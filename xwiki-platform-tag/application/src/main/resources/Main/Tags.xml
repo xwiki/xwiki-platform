@@ -12,8 +12,8 @@
 <customClass></customClass>
 <contentAuthor>XWiki.Admin</contentAuthor>
 <creationDate>1252454400000</creationDate>
-<date>1252454400000</date>
-<contentUpdateDate>1252454400000</contentUpdateDate>
+<date>1264723531000</date>
+<contentUpdateDate>1264723531000</contentUpdateDate>
 <version>1.1</version>
 <title>$msg.get("xe.tag.tags")</title>
 <template></template>
@@ -86,7 +86,7 @@
 <separators> ,|</separators>
 <size>1</size>
 <unmodifiable>0</unmodifiable>
-<values>onDemand=On demand|always=Always</values>
+<values>currentPage=Always on this page|onDemand=On demand|always=Always on this wiki</values>
 <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
 </use>
 </class>
@@ -186,15 +186,17 @@ $xwiki.ssx.use('Main.Dashboard')##
 ##
 #set($do = "$!{request.get('do')}")
 #set($tag = "$!{request.get('tag')}")
+#set($urlEscapedTag = $escapetool.url($tag))
+#set($htmlEscapedTag = $escapetool.html($tag))
 ##
 ## Macro displayTagAppTitle. Display level1 title of this app.
 ##
-#macro(displayTagAppTitle $tag $displayButtons)
+#macro(displayTagAppTitle $urlEscapedTag $htmlEscapedTag $displayButtons)
   &lt;h1 class="xapp"&gt;
     &lt;span class="highlight tag"&gt;
-      &lt;a href="$doc.getURL('view', "do=viewTag&amp;amp;tag=${tag}")"&gt;$tag&lt;/a&gt;
+      &lt;a href="$doc.getURL('view', "do=viewTag&amp;amp;tag=${urlEscapedTag}")"&gt;$htmlEscapedTag&lt;/a&gt;
       #if($xwiki.hasAdminRights() &amp;&amp; $displayButtons)
-        &lt;a href="$doc.getURL('view', "do=prepareRename&amp;amp;tag=${tag}")" class="button rename" rel="nofollow"&gt;Rename&lt;/a&gt;&amp;nbsp;&lt;a href="$doc.getURL('view', "do=prepareDelete&amp;amp;tag=${tag}")" class="button delete" rel="nofollow"&gt;Delete&lt;/a&gt;
+        &lt;a href="$doc.getURL('view', "do=prepareRename&amp;amp;tag=${urlEscapedTag}")" class="button rename" rel="nofollow"&gt;Rename&lt;/a&gt;&amp;nbsp;&lt;a href="$doc.getURL('view', "do=prepareDelete&amp;amp;tag=${urlEscapedTag}")" class="button delete" rel="nofollow"&gt;Delete&lt;/a&gt;
       #end
     &lt;/span&gt;
   &lt;/h1&gt;
@@ -208,21 +210,22 @@ $xwiki.ssx.use('Main.Dashboard')##
   ##
   ## View tag
   ##
-  #displayTagAppTitle($tag true)
+  #displayTagAppTitle($urlEscapedTag $htmlEscapedTag true)
   #if("$!{request.get('renamedTag')}" != '')
-    #info($msg.get('xe.tag.rename.success', [$request.get('renamedTag')]))
+    #set($htmlEscapedRenamedTag = $escapetool.html($request.get('renamedTag')))
+    #info($msg.get('xe.tag.rename.success', [$htmlEscapedRenamedTag]))
   #end
-  #set ($list = $xwiki.tag.getDocumentsWithTag($tag))
+  #set($list = $xwiki.tag.getDocumentsWithTag($tag))
   &lt;div&gt;
     &lt;div id="dashboardleft"&gt;
       &lt;div id="dashboardleftcontent"&gt;
-        &lt;h3 class="xapp"&gt;&lt;span&gt;$msg.get('xe.tag.alldocs', [$tag])&lt;/span&gt;&lt;/h3&gt;
+        &lt;h3 class="xapp"&gt;&lt;span&gt;$msg.get('xe.tag.alldocs', [$htmlEscapedTag])&lt;/span&gt;&lt;/h3&gt;
         #displayDocumentList($list true $blacklistedSpaces)
       &lt;/div&gt;
     &lt;/div&gt;
     &lt;div id="dashboardright"&gt;
       &lt;div id="dashboardrightcontent"&gt;
-        &lt;h3 class="xapp"&gt;&lt;span&gt;$msg.get("xe.tag.recentchanges", [$tag])&lt;/span&gt;&lt;/h3&gt;
+        &lt;h3 class="xapp"&gt;&lt;span&gt;$msg.get("xe.tag.recentchanges", [$htmlEscapedTag])&lt;/span&gt;&lt;/h3&gt;
         #set($rcTag = [$tag])
         #includeInContext('Main.RecentChanges')
     &lt;/div&gt;
@@ -233,12 +236,12 @@ $xwiki.ssx.use('Main.Dashboard')##
   ##
   ## Prepare rename tag
   ##
-  #displayTagAppTitle($tag false)
+  #displayTagAppTitle($urlEscapedTag $htmlEscapedTag false)
   &lt;form id="renameForm" action="$doc.getURL()" method="post"&gt;
    &lt;div&gt;
     &lt;input name="do" type="hidden" value="renameTag" /&gt;
-    &lt;input name="tag" type="hidden" value="$tag" /&gt;
-    $msg.get('xe.tag.rename.renameto', [$tag]) &lt;input type="text" name="renameTo" /&gt; &lt;span class="buttonwrapper"&gt;&lt;input type="submit" value="$msg.get('xe.tag.rename')"/&gt;&lt;/span&gt;
+    &lt;input name="tag" type="hidden" value="$htmlEscapedTag" /&gt;
+    $msg.get('xe.tag.rename.renameto', [$htmlEscapedTag]) &lt;input type="text" name="renameTo" /&gt; &lt;span class="buttonwrapper"&gt;&lt;input type="submit" value="$msg.get('xe.tag.rename')"/&gt;&lt;/span&gt;
    &lt;/div&gt;
   &lt;/form&gt;
 #elseif($do == 'renameTag')
@@ -251,22 +254,22 @@ $xwiki.ssx.use('Main.Dashboard')##
     #set($success = $xwiki.tag.renameTag($tag, $renameTo))
   #end
   #if ($success == true || $success == 'OK')
-   #set($encodedRenameTo = $util.encodeURI($renameTo))
-   #set($encodedTag = $util.encodeURI($tag))
-   $response.sendRedirect($doc.getURL('view', "do=viewTag&amp;tag=${encodedRenameTo}&amp;renamedTag=${encodedTag}"))
+   #set($urlEscapedRenameTo = $escapetool.url($renameTo))
+   $response.sendRedirect($doc.getURL('view', "do=viewTag&amp;tag=${urlEscapedRenameTo}&amp;renamedTag=${urlEscapedTag}"))
   #else
-    #error($msg.get('xe.tag.rename.failure', [$tag, $renameTo]))
+    #set($htmlEscapedRenameTo = $escapetool.html($renameTo))
+    #error($msg.get('xe.tag.rename.failure', [$htmlEscapedTag, $htmlEscapedRenameTo]))
   #end
 #elseif($do == 'prepareDelete')
   ##
   ## Prepare delete tag
   ##
-  #displayTagAppTitle($tag false)
+  #displayTagAppTitle($urlEscapedTag $htmlEscapedTag false)
   &lt;form id="deleteForm" action="$doc.getURL()" method="post"&gt;
    &lt;div&gt;
     &lt;input name="do" type="hidden" value="deleteTag" /&gt;
-    &lt;input name="tag" type="hidden" value="$tag" /&gt;
-    &lt;span class="buttonwrapper"&gt;&lt;input type="submit" value="$msg.get("xe.tag.delete", [$tag])" /&gt;&lt;/span&gt;
+    &lt;input name="tag" type="hidden" value="$htmlEscapedTag" /&gt;
+    &lt;span class="buttonwrapper"&gt;&lt;input type="submit" value="$msg.get("xe.tag.delete", [$htmlEscapedTag])" /&gt;&lt;/span&gt;
    &lt;/div&gt;
   &lt;/form&gt;
 #elseif($do == 'deleteTag')
@@ -275,19 +278,19 @@ $xwiki.ssx.use('Main.Dashboard')##
   ##
   #set($success = $xwiki.tag.deleteTag($tag))
   #if ($success == true || $success == 'OK')
-    #set($encodedTag = $util.encodeURI($tag))
-    $response.sendRedirect($doc.getURL('view', "deletedTag=${encodedTag}"))
+    $response.sendRedirect($doc.getURL('view', "deletedTag=${urlEscapedTag}"))
   #else
-    #error($msg.get('xe.tag.delete.failure', [$tag]))
+    #error($msg.get('xe.tag.delete.failure', [$htmlEscapedTag]))
   #end
 #else
   ##
   ## View all tags (Tag Cloud)
   ##
   #set($tags = $xwiki.tag.getTags(true))
-  #set ($title = 'All Tags')
+  #set($title = 'All Tags')
   #if("$!{request.get('deletedTag')}" != '')
-    #info($msg.get('xe.tag.delete.success', [$request.get('deletedTag')]))
+    #set($htmlEscapedTag = $escapetool.html($request.get('deletedTag')))
+    #info($msg.get('xe.tag.delete.success', [$htmlEscapedTag]))
   #end
   #set($docextras = [])
   #includeInContext("XWiki.TagCloud")

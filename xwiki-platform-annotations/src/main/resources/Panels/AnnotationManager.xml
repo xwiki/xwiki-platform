@@ -12,8 +12,8 @@
 <customClass></customClass>
 <contentAuthor>XWiki.Admin</contentAuthor>
 <creationDate>1240502446000</creationDate>
-<date>1264594033000</date>
-<contentUpdateDate>1264594033000</contentUpdateDate>
+<date>1264783514000</date>
+<contentUpdateDate>1264783514000</contentUpdateDate>
 <version>1.0</version>
 <title></title>
 <template></template>
@@ -107,7 +107,7 @@
 #if($active)
   ## the annotation form, hidden by default which will be made visible by the client js upon annotation add
   &lt;div id="annotationPanel" style="display:none"&gt;
-    &lt;label for="annotationInput"&gt;Annotation :&amp;nbsp;&lt;/label&gt;
+    &lt;label for="annotationInput" class="annotation-label"&gt;Annotation :&amp;nbsp;&lt;/label&gt;
     &lt;textarea cols="10" rows="5" id="annotationInput" name="annotationInput" value="test"&gt;&lt;/textarea&gt;
     &lt;span class="buttonwrapper"&gt;&lt;input type="submit" id="annotationRequest" name="annotationRequest" class="button" value="Annotate" /&gt;&lt;/span&gt;
     &lt;span class="buttonwrapper"&gt;&lt;input type="submit" id="cancelRequest" name="cancelRequest" class="button" value="Cancel" /&gt;&lt;/span&gt;
@@ -264,14 +264,9 @@ XWiki.Annotation = function() {
     this.annotationText = '';
 
     // Setting up listeners
-    document.observe('keydown', this.onKeyDown);
-    document.observe('keyup', this.onKeyUp);
     document.observe('mouseup', this.onMouseUp);
-    Element.observe($('annotationRequest'), 'click',
-            this.onAddAnnotationRequest);
-    Element
-            .observe($('cancelRequest'), 'click',
-                    this.onCancelAnnotationRequest);
+    Element.observe($('annotationRequest'), 'click', this.onAddAnnotationRequest);
+    Element.observe($('cancelRequest'), 'click', this.onCancelAnnotationRequest);
 };
 
 XWiki.Annotation.prototype = {
@@ -351,10 +346,10 @@ XWiki.Annotation.prototype = {
                     node.parentNode);
         }
         parent = node.parentNode;
-        for ( var i = 0; i &lt; parent.childNodes.length
-                &amp;&amp; parent.childNodes[i] != node; ++i) {
-            text += XWiki.Annotation.getInstance()
-                    .getText(parent.childNodes[i]);
+        if (parent.childNodes) {
+          for ( var i = 0; i &lt; parent.childNodes.length &amp;&amp; parent.childNodes[i] != node; ++i) {
+              text += XWiki.Annotation.getInstance().getText(parent.childNodes[i]);
+          }
         }
         return text;
     },
@@ -725,32 +720,24 @@ XWiki.Annotation.prototype = {
     },
 
     /* Events Management */
-    onKeyDown : function(event) {
-        if (event.keyCode == 17 || event.keyCode == 91) {
-            window.getSelection().removeAllRanges();
-            XWiki.Annotation.getInstance().onAnnotationFlag = 1;
-        }
-    },
-
-    onKeyUp : function(event) {
-        if (event.keyCode == 17 || event.keyCode == 91) {
-            XWiki.Annotation.getInstance().onAnnotationFlag = 0;
-        }
-    },
-
     onMouseUp : function(event) {
-        if (XWiki.Annotation.getInstance().onAnnotationFlag == 1) {
-            var initialRange = window.getSelection().getRangeAt(0);
-            XWiki.Annotation.getInstance().selection = initialRange.toString();
-            var contextInfos = XWiki.Annotation.getInstance().getContextInfos(
-                    initialRange);
-            XWiki.Annotation.getInstance().context = contextInfos.co;
-            XWiki.Annotation.getInstance().intraOffset = contextInfos.off;
-            XWiki.Annotation.getInstance().showAnnotationInputPanel(
-                    event.screenX, event.screenY);
-        } else if (window.getSelection().rangeCount == 0
-                || window.getSelection().getRangeAt(0).toString() == ''
-                || XWiki.Annotation.getInstance().selection != '') {
+        if (XWiki.Annotation.getInstance().onAnnotationFlag == 1 || event.ctrlKey || event.altKey) {
+            if (window.getSelection) {
+              // ff selection
+              var initialRange = window.getSelection().getRangeAt(0);
+              XWiki.Annotation.getInstance().selection = initialRange.toString();
+              var contextInfos = XWiki.Annotation.getInstance().getContextInfos(initialRange);
+              XWiki.Annotation.getInstance().context = contextInfos.co;
+              XWiki.Annotation.getInstance().intraOffset = contextInfos.off;
+            } else {
+              var selectedText = document.selection.createRange().text;
+              XWiki.Annotation.getInstance().selection = selectedText;
+              XWiki.Annotation.getInstance().context = selectedText;
+              XWiki.Annotation.getInstance().intraOffset = 0;
+            }
+            XWiki.Annotation.getInstance().showAnnotationInputPanel(event.screenX, event.screenY);
+        } else {
+            // hide the annotation panel
             var node = event.target;
             while (node != $('annotationPanel') &amp;&amp; node != $('xwikicontent')
                     &amp;&amp; node != null) {
@@ -905,6 +892,10 @@ XWiki.Annotation.getInstance = function() {
 /* annotation panel buttons style */
 #annotationResume .button {
   margin-top: 3px;
+}
+
+label.annotation-label {
+  display: block;
 }</code>
 </property>
 <property>

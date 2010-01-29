@@ -2192,15 +2192,26 @@ $request.getSession().setAttribute("com.xpn.xwiki.wysiwyg.input", $wysiwygInput)
 #if("$!propertyId" == "content")
 #wysiwyg_input("content" $editedDocument.content)
 #else
-## Let's extract the class name, the object index and the property name from the property identifier.
-#set($propertyNamePos = $propertyId.lastIndexOf("_"))
-#set($propertyName = $propertyId.substring($util.add($propertyNamePos, 1)))
-#set($objectIndexPos = $propertyId.lastIndexOf("_", $util.add($propertyNamePos, -1)))
-#set($objectIndex = $util.parseInt($propertyId.substring($util.add($objectIndexPos, 1), $propertyNamePos)))
-#set($className = $propertyId.substring(0, $objectIndexPos))
-#set($propertyValue = $editedDocument.getObject($className, $objectIndex).getProperty($propertyName).getValue())
+#set($found = false)
+#foreach($entry in $editedDocument.xWikiObjects.entrySet())
+## If class name matches..
+#if($propertyId.startsWith("${entry.key}_"))
+#foreach($object in $entry.value)
+#set($classNameAndObjectNumber = $entry.key + '_' + $object.number + '_')
+## If object number matches..
+#if($propertyId.startsWith($classNameAndObjectNumber))
+#set($propertyName = $propertyId.substring($classNameAndObjectNumber.length()))
 ## Make sure the property value is always a string. Use the empty string for unset properties.
-#wysiwyg_input($propertyId "$!propertyValue")
+#wysiwyg_input($propertyId "$!{object.getProperty($propertyName).getValue()}")
+#set($found = true)
+#break
+#end ## If object number matches..
+#end ## foreach object
+#if($found)
+#break
+#end
+#end ## If class name matches..
+#end ## foreach class name
 #end
 #end
 

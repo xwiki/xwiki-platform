@@ -103,16 +103,18 @@
 #set($spaces = $xwiki.spaces)
 #set($first = true)
 #foreach($space in $spaces)
-#if($first)
-#set($first = false)
-#else
-&lt;span class="pitemseparator"&gt;|&lt;/span&gt;
-#end
-#if($space == $doc.space)
-&lt;span class="panelitem currentspace"&gt;[$space&gt;${space}.WebHome]&lt;/span&gt;
-#else
-&lt;span class="panelitem"&gt;[$space&gt;${space}.WebHome]&lt;/span&gt;
-#end
+  #if ($hasAdmin || ($xwiki.hasAccessLevel('view', "${space}.WebHome") &amp;&amp; !$blacklistedSpaces.contains($space)))
+    #if($first)
+      #set($first = false)
+    #else
+      &lt;span class="pitemseparator"&gt;|&lt;/span&gt;
+    #end
+    #if($space == $doc.space)
+      &lt;span class="panelitem currentspace"&gt;[$space&gt;${space}.WebHome]&lt;/span&gt;
+    #else
+      &lt;span class="panelitem"&gt;[$space&gt;${space}.WebHome]&lt;/span&gt;
+    #end
+  #end
 #end
 #panelfooter()</content>
 </property>

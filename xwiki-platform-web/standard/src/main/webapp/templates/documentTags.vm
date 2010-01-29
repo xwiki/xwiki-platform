@@ -6,7 +6,7 @@
 ##
 ##
 #macro(displayTag $tag)
-  <span class="tag-wrapper"><span class="tag"><a href="$xwiki.getURL('Main.Tags', 'view', "do=viewTag&amp;tag=$escapetool.url($tag)")">$escapetool.html($tag)</a></span>#if($hasedit)<span class="separator">[</span><a href="$doc.getURL('view', "xpage=documentTags&amp;xaction=delete&amp;tag=${tag}&amp;xredirect=${xredirect}")" class="tag-tool tag-delete" title="$msg.get('core.tags.remove.tooltip')">X</a><span class="separator">]</span>#end</span>
+  <span class="tag-wrapper"><span class="tag"><a href="$xwiki.getURL('Main.Tags', 'view', "do=viewTag&amp;tag=$escapetool.url($tag)")">$escapetool.html($tag)</a></span>#if($hasedit)<span class="separator">[</span><a href="$doc.getURL('view', "xpage=documentTags&amp;xaction=delete&amp;tag=$escapetool.url($tag)&amp;xredirect=${xredirect}")" class="tag-tool tag-delete" title="$msg.get('core.tags.remove.tooltip')">X</a><span class="separator">]</span>#end</span>
 #end
 ##
 #macro(removeTag $tag)

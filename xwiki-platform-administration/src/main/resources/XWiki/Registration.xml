@@ -12,8 +12,8 @@
 <customClass></customClass>
 <contentAuthor>XWiki.Admin</contentAuthor>
 <creationDate>1264284581000</creationDate>
-<date>1264544372000</date>
-<contentUpdateDate>1264544372000</contentUpdateDate>
+<date>1264742739000</date>
+<contentUpdateDate>1264742739000</contentUpdateDate>
 <version>1.1</version>
 <title>Registration</title>
 <template></template>
@@ -427,6 +427,13 @@ $xwiki.get("ssfx").use('uicomponents/widgets/validation/livevalidation.css')
 #if($context.getAction() == "edit")
   $response.sendRedirect("$xwiki.getURL($doc.getFullName(), 'edit')?editor=wiki")
 #end
+##
+## Access level to register must be explicitly checked because it is only checked in XWiki.prepareDocuments
+## and this page is accessible through view action.
+#if(!$xcontext.hasAccessLevel("register", $doc.getFullName))
+  $response.sendRedirect("$xwiki.getURL($doc.getFullName(), 'login')")
+#end
+##
 ## Removing this opens a reflective XSS hole because url parameters are put into fields.
 #blockXSS()
 ## Display the heading

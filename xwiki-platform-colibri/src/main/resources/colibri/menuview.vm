@@ -76,7 +76,7 @@
     #submenuitem("$doc.getURL('view', 'xpage=createdocument&amp;tocreate=page')&amp;parent=$doc.fullName" $msg.get('core.menu.create.page') 'tmCreatePage', '')
     ## Only display the Office Importer menu action if the Office Importer application is installed
     #set($officeImporterMainDocument = $xwiki.getDocument('XWiki.OfficeImporter'))
-    #if (!$officeImporterMainDocument.isNew())
+    #if("$!{officeImporterMainDocument.isNew()}" == 'false')
       #submenuitem($officeImporterMainDocument.getURL('view', "&amp;parent=$doc.fullName") $msg.get('core.menu.create.pageFromOffice') 'tmCreatePageFromOffice', '')
     #end
   #end

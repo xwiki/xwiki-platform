@@ -15,7 +15,7 @@
 <date>1184180501000</date>
 <contentUpdateDate>1184180501000</contentUpdateDate>
 <version>1.1</version>
-<title></title>
+<title>Quick Links Panel</title>
 <template></template>
 <defaultTemplate></defaultTemplate>
 <validationScript></validationScript>
@@ -114,7 +114,7 @@
 <description>Important Navigation Links</description>
 </property>
 <property>
-<name>QuickLinks</name>
+<name>Quick Links</name>
 </property>
 <property>
 <type>view</type>

@@ -15,7 +15,7 @@
 <date>1232045491000</date>
 <contentUpdateDate>1232045491000</contentUpdateDate>
 <version>1.1</version>
-<title>Unpublished blog posts panel</title>
+<title>Unpublished Blog Posts Panel</title>
 <template></template>
 <defaultTemplate></defaultTemplate>
 <validationScript></validationScript>
@@ -124,7 +124,7 @@
 <description>Shows the most recent unpublished blog entries.</description>
 </property>
 <property>
-<name>Blog.UnpublishedPanel</name>
+<name>Unpublished Blog Posts</name>
 </property>
 <property>
 <type>view</type>

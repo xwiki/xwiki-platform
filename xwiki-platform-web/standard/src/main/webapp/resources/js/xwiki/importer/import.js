@@ -29,7 +29,7 @@
      * We hijack clicks on package names links, to display the rich importer UI since javascript is available.
      * If javascript is not available, links remains true synchronous HTTP links and the less-rich UI is displayed.
      *
-     * FIXME: right now disabled for IE browsers until the rich UI is fully debugged for those
+     * FIXME: right now disabled for IE6 - until the rich UI is fully debugged for this browser
      */
     if (!browser.isIE6x) {
       document.observe("dom:loaded", function(){

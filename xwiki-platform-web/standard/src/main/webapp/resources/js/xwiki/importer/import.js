@@ -270,8 +270,11 @@
               // Refuse to import since no document remains selected.
               // Displays a warning and exit.
               var warning = new Element("span", {'class':'warningmessage'}).update( translations["selectionEmpty"] );
-              $$('div#packagecontainer div.packagesubmit input').last().insert({'after' : warning});
-              Element.remove.delay(5, warning);
+              if (!$("packagecontainer").down("div.packagesubmit span.warningmessage")) {
+                 // Display the warning only if not present yet in the DOM (in case the user clicks like a maniac).
+                 $('packagecontainer').select('div.packagesubmit input').last().insert({'after' : warning});
+                 Element.remove.delay(5, warning);
+              }
 
               return;
             }
@@ -516,7 +519,16 @@
             var total = this.countDocumentsInSpace(spaceName);
             var selected = this.countSelectedDocumentsInSpace(spaceName);
             
-            container.down(".selection").update(selected + " / " + total + " " + translations["documentSelected"]);     
+            container.down(".selection").update(selected + " / " + total + " " + translations["documentSelected"]);
+
+            if (selected == 0) {
+              // If all document checkboxes have been unchecked, ensure that the space box is unchecked as well
+              container.down("input.space").uncheck();
+            }
+            else {
+              // At least one document box is checked, let's make sure the space box is too
+              container.down("input.space").check();
+            } 
         },
         
         /**

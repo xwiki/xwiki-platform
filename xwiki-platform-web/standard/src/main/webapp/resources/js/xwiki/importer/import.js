@@ -33,8 +33,7 @@
      */
     if (!browser.isIE6x) {
       document.observe("dom:loaded", function(){
-        $$("#packagelistcontainer ul.xlist li.xitem a.package").each(function(pack) {
-          pack.observe("click", function(event){
+        $$("#packagelistcontainer ul.xlist li.xitem a.package").invoke("observe", "click", function(event) {
             var a = event.element(), file = a.href.substring(a.href.indexOf("&file=") + 6);
 
             event.stop(); // prevent loading the link.
@@ -46,7 +45,6 @@
             // Create a package explorer widget to let the user browse
             // and select/unselect the documents he wants.          
             new PackageExplorer( "packagecontainer", decodeURIComponent(file) );        
-          });
         });
       });
     }

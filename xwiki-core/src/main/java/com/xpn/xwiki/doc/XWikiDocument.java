@@ -3534,7 +3534,7 @@ public class XWikiDocument implements DocumentModelBridge
         setDocumentReference(new DocumentReference(reference));
 
         String parent = getElement(docel, "parent");
-        if (parent != null) {
+        if (StringUtils.isNotEmpty(parent)) {
             setParentReference(this.currentMixedDocumentReferenceResolver.resolve(parent));
         }
 

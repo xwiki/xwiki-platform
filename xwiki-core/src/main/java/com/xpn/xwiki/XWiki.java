@@ -68,6 +68,7 @@ import org.apache.commons.httpclient.auth.AuthScope;
 import org.apache.commons.httpclient.methods.GetMethod;
 import org.apache.commons.httpclient.util.URIUtil;
 import org.apache.commons.lang.RandomStringUtils;
+import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -5354,7 +5355,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface
 
     public String getUserName(String user, String format, boolean link, XWikiContext context)
     {
-        if (user == null || user.trim().equals("")) {
+        if (StringUtils.isBlank(user)) {
             return "";
         }
         XWikiDocument userdoc = null;
@@ -5388,10 +5389,10 @@ public class XWiki implements XWikiDocChangeNotificationInterface
             }
 
             if (link == false) {
-                return text.trim();
+                return StringEscapeUtils.escapeXml(text.trim());
             } else {
-                return "<span class=\"wikilink\"><a href=\"" + userdoc.getURL("view", context) + "\">" + text.trim()
-                    + "</a></span>";
+                return "<span class=\"wikilink\"><a href=\"" + userdoc.getURL("view", context) + "\">"
+                    + StringEscapeUtils.escapeXml(text.trim()) + "</a></span>";
             }
         } catch (Exception e) {
             LOG.error("Failed to get user profile page", e);

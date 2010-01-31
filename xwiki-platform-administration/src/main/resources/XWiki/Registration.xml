@@ -398,6 +398,16 @@ $xwiki.get("ssfx").use('uicomponents/widgets/validation/livevalidation.css')
   })
 #set($discard = $fields.add($field))
 ##
+## Pass the redirect parameter on so that the login page may redirect to the right place.
+## Not necessary in Firefox 3.0.10 or Opera 9.64, I don't know about IE or Safari.
+#set($field = 
+  {'name' : $redirectParam,
+    'params' : {
+      'type' : 'hidden'
+    }
+  })
+#set($discard = $fields.add($field))
+##
 ## Allow permitted users to configure this application.
 #if($xcontext.getUser() != "XWiki.XWikiGuest")
   ## If this document doesn't exist then we are going to ASSUME that we are using registerinline.vm and it's pointing to XWiki.Registration...
@@ -423,7 +433,6 @@ $xwiki.get("ssfx").use('uicomponents/widgets/validation/livevalidation.css')
 #######################################################################
 ##
 ## This application's HTML is dynamically generated and editing in WYSIWYG would not work
-## Also blockXSS redirects causeing an infinite loop (http://jira.xwiki.org/jira/browse/XWIKI-4211)
 #if($context.getAction() == "edit")
   $response.sendRedirect("$xwiki.getURL($doc.getFullName(), 'edit')?editor=wiki")
 #end
@@ -434,8 +443,6 @@ $xwiki.get("ssfx").use('uicomponents/widgets/validation/livevalidation.css')
   $response.sendRedirect("$xwiki.getURL($doc.getFullName(), 'login')")
 #end
 ##
-## Removing this opens a reflective XSS hole because url parameters are put into fields.
-#blockXSS()
 ## Display the heading
 $heading
 ## If the submit button has been pressed, then we test the input and maybe create the user.
@@ -599,11 +606,9 @@ $heading
         {{html clean=false}}
           &lt;form id="loginForm" action="$loginURL" method="post"&gt;
             &lt;div&gt;
-            &lt;input id="j_username" name="j_username" type="hidden" value="$!userName" /&gt;
-            &lt;input id="j_password" name="j_password" type="hidden" value="$!password" /&gt;
-            #if(!$request.get($redirectParam))
-              &lt;input id="$redirectParam" name="$redirectParam" type="hidden" value="$defaultRedirect" /&gt;
-            #end
+            &lt;input id="j_username" name="j_username" type="hidden" value="$escapetool.html($!userName)" /&gt;
+            &lt;input id="j_password" name="j_password" type="hidden" value="$escapetool.html($!password)" /&gt;
+            &lt;input id="$redirectParam" name="$redirectParam" type="hidden" value="$escapetool.html($defaultRedirect)" /&gt;
             &lt;span class="buttonwrapper" style="margin-left:47%;"&gt;
               &lt;input type="submit" value="$msg.get('login')" class="button"/&gt;
             &lt;/span&gt;
@@ -661,7 +666,7 @@ $heading
             #foreach($entry in $params.entrySet())
               ## If a parameter is specified as '' then we don't include it.
               #if($entry.getValue() != '')
-                $entry.getKey()="$entry.getValue()"
+                $entry.getKey()="$escapetool.html($entry.getValue())"
               #end
             #end
           #end
@@ -767,31 +772,6 @@ $heading
           #set($params = $field.get('params'))
         #end
         #set($discard = $params.put('value', $request.get($field.get('name'))))
-      #end
-    #end
-  #end
-#end
-#*
- * Block XSS
- *
- * We must prevent non-persistent XSS by not getting parameters if the request is not a post
- * or if the referer header is not this page.
- * Imagine a link such as .../XWiki/Register?register_first_name=&lt;script&gt;badScript&lt;/script&gt;
- *#
-#macro(blockXSS)
-  #if($request.getParameterMap().size() &gt; 0)
-    #if($request.getHeader('referer') != $xwiki.getRequestURL() || $request.getMethod() != 'POST')
-      ## If there is a redirect to send after registration is over, preserve it.
-      #set($redirect = $request.getParameter($redirectParam))
-      #if($redirect)
-        ## There is a redirect parameter, if that is not the only parameter, then send a redirect with 
-        ## xredirect being the only parameter.
-        #if($request.getParameterMap().size() &gt; 1)
-          $response.sendRedirect("$request.getRequestURI()?$!redirectParam=$!redirect")
-        #end
-      #else
-        ## There is no redirect parameter, no parameters are acceptable.
-        $response.sendRedirect($request.getRequestURI())
       #end
     #end
   #end

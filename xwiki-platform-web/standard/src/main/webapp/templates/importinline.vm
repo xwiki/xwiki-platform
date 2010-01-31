@@ -60,11 +60,11 @@
     <h4 class="legend">$msg.get('core.importer.availablePackages')</h4>
     <div id="packagelistcontainer">
       #if($attachments.size() > 0)
-      <ul class="xlist" style="text-indent:0px">
+      <ul class="xlist">
         #foreach ($attach in $attachments)
           #set($url = $doc.getURL("import", "${baseQueryString}&amp;file=${attach.filename}"))
           #if("$!request.file" == "$!attach.filename") #set($extra = "active") #else #set($extra = "") #end
-          <li class="xitem xhighlight" style="text-indent:0px">
+          <li class="xitem xhighlight">
             <div class="xitemcontainer package $!extra">
               <div class="name">
                 <a href="$!url" class="package" title="$msg.get("core.importer.selectThisPackage")">

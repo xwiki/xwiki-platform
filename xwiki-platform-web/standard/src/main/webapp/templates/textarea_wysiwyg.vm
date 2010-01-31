@@ -23,7 +23,7 @@
 </script>
 #elseif($xwiki.wysiwyg.isSyntaxSupported($doc.syntaxId))
 ## Load the rich text object properties using a compact WYSIWYG editor.
-#wysiwyg_editProperties($tdoc $editors false)
+#wysiwyg_editProperties($doc $editors false)
 #else
 #warning("The new GWT-based WYSIWYG editor doesn't support the syntax of the current document: <em>$doc.syntaxId</em>.")
 #end

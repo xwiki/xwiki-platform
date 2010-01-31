@@ -22,6 +22,10 @@ ul.xlist li.xunderline {
   margin: 0;
 }
 
+div.loading {
+  min-height:200px;
+}
+
 /* Package List  styles */
 #packagelist {
   float: left;

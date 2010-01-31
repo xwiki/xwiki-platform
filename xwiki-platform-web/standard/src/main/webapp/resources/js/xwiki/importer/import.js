@@ -141,7 +141,6 @@
             // Request the server for information about the desired package,
             // and bind the response to the proper callbacks (success or failure).
             this.node.addClassName("loading");
-            this.node.setStyle("min-height:200px");
             var ajx = new PackageInformationRequest(name,{
               onSuccess: this.onPackageInfosAvailable.bind(this),
               onFailure: this.onPackageInfosRequestFailed.bind(this)

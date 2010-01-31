@@ -588,13 +588,13 @@ $heading
     #set($userName = $!request.get('xwikiname'))
     #set($password = $!request.get('register_password'))
     #set($loginURL = $xwiki.getURL($loginPage, $loginAction))
+    #if($request.getParameter($redirectParam))
+      #set($redirect = $request.getParameter($redirectParam))
+    #else
+      #set($redirect = $defaultRedirect)
+    #end
     ## Send redirect to loginsubmit page with credentials.
     #if($autoLogin)
-      #if($request.getParameter($redirectParam))
-        #set($redirect = $request.getParameter($redirectParam))
-      #else
-        #set($redirect = $defaultRedirect)
-      #end
       $response.sendRedirect("$loginURL?j_username=$!userName&amp;j_password=$!password&amp;$redirectParam=$!redirect");
       ##
     #else
@@ -608,7 +608,7 @@ $heading
             &lt;div&gt;
             &lt;input id="j_username" name="j_username" type="hidden" value="$escapetool.html($!userName)" /&gt;
             &lt;input id="j_password" name="j_password" type="hidden" value="$escapetool.html($!password)" /&gt;
-            &lt;input id="$redirectParam" name="$redirectParam" type="hidden" value="$escapetool.html($defaultRedirect)" /&gt;
+            &lt;input id="$redirectParam" name="$redirectParam" type="hidden" value="$escapetool.html($redirect)" /&gt;
             &lt;span class="buttonwrapper" style="margin-left:47%;"&gt;
               &lt;input type="submit" value="$msg.get('login')" class="button"/&gt;
             &lt;/span&gt;

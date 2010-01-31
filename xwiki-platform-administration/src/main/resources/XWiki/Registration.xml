@@ -83,17 +83,16 @@ $xwiki.get("ssfx").use('uicomponents/widgets/validation/livevalidation.css')
 ## LiveValidation field ok message
 #set($defaultFieldOkayMessage = $msg.get('XWiki.Registration.fieldOkay'))
 ##
-## You can automatically log the user in after registration by using a redirect but it sends 
-## the username and password in a get request to the login action so in the event that the login
-## fails, the password will be shown in the address bar and in browser history.
-## Turned off by default.
-## #set($autoLogin = true)
-##
 ## After the registration you can provide a login button for the user to be able to login,
 ## this requires passing back the username and password in html into hidden fields.
 ## Disable this and set password fields to 'noReturn' if your security policy precludes passing
 ## passwords back in html.
 #set($loginButton = true)
+##
+## You can automatically log the user in after registration by using a piece of Javascript which
+## pushes the button for them, loginButton must be turned on for this to work.
+## Turned off by default.
+## #set($autoLogin = true)
 ##
 ## After the user is logged in this is the page they are redirected to if no redirect parameter is
 ## passed to the registration application. Currently set to the main page.
@@ -593,29 +592,30 @@ $heading
     #else
       #set($redirect = $defaultRedirect)
     #end
-    ## Send redirect to loginsubmit page with credentials.
-    #if($autoLogin)
-      $response.sendRedirect("$loginURL?j_username=$!userName&amp;j_password=$!password&amp;$redirectParam=$!redirect");
-      ##
-    #else
-      ## Display a "registration successful" message
-      #set($fullName = "$request.get('register_first_name') $request.get('register_last_name')")
-      {{info}}$msg.get('core.register.successful', ["[[$fullName&gt;&gt;$userSpace$userName]]", $userName]){{/info}}
-      ## Give the user a login button which posts their username and password to loginsubmit
-      #if($loginButton)
-        {{html clean=false}}
-          &lt;form id="loginForm" action="$loginURL" method="post"&gt;
-            &lt;div&gt;
-            &lt;input id="j_username" name="j_username" type="hidden" value="$escapetool.html($!userName)" /&gt;
-            &lt;input id="j_password" name="j_password" type="hidden" value="$escapetool.html($!password)" /&gt;
-            &lt;input id="$redirectParam" name="$redirectParam" type="hidden" value="$escapetool.html($redirect)" /&gt;
-            &lt;span class="buttonwrapper" style="margin-left:47%;"&gt;
-              &lt;input type="submit" value="$msg.get('login')" class="button"/&gt;
-            &lt;/span&gt;
-            &lt;/div&gt;
-          &lt;/form&gt;
-        {{/html}}
-      #end
+    ## Display a "registration successful" message
+    #set($fullName = "$request.get('register_first_name') $request.get('register_last_name')")
+    {{info}}$msg.get('core.register.successful', ["[[$fullName&gt;&gt;$userSpace$userName]]", $userName]){{/info}}
+    ## Give the user a login button which posts their username and password to loginsubmit
+    #if($loginButton)
+      {{html clean=false}}
+        &lt;form id="loginForm" action="$loginURL" method="post"&gt;
+          &lt;div&gt;
+          &lt;input id="j_username" name="j_username" type="hidden" value="$escapetool.html($!userName)" /&gt;
+          &lt;input id="j_password" name="j_password" type="hidden" value="$escapetool.html($!password)" /&gt;
+          &lt;input id="$redirectParam" name="$redirectParam" type="hidden" value="$escapetool.html($redirect)" /&gt;
+          &lt;span class="buttonwrapper" style="margin-left:47%;"&gt;
+            &lt;input type="submit" value="$msg.get('login')" class="button"/&gt;
+          &lt;/span&gt;
+          &lt;/div&gt;
+        &lt;/form&gt;
+        #if($autoLogin)
+          &lt;script type='text/javascript'&gt;
+            document.observe('dom:loaded', function() {
+              document.forms['loginForm'].submit();
+            });
+          &lt;/script&gt;
+        #end
+      {{/html}}
     #end
   #end
   ##

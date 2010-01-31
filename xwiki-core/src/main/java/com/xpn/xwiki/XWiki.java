@@ -5565,12 +5565,14 @@ public class XWiki implements XWikiDocChangeNotificationInterface
                         + context.getDoc().getPrefixedFullName() + ">", vcontext, context);
             }
 
-            if (link == false) {
-                return StringEscapeUtils.escapeXml(text.trim());
-            } else {
-                return "<span class=\"wikilink\"><a href=\"" + userdoc.getURL("view", context) + "\">"
-                    + StringEscapeUtils.escapeXml(text.trim()) + "</a></span>";
+            text = StringEscapeUtils.escapeXml(text.trim());
+
+            if (link) {
+                text =
+                    "<span class=\"wikilink\"><a href=\"" + userdoc.getURL("view", context) + "\">" + text
+                        + "</a></span>";
             }
+            return text;
         } catch (Exception e) {
             LOG.error("Failed to get user profile page", e);
 

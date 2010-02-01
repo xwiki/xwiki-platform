@@ -1481,10 +1481,11 @@ ${Msz}Mb##
  *                  "email" : { "type" : "text" , "size" : 20, "link" : "editor"},
  *                  "_avatar" : { "type" : "none" , "size" : 20, "link" : "none", "html" : "true", "sortable":false }
  *                })
- * #set($options = { "className":"XWiki.XWikiUsers",
+ * #set($options = {  "className":"XWiki.XWikiUsers",
  *                    "translationPrefix" : "xe.index.users.",
  *                    "tagCloud" : true,
  *                    "rowCount": 15,
+ *                    "javascriptName" : "MyModule.myTable",
  *                    "description: "The description of this table here", })
  * #livetable("userstable" $columns $columnsProperties $options)
  * {{/velocity}}
@@ -1518,6 +1519,7 @@ ${Msz}Mb##
   #if("$!options.selectedColumn" != "") #set($selectedColumn = $options.selectedColumn) #end
   #if("$!options.callback" != "") #set($callback = $options.callback) #end
   #if("$!options.tagCloud" == "" || $options.tagCloud == false) #set($tagcloud=false) #else #set($tagcloud = true) #end
+  #if("$!options.javascriptName" != "") #set($jsName = $options.javascriptName) #else #set($jsName = "livetable") #end
   #set($classname = "$!options.className")
   #set($extraparams = "$!options.extraParams")
   ##
@@ -1665,9 +1667,9 @@ ${Msz}Mb##
   <script type="text/javascript">
   //<![CDATA[
   #if($callback)
-    var ta = new XWiki.widgets.LiveTable("$dataurl", "${divid}", $callback ,{"maxPages":$maxPages, "limit":$count});
+    $jsName = new XWiki.widgets.LiveTable("$dataurl", "${divid}", $callback ,{"maxPages":$maxPages, "limit":$count});
   #else
-    var ta = new XWiki.widgets.LiveTable("$dataurl", "${divid}", #livetablecallback($divid $collist $colprops $transprefix) ,{"maxPages":$maxPages, "limit":$count});
+    $jsName = new XWiki.widgets.LiveTable("$dataurl", "${divid}", #livetablecallback($divid $collist $colprops $transprefix) ,{"maxPages":$maxPages, "limit":$count});
   #end
    //]]>
   </script>

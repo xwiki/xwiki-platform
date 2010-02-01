@@ -249,7 +249,7 @@ XWiki.Annotation = Class.create({
 
   fetchAnnotations : function(andShow) {
     // TODO: fixme, get the URL in a less hardcoded way
-    var getAnnotationsURL = '/xwiki/rest/wikis/' + XWiki.currentWiki + '/spaces/' + XWiki.currentSpace + '/pages/' + $$('meta[name=page]')[0].content + '/annotation?media=json';
+    var getAnnotationsURL = '/xwiki/rest/wikis/' + XWiki.currentWiki + '/spaces/' + XWiki.currentSpace + '/pages/' + $$('meta[name=page]')[0].content + '/annotations?media=json';
     new Ajax.Request(getAnnotationsURL, {method: 'GET',
       onCreate: function() {
         // show nice loading message at page bottom
@@ -259,17 +259,17 @@ XWiki.Annotation = Class.create({
       onSuccess: function(response) {
         // TODO: check this response to see what's inside
         // TODO: store the annotated element in a different way, to have it the same in the instance (when it's an object prop for example)
-        $('xwikicontent').update(response.responseJSON.source);
+        $('xwikicontent').update(response.responseJSON.content);
         // and display the annotations
-        if (andShow) {
-          this.toggleAnnotations(true);
-        }
         // hide message at page bottom
         this._x_notification.hide();
         // store the state of the annotations
         this.fetchedAnnotations = true;
         if (response.responseJSON.annotations) {
           this.addAnnotationMarkers(response.responseJSON.annotations);
+        }
+        if (andShow) {
+          this.toggleAnnotations(true);
         }
       }.bind(this),
 
@@ -344,7 +344,8 @@ XWiki.Annotation = Class.create({
         return;
       }
       var lastSpan = allSpans[allSpans.size() - 1];
-      var markerSpan = new Element('span', {'id': 'ID' + item.annotationId, 'class' : 'annotation-marker ' + item.state});
+      // create the annotation markers hidden by default, since annotations are added on the document hidden by default
+      var markerSpan = new Element('span', {'id': 'ID' + item.annotationId, 'class' : 'hidden annotation-marker ' + item.state});
       lastSpan.insert({after: markerSpan});
     });
   }

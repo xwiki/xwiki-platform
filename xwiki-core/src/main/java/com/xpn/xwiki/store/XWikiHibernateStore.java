@@ -549,7 +549,7 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
                                         lp1.setValue(tmp);
                                     } else {
                                         Object tmp = lp.getValue();
-                                        if (tmp instanceof List) {
+                                        if (tmp instanceof List && ((List) tmp).size() > 0) {
                                             tmp = ((List) tmp).get(0);
                                         }
                                         lp1.setValue(tmp);

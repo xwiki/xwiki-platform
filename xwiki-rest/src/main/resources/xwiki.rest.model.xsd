@@ -424,6 +424,7 @@
           <element name="wiki" type="string"></element>
           <element name="space" type="string"></element>
           <element name="pageName" type="string"></element>
+          <element name="language" type="string"></element>
           <element name="className" type="string" minOccurs="0"></element>
           <element name="objectNumber" type="int" minOccurs="0"></element>
         </sequence>

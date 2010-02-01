@@ -657,20 +657,18 @@ $heading
             #set($tag = 'input')
           #end
           &lt;dd&gt;&lt;$tag id="$fieldName"
-          #if($field.get('params'))
-            #set($params = $field.get('params'))
-            ## If no name parameter is spacified, then we use the field name
-            #if(!$params.get('name'))
-              #set($discard = $params.put('name', $fieldName))
-            #end
-            #foreach($entry in $params.entrySet())
-              ## If a parameter is specified as '' then we don't include it.
-              #if($entry.getValue() != '')
-                $entry.getKey()="$escapetool.html($entry.getValue())"
-              #end
+          #set($params = $field.get('params'))
+          ## If no name parameter is spacified, then we use the field name
+          #if(!$params.get('name'))
+            #set($discard = $params.put('name', $fieldName))
+          #end
+          #foreach($entry in $params.entrySet())
+            ## If a parameter is specified as '' then we don't include it.
+            #if($entry.getValue() != '')
+              $entry.getKey()="$escapetool.html($entry.getValue())"
             #end
           #end
-          /&gt;
+          &gt;&lt;/$tag&gt;
           #if($field.get('error'))
             &lt;span 
             #foreach($entry in $failureMessageParams.entrySet())
@@ -756,7 +754,7 @@ $heading
 #end##macro
 #*
  * Get parameters from request so that values will be filled in if there is a mistake
- * in one of the entries. Entries will pe returned to fields[n].params.value
+ * in one of the entries. Entries will be returned to fields[n].params.value
  * Fields will not be returned if they have either noReturn or error specified.
  *
  * @param $fields The array of fields to get parameters for.

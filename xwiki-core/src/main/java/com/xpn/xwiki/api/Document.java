@@ -837,7 +837,7 @@ public class Document extends Api
     public Object getObject(String classname, boolean create)
     {
         try {
-            BaseObject obj = this.doc.getObject(classname, create, getXWikiContext());
+            BaseObject obj = getDoc().getObject(classname, create, getXWikiContext());
 
             if (obj == null) {
                 return null;

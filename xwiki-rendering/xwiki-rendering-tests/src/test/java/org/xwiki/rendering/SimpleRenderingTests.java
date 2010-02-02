@@ -37,7 +37,6 @@ public class SimpleRenderingTests extends TestCase
     public static junit.framework.Test suite() throws Exception
     {
         RenderingTestSuite suite = new RenderingTestSuite("Rendering tests not requiring the wiki notion");
-        suite.addTestsFromResource("link/links24", false);
 
         // Embedded documents
         suite.addTestsFromResource("group/group1", false);
@@ -211,7 +210,7 @@ public class SimpleRenderingTests extends TestCase
         suite.addTestsFromResource("encoding/encoding1", false);
 
         // Links without WikiModel
-//        suite.addTestsFromResource("link/links24", false);
+        suite.addTestsFromResource("link/links24", false);
 
         return new ComponentManagerTestSetup(suite);
     }

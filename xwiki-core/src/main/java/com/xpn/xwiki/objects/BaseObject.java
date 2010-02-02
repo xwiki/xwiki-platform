@@ -285,8 +285,8 @@ public class BaseObject extends BaseCollection implements ObjectInterface, Seria
                 // The property exist in the new object, but not in the old one
                 if ((newProperty != null) && (!newProperty.toText().equals(""))) {
                     String newPropertyValue =
-                        (newProperty.getValue() instanceof String) ? newProperty.toText() : ((PropertyClass) getXClass(
-                            context).getField(propertyName)).displayView(propertyName, this, context);
+                        (newProperty.getValue() instanceof String || pclass == null) ? newProperty.toText() : pclass
+                            .displayView(propertyName, this, context);
                     difflist.add(new ObjectDiff(getClassName(), getNumber(), getGuid(), "added", propertyName,
                         propertyType, "", newPropertyValue));
                 }
@@ -295,11 +295,11 @@ public class BaseObject extends BaseCollection implements ObjectInterface, Seria
                 if (pclass != null) {
                     // Put the values as they would be displayed in the interface
                     String newPropertyValue =
-                        (newProperty.getValue() instanceof String) ? newProperty.toText() : pclass.displayView(
-                            propertyName, this, context);
+                        (newProperty.getValue() instanceof String || pclass == null) ? newProperty.toText() : pclass
+                            .displayView(propertyName, this, context);
                     String oldPropertyValue =
-                        (oldProperty.getValue() instanceof String) ? oldProperty.toText() : pclass.displayView(
-                            propertyName, oldObject, context);
+                        (oldProperty.getValue() instanceof String || pclass == null) ? oldProperty.toText() : pclass
+                            .displayView(propertyName, oldObject, context);
                     difflist.add(new ObjectDiff(getClassName(), getNumber(), getGuid(), "changed", propertyName,
                         propertyType, oldPropertyValue, newPropertyValue));
                 } else {

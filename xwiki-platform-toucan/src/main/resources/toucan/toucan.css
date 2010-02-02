@@ -2923,28 +2923,28 @@ div#xwikiclassproperties.accordion
     width: auto;
 }
 
-#leftPanels.xwikipanelcontents ol,
-    #leftPanels .xwikipanelcontents ul.minus,
-    #rightPanels.xwikipanelcontents ol,
-    #rightPanels .xwikipanelcontents ul.minus {
-    margin-left: 1em;
+.xwikipanelcontents ol,
+.xwikipanelcontents ul {
+  margin-top: 0;
 }
 
-#leftPanels .xwikipanelcontents ul.star,
-    #rightPanels .xwikipanelcontents ul.star {
-    margin-left: 0em;
-    margin-bottom: 1em;
+.xwikipanelcontents ol,
+.xwikipanelcontents ul.minus {
+  margin-left: 1em;
 }
 
-#leftPanels .xwikipanelcontents ul.star ul,
-    #rightPanels .xwikipanelcontents ul.star ul {
-    margin-left: 2em;
+.xwikipanelcontents ul.star {
+  margin-left: 0em;
+  margin-bottom: 1em;
 }
 
-#leftPanels .xwikipanelcontents ul ul,
-    #rightPanels .xwikipanelcontents ul ul {
-    list-style-type: none;
-    margin-left: 2em;
+.xwikipanelcontents ul.star ul {
+  margin-left: 2em;
+}
+
+.xwikipanelcontents ul ul {
+  list-style-type: none;
+  margin-left: 2em;
 }
 
 .panel input, .panel select, #editPanels dl dd input {

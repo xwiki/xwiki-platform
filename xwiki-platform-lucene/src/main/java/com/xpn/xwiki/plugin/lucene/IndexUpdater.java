@@ -47,6 +47,7 @@ import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.doc.XWikiAttachment;
 import com.xpn.xwiki.doc.XWikiDocument;
+import com.xpn.xwiki.util.AbstractXWikiRunnable;
 
 /**
  * @version $Id$
@@ -100,6 +101,8 @@ public class IndexUpdater extends AbstractXWikiRunnable implements EventListener
 
     IndexUpdater(Directory directory, int indexingInterval, int maxQueueSize, LucenePlugin plugin, XWikiContext context)
     {
+        super(XWikiContext.EXECUTIONCONTEXT_KEY, context);
+
         this.xwiki = context.getWiki();
         this.context = (XWikiContext) context.clone();
         this.context.setDatabase(this.context.getMainXWiki());
@@ -128,20 +131,13 @@ public class IndexUpdater extends AbstractXWikiRunnable implements EventListener
      * 
      * @see java.lang.Runnable#run()
      */
-    public void run()
+    protected void runInternal()
     {
         MDC.put("url", "Lucene index updating thread");
 
-        // Since this is where a new thread is created this is where we need to initialize the Container
-        // ThreadLocal variables and not in the init() method. Otherwise we would simply overwrite the
-        // Container values for the main thread...
         try {
-            initXWikiContainer(this.context);
             runMainLoop();
         } finally {
-            // Cleanup Container component (it has ThreadLocal variables)
-            cleanupXWikiContainer(this.context);
-            this.xwiki.getStore().cleanUp(this.context);
             MDC.remove("url");
         }
     }

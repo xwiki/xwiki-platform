@@ -20,24 +20,39 @@
 package org.xwiki.rendering.internal.renderer;
 
 import org.xwiki.component.annotation.Component;
+import org.xwiki.component.annotation.Requirement;
+import org.xwiki.rendering.listener.Attachment;
 import org.xwiki.rendering.listener.Link;
-import org.xwiki.rendering.renderer.LinkLabelGenerator;
+import org.xwiki.rendering.parser.AttachmentParser;
+import org.xwiki.rendering.renderer.URILabelGenerator;
 
 /**
- * Basic default implementation to be used when the XWiki Rendering is used standalone, outside of XWiki.
+ * Generate link labels for ATTACH URIs.
  *
  * @version $Id$
- * @since 2.0M1
+ * @since 2.2RC1
  */
-@Component
-public class DefaultLinkLabelGenerator implements LinkLabelGenerator
+@Component("attach")
+public class AttachURILabelGenerator implements URILabelGenerator
 {
     /**
-     * {@inheritDoc}
-     * @see org.xwiki.rendering.renderer.LinkLabelGenerator#generate(org.xwiki.rendering.listener.Link)
+     * The ATTACH URI prefix (the scheme followed by ":").
      */
-    public String generate(Link link)
+    private static final String ATTACH = "attach:";
+
+    /**
+     * Used to extract the attachment name from the reference.
+     */
+    @Requirement
+    private AttachmentParser attachmentParser;
+
+    /**
+     * {@inheritDoc}
+     * @see org.xwiki.rendering.renderer.URILabelGenerator#generateLabel(org.xwiki.rendering.listener.Link)
+     */
+    public String generateLabel(Link link)
     {
-        return link.getReference();
+        Attachment attachment = this.attachmentParser.parse(link.getReference().substring(ATTACH.length()));
+        return attachment.getAttachmentName();
     }
 }

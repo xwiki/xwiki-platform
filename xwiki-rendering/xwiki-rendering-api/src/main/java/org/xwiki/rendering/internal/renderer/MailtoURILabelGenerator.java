@@ -21,23 +21,34 @@ package org.xwiki.rendering.internal.renderer;
 
 import org.xwiki.component.annotation.Component;
 import org.xwiki.rendering.listener.Link;
-import org.xwiki.rendering.renderer.LinkLabelGenerator;
+import org.xwiki.rendering.renderer.URILabelGenerator;
 
 /**
- * Basic default implementation to be used when the XWiki Rendering is used standalone, outside of XWiki.
- *
+ * Generate link labels for MAILTO URIs.
+ * 
  * @version $Id$
- * @since 2.0M1
+ * @since 2.2RC1
  */
-@Component
-public class DefaultLinkLabelGenerator implements LinkLabelGenerator
+@Component("mailto")
+public class MailtoURILabelGenerator implements URILabelGenerator
 {
     /**
-     * {@inheritDoc}
-     * @see org.xwiki.rendering.renderer.LinkLabelGenerator#generate(org.xwiki.rendering.listener.Link)
+     * The MAILTO URI prefix (the scheme followed by ":").
      */
-    public String generate(Link link)
+    private static final String MAILTO = "mailto:";
+    
+    /**
+     * {@inheritDoc}
+     * @see org.xwiki.rendering.renderer.URILabelGenerator#generateLabel(org.xwiki.rendering.listener.Link)
+     */
+    public String generateLabel(Link link)
     {
-        return link.getReference();
+        String label = link.getReference().substring(MAILTO.length());
+        // Also remove the query string part from the label (we only want the email address).
+        int queryStringPosition = label.indexOf("?");
+        if (queryStringPosition > -1) {
+            label = label.substring(0, queryStringPosition);
+        }
+        return label;
     }
 }

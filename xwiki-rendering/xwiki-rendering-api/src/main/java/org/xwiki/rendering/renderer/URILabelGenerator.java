@@ -17,27 +17,24 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.rendering.internal.renderer;
+package org.xwiki.rendering.renderer;
 
-import org.xwiki.component.annotation.Component;
+import org.xwiki.component.annotation.ComponentRole;
 import org.xwiki.rendering.listener.Link;
-import org.xwiki.rendering.renderer.LinkLabelGenerator;
 
 /**
- * Basic default implementation to be used when the XWiki Rendering is used standalone, outside of XWiki.
+ * Generate link labels for URIs. For example an implementation for MAILTO URIs would remove the scheme part and the
+ * query string part.
  *
  * @version $Id$
- * @since 2.0M1
+ * @since 2.2RC1
  */
-@Component
-public class DefaultLinkLabelGenerator implements LinkLabelGenerator
+@ComponentRole
+public interface URILabelGenerator
 {
     /**
-     * {@inheritDoc}
-     * @see org.xwiki.rendering.renderer.LinkLabelGenerator#generate(org.xwiki.rendering.listener.Link)
+     * @param link the link pointing to a URI for which we want to generate a label
+     * @return the URI label to display when rendering links
      */
-    public String generate(Link link)
-    {
-        return link.getReference();
-    }
+    String generateLabel(Link link);
 }

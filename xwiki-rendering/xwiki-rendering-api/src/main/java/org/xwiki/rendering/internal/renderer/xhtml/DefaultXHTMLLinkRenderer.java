@@ -36,6 +36,7 @@ import org.xwiki.rendering.listener.Link;
 import org.xwiki.rendering.listener.LinkType;
 import org.xwiki.rendering.parser.AttachmentParser;
 import org.xwiki.rendering.renderer.LinkLabelGenerator;
+import org.xwiki.rendering.renderer.URILabelGenerator;
 import org.xwiki.rendering.renderer.printer.XHTMLWikiPrinter;
 import org.xwiki.rendering.renderer.xhtml.XHTMLLinkRenderer;
 import org.xwiki.rendering.wiki.WikiModel;
@@ -68,11 +69,6 @@ public class DefaultXHTMLLinkRenderer implements XHTMLLinkRenderer, Initializabl
      * The link reference prefix indicating that the link is targeting an attachment.
      */
     private static final String ATTACH = "attach:";
-
-    /**
-     * The link reference prefix indicating that the link is targeting a mail address.
-     */
-    private static final String MAILTO = "mailto:";
 
     /**
      * The class attribute 'wikilink'.
@@ -276,23 +272,26 @@ public class DefaultXHTMLLinkRenderer implements XHTMLLinkRenderer, Initializabl
             if (link.getType() == LinkType.DOCUMENT) {
                 getXHTMLWikiPrinter().printXML(this.linkLabelGenerator.generate(link));
             } else if (link.getType() == LinkType.URI) {
+
+                // Look for a component implementing URILabelGenerator with a role hint matching the URI scheme.
+                // If not found then use the full reference as the label.
+                int schemeSeparator = link.getReference().indexOf(":");
+
+                // If there's no scheme separator then use the full reference as the label. Note that this can happen
+                // when we're not in wiki mode (since all links are considered URIs when not in wiki mode).
                 String label;
-                // Special handling for MAILTO and ATTACH URIs for which we don't want to print the scheme in the label
-                // (so that they appear displayed a nicer way for users).
-                if (link.getReference().startsWith(ATTACH)) {
-                    // Only display the attachment name.
-                    Attachment attachment = this.attachmentParser.parse(link.getReference().substring(ATTACH.length()));
-                    label = attachment.getAttachmentName();
-                } else if (link.getReference().startsWith(MAILTO)) {
-                    label = link.getReference().substring(MAILTO.length());
-                    // For MAILTO also remove the query string part from the label (we only want the email address).
-                    int queryStringPosition = label.indexOf("?");
-                    if (queryStringPosition > -1) {
-                        label = label.substring(0, queryStringPosition);
+                if (schemeSeparator > -1) {
+                    String scheme = link.getReference().substring(0, schemeSeparator);
+                    try {
+                        URILabelGenerator uriLabelGenerator = this.componentManager.lookup(URILabelGenerator.class, scheme);
+                        label = uriLabelGenerator.generateLabel(link);
+                    } catch (ComponentLookupException e) {
+                        label = link.getReference();
                     }
                 } else {
                     label = link.getReference();
                 }
+
                 getXHTMLWikiPrinter().printXML(label);
             } else {
                 getXHTMLWikiPrinter().printXML(link.getReference());

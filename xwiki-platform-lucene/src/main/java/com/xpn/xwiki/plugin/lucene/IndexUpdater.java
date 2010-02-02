@@ -37,7 +37,6 @@ import org.apache.lucene.index.Term;
 import org.apache.lucene.store.Directory;
 import org.apache.lucene.store.LockObtainFailedException;
 import org.xwiki.context.Execution;
-import org.xwiki.context.ExecutionContextManager;
 import org.xwiki.observation.EventListener;
 import org.xwiki.observation.event.ActionExecutionEvent;
 import org.xwiki.observation.event.DocumentDeleteEvent;
@@ -105,22 +104,22 @@ public class IndexUpdater extends AbstractXWikiRunnable implements EventListener
 
     private Analyzer analyzer;
 
-    private XWikiContext context;
-
     IndexUpdater(Directory directory, int indexingInterval, int maxQueueSize, LucenePlugin plugin, XWikiContext context)
     {
         super(XWikiContext.EXECUTIONCONTEXT_KEY, context.clone());
 
         this.plugin = plugin;
-        this.context =
-                (XWikiContext) Utils.getComponent(Execution.class).getContext().getProperty(
-                    XWikiContext.EXECUTIONCONTEXT_KEY);
-        this.context.setDatabase(context.getMainXWiki());
 
         this.directory = directory;
 
         this.indexingInterval = indexingInterval;
         this.maxQueueSize = maxQueueSize;
+    }
+
+    private XWikiContext getContext()
+    {
+        return (XWikiContext) Utils.getComponent(Execution.class).getContext().getProperty(
+            XWikiContext.EXECUTIONCONTEXT_KEY);
     }
 
     public void doExit()
@@ -144,6 +143,8 @@ public class IndexUpdater extends AbstractXWikiRunnable implements EventListener
     protected void runInternal()
     {
         MDC.put("url", "Lucene index updating thread");
+
+        getContext().setDatabase(getContext().getMainXWiki());
 
         try {
             runMainLoop();
@@ -192,7 +193,7 @@ public class IndexUpdater extends AbstractXWikiRunnable implements EventListener
                 LOG.debug("IndexUpdater: documents in queue, start indexing");
             }
 
-            XWikiContext context = (XWikiContext) this.context.clone();
+            XWikiContext context = getContext();
             context.getWiki().getStore().cleanUp(context);
 
             IndexWriter writer;
@@ -224,7 +225,7 @@ public class IndexUpdater extends AbstractXWikiRunnable implements EventListener
                         /*
                          * XXX Is it not possible to obtain the right translation directly?
                          */
-                        XWikiDocument doc = this.context.getWiki().getDocument(data.getFullName(), context);
+                        XWikiDocument doc = context.getWiki().getDocument(data.getFullName(), context);
 
                         if (data.getLanguage() != null && !data.getLanguage().equals("")) {
                             doc = doc.getTranslatedDocument(data.getLanguage(), context);
@@ -243,7 +244,7 @@ public class IndexUpdater extends AbstractXWikiRunnable implements EventListener
             } catch (Exception e) {
                 LOG.error("error indexing documents", e);
             } finally {
-                this.context.getWiki().getStore().cleanUp(this.context);
+                context.getWiki().getStore().cleanUp(context);
 
                 try {
                     writer.optimize();

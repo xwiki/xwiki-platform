@@ -94,6 +94,12 @@ public class IndexRebuilder extends AbstractXWikiRunnable
         }
     }
 
+    private XWikiContext getContext()
+    {
+        return (XWikiContext) Utils.getComponent(Execution.class).getContext().getProperty(
+            XWikiContext.EXECUTIONCONTEXT_KEY);
+    }
+
     public synchronized int startRebuildIndex(XWikiContext context)
     {
         if (this.rebuildInProgress) {
@@ -142,13 +148,11 @@ public class IndexRebuilder extends AbstractXWikiRunnable
             // context.setDatabase(this.context.getDatabase());
             // context.put("org.xwiki.component.manager.ComponentManager", this.context
             // .get("org.xwiki.component.manager.ComponentManager"));
-            context =
-                    (XWikiContext) Utils.getComponent(Execution.class).getContext().getProperty(
-                        XWikiContext.EXECUTIONCONTEXT_KEY);
+            context = getContext();
             // For example, we definitely don't want to use the same hibernate session...
             context.remove("hibsession");
             context.remove("hibtransaction");
-            // This is also causing seriuos problems, as the same xcontext gets shared between
+            // This is also causing serious problems, as the same xcontext gets shared between
             // threads and causes the hibernate session to be shared in the end. The vcontext is
             // automatically recreated by the velocity renderer, if it isn't found in the xcontext.
             context.remove("vcontext");

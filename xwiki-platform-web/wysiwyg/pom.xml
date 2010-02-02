@@ -163,6 +163,7 @@
           <disableClassMetadata>false</disableClassMetadata>
           <!-- HACK: We inject the GWT arguments in the out parameter because we have no other option. -->
           <out>target/www-test${gwt.args}</out>
+          <testTimeOut>600</testTimeOut>
           <!--
             In order to prevent the "java.lang.InternalError: Can't connect to X11 window server using ':1.0' as the
             value of the DISPLAY variable." error message we have to run the GWT compiler with the headless AWT option.
@@ -319,7 +320,7 @@
         <xwe.module>com.xpn.xwiki.wysiwyg.WysiwygDev</xwe.module>
         <gwt.style>DETAILED</gwt.style>
         <!-- Arguments required to run the tests manually in any browser. -->
-        <gwt.args>" -prod -userAgents gecko1_8 -port 54321 -codeServerPort 12345 -runStyle "Manual:1</gwt.args>
+        <gwt.args>" -prod -userAgents gecko1_8 -port 54321 -codeServerPort 12345 -style DETAILED -runStyle "Manual:1</gwt.args>
       </properties>
     </profile>
   </profiles>

@@ -28,6 +28,10 @@
 
   <extend-property name="locale" values="fr,de,es,it,sv,sk"/>
 
+  <!-- Custom linker that adds the document type declaration to the generated permutations. -->
+  <define-linker name="StandardsMode" class="org.xwiki.gwt.core.linker.StandardsModeIFrameLinker" />
+  <add-linker name="StandardsMode" />
+
   <!-- ColorPlugin -->
   <replace-with class="com.xpn.xwiki.wysiwyg.client.plugin.color.ColorPlugin">
     <when-type-is class="com.xpn.xwiki.wysiwyg.client.plugin.color.ColorPlugin"/>

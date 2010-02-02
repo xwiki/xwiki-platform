@@ -31,9 +31,14 @@ import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.context.Execution;
 import org.xwiki.context.ExecutionContext;
 import org.xwiki.context.ExecutionContextManager;
+import org.xwiki.model.reference.DocumentReferenceResolver;
+import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.rendering.block.Block;
+import org.xwiki.rendering.block.LinkBlock;
 import org.xwiki.rendering.block.XDOM;
 import org.xwiki.rendering.internal.transformation.MacroTransformation;
+import org.xwiki.rendering.listener.Link;
+import org.xwiki.rendering.listener.LinkType;
 import org.xwiki.rendering.macro.AbstractMacro;
 import org.xwiki.rendering.macro.MacroExecutionException;
 import org.xwiki.rendering.macro.include.IncludeMacroParameters;
@@ -78,6 +83,21 @@ public class IncludeMacro extends AbstractMacro<IncludeMacroParameters>
      */
     @Requirement
     private DocumentAccessBridge documentAccessBridge;
+
+    /**
+     * Used to transform relative document links into absolute references when including a document containing links.
+     * This is required otherwise the links will be resolved at render time in the context of the including document
+     * instead of in the context of the included document.
+     */
+    @Requirement("current")
+    private DocumentReferenceResolver<String> currentDocumentReferenceResolver;
+
+    /**
+     * Used to serialize resolved document links into a string again since the Rendering API only manipulates Strings
+     * (done voluntarily to be independent of any wiki engine and not draw XWiki-specific dependencies).
+     */
+    @Requirement
+    private EntityReferenceSerializer<String> defaultEntityReferenceSerializer;
 
     /**
      * Default constructor.
@@ -129,15 +149,15 @@ public class IncludeMacro extends AbstractMacro<IncludeMacroParameters>
         Context actualContext = parameters.getContext();
 
         // Retrieve the included document's content
-        String includedContent = null;
-        String includedSyntax = null;
+        String includedContent;
+        String includedSyntax;
         try {
             if (this.documentAccessBridge.isDocumentViewable(documentName)) {
                 includedContent = this.documentAccessBridge.getDocumentContent(documentName);
                 includedSyntax = this.documentAccessBridge.getDocumentSyntaxId(documentName);
             } else {
-                throw new MacroExecutionException("Current user doesn't have view rights on document [" + documentName
-                    + "]");
+                throw new MacroExecutionException(
+                    "Current user doesn't have view rights on document [" + documentName + "]");
             }
         } catch (Exception e) {
             throw new MacroExecutionException("Failed to get content for Document [" + documentName + "]", e);
@@ -147,20 +167,34 @@ public class IncludeMacro extends AbstractMacro<IncludeMacroParameters>
 
         // Check the value of the "context" parameter.
         //
-        // If CONTEXT_NEW then get the included
-        // page content, parse it, apply Transformations to it and return the resulting AST.
-        // Note that we need to push a new Container Request before doing this so that the
-        // Velocity, Groovy and any other scripting languages have a clean execution context.
+        // If CONTEXT_NEW then get the included page content, parse it, apply Transformations to it and return the
+        // resulting AST.
+        // Note that we need to push a new Container Request before doing this so that the Velocity, Groovy and any
+        // other scripting languages have an isolated execution context.
         //
-        // if CONTEXT_CURRENT, then simply get the included page's content, parse it and return
-        // the resulting AST (i.e. don't apply any transformations since we don't want any Macro
-        // to be executed at this stage since they should be executed by the currently running
-        // Macro Transformation.
+        // if CONTEXT_CURRENT, then simply get the included page's content, parse it and return the resulting AST
+        // (i.e. don't apply any transformations since we don't want any Macro to be executed at this stage since they
+        // should be executed by the currently running Macro Transformation.
         if (actualContext == Context.NEW) {
             result =
                 executeWithNewContext(documentName, includedContent, includedSyntax, context.getMacroTransformation());
         } else {
             result = executeWithCurrentContext(documentName, includedContent, includedSyntax);
+        }
+
+        // We need to handle the case when there are relative links specified in the content of the included document.
+        // These link references need to be resolved against the document being included and not the including document.
+        // TODO: When http://jira.xwiki.org/jira/browse/XWIKI-4802 is implemented it should be possible remove this
+        // code portion and instead perform the resolution at render time, using context information.
+        XDOM xdom = new XDOM(result);
+        for (LinkBlock block : xdom.getChildrenByType(LinkBlock.class, true)) {
+            Link link = block.getLink();
+            if (link.getType() == LinkType.DOCUMENT) {
+                // It's a link to a document, make the reference absolute
+                String resolvedReference = this.defaultEntityReferenceSerializer.serialize(
+                    this.currentDocumentReferenceResolver.resolve(link.getReference()));
+                link.setReference(resolvedReference);
+            }
         }
 
         return result;
@@ -187,8 +221,6 @@ public class IncludeMacro extends AbstractMacro<IncludeMacroParameters>
             
             this.execution.pushContext(clonedEc);
 
-            // TODO: Need to set the current document, space and wiki. This is required for wiki syntax acting on
-            // documents. For example if a link says "WebHome" it should point to the webhome of the current space.
             Map<String, Object> backupObjects = new HashMap<String, Object>();
             try {
                 this.documentAccessBridge.pushDocumentInContext(backupObjects, includedDocumentName);

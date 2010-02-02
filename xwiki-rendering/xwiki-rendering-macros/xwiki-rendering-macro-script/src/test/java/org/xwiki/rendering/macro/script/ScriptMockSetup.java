@@ -26,6 +26,7 @@ import org.xwiki.component.descriptor.DefaultComponentDescriptor;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.model.reference.AttachmentReferenceResolver;
 import org.xwiki.model.reference.DocumentReferenceResolver;
+import org.xwiki.rendering.wiki.WikiModel;
 
 /**
  * Dynamic mock setup for script macros.
@@ -43,6 +44,8 @@ public class ScriptMockSetup
     
     public DocumentReferenceResolver documentReferenceResolver;
 
+    public WikiModel wikiModel;
+
     public ScriptMockSetup(ComponentManager componentManager) throws Exception
     {
         mockery = new Mockery();
@@ -57,6 +60,13 @@ public class ScriptMockSetup
             new DefaultComponentDescriptor<DocumentAccessBridge>();
         descriptorDAB.setRole(DocumentAccessBridge.class);
         componentManager.registerComponent(descriptorDAB, bridge);
+
+        // Register a WikiModel mock so that we're in wiki mode (otherwise links will be considered as URLs for ex).
+        wikiModel = mockery.mock(WikiModel.class);
+        DefaultComponentDescriptor<WikiModel> descriptorWM =
+            new DefaultComponentDescriptor<WikiModel>();
+        descriptorWM.setRole(WikiModel.class);
+        componentManager.registerComponent(descriptorWM, wikiModel);
 
         // Use a mock for the AttachmentReference Resolver
         attachmentReferenceResolver = mockery.mock(AttachmentReferenceResolver.class);

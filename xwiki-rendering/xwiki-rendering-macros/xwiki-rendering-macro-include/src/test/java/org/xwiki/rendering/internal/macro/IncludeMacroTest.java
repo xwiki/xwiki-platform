@@ -27,6 +27,10 @@ import junit.framework.Assert;
 
 import org.jmock.Expectations;
 import org.junit.Test;
+import org.xwiki.component.descriptor.DefaultComponentDescriptor;
+import org.xwiki.model.reference.AttachmentReferenceResolver;
+import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.block.XDOM;
 import org.xwiki.rendering.internal.macro.include.IncludeMacro;
@@ -44,6 +48,7 @@ import org.xwiki.rendering.syntax.Syntax;
 import org.xwiki.rendering.syntax.SyntaxType;
 import org.xwiki.rendering.transformation.MacroTransformationContext;
 import org.xwiki.rendering.transformation.Transformation;
+import org.xwiki.rendering.wiki.WikiModel;
 import org.xwiki.test.AbstractComponentTestCase;
 import org.xwiki.velocity.VelocityManager;
 
@@ -57,12 +62,15 @@ public class IncludeMacroTest extends AbstractComponentTestCase
 {
     private ScriptMockSetup mockSetup;
 
+    private IncludeMacro includeMacro;
+
     @Override
     protected void registerComponents() throws Exception
     {
         super.registerComponents();
         
         this.mockSetup = new ScriptMockSetup(getComponentManager());
+        this.includeMacro = (IncludeMacro) getComponentManager().lookup(Macro.class, "include");
     }
 
     @Test
@@ -83,18 +91,16 @@ public class IncludeMacroTest extends AbstractComponentTestCase
         velocityManager.getVelocityEngine().evaluate(velocityManager.getVelocityContext(), writer, "template",
             "#set ($myvar = 'hello')");
 
-        IncludeMacro macro = (IncludeMacro) getComponentManager().lookup(Macro.class, "include");
-        
         this.mockSetup.mockery.checking(new Expectations() {{
             oneOf(mockSetup.bridge).isDocumentViewable(with(any(String.class))); will(returnValue(true));
             oneOf(mockSetup.bridge).getDocumentContent(with(any(String.class))); 
                 will(returnValue("{{velocity}}$myvar{{/velocity}}"));
             oneOf(mockSetup.bridge).getDocumentSyntaxId(with(any(String.class)));
-                will(returnValue(new Syntax(SyntaxType.XWIKI, "2.0").toIdString()));
-            allowing(mockSetup.bridge).pushDocumentInContext(with(any(Map.class)), with(any(String.class)));
-            allowing(mockSetup.bridge).popDocumentFromContext(with(any(Map.class)));
+                will(returnValue(Syntax.XWIKI_2_0.toIdString()));
+            oneOf(mockSetup.bridge).pushDocumentInContext(with(any(Map.class)), with(any(String.class)));
+            oneOf(mockSetup.bridge).popDocumentFromContext(with(any(Map.class)));
         }});
-        macro.setDocumentAccessBridge(this.mockSetup.bridge);
+        this.includeMacro.setDocumentAccessBridge(this.mockSetup.bridge);
 
         IncludeMacroParameters parameters = new IncludeMacroParameters();
         parameters.setDocument("wiki:Space.Page");
@@ -107,7 +113,7 @@ public class IncludeMacroTest extends AbstractComponentTestCase
         MacroTransformationContext context = new MacroTransformationContext();
         context.setMacroTransformation(macroTransformation);
 
-        List<Block> blocks = macro.execute(parameters, null, context);
+        List<Block> blocks = this.includeMacro.execute(parameters, null, context);
 
         assertBlocks(expected, blocks);
     }
@@ -119,23 +125,21 @@ public class IncludeMacroTest extends AbstractComponentTestCase
             + "onMacroStandalone [someMacro] []\n"
             + "endDocument";
 
-        IncludeMacro macro = (IncludeMacro) getComponentManager().lookup(Macro.class, "include");
-        
         this.mockSetup.mockery.checking(new Expectations() {{
             oneOf(mockSetup.bridge).isDocumentViewable(with(any(String.class))); will(returnValue(true));
             oneOf(mockSetup.bridge).getDocumentContent(with(any(String.class))); 
                 will(returnValue("{{someMacro/}}"));
             oneOf(mockSetup.bridge).getDocumentSyntaxId(with(any(String.class)));
-                will(returnValue(new Syntax(SyntaxType.XWIKI, "2.0").toIdString()));
+                will(returnValue(Syntax.XWIKI_2_0.toIdString()));
         }});
         
-        macro.setDocumentAccessBridge(mockSetup.bridge);
+        this.includeMacro.setDocumentAccessBridge(mockSetup.bridge);
 
         IncludeMacroParameters parameters = new IncludeMacroParameters();
         parameters.setDocument("wiki:Space.Page");
         parameters.setContext(Context.CURRENT);
 
-        List<Block> blocks = macro.execute(parameters, null, new MacroTransformationContext());
+        List<Block> blocks = this.includeMacro.execute(parameters, null, new MacroTransformationContext());
 
         assertBlocks(expected, blocks);
     }
@@ -143,18 +147,51 @@ public class IncludeMacroTest extends AbstractComponentTestCase
     @Test
     public void testIncludeMacroWithNoDocumentSpecified() throws Exception
     {
-        IncludeMacro macro = (IncludeMacro) getComponentManager().lookup(Macro.class, "include");
         IncludeMacroParameters parameters = new IncludeMacroParameters();
 
         try {
-            macro.execute(parameters, null, new MacroTransformationContext());
+            this.includeMacro.execute(parameters, null, new MacroTransformationContext());
             Assert.fail("An exception should have been thrown");
         } catch (MacroExecutionException expected) {
             Assert.assertEquals("You must specify a 'document' parameter pointing to the document to include.",
                 expected.getMessage());
         }
     }
-    
+
+    /**
+     * Verify that relative links are made absolute in the XDOM returned by the Include macro.
+     */
+    @Test
+    public void testIncludeMacroWhenIncludingDocumentWithRelativeLinks() throws Exception
+    {
+        String expected = "beginDocument\n"
+            + "beginParagraph\n"
+            + "beginLink [Reference = [wiki:space.page]] [false]\n"
+            + "endLink [Reference = [wiki:space.page]] [false]\n"
+            + "endParagraph\n"
+            + "endDocument";
+
+        this.mockSetup.mockery.checking(new Expectations() {{
+            oneOf(mockSetup.bridge).isDocumentViewable(with(any(String.class))); will(returnValue(true));
+            oneOf(mockSetup.bridge).getDocumentContent("includedWiki:includedSpace.includedPage");
+                will(returnValue("[[page]]"));
+            oneOf(mockSetup.bridge).getDocumentSyntaxId(with(any(String.class)));
+                will(returnValue(Syntax.XWIKI_2_0.toIdString()));
+            oneOf(mockSetup.bridge).pushDocumentInContext(with(any(Map.class)), with(any(String.class)));
+            oneOf(mockSetup.bridge).popDocumentFromContext(with(any(Map.class)));
+            oneOf(mockSetup.documentReferenceResolver).resolve("page");
+                will(returnValue(new DocumentReference("wiki", "space", "page")));
+        }});
+        
+        IncludeMacroParameters parameters = new IncludeMacroParameters();
+        parameters.setDocument("includedWiki:includedSpace.includedPage");
+        parameters.setContext(Context.NEW);
+
+        List<Block> blocks = this.includeMacro.execute(parameters, null, new MacroTransformationContext());
+
+        assertBlocks(expected, blocks);
+    }
+
     private void assertBlocks(String expected, List<Block> blocks) throws Exception
     {
         // Assert the result by parsing it through the EventsRenderer to generate easily

@@ -707,7 +707,7 @@ $heading
           || ($validate.get('regex') &amp;&amp; !$validate.get('regex').get('noscript'))
           || ($validate.get('mustMatch') &amp;&amp; !$validate.get('mustMatch').get('noscript')))
         #set($fieldName = $field.get('name'))
-        #if($validate.get('fieldOkay'))
+        #if($validate.get('fieldOkayMessage'))
           #set($okayMessage = $validate.get('fieldOkayMessage'))
         #else
           #set($okayMessage = $defaultFieldOkayMessage)

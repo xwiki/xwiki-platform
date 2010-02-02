@@ -12,8 +12,8 @@
 <customClass></customClass>
 <contentAuthor>XWiki.Admin</contentAuthor>
 <creationDate>1264860755000</creationDate>
-<date>1265063344000</date>
-<contentUpdateDate>1265063344000</contentUpdateDate>
+<date>1265151002000</date>
+<contentUpdateDate>1265151002000</contentUpdateDate>
 <version>1.0</version>
 <title></title>
 <template></template>
@@ -341,7 +341,8 @@ XWiki.Annotation = Class.create({
   addAnnotationMarkers : function(annotations) {
     annotations.each(function(item){
       // get the last span of this annotation
-      var allSpans = $$('#xwikicontent .ID' + item.annotationId);
+      // this will fail if the annotation is visible, displayed with annotation-highlight classname
+      var allSpans = $$('#xwikicontent [class=annotation ID' + item.annotationId + ']');
       if (allSpans.size() == 0) {
         return;
       }

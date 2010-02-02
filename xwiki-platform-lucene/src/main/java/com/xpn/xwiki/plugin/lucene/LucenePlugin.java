@@ -97,7 +97,9 @@ public class LucenePlugin extends XWikiDefaultPlugin
      */
     private IndexUpdater indexUpdater;
 
-    /** The thread running the index updater. */
+    /**
+     * The thread running the index updater.
+     */
     private Thread indexUpdaterThread;
 
     protected Properties config;
@@ -618,8 +620,8 @@ public class LucenePlugin extends XWikiDefaultPlugin
                         // constructor will throw an exception and fail to initialize
                         new IndexWriter(dirs[i], this.analyzer).close();
                     }
-                    IndexReader reader = IndexReader.open(dirs[i], true);
-                    searchersList.add(new IndexSearcher(reader));
+
+                    searchersList.add(new IndexSearcher(dirs[i], true));
                     break;
                 } catch (CorruptIndexException e) {
                     handleCorruptIndex(context);

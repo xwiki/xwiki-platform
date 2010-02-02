@@ -70,6 +70,11 @@ public class DefaultXHTMLLinkRenderer implements XHTMLLinkRenderer, Initializabl
     private static final String ATTACH = "attach:";
 
     /**
+     * The link reference prefix indicating that the link is targeting a mail address.
+     */
+    private static final String MAILTO = "mailto:";
+
+    /**
      * The class attribute 'wikilink'.
      */
     private static final String WIKILINK = "wikilink";
@@ -191,7 +196,7 @@ public class DefaultXHTMLLinkRenderer implements XHTMLLinkRenderer, Initializabl
             renderAutoLink(link, spanAttributes, aAttributes);
         } else {
             if (this.wikiModel != null && link.getType() == LinkType.URI && link.getReference().startsWith(ATTACH)) {
-                // use the default attachment syntax parser to extract document name and attachment name
+                // Use the default attachment syntax parser to extract document name and attachment name
                 Attachment attachment = this.attachmentParser.parse(link.getReference().substring(ATTACH.length()));
                 aAttributes.put(HREF, this.wikiModel.getAttachmentURL(attachment.getDocumentName(),
                     attachment.getAttachmentName()));
@@ -270,6 +275,25 @@ public class DefaultXHTMLLinkRenderer implements XHTMLLinkRenderer, Initializabl
             getXHTMLWikiPrinter().printXMLStartElement(SPAN, new String[][] {{CLASS, "wikigeneratedlinkcontent"}});
             if (link.getType() == LinkType.DOCUMENT) {
                 getXHTMLWikiPrinter().printXML(this.linkLabelGenerator.generate(link));
+            } else if (link.getType() == LinkType.URI) {
+                String label;
+                // Special handling for MAILTO and ATTACH URIs for which we don't want to print the scheme in the label
+                // (so that they appear displayed a nicer way for users).
+                if (link.getReference().startsWith(ATTACH)) {
+                    // Only display the attachment name.
+                    Attachment attachment = this.attachmentParser.parse(link.getReference().substring(ATTACH.length()));
+                    label = attachment.getAttachmentName();
+                } else if (link.getReference().startsWith(MAILTO)) {
+                    label = link.getReference().substring(MAILTO.length());
+                    // For MAILTO also remove the query string part from the label (we only want the email address).
+                    int queryStringPosition = label.indexOf("?");
+                    if (queryStringPosition > -1) {
+                        label = label.substring(0, queryStringPosition);
+                    }
+                } else {
+                    label = link.getReference();
+                }
+                getXHTMLWikiPrinter().printXML(label);
             } else {
                 getXHTMLWikiPrinter().printXML(link.getReference());
             }

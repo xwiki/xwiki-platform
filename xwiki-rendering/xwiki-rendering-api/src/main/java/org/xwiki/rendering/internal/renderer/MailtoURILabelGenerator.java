@@ -19,6 +19,7 @@
  */
 package org.xwiki.rendering.internal.renderer;
 
+import org.apache.commons.lang.StringUtils;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.rendering.listener.Link;
 import org.xwiki.rendering.renderer.URILabelGenerator;
@@ -43,12 +44,7 @@ public class MailtoURILabelGenerator implements URILabelGenerator
      */
     public String generateLabel(Link link)
     {
-        String label = link.getReference().substring(MAILTO.length());
-        // Also remove the query string part from the label (we only want the email address).
-        int queryStringPosition = label.indexOf("?");
-        if (queryStringPosition > -1) {
-            label = label.substring(0, queryStringPosition);
-        }
-        return label;
+        // Remove the scheme prefix and the query string (if any).
+        return StringUtils.substringBefore(StringUtils.removeStart(link.getReference(), MAILTO), "?");
     }
 }

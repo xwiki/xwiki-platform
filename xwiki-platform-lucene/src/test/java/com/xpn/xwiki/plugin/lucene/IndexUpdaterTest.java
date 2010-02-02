@@ -1,34 +1,35 @@
 package com.xpn.xwiki.plugin.lucene;
 
-import junit.framework.Test;
-import junit.framework.TestSuite;
-
 import java.io.File;
 import java.io.IOException;
-
 import java.util.Date;
 import java.util.concurrent.Semaphore;
 
-import org.apache.lucene.store.Directory;
-import org.apache.lucene.store.FSDirectory;
+import junit.framework.Test;
+import junit.framework.TestSuite;
+
 import org.apache.lucene.analysis.standard.StandardAnalyzer;
 import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.index.IndexWriter;
+import org.apache.lucene.index.Term;
 import org.apache.lucene.search.IndexSearcher;
-import org.apache.lucene.search.TopDocs;
 import org.apache.lucene.search.Query;
 import org.apache.lucene.search.TermQuery;
-import org.apache.lucene.index.Term;
+import org.apache.lucene.search.TopDocs;
+import org.apache.lucene.store.Directory;
+import org.apache.lucene.store.FSDirectory;
 import org.apache.lucene.store.LockObtainFailedException;
 import org.apache.lucene.util.Version;
+import org.xwiki.context.ExecutionContext;
+import org.xwiki.context.ExecutionContextException;
 
-import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWiki;
+import com.xpn.xwiki.XWikiConfig;
+import com.xpn.xwiki.XWikiContext;
+import com.xpn.xwiki.XWikiException;
+import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.store.XWikiStoreInterface;
 import com.xpn.xwiki.test.AbstractBridgedXWikiComponentTestCase;
-import com.xpn.xwiki.doc.XWikiDocument;
-import com.xpn.xwiki.XWikiConfig;
-import com.xpn.xwiki.XWikiException;
 
 public class IndexUpdaterTest extends AbstractBridgedXWikiComponentTestCase
 {
@@ -76,22 +77,24 @@ public class IndexUpdaterTest extends AbstractBridgedXWikiComponentTestCase
         }
 
         @Override
-        protected void initXWikiContainer(XWikiContext context)
+        protected ExecutionContext initExecutionContext() throws ExecutionContextException
         {
+            return null;
         }
 
         @Override
-        protected void cleanupXWikiContainer(XWikiContext context)
+        protected void cleanupExecutionContext()
         {
+
         }
 
         @Override
-        public void run()
+        protected void runInternal()
         {
-            super.run();
+            super.runInternal();
+
             IndexUpdaterTest.this.rebuildDone.release();
         }
-
     }
 
     private class TestIndexUpdater extends IndexUpdater
@@ -103,17 +106,19 @@ public class IndexUpdaterTest extends AbstractBridgedXWikiComponentTestCase
         }
 
         @Override
-        protected void initXWikiContainer(XWikiContext context)
+        protected ExecutionContext initExecutionContext() throws ExecutionContextException
         {
+            return null;
         }
 
         @Override
-        protected void cleanupXWikiContainer(XWikiContext context)
+        protected void cleanupExecutionContext()
         {
+
         }
 
         @Override
-        public void run()
+        protected void runInternal()
         {
             if (Thread.currentThread().getName().equals("writerBlocker")) {
                 try {

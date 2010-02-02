@@ -23,7 +23,8 @@ package org.xwiki.url;
 import org.xwiki.model.reference.AttachmentReference;
 
 /**
- * 
+ * Represents a XWiki URL pointing to an Attachment Entity.
+ *
  * @version $Id$
  * @since 2.0M1
  */

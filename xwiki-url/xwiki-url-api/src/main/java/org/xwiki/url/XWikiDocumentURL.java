@@ -25,6 +25,7 @@ import java.util.Locale;
 import org.xwiki.model.reference.DocumentReference;
 
 /**
+ * Represents a XWiki URL pointing to a Document Entity.
  * 
  * @version $Id$
  * @since 2.0M1

@@ -42,25 +42,29 @@ public class BaseObject extends BaseCollection implements ObjectInterface, Seria
     private String guid = UUID.randomUUID().toString();
 
     /**
-     * Note: This method is overridden to add the deprecation warning so that code using is can see it's deprecated.
+     * Note: This method is overridden to add the deprecation warning so that code using it can see it's deprecated.
+     * 
      * @deprecated since 2.2M2 use {@link #getDocumentReference()}
      */
     @Deprecated
-    @Override public String getName()
+    @Override
+    public String getName()
     {
         return super.getName();
     }
 
     /**
-     * Note: This method is overridden to add the deprecation warning so that code using is can see it's deprecated.
+     * Note: This method is overridden to add the deprecation warning so that code using it can see it's deprecated.
+     * 
      * @deprecated since 2.2M2 use {@link #setDocumentReference(org.xwiki.model.reference.DocumentReference)}
      */
     @Deprecated
-    @Override public void setName(String name)
+    @Override
+    public void setName(String name)
     {
         super.setName(name);
     }
-    
+
     /**
      * {@inheritDoc}
      * 
@@ -90,23 +94,23 @@ public class BaseObject extends BaseCollection implements ObjectInterface, Seria
 
     public void displayHidden(StringBuffer buffer, String name, String prefix, XWikiContext context)
     {
-        ((PropertyClass) getxWikiClass(context).get(name)).displayHidden(buffer, name, prefix, this, context);
+        ((PropertyClass) getXClass(context).get(name)).displayHidden(buffer, name, prefix, this, context);
     }
 
     public void displayView(StringBuffer buffer, String name, String prefix, XWikiContext context)
     {
-        ((PropertyClass) getxWikiClass(context).get(name)).displayView(buffer, name, prefix, this, context);
+        ((PropertyClass) getXClass(context).get(name)).displayView(buffer, name, prefix, this, context);
     }
 
     public void displayEdit(StringBuffer buffer, String name, String prefix, XWikiContext context)
     {
-        ((PropertyClass) getxWikiClass(context).get(name)).displayEdit(buffer, name, prefix, this, context);
+        ((PropertyClass) getXClass(context).get(name)).displayEdit(buffer, name, prefix, this, context);
     }
 
     public String displayHidden(String name, String prefix, XWikiContext context)
     {
         StringBuffer buffer = new StringBuffer();
-        ((PropertyClass) getxWikiClass(context).get(name)).displayHidden(buffer, name, prefix, this, context);
+        ((PropertyClass) getXClass(context).get(name)).displayHidden(buffer, name, prefix, this, context);
 
         return buffer.toString();
     }
@@ -114,7 +118,7 @@ public class BaseObject extends BaseCollection implements ObjectInterface, Seria
     public String displayView(String name, String prefix, XWikiContext context)
     {
         StringBuffer buffer = new StringBuffer();
-        ((PropertyClass) getxWikiClass(context).get(name)).displayView(buffer, name, prefix, this, context);
+        ((PropertyClass) getXClass(context).get(name)).displayView(buffer, name, prefix, this, context);
 
         return buffer.toString();
     }
@@ -122,7 +126,7 @@ public class BaseObject extends BaseCollection implements ObjectInterface, Seria
     public String displayEdit(String name, String prefix, XWikiContext context)
     {
         StringBuffer buffer = new StringBuffer();
-        ((PropertyClass) getxWikiClass(context).get(name)).displayEdit(buffer, name, prefix, this, context);
+        ((PropertyClass) getXClass(context).get(name)).displayEdit(buffer, name, prefix, this, context);
 
         return buffer.toString();
     }
@@ -273,18 +277,17 @@ public class BaseObject extends BaseCollection implements ObjectInterface, Seria
         for (String propertyName : this.getPropertyList()) {
             BaseProperty newProperty = (BaseProperty) this.getField(propertyName);
             BaseProperty oldProperty = (BaseProperty) oldObject.getField(propertyName);
-            BaseClass bclass = getxWikiClass(context);
+            BaseClass bclass = getXClass(context);
             PropertyClass pclass = (PropertyClass) ((bclass == null) ? null : bclass.getField(propertyName));
-            String propertyType = (pclass == null) ? "" : StringUtils.substringAfterLast(pclass.getClassType(), ".");            
+            String propertyType = (pclass == null) ? "" : StringUtils.substringAfterLast(pclass.getClassType(), ".");
 
             if (oldProperty == null) {
                 // The property exist in the new object, but not in the old one
                 if ((newProperty != null) && (!newProperty.toText().equals(""))) {
                     String newPropertyValue =
-                        (newProperty.getValue() instanceof String) ? newProperty.toText()
-                            : ((PropertyClass) getxWikiClass(context).getField(propertyName)).displayView(propertyName,
-                                this, context);
-                    difflist.add(new ObjectDiff(getClassName(), getNumber(), getGuid(), "added", propertyName, 
+                        (newProperty.getValue() instanceof String) ? newProperty.toText() : ((PropertyClass) getXClass(
+                            context).getField(propertyName)).displayView(propertyName, this, context);
+                    difflist.add(new ObjectDiff(getClassName(), getNumber(), getGuid(), "added", propertyName,
                         propertyType, "", newPropertyValue));
                 }
             } else if (!oldProperty.toText().equals(((newProperty == null) ? "" : newProperty.toText()))) {
@@ -311,9 +314,9 @@ public class BaseObject extends BaseCollection implements ObjectInterface, Seria
         for (String propertyName : oldObject.getPropertyList()) {
             BaseProperty newProperty = (BaseProperty) this.getField(propertyName);
             BaseProperty oldProperty = (BaseProperty) oldObject.getField(propertyName);
-            BaseClass bclass = getxWikiClass(context);
+            BaseClass bclass = getXClass(context);
             PropertyClass pclass = (PropertyClass) ((bclass == null) ? null : bclass.getField(propertyName));
-            String propertyType = (pclass == null) ? "" : StringUtils.substringAfterLast(pclass.getClassType(), ".");            
+            String propertyType = (pclass == null) ? "" : StringUtils.substringAfterLast(pclass.getClassType(), ".");
 
             if (newProperty == null) {
                 // The property exists in the old object, but not in the new one
@@ -344,7 +347,7 @@ public class BaseObject extends BaseCollection implements ObjectInterface, Seria
 
     public void set(String fieldname, java.lang.Object value, XWikiContext context)
     {
-        BaseClass bclass = getxWikiClass(context);
+        BaseClass bclass = getXClass(context);
         PropertyClass pclass = (PropertyClass) bclass.get(fieldname);
         BaseProperty prop = (BaseProperty) safeget(fieldname);
         if ((value instanceof String) && (pclass != null)) {

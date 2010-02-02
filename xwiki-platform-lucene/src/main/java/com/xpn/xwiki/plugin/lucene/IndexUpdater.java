@@ -70,6 +70,9 @@ public class IndexUpdater extends AbstractXWikiRunnable implements EventListener
     private static final List<Event> EVENTS = Arrays.<Event> asList(new DocumentUpdateEvent(), new DocumentSaveEvent(),
         new DocumentDeleteEvent(), new ActionExecutionEvent("upload"));
 
+    /*
+     * Collecting all the fields for using up in search
+     */
     static final List<String> fields = new ArrayList<String>();
 
     private final LucenePlugin plugin;

@@ -84,6 +84,9 @@
         -->
         <directory>src/test/java</directory>
       </testResource>
+      <testResource>
+        <directory>src/test/resources</directory>
+      </testResource>
     </testResources>
     <plugins>
       <plugin>
@@ -93,7 +96,7 @@
         <configuration>
           <!-- HACK: We inject the GWT arguments in the out parameter because we have no other option. -->
           <out>target/www-test${gwt.args}</out>
-          <style>DETAILED</style>
+          <testTimeOut>600</testTimeOut>
           <includes>org/xwiki/gwt/user/UserTestSuite.java</includes>
         </configuration>
         <executions>
@@ -144,7 +147,7 @@
       <id>manual</id>
       <properties>
         <!-- Arguments required to run the tests manually in any browser. -->
-        <gwt.args>" -prod -userAgents gecko1_8 -port 54321 -codeServerPort 12345 -runStyle "Manual:1</gwt.args>
+        <gwt.args>" -prod -userAgents gecko1_8 -port 54321 -codeServerPort 12345 -style DETAILED -runStyle "Manual:1</gwt.args>
       </properties>
     </profile>
   </profiles>

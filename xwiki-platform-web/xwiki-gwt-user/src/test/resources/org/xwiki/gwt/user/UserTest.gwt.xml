@@ -1,4 +1,5 @@
-/*
+<!--
+ *
  * See the NOTICE file distributed with this work for additional
  * information regarding copyright ownership.
  *
@@ -16,31 +17,12 @@
  * License along with this software; if not, write to the Free
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
- */
-package org.xwiki.gwt.user.client;
+ *
+-->
+<module>
+  <inherits name='org.xwiki.gwt.user.User'/>
 
-import com.google.gwt.junit.client.GWTTestCase;
-
-/**
- * Base class for all User client tests. It returns the name of the module in {@link #getModuleName()} so you don't have
- * to do it in each test.
- * 
- * @version $Id$
- */
-public class UserTestCase extends GWTTestCase
-{
-    /**
-     * The name of this GWT module.
-     */
-    public static final String MODULE_NAME = "org.xwiki.gwt.user.UserTest";
-
-    /**
-     * {@inheritDoc}
-     * 
-     * @see GWTTestCase#getModuleName()
-     */
-    public String getModuleName()
-    {
-        return MODULE_NAME;
-    }
-}
+  <!-- Custom linker that adds the document type declaration to the generated permutations. -->
+  <define-linker name="StandardsMode" class="org.xwiki.gwt.core.linker.StandardsModeIFrameLinker" />
+  <add-linker name="StandardsMode" />
+</module>

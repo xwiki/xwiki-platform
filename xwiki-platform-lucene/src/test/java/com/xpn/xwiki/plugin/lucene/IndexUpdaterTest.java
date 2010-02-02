@@ -77,18 +77,6 @@ public class IndexUpdaterTest extends AbstractBridgedXWikiComponentTestCase
         }
 
         @Override
-        protected ExecutionContext initExecutionContext() throws ExecutionContextException
-        {
-            return null;
-        }
-
-        @Override
-        protected void cleanupExecutionContext()
-        {
-
-        }
-
-        @Override
         protected void runInternal()
         {
             super.runInternal();
@@ -103,18 +91,6 @@ public class IndexUpdaterTest extends AbstractBridgedXWikiComponentTestCase
             XWikiContext context)
         {
             super(directory, indexingInterval, maxQueueSize, plugin, context);
-        }
-
-        @Override
-        protected ExecutionContext initExecutionContext() throws ExecutionContextException
-        {
-            return null;
-        }
-
-        @Override
-        protected void cleanupExecutionContext()
-        {
-
         }
 
         @Override

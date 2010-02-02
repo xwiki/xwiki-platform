@@ -136,7 +136,7 @@ public class IndexUpdaterTest extends AbstractBridgedXWikiComponentTestCase
                 } catch (Exception e) {
                 }
             } else {
-                super.run();
+                super.runInternal();
             }
         }
     }

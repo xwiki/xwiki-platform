@@ -93,7 +93,7 @@ public abstract class AbstractDOMTest extends GWTTestCase
      */
     public String getModuleName()
     {
-        return "org.xwiki.gwt.dom.DOM";
+        return "org.xwiki.gwt.dom.DOMTest";
     }
 
     /**

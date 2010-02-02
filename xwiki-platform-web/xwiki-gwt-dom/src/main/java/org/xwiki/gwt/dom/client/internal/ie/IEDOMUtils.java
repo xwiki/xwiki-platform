@@ -81,19 +81,23 @@ public class IEDOMUtils extends DOMUtils
     public native JsArrayString getAttributeNames(Element element)
     /*-{
         var attrNames = [];
+        var isAttributeValue = function(value) {
+            var typeOfValue = typeof value;
+            return typeOfValue != 'object' && typeOfValue != 'function';
+        }
         for(var i = 0; i < element.attributes.length; i++){
             var attribute = element.attributes[i];
             // On IE attributes and properties are stored in the same array. We exclude all objects and functions, 
             // since attributes should be strings, numbers. Note that this does not ensure the elimination of all 
             // custom properties, but covers most cases.
-            if (attribute.specified && typeof attribute.nodeValue != 'object' 
-                && typeof attribute.nodeValue != 'function') {
+            // NOTE: In IE8 typeof attribute.nodeValue is always string that's why we use element[attribute.nodeName]
+            if (attribute.specified && isAttributeValue(element[attribute.nodeName])) {
                 attrNames.push(attribute.nodeName);
             }
-            // Typeof style is object and, in our quest to eliminate custom set properties, this one also gets removed
-            if (element.style.cssText != '') {
-                attrNames.push('style');
-            }
+        }
+        // Typeof style is object and, in our quest to eliminate custom set properties, this one also gets removed.
+        if (element.style.cssText != '') {
+            attrNames.push('style');
         }
         return attrNames;
     }-*/;

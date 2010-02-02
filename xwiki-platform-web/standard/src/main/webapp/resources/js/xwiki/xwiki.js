@@ -337,7 +337,7 @@ Object.extend(XWiki, {
    */
   insertSectionEditLinks: function() {
       // Insert links only in view mode and for xwiki/2.0 documents.
-      if (XWiki.docsyntax == "xwiki/2.0" && XWiki.contextaction == "view") {
+      if (XWiki.docsyntax == "xwiki/2.0" && XWiki.contextaction == "view" && XWiki.hasEdit == "true") {
 
           // Section count starts at one, not zero.
           var sectioncount = 1;

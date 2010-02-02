@@ -36,6 +36,8 @@ import org.apache.lucene.index.IndexWriter;
 import org.apache.lucene.index.Term;
 import org.apache.lucene.store.Directory;
 import org.apache.lucene.store.LockObtainFailedException;
+import org.xwiki.context.Execution;
+import org.xwiki.context.ExecutionContextManager;
 import org.xwiki.observation.EventListener;
 import org.xwiki.observation.event.ActionExecutionEvent;
 import org.xwiki.observation.event.DocumentDeleteEvent;
@@ -43,43 +45,49 @@ import org.xwiki.observation.event.DocumentSaveEvent;
 import org.xwiki.observation.event.DocumentUpdateEvent;
 import org.xwiki.observation.event.Event;
 
-import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.doc.XWikiAttachment;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.util.AbstractXWikiRunnable;
+import com.xpn.xwiki.web.Utils;
 
 /**
  * @version $Id$
  */
 public class IndexUpdater extends AbstractXWikiRunnable implements EventListener
 {
-    /** Logging helper. */
+    /**
+     * Logging helper.
+     */
     private static final Log LOG = LogFactory.getLog(IndexUpdater.class);
 
     private static final String NAME = "lucene";
 
-    /** The maximum number of milliseconds we have to wait before this thread is safely closed. */
+    /**
+     * The maximum number of milliseconds we have to wait before this thread is safely closed.
+     */
     private static final int EXIT_INTERVAL = 3000;
 
     private static final List<Event> EVENTS = Arrays.<Event> asList(new DocumentUpdateEvent(), new DocumentSaveEvent(),
         new DocumentDeleteEvent(), new ActionExecutionEvent("upload"));
 
-    /** Milliseconds of sleep between checks for changed documents. */
-    private final int indexingInterval;
+    private final List<String> fields = new ArrayList<String>();
 
-    /** Milliseconds left till the next check for changed documents. */
-    private int indexingTimer = 0;
+    private final LucenePlugin plugin;
 
     /**
-     * volatile forces the VM to check for changes every time the variable is accessed since it is not otherwise changed
-     * in the main loop the VM could "optimize" the check out and possibly never exit
+     * Milliseconds of sleep between checks for changed documents.
      */
-    private volatile boolean exit = false;
+    private final int indexingInterval;
 
     private final Directory directory;
 
     private final XWikiDocumentQueue queue = new XWikiDocumentQueue();
+
+    /**
+     * Milliseconds left till the next check for changed documents.
+     */
+    private int indexingTimer = 0;
 
     /**
      * Soft threshold after which no more documents will be added to the indexing queue. When the queue size gets larger
@@ -89,24 +97,26 @@ public class IndexUpdater extends AbstractXWikiRunnable implements EventListener
      */
     private final int maxQueueSize;
 
-    private Analyzer analyzer;
+    /**
+     * volatile forces the VM to check for changes every time the variable is accessed since it is not otherwise changed
+     * in the main loop the VM could "optimize" the check out and possibly never exit
+     */
+    private volatile boolean exit = false;
 
-    private final LucenePlugin plugin;
+    private Analyzer analyzer;
 
     private XWikiContext context;
 
-    private XWiki xwiki;
-
-    static List<String> fields = new ArrayList<String>();
-
     IndexUpdater(Directory directory, int indexingInterval, int maxQueueSize, LucenePlugin plugin, XWikiContext context)
     {
-        super(XWikiContext.EXECUTIONCONTEXT_KEY, context);
+        super(XWikiContext.EXECUTIONCONTEXT_KEY, context.clone());
 
-        this.xwiki = context.getWiki();
-        this.context = (XWikiContext) context.clone();
-        this.context.setDatabase(this.context.getMainXWiki());
         this.plugin = plugin;
+        this.context =
+                (XWikiContext) Utils.getComponent(Execution.class).getContext().getProperty(
+                    XWikiContext.EXECUTIONCONTEXT_KEY);
+        this.context.setDatabase(context.getMainXWiki());
+
         this.directory = directory;
 
         this.indexingInterval = indexingInterval;
@@ -168,7 +178,9 @@ public class IndexUpdater extends AbstractXWikiRunnable implements EventListener
         }
     }
 
-    /** Polls the queue for documents to be indexed. */
+    /**
+     * Polls the queue for documents to be indexed.
+     */
     private void updateIndex()
     {
         if (this.queue.isEmpty()) {
@@ -212,7 +224,7 @@ public class IndexUpdater extends AbstractXWikiRunnable implements EventListener
                         /*
                          * XXX Is it not possible to obtain the right translation directly?
                          */
-                        XWikiDocument doc = this.xwiki.getDocument(data.getFullName(), context);
+                        XWikiDocument doc = this.context.getWiki().getDocument(data.getFullName(), context);
 
                         if (data.getLanguage() != null && !data.getLanguage().equals("")) {
                             doc = doc.getTranslatedDocument(data.getLanguage(), context);

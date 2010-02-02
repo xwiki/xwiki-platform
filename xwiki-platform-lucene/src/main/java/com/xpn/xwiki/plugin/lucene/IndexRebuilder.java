@@ -27,11 +27,14 @@ import java.util.List;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.log4j.MDC;
+import org.xwiki.context.Execution;
 
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
+import com.xpn.xwiki.util.AbstractXWikiRunnable;
+import com.xpn.xwiki.web.Utils;
 
 /**
  * <p>
@@ -76,14 +79,13 @@ public class IndexRebuilder extends AbstractXWikiRunnable
     /** The actual object/thread that indexes data. */
     private final IndexUpdater indexUpdater;
 
-    /** The XWiki context. */
-    private XWikiContext context;
-
     /** Variable used for indicating that a rebuild is already in progress. */
     private volatile boolean rebuildInProgress = false;
 
     public IndexRebuilder(IndexUpdater indexUpdater, XWikiContext context, boolean needInitialBuild)
     {
+        super(XWikiContext.EXECUTIONCONTEXT_KEY, context.clone());
+
         this.indexUpdater = indexUpdater;
 
         if (needInitialBuild) {
@@ -102,7 +104,6 @@ public class IndexRebuilder extends AbstractXWikiRunnable
             this.indexUpdater.cleanIndex();
 
             this.rebuildInProgress = true;
-            this.context = context;
             Thread indexRebuilderThread = new Thread(this, "Lucene Index Rebuilder");
             // The JVM should be allowed to shutdown while this thread is running
             indexRebuilderThread.setDaemon(true);
@@ -116,7 +117,8 @@ public class IndexRebuilder extends AbstractXWikiRunnable
         }
     }
 
-    public void run()
+    @Override
+    protected void runInternal()
     {
         MDC.put("url", "Lucene index rebuilder thread");
         LOG.debug("Starting lucene index rebuild");
@@ -140,8 +142,9 @@ public class IndexRebuilder extends AbstractXWikiRunnable
             // context.setDatabase(this.context.getDatabase());
             // context.put("org.xwiki.component.manager.ComponentManager", this.context
             // .get("org.xwiki.component.manager.ComponentManager"));
-            context = (XWikiContext) this.context.clone();
-            this.context = null;
+            context =
+                    (XWikiContext) Utils.getComponent(Execution.class).getContext().getProperty(
+                        XWikiContext.EXECUTIONCONTEXT_KEY);
             // For example, we definitely don't want to use the same hibernate session...
             context.remove("hibsession");
             context.remove("hibtransaction");
@@ -149,11 +152,6 @@ public class IndexRebuilder extends AbstractXWikiRunnable
             // threads and causes the hibernate session to be shared in the end. The vcontext is
             // automatically recreated by the velocity renderer, if it isn't found in the xcontext.
             context.remove("vcontext");
-
-            // Since this is where a new thread is created this is where we need to initialize the Container
-            // ThreadLocal variables and not in the init() method. Otherwise we would simply overwrite the
-            // Container values for the main thread...
-            initXWikiContainer(context);
 
             // The original request and response should not be used outside the actual request
             // processing thread, as they will be cleaned later by the container.
@@ -165,9 +163,6 @@ public class IndexRebuilder extends AbstractXWikiRunnable
             LOG.error("Error in lucene rebuild thread", e);
         } finally {
             this.rebuildInProgress = false;
-
-            // Cleanup Container component (it has ThreadLocal variables)
-            cleanupXWikiContainer(context);
 
             if (context != null) {
                 context.getWiki().getStore().cleanUp(context);

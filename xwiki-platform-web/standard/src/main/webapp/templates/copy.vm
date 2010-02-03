@@ -19,7 +19,7 @@
     <div id="document-title"><h1>$msg.get('core.copy.copydoc')</h1></div>
     #set($sourcedoc = "$!{request.sourcedoc}")
     #set($targetdoc = "$!{request.targetdoc}")
-    #if("$!request.language" != "" && "$!request.language" != $msg.get("core.copy.allTranslations"))
+    #if("$!request.language" != "" && "$!{request.language}" != 'ALL')
       #set($language = $request.language)
     #end
     #set($sourcewiki = $context.database)
@@ -51,7 +51,7 @@
       <td>
         <select name="language">
         ## Add a special "All Translations" combo box entry to copy all translations.
-        <option selected="selected">$msg.get("core.copy.allTranslations")</option>
+        <option value="ALL" selected="selected">$msg.get("core.copy.allTranslations")</option>
         ## Add all the existing translations
         #foreach ($docTranslation in $docTranslations)
           <option>$docTranslation</option>

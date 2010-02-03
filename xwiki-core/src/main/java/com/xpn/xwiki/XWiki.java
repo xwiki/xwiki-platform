@@ -601,7 +601,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface
 
     public static String getServerWikiPage(String servername)
     {
-        return "XWiki.XWikiServer" + servername.substring(0, 1).toUpperCase() + servername.substring(1);
+        return "XWiki.XWikiServer" + StringUtils.capitalize(servername);
     }
 
     public static String getXMLEncoded(String content)

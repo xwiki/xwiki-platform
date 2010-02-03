@@ -150,13 +150,15 @@ public class GraphVizPlugin extends XWikiDefaultPlugin implements XWikiPluginInt
             command[3] = "-o";
             command[4] = ofile.getAbsolutePath();
             Process p = rt.exec(command);
+            int exitValue = -1;
             try {
                 int i = 0;
                 int max = 10;
                 for (i = 0; i < max; i++) {
                     Thread.sleep(1000);
                     try {
-                        p.exitValue();
+                        // exitValue() throws an IllegalThreadStateException if the process is still running. 
+                        exitValue = p.exitValue();
                         break;
                     } catch (IllegalThreadStateException e) {
                     }
@@ -170,7 +172,7 @@ public class GraphVizPlugin extends XWikiDefaultPlugin implements XWikiPluginInt
                 mLogger.error("Error while generating image from dot", e);
             }
 
-            if (p.exitValue() != 0) {
+            if (exitValue != 0) {
                 BufferedReader os = new BufferedReader(new InputStreamReader(p.getErrorStream()));
                 StringBuffer error = new StringBuffer();
                 while (os.ready()) {

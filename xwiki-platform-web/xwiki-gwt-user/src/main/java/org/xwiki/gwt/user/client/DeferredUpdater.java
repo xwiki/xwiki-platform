@@ -92,7 +92,7 @@ public class DeferredUpdater implements TimerListener
                 updatable.update();
             }
         } catch (Throwable t) {
-            Console.getInstance().error(t, "Failed to update: " + updatable.getClass().getName());
+            Console.getInstance().error("Deferred update failed!", t);
         }
     }
 }

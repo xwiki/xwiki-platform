@@ -341,8 +341,7 @@ XWiki.Annotation = Class.create({
   addAnnotationMarkers : function(annotations) {
     annotations.each(function(item){
       // get the last span of this annotation
-      // this will fail if the annotation is visible, displayed with annotation-highlight classname
-      var allSpans = $$('#xwikicontent [class=annotation ID' + item.annotationId + ']');
+      var allSpans = $$('#xwikicontent [class~=ID' + item.annotationId + ']');
       if (allSpans.size() == 0) {
         return;
       }

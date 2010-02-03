@@ -33,9 +33,12 @@
 {{html clean="false" wiki="true"}}
 $xwiki.ssx.use("XWiki.XWikiUserSheet")##
 $xwiki.ssx.use('Main.Dashboard')##
-&lt;div class="dashboard"&gt;
+&lt;div class="dashboard dashboard${context.action}"&gt;
   &lt;div class="dashboardleft"&gt;
     &lt;div class="watchlistManagement"&gt;
+      #if($context.action == 'view')
+        &lt;div class="editProfileCategory"&gt;&lt;a href="$doc.getURL('inline', 'category=watchlist')"&gt;&lt;span class="hidden"&gt;$msg.get('platform.core.profile.category.watchlist.edit')&lt;/span&gt;&lt;/a&gt;&lt;/div&gt;
+      #end
       &lt;h1&gt;$msg.get('platform.core.profile.section.watchlistManagement')&lt;/h1&gt;
       &lt;dl&gt;
         &lt;dt class="label"&gt;&lt;label&gt;$msg.get('platform.core.profile.watchlist.notifier')&lt;/label&gt;&lt;/dt&gt;
@@ -103,5 +106,4 @@ $xwiki.ssx.use('Main.Dashboard')##
 {{/html}}
 #end
 {{/velocity}}
-</content>
-</xwikidoc>
+</content></xwikidoc>

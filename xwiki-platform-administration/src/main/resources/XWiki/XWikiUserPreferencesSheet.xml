@@ -31,9 +31,12 @@
 $xwiki.ssx.use("XWiki.XWikiUserSheet")##
 $xwiki.ssx.use('Main.Dashboard')##
 {{html wiki="true"}}
-&lt;div class="dashboard"&gt;
+&lt;div class="dashboard dashboard${context.action}"&gt;
   &lt;div class="dashboardleft"&gt;
     &lt;div class="userPreferences"&gt;
+      #if($context.action == 'view')
+        &lt;div class="editProfileCategory"&gt;&lt;a href="$doc.getURL('inline', 'category=preferences')"&gt;&lt;span class="hidden"&gt;$msg.get('platform.core.profile.category.preferences.edit')&lt;/span&gt;&lt;/a&gt;&lt;/div&gt;
+      #end
       &lt;h1&gt;$msg.get('platform.core.profile.section.editorPreferences')&lt;/h1&gt;
       &lt;dl&gt;
         &lt;dt class="label"&gt;&lt;label&gt;$msg.get('platform.core.profile.editor')&lt;/label&gt;&lt;/dt&gt;
@@ -45,8 +48,8 @@ $xwiki.ssx.use('Main.Dashboard')##
       &lt;/dl&gt;
     &lt;/div&gt;
   &lt;/div&gt;
-  #set($isMyProfile = ($doc.fullName == $context.user.substring($i)) &amp;&amp; ($context.action == "view"))
-  #if(($isMyProfile || $xwiki.hasAdminRights()) &amp;&amp; !$doc.getObject("XWiki.LDAPProfileClass"))
+  #set($isMyProfile = ($doc.fullName == $context.user.substring($i)))
+  #if(($isMyProfile || $xwiki.hasAdminRights()) &amp;&amp; !$doc.getObject("XWiki.LDAPProfileClass") &amp;&amp; $context.action == 'view')
     &lt;div class="dashboardright"&gt;
       &lt;div class="passwordManagement"&gt;
         &lt;h1&gt;$msg.get('platform.core.profile.section.security')&lt;/h1&gt;

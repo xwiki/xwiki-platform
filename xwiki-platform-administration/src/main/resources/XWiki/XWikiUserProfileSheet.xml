@@ -42,7 +42,7 @@ $xwiki.ssx.use('Main.Dashboard')##
 &lt;div class="dashboard dashboard${context.action}"&gt;
   &lt;div class="dashboardleft"&gt;
     &lt;div class="userInfo"&gt;
-      #if($context.action == 'view')
+      #if($context.action == 'view' &amp;&amp; $hasEdit)
         &lt;div class="editProfileCategory"&gt;&lt;a href="$doc.getURL('inline', 'category=profile')"&gt;&lt;span class="hidden"&gt;$msg.get('platform.core.profile.category.profile.edit')&lt;/span&gt;&lt;/a&gt;&lt;/div&gt;
       #end
       ## Please do not insert extra empty lines here (as it affects the validity of the rendered xhtml)

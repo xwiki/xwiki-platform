@@ -1519,7 +1519,7 @@ ${Msz}Mb##
   #if("$!options.selectedColumn" != "") #set($selectedColumn = $options.selectedColumn) #end
   #if("$!options.callback" != "") #set($callback = $options.callback) #end
   #if("$!options.tagCloud" == "" || $options.tagCloud == false) #set($tagcloud=false) #else #set($tagcloud = true) #end
-  #if("$!options.javascriptName" != "") #set($jsName = $options.javascriptName) #else #set($jsName = "livetable") #end
+  #if("$!options.javascriptName" != "") #set($jsName = $options.javascriptName) #else #set($jsName = "livetable") #end
   #set($classname = "$!options.className")
   #set($extraparams = "$!options.extraParams")
   ##

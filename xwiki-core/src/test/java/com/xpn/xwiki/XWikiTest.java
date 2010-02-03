@@ -52,6 +52,7 @@ import com.xpn.xwiki.store.XWikiVersioningStoreInterface;
 import com.xpn.xwiki.test.AbstractBridgedXWikiComponentTestCase;
 import com.xpn.xwiki.web.XWikiRequest;
 import com.xpn.xwiki.web.XWikiServletRequest;
+import org.xwiki.rendering.syntax.Syntax;
 
 /**
  * Unit tests for {@link com.xpn.xwiki.XWiki}.
@@ -381,20 +382,20 @@ public class XWikiTest extends AbstractBridgedXWikiComponentTestCase
     public void testGetCurrentContentSyntaxId()
     {
         XWikiDocument doc1 = new XWikiDocument();
-        doc1.setSyntaxId("syntax1");
+        doc1.setSyntax(Syntax.CREOLE_1_0);
         XWikiDocument doc2 = new XWikiDocument();
-        doc2.setSyntaxId("syntax2");
+        doc2.setSyntax(Syntax.PLAIN_1_0);
 
-        assertEquals(null, this.xwiki.getCurrentContentSyntaxId(null, getContext()));
-        assertEquals("syntax", this.xwiki.getCurrentContentSyntaxId("syntax", getContext()));
+        assertNull(this.xwiki.getCurrentContentSyntaxId(null, getContext()));
+        assertEquals("syntaxId", this.xwiki.getCurrentContentSyntaxId("syntaxId", getContext()));
 
         getContext().setDoc(doc1);
 
-        assertEquals("syntax1", this.xwiki.getCurrentContentSyntaxId(null, getContext()));
+        assertEquals(Syntax.CREOLE_1_0.toIdString(), this.xwiki.getCurrentContentSyntaxId(null, getContext()));
 
         getContext().put("sdoc", doc2);
 
-        assertEquals("syntax2", this.xwiki.getCurrentContentSyntaxId(null, getContext()));
+        assertEquals(Syntax.PLAIN_1_0.toIdString(), this.xwiki.getCurrentContentSyntaxId(null, getContext()));
     }
 
     /**

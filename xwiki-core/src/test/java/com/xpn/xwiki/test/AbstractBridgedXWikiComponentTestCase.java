@@ -24,6 +24,7 @@ import org.xwiki.component.descriptor.DefaultComponentDescriptor;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.container.Container;
 import org.xwiki.context.Execution;
+import org.xwiki.rendering.syntax.Syntax;
 import org.xwiki.test.AbstractXWikiComponentTestCase;
 
 import com.xpn.xwiki.CoreConfiguration;
@@ -69,7 +70,7 @@ public abstract class AbstractBridgedXWikiComponentTestCase extends AbstractXWik
         c.setApplicationContext(new TestApplicationContext());
 
         Mock mockCoreConfiguration = mock(CoreConfiguration.class);
-        mockCoreConfiguration.stubs().method("getDefaultDocumentSyntax").will(returnValue("xwiki/1.0"));
+        mockCoreConfiguration.stubs().method("getDefaultDocumentSyntax").will(returnValue(Syntax.XWIKI_1_0));
         DefaultComponentDescriptor<CoreConfiguration> descriptor = new DefaultComponentDescriptor<CoreConfiguration>();
         descriptor.setRole(CoreConfiguration.class);
         getComponentManager().registerComponent(descriptor, (CoreConfiguration) mockCoreConfiguration.proxy());

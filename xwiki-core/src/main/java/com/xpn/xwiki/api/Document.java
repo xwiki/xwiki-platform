@@ -381,10 +381,20 @@ public class Document extends Api
     }
 
     /**
+     * @return The syntax representing the syntax used for the document's content
+     * @since 2.3M1
+     */
+    public Syntax getSyntax()
+    {
+        return this.doc.getSyntax();
+    }
+
+    /**
      * Get the Syntax id representing the syntax used for the document. For example "xwiki/1.0" represents the first
      * version XWiki syntax while "xwiki/2.0" represents version 2.0 of the XWiki Syntax.
      * 
      * @return The syntax id representing the syntax used for the document.
+     * @deprecated since 2.3M1 use {@link #getSyntax()} instead
      */
     public String getSyntaxId()
     {
@@ -1686,6 +1696,15 @@ public class Document extends Api
     public void setContent(String content)
     {
         getDoc().setContent(content);
+    }
+
+    /**
+     * @param syntax the Syntax representing the syntax used for the current document's content.
+     * @since 2.3M1
+     */
+    public void setSyntax(Syntax syntax)
+    {
+        getDoc().setSyntax(syntax);
     }
 
     /**

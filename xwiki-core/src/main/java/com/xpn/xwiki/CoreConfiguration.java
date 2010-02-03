@@ -20,6 +20,7 @@
 package com.xpn.xwiki;
 
 import org.xwiki.component.annotation.ComponentRole;
+import org.xwiki.rendering.syntax.Syntax;
 
 /**
  * Configuration properties for the Core module.
@@ -36,6 +37,7 @@ public interface CoreConfiguration
 {
     /**
      * @return the default syntax to use for new documents
+     * @since 2.3M1
      */
-    String getDefaultDocumentSyntax();
+    Syntax getDefaultDocumentSyntax();
 }

@@ -240,7 +240,7 @@ public class XWikiDocument implements DocumentModelBridge
      * first need is to support the new rendering component. To use the old rendering implementation specify a
      * "xwiki/1.0" syntaxId and use a "xwiki/2.0" syntaxId for using the new rendering component.
      */
-    private String syntaxId;
+    private Syntax syntax;
 
     /**
      * Is latest modification a minor edit
@@ -2860,7 +2860,7 @@ public class XWikiDocument implements DocumentModelBridge
 
                     // Set the new document syntax as the syntax of the template since the template content
                     // is copied into the new document
-                    setSyntaxId(templatedoc.getSyntaxId());
+                    setSyntax(templatedoc.getSyntax());
 
                     // If the parent is not set in the current document set the template parent as the parent.
                     if (getParentReference() == null) {
@@ -2937,7 +2937,7 @@ public class XWikiDocument implements DocumentModelBridge
         setXClassXML(document.getXClassXML());
         setComment(document.getComment());
         setMinorEdit(document.isMinorEdit());
-        setSyntaxId(document.getSyntaxId());
+        setSyntax(document.getSyntax());
         setHidden(document.isHidden());
 
         cloneXObjects(document);
@@ -2988,7 +2988,7 @@ public class XWikiDocument implements DocumentModelBridge
             doc.setXClassXML(getXClassXML());
             doc.setComment(getComment());
             doc.setMinorEdit(isMinorEdit());
-            doc.setSyntaxId(getSyntaxId());
+            doc.setSyntax(getSyntax());
             doc.setHidden(isHidden());
 
             doc.cloneXObjects(this);
@@ -3593,7 +3593,7 @@ public class XWikiDocument implements DocumentModelBridge
         if ((syntaxId == null) || (syntaxId.length() == 0)) {
             // Documents that don't have syntax ids are considered old documents and thus in
             // XWiki Syntax 1.0 since newer documents always have syntax ids.
-            setSyntaxId(XWIKI10_SYNTAXID);
+            setSyntax(Syntax.XWIKI_1_0);
         } else {
             setSyntaxId(syntaxId);
         }
@@ -5484,53 +5484,62 @@ public class XWikiDocument implements DocumentModelBridge
     }
 
     /**
+     * @return the syntax of the document
+     * @since 2.3M1
+     */
+    public Syntax getSyntax()
+    {
+        // Can't be initialized in the XWikiDocument constructor because #getDefaultDocumentSyntax() need to create a
+        // XWikiDocument object to get preferences from wiki preferences pages and would thus generate an infinite loop
+        if (isNew() && this.syntax == null) {
+            this.syntax = getDefaultDocumentSyntax();
+        }
+
+        return this.syntax;
+    }
+
+    /**
+     * Note that this method cannot be removed for now since it's used by Hibernate for saving a XWikiDocument.
+     *
      * {@inheritDoc}
      * 
      * @see org.xwiki.bridge.DocumentModelBridge#getSyntaxId()
+     * @deprecated since 2.3M1, use {link #getSyntax()} instead
      */
     public String getSyntaxId()
     {
-        // Can't be initialized in the XWikiDocument constructor because #getDefaultDocumentSyntaxId() need to create a
-        // XWikiDocument object to get preferences and generate an infinite loop
-        if (isNew() && this.syntaxId == null) {
-            this.syntaxId = getDefaultDocumentSyntaxId();
-        }
-
-        return this.syntaxId;
+        return getSyntax().toIdString();
     }
 
     /**
-     * @return the syntax of the document
+     * @param syntax the new syntax to set for this document
+     * @see #getSyntax()
+     * @since 2.3M1
      */
-    private Syntax getSyntax()
+    public void setSyntax(Syntax syntax)
     {
-        Syntax syntax = null;
-
-        String syntaxId = getSyntaxId();
-        try {
-            syntax = this.syntaxFactory.createSyntaxFromIdString(syntaxId);
-        } catch (ParseException e) {
-            LOG.error("Failed to generate Syntax object for syntax identifier [" + syntaxId + "] in document ["
-                + this.defaultEntityReferenceSerializer.serialize(getDocumentReference()) + "]", e);
-
-            syntaxId = getDefaultDocumentSyntaxId();
-            try {
-                syntax = this.syntaxFactory.createSyntaxFromIdString(syntaxId);
-            } catch (ParseException e1) {
-                LOG.error("Failed to generate default Syntax object. The default syntax id is [" + syntaxId + "]", e);
-            }
-        }
-
-        return syntax;
+        this.syntax = syntax;
     }
 
     /**
+     * Note that this method cannot be removed for now since it's used by Hibernate for saving a XWikiDocument.
+     *
      * @param syntaxId the new syntax id to set (eg "xwiki/1.0", "xwiki/2.0", etc)
      * @see #getSyntaxId()
+     * @deprecated since 2.3M1, use {link #setSyntax(Syntax)} instead
      */
     public void setSyntaxId(String syntaxId)
     {
-        this.syntaxId = syntaxId;
+        Syntax syntax;
+        try {
+            syntax = this.syntaxFactory.createSyntaxFromIdString(syntaxId);
+        } catch (ParseException e) {
+            syntax = getDefaultDocumentSyntax();
+            LOG.warn("Failed to set syntax [" + syntaxId + "] for ["
+                + this.defaultEntityReferenceSerializer.serialize(getDocumentReference()) + "], setting syntax ["
+                + syntax.toIdString() + "] instead.", e);
+        }
+        setSyntax(syntax);
     }
 
     public Vector<BaseObject> getComments(boolean asc)
@@ -6717,8 +6726,8 @@ public class XWikiDocument implements DocumentModelBridge
             }
         }
 
-        // change syntax id
-        setSyntaxId(targetSyntax.toIdString());
+        // change syntax
+        setSyntax(targetSyntax);
     }
 
     /**
@@ -6884,20 +6893,19 @@ public class XWikiDocument implements DocumentModelBridge
         }
     }
 
-    private String getDefaultDocumentSyntaxId()
+    private Syntax getDefaultDocumentSyntax()
     {
         // If there's no parser available for the specified syntax default to XWiki 2.0 syntax
-        String syntaxId = Utils.getComponent(CoreConfiguration.class).getDefaultDocumentSyntax();
+        Syntax syntax = Utils.getComponent(CoreConfiguration.class).getDefaultDocumentSyntax();
 
         try {
-            Utils.getComponent(Parser.class, syntaxId);
+            Utils.getComponent(Parser.class, syntax.toIdString());
         } catch (Exception e) {
-            LOG.warn("Failed to find parser for syntax [" + syntaxId + "]. Defaulting to xwiki/2.0 syntax.");
-
-            syntaxId = XWIKI20_SYNTAXID;
+            LOG.warn("Failed to find parser for syntax [" + syntax.toIdString() + "]. Defaulting to xwiki/2.0 syntax.");
+            syntax = Syntax.XWIKI_2_0;
         }
 
-        return syntaxId;
+        return syntax;
     }
 
     private DocumentReference resolveReference(String referenceAsString, DocumentReferenceResolver resolver,

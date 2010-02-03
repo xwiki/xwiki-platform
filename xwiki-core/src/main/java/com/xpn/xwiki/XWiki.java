@@ -7092,7 +7092,8 @@ public class XWiki implements XWikiDocChangeNotificationInterface
      */
     public String getDefaultDocumentSyntax()
     {
-        return Utils.getComponent(CoreConfiguration.class).getDefaultDocumentSyntax();
+        // TODO: Fix this method to return a Syntax object instead of a String
+        return Utils.getComponent(CoreConfiguration.class).getDefaultDocumentSyntax().toIdString();
     }
 
     /**
@@ -7148,19 +7149,19 @@ public class XWiki implements XWikiDocChangeNotificationInterface
      * (it's generally the case when a document is directly rendered with
      * {@link XWikiDocument#getRenderedContent(XWikiContext)} for example).
      * 
-     * @param def the default value to return if no document can be found
+     * @param defaultSyntaxId the default value to return if no document can be found
      * @return the syntax identifier
      */
-    public String getCurrentContentSyntaxId(String def, XWikiContext context)
+    public String getCurrentContentSyntaxId(String defaultSyntaxId, XWikiContext context)
     {
-        String syntaxId = def;
+        String syntaxId = defaultSyntaxId;
 
         if (context.get("sdoc") != null) {
             // The content document
-            syntaxId = ((XWikiDocument) context.get("sdoc")).getSyntaxId();
+            syntaxId = ((XWikiDocument) context.get("sdoc")).getSyntax().toIdString();
         } else if (context.getDoc() != null) {
             // The context document
-            syntaxId = context.getDoc().getSyntaxId();
+            syntaxId = context.getDoc().getSyntax().toIdString();
         }
 
         return syntaxId;

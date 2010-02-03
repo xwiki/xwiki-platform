@@ -31,6 +31,7 @@ import org.xwiki.component.descriptor.DefaultComponentDescriptor;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.container.Container;
 import org.xwiki.context.Execution;
+import org.xwiki.rendering.syntax.Syntax;
 import org.xwiki.test.AbstractComponentTestCase;
 
 /**
@@ -73,7 +74,7 @@ public class AbstractBridgedComponentTestCase extends AbstractComponentTestCase
 
         final CoreConfiguration mockCoreConfiguration = this.mockery.mock(CoreConfiguration.class);
         this.mockery.checking(new Expectations() {{
-            allowing(mockCoreConfiguration).getDefaultDocumentSyntax(); will(returnValue("xwiki/1.0"));
+            allowing(mockCoreConfiguration).getDefaultDocumentSyntax(); will(returnValue(Syntax.XWIKI_1_0));
         }});
 
         DefaultComponentDescriptor<CoreConfiguration> descriptor = new DefaultComponentDescriptor<CoreConfiguration>();

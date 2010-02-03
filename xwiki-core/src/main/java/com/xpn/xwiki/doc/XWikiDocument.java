@@ -5490,10 +5490,10 @@ public class XWikiDocument implements DocumentModelBridge
      */
     public String getSyntaxId()
     {
-        // Can't be initialized in the XWikiDocument constructor because #getDefaultDocumentSyntax() need to create a
+        // Can't be initialized in the XWikiDocument constructor because #getDefaultDocumentSyntaxId() need to create a
         // XWikiDocument object to get preferences and generate an infinite loop
         if (isNew() && this.syntaxId == null) {
-            this.syntaxId = getDefaultDocumentSyntax();
+            this.syntaxId = getDefaultDocumentSyntaxId();
         }
 
         return this.syntaxId;
@@ -5513,7 +5513,7 @@ public class XWikiDocument implements DocumentModelBridge
             LOG.error("Failed to generate Syntax object for syntax identifier [" + syntaxId + "] in document ["
                 + this.defaultEntityReferenceSerializer.serialize(getDocumentReference()) + "]", e);
 
-            syntaxId = getDefaultDocumentSyntax();
+            syntaxId = getDefaultDocumentSyntaxId();
             try {
                 syntax = this.syntaxFactory.createSyntaxFromIdString(syntaxId);
             } catch (ParseException e1) {
@@ -6884,7 +6884,7 @@ public class XWikiDocument implements DocumentModelBridge
         }
     }
 
-    private String getDefaultDocumentSyntax()
+    private String getDefaultDocumentSyntaxId()
     {
         // If there's no parser available for the specified syntax default to XWiki 2.0 syntax
         String syntaxId = Utils.getComponent(CoreConfiguration.class).getDefaultDocumentSyntax();

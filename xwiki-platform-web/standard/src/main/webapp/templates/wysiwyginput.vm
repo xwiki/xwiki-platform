@@ -76,5 +76,7 @@ Event.stopObserving(window, "pagehide", cancelEdit);
   ## Round tripping between HTML and Wiki syntax.
   #set($content = $tdoc.getRenderedContent($content, $tdoc.getSyntaxId(), "annotatedxhtml/1.0"))
 #end
-<body id="body" class="main">$content<script id="__contentLoadTrigger" type="text/javascript">fireContentLoad('__contentLoadTrigger')</script></body>
+<body id="body" class="main">$content<script id="__contentLoadTrigger" type="text/javascript"><!--
+fireContentLoad('__contentLoadTrigger')
+--></script></body>
 </html>

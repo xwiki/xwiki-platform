@@ -54,11 +54,13 @@ public final class InputFactory
     public static Widget createInput(ParameterType type)
     {
         // TODO: This needs to be improved!
+        // NOTE: We hard-code the class names to be able to compile the GWT code with the disableClassMetadata flag on.
+        // This way we can reduce the size of the generated JavaScript code.
         String className = type.getName();
-        if (StringBuffer.class.getName().equals(className)) {
+        if ("java.lang.StringBuffer".equals(className)) {
             // Large string, let's use a text area.
             return new TextInput(new TextArea());
-        } else if (boolean.class.getName().equals(className) || Boolean.class.getName().equals(className)) {
+        } else if ("boolean".equals(className) || "java.lang.Boolean".equals(className)) {
             return createBooleanInput();
         } else if (type.isEnum()) {
             return createChoiceInput(type.getEnumConstants());

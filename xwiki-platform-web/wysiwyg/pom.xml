@@ -159,8 +159,7 @@
           <skipTests>${gwt.skipTests}</skipTests>
           <style>${gwt.style}</style>
           <disableCastChecking>true</disableCastChecking>
-          <!-- We use class meta data to detect the type of a macro parameter. -->
-          <disableClassMetadata>false</disableClassMetadata>
+          <disableClassMetadata>true</disableClassMetadata>
           <!-- HACK: We inject the GWT arguments in the out parameter because we have no other option. -->
           <out>target/www-test${gwt.args}</out>
           <testTimeOut>600</testTimeOut>

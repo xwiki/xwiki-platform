@@ -91,7 +91,7 @@
         #end    
         </ul>
     #else
-      #warning($msg.get("core.viewers.attachments.noAttachments"))
+      #warning($msg.get("core.importer.noPackageAvailable"))
     #end
     </div> ## packagelistcontainer
     </div> ## packagelist

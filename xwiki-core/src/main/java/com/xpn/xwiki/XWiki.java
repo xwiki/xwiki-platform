@@ -292,7 +292,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface
      */
     private DocumentReferenceResolver currentMixedDocumentReferenceResolver =
         Utils.getComponent(DocumentReferenceResolver.class, "currentmixed");
-    
+
     public static String getConfigPath() throws NamingException
     {
         if (configPath == null) {
@@ -464,8 +464,8 @@ public class XWiki implements XWikiDocChangeNotificationInterface
                     // IP address not to have to create a XWikiServerXwiki page since we consider
                     // in that case that they're pointing to the main wiki.
                     if ((servername.equals("www"))
-                        || (host.equals("localhost") || (context.getUtil().match(
-                            "m|[0-9]+\\.|[0-9]+\\.[0-9]+\\.[0-9]|", host)))) {
+                        || (host.equals("localhost")
+                        || (context.getUtil().match("m|[0-9]+\\.|[0-9]+\\.[0-9]+\\.[0-9]|", host)))) {
                         if (appname.equals("xwiki")) {
                             return xwiki;
                         }
@@ -648,6 +648,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface
      * etc.).
      * <p>
      * Needed for tools or tests which need XWiki because it is used everywhere in the API.
+     * </p>
      */
     public XWiki()
     {
@@ -728,9 +729,11 @@ public class XWiki implements XWikiDocChangeNotificationInterface
         setCriteriaService((XWikiCriteriaService) createClassFromConfig("xwiki.criteria.class",
             "com.xpn.xwiki.criteria.impl.XWikiCriteriaServiceImpl", context));
 
-        setAttachmentStore(Utils.getComponent(XWikiAttachmentStoreInterface.class, Param("xwiki.store.attachment.hint")));
+        setAttachmentStore(Utils.getComponent(XWikiAttachmentStoreInterface.class,
+            Param("xwiki.store.attachment.hint")));
 
-        setVersioningStore(Utils.getComponent(XWikiVersioningStoreInterface.class, Param("xwiki.store.versioning.hint")));
+        setVersioningStore(Utils.getComponent(XWikiVersioningStoreInterface.class,
+            Param("xwiki.store.versioning.hint")));
 
         setAttachmentVersioningStore(Utils.getComponent(AttachmentVersioningStore.class,
             hasAttachmentVersioning(context) ? Param("xwiki.store.attachment.versioning.hint") : "void"));
@@ -752,7 +755,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface
             }
             AbstractXWikiMigrationManager manager =
                 (AbstractXWikiMigrationManager) createClassFromConfig("xwiki.store.migration.manager.class",
-                    "com.xpn.xwiki.store.migration.hibernate.XWikiHibernateMigrationManager", context);
+                "com.xpn.xwiki.store.migration.hibernate.XWikiHibernateMigrationManager", context);
             manager.startMigrations(context);
             if ("1".equals(Param("xwiki.store.migration.exitAfterEnd", "0"))) {
                 if (LOG.isErrorEnabled()) {
@@ -934,8 +937,8 @@ public class XWiki implements XWikiDocChangeNotificationInterface
 
             String hql =
                 ", BaseObject as obj, StringProperty as prop where obj.name=doc.fullName"
-                    + " and obj.name <> 'XWiki.XWikiServerClassTemplate' and obj.className='XWiki.XWikiServerClass' "
-                    + "and prop.id.id = obj.id ";
+                + " and obj.name <> 'XWiki.XWikiServerClassTemplate' and obj.className='XWiki.XWikiServerClass' "
+                + "and prop.id.id = obj.id ";
             List<String> list = getStore().searchDocumentsNames(hql, context);
 
             for (String docname : list) {
@@ -991,8 +994,8 @@ public class XWiki implements XWikiDocChangeNotificationInterface
             if (wikiserver == null) {
                 String hql =
                     ", BaseObject as obj, StringProperty as prop where obj.name=doc.fullName"
-                        + " and obj.className='XWiki.XWikiServerClass' and prop.id.id = obj.id "
-                        + "and prop.id.name = 'server' and prop.value='" + host + "'";
+                    + " and obj.className='XWiki.XWikiServerClass' and prop.id.id = obj.id "
+                    + "and prop.id.name = 'server' and prop.value='" + host + "'";
                 try {
                     List<String> list = context.getWiki().getStore().searchDocumentsNames(hql, context);
                     if ((list != null) && (list.size() > 0)) {
@@ -1448,18 +1451,18 @@ public class XWiki implements XWikiDocChangeNotificationInterface
      * @deprecated since 2.2M1 use {@link #getDocument(DocumentReference, XWikiContext)} instead
      */
     @Deprecated
-    public XWikiDocument getDocument(String web, String fullname, XWikiContext context) throws XWikiException
+    public XWikiDocument getDocument(String space, String fullname, XWikiContext context) throws XWikiException
     {
-        int i1 = fullname.lastIndexOf(".");
-        if (i1 != -1) {
-            String web2 = fullname.substring(0, i1);
-            String name = fullname.substring(i1 + 1);
+        int dotPosition = fullname.lastIndexOf(".");
+        if (dotPosition != -1) {
+            String spaceFromFullname = fullname.substring(0, dotPosition);
+            String name = fullname.substring(dotPosition + 1);
             if (name.equals("")) {
                 name = "WebHome";
             }
-            return getDocument(web2 + "." + name, context);
+            return getDocument(spaceFromFullname + "." + name, context);
         } else {
-            return getDocument(web + "." + fullname, context);
+            return getDocument(space + "." + fullname, context);
         }
     }
 
@@ -1475,7 +1478,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface
             return context.getWiki().getDefaultWeb(context) + "." + context.getWiki().getDefaultPage(context);
         }
 
-        String web, name;
+        String space, name;
         int i1 = 0;
         int i2;
         if (StringUtils.countMatches(path, "/") > 2) {
@@ -1484,10 +1487,10 @@ public class XWiki implements XWikiDocChangeNotificationInterface
 
         if (StringUtils.countMatches(path, "/") > 1) {
             i2 = path.indexOf("/", i1 + 1);
-            web = path.substring(i1 + 1, i2);
+            space = path.substring(i1 + 1, i2);
         } else {
             i2 = 0;
-            web = context.getWiki().getDefaultWeb(context);
+            space = context.getWiki().getDefaultSpace(context);
         }
         int i3 = path.indexOf("/", i2 + 1);
         if (i3 == -1) {
@@ -1499,15 +1502,15 @@ public class XWiki implements XWikiDocChangeNotificationInterface
             name = getDefaultPage(context);
         }
 
-        web = Util.decodeURI(web, context);
+        space = Util.decodeURI(space, context);
         name = Util.decodeURI(name, context);
-        if (StringUtils.contains(web, ':')) {
-            web = StringUtils.substringAfterLast(web, ":");
+        if (StringUtils.contains(space, ':')) {
+            space = StringUtils.substringAfterLast(space, ":");
         }
         if (StringUtils.contains(name, ':')) {
             name = StringUtils.substringAfterLast(name, ":");
         }
-        String fullname = web + "." + name;
+        String fullname = space + "." + name;
         return fullname;
     }
 
@@ -2884,7 +2887,8 @@ public class XWiki implements XWikiDocChangeNotificationInterface
 
         bclass.setName(XWikiConstant.TAG_CLASS);
 
-        needsUpdate |= bclass.addStaticListField(XWikiConstant.TAG_CLASS_PROP_TAGS, "Tags", 30, true, true, "", "input", null);
+        needsUpdate |=
+            bclass.addStaticListField(XWikiConstant.TAG_CLASS_PROP_TAGS, "Tags", 30, true, true, "", "input", null);
         StaticListClass tagClass = (StaticListClass) bclass.get(XWikiConstant.TAG_CLASS_PROP_TAGS);
         if (tagClass.isRelationalStorage() == false) {
             tagClass.setRelationalStorage(true);
@@ -3059,9 +3063,9 @@ public class XWiki implements XWikiDocChangeNotificationInterface
 
         needsUpdate |= bclass.addTextField("skin", "Skin", 30);
         needsUpdate |= bclass.addDBListField("colorTheme", "Color theme",
-                "select doc.fullName, doc.title from XWikiDocument as doc, BaseObject as theme "
-                    + "where doc.fullName=theme.name and theme.className='ColorThemes.ColorThemeClass' "
-                    + "and doc.fullName<>'ColorThemes.ColorThemeTemplate'");
+            "select doc.fullName, doc.title from XWikiDocument as doc, BaseObject as theme "
+            + "where doc.fullName=theme.name and theme.className='ColorThemes.ColorThemeClass' "
+            + "and doc.fullName<>'ColorThemes.ColorThemeTemplate'");
         // This one should not be in the prefs
         PropertyInterface baseskinProp = bclass.get("baseskin");
         if (baseskinProp != null) {
@@ -4266,12 +4270,13 @@ public class XWiki implements XWikiDocChangeNotificationInterface
     public boolean copyDocument(DocumentReference sourceDocumentReference, DocumentReference targetDocumentReference,
         boolean reset, boolean force, boolean resetCreationData, XWikiContext context) throws XWikiException
     {
-        return copyDocument(sourceDocumentReference, targetDocumentReference, null, reset, force,
-            resetCreationData, context);
+        return copyDocument(sourceDocumentReference, targetDocumentReference, null, reset, force, resetCreationData,
+            context);
     }
 
     /**
-     * @deprecated since 2.2M2 use {@link #copyDocument(DocumentReference, DocumentReference, boolean, boolean, boolean, XWikiContext)}
+     * @deprecated since 2.2M2 use
+     *             {@link #copyDocument(DocumentReference, DocumentReference, boolean, boolean, boolean, XWikiContext)}
      */
     @Deprecated
     public boolean copyDocument(String docname, String targetdocname, boolean reset, boolean force,
@@ -4319,7 +4324,8 @@ public class XWiki implements XWikiDocChangeNotificationInterface
     }
 
     /**
-     * @deprecated since 2.2M2 use {@link #copyDocument(DocumentReference, DocumentReference, String, boolean, XWikiContext)}
+     * @deprecated since 2.2M2 use
+     *             {@link #copyDocument(DocumentReference, DocumentReference, String, boolean, XWikiContext)}
      */
     @Deprecated
     public boolean copyDocument(String docname, String targetdocname, String sourceWiki, String targetWiki,
@@ -4339,7 +4345,8 @@ public class XWiki implements XWikiDocChangeNotificationInterface
     }
 
     /**
-     * @deprecated since 2.2M2 use {@link #copyDocument(DocumentReference, DocumentReference, String, boolean, boolean, XWikiContext)}
+     * @deprecated since 2.2M2 use
+     *             {@link #copyDocument(DocumentReference, DocumentReference, String, boolean, boolean, XWikiContext)}
      */
     @Deprecated
     public boolean copyDocument(String docname, String targetdocname, String sourceWiki, String targetWiki,
@@ -4527,7 +4534,8 @@ public class XWiki implements XWikiDocChangeNotificationInterface
     }
 
     /**
-     * @deprecated since 2.2M2 use {@link #copyDocument(DocumentReference, DocumentReference, String, boolean, boolean, boolean, XWikiContext)}
+     * @deprecated since 2.2M2 use
+     *             {@link #copyDocument(DocumentReference, DocumentReference, String, boolean, boolean, boolean, XWikiContext)}
      */
     @Deprecated
     public boolean copyDocument(String docname, String targetdocname, String sourceWiki, String targetWiki,
@@ -4763,7 +4771,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface
                 context.setDatabase(getDatabase());
                 XWikiDocument doc =
                     getDocument("XWiki.XWikiServer" + database.substring(0, 1).toUpperCase() + database.substring(1),
-                        context);
+                    context);
                 BaseObject serverobject = doc.getObject("XWiki.XWikiServerClass");
                 if (serverobject != null) {
                     String server = serverobject.getStringValue("server");
@@ -4863,7 +4871,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface
 
         URL url =
             context.getURLFactory().createURL(doc.getSpace(), doc.getName(), action, queryString, anchor,
-                doc.getDatabase(), context);
+            doc.getDatabase(), context);
         return context.getURLFactory().getURL(url, context);
     }
 
@@ -4884,7 +4892,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface
 
         URL url =
             context.getURLFactory().createExternalURL(doc.getSpace(), doc.getName(), action, null, null,
-                doc.getDatabase(), context);
+            doc.getDatabase(), context);
         return url.toString();
     }
 
@@ -4896,7 +4904,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface
 
         URL url =
             context.getURLFactory().createExternalURL(doc.getSpace(), doc.getName(), action, querystring, null,
-                doc.getDatabase(), context);
+            doc.getDatabase(), context);
         return url.toString();
     }
 
@@ -5194,7 +5202,8 @@ public class XWiki implements XWikiDocChangeNotificationInterface
                     if (isExo()) {
                         try {
                             this.groupService =
-                                (XWikiGroupService) Class.forName("com.xpn.xwiki.user.impl.exo.ExoGroupServiceImpl").newInstance();
+                                (XWikiGroupService) Class.forName("com.xpn.xwiki.user.impl.exo.ExoGroupServiceImpl")
+                                .newInstance();
                         } catch (Exception e2) {
                             e2.printStackTrace();
                         }
@@ -5345,7 +5354,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface
                             }
                             factoryService =
                                 (XWikiURLFactoryService) Class.forName(urlFactoryServiceClass).getConstructor(
-                                    new Class< ? >[] {XWiki.class}).newInstance(new Object[] {this});
+                                new Class< ? >[] {XWiki.class}).newInstance(new Object[] {this});
                         } catch (Exception e) {
                             factoryService = null;
                             LOG.warn("Failed to initialize URLFactory Service [" + urlFactoryServiceClass + "]", e);
@@ -5490,7 +5499,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface
         return "org.hibernate.dialect.MySQLDialect".equals(getHibernateStore().getConfiguration().getProperties().get(
             "dialect"))
             || "net.sf.hibernate.dialect.MySQLDialect".equals(getHibernateStore().getConfiguration().getProperties()
-                .get("dialect"));
+            .get("dialect"));
     }
 
     public String getFullNameSQL()
@@ -5562,7 +5571,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface
                 }
                 text =
                     XWikiVelocityRenderer.evaluate(format, "<username formatting code in "
-                        + context.getDoc().getPrefixedFullName() + ">", vcontext, context);
+                    + context.getDoc().getPrefixedFullName() + ">", vcontext, context);
             }
 
             text = StringEscapeUtils.escapeXml(text.trim());
@@ -5570,7 +5579,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface
             if (link) {
                 text =
                     "<span class=\"wikilink\"><a href=\"" + userdoc.getURL("view", context) + "\">" + text
-                        + "</a></span>";
+                    + "</a></span>";
             }
             return text;
         } catch (Exception e) {
@@ -5982,13 +5991,14 @@ public class XWiki implements XWikiDocChangeNotificationInterface
     public List<String> getSpaceDocsName(String spaceName, XWikiContext context) throws XWikiException
     {
         try {
-            return getStore().getQueryManager().getNamedQuery("getSpaceDocsName").bindValue("space", spaceName).execute();
+            return getStore().getQueryManager().getNamedQuery("getSpaceDocsName").bindValue("space", spaceName)
+                .execute();
         } catch (QueryException ex) {
             throw new XWikiException(0, 0, ex.getMessage(), ex);
         }
     }
 
-    public List<String> getIncludedMacros(String defaultweb, String content, XWikiContext context)
+    public List<String> getIncludedMacros(String defaultSpace, String content, XWikiContext context)
     {
         List<String> list;
 
@@ -5998,7 +6008,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface
             for (int i = 0; i < list.size(); i++) {
                 String name = list.get(i);
                 if (name.indexOf(".") == -1) {
-                    list.set(i, defaultweb + "." + name);
+                    list.set(i, defaultSpace + "." + name);
                 }
             }
         } catch (Exception e) {
@@ -6162,12 +6172,11 @@ public class XWiki implements XWikiDocChangeNotificationInterface
 
     public String getDefaultPage(XWikiContext context)
     {
-        String dweb = getXWikiPreference("defaultpage", "", context);
-        if (StringUtils.isEmpty(dweb)) {
+        String defaultPage = getXWikiPreference("defaultpage", "", context);
+        if (StringUtils.isEmpty(defaultPage)) {
             return Param("xwiki.defaultpage", "WebHome");
-        } else {
-            return dweb;
         }
+        return defaultPage;
     }
 
     public boolean hasEditComment(XWikiContext context)
@@ -6438,7 +6447,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface
                 int i1 = username.indexOf('@');
                 id =
                     "" + username.charAt(0) + username.substring(i1 + 1, i1 + 2)
-                        + username.charAt(username.length() - 1) + id;
+                    + username.charAt(username.length() - 1) + id;
             }
 
             return id;
@@ -6453,10 +6462,10 @@ public class XWiki implements XWikiDocChangeNotificationInterface
     {
         return (context.getWiki().ParamAsLong("xwiki.section.edit", 0) == 1);
     }
-    
+
     /**
-     * @return the section depth for which section editing is available (can be configured through 
-     *         {@code xwiki.section.depth} configuration property. Defaults to 2 when not defined
+     * @return The maximum section depth for which section editing is available. This can be customized through the
+     *         {@code xwiki.section.depth} configuration property. Defaults to 2 when not defined.
      */
     public long getSectionEditingDepth()
     {
@@ -6481,14 +6490,10 @@ public class XWiki implements XWikiDocChangeNotificationInterface
     public String clearName(String name, boolean stripDots, boolean ascii, XWikiContext context)
     {
         String temp = name;
-        temp =
-            temp.replaceAll(
-                "[\u00c0\u00c1\u00c2\u00c3\u00c4\u00c5\u0100\u0102\u0104\u01cd\u01de\u01e0\u01fa\u0200\u0202\u0226]",
-                "A");
-        temp =
-            temp.replaceAll(
-                "[\u00e0\u00e1\u00e2\u00e3\u00e4\u00e5\u0101\u0103\u0105\u01ce\u01df\u01e1\u01fb\u0201\u0203\u0227]",
-                "a");
+        temp = temp.replaceAll(
+            "[\u00c0\u00c1\u00c2\u00c3\u00c4\u00c5\u0100\u0102\u0104\u01cd\u01de\u01e0\u01fa\u0200\u0202\u0226]", "A");
+        temp = temp.replaceAll(
+            "[\u00e0\u00e1\u00e2\u00e3\u00e4\u00e5\u0101\u0103\u0105\u01ce\u01df\u01e1\u01fb\u0201\u0203\u0227]", "a");
         temp = temp.replaceAll("[\u00c6\u01e2\u01fc]", "AE");
         temp = temp.replaceAll("[\u00e6\u01e3\u01fd]", "ae");
         temp = temp.replaceAll("[\u008c\u0152]", "OE");
@@ -6515,29 +6520,25 @@ public class XWiki implements XWikiDocChangeNotificationInterface
         temp = temp.replaceAll("[\u013a\u013c\u013e\u0140\u0142\u0234]", "l");
         temp = temp.replaceAll("[\u00d1\u0143\u0145\u0147\u014a\u01f8]", "N");
         temp = temp.replaceAll("[\u00f1\u0144\u0146\u0148\u0149\u014b\u01f9\u0235]", "n");
-        temp =
-            temp.replaceAll(
-                "[\u00d2\u00d3\u00d4\u00d5\u00d6\u00d8\u014c\u014e\u0150\u01d1\u01ea\u01ec\u01fe\u020c\u020e\u022a\u022c\u022e\u0230]",
-                "O");
-        temp =
-            temp.replaceAll(
-                "[\u00f2\u00f3\u00f4\u00f5\u00f6\u00f8\u014d\u014f\u0151\u01d2\u01eb\u01ed\u01ff\u020d\u020f\u022b\u022d\u022f\u0231]",
-                "o");
+        temp = temp.replaceAll(
+            "[\u00d2\u00d3\u00d4\u00d5\u00d6\u00d8\u014c\u014e\u0150\u01d1\u01ea\u01ec\u01fe\u020c\u020e\u022a\u022c" +
+            "\u022e\u0230]", "O");
+        temp = temp.replaceAll(
+            "[\u00f2\u00f3\u00f4\u00f5\u00f6\u00f8\u014d\u014f\u0151\u01d2\u01eb\u01ed\u01ff\u020d\u020f\u022b\u022d" +
+            "\u022f\u0231]", "o");
         temp = temp.replaceAll("[\u0156\u0158\u0210\u0212]", "R");
         temp = temp.replaceAll("[\u0157\u0159\u0211\u0213]", "r");
         temp = temp.replaceAll("[\u015a\u015c\u015e\u0160\u0218]", "S");
         temp = temp.replaceAll("[\u015b\u015d\u015f\u0161\u0219]", "s");
         temp = temp.replaceAll("[\u00de\u0162\u0164\u0166\u021a]", "T");
         temp = temp.replaceAll("[\u00fe\u0163\u0165\u0167\u021b\u0236]", "t");
-        temp =
-            temp.replaceAll(
-                "[\u00d9\u00da\u00db\u00dc\u0168\u016a\u016c\u016e\u0170\u0172\u01d3\u01d5\u01d7\u01d9\u01db\u0214\u0216]",
-                "U");
-        temp =
-            temp.replaceAll(
-                "[\u00f9\u00fa\u00fb\u00fc\u0169\u016b\u016d\u016f\u0171\u0173\u01d4\u01d6\u01d8\u01da\u01dc\u0215\u0217]",
-                "u");
-        temp = temp.replaceAll("/[\u0174]", "W");
+        temp = temp.replaceAll(
+            "[\u00d9\u00da\u00db\u00dc\u0168\u016a\u016c\u016e\u0170\u0172\u01d3\u01d5\u01d7\u01d9\u01db\u0214\u0216]",
+            "U");
+        temp = temp.replaceAll(
+            "[\u00f9\u00fa\u00fb\u00fc\u0169\u016b\u016d\u016f\u0171\u0173\u01d4\u01d6\u01d8\u01da\u01dc\u0215\u0217]",
+            "u");
+        temp = temp.replaceAll("[\u0174]", "W");
         temp = temp.replaceAll("[\u0175]", "w");
         temp = temp.replaceAll("[\u00dd\u0176\u0178\u0232]", "Y");
         temp = temp.replaceAll("[\u00fd\u00ff\u0177\u0233]", "y");
@@ -6947,10 +6948,6 @@ public class XWiki implements XWikiDocChangeNotificationInterface
                 workDir = null;
             }
         }
-
-        /*
-         * TODO : it would be nice to create a subdirectory xwiki in APPServer/work or WEBAPP/WEB-INF/work
-         */
 
         // No choices left, retreiving the temp directory
         this.workDir = this.getTempDirectory(context);

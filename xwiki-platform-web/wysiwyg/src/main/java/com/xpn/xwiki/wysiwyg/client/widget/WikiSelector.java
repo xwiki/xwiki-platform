@@ -23,7 +23,7 @@ import java.util.List;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.ListBox;
-import com.xpn.xwiki.wysiwyg.client.WikiServiceAsync;
+import com.xpn.xwiki.wysiwyg.client.wiki.WikiServiceAsync;
 
 /**
  * Selector to choose the wiki from the list of wikis in this instance.

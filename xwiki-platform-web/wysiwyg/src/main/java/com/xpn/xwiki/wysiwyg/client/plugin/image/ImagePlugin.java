@@ -29,14 +29,14 @@ import org.xwiki.gwt.user.client.ui.wizard.WizardListener;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.user.client.ui.PushButton;
-import com.xpn.xwiki.wysiwyg.client.WikiServiceAsync;
-import com.xpn.xwiki.wysiwyg.client.editor.Images;
-import com.xpn.xwiki.wysiwyg.client.editor.Strings;
+import com.xpn.xwiki.wysiwyg.client.Images;
+import com.xpn.xwiki.wysiwyg.client.Strings;
 import com.xpn.xwiki.wysiwyg.client.plugin.image.exec.InsertImageExecutable;
 import com.xpn.xwiki.wysiwyg.client.plugin.image.ui.ImageWizard;
 import com.xpn.xwiki.wysiwyg.client.plugin.image.ui.ImageWizard.ImageWizardSteps;
 import com.xpn.xwiki.wysiwyg.client.plugin.internal.AbstractPlugin;
 import com.xpn.xwiki.wysiwyg.client.plugin.internal.FocusWidgetUIExtension;
+import com.xpn.xwiki.wysiwyg.client.wiki.WikiServiceAsync;
 
 /**
  * Rich text editor plug-in for inserting images, using a dialog to get image data settings from the user. It installs

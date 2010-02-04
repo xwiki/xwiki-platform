@@ -31,7 +31,6 @@ import org.xwiki.gwt.user.client.ui.rta.cmd.Executable;
 import org.xwiki.gwt.user.client.ui.wizard.Wizard;
 import org.xwiki.gwt.user.client.ui.wizard.WizardListener;
 
-import com.xpn.xwiki.wysiwyg.client.WikiServiceAsync;
 import com.xpn.xwiki.wysiwyg.client.plugin.image.ImageConfig;
 import com.xpn.xwiki.wysiwyg.client.plugin.internal.AbstractPlugin;
 import com.xpn.xwiki.wysiwyg.client.plugin.link.exec.CreateLinkExecutable;
@@ -39,7 +38,8 @@ import com.xpn.xwiki.wysiwyg.client.plugin.link.exec.LinkExecutableUtils;
 import com.xpn.xwiki.wysiwyg.client.plugin.link.exec.UnlinkExecutable;
 import com.xpn.xwiki.wysiwyg.client.plugin.link.ui.LinkWizard;
 import com.xpn.xwiki.wysiwyg.client.plugin.link.ui.LinkWizard.LinkWizardSteps;
-import com.xpn.xwiki.wysiwyg.client.util.ResourceName;
+import com.xpn.xwiki.wysiwyg.client.wiki.ResourceName;
+import com.xpn.xwiki.wysiwyg.client.wiki.WikiServiceAsync;
 
 /**
  * Rich text editor plug-in for inserting links, using a dialog to get link settings from the user. It installs a menu

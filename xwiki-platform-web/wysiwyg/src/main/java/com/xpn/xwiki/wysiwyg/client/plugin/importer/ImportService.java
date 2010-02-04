@@ -25,7 +25,7 @@ import org.xwiki.component.annotation.ComponentRole;
 
 import com.google.gwt.user.client.rpc.RemoteService;
 import com.google.gwt.user.client.rpc.RemoteServiceRelativePath;
-import com.xpn.xwiki.wysiwyg.client.util.Attachment;
+import com.xpn.xwiki.wysiwyg.client.wiki.Attachment;
 
 /**
  * The service interface used on the server.

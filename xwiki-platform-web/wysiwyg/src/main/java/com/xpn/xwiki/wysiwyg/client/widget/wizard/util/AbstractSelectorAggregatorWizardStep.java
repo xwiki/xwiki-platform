@@ -36,8 +36,8 @@ import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.Panel;
 import com.google.gwt.user.client.ui.TabPanel;
 import com.google.gwt.user.client.ui.Widget;
-import com.xpn.xwiki.wysiwyg.client.editor.Strings;
-import com.xpn.xwiki.wysiwyg.client.util.ResourceName;
+import com.xpn.xwiki.wysiwyg.client.Strings;
+import com.xpn.xwiki.wysiwyg.client.wiki.ResourceName;
 
 /**
  * Wizard step used to aggregate a set of selectors for a file attached (file attachment or image) to a page in the

@@ -34,10 +34,10 @@ import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.TextBox;
-import com.xpn.xwiki.wysiwyg.client.WikiServiceAsync;
-import com.xpn.xwiki.wysiwyg.client.editor.Strings;
-import com.xpn.xwiki.wysiwyg.client.util.ResourceName;
-import com.xpn.xwiki.wysiwyg.client.util.WikiPage;
+import com.xpn.xwiki.wysiwyg.client.Strings;
+import com.xpn.xwiki.wysiwyg.client.wiki.ResourceName;
+import com.xpn.xwiki.wysiwyg.client.wiki.WikiPage;
+import com.xpn.xwiki.wysiwyg.client.wiki.WikiServiceAsync;
 
 /**
  * Wizard step to select the wiki page to link to, from the page search results for a keyword.

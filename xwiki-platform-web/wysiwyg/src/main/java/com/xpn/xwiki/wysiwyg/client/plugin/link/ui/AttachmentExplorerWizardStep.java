@@ -22,11 +22,11 @@ package com.xpn.xwiki.wysiwyg.client.plugin.link.ui;
 import org.xwiki.gwt.user.client.StringUtils;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
-import com.xpn.xwiki.wysiwyg.client.WikiServiceAsync;
-import com.xpn.xwiki.wysiwyg.client.editor.Strings;
+import com.xpn.xwiki.wysiwyg.client.Strings;
 import com.xpn.xwiki.wysiwyg.client.plugin.link.ui.LinkWizard.LinkWizardSteps;
-import com.xpn.xwiki.wysiwyg.client.util.Attachment;
-import com.xpn.xwiki.wysiwyg.client.util.ResourceName;
+import com.xpn.xwiki.wysiwyg.client.wiki.Attachment;
+import com.xpn.xwiki.wysiwyg.client.wiki.ResourceName;
+import com.xpn.xwiki.wysiwyg.client.wiki.WikiServiceAsync;
 
 /**
  * Specialized {@link AbstractExplorerWizardStep} to select an attachment to a wiki page.

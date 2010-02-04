@@ -24,12 +24,12 @@ import org.xwiki.gwt.user.client.ui.ListItem;
 
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.Label;
-import com.xpn.xwiki.wysiwyg.client.editor.Strings;
+import com.xpn.xwiki.wysiwyg.client.Strings;
 import com.xpn.xwiki.wysiwyg.client.plugin.link.LinkConfig;
 import com.xpn.xwiki.wysiwyg.client.plugin.link.ui.LinkWizard.LinkWizardSteps;
-import com.xpn.xwiki.wysiwyg.client.util.ResourceName;
-import com.xpn.xwiki.wysiwyg.client.util.WikiPage;
 import com.xpn.xwiki.wysiwyg.client.widget.wizard.util.AbstractListSelectorWizardStep;
+import com.xpn.xwiki.wysiwyg.client.wiki.ResourceName;
+import com.xpn.xwiki.wysiwyg.client.wiki.WikiPage;
 
 /**
  * Wizard step to select the wiki page to link to, from a list of wiki pages.

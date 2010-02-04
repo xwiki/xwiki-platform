@@ -22,9 +22,9 @@ package com.xpn.xwiki.wysiwyg.client.plugin.link.ui;
 import java.util.List;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
-import com.xpn.xwiki.wysiwyg.client.WikiServiceAsync;
-import com.xpn.xwiki.wysiwyg.client.util.ResourceName;
-import com.xpn.xwiki.wysiwyg.client.util.WikiPage;
+import com.xpn.xwiki.wysiwyg.client.wiki.ResourceName;
+import com.xpn.xwiki.wysiwyg.client.wiki.WikiPage;
+import com.xpn.xwiki.wysiwyg.client.wiki.WikiServiceAsync;
 
 /**
  * Wizard step to select the wiki page to link to, from the recently modified ones for the current user.

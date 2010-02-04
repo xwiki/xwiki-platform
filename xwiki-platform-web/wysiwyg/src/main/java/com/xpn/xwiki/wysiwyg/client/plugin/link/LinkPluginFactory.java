@@ -20,11 +20,11 @@
 package com.xpn.xwiki.wysiwyg.client.plugin.link;
 
 import com.google.gwt.core.client.GWT;
-import com.xpn.xwiki.wysiwyg.client.WikiService;
-import com.xpn.xwiki.wysiwyg.client.WikiServiceAsync;
-import com.xpn.xwiki.wysiwyg.client.WikiServiceAsyncCacheProxy;
 import com.xpn.xwiki.wysiwyg.client.plugin.Plugin;
 import com.xpn.xwiki.wysiwyg.client.plugin.internal.AbstractPluginFactory;
+import com.xpn.xwiki.wysiwyg.client.wiki.WikiService;
+import com.xpn.xwiki.wysiwyg.client.wiki.WikiServiceAsync;
+import com.xpn.xwiki.wysiwyg.client.wiki.WikiServiceAsyncCacheProxy;
 
 /**
  * Factory for {@link LinkPlugin}.

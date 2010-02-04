@@ -269,14 +269,14 @@
           <!-- New code should follow checkstyle rules. -->
           <excludes>
             com/xpn/xwiki/wysiwyg/client/diff/**/*,
-            com/xpn/xwiki/wysiwyg/client/editor/Images.java,
-            com/xpn/xwiki/wysiwyg/client/editor/Strings.java,
-            com/xpn/xwiki/wysiwyg/client/editor/WysiwygEditor.java,
             com/xpn/xwiki/wysiwyg/client/plugin/link/LinkConfig.java,
             com/xpn/xwiki/wysiwyg/client/plugin/link/LinkConfigTest.java,
             com/xpn/xwiki/wysiwyg/client/plugin/image/ImageConfig.java,
             com/xpn/xwiki/wysiwyg/client/plugin/sync/SyncPlugin.java,
             com/xpn/xwiki/wysiwyg/client/plugin/sync/SyncTools.java,
+            com/xpn/xwiki/wysiwyg/client/Images.java,
+            com/xpn/xwiki/wysiwyg/client/Strings.java,
+            com/xpn/xwiki/wysiwyg/client/WysiwygEditor.java,
             com/xpn/xwiki/wysiwyg/server/plugin/sync/internal/DefaultSyncEngine.java,
             com/xpn/xwiki/wysiwyg/server/plugin/sync/SyncTest.java
           </excludes>

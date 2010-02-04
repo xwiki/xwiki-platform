@@ -20,12 +20,12 @@
 package com.xpn.xwiki.wysiwyg.client.plugin.image.ui;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
-import com.xpn.xwiki.wysiwyg.client.editor.Strings;
+import com.xpn.xwiki.wysiwyg.client.Strings;
 import com.xpn.xwiki.wysiwyg.client.plugin.image.ImageConfig;
 import com.xpn.xwiki.wysiwyg.client.plugin.image.ui.ImageWizard.ImageWizardSteps;
-import com.xpn.xwiki.wysiwyg.client.util.Attachment;
-import com.xpn.xwiki.wysiwyg.client.util.ResourceName;
 import com.xpn.xwiki.wysiwyg.client.widget.wizard.util.AbstractFileUploadWizardStep;
+import com.xpn.xwiki.wysiwyg.client.wiki.Attachment;
+import com.xpn.xwiki.wysiwyg.client.wiki.ResourceName;
 
 /**
  * Specialized wizard step to upload an image.

@@ -22,7 +22,7 @@ package com.xpn.xwiki.wysiwyg.client.plugin.importer;
 import java.util.Map;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
-import com.xpn.xwiki.wysiwyg.client.util.Attachment;
+import com.xpn.xwiki.wysiwyg.client.wiki.Attachment;
 
 /**
  * Service interface used on the client by the importer plug-in. It should have all the methods from

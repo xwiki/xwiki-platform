@@ -20,12 +20,12 @@
 package com.xpn.xwiki.wysiwyg.client.plugin.link.ui;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
-import com.xpn.xwiki.wysiwyg.client.editor.Strings;
+import com.xpn.xwiki.wysiwyg.client.Strings;
 import com.xpn.xwiki.wysiwyg.client.plugin.link.LinkConfig;
 import com.xpn.xwiki.wysiwyg.client.plugin.link.ui.LinkWizard.LinkWizardSteps;
-import com.xpn.xwiki.wysiwyg.client.util.Attachment;
-import com.xpn.xwiki.wysiwyg.client.util.ResourceName;
 import com.xpn.xwiki.wysiwyg.client.widget.wizard.util.AbstractFileUploadWizardStep;
+import com.xpn.xwiki.wysiwyg.client.wiki.Attachment;
+import com.xpn.xwiki.wysiwyg.client.wiki.ResourceName;
 
 /**
  * Specific file upload wizard step to handle upload of a new file attachment in order to create a link to it.

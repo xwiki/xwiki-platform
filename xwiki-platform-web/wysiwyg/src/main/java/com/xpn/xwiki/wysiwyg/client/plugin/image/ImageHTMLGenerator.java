@@ -22,7 +22,7 @@ package com.xpn.xwiki.wysiwyg.client.plugin.image;
 import org.xwiki.gwt.user.client.StringUtils;
 
 import com.xpn.xwiki.wysiwyg.client.plugin.image.ImageConfig.ImageAlignment;
-import com.xpn.xwiki.wysiwyg.client.util.ResourceName;
+import com.xpn.xwiki.wysiwyg.client.wiki.ResourceName;
 
 /**
  * Generates an HTML block for an image, given by it's URL and filename.

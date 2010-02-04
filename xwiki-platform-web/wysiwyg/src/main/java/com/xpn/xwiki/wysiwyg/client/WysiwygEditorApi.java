@@ -17,7 +17,7 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package com.xpn.xwiki.wysiwyg.client.editor;
+package com.xpn.xwiki.wysiwyg.client;
 
 import org.xwiki.gwt.dom.client.JavaScriptObject;
 import org.xwiki.gwt.user.client.Config;
@@ -121,7 +121,7 @@ public class WysiwygEditorApi
     public static boolean isRichTextEditingSupported()
     {
         RichTextArea textArea = new RichTextArea(null);
-        return textArea.getBasicFormatter() != null;
+        return textArea.getFormatter() != null;
     }
 
     /**
@@ -201,23 +201,23 @@ public class WysiwygEditorApi
         // a reference to) the GWT instance methods without having an instance.
         $wnd.WysiwygEditor = function(config) {
             if (typeof config == 'object') {
-                this.instance = @com.xpn.xwiki.wysiwyg.client.editor.WysiwygEditorApi::new(Lorg/xwiki/gwt/dom/client/JavaScriptObject;)(config);
+                this.instance = @com.xpn.xwiki.wysiwyg.client.WysiwygEditorApi::new(Lorg/xwiki/gwt/dom/client/JavaScriptObject;)(config);
             }
         }
         $wnd.WysiwygEditor.prototype.release = function() {
-            this.instance.@com.xpn.xwiki.wysiwyg.client.editor.WysiwygEditorApi::release()();
+            this.instance.@com.xpn.xwiki.wysiwyg.client.WysiwygEditorApi::release()();
         }
         $wnd.WysiwygEditor.prototype.getPlainTextArea = function() {
-            return this.instance.@com.xpn.xwiki.wysiwyg.client.editor.WysiwygEditorApi::getPlainTextArea()();
+            return this.instance.@com.xpn.xwiki.wysiwyg.client.WysiwygEditorApi::getPlainTextArea()();
         }
         $wnd.WysiwygEditor.prototype.getRichTextArea = function() {
-            return this.instance.@com.xpn.xwiki.wysiwyg.client.editor.WysiwygEditorApi::getRichTextArea()();
+            return this.instance.@com.xpn.xwiki.wysiwyg.client.WysiwygEditorApi::getRichTextArea()();
         }
         $wnd.WysiwygEditor.prototype.getSourceText = function(onSuccess, onFailure) {
-            this.instance.@com.xpn.xwiki.wysiwyg.client.editor.WysiwygEditorApi::getSourceText(Lorg/xwiki/gwt/dom/client/JavaScriptObject;Lorg/xwiki/gwt/dom/client/JavaScriptObject;)(onSuccess, onFailure);
+            this.instance.@com.xpn.xwiki.wysiwyg.client.WysiwygEditorApi::getSourceText(Lorg/xwiki/gwt/dom/client/JavaScriptObject;Lorg/xwiki/gwt/dom/client/JavaScriptObject;)(onSuccess, onFailure);
         }
         $wnd.WysiwygEditor.prototype.getCommandManager = function() {
-            return this.instance.@com.xpn.xwiki.wysiwyg.client.editor.WysiwygEditorApi::getCommandManagerApi()();
+            return this.instance.@com.xpn.xwiki.wysiwyg.client.WysiwygEditorApi::getCommandManagerApi()();
         }
     }-*/;
 }

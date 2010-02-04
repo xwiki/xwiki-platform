@@ -22,7 +22,7 @@ package com.xpn.xwiki.wysiwyg.client.plugin.font;
 import org.xwiki.gwt.dom.client.Style;
 
 import com.google.gwt.dom.client.OptionElement;
-import com.xpn.xwiki.wysiwyg.client.editor.Strings;
+import com.xpn.xwiki.wysiwyg.client.Strings;
 
 /**
  * A widget used for choosing a font family.

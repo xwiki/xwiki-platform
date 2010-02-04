@@ -34,8 +34,8 @@ import org.xwiki.gwt.user.client.ui.rta.cmd.Command;
 
 import com.google.gwt.user.client.ui.MenuItemSeparator;
 import com.google.gwt.user.client.ui.UIObject;
-import com.xpn.xwiki.wysiwyg.client.editor.Images;
-import com.xpn.xwiki.wysiwyg.client.editor.Strings;
+import com.xpn.xwiki.wysiwyg.client.Images;
+import com.xpn.xwiki.wysiwyg.client.Strings;
 import com.xpn.xwiki.wysiwyg.client.plugin.internal.MenuItemUIExtension;
 import com.xpn.xwiki.wysiwyg.client.plugin.table.TableFeature;
 import com.xpn.xwiki.wysiwyg.client.plugin.table.TablePlugin;

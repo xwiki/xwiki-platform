@@ -31,8 +31,8 @@ import org.xwiki.gwt.user.client.ui.wizard.WizardListener;
 import org.xwiki.gwt.user.client.ui.wizard.WizardStepMap;
 import org.xwiki.gwt.user.client.ui.wizard.NavigationListener.NavigationDirection;
 
-import com.xpn.xwiki.wysiwyg.client.editor.Images;
-import com.xpn.xwiki.wysiwyg.client.editor.Strings;
+import com.xpn.xwiki.wysiwyg.client.Images;
+import com.xpn.xwiki.wysiwyg.client.Strings;
 import com.xpn.xwiki.wysiwyg.client.plugin.macro.ui.EditMacroWizardStep;
 import com.xpn.xwiki.wysiwyg.client.plugin.macro.ui.SelectMacroWizardStep;
 

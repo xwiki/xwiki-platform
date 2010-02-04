@@ -36,7 +36,7 @@ import org.xwiki.xml.html.HTMLCleanerConfiguration;
 import org.xwiki.xml.html.HTMLUtils;
 
 import com.xpn.xwiki.wysiwyg.client.plugin.importer.ImportService;
-import com.xpn.xwiki.wysiwyg.client.util.Attachment;
+import com.xpn.xwiki.wysiwyg.client.wiki.Attachment;
 
 /**
  * XWiki specific implementation of {@link ImportService}.

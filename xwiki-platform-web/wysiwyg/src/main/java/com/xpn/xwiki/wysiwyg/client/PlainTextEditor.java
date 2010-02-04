@@ -18,7 +18,7 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
-package com.xpn.xwiki.wysiwyg.client.editor;
+package com.xpn.xwiki.wysiwyg.client;
 
 import org.xwiki.gwt.dom.client.Element;
 import org.xwiki.gwt.user.client.BackForwardCache;

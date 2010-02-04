@@ -2629,7 +2629,7 @@ public class XWiki extends Api
      * Get the XWiki Class object defined in the passed Document name.
      * <p>
      * Note: This method doesn't require any rights for accessing the passed Document (as opposed to the
-     * {@link com.xpn.xwiki.api.Document#getXClass()} method which does require to get a Document object first. This is
+     * {@link com.xpn.xwiki.api.Document#getClass()} method which does require to get a Document object first. This is
      * thus useful in cases where the calling code doesn't have the access right to the specified Document. It is safe
      * because there are no sensitive data stored in a Class definition.
      * </p>
@@ -2824,5 +2824,23 @@ public class XWiki extends Api
     public boolean isTitleInCompatibilityMode()
     {
         return this.xwiki.isTitleInCompatibilityMode();
+    }
+
+    /**
+     * Get the syntax of the document currently being executed.
+     * <p>
+     * The document currently being executed is not the same than the context document since when including a page with
+     * velocity #includeForm(), method for example the context doc is the includer document even if includeForm() fully
+     * execute and render the included document before insert it in the includer document.
+     * <p>
+     * If the current document can't be found, the method assume that the executed document is the context document
+     * (it's generally the case when a document is directly rendered with
+     * {@link XWikiDocument#getRenderedContent(XWikiContext)} for example).
+     *
+     * @return the syntax identifier
+     */
+    public String getCurrentContentSyntaxId()
+    {
+        return this.xwiki.getCurrentContentSyntaxId(getXWikiContext());
     }
 }

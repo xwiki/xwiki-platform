@@ -7131,7 +7131,42 @@ public class XWiki implements XWikiDocChangeNotificationInterface
      */
     public String getCurrentContentSyntaxId(String defaultSyntaxId, XWikiContext context)
     {
-        String syntaxId = defaultSyntaxId;
+        String syntaxId = getCurrentContentSyntaxIdInternal(context);
+
+        if (syntaxId == null) {
+            syntaxId = defaultSyntaxId;
+        }
+
+        return syntaxId;
+    }
+
+    /**
+     * Get the syntax of the document currently being executed.
+     * <p>
+     * The document currently being executed is not the same than the context document since when including a page with
+     * velocity #includeForm(), method for example the context doc is the includer document even if includeForm() fully
+     * execute and render the included document before insert it in the includer document.
+     * <p>
+     * If the current document can't be found, the method assume that the executed document is the context document
+     * (it's generally the case when a document is directly rendered with
+     * {@link XWikiDocument#getRenderedContent(XWikiContext)} for example).
+     *
+     * @return the syntax identifier
+     */
+    public String getCurrentContentSyntaxId(XWikiContext context)
+    {
+        String syntaxId = getCurrentContentSyntaxIdInternal(context);
+
+        if (syntaxId == null) {
+            throw new RuntimeException("Cannot get the current syntax since there's no current document set");
+        }
+
+        return syntaxId;
+    }
+
+    private String getCurrentContentSyntaxIdInternal(XWikiContext context)
+    {
+        String syntaxId = null;
 
         if (context.get("sdoc") != null) {
             // The content document

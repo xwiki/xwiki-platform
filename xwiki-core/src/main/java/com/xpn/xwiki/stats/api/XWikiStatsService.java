@@ -33,6 +33,8 @@ import com.xpn.xwiki.criteria.impl.Period;
 import com.xpn.xwiki.criteria.impl.Range;
 import com.xpn.xwiki.criteria.impl.Scope;
 import com.xpn.xwiki.stats.impl.DocumentStats;
+import com.xpn.xwiki.stats.impl.RefererStats;
+import com.xpn.xwiki.stats.impl.VisitStats;
 
 /**
  * Store and retrieve statistics.
@@ -69,7 +71,8 @@ public interface XWikiStatsService
      * @param context the XWiki context.
      * @return A list of DocumentStats objects
      */
-    List< ? > getDocumentStatistics(String action, Scope scope, Period period, Range range, XWikiContext context);
+    List<DocumentStats> getDocumentStatistics(String action, Scope scope, Period period, Range range,
+        XWikiContext context);
 
     /**
      * Retrieves visit statistics.
@@ -81,7 +84,7 @@ public interface XWikiStatsService
      * @param context the XWiki context.
      * @return a list of VisitStats objects.
      */
-    List< ? > getVisitStatistics(String action, Period period, Range range, XWikiContext context);
+    List<VisitStats> getVisitStatistics(String action, Period period, Range range, XWikiContext context);
 
     /**
      * Retrieves referrer statistics.
@@ -94,7 +97,8 @@ public interface XWikiStatsService
      * @param context the XWiki context.
      * @return a list of RefererStats objects.
      */
-    List< ? > getRefererStatistics(String domain, Scope scope, Period period, Range range, XWikiContext context);
+    List<RefererStats> getRefererStatistics(String domain, Scope scope, Period period, Range range,
+        XWikiContext context);
 
     /**
      * Retrieves back-link statistics.

@@ -17,7 +17,7 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.script.internal.service;
+package org.xwiki.velocity.internal;
 
 import org.apache.velocity.VelocityContext;
 import org.xwiki.component.annotation.Component;

@@ -2,4 +2,3 @@ org.xwiki.script.internal.DefaultScriptContextManager
 org.xwiki.script.internal.ScriptExecutionContextInitializer
 org.xwiki.script.internal.service.DefaultScriptServiceManager
 org.xwiki.script.internal.service.ServicesScriptContextInitializer
-org.xwiki.script.internal.service.ServicesVelocityContextInitializer

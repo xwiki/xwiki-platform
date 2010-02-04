@@ -7,3 +7,4 @@ org.xwiki.model.internal.reference.DefaultReferenceDocumentReferenceResolver
 org.xwiki.model.internal.reference.DefaultStringAttachmentReferenceResolver
 org.xwiki.model.internal.DefaultModelConfiguration
 org.xwiki.model.internal.DefaultModelContext
+org.xwiki.model.internal.scripting.ModelScriptService

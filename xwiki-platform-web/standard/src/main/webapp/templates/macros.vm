@@ -1498,7 +1498,7 @@ ${Msz}Mb##
  *#
 #macro(livetable $divid $collist $colprops $options)
 ## Do not indent:
-#if($doc.syntaxId == "xwiki/2.0")
+#if($xwiki.getCurrentContentSyntaxId() == "xwiki/2.0")
 
 
 {{html}}

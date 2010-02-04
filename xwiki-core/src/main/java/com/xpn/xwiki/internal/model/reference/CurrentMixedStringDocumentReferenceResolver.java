@@ -34,7 +34,7 @@ import org.xwiki.model.reference.EntityReference;
 /**
  * This is an implementation for backward-compatibility. It's behavior is essentially similar to the
  * {@link com.xpn.xwiki.internal.model.reference.CurrentStringDocumentReferenceResolver} implementation except for
- * two detail:
+ * two details:
  * <ul>
  * <li>if the document reference doesn't have a name specified it defaults to the default name and not
  * the current document's page name.</li>

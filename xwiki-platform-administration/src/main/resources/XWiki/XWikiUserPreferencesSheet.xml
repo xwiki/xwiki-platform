@@ -48,7 +48,7 @@ $xwiki.ssx.use('Main.Dashboard')##
       &lt;/dl&gt;
     &lt;/div&gt;
   &lt;/div&gt;
-  #set($isMyProfile = ($doc.fullName == $context.user.substring($i)))
+  #set($isMyProfile = ($xwiki.getDocument($context.user).prefixedFullName == $doc.prefixedFullName))
   #if(($isMyProfile || $xwiki.hasAdminRights()) &amp;&amp; !$doc.getObject("XWiki.LDAPProfileClass") &amp;&amp; $context.action == 'view')
     &lt;div class="dashboardright"&gt;
       &lt;div class="passwordManagement"&gt;

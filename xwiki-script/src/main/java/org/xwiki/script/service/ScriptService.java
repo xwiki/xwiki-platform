@@ -17,22 +17,20 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.rendering.syntax;
+package org.xwiki.script.service;
 
 import org.xwiki.component.annotation.ComponentRole;
-import org.xwiki.rendering.parser.ParseException;
 
 /**
+ * Any module wishing to expose Script APIs (for example APIs accessible through Groovy, Python, Velocity, etc)
+ * must implement this component interface, in addition to implementing its own business interface. Any component
+ * implementing this interface will be automatically exposed to scripts.
+ *
  * @version $Id$
- * @since 2.0RC1
+ * @since 2.3M1
  */
 @ComponentRole
-public interface SyntaxFactory
+public interface ScriptService
 {
-    /**
-     * @param syntaxAsIdString the syntax as a string (eg "xwiki/2.0", "plain/1.0")
-     * @return the parsed syntax as a Syntax object
-     * @throws ParseException in case the string doesn't represent a valid syntax
-     */
-    Syntax createSyntaxFromIdString(String syntaxAsIdString) throws ParseException;
+    // Voluntarily empty
 }

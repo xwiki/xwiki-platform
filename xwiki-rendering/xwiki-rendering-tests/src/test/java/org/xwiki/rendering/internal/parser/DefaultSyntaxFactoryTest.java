@@ -26,6 +26,9 @@ import org.xwiki.test.AbstractComponentTestCase;
 import org.junit.Test;
 import org.junit.Assert;
 
+/**
+ * @version $Id$
+ */
 public class DefaultSyntaxFactoryTest extends AbstractComponentTestCase
 {
     @Test

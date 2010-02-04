@@ -19,18 +19,12 @@
  */
 package org.xwiki.rendering.internal.parser;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.xwiki.component.annotation.Component;
-import org.xwiki.component.annotation.Requirement;
 import org.xwiki.component.logging.AbstractLogEnabled;
-import org.xwiki.component.manager.ComponentLookupException;
-import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.rendering.parser.ParseException;
-import org.xwiki.rendering.parser.Parser;
 import org.xwiki.rendering.syntax.Syntax;
 import org.xwiki.rendering.syntax.SyntaxFactory;
 import org.xwiki.rendering.syntax.SyntaxType;
@@ -46,12 +40,6 @@ public class DefaultSyntaxFactory extends AbstractLogEnabled implements SyntaxFa
      * Used to cut the syntax identifier into syntax name and syntax version.
      */
     private static final Pattern SYNTAX_PATTERN = Pattern.compile("(.*)\\/(.*)");
-
-    /**
-     * Used to lookup all the parsers.
-     */
-    @Requirement
-    private ComponentManager componentManager;
 
     /**
      * {@inheritDoc}
@@ -73,29 +61,5 @@ public class DefaultSyntaxFactory extends AbstractLogEnabled implements SyntaxFa
         SyntaxType syntaxType = new SyntaxType(syntaxId, syntaxId);
 
         return new Syntax(syntaxType, version);
-    }
-
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.rendering.syntax.SyntaxFactory#getAvailableSyntaxes()
-     * @deprecated starting with 2.0M3 you should directly lookup the Parser using the Component Manager
-     */
-    public List<Syntax> getAvailableSyntaxes()
-    {
-        List<Syntax> parserSyntaxList = new ArrayList<Syntax>();
-        List<Parser> parsers;
-        try {
-            parsers = this.componentManager.lookupList(Parser.class);
-        } catch (ComponentLookupException e) {
-            // TODO: Do we need a Rendering RuntimeException? Or should we throw a checked exception instead?
-            throw new RuntimeException("Failed to lookup the list of available Parser Syntaxes", e);
-        }
-
-        for (Parser parser : parsers) {
-            parserSyntaxList.add(parser.getSyntax());
-        }
-
-        return parserSyntaxList;
     }
 }

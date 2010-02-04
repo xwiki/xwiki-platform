@@ -149,6 +149,7 @@
             **/rendering/renderer/xhtml/*.java,
             **/rendering/transformation/*.java,
             **/rendering/util/*.java
+            **/rendering/syntax/SyntaxFactory.java
           </includes>
           <excludes>
             **/rendering/internal/parser/XDOMGeneratorListener.java,
@@ -195,12 +196,13 @@
           <plugin>
             <groupId>org.codehaus.mojo</groupId>
             <artifactId>clirr-maven-plugin</artifactId>
-            <!-- <configuration>
+            <configuration>
+              <!-- TODO: To be removed when we release XWiki 2.3 -->
               <excludes>
-                <exclude>**/internal/**</exclude>
-                <exclude>org/xwiki/rendering/</exclude>
+                <exclude>org/xwiki/rendering/syntax/SyntaxFactory</exclude>
+                <exclude>org/xwiki/rendering/internal/parser/DefaultSyntaxFactory</exclude>
               </excludes>
-            </configuration> -->
+            </configuration>
           </plugin>
         </plugins>
       </build>

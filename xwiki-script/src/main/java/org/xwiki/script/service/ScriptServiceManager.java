@@ -17,22 +17,27 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.rendering.syntax;
+package org.xwiki.script.service;
 
 import org.xwiki.component.annotation.ComponentRole;
-import org.xwiki.rendering.parser.ParseException;
 
 /**
+ * Provides access to {@link ScriptService} implementation at runtime. Implementations of this interface are supposed
+ * to be bound to the Script Context so that they can be access from scripts.
+ *
  * @version $Id$
- * @since 2.0RC1
+ * @since 2.3M1
  */
 @ComponentRole
-public interface SyntaxFactory
+public interface ScriptServiceManager
 {
     /**
-     * @param syntaxAsIdString the syntax as a string (eg "xwiki/2.0", "plain/1.0")
-     * @return the parsed syntax as a Syntax object
-     * @throws ParseException in case the string doesn't represent a valid syntax
+     * Note that we're voluntarily using an API name of "get" to make it extra easy to access Script Services from
+     * Velocity (since in Velocity writing <code>$services.name</code> is equivalent to writing
+     * <code>$services.get("name")</code>). It also makes it a short and easy API name for other scripting languages.
+     *
+     * @param serviceName the name of the service to look for
+     * @return the service asked
      */
-    Syntax createSyntaxFromIdString(String syntaxAsIdString) throws ParseException;
+    ScriptService get(String serviceName) throws ScriptServiceNotFoundException;
 }

@@ -33,9 +33,14 @@
   <name>XWiki Platform - Core - Script</name>
   <description>XWiki Platform - Core - Script</description>
   <dependencies>
-  <dependency>
+    <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-core-component-api</artifactId>
+      <version>${pom.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-core-velocity</artifactId>
       <version>${pom.version}</version>
     </dependency>
     <dependency>

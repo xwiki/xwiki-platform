@@ -17,22 +17,38 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.rendering.syntax;
-
-import org.xwiki.component.annotation.ComponentRole;
-import org.xwiki.rendering.parser.ParseException;
+package org.xwiki.script.service;
 
 /**
+ * Thrown when a Script Service cannot be located.
+ * 
  * @version $Id$
- * @since 2.0RC1
+ * @since 2.3M1
  */
-@ComponentRole
-public interface SyntaxFactory
+public class ScriptServiceNotFoundException extends Exception
 {
     /**
-     * @param syntaxAsIdString the syntax as a string (eg "xwiki/2.0", "plain/1.0")
-     * @return the parsed syntax as a Syntax object
-     * @throws ParseException in case the string doesn't represent a valid syntax
+     * Class ID for serialization.
      */
-    Syntax createSyntaxFromIdString(String syntaxAsIdString) throws ParseException;
+    private static final long serialVersionUID = 8940300614005225360L;
+
+    /**
+     * {@inheritDoc}
+     *
+     * @see Exception#Exception(String)
+     */
+    public ScriptServiceNotFoundException(String message)
+    {
+        super(message);
+    }
+
+    /**
+     * {@inheritDoc}
+     *
+     * @see Exception#Exception(String, Throwable)
+     */
+    public ScriptServiceNotFoundException(String message, Throwable throwable)
+    {
+        super(message, throwable);
+    }
 }

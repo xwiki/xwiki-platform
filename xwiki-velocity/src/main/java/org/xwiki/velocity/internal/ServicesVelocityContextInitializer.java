@@ -26,7 +26,7 @@ import org.xwiki.script.service.ScriptServiceManager;
 import org.xwiki.velocity.VelocityContextInitializer;
 
 /**
- * Registers the Script Service Manager in the Velocity Context so that it's available from Velocity
+ * Registers the Script Service Manager in the Velocity Context so that it's available from Velocity.
  *
  * @version $Id$
  * @since 2.3M1

@@ -36,7 +36,7 @@
   #set($attachments = $sorttool.sort($doc.attachmentList, ["date:desc"]))
   <div id="import">
     <div id="packagelist">
-      <h4 class="legend">$msg.get('core.importer.uploadPackage')</h4>
+      <div class="legend">$msg.get('core.importer.uploadPackage')</div>
       ## Let the user upload XAR files.
       <form action="$doc.getURL('upload')" enctype="multipart/form-data" method="post" id="AddAttachment">
         <div>
@@ -46,18 +46,16 @@
             ## <div><label id="xwikiuploadnamelabel" for="xwikiuploadname">$msg.get('core.viewers.attachments.upload.filename')</label></div>
             <div><input id="xwikiuploadname" type="hidden" name="filename" value="" size="30"/></div>
             <div class="package-upload">
+	       <label for="xwikiuploadfile" class="hidden">$msg.get('core.viewers.attachments.upload.file')</label>
                <input id="xwikiuploadfile" type="file" name="filepath" value="" size="30" class="uploadFileInput"/>
                <span class="buttonwrapper">
                  <input type="submit" value="Upload" class="button" />
-               </span>
-               <span class="buttonwrapper">
-                 <input type="reset" value="Cancel" class="button cancel"/>
                </span>
             </div>
           </fieldset>
         </div>
       </form>
-    <h4 class="legend">$msg.get('core.importer.availablePackages')</h4>
+    <div class="legend">$msg.get('core.importer.availablePackages')</div>
     <div id="packagelistcontainer">
       #if($attachments.size() > 0)
       <ul class="xlist">
@@ -109,7 +107,7 @@
           #if(!$ok)
             #error("There was an error reading the file ${request.file}. $!context.import_error")
           #else
-          <h4 class="legend">$msg.get("core.importer.availableDocuments")</h4>
+          <div class="legend">$msg.get("core.importer.availableDocuments")</div>
           <div id="packageDescription">
             <div class="packageinfos">
               <div>

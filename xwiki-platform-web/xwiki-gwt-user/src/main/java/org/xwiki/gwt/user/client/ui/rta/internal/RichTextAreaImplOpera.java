@@ -94,6 +94,8 @@ public class RichTextAreaImplOpera extends com.google.gwt.user.client.ui.impl.Ri
     /*-{
         var elem = this.@com.google.gwt.user.client.ui.impl.RichTextAreaImpl::elem;
         elem.contentWindow.addEventListener('dblclick', elem.__gwt_handler, true);
+        // Paste event is currently not supported by Opera, but it might be in future releases.
+        elem.contentWindow.addEventListener('paste', elem.__gwt_handler, true);
     }-*/;
 
     /**
@@ -118,5 +120,6 @@ public class RichTextAreaImplOpera extends com.google.gwt.user.client.ui.impl.Ri
     /*-{
         var elem = this.@com.google.gwt.user.client.ui.impl.RichTextAreaImpl::elem;
         elem.contentWindow.removeEventListener('dblclick', elem.__gwt_handler, true);
+        elem.contentWindow.removeEventListener('paste', elem.__gwt_handler, true);
     }-*/;
 }

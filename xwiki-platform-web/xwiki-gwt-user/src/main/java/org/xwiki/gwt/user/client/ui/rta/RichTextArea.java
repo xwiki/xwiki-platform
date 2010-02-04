@@ -21,7 +21,10 @@ package org.xwiki.gwt.user.client.ui.rta;
 
 import org.xwiki.gwt.dom.client.Document;
 import org.xwiki.gwt.dom.client.Event;
+import org.xwiki.gwt.dom.client.HasPasteHandlers;
 import org.xwiki.gwt.dom.client.JavaScriptObject;
+import org.xwiki.gwt.dom.client.PasteEvent;
+import org.xwiki.gwt.dom.client.PasteHandler;
 import org.xwiki.gwt.user.client.ui.rta.cmd.Command;
 import org.xwiki.gwt.user.client.ui.rta.cmd.CommandManager;
 import org.xwiki.gwt.user.client.ui.rta.cmd.internal.DefaultCommandManager;
@@ -47,7 +50,7 @@ import com.google.gwt.user.client.ui.impl.RichTextAreaImpl;
  * @version $Id$
  */
 public class RichTextArea extends com.google.gwt.user.client.ui.RichTextArea implements HasDoubleClickHandlers,
-    HasLoadHandlers, LoadHandler
+    HasLoadHandlers, LoadHandler, HasPasteHandlers
 {
     /**
      * @see #setHTML(String)
@@ -218,6 +221,16 @@ public class RichTextArea extends com.google.gwt.user.client.ui.RichTextArea imp
     public HandlerRegistration addDoubleClickHandler(DoubleClickHandler handler)
     {
         return addDomHandler(handler, DoubleClickEvent.getType());
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see HasPasteHandlers#addPasteHandler(PasteHandler)
+     */
+    public HandlerRegistration addPasteHandler(PasteHandler handler)
+    {
+        return addDomHandler(handler, PasteEvent.getType());
     }
 
     /**

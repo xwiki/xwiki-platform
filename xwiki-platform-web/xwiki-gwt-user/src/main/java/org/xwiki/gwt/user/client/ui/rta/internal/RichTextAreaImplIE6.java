@@ -94,7 +94,8 @@ public class RichTextAreaImplIE6 extends com.google.gwt.user.client.ui.impl.Rich
     /*-{
         var elem = this.@com.google.gwt.user.client.ui.impl.RichTextAreaImpl::elem;
         var body = elem.contentWindow.document.body;
-        body.ondblclick = body.onclick;
+        body.ondblclick =
+        body.onpaste = body.onclick;
     }-*/;
 
     /**
@@ -118,6 +119,8 @@ public class RichTextAreaImplIE6 extends com.google.gwt.user.client.ui.impl.Rich
     protected native void unhookCustomEvents()
     /*-{
         var elem = this.@com.google.gwt.user.client.ui.impl.RichTextAreaImpl::elem;
-        elem.contentWindow.document.body.ondblclick = null;
+        var body = elem.contentWindow.document.body;
+        body.ondblclick =
+        body.onpaste = null;
     }-*/;
 }

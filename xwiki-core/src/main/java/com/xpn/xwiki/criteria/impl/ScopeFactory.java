@@ -84,8 +84,7 @@ public class ScopeFactory
      * Creates a new scope associated with the specified space.
      * 
      * @param spaceName A space name
-     * @param deep <code>true</code> for matching all its pages; <code>false</code> for matching
-     *            this space as a unit
+     * @param deep <code>true</code> for matching all its pages; <code>false</code> for matching this space as a unit
      * @return A new Scope instance
      */
     public static Scope createSpaceScope(String spaceName, boolean deep)
@@ -108,8 +107,7 @@ public class ScopeFactory
      * Creates a new scope associated with the specified wiki.
      * 
      * @param wikiName A wiki name
-     * @param deep <code>true</code> for matching all its spaces; <code>false</code> for
-     *            matching this wiki as a unit
+     * @param deep <code>true</code> for matching all its spaces; <code>false</code> for matching this wiki as a unit
      * @return A new Scope instance
      */
     public static Scope createWikiScope(String wikiName, boolean deep)

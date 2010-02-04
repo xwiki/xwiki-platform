@@ -20,8 +20,8 @@
  */
 package com.xpn.xwiki.criteria.impl;
 
-import java.util.List;
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Immutable continuous integer range. It can be used for pagination
@@ -29,20 +29,20 @@ import java.util.ArrayList;
 public class Range
 {
     /**
-     * The start of the interval. It can be both positive and negative. A negative start is usually
-     * associated with an interval which is relative to the end of the list it is applied to.
+     * The start of the interval. It can be both positive and negative. A negative start is usually associated with an
+     * interval which is relative to the end of the list it is applied to.
      */
     private int start;
 
     /**
-     * The size of the interval. It can be both positive and negative. A negative size is usually
-     * associated with an interval which is relative to the end of the list it is applied to.
+     * The size of the interval. It can be both positive and negative. A negative size is usually associated with an
+     * interval which is relative to the end of the list it is applied to.
      */
     private int size;
 
     /**
      * Creates a new interval having the specified start and size.
-     *
+     * 
      * @param start The start of the interval
      * @param size The size of the interval
      */
@@ -57,7 +57,7 @@ public class Range
      */
     public int getStart()
     {
-        return start;
+        return this.start;
     }
 
     /**
@@ -65,7 +65,7 @@ public class Range
      */
     public int getAbsoluteStart()
     {
-        return Math.abs(start);
+        return Math.abs(this.start);
     }
 
     /**
@@ -73,7 +73,7 @@ public class Range
      */
     public int getSize()
     {
-        return size;
+        return this.size;
     }
 
     /**
@@ -81,17 +81,14 @@ public class Range
      */
     public int getAbsoluteSize()
     {
-        return Math.abs(size);
+        return Math.abs(this.size);
     }
 
     /**
-     * Copy the given list and return a (smart) subList corresponding to this range. If the absolute
-     * size of this range is 0 (ALL) it returns an unmodified copy. <br/><br/>
-     *
-     * Considering this 9 elements list :
-     *
-     * [0, 1, 2, 3, 4, 5, 6, 7, 8]
-     *
+     * Copy the given list and return a (smart) subList corresponding to this range. If the absolute size of this range
+     * is 0 (ALL) it returns an unmodified copy. <br/>
+     * <br/>
+     * Considering this 9 elements list : [0, 1, 2, 3, 4, 5, 6, 7, 8]
      * <ul>
      * <li>Range 0 / 4 -> will return [0, 1, 2, 3]</li>
      * <li>Range -2 / 4 -> will return [7, 8] (not enough elements for the given size)</li>
@@ -99,6 +96,7 @@ public class Range
      * <li>Range 2 / -4 -> will return [0, 1] (not enough elements for the given size)</li>
      * <li>Range 0 / -4 -> will return [5, 6, 7, 8]</li>
      * </ul>
+     * 
      * @param list the list from which the sublist will be extracted
      * @return a sublist of the given list computed from this range
      */
@@ -111,14 +109,14 @@ public class Range
             int min = 0;
             int max = 0;
 
-            min = start;
+            min = this.start;
 
             // negative start : relative to the end of the list
             if (min < 0) {
-                min = (list.size()) + start;
+                min = (list.size()) + this.start;
             }
 
-            max = min + size;
+            max = min + this.size;
 
             // negative size with start 0 : 0 represents to the end of the list
             if (min == 0 && max < 0) {

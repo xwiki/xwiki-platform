@@ -22,10 +22,9 @@
 package com.xpn.xwiki.criteria.impl;
 
 /**
- * Immutable scope for retrieving statistics. A scope is associated with a single document but it
- * can match any number of documents. Here, a document can be a page, a space, a wiki or the entire
- * application as a unit. For instance, a scope associated with a space can match all the pages
- * within that space.
+ * Immutable scope for retrieving statistics. A scope is associated with a single document but it can match any number
+ * of documents. Here, a document can be a page, a space, a wiki or the entire application as a unit. For instance, a
+ * scope associated with a space can match all the pages within that space.
  */
 public class Scope
 {
@@ -50,8 +49,8 @@ public class Scope
     public static final int GLOBAL_SCOPE = 4;
 
     /**
-     * The type of the scope. It can be {@link #PAGE_SCOPE}, {@link #SPACE_SCOPE},
-     * {@link #WIKI_SCOPE} or {@link #GLOBAL_SCOPE}
+     * The type of the scope. It can be {@link #PAGE_SCOPE}, {@link #SPACE_SCOPE}, {@link #WIKI_SCOPE} or
+     * {@link #GLOBAL_SCOPE}
      */
     private int type;
 
@@ -67,10 +66,9 @@ public class Scope
     private String name;
 
     /**
-     * Specifies whether the document given by the {@link #name} field should be considered as a
-     * unit or not. When {@link #deep} is <code>false</code> the scope matches only the document
-     * with the given {@link #name} (taken as a unit). Otherwise the scope matches all its sub
-     * documents (like all pages within a space).
+     * Specifies whether the document given by the {@link #name} field should be considered as a unit or not. When
+     * {@link #deep} is <code>false</code> the scope matches only the document with the given {@link #name} (taken as a
+     * unit). Otherwise the scope matches all its sub documents (like all pages within a space).
      */
     private boolean deep;
 
@@ -79,8 +77,8 @@ public class Scope
      * 
      * @param type The type of the scope
      * @param name The name of the document associated with this scope
-     * @param deep <code>true</code> for matching all sub documents; <code>false</code> for
-     *            matching the associated document as a unit
+     * @param deep <code>true</code> for matching all sub documents; <code>false</code> for matching the associated
+     *            document as a unit
      */
     public Scope(int type, String name, boolean deep)
     {
@@ -94,7 +92,7 @@ public class Scope
      */
     public int getType()
     {
-        return type;
+        return this.type;
     }
 
     /**
@@ -102,7 +100,7 @@ public class Scope
      */
     public String getName()
     {
-        return name;
+        return this.name;
     }
 
     /**
@@ -110,7 +108,7 @@ public class Scope
      */
     public boolean isDeep()
     {
-        return deep;
+        return this.deep;
     }
 
     /**
@@ -118,7 +116,7 @@ public class Scope
      */
     public String getPattern()
     {
-        switch (type) {
+        switch (this.type) {
             case PAGE_SCOPE:
                 return getPagePattern();
             case SPACE_SCOPE:
@@ -135,11 +133,11 @@ public class Scope
     private String getPagePattern()
     {
         // ignore deep
-        if ("".equals(name)) {
+        if ("".equals(this.name)) {
             // a pattern to match any page name
             return "%.%";
         }
-        return name;
+        return this.name;
     }
 
     /**
@@ -148,13 +146,13 @@ public class Scope
      */
     private String getSpacePattern()
     {
-        if ("".equals(name)) {
+        if ("".equals(this.name)) {
             // TODO a pattern to match any space name
             return null;
-        } else if (deep) {
-            return name + ".%";
+        } else if (this.deep) {
+            return this.name + ".%";
         }
-        return name;
+        return this.name;
     }
 
     /**

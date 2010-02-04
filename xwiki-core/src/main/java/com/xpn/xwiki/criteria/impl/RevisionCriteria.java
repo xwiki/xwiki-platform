@@ -23,7 +23,7 @@ import java.util.Date;
 
 /**
  * information about document versions used to retreive a set of document versions.
- *
+ * 
  * @version $Id$
  * @see com.xpn.xwiki.doc.XWikiDocument#getRevisions(RevisionCriteria, com.xpn.xwiki.XWikiContext)
  * @since 1.4M1
@@ -37,7 +37,7 @@ public class RevisionCriteria
 
     /**
      * date range of the version set
-     */       
+     */
     private Period period = PeriodFactory.createMaximumPeriod();
 
     /**
@@ -51,15 +51,16 @@ public class RevisionCriteria
     private boolean includeMinorVersions = false;
 
     /**
-     * Default constructor, the default query match the versions created by any author, from January
-     * 1, 1970, 00:00:00 GMT (epoch) to the maximum possible date (Long.MAX_VALUE), minor versions
-     * aren't included
+     * Default constructor, the default query match the versions created by any author, from January 1, 1970, 00:00:00
+     * GMT (epoch) to the maximum possible date (Long.MAX_VALUE), minor versions aren't included
      */
-    public RevisionCriteria() { }
+    public RevisionCriteria()
+    {
+        // Nothing to do here.
+    }
 
     /**
-     * Fully featured constructor, allow to set all the query parameters, null arguments are
-     * ignored
+     * Fully featured constructor, allow to set all the query parameters, null arguments are ignored
      */
     public RevisionCriteria(String author, Period period, Range range,
         boolean includeMinorVersions)
@@ -81,7 +82,7 @@ public class RevisionCriteria
      */
     public String getAuthor()
     {
-        return author;
+        return this.author;
     }
 
     /**
@@ -97,12 +98,12 @@ public class RevisionCriteria
      */
     public Period getPeriod()
     {
-        return period;
+        return this.period;
     }
 
     /**
      * Set the Period (time limits) desired for the results
-     *
+     * 
      * @param period
      */
     public void setPeriod(Period period)
@@ -110,7 +111,7 @@ public class RevisionCriteria
         this.period = period;
     }
 
-    /**     
+    /**
      * @return range the Range (size limits) desired for the results
      */
     public Range getRange()
@@ -120,7 +121,7 @@ public class RevisionCriteria
 
     /**
      * Set the Range (size limits) desired for the results
-     *
+     * 
      * @param range desired range @see Range
      */
     public void setRange(Range range)
@@ -133,7 +134,7 @@ public class RevisionCriteria
      */
     public Date getMinDate()
     {
-        return new Date(period.getStart());
+        return new Date(this.period.getStart());
     }
 
     /**
@@ -141,7 +142,7 @@ public class RevisionCriteria
      */
     public Date getMaxDate()
     {
-        return new Date(period.getEnd());
+        return new Date(this.period.getEnd());
     }
 
     /**
@@ -149,7 +150,7 @@ public class RevisionCriteria
      */
     public boolean getIncludeMinorVersions()
     {
-        return includeMinorVersions;
+        return this.includeMinorVersions;
     }
 
     /**

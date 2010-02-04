@@ -27,10 +27,9 @@
   <parent>
     <groupId>com.xpn.xwiki.products</groupId>
     <artifactId>xwiki-enterprise-parent</artifactId>
-    <version>2.2-SNAPSHOT</version>
+    <version>2.3-SNAPSHOT</version>
   </parent>
   <artifactId>xem-web-debug</artifactId>
-  <version>2.3-SNAPSHOT</version>
   <name>xem-web-debug</name>
   <packaging>war</packaging>
   <description>xem-web-debug</description>

@@ -54,7 +54,22 @@ public class WatchListJobManager
      * WatchList Job last fire time property name.
      */
     public static final String WATCHLIST_JOB_LAST_FIRE_TIME_PROP = "last_fire_time";
+    
+    /**
+     * Name of the groups property in the XWiki rights class.
+     */
+    public static final String XWIKI_RIGHTS_CLASS_GROUPS_PROPERTY = "groups";
 
+    /**
+     * Name of the levels property in the XWiki rights class.
+     */
+    public static final String XWIKI_RIGHTS_CLASS_LEVELS_PROPERTY = "levels";
+
+    /**
+     * Name of the allow property in the XWiki rights class.
+     */
+    public static final String XWIKI_RIGHTS_CLASS_ALLOW_PROPERTY = "allow";
+    
     /**
      * Logger.
      */
@@ -196,17 +211,29 @@ public class WatchListJobManager
      */
     private boolean createWatchListJobRightsObject(XWikiDocument doc, XWikiContext context) throws XWikiException
     {
-        BaseObject rights = doc.getObject(XWIKI_RIGHTS_CLASS);
-        if (rights == null) {
+        boolean needsUpdate = false;
+        BaseObject editRights = doc.getObject(XWIKI_RIGHTS_CLASS, 0);
+        BaseObject viewRights = doc.getObject(XWIKI_RIGHTS_CLASS, 1);
+        
+        if (editRights == null) {
             int index = doc.createNewObject(XWIKI_RIGHTS_CLASS, context);
-            rights = doc.getObject(XWIKI_RIGHTS_CLASS, index);
-            rights.setLargeStringValue("groups", "XWiki.XWikiAdminGroup");
-            rights.setStringValue("levels", "edit,delete");
-            rights.setIntValue("allow", 1);
-            return true;
+            editRights = doc.getObject(XWIKI_RIGHTS_CLASS, index);
+            editRights.setLargeStringValue(XWIKI_RIGHTS_CLASS_GROUPS_PROPERTY, "XWiki.XWikiAdminGroup");
+            editRights.setStringValue(XWIKI_RIGHTS_CLASS_LEVELS_PROPERTY, "edit,delete");
+            editRights.setIntValue(XWIKI_RIGHTS_CLASS_ALLOW_PROPERTY, 1);
+            needsUpdate = true;
+        }
+        
+        if (viewRights == null) {
+            int index = doc.createNewObject(XWIKI_RIGHTS_CLASS, context);
+            viewRights = doc.getObject(XWIKI_RIGHTS_CLASS, index);
+            viewRights.setLargeStringValue(XWIKI_RIGHTS_CLASS_GROUPS_PROPERTY, "XWiki.XWikiAllGroup");
+            viewRights.setStringValue(XWIKI_RIGHTS_CLASS_LEVELS_PROPERTY, "view");
+            viewRights.setIntValue(XWIKI_RIGHTS_CLASS_ALLOW_PROPERTY, 1);
+            needsUpdate = true;
         }
 
-        return false;
+        return needsUpdate;
     }
 
     /**

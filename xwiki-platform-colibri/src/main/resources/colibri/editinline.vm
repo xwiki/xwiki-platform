@@ -25,7 +25,7 @@ $xwiki.ssfx.use('js/xwiki/editors/fullScreenEdit.css')##
 #if (($doc.getLocked()==true)&&(!$force))
   <div class="layoutsection">
   $response.setStatus(423)
-  #set($newquerystring = "$!request.getQueryString().replaceAll('&', '&amp;').replaceAll('&amp;amp;', '&amp;')}&amp;force=1")
+  #set($newquerystring = "$!{request.getQueryString().replaceAll('&', '&amp;').replaceAll('&amp;amp;', '&amp;')}&amp;force=1")
   #set($forceEditURL = $doc.getURL($context.action, ${newquerystring}))
   #xwikimessageboxstart($msg.get("notice") "$msg.get('doclockedby') $xwiki.getLocalUserName($doc.getLockingUser())")
     <a href="$forceEditURL">$msg.get('forcelock')</a>

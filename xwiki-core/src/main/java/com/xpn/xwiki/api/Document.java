@@ -1436,7 +1436,7 @@ public class Document extends Api
      * @param action the type of request for which to retrieve statistics: view, edit...
      * @return the statistics object holding information for the document's space and the current month
      */
-    public DocumentStats getCurrentMonthWebStats(String action)
+    public DocumentStats getCurrentMonthSpaceStats(String action)
     {
         Scope scope = ScopeFactory.createSpaceScope(this.doc.getSpace(), false);
         Range range = RangeFactory.ALL;

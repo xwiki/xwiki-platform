@@ -7192,10 +7192,10 @@ public class XWiki implements XWikiDocChangeNotificationInterface
 
         if (context.get("sdoc") != null) {
             // The content document
-            syntaxId = ((XWikiDocument) context.get("sdoc")).getSyntax().toIdString();
+            syntaxId = ((XWikiDocument) context.get("sdoc")).getSyntaxId();
         } else if (context.getDoc() != null) {
             // The context document
-            syntaxId = context.getDoc().getSyntax().toIdString();
+            syntaxId = context.getDoc().getSyntaxId();
         }
 
         return syntaxId;

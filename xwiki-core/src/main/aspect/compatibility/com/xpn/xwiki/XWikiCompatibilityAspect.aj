@@ -105,4 +105,117 @@ public privileged aspect XWikiCompatibilityAspect
     {
         return new XWikiCacheStub(this.virtualWikiMap);
     }
+
+    /**
+     * @deprecated replaced by {@link XWiki#getSpaceCopyright(XWikiContext)} since 2.3M1
+     */
+    @Deprecated
+    public String XWiki.getWebCopyright(XWikiContext context)
+    {
+        return this.getSpaceCopyright(context);
+    }
+
+    /**
+     * @deprecated replaced by {@link XWiki#getSpacePreference(String, XWikiContext)} since 2.3M1
+     */
+    @Deprecated
+    public String XWiki.getWebPreference(String preference, XWikiContext context)
+    {
+        return this.getSpacePreference(preference, context);
+    }
+
+    /**
+     * @deprecated replaced by {@link XWiki#getSpacePreference(String, String, XWikiContext)} since 2.3M1
+     */
+    @Deprecated
+    public String XWiki.getWebPreference(String preference, String defaultValue, XWikiContext context)
+    {
+        return this.getSpacePreference(preference, defaultValue, context);
+    }
+
+    /**
+     * @deprecated replaced by {@link XWiki#getSpacePreference(String, String, String, XWikiContext)} since 2.3M1
+     */
+    @Deprecated
+    public String XWiki.getWebPreference(String preference, String space, String defaultValue, XWikiContext context)
+    {
+        return this.getSpacePreference(preference, space, defaultValue, context);
+    }
+
+    /**
+     * @deprecated replaced by {@link XWiki#getSpacePreferenceAsLong(String, XWikiContext)} since 2.3M1
+     */
+    @Deprecated
+    public long XWiki.getWebPreferenceAsLong(String preference, XWikiContext context)
+    {
+        return this.getSpacePreferenceAsLong(preference, context);
+    }
+
+    /**
+     * @deprecated replaced by {@link XWiki#getSpacePreferenceAsLong(String, long, XWikiContext)} since 2.3M1
+     */
+    @Deprecated
+    public long XWiki.getWebPreferenceAsLong(String preference, long defaultValue, XWikiContext context)
+    {
+        return this.getSpacePreferenceAsLong(preference, defaultValue, context);
+    }
+
+    /**
+     * @deprecated replaced by {@link XWiki#getSpacePreferenceAsInt(String, XWikiContext)} since 2.3M1
+     */
+    @Deprecated
+    public int XWiki.getWebPreferenceAsInt(String preference, XWikiContext context)
+    {
+        return this.getSpacePreferenceAsInt(preference, context);
+    }
+
+    /**
+     * @deprecated replaced by {@link XWiki#getSpacePreferenceAsInt(String, int, XWikiContext)} since 2.3M1
+     */
+    @Deprecated
+    public int XWiki.getWebPreferenceAsInt(String preference, int defaultValue, XWikiContext context)
+    {
+        return this.getSpacePreferenceAsInt(preference, defaultValue, context);
+    }
+
+    /**
+     * @deprecated replaced by {@link XWiki#copySpaceBetweenWikis(String, String, String, String, XWikiContext)} since
+     *             2.3M1
+     */
+    @Deprecated
+    public int XWiki.copyWikiWeb(String space, String sourceWiki, String targetWiki, String language, XWikiContext context)
+        throws XWikiException
+    {
+        return this.copySpaceBetweenWikis(space, sourceWiki, targetWiki, language, context);
+    }
+
+    /**
+     * @deprecated replaced by
+     *             {@link XWiki#copySpaceBetweenWikis(String, String, String, String, boolean, XWikiContext)} since
+     *             2.3M1
+     */
+    @Deprecated
+    public int XWiki.copyWikiWeb(String space, String sourceWiki, String targetWiki, String language, boolean clean,
+        XWikiContext context) throws XWikiException
+    {
+        return this.copySpaceBetweenWikis(space, sourceWiki, targetWiki, language, clean, context);
+    }
+
+    /**
+     * @deprecated replaced by {@link XWiki#getDefaultSpace(XWikiContext)} since 2.3M1
+     */
+    @Deprecated
+    public String XWiki.getDefaultWeb(XWikiContext context)
+    {
+        return this.getDefaultSpace(context);
+    }
+
+    /**
+     * @deprecated replaced by {@link XWiki#skipDefaultSpaceInURLs(XWikiContext)} since 2.3M1
+     */
+    @Deprecated
+    public boolean XWiki.useDefaultWeb(XWikiContext context)
+    {
+        return this.skipDefaultSpaceInURLs(context);
+    }
 }

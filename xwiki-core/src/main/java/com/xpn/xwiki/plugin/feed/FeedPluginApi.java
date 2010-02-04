@@ -615,7 +615,7 @@ public class FeedPluginApi extends PluginApi<FeedPlugin>
         }
 
         if (!keyHasValue(metadata, "copyright", "")) {
-            metadata.put("copyright", xwiki.getWebCopyright(getXWikiContext()));
+            metadata.put("copyright", xwiki.getSpaceCopyright(getXWikiContext()));
         }
 
         if (!keyHasValue(metadata, "encoding", "")) {

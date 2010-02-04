@@ -285,12 +285,12 @@ public class XWikiRightServiceImpl implements XWikiRightService
 
         try {
             needsAuth |=
-                    context.getWiki().getWebPreference("authenticate_" + right, "", context).toLowerCase().equals("yes");
+                    context.getWiki().getSpacePreference("authenticate_" + right, "", context).toLowerCase().equals("yes");
         } catch (Exception e) {
         }
 
         try {
-            needsAuth |= (context.getWiki().getWebPreferenceAsInt("authenticate_" + right, 0, context) == 1);
+            needsAuth |= (context.getWiki().getSpacePreferenceAsInt("authenticate_" + right, 0, context) == 1);
         } catch (Exception e) {
         }
 
@@ -662,7 +662,7 @@ public class XWikiRightServiceImpl implements XWikiRightService
             }
 
             // Check if this document is denied/allowed
-            // through the web WebPreferences Global Rights
+            // through the space WebPreferences Global Rights
 
             String space = currentdoc.getSpace();
             ArrayList<String> spacesChecked = new ArrayList<String>();

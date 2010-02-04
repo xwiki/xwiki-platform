@@ -1475,7 +1475,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface
     public String getDocumentNameFromPath(String path, XWikiContext context)
     {
         if (StringUtils.countMatches(path, "/") == 0) {
-            return context.getWiki().getDefaultWeb(context) + "." + context.getWiki().getDefaultPage(context);
+            return context.getWiki().getDefaultSpace(context) + "." + context.getWiki().getDefaultPage(context);
         }
 
         String space, name;
@@ -2125,10 +2125,10 @@ public class XWiki implements XWikiDocChangeNotificationInterface
         return "";
     }
 
-    public String getWebCopyright(XWikiContext context)
+    public String getSpaceCopyright(XWikiContext context)
     {
         String defaultValue = "Copyright 2004-" + Calendar.getInstance().get(java.util.Calendar.YEAR) + " XWiki";
-        return getWebPreference("webcopyright", defaultValue, context);
+        return getSpacePreference("webcopyright", defaultValue, context);
     }
 
     public String getXWikiPreference(String prefname, XWikiContext context)
@@ -2189,20 +2189,21 @@ public class XWiki implements XWikiDocChangeNotificationInterface
         return getXWikiPreference(prefname, "", default_value, context);
     }
 
-    public String getWebPreference(String prefname, XWikiContext context)
+    public String getSpacePreference(String preference, XWikiContext context)
     {
-        return getWebPreference(prefname, "", context);
+        return getSpacePreference(preference, "", context);
     }
 
-    public String getWebPreference(String prefname, String default_value, XWikiContext context)
+    public String getSpacePreference(String preference, String defaultValue, XWikiContext context)
     {
         XWikiDocument currentdoc = (XWikiDocument) context.get("doc");
-        return getWebPreference(prefname, (currentdoc == null) ? null : currentdoc.getSpace(), default_value, context);
+        return getSpacePreference(preference, (currentdoc == null) ? null : currentdoc.getSpace(), defaultValue,
+            context);
     }
 
-    public String getWebPreference(String prefname, String space, String default_value, XWikiContext context)
+    public String getSpacePreference(String preference, String space, String defaultValue, XWikiContext context)
     {
-        // If there's no space defined then don't return web preferences (since it'll usually mean that the current
+        // If there's no space defined then don't return space preferences (since it'll usually mean that the current
         // doc is not set).
         if (space != null) {
             try {
@@ -2216,9 +2217,9 @@ public class XWiki implements XWikiDocChangeNotificationInterface
                 String result = "";
                 if (object != null) {
                     try {
-                        result = object.getStringValue(prefname);
+                        result = object.getStringValue(preference);
                     } catch (Exception e) {
-                        LOG.warn("Exception while getting space preference [" + prefname + "]", e);
+                        LOG.warn("Exception while getting space preference [" + preference + "]", e);
                     }
                 }
 
@@ -2226,10 +2227,10 @@ public class XWiki implements XWikiDocChangeNotificationInterface
                     return result;
                 }
             } catch (Exception e) {
-                LOG.warn("Exception while getting space preference [" + prefname + "]", e);
+                LOG.warn("Exception while getting space preference [" + preference + "]", e);
             }
         }
-        return getXWikiPreference(prefname, default_value, context);
+        return getXWikiPreference(preference, defaultValue, context);
     }
 
     public String getUserPreference(String prefname, XWikiContext context)
@@ -2247,7 +2248,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface
             LOG.warn("Exception while getting user preference [" + prefname + "]", e);
         }
 
-        return getWebPreference(prefname, context);
+        return getSpacePreference(prefname, context);
     }
 
     public String getUserPreferenceFromCookie(String prefname, XWikiContext context)
@@ -2376,7 +2377,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface
         // If the default language is prefered, and since the user didn't explicitely ask for a
         // language already, then use the default wiki language.
         if (Param("xwiki.language.preferDefault", "0").equals("1")
-            || getWebPreference("preferDefaultLanguage", "0", context).equals("1")) {
+            || getSpacePreference("preferDefaultLanguage", "0", context).equals("1")) {
             language = defaultLanguage;
             context.setLanguage(language);
             return language;
@@ -2624,84 +2625,61 @@ public class XWiki implements XWikiDocChangeNotificationInterface
         return language;
     }
 
-    public long getXWikiPreferenceAsLong(String prefname, XWikiContext context)
+    public long getXWikiPreferenceAsLong(String preference, XWikiContext context)
     {
-        return Long.parseLong(getXWikiPreference(prefname, context));
+        return Long.parseLong(getXWikiPreference(preference, context));
     }
 
-    public long getWebPreferenceAsLong(String prefname, XWikiContext context)
+    public long getSpacePreferenceAsLong(String preference, XWikiContext context)
     {
-        return Long.parseLong(getWebPreference(prefname, context));
+        return Long.parseLong(getSpacePreference(preference, context));
     }
 
-    public long getXWikiPreferenceAsLong(String prefname, long default_value, XWikiContext context)
+    public long getXWikiPreferenceAsLong(String preference, long defaultValue, XWikiContext context)
     {
-        try {
-            return Long.parseLong(getXWikiPreference(prefname, context));
-        } catch (NumberFormatException e) {
-            return default_value;
-        }
+        return NumberUtils.toLong((getXWikiPreference(preference, context)), defaultValue);
     }
 
-    public long getXWikiPreferenceAsLong(String prefname, String fallback_param, long default_value,
+    public long getXWikiPreferenceAsLong(String preference, String fallbackParameter, long defaultValue,
         XWikiContext context)
     {
-        try {
-            return Long.parseLong(getXWikiPreference(prefname, fallback_param, "", context));
-        } catch (NumberFormatException e) {
-            return default_value;
-        }
+        return NumberUtils.toLong(getXWikiPreference(preference, fallbackParameter, "", context), defaultValue);
     }
 
-    public long getWebPreferenceAsLong(String prefname, long default_value, XWikiContext context)
+    public long getSpacePreferenceAsLong(String preference, long defaultValue, XWikiContext context)
     {
-        try {
-            return Long.parseLong(getWebPreference(prefname, context));
-        } catch (NumberFormatException e) {
-            return default_value;
-        }
+        return NumberUtils.toLong(getSpacePreference(preference, context), defaultValue);
     }
 
-    public long getUserPreferenceAsLong(String prefname, XWikiContext context)
+    public long getUserPreferenceAsLong(String preference, XWikiContext context)
     {
-        return Long.parseLong(getUserPreference(prefname, context));
+        return Long.parseLong(getUserPreference(preference, context));
     }
 
-    public int getXWikiPreferenceAsInt(String prefname, XWikiContext context)
+    public int getXWikiPreferenceAsInt(String preference, XWikiContext context)
     {
-        return Integer.parseInt(getXWikiPreference(prefname, context));
+        return Integer.parseInt(getXWikiPreference(preference, context));
     }
 
-    public int getWebPreferenceAsInt(String prefname, XWikiContext context)
+    public int getSpacePreferenceAsInt(String preference, XWikiContext context)
     {
-        return Integer.parseInt(getWebPreference(prefname, context));
+        return Integer.parseInt(getSpacePreference(preference, context));
     }
 
-    public int getXWikiPreferenceAsInt(String prefname, int default_value, XWikiContext context)
+    public int getXWikiPreferenceAsInt(String preference, int defaultValue, XWikiContext context)
     {
-        try {
-            return Integer.parseInt(getXWikiPreference(prefname, context));
-        } catch (NumberFormatException e) {
-            return default_value;
-        }
+        return NumberUtils.toInt(getXWikiPreference(preference, context), defaultValue);
     }
 
-    public int getXWikiPreferenceAsInt(String prefname, String fallback_param, int default_value, XWikiContext context)
+    public int getXWikiPreferenceAsInt(String preference, String fallbackParameter, int defaultValue,
+        XWikiContext context)
     {
-        try {
-            return Integer.parseInt(getXWikiPreference(prefname, fallback_param, "", context));
-        } catch (NumberFormatException e) {
-            return default_value;
-        }
+        return NumberUtils.toInt(getXWikiPreference(preference, fallbackParameter, "", context), defaultValue);
     }
 
-    public int getWebPreferenceAsInt(String prefname, int default_value, XWikiContext context)
+    public int getSpacePreferenceAsInt(String preference, int defaultValue, XWikiContext context)
     {
-        try {
-            return Integer.parseInt(getWebPreference(prefname, context));
-        } catch (NumberFormatException e) {
-            return default_value;
-        }
+        return NumberUtils.toInt(getSpacePreference(preference, context), defaultValue);
     }
 
     public int getUserPreferenceAsInt(String prefname, XWikiContext context)
@@ -4556,20 +4534,23 @@ public class XWiki implements XWikiDocChangeNotificationInterface
             resetCreationData, context);
     }
 
-    public int copyWikiWeb(String web, String sourceWiki, String targetWiki, String wikilanguage, XWikiContext context)
+    public int copySpaceBetweenWikis(String space, String sourceWiki, String targetWiki, String language,
+        XWikiContext context)
         throws XWikiException
     {
-        return copyWikiWeb(web, sourceWiki, targetWiki, wikilanguage, false, context);
+        return copySpaceBetweenWikis(space, sourceWiki, targetWiki, language, false, context);
     }
 
-    public int copyWikiWeb(String web, String sourceWiki, String targetWiki, String wikilanguage, boolean clean,
+    public int copySpaceBetweenWikis(String space, String sourceWiki, String targetWiki, String language,
+        boolean clean,
         XWikiContext context) throws XWikiException
     {
         String db = context.getDatabase();
         int nb = 0;
         String sql = "";
-        if (web != null) {
-            sql = "where doc.space = '" + Utils.SQLFilter(web) + "'";
+        if (space != null) {
+            // FIXME: escapeSql is not enough.
+            sql = "where doc.space = '" + StringEscapeUtils.escapeSql(space) + "'";
         }
 
         if (clean) {
@@ -4597,7 +4578,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface
             }
 
             for (String docname : list) {
-                copyDocument(docname, sourceWiki, targetWiki, wikilanguage, context);
+                copyDocument(docname, sourceWiki, targetWiki, language, context);
                 nb++;
             }
             return nb;
@@ -4609,7 +4590,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface
     public int copyWiki(String sourceWiki, String targetWiki, String language, XWikiContext context)
         throws XWikiException
     {
-        return copyWikiWeb(null, sourceWiki, targetWiki, language, context);
+        return copySpaceBetweenWikis(null, sourceWiki, targetWiki, language, context);
     }
 
     /**
@@ -6120,17 +6101,16 @@ public class XWiki implements XWikiDocChangeNotificationInterface
         return "1".equals(Param("xwiki.store.hibernate.custommapping.dynamic", "0"));
     }
 
-    public String getDefaultWeb(XWikiContext context)
+    public String getDefaultSpace(XWikiContext context)
     {
-        String dweb = getXWikiPreference("defaultweb", "", context);
-        if (StringUtils.isEmpty(dweb)) {
+        String defaultSpace = getXWikiPreference("defaultweb", "", context);
+        if (StringUtils.isEmpty(defaultSpace)) {
             return Param("xwiki.defaultweb", "Main");
-        } else {
-            return dweb;
         }
+        return defaultSpace;
     }
 
-    public boolean useDefaultWeb(XWikiContext context)
+    public boolean skipDefaultSpaceInURLs(XWikiContext context)
     {
         String bl = getXWikiPreference("usedefaultweb", "", context);
         if ("1".equals(bl)) {
@@ -6331,7 +6311,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface
     {
         String pref = getUserPreference("editor", context);
         if (pref.equals("---")) {
-            pref = getWebPreference("editor", context);
+            pref = getSpacePreference("editor", context);
         }
 
         if (pref.equals("")) {

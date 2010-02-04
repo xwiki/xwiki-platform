@@ -77,7 +77,7 @@ public class DefaultXWikiRenderingEngineTest extends AbstractBridgedXWikiCompone
                 return defaultValue;
             }
 
-            public String getWebPreference(String prefname, String defaultValue, XWikiContext context)
+            public String getSpacePreference(String prefname, String defaultValue, XWikiContext context)
             {
                 return defaultValue;
             }

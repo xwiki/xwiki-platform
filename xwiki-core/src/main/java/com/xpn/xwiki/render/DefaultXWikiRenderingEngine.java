@@ -326,7 +326,7 @@ public class DefaultXWikiRenderingEngine implements XWikiRenderingEngine
             if (rendererName.indexOf('.') >= 0) {
                 rendererName = rendererName.substring(rendererName.lastIndexOf(".") + 1);
             }
-            String render = context.getWiki().getWebPreference("render" + rendererName, context);
+            String render = context.getWiki().getSpacePreference("render" + rendererName, context);
             if (render != null && render.length() > 0) {
                 return render.equals("1");
             }

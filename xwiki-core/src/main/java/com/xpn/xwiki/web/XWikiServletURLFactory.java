@@ -224,15 +224,15 @@ public class XWikiServletURLFactory extends XWikiDefaultURLFactory
         }
     }
 
-    private void addSpace(StringBuffer newpath, String web, String action, XWikiContext context)
+    private void addSpace(StringBuffer newpath, String space, String action, XWikiContext context)
     {
-        boolean useDefaultWeb = context.getWiki().useDefaultWeb(context);
-        if (useDefaultWeb) {
-            String defaultWeb = context.getWiki().getDefaultWeb(context);
-            useDefaultWeb = (web.equals(defaultWeb)) && ("view".equals(action));
+        boolean skipDefaultSpace = context.getWiki().skipDefaultSpaceInURLs(context);
+        if (skipDefaultSpace) {
+            String defaultSpace = context.getWiki().getDefaultSpace(context);
+            skipDefaultSpace = (space.equals(defaultSpace)) && ("view".equals(action));
         }
-        if (!useDefaultWeb) {
-            newpath.append(encode(web, context));
+        if (!skipDefaultSpace) {
+            newpath.append(encode(space, context));
             newpath.append("/");
         }
     }

@@ -53,9 +53,9 @@ public abstract class AbstractSyntaxTest extends AbstractBridgedXWikiComponentTe
         // These are needed by the Link filter
         this.mockXWiki.stubs().method("exists").will(returnValue(true));
         this.mockXWiki.stubs().method("showViewAction").will(returnValue(true));
-        this.mockXWiki.stubs().method("useDefaultWeb").will(returnValue(true));
+        this.mockXWiki.stubs().method("skipDefaultSpaceInURLs").will(returnValue(true));
         this.mockXWiki.stubs().method("useDefaultAction").will(returnValue(true));
-        this.mockXWiki.stubs().method("getDefaultWeb").will(returnValue("Main"));
+        this.mockXWiki.stubs().method("getDefaultSpace").will(returnValue("Main"));
         this.mockXWiki.stubs().method("getEncoding").will(returnValue("UTF-8"));
         this.mockXWiki.stubs().method("getServletPath").will(returnValue("bin/"));
 

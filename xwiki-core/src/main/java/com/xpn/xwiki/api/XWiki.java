@@ -828,7 +828,7 @@ public class XWiki extends Api
      */
     public String getWebCopyright()
     {
-        return this.xwiki.getWebCopyright(getXWikiContext());
+        return this.xwiki.getSpaceCopyright(getXWikiContext());
     }
 
     /**
@@ -866,7 +866,7 @@ public class XWiki extends Api
      */
     public String getWebPreference(String prefname)
     {
-        return this.xwiki.getWebPreference(prefname, getXWikiContext());
+        return this.xwiki.getSpacePreference(prefname, getXWikiContext());
     }
 
     /**
@@ -880,7 +880,7 @@ public class XWiki extends Api
      */
     public String getWebPreferenceFor(String prefname, String space)
     {
-        return this.xwiki.getWebPreference(prefname, space, "", getXWikiContext());
+        return this.xwiki.getSpacePreference(prefname, space, "", getXWikiContext());
     }
 
     /**
@@ -894,7 +894,7 @@ public class XWiki extends Api
      */
     public String getWebPreference(String prefname, String default_value)
     {
-        return this.xwiki.getWebPreference(prefname, default_value, getXWikiContext());
+        return this.xwiki.getSpacePreference(prefname, default_value, getXWikiContext());
     }
 
     /**
@@ -931,7 +931,7 @@ public class XWiki extends Api
      */
     public String getWebPreferenceFor(String prefname, String space, String default_value)
     {
-        return this.xwiki.getWebPreference(prefname, space, default_value, getXWikiContext());
+        return this.xwiki.getSpacePreference(prefname, space, default_value, getXWikiContext());
     }
 
     /**
@@ -960,7 +960,7 @@ public class XWiki extends Api
     }
 
     /**
-     * API to access an Web Preference as a long number There can be one preference object per language This function
+     * API to access a Space Preference as a long number There can be one preference object per language This function
      * will find the right preference object associated to the current active language If no preference is found it will
      * look for the XWiki Preference
      * 
@@ -970,11 +970,11 @@ public class XWiki extends Api
      */
     public long getWebPreferenceAsLong(String prefname, long default_value)
     {
-        return this.xwiki.getWebPreferenceAsLong(prefname, default_value, getXWikiContext());
+        return this.xwiki.getSpacePreferenceAsLong(prefname, default_value, getXWikiContext());
     }
 
     /**
-     * API to access an Web Preference as a long number There can be one preference object per language This function
+     * API to access a Space Preference as a long number There can be one preference object per language This function
      * will find the right preference object associated to the current active language If no preference is found it will
      * look for the XWiki Preference
      * 
@@ -983,7 +983,7 @@ public class XWiki extends Api
      */
     public long getWebPreferenceAsLong(String prefname)
     {
-        return this.xwiki.getWebPreferenceAsLong(prefname, getXWikiContext());
+        return this.xwiki.getSpacePreferenceAsLong(prefname, getXWikiContext());
     }
 
     /**
@@ -1022,11 +1022,11 @@ public class XWiki extends Api
      */
     public int getWebPreferenceAsInt(String prefname, int default_value)
     {
-        return this.xwiki.getWebPreferenceAsInt(prefname, default_value, getXWikiContext());
+        return this.xwiki.getSpacePreferenceAsInt(prefname, default_value, getXWikiContext());
     }
 
     /**
-     * API to access an Web Preference as a int number There can be one preference object per language This function
+     * API to access a Space Preference as a int number There can be one preference object per language This function
      * will find the right preference object associated to the current active language If no preference is found it will
      * look for the XWiki Preference
      * 
@@ -1035,7 +1035,7 @@ public class XWiki extends Api
      */
     public int getWebPreferenceAsInt(String prefname)
     {
-        return this.xwiki.getWebPreferenceAsInt(prefname, getXWikiContext());
+        return this.xwiki.getSpacePreferenceAsInt(prefname, getXWikiContext());
     }
 
     /**
@@ -1413,11 +1413,11 @@ public class XWiki extends Api
      * @return number of copied documents
      * @throws XWikiException if the space was not copied properly
      */
-    public int copyWikiWeb(String web, String sourceWiki, String targetWiki, String wikiLanguage, boolean clean)
+    public int copyWikiWeb(String space, String sourceWiki, String targetWiki, String wikiLanguage, boolean clean)
         throws XWikiException
     {
         if (hasProgrammingRights()) {
-            return this.xwiki.copyWikiWeb(web, sourceWiki, targetWiki, wikiLanguage, clean, getXWikiContext());
+            return this.xwiki.copySpaceBetweenWikis(space, sourceWiki, targetWiki, wikiLanguage, clean, getXWikiContext());
         }
 
         return -1;
@@ -2127,13 +2127,13 @@ public class XWiki extends Api
     /**
      * Returns the list of Macros documents in the specified content
      * 
-     * @param defaultweb Default Web to use for relative path names
+     * @param defaultSpace Default space to use for relative path names
      * @param content Content to parse
      * @return ArrayList of document names
      */
-    public List<String> getIncludedMacros(String defaultweb, String content)
+    public List<String> getIncludedMacros(String defaultSpace, String content)
     {
-        return this.xwiki.getIncludedMacros(defaultweb, content, getXWikiContext());
+        return this.xwiki.getIncludedMacros(defaultSpace, content, getXWikiContext());
     }
 
     /**

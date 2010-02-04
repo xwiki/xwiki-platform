@@ -259,7 +259,7 @@ public abstract class XWikiAction extends Action
                         return null;
                     } else if (xex.getCode() == XWikiException.ERROR_XWIKI_APP_URL_EXCEPTION) {
                         vcontext.put("message", context.getMessageTool().get("platform.core.invalidUrl"));
-                        xwiki.setPhonyDocument(xwiki.getDefaultWeb(context) + "." + xwiki.getDefaultPage(context),
+                        xwiki.setPhonyDocument(xwiki.getDefaultSpace(context) + "." + xwiki.getDefaultPage(context),
                             context, vcontext);
                         context.getResponse().setStatus(HttpServletResponse.SC_BAD_REQUEST);
                         Utils.parseTemplate(context.getWiki().Param("xwiki.invalid_url_exception", "error"), context);

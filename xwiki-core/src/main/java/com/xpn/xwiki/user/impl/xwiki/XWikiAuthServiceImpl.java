@@ -127,7 +127,7 @@ public class XWikiAuthServiceImpl extends AbstractXWikiAuthService
                     sconfig.setDefaultPage(xwiki.Param("xwiki.authentication.defaultpage"));
                 } else {
                     sconfig.setDefaultPage(stripContextPathFromURL(context.getURLFactory().createURL(
-                        context.getWiki().getDefaultWeb(context), context.getWiki().getDefaultPage(context), "view",
+                        context.getWiki().getDefaultSpace(context), context.getWiki().getDefaultPage(context), "view",
                         context), context));
                 }
 

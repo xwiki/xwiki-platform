@@ -519,4 +519,95 @@ public privileged aspect XWikiCompatibilityAspect
     {
         return this.isVirtualMode();
     }
+
+    /**
+     * @deprecated replaced by {@link XWiki#getSpaceCopyright()} since 2.3M1
+     */
+    @Deprecated
+    public String XWiki.getWebCopyright()
+    {
+        return this.getSpaceCopyright();
+    }
+
+    /**
+     * @deprecated replaced by {@link XWiki#getSpacePreference(String)} since 2.3M1
+     */
+    @Deprecated
+    public String XWiki.getWebPreference(String preference)
+    {
+        return this.getSpacePreference(preference);
+    }
+
+    /**
+     * @deprecated replaced by {@link XWiki#getSpacePreferenceFor(String, String)} since 2.3M1
+     */
+    @Deprecated
+    public String XWiki.getWebPreferenceFor(String preference, String space)
+    {
+        return this.getSpacePreferenceFor(preference, space);
+    }
+
+    /**
+     * @deprecated replaced by {@link XWiki#getSpacePreferenceFor(String, String, String)} since 2.3M1
+     */
+    @Deprecated
+    public String XWiki.getWebPreferenceFor(String preference, String space, String defaultValue)
+    {
+        return this.getSpacePreferenceFor(preference, space, defaultValue);
+    }
+
+    /**
+     * @deprecated replaced by {@link XWiki#getSpacePreferenceAsLong(String, long)} since 2.3M1
+     */
+    @Deprecated
+    public long XWiki.getWebPreferenceAsLong(String preference, long defaultValue)
+    {
+        return this.getSpacePreferenceAsLong(preference, defaultValue);
+    }
+
+    /**
+     * @deprecated replaced by {@link XWiki#getSpacePreferenceAsLong(String)} since 2.3M1
+     */
+    @Deprecated
+    public long XWiki.getWebPreferenceAsLong(String preference)
+    {
+        return this.getSpacePreferenceAsLong(preference);
+    }
+
+    /**
+     * @deprecated replaced by {@link XWiki#getSpacePreferenceAsInt(String, int)} since 2.3M1
+     */
+    @Deprecated
+    public int XWiki.getWebPreferenceAsInt(String preference, int defaultValue)
+    {
+        return this.getSpacePreferenceAsInt(preference, defaultValue);
+    }
+
+    /**
+     * @deprecated replaced by {@link XWiki#getSpacePreference(String, String)} since 2.3M1
+     */
+    @Deprecated
+    public String XWiki.getWebPreference(String preference, String defaultValue)
+    {
+        return this.getSpacePreference(preference, defaultValue);
+    }
+
+    /**
+     * @deprecated replaced by {@link XWiki#getSpacePreferenceAsInt(String)} since 2.3M1
+     */
+    @Deprecated
+    public int XWiki.getWebPreferenceAsInt(String preference)
+    {
+        return this.getSpacePreferenceAsInt(preference);
+    }
+
+    /**
+     * @deprecated replaced by {@link XWiki#copySpaceBetweenWikis(String, String, String, String, boolean)} since 2.3M1
+     */
+    @Deprecated
+    public int XWiki.copyWikiWeb(String space, String sourceWiki, String targetWiki, String language, boolean clean)
+        throws XWikiException
+    {
+        return this.copySpaceBetweenWikis(space, sourceWiki, targetWiki, language, clean);
+    }
 }

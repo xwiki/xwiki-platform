@@ -280,14 +280,14 @@ public class XWiki extends Api
     /**
      * Loads an Document from the database. Rights are checked before sending back the document.
      * 
-     * @param web Space to use in case no space is defined in the provided <code>fullname</code>
+     * @param space Space to use in case no space is defined in the provided <code>fullname</code>
      * @param fullname the full name or relative name of the document to load
      * @return a Document object or null if it is not accessible
      * @throws XWikiException
      */
-    public Document getDocument(String web, String fullname) throws XWikiException
+    public Document getDocument(String space, String fullname) throws XWikiException
     {
-        XWikiDocument doc = this.xwiki.getDocument(web, fullname, getXWikiContext());
+        XWikiDocument doc = this.xwiki.getDocument(space, fullname, getXWikiContext());
         if (this.xwiki.getRightService().hasAccessLevel("view", getXWikiContext().getUser(), doc.getFullName(),
             getXWikiContext()) == false) {
             return null;
@@ -826,7 +826,7 @@ public class XWiki extends Api
      * 
      * @return the text for the copyright
      */
-    public String getWebCopyright()
+    public String getSpaceCopyright()
     {
         return this.xwiki.getSpaceCopyright(getXWikiContext());
     }
@@ -835,25 +835,25 @@ public class XWiki extends Api
      * API to access an XWiki Preference There can be one preference object per language This function will find the
      * right preference object associated to the current active language
      * 
-     * @param prefname Preference name
+     * @param preference Preference name
      * @return The preference for this wiki and the current language
      */
-    public String getXWikiPreference(String prefname)
+    public String getXWikiPreference(String preference)
     {
-        return this.xwiki.getXWikiPreference(prefname, getXWikiContext());
+        return this.xwiki.getXWikiPreference(preference, getXWikiContext());
     }
 
     /**
      * API to access an XWiki Preference There can be one preference object per language This function will find the
      * right preference object associated to the current active language
      * 
-     * @param prefname Preference name
-     * @param default_value default value to return if the prefenrece does not exist or is empty
+     * @param preference Preference name
+     * @param defaultValue default value to return if the prefenrece does not exist or is empty
      * @return The preference for this wiki and the current language
      */
-    public String getXWikiPreference(String prefname, String default_value)
+    public String getXWikiPreference(String preference, String defaultValue)
     {
-        return this.xwiki.getXWikiPreference(prefname, default_value, getXWikiContext());
+        return this.xwiki.getXWikiPreference(preference, defaultValue, getXWikiContext());
     }
 
     /**
@@ -861,12 +861,12 @@ public class XWiki extends Api
      * right preference object associated to the current active language If no preference is found it will look in the
      * XWiki Preferences
      * 
-     * @param prefname Preference name
+     * @param preference Preference name
      * @return The preference for this wiki and the current language
      */
-    public String getWebPreference(String prefname)
+    public String getSpacePreference(String preference)
     {
-        return this.xwiki.getSpacePreference(prefname, getXWikiContext());
+        return this.xwiki.getSpacePreference(preference, getXWikiContext());
     }
 
     /**
@@ -874,13 +874,13 @@ public class XWiki extends Api
      * right preference object associated to the current active language If no preference is found it will look in the
      * XWiki Preferences
      * 
-     * @param prefname Preference name
+     * @param preference Preference name
      * @param space The space for which this preference is requested
      * @return The preference for this wiki and the current language
      */
-    public String getWebPreferenceFor(String prefname, String space)
+    public String getSpacePreferenceFor(String preference, String space)
     {
-        return this.xwiki.getSpacePreference(prefname, space, "", getXWikiContext());
+        return this.xwiki.getSpacePreference(preference, space, "", getXWikiContext());
     }
 
     /**
@@ -888,75 +888,75 @@ public class XWiki extends Api
      * right preference object associated to the current active language If no preference is found it will look in the
      * XWiki Preferences
      * 
-     * @param prefname Preference name
-     * @param default_value default value to return if the preference does not exist or is empty
+     * @param preference Preference name
+     * @param defaultValue default value to return if the preference does not exist or is empty
      * @return The preference for this wiki and the current language
      */
-    public String getWebPreference(String prefname, String default_value)
+    public String getSpacePreference(String preference, String defaultValue)
     {
-        return this.xwiki.getSpacePreference(prefname, default_value, getXWikiContext());
+        return this.xwiki.getSpacePreference(preference, defaultValue, getXWikiContext());
     }
 
     /**
      * API to access a Skin Preference The skin object is the current user's skin
      * 
-     * @param prefname Preference name
+     * @param preference Preference name
      * @return The preference for the current skin
      */
-    public String getSkinPreference(String prefname)
+    public String getSkinPreference(String preference)
     {
-        return this.xwiki.getSkinPreference(prefname, getXWikiContext());
+        return this.xwiki.getSkinPreference(preference, getXWikiContext());
     }
 
     /**
      * API to access a Skin Preference The skin object is the current user's skin
      * 
-     * @param prefname Preference name
-     * @param default_value default value to return if the preference does not exist or is empty
+     * @param preference Preference name
+     * @param defaultValue default value to return if the preference does not exist or is empty
      * @return The preference for the current skin
      */
-    public String getSkinPreference(String prefname, String default_value)
+    public String getSkinPreference(String preference, String defaultValue)
     {
-        return this.xwiki.getSkinPreference(prefname, default_value, getXWikiContext());
+        return this.xwiki.getSkinPreference(preference, defaultValue, getXWikiContext());
     }
 
     /**
      * API to access an XWiki Preference as a long number There can be one preference object per language This function
      * will find the right preference object associated to the current active language
      * 
-     * @param prefname Preference name
+     * @param preference Preference name
      * @param space The space for which this preference is requested
-     * @param default_value default value to return if the prefenrece does not exist or is empty
+     * @param defaultValue default value to return if the prefenrece does not exist or is empty
      * @return The preference for this wiki and the current language in long format
      */
-    public String getWebPreferenceFor(String prefname, String space, String default_value)
+    public String getSpacePreferenceFor(String preference, String space, String defaultValue)
     {
-        return this.xwiki.getSpacePreference(prefname, space, default_value, getXWikiContext());
+        return this.xwiki.getSpacePreference(preference, space, defaultValue, getXWikiContext());
     }
 
     /**
      * API to access an XWiki Preference as a long number There can be one preference object per language This function
      * will find the right preference object associated to the current active language
      * 
-     * @param prefname Preference name
-     * @param default_value default value to return if the prefenrece does not exist or is empty
+     * @param preference Preference name
+     * @param defaultValue default value to return if the prefenrece does not exist or is empty
      * @return The preference for this wiki and the current language in long format
      */
-    public long getXWikiPreferenceAsLong(String prefname, long default_value)
+    public long getXWikiPreferenceAsLong(String preference, long defaultValue)
     {
-        return this.xwiki.getXWikiPreferenceAsLong(prefname, default_value, getXWikiContext());
+        return this.xwiki.getXWikiPreferenceAsLong(preference, defaultValue, getXWikiContext());
     }
 
     /**
      * API to access an XWiki Preference as a long number There can be one preference object per language This function
      * will find the right preference object associated to the current active language
      * 
-     * @param prefname Preference name
+     * @param preference Preference name
      * @return The preference for this wiki and the current language in long format
      */
-    public long getXWikiPreferenceAsLong(String prefname)
+    public long getXWikiPreferenceAsLong(String preference)
     {
-        return this.xwiki.getXWikiPreferenceAsLong(prefname, getXWikiContext());
+        return this.xwiki.getXWikiPreferenceAsLong(preference, getXWikiContext());
     }
 
     /**
@@ -964,13 +964,13 @@ public class XWiki extends Api
      * will find the right preference object associated to the current active language If no preference is found it will
      * look for the XWiki Preference
      * 
-     * @param prefname Preference name
-     * @param default_value default value to return if the prefenrece does not exist or is empty
+     * @param preference Preference name
+     * @param defaultValue default value to return if the prefenrece does not exist or is empty
      * @return The preference for this wiki and the current language in long format
      */
-    public long getWebPreferenceAsLong(String prefname, long default_value)
+    public long getSpacePreferenceAsLong(String preference, long defaultValue)
     {
-        return this.xwiki.getSpacePreferenceAsLong(prefname, default_value, getXWikiContext());
+        return this.xwiki.getSpacePreferenceAsLong(preference, defaultValue, getXWikiContext());
     }
 
     /**
@@ -978,51 +978,51 @@ public class XWiki extends Api
      * will find the right preference object associated to the current active language If no preference is found it will
      * look for the XWiki Preference
      * 
-     * @param prefname Preference name
+     * @param preference Preference name
      * @return The preference for this wiki and the current language in long format
      */
-    public long getWebPreferenceAsLong(String prefname)
+    public long getSpacePreferenceAsLong(String preference)
     {
-        return this.xwiki.getSpacePreferenceAsLong(prefname, getXWikiContext());
+        return this.xwiki.getSpacePreferenceAsLong(preference, getXWikiContext());
     }
 
     /**
      * API to access an XWiki Preference as an int number There can be one preference object per language This function
      * will find the right preference object associated to the current active language
      * 
-     * @param prefname Preference name
-     * @param default_value default value to return if the prefenrece does not exist or is empty
+     * @param preference Preference name
+     * @param defaultValue default value to return if the prefenrece does not exist or is empty
      * @return The preference for this wiki and the current language in int format
      */
-    public int getXWikiPreferenceAsInt(String prefname, int default_value)
+    public int getXWikiPreferenceAsInt(String preference, int defaultValue)
     {
-        return this.xwiki.getXWikiPreferenceAsInt(prefname, default_value, getXWikiContext());
+        return this.xwiki.getXWikiPreferenceAsInt(preference, defaultValue, getXWikiContext());
     }
 
     /**
      * API to access an XWiki Preference as a int number There can be one preference object per language This function
      * will find the right preference object associated to the current active language
      * 
-     * @param prefname Preference name
+     * @param preference Preference name
      * @return The preference for this wiki and the current language in int format
      */
-    public int getXWikiPreferenceAsInt(String prefname)
+    public int getXWikiPreferenceAsInt(String preference)
     {
-        return this.xwiki.getXWikiPreferenceAsInt(prefname, getXWikiContext());
+        return this.xwiki.getXWikiPreferenceAsInt(preference, getXWikiContext());
     }
 
     /**
-     * API to access an Web Preference as a int number There can be one preference object per language This function
+     * API to access a space Preference as a int number There can be one preference object per language This function
      * will find the right preference object associated to the current active language If no preference is found it will
      * look for the XWiki Preference
      * 
-     * @param prefname Preference name
-     * @param default_value default value to return if the prefenrece does not exist or is empty
+     * @param preference Preference name
+     * @param defaultValue default value to return if the prefenrece does not exist or is empty
      * @return The preference for this wiki and the current language in int format
      */
-    public int getWebPreferenceAsInt(String prefname, int default_value)
+    public int getSpacePreferenceAsInt(String preference, int defaultValue)
     {
-        return this.xwiki.getSpacePreferenceAsInt(prefname, default_value, getXWikiContext());
+        return this.xwiki.getSpacePreferenceAsInt(preference, defaultValue, getXWikiContext());
     }
 
     /**
@@ -1030,35 +1030,35 @@ public class XWiki extends Api
      * will find the right preference object associated to the current active language If no preference is found it will
      * look for the XWiki Preference
      * 
-     * @param prefname Preference name
+     * @param preference Preference name
      * @return The preference for this wiki and the current language in int format
      */
-    public int getWebPreferenceAsInt(String prefname)
+    public int getSpacePreferenceAsInt(String preference)
     {
-        return this.xwiki.getSpacePreferenceAsInt(prefname, getXWikiContext());
+        return this.xwiki.getSpacePreferenceAsInt(preference, getXWikiContext());
     }
 
     /**
      * API to access a User Preference This function will look in the User profile for the preference If no preference
      * is found it will look in the Space Preferences If no preference is found it will look in the XWiki Preferences
      * 
-     * @param prefname Preference name
+     * @param preference Preference name
      * @return The preference for this wiki and the current language
      */
-    public String getUserPreference(String prefname)
+    public String getUserPreference(String preference)
     {
-        return this.xwiki.getUserPreference(prefname, getXWikiContext());
+        return this.xwiki.getUserPreference(preference, getXWikiContext());
     }
 
     /**
      * API to access a User Preference from cookie This function will look in the session cookie for the preference
      * 
-     * @param prefname Preference name
+     * @param preference Preference name
      * @return The preference for this wiki and the current language
      */
-    public String getUserPreferenceFromCookie(String prefname)
+    public String getUserPreferenceFromCookie(String preference)
     {
-        return this.xwiki.getUserPreferenceFromCookie(prefname, getXWikiContext());
+        return this.xwiki.getUserPreferenceFromCookie(preference, getXWikiContext());
     }
 
     /**
@@ -1176,7 +1176,7 @@ public class XWiki extends Api
             } else {
                 registerRight =
                     this.xwiki.getRightService().hasAccessLevel("register", getXWikiContext().getUser(),
-                        "XWiki.XWikiPreferences", getXWikiContext());
+                    "XWiki.XWikiPreferences", getXWikiContext());
             }
 
             if (registerRight) {
@@ -1405,19 +1405,20 @@ public class XWiki extends Api
     /**
      * Privileged API to copy a space to another wiki, optionally deleting all document of the target space
      * 
-     * @param web source Space
+     * @param space source Space
      * @param sourceWiki source Wiki
      * @param targetWiki target Wiki
-     * @param wikiLanguage language to copy
+     * @param language language to copy
      * @param clean true to delete all document of the target space
      * @return number of copied documents
      * @throws XWikiException if the space was not copied properly
      */
-    public int copyWikiWeb(String space, String sourceWiki, String targetWiki, String wikiLanguage, boolean clean)
+    public int copySpaceBetweenWikis(String space, String sourceWiki, String targetWiki, String language, boolean clean)
         throws XWikiException
     {
         if (hasProgrammingRights()) {
-            return this.xwiki.copySpaceBetweenWikis(space, sourceWiki, targetWiki, wikiLanguage, clean, getXWikiContext());
+            return this.xwiki.copySpaceBetweenWikis(space, sourceWiki, targetWiki, language, clean,
+                getXWikiContext());
         }
 
         return -1;
@@ -2270,7 +2271,7 @@ public class XWiki extends Api
         try {
             if (this.xwiki.exists(newFullName, getXWikiContext())
                 && !this.xwiki.getRightService().hasAccessLevel("delete", getXWikiContext().getUser(), newFullName,
-                    getXWikiContext())) {
+                getXWikiContext())) {
                 return false;
             }
             if (this.xwiki.getRightService().hasAccessLevel("edit", getXWikiContext().getUser(), doc.getFullName(),
@@ -2628,9 +2629,9 @@ public class XWiki extends Api
      * Get the XWiki Class object defined in the passed Document name.
      * <p>
      * Note: This method doesn't require any rights for accessing the passed Document (as opposed to the
-     * {@link com.xpn.xwiki.api.Document#getXClass()} method which does require to get a Document object first. This
-     * is thus useful in cases where the calling code doesn't have the access right to the specified Document. It is
-     * safe because there are no sensitive data stored in a Class definition.
+     * {@link com.xpn.xwiki.api.Document#getXClass()} method which does require to get a Document object first. This is
+     * thus useful in cases where the calling code doesn't have the access right to the specified Document. It is safe
+     * because there are no sensitive data stored in a Class definition.
      * </p>
      * 
      * @param documentName the name of the document for which to get the Class object. For example
@@ -2805,20 +2806,20 @@ public class XWiki extends Api
 
         return syntax;
     }
-    
+
     /**
-     * @return the section depth for which section editing is available (can be configured through 
-     *         {@code xwiki.section.depth} configuration property. Defaults to 2 when not defined
+     * @return the section depth for which section editing is available (can be configured through {@code
+     *         xwiki.section.depth} configuration property. Defaults to 2 when not defined
      */
     public long getSectionEditingDepth()
     {
         return this.xwiki.getSectionEditingDepth();
     }
-    
+
     /**
-     * @return true if title handling should be using the compatibility mode or not. When the compatibility
-     *         mode is active, if the document's content first header (level 1 or level 2) matches the document's 
-     *         title the first header is stripped.
+     * @return true if title handling should be using the compatibility mode or not. When the compatibility mode is
+     *         active, if the document's content first header (level 1 or level 2) matches the document's title the
+     *         first header is stripped.
      */
     public boolean isTitleInCompatibilityMode()
     {

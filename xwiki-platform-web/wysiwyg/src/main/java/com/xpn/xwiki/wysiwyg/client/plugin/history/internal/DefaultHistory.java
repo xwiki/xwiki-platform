@@ -25,6 +25,8 @@ import java.util.List;
 
 import org.xwiki.gwt.dom.client.DOMUtils;
 import org.xwiki.gwt.dom.client.Document;
+import org.xwiki.gwt.dom.client.PasteEvent;
+import org.xwiki.gwt.dom.client.PasteHandler;
 import org.xwiki.gwt.dom.client.Range;
 import org.xwiki.gwt.dom.client.Selection;
 import org.xwiki.gwt.dom.client.Text;
@@ -43,7 +45,7 @@ import com.xpn.xwiki.wysiwyg.client.plugin.history.History;
  * 
  * @version $Id$
  */
-public class DefaultHistory implements History, KeyDownHandler, CommandListener
+public class DefaultHistory implements History, KeyDownHandler, PasteHandler, CommandListener
 {
     /**
      * The list of commands that should be ignored, meaning that they shouldn't generate history entries.
@@ -94,6 +96,7 @@ public class DefaultHistory implements History, KeyDownHandler, CommandListener
         this.capacity = capacity;
 
         this.textArea = textArea;
+        textArea.addPasteHandler(this);
         textArea.addKeyDownHandler(this);
         textArea.getCommandManager().addCommandListener(this);
     }
@@ -304,6 +307,19 @@ public class DefaultHistory implements History, KeyDownHandler, CommandListener
                 save();
             }
             previousKeyboardAction = currentKeyboardAction;
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see PasteHandler#onPaste(PasteEvent)
+     */
+    public void onPaste(PasteEvent event)
+    {
+        if (event.getSource() == textArea) {
+            save();
+            previousKeyboardAction = null;
         }
     }
 

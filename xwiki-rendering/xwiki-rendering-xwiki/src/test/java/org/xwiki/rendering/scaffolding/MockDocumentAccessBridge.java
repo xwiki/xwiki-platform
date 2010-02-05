@@ -376,12 +376,26 @@ public class MockDocumentAccessBridge implements DocumentAccessBridge
      * {@inheritDoc}
      * 
      * @see DocumentAccessBridge#pushDocumentInContext(Map, String)
+     * @deprecated use {@link #pushDocumentInContext(Map, DocumentReference)} instead
      */
+    @Deprecated
     public void pushDocumentInContext(Map<String, Object> backupObjects, String documentName) throws Exception
     {
         throw new RuntimeException("Not implemented");
     }
-    
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see DocumentAccessBridge#pushDocumentInContext(Map, DocumentReference)
+     * @since 2.3M1
+     */
+    public void pushDocumentInContext(Map<String, Object> backupObjects, DocumentReference documentReference)
+        throws Exception
+    {
+        throw new RuntimeException("Not implemented");
+    }
+
     /**
      * {@inheritDoc}
      * 

@@ -1451,8 +1451,8 @@ public class XWiki extends Api
     }
 
     /**
-     * API to include a topic into another, optionnaly surrounding the content with {pre}{/pre} to avoid future wiki
-     * rendering The topic is rendered fully in the context of itself.
+     * API to include a topic into another, optionally surrounding the content with {pre}{/pre} to avoid future wiki
+     * rendering. The topic is rendered fully in the context of itself.
      * 
      * @param topic page name of the topic to include
      * @param pre true to add {pre} {/pre} (only if includer document is 1.0 syntax)

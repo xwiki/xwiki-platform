@@ -512,7 +512,7 @@ $xwiki.jsx.use("XWiki.XWikiUserSheet")##
         {{html clean="false"}}
       &lt;/div&gt;
     #end
-    &lt;div class="spacer"&gt;&amp;nbsp;&lt;/div&gt;
+    &lt;div class="clearfloats"&gt;&amp;nbsp;&lt;/div&gt;
   &lt;/div&gt;
 {{/html}}
 {{/velocity}}</content>

@@ -42,6 +42,8 @@
 #set($ok = $xwiki.ssfx.use("js/xwiki/usersandgroups/usersandgroups.css", true))
 #set($ok = $xwiki.jsfx.use("js/xwiki/table/livetable.js", true))
 #set($ok = $xwiki.ssfx.use("js/xwiki/table/livetable.css", true))
+#set($ok = $xwiki.ssx.use("XWiki.XWikiUserSheet"))
+#set($ok = $xwiki.jsx.use("XWiki.XWikiUserSheet"))
 ##
 ## url to get the users for displaying them in the ajax-based table
 ##

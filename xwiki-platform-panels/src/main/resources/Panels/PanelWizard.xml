@@ -77,7 +77,7 @@
   &lt;/div&gt;
   &lt;div id="xwikieditcontent" class="clear"&gt;
     &lt;div id="PanelListSection"&gt;
-      &lt;span class="hastooltip" onmouseover="if(window.isDraggingPanel) return; showtip(this, '$msg.get("panelwizard.tip")', 300)"&gt;$msg.get("panelwizard.draganddrop")
+      &lt;span id="draganddroptooltip" class="hastooltip"&gt;$msg.get("panelwizard.draganddrop")&lt;/span&gt;
       #set($panelClass = $xwiki.getDocument("Panels.PanelClass").xWikiClass)
       #set($categoryList = $panelClass.category.getProperty("values").value.split("[|]"))
       #set($sql = ", BaseObject as obj where obj.name=doc.fullName and obj.className='Panels.PanelClass' and doc.fullName!='Panels.PanelTemplate'")
@@ -114,6 +114,13 @@
       $xwiki.jsfx.use("js/xwiki/panelwizard/toolTip.js")
       &lt;script type="text/javascript"&gt;
       //&lt;![CDATA[
+      Event.observe($('draganddroptooltip'), "mouseover", function() {
+        if(window.isDraggingPanel) {
+          return; 
+        } 
+        showtip($('draganddroptooltip'), '$msg.get("panelwizard.tip")', 300);
+      });
+
       window.ajaxurl = "$ajaxurl";
       window.allPanelsPlace = new Object();
       window.panelsavesuccess = "$msg.get("panelsavesuccess")";

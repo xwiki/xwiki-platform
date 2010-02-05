@@ -1,3 +1,4 @@
+#template("xwikivars.vm")
 <div>
 <form name="edituser" method="post">
 #set($force = $!request.get("force"))

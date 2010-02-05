@@ -135,7 +135,7 @@ public class DialogBox extends PopupPanel implements DragListener, ClickHandler
         caption.addStyleName("xDialogCaption");
         (new DragAdaptor(caption)).addDragListener(this);
 
-        closeIcon = Images.INSTANCE.close().createImage();
+        closeIcon = new Image(Images.INSTANCE.close());
         closeIcon.setTitle(Strings.INSTANCE.close());
         closeIcon.addStyleName("xDialogCloseIcon");
         closeIcon.addClickHandler(this);

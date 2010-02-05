@@ -20,27 +20,25 @@
 package org.xwiki.gwt.user.client;
 
 import com.google.gwt.core.client.GWT;
-import com.google.gwt.user.client.ui.AbstractImagePrototype;
-import com.google.gwt.user.client.ui.ImageBundle;
+import com.google.gwt.resources.client.ClientBundle;
+import com.google.gwt.resources.client.ImageResource;
 
 /**
- * This {@link ImageBundle} contains all the images used in the User module. Using an image bundle allows all of these
+ * This {@link ClientBundle} contains all the images used in the User module. Using a client bundle allows all of these
  * images to be packed into a single image, which saves a lot of HTTP requests, drastically improving startup time.
  * 
  * @version $Id$
  */
-public interface Images extends ImageBundle
+public interface Images extends ClientBundle
 {
     /**
-     * An instance of this image bundle that can be used anywhere in the code to extract images.
+     * An instance of this client bundle that can be used anywhere in the code to extract images.
      */
-    Images INSTANCE = (Images) GWT.create(Images.class);
+    Images INSTANCE = GWT.create(Images.class);
 
     /**
-     * The icon representing the action of closing a dialog box.
-     * 
-     * @return a prototype of this image
+     * @return the icon representing the action of closing a dialog box
      */
-    @Resource("close.gif")
-    AbstractImagePrototype close();
+    @Source("close.gif")
+    ImageResource close();
 }

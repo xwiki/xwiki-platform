@@ -22,9 +22,10 @@ package org.xwiki.gwt.user.client.ui;
 import org.xwiki.gwt.dom.client.DOMUtils;
 import org.xwiki.gwt.dom.client.Element;
 
+import com.google.gwt.resources.client.ImageResource;
 import com.google.gwt.user.client.Command;
+import com.google.gwt.user.client.ui.AbstractImagePrototype;
 import com.google.gwt.user.client.ui.HTML;
-import com.google.gwt.user.client.ui.AbstractImagePrototype.ImagePrototypeElement;
 
 /**
  * Improves the default menu item widget provided by GWT:
@@ -153,9 +154,9 @@ public class MenuItem extends com.google.gwt.user.client.ui.MenuItem implements 
      * 
      * @param icon the icon to be displayed on the left of this menu item
      */
-    public void setIcon(ImagePrototypeElement icon)
+    public void setIcon(ImageResource icon)
     {
-        setIcon((Element) icon.cast());
+        setIcon((Element) AbstractImagePrototype.create(icon).createElement().cast());
     }
 
     /**

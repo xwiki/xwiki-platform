@@ -136,8 +136,6 @@
         <configuration>
           <failsOnError>true</failsOnError>
           <includeTestSourceDirectory>true</includeTestSourceDirectory>
-          <!-- New code should follow checkstyle rules. -->
-          <excludes>org/xwiki/gwt/user/client/Images.java</excludes>
         </configuration>
       </plugin>
     </plugins>

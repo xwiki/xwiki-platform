@@ -439,8 +439,21 @@ public interface DocumentAccessBridge
      * @param backupObjects the object in which to some context properties will be saved
      * @param documentReference the reference to the document to set as the current document
      * @throws Exception in case of an error like a problem loading the document from the database
+     * @deprecated use {@link #pushDocumentInContext(Map, DocumentReference)} instead
      */
+    @Deprecated
     void pushDocumentInContext(Map<String, Object> backupObjects, String documentReference) throws Exception;
+
+    /**
+     * Sets the passed document as the current document in the XWiki Context and saves current values related to the
+     * current document into a backup object.
+     * 
+     * @param backupObjects the object in which to some context properties will be saved
+     * @param documentReference the reference to the document to set as the current document
+     * @throws Exception in case of an error like a problem loading the document from the database
+     * @since 2.3M1
+     */
+    void pushDocumentInContext(Map<String, Object> backupObjects, DocumentReference documentReference) throws Exception;
 
     /**
      * Restore values saved in a backup object in the XWiki Context and restore the current document with the same value

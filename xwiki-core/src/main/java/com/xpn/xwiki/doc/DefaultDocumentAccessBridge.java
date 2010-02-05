@@ -695,8 +695,24 @@ public class DefaultDocumentAccessBridge implements DocumentAccessBridge
      * {@inheritDoc}
      * 
      * @see DocumentAccessBridge#pushDocumentInContext(Map, String)
+     * @deprecated use {@link #pushDocumentInContext(Map, DocumentReference)} instead
      */
+    @Deprecated
     public void pushDocumentInContext(Map<String, Object> backupObjects, String documentReference) throws Exception
+    {
+        XWikiContext xcontext = getContext();
+        XWikiDocument.backupContext(backupObjects, xcontext);
+        xcontext.getWiki().getDocument(documentReference, xcontext).setAsContextDoc(xcontext);
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see DocumentAccessBridge#pushDocumentInContext(Map, DocumentReference)
+     * @since 2.3M1
+     */
+    public void pushDocumentInContext(Map<String, Object> backupObjects, DocumentReference documentReference)
+        throws Exception
     {
         XWikiContext xcontext = getContext();
         XWikiDocument.backupContext(backupObjects, xcontext);

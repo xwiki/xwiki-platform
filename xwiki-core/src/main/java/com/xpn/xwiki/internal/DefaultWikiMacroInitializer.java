@@ -114,13 +114,14 @@ public class DefaultWikiMacroInitializer extends AbstractLogEnabled implements W
                 xcontext.setDatabase(wikiName);
 
                 // Search for all those documents with macro definitions and for each register the macro
-                for (String[] wikiMacroDocumentData : getWikiMacroDocumentData(xcontext)) {
+                for (Object[] wikiMacroDocumentData : getWikiMacroDocumentData(xcontext)) {
                     // In the database the space and page names are always specified for a document. However the wiki
                     // part isn't so we need to replace the wiki reference with the current wiki.
-                    DocumentReference wikiMacroDocumentReference = new DocumentReference(wikiMacroDocumentData[1],
-                        new SpaceReference(wikiMacroDocumentData[0], new WikiReference(wikiName)));
+                    DocumentReference wikiMacroDocumentReference = new DocumentReference(
+                        (String) wikiMacroDocumentData[1], new SpaceReference((String) wikiMacroDocumentData[0],
+                            new WikiReference(wikiName)));
 
-                    String wikiMacroDocumentAuthor = wikiMacroDocumentData[1];
+                    String wikiMacroDocumentAuthor = (String) wikiMacroDocumentData[2];
                     try {
                         WikiMacro macro = wikiMacroFactory.createWikiMacro(wikiMacroDocumentReference);
 
@@ -145,12 +146,12 @@ public class DefaultWikiMacroInitializer extends AbstractLogEnabled implements W
         }
     }
 
-    private List<String[]> getWikiMacroDocumentData(XWikiContext xcontext) throws Exception
+    private List<Object[]> getWikiMacroDocumentData(XWikiContext xcontext) throws Exception
     {
         // TODO: Use the query manager instead
         String sql = "select doc.space, doc.name, doc.author from XWikiDocument doc, BaseObject obj where "
             + "doc.fullName=obj.name and obj.className=?";
-        List<String[]> wikiMacroDocumentData;
+        List<Object[]> wikiMacroDocumentData;
         try {
             wikiMacroDocumentData = xcontext.getWiki().getStore().search(sql, 0, 0, Arrays.asList(WIKI_MACRO_CLASS),
                 xcontext);

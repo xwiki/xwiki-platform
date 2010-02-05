@@ -1673,7 +1673,7 @@ ${Msz}Mb##
   #end
    //]]>
   </script>
-  #if($doc.syntaxId == "xwiki/2.0"){{/html}}
+  #if($xwiki.getCurrentContentSyntaxId() == "xwiki/2.0"){{/html}}
 
   #else {/pre} #end
 #end

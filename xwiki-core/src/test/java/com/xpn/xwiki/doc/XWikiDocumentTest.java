@@ -657,7 +657,7 @@ public class XWikiDocumentTest extends AbstractBridgedXWikiComponentTestCase
 
         assertEquals("string", this.document.display("string", "view", getContext()));
         assertEquals(
-            "{pre}<input size='30' id='Space.Page_0_string' value='string' name='Space.Page_0_string' type='text'/>{/pre}",
+            "<input size='30' id='Space.Page_0_string' value='string' name='Space.Page_0_string' type='text'/>",
             this.document.display("string", "edit", getContext()));
 
         this.mockXWikiRenderingEngine.expects(once()).method("renderText").with(eq("area"), ANYTHING, ANYTHING).will(

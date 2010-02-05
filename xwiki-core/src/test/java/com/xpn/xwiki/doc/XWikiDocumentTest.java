@@ -869,11 +869,12 @@ public class XWikiDocumentTest extends AbstractBridgedXWikiComponentTestCase
     public void testResolveReferenceWithSpecificSpace() throws Exception
     {
         XWikiDocument doc = new XWikiDocument();
+        getContext().setDatabase("currentwiki");
 
-        DocumentReference expected1 = new DocumentReference("xwiki", "defaultSpace", "page");
+        DocumentReference expected1 = new DocumentReference("currentwiki", "defaultSpace", "page");
         assertEquals(expected1, doc.resolveReferenceWithSpecificSpace("page", "defaultSpace"));
 
-        DocumentReference expected2 = new DocumentReference("xwiki", "space", "page");
+        DocumentReference expected2 = new DocumentReference("currentwiki", "space", "page");
         assertEquals(expected2, doc.resolveReferenceWithSpecificSpace("space.page", "XWiki"));
 
         DocumentReference expected3 = new DocumentReference("wiki", "space", "page");

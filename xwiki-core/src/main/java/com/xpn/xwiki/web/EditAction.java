@@ -20,6 +20,7 @@
  */
 package com.xpn.xwiki.web;
 
+import org.apache.commons.lang.math.NumberUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.velocity.VelocityContext;
@@ -59,7 +60,7 @@ public class EditAction extends XWikiAction
         String sectionContent = "";
         int sectionNumber = 0;
         if (request.getParameter("section") != null && xwiki.hasSectionEdit(context)) {
-            sectionNumber = Integer.parseInt(request.getParameter("section"));
+            sectionNumber = NumberUtils.toInt(request.getParameter("section"));
             sectionContent = doc.getContentOfSection(sectionNumber);
         }
         vcontext.put("sectionNumber", new Integer(sectionNumber));

@@ -268,7 +268,8 @@ public abstract class BaseElement implements ElementInterface, Serializable
     /**
      * @return the syntax id of the document containing this element. If an error occurs while retrieving the document a
      *         syntax id of "xwiki/1.0" is assumed.
-     * @deprecated since 2.2M2 use {@link #getDocumentReference()} instead
+     * @deprecated since 2.2M2 use <code>context.getWiki().getDocument(object.getDocumentReference())</code> and then
+     *             get the syntax on the document object
      */
     @Deprecated
     public String getDocumentSyntaxId(XWikiContext context)

@@ -20,8 +20,9 @@
 package com.xpn.xwiki.internal;
 
 import java.util.Arrays;
-import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import org.apache.commons.lang.StringUtils;
 import org.xwiki.model.reference.DocumentReference;
@@ -98,12 +99,12 @@ public class DefaultWikiMacroInitializer extends AbstractLogEnabled implements W
         // Register the wiki macros that exist in each wiki
         String originalWiki = xcontext.getDatabase();
         try {
-            // If we're in multi wiki mode get the list of all subwikis, otherwise just look into the main wiki
-            List<String> wikiNames;
+            Set<String> wikiNames = new HashSet<String>();
+            // Always add the main wiki to the list of wikis for which to load defined wiki macros.
+            wikiNames.add(xcontext.getMainXWiki());
+            // If we're in multi wiki mode add the list of all subwikis
             if (xcontext.getWiki().isVirtualMode()) {
-                wikiNames = xcontext.getWiki().getVirtualWikisDatabaseNames(xcontext);
-            } else {
-                wikiNames = Collections.singletonList(xcontext.getMainXWiki());
+                wikiNames.addAll(xcontext.getWiki().getVirtualWikisDatabaseNames(xcontext));
             }
 
             for (String wikiName : wikiNames) {

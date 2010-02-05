@@ -24,9 +24,8 @@ import org.apache.commons.lang.StringUtils;
 import org.radeox.macro.table.Table;
 
 /**
- * Built a table from a string
+ * Builds a Radeox {@link Table} by parsing its textual representation, usually the content of a {table} macro.
  * 
- * @author stephan
  * @version $Id$
  */
 public class TableBuilder

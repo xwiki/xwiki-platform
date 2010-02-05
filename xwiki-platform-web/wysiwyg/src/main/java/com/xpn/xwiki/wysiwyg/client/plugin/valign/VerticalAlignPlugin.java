@@ -28,6 +28,7 @@ import org.xwiki.gwt.user.client.ui.rta.cmd.Command;
 
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.gwt.resources.client.ImageResource;
 import com.google.gwt.user.client.ui.FocusWidget;
 import com.google.gwt.user.client.ui.Image;
 import com.google.gwt.user.client.ui.ToggleButton;
@@ -67,10 +68,8 @@ public class VerticalAlignPlugin extends AbstractStatefulPlugin implements Click
     {
         super.init(textArea, config);
 
-        addFeature("superscript", Command.SUPER_SCRIPT, Images.INSTANCE.superscript().createImage(), Strings.INSTANCE
-            .superscript());
-        addFeature("subscript", Command.SUB_SCRIPT, Images.INSTANCE.subscript().createImage(), Strings.INSTANCE
-            .subscript());
+        addFeature("superscript", Command.SUPER_SCRIPT, Images.INSTANCE.superscript(), Strings.INSTANCE.superscript());
+        addFeature("subscript", Command.SUB_SCRIPT, Images.INSTANCE.subscript(), Strings.INSTANCE.subscript());
 
         if (toolBarExtension.getFeatures().length > 0) {
             registerTextAreaHandlers();
@@ -83,13 +82,13 @@ public class VerticalAlignPlugin extends AbstractStatefulPlugin implements Click
      * 
      * @param name the feature name
      * @param command the rich text area command that is executed by this feature
-     * @param image the image displayed on the tool bar
+     * @param imageResource the image displayed on the tool bar
      * @param title the tool tip used on the tool bar button
      */
-    private void addFeature(String name, Command command, Image image, String title)
+    private void addFeature(String name, Command command, ImageResource imageResource, String title)
     {
         if (getTextArea().getCommandManager().isSupported(command)) {
-            ToggleButton button = new ToggleButton(image);
+            ToggleButton button = new ToggleButton(new Image(imageResource));
             saveRegistration(button.addClickHandler(this));
             button.setTitle(title);
             toolBarExtension.addFeature(name, button);

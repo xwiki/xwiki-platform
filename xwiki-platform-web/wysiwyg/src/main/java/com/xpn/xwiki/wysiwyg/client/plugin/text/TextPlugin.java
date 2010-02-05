@@ -35,6 +35,7 @@ import org.xwiki.gwt.user.client.ui.rta.cmd.internal.ToggleInlineStyleExecutable
 
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.gwt.resources.client.ImageResource;
 import com.google.gwt.user.client.ui.FocusWidget;
 import com.google.gwt.user.client.ui.Image;
 import com.google.gwt.user.client.ui.ToggleButton;
@@ -93,13 +94,12 @@ public class TextPlugin extends AbstractStatefulPlugin implements ClickHandler
 
         shortcutKeyManager = new ShortcutKeyManager();
 
-        addFeature("bold", Command.BOLD, Images.INSTANCE.bold().createImage(), Strings.INSTANCE.bold(), 'B');
-        addFeature("italic", Command.ITALIC, Images.INSTANCE.italic().createImage(), Strings.INSTANCE.italic(), 'I');
-        addFeature("underline", Command.UNDERLINE, Images.INSTANCE.underline().createImage(), Strings.INSTANCE
-            .underline(), 'U');
-        addFeature("strikethrough", Command.STRIKE_THROUGH, Images.INSTANCE.strikeThrough().createImage(),
-            Strings.INSTANCE.strikeThrough());
-        addFeature("teletype", Command.TELETYPE, Images.INSTANCE.teletype().createImage(), Strings.INSTANCE.teletype());
+        addFeature("bold", Command.BOLD, Images.INSTANCE.bold(), Strings.INSTANCE.bold(), 'B');
+        addFeature("italic", Command.ITALIC, Images.INSTANCE.italic(), Strings.INSTANCE.italic(), 'I');
+        addFeature("underline", Command.UNDERLINE, Images.INSTANCE.underline(), Strings.INSTANCE.underline(), 'U');
+        addFeature("strikethrough", Command.STRIKE_THROUGH, Images.INSTANCE.strikeThrough(), Strings.INSTANCE
+            .strikeThrough());
+        addFeature("teletype", Command.TELETYPE, Images.INSTANCE.teletype(), Strings.INSTANCE.teletype());
 
         if (toolBarExtension.getFeatures().length > 0) {
             registerTextAreaHandlers();
@@ -113,15 +113,15 @@ public class TextPlugin extends AbstractStatefulPlugin implements ClickHandler
      * 
      * @param name the feature name
      * @param command the rich text area command that is executed by this feature
-     * @param image the image displayed on the tool bar
+     * @param imageResource the image displayed on the tool bar
      * @param title the tool tip used on the tool bar button
      * @return the tool bar button that exposes this feature
      */
-    private ToggleButton addFeature(String name, Command command, Image image, String title)
+    private ToggleButton addFeature(String name, Command command, ImageResource imageResource, String title)
     {
         ToggleButton button = null;
         if (getTextArea().getCommandManager().isSupported(command)) {
-            button = new ToggleButton(image);
+            button = new ToggleButton(new Image(imageResource));
             saveRegistration(button.addClickHandler(this));
             button.setTitle(title);
             toolBarExtension.addFeature(name, button);
@@ -135,14 +135,15 @@ public class TextPlugin extends AbstractStatefulPlugin implements ClickHandler
      * 
      * @param name the feature name
      * @param command the rich text area command that is executed by this feature
-     * @param image the image displayed on the tool bar
+     * @param imageResource the image displayed on the tool bar
      * @param title the tool tip used on the tool bar button
      * @param keyCode the shortcut key to be used
      * @return the tool bar button that exposes this feature
      */
-    private ToggleButton addFeature(String name, Command command, Image image, String title, char keyCode)
+    private ToggleButton addFeature(String name, Command command, ImageResource imageResource, String title,
+        char keyCode)
     {
-        ToggleButton button = addFeature(name, command, image, title);
+        ToggleButton button = addFeature(name, command, imageResource, title);
         if (button != null) {
             ClickCommand clickCommand = new ClickCommand(button);
             shortcutKeyManager.put(new ShortcutKey(keyCode, EnumSet.of(ModifierKey.CTRL)), clickCommand);

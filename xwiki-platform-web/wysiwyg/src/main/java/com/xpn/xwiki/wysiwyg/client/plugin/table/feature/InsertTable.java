@@ -34,6 +34,7 @@ import org.xwiki.gwt.user.client.ui.wizard.WizardStepMap;
 import org.xwiki.gwt.user.client.ui.wizard.NavigationListener.NavigationDirection;
 
 import com.google.gwt.dom.client.Node;
+import com.google.gwt.user.client.ui.Image;
 import com.xpn.xwiki.wysiwyg.client.Images;
 import com.xpn.xwiki.wysiwyg.client.Strings;
 import com.xpn.xwiki.wysiwyg.client.plugin.table.TableDescriptor;
@@ -90,8 +91,7 @@ public class InsertTable extends AbstractTableFeature implements WizardListener
             WizardStepMap insertSteps = new WizardStepMap();
             insertSteps.put(CONFIG_STEP_NAME, configStep);
 
-            wizard =
-                new Wizard(Strings.INSTANCE.tableInsertDialogCaption(), Images.INSTANCE.insertTable().createImage());
+            wizard = new Wizard(Strings.INSTANCE.tableInsertDialogCaption(), new Image(Images.INSTANCE.insertTable()));
             wizard.setProvider(insertSteps);
             wizard.addWizardListener(this);
         }

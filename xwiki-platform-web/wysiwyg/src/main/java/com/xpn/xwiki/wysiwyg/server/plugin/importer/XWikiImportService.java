@@ -57,8 +57,8 @@ public class XWikiImportService implements ImportService
     private OfficeImporter officeImporter;
 
     /**
-     * The component used to serialize {@link org.xwiki.model.reference.DocumentReference} instances. This component
-     * is needed only because OfficeImporter component uses String instead of
+     * The component used to serialize {@link org.xwiki.model.reference.DocumentReference} instances. This component is
+     * needed only because OfficeImporter component uses String instead of
      * {@link org.xwiki.model.reference.DocumentReference}.
      */
     @Requirement
@@ -67,8 +67,7 @@ public class XWikiImportService implements ImportService
     /**
      * The component used to parse attachment references.
      */
-    @Requirement("current")
-    private AttachmentReferenceResolver attachmentReferenceResolver;
+    private AttachmentReferenceResolver<String> attachmentReferenceResolver;
 
     /**
      * The component manager. We need it because we have to access some components dynamically.
@@ -108,9 +107,8 @@ public class XWikiImportService implements ImportService
                 this.attachmentReferenceResolver.resolve(attachment.getReference());
             // OfficeImporter should be improved to use DocumentName instead of String. This will remove the need for a
             // DocumentNameSerializer.
-            return officeImporter.importAttachment(
-                this.entityReferenceSerializer.serialize(attachmentReference.getDocumentReference()),
-                attachmentReference.getName(), cleaningParams);
+            return officeImporter.importAttachment(this.entityReferenceSerializer.serialize(attachmentReference
+                .getDocumentReference()), attachmentReference.getName(), cleaningParams);
         } catch (Exception e) {
             LOG.error("Exception while importing office document.", e);
             throw new RuntimeException(e.getLocalizedMessage());

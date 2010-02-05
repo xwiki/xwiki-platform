@@ -27,6 +27,7 @@ import org.xwiki.gwt.user.client.ui.wizard.Wizard;
 import org.xwiki.gwt.user.client.ui.wizard.WizardStep;
 import org.xwiki.gwt.user.client.ui.wizard.WizardStepProvider;
 
+import com.google.gwt.user.client.ui.Image;
 import com.xpn.xwiki.wysiwyg.client.Images;
 import com.xpn.xwiki.wysiwyg.client.Strings;
 import com.xpn.xwiki.wysiwyg.client.wiki.ResourceName;
@@ -76,7 +77,7 @@ public class LinkWizard extends Wizard implements WizardStepProvider
      */
     public LinkWizard(Config config, WikiServiceAsync wikiService)
     {
-        super(Strings.INSTANCE.link(), Images.INSTANCE.link().createImage());
+        super(Strings.INSTANCE.link(), new Image(Images.INSTANCE.link()));
         this.config = config;
         this.wikiService = wikiService;
         this.setProvider(this);

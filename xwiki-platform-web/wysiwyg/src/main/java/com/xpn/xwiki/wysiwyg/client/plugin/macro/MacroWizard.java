@@ -31,6 +31,7 @@ import org.xwiki.gwt.user.client.ui.wizard.WizardListener;
 import org.xwiki.gwt.user.client.ui.wizard.WizardStepMap;
 import org.xwiki.gwt.user.client.ui.wizard.NavigationListener.NavigationDirection;
 
+import com.google.gwt.user.client.ui.Image;
 import com.xpn.xwiki.wysiwyg.client.Images;
 import com.xpn.xwiki.wysiwyg.client.Strings;
 import com.xpn.xwiki.wysiwyg.client.plugin.macro.ui.EditMacroWizardStep;
@@ -161,8 +162,7 @@ public class MacroWizard implements WizardListener
             WizardStepMap editSteps = new WizardStepMap();
             editSteps.put(EDIT_STEP_NAME, editStep);
 
-            editWizard =
-                new Wizard(Strings.INSTANCE.macroEditDialogCaption(), Images.INSTANCE.macroEdit().createImage());
+            editWizard = new Wizard(Strings.INSTANCE.macroEditDialogCaption(), new Image(Images.INSTANCE.macroEdit()));
             editWizard.setProvider(editSteps);
             editWizard.addWizardListener(this);
         }
@@ -189,7 +189,7 @@ public class MacroWizard implements WizardListener
             insertSteps.put(EDIT_STEP_NAME, editStep);
 
             insertWizard =
-                new Wizard(Strings.INSTANCE.macroInsertDialogCaption(), Images.INSTANCE.macroInsert().createImage());
+                new Wizard(Strings.INSTANCE.macroInsertDialogCaption(), new Image(Images.INSTANCE.macroInsert()));
             insertWizard.setProvider(insertSteps);
             insertWizard.addWizardListener(this);
         }

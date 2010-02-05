@@ -31,6 +31,7 @@ import org.xwiki.gwt.user.client.ui.rta.cmd.internal.ToggleExecutable;
 
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.gwt.resources.client.ImageResource;
 import com.google.gwt.user.client.ui.FocusWidget;
 import com.google.gwt.user.client.ui.Image;
 import com.google.gwt.user.client.ui.ToggleButton;
@@ -72,14 +73,12 @@ public class JustifyPlugin extends AbstractStatefulPlugin implements ClickHandle
         registerCustomExecutable(Command.JUSTIFY_RIGHT, Style.TextAlign.RIGHT);
         registerCustomExecutable(Command.JUSTIFY_FULL, Style.TextAlign.JUSTIFY);
 
-        addFeature("justifyleft", Command.JUSTIFY_LEFT, Images.INSTANCE.justifyLeft().createImage(), Strings.INSTANCE
-            .justifyLeft());
-        addFeature("justifycenter", Command.JUSTIFY_CENTER, Images.INSTANCE.justifyCenter().createImage(),
-            Strings.INSTANCE.justifyCenter());
-        addFeature("justifyright", Command.JUSTIFY_RIGHT, Images.INSTANCE.justifyRight().createImage(),
-            Strings.INSTANCE.justifyRight());
-        addFeature("justifyfull", Command.JUSTIFY_FULL, Images.INSTANCE.justifyFull().createImage(), Strings.INSTANCE
-            .justifyFull());
+        addFeature("justifyleft", Command.JUSTIFY_LEFT, Images.INSTANCE.justifyLeft(), Strings.INSTANCE.justifyLeft());
+        addFeature("justifycenter", Command.JUSTIFY_CENTER, Images.INSTANCE.justifyCenter(), Strings.INSTANCE
+            .justifyCenter());
+        addFeature("justifyright", Command.JUSTIFY_RIGHT, Images.INSTANCE.justifyRight(), Strings.INSTANCE
+            .justifyRight());
+        addFeature("justifyfull", Command.JUSTIFY_FULL, Images.INSTANCE.justifyFull(), Strings.INSTANCE.justifyFull());
 
         if (toolBarExtension.getFeatures().length > 0) {
             registerTextAreaHandlers();
@@ -106,15 +105,15 @@ public class JustifyPlugin extends AbstractStatefulPlugin implements ClickHandle
      * 
      * @param name the feature name
      * @param command the rich text area command that is executed by this feature
-     * @param image the image displayed on the tool bar
+     * @param imageResource the image displayed on the tool bar
      * @param title the tool tip used on the tool bar button
      * @return the tool bar button that exposes this feature
      */
-    private ToggleButton addFeature(String name, Command command, Image image, String title)
+    private ToggleButton addFeature(String name, Command command, ImageResource imageResource, String title)
     {
         ToggleButton button = null;
         if (getTextArea().getCommandManager().isSupported(command)) {
-            button = new ToggleButton(image);
+            button = new ToggleButton(new Image(imageResource));
             saveRegistration(button.addClickHandler(this));
             button.setTitle(title);
             toolBarExtension.addFeature(name, button);

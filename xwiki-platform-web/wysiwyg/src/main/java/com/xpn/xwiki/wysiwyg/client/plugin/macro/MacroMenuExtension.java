@@ -111,7 +111,7 @@ public class MacroMenuExtension implements Updatable, MenuListener
         MenuItem refresh =
             new MenuItem(Strings.INSTANCE.macroRefresh(), new RichTextAreaCommand(plugin.getTextArea(),
                 MacroPlugin.REFRESH, null, false));
-        refresh.setIcon(Images.INSTANCE.macroRefresh().createElement());
+        refresh.setIcon(Images.INSTANCE.macroRefresh());
         collapse =
             new MenuItem(Strings.INSTANCE.macroCollapseAll(), new RichTextAreaCommand(plugin.getTextArea(),
                 MacroPlugin.COLLAPSE));
@@ -125,7 +125,7 @@ public class MacroMenuExtension implements Updatable, MenuListener
                 plugin.edit();
             }
         });
-        edit.setIcon(Images.INSTANCE.macroEdit().createElement());
+        edit.setIcon(Images.INSTANCE.macroEdit());
         insert = new MenuItem(Strings.INSTANCE.macroInsert(), new com.google.gwt.user.client.Command()
         {
             public void execute()
@@ -133,7 +133,7 @@ public class MacroMenuExtension implements Updatable, MenuListener
                 plugin.insert();
             }
         });
-        insert.setIcon(Images.INSTANCE.macroInsert().createElement());
+        insert.setIcon(Images.INSTANCE.macroInsert());
 
         insertSubMenuEntries = new ArrayList<UIObject>();
         insertSubMenuEntries.add(insert);
@@ -154,7 +154,7 @@ public class MacroMenuExtension implements Updatable, MenuListener
         macroSubMenu.addAll(insertSubMenuEntries);
 
         macroMenuItem = new MenuItem(Strings.INSTANCE.macro(), macroSubMenu);
-        macroMenuItem.setIcon(Images.INSTANCE.macro().createElement());
+        macroMenuItem.setIcon(Images.INSTANCE.macro());
         macroMenuItem.addMenuListener(this);
 
         menuExtension.addFeature(MacroPluginFactory.getInstance().getPluginName(), macroMenuItem);

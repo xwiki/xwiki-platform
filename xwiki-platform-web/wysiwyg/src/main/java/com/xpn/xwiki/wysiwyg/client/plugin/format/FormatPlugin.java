@@ -30,6 +30,7 @@ import com.google.gwt.event.dom.client.ChangeEvent;
 import com.google.gwt.event.dom.client.ChangeHandler;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.gwt.resources.client.ImageResource;
 import com.google.gwt.user.client.ui.FocusWidget;
 import com.google.gwt.user.client.ui.Image;
 import com.google.gwt.user.client.ui.ListBox;
@@ -77,8 +78,8 @@ public class FormatPlugin extends AbstractStatefulPlugin implements ChangeHandle
         getTextArea().getCommandManager().registerCommand(Command.FORMAT_BLOCK, new FormatBlockExecutable(textArea));
         getTextArea().getCommandManager().registerCommand(Command.REMOVE_FORMAT, new RemoveFormatExecutable(textArea));
 
-        addFeature("removeformat", Command.REMOVE_FORMAT, Images.INSTANCE.removeFormat().createImage(),
-            Strings.INSTANCE.removeFormat());
+        addFeature("removeformat", Command.REMOVE_FORMAT, Images.INSTANCE.removeFormat(), Strings.INSTANCE
+            .removeFormat());
 
         if (getTextArea().getCommandManager().isSupported(Command.FORMAT_BLOCK)) {
             levels = new ListBox(false);
@@ -108,13 +109,13 @@ public class FormatPlugin extends AbstractStatefulPlugin implements ChangeHandle
      * 
      * @param name the feature name
      * @param command the rich text area command that is executed by this feature
-     * @param image the image displayed on the tool bar
+     * @param imageResource the image displayed on the tool bar
      * @param title the tool tip used on the tool bar button
      */
-    private void addFeature(String name, Command command, Image image, String title)
+    private void addFeature(String name, Command command, ImageResource imageResource, String title)
     {
         if (getTextArea().getCommandManager().isSupported(command)) {
-            PushButton button = new PushButton(image);
+            PushButton button = new PushButton(new Image(imageResource));
             saveRegistration(button.addClickHandler(this));
             button.setTitle(title);
             toolBarExtension.addFeature(name, button);

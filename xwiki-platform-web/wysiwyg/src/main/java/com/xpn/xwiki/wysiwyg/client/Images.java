@@ -20,157 +20,148 @@
 package com.xpn.xwiki.wysiwyg.client;
 
 import com.google.gwt.core.client.GWT;
-import com.google.gwt.user.client.ui.AbstractImagePrototype;
-import com.google.gwt.user.client.ui.ImageBundle;
+import com.google.gwt.resources.client.ClientBundle;
+import com.google.gwt.resources.client.ImageResource;
 
 /**
- * This {@link ImageBundle} is used for all the button icons. Using an image bundle allows all of these images to be
+ * This {@link ClientBundle} is used for all the button icons. Using a client bundle allows all of these images to be
  * packed into a single image, which saves a lot of HTTP requests, drastically improving startup time.
  * 
  * @version $Id$
  */
-public interface Images extends ImageBundle
+public interface Images extends ClientBundle
 {
     /**
-     * An instance of this image bundle that can be used anywhere in the code to extract images.
+     * An instance of this client bundle that can be used anywhere in the code to extract images.
      */
-    Images INSTANCE = (Images) GWT.create(Images.class);
+    Images INSTANCE = GWT.create(Images.class);
 
-    @Resource("attachment.gif")
-    AbstractImagePrototype attachment();
+    @Source("attachment.gif")
+    ImageResource attachment();
 
-    @Resource("backcolor.gif")
-    AbstractImagePrototype backColor();
+    @Source("backcolor.gif")
+    ImageResource backColor();
 
-    @Resource("bold.gif")
-    AbstractImagePrototype bold();
+    @Source("bold.gif")
+    ImageResource bold();
 
-    @Resource("charmap.gif")
-    AbstractImagePrototype charmap();
+    @Source("charmap.gif")
+    ImageResource charmap();
 
-    // @Resource("copy.gif")
-    // AbstractImagePrototype copy();
+    @Source("table_delete_col.gif")
+    ImageResource deleteCol();
 
-    // @Resource("cut.gif")
-    // AbstractImagePrototype cut();
+    @Source("table_delete_row.gif")
+    ImageResource deleteRow();
 
-    @Resource("table_delete_col.gif")
-    AbstractImagePrototype deleteCol();
+    @Source("forecolor.gif")
+    ImageResource foreColor();
 
-    @Resource("table_delete_row.gif")
-    AbstractImagePrototype deleteRow();
+    @Source("hr.gif")
+    ImageResource hr();
 
-    @Resource("forecolor.gif")
-    AbstractImagePrototype foreColor();
+    @Source("image.gif")
+    ImageResource image();
 
-    @Resource("hr.gif")
-    AbstractImagePrototype hr();
+    @Source("import.gif")
+    ImageResource importMenuEntryIcon();
 
-    @Resource("image.gif")
-    AbstractImagePrototype image();
+    @Source("import.gif")
+    ImageResource importWizardIcon();
 
-    @Resource("import.gif")
-    AbstractImagePrototype importMenuEntryIcon();
+    @Source("import_office_file.gif")
+    ImageResource importOfficeFileMenuEntryIcon();
 
-    @Resource("import.gif")
-    AbstractImagePrototype importWizardIcon();
+    @Source("import_office_paste.gif")
+    ImageResource importOfficePasteMenuEntryIcon();
 
-    @Resource("import_office_file.gif")
-    AbstractImagePrototype importOfficeFileMenuEntryIcon();
+    @Source("indent.gif")
+    ImageResource indent();
 
-    @Resource("import_office_paste.gif")
-    AbstractImagePrototype importOfficePasteMenuEntryIcon();
+    @Source("table_delete.gif")
+    ImageResource deleteTable();
 
-    @Resource("indent.gif")
-    AbstractImagePrototype indent();
+    @Source("table_insert_col_after.gif")
+    ImageResource insertColAfter();
 
-    @Resource("table_delete.gif")
-    AbstractImagePrototype deleteTable();
+    @Source("table_insert_col_before.gif")
+    ImageResource insertColBefore();
 
-    @Resource("table_insert_col_after.gif")
-    AbstractImagePrototype insertColAfter();
+    @Source("table_insert_row_after.gif")
+    ImageResource insertRowAfter();
 
-    @Resource("table_insert_col_before.gif")
-    AbstractImagePrototype insertColBefore();
+    @Source("table_insert_row_before.gif")
+    ImageResource insertRowBefore();
 
-    @Resource("table_insert_row_after.gif")
-    AbstractImagePrototype insertRowAfter();
+    @Source("table.gif")
+    ImageResource insertTable();
 
-    @Resource("table_insert_row_before.gif")
-    AbstractImagePrototype insertRowBefore();
+    @Source("italic.gif")
+    ImageResource italic();
 
-    @Resource("table.gif")
-    AbstractImagePrototype insertTable();
+    @Source("justifycenter.gif")
+    ImageResource justifyCenter();
 
-    @Resource("italic.gif")
-    AbstractImagePrototype italic();
+    @Source("justifyfull.gif")
+    ImageResource justifyFull();
 
-    @Resource("justifycenter.gif")
-    AbstractImagePrototype justifyCenter();
+    @Source("justifyleft.gif")
+    ImageResource justifyLeft();
 
-    @Resource("justifyfull.gif")
-    AbstractImagePrototype justifyFull();
+    @Source("justifyright.gif")
+    ImageResource justifyRight();
 
-    @Resource("justifyleft.gif")
-    AbstractImagePrototype justifyLeft();
+    @Source("link.gif")
+    ImageResource link();
 
-    @Resource("justifyright.gif")
-    AbstractImagePrototype justifyRight();
+    @Source("macro.gif")
+    ImageResource macro();
 
-    @Resource("link.gif")
-    AbstractImagePrototype link();
+    @Source("macro_edit.gif")
+    ImageResource macroEdit();
 
-    @Resource("macro.gif")
-    AbstractImagePrototype macro();
+    @Source("macro_insert.gif")
+    ImageResource macroInsert();
 
-    @Resource("macro_edit.gif")
-    AbstractImagePrototype macroEdit();
+    @Source("macro_refresh.gif")
+    ImageResource macroRefresh();
 
-    @Resource("macro_insert.gif")
-    AbstractImagePrototype macroInsert();
+    @Source("ol.gif")
+    ImageResource ol();
 
-    @Resource("macro_refresh.gif")
-    AbstractImagePrototype macroRefresh();
+    @Source("outdent.gif")
+    ImageResource outdent();
 
-    @Resource("ol.gif")
-    AbstractImagePrototype ol();
+    @Source("redo.gif")
+    ImageResource redo();
 
-    @Resource("outdent.gif")
-    AbstractImagePrototype outdent();
+    @Source("removeformat.gif")
+    ImageResource removeFormat();
 
-    // @Resource("paste.gif")
-    // AbstractImagePrototype paste();
+    @Source("strikethrough.gif")
+    ImageResource strikeThrough();
 
-    @Resource("redo.gif")
-    AbstractImagePrototype redo();
+    @Source("subscript.gif")
+    ImageResource subscript();
 
-    @Resource("removeformat.gif")
-    AbstractImagePrototype removeFormat();
+    @Source("superscript.gif")
+    ImageResource superscript();
 
-    @Resource("strikethrough.gif")
-    AbstractImagePrototype strikeThrough();
+    @Source("sync.gif")
+    ImageResource sync();
 
-    @Resource("subscript.gif")
-    AbstractImagePrototype subscript();
+    @Source("tt.gif")
+    ImageResource teletype();
 
-    @Resource("superscript.gif")
-    AbstractImagePrototype superscript();
+    @Source("ul.gif")
+    ImageResource ul();
 
-    @Resource("sync.gif")
-    AbstractImagePrototype sync();
+    @Source("underline.gif")
+    ImageResource underline();
 
-    @Resource("tt.gif")
-    AbstractImagePrototype teletype();
+    @Source("undo.gif")
+    ImageResource undo();
 
-    @Resource("ul.gif")
-    AbstractImagePrototype ul();
-
-    @Resource("underline.gif")
-    AbstractImagePrototype underline();
-
-    @Resource("undo.gif")
-    AbstractImagePrototype undo();
-
-    @Resource("unlink.gif")
-    AbstractImagePrototype unlink();
+    @Source("unlink.gif")
+    ImageResource unlink();
 }

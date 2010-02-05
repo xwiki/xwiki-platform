@@ -63,7 +63,7 @@ public class ImportMenuExtension extends MenuItemUIExtension
                     importPlugin.onImportOfficeFile();
                 }
             });
-        importOfficeFileMenuItem.setIcon(Images.INSTANCE.importOfficeFileMenuEntryIcon().createElement());
+        importOfficeFileMenuItem.setIcon(Images.INSTANCE.importOfficeFileMenuEntryIcon());
 
         // Office Paste Import.
         MenuItem importOfficePasteMenuItem =
@@ -75,7 +75,7 @@ public class ImportMenuExtension extends MenuItemUIExtension
 
                 }
             });
-        importOfficePasteMenuItem.setIcon(Images.INSTANCE.importOfficePasteMenuEntryIcon().createElement());
+        importOfficePasteMenuItem.setIcon(Images.INSTANCE.importOfficePasteMenuEntryIcon());
 
         importMenu = new MenuBar(true);
         importMenu.setAnimationEnabled(false);
@@ -83,7 +83,7 @@ public class ImportMenuExtension extends MenuItemUIExtension
         importMenu.addItem(importOfficePasteMenuItem);
 
         importMenuEntry = new MenuItem(Strings.INSTANCE.importMenuEntryCaption(), importMenu);
-        importMenuEntry.setIcon(Images.INSTANCE.importMenuEntryIcon().createElement());
+        importMenuEntry.setIcon(Images.INSTANCE.importMenuEntryIcon());
 
         addFeature(ImportPluginFactory.getInstance().getPluginName(), importMenuEntry);
     }

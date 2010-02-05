@@ -23,6 +23,7 @@ import org.xwiki.gwt.user.client.ui.CompositeDialogBox;
 
 import com.google.gwt.event.logical.shared.SelectionEvent;
 import com.google.gwt.event.logical.shared.SelectionHandler;
+import com.google.gwt.user.client.ui.Image;
 import com.xpn.xwiki.wysiwyg.client.Images;
 import com.xpn.xwiki.wysiwyg.client.Strings;
 
@@ -320,7 +321,7 @@ public class SymbolPicker extends CompositeDialogBox implements SelectionHandler
     {
         super(false, true);
 
-        getDialog().setIcon(Images.INSTANCE.charmap().createImage());
+        getDialog().setIcon(new Image(Images.INSTANCE.charmap()));
         getDialog().setCaption(Strings.INSTANCE.charmap());
         getDialog().addStyleName("xSymbolPicker");
 

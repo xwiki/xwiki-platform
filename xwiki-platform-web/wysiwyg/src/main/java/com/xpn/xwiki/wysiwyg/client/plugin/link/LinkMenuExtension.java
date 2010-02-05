@@ -140,7 +140,7 @@ public class LinkMenuExtension extends MenuItemUIExtension implements Updatable,
                 plugin.onUnlink();
             }
         });
-        removeLink.setIcon(Images.INSTANCE.unlink().createElement());
+        removeLink.setIcon(Images.INSTANCE.unlink());
 
         editLinkMenus = new ArrayList<UIObject>();
         editLinkMenus.add(editLink);
@@ -151,7 +151,7 @@ public class LinkMenuExtension extends MenuItemUIExtension implements Updatable,
         submenu.addAll(createLinkMenus);
 
         menu = new MenuItem(Strings.INSTANCE.link(), submenu);
-        menu.setIcon(Images.INSTANCE.link().createElement());
+        menu.setIcon(Images.INSTANCE.link());
         menu.addMenuListener(this);
 
         addFeature(LinkPluginFactory.getInstance().getPluginName(), menu);

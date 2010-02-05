@@ -180,31 +180,31 @@ public class DefaultWikiService implements WikiService
      */
     public List<String> getPageNames(String wikiName, String spaceName)
     {
-        String database = getXWikiContext().getDatabase();
-        List<String> pagesFullNameList = null;
-        List<String> pagesNameList = new ArrayList<String>();
+        XWikiContext xcontext = getXWikiContext();
+        String database = xcontext.getDatabase();
+        List<DocumentReference> documentReferences = null;
+        List<String> pagesNames = new ArrayList<String>();
         List<String> params = new ArrayList<String>();
         params.add(spaceName);
         String query = "where doc.space = ? order by doc.fullName asc";
         try {
             if (wikiName != null) {
-                getXWikiContext().setDatabase(wikiName);
+                xcontext.setDatabase(wikiName);
             }
-            pagesFullNameList =
-                getXWikiContext().getWiki().getStore().searchDocumentsNames(query, params, getXWikiContext());
+            documentReferences = xcontext.getWiki().getStore().searchDocumentReferences(query, params, xcontext);
         } catch (XWikiException e) {
             LOG.error(e.getLocalizedMessage(), e);
         } finally {
             if (wikiName != null) {
-                getXWikiContext().setDatabase(database);
+                xcontext.setDatabase(database);
             }
         }
-        if (pagesFullNameList != null) {
-            for (String p : pagesFullNameList) {
-                pagesNameList.add(p.substring(params.get(0).length() + 1));
+        if (documentReferences != null) {
+            for (DocumentReference documentReference : documentReferences) {
+                pagesNames.add(documentReference.getName());
             }
         }
-        return pagesNameList;
+        return pagesNames;
     }
 
     /**
@@ -279,7 +279,7 @@ public class DefaultWikiService implements WikiService
         List<WikiPage> results = new ArrayList<WikiPage>();
         for (XWikiDocument doc : docs) {
             WikiPage page = new WikiPage();
-            page.setName(doc.getFullName());
+            page.setName(entityReferenceSerializer.serialize(doc.getDocumentReference()));
             page.setTitle(doc.getRenderedTitle(Syntax.XHTML_1_0, getXWikiContext()));
             page.setURL(doc.getURL(VIEW_ACTION, getXWikiContext()));
             results.add(page);
@@ -329,10 +329,9 @@ public class DefaultWikiService implements WikiService
         // clean attachment filename to be synchronized with all attachment operations
         String cleanedFileName = context.getWiki().clearName(attachmentName, false, true, context);
         DocumentReference documentReference = prepareDocumentReference(wikiName, spaceName, pageName);
-        String documentReferenceAsString = this.entityReferenceSerializer.serialize(documentReference);
         XWikiDocument doc;
         try {
-            doc = context.getWiki().getDocument(documentReferenceAsString, context);
+            doc = context.getWiki().getDocument(documentReference, context);
         } catch (XWikiException e) {
             // there was a problem with getting the document on the server
             return null;
@@ -347,8 +346,8 @@ public class DefaultWikiService implements WikiService
             return null;
         }
         // all right, now set the reference and url and return
-        String attachmentReferenceAsString = this.entityReferenceSerializer.serialize(
-            new AttachmentReference(cleanedFileName, documentReference));
+        String attachmentReferenceAsString =
+            this.entityReferenceSerializer.serialize(new AttachmentReference(cleanedFileName, documentReference));
         attach.setReference(attachmentReferenceAsString);
         attach.setURL(doc.getAttachmentURL(cleanedFileName, context));
 
@@ -382,7 +381,7 @@ public class DefaultWikiService implements WikiService
         if (!StringUtils.isEmpty(page)) {
             reference = new EntityReference(page, EntityType.DOCUMENT, reference);
         }
-        
+
         DocumentReference resolvedReference = this.defaultReferenceDocumentReferenceResolver.resolve(reference);
         if (StringUtils.isEmpty(wiki)) {
             resolvedReference.setWikiReference(new WikiReference(getXWikiContext().getDatabase()));
@@ -418,14 +417,13 @@ public class DefaultWikiService implements WikiService
             XWikiContext context = getXWikiContext();
             List<Attachment> attachments = new ArrayList<Attachment>();
             DocumentReference documentReference = prepareDocumentReference(wikiName, spaceName, pageName);
-            String documentReferenceAsString = this.entityReferenceSerializer.serialize(documentReference);
-            XWikiDocument doc = context.getWiki().getDocument(documentReferenceAsString, context);
+            XWikiDocument doc = context.getWiki().getDocument(documentReference, context);
             for (XWikiAttachment attach : doc.getAttachmentList()) {
                 Attachment currentAttach = new Attachment();
                 currentAttach.setFileName(attach.getFilename());
                 currentAttach.setURL(doc.getAttachmentURL(attach.getFilename(), context));
-                currentAttach.setReference(this.entityReferenceSerializer.serialize(
-                    new AttachmentReference(attach.getFilename(), documentReference)));
+                currentAttach.setReference(this.entityReferenceSerializer.serialize(new AttachmentReference(attach
+                    .getFilename(), documentReference)));
                 currentAttach.setMimeType(attach.getMimeType(context));
                 attachments.add(currentAttach);
             }

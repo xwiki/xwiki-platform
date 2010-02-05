@@ -50,6 +50,7 @@ public class MutableHttpServletRequest extends HttpServletRequestWrapper impleme
      * 
      * @param request The request to be wrapped.
      */
+    @SuppressWarnings("unchecked")
     public MutableHttpServletRequest(HttpServletRequest request)
     {
         super(request);

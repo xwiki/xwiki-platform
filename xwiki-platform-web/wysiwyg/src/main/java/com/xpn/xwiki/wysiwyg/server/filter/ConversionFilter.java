@@ -172,6 +172,7 @@ public class ConversionFilter implements Filter
      *         extract the conversion output and the conversion exceptions from the {@link #CONVERSION_OUTPUT} and
      *         {@value #CONVERSION_ERRORS} session attributes
      */
+    @SuppressWarnings("unchecked")
     private String save(MutableServletRequest mreq, Map<String, String> output, Map<String, Throwable> errors)
     {
         // Generate a random key to identify the request.

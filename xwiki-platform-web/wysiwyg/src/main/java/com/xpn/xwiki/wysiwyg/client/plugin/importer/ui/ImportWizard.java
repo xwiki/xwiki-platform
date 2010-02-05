@@ -28,6 +28,7 @@ import org.xwiki.gwt.user.client.ui.wizard.Wizard;
 import org.xwiki.gwt.user.client.ui.wizard.WizardStep;
 import org.xwiki.gwt.user.client.ui.wizard.WizardStepProvider;
 
+import com.google.gwt.user.client.ui.Image;
 import com.xpn.xwiki.wysiwyg.client.Images;
 import com.xpn.xwiki.wysiwyg.client.Strings;
 import com.xpn.xwiki.wysiwyg.client.plugin.importer.ImportServiceAsync;
@@ -90,7 +91,7 @@ public class ImportWizard extends Wizard implements WizardStepProvider
      */
     public ImportWizard(Config config, ImportServiceAsync importService, WikiServiceAsync wikiService)
     {
-        super(Strings.INSTANCE.importWizardTitle(), Images.INSTANCE.importWizardIcon().createImage());
+        super(Strings.INSTANCE.importWizardTitle(), new Image(Images.INSTANCE.importWizardIcon()));
         this.config = config;
         this.importService = importService;
         this.wikiService = wikiService;

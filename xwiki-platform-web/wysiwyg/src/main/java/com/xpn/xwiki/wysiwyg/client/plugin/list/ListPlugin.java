@@ -29,6 +29,7 @@ import org.xwiki.gwt.user.client.ui.rta.cmd.Command;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.gwt.resources.client.ImageResource;
 import com.google.gwt.user.client.ui.FocusWidget;
 import com.google.gwt.user.client.ui.Image;
 import com.google.gwt.user.client.ui.ToggleButton;
@@ -76,10 +77,8 @@ public class ListPlugin extends AbstractStatefulPlugin implements ClickHandler
         getTextArea().getCommandManager().registerCommand(Command.INSERT_UNORDERED_LIST,
             new ListExecutable(textArea, false));
 
-        addFeature("orderedlist", Command.INSERT_ORDERED_LIST, Images.INSTANCE.ol().createImage(), Strings.INSTANCE
-            .ol());
-        addFeature("unorderedlist", Command.INSERT_UNORDERED_LIST, Images.INSTANCE.ul().createImage(), Strings.INSTANCE
-            .ul());
+        addFeature("orderedlist", Command.INSERT_ORDERED_LIST, Images.INSTANCE.ol(), Strings.INSTANCE.ol());
+        addFeature("unorderedlist", Command.INSERT_UNORDERED_LIST, Images.INSTANCE.ul(), Strings.INSTANCE.ul());
 
         if (toolBarExtension.getFeatures().length > 0) {
             registerTextAreaHandlers();
@@ -103,13 +102,13 @@ public class ListPlugin extends AbstractStatefulPlugin implements ClickHandler
      * 
      * @param name the feature name
      * @param command the rich text area command that is executed by this feature
-     * @param image the image displayed on the tool bar
+     * @param imageResource the image displayed on the tool bar
      * @param title the tool tip used on the tool bar button
      */
-    private void addFeature(String name, Command command, Image image, String title)
+    private void addFeature(String name, Command command, ImageResource imageResource, String title)
     {
         if (getTextArea().getCommandManager().isSupported(command)) {
-            ToggleButton button = new ToggleButton(image);
+            ToggleButton button = new ToggleButton(new Image(imageResource));
             saveRegistration(button.addClickHandler(this));
             button.setTitle(title);
             toolBarExtension.addFeature(name, button);

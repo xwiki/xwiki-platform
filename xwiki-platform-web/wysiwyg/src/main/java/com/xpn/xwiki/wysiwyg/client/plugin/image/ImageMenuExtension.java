@@ -120,7 +120,7 @@ public class ImageMenuExtension extends MenuItemUIExtension implements Updatable
         submenu.addAll(createImageMenus);
 
         menu = new MenuItem(Strings.INSTANCE.image(), submenu);
-        menu.setIcon(Images.INSTANCE.image().createElement());
+        menu.setIcon(Images.INSTANCE.image());
         menu.addMenuListener(this);
 
         addFeature(ImagePluginFactory.getInstance().getPluginName(), menu);

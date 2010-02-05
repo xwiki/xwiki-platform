@@ -28,6 +28,7 @@ import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.logical.shared.CloseEvent;
 import com.google.gwt.event.logical.shared.CloseHandler;
+import com.google.gwt.user.client.ui.Image;
 import com.google.gwt.user.client.ui.PushButton;
 import com.xpn.xwiki.wysiwyg.client.Images;
 import com.xpn.xwiki.wysiwyg.client.Strings;
@@ -66,7 +67,7 @@ public class SymbolPlugin extends AbstractPlugin implements ClickHandler, CloseH
         super.init(textArea, config);
 
         if (getTextArea().getCommandManager().isSupported(Command.INSERT_HTML)) {
-            insert = new PushButton(Images.INSTANCE.charmap().createImage());
+            insert = new PushButton(new Image(Images.INSTANCE.charmap()));
             saveRegistration(insert.addClickHandler(this));
             insert.setTitle(Strings.INSTANCE.charmap());
 

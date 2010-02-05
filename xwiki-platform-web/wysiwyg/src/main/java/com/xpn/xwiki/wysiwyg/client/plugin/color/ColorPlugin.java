@@ -31,6 +31,7 @@ import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.logical.shared.CloseEvent;
 import com.google.gwt.event.logical.shared.CloseHandler;
+import com.google.gwt.resources.client.ImageResource;
 import com.google.gwt.user.client.ui.Image;
 import com.google.gwt.user.client.ui.PopupPanel;
 import com.google.gwt.user.client.ui.PushButton;
@@ -100,10 +101,8 @@ public class ColorPlugin extends AbstractPlugin implements ClickHandler, CloseHa
         // Register custom executables.
         getTextArea().getCommandManager().registerCommand(Command.BACK_COLOR, getBackColorExecutable());
 
-        addFeature("forecolor", Command.FORE_COLOR, Images.INSTANCE.foreColor().createImage(), Strings.INSTANCE
-            .foreColor());
-        addFeature("backcolor", Command.BACK_COLOR, Images.INSTANCE.backColor().createImage(), Strings.INSTANCE
-            .backColor());
+        addFeature("forecolor", Command.FORE_COLOR, Images.INSTANCE.foreColor(), Strings.INSTANCE.foreColor());
+        addFeature("backcolor", Command.BACK_COLOR, Images.INSTANCE.backColor(), Strings.INSTANCE.backColor());
 
         if (toolBarExtension.getFeatures().length > 0) {
             getUIExtensionList().add(toolBarExtension);
@@ -115,13 +114,13 @@ public class ColorPlugin extends AbstractPlugin implements ClickHandler, CloseHa
      * 
      * @param name the feature name
      * @param command the rich text area command that is executed by this feature
-     * @param image the image displayed on the tool bar
+     * @param imageResource the image displayed on the tool bar
      * @param title the tool tip used on the tool bar button
      */
-    private void addFeature(String name, Command command, Image image, String title)
+    private void addFeature(String name, Command command, ImageResource imageResource, String title)
     {
         if (getTextArea().getCommandManager().isSupported(command)) {
-            PushButton button = new PushButton(image);
+            PushButton button = new PushButton(new Image(imageResource));
             saveRegistration(button.addClickHandler(this));
             button.setTitle(title);
             toolBarExtension.addFeature(name, button);

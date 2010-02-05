@@ -28,6 +28,7 @@ import org.xwiki.gwt.user.client.ui.wizard.WizardListener;
 
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.gwt.user.client.ui.Image;
 import com.google.gwt.user.client.ui.PushButton;
 import com.xpn.xwiki.wysiwyg.client.Images;
 import com.xpn.xwiki.wysiwyg.client.Strings;
@@ -106,7 +107,7 @@ public class ImagePlugin extends AbstractPlugin implements ClickHandler, WizardL
 
         // add the toolbar extension
         if (getTextArea().getCommandManager().isSupported(Command.INSERT_IMAGE)) {
-            imageButton = new PushButton(Images.INSTANCE.image().createImage());
+            imageButton = new PushButton(new Image(Images.INSTANCE.image()));
             saveRegistration(imageButton.addClickHandler(this));
             imageButton.setTitle(Strings.INSTANCE.imageTooltip());
             toolBarExtension.addFeature("image", imageButton);

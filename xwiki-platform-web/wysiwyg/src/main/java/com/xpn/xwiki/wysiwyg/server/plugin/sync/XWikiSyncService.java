@@ -27,6 +27,8 @@ import org.apache.commons.logging.LogFactory;
 import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.bridge.DocumentModelBridge;
 import org.xwiki.component.annotation.Requirement;
+import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.DocumentReferenceResolver;
 
 import com.xpn.xwiki.wysiwyg.client.converter.HTMLConverter;
 import com.xpn.xwiki.wysiwyg.client.diff.Revision;
@@ -60,6 +62,12 @@ public class XWikiSyncService implements SyncService
     private DocumentAccessBridge docAccessBridge;
 
     /**
+     * The component used to parse document references.
+     */
+    @Requirement
+    private DocumentReferenceResolver<String> documentReferenceResolver;
+
+    /**
      * The component used to convert the content of the edited page from source syntax to XHTML.
      */
     @Requirement
@@ -75,7 +83,8 @@ public class XWikiSyncService implements SyncService
         try {
             SyncStatus syncStatus = syncEngine.getSyncStatus(pageName);
             if (syncStatus == null || syncReset) {
-                DocumentModelBridge docModelBridge = docAccessBridge.getDocument(pageName);
+                DocumentReference docRef = documentReferenceResolver.resolve(pageName);
+                DocumentModelBridge docModelBridge = docAccessBridge.getDocument(docRef);
                 syncStatus = new SyncStatus(pageName, docModelBridge.getVersion(), getRenderedContent(docModelBridge));
                 syncEngine.setSyncStatus(pageName, syncStatus);
             } else {
@@ -99,7 +108,7 @@ public class XWikiSyncService implements SyncService
         // Push the document on the context before rendering its content.
         Map<String, Object> backupObjects = new HashMap<String, Object>();
         try {
-            docAccessBridge.pushDocumentInContext(backupObjects, docModelBridge.getFullName());
+            docAccessBridge.pushDocumentInContext(backupObjects, docModelBridge.getDocumentReference());
             return htmlConverter.toHTML(docModelBridge.getContent(), docModelBridge.getSyntaxId());
         } finally {
             // Restore the context after the conversion.

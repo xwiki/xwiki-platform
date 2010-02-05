@@ -33,9 +33,11 @@ import com.xpn.xwiki.plugin.XWikiPluginInterface;
 public class WysiwygPlugin extends XWikiDefaultPlugin
 {
     /**
-     * {@inheritDoc}
+     * Creates a new plugin.
      * 
-     * @see XWikiDefaultPlugin#XWikiDefaultPlugin(String,String,com.xpn.xwiki.XWikiContext)
+     * @param name the name
+     * @param className the class name
+     * @param context the XWiki context
      */
     public WysiwygPlugin(String name, String className, XWikiContext context)
     {

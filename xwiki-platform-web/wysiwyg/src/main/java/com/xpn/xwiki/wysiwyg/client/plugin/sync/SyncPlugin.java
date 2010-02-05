@@ -37,6 +37,7 @@ import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.user.client.Element;
 import com.google.gwt.user.client.Random;
 import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.google.gwt.user.client.ui.Image;
 import com.google.gwt.user.client.ui.PushButton;
 import com.xpn.xwiki.wysiwyg.client.Images;
 import com.xpn.xwiki.wysiwyg.client.Strings;
@@ -107,7 +108,7 @@ public class SyncPlugin extends AbstractPlugin implements ClickHandler, TimerLis
             return;
         }
 
-        sync = new PushButton(Images.INSTANCE.sync().createImage());
+        sync = new PushButton(new Image(Images.INSTANCE.sync()));
         saveRegistration(sync.addClickHandler(this));
         sync.setTitle(Strings.INSTANCE.sync());
 

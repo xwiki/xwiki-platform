@@ -25,6 +25,7 @@ import org.xwiki.gwt.user.client.ui.rta.cmd.Command;
 
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.gwt.user.client.ui.Image;
 import com.google.gwt.user.client.ui.PushButton;
 import com.xpn.xwiki.wysiwyg.client.Images;
 import com.xpn.xwiki.wysiwyg.client.Strings;
@@ -75,7 +76,7 @@ public class SeparatorPlugin extends AbstractPlugin implements ClickHandler
         toolBarExtension.addUIExtension(toolBarFocusWidgets);
 
         if (getTextArea().getCommandManager().isSupported(Command.INSERT_HORIZONTAL_RULE)) {
-            hr = new PushButton(Images.INSTANCE.hr().createImage());
+            hr = new PushButton(new Image(Images.INSTANCE.hr()));
             saveRegistration(hr.addClickHandler(this));
             hr.setTitle(Strings.INSTANCE.hr());
             toolBarFocusWidgets.addFeature("hr", hr);

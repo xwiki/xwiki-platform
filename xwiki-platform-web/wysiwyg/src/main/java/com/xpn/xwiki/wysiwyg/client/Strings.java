@@ -32,7 +32,7 @@ public interface Strings extends Constants
     /**
      * An instance of this string bundle that can be used anywhere in the code to obtain i18n strings.
      */
-    Strings INSTANCE = (Strings) GWT.create(Strings.class);
+    Strings INSTANCE = GWT.create(Strings.class);
 
     String yes();
 

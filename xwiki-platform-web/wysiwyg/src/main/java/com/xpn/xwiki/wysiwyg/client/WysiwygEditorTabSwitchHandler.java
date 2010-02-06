@@ -48,7 +48,7 @@ import com.xpn.xwiki.wysiwyg.client.converter.HTMLConverterAsync;
  * 
  * @version $Id$
  */
-public class WysiwygEditorListener implements SelectionHandler<Integer>, BeforeSelectionHandler<Integer>
+public class WysiwygEditorTabSwitchHandler implements SelectionHandler<Integer>, BeforeSelectionHandler<Integer>
 {
     /**
      * The command used to store the value of the rich text area before submitting the including form.
@@ -120,7 +120,7 @@ public class WysiwygEditorListener implements SelectionHandler<Integer>, BeforeS
      * 
      * @param editor the {@link WysiwygEditor} instance
      */
-    WysiwygEditorListener(final WysiwygEditor editor)
+    WysiwygEditorTabSwitchHandler(final WysiwygEditor editor)
     {
         this.editor = editor;
         reloader = new Reloader(editor.getRichTextEditor().getTextArea());

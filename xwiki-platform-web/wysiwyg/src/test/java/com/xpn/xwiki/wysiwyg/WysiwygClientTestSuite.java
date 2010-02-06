@@ -23,6 +23,7 @@ import junit.framework.Test;
 import junit.framework.TestSuite;
 
 import com.google.gwt.junit.tools.GWTTestSuite;
+import com.xpn.xwiki.wysiwyg.client.ToolBarControllerTest;
 import com.xpn.xwiki.wysiwyg.client.plugin.color.ColorPickerTest;
 import com.xpn.xwiki.wysiwyg.client.plugin.format.exec.FormatBlockExecutableTest;
 import com.xpn.xwiki.wysiwyg.client.plugin.format.exec.RemoveFormatExecutableTest;
@@ -69,13 +70,14 @@ public class WysiwygClientTestSuite extends GWTTestSuite
 
         addPluginTests(suite);
 
+        suite.addTestSuite(ToolBarControllerTest.class);
+
         // syntax
         suite.addTestSuite(DefaultSyntaxValidatorManagerTest.class);
         suite.addTestSuite(DefaultValidationRuleTest.class);
         suite.addTestSuite(DisablingRuleTest.class);
         suite.addTestSuite(XWikiSyntaxValidatorTest.class);
 
-        // util
         suite.addTestSuite(ResourceNameTest.class);
 
         return suite;

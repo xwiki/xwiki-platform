@@ -276,7 +276,6 @@
             com/xpn/xwiki/wysiwyg/client/plugin/sync/SyncTools.java,
             com/xpn/xwiki/wysiwyg/client/Images.java,
             com/xpn/xwiki/wysiwyg/client/Strings.java,
-            com/xpn/xwiki/wysiwyg/client/WysiwygEditor.java,
             com/xpn/xwiki/wysiwyg/server/plugin/sync/internal/DefaultSyncEngine.java,
             com/xpn/xwiki/wysiwyg/server/plugin/sync/SyncTest.java
           </excludes>

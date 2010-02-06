@@ -21,6 +21,7 @@ package com.xpn.xwiki.user.impl.xwiki;
 
 import java.security.Principal;
 
+import com.xpn.xwiki.XWikiException;
 import org.jmock.Mock;
 
 import com.xpn.xwiki.XWiki;
@@ -136,7 +137,6 @@ public class XWikiAuthServiceImplTest extends AbstractBridgedXWikiComponentTestC
     {
         // Setup simple user profile documents
         XWikiDocument userDocLocal = new XWikiDocument("local", "XWiki", "Admin");
-        XWikiDocument userDocVirtual = new XWikiDocument("xwiki", "XWiki", "Admin");
 
         // Make a simple XWiki.XWikiUsers class that will contain a default password field
         BaseClass userClass = new BaseClass();
@@ -151,7 +151,7 @@ public class XWikiAuthServiceImplTest extends AbstractBridgedXWikiComponentTestC
         userDocLocal.addObject("XWiki.XWikiUsers", (BaseObject) mockUserObj.proxy());
 
         // Prepare the XWiki mock for local
-        this.mockXWiki.stubs().method("getDocument").with(eq("XWiki.Admin"), eq(this.getContext())).will(
+        this.mockXWiki.stubs().method("getDocument").with(eq("XWiki.Admin"), ANYTHING).will(
             returnValue(userDocLocal));
         this.mockXWiki.stubs().method("getClass").with(eq("XWiki.XWikiUsers"), eq(this.getContext())).will(
             returnValue(userClass));
@@ -167,10 +167,7 @@ public class XWikiAuthServiceImplTest extends AbstractBridgedXWikiComponentTestC
         this.getContext().setDatabase("local");
 
         // Prepare the XWiki mock for virtual
-        this.mockXWiki.stubs().method("getDocument").with(eq("XWiki.Admin"), eq(this.getContext())).will(
-            returnValue(userDocVirtual));
         this.mockXWiki.stubs().method("isVirtualMode").will(returnValue(true));
-        userDocVirtual.addObject("XWiki.XWikiUsers", (BaseObject) mockUserObj.proxy());
 
         // Finally run the test: Using xwiki:Xwiki.Admin should correctly authenticate the Admin user
         Principal principalVirtual = this.authService.authenticate("xwiki:XWiki.Admin", "admin", this.getContext());

@@ -76,23 +76,23 @@ public class CurrentMixedStringDocumentReferenceResolver extends DefaultStringEn
     {
         String result;
 
-        XWikiDocument currentDoc = getContext().getDoc();
-        if (currentDoc == null) {
-            result = super.getDefaultValuesForType(type);
-        } else {
-            switch (type) {
-                case WIKI:
-                    EntityReference wikiReference =
-                        this.modelContext.getCurrentEntityReference().extractReference(EntityType.WIKI);
-                    result = wikiReference.getName();
-                    break;
-                case SPACE:
-                    result = currentDoc.getSpaceName();
-                    break;
-                default:
+        switch (type) {
+            case WIKI:
+                EntityReference wikiReference =
+                    this.modelContext.getCurrentEntityReference().extractReference(EntityType.WIKI);
+                result = wikiReference.getName();
+                break;
+            case SPACE:
+                XWikiDocument currentDoc = getContext().getDoc();
+                if (currentDoc == null) {
                     result = super.getDefaultValuesForType(type);
-                    break;
-            }
+                } else {
+                    result = currentDoc.getSpaceName();
+                }
+                break;
+            default:
+                result = super.getDefaultValuesForType(type);
+                break;
         }
 
         return result;

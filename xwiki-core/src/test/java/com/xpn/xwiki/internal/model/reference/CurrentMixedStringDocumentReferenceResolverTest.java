@@ -86,4 +86,21 @@ public class CurrentMixedStringDocumentReferenceResolverTest extends AbstractBri
         Assert.assertEquals(CURRENT_SPACE, reference.extractReference(EntityType.SPACE).getName());
         Assert.assertEquals("WebHome", reference.getName());
     }
+
+    @org.junit.Test
+    public void testResolveDocumentReferenceForDefaultWikiWhenNoContextDocument() throws Exception
+    {
+        mockery.checking(new Expectations() {{
+            allowing(mockModelContext).getCurrentEntityReference(); will(returnValue(new WikiReference("currentwiki")));
+        }});
+
+        EntityReference reference = resolver.resolve("space.page", EntityType.DOCUMENT);
+
+        // Make sure the resolved wiki is the current wiki and not the wiki from the current document (since that
+        // doc isn't set).
+        Assert.assertEquals("currentwiki", reference.extractReference(EntityType.WIKI).getName());
+        
+        Assert.assertEquals("space", reference.extractReference(EntityType.SPACE).getName());
+        Assert.assertEquals("page", reference.getName());
+    }
 }

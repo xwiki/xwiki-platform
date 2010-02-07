@@ -29,6 +29,10 @@ import java.util.Map;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.xwiki.component.annotation.Requirement;
+import org.xwiki.gwt.wysiwyg.client.plugin.macro.MacroDescriptor;
+import org.xwiki.gwt.wysiwyg.client.plugin.macro.MacroService;
+import org.xwiki.gwt.wysiwyg.client.plugin.macro.ParameterDescriptor;
+import org.xwiki.gwt.wysiwyg.client.plugin.macro.ParameterType;
 import org.xwiki.rendering.macro.Macro;
 import org.xwiki.rendering.macro.MacroCategoryManager;
 import org.xwiki.rendering.macro.MacroId;
@@ -36,10 +40,6 @@ import org.xwiki.rendering.macro.MacroManager;
 import org.xwiki.rendering.syntax.Syntax;
 import org.xwiki.rendering.syntax.SyntaxFactory;
 
-import com.xpn.xwiki.wysiwyg.client.plugin.macro.MacroDescriptor;
-import com.xpn.xwiki.wysiwyg.client.plugin.macro.MacroService;
-import com.xpn.xwiki.wysiwyg.client.plugin.macro.ParameterDescriptor;
-import com.xpn.xwiki.wysiwyg.client.plugin.macro.ParameterType;
 
 /**
  * XWiki specific implementation of {@link MacroService}.

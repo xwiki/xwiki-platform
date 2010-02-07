@@ -34,9 +34,9 @@ import org.apache.commons.lang.RandomStringUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.xwiki.gwt.wysiwyg.client.converter.HTMLConverter;
 
 import com.xpn.xwiki.web.Utils;
-import com.xpn.xwiki.wysiwyg.client.converter.HTMLConverter;
 
 /**
  * This filter is used to convert the values of request parameters that require HTML conversion before being processed.

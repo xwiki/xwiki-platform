@@ -27,6 +27,8 @@ import org.apache.commons.logging.LogFactory;
 import org.w3c.dom.Document;
 import org.xwiki.component.annotation.Requirement;
 import org.xwiki.component.manager.ComponentManager;
+import org.xwiki.gwt.wysiwyg.client.plugin.importer.ImportService;
+import org.xwiki.gwt.wysiwyg.client.wiki.Attachment;
 import org.xwiki.model.reference.AttachmentReference;
 import org.xwiki.model.reference.AttachmentReferenceResolver;
 import org.xwiki.model.reference.EntityReferenceSerializer;
@@ -35,8 +37,6 @@ import org.xwiki.xml.html.HTMLCleaner;
 import org.xwiki.xml.html.HTMLCleanerConfiguration;
 import org.xwiki.xml.html.HTMLUtils;
 
-import com.xpn.xwiki.wysiwyg.client.plugin.importer.ImportService;
-import com.xpn.xwiki.wysiwyg.client.wiki.Attachment;
 
 /**
  * XWiki specific implementation of {@link ImportService}.

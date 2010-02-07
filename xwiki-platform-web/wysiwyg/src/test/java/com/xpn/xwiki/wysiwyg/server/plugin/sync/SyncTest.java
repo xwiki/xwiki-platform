@@ -20,12 +20,12 @@
 package com.xpn.xwiki.wysiwyg.server.plugin.sync;
 
 import org.jmock.cglib.MockObjectTestCase;
+import org.xwiki.gwt.wysiwyg.client.diff.Diff;
+import org.xwiki.gwt.wysiwyg.client.diff.Revision;
+import org.xwiki.gwt.wysiwyg.client.diff.ToString;
+import org.xwiki.gwt.wysiwyg.client.plugin.sync.SyncResult;
+import org.xwiki.gwt.wysiwyg.client.plugin.sync.SyncStatus;
 
-import com.xpn.xwiki.wysiwyg.client.diff.Diff;
-import com.xpn.xwiki.wysiwyg.client.diff.Revision;
-import com.xpn.xwiki.wysiwyg.client.diff.ToString;
-import com.xpn.xwiki.wysiwyg.client.plugin.sync.SyncResult;
-import com.xpn.xwiki.wysiwyg.client.plugin.sync.SyncStatus;
 import com.xpn.xwiki.wysiwyg.server.plugin.sync.internal.DefaultSyncEngine;
 
 /**

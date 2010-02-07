@@ -25,6 +25,8 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.xwiki.component.annotation.Requirement;
 import org.xwiki.component.manager.ComponentManager;
+import org.xwiki.gwt.wysiwyg.client.cleaner.HTMLCleaner;
+import org.xwiki.gwt.wysiwyg.client.converter.HTMLConverter;
 import org.xwiki.rendering.block.XDOM;
 import org.xwiki.rendering.parser.Parser;
 import org.xwiki.rendering.renderer.BlockRenderer;
@@ -33,8 +35,6 @@ import org.xwiki.rendering.renderer.printer.WikiPrinter;
 import org.xwiki.rendering.syntax.SyntaxFactory;
 import org.xwiki.rendering.transformation.TransformationManager;
 
-import com.xpn.xwiki.wysiwyg.client.cleaner.HTMLCleaner;
-import com.xpn.xwiki.wysiwyg.client.converter.HTMLConverter;
 
 /**
  * Converts HTML into/from xwiki/2.0 syntax.

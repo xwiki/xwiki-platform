@@ -25,11 +25,11 @@ import java.util.List;
 
 import org.w3c.dom.Document;
 import org.xwiki.component.annotation.Requirement;
+import org.xwiki.gwt.wysiwyg.client.cleaner.HTMLCleaner;
 import org.xwiki.xml.html.HTMLCleanerConfiguration;
 import org.xwiki.xml.html.HTMLUtils;
 import org.xwiki.xml.html.filter.HTMLFilter;
 
-import com.xpn.xwiki.wysiwyg.client.cleaner.HTMLCleaner;
 
 /**
  * Default HTML cleaner for the WYSIWYG editor's output.

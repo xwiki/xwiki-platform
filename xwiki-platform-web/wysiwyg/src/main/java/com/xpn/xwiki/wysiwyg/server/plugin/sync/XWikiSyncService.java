@@ -27,14 +27,14 @@ import org.apache.commons.logging.LogFactory;
 import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.bridge.DocumentModelBridge;
 import org.xwiki.component.annotation.Requirement;
+import org.xwiki.gwt.wysiwyg.client.converter.HTMLConverter;
+import org.xwiki.gwt.wysiwyg.client.diff.Revision;
+import org.xwiki.gwt.wysiwyg.client.plugin.sync.SyncResult;
+import org.xwiki.gwt.wysiwyg.client.plugin.sync.SyncService;
+import org.xwiki.gwt.wysiwyg.client.plugin.sync.SyncStatus;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
 
-import com.xpn.xwiki.wysiwyg.client.converter.HTMLConverter;
-import com.xpn.xwiki.wysiwyg.client.diff.Revision;
-import com.xpn.xwiki.wysiwyg.client.plugin.sync.SyncResult;
-import com.xpn.xwiki.wysiwyg.client.plugin.sync.SyncService;
-import com.xpn.xwiki.wysiwyg.client.plugin.sync.SyncStatus;
 
 /**
  * XWiki specific implementation of {@link SyncService}.

@@ -19,13 +19,13 @@
  */
 package com.xpn.xwiki.wysiwyg.server.plugin;
 
+import org.xwiki.gwt.wysiwyg.client.converter.HTMLConverter;
 import org.xwiki.rendering.parser.Parser;
 import org.xwiki.rendering.renderer.PrintRendererFactory;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.api.Api;
 import com.xpn.xwiki.web.Utils;
-import com.xpn.xwiki.wysiwyg.client.converter.HTMLConverter;
 
 /**
  * Api for the WysiwygPlugin.

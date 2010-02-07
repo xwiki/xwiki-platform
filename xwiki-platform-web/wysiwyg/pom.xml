@@ -37,7 +37,7 @@
     <gwt.style>OBF</gwt.style>
     <gwt.output.directory>${project.build.directory}/${project.build.finalName}/resources/js/xwiki/wysiwyg</gwt.output.directory>
     <xwe.directory>${gwt.output.directory}/xwe</xwe.directory>
-    <xwe.module>com.xpn.xwiki.wysiwyg.Wysiwyg</xwe.module>
+    <xwe.module>org.xwiki.gwt.wysiwyg.Wysiwyg</xwe.module>
   </properties>
   <dependencies>
     <!-- GWT core dependencies -->
@@ -155,7 +155,7 @@
         <configuration>
           <module>${xwe.module}</module>
           <webappDirectory>${gwt.output.directory}</webappDirectory>
-          <includes>com/xpn/xwiki/wysiwyg/WysiwygClientTestSuite.java</includes>
+          <includes>org/xwiki/gwt/wysiwyg/WysiwygTestSuite.java</includes>
           <skipTests>${gwt.skipTests}</skipTests>
           <style>${gwt.style}</style>
           <disableCastChecking>true</disableCastChecking>
@@ -268,14 +268,14 @@
           <includeTestSourceDirectory>true</includeTestSourceDirectory>
           <!-- New code should follow checkstyle rules. -->
           <excludes>
-            com/xpn/xwiki/wysiwyg/client/diff/**/*,
-            com/xpn/xwiki/wysiwyg/client/plugin/link/LinkConfig.java,
-            com/xpn/xwiki/wysiwyg/client/plugin/link/LinkConfigTest.java,
-            com/xpn/xwiki/wysiwyg/client/plugin/image/ImageConfig.java,
-            com/xpn/xwiki/wysiwyg/client/plugin/sync/SyncPlugin.java,
-            com/xpn/xwiki/wysiwyg/client/plugin/sync/SyncTools.java,
-            com/xpn/xwiki/wysiwyg/client/Images.java,
-            com/xpn/xwiki/wysiwyg/client/Strings.java,
+            org/xwiki/gwt/wysiwyg/client/diff/**/*,
+            org/xwiki/gwt/wysiwyg/client/plugin/link/LinkConfig.java,
+            org/xwiki/gwt/wysiwyg/client/plugin/link/LinkConfigTest.java,
+            org/xwiki/gwt/wysiwyg/client/plugin/image/ImageConfig.java,
+            org/xwiki/gwt/wysiwyg/client/plugin/sync/SyncPlugin.java,
+            org/xwiki/gwt/wysiwyg/client/plugin/sync/SyncTools.java,
+            org/xwiki/gwt/wysiwyg/client/Images.java,
+            org/xwiki/gwt/wysiwyg/client/Strings.java,
             com/xpn/xwiki/wysiwyg/server/plugin/sync/internal/DefaultSyncEngine.java,
             com/xpn/xwiki/wysiwyg/server/plugin/sync/SyncTest.java
           </excludes>
@@ -307,7 +307,7 @@
     <profile>
       <id>dev</id>
       <properties>
-        <xwe.module>com.xpn.xwiki.wysiwyg.WysiwygDev</xwe.module>
+        <xwe.module>org.xwiki.gwt.wysiwyg.WysiwygDev</xwe.module>
         <gwt.style>DETAILED</gwt.style>
         <gwt.skipTests>true</gwt.skipTests>
       </properties>
@@ -315,7 +315,7 @@
     <profile>
       <id>manual</id>
       <properties>
-        <xwe.module>com.xpn.xwiki.wysiwyg.WysiwygDev</xwe.module>
+        <xwe.module>org.xwiki.gwt.wysiwyg.WysiwygDev</xwe.module>
         <gwt.style>DETAILED</gwt.style>
         <!-- Arguments required to run the tests manually in any browser. -->
         <gwt.args>" -prod -userAgents gecko1_8 -port 54321 -codeServerPort 12345 -style DETAILED -runStyle "Manual:1</gwt.args>

@@ -23,11 +23,11 @@ import java.util.Map.Entry;
 
 import org.xwiki.component.annotation.Requirement;
 import org.xwiki.context.Execution;
+import org.xwiki.gwt.wysiwyg.client.plugin.macro.MacroDescriptor;
+import org.xwiki.gwt.wysiwyg.client.plugin.macro.ParameterDescriptor;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.web.XWikiMessageTool;
-import com.xpn.xwiki.wysiwyg.client.plugin.macro.MacroDescriptor;
-import com.xpn.xwiki.wysiwyg.client.plugin.macro.ParameterDescriptor;
 
 /**
  * XWiki specific implementation of {@link MacroDescriptorTranslator}.

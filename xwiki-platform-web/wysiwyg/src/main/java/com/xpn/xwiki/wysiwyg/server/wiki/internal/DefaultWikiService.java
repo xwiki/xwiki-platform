@@ -29,6 +29,10 @@ import org.apache.commons.logging.LogFactory;
 import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.component.annotation.Requirement;
 import org.xwiki.context.Execution;
+import org.xwiki.gwt.wysiwyg.client.plugin.link.LinkConfig;
+import org.xwiki.gwt.wysiwyg.client.wiki.Attachment;
+import org.xwiki.gwt.wysiwyg.client.wiki.WikiPage;
+import org.xwiki.gwt.wysiwyg.client.wiki.WikiService;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.AttachmentReference;
 import org.xwiki.model.reference.DocumentReference;
@@ -42,10 +46,6 @@ import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiAttachment;
 import com.xpn.xwiki.doc.XWikiDocument;
-import com.xpn.xwiki.wysiwyg.client.plugin.link.LinkConfig;
-import com.xpn.xwiki.wysiwyg.client.wiki.Attachment;
-import com.xpn.xwiki.wysiwyg.client.wiki.WikiPage;
-import com.xpn.xwiki.wysiwyg.client.wiki.WikiService;
 
 /**
  * The default implementation for {@link WikiService}.

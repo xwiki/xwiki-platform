@@ -65,6 +65,7 @@
         <module>gwt</module>
         <module>xwiki-gwt-dom</module>
         <module>xwiki-gwt-user</module>
+        <module>xwiki-gwt-wysiwyg-client</module>
         <module>wysiwyg</module>
         <module>standard</module>
       </modules>
@@ -76,6 +77,7 @@
         <module>gwt</module>
         <module>xwiki-gwt-dom</module>
         <module>xwiki-gwt-user</module>
+        <module>xwiki-gwt-wysiwyg-client</module>
         <module>wysiwyg</module>
         <module>standard</module>
       </modules>
@@ -87,6 +89,7 @@
         <module>gwt</module>
         <module>xwiki-gwt-dom</module>
         <module>xwiki-gwt-user</module>
+        <module>xwiki-gwt-wysiwyg-client</module>
         <module>wysiwyg</module>
         <module>standard</module>
       </modules>

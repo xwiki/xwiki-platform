@@ -42,9 +42,7 @@ public class NestedAnchorsFilterTest extends TestCase
     /**
      * The string with the XML prologue and the xhtml DTD.
      */
-    private static final String PROLOGUE_DTD =
-        "<?xml version=\"1.0\"?>\n<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Strict//EN\" "
-            + "\"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd\">\n";
+    private static final String PROLOGUE_DTD = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n";
 
     /**
      * The filter under test.
@@ -59,9 +57,9 @@ public class NestedAnchorsFilterTest extends TestCase
     public void testFilterOneLevel() throws Exception
     {
         String documentString =
-            PROLOGUE_DTD + "<html><head /><body><p>XWiki&nbsp;<!--startwikilink:http://www.xwiki.org-->"
+            PROLOGUE_DTD + "<html><head></head><body><p>XWiki <!--startwikilink:http://www.xwiki.org-->"
                 + "<span class=\"wikiexternallink\"><a href=\"http://www.xwiki.org\">http://www.xwiki.org</a></span>"
-                + "<!--stopwikilink--> .org<br /></p></body></html>";
+                + "<!--stopwikilink--> .org<br /></p></body></html>\n";
         Document doc = prepareDocument(documentString);
 
         String before = HTMLUtils.toString(doc);
@@ -80,11 +78,11 @@ public class NestedAnchorsFilterTest extends TestCase
     public void testFilterTwoLevels() throws Exception
     {
         String beforeAnchor =
-            "<html><head/><body><p><!--startwikilink:http://www.xwiki.org--><span class=\"wikiexternallink\">"
+            "<html><head></head><body><p><!--startwikilink:http://www.xwiki.org--><span class=\"wikiexternallink\">"
                 + "<a class=\"wikimodel-freestanding\" href=\"http://www.xwiki.org\">"
                 + "<span class=\"wikigeneratedlinkcontent\">";
         String anchorLabel = "http://www.<strong>xwiki</strong>.org";
-        String afterAnchor = "</span></a>ssst</span><!--stopwikilink-->s</p></body></html>";
+        String afterAnchor = "</span></a>ssst</span><!--stopwikilink-->s</p></body></html>\n";
         String documentString =
             PROLOGUE_DTD + beforeAnchor + "<a href=\"http://www.xwiki.orgs\">" + anchorLabel + "</a>" + afterAnchor;
 
@@ -105,10 +103,10 @@ public class NestedAnchorsFilterTest extends TestCase
     public void testFilterThreeLevels() throws Exception
     {
         String beforeAnchor =
-            "<html><head/><body><p><!--startwikilink:http://www.xwiki.org--><span>"
+            "<html><head></head><body><p><!--startwikilink:http://www.xwiki.org--><span>"
                 + "<a class=\"wikimodel-freestanding\" href=\"http://www.xwiki.com\">" + "<span>";
         String anchorLabel = "http://www.xwiki.org";
-        String afterAnchor = "</span></a>s </span><!--stopwikilink-->s</p></body></html>";
+        String afterAnchor = "</span></a>s </span><!--stopwikilink-->s</p></body></html>\n";
         String documentString =
             PROLOGUE_DTD + beforeAnchor + "<a href=\"http://www.xwiki.orgs\"><a href=\"http://www.xwiki.com\">"
                 + anchorLabel + "</a>com</a>" + afterAnchor;

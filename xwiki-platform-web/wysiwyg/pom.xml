@@ -32,8 +32,6 @@
   <packaging>war</packaging>
   <description>XWiki's GWT WYSIWYG editor</description>
   <properties>
-    <gwt.args />
-    <gwt.skipTests>false</gwt.skipTests>
     <gwt.style>OBF</gwt.style>
     <gwt.output.directory>${project.build.directory}/${project.build.finalName}/resources/js/xwiki/wysiwyg</gwt.output.directory>
     <xwe.directory>${gwt.output.directory}/xwe</xwe.directory>
@@ -56,35 +54,16 @@
     <!-- GWT libraries -->
     <dependency>
       <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-web-gwt-dom</artifactId>
+      <artifactId>xwiki-web-gwt-wysiwyg-client</artifactId>
       <version>${pom.version}</version>
       <scope>provided</scope>
     </dependency>
-    <dependency>
-      <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-web-gwt-user</artifactId>
-      <version>${pom.version}</version>
-      <scope>provided</scope>
-    </dependency>
-    <dependency>
-      <groupId>com.smartgwt</groupId>
-      <artifactId>smartgwt</artifactId>
-      <version>${smartgwt.version}</version>
-      <scope>provided</scope>
-    </dependency>
-    <!-- XWiki dependencies for server side -->
+    <!-- XWiki dependencies -->
     <dependency>
       <groupId>com.xpn.xwiki.platform</groupId>
       <artifactId>xwiki-core</artifactId>
       <version>${platform.core.version}</version>
       <scope>provided</scope>
-      <exclusions>
-        <exclusion>
-          <!-- GWT Unit tests fail to run from Eclipse if xercesImpl is in the class path. -->
-          <groupId>xerces</groupId>
-          <artifactId>xercesImpl</artifactId>
-        </exclusion>
-      </exclusions>
     </dependency>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
@@ -123,27 +102,10 @@
       <scope>test</scope>
     </dependency>
     <dependency>
-      <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-web-gwt-user</artifactId>
-      <classifier>tests</classifier>
-      <version>${pom.version}</version>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>
       <version>${junit.version}</version>
       <scope>test</scope>
-    </dependency>
-    <dependency>
-      <!--
-        HtmlUnit 2.6 used by GWT 2.0.0 to run the JUnit tests requires a newer version of Xalan than the one (2.5.1)
-        coming as a transitive dependency of XWiki Core.
-      -->
-      <groupId>xalan</groupId>
-      <artifactId>xalan</artifactId>
-      <version>2.7.1</version>
-      <scope>provided</scope>
     </dependency>
   </dependencies>
   <build>
@@ -153,16 +115,12 @@
         <artifactId>gwt-maven-plugin</artifactId>
         <version>1.2</version>
         <configuration>
+          <gwtVersion>${gwt.version}</gwtVersion>
           <module>${xwe.module}</module>
           <webappDirectory>${gwt.output.directory}</webappDirectory>
-          <includes>org/xwiki/gwt/wysiwyg/WysiwygTestSuite.java</includes>
-          <skipTests>${gwt.skipTests}</skipTests>
           <style>${gwt.style}</style>
           <disableCastChecking>true</disableCastChecking>
           <disableClassMetadata>true</disableClassMetadata>
-          <!-- HACK: We inject the GWT arguments in the out parameter because we have no other option. -->
-          <out>target/www-test${gwt.args}</out>
-          <testTimeOut>600</testTimeOut>
           <!--
             In order to prevent the "java.lang.InternalError: Can't connect to X11 window server using ':1.0' as the
             value of the DISPLAY variable." error message we have to run the GWT compiler with the headless AWT option.
@@ -174,7 +132,6 @@
           <execution>
             <goals>
               <goal>compile</goal>
-              <goal>test</goal>
             </goals>
           </execution>
         </executions>
@@ -252,11 +209,6 @@
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-surefire-plugin</artifactId>
         <configuration>
-          <!--
-            We skip the tests because of http://jira.codehaus.org/browse/SUREFIRE-508 (Cannot run GWTTestCases with
-            Surefire). GWT tests are currently run by gwt-maven-plugin.
-          -->
-          <skip>true</skip>
         </configuration>
       </plugin>
       <plugin>
@@ -268,38 +220,10 @@
           <includeTestSourceDirectory>true</includeTestSourceDirectory>
           <!-- New code should follow checkstyle rules. -->
           <excludes>
-            org/xwiki/gwt/wysiwyg/client/diff/**/*,
-            org/xwiki/gwt/wysiwyg/client/plugin/link/LinkConfig.java,
-            org/xwiki/gwt/wysiwyg/client/plugin/link/LinkConfigTest.java,
-            org/xwiki/gwt/wysiwyg/client/plugin/image/ImageConfig.java,
-            org/xwiki/gwt/wysiwyg/client/plugin/sync/SyncPlugin.java,
-            org/xwiki/gwt/wysiwyg/client/plugin/sync/SyncTools.java,
-            org/xwiki/gwt/wysiwyg/client/Images.java,
-            org/xwiki/gwt/wysiwyg/client/Strings.java,
             com/xpn/xwiki/wysiwyg/server/plugin/sync/internal/DefaultSyncEngine.java,
             com/xpn/xwiki/wysiwyg/server/plugin/sync/SyncTest.java
           </excludes>
         </configuration>
-      </plugin>
-      <plugin>
-        <!--
-          GWT needs the client sources in development mode. We include all the sources for now because we cannot filter
-          server sources.
-        -->
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-source-plugin</artifactId>
-        <executions>
-          <execution>
-            <id>build-source-jar</id>
-            <goals>
-              <goal>jar</goal>
-            </goals>
-            <configuration>
-              <!-- Resources are included in the classes jar. -->
-              <excludeResources>true</excludeResources>
-            </configuration>
-          </execution>
-        </executions>
       </plugin>
     </plugins>
   </build>
@@ -307,18 +231,8 @@
     <profile>
       <id>dev</id>
       <properties>
-        <xwe.module>org.xwiki.gwt.wysiwyg.WysiwygDev</xwe.module>
         <gwt.style>DETAILED</gwt.style>
-        <gwt.skipTests>true</gwt.skipTests>
-      </properties>
-    </profile>
-    <profile>
-      <id>manual</id>
-      <properties>
         <xwe.module>org.xwiki.gwt.wysiwyg.WysiwygDev</xwe.module>
-        <gwt.style>DETAILED</gwt.style>
-        <!-- Arguments required to run the tests manually in any browser. -->
-        <gwt.args>" -prod -userAgents gecko1_8 -port 54321 -codeServerPort 12345 -style DETAILED -runStyle "Manual:1</gwt.args>
       </properties>
     </profile>
   </profiles>

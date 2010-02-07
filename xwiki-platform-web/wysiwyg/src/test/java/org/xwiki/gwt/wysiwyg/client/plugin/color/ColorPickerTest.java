@@ -19,7 +19,7 @@
  */
 package org.xwiki.gwt.wysiwyg.client.plugin.color;
 
-import org.xwiki.gwt.wysiwyg.client.AbstractWysiwygClientTest;
+import org.xwiki.gwt.wysiwyg.client.WysiwygTestCase;
 
 
 /**
@@ -27,7 +27,7 @@ import org.xwiki.gwt.wysiwyg.client.AbstractWysiwygClientTest;
  * 
  * @version $Id$
  */
-public class ColorPickerTest extends AbstractWysiwygClientTest
+public class ColorPickerTest extends WysiwygTestCase
 {
     /**
      * The array of hex color codes that are tested.

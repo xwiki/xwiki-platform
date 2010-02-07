@@ -24,7 +24,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.xwiki.gwt.dom.client.Element;
-import org.xwiki.gwt.wysiwyg.client.AbstractWysiwygClientTest;
+import org.xwiki.gwt.wysiwyg.client.WysiwygTestCase;
 
 import com.google.gwt.dom.client.Document;
 
@@ -33,7 +33,7 @@ import com.google.gwt.dom.client.Document;
  * 
  * @version $Id$
  */
-public class MacroCallTest extends AbstractWysiwygClientTest
+public class MacroCallTest extends WysiwygTestCase
 {
     /**
      * The empty list of macro call arguments.

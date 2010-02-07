@@ -19,7 +19,7 @@
  */
 package org.xwiki.gwt.wysiwyg.client.plugin;
 
-import org.xwiki.gwt.wysiwyg.client.AbstractWysiwygClientTest;
+import org.xwiki.gwt.wysiwyg.client.WysiwygTestCase;
 import org.xwiki.gwt.wysiwyg.client.plugin.internal.MockPluginFactory;
 
 
@@ -28,7 +28,7 @@ import org.xwiki.gwt.wysiwyg.client.plugin.internal.MockPluginFactory;
  * 
  * @version $Id$
  */
-public abstract class AbstractPluginFactoryManagerTest extends AbstractWysiwygClientTest
+public abstract class AbstractPluginFactoryManagerTest extends WysiwygTestCase
 {
     /**
      * @return A new instance of the concrete {@link PluginFactoryManager} being tested.

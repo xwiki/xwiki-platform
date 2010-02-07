@@ -20,7 +20,7 @@
 package org.xwiki.gwt.wysiwyg.client.wiki;
 
 import org.xwiki.gwt.user.client.StringUtils;
-import org.xwiki.gwt.wysiwyg.client.AbstractWysiwygClientTest;
+import org.xwiki.gwt.wysiwyg.client.WysiwygTestCase;
 
 
 /**
@@ -28,7 +28,7 @@ import org.xwiki.gwt.wysiwyg.client.AbstractWysiwygClientTest;
  * 
  * @version $Id$
  */
-public class ResourceNameTest extends AbstractWysiwygClientTest
+public class ResourceNameTest extends WysiwygTestCase
 {
     /**
      * First value of a wiki to use in tests.

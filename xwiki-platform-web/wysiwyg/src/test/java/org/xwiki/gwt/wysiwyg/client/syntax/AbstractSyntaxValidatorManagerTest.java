@@ -19,7 +19,7 @@
  */
 package org.xwiki.gwt.wysiwyg.client.syntax;
 
-import org.xwiki.gwt.wysiwyg.client.AbstractWysiwygClientTest;
+import org.xwiki.gwt.wysiwyg.client.WysiwygTestCase;
 import org.xwiki.gwt.wysiwyg.client.syntax.internal.XWikiSyntaxValidator;
 
 
@@ -28,7 +28,7 @@ import org.xwiki.gwt.wysiwyg.client.syntax.internal.XWikiSyntaxValidator;
  * 
  * @version $Id$
  */
-public abstract class AbstractSyntaxValidatorManagerTest extends AbstractWysiwygClientTest
+public abstract class AbstractSyntaxValidatorManagerTest extends WysiwygTestCase
 {
     /**
      * @return A new instance of the concrete implementation of {@link SyntaxValidatorManager} being tested.

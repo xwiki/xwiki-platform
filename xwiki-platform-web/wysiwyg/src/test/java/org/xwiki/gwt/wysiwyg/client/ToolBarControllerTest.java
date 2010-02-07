@@ -36,7 +36,7 @@ import org.xwiki.gwt.wysiwyg.client.plugin.separator.ToolBarSeparator;
  * 
  * @version $Id$
  */
-public class ToolBarControllerTest extends AbstractWysiwygClientTest
+public class ToolBarControllerTest extends WysiwygTestCase
 {
     /**
      * The tool bar controller being tested.
@@ -51,7 +51,7 @@ public class ToolBarControllerTest extends AbstractWysiwygClientTest
     /**
      * {@inheritDoc}
      * 
-     * @see AbstractWysiwygClientTest#gwtSetUp()
+     * @see WysiwygTestCase#gwtSetUp()
      */
     protected void gwtSetUp() throws Exception
     {

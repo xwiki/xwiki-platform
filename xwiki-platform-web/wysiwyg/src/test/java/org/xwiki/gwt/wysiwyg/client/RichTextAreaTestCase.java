@@ -35,6 +35,6 @@ public class RichTextAreaTestCase extends AbstractRichTextAreaTestCase
      */
     public String getModuleName()
     {
-        return AbstractWysiwygClientTest.MODULE_NAME;
+        return WysiwygTestCase.MODULE_NAME;
     }
 }

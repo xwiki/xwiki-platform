@@ -20,7 +20,7 @@
 package org.xwiki.gwt.wysiwyg.client.syntax;
 
 import org.xwiki.gwt.user.client.ui.rta.RichTextArea;
-import org.xwiki.gwt.wysiwyg.client.AbstractWysiwygClientTest;
+import org.xwiki.gwt.wysiwyg.client.WysiwygTestCase;
 import org.xwiki.gwt.wysiwyg.client.syntax.internal.DisablingRule;
 
 
@@ -29,7 +29,7 @@ import org.xwiki.gwt.wysiwyg.client.syntax.internal.DisablingRule;
  * 
  * @version $Id$
  */
-public abstract class AbstractSyntaxValidatorTest extends AbstractWysiwygClientTest
+public abstract class AbstractSyntaxValidatorTest extends WysiwygTestCase
 {
     /**
      * @return A new instance of the concrete implementation of {@link SyntaxValidator} being tested.

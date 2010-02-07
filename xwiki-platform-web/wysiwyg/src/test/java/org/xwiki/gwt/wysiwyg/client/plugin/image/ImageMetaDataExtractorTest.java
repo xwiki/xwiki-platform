@@ -23,7 +23,7 @@ import org.xwiki.gwt.dom.client.DOMUtils;
 import org.xwiki.gwt.dom.client.Document;
 import org.xwiki.gwt.dom.client.DocumentFragment;
 import org.xwiki.gwt.dom.client.Element;
-import org.xwiki.gwt.wysiwyg.client.AbstractWysiwygClientTest;
+import org.xwiki.gwt.wysiwyg.client.WysiwygTestCase;
 
 import com.google.gwt.dom.client.Node;
 
@@ -32,7 +32,7 @@ import com.google.gwt.dom.client.Node;
  * 
  * @version $Id$
  */
-public class ImageMetaDataExtractorTest extends AbstractWysiwygClientTest
+public class ImageMetaDataExtractorTest extends WysiwygTestCase
 {
     /**
      * The DOM element in which we run the tests.
@@ -47,7 +47,7 @@ public class ImageMetaDataExtractorTest extends AbstractWysiwygClientTest
     /**
      * {@inheritDoc}
      * 
-     * @see AbstractWysiwygClientTest#gwtSetUp()
+     * @see WysiwygTestCase#gwtSetUp()
      */
     protected void gwtSetUp() throws Exception
     {
@@ -60,7 +60,7 @@ public class ImageMetaDataExtractorTest extends AbstractWysiwygClientTest
     /**
      * {@inheritDoc}
      * 
-     * @see AbstractWysiwygClientTest#gwtTearDown()
+     * @see WysiwygTestCase#gwtTearDown()
      */
     protected void gwtTearDown() throws Exception
     {

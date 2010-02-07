@@ -19,7 +19,7 @@
  */
 package org.xwiki.gwt.wysiwyg.client.plugin.link;
 
-import org.xwiki.gwt.wysiwyg.client.AbstractWysiwygClientTest;
+import org.xwiki.gwt.wysiwyg.client.WysiwygTestCase;
 import org.xwiki.gwt.wysiwyg.client.plugin.link.LinkConfig.LinkType;
 
 
@@ -28,7 +28,7 @@ import org.xwiki.gwt.wysiwyg.client.plugin.link.LinkConfig.LinkType;
  * 
  * @version $Id$
  */
-public class LinkConfigTest extends AbstractWysiwygClientTest
+public class LinkConfigTest extends WysiwygTestCase
 {
     /**
      * Test for the parsing of a basic {@link LinkConfig} from a JSON String.

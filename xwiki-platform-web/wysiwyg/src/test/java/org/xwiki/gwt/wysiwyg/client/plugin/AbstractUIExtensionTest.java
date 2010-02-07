@@ -19,7 +19,7 @@
  */
 package org.xwiki.gwt.wysiwyg.client.plugin;
 
-import org.xwiki.gwt.wysiwyg.client.AbstractWysiwygClientTest;
+import org.xwiki.gwt.wysiwyg.client.WysiwygTestCase;
 
 import com.google.gwt.user.client.Random;
 
@@ -28,7 +28,7 @@ import com.google.gwt.user.client.Random;
  * 
  * @version $Id$
  */
-public abstract class AbstractUIExtensionTest extends AbstractWysiwygClientTest
+public abstract class AbstractUIExtensionTest extends WysiwygTestCase
 {
     /**
      * @return A new instance of the concrete {@link UIExtension} being tested.

@@ -27,12 +27,12 @@ import com.google.gwt.junit.client.GWTTestCase;
  * 
  * @version $Id$
  */
-public abstract class AbstractWysiwygClientTest extends GWTTestCase
+public class WysiwygTestCase extends GWTTestCase
 {
     /**
      * The name of this GWT module.
      */
-    public static final String MODULE_NAME = "com.xpn.xwiki.wysiwyg.WysiwygDev";
+    public static final String MODULE_NAME = "org.xwiki.gwt.wysiwyg.WysiwygDev";
 
     /**
      * {@inheritDoc}

@@ -23,7 +23,7 @@ import org.xwiki.gwt.dom.client.DOMUtils;
 import org.xwiki.gwt.dom.client.Document;
 import org.xwiki.gwt.dom.client.DocumentFragment;
 import org.xwiki.gwt.dom.client.Element;
-import org.xwiki.gwt.wysiwyg.client.AbstractWysiwygClientTest;
+import org.xwiki.gwt.wysiwyg.client.WysiwygTestCase;
 
 import com.google.gwt.dom.client.Node;
 
@@ -33,7 +33,7 @@ import com.google.gwt.dom.client.Node;
  * 
  * @version $Id$
  */
-public class LinkMetaDataExtractorTest extends AbstractWysiwygClientTest
+public class LinkMetaDataExtractorTest extends WysiwygTestCase
 {
     /**
      * The name of the anchor tag.
@@ -63,7 +63,7 @@ public class LinkMetaDataExtractorTest extends AbstractWysiwygClientTest
     /**
      * {@inheritDoc}
      * 
-     * @see AbstractWysiwygClientTest#gwtSetUp()
+     * @see WysiwygTestCase#gwtSetUp()
      */
     protected void gwtSetUp() throws Exception
     {
@@ -76,7 +76,7 @@ public class LinkMetaDataExtractorTest extends AbstractWysiwygClientTest
     /**
      * {@inheritDoc}
      * 
-     * @see AbstractWysiwygClientTest#gwtTearDown()
+     * @see WysiwygTestCase#gwtTearDown()
      */
     protected void gwtTearDown() throws Exception
     {

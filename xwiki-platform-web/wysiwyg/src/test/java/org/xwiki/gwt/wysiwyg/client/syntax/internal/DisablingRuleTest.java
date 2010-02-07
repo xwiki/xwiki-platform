@@ -20,7 +20,7 @@
 package org.xwiki.gwt.wysiwyg.client.syntax.internal;
 
 import org.xwiki.gwt.user.client.ui.rta.RichTextArea;
-import org.xwiki.gwt.wysiwyg.client.AbstractWysiwygClientTest;
+import org.xwiki.gwt.wysiwyg.client.WysiwygTestCase;
 
 
 /**
@@ -28,7 +28,7 @@ import org.xwiki.gwt.wysiwyg.client.AbstractWysiwygClientTest;
  * 
  * @version $Id$
  */
-public class DisablingRuleTest extends AbstractWysiwygClientTest
+public class DisablingRuleTest extends WysiwygTestCase
 {
     /**
      * Tests if a {@link DisablingRule} really disables the specified features.

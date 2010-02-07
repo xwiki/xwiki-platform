@@ -22,7 +22,7 @@ package org.xwiki.gwt.wysiwyg.client.syntax.internal;
 import org.xwiki.gwt.user.client.ui.rta.RichTextArea;
 import org.xwiki.gwt.user.client.ui.rta.cmd.Command;
 import org.xwiki.gwt.user.client.ui.rta.cmd.internal.MockCommandManager;
-import org.xwiki.gwt.wysiwyg.client.AbstractWysiwygClientTest;
+import org.xwiki.gwt.wysiwyg.client.WysiwygTestCase;
 
 import com.google.gwt.user.client.ui.RootPanel;
 
@@ -31,7 +31,7 @@ import com.google.gwt.user.client.ui.RootPanel;
  * 
  * @version $Id$
  */
-public class DefaultValidationRuleTest extends AbstractWysiwygClientTest
+public class DefaultValidationRuleTest extends WysiwygTestCase
 {
     /**
      * Tests if the outdent feature becomes enabled after the indent command is executed.

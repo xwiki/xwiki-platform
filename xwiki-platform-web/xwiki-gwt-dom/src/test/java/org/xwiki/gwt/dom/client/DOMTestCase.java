@@ -27,7 +27,7 @@ import com.google.gwt.junit.client.GWTTestCase;
  * 
  * @version $Id$
  */
-public abstract class AbstractDOMTest extends GWTTestCase
+public class DOMTestCase extends GWTTestCase
 {
     /**
      * Greater-than sign.

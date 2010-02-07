@@ -36,7 +36,7 @@ import com.google.gwt.dom.client.SpanElement;
  * 
  * @version $Id$
  */
-public class DepthFirstPreOrderIteratorTest extends AbstractDOMTest
+public class DepthFirstPreOrderIteratorTest extends DOMTestCase
 {
 
     /**

@@ -21,7 +21,7 @@ package org.xwiki.gwt.dom.client.internal.ie;
 
 import java.util.Iterator;
 
-import org.xwiki.gwt.dom.client.AbstractDOMTest;
+import org.xwiki.gwt.dom.client.DOMTestCase;
 import org.xwiki.gwt.dom.client.Document;
 import org.xwiki.gwt.dom.client.DocumentFragment;
 import org.xwiki.gwt.dom.client.Element;
@@ -42,7 +42,7 @@ import com.google.gwt.dom.client.Node;
  * 
  * @version $Id$
  */
-public class IERangeTest extends AbstractDOMTest
+public class IERangeTest extends DOMTestCase
 {
     /**
      * A range factory to be used in tests. It allows us to use deferred binding and load a IE specific implementation

@@ -24,7 +24,7 @@ package org.xwiki.gwt.dom.client;
  * 
  * @version $Id$
  */
-public class StyleTest extends AbstractDOMTest
+public class StyleTest extends DOMTestCase
 {
     /**
      * Unit test for {@link Style#toCamelCase(String)}.

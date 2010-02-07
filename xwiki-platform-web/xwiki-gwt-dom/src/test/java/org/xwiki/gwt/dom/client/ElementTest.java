@@ -29,7 +29,7 @@ import com.google.gwt.core.client.JsArrayString;
  * 
  * @version $Id$
  */
-public class ElementTest extends AbstractDOMTest
+public class ElementTest extends DOMTestCase
 {
     /**
      * The name of the class attribute.

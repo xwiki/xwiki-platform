@@ -24,7 +24,7 @@ package org.xwiki.gwt.dom.client;
  * 
  * @version $Id$
  */
-public class TextTest extends AbstractDOMTest
+public class TextTest extends DOMTestCase
 {
     /**
      * Unit test for {@link Text#getOffset()}.

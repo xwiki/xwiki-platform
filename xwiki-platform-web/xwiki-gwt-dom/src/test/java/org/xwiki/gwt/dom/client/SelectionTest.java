@@ -30,7 +30,7 @@ import com.google.gwt.junit.Platform;
  * 
  * @version $Id$
  */
-public class SelectionTest extends AbstractDOMTest
+public class SelectionTest extends DOMTestCase
 {
     /**
      * This test is mainly for Opera browser which reports a wrong range when the selection ends before an image.

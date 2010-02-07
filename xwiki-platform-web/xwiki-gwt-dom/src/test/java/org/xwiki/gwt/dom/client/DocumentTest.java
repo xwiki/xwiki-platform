@@ -30,7 +30,7 @@ import com.google.gwt.user.client.Timer;
  * 
  * @version $Id$
  */
-public class DocumentTest extends AbstractDOMTest
+public class DocumentTest extends DOMTestCase
 {
     /**
      * Unit test for {@link Document#fireInnerHTMLChange(Element)}.

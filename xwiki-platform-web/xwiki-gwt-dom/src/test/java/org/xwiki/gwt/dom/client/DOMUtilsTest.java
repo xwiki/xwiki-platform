@@ -30,7 +30,7 @@ import com.google.gwt.dom.client.SpanElement;
  * 
  * @version $Id$
  */
-public class DOMUtilsTest extends AbstractDOMTest
+public class DOMUtilsTest extends DOMTestCase
 {
     /**
      * The collection of DOM utility methods being tested.
@@ -40,7 +40,7 @@ public class DOMUtilsTest extends AbstractDOMTest
     /**
      * {@inheritDoc}
      * 
-     * @see AbstractDOMTest#gwtSetUp()
+     * @see DOMTestCase#gwtSetUp()
      */
     protected void gwtSetUp() throws Exception
     {

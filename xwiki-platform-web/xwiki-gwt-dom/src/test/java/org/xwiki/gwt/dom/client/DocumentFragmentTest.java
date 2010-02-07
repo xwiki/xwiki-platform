@@ -24,7 +24,7 @@ package org.xwiki.gwt.dom.client;
  * 
  * @version $Id$
  */
-public class DocumentFragmentTest extends AbstractDOMTest
+public class DocumentFragmentTest extends DOMTestCase
 {
     /**
      * Unit test for {@link DocumentFragment#getInnerHTML()}.

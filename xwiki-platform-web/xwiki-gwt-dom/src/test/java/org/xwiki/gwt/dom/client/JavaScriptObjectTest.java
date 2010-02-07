@@ -26,7 +26,7 @@ import com.google.gwt.core.client.JsArrayString;
  * 
  * @version $Id$
  */
-public class JavaScriptObjectTest extends AbstractDOMTest
+public class JavaScriptObjectTest extends DOMTestCase
 {
     /**
      * Unit test for {@link JavaScriptObject#set(String, Object)} and {@link JavaScriptObject#get(String)}.

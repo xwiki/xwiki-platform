@@ -26,7 +26,7 @@ import com.google.gwt.dom.client.Node;
  * 
  * @version $Id$
  */
-public class RangeTest extends AbstractDOMTest
+public class RangeTest extends DOMTestCase
 {
     /**
      * Unit test for {@link Range#toHTML()}.

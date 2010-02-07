@@ -52,7 +52,14 @@ public class RichTextEditorController implements Updatable, MouseUpHandler, KeyU
     /**
      * The string used to identify the menu bar extension point.
      */
-    private static final String MENU_ROLE = "menu";
+    public static final String MENU_ROLE = "menu";
+
+    /**
+     * The list of plugins this controller will attempt to load by default if the configuration doesn't specify which
+     * plugins to load.
+     */
+    public static final String DEFAULT_PLUGINS =
+        "submit line separator text valign justify list indent history format font color symbol table";
 
     /**
      * The regular expression used to express the separator for tool bar and menu bar feature names in configuration.
@@ -204,7 +211,7 @@ public class RichTextEditorController implements Updatable, MouseUpHandler, KeyU
      */
     protected void loadPlugins()
     {
-        String[] pluginNames = config.getParameter("plugins", "").split(WHITE_SPACE_SEPARATOR);
+        String[] pluginNames = config.getParameter("plugins", DEFAULT_PLUGINS).split(WHITE_SPACE_SEPARATOR);
         for (int i = 0; i < pluginNames.length; i++) {
             pluginManager.load(pluginNames[i]);
         }

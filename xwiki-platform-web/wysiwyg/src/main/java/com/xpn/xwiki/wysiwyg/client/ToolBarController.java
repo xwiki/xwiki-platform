@@ -49,6 +49,15 @@ public class ToolBarController
     public static final String TOOLBAR_ROLE = "toolbar";
 
     /**
+     * The list of features this controller will attempt to place on the tool bar by default if the configuration
+     * doesn't specify the tool bar features.
+     */
+    public static final String DEFAULT_TOOLBAR_FEATURES =
+        "bold italic underline strikethrough teletype | subscript superscript"
+            + " | justifyleft justifycenter justifyright justifyfull | unorderedlist orderedlist | outdent indent"
+            + " | undo redo | format | fontname fontsize forecolor backcolor | hr removeformat symbol";
+
+    /**
      * The underlying tool bar that is managed by this object.
      */
     private final ToolBar toolBar;
@@ -79,7 +88,7 @@ public class ToolBarController
     {
         toolBar.clear();
         toolBarFeatures.clear();
-        for (String featureName : split(config.getParameter(TOOLBAR_ROLE, ""), pluginManager)) {
+        for (String featureName : split(config.getParameter(TOOLBAR_ROLE, DEFAULT_TOOLBAR_FEATURES), pluginManager)) {
             UIExtension extension = pluginManager.getUIExtension(TOOLBAR_ROLE, featureName);
             toolBarFeatures.put(featureName, extension);
             toolBar.add((Widget) extension.getUIObject(featureName));

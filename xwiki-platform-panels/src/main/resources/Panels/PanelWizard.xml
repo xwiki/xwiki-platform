@@ -77,7 +77,7 @@
   &lt;/div&gt;
   &lt;div id="xwikieditcontent" class="clear"&gt;
     &lt;div id="PanelListSection"&gt;
-      &lt;span id="draganddroptooltip" class="hastooltip"&gt;$msg.get("panelwizard.draganddrop")&lt;/span&gt;
+      &lt;span id="draganddroptooltip" class="hastooltip"&gt;$msg.get("panelwizard.draganddrop")
       #set($panelClass = $xwiki.getDocument("Panels.PanelClass").xWikiClass)
       #set($categoryList = $panelClass.category.getProperty("values").value.split("[|]"))
       #set($sql = ", BaseObject as obj where obj.name=doc.fullName and obj.className='Panels.PanelClass' and doc.fullName!='Panels.PanelTemplate'")

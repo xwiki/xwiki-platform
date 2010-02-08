@@ -281,7 +281,7 @@ public class XWikiDocument implements DocumentModelBridge
     private String xClassXML;
 
     /**
-     * Map holding document objects indexed by classname references (i.e. Document References since a classname
+     * Map holding document objects indexed by XClass references (i.e. Document References since a XClass reference
      * points to a document). The map is not synchronized, and uses a TreeMap implementation to preserve index
      * ordering (consistent sorted order for output to XML, rendering in velocity, etc.)
      */
@@ -1708,8 +1708,7 @@ public class XWikiDocument implements DocumentModelBridge
         Map<DocumentReference, List<BaseObject>> newObjects = new LinkedHashMap<DocumentReference, List<BaseObject>>();
 
         for (Map.Entry<String, Vector<BaseObject>> entry : objects.entrySet()) {
-            newObjects.put(this.currentMixedDocumentReferenceResolver.resolve(entry.getKey()),
-                new ArrayList<BaseObject>(entry.getValue()));
+            newObjects.put(resolveClassReference(entry.getKey()), new ArrayList<BaseObject>(entry.getValue()));
         }
 
         setXObjects(newObjects);
@@ -1772,8 +1771,8 @@ public class XWikiDocument implements DocumentModelBridge
      */
     public int createXObject(DocumentReference classReference, XWikiContext context) throws XWikiException
     {
-        String classname = this.compactWikiEntityReferenceSerializer.serialize(classReference);
-        BaseObject object = BaseClass.newCustomClassInstance(classname, context);
+        String className = this.compactWikiEntityReferenceSerializer.serialize(classReference);
+        BaseObject object = BaseClass.newCustomClassInstance(className, context);
         object.setDocumentReference(getDocumentReference());
         object.setXClassReference(classReference);
         List<BaseObject> objects = getXObjects(classReference);
@@ -1792,9 +1791,9 @@ public class XWikiDocument implements DocumentModelBridge
      * @deprecated since 2.2M1 use {@link #createXObject(DocumentReference, XWikiContext)} instead
      */
     @Deprecated
-    public int createNewObject(String classname, XWikiContext context) throws XWikiException
+    public int createNewObject(String className, XWikiContext context) throws XWikiException
     {
-        return createXObject(this.currentMixedDocumentReferenceResolver.resolve(classname), context);
+        return createXObject(resolveClassReference(className), context);
     }
 
     /**
@@ -1813,9 +1812,9 @@ public class XWikiDocument implements DocumentModelBridge
      * @deprecated since 2.2M1 use {@link #getXObjectSize(DocumentReference)} instead
      */
     @Deprecated
-    public int getObjectNumbers(String classname)
+    public int getObjectNumbers(String className)
     {
-        return getXObjectSize(this.currentMixedDocumentReferenceResolver.resolve(classname));
+        return getXObjectSize(resolveClassReference(className));
     }
 
     /**
@@ -1833,11 +1832,9 @@ public class XWikiDocument implements DocumentModelBridge
      * @deprecated since 2.2M1 use {@link #getXObjects(DocumentReference)} instead
      */
     @Deprecated
-    public Vector<BaseObject> getObjects(String classname)
+    public Vector<BaseObject> getObjects(String className)
     {
-        // In order to preserve backward compatibility, ensure that if no space is specified then the "XWiki" space
-        // is used. Note that in the new API the current space is used instead.
-        List<BaseObject> result = getXObjects(resolveReferenceWithSpecificSpace(classname, "XWiki"));
+        List<BaseObject> result = getXObjects(resolveClassReference(className));
         return result == null ? null : new Vector<BaseObject>(result);
     }
 
@@ -1853,11 +1850,9 @@ public class XWikiDocument implements DocumentModelBridge
      * @deprecated since 2.2M1 use {@link #setXObjects(DocumentReference, List)} instead
      */
     @Deprecated
-    public void setObjects(String classname, Vector<BaseObject> objects)
+    public void setObjects(String className, Vector<BaseObject> objects)
     {
-        // In order to preserve backward compatibility, ensure that if no space is specified then the "XWiki" space
-        // is used. Note that in the new API the current space is used instead.
-        setXObjects(resolveReferenceWithSpecificSpace(classname, "XWiki"), new ArrayList<BaseObject>(objects));
+        setXObjects(resolveClassReference(className), new ArrayList<BaseObject>(objects));
     }
 
     /**
@@ -1883,11 +1878,9 @@ public class XWikiDocument implements DocumentModelBridge
      * @deprecated since 2.2M1 use {@link #getXObject(DocumentReference)} instead
      */
     @Deprecated
-    public BaseObject getObject(String classname)
+    public BaseObject getObject(String className)
     {
-        // In order to preserve backward compatibility, ensure that if no space is specified then the "XWiki" space
-        // is used. Note that in the new API the current space is used instead.
-        return getXObject(resolveReferenceWithSpecificSpace(classname, "XWiki"));
+        return getXObject(resolveClassReference(className));
     }
 
     /**
@@ -1906,11 +1899,9 @@ public class XWikiDocument implements DocumentModelBridge
      * @deprecated since 2.2M1 use {@link #getXObject(DocumentReference, int)} instead
      */
     @Deprecated
-    public BaseObject getObject(String classname, int nb)
+    public BaseObject getObject(String className, int nb)
     {
-        // In order to preserve backward compatibility, ensure that if no space is specified then the "XWiki" space
-        // is used. Note that in the new API the current space is used instead.
-        return getXObject(resolveReferenceWithSpecificSpace(classname, "XWiki"), nb);
+        return getXObject(resolveClassReference(className), nb);
     }
 
     /**
@@ -1925,9 +1916,9 @@ public class XWikiDocument implements DocumentModelBridge
      * @deprecated since 2.2M1 use {@link #getXObject(DocumentReference, String, String)} instead
      */
     @Deprecated
-    public BaseObject getObject(String classname, String key, String value)
+    public BaseObject getObject(String className, String key, String value)
     {
-        return getObject(classname, key, value, false);
+        return getObject(className, key, value, false);
     }
 
     /**
@@ -1976,11 +1967,9 @@ public class XWikiDocument implements DocumentModelBridge
      * @deprecated since 2.2M1 use {@link #getXObject(DocumentReference, String, String, boolean)} instead
      */
     @Deprecated
-    public BaseObject getObject(String classname, String key, String value, boolean failover)
+    public BaseObject getObject(String className, String key, String value, boolean failover)
     {
-        // In order to preserve backward compatibility, ensure that if no space is specified then the "XWiki" space
-        // is used. Note that in the new API the current space is used instead.
-        return getXObject(resolveReferenceWithSpecificSpace(classname, "XWiki"), key, value, failover);
+        return getXObject(resolveClassReference(className), key, value, failover);
     }
 
     /**
@@ -2000,9 +1989,9 @@ public class XWikiDocument implements DocumentModelBridge
      * @deprecated since 2.2M1 use {@link #addXObject(DocumentReference, BaseObject)} instead
      */
     @Deprecated
-    public void addObject(String classname, BaseObject object)
+    public void addObject(String className, BaseObject object)
     {
-        addXObject(this.currentMixedDocumentReferenceResolver.resolve(classname), object);
+        addXObject(resolveClassReference(className), object);
     }
 
     /**
@@ -2030,9 +2019,9 @@ public class XWikiDocument implements DocumentModelBridge
      * @deprecated since 2.2M1 use {@link #setXObject(DocumentReference, int, BaseObject)} instead
      */
     @Deprecated
-    public void setObject(String classname, int nb, BaseObject object)
+    public void setObject(String className, int nb, BaseObject object)
     {
-        setXObject(this.currentMixedDocumentReferenceResolver.resolve(classname), nb, object);
+        setXObject(resolveClassReference(className), nb, object);
     }
 
     /**
@@ -2592,8 +2581,7 @@ public class XWikiDocument implements DocumentModelBridge
     @Deprecated
     public String displayForm(String className, String header, String format, boolean linebreak, XWikiContext context)
     {
-        return displayForm(this.currentMixedDocumentReferenceResolver.resolve(className), header, format, linebreak,
-            context);
+        return displayForm(resolveClassReference(className), header, format, linebreak, context);
     }
 
     /**
@@ -2666,7 +2654,7 @@ public class XWikiDocument implements DocumentModelBridge
     @Deprecated
     public String displayForm(String className, XWikiContext context)
     {
-        return displayForm(this.currentMixedDocumentReferenceResolver.resolve(className), context);
+        return displayForm(resolveClassReference(className), context);
     }
 
     public boolean isFromCache()
@@ -4080,7 +4068,7 @@ public class XWikiDocument implements DocumentModelBridge
     @Deprecated
     public void renameProperties(String className, Map<String, String> fieldsToRename)
     {
-        renameProperties(this.currentMixedDocumentReferenceResolver.resolve(className), fieldsToRename);
+        renameProperties(resolveClassReference(className), fieldsToRename);
     }
 
     /**
@@ -4337,7 +4325,7 @@ public class XWikiDocument implements DocumentModelBridge
     @Deprecated
     public void setProperty(String className, String fieldName, BaseProperty value)
     {
-        setProperty(this.currentMixedDocumentReferenceResolver.resolve(className), fieldName, value);
+        setProperty(resolveClassReference(className), fieldName, value);
     }
 
     /**
@@ -4359,7 +4347,7 @@ public class XWikiDocument implements DocumentModelBridge
     @Deprecated
     public int getIntValue(String className, String fieldName)
     {
-        return getIntValue(this.currentMixedDocumentReferenceResolver.resolve(className), fieldName);
+        return getIntValue(resolveClassReference(className), fieldName);
     }
 
     /**
@@ -4381,7 +4369,7 @@ public class XWikiDocument implements DocumentModelBridge
     @Deprecated
     public long getLongValue(String className, String fieldName)
     {
-        return getLongValue(this.currentMixedDocumentReferenceResolver.resolve(className), fieldName);
+        return getLongValue(resolveClassReference(className), fieldName);
     }
 
     /**
@@ -4408,7 +4396,7 @@ public class XWikiDocument implements DocumentModelBridge
     @Deprecated
     public String getStringValue(String className, String fieldName)
     {
-        return getStringValue(this.currentMixedDocumentReferenceResolver.resolve(className), fieldName);
+        return getStringValue(resolveClassReference(className), fieldName);
     }
 
     public int getIntValue(String fieldName)
@@ -4468,7 +4456,7 @@ public class XWikiDocument implements DocumentModelBridge
     @Deprecated
     public void setStringValue(String className, String fieldName, String value)
     {
-        setStringValue(this.currentMixedDocumentReferenceResolver.resolve(className), fieldName, value);
+        setStringValue(resolveClassReference(className), fieldName, value);
     }
 
     /**
@@ -4490,7 +4478,7 @@ public class XWikiDocument implements DocumentModelBridge
     @Deprecated
     public List getListValue(String className, String fieldName)
     {
-        return getListValue(this.currentMixedDocumentReferenceResolver.resolve(className), fieldName); 
+        return getListValue(resolveClassReference(className), fieldName);
     }
 
     public List getListValue(String fieldName)
@@ -4525,7 +4513,7 @@ public class XWikiDocument implements DocumentModelBridge
     @Deprecated
     public void setStringListValue(String className, String fieldName, List value)
     {
-        setStringListValue(this.currentMixedDocumentReferenceResolver.resolve(className), fieldName, value);
+        setStringListValue(resolveClassReference(className), fieldName, value);
     }
 
     /**
@@ -4550,7 +4538,7 @@ public class XWikiDocument implements DocumentModelBridge
     @Deprecated
     public void setDBStringListValue(String className, String fieldName, List value)
     {
-        setDBStringListValue(this.currentMixedDocumentReferenceResolver.resolve(className), fieldName, value);
+        setDBStringListValue(resolveClassReference(className), fieldName, value);
     }
 
     /**
@@ -4575,7 +4563,7 @@ public class XWikiDocument implements DocumentModelBridge
     @Deprecated
     public void setLargeStringValue(String className, String fieldName, String value)
     {
-        setLargeStringValue(this.currentMixedDocumentReferenceResolver.resolve(className), fieldName, value);
+        setLargeStringValue(resolveClassReference(className), fieldName, value);
     }
 
     /**
@@ -4600,7 +4588,7 @@ public class XWikiDocument implements DocumentModelBridge
     @Deprecated
     public void setIntValue(String className, String fieldName, int value)
     {
-        setIntValue(this.currentMixedDocumentReferenceResolver.resolve(className), fieldName, value);
+        setIntValue(resolveClassReference(className), fieldName, value);
     }
 
     /**
@@ -5718,7 +5706,7 @@ public class XWikiDocument implements DocumentModelBridge
     public List<BaseObject> addObjectsFromRequest(String className, String pref, XWikiContext context)
         throws XWikiException
     {
-        return addXObjectsFromRequest(this.currentMixedDocumentReferenceResolver.resolve(className), pref, context);
+        return addXObjectsFromRequest(resolveClassReference(className), pref, context);
     }
 
     /**
@@ -5762,7 +5750,7 @@ public class XWikiDocument implements DocumentModelBridge
     public BaseObject addObjectFromRequest(String className, String prefix, int num, XWikiContext context)
         throws XWikiException
     {
-        return addXObjectFromRequest(this.currentMixedDocumentReferenceResolver.resolve(className), prefix, num,
+        return addXObjectFromRequest(resolveClassReference(className), prefix, num,
             context);
     }
 
@@ -5839,7 +5827,7 @@ public class XWikiDocument implements DocumentModelBridge
     public BaseObject updateObjectFromRequest(String className, String prefix, int num, XWikiContext context)
         throws XWikiException
     {
-        return updateXObjectFromRequest(this.currentMixedDocumentReferenceResolver.resolve(className), prefix, num,
+        return updateXObjectFromRequest(resolveClassReference(className), prefix, num,
             context);
     }
 
@@ -5898,7 +5886,7 @@ public class XWikiDocument implements DocumentModelBridge
     public List<BaseObject> updateObjectsFromRequest(String className, String pref, XWikiContext context)
         throws XWikiException
     {
-        return updateXObjectsFromRequest(this.currentMixedDocumentReferenceResolver.resolve(className), pref, context);
+        return updateXObjectsFromRequest(resolveClassReference(className), pref, context);
     }
 
     public boolean isAdvancedContent()
@@ -6039,7 +6027,7 @@ public class XWikiDocument implements DocumentModelBridge
     @Deprecated
     public boolean removeObjects(String className)
     {
-        return removeXObjects(this.currentMixedDocumentReferenceResolver.resolve(className));
+        return removeXObjects(resolveClassReference(className));
     }
 
     /**
@@ -6453,9 +6441,9 @@ public class XWikiDocument implements DocumentModelBridge
      * @deprecated since 2.2M2 use {@link #newXObject(DocumentReference, XWikiContext)}
      */
     @Deprecated
-    public BaseObject newObject(String classname, XWikiContext context) throws XWikiException
+    public BaseObject newObject(String className, XWikiContext context) throws XWikiException
     {
-        return newXObject(this.currentMixedDocumentReferenceResolver.resolve(classname), context);
+        return newXObject(resolveClassReference(className), context);
     }
 
     /**
@@ -6484,9 +6472,9 @@ public class XWikiDocument implements DocumentModelBridge
      * @deprecated since 2.2M2 use {@link #getXObject(DocumentReference, boolean, XWikiContext)}
      */
     @Deprecated
-    public BaseObject getObject(String classname, boolean create, XWikiContext context)
+    public BaseObject getObject(String className, boolean create, XWikiContext context)
     {
-        return getXObject(this.currentMixedDocumentReferenceResolver.resolve(classname), create, context);
+        return getXObject(resolveClassReference(className), create, context);
     }
 
     public boolean validate(XWikiContext context) throws XWikiException
@@ -6919,13 +6907,18 @@ public class XWikiDocument implements DocumentModelBridge
     }
 
     /**
-     * @return the resolved reference but using the passed space name if none is specified 
+     * Backward-compatibility method to use in order to resolve a class reference passed as a String into a
+     * DocumentReference proper.
+     * 
+     * @return the resolved class reference but using this document's wiki if the passed String doesn't specify a wiki,
+     *         the "XWiki" space if the passed String doesn't specify a space and this document's page if the passed
+     *         String doesn't specify a page.
      */
-    protected DocumentReference resolveReferenceWithSpecificSpace(String documentName, String spaceName)
+    protected DocumentReference resolveClassReference(String documentName)
     {
-        EntityReference defaultSpaceReference = new EntityReference(spaceName, EntityType.SPACE);
-        return resolveReference(documentName, this.currentMixedDocumentReferenceResolver,
-            this.currentReferenceDocumentReferenceResolver.resolve(defaultSpaceReference));
+        DocumentReference defaultReference = new DocumentReference(getDocumentReference().getWikiReference().getName(),
+            "XWiki", getDocumentReference().getName());
+        return resolveReference(documentName, this.currentDocumentReferenceResolver, defaultReference);
     }
 
     private XWikiContext getXWikiContext()

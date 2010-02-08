@@ -1,12 +1,13 @@
 #template("frequentlyUsedDocs.vm")
 #set($isGuest = $context.getUser().equals("XWiki.XWikiGuest"))
+#set($isSuperAdmin = ($context.user == 'XWiki.superadmin'))
 #set($hasEdit = $xwiki.hasAccessLevel("edit"))
 #set($hasAdmin = $xwiki.hasAccessLevel("admin"))
 #set($hasCreateSpace = $xwiki.hasAccessLevel("edit", "${doc.space}${mathtool.random(0, 999)}.DocumentReservedForInternalXWikiUsage"))
 #set($hasCreatePage = $xwiki.hasAccessLevel("edit", "${doc.space}.DocumentReservedForInternalXWikiUsage${mathtool.random(0, 999)}"))
 #set($hasGlobalAdmin = $xwiki.hasAccessLevel("admin", $context.user, "XWiki.XWikiPreferences"))
 #set($hasSpaceAdmin = $xwiki.hasAccessLevel("admin", $context.user, "${doc.space}.WebPreferences"))
-#set($hasWatch = $xwiki.watchlist && !$isGuest && $xwiki.exists('XWiki.WatchListManager'))
+#set($hasWatch = $xwiki.watchlist && !$isGuest && !$isSuperAdmin)
 #set($isReadOnly = $xwiki.isReadOnly())
 #set($spaceViewUrl = $spaceDoc.getURL("view"))
 #set($viewUrl = $doc.getURL("view"))
@@ -17,7 +18,7 @@
 ## - user documents who have their usertype property set to "Advanced"
 ## - guest users who have admin rights (i.e. when the wiki is empty with no rights set)
 ## =====================================================================================
-#if($context.user == "XWiki.superadmin")
+#if($isSuperAdmin)
   #set($isAdvancedUser = true)
 #elseif($isGuest && $hasAdmin)
   #set($isAdvancedUser = true)

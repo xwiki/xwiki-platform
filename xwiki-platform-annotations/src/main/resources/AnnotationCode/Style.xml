@@ -12,8 +12,8 @@
 <customClass></customClass>
 <contentAuthor>XWiki.Admin</contentAuthor>
 <creationDate>1264863273000</creationDate>
-<date>1264984429000</date>
-<contentUpdateDate>1264984429000</contentUpdateDate>
+<date>1265460815000</date>
+<contentUpdateDate>1265460815000</contentUpdateDate>
 <version>1.0</version>
 <title></title>
 <template></template>
@@ -197,7 +197,7 @@
   vertical-align: baseline;
   ##margin: -19px -14px 3px -2px;
   margin: -15px -7px 5px -3px;
-  z-index: 5;
+  z-index: 1;
   position: relative;
   cursor: pointer;
 }
@@ -209,6 +209,7 @@
   width: 280px;
   position: absolute;
   padding: 2px 12px 4px 6px;
+  z-index: 2;
 }
 .annotation-box textarea {
   width: 99%;
@@ -227,8 +228,11 @@
   ##padding: 0 0 0 18px;
   padding: 0 0 0 14px;
 }
+/* Make room for the large note_add icon */
 .annotation-box-create .annotation, .annotation-box-create .buttons {
   padding-left: 18px !important;
+}
+.annotation-box-create .annotation {
   background: transparent #imgURL('note_add') left top no-repeat !important;
 }
 #xwikicontent .annotationAdd {
@@ -257,7 +261,7 @@
 .annotationHeader{
   padding: 2px 0px 6px;
 }
-.annotationHeader:hover {
+#allAnnotations .annotationHeader:hover {
   background-color: $theme.highlightColor;
 }
 .annotationDate {

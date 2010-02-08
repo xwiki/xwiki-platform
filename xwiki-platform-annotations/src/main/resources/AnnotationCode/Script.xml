@@ -12,8 +12,8 @@
 <customClass></customClass>
 <contentAuthor>XWiki.Admin</contentAuthor>
 <creationDate>1264860755000</creationDate>
-<date>1265151002000</date>
-<contentUpdateDate>1265151002000</contentUpdateDate>
+<date>1265465345000</date>
+<contentUpdateDate>1265465345000</contentUpdateDate>
 <version>1.0</version>
 <title></title>
 <template></template>
@@ -101,9 +101,154 @@
 <code>if (typeof (XWiki) == 'undefined') {
     XWiki = new Object();
 }
+ 
+XWiki.Selection = Class.create({
+  container : false,
+  selectionText : false,
+  selectionContext : false,
+  selectionOffset : false,
+  // how many characters to expand left &amp; right on ff
+  step : 5,
+  // how may words to expand left &amp; right on IE
+  wordStep : 1,
+
+  initialize : function (container) {
+    this.container = container;
+    // get the selection from the document and compute its offset if it's not unique
+    if (window.getSelection) { 
+      // FF selection &amp; hopefully other browsers 
+      var initialRange = window.getSelection().getRangeAt(0);
+      // ignore if the selection is in the passed container
+      if (!this.isDescendantOrSelf(container, initialRange.commonAncestorContainer)) {
+        return;
+      }
+      this.selectionText = initialRange.toString();
+    } else {
+      // IE selection
+      if (document.selection.type == 'Text') {
+        var range = document.selection.createRange();
+        // ignore if the selection is in the passed container
+        if (!this.isDescendantOrSelf(container, range.parentElement())) {
+          return;
+        }
+        this.selectionText = range.text;
+      }
+    }
+    if (this.selectionText == '') {
+      this.selectionText = false;
+    }
+  },
+
+  isDescendantOrSelf : function(ancestor, descendant) {
+    return ancestor == descendant || Element.descendantOf(descendant, ancestor); 
+  },
+
+  computeContext : function() {
+    if (window.getSelection) {
+      this.computeContextFF(window.getSelection().getRangeAt(0));
+    } else {
+      this.computeContextIE(document.selection.createRange());
+    }
+  },
+
+  /*
+   * I don't understand what's under here, I will need to review it
+   */
+  getRightDocument : function(node) {
+    var text = '';
+    if (node == this.container) {
+      text = this.getRightDocument(node.parentNode);
+    }
+    for (var current = node.nextSibling; current != null; current = current.nextSibling) {
+      text += current.textContent;
+    }
+    return text;
+  },
+
+  getLeftDocument : function(node) {
+    var text = '';
+    if (node == this.container) {
+      text = this.getLeftDocument(node.parentNode);
+    }
+    parent = node.parentNode;
+    if (parent.childNodes) {
+      for (var i = 0; i &lt; parent.childNodes.length &amp;&amp; parent.childNodes[i] != node; ++i) {
+        text += parent.childNodes[i].textContent;
+      }
+    }
+    return text;
+  },
+
+  computeContextFF : function(range) {
+    var left = this.getLeftDocument(range.startContainer) + range.startContainer.textContent.substring(0, range.startOffset);
+    var subLeft = '';
+    var right = range.endContainer.textContent.substring(range.endOffset, range.endContainer.textContent.length) + this.getRightDocument(range.endContainer);
+    var subRight = '';
+    var offset = 0;
+    var context = range.toString();
+    var leftExpansion = 0;
+    var rightExpansion = 0;
+    while (subRight != right || subLeft != left) {
+      var k = this.container.textContent.indexOf(context);
+      var l = this.container.textContent.indexOf(context, k + 1);
+      if (l == -1) {
+        break;
+      }
+      leftExpansion = Math.min(left.length, leftExpansion + this.step);
+      rightExpansion = Math.min(right.length, rightExpansion + this.step);
+      subRight = right.substring(0, rightExpansion);
+      subLeft = left.substring(left.length - leftExpansion, left.length);
+    }
+    this.selectionContext = subLeft + this.selectionText + subRight;
+    this.selectionOffset = Math.max(subLeft.length, 0);
+  },
+  
+  computeContextIE : function(range) {
+    var containerInnerText = this.container.innerText;
+    // while the selection appears more than once, expand the selection to left and right with one or more words and get its text
+    var leftOffset = 0;
+    // if we managed to expand anything (to prevent a loop where it's not unique but we can't expand)
+    var expanded = true;
+    while(!this.isUnique(containerInnerText, range.text) &amp;&amp; expanded) {
+      var expanded = false;
+      // expand left
+      var initialLength = range.text.length;
+      range.moveStart('word', -1);
+      if (!this.isDescendantOrSelf(this.container, range.parentElement())) {
+        // move back, cannot move to the left, cross fingers that this works the same in both directions
+        range.moveStart('word', 1);
+      } else {
+        //update the offset with the word we just added
+        leftOffset += range.text.length - initialLength;
+        expanded = true;
+      }
+
+      // expand right
+      range.moveEnd('word', 1);
+      if (!this.isDescendantOrSelf(this.container, range.parentElement())) {
+        // move back, cannot move to right, cross fingers that this works the same in both directions
+        range.moveEnd('word', -1);
+      } else {
+        expanded = true;
+      }
+    }
+    // is unique or we couldn't expand anymore, this is it, send it
+    this.selectionContext = range.text;
+    this.selectionOffset = leftOffset;
+  },
+
+  isUnique : function(subject, pattern) {
+    var index1 = subject.indexOf(pattern);
+    if (index1 &gt;= 0) {
+      return subject.indexOf(pattern, index1 + 1) &lt; 0;
+    }
+    // assume (ass of u and me) that no encounter means unique
+    return true;
+  }
+});
 
 XWiki.Annotation = Class.create({
-  // tab name of the anntoatations tab
+  // tab name of the annotations tab
   annTabname : 'Annotations',
   // whether current displayed doc is the rendered annotated document
   fetchedAnnotations : false,
@@ -116,7 +261,9 @@ XWiki.Annotation = Class.create({
     this.hookTab();
 
     // add the delete listeners to the annotations in the annotations tab when the extra panels are loaded
-    document.observe('xwiki:docextra:loaded', this.addDeleteListeners);
+    document.observe('xwiki:docextra:loaded', this.addDeleteListeners.bindAsEventListener(this));
+    // register the key shortcuts for adding an annotation
+    this.registerAddAnnotationShortcut();
   },
 
   hookMenuButton : function() {
@@ -242,9 +389,10 @@ XWiki.Annotation = Class.create({
   
   // check if I need this parameter or not
   toggleAnnotations : function(visible) {
-    $$('#xwikicontent .annotation').invoke('toggleClassName', 'annotation-highlight');
+    // don't standard toggle because we want to ensure it matches visible
+    $$('#xwikicontent .annotation').invoke(visible ? 'addClassName' : 'removeClassName', 'annotation-highlight');
     //and hide all annotation markers
-    $$('#xwikicontent .annotation-marker').invoke('toggleClassName', 'hidden');
+    $$('#xwikicontent .annotation-marker').invoke(visible ? 'removeClassName' : 'addClassName', 'hidden');
   },
 
   fetchAnnotations : function(andShow) {
@@ -258,19 +406,12 @@ XWiki.Annotation = Class.create({
 
       onSuccess: function(response) {
         // TODO: check this response to see what's inside
-        // TODO: store the annotated element in a different way, to have it the same in the instance (when it's an object prop for example)
-        $('xwikicontent').update(response.responseJSON.content);
-        // and display the annotations
         // hide message at page bottom
         this._x_notification.hide();
+        // load the received annotated content in the page, along with annotations and annotations markers
+        this.loadAnnotatedContent(response.responseJSON, andShow);
         // store the state of the annotations
         this.fetchedAnnotations = true;
-        if (response.responseJSON.annotations) {
-          this.addAnnotationMarkers(response.responseJSON.annotations);
-        }
-        if (andShow) {
-          this.toggleAnnotations(true);
-        }
         this.displayAnnotationsCheckbox.checked = true;
       }.bind(this),
 
@@ -295,6 +436,27 @@ XWiki.Annotation = Class.create({
     });
   },
 
+  loadAnnotatedContent : function(annotatedContent, andShow, navigateToPane) {
+    // TODO: store the annotated element in a different way, to have it the same in the instance (when it's an object prop for example)
+    $('xwikicontent').update(annotatedContent.content);
+    if (annotatedContent.annotations) {
+      this.addAnnotationMarkers(annotatedContent.annotations);
+    }
+    if (andShow) {
+      this.toggleAnnotations(true);
+    }
+
+    // and also handle the tab 'downstairs' when the annotations list changes
+    var annotationsPane = $( this.annTabname + 'pane');
+    // reset to initial state
+    annotationsPane.update('');
+    annotationsPane.addClassName('empty');
+    if (!annotationsPane.hasClassName('hidden')) {
+      // reload
+      XWiki.displayDocExtra(this.annTabname, 'annotationsinline.vm', navigateToPane)
+    }
+  },
+
   addDeleteListeners : function() {
     $$(".annotation a.delete").each(function(item) {
       item.observe('click', function(event) {
@@ -311,14 +473,9 @@ XWiki.Annotation = Class.create({
                 // Disable the button, to avoid a cascade of clicks from impatient users
                 item.disabled = true;
               },
-              onSuccess : function() {
-                // Remove the corresponding HTML element from the UI and update the comment count
-                var annotation = item.up('.annotation');
-                // If the form is inside this comment's reply thread, move it back to the bottom.
-                if (this.form &amp;&amp; this.form.descendantOf(comment.next('.commentthread'))) {
-                  this.resetForm();
-                }
-                annotation.remove();
+              onSuccess : function(response) {
+                // reload the received annotated content, with scroll to tab
+                this.loadAnnotatedContent(response.responseJSON.annotatedContent, this.displayAnnotationsCheckbox.checked, true);
               }.bind(this),
               onComplete : function() {
                 // In the end: re-enable the button
@@ -327,10 +484,10 @@ XWiki.Annotation = Class.create({
             },
             /* Interaction parameters */
             {
-               confirmationText: "$msg.get('annotations.delete.confirm')",
-               progressMessageText : "$msg.get('annotations.delete.inProgress')",
-               successMessageText : "$msg.get('annotations.delete.done')",
-               failureMessageText : "$msg.get('annotations.delete.failed')"
+               confirmationText: "$msg.get('annotations.action.delete.confirm')",
+               progressMessageText : "$msg.get('annotations.action.delete.inProgress')",
+               successMessageText : "$msg.get('annotations.action.delete.done')",
+               failureMessageText : "$msg.get('annotations.action.delete.failed')"
             }
           );
         }
@@ -349,6 +506,135 @@ XWiki.Annotation = Class.create({
       // create the annotation markers hidden by default, since annotations are added on the document hidden by default
       var markerSpan = new Element('span', {'id': 'ID' + item.annotationId, 'class' : 'hidden annotation-marker ' + item.state});
       lastSpan.insert({after: markerSpan});
+    });
+  }, 
+
+  registerAddAnnotationShortcut : function() {
+    var shortcuts = ['Ctrl+M', 'Meta+M', 'Ctrl+I', 'Meta+I'];
+    var method = this.addAnnotation;
+    for (var i = 0; i &lt; shortcuts.size(); ++i) {
+      if (Prototype.Browser.IE || Prototype.Browser.WebKit) {
+        shortcut.add(shortcuts[i], method.bindAsEventListener(this), {type: 'keyup'});
+      } else {
+        shortcut.add(shortcuts[i], method.bindAsEventListener(this), {type: 'keypress'});
+      }
+    }
+  },
+
+  /**
+   * Execute the add annotation shortcut: get selection, compute context, open dialog, register listeners.
+   */
+  addAnnotation : function() {
+    // create a selection object on the xwiki content container
+    var selectionObj = new XWiki.Selection($('xwikicontent'));
+    var selectionText = selectionObj.selectionText;
+    if (!selectionText) {
+      // show an 'invalid selection message'
+      new XWiki.widgets.Notification("$msg.get('annotations.action.create.selection.invalid')", "error");
+    } else {
+      selectionObj.computeContext();
+      // fetch the creation for this annotation and display it at the position of the selection
+      new Ajax.Request('$xwiki.getURL("AnnotationCode.CreateForm")', {
+        parameters: {
+          'xpage' : 'plain',
+          'selection' : encodeURIComponent(selectionText),
+          'selectionContext' : encodeURIComponent(selectionObj.selectionContext),
+          'selectionOffset' : selectionObj.selectionOffset,
+          'space' : encodeURIComponent(XWiki.currentSpace),
+          'page' : encodeURIComponent($$('meta[name=page]')[0].content)
+        },
+        onCreate: function() {
+          // show nice loading message at page bottom
+          this._x_notification = new XWiki.widgets.Notification("$msg.get('annotations.action.create.form.loading')", "inprogress");
+        }.bind(this),
+
+        onSuccess: function(response) {
+          // display the annotation creation form
+          this.displayAnnotationCreationForm(response.responseText);
+          // and add the button observers
+          this.createPanel.down('input[type=submit]').observe('click', this.onAnnotationAdd.bindAsEventListener(this));
+          this.createPanel.down('input[type=reset]').observe('click', this.hideAnnotationCreationForm.bindAsEventListener(this));
+          // hide the notification message
+          this._x_notification.hide();
+        }.bind(this),
+   
+        onFailure: function(response) {
+          var failureReason = response.statusText;
+          if (response.statusText == '' /* No response */ || response.status == 12031 /* In IE */) {
+            failureReason = 'Server not responding';
+          }
+          // show the error message at the bottom
+          this._x_notification.replace(new XWiki.widgets.Notification("$msg.get('annotations.action.create.form.loaderror')" + failureReason, "error"));
+        }.bind(this),
+
+        on0: function (response) {
+          response.request.options.onFailure(response);
+        }.bind(this)
+      });
+    }
+  }, 
+
+  displayAnnotationCreationForm : function(panelContent) {
+    // create an element with the form
+    this.createPanel = new Element('div', {'style' : 'position: absolute;'});
+    // make it hidden for the moment
+    this.createPanel.toggleClassName('hidden');
+    if (window.getSelection) {
+      // ff and other browsers:
+      // create an annotation highlight span around this content
+      var highlightSpan = new Element('span', {'class': 'annotation annotation-highlight', 'id' : 'selection-highlight'});
+      // surround the selection with the highlighted span
+      var range = window.getSelection().getRangeAt(0);
+      // TODO: this doesn't work if content of selection is not inline (or anything else but text)
+      range.surroundContents(highlightSpan);
+    } else {
+      // IE
+      // TODO: implement me
+    }
+    highlightSpan.insert({after : this.createPanel});
+    // put the content in
+    this.createPanel.update(panelContent);
+    // set the position
+    // TODO: investigate how this positioning works on IE
+    this.createPanel.style.left = highlightSpan.viewportOffset().left + 'px';
+    // make it visible
+    this.createPanel.toggleClassName('hidden');
+    // set the focus in the first element of type input
+    this.createPanel.select('form').first().focusFirstElement();
+    // TODO: make it listen to escape and close it if it's the case
+  },
+
+  hideAnnotationCreationForm : function() {
+    // TODO: rollback selection coloring
+    // make the dialog go away
+    this.createPanel.remove();
+  }, 
+
+  onAnnotationAdd : function(event) {
+    // don't submit
+    event.stop();
+    var form = this.createPanel.down('form');
+    var formData = new Hash(form.serialize(true));
+    // aaand submit
+    new Ajax.Request(form.action, {
+      method : form.method,
+      parameters : formData,
+      onCreate : function() {
+        form._x_notification = new XWiki.widgets.Notification("$msg.get("annotations.action.create.loading")", "inprogress");
+      },
+      onSuccess : function (response) {
+        // TODO: check response code
+        this.loadAnnotatedContent(response.responseJSON.annotatedContent, this.displayAnnotationsCheckbox.checked);
+        this.fetchedAnnotations = true;
+        form._x_notification.replace(new XWiki.widgets.Notification("$msg.get('annotations.action.create.success')", "done"));
+      }.bind(this),
+      onFailure : function(response) {
+        this.hideAnnotationCreationForm();
+        this._x_notification.replace(new XWiki.widgets.Notification("$msg.get('annotations.action.create.loaderror')" + failureReason, "error"));
+      }.bind(this),
+      on0 : function (response) {
+        response.request.options.onFailure(response);
+      }
     });
   }
 });

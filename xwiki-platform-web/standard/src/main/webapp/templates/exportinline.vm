@@ -2,19 +2,19 @@
 <form action="" method="post">
 <div>
 <dl>
-<dt><label for="name"><i>$msg.get('export_packagename')</i></label></dt>
+<dt><label for="name">$msg.get('export_packagename')</label></dt>
   <dd><input type="text" name="name" id="name" value=""/></dd>
-<dt><label for="description"><i>$msg.get('export_description')</i></label></dt>
+<dt><label for="description">$msg.get('export_description')</label></dt>
   <dd><textarea name="description" id="description" rows="6" cols="40"></textarea></dd>
-<dt><label for="licence"><i>$msg.get('export_licence')</i></label></dt>
+<dt><label for="licence">$msg.get('export_licence')</label></dt>
   <dd><input type="text" name="licence" id="licence" value=""/></dd>
-<dt><label for="author"><i>$msg.get('export_author')</i></label></dt>
+<dt><label for="author">$msg.get('export_author')</label></dt>
   <dd><input type="text" name="author" id="author" value="$context.user"/></dd>
-<dt><label for="version"><i>$msg.get('export_version')</i></label></dt>
+<dt><label for="version">$msg.get('export_version')</label></dt>
   <dd><input type="text" name="version" id="version" value=""/></dd>
 </dl>
-<label><input type="checkbox" name="history" id="history" value="true"/><em>$msg.get('export_addhistory')</em></label><br/>
-<label><input type="checkbox" name="backup" id="backup" value="true"/><em>$msg.get('export_backuppack') ($msg.get('export_authorpreserved'))</em></label><br/>
+<input type="checkbox" name="history" id="history" value="true"/><label for="history">$msg.get('export_addhistory')</label><br/>
+<input type="checkbox" name="backup" id="backup" value="true"/><label for="backup">$msg.get('export_backuppack') ($msg.get('export_authorpreserved'))</label><br/>
 <div class="floatcontainer">
 <span class="buttonwrapper"><input type="submit" value="$msg.get('export')" class="button"/></span>
 </div>

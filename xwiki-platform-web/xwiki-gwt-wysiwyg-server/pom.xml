@@ -28,10 +28,10 @@
     <artifactId>xwiki-web</artifactId>
     <version>2.3-SNAPSHOT</version>
   </parent>
-  <artifactId>xwiki-web-wysiwyg</artifactId>
-  <name>XWiki Platform - Web - WYSIWYG</name>
+  <artifactId>xwiki-web-gwt-wysiwyg-server</artifactId>
+  <name>XWiki Platform - Web - GWT - WYSIWYG Editor - Server Side</name>
   <packaging>war</packaging>
-  <description>XWiki's GWT WYSIWYG editor</description>
+  <description>The server side of XWiki's WYSIWYG editor.</description>
   <properties>
     <gwt.style>OBF</gwt.style>
     <gwt.output.directory>${project.build.directory}/${project.build.finalName}/resources/js/xwiki/wysiwyg</gwt.output.directory>

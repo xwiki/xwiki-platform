@@ -145,7 +145,7 @@
 ##
 ## Watch menu
 ##
-#if ($xwiki.watchlist && $context.user != 'XWiki.XWikiGuest' && !$doc.isNew() && $xwiki.exists('XWiki.WatchListManager'))
+#if ($hasWatch && !$doc.isNew())
 <script type="text/javascript">
 //<![CDATA[
 function watchlist(action)

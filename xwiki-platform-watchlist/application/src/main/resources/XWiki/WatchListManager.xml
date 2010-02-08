@@ -23,6 +23,115 @@
 <minorEdit>false</minorEdit>
 <syntaxId>xwiki/1.0</syntaxId>
 <hidden>false</hidden>
+<object>
+<class>
+<name>XWiki.StyleSheetExtension</name>
+<customClass></customClass>
+<customMapping></customMapping>
+<defaultViewSheet></defaultViewSheet>
+<defaultEditSheet></defaultEditSheet>
+<defaultWeb></defaultWeb>
+<nameField></nameField>
+<validationScript></validationScript>
+<cache>
+<cache>0</cache>
+<displayType>select</displayType>
+<multiSelect>0</multiSelect>
+<name>cache</name>
+<number>5</number>
+<prettyName>Caching policy</prettyName>
+<relationalStorage>0</relationalStorage>
+<separator> </separator>
+<separators> ,|</separators>
+<size>1</size>
+<unmodifiable>0</unmodifiable>
+<values>long|short|default|forbid</values>
+<classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+</cache>
+<code>
+<name>code</name>
+<number>2</number>
+<prettyName>Code</prettyName>
+<rows>20</rows>
+<size>50</size>
+<unmodifiable>0</unmodifiable>
+<classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+</code>
+<name>
+<name>name</name>
+<number>1</number>
+<prettyName>Name</prettyName>
+<size>30</size>
+<unmodifiable>0</unmodifiable>
+<classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+</name>
+<parse>
+<displayFormType>select</displayFormType>
+<displayType>yesno</displayType>
+<name>parse</name>
+<number>4</number>
+<prettyName>Parse content</prettyName>
+<unmodifiable>0</unmodifiable>
+<classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+</parse>
+<use>
+<cache>0</cache>
+<displayType>select</displayType>
+<multiSelect>0</multiSelect>
+<name>use</name>
+<number>3</number>
+<prettyName>Use this extension</prettyName>
+<relationalStorage>0</relationalStorage>
+<separator> </separator>
+<separators> ,|</separators>
+<size>1</size>
+<unmodifiable>0</unmodifiable>
+<values>currentPage=Always on this page|onDemand=On demand|always=Always on this wiki</values>
+<classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+</use>
+</class>
+<name>XWiki.WatchListManager</name>
+<number>0</number>
+<className>XWiki.StyleSheetExtension</className>
+<guid>0523d2b3-ee87-43c2-9b01-ee77261afa05</guid>
+<property>
+<cache>long</cache>
+</property>
+<property>
+<code>.watchListNotifications {
+  width:48%;
+  float:left;
+}
+
+.watchListRss {
+  width:48%;
+  float:right;
+}
+
+.watchListRssInfo {
+  padding-left:18px;
+  background:url('$xwiki.getSkinFile('icons/xwiki/rss-medium.png')') left no-repeat;
+  font-weight:bold;
+}
+
+.watchListSpaceCol {
+  width:140px;
+}
+
+.watchListActionsCol {
+  width:180px;
+}</code>
+</property>
+<property>
+<name>WatchListManager</name>
+</property>
+<property>
+<parse>1</parse>
+</property>
+<property>
+<use>onDemand</use>
+</property>
+</object>
 <content>###
 ### User's watchlist
 ###
@@ -41,6 +150,7 @@
   #set ($isMyProfile = true)
 #end
 #if ($profileDoc)
+$xwiki.ssx.use('XWiki.WatchListManager')##
 1 $msg.get("watchlist.title", [$xwiki.getUserName($profileDoc.fullName, false)])
 #if ($request.removedocument || $request.removespace)
   #set ($el = "")
@@ -76,7 +186,7 @@
     ## Notifications
     ##
     &lt;div class="padded"&gt;
-        &lt;div style="width:48%;float:left;"&gt;
+        &lt;div class="watchListNotifications"&gt;
         &lt;h2&gt;$msg.get("watchlist.staytuned.email")&lt;/h2&gt;
         &lt;p&gt;
         $msg.get("watchlist.staytuned.email.info")
@@ -90,11 +200,11 @@
           &lt;/fieldset&gt;
         &lt;/form&gt;
         &lt;/div&gt;
-        &lt;div style="width:48%;float:right;"&gt;
+        &lt;div class="watchListRss"&gt;
         &lt;h2&gt;$msg.get("watchlist.staytuned.rss")&lt;/h2&gt;
-        &lt;a href="$xwiki.getURL('XWiki.WatchListRss', 'view', 'xpage=plain&amp;amp;outputSyntax=plain')" style="padding-left:18px; background:url('$xwiki.getSkinFile('icons/xwiki/rss-medium.png')') left no-repeat;font-weight:bold;"&gt;$msg.get('watchlist.staytuned.rss.info')&lt;/a&gt;
+        &lt;a href="$xwiki.getURL('XWiki.WatchListRss', 'view', 'xpage=plain&amp;amp;outputSyntax=plain')" class="watchListRssInfo"&gt;$msg.get('watchlist.staytuned.rss.info')&lt;/a&gt;
         &lt;/div&gt;
-        &lt;div style="clear:both;"&gt;&lt;/div&gt;
+        &lt;div class="clearfloats"&gt;&lt;/div&gt;
     &lt;/div&gt;
     ##
     ## Watched elements
@@ -107,9 +217,9 @@
         &lt;h2&gt;$msg.get("watchlist.pages")&lt;/h2&gt;
         &lt;table id="searchTable1" class="grid sortable filterable doOddEven"&gt;
         &lt;tr class="sortHeader"&gt;
-            &lt;th&gt;$msg.get("watchlist.page")&lt;/th&gt;
-            &lt;th style="width:140px" class="selectFilter"&gt;$msg.get("watchlist.space")&lt;/th&gt;
-            &lt;th style="width:180px" class="unsortable noFilter"&gt;$msg.get("watchlist.actions")&lt;/th&gt;
+            &lt;th scope="col" class="watchListPageCol"&gt;$msg.get("watchlist.page")&lt;/th&gt;
+            &lt;th scope="col" class="selectFilter watchListSpaceCol"&gt;$msg.get("watchlist.space")&lt;/th&gt;
+            &lt;th scope="col" class=" watchListActionsColunsortable noFilter"&gt;$msg.get("watchlist.actions")&lt;/th&gt;
         &lt;/tr&gt;
         #set ($wlist = $xwiki.watchlist.getWatchedDocuments())
         #foreach($item in $wlist)
@@ -117,7 +227,7 @@
             &lt;tr&gt;
                 #set ($idoc = $xwiki.getDocument($item))
                 #if (!$idoc.isNew())
-                &lt;td&gt;&lt;a href="$idoc.getURL()"&gt;$idoc.getDisplayTitle()&lt;/a&gt;&lt;/td&gt;
+                &lt;td&gt;&lt;a href="$idoc.getURL()"&gt;$idoc.getDisplayTitle().replaceAll("[^\\.,:]+:", "")&lt;/a&gt;&lt;/td&gt;
                 &lt;td&gt;$idoc.space&lt;/td&gt;
                 &lt;td&gt;&lt;a href="$doc.getURL("view", "removedocument=${item}")" title="$msg.get("watchlist.delete.tooltip")"&gt;$msg.get("watchlist.delete")&lt;/a&gt;&lt;/td&gt;
                 #else
@@ -137,8 +247,8 @@
         &lt;h2&gt;$msg.get("watchlist.spaces")&lt;/h2&gt;
         &lt;table id="searchTable2" class="grid sortable doOddEven"&gt;
         &lt;tr class=""&gt;
-            &lt;th&gt;$msg.get("watchlist.space")&lt;/th&gt;
-            &lt;th style="width:180px" class="unsortable noFilter"&gt;$msg.get("watchlist.actions")&lt;/th&gt;
+            &lt;th scope="col" class="watchListSpaceCol"&gt;$msg.get("watchlist.space")&lt;/th&gt;
+            &lt;th scope="col" class="watchListActionsCol unsortable noFilter"&gt;$msg.get("watchlist.actions")&lt;/th&gt;
         &lt;/tr&gt;
         #set ($wlist = $xwiki.watchlist.getWatchedSpaces())
         #foreach($item in $wlist)

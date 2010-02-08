@@ -20,7 +20,8 @@
  *
 -->
 
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <parent>
     <groupId>com.xpn.xwiki.platform</groupId>
@@ -57,8 +58,10 @@
     </dependency>
     <!-- XWiki dependencies -->
     <dependency>
-      <!-- This dependency is required only for its annotations. GWT-RPC services are implemented as components in XWiki
-      and for this reason service interfaces have to be annotated as component roles. -->
+      <!--
+        This dependency is required only for its annotations. GWT-RPC services are implemented as components in XWiki
+        and for this reason service interfaces have to be annotated as component roles.
+      -->
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-core-component-api</artifactId>
       <version>${pom.version}</version>
@@ -121,6 +124,29 @@
           -->
           <skip>true</skip>
         </configuration>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-jar-plugin</artifactId>
+        <executions>
+          <execution>
+            <!-- Build the jar that needs to be shared with the server side. -->
+            <id>build-shared-jar</id>
+            <configuration>
+              <classifier>shared</classifier>
+              <includes>
+                <!--
+                  We need to share only the classes that are used on the server (e.g. GWT-RPC service interfaces and
+                  GWT-RPC parameter types)
+                -->
+                <include>**/*.class</include>
+              </includes>
+            </configuration>
+            <goals>
+              <goal>jar</goal>
+            </goals>
+          </execution>
+        </executions>
       </plugin>
       <plugin>
         <!-- Apply the Checkstyle configurations defined in the top level pom.xml file. -->

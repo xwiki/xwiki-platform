@@ -21,13 +21,15 @@
 ##
 ##
 #if (!$isGuest)
-#if ($context.user == 'XWiki.superadmin' || !$hasWatch)
-  #xwikitopmenuentry('#' $!msg.get('superadmin') 'tmUser')
+#if ($isSuperAdmin)
+  #xwikitopmenuentry('#' $!msg.get('superadmin') 'tmUser' 'hasIcon')
 #else
   #xwikitopmenuentrystart($xwiki.getURL($context.user, 'view') $!xwiki.getUserName($context.user, false) 'tmUser' 'hasIcon')
   #submenuitem($xwiki.getURL($context.user, 'view') $msg.get('core.menu.profile') 'tmProfile', '')
   #submenuitem($xwiki.getURL($context.user, 'view', 'category=preferences') $msg.get('core.menu.userPreferences') 'tmUserPreferences', '')
-  #submenuitem($xwiki.getURL($context.user, 'view', 'category=watchlist') $msg.get('core.menu.watchlist.management') 'tmWatchlistManager', '')
+  #if($hasWatch)
+    #submenuitem($xwiki.getURL($context.user, 'view', 'category=watchlist') $msg.get('core.menu.watchlist.management') 'tmWatchlistManager', '')
+  #end
   #xwikitopmenuentryend()
 #end
 #end

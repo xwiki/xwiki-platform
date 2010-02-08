@@ -3,7 +3,7 @@
 ##
 ## Watch menu
 ##
-#if ($xwiki.watchlist && !$isGuest && !$doc.isNew() && $xwiki.exists('XWiki.WatchListManager'))
+#if ($hasWatch && !$doc.isNew())
   #set ($isDocWatched = $xwiki.watchlist.isDocumentWatched())
   #if ($isDocWatched)
     #xwikitopmenuentry("$doc.getURL('view', 'xpage=watch&amp;do=removedocument')&amp;xredirect=$doc.getURL()" $msg.get('core.menu.watchlist.remove.page') 'tmUnwatchDocument' 'hasIcon')

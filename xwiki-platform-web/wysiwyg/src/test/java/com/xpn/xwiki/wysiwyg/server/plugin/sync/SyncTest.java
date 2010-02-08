@@ -19,7 +19,8 @@
  */
 package com.xpn.xwiki.wysiwyg.server.plugin.sync;
 
-import org.jmock.cglib.MockObjectTestCase;
+import junit.framework.TestCase;
+
 import org.xwiki.gwt.wysiwyg.client.diff.Diff;
 import org.xwiki.gwt.wysiwyg.client.diff.Revision;
 import org.xwiki.gwt.wysiwyg.client.diff.ToString;
@@ -33,22 +34,12 @@ import com.xpn.xwiki.wysiwyg.server.plugin.sync.internal.DefaultSyncEngine;
  * 
  * @version $Id$
  */
-public class SyncTest extends MockObjectTestCase
+public class SyncTest extends TestCase
 {
     /**
      * The synchronization engine.
      */
     private SyncEngine syncEngine;
-
-    /**
-     * {@inheritDoc}
-     * 
-     * @see MockObjectTestCase#tearDown()
-     */
-    protected void tearDown() throws Exception
-    {
-        super.tearDown();
-    }
 
     /**
      * {@inheritDoc}

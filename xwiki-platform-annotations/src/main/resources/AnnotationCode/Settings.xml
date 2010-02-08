@@ -24,10 +24,13 @@
 <syntaxId>xwiki/2.0</syntaxId>
 <hidden>false</hidden>
 <content>{{velocity}}
-{{html}}
+{{html clean="false"}}
 &lt;div class="annotationsettings"&gt;
 &lt;input type="checkbox" name="annotationsdisplay" id="annotationsdisplay" /&gt;
 &lt;label for="annotationsdisplay"&gt;$msg.get('annotations.settings.display')&lt;/label&gt;
+{{/html}}
+{{info}}To annotate a piece of text, select it and hit **Ctrl + M (Meta + M)** or **Ctrl + I (Meta + I)**.{{/info}}
+{{html clean="false"}}
 &lt;/div&gt;
 {{/html}}
 {{/velocity}}</content>

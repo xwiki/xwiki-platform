@@ -28,7 +28,7 @@
 #includeTopic('AnnotationCode.Macros')
 ## clean=false because otherwise the html macro fails on blockquote
   &lt;div id="allAnnotations"&gt;
-  #foreach($ann in $annotations.getAnnotations($doc.fullName))
+  #foreach($ann in $annotations.getAnnotations($doc.prefixedFullName))
     #displayAnnotation($ann, 'list')
   #end
   &lt;/div&gt;

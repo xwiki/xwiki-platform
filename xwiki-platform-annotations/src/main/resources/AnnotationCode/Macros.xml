@@ -44,7 +44,7 @@
  *#
 #macro(displayCreateBox $space $page $annData)
 &lt;div class="annotation-box annotation-box-create"&gt;
-  &lt;form method="POST" action="/xwiki/rest/wikis/${context.wiki}/spaces/${space}/pages/${page}/annotations?media=json"&gt;
+  &lt;form method="POST" action="/xwiki/rest/wikis/${context.database}/spaces/${space}/pages/${page}/annotations?media=json"&gt;
     &lt;div class="hidden"&gt;
       #foreach($field in $annData.keySet())
          &lt;input type="hidden" name="${field}" value="$!{annData.get(${field})}"/&gt;

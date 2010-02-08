@@ -146,9 +146,14 @@
 			<locationURI>XWIKI_SKINS/toucan/src/main/resources/toucan</locationURI>
 		</link>
 		<link>
-			<name>src/main/java/com/xpn/xwiki/wysiwyg</name>
+			<name>src/main/java/com/xpn/xwiki/wysiwyg/server</name>
 			<type>2</type>
-			<locationURI>XWIKI_WEB/wysiwyg/src/main/java/com/xpn/xwiki/wysiwyg</locationURI>
+			<locationURI>XWIKI_WEB/xwiki-gwt-wysiwyg-server/src/main/java/com/xpn/xwiki/wysiwyg/server</locationURI>
+		</link>
+		<link>
+			<name>src/main/java/org/xwiki/gwt/wysiwyg/client</name>
+			<type>2</type>
+			<locationURI>XWIKI_WEB/xwiki-gwt-wysiwyg-client/src/main/java/org/xwiki/gwt/wysiwyg/client</locationURI>
 		</link>
 	</linkedResources>
 </projectDescription>

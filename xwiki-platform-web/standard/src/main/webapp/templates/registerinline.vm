@@ -64,5 +64,6 @@
   #end
 #else
   ## An override exists in the wiki, display it
-  $xwiki.getDocument('XWiki.Registration').getTranslatedDocument().getRenderedContent()
+  #set($doc = $xwiki.getDocument('XWiki.Registration'))
+  $xwiki.includeTopic('XWiki.Registration', false)
 #end

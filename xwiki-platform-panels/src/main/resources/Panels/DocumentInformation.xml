@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="ISO-8859-1"?>
+<?xml version="1.0" encoding="UTF-8"?>
 
 <xwikidoc>
 <web>Panels</web>
@@ -12,8 +12,8 @@
 <customClass></customClass>
 <contentAuthor>XWiki.Admin</contentAuthor>
 <creationDate>1154090261000</creationDate>
-<date>1243608949000</date>
-<contentUpdateDate>1243608949000</contentUpdateDate>
+<date>1265716070000</date>
+<contentUpdateDate>1265716070000</contentUpdateDate>
 <version>1.1</version>
 <title>Document Information</title>
 <template></template>
@@ -23,139 +23,6 @@
 <minorEdit>false</minorEdit>
 <syntaxId>xwiki/1.0</syntaxId>
 <hidden>false</hidden>
-<object>
-<class>
-<name>Panels.PanelClass</name>
-<customClass></customClass>
-<customMapping></customMapping>
-<defaultViewSheet></defaultViewSheet>
-<defaultEditSheet></defaultEditSheet>
-<defaultWeb></defaultWeb>
-<nameField></nameField>
-<validationScript></validationScript>
-<category>
-<cache>0</cache>
-<displayType>select</displayType>
-<multiSelect>0</multiSelect>
-<name>category</name>
-<number>5</number>
-<prettyName>Category</prettyName>
-<relationalStorage>0</relationalStorage>
-<separator> </separator>
-<separators> ,|</separators>
-<size>1</size>
-<unmodifiable>0</unmodifiable>
-<values>Information|Navigation|Tools|Administration|Other</values>
-<classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
-</category>
-<content>
-<editor>Text</editor>
-<name>content</name>
-<number>4</number>
-<prettyName>Content</prettyName>
-<rows>25</rows>
-<size>60</size>
-<unmodifiable>0</unmodifiable>
-<classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
-</content>
-<description>
-<editor>Text</editor>
-<name>description</name>
-<number>3</number>
-<prettyName>Description</prettyName>
-<rows>5</rows>
-<size>40</size>
-<unmodifiable>0</unmodifiable>
-<classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
-</description>
-<name>
-<name>name</name>
-<number>1</number>
-<prettyName>Name</prettyName>
-<size>40</size>
-<unmodifiable>0</unmodifiable>
-<classType>com.xpn.xwiki.objects.classes.StringClass</classType>
-</name>
-<type>
-<cache>0</cache>
-<displayType>select</displayType>
-<multiSelect>0</multiSelect>
-<name>type</name>
-<number>2</number>
-<prettyName>Panel type</prettyName>
-<relationalStorage>0</relationalStorage>
-<separator> </separator>
-<separators> ,|</separators>
-<size>1</size>
-<unmodifiable>0</unmodifiable>
-<values>view|edit</values>
-<classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
-</type>
-</class>
-<name>Panels.DocumentInformation</name>
-<number>0</number>
-<className>Panels.PanelClass</className>
-<guid>0fc28595-9c62-4ef9-b19b-a937f795efd8</guid>
-<property>
-<category>Tools</category>
-</property>
-<property>
-<content>$xwiki.ssx.use('Panels.DocumentInformation')##
-#set($pages = $tdoc.includedPages)
-#largepanelheader($msg.get("panels.documentInformation.title"))
-&lt;dl&gt;
-&lt;dt&gt;&lt;label for="xwikidocparentinput2"&gt;$msg.get("panels.documentInformation.parent")&lt;/label&gt;&lt;/dt&gt; &lt;dd&gt;&lt;input type="text" id="xwikidocparentinput2" name="parent" value="$!tdoc.parent" size="30"/&gt;&lt;/dd&gt;
-#if(($tdoc.language=="")&amp;&amp;($xwiki.isMultiLingual()))
-&lt;dt&gt;&lt;label for="xwikidoclanguageinput2"&gt;$msg.get("panels.documentInformation.defaultLanguage")&lt;/label&gt;&lt;/dt&gt; &lt;dd&gt;&lt;input type="text" id="xwikidoclanguageinput2" name="defaultLanguage" value="$!tdoc.defaultLanguage" size="30"/&gt;&lt;/dd&gt;
-#end
-##--------------------------------------------------------------------------
-## Display wiki syntax combo box if there's more than one configured syntax.
-##--------------------------------------------------------------------------
-$xwiki.jsx.use($paneldoc.fullName)##
-#if($xwiki.getConfiguredSyntaxes().size() &gt; 1)
-&lt;dt&gt;&lt;label for="xwikidocsyntaxinput2"&gt;Page Syntax&lt;/label&gt;&lt;/dt&gt;
-&lt;dd&gt;
-&lt;select name="syntaxId" id="xwikidocsyntaxinput2"&gt;
-&lt;option value="xwiki/1.0"#if($tdoc.getSyntaxId().equalsIgnoreCase('xwiki/1.0')) selected="selected"#end&gt;XWiki 1.0&lt;/option&gt;
-#set($configuredSyntaxes = $xwiki.getConfiguredSyntaxes())
-#foreach($syntax in $services.rendering.getAvailableParserSyntaxes())
-  #if($configuredSyntaxes.contains($syntax.toIdString()) &amp;&amp; !$syntax.toIdString().equalsIgnoreCase('xwiki/1.0'))
-    &lt;option value="$syntax.toIdString()"#if($tdoc.getSyntaxId().equalsIgnoreCase($syntax.toIdString())) selected="selected"#end&gt;$syntax.toString()&lt;/option&gt;
-  #end  
-#end
-&lt;/select&gt;
-&lt;/dd&gt;
-#end
-##--------------------------------------------------------------------------
-#if($pages.size() != 0)
-  #if($pages.size() == 1)
-    &lt;dt&gt;$msg.get("panels.documentInformation.includesOne", [$pages.size()])&lt;/dt&gt;
-  #else
-    &lt;dt&gt;$msg.get("panels.documentInformation.includesMore", [$pages.size()])&lt;/dt&gt;
-  #end
-  &lt;dd&gt;
-  &lt;ul&gt;
-  #foreach ($page in $pages)
-    &lt;li&gt;&lt;a href="$xwiki.getURL($page, 'view')"&gt;$page&lt;/a&gt;
-    &lt;a href="$xwiki.getURL($page, 'edit')"&gt;&lt;img alt="$msg.get('panels.documentInformation.editIncluded', [$page])" src="$xwiki.getSkinFile('icons/silk/page_white_edit.gif')" /&gt;&lt;/a&gt;&lt;/li&gt;
-  #end
-  &lt;/ul&gt;
-  &lt;/dd&gt;
-#end
-&lt;/dl&gt;
-#template("tagedit.vm")
-#panelfooter()</content>
-</property>
-<property>
-<description>Displays and allows editing the document title, parent and included documents.</description>
-</property>
-<property>
-<name>Document Information</name>
-</property>
-<property>
-<type>edit</type>
-</property>
-</object>
 <object>
 <class>
 <name>XWiki.JavaScriptExtension</name>
@@ -219,7 +86,7 @@ $xwiki.jsx.use($paneldoc.fullName)##
 <separators> ,|</separators>
 <size>1</size>
 <unmodifiable>0</unmodifiable>
-<values>onDemand=On demand|always=Always</values>
+<values>currentPage=Always on this page|onDemand=On demand|always=Always on this wiki</values>
 <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
 </use>
 </class>
@@ -429,6 +296,143 @@ document.observe("dom:loaded", function() { new XWiki.SyntaxConverter(); });</co
 </object>
 <object>
 <class>
+<name>Panels.PanelClass</name>
+<customClass></customClass>
+<customMapping></customMapping>
+<defaultViewSheet></defaultViewSheet>
+<defaultEditSheet></defaultEditSheet>
+<defaultWeb></defaultWeb>
+<nameField></nameField>
+<validationScript></validationScript>
+<category>
+<cache>0</cache>
+<displayType>select</displayType>
+<multiSelect>0</multiSelect>
+<name>category</name>
+<number>5</number>
+<prettyName>Category</prettyName>
+<relationalStorage>0</relationalStorage>
+<separator> </separator>
+<separators> ,|</separators>
+<size>1</size>
+<unmodifiable>0</unmodifiable>
+<values>Information|Navigation|Tools|Administration|Other</values>
+<classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+</category>
+<content>
+<editor>Text</editor>
+<name>content</name>
+<number>4</number>
+<prettyName>Content</prettyName>
+<rows>25</rows>
+<size>60</size>
+<unmodifiable>0</unmodifiable>
+<classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+</content>
+<description>
+<editor>Text</editor>
+<name>description</name>
+<number>3</number>
+<prettyName>Description</prettyName>
+<rows>5</rows>
+<size>40</size>
+<unmodifiable>0</unmodifiable>
+<classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+</description>
+<name>
+<name>name</name>
+<number>1</number>
+<prettyName>Name</prettyName>
+<size>40</size>
+<unmodifiable>0</unmodifiable>
+<classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+</name>
+<type>
+<cache>0</cache>
+<displayType>select</displayType>
+<multiSelect>0</multiSelect>
+<name>type</name>
+<number>2</number>
+<prettyName>Panel type</prettyName>
+<relationalStorage>0</relationalStorage>
+<separator> </separator>
+<separators> ,|</separators>
+<size>1</size>
+<unmodifiable>0</unmodifiable>
+<values>view|edit</values>
+<classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+</type>
+</class>
+<name>Panels.DocumentInformation</name>
+<number>0</number>
+<className>Panels.PanelClass</className>
+<guid>0fc28595-9c62-4ef9-b19b-a937f795efd8</guid>
+<property>
+<category>Tools</category>
+</property>
+<property>
+<content>$xwiki.ssx.use('Panels.DocumentInformation')##
+#set($pages = $tdoc.includedPages)
+#largepanelheader($msg.get("panels.documentInformation.title"))
+&lt;dl&gt;
+&lt;dt&gt;&lt;label for="xwikidocparentinput2"&gt;$msg.get("panels.documentInformation.parent")&lt;/label&gt;&lt;/dt&gt; &lt;dd&gt;&lt;input type="text" id="xwikidocparentinput2" name="parent" value="$!tdoc.parent" size="30"/&gt;&lt;/dd&gt;
+#if(($tdoc.language=="")&amp;&amp;($xwiki.isMultiLingual()))
+&lt;dt&gt;&lt;label for="xwikidoclanguageinput2"&gt;$msg.get("panels.documentInformation.defaultLanguage")&lt;/label&gt;&lt;/dt&gt; &lt;dd&gt;&lt;input type="text" id="xwikidoclanguageinput2" name="defaultLanguage" value="$!tdoc.defaultLanguage" size="30"/&gt;&lt;/dd&gt;
+#end
+##--------------------------------------------------------------------------
+## Display wiki syntax combo box if there's more than one configured syntax.
+##--------------------------------------------------------------------------
+$xwiki.jsx.use($paneldoc.fullName)##
+#if($xwiki.getConfiguredSyntaxes().size() &gt; 1)
+&lt;dt&gt;&lt;label for="xwikidocsyntaxinput2"&gt;Page Syntax&lt;/label&gt;&lt;/dt&gt;
+&lt;dd&gt;
+&lt;select name="syntaxId" id="xwikidocsyntaxinput2"&gt;
+&lt;option value="xwiki/1.0"#if($tdoc.getSyntaxId().equalsIgnoreCase('xwiki/1.0')) selected="selected"#end&gt;XWiki 1.0&lt;/option&gt;
+#set($configuredSyntaxes = $xwiki.getConfiguredSyntaxes())
+#set($availableParserSyntaxes = $services.rendering.getAvailableParserSyntaxes())
+#if (!$availableParserSyntaxes)
+  #set($availableParserSyntaxes = $syntaxFactory.getAvailableSyntaxes())
+#end
+#foreach($syntax in $availableParserSyntaxes)
+  #if($configuredSyntaxes.contains($syntax.toIdString()) &amp;&amp; !$syntax.toIdString().equalsIgnoreCase('xwiki/1.0'))
+    &lt;option value="$syntax.toIdString()"#if($tdoc.getSyntaxId().equalsIgnoreCase($syntax.toIdString())) selected="selected"#end&gt;$syntax.toString()&lt;/option&gt;
+  #end  
+#end
+&lt;/select&gt;
+&lt;/dd&gt;
+#end
+##--------------------------------------------------------------------------
+#if($pages.size() != 0)
+  #if($pages.size() == 1)
+    &lt;dt&gt;$msg.get("panels.documentInformation.includesOne", [$pages.size()])&lt;/dt&gt;
+  #else
+    &lt;dt&gt;$msg.get("panels.documentInformation.includesMore", [$pages.size()])&lt;/dt&gt;
+  #end
+  &lt;dd&gt;
+  &lt;ul&gt;
+  #foreach ($page in $pages)
+    &lt;li&gt;&lt;a href="$xwiki.getURL($page, 'view')"&gt;$page&lt;/a&gt;
+    &lt;a href="$xwiki.getURL($page, 'edit')"&gt;&lt;img alt="$msg.get('panels.documentInformation.editIncluded', [$page])" src="$xwiki.getSkinFile('icons/silk/page_white_edit.gif')" /&gt;&lt;/a&gt;&lt;/li&gt;
+  #end
+  &lt;/ul&gt;
+  &lt;/dd&gt;
+#end
+&lt;/dl&gt;
+#template("tagedit.vm")
+#panelfooter()</content>
+</property>
+<property>
+<description>Displays and allows editing the document title, parent and included documents.</description>
+</property>
+<property>
+<name>Document Information</name>
+</property>
+<property>
+<type>edit</type>
+</property>
+</object>
+<object>
+<class>
 <name>XWiki.StyleSheetExtension</name>
 <customClass></customClass>
 <customMapping></customMapping>
@@ -490,7 +494,7 @@ document.observe("dom:loaded", function() { new XWiki.SyntaxConverter(); });</co
 <separators> ,|</separators>
 <size>1</size>
 <unmodifiable>0</unmodifiable>
-<values>onDemand=On demand|always=Always</values>
+<values>currentPage=Always on this page|onDemand=On demand|always=Always on this wiki</values>
 <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
 </use>
 </class>

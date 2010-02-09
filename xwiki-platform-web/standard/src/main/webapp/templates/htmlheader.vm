@@ -20,7 +20,7 @@
     ## Compute the title.
     ## ---------------------------------------------------------------------------------------------------------------
     #if(!$title)
-      #set($title = $!xwiki.getWebPreference('title'))
+      #set($title = $!xwiki.getSpacePreference('title'))
       #if($title != '')
         #set($title = "$xwiki.getXMLEncoded($xwiki.parseContent($title))")
       #else
@@ -66,7 +66,7 @@
     ## ---------------------------------------------------------------------------------------------------------------
     ## Add user-defined Meta directives
     ## ---------------------------------------------------------------------------------------------------------------
-    $xwiki.parseContent($!xwiki.getWebPreference("meta"))
+    $xwiki.parseContent($!xwiki.getSpacePreference("meta"))
     ## ---------------------------------------------------------------------------------------------------------------
     ## Hook for inserting Link extensions. This will be replaced with the pulled link references.
     ## ---------------------------------------------------------------------------------------------------------------

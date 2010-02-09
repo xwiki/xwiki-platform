@@ -150,7 +150,7 @@ $xwiki.ssfx.use('uicomponents/viewers/comments.css', true)
     #error($msg.get('core.viewers.comments.edit.notFound'))
   #end
 #else
-#if($xwiki.getWebPreferenceAsInt('commentsorder', 1) == 1)
+#if($xwiki.getSpacePreferenceAsInt('commentsorder', 1) == 1)
   #set($comments = $doc.getComments())
 #else
   #set($comments = $doc.getComments(false))

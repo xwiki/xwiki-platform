@@ -7,7 +7,7 @@
 <title>Table data source wizard</title>
 <meta http-equiv="Content-Type" content="text/xhtml+xml; charset=$xwiki.encoding" />
 <meta http-equiv="imagetoolbar" content="no"/>
-$!xwiki.getWebPreference("meta") 
+$!xwiki.getSpacePreference('meta')
 <link href="$xwiki.getSkinFile("js/xwiki/chartwizard/tdwSkin.css")" rel="stylesheet" type="text/css"/>
 #template("stylesheets.vm")
 <script type="text/javascript" src="$xwiki.getSkinFile("js/xwiki/chartwizard/tdwScripts.js")"></script>

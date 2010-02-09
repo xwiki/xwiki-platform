@@ -27,16 +27,16 @@
 ##
 #if (!$docextras)
   #if("$!{showcomments}" == "")
-    #set($showcomments = $xwiki.getWebPreference("showcomments"))
+    #set($showcomments = $xwiki.getSpacePreference('showcomments'))
   #end
   #if("$!{showattachments}" == "")
-    #set($showattachments = $xwiki.getWebPreference("showattachments"))
+    #set($showattachments = $xwiki.getSpacePreference('showattachments'))
   #end
   #if("$!{showhistory}" == "")
-    #set($showhistory = $xwiki.getWebPreference("showhistory"))
+    #set($showhistory = $xwiki.getSpacePreference('showhistory'))
   #end
   #if("$!{showinformation}" == "")
-    #set($showinformation = $xwiki.getWebPreference("showinformation"))
+    #set($showinformation = $xwiki.getSpacePreference('showinformation'))
   #end
   #set($docextras = $util.arrayList)
   #if($showcomments != false && $showcomments != "no" && $showcomments != "0" && $showcomments != "false")

@@ -3,7 +3,7 @@
 <div class="minwidth"></div>
 <hr/>
   <div id="xwikilicence">$!copyright</div>
-  #set ($version = $xwiki.getWebPreference("version"))
+  #set ($version = $xwiki.getSpacePreference('version'))
   #if ("$!version" == "")
     #set ($version = $xwiki.getXWikiPreference("version"))
   #end

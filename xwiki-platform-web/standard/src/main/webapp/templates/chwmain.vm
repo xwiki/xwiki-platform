@@ -7,7 +7,7 @@
 <title>Creating new chart</title>
 <meta http-equiv="Content-Type" content="text/xhtml+xml; charset=$xwiki.encoding" />
 <meta http-equiv="imagetoolbar" content="no"/>
-$!xwiki.getWebPreference("meta") 
+$!xwiki.getSpacePreference('meta')
 <link href="$xwiki.getSkinFile("chwSkin.css")" rel="stylesheet" type="text/css"/>
 #template("stylesheets.vm")
 <script type="text/javascript" src="$xwiki.getSkinFile("chwScripts.js")"></script>

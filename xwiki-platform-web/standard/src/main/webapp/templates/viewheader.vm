@@ -30,7 +30,7 @@
 ## Begin upper menu area
   <div id="xwikiwebusermenu">
     <span id="xwikiwebusermenutitle">$msg.get("webusermenu")</span>
-    $!xwiki.parseContent($!xwiki.getWebPreference("menu"))
+    $!xwiki.parseContent($!xwiki.getSpacePreference('menu'))
   </div>
 ## End upper menu area
 ## Begin lower menu area

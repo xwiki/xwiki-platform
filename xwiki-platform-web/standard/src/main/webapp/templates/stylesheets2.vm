@@ -7,7 +7,7 @@
   @import url($xwiki.getSkinFile('style.css', true));
 </style>
 
-#set($defaultstyle = $xwiki.getWebPreference('stylesheet'))
+#set($defaultstyle = $xwiki.getSpacePreference('stylesheet'))
 #if($defaultstyle != '')
 <style type="text/css">
   @import url($xwiki.getSkinFile($defaultstyle, true));
@@ -25,7 +25,7 @@
   @import url($xwiki.getSkinFile('customlayout.css', true));
 </style>
 
-#set($style = "$!xwiki.getWebPreference('style')")
+#set($style = "$!xwiki.getSpacePreference('style')")
 #if($style != '')
 <style type="text/css">
   $style

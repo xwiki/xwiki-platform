@@ -1,4 +1,4 @@
-#set( $stylesheets = $xwiki.getWebPreference("stylesheets"))
+#set( $stylesheets = $xwiki.getSpacePreference('stylesheets'))
 #if ($stylesheets != "")
 <a href="#" onclick="setActiveStyleSheet('default'); return false;">$msg.get("defaultstyle")</a>
 #set( $stylenb = 1)

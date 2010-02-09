@@ -1,8 +1,8 @@
 #if(!$showcomments)
-#set($showcomments = $xwiki.getWebPreference("showcomments"))
+#set($showcomments = $xwiki.getSpacePreference('showcomments'))
 #end
 #if($showcomments!="no")
-#if($xwiki.getWebPreferenceAsInt("commentsorder",1)==0)
+#if($xwiki.getSpacePreferenceAsInt('commentsorder', 1) == 0)
 #set($comments = $doc.getComments())
 #else
 #set($comments = $doc.getComments(false))

@@ -7,7 +7,7 @@
 <title>
 #set($title = $!doc.display("title", "view", $doc.getObject("XWiki.XWikiHTML",0)))
 #if ( $title != "")
-#set( $title = $!xwiki.getWebPreference("title"))
+#set($title = $!xwiki.getSpacePreference('title'))
 #end
 #if ( $title != "")
 $xwiki.parseContent($title)
@@ -30,7 +30,7 @@ XWiki . $!doc.space . $!doc.name
 </head>
 <body>
 <style type="text/css">
-$!xwiki.getWebPreference("style")
+$!xwiki.getSpacePreference('style')
 </style>
 <style type="text/css">
 $!doc.display("style", "view", $doc.getObject("XWiki.XWikiHTML",0))

@@ -108,4 +108,21 @@ public class RegexTool
         }
         return result;
     }
+
+    /**
+     * Compiles a regular expression into a java {@code Pattern} object.
+     * 
+     * @param regex the textual representation of the regular expression
+     * @return the {@code Pattern} object corresponding to the regular expression, or {@code null} if the expression is
+     *         invalid
+     * @since 2.3M1
+     */
+    public Pattern compile(String regex)
+    {
+        try {
+            return Pattern.compile(regex);
+        } catch (PatternSyntaxException ex) {
+            return null;
+        }
+    }
 }

@@ -20,6 +20,8 @@
 package org.xwiki.velocity.tools;
 
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.junit.Assert;
 import org.junit.Test;
@@ -43,5 +45,56 @@ public class RegexToolTest
         Assert.assertEquals(2, result.size());
         Assert.assertEquals("<h1><span>header</span></h1>", result.get(0).getGroup());
         Assert.assertEquals("header", result.get(1).getGroup());
+    }
+
+    /**
+     * Compiling a valid regular expression should work.
+     */
+    @Test
+    public void testCompileValidRegex()
+    {
+        RegexTool tool = new RegexTool();
+        Pattern p = tool.compile("ab?");
+        Assert.assertNotNull(p);
+        // Try to check that the right regular expression was parsed.
+        Matcher m = p.matcher("xyz");
+        Assert.assertFalse(m.matches());
+        m = p.matcher("a");
+        Assert.assertTrue(m.matches());
+        m = p.matcher("aba");
+        Assert.assertFalse(m.matches());
+        m.reset();
+        Assert.assertTrue(m.find() && m.find() && m.hitEnd());
+    }
+
+    /**
+     * Compiling a valid regular expression with internal flags should work.
+     */
+    @Test
+    public void testCompileRegexWithFlags()
+    {
+        RegexTool tool = new RegexTool();
+        Pattern p = tool.compile("(?im)^ab?$");
+        Assert.assertNotNull(p);
+        // Try to check that the right regular expression was parsed.
+        Matcher m = p.matcher("xyz");
+        Assert.assertFalse(m.matches());
+        m = p.matcher("A");
+        Assert.assertTrue(m.matches());
+        m = p.matcher("ab\na");
+        Assert.assertFalse(m.matches());
+        m.reset();
+        Assert.assertTrue(m.find() && m.find() && m.hitEnd());
+    }
+
+    /**
+     * Compiling an invalid regular expression should return null, and not throw an exception.
+     */
+    @Test
+    public void testCompileInvalidRegex()
+    {
+        RegexTool tool = new RegexTool();
+        Pattern p = tool.compile("*");
+        Assert.assertNull(p);
     }
 }

@@ -12,8 +12,8 @@
 <customClass></customClass>
 <contentAuthor>XWiki.Admin</contentAuthor>
 <creationDate>1157375356000</creationDate>
-<date>1253203809000</date>
-<contentUpdateDate>1253203809000</contentUpdateDate>
+<date>1157375356000</date>
+<contentUpdateDate>1157375356000</contentUpdateDate>
 <version>1.1</version>
 <title>$msg.get("panelwizard.panelwizard")</title>
 <template></template>
@@ -182,12 +182,22 @@
                   $msg.get("panelwizard.nopanels")
                 #else
                   #foreach ($item in $categPanels)
-                    #set($obj = $xwiki.getDocument($item).getObject("Panels.PanelClass"))
+                    #set($panelDoc = $xwiki.getDocument($item))
+                    #set($obj = $panelDoc.getObject("Panels.PanelClass"))
                           &lt;div class="panelitemc"&gt;
                             &lt;div class="label"&gt;$doc.display("name", $obj)&lt;/div&gt;
-                            &lt;div class="panelcontainer" onmouseover="if(!window.isDraggingPanel){ showtip(this, unescape('$util.encodeURI($doc.display("description", $obj)).replaceAll("[+]", "%20")'), 300); }"&gt;#if($panelsStatus.get($item) == "false")#displaypanel("$item")#else&lt;div class="panel"&gt;&lt;/div&gt;#end&lt;/div&gt;
+                            &lt;div id="panelContainer${panelDoc.getName()}"class="panelcontainer"&gt;#if($panelsStatus.get($item) == "false")#displaypanel("$item")#else&lt;div class="panel"&gt;&lt;/div&gt;#end&lt;/div&gt;
                             &lt;div class="xwikibuttonlink"&gt;&lt;a href="$xwiki.getURL("$item", "inline")"&gt;$msg.get("edit")&lt;/a&gt; &lt;a href="$xwiki.getURL("$item", "delete")"&gt;$msg.get("delete")&lt;/a&gt;&lt;/div&gt;
                           &lt;/div&gt;
+                          &lt;script type="text/javascript"&gt;
+                          //&lt;![CDATA[
+                            Event.observe($("panelContainer${panelDoc.getName()}"), "mouseover", function(event) {
+                              if(!window.isDraggingPanel) {
+                                showtip($("panelContainer${panelDoc.getName()}"), unescape('$util.encodeURI($doc.display("description", $obj)).replaceAll("[+]", "%20").replaceAll("'", "&amp;#39;")'), 300); 
+                              }
+                            });
+                          //]]&gt;
+                          &lt;/script&gt;
                    #end
                  #end
               &lt;/div&gt;  ## end of accordion tab content

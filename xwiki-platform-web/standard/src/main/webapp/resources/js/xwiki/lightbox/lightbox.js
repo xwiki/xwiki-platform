@@ -46,28 +46,74 @@ Lightbox = Class.create({
   lbLoadForm: function(url) {
     this.currentUrl = url;
     if(this.loadedForms[url]) {
+      this.lbMoveScriptsAndCSSToHead(this.loadedForms[url]);
       var c = $('lb-content');
       $('lb-content').innerHTML = "";
       $('lb-content').appendChild(this.loadedForms[url]);
       this.form = c.getElementsByTagName('form')[0];
-      var scripts = c.getElementsByTagName("script");
-      for(var i = 0; i < scripts.length; ++i) {
-        eval(scripts[i].text);
-      }
     } else {
       new Ajax.Request(url, {onSuccess: this.lbFormDataLoaded.bind(this)});
     }
   },
 
   lbFormDataLoaded: function(transport) {
+    var responseContent = document.createElement("div");
+    responseContent.innerHTML = transport.responseText;
+    this.lbMoveScriptsAndCSSToHead(responseContent);
     var c = $('lb-content');
-    c.innerHTML = "<div>" + transport.responseText + "</div>";
+    $('lb-content').innerHTML = "";
+    c.appendChild(responseContent);
     this.form = c.getElementsByTagName('form')[0];
-    var scripts = c.getElementsByTagName("script");
-    for(var i = 0; i < scripts.length; ++i) {
-      eval(scripts[i].text);
-    }
     this.resizeBackground();
+  },
+
+  /**
+   * Takes all scripts and CSS, moves them to the head and makes them get executed.
+   *
+   * @param content A DOM node to traverse looking for scripts or CSS in the child nodes.
+   */
+  lbMoveScriptsAndCSSToHead: function(content) {
+    var head = document.getElementsByTagName("head")[0];
+    var scripts = Array.from(content.getElementsByTagName("script"));
+    // Opera doesn't render stylesheets unless we expressly copy them into the head.
+    var links = Array.from(content.getElementsByTagName("link"));
+    var toHead = links.concat(scripts).flatten();
+    //
+    var elementsToHead = function(elements, i) {
+      while(i < elements.length) {
+        // Clone the element...
+        var out = document.createElement(elements[i].tagName);
+        var attributes = elements[i].attributes;
+        for(var j = 0; j < attributes.length; j++) {
+          out.setAttribute(attributes[j].name, attributes[j].value);
+        }
+        out.innerHTML = elements[i].text;
+        // Firefox runs embedded scripts twice if they show up twice, however using removeChild 
+        // makes unembedded (reference) scripts not get put into the head (??)
+        //elements[i].parentNode.removeChild(elements[i]);
+        // This works though...
+        elements[i].innerHTML = "";
+        //
+        head.appendChild(out);
+        // If the script is being loaded from source, we have to make sure it is loaded before loading the next script.
+        // This function ends and then is restarted by the callback.
+        if(out.src != undefined && out.src != '') {
+          // We break the loop and stop until the element is loaded, then a recursive call restarts it.
+          Event.observe(out, "load", function() {
+            elementsToHead(elements, i + 1);
+          });
+          break;
+        }
+        i++;
+      }
+      // If we there are no elements left to be placed in the head, we place a script which fires a dom:loaded event.
+      // We are not just manually firing the event because we want to make sure all other scripts have been loaded and parsed first.
+      if(i == elements.length) {
+        head.appendChild(new Element("script", {"type" : "text/javascript"}).update('document.fire("dom:loaded");'));
+      }
+    }
+    // Start running the function above.
+    elementsToHead(toHead, 0);
   },
 
   lbSaveForm: function() {

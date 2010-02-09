@@ -51,7 +51,7 @@
 #set($headertitle = "<a href='$viewUrl'>$xwiki.getXMLEncoded(${doc.displayTitle})</a>")
 #end
 #set($skin=$xwiki.getSkin())
-#set($copyright=$xwiki.getWebCopyright())
+#set($copyright=$xwiki.getSpaceCopyright())
 #set($xwikimode=$context.getMode())
 #set($logredir = $xwiki.getFormEncoded($xwiki.getRequestURL()))
 ##

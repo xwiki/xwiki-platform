@@ -3,7 +3,7 @@
 #set($pageWidth = $xwiki.getUserPreference("pageWidth"))
 #end
 #if(!$pageWidth || $pageWidth == "" || $pageWidth == "default")
-#set($pageWidth = $xwiki.getWebPreference("pageWidth"))
+#set($pageWidth = $xwiki.getSpacePreference("pageWidth"))
 #end
 #if(!$pageWidth || $pageWidth == "" || $pageWidth == "default")
 #set($pageWidth = "1024")
@@ -32,15 +32,15 @@
 
 #if($doc.name == "WebPreferences" && "$!{request.space}" != "") ## space administration
   #set($spaceprefs = $request.space)
-  #set($showLeftPanels =  $xwiki.getWebPreferenceFor("showLeftPanels", $request.space))
-  #set($showRightPanels = $xwiki.getWebPreferenceFor("showRightPanels", $request.space))
+  #set($showLeftPanels =  $xwiki.getSpacePreferenceFor("showLeftPanels", $request.space))
+  #set($showRightPanels = $xwiki.getSpacePreferenceFor("showRightPanels", $request.space))
 #elseif($doc.fullName == "XWiki.XWikiPreferences" || "$!request.editor" == "globaladmin")
 	 #set($globalprefs = true)
      #set($showLeftPanels = $xwiki.getXWikiPreference("showLeftPanels"))
      #set($showRightPanels = $xwiki.getXWikiPreference("showRightPanels"))
 #else
-     #set($showLeftPanels = $xwiki.getWebPreference("showLeftPanels"))
-     #set($showRightPanels = $xwiki.getWebPreference("showRightPanels"))
+     #set($showLeftPanels = $xwiki.getSpacePreference("showLeftPanels"))
+     #set($showRightPanels = $xwiki.getSpacePreference("showRightPanels"))
 #end
 
 #if(!$showLeftPanels || $showLeftPanels == "" || $showLeftPanels == "default")
@@ -69,11 +69,11 @@
   #if($globalprefs == true)
      #set($leftPanels = $xwiki.getXWikiPreference("leftPanels"))
   #elseif($spaceprefs != "")
-     #set($leftPanels = $xwiki.getWebPreferenceFor("leftPanels", $spaceprefs))
+     #set($leftPanels = $xwiki.getSpacePreferenceFor("leftPanels", $spaceprefs))
   #else
     #set($leftPanels = $xwiki.getUserPreference("leftPanels"))
     #if($leftPanels == "")
-       #set($leftPanels = $xwiki.getWebPreference("leftPanels"))
+       #set($leftPanels = $xwiki.getSpacePreference("leftPanels"))
     #end
   #end
   #if($leftPanels == "")
@@ -87,11 +87,11 @@
   #if($globalprefs == true)
     #set($rightPanels = $xwiki.getXWikiPreference("rightPanels"))
   #elseif($spaceprefs != "")
-    #set($rightPanels = $xwiki.getWebPreferenceFor("rightPanels", $spaceprefs))
+    #set($rightPanels = $xwiki.getSpacePreferenceFor("rightPanels", $spaceprefs))
   #else
     #set($rightPanels = $xwiki.getUserPreference("rightPanels"))
     #if($rightPanels == "")
-      #set($rightPanels = $xwiki.getWebPreference("rightPanels"))
+      #set($rightPanels = $xwiki.getSpacePreference("rightPanels"))
     #end
   #end
   #if($rightPanels == "")

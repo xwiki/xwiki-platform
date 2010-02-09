@@ -463,7 +463,7 @@ $heading
 #if(!$registrationDone)
   $welcomeMessage
   {{html clean=false wiki=false}}
-    ## Html macro forces the code inside to be in a &lt;p&gt; block, &lt/p&gt is a trick to get out of it.
+    ## Html macro forces the code inside to be in a &lt;p&gt; block, &lt;/p&gt; is a trick to get out of it.
     &lt;/p&gt;
     &lt;form id="register" action="" method="post"&gt;
     &lt;div&gt;
@@ -657,7 +657,7 @@ $heading
     ## Give the user a login button which posts their username and password to loginsubmit
     #if($loginButton)
       {{html clean=false wiki=false}}
-        ## Html macro forces the code inside to be in a &lt;p&gt; block, &lt/p&gt is a trick to get out of it.
+        ## Html macro forces the code inside to be in a &lt;p&gt; block, &lt;/p&gt; is a trick to get out of it.
         &lt;/p&gt;
         &lt;form id="loginForm" action="$loginURL" method="post"&gt;
           &lt;div&gt;

@@ -535,7 +535,7 @@ $xwiki.getUserName("xwiki:${username}")
   #end
   #if(!$picturelist.containsKey($username))
     #set($picture = "<img src='")
-    #set($picture = $picture.concat($xwiki.getSkinFile("noavatar.png")))
+    #set($picture = $picture.concat($xwiki.getSkinFile('noavatar.png')))
     #set($picture = $picture.concat("' alt='$username' title='$username'/>"))
     #set($profiledoc = $xwiki.getDocument($username))
     #if(!$profiledoc.isNew())

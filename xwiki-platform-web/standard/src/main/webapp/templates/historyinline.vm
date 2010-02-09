@@ -85,7 +85,7 @@ $xwiki.ssfx.use('uicomponents/pagination/pagination.css', true)##
           <td><input type="radio" name="rev2" value="$version" #if ($velocityCount==1) checked="checked" #end/></td>
         #end
           <td><a href="$tdoc.getURL('viewrev',"rev=$version")">$version</a></td>
-          <td>$xwiki.getLocalUserName($revinfo.author)</td>
+          <td>$xwiki.getUserName($revinfo.author)</td>
           <td>$xwiki.formatDate($revinfo.date)</td>
     #if($xwiki.hasEditComment())
           <td>$!{revinfo.comment}</td>

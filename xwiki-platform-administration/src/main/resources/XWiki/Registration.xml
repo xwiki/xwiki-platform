@@ -463,7 +463,8 @@ $heading
 #if(!$registrationDone)
   $welcomeMessage
   {{html clean=false wiki=false}}
-    &lt;div&gt;
+    ## Html macro forces the code inside to be in a &lt;p&gt; block, &lt/p&gt is a trick to get out of it.
+    &lt;/p&gt;
     &lt;form id="register" action="" method="post"&gt;
     &lt;div&gt;
     #generateHtml($fields, $fieldMandatoryStar, $failureMessageParams)
@@ -505,7 +506,8 @@ $heading
     #if($useLiveValidation)
       #generateJavascript($fields)
     #end
-    &lt;/div&gt;
+    ## Html macro forces the code inside to be in a &lt;p&gt; block, we closed it up top now we open another one which the html macro will close.
+    &lt;p&gt;
   {{/html}}
 ## If the registration is done (successful) and we detect the Lightbox simply send the user back to the original page.
 #elseif($assumeLightbox)
@@ -654,7 +656,9 @@ $heading
     {{info}}$msg.get('core.register.successful', ["[[$fullName&gt;&gt;$userSpace$userName]]", $userName]){{/info}}
     ## Give the user a login button which posts their username and password to loginsubmit
     #if($loginButton)
-      {{html clean=false}}
+      {{html clean=false wiki=false}}
+        ## Html macro forces the code inside to be in a &lt;p&gt; block, &lt/p&gt is a trick to get out of it.
+        &lt;/p&gt;
         &lt;form id="loginForm" action="$loginURL" method="post"&gt;
           &lt;div&gt;
           &lt;input id="j_username" name="j_username" type="hidden" value="$escapetool.html($!userName)" /&gt;
@@ -673,6 +677,8 @@ $heading
             });
           &lt;/script&gt;
         #end
+        ## Start another &lt;p&gt; block which the html macro will close.
+        &lt;p&gt;
       {{/html}}
     #end
   #end

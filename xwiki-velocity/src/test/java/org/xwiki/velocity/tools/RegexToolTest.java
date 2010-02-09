@@ -29,7 +29,7 @@ import org.xwiki.velocity.tools.RegexTool.RegexResult;
 
 /**
  * Unit tests for {@link RegexTool}.
- *  
+ * 
  * @version $Id$
  * @since 2.0RC1
  */
@@ -39,9 +39,9 @@ public class RegexToolTest
     public void testFind()
     {
         RegexTool tool = new RegexTool();
-        List<RegexResult> result = 
+        List<RegexResult> result =
             tool.find("<h1><span>header</span></h1> whatever", "<[hH][12].*?><span>(.*?)</span></[hH][12]>");
-        
+
         Assert.assertEquals(2, result.size());
         Assert.assertEquals("<h1><span>header</span></h1>", result.get(0).getGroup());
         Assert.assertEquals("header", result.get(1).getGroup());

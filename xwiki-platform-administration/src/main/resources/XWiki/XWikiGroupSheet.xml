@@ -12,8 +12,8 @@
 <customClass></customClass>
 <contentAuthor>XWiki.Admin</contentAuthor>
 <creationDate>1242173909000</creationDate>
-<date>1258641136000</date>
-<contentUpdateDate>1258641136000</contentUpdateDate>
+<date>1242173909000</date>
+<contentUpdateDate>1242173909000</contentUpdateDate>
 <version>1.1</version>
 <title></title>
 <template></template>
@@ -44,7 +44,7 @@ $xwiki.ssfx.use("js/xwiki/table/livetable.css", true)
 #else
   #set($columns = ['member'])
 #end
-#livetable("groupusers", $columns, $columnOptions, {'url' : "${doc.getURL()}?xpage=getgroupmembers", 'translationPrefix' : 'xe.admin.groups.'})
+#livetable("groupusers", $columns, $columnOptions, {'url' : "${doc.getURL()}?xpage=getgroupmembers", 'translationPrefix' : 'xe.admin.groups.', 'javascriptName' : 'editgrouptable'})
 ##
 ##
 ##
@@ -100,11 +100,11 @@ window.addNewMember = function(uorg, name)
                          var nr = parseInt(transport.responseText);  
                          if(nr == 0) $('errMsg').innerHTML = "$msg.get('xe.admin.groups.addUser.duplicate')";
                          else {
-                                var end = ta.limit;
-                                var start = ta.lastoffset;
-                                ta.clearCache();
+                                var end = editgrouptable.limit;
+                                var start = editgrouptable.lastoffset;
+                                editgrouptable.clearCache();
                                 if(start &lt; 1)  start = 1;
-                                ta.getRows(start, end, start, end);
+                                editgrouptable.getRows(start, end, start, end);
                          }                   
                        }
              });

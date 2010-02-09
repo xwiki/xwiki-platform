@@ -23,10 +23,11 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.regex.PatternSyntaxException;
 
 /**
- * Velocity Tools offering various Regex-based APIs to make it easy to manipulate Regex from Velocity.
- *  
+ * Velocity Tool offering various Regex-based APIs to make it easy to manipulate regular expressions from Velocity.
+ * 
  * @version $Id$
  * @since 2.0RC2
  */
@@ -38,17 +39,17 @@ public class RegexTool
     public class RegexResult
     {
         /**
-         * @see #getStart() 
+         * @see #getStart()
          */
         public int start;
 
         /**
-         * @see #getEnd() 
+         * @see #getEnd()
          */
         public int end;
 
         /**
-         * @see #getGroup() 
+         * @see #getGroup()
          */
         public String group;
 
@@ -71,7 +72,7 @@ public class RegexTool
         {
             return this.group;
         }
-        
+
         /**
          * @return the capture group's start position
          */
@@ -79,7 +80,7 @@ public class RegexTool
         {
             return this.start;
         }
-        
+
         /**
          * @return the capture group's end position
          */
@@ -88,13 +89,13 @@ public class RegexTool
             return this.end;
         }
     }
-    
+
     /**
      * @param content the content to parse
      * @param regex the regex to look for in the passed content
      * @return empty list if the passed regex doesn't match the content or several {@link RegexResult} objects
      *         containing the matched position and matched content for all capturing groups, the first group
-     *         representing the whole . The first object is represents the entier pattern  
+     *         representing the whole . The first object is represents the entire pattern
      */
     public List<RegexResult> find(String content, String regex)
     {

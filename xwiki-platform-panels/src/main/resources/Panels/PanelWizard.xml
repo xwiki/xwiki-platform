@@ -71,8 +71,8 @@
 #if($accessLevel)
   &lt;div class="floatcontainer"&gt;
     &lt;ul class="xwikitabbar" id="panelEditorSteps"&gt;
-      &lt;li id="firstwtab" class="active" onclick="switchToWizardPage(this, 'PanelListSection'); return false;"&gt;&lt;a href="#PanelListSection"&gt;$msg.get("panelwizard.panellist")&lt;/a&gt;&lt;/li&gt;
-      &lt;li onclick="switchToWizardPage(this, 'PageLayoutSection'); return false;"&gt;&lt;a href="#PageLayoutSection"&gt;$msg.get("panelwizard.pagelayout")&lt;/a&gt;&lt;/li&gt;
+      &lt;li id="firstwtab" class="active"&gt;&lt;a href="#PanelListSection"&gt;$msg.get("panelwizard.panellist")&lt;/a&gt;&lt;/li&gt;
+      &lt;li id="secondwtab"&gt;&lt;a href="#PageLayoutSection"&gt;$msg.get("panelwizard.pagelayout")&lt;/a&gt;&lt;/li&gt;
     &lt;/ul&gt;
   &lt;/div&gt;
   &lt;div id="xwikieditcontent" class="clear"&gt;
@@ -114,13 +114,6 @@
       $xwiki.jsfx.use("js/xwiki/panelwizard/toolTip.js")
       &lt;script type="text/javascript"&gt;
       //&lt;![CDATA[
-      Event.observe($('draganddroptooltip'), "mouseover", function() {
-        if(window.isDraggingPanel) {
-          return; 
-        } 
-        showtip($('draganddroptooltip'), '$msg.get("panelwizard.tip")', 300);
-      });
-
       window.ajaxurl = "$ajaxurl";
       window.allPanelsPlace = new Object();
       window.panelsavesuccess = "$msg.get("panelsavesuccess")";
@@ -223,7 +216,7 @@
           &lt;td&gt;
             &lt;div
             #if($crtlayout == 0)id="selectedoption" #end 
-            class="pagelayoutoption" onclick="changePreviewLayout(this, 0)"&gt;
+            class="pagelayoutoption pagelayoutoption0"&gt;
               ##&lt;input type="radio" name="pagelayout" value="nosidecol" checked="cheched" /&gt;
               &lt;label&gt;$msg.get("panelwizard.nosidecolumn")&lt;/label&gt;
               &lt;div id="nosidecolumn" class="layoutmaquette"&gt;
@@ -234,7 +227,7 @@
           &lt;td&gt;
             &lt;div 
             #if($crtlayout == 1)id="selectedoption" #end
-            class="pagelayoutoption" onclick="changePreviewLayout(this, 1)"&gt;
+            class="pagelayoutoption pagelayoutoption1"&gt;
               ##&lt;input type="radio" name="pagelayout" value="leftcol" "/&gt;
               &lt;label&gt;$msg.get("panelwizard.leftcolumn")&lt;/label&gt;
               &lt;div id="leftcolumn" class="layoutmaquette"&gt;
@@ -246,7 +239,7 @@
           &lt;td&gt;
             &lt;div
             #if($crtlayout == 2)id="selectedoption" #end
-            class="pagelayoutoption" onclick="changePreviewLayout(this, 2)"&gt;
+            class="pagelayoutoption pagelayoutoption2"&gt;
               ##&lt;input type="radio" name="pagelayout" value="rightcol" /&gt;
               &lt;label&gt;$msg.get("panelwizard.rightcolumn")&lt;/label&gt;
               &lt;div id="rightcolumn" class="layoutmaquette"&gt;
@@ -258,7 +251,7 @@
           &lt;td&gt;
             &lt;div 
             #if($crtlayout == 3)id="selectedoption" #end
-            class="pagelayoutoption" onclick="changePreviewLayout(this, 3)"&gt;
+            class="pagelayoutoption pagelayoutoption3"&gt;
               &lt;label&gt;$msg.get("panelwizard.bothcolumns")&lt;/label&gt;
               &lt;div  id="bothcolumns" class="layoutmaquette"&gt;
                 &lt;div class="lmleftcolumn"&gt;&lt;/div&gt;
@@ -274,11 +267,46 @@
   &lt;/div&gt; ## xwikieditcontent
   &lt;div id="panelwizardbuttons" class="floatcontainer"&gt;
     &lt;span class="xwikibuttonlink"&gt;
-      &lt;span class="buttonwrapper"&gt;&lt;a href="#" onclick="save(); return false;"&gt;$msg.get("xe.panels.wizard.savenew")&lt;/a&gt;&lt;/span&gt;
-      &lt;span class="buttonwrapper"&gt;&lt;a href="$doc.getURL("view")" onclick="revert(); return false;"&gt;$msg.get("xe.panels.wizard.revert")&lt;/a&gt;&lt;/span&gt;
+      &lt;span class="buttonwrapper"&gt;&lt;a id="saveLayout" href="#"&gt;$msg.get("xe.panels.wizard.savenew")&lt;/a&gt;&lt;/span&gt;
+      &lt;span class="buttonwrapper"&gt;&lt;a id="revertLayout" href="$doc.getURL("view")"&gt;$msg.get("xe.panels.wizard.revert")&lt;/a&gt;&lt;/span&gt;
       &lt;span class="buttonwrapper"&gt;&lt;a href="$xwiki.getURL("Panels.WebHome")"&gt;$msg.get("xe.panels.wizard.homepage")&lt;/a&gt;&lt;/span&gt;
     &lt;/span&gt;
   &lt;/div&gt;
+  &lt;script type="text/javascript"&gt;
+  //&lt;![CDATA[
+    Event.observe($('draganddroptooltip'), "mouseover", function() {
+      if(window.isDraggingPanel) {
+        return; 
+      } 
+      showtip($('draganddroptooltip'), '$msg.get("panelwizard.tip")', 300);
+    });
+
+    Event.observe($('firstwtab'), "click", function(event) {
+      switchToWizardPage($('firstwtab'), 'PanelListSection'); 
+      return false;
+    });
+
+    Event.observe($('secondwtab'), "click", function(event) {
+      switchToWizardPage($('secondwtab'), 'PageLayoutSection'); 
+      return false;
+    });
+
+    Event.observe($$('.pagelayoutoption0')[0], "click", function(event) { changePreviewLayout($$('.pagelayoutoption0')[0], 0); });
+    Event.observe($$('.pagelayoutoption1')[0], "click", function(event) { changePreviewLayout($$('.pagelayoutoption1')[0], 1); });
+    Event.observe($$('.pagelayoutoption2')[0], "click", function(event) { changePreviewLayout($$('.pagelayoutoption2')[0], 2); });
+    Event.observe($$('.pagelayoutoption3')[0], "click", function(event) { changePreviewLayout($$('.pagelayoutoption3')[0], 3); });
+
+    Event.observe($('saveLayout'), "click", function(event) {
+      save(); 
+      return false;
+    });
+
+    Event.observe($('revertLayout'), "click", function(event) {
+      revert(); 
+      return false;
+    });
+  //]]&gt;
+  &lt;/script&gt;
 #else
   #xwikimessageboxstart("$msg.get('panelwizard.paneleditor')" "")
   $msg.get("panelwizard.needadminright")

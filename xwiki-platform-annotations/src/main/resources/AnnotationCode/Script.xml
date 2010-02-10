@@ -12,8 +12,8 @@
 <customClass></customClass>
 <contentAuthor>XWiki.Admin</contentAuthor>
 <creationDate>1264860755000</creationDate>
-<date>1265465345000</date>
-<contentUpdateDate>1265465345000</contentUpdateDate>
+<date>1265806933000</date>
+<contentUpdateDate>1265806933000</contentUpdateDate>
 <version>1.0</version>
 <title></title>
 <template></template>
@@ -107,6 +107,16 @@ XWiki.Selection = Class.create({
   selectionText : false,
   selectionContext : false,
   selectionOffset : false,
+  // the selection range
+  range : false,
+  // the element that wraps the selection to make it colored, in FF
+  highlightWrapper : false,
+  // the parent of the selection and the selection inner HTML to make it colored in FF and to be able to rollback this change
+  selectionParent : false,
+  selectionParentInnerHTML : false,
+  // position of the last mouse up, to know where to display the dialog
+  offsetX : false,
+  offsetY : false,
   // how many characters to expand left &amp; right on ff
   step : 5,
   // how may words to expand left &amp; right on IE
@@ -114,24 +124,41 @@ XWiki.Selection = Class.create({
 
   initialize : function (container) {
     this.container = container;
-    // get the selection from the document and compute its offset if it's not unique
+    // on IE we listen to the mousedown and remember the position of the mousedown of the selection to know where to display the dialog for annotation creation
+    if (!window.getSelection) {
+      this.container.observe('mousedown', function(event) {
+        this.offsetX = event.offsetX;
+        this.offsetY = event.offsetY;
+      }.bindAsEventListener(this));
+    }
+  },
+
+  computeSelection : function () {
+    // reset the selection state
+    this.selectionText = false;
+    this.range = false;
+    this.selectionContext = false;
+    this.selectionOffset = false;
+    this.highlightWrapper = false;
+    this.selectionParent = false;
+    this.selectionParentInnerHTML = false;
     if (window.getSelection) { 
       // FF selection &amp; hopefully other browsers 
-      var initialRange = window.getSelection().getRangeAt(0);
+      this.range = window.getSelection().getRangeAt(0);
       // ignore if the selection is in the passed container
-      if (!this.isDescendantOrSelf(container, initialRange.commonAncestorContainer)) {
+      if (!this.isDescendantOrSelf(this.container, this.range.commonAncestorContainer)) {
         return;
       }
-      this.selectionText = initialRange.toString();
+      this.selectionText = this.range.toString();
     } else {
       // IE selection
       if (document.selection.type == 'Text') {
-        var range = document.selection.createRange();
+        this.range = document.selection.createRange();
         // ignore if the selection is in the passed container
-        if (!this.isDescendantOrSelf(container, range.parentElement())) {
+        if (!this.isDescendantOrSelf(this.container, this.range.parentElement())) {
           return;
         }
-        this.selectionText = range.text;
+        this.selectionText = this.range.text;
       }
     }
     if (this.selectionText == '') {
@@ -145,9 +172,62 @@ XWiki.Selection = Class.create({
 
   computeContext : function() {
     if (window.getSelection) {
-      this.computeContextFF(window.getSelection().getRangeAt(0));
+      this.computeContextFF();
     } else {
-      this.computeContextIE(document.selection.createRange());
+      this.computeContextIE();
+    }
+  },
+
+  // these functions are here because they depend on selection
+
+  highlightSelection : function(color) {
+    if (!this.range) {
+      // there should be some selection at this point
+      return;
+    }
+    if (window.getSelection) {
+      // standard
+      // create an annotation highlight span around this content
+      this.highlightWrapper = new Element('span', {'style': 'background-color: ' + color, 'id' : 'selection-highlight'});
+      // surround the selection with the highlighted span
+      // TODO: this doesn't work if content of selection is not inline (or anything else but text)
+      this.range.surroundContents(this.highlightWrapper);
+    } else {
+      // IE
+      // get the selection parent and its inner HTML to be able to restore it after
+      this.selectionParent = this.range.parentElement();
+      this.selectionParentInnerHTML = this.selectionParent.innerHTML;
+      // and finally color it
+      this.range.execCommand("BackColor", false, color);
+    }
+  },
+
+  removeSelectionHighlight : function() {
+    if (window.getSelection) {
+      // standard
+      // unwrap
+      this.highlightWrapper.replace(this.highlightWrapper.innerHTML);
+    } else {
+      // IE
+      this.selectionParent.update(this.selectionParentInnerHTML);
+    }
+  },
+
+  addPanelNextToSelection : function(panel) {
+    if (!this.range) {
+      return;
+    }
+
+    if (window.getSelection) {
+      // standard
+      this.highlightWrapper.insert({after : panel});
+      // set the position
+      panel.style.left = this.highlightWrapper.viewportOffset().left + 'px';
+    } else {
+      // IE
+      this.container.insert({bottom : panel});
+      panel.style.left = this.offsetX + "px";
+      panel.style.top = this.offsetY + "px";
     }
   },
 
@@ -179,13 +259,13 @@ XWiki.Selection = Class.create({
     return text;
   },
 
-  computeContextFF : function(range) {
-    var left = this.getLeftDocument(range.startContainer) + range.startContainer.textContent.substring(0, range.startOffset);
+  computeContextFF : function() {
+    var left = this.getLeftDocument(this.range.startContainer) + this.range.startContainer.textContent.substring(0, this.range.startOffset);
     var subLeft = '';
-    var right = range.endContainer.textContent.substring(range.endOffset, range.endContainer.textContent.length) + this.getRightDocument(range.endContainer);
+    var right = this.range.endContainer.textContent.substring(this.range.endOffset, this.range.endContainer.textContent.length) + this.getRightDocument(this.range.endContainer);
     var subRight = '';
     var offset = 0;
-    var context = range.toString();
+    var context = this.range.toString();
     var leftExpansion = 0;
     var rightExpansion = 0;
     while (subRight != right || subLeft != left) {
@@ -203,37 +283,39 @@ XWiki.Selection = Class.create({
     this.selectionOffset = Math.max(subLeft.length, 0);
   },
   
-  computeContextIE : function(range) {
+  computeContextIE : function() {
     var containerInnerText = this.container.innerText;
+    // copy the range to make the expanding on a range copy
+    var cRange = this.range.duplicate();
     // while the selection appears more than once, expand the selection to left and right with one or more words and get its text
     var leftOffset = 0;
     // if we managed to expand anything (to prevent a loop where it's not unique but we can't expand)
     var expanded = true;
-    while(!this.isUnique(containerInnerText, range.text) &amp;&amp; expanded) {
+    while(!this.isUnique(containerInnerText, cRange.text) &amp;&amp; expanded) {
       var expanded = false;
       // expand left
-      var initialLength = range.text.length;
-      range.moveStart('word', -1);
-      if (!this.isDescendantOrSelf(this.container, range.parentElement())) {
+      var initialLength = cRange.text.length;
+      cRange.moveStart('word', -1);
+      if (!this.isDescendantOrSelf(this.container, cRange.parentElement())) {
         // move back, cannot move to the left, cross fingers that this works the same in both directions
-        range.moveStart('word', 1);
+        cRange.moveStart('word', 1);
       } else {
         //update the offset with the word we just added
-        leftOffset += range.text.length - initialLength;
+        leftOffset += cRange.text.length - initialLength;
         expanded = true;
       }
 
       // expand right
-      range.moveEnd('word', 1);
-      if (!this.isDescendantOrSelf(this.container, range.parentElement())) {
+      cRange.moveEnd('word', 1);
+      if (!this.isDescendantOrSelf(this.container, cRange.parentElement())) {
         // move back, cannot move to right, cross fingers that this works the same in both directions
-        range.moveEnd('word', -1);
+        cRange.moveEnd('word', -1);
       } else {
         expanded = true;
       }
     }
     // is unique or we couldn't expand anymore, this is it, send it
-    this.selectionContext = range.text;
+    this.selectionContext = cRange.text;
     this.selectionOffset = leftOffset;
   },
 
@@ -254,6 +336,8 @@ XWiki.Annotation = Class.create({
   fetchedAnnotations : false,
   // the display annotations check box in the settings panel
   displayAnnotationsCheckbox : false,
+  // the selection service used to detect and handle selection related functions on the document
+  selectionService : false,
 
   initialize : function () {
     this.hookMenuButton();
@@ -264,6 +348,10 @@ XWiki.Annotation = Class.create({
     document.observe('xwiki:docextra:loaded', this.addDeleteListeners.bindAsEventListener(this));
     // register the key shortcuts for adding an annotation
     this.registerAddAnnotationShortcut();
+
+    // and initialize the selectionService
+    // TODO: get this container from a member or something, so that we're sure all functions use the same container
+    this.selectionService = new XWiki.Selection($('xwikicontent'));
   },
 
   hookMenuButton : function() {
@@ -525,21 +613,21 @@ XWiki.Annotation = Class.create({
    * Execute the add annotation shortcut: get selection, compute context, open dialog, register listeners.
    */
   addAnnotation : function() {
-    // create a selection object on the xwiki content container
-    var selectionObj = new XWiki.Selection($('xwikicontent'));
-    var selectionText = selectionObj.selectionText;
+    // parse the selection on the xwiki content container
+    this.selectionService.computeSelection($('xwikicontent'));
+    var selectionText = this.selectionService.selectionText;
     if (!selectionText) {
       // show an 'invalid selection message'
       new XWiki.widgets.Notification("$msg.get('annotations.action.create.selection.invalid')", "error");
     } else {
-      selectionObj.computeContext();
+      this.selectionService.computeContext();
       // fetch the creation for this annotation and display it at the position of the selection
       new Ajax.Request('$xwiki.getURL("AnnotationCode.CreateForm")', {
         parameters: {
           'xpage' : 'plain',
           'selection' : encodeURIComponent(selectionText),
-          'selectionContext' : encodeURIComponent(selectionObj.selectionContext),
-          'selectionOffset' : selectionObj.selectionOffset,
+          'selectionContext' : encodeURIComponent(this.selectionService.selectionContext),
+          'selectionOffset' : this.selectionService.selectionOffset,
           'space' : encodeURIComponent(XWiki.currentSpace),
           'page' : encodeURIComponent($$('meta[name=page]')[0].content)
         },
@@ -579,24 +667,12 @@ XWiki.Annotation = Class.create({
     this.createPanel = new Element('div', {'style' : 'position: absolute;'});
     // make it hidden for the moment
     this.createPanel.toggleClassName('hidden');
-    if (window.getSelection) {
-      // ff and other browsers:
-      // create an annotation highlight span around this content
-      var highlightSpan = new Element('span', {'class': 'annotation annotation-highlight', 'id' : 'selection-highlight'});
-      // surround the selection with the highlighted span
-      var range = window.getSelection().getRangeAt(0);
-      // TODO: this doesn't work if content of selection is not inline (or anything else but text)
-      range.surroundContents(highlightSpan);
-    } else {
-      // IE
-      // TODO: implement me
-    }
-    highlightSpan.insert({after : this.createPanel});
+    // TODO: get this color from the color theme
+    this.selectionService.highlightSelection("#FFEE99");
+    // display the panel
+    this.selectionService.addPanelNextToSelection(this.createPanel);
     // put the content in
     this.createPanel.update(panelContent);
-    // set the position
-    // TODO: investigate how this positioning works on IE
-    this.createPanel.style.left = highlightSpan.viewportOffset().left + 'px';
     // make it visible
     this.createPanel.toggleClassName('hidden');
     // set the focus in the first element of type input
@@ -605,9 +681,10 @@ XWiki.Annotation = Class.create({
   },
 
   hideAnnotationCreationForm : function() {
-    // TODO: rollback selection coloring
     // make the dialog go away
     this.createPanel.remove();
+    // rollback selection coloring
+    this.selectionService.removeSelectionHighlight();
   }, 
 
   onAnnotationAdd : function(event) {

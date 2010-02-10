@@ -1,0 +1,317 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<xwikidoc>
+<web>Panels</web>
+<name>PanelWizard</name>
+<language></language>
+<defaultLanguage>en</defaultLanguage>
+<translation>0</translation>
+<parent>Panels.WebHome</parent>
+<creator>XWiki.Admin</creator>
+<author>XWiki.Admin</author>
+<customClass></customClass>
+<contentAuthor>XWiki.Admin</contentAuthor>
+<creationDate>1157375356000</creationDate>
+<date>1157375356000</date>
+<contentUpdateDate>1157375356000</contentUpdateDate>
+<version>1.1</version>
+<title>$msg.get("panelwizard.panelwizard")</title>
+<template></template>
+<defaultTemplate></defaultTemplate>
+<validationScript></validationScript>
+<comment></comment>
+<minorEdit>false</minorEdit>
+<syntaxId>xwiki/1.0</syntaxId>
+<hidden>false</hidden>
+<attachment>
+<filename>icon.png</filename>
+<filesize>14155</filesize>
+<author>XWiki.Admin</author>
+<date>1215021941000</date>
+<version>1.1</version>
+<comment></comment>
+<content>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8pGPPPTQQ3feeefHP/7xmZmZL3zhC5///Of9WSHErl27PvrRj37pS186dOjQ7t27f/M3f1NKSUTexC9D/xKWZ7l9l1J2u91/iVf6KRfn3FtvvXXfffedPXv26NGjRAQAWutbbrkFAMbHx//8z//8lltumZiYQMQnnnjiM5/5zIEDB+6++24AOHr06AMPPLB79+5f/dVfBQB/rffBnHO+J5aNhn/XPIEx5qWXXvrKV77y1FNPAcDCwsKv//qv/83f/I13YQFASrlhwwYAiKLoPe95z7p165RSQoh169ZFUfT6668fO3ZscXHx+PHjX/rSl/7+7/8+z/M8zxcWFowxzrmBWzE8x/TuvPJpBnOFF2vtuXPnvMNnrV0WVuR5fvTo0Z8sHD+OrNGpaLXb3/jGNx5+6KETJ07EcfyJT37y05/+9Pz8/NatWzudzg9+8IP3vve9AICIlUpl85YtzUbjoYcf/pW77x4c3LVr10svvfSNe+9917vehUSf+x//4x033/zZz372K1/5yh/90R/9yq/8iu+DbrcbhqGfJmFI65fb9yAIBr3txVp79uxZAJidnTXG7N+/f9k7WGvPnlkAdAAIAITADIikAkmEAMLkmdYGCRDRMQgSDPzKK69ec83WD33og0pJADB5bq0VSkkprbV+kAZB4KE0xvhJfjDBKKWutEuGZWlp6e/+9m9PnDgRhuHtt9/+n++663tPPnnvvfe+9tprSZL8n//9fzzuAJAkycc++tG//uu/fuD+BzzuAFAoFO64444jR448+sgjh555ptvtPvHEd4rF5NSpU2mafu973/vEJz6R53mapo1GI47jQqHgn3913C8mzWbz61//OgCMjIysxB0Ai6XCrl3XCoFaG0Ikgd00bzZqgiQRhmEcFWJwFgAdQxgEaZq++eapbje11nrcZRAMHsW7w+fvjjhA+ceEeyBBEHzkIx/5/Oc/v27dOiJaXFz8h3/4h6effhoA0m76+BOPZ1nmg4koim655ZYvf/nLR48+12g0fOgbBMENN9xgrX3ttdcAYHJy8ujR59///vfu27cvy7Knn366VqsZYzqdztzcnA9Q/KzrTT+sxb4jYqlUuummmy7eAJRSU1MT4+PjExPV6nh1fHxiZKTUajVffuVHR5490ul21q+bHp+YHKtWx8er1fHqWLUSSOmc9d3vub2fAJxrkDRN77333qmpqSeeeGLDhg0eiDiO3/e+9/kG1tmzZ8/Onpv1X5VS27dvd87Nz88fP358+GAYhuVy+Z577nn00UdvvvkAEY2Pj4+Pjy8sLBw6dGhxcbHRaCwsLDQajU6ns8yKLNd3PxzyPPdj3B8Jw7BYLF70VdgzeRkRGWMRWec2UOGePXuvuUYzO6XCRqPN7ABACgKWbJ1xGhGFkLOzs/fff38cx7feeisi+tnF867eshUKhZmZGaVUFEVa65MnT1ar1Z07d14p9TqAbMOGDd1u97HHHnPOedyVUtdcc82gTZZlh394eOOmjQAghNi0adO11147Ozt76NChG2+80R9cv379zp07T506ValU9uzZ4y+sVCrvfve7H3vssYMHDyZJ0mw25+fnvZ2J49ha6638Krj7my6bWtciDNxut9vtllLCOUYkpVQQBEKIPM/a7UwQ5tq8Nb84NT45WikQEjAgQqPROH36dLVa/drXviaECIJgdnZ248aNe/bs+e53v9tsNr1WCiGWlpbiODbG3Hrrrddee+2VY957uy1btqxbt25paWl2dnZ6ehoApJSbN2/+pV/6pZtuuunBBx985plnHnnkkV/8xV/0lxQKhQ9+8IN/+Zd/+fjjj3/qU5/yB+M4fv/73/8Xf/EX3/72t3/7t397cPA973nP/ffff/DgwRtvvLHVatXr9XK5XKlUtNbDqK7JviulCoXCRU8jACAhzM3NPv/80SiK4jhcWqqXy6UdO66JoijPcwAMAzW3VHvwiad279jxgfe9QwWSga211Wr17rvvTpLkkUcemZycrFQqJ0+eXL9+/aZNm5IkabfbzLy4uBiGYZ7nU1NTaZp63847ZwMHee0ipXzXu9712GOPPfTQQx/84Adff/31G264YePGjd/85jfb7XaxWPzOd77z6KOP1mq1SqUCAGEY3nDDjVmWHT58eHFxaWxs1EN82223ffGLXzx27Njc3NzExAQABEGwd+9eY8wrr7zSarU6nU673e50Ommaes/yMrgPt/AEkGeoLy7MTNPTU3EhZsdCyDTtCEGlUsk5F4UhICHAeGXskx/6ubHRimPW2kQRMvPo6Ojo6KhzfNddd/l7DabuS//owGW80tFZKBR+7dd+7VOf+pSUcnp6ev369U9+9zubt2wFgCAIrrtut3NuYWHhlVdeecc73uEPXn/93h07dvzs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</content>
+</attachment>
+<content>{pre}
+##
+## Redirect to force right and left panels layout
+##
+#set($mustRedirect = false)
+#set($redirectQuery = '')
+#set($redirectDoc = $doc.fullName)
+#set($redirectMode = 'view')
+#if($xwiki.exists('XWiki.AdminSheet'))
+  ## The new administration interface, use XWiki.XWikiPreferences as the container document, and this as an included sheet
+  #set($currSpace = $request.getParameter("space"))
+  #set($redirectQuery = "$!{request.queryString}&amp;forceLeftPanels=1&amp;forceRightPanels=1&amp;section=Panels.PanelWizard&amp;$docvariant")
+  #set($redirectMode = 'admin')
+  #if($doc.name != 'XWikiPreferences' &amp;&amp; $doc.name != 'WebPreferences')
+    #set($redirectDoc = 'XWiki.XWikiPreferences')
+    #set($mustRedirect = true)
+  #end
+#else ## No admin application, use this as the container document
+  #set($redirectQuery = "$!{request.queryString}&amp;forceLeftPanels=1&amp;forceRightPanels=1&amp;$docvariant")
+#end
+#if(!$request.getParameter("forceLeftPanels") || !$request.getParameter("forceRightPanels"))
+  #set($mustRedirect = true)
+#end
+#if($mustRedirect)
+  $response.sendRedirect($xwiki.getDocument($redirectDoc).getURL($redirectMode, $redirectQuery))
+#else ## No redirect needed, display the wizard
+#set($showdata = 0)
+#set($showEmptyPanels = 1)
+#if("$!{currSpace}" != "")
+    #set($accessLevel = $xwiki.hasAccessLevel("admin", $context.user, "${currSpace}.WebPreferences"))
+#else
+    #set($accessLevel = $xwiki.hasAdminRights())
+#end
+##
+## Check for admin right for the current preferences document (XWiki.XWikiPreferences or Space.WebPreferences)
+##
+#if($accessLevel)
+  &lt;div class="floatcontainer"&gt;
+    &lt;ul class="xwikitabbar" id="panelEditorSteps"&gt;
+      &lt;li id="firstwtab" class="active"&gt;&lt;a href="#PanelListSection"&gt;$msg.get("panelwizard.panellist")&lt;/a&gt;&lt;/li&gt;
+      &lt;li id="secondwtab"&gt;&lt;a href="#PageLayoutSection"&gt;$msg.get("panelwizard.pagelayout")&lt;/a&gt;&lt;/li&gt;
+    &lt;/ul&gt;
+  &lt;/div&gt;
+  &lt;div id="xwikieditcontent" class="clear"&gt;
+    &lt;div id="PanelListSection"&gt;
+      &lt;span id="draganddroptooltip" class="hastooltip"&gt;$msg.get("panelwizard.draganddrop")
+      #set($panelClass = $xwiki.getDocument("Panels.PanelClass").xWikiClass)
+      #set($categoryList = $panelClass.category.getProperty("values").value.split("[|]"))
+      #set($sql = ", BaseObject as obj where obj.name=doc.fullName and obj.className='Panels.PanelClass' and doc.fullName!='Panels.PanelTemplate'")
+      #set($panelsList = $xwiki.searchDocuments($sql))
+      #set($categoryMap = $util.getHashMap())
+      #foreach($category in $categoryList)
+        $!categoryMap.put($category, $util.getArrayList())
+      #end
+      #foreach ($item in $panelsList)
+        ## stats panels can't be seen by non global admins
+        #if($xwiki.hasAccessLevel("view", $context.user, $item))
+          #set($obj = $xwiki.getDocument($item).getObject("Panels.PanelClass"))
+          #if($obj.type == 'view')
+            #set($arrayList = $categoryMap.get($obj.category))
+            #if($arrayList)
+              #set($discard = $categoryMap.get($obj.category).add($item))
+              ## TODO: uncategorized?
+            #end
+          #end
+        #end
+      #end
+      #set($panelsPerRow = 3)
+      &lt;div id="dhtmltooltip" style="visibility: hidden;"&gt;&lt;/div&gt;
+      #set($ajaxdoc = $xwiki.getDocument("Panels.AjaxEditor"))
+      #if($request.place)
+        #set($ajaxurl = $xwiki.getDocument("Panels.PanelLayoutUpdate").getURL("view", "xpage=plain&amp;place=${request.place}&amp;prefsdoc=${currentDoc}"))
+      #else
+        #set($ajaxurl = $xwiki.getDocument("Panels.PanelLayoutUpdate").getURL("view", "xpage=plain&amp;prefsdoc=${currentDoc}"))
+      #end
+      $xwiki.jsfx.use("js/scriptaculous/scriptaculous.js")
+      $xwiki.jsfx.use("js/xwiki/accordion/accordion.js")
+      $xwiki.jsfx.use("js/xwiki/panelwizard/Drag.js")
+      $xwiki.jsfx.use("js/xwiki/panelwizard/ieemu.js")
+      $xwiki.jsfx.use("js/xwiki/panelwizard/toolTip.js")
+      &lt;script type="text/javascript"&gt;
+      //&lt;![CDATA[
+      window.ajaxurl = "$ajaxurl";
+      window.allPanelsPlace = new Object();
+      window.panelsavesuccess = "$msg.get("panelsavesuccess")";
+      window.panelsaveerror = "$msg.get("panelsaveerror")";
+      #set($counter = 0)
+      #set($panelsStatus = $util.hashMap)
+      #foreach($category in $categoryList)
+        #set($categPanels = $categoryMap.get($category))
+        #foreach ($item in $categPanels)
+          #set($discard = $panelsStatus.put($item, "false"))
+          #set($obj = $xwiki.getDocument($item).getObject("Panels.PanelClass"))
+          window.allPanelsPlace[$counter] = new Object();
+          window.allPanelsPlace[$counter]['fullname'] = '$item';
+          #set($issetleft = 0)
+          #set($counterleft = 0)
+          #set($issetright = 0)
+          #set($counterright = 0)
+          #foreach($element in $leftPanels)
+            #if($item == $element)
+              window.allPanelsPlace[$counter]['left'] = $counterleft;
+              #set($issetleft = 1)
+              #set($discard = $panelsStatus.put($item, "true"))
+            #end
+            #set($counterleft = $counterleft + 1)
+          #end
+          #if($issetleft == 0)
+            window.allPanelsPlace[$counter]['left'] = -1;
+          #end
+          #foreach($element in $rightPanels)
+            #if($item == $element)
+              window.allPanelsPlace[$counter]['right'] = $counterright;
+              #set($issetright = 1)
+              #set($discard = $panelsStatus.put($item, "true"))
+            #end
+            #set($counterright = $counterright + 1)
+          #end
+          #if($issetright == 0)
+            window.allPanelsPlace[$counter]['right'] = -1;
+          #end
+          #set($counter = $counter + 1)
+        #end
+      #end
+      window.showLeftColumn = $showLeftPanels;
+      window.showRightColumn = $showRightPanels;
+      var obj = {div:'panellistaccordion', no:0, height:512};  
+      Event.observe(window,'load',createAccordion.bind(this,obj));
+      //]]&gt;
+      &lt;/script&gt;
+      &lt;script type="text/javascript" src="$xwiki.getSkinFile("js/xwiki/panelwizard/panelWizard.js")"&gt;&lt;/script&gt;
+      &lt;div id="allviewpanels"&gt;
+        &lt;div id="panellistaccordion" class="accordion"&gt; ## start of accordion
+          #set($panelCount = 0)
+          #foreach($category in $categoryList)
+              ## start of accordion tab:
+              &lt;div class="accordionTabTitleBar" id="${category}_header"&gt;&lt;h1&gt;$category&lt;/h1&gt;&lt;/div&gt;
+              ## start of accordion tab content:
+              &lt;div class="accordionTabContentBox"&gt;
+                #set($categPanels = $categoryMap.get($category))
+                #if($categPanels.size() == 0)
+                  $msg.get("panelwizard.nopanels")
+                #else
+                  #foreach ($item in $categPanels)
+                    #set($panelDoc = $xwiki.getDocument($item))
+                    #set($obj = $panelDoc.getObject("Panels.PanelClass"))
+                          &lt;div class="panelitemc"&gt;
+                            &lt;div class="label"&gt;$doc.display("name", $obj)&lt;/div&gt;
+                            &lt;div id="panelContainer${panelCount}" class="panelcontainer"&gt;#if($panelsStatus.get($item) == "false")#displaypanel("$item")#else&lt;div class="panel"&gt;&lt;/div&gt;#end&lt;/div&gt;
+                            &lt;div class="xwikibuttonlink"&gt;&lt;a href="$xwiki.getURL("$item", "inline")"&gt;$msg.get("edit")&lt;/a&gt; &lt;a href="$xwiki.getURL("$item", "delete")"&gt;$msg.get("delete")&lt;/a&gt;&lt;/div&gt;
+                          &lt;/div&gt;
+                          &lt;script type="text/javascript"&gt;
+                          //&lt;![CDATA[
+                            Event.observe($("panelContainer${panelCount}"), "mouseover", function(event) {
+                              if(!window.isDraggingPanel) {
+                                showtip(Event.element(event), unescape('$util.encodeURI($doc.display("description", $obj)).replaceAll("[+]", "%20").replaceAll("'", "&amp;#39;")'), 300); 
+                              }
+                            });
+                          //]]&gt;
+                          &lt;/script&gt;
+                          #set($panelCount = $panelCount + 1)
+                   #end
+                 #end
+              &lt;/div&gt;  ## end of accordion tab content
+            #end   ## end of foreach
+          &lt;/div&gt; ## end of accordion
+       &lt;/div&gt;   ## end of allpanels div
+     &lt;/div&gt;      ## end of PanelsListSection
+     &lt;div id="PageLayoutSection"&gt;
+    $msg.get("panelwizard.choosepagelayout")
+
+    #set($crtlayout = 0)
+    #if($showLeftPanels and $showLeftPanels == "1")
+      #set($crtlayout = $crtlayout + 1)
+    #end
+    #if($showRightPanels and $showRightPanels == "1")
+      #set($crtlayout = $crtlayout + 2)
+    #end
+    &lt;div class="pagelayoutoptions"&gt;
+      &lt;table&gt;
+        &lt;tr&gt;
+          &lt;td&gt;
+            &lt;div
+            #if($crtlayout == 0)id="selectedoption" #end 
+            class="pagelayoutoption pagelayoutoption0"&gt;
+              ##&lt;input type="radio" name="pagelayout" value="nosidecol" checked="cheched" /&gt;
+              &lt;label&gt;$msg.get("panelwizard.nosidecolumn")&lt;/label&gt;
+              &lt;div id="nosidecolumn" class="layoutmaquette"&gt;
+                &lt;div class="lmcontentcolumn"&gt;&lt;/div&gt;
+              &lt;/div&gt;
+            &lt;/div&gt;
+          &lt;/td&gt;
+          &lt;td&gt;
+            &lt;div 
+            #if($crtlayout == 1)id="selectedoption" #end
+            class="pagelayoutoption pagelayoutoption1"&gt;
+              ##&lt;input type="radio" name="pagelayout" value="leftcol" "/&gt;
+              &lt;label&gt;$msg.get("panelwizard.leftcolumn")&lt;/label&gt;
+              &lt;div id="leftcolumn" class="layoutmaquette"&gt;
+                &lt;div class="lmleftcolumn"&gt;&lt;/div&gt;
+                &lt;div class="lmcontentcolumn"&gt;&lt;/div&gt;
+              &lt;/div&gt;
+            &lt;/div&gt;
+          &lt;/td&gt;
+          &lt;td&gt;
+            &lt;div
+            #if($crtlayout == 2)id="selectedoption" #end
+            class="pagelayoutoption pagelayoutoption2"&gt;
+              ##&lt;input type="radio" name="pagelayout" value="rightcol" /&gt;
+              &lt;label&gt;$msg.get("panelwizard.rightcolumn")&lt;/label&gt;
+              &lt;div id="rightcolumn" class="layoutmaquette"&gt;
+                &lt;div class="lmrightcolumn"&gt;&lt;/div&gt;
+                &lt;div class="lmcontentcolumn"&gt;&lt;/div&gt;
+              &lt;/div&gt;
+            &lt;/div&gt;
+          &lt;/td&gt;
+          &lt;td&gt;
+            &lt;div 
+            #if($crtlayout == 3)id="selectedoption" #end
+            class="pagelayoutoption pagelayoutoption3"&gt;
+              &lt;label&gt;$msg.get("panelwizard.bothcolumns")&lt;/label&gt;
+              &lt;div  id="bothcolumns" class="layoutmaquette"&gt;
+                &lt;div class="lmleftcolumn"&gt;&lt;/div&gt;
+                &lt;div class="lmrightcolumn"&gt;&lt;/div&gt;
+                &lt;div class="lmcontentcolumn"&gt;&lt;/div&gt;
+              &lt;/div&gt;
+            &lt;/div&gt;
+          &lt;/td&gt;
+         &lt;/tr&gt;
+        &lt;/table&gt;
+      &lt;/div&gt;
+    &lt;/div&gt;  
+  &lt;/div&gt; ## xwikieditcontent
+  &lt;div id="panelwizardbuttons" class="floatcontainer"&gt;
+    &lt;span class="xwikibuttonlink"&gt;
+      &lt;span class="buttonwrapper"&gt;&lt;a id="saveLayout" href="#"&gt;$msg.get("xe.panels.wizard.savenew")&lt;/a&gt;&lt;/span&gt;
+      &lt;span class="buttonwrapper"&gt;&lt;a id="revertLayout" href="$doc.getURL("view")"&gt;$msg.get("xe.panels.wizard.revert")&lt;/a&gt;&lt;/span&gt;
+      &lt;span class="buttonwrapper"&gt;&lt;a href="$xwiki.getURL("Panels.WebHome")"&gt;$msg.get("xe.panels.wizard.homepage")&lt;/a&gt;&lt;/span&gt;
+    &lt;/span&gt;
+  &lt;/div&gt;
+  &lt;script type="text/javascript"&gt;
+  //&lt;![CDATA[
+    Event.observe($('draganddroptooltip'), "mouseover", function() {
+      if(window.isDraggingPanel) {
+        return; 
+      } 
+      showtip($('draganddroptooltip'), '$msg.get("panelwizard.tip")', 300);
+    });
+
+    Event.observe($('firstwtab'), "click", function(event) {
+      switchToWizardPage($('firstwtab'), 'PanelListSection'); 
+      return false;
+    });
+
+    Event.observe($('secondwtab'), "click", function(event) {
+      switchToWizardPage($('secondwtab'), 'PageLayoutSection'); 
+      return false;
+    });
+
+    Event.observe($$('.pagelayoutoption0')[0], "click", function(event) { changePreviewLayout($$('.pagelayoutoption0')[0], 0); });
+    Event.observe($$('.pagelayoutoption1')[0], "click", function(event) { changePreviewLayout($$('.pagelayoutoption1')[0], 1); });
+    Event.observe($$('.pagelayoutoption2')[0], "click", function(event) { changePreviewLayout($$('.pagelayoutoption2')[0], 2); });
+    Event.observe($$('.pagelayoutoption3')[0], "click", function(event) { changePreviewLayout($$('.pagelayoutoption3')[0], 3); });
+
+    Event.observe($('saveLayout'), "click", function(event) {
+      save(); 
+      return false;
+    });
+
+    Event.observe($('revertLayout'), "click", function(event) {
+      revert(); 
+      return false;
+    });
+  //]]&gt;
+  &lt;/script&gt;
+#else
+  #xwikimessageboxstart("$msg.get('panelwizard.paneleditor')" "")
+  $msg.get("panelwizard.needadminright")
+  #xwikimessageboxend()
+#end
+#end ## redirect
+{/pre}</content>
+</xwikidoc>

@@ -393,13 +393,21 @@ XWiki.editors.FullScreenEditing = Class.create({
     }
 
     // Restore the previous layout
+    // NOTE: We restore the previous layout in reverse order (from the document body down to the target element) to
+    // overcome a IE7 bug (see http://jira.xwiki.org/jira/browse/XWIKI-4346 ).
     var parent = targetElement.up();
+    var parents = [];
     while (parent != document.body) {
+      parents.push(parent);
+      parent = parent.up();
+    }
+    var i = parents.length;
+    while (i--) {
+      parent = parents[i];
       parent.setStyle(parent._originalStyle);
       parent.siblings().each(function(item) {
         item.style['display'] = item._originalDisplay;
       });
-      parent = parent.up();
     }
     document.body.setStyle(document.body._originalStyle);
     $(document.body).up().setStyle($(document.body).up()._originalStyle);

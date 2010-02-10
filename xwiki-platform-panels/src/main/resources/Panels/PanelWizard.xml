@@ -172,6 +172,7 @@
       &lt;script type="text/javascript" src="$xwiki.getSkinFile("js/xwiki/panelwizard/panelWizard.js")"&gt;&lt;/script&gt;
       &lt;div id="allviewpanels"&gt;
         &lt;div id="panellistaccordion" class="accordion"&gt; ## start of accordion
+          #set($panelCount = 0)
           #foreach($category in $categoryList)
               ## start of accordion tab:
               &lt;div class="accordionTabTitleBar" id="${category}_header"&gt;&lt;h1&gt;$category&lt;/h1&gt;&lt;/div&gt;
@@ -186,18 +187,19 @@
                     #set($obj = $panelDoc.getObject("Panels.PanelClass"))
                           &lt;div class="panelitemc"&gt;
                             &lt;div class="label"&gt;$doc.display("name", $obj)&lt;/div&gt;
-                            &lt;div id="panelContainer${panelDoc.getName()}"class="panelcontainer"&gt;#if($panelsStatus.get($item) == "false")#displaypanel("$item")#else&lt;div class="panel"&gt;&lt;/div&gt;#end&lt;/div&gt;
+                            &lt;div id="panelContainer${panelCount}" class="panelcontainer"&gt;#if($panelsStatus.get($item) == "false")#displaypanel("$item")#else&lt;div class="panel"&gt;&lt;/div&gt;#end&lt;/div&gt;
                             &lt;div class="xwikibuttonlink"&gt;&lt;a href="$xwiki.getURL("$item", "inline")"&gt;$msg.get("edit")&lt;/a&gt; &lt;a href="$xwiki.getURL("$item", "delete")"&gt;$msg.get("delete")&lt;/a&gt;&lt;/div&gt;
                           &lt;/div&gt;
                           &lt;script type="text/javascript"&gt;
                           //&lt;![CDATA[
-                            Event.observe($("panelContainer${panelDoc.getName()}"), "mouseover", function(event) {
+                            Event.observe($("panelContainer${panelCount}"), "mouseover", function(event) {
                               if(!window.isDraggingPanel) {
-                                showtip($("panelContainer${panelDoc.getName()}"), unescape('$util.encodeURI($doc.display("description", $obj)).replaceAll("[+]", "%20").replaceAll("'", "&amp;#39;")'), 300); 
+                                showtip(Event.element(event), unescape('$util.encodeURI($doc.display("description", $obj)).replaceAll("[+]", "%20").replaceAll("'", "&amp;#39;")'), 300); 
                               }
                             });
                           //]]&gt;
                           &lt;/script&gt;
+                          #set($panelCount = $panelCount + 1)
                    #end
                  #end
               &lt;/div&gt;  ## end of accordion tab content

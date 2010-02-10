@@ -19,21 +19,15 @@
  */
 package com.xpn.xwiki.internal.model.reference;
 
-import com.xpn.xwiki.XWikiContext;
-import com.xpn.xwiki.doc.XWikiDocument;
-import com.xpn.xwiki.test.AbstractBridgedXWikiComponentTestCase;
-import com.xpn.xwiki.web.Utils;
-import org.jmock.Expectations;
 import org.jmock.Mockery;
 import org.junit.Assert;
 import org.junit.Before;
-import org.xwiki.component.descriptor.DefaultComponentDescriptor;
-import org.xwiki.context.Execution;
 import org.xwiki.model.EntityType;
-import org.xwiki.model.ModelContext;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.EntityReferenceResolver;
-import org.xwiki.model.reference.WikiReference;
+
+import com.xpn.xwiki.doc.XWikiDocument;
+import com.xpn.xwiki.test.AbstractBridgedXWikiComponentTestCase;
 
 /**
  * Unit tests for {@link CurrentMixedStringDocumentReferenceResolver}.
@@ -45,43 +39,24 @@ public class CurrentMixedStringDocumentReferenceResolverTest extends AbstractBri
 {
     private static final String CURRENT_SPACE = "currentspace";
 
-    private Mockery mockery = new Mockery();
-    
-    private EntityReferenceResolver resolver;
-
-    private XWikiContext context;
-
-    private ModelContext mockModelContext;
+    private EntityReferenceResolver<String> resolver;
     
     @Before
     public void setUp() throws Exception
     {
         super.setUp();
 
-        this.context = new XWikiContext();
-
-        Execution execution = getComponentManager().lookup(Execution.class);
-        execution.getContext().setProperty("xwikicontext", this.context);
-        Utils.setComponentManager(getComponentManager());
-
-        this.mockModelContext = mockery.mock(ModelContext.class);
-        DefaultComponentDescriptor<ModelContext> descriptor = new DefaultComponentDescriptor<ModelContext>();
-        descriptor.setRole(ModelContext.class);
-        getComponentManager().registerComponent(descriptor, this.mockModelContext);
-        
         this.resolver = getComponentManager().lookup(EntityReferenceResolver.class, "currentmixed");
     }
 
     @org.junit.Test
     public void testResolveDocumentReferenceWhenContextDocument() throws Exception
     {
-        this.context.setDoc(new XWikiDocument("not used", CURRENT_SPACE, "notused"));
+        getContext().setDoc(new XWikiDocument("not used", CURRENT_SPACE, "notused"));
 
-        mockery.checking(new Expectations() {{
-            allowing(mockModelContext).getCurrentEntityReference(); will(returnValue(new WikiReference("currentwiki")));
-        }});
+        getContext().setDatabase("currentwiki");
 
-        EntityReference reference = resolver.resolve("", EntityType.DOCUMENT);
+        EntityReference reference = this.resolver.resolve("", EntityType.DOCUMENT);
         Assert.assertEquals("currentwiki", reference.extractReference(EntityType.WIKI).getName());
         Assert.assertEquals(CURRENT_SPACE, reference.extractReference(EntityType.SPACE).getName());
         Assert.assertEquals("WebHome", reference.getName());
@@ -90,11 +65,9 @@ public class CurrentMixedStringDocumentReferenceResolverTest extends AbstractBri
     @org.junit.Test
     public void testResolveDocumentReferenceForDefaultWikiWhenNoContextDocument() throws Exception
     {
-        mockery.checking(new Expectations() {{
-            allowing(mockModelContext).getCurrentEntityReference(); will(returnValue(new WikiReference("currentwiki")));
-        }});
+        getContext().setDatabase("currentwiki");
 
-        EntityReference reference = resolver.resolve("space.page", EntityType.DOCUMENT);
+        EntityReference reference = this.resolver.resolve("space.page", EntityType.DOCUMENT);
 
         // Make sure the resolved wiki is the current wiki and not the wiki from the current document (since that
         // doc isn't set).

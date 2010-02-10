@@ -25,13 +25,15 @@ import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.Requirement;
 import org.xwiki.context.Execution;
 import org.xwiki.model.EntityType;
+import org.xwiki.model.ModelContext;
 import org.xwiki.model.internal.reference.DefaultReferenceEntityReferenceResolver;
+import org.xwiki.model.reference.EntityReference;
 
 /**
  * Resolve an {@link org.xwiki.model.reference.EntityReference} into a valid and absolute reference (with all required
  * parents filled in). This implementation uses values from the current document reference in the context when parts of
  * the Reference are missing in the string representation.
- *
+ * 
  * @version $Id$
  * @since 2.2M1
  */
@@ -39,34 +41,51 @@ import org.xwiki.model.internal.reference.DefaultReferenceEntityReferenceResolve
 public class CurrentReferenceEntityReferenceResolver extends DefaultReferenceEntityReferenceResolver
 {
     @Requirement
+    private ModelContext modelContext;
+
+    @Requirement
     private Execution execution;
 
     /**
      * {@inheritDoc}
+     * 
      * @see DefaultReferenceEntityReferenceResolver#getDefaultReferenceName(org.xwiki.model.EntityType)
      */
-    @Override protected String getDefaultReferenceName(EntityType type)
+    @Override
+    protected String getDefaultReferenceName(EntityType type)
     {
         String result;
 
         XWikiDocument currentDoc = getContext().getDoc();
-        if (currentDoc == null) {
-            result = super.getDefaultReferenceName(type);
-        } else {
-            switch (type) {
-                case DOCUMENT:
-                    result = currentDoc.getPageName();
-                    break;
-                case WIKI:
-                    result = currentDoc.getWikiName();
-                    break;
-                case SPACE:
-                    result = currentDoc.getSpaceName();
-                    break;
-                default:
+        switch (type) {
+            case WIKI:
+                EntityReference wikiReference = this.modelContext.getCurrentEntityReference();
+                if (wikiReference != null) {
+                    wikiReference = wikiReference.extractReference(EntityType.WIKI);
+                }
+                if (wikiReference != null) {
+                    result = wikiReference.getName();
+                } else {
                     result = super.getDefaultReferenceName(type);
-                    break;
-            }
+                }
+                break;
+            case SPACE:
+                if (currentDoc != null) {
+                    result = currentDoc.getSpaceName();
+                } else {
+                    result = super.getDefaultReferenceName(type);
+                }
+                break;
+            case DOCUMENT:
+                if (currentDoc != null) {
+                    result = currentDoc.getPageName();
+                } else {
+                    result = super.getDefaultReferenceName(type);
+                }
+                break;
+            default:
+                result = super.getDefaultReferenceName(type);
+                break;
         }
 
         return result;

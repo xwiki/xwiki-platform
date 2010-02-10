@@ -23,9 +23,13 @@ import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.test.AbstractBridgedXWikiComponentTestCase;
 import com.xpn.xwiki.web.Utils;
+
+import org.jmock.Mockery;
 import org.junit.*;
+import org.xwiki.component.descriptor.DefaultComponentDescriptor;
 import org.xwiki.context.Execution;
 import org.xwiki.model.EntityType;
+import org.xwiki.model.ModelContext;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.EntityReferenceResolver;
@@ -40,24 +44,20 @@ public class CurrentEntityReferenceResolverTest extends AbstractBridgedXWikiComp
 {
     private static final String CURRENT_WIKI = "currentwiki";
 
-    private static final String CURRENT_SPACE = "currentspace";
+    private static final String CURRENTDOC_WIKI = "currentdocwiki";
 
-    private static final String CURRENT_PAGE = "currentpage";
+    private static final String CURRENTDOC_SPACE = "currentdocspace";
+
+    private static final String CURRENTDOC_PAGE = "currentdocpage";
 
     private EntityReferenceResolver<String> resolver;
-
-    private XWikiContext context;
-
+   
     @Before
     public void setUp() throws Exception
     {
         super.setUp();
-        
-        this.context = new XWikiContext();
 
-        Execution execution = getComponentManager().lookup(Execution.class);
-        execution.getContext().setProperty("xwikicontext", this.context);
-        Utils.setComponentManager(getComponentManager());
+        getContext().setDatabase(CURRENT_WIKI);
         
         this.resolver = getComponentManager().lookup(EntityReferenceResolver.class, "current");
     }
@@ -65,7 +65,11 @@ public class CurrentEntityReferenceResolverTest extends AbstractBridgedXWikiComp
     @org.junit.Test
     public void testResolveDocumentReferenceWhenNoContextDocument() throws Exception
     {
+        getContext().setDatabase(null);
+        getContext().setDoc(null);
+
         EntityReference reference = resolver.resolve("", EntityType.DOCUMENT);
+
         Assert.assertEquals("xwiki", reference.extractReference(EntityType.WIKI).getName());
         Assert.assertEquals("Main", reference.extractReference(EntityType.SPACE).getName());
         Assert.assertEquals("WebHome", reference.getName());
@@ -74,23 +78,26 @@ public class CurrentEntityReferenceResolverTest extends AbstractBridgedXWikiComp
     @org.junit.Test
     public void testResolveDocumentReferenceWhenContextDocument() throws Exception
     {
-        this.context.setDoc(new XWikiDocument(new DocumentReference(CURRENT_WIKI, CURRENT_SPACE, CURRENT_PAGE)));
+        getContext().setDoc(
+            new XWikiDocument(new DocumentReference(CURRENT_WIKI, CURRENTDOC_SPACE, CURRENTDOC_PAGE)));
 
         EntityReference reference = resolver.resolve("", EntityType.DOCUMENT);
+
         Assert.assertEquals(CURRENT_WIKI, reference.extractReference(EntityType.WIKI).getName());
-        Assert.assertEquals(CURRENT_SPACE, reference.extractReference(EntityType.SPACE).getName());
-        Assert.assertEquals(CURRENT_PAGE, reference.getName());
+        Assert.assertEquals(CURRENTDOC_SPACE, reference.extractReference(EntityType.SPACE).getName());
+        Assert.assertEquals(CURRENTDOC_PAGE, reference.getName());
     }
 
     @org.junit.Test
     public void testResolveAttachmentReference() throws Exception
     {
-        this.context.setDoc(new XWikiDocument(new DocumentReference(CURRENT_WIKI, CURRENT_SPACE, CURRENT_PAGE)));
+        getContext().setDoc(new XWikiDocument(new DocumentReference(CURRENT_WIKI, CURRENTDOC_SPACE, CURRENTDOC_PAGE)));
 
         EntityReference reference = resolver.resolve("", EntityType.ATTACHMENT);
+
         Assert.assertEquals(CURRENT_WIKI, reference.extractReference(EntityType.WIKI).getName());
-        Assert.assertEquals(CURRENT_SPACE, reference.extractReference(EntityType.SPACE).getName());
-        Assert.assertEquals(CURRENT_PAGE, reference.extractReference(EntityType.DOCUMENT).getName());
+        Assert.assertEquals(CURRENTDOC_SPACE, reference.extractReference(EntityType.SPACE).getName());
+        Assert.assertEquals(CURRENTDOC_PAGE, reference.extractReference(EntityType.DOCUMENT).getName());
         Assert.assertEquals("filename", reference.getName());
     }
 }

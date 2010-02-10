@@ -46,18 +46,10 @@ public class CurrentReferenceEntityReferenceResolverTest extends AbstractBridged
 
     private EntityReferenceResolver<EntityReference> resolver;
 
-    private XWikiContext context;
-
     @Before
     public void setUp() throws Exception
     {
         super.setUp();
-
-        this.context = new XWikiContext();
-
-        Execution execution = getComponentManager().lookup(Execution.class);
-        execution.getContext().setProperty("xwikicontext", this.context);
-        Utils.setComponentManager(getComponentManager());
 
         this.resolver = getComponentManager().lookup(EntityReferenceResolver.class, "current/reference");
     }
@@ -65,8 +57,9 @@ public class CurrentReferenceEntityReferenceResolverTest extends AbstractBridged
     @org.junit.Test
     public void testResolveAttachmentReferenceWhenMissingParentsAndNoContextDocument()
     {
-        EntityReference reference = resolver.resolve(
-            new EntityReference("filename", EntityType.ATTACHMENT), EntityType.ATTACHMENT);
+        EntityReference reference =
+                resolver.resolve(new EntityReference("filename", EntityType.ATTACHMENT), EntityType.ATTACHMENT);
+
         Assert.assertEquals("WebHome", reference.getParent().getName());
         Assert.assertEquals(EntityType.DOCUMENT, reference.getParent().getType());
         Assert.assertEquals("Main", reference.getParent().getParent().getName());
@@ -78,10 +71,12 @@ public class CurrentReferenceEntityReferenceResolverTest extends AbstractBridged
     @org.junit.Test
     public void testResolveAttachmentReferenceWhenMissingParentsAndContextDocument()
     {
-        this.context.setDoc(new XWikiDocument(CURRENT_WIKI, CURRENT_SPACE, CURRENT_PAGE));
+        getContext().setDatabase(CURRENT_WIKI);
+        getContext().setDoc(new XWikiDocument(CURRENT_WIKI, CURRENT_SPACE, CURRENT_PAGE));
 
-        EntityReference reference = resolver.resolve(
-            new EntityReference("filename", EntityType.ATTACHMENT), EntityType.ATTACHMENT);
+        EntityReference reference =
+                resolver.resolve(new EntityReference("filename", EntityType.ATTACHMENT), EntityType.ATTACHMENT);
+
         Assert.assertEquals(CURRENT_PAGE, reference.getParent().getName());
         Assert.assertEquals(EntityType.DOCUMENT, reference.getParent().getType());
         Assert.assertEquals(CURRENT_SPACE, reference.getParent().getParent().getName());

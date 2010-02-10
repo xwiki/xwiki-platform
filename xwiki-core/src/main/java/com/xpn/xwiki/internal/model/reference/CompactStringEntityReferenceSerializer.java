@@ -20,6 +20,9 @@
 package com.xpn.xwiki.internal.model.reference;
 
 import com.xpn.xwiki.doc.XWikiDocument;
+
+import org.xwiki.model.EntityType;
+import org.xwiki.model.ModelContext;
 import org.xwiki.model.internal.reference.DefaultStringEntityReferenceSerializer;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.Requirement;
@@ -29,9 +32,9 @@ import com.xpn.xwiki.XWikiContext;
 import org.xwiki.model.reference.EntityReference;
 
 /**
- * Generate an entity reference string that doesn't contain reference parts that are the same as the current entity
- * in the execution context. Note that the terminal part is always kept (eg the document's page for a document reference
- * or the attachment's filename for an attachment reference). 
+ * Generate an entity reference string that doesn't contain reference parts that are the same as the current entity in
+ * the execution context. Note that the terminal part is always kept (eg the document's page for a document reference or
+ * the attachment's filename for an attachment reference).
  * 
  * @version $Id$
  * @since 2.2M1
@@ -39,6 +42,9 @@ import org.xwiki.model.reference.EntityReference;
 @Component("compact")
 public class CompactStringEntityReferenceSerializer extends DefaultStringEntityReferenceSerializer
 {
+    @Requirement
+    private ModelContext modelContext;
+
     /**
      * Execution context handler, needed for accessing the XWikiContext.
      */
@@ -47,11 +53,12 @@ public class CompactStringEntityReferenceSerializer extends DefaultStringEntityR
 
     /**
      * {@inheritDoc}
+     * 
      * @see org.xwiki.model.internal.reference.DefaultStringEntityReferenceSerializer
      *      #serializeEntityReference(EntityReference, StringBuilder, boolean)
      */
     @Override
-    protected void serializeEntityReference(EntityReference currentReference, StringBuilder representation, 
+    protected void serializeEntityReference(EntityReference currentReference, StringBuilder representation,
         boolean isLastReference)
     {
         boolean shouldPrint = false;
@@ -62,33 +69,36 @@ public class CompactStringEntityReferenceSerializer extends DefaultStringEntityR
         // In addition an entity reference isn't printed only if all parent references are not printed either,
         // otherwise print it. For example "wiki:page" isn't allowed for a Document Reference.
 
-        if (getContext() == null || getContext().getDoc() == null || currentReference.getChild() == null 
-            || isLastReference || representation.length() > 0)
-        {
+        if (getContext() == null || currentReference.getChild() == null || isLastReference
+            || representation.length() > 0) {
             shouldPrint = true;
         } else {
             XWikiDocument currentDoc = getContext().getDoc();
             switch (currentReference.getType()) {
                 case WIKI:
-                    if (!currentDoc.getWikiName().equals(currentReference.getName())) {
+                    EntityReference wikiReference = this.modelContext.getCurrentEntityReference();
+                    if (wikiReference != null) {
+                        wikiReference = wikiReference.extractReference(EntityType.WIKI);
+                    }
+                    if (wikiReference == null || !wikiReference.getName().equals(currentReference.getName())) {
                         shouldPrint = true;
                     }
                     break;
                 case SPACE:
-                    if (!currentDoc.getSpaceName().equals(currentReference.getName())) {
+                    if (currentDoc == null || !currentDoc.getSpaceName().equals(currentReference.getName())) {
                         shouldPrint = true;
                     }
                     break;
                 case DOCUMENT:
-                    if (!currentDoc.getPageName().equals(currentReference.getName())) {
+                    if (currentDoc == null || !currentDoc.getPageName().equals(currentReference.getName())) {
                         shouldPrint = true;
                     }
                     break;
                 default:
                     break;
             }
-
         }
+
         if (shouldPrint) {
             super.serializeEntityReference(currentReference, representation, isLastReference);
         }

@@ -25,6 +25,7 @@ import org.junit.Assert;
 import org.xwiki.component.descriptor.DefaultComponentDescriptor;
 import org.xwiki.model.ModelContext;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.model.reference.WikiReference;
 import org.xwiki.test.AbstractComponentTestCase;
@@ -37,7 +38,7 @@ import org.xwiki.test.AbstractComponentTestCase;
  */
 public class CompactWikiEntityReferenceSerializerTest extends AbstractComponentTestCase
 {
-    private EntityReferenceSerializer serializer;
+    private EntityReferenceSerializer<EntityReference> serializer;
 
     private Mockery mockery = new Mockery();
 
@@ -60,7 +61,7 @@ public class CompactWikiEntityReferenceSerializerTest extends AbstractComponentT
     {
         DocumentReference reference = new DocumentReference("wiki", "space", "page");
 
-        mockery.checking(new Expectations() {{
+        this.mockery.checking(new Expectations() {{
             allowing(mockModelContext).getCurrentEntityReference(); will(returnValue(new WikiReference("wiki")));
         }});
 
@@ -73,7 +74,7 @@ public class CompactWikiEntityReferenceSerializerTest extends AbstractComponentT
     {
         DocumentReference reference = new DocumentReference("wiki", "space", "page");
 
-        mockery.checking(new Expectations() {{
+        this.mockery.checking(new Expectations() {{
             allowing(mockModelContext).getCurrentEntityReference(); will(returnValue(new WikiReference("otherwiki")));
         }});
 

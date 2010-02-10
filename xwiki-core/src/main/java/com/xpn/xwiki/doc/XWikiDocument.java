@@ -6913,12 +6913,17 @@ public class XWikiDocument implements DocumentModelBridge
         DocumentReference defaultReference)
     {
         XWikiContext xcontext = getXWikiContext();
+
+        String originalWikiName = xcontext.getDatabase();
         XWikiDocument originalCurentDocument = xcontext.getDoc();
         try {
+            xcontext.setDatabase(defaultReference.getWikiReference().getName());
             xcontext.setDoc(new XWikiDocument(defaultReference));
+
             return resolver.resolve(referenceAsString);
         } finally {
             xcontext.setDoc(originalCurentDocument);
+            xcontext.setDatabase(originalWikiName);
         }
     }
 

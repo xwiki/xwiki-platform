@@ -12,8 +12,8 @@
 <customClass></customClass>
 <contentAuthor>XWiki.Admin</contentAuthor>
 <creationDate>1264860755000</creationDate>
-<date>1265806933000</date>
-<contentUpdateDate>1265806933000</contentUpdateDate>
+<date>1265812097000</date>
+<contentUpdateDate>1265812097000</contentUpdateDate>
 <version>1.0</version>
 <title></title>
 <template></template>
@@ -213,19 +213,16 @@ XWiki.Selection = Class.create({
     }
   },
 
-  addPanelNextToSelection : function(panel) {
+  positionPanelNextToSelection : function(panel) {
     if (!this.range) {
       return;
     }
 
     if (window.getSelection) {
-      // standard
-      this.highlightWrapper.insert({after : panel});
       // set the position
-      panel.style.left = this.highlightWrapper.viewportOffset().left + 'px';
+      panel.style.left = this.highlightWrapper.positionedOffset().left + "px";
+      panel.style.top = (this.highlightWrapper.positionedOffset().top + this.highlightWrapper.getHeight())+ "px";
     } else {
-      // IE
-      this.container.insert({bottom : panel});
       panel.style.left = this.offsetX + "px";
       panel.style.top = this.offsetY + "px";
     }
@@ -669,8 +666,9 @@ XWiki.Annotation = Class.create({
     this.createPanel.toggleClassName('hidden');
     // TODO: get this color from the color theme
     this.selectionService.highlightSelection("#FFEE99");
-    // display the panel
-    this.selectionService.addPanelNextToSelection(this.createPanel);
+    this.selectionService.container.insert({bottom : this.createPanel});
+    // set the position of the panel on the screen
+    this.selectionService.positionPanelNextToSelection(this.createPanel);
     // put the content in
     this.createPanel.update(panelContent);
     // make it visible

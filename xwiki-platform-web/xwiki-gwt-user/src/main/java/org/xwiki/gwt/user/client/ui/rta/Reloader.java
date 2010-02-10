@@ -21,6 +21,7 @@ package org.xwiki.gwt.user.client.ui.rta;
 
 import java.util.Map;
 
+import org.xwiki.gwt.dom.client.Document;
 import org.xwiki.gwt.dom.client.IFrameElement;
 import org.xwiki.gwt.dom.client.JavaScriptObject;
 import org.xwiki.gwt.user.client.Strings;
@@ -173,13 +174,17 @@ public class Reloader implements RequestCallback, LoadHandler
      * 
      * @param content the new content
      */
-    private native void updateContent(String content)
-    /*-{
-        var rta = this.@org.xwiki.gwt.user.client.ui.rta.Reloader::rta;
-        var iframe = rta.@com.google.gwt.user.client.ui.UIObject::getElement()();
-        iframe.contentWindow.content = content;
-        iframe.contentWindow.location = 'javascript:window.content';
-    }-*/;
+    private void updateContent(String content)
+    {
+        // We have previously used the JavaScript URI scheme/protocol to update the content of the rich text area but we
+        // had problems on IE when using the Unicode character set with UTF-8 encoding. It seems IE doesn't detect the
+        // correct encoding when using the JavaScript URI scheme unless we add a byte order mark (\uFEFF) at the start
+        // of the content.
+        Document document = rta.getDocument();
+        document.open();
+        document.write(content);
+        document.close();
+    }
 
     /**
      * {@inheritDoc}

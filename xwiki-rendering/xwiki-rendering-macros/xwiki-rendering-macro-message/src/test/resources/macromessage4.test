@@ -1,0 +1,51 @@
+.#-----------------------------------------------------
+.input|xwiki/2.0
+.# Validate that non inline content is properly supported
+.#-----------------------------------------------------
+{{info}}
+* use another value
+* you don't have right
+* another possibility
+{{/info}}
+.#-----------------------------------------------------
+.expect|event/1.0
+.#-----------------------------------------------------
+beginDocument
+beginMacroMarkerStandalone [info] [] [
+* use another value
+* you don't have right
+* another possibility
+]
+beginGroup [[class]=[box infomessage]]
+beginList [BULLETED]
+beginListItem
+onWord [use]
+onSpace
+onWord [another]
+onSpace
+onWord [value]
+endListItem
+beginListItem
+onWord [you]
+onSpace
+onWord [don]
+onSpecialSymbol [']
+onWord [t]
+onSpace
+onWord [have]
+onSpace
+onWord [right]
+endListItem
+beginListItem
+onWord [another]
+onSpace
+onWord [possibility]
+endListItem
+endList [BULLETED]
+endGroup [[class]=[box infomessage]]
+endMacroMarkerStandalone [info] [] [
+* use another value
+* you don't have right
+* another possibility
+]
+endDocument

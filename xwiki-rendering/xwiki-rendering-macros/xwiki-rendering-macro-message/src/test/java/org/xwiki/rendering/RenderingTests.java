@@ -40,6 +40,7 @@ public class RenderingTests extends TestCase
         suite.addTestsFromResource("macromessage1", true);
         suite.addTestsFromResource("macromessage2", true);
         suite.addTestsFromResource("macromessage3", true);
+        suite.addTestsFromResource("macromessage4", true);
 
         return new ComponentManagerTestSetup(suite);
     }

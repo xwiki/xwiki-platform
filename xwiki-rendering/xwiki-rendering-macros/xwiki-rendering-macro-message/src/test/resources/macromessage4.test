@@ -3,49 +3,29 @@
 .# Validate that non inline content is properly supported
 .#-----------------------------------------------------
 {{info}}
-* use another value
-* you don't have right
-* another possibility
+* item1
+* item2
 {{/info}}
 .#-----------------------------------------------------
 .expect|event/1.0
 .#-----------------------------------------------------
 beginDocument
 beginMacroMarkerStandalone [info] [] [
-* use another value
-* you don't have right
-* another possibility
+* item1
+* item2
 ]
 beginGroup [[class]=[box infomessage]]
 beginList [BULLETED]
 beginListItem
-onWord [use]
-onSpace
-onWord [another]
-onSpace
-onWord [value]
+onWord [item1]
 endListItem
 beginListItem
-onWord [you]
-onSpace
-onWord [don]
-onSpecialSymbol [']
-onWord [t]
-onSpace
-onWord [have]
-onSpace
-onWord [right]
-endListItem
-beginListItem
-onWord [another]
-onSpace
-onWord [possibility]
+onWord [item2]
 endListItem
 endList [BULLETED]
 endGroup [[class]=[box infomessage]]
 endMacroMarkerStandalone [info] [] [
-* use another value
-* you don't have right
-* another possibility
+* item1
+* item2
 ]
 endDocument

@@ -34,6 +34,7 @@ import org.xwiki.rendering.block.FormatBlock;
 import org.xwiki.rendering.block.GroupBlock;
 import org.xwiki.rendering.block.ImageBlock;
 import org.xwiki.rendering.block.NewLineBlock;
+import org.xwiki.rendering.block.ParagraphBlock;
 import org.xwiki.rendering.listener.Format;
 import org.xwiki.rendering.listener.Image;
 import org.xwiki.rendering.listener.URLImage;
@@ -167,7 +168,7 @@ public abstract class AbstractBoxMacro<P extends BoxMacroParameters> extends Abs
             List<Block> titleBlocks = parser.parse(new StringReader(titleParameter)).getChildren();
 
             // we try to simplify a bit the generated XDOM tree
-            if (titleBlocks.size() == 1) {
+            if (titleBlocks.size() == 1 && titleBlocks.get(0) instanceof ParagraphBlock) {
                 List<Block> children = titleBlocks.get(0).getChildren();
                 if (children.size() > 0) {
                     titleBlocks = children;
@@ -206,8 +207,8 @@ public abstract class AbstractBoxMacro<P extends BoxMacroParameters> extends Abs
         try {
             return getComponentManager().lookup(Parser.class, context.getSyntax().toIdString());
         } catch (ComponentLookupException e) {
-            throw new MacroExecutionException("Failed to find source parser for syntax [" + context.getSyntax()
-                + "]", e);
+            throw new MacroExecutionException("Failed to find source parser for syntax [" + context.getSyntax() + "]",
+                e);
         }
     }
 

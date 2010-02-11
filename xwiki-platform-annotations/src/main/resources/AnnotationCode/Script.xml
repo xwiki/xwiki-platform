@@ -12,8 +12,8 @@
 <customClass></customClass>
 <contentAuthor>XWiki.Admin</contentAuthor>
 <creationDate>1264860755000</creationDate>
-<date>1265898071000</date>
-<contentUpdateDate>1265898071000</contentUpdateDate>
+<date>1265900802000</date>
+<contentUpdateDate>1265900802000</contentUpdateDate>
 <version>173.1</version>
 <title></title>
 <template></template>
@@ -111,7 +111,7 @@ XWiki.Selection = Class.create({
   range : false,
   // the list of elements that wrap the selection to make it colored, in FF
   highlightWrappers : false,
-  // the parent of the selection and the selection inner HTML to make it colored in FF and to be able to rollback this change
+  // the parent of the selection and the selection inner HTML to make it colored in IE and to be able to rollback this change
   selectionParent : false,
   selectionParentInnerHTML : false,
   // position of the last mouse up, to know where to display the dialog
@@ -462,9 +462,94 @@ XWiki.Selection = Class.create({
     // assume (ass of u and me) that no encounter means unique
     return true;
   }
-});
-
-XWiki.Annotation = Class.create({
+});</code>
+</property>
+<property>
+<name>Annotation Javascript -- Selection handling code</name>
+</property>
+<property>
+<parse>0</parse>
+</property>
+<property>
+<use>always</use>
+</property>
+</object>
+<object>
+<class>
+<name>XWiki.JavaScriptExtension</name>
+<customClass></customClass>
+<customMapping></customMapping>
+<defaultViewSheet></defaultViewSheet>
+<defaultEditSheet></defaultEditSheet>
+<defaultWeb></defaultWeb>
+<nameField></nameField>
+<validationScript></validationScript>
+<cache>
+<cache>0</cache>
+<displayType>select</displayType>
+<multiSelect>0</multiSelect>
+<name>cache</name>
+<number>5</number>
+<prettyName>Caching policy</prettyName>
+<relationalStorage>0</relationalStorage>
+<separator> </separator>
+<separators> ,|</separators>
+<size>1</size>
+<unmodifiable>0</unmodifiable>
+<values>long|short|default|forbid</values>
+<classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+</cache>
+<code>
+<name>code</name>
+<number>2</number>
+<prettyName>Code</prettyName>
+<rows>20</rows>
+<size>50</size>
+<unmodifiable>0</unmodifiable>
+<classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+</code>
+<name>
+<name>name</name>
+<number>1</number>
+<prettyName>Name</prettyName>
+<size>30</size>
+<unmodifiable>0</unmodifiable>
+<classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+</name>
+<parse>
+<displayFormType>select</displayFormType>
+<displayType>yesno</displayType>
+<name>parse</name>
+<number>4</number>
+<prettyName>Parse content</prettyName>
+<unmodifiable>0</unmodifiable>
+<classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+</parse>
+<use>
+<cache>0</cache>
+<displayType>select</displayType>
+<multiSelect>0</multiSelect>
+<name>use</name>
+<number>3</number>
+<prettyName>Use this extension</prettyName>
+<relationalStorage>0</relationalStorage>
+<separator> </separator>
+<separators> ,|</separators>
+<size>1</size>
+<unmodifiable>0</unmodifiable>
+<values>onDemand=On demand|always=Always</values>
+<classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+</use>
+</class>
+<name>AnnotationCode.Script</name>
+<number>1</number>
+<className>XWiki.JavaScriptExtension</className>
+<guid>f380ccb0-3533-4b3b-b257-184223ca7bdd</guid>
+<property>
+<cache></cache>
+</property>
+<property>
+<code>XWiki.Annotation = Class.create({
   // tab name of the annotations tab
   annTabname : 'Annotations',
   // whether current displayed doc is the rendered annotated document
@@ -778,8 +863,8 @@ XWiki.Annotation = Class.create({
     this.selectionService.computeSelection($('xwikicontent'));
     var selectionText = this.selectionService.selectionText;
     if (!selectionText) {
-      // show an 'invalid selection message'
-      new XWiki.widgets.Notification("$msg.get('annotations.action.create.selection.invalid')", "error");
+      // show an 'invalid selection message'. Shorter time here, otherwise it's a bit confusing...
+      new XWiki.widgets.Notification("$msg.get('annotations.action.create.selection.invalid')", "error", {timeout : 5});
     } else {
       this.selectionService.computeContext();
       // fetch the creation for this annotation and display it at the position of the selection
@@ -897,7 +982,7 @@ document.observe('dom:loaded', function() {
 });</code>
 </property>
 <property>
-<name>Annotation Javascript</name>
+<name>Annotation Javascript -- Annotation application</name>
 </property>
 <property>
 <parse>1</parse>

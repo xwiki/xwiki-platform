@@ -987,6 +987,9 @@ div#xwikiobjects input[type="checkbox"], div#xwikiclassproperties input[type="ch
 /* --------------------------------------------------------------
   * Button elements different containers
 -------------------------------------------------------------- */
+.buttonwrapper {
+  margin: 5px 5px 0 0;
+}
 input.button, .buttonwrapper a:visited, .buttonwrapper a:link, .buttonwrapper a:active {
   background-color: $theme.buttonPrimaryBackgroundColor;
   background-image: none;
@@ -994,7 +997,7 @@ input.button, .buttonwrapper a:visited, .buttonwrapper a:link, .buttonwrapper a:
   color: $theme.buttonPrimaryTextColor;
   cursor: pointer;
   font: normal normal 700 .8em/140% "Helvetica",sans-serif;
-  margin: 5px 5px 0 0;
+  margin: 0;
   padding: 2px 3px;
   text-transform: uppercase;
 }

@@ -3,7 +3,9 @@
 #set($isSuperAdmin = ($context.user == 'XWiki.superadmin'))
 #set($hasEdit = $xwiki.hasAccessLevel("edit"))
 #set($hasAdmin = $xwiki.hasAccessLevel("admin"))
+## Note: In order to know if the user has the right to create a space we compute a space name that doesn't exist and check edit rights on that space
 #set($hasCreateSpace = $xwiki.hasAccessLevel("edit", "${doc.space}${mathtool.random(0, 999)}.DocumentReservedForInternalXWikiUsage"))
+## Note: In order to know if the user has the right to create a page we compute a page name that doesn't exist and check edit rights on that page 
 #set($hasCreatePage = $xwiki.hasAccessLevel("edit", "${doc.space}.DocumentReservedForInternalXWikiUsage${mathtool.random(0, 999)}"))
 #set($hasGlobalAdmin = $xwiki.hasAccessLevel("admin", $context.user, "XWiki.XWikiPreferences"))
 #set($hasSpaceAdmin = $xwiki.hasAccessLevel("admin", $context.user, "${doc.space}.WebPreferences"))

@@ -12,8 +12,8 @@
 <customClass></customClass>
 <contentAuthor>XWiki.Admin</contentAuthor>
 <creationDate>1264860755000</creationDate>
-<date>1265812097000</date>
-<contentUpdateDate>1265812097000</contentUpdateDate>
+<date>1265887975000</date>
+<contentUpdateDate>1265887975000</contentUpdateDate>
 <version>1.0</version>
 <title></title>
 <template></template>
@@ -101,7 +101,7 @@
 <code>if (typeof (XWiki) == 'undefined') {
     XWiki = new Object();
 }
- 
+
 XWiki.Selection = Class.create({
   container : false,
   selectionText : false,
@@ -109,15 +109,15 @@ XWiki.Selection = Class.create({
   selectionOffset : false,
   // the selection range
   range : false,
-  // the element that wraps the selection to make it colored, in FF
-  highlightWrapper : false,
+  // the list of elements that wrap the selection to make it colored, in FF
+  highlightWrappers : false,
   // the parent of the selection and the selection inner HTML to make it colored in FF and to be able to rollback this change
   selectionParent : false,
   selectionParentInnerHTML : false,
   // position of the last mouse up, to know where to display the dialog
   offsetX : false,
   offsetY : false,
-  // how many characters to expand left &amp; right on ff
+  // how many characters to expand left &amp; right in standard impl
   step : 5,
   // how may words to expand left &amp; right on IE
   wordStep : 1,
@@ -139,7 +139,7 @@ XWiki.Selection = Class.create({
     this.range = false;
     this.selectionContext = false;
     this.selectionOffset = false;
-    this.highlightWrapper = false;
+    this.highlightWrappers = false;
     this.selectionParent = false;
     this.selectionParentInnerHTML = false;
     if (window.getSelection) { 
@@ -188,10 +188,17 @@ XWiki.Selection = Class.create({
     if (window.getSelection) {
       // standard
       // create an annotation highlight span around this content
-      this.highlightWrapper = new Element('span', {'style': 'background-color: ' + color, 'id' : 'selection-highlight'});
-      // surround the selection with the highlighted span
-      // TODO: this doesn't work if content of selection is not inline (or anything else but text)
-      this.range.surroundContents(this.highlightWrapper);
+      var highlightWrapperTemplate = new Element('span', {'style': 'background-color: ' + color, 'class' : 'selection-highlight'});
+      // get all the text nodes of this range
+      var rangeTextNodes = this.getRangeTextNodes();
+      this.highlightWrappers = new Array();
+      rangeTextNodes.each(function(text) {
+        // clone a highlightWrapper from the template
+        var highlightWrapper = highlightWrapperTemplate.clone();
+        highlightWrapper.update(text.textContent);
+        text.parentNode.replaceChild(highlightWrapper, text);
+        this.highlightWrappers.push(highlightWrapper);
+      }.bind(this));
     } else {
       // IE
       // get the selection parent and its inner HTML to be able to restore it after
@@ -201,12 +208,135 @@ XWiki.Selection = Class.create({
       this.range.execCommand("BackColor", false, color);
     }
   },
+  
+  /**
+   * Returns all the text nodes in the range, in depth first preorder, and also splitting the startContainer &amp; endContainer in text nodes by the start &amp; end offset, if needed
+   */
+  getRangeTextNodes : function() {
+    var startContainer = this.range.startContainer;
+    var endContainer = this.range.endContainer;
+    var startOffset = this.range.startOffset;
+    var endOffset = this.range.endOffset;
+
+    var firstLeaf = this.getFirstLeafInRange(this.range);
+    var lastLeaf = this.getLastLeafInRange(this.range);
+    
+    var leafs = this.getLeafsBetween(firstLeaf, lastLeaf);
+    // filter out the text leafs
+    var textLeafs = leafs.findAll(function(item) {
+      return item.nodeType == 3;
+    });
+    
+    // and now split the ends, if necessary
+    if (startContainer == textLeafs[0] &amp;&amp; startOffset != 0) {
+      // split the start
+      textLeafs[0] = startContainer.splitText(startOffset);
+      // if the start container was the same as the end container, the end container must move to the split part of the start container and its offset must be updated
+      if (startContainer == endContainer) {
+        endOffset = endOffset - startOffset;
+        endContainer = textLeafs[0];
+      }
+    }
+    if (endContainer == textLeafs[textLeafs.length - 1] &amp;&amp; endOffset != endContainer.length) {
+      // and hope that this will stay in the container
+      endContainer = endContainer.splitText(endOffset);
+    }
+
+    return textLeafs;
+  },
+
+  getLeafsBetween : function(startLeaf, endLeaf) {
+    var leafsArray = new Array();
+    var currentLeaf = startLeaf;
+    leafsArray.push(startLeaf);
+    while (currentLeaf != endLeaf) {
+      currentLeaf = this.getNextLeaf(currentLeaf);
+      leafsArray.push(currentLeaf);
+    }
+    return leafsArray;
+  },
+
+  // and here we go, helper functions to help iterate through the nodes &amp; leaves &amp; all
+
+  getFirstLeafInRange : function(range) {
+    if (range.startContainer.hasChildNodes()) {
+        if (range.collapsed) {
+            return null;
+        } else if (range.startOffset &gt;= range.startContainer.childNodes.length) {
+            return this.getNextLeaf(range.startContainer);
+        } else {
+            return this.getFirstLeaf(range.startContainer.childNodes[range.startOffset]);
+        }
+    } else {
+        return range.startContainer;
+    }  
+  },
+
+  getLastLeafInRange : function(range) {
+    if (range.endContainer.hasChildNodes()) {
+        if (range.collapsed) {
+            return null;
+        } else if (range.endOffset == 0) {
+            return this.getPreviousLeaf(range.endContainer);
+        } else {
+            return this.getLastLeaf(range.endContainer.childNodes[range.endOffset - 1]);
+        }
+    } else {
+        return range.endContainer;
+    }
+  },
+
+  getNextLeaf : function(node) {
+    var ancestor = node;
+    while (ancestor != null &amp;&amp; ancestor.nextSibling == null) {
+        ancestor = ancestor.parentNode;
+    }
+    if (ancestor == null) {
+        // There's no next leaf.
+        return null;
+    } else {
+        // Return the first leaf in the subtree whose root is the next sibling of the ancestor.
+        return this.getFirstLeaf(ancestor.nextSibling);
+    }    
+  },
+
+  getPreviousLeaf : function(node) {
+    var ancestor = node;
+    while (ancestor != null &amp;&amp; ancestor.previousSibling == null) {
+      ancestor = ancestor.parentNode;
+    }
+    if (ancestor == null) {
+      // There's no previous leaf.
+      return null;
+    } else {
+      // Return the last leaf in the subtree whose root is the next sibling of the ancestor.
+      return this.getLastLeaf(ancestor.previousSibling);
+    }
+  },
+
+  getFirstLeaf : function(node) {
+    var descendant = node;
+    while (descendant.hasChildNodes()) {
+      descendant = descendant.firstChild;
+    }
+    return descendant;    
+  },
+
+  getLastLeaf : function(node) {
+    var descendant = node;
+    while (descendant.hasChildNodes()) {
+      descendant = descendant.lastChild;
+    }
+    return descendant;    
+  },
 
   removeSelectionHighlight : function() {
     if (window.getSelection) {
       // standard
       // unwrap
-      this.highlightWrapper.replace(this.highlightWrapper.innerHTML);
+      this.highlightWrappers.each(function(wrapper) {
+        wrapper.replace(wrapper.innerHTML);
+      });
     } else {
       // IE
       this.selectionParent.update(this.selectionParentInnerHTML);
@@ -220,8 +350,16 @@ XWiki.Selection = Class.create({
 
     if (window.getSelection) {
       // set the position
-      panel.style.left = this.highlightWrapper.positionedOffset().left + "px";
-      panel.style.top = (this.highlightWrapper.positionedOffset().top + this.highlightWrapper.getHeight())+ "px";
+      // get the offsetleft from the first highlightWrapper
+      var left = 0;
+      var top = 0;
+      if (this.highlightWrappers.length &gt; 0) {
+        left = this.highlightWrappers[0].positionedOffset().left;
+        var lastWrapper = this.highlightWrappers[this.highlightWrappers.length - 1];
+        top = lastWrapper.positionedOffset().top + lastWrapper.getHeight();
+      }
+      panel.style.left = left + "px";
+      panel.style.top = top + "px";
     } else {
       panel.style.left = this.offsetX + "px";
       panel.style.top = this.offsetY + "px";

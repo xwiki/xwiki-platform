@@ -56,7 +56,7 @@ public abstract class AbstractResourceSkinExtensionPlugin extends AbstractSkinEx
      *
      * @param url String representation of the url to load (eg: {@code /this/url.js})
      * @return HTML code linking to the pulled resource
-     *         (eg: {@code <script type="text/javascript" src="/this/url.js"></script>})
+     *         (eg: {@code <script type="text/javascript" src="/this/url.js"/>})
      */
     protected abstract String generateLink(String url);
 

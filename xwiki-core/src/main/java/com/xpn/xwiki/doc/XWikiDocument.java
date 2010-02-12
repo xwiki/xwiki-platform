@@ -6910,7 +6910,8 @@ public class XWikiDocument implements DocumentModelBridge
         try {
             Utils.getComponent(Parser.class, syntax.toIdString());
         } catch (Exception e) {
-            LOG.warn("Failed to find parser for syntax [" + syntax.toIdString() + "]. Defaulting to xwiki/2.0 syntax.");
+            LOG.warn("Failed to find parser for the default syntax [" + syntax.toIdString()
+                + "]. Defaulting to xwiki/2.0 syntax.");
             syntax = Syntax.XWIKI_2_0;
         }
 

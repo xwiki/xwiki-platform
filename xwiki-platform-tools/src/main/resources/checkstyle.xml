@@ -17,6 +17,10 @@
      ======================================================================================
   -->
 
+  <module name="FileLength"/>
+
+  <module name="FileTabCharacter"/>
+
   <!-- Subversion has a config file in which you specify how to treat end of lines/end of files.
        The recommendation is to use "svn:eol-style=native".
        (See http://svnbook.red-bean.com/en/1.1/ch07s02.html#svn-ch-7-sect-2.3.5).
@@ -30,6 +34,12 @@
   <!-- We'd like to use this one but there's no option to exclude our internal packages
   <module name="PackageHtml"/>
   -->
+
+  <!-- No @author tags -->
+  <module name="RegexpSingleline">
+    <property name="format" value="@author"/>
+    <property name="message" value="No @author tag allowed"/>
+  </module>
 
   <!-- We cannot use this rule as it fails on our license headers, considering them as copy-pastes!
   <module name="StrictDuplicateCode"/>
@@ -99,8 +109,6 @@
 
     <module name="EmptyStatement"/>
 
-    <module name="j2ee.EntityBean"/>
-
     <module name="EqualsHashCode"/>
 
     <module name="ExecutableStatementCount"/>
@@ -109,32 +117,25 @@
 
     <module name="FallThrough"/>
 
-    <module name="FileLength"/>
-
     <module name="FinalClass"/>
 
     <!--module name="FinalLocalVariable"/-->
 
     <!--module name="FinalParameters"/-->
 
-    <module name="j2ee.FinalStatic"/>
-
     <!-- Avoid finalizers (this will not find violations that contain linebreaks) -->
-    <module name="GenericIllegalRegexp">
+    <module name="RegexpSinglelineJava">
       <property name="format" value="((public)|(protected))\s+void\s+finalize\(\s*\)"/>
       <property name="message" value="Avoid finalizers"/>
+      <property name="ignoreComments" value="true"/>
     </module>
 
     <!-- No direct printing to System.out or System.err -->
-    <module name="GenericIllegalRegexp">
+    <module name="RegexpSinglelineJava">
+      <!-- . matches any character, so we need to
+           escape it and use \. to match dots. -->
       <property name="format" value="System\.(out|err)\."/>
-      <property name="message" value="Don't write directly to System.out our System.err"/>
-    </module>
-
-    <!-- No @author tags -->
-    <module name="GenericIllegalRegexp">
-      <property name="format" value="@author"/>
-      <property name="message" value="No @author tag allowed"/>
+      <property name="ignoreComments" value="true"/>
     </module>
 
     <!-- Need to put this back when we find a way of making it work
@@ -208,17 +209,11 @@
 
     <module name="LocalFinalVariableName"/>
 
-    <module name="j2ee.LocalHomeInterface"/>
-
-    <module name="j2ee.LocalInterface"/>
-
     <module name="LocalVariableName"/>
 
     <!--module name="MagicNumber"/-->
 
     <module name="MemberName"/>
-
-    <module name="j2ee.MessageBean"/>
 
     <module name="MethodLength"/>
 
@@ -288,10 +283,6 @@
 
     <!--module name="RegexpHeader"/-->
 
-    <module name="j2ee.RemoteHomeInterface"/>
-
-    <module name="j2ee.RemoteInterface"/>
-
     <!--module name="RequireThis">
       <property name="checkMethods" value="false"/>
     </module-->
@@ -306,8 +297,6 @@
 
     <module name="RightCurly"/>
 
-    <module name="j2ee.SessionBean"/>
-
     <module name="SimplifyBooleanExpression"/>
 
     <module name="SimplifyBooleanReturn"/>
@@ -321,12 +310,6 @@
     <!--<module name="SuperClone"/>-->
 
     <module name="SuperFinalize"/>
-
-    <module name="TabCharacter"/>
-
-    <module name="j2ee.ThisParameter"/>
-
-    <module name="j2ee.ThisReturn"/>
 
     <!--module name="ThrowsCount"-->
 

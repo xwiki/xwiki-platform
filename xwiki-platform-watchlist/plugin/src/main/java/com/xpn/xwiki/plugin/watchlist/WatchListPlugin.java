@@ -84,8 +84,10 @@ public class WatchListPlugin extends XWikiDefaultPlugin implements XWikiPluginIn
     private WatchListEventFeedManager feedManager = new WatchListEventFeedManager(this);
 
     /**
-     * {@inheritDoc}
-     * 
+     * @param name the plugin name
+     * @param className the plugin classname (used in logs for example)
+     * @param context the XWiki Context
+     *
      * @see XWikiDefaultPlugin#XWikiDefaultPlugin(String,String,com.xpn.xwiki.XWikiContext)
      */
     public WatchListPlugin(String name, String className, XWikiContext context)

@@ -9,19 +9,19 @@
 $xwiki.jsfx.use('js/scriptaculous/scriptaculous.js')
 $xwiki.jsfx.use('js/xwiki/actionbuttons/actionButtons.js', true)
 #if("$!editor" == '')
-  #set($editor = $request.getParameter("editor"))
+  #set($editor = $request.getParameter('editor'))
   #if("$!editor" == '')
-    #if(($xwiki.getUserPreference("editor")=="Wysiwyg")&&($doc.SyntaxId!="xwiki/1.0"||!$doc.isAdvancedContent()))
-      #set($editor="wysiwyg")
+    #if(($xwiki.getUserPreference('editor') == 'Wysiwyg') && ($doc.SyntaxId != 'xwiki/1.0' || !$doc.isAdvancedContent()))
+      #set($editor = 'wysiwyg')
     #else
-      #set($editor="wiki")
+      #set($editor = 'wiki')
     #end
   #end
 #end
 ##
 ## "Compute" the title
 ##
-#set($title = $xwiki.parseContent($msg.get("editpageTitle")))
+#set($title = $xwiki.parseContent($msg.get('editpageTitle')))
 ##
 ## Header
 ##
@@ -52,7 +52,7 @@ $xwiki.jsfx.use('js/xwiki/actionbuttons/actionButtons.js', true)
   $response.setStatus(423)
   #set($newquerystring = "$!{request.getQueryString().replaceAll('&', '&amp;').replaceAll('&amp;amp;', '&amp;')}&amp;force=1")
   #set($forceEditURL = $doc.getURL($context.action, ${newquerystring}))
-  #xwikimessageboxstart($msg.get("notice") "$msg.get('doclockedby') $xwiki.getLocalUserName($doc.getLockingUser())")
+  #xwikimessageboxstart($msg.get('notice') "$msg.get('doclockedby') $xwiki.getUserName($doc.getLockingUser())")
     <a href="$forceEditURL">$msg.get('forcelock')</a>
   #xwikimessageboxend()
   </div>
@@ -70,12 +70,12 @@ $xwiki.jsfx.use('js/xwiki/actionbuttons/actionButtons.js', true)
   </div>
   <div id="mainEditArea">
   #template("hierarchy.vm")
-  #if($editor == "wiki" || $editor == "wysiwyg")
-    #set($docTitle = $request.getParameter("title"))
-    #if("$!docTitle" == "")
+  #if($editor == 'wiki' || $editor == 'wysiwyg')
+    #set($docTitle = $request.getParameter('title'))
+    #if("$!docTitle" == '')
       #set($docTitle = $!tdoc.title)
     #end
-    <label>$msg.get("titlefield"):
+    <label>$msg.get('titlefield'):
     <input type="text" id="xwikidoctitleinput" name="title" value="$xwiki.getXMLEncoded("$!docTitle")"/></label>
   #end
   #template("editmodes.vm")
@@ -85,25 +85,25 @@ $xwiki.jsfx.use('js/xwiki/actionbuttons/actionButtons.js', true)
     //<![CDATA[
       // Manage switch from wiki to wysiwyg, content must be preserved between those editors.
       Event.observe($('tmEditWysiwyg'), "click", function(event) {
-        if (checkAdvancedContent('$msg.get("checkadvancedcontent")') == false) { 
-          Event.stop(event); 
+        if (checkAdvancedContent('$msg.get("checkadvancedcontent")') == false) {
+          Event.stop(event);
           return;
         }
-        document.forms.${formname}.action='$doc.getURL("edit", "editor=wysiwyg&$languageparams")'; 
-        document.forms.${formname}.submit(); 
-        Event.stop(event);       
-      });
-      
-      // Manage switch from wiki to wysiwyg, content must be preserved between those editors. 
-      Event.observe($('tmEditWiki'), "click", function(event) {
-        document.forms.${formname}.action='$doc.getURL("edit", "editor=wiki&$languageparams")';
-        document.forms.${formname}.submit(); 
+        document.forms.${formname}.action='$doc.getURL("edit", "editor=wysiwyg&$languageparams")';
+        document.forms.${formname}.submit();
         Event.stop(event);
       });
-    //]]>      
+
+      // Manage switch from wiki to wysiwyg, content must be preserved between those editors.
+      Event.observe($('tmEditWiki'), "click", function(event) {
+        document.forms.${formname}.action='$doc.getURL("edit", "editor=wiki&$languageparams")';
+        document.forms.${formname}.submit();
+        Event.stop(event);
+      });
+    //]]>
   </script>
   </div> ## mainEditArea
-  </div> ## alleditcontent  
+  </div> ## alleditcontent
   </div> ## editcolumn
   <div class="clearfloats"></div>
   </div> ## leftsidecolumns
@@ -115,7 +115,7 @@ $xwiki.jsfx.use('js/xwiki/actionbuttons/actionButtons.js', true)
 ##
 ## Footer
 ##
-#if($editor == "wiki" || $editor == "wysiwyg")
+#if($editor == 'wiki' || $editor == 'wysiwyg')
   </form>
 #end
 #template("footer.vm")

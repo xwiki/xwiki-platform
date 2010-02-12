@@ -4,6 +4,7 @@
 ###
 #template("startpage.vm")
 <div class="main layoutsubsection">
+<div id="mainContentArea">
 #if($message)
   <div id="xwikimessage">$message</div>
 #end
@@ -28,14 +29,14 @@
   #set($hasInlinks = true)
 #end
 #if($orphans && $orphans.size() > 0)
-  #set($tmpmsg = '</p><ul style="text-align: left">')
+  #set($tmpmsg = '</p><ul style="text-align: left;">')
   #foreach($docname in $orphans)
     #set($rdoc = $xwiki.getDocument($docname).getTranslatedDocument())
     #set($tmpmsg = "${tmpmsg}<li><a href=${quote}${rdoc.getURL('view')}${quote}>$xwiki.getXMLEncoded(${rdoc.displayTitle})</a></li>")
   #end
   #set($tmpmsg = "${tmpmsg}</ul><p class='xwikimessage'>")
   #set($tmpmsg = $msg.get('core.delete.orphansWarning', [$tmpmsg]))
-  #set($fullmsg="${fullmsg}${tmpmsg}</p><p class='xwikimessage'>")
+  #set($fullmsg = "${fullmsg}${tmpmsg}</p><p class='xwikimessage'>")
   #set($hasInlinks = true)
 #end
 #if($xwiki.hasRecycleBin())
@@ -72,6 +73,7 @@
     </form>
   #xwikimessageboxend()
 #end
-</div>
 <div class="clearfloats"></div>
+</div>## mainContentArea
+</div>## main
 #template("endpage.vm")

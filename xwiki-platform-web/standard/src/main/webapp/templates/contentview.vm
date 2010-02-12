@@ -1,9 +1,6 @@
 ###
 ### Display document contents in "view" mode.
 ###
-### TODO: Web service?
-###
-<div id="xwikicontent">
 ## -------------------------------
 ## Compute the content to display 
 ## -------------------------------
@@ -32,12 +29,17 @@
 ## ----------------------------
 <div id="document-title"><h1>$titleToDisplay</h1></div>
 ## ----------------------------
+## Display the shortcuts
+## ----------------------------
+#template("shortcuts.vm")
+## ----------------------------
 ## Display the rendered content
 ## ----------------------------
+<div id="xwikicontent">
 $renderedContent
+</div>
 ## -----------------------------------------------------------------------------------
 ## Display the footnotes if the document is in 1.0 syntax and if there are any defined
 ## -----------------------------------------------------------------------------------
 #set($footnotes = "#putFootnotes()")
 $xwiki.renderText($footnotes, $doc)
-</div>

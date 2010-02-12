@@ -47,8 +47,8 @@ public final class HTMLUtils
      * IE6 doesn't handle XHTML properly and some elements must not be expanded when printed
      * (for example {@code <br></br>} isn't valid for IE6 but {@code <br/>} is. Thus for the
      * list of elements below we need special handling.
-     * @todo remove when we drop IE6 support
      */
+    // TODO: Remove when we drop IE6 support
     private static final List<String> OMIT_ELEMENT_CLOSE_SET = Arrays.asList(
         "area", "base", "br", "col", "hr", "img", "input", "link", "meta", "p", "param");
     
@@ -57,9 +57,8 @@ public final class HTMLUtils
      * (&lt;, &gt; &apos; &amp; &#xD; and \r\n). However since we're using HTML Cleaner
      * (http://htmlcleaner.sourceforge.net/) and since it's buggy for character escapes we have turned off character
      * escaping for it and thus we need to perform selective escaping here.
-     * 
-     * @todo Remove this complex escaping code when SF HTML Cleaner will do proper escaping
      */
+    // TODO: Remove this complex escaping code when SF HTML Cleaner will do proper escaping
     public static class XWikiXMLOutputter extends XMLOutputter
     {
         /**
@@ -78,8 +77,8 @@ public final class HTMLUtils
         private boolean omitDocType;
         
         /**
-         * {@inheritDoc}
-         * 
+         * @param format the JDOM class used to control output formats, see {@link org.jdom.output.Format}
+         * @param omitDocType if true then omit the document type when printing the W3C Document
          * @see XMLOutputter#XMLOutputter(Format)
          */
         public XWikiXMLOutputter(Format format, boolean omitDocType)

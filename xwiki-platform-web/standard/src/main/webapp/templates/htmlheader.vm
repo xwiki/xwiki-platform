@@ -47,18 +47,16 @@
       <link rel="alternate" type="application/x-wiki" title="Edit" href="$doc.getURL("edit")" />
     #end
     ## ---------------------------------------------------------------------------------------------------------------
-    ## Store the space name, page name, wiki name and full document name (for convenience since it can be 
-    ## reconstructed from the individual wiki/space/page names), so that it can be accessed from Javascript code.
+    ## Store the space name, page name, wiki name, full document name (for convenience since it can be reconstructed
+    ## from the individual wiki/space/page names), and other metadata, so that it can be accessed from Javascript code.
     ## For example, to pass it to the server side using an Ajax query.
     ## Usage example: var name = $$("meta[name='page']")[0].content;
     ## ---------------------------------------------------------------------------------------------------------------
     <meta name="document" content="$xwiki.getXMLEncoded($doc.fullName)"/>
+    <meta name="wiki" content="$xwiki.getXMLEncoded($doc.wiki)"/>
     <meta name="space" content="$xwiki.getXMLEncoded($doc.space)"/>
     <meta name="page" content="$xwiki.getXMLEncoded($doc.name)"/>
     <meta name="version" content="$doc.version"/>
-    #if($xwiki.isVirtualMode())
-      <meta name="wiki" content="$xwiki.getXMLEncoded($doc.wiki)"/>
-    #end
     ## ---------------------------------------------------------------------------------------------------------------
     ## Localize GWT applications.
     ## ---------------------------------------------------------------------------------------------------------------

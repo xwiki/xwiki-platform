@@ -1,6 +1,12 @@
 This is a Eclipse project used to easily debug a complete XWiki Enterprise (it can also be used for XWiki Enterprise Manager since it comes with it dependencies).
 
+= PREREQUISITES =
+
+* You need M2EClipse 0.9.9 or superior, if Eclipse does not propose it automatically in updates it probably mean it's still the dev version. In that case you should try http://m2eclipse.sonatype.org/update-dev/ as update site.
+
 = INSTALL =
+
+Make sure to import the project as existing Eclipse project and not M2Eclipse project otherwise M2Eclipse will try to rebuild the configuration and could break some things.
 
 There is still some things to do once the project is imported into Eclipse workspace.
 
@@ -27,4 +33,4 @@ This project comes with some example configuration you need to copy/past and set
 = TODO =
 
 * add support for GWT WYSIWYG
-* replace Eclipse linked resources by subversion 1.6 internal links when svn.xwiki.org will be to 1.6
+* replace Eclipse linked resources by subversion 1.6 internal links when svn.xwiki.org will be upgraded to 1.6

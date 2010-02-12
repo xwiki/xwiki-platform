@@ -26,9 +26,9 @@ import java.io.Serializable;
  * An event triggered whenever a client request (action) is processed, like <tt>/upload/</tt> or <tt>/view/</tt>. A
  * specific event corresponds to only one {@link #actionName action type}.
  * 
- * @todo use the enumerated Action class when it's implemented...
  * @version $Id$
  */
+// TODO: use the enumerated Action class when it's implemented...
 public class ActionExecutionEvent implements Event, Serializable
 {
     /**

@@ -33,9 +33,10 @@ public class CacheException extends Exception
     private static final long serialVersionUID = -8860020664723282003L;
 
     /**
-     * {@inheritDoc}
-     * 
-     * @see Exception#Exception(String)
+     * Constructs a new exception with the specified detail message. The cause is not initialized, and may
+     * subsequently be initialized by a call to {@link #initCause(Throwable)}.
+     *  
+     * @param message the detail message (which is saved for later retrieval by the {@link #getMessage()} method)
      */
     public CacheException(String message)
     {
@@ -43,9 +44,11 @@ public class CacheException extends Exception
     }
 
     /**
-     * {@inheritDoc}
+     * Constructs a new exception with the specified detail message and cause.
      * 
-     * @see Exception#Exception(String, Throwable)
+     * @param message the detail message (which is saved for later retrieval by the {@link #getMessage()} method)
+     * @param cause the cause (which is saved for later retrieval by the {@link #getCause()} method). A null value is
+     *        permitted, and indicates that the cause is nonexistent or unknown
      */
     public CacheException(String message, Throwable cause)
     {

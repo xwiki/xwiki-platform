@@ -23,9 +23,9 @@ package org.xwiki.observation.event;
 /**
  * Special event matcher used by a listener which need to listened to all possible events.
  * 
- * @todo introduce a generic multi-events matcher system to observation manager
  * @version $Id$
  */
+// TODO: introduce a generic multi-events matcher system to observation manager
 public final class AllEvent implements Event
 {
     /**

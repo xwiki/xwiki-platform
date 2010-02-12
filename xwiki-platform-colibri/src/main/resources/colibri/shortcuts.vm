@@ -5,16 +5,16 @@
 ##
 #if (!$docextralinks && !$docextras)
   #if("$!{showcomments}" == "")
-    #set($showcomments = $xwiki.getWebPreference("showcomments"))
+    #set($showcomments = $xwiki.getSpacePreference('showcomments'))
   #end
   #if("$!{showattachments}" == "")
-    #set($showattachments = $xwiki.getWebPreference("showattachments"))
+    #set($showattachments = $xwiki.getSpacePreference('showattachments'))
   #end
   #if("$!{showhistory}" == "")
-    #set($showhistory = $xwiki.getWebPreference("showhistory"))
+    #set($showhistory = $xwiki.getSpacePreference('showhistory'))
   #end
   #if("$!{showinformation}" == "")
-    #set($showinformation = $xwiki.getWebPreference("showinformation"))
+    #set($showinformation = $xwiki.getSpacePreference('showinformation'))
   #end
   #set($docextralinks = $util.arrayList)
   #if($context.action == 'view' && $viewer != 'content')

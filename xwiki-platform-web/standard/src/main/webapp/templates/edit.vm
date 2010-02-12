@@ -43,44 +43,52 @@ $xwiki.jsfx.use('js/xwiki/actionbuttons/actionButtons.js', true)
 ##
 ## Content
 ##
+## Is the document being edited by another user?
+## If yes, warn about it and show a forcing link:
+##
 #set($force = $!request.get('force'))
 #if (($tdoc.getLocked()==true)&&(!$force))
   <div class="layoutsection">
   $response.setStatus(423)
-  #xwikimessageboxstart($msg.get('notice') "$msg.get('doclockedby') $xwiki.getLocalUserName($doc.getLockingUser())")
-    <a href="$doc.getURL($context.action, "$!{request.getQueryString().replaceAll('&', '&amp;').replaceAll('&amp;amp;', '&amp;')}&amp;force=1")">$msg.get('forcelock')</a>
+  #set($newquerystring = "$!{request.getQueryString().replaceAll('&', '&amp;').replaceAll('&amp;amp;', '&amp;')}&amp;force=1")
+  #set($forceEditURL = $doc.getURL($context.action, ${newquerystring}))
+  #xwikimessageboxstart($msg.get('notice') "$msg.get('doclockedby') $xwiki.getUserName($doc.getLockingUser())")
+    <a href="$forceEditURL">$msg.get('forcelock')</a>
   #xwikimessageboxend()
   </div>
 #else
-<div id="xwikieditor" class="layoutsection">
-<div id="xwikieditorinner">
-<div class="leftsidecolumns">
-<div id="editcolumn" class="editor">
-<div class="alleditcontent">
-#if($editor == 'wiki' || $editor == 'wysiwyg')
-#set($docTitle = $request.getParameter('title'))
-#if("$!docTitle" == '')
-#set($docTitle = $!tdoc.title)
-#end
-<label>$msg.get('titlefield'):
-<input type="text" id="xwikidoctitleinput" name="title" value="$xwiki.getXMLEncoded("$!docTitle")"/></label>
-#end
-#template("editmodes.vm")
-#template("edit${editor}.vm")
-</div> ## alleditcontent
-</div> ## editcolumn
-<div class="clearfloats"></div>
-</div> ## leftsidecolumns
-#template("editpanels.vm")
-<div class="clearfloats"></div>
-</div> ## xwikieditorinner
+  ##################
+  ##   Edit zone  ##
+  ##################
+  <div id="xwikieditor" class="layoutsection">
+  <div id="xwikieditorinner">
+  <div class="leftsidecolumns">
+  <div id="editcolumn" class="editor">
+  <div class="alleditcontent">
+  #if($editor == 'wiki' || $editor == 'wysiwyg')
+    #set($docTitle = $request.getParameter('title'))
+    #if("$!docTitle" == '')
+      #set($docTitle = $!tdoc.title)
+    #end
+    <label>$msg.get('titlefield'):
+    <input type="text" id="xwikidoctitleinput" name="title" value="$xwiki.getXMLEncoded("$!docTitle")"/></label>
+  #end
+  #template("editmodes.vm")
+  #template("edit${editor}.vm")
+  </div> ## alleditcontent
+  </div> ## editcolumn
+  <div class="clearfloats"></div>
+  </div> ## leftsidecolumns
+  #template("editpanels.vm")
+  <div class="clearfloats"></div>
+  </div> ## xwikieditorinner
+  </div> ## xwikieditor
 #end
 ##
 ## Footer
 ##
-</div> ## xwikieditor
 #if($editor == 'wiki' || $editor == 'wysiwyg')
-</form>
+  </form>
 #end
 #template("footer.vm")
 #template("htmlfooter.vm")

@@ -20,8 +20,8 @@ import com.xpn.xwiki.plugin.wikimanager.WikiManagerMessageTool;
  * This class manage wiki document descriptor.
  * 
  * @version $Id$
- * @future XA2 : create a Wiki interface to implement here and rename.
  */
+// TODO: Future: XA2: create a Wiki interface to implement here and rename.
 public class Wiki extends Document
 {
     /**

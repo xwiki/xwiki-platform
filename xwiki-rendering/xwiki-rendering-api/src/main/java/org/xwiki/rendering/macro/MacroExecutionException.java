@@ -33,9 +33,10 @@ public class MacroExecutionException extends Exception
     private static final long serialVersionUID = -8645177947063178698L;
 
     /**
-     * {@inheritDoc}
-     * 
-     * @see Exception#Exception(String)
+     * Constructs a new exception with the specified detail message. The cause is not initialized, and may
+     * subsequently be initialized by a call to {@link #initCause(Throwable)}.
+     *
+     * @param message the detail message (which is saved for later retrieval by the {@link #getMessage()} method)
      */
     public MacroExecutionException(String message)
     {
@@ -43,12 +44,14 @@ public class MacroExecutionException extends Exception
     }
 
     /**
-     * {@inheritDoc}
-     * 
-     * @see Exception#Exception(String, Throwable)
+     * Constructs a new exception with the specified detail message and cause.
+     *
+     * @param message the detail message (which is saved for later retrieval by the {@link #getMessage()} method)
+     * @param cause the cause (which is saved for later retrieval by the {@link #getCause()} method). A null value is
+     *        permitted, and indicates that the cause is nonexistent or unknown
      */
-    public MacroExecutionException(String message, Throwable throwable)
+    public MacroExecutionException(String message, Throwable cause)
     {
-        super(message, throwable);
+        super(message, cause);
     }
 }

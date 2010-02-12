@@ -33,8 +33,8 @@ import org.xwiki.model.reference.DocumentReference;
  * 
  * @version $Id$
  * @since 1.6M1
- * @todo Refactor to use DocumentReference and AttachmentReference everywhere
  */
+// TODO: Refactor to use DocumentReference and AttachmentReference everywhere
 @ComponentRole
 public interface DocumentAccessBridge
 {

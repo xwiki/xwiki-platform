@@ -30,8 +30,8 @@ import org.xwiki.velocity.VelocityContextInitializer;
  *
  * @version $Id$
  * @since 2.3M1
- * @todo in the future Velocity will be implemented using the JSR 223 API and this class won't be required anymore
  */
+// TODO: In the future Velocity will be implemented using the JSR 223 API and this class won't be required anymore.
 @Component("scriptservices")
 public class ServicesVelocityContextInitializer implements VelocityContextInitializer
 {

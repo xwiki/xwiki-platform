@@ -57,6 +57,7 @@
     <meta name="space" content="$xwiki.getXMLEncoded($doc.space)"/>
     <meta name="page" content="$xwiki.getXMLEncoded($doc.name)"/>
     <meta name="version" content="$doc.version"/>
+    <meta name="restURL" content="${request.contextPath}/rest/wikis/${context.database}/spaces/${doc.space}/pages/${doc.name}"/>
     ## ---------------------------------------------------------------------------------------------------------------
     ## Localize GWT applications.
     ## ---------------------------------------------------------------------------------------------------------------

@@ -140,20 +140,20 @@ public class DefaultWikiMacroFactory extends AbstractLogEnabled implements WikiM
         // Verify macro name.
         if (StringUtils.isEmpty(macroName)) {
             macroName = macroId;
-            getLogger().warn(
+            getLogger().debug(
                 String.format("Incomplete macro definition in [%s], macro name is empty", documentReference));
         }
 
         // Verify macro description.
         if (StringUtils.isEmpty(macroDescription)) {
-            getLogger().warn(
+            getLogger().debug(
                 String.format("Incomplete macro definition in [%s], macro description is empty", documentReference));
         }
 
         // Verify default macro category.
         if (StringUtils.isEmpty(macroDefaultCategory)) {
             macroDefaultCategory = null;
-            getLogger().warn(String.format("Incomplete macro definition in [%s], default macro category is empty",
+            getLogger().debug(String.format("Incomplete macro definition in [%s], default macro category is empty",
                 documentReference));
         }
 
@@ -165,7 +165,7 @@ public class DefaultWikiMacroFactory extends AbstractLogEnabled implements WikiM
         // Verify macro content description.
         if (!macroContentType.equals(MACRO_CONTENT_EMPTY) && StringUtils.isEmpty(macroContentDescription)) {
             String errorMsg = "Incomplete macro definition in [%s], macro content description is empty";
-            getLogger().warn(String.format(errorMsg, documentReference));
+            getLogger().debug(String.format(errorMsg, documentReference));
             macroContentDescription = "Macro content";
         }
 
@@ -200,7 +200,7 @@ public class DefaultWikiMacroFactory extends AbstractLogEnabled implements WikiM
                 // Verify parameter description.
                 if (StringUtils.isEmpty(parameterDescription)) {
                     String errorMessage = "Incomplete macro definition in [%s], macro parameter description is empty";
-                    getLogger().warn(String.format(errorMessage, documentReference));
+                    getLogger().debug(String.format(errorMessage, documentReference));
                 }
 
                 // Create the parameter descriptor.

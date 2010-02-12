@@ -64,8 +64,10 @@ public class ZipExplorerPlugin extends XWikiDefaultPlugin
     private static final String URL_SEPARATOR = "/";
 
     /**
-     * {@inheritDoc}
-     * 
+     * @param name the plugin name
+     * @param className the plugin classname (used in logs for example)
+     * @param context the XWiki Context
+     *
      * @see XWikiDefaultPlugin#XWikiDefaultPlugin(String,String,com.xpn.xwiki.XWikiContext)
      */
     public ZipExplorerPlugin(String name, String className, XWikiContext context)

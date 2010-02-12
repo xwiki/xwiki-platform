@@ -48,8 +48,6 @@ import org.radeox.regex.MatchResult;
  * Listfilter checks for lists in in its input. These are transformed to output lists, e.g. in HTML.
  * Recognizes different lists like numbered lists, unnumbered lists, greek lists, alpha lists etc.
  * 
- * @credits nested list support by Davor Cubranic
- * @credits improved nested list support by Sergiu Dumitriu
  * @version $Id$
  */
 public class XWikiListFilter extends ListFilter implements CacheFilter

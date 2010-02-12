@@ -29,25 +29,33 @@ import com.xpn.xwiki.XWikiException;
 public class ContentParserException extends XWikiException
 {
     /**
-     * {@inheritDoc}
+     * @param code the exception code value, see {@link com.xpn.xwiki.XWikiException}
+     * @param message the detail message (which is saved for later retrieval by the {@link #getMessage()} method)
+     * @param cause the cause (which is saved for later retrieval by the {@link #getCause()} method). A null value is
+     *        permitted, and indicates that the cause is nonexistent or unknown
+     * @param args the arguments used to format the passed message string using {@link java.text.MessageFormat}
      * @see XWikiException#XWikiException(int, int, String, Throwable, Object[])
      */
-    public ContentParserException(int code, String message, Throwable e, Object[] args)
+    public ContentParserException(int code, String message, Throwable cause, Object[] args)
     {
-        super(XWikiException.MODULE_XWIKI_CONTENT, code, message, e, args);
+        super(XWikiException.MODULE_XWIKI_CONTENT, code, message, cause, args);
     }
 
     /**
-     * {@inheritDoc}
+     * @param code the exception code value, see {@link com.xpn.xwiki.XWikiException}
+     * @param message the detail message (which is saved for later retrieval by the {@link #getMessage()} method)
+     * @param cause the cause (which is saved for later retrieval by the {@link #getCause()} method). A null value is
+     *        permitted, and indicates that the cause is nonexistent or unknown
      * @see XWikiException#XWikiException(int, int, String, Throwable)
      */
-    public ContentParserException(int code, String message, Throwable e)
+    public ContentParserException(int code, String message, Throwable cause)
     {
-        super(XWikiException.MODULE_XWIKI_CONTENT, code, message, e);
+        super(XWikiException.MODULE_XWIKI_CONTENT, code, message, cause);
     }
 
     /**
-     * {@inheritDoc}
+     * @param code the exception code value, see {@link com.xpn.xwiki.XWikiException}
+     * @param message the detail message (which is saved for later retrieval by the {@link #getMessage()} method)
      * @see XWikiException#XWikiException(int, int, String)
      */
     public ContentParserException(int code, String message)
@@ -56,7 +64,6 @@ public class ContentParserException extends XWikiException
     }
 
     /**
-     * {@inheritDoc}
      * @see XWikiException#XWikiException() 
      */
     public ContentParserException()

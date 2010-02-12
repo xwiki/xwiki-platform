@@ -96,7 +96,9 @@ public class FileUploadPlugin extends XWikiDefaultPlugin implements XWikiPluginI
     private static final long UPLOAD_DEFAULT_SIZETHRESHOLD = 100000L;
 
     /**
-     * {@inheritDoc}
+     * @param name the plugin name
+     * @param className the plugin classname (used in logs for example)
+     * @param context the XWiki Context
      * 
      * @see XWikiDefaultPlugin#XWikiDefaultPlugin(String,String,com.xpn.xwiki.XWikiContext)
      */

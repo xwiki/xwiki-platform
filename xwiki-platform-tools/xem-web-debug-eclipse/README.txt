@@ -14,7 +14,7 @@ There is still some things to do once the project is imported into Eclipse works
 
 Most of this project resources are "virtual", meaning that this project is full of linked folders and files targeting the sources in different checkouted projects on the filesystem.
 
-Best is generally to checkout http(s)://svn.xwiki.org/svnroot/xwiki/platform/trunks/.
+Best thing is generally to checkout http(s)://svn.xwiki.org/svnroot/xwiki/platform/trunks/.
 
 For theses links to work for everyone this project is using Eclipse linked resource to find the sources. Go to Window->Preferences->General->Workspace->Linked Resources and add the following links:
 * XWIKI_CORE: path to the xwiki-core-parent maven project (/core sub-folder of platform/trunks)

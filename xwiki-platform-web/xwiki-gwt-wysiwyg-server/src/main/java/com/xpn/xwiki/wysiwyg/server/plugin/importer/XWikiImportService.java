@@ -67,6 +67,7 @@ public class XWikiImportService implements ImportService
     /**
      * The component used to parse attachment references.
      */
+    @Requirement
     private AttachmentReferenceResolver<String> attachmentReferenceResolver;
 
     /**

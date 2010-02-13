@@ -552,16 +552,16 @@ p.legend {
     ## hard-coded links to app. admin pages which appear at global/space level
     ## TODO: replace this when the new IX are ready
     ##----------------------------------------------------------------------------
-    #set($globalAppAdmin = ['Panels.PanelWizard', 'Blog.Categories', 'Photos.Links', 'XWiki.OfficeImporterAdmin'])
+    #set($globalAppAdmin = ['Panels.PanelWizard', 'Photos.Links', 'XWiki.OfficeImporterAdmin'])
     #set($spaceAppAdmin = ['Panels.PanelWizard'])
     ##-----------------------------------------------------------------------------
     ## some applications at space level (like Panel Wizard) might require a different type of
     ## integration to allow users with space admin rights to use them, so they will have a
     ## "/xwiki/bin/Space/WebPreferences?section=application" type of url, while some at global level
-    ## need to use a "/xwiki/admin/Blog/Categories?" type of url, to be edited inline
+    ## need to use a "/xwiki/admin/App/Settings" type of url, to be edited inline
     ## inside the administration application UI.
     ##------------------------------------------------------------------------------
-    #set($hasAdminActionUrl = ['Blog.Categories', 'Photos.Links'])
+    #set($hasAdminActionUrl = ['Photos.Links'])
     #set($section = "$!{request.section}")
     ##-------------------------------------
     ## determine the displayed sections

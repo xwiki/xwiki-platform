@@ -506,6 +506,7 @@ XWiki.widgets.Suggest = Class.create({
           this.sInput = this.fld.value = this.aSuggestions[ this.iHighlighted-1 ].value;
       }
 
+      Event.fire(this.fld, "xwiki:suggest:selected");
       this.fld.focus();
 
       /*

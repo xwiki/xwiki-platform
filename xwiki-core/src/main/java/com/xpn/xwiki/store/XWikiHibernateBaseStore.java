@@ -139,7 +139,7 @@ public class XWikiHibernateBaseStore implements Initializable
      * 
      * @throws org.hibernate.HibernateException
      */
-    private void initHibernate(XWikiContext context) throws HibernateException
+    private synchronized void initHibernate(XWikiContext context) throws HibernateException
     {
         getConfiguration().configure(getPath());
 

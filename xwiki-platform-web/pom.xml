@@ -53,7 +53,7 @@
     <platform.core.version>2.3-SNAPSHOT</platform.core.version>
     <platform.skin.albatross.version>1.27-SNAPSHOT</platform.skin.albatross.version>
     <platform.skin.toucan.version>1.33-SNAPSHOT</platform.skin.toucan.version>
-    <platform.skin.colibri.version>1.12-SNAPSHOT</platform.skin.colibri.version>
+    <platform.skin.colibri.version>1.13-SNAPSHOT</platform.skin.colibri.version>
   </properties>
   <profiles>
     <profile>

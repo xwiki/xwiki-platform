@@ -23,11 +23,11 @@ import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.List;
 
-import org.xwiki.gwt.dom.client.Style;
 import org.xwiki.gwt.user.client.Strings;
 import org.xwiki.gwt.user.client.ui.ComplexDialogBox;
 import org.xwiki.gwt.user.client.ui.wizard.NavigationListener.NavigationDirection;
 
+import com.google.gwt.dom.client.Style.Visibility;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.user.client.ui.Button;
@@ -103,8 +103,8 @@ public class WizardDialog extends ComplexDialogBox implements SourcesNavigationE
         if (getBody().getWidgetCount() > 0) {
             // use the visibility attribute instead of the setVisible method to have the layout of the dialog on errors
             // display correctly recomputed, having elements sizes even is the container is not visible
-            getBody().getWidget(0).getElement().getStyle().setProperty(Style.VISIBILITY,
-                !loading ? "visible" : "hidden");
+            getBody().getWidget(0).getElement().getStyle().setVisibility(
+                !loading ? Visibility.VISIBLE : Visibility.HIDDEN);
         }
         // toggle buttons state
         for (Button b : buttons) {

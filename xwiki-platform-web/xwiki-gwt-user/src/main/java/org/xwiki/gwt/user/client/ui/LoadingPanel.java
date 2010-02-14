@@ -19,8 +19,8 @@
  */
 package org.xwiki.gwt.user.client.ui;
 
-import org.xwiki.gwt.dom.client.Style;
-
+import com.google.gwt.dom.client.Style.Position;
+import com.google.gwt.dom.client.Style.Unit;
 import com.google.gwt.user.client.ui.FocusPanel;
 import com.google.gwt.user.client.ui.Widget;
 
@@ -37,7 +37,7 @@ public class LoadingPanel extends FocusPanel
     public LoadingPanel()
     {
         addStyleName("loading");
-        getElement().getStyle().setProperty(Style.POSITION, Style.Position.ABSOLUTE);
+        getElement().getStyle().setPosition(Position.ABSOLUTE);
     }
 
     /**
@@ -60,8 +60,8 @@ public class LoadingPanel extends FocusPanel
         if (widget.isAttached()) {
             stopLoading();
 
-            getElement().getStyle().setPropertyPx(Style.WIDTH, widget.getOffsetWidth());
-            getElement().getStyle().setPropertyPx(Style.HEIGHT, widget.getOffsetHeight());
+            getElement().getStyle().setWidth(widget.getOffsetWidth(), Unit.PX);
+            getElement().getStyle().setHeight(widget.getOffsetHeight(), Unit.PX);
             widget.getElement().getParentNode().insertBefore(getElement(), widget.getElement());
         }
     }

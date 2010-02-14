@@ -19,6 +19,7 @@
  */
 package org.xwiki.gwt.user.client.ui;
 
+import com.google.gwt.dom.client.Style.Overflow;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.Widget;
 
@@ -82,15 +83,14 @@ public class VerticalResizePanel extends FlowPanel
         // hack to get the inner size of this container: overflow hidden, so that no matter the content, we will never
         // get scroll bars to shrink the clientHeight. We need client height (and not offset height) because we need to
         // check the space inside the container.
-        String overflowProp = "overflow";
-        String oldOverflow = getElement().getStyle().getProperty(overflowProp);
-        getElement().getStyle().setProperty(overflowProp, "hidden");
+        String oldOverflow = getElement().getStyle().getOverflow();
+        getElement().getStyle().setOverflow(Overflow.HIDDEN);
         int desiredHeight = getElement().getClientHeight();
 
         // hack to get the actual height: shrink the container to 0px height with scroll and get the scroll height
         int oldHeight = getElement().getOffsetHeight();
         setHeight("0px");
-        getElement().getStyle().setProperty(overflowProp, "auto");
+        getElement().getStyle().setOverflow(Overflow.AUTO);
         int actualHeight = getElement().getScrollHeight();
 
         int deltaHeight = desiredHeight - actualHeight;
@@ -106,7 +106,7 @@ public class VerticalResizePanel extends FlowPanel
 
         // restore the container setup
         setHeight(oldHeight + pixelUnit);
-        getElement().getStyle().setProperty(overflowProp, oldOverflow);
+        getElement().getStyle().setProperty("overflow", oldOverflow);
     }
 
     /**

@@ -50,7 +50,7 @@ public class DefaultHTMLCleanerTest extends AbstractXWikiComponentTestCase
     protected void setUp() throws Exception
     {
         super.setUp();
-        cleaner = (HTMLCleaner) getComponentManager().lookup(HTMLCleaner.class, "default");
+        cleaner = getComponentManager().lookup(HTMLCleaner.class, "default");
     }
 
     public void testElementExpansion()
@@ -174,7 +174,7 @@ public class DefaultHTMLCleanerTest extends AbstractXWikiComponentTestCase
         // <p>something</p>.
         assertEquals(HEADER_FULL + "something" + FOOTER, result);
     }
-    
+
     private void assertHTML(String expected, String actual)
     {
         assertEquals(HEADER_FULL + expected + FOOTER, HTMLUtils.toString(this.cleaner.clean(new StringReader(actual))));

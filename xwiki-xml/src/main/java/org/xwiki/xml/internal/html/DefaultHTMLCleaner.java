@@ -100,7 +100,7 @@ public class DefaultHTMLCleaner implements HTMLCleaner, Initializable
     /**
      * {@inheritDoc}
      * 
-     * @see org.xwiki.xml.html.HTMLCleaner#clean(String)
+     * @see org.xwiki.xml.html.HTMLCleaner#clean(java.io.Reader) 
      */
     public Document clean(Reader originalHtmlContent)
     {

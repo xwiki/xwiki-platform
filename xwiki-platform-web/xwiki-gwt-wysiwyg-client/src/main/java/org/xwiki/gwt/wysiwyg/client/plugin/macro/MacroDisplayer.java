@@ -28,12 +28,11 @@ import org.xwiki.gwt.dom.client.Document;
 import org.xwiki.gwt.dom.client.DocumentFragment;
 import org.xwiki.gwt.dom.client.Element;
 import org.xwiki.gwt.dom.client.InnerHTMLListener;
-import org.xwiki.gwt.dom.client.Style;
-import org.xwiki.gwt.dom.client.Style.Display;
 import org.xwiki.gwt.user.client.ui.rta.RichTextArea;
 
 import com.google.gwt.dom.client.Node;
 import com.google.gwt.dom.client.NodeList;
+import com.google.gwt.dom.client.Style.Display;
 
 /**
  * Hides macro meta data and displays macro output in a read only text box.
@@ -384,11 +383,11 @@ public class MacroDisplayer implements InnerHTMLListener
         Element output = getOutput(container);
         boolean collapse = collapsed || output == null;
         if (output != null) {
-            output.getStyle().setProperty(Style.DISPLAY, collapse ? Display.NONE : Display.BLOCK);
+            output.getStyle().setDisplay(collapse ? Display.NONE : Display.BLOCK);
         }
 
         Element placeHolder = getPlaceHolder(container);
-        placeHolder.getStyle().setProperty(Style.DISPLAY, collapse ? Display.INLINE : Display.NONE);
+        placeHolder.getStyle().setDisplay(collapse ? Display.INLINE : Display.NONE);
     }
 
     /**
@@ -397,7 +396,7 @@ public class MacroDisplayer implements InnerHTMLListener
      */
     public boolean isCollapsed(Element container)
     {
-        return !Display.NONE.equals(getPlaceHolder(container).getStyle().getProperty(Style.DISPLAY));
+        return !Display.NONE.getCssName().equals(getPlaceHolder(container).getStyle().getDisplay());
     }
 
     /**

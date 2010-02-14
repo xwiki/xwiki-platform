@@ -20,9 +20,11 @@
 package org.xwiki.gwt.wysiwyg.client.plugin.font;
 
 import org.xwiki.gwt.dom.client.Element;
-import org.xwiki.gwt.dom.client.Style;
 
 import com.google.gwt.dom.client.Document;
+import com.google.gwt.dom.client.Style.Position;
+import com.google.gwt.dom.client.Style.Unit;
+import com.google.gwt.dom.client.Style.Visibility;
 
 /**
  * Abstract font {@link Matcher}.
@@ -59,10 +61,10 @@ public abstract class AbstractFontMatcher extends DefaultStringMatcher
         right = (Element) left.cloneNode(true);
 
         container = Document.get().createDivElement().cast();
-        container.getStyle().setProperty(Style.POSITION, Style.Position.ABSOLUTE);
-        container.getStyle().setPropertyPx(Style.LEFT, -9999);
-        container.getStyle().setPropertyPx(Style.TOP, 0);
-        container.getStyle().setProperty(Style.VISIBILITY, Style.Visibility.HIDDEN);
+        container.getStyle().setPosition(Position.ABSOLUTE);
+        container.getStyle().setLeft(-9999, Unit.PX);
+        container.getStyle().setTop(0, Unit.PX);
+        container.getStyle().setVisibility(Visibility.HIDDEN);
         container.appendChild(left);
         container.appendChild(right);
         Document.get().getBody().appendChild(container);

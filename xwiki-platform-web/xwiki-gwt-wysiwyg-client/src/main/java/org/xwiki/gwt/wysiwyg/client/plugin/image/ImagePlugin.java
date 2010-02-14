@@ -84,6 +84,16 @@ public class ImagePlugin extends AbstractPlugin implements ClickHandler, WizardL
     private final WikiServiceAsync wikiService;
 
     /**
+     * The object used to serialize an {@link ImageConfig} instance to JSON.
+     */
+    private final ImageConfigJSONSerializer imageConfigJSONSerializer = new ImageConfigJSONSerializer();
+
+    /**
+     * The object used to create an {@link ImageConfig} from JSON.
+     */
+    private final ImageConfigJSONParser imageConfigJSONParser = new ImageConfigJSONParser();
+
+    /**
      * Create a new image plugin that used the specified wiki service.
      * 
      * @param wikiService the service used to access the wiki
@@ -181,12 +191,12 @@ public class ImagePlugin extends AbstractPlugin implements ClickHandler, WizardL
      */
     public void onImage()
     {
-        ImageConfig config = new ImageConfig();
+        ImageConfig config;
         String imageParam = getTextArea().getCommandManager().getStringValue(Command.INSERT_IMAGE);
         if (imageParam != null) {
-            config.fromJSON(imageParam);
+            config = imageConfigJSONParser.parse(imageParam);
         } else {
-            // get selection, textify and set as the default alternative text
+            config = new ImageConfig();
             config.setAltText(getTextArea().getDocument().getSelection().getRangeAt(0).toString());
         }
         imageWizard.start(ImageWizardSteps.IMAGE_SELECTOR.toString(), config);
@@ -208,9 +218,9 @@ public class ImagePlugin extends AbstractPlugin implements ClickHandler, WizardL
      */
     public void onFinish(Wizard sender, Object result)
     {
-        String imageHTML = ImageHTMLGenerator.getInstance().getAttachedImageHTML((ImageConfig) result);
         getTextArea().setFocus(true);
-        getTextArea().getCommandManager().execute(Command.INSERT_IMAGE, imageHTML);
+        String imageJSON = imageConfigJSONSerializer.serialize((ImageConfig) result);
+        getTextArea().getCommandManager().execute(Command.INSERT_IMAGE, imageJSON);
     }
 
     /**

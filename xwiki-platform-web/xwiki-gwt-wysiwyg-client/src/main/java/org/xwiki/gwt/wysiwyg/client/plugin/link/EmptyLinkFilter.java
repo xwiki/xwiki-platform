@@ -22,7 +22,6 @@ package org.xwiki.gwt.wysiwyg.client.plugin.link;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.xwiki.gwt.dom.client.Style;
 import org.xwiki.gwt.user.client.StringUtils;
 import org.xwiki.gwt.user.client.ui.rta.RichTextArea;
 import org.xwiki.gwt.user.client.ui.rta.cmd.Command;
@@ -32,6 +31,7 @@ import org.xwiki.gwt.user.client.ui.rta.cmd.CommandManager;
 import com.google.gwt.dom.client.AnchorElement;
 import com.google.gwt.dom.client.Element;
 import com.google.gwt.dom.client.NodeList;
+import com.google.gwt.dom.client.Style.Display;
 
 /**
  * Client side empty link cleaner, to delete all links without content before the content is submitted. This is to
@@ -105,7 +105,7 @@ public class EmptyLinkFilter implements CommandListener
     }
 
     /**
-     * We have to iterate all the ancestor elements and check if each is displayed because the {@link Style#DISPLAY} CSS
+     * We have to iterate all the ancestor elements and check if each is displayed because the {@code display} CSS
      * property is not inherited.
      * 
      * @param element a DOM element
@@ -115,7 +115,7 @@ public class EmptyLinkFilter implements CommandListener
     {
         Element ancestor = element;
         while (ancestor != null) {
-            if (Style.Display.NONE.equals(ancestor.getStyle().getProperty(Style.DISPLAY))) {
+            if (Display.NONE.getCssName().equals(ancestor.getStyle().getDisplay())) {
                 return false;
             }
             ancestor = ancestor.getParentElement();

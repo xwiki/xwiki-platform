@@ -19,12 +19,18 @@
  */
 package org.xwiki.gwt.wysiwyg;
 
+import junit.framework.Test;
+import junit.framework.TestSuite;
+
 import org.xwiki.gwt.wysiwyg.client.ToolBarControllerTest;
 import org.xwiki.gwt.wysiwyg.client.plugin.color.ColorPickerTest;
 import org.xwiki.gwt.wysiwyg.client.plugin.format.exec.FormatBlockExecutableTest;
 import org.xwiki.gwt.wysiwyg.client.plugin.format.exec.RemoveFormatExecutableTest;
 import org.xwiki.gwt.wysiwyg.client.plugin.history.HistoryTest;
+import org.xwiki.gwt.wysiwyg.client.plugin.image.ImageConfigHTMLSerializerTest;
+import org.xwiki.gwt.wysiwyg.client.plugin.image.ImageConfigJSONSerializerTest;
 import org.xwiki.gwt.wysiwyg.client.plugin.image.ImageMetaDataExtractorTest;
+import org.xwiki.gwt.wysiwyg.client.plugin.image.exec.InsertImageExecutableTest;
 import org.xwiki.gwt.wysiwyg.client.plugin.indent.exec.IndentExecutableTest;
 import org.xwiki.gwt.wysiwyg.client.plugin.indent.exec.OutdentExecutableTest;
 import org.xwiki.gwt.wysiwyg.client.plugin.internal.DefaultPluginFactoryManagerTest;
@@ -42,9 +48,6 @@ import org.xwiki.gwt.wysiwyg.client.syntax.internal.DefaultValidationRuleTest;
 import org.xwiki.gwt.wysiwyg.client.syntax.internal.DisablingRuleTest;
 import org.xwiki.gwt.wysiwyg.client.syntax.internal.XWikiSyntaxValidatorTest;
 import org.xwiki.gwt.wysiwyg.client.wiki.ResourceNameTest;
-
-import junit.framework.Test;
-import junit.framework.TestSuite;
 
 import com.google.gwt.junit.tools.GWTTestSuite;
 
@@ -98,7 +101,10 @@ public class WysiwygTestSuite extends GWTTestSuite
         suite.addTestSuite(FormatBlockExecutableTest.class);
         suite.addTestSuite(RemoveFormatExecutableTest.class);
         suite.addTestSuite(InsertHRExecutableTest.class);
+        suite.addTestSuite(ImageConfigJSONSerializerTest.class);
+        suite.addTestSuite(ImageConfigHTMLSerializerTest.class);
         suite.addTestSuite(ImageMetaDataExtractorTest.class);
+        suite.addTestSuite(InsertImageExecutableTest.class);
         suite.addTestSuite(LinkMetaDataExtractorTest.class);
         suite.addTestSuite(EmptyLinkFilterTest.class);
         suite.addTestSuite(MacroCallTest.class);

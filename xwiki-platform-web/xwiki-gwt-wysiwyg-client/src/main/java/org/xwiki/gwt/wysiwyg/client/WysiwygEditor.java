@@ -26,6 +26,7 @@ import org.xwiki.gwt.wysiwyg.client.plugin.PluginFactoryManager;
 import org.xwiki.gwt.wysiwyg.client.syntax.SyntaxValidatorManager;
 
 import com.google.gwt.dom.client.IFrameElement;
+import com.google.gwt.dom.client.Style.Display;
 import com.google.gwt.event.logical.shared.SelectionEvent;
 import com.google.gwt.event.logical.shared.SelectionHandler;
 import com.google.gwt.user.client.DOM;
@@ -82,7 +83,7 @@ public class WysiwygEditor extends RichTextEditorController
             ui = getRichTextEditor();
         }
 
-        getHook().getStyle().setProperty("display", "none");
+        getHook().getStyle().setDisplay(Display.NONE);
     }
 
     /**

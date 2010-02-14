@@ -19,18 +19,22 @@
  */
 package org.xwiki.gwt.wysiwyg.client.plugin.image.exec;
 
-import org.xwiki.gwt.dom.client.DOMUtils;
-import org.xwiki.gwt.dom.client.DocumentFragment;
 import org.xwiki.gwt.dom.client.Element;
 import org.xwiki.gwt.dom.client.Range;
-import org.xwiki.gwt.user.client.StringUtils;
+import org.xwiki.gwt.dom.client.Style;
 import org.xwiki.gwt.user.client.Cache.CacheCallback;
 import org.xwiki.gwt.user.client.ui.rta.RichTextArea;
 import org.xwiki.gwt.user.client.ui.rta.cmd.internal.InsertHTMLExecutable;
 import org.xwiki.gwt.wysiwyg.client.plugin.image.ImageConfig;
-import org.xwiki.gwt.wysiwyg.client.plugin.image.ImageConfig.ImageAlignment;
+import org.xwiki.gwt.wysiwyg.client.plugin.image.ImageConfigHTMLParser;
+import org.xwiki.gwt.wysiwyg.client.plugin.image.ImageConfigHTMLSerializer;
+import org.xwiki.gwt.wysiwyg.client.plugin.image.ImageConfigJSONParser;
+import org.xwiki.gwt.wysiwyg.client.plugin.image.ImageConfigJSONSerializer;
 
+import com.google.gwt.core.client.JsArrayString;
+import com.google.gwt.dom.client.ImageElement;
 import com.google.gwt.dom.client.Node;
+import com.google.gwt.dom.client.Style.Unit;
 
 /**
  * Handles the insertion of an image, passed through its corresponding HTML block.
@@ -39,6 +43,26 @@ import com.google.gwt.dom.client.Node;
  */
 public class InsertImageExecutable extends InsertHTMLExecutable
 {
+    /**
+     * The object used to extract an {@link ImageConfig} from an {@link ImageElement}.
+     */
+    private final ImageConfigHTMLParser imageConfigHTMLParser = new ImageConfigHTMLParser();
+
+    /**
+     * The object used to serialize an {@link ImageConfig} to HTML.
+     */
+    private final ImageConfigHTMLSerializer imageConfigHTMLSerializer = new ImageConfigHTMLSerializer();
+
+    /**
+     * The object used to serialize an {@link ImageConfig} instance to JSON.
+     */
+    private final ImageConfigJSONSerializer imageConfigJSONSerializer = new ImageConfigJSONSerializer();
+
+    /**
+     * The object used to create an {@link ImageConfig} from JSON.
+     */
+    private final ImageConfigJSONParser imageConfigJSONParser = new ImageConfigJSONParser();
+
     /**
      * Creates a new executable that can be used to insert images in the specified rich text area.
      * 
@@ -50,28 +74,26 @@ public class InsertImageExecutable extends InsertHTMLExecutable
     }
 
     /**
-     * Gets the image element in the current selection.
+     * {@inheritDoc}
      * 
-     * @param rta the rich text area to get the selection from.
-     * @return the image element in the current selection, if any or null otherwise.
+     * @see InsertHTMLExecutable#execute(String)
      */
-    private Element getSelectedImage(RichTextArea rta)
+    @Override
+    public boolean execute(String imageJSON)
     {
-        // Check if the current selection perfectly wraps an image.
-        // We expect the selection to have at least one range, otherwise this executable wouldn't be enabled.
-        Range currentRange = rta.getDocument().getSelection().getRangeAt(0);
-        Node startContainer = currentRange.getStartContainer();
-        Node endContainer = currentRange.getEndContainer();
-
-        if (startContainer == endContainer && startContainer.getNodeType() == Node.ELEMENT_NODE
-            && (currentRange.getEndOffset() - currentRange.getStartOffset() == 1)) {
-            // Check that the node inside is an image
-            Node nodeInside = startContainer.getChildNodes().getItem(currentRange.getStartOffset());
-            if (nodeInside.getNodeType() == Node.ELEMENT_NODE && nodeInside.getNodeName().equalsIgnoreCase("img")) {
-                return (Element) nodeInside;
-            }
+        String imageHTML = imageConfigHTMLSerializer.serialize(imageConfigJSONParser.parse(imageJSON));
+        ImageElement image = getSelectedImage();
+        if (image == null) {
+            // Insert a new image.
+            return super.execute(imageHTML);
+        } else {
+            // Overwrite an existing image.
+            Element container = Element.as(rta.getDocument().createDivElement());
+            // Inner HTML listeners have to be notified in order to extract the image meta data.
+            container.xSetInnerHTML(imageHTML);
+            merge(image, (ImageElement) container.getFirstChild());
+            return true;
         }
-        return null;
     }
 
     /**
@@ -85,7 +107,7 @@ public class InsertImageExecutable extends InsertHTMLExecutable
         {
             public Boolean get()
             {
-                return getSelectedImage(rta) != null;
+                return getSelectedImage() != null;
             }
         });
     }
@@ -97,109 +119,105 @@ public class InsertImageExecutable extends InsertHTMLExecutable
      */
     public String getParameter()
     {
-        Element selectedImageElement = getSelectedImage(rta);
+        ImageElement selectedImageElement = getSelectedImage();
         if (selectedImageElement == null) {
             return null;
         }
-        // Get the image reference
-        DocumentFragment imageMetaData = selectedImageElement.getMetaData();
-        if (imageMetaData == null) {
-            return null;
-        }
-        Node startComment = imageMetaData.getChildNodes().getItem(0);
-        if (startComment.getNodeType() != DOMUtils.COMMENT_NODE
-            || !startComment.getNodeValue().startsWith("startimage:")) {
-            return null;
-        }
-
-        // parse image and return stuff.
-        ImageConfig config = new ImageConfig();
-        config.setReference(startComment.getNodeValue().substring(11));
-        parseImageAttributes(selectedImageElement, config);
-        return config.toJSON();
+        ImageConfig config = imageConfigHTMLParser.parse(selectedImageElement);
+        return imageConfigJSONSerializer.serialize(config);
     }
 
     /**
-     * Parses the image attributes to re-compose the Image configuration.
+     * Gets the image element in the current selection.
      * 
-     * @param img the image element to get the attributes from
-     * @param config the {@link ImageConfig} object in which to store found values
+     * @return the image element in the current selection, if any or {@code null} otherwise
      */
-    private void parseImageAttributes(Element img, ImageConfig config)
+    private ImageElement getSelectedImage()
     {
-        // get the url of the image
-        String srcAttribute = img.getAttribute("src");
-        config.setImageURL(srcAttribute);
-        String widthName = "width";
-        String heightName = "height";
-        String widthValue = img.getStyle().getProperty(widthName);
-        if (!StringUtils.isEmpty(widthValue)) {
-            config.setWidth(widthValue);
-        }
-        String heightValue = img.getStyle().getProperty(heightName);
-        if (!StringUtils.isEmpty(heightValue)) {
-            config.setHeight(heightValue);
-        }
-        String altAttr = img.xGetAttribute("alt");
-        if (altAttr != null && altAttr.trim().length() != 0) {
-            config.setAltText(altAttr);
-        }
-        // search for width and height in attributes, if none were set
-        if (config.getHeight() == null && config.getWidth() == null) {
-            if (!StringUtils.isEmpty(img.xGetAttribute(widthName))) {
-                config.setWidth(img.xGetAttribute(widthName));
-            }
-            if (!StringUtils.isEmpty(img.xGetAttribute(heightName))) {
-                config.setHeight(img.xGetAttribute(heightName));
+        // Check if the current selection perfectly wraps an image.
+        // We expect the selection to have at least one range, otherwise this executable wouldn't be enabled.
+        Range currentRange = rta.getDocument().getSelection().getRangeAt(0);
+        Node startContainer = currentRange.getStartContainer();
+        Node endContainer = currentRange.getEndContainer();
+
+        if (startContainer == endContainer && startContainer.getNodeType() == Node.ELEMENT_NODE
+            && (currentRange.getEndOffset() - currentRange.getStartOffset() == 1)) {
+            // Check that the node inside is an image.
+            Node nodeInside = startContainer.getChildNodes().getItem(currentRange.getStartOffset());
+            if (nodeInside.getNodeType() == Node.ELEMENT_NODE && nodeInside.getNodeName().equalsIgnoreCase("img")) {
+                return (ImageElement) nodeInside;
             }
         }
-        ImageAlignment alignment = parseImageAlignment(img);
-        if (alignment != null) {
-            config.setAlignment(alignment);
+        return null;
+    }
+
+    /**
+     * Merges the given image elements.
+     * 
+     * @param target the image that will be updated
+     * @param source the image providing the change
+     */
+    private void merge(ImageElement target, ImageElement source)
+    {
+        // Remove redundant attributes.
+        adjustDimension(target, source, Style.WIDTH);
+        adjustDimension(target, source, Style.HEIGHT);
+        // Merge complex attributes.
+        // Merge class name attribute.
+        if (!target.getClassName().equals(source.getClassName())) {
+            String[] targetClassNames = target.getClassName().split("\\s+");
+            for (int i = 0; i < targetClassNames.length; i++) {
+                source.addClassName(targetClassNames[i]);
+            }
+        }
+        // Merge style attribute.
+        if (!Element.as(target).xGetAttribute(Style.STYLE_ATTRIBUTE).equals(
+            Element.as(source).xGetAttribute(Style.STYLE_ATTRIBUTE))) {
+            extend((Style) source.getStyle(), (Style) target.getStyle());
+        }
+        // Update all attributes.
+        JsArrayString attributeNames = Element.as(source).getAttributeNames();
+        for (int i = 0; i < attributeNames.length(); i++) {
+            String newValue = Element.as(source).xGetAttribute(attributeNames.get(i));
+            Element.as(target).xSetAttribute(attributeNames.get(i), newValue);
         }
     }
 
     /**
-     * Parses the style attribute of the image to re-compose the alignment for the image.
+     * Adjusts the specified dimension of the target image based on the source image.
      * 
-     * @return the found alignment, if there is any or null otherwise.
-     * @param img the image to parse the alignment for
+     * @param target the image whose dimension is being adjusted
+     * @param source the image providing the new value for the specified dimension
+     * @param dimension the dimension to adjust, either {@link Style#WIDTH} or {@link Style#HEIGHT}
      */
-    private ImageAlignment parseImageAlignment(Element img)
+    private void adjustDimension(ImageElement target, ImageElement source, String dimension)
     {
-        ImageAlignment foundAlignment = null;
-        // Try to get the float of this element, either as "styleFloat" or as "cssFloat", to make sure we get it from
-        // all browsers (IE uses "styleFloat")
-        // cssFloat is the name of the float property in CSS2, it seems
-        String floatValue = img.getStyle().getProperty("cssFloat");
-        if (StringUtils.isEmpty(floatValue)) {
-            floatValue = img.getStyle().getProperty("styleFloat");
+        if (source.hasAttribute(dimension)) {
+            // Keep the specified dimension only if it's different than the computed dimension.
+            String specifiedValue = source.getAttribute(dimension);
+            String computedValue = target.getPropertyString(dimension);
+            if (specifiedValue.equals(computedValue) || specifiedValue.equals(computedValue + Unit.PX.getType())) {
+                source.removeAttribute(dimension);
+            }
+        } else {
+            // Restore the dimension of the target image to its default value if the dimension of the source image isn't
+            // specified.
+            target.removeAttribute(dimension);
         }
-        if ("left".equalsIgnoreCase(floatValue)) {
-            foundAlignment = ImageAlignment.LEFT;
-        }
-        if ("right".equalsIgnoreCase(floatValue)) {
-            foundAlignment = ImageAlignment.RIGHT;
-        }
-        String autoValue = "auto";
-        if ("block".equalsIgnoreCase(img.getStyle().getProperty("display"))
-            && autoValue.equalsIgnoreCase(img.getStyle().getProperty(
-                org.xwiki.gwt.dom.client.Style.toCamelCase("margin-left")))
-            && autoValue.equalsIgnoreCase(img.getStyle().getProperty(
-                org.xwiki.gwt.dom.client.Style.toCamelCase("margin-right")))) {
-            foundAlignment = ImageAlignment.CENTER;
-        }
-        String verticalAlignValue =
-            img.getStyle().getProperty(org.xwiki.gwt.dom.client.Style.toCamelCase("vertical-align"));
-        if ("top".equalsIgnoreCase(verticalAlignValue)) {
-            foundAlignment = ImageAlignment.TOP;
-        }
-        if ("bottom".equalsIgnoreCase(verticalAlignValue)) {
-            foundAlignment = ImageAlignment.BOTTOM;
-        }
-        if ("middle".equalsIgnoreCase(verticalAlignValue)) {
-            foundAlignment = ImageAlignment.MIDDLE;
-        }
-        return foundAlignment;
     }
+
+    /**
+     * Copies the properties from the source style to the target style only they are not defined in the target style.
+     * 
+     * @param target the style to be extended
+     * @param source the extension source
+     */
+    private native void extend(Style target, Style source)
+    /*-{
+        for(propertyName in source) {
+            if ('' + source[propertyName] != '' && '' + target[propertyName] == '') {
+                target[propertyName] = source[propertyName];
+            }
+        }
+    }-*/;
 }

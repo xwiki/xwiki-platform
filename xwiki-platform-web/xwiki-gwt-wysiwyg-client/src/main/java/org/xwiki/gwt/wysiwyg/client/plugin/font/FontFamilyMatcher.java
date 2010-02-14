@@ -21,6 +21,8 @@ package org.xwiki.gwt.wysiwyg.client.plugin.font;
 
 import org.xwiki.gwt.dom.client.Style;
 
+import com.google.gwt.dom.client.Style.Unit;
+
 /**
  * Matches values of the font-family CSS property.
  * 
@@ -31,7 +33,7 @@ public class FontFamilyMatcher extends AbstractFontMatcher
     /**
      * A larger font size increases the accuracy but may lower the speed of the test.
      */
-    public static final String TEST_FONT_SIZE = "50px";
+    public static final int TEST_FONT_SIZE = 50;
 
     /**
      * The suffix added to a font family name in order to default it to the generic serif family.
@@ -50,8 +52,8 @@ public class FontFamilyMatcher extends AbstractFontMatcher
     {
         super("mmmmmmmmmwwwwwww");
 
-        left.getStyle().setProperty(Style.FONT_SIZE.getJSName(), TEST_FONT_SIZE);
-        right.getStyle().setProperty(Style.FONT_SIZE.getJSName(), TEST_FONT_SIZE);
+        left.getStyle().setFontSize(TEST_FONT_SIZE, Unit.PX);
+        right.getStyle().setFontSize(TEST_FONT_SIZE, Unit.PX);
     }
 
     /**

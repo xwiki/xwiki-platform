@@ -22,12 +22,12 @@ package org.xwiki.gwt.wysiwyg.client.plugin.format.exec;
 import org.xwiki.gwt.dom.client.Document;
 import org.xwiki.gwt.dom.client.Element;
 import org.xwiki.gwt.dom.client.Range;
-import org.xwiki.gwt.dom.client.Style;
 import org.xwiki.gwt.user.client.ui.rta.cmd.Executable;
 import org.xwiki.gwt.user.client.ui.rta.cmd.internal.InsertHTMLExecutable;
 import org.xwiki.gwt.wysiwyg.client.RichTextAreaTestCase;
 
 import com.google.gwt.dom.client.Node;
+import com.google.gwt.dom.client.Style.Display;
 import com.google.gwt.user.client.Command;
 
 /**
@@ -295,7 +295,7 @@ public class FormatBlockExecutableTest extends RichTextAreaTestCase
         Element element = Document.get().createSpanElement().cast();
         element.setId("agent007");
         element.setTitle("classified");
-        element.getStyle().setProperty(Style.DISPLAY, Style.Display.NONE);
+        element.getStyle().setDisplay(Display.NONE);
         element.setInnerHTML("?<!--$--><em>*</em>");
 
         Element parent = Document.get().createSpanElement().cast();

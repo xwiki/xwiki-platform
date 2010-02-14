@@ -19,7 +19,6 @@
  */
 package org.xwiki.gwt.wysiwyg.client;
 
-import org.xwiki.gwt.dom.client.Style;
 import org.xwiki.gwt.user.client.ui.LoadingPanel;
 import org.xwiki.gwt.user.client.ui.MenuBar;
 import org.xwiki.gwt.user.client.ui.ToolBar;
@@ -73,7 +72,7 @@ public class RichTextEditor extends Composite implements LoadHandler
         textArea.addLoadHandler(this);
 
         loadingPanel = new LoadingPanel();
-        loadingPanel.getElement().getStyle().setProperty(Style.BACKGROUND_COLOR, "white");
+        loadingPanel.getElement().getStyle().setBackgroundColor("white");
 
         container = new FlowPanel();
         container.add(textArea);

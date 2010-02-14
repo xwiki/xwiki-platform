@@ -30,7 +30,7 @@ import org.xwiki.gwt.user.client.ui.rta.cmd.Command;
 import org.xwiki.gwt.user.client.ui.rta.cmd.Executable;
 import org.xwiki.gwt.user.client.ui.wizard.Wizard;
 import org.xwiki.gwt.user.client.ui.wizard.WizardListener;
-import org.xwiki.gwt.wysiwyg.client.plugin.image.ImageConfig;
+import org.xwiki.gwt.wysiwyg.client.plugin.image.ImageConfigJSONParser;
 import org.xwiki.gwt.wysiwyg.client.plugin.internal.AbstractPlugin;
 import org.xwiki.gwt.wysiwyg.client.plugin.link.exec.CreateLinkExecutable;
 import org.xwiki.gwt.wysiwyg.client.plugin.link.exec.LinkExecutableUtils;
@@ -39,7 +39,6 @@ import org.xwiki.gwt.wysiwyg.client.plugin.link.ui.LinkWizard;
 import org.xwiki.gwt.wysiwyg.client.plugin.link.ui.LinkWizard.LinkWizardSteps;
 import org.xwiki.gwt.wysiwyg.client.wiki.ResourceName;
 import org.xwiki.gwt.wysiwyg.client.wiki.WikiServiceAsync;
-
 
 /**
  * Rich text editor plug-in for inserting links, using a dialog to get link settings from the user. It installs a menu
@@ -78,6 +77,11 @@ public class LinkPlugin extends AbstractPlugin implements WizardListener
      * The service used to access the wiki.
      */
     private final WikiServiceAsync wikiService;
+
+    /**
+     * The object used to parse image configuration from JSON.
+     */
+    private final ImageConfigJSONParser imageConfigJSONParser = new ImageConfigJSONParser();
 
     /**
      * Creates a new link plugin that will use the specified wiki service.
@@ -287,14 +291,13 @@ public class LinkPlugin extends AbstractPlugin implements WizardListener
     /**
      * Helper method to parse an image execution String parameter and fill the passed {@link LinkConfig} from it.
      * 
-     * @param linkConfig the link config to set the label to
-     * @param imageParam the image parameter, as returned by the command manager
+     * @param linkConfig the link configuration object to set the label to
+     * @param imageJSON the JSON serialization of an image configuration object, as returned by the command manager for
+     *            the {@link Command#INSERT_IMAGE} command.
      */
-    protected void parseLabelFromImage(LinkConfig linkConfig, String imageParam)
+    protected void parseLabelFromImage(LinkConfig linkConfig, String imageJSON)
     {
-        ImageConfig imgConfig = new ImageConfig();
-        imgConfig.fromJSON(imageParam);
-        ResourceName imageResource = new ResourceName(imgConfig.getReference(), true);
+        ResourceName imageResource = new ResourceName(imageConfigJSONParser.parse(imageJSON).getReference(), true);
         linkConfig.setLabelText(imageResource.getFile());
         linkConfig.setReadOnlyLabel(true);
     }

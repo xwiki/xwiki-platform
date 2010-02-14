@@ -23,6 +23,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.google.gwt.core.client.JsArrayString;
+import com.google.gwt.dom.client.Style.FontWeight;
 
 /**
  * Unit tests for {@link Element}.
@@ -153,7 +154,7 @@ public class ElementTest extends DOMTestCase
         String customAttribute = "x";
         element.setAttribute(customAttribute, "y");
         element.setTitle("z");
-        element.getStyle().setProperty(Style.BACKGROUND_COLOR, "rgb(255, 0, 0)");
+        element.getStyle().setBackgroundColor("rgb(255, 0, 0)");
         element.setClassName("test");
 
         List<String> attrList = new ArrayList<String>();
@@ -261,7 +262,7 @@ public class ElementTest extends DOMTestCase
         element.setClassName("xyz");
         assertTrue(element.hasAttribute(CLASS_ATTRIBUTE));
 
-        element.getStyle().setProperty(Style.FONT_WEIGHT.getJSName(), Style.FontWeight.BOLD);
+        element.getStyle().setFontWeight(FontWeight.BOLD);
         assertTrue(element.hasAttribute(STYLE_ATTRIBUTE));
 
         element.setTitle("abc");

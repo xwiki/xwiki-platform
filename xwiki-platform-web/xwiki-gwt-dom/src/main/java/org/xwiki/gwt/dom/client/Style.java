@@ -19,6 +19,8 @@
  */
 package org.xwiki.gwt.dom.client;
 
+import com.google.gwt.core.client.GWT;
+
 /**
  * Extends the {@link com.google.gwt.dom.client.Style} to add constants for standard property names and values.
  * 
@@ -120,6 +122,21 @@ public class Style extends com.google.gwt.dom.client.Style
      * on the page. Use the {@link #DISPLAY} property to create invisible elements that do not take up space.
      */
     public static final String VISIBILITY = "visibility";
+
+    /**
+     * The float property specifies whether or not a box (an element) should float.
+     */
+    public static final Property FLOAT = GWT.create(FloatProperty.class);
+
+    /**
+     * The margin-left property sets the left margin of an element.
+     */
+    public static final Property MARGIN_LEFT = new Property("margin-left", "marginLeft", false, false, "0");
+
+    /**
+     * The margin-right property sets the right margin of an element.
+     */
+    public static final Property MARGIN_RIGHT = new Property("margin-right", "marginRight", false, false, "0");
 
     /**
      * Standard values for {@link Style#DISPLAY}.
@@ -355,6 +372,101 @@ public class Style extends com.google.gwt.dom.client.Style
          * This is a utility class so it has a private constructor.
          */
         private Visibility()
+        {
+        }
+    }
+
+    /**
+     * Defines the {@code float} CSS property.
+     */
+    public static class FloatProperty extends Property
+    {
+        /**
+         * Default constructor required in order to use the deferred binding mechanism.
+         */
+        public FloatProperty()
+        {
+            this("cssFloat");
+        }
+
+        /**
+         * Protected constructor allowing browser specific implementations that use a different JavaScript name for this
+         * property.
+         * 
+         * @param jsName the name of this CSS property as used in JavaScript
+         */
+        protected FloatProperty(String jsName)
+        {
+            super("float", jsName, false, false, Float.NONE);
+        }
+    }
+
+    /**
+     * Internet Explorer specific implementation of {@link FloatProperty}.
+     */
+    public static final class IEFloatProperty extends FloatProperty
+    {
+        /**
+         * Default constructor required in order to use the deferred binding mechanism.
+         */
+        public IEFloatProperty()
+        {
+            super("styleFloat");
+        }
+    }
+
+    /**
+     * Standard values for {@link Style#FLOAT}.
+     */
+    public static final class Float
+    {
+        /**
+         * The element floats to the left.
+         */
+        public static final String LEFT = Style.LEFT;
+
+        /**
+         * The element floats the right.
+         */
+        public static final String RIGHT = TextAlign.RIGHT;
+
+        /**
+         * The element is not floated, and will be displayed just where it occurs in the text. This is default.
+         */
+        public static final String NONE = Display.NONE;
+
+        /**
+         * Specifies that the value of the float property should be inherited from the parent element.
+         */
+        public static final String INHERIT = "inherit";
+
+        /**
+         * This is a utility class so it has a private constructor.
+         */
+        private Float()
+        {
+        }
+    }
+
+    /**
+     * Standard values for {@link Style#MARGIN_LEFT} and {@link Style#MARGIN_RIGHT} properties.
+     */
+    public static final class Margin
+    {
+        /**
+         * The browser calculates a right margin.
+         */
+        public static final String AUTO = "auto";
+
+        /**
+         * Specifies that the right margin should be inherited from the parent element.
+         */
+        public static final String INHERIT = Float.INHERIT;
+
+        /**
+         * This is a utility class so it has a private constructor.
+         */
+        private Margin()
         {
         }
     }

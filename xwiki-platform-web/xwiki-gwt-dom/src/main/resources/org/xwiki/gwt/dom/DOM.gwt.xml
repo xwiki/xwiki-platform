@@ -102,4 +102,17 @@
       <when-property-is name="user.agent" value="ie8"/>
     </any>
   </replace-with>
+
+  <!-- FloatProperty -->
+  <replace-with class="org.xwiki.gwt.dom.client.Style.FloatProperty">
+    <when-type-is class="org.xwiki.gwt.dom.client.Style.FloatProperty"/>
+  </replace-with>
+
+  <replace-with class="org.xwiki.gwt.dom.client.Style.IEFloatProperty">
+    <when-type-is class="org.xwiki.gwt.dom.client.Style.FloatProperty"/>
+    <any>
+      <when-property-is name="user.agent" value="ie6"/>
+      <when-property-is name="user.agent" value="ie8"/>
+    </any>
+  </replace-with>
 </module>

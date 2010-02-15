@@ -21,19 +21,29 @@ package org.xwiki.officeimporter.internal.builder;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
 import junit.framework.Assert;
 
 import org.jmock.Expectations;
+import org.jmock.Mockery;
 import org.junit.Before;
+import org.xwiki.component.descriptor.DefaultComponentDescriptor;
 import org.xwiki.component.util.ReflectionUtils;
+import org.xwiki.model.ModelContext;
+import org.xwiki.model.reference.WikiReference;
 import org.xwiki.officeimporter.builder.PresentationBuilder;
 import org.xwiki.officeimporter.document.XDOMOfficeDocument;
 import org.xwiki.officeimporter.internal.AbstractOfficeImporterTest;
 import org.xwiki.officeimporter.openoffice.OpenOfficeConverter;
 import org.xwiki.officeimporter.openoffice.OpenOfficeManager;
+import org.xwiki.rendering.block.Block;
+import org.xwiki.rendering.block.MacroMarkerBlock;
+import org.xwiki.rendering.block.WordBlock;
+import org.xwiki.rendering.macro.Macro;
+import org.xwiki.rendering.transformation.MacroTransformationContext;
 
 /**
  * Test case for {@link DefaultPresentationBuilder}.
@@ -53,6 +63,10 @@ public class DefaultPresentationBuilderTest extends AbstractOfficeImporterTest
      */
     private OpenOfficeManager officeManager;
 
+    private Mockery mockery = new Mockery();
+
+    private Macro mockVelocityMacro;
+    
     /**
      * {@inheritDoc}
      */
@@ -60,8 +74,16 @@ public class DefaultPresentationBuilderTest extends AbstractOfficeImporterTest
     public void setUp() throws Exception
     {
         super.setUp();
+
         this.presentationBuilder = getComponentManager().lookup(PresentationBuilder.class);
         this.officeManager = getComponentManager().lookup(OpenOfficeManager.class);
+        
+        // TODO : Remove when DefaultPresentationBuilder#buildPresentationXDOM() is fixed
+        this.mockVelocityMacro = this.mockery.mock(Macro.class);
+        DefaultComponentDescriptor<Macro> descriptor = new DefaultComponentDescriptor<Macro>();
+        descriptor.setRole(Macro.class);
+        descriptor.setRoleHint("velocity");
+        getComponentManager().registerComponent(descriptor, this.mockVelocityMacro);
     }
     
     /**
@@ -83,11 +105,18 @@ public class DefaultPresentationBuilderTest extends AbstractOfficeImporterTest
         this.mockery.checking(new Expectations() {{
                 allowing(mockDocumentConverter).convert(mockInput, "input.ppt", "output.html");
                 will(returnValue(mockOutput));
+
+                // TODO : Remove when DefaultPresentationBuilder#buildPresentationXDOM() is fixed
+                allowing(mockVelocityMacro).execute(with(any(Object.class)), with(any(String.class)), with(any(MacroTransformationContext.class)));
+                will(returnValue(Arrays.<Block>asList(new WordBlock("presentationcontent"))));
         }});
         ReflectionUtils.setFieldValue(officeManager, "converter", mockDocumentConverter);
-        
+
         XDOMOfficeDocument presentation = presentationBuilder.build(mockOfficeFileStream, "input.ppt");
         Assert.assertNotNull(presentation.getContentDocument());
+        // Make sure provided XDOM is a final XDOM (transformations are executed)
+        // TODO : Remove when DefaultPresentationBuilder#buildPresentationXDOM() is fixed
+        Assert.assertSame(presentation.getContentDocument().getChildren().get(0).getClass(), MacroMarkerBlock.class);
         Assert.assertEquals(1, presentation.getArtifacts().size());
         Assert.assertTrue(presentation.getArtifacts().containsKey("presentation.zip"));
     }

@@ -40,6 +40,9 @@ import org.xwiki.officeimporter.openoffice.OpenOfficeManager;
 import org.xwiki.rendering.block.XDOM;
 import org.xwiki.rendering.parser.ParseException;
 import org.xwiki.rendering.parser.Parser;
+import org.xwiki.rendering.syntax.Syntax;
+import org.xwiki.rendering.transformation.TransformationException;
+import org.xwiki.rendering.transformation.TransformationManager;
 
 /**
  * Default implementation of {@link PresentationBuilder}.
@@ -49,7 +52,7 @@ import org.xwiki.rendering.parser.Parser;
  */
 @Component
 public class DefaultPresentationBuilder implements PresentationBuilder
-{    
+{
     /**
      * XWiki/2.0 syntax parser used for building the presentation XDOM.
      */
@@ -57,11 +60,17 @@ public class DefaultPresentationBuilder implements PresentationBuilder
     private Parser xwikiParser;
 
     /**
+     * Used to transform the XDOM.
+     */
+    @Requirement
+    private TransformationManager transformationManager;
+
+    /**
      * Component manager used by {@link XDOMOfficeDocument}.
      */
     @Requirement
     private ComponentManager componentManager;
-    
+
     /**
      * Used to obtain document converter.
      */
@@ -69,7 +78,9 @@ public class DefaultPresentationBuilder implements PresentationBuilder
     private OpenOfficeManager officeManager;
 
     /**
-     * {@inheritDoc}    
+     * {@inheritDoc}
+     * 
+     * @see org.xwiki.officeimporter.builder.PresentationBuilder#build(java.io.InputStream, java.lang.String)
      */
     public XDOMOfficeDocument build(InputStream officeFileStream, String officeFileName) throws OfficeImporterException
     {
@@ -78,23 +89,25 @@ public class DefaultPresentationBuilder implements PresentationBuilder
         inputStreams.put(officeFileName, officeFileStream);
         Map<String, byte[]> artifacts;
         try {
-            artifacts = officeManager.getConverter().convert(inputStreams, officeFileName, "output.html");
+            artifacts = this.officeManager.getConverter().convert(inputStreams, officeFileName, "output.html");
         } catch (OpenOfficeConverterException ex) {
             String message = "Error while converting document [%s] into html.";
             throw new OfficeImporterException(String.format(message, officeFileName), ex);
         }
-        
+
         // Create presentation archive.
         byte[] presentationArchive = buildPresentationArchive(artifacts);
         artifacts.clear();
         artifacts.put("presentation.zip", presentationArchive);
-        
+
         // Build presentation XDOM.
-        return new XDOMOfficeDocument(buildPresentationXDOM(), artifacts, componentManager);
+        return new XDOMOfficeDocument(buildPresentationXDOM(), artifacts, this.componentManager);
     }
 
     /**
      * {@inheritDoc}
+     * 
+     * @see org.xwiki.officeimporter.builder.PresentationBuilder#build(byte[])
      */
     @Deprecated
     public XDOMOfficeDocument build(byte[] officeFileData) throws OfficeImporterException
@@ -135,19 +148,30 @@ public class DefaultPresentationBuilder implements PresentationBuilder
      */
     private XDOM buildPresentationXDOM() throws OfficeImporterException
     {
-        String newLine = "\n";
+        // TODO: the XDOM should be generated in pure java and not depends on velocity, html macros and xwiki/2.0
+        // parser. This is slow and wrong. Before we need to convert the zip plugin into component to be able to use it
+        // directly.
         StringBuffer buffer = new StringBuffer();
-        buffer.append("{{velocity}}").append(newLine);
-        buffer.append("#set($url=$xwiki.zipexplorer.getFileLink($doc, 'presentation.zip', 'output.html'))");
-        buffer.append(newLine).append(newLine);
-        buffer.append("{{html}}").append(newLine);
-        buffer.append("<iframe src=\"$url\" frameborder=0 width=800px height=600px></iframe>").append(newLine);
-        buffer.append("{{/html}}").append(newLine).append(newLine);
+        buffer.append("{{velocity}}");
+        buffer.append("#set($url = $xwiki.zipexplorer.getFileLink($doc, 'presentation.zip', 'output.html'))");
+        buffer.append("{{html wiki=\"false\" clean=\"false\"}}");
+        buffer.append("<iframe src=\"$url\" frameborder=0 width=800px height=600px></iframe>");
+        buffer.append("{{/html}}");
         buffer.append("{{/velocity}}");
+
+        XDOM xdom;
         try {
-            return xwikiParser.parse(new StringReader(buffer.toString()));
-        } catch (ParseException ex) {
-            throw new OfficeImporterException("Error while building presentation.", ex);
+            xdom = this.xwikiParser.parse(new StringReader(buffer.toString()));
+
+            // Transform XDOM
+            this.transformationManager.performTransformations(xdom, Syntax.XWIKI_2_0);
+
+            return xdom;
+        } catch (ParseException e) {
+            throw new OfficeImporterException(
+                "Error while building presentation: failed to parse presentation content", e);
+        } catch (TransformationException e) {
+            throw new OfficeImporterException("Error while building presentation: failed to transform XDOM", e);
         }
     }
 }

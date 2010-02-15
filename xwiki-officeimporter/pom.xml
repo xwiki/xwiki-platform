@@ -71,7 +71,7 @@
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-core-refactoring</artifactId>
       <version>${pom.version}</version>
-    </dependency> 
+    </dependency>
     <dependency>
       <groupId>net.sf.jodconverter</groupId>
       <artifactId>jodconverter</artifactId>
@@ -81,13 +81,30 @@
       <groupId>org.codehaus.groovy</groupId>
       <artifactId>groovy-all</artifactId>
       <version>1.6.0</version>
-    </dependency>   
+    </dependency>
+
+    <!-- Runtime dependencies -->
     <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-core-rendering-syntax-wikimodel</artifactId>
       <version>${pom.version}</version>
       <scope>runtime</scope>
     </dependency>
+    <!-- This dependency is dues to a bad design in DefaultPresentationBuilder#buildPresentationXDOM and should be fixed. -->
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-core-rendering-macro-velocity</artifactId>
+      <version>${pom.version}</version>
+      <scope>runtime</scope>
+    </dependency>
+    <!-- This dependency is dues to a bad design in DefaultPresentationBuilder#buildPresentationXDOM and should be fixed. -->
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-core-rendering-macro-html</artifactId>
+      <version>${pom.version}</version>
+      <scope>runtime</scope>
+    </dependency>
+
     <!-- Testing dependencies -->
     <dependency>
       <groupId>org.xwiki.platform</groupId>

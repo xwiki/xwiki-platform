@@ -19,6 +19,7 @@
  */
 package com.xpn.xwiki.internal.model.reference;
 
+import org.jmock.Mockery;
 import org.junit.Assert;
 import org.junit.Before;
 import org.xwiki.model.EntityType;
@@ -29,12 +30,12 @@ import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.test.AbstractBridgedXWikiComponentTestCase;
 
 /**
- * Unit tests for {@link com.xpn.xwiki.internal.model.reference.CurrentReferenceEntityReferenceResolver}.
+ * Unit tests for {@link CurrentMixedStringDocumentReferenceResolver}.
  * 
  * @version $Id$
  * @since 2.2M1
  */
-public class CurrentReferenceEntityReferenceResolverTest extends AbstractBridgedXWikiComponentTestCase
+public class CurrentStringEntityReferenceResolverTest extends AbstractBridgedXWikiComponentTestCase
 {
     private static final String CURRENT_WIKI = "currentwiki";
 
@@ -42,21 +43,20 @@ public class CurrentReferenceEntityReferenceResolverTest extends AbstractBridged
 
     private static final String CURRENT_PAGE = "currentpage";
 
-    private EntityReferenceResolver<EntityReference> resolver;
+    private EntityReferenceResolver<String> resolver;
 
     @Before
     public void setUp() throws Exception
     {
         super.setUp();
 
-        this.resolver = getComponentManager().lookup(EntityReferenceResolver.class, "current/reference");
+        this.resolver = getComponentManager().lookup(EntityReferenceResolver.class, "current");
     }
 
     @org.junit.Test
     public void testResolveAttachmentReferenceWhenMissingParentsAndNoContextDocument()
     {
-        EntityReference reference =
-                resolver.resolve(new EntityReference("filename", EntityType.ATTACHMENT), EntityType.ATTACHMENT);
+        EntityReference reference = resolver.resolve("filename", EntityType.ATTACHMENT);
 
         Assert.assertEquals("WebHome", reference.getParent().getName());
         Assert.assertEquals(EntityType.DOCUMENT, reference.getParent().getType());
@@ -72,8 +72,7 @@ public class CurrentReferenceEntityReferenceResolverTest extends AbstractBridged
         getContext().setDatabase(CURRENT_WIKI);
         getContext().setDoc(new XWikiDocument("docwiki", CURRENT_SPACE, CURRENT_PAGE));
 
-        EntityReference reference =
-                resolver.resolve(new EntityReference("filename", EntityType.ATTACHMENT), EntityType.ATTACHMENT);
+        EntityReference reference = resolver.resolve("filename", EntityType.ATTACHMENT);
 
         Assert.assertEquals(CURRENT_PAGE, reference.getParent().getName());
         Assert.assertEquals(EntityType.DOCUMENT, reference.getParent().getType());

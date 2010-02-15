@@ -28,6 +28,7 @@ import org.junit.Before;
 import org.xwiki.context.Execution;
 import org.xwiki.model.reference.AttachmentReference;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.EntityReference;
 
 import org.xwiki.model.reference.EntityReferenceSerializer;
 
@@ -39,7 +40,7 @@ import org.xwiki.model.reference.EntityReferenceSerializer;
  */
 public class CompactEntityReferenceSerializerTest extends AbstractBridgedXWikiComponentTestCase
 {
-    private EntityReferenceSerializer serializer;
+    private EntityReferenceSerializer<EntityReference> serializer;
 
     @Before
     public void setUp() throws Exception

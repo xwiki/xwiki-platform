@@ -19,7 +19,6 @@
  */
 package com.xpn.xwiki.internal.model.reference;
 
-import org.jmock.Mockery;
 import org.junit.Assert;
 import org.junit.Before;
 import org.xwiki.model.EntityType;

@@ -57,36 +57,29 @@ public class CurrentReferenceEntityReferenceResolver extends DefaultReferenceEnt
     {
         String result;
 
-        XWikiDocument currentDoc = getContext().getDoc();
-        switch (type) {
-            case WIKI:
-                EntityReference wikiReference = this.modelContext.getCurrentEntityReference();
-                if (wikiReference != null) {
-                    wikiReference = wikiReference.extractReference(EntityType.WIKI);
-                }
-                if (wikiReference != null) {
-                    result = wikiReference.getName();
-                } else {
-                    result = super.getDefaultReferenceName(type);
-                }
-                break;
-            case SPACE:
-                if (currentDoc != null) {
-                    result = currentDoc.getSpaceName();
-                } else {
-                    result = super.getDefaultReferenceName(type);
-                }
-                break;
-            case DOCUMENT:
-                if (currentDoc != null) {
-                    result = currentDoc.getPageName();
-                } else {
-                    result = super.getDefaultReferenceName(type);
-                }
-                break;
-            default:
+        if (type == EntityType.WIKI) {
+            EntityReference wikiReference = this.modelContext.getCurrentEntityReference();
+            if (wikiReference != null) {
+                wikiReference = wikiReference.extractReference(EntityType.WIKI);
+            }
+            if (wikiReference != null) {
+                result = wikiReference.getName();
+            } else {
                 result = super.getDefaultReferenceName(type);
-                break;
+            }
+        } else if (type == EntityType.SPACE || type == EntityType.DOCUMENT) {
+            XWikiDocument currentDoc = getContext().getDoc();
+            if (currentDoc != null) {
+                if (type == EntityType.SPACE) {
+                    result = currentDoc.getDocumentReference().getLastSpaceReference().getName();
+                } else {
+                    result = currentDoc.getDocumentReference().getName();
+                }
+            } else {
+                result = super.getDefaultReferenceName(type);
+            }
+        } else {
+            result = super.getDefaultReferenceName(type);
         }
 
         return result;

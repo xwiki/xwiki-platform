@@ -46,7 +46,7 @@
   <properties>
     <!-- Used by gwt and wysiwyg modules -->
     <gwt.version>2.0.0</gwt.version>
-    <smartgwt.version>1.2</smartgwt.version>
+    <smartgwt.version>2.0</smartgwt.version>
     <junit.version>3.8.2</junit.version>
     <!-- Versions of XWiki dependencies used in Platform/Web modules -->
     <platform.tool.configuration.version>1.38-SNAPSHOT</platform.tool.configuration.version>

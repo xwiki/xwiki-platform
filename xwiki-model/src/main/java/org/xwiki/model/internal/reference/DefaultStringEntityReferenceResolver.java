@@ -44,6 +44,6 @@ public class DefaultStringEntityReferenceResolver extends AbstractStringEntityRe
      */
     protected String getDefaultValuesForType(EntityType type)
     {
-        return this.configuration.getDefaultReferenceName(type);
+        return this.configuration.getDefaultReferenceValue(type);
     }
 }

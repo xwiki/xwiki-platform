@@ -49,10 +49,10 @@ public class CurrentReferenceEntityReferenceResolver extends DefaultReferenceEnt
     /**
      * {@inheritDoc}
      * 
-     * @see DefaultReferenceEntityReferenceResolver#getDefaultReferenceName(org.xwiki.model.EntityType)
+     * @see DefaultReferenceEntityReferenceResolver#getDefaultValue(org.xwiki.model.EntityType)
      */
     @Override
-    protected String getDefaultReferenceName(EntityType type)
+    protected String getDefaultValue(EntityType type)
     {
         String result;
 
@@ -66,25 +66,25 @@ public class CurrentReferenceEntityReferenceResolver extends DefaultReferenceEnt
                 if (wikiReference != null) {
                     result = wikiReference.getName();
                 } else {
-                    result = super.getDefaultReferenceName(type);
+                    result = super.getDefaultValue(type);
                 }
                 break;
             case SPACE:
                 if (currentDoc != null) {
                     result = currentDoc.getSpaceName();
                 } else {
-                    result = super.getDefaultReferenceName(type);
+                    result = super.getDefaultValue(type);
                 }
                 break;
             case DOCUMENT:
                 if (currentDoc != null) {
                     result = currentDoc.getPageName();
                 } else {
-                    result = super.getDefaultReferenceName(type);
+                    result = super.getDefaultValue(type);
                 }
                 break;
             default:
-                result = super.getDefaultReferenceName(type);
+                result = super.getDefaultValue(type);
                 break;
         }
 

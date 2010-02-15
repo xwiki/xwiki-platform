@@ -71,10 +71,10 @@ public class DefaultModelConfigurationTest
                 will(returnValue("defaultFilename"));
         }});
         
-        Assert.assertEquals("defaultWiki", this.configuration.getDefaultReferenceName(EntityType.WIKI));
-        Assert.assertEquals("defaultDocument", this.configuration.getDefaultReferenceName(EntityType.DOCUMENT));
-        Assert.assertEquals("defaultSpace", this.configuration.getDefaultReferenceName(EntityType.SPACE));
-        Assert.assertEquals("defaultFilename", this.configuration.getDefaultReferenceName(EntityType.ATTACHMENT));
+        Assert.assertEquals("defaultWiki", this.configuration.getDefaultReferenceValue(EntityType.WIKI));
+        Assert.assertEquals("defaultDocument", this.configuration.getDefaultReferenceValue(EntityType.DOCUMENT));
+        Assert.assertEquals("defaultSpace", this.configuration.getDefaultReferenceValue(EntityType.SPACE));
+        Assert.assertEquals("defaultFilename", this.configuration.getDefaultReferenceValue(EntityType.ATTACHMENT));
     }
 
     @Test
@@ -88,9 +88,9 @@ public class DefaultModelConfigurationTest
                 will(returnValue("filename"));
         }});
 
-        Assert.assertEquals("xwiki", this.configuration.getDefaultReferenceName(EntityType.WIKI));
-        Assert.assertEquals("WebHome", this.configuration.getDefaultReferenceName(EntityType.DOCUMENT));
-        Assert.assertEquals("Main", this.configuration.getDefaultReferenceName(EntityType.SPACE));
-        Assert.assertEquals("filename", this.configuration.getDefaultReferenceName(EntityType.ATTACHMENT));
+        Assert.assertEquals("xwiki", this.configuration.getDefaultReferenceValue(EntityType.WIKI));
+        Assert.assertEquals("WebHome", this.configuration.getDefaultReferenceValue(EntityType.DOCUMENT));
+        Assert.assertEquals("Main", this.configuration.getDefaultReferenceValue(EntityType.SPACE));
+        Assert.assertEquals("filename", this.configuration.getDefaultReferenceValue(EntityType.ATTACHMENT));
     }
 }

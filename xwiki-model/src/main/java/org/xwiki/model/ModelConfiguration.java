@@ -34,5 +34,5 @@ public interface ModelConfiguration
      * @param type the type for which to return the default value
      * @return the default value to use when a reference doesn't have the passed type specified
      */
-    String getDefaultReferenceName(EntityType type);
+    String getDefaultReferenceValue(EntityType type);
 }

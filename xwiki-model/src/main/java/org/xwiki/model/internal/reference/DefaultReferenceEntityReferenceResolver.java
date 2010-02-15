@@ -19,7 +19,6 @@
  */
 package org.xwiki.model.internal.reference;
 
-import org.apache.commons.lang.StringUtils;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.Requirement;
 import org.xwiki.model.EntityType;
@@ -67,7 +66,7 @@ public class DefaultReferenceEntityReferenceResolver implements EntityReferenceR
         // If the passed type is a supertype of the reference to resolve's type then we need to insert a top level
         // reference.
         if (type.ordinal() > referenceToResolve.getType().ordinal()) {
-            normalizedReference = new EntityReference(getDefaultReferenceName(type), type, referenceToResolve.clone());
+            normalizedReference = new EntityReference(getDefaultValue(type), type, referenceToResolve.clone());
         } else {
             normalizedReference = referenceToResolve.clone();
         }
@@ -80,12 +79,12 @@ public class DefaultReferenceEntityReferenceResolver implements EntityReferenceR
             if (reference.getParent() != null && !types.isEmpty() && !types.contains(reference.getParent().getType())) {
                 // The parent reference isn't the allowed parent: insert an allowed reference
                 EntityReference newReference = new EntityReference(
-                    getDefaultReferenceName(types.get(0)), types.get(0), reference.getParent());
+                    getDefaultValue(types.get(0)), types.get(0), reference.getParent());
                 reference.setParent(newReference);
             } else if (reference.getParent() == null && !types.isEmpty()) {
                 // The top reference isn't the allowed top level reference, add a parent reference
                 EntityReference newReference = new EntityReference(
-                    getDefaultReferenceName(types.get(0)), types.get(0));
+                    getDefaultValue(types.get(0)), types.get(0));
                 reference.setParent(newReference);
             } else if (reference.getParent() != null && types.isEmpty()) {
                 // There's a parent but not of the correct type... it means the reference is invalid
@@ -102,8 +101,8 @@ public class DefaultReferenceEntityReferenceResolver implements EntityReferenceR
         return normalizedReference;
     }
 
-    protected String getDefaultReferenceName(EntityType type)
+    protected String getDefaultValue(EntityType type)
     {
-        return this.configuration.getDefaultReferenceName(type);
+        return this.configuration.getDefaultReferenceValue(type);
     }
 }

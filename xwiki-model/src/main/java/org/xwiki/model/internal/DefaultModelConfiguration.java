@@ -62,9 +62,9 @@ public class DefaultModelConfiguration extends AbstractLogEnabled implements Mod
 
     /**
      * {@inheritDoc}
-     * @see org.xwiki.model.ModelConfiguration#getDefaultReferenceName(org.xwiki.model.EntityType)
+     * @see org.xwiki.model.ModelConfiguration#getDefaultReferenceValue(org.xwiki.model.EntityType)
      */
-    public String getDefaultReferenceName(EntityType type)
+    public String getDefaultReferenceValue(EntityType type)
     {
         String name;
         try {

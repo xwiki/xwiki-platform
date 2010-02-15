@@ -53,9 +53,9 @@ public class DefaultReferenceEntityReferenceResolverTest
         ReflectionUtils.setFieldValue(this.resolver, "configuration", this.mockModelConfiguration);
 
         this.mockery.checking(new Expectations() {{
-            allowing(mockModelConfiguration).getDefaultReferenceName(EntityType.SPACE); will(returnValue("defspace"));
-            allowing(mockModelConfiguration).getDefaultReferenceName(EntityType.WIKI); will(returnValue("defwiki"));
-            allowing(mockModelConfiguration).getDefaultReferenceName(EntityType.DOCUMENT); will(returnValue("defpage"));
+            allowing(mockModelConfiguration).getDefaultReferenceValue(EntityType.SPACE); will(returnValue("defspace"));
+            allowing(mockModelConfiguration).getDefaultReferenceValue(EntityType.WIKI); will(returnValue("defwiki"));
+            allowing(mockModelConfiguration).getDefaultReferenceValue(EntityType.DOCUMENT); will(returnValue("defpage"));
         }});
     }
 

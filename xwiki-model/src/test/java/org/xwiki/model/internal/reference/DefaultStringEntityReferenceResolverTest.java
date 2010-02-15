@@ -60,13 +60,13 @@ public class DefaultStringEntityReferenceResolverTest
         ReflectionUtils.setFieldValue(this.resolver, "configuration", this.mockModelConfiguration);
         
         this.mockery.checking(new Expectations() {{
-            allowing(mockModelConfiguration).getDefaultReferenceName(EntityType.WIKI);
+            allowing(mockModelConfiguration).getDefaultReferenceValue(EntityType.WIKI);
                 will(returnValue(DEFAULT_WIKI));
-            allowing(mockModelConfiguration).getDefaultReferenceName(EntityType.SPACE);
+            allowing(mockModelConfiguration).getDefaultReferenceValue(EntityType.SPACE);
                 will(returnValue(DEFAULT_SPACE));
-            allowing(mockModelConfiguration).getDefaultReferenceName(EntityType.DOCUMENT);
+            allowing(mockModelConfiguration).getDefaultReferenceValue(EntityType.DOCUMENT);
                 will(returnValue(DEFAULT_PAGE));
-            allowing(mockModelConfiguration).getDefaultReferenceName(EntityType.ATTACHMENT);
+            allowing(mockModelConfiguration).getDefaultReferenceValue(EntityType.ATTACHMENT);
                 will(returnValue(DEFAULT_ATTACHMENT));
         }});
     }

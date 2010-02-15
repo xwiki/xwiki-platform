@@ -19,20 +19,15 @@
  */
 package com.xpn.xwiki.internal.model.reference;
 
-import com.xpn.xwiki.XWikiContext;
-import com.xpn.xwiki.doc.XWikiDocument;
-import com.xpn.xwiki.test.AbstractBridgedXWikiComponentTestCase;
-import com.xpn.xwiki.web.Utils;
-
-import org.jmock.Mockery;
-import org.junit.*;
-import org.xwiki.component.descriptor.DefaultComponentDescriptor;
-import org.xwiki.context.Execution;
+import org.junit.Assert;
+import org.junit.Before;
 import org.xwiki.model.EntityType;
-import org.xwiki.model.ModelContext;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.EntityReferenceResolver;
+
+import com.xpn.xwiki.doc.XWikiDocument;
+import com.xpn.xwiki.test.AbstractBridgedXWikiComponentTestCase;
 
 /**
  * Unit tests for {@link com.xpn.xwiki.internal.model.reference.CurrentStringEntityReferenceResolver}.

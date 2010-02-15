@@ -31,11 +31,12 @@ import org.xwiki.model.reference.EntityReference;
 
 /**
  * Resolve an {@link org.xwiki.model.reference.EntityReference} into a valid and absolute reference (with all required
- * parents filled in). This implementation uses values from the current document reference in the context when parts of
- * the Reference are missing in the string representation.
- * 
+ * parents filled in). The behavior is the same as for
+ * {@link com.xpn.xwiki.internal.model.reference.CurrentStringEntityReferenceResolver}.
+ *
  * @version $Id$
  * @since 2.2M1
+ * @see com.xpn.xwiki.internal.model.reference.CurrentStringEntityReferenceResolver
  */
 @Component("current/reference")
 public class CurrentReferenceEntityReferenceResolver extends DefaultReferenceEntityReferenceResolver

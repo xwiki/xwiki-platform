@@ -30,9 +30,18 @@ import org.xwiki.model.internal.reference.DefaultStringEntityReferenceResolver;
 import org.xwiki.model.reference.EntityReference;
 
 /**
- * Generic implementation that resolve {@link org.xwiki.model.reference.EntityReference} objects from their string
- * representation. This implementation uses values from the current document reference in the context when parts of the
- * Reference are missing in the string representation.  
+ * Resolve a String representing an Entity Reference into an {@link org.xwiki.model.reference.EntityReference} object.
+ * The behavior is the following:
+ * <ul>
+ *   <li>The wiki value used is the default wiki if no wiki was specified in the passed reference (or if it was
+ *       empty). Note that this is different from using the current document's wiki value.</li>
+ *   <li>The space value used is the space from the current document reference if no space was specified in the passed
+ *       reference (or if it was empty). If the current document reference is not defined then the default space
+ *       value is used instead.</li>
+ *   <li>The page value used is the page from the current document reference if no page was specified in the passed
+ *       reference (or if it was empty). If the current document reference is not defined then the default page
+ *       value is used instead.</li>
+ * </ul>
  *
  * @version $Id$
  * @since 2.2M1

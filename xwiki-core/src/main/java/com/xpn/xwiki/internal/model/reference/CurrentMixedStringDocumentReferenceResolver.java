@@ -32,19 +32,14 @@ import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.model.reference.EntityReference;
 
 /**
- * This is an implementation for backward-compatibility. It's behavior is essentially similar to the
- * {@link com.xpn.xwiki.internal.model.reference.CurrentStringDocumentReferenceResolver} implementation except for
- * two details:
+ * Resolve a String representing an Entity Reference into an {@link org.xwiki.model.reference.EntityReference} object.
+ * The behavior is the same as for
+ * {@link com.xpn.xwiki.internal.model.reference.CurrentStringDocumentReferenceResolver} but with the following
+ * differences:
  * <ul>
- * <li>if the document reference doesn't have a name specified it defaults to the default name and not
- * the current document's page name.</li>
- * <li>if the wiki reference isn't specified then the current wiki reference is used (as opposed to the current
- * document reference's wiki reference for
- * {@link com.xpn.xwiki.internal.model.reference.CurrentStringDocumentReferenceResolver}</li>
+ *   <li>if the passed reference doesn't have a page name specified (or if it's empty) the value used is the default
+ *       page name (instead of the page name of the current document's reference).</li>
  * </ul>
- * This is to behave similarly to the old code. However new code should use the
- * {@link com.xpn.xwiki.internal.model.reference.CurrentStringDocumentReferenceResolver} instead as much as possible
- * since this version will eventually be removed.
  *
  * @version $Id$
  * @since 2.2M1
@@ -78,9 +73,15 @@ public class CurrentMixedStringDocumentReferenceResolver extends DefaultStringEn
 
         switch (type) {
             case WIKI:
-                EntityReference wikiReference =
-                    this.modelContext.getCurrentEntityReference().extractReference(EntityType.WIKI);
-                result = wikiReference.getName();
+                EntityReference wikiReference = this.modelContext.getCurrentEntityReference();
+                if (wikiReference != null) {
+                    wikiReference = wikiReference.extractReference(EntityType.WIKI);
+                }
+                if (wikiReference != null) {
+                    result = wikiReference.getName();
+                } else {
+                    result = super.getDefaultValuesForType(type);
+                }
                 break;
             case SPACE:
                 XWikiDocument currentDoc = getContext().getDoc();

@@ -30,8 +30,8 @@ import org.xwiki.model.reference.EntityReferenceResolver;
 /**
  * Specialized version of {@link org.xwiki.model.reference.EntityReferenceResolver} which can be considered a helper
  * component to resolve {@link DocumentReference} objects from Entity Reference (when they miss some parent references
- * or have NULL values). This implementation uses values from the current document reference in the context when parts
- * of the Reference are missing in the Entity Reference representation.
+ * or have NULL values). The behavior is the one defined in
+ * {@link com.xpn.xwiki.internal.model.reference.CurrentReferenceDocumentReferenceResolver}.
  *
  * @version $Id$
  * @since 2.2M1

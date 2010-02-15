@@ -17,22 +17,26 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.model;
+package org.xwiki.model.reference;
 
 import org.xwiki.component.annotation.ComponentRole;
+import org.xwiki.model.EntityType;
 
 /**
- * Provides configuration options for the Model module.
+ * Return default values for specified Entity Reference types. Useful when an Entity Reference value has not been
+ * specified and we need to find a default value for it (the default value returned will depend on the implementations,
+ * some will return default values defined in the XWiki configuration, others will return values taken from the
+ * current document reference, etc).
  *
  * @version $Id$
- * @since 2.2M1
+ * @since 2.3M1
  */
 @ComponentRole
-public interface ModelConfiguration
+public interface EntityReferenceValueProvider
 {
     /**
-     * @param type the type for which to return the default value
-     * @return the default value to use when a reference doesn't have the passed type specified
+     * @param type the entity reference type for which to get the default value
+     * @return the default value for the passed type
      */
-    String getDefaultReferenceValue(EntityType type);
+    String getDefaultValue(EntityType type);
 }

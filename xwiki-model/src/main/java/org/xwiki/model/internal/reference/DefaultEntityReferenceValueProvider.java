@@ -17,37 +17,33 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package com.xpn.xwiki.internal.model.reference;
+package org.xwiki.model.internal.reference;
 
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.Requirement;
 import org.xwiki.model.EntityType;
-import org.xwiki.model.internal.reference.DefaultReferenceEntityReferenceResolver;
+import org.xwiki.model.ModelConfiguration;
 import org.xwiki.model.reference.EntityReferenceValueProvider;
 
 /**
- * Resolve an {@link org.xwiki.model.reference.EntityReference} into a valid and absolute reference (with all required
- * parents filled in). The behavior is the one defined in
- * {@link com.xpn.xwiki.internal.model.reference.CurrentEntityReferenceValueProvider}.
+ * Uses the Entity Reference values defined in the Model Configuration.
  *
  * @version $Id$
- * @since 2.2M1
- * @see com.xpn.xwiki.internal.model.reference.CurrentStringEntityReferenceResolver
+ * @since 2.3M1
+ * @see org.xwiki.model.internal.DefaultModelConfiguration 
  */
-@Component("current/reference")
-public class CurrentReferenceEntityReferenceResolver extends DefaultReferenceEntityReferenceResolver
+@Component
+public class DefaultEntityReferenceValueProvider implements EntityReferenceValueProvider
 {
-    @Requirement("current")
-    private EntityReferenceValueProvider provider;
+    @Requirement
+    private ModelConfiguration configuration;
 
     /**
      * {@inheritDoc}
-     * 
-     * @see DefaultReferenceEntityReferenceResolver#getDefaultValue(org.xwiki.model.EntityType)
+     * @see org.xwiki.model.reference.EntityReferenceValueProvider#getDefaultValue(org.xwiki.model.EntityType)
      */
-    @Override
-    protected String getDefaultValue(EntityType type)
+    public String getDefaultValue(EntityType type)
     {
-        return this.provider.getDefaultValue(type);
+        return this.configuration.getDefaultReferenceValue(type);
     }
 }

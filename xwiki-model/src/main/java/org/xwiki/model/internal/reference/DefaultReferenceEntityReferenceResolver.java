@@ -28,14 +28,15 @@ import java.util.Map;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.Requirement;
 import org.xwiki.model.EntityType;
-import org.xwiki.model.ModelConfiguration;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.EntityReferenceResolver;
+import org.xwiki.model.reference.EntityReferenceValueProvider;
 import org.xwiki.model.reference.InvalidEntityReferenceException;
 
 /**
- * Resolve an {@link EntityReference} into a valid and absolute reference (with all required parents filled in). This
- * implementation uses fixed default values when parts of the Reference are missing.
+ * Resolve an {@link EntityReference} into a valid and absolute reference (with all required parents filled in).
+ * See {@link DefaultEntityReferenceValueProvider} for the behavior used when
+ * Reference values are not defined in the passed reference.
  * 
  * @version $Id$
  * @since 2.2M1
@@ -44,7 +45,7 @@ import org.xwiki.model.reference.InvalidEntityReferenceException;
 public class DefaultReferenceEntityReferenceResolver implements EntityReferenceResolver<EntityReference>
 {
     @Requirement
-    private ModelConfiguration configuration;
+    private EntityReferenceValueProvider provider;
 
     private Map<EntityType, List<EntityType>> nextAllowedEntityTypes = new HashMap<EntityType, List<EntityType>>()
     {
@@ -70,7 +71,7 @@ public class DefaultReferenceEntityReferenceResolver implements EntityReferenceR
         // If the passed type is a supertype of the reference to resolve's type then we need to insert a top level
         // reference.
         if (type.ordinal() > referenceToResolve.getType().ordinal()) {
-            normalizedReference = new EntityReference(getDefaultReferenceName(type), type, referenceToResolve.clone());
+            normalizedReference = new EntityReference(getDefaultValue(type), type, referenceToResolve.clone());
         } else {
             normalizedReference = referenceToResolve.clone();
         }
@@ -83,11 +84,11 @@ public class DefaultReferenceEntityReferenceResolver implements EntityReferenceR
             if (reference.getParent() != null && !types.isEmpty() && !types.contains(reference.getParent().getType())) {
                 // The parent reference isn't the allowed parent: insert an allowed reference
                 EntityReference newReference =
-                        new EntityReference(getDefaultReferenceName(types.get(0)), types.get(0), reference.getParent());
+                    new EntityReference(getDefaultValue(types.get(0)), types.get(0), reference.getParent());
                 reference.setParent(newReference);
             } else if (reference.getParent() == null && !types.isEmpty()) {
                 // The top reference isn't the allowed top level reference, add a parent reference
-                EntityReference newReference = new EntityReference(getDefaultReferenceName(types.get(0)), types.get(0));
+                EntityReference newReference = new EntityReference(getDefaultValue(types.get(0)), types.get(0));
                 reference.setParent(newReference);
             } else if (reference.getParent() != null && types.isEmpty()) {
                 // There's a parent but not of the correct type... it means the reference is invalid
@@ -104,8 +105,8 @@ public class DefaultReferenceEntityReferenceResolver implements EntityReferenceR
         return normalizedReference;
     }
 
-    protected String getDefaultReferenceName(EntityType type)
+    protected String getDefaultValue(EntityType type)
     {
-        return this.configuration.getDefaultReferenceName(type);
+        return this.provider.getDefaultValue(type);
     }
 }

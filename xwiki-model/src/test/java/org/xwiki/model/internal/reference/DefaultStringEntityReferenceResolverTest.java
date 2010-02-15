@@ -26,9 +26,9 @@ import org.junit.Before;
 import org.junit.Test;
 import org.xwiki.component.util.ReflectionUtils;
 import org.xwiki.model.EntityType;
-import org.xwiki.model.ModelConfiguration;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.EntityReferenceResolver;
+import org.xwiki.model.reference.EntityReferenceValueProvider;
 
 /**
  * Unit tests for {@link DefaultStringEntityReferenceResolver}.
@@ -38,35 +38,33 @@ import org.xwiki.model.reference.EntityReferenceResolver;
  */
 public class DefaultStringEntityReferenceResolverTest
 {
-    private static final String DEFAULT_WIKI = "xwiki";
+    private static final String DEFAULT_WIKI = "defwiki";
     
-    private static final String DEFAULT_SPACE = "XWiki";
+    private static final String DEFAULT_SPACE = "defspace";
     
-    private static final String DEFAULT_PAGE = "WebHome";
+    private static final String DEFAULT_PAGE = "defpage";
         
-    private static final String DEFAULT_ATTACHMENT = "filename";
+    private static final String DEFAULT_ATTACHMENT = "deffilename";
 
     private EntityReferenceResolver resolver;
 
     private Mockery mockery = new Mockery();
 
-    private ModelConfiguration mockModelConfiguration;
-
     @Before
     public void setUp()
     {
         this.resolver = new DefaultStringEntityReferenceResolver();
-        this.mockModelConfiguration = this.mockery.mock(ModelConfiguration.class);
-        ReflectionUtils.setFieldValue(this.resolver, "configuration", this.mockModelConfiguration);
+        final EntityReferenceValueProvider mockValueProvider = this.mockery.mock(EntityReferenceValueProvider.class);
+        ReflectionUtils.setFieldValue(this.resolver, "provider", mockValueProvider);
         
         this.mockery.checking(new Expectations() {{
-            allowing(mockModelConfiguration).getDefaultReferenceName(EntityType.WIKI);
+            allowing(mockValueProvider).getDefaultValue(EntityType.WIKI);
                 will(returnValue(DEFAULT_WIKI));
-            allowing(mockModelConfiguration).getDefaultReferenceName(EntityType.SPACE);
+            allowing(mockValueProvider).getDefaultValue(EntityType.SPACE);
                 will(returnValue(DEFAULT_SPACE));
-            allowing(mockModelConfiguration).getDefaultReferenceName(EntityType.DOCUMENT);
+            allowing(mockValueProvider).getDefaultValue(EntityType.DOCUMENT);
                 will(returnValue(DEFAULT_PAGE));
-            allowing(mockModelConfiguration).getDefaultReferenceName(EntityType.ATTACHMENT);
+            allowing(mockValueProvider).getDefaultValue(EntityType.ATTACHMENT);
                 will(returnValue(DEFAULT_ATTACHMENT));
         }});
     }
@@ -140,10 +138,6 @@ public class DefaultStringEntityReferenceResolverTest
     @Test
     public void testResolveAttachmentReference() throws Exception
     {
-        String DEFAULT_WIKI = "xwiki";
-        String DEFAULT_SPACE = "XWiki";
-        String DEFAULT_PAGE = "WebHome";
-
         EntityReference reference = resolver.resolve("wiki:space.page@filename.ext", EntityType.ATTACHMENT);
         Assert.assertEquals("wiki", reference.extractReference(EntityType.WIKI).getName());
         Assert.assertEquals("space", reference.extractReference(EntityType.SPACE).getName());

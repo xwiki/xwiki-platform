@@ -22,7 +22,7 @@ package org.xwiki.model.internal.reference;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.Requirement;
 import org.xwiki.model.EntityType;
-import org.xwiki.model.ModelConfiguration;
+import org.xwiki.model.reference.EntityReferenceValueProvider;
 
 /**
  * Generic implementation that resolve {@link org.xwiki.model.reference.EntityReference} objects from their string
@@ -36,14 +36,14 @@ import org.xwiki.model.ModelConfiguration;
 public class DefaultStringEntityReferenceResolver extends AbstractStringEntityReferenceResolver
 {
     @Requirement
-    private ModelConfiguration configuration;
+    private EntityReferenceValueProvider provider;
 
     /**
      * {@inheritDoc}
-     * @see AbstractStringEntityReferenceResolver#getDefaultValuesForType(org.xwiki.model.EntityType)
+     * @see AbstractStringEntityReferenceResolver#getDefaultValue(org.xwiki.model.EntityType)
      */
-    protected String getDefaultValuesForType(EntityType type)
+    protected String getDefaultValue(EntityType type)
     {
-        return this.configuration.getDefaultReferenceName(type);
+        return this.provider.getDefaultValue(type);
     }
 }

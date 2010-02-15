@@ -26,9 +26,9 @@ import org.junit.Before;
 import org.junit.Test;
 import org.xwiki.component.util.ReflectionUtils;
 import org.xwiki.model.EntityType;
-import org.xwiki.model.ModelConfiguration;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.EntityReferenceResolver;
+import org.xwiki.model.reference.EntityReferenceValueProvider;
 import org.xwiki.model.reference.InvalidEntityReferenceException;
 
 /**
@@ -41,25 +41,23 @@ public class DefaultReferenceEntityReferenceResolverTest
 {
     private EntityReferenceResolver<EntityReference> resolver;
 
-    private ModelConfiguration mockModelConfiguration;
-
     private Mockery mockery = new Mockery();
 
     @Before
     public void setUp()
     {
         this.resolver = new DefaultReferenceEntityReferenceResolver();
-        this.mockModelConfiguration = this.mockery.mock(ModelConfiguration.class);
-        ReflectionUtils.setFieldValue(this.resolver, "configuration", this.mockModelConfiguration);
+        final EntityReferenceValueProvider mockValueProvider = this.mockery.mock(EntityReferenceValueProvider.class);
+        ReflectionUtils.setFieldValue(this.resolver, "provider", mockValueProvider);
 
         this.mockery.checking(new Expectations()
         {
             {
-                allowing(mockModelConfiguration).getDefaultReferenceName(EntityType.SPACE);
+                allowing(mockValueProvider).getDefaultValue(EntityType.SPACE);
                 will(returnValue("defspace"));
-                allowing(mockModelConfiguration).getDefaultReferenceName(EntityType.WIKI);
+                allowing(mockValueProvider).getDefaultValue(EntityType.WIKI);
                 will(returnValue("defwiki"));
-                allowing(mockModelConfiguration).getDefaultReferenceName(EntityType.DOCUMENT);
+                allowing(mockValueProvider).getDefaultValue(EntityType.DOCUMENT);
                 will(returnValue("defpage"));
             }
         });

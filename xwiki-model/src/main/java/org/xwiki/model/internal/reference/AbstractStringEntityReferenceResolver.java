@@ -55,7 +55,7 @@ public abstract class AbstractStringEntityReferenceResolver implements EntityRef
      * @param type the entity type for which to return the default value to use (since the use has not specified it)
      * @return the default value to use
      */
-    protected abstract String getDefaultValuesForType(EntityType type);
+    protected abstract String getDefaultValue(EntityType type);
 
     /**
      * {@inheritDoc}
@@ -94,7 +94,7 @@ public abstract class AbstractStringEntityReferenceResolver implements EntityRef
                 name = lastIndexOf(representation, separator, entityTypesForType.get(i));
             } else {
                 // There's no definition for the current segment use default values
-                name = getDefaultValuesForType(entityTypesForType.get(i));
+                name = getDefaultValue(entityTypesForType.get(i));
             }
 
             EntityReference newReference = new EntityReference(name, entityTypesForType.get(i));
@@ -112,7 +112,7 @@ public abstract class AbstractStringEntityReferenceResolver implements EntityRef
         if (representation.length() > 0) {
             name = representation.toString();
         } else {
-            name = getDefaultValuesForType(entityTypesForType.get(separatorsForType.size()));
+            name = getDefaultValue(entityTypesForType.get(separatorsForType.size()));
         }
 
         EntityReference newReference = new EntityReference(name, entityTypesForType.get(separatorsForType.size()));
@@ -143,7 +143,7 @@ public abstract class AbstractStringEntityReferenceResolver implements EntityRef
                 // Found a valid separator (not escaped), separate content on its left from content on its
                 // right
                 if (j == representation.length() - 1) {
-                    name = getDefaultValuesForType(entityType);
+                    name = getDefaultValue(entityType);
                 } else {
                     name = representation.substring(j + 1, representation.length());
                 }

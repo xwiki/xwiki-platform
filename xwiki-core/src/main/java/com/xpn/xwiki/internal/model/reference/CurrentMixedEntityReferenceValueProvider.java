@@ -22,41 +22,37 @@ package com.xpn.xwiki.internal.model.reference;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.Requirement;
 import org.xwiki.model.EntityType;
-import org.xwiki.model.internal.reference.DefaultStringEntityReferenceResolver;
-import org.xwiki.model.reference.DocumentReference;
-import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.model.reference.EntityReferenceValueProvider;
 
 /**
- * Resolve a String representing an Entity Reference into an {@link org.xwiki.model.reference.EntityReference} object.
- * The behavior is the one defined in
- * {@link com.xpn.xwiki.internal.model.reference.CurrentMixedEntityReferenceValueProvider}.
+ * The behavior is the same as for {@link CurrentEntityReferenceValueProvider} but with the following differences:
+ * <ul>
+ *   <li>if the passed reference doesn't have a page name specified (or if it's empty) the value used is the default
+ *       page name (instead of the page name of the current document's reference).</li>
+ * </ul>
  *
  * @version $Id$
- * @since 2.2M1
+ * @since 2.3M1
  */
 @Component("currentmixed")
-public class CurrentMixedStringDocumentReferenceResolver extends DefaultStringEntityReferenceResolver
-    implements DocumentReferenceResolver<String>
+public class CurrentMixedEntityReferenceValueProvider extends CurrentEntityReferenceValueProvider
 {
-    @Requirement("currentmixed")
-    private EntityReferenceValueProvider provider;
+    @Requirement
+    private EntityReferenceValueProvider defaultProvider;
 
     /**
      * {@inheritDoc}
-     * @see org.xwiki.model.reference.DocumentReferenceResolver#resolve(Object)
+     * @see CurrentMixedEntityReferenceValueProvider#getDefaultValue(EntityType)
      */
-    public DocumentReference resolve(String documentReferenceRepresentation)
+    @Override
+    public String getDefaultValue(EntityType type)
     {
-        return new DocumentReference(resolve(documentReferenceRepresentation, EntityType.DOCUMENT));
-    }
-
-    /**
-     * {@inheritDoc}
-     * @see DefaultStringEntityReferenceResolver#getDefaultValue(org.xwiki.model.EntityType)
-     */
-    protected String getDefaultValue(EntityType type)
-    {
-        return this.provider.getDefaultValue(type);
+        String result;
+        if (type == EntityType.DOCUMENT) {
+            result = this.defaultProvider.getDefaultValue(EntityType.DOCUMENT);
+        } else {
+            result = super.getDefaultValue(type);
+        }
+        return result;
     }
 }

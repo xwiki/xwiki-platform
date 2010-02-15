@@ -26,10 +26,10 @@ import org.junit.Before;
 import org.junit.Test;
 import org.xwiki.component.util.ReflectionUtils;
 import org.xwiki.model.EntityType;
-import org.xwiki.model.ModelConfiguration;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.EntityReferenceResolver;
 import org.xwiki.model.reference.EntityReferenceSerializer;
+import org.xwiki.model.reference.EntityReferenceValueProvider;
 
 /**
  * Unit tests for {@link DefaultStringEntityReferenceSerializer}.
@@ -39,13 +39,13 @@ import org.xwiki.model.reference.EntityReferenceSerializer;
  */
 public class DefaultStringEntityReferenceSerializerTest
 {
-    private static final String DEFAULT_WIKI = "xwiki";
+    private static final String DEFAULT_WIKI = "defwiki";
 
-    private static final String DEFAULT_SPACE = "XWiki";
+    private static final String DEFAULT_SPACE = "defspace";
 
-    private static final String DEFAULT_PAGE = "WebHome";
+    private static final String DEFAULT_PAGE = "defpage";
 
-    private static final String DEFAULT_ATTACHMENT = "filename";
+    private static final String DEFAULT_ATTACHMENT = "deffilename";
 
     private EntityReferenceSerializer serializer;
 
@@ -53,25 +53,23 @@ public class DefaultStringEntityReferenceSerializerTest
 
     private Mockery mockery = new Mockery();
 
-    private ModelConfiguration mockModelConfiguration;
-
     @Before
     public void setUp()
     {
         this.serializer = new DefaultStringEntityReferenceSerializer();
         
         this.resolver = new DefaultStringEntityReferenceResolver();
-        this.mockModelConfiguration = this.mockery.mock(ModelConfiguration.class);
-        ReflectionUtils.setFieldValue(this.resolver, "configuration", this.mockModelConfiguration);
+        final EntityReferenceValueProvider mockValueProvider = this.mockery.mock(EntityReferenceValueProvider.class);
+        ReflectionUtils.setFieldValue(this.resolver, "provider", mockValueProvider);
 
         this.mockery.checking(new Expectations() {{
-            allowing(mockModelConfiguration).getDefaultReferenceName(EntityType.WIKI);
+            allowing(mockValueProvider).getDefaultValue(EntityType.WIKI);
                 will(returnValue(DEFAULT_WIKI));
-            allowing(mockModelConfiguration).getDefaultReferenceName(EntityType.SPACE);
+            allowing(mockValueProvider).getDefaultValue(EntityType.SPACE);
                 will(returnValue(DEFAULT_SPACE));
-            allowing(mockModelConfiguration).getDefaultReferenceName(EntityType.DOCUMENT);
+            allowing(mockValueProvider).getDefaultValue(EntityType.DOCUMENT);
                 will(returnValue(DEFAULT_PAGE));
-            allowing(mockModelConfiguration).getDefaultReferenceName(EntityType.ATTACHMENT);
+            allowing(mockValueProvider).getDefaultValue(EntityType.ATTACHMENT);
                 will(returnValue(DEFAULT_ATTACHMENT));
         }});
     }
@@ -83,31 +81,31 @@ public class DefaultStringEntityReferenceSerializerTest
         Assert.assertEquals("wiki:space.page", serializer.serialize(reference));
 
         reference = resolver.resolve("wiki:space.", EntityType.DOCUMENT);
-        Assert.assertEquals("wiki:space.WebHome", serializer.serialize(reference));
+        Assert.assertEquals("wiki:space.defpage", serializer.serialize(reference));
 
         reference = resolver.resolve("space.", EntityType.DOCUMENT);
-        Assert.assertEquals("xwiki:space.WebHome", serializer.serialize(reference));
+        Assert.assertEquals("defwiki:space.defpage", serializer.serialize(reference));
 
         reference = resolver.resolve("page", EntityType.DOCUMENT);
-        Assert.assertEquals("xwiki:XWiki.page", serializer.serialize(reference));
+        Assert.assertEquals("defwiki:defspace.page", serializer.serialize(reference));
 
         reference = resolver.resolve(".", EntityType.DOCUMENT);
-        Assert.assertEquals("xwiki:XWiki.WebHome", serializer.serialize(reference));
+        Assert.assertEquals("defwiki:defspace.defpage", serializer.serialize(reference));
 
         reference = resolver.resolve(null, EntityType.DOCUMENT);
-        Assert.assertEquals("xwiki:XWiki.WebHome", serializer.serialize(reference));
+        Assert.assertEquals("defwiki:defspace.defpage", serializer.serialize(reference));
 
         reference = resolver.resolve("", EntityType.DOCUMENT);
-        Assert.assertEquals("xwiki:XWiki.WebHome", serializer.serialize(reference));
+        Assert.assertEquals("defwiki:defspace.defpage", serializer.serialize(reference));
 
         reference = resolver.resolve("wiki1.wiki2:wiki3:some.space.page", EntityType.DOCUMENT);
         Assert.assertEquals("wiki1.wiki2:wiki3:some\\.space.page", serializer.serialize(reference));
 
         reference = resolver.resolve("some.space.page", EntityType.DOCUMENT);
-        Assert.assertEquals("xwiki:some\\.space.page", serializer.serialize(reference));
+        Assert.assertEquals("defwiki:some\\.space.page", serializer.serialize(reference));
 
         reference = resolver.resolve("wiki:page", EntityType.DOCUMENT);
-        Assert.assertEquals("xwiki:XWiki.wiki:page", serializer.serialize(reference));
+        Assert.assertEquals("defwiki:defspace.wiki:page", serializer.serialize(reference));
 
         // Verify that passing null doesn't throw a NPE
         Assert.assertNull(serializer.serialize(null));
@@ -115,7 +113,7 @@ public class DefaultStringEntityReferenceSerializerTest
         // Test escapes
 
         reference = resolver.resolve("\\.:@\\.", EntityType.DOCUMENT);
-        Assert.assertEquals("xwiki:XWiki.\\.:@\\.", serializer.serialize(reference));
+        Assert.assertEquals("defwiki:defspace.\\.:@\\.", serializer.serialize(reference));
     }
 
     @Test
@@ -132,18 +130,18 @@ public class DefaultStringEntityReferenceSerializerTest
         Assert.assertEquals("wiki:space.page@filename", serializer.serialize(reference));
 
         reference = resolver.resolve("", EntityType.ATTACHMENT);
-        Assert.assertEquals("xwiki:XWiki.WebHome@filename", serializer.serialize(reference));
+        Assert.assertEquals("defwiki:defspace.defpage@deffilename", serializer.serialize(reference));
 
         reference = resolver.resolve("wiki:space.page@my.png", EntityType.ATTACHMENT);
         Assert.assertEquals("wiki:space.page@my.png", serializer.serialize(reference));
 
         reference = resolver.resolve("some:file.name", EntityType.ATTACHMENT);
-        Assert.assertEquals("xwiki:XWiki.WebHome@some:file.name", serializer.serialize(reference));
+        Assert.assertEquals("defwiki:defspace.defpage@some:file.name", serializer.serialize(reference));
 
         // Test escapes
 
         reference = resolver.resolve(":.\\@", EntityType.ATTACHMENT);
-        Assert.assertEquals("xwiki:XWiki.WebHome@:.\\@", serializer.serialize(reference));
+        Assert.assertEquals("defwiki:defspace.defpage@:.\\@", serializer.serialize(reference));
     }
     
     @Test

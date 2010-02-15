@@ -1678,10 +1678,6 @@ body .listGrid {
   border: none;
 }
 
-#XWEWrapper {
-  margin: 0 !important;
-}
-
 /* -----------------------YUI Trees----------------------*/
 .ygtvitem table {
   border: none !important;

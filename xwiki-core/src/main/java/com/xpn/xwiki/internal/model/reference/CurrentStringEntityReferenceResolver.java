@@ -25,7 +25,9 @@ import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.Requirement;
 import org.xwiki.context.Execution;
 import org.xwiki.model.EntityType;
+import org.xwiki.model.ModelContext;
 import org.xwiki.model.internal.reference.DefaultStringEntityReferenceResolver;
+import org.xwiki.model.reference.EntityReference;
 
 /**
  * Generic implementation that resolve {@link org.xwiki.model.reference.EntityReference} objects from their string
@@ -39,6 +41,9 @@ import org.xwiki.model.internal.reference.DefaultStringEntityReferenceResolver;
 public class CurrentStringEntityReferenceResolver extends DefaultStringEntityReferenceResolver
 {
     @Requirement
+    private ModelContext modelContext;
+
+    @Requirement
     private Execution execution;
 
     /**
@@ -50,24 +55,36 @@ public class CurrentStringEntityReferenceResolver extends DefaultStringEntityRef
         String result;
 
         XWikiDocument currentDoc = getContext().getDoc();
-        if (currentDoc == null) {
-            result = super.getDefaultValuesForType(type);
-        } else {
             switch (type) {
-                case DOCUMENT:
-                    result = currentDoc.getPageName();
-                    break;
                 case WIKI:
-                    result = currentDoc.getWikiName();
+                    EntityReference wikiReference = this.modelContext.getCurrentEntityReference();
+                    if (wikiReference != null) {
+                        wikiReference = wikiReference.extractReference(EntityType.WIKI);
+                    }
+                    if (wikiReference != null) {
+                        result = wikiReference.getName();
+                    } else {
+                        result = super.getDefaultValuesForType(type);
+                    }
                     break;
                 case SPACE:
-                    result = currentDoc.getSpaceName();
+                    if (currentDoc != null) {
+                        result = currentDoc.getSpaceName();
+                    } else {
+                        result = super.getDefaultValuesForType(type);
+                    }
+                    break;
+                case DOCUMENT:
+                    if (currentDoc != null) {
+                        result = currentDoc.getPageName();
+                    } else {
+                        result = super.getDefaultValuesForType(type);
+                    }
                     break;
                 default:
                     result = super.getDefaultValuesForType(type);
                     break;
             }
-        }
 
         return result;
     }

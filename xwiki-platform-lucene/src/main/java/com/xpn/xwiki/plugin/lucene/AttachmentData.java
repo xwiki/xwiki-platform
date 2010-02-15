@@ -167,7 +167,7 @@ public class AttachmentData extends IndexData
                             TextExtractor.getText(content, MIMETYPES.get(nameParts[nameParts.length - 1].toLowerCase()));
                 }
             }
-        } catch (Exception e) {
+        } catch (Throwable e) {
             LOG.error("error getting content of attachment", e);
         }
 

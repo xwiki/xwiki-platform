@@ -70,7 +70,7 @@ public class IndexUpdater extends AbstractXWikiRunnable implements EventListener
     private static final List<Event> EVENTS = Arrays.<Event> asList(new DocumentUpdateEvent(), new DocumentSaveEvent(),
         new DocumentDeleteEvent(), new ActionExecutionEvent("upload"));
 
-    /*
+    /**
      * Collecting all the fields for using up in search
      */
     static final List<String> fields = new ArrayList<String>();
@@ -236,7 +236,7 @@ public class IndexUpdater extends AbstractXWikiRunnable implements EventListener
 
                         addToIndex(writer, data, doc, context);
                         ++nb;
-                    } catch (Exception e) {
+                    } catch (Throwable e) {
                         LOG.error("error indexing document " + id, e);
                     }
                 }
@@ -443,6 +443,7 @@ public class IndexUpdater extends AbstractXWikiRunnable implements EventListener
             n = w.numDocs();
             w.close();
         } catch (IOException e) {
+            LOG.error("Failed to get the number of documents in Lucene index writer", e);
         }
 
         return n;
@@ -452,5 +453,4 @@ public class IndexUpdater extends AbstractXWikiRunnable implements EventListener
     {
         return this.maxQueueSize;
     }
-
 }

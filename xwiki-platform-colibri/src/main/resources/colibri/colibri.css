@@ -968,11 +968,11 @@ div#xwikiobjects input[type="checkbox"], div#xwikiclassproperties input[type="ch
 }
 
 .actionmenu .tmUserPreferences {
-  background-image: url($xwiki.getSkinFile('icons/silk/application_form.gif'));
+  background-image: url($xwiki.getSkinFile('icons/silk/wrench.gif'));
 }
 
 .actionmenu .tmWatchlistManager {
-  background-image: url($xwiki.getSkinFile('icons/silk/wrench.gif'));
+  background-image: url($xwiki.getSkinFile('icons/silk/star.gif'));
 }
 
 .actionmenu .tmWatchWiki, .actionmenu .tmWatchSpace, .actionmenu .tmWatchDocument {

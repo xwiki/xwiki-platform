@@ -69,6 +69,7 @@ public class XWikiRadeoxRendererTest extends AbstractBridgedXWikiComponentTestCa
         Mock mockCurrentDocument = mock(XWikiDocument.class);
         mockCurrentDocument.stubs().method("getDocumentReference").will(returnValue(
             new DocumentReference("xwiki", "Main", "WebHome")));
+        mockCurrentDocument.stubs().method("getFullName").will(returnValue("Main.WebHome"));
         getContext().setDoc((XWikiDocument) mockCurrentDocument.proxy());
     }
 

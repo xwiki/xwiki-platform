@@ -75,13 +75,12 @@
         -->
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-checkstyle-plugin</artifactId>
-        <dependencies>
-          <dependency>
-            <groupId>org.xwiki.platform.tools</groupId>
-            <artifactId>xwiki-verification-resources</artifactId>
-            <version>${platform.tool.verification.version}</version>
-          </dependency>
-        </dependencies>
+        <configuration>
+          <excludes>
+              **/ImportMojo.java,
+              **/ExportMojo.java
+          </excludes>
+        </configuration>
       </plugin>
       <plugin>
         <artifactId>maven-plugin-plugin</artifactId>

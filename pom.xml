@@ -39,7 +39,7 @@
   <properties>
     <!-- Versions of XWiki dependencies used in Core modules -->
     <platform.tag.version>1.10</platform.tag.version>
-    <clirr.previous.version>2.1</clirr.previous.version>
+    <clirr.previous.version>2.2</clirr.previous.version>
   </properties>
   <scm>
     <connection>scm:svn:http://svn.xwiki.org/svnroot/xwiki/platform/core/branches/xwiki-core-2.2</connection>

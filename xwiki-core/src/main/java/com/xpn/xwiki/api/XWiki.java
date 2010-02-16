@@ -29,6 +29,8 @@ import java.util.List;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.suigeneris.jrcs.diff.delta.Chunk;
+import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.query.QueryManager;
 import org.xwiki.rendering.renderer.PrintRendererFactory;
 import org.xwiki.rendering.syntax.Syntax;
@@ -63,6 +65,18 @@ public class XWiki extends Api
      * @see #getCriteriaService()
      */
     private CriteriaService criteriaService;
+
+    /**
+     * @see com.xpn.xwiki.internal.model.reference.CurrentMixedStringDocumentReferenceResolver
+     */
+    private DocumentReferenceResolver<String> currentMixedDocumentReferenceResolver = Utils.getComponent(
+        DocumentReferenceResolver.class, "currentmixed");
+
+    /**
+     * @see org.xwiki.model.internal.reference.DefaultStringDocumentReferenceResolver
+     */
+    private DocumentReferenceResolver<String> defaultDocumentReferenceResolver = Utils.getComponent(
+        DocumentReferenceResolver.class);
 
     /**
      * XWiki API Constructor
@@ -117,13 +131,37 @@ public class XWiki extends Api
     /**
      * Loads an Document from the database. Rights are checked before sending back the document.
      * 
-     * @param fullname the full name of the XWiki document to be loaded
+     * @param fullName the full name of the XWiki document to be loaded
      * @return a Document object or null if it is not accessible
      * @throws XWikiException
      */
-    public Document getDocument(String fullname) throws XWikiException
+    public Document getDocument(String fullName) throws XWikiException
     {
-        XWikiDocument doc = this.xwiki.getDocument(fullname, getXWikiContext());
+        DocumentReference reference;
+
+        // We ignore the passed full name if it's null to be backward compatible with previous behaviors.
+        if (fullName != null) {
+            // Note: We use the CurrentMixed Resolver since we want to use the default page name if the page isn't
+            // specified in the passed string, rather than use the current document's page name.
+            reference = this.currentMixedDocumentReferenceResolver.resolve(fullName);
+        } else {
+            reference = this.defaultDocumentReferenceResolver.resolve("");
+        }
+
+        return getDocument(reference);
+    }
+
+    /**
+     * Loads an Document from the database. Rights are checked before sending back the document.
+     *
+     * @param reference the reference of the XWiki document to be loaded
+     * @return a Document object or null if it is not accessible
+     * @throws XWikiException
+     * @since 2.3M1
+     */
+    public Document getDocument(DocumentReference reference) throws XWikiException
+    {
+        XWikiDocument doc = this.xwiki.getDocument(reference, getXWikiContext());
         if (this.xwiki.getRightService().hasAccessLevel("view", getXWikiContext().getUser(), doc.getFullName(),
             getXWikiContext()) == false) {
             return null;

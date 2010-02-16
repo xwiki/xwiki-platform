@@ -159,13 +159,21 @@ public class Document extends Api
     }
 
     /**
+     * @since 2.3M1
+     */
+    public DocumentReference getDocumentReference()
+    {
+        return this.doc.getDocumentReference();
+    }
+
+    /**
      * return the name of a document. for exemple if the fullName of a document is "MySpace.Mydoc", the name is MyDoc.
      * 
      * @return the name of the document
      */
     public String getName()
     {
-        return this.doc.getName();
+        return this.doc.getDocumentReference().getName();
     }
 
     /**
@@ -176,7 +184,7 @@ public class Document extends Api
      */
     public String getSpace()
     {
-        return this.doc.getSpace();
+        return this.doc.getDocumentReference().getLastSpaceReference().getName();
     }
 
     /**
@@ -187,7 +195,7 @@ public class Document extends Api
      */
     public String getWiki()
     {
-        return this.doc.getDatabase();
+        return this.doc.getDocumentReference().getWikiReference().getName();
     }
 
     /**

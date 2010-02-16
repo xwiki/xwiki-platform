@@ -4,44 +4,74 @@
 #template("startpage.vm")
 <div class="main layoutsubsection">
 <div id="mainContentArea">
-  <h1><span>#if ($request.getParameter('tocreate') && $request.getParameter('tocreate') != 'page') $msg.get('xe.create.space') #else $msg.get('xe.create.page') #end</span></h1>
-  #set($parentdoc = $request.getParameter('parent'))
-  #if("$!request.getParameter('parent')" == '')
-    #set($pweb = 'Main')
-  #else
-    #set($pweb = $request.getParameter('parent').substring(0, $request.getParameter('parent').indexOf('.')))
-  #end
+  ## ---------------------------------------------------------------------------------------------------------
+  ## Since this template can be used for creating a Page or a Space, compute its title based on the passed
+  ## "tocreate" parameter which can be either "page" or "space". If no "tocreate" parameter is passed then we
+  ## default to creating a Page. 
+  ## ---------------------------------------------------------------------------------------------------------
   #set($tocreate = $request.getParameter('tocreate'))
   #if(!$tocreate || ($tocreate == '') || ($tocreate != 'space'))
     #set($tocreate = 'page')
+    #set ($title = $msg.get('core.create.pageTitle'))
+  #else
+    #set($tocreate = 'space')
+    #set ($title = $msg.get('core.create.spaceTitle'))
   #end
+  <h1><span>$title</span></h1>
+  ## ---------------------------------------------------------------------------------------------------------
+  ## This template can be passed a parent document reference in parameter (using the "parent" parameter).
+  ## If a parent parameter is passed use it as the default parent to use when creating the new Page or Space.
+  ## If no parent parameter was passed then default the parent to be the current document in the context if
+  ## we're creating a new page and default it to the current document's space home page if we're creating a
+  ## new space.
+  ## ---------------------------------------------------------------------------------------------------------
+  #set($parent = $request.getParameter('parent'))
+  #if("$!request.getParameter('parent')" == '')
+    #if ($tocreate == 'page')
+      #set ($parentReference = $doc.documentReference)
+    #else
+      #set ($parentReference = $services.model.createDocumentReference($doc.documentReference.wikiReference.name,
+          $doc.documentReference.lastSpaceReference.name, "", "currentmixed/reference"))
+    #end
+    #set ($parent = $services.model.serialize($parentReference, "local"))
+  #end
+  ## ---------------------------------------------------------------------------------------------------------
+  ## Compute the default space value to be the space of the current document.
+  ## ---------------------------------------------------------------------------------------------------------
+  #set ($space = $doc.documentReference.lastSpaceReference.name)
+  ## ---------------------------------------------------------------------------------------------------------
+  ## Display the form.
+  ## ---------------------------------------------------------------------------------------------------------
   <form method="post" action="$doc.getURL('view', 'xpage=create')" onsubmit="cancelCancelEdit()">
     <div class="plainmessage">
       <input type="hidden" name="tocreate" value="$tocreate"/>
       #if($tocreate == 'page')
         <dl>
           <dt>
-            <label for="pageTitle">$msg.get('spaceandname')</label>:
+            <label for="space">$msg.get('core.create.space')</label>
           </dt>
           <dd>
-            <input type="text" id="pageTitle" name="title" value="${pweb}.Title" onfocus="if(this.value=='${pweb}.Title') this.value='${pweb}.'" onblur="if(this.value=='${pweb}.' || this.value=='') this.value='${pweb}.Title'"/>
+            <input type="text" id="space" name="space" value="$space"/>
           </dd>
           <dt>
-            <label for="parent">$msg.get('parent')</label>:
+            <label for="page">$msg.get('core.create.page')</label>
           </dt>
           <dd>
-            <input type="text" id="parent" name="parent" value="$!parentdoc"/>
+            #set ($pageText = $msg.get('core.create.pageText'))
+            <input type="text" id="page" name="page" value="$pageText" onfocus="if(this.value=='$pageText') this.value=''" onblur="if(this.value=='') this.value='$pageText'"/>
           </dd>
         </dl>
+        <input type="hidden" name="parent" value="$!parent"/>
       #else
         <dl>
           <dt>
-            <label for="spaceTitle">$msg.get('xe.create.space.name')</label>:
+            <label for="space">$msg.get('core.create.space')</label>
           </dt>
           <dd>
-            <input type="text" id="spaceTitle" name="title"/>
+            <input type="text" id="space" name="space"/>
           </dd>
         </dl>
+        <input type="hidden" name="parent" value="$!parent"/>
       #end
       <input type="submit" class="button" value="$msg.get('create')"/>
     </div>

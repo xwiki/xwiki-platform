@@ -1,54 +1,63 @@
 #set($tocreate = "$!{request.getParameter('tocreate')}")
+#set($space = "$!{request.getParameter('space')}")
+#set($page = "$!{request.getParameter('page')}")
 #set($title = "$!{request.getParameter('title')}")
-#set($etitle = $util.encodeURI($title))
+#set($etitle = $escapetool.url($title))
 #set($template = "$!{request.getParameter('template')}")
+#set($etemplate = $escapetool.url("${template}"))
 #set($parent = "$!{request.getParameter('parent')}")
-#set($auxparams = "$!{request.getParameter('auxparams')}")
+#set($eparent = $escapetool.url($parent))
 ##
 ## Create panel
 ##
-#if($tocreate=="panel")
-  #set($docname=$title.replaceAll("/", "%2F"))
+#if($tocreate == "panel")
+  #set($docname = $title.replaceAll("/", "%2F"))
+  #set($docReference = $services.model.resolveDocument($docname, "currentmixed"))
   #if($template == "")
     #set($template="Panels.PanelTemplate")
   #end
   #set($pcontent = "#")
   #set($pcontent = $pcontent.concat("panelheader('${title}')${util.getNewline()}${util.getNewline()}#"))
   #set($pcontent = $pcontent.concat("panelfooter()"))
-  #set($pcontent = $util.encodeURL($pcontent))
+  #set($pcontent = $escapetool.url($pcontent))
   #set($redirectaction = "inline")
   #set($redirectparams = "template=${template}&Panels.PanelClass_0_name=${title}&Panels.PanelClass_0_content=$pcontent")
 ##
 ## Create page
 ##
-#elseif($tocreate=="page")
-  #set($docname=$title.replaceAll("/", "."))
-  #set($etemplate = $util.encodeURI("${template}"))
-  #set($eparent = $util.encodeURI("${parent}${auxparams}"))
+#elseif($tocreate == "page")
+  #set($docReference = $services.model.createDocumentReference("", $space, $page, "currentmixed/reference"))
   #set($redirectaction = "edit")
+  ## If no title has been set use the current document's name as the title
+  #if ("$!title" == "")
+    #set ($etitle = $escapetool.url($docReference.name))
+  #end
   #set($redirectparams = "template=${etemplate}&parent=${eparent}&title=${etitle}")
 ##
 ## Create space
 ##
-#elseif($tocreate=='space')
-  #set($title=$title.replaceAll(" \\.\\/", ""))
-  #set($docname="${title}.WebHome")
-  #set($eparent = $util.encodeURI("${parent}${auxparams}"))
+#elseif($tocreate == 'space')
+  #set($docReference = $services.model.createDocumentReference("", $space, "", "currentmixed/reference"))
   ## TODO : Use a WebHome template ?
   #set($redirectaction = "edit")
-  #set($redirectparams = "parent=${eparent}&title=${etitle}")
+  ## If no title has been set use the new space name as the title
+  #if ("$!title" == "")
+    #set ($etitle = $escapetool.url($space))
+  #end
+  #set($redirectparams = "template=${etemplate}&parent=${eparent}&title=${etitle}")
 ##
 ## Create blog post
 ##
-#elseif($tocreate=="post")
-  #set($docname="Blog.${title.replaceAll(' ', '')}")
+#elseif($tocreate == "post")
+  #set($docname = "Blog.${title.replaceAll(' ', '')}")
+  #set($docReference = $services.model.resolveDocument($docname, "currentmixed"))
   #set($redirectaction = "inline")
   #set($redirectparams = "parent=Blog.WebHome&template=XWiki.ArticleClassTemplate&XWiki.ArticleClass_0_title=$etitle")
 #end
 ##
 ## Send redirect
 ##
-#set($newdoc=$xwiki.getDocument($docname))
+#set($newdoc = $xwiki.getDocument($docReference))
 #if(!$newdoc.isNew())
   #set($redirecturl = $newdoc.getURL("view", "xpage=docalreadyexists"))
 #else

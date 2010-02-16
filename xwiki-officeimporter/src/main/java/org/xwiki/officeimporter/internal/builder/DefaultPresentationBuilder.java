@@ -29,9 +29,12 @@ import java.util.Map;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
+import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.Requirement;
 import org.xwiki.component.manager.ComponentManager;
+import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.officeimporter.OfficeImporterException;
 import org.xwiki.officeimporter.builder.PresentationBuilder;
 import org.xwiki.officeimporter.document.XDOMOfficeDocument;
@@ -76,13 +79,24 @@ public class DefaultPresentationBuilder implements PresentationBuilder
      */
     @Requirement
     private OpenOfficeManager officeManager;
+    
+    /**
+     * Used to serialize {@link DocumentReference} instances into strings.
+     */
+    @Requirement
+    private EntityReferenceSerializer<String> serializer;
+    
+    /**
+     * Used to access current context document.
+     */
+    @Requirement
+    private DocumentAccessBridge docBridge;
 
     /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.officeimporter.builder.PresentationBuilder#build(java.io.InputStream, java.lang.String)
+     * {@inheritDoc}    
      */
-    public XDOMOfficeDocument build(InputStream officeFileStream, String officeFileName) throws OfficeImporterException
+    public XDOMOfficeDocument build(InputStream officeFileStream, String officeFileName, DocumentReference reference)
+        throws OfficeImporterException
     {
         // Invoke openoffice document converter.
         Map<String, InputStream> inputStreams = new HashMap<String, InputStream>();
@@ -101,7 +115,19 @@ public class DefaultPresentationBuilder implements PresentationBuilder
         artifacts.put("presentation.zip", presentationArchive);
 
         // Build presentation XDOM.
-        return new XDOMOfficeDocument(buildPresentationXDOM(), artifacts, this.componentManager);
+        String stringReference = serializer.serialize(reference);
+        return new XDOMOfficeDocument(buildPresentationXDOM(stringReference), artifacts, this.componentManager);
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see org.xwiki.officeimporter.builder.PresentationBuilder#build(java.io.InputStream, java.lang.String)
+     */
+    @Deprecated
+    public XDOMOfficeDocument build(InputStream officeFileStream, String officeFileName) throws OfficeImporterException
+    {
+        return build(officeFileStream, officeFileName, docBridge.getCurrentDocumentReference());
     }
 
     /**
@@ -143,17 +169,19 @@ public class DefaultPresentationBuilder implements PresentationBuilder
     /**
      * Utility method for building the presentation XDOM.
      * 
+     * @param stringDocumentReference name of the target wiki page.
      * @return presentation XDOM.
      * @throws OfficeImporterException if an error occurs while building the presentation xdom.
      */
-    private XDOM buildPresentationXDOM() throws OfficeImporterException
+    private XDOM buildPresentationXDOM(String stringDocumentReference) throws OfficeImporterException
     {
         // TODO: the XDOM should be generated in pure java and not depends on velocity, html macros and xwiki/2.0
         // parser. This is slow and wrong. Before we need to convert the zip plugin into component to be able to use it
         // directly.
         StringBuffer buffer = new StringBuffer();
         buffer.append("{{velocity}}");
-        buffer.append("#set($url = $xwiki.zipexplorer.getFileLink($doc, 'presentation.zip', 'output.html'))");
+        buffer.append(String.format("#set($mdoc = $xwiki.getDocument(\"%s\"))", stringDocumentReference));
+        buffer.append("#set($url = $xwiki.zipexplorer.getFileLink($mdoc, 'presentation.zip', 'output.html'))");
         buffer.append("{{html wiki=\"false\" clean=\"false\"}}");
         buffer.append("<iframe src=\"$url\" frameborder=0 width=800px height=600px></iframe>");
         buffer.append("{{/html}}");

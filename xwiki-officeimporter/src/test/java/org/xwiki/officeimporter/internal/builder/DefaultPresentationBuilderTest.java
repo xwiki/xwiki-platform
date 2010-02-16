@@ -32,8 +32,8 @@ import org.jmock.Mockery;
 import org.junit.Before;
 import org.xwiki.component.descriptor.DefaultComponentDescriptor;
 import org.xwiki.component.util.ReflectionUtils;
-import org.xwiki.model.ModelContext;
-import org.xwiki.model.reference.WikiReference;
+import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.officeimporter.builder.PresentationBuilder;
 import org.xwiki.officeimporter.document.XDOMOfficeDocument;
 import org.xwiki.officeimporter.internal.AbstractOfficeImporterTest;
@@ -102,17 +102,21 @@ public class DefaultPresentationBuilderTest extends AbstractOfficeImporterTest
         mockOutput.put("output.html", "<html><head><title></tile></head><body><p>Slide1</p></body></html>".getBytes());
 
         final OpenOfficeConverter mockDocumentConverter = this.mockery.mock(OpenOfficeConverter.class);
+        final EntityReferenceSerializer mockSerializer = this.mockery.mock(EntityReferenceSerializer.class);
+        final DocumentReference reference = new DocumentReference("xwiki", "Main", "Test");
         this.mockery.checking(new Expectations() {{
-                allowing(mockDocumentConverter).convert(mockInput, "input.ppt", "output.html");
+                oneOf(mockDocumentConverter).convert(mockInput, "input.ppt", "output.html");
                 will(returnValue(mockOutput));
-
+                oneOf(mockSerializer).serialize(with(aNonNull(DocumentReference.class)));
+                will(returnValue("xwiki:Main.Test"));
                 // TODO : Remove when DefaultPresentationBuilder#buildPresentationXDOM() is fixed
-                allowing(mockVelocityMacro).execute(with(any(Object.class)), with(any(String.class)), with(any(MacroTransformationContext.class)));
+                oneOf(mockVelocityMacro).execute(with(any(Object.class)), with(any(String.class)), with(any(MacroTransformationContext.class)));
                 will(returnValue(Arrays.<Block>asList(new WordBlock("presentationcontent"))));
         }});
         ReflectionUtils.setFieldValue(officeManager, "converter", mockDocumentConverter);
+        ReflectionUtils.setFieldValue(presentationBuilder, "serializer", mockSerializer);
 
-        XDOMOfficeDocument presentation = presentationBuilder.build(mockOfficeFileStream, "input.ppt");
+        XDOMOfficeDocument presentation = presentationBuilder.build(mockOfficeFileStream, "input.ppt", reference);
         Assert.assertNotNull(presentation.getContentDocument());
         // Make sure provided XDOM is a final XDOM (transformations are executed)
         // TODO : Remove when DefaultPresentationBuilder#buildPresentationXDOM() is fixed

@@ -27,11 +27,11 @@
   <parent>
     <groupId>org.xwiki.platform.skins</groupId>
     <artifactId>xwiki-skins</artifactId>
-    <version>20-SNAPSHOT</version>
+    <version>20</version>
   </parent>
   <artifactId>xwiki-skin-colibri</artifactId>
   <name>XWiki Platform - Skins - Colibri</name>
-  <version>1.12-SNAPSHOT</version>
+  <version>1.12.1</version>
   <packaging>pom</packaging>
   <description>
     Colibri Skin. It is based on Toucan and requires that Albatross be set as the base skin
@@ -42,7 +42,7 @@
     <dependency>
       <groupId>org.xwiki.platform.skins</groupId>
       <artifactId>xwiki-skin-albatross</artifactId>
-      <version>1.27-SNAPSHOT</version>
+      <version>1.26</version>
       <type>zip</type>
       <scope>runtime</scope>
     </dependency>
@@ -50,9 +50,9 @@
   <!-- We must configure SCM in each module. For more information see:
        http://svn.xwiki.org/svnroot/xwiki/platform/pom/trunk/pom.xml -->
   <scm>
-    <connection>scm:svn:http://svn.xwiki.org/svnroot/xwiki/platform/skins/branches/xwiki-skin-colibri-1.12-web-2.2</connection>
-    <developerConnection>scm:svn:https://svn.xwiki.org/svnroot/xwiki/platform/skins/branches/xwiki-skin-colibri-1.12-web-2.2</developerConnection>
-    <url>http://svn.xwiki.org/svnroot/xwiki/platform/skins/branches/xwiki-skin-colibri-1.12-web-2.2</url>
+    <connection>scm:svn:http://svn.xwiki.org/svnroot/xwiki/platform/skins/tags/xwiki-skin-colibri-1.12.1</connection>
+    <developerConnection>scm:svn:https://svn.xwiki.org/svnroot/xwiki/platform/skins/tags/xwiki-skin-colibri-1.12.1</developerConnection>
+    <url>http://svn.xwiki.org/svnroot/xwiki/platform/skins/tags/xwiki-skin-colibri-1.12.1</url>
   </scm>
   <build>
     <plugins>

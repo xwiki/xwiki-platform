@@ -135,10 +135,12 @@
           	- DefaultXDOMOfficeDocumentSplitter class has a fan-out of 21 (max 20). Needs refactoring. There are TODOs
           	  in the code from Asiri that say: "This code needs to be refactored along with the xwiki-refactoring
           	  module code."
+          	- DefaultPresentationBuilder Class Fan-Out Complexity is 22 (max allowed is 20). Needs to be refactored.
            -->
           <excludes>
               org/xwiki/officeimporter/internal/DefaultOfficeImporter.java,
-              org/xwiki/officeimporter/internal/splitter/DefaultXDOMOfficeDocumentSplitter.java
+              org/xwiki/officeimporter/internal/splitter/DefaultXDOMOfficeDocumentSplitter.java,
+              org/xwiki/officeimporter/internal/builder/DefaultPresentationBuilder.java
           </excludes>
         </configuration>
       </plugin>

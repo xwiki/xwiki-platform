@@ -156,8 +156,8 @@ public class OfficeImporterVelocityBridge
     {
         try {
             connect();
-            return xhtmlBuilder.build(officeFileStream, officeFileName,
-                currentMixedDocumentReferenceResolver.resolve(referenceDocument), filterStyles);
+            return xhtmlBuilder.build(officeFileStream, officeFileName, currentMixedDocumentReferenceResolver
+                .resolve(referenceDocument), filterStyles);
         } catch (OfficeImporterException ex) {
             setErrorMessage(ex.getMessage());
             logger.error(ex.getMessage(), ex);
@@ -207,11 +207,11 @@ public class OfficeImporterVelocityBridge
     {
         try {
             connect();
+            DocumentReference reference = currentMixedDocumentReferenceResolver.resolve(referenceDocument);
             if (isPresentation(officeFileName)) {
-                return presentationBuilder.build(officeFileStream, officeFileName);
+                return presentationBuilder.build(officeFileStream, officeFileName, reference);
             } else {
-                return xdomBuilder.build(officeFileStream, officeFileName,
-                    currentMixedDocumentReferenceResolver.resolve(referenceDocument), filterStyles);
+                return xdomBuilder.build(officeFileStream, officeFileName, reference, filterStyles);
             }
         } catch (OfficeImporterException ex) {
             setErrorMessage(ex.getMessage());
@@ -232,8 +232,8 @@ public class OfficeImporterVelocityBridge
      * @param headingLevels heading levels defining the split points on the original document.
      * @param namingCriterionHint hint indicating the child pages naming criterion.
      * @param rootDocumentName name of the root document w.r.t which splitting will occur. In the results set the entry
-     *        corresponding to <b>rootDocumentName</b> {@link TargetDocumentDescriptor} will hold an auto-generated TOC
-     *        structure.
+     *            corresponding to <b>rootDocumentName</b> {@link TargetDocumentDescriptor} will hold an auto-generated
+     *            TOC structure.
      * @return a map holding {@link XDOMOfficeDocument} fragments against corresponding {@link TargetDocumentDescriptor}
      *         instances or null if an error occurs.
      * @since 2.2M1
@@ -316,7 +316,7 @@ public class OfficeImporterVelocityBridge
 
             // Finally attach all the artifacts into target document.
             attachArtifacts(doc.getArtifacts(), target);
-            
+
             return true;
         } catch (OfficeImporterException ex) {
             setErrorMessage(ex.getMessage());
@@ -371,7 +371,7 @@ public class OfficeImporterVelocityBridge
         String extension = officeFileName.substring(officeFileName.lastIndexOf('.') + 1);
         return PRESENTATION_FORMAT_EXTENSIONS.contains(extension);
     }
-    
+
     /**
      * Utility method for attaching artifacts into a wiki page.
      * 

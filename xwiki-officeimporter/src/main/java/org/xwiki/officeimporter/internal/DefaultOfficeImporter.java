@@ -62,7 +62,7 @@ public class DefaultOfficeImporter extends AbstractLogEnabled implements OfficeI
      * File extensions corresponding to slide presentations.
      */
     public static final List<String> PRESENTATION_FORMAT_EXTENSIONS = Arrays.asList("ppt", "odp");
-    
+
     /**
      * Error message to be used for indicating invalid splitting criterion.
      */
@@ -123,7 +123,7 @@ public class DefaultOfficeImporter extends AbstractLogEnabled implements OfficeI
 
         DocumentReference baseDocument = this.currentMixedDocumentReferenceResolver.resolve(targetWikiDocument);
         if (isPresentation(documentFormat)) {
-            XDOMOfficeDocument presentation = presentationBuilder.build(documentStream, officeFileName);
+            XDOMOfficeDocument presentation = presentationBuilder.build(documentStream, officeFileName, baseDocument);
             saveDocument(presentation, new TargetDocumentDescriptor(baseDocument, this.componentManager), null,
                 isAppendRequest(params), false);
         } else {
@@ -135,8 +135,8 @@ public class DefaultOfficeImporter extends AbstractLogEnabled implements OfficeI
             XDOMOfficeDocument xdomDoc = xdomOfficeDocumentBuilder.build(xhtmlDoc);
             importerFilter.filter(targetWikiDocument, xdomDoc.getContentDocument(), false);
             if (!isSplitRequest(params)) {
-                saveDocument(xdomDoc, new TargetDocumentDescriptor(baseDocument, this.componentManager), importerFilter,
-                    isAppendRequest(params), false);
+                saveDocument(xdomDoc, new TargetDocumentDescriptor(baseDocument, this.componentManager),
+                    importerFilter, isAppendRequest(params), false);
             } else {
                 int[] headingLevels = getHeadingLevelsToSplit(params);
                 String namingCriterionHint = params.get("childPagesNamingMethod");
@@ -169,8 +169,14 @@ public class DefaultOfficeImporter extends AbstractLogEnabled implements OfficeI
 
         String result = null;
         if (isPresentation(strAttachmentFileName)) {
-            XDOMOfficeDocument presentation = presentationBuilder.build(attachmentStream, strAttachmentFileName);
-            result = presentation.getContentAsString("xhtml/1.0");
+            XDOMOfficeDocument presentation =
+                presentationBuilder.build(attachmentStream, strAttachmentFileName, documentReference);
+            // Annotated xhtml renderer is required here because WYSIWYG needs these annotations to interpret the macros
+            // used in the presentation XDOM. Fortunately WYSIWYG module is the only module which depends on this
+            // OfficeImporter#importAttachment() deprecated API so we don't have any side effects of this. However we
+            // need to update xwiki-web-gwt-wysiwyg-server module so that it does not depend on this deprecated API
+            // anymore and instead directly use PresentaionBuilder component.
+            result = presentation.getContentAsString("annotatedxhtml/1.0");
             attachArtifacts(strDocumentName, presentation.getArtifacts());
         } else {
             XHTMLOfficeDocument xhtmlDoc =

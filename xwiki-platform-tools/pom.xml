@@ -113,7 +113,6 @@
               **/XarMojo.java
           </excludes>
         </configuration>
-        
       </plugin>
     </plugins>
   </build>

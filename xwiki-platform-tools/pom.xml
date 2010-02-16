@@ -107,13 +107,13 @@
         <!-- Apply the Checkstyle configurations defined in the top level pom.xml file -->
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-checkstyle-plugin</artifactId>
-        <dependencies>
-          <dependency>
-            <groupId>org.xwiki.platform.tools</groupId>
-            <artifactId>xwiki-verification-resources</artifactId>
-            <version>${platform.tool.verification.version}</version>
-          </dependency>
-        </dependencies>
+        <configuration>
+          <excludes>
+              **/UnXarMojo.java,
+              **/XarMojo.java
+          </excludes>
+        </configuration>
+        
       </plugin>
     </plugins>
   </build>

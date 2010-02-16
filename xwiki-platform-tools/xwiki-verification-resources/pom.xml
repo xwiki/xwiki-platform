@@ -27,18 +27,18 @@
   <parent>
     <groupId>org.xwiki.platform.tools</groupId>
     <artifactId>xwiki-tools</artifactId>
-    <version>22-SNAPSHOT</version>
+    <version>21</version>
   </parent>
   <artifactId>xwiki-verification-resources</artifactId>
   <name>XWiki Platform - Tools - Shared Verification Resources</name>
-  <version>1.15-SNAPSHOT</version>
+  <version>1.15</version>
   <packaging>jar</packaging>
   <description>XWiki Platform - Tools - Shared Verification Resources (Checkstyle files, etc)</description>
   <!-- We must configure SCM in each module. For more information see:
        http://svn.xwiki.org/svnroot/xwiki/platform/pom/trunk/pom.xml -->
   <scm>
-    <connection>scm:svn:http://svn.xwiki.org/svnroot/xwiki/platform/xwiki-tools/trunk/xwiki-verification-resources</connection>
-    <developerConnection>scm:svn:https://svn.xwiki.org/svnroot/xwiki/platform/xwiki-tools/trunk/xwiki-verification-resources</developerConnection>
-    <url>http://svn.xwiki.org/svnroot/xwiki/platform/xwiki-tools/trunk/xwiki-verification-resources</url>
+    <connection>scm:svn:http://svn.xwiki.org/svnroot/xwiki/platform/xwiki-tools/tags/xwiki-verification-resources-1.15</connection>
+    <developerConnection>scm:svn:https://svn.xwiki.org/svnroot/xwiki/platform/xwiki-tools/tags/xwiki-verification-resources-1.15</developerConnection>
+    <url>http://svn.xwiki.org/svnroot/xwiki/platform/xwiki-tools/tags/xwiki-verification-resources-1.15</url>
   </scm>
 </project>

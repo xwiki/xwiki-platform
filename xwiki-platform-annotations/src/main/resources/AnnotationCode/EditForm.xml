@@ -12,15 +12,15 @@
 <customClass></customClass>
 <contentAuthor>XWiki.Admin</contentAuthor>
 <creationDate>1264977470000</creationDate>
-<date>1264981488000</date>
-<contentUpdateDate>1264981488000</contentUpdateDate>
+<date>1266009647000</date>
+<contentUpdateDate>1266009647000</contentUpdateDate>
 <version>1.0</version>
 <title></title>
 <template></template>
 <defaultTemplate></defaultTemplate>
 <validationScript></validationScript>
-<comment>Deleted object</comment>
-<minorEdit>true</minorEdit>
+<comment></comment>
+<minorEdit>false</minorEdit>
 <syntaxId>xwiki/2.0</syntaxId>
 <hidden>false</hidden>
 <object>
@@ -60,7 +60,7 @@
 <content>{{velocity filter="none"}}
 {{html wiki="false" clean="false"}}
 #includeTopic('AnnotationCode.Macros')
-#displayEditBox("$!{request.target}", "$!{request.id}")
+#displayEditBox("$!{request.id}", "$!{request.wiki}", "$!{request.space}", "$!{request.page}")
 {{/html}}
 {{/velocity}}</content>
 </xwikidoc>

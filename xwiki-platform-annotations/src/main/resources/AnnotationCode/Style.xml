@@ -12,8 +12,8 @@
 <customClass></customClass>
 <contentAuthor>XWiki.Admin</contentAuthor>
 <creationDate>1264863273000</creationDate>
-<date>1265460815000</date>
-<contentUpdateDate>1265460815000</contentUpdateDate>
+<date>1266004394000</date>
+<contentUpdateDate>1266004394000</contentUpdateDate>
 <version>1.0</version>
 <title></title>
 <template></template>
@@ -203,20 +203,48 @@
 }
 
 /* Annotation boxes */
-.annotation-box {
+.annotation-bubble {
   background: $theme.backgroundSecondaryColor;
   border: 1px dotted $theme.borderColor;
   width: 280px;
   position: absolute;
-  padding: 2px 12px 4px 6px;
   z-index: 2;
 }
+
+.annotation-box {
+  padding: 2px 12px 4px 6px;
+  font-size: medium;
+}
+
+.annotation-box-placeholder {
+  height: 75px;
+}
+
+.annotation-box-placeholder .loading {
+  height: 100%;
+  width: 100%;
+}
+
 .annotation-box textarea {
   width: 99%;
 }
-.annotation-box .annotationHeader {
+
+.annotation-box .annotationAuthor {
   border-bottom: 1px dotted $theme.borderColor;
+  display: block;
 }
+.annotation-box .sep {
+  display: none;
+}
+.annotation-box .annotationDate {
+  padding-top: 3px;
+  margin-right: 51px;
+  display: block;
+}
+.annotationContent {
+  clear: both;
+}
+
 ## In velocity comment: settings for using the larger images from silk
 .annotation-box .annotation {
   ##padding: 0 0 0 18px;
@@ -228,6 +256,7 @@
   ##padding: 0 0 0 18px;
   padding: 0 0 0 14px;
 }
+
 /* Make room for the large note_add icon */
 .annotation-box-create .annotation, .annotation-box-create .buttons {
   padding-left: 18px !important;
@@ -235,6 +264,22 @@
 .annotation-box-create .annotation {
   background: transparent #imgURL('note_add') left top no-repeat !important;
 }
+
+.annotation-box .links {
+  float: right;
+  font-size: 80%;
+  text-transform: lowercase:
+/*  margin: -6px -8px 0 0;
+}
+
+.annotation-box .links a {
+  color: $theme.textColor;
+}
+
+.annotation-box .links a:hover {
+  text-decoration: none;*/
+}
+
 #xwikicontent .annotationAdd {
   background-image: #imgURL('note_add');
 }
@@ -272,6 +317,7 @@
   display: block;
   float: right;
   margin-top: -1.2em;
+  margin-right: -2px;
 }
 .annotationTools a {
   background: transparent none no-repeat left top;

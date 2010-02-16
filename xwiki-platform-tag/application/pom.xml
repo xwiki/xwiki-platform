@@ -27,11 +27,11 @@
   <parent>
     <groupId>org.xwiki.platform.applications</groupId>
     <artifactId>xwiki-applications</artifactId>
-    <version>27-SNAPSHOT</version>
+    <version>27</version>
   </parent>
   <artifactId>xwiki-application-tag</artifactId>
   <name>XWiki Platform - Applications - Tag</name>
-  <version>1.10-SNAPSHOT</version>
+  <version>1.10</version>
   <packaging>xar</packaging>
   <description>Tag application for XWiki</description>
   <dependencies>
@@ -39,16 +39,16 @@
       <groupId>com.xpn.xwiki.platform.plugins</groupId>
       <artifactId>xwiki-plugin-tag</artifactId>
       <!-- We want to release the tag plugin and application together. Hence they should have the same version -->
-      <version>1.10-SNAPSHOT</version>
+      <version>1.10</version>
       <scope>runtime</scope>
     </dependency>
   </dependencies>
   <!-- We must configure SCM in each module. For more information see:
        http://svn.xwiki.org/svnroot/xwiki/platform/pom/trunk/pom.xml -->
   <scm>
-    <connection>scm:svn:http://svn.xwiki.org/svnroot/xwiki/platform/xwiki-applications/trunk/tag</connection>
-    <developerConnection>scm:svn:https://svn.xwiki.org/svnroot/xwiki/platform/xwiki-applications/trunk/tag</developerConnection>
-    <url>http://svn.xwiki.org/svnroot/xwiki/platform/xwiki-applications/trunk/tag</url>
+    <connection>scm:svn:http://svn.xwiki.org/svnroot/xwiki/platform/xwiki-applications/tags/xwiki-application-tag-1.10</connection>
+    <developerConnection>scm:svn:https://svn.xwiki.org/svnroot/xwiki/platform/xwiki-applications/tags/xwiki-application-tag-1.10</developerConnection>
+    <url>http://svn.xwiki.org/svnroot/xwiki/platform/xwiki-applications/tags/xwiki-application-tag-1.10</url>
   </scm>
   <issueManagement>
     <system>jira</system>

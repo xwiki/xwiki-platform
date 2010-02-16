@@ -38,8 +38,12 @@ import org.xwiki.model.reference.EntityReferenceResolver;
 public class CurrentStringDocumentReferenceResolver implements DocumentReferenceResolver<String>
 {
     @Requirement("current")
-    private EntityReferenceResolver entityReferenceResolver;
+    private EntityReferenceResolver<String> entityReferenceResolver;
 
+    /**
+     * {@inheritDoc}
+     * @see org.xwiki.model.reference.DocumentReferenceResolver#resolve(Object)
+     */
     public DocumentReference resolve(String documentReferenceRepresentation)
     {
         return new DocumentReference(this.entityReferenceResolver.resolve(

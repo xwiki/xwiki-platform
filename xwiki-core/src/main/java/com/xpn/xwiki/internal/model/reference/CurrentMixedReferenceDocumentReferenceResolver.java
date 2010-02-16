@@ -22,43 +22,34 @@ package com.xpn.xwiki.internal.model.reference;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.Requirement;
 import org.xwiki.model.EntityType;
-import org.xwiki.model.internal.reference.AbstractStringEntityReferenceResolver;
-import org.xwiki.model.internal.reference.DefaultStringEntityReferenceResolver;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
-import org.xwiki.model.reference.EntityReferenceValueProvider;
+import org.xwiki.model.reference.EntityReference;
+import org.xwiki.model.reference.EntityReferenceResolver;
 
 /**
- * Resolve a String representing an Entity Reference into an {@link org.xwiki.model.reference.EntityReference} object.
- * The behavior is the one defined in
+ * Specialized version of {@link org.xwiki.model.reference.EntityReferenceResolver} which can be considered a helper
+ * component to resolve {@link org.xwiki.model.reference.DocumentReference} objects from Entity Reference (when they
+ * miss some parent references or have NULL values). The behavior is the one defined in
  * {@link com.xpn.xwiki.internal.model.reference.CurrentMixedEntityReferenceValueProvider}.
  *
  * @version $Id$
- * @since 2.2M1
+ * @since 2.3M1
  */
-@Component("currentmixed")
-public class CurrentMixedStringDocumentReferenceResolver extends AbstractStringEntityReferenceResolver
-    implements DocumentReferenceResolver<String>
+@Component("currentmixed/reference")
+public class CurrentMixedReferenceDocumentReferenceResolver implements DocumentReferenceResolver<EntityReference>
 {
-    @Requirement("currentmixed")
-    private EntityReferenceValueProvider provider;
+    @Requirement("currentmixed/reference")
+    private EntityReferenceResolver<EntityReference> entityReferenceResolver;
 
     /**
      * {@inheritDoc}
+     *
      * @see org.xwiki.model.reference.DocumentReferenceResolver#resolve(Object)
      */
-    public DocumentReference resolve(String documentReferenceRepresentation)
+    public DocumentReference resolve(EntityReference documentReferenceRepresentation)
     {
-        return new DocumentReference(resolve(documentReferenceRepresentation, EntityType.DOCUMENT));
-    }
-
-    /**
-     * {@inheritDoc}
-     * @see DefaultStringEntityReferenceResolver#getDefaultValue(org.xwiki.model.EntityType)
-     */
-    @Override
-    protected String getDefaultValue(EntityType type)
-    {
-        return this.provider.getDefaultValue(type);
+        return new DocumentReference(this.entityReferenceResolver.resolve(documentReferenceRepresentation,
+            EntityType.DOCUMENT));
     }
 }

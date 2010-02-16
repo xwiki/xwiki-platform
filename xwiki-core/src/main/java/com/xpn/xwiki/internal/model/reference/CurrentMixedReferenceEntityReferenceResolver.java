@@ -22,26 +22,27 @@ package com.xpn.xwiki.internal.model.reference;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.Requirement;
 import org.xwiki.model.EntityType;
-import org.xwiki.model.internal.reference.DefaultStringEntityReferenceResolver;
+import org.xwiki.model.internal.reference.DefaultReferenceEntityReferenceResolver;
 import org.xwiki.model.reference.EntityReferenceValueProvider;
 
 /**
- * Resolve a String representing an Entity Reference into an {@link org.xwiki.model.reference.EntityReference} object.
- * The behavior is the one defined in
- * {@link com.xpn.xwiki.internal.model.reference.CurrentEntityReferenceValueProvider}.
+ * Resolve an {@link org.xwiki.model.reference.EntityReference} into a valid and absolute reference (with all required
+ * parents filled in). The behavior is the one defined in
+ * {@link com.xpn.xwiki.internal.model.reference.CurrentMixedEntityReferenceValueProvider}.
  *
  * @version $Id$
- * @since 2.2M1
+ * @since 2.3M1
  */
-@Component("current")
-public class CurrentStringEntityReferenceResolver extends DefaultStringEntityReferenceResolver
+@Component("currentmixed/reference")
+public class CurrentMixedReferenceEntityReferenceResolver extends DefaultReferenceEntityReferenceResolver
 {
-    @Requirement("current")
+    @Requirement("currentmixed")
     private EntityReferenceValueProvider provider;
 
     /**
      * {@inheritDoc}
-     * @see DefaultStringEntityReferenceResolver#getDefaultValue(org.xwiki.model.EntityType)
+     *
+     * @see DefaultReferenceEntityReferenceResolver#getDefaultValue(org.xwiki.model.EntityType)
      */
     @Override
     protected String getDefaultValue(EntityType type)

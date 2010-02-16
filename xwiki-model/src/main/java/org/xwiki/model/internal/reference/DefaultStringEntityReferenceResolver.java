@@ -42,6 +42,7 @@ public class DefaultStringEntityReferenceResolver extends AbstractStringEntityRe
      * {@inheritDoc}
      * @see AbstractStringEntityReferenceResolver#getDefaultValue(org.xwiki.model.EntityType)
      */
+    @Override
     protected String getDefaultValue(EntityType type)
     {
         return this.provider.getDefaultValue(type);

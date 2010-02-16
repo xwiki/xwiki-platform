@@ -38,8 +38,12 @@ import org.xwiki.model.reference.EntityReferenceResolver;
 public class CurrentStringAttachmentReferenceResolver implements AttachmentReferenceResolver<String>
 {
     @Requirement("current")
-    private EntityReferenceResolver entityReferenceResolver;
+    private EntityReferenceResolver<String> entityReferenceResolver;
 
+    /**
+     * {@inheritDoc}
+     * @see org.xwiki.model.reference.AttachmentReferenceResolver#resolve(Object)
+     */
     public AttachmentReference resolve(String attachmentReferenceRepresentation)
     {
         return new AttachmentReference(this.entityReferenceResolver.resolve(

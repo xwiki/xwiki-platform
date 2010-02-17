@@ -215,10 +215,11 @@ public class DefaultWikiService implements WikiService
     public List<WikiPage> getRecentlyModifiedPages(int start, int count)
     {
         try {
+            XWikiContext context = getXWikiContext();
             List<XWikiDocument> docs =
-                getXWikiContext().getWiki().search(
-                    "select distinct doc from XWikiDocument doc where 1=1 and doc.author='"
-                        + getXWikiContext().getUser() + "' order by doc.date desc", count, start, getXWikiContext());
+                context.getWiki().search(
+                    "select doc from XWikiDocument doc where doc.author='" + context.getUser()
+                        + "' order by doc.date desc", count, start, context);
             return prepareDocumentResultsList(docs);
         } catch (XWikiException e) {
             LOG.error(e.getLocalizedMessage(), e);
@@ -256,9 +257,9 @@ public class DefaultWikiService implements WikiService
             }
             List<XWikiDocument> docs =
                 getXWikiContext().getWiki().search(
-                    "select distinct doc from XWikiDocument as doc where " + noBlacklistedSpaces
-                        + "(lower(doc.title) like '%" + escapedKeyword + "%' or lower(doc.fullName) like '%"
-                        + escapedKeyword + "%')", count, start, getXWikiContext());
+                    "select doc from XWikiDocument as doc where " + noBlacklistedSpaces + "(lower(doc.title) like '%"
+                        + escapedKeyword + "%' or lower(doc.fullName) like '%" + escapedKeyword + "%')", count, start,
+                    getXWikiContext());
             return prepareDocumentResultsList(docs);
         } catch (XWikiException e) {
             LOG.error(e.getLocalizedMessage(), e);

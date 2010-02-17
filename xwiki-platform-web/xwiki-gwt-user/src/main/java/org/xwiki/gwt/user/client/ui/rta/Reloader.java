@@ -86,7 +86,8 @@ public class Reloader implements RequestCallback, LoadHandler
         this.rta = rta;
 
         requestBuilder = new RequestBuilder(RequestBuilder.POST, IFrameElement.as(rta.getElement()).getSrc());
-        requestBuilder.setHeader("Content-type", "application/x-www-form-urlencoded");
+        // NOTE: We must specify the character set because otherwise the server side will use the configured encoding.
+        requestBuilder.setHeader("Content-type", "application/x-www-form-urlencoded; charset=UTF-8");
     }
 
     /**

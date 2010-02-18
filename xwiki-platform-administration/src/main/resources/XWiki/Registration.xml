@@ -196,7 +196,7 @@ $xwiki.get("ssfx").use('uicomponents/widgets/validation/livevalidation.css')
  *        * template
  *       Removing or renaming any of these fields will result in undefined behavior.
  *
- *#
+ *###
 #set($fields = [])
 ##
 ## The first name field, no checking.
@@ -341,7 +341,7 @@ $xwiki.get("ssfx").use('uicomponents/widgets/validation/livevalidation.css')
   ## will save the document as long as the user who last saved this registration page has programming rights.
   $userDoc.saveWithProgrammingRights("Saved favorite color from registration form.")
 #end
-## *#
+## *###
 ## To disable the captcha on this page, comment out the next two entries.
 ## The captcha image, not an input field but still defined the same way.
 #if($captchaservice &amp;&amp; $captchaservice.isEnabled() &amp;&amp; $xcontext.getUser() == "XWiki.XWikiGuest")
@@ -534,7 +534,7 @@ $heading
  *
  * @param $fields The array of fields to validate.
  * @param $request An XWikiRequest object which made the register request, used to get parameters.
- *#
+ *###
 #macro(validateFields, $fields, $request)
   #foreach($field in $fields)
     #if($field.get('validate') &amp;&amp; $field.get('name'))
@@ -609,7 +609,7 @@ $heading
  *
  * @param $request An XWikiRequest object which made the register request.
  * @param $response The XWikiResponse object to send any redirects to.
- *#
+ *###
 #macro(createUser, $fields, $request, $response)
   ## See if email verification is required and register the user.
   #if($xwiki.getXWikiPreferenceAsInt('use_email_verification', 0) == 1)
@@ -690,7 +690,7 @@ $heading
  * @param $fields The array of fields to use for generating html code.
  * @param $fieldMandatoryStar The tag parameters for a * indicating a mandatory field.
  * @param $failureMessageParams The tag parameters for a failure message.
- *#
+ *###
 #macro(generateHtml, $fields, $fieldMandatoryStar, $failureMessageParams)
   #define($html)
     ## Put the same values back into the fields.
@@ -753,7 +753,7 @@ $heading
  * Generate the Javascript for interacting with LiveValidation.
  *
  * @param $fields The array of fields which to validate.
- *#
+ *###
 #macro(generateJavascript, $fields)
   &lt;script type='text/javascript'&gt;
   /* &lt;![CDATA[ */
@@ -817,7 +817,7 @@ $heading
  * Fields will not be returned if they have either noReturn or error specified.
  *
  * @param $fields The array of fields to get parameters for.
- *#
+ *###
 #macro(getParams $fields)
   #foreach($field in $fields)
     #if($field.get('name') &amp;&amp; $request.get($field.get('name')))

@@ -37,6 +37,7 @@ import org.xwiki.component.annotation.Requirement;
 import org.xwiki.component.phase.Initializable;
 import org.xwiki.component.phase.InitializationException;
 import org.xwiki.rendering.block.Block;
+import org.xwiki.rendering.block.NewLineBlock;
 import org.xwiki.rendering.block.VerbatimBlock;
 import org.xwiki.rendering.parser.AbstractHighlightParser;
 import org.xwiki.rendering.parser.HighlightParser;
@@ -90,13 +91,13 @@ public class PygmentsParser extends AbstractHighlightParser implements Initializ
     /**
      * Python code to create the lexer.
      */
-    private static final String PY_LEXER_CREATE =
-            PY_LEXER_TRY + " = pygments.lexers.get_lexer_by_name(\"{0}\", stripall=True)" + PY_LEXER_CATCH;
+    private static final String PY_LEXER_CREATE = PY_LEXER_TRY
+        + " = pygments.lexers.get_lexer_by_name(\"{0}\", stripnl=False)" + PY_LEXER_CATCH;
 
     /**
      * Python code to find the lexer from source.
      */
-    private static final String PY_LEXER_FIND = PY_LEXER_TRY + " = guess_lexer(code, stripall=True)" + PY_LEXER_CATCH;
+    private static final String PY_LEXER_FIND = PY_LEXER_TRY + " = guess_lexer(code, stripnl=False)" + PY_LEXER_CATCH;
 
     /**
      * The syntax identifier.
@@ -148,9 +149,6 @@ public class PygmentsParser extends AbstractHighlightParser implements Initializ
      */
     public List<Block> highlight(String syntaxId, Reader source) throws ParseException
     {
-        PythonInterpreter interpreter = getPythonInterpreter();
-        BlocksGeneratorPygmentsListener listener = new BlocksGeneratorPygmentsListener(this.plainTextParser);
-
         String code;
         try {
             code = IOUtils.toString(source);
@@ -161,6 +159,31 @@ public class PygmentsParser extends AbstractHighlightParser implements Initializ
         if (code.length() == 0) {
             return Collections.emptyList();
         }
+
+        List<Block> blocks = highlight(syntaxId, code);
+
+        // TODO: there is a bug in Pygments that makes it always put a newline at the end of the content, should be
+        // fixed in Pygments 1.3.
+        if (code.charAt(code.length() - 1) != '\n' && !blocks.isEmpty()
+            && blocks.get(blocks.size() - 1) instanceof NewLineBlock) {
+            blocks.remove(blocks.size() - 1);
+        }
+
+        return blocks;
+    }
+
+    /**
+     * Return a highlighted version of the provided content.
+     * 
+     * @param syntaxId the identifier of the source syntax.
+     * @param code the content to highlight.
+     * @return the highlighted version of the provided source.
+     * @throws ParseException the highlighting failed.
+     */
+    private List<Block> highlight(String syntaxId, String code) throws ParseException
+    {
+        PythonInterpreter interpreter = getPythonInterpreter();
+        BlocksGeneratorPygmentsListener listener = new BlocksGeneratorPygmentsListener(this.plainTextParser);
 
         interpreter.set(PY_LISTENER_VARNAME, listener);
         interpreter.set(PY_CODE_VARNAME, new PyUnicode(code));

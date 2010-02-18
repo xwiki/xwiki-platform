@@ -49,7 +49,7 @@ public class BlocksGeneratorPygmentsListener implements PygmentsListener
     private List<Block> blocks = new ArrayList<Block>();
 
     /**
-     * Used to parse Pygment token values into blocks.
+     * Used to convert Pygment token values into blocks.
      */
     private Parser plainTextParser;
 

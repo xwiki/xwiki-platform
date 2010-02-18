@@ -216,6 +216,9 @@ public class DefaultWikiService implements WikiService
     {
         try {
             XWikiContext context = getXWikiContext();
+            // NOTE: Currently Oracle doesn't support distinct when a row is BLOB or CLOB. As a consequence we cannot
+            // query distinct documents. This is not a problem though as long as we query only the XWikiDocument table,
+            // which shouldn't contain duplicates.
             List<XWikiDocument> docs =
                 context.getWiki().search(
                     "select doc from XWikiDocument doc where doc.author='" + context.getUser()
@@ -255,6 +258,9 @@ public class DefaultWikiService implements WikiService
                 }
                 noBlacklistedSpaces = "doc.web not in (" + spacesList.toString() + ") and ";
             }
+            // NOTE: Currently Oracle doesn't support distinct when a row is BLOB or CLOB. As a consequence we cannot
+            // query distinct documents. This is not a problem though as long as we query only the XWikiDocument table,
+            // which shouldn't contain duplicates.
             List<XWikiDocument> docs =
                 getXWikiContext().getWiki().search(
                     "select doc from XWikiDocument as doc where " + noBlacklistedSpaces + "(lower(doc.title) like '%"

@@ -12,15 +12,15 @@
 <customClass></customClass>
 <contentAuthor>XWiki.Admin</contentAuthor>
 <creationDate>1251635783000</creationDate>
-<date>1254066504000</date>
-<contentUpdateDate>1254066504000</contentUpdateDate>
+<date>1266501670000</date>
+<contentUpdateDate>1266501670000</contentUpdateDate>
 <version>1.1</version>
 <title>IRC Bot</title>
 <template></template>
 <defaultTemplate></defaultTemplate>
 <validationScript></validationScript>
-<comment>allow delete right for XWiki.XWikiAdminGroup</comment>
-<minorEdit>true</minorEdit>
+<comment></comment>
+<minorEdit>false</minorEdit>
 <syntaxId>xwiki/2.0</syntaxId>
 <hidden>false</hidden>
 <attachment>
@@ -87,6 +87,19 @@
 <validationRegExp></validationRegExp>
 <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
 </server>
+<validation>
+<editor>PureText</editor>
+<name>validation</name>
+<number>5</number>
+<picker>0</picker>
+<prettyName>Validation</prettyName>
+<rows>8</rows>
+<size>100</size>
+<unmodifiable>0</unmodifiable>
+<validationMessage></validationMessage>
+<validationRegExp></validationRegExp>
+<classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+</validation>
 </class>
 <object>
 <class>
@@ -144,6 +157,19 @@
 <validationRegExp></validationRegExp>
 <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
 </server>
+<validation>
+<editor>PureText</editor>
+<name>validation</name>
+<number>5</number>
+<picker>0</picker>
+<prettyName>Validation</prettyName>
+<rows>8</rows>
+<size>100</size>
+<unmodifiable>0</unmodifiable>
+<validationMessage></validationMessage>
+<validationRegExp></validationRegExp>
+<classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+</validation>
 </class>
 <name>IRC.IRCBot</name>
 <number>0</number>
@@ -161,7 +187,10 @@
 <property>
 <server>irc.freenode.net</server>
 </property>
-</object>
+<property>
+<validation>return !source.fullName.startsWith("IRC.${bot.getChannels()[0][1..-1]}Archive")
+
+</validation></property></object>
 <object>
 <class>
 <name>XWiki.XWikiRights</name>
@@ -457,12 +486,14 @@ class IRCEventListener implements EventListener
     def xwiki
     def context
     def bot
+    def onEventValidationScript
 
-    IRCEventListener(bot, xwiki, context)
+    IRCEventListener(bot, xwiki, context, onEventValidationScript)
     {
         this.bot = bot
         this.xwiki = xwiki
         this.context = context
+        this.onEventValidationScript = onEventValidationScript
     }
 
     IRCBot getBot()
@@ -477,23 +508,27 @@ class IRCEventListener implements EventListener
 
     List&lt;Event&gt; getEvents()
     {
-        return Arrays.asList(new DocumentUpdateEvent(), new DocumentSaveEvent(), new DocumentDeleteEvent());
+        return Arrays.asList(new DocumentUpdateEvent())
     }
 
     void onEvent(Event event, Object source, Object data)
     {
-        // Don't send notifications for IRC archives
-        if (!source.fullName.startsWith("IRC.${bot.getChannels()[0][1..-1]}Archive")) {
+        // We allow the user to define a script to decide if the given event should be notified or not.
+        // For example the user may want to filter out some wikis.
+        Binding binding = new Binding();
+        binding.setVariable("event", event);
+        binding.setVariable("source", source);
+        binding.setVariable("data", data);
+        binding.setVariable("bot", bot);
+        GroovyShell shell = new GroovyShell(binding);
+        if (shell.evaluate(onEventValidationScript)) {
             def author = source.author
             def comment = source.comment
-            def action = "modified"
-            if (event instanceof DocumentSaveEvent) {
-                action = "created"
-            } else if (event instanceof DocumentDeleteEvent) {
+            if (source.isNew()) {
                 author = context.user
-                action = "deleted"
+                comment = "deleted document"
             }
-            bot.sendMessage(bot.getChannels()[0], "${source.fullName} was ${action} by ${author} ${comment ? "(${comment})" : ""} - ${source.getExternalURL("view", data)}")
+            bot.sendMessage(bot.getChannels()[0], "${source.fullName} was modified by ${author} ${comment ? "(${comment})" : ""} - ${source.getExternalURL("view", data)}")
         }
     }
 }
@@ -525,7 +560,7 @@ if (request.action == "start") {
     }
     bot.start()
 
-    def listener = new IRCEventListener(bot, xwiki, xcontext)
+    def listener = new IRCEventListener(bot, xwiki, xcontext, doc.getValue("validation"))
     observation.addListener(listener)
     println "{{info}}IRC Bot is now active{{/info}}"
 } else if (request.action == "stop") {
@@ -580,6 +615,13 @@ $doc.use($doc.fullName)
 * Channel: $doc.display("channel")
 * Bot name: $doc.display("botname")
 * Password: $doc.display("password")
+* Validation script for events: (((
+#if ($context.action == "view")
+  {{code language="groovy"}}$doc.getValue("validation"){{/code}}
+#else
+  $doc.display("validation")
+#end
+)))
 
 #if ($context.action != "inline")
 {{html}}

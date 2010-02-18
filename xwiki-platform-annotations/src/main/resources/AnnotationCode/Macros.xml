@@ -12,8 +12,8 @@
 <customClass></customClass>
 <contentAuthor>XWiki.Admin</contentAuthor>
 <creationDate>1264959390000</creationDate>
-<date>1266221246000</date>
-<contentUpdateDate>1266221246000</contentUpdateDate>
+<date>1266512079000</date>
+<contentUpdateDate>1266512079000</contentUpdateDate>
 <version>1.0</version>
 <title></title>
 <template></template>
@@ -71,11 +71,16 @@
   ## TODO: unhardcode this reference generation here when document reference will be available in velo. Or build Annotation velocity API for xwiki
   #set($ann = $annotations.getAnnotation("${docWiki}:${docSpace}.${docPage}", $id))
   &lt;div class="annotation-box annotation-box-edit"&gt;
-    ## TODO set the form action
-    &lt;form method='' action=""&gt;
-      #displayAnnotation($ann, 'edit')
-      #displayAnnotationBoxButtons('edit')
-    &lt;/form&gt;
+    #if($ann)
+      ## TODO: fix this url to be generated less hardcoded
+      #set($editURL = "/xwiki/rest/wikis/" + $docWiki + "/spaces/" + $docSpace + "/pages/" + $docPage + "/annotation/" + $util.encodeURI($ann.id) + "?method=PUT&amp;media=json")
+      &lt;form method='POST' action="${editURL}"&gt;
+        #displayAnnotation($ann, 'edit')
+        #displayAnnotationBoxButtons('edit')
+      &lt;/form&gt;
+    #else
+      &lt;div class="box infomessage"&gt;$msg.get("annotations.action.edit.error.notfound")&lt;/div&gt;
+    #end
   &lt;/div&gt;
 #end
 #*
@@ -98,7 +103,7 @@
       ##&lt;div class="clearfloats"&gt;&lt;/div&gt;
       #displayAnnotation($ann $mode $docWiki $docSpace $docPage)
     #else
-      ((({{info}}$msg.get("annotations.action.view.error.notfound"){{/info}})))
+      &lt;div class="box infomessage"&gt;$msg.get("annotations.action.view.error.notfound")&lt;/div&gt;
     #end
   &lt;/div&gt;
 #end
@@ -149,7 +154,7 @@
   &lt;div class="annotationTitle"&gt;
     &lt;span class="annotationAuthor"&gt;$!xwiki.getUserName($ann.author)&lt;/span&gt;##
 ## Do not indent this, or the comma will be misplaced
-#if("$!{ann.displayDate}" != '')&lt;span class="sep"&gt;, &lt;/span&gt;&lt;span class="annotationDate"&gt;$ann.displayDate&lt;/span&gt;#end
+#if("$!{ann.date}" != '')&lt;span class="sep"&gt;, &lt;/span&gt;&lt;span class="annotationDate"&gt;$xwiki.formatDate($ann.date, "dd/MM/yyyy")&lt;/span&gt;#end
   &lt;/div&gt;
 #end
 ##
@@ -198,44 +203,22 @@
   #if ($mode == 'list') 
     &lt;blockquote class="annotatedText"&gt;$ann.selection&lt;/blockquote&gt;
   #end
-  #if($mode == 'edit' || $mode == 'create')
-    #generateAnnForm($ann)
-  #else
-    #generateAnnContent($ann)
-  #end
-#end
-##
-##
-#**
- * Generated a form which allows to edit the fields that are not hidden.
- * Used in the 'create' and 'edit' display modes.
- *
- * @param $ann the annotation object
- *#
-#macro(generateAnnForm $ann)
-  ## Fake object that allows to use the API to generate the form
+  ## Fake object that allows to use the API to generate the display
   #set($fakeObj = $doc.newObject($annotationClassDocName))
   #set($properties = $annotationClass.properties)
   &lt;dl&gt;
   #foreach($prop in $properties)
     #if (!$listtool.contains($hiddenProperties, $prop.name))
       #set($discard = $fakeObj.set($prop.name, "$!{ann.get($prop.name)}"))
-      &lt;dt class="label"&gt;&lt;label for="$prop.name"&gt;$prop.prettyName&lt;/label&gt;&lt;/dt&gt;
-      &lt;dd&gt;$doc.displayEdit($prop, "" , $fakeObj)&lt;/dd&gt;
+      &lt;dt class="annotation-label"&gt;&lt;label for="$prop.name"&gt;$prop.prettyName&lt;/label&gt;&lt;/dt&gt;
+      #if($mode == 'edit' || $mode == 'create')
+        &lt;dd&gt;$doc.displayEdit($prop, "" , $fakeObj)&lt;/dd&gt;
+      #else
+        &lt;dd&gt;$doc.displayView($prop, "" , $fakeObj)&lt;/dd&gt;
+      #end
     #end
   #end
   &lt;/dl&gt;
-#end
-##
-##
-#**
- * Generates the annotation content. Should be customized to correspond to the annotation class structure.
- * Used in the 'view' and 'list' display modes.
- *
- * @param $ann the annotation object
- *#
-#macro(generateAnnContent $ann)
-  &lt;div class="annotationComment"&gt;$!{ann.annotation}&lt;/div&gt;
 #end
 {{/velocity}}</content>
 </xwikidoc>

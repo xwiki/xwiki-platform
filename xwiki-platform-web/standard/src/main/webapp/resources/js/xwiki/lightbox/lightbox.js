@@ -46,10 +46,8 @@ Lightbox = Class.create({
   lbLoadForm: function(url) {
     this.currentUrl = url;
     if(this.loadedForms[url]) {
-      this.lbMoveScriptsAndCSSToHead(this.loadedForms[url]);
-      var c = $('lb-content');
-      $('lb-content').innerHTML = "";
-      $('lb-content').appendChild(this.loadedForms[url]);
+      $('lb-content').innerHTML = '';
+      this.lbPlaceContentInDocument(this.loadedForms[url], $('lb-content'));
       this.form = c.getElementsByTagName('form')[0];
     } else {
       new Ajax.Request(url, {onSuccess: this.lbFormDataLoaded.bind(this)});
@@ -57,63 +55,94 @@ Lightbox = Class.create({
   },
 
   lbFormDataLoaded: function(transport) {
-    var responseContent = document.createElement("div");
+    var responseContent = document.createElement('div');
     responseContent.innerHTML = transport.responseText;
-    this.lbMoveScriptsAndCSSToHead(responseContent);
-    var c = $('lb-content');
-    $('lb-content').innerHTML = "";
-    c.appendChild(responseContent);
-    this.form = c.getElementsByTagName('form')[0];
-    this.resizeBackground();
+    $('lb-content').innerHTML = '';
+    this.lbPlaceContentInDocument(responseContent, $('lb-content'), 
+      function() {
+        this.resizeBackground();
+      }.bind(this)
+    );
+    this.form = $('lb-content').getElementsByTagName('form')[0];
   },
 
   /**
-   * Takes all scripts and CSS, moves them to the head and makes them get executed.
+   * Some elements such as script elements are treated specially by the browser and not loaded if they are deep in a
+   * DOM tree which is added to the document with Javascript.
+   * However if each of these elements are placed in the tree individually, the loading works but execution must stop
+   * while scripts are loading otherwise an inline script may be executed before a reference script which it depends on.
+   * This function ends and is restarted by a callback each time a script is done loading.
    *
-   * @param content A DOM node to traverse looking for scripts or CSS in the child nodes.
+   * @param content A DOM node containing th econtent to place in the document.
+   * @param whereToPlace A DOM node in the document inwhich to place the content.
+   * @param onComplete A function to run when this is completely finished, note that this function will return before it
+   *                   is complete, it will be restarted later by a callback.
    */
-  lbMoveScriptsAndCSSToHead: function(content) {
-    var head = document.getElementsByTagName("head")[0];
-    var scripts = Array.from(content.getElementsByTagName("script"));
-    // Opera doesn't render stylesheets unless we expressly copy them into the head.
-    var links = Array.from(content.getElementsByTagName("link"));
-    var toHead = links.concat(scripts).flatten();
-    //
-    var elementsToHead = function(elements, i) {
-      while(i < elements.length) {
-        // Clone the element...
-        var out = document.createElement(elements[i].tagName);
-        var attributes = elements[i].attributes;
-        for(var j = 0; j < attributes.length; j++) {
-          out.setAttribute(attributes[j].name, attributes[j].value);
-        }
-        out.innerHTML = elements[i].text;
-        // Firefox runs embedded scripts twice if they show up twice, however using removeChild 
-        // makes unembedded (reference) scripts not get put into the head (??)
-        //elements[i].parentNode.removeChild(elements[i]);
-        // This works though...
-        elements[i].innerHTML = "";
-        //
-        head.appendChild(out);
-        // If the script is being loaded from source, we have to make sure it is loaded before loading the next script.
-        // This function ends and then is restarted by the callback.
-        if(out.src != undefined && out.src != '') {
-          // We break the loop and stop until the element is loaded, then a recursive call restarts it.
-          Event.observe(out, "load", function() {
-            elementsToHead(elements, i + 1);
+  lbPlaceContentInDocument: function(content, whereToPlace, onComplete) {
+    // First clear already existing listeners because we will be firing a dom:loaded event for the 
+    // benefit of listeners we may be adding.
+    document.stopObserving('dom:loaded');
+
+    var scripts = Array.from(content.getElementsByTagName('script'));
+    // Opera doesn't render stylesheets unless we expressly place them.
+    var links = Array.from(content.getElementsByTagName('link'));
+    var styles = Array.from(content.getElementsByTagName('style'));
+    var treatSpecially = links.concat(scripts, styles).flatten();
+
+    // Clone all elements in treatSpecially and remove them from the content DOM tree.
+    var clones = [];
+    for (var i = 0; i < treatSpecially.length; i++) {
+      clones[i] = document.createElement(treatSpecially[i].tagName);
+      var attributes = treatSpecially[i].attributes;
+      for(var j = 0; j < attributes.length; j++) {
+        clones[i].setAttribute(attributes[j].name, attributes[j].value);
+      }
+      clones[i].innerHTML = treatSpecially[i].innerHTML;
+      // Remove element from content.
+      treatSpecially[i].parentNode.removeChild(treatSpecially[i]);
+    }
+
+    // Insert the content.
+    whereToPlace.appendChild(content);
+
+    /*
+     * @param elements - Array - The elements to add to the document in the order given.
+     * @param whereToPlace A DOM node in the document inwhich to place the elements.
+     * @param onComplete - Function - Do this when the function is completely finished (it will return at the first script
+     *                                which needs to be loaded.)
+     * @param startAt - Skips over this number of elements at the beginning of the list.
+     */ 
+    var appendSpecialElements = function(elements, whereToPlace, onComplete, startAt) {
+      var i = 0;
+      if (startAt) {
+        i = startAt;
+      }
+      while (i < elements.length) {
+        whereToPlace.appendChild(elements[i]);
+        if (elements[i].tagName == 'SCRIPT' && elements[i].src != '') {
+          // In order to make sure the element is loaded before loading the next one, This function ends and then is 
+          // restarted by the callback.
+          Event.observe(elements[i], 'load', function() {
+            appendSpecialElements(elements, whereToPlace, onComplete, i + 1);
           });
-          break;
+          return;
         }
         i++;
       }
-      // If we there are no elements left to be placed in the head, we place a script which fires a dom:loaded event.
-      // We are not just manually firing the event because we want to make sure all other scripts have been loaded and parsed first.
-      if(i == elements.length) {
-        head.appendChild(new Element("script", {"type" : "text/javascript"}).update('document.fire("dom:loaded");'));
-      }
+      // Do whatever was supposed to be done after this is finished.
+      onComplete();
     }
-    // Start running the function above.
-    elementsToHead(toHead, 0);
+
+    // Start running the appendSpecialElements function.
+    appendSpecialElements(clones, whereToPlace, function() {
+      // Do whatever was supposed to do at completion.
+      if(Object.isFunction(onComplete)) {
+        onComplete();
+      }
+      // Finally, we place a script which fires a dom:loaded event. We are not just manually firing the event 
+      // because we want to make sure all other scripts have been loaded and parsed first.
+      whereToPlace.appendChild(new Element("script", {"type" : "text/javascript"}).update('document.fire("dom:loaded");'));
+    }.bind(this));
   },
 
   lbSaveForm: function() {

@@ -27,7 +27,6 @@ endFormat [NONE] [[style]=[color: #666666; ]]
 onWord [foo]
 onNewLine
 onWord [bar]
-onNewLine
 endGroup [[class]=[box code]]
 endMacroMarkerStandalone [code] [language=sh] [
 export X=foo

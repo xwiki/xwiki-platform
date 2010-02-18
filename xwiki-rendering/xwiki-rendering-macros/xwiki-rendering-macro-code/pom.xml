@@ -49,7 +49,8 @@
     <dependency>
       <groupId>pygments</groupId>
       <artifactId>pygments</artifactId>
-      <version>1.0-xwiki-1</version>
+      <version>1.2.2-xwiki</version>
+      <scope>runtime</scope>
     </dependency>
   </dependencies>
   <build>

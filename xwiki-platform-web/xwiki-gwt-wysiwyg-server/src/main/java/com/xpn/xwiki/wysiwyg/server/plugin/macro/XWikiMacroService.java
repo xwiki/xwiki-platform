@@ -40,7 +40,6 @@ import org.xwiki.rendering.macro.MacroManager;
 import org.xwiki.rendering.syntax.Syntax;
 import org.xwiki.rendering.syntax.SyntaxFactory;
 
-
 /**
  * XWiki specific implementation of {@link MacroService}.
  * 
@@ -121,6 +120,7 @@ public class XWikiMacroService implements MacroService
             result.setId(macroIdObject.getId());
             result.setName(descriptor.getName());
             result.setDescription(descriptor.getDescription());
+            result.setSupportingInlineMode(macro.supportsInlineMode());
             // NOTE: we should set the category also, but we need a new method in MacroCategoryManager.
             result.setContentDescriptor(contentDescriptor);
             result.setParameterDescriptorMap(parameterDescriptorMap);

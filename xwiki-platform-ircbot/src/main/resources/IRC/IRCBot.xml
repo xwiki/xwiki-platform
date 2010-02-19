@@ -12,8 +12,8 @@
 <customClass></customClass>
 <contentAuthor>XWiki.Admin</contentAuthor>
 <creationDate>1251635783000</creationDate>
-<date>1266577153000</date>
-<contentUpdateDate>1266577153000</contentUpdateDate>
+<date>1266581755000</date>
+<contentUpdateDate>1266581755000</contentUpdateDate>
 <version>1.1</version>
 <title>IRC Bot</title>
 <template></template>
@@ -101,96 +101,6 @@
 <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
 </validation>
 </class>
-<object>
-<class>
-<name>IRC.IRCBot</name>
-<customClass></customClass>
-<customMapping></customMapping>
-<defaultViewSheet></defaultViewSheet>
-<defaultEditSheet></defaultEditSheet>
-<defaultWeb></defaultWeb>
-<nameField></nameField>
-<validationScript></validationScript>
-<botname>
-<name>botname</name>
-<number>1</number>
-<picker>0</picker>
-<prettyName>Bot Name</prettyName>
-<size>30</size>
-<unmodifiable>0</unmodifiable>
-<validationMessage></validationMessage>
-<validationRegExp></validationRegExp>
-<classType>com.xpn.xwiki.objects.classes.StringClass</classType>
-</botname>
-<channel>
-<name>channel</name>
-<number>3</number>
-<picker>0</picker>
-<prettyName>Channel</prettyName>
-<size>30</size>
-<unmodifiable>0</unmodifiable>
-<validationMessage></validationMessage>
-<validationRegExp></validationRegExp>
-<classType>com.xpn.xwiki.objects.classes.StringClass</classType>
-</channel>
-<password>
-<algorithm></algorithm>
-<name>password</name>
-<number>4</number>
-<picker>0</picker>
-<prettyName>Password</prettyName>
-<size>30</size>
-<storageType>Hash</storageType>
-<unmodifiable>0</unmodifiable>
-<validationMessage></validationMessage>
-<validationRegExp></validationRegExp>
-<classType>com.xpn.xwiki.objects.classes.PasswordClass</classType>
-</password>
-<server>
-<name>server</name>
-<number>2</number>
-<picker>0</picker>
-<prettyName>Server</prettyName>
-<size>30</size>
-<unmodifiable>0</unmodifiable>
-<validationMessage></validationMessage>
-<validationRegExp></validationRegExp>
-<classType>com.xpn.xwiki.objects.classes.StringClass</classType>
-</server>
-<validation>
-<editor>PureText</editor>
-<name>validation</name>
-<number>5</number>
-<picker>0</picker>
-<prettyName>Validation</prettyName>
-<rows>8</rows>
-<size>100</size>
-<unmodifiable>0</unmodifiable>
-<validationMessage></validationMessage>
-<validationRegExp></validationRegExp>
-<classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
-</validation>
-</class>
-<name>IRC.IRCBot</name>
-<number>0</number>
-<className>IRC.IRCBot</className>
-<guid>a78386b7-eb71-4e92-b6a6-7700caa4c7c5</guid>
-<property>
-<botname>xwikibottest</botname>
-</property>
-<property>
-<channel>#xwikitest</channel>
-</property>
-<property>
-<password>hash:SHA-512:cf83e1357eefb8bdf1542850d66d8007d620e4050b5715dc83f4a921d36ce9ce47d0d13c5d85f2b0ff8318d2877eec2f63b931bd47417a81a538327af927da3e</password>
-</property>
-<property>
-<server>irc.freenode.net</server>
-</property>
-<property>
-<validation>return !source.fullName.startsWith("IRC.${bot.getChannels()[0][1..-1]}Archive")
-
-</validation></property></object>
 <object>
 <class>
 <name>XWiki.XWikiRights</name>
@@ -564,15 +474,16 @@ if (request.action == "start") {
     }
 
     // Start the bot
-    doc.use(doc.fullName)
-    def bot = new IRCBot(doc.getValue("botname"), doc.getValue("channel"), xwiki.XWiki, xcontext.getContext())
-    bot.connect(doc.getValue("server"))
-    if (doc.getValue("password").trim().length() &gt; 0) {
-        bot.identify(doc.getValue("password"))
+    def ircconfigdoc = xwiki.getDocument("IRC.IRCConfig")
+    ircconfigdoc.use(doc.fullName)
+    def bot = new IRCBot(ircconfigdoc.getValue("botname"), ircconfigdoc.getValue("channel"), xwiki.XWiki, xcontext.getContext())
+    bot.connect(ircconfigdoc.getValue("server"))
+    if (ircconfigdoc.getValue("password").trim().length() &gt; 0) {
+        bot.identify(ircconfigdoc.getValue("password"))
     }
     bot.start()
 
-    def listener = new IRCEventListener(bot, xwiki, xcontext, doc.getValue("validation"))
+    def listener = new IRCEventListener(bot, xwiki, xcontext, ircconfigdoc.getValue("validation"))
     observation.addListener(listener)
     println "{{info}}IRC Bot is now active{{/info}}"
 } else if (request.action == "stop") {
@@ -622,28 +533,17 @@ println "&lt;/form&gt;{{/html}}"
 == Bot parameters ==
 
 {{velocity}}
-$doc.use($doc.fullName)
-* Server: $doc.display("server")
-* Channel: $doc.display("channel")
-* Bot name: $doc.display("botname")
-* Password: $doc.display("password")
+#set ($ircconfigdoc = $xwiki.getDocument("IRC.IRCConfig"))
+$ircconfigdoc.use($doc.fullName)
+* Server: $ircconfigdoc.getValue("server")
+* Channel: $ircconfigdoc.getValue("channel")
+* Bot name: $ircconfigdoc.getValue("botname")
 * Validation script for events: (((
-#if ($context.action == "view")
-  {{code language="groovy"}}$doc.getValue("validation"){{/code}}
-#else
-  $doc.display("validation")
-#end
+{{code language="groovy"}}$ircconfigdoc.getValue("validation"){{/code}}
 )))
-
-#if ($context.action != "inline")
-{{html}}
-&lt;form method="get" action="$xwiki.getURL($doc.fullName, "inline")"&gt;
-  &lt;input type="submit" class="button" value="Edit"/&gt;
-&lt;/form&gt;
-{{/html}}
-#end
-
 {{/velocity}}
+
+To modify the configuration, go to the [[IRC Configuration page&gt;&gt;IRC.IRCConfig]].
 
 = Code =
 

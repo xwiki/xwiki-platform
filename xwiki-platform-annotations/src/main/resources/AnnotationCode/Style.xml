@@ -338,7 +338,7 @@
 }
 
 dt.annotation-label label {
-  color: #999999;
+  color: $theme.textPrimaryColor;
   font-variant: small-caps;
 }
 .annotationContent dt {

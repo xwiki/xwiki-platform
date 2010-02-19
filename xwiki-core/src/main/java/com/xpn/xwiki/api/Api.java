@@ -78,9 +78,9 @@ public class Api
     }
 
     /**
-     * Check if the current user has administration rights on the current space.
+     * Check if the current user has administration rights on the current wiki.
      * 
-     * @return <tt>true</tt> if the current user has the Admin right or <tt>false</tt> otherwise.
+     * @return <code>true</code> if the current user has the <code>admin</code> right or <code>false</code> otherwise.
      */
     public boolean hasAdminRights()
     {

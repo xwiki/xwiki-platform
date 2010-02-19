@@ -53,6 +53,11 @@ public interface XWikiRightService
 
     public boolean hasProgrammingRights(XWikiDocument doc, XWikiContext context);
 
+    /**
+     * Check if the current user has administration rights on the current wiki.
+     * 
+     * @return <code>true</code> if the current user has the <code>admin</code> right or <code>false</code> otherwise.
+     */
     public boolean hasAdminRights(XWikiContext context);
 
     public List<String> listAllLevels(XWikiContext context) throws XWikiException;

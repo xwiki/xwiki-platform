@@ -25,6 +25,7 @@ import org.xwiki.gwt.dom.client.Selection;
 import org.xwiki.gwt.user.client.ui.rta.RichTextArea;
 
 import com.google.gwt.core.client.GWT;
+import com.google.gwt.dom.client.Node;
 
 /**
  * Inserts an HTML fragment in place of the current selection. We overwrite the default implementation provided by the
@@ -64,18 +65,46 @@ public class InsertHTMLExecutable extends AbstractSelectionExecutable
     {
         Element container = rta.getDocument().createDivElement().cast();
         container.xSetInnerHTML(param);
+        return execute(container.extractContents());
+    }
 
+    /**
+     * Inserts the given node in place of the current rich text area selection.
+     * 
+     * @param node the node to be inserted in place of the current rich text area selection
+     * @return {@code true} if the execution was successful, {@code false} otherwise
+     */
+    public boolean execute(Node node)
+    {
         Selection selection = rta.getDocument().getSelection();
         Range range = selection.isCollapsed() ? selection.getRangeAt(0) : impl.deleteSelection(rta);
+        if (insertNode(range, node)) {
+            selection.removeAllRanges();
+            selection.addRange(range);
+            return true;
+        }
+        return false;
+    }
+
+    /**
+     * Inserts the given node at the specified position. The range that specifies where to insert the node must be
+     * collapsed.
+     * <p>
+     * In the current implementation the node will be wrapped by the range after the insertion. Derived classes may
+     * adopt a different behavior.
+     * 
+     * @param range specifies where you insert the node; the range must be initially collapsed
+     * @param node the node to be inserted
+     * @return {@code true} if the node was inserted successfully, {@code false} otherwise
+     */
+    protected boolean insertNode(Range range, Node node)
+    {
         // NOTE: Range#insertNode(Node) is not allowed to change the start point of the target range. This means that if
         // the range starts inside a text node then it will start in the same text node after the insertion, but at the
         // end (of course, the text node would have been split).
-        range.insertNode(container.extractContents());
+        range.insertNode(node);
         // In order to perfectly wrap the inserted nodes (see also the previous comment) we have to contract the range.
         contractRange(range);
-        selection.removeAllRanges();
-        selection.addRange(range);
-
         return true;
     }
 

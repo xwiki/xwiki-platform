@@ -94,6 +94,12 @@ public class Document extends Api
     protected Object currentObj;
 
     /**
+     * Used to convert a proper Document Reference to string (standard form).
+     */
+    private EntityReferenceSerializer<String> defaultEntityReferenceSerializer =
+        Utils.getComponent(EntityReferenceSerializer.class);
+    
+    /**
      * Used to convert a proper Document Reference to a string but without the wiki name.
      */
     private EntityReferenceSerializer<String> localEntityReferenceSerializer =
@@ -1798,7 +1804,7 @@ public class Document extends Api
         if (hasAccessLevel("edit")) {
             saveDocument(comment, minorEdit);
         } else {
-            java.lang.Object[] args = {this.doc.getFullName()};
+            java.lang.Object[] args = {this.defaultEntityReferenceSerializer.serialize(getDocumentReference())};
             throw new XWikiException(XWikiException.MODULE_XWIKI_ACCESS, XWikiException.ERROR_XWIKI_ACCESS_DENIED,
                 "Access denied in edit mode on document {0}", null, args);
         }

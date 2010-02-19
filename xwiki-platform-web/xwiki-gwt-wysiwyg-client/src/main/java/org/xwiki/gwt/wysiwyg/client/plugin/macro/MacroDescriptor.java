@@ -63,6 +63,11 @@ public class MacroDescriptor implements IsSerializable
     private ParameterDescriptor contentDescriptor;
 
     /**
+     * Flag indicating if this macro supports in-line mode.
+     */
+    private boolean supportingInlineMode;
+
+    /**
      * @return the macro identifier
      */
     public String getId()
@@ -168,5 +173,23 @@ public class MacroDescriptor implements IsSerializable
     public void setContentDescriptor(ParameterDescriptor contentDescriptor)
     {
         this.contentDescriptor = contentDescriptor;
+    }
+
+    /**
+     * @return {@code true} if this macro supports in-line mode, {@code false} otherwise
+     */
+    public boolean isSupportingInlineMode()
+    {
+        return supportingInlineMode;
+    }
+
+    /**
+     * Sets the flag which indicates if this macro supports in-line mode.
+     * 
+     * @param supportingInlineMode {@code true} if this macro is allowed in-line, {@code false} otherwise
+     */
+    public void setSupportingInlineMode(boolean supportingInlineMode)
+    {
+        this.supportingInlineMode = supportingInlineMode;
     }
 }

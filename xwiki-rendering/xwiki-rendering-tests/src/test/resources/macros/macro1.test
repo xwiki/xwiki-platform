@@ -15,12 +15,8 @@ content
 beginDocument
 onMacroStandalone [testsimplemacro] []
 onMacroStandalone [testsimplemacro] [param1=value1|param2=value2]
-onMacroStandalone [testsimplemacro] [param1=value1|param2=value2] [
-content
-]
-onMacroStandalone [testsimplemacro] [] [
-content
-]
+onMacroStandalone [testsimplemacro] [param1=value1|param2=value2] [content]
+onMacroStandalone [testsimplemacro] [] [content]
 endDocument
 .#-----------------------------------------------------
 .expect|xhtml/1.0
@@ -28,11 +24,7 @@ endDocument
 .#-----------------------------------------------------
 .expect|annotatedxhtml/1.0
 .#-----------------------------------------------------
-<!--startmacro:testsimplemacro|-|--><!--stopmacro--><!--startmacro:testsimplemacro|-|param1="value1" param2="value2"--><!--stopmacro--><!--startmacro:testsimplemacro|-|param1="value1" param2="value2"|-|
-content
---><!--stopmacro--><!--startmacro:testsimplemacro|-||-|
-content
---><!--stopmacro-->
+<!--startmacro:testsimplemacro|-|--><!--stopmacro--><!--startmacro:testsimplemacro|-|param1="value1" param2="value2"--><!--stopmacro--><!--startmacro:testsimplemacro|-|param1="value1" param2="value2"|-|content--><!--stopmacro--><!--startmacro:testsimplemacro|-||-|content--><!--stopmacro-->
 .#-----------------------------------------------------
 .expect|xwiki/2.0
 .#-----------------------------------------------------
@@ -50,11 +42,7 @@ content
 .#-----------------------------------------------------
 .input|xhtml/1.0
 .#-----------------------------------------------------
-<!--startmacro:testsimplemacro|-|--><!--stopmacro--><!--startmacro:testsimplemacro|-|param1="value1" param2="value2"--><!--stopmacro--><!--startmacro:testsimplemacro|-|param1="value1" param2="value2"|-|
-content
---><!--stopmacro--><!--startmacro:testsimplemacro|-||-|
-content
---><!--stopmacro-->
+<!--startmacro:testsimplemacro|-|--><!--stopmacro--><!--startmacro:testsimplemacro|-|param1="value1" param2="value2"--><!--stopmacro--><!--startmacro:testsimplemacro|-|param1="value1" param2="value2"|-|content--><!--stopmacro--><!--startmacro:testsimplemacro|-||-|content--><!--stopmacro-->
 .#-----------------------------------------------------
 .expect|plain/1.0
 .#-----------------------------------------------------

@@ -17,13 +17,11 @@
 .expect|event/1.0
 .#-----------------------------------------------------
 beginDocument
-beginMacroMarkerStandalone [velocity] [] [
-#macro(somemacro)
+beginMacroMarkerStandalone [velocity] [] [#macro(somemacro)
 "macro content"
 #end
 
-#somemacro()
-]
+#somemacro()]
 beginParagraph
 onSpecialSymbol ["]
 onWord [macro]
@@ -31,25 +29,19 @@ onSpace
 onWord [content]
 onSpecialSymbol ["]
 endParagraph
-endMacroMarkerStandalone [velocity] [] [
-#macro(somemacro)
+endMacroMarkerStandalone [velocity] [] [#macro(somemacro)
 "macro content"
 #end
 
-#somemacro()
-]
-beginMacroMarkerStandalone [velocity] [] [
-#somemacro()
-]
+#somemacro()]
+beginMacroMarkerStandalone [velocity] [] [#somemacro()]
 beginParagraph
 onSpecialSymbol [#]
 onWord [somemacro]
 onSpecialSymbol [(]
 onSpecialSymbol [)]
 endParagraph
-endMacroMarkerStandalone [velocity] [] [
-#somemacro()
-]
+endMacroMarkerStandalone [velocity] [] [#somemacro()]
 endDocument
 .#-----------------------------------------------------
 .expect|xhtml/1.0

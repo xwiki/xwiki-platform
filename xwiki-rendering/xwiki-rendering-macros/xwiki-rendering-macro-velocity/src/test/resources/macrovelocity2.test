@@ -11,12 +11,10 @@
 .expect|event/1.0
 .#-----------------------------------------------------
 beginDocument
-beginMacroMarkerStandalone [velocity] [] [
-#set ($list = ['one', 'two'])
+beginMacroMarkerStandalone [velocity] [] [#set ($list = ['one', 'two'])
 #foreach ($item in $list)
 * $item
-#end
-]
+#end]
 beginList [BULLETED]
 beginListItem
 onWord [one]
@@ -25,10 +23,8 @@ beginListItem
 onWord [two]
 endListItem
 endList [BULLETED]
-endMacroMarkerStandalone [velocity] [] [
-#set ($list = ['one', 'two'])
+endMacroMarkerStandalone [velocity] [] [#set ($list = ['one', 'two'])
 #foreach ($item in $list)
 * $item
-#end
-]
+#end]
 endDocument

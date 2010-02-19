@@ -39,10 +39,6 @@
       <version>${pom.version}</version>
     </dependency>
     <dependency>
-      <groupId>org.wikimodel</groupId>
-      <artifactId>org.wikimodel.wem</artifactId>
-    </dependency>
-    <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-core-bridge</artifactId>
       <version>${pom.version}</version>

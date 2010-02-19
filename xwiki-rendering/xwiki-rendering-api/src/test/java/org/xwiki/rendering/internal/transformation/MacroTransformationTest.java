@@ -211,22 +211,4 @@ public class MacroTransformationTest extends AbstractXWikiComponentTestCase
             + "endDocument";
         assertEquals(expected, printer.toString());
     }
-    
-    /**
-     * Verify that
-     * <pre><code>{{macro}}
-     * content
-     * {{/macro}}</code></pre>
-     * is equivalent to:
-     * <pre><code>{{macro}}content{{/macro}}</code></pre>
-     */
-    public void testMacroTransformationWithLeadingAndTrailingNewLines() throws Exception
-    {
-        XDOM dom = new XDOM(Arrays.asList((Block) new MacroBlock("testcontentmacro",
-            Collections.<String, String>emptyMap(), "\nhello\n", false)));
-        
-        this.transformation.transform(dom, new Syntax(SyntaxType.XWIKI, "2.0"));
-
-        assertEquals("hello", dom.getChildrenByType(WordBlock.class, true).get(0).getWord());
-    }
 }

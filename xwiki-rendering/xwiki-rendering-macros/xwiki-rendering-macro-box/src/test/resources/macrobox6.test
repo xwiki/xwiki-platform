@@ -51,4 +51,6 @@ endDocument
 .#-----------------------------------------------------
 An {{box}}Inline box {{/box}} first
 
-{{box}}A box that should not be inline{{/box}}
+{{box}}
+A box that should not be inline
+{{/box}}

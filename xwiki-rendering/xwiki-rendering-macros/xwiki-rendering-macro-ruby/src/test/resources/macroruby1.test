@@ -10,17 +10,13 @@ puts "Hello World"
 .expect|event/1.0
 .#-----------------------------------------------------
 beginDocument
-beginMacroMarkerStandalone [ruby] [] [
-puts "Hello World"
-]
+beginMacroMarkerStandalone [ruby] [] [puts "Hello World"]
 beginParagraph
 onWord [Hello]
 onSpace
 onWord [World]
 endParagraph
-endMacroMarkerStandalone [ruby] [] [
-puts "Hello World"
-]
+endMacroMarkerStandalone [ruby] [] [puts "Hello World"]
 beginSection
 beginHeader [1, HHello]
 onWord [Hello]

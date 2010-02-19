@@ -5,4 +5,6 @@ $var.method
 .#-----------------------------------------------------
 .expect|xwiki/2.0
 .#-----------------------------------------------------
-{{velocity filter="none"}}{{html clean="false" wiki="true"}}$var.method{{/html}}{{/velocity}}
+{{velocity filter="none"}}
+{{html clean="false" wiki="true"}}$var.method{{/html}}
+{{/velocity}}

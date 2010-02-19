@@ -9,16 +9,12 @@
 .expect|event/1.0
 .#-----------------------------------------------------
 beginDocument
-beginMacroMarkerStandalone [code] [language=none] [
-<b>bold</b>
-<i>italic</i>
-]
+beginMacroMarkerStandalone [code] [language=none] [<b>bold</b>
+<i>italic</i>]
 beginGroup [[class]=[box code]]
 onVerbatim [<b>bold</b>
 <i>italic</i>] [false]
 endGroup [[class]=[box code]]
-endMacroMarkerStandalone [code] [language=none] [
-<b>bold</b>
-<i>italic</i>
-]
+endMacroMarkerStandalone [code] [language=none] [<b>bold</b>
+<i>italic</i>]
 endDocument

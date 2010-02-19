@@ -36,7 +36,9 @@ endDocument
 .#-----------------------------------------------------
 An {{testsimpleinlinemacro}}Inline macro {{/testsimpleinlinemacro}} first
 
-{{testsimpleinlinemacro}}A macro that should not be inline{{/testsimpleinlinemacro}}
+{{testsimpleinlinemacro}}
+A macro that should not be inline
+{{/testsimpleinlinemacro}}
 .#-----------------------------------------------------
 .input|xhtml/1.0
 .#-----------------------------------------------------

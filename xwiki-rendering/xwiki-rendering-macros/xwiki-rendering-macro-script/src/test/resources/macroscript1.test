@@ -8,15 +8,11 @@ script here
 .expect|event/1.0
 .#-----------------------------------------------------
 beginDocument
-beginMacroMarkerStandalone [script] [] [
-script here
-]
+beginMacroMarkerStandalone [script] [] [script here]
 beginParagraph
 onWord [script]
 onSpace
 onWord [here]
 endParagraph
-endMacroMarkerStandalone [script] [] [
-script here
-]
+endMacroMarkerStandalone [script] [] [script here]
 endDocument

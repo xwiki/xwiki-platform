@@ -33,7 +33,7 @@ public class XWikiSyntaxMacroRenderer
 {
     private ParametersPrinter parametersPrinter = new ParametersPrinter();
 
-    public String renderMacro(String id, Map<String, String> parameters, String content)
+    public String renderMacro(String id, Map<String, String> parameters, String content, boolean isInline)
     {
         StringBuffer buffer = new StringBuffer();
 
@@ -52,7 +52,15 @@ public class XWikiSyntaxMacroRenderer
             buffer.append("/}}");
         } else {
             buffer.append("}}");
-            buffer.append(content);
+            if (content.length() > 0) {
+                if (!isInline) {
+                    buffer.append("\n");
+                }
+                buffer.append(content);
+                if (!isInline) {
+                    buffer.append("\n");
+                }
+            }
             buffer.append("{{/").append(id).append("}}");
         }
 

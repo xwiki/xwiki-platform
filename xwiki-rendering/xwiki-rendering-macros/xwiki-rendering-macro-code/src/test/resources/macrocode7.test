@@ -9,10 +9,8 @@ Yahoo! : {{map location="10, rue Pernety, Paris, France" service="yahoo" size="s
 .expect|event/1.0
 .#-----------------------------------------------------
 beginDocument
-beginMacroMarkerStandalone [code] [language=django] [
-Google : {{map location="Romania" service="google" size="small" zoom="country"/}} 
-Yahoo! : {{map location="10, rue Pernety, Paris, France" service="yahoo" size="small" message="One of the XWiki Offices"/}}
-]
+beginMacroMarkerStandalone [code] [language=django] [Google : {{map location="Romania" service="google" size="small" zoom="country"/}} 
+Yahoo! : {{map location="10, rue Pernety, Paris, France" service="yahoo" size="small" message="One of the XWiki Offices"/}}]
 beginGroup [[class]=[box code]]
 onWord [Google]
 onSpace
@@ -169,18 +167,14 @@ onSpecialSymbol [}]
 onSpecialSymbol [}]
 endFormat [NONE] [[style]=[color: #BC7A00; ]]
 endGroup [[class]=[box code]]
-endMacroMarkerStandalone [code] [language=django] [
-Google : {{map location="Romania" service="google" size="small" zoom="country"/}} 
-Yahoo! : {{map location="10, rue Pernety, Paris, France" service="yahoo" size="small" message="One of the XWiki Offices"/}}
-]
+endMacroMarkerStandalone [code] [language=django] [Google : {{map location="Romania" service="google" size="small" zoom="country"/}} 
+Yahoo! : {{map location="10, rue Pernety, Paris, France" service="yahoo" size="small" message="One of the XWiki Offices"/}}]
 endDocument
 .#-----------------------------------------------------
 .expect|annotatedxhtml/1.0
 .#-----------------------------------------------------
-<!--startmacro:code|-|language="django"|-|
-Google : {{map location="Romania" service="google" size="small" zoom="country"/}} 
-Yahoo! : {{map location="10, rue Pernety, Paris, France" service="yahoo" size="small" message="One of the XWiki Offices"/}}
---><div class="box code">Google : <span style="color: #BC7A00; ">{{</span><span style="color: #19177C; ">map</span> <span style="color: #19177C; ">location</span><span style="color: #666666; ">=</span><span style="color: #BA2121; ">"Romania"</span> <span style="color: #19177C; ">service</span><span style="color: #666666; ">=</span><span style="color: #BA2121; ">"google"</span> <span style="color: #19177C; ">size</span><span style="color: #666666; ">=</span><span style="color: #BA2121; ">"small"</span> <span style="color: #19177C; ">zoom</span><span style="color: #666666; ">=</span><span style="color: #BA2121; ">"country"</span><span style="color: #666666; ">/</span><span style="color: #BC7A00; ">}}</span> <br/>Yahoo! : <span style="color: #BC7A00; ">{{</span><span style="color: #19177C; ">map</span> <span style="color: #19177C; ">location</span><span style="color: #666666; ">=</span><span style="color: #BA2121; ">"10, rue Pernety, Paris, France"</span> <span style="color: #19177C; ">service</span><span style="color: #666666; ">=</span><span style="color: #BA2121; ">"yahoo"</span> <span style="color: #19177C; ">size</span><span style="color: #666666; ">=</span><span style="color: #BA2121; ">"small"</span> <span style="color: #19177C; ">message</span><span style="color: #666666; ">=</span><span style="color: #BA2121; ">"One of the XWiki Offices"</span><span style="color: #666666; ">/</span><span style="color: #BC7A00; ">}}</span></div><!--stopmacro-->
+<!--startmacro:code|-|language="django"|-|Google : {{map location="Romania" service="google" size="small" zoom="country"/}} 
+Yahoo! : {{map location="10, rue Pernety, Paris, France" service="yahoo" size="small" message="One of the XWiki Offices"/}}--><div class="box code">Google : <span style="color: #BC7A00; ">{{</span><span style="color: #19177C; ">map</span> <span style="color: #19177C; ">location</span><span style="color: #666666; ">=</span><span style="color: #BA2121; ">"Romania"</span> <span style="color: #19177C; ">service</span><span style="color: #666666; ">=</span><span style="color: #BA2121; ">"google"</span> <span style="color: #19177C; ">size</span><span style="color: #666666; ">=</span><span style="color: #BA2121; ">"small"</span> <span style="color: #19177C; ">zoom</span><span style="color: #666666; ">=</span><span style="color: #BA2121; ">"country"</span><span style="color: #666666; ">/</span><span style="color: #BC7A00; ">}}</span> <br/>Yahoo! : <span style="color: #BC7A00; ">{{</span><span style="color: #19177C; ">map</span> <span style="color: #19177C; ">location</span><span style="color: #666666; ">=</span><span style="color: #BA2121; ">"10, rue Pernety, Paris, France"</span> <span style="color: #19177C; ">service</span><span style="color: #666666; ">=</span><span style="color: #BA2121; ">"yahoo"</span> <span style="color: #19177C; ">size</span><span style="color: #666666; ">=</span><span style="color: #BA2121; ">"small"</span> <span style="color: #19177C; ">message</span><span style="color: #666666; ">=</span><span style="color: #BA2121; ">"One of the XWiki Offices"</span><span style="color: #666666; ">/</span><span style="color: #BC7A00; ">}}</span></div><!--stopmacro-->
 .#-----------------------------------------------------
 .expect|xwiki/2.0
 .#-----------------------------------------------------
@@ -191,7 +185,5 @@ Yahoo! : {{map location="10, rue Pernety, Paris, France" service="yahoo" size="s
 .#-----------------------------------------------------
 .input|xhtml/1.0
 .#-----------------------------------------------------
-<!--startmacro:code|-|language="django"|-|
-Google : {{map location="Romania" service="google" size="small" zoom="country"/}} 
-Yahoo! : {{map location="10, rue Pernety, Paris, France" service="yahoo" size="small" message="One of the XWiki Offices"/}}
---><div class="box code">Google : <span style="color: #BC7A00; ">{{</span><span style="color: #19177C; ">map</span> <span style="color: #19177C; ">location</span><span style="color: #666666; ">=</span><span style="color: #BA2121; ">"Romania"</span> <span style="color: #19177C; ">service</span><span style="color: #666666; ">=</span><span style="color: #BA2121; ">"google"</span> <span style="color: #19177C; ">size</span><span style="color: #666666; ">=</span><span style="color: #BA2121; ">"small"</span> <span style="color: #19177C; ">zoom</span><span style="color: #666666; ">=</span><span style="color: #BA2121; ">"country"</span><span style="color: #666666; ">/</span><span style="color: #BC7A00; ">}}</span> <br/>Yahoo! : <span style="color: #BC7A00; ">{{</span><span style="color: #19177C; ">map</span> <span style="color: #19177C; ">location</span><span style="color: #666666; ">=</span><span style="color: #BA2121; ">"10, rue Pernety, Paris, France"</span> <span style="color: #19177C; ">service</span><span style="color: #666666; ">=</span><span style="color: #BA2121; ">"yahoo"</span> <span style="color: #19177C; ">size</span><span style="color: #666666; ">=</span><span style="color: #BA2121; ">"small"</span> <span style="color: #19177C; ">message</span><span style="color: #666666; ">=</span><span style="color: #BA2121; ">"One of the XWiki Offices"</span><span style="color: #666666; ">/</span><span style="color: #BC7A00; ">}}</span></div><!--stopmacro-->
+<!--startmacro:code|-|language="django"|-|Google : {{map location="Romania" service="google" size="small" zoom="country"/}} 
+Yahoo! : {{map location="10, rue Pernety, Paris, France" service="yahoo" size="small" message="One of the XWiki Offices"/}}--><div class="box code">Google : <span style="color: #BC7A00; ">{{</span><span style="color: #19177C; ">map</span> <span style="color: #19177C; ">location</span><span style="color: #666666; ">=</span><span style="color: #BA2121; ">"Romania"</span> <span style="color: #19177C; ">service</span><span style="color: #666666; ">=</span><span style="color: #BA2121; ">"google"</span> <span style="color: #19177C; ">size</span><span style="color: #666666; ">=</span><span style="color: #BA2121; ">"small"</span> <span style="color: #19177C; ">zoom</span><span style="color: #666666; ">=</span><span style="color: #BA2121; ">"country"</span><span style="color: #666666; ">/</span><span style="color: #BC7A00; ">}}</span> <br/>Yahoo! : <span style="color: #BC7A00; ">{{</span><span style="color: #19177C; ">map</span> <span style="color: #19177C; ">location</span><span style="color: #666666; ">=</span><span style="color: #BA2121; ">"10, rue Pernety, Paris, France"</span> <span style="color: #19177C; ">service</span><span style="color: #666666; ">=</span><span style="color: #BA2121; ">"yahoo"</span> <span style="color: #19177C; ">size</span><span style="color: #666666; ">=</span><span style="color: #BA2121; ">"small"</span> <span style="color: #19177C; ">message</span><span style="color: #666666; ">=</span><span style="color: #BA2121; ">"One of the XWiki Offices"</span><span style="color: #666666; ">/</span><span style="color: #BC7A00; ">}}</span></div><!--stopmacro-->

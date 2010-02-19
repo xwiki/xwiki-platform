@@ -13,13 +13,9 @@
 .expect|event/1.0
 .#-----------------------------------------------------
 beginDocument
-beginMacroMarkerStandalone [html] [clean=false|wiki=true] [
-<unknown>
-* item
-]
+beginMacroMarkerStandalone [html] [clean=false|wiki=true] [<unknown>
+* item]
 onRawText [<unknown><ul><li>item</li></ul>] [xhtml/1.0]
-endMacroMarkerStandalone [html] [clean=false|wiki=true] [
-<unknown>
-* item
-]
+endMacroMarkerStandalone [html] [clean=false|wiki=true] [<unknown>
+* item]
 endDocument

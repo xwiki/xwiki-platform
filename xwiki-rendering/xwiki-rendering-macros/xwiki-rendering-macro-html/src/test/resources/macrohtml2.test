@@ -23,29 +23,25 @@
 .expect|event/1.0
 .#-------------------------------------------------------------------------------------------
 beginDocument
-beginMacroMarkerStandalone [html] [wiki=true] [
-<table>
+beginMacroMarkerStandalone [html] [wiki=true] [<table>
 <tr>
 <td>
 * [[listitem]]
 
 </td>
 </tr>
-</table>
-]
+</table>]
 onRawText [
 
 
 
 <table><tbody><tr><td><ul><li><span class="wikiexternallink"><a href="listitem"><span class="wikigeneratedlinkcontent">listitem</span></a></span></li></ul></td></tr></tbody></table>] [xhtml/1.0]
-endMacroMarkerStandalone [html] [wiki=true] [
-<table>
+endMacroMarkerStandalone [html] [wiki=true] [<table>
 <tr>
 <td>
 * [[listitem]]
 
 </td>
 </tr>
-</table>
-]
+</table>]
 endDocument

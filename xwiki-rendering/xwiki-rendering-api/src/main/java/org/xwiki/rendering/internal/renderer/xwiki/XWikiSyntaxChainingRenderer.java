@@ -361,9 +361,9 @@ public class XWikiSyntaxChainingRenderer extends AbstractChainingPrintRenderer i
     {
         if (!isInline) {
             printEmptyLine();
-            print(getMacroPrinter().renderMacro(id, parameters, content));
+            print(getMacroPrinter().renderMacro(id, parameters, content, isInline));
         } else {
-            getXWikiPrinter().printInlineMacro(getMacroPrinter().renderMacro(id, parameters, content));
+            getXWikiPrinter().printInlineMacro(getMacroPrinter().renderMacro(id, parameters, content, isInline));
         }
     }
 
@@ -524,7 +524,7 @@ public class XWikiSyntaxChainingRenderer extends AbstractChainingPrintRenderer i
 
         popPrinter();
 
-        print(getMacroPrinter().renderMacro(name, parameters, content));
+        print(getMacroPrinter().renderMacro(name, parameters, content, isInline));
     }
 
     /**

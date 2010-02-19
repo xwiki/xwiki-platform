@@ -12,10 +12,18 @@ message")
 .#-----------------------------------------------------
 .expect|xwiki/2.0
 .#-----------------------------------------------------
-{{error}}message{{/error}}
+{{error}}
+message
+{{/error}}
 
-{{error}}**bold message**{{/error}}
+{{error}}
+**bold message**
+{{/error}}
 
-{{error}}multilines message{{/error}}
+{{error}}
+multilines message
+{{/error}}
 
-{{error}}{{toc start=2 depth=6 numbered=false/}}{{/error}}
+{{error}}
+{{toc start=2 depth=6 numbered=false/}}
+{{/error}}

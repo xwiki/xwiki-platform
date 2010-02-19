@@ -7,6 +7,8 @@
 .#-----------------------------------------------------
 .expect|xwiki/2.0
 .#-----------------------------------------------------
-{{groovy}} out.println("value") {{/groovy}}
+{{groovy}}
+ out.println("value") 
+{{/groovy}}
 
 {{groovy}} out.println("value") {{/groovy}} some text {{groovy}} out.println("value"){{/groovy}}

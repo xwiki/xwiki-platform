@@ -10,17 +10,13 @@ print "Hello World"
 .expect|event/1.0
 .#-----------------------------------------------------
 beginDocument
-beginMacroMarkerStandalone [python] [] [
-print "Hello World"
-]
+beginMacroMarkerStandalone [python] [] [print "Hello World"]
 beginParagraph
 onWord [Hello]
 onSpace
 onWord [World]
 endParagraph
-endMacroMarkerStandalone [python] [] [
-print "Hello World"
-]
+endMacroMarkerStandalone [python] [] [print "Hello World"]
 beginSection
 beginHeader [1, HHello]
 onWord [Hello]

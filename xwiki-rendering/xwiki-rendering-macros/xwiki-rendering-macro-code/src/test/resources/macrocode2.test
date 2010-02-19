@@ -10,10 +10,8 @@
 .expect|event/1.0
 .#-----------------------------------------------------
 beginDocument
-beginMacroMarkerStandalone [code] [language=java] [
-<b>bold</b>
-<i>italic</i>
-]
+beginMacroMarkerStandalone [code] [language=java] [<b>bold</b>
+<i>italic</i>]
 beginGroup [[class]=[box code]]
 beginFormat [NONE] [[style]=[color: #666666; ]]
 onSpecialSymbol [<]
@@ -49,8 +47,6 @@ beginFormat [NONE] [[style]=[color: #666666; ]]
 onSpecialSymbol [>]
 endFormat [NONE] [[style]=[color: #666666; ]]
 endGroup [[class]=[box code]]
-endMacroMarkerStandalone [code] [language=java] [
-<b>bold</b>
-<i>italic</i>
-]
+endMacroMarkerStandalone [code] [language=java] [<b>bold</b>
+<i>italic</i>]
 endDocument

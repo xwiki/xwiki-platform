@@ -11,25 +11,17 @@ script here
 .expect|event/1.0
 .#-----------------------------------------------------
 beginDocument
-beginMacroMarkerStandalone [script] [] [
-{{script}}
+beginMacroMarkerStandalone [script] [] [{{script}}
 script here
-{{/script}}
-]
-beginMacroMarkerStandalone [script] [] [
-script here
-]
+{{/script}}]
+beginMacroMarkerStandalone [script] [] [script here]
 beginParagraph
 onWord [script]
 onSpace
 onWord [here]
 endParagraph
-endMacroMarkerStandalone [script] [] [
+endMacroMarkerStandalone [script] [] [script here]
+endMacroMarkerStandalone [script] [] [{{script}}
 script here
-]
-endMacroMarkerStandalone [script] [] [
-{{script}}
-script here
-{{/script}}
-]
+{{/script}}]
 endDocument

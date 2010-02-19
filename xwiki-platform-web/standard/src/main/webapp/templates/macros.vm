@@ -1599,11 +1599,22 @@ ${Msz}Mb##
               #else
                 #set($isSortable = false)
               #end
+              ## Determine the name to be displayed in the column header. Strategy is as following :
+              ## - If defined the displayName passed as a column option wins
+              ## - If not, and if a i18n prefix has been passed, we use the localization tool with the prefix + the column name
+              ## - Finally, we fall back on the column name
+              #if("$!colprop.displayName" != '') 
+                #set($displayName = $colprop.displayName)
+              #elseif($transprefix != '')
+                #set($displayName = $msg.get("${transprefix}${colname}"))
+              #else
+                #set($displayName = $colname)
+              #end
               #if($colname != "_actions" || $hasAdmin)
               <th class="xwiki-livetable-display-header-text #if($isSortable)sortable #if($colname == $selectedColumn)selected $defaultOrder#else asc#end#end" #if("$!colprop.type"=="hidden")style="display: none"#end scope="col">
                 #if($isSortable)<a rel="${colname}">#end
                 #if($isFilterable && ("$!colprop.type"=="text"||"$!colprop.type"=="number"))<label for="xwiki-livetable-${divid}-filter-${velocityCount}">#end
-                $msg.get("${transprefix}${colname}")
+                $displayName
                 #if($isFilterable && ("$!colprop.type"=="text"||"$!colprop.type"=="number"))</label>#end
                 #if($isSortable)</a>#end
               </th>

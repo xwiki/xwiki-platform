@@ -21,13 +21,13 @@ package org.xwiki.gwt.wysiwyg.client.plugin.table.feature;
 
 import java.util.EnumSet;
 
-import org.xwiki.gwt.dom.client.DOMUtils;
 import org.xwiki.gwt.dom.client.Document;
 import org.xwiki.gwt.dom.client.Element;
 import org.xwiki.gwt.dom.client.Range;
 import org.xwiki.gwt.dom.client.Selection;
 import org.xwiki.gwt.user.client.StringUtils;
 import org.xwiki.gwt.user.client.ui.rta.cmd.Command;
+import org.xwiki.gwt.user.client.ui.rta.cmd.internal.InsertBlockHTMLExecutable;
 import org.xwiki.gwt.user.client.ui.wizard.Wizard;
 import org.xwiki.gwt.user.client.ui.wizard.WizardListener;
 import org.xwiki.gwt.user.client.ui.wizard.WizardStepMap;
@@ -40,7 +40,6 @@ import org.xwiki.gwt.wysiwyg.client.plugin.table.ui.TableConfigWizardStep;
 import org.xwiki.gwt.wysiwyg.client.plugin.table.util.TableConfig;
 import org.xwiki.gwt.wysiwyg.client.plugin.table.util.TableUtils;
 
-import com.google.gwt.dom.client.Node;
 import com.google.gwt.user.client.ui.Image;
 
 /**
@@ -66,6 +65,13 @@ public class InsertTable extends AbstractTableFeature implements WizardListener
     private Wizard wizard;
 
     /**
+     * The object used to insert the table.
+     * <p>
+     * NOTE: This class should extend {@link InsertBlockHTMLExecutable} instead of aggregating it.
+     */
+    private final InsertBlockHTMLExecutable insertBlockHTMLExecutable;
+
+    /**
      * Initialize the feature. Table features needs to be aware of the plug-in (here the ClickListener) since they hold
      * their own PushButton.
      * 
@@ -74,6 +80,7 @@ public class InsertTable extends AbstractTableFeature implements WizardListener
     public InsertTable(TablePlugin plugin)
     {
         super(NAME, new Command(NAME), Strings.INSTANCE.insertTable(), plugin);
+        insertBlockHTMLExecutable = new InsertBlockHTMLExecutable(rta);
     }
 
     /**
@@ -153,37 +160,16 @@ public class InsertTable extends AbstractTableFeature implements WizardListener
      */
     public void insertTable(TableConfig config)
     {
-        Selection selection = rta.getDocument().getSelection();
-        if (!selection.isCollapsed()) {
-            // Delete the selected contents. The table will be inserted in place of the deleted text.
-            // NOTE: We cannot use Range#deleteContents because it may lead to DTD-invalid HTML. That's because it
-            // operates on any DOM tree without taking care of the underlying XML syntax, (X)HTML in our case. Let's use
-            // the Delete command instead which is HTML-aware. Moreover, others could listen to this command and adjust
-            // the DOM before we insert the table.
-            rta.getCommandManager().execute(Command.DELETE);
-        }
-
-        // At this point the selection should be collapsed.
-        // Split the DOM tree up to the nearest flow container and insert the table.
-        Range range = selection.getRangeAt(0);
-        Node start = range.getStartContainer();
-        int offset = range.getStartOffset();
-        Node flowContainer = DOMUtils.getInstance().getNearestFlowContainer(start);
-        if (flowContainer == null) {
-            return;
-        }
         Element table = createTable(rta.getDocument(), config);
-        if (flowContainer == start) {
-            DOMUtils.getInstance().insertAt(flowContainer, table, offset);
-        } else {
-            DOMUtils.getInstance().splitHTMLNode(flowContainer, start, offset);
-            DOMUtils.getInstance().insertAfter(table, DOMUtils.getInstance().getChild(flowContainer, start));
-        }
+        insertBlockHTMLExecutable.execute(table);
 
         // Place the caret at the beginning of the first cell.
-        range.selectNodeContents(DOMUtils.getInstance().getFirstDescendant(table,
-            config.hasHeader() ? TableUtils.COL_HNODENAME : TableUtils.COL_NODENAME));
-        range.collapse(false);
+        Range range = rta.getDocument().createRange();
+        range.selectNodeContents(domUtils.getFirstDescendant(table, config.hasHeader() ? TableUtils.COL_HNODENAME
+            : TableUtils.COL_NODENAME));
+        range.collapse(true);
+
+        Selection selection = rta.getDocument().getSelection();
         selection.removeAllRanges();
         selection.addRange(range);
     }

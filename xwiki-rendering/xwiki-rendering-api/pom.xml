@@ -146,7 +146,7 @@
             **/rendering/renderer/xhtml/*.java,
             **/rendering/syntax/SyntaxFactory.java,
             **/rendering/transformation/*.java,
-            **/rendering/util/*.java,
+            **/rendering/util/ParserUtils.java,
             **/rendering/wiki/*.java
           </includes>
           <excludes>

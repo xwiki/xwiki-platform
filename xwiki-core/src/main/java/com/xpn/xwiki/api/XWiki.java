@@ -564,7 +564,7 @@ public class XWiki extends Api
     }
 
     /**
-     * API allowing to search for documents allowing to have mutliple entries per language
+     * API allowing to search for documents allowing to have multiple entries per language
      * 
      * @param wheresql query to use similar to searchDocuments(wheresql)
      * @param distinctbylanguage true to return multiple rows per language

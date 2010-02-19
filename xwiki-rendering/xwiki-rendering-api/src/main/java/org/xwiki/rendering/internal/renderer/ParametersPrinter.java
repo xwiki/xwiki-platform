@@ -33,6 +33,7 @@ public class ParametersPrinter
      * Print parameters in a String.
      * 
      * @param parameters the parameters to print.
+     * @param escapeChar the character used in front of a special character when need to escape it
      * @return the printed parameters.
      */
     public String print(Map<String, String> parameters, char escapeChar)

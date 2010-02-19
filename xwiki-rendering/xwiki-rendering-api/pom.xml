@@ -131,10 +131,7 @@
             **/rendering/internal/converter/*.java,
             **/rendering/internal/macro/*.java,
             **/rendering/internal/parser/*.java,
-            **/rendering/internal/renderer/BasicLinkRenderer.java,
-            **/rendering/internal/renderer/DefaultLinkLabelGenerator.java,
-            **/rendering/internal/renderer/AttachURILabelGenerator.java,
-            **/rendering/internal/renderer/MailtoURILabelGenerator.java,
+            **/rendering/internal/renderer/*.java,
             **/rendering/listener/*.java,
             **/rendering/listener/chaining/AbstractChainingListener.java,
             **/rendering/listener/chaining/ChainingListener.java,
@@ -147,9 +144,10 @@
             **/rendering/renderer/printer/DefaultWikiPrinter.java,
             **/rendering/renderer/printer/WikiPrinter.java,
             **/rendering/renderer/xhtml/*.java,
+            **/rendering/syntax/SyntaxFactory.java,
             **/rendering/transformation/*.java,
-            **/rendering/util/*.java
-            **/rendering/syntax/SyntaxFactory.java
+            **/rendering/util/*.java,
+            **/rendering/wiki/*.java
           </includes>
           <excludes>
             **/rendering/internal/parser/XDOMGeneratorListener.java,

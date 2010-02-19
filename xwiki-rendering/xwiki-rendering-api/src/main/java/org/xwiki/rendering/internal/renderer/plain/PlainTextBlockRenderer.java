@@ -16,7 +16,8 @@
  * License along with this software; if not, write to the Free
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
- */package org.xwiki.rendering.internal.renderer.plain;
+ */
+package org.xwiki.rendering.internal.renderer.plain;
 
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.Requirement;
@@ -34,6 +35,9 @@ import org.xwiki.rendering.renderer.PrintRendererFactory;
 @Component("plain/1.0")
 public class PlainTextBlockRenderer extends AbstractBlockRenderer
 {
+    /**
+     * Used to create new plain/1.0 {@link org.xwiki.rendering.renderer.PrintRenderer}s. 
+     */
     @Requirement("plain/1.0")
     private PrintRendererFactory plainTextRendererFactory;
 

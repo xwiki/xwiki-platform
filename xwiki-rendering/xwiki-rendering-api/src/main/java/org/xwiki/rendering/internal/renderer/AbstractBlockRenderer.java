@@ -35,6 +35,9 @@ import org.xwiki.rendering.renderer.PrintRenderer;
  */
 public abstract class AbstractBlockRenderer implements BlockRenderer
 {
+    /**
+     * @return provide the factory to use to create a new {@link PrintRenderer}.
+     */
     protected abstract PrintRendererFactory getPrintRendererFactory();
 
     /**

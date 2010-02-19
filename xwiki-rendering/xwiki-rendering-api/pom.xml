@@ -199,7 +199,7 @@
             <configuration>
               <!-- TODO: To be removed when we release XWiki 2.3 -->
               <excludes>
-                <exclude>org/xwiki/rendering/internal/renderer/xwiki/XWikiSyntaxMacroRenderer</exclude>
+                <exclude>**/internal/**</exclude>
                 <exclude>org/xwiki/rendering/syntax/SyntaxFactory</exclude>
                 <exclude>org/xwiki/rendering/internal/parser/DefaultSyntaxFactory</exclude>
               </excludes>

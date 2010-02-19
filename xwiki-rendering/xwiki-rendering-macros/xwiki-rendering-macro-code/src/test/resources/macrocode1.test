@@ -10,10 +10,8 @@
 .expect|event/1.0
 .#-----------------------------------------------------
 beginDocument
-beginMacroMarkerStandalone [code] [] [
-<b>bold</b>
-<i>italic</i>
-]
+beginMacroMarkerStandalone [code] [] [<b>bold</b>
+<i>italic</i>]
 beginGroup [[class]=[box code]]
 beginFormat [NONE] [[style]=[font-weight: bold; color: #008000; ]]
 onSpecialSymbol [<]
@@ -41,8 +39,6 @@ onWord [i]
 onSpecialSymbol [>]
 endFormat [NONE] [[style]=[font-weight: bold; color: #008000; ]]
 endGroup [[class]=[box code]]
-endMacroMarkerStandalone [code] [] [
-<b>bold</b>
-<i>italic</i>
-]
+endMacroMarkerStandalone [code] [] [<b>bold</b>
+<i>italic</i>]
 endDocument

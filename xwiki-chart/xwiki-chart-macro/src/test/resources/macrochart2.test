@@ -1,7 +1,7 @@
 .#-----------------------------------------------------
 .input|xwiki/2.0
 .#-----------------------------------------------------
-{{testchart type="bar" source="xdom" params="document:Test.Test;table:table1;range:B1-C3;series:rows;" title="Chart Test" width="640" height="480"}}
+{{testchart type="bar" source="xdom" params="document:Test.Test;table:table1;range:B1-C3;series:rows;" title="Chart Test" width="640" height="480"/}}
 .#-----------------------------------------------------
 .expect|xhtml/1.0
 .#-----------------------------------------------------

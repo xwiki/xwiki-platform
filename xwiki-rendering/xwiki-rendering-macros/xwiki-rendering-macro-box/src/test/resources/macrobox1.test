@@ -9,10 +9,8 @@
 .expect|event/1.0
 .#-----------------------------------------------------
 beginDocument
-beginMacroMarkerStandalone [box] [] [
-* one
-* two
-]
+beginMacroMarkerStandalone [box] [] [* one
+* two]
 beginGroup [[class]=[box]]
 beginList [BULLETED]
 beginListItem
@@ -23,8 +21,6 @@ onWord [two]
 endListItem
 endList [BULLETED]
 endGroup [[class]=[box]]
-endMacroMarkerStandalone [box] [] [
-* one
-* two
-]
+endMacroMarkerStandalone [box] [] [* one
+* two]
 endDocument

@@ -10,10 +10,8 @@
 .expect|event/1.0
 .#-----------------------------------------------------
 beginDocument
-beginMacroMarkerStandalone [info] [] [
-* item1
-* item2
-]
+beginMacroMarkerStandalone [info] [] [* item1
+* item2]
 beginGroup [[class]=[box infomessage]]
 beginList [BULLETED]
 beginListItem
@@ -24,8 +22,6 @@ onWord [item2]
 endListItem
 endList [BULLETED]
 endGroup [[class]=[box infomessage]]
-endMacroMarkerStandalone [info] [] [
-* item1
-* item2
-]
+endMacroMarkerStandalone [info] [] [* item1
+* item2]
 endDocument

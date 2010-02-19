@@ -12,21 +12,17 @@
 .expect|event/1.0
 .#-----------------------------------------------------
 beginDocument
-beginMacroMarkerStandalone [velocity] [] [
-## some comment
+beginMacroMarkerStandalone [velocity] [] [## some comment
 #if (true)
   text
-#end
-]
+#end]
 beginParagraph
 onWord [text]
 endParagraph
-endMacroMarkerStandalone [velocity] [] [
-## some comment
+endMacroMarkerStandalone [velocity] [] [## some comment
 #if (true)
   text
-#end
-]
+#end]
 endDocument
 .#-----------------------------------------------------
 .expect|xhtml/1.0

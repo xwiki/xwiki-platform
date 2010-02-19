@@ -15,14 +15,12 @@
 .expect|event/1.0
 .#-----------------------------------------------------
 beginDocument
-beginMacroMarkerStandalone [html] [] [
-<script type="text/javascript">
+beginMacroMarkerStandalone [html] [] [<script type="text/javascript">
    //<![CDATA[
          if (2 > 1)
              alert("Hello, World")
    // ]]>
-</script>
-]
+</script>]
 onRawText [<script type="text/javascript">//<![CDATA[
 
    //
@@ -31,12 +29,10 @@ onRawText [<script type="text/javascript">//<![CDATA[
    // 
 
 //]]></script>] [xhtml/1.0]
-endMacroMarkerStandalone [html] [] [
-<script type="text/javascript">
+endMacroMarkerStandalone [html] [] [<script type="text/javascript">
    //<![CDATA[
          if (2 > 1)
              alert("Hello, World")
    // ]]>
-</script>
-]
+</script>]
 endDocument

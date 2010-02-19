@@ -13,16 +13,8 @@ def var = new MyClass()
 .expect|event/1.0
 .#-----------------------------------------------------
 beginDocument
-beginMacroMarkerStandalone [groovy] [] [
-class MyClass {}
-]
-endMacroMarkerStandalone [groovy] [] [
-class MyClass {}
-]
-beginMacroMarkerStandalone [groovy] [] [
-def var = new MyClass()
-]
-endMacroMarkerStandalone [groovy] [] [
-def var = new MyClass()
-]
+beginMacroMarkerStandalone [groovy] [] [class MyClass {}]
+endMacroMarkerStandalone [groovy] [] [class MyClass {}]
+beginMacroMarkerStandalone [groovy] [] [def var = new MyClass()]
+endMacroMarkerStandalone [groovy] [] [def var = new MyClass()]
 endDocument

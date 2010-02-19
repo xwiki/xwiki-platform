@@ -9,11 +9,7 @@
 .expect|event/1.0
 .#-----------------------------------------------------
 beginDocument
-beginMacroMarkerStandalone [html] [wiki=true] [
-&nbsp;
-]
+beginMacroMarkerStandalone [html] [wiki=true] [&nbsp;]
 onRawText [<p>&nbsp;</p>] [xhtml/1.0]
-endMacroMarkerStandalone [html] [wiki=true] [
-&nbsp;
-]
+endMacroMarkerStandalone [html] [wiki=true] [&nbsp;]
 endDocument

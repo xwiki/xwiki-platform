@@ -9,10 +9,8 @@ bar
 .expect|event/1.0
 .#-----------------------------------------------------
 beginDocument
-beginMacroMarkerStandalone [code] [language=sh] [
-export X=foo
-bar
-]
+beginMacroMarkerStandalone [code] [language=sh] [export X=foo
+bar]
 beginGroup [[class]=[box code]]
 beginFormat [NONE] [[style]=[color: #008000; ]]
 onWord [export]
@@ -28,8 +26,6 @@ onWord [foo]
 onNewLine
 onWord [bar]
 endGroup [[class]=[box code]]
-endMacroMarkerStandalone [code] [language=sh] [
-export X=foo
-bar
-]
+endMacroMarkerStandalone [code] [language=sh] [export X=foo
+bar]
 endDocument

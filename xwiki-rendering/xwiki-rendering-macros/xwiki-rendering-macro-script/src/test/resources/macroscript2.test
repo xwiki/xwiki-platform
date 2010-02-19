@@ -9,10 +9,6 @@ will not be printed
 .expect|event/1.0
 .#-----------------------------------------------------
 beginDocument
-beginMacroMarkerStandalone [script] [output=false] [
-will not be printed
-]
-endMacroMarkerStandalone [script] [output=false] [
-will not be printed
-]
+beginMacroMarkerStandalone [script] [output=false] [will not be printed]
+endMacroMarkerStandalone [script] [output=false] [will not be printed]
 endDocument

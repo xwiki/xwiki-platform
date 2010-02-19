@@ -195,12 +195,11 @@
           <plugin>
             <groupId>org.codehaus.mojo</groupId>
             <artifactId>clirr-maven-plugin</artifactId>
-            <!-- <configuration>
+            <configuration>
               <excludes>
                 <exclude>**/internal/**</exclude>
-                <exclude>org/xwiki/rendering/</exclude>
               </excludes>
-            </configuration> -->
+            </configuration>
           </plugin>
         </plugins>
       </build>

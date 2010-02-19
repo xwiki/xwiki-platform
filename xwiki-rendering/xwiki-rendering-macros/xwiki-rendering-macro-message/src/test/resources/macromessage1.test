@@ -11,12 +11,10 @@ Failed to do this action. The correct possibilities are:
 .expect|event/1.0
 .#-----------------------------------------------------
 beginDocument
-beginMacroMarkerStandalone [info] [] [
-Failed to do this action. The correct possibilities are:
+beginMacroMarkerStandalone [info] [] [Failed to do this action. The correct possibilities are:
 * use another value
 * you don't have right
-* another possibility
-]
+* another possibility]
 beginGroup [[class]=[box infomessage]]
 beginParagraph
 onWord [Failed]
@@ -65,10 +63,8 @@ onWord [possibility]
 endListItem
 endList [BULLETED]
 endGroup [[class]=[box infomessage]]
-endMacroMarkerStandalone [info] [] [
-Failed to do this action. The correct possibilities are:
+endMacroMarkerStandalone [info] [] [Failed to do this action. The correct possibilities are:
 * use another value
 * you don't have right
-* another possibility
-]
+* another possibility]
 endDocument

@@ -41,8 +41,7 @@ Some more static content.
 .expect|event/1.0
 .#-----------------------------------------------------
 beginDocument
-beginMacroMarkerStandalone [php] [] [
-Some static content.
+beginMacroMarkerStandalone [php] [] [Some static content.
 
 <?php
 class Sample {
@@ -74,8 +73,7 @@ Some more static content.
 
 <?php
   echo($instance->doubleV());
-?>
-]
+?>]
 beginParagraph
 onWord [Some]
 onSpace
@@ -110,8 +108,7 @@ endParagraph
 beginParagraph
 onWord [84]
 endParagraph
-endMacroMarkerStandalone [php] [] [
-Some static content.
+endMacroMarkerStandalone [php] [] [Some static content.
 
 <?php
 class Sample {
@@ -143,6 +140,5 @@ Some more static content.
 
 <?php
   echo($instance->doubleV());
-?>
-]
+?>]
 endDocument

@@ -14,12 +14,22 @@ message")
 .#-----------------------------------------------------
 .expect|xwiki/2.0
 .#-----------------------------------------------------
-{{warning}}message{{/warning}}
+{{warning}}
+message
+{{/warning}}
 
-{{warning}}**bold message**{{/warning}}
+{{warning}}
+**bold message**
+{{/warning}}
 
-{{warning}}multilines message{{/warning}}
+{{warning}}
+multilines message
+{{/warning}}
 
-{{warning}}{{toc start=2 depth=6 numbered=false/}}{{/warning}}
+{{warning}}
+{{toc start=2 depth=6 numbered=false/}}
+{{/warning}}
 
-{{velocity filter="none"}}{{html clean="false" wiki="true"}}{{warning}}$var{{/warning}}{{/html}}{{/velocity}}
+{{velocity filter="none"}}
+{{html clean="false" wiki="true"}}{{warning}}$var{{/warning}}{{/html}}
+{{/velocity}}

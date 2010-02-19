@@ -13,20 +13,14 @@
 .expect|event/1.0
 .#-----------------------------------------------------
 beginDocument
-beginMacroMarkerStandalone [script] [] [
-**bold**
-]
+beginMacroMarkerStandalone [script] [] [**bold**]
 beginParagraph
 beginFormat [BOLD]
 onWord [bold]
 endFormat [BOLD]
 endParagraph
-endMacroMarkerStandalone [script] [] [
-**bold**
-]
-beginMacroMarkerStandalone [script] [wiki=false] [
-**not bold**
-]
+endMacroMarkerStandalone [script] [] [**bold**]
+beginMacroMarkerStandalone [script] [wiki=false] [**not bold**]
 beginParagraph
 onSpecialSymbol [*]
 onSpecialSymbol [*]
@@ -36,9 +30,7 @@ onWord [bold]
 onSpecialSymbol [*]
 onSpecialSymbol [*]
 endParagraph
-endMacroMarkerStandalone [script] [wiki=false] [
-**not bold**
-]
+endMacroMarkerStandalone [script] [wiki=false] [**not bold**]
 beginParagraph
 beginMacroMarkerInline [script] [] [**bold**]
 beginFormat [BOLD]

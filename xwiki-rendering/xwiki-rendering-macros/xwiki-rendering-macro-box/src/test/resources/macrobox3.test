@@ -9,13 +9,9 @@ content
 .expect|event/1.0
 .#-----------------------------------------------------
 beginDocument
-beginMacroMarkerStandalone [testbox] [] [
-content
-]
+beginMacroMarkerStandalone [testbox] [] [content]
 beginGroup [[class]=[box]]
 onVerbatim [content] [false]
 endGroup [[class]=[box]]
-endMacroMarkerStandalone [testbox] [] [
-content
-]
+endMacroMarkerStandalone [testbox] [] [content]
 endDocument

@@ -33,8 +33,7 @@
 .expect|event/1.0
 .#----------------------------------------------------
 beginDocument
-beginMacroMarkerStandalone [code] [language=javascript] [
-// getJSON function by Juriy Zaytsev 
+beginMacroMarkerStandalone [code] [language=javascript] [// getJSON function by Juriy Zaytsev 
 // http://github.com/kangax/protolicious/tree/master/get_json.js
 (function(){
   var id = 0, head = $$('head')[0], global = this;
@@ -58,8 +57,7 @@ beginMacroMarkerStandalone [code] [language=javascript] [
     // callback name should be unique
     id++;
   }
-})();
-]
+})();]
 beginGroup [[class]=[box code]]
 beginFormat [NONE] [[style]=[font-weight: italic; color: #408080; ]]
 onSpecialSymbol [/]
@@ -539,8 +537,7 @@ onSpecialSymbol [(]
 onSpecialSymbol [)]
 onSpecialSymbol [;]
 endGroup [[class]=[box code]]
-endMacroMarkerStandalone [code] [language=javascript] [
-// getJSON function by Juriy Zaytsev 
+endMacroMarkerStandalone [code] [language=javascript] [// getJSON function by Juriy Zaytsev 
 // http://github.com/kangax/protolicious/tree/master/get_json.js
 (function(){
   var id = 0, head = $$('head')[0], global = this;
@@ -564,6 +561,5 @@ endMacroMarkerStandalone [code] [language=javascript] [
     // callback name should be unique
     id++;
   }
-})();
-]
+})();]
 endDocument

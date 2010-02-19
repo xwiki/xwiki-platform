@@ -13,20 +13,14 @@
 .expect|event/1.0
 .#-----------------------------------------------------
 beginDocument
-beginMacroMarkerStandalone [velocity] [] [
-  Some text
-]
+beginMacroMarkerStandalone [velocity] [] [  Some text]
 beginParagraph
 onWord [Some]
 onSpace
 onWord [text]
 endParagraph
-endMacroMarkerStandalone [velocity] [] [
-  Some text
-]
-beginMacroMarkerStandalone [velocity] [filter=none] [
-  Some text
-]
+endMacroMarkerStandalone [velocity] [] [  Some text]
+beginMacroMarkerStandalone [velocity] [filter=none] [  Some text]
 beginParagraph
 onSpace
 onSpace
@@ -34,9 +28,7 @@ onWord [Some]
 onSpace
 onWord [text]
 endParagraph
-endMacroMarkerStandalone [velocity] [filter=none] [
-  Some text
-]
+endMacroMarkerStandalone [velocity] [filter=none] [  Some text]
 endDocument
 .#-----------------------------------------------------
 .expect|xhtml/1.0

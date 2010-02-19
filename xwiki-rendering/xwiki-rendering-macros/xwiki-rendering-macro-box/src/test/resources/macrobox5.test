@@ -26,4 +26,6 @@ endDocument
 .#-----------------------------------------------------
 .expect|xwiki/2.0
 .#-----------------------------------------------------
-{{box title="[[XWiki>>http://www.xwiki.org]]" cssClass="myCLASS" image="http://l.yimg.com/i/i/fr/tr/usa4.jpg"}}alabala{{/box}}
+{{box title="[[XWiki>>http://www.xwiki.org]]" cssClass="myCLASS" image="http://l.yimg.com/i/i/fr/tr/usa4.jpg"}}
+alabala
+{{/box}}

@@ -17,15 +17,11 @@ onSpace
 onWord [paragraph]
 onSpecialSymbol [.]
 endParagraph
-beginMacroMarkerStandalone [testsimplemacro] [] [
-Some **content**
-]
+beginMacroMarkerStandalone [testsimplemacro] [] [Some **content**]
 beginParagraph
 onWord [simplemacro2]
 endParagraph
-endMacroMarkerStandalone [testsimplemacro] [] [
-Some **content**
-]
+endMacroMarkerStandalone [testsimplemacro] [] [Some **content**]
 endDocument
 .#-----------------------------------------------------
 .expect|xhtml/1.0
@@ -34,9 +30,7 @@ endDocument
 .#-----------------------------------------------------
 .expect|annotatedxhtml/1.0
 .#-----------------------------------------------------
-<p>First paragraph.</p><!--startmacro:testsimplemacro|-||-|
-Some **content**
---><p>simplemacro2</p><!--stopmacro-->
+<p>First paragraph.</p><!--startmacro:testsimplemacro|-||-|Some **content**--><p>simplemacro2</p><!--stopmacro-->
 .#-----------------------------------------------------
 .expect|xwiki/2.0
 .#-----------------------------------------------------
@@ -48,6 +42,4 @@ Some **content**
 .#-----------------------------------------------------
 .input|xhtml/1.0
 .#-----------------------------------------------------
-<html><p>First paragraph.</p><!--startmacro:testsimplemacro|-||-|
-Some **content**
---><p>simplemacro2</p><!--stopmacro--></html>
+<p>First paragraph.</p><!--startmacro:testsimplemacro|-||-|Some **content**--><p>simplemacro2</p><!--stopmacro-->

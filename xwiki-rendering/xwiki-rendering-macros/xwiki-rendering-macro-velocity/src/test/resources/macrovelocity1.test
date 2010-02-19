@@ -39,8 +39,7 @@ beginMacroMarkerStandalone [velocity] [] [{{html wiki="true"}}
   </table>
 </div>
 {{/html}}]
-beginMacroMarkerStandalone [html] [wiki=true] [
-<div>
+beginMacroMarkerStandalone [html] [wiki=true] [<div>
 <h1>Hello John</h1>
 <table>
 <tr>
@@ -56,8 +55,7 @@ beginMacroMarkerStandalone [html] [wiki=true] [
 </td>
 </tr>
 </table>
-</div>
-]
+</div>]
 onRawText [<div>
 <h1>Hello John</h1>
 
@@ -69,8 +67,7 @@ onRawText [<div>
 
 <table><tbody><tr><td><ul><li>item</li></ul></td></tr><tr><td><ul><li>item</li></ul></td></tr></tbody></table>
 </div>] [xhtml/1.0]
-endMacroMarkerStandalone [html] [wiki=true] [
-<div>
+endMacroMarkerStandalone [html] [wiki=true] [<div>
 <h1>Hello John</h1>
 <table>
 <tr>
@@ -86,8 +83,7 @@ endMacroMarkerStandalone [html] [wiki=true] [
 </td>
 </tr>
 </table>
-</div>
-]
+</div>]
 endMacroMarkerStandalone [velocity] [] [{{html wiki="true"}}
 <div>
   #set ($name = "John")

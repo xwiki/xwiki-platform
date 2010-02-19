@@ -18,8 +18,7 @@ hello  world
 .expect|event/1.0
 .#-----------------------------------------------------
 beginDocument
-beginMacroMarkerStandalone [html] [] [
-<pre>
+beginMacroMarkerStandalone [html] [] [<pre>
   newline
   newline
 </pre>
@@ -28,8 +27,7 @@ beginMacroMarkerStandalone [html] [] [
 <!--comment-->  another  <![CDATA[
 hello  world
    ]]>
-</p>
-]
+</p>]
 onRawText [<pre>
   newline
   newline
@@ -40,8 +38,7 @@ onRawText [<pre>
 hello  world
    ]]>
 </p>] [xhtml/1.0]
-endMacroMarkerStandalone [html] [] [
-<pre>
+endMacroMarkerStandalone [html] [] [<pre>
   newline
   newline
 </pre>
@@ -50,6 +47,5 @@ endMacroMarkerStandalone [html] [] [
 <!--comment-->  another  <![CDATA[
 hello  world
    ]]>
-</p>
-]
+</p>]
 endDocument

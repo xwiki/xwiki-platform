@@ -13,13 +13,11 @@ some text #if (true)
 .expect|event/1.0
 .#-----------------------------------------------------
 beginDocument
-beginMacroMarkerStandalone [velocity] [] [
-some text #if (true)
+beginMacroMarkerStandalone [velocity] [] [some text #if (true)
     #if (true)
       and the end of the sentence indented to be more readable.
     #end
-  #end
-]
+  #end]
 beginParagraph
 onWord [some]
 onSpace
@@ -48,13 +46,11 @@ onSpace
 onWord [readable]
 onSpecialSymbol [.]
 endParagraph
-endMacroMarkerStandalone [velocity] [] [
-some text #if (true)
+endMacroMarkerStandalone [velocity] [] [some text #if (true)
     #if (true)
       and the end of the sentence indented to be more readable.
     #end
-  #end
-]
+  #end]
 endDocument
 .#-----------------------------------------------------
 .expect|xhtml/1.0

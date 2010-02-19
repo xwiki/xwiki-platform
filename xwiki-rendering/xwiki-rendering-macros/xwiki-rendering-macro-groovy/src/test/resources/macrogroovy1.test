@@ -17,12 +17,10 @@ list.each { item ->
 .expect|event/1.0
 .#-----------------------------------------------------
 beginDocument
-beginMacroMarkerStandalone [groovy] [] [
-def list = ["one", var]
+beginMacroMarkerStandalone [groovy] [] [def list = ["one", var]
 list.each { item ->
   println "* ${item}"
-}
-]
+}]
 beginList [BULLETED]
 beginListItem
 onWord [one]
@@ -31,18 +29,14 @@ beginListItem
 onWord [value]
 endListItem
 endList [BULLETED]
-endMacroMarkerStandalone [groovy] [] [
-def list = ["one", var]
+endMacroMarkerStandalone [groovy] [] [def list = ["one", var]
 list.each { item ->
   println "* ${item}"
-}
-]
-beginMacroMarkerStandalone [groovy] [] [
-def list = ["one", var]
+}]
+beginMacroMarkerStandalone [groovy] [] [def list = ["one", var]
 list.each { item ->
   println "* ${item}"
-}
-]
+}]
 beginList [BULLETED]
 beginListItem
 onWord [one]
@@ -51,10 +45,8 @@ beginListItem
 onWord [value]
 endListItem
 endList [BULLETED]
-endMacroMarkerStandalone [groovy] [] [
-def list = ["one", var]
+endMacroMarkerStandalone [groovy] [] [def list = ["one", var]
 list.each { item ->
   println "* ${item}"
-}
-]
+}]
 endDocument

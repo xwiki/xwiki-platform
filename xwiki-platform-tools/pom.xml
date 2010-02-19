@@ -63,7 +63,7 @@
         <artifactId>maven-checkstyle-plugin</artifactId>
         <configuration>
           <failsOnError>true</failsOnError>
-          <suppressionsLocation>checkstyle-suppressions.xml</suppressionsLocation>
+          <suppressionsLocation>${basedir}/src/checkstyle/checkstyle-suppressions.xml</suppressionsLocation>
         </configuration>
       </plugin>
     </plugins>

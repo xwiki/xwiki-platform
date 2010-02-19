@@ -86,7 +86,6 @@ public class DutchWebGuidelinesValidator extends AbstractDOMValidator
      * Run the validator on the given {@link Document}.
      * 
      * @return results of the validation
-     * @throws
      */
     public List<ValidationError> validate()
     {
@@ -264,7 +263,7 @@ public class DutchWebGuidelinesValidator extends AbstractDOMValidator
     }
 
     /**
-     * Build websites according to the Ôlayered constructionÕ principle.
+     * Build websites according to the ï¿½layered constructionï¿½ principle.
      */
     public void validateRpd1s2()
     {
@@ -1281,7 +1280,7 @@ public class DutchWebGuidelinesValidator extends AbstractDOMValidator
     }
 
     /**
-     * Do not confront a visitor with a non-working form if optional technologies Ð such as CSS or client-side script Ð
+     * Do not confront a visitor with a non-working form if optional technologies ï¿½ such as CSS or client-side script ï¿½
      * are not supported by the browser.
      */
     public void validateRpd13s6()
@@ -1536,7 +1535,7 @@ public class DutchWebGuidelinesValidator extends AbstractDOMValidator
     }
 
     /**
-     * Give visitors an Ôescape routeÕ: possibilities to continue if they get stuck. Escape routes include useful links,
+     * Give visitors an ï¿½escape routeï¿½: possibilities to continue if they get stuck. Escape routes include useful links,
      * being able to use the back button, a search function, and being able to correct input errors immediately.
      */
     public void validateRpd22s2()
@@ -1554,7 +1553,7 @@ public class DutchWebGuidelinesValidator extends AbstractDOMValidator
     }
 
     /**
-     * Make modified error pages Ð for errors such as dead links (404 Not Found) Ð where the visitor is given options
+     * Make modified error pages ï¿½ for errors such as dead links (404 Not Found) ï¿½ where the visitor is given options
      * for continuing within the site.
      */
     public void validateRpd22s4()
@@ -1572,7 +1571,7 @@ public class DutchWebGuidelinesValidator extends AbstractDOMValidator
     }
 
     /**
-     * When implementing a search engine on the website: use ÔsmartÕ search technology that takes into account spelling
+     * When implementing a search engine on the website: use ï¿½smartï¿½ search technology that takes into account spelling
      * errors, similar search terms, terms in singular or plural form, etc.
      */
     public void validateRpd22s6()

@@ -12,8 +12,8 @@
 <customClass></customClass>
 <contentAuthor>XWiki.Admin</contentAuthor>
 <creationDate>1251635783000</creationDate>
-<date>1266501670000</date>
-<contentUpdateDate>1266501670000</contentUpdateDate>
+<date>1266577153000</date>
+<contentUpdateDate>1266577153000</contentUpdateDate>
 <version>1.1</version>
 <title>IRC Bot</title>
 <template></template>
@@ -299,6 +299,7 @@ class IRCBot extends PircBot
     def shouldStop = false
     def xwiki
     def context
+    def errorCounter = 0
 
     IRCBot(botname, channel, xwiki, context)
     {
@@ -358,9 +359,20 @@ class IRCBot extends PircBot
                     }
                     break;
                 }
-            } catch(e) {
-                // Prevent any exception from executing other botlets
-                e.printStackTrace()
+            } catch(e) { // Prevent any exception from executing other botlets
+                if (errorCounter &lt; 5) {
+                    def counter = 0
+                    def exception = e
+                    while (exception != null &amp;&amp; counter &lt; 3) {
+                        sendMessage(channel, "Bot error: ${exception.getMessage()}")
+                        exception = exception.getCause()
+                        counter++
+                    }
+                    errorCounter++
+                } else if (errorCounter == 5) {
+                    sendMessage(channel, "Bot error: The error is still there but I won't display it again to not spam you... Yes I know I'm that kind!")
+                    errorCounter++
+                }
             }
         }  
     }

@@ -35,10 +35,11 @@ import org.xwiki.validator.framework.NodeListIterable;
 
 /**
  * Validator allowing to validate (X)HTML content against Dutch Web Guidelines.
- * <p>"There are internationally recognized agreements for creating web sites, known as 125 quality requirements
- * standards warrants a significantly better website. The Netherlands government has assembled these international
- * standards in a quality model called the Web Guidelines. This quality model comprises 125 quality requirements for the
- * benefit of better websites."
+ * <p>
+ * "There are internationally recognized agreements for creating web sites, known as 125 quality requirements standards
+ * warrants a significantly better website. The Netherlands government has assembled these international standards in a
+ * quality model called the Web Guidelines. This quality model comprises 125 quality requirements for the benefit of
+ * better websites."
  * </p>
  * 
  * @version $Id$
@@ -49,12 +50,12 @@ public class DutchWebGuidelinesValidator extends AbstractDOMValidator
      * Utility selector.
      */
     private static final String CONTENT_TYPE_META_SELECTOR = "//meta[@http-equiv='Content-Type']";
-    
+
     /**
      * String used to identify the charset in the content-type meta.
      */
     private static final String CONTENT_CHARSET_FRAGMENT = "charset=";
-    
+
     /**
      * Message resources.
      */
@@ -263,7 +264,7 @@ public class DutchWebGuidelinesValidator extends AbstractDOMValidator
     }
 
     /**
-     * Build websites according to the �layered construction� principle.
+     * Build websites according to the "layered construction" principle.
      */
     public void validateRpd1s2()
     {
@@ -287,8 +288,8 @@ public class DutchWebGuidelinesValidator extends AbstractDOMValidator
 
         // Links must not use the attributes listed below.
         List<String> forbiddenAttributes =
-            Arrays.asList(ATTR_BLUR, ATTR_CHANGE, ATTR_CLICK, ATTR_FOCUS, ATTR_LOAD, ATTR_MOUSEOVER, ATTR_SELECT,
-                ATTR_SELECT, ATTR_UNLOAD);
+                Arrays.asList(ATTR_BLUR, ATTR_CHANGE, ATTR_CLICK, ATTR_FOCUS, ATTR_LOAD, ATTR_MOUSEOVER, ATTR_SELECT,
+                    ATTR_SELECT, ATTR_UNLOAD);
         for (Node linkElement : linkElements) {
             if (!ListUtils.intersection(getAttributeNames(linkElement), forbiddenAttributes).isEmpty()) {
                 assertFalse(Type.ERROR, "rpd1s3.inlineEventHandlers", getAttributeValue(linkElement, ATTR_HREF).equals(
@@ -369,8 +370,8 @@ public class DutchWebGuidelinesValidator extends AbstractDOMValidator
     {
         // Usage of frameset doctype is forbidden
         if (document.getDoctype() != null) {
-            assertFalse(Type.ERROR, "rpd2s5.framesetDoctype", StringUtils.containsIgnoreCase(document.getDoctype()
-                .getPublicId(), "frameset"));
+            assertFalse(Type.ERROR, "rpd2s5.framesetDoctype", StringUtils.containsIgnoreCase(
+                document.getDoctype().getPublicId(), "frameset"));
         }
 
         // Usage of frameset is forbidden
@@ -564,9 +565,10 @@ public class DutchWebGuidelinesValidator extends AbstractDOMValidator
                 if (previousNode != null && nextNode != null) {
                     boolean currentNodeMatches = currentNode.getNodeName().equals(ELEM_BR);
                     boolean previousNodeMatches =
-                        previousNode.getNodeType() == Node.TEXT_NODE && previousNode.getTextContent().matches(regex);
+                            previousNode.getNodeType() == Node.TEXT_NODE
+                                && previousNode.getTextContent().matches(regex);
                     boolean nextNodeMatches =
-                        nextNode.getNodeType() == Node.TEXT_NODE && nextNode.getTextContent().matches(regex);
+                            nextNode.getNodeType() == Node.TEXT_NODE && nextNode.getTextContent().matches(regex);
 
                     assertFalse(Type.ERROR, "rpd3s13.lists", previousNodeMatches && currentNodeMatches
                         && nextNodeMatches);
@@ -792,8 +794,8 @@ public class DutchWebGuidelinesValidator extends AbstractDOMValidator
             for (Node linkChild : new NodeListIterable(link.getChildNodes())) {
                 if (linkChild.getNodeType() == Node.TEXT_NODE) {
                     for (String forbiddenLinkText : forbiddenLinkTexts) {
-                        assertFalse(Type.ERROR, "rpd8s1.link", StringUtils.containsIgnoreCase(linkChild
-                            .getTextContent(), forbiddenLinkText));
+                        assertFalse(Type.ERROR, "rpd8s1.link", StringUtils.containsIgnoreCase(
+                            linkChild.getTextContent(), forbiddenLinkText));
                     }
                 }
             }
@@ -956,8 +958,8 @@ public class DutchWebGuidelinesValidator extends AbstractDOMValidator
             String href = getAttributeValue(link, ATTR_HREF);
             if (href != null && href.startsWith(MAILTO)) {
                 String email = StringUtils.substringAfter(href, MAILTO);
-                assertTrue(Type.ERROR, "rpd8s17.email", email
-                    .matches("^[\\w\\-]([\\.\\w])+[\\w]+@([\\w\\-]+\\.)+[a-zA-Z]{2,4}$"));
+                assertTrue(Type.ERROR, "rpd8s17.email",
+                    email.matches("^[\\w\\-]([\\.\\w])+[\\w]+@([\\w\\-]+\\.)+[a-zA-Z]{2,4}$"));
             }
         }
     }
@@ -1020,7 +1022,7 @@ public class DutchWebGuidelinesValidator extends AbstractDOMValidator
         String exprString = "//@style";
         assertFalse(Type.ERROR, "rpd9s1.attr", ((Boolean) evaluate(getElement(ELEM_BODY), exprString,
             XPathConstants.BOOLEAN)));
-        assertFalse(Type.ERROR, "rpd9s1.tag", 
+        assertFalse(Type.ERROR, "rpd9s1.tag",
             getChildren(getElement(ELEM_BODY), "style").getNodeList().getLength() > 0);
     }
 
@@ -1280,7 +1282,7 @@ public class DutchWebGuidelinesValidator extends AbstractDOMValidator
     }
 
     /**
-     * Do not confront a visitor with a non-working form if optional technologies � such as CSS or client-side script �
+     * Do not confront a visitor with a non-working form if optional technologies "such as CSS or client-side script"
      * are not supported by the browser.
      */
     public void validateRpd13s6()
@@ -1462,7 +1464,7 @@ public class DutchWebGuidelinesValidator extends AbstractDOMValidator
     public void validateRpd16s1()
     {
         NodeListIterable metas =
-            new NodeListIterable((NodeList) evaluate(document, CONTENT_TYPE_META_SELECTOR, XPathConstants.NODESET));
+                new NodeListIterable((NodeList) evaluate(document, CONTENT_TYPE_META_SELECTOR, XPathConstants.NODESET));
 
         assertTrue(Type.ERROR, "rpd16s1.nometa", metas.getNodeList().getLength() > 0);
 
@@ -1478,15 +1480,15 @@ public class DutchWebGuidelinesValidator extends AbstractDOMValidator
     public void validateRpd16s2()
     {
         NodeListIterable metas =
-            new NodeListIterable((NodeList) evaluate(document, CONTENT_TYPE_META_SELECTOR, XPathConstants.NODESET));
+                new NodeListIterable((NodeList) evaluate(document, CONTENT_TYPE_META_SELECTOR, XPathConstants.NODESET));
 
         assertTrue(Type.ERROR, "rpd16s2.nometa", metas.getNodeList().getLength() > 0);
 
         for (Node meta : metas) {
             String content = getAttributeValue(meta, ATTR_CONTENT);
             assertTrue(Type.ERROR, "rpd16s2.notutf8", StringUtils.containsIgnoreCase(content, "charset=utf-8"));
-            assertTrue(Type.ERROR, "rpd16s2.differs", 
-                StringUtils.containsIgnoreCase(content, CONTENT_CHARSET_FRAGMENT + document.getXmlEncoding()));
+            assertTrue(Type.ERROR, "rpd16s2.differs", StringUtils.containsIgnoreCase(content, CONTENT_CHARSET_FRAGMENT
+                + document.getXmlEncoding()));
         }
     }
 
@@ -1506,7 +1508,7 @@ public class DutchWebGuidelinesValidator extends AbstractDOMValidator
     {
         Node meta = getElement(ELEM_META);
 
-        assertTrue(Type.ERROR, "rpd16s4.position", hasAttribute(meta, ATTR_CONTENT) 
+        assertTrue(Type.ERROR, "rpd16s4.position", hasAttribute(meta, ATTR_CONTENT)
             && StringUtils.containsIgnoreCase(getAttributeValue(meta, ATTR_CONTENT), CONTENT_CHARSET_FRAGMENT));
     }
 
@@ -1535,8 +1537,8 @@ public class DutchWebGuidelinesValidator extends AbstractDOMValidator
     }
 
     /**
-     * Give visitors an �escape route�: possibilities to continue if they get stuck. Escape routes include useful links,
-     * being able to use the back button, a search function, and being able to correct input errors immediately.
+     * Give visitors an <em>escape route</em>: possibilities to continue if they get stuck. Escape routes include useful
+     * links, being able to use the back button, a search function, and being able to correct input errors immediately.
      */
     public void validateRpd22s2()
     {
@@ -1553,8 +1555,8 @@ public class DutchWebGuidelinesValidator extends AbstractDOMValidator
     }
 
     /**
-     * Make modified error pages � for errors such as dead links (404 Not Found) � where the visitor is given options
-     * for continuing within the site.
+     * Make modified error pages "for errors such as dead links (404 Not Found)" where the visitor is given options for
+     * continuing within the site.
      */
     public void validateRpd22s4()
     {
@@ -1571,7 +1573,7 @@ public class DutchWebGuidelinesValidator extends AbstractDOMValidator
     }
 
     /**
-     * When implementing a search engine on the website: use �smart� search technology that takes into account spelling
+     * When implementing a search engine on the website: use "smart" search technology that takes into account spelling
      * errors, similar search terms, terms in singular or plural form, etc.
      */
     public void validateRpd22s6()

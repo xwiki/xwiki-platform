@@ -92,10 +92,7 @@ public class CodeMacro extends AbstractBoxMacro<CodeMacroParameters>
                 if (StringUtils.isEmpty(content)) {
                     result = Collections.emptyList();
                 } else {
-                    result = this.plainTextParser.parse(new StringReader(content)).getChildren();
-                    if (context.isInline()) {
-                        result = result.get(0).getChildren();
-                    }
+                    result = this.plainTextParser.parse(new StringReader(content)).getChildren().get(0).getChildren();
                 }
             } else {
                 result = highlight(parameters, content);

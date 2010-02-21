@@ -12,7 +12,6 @@ beginDocument
 beginMacroMarkerStandalone [code] [language=none] [<b>bold</b>
 <i>italic</i>]
 beginGroup [[class]=[box code]]
-beginParagraph
 onSpecialSymbol [<]
 onWord [b]
 onSpecialSymbol [>]
@@ -30,7 +29,6 @@ onSpecialSymbol [<]
 onSpecialSymbol [/]
 onWord [i]
 onSpecialSymbol [>]
-endParagraph
 endGroup [[class]=[box code]]
 endMacroMarkerStandalone [code] [language=none] [<b>bold</b>
 <i>italic</i>]

@@ -51,9 +51,7 @@ annotations.action.delete.failed=Failed to delete annotation:
 annotations.action.create.submit.text=Add annotation
 annotations.action.create.cancel.text=Cancel
 annotations.action.create.selection.invalid=Please select a non-empty text in the document content.
-annotations.action.create.form.loading=Loading create form...
 annotations.action.create.form.loaderror=Failed: 
-annotations.action.create.loading=Adding annotation...
 annotations.action.create.success=Annotation has been successfully added
 annotations.action.create.loaderror=Failed: 
 

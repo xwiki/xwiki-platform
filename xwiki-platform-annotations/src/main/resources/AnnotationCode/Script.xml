@@ -12,8 +12,8 @@
 <customClass></customClass>
 <contentAuthor>XWiki.Admin</contentAuthor>
 <creationDate>1264860755000</creationDate>
-<date>1266414817000</date>
-<contentUpdateDate>1266414817000</contentUpdateDate>
+<date>1266768903000</date>
+<contentUpdateDate>1266768903000</contentUpdateDate>
 <version>1.0</version>
 <title></title>
 <template></template>
@@ -344,27 +344,27 @@ XWiki.Selection = Class.create({
     }
   },
 
-  positionPanelNextToSelection : function(panel) {
+  getPositionNextToSelection : function() {
     if (!this.range) {
-      return;
+      return {'left' : 0, 'top' : 0};
     }
 
+    var left = 0;
+    var top = 0;
     if (window.getSelection) {
       // set the position
       // get the offsetleft from the first highlightWrapper
-      var left = 0;
-      var top = 0;
       if (this.highlightWrappers.length &gt; 0) {
         left = this.highlightWrappers[0].positionedOffset().left;
         var lastWrapper = this.highlightWrappers[this.highlightWrappers.length - 1];
         top = lastWrapper.positionedOffset().top + lastWrapper.getHeight();
       }
-      panel.style.left = left + "px";
-      panel.style.top = top + "px";
     } else {
-      panel.style.left = this.offsetX + "px";
-      panel.style.top = this.offsetY + "px";
+      left = this.offsetX + "px";
+      top = this.offsetY + "px";
     }
+    
+    return {'left' : left, 'top' : top}; 
   },
 
   /*
@@ -572,9 +572,9 @@ XWiki.Selection = Class.create({
     this.hookTab();
 
     // add the delete and edit listeners to the annotations in the annotations tab when the extra panels are loaded
-    document.observe('xwiki:docextra:loaded', this.addAllDeleteListeners.bindAsEventListener(this));
+    document.observe('xwiki:docextra:loaded', this.addDeleteListenersInTab.bindAsEventListener(this));
     // add the delete and edit listeners to the annotations in the annotations tab when the extra panels are loaded
-    document.observe('xwiki:docextra:loaded', this.addAllEditListeners.bindAsEventListener(this));
+    document.observe('xwiki:docextra:loaded', this.addEditListenersInTab.bindAsEventListener(this));
     // register the key shortcuts for adding an annotation
     this.registerAddAnnotationShortcut();
     // register the close dialog shortcut
@@ -633,7 +633,7 @@ XWiki.Selection = Class.create({
 
     // add the anchor before the annotations pane
     var anchorsContainer = $('docextraanchors');
-    anchorsContainer.insert({top : new Element('span', {'id' : this.annTabname + 'anchor'}).update("&amp;nbsp;")})
+    anchorsContainer.insert({top : new Element('span', {'id' : this.annTabname + 'anchor'}).update("&amp;nbsp;")});
   },
   
   toggleSettingsPanel : function(event) {
@@ -705,9 +705,9 @@ XWiki.Selection = Class.create({
       }
     }.bindAsEventListener(this));
   },
-  
-  // check if I need this parameter or not
+
   toggleAnnotations : function(visible) {
+    // TODO: #xwikicontent is container specific, get the container from a member or something
     // don't standard toggle because we want to ensure it matches visible
     $$('#xwikicontent .annotation').invoke(visible ? 'addClassName' : 'removeClassName', 'annotation-highlight');
     //and hide all annotation markers
@@ -734,7 +734,10 @@ XWiki.Selection = Class.create({
       }.bind(this),
 
       onSuccess: function(response) {
-        // TODO: check this response to see what's inside
+        // check the response to make sure it suceeded
+        if (this.checkResponseCodeAndFail(response)) {
+          return;
+        }
         // hide message at page bottom
         this._x_notification.hide();
         // load the received annotated content in the page, along with annotations and annotations markers
@@ -764,6 +767,22 @@ XWiki.Selection = Class.create({
       }.bind(this)
     });
   },
+  
+  /**
+   * Checks if the passed response contains a non-zero response code and, in this case, executes the failure callback 
+   * of the response.
+   */
+  checkResponseCodeAndFail : function(response) {
+    if (response.responseJSON.responseCode &amp;&amp; response.responseJSON.responseCode != 0) {
+      // response returns a code and says that there is an error
+      response.statusText = response.responseJSON.responseMessage;
+      response.request.options.onFailure(response);
+      return true;
+    } else {
+      // everything's fine
+      return false;
+    }
+  },
 
   loadAnnotatedContent : function(annotatedContent, andShow, navigateToPane) {
     // TODO: store the annotated element in a different way, to have it the same in the instance (when it's an object prop for example)
@@ -776,23 +795,27 @@ XWiki.Selection = Class.create({
     }
 
     // and also handle the tab 'downstairs' when the annotations list changes
+    this.reloadTab(navigateToPane);
+  },
+  
+  reloadTab : function(navigateToPane) {
     var annotationsPane = $( this.annTabname + 'pane');
     // reset to initial state
     annotationsPane.update('');
     annotationsPane.addClassName('empty');
     if (!annotationsPane.hasClassName('hidden')) {
       // reload
-      XWiki.displayDocExtra(this.annTabname, 'annotationsinline.vm', navigateToPane)
-    }
+      XWiki.displayDocExtra(this.annTabname, 'annotationsinline.vm', navigateToPane);
+    }    
   },
 
-  addAllDeleteListeners : function() {
+  addDeleteListenersInTab : function() {
     $$(".annotation a.delete").each(function(item) {
       this.addDeleteListener(item);
     }.bind(this));
   },
 
-  addAllEditListeners : function() {
+  addEditListenersInTab : function() {
     $$(".annotation a.edit").each(function(item) {
       var container = item.up('.annotation');
       // compute annotation id, which is right after annotation_list_ in the container ID... TODO: this is pretty wrongish...
@@ -801,7 +824,7 @@ XWiki.Selection = Class.create({
     }.bind(this));
   },
 
-  addDeleteListener : function(item) {
+  addDeleteListener : function(item, inBubble) {
     item.observe('click', function(event) {
       item.blur();
       event.stop();
@@ -817,8 +840,12 @@ XWiki.Selection = Class.create({
               item.disabled = true;
             },
             onSuccess : function(response) {
+              // check the response to see if all went fine
+              if (this.checkResponseCodeAndFail(response)) {
+                return;
+              }              
               // reload the received annotated content, with scroll to tab
-              this.loadAnnotatedContent(response.responseJSON.annotatedContent, this.displayAnnotationsCheckbox.checked, true);
+              this.loadAnnotatedContent(response.responseJSON.annotatedContent, this.displayAnnotationsCheckbox.checked, !inBubble);
             }.bind(this),
             onComplete : function() {
               // In the end: re-enable the button
@@ -837,7 +864,7 @@ XWiki.Selection = Class.create({
     }.bindAsEventListener(this));
   },
 
-  addEditListener : function(item, id, container) {
+  addEditListener : function(item, id, container, inBubble) {
     item.observe('click', function(event) {
       item.blur();
       event.stop();
@@ -863,7 +890,7 @@ XWiki.Selection = Class.create({
           },
           onSuccess : function(response) {
             // fill the edit bubble
-            this.fillEditBubble(container, response.responseText, id);
+            this.fillEditForm(container, response.responseText, id, inBubble);
           }.bind(this),
           onFailure: function(response) {
             var failureReason = response.statusText;
@@ -873,7 +900,7 @@ XWiki.Selection = Class.create({
             // show the error message at the bottom
             this._x_notification = new XWiki.widgets.Notification("$msg.get('annotations.action.edit.form.loaderror')" + failureReason, "error");
             // load the original content of the container
-            container.update(container.originalContentHTML);
+            this.fillViewPanel(container, container.originalContentHTML, id, inBubble);
           }.bind(this),
           on0: function (response) {
             response.request.options.onFailure(response);
@@ -898,16 +925,29 @@ XWiki.Selection = Class.create({
       // create the annotation markers hidden by default, since annotations are added on the document hidden by default
       var markerSpan = new Element('span', {'id': 'ID' + item.annotationId, 'class' : 'hidden annotation-marker ' + item.state});
       lastSpan.insert({after: markerSpan});
-      // add a click listener to display the annotation display form for each
-      // TODO: this reference should be taken already made from a document function
-      markerSpan.observe("mouseover", this.displayAnnotationDetails.bindAsEventListener(this, item.annotationId));
+      // annotations are displayed on mouseover
+      markerSpan.observe("mouseover", this.onMarkerMouseOver.bindAsEventListener(this, item.annotationId));
     }.bind(this));
   },
 
   // maybe this should be moved in a function to display a bubble from an address, to call for all dialogs for different parameters
-  displayAnnotationDetails : function(event, id) {
+  onMarkerMouseOver : function(event, id) {
     // TODO: this.bubbles should work as a cache for these bubbles but to make things simple for the moment...
-    var newBubble = this.displayAnnotationBubble(event.element());
+    // create the bubble
+    var newBubble = this.displayLoadingBubble(event.element().positionedOffset().top, event.element().positionedOffset().left);
+    // and the mouseover observer to close the bubble when mouse goes out
+    newBubble.observe('mouseout', function(event, newBubble) {
+      // mouse is going out of something in the annotation bubble or the bubble itself to something which is not under the bubble, so close the dialog
+      // get the relatedTarget cross browser way, although relatedTarget seems to work on IE as well
+      var relatedTarget = event.relatedTarget || event.toElement;
+      if ((event.element() == newBubble || event.element().up('.annotation-bubble')) &amp;&amp; (relatedTarget == null || relatedTarget.up('.annotation-bubble') == null)) {
+        // enough propagation
+        event.stop();
+        this.hideBubble(newBubble);
+      }
+    }.bindAsEventListener(this, newBubble));
+
+    // and fetch the annotations display in it
     this.fetchAndShowAnnotationDetails(id, newBubble);
   },
   
@@ -922,7 +962,7 @@ XWiki.Selection = Class.create({
       },
       onSuccess: function(response) {
         // display the annotation creation form
-        this.fillViewBubble(container, response.responseText, annotationId);
+        this.fillViewPanel(container, response.responseText, annotationId, true);
       }.bind(this),
    
       onFailure: function(response) {
@@ -941,62 +981,73 @@ XWiki.Selection = Class.create({
       }.bind(this)
     });
   },
-
-  displayAnnotationBubble : function(marker) {
+  
+  displayLoadingBubble : function(top, left) {
     // create an element with the form
     var bubble = new Element('div', {'class' : 'annotation-bubble'});
     // and a nice loading panel inside
     bubble.insert({top : new Element('div', {'class' : 'loading'})});
-    // and put it in the content TODO: unhardcode this container reference
+    // and put it in the content
+    // TODO: insert in the body
     $('xwikicontent').insert({bottom : bubble});
     // make it hidden for the moment
     bubble.toggleClassName('hidden');
     // position it
-    bubble.style.left = marker.positionedOffset().left + "px";
-    bubble.style.top = marker.positionedOffset().top + "px";
+    bubble.style.left = left + "px";
+    bubble.style.top = top + "px";
     // make it visible
     bubble.toggleClassName('hidden');
     // put this bubble in the bubbles stack
     this.bubbles.push(bubble);
-    // and the mouseover observer to close the dialog when mouse goes out
-    bubble.observe('mouseout', function(event, bubble) {
-      // mouse is going out of something in the annotation bubble or the bubble itself to something which is not under the bubble, so close the dialog
-      // get the relatedTarget cross browser way, although relatedTarget seems to work on IE as well
-      var relatedTarget = event.relatedTarget || event.toElement;
-      if ((event.element() == bubble || event.element().up('.annotation-bubble')) &amp;&amp; (relatedTarget == null || relatedTarget.up('.annotation-bubble') == null)) {
-        // enough propagation
-        event.stop();
-        this.hideBubble(bubble);
-      }
-    }.bindAsEventListener(this, bubble));
-    
+
     return bubble;
   },
 
-  fillBubble : function(bubble, bubbleContent) {
-    if (!bubble.parentNode) {
+  displayAnnotationViewBubble : function(marker) {
+  },
+
+  /**
+   * Updates the container with the passed content only if the container is still displayed, and returns true if this is the case. 
+   */
+  safeUpdate : function(container, content) {
+    if (!container.parentNode) {
       // it's not attached anymore: either mouseout or escape
-      return;
+      return false;
     }
 
     // put the content in
-    bubble.update(bubbleContent);
+    container.update(content);
+    return true;
   },
   
-  fillEditBubble : function(bubble, bubbleContent, annotationId) {
-    this.fillBubble(bubble, bubbleContent);
+  /**
+   * Fills the edit form in the passed container, with the content passed (which should be the edit form) and sets all 
+   * listeners for the annotation with the passed id. If inBubble is true, the edit form is in a bubble, not in the 
+   * bottom panel.
+   */
+  fillEditForm : function(container, content, annotationId, inBubble) {
+    if (!this.safeUpdate(container, content)) {
+      return;
+    }
+    // remove the mouseout listener (if any), edit form should stay on
+    container.stopObserving('mouseout');
     // add the delete listener to the delete button
-    this.addDeleteListener(bubble.down('a.delete'));
-    bubble.down('form').focusFirstElement();
+    this.addDeleteListener(container.down('a.delete'), inBubble);
+    container.down('form').focusFirstElement();
     // and add the button listeners
-    bubble.down('input[type=submit]').observe('click', this.onAnnotationEdit.bindAsEventListener(this, bubble, annotationId));
-    bubble.down('input[type=reset]').observe('click', function(event) {
-      // reset content back to view, like this and not just updated() because we need the listeners to be added as well
-      this.fillViewBubble(bubble, bubble.originalContentHTML, annotationId);
+    container.down('input[type=submit]').observe('click', this.onAnnotationEdit.bindAsEventListener(this, container, annotationId, inBubble));
+    container.down('input[type=reset]').observe('click', function(event) {
+      if (inBubble) {
+        // close this bubble. 
+        this.hideBubble(container);
+      } else {
+        // reload the original content on cancel
+        this.fillViewPanel(container, container.originalContentHTML, annotationId, false);        
+      }
     }.bindAsEventListener(this));
   },
 
-  onAnnotationEdit : function(event, container, annotationId) {
+  onAnnotationEdit : function(event, container, annotationId, inBubble) {
     event.stop();
     var form = container.down('form');
     var formData = new Hash(form.serialize(true));
@@ -1005,23 +1056,36 @@ XWiki.Selection = Class.create({
       method : form.method,
       parameters : formData,
       onCreate : function() {
+        // make it load when starting to submit the form
         if (container.parentNode) {
           container.update(new Element('div', {'class' : 'loading'}));
         }
       },
       onSuccess : function (response) {
-        // TODO: check response code
-        form._x_notification = new XWiki.widgets.Notification("$msg.get('annotations.action.edit.success')", "done");
-        // and start a display again, if the container is still attached
-        if (container.parentNode) {
-          this.fetchAndShowAnnotationDetails(annotationId, container);
+        // check the response to see if all went fine
+        if (this.checkResponseCodeAndFail(response)) {
+          return;
         }
+        form._x_notification = new XWiki.widgets.Notification("$msg.get('annotations.action.edit.success')", "done");
+        if (inBubble) {
+          // close the bubble on successful update
+          this.hideBubble(container);
+        }
+        // and reload the annotations tab in the bottom
+        this.reloadTab(!inBubble);
       }.bind(this),
       onFailure : function(response) {
+        var failureReason = response.statusText;
+        if (response.statusText == '' /* No response */ || response.status == 12031 /* In IE */) {
+          failureReason = 'Server not responding';
+        }        
         this._x_notification = new XWiki.widgets.Notification("$msg.get('annotations.action.edit.loaderror')" + failureReason, "error");
-        // refresh the display
-        if (container.parentNode) {
-          this.fetchAndShowAnnotationDetails(annotationId, container);
+        if (inBubble) {
+          // and close the bubble on failure to update
+          this.hideBubble(container);
+        } else {
+          // reload the original content on failure
+          this.fillViewPanel(container, container.originalContentHTML, annotationId, false);          
         }
       }.bind(this),
       on0 : function (response) {
@@ -1030,8 +1094,15 @@ XWiki.Selection = Class.create({
     }); 
   },
 
-  fillViewBubble : function(bubble, bubbleContent, annotationId) {
-    this.fillBubble(bubble, bubbleContent);
+  /**
+   * Fills the display panel for the passed container, with the passed content, for the passed annotation and sets the 
+   * edit and delete listeners. If inBubble is set to true, then the panel is in a view bubble, not in the bottom panel 
+   * (or other place).
+   */
+  fillViewPanel : function(container, content, annotationId, inBubble) {
+    if (!this.safeUpdate(container, content)) {
+      return;
+    }
     // and add the button observers
     /*
     No hide button ftm
@@ -1041,17 +1112,19 @@ XWiki.Selection = Class.create({
     }.bindAsEventListener(this, bubble));
     */
     // add the delete listener to the delete button
-    this.addDeleteListener(bubble.down('a.delete'));
-    this.addEditListener(bubble.down('a.edit'), annotationId, bubble);
+    this.addDeleteListener(container.down('a.delete'), inBubble);
+    this.addEditListener(container.down('a.edit'), annotationId, container, true);
   },
 
+  /**
+   * Hides the passed bubble and removes it from the bubbles stack.
+   */
   hideBubble : function(bubble) {
     if (!bubble.parentNode) {
       // it's not attached anymore: either mouseout or escape
       return;
     }
     bubble.remove();
-    // TODO: remove from the bubbles array
     var bubbleIndex = this.bubbles.indexOf(bubble);
     if (bubbleIndex &gt;= 0) {
       // remove it
@@ -1060,7 +1133,7 @@ XWiki.Selection = Class.create({
   },
 
   registerAddAnnotationShortcut : function() {
-    var method = this.addAnnotation;
+    var method = this.onAddAnnotationShortcut;
     for (var i = 0; i &lt; this.addAnnotationShortcuts.size(); ++i) {
       if (Prototype.Browser.IE || Prototype.Browser.WebKit) {
         shortcut.add(this.addAnnotationShortcuts[i], method.bindAsEventListener(this), {type: 'keyup'});
@@ -1087,6 +1160,9 @@ XWiki.Selection = Class.create({
     }
   },
 
+  /**
+   * Closes the last opened bubble (i.e. last bubble in the this.bubbles stack).
+   */
   closeOpenBubble : function() {
     if (this.bubbles.length &gt; 0) {
       // get the last one
@@ -1102,7 +1178,7 @@ XWiki.Selection = Class.create({
   /**
    * Execute the add annotation shortcut: get selection, compute context, open dialog, register listeners.
    */
-  addAnnotation : function() {
+  onAddAnnotationShortcut : function() {
     // parse the selection on the xwiki content container
     this.selectionService.computeSelection($('xwikicontent'));
     var selectionText = this.selectionService.selectionText;
@@ -1123,20 +1199,13 @@ XWiki.Selection = Class.create({
           'page' : encodeURIComponent($$('meta[name=page]')[0].content)
         },
         onCreate: function() {
-          // show nice loading message at page bottom
-          this._x_notification = new XWiki.widgets.Notification("$msg.get('annotations.action.create.form.loading')", "inprogress");
-          // remove the ctrl + M listeners, so that only one dialog is displayed at one moment
-          this.unregisterAddAnnotationShortcut();
+          // create nice loading panel
+          this.displayAnnotationCreationForm();
         }.bind(this),
 
         onSuccess: function(response) {
           // display the annotation creation form
-          this.displayAnnotationCreationForm(response.responseText);
-          // and add the button observers
-          this.createPanel.down('input[type=submit]').observe('click', this.onAnnotationAdd.bindAsEventListener(this));
-          this.createPanel.down('input[type=reset]').observe('click', this.hideAnnotationCreationForm.bindAsEventListener(this));
-          // hide the notification message
-          this._x_notification.hide();
+          this.fillCreateForm(this.createPanel, response.responseText);
         }.bind(this),
    
         onFailure: function(response) {
@@ -1145,7 +1214,9 @@ XWiki.Selection = Class.create({
             failureReason = 'Server not responding';
           }
           // show the error message at the bottom
-          this._x_notification.replace(new XWiki.widgets.Notification("$msg.get('annotations.action.create.form.loaderror')" + failureReason, "error"));
+          this._x_notification = new XWiki.widgets.Notification("$msg.get('annotations.action.create.form.loaderror')" + failureReason, "error");
+          // and hide the create form panel
+          this.hideAnnotationCreationForm();
           // and register the listeners again
           this.registerAddAnnotationShortcut();
         }.bind(this),
@@ -1155,27 +1226,28 @@ XWiki.Selection = Class.create({
         }.bind(this)
       });
     }
-  }, 
+  },
 
-  displayAnnotationCreationForm : function(panelContent) {
-    // create an element with the form
-    this.createPanel = new Element('div', {'class' : 'annotation-bubble'});
-    // make it hidden for the moment
-    this.createPanel.toggleClassName('hidden');
+  displayAnnotationCreationForm : function() {
     // TODO: get this color from the color theme
     this.selectionService.highlightSelection("#FFEE99");
-    this.selectionService.container.insert({bottom : this.createPanel});
-
-    // set the position of the panel on the screen
-    this.selectionService.positionPanelNextToSelection(this.createPanel);
-    // put the content in
-    this.createPanel.update(panelContent);
-    // make it visible
-    this.createPanel.toggleClassName('hidden');
+    // get the position and build the loading bubble
+    var position = this.selectionService.getPositionNextToSelection();
+    this.createPanel = this.displayLoadingBubble(position.top, position.left);
+    // remove the ctrl + M listeners, so that only one dialog is displayed at one moment
+    this.unregisterAddAnnotationShortcut();    
+  },
+  
+  fillCreateForm : function(container, panelContent) {
+    // put the content in. Safe update because an escape might have been hit
+    if (!this.safeUpdate(this.createPanel, panelContent)) {
+      return;
+    }
     // set the focus in the first element of type input
     this.createPanel.select('form').first().focusFirstElement();
-    // and put the create panel in the list of bubbles
-    this.bubbles.push(this.createPanel);
+    // and add the button observers
+    this.createPanel.down('input[type=submit]').observe('click', this.onAnnotationAdd.bindAsEventListener(this));
+    this.createPanel.down('input[type=reset]').observe('click', this.hideAnnotationCreationForm.bindAsEventListener(this));    
   },
 
   hideAnnotationCreationForm : function() {
@@ -1197,19 +1269,27 @@ XWiki.Selection = Class.create({
       method : form.method,
       parameters : formData,
       onCreate : function() {
-        form._x_notification = new XWiki.widgets.Notification("$msg.get("annotations.action.create.loading")", "inprogress");
-      },
+        // make it load while update is in progress
+        this.createPanel.update(new Element('div', {'class' : 'loading'}));
+      }.bind(this),
       onSuccess : function (response) {
-        // TODO: check response code
+        // check the response to see if all went fine
+        if (this.checkResponseCodeAndFail(response)) {
+          return;
+        }
         this.loadAnnotatedContent(response.responseJSON.annotatedContent, this.displayAnnotationsCheckbox.checked);
         this.fetchedAnnotations = true;
-        form._x_notification.replace(new XWiki.widgets.Notification("$msg.get('annotations.action.create.success')", "done"));
+        form._x_notification = new XWiki.widgets.Notification("$msg.get('annotations.action.create.success')", "done");
         // and add the shortcut again since the dialog has been 'closed' (anywayremoved)
         this.registerAddAnnotationShortcut();
       }.bind(this),
       onFailure : function(response) {
         this.hideAnnotationCreationForm();
-        this._x_notification.replace(new XWiki.widgets.Notification("$msg.get('annotations.action.create.loaderror')" + failureReason, "error"));
+        var failureReason = response.statusText;
+        if (response.statusText == '' /* No response */ || response.status == 12031 /* In IE */) {
+          failureReason = 'Server not responding';
+        }
+        this._x_notification = new XWiki.widgets.Notification("$msg.get('annotations.action.create.loaderror')" + failureReason, "error");
       }.bind(this),
       on0 : function (response) {
         response.request.options.onFailure(response);

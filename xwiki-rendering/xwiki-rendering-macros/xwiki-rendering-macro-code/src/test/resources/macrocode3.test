@@ -12,8 +12,25 @@ beginDocument
 beginMacroMarkerStandalone [code] [language=none] [<b>bold</b>
 <i>italic</i>]
 beginGroup [[class]=[box code]]
-onVerbatim [<b>bold</b>
-<i>italic</i>] [false]
+beginParagraph
+onSpecialSymbol [<]
+onWord [b]
+onSpecialSymbol [>]
+onWord [bold]
+onSpecialSymbol [<]
+onSpecialSymbol [/]
+onWord [b]
+onSpecialSymbol [>]
+onNewLine
+onSpecialSymbol [<]
+onWord [i]
+onSpecialSymbol [>]
+onWord [italic]
+onSpecialSymbol [<]
+onSpecialSymbol [/]
+onWord [i]
+onSpecialSymbol [>]
+endParagraph
 endGroup [[class]=[box code]]
 endMacroMarkerStandalone [code] [language=none] [<b>bold</b>
 <i>italic</i>]

@@ -23,16 +23,18 @@ import java.io.StringReader;
 import java.util.Collections;
 import java.util.List;
 
+import org.apache.commons.lang.StringUtils;
 import org.xwiki.component.annotation.Component;
+import org.xwiki.component.annotation.Requirement;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.rendering.block.Block;
-import org.xwiki.rendering.block.VerbatimBlock;
 import org.xwiki.rendering.macro.MacroExecutionException;
 import org.xwiki.rendering.macro.box.AbstractBoxMacro;
 import org.xwiki.rendering.macro.code.CodeMacroParameters;
 import org.xwiki.rendering.macro.descriptor.DefaultContentDescriptor;
 import org.xwiki.rendering.parser.HighlightParser;
 import org.xwiki.rendering.parser.ParseException;
+import org.xwiki.rendering.parser.Parser;
 import org.xwiki.rendering.transformation.MacroTransformationContext;
 
 /**
@@ -48,7 +50,7 @@ public class CodeMacro extends AbstractBoxMacro<CodeMacroParameters>
      * The description of the macro.
      */
     private static final String DESCRIPTION = "Highlights code snippets of various programming languages";
-    
+
     /**
      * Used to indicate that content should not be highlighted.
      */
@@ -58,6 +60,12 @@ public class CodeMacro extends AbstractBoxMacro<CodeMacroParameters>
      * The description of the macro content.
      */
     private static final String CONTENT_DESCRIPTION = "the content to highlight";
+
+    /**
+     * Used to parse content when language="none".
+     */
+    @Requirement("plain/1.0")
+    private Parser plainTextParser;
 
     /**
      * Create and initialize the descriptor of the macro.
@@ -81,7 +89,14 @@ public class CodeMacro extends AbstractBoxMacro<CodeMacroParameters>
         List<Block> result;
         try {
             if (LANGUAGE_NONE.equalsIgnoreCase(parameters.getLanguage())) {
-                result = Collections.<Block> singletonList(new VerbatimBlock(content, context.isInline()));
+                if (StringUtils.isEmpty(content)) {
+                    result = Collections.emptyList();
+                } else {
+                    result = this.plainTextParser.parse(new StringReader(content)).getChildren();
+                    if (context.isInline()) {
+                        result = result.get(0).getChildren();
+                    }
+                }
             } else {
                 result = highlight(parameters, content);
             }

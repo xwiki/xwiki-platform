@@ -16,9 +16,7 @@ endGroup [[class]=[box code]]
 endMacroMarkerStandalone [code] [language=notsupportedsyntax] [Text]
 beginMacroMarkerStandalone [code] [language=none] [Text]
 beginGroup [[class]=[box code]]
-beginParagraph
 onWord [Text]
-endParagraph
 endGroup [[class]=[box code]]
 endMacroMarkerStandalone [code] [language=none] [Text]
 endDocument

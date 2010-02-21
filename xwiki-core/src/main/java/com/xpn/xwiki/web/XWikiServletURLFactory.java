@@ -133,9 +133,9 @@ public class XWikiServletURLFactory extends XWikiDefaultURLFactory
             return serverURL;
         }
 
-        if (xwikidb.equals("xwiki")) {
-            String surl = context.getWiki().Param("xwiki.home", "");
-            if (!surl.equals("")) {
+        if (context.isMainWiki(xwikidb)) {
+            String surl = context.getWiki().Param("xwiki.home", null);
+            if (!StringUtils.isEmpty(surl)) {
                 return new URL(surl);
             }
         }

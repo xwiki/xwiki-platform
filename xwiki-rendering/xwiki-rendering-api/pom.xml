@@ -200,6 +200,8 @@
                 <exclude>**/internal/**</exclude>
                 <exclude>org/xwiki/rendering/syntax/SyntaxFactory</exclude>
                 <exclude>org/xwiki/rendering/internal/parser/DefaultSyntaxFactory</exclude>
+                <exclude>org/xwiki/rendering/syntax/Syntax</exclude>
+                <exclude>org/xwiki/rendering/syntax/SyntaxType</exclude>
               </excludes>
             </configuration>
           </plugin>

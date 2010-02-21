@@ -47,8 +47,6 @@ public class SyntaxType
 
     public static final SyntaxType EVENT = new SyntaxType("event", "Event");
 
-    public static final SyntaxType XDOM = new SyntaxType("xdom", "XML based xdom");
-
     public static final SyntaxType TEX = new SyntaxType("tex", "TeX");
 
     /**

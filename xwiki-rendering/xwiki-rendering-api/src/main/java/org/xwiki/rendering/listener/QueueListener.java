@@ -34,6 +34,11 @@ import org.xwiki.rendering.syntax.Syntax;
 public class QueueListener extends LinkedList<QueueListener.Event> implements Listener
 {
     /**
+     * Class ID for serialization.
+     */
+    private static final long serialVersionUID = 2869508092440006345L;
+
+    /**
      * An event.
      * 
      * @version $Id$

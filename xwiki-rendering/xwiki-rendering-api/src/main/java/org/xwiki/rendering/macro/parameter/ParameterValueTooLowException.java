@@ -27,6 +27,11 @@ package org.xwiki.rendering.macro.parameter;
 public class ParameterValueTooLowException extends MacroParameterException
 {
     /**
+     * Class ID for serialization.
+     */
+    private static final long serialVersionUID = 5386966650727002176L;
+
+    /**
      * @param maxValue the minimum valid number
      */
     public ParameterValueTooLowException(int maxValue)

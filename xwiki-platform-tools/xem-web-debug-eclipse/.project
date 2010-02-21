@@ -150,10 +150,5 @@
 			<type>2</type>
 			<locationURI>XWIKI_WEB/xwiki-gwt-wysiwyg-server/src/main/java/com/xpn/xwiki/wysiwyg/server</locationURI>
 		</link>
-		<link>
-			<name>src/main/java/org/xwiki/gwt/wysiwyg/client</name>
-			<type>2</type>
-			<locationURI>XWIKI_WEB/xwiki-gwt-wysiwyg-client/src/main/java/org/xwiki/gwt/wysiwyg/client</locationURI>
-		</link>
 	</linkedResources>
 </projectDescription>

@@ -12,8 +12,8 @@
 <customClass></customClass>
 <contentAuthor>XWiki.Admin</contentAuthor>
 <creationDate>1264860755000</creationDate>
-<date>1266768903000</date>
-<contentUpdateDate>1266768903000</contentUpdateDate>
+<date>1266772268000</date>
+<contentUpdateDate>1266772268000</contentUpdateDate>
 <version>1.0</version>
 <title></title>
 <template></template>
@@ -355,9 +355,9 @@ XWiki.Selection = Class.create({
       // set the position
       // get the offsetleft from the first highlightWrapper
       if (this.highlightWrappers.length &gt; 0) {
-        left = this.highlightWrappers[0].positionedOffset().left;
+        left = this.highlightWrappers[0].cumulativeOffset().left;
         var lastWrapper = this.highlightWrappers[this.highlightWrappers.length - 1];
-        top = lastWrapper.positionedOffset().top + lastWrapper.getHeight();
+        top = lastWrapper.cumulativeOffset().top + lastWrapper.getHeight();
       }
     } else {
       left = this.offsetX + "px";
@@ -934,7 +934,7 @@ XWiki.Selection = Class.create({
   onMarkerMouseOver : function(event, id) {
     // TODO: this.bubbles should work as a cache for these bubbles but to make things simple for the moment...
     // create the bubble
-    var newBubble = this.displayLoadingBubble(event.element().positionedOffset().top, event.element().positionedOffset().left);
+    var newBubble = this.displayLoadingBubble(event.element().cumulativeOffset().top, event.element().cumulativeOffset().left);
     // and the mouseover observer to close the bubble when mouse goes out
     newBubble.observe('mouseout', function(event, newBubble) {
       // mouse is going out of something in the annotation bubble or the bubble itself to something which is not under the bubble, so close the dialog
@@ -988,8 +988,7 @@ XWiki.Selection = Class.create({
     // and a nice loading panel inside
     bubble.insert({top : new Element('div', {'class' : 'loading'})});
     // and put it in the content
-    // TODO: insert in the body
-    $('xwikicontent').insert({bottom : bubble});
+    document.body.insert({bottom : bubble});
     // make it hidden for the moment
     bubble.toggleClassName('hidden');
     // position it
@@ -1247,14 +1246,18 @@ XWiki.Selection = Class.create({
     this.createPanel.select('form').first().focusFirstElement();
     // and add the button observers
     this.createPanel.down('input[type=submit]').observe('click', this.onAnnotationAdd.bindAsEventListener(this));
-    this.createPanel.down('input[type=reset]').observe('click', this.hideAnnotationCreationForm.bindAsEventListener(this));    
+    this.createPanel.down('input[type=reset]').observe('click', function() {
+      this.hideAnnotationCreationForm();
+    }.bind(this));
   },
 
-  hideAnnotationCreationForm : function() {
+  hideAnnotationCreationForm : function(skipSelectionHighlightClear) {
     // remove it from document and remove it from the open bubbles
     this.hideBubble(this.createPanel);
-    // rollback selection coloring
-    this.selectionService.removeSelectionHighlight();
+    if (!skipSelectionHighlightClear) {
+      // rollback selection coloring
+      this.selectionService.removeSelectionHighlight();
+    }
     // and listen to the create shortcut again
     this.registerAddAnnotationShortcut();
   }, 
@@ -1280,8 +1283,8 @@ XWiki.Selection = Class.create({
         this.loadAnnotatedContent(response.responseJSON.annotatedContent, this.displayAnnotationsCheckbox.checked);
         this.fetchedAnnotations = true;
         form._x_notification = new XWiki.widgets.Notification("$msg.get('annotations.action.create.success')", "done");
-        // and add the shortcut again since the dialog has been 'closed' (anywayremoved)
-        this.registerAddAnnotationShortcut();
+        // and hide the create bubble, skipping selection highlight clear
+        this.hideAnnotationCreationForm(true);
       }.bind(this),
       onFailure : function(response) {
         this.hideAnnotationCreationForm();

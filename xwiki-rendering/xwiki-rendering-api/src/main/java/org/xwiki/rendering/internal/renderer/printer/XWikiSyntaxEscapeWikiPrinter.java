@@ -38,6 +38,8 @@ import org.xwiki.rendering.renderer.printer.WikiPrinter;
  */
 public class XWikiSyntaxEscapeWikiPrinter extends LookaheadWikiPrinter
 {
+    private static final Pattern VERBATIM_PATTERN = Pattern.compile("(\\{\\{\\{)|(\\}\\}\\})");
+
     private XWikiSyntaxListenerChain listenerChain;
 
     private XWikiSyntaxEscapeHandler escapeHandler;
@@ -46,7 +48,7 @@ public class XWikiSyntaxEscapeWikiPrinter extends LookaheadWikiPrinter
 
     private Pattern escapeFirstIfMatching;
 
-    private static final Pattern VERBATIM_PATTERN = Pattern.compile("(\\{\\{\\{)|(\\}\\}\\})");
+    private String lastPrinted;
 
     public XWikiSyntaxEscapeWikiPrinter(WikiPrinter printer, XWikiSyntaxListenerChain listenerChain)
     {
@@ -62,6 +64,11 @@ public class XWikiSyntaxEscapeWikiPrinter extends LookaheadWikiPrinter
         return escapeHandler;
     }
 
+    /**
+     * {@inheritDoc}
+     * 
+     * @see org.xwiki.rendering.renderer.printer.LookaheadWikiPrinter#printInternal(java.lang.String)
+     */
     @Override
     protected void printInternal(String text)
     {
@@ -72,6 +79,8 @@ public class XWikiSyntaxEscapeWikiPrinter extends LookaheadWikiPrinter
         if (length > 0) {
             this.escapeHandler.setOnNewLine(text.charAt(length - 1) == '\n');
         }
+
+        this.lastPrinted = text;
     }
 
     /**
@@ -85,6 +94,8 @@ public class XWikiSyntaxEscapeWikiPrinter extends LookaheadWikiPrinter
         super.printlnInternal(text);
 
         this.escapeHandler.setOnNewLine(true);
+
+        this.lastPrinted = "\n";
     }
 
     /**
@@ -129,6 +140,16 @@ public class XWikiSyntaxEscapeWikiPrinter extends LookaheadWikiPrinter
     public boolean isOnNewLine()
     {
         return this.escapeHandler.isOnNewLine();
+    }
+
+    public boolean isAfterWhiteSpace()
+    {
+        return isOnNewLine() || Character.isWhitespace(getLastPrinted().charAt(getLastPrinted().length() - 1));
+    }
+
+    public String getLastPrinted()
+    {
+        return this.lastPrinted;
     }
 
     public void printBeginItalic()

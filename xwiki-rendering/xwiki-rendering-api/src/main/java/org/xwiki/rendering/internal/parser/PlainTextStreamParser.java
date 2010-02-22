@@ -43,7 +43,7 @@ public class PlainTextStreamParser implements StreamParser
      * The characters which are considered as "special" symbols for {@link org.xwiki.rendering.block.SpecialSymbolBlock}
      * .
      */
-    private static final Pattern SPECIALSYMBOL_PATTERN = Pattern.compile("[!\"#$%&'()*+,-./:;<=>?@\\[\\]^_`{|}~]");
+    public static final Pattern SPECIALSYMBOL_PATTERN = Pattern.compile("[!\"#$%&'()*+,-./:;<=>?@\\[\\]^_`{|}~]");
 
     /**
      * {@inheritDoc}

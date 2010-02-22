@@ -33,27 +33,27 @@ public interface XWikiRightService
      * The Superadmin username.
      */
     public static final String SUPERADMIN_USER = "superadmin";
-    
+
     /**
      * The Superadmin full name.
      */
     public static final String SUPERADMIN_USER_FULLNAME = "XWiki." + SUPERADMIN_USER;
-    
+
     /**
      * The Guest full name.
      */
     public static final String GUEST_USER_FULLNAME = "XWiki.XWikiGuest";
-    
+
     /**
      * Checks if the wiki current user has the right to execute (@code action} on the document {@code doc}, along with
-     * redirecting to the login if it's not the case. It returns {@code true} if the user has access, and {@code false}
-     * otherwise <strong> along with requesting the login from the authentication service (redirecting to the login page
-     * in the case of a form authenticator, for example) <strong/>.
+     * redirecting to the login if it's not the case and there is no logged in user (the user is the guest user).
      * 
      * @param action the action to be executed on the document
      * @param doc the document to perform action on
      * @param context the xwiki context in which to perform the verification (from which to get the user, for example)
-     * @return {@code true} if the current user has the right to execute {@code action} on {@code doc}
+     * @return {@code true} if the user has right to execute {@code action} on {@code doc}, {@code false} otherwise
+     *         <strong> and requests the login from the authentication service (redirecting to the login page in the
+     *         case of a form authenticator, for example) when no user is logged in. </strong>
      * @throws XWikiException if something goes wrong during the rights checking process
      */
     public boolean checkAccess(String action, XWikiDocument doc, XWikiContext context) throws XWikiException;
@@ -73,18 +73,17 @@ public interface XWikiRightService
         throws XWikiException;
 
     /**
-     * Checks if the author of the current document in the context has programming rights in this wiki (used to
-     * determine if the protected calls in the script contained in the document should be executed or not).
+     * Checks if the author of the context document (last editor of the content of the document) has programming rights
+     * (used to determine if the protected calls in the script contained in the document should be executed or not).
      * 
      * @param context the xwiki context of this request
-     * @return {@code true} if the author of the current document in the context has programming rights, {@code false}
-     *         otherwise.
+     * @return {@code true} if the author of the context document has programming rights, {@code false} otherwise.
      */
     public boolean hasProgrammingRights(XWikiContext context);
 
     /**
-     * Checks if the author of the passed document has programming rights in this wiki (used to determine if the
-     * protected calls in the script contained in the document should be executed or not).
+     * Checks if the author of the passed document (last editor of the content of the document) has programming rights
+     * (used to determine if the protected calls in the script contained in the document should be executed or not).
      * 
      * @param doc the document to check programming rights for
      * @param context the xwiki context of this request
@@ -103,7 +102,7 @@ public interface XWikiRightService
 
     /**
      * @param context the xwiki context of this request
-     * @return the list of all the possible access levels
+     * @return the list of all the known access levels
      * @throws XWikiException if something goes wrong during the rights checking process
      */
     public List<String> listAllLevels(XWikiContext context) throws XWikiException;

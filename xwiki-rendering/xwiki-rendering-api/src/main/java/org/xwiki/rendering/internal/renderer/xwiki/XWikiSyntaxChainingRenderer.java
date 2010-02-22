@@ -64,7 +64,7 @@ public class XWikiSyntaxChainingRenderer extends AbstractChainingPrintRenderer i
     {
         setListenerChain(listenerChain);
 
-        this.linkRenderer = new XWikiSyntaxLinkRenderer();
+        this.linkRenderer = new XWikiSyntaxLinkRenderer(getXWikiSyntaxListenerChain());
         this.imageRenderer = new XWikiSyntaxImageRenderer();
         this.macroPrinter = new XWikiSyntaxMacroRenderer();
     }
@@ -179,10 +179,10 @@ public class XWikiSyntaxChainingRenderer extends AbstractChainingPrintRenderer i
         // If we are at a depth of 2 or greater it means we're in a link inside a link and in this case we
         // shouldn't output the nested link as a link unless it's a free standing link.
         if (linkDepth < 2) {
-            getLinkRenderer().beginRenderLink(getPrinter(), link, isFreeStandingURI, parameters);
+            getLinkRenderer().beginRenderLink(getXWikiPrinter(), link, isFreeStandingURI, parameters);
 
             XWikiSyntaxEscapeWikiPrinter linkLabelPrinter =
-                new XWikiSyntaxEscapeWikiPrinter(new DefaultWikiPrinter(), getXWikiSyntaxListenerChain());
+                    new XWikiSyntaxEscapeWikiPrinter(new DefaultWikiPrinter(), getXWikiSyntaxListenerChain());
 
             // Make sure the escape handler knows there is already characters before
             linkLabelPrinter.setOnNewLine(getXWikiPrinter().isOnNewLine());
@@ -210,8 +210,8 @@ public class XWikiSyntaxChainingRenderer extends AbstractChainingPrintRenderer i
             String content = linkBlocksPrinter.toString();
             popPrinter();
 
-            getLinkRenderer().renderLinkContent(getPrinter(), content);
-            getLinkRenderer().endRenderLink(getPrinter(), link, isFreeStandingURI, parameters);
+            getLinkRenderer().renderLinkContent(getXWikiPrinter(), content);
+            getLinkRenderer().endRenderLink(getXWikiPrinter(), link, isFreeStandingURI, parameters);
         }
     }
 
@@ -807,8 +807,8 @@ public class XWikiSyntaxChainingRenderer extends AbstractChainingPrintRenderer i
         link.setReference("image:" + getImageRenderer().renderImage(image));
         link.setType(LinkType.URI);
 
-        getLinkRenderer().beginRenderLink(getPrinter(), link, isFreeStandingURI, parameters);
-        getLinkRenderer().endRenderLink(getPrinter(), link, isFreeStandingURI, parameters);
+        getLinkRenderer().beginRenderLink(getXWikiPrinter(), link, isFreeStandingURI, parameters);
+        getLinkRenderer().endRenderLink(getXWikiPrinter(), link, isFreeStandingURI, parameters);
     }
 
     protected void printParameters(Map<String, String> parameters)

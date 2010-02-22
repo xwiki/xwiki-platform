@@ -20,12 +20,17 @@
 package org.xwiki.rendering.internal.renderer.xwiki;
 
 import java.util.Map;
+import java.util.Stack;
 
 import org.apache.commons.lang.StringUtils;
-import org.xwiki.rendering.listener.Link;
-import org.xwiki.rendering.renderer.printer.WikiPrinter;
+import org.xwiki.rendering.internal.parser.PlainTextStreamParser;
 import org.xwiki.rendering.internal.renderer.BasicLinkRenderer;
 import org.xwiki.rendering.internal.renderer.ParametersPrinter;
+import org.xwiki.rendering.internal.renderer.printer.XWikiSyntaxEscapeWikiPrinter;
+import org.xwiki.rendering.listener.Link;
+import org.xwiki.rendering.listener.QueueListener.Event;
+import org.xwiki.rendering.listener.chaining.EventType;
+import org.xwiki.rendering.renderer.XWikiSyntaxListenerChain;
 
 /**
  * Logic to render a XWiki Link into XWiki syntax.
@@ -35,22 +40,65 @@ import org.xwiki.rendering.internal.renderer.ParametersPrinter;
  */
 public class XWikiSyntaxLinkRenderer extends BasicLinkRenderer
 {
-    ParametersPrinter parametersPrinter = new ParametersPrinter();
+    private ParametersPrinter parametersPrinter = new ParametersPrinter();
 
+    private Stack<Boolean> forceFullSyntax = new Stack<Boolean>();
+
+    private XWikiSyntaxListenerChain listenerChain;
+
+    public XWikiSyntaxLinkRenderer(XWikiSyntaxListenerChain listenerChain)
+    {
+        this.listenerChain = listenerChain;
+        this.forceFullSyntax.push(false);
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see org.xwiki.rendering.internal.renderer.BasicLinkRenderer#renderLinkReference(org.xwiki.rendering.listener.Link)
+     */
     public String renderLinkReference(Link link)
     {
         return super.renderLinkReference(link).replace(">>", "~>~>").replace("||", "~|~|");
     }
 
-    public void beginRenderLink(WikiPrinter printer, Link link, boolean isFreeStandingURI,
+    public void beginRenderLink(XWikiSyntaxEscapeWikiPrinter printer, Link link, boolean isFreeStandingURI,
         Map<String, String> parameters)
     {
-        if (!isFreeStandingURI || !parameters.isEmpty()) {
+        // find if the last printed char is part of a syntax (i.e. consumed by the parser before starting to parse the
+        // link)
+        boolean isLastSyntax = printer.getBuffer().length() == 0;
+
+        printer.flush();
+
+        Event nextEvent = this.listenerChain.getLookaheadChainingListener().getNextEvent();
+
+        // force full syntax if
+        // 1: it's not a free standing URI
+        // 2: there is parameters
+        // 3: it follows a character which is not a white space (newline/space) and is not consumed by the parser (like
+        // a another link)
+        // 4: it's followed by a character which is not a white space (TODO: find a better way than this endless list of
+        // EventType test but it probably need some big refactoring of the printer and XWikiSyntaxLinkRenderer)
+        if (!isFreeStandingURI
+            || !parameters.isEmpty()
+            || (!isLastSyntax && !printer.isAfterWhiteSpace() && (!PlainTextStreamParser.SPECIALSYMBOL_PATTERN.matcher(
+                String.valueOf(printer.getLastPrinted().charAt(printer.getLastPrinted().length() - 1))).matches()))
+            || (nextEvent != null && nextEvent.eventType != EventType.ON_SPACE
+                && nextEvent.eventType != EventType.ON_NEW_LINE && nextEvent.eventType != EventType.END_PARAGRAPH
+                && nextEvent.eventType != EventType.END_LINK && nextEvent.eventType != EventType.END_LIST_ITEM
+                && nextEvent.eventType != EventType.END_DEFINITION_DESCRIPTION
+                && nextEvent.eventType != EventType.END_DEFINITION_TERM
+                && nextEvent.eventType != EventType.END_QUOTATION_LINE && nextEvent.eventType != EventType.END_SECTION)) {
+            this.forceFullSyntax.push(true);
+
             printer.print("[[");
+        } else {
+            this.forceFullSyntax.push(false);
         }
     }
 
-    public void renderLinkContent(WikiPrinter printer, String label)
+    public void renderLinkContent(XWikiSyntaxEscapeWikiPrinter printer, String label)
     {
         // If there was some link content specified then output the character separator ">>".
         if (!StringUtils.isEmpty(label)) {
@@ -59,7 +107,8 @@ public class XWikiSyntaxLinkRenderer extends BasicLinkRenderer
         }
     }
 
-    public void endRenderLink(WikiPrinter printer, Link link, boolean isFreeStandingURI, Map<String, String> parameters)
+    public void endRenderLink(XWikiSyntaxEscapeWikiPrinter printer, Link link, boolean isFreeStandingURI,
+        Map<String, String> parameters)
     {
         printer.print(renderLinkReference(link));
 
@@ -69,8 +118,10 @@ public class XWikiSyntaxLinkRenderer extends BasicLinkRenderer
             printer.print(this.parametersPrinter.print(parameters, '~'));
         }
 
-        if (!isFreeStandingURI || !parameters.isEmpty()) {
+        if (this.forceFullSyntax.peek() || !isFreeStandingURI) {
             printer.print("]]");
         }
+
+        this.forceFullSyntax.pop();
     }
 }

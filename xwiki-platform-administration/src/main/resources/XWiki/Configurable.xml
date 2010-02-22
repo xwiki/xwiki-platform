@@ -1,0 +1,1839 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<xwikidoc>
+<web>XWiki</web>
+<name>Configurable</name>
+<language></language>
+<defaultLanguage>en</defaultLanguage>
+<translation>0</translation>
+<parent>XWiki.WebHome</parent>
+<creator>XWiki.Admin</creator>
+<author>XWiki.Admin</author>
+<customClass></customClass>
+<contentAuthor>XWiki.Admin</contentAuthor>
+<creationDate>1265775370000</creationDate>
+<date>1266578504000</date>
+<contentUpdateDate>1266578504000</contentUpdateDate>
+<version>1.1</version>
+<title>XWiki.Configurable</title>
+<template></template>
+<defaultTemplate></defaultTemplate>
+<validationScript></validationScript>
+<comment>Deleted object</comment>
+<minorEdit>true</minorEdit>
+<syntaxId>xwiki/2.0</syntaxId>
+<hidden>false</hidden>
+<attachment>
+<filename>DefaultAdminSectionIcon.png</filename>
+<filesize>7502</filesize>
+<author>XWiki.Admin</author>
+<date>1266210801000</date>
+<version>1.1</version>
+<comment></comment>
+<content>iVBORw0KGgoAAAANSUhEUgAAAH0AAABVCAYAAABkf+t+AAAAAXNSR0IArs4c6QAAAAZiS0dEAN8A4ADfTWhMEgAAAAlwSFlzAAALEwAACxMBAJqcGAAAAAd0SU1FB9oCDwUKOxD9FZoAABzOSURBVHja7Z33cxvXluc/93ZAZlamsmQrWJYsreVAUqRkeWdcs/V2/tCtrVc7tfNejUeJlLxPtiz7WZG2lRMpiWICCHS8+wO6G41IUALk57EuiwWC3Y2+uOee9D2hhVJK8W78oYZ8twTviP5u/AGG/m4J3v7wfb/uNdSyvu9H/wfwPI9MJoOmae+I/lsPpVT0C+D5HigavldK4XledK3runieh6J8rmM70Xvf88t/B9ctLS2xe/duent7kVIihHhH9E5xXcRlKnivKhwYEsf3qrkwJF7IkSGxhBDYtl3Fya7rRoQ0TRNdLy+9kIJkIolpmigUhm6g6zpSyuha27ZxXRdd1xFCRMf+0ESPEyLkQs+vcJbv+dH/QwLFCRe/3nGc6H3Iob7vo1C4TuVcKSWmaSKEiAiZSCSiYyFnAmiaFp27ZgIZBrZt4zgOQgg0TcP3/TcivP6PTLy4rlMolK8aHgv1YJyoIdeFhI2f6/keyi9zXSKRQEoZcWicOLquoxuVJUomkm/MZWsdIpi/bduReH9T/d5xosf1XC0x46Iy1Hd14jUmEmsJGd8AruNGnymlRNM1BBViGYaBEAIhBLqhI0WZWFKTGLrREd3YEZWiFComPWoJqhs6VsnCcR0Mz0DTtGjur7sB9Xa5Lk7QuN6LCBFykvLxPT8613Xdqs9wXCe6LhKdwblxXSalrDJcwmMRIXN6S8LVbrxo87genutFm6fxxbT9ue0eC4/7vo8TUymu40Qb2jRNkskaaaKgWCwiNQ3XcdENHUM3ovWpvW82m11VEohaRM73fRzHiazPRlwX/m1ZFlKTERd1UlpU00BFc2lGzEYSptln1v4dlyCNNkCjz46/92vvW8MItfOsO9Z4wo3PrZ177Or8cp4PPviA3t7etXF6ySqxvLyMoRvRjgnFTlysSE3iui59fX2YpvnOh/sHGH//+99fT7xrUiNhJshms5Fb0VRM/IZ68d1Yu3oJR51cllJWifJ34/dF9Lid1BHrPQIYAvcpMuhqhmVZVX7y72vlfh/TrDP4ghG6q7WGcEuihyc1MmoWFxexLAvLsrBtm2QyCX31E3o28wzf85Hau3jOqvtLrZ2bS6USO7ZvJ51O1x2rhXgbEb6O6LqulxGrBpNZzi/z7OkzFhcXKRQK7D9woOnkhoeH3xl4XRp3791r4GKUkUHbtrEsC8M0kEYFdHpt8S4Q3Lp1i/v37+O6Ltu3b39Hgd9QfysVuLKiIjJCSSyEQJNaQxBHNrPKGxkCuq6zc+dOMplMG6LrnSHYPYLHrXVV+QlEfxigiSOhqxJdSlkFe8aJnkgk2sN+39G8e0PEQB4AP/ilHDCKE70h8zYjerhDqvSBIIJB3zbNw10bGZrB3JrNJRR/jY6HeL3nOcwXnzFfmkUKnYHUZnqT6yJJ1+zatd6343hGHIWslu54nlf2slBRdPCNXDZNaqQz6TY5Xf2G4k/VqSvf96PFD1/z9iLXn1/g+sx5TC3Nkc1fcnDDCTJmX/QZ4bVhJO515tIVECsO0wog2Kihnx6Gk9v200PxXjsMwyCXzbVF9E7TPL5wcW6zLIuFhQUKKyuYpkl/Xx+ZTKYOo27EeUV3mQcLN/hp5j9J6TnWZ7exa+AjMmYfUshIT4acH3JVeP3S8jILCwt4nkcum6WntxcjSHRYTSJ0ZmOXZ6R8EKimGH1bRNd1vSoG/Y+AcoSLF3KsEIJSqcSDBw+4du0aT54+JZvNcvDgQQ4eOEAul6v68o0W3/UdLLfAir2EUj4lJ4/j2eWlFGVvpTboERJ0YXGR69evc/PmTSzLYseOHRw6dIgtmzdHrmqoRjrO7YHRXh20aS/wtHaXLUjVaesLqO6I7JDgSilmZ2e59M03TE1O8vjJEzLZLI8fP8ZzXY4dPUoylarTsxXwqcy1mtAxtASGlkBKLVhRFYnLuo0jBPl8nqtXr3LmzBmuXbuGZVns3LmTlZUVTk5MsGHDhjrbo6NrISrSVETkbv8e+mrWYdXJhl4l2lvtqm65bOEC2rbN48ePuXLlCj/+9BOFQgFD11kpFADI5XLs378fwzAai/hwEwsdTZpo0kAKHSFkQ04KN8zKygo3b97k66+/5vLly8zOzuL5PvMLC+RyOT44eJANGza0dH07pc9VJeKMEH7j8K9qk+ia1LB8C9/3q4i8trh5dw05z/MoFossLy/jeR6pZBJN05ibm+Py5cv05HIYhsGePXswDKNqg0bEj5u+qmpnIagQPpRuJcvi9u3bfP3113z33XcsLi6SSqWiHISlpSUsy2pLr3ZKzgdaHaXa32ANiS6kqAvQN9KLLZMWumiZCyFIJBIMDQ0xPDzMw4cPWVlZiYj74sULLly4QCqVwjAMtm/fjq7rFaIjKtJQ+Sjl4SsPpfy6mYccblsWd379lfMXLnDp0iUWFhZIJpMIIXBdl1wux9atW+np6Xm7iFxsxo2yndonehP9sKawq+qeIQflDNNt27dz/PhxXrx8yc0bN3Ach2QyiVKKR48eMTU1RTqdxjRNtm7dWtm0IaMLhadcHN9GV3ZA+BgmEZzoeR4PHj5k6uJFvvnmG2ZmZyOQyrIsEokEBw4c4JPjxyPRHhKlG4acikR8XKertqWL3myBfd+vY1fDMCI35rfi9MgdAvr6+jj+8ccsLS2xUihw9+5dHMfBMAxcx+HXO3dITk6SzWZJp9MMDQ1VqzGhoWsJTD2NqacxtCS6NIj2RvDH7Owsl7/9lqmLF3nw4AGGYWAaBqVSCV3X2bt3L2Ojo3x05Ai5XK4lMNSRNYi0UaDX13ibpi5bIxi2lYhZDSDppPUO5bw0KSWbt2xhdGSEYrGI4zjcv38fKSWpdJpCocD09DSZTIZUOs34iRNV4ciknmVLz3vsXz9CQkuzMbeHlJGruudyPs/fLl/mwuQkd+/eRSlFOpnEsiyUUuzYsYOJ8XE++fRThtatqwKCWiF7b8rpFUNTrFmq6msmqJDkcjlevnz5m9hxjUCXXbt2cerUKUqlEqVSiWfPnpFKpchkMpRKJX766acIuDl8+DCpwJXLmL3sXzfCUHoYKQw25naRNCr+fT6f58r333P23Dlu37qF73mk02lc143ctInxccbHx9m2dWvD+XU16hICRqKSadvOBtNXE6N1qJymsXfvXl6+fNmCy7sHzjQj/LZt2/jiiy+wLIu//vWvLC0tkUwmSSaTFItFfvjhB3RNI5PJsHfvXpLJJLpMsCG7i8H0VgQCXTOicOTKygq3bt/mz3/+Mzdv3MBzXUzTxHYcLMti/fr1nDp1ilOnTrFly5am8G83oVg/Qmpaq9va+zcleojK1ZbQtFtdobrM6bWbMplIsGvXLk6cOMHi4iKTU1MUCgXSgQUfcu3gwACaprFnzx5M04yAmfgolUpMT0/zl7/8hZ9++olSsYiuaWUOL5Xo7evjxNgYY6OjbN26NfIMalVQ96DYMJau2hKqa0qiaLRzwrKa1w1AdIP7w3mkUykOHjjAysoKr+bnywSzLJKJBIZhsLS0xPnJSfr6+0kkEmzbti1y88LPsyyLe/fuMXXxIlMXL1LI50kkEnieh2VZZHM5PjpyhJOnTrFnzx4SiUTXDbdmwFcAHAaG7Zsicq0u0HVyPT0t06MrwYDucriogUqFEPT09HDk8GEW5uexbZtbt25hOw7JRAJd13n69CkXpqbIZLMkEgk2bdoUSS/HdXn85AmXLl3i4sWLvHj+nGw2W8bpXZd0Os0HBw9y+vRpDhw4EAV2apG72vl1PrQaroeP8kXZqBN+HZi2ZqI388mllCQSiToue1vivdXihu8HBgYYGRkhXyhgBaCKbdukUils2+bn6Wky6TQ92SzJZJKhoSF83+f58+d8d+UKk1NT3Llzh0SwUYrFIqZp8t577zE+Ps7x48fp7elpKdK7LQUr0l3F3qs343Qt0GGvO3nVJUMuzjnxxQ3VTXh8aGiIE2Nj2LaNbVmRD5/NZFhcXub6jRskTJNUOs3o6Cie5/HDDz9w5swZpn/+GaUUqVQK13FQSrF9+3YmJiYYHRlhoL+/Tmc3iuZ1V+SXfXSEqoq8dUW8a5oWBSuabojOS/emHNWI08N5Dg8Pc3JiglKpRLFU4tHDh/T09JBJpymVSly/cYPevj5sx8H3PC5OTjJ9+zau45DNZvF8n0KxyJ7duzl58iQnxsbYuHFjlWHbzLBsNu+O+emhCvUVSojwn6+PyLUS74ZhRmXAb5PTmyVC1L7GF9owDLZu3crExATFYpG//Pu/s5TPY5pm2f2yba5dv86L589RSjEzM4PruiQSCXzfx7JtNm7cyMmTJ5kYH2fLli3VGH54b+rnULsROx1Pr1KtnQJn2hHvzY91Xp/VV3Oo+ohBtAEqOs40TXbu2MGJsTEWFxaYvHiRUrFYzguXkvlXr5h/9arOVXUdh76eHsZjrlmtpb/qtxUCKUR9VWun7Xgl1rTmevuLHP5fRPh7o0hcNB2/s1/Udj2WLJeC7eG4CoGKMPJy4AFMXZJL6GSTOjKgvJCSdDrN/v37sSyLVwsL3L51K4BRywsXpobpMcu3p7eXw4cO8eWXX7J79+6otUi41Mp1UNYKvl1ERSVckngShjBMpJlGJFKsJcmhXcmn/AoQr4R6syhbK27WNA2/HUuxw/bLg7kVLt+dY3o2T9H20DWJDO7hBfqsN6nzwZYePt41wLpsEk2KKlfu8OHDLC8vo2sa07enWSkWEUJEHByqs56eHg4ePMhX//zP7N+/v9o1EwLl2Lgv7lO6/xPO3COU5yCkDlKW9arnAgot24e5aR/JnUeQ6d4OR9lA4Ze5XLUfYVuV08PMylo/nSC1tnnWTOd9tp9nlvnf3z7i8vQLSraHZgQAUSBVfM+jL2PyxeFNrO9P0Z9OoGuyqjFQb28vE+PjPHs2w8zMLCvFFTxfoWsaKugIJaRkcGiIox99xMjoaLleL7agUghwSpQe3WDp8v+idO9HfNdBGkmEpoHy8W0LfA+9fwPZw/+EMbgVvYNEJ5Swirp2Lm9kyBmGUVUIV0tUXdPfKgxbdH0WV2zySyVKro8wdIQW7HK/3FZE+T4LRZuS5zfUo2WuNtE1o5woEtO98QlLKTEMI0q1qlddPn6pgLv0EndhFuW6+GYSEXK6baF8B4TAKyyCa3cFjlaBWBcqZHjVGfHe2MiTDA0NrVKg2Fmq7xrK8E+HNrFzIE3B8ZF6Rbwrv1w6nU3qHNk1wOaeFLoMdHosEbJQKPDdt99x89YNlhYXyxmvQpY3SNDzxvd9Xs3Nce3aNbZt3cpHR49GYFSUBq2bmBv3kP3wS8x1u1CeA+FG8hV4DigfLTdIavfHyExf98y48p5H+KozRBdCNDTIDMNk06ZNZeNGNdmFHf6C+zblGMyYzBVtbFchw4wnUUkATBqSwWyCoWxZtKuY61QoFLhx8yb/9n//jevXr1PIF9CkBCFwHSficCEE8/PzfH/1KkoIsrkce/fujQw5pRTCSJLcdgijfxNeYRHle6jQbUNRTkQXSDONlhtAzw50nNhViJxYG4u1JLphGA0jbbRD1A5TPW1qbB/KsFWl63LDQgkthEBSDw9blsWvv/7K1//xH/z444/k83kM3YCa1lzxiNjc3BxXvvuOdYODGIbBrl27ygafHxA0lUWmshi+H+TWxa1XFbiQkkgcdYHPA/O9gs51CpFrFmlbrR9Np3nd9wVSBoZUK6AjtiGFEDiOw8OHD5mammJqcorFxSUSgVryfZ/+/n6GhoaihMqFhQUIIolzc3OcO3+eXC5HMplky5YtlYBGGOKSEtmimbYKbADRyaaDStQZccS8j1Uxj3aCGvWonEFfX19Twq8F/G8fe682Dhu16Cr3dq2c5LouT5484cKFC5w/f56Z2ZkoVdq2LHRN48D+/fyPf/kXvvrqK/bu3RtlvmqaRiKR4MGDB5w9e5apqSlmZmaqGyH6fvm3RbswuoG/i7iIV2tWpy3ZNZ5IUZX/rmloUuLX1Lt1M7JUAWLqExPiEG28193s7CwXL17k/OQkDx4+JJPJYOh6uWWaafLe++8zMTHBxMQEtm2XufvVK27fusXKykrE4T//8gtG0NhvbGyMdevW1dWr1YZXuxtwUVGERREGXURnDDkpJa7n1vnk5S9SSUlueLMuBlwahS9rS5nn5+e5dOkSZ8+d497du0ghMA2DwsoKSMm+ffs4ffo0R44cIZUsd2E+duwYy/k8tmUxPT1NsVgkkUjgui6//vorZ8+exTRNxsfHowZ9tQkU8bl1LTEyMOJURPwOwbBVcKqqx+U1XcN1RRMuV13vRFFVTVpT57awuMjlb7/l3IULTP/8M47jkEgkcILGuu+//z5jo6P8t2PHWLduXaTDt2zezKeffEJ+eZliscjDhw/RdR3TNCmVSty4eZNUKkUum+Xj48ejBIvaWrlux9JFyOXRfVTVxn8joodtpmv1umHoVfHrt5EB2ihpo1GtWaFQ4OaNG/znmTNcv36dUsCtUK5/W7duHSOjo3z2+eeVqFnwGaZpsmP7dkZHRykUCuV8+pUVzKCwYTmf54cffySRTNLT18fBAwfqELtWJdKdFe4qstqFoGYTvIlON/SoL1m8EDD03f0GRH8b+r2RyA/z23755RfOnD3LD1evUsjno35rtm2TTqcZGx1lbGSEnTt2lPPbahYzlUrx3t69FItF5hcW+Oabb3BsGyMwWufn57ly5QqDQ0OkU6moVq52Pl3/7jE3zQ/q0zsi3kXM560iYhgubNGotlvSPS7S47H00DWbnJxkamoqSoHWNK3c8y6V4vDhw3z11Ve8//77AYcqlOuHqwaaREgtyoVzXZf5V6+4PT2Na9uYAeFfvnzJ+XPn6MnlSKfTDA8P11XzVpVFd7qsSdV7SIo3aBNaF3TxvSoxrpTCMHR8z6vi9FpR340kikZSJVzMJ0+fcvbcOc5duMDc3BzpVApN0yiVShiGwaFDh/if//qv7Nu/n3SqXOXiux7OizmKt+5QnL6LO7eA8soFA7lcjsMffsif/vQn3nvvPZAS23VJJpMkEgkeP3nCmTNnmJycZGZmpiGHdytLVoQGu4r3luqQy6ZpGo7jtnT6a/u/VzhddZXT438/fvyYyclJJicnefL0KWYigdQ0CoUCZlBcePrUKT4+doxsJhMBZ86rRebPTLI49Q0ynaT/i3F6Rz7D6O+JwrGfffopi4uLOLbN9PQ0K4UCqVQKz/e5d+8e586fJ5lMMjo2xqaNG5tm63ZDp/tKBUadQIkOifcQfIm6FKnq3VbVwK4Gd1cdDqjHRWXccn/x4kW51uzCBe7dv49QCiPIYBVSsnv3bk5OTPDZp59WlRErwF1YYunK9zz/P39Gz+UwhwbJfnAQo78nuufAwAAjn39OsVikWCxy584diqUSiUSCUqnEL7/8Uq6kSaUYHRmhv7//raRBq4DgqhJcb5vf9XYUSLyCNfoyUm+uz7vhqDfQl4uLi1y9epXJyUl+/vlnHNsuu2aOg+u67Nq9m7HRUY4fP876DRvqkystC3dxAfvVc3zLwp1bwi8GGTWigqYNDw/z+Wefkc/nKZZKPHz4EE3XSSaTlCyLmzdvks1m6e3t5ejRo2Vp0k1wRtUGtgRCdNBPJ6jCDIvjKkmH5Wem1Lp0lVSq7lrqnu/z8NEj/t/f/sbNmzcplUqYphk90mrjxo2MfP45o0F+m5SVEGoFu1cIKRCaHvSbEVWtN8N76rpeLpkaG6OwssLKygoL8/NoqRSmYVAsFrl27RpDQ0Ns3ryZPbt3d7fnTJCS5aMQSqDwUaqDFS7JAJEK20kT8xHDmqraFuDdKGCkJo5lWRazMzPcvXuXly9fVj3HrL+/n5GREU6Oj7Nn9+7yM8+CmvZ4a5FyaE5DoiOkjtCCqJio32zJZJL39+2jZFmsFApcvHiR5eXlMhzt+zyfneXOnTu8evUKtWtX1902RZA8Eapd0b7HpK+F06qiOsSiXQ0DId0F4WXwOK1UMglBAyDDMFi/fj3Hjh3jv58+zb59+6pqzeqSPaNuE5Vf0ULKZAJXznEc8oUC33//PXMvX+L7foTTG7EgVFfRudBlC6feydBqmP9e2zXR0PXG4j2y3Lur003TZMvwMB8dPcpyPs+Tp0/JpNMcOXyYL06fZv+BA6TS6bq5VXGgAqX8snj0FcoL0lDC8xoYjz09PXx46BD5fB5NSq5dv44d9JE7+tFHrFu/ftWSr04MH9CiNlisKRF1VaIbQZuN2ic2VRD2Rqm3nQdnanvOSCnZtHEjIyMjpNNpHj16FPnWR44cIZvNtqw1C6Es33fwlIX0S6iaPP/awEn4d29vL58cP45pGAwPD1MsFtm5cyfHjh5lXdDipLs9Z1SUaR1Lnukwp6tqgle6NDWHXdVbqFpNp9Ps3bOH/v5+lpeXyx2nBgejCFht5K0eiNARCQNpll9F2kDoWhWHNxLVUkoGBwc5duwYO3bswPU8ent6GBwcrCtd7hY4U+Z1GRG8o4ZcPE9O1WSMhunHDV021T3RHidAKpVi6/DwmpAwRbmeW+vJkt65h54Pj6P1ZEnu3Y7Wky0nbKBWhYAHBgYYGBh4KyhcIxg2yNzCZ21gWFucHgZdQrBGKYXUtHLJToMonFLdqVptVp5ci3M36pwYv175ZVfNHOij/8QI5mA/wjDIHjmEMRjEyf2aa1T9+0agUa1k6VqNerh91RoVejtED8VV7cPc48z8tji90YI22xytrgnfa5k0vZ99TO9nHzfc7M0+s937tjq/E8QWhPkTqrNEb0ZUEbC0avZ4SN6N7o1GuQUdJHoonmrFePgA90abotkTBd6NDlrvgWWiFIg1ivi2xHvt80CaPbe81tq4//B+IBFEBQipejpIzXsRISblYxFkKoL+6zEgIqoNj6FsQkSNGYSIvRfxWnKI2vIIUfnM+NHonkH+maiANnXnCyqgTuy8qv/XfDdUiJWLFipLRC1ARe3a1bYeWaNsbcuQUw1yqls9Zdg0TZaXCy33aQXVC/Fj1SSuoIKvX/leYhU5EnXlEJU+yVVQpSCGr1e9rZxfdUKYfx38X4g2oebY06Cj7dbgqhpGVdVCPDbHytVJQ49tuub1CY0EwJpq2Ro9grpRckN/X29bzyZvmS++yuZa7dy6px6o9u2VZl7Af5XRFtHD8ibP98rPNql5ZnlLHa5aL3ArifG2idxt6PStmHjB0zdki4qatonu+2V82pd+NTfUJusoWhJtNSK3e26j55c0K6Zcy3x+7yN8zn0rN7Ft8e4Hj3+SqlrHl4qlqsrWtYjsRgRpSeiYb/I6m6WdrtZvcrzd4ThOObU6yKfPZrO8evUqgo81TavyjtodrusipYyulVI2jBu2RXSpSUqlEkuOgwI818VxHEqlEvlCoVxUGCxKHLULnxMWWvqrce5amhq1ip41y0GvO05rIKnZJux0nv+roNFRPp9/7c+QUqJpGqlUCtM0y4SXoiHXt0X0bCaLbdkUS0WskoXrulU9YuO129lsFikljuNEv80eAdkMKWuFasVf2zm/FSL2JkjZWq7tdkKF1CS6pmMYBolEIiK6JrXG6KFqc6uGEKzrutGv4zhRi5J4UCbE6sNHQLqeV1XdWUUwUS+AmhGsoXES99fXuOiNetD91gR8XYBOk2UGNE2z3N7U0DF0I2LM19LpITIXJvWHnN7Ifw91ftiHrg6zbxCAqN4Iq+xsIddEgH9IQnWa2wPxHr5qutb0GXr66+zw0EKM++i1HZlVrMiuEeFFTReINybYf326NvjK9epRSIEUsvL+TcR7O5Zyq5ywt9kP/Y862lVXr030d+N3rAreLcEfb/x/dL2hl9EJZ1cAAAAASUVORK5CYII=</content>
+</attachment>
+<class>
+<name>XWiki.Configurable</name>
+<customClass></customClass>
+<customMapping></customMapping>
+<defaultViewSheet></defaultViewSheet>
+<defaultEditSheet></defaultEditSheet>
+<defaultWeb></defaultWeb>
+<nameField></nameField>
+<validationScript></validationScript>
+<codeToExecute>
+<editor>---</editor>
+<name>codeToExecute</name>
+<number>7</number>
+<picker>0</picker>
+<prettyName>codeToExecute</prettyName>
+<rows>5</rows>
+<size>40</size>
+<unmodifiable>0</unmodifiable>
+<validationMessage></validationMessage>
+<validationRegExp></validationRegExp>
+<classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+</codeToExecute>
+<configurationClass>
+<name>configurationClass</name>
+<number>3</number>
+<picker>0</picker>
+<prettyName>configurationClass</prettyName>
+<size>30</size>
+<unmodifiable>0</unmodifiable>
+<validationMessage></validationMessage>
+<validationRegExp></validationRegExp>
+<classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+</configurationClass>
+<configureGlobally>
+<defaultValue></defaultValue>
+<displayFormType>checkbox</displayFormType>
+<displayType></displayType>
+<name>configureGlobally</name>
+<number>4</number>
+<prettyName>configureGlobally</prettyName>
+<unmodifiable>0</unmodifiable>
+<validationMessage></validationMessage>
+<validationRegExp></validationRegExp>
+<classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+</configureGlobally>
+<displayInSection>
+<name>displayInSection</name>
+<number>1</number>
+<picker>0</picker>
+<prettyName>displayInSection</prettyName>
+<size>30</size>
+<unmodifiable>0</unmodifiable>
+<validationMessage></validationMessage>
+<validationRegExp></validationRegExp>
+<classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+</displayInSection>
+<heading>
+<name>heading</name>
+<number>2</number>
+<picker>0</picker>
+<prettyName>heading</prettyName>
+<size>30</size>
+<unmodifiable>0</unmodifiable>
+<validationMessage></validationMessage>
+<validationRegExp></validationRegExp>
+<classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+</heading>
+<iconAttachment>
+<name>iconAttachment</name>
+<number>8</number>
+<picker>0</picker>
+<prettyName>iconAttachment</prettyName>
+<size>30</size>
+<unmodifiable>0</unmodifiable>
+<validationMessage></validationMessage>
+<validationRegExp></validationRegExp>
+<classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+</iconAttachment>
+<linkPrefix>
+<name>linkPrefix</name>
+<number>5</number>
+<picker>0</picker>
+<prettyName>linkPrefix</prettyName>
+<size>30</size>
+<unmodifiable>0</unmodifiable>
+<validationMessage></validationMessage>
+<validationRegExp></validationRegExp>
+<classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+</linkPrefix>
+<propertiesToShow>
+<cache>0</cache>
+<displayType>input</displayType>
+<multiSelect>1</multiSelect>
+<name>propertiesToShow</name>
+<number>6</number>
+<picker>0</picker>
+<prettyName>propertiesToShow</prettyName>
+<relationalStorage>1</relationalStorage>
+<separator> </separator>
+<separators> ,|</separators>
+<size>20</size>
+<sort>none</sort>
+<unmodifiable>0</unmodifiable>
+<validationMessage></validationMessage>
+<validationRegExp></validationRegExp>
+<values></values>
+<classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+</propertiesToShow>
+</class>
+<content>{{velocity}}
+#*
+ * This part takes the configuration from any documents containing XWiki.Configurable objects and creates a form 
+ * for each. To includeForm this document, you may specify:
+ *
+ * $section - String - The section which we are administrating eg: "Registration", "Users", or "Import".
+ *                     If none is specified then it checks for a request parameter called "section" and uses that,
+ *                     if no parameter, then this code assumes that it is part of the admin icons sheet and adds icons
+ *                     for any section which is not in $sections, in that event, this code assumes it is being run 
+ *                     inside of a &lt;ul&gt; block.
+ *
+ * $sections - List&lt;String&gt; - If section is not specified, any sections on this list will not have icons made for them
+ *                            the assumption being that the icons are already there. If section is specified then this
+ *                            is not taken into account and may safely be undefined.
+ *
+ * $currentDoc - String (document.fullName) - The administration document, users who don't have permission to edit 
+ *                                            it will not be able to include applications (possibly injecting 
+ *                                            arbitrary code.) if none specified then $doc.getFullName() is used.
+ *
+ * $globaladmin - boolean - If set true then we will assume we are administrationg the entire wiki.
+ *                          If not set then we look for a request parameter called "editor" if that exists and equals
+ *                          "globaladmin" then $globaladmin is true, if it doesn't exist then we check to see if 
+ *                          $currentDoc.getFullName() equals "XWiki.XWikiPreferences".
+ *
+ * $doNotUnlockConfigurableDocuments - boolean - If true then this code will not make any attempt to unlock configurable
+ *                                               documents. By default it does because it locks any document in the 
+ *                                               section which is being configured which would lead to a lot of stray
+ *                                               locks if they weren't all cancelled. Only recommended if this page is
+ *                                               being included twice in the same page.
+ *###
+## Constants:
+#set($redirectParameter = 'xredirect')
+#set($nameOfThisDocument = 'XWiki.Configurable')
+##
+##
+#if(!$section)
+  #set($section = $request.getParameter('section'))
+#end
+#if(!$currentDoc)
+  #set($currentDoc = $doc.getFullName())
+#end
+## Get value of $globaladmin if not specified.
+#if("$!globaladmin" == '')
+  #if($editor != 'globaladmin'
+      &amp;&amp; $request.getParameter('editor') != 'globaladmin'
+      &amp;&amp; $currentDoc != "XWiki.XWikiPreferences")
+  ##
+    #set($globaladmin = false)
+  #else
+    #set($globaladmin = true)
+  #end
+#end
+#set($currentSpace = $xwiki.getDocument("$currentDoc").getSpace())
+##
+## This application should not run with programming rights because it evaluates code which may not be trustworthy.
+## Removing the next line will open a security hole.
+#sandboxDocument($nameOfThisDocument)
+##
+## This application locks every document in a section while that section is being edited so we should 
+## check for locks held by the current user on any of the applications configured here and remove them.
+#if(!$doNotUnlockConfigurableDocuments)
+  #set($outputList = [])
+  #findNamesOfAppsToConfigure("", $globaladmin, $currentSpace, $outputList)
+  ## We don't want to generate javascript which unlocks the current document just after we got finished locking it.
+  #set($discard = $outputList.remove($currentDoc))
+  #unlockDocuments($outputList)
+#end
+##
+##------------------------------------------------------------------------------------------------------------
+## If $section exists then we are viewing the admin page for a perticular section.
+## eg: 'Registration', 'Presentation', 'Import' etc.
+##------------------------------------------------------------------------------------------------------------
+##
+#if($section &amp;&amp; $section != '')
+  ##
+  ## Searches the database for names of apps to be configured
+  #set($outputList = [])
+  #findNamesOfAppsToConfigure($section, $globaladmin, $xwiki.getDocument("$currentDoc").getSpace(), $outputList)
+  ##
+  #foreach($appName in $outputList)
+    ##
+    = $msg.get("admin.customize") __[[$appName&gt;&gt;$appName]]__: =
+    ##
+    ## Make sure the current user has permission to edit the configurable application.
+    #if(!$xcontext.hasAccessLevel('edit', $appName))
+      {{error}}$msg.get('XWiki.Configurable.noPermissionThisApplication'){{/error}}
+    #else
+      ##
+      ## Get the configurable application
+      #set($app = $xwiki.getDocument($appName))
+      ##
+      ## If the document was not last saved by a user with edit privilage on this page
+      ## then we can't safely display the page but we should warn the viewer.
+      #if(!$xwiki.hasAccessLevel("edit", $app.getAuthor(), $currentDoc))
+        {{error}}$msg.get('XWiki.Configurable.applicationAuthorNoAdmin', [$app.Author]){{/error}}
+      #else
+        ##
+        ## Locking document
+        ##------------------------------------------------------------------------------------------------------------
+        #if($app.getLocked())
+          #set($locked = true)
+        #end
+        ## If the document is locked and not by the current user and forceEdit is not set true,
+        #if($locked &amp;&amp; $app.getLockingUser() != $xcontext.getUser() &amp;&amp; !$request.getParameter('forceEdit'))
+          #set($requestURL = "$request.getRequestURL()")
+          #if($requestURL.indexOf("?") == -1)
+            #set($requestURL = "${requestURL}?")
+          #end
+          {{error}}$msg.get("doclockedby") $app.getLockingUser() [[$msg.get("forcelock")&gt;&gt;${requestURL}&amp;forceEdit=1]]{{/error}}
+        #else
+          ## If the document is not already locked, attempt to aquire the lock.
+          #if(!$locked)
+            ## Try to use an ajax call to lock the document.
+            {{html clean=false wiki=true}}
+              &lt;/p&gt;&lt;noscript&gt;
+                {{warning}}$msg.get('XWiki.Configurable.cannotLockNoJavascript'){{/warning}}
+              &lt;/noscript&gt;
+              &lt;script type="text/javascript"&gt;
+                document.observe("dom:loaded", function() {
+                  new Ajax.Request("$xwiki.getURL($app.getFullName(), 'lock', 'ajax=1')");
+                });
+              &lt;/script&gt;&lt;p&gt;
+            {{/html}}
+            #set($discard = $lockedDocumentNames.add($app.getFullName()))
+          #end
+          ##------------------------------------------------------------------------------------------------------------
+          ## Done Locking.
+          ##
+          ## Get all objects of the "Configurable" class from this document.
+          #set($allConfigurableObjs = $app.getObjects('XWiki.Configurable'))
+          ## Seperate out the objects which are for this section.
+          #set($configurableObjs = [])
+          #foreach($configurableObj in $allConfigurableObjs)
+            #if($app.getValue('displayInSection', $configurableObj) == $section)
+              ## If this is space admin, then don't display global, if global don't display space.
+              #if($globaladmin == ($app.getValue('configureGlobally', $configurableObj) == 1))
+                  #set($discard = $configurableObjs.add($configurableObj))
+              #end
+            #end
+          #end
+          #if($configurableObjs.size() == 0)
+            ## Internal error, not translated.
+            {{error}}Internal error: All objects were filtered out for application: $appName.{{/error}}
+          #else
+            #set($formAction = "$xwiki.getURL($app.getFullName(), 'save')")
+            #set($formId = "$section.toLowerCase()_$app.getFullName()")
+            #set($escapedAppName = $escapetool.html($app.getFullName()))
+            {{html clean=false wiki=false}}
+            #foreach($configurableObj in $configurableObjs)
+              ## Display the header if one exists.
+              #set($heading = $app.getValue('heading', $configurableObj))
+              #if($heading &amp;&amp; $heading != '')
+                {{/html}}
+                == #evaluate($heading) ==
+                {{html clean=false wiki=false}}
+              #end
+              ## If the class specifies custom code to evaluate,
+              ## then close the html macro, evaluate it and reopen the macro.
+              #set($codeToExecute = "$!app.getValue('codeToExecute', $configurableObj)")
+              #if($codeToExecute != '')
+                {{/html}}
+                #evaluate($codeToExecute)
+                {{html clean=false wiki=false}}
+              #end
+              ##
+              ## If propertiesToShow is set, then we will only show the properties contained therein.
+              #set($propertiesToShow = $app.getValue('propertiesToShow', $configurableObj))
+              #if(!$propertiesToShow || $propertiesToShow.getClass().getName().indexOf('List') == -1)
+                #set($propertiesToShow = [])
+              #end
+              ##
+              ## If linkPrefix is set, then we will make each property label a link which starts with that prefix.
+              #set($linkPrefix = "$!app.getValue('linkPrefix', $configurableObj)")
+              ##
+              ## If the Configurable object specifies a configuration class, use it, 
+              ## otherwise assume custom forms are used instead.
+              #set($configClassName = "$!app.getValue('configurationClass', $configurableObj)")
+              #if($configClassName != '')
+                #set($objClass = $xwiki.getDocument("$configClassName").getxWikiClass())
+                #if(!$objClass || $objClass.getClass().getName().indexOf('.Class') == -1)
+                  {{/html}}
+                  {{error}}$msg.get('XWiki.Configurable.configurationClassNonexistant'){{/error}}
+                  {{html clean=false wiki=false}}
+                #else
+                  ## Use the first object from the document which is of the configuration class.
+                  #set($obj = $app.getObject($objClass.getName()))
+                  ##
+                  #if(!$obj || $obj.getClass().getName().indexOf('.Object') == -1)
+                    {{/html}}
+                    {{error}}
+                      $msg.get('XWiki.Configurable.noObjectOfConfigurationClassFound',
+                        [$objClass.getName(), $app.getFullName()])
+                    {{/error}}
+                    {{html clean=false wiki=false}}
+                  #else
+                    #define($formHtml)
+                      ## We don't begin the form until we have content for it so that a configurable can specify a 
+                      ## custom form in codeToExecute and if that configurable object is the first of it's kind in that
+                      ## document, the custom form will not be put inside of our form.
+                      #if(!$insideForm)
+                        &lt;form id="$formId" method="post" action="$formAction" onsubmit="cancelCancelEdit()"&gt;
+                        &lt;fieldset&gt;
+                        #set($insideForm = true)
+                      #end
+                      #foreach($propName in $objClass.getPropertyNames())
+                        #if($propertiesToShow.size() &gt; 0 &amp;&amp; !$propertiesToShow.contains($propName))
+                          ## Silently skip over this property.
+                        #else
+                          &lt;p&gt;
+                          #set($prettyName = "#evaluate($app.displayPrettyName($propName, $obj))")
+                          ## App Name is prepended to for= to make label work with id which is modified to prevent collisions.
+                          &lt;label for="${escapedAppName}_$objClass.getName()_0_$propName"&gt;
+                          #if($linkPrefix != '')
+                            &lt;a href="$escapetool.url("$linkPrefix$prettyName")"&gt;$escapetool.html($prettyName)&lt;/a&gt;
+                          #else
+                            $escapetool.html($prettyName)
+                          #end
+                          &lt;/label&gt;
+                          $obj.display($propName, "edit")
+                          &lt;/p&gt;
+                        #end## If property is in propertiesToShow
+                      #end## Foreach property in this class
+                    #end## define $formHtml
+                    ## Strip pre tags and html macro invocations which $obj.display inserts.
+                    ## then prepend application name to ids to prevent id collissions.
+                    $formHtml.toString().replaceAll('\{\{[/]?html[^}]*\}\}|&lt;[/]?pre&gt;', '').replaceAll(" id='", " id='${escapedAppName}_")
+                  #end## If object exists
+                #end## If class exists
+              #end## If class name is specified.
+            #end## Foreach configurable object found in this document
+            ## If a form was started then we end it.
+            #if($insideForm)
+              ## We add in a redirect field to prevent the user from being carried away when they save
+              ## if they don't have javascript.
+              #set($thisURL = $request.getRequestURL())
+              #if($request.getQueryString() &amp;&amp; $request.getQueryString().length() &gt; 0)
+                #set($thisURL = "${thisURL}?$request.getQueryString()")
+              #end
+              &lt;input type="hidden" id="${escapedAppName}_redirect" name="$redirectParameter" value="$escapetool.html($thisURL)" /&gt;
+              &lt;/fieldset&gt;
+              &lt;div class="bottombuttons"&gt;
+                &lt;p class="admin-buttons"&gt;
+                  &lt;span class="buttonwrapper"&gt;
+                    ## Ajax form submission Javascript.
+                    #set($onclick = "document.forms.update.action='" + $xwiki.getURL($app.getFullName(), 'saveandcontinue') + "'; "
+                                    + "if (document.forms.update.onsubmit) document.forms.update.onsubmit();"
+                                    + "if (checkDocumentContent()) document.forms.update.submit(); return false;")
+                    ## Text to display on the button
+                    #set($buttonText = "$msg.get('admin.save') $escapedAppName")
+                    &lt;input class="button" type="submit" name="formactionsac" value="$buttonText" onclick="$onclick" /&gt;
+                  &lt;/span&gt;
+                &lt;/p&gt;
+              &lt;/div&gt; ## bottombuttons
+              &lt;/form&gt;
+              #set($insideForm = false)
+            #end
+            {{/html}}
+          #end## If there are configurable objects
+        #end## If document is not locked or forceEdit is enabled
+      #end## If app author has permission to edit admin page
+    #end## If the current user has permission to edit the configurable application.
+  #end## Foreach document name in names to configure
+  ##
+  ## TODO: cancel and "submit all" buttons.
+  ##
+#else
+  ##
+  ##------------------------------------------------------------------------------------------------------------
+  ## If section is not set then we are viewing the main administration page.
+  ##------------------------------------------------------------------------------------------------------------
+  ##
+  ## If there is no list called sections then we set sections to an empty list.
+  #if(!$sections || $sections.getClass().getName().indexOf("List") == -1)
+    #set($sections = [])
+  #end
+  ##
+  ## We have to create a list of documents which the current user doesn't have permission to view.
+  ## So we can add an error messsage to the bottom of the page if there are any.
+  #set($appsUserCannotView = [])
+  ##
+  ## A list of sections (to be added) which the user is not allowed to edit, icons will be displayed with a message
+  #set($sectionsUserCannotEdit = [])
+  ## List of sections to be added, in order by creationDate of oldest contained application.
+  #set($sectionsToAdd = [])
+  ## Map of URL of icon to use by the name of the section to use that icon on.
+  #set($iconBySection = {})
+  ##
+  #set($outputList = [])
+  #findNamesOfAppsToConfigure("", $globaladmin, $currentSpace, $outputList)
+  ##
+  #foreach($appName in $outputList)
+    ##
+    ## Get the configurable application
+    #set($app = $xwiki.getDocument($appName))
+    ##
+    ## If getDocument returns null, then warn the user that they don't have view access to that application.
+    #if(!$app)
+      #set($discard = $appsUserCannotView.add($appName))
+    #end
+    ## 
+    #set($configurableObjects = $app.getObjects('XWiki.Configurable'))
+    #foreach($configurableObject in $configurableObjects)
+      #set($displayInSection = $app.getValue('displayInSection', $configurableObject))
+      ##
+      ## If there is no section for this configurable or if the section cannot be edited, then check if the
+      ## application can be edited by the current user, if so then we display the icon from the current app and
+      ## don't display any message to tell the user they can't edit that section.
+      #if(!$sections.contains($displayInSection) || $sectionsUserCannotEdit.contains($displayInSection))
+        ##
+        ## If there is no section for this configurable, then we will have to add one.
+        #if(!$sections.contains($displayInSection) &amp;&amp; !$sectionsToAdd.contains($displayInSection))
+          #set($discard = $sectionsToAdd.add($displayInSection))
+        #end
+        ##
+        ## If an attachment by the filename iconAttachment exists and is an image
+        #set($attachment = $app.getAttachment("$app.getValue('iconAttachment', $configurableObject)"))
+        #if($attachment &amp;&amp; $attachment.isImage())
+          ## Set the icon for this section as the attachment URL.
+          #set($discard = $iconBySection.put($displayInSection, $app.getAttachmentURL($attachment.getFilename())))
+        #end
+        ##
+        ## If the user doesn't have edit access to the application, we want to should show a message on the icon
+        #if(!$xcontext.hasAccessLevel("edit", $app.getFullName()))
+          #if(!$sectionsUserCannotEdit.contains($displayInSection))
+            #set($discard = $sectionsUserCannotEdit.add($displayInSection))
+          #end
+        #elseif($sectionsUserCannotEdit.contains($displayInSection))
+          ## If the user didn't have access to the section before but does have access to _this_ app which is
+          ## configured in the section, then the section becomes accessable.
+          #set($discard = $sectionsUserCannotEdit.remove($displayInSection))
+        #end
+      #end## If section doesn't exist or user doesn't have access.
+    #end## Foreach configurable object in this app.
+  #end## Foreach application which is configurable.
+  ##
+  ## Now we go through sectionsToAdd and generate icons for them
+  #set($defaultIcon = $xwiki.getAttachmentURL('XWiki.Configurable', 'DefaultAdminSectionIcon.png'))
+  #if($globaladmin)
+    #set($queryString = "editor=globaladmin&amp;amp;section=")
+  #else
+    #set($queryString = "space=${currentSpace}&amp;amp;section=")
+    #if($request.getParameter('editor'))
+      #set($queryString = "editor=$escapetool.url($request.getParameter('editor'))&amp;amp;$queryString")
+    #end
+  #end
+  {{html clean=false wiki=false}}
+  #foreach($sectionToAdd in $sectionsToAdd)
+    #set($icon = $iconBySection.get($sectionToAdd))
+    #if(!$icon)
+      #set($icon = $defaultIcon)
+    #end
+    &lt;li class="$escapetool.html($sectionToAdd).replaceAll(' ', '_')"&gt;
+      #set($hasAccess = !$sectionsUserCannotEdit.contains($sectionToAdd))
+      #if($hasAccess)
+        &lt;a href="$xwiki.getURL($currentDoc, $xcontext.getAction(), "$queryString$escapetool.url($sectionToAdd)")"&gt;
+      #else
+        &lt;a title="$msg.get('XWiki.Configurable.sectionIconNoAccessTooltip')"&gt;
+      #end
+      &lt;img src="$icon" alt="$escapetool.html($sectionToAdd) icon"/&gt;
+      $escapetool.html($sectionToAdd)
+      #if(!$hasAccess)
+        &lt;br/&gt;&lt;span class="errormessage"&gt;$msg.get('XWiki.Configurable.sectionIconNoAccess')&lt;/span&gt;
+      #end
+      &lt;/a&gt;
+    &lt;/li&gt;
+  #end
+  {{/html}}
+  ##
+  ## Finally we display an error message if there are any applications which we were unable to view.
+  #if($appsUserCannotView.size() &gt; 0)
+    {{error}}$msg.get('XWiki.Configurable.noViewAccessSomeApplications', [$appsUserCannotView]){{/error}}
+  #end
+#end## If we should be looking at the main administration page.
+##
+##------------------------------------------------------------------------------------------------------------
+## The Macros, nothing below this point is run directly.
+##------------------------------------------------------------------------------------------------------------
+##
+#*
+ *
+ * Any documents which are on the provided list ($documentNames) which are locked by the current user will be unlocked.
+ * If this macro has programming rights, then they are unlocked programmatically, otherwise a javascript tag is
+ * generated with ajax calls to cancel for all of the documents. If there are documents on this list which are not
+ * locked by the current user, then they are ignored.
+ *
+ * @param $documentNames - List&lt;String&gt; - fullNames of documents which should be unlocked if they are locked by the 
+ *                                        current user.
+ *###
+#macro(unlockDocuments $documentNames)
+  #if($documentNames.size() &gt; 0)
+    #set($sql = "doc.fullName=")
+    #foreach($documentName in $documentNames)
+      #set($sql = "${sql}'$documentName' or doc.fullName=")
+    #end
+    ## Trim the dangling ' or doc.fullName=?'
+    #set($sql = $sql.substring(0, $sql.lastIndexOf(' or doc.fullName=')))
+    #set($sql = ", XWikiLock lock where lock.docId=doc.id and lock.userName='$xcontext.getUser()' and (${sql})")
+    #set($namesOfdocumentsToUnlock = $xwiki.searchDocuments($sql))
+    ## Use ajax and hope the user runs javascript.
+    {{html clean=false wiki=false}}
+      &lt;script type="text/javascript"&gt;
+        document.observe("dom:loaded", function() {
+          #foreach($nameOflockedDocument in $namesOfdocumentsToUnlock)
+            new Ajax.Request("$xwiki.getURL($nameOflockedDocument, 'cancel', 'ajax=1')");
+          #end
+        });
+      &lt;/script&gt;
+    {{/html}}
+  #end## If output list size &gt; 0
+#end## Macro
+##
+#*
+ * Find names of documents which contain objects of the class 'XWiki.Configurable'
+ *
+ * @param $section - String - Look for apps which specify that they should be configured in this section,
+ *                            if null or "" then returns them for all sections.
+ *
+ * @param $globaladmin - boolean - If true then we will look for applications which should be configured globally.
+ *
+ * @param $space - String - If not looking for apps which are configured globally, then this is the space where we
+ *                          will look for apps in. If null or "" or if $globaladmin is true, then all spaces will be 
+ *                          searched.
+ *
+ * @param $outputList - List - The returns from this macro will be put in this list, passing the list as a parameter
+ *                             a safety measure because macros can't return values.
+ *###
+#macro(findNamesOfAppsToConfigure, $section, $globaladmin, $space, $outputList)
+  ## Use a parameterized sql query to prevent injection.
+  #set($params = [])
+  #if($section &amp;&amp; $section != '')
+    #set($discard = $params.add("$section"))
+    #set($sqlA = ' StringProperty as section,')
+    #set($sqlB = " and section.id=obj.id and section.name='displayInSection' and section.value=?")
+  #else
+    ## Make sure they are "" in case they were set prior to calling the macro.
+    #set($sqlA = '')
+    #set($sqlB = '')
+  #end
+  ## Set up query based on value of $globaladmin
+  #if($globaladmin == true)
+    #set($sqlC = '1')
+  #else
+    #if($space &amp;&amp; $space != '')
+      #set($sqlC = '0 and doc.space = ?')
+      #set($discard = $params.add($space))
+    #else
+      #set($sqlC = '0')
+    #end
+  #end
+  #set($sql = ", BaseObject as obj,$sqlA IntegerProperty as global where "
+              + "doc.fullName=obj.name and obj.className='XWiki.Configurable'$sqlB "
+              + "and global.id=obj.id and global.name='configureGlobally' and global.value=$sqlC "
+              + "order by doc.creationDate")
+  ##
+  ## Run the search
+  #set($outputList = $xwiki.searchDocuments($sql, 0, 0, $params))
+  ##
+#end
+##
+#*
+ * If this document is saved with programming access or is includeForm'd into a document with programming, we have to
+ * drop programming rights in order for it to run safely because it evaluates potentially untrustworthy code.
+ *###
+#macro(sandboxDocument)
+  #if($xcontext.hasProgrammingRights())
+    $xcontext.getContext().getDoc().setContentAuthor('XWiki.XWikiGuest')
+  #end
+#end
+{{/velocity}}</content>
+</xwikidoc>
+<?xml version="1.0" encoding="UTF-8"?>
+
+<xwikidoc>
+<web>XWiki</web>
+<name>Configurable</name>
+<language></language>
+<defaultLanguage>en</defaultLanguage>
+<translation>0</translation>
+<parent>XWiki.WebHome</parent>
+<creator>XWiki.Admin</creator>
+<author>XWiki.Admin</author>
+<customClass></customClass>
+<contentAuthor>XWiki.Admin</contentAuthor>
+<creationDate>1265775370000</creationDate>
+<date>1266578504000</date>
+<contentUpdateDate>1266578504000</contentUpdateDate>
+<version>1.1</version>
+<title>XWiki.Configurable</title>
+<template></template>
+<defaultTemplate></defaultTemplate>
+<validationScript></validationScript>
+<comment>Deleted object</comment>
+<minorEdit>true</minorEdit>
+<syntaxId>xwiki/2.0</syntaxId>
+<hidden>false</hidden>
+<attachment>
+<filename>DefaultAdminSectionIcon.png</filename>
+<filesize>7502</filesize>
+<author>XWiki.Admin</author>
+<date>1266210801000</date>
+<version>1.1</version>
+<comment></comment>
+<content>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</content>
+</attachment>
+<class>
+<name>XWiki.Configurable</name>
+<customClass></customClass>
+<customMapping></customMapping>
+<defaultViewSheet></defaultViewSheet>
+<defaultEditSheet></defaultEditSheet>
+<defaultWeb></defaultWeb>
+<nameField></nameField>
+<validationScript></validationScript>
+<codeToExecute>
+<editor>---</editor>
+<name>codeToExecute</name>
+<number>7</number>
+<picker>0</picker>
+<prettyName>codeToExecute</prettyName>
+<rows>5</rows>
+<size>40</size>
+<unmodifiable>0</unmodifiable>
+<validationMessage></validationMessage>
+<validationRegExp></validationRegExp>
+<classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+</codeToExecute>
+<configurationClass>
+<name>configurationClass</name>
+<number>3</number>
+<picker>0</picker>
+<prettyName>configurationClass</prettyName>
+<size>30</size>
+<unmodifiable>0</unmodifiable>
+<validationMessage></validationMessage>
+<validationRegExp></validationRegExp>
+<classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+</configurationClass>
+<configureGlobally>
+<defaultValue></defaultValue>
+<displayFormType>checkbox</displayFormType>
+<displayType></displayType>
+<name>configureGlobally</name>
+<number>4</number>
+<prettyName>configureGlobally</prettyName>
+<unmodifiable>0</unmodifiable>
+<validationMessage></validationMessage>
+<validationRegExp></validationRegExp>
+<classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+</configureGlobally>
+<displayInSection>
+<name>displayInSection</name>
+<number>1</number>
+<picker>0</picker>
+<prettyName>displayInSection</prettyName>
+<size>30</size>
+<unmodifiable>0</unmodifiable>
+<validationMessage></validationMessage>
+<validationRegExp></validationRegExp>
+<classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+</displayInSection>
+<heading>
+<name>heading</name>
+<number>2</number>
+<picker>0</picker>
+<prettyName>heading</prettyName>
+<size>30</size>
+<unmodifiable>0</unmodifiable>
+<validationMessage></validationMessage>
+<validationRegExp></validationRegExp>
+<classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+</heading>
+<iconAttachment>
+<name>iconAttachment</name>
+<number>8</number>
+<picker>0</picker>
+<prettyName>iconAttachment</prettyName>
+<size>30</size>
+<unmodifiable>0</unmodifiable>
+<validationMessage></validationMessage>
+<validationRegExp></validationRegExp>
+<classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+</iconAttachment>
+<linkPrefix>
+<name>linkPrefix</name>
+<number>5</number>
+<picker>0</picker>
+<prettyName>linkPrefix</prettyName>
+<size>30</size>
+<unmodifiable>0</unmodifiable>
+<validationMessage></validationMessage>
+<validationRegExp></validationRegExp>
+<classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+</linkPrefix>
+<propertiesToShow>
+<cache>0</cache>
+<displayType>input</displayType>
+<multiSelect>1</multiSelect>
+<name>propertiesToShow</name>
+<number>6</number>
+<picker>0</picker>
+<prettyName>propertiesToShow</prettyName>
+<relationalStorage>1</relationalStorage>
+<separator> </separator>
+<separators> ,|</separators>
+<size>20</size>
+<sort>none</sort>
+<unmodifiable>0</unmodifiable>
+<validationMessage></validationMessage>
+<validationRegExp></validationRegExp>
+<values></values>
+<classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+</propertiesToShow>
+</class>
+<content>{{velocity}}
+#*
+ * This part takes the configuration from any documents containing XWiki.Configurable objects and creates a form 
+ * for each. To includeForm this document, you may specify:
+ *
+ * $section - String - The section which we are administrating eg: "Registration", "Users", or "Import".
+ *                     If none is specified then it checks for a request parameter called "section" and uses that,
+ *                     if no parameter, then this code assumes that it is part of the admin icons sheet and adds icons
+ *                     for any section which is not in $sections, in that event, this code assumes it is being run 
+ *                     inside of a &lt;ul&gt; block.
+ *
+ * $sections - List&lt;String&gt; - If section is not specified, any sections on this list will not have icons made for them
+ *                            the assumption being that the icons are already there. If section is specified then this
+ *                            is not taken into account and may safely be undefined.
+ *
+ * $currentDoc - String (document.fullName) - The administration document, users who don't have permission to edit 
+ *                                            it will not be able to include applications (possibly injecting 
+ *                                            arbitrary code.) if none specified then $doc.getFullName() is used.
+ *
+ * $globaladmin - boolean - If set true then we will assume we are administrationg the entire wiki.
+ *                          If not set then we look for a request parameter called "editor" if that exists and equals
+ *                          "globaladmin" then $globaladmin is true, if it doesn't exist then we check to see if 
+ *                          $currentDoc.getFullName() equals "XWiki.XWikiPreferences".
+ *
+ * $doNotUnlockConfigurableDocuments - boolean - If true then this code will not make any attempt to unlock configurable
+ *                                               documents. By default it does because it locks any document in the 
+ *                                               section which is being configured which would lead to a lot of stray
+ *                                               locks if they weren't all cancelled. Only recommended if this page is
+ *                                               being included twice in the same page.
+ *###
+## Constants:
+#set($redirectParameter = 'xredirect')
+#set($nameOfThisDocument = 'XWiki.Configurable')
+##
+##
+#if(!$section)
+  #set($section = $request.getParameter('section'))
+#end
+#if(!$currentDoc)
+  #set($currentDoc = $doc.getFullName())
+#end
+## Get value of $globaladmin if not specified.
+#if("$!globaladmin" == '')
+  #if($editor != 'globaladmin'
+      &amp;&amp; $request.getParameter('editor') != 'globaladmin'
+      &amp;&amp; $currentDoc != "XWiki.XWikiPreferences")
+  ##
+    #set($globaladmin = false)
+  #else
+    #set($globaladmin = true)
+  #end
+#end
+#set($currentSpace = $xwiki.getDocument("$currentDoc").getSpace())
+##
+## This application should not run with programming rights because it evaluates code which may not be trustworthy.
+## Removing the next line will open a security hole.
+#sandboxDocument($nameOfThisDocument)
+##
+## This application locks every document in a section while that section is being edited so we should 
+## check for locks held by the current user on any of the applications configured here and remove them.
+#if(!$doNotUnlockConfigurableDocuments)
+  #set($outputList = [])
+  #findNamesOfAppsToConfigure("", $globaladmin, $currentSpace, $outputList)
+  ## We don't want to generate javascript which unlocks the current document just after we got finished locking it.
+  #set($discard = $outputList.remove($currentDoc))
+  #unlockDocuments($outputList)
+#end
+##
+##------------------------------------------------------------------------------------------------------------
+## If $section exists then we are viewing the admin page for a perticular section.
+## eg: 'Registration', 'Presentation', 'Import' etc.
+##------------------------------------------------------------------------------------------------------------
+##
+#if($section &amp;&amp; $section != '')
+  ##
+  ## Searches the database for names of apps to be configured
+  #set($outputList = [])
+  #findNamesOfAppsToConfigure($section, $globaladmin, $xwiki.getDocument("$currentDoc").getSpace(), $outputList)
+  ##
+  #foreach($appName in $outputList)
+    ##
+    = $msg.get("admin.customize") __[[$appName&gt;&gt;$appName]]__: =
+    ##
+    ## Make sure the current user has permission to edit the configurable application.
+    #if(!$xcontext.hasAccessLevel('edit', $appName))
+      {{error}}$msg.get('XWiki.Configurable.noPermissionThisApplication'){{/error}}
+    #else
+      ##
+      ## Get the configurable application
+      #set($app = $xwiki.getDocument($appName))
+      ##
+      ## If the document was not last saved by a user with edit privilage on this page
+      ## then we can't safely display the page but we should warn the viewer.
+      #if(!$xwiki.hasAccessLevel("edit", $app.getAuthor(), $currentDoc))
+        {{error}}$msg.get('XWiki.Configurable.applicationAuthorNoAdmin', [$app.Author]){{/error}}
+      #else
+        ##
+        ## Locking document
+        ##------------------------------------------------------------------------------------------------------------
+        #if($app.getLocked())
+          #set($locked = true)
+        #end
+        ## If the document is locked and not by the current user and forceEdit is not set true,
+        #if($locked &amp;&amp; $app.getLockingUser() != $xcontext.getUser() &amp;&amp; !$request.getParameter('forceEdit'))
+          #set($requestURL = "$request.getRequestURL()")
+          #if($requestURL.indexOf("?") == -1)
+            #set($requestURL = "${requestURL}?")
+          #end
+          {{error}}$msg.get("doclockedby") $app.getLockingUser() [[$msg.get("forcelock")&gt;&gt;${requestURL}&amp;forceEdit=1]]{{/error}}
+        #else
+          ## If the document is not already locked, attempt to aquire the lock.
+          #if(!$locked)
+            ## Try to use an ajax call to lock the document.
+            {{html clean=false wiki=true}}
+              &lt;/p&gt;&lt;noscript&gt;
+                {{warning}}$msg.get('XWiki.Configurable.cannotLockNoJavascript'){{/warning}}
+              &lt;/noscript&gt;
+              &lt;script type="text/javascript"&gt;
+                document.observe("dom:loaded", function() {
+                  new Ajax.Request("$xwiki.getURL($app.getFullName(), 'lock', 'ajax=1')");
+                });
+              &lt;/script&gt;&lt;p&gt;
+            {{/html}}
+            #set($discard = $lockedDocumentNames.add($app.getFullName()))
+          #end
+          ##------------------------------------------------------------------------------------------------------------
+          ## Done Locking.
+          ##
+          ## Get all objects of the "Configurable" class from this document.
+          #set($allConfigurableObjs = $app.getObjects('XWiki.Configurable'))
+          ## Seperate out the objects which are for this section.
+          #set($configurableObjs = [])
+          #foreach($configurableObj in $allConfigurableObjs)
+            #if($app.getValue('displayInSection', $configurableObj) == $section)
+              ## If this is space admin, then don't display global, if global don't display space.
+              #if($globaladmin == ($app.getValue('configureGlobally', $configurableObj) == 1))
+                  #set($discard = $configurableObjs.add($configurableObj))
+              #end
+            #end
+          #end
+          #if($configurableObjs.size() == 0)
+            ## Internal error, not translated.
+            {{error}}Internal error: All objects were filtered out for application: $appName.{{/error}}
+          #else
+            #set($formAction = "$xwiki.getURL($app.getFullName(), 'save')")
+            #set($formId = "$section.toLowerCase()_$app.getFullName()")
+            #set($escapedAppName = $escapetool.html($app.getFullName()))
+            {{html clean=false wiki=false}}
+            #foreach($configurableObj in $configurableObjs)
+              ## Display the header if one exists.
+              #set($heading = $app.getValue('heading', $configurableObj))
+              #if($heading &amp;&amp; $heading != '')
+                {{/html}}
+                == #evaluate($heading) ==
+                {{html clean=false wiki=false}}
+              #end
+              ## If the class specifies custom code to evaluate,
+              ## then close the html macro, evaluate it and reopen the macro.
+              #set($codeToExecute = "$!app.getValue('codeToExecute', $configurableObj)")
+              #if($codeToExecute != '')
+                {{/html}}
+                #evaluate($codeToExecute)
+                {{html clean=false wiki=false}}
+              #end
+              ##
+              ## If propertiesToShow is set, then we will only show the properties contained therein.
+              #set($propertiesToShow = $app.getValue('propertiesToShow', $configurableObj))
+              #if(!$propertiesToShow || $propertiesToShow.getClass().getName().indexOf('List') == -1)
+                #set($propertiesToShow = [])
+              #end
+              ##
+              ## If linkPrefix is set, then we will make each property label a link which starts with that prefix.
+              #set($linkPrefix = "$!app.getValue('linkPrefix', $configurableObj)")
+              ##
+              ## If the Configurable object specifies a configuration class, use it, 
+              ## otherwise assume custom forms are used instead.
+              #set($configClassName = "$!app.getValue('configurationClass', $configurableObj)")
+              #if($configClassName != '')
+                #set($objClass = $xwiki.getDocument("$configClassName").getxWikiClass())
+                #if(!$objClass || $objClass.getClass().getName().indexOf('.Class') == -1)
+                  {{/html}}
+                  {{error}}$msg.get('XWiki.Configurable.configurationClassNonexistant'){{/error}}
+                  {{html clean=false wiki=false}}
+                #else
+                  ## Use the first object from the document which is of the configuration class.
+                  #set($obj = $app.getObject($objClass.getName()))
+                  ##
+                  #if(!$obj || $obj.getClass().getName().indexOf('.Object') == -1)
+                    {{/html}}
+                    {{error}}
+                      $msg.get('XWiki.Configurable.noObjectOfConfigurationClassFound',
+                        [$objClass.getName(), $app.getFullName()])
+                    {{/error}}
+                    {{html clean=false wiki=false}}
+                  #else
+                    #define($formHtml)
+                      ## We don't begin the form until we have content for it so that a configurable can specify a 
+                      ## custom form in codeToExecute and if that configurable object is the first of it's kind in that
+                      ## document, the custom form will not be put inside of our form.
+                      #if(!$insideForm)
+                        &lt;form id="$formId" method="post" action="$formAction" onsubmit="cancelCancelEdit()"&gt;
+                        &lt;fieldset&gt;
+                        #set($insideForm = true)
+                      #end
+                      #foreach($propName in $objClass.getPropertyNames())
+                        #if($propertiesToShow.size() &gt; 0 &amp;&amp; !$propertiesToShow.contains($propName))
+                          ## Silently skip over this property.
+                        #else
+                          &lt;p&gt;
+                          #set($prettyName = "#evaluate($app.displayPrettyName($propName, $obj))")
+                          ## App Name is prepended to for= to make label work with id which is modified to prevent collisions.
+                          &lt;label for="${escapedAppName}_$objClass.getName()_0_$propName"&gt;
+                          #if($linkPrefix != '')
+                            &lt;a href="$escapetool.url("$linkPrefix$prettyName")"&gt;$escapetool.html($prettyName)&lt;/a&gt;
+                          #else
+                            $escapetool.html($prettyName)
+                          #end
+                          &lt;/label&gt;
+                          $obj.display($propName, "edit")
+                          &lt;/p&gt;
+                        #end## If property is in propertiesToShow
+                      #end## Foreach property in this class
+                    #end## define $formHtml
+                    ## Strip pre tags and html macro invocations which $obj.display inserts.
+                    ## then prepend application name to ids to prevent id collissions.
+                    $formHtml.toString().replaceAll('\{\{[/]?html[^}]*\}\}|&lt;[/]?pre&gt;', '').replaceAll(" id='", " id='${escapedAppName}_")
+                  #end## If object exists
+                #end## If class exists
+              #end## If class name is specified.
+            #end## Foreach configurable object found in this document
+            ## If a form was started then we end it.
+            #if($insideForm)
+              ## We add in a redirect field to prevent the user from being carried away when they save
+              ## if they don't have javascript.
+              #set($thisURL = $request.getRequestURL())
+              #if($request.getQueryString() &amp;&amp; $request.getQueryString().length() &gt; 0)
+                #set($thisURL = "${thisURL}?$request.getQueryString()")
+              #end
+              &lt;input type="hidden" id="${escapedAppName}_redirect" name="$redirectParameter" value="$escapetool.html($thisURL)" /&gt;
+              &lt;/fieldset&gt;
+              &lt;div class="bottombuttons"&gt;
+                &lt;p class="admin-buttons"&gt;
+                  &lt;span class="buttonwrapper"&gt;
+                    ## Ajax form submission Javascript.
+                    #set($onclick = "document.forms.update.action='" + $xwiki.getURL($app.getFullName(), 'saveandcontinue') + "'; "
+                                    + "if (document.forms.update.onsubmit) document.forms.update.onsubmit();"
+                                    + "if (checkDocumentContent()) document.forms.update.submit(); return false;")
+                    ## Text to display on the button
+                    #set($buttonText = "$msg.get('admin.save') $escapedAppName")
+                    &lt;input class="button" type="submit" name="formactionsac" value="$buttonText" onclick="$onclick" /&gt;
+                  &lt;/span&gt;
+                &lt;/p&gt;
+              &lt;/div&gt; ## bottombuttons
+              &lt;/form&gt;
+              #set($insideForm = false)
+            #end
+            {{/html}}
+          #end## If there are configurable objects
+        #end## If document is not locked or forceEdit is enabled
+      #end## If app author has permission to edit admin page
+    #end## If the current user has permission to edit the configurable application.
+  #end## Foreach document name in names to configure
+  ##
+  ## TODO: cancel and "submit all" buttons.
+  ##
+#else
+  ##
+  ##------------------------------------------------------------------------------------------------------------
+  ## If section is not set then we are viewing the main administration page.
+  ##------------------------------------------------------------------------------------------------------------
+  ##
+  ## If there is no list called sections then we set sections to an empty list.
+  #if(!$sections || $sections.getClass().getName().indexOf("List") == -1)
+    #set($sections = [])
+  #end
+  ##
+  ## We have to create a list of documents which the current user doesn't have permission to view.
+  ## So we can add an error messsage to the bottom of the page if there are any.
+  #set($appsUserCannotView = [])
+  ##
+  ## A list of sections (to be added) which the user is not allowed to edit, icons will be displayed with a message
+  #set($sectionsUserCannotEdit = [])
+  ## List of sections to be added, in order by creationDate of oldest contained application.
+  #set($sectionsToAdd = [])
+  ## Map of URL of icon to use by the name of the section to use that icon on.
+  #set($iconBySection = {})
+  ##
+  #set($outputList = [])
+  #findNamesOfAppsToConfigure("", $globaladmin, $currentSpace, $outputList)
+  ##
+  #foreach($appName in $outputList)
+    ##
+    ## Get the configurable application
+    #set($app = $xwiki.getDocument($appName))
+    ##
+    ## If getDocument returns null, then warn the user that they don't have view access to that application.
+    #if(!$app)
+      #set($discard = $appsUserCannotView.add($appName))
+    #end
+    ## 
+    #set($configurableObjects = $app.getObjects('XWiki.Configurable'))
+    #foreach($configurableObject in $configurableObjects)
+      #set($displayInSection = $app.getValue('displayInSection', $configurableObject))
+      ##
+      ## If there is no section for this configurable or if the section cannot be edited, then check if the
+      ## application can be edited by the current user, if so then we display the icon from the current app and
+      ## don't display any message to tell the user they can't edit that section.
+      #if(!$sections.contains($displayInSection) || $sectionsUserCannotEdit.contains($displayInSection))
+        ##
+        ## If there is no section for this configurable, then we will have to add one.
+        #if(!$sections.contains($displayInSection) &amp;&amp; !$sectionsToAdd.contains($displayInSection))
+          #set($discard = $sectionsToAdd.add($displayInSection))
+        #end
+        ##
+        ## If an attachment by the filename iconAttachment exists and is an image
+        #set($attachment = $app.getAttachment("$app.getValue('iconAttachment', $configurableObject)"))
+        #if($attachment &amp;&amp; $attachment.isImage())
+          ## Set the icon for this section as the attachment URL.
+          #set($discard = $iconBySection.put($displayInSection, $app.getAttachmentURL($attachment.getFilename())))
+        #end
+        ##
+        ## If the user doesn't have edit access to the application, we want to should show a message on the icon
+        #if(!$xcontext.hasAccessLevel("edit", $app.getFullName()))
+          #if(!$sectionsUserCannotEdit.contains($displayInSection))
+            #set($discard = $sectionsUserCannotEdit.add($displayInSection))
+          #end
+        #elseif($sectionsUserCannotEdit.contains($displayInSection))
+          ## If the user didn't have access to the section before but does have access to _this_ app which is
+          ## configured in the section, then the section becomes accessable.
+          #set($discard = $sectionsUserCannotEdit.remove($displayInSection))
+        #end
+      #end## If section doesn't exist or user doesn't have access.
+    #end## Foreach configurable object in this app.
+  #end## Foreach application which is configurable.
+  ##
+  ## Now we go through sectionsToAdd and generate icons for them
+  #set($defaultIcon = $xwiki.getAttachmentURL('XWiki.Configurable', 'DefaultAdminSectionIcon.png'))
+  #if($globaladmin)
+    #set($queryString = "editor=globaladmin&amp;amp;section=")
+  #else
+    #set($queryString = "space=${currentSpace}&amp;amp;section=")
+    #if($request.getParameter('editor'))
+      #set($queryString = "editor=$escapetool.url($request.getParameter('editor'))&amp;amp;$queryString")
+    #end
+  #end
+  {{html clean=false wiki=false}}
+  #foreach($sectionToAdd in $sectionsToAdd)
+    #set($icon = $iconBySection.get($sectionToAdd))
+    #if(!$icon)
+      #set($icon = $defaultIcon)
+    #end
+    &lt;li class="$escapetool.html($sectionToAdd).replaceAll(' ', '_')"&gt;
+      #set($hasAccess = !$sectionsUserCannotEdit.contains($sectionToAdd))
+      #if($hasAccess)
+        &lt;a href="$xwiki.getURL($currentDoc, $xcontext.getAction(), "$queryString$escapetool.url($sectionToAdd)")"&gt;
+      #else
+        &lt;a title="$msg.get('XWiki.Configurable.sectionIconNoAccessTooltip')"&gt;
+      #end
+      &lt;img src="$icon" alt="$escapetool.html($sectionToAdd) icon"/&gt;
+      $escapetool.html($sectionToAdd)
+      #if(!$hasAccess)
+        &lt;br/&gt;&lt;span class="errormessage"&gt;$msg.get('XWiki.Configurable.sectionIconNoAccess')&lt;/span&gt;
+      #end
+      &lt;/a&gt;
+    &lt;/li&gt;
+  #end
+  {{/html}}
+  ##
+  ## Finally we display an error message if there are any applications which we were unable to view.
+  #if($appsUserCannotView.size() &gt; 0)
+    {{error}}$msg.get('XWiki.Configurable.noViewAccessSomeApplications', [$appsUserCannotView]){{/error}}
+  #end
+#end## If we should be looking at the main administration page.
+##
+##------------------------------------------------------------------------------------------------------------
+## The Macros, nothing below this point is run directly.
+##------------------------------------------------------------------------------------------------------------
+##
+#*
+ *
+ * Any documents which are on the provided list ($documentNames) which are locked by the current user will be unlocked.
+ * If this macro has programming rights, then they are unlocked programmatically, otherwise a javascript tag is
+ * generated with ajax calls to cancel for all of the documents. If there are documents on this list which are not
+ * locked by the current user, then they are ignored.
+ *
+ * @param $documentNames - List&lt;String&gt; - fullNames of documents which should be unlocked if they are locked by the 
+ *                                        current user.
+ *###
+#macro(unlockDocuments $documentNames)
+  #if($documentNames.size() &gt; 0)
+    #set($sql = "doc.fullName=")
+    #foreach($documentName in $documentNames)
+      #set($sql = "${sql}'$documentName' or doc.fullName=")
+    #end
+    ## Trim the dangling ' or doc.fullName=?'
+    #set($sql = $sql.substring(0, $sql.lastIndexOf(' or doc.fullName=')))
+    #set($sql = ", XWikiLock lock where lock.docId=doc.id and lock.userName='$xcontext.getUser()' and (${sql})")
+    #set($namesOfdocumentsToUnlock = $xwiki.searchDocuments($sql))
+    ## Use ajax and hope the user runs javascript.
+    {{html clean=false wiki=false}}
+      &lt;script type="text/javascript"&gt;
+        document.observe("dom:loaded", function() {
+          #foreach($nameOflockedDocument in $namesOfdocumentsToUnlock)
+            new Ajax.Request("$xwiki.getURL($nameOflockedDocument, 'cancel', 'ajax=1')");
+          #end
+        });
+      &lt;/script&gt;
+    {{/html}}
+  #end## If output list size &gt; 0
+#end## Macro
+##
+#*
+ * Find names of documents which contain objects of the class 'XWiki.Configurable'
+ *
+ * @param $section - String - Look for apps which specify that they should be configured in this section,
+ *                            if null or "" then returns them for all sections.
+ *
+ * @param $globaladmin - boolean - If true then we will look for applications which should be configured globally.
+ *
+ * @param $space - String - If not looking for apps which are configured globally, then this is the space where we
+ *                          will look for apps in. If null or "" or if $globaladmin is true, then all spaces will be 
+ *                          searched.
+ *
+ * @param $outputList - List - The returns from this macro will be put in this list, passing the list as a parameter
+ *                             a safety measure because macros can't return values.
+ *###
+#macro(findNamesOfAppsToConfigure, $section, $globaladmin, $space, $outputList)
+  ## Use a parameterized sql query to prevent injection.
+  #set($params = [])
+  #if($section &amp;&amp; $section != '')
+    #set($discard = $params.add("$section"))
+    #set($sqlA = ' StringProperty as section,')
+    #set($sqlB = " and section.id=obj.id and section.name='displayInSection' and section.value=?")
+  #else
+    ## Make sure they are "" in case they were set prior to calling the macro.
+    #set($sqlA = '')
+    #set($sqlB = '')
+  #end
+  ## Set up query based on value of $globaladmin
+  #if($globaladmin == true)
+    #set($sqlC = '1')
+  #else
+    #if($space &amp;&amp; $space != '')
+      #set($sqlC = '0 and doc.space = ?')
+      #set($discard = $params.add($space))
+    #else
+      #set($sqlC = '0')
+    #end
+  #end
+  #set($sql = ", BaseObject as obj,$sqlA IntegerProperty as global where "
+              + "doc.fullName=obj.name and obj.className='XWiki.Configurable'$sqlB "
+              + "and global.id=obj.id and global.name='configureGlobally' and global.value=$sqlC "
+              + "order by doc.creationDate")
+  ##
+  ## Run the search
+  #set($outputList = $xwiki.searchDocuments($sql, 0, 0, $params))
+  ##
+#end
+##
+#*
+ * If this document is saved with programming access or is includeForm'd into a document with programming, we have to
+ * drop programming rights in order for it to run safely because it evaluates potentially untrustworthy code.
+ *###
+#macro(sandboxDocument)
+  #if($xcontext.hasProgrammingRights())
+    $xcontext.getContext().getDoc().setContentAuthor('XWiki.XWikiGuest')
+  #end
+#end
+{{/velocity}}</content>
+</xwikidoc>
+<?xml version="1.0" encoding="UTF-8"?>
+
+<xwikidoc>
+<web>XWiki</web>
+<name>Configurable</name>
+<language></language>
+<defaultLanguage>en</defaultLanguage>
+<translation>0</translation>
+<parent>XWiki.WebHome</parent>
+<creator>XWiki.Admin</creator>
+<author>XWiki.Admin</author>
+<customClass></customClass>
+<contentAuthor>XWiki.Admin</contentAuthor>
+<creationDate>1265775370000</creationDate>
+<date>1266578504000</date>
+<contentUpdateDate>1266578504000</contentUpdateDate>
+<version>1.1</version>
+<title>XWiki.Configurable</title>
+<template></template>
+<defaultTemplate></defaultTemplate>
+<validationScript></validationScript>
+<comment>Deleted object</comment>
+<minorEdit>true</minorEdit>
+<syntaxId>xwiki/2.0</syntaxId>
+<hidden>false</hidden>
+<attachment>
+<filename>DefaultAdminSectionIcon.png</filename>
+<filesize>7502</filesize>
+<author>XWiki.Admin</author>
+<date>1266210801000</date>
+<version>1.1</version>
+<comment></comment>
+<content>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</content>
+</attachment>
+<class>
+<name>XWiki.Configurable</name>
+<customClass></customClass>
+<customMapping></customMapping>
+<defaultViewSheet></defaultViewSheet>
+<defaultEditSheet></defaultEditSheet>
+<defaultWeb></defaultWeb>
+<nameField></nameField>
+<validationScript></validationScript>
+<codeToExecute>
+<editor>---</editor>
+<name>codeToExecute</name>
+<number>7</number>
+<picker>0</picker>
+<prettyName>codeToExecute</prettyName>
+<rows>5</rows>
+<size>40</size>
+<unmodifiable>0</unmodifiable>
+<validationMessage></validationMessage>
+<validationRegExp></validationRegExp>
+<classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+</codeToExecute>
+<configurationClass>
+<name>configurationClass</name>
+<number>3</number>
+<picker>0</picker>
+<prettyName>configurationClass</prettyName>
+<size>30</size>
+<unmodifiable>0</unmodifiable>
+<validationMessage></validationMessage>
+<validationRegExp></validationRegExp>
+<classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+</configurationClass>
+<configureGlobally>
+<defaultValue></defaultValue>
+<displayFormType>checkbox</displayFormType>
+<displayType></displayType>
+<name>configureGlobally</name>
+<number>4</number>
+<prettyName>configureGlobally</prettyName>
+<unmodifiable>0</unmodifiable>
+<validationMessage></validationMessage>
+<validationRegExp></validationRegExp>
+<classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+</configureGlobally>
+<displayInSection>
+<name>displayInSection</name>
+<number>1</number>
+<picker>0</picker>
+<prettyName>displayInSection</prettyName>
+<size>30</size>
+<unmodifiable>0</unmodifiable>
+<validationMessage></validationMessage>
+<validationRegExp></validationRegExp>
+<classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+</displayInSection>
+<heading>
+<name>heading</name>
+<number>2</number>
+<picker>0</picker>
+<prettyName>heading</prettyName>
+<size>30</size>
+<unmodifiable>0</unmodifiable>
+<validationMessage></validationMessage>
+<validationRegExp></validationRegExp>
+<classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+</heading>
+<iconAttachment>
+<name>iconAttachment</name>
+<number>8</number>
+<picker>0</picker>
+<prettyName>iconAttachment</prettyName>
+<size>30</size>
+<unmodifiable>0</unmodifiable>
+<validationMessage></validationMessage>
+<validationRegExp></validationRegExp>
+<classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+</iconAttachment>
+<linkPrefix>
+<name>linkPrefix</name>
+<number>5</number>
+<picker>0</picker>
+<prettyName>linkPrefix</prettyName>
+<size>30</size>
+<unmodifiable>0</unmodifiable>
+<validationMessage></validationMessage>
+<validationRegExp></validationRegExp>
+<classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+</linkPrefix>
+<propertiesToShow>
+<cache>0</cache>
+<displayType>input</displayType>
+<multiSelect>1</multiSelect>
+<name>propertiesToShow</name>
+<number>6</number>
+<picker>0</picker>
+<prettyName>propertiesToShow</prettyName>
+<relationalStorage>1</relationalStorage>
+<separator> </separator>
+<separators> ,|</separators>
+<size>20</size>
+<sort>none</sort>
+<unmodifiable>0</unmodifiable>
+<validationMessage></validationMessage>
+<validationRegExp></validationRegExp>
+<values></values>
+<classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+</propertiesToShow>
+</class>
+<content>{{velocity}}
+#*
+ * This part takes the configuration from any documents containing XWiki.Configurable objects and creates a form 
+ * for each. To includeForm this document, you may specify:
+ *
+ * $section - String - The section which we are administrating eg: "Registration", "Users", or "Import".
+ *                     If none is specified then it checks for a request parameter called "section" and uses that,
+ *                     if no parameter, then this code assumes that it is part of the admin icons sheet and adds icons
+ *                     for any section which is not in $sections, in that event, this code assumes it is being run 
+ *                     inside of a &lt;ul&gt; block.
+ *
+ * $sections - List&lt;String&gt; - If section is not specified, any sections on this list will not have icons made for them
+ *                            the assumption being that the icons are already there. If section is specified then this
+ *                            is not taken into account and may safely be undefined.
+ *
+ * $currentDoc - String (document.fullName) - The administration document, users who don't have permission to edit 
+ *                                            it will not be able to include applications (possibly injecting 
+ *                                            arbitrary code.) if none specified then $doc.getFullName() is used.
+ *
+ * $globaladmin - boolean - If set true then we will assume we are administrationg the entire wiki.
+ *                          If not set then we look for a request parameter called "editor" if that exists and equals
+ *                          "globaladmin" then $globaladmin is true, if it doesn't exist then we check to see if 
+ *                          $currentDoc.getFullName() equals "XWiki.XWikiPreferences".
+ *
+ * $doNotUnlockConfigurableDocuments - boolean - If true then this code will not make any attempt to unlock configurable
+ *                                               documents. By default it does because it locks any document in the 
+ *                                               section which is being configured which would lead to a lot of stray
+ *                                               locks if they weren't all cancelled. Only recommended if this page is
+ *                                               being included twice in the same page.
+ *###
+## Constants:
+#set($redirectParameter = 'xredirect')
+#set($nameOfThisDocument = 'XWiki.Configurable')
+##
+##
+#if(!$section)
+  #set($section = $request.getParameter('section'))
+#end
+#if(!$currentDoc)
+  #set($currentDoc = $doc.getFullName())
+#end
+## Get value of $globaladmin if not specified.
+#if("$!globaladmin" == '')
+  #if($editor != 'globaladmin'
+      &amp;&amp; $request.getParameter('editor') != 'globaladmin'
+      &amp;&amp; $currentDoc != "XWiki.XWikiPreferences")
+  ##
+    #set($globaladmin = false)
+  #else
+    #set($globaladmin = true)
+  #end
+#end
+#set($currentSpace = $xwiki.getDocument("$currentDoc").getSpace())
+##
+## This application should not run with programming rights because it evaluates code which may not be trustworthy.
+## Removing the next line will open a security hole.
+#sandboxDocument($nameOfThisDocument)
+##
+## This application locks every document in a section while that section is being edited so we should 
+## check for locks held by the current user on any of the applications configured here and remove them.
+#if(!$doNotUnlockConfigurableDocuments)
+  #set($outputList = [])
+  #findNamesOfAppsToConfigure("", $globaladmin, $currentSpace, $outputList)
+  ## We don't want to generate javascript which unlocks the current document just after we got finished locking it.
+  #set($discard = $outputList.remove($currentDoc))
+  #unlockDocuments($outputList)
+#end
+##
+##------------------------------------------------------------------------------------------------------------
+## If $section exists then we are viewing the admin page for a perticular section.
+## eg: 'Registration', 'Presentation', 'Import' etc.
+##------------------------------------------------------------------------------------------------------------
+##
+#if($section &amp;&amp; $section != '')
+  ##
+  ## Searches the database for names of apps to be configured
+  #set($outputList = [])
+  #findNamesOfAppsToConfigure($section, $globaladmin, $xwiki.getDocument("$currentDoc").getSpace(), $outputList)
+  ##
+  #foreach($appName in $outputList)
+    ##
+    = $msg.get("admin.customize") __[[$appName&gt;&gt;$appName]]__: =
+    ##
+    ## Make sure the current user has permission to edit the configurable application.
+    #if(!$xcontext.hasAccessLevel('edit', $appName))
+      {{error}}$msg.get('XWiki.Configurable.noPermissionThisApplication'){{/error}}
+    #else
+      ##
+      ## Get the configurable application
+      #set($app = $xwiki.getDocument($appName))
+      ##
+      ## If the document was not last saved by a user with edit privilage on this page
+      ## then we can't safely display the page but we should warn the viewer.
+      #if(!$xwiki.hasAccessLevel("edit", $app.getAuthor(), $currentDoc))
+        {{error}}$msg.get('XWiki.Configurable.applicationAuthorNoAdmin', [$app.Author]){{/error}}
+      #else
+        ##
+        ## Locking document
+        ##------------------------------------------------------------------------------------------------------------
+        #if($app.getLocked())
+          #set($locked = true)
+        #end
+        ## If the document is locked and not by the current user and forceEdit is not set true,
+        #if($locked &amp;&amp; $app.getLockingUser() != $xcontext.getUser() &amp;&amp; !$request.getParameter('forceEdit'))
+          #set($requestURL = "$request.getRequestURL()")
+          #if($requestURL.indexOf("?") == -1)
+            #set($requestURL = "${requestURL}?")
+          #end
+          {{error}}$msg.get("doclockedby") $app.getLockingUser() [[$msg.get("forcelock")&gt;&gt;${requestURL}&amp;forceEdit=1]]{{/error}}
+        #else
+          ## If the document is not already locked, attempt to aquire the lock.
+          #if(!$locked)
+            ## Try to use an ajax call to lock the document.
+            {{html clean=false wiki=true}}
+              &lt;/p&gt;&lt;noscript&gt;
+                {{warning}}$msg.get('XWiki.Configurable.cannotLockNoJavascript'){{/warning}}
+              &lt;/noscript&gt;
+              &lt;script type="text/javascript"&gt;
+                document.observe("dom:loaded", function() {
+                  new Ajax.Request("$xwiki.getURL($app.getFullName(), 'lock', 'ajax=1')");
+                });
+              &lt;/script&gt;&lt;p&gt;
+            {{/html}}
+            #set($discard = $lockedDocumentNames.add($app.getFullName()))
+          #end
+          ##------------------------------------------------------------------------------------------------------------
+          ## Done Locking.
+          ##
+          ## Get all objects of the "Configurable" class from this document.
+          #set($allConfigurableObjs = $app.getObjects('XWiki.Configurable'))
+          ## Seperate out the objects which are for this section.
+          #set($configurableObjs = [])
+          #foreach($configurableObj in $allConfigurableObjs)
+            #if($app.getValue('displayInSection', $configurableObj) == $section)
+              ## If this is space admin, then don't display global, if global don't display space.
+              #if($globaladmin == ($app.getValue('configureGlobally', $configurableObj) == 1))
+                  #set($discard = $configurableObjs.add($configurableObj))
+              #end
+            #end
+          #end
+          #if($configurableObjs.size() == 0)
+            ## Internal error, not translated.
+            {{error}}Internal error: All objects were filtered out for application: $appName.{{/error}}
+          #else
+            #set($formAction = "$xwiki.getURL($app.getFullName(), 'save')")
+            #set($formId = "$section.toLowerCase()_$app.getFullName()")
+            #set($escapedAppName = $escapetool.html($app.getFullName()))
+            {{html clean=false wiki=false}}
+            #foreach($configurableObj in $configurableObjs)
+              ## Display the header if one exists.
+              #set($heading = $app.getValue('heading', $configurableObj))
+              #if($heading &amp;&amp; $heading != '')
+                {{/html}}
+                == #evaluate($heading) ==
+                {{html clean=false wiki=false}}
+              #end
+              ## If the class specifies custom code to evaluate,
+              ## then close the html macro, evaluate it and reopen the macro.
+              #set($codeToExecute = "$!app.getValue('codeToExecute', $configurableObj)")
+              #if($codeToExecute != '')
+                {{/html}}
+                #evaluate($codeToExecute)
+                {{html clean=false wiki=false}}
+              #end
+              ##
+              ## If propertiesToShow is set, then we will only show the properties contained therein.
+              #set($propertiesToShow = $app.getValue('propertiesToShow', $configurableObj))
+              #if(!$propertiesToShow || $propertiesToShow.getClass().getName().indexOf('List') == -1)
+                #set($propertiesToShow = [])
+              #end
+              ##
+              ## If linkPrefix is set, then we will make each property label a link which starts with that prefix.
+              #set($linkPrefix = "$!app.getValue('linkPrefix', $configurableObj)")
+              ##
+              ## If the Configurable object specifies a configuration class, use it, 
+              ## otherwise assume custom forms are used instead.
+              #set($configClassName = "$!app.getValue('configurationClass', $configurableObj)")
+              #if($configClassName != '')
+                #set($objClass = $xwiki.getDocument("$configClassName").getxWikiClass())
+                #if(!$objClass || $objClass.getClass().getName().indexOf('.Class') == -1)
+                  {{/html}}
+                  {{error}}$msg.get('XWiki.Configurable.configurationClassNonexistant'){{/error}}
+                  {{html clean=false wiki=false}}
+                #else
+                  ## Use the first object from the document which is of the configuration class.
+                  #set($obj = $app.getObject($objClass.getName()))
+                  ##
+                  #if(!$obj || $obj.getClass().getName().indexOf('.Object') == -1)
+                    {{/html}}
+                    {{error}}
+                      $msg.get('XWiki.Configurable.noObjectOfConfigurationClassFound',
+                        [$objClass.getName(), $app.getFullName()])
+                    {{/error}}
+                    {{html clean=false wiki=false}}
+                  #else
+                    #define($formHtml)
+                      ## We don't begin the form until we have content for it so that a configurable can specify a 
+                      ## custom form in codeToExecute and if that configurable object is the first of it's kind in that
+                      ## document, the custom form will not be put inside of our form.
+                      #if(!$insideForm)
+                        &lt;form id="$formId" method="post" action="$formAction" onsubmit="cancelCancelEdit()"&gt;
+                        &lt;fieldset&gt;
+                        #set($insideForm = true)
+                      #end
+                      #foreach($propName in $objClass.getPropertyNames())
+                        #if($propertiesToShow.size() &gt; 0 &amp;&amp; !$propertiesToShow.contains($propName))
+                          ## Silently skip over this property.
+                        #else
+                          &lt;p&gt;
+                          #set($prettyName = "#evaluate($app.displayPrettyName($propName, $obj))")
+                          ## App Name is prepended to for= to make label work with id which is modified to prevent collisions.
+                          &lt;label for="${escapedAppName}_$objClass.getName()_0_$propName"&gt;
+                          #if($linkPrefix != '')
+                            &lt;a href="$escapetool.url("$linkPrefix$prettyName")"&gt;$escapetool.html($prettyName)&lt;/a&gt;
+                          #else
+                            $escapetool.html($prettyName)
+                          #end
+                          &lt;/label&gt;
+                          $obj.display($propName, "edit")
+                          &lt;/p&gt;
+                        #end## If property is in propertiesToShow
+                      #end## Foreach property in this class
+                    #end## define $formHtml
+                    ## Strip pre tags and html macro invocations which $obj.display inserts.
+                    ## then prepend application name to ids to prevent id collissions.
+                    $formHtml.toString().replaceAll('\{\{[/]?html[^}]*\}\}|&lt;[/]?pre&gt;', '').replaceAll(" id='", " id='${escapedAppName}_")
+                  #end## If object exists
+                #end## If class exists
+              #end## If class name is specified.
+            #end## Foreach configurable object found in this document
+            ## If a form was started then we end it.
+            #if($insideForm)
+              ## We add in a redirect field to prevent the user from being carried away when they save
+              ## if they don't have javascript.
+              #set($thisURL = $request.getRequestURL())
+              #if($request.getQueryString() &amp;&amp; $request.getQueryString().length() &gt; 0)
+                #set($thisURL = "${thisURL}?$request.getQueryString()")
+              #end
+              &lt;input type="hidden" id="${escapedAppName}_redirect" name="$redirectParameter" value="$escapetool.html($thisURL)" /&gt;
+              &lt;/fieldset&gt;
+              &lt;div class="bottombuttons"&gt;
+                &lt;p class="admin-buttons"&gt;
+                  &lt;span class="buttonwrapper"&gt;
+                    ## Ajax form submission Javascript.
+                    #set($onclick = "document.forms.update.action='" + $xwiki.getURL($app, 'saveandcontinue') + "'; "
+                                    + "if (document.forms.update.onsubmit) document.forms.update.onsubmit();"
+                                    + "if (checkDocumentContent()) document.forms.update.submit(); return false;")
+                    ## Text to display on the button
+                    #set($buttonText = "$msg.get('admin.save') $escapedAppName")
+                    &lt;input class="button" type="submit" name="formactionsac" value="$buttonText" onclick="$onclick" /&gt;
+                  &lt;/span&gt;
+                &lt;/p&gt;
+              &lt;/div&gt; ## bottombuttons
+              &lt;/form&gt;
+              #set($insideForm = false)
+            #end
+            {{/html}}
+          #end## If there are configurable objects
+        #end## If document is not locked or forceEdit is enabled
+      #end## If app author has permission to edit admin page
+    #end## If the current user has permission to edit the configurable application.
+  #end## Foreach document name in names to configure
+  ##
+  ## TODO: cancel and "submit all" buttons.
+  ##
+#else
+  ##
+  ##------------------------------------------------------------------------------------------------------------
+  ## If section is not set then we are viewing the main administration page.
+  ##------------------------------------------------------------------------------------------------------------
+  ##
+  ## If there is no list called sections then we set sections to an empty list.
+  #if(!$sections || $sections.getClass().getName().indexOf("List") == -1)
+    #set($sections = [])
+  #end
+  ##
+  ## We have to create a list of documents which the current user doesn't have permission to view.
+  ## So we can add an error messsage to the bottom of the page if there are any.
+  #set($appsUserCannotView = [])
+  ##
+  ## A list of sections (to be added) which the user is not allowed to edit, icons will be displayed with a message
+  #set($sectionsUserCannotEdit = [])
+  ## List of sections to be added, in order by creationDate of oldest contained application.
+  #set($sectionsToAdd = [])
+  ## Map of URL of icon to use by the name of the section to use that icon on.
+  #set($iconBySection = {})
+  ##
+  #set($outputList = [])
+  #findNamesOfAppsToConfigure("", $globaladmin, $currentSpace, $outputList)
+  ##
+  #foreach($appName in $outputList)
+    ##
+    ## Get the configurable application
+    #set($app = $xwiki.getDocument($appName))
+    ##
+    ## If getDocument returns null, then warn the user that they don't have view access to that application.
+    #if(!$app)
+      #set($discard = $appsUserCannotView.add($appName))
+    #end
+    ## 
+    #set($configurableObjects = $app.getObjects('XWiki.Configurable'))
+    #foreach($configurableObject in $configurableObjects)
+      #set($displayInSection = $app.getValue('displayInSection', $configurableObject))
+      ##
+      ## If there is no section for this configurable or if the section cannot be edited, then check if the
+      ## application can be edited by the current user, if so then we display the icon from the current app and
+      ## don't display any message to tell the user they can't edit that section.
+      #if(!$sections.contains($displayInSection) || $sectionsUserCannotEdit.contains($displayInSection))
+        ##
+        ## If there is no section for this configurable, then we will have to add one.
+        #if(!$sections.contains($displayInSection) &amp;&amp; !$sectionsToAdd.contains($displayInSection))
+          #set($discard = $sectionsToAdd.add($displayInSection))
+        #end
+        ##
+        ## If an attachment by the filename iconAttachment exists and is an image
+        #set($attachment = $app.getAttachment("$app.getValue('iconAttachment', $configurableObject)"))
+        #if($attachment &amp;&amp; $attachment.isImage())
+          ## Set the icon for this section as the attachment URL.
+          #set($discard = $iconBySection.put($displayInSection, $app.getAttachmentURL($attachment.getFilename())))
+        #end
+        ##
+        ## If the user doesn't have edit access to the application, we want to should show a message on the icon
+        #if(!$xcontext.hasAccessLevel("edit", $app.getFullName()))
+          #if(!$sectionsUserCannotEdit.contains($displayInSection))
+            #set($discard = $sectionsUserCannotEdit.add($displayInSection))
+          #end
+        #elseif($sectionsUserCannotEdit.contains($displayInSection))
+          ## If the user didn't have access to the section before but does have access to _this_ app which is
+          ## configured in the section, then the section becomes accessable.
+          #set($discard = $sectionsUserCannotEdit.remove($displayInSection))
+        #end
+      #end## If section doesn't exist or user doesn't have access.
+    #end## Foreach configurable object in this app.
+  #end## Foreach application which is configurable.
+  ##
+  ## Now we go through sectionsToAdd and generate icons for them
+  #set($defaultIcon = $xwiki.getAttachmentURL('XWiki.Configurable', 'DefaultAdminSectionIcon.png'))
+  #if($globaladmin)
+    #set($queryString = "editor=globaladmin&amp;amp;section=")
+  #else
+    #set($queryString = "space=${currentSpace}&amp;amp;section=")
+    #if($request.getParameter('editor'))
+      #set($queryString = "editor=$escapetool.url($request.getParameter('editor'))&amp;amp;$queryString")
+    #end
+  #end
+  {{html clean=false wiki=false}}
+  #foreach($sectionToAdd in $sectionsToAdd)
+    #set($icon = $iconBySection.get($sectionToAdd))
+    #if(!$icon)
+      #set($icon = $defaultIcon)
+    #end
+    &lt;li class="$escapetool.html($sectionToAdd).replaceAll(' ', '_')"&gt;
+      #set($hasAccess = !$sectionsUserCannotEdit.contains($sectionToAdd))
+      #if($hasAccess)
+        &lt;a href="$xwiki.getURL($currentDoc, $xcontext.getAction(), "$queryString$escapetool.url($sectionToAdd)")"&gt;
+      #else
+        &lt;a title="$msg.get('XWiki.Configurable.sectionIconNoAccessTooltip')"&gt;
+      #end
+      &lt;img src="$icon" alt="$escapetool.html($sectionToAdd) icon"/&gt;
+      $escapetool.html($sectionToAdd)
+      #if(!$hasAccess)
+        &lt;br/&gt;&lt;span class="errormessage"&gt;$msg.get('XWiki.Configurable.sectionIconNoAccess')&lt;/span&gt;
+      #end
+      &lt;/a&gt;
+    &lt;/li&gt;
+  #end
+  {{/html}}
+  ##
+  ## Finally we display an error message if there are any applications which we were unable to view.
+  #if($appsUserCannotView.size() &gt; 0)
+    {{error}}$msg.get('XWiki.Configurable.noViewAccessSomeApplications', [$appsUserCannotView]){{/error}}
+  #end
+#end## If we should be looking at the main administration page.
+##
+##------------------------------------------------------------------------------------------------------------
+## The Macros, nothing below this point is run directly.
+##------------------------------------------------------------------------------------------------------------
+##
+#*
+ *
+ * Any documents which are on the provided list ($documentNames) which are locked by the current user will be unlocked.
+ * If this macro has programming rights, then they are unlocked programmatically, otherwise a javascript tag is
+ * generated with ajax calls to cancel for all of the documents. If there are documents on this list which are not
+ * locked by the current user, then they are ignored.
+ *
+ * @param $documentNames - List&lt;String&gt; - fullNames of documents which should be unlocked if they are locked by the 
+ *                                        current user.
+ *###
+#macro(unlockDocuments $documentNames)
+  #if($documentNames.size() &gt; 0)
+    #set($sql = "doc.fullName=")
+    #foreach($documentName in $documentNames)
+      #set($sql = "${sql}'$documentName' or doc.fullName=")
+    #end
+    ## Trim the dangling ' or doc.fullName=?'
+    #set($sql = $sql.substring(0, $sql.lastIndexOf(' or doc.fullName=')))
+    #set($sql = ", XWikiLock lock where lock.docId=doc.id and lock.userName='$xcontext.getUser()' and (${sql})")
+    #set($namesOfdocumentsToUnlock = $xwiki.searchDocuments($sql))
+    ## Use ajax and hope the user runs javascript.
+    {{html clean=false wiki=false}}
+      &lt;script type="text/javascript"&gt;
+        document.observe("dom:loaded", function() {
+          #foreach($nameOflockedDocument in $namesOfdocumentsToUnlock)
+            new Ajax.Request("$xwiki.getURL($nameOflockedDocument, 'cancel', 'ajax=1')");
+          #end
+        });
+      &lt;/script&gt;
+    {{/html}}
+  #end## If output list size &gt; 0
+#end## Macro
+##
+#*
+ * Find names of documents which contain objects of the class 'XWiki.Configurable'
+ *
+ * @param $section - String - Look for apps which specify that they should be configured in this section,
+ *                            if null or "" then returns them for all sections.
+ *
+ * @param $globaladmin - boolean - If true then we will look for applications which should be configured globally.
+ *
+ * @param $space - String - If not looking for apps which are configured globally, then this is the space where we
+ *                          will look for apps in. If null or "" or if $globaladmin is true, then all spaces will be 
+ *                          searched.
+ *
+ * @param $outputList - List - The returns from this macro will be put in this list, passing the list as a parameter
+ *                             a safety measure because macros can't return values.
+ *###
+#macro(findNamesOfAppsToConfigure, $section, $globaladmin, $space, $outputList)
+  ## Use a parameterized sql query to prevent injection.
+  #set($params = [])
+  #if($section &amp;&amp; $section != '')
+    #set($discard = $params.add("$section"))
+    #set($sqlA = ' StringProperty as section,')
+    #set($sqlB = " and section.id=obj.id and section.name='displayInSection' and section.value=?")
+  #else
+    ## Make sure they are "" in case they were set prior to calling the macro.
+    #set($sqlA = '')
+    #set($sqlB = '')
+  #end
+  ## Set up query based on value of $globaladmin
+  #if($globaladmin == true)
+    #set($sqlC = '1')
+  #else
+    #if($space &amp;&amp; $space != '')
+      #set($sqlC = '0 and doc.space = ?')
+      #set($discard = $params.add($space))
+    #else
+      #set($sqlC = '0')
+    #end
+  #end
+  #set($sql = ", BaseObject as obj,$sqlA IntegerProperty as global where "
+              + "doc.fullName=obj.name and obj.className='XWiki.Configurable'$sqlB "
+              + "and global.id=obj.id and global.name='configureGlobally' and global.value=$sqlC "
+              + "order by doc.creationDate")
+  ##
+  ## Run the search
+  #set($outputList = $xwiki.searchDocuments($sql, 0, 0, $params))
+  ##
+#end
+##
+#*
+ * If this document is saved with programming access or is includeForm'd into a document with programming, we have to
+ * drop programming rights in order for it to run safely because it evaluates potentially untrustworthy code.
+ *###
+#macro(sandboxDocument)
+  #if($xcontext.hasProgrammingRights())
+    $xcontext.getContext().getDoc().setContentAuthor('XWiki.XWikiGuest')
+  #end
+#end
+{{/velocity}}</content>
+</xwikidoc>

@@ -226,7 +226,7 @@
     ##
     ## Make sure the current user has permission to edit the configurable application.
     #if(!$xcontext.hasAccessLevel('edit', $appName))
-      {{error}}$msg.get('XWiki.Configurable.noPermissionThisApplication'){{/error}}
+      {{error}}$msg.get('xe.admin.configurable.noPermissionThisApplication'){{/error}}
     #else
       ##
       ## Get the configurable application
@@ -235,7 +235,7 @@
       ## If the document was not last saved by a user with edit privilage on this page
       ## then we can't safely display the page but we should warn the viewer.
       #if(!$xwiki.hasAccessLevel("edit", $app.getAuthor(), $currentDoc))
-        {{error}}$msg.get('XWiki.Configurable.applicationAuthorNoAdmin', [$app.Author]){{/error}}
+        {{error}}$msg.get('xe.admin.configurable.applicationAuthorNoAdmin', [$app.Author]){{/error}}
       #else
         ##
         ## Locking document
@@ -256,7 +256,7 @@
             ## Try to use an ajax call to lock the document.
             {{html clean=false wiki=true}}
               &lt;/p&gt;&lt;noscript&gt;
-                {{warning}}$msg.get('XWiki.Configurable.cannotLockNoJavascript'){{/warning}}
+                {{warning}}$msg.get('xe.admin.configurable.cannotLockNoJavascript'){{/warning}}
               &lt;/noscript&gt;
               &lt;script type="text/javascript"&gt;
                 document.observe("dom:loaded", function() {
@@ -322,7 +322,7 @@
                 #set($objClass = $xwiki.getDocument("$configClassName").getxWikiClass())
                 #if(!$objClass || $objClass.getClass().getName().indexOf('.Class') == -1)
                   {{/html}}
-                  {{error}}$msg.get('XWiki.Configurable.configurationClassNonexistant'){{/error}}
+                  {{error}}$msg.get('xe.admin.configurable.configurationClassNonexistant'){{/error}}
                   {{html clean=false wiki=false}}
                 #else
                   ## Use the first object from the document which is of the configuration class.
@@ -331,7 +331,7 @@
                   #if(!$obj || $obj.getClass().getName().indexOf('.Object') == -1)
                     {{/html}}
                     {{error}}
-                      $msg.get('XWiki.Configurable.noObjectOfConfigurationClassFound',
+                      $msg.get('xe.admin.configurable.noObjectOfConfigurationClassFound',
                         [$objClass.getName(), $app.getFullName()])
                     {{/error}}
                     {{html clean=false wiki=false}}
@@ -497,12 +497,12 @@
       #if($hasAccess)
         &lt;a href="$xwiki.getURL($currentDoc, $xcontext.getAction(), "$queryString$escapetool.url($sectionToAdd)")"&gt;
       #else
-        &lt;a title="$msg.get('XWiki.Configurable.sectionIconNoAccessTooltip')"&gt;
+        &lt;a title="$msg.get('xe.admin.configurable.sectionIconNoAccessTooltip')"&gt;
       #end
       &lt;img src="$icon" alt="$escapetool.html($sectionToAdd) icon"/&gt;
       $escapetool.html($sectionToAdd)
       #if(!$hasAccess)
-        &lt;br/&gt;&lt;span class="errormessage"&gt;$msg.get('XWiki.Configurable.sectionIconNoAccess')&lt;/span&gt;
+        &lt;br/&gt;&lt;span class="errormessage"&gt;$msg.get('xe.admin.configurable.sectionIconNoAccess')&lt;/span&gt;
       #end
       &lt;/a&gt;
     &lt;/li&gt;
@@ -511,7 +511,7 @@
   ##
   ## Finally we display an error message if there are any applications which we were unable to view.
   #if($appsUserCannotView.size() &gt; 0)
-    {{error}}$msg.get('XWiki.Configurable.noViewAccessSomeApplications', [$appsUserCannotView]){{/error}}
+    {{error}}$msg.get('xe.admin.configurable.noViewAccessSomeApplications', [$appsUserCannotView]){{/error}}
   #end
 #end## If we should be looking at the main administration page.
 ##

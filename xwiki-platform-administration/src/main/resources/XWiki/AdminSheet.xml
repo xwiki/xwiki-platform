@@ -639,6 +639,7 @@ p.legend {
            #end
          #end
        #end
+       #includeForm('XWiki.Configurable')
      &lt;/div&gt; ## admin-page-content
      #end
      &lt;div id="admin-page-menu" #if($section != '')class="hidden"#end&gt;
@@ -681,6 +682,9 @@ p.legend {
             &lt;li class="${name}"&gt;&lt;a href="$url"&gt;&lt;span&gt;#if("$!aiconurl" != '')&lt;img src="$aiconurl" alt="$name icon" /&gt;#end#if("$!atitle" != '')$atitle#else$name#end&lt;/span&gt;&lt;/a&gt;&lt;/li&gt;
           #end
         #end
+        #set($section = '')
+        #set($doNotUnlockConfigurableDocuments = true)
+        #includeForm('XWiki.Configurable')
        &lt;/ul&gt;
      &lt;/div&gt; ## admin-page-menu
  &lt;/div&gt; ## admin-page

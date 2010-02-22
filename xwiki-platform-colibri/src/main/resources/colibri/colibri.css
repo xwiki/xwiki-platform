@@ -1196,7 +1196,7 @@ ul.xlist li.xitem div.xitemcontainer ul.xlist {
   border: 1px dotted $theme.borderColor;
 }
 
-.code, .code pre  {
+.code, .code pre, .code *  {
   font-family: courier, "courier new", monospace;
   white-space: pre;
 }

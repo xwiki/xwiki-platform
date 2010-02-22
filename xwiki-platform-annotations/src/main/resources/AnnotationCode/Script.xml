@@ -360,8 +360,8 @@ XWiki.Selection = Class.create({
         top = lastWrapper.cumulativeOffset().top + lastWrapper.getHeight();
       }
     } else {
-      left = this.offsetX + "px";
-      top = this.offsetY + "px";
+      left = this.offsetX;
+      top = this.offsetY;
     }
     
     return {'left' : left, 'top' : top}; 

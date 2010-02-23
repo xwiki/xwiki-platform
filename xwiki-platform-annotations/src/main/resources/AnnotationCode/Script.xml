@@ -675,7 +675,7 @@ XWiki.Selection = Class.create({
             failureReason = 'Server not responding';
           }
           // show the error message at the bottom
-          menu._x_notification.replace(new XWiki.widgets.Notification("$msg.get('annotations.menu.loaderror')" + failureReason, "error"));
+          menu._x_notification.replace(new XWiki.widgets.Notification("$msg.get('annotations.menu.loaderror')" + failureReason, "error", {timeout : 5}));
         },
 
         on0: function (response) {
@@ -758,7 +758,7 @@ XWiki.Selection = Class.create({
           failureReason = 'Server not responding';
         }
         // show the error message at the bottom
-        this._x_notification.replace(new XWiki.widgets.Notification("$msg.get('annotations.annotated.loaderror')" + failureReason, "error"));
+        this._x_notification.replace(new XWiki.widgets.Notification("$msg.get('annotations.annotated.loaderror')" + failureReason, "error", {timeout : 5}));
         this.displayAnnotationsCheckbox.checked = false;
       }.bind(this),
 
@@ -903,7 +903,7 @@ XWiki.Selection = Class.create({
               failureReason = 'Server not responding';
             }
             // show the error message at the bottom
-            this._x_notification = new XWiki.widgets.Notification("$msg.get('annotations.action.edit.form.loaderror')" + failureReason, "error");
+            this._x_notification = new XWiki.widgets.Notification("$msg.get('annotations.action.edit.form.loaderror')" + failureReason, "error", {timeout : 5});
             // load the original content of the container
             this.fillViewPanel(container, container.originalContentHTML, id, inBubble);
           }.bind(this),
@@ -978,7 +978,7 @@ XWiki.Selection = Class.create({
         // hide the loading bubble
         this.hideBubble(newBubble);
         // show the error message at the bottom
-        this._x_notification = new XWiki.widgets.Notification("$msg.get('annotations.action.view.form.loaderror')" + failureReason, "error");
+        this._x_notification = new XWiki.widgets.Notification("$msg.get('annotations.action.view.form.loaderror')" + failureReason, "error", {timeout : 5});
       }.bind(this),
 
       on0: function (response) {
@@ -1084,7 +1084,7 @@ XWiki.Selection = Class.create({
         if (response.statusText == '' /* No response */ || response.status == 12031 /* In IE */) {
           failureReason = 'Server not responding';
         }        
-        this._x_notification = new XWiki.widgets.Notification("$msg.get('annotations.action.edit.loaderror')" + failureReason, "error");
+        this._x_notification = new XWiki.widgets.Notification("$msg.get('annotations.action.edit.loaderror')" + failureReason, "error", {timeout : 5});
         if (inBubble) {
           // and close the bubble on failure to update
           this.hideBubble(container);
@@ -1219,7 +1219,7 @@ XWiki.Selection = Class.create({
             failureReason = 'Server not responding';
           }
           // show the error message at the bottom
-          this._x_notification = new XWiki.widgets.Notification("$msg.get('annotations.action.create.form.loaderror')" + failureReason, "error");
+          this._x_notification = new XWiki.widgets.Notification("$msg.get('annotations.action.create.form.loaderror')" + failureReason, "error", {timeout : 5});
           // and hide the create form panel
           this.hideAnnotationCreationForm();
         }.bind(this),
@@ -1296,7 +1296,7 @@ XWiki.Selection = Class.create({
         if (response.statusText == '' /* No response */ || response.status == 12031 /* In IE */) {
           failureReason = 'Server not responding';
         }
-        this._x_notification = new XWiki.widgets.Notification("$msg.get('annotations.action.create.loaderror')" + failureReason, "error");
+        this._x_notification = new XWiki.widgets.Notification("$msg.get('annotations.action.create.loaderror')" + failureReason, "error", {timeout : 5});
       }.bind(this),
       on0 : function (response) {
         response.request.options.onFailure(response);

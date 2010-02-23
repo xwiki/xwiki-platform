@@ -90,6 +90,7 @@ import org.xwiki.cache.CacheManager;
 import org.xwiki.cache.config.CacheConfiguration;
 import org.xwiki.cache.eviction.LRUEvictionConfiguration;
 import org.xwiki.component.manager.ComponentLookupException;
+import org.xwiki.model.reference.AttachmentReference;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.model.reference.SpaceReference;
@@ -4845,6 +4846,19 @@ public class XWiki implements XWikiDocChangeNotificationInterface
         return contextPath;
     }
 
+    public String getURL(DocumentReference documentReference, String action, String queryString, String anchor, XWikiContext context)
+    {
+        XWikiDocument doc = new XWikiDocument(documentReference);
+
+        URL url =
+            context.getURLFactory().createURL(doc.getSpace(), doc.getName(), action, queryString, anchor,
+            doc.getDatabase(), context);
+        return context.getURLFactory().getURL(url, context);
+    }
+
+    /**
+     * @deprecated since 2.2.1 use {@link #getURL(DocumentReference, String, String, String, XWikiContext)}
+     */
     public String getURL(String fullname, String action, String queryString, String anchor, XWikiContext context)
     {
         XWikiDocument doc = new XWikiDocument();
@@ -4888,7 +4902,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface
             doc.getDatabase(), context);
         return url.toString();
     }
-
+   
     public String getAttachmentURL(String fullname, String filename, XWikiContext context) throws XWikiException
     {
         XWikiDocument doc = new XWikiDocument();
@@ -5677,6 +5691,9 @@ public class XWiki implements XWikiDocChangeNotificationInterface
         }
     }
 
+    /**
+     * @deprecated since 2.2.1 use {@link #exists(DocumentReference, XWikiContext)}
+     */
     public boolean exists(String fullname, XWikiContext context)
     {
         String server = null, database = null;
@@ -5700,6 +5717,28 @@ public class XWiki implements XWikiDocChangeNotificationInterface
         }
     }
 
+    public boolean exists(DocumentReference documentReference, XWikiContext context)
+    {
+        String server = null, database = null;
+        try {
+            XWikiDocument doc = new XWikiDocument(documentReference);
+            server = doc.getDatabase();
+
+            if (server != null) {
+                database = context.getDatabase();
+                context.setDatabase(server);
+            }
+
+            return getStore().exists(doc, context);
+        } catch (XWikiException e) {
+            return false;
+        } finally {
+            if ((server != null) && (database != null)) {
+                context.setDatabase(database);
+            }
+        }
+    }
+    
     public String getAdType(XWikiContext context)
     {
         String adtype = "";

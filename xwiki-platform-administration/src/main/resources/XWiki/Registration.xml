@@ -86,7 +86,7 @@ $xwiki.get("jsfx").use('uicomponents/widgets/validation/livevalidation_prototype
 $xwiki.get("ssfx").use('uicomponents/widgets/validation/livevalidation.css')
 ##
 ## LiveValidation field ok message
-#set($defaultFieldOkayMessage = $msg.get('XWiki.Registration.fieldOkay'))
+#set($defaultFieldOkayMessage = $msg.get('xe.admin.registration.fieldOkay'))
 ##
 ## After the registration you can provide a login button for the user to be able to login,
 ## this requires passing back the username and password in html into hidden fields.
@@ -232,7 +232,7 @@ $xwiki.get("ssfx").use('uicomponents/widgets/validation/livevalidation.css')
     },
     'validate' : {
       'mandatory' : { 
-        'failureMessage' : $msg.get('XWiki.Registration.fieldMandatory') 
+        'failureMessage' : $msg.get('xe.admin.registration.fieldMandatory') 
       },
       'programmaticValidation' : {
         'code' : '#nameAvailable($request.get("xwikiname"))',
@@ -259,11 +259,11 @@ $xwiki.get("ssfx").use('uicomponents/widgets/validation/livevalidation.css')
     },
     'validate' : {
       'mandatory' : { 
-        'failureMessage' : $msg.get('XWiki.Registration.fieldMandatory') 
+        'failureMessage' : $msg.get('xe.admin.registration.fieldMandatory') 
       },
       'regex' : {
         'pattern' : '/.{6,}/',
-        'failureMessage' : $msg.get('XWiki.Registration.passwordTooShort')
+        'failureMessage' : $msg.get('xe.admin.registration.passwordTooShort')
       }
     }
   })
@@ -279,15 +279,15 @@ $xwiki.get("ssfx").use('uicomponents/widgets/validation/livevalidation.css')
     },
     'validate' : {
       'mandatory' : { 
-        'failureMessage' : $msg.get('XWiki.Registration.fieldMandatory') 
+        'failureMessage' : $msg.get('xe.admin.registration.fieldMandatory') 
       },
       'mustMatch' : {
         'name' : 'register_password',
-        'failureMessage' : $msg.get('XWiki.Registration.passwordMismatch')
+        'failureMessage' : $msg.get('xe.admin.registration.passwordMismatch')
       },
       'regex' : {
         'pattern' : '/.{6,}/',
-        'failureMessage' : $msg.get('XWiki.Registration.passwordTooShort')
+        'failureMessage' : $msg.get('xe.admin.registration.passwordTooShort')
       }
     }
   })
@@ -304,7 +304,7 @@ $xwiki.get("ssfx").use('uicomponents/widgets/validation/livevalidation.css')
     'validate' : {
       'regex' : {
         'pattern' : '/^([^@\s]+)@((?:[-a-zA-Z0-9]+\.)+[a-zA-Z]{2,})$/',
-        'failureMessage' : $msg.get('XWiki.Registration.invalidEmail')
+        'failureMessage' : $msg.get('xe.admin.registration.invalidEmail')
       }
     }
   })
@@ -321,7 +321,7 @@ $xwiki.get("ssfx").use('uicomponents/widgets/validation/livevalidation.css')
     },
     'validate' : {
       'mandatory' : {
-        'failureMessage' : $msg.get('XWiki.Registration.fieldMandatory')
+        'failureMessage' : $msg.get('xe.admin.registration.fieldMandatory')
       },
       'regex' : {
         'pattern' : '/^green$/i',

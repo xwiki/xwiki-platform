@@ -1,1 +1,2 @@
-org.xwiki.url.internal.RegexXWikiURLFactory
+org.xwiki.url.internal.standard.StandardXWikiURLFactory
+org.xwiki.url.internal.standard.StandardURLFormatConfiguration

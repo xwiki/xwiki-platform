@@ -16,31 +16,38 @@
  * License along with this software; if not, write to the Free
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
- *
  */
-package org.xwiki.url;
+package org.xwiki.url.internal;
 
-import org.xwiki.component.annotation.ComponentRole;
-
-import java.util.Map;
+import org.xwiki.component.annotation.Component;
+import org.xwiki.component.annotation.Requirement;
+import org.xwiki.configuration.ConfigurationSource;
+import org.xwiki.url.URLConfiguration;
 
 /**
- * Transforms some representation of a XWiki URL into a {@link XWikiURL} instance.
- * 
  * @version $Id$
- * @param <T> the object to transform into a XWiki URL
+ * @since 2.3M1
  */
-@ComponentRole
-public interface XWikiURLFactory<T>
+@Component
+public class DefaultURLConfiguration implements URLConfiguration
 {
     /**
-     * Transforms some representation of a XWiki URL into a {@link XWikiURL} instance.
-     * 
-     * @param urlRepresentation the object to transform into a {@link XWikiURL} instance
-     * @param parameters generic parameters that depend on the underlying implementation. In order to know what to
-     *        pass you need to check the documentation for the implementation you're using.
-     * @return the {@link XWikiURL} instance
-     * @throws InvalidURLException if the input representation doesn't represent a valid XWiki URL
+     * Prefix for configuration keys for the Core module.
      */
-    XWikiURL createURL(T urlRepresentation, Map<String, Object> parameters) throws InvalidURLException;
+    private static final String PREFIX = "url.";
+
+    /**
+     * Defines from where to read the rendering configuration data.
+     */
+    @Requirement("xwikiproperties")
+    private ConfigurationSource configuration;
+
+    /**
+     * {@inheritDoc}
+     * @see org.xwiki.url.URLConfiguration#getURLFormatId()
+     */
+    public String getURLFormatId()
+    {
+        return this.configuration.getProperty(PREFIX + "formatId", "standard");        
+    }
 }

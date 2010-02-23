@@ -50,7 +50,7 @@ public class AbstractXWikiURL implements XWikiURL
     }
     
     /**
-     * @return the type of URL (Document UEL, Attachment URL, Template URL, etc) 
+     * @return the type of URL (Entity URL, Attachment URL, Template URL, etc) 
      */
     public XWikiURLType getType()
     {

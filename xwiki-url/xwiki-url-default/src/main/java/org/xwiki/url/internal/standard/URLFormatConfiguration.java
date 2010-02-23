@@ -16,36 +16,13 @@
  * License along with this software; if not, write to the Free
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
- *
  */
-package org.xwiki.url;
+package org.xwiki.url.internal.standard;
 
-import org.xwiki.model.reference.AttachmentReference;
+import org.xwiki.component.annotation.ComponentRole;
 
-/**
- * Represents a XWiki URL pointing to an Attachment Entity.
- *
- * @version $Id$
- * @since 2.0M1
- */
-public class XWikiAttachmentURL extends XWikiDocumentURL
+@ComponentRole
+public interface URLFormatConfiguration
 {
-    private AttachmentReference attachmentReference;
-
-    public XWikiAttachmentURL(AttachmentReference attachmentReference)
-    {
-        super(attachmentReference.getDocumentReference());
-        setType(XWikiURLType.ATTACHMENT);
-        setAttachmentReference(attachmentReference);
-    }
-    
-    public void setAttachmentReference(AttachmentReference attachmentReference)
-    {
-        this.attachmentReference = attachmentReference;
-    }
-    
-    public AttachmentReference getAttachmentReference()
-    {
-        return this.attachmentReference;
-    }
+    boolean isPathBasedMultiWikiFormat();
 }

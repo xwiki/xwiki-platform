@@ -21,12 +21,12 @@
 package org.xwiki.url;
 
 /**
- * Represents a type of XWiki URL (URL to a document, URL to an attachment, URL to a skin file, etc).
+ * Represents a type of XWiki URL (URL to an Entity, URL to a skin file, etc).
  * 
  * @version $Id$
  * @since 2.0M1
  */
 public enum XWikiURLType
 {
-    DOCUMENT, ATTACHMENT, SKIN, TEMPLATE, RESOURCE;
+    ENTITY, SKIN, TEMPLATE, RESOURCE;
 }

@@ -22,28 +22,30 @@ package org.xwiki.url;
 
 import java.util.Locale;
 
-import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.EntityReference;
 
 /**
- * Represents a XWiki URL pointing to a Document Entity.
+ * Represents a XWiki URL pointing to an Entity (Document, Attachment, etc).
  * 
  * @version $Id$
- * @since 2.0M1
+ * @since 2.3M1
  */
-public class XWikiDocumentURL extends AbstractXWikiURL
+public class XWikiEntityURL extends AbstractXWikiURL
 {
+    // Note: We're not using a typed object since the action name can be anything and corresponds to an Action
+    // component role hint.
     private String action;
 
-    private DocumentReference documentReference;
+    private EntityReference entityReference;
 
     private Locale locale;
     
     private String revision;
 
-    public XWikiDocumentURL(DocumentReference documentReference)
+    public XWikiEntityURL(EntityReference entityReference)
     {
-        super(XWikiURLType.DOCUMENT);
-        setDocumentReference(documentReference);
+        super(XWikiURLType.ENTITY);
+        setEntityReference(entityReference);
     }
 
     public String getAction()
@@ -56,14 +58,14 @@ public class XWikiDocumentURL extends AbstractXWikiURL
         this.action = action;
     }
 
-    public DocumentReference getDocumentReference()
+    public EntityReference getEntityReference()
     {
-        return this.documentReference;
+        return this.entityReference;
     }
 
-    public void setDocumentReference(DocumentReference documentReference)
+    public void setEntityReference(EntityReference entityReference)
     {
-        this.documentReference = documentReference;
+        this.entityReference = entityReference;
     }
     
     public void setLocale(Locale locale)

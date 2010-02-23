@@ -28,13 +28,13 @@ import org.xwiki.model.reference.AttachmentReference;
 import org.xwiki.model.reference.DocumentReference;
 
 /**
- * Exposes methods for accessing Document data. This is temporary until we remodel the Model classes and the 
- * Document services.
+ * Exposes methods for accessing Document data. This is temporary until we remodel the Model classes and the Document
+ * services.
  * 
  * @version $Id$
  * @since 1.6M1
- * @todo Refactor to use DocumentReference and AttachmentReference everywhere
  */
+// TODO: Refactor to use DocumentReference and AttachmentReference everywhere
 @ComponentRole
 public interface DocumentAccessBridge
 {
@@ -61,7 +61,7 @@ public interface DocumentAccessBridge
 
     /**
      * Get the document object associated with the passed document name.
-     *
+     * 
      * @param documentName the name of the document to find
      * @return the document object matching the passed document name
      * @throws Exception when the storage cannot be accessed
@@ -72,7 +72,7 @@ public interface DocumentAccessBridge
 
     /**
      * Get the different parts of a document name (wiki, space, page).
-     *
+     * 
      * @param documentName the name of the document for which to return name information
      * @return the document name object containing the information
      * @deprecated replaced by {@link org.xwiki.model.reference.DocumentReferenceResolver} since 2.2M1
@@ -84,7 +84,7 @@ public interface DocumentAccessBridge
      * Get the different parts of a the current document name (wiki, space, page).
      * <p>
      * The current document is found in the context.
-     *
+     * 
      * @return the document name object containing the information
      * @deprecated replaced by {@link #getCurrentDocumentReference()} since 2.2M1
      */
@@ -93,8 +93,9 @@ public interface DocumentAccessBridge
 
     /**
      * Get the reference to the current document (found in the Context).
-     *
+     * 
      * @return the reference to the current document
+     * @since 2.2M1
      */
     DocumentReference getCurrentDocumentReference();
 
@@ -103,6 +104,16 @@ public interface DocumentAccessBridge
      * 
      * @param documentReference The reference of the document to check.
      * @return <code>true</code> if the document already exists, <code>false</code> otherwise.
+     * @since 2.2.1
+     */
+    boolean exists(DocumentReference documentReference);
+
+    /**
+     * Check if a document exists or not in the wiki.
+     * 
+     * @param documentReference The reference of the document to check.
+     * @return <code>true</code> if the document already exists, <code>false</code> otherwise.
+     * @deprecated replaced by {@link #exists(DocumentReference)} since 2.2.1
      */
     boolean exists(String documentReference);
 
@@ -115,7 +126,23 @@ public interface DocumentAccessBridge
      * @param editComment Comment describing this particular change.
      * @param isMinorEdit Flag indicating if this change is a minor one.
      * @throws Exception if the storage cannot be accessed.
+     * @since 2.2.1
      */
+    void setDocumentContent(DocumentReference documentReference, String content, String editComment, boolean isMinorEdit)
+        throws Exception;
+
+    /**
+     * Updates the target document with the new content provided. If the target document does not exists, a new one will
+     * be created.
+     * 
+     * @param documentReference the reference to the target document
+     * @param content Content to be set.
+     * @param editComment Comment describing this particular change.
+     * @param isMinorEdit Flag indicating if this change is a minor one.
+     * @throws Exception if the storage cannot be accessed.
+     * @deprecated replaced by {@link #setDocumentContent(DocumentReference, String, String, boolean)} since 2.2.1
+     */
+    @Deprecated
     void setDocumentContent(String documentReference, String content, String editComment, boolean isMinorEdit)
         throws Exception;
 
@@ -125,7 +152,10 @@ public interface DocumentAccessBridge
      * @param documentReference the reference of the document to access
      * @return The document's content.
      * @throws Exception If the document cannot be accessed.
+     * @deprecated replaced by {@link #getDocument(DocumentReference)} and {@link DocumentModelBridge#getContent()}
+     *             since 2.2.1
      */
+    @Deprecated
     String getDocumentContent(String documentReference) throws Exception;
 
     /**
@@ -135,7 +165,10 @@ public interface DocumentAccessBridge
      * @param documentReference the reference of the target document
      * @return the syntax id.
      * @throws Exception If the storage cannot be accessed.
+     * @deprecated replaced by {@link #getDocument(DocumentReference)} and {@link DocumentModelBridge#getSyntaxId()}
+     *             since 2.2.1
      */
+    @Deprecated
     String getDocumentSyntaxId(String documentReference) throws Exception;
 
     /**
@@ -145,7 +178,20 @@ public interface DocumentAccessBridge
      * @param documentReference the reference of the target document
      * @param syntaxId New syntax Id.
      * @throws Exception If the storage cannot be accessed.
+     * @since 2.2.1
      */
+    void setDocumentSyntaxId(DocumentReference documentReference, String syntaxId) throws Exception;
+
+    /**
+     * Changes the syntax Id of the target document to the given syntaxId. If the target document does not exists, a new
+     * one will be created.
+     * 
+     * @param documentReference the reference of the target document
+     * @param syntaxId New syntax Id.
+     * @throws Exception If the storage cannot be accessed.
+     * @deprecated replaced by {@link #setDocumentSyntaxId(DocumentReference, String)} since 2.2.1
+     */
+    @Deprecated
     void setDocumentSyntaxId(String documentReference, String syntaxId) throws Exception;
 
     /**
@@ -157,7 +203,22 @@ public interface DocumentAccessBridge
      * @param documentReference the reference of the document to access
      * @return The document's content.
      * @throws Exception If the document cannot be accessed.
+     * @since 2.2.1
      */
+    String getDocumentContentForDefaultLanguage(DocumentReference documentReference) throws Exception;
+
+    /**
+     * Retrieves the textual content of the document, in the document's default language.
+     * <p>
+     * Note: you should always use {@link #getDocumentContent(String)} unless you really need specifically the
+     * document's content for default language of the document.
+     * 
+     * @param documentReference the reference of the document to access
+     * @return The document's content.
+     * @throws Exception If the document cannot be accessed.
+     * @deprecated replaced by {@link #getDocumentContentForDefaultLanguage(DocumentReference)} since 2.2.1
+     */
+    @Deprecated
     String getDocumentContentForDefaultLanguage(String documentReference) throws Exception;
 
     /**
@@ -167,7 +228,20 @@ public interface DocumentAccessBridge
      * @param language The desired translation of the document.
      * @return The document's content.
      * @throws Exception If the document cannot be accessed.
+     * @since 2.2.1
      */
+    String getDocumentContent(DocumentReference documentReference, String language) throws Exception;
+
+    /**
+     * Retrieves the textual content of the document, in the given language.
+     * 
+     * @param documentReference the referenc of the document to access
+     * @param language The desired translation of the document.
+     * @return The document's content.
+     * @throws Exception If the document cannot be accessed.
+     * @deprecated replaced by {@link #getDocumentContent(DocumentReference)} since 2.2.1
+     */
+    @Deprecated
     String getDocumentContent(String documentReference, String language) throws Exception;
 
     /**
@@ -177,8 +251,8 @@ public interface DocumentAccessBridge
      * @param className The name of the class.
      * @param objectNumber The number of the object from the given class.
      * @param propertyName The name of the property to retrieve.
-     * @return the property value or null if it doesn't exist or an error occurred while looking for the property
-     *         (the document doesn't exist for example)
+     * @return the property value or null if it doesn't exist or an error occurred while looking for the property (the
+     *         document doesn't exist for example)
      */
     Object getProperty(String documentReference, String className, int objectNumber, String propertyName);
 
@@ -188,8 +262,8 @@ public interface DocumentAccessBridge
      * @param documentReference the reference of the document to access
      * @param className The name of the class.
      * @param propertyName The name of the property to retrieve.
-     * @return the property value or null if it doesn't exist or an error occurred while looking for the property
-     *         (the document doesn't exist for example)
+     * @return the property value or null if it doesn't exist or an error occurred while looking for the property (the
+     *         document doesn't exist for example)
      * @deprecated since 2.2M1 use {@link #getProperty(DocumentReference, DocumentReference, String)} instead
      */
     @Deprecated
@@ -197,24 +271,24 @@ public interface DocumentAccessBridge
 
     /**
      * Retrieves the value for an object property, from the first object of the given class.
-     *
+     * 
      * @param documentReference the reference of the document to access
      * @param classReference the reference to the XWiki Class
      * @param propertyName The name of the property to retrieve.
-     * @return the property value or null if it doesn't exist or an error occurred while looking for the property
-     *         (the document doesn't exist for example)
+     * @return the property value or null if it doesn't exist or an error occurred while looking for the property (the
+     *         document doesn't exist for example)
      * @since 2.2M1
      */
     Object getProperty(DocumentReference documentReference, DocumentReference classReference, String propertyName);
-    
+
     /**
      * Retrieves the value for an object property, from the first object of any class that has a property with that
      * name.
      * 
      * @param documentReference the reference of the document to access
      * @param propertyName The name of the property to retrieve.
-     * @return the property value or null if it doesn't exist or an error occurred while looking for the property
-     *         (the document doesn't exist for example)
+     * @return the property value or null if it doesn't exist or an error occurred while looking for the property (the
+     *         document doesn't exist for example)
      */
     Object getProperty(String documentReference, String propertyName);
 
@@ -224,7 +298,7 @@ public interface DocumentAccessBridge
      * @return the list of properties available in the passed document and class names
      */
     List<Object> getProperties(String documentReference, String className);
-    
+
     /**
      * @param className The name of the class.
      * @param propertyName The name of the property.
@@ -281,7 +355,7 @@ public interface DocumentAccessBridge
 
     /**
      * Returns the content of a document attachment.
-     *
+     * 
      * @param attachmentName the name of the attachment to access
      * @return The content of the attachment, as an array of <code>byte</code>s, which is empty if the attachment does
      *         not exist
@@ -295,11 +369,24 @@ public interface DocumentAccessBridge
      * Sets the content of a document attachment. If the document or the attachment does not exist, both will be created
      * newly.
      * 
+     * @param attachmentReference the name of the attachment to access
+     * @param attachmentData Attachment content.
+     * @throws Exception If the storage cannot be accessed.
+     * @since 2.2.1
+     */
+    void setAttachmentContent(AttachmentReference attachmentReference, byte[] attachmentData) throws Exception;
+
+    /**
+     * Sets the content of a document attachment. If the document or the attachment does not exist, both will be created
+     * newly.
+     * 
      * @param documentReference the reference to the target document name
      * @param attachmentFilename the name of the attachment
      * @param attachmentData Attachment content.
      * @throws Exception If the storage cannot be accessed.
+     * @deprecated replaced by {@link #getAttachmentContent(AttachmentReference)} since 2.2.1
      */
+    @Deprecated
     void setAttachmentContent(String documentReference, String attachmentFilename, byte[] attachmentData)
         throws Exception;
 
@@ -314,7 +401,24 @@ public interface DocumentAccessBridge
      * @param anchor An optional URL fragment to append to the URL, use <code>null</code> or an empty string to skip.
      * @return A <code>String</code> representation of the URL, starting with the path segment of the URL (without
      *         protocol, host and port), for example <code>/xwiki/bin/save/Main/WebHome?content=abc</code>.
+     * @since 2.2.1
      */
+    String getDocumentURL(DocumentReference documentReference, String action, String queryString, String anchor);
+
+    /**
+     * Retrieves the internal (without the hostname) URL that can be used to access a document, using a specific action.
+     * 
+     * @param documentReference the reference of the document to access
+     * @param action The "mode" in which the document is accessed, for example <code>view</code> to view the document,
+     *            <code>edit</code> to open the document for modifications, etc.
+     * @param queryString An optional query string to append to the URL, use <code>null</code> or an empty string to
+     *            skip.
+     * @param anchor An optional URL fragment to append to the URL, use <code>null</code> or an empty string to skip.
+     * @return A <code>String</code> representation of the URL, starting with the path segment of the URL (without
+     *         protocol, host and port), for example <code>/xwiki/bin/save/Main/WebHome?content=abc</code>.
+     * @deprecated replaced by {@link #getDocumentURL(DocumentReference, String, String, String)} since 2.2.1
+     */
+    @Deprecated
     String getURL(String documentReference, String action, String queryString, String anchor);
 
     /**
@@ -329,7 +433,7 @@ public interface DocumentAccessBridge
 
     /**
      * Retrieves all attachments in the passed document.
-     *
+     * 
      * @param documentName the document for which to retrieve all attachment names
      * @return the list of attachment names in the passed document
      * @throws Exception in case of a storage issue finding all attachments for the document matching the passed name
@@ -350,8 +454,8 @@ public interface DocumentAccessBridge
     String getAttachmentURL(String documentReference, String attachmentFilename);
 
     /**
-     * Retrieves the URL (either relative ie the path without the hostname and port, or the full URL) that can be
-     * used to access an attachment.
+     * Retrieves the URL (either relative ie the path without the hostname and port, or the full URL) that can be used
+     * to access an attachment.
      * 
      * @param attachmentReference the attachment name for which to find the URL
      * @param isFullURL whether the returned URL will a relative URL or the full URL
@@ -361,9 +465,9 @@ public interface DocumentAccessBridge
     String getAttachmentURL(AttachmentReference attachmentReference, boolean isFullURL);
 
     /**
-     * Retrieves the URL (either relative ie the path without the hostname and port, or the full URL) that can be
-     * used to access an attachment.
-     *
+     * Retrieves the URL (either relative ie the path without the hostname and port, or the full URL) that can be used
+     * to access an attachment.
+     * 
      * @param attachmentName the attachment name for which to find the URL
      * @param isFullURL whether the returned URL will a relative URL or the full URL
      * @return the attachment URL
@@ -375,8 +479,8 @@ public interface DocumentAccessBridge
     /**
      * @param documentReference the document for which to retrieve all attachment URLs
      * @param isFullURL whether the returned URL will a relative URL or the full URL
-     * @return the list of attachment URLs (either relative ie the path without the hostname and port, or the full 
-     *         URL) for all attachments in the passed document  
+     * @return the list of attachment URLs (either relative ie the path without the hostname and port, or the full URL)
+     *         for all attachments in the passed document
      * @throws Exception in case of a storage issue finding all attachments for the document matching the passed name
      * @deprecated use {@link #getAttachmentReferences(org.xwiki.model.reference.DocumentReference)} instead
      * @since 2.2M1
@@ -387,8 +491,8 @@ public interface DocumentAccessBridge
     /**
      * @param documentName the document for which to retrieve all attachment URLs
      * @param isFullURL whether the returned URL will a relative URL or the full URL
-     * @return the list of attachment URLs (either relative ie the path without the hostname and port, or the full
-     *         URL) for all attachments in the passed document
+     * @return the list of attachment URLs (either relative ie the path without the hostname and port, or the full URL)
+     *         for all attachments in the passed document
      * @throws Exception in case of a storage issue finding all attachments for the document matching the passed name
      * @deprecated use {@link #getAttachmentReferences(org.xwiki.model.reference.DocumentReference)} instead
      */
@@ -398,7 +502,16 @@ public interface DocumentAccessBridge
     /**
      * @param documentReference the reference of the document to access
      * @return true if current user can view provided document.
+     * @since 2.2.1
      */
+    boolean isDocumentViewable(DocumentReference documentReference);
+
+    /**
+     * @param documentReference the reference of the document to access
+     * @return true if current user can view provided document.
+     * @deprecated use {@link #isDocumentViewable(org.xwiki.model.reference.DocumentReference)} instead
+     */
+    @Deprecated
     boolean isDocumentViewable(String documentReference);
 
     /**
@@ -406,6 +519,7 @@ public interface DocumentAccessBridge
      * @return True if current user has 'edit' access on the target document.
      * @deprecated use {@link #isDocumentEditable(org.xwiki.model.reference.DocumentReference)} instead
      */
+    @Deprecated
     boolean isDocumentEditable(String documentReference);
 
     /**
@@ -439,8 +553,21 @@ public interface DocumentAccessBridge
      * @param backupObjects the object in which to some context properties will be saved
      * @param documentReference the reference to the document to set as the current document
      * @throws Exception in case of an error like a problem loading the document from the database
+     * @deprecated use {@link #pushDocumentInContext(Map, DocumentReference)} instead
      */
+    @Deprecated
     void pushDocumentInContext(Map<String, Object> backupObjects, String documentReference) throws Exception;
+
+    /**
+     * Sets the passed document as the current document in the XWiki Context and saves current values related to the
+     * current document into a backup object.
+     * 
+     * @param backupObjects the object in which to some context properties will be saved
+     * @param documentReference the reference to the document to set as the current document
+     * @throws Exception in case of an error like a problem loading the document from the database
+     * @since 2.2.1
+     */
+    void pushDocumentInContext(Map<String, Object> backupObjects, DocumentReference documentReference) throws Exception;
 
     /**
      * Restore values saved in a backup object in the XWiki Context and restore the current document with the same value
@@ -452,6 +579,8 @@ public interface DocumentAccessBridge
 
     /**
      * @return the current wiki
+     * @deprecated replaced by {@link org.xwiki.model.ModelContext#getCurrentEntityReference()} since 2.2M1
      */
+    @Deprecated
     String getCurrentWiki();
 }

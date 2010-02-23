@@ -4856,6 +4856,19 @@ public class XWiki implements XWikiDocChangeNotificationInterface
         return contextPath;
     }
 
+    public String getURL(DocumentReference documentReference, String action, String queryString, String anchor, XWikiContext context)
+    {
+        XWikiDocument doc = new XWikiDocument(documentReference);
+
+        URL url =
+            context.getURLFactory().createURL(doc.getSpace(), doc.getName(), action, queryString, anchor,
+            doc.getDatabase(), context);
+        return context.getURLFactory().getURL(url, context);
+    }
+
+    /**
+     * @deprecated since 2.2.1 use {@link #getURL(DocumentReference, String, String, String, XWikiContext)}
+     */
     public String getURL(String fullname, String action, String queryString, String anchor, XWikiContext context)
     {
         XWikiDocument doc = new XWikiDocument();
@@ -5686,13 +5699,38 @@ public class XWiki implements XWikiDocChangeNotificationInterface
             return tz;
         }
     }
-
+   
+    /**
+     * @deprecated since 2.2.1 use {@link #exists(DocumentReference, XWikiContext)}
+     */
     public boolean exists(String fullname, XWikiContext context)
     {
         String server = null, database = null;
         try {
             XWikiDocument doc = new XWikiDocument();
             doc.setFullName(fullname, context);
+            server = doc.getDatabase();
+
+            if (server != null) {
+                database = context.getDatabase();
+                context.setDatabase(server);
+            }
+
+            return getStore().exists(doc, context);
+        } catch (XWikiException e) {
+            return false;
+        } finally {
+            if ((server != null) && (database != null)) {
+                context.setDatabase(database);
+            }
+        }
+    }
+
+    public boolean exists(DocumentReference documentReference, XWikiContext context)
+    {
+        String server = null, database = null;
+        try {
+            XWikiDocument doc = new XWikiDocument(documentReference);
             server = doc.getDatabase();
 
             if (server != null) {

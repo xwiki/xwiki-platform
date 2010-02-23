@@ -115,6 +115,7 @@ public interface DocumentAccessBridge
      * @return <code>true</code> if the document already exists, <code>false</code> otherwise.
      * @deprecated replaced by {@link #exists(DocumentReference)} since 2.2.1
      */
+    @Deprecated
     boolean exists(String documentReference);
 
     /**

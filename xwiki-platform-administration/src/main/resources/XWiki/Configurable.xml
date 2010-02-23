@@ -354,7 +354,8 @@
                           ## App Name is prepended to for= to make label work with id which is modified to prevent collisions.
                           &lt;label for="${escapedAppName}_$objClass.getName()_0_$propName"&gt;
                           #if($linkPrefix != '')
-                            &lt;a href="$escapetool.url("$linkPrefix$prettyName")"&gt;$escapetool.html($prettyName)&lt;/a&gt;
+                            #set($linkScript = "$linkPrefix$propName")
+                            &lt;a href="$escapetool.html("#evaluate($linkScript)")"&gt;$escapetool.html($prettyName)&lt;/a&gt;
                           #else
                             $escapetool.html($prettyName)
                           #end

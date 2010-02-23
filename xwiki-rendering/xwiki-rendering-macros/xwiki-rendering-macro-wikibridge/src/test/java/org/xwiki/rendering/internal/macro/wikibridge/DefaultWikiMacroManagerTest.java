@@ -208,9 +208,9 @@ public class DefaultWikiMacroManagerTest extends AbstractComponentTestCase
     {
         DocumentReference wikiMacroDocReference = new DocumentReference("xwiki", "Main", "TestWikiMacro");
 
-        WikiMacroDescriptor descriptor = new WikiMacroDescriptor("Test Wiki Macro", "Description", "Test",
-            visibility, new DefaultContentDescriptor(), new ArrayList<WikiMacroParameterDescriptor>());
-        DefaultWikiMacro wikiMacro = new DefaultWikiMacro(wikiMacroDocReference, "testwikimacro", true, descriptor,
+        WikiMacroDescriptor descriptor = new WikiMacroDescriptor(new MacroId("testwikimacro"), "Test Wiki Macro", "Description", 
+            "Test", visibility, new DefaultContentDescriptor(), new ArrayList<WikiMacroParameterDescriptor>());
+        DefaultWikiMacro wikiMacro = new DefaultWikiMacro(wikiMacroDocReference, true, descriptor,
             "== Test ==", "xwiki/2.0", getComponentManager());
 
         return wikiMacro;

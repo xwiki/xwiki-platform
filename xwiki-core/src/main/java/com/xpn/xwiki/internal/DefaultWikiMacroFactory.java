@@ -33,6 +33,7 @@ import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.context.Execution;
 import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.rendering.internal.macro.wikibridge.DefaultWikiMacro;
+import org.xwiki.rendering.macro.MacroId;
 import org.xwiki.rendering.macro.descriptor.ContentDescriptor;
 import org.xwiki.rendering.macro.descriptor.DefaultContentDescriptor;
 import org.xwiki.rendering.macro.descriptor.MacroDescriptor;
@@ -217,11 +218,12 @@ public class DefaultWikiMacroFactory extends AbstractLogEnabled implements WikiM
         }
 
         // Create macro descriptor.
-        MacroDescriptor macroDescriptor = new WikiMacroDescriptor(macroName, macroDescription, macroDefaultCategory,
+        MacroId id = new MacroId(macroId, doc.getSyntax());
+        MacroDescriptor macroDescriptor = new WikiMacroDescriptor(id, macroName, macroDescription, macroDefaultCategory,
             macroVisibility, contentDescriptor, parameterDescriptors);
 
         // Create & return the macro.
-        return new DefaultWikiMacro(documentReference, macroId, macroSupportsInlineMode, macroDescriptor, macroCode,
+        return new DefaultWikiMacro(documentReference, macroSupportsInlineMode, macroDescriptor, macroCode,
             doc.getSyntaxId(), componentManager);
     }
 

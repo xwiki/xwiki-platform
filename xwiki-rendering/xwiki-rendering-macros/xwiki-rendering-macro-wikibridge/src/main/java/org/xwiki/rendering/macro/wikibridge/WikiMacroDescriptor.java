@@ -23,6 +23,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.xwiki.rendering.macro.MacroId;
 import org.xwiki.rendering.macro.descriptor.ContentDescriptor;
 import org.xwiki.rendering.macro.descriptor.MacroDescriptor;
 import org.xwiki.rendering.macro.descriptor.ParameterDescriptor;
@@ -36,6 +37,11 @@ import org.xwiki.rendering.macro.descriptor.ParameterDescriptor;
 public class WikiMacroDescriptor implements MacroDescriptor
 {
     /**
+     * Macro id.
+     */
+    private MacroId id;
+
+    /**
      * Macro name.
      */
     private String name;
@@ -44,7 +50,7 @@ public class WikiMacroDescriptor implements MacroDescriptor
      * Macro description.
      */
     private String description;
-    
+
     /**
      * Default category under which this macro should be listed.
      */
@@ -54,7 +60,7 @@ public class WikiMacroDescriptor implements MacroDescriptor
      * Whether the macro is visible in the current wiki, for the current user or global.
      */
     private WikiMacroVisibility visibility;
-    
+
     /**
      * Macro content description.
      */
@@ -67,15 +73,43 @@ public class WikiMacroDescriptor implements MacroDescriptor
 
     /**
      * Creates a new {@link WikiMacroDescriptor} instance.
-     *
-     * @param name the macro name 
+     * 
+     * @param id the macro id
+     * @param name the macro name
+     * @param description macro description
+     * @param defaultCategory default category under which this macro should be listed.
+     * @param visibility the macro visibility (only visible in the current wiki, for the current user or global)
+     * @param contentDescriptor macro content description.
+     * @param parameterDescriptors parameter descriptors.
+     * @since 2.3M1
+     */
+    public WikiMacroDescriptor(MacroId id, String name, String description, String defaultCategory,
+        WikiMacroVisibility visibility, ContentDescriptor contentDescriptor,
+        List<WikiMacroParameterDescriptor> parameterDescriptors)
+    {
+        this.id = id;
+        this.name = name;
+        this.description = description;
+        this.contentDescriptor = contentDescriptor;
+        this.parameterDescriptors = parameterDescriptors;
+        this.defaultCategory = defaultCategory;
+        this.visibility = visibility;
+    }
+
+    /**
+     * Creates a new {@link WikiMacroDescriptor} instance.
+     * 
+     * @param name the macro name
      * @param description macro description
      * @param defaultCategory default category under which this macro should be listed.
      * @param visibility the macro visibility (only visible in the current wiki, for the current user or global)
      * @param contentDescriptor macro content description.
      * @param parameterDescriptors parameter descriptors.
      * @since 2.2M1
+     * @deprecated since 2.3M1 use {@link WikiMacroDescriptor(MacroId, String, String, String, WikiMacroVisibility,
+     *             ContentDescriptor, List<WikiMacroParameterDescriptor>)} instead
      */
+    @Deprecated
     public WikiMacroDescriptor(String name, String description, String defaultCategory, WikiMacroVisibility visibility,
         ContentDescriptor contentDescriptor, List<WikiMacroParameterDescriptor> parameterDescriptors)
     {
@@ -85,6 +119,14 @@ public class WikiMacroDescriptor implements MacroDescriptor
         this.parameterDescriptors = parameterDescriptors;
         this.defaultCategory = defaultCategory;
         this.visibility = visibility;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public MacroId getId()
+    {
+        return this.id;
     }
 
     /**
@@ -145,8 +187,8 @@ public class WikiMacroDescriptor implements MacroDescriptor
     }
 
     /**
-     * @return the visibility of the macro (ie whether the macro is visible in the current wiki, for the current user
-     *         or global)
+     * @return the visibility of the macro (ie whether the macro is visible in the current wiki, for the current user or
+     *         global)
      * @since 2.2M1
      */
     public WikiMacroVisibility getVisibility()

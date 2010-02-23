@@ -97,11 +97,6 @@ public class DefaultWikiMacro implements WikiMacro
     private DocumentReference macroDocumentReference;
 
     /**
-     * Id under which this macro is registered with component manager.
-     */
-    private String macroId;
-
-    /**
      * Whether this macro supports inline mode or not.
      */
     private boolean supportsInlineMode;
@@ -130,18 +125,17 @@ public class DefaultWikiMacro implements WikiMacro
      * Constructs a new {@link DefaultWikiMacro}.
      * 
      * @param macroDocumentReference the name of the document which contains the definition of this macro
-     * @param macroId id under which this macro is registered with component manager.
+     * @param supportsInlineMode says if macro support inline mode or not
      * @param descriptor the {@link MacroDescriptor} describing this macro.
      * @param macroContent macro content to be evaluated.
      * @param syntaxId syntax of the macroContent.
      * @param componentManager {@link ComponentManager} component used to look up for other components.
-     * @since 2.2M1
+     * @since 2.3M1
      */
-    public DefaultWikiMacro(DocumentReference macroDocumentReference, String macroId, boolean supportsInlineMode,
+    public DefaultWikiMacro(DocumentReference macroDocumentReference, boolean supportsInlineMode,
         MacroDescriptor descriptor, String macroContent, String syntaxId, ComponentManager componentManager)
     {
         this.macroDocumentReference = macroDocumentReference;
-        this.macroId = macroId;
         this.supportsInlineMode = supportsInlineMode;
         this.descriptor = descriptor;
         this.content = macroContent;
@@ -274,7 +268,7 @@ public class DefaultWikiMacro implements WikiMacro
      */
     public String getId()
     {
-        return this.macroId;
+        return this.descriptor.getId().getId();
     }
 
     /**

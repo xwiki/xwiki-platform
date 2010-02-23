@@ -27,6 +27,7 @@ import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.component.descriptor.DefaultComponentDescriptor;
 import org.xwiki.context.Execution;
 import org.xwiki.rendering.converter.Converter;
+import org.xwiki.rendering.macro.MacroId;
 import org.xwiki.rendering.macro.descriptor.DefaultContentDescriptor;
 import org.xwiki.rendering.macro.wikibridge.WikiMacroDescriptor;
 import org.xwiki.rendering.macro.wikibridge.WikiMacroManager;
@@ -133,10 +134,10 @@ public class DefaultWikiMacroTest extends AbstractComponentTestCase
         List<WikiMacroParameterDescriptor> parameterDescriptors = Arrays.asList(
             new WikiMacroParameterDescriptor("param1", "This is param1", true),
             new WikiMacroParameterDescriptor("param2", "This is param2", true));
-        WikiMacroDescriptor descriptor = new WikiMacroDescriptor("Wiki Macro", "Description", "Test",
+        WikiMacroDescriptor descriptor = new WikiMacroDescriptor(new MacroId(macroId), "Wiki Macro", "Description", "Test",
             WikiMacroVisibility.GLOBAL, new DefaultContentDescriptor(false), parameterDescriptors);
 
-        DefaultWikiMacro wikiMacro = new DefaultWikiMacro(wikiMacroDocumentReference, macroId, true, descriptor,
+        DefaultWikiMacro wikiMacro = new DefaultWikiMacro(wikiMacroDocumentReference, true, descriptor,
             macroContent, "xwiki/2.0", getComponentManager());
 
         wikiMacroManager.registerWikiMacro(wikiMacroDocumentReference, wikiMacro);

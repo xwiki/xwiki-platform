@@ -23,7 +23,7 @@ import org.xwiki.rendering.macro.Macro;
 
 /**
  * Interface for defining wiki content based xwiki rendering macros.
- *
+ * 
  * @version $Id$
  * @since 2.0M2
  */
@@ -31,6 +31,8 @@ public interface WikiMacro extends Macro<WikiMacroParameters>
 {
     /**
      * @return the id under which this macro is registered with the component manager
+     * @deprecated since 2.3M1, use {@link MacroDescriptor#getId()} instead
      */
+    @Deprecated
     String getId();
 }

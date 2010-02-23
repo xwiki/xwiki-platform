@@ -25,6 +25,7 @@ import java.util.Map;
 
 import org.xwiki.properties.BeanDescriptor;
 import org.xwiki.properties.PropertyDescriptor;
+import org.xwiki.rendering.macro.MacroId;
 
 /**
  * Describe a macro.
@@ -34,6 +35,11 @@ import org.xwiki.properties.PropertyDescriptor;
  */
 public abstract class AbstractMacroDescriptor implements MacroDescriptor
 {
+    /**
+     * @see #getId()
+     */
+    private MacroId id;
+
     /**
      * @see #getName()
      */
@@ -68,13 +74,35 @@ public abstract class AbstractMacroDescriptor implements MacroDescriptor
     private Map<String, ParameterDescriptor> parameterDescriptorMap = new LinkedHashMap<String, ParameterDescriptor>();
 
     /**
+     * @param id the id of the macro
+     * @param name the name of the macro (eg "Table Of Contents" for the TOC macro)
+     * @param description the description of the macro.
+     * @param contentDescriptor the description of the macro content. null indicate macro does not support content.
+     * @param parametersBeanDescriptor the description of the parameters bean or null if there are no parameters for
+     *            this macro.
+     * @since 2.3M1
+     */
+    public AbstractMacroDescriptor(MacroId id, String name, String description, ContentDescriptor contentDescriptor,
+        BeanDescriptor parametersBeanDescriptor)
+    {
+        this.id = id;
+        this.name = name;
+        this.description = description;
+        this.contentDescriptor = contentDescriptor;
+        this.parametersBeanDescriptor = parametersBeanDescriptor;
+    }
+
+    /**
      * @param name the name of the macro (eg "Table Of Contents" for the TOC macro)
      * @param description the description of the macro.
      * @param contentDescriptor the description of the macro content. null indicate macro does not support content.
      * @param parametersBeanDescriptor the description of the parameters bean or null if there are no parameters for
      *            this macro.
      * @since 2.0M3
+     * @deprecated since 2.3M1 use
+     *             {@link #AbstractMacroDescriptor(MacroId, String, String, ContentDescriptor, BeanDescriptor)} instead
      */
+    @Deprecated
     public AbstractMacroDescriptor(String name, String description, ContentDescriptor contentDescriptor,
         BeanDescriptor parametersBeanDescriptor)
     {
@@ -96,6 +124,17 @@ public abstract class AbstractMacroDescriptor implements MacroDescriptor
             DefaultParameterDescriptor desc = new DefaultParameterDescriptor(propertyDescriptor);
             this.parameterDescriptorMap.put(desc.getId().toLowerCase(), desc);
         }
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see MacroDescriptor#getId()
+     * @since 2.3M1
+     */
+    public MacroId getId()
+    {
+        return this.id;
     }
 
     /**

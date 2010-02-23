@@ -198,6 +198,7 @@
               <!-- TODO: To be removed when we release XWiki 2.3 -->
               <excludes>
                 <exclude>**/internal/**</exclude>
+                <exclude>org/xwiki/rendering/macro/descriptor/MacroDescriptor</exclude>
                 <exclude>org/xwiki/rendering/syntax/SyntaxFactory</exclude>
                 <exclude>org/xwiki/rendering/internal/parser/DefaultSyntaxFactory</exclude>
                 <exclude>org/xwiki/rendering/syntax/Syntax</exclude>

@@ -19,6 +19,7 @@
  */
 package org.xwiki.rendering.macro;
 
+import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.Requirement;
 import org.xwiki.component.logging.AbstractLogEnabled;
 import org.xwiki.component.phase.Initializable;
@@ -40,22 +41,22 @@ public abstract class AbstractMacro<P> extends AbstractLogEnabled implements Mac
      * "Formatting" default macro category.
      */
     public static final String DEFAULT_CATEGORY_FORMATTING = "Formatting";
-    
+
     /**
      * "Development" default macro category.
      */
     public static final String DEFAULT_CATEGORY_DEVELOPMENT = "Development";
-    
+
     /**
      * "Content" default macro category.
      */
     public static final String DEFAULT_CATEGORY_CONTENT = "Content";
-    
+
     /**
      * "Navigation" default macro category.
      */
     public static final String DEFAULT_CATEGORY_NAVIGATION = "Navigation";
-    
+
     /**
      * The {@link BeanManager} component.
      */
@@ -169,8 +170,15 @@ public abstract class AbstractMacro<P> extends AbstractLogEnabled implements Mac
      */
     public void initialize() throws InitializationException
     {
+        MacroId macroId = null;
+        // Try to get macro id from component hint - only possible for XWiki Java Macros
+        Component annotation = this.getClass().getAnnotation(Component.class);
+        if (annotation != null && !"".equals(annotation)) {
+            macroId = new MacroId(annotation.value());
+        }
+
         DefaultMacroDescriptor descriptor =
-            new DefaultMacroDescriptor(this.name, this.description, this.contentDescriptor, this.beanManager
+            new DefaultMacroDescriptor(macroId, this.name, this.description, this.contentDescriptor, this.beanManager
                 .getBeanDescriptor(this.parametersBeanClass));
         descriptor.setDefaultCategory(this.defaultCategory);
         setDescriptor(descriptor);

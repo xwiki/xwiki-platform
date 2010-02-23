@@ -21,6 +21,8 @@ package org.xwiki.rendering.macro.descriptor;
 
 import java.util.Map;
 
+import org.xwiki.rendering.macro.MacroId;
+
 /**
  * Describe a Macro (macro description and macro parameters description).
  * 
@@ -29,6 +31,12 @@ import java.util.Map;
  */
 public interface MacroDescriptor
 {
+    /**
+     * @return the id of the macro
+     * @since 2.3M1
+     */
+    MacroId getId();
+    
     /**
      * @return the human-readable name of the macro (eg "Table Of Contents" for the TOC macro).
      * @since 2.0M3

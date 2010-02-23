@@ -129,8 +129,8 @@ public interface DocumentAccessBridge
      * @throws Exception if the storage cannot be accessed.
      * @since 2.2.1
      */
-    void setDocumentContent(DocumentReference documentReference, String content, String editComment, boolean isMinorEdit)
-        throws Exception;
+    void setDocumentContent(DocumentReference documentReference, String content, String editComment,
+        boolean isMinorEdit) throws Exception;
 
     /**
      * Updates the target document with the new content provided. If the target document does not exists, a new one will

@@ -12,8 +12,8 @@
 <customClass></customClass>
 <contentAuthor>XWiki.Admin</contentAuthor>
 <creationDate>1264860755000</creationDate>
-<date>1266772268000</date>
-<contentUpdateDate>1266772268000</contentUpdateDate>
+<date>1266858116000</date>
+<contentUpdateDate>1266858116000</contentUpdateDate>
 <version>1.0</version>
 <title></title>
 <template></template>
@@ -741,7 +741,7 @@ XWiki.Selection = Class.create({
         // hide message at page bottom
         this._x_notification.hide();
         // load the received annotated content in the page, along with annotations and annotations markers
-        this.loadAnnotatedContent(response.responseJSON, andShow);
+        this.loadAnnotatedContent(response.responseJSON.annotatedContent, andShow);
         // store the state of the annotations
         this.fetchedAnnotations = true;
         this.displayAnnotationsCheckbox.checked = true;

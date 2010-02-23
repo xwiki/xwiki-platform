@@ -12,8 +12,8 @@
 <customClass></customClass>
 <contentAuthor>XWiki.Admin</contentAuthor>
 <creationDate>1264860755000</creationDate>
-<date>1266936482000</date>
-<contentUpdateDate>1266936482000</contentUpdateDate>
+<date>1266940241000</date>
+<contentUpdateDate>1266940241000</contentUpdateDate>
 <version>1.0</version>
 <title></title>
 <template></template>
@@ -1075,8 +1075,9 @@ XWiki.Selection = Class.create({
           // close the bubble on successful update
           this.hideBubble(container);
         }
-        // and reload the annotations tab in the bottom
-        this.reloadTab(!inBubble);
+        this.fetchedAnnotations = true;
+        // reload the received annotated content, with scroll to tab
+        this.loadAnnotatedContent(response.responseJSON.annotatedContent, this.displayAnnotationsCheckbox.checked, !inBubble);
       }.bind(this),
       onFailure : function(response) {
         var failureReason = response.statusText;

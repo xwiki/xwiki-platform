@@ -12,8 +12,8 @@
 <customClass></customClass>
 <contentAuthor>XWiki.Admin</contentAuthor>
 <creationDate>1264860755000</creationDate>
-<date>1266858116000</date>
-<contentUpdateDate>1266858116000</contentUpdateDate>
+<date>1266936482000</date>
+<contentUpdateDate>1266936482000</contentUpdateDate>
 <version>1.0</version>
 <title></title>
 <template></template>
@@ -145,6 +145,9 @@ XWiki.Selection = Class.create({
     this.selectionParentInnerHTML = false;
     if (window.getSelection) { 
       // FF selection &amp; hopefully other browsers 
+      if (window.getSelection().rangeCount == 0) {
+        return;
+      }
       this.range = window.getSelection().getRangeAt(0);
       // ignore if the selection is in the passed container
       if (!this.isDescendantOrSelf(this.container, this.range.commonAncestorContainer)) {
@@ -192,6 +195,8 @@ XWiki.Selection = Class.create({
       var highlightWrapperTemplate = new Element('span', {'style': 'background-color: ' + color, 'class' : 'selection-highlight'});
       // get all the text nodes of this range
       var rangeTextNodes = this.getRangeTextNodes();
+      // and remove all the ranges in this selection, otherwise so messed up things will happen
+      window.getSelection().removeAllRanges();
       this.highlightWrappers = new Array();
       rangeTextNodes.each(function(text) {
         // clone a highlightWrapper from the template
@@ -1216,8 +1221,6 @@ XWiki.Selection = Class.create({
           this._x_notification = new XWiki.widgets.Notification("$msg.get('annotations.action.create.form.loaderror')" + failureReason, "error");
           // and hide the create form panel
           this.hideAnnotationCreationForm();
-          // and register the listeners again
-          this.registerAddAnnotationShortcut();
         }.bind(this),
 
         on0: function (response) {

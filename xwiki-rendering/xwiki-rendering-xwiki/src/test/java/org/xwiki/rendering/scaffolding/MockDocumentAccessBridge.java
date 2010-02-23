@@ -50,7 +50,7 @@ public class MockDocumentAccessBridge implements DocumentAccessBridge
     public static ComponentDescriptor<DocumentAccessBridge> getComponentDescriptor()
     {
         DefaultComponentDescriptor<DocumentAccessBridge> componentDescriptor =
-                new DefaultComponentDescriptor<DocumentAccessBridge>();
+            new DefaultComponentDescriptor<DocumentAccessBridge>();
 
         componentDescriptor.setRole(DocumentAccessBridge.class);
         componentDescriptor.setImplementation(MockDocumentAccessBridge.class);
@@ -138,8 +138,7 @@ public class MockDocumentAccessBridge implements DocumentAccessBridge
     public String getURL(String documentName, String action, String queryString, String anchor)
     {
         String result =
-                "/xwiki/bin/view/"
-                    + (StringUtils.isBlank(documentName) ? "currentdoc" : documentName.replace(".", "/"));
+            "/xwiki/bin/view/" + (StringUtils.isBlank(documentName) ? "currentdoc" : documentName.replace(".", "/"));
         if (anchor != null) {
             result = result + "#" + anchor;
         }
@@ -152,9 +151,9 @@ public class MockDocumentAccessBridge implements DocumentAccessBridge
     public String getDocumentURL(DocumentReference documentReference, String action, String queryString, String anchor)
     {
         String result =
-                "/xwiki/bin/view/"
-                    + (documentReference == null ? "currentdoc" : documentReference.getLastSpaceReference().getName()
-                        + "/" + documentReference.getName());
+            "/xwiki/bin/view/"
+                + (documentReference == null ? "currentdoc" : documentReference.getLastSpaceReference().getName() + "/"
+                    + documentReference.getName());
         if (anchor != null) {
             result = result + "#" + anchor;
         }
@@ -475,7 +474,19 @@ public class MockDocumentAccessBridge implements DocumentAccessBridge
     {
         throw new RuntimeException("Not implemented");
     }
-    
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see org.xwiki.bridge.DocumentAccessBridge#pushDocumentInContext(java.util.Map,
+     *      org.xwiki.model.reference.DocumentReference)
+     */
+    public void pushDocumentInContext(Map<String, Object> backupObjects, DocumentReference documentReference)
+        throws Exception
+    {
+        throw new RuntimeException("Not implemented");
+    }
+
     /**
      * {@inheritDoc}
      * 

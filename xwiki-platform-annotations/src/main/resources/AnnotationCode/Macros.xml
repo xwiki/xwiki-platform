@@ -12,8 +12,8 @@
 <customClass></customClass>
 <contentAuthor>XWiki.Admin</contentAuthor>
 <creationDate>1264959390000</creationDate>
-<date>1266919948000</date>
-<contentUpdateDate>1266919948000</contentUpdateDate>
+<date>1266964140000</date>
+<contentUpdateDate>1266964140000</contentUpdateDate>
 <version>1.0</version>
 <title></title>
 <template></template>
@@ -173,8 +173,7 @@
  *#
 #macro(displayAnnotationToolbox $ann $mode $docWiki $docSpace $docPage)
   &lt;span class="annotationTools"&gt;
-    #set($canEditAnnotation = $annotations.canEditAnnotation($ann.id, $docWiki, $docSpace, $docPage))
-    #if($mode != 'create' &amp;&amp; $canEditAnnotation)
+    #if($mode != 'create' &amp;&amp; $annotations.canEditAnnotation($ann.id, $docWiki, $docSpace, $docPage))
       #if ("$!{ann.state}" == 'UPDATED')
         ## TODO set the correct url for the 'verify' button
         &lt;span class="tool accept"&gt;&lt;a class="accept" href="#" title="$msg.get('annotations.accept.action.tooltip')"&gt;$msg.get('annotations.accept.action.text')&lt;/a&gt;&lt;/span&gt;

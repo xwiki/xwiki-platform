@@ -19,6 +19,7 @@
  */
 package org.xwiki.url.internal.standard;
 
+import org.apache.commons.lang.StringUtils;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.Requirement;
 import org.xwiki.model.reference.AttachmentReference;
@@ -32,6 +33,7 @@ import org.xwiki.url.XWikiURLType;
 
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
@@ -90,11 +92,11 @@ public class StandardXWikiURLFactory implements XWikiURLFactory<URL>
         if (ignorePrefix != null && !url.getPath().startsWith(ignorePrefix)) {
             throw new InvalidURLException("URL Path doesn't start with [" + ignorePrefix + "]");
         }
-        StringBuilder path = new StringBuilder(url.getPath().substring(ignorePrefix.length()));
+        String path = url.getPath().substring(ignorePrefix.length());
 
         // Step 2: Extract all segment to make it easy to decide based on their values.
         URLParsingState state = new URLParsingState();
-        state.urlSegments = extractPathSegments(path);
+        state.urlSegments = new ArrayList<String>(Arrays.asList(StringUtils.split(path, '/')));
 
         // Step 3: Extract the wiki name.
         // The location of the wiki name depends on whether the wiki is configured to use domain-based multiwiki or
@@ -170,45 +172,6 @@ public class StandardXWikiURLFactory implements XWikiURLFactory<URL>
             host = url.getHost();
         }
         return this.hostResolver.resolve(host);
-    }
-
-    protected List<String> extractPathSegments(StringBuilder path) throws InvalidURLException
-    {
-        List<String> segments = new ArrayList<String>();
-        String segment;
-        while ((segment = extractPathSegment(path)) != null) {
-            segments.add(segment);
-        }
-        return segments;
-    }
-
-    protected String extractPathSegment(StringBuilder path) throws InvalidURLException
-    {
-        String result;
-
-        if (path.length() == 0) {
-            result = null;
-        } else {
-            // Look for the next "/" and if none exist then consider the rest as the path segment
-            // We start the search at position 1 instead of 0 since path segments start with "/".
-            if (path.charAt(0) != '/') {
-                throw new InvalidURLException("Path should start with \"/\"");
-            }
-            if (path.length() == 1) {
-                result = "";
-            } else {
-                int pos = path.indexOf("/", 1);
-                // TODO: Unencode string
-                if (pos > -1) {
-                    result = path.substring(1, pos);
-                    path.delete(0, pos);
-                } else {
-                    result = path.substring(1);
-                    path.setLength(0);
-                }
-            }
-        }
-        return result;
     }
 
     protected XWikiURLType getXWikiURLType(String type) throws InvalidURLException

@@ -68,14 +68,18 @@ public class DefaultReferenceEntityReferenceResolver implements EntityReferenceR
     {
         EntityReference normalizedReference;
 
-        // If the passed type is a supertype of the reference to resolve's type then we need to insert a top level
-        // reference.
-        if (type.ordinal() > referenceToResolve.getType().ordinal()) {
-            normalizedReference = new EntityReference(getDefaultValue(type), type, referenceToResolve.clone());
+        if (referenceToResolve == null) {
+            normalizedReference = new EntityReference(getDefaultValue(type), type);
         } else {
-            normalizedReference = referenceToResolve.clone();
+            // If the passed type is a supertype of the reference to resolve's type then we need to insert a top level
+            // reference.
+            if (type.ordinal() > referenceToResolve.getType().ordinal()) {
+                normalizedReference = new EntityReference(getDefaultValue(type), type, referenceToResolve.clone());
+            } else {
+                normalizedReference = referenceToResolve.clone();
+            }
         }
-
+        
         // Check all references and parent references which have a NULL name and replace them with default values.
         // In addition insert references where needed.
         EntityReference reference = normalizedReference;
@@ -97,11 +101,13 @@ public class DefaultReferenceEntityReferenceResolver implements EntityReferenceR
             reference = reference.getParent();
         }
 
-        // If the passed type is a subtype of the reference to resolve's type then we extract the reference.
-        if (type.ordinal() < referenceToResolve.getType().ordinal()) {
-            normalizedReference = normalizedReference.extractReference(type);
+        if (referenceToResolve != null) {
+            // If the passed type is a subtype of the reference to resolve's type then we extract the reference.
+            if (type.ordinal() < referenceToResolve.getType().ordinal()) {
+                normalizedReference = normalizedReference.extractReference(type);
+            }
         }
-
+        
         return normalizedReference;
     }
 

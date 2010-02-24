@@ -160,4 +160,17 @@ public class DefaultReferenceEntityReferenceResolverTest
         Assert.assertEquals(EntityType.WIKI, reference.getParent().getType());
         Assert.assertEquals("defwiki", reference.getParent().getName());
     }
+
+    @Test
+    public void testResolveDocumentReferenceWhenNullReference()
+    {
+        EntityReference reference = this.resolver.resolve(null, EntityType.DOCUMENT);
+
+        Assert.assertEquals(EntityType.DOCUMENT, reference.getType());
+        Assert.assertEquals("defpage", reference.getName());
+        Assert.assertEquals(EntityType.SPACE, reference.getParent().getType());
+        Assert.assertEquals("defspace", reference.getParent().getName());
+        Assert.assertEquals(EntityType.WIKI, reference.getParent().getParent().getType());
+        Assert.assertEquals("defwiki", reference.getParent().getParent().getName());
+    }
 }

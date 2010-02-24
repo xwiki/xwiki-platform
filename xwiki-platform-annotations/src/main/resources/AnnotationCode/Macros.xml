@@ -32,7 +32,7 @@
 ##
 ##
 ## Do not display these 'internal' properties in the form:
-#set($hiddenProperties = ['selection', 'selectionContext', 'originalSelection', 'target', 'date', 'author', 'state', 'color'])
+#set($hiddenProperties = ['selection', 'selectionLeftContext', 'selectionRightContext', 'originalSelection', 'target', 'date', 'author', 'state', 'color'])
 ##
 ##
 #*

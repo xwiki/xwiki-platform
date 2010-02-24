@@ -520,7 +520,7 @@ var LiveTableFilter = Class.create({
     var filterString = "";
     for (key in this.filters) {
       if (!existing[key] && this.filters[key] != "") {
-        filterString += '&' + key + '=' + this.filters[key];
+        filterString += '&' + key + '=' + encodeURIComponent(this.filters[key]);
       }
     }
     delete existing;

@@ -329,15 +329,6 @@ public class XWiki implements XWikiDocChangeNotificationInterface
         XWiki xwiki = null;
         XWikiEngineContext econtext = context.getEngineContext();
 
-        try {
-            if (context.getRequest().getRequestURL().indexOf("/testbin/") != -1) {
-                xwikiname = "xwikitest";
-                context.setDatabase("xwikitest");
-                context.setOriginalDatabase("xwikitest");
-            }
-        } catch (Exception e) {
-        }
-
         context.setMainXWiki(xwikiname);
 
         try {
@@ -4827,8 +4818,6 @@ public class XWiki implements XWikiDocChangeNotificationInterface
                 String currentServletpath = context.getRequest().getServletPath();
                 if (currentServletpath != null && currentServletpath.startsWith("/bin")) {
                     servletPath = "bin/";
-                } else if (currentServletpath != null && currentServletpath.startsWith("/testbin")) {
-                    servletPath = "testbin/";
                 } else {
                     servletPath = Param("xwiki.defaultservletpath", "bin/");
                 }

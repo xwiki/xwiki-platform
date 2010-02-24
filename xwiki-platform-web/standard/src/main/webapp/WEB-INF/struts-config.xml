@@ -392,7 +392,6 @@
             <forward name="export" path="/templates/export.vm"/>
         </action>
 
-
         <action path="/import/"
                 type="com.xpn.xwiki.web.ImportAction"
                 name="import"
@@ -400,6 +399,12 @@
             <forward name="import" path="/templates/import.vm"/>
         </action>
 
+        <action path="/get/"
+                type="com.xpn.xwiki.web.GetAction"
+                name="get"
+                scope="request">
+            <forward name="get" path="/templates/get.vm"/>
+        </action>
 
         <action path="/imagecaptcha/"
                 type="org.xwiki.captcha.internal.DefaultImageCaptchaAction">

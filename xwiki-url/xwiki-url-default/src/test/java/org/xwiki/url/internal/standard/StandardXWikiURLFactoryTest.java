@@ -88,6 +88,25 @@ public class StandardXWikiURLFactoryTest extends AbstractComponentTestCase
     }
 
     @Test
+    public void testCreateDomainBasedSubWikiURL() throws Exception
+    {
+        this.mockery.checking(new Expectations() {{
+            allowing(mockHostResolver).resolve("subwiki.domain.ext");
+                will(returnValue(new WikiReference("Wiki")));
+            allowing(mockConfiguration).isPathBasedMultiWikiFormat();
+                will(returnValue(false));
+        }});
+
+        XWikiURL xwikiURL = this.factory.createURL(new URL("http://subwiki.domain.ext/xwiki/bin/view/Space/Page"),
+            Collections.<String, Object>singletonMap("ignorePrefix", "/xwiki"));
+
+        Assert.assertEquals(XWikiURLType.ENTITY, xwikiURL.getType());
+        XWikiEntityURL entityURL = (XWikiEntityURL) xwikiURL;
+        Assert.assertEquals("view", entityURL.getAction());
+        Assert.assertEquals(new DocumentReference("Wiki", "Space", "Page"), entityURL.getEntityReference());
+    }
+
+    @Test
     public void testCreatePathBasedMainWikiURL() throws Exception
     {
         this.mockery.checking(new Expectations() {{
@@ -100,6 +119,27 @@ public class StandardXWikiURLFactoryTest extends AbstractComponentTestCase
         }});
 
         XWikiURL xwikiURL = this.factory.createURL(new URL("http://localhost:8080/xwiki/bin/view/Space/Page"),
+            Collections.<String, Object>singletonMap("ignorePrefix", "/xwiki"));
+
+        Assert.assertEquals(XWikiURLType.ENTITY, xwikiURL.getType());
+        XWikiEntityURL entityURL = (XWikiEntityURL) xwikiURL;
+        Assert.assertEquals("view", entityURL.getAction());
+        Assert.assertEquals(new DocumentReference("Wiki", "Space", "Page"), entityURL.getEntityReference());
+    }
+
+    @Test
+    public void testCreatePathBasedSubWikiURL() throws Exception
+    {
+        this.mockery.checking(new Expectations() {{
+            allowing(mockHostResolver).resolve("subwiki");
+                will(returnValue(new WikiReference("Wiki")));
+            allowing(mockConfiguration).isPathBasedMultiWikiFormat();
+                will(returnValue(true));
+            allowing(mockConfiguration).getWikiPathPrefix();
+                will(returnValue("wiki"));
+        }});
+
+        XWikiURL xwikiURL = this.factory.createURL(new URL("http://host/xwiki/wiki/subwiki/view/Space/Page"),
             Collections.<String, Object>singletonMap("ignorePrefix", "/xwiki"));
 
         Assert.assertEquals(XWikiURLType.ENTITY, xwikiURL.getType());

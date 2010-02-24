@@ -59,6 +59,12 @@ public class StandardXWikiURLFactory implements XWikiURLFactory<URL>
     @Requirement
     private HostResolver hostResolver;
 
+    private class URLParsingState
+    {
+        public List<String> urlSegments;
+        public XWikiURLType urlType; 
+    }
+
     /**
      * {@inheritDoc}
      *
@@ -87,21 +93,27 @@ public class StandardXWikiURLFactory implements XWikiURLFactory<URL>
         StringBuilder path = new StringBuilder(url.getPath().substring(ignorePrefix.length()));
 
         // Step 2: Extract all segment to make it easy to decide based on their values.
-        List<String> urlSegments = extractPathSegments(path);
+        URLParsingState state = new URLParsingState();
+        state.urlSegments = extractPathSegments(path);
 
         // Step 3: Extract the wiki name.
         // The location of the wiki name depends on whether the wiki is configured to use domain-based multiwiki or
         // path-based multiwiki. If domain-based multiwiki then extract the wiki reference from the domain, otherwise
         // extract it from the path.
-        WikiReference wikiReference = extractWikiReference(url, urlSegments);
+        WikiReference wikiReference = extractWikiReference(url, state);
 
         // Step 4: Extract the URL type and construct a XWiki URL of the corresponding type.
-        String typeAsString = urlSegments.remove(0);
-        XWikiURLType type = getXWikiURLType(typeAsString);
-        if (type == XWikiURLType.ENTITY) {
-            xwikiURL = buildXWikiEntityURL(wikiReference, urlSegments);
+        // Note that the type could have been found already if the wiki was configured in path-based (in this case
+        // the type is always ENTITY).
+        if (state.urlType == null) {
+            String typeAsString = state.urlSegments.remove(0);
+            state.urlType = getXWikiURLType(typeAsString);
+        }
+
+        if (state.urlType == XWikiURLType.ENTITY) {
+            xwikiURL = buildXWikiEntityURL(wikiReference, state.urlSegments);
         } else {
-            throw new InvalidURLException("URL type [" + type + "] not supported yet!");
+            throw new InvalidURLException("URL type [" + state.urlType + "] not supported yet!");
         }
 
         return xwikiURL;
@@ -138,18 +150,20 @@ public class StandardXWikiURLFactory implements XWikiURLFactory<URL>
         return entityURL;
     }
 
-    protected WikiReference extractWikiReference(URL url, List<String> urlSegments)
+    protected WikiReference extractWikiReference(URL url, URLParsingState state)
     {
         String host = null;
         if (this.configuration.isPathBasedMultiWikiFormat()) {
             // If the first path element isn't the value of the wikiPathPrefix configuration value then we fall back
             // to the host name. This also allows the main wiki URL to be domain-based even for a path-based multiwiki.
-            if (urlSegments.get(0).equalsIgnoreCase(this.configuration.getWikiPathPrefix())) {
-                host = urlSegments.get(1);
+            if (state.urlSegments.get(0).equalsIgnoreCase(this.configuration.getWikiPathPrefix())) {
+                host = state.urlSegments.get(1);
                 // Remove the first 2 segments so that when this method returns the remaining URL segments point to
                 // the next meaningful item to extract, whether the wiki was domain-based or path-based. 
-                urlSegments.remove(0);
-                urlSegments.remove(0);
+                state.urlSegments.remove(0);
+                state.urlSegments.remove(0);
+                // For path-based multiwiki the URL type is always ENTITY...
+                state.urlType = XWikiURLType.ENTITY;
             }
         }
         if (host == null) {

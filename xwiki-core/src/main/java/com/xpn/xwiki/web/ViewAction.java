@@ -19,13 +19,11 @@
  */
 package com.xpn.xwiki.web;
 
-import com.xpn.xwiki.XWiki;
+import java.io.IOException;
+
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
-import org.apache.velocity.VelocityContext;
-
-import java.io.IOException;
 
 /**
  * Action called when the request URL has the "/view/" string in its path (this is configured in
@@ -37,6 +35,7 @@ public class ViewAction extends XWikiAction
 {
     /**
      * The identifier of the view action.
+     * 
      * @todo need an enumerated class for actions.
      */
     public static final String VIEW_ACTION = "view";
@@ -50,11 +49,11 @@ public class ViewAction extends XWikiAction
     {
         boolean shouldRender = true;
 
-        XWikiRequest request = context.getRequest();
         context.put("action", VIEW_ACTION);
 
         // Redirect to the ViewrevAction is the URL has a rev parameter (when the user asks to
         // view a specific revision of a document).
+        XWikiRequest request = context.getRequest();
         String rev = request.getParameter("rev");
         if (rev != null) {
             String url = context.getDoc().getURL("viewrev", request.getQueryString(), context);
@@ -78,8 +77,6 @@ public class ViewAction extends XWikiAction
     {
         handleRevision(context);
         XWikiDocument doc = (XWikiDocument) context.get("doc");
-        XWiki xwiki = context.getWiki();
-        VelocityContext vcontext = (VelocityContext) context.get("vcontext");
 
         String defaultTemplate = doc.getDefaultTemplate();
         if ((defaultTemplate != null) && (!defaultTemplate.equals(""))) {

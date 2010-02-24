@@ -234,7 +234,9 @@
       ##
       ## If the document was not last saved by a user with edit privilage on this page
       ## then we can't safely display the page but we should warn the viewer.
-      #if(!$xwiki.hasAccessLevel("edit", $app.getAuthor(), $currentDoc))
+      #set($hasAccess = false)
+      #checkDocumentSavedByAuthorizedUser($app, $currentDoc, $hasAccess)
+      #if(!$hasAccess)
         {{error}}$msg.get('xe.admin.configurable.applicationAuthorNoAdmin', [$app.Author]){{/error}}
       #else
         ##
@@ -609,6 +611,27 @@
   #if($xcontext.hasProgrammingRights())
     $xcontext.getContext().getDoc().setContentAuthor('XWiki.XWikiGuest')
   #end
+#end
+##
+#*
+ * Try to determine whether a document was edited by a user who has edit right on this page. This is trickey because
+ * documents are imported with the name XWiki.XWikiGuest who has no access to anything after import.
+ *
+ * @param theDoc - Document who's editor should be checked for edit access on this document.
+ *#
+#macro(checkDocumentSavedByAuthorizedUser, $docToCheck, $currentDoc, $hasAccess)
+  ## The system is started and the only user is XWikiGuest who has admin right but gives it up when he imports the default
+  ## documents, we are checking to see if this looks like the guest imported the document with the first import.
+  #if($docToCheck.getWiki() == $xcontext.getMainWikiName()
+      &amp;&amp; $docToCheck.getVersion() == '1.1'
+      &amp;&amp; $docToCheck.getCreator() != $docToCheck.getContentAuthor()
+      &amp;&amp; $docToCheck.getContentAuthor() == 'XWiki.XWikiGuest')
+  ##
+    #set($userToCheck = $docToCheck.getCreator())
+  #else
+    #set($userToCheck = $docToCheck.getAuthor())
+  #end
+  #set($hasAccess = $xwiki.hasAccessLevel("edit", $userToCheck, $currentDoc))
 #end
 {{/velocity}}</content>
 </xwikidoc>

@@ -1,0 +1,207 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<xwikidoc>
+<web>XWiki</web>
+<name>RegistrationHelp</name>
+<language></language>
+<defaultLanguage>en</defaultLanguage>
+<translation>0</translation>
+<parent></parent>
+<creator>XWiki.Admin</creator>
+<author>XWiki.Admin</author>
+<customClass></customClass>
+<contentAuthor>XWiki.Admin</contentAuthor>
+<creationDate>1267027868000</creationDate>
+<date>1267027924000</date>
+<contentUpdateDate>1267027924000</contentUpdateDate>
+<version>1.1</version>
+<title>Registration Page Documentation</title>
+<template></template>
+<defaultTemplate></defaultTemplate>
+<validationScript></validationScript>
+<comment></comment>
+<minorEdit>false</minorEdit>
+<syntaxId>xwiki/2.0</syntaxId>
+<hidden>false</hidden>
+<content>The verified registration page is the new default registration method for XWiki Enterprise. It supports image captchas supplied by the captcha module it also supports validating the input fields both on the server side and in Javascript using [[LiveValidation&gt;&gt;http://livevalidation.com/]].
+
+{{info}}The Verified Registration page does not require programming rights to operate so you can configure it even if you are administrating a virtual wiki on a wiki farm.{{/info}}
+
+= Options you can set from the [[Registration section of the Administration Application&gt;&gt;XWiki.XWikiPreferences?section=Registration&amp;editor=globaladmin#HCustomizeXWikiRegistration]] =
+
+{{id name=heading/}}
+* **Registration page heading**
+(% style="list-style-type: none" %)
+** This is the line at the top of the page which is shown to people who are registering and when they have just registered.
+
+{{id name=welcomeMessage/}}
+* **Welcome Message**
+(% style="list-style-type: none" %)
+** This is only shown when people are filling out the form.
+
+{{id name=liveValidation_enabled/}}
+* **Enable Javascript field validation** (Default: Yes)
+(% style="list-style-type: none" %)
+** Set this to false and LiveValidation javascript will not be generated (fields will still be validated at the server side.)
+
+{{id name=liveValidation_defaultFieldOkMessage/}}
+* **Default field okay message** (Default: 'Ok.')
+(% style="list-style-type: none" %)
+** LiveValidation shows a message to indicate to users that they have filled in the field satisfactorily. this is the message they will get if it is not overridden for a particular field.
+
+{{id name=loginButton_enabled/}}
+* **Enable login button** (Default: Yes)
+(% style="list-style-type: none" %)
+** When the user has registered, we provide a button for them to click which will post their username and passoerd to the login action and get them logged in right away. This however causes the username and password to be passed back in the HTML which may be unacceptable depending on your security needs.
+
+{{id name=loginButton_autoLogin_enabled/}}
+* **Enable automatic login** (Default: No)
+(% style="list-style-type: none" %)
+** If login button is enabled, then you can have a piece of Javascript push the login button for the user.
+
+{{id name=defaultRedirect/}}
+* **Redirect here after registration** (Default: Main.WebHome)
+(% style="list-style-type: none" %)
+** This is the page which the user will be redirected to after pushing the login button if the xredirect parameter is not specified.
+
+{{id name=requireCaptcha/}}
+* **Require captcha to register** (Default: No)
+(% style="list-style-type: none" %)
+** Set this true to require the user to solve a captcha in order to register. **NOTE:** captcha.enable must be set true in the xwiki.properties configuration file in xwiki/WEB-INF/
+
+= Configuration you can set by editing the XWiki.Registration =
+
+In XWiki.Registration, the fields are defined separately from the code which generates the HTML. You can add or remove fields simply by modifying the configuration. Fields are defined as maps. The maps are each required to have a 'name' key which must map to a string. This string will be the id and name of the field when it is rendered into HTML.
+
+* **label** (string)
+(% style="list-style-type: none" %)
+** This is what the user is prompted with above the field for their input.
+
+* **tag** (string)
+(% style="list-style-type: none" %)
+** Usually a field is an input field but if you specify a different tag (eg: textarea) then it will not be an input type field. You can even specify non field tags such as &lt;img&gt; or &lt;div&gt; but it may cause invalid HTML to be generated.
+
+* **params** (map)
+(% style="list-style-type: none" %)
+** This map corresponds to the HTML parameters of the tag. If you specify params to be { 'class' : 'someclass', 'style' : 'color:red;' } then the HTML tag will read &lt;input class="someclass" style="color:red;"&gt;
+
+* **noReturn** (boolean)
+(% style="list-style-type: none" %)
+** If this is specified, the field will not be filled in if there is an error and the user has to fix their registration information. If you don't want a password to be passed back in html then set this true for the password fields. Used for the captcha because it makes no sense to pass back an incorrect captcha answer.
+
+* **doAfterRegistration** (string)
+(% style="list-style-type: none" %)
+** Some Velocity code which will be executed after a successful registration. This is used in the favorite color example. Remember to put the code in single quotes ('') because you want the 'code' entry to equal the literal code, not the output from running it.
+
+* **validate** (map)
+(% style="list-style-type: none" %)
+** This map is the most complex and is covered later on in this section.
+
+Here is the definition of a field which is used in the registration page
+
+{{code}}
+## The user name field, mandatory and programmatically checked to make sure the username doesn't exist.
+#set($field = 
+  {'name' : 'xwikiname',
+    'label' : $msg.get('core.register.username'),
+    'params' : {
+      'type' : 'text',
+      'onfocus' : 'prepareName(document.forms.register);',
+      'size' : '20'
+    },
+    'validate' : {
+      'mandatory' : { 
+        'failureMessage' : $msg.get('XWiki.Registration.fieldMandatory') 
+      },
+      'programmaticValidation' : {
+        'code' : '#nameAvailable($request.get("xwikiname"))',
+        'failureMessage' : $msg.get('core.register.userAlreadyExists')
+      }
+    }
+  })
+#set($discard = $fields.add($field))
+{{/code}}
+
+Line by line it is:
+* A comments and the beginning of a set directive.
+** name is set to 'xwikiname'
+** label is set to 'User Id:' or translation there of.
+** params is set to a new map
+*** params map gets type set to 'text'
+*** params map gets onfocus set to some Javascript
+*** params map gets size set to '20'
+** End of params map
+** validate is set to a new map.
+*** validate map gets mandatory set to new map.
+**** validate.mandatory gets failureMessage set to 'this field is mandatory' or translation there of.
+*** validate.mandatory is ended.
+*** validate gets programmaticValidation set to new map
+**** validate.programmaticValidation gets 'code' set to a macro call which will check if the username is taken.
+**** validate.programmaticValidation gets 'failureMessage' set to a message telling the user that the name is taken.
+*** validate.programmaticValidation map is closed.
+** validate map is closed.
+* Map for this field is closed and set directive ends.
+* This field is added to the fields array and the output from the add function is set to discard to avoid having it print on the page.
+
+= Validation Constraints =
+The validate field configuration key is itself a map which allows a number of parameters to be defined. Validation is done in the order of mandatory, then regex, then mustMatch, then programmatic validation so if nothing is entered and the mandatory constraint is not in place then the entry will be accepted and if a entry fails the regex test then it will not be evaluated programmatically.
+
+* **mandatory** (Optional)
+(% style="list-style-type: none" %)
+** Will fail if the field is not filled in.
+** **failureMessage** (Required)
+(% style="list-style-type: none" %)
+*** The message to display if the field is not filled in.
+** **noscript** (Optional)
+(% style="list-style-type: none" %)
+*** Will not be validated by Javascript, only on the server side.
+
+* **regex** (Optional)
+(% style="list-style-type: none" %)
+** Will validate the field using a regular expression. because of character escaping, you must provide a different expression for the javascript validation and the server side validation. Both javascript and server side validation are optional, but if you provide neither, then your field will not be validated.
+** **failureMessage** (Optional)
+(% style="list-style-type: none" %)
+*** The message to display if the regex evaluation returns false, note that this is sent in HTML so &amp;lt; will display as &lt;
+** **jsFailureMessage** (Optional)
+(% style="list-style-type: none" %)
+*** The message for Javascript to display if regex fails. If jsFailureMessage is not defined Javascript uses failureMessage. NOTE: Javascript injects the failure message using createTextNode so &amp;lt; will be displayed as &amp;lt;
+** **pattern** (Optional)
+(% style="list-style-type: none" %)
+*** The regular expression to test the input at the server side, it's important to use this if you need to validate the field for security reasons, also it is good because not all browsers use javascript or have it enabled.
+** **jsPattern** (Optional)
+(% style="list-style-type: none" %)
+*** The regular expression to use for client side, you can use escaped characters to avoid them being parsed as Javascript code. To get javascript to unescape characters use: "'+unescape('%5E%5B%24')+'"
+(% style="list-style-type: none" %)
+**** **NOTE:** If no jsPattern is specified, the jsValidator will try to validate using 'pattern'.
+** **noscript** (Optional)
+(% style="list-style-type: none" %)
+*** Will not be validated by Javascript, only on the server side.
+
+* **mustMatch** (Optional)
+(% style="list-style-type: none" %)
+** Will fail if the entry into the field is not the same as the entry in another field. Used for password confirmation.
+** **failureMessage** (Required)
+(% style="list-style-type: none" %)
+*** The message to display if the field doesn't match the named field.
+** **name** (Required)
+(% style="list-style-type: none" %)
+*** The name of the field which this field must match.
+** **noscript** (Optional)
+(% style="list-style-type: none" %)
+*** Will not be validated by Javascript, only on the server side.
+
+
+* **programmaticValidation** (Optional)
+(% style="list-style-type: none" %)
+** This form of validation executes a piece of Velocity code which you give it and if the code returns the word "failed" then it gives the error message. Remember to put the code in single quotes because you want the value of 'code' to equal the literal code, not the output from running it (Velocity parses code in double quotes)
+** **code** (Required)
+(% style="list-style-type: none" %)
+*** The code which will be executed to test whether the field is filled in correctly.
+** **failureMessage** (Required)
+(% style="list-style-type: none" %)
+*** The message which will be displayed if evaluating the code returns "false".
+
+* **fieldOkayMessage** (Optional)
+(% style="list-style-type: none" %)
+** The message which is displayed by LiveValidation when a field is validated as okay. If not specified, will be the LiveValidation default field ok message</content>
+</xwikidoc>

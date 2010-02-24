@@ -47,10 +47,18 @@ public class StandardXWikiURLFactoryTest extends AbstractComponentTestCase
 
     private HostResolver mockHostResolver;
 
+    private StandardURLConfiguration mockConfiguration;
+
     private Mockery mockery = new Mockery();
 
     @Override protected void registerComponents() throws Exception
     {
+        this.mockConfiguration = this.mockery.mock(StandardURLConfiguration.class);
+        DefaultComponentDescriptor<StandardURLConfiguration> descriptorUC =
+            new DefaultComponentDescriptor<StandardURLConfiguration>();
+        descriptorUC.setRole(StandardURLConfiguration.class);
+        getComponentManager().registerComponent(descriptorUC, this.mockConfiguration);
+
         this.mockHostResolver = this.mockery.mock(HostResolver.class);
         DefaultComponentDescriptor<HostResolver> descriptorHR =
             new DefaultComponentDescriptor<HostResolver>();
@@ -61,11 +69,34 @@ public class StandardXWikiURLFactoryTest extends AbstractComponentTestCase
     }
 
     @Test
-    public void testCreateURL() throws Exception
+    public void testCreateDomainBasedMainWikiURL() throws Exception
     {
         this.mockery.checking(new Expectations() {{
             allowing(mockHostResolver).resolve("localhost");
-            will(returnValue(new WikiReference("Wiki")));
+                will(returnValue(new WikiReference("Wiki")));
+            allowing(mockConfiguration).isPathBasedMultiWikiFormat();
+                will(returnValue(false));
+        }});
+
+        XWikiURL xwikiURL = this.factory.createURL(new URL("http://localhost:8080/xwiki/bin/view/Space/Page"),
+            Collections.<String, Object>singletonMap("ignorePrefix", "/xwiki"));
+
+        Assert.assertEquals(XWikiURLType.ENTITY, xwikiURL.getType());
+        XWikiEntityURL entityURL = (XWikiEntityURL) xwikiURL;
+        Assert.assertEquals("view", entityURL.getAction());
+        Assert.assertEquals(new DocumentReference("Wiki", "Space", "Page"), entityURL.getEntityReference());
+    }
+
+    @Test
+    public void testCreatePathBasedMainWikiURL() throws Exception
+    {
+        this.mockery.checking(new Expectations() {{
+            allowing(mockHostResolver).resolve("localhost");
+                will(returnValue(new WikiReference("Wiki")));
+            allowing(mockConfiguration).isPathBasedMultiWikiFormat();
+                will(returnValue(true));
+            allowing(mockConfiguration).getWikiPathPrefix();
+                will(returnValue("wiki"));
         }});
 
         XWikiURL xwikiURL = this.factory.createURL(new URL("http://localhost:8080/xwiki/bin/view/Space/Page"),

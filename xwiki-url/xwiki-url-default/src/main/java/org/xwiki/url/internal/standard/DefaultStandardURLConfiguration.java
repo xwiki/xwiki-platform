@@ -22,15 +22,15 @@ package org.xwiki.url.internal.standard;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.Requirement;
 import org.xwiki.configuration.ConfigurationSource;
-import org.xwiki.url.internal.standard.URLFormatConfiguration;
+import org.xwiki.url.internal.standard.StandardURLConfiguration;
 
 @Component
-public class StandardURLFormatConfiguration implements URLFormatConfiguration
+public class DefaultStandardURLConfiguration implements StandardURLConfiguration
 {
     /**
      * Prefix for configuration keys for the Core module.
      */
-    private static final String PREFIX = "url.default.";
+    private static final String PREFIX = "url.standard.";
 
     /**
      * Defines from where to read the rendering configuration data.
@@ -40,11 +40,20 @@ public class StandardURLFormatConfiguration implements URLFormatConfiguration
 
     /**
      * {@inheritDoc}
-     * @see org.xwiki.url.internal.standard.URLFormatConfiguration#isPathBasedMultiWikiFormat()
+     * @see StandardURLConfiguration#isPathBasedMultiWikiFormat()
      */
     public boolean isPathBasedMultiWikiFormat()
     {
         // Note: the id corresponds to the component hint for the WikiReferenceResolver component role.
         return this.configuration.getProperty(PREFIX + "pathBasedMultiWiki", Boolean.FALSE);
+    }
+
+    /**
+     * {@inheritDoc}
+     * @see StandardURLConfiguration#getWikiPathPrefix()
+     */
+    public String getWikiPathPrefix()
+    {
+        return this.configuration.getProperty(PREFIX + "wikiPathPrefix", "wiki");
     }
 }

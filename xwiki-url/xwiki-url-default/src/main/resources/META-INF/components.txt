@@ -1,2 +1,4 @@
+org.xwiki.url.internal.URLXWikiURLSerializer
+org.xwiki.url.internal.DefaultURLConfiguration
 org.xwiki.url.internal.standard.StandardXWikiURLFactory
-org.xwiki.url.internal.standard.StandardURLFormatConfiguration
+org.xwiki.url.internal.standard.DefaultStandardURLConfiguration

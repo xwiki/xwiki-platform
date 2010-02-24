@@ -22,7 +22,9 @@ package org.xwiki.url.internal.standard;
 import org.xwiki.component.annotation.ComponentRole;
 
 @ComponentRole
-public interface URLFormatConfiguration
+public interface StandardURLConfiguration
 {
     boolean isPathBasedMultiWikiFormat();
+
+    String getWikiPathPrefix();
 }

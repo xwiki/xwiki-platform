@@ -21,6 +21,7 @@ package org.xwiki.url.internal;
 
 import java.net.URL;
 
+import org.xwiki.component.annotation.Component;
 import org.xwiki.url.XWikiURL;
 import org.xwiki.url.XWikiURLSerializer;
 
@@ -31,6 +32,7 @@ import org.xwiki.url.XWikiURLSerializer;
  * @version $Id$
  * @since 2.0M1
  */
+@Component
 public class URLXWikiURLSerializer implements XWikiURLSerializer<URL>
 {
     /**

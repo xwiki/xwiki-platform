@@ -54,7 +54,7 @@ public class StandardXWikiURLFactory implements XWikiURLFactory<URL>
     private static final String IGNORE_PREFIX_KEY = "ignorePrefix";
 
     @Requirement
-    private URLFormatConfiguration configuration;
+    private StandardURLConfiguration configuration;
 
     @Requirement
     private HostResolver hostResolver;
@@ -76,37 +76,30 @@ public class StandardXWikiURLFactory implements XWikiURLFactory<URL>
     {
         XWikiURL xwikiURL;
 
-        // Remove the passed ignore prefix from the URL path.
+        // Step 1: Remove the passed ignored prefix from the URL path.
+        // Note that the reason is because we need to ignore the Servlet Context if this code is called in a Servlet
+        // environment and since the XWiki Application can be installed in the ROOT context, as well as in any Context
+        // there's no way we can guess this, and thus it needs to be passed.
         String ignorePrefix = (String) parameters.get(IGNORE_PREFIX_KEY);
         if (ignorePrefix != null && !url.getPath().startsWith(ignorePrefix)) {
             throw new InvalidURLException("URL Path doesn't start with [" + ignorePrefix + "]");
         }
         StringBuilder path = new StringBuilder(url.getPath().substring(ignorePrefix.length()));
 
-        // Extract all segment to make it easy to decide based on their values.
+        // Step 2: Extract all segment to make it easy to decide based on their values.
         List<String> urlSegments = extractPathSegments(path);
 
-        // Extract the wiki name.
-        // If domain-based multiwiki then extract the wiki reference from the domain
-        String host;
-        int pos;
-        if (!this.configuration.isPathBasedMultiWikiFormat()) {
-            host = url.getHost();
-            pos = 0;
-        } else {
-            // Extract the wiki name (it's the path element just before the type).
-            host = urlSegments.get(1);
-            pos = 2;
-        }
+        // Step 3: Extract the wiki name.
+        // The location of the wiki name depends on whether the wiki is configured to use domain-based multiwiki or
+        // path-based multiwiki. If domain-based multiwiki then extract the wiki reference from the domain, otherwise
+        // extract it from the path.
+        WikiReference wikiReference = extractWikiReference(url, urlSegments);
 
-        WikiReference wikiReference = this.hostResolver.resolve(host);
-
-        // Extract the URL type.
-        String typeAsString = urlSegments.get(pos);
-
+        // Step 4: Extract the URL type and construct a XWiki URL of the corresponding type.
+        String typeAsString = urlSegments.remove(0);
         XWikiURLType type = getXWikiURLType(typeAsString);
         if (type == XWikiURLType.ENTITY) {
-            xwikiURL = buildXWikiURL(wikiReference, urlSegments.subList(pos + 1, urlSegments.size()));
+            xwikiURL = buildXWikiEntityURL(wikiReference, urlSegments);
         } else {
             throw new InvalidURLException("URL type [" + type + "] not supported yet!");
         }
@@ -115,7 +108,7 @@ public class StandardXWikiURLFactory implements XWikiURLFactory<URL>
     }
 
     // TODO: handle query string
-    protected XWikiEntityURL buildXWikiURL(WikiReference wikiReference, List<String> urlSegments)
+    protected XWikiEntityURL buildXWikiEntityURL(WikiReference wikiReference, List<String> urlSegments)
         throws InvalidURLException
     {
         XWikiEntityURL entityURL;
@@ -143,6 +136,26 @@ public class StandardXWikiURLFactory implements XWikiURLFactory<URL>
         entityURL.setAction(action);
 
         return entityURL;
+    }
+
+    protected WikiReference extractWikiReference(URL url, List<String> urlSegments)
+    {
+        String host = null;
+        if (this.configuration.isPathBasedMultiWikiFormat()) {
+            // If the first path element isn't the value of the wikiPathPrefix configuration value then we fall back
+            // to the host name. This also allows the main wiki URL to be domain-based even for a path-based multiwiki.
+            if (urlSegments.get(0).equalsIgnoreCase(this.configuration.getWikiPathPrefix())) {
+                host = urlSegments.get(1);
+                // Remove the first 2 segments so that when this method returns the remaining URL segments point to
+                // the next meaningful item to extract, whether the wiki was domain-based or path-based. 
+                urlSegments.remove(0);
+                urlSegments.remove(0);
+            }
+        }
+        if (host == null) {
+            host = url.getHost();
+        }
+        return this.hostResolver.resolve(host);
     }
 
     protected List<String> extractPathSegments(StringBuilder path) throws InvalidURLException

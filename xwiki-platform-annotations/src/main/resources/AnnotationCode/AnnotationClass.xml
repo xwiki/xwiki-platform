@@ -50,7 +50,7 @@
 <displayType>input</displayType>
 <multiSelect>0</multiSelect>
 <name>author</name>
-<number>5</number>
+<number>6</number>
 <picker>1</picker>
 <prettyName>Author</prettyName>
 <relationalStorage>0</relationalStorage>
@@ -68,7 +68,7 @@
 <dateFormat>dd/MM/yyyy HH:mm:ss</dateFormat>
 <emptyIsToday>1</emptyIsToday>
 <name>date</name>
-<number>7</number>
+<number>8</number>
 <picker>1</picker>
 <prettyName>Date</prettyName>
 <size>20</size>
@@ -80,7 +80,7 @@
 <originalSelection>
 <editor>---</editor>
 <name>originalSelection</name>
-<number>4</number>
+<number>5</number>
 <picker>0</picker>
 <prettyName>Original selection</prettyName>
 <rows>5</rows>
@@ -103,22 +103,35 @@
 <validationRegExp></validationRegExp>
 <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
 </selection>
-<selectionContext>
+<selectionLeftContext>
 <editor>---</editor>
-<name>selectionContext</name>
+<name>selectionLeftContext</name>
 <number>3</number>
 <picker>0</picker>
-<prettyName>Selection context</prettyName>
+<prettyName>Selection left context</prettyName>
 <rows>5</rows>
 <size>40</size>
 <unmodifiable>0</unmodifiable>
 <validationMessage></validationMessage>
 <validationRegExp></validationRegExp>
 <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
-</selectionContext>
+</selectionLeftContext>
+<selectionRightContext>
+<editor>---</editor>
+<name>selectionRightContext</name>
+<number>4</number>
+<picker>0</picker>
+<prettyName>Selection right context</prettyName>
+<rows>5</rows>
+<size>40</size>
+<unmodifiable>0</unmodifiable>
+<validationMessage></validationMessage>
+<validationRegExp></validationRegExp>
+<classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+</selectionRightContext>
 <state>
 <name>state</name>
-<number>8</number>
+<number>9</number>
 <picker>1</picker>
 <prettyName>State</prettyName>
 <size>30</size>
@@ -129,7 +142,7 @@
 </state>
 <target>
 <name>target</name>
-<number>6</number>
+<number>7</number>
 <picker>0</picker>
 <prettyName>Target</prettyName>
 <size>30</size>

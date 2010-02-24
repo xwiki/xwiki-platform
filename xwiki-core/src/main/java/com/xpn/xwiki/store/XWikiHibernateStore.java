@@ -123,6 +123,12 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
      */
     private DocumentReferenceResolver currentMixedDocumentReferenceResolver =
         Utils.getComponent(DocumentReferenceResolver.class, "currentmixed");
+
+    /**
+     * Used to convert a proper Document Reference to string (standard form).
+     */
+    private EntityReferenceSerializer<String> defaultEntityReferenceSerializer =
+        Utils.getComponent(EntityReferenceSerializer.class);
     
     /**
      * Used to convert a Document Reference to string (compact form without the wiki part).
@@ -428,11 +434,10 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
             }
             doc.setStore(this);
             // Make sure the database name is stored
-            doc.setDatabase(context.getDatabase());
+            doc.getDocumentReference().setWikiReference(new WikiReference(context.getDatabase()));
 
             if (bTransaction) {
                 checkHibernate(context);
-
                 SessionFactory sfactory = injectCustomMappingsInSessionFactory(doc, context);
                 bTransaction = beginTransaction(sfactory, context);
             }
@@ -463,7 +468,7 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
                     doc.setContentAuthor(doc.getAuthor());
                 }
                 doc.incrementVersion();
-                if (context.getWiki().hasVersioning(doc.getFullName(), context)) {
+                if (context.getWiki().hasVersioning(context)) {
                     context.getWiki().getVersioningStore().updateXWikiDocArchive(doc, false, context);
                 }
 
@@ -473,7 +478,7 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
                 if (doc.getDocumentArchive() != null) {
                     // Let's make sure we save the archive if we have one
                     // This is especially needed if we load a document from XML
-                    if (context.getWiki().hasVersioning(doc.getFullName(), context)) {
+                    if (context.getWiki().hasVersioning(context)) {
                         context.getWiki().getVersioningStore().saveXWikiDocArchive(doc.getDocumentArchive(), false,
                             context);
                     }
@@ -481,7 +486,7 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
                     // Make sure the getArchive call has been made once
                     // with a valid context
                     try {
-                        if (context.getWiki().hasVersioning(doc.getFullName(), context)) {
+                        if (context.getWiki().hasVersioning(context)) {
                             doc.getDocumentArchive(context);
                         }
                     } catch (XWikiException e) {
@@ -630,7 +635,7 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
             doc.setOriginalDocument((XWikiDocument) doc.clone());
 
         } catch (Exception e) {
-            Object[] args = {doc.getFullName()};
+            Object[] args = {this.defaultEntityReferenceSerializer.serialize(doc.getDocumentReference())};
             throw new XWikiException(XWikiException.MODULE_XWIKI_STORE,
                 XWikiException.ERROR_XWIKI_STORE_HIBERNATE_SAVING_DOC, "Exception while saving document {0}", e, args);
         } finally {

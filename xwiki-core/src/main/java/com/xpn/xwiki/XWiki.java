@@ -93,6 +93,7 @@ import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.model.reference.AttachmentReference;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
+import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.model.reference.WikiReference;
 import org.xwiki.observation.ObservationManager;
@@ -286,6 +287,18 @@ public class XWiki implements XWikiDocChangeNotificationInterface
      * List of configured syntax ids.
      */
     private List<String> configuredSyntaxes;
+
+    /**
+     * Used to convert a proper Document Reference to string (standard form).
+     */
+    private EntityReferenceSerializer<String> defaultEntityReferenceSerializer =
+        Utils.getComponent(EntityReferenceSerializer.class);
+
+    /**
+     * @see org.xwiki.model.internal.reference.DefaultStringDocumentReferenceResolver
+     */
+    private DocumentReferenceResolver<String> defaultDocumentReferenceResolver = Utils.getComponent(
+        DocumentReferenceResolver.class);
 
     /**
      * Used to resolve a string into a proper Document Reference using the current document's reference to fill the
@@ -1329,7 +1342,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface
             // originalDocument is null are rare (specifically when the XWikiDocument object is
             // manually constructed, and not obtained using the API).
             if (originalDocument == null) {
-                originalDocument = new XWikiDocument(doc.getWikiName(), doc.getSpace(), doc.getName());
+                originalDocument = new XWikiDocument(doc.getDocumentReference());
             }
 
             // Notify listeners about the document change
@@ -1372,7 +1385,8 @@ public class XWiki implements XWikiDocChangeNotificationInterface
                     }
                 }
             } catch (Exception ex) {
-                LOG.error("Failed to send document save notifications for document [" + doc.getFullName() + "]", ex);
+                LOG.error("Failed to send document save notification for document ["
+                    + this.defaultEntityReferenceSerializer.serialize(doc.getDocumentReference()) + "]", ex);
             } finally {
                 doc.setOriginalDocument(newOriginal);
             }
@@ -6824,9 +6838,21 @@ public class XWiki implements XWikiDocChangeNotificationInterface
         return context.getWiki().getXWikiPreference("mandatory_display", star, context);
     }
 
-    public boolean hasVersioning(String fullName, XWikiContext context)
+    /**
+     * @since 2.3M1
+     */
+    public boolean hasVersioning(XWikiContext context)
     {
         return ("1".equals(context.getWiki().Param("xwiki.store.versioning", "1")));
+    }
+
+    /**
+     * @deprecated since 2.3M1 use {@link #hasVersioning(XWikiContext)} instead
+     */
+    @Deprecated
+    public boolean hasVersioning(String fullName, XWikiContext context)
+    {
+        return hasVersioning(context);
     }
 
     public boolean hasAttachmentVersioning(XWikiContext context)

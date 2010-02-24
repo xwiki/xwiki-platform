@@ -5594,7 +5594,7 @@ public class XWikiDocument implements DocumentModelBridge
 
     public void resetArchive(XWikiContext context) throws XWikiException
     {
-        boolean hasVersioning = context.getWiki().hasVersioning(getFullName(), context);
+        boolean hasVersioning = context.getWiki().hasVersioning(context);
         if (hasVersioning) {
             getVersioningStore(context).resetRCSArchive(this, true, context);
         }

@@ -21,6 +21,7 @@
 package org.xwiki.url;
 
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.HashMap;
@@ -42,7 +43,7 @@ public class AbstractXWikiURL implements XWikiURL
     /**
      * @see #getParameters()
      */
-    private Map<String, List<String>> parameters = new HashMap<String, List<String>>();
+    private Map<String, List<String>> parameters = new LinkedHashMap<String, List<String>>();
 
     public AbstractXWikiURL(XWikiURLType type)
     {
@@ -76,7 +77,7 @@ public class AbstractXWikiURL implements XWikiURL
      * A XWiki URL parameter provides optional additional information about the URL. 
      * For example these will find their way into the Query String when the XWiki URL serialized to a standard URL.
      * Note that there can be several values for the same name (since this is allowed in URLs and we want to map a 
-     * URL to a XWiki URL).
+     * URL to a XWiki URL). Also note that the order in the map is the same as the order in the URL.
      * 
      * @return the XWiki URL parameters
      */

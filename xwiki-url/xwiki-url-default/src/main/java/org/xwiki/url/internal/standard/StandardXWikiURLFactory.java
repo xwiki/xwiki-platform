@@ -134,10 +134,17 @@ public class StandardXWikiURLFactory implements XWikiURLFactory<URL>
             throw new InvalidURLException("URL type [" + state.urlType + "] not supported yet!");
         }
 
+        // Add the Query string parameters
+        if (uri.getQuery() != null) {
+            for (String nameValue : Arrays.asList(uri.getQuery().split("&"))) {
+                String[] pair = nameValue.split("=", 2);
+                xwikiURL.addParameter(pair[0], pair[1]);
+            }
+        }
+        
         return xwikiURL;
     }
 
-    // TODO: handle query string
     protected XWikiEntityURL buildXWikiEntityURL(WikiReference wikiReference, List<String> urlSegments)
         throws InvalidURLException
     {

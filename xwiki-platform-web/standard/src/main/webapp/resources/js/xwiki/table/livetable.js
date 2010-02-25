@@ -359,7 +359,7 @@ XWiki.widgets.LiveTable = Class.create({
             elem.addClassName("selected");
             self.selectedColumn = elem;
          }
-         self.totalRows = -1; //reset
+         self.clearCache(); //reset
          self.showRows(1, self.limit);
       });
    });

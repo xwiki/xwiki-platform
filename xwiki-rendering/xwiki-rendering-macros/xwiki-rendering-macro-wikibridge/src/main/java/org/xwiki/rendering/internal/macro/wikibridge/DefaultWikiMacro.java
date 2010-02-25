@@ -221,7 +221,7 @@ public class DefaultWikiMacro implements WikiMacro
             // it's context ($context.macro) which holds macro parameters, macro content and other important structures.
             // This workaround ensures that macro code is evaluated with programming rights, which in turn ensures that
             // $context.macro is accessible within the macro code.
-            xwikiContext.put(CONTEXT_DOCUMENT_KEY, docBridge.getDocument(getDocumentName()));
+            xwikiContext.put(CONTEXT_DOCUMENT_KEY, docBridge.getDocument(getDocumentReference()));
 
             // Perform internal macro transformations.
             macroTransformation.transform(xdom, syntaxFactory.createSyntaxFromIdString(syntaxId));
@@ -272,10 +272,9 @@ public class DefaultWikiMacro implements WikiMacro
     }
 
     /**
-     * @return the name of the document containing the macro class definition
-     * @since 2.2M1
+     * {@inheritDoc}
      */
-    public DocumentReference getDocumentName()
+    public DocumentReference getDocumentReference()
     {
         return this.macroDocumentReference;
     }

@@ -88,16 +88,16 @@ public class DefaultWikiMacroManagerTest extends AbstractComponentTestCase
             allowing(mockDocumentAccessBridge).hasProgrammingRights(); will(returnValue(true));
         }});
 
-        Assert.assertFalse(wikiMacroManager.hasWikiMacro(wikiMacro.getDocumentName()));
+        Assert.assertFalse(wikiMacroManager.hasWikiMacro(wikiMacro.getDocumentReference()));
 
-        wikiMacroManager.registerWikiMacro(wikiMacro.getDocumentName(), wikiMacro);
-        Assert.assertTrue(wikiMacroManager.hasWikiMacro(wikiMacro.getDocumentName()));
+        wikiMacroManager.registerWikiMacro(wikiMacro.getDocumentReference(), wikiMacro);
+        Assert.assertTrue(wikiMacroManager.hasWikiMacro(wikiMacro.getDocumentReference()));
 
         Macro< ? > registeredMacro = macroManager.getMacro(new MacroId("testwikimacro"));
         Assert.assertEquals(0, registeredMacro.compareTo(wikiMacro));
 
-        wikiMacroManager.unregisterWikiMacro(wikiMacro.getDocumentName());
-        Assert.assertFalse(wikiMacroManager.hasWikiMacro(wikiMacro.getDocumentName()));
+        wikiMacroManager.unregisterWikiMacro(wikiMacro.getDocumentReference());
+        Assert.assertFalse(wikiMacroManager.hasWikiMacro(wikiMacro.getDocumentReference()));
 
         Assert.assertFalse(macroManager.exists(new MacroId("testwikimacro")));
     }
@@ -111,11 +111,11 @@ public class DefaultWikiMacroManagerTest extends AbstractComponentTestCase
         mockery.checking(new Expectations() {{
             allowing(mockDocumentAccessBridge).getCurrentWiki(); will(returnValue("wiki"));
             allowing(mockDocumentAccessBridge).getCurrentUser(); will(returnValue("dummy"));
-            allowing(mockDocumentAccessBridge).isDocumentEditable(wikiMacro.getDocumentName()); will(returnValue(true));
+            allowing(mockDocumentAccessBridge).isDocumentEditable(wikiMacro.getDocumentReference()); will(returnValue(true));
         }});
 
-        wikiMacroManager.registerWikiMacro(wikiMacro.getDocumentName(), wikiMacro);
-        Assert.assertTrue(wikiMacroManager.hasWikiMacro(wikiMacro.getDocumentName()));
+        wikiMacroManager.registerWikiMacro(wikiMacro.getDocumentReference(), wikiMacro);
+        Assert.assertTrue(wikiMacroManager.hasWikiMacro(wikiMacro.getDocumentReference()));
 
         Macro< ? > registeredMacro = macroManager.getMacro(new MacroId("testwikimacro"));
         Assert.assertEquals(0, registeredMacro.compareTo(wikiMacro));
@@ -129,11 +129,11 @@ public class DefaultWikiMacroManagerTest extends AbstractComponentTestCase
         // Simulate a user with programming rights
         mockery.checking(new Expectations() {{
             allowing(mockDocumentAccessBridge).getCurrentUser(); will(returnValue("dummy"));
-            allowing(mockDocumentAccessBridge).isDocumentEditable(wikiMacro.getDocumentName()); will(returnValue(true));
+            allowing(mockDocumentAccessBridge).isDocumentEditable(wikiMacro.getDocumentReference()); will(returnValue(true));
         }});
 
-        wikiMacroManager.registerWikiMacro(wikiMacro.getDocumentName(), wikiMacro);
-        Assert.assertTrue(wikiMacroManager.hasWikiMacro(wikiMacro.getDocumentName()));
+        wikiMacroManager.registerWikiMacro(wikiMacro.getDocumentReference(), wikiMacro);
+        Assert.assertTrue(wikiMacroManager.hasWikiMacro(wikiMacro.getDocumentReference()));
 
         Macro< ? > registeredMacro = macroManager.getMacro(new MacroId("testwikimacro"));
         Assert.assertEquals(0, registeredMacro.compareTo(wikiMacro));
@@ -150,7 +150,7 @@ public class DefaultWikiMacroManagerTest extends AbstractComponentTestCase
         }});
 
         try {
-            wikiMacroManager.registerWikiMacro(wikiMacro.getDocumentName(), wikiMacro);
+            wikiMacroManager.registerWikiMacro(wikiMacro.getDocumentReference(), wikiMacro);
             Assert.fail("Should have raised an exception here");
         } catch (WikiMacroException e) {
             Assert.assertEquals("Unable to register macro [testwikimacro] in "
@@ -167,12 +167,12 @@ public class DefaultWikiMacroManagerTest extends AbstractComponentTestCase
 
         // Simulate a user without edit rights
         mockery.checking(new Expectations() {{
-            allowing(mockDocumentAccessBridge).isDocumentEditable(wikiMacro.getDocumentName());
+            allowing(mockDocumentAccessBridge).isDocumentEditable(wikiMacro.getDocumentReference());
                 will(returnValue(false));
         }});
 
         try {
-            wikiMacroManager.registerWikiMacro(wikiMacro.getDocumentName(), wikiMacro);
+            wikiMacroManager.registerWikiMacro(wikiMacro.getDocumentReference(), wikiMacro);
             Assert.fail("Should have raised an exception here");
         } catch (WikiMacroException e) {
             Assert.assertEquals("Unable to register macro [testwikimacro] in [name = [TestWikiMacro], "
@@ -189,12 +189,12 @@ public class DefaultWikiMacroManagerTest extends AbstractComponentTestCase
 
         // Simulate a user without edit rights
         mockery.checking(new Expectations() {{
-            allowing(mockDocumentAccessBridge).isDocumentEditable(wikiMacro.getDocumentName());
+            allowing(mockDocumentAccessBridge).isDocumentEditable(wikiMacro.getDocumentReference());
                 will(returnValue(false));
         }});
 
         try {
-            wikiMacroManager.registerWikiMacro(wikiMacro.getDocumentName(), wikiMacro);
+            wikiMacroManager.registerWikiMacro(wikiMacro.getDocumentReference(), wikiMacro);
             Assert.fail("Should have raised an exception here");
         } catch (WikiMacroException e) {
             Assert.assertEquals("Unable to register macro [testwikimacro] in [name = [TestWikiMacro], "

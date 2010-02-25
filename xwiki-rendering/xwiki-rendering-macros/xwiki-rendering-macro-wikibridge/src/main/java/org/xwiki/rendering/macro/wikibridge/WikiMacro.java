@@ -19,6 +19,7 @@
  */
 package org.xwiki.rendering.macro.wikibridge;
 
+import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.rendering.macro.Macro;
 
 /**
@@ -35,4 +36,10 @@ public interface WikiMacro extends Macro<WikiMacroParameters>
      */
     @Deprecated
     String getId();
+
+    /**
+     * @return the {@link DocumentReference} of the Wiki Macro
+     * @since 2.3M1
+     */
+    DocumentReference getDocumentReference();
 }

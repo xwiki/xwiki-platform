@@ -22,8 +22,12 @@ package org.xwiki.url.internal.standard;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.Requirement;
 import org.xwiki.configuration.ConfigurationSource;
-import org.xwiki.url.internal.standard.StandardURLConfiguration;
+import org.xwiki.url.standard.StandardURLConfiguration;
 
+/**
+ * @version $Id$
+ * @since 2.3M1
+ */
 @Component
 public class DefaultStandardURLConfiguration implements StandardURLConfiguration
 {
@@ -40,7 +44,7 @@ public class DefaultStandardURLConfiguration implements StandardURLConfiguration
 
     /**
      * {@inheritDoc}
-     * @see StandardURLConfiguration#isPathBasedMultiWikiFormat()
+     * @see org.xwiki.url.standard.StandardURLConfiguration#isPathBasedMultiWikiFormat()
      */
     public boolean isPathBasedMultiWikiFormat()
     {

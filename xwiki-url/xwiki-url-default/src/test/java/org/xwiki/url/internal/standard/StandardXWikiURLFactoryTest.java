@@ -34,12 +34,12 @@ import org.xwiki.url.XWikiEntityURL;
 import org.xwiki.url.XWikiURL;
 import org.xwiki.url.XWikiURLFactory;
 import org.xwiki.url.XWikiURLType;
+import org.xwiki.url.standard.HostResolver;
+import org.xwiki.url.standard.StandardURLConfiguration;
 
 import java.net.URL;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -102,42 +102,10 @@ public class StandardXWikiURLFactoryTest extends AbstractComponentTestCase
     }
 
     @Test
-    public void testCreateXWikiURLWhenNoViewAction() throws Exception
+    public void testCreateXWikiURLWhenTrailingSlah() throws Exception
     {
         XWikiURL xwikiURL = createURL("http://host/xwiki/bin/", true, "host");
         assertXWikiURL(xwikiURL, "view", new DocumentReference("Wiki", "Main", "WebHome"));
-
-        xwikiURL = createURL("http://host/xwiki/bin", true, "host");
-        assertXWikiURL(xwikiURL, "view", new DocumentReference("Wiki", "Main", "WebHome"));
-
-        xwikiURL = createURL("http://host/xwiki/bin/Space/Page", true, "host");
-        assertXWikiURL(xwikiURL, "view", new DocumentReference("Wiki", "Space", "Page"));
-
-        xwikiURL = createURL("http://host/xwiki/bin/Page", true, "host");
-        assertXWikiURL(xwikiURL, "view", new DocumentReference("Wiki", "Main", "Page"));
-
-        xwikiURL = createURL("http://host/xwiki/bin/Space/", true, "host");
-        assertXWikiURL(xwikiURL, "view", new DocumentReference("Wiki", "Space", "WebHome"));
-    }
-
-    @Test
-    public void testCreateXWikiURLWhenViewAction() throws Exception
-    {
-        XWikiURL xwikiURL = createURL("http://host/xwiki/bin/view/Space/", true, "host");
-        assertXWikiURL(xwikiURL, "view", new DocumentReference("Wiki", "Space", "WebHome"));
-
-        xwikiURL = createURL("http://host/xwiki/bin/view/Space/Page", true, "host");
-        assertXWikiURL(xwikiURL, "view", new DocumentReference("Wiki", "Space", "Page"));
-
-        xwikiURL = createURL("http://host/xwiki/bin/view/Space/Page/", true, "host");
-        assertXWikiURL(xwikiURL, "view", new DocumentReference("Wiki", "Space", "Page"));
-
-        xwikiURL = createURL("http://host/xwiki/bin/view/Space/Page/ignored/path", true, "host");
-        assertXWikiURL(xwikiURL, "view", new DocumentReference("Wiki", "Space", "Page"));
-
-        // Ensure there can be dots in document name for example
-        xwikiURL = createURL("http://host/xwiki/bin/view/Space/Page.With.Dots", true, "host");
-        assertXWikiURL(xwikiURL, "view", new DocumentReference("Wiki", "Space", "Page.With.Dots"));
     }
 
     @Test
@@ -151,14 +119,6 @@ public class StandardXWikiURLFactoryTest extends AbstractComponentTestCase
         } catch (InvalidURLException expected) {
             Assert.assertEquals("Invalid URL [http://host/xwiki/bin/view/Space/Page Name]", expected.getMessage());
         }
-    }
-
-    @Test
-    public void testCreateXWikiURLWhenDownloadAction() throws Exception
-    {
-        XWikiURL xwikiURL = createURL("http://host/xwiki/bin/download/Space/Page/attachment.ext", true, "host");
-        assertXWikiURL(xwikiURL, "download",
-            new AttachmentReference("attachment.ext", new DocumentReference("Wiki", "Space", "Page")));
     }
 
     @Test

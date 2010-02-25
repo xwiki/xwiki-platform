@@ -29,6 +29,7 @@ import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.WikiReference;
 import org.xwiki.test.AbstractComponentTestCase;
+import org.xwiki.url.InvalidURLException;
 import org.xwiki.url.XWikiEntityURL;
 import org.xwiki.url.XWikiURL;
 import org.xwiki.url.XWikiURLFactory;
@@ -71,7 +72,7 @@ public class StandardXWikiURLFactoryTest extends AbstractComponentTestCase
     }
 
     @Test
-    public void testCreatePathBasedWikiURL() throws Exception
+    public void testCreatePathBasedXWikiURL() throws Exception
     {
         // Verify Main wiki URL.
         assertXWikiURL("http://localhost:8080/xwiki/bin/view/Space/Page", false, "localhost", "view",
@@ -83,7 +84,7 @@ public class StandardXWikiURLFactoryTest extends AbstractComponentTestCase
     }
     
     @Test
-    public void testCreateDomainBasedWikiURL() throws Exception
+    public void testCreateDomainBasedXWikiURL() throws Exception
     {
         // Verify Main wiki URL.
         assertXWikiURL("http://localhost:8080/xwiki/bin/view/Space/Page", true, "localhost", "view",
@@ -95,7 +96,7 @@ public class StandardXWikiURLFactoryTest extends AbstractComponentTestCase
     }
 
     @Test
-    public void testCreateURLWhenNoViewAction() throws Exception
+    public void testCreateXWikiURLWhenNoViewAction() throws Exception
     {
         assertXWikiURL("http://host/xwiki/bin/", true, "host", "view",
             new DocumentReference("Wiki", "Main", "WebHome"));
@@ -110,7 +111,7 @@ public class StandardXWikiURLFactoryTest extends AbstractComponentTestCase
     }
 
     @Test
-    public void testCreateURLWhenViewAction() throws Exception
+    public void testCreateXWikiURLWhenViewAction() throws Exception
     {
         assertXWikiURL("http://host/xwiki/bin/view/Space/", true, "host", "view",
             new DocumentReference("Wiki", "Space", "WebHome"));
@@ -127,14 +128,27 @@ public class StandardXWikiURLFactoryTest extends AbstractComponentTestCase
     }
 
     @Test
-    public void testCreateURLWithEncodedChars() throws Exception
+    public void testCreateXWikiURLWithEncodedChars() throws Exception
     {
         assertXWikiURL("http://host/xwiki/bin/view/Space/Page%20Name", true, "host", "view",
             new DocumentReference("Wiki", "Space", "Page Name"));
     }
 
     @Test
-    public void testCreateURLWhenDownloadAction() throws Exception
+    public void testCreateXWikiURLWhenInvalidURL() throws Exception
+    {
+        try {
+            // Invalid URL since the space isn't encoded.
+            assertXWikiURL("http://host/xwiki/bin/view/Space/Page Name", true, "host", "view",
+                new DocumentReference("Wiki", "Space", "Page Name"));
+            Assert.fail("Should have thrown an exception here");
+        } catch (InvalidURLException expected) {
+            Assert.assertEquals("Invalid URL [http://host/xwiki/bin/view/Space/Page Name]", expected.getMessage());
+        }
+    }
+
+    @Test
+    public void testCreateXWikiURLWhenDownloadAction() throws Exception
     {
         assertXWikiURL("http://host/xwiki/bin/download/Space/Page/attachment.ext", true, "host", "download",
             new AttachmentReference("attachment.ext", new DocumentReference("Wiki", "Space", "Page")));

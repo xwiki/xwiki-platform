@@ -90,7 +90,8 @@ public class StandardXWikiURLFactory implements XWikiURLFactory<URL>
     {
         XWikiURL xwikiURL;
 
-        // Convert the URL to a URI since URI perform correctly encoding and decoding.
+        // Convert the URL to a URI since URI performs correctly decoding.
+        // Note that this means that this method only accepts valid URLs (with proper encoding)
         URI uri;
         try {
             uri = url.toURI();

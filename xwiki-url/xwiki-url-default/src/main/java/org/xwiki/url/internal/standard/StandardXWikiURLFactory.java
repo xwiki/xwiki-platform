@@ -135,9 +135,11 @@ public class StandardXWikiURLFactory implements XWikiURLFactory<URL>
         }
 
         // Add the Query string parameters
+        // TODO: Add special support for revisions and language since those are in XWikiEntityURL.
         if (uri.getQuery() != null) {
             for (String nameValue : Arrays.asList(uri.getQuery().split("&"))) {
                 String[] pair = nameValue.split("=", 2);
+                // Check if the parameter has a value or not.
                 if (pair.length == 2) {
                     xwikiURL.addParameter(pair[0], pair[1]);
                 } else {

@@ -177,7 +177,7 @@ In XWiki.Registration, the fields are defined separately from the code which gen
 
 Here is the definition of a field which is used in the registration page
 
-{{code}}
+{{code language=none}}
 ## The user name field, mandatory and programmatically checked to make sure the username doesn't exist.
 #set($field = 
   {'name' : 'xwikiname',

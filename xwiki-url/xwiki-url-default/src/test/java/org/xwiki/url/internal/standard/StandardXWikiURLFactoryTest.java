@@ -150,7 +150,24 @@ public class StandardXWikiURLFactoryTest extends AbstractComponentTestCase
         expectedMap.put("param", Arrays.asList("-"));
         Assert.assertEquals(expectedMap, xwikiURL.getParameters());
     }
-    
+
+    /**
+     * Verify we ignore path parameters (see section 3.3 of the RFC 2396: http://www.faqs.org/rfcs/rfc2396.html).
+     */
+    @Test
+    public void testCreateXWikiURLWhenURLHasPathParameters() throws Exception
+    {
+        XWikiURL xwikiURL =
+            createURL("http://host/xwiki/bin/view/Space;param1=value1/Page;param2=value2", true, "host");
+        assertXWikiURL(xwikiURL, "view", new DocumentReference("Wiki", "Space", "Page"));
+
+        // Ensure we don't remove ";" when they are encoded in order to allow the ";" character to be in document names
+        // for example.
+        xwikiURL =
+            createURL("http://host/xwiki/bin/view/Space/My%3BPage", true, "host");
+        assertXWikiURL(xwikiURL, "view", new DocumentReference("Wiki", "Space", "My;Page"));
+    }
+
     private XWikiURL createURL(String url, final boolean isDomainBasedWikiFormat, final String expectedHost)
         throws Exception
     {

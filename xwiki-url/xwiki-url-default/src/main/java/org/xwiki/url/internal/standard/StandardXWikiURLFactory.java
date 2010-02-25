@@ -32,9 +32,12 @@ import org.xwiki.url.standard.HostResolver;
 import org.xwiki.url.standard.StandardURLConfiguration;
 import org.xwiki.url.standard.XWikiURLBuilder;
 
+import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.net.URLDecoder;
+import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -108,11 +111,11 @@ public class StandardXWikiURLFactory implements XWikiURLFactory<URL>
             throw new InvalidURLException("URL Path doesn't start with [" + ignorePrefix + "]");
         }
         // Note: We also remove the leading "/" after the ignored prefix.
-        String path = uri.getPath().substring(ignorePrefix.length() + 1);
+        String path = uri.getRawPath().substring(ignorePrefix.length() + 1);
 
         // Step 2: Extract all segment to make it easy to decide based on their values.
         URLParsingState state = new URLParsingState();
-        state.urlSegments = new ArrayList<String>(Arrays.asList(path.split("/", -1)));
+        state.urlSegments = extractPathSegments(path);
 
         // Step 3: Extract the wiki name.
         // The location of the wiki name depends on whether the wiki is configured to use domain-based multiwiki or
@@ -152,6 +155,46 @@ public class StandardXWikiURLFactory implements XWikiURLFactory<URL>
         }
         
         return xwikiURL;
+    }
+
+    /**
+     * Extract segments between "/" characters in the passed path. Also remove any path parameters (i.e. content
+     * after ";" in a path segment; for ex ";jsessionid=...") since we don't want to have these params in the
+     * segments we return and act on (otherwise we would get them in document names for example).
+     *
+     * Note that we only remove ";" characters when they are not URL-encoded. We want to allow the ";" character to be
+     * in document names for example.
+     */
+    protected List<String> extractPathSegments(String rawPath)
+    {
+        List<String> urlSegments = new ArrayList<String>();
+
+        // Note that we use -1 in the call below in order to get empty segments too. This is needed since in our
+        // URL format "bin/view/Page" represents a Page while "bin/view/Space/" represents a Space.
+        for (String pathSegment : rawPath.split("/", -1)) {
+
+            // Remove path parameters
+            String normalizedPathSegment = pathSegment.split(";", 2)[0];
+
+            // Now let's decode it
+            String decodedPathSegment;
+            try {
+                // Note: we decode using UTF-8 since the URI javadoc says:
+                // "A sequence of escaped octets is decoded by replacing it with the sequence of characters that it
+                // represents in the UTF-8 character set. UTF-8 contains US-ASCII, hence decoding has the effect of
+                // de-quoting any quoted US-ASCII characters as well as that of decoding any encoded non-US-ASCII
+                // characters."
+                decodedPathSegment = URLDecoder.decode(normalizedPathSegment, "UTF-8");
+            } catch (UnsupportedEncodingException e) {
+                // Not supporting UTF-8 as a valid encoding for some reasons. We consider XWiki cannot work
+                // without that encoding.
+                throw new RuntimeException("Failed to URL decode [" + normalizedPathSegment + "] using UTF-8.", e);
+            }
+
+            urlSegments.add(decodedPathSegment);
+        }
+
+        return urlSegments;
     }
 
     protected WikiReference extractWikiReference(URI uri, URLParsingState state)

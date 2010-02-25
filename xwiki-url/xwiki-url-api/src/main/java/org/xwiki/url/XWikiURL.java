@@ -31,7 +31,10 @@ import java.util.Map;
 public interface XWikiURL
 {
     XWikiURLType getType();
-    
+
+    /**
+     * @param value the value of the parameter to add. If null then no value is added.
+     */
     void addParameter(String name, String value);
 
     Map<String, List<String>> getParameters();

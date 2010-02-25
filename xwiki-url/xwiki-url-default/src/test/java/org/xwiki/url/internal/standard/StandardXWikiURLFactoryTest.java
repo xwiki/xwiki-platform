@@ -36,6 +36,7 @@ import org.xwiki.url.XWikiURLFactory;
 import org.xwiki.url.XWikiURLType;
 
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
@@ -171,6 +172,12 @@ public class StandardXWikiURLFactoryTest extends AbstractComponentTestCase
         Map<String, List<String>> expectedMap = new LinkedHashMap<String, List<String>>();
         expectedMap.put("param1", Arrays.asList("value1"));
         expectedMap.put("param2", Arrays.asList("value2"));
+        Assert.assertEquals(expectedMap, xwikiURL.getParameters());
+
+        // Verify it works when there's a param with no value.
+        xwikiURL = createURL("http://host/xwiki/bin/view/Space/Page?param", true, "host");
+        expectedMap = new LinkedHashMap<String, List<String>>();
+        expectedMap.put("param", Collections.<String>emptyList());
         Assert.assertEquals(expectedMap, xwikiURL.getParameters());
     }
 

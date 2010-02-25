@@ -62,14 +62,16 @@ public class AbstractXWikiURL implements XWikiURL
     {
         this.type = type;
     }
-    
+
     public void addParameter(String name, String value)
     {
         List<String> list = this.parameters.get(name);
         if (list == null) {
             list = new ArrayList<String>();
         }
-        list.add(value);
+        if (value != null) {
+            list.add(value);
+        }
         this.parameters.put(name, list);
     }
 

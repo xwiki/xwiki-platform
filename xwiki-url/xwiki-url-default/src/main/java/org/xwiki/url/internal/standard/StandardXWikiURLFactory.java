@@ -138,7 +138,11 @@ public class StandardXWikiURLFactory implements XWikiURLFactory<URL>
         if (uri.getQuery() != null) {
             for (String nameValue : Arrays.asList(uri.getQuery().split("&"))) {
                 String[] pair = nameValue.split("=", 2);
-                xwikiURL.addParameter(pair[0], pair[1]);
+                if (pair.length == 2) {
+                    xwikiURL.addParameter(pair[0], pair[1]);
+                } else {
+                    xwikiURL.addParameter(pair[0], null);
+                }
             }
         }
         

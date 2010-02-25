@@ -17,7 +17,7 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.url.internal;
+package org.xwiki.url.internal.standard;
 
 import java.net.URL;
 
@@ -32,7 +32,7 @@ import org.xwiki.url.XWikiURLSerializer;
  * @version $Id$
  * @since 2.0M1
  */
-@Component
+@Component("standard")
 public class URLXWikiURLSerializer implements XWikiURLSerializer<URL>
 {
     /**

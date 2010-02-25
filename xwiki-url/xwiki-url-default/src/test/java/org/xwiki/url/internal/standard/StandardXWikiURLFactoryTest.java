@@ -24,7 +24,9 @@ import org.jmock.Mockery;
 import org.junit.Assert;
 import org.junit.Test;
 import org.xwiki.component.descriptor.DefaultComponentDescriptor;
+import org.xwiki.model.reference.AttachmentReference;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.WikiReference;
 import org.xwiki.test.AbstractComponentTestCase;
 import org.xwiki.url.XWikiEntityURL;
@@ -69,82 +71,82 @@ public class StandardXWikiURLFactoryTest extends AbstractComponentTestCase
     }
 
     @Test
-    public void testCreateDomainBasedMainWikiURL() throws Exception
+    public void testCreatePathBasedWikiURL() throws Exception
     {
-        this.mockery.checking(new Expectations() {{
-            allowing(mockHostResolver).resolve("localhost");
-                will(returnValue(new WikiReference("Wiki")));
-            allowing(mockConfiguration).isPathBasedMultiWikiFormat();
-                will(returnValue(false));
-        }});
+        // Verify Main wiki URL.
+        assertXWikiURL("http://localhost:8080/xwiki/bin/view/Space/Page", false, "localhost", "view",
+            new DocumentReference("Wiki", "Space", "Page"));
 
-        XWikiURL xwikiURL = this.factory.createURL(new URL("http://localhost:8080/xwiki/bin/view/Space/Page"),
-            Collections.<String, Object>singletonMap("ignorePrefix", "/xwiki"));
+        // Verify Sub Wiki URL.
+        assertXWikiURL("http://host/xwiki/wiki/subwiki/view/Space/Page", false, "subwiki", "view",
+            new DocumentReference("Wiki", "Space", "Page"));
+    }
+    
+    @Test
+    public void testCreateDomainBasedWikiURL() throws Exception
+    {
+        // Verify Main wiki URL.
+        assertXWikiURL("http://localhost:8080/xwiki/bin/view/Space/Page", true, "localhost", "view",
+            new DocumentReference("Wiki", "Space", "Page"));
 
-        Assert.assertEquals(XWikiURLType.ENTITY, xwikiURL.getType());
-        XWikiEntityURL entityURL = (XWikiEntityURL) xwikiURL;
-        Assert.assertEquals("view", entityURL.getAction());
-        Assert.assertEquals(new DocumentReference("Wiki", "Space", "Page"), entityURL.getEntityReference());
+        // Verify Sub Wiki URL.
+        assertXWikiURL("http://subwiki.domain.ext/xwiki/bin/view/Space/Page", true, "subwiki.domain.ext", "view",
+            new DocumentReference("Wiki", "Space", "Page"));
     }
 
     @Test
-    public void testCreateDomainBasedSubWikiURL() throws Exception
+    public void testCreateURLWhenNoViewAction() throws Exception
     {
-        this.mockery.checking(new Expectations() {{
-            allowing(mockHostResolver).resolve("subwiki.domain.ext");
-                will(returnValue(new WikiReference("Wiki")));
-            allowing(mockConfiguration).isPathBasedMultiWikiFormat();
-                will(returnValue(false));
-        }});
-
-        XWikiURL xwikiURL = this.factory.createURL(new URL("http://subwiki.domain.ext/xwiki/bin/view/Space/Page"),
-            Collections.<String, Object>singletonMap("ignorePrefix", "/xwiki"));
-
-        Assert.assertEquals(XWikiURLType.ENTITY, xwikiURL.getType());
-        XWikiEntityURL entityURL = (XWikiEntityURL) xwikiURL;
-        Assert.assertEquals("view", entityURL.getAction());
-        Assert.assertEquals(new DocumentReference("Wiki", "Space", "Page"), entityURL.getEntityReference());
+        assertXWikiURL("http://host/xwiki/bin/", true, "host", "view",
+            new DocumentReference("Wiki", "Main", "WebHome"));
+        assertXWikiURL("http://host/xwiki/bin", true, "host", "view",
+            new DocumentReference("Wiki", "Main", "WebHome"));
+        assertXWikiURL("http://host/xwiki/bin/Space/Page", true, "host", "view",
+            new DocumentReference("Wiki", "Space", "Page"));
+        assertXWikiURL("http://host/xwiki/bin/Page", true, "host", "view",
+            new DocumentReference("Wiki", "Main", "Page"));
+        assertXWikiURL("http://host/xwiki/bin/Space/", true, "host", "view",
+            new DocumentReference("Wiki", "Space", "WebHome"));
     }
 
     @Test
-    public void testCreatePathBasedMainWikiURL() throws Exception
+    public void testCreateURLWhenViewAction() throws Exception
+    {
+        assertXWikiURL("http://host/xwiki/bin/view/Space/", true, "host", "view",
+            new DocumentReference("Wiki", "Space", "WebHome"));
+        assertXWikiURL("http://host/xwiki/bin/view/Space/Page", true, "host", "view",
+            new DocumentReference("Wiki", "Space", "Page"));
+        assertXWikiURL("http://host/xwiki/bin/view/Space/Page/", true, "host", "view",
+            new DocumentReference("Wiki", "Space", "Page"));
+        assertXWikiURL("http://host/xwiki/bin/view/Space/Page/ignored/path", true, "host", "view",
+            new DocumentReference("Wiki", "Space", "Page"));
+    }
+
+    @Test
+    public void testCreateURLWhenDownloadAction() throws Exception
+    {
+        assertXWikiURL("http://host/xwiki/bin/download/Space/Page/attachment.ext", true, "host", "download",
+            new AttachmentReference("attachment.ext", new DocumentReference("Wiki", "Space", "Page")));
+    }
+
+    private void assertXWikiURL(String url, final boolean isDomainBasedWikiFormat, final String expectedHost,
+        String expectedAction, EntityReference expectedReference) throws Exception
     {
         this.mockery.checking(new Expectations() {{
-            allowing(mockHostResolver).resolve("localhost");
+            allowing(mockHostResolver).resolve(expectedHost);
                 will(returnValue(new WikiReference("Wiki")));
             allowing(mockConfiguration).isPathBasedMultiWikiFormat();
-                will(returnValue(true));
+                will(returnValue(!isDomainBasedWikiFormat));
             allowing(mockConfiguration).getWikiPathPrefix();
                 will(returnValue("wiki"));
         }});
 
-        XWikiURL xwikiURL = this.factory.createURL(new URL("http://localhost:8080/xwiki/bin/view/Space/Page"),
+        XWikiURL xwikiURL = this.factory.createURL(new URL(url),
             Collections.<String, Object>singletonMap("ignorePrefix", "/xwiki"));
 
         Assert.assertEquals(XWikiURLType.ENTITY, xwikiURL.getType());
         XWikiEntityURL entityURL = (XWikiEntityURL) xwikiURL;
-        Assert.assertEquals("view", entityURL.getAction());
-        Assert.assertEquals(new DocumentReference("Wiki", "Space", "Page"), entityURL.getEntityReference());
-    }
-
-    @Test
-    public void testCreatePathBasedSubWikiURL() throws Exception
-    {
-        this.mockery.checking(new Expectations() {{
-            allowing(mockHostResolver).resolve("subwiki");
-                will(returnValue(new WikiReference("Wiki")));
-            allowing(mockConfiguration).isPathBasedMultiWikiFormat();
-                will(returnValue(true));
-            allowing(mockConfiguration).getWikiPathPrefix();
-                will(returnValue("wiki"));
-        }});
-
-        XWikiURL xwikiURL = this.factory.createURL(new URL("http://host/xwiki/wiki/subwiki/view/Space/Page"),
-            Collections.<String, Object>singletonMap("ignorePrefix", "/xwiki"));
-
-        Assert.assertEquals(XWikiURLType.ENTITY, xwikiURL.getType());
-        XWikiEntityURL entityURL = (XWikiEntityURL) xwikiURL;
-        Assert.assertEquals("view", entityURL.getAction());
-        Assert.assertEquals(new DocumentReference("Wiki", "Space", "Page"), entityURL.getEntityReference());
+        Assert.assertEquals(expectedAction, entityURL.getAction());
+        Assert.assertEquals(expectedReference, entityURL.getEntityReference());
     }
 }

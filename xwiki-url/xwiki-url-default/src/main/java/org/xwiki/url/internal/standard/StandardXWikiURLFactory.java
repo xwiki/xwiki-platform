@@ -22,8 +22,9 @@ package org.xwiki.url.internal.standard;
 import org.apache.commons.lang.StringUtils;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.Requirement;
-import org.xwiki.model.reference.AttachmentReference;
-import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.EntityType;
+import org.xwiki.model.reference.EntityReference;
+import org.xwiki.model.reference.EntityReferenceResolver;
 import org.xwiki.model.reference.WikiReference;
 import org.xwiki.url.InvalidURLException;
 import org.xwiki.url.XWikiEntityURL;
@@ -61,6 +62,9 @@ public class StandardXWikiURLFactory implements XWikiURLFactory<URL>
     @Requirement
     private HostResolver hostResolver;
 
+    @Requirement("default/reference")
+    private EntityReferenceResolver<EntityReference> defaultReferenceEntityReferenceResolver;
+
     private class URLParsingState
     {
         public List<String> urlSegments;
@@ -92,11 +96,12 @@ public class StandardXWikiURLFactory implements XWikiURLFactory<URL>
         if (ignorePrefix != null && !url.getPath().startsWith(ignorePrefix)) {
             throw new InvalidURLException("URL Path doesn't start with [" + ignorePrefix + "]");
         }
-        String path = url.getPath().substring(ignorePrefix.length());
+        // Note: We also remove the leading "/" after the ignored prefix.
+        String path = url.getPath().substring(ignorePrefix.length() + 1);
 
         // Step 2: Extract all segment to make it easy to decide based on their values.
         URLParsingState state = new URLParsingState();
-        state.urlSegments = new ArrayList<String>(Arrays.asList(StringUtils.split(path, '/')));
+        state.urlSegments = new ArrayList<String>(Arrays.asList(path.split("/", -1)));
 
         // Step 3: Extract the wiki name.
         // The location of the wiki name depends on whether the wiki is configured to use domain-based multiwiki or
@@ -127,26 +132,53 @@ public class StandardXWikiURLFactory implements XWikiURLFactory<URL>
     {
         XWikiEntityURL entityURL;
 
-        // Extract the action as the first segment, unless the view action is the default action.
-        // TODO: handle default view action
-        String action = urlSegments.get(0);
+        // Rules based on counting the url segments:
+        // - 0 segments (e.g. ""): default document reference, "view" action
+        // - 1 segment (e.g. "/", "/Document"): default space, specified document (and default if empty), "view" action
+        // - 2 segments (e.g. "/Space/", "/Space/Document"): specified space, document (and default doc if empty),
+        //   "view" action
+        // - 3 segments (e.g. "/action/Space/Document"): specified space, document (and default doc if empty),
+        //   specified action
+        // - 4 segments (e.g. "/download/Space/Document/attachment"): specified space, document and attachment (and
+        //   default doc if empty), "download" action
+        // - 4 segments or more (e.g. "/action/Space/Document/whatever/else"): specified space, document (and default
+        //     doc if empty), specified "action" (if action != "download"), trailing segments ignored
 
-        String space = urlSegments.get(1);
-        String page = urlSegments.get(2);
+        String spaceName = null;
+        String pageName = null;
+        String attachmentName = null;
+        String action = "view";
 
-        DocumentReference documentReference = new DocumentReference(wikiReference.getName(),
-            space, page);
-        // TODO: Normalize with default resolver
-
-        if (urlSegments.size() == 4) {
-            String attachment = urlSegments.get(3);
-            entityURL = new XWikiEntityURL(new AttachmentReference(attachment, documentReference));
-        } else if (urlSegments.size() < 4) {
-            entityURL = new XWikiEntityURL(documentReference);
-        } else {
-            throw new InvalidURLException("Invalid number of path separators");
+        if (urlSegments.size() == 1) {
+            pageName = urlSegments.get(0);
+        } else if (urlSegments.size() == 2) {
+            spaceName = urlSegments.get(0);
+            pageName = urlSegments.get(1);
+        } else if (urlSegments.size() >= 3) {
+            action = urlSegments.get(0);
+            spaceName = urlSegments.get(1);
+            pageName = urlSegments.get(2);
+            if (action.equals("download") && urlSegments.size() >= 4) {
+                attachmentName = urlSegments.get(3);
+            }
         }
 
+        // Normalize the extracted space/page to resolve empty/null values and replace them with default values.
+        EntityReference reference = wikiReference;
+        EntityType entityType = EntityType.DOCUMENT;
+        if (!StringUtils.isEmpty(spaceName)) {
+            reference = new EntityReference(spaceName, EntityType.SPACE, reference);            
+        }
+        if (!StringUtils.isEmpty(pageName)) {
+            reference = new EntityReference(pageName, EntityType.DOCUMENT, reference);
+        }
+        if (!StringUtils.isEmpty(attachmentName)) {
+            reference = new EntityReference(attachmentName, EntityType.ATTACHMENT, reference);
+            entityType = EntityType.ATTACHMENT;
+        }
+        reference = this.defaultReferenceEntityReferenceResolver.resolve(reference, entityType);
+
+        entityURL = new XWikiEntityURL(reference);
         entityURL.setAction(action);
 
         return entityURL;

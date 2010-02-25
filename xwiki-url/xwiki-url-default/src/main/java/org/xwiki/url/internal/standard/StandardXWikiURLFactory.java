@@ -32,6 +32,8 @@ import org.xwiki.url.XWikiURL;
 import org.xwiki.url.XWikiURLFactory;
 import org.xwiki.url.XWikiURLType;
 
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -88,16 +90,24 @@ public class StandardXWikiURLFactory implements XWikiURLFactory<URL>
     {
         XWikiURL xwikiURL;
 
+        // Convert the URL to a URI since URI perform correctly encoding and decoding.
+        URI uri;
+        try {
+            uri = url.toURI();
+        } catch (URISyntaxException e) {
+            throw new InvalidURLException("Invalid URL [" + url + "]", e);
+        }
+
         // Step 1: Remove the passed ignored prefix from the URL path.
         // Note that the reason is because we need to ignore the Servlet Context if this code is called in a Servlet
         // environment and since the XWiki Application can be installed in the ROOT context, as well as in any Context
         // there's no way we can guess this, and thus it needs to be passed.
         String ignorePrefix = (String) parameters.get(IGNORE_PREFIX_KEY);
-        if (ignorePrefix != null && !url.getPath().startsWith(ignorePrefix)) {
+        if (ignorePrefix != null && !uri.getPath().startsWith(ignorePrefix)) {
             throw new InvalidURLException("URL Path doesn't start with [" + ignorePrefix + "]");
         }
         // Note: We also remove the leading "/" after the ignored prefix.
-        String path = url.getPath().substring(ignorePrefix.length() + 1);
+        String path = uri.getPath().substring(ignorePrefix.length() + 1);
 
         // Step 2: Extract all segment to make it easy to decide based on their values.
         URLParsingState state = new URLParsingState();
@@ -107,7 +117,7 @@ public class StandardXWikiURLFactory implements XWikiURLFactory<URL>
         // The location of the wiki name depends on whether the wiki is configured to use domain-based multiwiki or
         // path-based multiwiki. If domain-based multiwiki then extract the wiki reference from the domain, otherwise
         // extract it from the path.
-        WikiReference wikiReference = extractWikiReference(url, state);
+        WikiReference wikiReference = extractWikiReference(uri, state);
 
         // Step 4: Extract the URL type and construct a XWiki URL of the corresponding type.
         // Note that the type could have been found already if the wiki was configured in path-based (in this case
@@ -184,7 +194,7 @@ public class StandardXWikiURLFactory implements XWikiURLFactory<URL>
         return entityURL;
     }
 
-    protected WikiReference extractWikiReference(URL url, URLParsingState state)
+    protected WikiReference extractWikiReference(URI uri, URLParsingState state)
     {
         String host = null;
         if (this.configuration.isPathBasedMultiWikiFormat()) {
@@ -201,7 +211,7 @@ public class StandardXWikiURLFactory implements XWikiURLFactory<URL>
             }
         }
         if (host == null) {
-            host = url.getHost();
+            host = uri.getHost();
         }
         return this.hostResolver.resolve(host);
     }

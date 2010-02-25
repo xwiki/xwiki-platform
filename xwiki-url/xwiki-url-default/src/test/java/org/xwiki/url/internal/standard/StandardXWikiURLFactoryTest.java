@@ -120,6 +120,17 @@ public class StandardXWikiURLFactoryTest extends AbstractComponentTestCase
             new DocumentReference("Wiki", "Space", "Page"));
         assertXWikiURL("http://host/xwiki/bin/view/Space/Page/ignored/path", true, "host", "view",
             new DocumentReference("Wiki", "Space", "Page"));
+
+        // Ensure there can be dots in document name for example
+        assertXWikiURL("http://host/xwiki/bin/view/Space/Page.With.Dots", true, "host", "view",
+            new DocumentReference("Wiki", "Space", "Page.With.Dots"));
+    }
+
+    @Test
+    public void testCreateURLWithEncodedChars() throws Exception
+    {
+        assertXWikiURL("http://host/xwiki/bin/view/Space/Page%20Name", true, "host", "view",
+            new DocumentReference("Wiki", "Space", "Page Name"));
     }
 
     @Test

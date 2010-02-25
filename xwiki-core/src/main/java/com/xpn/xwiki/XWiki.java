@@ -326,7 +326,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface
     public static XWiki getMainXWiki(XWikiContext context) throws XWikiException
     {
         String xwikiname = "xwiki";
-        XWiki xwiki = null;
+        XWiki xwiki;
         XWikiEngineContext econtext = context.getEngineContext();
 
         context.setMainXWiki(xwikiname);
@@ -357,7 +357,6 @@ public class XWiki implements XWikiDocChangeNotificationInterface
 
             return xwiki;
         } catch (Exception e) {
-            e.printStackTrace();
             throw new XWikiException(XWikiException.MODULE_XWIKI, XWikiException.ERROR_XWIKI_INIT_FAILED,
                 "Could not initialize main XWiki context", e);
         }

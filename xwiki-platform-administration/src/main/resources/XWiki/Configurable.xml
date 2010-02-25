@@ -388,12 +388,11 @@
                 &lt;p class="admin-buttons"&gt;
                   &lt;span class="buttonwrapper"&gt;
                     ## Ajax form submission Javascript.
-                    #set($onclick = "document.forms.update.action='" + $xwiki.getURL($app.getFullName(), 'saveandcontinue') + "'; "
-                                    + "if (document.forms.update.onsubmit) document.forms.update.onsubmit();"
-                                    + "if (checkDocumentContent()) document.forms.update.submit(); return false;")
+                    #set($onclick = "(" + $xwiki.getURL($app.getFullName(), 'saveandcontinue') + "'; return false;")
                     ## Text to display on the button
                     #set($buttonText = "$msg.get('admin.save') $escapedAppName")
-                    &lt;input class="button" type="submit" name="formactionsac" value="$buttonText" onclick="$onclick" /&gt;
+                    $xwiki.jsfx.use('js/xwiki/actionbuttons/actionButtons.js', true)
+                    &lt;input class="button" type="submit" name="action_saveandcontinue" value="$buttonText" onclick="$onclick" /&gt;
                   &lt;/span&gt;
                 &lt;/p&gt;
               &lt;/div&gt; ## bottombuttons
@@ -406,8 +405,17 @@
       #end## If app author has permission to edit admin page
     #end## If the current user has permission to edit the configurable application.
   #end## Foreach document name in names to configure
+  {{html clean=false wiki=false}}
+  &lt;script type="text/javascript"&gt;
+  /* &lt;![CDATA[ */
+  ## Alt+Shift+S presses the first saveAndContinue button it finds, not what we want so we will disable edit shortcuts.
+  XWiki.actionButtons.EditActions = Object.extend(XWiki.actionButtons.EditActions, {addShortcuts : function() { }});
   ##
   ## TODO: cancel and "submit all" buttons.
+  //]]&gt;
+  &lt;/script&gt;
+  {{/html}}
+  ##
   ##
 #else
   ##

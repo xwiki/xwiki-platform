@@ -618,24 +618,34 @@ public class Package
                 if (!this.withVersions) {
                     doc.getDoc().setVersion("1.1");
                 }
+                
+                // Does the document to be imported already exists in the wiki ?
+                boolean isNewDocument = previousdoc == null;
 
-                if (this.preserveVersion && previousdoc != null) {
-                    // If it is not a backup pack and we are not overriding the versions
-                    // then we want to insert the archive from the original doc
+                // Conserve existing history only if asked for it and if this history exists
+                boolean conserveExistingHistory = this.preserveVersion && !isNewDocument;
+
+                // Does the document from the package contains history revisions ?
+                boolean packageHasHistory = this.documentContainsHistory(doc);
+                
+                // Reset to initial (1.1) version when we don't want to conserve existing history and either we don't
+                // want the package history or this latter one is empty
+                boolean shouldResetToInitialVersion =
+                    !conserveExistingHistory && (!this.withVersions || !packageHasHistory);
+
+                if (conserveExistingHistory) {
+                    // Insert the archive from the existing document
                     doc.getDoc().setDocumentArchive(previousdoc.getDocumentArchive(context));
                 }
 
                 else {
                     // Reset or replace history
                     // if there was not history in the source package then we should reset the version number to 1.1
-                    if (!this.documentContainsHistory(doc) || !this.withVersions) {
-                        doc.getDoc().setVersion("1.1");
+                    if (shouldResetToInitialVersion) {
+                        // Make sure the save will not increment the version to 2.1
+                        doc.getDoc().setContentDirty(false);
+                        doc.getDoc().setMetaDataDirty(false);
                     }
-
-                    // We don't want date and version to change
-                    // So we need to cancel the dirty status
-                    doc.getDoc().setContentDirty(false);
-                    doc.getDoc().setMetaDataDirty(false);
                 }
 
                 // Attachment saving should not generate additional saving
@@ -649,7 +659,7 @@ public class Package
                 doc.getDoc().saveAllAttachments(false, true, context);
                 addToInstalled(doc.getFullName() + ":" + doc.getLanguage(), context);
 
-                if (this.withVersions || this.preserveVersion) {
+                if ((this.withVersions && packageHasHistory) || conserveExistingHistory) {
                     // we need to force the saving the document archive.
                     if (doc.getDoc().getDocumentArchive() != null) {
                         context.getWiki().getVersioningStore().saveXWikiDocArchive(
@@ -657,9 +667,10 @@ public class Package
                     }
                 }
 
-                if (!this.preserveVersion && !this.withVersions) {
+                if (shouldResetToInitialVersion) {
                     // If we override and do not import version, (meaning reset document to 1.1)
                     // We need manually reset possible existing revision for the document
+                    // This means making the history empty (it does not affect the version number)
                     doc.getDoc().resetArchive(context);
                 }
 

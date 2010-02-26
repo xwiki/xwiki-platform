@@ -32,14 +32,14 @@
   </parent>
   <groupId>com.xpn.xwiki.platform</groupId>
   <artifactId>xwiki-web</artifactId>
-  <version>2.2-SNAPSHOT</version>
+  <version>2.2.1</version>
   <name>XWiki Platform - Web - Parent POM</name>
   <packaging>pom</packaging>
   <description>Common web resources for all XWiki WARs</description>
   <scm>
-    <connection>scm:svn:http://svn.xwiki.org/svnroot/xwiki/platform/web/branches/xwiki-web-2.2</connection>
-    <developerConnection>scm:svn:https://svn.xwiki.org/svnroot/xwiki/platform/web/branches/xwiki-web-2.2</developerConnection>
-    <url>http://svn.xwiki.org/svnroot/xwiki/platform/web/branches/xwiki-web-2.2</url>
+    <connection>scm:svn:http://svn.xwiki.org/svnroot/xwiki/platform/web/tags/xwiki-web-2.2.1</connection>
+    <developerConnection>scm:svn:https://svn.xwiki.org/svnroot/xwiki/platform/web/tags/xwiki-web-2.2.1</developerConnection>
+    <url>http://svn.xwiki.org/svnroot/xwiki/platform/web/tags/xwiki-web-2.2.1</url>
   </scm>
   <issueManagement>
       <system>jira</system>
@@ -51,12 +51,12 @@
     <smartgwt.version>1.2</smartgwt.version>
     <junit.version>3.8.2</junit.version>
     <!-- Versions of XWiki dependencies used in Platform/Web modules -->
-    <platform.tool.configuration.version>1.38-SNAPSHOT</platform.tool.configuration.version>
-    <platform.core.version>2.2-SNAPSHOT</platform.core.version>
-    <platform.skin.albatross.version>1.27-SNAPSHOT</platform.skin.albatross.version>
-    <platform.skin.toucan.version>1.33-SNAPSHOT</platform.skin.toucan.version>
+    <platform.tool.configuration.version>1.37</platform.tool.configuration.version>
+    <platform.core.version>2.2.1</platform.core.version>
+    <platform.skin.albatross.version>1.26</platform.skin.albatross.version>
+    <platform.skin.toucan.version>1.32</platform.skin.toucan.version>
     <!-- Starting with 1.13 and beyond Colibri skins are not compatible with web 2.2 anymore -->
-    <platform.skin.colibri.version>1.12-SNAPSHOT</platform.skin.colibri.version>
+    <platform.skin.colibri.version>1.12.2</platform.skin.colibri.version>
   </properties>
   <profiles>
     <profile>

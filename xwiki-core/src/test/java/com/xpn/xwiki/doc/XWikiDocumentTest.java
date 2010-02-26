@@ -47,6 +47,7 @@ import com.xpn.xwiki.test.AbstractBridgedXWikiComponentTestCase;
 import com.xpn.xwiki.user.api.XWikiRightService;
 import com.xpn.xwiki.web.XWikiMessageTool;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.rendering.syntax.Syntax;
 
 /**
  * Unit tests for {@link XWikiDocument}.
@@ -90,14 +91,14 @@ public class XWikiDocumentTest extends AbstractBridgedXWikiComponentTestCase
     {
         super.setUp();
 
-        this.document = new XWikiDocument(DOCWIKI, DOCSPACE, DOCNAME);
-        this.document.setSyntaxId("xwiki/1.0");
+        this.document = new XWikiDocument(new DocumentReference(DOCWIKI, DOCSPACE, DOCNAME));
+        this.document.setSyntax(Syntax.XWIKI_1_0);
         this.document.setLanguage("en");
         this.document.setDefaultLanguage("en");
         this.document.setNew(false);
 
         this.translatedDocument = new XWikiDocument();
-        this.translatedDocument.setSyntaxId("xwiki/1.0");
+        this.translatedDocument.setSyntax(Syntax.XWIKI_2_0);
         this.translatedDocument.setLanguage("fr");
         this.translatedDocument.setNew(false);
 
@@ -115,8 +116,8 @@ public class XWikiDocumentTest extends AbstractBridgedXWikiComponentTestCase
         this.document.setStore((XWikiStoreInterface) this.mockXWikiStoreInterface.proxy());
 
         this.mockXWikiMessageTool =
-            mock(XWikiMessageTool.class, new Class[] {ResourceBundle.class, XWikiContext.class}, new Object[] {null,
-            getContext()});
+                mock(XWikiMessageTool.class, new Class[] {ResourceBundle.class, XWikiContext.class}, new Object[] {
+                null, getContext()});
         this.mockXWikiMessageTool.stubs().method("get").will(returnValue("message"));
 
         this.mockXWikiRightService = mock(XWikiRightService.class);
@@ -342,8 +343,8 @@ public class XWikiDocumentTest extends AbstractBridgedXWikiComponentTestCase
 
         Set<String> linkedPages = this.document.getUniqueLinkedPages(getContext());
 
-        assertEquals(new HashSet<String>(Arrays.asList("TargetPage", "TargetSpace.TargetPage")),
-            new HashSet<String>(linkedPages));
+        assertEquals(new HashSet<String>(Arrays.asList("TargetPage", "TargetSpace.TargetPage")), new HashSet<String>(
+            linkedPages));
     }
 
     public void testGetUniqueLinkedPages()
@@ -569,8 +570,8 @@ public class XWikiDocumentTest extends AbstractBridgedXWikiComponentTestCase
             content1);
 
         String content2 =
-            this.document.updateDocumentSection(1,
-                "= header 1 =\n\nmodified also header 1 content\n\n== header 2 ==\n\nheader 2 content");
+                this.document.updateDocumentSection(1,
+                    "= header 1 =\n\nmodified also header 1 content\n\n== header 2 ==\n\nheader 2 content");
 
         assertEquals(
             "content not in section\n\n= header 1 =\n\nmodified also header 1 content\n\n== header 2 ==\n\nheader 2 content",
@@ -752,26 +753,25 @@ public class XWikiDocumentTest extends AbstractBridgedXWikiComponentTestCase
     public void testRename() throws XWikiException
     {
         // Possible ways to write parents, include documents, or make links:
-        // "name"  -----means-----> DOCWIKI+":"+DOCSPACE+"."+input
+        // "name" -----means-----> DOCWIKI+":"+DOCSPACE+"."+input
         // "space.name" -means----> DOCWIKI+":"+input
         // "database:space.name" (no change)
 
         DocumentReference reference1 = new DocumentReference(DOCWIKI, DOCSPACE, "Page1");
         XWikiDocument doc1 = new XWikiDocument(reference1);
-        doc1.setContent("[[" + DOCWIKI + ":" + DOCSPACE + "." + DOCNAME + "]] [[someName>>" 
-                             + DOCSPACE + "." + DOCNAME + "]] [["
-                             + DOCNAME + "]]");
-        doc1.setSyntaxId("xwiki/2.0");
+        doc1.setContent("[[" + DOCWIKI + ":" + DOCSPACE + "." + DOCNAME + "]] [[someName>>" + DOCSPACE + "." + DOCNAME
+            + "]] [[" + DOCNAME + "]]");
+        doc1.setSyntax(Syntax.XWIKI_2_0);
 
         DocumentReference reference2 = new DocumentReference("newwikiname", DOCSPACE, "Page2");
         XWikiDocument doc2 = new XWikiDocument(reference2);
         doc2.setContent("[[" + DOCWIKI + ":" + DOCSPACE + "." + DOCNAME + "]]");
-        doc2.setSyntaxId("xwiki/2.0");
+        doc2.setSyntax(Syntax.XWIKI_2_0);
 
         DocumentReference reference3 = new DocumentReference("newwikiname", "newspace", "Page3");
         XWikiDocument doc3 = new XWikiDocument(reference3);
         doc3.setContent("[[" + DOCWIKI + ":" + DOCSPACE + "." + DOCNAME + "]]");
-        doc3.setSyntaxId("xwiki/2.0");
+        doc3.setSyntax(Syntax.XWIKI_2_0);
 
         // Test to make sure it also drags children along.
         DocumentReference reference4 = new DocumentReference(DOCWIKI, DOCSPACE, "Page4");
@@ -792,19 +792,18 @@ public class XWikiDocumentTest extends AbstractBridgedXWikiComponentTestCase
         this.mockXWiki.stubs().method("deleteDocument").isVoid();
 
         this.document.rename("newwikiname:newspace.newpage", Arrays.asList(DOCWIKI + ":" + DOCSPACE + ".Page1",
-            "newwikiname:" + DOCSPACE + ".Page2", "newwikiname:newspace.Page3"), Arrays.asList(
-            DOCWIKI + ":" + DOCSPACE + ".Page4", "newwikiname:newspace.Page5"), getContext());
+            "newwikiname:" + DOCSPACE + ".Page2", "newwikiname:newspace.Page3"), Arrays.asList(DOCWIKI + ":" + DOCSPACE
+            + ".Page4", "newwikiname:newspace.Page5"), getContext());
 
         // Test links
-        assertEquals("[[newwikiname:newspace.newpage]] "
-                   + "[[someName>>newwikiname:newspace.newpage]] "
-                   + "[[newwikiname:newspace.newpage]]", doc1.getContent());
+        assertEquals("[[newwikiname:newspace.newpage]] " + "[[someName>>newwikiname:newspace.newpage]] "
+            + "[[newwikiname:newspace.newpage]]", doc1.getContent());
         assertEquals("[[newspace.newpage]]", doc2.getContent());
         assertEquals("[[newpage]]", doc3.getContent());
 
         // Test parents
         assertEquals("newwikiname:newspace.newpage", doc4.getParent());
-        assertEquals("newwikiname:newspace.newpage", doc5.getParent());
+        assertEquals(new DocumentReference("newwikiname", "newspace", "newpage"), doc5.getParentReference());
     }
 
     /**
@@ -833,7 +832,7 @@ public class XWikiDocumentTest extends AbstractBridgedXWikiComponentTestCase
         // Set a field on o1 so that when comparing it with o2 they are different. This is needed so that the remove
         // will pick the right object to remove (since we've voluntarily set a wrong number of o2 it would pick o1
         // if they were equals).
-        o1.addField("somefield", new StringProperty()); 
+        o1.addField("somefield", new StringProperty());
 
         // Call the tested method, removing o2 from position 2 which is set to null
         boolean result = doc.removeObject(o2);
@@ -866,7 +865,7 @@ public class XWikiDocumentTest extends AbstractBridgedXWikiComponentTestCase
         assertFalse(newO.getGuid().equals(o.getGuid()));
     }
 
-    public void testResolveReferenceWithSpecificSpace() throws Exception
+    public void testResolveClassReference() throws Exception
     {
         XWikiDocument doc = new XWikiDocument(new DocumentReference("docwiki", "docspace", "docpage"));
 
@@ -881,5 +880,63 @@ public class XWikiDocumentTest extends AbstractBridgedXWikiComponentTestCase
 
         DocumentReference expected4 = new DocumentReference("wiki", "space", "page");
         assertEquals(expected4, doc.resolveClassReference("wiki:space.page"));
+    }
+
+    /**
+     * Test that the parent remain the same relative value whatever the context.
+     */
+    public void testGetParent()
+    {
+        XWikiDocument doc = new XWikiDocument(new DocumentReference("docwiki", "docspace", "docpage"));
+
+        doc.setParent("page");
+        assertEquals("page", doc.getParent());
+
+        getContext().setDatabase("otherwiki");
+        assertEquals("page", doc.getParent());
+
+        doc.setDocumentReference(new DocumentReference("otherwiki", "otherspace", "otherpage"));
+        assertEquals("page", doc.getParent());
+    }
+
+    public void testGetParentReference()
+    {
+        XWikiDocument doc = new XWikiDocument(new DocumentReference("docwiki", "docspace", "docpage"));
+
+        assertNull(doc.getParentReference());
+
+        doc.setParent("parentpage");
+
+        //////////////////////////////////////////////////////////////////
+        // The following tests are checking that document reference cache is properly cleaned something could make the
+        // parent change
+
+        assertEquals(new DocumentReference("docwiki", "docspace", "parentpage"), doc.getParentReference());
+
+        doc.setName("docpage2");
+        assertEquals(new DocumentReference("docwiki", "docspace", "parentpage"), doc.getParentReference());
+
+        doc.setSpace("docspace2");
+        assertEquals(new DocumentReference("docwiki", "docspace2", "parentpage"), doc.getParentReference());
+
+        doc.setDatabase("docwiki2");
+        assertEquals(new DocumentReference("docwiki2", "docspace2", "parentpage"), doc.getParentReference());
+
+        doc.setDocumentReference(new DocumentReference("docwiki", "docspace", "docpage"));
+        assertEquals(new DocumentReference("docwiki", "docspace", "parentpage"), doc.getParentReference());
+
+        doc.setFullName("docwiki2:docspace2.docpage2", getContext());
+        assertEquals(new DocumentReference("docwiki2", "docspace2", "parentpage"), doc.getParentReference());
+
+        doc.setParent("parentpage2");
+        assertEquals(new DocumentReference("docwiki2", "docspace2", "parentpage2"), doc.getParentReference());
+    }
+
+    public void testSetParentReference()
+    {
+        XWikiDocument doc = new XWikiDocument(new DocumentReference("docwiki", "docspace", "docpage"));
+
+        doc.setParentReference(new DocumentReference("docwiki", "docspace", "docpage2"));
+        assertEquals("docspace.docpage2", doc.getParent());
     }
 }

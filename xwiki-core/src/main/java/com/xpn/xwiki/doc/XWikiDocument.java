@@ -641,7 +641,7 @@ public class XWikiDocument implements DocumentModelBridge
      */
     public String getParent()
     {
-        return this.parent;
+        return this.parent != null ? this.parent : "";
     }
 
     /**
@@ -686,8 +686,11 @@ public class XWikiDocument implements DocumentModelBridge
      */
     public void setParent(String parent)
     {
-        this.parent = parent;
+        if (parent != null && !parent.equals(this.parent)) {
+            setMetaDataDirty(true);
+        }
 
+        this.parent = parent;
         this.parentReferenceCache = null;
     }
 

@@ -195,6 +195,27 @@ public interface DocumentAccessBridge
     void setDocumentSyntaxId(String documentReference, String syntaxId) throws Exception;
 
     /**
+     * Sets the parent document name attribute for this document.
+     * 
+     * @param documentReference the reference of the target document
+     * @param parentReference name of the parent document.
+     * @throws Exception If the storage cannot be accessed.
+     * @since 2.2
+     */
+    void setDocumentParentReference(DocumentReference documentReference, DocumentReference parentReference)
+        throws Exception;
+
+    /**
+     * Sets the title of this document.
+     * 
+     * @param documentReference the reference of the target document
+     * @param title the title to be set.
+     * @throws Exception If the storage cannot be accessed.
+     * @since 2.2
+     */
+    void setDocumentTitle(DocumentReference documentReference, String title) throws Exception;
+
+    /**
      * Retrieves the textual content of the document, in the document's default language.
      * <p>
      * Note: you should always use {@link #getDocumentContent(String)} unless you really need specifically the

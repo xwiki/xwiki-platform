@@ -306,7 +306,7 @@ public class DefaultDocumentAccessBridge implements DocumentAccessBridge
         doc.setSyntaxId(syntaxId);
         saveDocument(doc, String.format("Changed document syntax from [%s] to [%s].", oldSyntaxId, syntaxId), true);
     }
-
+    
     /**
      * {@inheritDoc}
      * 
@@ -322,6 +322,24 @@ public class DefaultDocumentAccessBridge implements DocumentAccessBridge
         saveDocument(doc, String.format("Changed document syntax from [%s] to [%s].", oldSyntaxId, syntaxId), true);
     }
 
+    public void setDocumentParentReference(DocumentReference documentReference, DocumentReference parentReference) throws Exception
+    {
+        XWikiContext xcontext = getContext();
+        XWikiDocument doc = xcontext.getWiki().getDocument(documentReference, xcontext);
+        DocumentReference oldParentReference = doc.getParentReference();
+        doc.setParentReference(parentReference);
+        saveDocument(doc, String.format("Changed document syntax from [%s] to [%s].", oldParentReference, parentReference), true);   
+    }
+    
+    public void setDocumentTitle(DocumentReference documentReference, String title) throws Exception
+    {
+        XWikiContext xcontext = getContext();
+        XWikiDocument doc = xcontext.getWiki().getDocument(documentReference, xcontext);
+        String oldTitle = doc.getTitle();
+        doc.setTitle(title);
+        saveDocument(doc, String.format("Changed document syntax from [%s] to [%s].", oldTitle, title), true);
+    }
+    
     /**
      * {@inheritDoc}
      * 

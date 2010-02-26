@@ -218,13 +218,16 @@ public class DefaultOfficeImporter extends AbstractLogEnabled implements OfficeI
                 docBridge.setDocumentContent(target, oldContent + "\n" + content, "Updated by office importer", false);
             } else {
                 docBridge.setDocumentSyntaxId(target, Syntax.XWIKI_2_0.toIdString());
-                if (null != title) {
-                    docBridge.getDocument(targetDescriptor.getDocumentReference()).setTitle(title);
+
+                if (title != null) {
+                    docBridge.setDocumentTitle(targetDescriptor.getDocumentReference(), title);
                 }
-                if (null != parent) {
-                    docBridge.getDocument(targetDescriptor.getDocumentReference()).setParentReference(
+
+                if (parent != null) {
+                    docBridge.setDocumentParentReference(targetDescriptor.getDocumentReference(),
                         targetDescriptor.getParentReference());
                 }
+
                 docBridge.setDocumentContent(target, content, "Created by office importer", false);
             }
             // Attach the artifacts.

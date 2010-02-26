@@ -196,6 +196,16 @@ public class StandardXWikiURLFactory implements XWikiURLFactory<URL>
         return urlSegments;
     }
 
+    /**
+     * Extract the name of the wiki the URL is pointing to.
+     *
+     * For domain-based multiwiki setups we ask a resolver to resolve the URL's host name.
+     * For path-based multiwiki setup we get the path segment after the first segment, if this first segment has the
+     * predefined {@link org.xwiki.url.standard.StandardURLConfiguration#getWikiPathPrefix()} value. If not then we
+     * fall-back to domain-based multiwiki setups and resolve with the URL's host name.
+     *
+     * @return the wiki the URL is pointing to, returned as a {@link WikiReference}.
+     */
     protected WikiReference extractWikiReference(URI uri, URLParsingState state)
     {
         String host = null;

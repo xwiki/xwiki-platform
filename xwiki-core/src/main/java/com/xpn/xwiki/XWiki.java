@@ -835,6 +835,8 @@ public class XWiki implements XWikiDocChangeNotificationInterface
     /**
      * TODO: This is only a temporary work around, we need to use a component-based init mechanism instead. Note that we
      * need DB access to be available (at component initialization) to make this possible.
+     * <p>
+     * This method is protected to be able to skip it in unit tests.
      */
     protected void registerWikiMacros()
     {

@@ -302,7 +302,7 @@ public class OfficeImporterVelocityBridge
 
                 // Set parent if provided.
                 if (null != parent) {
-                    docBridge.getDocument(docReference).setParentReference(parentReference);
+                    docBridge.setDocumentParentReference(docReference, parentReference);
                 }
 
                 // If no title is specified, try to extract one.
@@ -310,7 +310,7 @@ public class OfficeImporterVelocityBridge
 
                 // Set title if applicable.
                 if (null != docTitle) {
-                    docBridge.getDocument(docReference).setTitle(docTitle);
+                    docBridge.setDocumentTitle(docReference, docTitle);
                 }
             }
 

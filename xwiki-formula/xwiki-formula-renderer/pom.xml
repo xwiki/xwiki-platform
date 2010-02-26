@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-core-formula</artifactId>
-    <version>2.2.1</version>
+    <version>2.2-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-core-formula-renderer</artifactId>
   <name>XWiki Platform - Core - Renderer for mathematical formulae</name>

@@ -30,22 +30,7 @@ import org.xwiki.model.reference.DocumentReference;
  * @since 1.6M1
  */
 public interface DocumentModelBridge
-{
-    /**
-     * Sets the parent document name attribute for this document.
-     * 
-     * @param parentReference name of the parent document.
-     * @since 2.2M1
-     */
-    void setParentReference(DocumentReference parentReference);
-    
-    /**
-     * Sets the title of this document.
-     * 
-     * @param title the title to be set.
-     */
-    void setTitle(String title);
-    
+{    
     /**
      * Retrieve the full name of the document, in the <code>Space.Name</code> format, for example <tt>Main.WebHome</tt>.
      * 

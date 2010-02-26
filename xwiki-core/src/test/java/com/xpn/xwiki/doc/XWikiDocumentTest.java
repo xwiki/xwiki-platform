@@ -47,6 +47,7 @@ import com.xpn.xwiki.test.AbstractBridgedXWikiComponentTestCase;
 import com.xpn.xwiki.user.api.XWikiRightService;
 import com.xpn.xwiki.web.XWikiMessageTool;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.rendering.syntax.Syntax;
 
 /**
  * Unit tests for {@link XWikiDocument}.
@@ -90,7 +91,7 @@ public class XWikiDocumentTest extends AbstractBridgedXWikiComponentTestCase
     {
         super.setUp();
 
-        this.document = new XWikiDocument(DOCWIKI, DOCSPACE, DOCNAME);
+        this.document = new XWikiDocument(new DocumentReference(DOCWIKI, DOCSPACE, DOCNAME));
         this.document.setSyntaxId("xwiki/1.0");
         this.document.setLanguage("en");
         this.document.setDefaultLanguage("en");
@@ -752,7 +753,7 @@ public class XWikiDocumentTest extends AbstractBridgedXWikiComponentTestCase
     public void testRename() throws XWikiException
     {
         // Possible ways to write parents, include documents, or make links:
-        // "name"  -----means-----> DOCWIKI+":"+DOCSPACE+"."+input
+        // "name" -----means-----> DOCWIKI+":"+DOCSPACE+"."+input
         // "space.name" -means----> DOCWIKI+":"+input
         // "database:space.name" (no change)
 
@@ -792,8 +793,8 @@ public class XWikiDocumentTest extends AbstractBridgedXWikiComponentTestCase
         this.mockXWiki.stubs().method("deleteDocument").isVoid();
 
         this.document.rename("newwikiname:newspace.newpage", Arrays.asList(DOCWIKI + ":" + DOCSPACE + ".Page1",
-            "newwikiname:" + DOCSPACE + ".Page2", "newwikiname:newspace.Page3"), Arrays.asList(
-            DOCWIKI + ":" + DOCSPACE + ".Page4", "newwikiname:newspace.Page5"), getContext());
+            "newwikiname:" + DOCSPACE + ".Page2", "newwikiname:newspace.Page3"), Arrays.asList(DOCWIKI + ":" + DOCSPACE
+            + ".Page4", "newwikiname:newspace.Page5"), getContext());
 
         // Test links
         assertEquals("[[newwikiname:newspace.newpage]] "
@@ -804,7 +805,7 @@ public class XWikiDocumentTest extends AbstractBridgedXWikiComponentTestCase
 
         // Test parents
         assertEquals("newwikiname:newspace.newpage", doc4.getParent());
-        assertEquals("newwikiname:newspace.newpage", doc5.getParent());
+        assertEquals(new DocumentReference("newwikiname", "newspace", "newpage"), doc5.getParentReference());
     }
 
     /**
@@ -833,7 +834,7 @@ public class XWikiDocumentTest extends AbstractBridgedXWikiComponentTestCase
         // Set a field on o1 so that when comparing it with o2 they are different. This is needed so that the remove
         // will pick the right object to remove (since we've voluntarily set a wrong number of o2 it would pick o1
         // if they were equals).
-        o1.addField("somefield", new StringProperty()); 
+        o1.addField("somefield", new StringProperty());
 
         // Call the tested method, removing o2 from position 2 which is set to null
         boolean result = doc.removeObject(o2);
@@ -866,7 +867,7 @@ public class XWikiDocumentTest extends AbstractBridgedXWikiComponentTestCase
         assertFalse(newO.getGuid().equals(o.getGuid()));
     }
 
-    public void testResolveReferenceWithSpecificSpace() throws Exception
+    public void testResolveClassReference() throws Exception
     {
         XWikiDocument doc = new XWikiDocument(new DocumentReference("docwiki", "docspace", "docpage"));
 
@@ -881,5 +882,63 @@ public class XWikiDocumentTest extends AbstractBridgedXWikiComponentTestCase
 
         DocumentReference expected4 = new DocumentReference("wiki", "space", "page");
         assertEquals(expected4, doc.resolveClassReference("wiki:space.page"));
+    }
+
+    /**
+     * Test that the parent remain the same relative value whatever the context.
+     */
+    public void testGetParent()
+    {
+        XWikiDocument doc = new XWikiDocument(new DocumentReference("docwiki", "docspace", "docpage"));
+
+        doc.setParent("page");
+        assertEquals("page", doc.getParent());
+
+        getContext().setDatabase("otherwiki");
+        assertEquals("page", doc.getParent());
+
+        doc.setDocumentReference(new DocumentReference("otherwiki", "otherspace", "otherpage"));
+        assertEquals("page", doc.getParent());
+    }
+
+    public void testGetParentReference()
+    {
+        XWikiDocument doc = new XWikiDocument(new DocumentReference("docwiki", "docspace", "docpage"));
+
+        assertNull(doc.getParentReference());
+
+        doc.setParent("parentpage");
+
+        //////////////////////////////////////////////////////////////////
+        // The following tests are checking that document reference cache is properly cleaned something could make the
+        // parent change
+
+        assertEquals(new DocumentReference("docwiki", "docspace", "parentpage"), doc.getParentReference());
+
+        doc.setName("docpage2");
+        assertEquals(new DocumentReference("docwiki", "docspace", "parentpage"), doc.getParentReference());
+
+        doc.setSpace("docspace2");
+        assertEquals(new DocumentReference("docwiki", "docspace2", "parentpage"), doc.getParentReference());
+
+        doc.setDatabase("docwiki2");
+        assertEquals(new DocumentReference("docwiki2", "docspace2", "parentpage"), doc.getParentReference());
+
+        doc.setDocumentReference(new DocumentReference("docwiki", "docspace", "docpage"));
+        assertEquals(new DocumentReference("docwiki", "docspace", "parentpage"), doc.getParentReference());
+
+        doc.setFullName("docwiki2:docspace2.docpage2", getContext());
+        assertEquals(new DocumentReference("docwiki2", "docspace2", "parentpage"), doc.getParentReference());
+
+        doc.setParent("parentpage2");
+        assertEquals(new DocumentReference("docwiki2", "docspace2", "parentpage2"), doc.getParentReference());
+    }
+
+    public void testSetParentReference()
+    {
+        XWikiDocument doc = new XWikiDocument(new DocumentReference("docwiki", "docspace", "docpage"));
+
+        doc.setParentReference(new DocumentReference("docwiki", "docspace", "docpage2"));
+        assertEquals("docspace.docpage2", doc.getParent());
     }
 }

@@ -164,7 +164,12 @@ public class XWikiDocument implements DocumentModelBridge
 
     private String title;
 
-    private DocumentReference parentReference;
+    private String parent;
+
+    /**
+     * DocumentReference version of the parent is cached for better performance of {@link #getParentReference()}.
+     */
+    private DocumentReference parentReferenceCache;
 
     private DocumentReference documentReference;
 
@@ -538,6 +543,9 @@ public class XWikiDocument implements DocumentModelBridge
     {
         if (space != null) {
             getDocumentReference().getLastSpaceReference().setName(space);
+
+            // since document change the full reference resolution change too so we clean the cache
+            this.parentReferenceCache = null;
         }
     }
 
@@ -615,29 +623,29 @@ public class XWikiDocument implements DocumentModelBridge
      */
     public DocumentReference getParentReference()
     {
-        return this.parentReference;
+        if (this.parentReferenceCache == null && !StringUtils.isEmpty(this.parent)) {
+            this.parentReferenceCache =
+                    resolveReference(this.parent, this.currentMixedDocumentReferenceResolver, getDocumentReference());
+        }
+
+        return this.parentReferenceCache;
     }
 
     /**
-     * Note that this method cannot be removed for now since it's used by Hibernate for saving a XWikiDocument.
+     * Return the parent reference stored in the database. It's is relative to the document.
+     * <p>
+     * If you want the full reference of the parent you should use {@link #getParentReference()}.
      * 
      * @return the parent reference or an empty string ("") if the parent is not set
-     * @deprecated since 2.2M1 used {@link #getParentReference()} instead
+     * @see #getParentReference()
      */
-    @Deprecated
     public String getParent()
     {
-        String parentReferenceAsString;
-        if (getParentReference() != null) {
-            parentReferenceAsString = this.compactWikiEntityReferenceSerializer.serialize(getParentReference());
-        } else {
-            parentReferenceAsString = "";
-        }
-        return parentReferenceAsString;
+        return this.parent;
     }
 
     /**
-     * @deprecated since 2.2M1 used {@link #getParentReference()} instead
+     * @deprecated since 2.2M1 use {@link #getParentReference()} instead
      */
     @Deprecated
     public XWikiDocument getParentDoc()
@@ -646,33 +654,41 @@ public class XWikiDocument implements DocumentModelBridge
     }
 
     /**
-     * @since 2.2M1
+     * {@inheritDoc}
+     * <p>
+     * Convert a full document reference into the proper relative document reference (wiki part is removed if it's the
+     * same as document wiki) to store as parent.
+     * 
+     * @see org.xwiki.bridge.DocumentModelBridge#setParentReference(org.xwiki.model.reference.DocumentReference)
      */
     public void setParentReference(DocumentReference parentReference)
     {
         if ((parentReference == null && getParentReference() != null)
             || (parentReference != null && !parentReference.equals(getParentReference()))) {
-            this.parentReference = parentReference;
+            if (parentReference != null) {
+                setParent(serializeReference(parentReference, this.compactWikiEntityReferenceSerializer,
+                    getDocumentReference()));
+            } else {
+                setParent("");
+            }
+
             setMetaDataDirty(true);
+            this.parentReferenceCache = parentReference;
         }
     }
 
     /**
-     * Note that this method cannot be removed for now since it's used by Hibernate for loading a XWikiDocument.
+     * Set the parent reference to store in the database. It is relative to the document.
+     * <p>
+     * If you want to set the full reference of the parent use {@link #getParentReference()}.
      * 
-     * @deprecated since 2.2M1 used {@link #setParentReference(DocumentReference)} instead
+     * @param parent the reference of the parent relative to the document
      */
-    @Deprecated
     public void setParent(String parent)
     {
-        // If the passed parent is an empty string we also need to set the reference to null. The reason is that
-        // in the database we store "" when the parent is empty and thus when Hibernate loads this class it'll call
-        // setParent with "" if the parent had not been set when saved.
-        if (StringUtils.isEmpty(parent)) {
-            setParentReference(null);
-        } else {
-            setParentReference(this.currentMixedDocumentReferenceResolver.resolve(parent));
-        }
+        this.parent = parent;
+
+        this.parentReferenceCache = null;
     }
 
     public String getContent()
@@ -825,6 +841,9 @@ public class XWikiDocument implements DocumentModelBridge
     {
         if (name != null) {
             getDocumentReference().setName(name);
+
+            // since document change the full reference resolution change too so we clean the cache
+            this.parentReferenceCache = null;
         }
     }
 
@@ -870,6 +889,9 @@ public class XWikiDocument implements DocumentModelBridge
             if (!reference.equals(getDocumentReference())) {
                 this.documentReference = reference;
                 setMetaDataDirty(true);
+
+                // since document change the full reference resolution change too so we clean the cache
+                this.parentReferenceCache = null;
             }
         }
     }
@@ -2973,7 +2995,7 @@ public class XWikiDocument implements DocumentModelBridge
             doc.setNew(isNew());
             doc.setStore(getStore());
             doc.setTemplateDocumentReference(getTemplateDocumentReference());
-            doc.setParentReference(getParentReference());
+            doc.setParent(getParent());
             doc.setCreator(getCreator());
             doc.setDefaultLanguage(getDefaultLanguage());
             doc.setDefaultTemplate(getDefaultTemplate());
@@ -3265,11 +3287,11 @@ public class XWikiDocument implements DocumentModelBridge
         docel.add(el);
 
         el = new DOMElement("parent");
-        if (getParentReference() == null) {
+        if (getParent() == null) {
             // No parent have been specified
             el.addText("");
         } else {
-            el.addText(this.localEntityReferenceSerializer.serialize(getParentReference()));
+            el.addText(getParent());
         }
         docel.add(el);
 
@@ -4614,6 +4636,9 @@ public class XWikiDocument implements DocumentModelBridge
     {
         if (database != null) {
             getDocumentReference().getWikiReference().setName(database);
+
+            // since document change the full reference resolution change too so we clean the cache
+            this.parentReferenceCache = null;
         }
     }
 
@@ -6921,6 +6946,24 @@ public class XWikiDocument implements DocumentModelBridge
             xcontext.setDoc(new XWikiDocument(defaultReference));
 
             return resolver.resolve(referenceAsString);
+        } finally {
+            xcontext.setDoc(originalCurentDocument);
+            xcontext.setDatabase(originalWikiName);
+        }
+    }
+
+    private String serializeReference(DocumentReference reference, EntityReferenceSerializer<String> serializer,
+        DocumentReference defaultReference)
+    {
+        XWikiContext xcontext = getXWikiContext();
+
+        String originalWikiName = xcontext.getDatabase();
+        XWikiDocument originalCurentDocument = xcontext.getDoc();
+        try {
+            xcontext.setDatabase(defaultReference.getWikiReference().getName());
+            xcontext.setDoc(new XWikiDocument(defaultReference));
+
+            return serializer.serialize(reference);
         } finally {
             xcontext.setDoc(originalCurentDocument);
             xcontext.setDatabase(originalWikiName);

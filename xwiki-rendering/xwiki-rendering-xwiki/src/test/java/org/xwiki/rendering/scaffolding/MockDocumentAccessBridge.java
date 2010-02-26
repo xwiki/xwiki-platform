@@ -602,4 +602,15 @@ public class MockDocumentAccessBridge implements DocumentAccessBridge
     {
         throw new RuntimeException("Not implemented");
     }
+
+    public void setDocumentParentReference(DocumentReference documentReference, DocumentReference parentReference)
+        throws Exception
+    {
+        throw new RuntimeException("Not implemented");
+    }
+
+    public void setDocumentTitle(DocumentReference documentReference, String title) throws Exception
+    {
+        throw new RuntimeException("Not implemented");
+    }
 }

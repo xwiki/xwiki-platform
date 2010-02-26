@@ -889,6 +889,10 @@ public class XWikiDocumentTest extends AbstractBridgedXWikiComponentTestCase
     {
         XWikiDocument doc = new XWikiDocument(new DocumentReference("docwiki", "docspace", "docpage"));
 
+        assertEquals("", doc.getParent());
+        doc.setParent(null);
+        assertEquals("", doc.getParent());
+
         doc.setParent("page");
         assertEquals("page", doc.getParent());
 

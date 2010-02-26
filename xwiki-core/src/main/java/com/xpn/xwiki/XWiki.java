@@ -836,7 +836,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface
      * TODO: This is only a temporary work around, we need to use a component-based init mechanism instead. Note that we
      * need DB access to be available (at component initialization) to make this possible.
      */
-    private void registerWikiMacros()
+    protected void registerWikiMacros()
     {
         try {
             WikiMacroInitializer wikiMacroInitializer = Utils.getComponentManager().lookup(WikiMacroInitializer.class);

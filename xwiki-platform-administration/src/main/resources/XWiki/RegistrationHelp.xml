@@ -123,11 +123,11 @@ ul.showCircles li {
 
 {{id name=heading/}}
 * **Registration page heading**
-** This is the line at the top of the page which is shown to people who are registering and when they have just registered.
+** This is the line at the top of the page which is shown to people who are registering and when they have just registered. Velocity and XWiki Syntax 2.0 code may be used.
 
 {{id name=welcomeMessage/}}
 * **Welcome Message**
-** This is only shown when people are filling out the form.
+** This is only shown when people are filling out the form. Velocity and XWiki Syntax 2.0 code may be used.
 
 {{id name=liveValidation_enabled/}}
 * **Enable Javascript field validation** (Default: Yes)
@@ -135,7 +135,7 @@ ul.showCircles li {
 
 {{id name=liveValidation_defaultFieldOkMessage/}}
 * **Default field okay message** (Default: 'Ok.')
-** LiveValidation shows a message to indicate to users that they have filled in the field satisfactorily. this is the message they will get if it is not overridden for a particular field.
+** LiveValidation shows a message to indicate to users that they have filled in the field satisfactorily. this is the message they will get if it is not overridden for a particular field.  Velocity code may be used.
 
 {{id name=loginButton_enabled/}}
 * **Enable login button** (Default: Yes)
@@ -146,14 +146,18 @@ ul.showCircles li {
 ** If login button is enabled, then you can have a piece of Javascript push the login button for the user.
 
 {{id name=defaultRedirect/}}
-* **Redirect here after registration** (Default: Main.WebHome)
-** This is the page which the user will be redirected to after pushing the login button if the xredirect parameter is not specified.
+* **Redirect here after registration** (Default: "$xwiki.getURL('Main.WebHome')")
+** This is the URL of the which the user will be redirected to after pushing the login button if the xredirect parameter is not specified.  Velocity code may be used.
 
 {{id name=requireCaptcha/}}
 * **Require captcha to register** (Default: No)
 ** Set this true to require the user to solve a captcha in order to register. **NOTE:** captcha.enable must be set true in the xwiki.properties configuration file in xwiki/WEB-INF/
 
-= Configuration you can set by editing the XWiki.Registration =
+{{id name=registrationSuccessMessage/}}
+* **Registration Successful Message**
+** This is shown to the user when they have registered successfully. Velocity and XWiki Syntax 2.0 code may be used.
+
+= Adding or removing fields to the registration form by editing the XWiki.Registration =
 
 In XWiki.Registration, the fields are defined separately from the code which generates the HTML. You can add or remove fields simply by modifying the configuration. Fields are defined as maps. The maps are each required to have a 'name' key which must map to a string. This string will be the id and name of the field when it is rendered into HTML.
 
@@ -222,7 +226,7 @@ Line by line it is:
 * Map for this field is closed and set directive ends.
 * This field is added to the fields array and the output from the add function is set to discard to avoid having it print on the page.
 
-= Validation Constraints =
+== Validation Constraints ==
 The validate field configuration key is itself a map which allows a number of parameters to be defined. Validation is done in the order of mandatory, then regex, then mustMatch, then programmatic validation so if nothing is entered and the mandatory constraint is not in place then the entry will be accepted and if a entry fails the regex test then it will not be evaluated programmatically.
 
 * **mandatory** (Optional)

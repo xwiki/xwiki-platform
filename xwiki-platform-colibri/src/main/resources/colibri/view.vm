@@ -14,9 +14,11 @@
     #set($viewer = 'content')
   #end
   <div class="main layoutsubsection">
-  <div id="contentmenu" class="actionmenu">
-  #template("contentmenu.vm")
-  </div>
+  #if($displayContentMenu)
+    <div id="contentmenu" class="actionmenu">
+    #template("contentmenu.vm")
+    </div>
+  #end
   <div id="mainContentArea">
   #template("hierarchy.vm")
   #if($viewer == 'content')
@@ -26,7 +28,7 @@
   #end
   <div class="clearfloats"></div>
   </div>## mainContentArea
-  #if($viewer == 'content')
+  #if($viewer == 'content' && $displayDocExtra)
     #template("docextra.vm")
   #end
   </div>## main

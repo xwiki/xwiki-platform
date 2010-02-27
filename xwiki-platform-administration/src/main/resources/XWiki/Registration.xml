@@ -101,256 +101,25 @@
 <validationRegExp></validationRegExp>
 <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
 </loginButton_enabled>
+<registrationSuccessMessage>
+<editor>PureText</editor>
+<name>registrationSuccessMessage</name>
+<number>9</number>
+<picker>0</picker>
+<prettyName>Registration Successful Message</prettyName>
+<rows>12</rows>
+<size>40</size>
+<unmodifiable>0</unmodifiable>
+<validationMessage></validationMessage>
+<validationRegExp></validationRegExp>
+<classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+</registrationSuccessMessage>
 <requireCaptcha>
 <defaultValue></defaultValue>
 <displayFormType>checkbox</displayFormType>
 <displayType></displayType>
 <name>requireCaptcha</name>
-<number>10</number>
-<prettyName>Require captcha to register</prettyName>
-<unmodifiable>0</unmodifiable>
-<validationMessage></validationMessage>
-<validationRegExp></validationRegExp>
-<classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
-</requireCaptcha>
-<welcomeMessage>
-<editor>---</editor>
-<name>welcomeMessage</name>
-<number>2</number>
-<picker>0</picker>
-<prettyName>Welcome message</prettyName>
-<rows>5</rows>
-<size>40</size>
-<unmodifiable>0</unmodifiable>
-<validationMessage></validationMessage>
-<validationRegExp></validationRegExp>
-<classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
-</welcomeMessage>
-</class>
-<object>
-<class>
-<name>XWiki.Configurable</name>
-<customClass></customClass>
-<customMapping></customMapping>
-<defaultViewSheet></defaultViewSheet>
-<defaultEditSheet></defaultEditSheet>
-<defaultWeb></defaultWeb>
-<nameField></nameField>
-<validationScript></validationScript>
-<codeToExecute>
-<editor>---</editor>
-<name>codeToExecute</name>
-<number>7</number>
-<picker>0</picker>
-<prettyName>codeToExecute</prettyName>
-<rows>5</rows>
-<size>40</size>
-<unmodifiable>0</unmodifiable>
-<validationMessage></validationMessage>
-<validationRegExp></validationRegExp>
-<classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
-</codeToExecute>
-<configurationClass>
-<name>configurationClass</name>
-<number>3</number>
-<picker>0</picker>
-<prettyName>configurationClass</prettyName>
-<size>30</size>
-<unmodifiable>0</unmodifiable>
-<validationMessage></validationMessage>
-<validationRegExp></validationRegExp>
-<classType>com.xpn.xwiki.objects.classes.StringClass</classType>
-</configurationClass>
-<configureGlobally>
-<defaultValue></defaultValue>
-<displayFormType>checkbox</displayFormType>
-<displayType></displayType>
-<name>configureGlobally</name>
-<number>4</number>
-<prettyName>configureGlobally</prettyName>
-<unmodifiable>0</unmodifiable>
-<validationMessage></validationMessage>
-<validationRegExp></validationRegExp>
-<classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
-</configureGlobally>
-<displayInSection>
-<name>displayInSection</name>
-<number>1</number>
-<picker>0</picker>
-<prettyName>displayInSection</prettyName>
-<size>30</size>
-<unmodifiable>0</unmodifiable>
-<validationMessage></validationMessage>
-<validationRegExp></validationRegExp>
-<classType>com.xpn.xwiki.objects.classes.StringClass</classType>
-</displayInSection>
-<heading>
-<name>heading</name>
-<number>2</number>
-<picker>0</picker>
-<prettyName>heading</prettyName>
-<size>30</size>
-<unmodifiable>0</unmodifiable>
-<validationMessage></validationMessage>
-<validationRegExp></validationRegExp>
-<classType>com.xpn.xwiki.objects.classes.StringClass</classType>
-</heading>
-<iconAttachment>
-<name>iconAttachment</name>
 <number>8</number>
-<picker>0</picker>
-<prettyName>iconAttachment</prettyName>
-<size>30</size>
-<unmodifiable>0</unmodifiable>
-<validationMessage></validationMessage>
-<validationRegExp></validationRegExp>
-<classType>com.xpn.xwiki.objects.classes.StringClass</classType>
-</iconAttachment>
-<linkPrefix>
-<name>linkPrefix</name>
-<number>5</number>
-<picker>0</picker>
-<prettyName>linkPrefix</prettyName>
-<size>30</size>
-<unmodifiable>0</unmodifiable>
-<validationMessage></validationMessage>
-<validationRegExp></validationRegExp>
-<classType>com.xpn.xwiki.objects.classes.StringClass</classType>
-</linkPrefix>
-<propertiesToShow>
-<cache>0</cache>
-<displayType>input</displayType>
-<multiSelect>1</multiSelect>
-<name>propertiesToShow</name>
-<number>6</number>
-<picker>0</picker>
-<prettyName>propertiesToShow</prettyName>
-<relationalStorage>1</relationalStorage>
-<separator> </separator>
-<separators> ,|</separators>
-<size>20</size>
-<sort>none</sort>
-<unmodifiable>0</unmodifiable>
-<validationMessage></validationMessage>
-<validationRegExp></validationRegExp>
-<values></values>
-<classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
-</propertiesToShow>
-</class>
-<name>XWiki.Registration</name>
-<number>0</number>
-<className>XWiki.Configurable</className>
-<guid>c0f5ed8d-9e38-4ef7-b52b-1be0ec6ade32</guid>
-<property>
-<codeToExecute></codeToExecute>
-</property>
-<property>
-<configurationClass>XWiki.Registration</configurationClass>
-</property>
-<property>
-<configureGlobally>1</configureGlobally>
-</property>
-<property>
-<displayInSection>Registration</displayInSection>
-</property>
-<property>
-<heading></heading>
-</property>
-<property>
-<iconAttachment></iconAttachment>
-</property>
-<property>
-<linkPrefix>$xwiki.getURL('XWiki.RegistrationHelp')#</linkPrefix>
-</property>
-<property>
-<propertiesToShow/>
-</property>
-</object>
-<object>
-<class>
-<name>XWiki.Registration</name>
-<customClass></customClass>
-<customMapping></customMapping>
-<defaultViewSheet></defaultViewSheet>
-<defaultEditSheet></defaultEditSheet>
-<defaultWeb></defaultWeb>
-<nameField></nameField>
-<validationScript></validationScript>
-<defaultRedirect>
-<name>defaultRedirect</name>
-<number>7</number>
-<picker>0</picker>
-<prettyName>Redirect here after registration</prettyName>
-<size>30</size>
-<unmodifiable>0</unmodifiable>
-<validationMessage></validationMessage>
-<validationRegExp></validationRegExp>
-<classType>com.xpn.xwiki.objects.classes.StringClass</classType>
-</defaultRedirect>
-<heading>
-<name>heading</name>
-<number>1</number>
-<picker>0</picker>
-<prettyName>Registration page heading</prettyName>
-<size>30</size>
-<unmodifiable>0</unmodifiable>
-<validationMessage></validationMessage>
-<validationRegExp></validationRegExp>
-<classType>com.xpn.xwiki.objects.classes.StringClass</classType>
-</heading>
-<liveValidation_defaultFieldOkMessage>
-<name>liveValidation_defaultFieldOkMessage</name>
-<number>4</number>
-<picker>0</picker>
-<prettyName>Default field okay message</prettyName>
-<size>30</size>
-<unmodifiable>0</unmodifiable>
-<validationMessage></validationMessage>
-<validationRegExp></validationRegExp>
-<classType>com.xpn.xwiki.objects.classes.StringClass</classType>
-</liveValidation_defaultFieldOkMessage>
-<liveValidation_enabled>
-<defaultValue></defaultValue>
-<displayFormType>checkbox</displayFormType>
-<displayType></displayType>
-<name>liveValidation_enabled</name>
-<number>3</number>
-<prettyName>Enable Javascript field validation</prettyName>
-<unmodifiable>0</unmodifiable>
-<validationMessage></validationMessage>
-<validationRegExp></validationRegExp>
-<classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
-</liveValidation_enabled>
-<loginButton_autoLogin_enabled>
-<defaultValue></defaultValue>
-<displayFormType>checkbox</displayFormType>
-<displayType></displayType>
-<name>loginButton_autoLogin_enabled</name>
-<number>6</number>
-<prettyName>Enable automatic login</prettyName>
-<unmodifiable>0</unmodifiable>
-<validationMessage></validationMessage>
-<validationRegExp></validationRegExp>
-<classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
-</loginButton_autoLogin_enabled>
-<loginButton_enabled>
-<defaultValue></defaultValue>
-<displayFormType>checkbox</displayFormType>
-<displayType></displayType>
-<name>loginButton_enabled</name>
-<number>5</number>
-<prettyName>Enable login button</prettyName>
-<unmodifiable>0</unmodifiable>
-<validationMessage></validationMessage>
-<validationRegExp></validationRegExp>
-<classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
-</loginButton_enabled>
-<requireCaptcha>
-<defaultValue></defaultValue>
-<displayFormType>checkbox</displayFormType>
-<displayType></displayType>
-<name>requireCaptcha</name>
-<number>10</number>
 <prettyName>Require captcha to register</prettyName>
 <unmodifiable>0</unmodifiable>
 <validationMessage></validationMessage>
@@ -358,12 +127,12 @@
 <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
 </requireCaptcha>
 <welcomeMessage>
-<editor>---</editor>
+<editor>PureText</editor>
 <name>welcomeMessage</name>
 <number>2</number>
 <picker>0</picker>
 <prettyName>Welcome message</prettyName>
-<rows>5</rows>
+<rows>12</rows>
 <size>40</size>
 <unmodifiable>0</unmodifiable>
 <validationMessage></validationMessage>
@@ -371,35 +140,6 @@
 <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
 </welcomeMessage>
 </class>
-<name>XWiki.Registration</name>
-<number>0</number>
-<className>XWiki.Registration</className>
-<guid>cdf4d6f7-ffc8-4f3b-83c7-069a33914a63</guid>
-<property>
-<defaultRedirect>$xwiki.getURL("Main.WebHome")</defaultRedirect>
-</property>
-<property>
-<heading>$msg.get('core.register.title')</heading>
-</property>
-<property>
-<liveValidation_defaultFieldOkMessage>$msg.get('xe.admin.registration.fieldOkay')</liveValidation_defaultFieldOkMessage>
-</property>
-<property>
-<liveValidation_enabled>1</liveValidation_enabled>
-</property>
-<property>
-<loginButton_autoLogin_enabled>0</loginButton_autoLogin_enabled>
-</property>
-<property>
-<loginButton_enabled>1</loginButton_enabled>
-</property>
-<property>
-<requireCaptcha>0</requireCaptcha>
-</property>
-<property>
-<welcomeMessage>$msg.get('core.register.welcome')</welcomeMessage>
-</property>
-</object>
 <content>{{velocity}}
 ## These are defined in other places around XWiki, changing them here will result in undefined behavior.
 #set($redirectParam = 'xredirect')
@@ -407,8 +147,10 @@
 #set($loginPage = 'XWiki.XWikiLogin')
 #set($loginAction = 'loginsubmit')
 ##
-## The configuration object.
-#set($configObject = $doc.getObject('XWiki.Registration'))
+#set($documentName = 'XWiki.Registration')
+##
+## Load the configuration from a seperate document.
+#loadConfig('XWiki.RegistrationConfig')
 ##
 ## Defines what server generated error messages should look like
 ## The error message when a field is entered incorrectly
@@ -654,7 +396,7 @@ $xwiki.get('ssfx').use('uicomponents/widgets/validation/livevalidation.css')
 #if($captchaservice
     &amp;&amp; $captchaservice.isEnabled()
     &amp;&amp; $xcontext.getUser() == "XWiki.XWikiGuest"
-    &amp;&amp; $configObject.getProperty('requireCaptcha').getValue() == 1)
+    &amp;&amp; $requireCaptcha)
   ## Empty label field used for padding.
   ## Empty 'name' field overriddes name="captcha_image" with "" so name is not specified at all.
   #set($field = 
@@ -725,23 +467,6 @@ $xwiki.get('ssfx').use('uicomponents/widgets/validation/livevalidation.css')
 #######################################################################
 ## The Code.
 #######################################################################
-##
-## Load configuration from XWiki.Registration object.
-##---------------------------------------------------------------------
-#set($heading = "= #evaluate($configObject.getProperty('heading').getValue()) =")
-#set($welcomeMessage = "#evaluate($configObject.getProperty('welcomeMessage').getValue())")
-#if($configObject.getProperty('liveValidation_enabled').getValue() == 1)
-  #set($useLiveValidation = true)
-#end
-#set($defaultFieldOkayMessage = "#evaluate($configObject.getProperty('liveValidation_defaultFieldOkMessage').getValue())")
-#if($configObject.getProperty('loginButton_enabled').getValue() == 1)
-  #set($loginButton = true)
-#end
-#if($configObject.getProperty('loginButton_autoLogin_enabled').getValue() == 1)
-  #set($autoLogin = true)
-#end
-#set($defaultRedirect = "#evaluate($configObject.getProperty('defaultRedirect').getValue())")
-##---------------------------------------------------------------------
 ##
 #if($useLiveValidation)
   $xwiki.get('jsfx').use('uicomponents/widgets/validation/livevalidation_prototype.js')
@@ -827,7 +552,7 @@ $heading
   {{/html}}
   ##
   ## Allow permitted users to configure this application.
-  #if($xcontext.getUser() != 'XWiki.XWikiGuest' &amp;&amp; $xcontext.hasAccessLevel("edit", $doc.getFullName()))
+  #if($xcontext.getUser() != 'XWiki.XWikiGuest' &amp;&amp; $xcontext.hasAccessLevel("edit", $documentName))
     [[$msg.get('xe.admin.registration.youCanConfigureRegistrationHere')&gt;&gt;XWiki.XWikiPreferences?section=Registration&amp;editor=globaladmin#HCustomizeXWikiRegistration]]
     {{html}}&lt;a href="$xwiki.getURL($documentName, 'edit', 'editor=wiki')"&gt;$msg.get('xe.admin.registration.youCanConfigureRegistrationFieldsHere')&lt;/a&gt;{{/html}}
   #end
@@ -974,8 +699,9 @@ $heading
       #set($redirect = $defaultRedirect)
     #end
     ## Display a "registration successful" message
-    #set($fullName = "$request.get('register_first_name') $request.get('register_last_name')")
-    {{info}}$msg.get('core.register.successful', ["[[$fullName&gt;&gt;$userSpace$userName]]", $userName]){{/info}}
+    #evaluate($registrationSuccessMessage)
+    ## Empty line prevents message from being forced into a &lt;p&gt; block.
+
     ## Give the user a login button which posts their username and password to loginsubmit
     #if($loginButton)
       {{html clean=false wiki=false}}
@@ -1152,6 +878,44 @@ $heading
         #end
         #set($discard = $params.put('value', $request.get($field.get('name'))))
       #end
+    #end
+  #end
+#end
+#*
+ * Get the configuration from the configuration object.
+ *
+ * @param $configDocumentName The name of the document to get the configuration from.
+ *###
+#macro(loadConfig, $configDocumentName)
+  #set($configDocument = $xwiki.getDocument($configDocumentName))
+  #if(!$configDocument || !$configDocument.getObject($documentName))
+    ## No config document, load defaults.
+    #set($heading = "= $msg.get('core.register.title') =")
+    #set($welcomeMessage = "$msg.get('core.register.welcome')")
+    #set($useLiveValidation = true)
+    #set($defaultFieldOkayMessage = "$msg.get('xe.admin.registration.fieldOkay')")
+    #set($loginButton = true)
+    #set($defaultRedirect = "$xwiki.getURL('Main.WebHome')")
+    #set($userFullName = "$request.get('register_first_name') $request.get('register_last_name')")
+    #set($registrationSuccessMessage = '{{info}}$msg.get("core.register.successful", ["[[$fullName&gt;&gt;$userSpace$userName]]", $userName]){{/info}}')
+  #else
+    #set($configObject = $configDocument.getObject($documentName))
+    #set($heading = "= #evaluate($configObject.getProperty('heading').getValue()) =")
+    #set($welcomeMessage = "#evaluate($configObject.getProperty('welcomeMessage').getValue())")
+    #if($configObject.getProperty('liveValidation_enabled').getValue() == 1)
+      #set($useLiveValidation = true)
+    #end
+    #set($defaultFieldOkayMessage = "#evaluate($configObject.getProperty('liveValidation_defaultFieldOkMessage').getValue())")
+    #if($configObject.getProperty('loginButton_enabled').getValue() == 1)
+      #set($loginButton = true)
+    #end
+    #if($configObject.getProperty('loginButton_autoLogin_enabled').getValue() == 1)
+      #set($autoLogin = true)
+    #end
+    #set($defaultRedirect = "#evaluate($configObject.getProperty('defaultRedirect').getValue())")
+    #set($registrationSuccessMessage = "$configObject.getProperty('registrationSuccessMessage').getValue()")
+    #if($configObject.getProperty('requireCaptcha').getValue() == 1)
+      #set($requireCaptcha = true)
     #end
   #end
 #end

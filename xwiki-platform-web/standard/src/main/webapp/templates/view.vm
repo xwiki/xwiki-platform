@@ -18,8 +18,10 @@
     <div class="main layoutsubsection">
     #template("contentview.vm")
     <div class="clearfloats"></div>
-    #template("docextra.vm")
-    <div class="clearfloats"></div>
+    #if($displayDocExtra)
+      #template("docextra.vm")
+      <div class="clearfloats"></div>
+    #end
     </div>## main
   #else
     <div class="main layoutsubsection">

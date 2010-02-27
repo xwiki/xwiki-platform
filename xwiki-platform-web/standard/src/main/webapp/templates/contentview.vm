@@ -31,7 +31,9 @@
 ## ----------------------------
 ## Display the shortcuts
 ## ----------------------------
-#template("shortcuts.vm")
+#if($displayShortcuts)
+  #template("shortcuts.vm")
+#end
 ## ----------------------------
 ## Display the rendered content
 ## ----------------------------

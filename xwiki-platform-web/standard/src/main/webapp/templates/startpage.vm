@@ -1,9 +1,11 @@
 #template("xwikivars.vm")
 #template("layoutvars.vm")
 #template("htmlheader.vm")
-<div id="menuview">
-  #template("menuview.vm")
-</div>
+#if($displayMainMenu)
+  <div id="menuview">
+    #template("menuview.vm")
+  </div>
+#end
 #template("header.vm")
 <div class="content#if($showLeftPanels == "0")hideleft#end#if($showRightPanels == "0")hideright#end" id="contentcontainer">
 <div id="contentcontainerinner">

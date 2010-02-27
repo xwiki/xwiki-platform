@@ -2384,7 +2384,7 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
      */
     public int countDocuments(String wheresql, XWikiContext context) throws XWikiException
     {
-        String sql = createSQLQuery("select count(*)", wheresql);
+        String sql = createSQLQuery("select count(distinct doc.fullName)", wheresql);
         List l = search(sql, 0, 0, context);
         return ((Number) l.get(0)).intValue();
     }
@@ -2397,7 +2397,7 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
     public int countDocuments(String parametrizedSqlClause, List parameterValues, XWikiContext context)
         throws XWikiException
     {
-        String sql = createSQLQuery("select count(*)", parametrizedSqlClause);
+        String sql = createSQLQuery("select count(distinct doc.fullName)", parametrizedSqlClause);
         List l = searchGenericInternal(sql, 0, 0, parameterValues, context);
         return ((Number) ((Object[]) l.get(0))[0]).intValue();
     }

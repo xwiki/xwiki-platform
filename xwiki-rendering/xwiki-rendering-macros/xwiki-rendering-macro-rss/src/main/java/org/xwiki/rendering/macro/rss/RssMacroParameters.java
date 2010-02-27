@@ -49,7 +49,7 @@ public class RssMacroParameters
     /**
      * The number of feed items to display.
      */
-    private int count = Integer.MAX_VALUE;
+    private int count = 10;
 
     /**
      * If "true" and if the feed has an image, display it.

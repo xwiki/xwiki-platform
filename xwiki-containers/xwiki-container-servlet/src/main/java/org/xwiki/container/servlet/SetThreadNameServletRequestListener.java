@@ -36,6 +36,9 @@ import javax.servlet.http.HttpServletRequest;
  */
 public class SetThreadNameServletRequestListener implements ServletRequestListener
 {
+    /** The name of the servlet request attribute holding the original name of the processing thread. */
+    private static final String ORIGINAL_THREAD_NAME_ATTRIBUTE = "xwiki.thread.originalName";
+
     /**
      * {@inheritDoc}
      * 
@@ -54,6 +57,7 @@ public class SetThreadNameServletRequestListener implements ServletRequestListen
                 threadName += "?" + httpServletRequest.getQueryString();
             }
 
+            httpServletRequest.setAttribute(ORIGINAL_THREAD_NAME_ATTRIBUTE, Thread.currentThread().getName());
             Thread.currentThread().setName(threadName);
         }
     }
@@ -65,6 +69,10 @@ public class SetThreadNameServletRequestListener implements ServletRequestListen
      */
     public void requestDestroyed(ServletRequestEvent sre)
     {
-        // Nothing to do here
+        ServletRequest servletRequest = sre.getServletRequest();
+        if (servletRequest instanceof HttpServletRequest) {
+            HttpServletRequest httpServletRequest = (HttpServletRequest) servletRequest;
+            Thread.currentThread().setName("" + httpServletRequest.getAttribute(ORIGINAL_THREAD_NAME_ATTRIBUTE));
+        }
     }
 }

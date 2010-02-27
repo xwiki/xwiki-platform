@@ -828,8 +828,8 @@ $heading
   ##
   ## Allow permitted users to configure this application.
   #if($xcontext.getUser() != 'XWiki.XWikiGuest' &amp;&amp; $xcontext.hasAccessLevel("edit", $doc.getFullName()))
-    [[You can configure this application by clicking here.&gt;&gt;XWiki.XWikiPreferences?section=Registration&amp;editor=globaladmin#HCustomizeXWikiRegistration]]
-    {{html}}&lt;a href="$xwiki.getURL($doc.getFullName(), 'edit', 'editor=wiki')"&gt;You can add, remove and change fields in this form by clicking here.&lt;/a&gt;{{/html}}
+    [[$msg.get('xe.admin.registration.youCanConfigureRegistrationHere')&gt;&gt;XWiki.XWikiPreferences?section=Registration&amp;editor=globaladmin#HCustomizeXWikiRegistration]]
+    {{html}}&lt;a href="$xwiki.getURL($documentName, 'edit', 'editor=wiki')"&gt;$msg.get('xe.admin.registration.youCanConfigureRegistrationFieldsHere')&lt;/a&gt;{{/html}}
   #end
 ## If the registration is done (successful) and we detect the Lightbox simply send the user back to the original page.
 #elseif($assumeLightbox)

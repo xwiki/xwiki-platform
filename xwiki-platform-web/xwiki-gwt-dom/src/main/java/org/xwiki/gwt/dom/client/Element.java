@@ -141,7 +141,7 @@ public class Element extends com.google.gwt.dom.client.Element
         List<Element> elementsWithMetaData = new ArrayList<Element>();
         for (int i = 0; i < elements.getLength(); i++) {
             Element element = (Element) elements.getItem(i);
-            if (element.hasAttribute(META_DATA_ATTR)) {
+            if (element.xHasAttribute(META_DATA_ATTR)) {
                 elementsWithMetaData.add(element);
             }
         }
@@ -255,12 +255,12 @@ public class Element extends com.google.gwt.dom.client.Element
         if (metaData == null) {
             // There's no saved reference to the meta data.
             // Test if this element has stored meta data.
-            if (hasAttribute(META_DATA_ATTR)) {
+            if (xHasAttribute(META_DATA_ATTR)) {
                 // This element could be the result of node cloning or copy&paste.
                 // Let's update the cached meta data reference.
                 Element container = Element.as(getOwnerDocument().createDivElement());
                 // Set the inner HTML without notifying the listeners to prevent the meta data from being altered.
-                DOMUtils.getInstance().setInnerHTML(container, xGetAttribute(META_DATA_ATTR));
+                DOMUtils.getInstance().setInnerHTML(container, getAttribute(META_DATA_ATTR));
                 metaData = container.extractContents();
                 ((JavaScriptObject) cast()).set(META_DATA_REF, metaData);
             }
@@ -284,7 +284,7 @@ public class Element extends com.google.gwt.dom.client.Element
             setAttribute(META_DATA_ATTR, metaData.getInnerHTML());
         } else {
             removeProperty(META_DATA_REF);
-            removeAttribute(META_DATA_ATTR);
+            xRemoveAttribute(META_DATA_ATTR);
         }
     };
 
@@ -400,5 +400,47 @@ public class Element extends com.google.gwt.dom.client.Element
     public final void removeProperty(String propertyName)
     {
         DOMUtils.getInstance().removeProperty(this, propertyName);
+    }
+
+    /**
+     * Checks if this element has the specified attribute.
+     * <p>
+     * NOTE: We added this method in order to fix an IE7 bug in {@link #removeAttribute(String)}. It seems that
+     * {@link #cloneNode(boolean)} doesn't clone the attributes in IE7 but only copies their references to the clone. As
+     * a consequence an attribute can be shared by multiple elements. When we {@link #removeAttribute(String)} the
+     * {@code specified} flag is set to {@code false} and thus {@link #hasAttribute(String)}, which uses this flag in
+     * its IE7 implementation, mistakenly reports the attribute as missing from the rest of the elements that share it.
+     * 
+     * @param attributeName the name of an attribute
+     * @return {@code true} if this element has the specified attribute, {@code false} otherwise
+     * @see #hasAttribute(String)
+     * @see http://code.google.com/p/google-web-toolkit/issues/detail?id=4690
+     */
+    public final boolean xHasAttribute(String attributeName)
+    {
+        return DOMUtils.getInstance().hasAttribute(this, attributeName);
+    }
+
+    /**
+     * @param attributeName the name of an attribute
+     * @return the DOM node associated with the specified attribute
+     */
+    public final native Attribute getAttributeNode(String attributeName)
+    /*-{
+        return this.getAttributeNode(attributeName);
+    }-*/;
+
+    /**
+     * Removes an attribute by name.
+     * <p>
+     * We added this method to fix a bug in IE7 which allows <em>shared</em> attribute nodes. Removing a <em>shared</em>
+     * attribute affects all the element that share it and also can crash the browser if the attribute is remove twice.
+     * 
+     * @param attributeName the name of the attribute to remove
+     * @see #xHasAttribute(String)
+     */
+    public final void xRemoveAttribute(String attributeName)
+    {
+        DOMUtils.getInstance().removeAttribute(this, attributeName);
     }
 }

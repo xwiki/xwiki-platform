@@ -19,9 +19,17 @@
  */
 package org.xwiki.gwt.dom.client.internal.ie;
 
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.EnumSet;
+import java.util.List;
+
+import org.xwiki.gwt.dom.client.Attribute;
 import org.xwiki.gwt.dom.client.DOMUtils;
 import org.xwiki.gwt.dom.client.Document;
 import org.xwiki.gwt.dom.client.Element;
+import org.xwiki.gwt.dom.client.JavaScriptObject;
+import org.xwiki.gwt.dom.client.JavaScriptType;
 import org.xwiki.gwt.dom.client.Style;
 import org.xwiki.gwt.dom.client.Window;
 
@@ -35,6 +43,25 @@ import com.google.gwt.dom.client.Node;
  */
 public class IEDOMUtils extends DOMUtils
 {
+    /**
+     * The class attribute.
+     */
+    private static final String CLASS_ATTRIBUTE = "class";
+
+    /**
+     * The type an attribute value can have.
+     */
+    private static final EnumSet<JavaScriptType> ATTRIBUTE_TYPES =
+        EnumSet.of(JavaScriptType.BOOLEAN, JavaScriptType.NUMBER, JavaScriptType.STRING);
+
+    /**
+     * A list of know attributes that are handled in a special way.
+     * 
+     * @see #isAttribute(Element, String)
+     */
+    private static final List<String> KNOWN_ATTRIBUTES =
+        Collections.unmodifiableList(Arrays.asList(new String[] {Style.STYLE_ATTRIBUTE, CLASS_ATTRIBUTE}));
+
     /**
      * {@inheritDoc}
      * 
@@ -76,35 +103,6 @@ public class IEDOMUtils extends DOMUtils
     /**
      * {@inheritDoc}
      * 
-     * @see DOMUtils#getAttributeNames(Element)
-     */
-    public native JsArrayString getAttributeNames(Element element)
-    /*-{
-        var attrNames = [];
-        var isAttributeValue = function(value) {
-            var typeOfValue = typeof value;
-            return typeOfValue != 'object' && typeOfValue != 'function';
-        }
-        for(var i = 0; i < element.attributes.length; i++){
-            var attribute = element.attributes[i];
-            // On IE attributes and properties are stored in the same array. We exclude all objects and functions, 
-            // since attributes should be strings, numbers. Note that this does not ensure the elimination of all 
-            // custom properties, but covers most cases.
-            // NOTE: In IE8 typeof attribute.nodeValue is always string that's why we use element[attribute.nodeName]
-            if (attribute.specified && isAttributeValue(element[attribute.nodeName])) {
-                attrNames.push(attribute.nodeName);
-            }
-        }
-        // Typeof style is object and, in our quest to eliminate custom set properties, this one also gets removed.
-        if (element.style.cssText != '') {
-            attrNames.push('style');
-        }
-        return attrNames;
-    }-*/;
-
-    /**
-     * {@inheritDoc}
-     * 
      * @see DOMUtils#setInnerHTML(Element, String)
      * @see http://code.google.com/p/google-web-toolkit/issues/detail?id=3146
      */
@@ -117,50 +115,18 @@ public class IEDOMUtils extends DOMUtils
     /**
      * {@inheritDoc}
      * 
-     * @see DOMUtils#getAttribute(Element, String)
+     * @see DOMUtils#getAttributeNames(Element)
      */
-    public native String getAttribute(Element element, String name)
+    public native JsArrayString getAttributeNames(Element element)
     /*-{
-        // it seems that IE cannot return the style attribute value with getAttributeNode("style").nodeValue
-        // http://www.quirksmode.org/dom/w3c_core.html
-        if (name == "style") {
-            return element.style.cssText;
+        var attrNames = [];
+        for(var i = 0; i < element.attributes.length; i++){
+            var attribute = element.attributes[i];
+            if (this.@org.xwiki.gwt.dom.client.internal.ie.IEDOMUtils::hasAttribute(Lorg/xwiki/gwt/dom/client/Element;Ljava/lang/String;)(element, attribute.nodeName)) {
+                attrNames.push(attribute.nodeName);
+            }
         }
-        // the class, for example, is not returned on getAttribute("class") but getAttribute("className") or 
-        // getAttributeNode("class").nodeValue so make this the same for all attributes 
-        var attrNode = element.getAttributeNode(name);
-        if (attrNode) {
-            // make sure we don't print "undefined" and always return a String
-            return (attrNode.nodeValue || '' ) + ''; 
-        }
-        return '';
-    }-*/;
-
-    /**
-     * {@inheritDoc}
-     * 
-     * @see DOMUtils#setAttribute(Element, String, String)
-     */
-    public void setAttribute(Element element, String name, String value)
-    {
-        // In IE we can't set the style attribute using the standard setAttribute method from the DOM API.
-        if (Style.STYLE_ATTRIBUTE.equalsIgnoreCase(name)) {
-            element.getStyle().setProperty("cssText", value);
-        } else if ("class".equalsIgnoreCase(name)) {
-            element.setClassName(value);
-        } else {
-            element.setAttribute(name, value);
-        }
-    }
-
-    /**
-     * {@inheritDoc}
-     * 
-     * @see DOMUtils#getInnerText(Element)
-     */
-    public native String getInnerText(Element element)
-    /*-{
-        return element.innerText;
+        return attrNames;
     }-*/;
 
     /**
@@ -172,6 +138,146 @@ public class IEDOMUtils extends DOMUtils
     {
         return getAttributeNames(element).length() > 0;
     }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see DOMUtils#getAttribute(Element, String)
+     */
+    public String getAttribute(Element element, String attributeName)
+    {
+        // In IE we can't get the style and class attributes using the standard getAttribute method from the DOM API.
+        if (Style.STYLE_ATTRIBUTE.equalsIgnoreCase(attributeName)) {
+            return element.getStyle().getProperty(Style.STYLE_PROPERTY);
+        } else if (CLASS_ATTRIBUTE.equalsIgnoreCase(attributeName)) {
+            return element.getClassName();
+        } else if (hasAttribute(element, attributeName)) {
+            // IE handles attributes and properties in the same way so we check if the given attribute name refers
+            // indeed to an attribute (the associated value is of primitive type).
+            return element.getAttribute(attributeName);
+        } else {
+            return "";
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see DOMUtils#setAttribute(Element, String, String)
+     */
+    public void setAttribute(Element element, String attributeName, String attributeValue)
+    {
+        // In IE we can't set the style and class attributes using the standard setAttribute method from the DOM API.
+        if (Style.STYLE_ATTRIBUTE.equalsIgnoreCase(attributeName)) {
+            element.getStyle().setProperty(Style.STYLE_PROPERTY, attributeValue);
+        } else if (CLASS_ATTRIBUTE.equalsIgnoreCase(attributeName)) {
+            element.setClassName(attributeValue);
+        } else {
+            element.setAttribute(attributeName, attributeValue);
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     * <p>
+     * NOTE: We override the default implementation to fix an IE7 bug in {@link #removeAttribute(String)}. It seems that
+     * {@link #cloneNode(boolean)} doesn't clone the attributes in IE7 but only copies their references to the clone. As
+     * a consequence an attribute can be shared by multiple elements. When we {@link #removeAttribute(String)} the
+     * {@code specified} flag is set to {@code false} and thus {@link #hasAttribute(String)}, which uses this flag in
+     * its IE7 implementation, mistakenly reports the attribute as missing from the rest of the elements that share it.
+     * <p>
+     * We also think that element properties of non-primitive types shouldn't be counted as attributes.
+     * 
+     * @see DOMUtils#hasAttribute(Element, String)
+     * @see http://code.google.com/p/google-web-toolkit/issues/detail?id=4690
+     */
+    public boolean hasAttribute(Element element, String attributeName)
+    {
+        Attribute attribute = element.getAttributeNode(attributeName);
+        // IE handlers attributes and properties in the same way so we have to check if the given attribute name refers
+        // indeed to an attribute and not to a JavaScript property of the element object.
+        return attribute != null && attribute.isSpecified() && isAttribute(element, attributeName);
+    }
+
+    /**
+     * On IE attributes and properties are stored in the same array. We exclude all objects and functions, since
+     * attributes should be strings, numbers or booleans. Note that this does not ensure the elimination of all custom
+     * properties, but covers most cases.
+     * <p>
+     * In IE8 type of attribute.nodeValue is always string that's why we use element[attributeName] to get the attribute
+     * value.
+     * 
+     * @param element a DOM element
+     * @param name the name of a JavaScript property of the given element object
+     * @return {@code true} if the specified property is an attribute (i.e. has a primitive type), {@code false}
+     *         otherwise
+     */
+    private boolean isAttribute(Element element, String name)
+    {
+        return KNOWN_ATTRIBUTES.contains(name)
+            || ATTRIBUTE_TYPES.contains(((JavaScriptObject) element.cast()).typeOf(name));
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see DOMUtils#removeAttribute(Element, String)
+     */
+    public void removeAttribute(Element element, String attributeName)
+    {
+        // IE7 has a buggy implementation of cloneNode which can lead to multiple elements sharing the same attribute
+        // node. As a result removing the attribute from one of the sharing elements affects the others. Additionally,
+        // removing the attribute from two different elements that share it can crash the browser. Instead of removing
+        // the attribute we set its value to the empty object which prevents it from being serialized to HTML.
+        // Considering that attributes must have values of primitive types we think this is an acceptable workaround.
+        if (isExpando(element, attributeName)) {
+            ((JavaScriptObject) element.cast()).set(attributeName, JavaScriptObject.createObject());
+        } else {
+            element.removeAttribute(attributeName);
+        }
+    }
+
+    /**
+     * @param element a DOM element
+     * @param attributeName the name of an attribute
+     * @return {@code true} if the specified attribute is custom, set through JavaScript, {@code false} otherwise
+     * @see http://msdn.microsoft.com/en-us/library/ms533747.aspx
+     */
+    private native boolean isExpando(Element element, String attributeName)
+    /*-{
+        var attribute = element.getAttributeNode(attributeName);
+        var buggyExpando = function() {
+            var elementClone = element.ownerDocument.createElement(element.nodeName);
+            var attributeClone = attribute.cloneNode();
+            elementClone.setAttributeNode(attributeClone);
+            return attributeClone.expando;
+        }
+        return !!(attribute && (attribute.expando || buggyExpando()));
+    }-*/;
+
+    /**
+     * {@inheritDoc}
+     * <p>
+     * Internet Explorer stores element properties in attribute nodes. In order to remove a property we have to remove
+     * its attribute node too.
+     * 
+     * @see DOMUtils#removeProperty(Element, String)
+     */
+    public void removeProperty(Element element, String propertyName)
+    {
+        super.removeProperty(element, propertyName);
+        element.removeAttribute(propertyName);
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see DOMUtils#getInnerText(Element)
+     */
+    public native String getInnerText(Element element)
+    /*-{
+        return element.innerText;
+    }-*/;
 
     /**
      * {@inheritDoc}
@@ -214,20 +320,6 @@ public class IEDOMUtils extends DOMUtils
     public void stop(Window window)
     {
         window.getDocument().execCommand("Stop", null);
-    }
-
-    /**
-     * {@inheritDoc}
-     * <p>
-     * Internet Explorer stores element properties in attribute nodes. In order to remove a property we have to remove
-     * its attribute node too.
-     * 
-     * @see DOMUtils#removeProperty(Element, String)
-     */
-    public void removeProperty(Element element, String propertyName)
-    {
-        super.removeProperty(element, propertyName);
-        element.removeAttribute(propertyName);
     }
 
     /**

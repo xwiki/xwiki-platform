@@ -245,34 +245,34 @@ public class ElementTest extends DOMTestCase
     }
 
     /**
-     * Unit test for {@link Element#hasAttribute(String)}.
+     * Unit test for {@link Element#xHasAttribute(String)}.
      */
-    public void testHasAttribute()
+    public void testXHasAttribute()
     {
         Element element = getDocument().createSpanElement().cast();
 
-        assertFalse(element.hasAttribute(CLASS_ATTRIBUTE));
-        assertFalse(element.hasAttribute(STYLE_ATTRIBUTE));
-        assertFalse(element.hasAttribute(TITLE_ATTRIBUTE));
-        assertFalse(element.hasAttribute(ID_ATTRIBUTE));
+        assertFalse(element.xHasAttribute(CLASS_ATTRIBUTE));
+        assertFalse(element.xHasAttribute(STYLE_ATTRIBUTE));
+        assertFalse(element.xHasAttribute(TITLE_ATTRIBUTE));
+        assertFalse(element.xHasAttribute(ID_ATTRIBUTE));
 
         String customAttribute = "from";
-        assertFalse(element.hasAttribute(customAttribute));
+        assertFalse(element.xHasAttribute(customAttribute));
 
         element.setClassName("xyz");
-        assertTrue(element.hasAttribute(CLASS_ATTRIBUTE));
+        assertTrue(element.xHasAttribute(CLASS_ATTRIBUTE));
 
         element.getStyle().setFontWeight(FontWeight.BOLD);
-        assertTrue(element.hasAttribute(STYLE_ATTRIBUTE));
+        assertTrue(element.xHasAttribute(STYLE_ATTRIBUTE));
 
         element.setTitle("abc");
-        assertTrue(element.hasAttribute(TITLE_ATTRIBUTE));
+        assertTrue(element.xHasAttribute(TITLE_ATTRIBUTE));
 
         element.setId("x11");
-        assertTrue(element.hasAttribute(ID_ATTRIBUTE));
+        assertTrue(element.xHasAttribute(ID_ATTRIBUTE));
 
         element.setAttribute(customAttribute, "me");
-        assertTrue(element.hasAttribute(customAttribute));
+        assertTrue(element.xHasAttribute(customAttribute));
     }
 
     /**
@@ -301,5 +301,40 @@ public class ElementTest extends DOMTestCase
     {
         element.xSetAttribute(attrName, attrValue);
         assertEquals(attrValue, element.xGetAttribute(attrName).toLowerCase());
+    }
+
+    /**
+     * Clones an element, removes an attribute from the clone and checks if the original element is affected.
+     */
+    public void testRemoveAttributeFromClone()
+    {
+        // Create an element and set a custom attribute on it.
+        String alice = "alice";
+        String bob = "bob";
+        Element element = Element.as(getDocument().createSpanElement());
+        element.setAttribute(alice, alice);
+        element.setAttribute(bob, bob);
+
+        // At this point, although we set the attribute, the attribute node was not created.
+        // It seems that IE7 creates the attribute node the first time we access it.
+        // This line calls in behind getAttributeNode which creates the attribute node at first call.
+        assertTrue(element.xHasAttribute(alice));
+        assertTrue(element.xHasAttribute(bob));
+
+        // Now let's clone the element.
+        Element clone = Element.as(element.cloneNode(true));
+        assertTrue(clone.xHasAttribute(alice));
+        assertTrue(clone.xHasAttribute(bob));
+
+        // Remove the attribute from the clone. It seems that IE7 doesn't clone the attribute node, it only copies the
+        // reference. As a consequence removing the attribute from the clone affects the original element. Note that if
+        // we don't access the attribute node on the original element the attribute node is not created thus not copied
+        // to the clone. This way the clone has its own attribute which we can safely remove without affecting the
+        // original element.
+        clone.xRemoveAttribute(alice);
+        element.xRemoveAttribute(bob);
+
+        assertTrue(clone.xHasAttribute(bob));
+        assertTrue(element.xHasAttribute(alice));
     }
 }

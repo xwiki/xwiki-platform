@@ -316,8 +316,8 @@ public abstract class DOMUtils
                 return node.getNodeValue().length() > 0;
             case Node.ELEMENT_NODE:
                 Element element = Element.as(node);
-                return !element.hasAttribute(Element.META_DATA_ATTR)
-                    || !"".equals(element.xGetAttribute(Element.META_DATA_ATTR));
+                return !element.xHasAttribute(Element.META_DATA_ATTR)
+                    || !"".equals(element.getAttribute(Element.META_DATA_ATTR));
             default:
                 return true;
         }
@@ -1005,7 +1005,9 @@ public abstract class DOMUtils
 
     /**
      * Returns the value of the named attribute of the specified element. This method will be overwritten for Internet
-     * Explorer browsers to handle bug http://code.google.com/p/google-web-toolkit/issues/detail?id=3238 .
+     * Explorer browsers to overcome the fact that the native implementation doesn't return the value from some of the
+     * standard attributes like {@code style} and {@code class}. This method should be used only when the attribute name
+     * is not know.
      * 
      * @param element the element to get the attribute for
      * @param name the name of the attribute to return
@@ -1366,5 +1368,26 @@ public abstract class DOMUtils
             }
         }
         return true;
+    }
+
+    /**
+     * @param element a DOM element
+     * @param attributeName the name of an attribute
+     * @return {@code true} if the given element has the specified attribute, {@code false} otherwise
+     */
+    public boolean hasAttribute(Element element, String attributeName)
+    {
+        return element.hasAttribute(attributeName);
+    }
+
+    /**
+     * Removes an attribute by name.
+     * 
+     * @param element a DOM element
+     * @param attributeName the name of the attribute to remove
+     */
+    public void removeAttribute(Element element, String attributeName)
+    {
+        element.removeAttribute(attributeName);
     }
 }

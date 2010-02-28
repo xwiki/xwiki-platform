@@ -116,4 +116,14 @@ public class JavaScriptObject extends com.google.gwt.core.client.JavaScriptObjec
            }
            return keys;
     }-*/;
+
+    /**
+     * @param key the name of a property of this JavaScript object
+     * @return the type of value assigned to the specified property
+     */
+    public final native JavaScriptType typeOf(String key)
+    /*-{
+        var type = (typeof this[key]).toUpperCase();
+        return @org.xwiki.gwt.dom.client.JavaScriptType::valueOf(Ljava/lang/String;)(type);
+    }-*/;
 }

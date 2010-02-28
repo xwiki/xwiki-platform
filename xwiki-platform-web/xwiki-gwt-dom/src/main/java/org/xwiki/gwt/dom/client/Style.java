@@ -34,6 +34,11 @@ public class Style extends com.google.gwt.dom.client.Style
     public static final String STYLE_ATTRIBUTE = "style";
 
     /**
+     * The name of the style property holding the value of the {@link #STYLE_ATTRIBUTE}.
+     */
+    public static final String STYLE_PROPERTY = "cssText";
+
+    /**
      * Sets how/if an element is displayed.
      */
     public static final String DISPLAY = "display";

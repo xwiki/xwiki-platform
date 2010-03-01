@@ -37,6 +37,8 @@ import org.apache.commons.fileupload.FileItem;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.RandomStringUtils;
 import org.apache.commons.lang.StringUtils;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.apache.ecs.Filter;
 import org.apache.ecs.filter.CharacterFilter;
 import org.apache.log4j.MDC;
@@ -52,6 +54,8 @@ import com.xpn.xwiki.util.Util;
 
 public class Utils
 {
+    protected static final Log LOG = LogFactory.getLog(Utils.class);
+
     /** A key that is used for placing a map of replaced (for protection) strings in the context. */
     private static final String PLACEHOLDERS_CONTEXT_KEY = Utils.class.getCanonicalName() + "_placeholders";
 
@@ -145,13 +149,18 @@ public class Utils
         // the content is fully rendered. The rendering code can use Utils.createPlaceholder.
         // Initialize the placeholder map
         enablePlaceholders(context);
-        String content = context.getWiki().parseTemplate(template + ".vm", context);
-        // Replace all placeholders with the protected values
-        content = replacePlaceholders(content, context);
-        disablePlaceholders(context);
-        content = context.getWiki().getPluginManager().endParsing(content.trim(), context);
+        String content;
+        try {
+            content = context.getWiki().evaluateTemplate(template + ".vm", context);
+            // Replace all placeholders with the protected values
+            content = replacePlaceholders(content, context);
+            disablePlaceholders(context);
+            content = context.getWiki().getPluginManager().endParsing(content, context);
+        } catch (IOException e) {
+            if (LOG.isDebugEnabled()) {
+                LOG.debug("IOException while evaluating template [" + template + "] from /templates/", e);
+            }
 
-        if (content.equals("")) {
             // get Error template "This template does not exist
             content = context.getWiki().parseTemplate("templatedoesnotexist.vm", context);
             content = content.trim();

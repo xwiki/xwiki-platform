@@ -882,6 +882,8 @@
           <excludes>
               **/XWikiContext.java,
               **/export/html/HtmlPackager.java,
+              **/doc/rcs/XWikiRCSArchive.java,
+              **/doc/rcs/XWikiPatchUtils.java,
               **/doc/XWikiDocument.java,
               **/doc/MetaDataDiff.java,
               **/doc/AttachmentDiff.java,
@@ -946,6 +948,7 @@
               **/store/XWikiAttachmentStoreInterface.java,
               **/store/XWikiBatcherFactory.java,
               **/store/XWikiCacheStore.java,
+              **/store/migration/AbstractXWikiMigrationManager.java,
               **/store/migration/hibernate/XWikiHibernateMigrationManager.java,
               **/store/migration/hibernate/R4340XWIKI883Migrator.java,
               **/store/migration/hibernate/R7350XWIKI2079Migrator.java,

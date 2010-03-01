@@ -27,8 +27,19 @@ import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.objects.classes.BaseClass;
 
+/**
+ * Action used to post a comment on a page, adds a comment object to the document and saves it, requires comment right
+ * but not edit right.
+ * 
+ * @version $Id$
+ */
 public class CommentAddAction extends XWikiAction
 {
+    /**
+     * {@inheritDoc}
+     * 
+     * @see XWikiAction#action(com.xpn.xwiki.XWikiContext)
+     */
     @Override
     public boolean action(XWikiContext context) throws XWikiException
     {
@@ -42,7 +53,8 @@ public class CommentAddAction extends XWikiAction
         if (doc.isNew()) {
             return true;
         } else {
-            String className = baseclass.getName(); // XWiki.XWikiComments
+            // className = XWiki.XWikiComments
+            String className = baseclass.getName();
             BaseObject object = doc.newObject(className, context);
             // TODO The map should be pre-filled with empty strings for all class properties, just like in
             // ObjectAddAction, so that properties missing from the request are still added to the database.
@@ -60,6 +72,11 @@ public class CommentAddAction extends XWikiAction
         return false;
     }
 
+    /**
+     * {@inheritDoc}
+     * 
+     * @see XWikiAction#render(com.xpn.xwiki.XWikiContext)
+     */
     @Override
     public String render(XWikiContext context) throws XWikiException
     {

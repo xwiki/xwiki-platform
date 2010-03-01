@@ -891,6 +891,7 @@
               **/web/DeleteVersionsForm.java,
               **/UndeleteAction.java,
               **/ViewAction.java,
+              **/CommentAddAction.java,
               **/ZipExplorer*.java,
               **/FileUpload*.java,
               **/PluginApi.java,

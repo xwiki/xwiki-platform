@@ -62,7 +62,7 @@ import org.xwiki.rendering.wiki.WikiModel;
  * @version $Id$
  * @since 1.5M2
  */
-public abstract class AbstractLinkParser  implements LinkParser
+public abstract class AbstractLinkParser implements LinkParser
 {
     /**
      * URL matching pattern.

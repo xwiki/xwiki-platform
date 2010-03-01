@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="ISO-8859-1"?>
+<?xml version="1.0" encoding="UTF-8"?>
 
 <xwikidoc>
 <web>XWiki</web>
@@ -12,9 +12,9 @@
 <customClass></customClass>
 <contentAuthor>XWiki.Admin</contentAuthor>
 <creationDate>1211801430000</creationDate>
-<date>1240954259000</date>
-<contentUpdateDate>1240954259000</contentUpdateDate>
-<version>1.1</version>
+<date>1267456606000</date>
+<contentUpdateDate>1267456606000</contentUpdateDate>
+<version>2.1</version>
 <title>AdminUsersSheet</title>
 <template></template>
 <defaultTemplate></defaultTemplate>
@@ -47,7 +47,7 @@
 ##
 ## url to get the users for displaying them in the ajax-based table
 ##
-#set($url = "?xpage=getusers")
+#set($url = $doc.getURL('get', 'xpage=getusers'))
 #if($context.database != "xwiki") 
   #set($mainwk = false) 
 #else 
@@ -108,8 +108,8 @@
    &lt;script type="text/javascript"&gt;
   //&lt;![CDATA[
        var ta = new XWiki.widgets.LiveTable("$url", "userstable", displayUsers); 
-       #set($registerurl = $doc.getURL("view", "xpage=registerinline"))
-       #set($saveurl = $doc.getURL("view", "xpage=registerinline"))
+       #set($registerurl = $doc.getURL("view", "xpage=registeruser"))
+       #set($saveurl = $doc.getURL("register", "xpage=registeruser"))
        #set($redirectuserurl = $xwiki.getDocument("XWiki.XWikiPreferences").getURL("admin", "editor=${editor}&amp;section=Users")) 
        Event.observe($('addNewUser'), "click", makeAddHandler("$registerurl", "$saveurl", "$redirectuserurl"));
   //]]&gt;

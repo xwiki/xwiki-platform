@@ -1730,6 +1730,15 @@ public class XWiki implements XWikiDocChangeNotificationInterface
         return result;
     }
 
+    /**
+     * Evaluate provided template content using velocity engine.
+     * 
+     * @param template the template to evaluate
+     * @param context the XWiki context
+     * @return the return of the velocity script
+     * @throws IOException failed to get the template content
+     * @since 2.2.2
+     */
     public String evaluateTemplate(String template, XWikiContext context) throws IOException
     {
         try {

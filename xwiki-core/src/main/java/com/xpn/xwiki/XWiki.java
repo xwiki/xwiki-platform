@@ -1711,7 +1711,26 @@ public class XWiki implements XWikiDocChangeNotificationInterface
         return parsedContent;
     }
 
+    /**
+     * @deprecated use {@link #evaluateTemplate(String, XWikiContext)} instead
+     */
+    @Deprecated
     public String parseTemplate(String template, XWikiContext context)
+    {
+        String result = "";
+
+        try {
+            result = evaluateTemplate(template, context);
+        } catch (Exception e) {
+            if (LOG.isDebugEnabled()) {
+                LOG.debug("Exception while parsing template [" + template + "] from /templates/", e);
+            }
+        }
+
+        return result;
+    }
+
+    public String evaluateTemplate(String template, XWikiContext context) throws IOException
     {
         try {
             String skin = getSkin(context);
@@ -1746,16 +1765,9 @@ public class XWiki implements XWikiDocChangeNotificationInterface
             }
         }
 
-        try {
-            String content = getResourceContent("/templates/" + template);
-            return XWikiVelocityRenderer.evaluate(content, "/templates/" + template,
-                (VelocityContext) context.get("vcontext"), context);
-        } catch (Exception e) {
-            if (LOG.isDebugEnabled()) {
-                LOG.debug("Exception while parsing template [" + template + "] from /templates/", e);
-            }
-            return "";
-        }
+        String content = getResourceContent("/templates/" + template);
+        return XWikiVelocityRenderer.evaluate(content, "/templates/" + template,
+            (VelocityContext) context.get("vcontext"), context);
     }
 
     public String parseTemplate(String template, String skin, XWikiContext context)

@@ -239,7 +239,7 @@ XWiki.viewers.Comments = Class.create({
         event.stop();
         if (form.down('textarea').value != "") {
           var formData = new Hash(form.serialize(true));
-          formData.set('xredirect', window.docviewurl + '?xpage=xpart&vm=' + this.generatorTemplate);
+          formData.set('xredirect', window.docgeturl + '?xpage=xpart&vm=' + this.generatorTemplate);
           formData.unset('action_cancel');
           // Create a notification message to display to the user when the submit is being sent
           form._x_notification = new XWiki.widgets.Notification("$msg.get('core.viewers.comments.add.inProgress')", "inprogress");

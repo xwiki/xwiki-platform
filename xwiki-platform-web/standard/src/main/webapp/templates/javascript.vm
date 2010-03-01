@@ -40,6 +40,7 @@ XWiki.hasEdit = $hasEdit;
 window.docviewurl = "${doc.getURL('view')}";
 window.docediturl = "${doc.getURL('edit')}";
 window.docsaveurl = "${doc.getURL('save')}";
+window.docgeturl = "${doc.getURL('get')}";
 // ]]>
 </script>
 #if(($context.action=="inline")||($context.action=="edit") || ($context.action=="admin"))

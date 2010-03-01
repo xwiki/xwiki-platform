@@ -1544,9 +1544,9 @@ ${Msz}Mb##
   #if("$!options.url" != "")
     #set($dataurl = $options.url)
   #elseif("$!options.resultPage" != "")
-    #set($dataurl = $xwiki.getURL($options.resultPage,"view","xpage=plain&outputSyntax=plain&transprefix=${transprefix}&classname=$!{classname}&collist=${collist2}&$!{extraparams}${classparams}") )
+    #set($dataurl = $xwiki.getURL($options.resultPage,'get',"outputSyntax=plain&transprefix=${transprefix}&classname=$!{classname}&collist=${collist2}&$!{extraparams}${classparams}") )
   #else
-    #set($dataurl = $xwiki.getURL("XWiki.LiveTableResults","view","xpage=plain&outputSyntax=plain&transprefix=${transprefix}&classname=$!{classname}&collist=${collist2}$!{extraparams}${classparams}"))
+    #set($dataurl = $xwiki.getURL("XWiki.LiveTableResults",'get',"outputSyntax=plain&transprefix=${transprefix}&classname=$!{classname}&collist=${collist2}$!{extraparams}${classparams}"))
   #end
   ##
   ## HTML Table

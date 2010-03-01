@@ -81,7 +81,7 @@
             this.successCallback = options.onSuccess || function(){};
             this.failureCallback = options.onFailure || function(){};
             
-            var url = window.docviewurl + "?xpage=packageinfo&package=" + name;
+            var url = window.docgeturl + "?xpage=packageinfo&package=" + name;
             
             var ajx = new Ajax.Request(url, {
                 onSuccess: this.onSuccess.bindAsEventListener(this),

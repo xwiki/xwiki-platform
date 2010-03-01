@@ -241,7 +241,7 @@ Object.extend(XWiki, {
         $("docextrapanes").className="loading";
         new Ajax.Updater(
                 extraID + "pane",
-                window.docviewurl + '?xpage=xpart&vm=' + extraTemplate,
+                window.docgeturl + '?xpage=xpart&vm=' + extraTemplate,
                 {
                     method: 'post',
                     evalScripts: true,
@@ -385,7 +385,7 @@ Object.extend(XWiki, {
     updateMenu : function(menu) {
       new Ajax.Updater(
               menu,
-              window.docviewurl + "?xpage=xpart&vm=" + menu + ".vm",
+              window.docgeturl + "?xpage=xpart&vm=" + menu + ".vm",
               {
                 method: 'get',
                 onComplete: XWiki.watchlist.initialize
@@ -402,7 +402,7 @@ Object.extend(XWiki, {
       if (add) {
         action = "adddocument";
       }
-      var surl = window.docviewurl + "?xpage=watch&do=" + action;
+      var surl = window.docgeturl + "?xpage=watch&do=" + action;
       var myAjax = new Ajax.Request(
         surl,
         {
@@ -421,7 +421,7 @@ Object.extend(XWiki, {
         if (add) {
           action = "addspace";
         }
-        var surl = window.docviewurl + "?xpage=watch&do=" + action;
+        var surl = window.docgeturl + "?xpage=watch&do=" + action;
         var myAjax = new Ajax.Request(
           surl,
           {
@@ -440,7 +440,7 @@ Object.extend(XWiki, {
         if (add) {
           action = "addwiki";
         }
-        var surl = window.docviewurl + "?xpage=watch&do=" + action;
+        var surl = window.docgeturl + "?xpage=watch&do=" + action;
         var myAjax = new Ajax.Request(
           surl,
           {

@@ -55,7 +55,7 @@ $xwiki.ssfx.use('uicomponents/viewers/comments.css', true)
       #if($xwiki.hasAccessLevel('comment'))
         <span class="commenttool commentreply"><a class="commentreply" href="${request.getRequestURL()}?${request.getQueryString().replaceAll('&?replyto=\d++', '')}&amp;replyto=${comment.number}#xwikicomment_${comment.number}" title="$msg.get('core.viewers.comments.reply')"#if("$!{request.replyto}" == "${comment.number}") style="display: none;"#end>$msg.get('core.viewers.comments.reply')</a></span>
         #if($comment.author == $context.user)
-          <span class="commenttool commentedit"><a class="edit" href="$doc.getURL('view', "viewer=commentsinline&amp;number=${comment.number}&amp;xredirect=${request.getRequestURL()}")" title="$msg.get('core.viewers.comments.edit')">$msg.get('core.viewers.comments.edit')</a></span>
+          <span class="commenttool commentedit"><a class="edit" href="$doc.getURL('get', "viewer=commentsinline&amp;number=${comment.number}&amp;xredirect=${request.getRequestURL()}")" title="$msg.get('core.viewers.comments.edit')">$msg.get('core.viewers.comments.edit')</a></span>
         #end
       #end
       #if($hasEdit) 

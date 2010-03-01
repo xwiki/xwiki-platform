@@ -2947,7 +2947,7 @@ public class XWikiDocument implements DocumentModelBridge
         setNew(document.isNew());
         setStore(document.getStore());
         setTemplateDocumentReference(document.getTemplateDocumentReference());
-        setParentReference(document.getParentReference());
+        setParent(document.getParent());
         setCreator(document.getCreator());
         setDefaultLanguage(document.getDefaultLanguage());
         setDefaultTemplate(document.getDefaultTemplate());

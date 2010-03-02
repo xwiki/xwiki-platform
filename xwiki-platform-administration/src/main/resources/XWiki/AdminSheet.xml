@@ -511,6 +511,12 @@ p.legend {
   margin-bottom: 10px;
 }
 
+/* Checkboxes are centered in some browsers without this. */
+#admin-page-content fieldset p input[type=checkbox] {
+  width: auto;
+  margin: 0 0 0 10px;
+}
+
 #admin-page-content fieldset p select {
   width: 30%;
   margin-left: 10px;

@@ -19,9 +19,9 @@
  */
 package com.xpn.xwiki.user.impl.xwiki;
 
+import java.net.URL;
 import java.security.Principal;
 
-import com.xpn.xwiki.XWikiException;
 import org.jmock.Mock;
 
 import com.xpn.xwiki.XWiki;
@@ -173,5 +173,21 @@ public class XWikiAuthServiceImplTest extends AbstractBridgedXWikiComponentTestC
         Principal principalVirtual = this.authService.authenticate("xwiki:XWiki.Admin", "admin", this.getContext());
         assertNotNull(principalVirtual);
         assertEquals("xwiki:XWiki.Admin", principalVirtual.getName());
+    }
+
+    public void testStripContextPathFromURLWithSlashAfter() throws Exception
+    {
+        this.mockXWiki.stubs().method("getWebAppPath").will(returnValue("xwiki/"));
+
+        assertEquals("/something",
+            this.authService.stripContextPathFromURL(new URL("http://localhost:8080/xwiki/something"), getContext()));
+    }
+
+    public void testStripContextPathFromURLWithSlashBefore() throws Exception
+    {
+        this.mockXWiki.stubs().method("getWebAppPath").will(returnValue("/xwiki"));
+
+        assertEquals("/something",
+            this.authService.stripContextPathFromURL(new URL("http://localhost:8080/xwiki/something"), getContext()));
     }
 }

@@ -23,17 +23,12 @@ package com.xpn.xwiki.xmlrpc;
 import java.io.IOException;
 import java.net.URL;
 
-import javax.servlet.ServletConfig;
-import javax.servlet.http.HttpServletRequest;
-
 import org.apache.xmlrpc.XmlRpcException;
 import org.apache.xmlrpc.XmlRpcRequest;
-import org.apache.xmlrpc.common.XmlRpcHttpRequestConfigImpl;
 import org.apache.xmlrpc.server.PropertyHandlerMapping;
 import org.apache.xmlrpc.server.RequestProcessorFactoryFactory;
 import org.apache.xmlrpc.server.RequestProcessorFactoryFactory.RequestSpecificProcessorFactoryFactory;
 import org.apache.xmlrpc.webserver.XmlRpcServlet;
-import org.apache.xmlrpc.webserver.XmlRpcServletServer;
 
 /**
  * This is the XMLRPC Servlet that is used as a gateway for serving XMLRPC requests.
@@ -50,7 +45,6 @@ public class XWikiXmlRpcServlet extends XmlRpcServlet
         PropertyHandlerMapping mapping = new PropertyHandlerMapping();
         RequestProcessorFactoryFactory factory = new RequestSpecificProcessorFactoryFactory()
         {
-
             @Override
             protected Object getRequestProcessor(Class class1, XmlRpcRequest request) throws XmlRpcException
             {

@@ -75,10 +75,10 @@
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-checkstyle-plugin</artifactId>
         <configuration>
-          <includes>
-            **/rendering/internal/macro/wikibridge/DefaultWikiMacroManager.java,
-            **/rendering/macro/wikibridge/*.java
-          </includes>
+          <excludes>
+            org/xwiki/rendering/internal/macro/wikibridge/WikiMacroEventListener.java,
+            org/xwiki/rendering/internal/macro/wikibridge/DefaultWikiMacro.java
+          </excludes>
         </configuration>
       </plugin>
     </plugins>

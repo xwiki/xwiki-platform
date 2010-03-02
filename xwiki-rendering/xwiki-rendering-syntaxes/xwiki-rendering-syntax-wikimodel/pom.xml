@@ -51,10 +51,23 @@
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-checkstyle-plugin</artifactId>
         <configuration>
-          <includes>
-            **/AbstractWikiModelParser.java
-            **/WikiModelXWiki20Parser.java
-          </includes>
+          <excludes>
+            org/xwiki/rendering/internal/renderer/tex/TexBlockRenderer.java,
+            org/xwiki/rendering/internal/renderer/tex/TexRendererFactory.java,
+            org/xwiki/rendering/internal/renderer/wikimodel/WikiModelGeneratorListener.java,
+            org/xwiki/rendering/internal/renderer/wikimodel/WikiModelPrinterAdapter.java,
+            org/xwiki/rendering/internal/parser/WikiModelXHTMLParser.java,
+            org/xwiki/rendering/internal/parser/wikimodel/XWikiGeneratorListener.java,
+            org/xwiki/rendering/internal/parser/wikimodel/xhtml/XWikiXHTMLWhitespaceXMLFilter.java,
+            org/xwiki/rendering/internal/parser/wikimodel/xhtml/XWikiImageTagHandler.java,
+            org/xwiki/rendering/internal/parser/wikimodel/xhtml/XWikiReferenceTagHandler.java,
+            org/xwiki/rendering/internal/parser/wikimodel/xhtml/XWikiCommentHandler.java,
+            org/xwiki/rendering/internal/parser/wikimodel/xhtml/XWikiHeaderTagHandler.java,
+            org/xwiki/rendering/internal/parser/wikimodel/xhtml/XWikiSpanTagHandler.java,
+            org/xwiki/rendering/internal/parser/wikimodel/xhtml/XWikiXMLReaderFactory.java,
+            org/xwiki/rendering/internal/parser/wikimodel/WikiModelParserUtils.java,
+            org/xwiki/rendering/internal/parser/WikiModelConfluenceParser.java
+          </excludes>
         </configuration>
       </plugin>
     </plugins>

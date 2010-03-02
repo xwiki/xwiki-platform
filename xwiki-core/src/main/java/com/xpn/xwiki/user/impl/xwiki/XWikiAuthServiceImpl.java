@@ -664,6 +664,7 @@ public class XWikiAuthServiceImpl extends AbstractXWikiAuthService
         // Apply the same escape method to compensate this.
         contextPath = Util.escapeURL(contextPath);
 
-        return StringUtils.removeStart(context.getURLFactory().getURL(url, context), contextPath);
+        String urlPrefix = url.getProtocol() + "://" + url.getAuthority() + contextPath;
+        return StringUtils.removeStart(url.toExternalForm(), urlPrefix);
     }
 }

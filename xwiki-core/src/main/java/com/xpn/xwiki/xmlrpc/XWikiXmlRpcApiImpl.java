@@ -94,8 +94,8 @@ public class XWikiXmlRpcApiImpl implements XWikiXmlRpcApi
     protected XWikiContext getContext()
     {
         Execution execution = Utils.getComponent(Execution.class);
-        ExecutionContext executionContex = execution.getContext();
-        return (XWikiContext) executionContex.getProperty("xwikicontext");
+        ExecutionContext executionContext = execution.getContext();
+        return (XWikiContext) executionContext.getProperty("xwikicontext");
     }
 
     /**
@@ -757,7 +757,6 @@ public class XWikiXmlRpcApiImpl implements XWikiXmlRpcApi
      * Add a comment.
      * 
      * @param token The authentication token.
-     * @param pageId The pageId in the 'Space.Page' format.
      * @param commentMap A map representing a Comment object.
      * @return A map representing a Comment object with updated information.
      * @throws Exception An invalid token is provided or if the user has not the right to access it.
@@ -788,7 +787,6 @@ public class XWikiXmlRpcApiImpl implements XWikiXmlRpcApi
      * Remove a comment.
      * 
      * @param token The authentication token.
-     * @param pageId The pageId in the 'Space.Page' format.
      * @return True if the comment has been successfully removed.
      * @throws Exception An invalid token is provided or the user has not the right to access it.
      */

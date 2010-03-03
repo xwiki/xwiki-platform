@@ -106,13 +106,6 @@ public class Document extends Api
         Utils.getComponent(EntityReferenceSerializer.class, "local");
 
     /**
-     * Used to resolve a string into a proper Document Reference using the current document's reference to fill the
-     * blanks, except for the page name for which the default page name is used instead.
-     */
-    private DocumentReferenceResolver currentMixedDocumentReferenceResolver =
-        Utils.getComponent(DocumentReferenceResolver.class, "currentmixed");
-
-    /**
      * Document constructor.
      * 
      * @param doc The XWikiDocument object to wrap.
@@ -772,9 +765,9 @@ public class Document extends Api
         return result;
     }
 
-    public Vector<Object> getObjects(String classname)
+    public Vector<Object> getObjects(String className)
     {
-        List<BaseObject> objects = this.doc.getXObjects(this.currentMixedDocumentReferenceResolver.resolve(classname));
+        List<BaseObject> objects = this.doc.getXObjects(this.doc.resolveClassReference(className));
         return getXObjects(objects);
     }
 

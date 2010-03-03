@@ -6989,7 +6989,7 @@ public class XWikiDocument implements DocumentModelBridge
      *         the "XWiki" space if the passed String doesn't specify a space and this document's page if the passed
      *         String doesn't specify a page.
      */
-    protected DocumentReference resolveClassReference(String documentName)
+    public DocumentReference resolveClassReference(String documentName)
     {
         DocumentReference defaultReference =
                 new DocumentReference(getDocumentReference().getWikiReference().getName(), "XWiki",

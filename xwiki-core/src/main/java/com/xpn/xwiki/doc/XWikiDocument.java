@@ -655,12 +655,8 @@ public class XWikiDocument implements DocumentModelBridge
     }
 
     /**
-     * {@inheritDoc}
-     * <p>
      * Convert a full document reference into the proper relative document reference (wiki part is removed if it's the
      * same as document wiki) to store as parent.
-     *
-     * @see org.xwiki.bridge.DocumentModelBridge#setParentReference(org.xwiki.model.reference.DocumentReference)
      */
     public void setParentReference(DocumentReference parentReference)
     {

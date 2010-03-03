@@ -155,7 +155,7 @@ public class Utils
             // Replace all placeholders with the protected values
             content = replacePlaceholders(content, context);
             disablePlaceholders(context);
-            content = context.getWiki().getPluginManager().endParsing(content, context);
+            content = context.getWiki().getPluginManager().endParsing(content.trim(), context);
         } catch (IOException e) {
             if (LOG.isDebugEnabled()) {
                 LOG.debug("IOException while evaluating template [" + template + "] from /templates/", e);

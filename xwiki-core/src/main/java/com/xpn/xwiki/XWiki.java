@@ -4575,20 +4575,24 @@ public class XWiki implements XWikiDocChangeNotificationInterface
         return copyWikiWeb(web, sourceWiki, targetWiki, wikilanguage, false, context);
     }
 
-    public int copyWikiWeb(String web, String sourceWiki, String targetWiki, String wikilanguage, boolean clean,
+    public int copyWikiWeb(String Space, String sourceWiki, String targetWiki, String wikilanguage, boolean clean,
         XWikiContext context) throws XWikiException
     {
         String db = context.getDatabase();
         int nb = 0;
-        String sql = "";
-        if (web != null) {
-            sql = "where doc.space = '" + Utils.SQLFilter(web) + "'";
+        // Workaround for XWIKI-3915: Do not use XWikiStoreInterface#searchDocumentNames since currently it has the
+        // side effect of hidding hidden documents and no other workaround exists than directly using
+        // XWikiStoreInterface#search directly
+        String sql = "select distinct doc.fullName from XWikiDocument as doc";
+        if (space != null) {
+            // FIXME: escapeSql is not enough.
+            sql += " where doc.space = '" + StringEscapeUtils.escapeSql(space) + "'";
         }
 
         if (clean) {
             try {
                 context.setDatabase(targetWiki);
-                List<String> list = getStore().searchDocumentsNames(sql, context);
+                List<String> list = getStore().search(sql, 0, 0, context);
                 if (LOG.isInfoEnabled()) {
                     LOG.info("Deleting " + list.size() + " documents from wiki " + targetWiki);
                 }
@@ -4604,7 +4608,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface
 
         try {
             context.setDatabase(sourceWiki);
-            List<String> list = getStore().searchDocumentsNames(sql, context);
+            List<String> list = getStore().search(sql, 0, 0, context);
             if (LOG.isInfoEnabled()) {
                 LOG.info("Copying " + list.size() + " documents from wiki " + sourceWiki + " to wiki " + targetWiki);
             }

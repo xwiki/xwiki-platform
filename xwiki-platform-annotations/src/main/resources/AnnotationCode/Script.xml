@@ -12,8 +12,8 @@
 <customClass></customClass>
 <contentAuthor>XWiki.Admin</contentAuthor>
 <creationDate>1264860755000</creationDate>
-<date>1266940241000</date>
-<contentUpdateDate>1266940241000</contentUpdateDate>
+<date>1267555757000</date>
+<contentUpdateDate>1267555757000</contentUpdateDate>
 <version>1.0</version>
 <title></title>
 <template></template>
@@ -576,10 +576,10 @@ XWiki.Selection = Class.create({
     this.hookTabShortcut();
     this.hookTab();
 
-    // add the delete and edit listeners to the annotations in the annotations tab when the extra panels are loaded
+    // add the delete, edit and validate listeners to the annotations in the annotations tab when the extra panels are loaded
     document.observe('xwiki:docextra:loaded', this.addDeleteListenersInTab.bindAsEventListener(this));
-    // add the delete and edit listeners to the annotations in the annotations tab when the extra panels are loaded
     document.observe('xwiki:docextra:loaded', this.addEditListenersInTab.bindAsEventListener(this));
+    document.observe('xwiki:docextra:loaded', this.addValidateListenersInTab.bindAsEventListener(this));
     // register the key shortcuts for adding an annotation
     this.registerAddAnnotationShortcut();
     // register the close dialog shortcut
@@ -828,6 +828,15 @@ XWiki.Selection = Class.create({
       this.addEditListener(item, annotationId, container);
     }.bind(this));
   },
+  
+  addValidateListenersInTab : function() {
+    $$(".annotation a.validate").each(function(item) {
+      var container = item.up('.annotation');
+      // compute annotation id, which is right after annotation_list_ in the container ID... TODO: this is pretty wrongish...
+      var annotationId = container.id.substring(16);
+      this.addValidateListener(item, annotationId, container);
+    }.bind(this));
+  },  
 
   addDeleteListener : function(item, inBubble) {
     item.observe('click', function(event) {
@@ -866,6 +875,23 @@ XWiki.Selection = Class.create({
           }
         );
       }
+    }.bindAsEventListener(this));
+  },
+  
+  addValidateListener : function(item, id, container, inBubble) {
+    item.observe('click', function(event) {
+      item.blur();
+      event.stop();
+      // and submit the update
+      this.updateAnnotationAsync(container, id, inBubble, item.href, 'POST',
+        {
+          'state' : 'SAFE',
+          'originalSelection' : ''
+        },
+        {
+          successText : "$msg.get('annotations.action.validate.success')",
+          failureText : "$msg.get('annotations.action.validate.loaderror')"
+        });
     }.bindAsEventListener(this));
   },
 
@@ -1035,8 +1061,15 @@ XWiki.Selection = Class.create({
     }
     // remove the mouseout listener (if any), edit form should stay on
     container.stopObserving('mouseout');
-    // add the delete listener to the delete button
-    this.addDeleteListener(container.down('a.delete'), inBubble);
+    // add the delete and validate listeners to the respective delete buttons
+    var deleteButton = container.down('a.delete');
+    if (deleteButton) {
+      this.addDeleteListener(deleteButton, inBubble);
+    }
+    var validateButton = container.down('a.validate');
+    if (validateButton) {
+      this.addValidateListener(validateButton, annotationId, container, inBubble);
+    }    
     container.down('form').focusFirstElement();
     // and add the button listeners
     container.down('input[type=submit]').observe('click', this.onAnnotationEdit.bindAsEventListener(this, container, annotationId, inBubble));
@@ -1055,12 +1088,27 @@ XWiki.Selection = Class.create({
     event.stop();
     var form = container.down('form');
     var formData = new Hash(form.serialize(true));
-    // aaand submit
-    new Ajax.Request(form.action, {
-      method : form.method,
-      parameters : formData,
+    // aaand update
+    this.updateAnnotationAsync(container, annotationId, inBubble, form.action, form.method, formData, 
+      {
+        successText : "$msg.get('annotations.action.edit.success')",
+        failureText : "$msg.get('annotations.action.edit.loaderror')"
+      });
+  },
+  
+  /**
+   * Handles the asynchronous update of annotation given by annotatinId, to the specified url, sending the specified 
+   * parameters and using the passed messages. Container will pass in loading state while the async call takes place, 
+   * and the tab update &amp; form hiding will be handled as specified by inBubble. The passed messages must specify
+   * successText and failureText.
+   */
+  updateAnnotationAsync : function(container, annotationId, inBubble, action, method, parameters, messages) {
+    // create the async request to update the annotation
+    new Ajax.Request(action, {
+      method : method,
+      parameters : parameters,
       onCreate : function() {
-        // make it load when starting to submit the form
+        // make it load when starting to send the async call
         if (container.parentNode) {
           container.update(new Element('div', {'class' : 'loading'}));
         }
@@ -1070,7 +1118,7 @@ XWiki.Selection = Class.create({
         if (this.checkResponseCodeAndFail(response)) {
           return;
         }
-        form._x_notification = new XWiki.widgets.Notification("$msg.get('annotations.action.edit.success')", "done");
+        this._x_notification = new XWiki.widgets.Notification(messages.successText, "done");
         if (inBubble) {
           // close the bubble on successful update
           this.hideBubble(container);
@@ -1084,7 +1132,7 @@ XWiki.Selection = Class.create({
         if (response.statusText == '' /* No response */ || response.status == 12031 /* In IE */) {
           failureReason = 'Server not responding';
         }        
-        this._x_notification = new XWiki.widgets.Notification("$msg.get('annotations.action.edit.loaderror')" + failureReason, "error", {timeout : 5});
+        this._x_notification.replace(new XWiki.widgets.Notification(messages.failureText + failureReason, "error", {timeout : 5}));
         if (inBubble) {
           // and close the bubble on failure to update
           this.hideBubble(container);
@@ -1117,8 +1165,18 @@ XWiki.Selection = Class.create({
     }.bindAsEventListener(this, bubble));
     */
     // add the delete listener to the delete button
-    this.addDeleteListener(container.down('a.delete'), inBubble);
-    this.addEditListener(container.down('a.edit'), annotationId, container, true);
+    var deleteButton = container.down('a.delete');
+    if (deleteButton) {
+      this.addDeleteListener(deleteButton, inBubble);
+    }
+    var validateButton = container.down('a.validate');
+    if (validateButton) {
+      this.addValidateListener(validateButton, annotationId, container, inBubble);
+    }
+    var editButton = container.down('a.edit');
+    if (editButton) {
+      this.addEditListener(editButton, annotationId, container, inBubble);
+    }
   },
 
   /**

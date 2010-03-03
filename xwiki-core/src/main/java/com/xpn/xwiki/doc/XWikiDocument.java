@@ -659,7 +659,7 @@ public class XWikiDocument implements DocumentModelBridge
      * <p>
      * Convert a full document reference into the proper relative document reference (wiki part is removed if it's the
      * same as document wiki) to store as parent.
-     * 
+     *
      * @see org.xwiki.bridge.DocumentModelBridge#setParentReference(org.xwiki.model.reference.DocumentReference)
      */
     public void setParentReference(DocumentReference parentReference)
@@ -5557,14 +5557,24 @@ public class XWikiDocument implements DocumentModelBridge
     public void setSyntaxId(String syntaxId)
     {
         Syntax syntax;
-        try {
-            syntax = this.syntaxFactory.createSyntaxFromIdString(syntaxId);
-        } catch (ParseException e) {
-            syntax = getDefaultDocumentSyntax();
-            LOG.warn("Failed to set syntax [" + syntaxId + "] for ["
-                + this.defaultEntityReferenceSerializer.serialize(getDocumentReference()) + "], setting syntax ["
-                + syntax.toIdString() + "] instead.", e);
+
+        // In order to preserve backward-compatibility with previous versions of XWiki in which the notion of Syntax Id
+        // did not exist, we check the passed syntaxId parameter. Since this parameter comes from the database (it's
+        // called automatically by Hibernate) it can be NULL or empty. In this case we consider the document is in
+        // syntax/1.0 syntax.
+        if (StringUtils.isBlank(syntaxId)) {
+            syntax = Syntax.XWIKI_1_0;
+        } else {
+            try {
+                syntax = this.syntaxFactory.createSyntaxFromIdString(syntaxId);
+            } catch (ParseException e) {
+                syntax = getDefaultDocumentSyntax();
+                LOG.warn("Failed to set syntax [" + syntaxId + "] for ["
+                    + this.defaultEntityReferenceSerializer.serialize(getDocumentReference()) + "], setting syntax ["
+                    + syntax.toIdString() + "] instead.", e);
+            }
         }
+        
         setSyntax(syntax);
     }
 

@@ -21,7 +21,7 @@ public class DocumentTest extends AbstractBridgedXWikiComponentTestCase
     public void testGetObjects() throws XWikiException
     {
         XWikiContext context = new XWikiContext();        
-        XWikiDocument doc = new XWikiDocument("Space", "Page");
+        XWikiDocument doc = new XWikiDocument("Wiki", "Space", "Page");
 
         doc.getxWikiClass().addNumberField("prop", "prop", 5, "long");
         BaseObject obj = (BaseObject) doc.getxWikiClass().newObject(context);
@@ -38,5 +38,8 @@ public class DocumentTest extends AbstractBridgedXWikiComponentTestCase
 
         lst = adoc.getObjects(adoc.getFullName(), "prop", "0");
         assertEquals(0, lst.size());
+
+        lst = adoc.getObjects(adoc.getFullName());
+        assertEquals(1, lst.size());
     }
 }

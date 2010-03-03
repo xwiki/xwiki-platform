@@ -48,6 +48,10 @@ public class DefaultSyntaxFactory extends AbstractLogEnabled implements SyntaxFa
      */
     public Syntax createSyntaxFromIdString(String syntaxIdAsString) throws ParseException
     {
+        if (syntaxIdAsString == null) {
+            throw new ParseException("The passed Syntax cannot be NULL");
+        }
+
         Matcher matcher = SYNTAX_PATTERN.matcher(syntaxIdAsString);
         if (!matcher.matches()) {
             throw new ParseException("Invalid Syntax format [" + syntaxIdAsString + "]");

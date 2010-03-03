@@ -19,6 +19,7 @@
  */
 package org.xwiki.rendering.internal.parser;
 
+import org.junit.Before;
 import org.xwiki.rendering.syntax.SyntaxFactory;
 import org.xwiki.rendering.syntax.Syntax;
 import org.xwiki.rendering.parser.ParseException;
@@ -31,12 +32,18 @@ import org.junit.Assert;
  */
 public class DefaultSyntaxFactoryTest extends AbstractComponentTestCase
 {
+    private SyntaxFactory syntaxFactory;
+
+    @Before
+    public void setUp() throws Exception
+    {
+        this.syntaxFactory = getComponentManager().lookup(SyntaxFactory.class);
+    }
+
     @Test
     public void testCreateSyntaxFromSyntaxIdString() throws Exception
     {
-        SyntaxFactory syntaxFactory = getComponentManager().lookup(SyntaxFactory.class);
-
-        Syntax syntax = syntaxFactory.createSyntaxFromIdString("type/version");
+        Syntax syntax = this.syntaxFactory.createSyntaxFromIdString("type/version");
         Assert.assertEquals("type", syntax.getType().getId());
         Assert.assertEquals("type", syntax.getType().getName());
         Assert.assertEquals("version", syntax.getVersion());
@@ -45,13 +52,22 @@ public class DefaultSyntaxFactoryTest extends AbstractComponentTestCase
     @Test
     public void testCreateSyntaxFromSyntaxIdStringWhenInvalid() throws Exception
     {
-        SyntaxFactory syntaxFactory = getComponentManager().lookup(SyntaxFactory.class);
-
         try {
-            syntaxFactory.createSyntaxFromIdString("invalid");
+            this.syntaxFactory.createSyntaxFromIdString("invalid");
             Assert.fail("Should have thrown an exception");
         } catch (ParseException expected) {
             Assert.assertEquals("Invalid Syntax format [invalid]", expected.getMessage());
+        }
+    }
+
+    @Test
+    public void testCreateSyntaxFromSyntaxIdStringWhenNull() throws Exception
+    {
+        try {
+            this.syntaxFactory.createSyntaxFromIdString(null);
+            Assert.fail("Should have thrown an exception");
+        } catch (ParseException expected) {
+            Assert.assertEquals("The passed Syntax cannot be NULL", expected.getMessage());
         }
     }
 }

@@ -1413,7 +1413,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface
             }
 
             if ((revision == null) || revision.equals("")) {
-                newdoc = new XWikiDocument(doc.getWikiName(), doc.getSpace(), doc.getName());
+                newdoc = new XWikiDocument(doc.getDocumentReference());
             } else if (revision.equals(doc.getVersion())) {
                 newdoc = doc;
             } else {
@@ -1421,7 +1421,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface
             }
         } catch (XWikiException e) {
             if (revision.equals("1.1") || revision.equals("1.0")) {
-                newdoc = new XWikiDocument(doc.getSpace(), doc.getName());
+                newdoc = new XWikiDocument(doc.getDocumentReference());
             } else {
                 throw e;
             }
@@ -4153,7 +4153,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface
 
     public void deleteDocument(XWikiDocument doc, boolean totrash, XWikiContext context) throws XWikiException
     {
-        getNotificationManager().preverify(doc, new XWikiDocument(doc.getWikiName(), doc.getSpace(), doc.getName()),
+        getNotificationManager().preverify(doc, new XWikiDocument(doc.getDocumentReference()),
             XWikiDocChangeNotificationInterface.EVENT_DELETE, context);
         if (hasRecycleBin(context) && totrash) {
             getRecycleBinStore().saveToRecycleBin(doc, context.getUser(), new Date(), context, true);
@@ -4164,7 +4164,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface
         try {
             // This is the old notification mechanism. It is kept here because it is in a
             // deprecation stage. It will be removed later.
-            getNotificationManager().verify(new XWikiDocument(doc.getWikiName(), doc.getSpace(), doc.getName()), doc,
+            getNotificationManager().verify(new XWikiDocument(doc.getDocumentReference()), doc,
                 XWikiDocChangeNotificationInterface.EVENT_DELETE, context);
 
             // This is the new notification mechanism, implemented as a Component.
@@ -4175,7 +4175,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface
             // doc.getOriginalDocument()
             ObservationManager om = Utils.getComponent(ObservationManager.class);
             if (om != null) {
-                XWikiDocument blankDoc = new XWikiDocument(doc.getWikiName(), doc.getSpace(), doc.getName());
+                XWikiDocument blankDoc = new XWikiDocument(doc.getDocumentReference());
                 // Again to follow general event policy, new document author is the user who modified the document (here
                 // the modification is delete)
                 blankDoc.setOriginalDocument(doc);

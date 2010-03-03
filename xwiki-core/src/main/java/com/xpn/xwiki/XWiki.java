@@ -4575,7 +4575,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface
         return copyWikiWeb(web, sourceWiki, targetWiki, wikilanguage, false, context);
     }
 
-    public int copyWikiWeb(String Space, String sourceWiki, String targetWiki, String wikilanguage, boolean clean,
+    public int copyWikiWeb(String space, String sourceWiki, String targetWiki, String wikilanguage, boolean clean,
         XWikiContext context) throws XWikiException
     {
         String db = context.getDatabase();

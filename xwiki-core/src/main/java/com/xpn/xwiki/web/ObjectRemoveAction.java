@@ -67,12 +67,14 @@ public class ObjectRemoveAction extends XWikiAction
     {
         XWiki xwiki = context.getWiki();
         XWikiResponse response = context.getResponse();
+        String username = context.getUser();
         XWikiDocument doc = context.getDoc();
         BaseObject obj = getObject(doc, context);
         if (obj == null) {
             return true;
         }
         doc.removeObject(obj);
+        doc.setAuthor(username);
         xwiki.saveDocument(doc, context.getMessageTool().get("core.comment.deleteObject"), true, context);
 
         if (BooleanUtils.isTrue((Boolean) context.get("ajax"))) {

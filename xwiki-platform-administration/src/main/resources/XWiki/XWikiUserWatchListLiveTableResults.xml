@@ -24,7 +24,7 @@
 <syntaxId>xwiki/2.0</syntaxId>
 <hidden>false</hidden>
 <content>{{velocity wiki="false"}}
-#if("$!request.xpage" == 'plain' &amp;&amp; "$!request.outputSyntax" == 'plain')
+#if($context.action == 'get')
 ##
 ## Constants
 ##

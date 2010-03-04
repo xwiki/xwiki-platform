@@ -19,7 +19,7 @@
   </ul>
   #showfilelist($xwiki.package.installed "installed")
   #showfilelist($xwiki.package.skipped "skipped")
-  #showfilelist($xwiki.package.errors "errors")
+  #showfilelist($xwiki.package.errors "error")
 #else
   ## If the current user does not have admin and this template is being displayed
   ## it means security settings have been changed with the import (probably a defaut XE XAR import)

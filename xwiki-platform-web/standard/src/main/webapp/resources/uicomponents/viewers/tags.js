@@ -113,7 +113,7 @@ XWiki.viewers.Tags = Class.create({
       form.down('input[type=text]').focus();
       if (form.tag.value != '') {
         new Ajax.Request(
-          form.action.replace(/&xredirect=.+$/, '&ajax=1&tag=') + form.tag.value,
+          form.action.replace(/&xredirect=.+$/, '&ajax=1&tag=') + encodeURIComponent(form.tag.value),
           {
             onCreate : function () {
               // ignore "cascade" clicks

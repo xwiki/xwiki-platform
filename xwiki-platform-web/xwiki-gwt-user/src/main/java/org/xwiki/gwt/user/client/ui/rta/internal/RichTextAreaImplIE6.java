@@ -74,6 +74,27 @@ public class RichTextAreaImplIE6 extends com.google.gwt.user.client.ui.impl.Rich
 
     /**
      * {@inheritDoc}
+     * <p>
+     * IE doesn't unload the in-line frame used by the rich text area when we remove it from the DOM document. Its state
+     * is preserved when we re-attach it. Naturally, IE doesn't fire the load and unload events in these cases since the
+     * in-line frame's document is kept in memory, thus not reloaded when the in-line frame is re-attached.
+     * <p>
+     * If the rich text area is detached using GWT code then its element is uninitialized even though the unload event
+     * wasn't fired. If the unload event wasn't fired then the load event won't be fired next time we re-attach the rich
+     * text area. We have to overwrite this method to prevent the rich text area's element from being uninitialized if
+     * the unload even wasn't fired.
+     * 
+     * @see com.google.gwt.user.client.ui.impl.RichTextAreaImplIE6#uninitElement()
+     */
+    public void uninitElement()
+    {
+        if (!elem.getPropertyBoolean(RichTextArea.LOADED)) {
+            super.uninitElement();
+        }
+    }
+
+    /**
+     * {@inheritDoc}
      * 
      * @see com.google.gwt.user.client.ui.impl.RichTextAreaImplIE6#hookEvents()
      */

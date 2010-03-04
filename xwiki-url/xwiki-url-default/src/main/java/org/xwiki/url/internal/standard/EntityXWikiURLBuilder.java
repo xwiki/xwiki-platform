@@ -26,7 +26,6 @@ import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.EntityReferenceResolver;
 import org.xwiki.model.reference.WikiReference;
-import org.xwiki.url.InvalidURLException;
 import org.xwiki.url.XWikiEntityURL;
 import org.xwiki.url.XWikiURL;
 import org.xwiki.url.standard.XWikiURLBuilder;
@@ -47,7 +46,7 @@ public class EntityXWikiURLBuilder implements XWikiURLBuilder
      * {@inheritDoc}
      * @see org.xwiki.url.standard.XWikiURLBuilder#build(org.xwiki.model.reference.WikiReference, java.util.List)
      */
-    public XWikiURL build(WikiReference wikiReference, List<String> pathSegments) throws InvalidURLException
+    public XWikiURL build(WikiReference wikiReference, List<String> pathSegments)
     {
         XWikiEntityURL entityURL;
 

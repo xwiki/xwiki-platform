@@ -610,6 +610,11 @@
       <artifactId>xwiki-core-chart-renderer</artifactId>
       <version>${pom.version}</version>
     </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-core-url-default</artifactId>
+      <version>${pom.version}</version>
+    </dependency>
     <!-- XWiki rendering macros, listed here so that they are included in the distribution
          TODO: Move these dependencies elsewhere. -->
     <!-- Please try to keep them in alphabetical order -->

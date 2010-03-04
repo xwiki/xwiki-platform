@@ -280,19 +280,6 @@ public class XWikiTest extends AbstractBridgedXWikiComponentTestCase
         assertEquals("Space.Document", this.xwiki.getDocumentNameFromPath("/view/Space/Document/", getContext()));
         assertEquals("Space.Document", this.xwiki.getDocumentNameFromPath("/view/Space/Document/some/ignored/paths",
             getContext()));
-        assertEquals("From.Space", this.xwiki.getDocumentNameFromPath("/Some:Document:From/Some:Space", getContext()));
-        assertEquals("From.Space", this.xwiki.getDocumentNameFromPath("/Some:Document:From/Some:Other%3ASpace",
-            getContext()));
-    }
-
-    public void testGetDocumentNameFromPathUsesDefaultSpaceAndDocument()
-    {
-        this.xwiki.getDefaultPage(getContext());
-        this.xwiki.getConfig().setProperty("xwiki.defaultpage", "Default");
-        assertEquals("Main.Default", this.xwiki.getDocumentNameFromPath("/", getContext()));
-        this.xwiki.getConfig().setProperty("xwiki.defaultweb", "Content");
-        assertEquals("Content.Default", this.xwiki.getDocumentNameFromPath("/", getContext()));
-        assertEquals("Space.Default", this.xwiki.getDocumentNameFromPath("/Space/", getContext()));
     }
 
     /**

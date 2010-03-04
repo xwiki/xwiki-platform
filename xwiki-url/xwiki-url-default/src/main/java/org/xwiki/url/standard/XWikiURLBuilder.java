@@ -33,5 +33,13 @@ import java.util.List;
 @ComponentRole
 public interface XWikiURLBuilder
 {
-    XWikiURL build(WikiReference wikiReference, List<String> pathSegments) throws InvalidURLException;
+    /**
+     * Builds a {@link XWikiURL} object from the passed URL path segments.
+     *
+     * @param wikiReference the wiki reference part of the
+     * @param pathSegments the URL path segments (ie the parts separated by forward slashes in the URL) but starting
+     *        at the action segment part (e.g. "/view/Space/Page")
+     * @return the {@link XWikiURL} object
+     */
+    XWikiURL build(WikiReference wikiReference, List<String> pathSegments);
 }

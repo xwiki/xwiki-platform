@@ -90,9 +90,11 @@ import org.xwiki.cache.CacheManager;
 import org.xwiki.cache.config.CacheConfiguration;
 import org.xwiki.cache.eviction.LRUEvictionConfiguration;
 import org.xwiki.component.manager.ComponentLookupException;
+import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.model.reference.EntityReferenceSerializer;
+import org.xwiki.model.reference.EntityReferenceValueProvider;
 import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.model.reference.WikiReference;
 import org.xwiki.observation.ObservationManager;
@@ -175,6 +177,8 @@ import com.xpn.xwiki.web.XWikiURLFactory;
 import com.xpn.xwiki.web.XWikiURLFactoryService;
 import com.xpn.xwiki.web.XWikiURLFactoryServiceImpl;
 import com.xpn.xwiki.web.includeservletasstring.IncludeServletAsString;
+import org.xwiki.url.XWikiEntityURL;
+import org.xwiki.url.standard.XWikiURLBuilder;
 
 public class XWiki implements XWikiDocChangeNotificationInterface
 {
@@ -293,11 +297,11 @@ public class XWiki implements XWikiDocChangeNotificationInterface
     private EntityReferenceSerializer<String> defaultEntityReferenceSerializer =
         Utils.getComponent(EntityReferenceSerializer.class);
 
-    /**
-     * @see org.xwiki.model.internal.reference.DefaultStringDocumentReferenceResolver
-     */
-    private DocumentReferenceResolver<String> defaultDocumentReferenceResolver = Utils.getComponent(
-        DocumentReferenceResolver.class);
+    private EntityReferenceSerializer<String> localEntityReferenceSerializer =
+        Utils.getComponent(EntityReferenceSerializer.class, "local");
+
+    private EntityReferenceValueProvider defaultEntityReferenceValueProvider =
+        Utils.getComponent(EntityReferenceValueProvider.class);
 
     /**
      * Used to resolve a string into a proper Document Reference using the current document's reference to fill the
@@ -305,6 +309,8 @@ public class XWiki implements XWikiDocChangeNotificationInterface
      */
     private DocumentReferenceResolver currentMixedDocumentReferenceResolver =
         Utils.getComponent(DocumentReferenceResolver.class, "currentmixed");
+
+    private XWikiURLBuilder entityXWikiURLBuilder = Utils.getComponent(XWikiURLBuilder.class, "entity");
 
     public static String getConfigPath() throws NamingException
     {
@@ -1474,50 +1480,36 @@ public class XWiki implements XWikiDocChangeNotificationInterface
 
     public XWikiDocument getDocumentFromPath(String path, XWikiContext context) throws XWikiException
     {
-        String fullname = getDocumentNameFromPath(path, context);
-        return getDocument(fullname, context);
+        return getDocument(getDocumentReferenceFromPath(path, context), context);
     }
 
+    /**
+     * @since 2.3M1
+     */
+    public DocumentReference getDocumentReferenceFromPath(String path, XWikiContext context)
+    {
+        // TODO: Remove this and use XWikiURLFactory instead in XWikiAction and all entry points.
+        List<String> segments = new ArrayList<String>();
+        for (String segment : path.split("/", -1)) {
+            segments.add(segment);
+        }
+        // Remove the first segment if it's empty to cater for cases when the path starts with "/"
+        if (segments.size() > 0 && segments.get(0).length() == 0) {
+            segments.remove(0);
+        }
+
+        XWikiEntityURL entityURL = (XWikiEntityURL) this.entityXWikiURLBuilder.build(
+            new WikiReference(context.getDatabase()), segments);
+        return new DocumentReference(entityURL.getEntityReference().extractReference(EntityType.DOCUMENT));
+    }
+
+    /**
+     * @deprecated since 2.3M1 use {@link #getDocumentReferenceFromPath(String, XWikiContext)} instead
+     */
+    @Deprecated
     public String getDocumentNameFromPath(String path, XWikiContext context)
     {
-        if (StringUtils.countMatches(path, "/") == 0) {
-            return context.getWiki().getDefaultSpace(context) + "." + context.getWiki().getDefaultPage(context);
-        }
-
-        String space, name;
-        int i1 = 0;
-        int i2;
-        if (StringUtils.countMatches(path, "/") > 2) {
-            i1 = path.indexOf("/", 1);
-        }
-
-        if (StringUtils.countMatches(path, "/") > 1) {
-            i2 = path.indexOf("/", i1 + 1);
-            space = path.substring(i1 + 1, i2);
-        } else {
-            i2 = 0;
-            space = context.getWiki().getDefaultSpace(context);
-        }
-        int i3 = path.indexOf("/", i2 + 1);
-        if (i3 == -1) {
-            name = path.substring(i2 + 1);
-        } else {
-            name = path.substring(i2 + 1, i3);
-        }
-        if (name.equals("")) {
-            name = getDefaultPage(context);
-        }
-
-        space = Util.decodeURI(space, context);
-        name = Util.decodeURI(name, context);
-        if (StringUtils.contains(space, ':')) {
-            space = StringUtils.substringAfterLast(space, ":");
-        }
-        if (StringUtils.contains(name, ':')) {
-            name = StringUtils.substringAfterLast(name, ":");
-        }
-        String fullname = space + "." + name;
-        return fullname;
+        return this.localEntityReferenceSerializer.serialize(getDocumentReferenceFromPath(path, context));
     }
 
     /**
@@ -5008,21 +5000,29 @@ public class XWiki implements XWikiDocChangeNotificationInterface
         return active;
     }
 
-    public String getDocumentName(XWikiRequest request, XWikiContext context)
+    /**
+     * @since 2.3M1
+     */
+    public DocumentReference getDocumentReference(XWikiRequest request, XWikiContext context)
     {
-        String docname;
+        DocumentReference reference;
         if (context.getMode() == XWikiContext.MODE_PORTLET) {
             if (request.getParameter("topic") != null) {
-                docname = request.getParameter("topic");
+                reference = this.currentMixedDocumentReferenceResolver.resolve(request.getParameter("topic"));
             } else {
-                docname = "Main.WebHome";
+                // Point to this wiki's home page
+                reference = new DocumentReference(context.getDatabase(),
+                    this.defaultEntityReferenceValueProvider.getDefaultValue(EntityType.SPACE),
+                    this.defaultEntityReferenceValueProvider.getDefaultValue(EntityType.DOCUMENT));
             }
         } else if (context.getMode() == XWikiContext.MODE_XMLRPC) {
-            docname = context.getDoc().getFullName();
+            reference = new DocumentReference(context.getDatabase(),
+                context.getDoc().getDocumentReference().getLastSpaceReference().getName(),
+                context.getDoc().getDocumentReference().getName());
         } else {
             String action = context.getAction();
             if ((request.getParameter("topic") != null) && (action.equals("edit") || action.equals("inline"))) {
-                docname = request.getParameter("topic");
+                reference = this.currentMixedDocumentReferenceResolver.resolve(request.getParameter("topic"));
             } else {
                 // TODO: Introduce a XWikiURL class in charge of getting the information relevant
                 // to XWiki from a request URL (action, space, document name, file, etc)
@@ -5058,11 +5058,20 @@ public class XWiki implements XWikiDocChangeNotificationInterface
                 if (path.indexOf(";jsessionid=") != -1) {
                     path = path.substring(0, path.indexOf(";jsessionid="));
                 }
-                docname = getDocumentNameFromPath(path, context);
+                reference = getDocumentReferenceFromPath(path, context);
             }
         }
 
-        return (docname.indexOf(":") < 0) ? context.getDatabase() + ":" + docname : docname;
+        return reference;
+    }
+
+    /**
+     * @deprecated since 2.3M1 use {@link #getDocumentReferenceFromPath(String, XWikiContext)} instead
+     */
+    @Deprecated
+    public String getDocumentName(XWikiRequest request, XWikiContext context)
+    {
+        return this.localEntityReferenceSerializer.serialize(getDocumentReference(request, context));
     }
 
     /**
@@ -5101,18 +5110,18 @@ public class XWiki implements XWikiDocChangeNotificationInterface
     {
         XWikiDocument doc;
         context.getWiki().prepareResources(context);
-        String docName = getDocumentName(request, context);
+        DocumentReference reference = getDocumentReference(request, context);
         if (context.getAction().equals("register")) {
-            setPhonyDocument(docName, context, vcontext);
+            setPhonyDocument(reference, context, vcontext);
             doc = context.getDoc();
         } else {
             try {
-                doc = getDocument(docName, context);
+                doc = getDocument(reference, context);
             } catch (XWikiException e) {
                 doc = context.getDoc();
                 if (context.getAction().equals("delete")) {
                     if (doc == null) {
-                        setPhonyDocument(docName, context, vcontext);
+                        setPhonyDocument(reference, context, vcontext);
                     }
                     if (!checkAccess("admin", doc, context)) {
                         throw e;
@@ -5127,7 +5136,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface
         // Otherwise we don't have the user language
         if (checkAccess(context.getAction(), doc, context) == false) {
             Object[] args = {doc.getFullName(), context.getUser()};
-            setPhonyDocument(docName, context, vcontext);
+            setPhonyDocument(reference, context, vcontext);
             throw new XWikiException(XWikiException.MODULE_XWIKI_ACCESS, XWikiException.ERROR_XWIKI_ACCESS_DENIED,
                 "Access to document {0} has been denied to user {1}", null, args);
         } else if (checkActive(context) == 0) {
@@ -5144,7 +5153,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface
             }
             if (!allow) {
                 Object[] args = {context.getUser()};
-                setPhonyDocument(docName, context, vcontext);
+                setPhonyDocument(reference, context, vcontext);
                 throw new XWikiException(XWikiException.MODULE_XWIKI_USER, XWikiException.ERROR_XWIKI_USER_INACTIVE,
                     "User {0} account is inactive", null, args);
             }
@@ -5160,16 +5169,27 @@ public class XWiki implements XWikiDocChangeNotificationInterface
         return true;
     }
 
-    public void setPhonyDocument(String docName, XWikiContext context, VelocityContext vcontext)
+    /**
+     * @since 2.3M1
+     */
+    public void setPhonyDocument(DocumentReference reference, XWikiContext context, VelocityContext vcontext)
     {
-        XWikiDocument doc = new XWikiDocument();
-        doc.setFullName(docName);
+        XWikiDocument doc = new XWikiDocument(reference);
         doc.setElements(XWikiDocument.HAS_ATTACHMENTS | XWikiDocument.HAS_OBJECTS);
         doc.setStore(getStore());
         context.put("doc", doc);
         vcontext.put("doc", doc.newDocument(context));
         vcontext.put("cdoc", vcontext.get("doc"));
         vcontext.put("tdoc", vcontext.get("doc"));
+    }
+
+    /**
+     * @deprecated since 2.3M1 use {@link #setPhonyDocument(DocumentReference, XWikiContext, VelocityContext)}
+     */
+    @Deprecated
+    public void setPhonyDocument(String docName, XWikiContext context, VelocityContext vcontext)
+    {
+        setPhonyDocument(this.currentMixedDocumentReferenceResolver.resolve(docName), context, vcontext);
     }
 
     public XWikiEngineContext getEngineContext()

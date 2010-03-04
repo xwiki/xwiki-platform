@@ -6,7 +6,7 @@ $xwiki.jsfx.use('uicomponents/viewers/code.js', true)##
 $xwiki.jsfx.use('js/xwiki/editors/fullScreenEdit.js', true)##
 $xwiki.ssfx.use('js/xwiki/editors/fullScreenEdit.css', true)##
 <div id="document-title"><h1>$msg.get('core.viewers.code.title', [$xwiki.getXMLEncoded($doc.displayTitle), $doc.getURL()])</h1></div>
-#set($escapedcontent = $xwiki.getXMLEncoded($tdoc.translatedContent))
+#set($escapedcontent = $escapetool.html($tdoc.translatedContent))
 #set($ln = "$!request.getParameter('showlinenumbers')")
 <div>
 #if($ln != '0')

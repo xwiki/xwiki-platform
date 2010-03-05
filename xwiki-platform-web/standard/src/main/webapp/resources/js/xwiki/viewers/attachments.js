@@ -41,7 +41,7 @@ XWiki.viewers.Attachments = Class.create({
         } else {
           new XWiki.widgets.ConfirmedAjaxRequest(
             /* Ajax request URL */
-            item.href + (Prototype.Browser.Opera ? "" : "&ajax=1"),
+            item.readAttribute('href') + (Prototype.Browser.Opera ? "" : "&ajax=1"),
             /* Ajax request parameters */
             {
               onCreate : function() {

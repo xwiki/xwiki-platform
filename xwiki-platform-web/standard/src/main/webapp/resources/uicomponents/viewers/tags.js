@@ -33,7 +33,7 @@ XWiki.viewers.Tags = Class.create({
       }
       if (!item.disabled) {
         new Ajax.Request(
-          item.href.replace(/&xredirect=.+$/, "&ajax=1"),
+          item.readAttribute('href').replace(/&xredirect=.+$/, "&ajax=1"),
           {
             onCreate : function () {
               // ignore "cascade" clicks
@@ -68,7 +68,7 @@ XWiki.viewers.Tags = Class.create({
       if (!item._x_form) {
         if (!item.disabled) {
           new Ajax.Request(
-            item.href.replace(/#.+$/, "&ajax=1&xpage=documentTags"),
+            item.readAttribute('href').replace(/#.+$/, "&ajax=1&xpage=documentTags"),
             {
               onCreate : function () {
                 // ignore "cascade" clicks

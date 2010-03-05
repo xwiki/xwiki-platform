@@ -74,7 +74,7 @@ XWiki.viewers.Comments = Class.create({
         } else {
           new XWiki.widgets.ConfirmedAjaxRequest(
             /* Ajax request URL */
-            item.href + (Prototype.Browser.Opera ? "" : "&ajax=1"),
+            item.readAttribute('href') + (Prototype.Browser.Opera ? "" : "&ajax=1"),
             /* Ajax request parameters */
             {
               onCreate : function() {
@@ -136,7 +136,7 @@ XWiki.viewers.Comments = Class.create({
         } else {
           new Ajax.Request(
             /* Ajax request URL */
-            item.href.replace('viewer=', 'xpage='),
+            item.readAttribute('href').replace('viewer=', 'xpage='),
             /* Ajax request parameters */
             {
               onCreate : function() {

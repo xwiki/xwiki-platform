@@ -43,8 +43,7 @@ public class XWikiPluginManager
 
     private Vector<String> pluginClassNames = new Vector<String>();
 
-    private Map<String, XWikiPluginInterface> plugins_classes =
-        new HashMap<String, XWikiPluginInterface>();
+    private Map<String, XWikiPluginInterface> plugins_classes = new HashMap<String, XWikiPluginInterface>();
 
     private Map<String, Vector<XWikiPluginInterface>> functionList =
         new HashMap<String, Vector<XWikiPluginInterface>>();
@@ -82,8 +81,7 @@ public class XWikiPluginManager
             args[0] = name;
             args[1] = className;
             args[2] = context;
-            Class<XWikiPluginInterface> pluginClass =
-                (Class<XWikiPluginInterface>) Class.forName(className);
+            Class<XWikiPluginInterface> pluginClass = (Class<XWikiPluginInterface>) Class.forName(className);
             XWikiPluginInterface plugin = pluginClass.getConstructor(classes).newInstance(args);
             if (plugin != null) {
                 plugins.add(plugin.getName());
@@ -112,8 +110,8 @@ public class XWikiPluginManager
     public void addPlugins(String[] classNames, XWikiContext context)
     {
         if (context.getURLFactory() == null) {
-            context.setURLFactory(context.getWiki().getURLFactoryService().createURLFactory(
-                context.getMode(), context));
+            context
+                .setURLFactory(context.getWiki().getURLFactoryService().createURLFactory(context.getMode(), context));
         }
         initInterface();
         for (int i = 0; i < classNames.length; i++) {
@@ -144,8 +142,8 @@ public class XWikiPluginManager
         }
     }
 
-    public void initPlugin(Object plugin, Class<XWikiPluginInterface> pluginClass,
-        XWikiContext context) throws XWikiException
+    public void initPlugin(Object plugin, Class<XWikiPluginInterface> pluginClass, XWikiContext context)
+        throws XWikiException
     {
         for (Method method : pluginClass.getDeclaredMethods()) {
             String name = method.getName();
@@ -179,6 +177,7 @@ public class XWikiPluginManager
             try {
                 plugin.flushCache(context);
             } catch (Exception e) {
+                LOG.error("Failed to flush cache in plugin [" + plugin.getClass() + "]", e);
             }
         }
     }

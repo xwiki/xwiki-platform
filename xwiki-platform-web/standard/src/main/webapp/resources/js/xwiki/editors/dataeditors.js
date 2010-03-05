@@ -10,7 +10,7 @@ document.observe('dom:loaded', function() {
       if (!item.disabled) {
         new XWiki.widgets.ConfirmedAjaxRequest(
           /* Ajax request URL */
-          item.href,
+          item.readAttribute('href'),
           /* Ajax request parameters */
           {
             onCreate : function() {
@@ -46,7 +46,7 @@ document.observe('dom:loaded', function() {
     item.observe('click', function(event) {
       item.blur();
       event.stop();
-      window.location = item.href;
+      window.location = item.readAttribute('href');
     }.bindAsEventListener());
   });
   // ------------------------------------

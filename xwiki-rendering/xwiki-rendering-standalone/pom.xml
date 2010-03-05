@@ -27,7 +27,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-core-rendering-parent</artifactId>
-    <version>2.2-SNAPSHOT</version>
+    <version>2.2.2</version>
   </parent>
   <artifactId>xwiki-core-rendering-standalone</artifactId>
   <name>XWiki Platform - Core - Rendering - Standalone Distribution</name>

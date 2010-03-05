@@ -298,7 +298,7 @@ XWiki.viewers.Comments = Class.create({
     if (!form) {
       return;
     }
-    var previewURL = "$xwiki.getURL('__space__.__page__', 'preview')".replace("__space__", $$("meta[name=space]")[0].content).replace("__page__", $$("meta[name=page]")[0].content);
+    var previewURL = "$xwiki.getURL('__space__.__page__', 'preview')".replace("__space__", encodeURIComponent($$("meta[name=space]")[0].content)).replace("__page__", encodeURIComponent($$("meta[name=page]")[0].content));
     form.commentElt = form.down('textarea');
     var buttons = form.down('input[type=submit]').up('div');
     form.previewButton = new Element('span', {'class' : 'buttonwrapper'}).update(new Element('input', {'type' : 'button', 'class' : 'button', 'value' : "$msg.get('core.viewers.comments.preview.button.preview')"}));

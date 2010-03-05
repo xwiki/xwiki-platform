@@ -82,6 +82,7 @@ import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.model.reference.EntityReference;
+import org.xwiki.model.reference.EntityReferenceResolver;
 import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.model.reference.WikiReference;
 import org.xwiki.rendering.block.Block;
@@ -163,10 +164,14 @@ public class XWikiDocument implements DocumentModelBridge
 
     private String title;
 
-    private String parent;
+    /**
+     * Relative reference to this document's parent.
+     */
+    private EntityReference parentReference;
 
     /**
-     * DocumentReference version of the parent is cached for better performance of {@link #getParentReference()}.
+     * Cache the parent refernce resolved as an absolute reference for improved performance (so that we don't have
+     * to resolve the relative reference every time getParentReference() is called.
      */
     private DocumentReference parentReferenceCache;
 
@@ -349,6 +354,13 @@ public class XWikiDocument implements DocumentModelBridge
      */
     private DocumentReferenceResolver<EntityReference> currentReferenceDocumentReferenceResolver = Utils.getComponent(
         DocumentReferenceResolver.class, "current/reference");
+
+    /**
+     * Used to resolve parent references in the way they are stored externally (database, xml, etc), ie relative or
+     * absolute.
+     */
+    private EntityReferenceResolver<String> relativeEntityReferenceResolver = Utils.getComponent(
+        EntityReferenceResolver.class, "relative");
 
     /**
      * Used to convert a proper Document Reference to string (compact form).
@@ -545,7 +557,7 @@ public class XWikiDocument implements DocumentModelBridge
         if (space != null) {
             getDocumentReference().getLastSpaceReference().setName(space);
 
-            // since document change the full reference resolution change too so we clean the cache
+            // Clean the absolute parent reference cache to rebuild it next time getParentReference is called.
             this.parentReferenceCache = null;
         }
     }
@@ -624,25 +636,34 @@ public class XWikiDocument implements DocumentModelBridge
      */
     public DocumentReference getParentReference()
     {
-        if (this.parentReferenceCache == null && !StringUtils.isEmpty(this.parent)) {
-            this.parentReferenceCache =
-                    resolveReference(this.parent, this.currentMixedDocumentReferenceResolver, getDocumentReference());
+        // Ensure we always return absolute document references for the parent since we always want well-constructed
+        // references and since we store the parent reference as relative internally.
+        if (this.parentReferenceCache == null && getRelativeParentReference() != null) {
+            this.parentReferenceCache = resolveReference(getRelativeParentReference(),
+                this.currentReferenceDocumentReferenceResolver, getDocumentReference());
         }
 
         return this.parentReferenceCache;
     }
 
     /**
-     * Return the parent reference stored in the database. It's is relative to the document.
-     * <p>
-     * If you want the full reference of the parent you should use {@link #getParentReference()}.
+     * Note that this method cannot be removed for now since it's used by Hibernate for saving a XWikiDocument.
      * 
-     * @return the parent reference or an empty string ("") if the parent is not set
+     * @return the parent reference stored in the database, which is relative to this document, or an empty string ("")
+     *         if the parent is not set
      * @see #getParentReference()
+     * @deprecated since 2.2M1 use {@link #getParentReference()} instead
      */
+    @Deprecated
     public String getParent()
     {
-        return this.parent != null ? this.parent : "";
+        String parentReferenceAsString;
+        if (getParentReference() != null) {
+            parentReferenceAsString = this.defaultEntityReferenceSerializer.serialize(getRelativeParentReference());
+        } else {
+            parentReferenceAsString = "";
+        }
+        return parentReferenceAsString;
     }
 
     /**
@@ -655,40 +676,54 @@ public class XWikiDocument implements DocumentModelBridge
     }
 
     /**
-     * Convert a full document reference into the proper relative document reference (wiki part is removed if it's the
-     * same as document wiki) to store as parent.
+     * @since 2.2.3
      */
-    public void setParentReference(DocumentReference parentReference)
+    public void setParentReference(EntityReference parentReference)
     {
-        if ((parentReference == null && getParentReference() != null)
-            || (parentReference != null && !parentReference.equals(getParentReference()))) {
-            if (parentReference != null) {
-                setParent(serializeReference(parentReference, this.compactWikiEntityReferenceSerializer,
-                    getDocumentReference()));
-            } else {
-                setParent("");
-            }
+        if ((parentReference == null && getRelativeParentReference() != null)
+            || (parentReference != null && !parentReference.equals(getRelativeParentReference()))) {
+            this.parentReference = parentReference;
+
+            // Clean the absolute parent reference cache to rebuild it next time getParentReference is called.
+            this.parentReferenceCache = null;
 
             setMetaDataDirty(true);
-            this.parentReferenceCache = parentReference;
         }
     }
 
     /**
-     * Set the parent reference to store in the database. It is relative to the document.
-     * <p>
-     * If you want to set the full reference of the parent use {@link #getParentReference()}.
+     * Convert a full document reference into the proper relative document reference (wiki part is removed if it's the
+     * same as document wiki) to store as parent.
+     * @deprecated since 2.2.3 use {@link #setParentReference(org.xwiki.model.reference.EntityReference)} instead
+     */
+    @Deprecated
+    public void setParentReference(DocumentReference parentReference)
+    {
+        if (parentReference != null) {
+            setParent(serializeReference(parentReference, this.compactWikiEntityReferenceSerializer,
+                getDocumentReference()));
+        } else {
+            setParentReference((EntityReference) null);
+        }
+    }
+
+    /**
+     * Note that this method cannot be removed for now since it's used by Hibernate for loading a XWikiDocument.
      * 
      * @param parent the reference of the parent relative to the document
+     * @deprecated since 2.2M1 used {@link #setParentReference(DocumentReference)} instead
      */
+    @Deprecated
     public void setParent(String parent)
     {
-        if (parent != null && !parent.equals(this.parent)) {
-            setMetaDataDirty(true);
+        // If the passed parent  is an empty string we also need to set the reference to null. The reason is that
+        // in the database we store "" when the parent is empty and thus when Hibernate loads this class it'll call
+        // setParent with "" if the parent had not been set when saved.
+        if (StringUtils.isEmpty(parent)) {
+            setParentReference((EntityReference) null);
+        } else {
+            setParentReference(this.relativeEntityReferenceResolver.resolve(parent, EntityType.DOCUMENT));
         }
-
-        this.parent = parent;
-        this.parentReferenceCache = null;
     }
 
     public String getContent()
@@ -842,7 +877,7 @@ public class XWikiDocument implements DocumentModelBridge
         if (name != null) {
             getDocumentReference().setName(name);
 
-            // since document change the full reference resolution change too so we clean the cache
+            // Clean the absolute parent reference cache to rebuild it next time getParentReference is called.
             this.parentReferenceCache = null;
         }
     }
@@ -880,7 +915,10 @@ public class XWikiDocument implements DocumentModelBridge
 
     /**
      * @since 2.2M1
+     * @deprecated since 2.2.3 don't change the reference of a document once it's been constructed. Instead you can
+     *             clone the doc, rename it or copy it.
      */
+    @Deprecated
     public void setDocumentReference(DocumentReference reference)
     {
         // Don't allow setting a null reference for now, ie. don't do anything to preserve backward compatibility
@@ -890,7 +928,7 @@ public class XWikiDocument implements DocumentModelBridge
                 this.documentReference = reference;
                 setMetaDataDirty(true);
 
-                // since document change the full reference resolution change too so we clean the cache
+                // Clean the absolute parent reference cache to rebuild it next time getParentReference is called.
                 this.parentReferenceCache = null;
             }
         }
@@ -2998,7 +3036,7 @@ public class XWikiDocument implements DocumentModelBridge
             doc.setNew(isNew());
             doc.setStore(getStore());
             doc.setTemplateDocumentReference(getTemplateDocumentReference());
-            doc.setParent(getParent());
+            doc.setParentReference(getRelativeParentReference());
             doc.setCreator(getCreator());
             doc.setDefaultLanguage(getDefaultLanguage());
             doc.setDefaultTemplate(getDefaultTemplate());
@@ -3290,7 +3328,12 @@ public class XWikiDocument implements DocumentModelBridge
         docel.add(el);
 
         el = new DOMElement("parent");
-        el.addText(getParent());
+        if (getRelativeParentReference() == null) {
+            // No parent have been specified
+            el.addText("");
+        } else {
+            el.addText(this.defaultEntityReferenceSerializer.serialize(getRelativeParentReference()));
+        }
         docel.add(el);
 
         el = new DOMElement("creator");
@@ -4635,7 +4678,7 @@ public class XWikiDocument implements DocumentModelBridge
         if (database != null) {
             getDocumentReference().getWikiReference().setName(database);
 
-            // since document change the full reference resolution change too so we clean the cache
+            // Clean the absolute parent reference cache to rebuild it next time getParentReference is called.
             this.parentReferenceCache = null;
         }
     }
@@ -6951,7 +6994,7 @@ public class XWikiDocument implements DocumentModelBridge
         return syntax;
     }
 
-    private DocumentReference resolveReference(String referenceAsString, DocumentReferenceResolver<String> resolver,
+    private <T> DocumentReference resolveReference(T referenceToResolve, DocumentReferenceResolver<T> resolver,
         DocumentReference defaultReference)
     {
         XWikiContext xcontext = getXWikiContext();
@@ -6962,7 +7005,7 @@ public class XWikiDocument implements DocumentModelBridge
             xcontext.setDatabase(defaultReference.getWikiReference().getName());
             xcontext.setDoc(new XWikiDocument(defaultReference));
 
-            return resolver.resolve(referenceAsString);
+            return resolver.resolve(referenceToResolve);
         } finally {
             xcontext.setDoc(originalCurentDocument);
             xcontext.setDatabase(originalWikiName);
@@ -7001,6 +7044,16 @@ public class XWikiDocument implements DocumentModelBridge
                 new DocumentReference(getDocumentReference().getWikiReference().getName(), "XWiki",
                     getDocumentReference().getName());
         return resolveReference(documentName, this.currentDocumentReferenceResolver, defaultReference);
+    }
+
+    /**
+     * @return the relative parent reference, this method should stay private since this the relative saving of the
+     *         parent reference is an implementation detail and from the outside we should only see absolute references
+     * @since 2.2.3
+     */
+    private EntityReference getRelativeParentReference()
+    {
+        return this.parentReference;
     }
 
     private XWikiContext getXWikiContext()

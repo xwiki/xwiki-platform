@@ -1677,6 +1677,10 @@ input#tags {
 body .listGrid {
   border: none;
 }
+#XWEWrapper {
+  /* Fix double scrollbar in IE7&8 */
+  overflow: hidden !important;
+}
 
 /* -----------------------YUI Trees----------------------*/
 .ygtvitem table {

@@ -46,8 +46,9 @@ import com.xpn.xwiki.store.XWikiVersioningStoreInterface;
 import com.xpn.xwiki.test.AbstractBridgedXWikiComponentTestCase;
 import com.xpn.xwiki.user.api.XWikiRightService;
 import com.xpn.xwiki.web.XWikiMessageTool;
+import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.DocumentReference;
-import org.xwiki.rendering.syntax.Syntax;
+import org.xwiki.model.reference.EntityReference;
 
 /**
  * Unit tests for {@link XWikiDocument}.
@@ -934,11 +935,20 @@ public class XWikiDocumentTest extends AbstractBridgedXWikiComponentTestCase
         assertEquals(new DocumentReference("docwiki2", "docspace2", "parentpage2"), doc.getParentReference());
     }
 
-    public void testSetParentReference()
+    public void testSetAbsoluteParentReference()
     {
         XWikiDocument doc = new XWikiDocument(new DocumentReference("docwiki", "docspace", "docpage"));
 
         doc.setParentReference(new DocumentReference("docwiki", "docspace", "docpage2"));
         assertEquals("docspace.docpage2", doc.getParent());
+    }
+
+    public void testSetRelativeParentReference()
+    {
+        XWikiDocument doc = new XWikiDocument(new DocumentReference("docwiki", "docspace", "docpage"));
+
+        doc.setParentReference(new EntityReference("docpage2", EntityType.DOCUMENT));
+        assertEquals(new DocumentReference("docwiki", "docspace", "docpage2"), doc.getParentReference());
+        assertEquals("docpage2", doc.getParent());
     }
 }

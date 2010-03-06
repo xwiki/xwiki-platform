@@ -26,12 +26,7 @@
     </dl>
   </div>## informationleft
   <div id="informationright" style="float:right; width: 50.1%;">
-    #if ($xwiki.hasAccessLevel('edit'))
-      #template("tagedit.vm")
-    #end
     <dl>
-      <dt>$msg.get('core.viewers.information.creation')</dt>
-      <dd>$msg.get('core.viewers.information.creationData', [$xwiki.getUserName($doc.creator), $xwiki.formatDate($doc.creationDate)])</dd>
       #if($tdoc.realLanguage != $doc.realLanguage)
         <dt>$msg.get('core.viewers.information.translationCreation', [$tdoc.realLanguage])</dt>
         <dd>$msg.get('core.viewers.information.translationCreationData', [$xwiki.getUserName($tdoc.creator), $xwiki.formatDate($tdoc.creationDate)])</dd>

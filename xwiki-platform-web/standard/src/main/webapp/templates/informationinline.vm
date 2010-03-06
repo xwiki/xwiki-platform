@@ -40,7 +40,7 @@
           </dd>
       #end
       #end
-      #set($blinks = $doc.getBacklinks())
+      #set($blinks = $sorttool.sort($doc.getBacklinks()))
       #if($blinks.size()>0)
         <dt>$msg.get('core.viewers.information.backlinks')</dt>
         <dd>

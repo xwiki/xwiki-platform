@@ -1,0 +1,5 @@
+This is the old historical module containing XWiki platform core code.
+
+Since 2007 we've been busy exploding this monolithic module into smaller submodules, each handling a specific concern.
+
+In due time this module will completely disappear.

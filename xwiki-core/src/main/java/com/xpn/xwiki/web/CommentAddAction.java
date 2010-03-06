@@ -55,7 +55,7 @@ public class CommentAddAction extends XWikiAction
         BaseClass baseclass = xwiki.getCommentsClass(context);
         if (doc.isNew()) {
             return true;
-        } else if (context.getUser() == XWikiRightService.GUEST_USER_FULLNAME && !checkCaptcha(context)) {
+        } else if (context.getUser().equals(XWikiRightService.GUEST_USER_FULLNAME) && !checkCaptcha(context)) {
             ((VelocityContext) context.get("vcontext")).put("captchaAnswerWrong", Boolean.TRUE);
         } else {
             // className = XWiki.XWikiComments

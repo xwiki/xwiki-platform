@@ -26,6 +26,9 @@ import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.objects.classes.BaseClass;
+import com.xpn.xwiki.user.api.XWikiRightService;
+
+import org.apache.velocity.VelocityContext;
 
 /**
  * Action used to post a comment on a page, adds a comment object to the document and saves it, requires comment right
@@ -52,6 +55,8 @@ public class CommentAddAction extends XWikiAction
         BaseClass baseclass = xwiki.getCommentsClass(context);
         if (doc.isNew()) {
             return true;
+        } else if (context.getUser() == XWikiRightService.GUEST_USER_FULLNAME && !checkCaptcha(context)) {
+            ((VelocityContext) context.get("vcontext")).put("captchaAnswerWrong", Boolean.TRUE);
         } else {
             // className = XWiki.XWikiComments
             String className = baseclass.getName();
@@ -65,6 +70,10 @@ public class CommentAddAction extends XWikiAction
             // if contentDirty is false, in order for the change to create a new version metaDataDirty must be true.
             doc.setMetaDataDirty(true);
             xwiki.saveDocument(doc, context.getMessageTool().get("core.comment.addComment"), true, context);
+        }
+        // If xpage is specified then allow the specified template to be parsed.
+        if (context.getRequest().get("xpage") != null) {
+            return true;
         }
         // forward to edit
         String redirect = Utils.getRedirect("edit", context);
@@ -80,7 +89,36 @@ public class CommentAddAction extends XWikiAction
     @Override
     public String render(XWikiContext context) throws XWikiException
     {
-        context.put("message", "nocommentwithnewdoc");
-        return "exception";
+        if (context.getDoc().isNew()) {
+            context.put("message", "nocommentwithnewdoc");
+            return "exception";
+        }
+        return "";
+    }
+
+    /**
+     * Checks the request parameter captcha_answer against the captcha module.
+     * This makes xwiki-core dependant on xwiki-captcha and should be removed as soon as possible.
+     *
+     * @param context The XWikiContext for getting the request and whether guest comment requires a captcha.
+     * @return true if the captcha answer is correct or if no captcha answer and captcha is not required.
+     * @throws XWikiException if something goes wrong in the captcha module.
+     * @since 2.3M1
+     */
+    private boolean checkCaptcha(XWikiContext context) throws XWikiException
+    {
+        String answer = context.getRequest().get("captcha_answer");
+        if (answer != null && answer.length() > 0) {
+            org.xwiki.captcha.CaptchaVerifier cv = 
+                Utils.getComponent(org.xwiki.captcha.CaptchaVerifier.class, context.getRequest().get("captcha_type"));
+            try {
+                return cv.isAnswerCorrect(cv.getUserId(context.getRequest()), answer);
+            } catch (Exception e) {
+                throw new XWikiException(XWikiException.MODULE_XWIKI, XWikiException.ERROR_XWIKI_UNKNOWN, 
+                                        "Exception while attempting to verify captcha", e);
+            }
+        } else {
+            return (context.getWiki().getSpacePreferenceAsInt("guest_comment_requires_captcha", 0, context) != 1);
+        }
     }
 }

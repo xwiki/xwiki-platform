@@ -149,6 +149,24 @@ public class XWikiDocumentRenderingTest extends AbstractBridgedXWikiComponentTes
         this.baseObject.setStringListValue("stringlist", Arrays.asList("VALUE1", "VALUE2"));
     }
 
+    /*
+     * Variables must be nulled because junit does not dispose of tests until it is done with them all. see: XWIKI-4953
+     */
+    @Override
+    protected void tearDown() throws Exception
+    {
+        this.mockXWiki = null;
+        this.document = null;
+        this.translatedDocument = null;
+        this.mockXWikiRenderingEngine = null;
+        this.mockXWikiVersioningStore = null;
+        this.mockXWikiStoreInterface = null;
+        this.mockXWikiRightService = null;
+        this.baseClass = null;
+        this.baseObject = null;
+        super.tearDown();
+    }
+
     public void testScriptContext() throws XWikiException
     {
         this.document.setContent("{{groovy}}print(doc);{{/groovy}}");

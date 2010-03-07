@@ -68,6 +68,19 @@ public abstract class AbstractSyntaxTest extends AbstractBridgedXWikiComponentTe
         this.context.setDoc(this.document);
     }
 
+    /*
+     * Variables must be nulled because junit does not dispose of tests until it is done with them all. see: XWIKI-4953
+     */
+    @Override
+    protected void tearDown() throws Exception
+    {
+        this.context = null;
+        this.renderer = null;
+        this.mockXWiki = null;
+        this.document = null;
+        super.tearDown();
+    }
+
     protected void test(ArrayList<String> tests, ArrayList<String> expects)
     {
         for (int i = 0; i < tests.size(); ++i) {

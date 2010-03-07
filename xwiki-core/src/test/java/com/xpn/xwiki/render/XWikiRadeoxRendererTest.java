@@ -73,6 +73,21 @@ public class XWikiRadeoxRendererTest extends AbstractBridgedXWikiComponentTestCa
         getContext().setDoc((XWikiDocument) mockCurrentDocument.proxy());
     }
 
+    /*
+     * Variables must be nulled because junit does not dispose of tests until it is done with them all. see: XWIKI-4953
+     */
+    @Override
+    protected void tearDown() throws Exception
+    {
+        this.renderer = null;
+        this.mockXWiki = null;
+        this.mockContentDocument = null;
+        this.contentDocument = null;
+        this.mockDocument = null;
+        this.document = null;
+        super.tearDown();
+    }
+
     public void testRenderWithSimpleText()
     {
         String result = this.renderer.render("Simple content", this.contentDocument, this.document, getContext());

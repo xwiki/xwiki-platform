@@ -37,6 +37,7 @@ XWiki.docisnew = $!doc.isNew();
 XWiki.docsyntax = "$!doc.getSyntaxId()";
 XWiki.blacklistedSpaces = [ #foreach($space in $blacklistedSpaces)#if($velocityCount > 1),#end"$space"#end ];
 XWiki.hasEdit = $hasEdit;
+XWiki.hasProgramming = $hasProgramming;
 window.docviewurl = "${doc.getURL('view')}";
 window.docediturl = "${doc.getURL('edit')}";
 window.docsaveurl = "${doc.getURL('save')}";

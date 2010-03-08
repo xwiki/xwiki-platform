@@ -141,6 +141,10 @@ div.loading {
   margin-left: .2em;
 }
 
+div#package div.importOption {
+  margin-bottom:5px;
+}
+
 div#package ul.package {
   background-color: $theme.pageContentBackgroundColor;
   border: 1px dotted $theme.borderColor;

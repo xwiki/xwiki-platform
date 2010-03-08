@@ -39,7 +39,7 @@ XWiki.widgets.LiveTable = Class.create({
     if (!options) {
       var options = {};
     }
-	 
+     
     // id of the root element that encloses this livetable
     this.domNodeName = domNodeName;
 
@@ -61,14 +61,18 @@ XWiki.widgets.LiveTable = Class.create({
     this.limit = options.limit || 10;
     this.action = options.action || "view"; // FIXME check if this can be removed safely.
 
+    this.permalinks = options.permalinks || true;
+
     // Initialize pagination
     if (typeof this.paginationNodes != "undefined") {
        this.paginator = new LiveTablePagination(this, this.paginationNodes, options.maxPages || 10);
     }
-	// Initialize filters
+    // Initialize filters
     if (this.filtersNode) {
-      this.filter = new LiveTableFilter(this, this.filtersNode);
+      var initialFilters = this.permalinks ? this.getFiltersFromHash() : new Object();
+      this.filter = new LiveTableFilter(this, this.filtersNode, initialFilters);
     }
+
     if ($(domNodeName + "-tagcloud"))
     {
        this.tagCloud = new LiveTableTagCloud(this, domNodeName + "-tagcloud");
@@ -86,8 +90,84 @@ XWiki.widgets.LiveTable = Class.create({
 
     this.observeSortableColumns();   
  
+    var initialPage = this.permalinks ? this.getPageFromHash() : 1;
+    this.currentOffset = (initialPage - 1) * this.limit + 1;
+
     // Show initial rows
-    this.showRows(1, this.limit);
+    this.showRows(this.currentOffset, this.limit);
+  },
+
+  /**
+   * Re-write location hash with current page and filters values
+   */
+  updateLocationHash: function()
+  {
+    var currentHash = window.location.hash.substring(1);
+    var filterString = this.filter.serializeFilters();
+
+    var shouldUpdate = this.lastoffset != 1 || !currentHash.blank() || !filterString.blank();
+
+    if (shouldUpdate) {
+      var tables = currentHash.split("|"), newHash = "";
+      for (var i=0;i<tables.length;i++) {
+        var params = tables[i].toQueryParams();
+        if (params["t"] != this.domNodeName) {
+          // Don't override other tables params
+          newHash += (tables[i] + "|"); 
+        }
+      }
+      newHash += "t=#{table}&p=#{page}".interpolate({
+        "table" : this.domNodeName,
+        "page" : ((this.lastoffset - 1) / this.limit) + 1
+      });
+
+      newHash += filterString;
+
+      window.location.hash = "#" + newHash;
+    }
+  },
+
+  /**
+   * Returns the current page associated to this livetable.
+   */
+  getPageFromHash: function()
+  {
+    var hashString = window.location.hash.substring(1);
+    if (!hashString.blank()) {
+      var tables = hashString.split("|");
+      for (var i=0;i<tables.length;i++) {
+        var params = tables[i].toQueryParams();
+        if (params["t"] == this.domNodeName && parseInt(params["p"])) {
+          return parseInt(params["p"]);
+        }
+      }
+    }
+    return 1;
+  },
+
+  /**
+   * Retrieve this table filters as filter key/filter value object from the window location hash.
+   * Returns an empty object if no filter is defined in the hash for this table.
+   */
+  getFiltersFromHash: function()
+  {
+    var hashString = window.location.hash.substring(1);
+    if (!hashString.blank()) {
+      var tables = hashString.split("|");
+      for (var i=0;i<tables.length;i++) {
+        var params = tables[i].toQueryParams();
+        if (params["t"] == this.domNodeName) { // that's our table !
+          var parameterNames = Object.keys(params), result = new Object();
+          for (var j=0;j<parameterNames.length;j++) {
+            if (parameterNames[j] != "t" && parameterNames[j] != "p") { // ignore those reserved params
+              result[parameterNames[j]] = params[parameterNames[j]];
+            }
+          }
+          return result;
+        }
+      }
+    }
+    return new Object();
   },
 
   /**
@@ -105,8 +185,8 @@ XWiki.widgets.LiveTable = Class.create({
     var url =  this.getUrl + '&offset='+reqOffset+'&limit='+reqLimit+'&reqNo='+ (++this.sendReqNo);
 
     if (this.filter) {
-      this.filters = this.filter.getFilters();
-      if (this.filters != "" && this.filters != undefined) {
+      this.filters = this.filter.serializeFilters();
+      if (this.filters != undefined && this.filters != "") {
         url += this.filters;
       }
     }
@@ -213,6 +293,11 @@ XWiki.widgets.LiveTable = Class.create({
   showRows: function(offset, limit)
   {
     this.lastoffset = offset;
+
+    if (this.permalinks) {
+      this.updateLocationHash();
+    }
+
     // This is some debugging string.
     var buff  = 'request to display rows '+offset+' to '+(offset+limit)+' <br />\n';
 
@@ -458,11 +543,14 @@ var LiveTablePagination = Class.create({
  * The class that deals with the filtering in a table
  */
 var LiveTableFilter = Class.create({
-  initialize: function(table, filterNode)
+  initialize: function(table, filterNode, filters)
   {
     this.table = table;
     this.filterNode = $(filterNode);
     this.filters = new Object();
+
+    this.filters = filters;
+    this.initializeFilters();
 
     this.attachEventHandlers();
   },
@@ -473,6 +561,57 @@ var LiveTableFilter = Class.create({
       self.refreshContent();
     }
   },
+
+  /**
+   * Initialize DOM values of the filters elements based on the passed map of name/value.
+   * TODO: rewrite this method the other way around (iterate on the map, not on the filters).
+   */
+  initializeFilters: function()
+  {
+    var inputs = this.filterNode.select("input");
+    for(var i=0;i<inputs.length;i++) {
+       var key=inputs[i].name;
+       if(inputs[i].type=="radio" || inputs[i].type=="checkbox") {
+          if(this.filters[key] && this.filters[key] == inputs[i].value.strip())
+            inputs[i].checked = true;
+          else
+            inputs[i].checked = false;
+       } else {
+          if(this.filters[key])
+            inputs[i].value = this.filters[key];
+       }
+     }
+
+     var selects = this.filterNode.select("select");
+     for(var i=0;i<selects.length;i++) {
+        for (var j=0;j<selects[i].options.length;j++) {
+        if (this.filters[selects[i].name] && selects[i].options[j].value == this.filters[selects[i].name]) {
+           selects[i].options[j].selected = true;
+        } else {
+           selects[i].options[j].selected = false;
+        } 
+      }
+     }
+  },
+
+  serializeFilters: function()
+  {
+    // It's a shame we can't use prototype Form methods on non-form elements.
+    // In the future, we need to have the livetable filters in a real form (for a degraded version w/o js)
+    // Then we can write :
+    // return Form.serializeElements(Form.getElements(this.domNodeName);
+    var result = "";
+    var filters = this.filterNode.select("input", "select");
+    for (var i=0;i<filters.length;i++) {
+      if (!filters[i].value.blank()) {
+	    if ((filters[i].type != "radio" && filters[i].type != "checkbox") || filters[i].checked) {
+          result += ("&" + filters[i].name + "=" + encodeURIComponent(filters[i].value));
+        }
+      }
+    }
+    return result;
+  },
+
 
   attachEventHandlers: function()
   {
@@ -493,47 +632,12 @@ var LiveTableFilter = Class.create({
     }
   },
 
-  getFilters : function()
-  {
-    var inputs = this.filterNode.getElementsByTagName('input');
-    this.filters = new Object();
-    var existing = new Object();
-    for(var prop in this.filters) {
-      existing[prop] = true;
-    }
-    for (var i = 0; i < inputs.length; i++) {
-      var key = inputs[i].name;
-      if (inputs[i].type == "radio" || inputs[i].type == "checkbox" ) {
-        if (inputs[i].checked) {
-          this.filters[key] = inputs[i].value.strip();
-        }
-      } else {
-        this.filters[key] = inputs[i].value.strip();
-      }
-    }
-
-    var selects = this.filterNode.getElementsByTagName('select');
-    for(var i = 0; i < selects.length; i++) {
-      this.filters[selects[i].name] = selects[i].value.strip();
-    }
-
-    var filterString = "";
-    for (key in this.filters) {
-      if (!existing[key] && this.filters[key] != "") {
-        filterString += '&' + key + '=' + encodeURIComponent(this.filters[key]);
-      }
-    }
-    delete existing;
-
-    return filterString;
-  },
-
   /**
     * Refresh the table when the filters have changed.
     */
   refreshContent : function()
   {
-    var newFilters = this.getFilters();
+    var newFilters = this.serializeFilters();
     if (newFilters == this.table.filters) {
       return;
     }
@@ -590,7 +694,7 @@ var LiveTableTagCloud = Class.create({
     */
    updateTagCloud: function(tags, matchingTags) {
       if (!this.hasTags && tags.length > 0) {
-        this.tags = tags;	 
+        this.tags = tags;    
         this.map = this.buildPopularityMap(this.tags);
         this.hasTags = true;
         this.domNode.removeClassName("hidden");
@@ -716,3 +820,4 @@ if(browser.isIE6x) {
 }
 
 })();
+

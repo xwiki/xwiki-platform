@@ -136,7 +136,7 @@ XWiki.viewers.Comments = Class.create({
         } else {
           new Ajax.Request(
             /* Ajax request URL */
-            item.readAttribute('href').replace('viewer=', 'xpage='),
+            item.readAttribute('href').replace('viewer=comments', 'xpage=xpart&vm=commentsinline.vm'),
             /* Ajax request parameters */
             {
               onCreate : function() {

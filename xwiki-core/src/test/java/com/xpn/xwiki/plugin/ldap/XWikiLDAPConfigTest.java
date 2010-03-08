@@ -196,17 +196,6 @@ public class XWikiLDAPConfigTest extends AbstractBridgedXWikiComponentTestCase
         };
     }
 
-    /*
-     * Variables must be nulled because junit does not dispose of tests until it is done with them all. see: XWIKI-4953
-     */
-    @Override
-    protected void tearDown() throws Exception
-    {
-        this.prefContext = null;
-        this.cfgContext = null;
-        super.tearDown();
-    }
-
     // ///////////////////////////////////////////////////////////////////////////////////////:
     // Tests
 

@@ -36,21 +36,10 @@ import com.xpn.xwiki.user.api.XWikiRightService;
 public class XWikiDocumentArchiveTest extends AbstractBridgedXWikiComponentTestCase
 {
     private XWikiContext context;
-
     protected void setUp() throws Exception
     {
         super.setUp();
         this.context = new XWikiContext();
-    }
-
-    /*
-     * Variables must be nulled because junit does not dispose of tests until it is done with them all. see: XWIKI-4953
-     */
-    @Override
-    protected void tearDown() throws Exception
-    {
-        this.context = null;
-        super.tearDown();
     }
     
     /**

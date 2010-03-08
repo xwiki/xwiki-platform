@@ -80,11 +80,6 @@ public abstract class AbstractBridgedXWikiComponentTestCase extends AbstractXWik
     protected void tearDown() throws Exception
     {
         Utils.setComponentManager(null);
-
-        // Variables must be nulled because junit does not dispose of any tests until it is done with them all.
-        // see: XWIKI-4953
-        this.context = null;
-
         super.tearDown();
     }
 

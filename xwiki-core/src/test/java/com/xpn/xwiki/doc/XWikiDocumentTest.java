@@ -161,25 +161,6 @@ public class XWikiDocumentTest extends AbstractBridgedXWikiComponentTestCase
         this.mockXWikiStoreInterface.stubs().method("search").will(returnValue(new ArrayList<XWikiDocument>()));
     }
 
-    /*
-     * Variables must be nulled because junit does not dispose of tests until it is done with them all. see: XWIKI-4953
-     */
-    @Override
-    protected void tearDown() throws Exception
-    {
-        this.document = null;
-        this.translatedDocument = null;
-        this.mockXWiki = null;
-        this.mockXWikiRenderingEngine = null;
-        this.mockXWikiVersioningStore = null;
-        this.mockXWikiStoreInterface = null;
-        this.mockXWikiMessageTool = null;
-        this.mockXWikiRightService = null;
-        this.baseClass = null;
-        this.baseObject = null;
-        super.tearDown();
-    }
-
     public void testConstructor()
     {
         DocumentReference defaultReference = new DocumentReference("xwiki", "Main", "WebHome");

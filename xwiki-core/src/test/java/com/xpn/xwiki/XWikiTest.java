@@ -158,20 +158,6 @@ public class XWikiTest extends AbstractBridgedXWikiComponentTestCase
         this.xwiki.saveDocument(this.document, getContext());
     }
 
-    /*
-     * Variables must be nulled because junit does not dispose of tests until it is done with them all. see: XWIKI-4953
-     */
-    @Override
-    protected void tearDown() throws Exception
-    {
-        this.document = null;
-        this.xwiki = null;
-        this.mockXWikiStore = null;
-        this.mockXWikiVersioningStore = null;
-        this.docs = null;
-        super.tearDown();
-    }
-
     public void testAuthorAfterDocumentCopy() throws XWikiException
     {
         String copyName = "Lyre";

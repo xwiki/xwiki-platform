@@ -835,6 +835,10 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-surefire-plugin</artifactId>
+        <configuration>
+          <!-- Prevent Out Of Memory errors resulting from tests that do no free up the memory correctly -->
+          <forkMode>pertest</forkMode>
+        </configuration>
       </plugin>      
       <!-- Publish a Core Test JAR -->
       <plugin>

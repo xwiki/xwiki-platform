@@ -106,17 +106,6 @@ public class SyndEntryDocumentSourceTest extends AbstractBridgedXWikiComponentTe
         source = new SyndEntryDocumentSource();
     }
 
-    /*
-     * Variables must be nulled because junit does not dispose of tests until it is done with them all. see: XWIKI-4953
-     */
-    @Override
-    protected void tearDown() throws Exception
-    {
-        this.source = null;
-        this.doc = null;
-        super.tearDown();
-    }
-
     private void mockUp() throws Exception
     {
         final Map<String, XWikiDocument> docs = new HashMap<String, XWikiDocument>();

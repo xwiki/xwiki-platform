@@ -602,7 +602,9 @@ public class Package
                 // Determine if the user performing the installation is a farm admin.
                 // Right now, check for programming rights, which is the closer we can get to the notion
                 // of farm admin.
-                boolean isFarmAdmin = context.getWiki().getRightService().hasProgrammingRights(context);
+                // Note: we test the programming right against a "null" document, otherwise the right service
+                // uses the document in the context and verify the PR against it instead of against the context user
+                boolean isFarmAdmin = context.getWiki().getRightService().hasProgrammingRights(null, context);
 
                 if (!this.backupPack || !isFarmAdmin) {
                     // We allow author preservation from the package only to farm admins,
@@ -1188,6 +1190,7 @@ public class Package
         infos.put("licence", this.licence);
         infos.put("author", this.authorName);
         infos.put("version", this.version);
+        infos.put("backup", this.isBackupPack());
 
         Map<String, Map<String, List<Map<String, String>>>> files =
             new HashMap<String, Map<String, List<Map<String, String>>>>();

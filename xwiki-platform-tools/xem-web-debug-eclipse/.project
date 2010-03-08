@@ -66,11 +66,6 @@
 			<locationURI>XWIKI_WEB/standard/src/main/webapp/WEB-INF/cache</locationURI>
 		</link>
 		<link>
-			<name>src/main/webapp/WEB-INF/cactus.properties</name>
-			<type>1</type>
-			<locationURI>XWIKI_WEB/standard/src/main/webapp/WEB-INF/cactus.properties</locationURI>
-		</link>
-		<link>
 			<name>src/main/webapp/WEB-INF/commons-logging.properties</name>
 			<type>1</type>
 			<locationURI>XWIKI_WEB/standard/src/main/webapp/WEB-INF/commons-logging.properties</locationURI>

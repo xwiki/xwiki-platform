@@ -326,7 +326,7 @@
 <displayFormType>select</displayFormType>
 <name>guest_comment_requires_captcha</name>
 <number>77</number>
-<prettyName>guest_comment_requires_captcha</prettyName>
+<prettyName>Guests Must Solve Captcha To Comment</prettyName>
 <unmodifiable>0</unmodifiable>
 <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
 </guest_comment_requires_captcha>

@@ -462,6 +462,62 @@ function makeAddHandler(url, saveurl, redirecturl)
   }
 }
 
+/*
+ * Set a boolean property in a class from a live checkbox. A live checkbox is a picture of a checkmark which has
+ * an id that is the same as the property name of a class property. To use this function call:
+ * Event.observe($('live_checkbox_id'), 'click', setBooleanPropertyFromLiveCheckbox($('live_checkbox_id'),
+ *                                                                                  '/xwiki/bin/save/Main/Document',
+ *                                                                                  'Main.someClass',
+ *                                                                                  0));
+ * This will make your checkbox with the element id 'live_checkbox_id' change a property called 'live_checkbox_id'
+ * in object number 0 of the class 'Main.SomeClass' in the document 'Main.Document'
+ *
+ * @param self (DOM Element) The live checkbox, the id of this element will be the name of the property which is changed.
+ * @param saveDocumentURL (String) The URL to post data to to save the property change.
+ * @param configurationClassName (String) An object of the named class will be altered.
+ * @param objectNumber (Number) This number object will have it's property altered.
+ * @since 2.3M1
+ */
+function setBooleanPropertyFromLiveCheckbox(self, saveDocumentURL, configurationClassName, objectNumber)
+{
+  return function() {
+    var saveURL = "$xwiki.getURL('XWiki.XWikiPreferences', 'save')";
+    var config = "XWiki.XWikiPreferences";
+    var objNum = "0";
+    if (saveDocumentURL != undefined && saveDocumentURL.length > 0) {
+      saveURL = saveDocumentURL;
+    }
+    if (configurationClassName != undefined && configurationClassName.length > 0) {
+      config = configurationClassName;
+    }
+    if (objectNumber != undefined) {
+      objNum = objectNumber;
+    }
+    var pivot = self;
+    var newAlt = "yes";
+    var newSrc = "$xwiki.getSkinFile('js/xwiki/usersandgroups/img/allow-black.png')";
+    var setValue = "1";
+    if (self.getAttribute('alt') == "yes") {
+      newAlt = "no";
+      newSrc = "$xwiki.getSkinFile('js/xwiki/usersandgroups/img/none.png')";
+      setValue = "0";
+    }
+    var paramMap = {};
+    paramMap["parameters"] = {};
+    paramMap["parameters"][config + "_" + objNum + "_" + self.id] = setValue;
+    paramMap["parameters"]["ajax"] = "1";
+    paramMap["onSuccess"] = function() {
+      pivot.alt = newAlt;
+      pivot.src = newSrc;
+    }
+    new Ajax.Request(saveURL, paramMap);
+  }
+}
+
+/*
+ * Depricated Since 2.3M1
+ * Use setBooleanPropertyFromLiveCheckbox
+ */
 function setGuestExtendedRights(self)
 {
   return function() {

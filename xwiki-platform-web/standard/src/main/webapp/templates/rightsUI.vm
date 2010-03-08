@@ -131,32 +131,43 @@
              </table>
            </td>
           </tr>
-          #if("$!request.editor" == "globaladmin" || "$!editor" == "globaladmin")
           <tr>
             <td>
               <table>
-              #set($auth_view = $doc.getObject("XWiki.XWikiPreferences").getProperty("authenticate_view").getValue())
-              #set($auth_edit = $doc.getObject("XWiki.XWikiPreferences").getProperty("authenticate_edit").getValue())              
-              #if("$!auth_view" == "1")
-                #set($view_icon = $xwiki.getSkinFile('js/xwiki/usersandgroups/img/allow-black.png'))
-                #set($view_alt = "yes")
-              #else
-                #set($view_icon = $xwiki.getSkinFile('js/xwiki/usersandgroups/img/none.png'))
-                #set($view_alt = "no")
+              #if("$!request.editor" == "globaladmin" || "$!editor" == "globaladmin")
+                #set($auth_view = $doc.getObject("XWiki.XWikiPreferences").getProperty("authenticate_view").getValue())
+                #if("$!auth_view" == "1")
+                  #set($view_icon = $xwiki.getSkinFile('js/xwiki/usersandgroups/img/allow-black.png'))
+                  #set($view_alt = "yes")
+                #else
+                  #set($view_icon = $xwiki.getSkinFile('js/xwiki/usersandgroups/img/none.png'))
+                  #set($view_alt = "no")
+                #end
+                <tr><td>$msg.get("authenticate_view")</td><td><img id="authenticate_view" alt="$view_alt" src="${view_icon}" /></td></tr>
+                #set($auth_edit = $doc.getObject("XWiki.XWikiPreferences").getProperty("authenticate_edit").getValue())
+                #if("$!auth_edit" == "1")
+                  #set($edit_icon = $xwiki.getSkinFile('js/xwiki/usersandgroups/img/allow-black.png'))
+                  #set($edit_alt = "yes")
+                #else
+                  #set($edit_icon = $xwiki.getSkinFile('js/xwiki/usersandgroups/img/none.png'))
+                  #set($edit_alt = "no")
+                #end
+                <tr><td>$msg.get("authenticate_edit")</td><td><img id="authenticate_edit" alt="$edit_alt" src="${edit_icon}" /></td></tr>
               #end
-              #if("$!auth_edit" == "1")
-                #set($edit_icon = $xwiki.getSkinFile('js/xwiki/usersandgroups/img/allow-black.png'))
-                #set($edit_alt = "yes")
-              #else
-                #set($edit_icon = $xwiki.getSkinFile('js/xwiki/usersandgroups/img/none.png'))
-                #set($edit_alt = "no")
+              #if($xwiki.getDocument("XWiki", "XWikiPreferences").getxWikiClass().get('guest_comment_requires_captcha'))
+                #set($guest_comment_requires_captcha = $doc.getObject("XWiki.XWikiPreferences").getProperty("guest_comment_requires_captcha").getValue())
+                #if("$!guest_comment_requires_captcha" == "1")
+                  #set($guest_comment_requires_captcha_icon = $xwiki.getSkinFile('js/xwiki/usersandgroups/img/allow-black.png'))
+                  #set($guest_comment_requires_captcha_alt = "yes")
+                #else
+                  #set($guest_comment_requires_captcha_icon = $xwiki.getSkinFile('js/xwiki/usersandgroups/img/none.png'))
+                  #set($guest_comment_requires_captcha_alt = "no")
+                #end
+                <tr><td>$msg.get("rightsmanager.guestcommentrequirescaptcha")</td><td><img id="guest_comment_requires_captcha" alt="$guest_comment_requires_captcha_alt" src="$guest_comment_requires_captcha_icon" /></td></tr>
               #end
-                <tr><td>$msg.get("authenticate_view")</td><td><img id="allowguestview" alt="$view_alt" src="${view_icon}" /></td></tr>
-                <tr><td>$msg.get("authenticate_edit")</td><td><img id="allowguestedit" alt="$edit_alt" src="${edit_icon}" /></td></tr>
               </table>
             </td>
           </tr>
-		#end
         </table>
         <script type="text/javascript">
         //<![CDATA[
@@ -176,8 +187,11 @@
 		   $('unregistered').removeClassName('hidden');
 		});
         #if("$!editor" == "globaladmin")
-		Event.observe($('allowguestview'), 'click', setGuestExtendedRights($('allowguestview')));
-		Event.observe($('allowguestedit'), 'click', setGuestExtendedRights($('allowguestedit')));
+    Event.observe($('authenticate_view'), 'click', setBooleanPropertyFromLiveCheckbox($('authenticate_view'), '$xwiki.getURL("XWiki.XWikiPreferences", "save")', 'XWiki.XWikiPreferences', 0));
+    Event.observe($('authenticate_edit'), 'click', setBooleanPropertyFromLiveCheckbox($('authenticate_edit'), '$xwiki.getURL("XWiki.XWikiPreferences", "save")', 'XWiki.XWikiPreferences', 0));
+        #end
+        #if($guest_comment_requires_captcha_icon)
+    Event.observe($('guest_comment_requires_captcha'), 'click', setBooleanPropertyFromLiveCheckbox($('guest_comment_requires_captcha'), '$xwiki.getURL("XWiki.XWikiPreferences", "save")', 'XWiki.XWikiPreferences', 0));
         #end
         //]]>
         </script>

@@ -240,12 +240,17 @@ XWiki.viewers.Comments = Class.create({
         if (form.down('textarea').value != "") {
           var formData = new Hash(form.serialize(true));
           formData.set('xredirect', window.docgeturl + '?xpage=xpart&vm=' + this.generatorTemplate);
+          // Allows CommentAddAction to parse a template which will return a message telling if the captcha was wrong.
+          formData.set('xpage', 'xpart');
+          formData.set('vm', this.generatorTemplate);
+          // Strip whatever query string is supplied by the form so it doesn't override the formData.
+          var url = form.action.replace(/\?.*/, '');
           formData.unset('action_cancel');
           // Create a notification message to display to the user when the submit is being sent
           form._x_notification = new XWiki.widgets.Notification("$msg.get('core.viewers.comments.add.inProgress')", "inprogress");
           form.disable();
           this.restartNeeded = false;
-          new Ajax.Request(form.action, {
+          new Ajax.Request(url, {
             method : 'post',
             parameters : formData,
             onSuccess : function () {

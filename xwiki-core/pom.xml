@@ -620,7 +620,8 @@
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-core-captcha</artifactId>
       <version>${pom.version}</version>
-      <scope>runtime</scope>
+      <!-- Core does not depend on this to run so it shouldn't be pulled in unless it is a dependency somewhere else. -->
+      <scope>provided</scope>
     </dependency>
     <!-- XWiki rendering macros, listed here so that they are included in the distribution
          TODO: Move these dependencies elsewhere. -->

@@ -83,7 +83,7 @@ $xwiki.ssfx.use('uicomponents/viewers/comments.css', true)
 ## If we are viewing this page through the commentAdd or save actions then we should redirect to view
 ## This doesn't apply if it is being viewed through javascript.
 #macro(redirectIfActionNotView)
-  #if(!$requestedByAjax && $xcontext.getAction() != 'view')
+  #if(!$requestedByAjax && $xcontext.getAction() != 'view' && $xcontext.getAction() != 'get')
     #if(!$captchaAnswerWrong)
       $response.sendRedirect("$doc.getURL('view')?viewer=comments");
     #else
@@ -148,7 +148,7 @@ $xwiki.ssfx.use('uicomponents/viewers/comments.css', true)
       #if($xwiki.hasAccessLevel('comment'))
         <span class="commenttool commentreply"><a class="commentreply" href="${request.getRequestURL()}?$escapetool.html(${request.getQueryString().replaceAll('&?replyto=\d++', '')})&amp;replyto=${comment.number}#xwikicomment_${comment.number}" title="$msg.get('core.viewers.comments.reply')"#if("$!replyTo" == "${comment.number}") style="display: none;"#end>$msg.get('core.viewers.comments.reply')</a></span>
         #if($comment.author == $context.user)
-          <span class="commenttool commentedit"><a class="edit" href="$doc.getURL('get', "viewer=commentsinline&amp;number=${comment.number}&amp;xredirect=${request.getRequestURL()}")" title="$msg.get('core.viewers.comments.edit')">$msg.get('core.viewers.comments.edit')</a></span>
+          <span class="commenttool commentedit"><a class="edit" href="$doc.getURL('view', "viewer=commentsinline&amp;number=${comment.number}&amp;xredirect=${request.getRequestURL()}")" title="$msg.get('core.viewers.comments.edit')">$msg.get('core.viewers.comments.edit')</a></span>
         #end
       #end
       #if($hasEdit) 

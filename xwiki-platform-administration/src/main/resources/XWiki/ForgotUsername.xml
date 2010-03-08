@@ -247,7 +247,7 @@
 <levels>edit</levels>
 </property>
 </object>
-<content>#set($email = "$!request.get('e')")
+<content>#set($email = "$!escapetool.sql($!request.get('e'))")
 #if($email == '')
 1 $msg.get("xe.admin.passwordreset.forgotusername")
 

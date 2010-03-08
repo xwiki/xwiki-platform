@@ -131,6 +131,8 @@
              </table>
            </td>
           </tr>
+        #set($guest_comment_captcha_prop = $xwiki.getDocument("XWiki", "XWikiPreferences").getxWikiClass().get('guest_comment_requires_captcha'))
+        #if("$!request.editor" == "globaladmin" || "$!editor" == "globaladmin" || $guest_comment_captcha_prop)
           <tr>
             <td>
               <table>
@@ -154,7 +156,7 @@
                 #end
                 <tr><td>$msg.get("authenticate_edit")</td><td><img id="authenticate_edit" alt="$edit_alt" src="${edit_icon}" /></td></tr>
               #end
-              #if($xwiki.getDocument("XWiki", "XWikiPreferences").getxWikiClass().get('guest_comment_requires_captcha'))
+              #if($guest_comment_captcha_prop)
                 #set($guest_comment_requires_captcha = $doc.getObject("XWiki.XWikiPreferences").getProperty("guest_comment_requires_captcha").getValue())
                 #if("$!guest_comment_requires_captcha" == "1")
                   #set($guest_comment_requires_captcha_icon = $xwiki.getSkinFile('js/xwiki/usersandgroups/img/allow-black.png'))
@@ -168,6 +170,7 @@
               </table>
             </td>
           </tr>
+        #end
         </table>
         <script type="text/javascript">
         //<![CDATA[
@@ -190,7 +193,7 @@
     Event.observe($('authenticate_view'), 'click', setBooleanPropertyFromLiveCheckbox($('authenticate_view'), '$xwiki.getURL("XWiki.XWikiPreferences", "save")', 'XWiki.XWikiPreferences', 0));
     Event.observe($('authenticate_edit'), 'click', setBooleanPropertyFromLiveCheckbox($('authenticate_edit'), '$xwiki.getURL("XWiki.XWikiPreferences", "save")', 'XWiki.XWikiPreferences', 0));
         #end
-        #if($guest_comment_requires_captcha_icon)
+        #if($guest_comment_captcha_prop)
     Event.observe($('guest_comment_requires_captcha'), 'click', setBooleanPropertyFromLiveCheckbox($('guest_comment_requires_captcha'), '$xwiki.getURL("XWiki.XWikiPreferences", "save")', 'XWiki.XWikiPreferences', 0));
         #end
         //]]>

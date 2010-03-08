@@ -71,7 +71,7 @@
                 </a>
                 <span class="version">$attach.version</span>
                 <span class="xwikibuttonlinks">
-                    #if("$!{redirect}" != "") #set($redirect=$redirect.replaceAll("&", "&amp;")) #end
+	            #set($redirect = $doc.getURL('import', 'section=Import'))
                     #set($attachurl = $doc.getAttachmentURL("${attach.filename}", "delattachment", "xredirect=$!{redirect}"))
                     <a class="deletelink" href="${attachurl}" 
                          onclick="return confirm('$msg.get("core.viewers.attachments.delete.confirm")');"           
@@ -174,7 +174,7 @@
                     </li>
                     #end
                 </ul>
-                <div>
+                <div class="importOption">
                   <em>$msg.get('core.importer.whenDocumentAlreadyExists')</em>
                   <div class="historyStrategyOption">
                      <input type="radio" name="historyStrategy" value="add" checked="checked" />
@@ -189,6 +189,12 @@
                      $msg.get('core.importer.resetHistory')
                   </div>
                 </div>
+                #if($xwiki.hasProgrammingRights())
+                <div class="importOption">
+	                  <input type="checkbox" name="importAsBackup" value="true" #if($packager.isBackupPack())checked="checked"#end/>
+                      $msg.get('core.importer.importAsBackup')
+	            </div>
+                #end
                 <span class="buttonwrapper">
                   <input class="button" type="submit" value="$msg.get('core.importer.import')" />
                 </span>

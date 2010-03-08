@@ -15,6 +15,7 @@
                      "addNewVersion" : "$msg.get('core.importer.addNewVersion')",
             "replaceDocumentHistory" : "$msg.get('core.importer.replaceDocumentHistory')",
                       "resetHistory" : "$msg.get('core.importer.resetHistory')",
+                    "importAsBackup" : "$msg.get('core.importer.importAsBackup')",
                             "select" : "$msg.get('core.importer.select')",
                                "all" : "$msg.get('core.importer.selectAll')",
                               "none" : "$msg.get('core.importer.selectNone')"
@@ -249,6 +250,15 @@
                                        .insert( new Element("input", { 'type':'radio','name':'historyStrategy', 'value': 'reset' }) )
                                        .insert(translations["resetHistory"] )  );
             
+            if (XWiki.hasProgramming) {
+	            var importAsBackupCheckbox = new Element("input", { 'type':'checkbox', 'name':'importAsBackup', 'value':'true' });            
+	            if (infos.backup) {
+	              importAsBackupCheckbox.checked = true;
+	            }
+	            submitBlock.insert(  new Element("div", {'class':'importOption'})
+	                                       .insert(importAsBackupCheckbox)
+	                                       .insert(translations["importAsBackup"])  );	
+            }
             
             var submit = new Element("div").update(new Element("span", {'class':'buttonwrapper'}));
             var button = new Element("input", {'type':'submit', 'value': translations["import"], 'class':'button'});

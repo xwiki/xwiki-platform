@@ -2397,8 +2397,8 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
         throws XWikiException
     {
         String sql = createSQLQuery("select count(distinct doc.fullName)", parametrizedSqlClause);
-        List l = searchGenericInternal(sql, 0, 0, parameterValues, context);
-        return ((Number) ((Object[]) l.get(0))[0]).intValue();
+        List l = search(sql, 0, 0, parameterValues, context);
+        return ((Number) l.get(0)).intValue();
     }
 
     /**

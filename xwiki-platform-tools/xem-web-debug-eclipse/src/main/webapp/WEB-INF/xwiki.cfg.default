@@ -21,6 +21,10 @@ xwiki.rendering.syntaxes = xwiki/1.0, xwiki/2.0
 #-# names.
 # xwiki.users.initialGroups=XWiki.XWikiAllGroup
 
+#-# Should all users be considered members of XWiki.XWikiAllGroup, even if they don't have an associated object in the
+#-# group's document?
+# xwiki.authentication.group.allgroupimplicit=0
+
 #-# Uncomment if you want to ignore requests for unmapped actions, and simply display the document
 # xwiki.unknownActionResponse=view
 
@@ -477,39 +481,39 @@ xwiki.title.compatibility=1
 
 #-# List of active plugins.
 xwiki.plugins=\
-                  com.xpn.xwiki.monitor.api.MonitorPlugin,\
-                  com.xpn.xwiki.plugin.skinx.JsSkinExtensionPlugin,\
-                  com.xpn.xwiki.plugin.skinx.JsSkinFileExtensionPlugin,\
-                  com.xpn.xwiki.plugin.skinx.CssSkinExtensionPlugin,\
-                  com.xpn.xwiki.plugin.skinx.CssSkinFileExtensionPlugin,\
-                  com.xpn.xwiki.plugin.feed.FeedPlugin,\
-                  com.xpn.xwiki.plugin.ldap.LDAPPlugin,\
-                  com.xpn.xwiki.plugin.google.GooglePlugin,\
-                  com.xpn.xwiki.plugin.flickr.FlickrPlugin,\
-                  com.xpn.xwiki.plugin.mail.MailPlugin,\
-                  com.xpn.xwiki.plugin.packaging.PackagePlugin,\
-                  com.xpn.xwiki.plugin.query.QueryPlugin,\
-                  com.xpn.xwiki.plugin.svg.SVGPlugin,\
-                  com.xpn.xwiki.plugin.charts.ChartingPlugin,\
-                  com.xpn.xwiki.plugin.fileupload.FileUploadPlugin,\
-                  com.xpn.xwiki.plugin.image.ImagePlugin,\
-                  com.xpn.xwiki.plugin.captcha.CaptchaPlugin,\
-                  com.xpn.xwiki.plugin.userdirectory.UserDirectoryPlugin,\
-                  com.xpn.xwiki.plugin.usertools.XWikiUserManagementToolsImpl,\
-                  com.xpn.xwiki.plugin.zipexplorer.ZipExplorerPlugin,\
-                  com.xpn.xwiki.plugin.autotag.AutoTagPlugin,\
-                  com.xpn.xwiki.plugin.lucene.LucenePlugin,\
-                  com.xpn.xwiki.plugin.diff.DiffPlugin,\
-                  com.xpn.xwiki.plugin.rightsmanager.RightsManagerPlugin,\
-                  com.xpn.xwiki.plugin.jodatime.JodaTimePlugin,\
-                  com.xpn.xwiki.plugin.scheduler.SchedulerPlugin,\
-                  com.xpn.xwiki.plugin.mailsender.MailSenderPlugin,\
-                  com.xpn.xwiki.plugin.activitystream.plugin.ActivityStreamPlugin, \
-                  com.xpn.xwiki.plugin.watchlist.WatchListPlugin, \
-                  com.xpn.xwiki.wysiwyg.server.plugin.WysiwygPlugin, \
-                  com.xpn.xwiki.plugin.tag.TagPlugin,\
-                  com.xpn.xwiki.plugin.wikimanager.WikiManagerPlugin,\
-                  com.xpn.xwiki.plugin.applicationmanager.ApplicationManagerPlugin
+                    com.xpn.xwiki.monitor.api.MonitorPlugin,\
+                    com.xpn.xwiki.plugin.skinx.JsSkinExtensionPlugin,\
+                    com.xpn.xwiki.plugin.skinx.JsSkinFileExtensionPlugin,\
+                    com.xpn.xwiki.plugin.skinx.CssSkinExtensionPlugin,\
+                    com.xpn.xwiki.plugin.skinx.CssSkinFileExtensionPlugin,\
+                    com.xpn.xwiki.plugin.feed.FeedPlugin,\
+                    com.xpn.xwiki.plugin.ldap.LDAPPlugin,\
+                    com.xpn.xwiki.plugin.google.GooglePlugin,\
+                    com.xpn.xwiki.plugin.flickr.FlickrPlugin,\
+                    com.xpn.xwiki.plugin.mail.MailPlugin,\
+                    com.xpn.xwiki.plugin.packaging.PackagePlugin,\
+                    com.xpn.xwiki.plugin.query.QueryPlugin,\
+                    com.xpn.xwiki.plugin.svg.SVGPlugin,\
+                    com.xpn.xwiki.plugin.charts.ChartingPlugin,\
+                    com.xpn.xwiki.plugin.fileupload.FileUploadPlugin,\
+                    com.xpn.xwiki.plugin.image.ImagePlugin,\
+                    com.xpn.xwiki.plugin.userdirectory.UserDirectoryPlugin,\
+                    com.xpn.xwiki.plugin.usertools.XWikiUserManagementToolsImpl,\
+                    com.xpn.xwiki.plugin.zipexplorer.ZipExplorerPlugin,\
+                    com.xpn.xwiki.plugin.autotag.AutoTagPlugin,\
+                    com.xpn.xwiki.plugin.lucene.LucenePlugin,\
+                    com.xpn.xwiki.plugin.diff.DiffPlugin,\
+                    com.xpn.xwiki.plugin.rightsmanager.RightsManagerPlugin,\
+                    com.xpn.xwiki.plugin.jodatime.JodaTimePlugin,\
+                    com.xpn.xwiki.plugin.scheduler.SchedulerPlugin,\
+                    com.xpn.xwiki.plugin.mailsender.MailSenderPlugin,\
+                    com.xpn.xwiki.plugin.activitystream.plugin.ActivityStreamPlugin, \
+                    com.xpn.xwiki.plugin.watchlist.WatchListPlugin, \
+                    com.xpn.xwiki.wysiwyg.server.plugin.WysiwygPlugin, \
+                    com.xpn.xwiki.plugin.tag.TagPlugin,\
+                    com.xpn.xwiki.plugin.wikimanager.WikiManagerPlugin,\
+                    com.xpn.xwiki.plugin.applicationmanager.ApplicationManagerPlugin
+                    
 
 #-# Enable light monitoring of the wiki performance. Records various statistics, like number of requests processed,
 #-# time spent in rendering or in the database, medium time for a request, etc. Disable for a minor increase of
@@ -542,8 +546,6 @@ xwiki.plugin.laszlo.baseurl=/openlaszlo/xwiki/
 xwiki.plugin.laszlo.path=c:/Program Files/Apache Software Foundation/Tomcat 5.0/webapps/openlaszlo/xwiki/
 
 xwiki.plugin.image.cache.capacity=30
-
-xwiki.plugin.captcha=0
 
 #-# Calendar Prev/Next Month bounds.
 #-# The calendar generates links to the previous/next months for a limited range, by default 6 months back and 12 months
@@ -594,3 +596,4 @@ xwiki.plugin.captcha=0
 #-# XWiki work directory
 # xwiki.work.dir=/usr/local/xwiki
 
+xwiki.work.dir=work

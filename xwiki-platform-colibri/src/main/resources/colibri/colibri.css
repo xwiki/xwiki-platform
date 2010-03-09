@@ -1446,6 +1446,10 @@ ol.footnotes {
   text-align: center;
 }
 
+.rsschanneltitle span a img {
+  margin-left:5px;
+}
+
 .rssfeed .rssitem {
   padding: 5px;
 }

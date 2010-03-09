@@ -25,6 +25,7 @@ import java.util.Date;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.ResourceBundle;
 import java.util.Set;
 import java.util.Vector;
@@ -953,5 +954,39 @@ public class XWikiDocumentTest extends AbstractBridgedXWikiComponentTestCase
         doc.setParentReference(new EntityReference("docpage2", EntityType.DOCUMENT));
         assertEquals(new DocumentReference("docwiki", "docspace", "docpage2"), doc.getParentReference());
         assertEquals("docpage2", doc.getParent());
+    }
+
+    /**
+     * Verify that cloning objects modify their references to point to the document in which they are cloned into.
+     */
+    public void testCloneObjectsHaveCorrectReference()
+    {
+        XWikiDocument doc = new XWikiDocument(new DocumentReference("somewiki", "somespace", "somepage"));
+        doc.cloneXObjects(this.document);
+        assertTrue(doc.getXObjects().size() > 0);
+
+        // Verify that the object references point to the doc in which it's cloned.
+        for (Map.Entry<DocumentReference, List<BaseObject>> entry : doc.getXObjects().entrySet()) {
+            for (BaseObject baseObject : entry.getValue()) {
+                assertEquals(doc.getDocumentReference(), baseObject.getDocumentReference());
+            }
+        }
+    }
+
+    /**
+     * Verify that merging objects modify their references to point to the document in which they are cloned into.
+     */
+    public void testMergeObjectsHaveCorrectReference()
+    {
+        XWikiDocument doc = new XWikiDocument(new DocumentReference("somewiki", "somespace", "somepage"));
+        doc.mergeXObjects(this.document);
+        assertTrue(doc.getXObjects().size() > 0);
+
+        // Verify that the object references point to the doc in which it's cloned.
+        for (Map.Entry<DocumentReference, List<BaseObject>> entry : doc.getXObjects().entrySet()) {
+            for (BaseObject baseObject : entry.getValue()) {
+                assertEquals(doc.getDocumentReference(), baseObject.getDocumentReference());
+            }
+        }
     }
 }

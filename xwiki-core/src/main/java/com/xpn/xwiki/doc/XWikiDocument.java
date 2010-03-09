@@ -1908,7 +1908,13 @@ public class XWikiDocument implements DocumentModelBridge
      */
     public void setXObjects(DocumentReference classReference, List<BaseObject> objects)
     {
-        getXObjects().put(classReference, objects);
+        if (objects.isEmpty()) {
+            getXObjects().put(classReference, objects);
+        } else {
+            for (BaseObject baseObject : objects) {
+                addXObject(classReference, baseObject);
+            }
+        }
     }
 
     /**
@@ -2149,7 +2155,7 @@ public class XWikiDocument implements DocumentModelBridge
                     myObject.setNumber(myObjects.size() - 1);
                 }
             }
-            getXObjects().put(reference, myObjects);
+            setXObjects(reference, myObjects);
         }
         setContentDirty(true);
     }
@@ -2168,8 +2174,8 @@ public class XWikiDocument implements DocumentModelBridge
      */
     public void cloneXObjects(XWikiDocument templatedoc)
     {
-        for (DocumentReference reference : templatedoc.getXObjects().keySet()) {
-            List<BaseObject> tobjects = templatedoc.getXObjects(reference);
+        for (Map.Entry<DocumentReference, List<BaseObject>> entry : templatedoc.getXObjects().entrySet()) {
+            List<BaseObject> tobjects = entry.getValue();
             List<BaseObject> objects = new ArrayList<BaseObject>();
             while (objects.size() < tobjects.size()) {
                 objects.add(null);
@@ -2181,7 +2187,7 @@ public class XWikiDocument implements DocumentModelBridge
                     objects.set(i, myObject);
                 }
             }
-            getXObjects().put(reference, objects);
+            setXObjects(entry.getKey(), objects);
         }
     }
 

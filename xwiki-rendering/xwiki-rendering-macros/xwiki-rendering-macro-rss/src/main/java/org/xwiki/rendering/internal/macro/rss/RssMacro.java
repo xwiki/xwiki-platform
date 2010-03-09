@@ -59,6 +59,7 @@ import com.sun.syndication.feed.synd.SyndFeed;
 @Component("rss")
 public class RssMacro extends AbstractMacro<RssMacroParameters>
 {
+
     /**
      * The name of the CSS class attribute.
      */
@@ -69,6 +70,11 @@ public class RssMacro extends AbstractMacro<RssMacroParameters>
      */
     private static final String DESCRIPTION = "Output latest feed entries from a RSS feed.";
 
+    /**
+     * The relative skin path of the feed icon to be displayed in the channel title.
+     */
+    private static final String FEED_ICON_RESOURCE_PATH = "icons/silk/feed.gif";
+    
     /**
      * The Box macro is used to draw boxes around RSS feed items and for the main around the RSS feed list.
      */
@@ -164,7 +170,7 @@ public class RssMacro extends AbstractMacro<RssMacroParameters>
             Block titleTextLinkBlock = new LinkBlock(parsePlainText(feed.getTitle()), titleLink, true);
 
             // Rss icon.
-            String imagePath = skinAccessBridge.getSkinFile("icons/black-rss.png");
+            String imagePath = skinAccessBridge.getSkinFile(FEED_ICON_RESOURCE_PATH);
             ImageBlock imageBlock = new ImageBlock(new URLImage(imagePath), false);
 
             // Title rss icon link.

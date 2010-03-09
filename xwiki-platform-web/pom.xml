@@ -52,7 +52,7 @@
     <junit.version>3.8.2</junit.version>
     <!-- Versions of XWiki dependencies used in Platform/Web modules -->
     <platform.tool.configuration.version>1.38-SNAPSHOT</platform.tool.configuration.version>
-    <platform.core.version>2.2-SNAPSHOT-SNAPSHOT</platform.core.version>
+    <platform.core.version>2.2-SNAPSHOT</platform.core.version>
     <platform.skin.albatross.version>1.27-SNAPSHOT</platform.skin.albatross.version>
     <platform.skin.toucan.version>1.33-SNAPSHOT</platform.skin.toucan.version>
     <!-- Starting with 1.13 and beyond Colibri skins are not compatible with web 2.2 anymore -->

@@ -3821,7 +3821,7 @@ ul.xlist li.xitem div.xitemcontainer ul.xlist {
   background-color: white;
 }
 
-.rssfeed div.rsschanneltitle {
+.rssfeed p.rsschanneltitle {
   margin-bottom: 10px;
   border-bottom: 1px solid #DDD;
   padding: 5px;
@@ -3829,6 +3829,10 @@ ul.xlist li.xitem div.xitemcontainer ul.xlist {
   text-align: center;
   font-size: 14px;
   font-weight: bold;
+}
+
+.rssfeed p.rsschanneltitle span a img {
+  margin-left:5px;
 }
 
 .rssfeed .rssitem {

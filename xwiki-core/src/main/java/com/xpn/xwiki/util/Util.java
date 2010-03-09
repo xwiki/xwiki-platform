@@ -866,7 +866,7 @@ public class Util
                 return res;
             }
         } catch (Exception e) {
-            LOG.debug("Failed load resource [" + resource + "] using a application context");
+            LOG.debug("Failed to load resource [" + resource + "] using the application context");
         }
 
         return Thread.currentThread().getContextClassLoader().getResourceAsStream(resource);

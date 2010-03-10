@@ -165,12 +165,17 @@ public class XWikiDocument implements DocumentModelBridge
     private String title;
 
     /**
-     * Relative reference to this document's parent.
+     * Reference to this document's parent.
+     *
+     * Note that we're saving the parent reference as a relative reference instead of an absolute one because
+     * We want the ability (for example) to create a parent reference relative to the current space or wiki so that a
+     * copy of this XWikiDocument object would retain that relativity. This is for example useful when copying a Wiki
+     * into another Wiki so that the copied XWikiDcoument's parent reference points to the new wiki.
      */
     private EntityReference parentReference;
 
     /**
-     * Cache the parent refernce resolved as an absolute reference for improved performance (so that we don't have
+     * Cache the parent reference resolved as an absolute reference for improved performance (so that we don't have
      * to resolve the relative reference every time getParentReference() is called.
      */
     private DocumentReference parentReferenceCache;

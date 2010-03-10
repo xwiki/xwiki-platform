@@ -155,7 +155,21 @@ public class BaseObject extends BaseCollection implements ObjectInterface, Seria
     public Object clone()
     {
         BaseObject object = (BaseObject) super.clone();
-        // Set a new GUID since GUIDs must be unique for each XObject.
+        object.setGuid(getGuid());
+
+        return object;
+    }
+
+    /**
+     * Similar to {@link #clone()} but whereas a clone is an exact copy (with the same GUID), a duplicate keeps the
+     * same data but with a different identity.
+     *
+     * @since 2.3M1
+     */
+    public BaseObject duplicate()
+    {
+        BaseObject object = (BaseObject) clone();
+        // Set a new GUID for the duplicate
         object.setGuid(UUID.randomUUID().toString());
 
         return object;

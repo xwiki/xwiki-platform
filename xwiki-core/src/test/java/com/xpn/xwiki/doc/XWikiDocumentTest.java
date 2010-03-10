@@ -258,13 +258,34 @@ public class XWikiDocumentTest extends AbstractBridgedXWikiComponentTestCase
         assertTrue(creator.equals(copy.getCreator()));
     }
 
-    public void testCreationDateAfterDocumentCopy() throws XWikiException, InterruptedException
+    public void testCreationDateAfterDocumentCopy() throws Exception
     {
         Date sourceCreationDate = this.document.getCreationDate();
         Thread.sleep(1000);
         XWikiDocument copy = this.document.copyDocument(this.document.getName() + " Copy", getContext());
 
         assertTrue(copy.getCreationDate().equals(sourceCreationDate));
+    }
+
+    public void testObjectGuidsAfterDocumentCopy() throws Exception
+    {
+        assertTrue(this.document.getXObjects().size() > 0);
+
+        List<String> originalGuids = new ArrayList<String>();
+        for (Map.Entry<DocumentReference, List<BaseObject>> entry : this.document.getXObjects().entrySet()) {
+            for (BaseObject baseObject : entry.getValue()) {
+                originalGuids.add(baseObject.getGuid());
+            }
+        }
+
+        XWikiDocument copy = this.document.copyDocument(this.document.getName() + " Copy", getContext());
+
+        // Verify that the cloned objects have different GUIDs
+        for (Map.Entry<DocumentReference, List<BaseObject>> entry : copy.getXObjects().entrySet()) {
+            for (BaseObject baseObject : entry.getValue()) {
+                assertFalse("Non unique object GUID found!", originalGuids.contains(baseObject.getGuid()));
+            }
+        }
     }
 
     public void testToStringReturnsFullName()

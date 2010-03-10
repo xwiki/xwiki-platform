@@ -155,7 +155,8 @@ public class BaseObject extends BaseCollection implements ObjectInterface, Seria
     public Object clone()
     {
         BaseObject object = (BaseObject) super.clone();
-        object.setGuid(getGuid());
+        // Set a new GUID since GUIDs must be unique for each XObject.
+        object.setGuid(UUID.randomUUID().toString());
 
         return object;
     }

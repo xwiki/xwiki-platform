@@ -2149,8 +2149,6 @@ public class XWikiDocument implements DocumentModelBridge
             for (BaseObject otherObject : templatedoc.getXObjects().get(reference)) {
                 if (otherObject != null) {
                     BaseObject myObject = (BaseObject) otherObject.clone();
-                    // BaseObject.clone copies the GUID, so randomize it for the copied object.
-                    myObject.setGuid(UUID.randomUUID().toString());
                     myObjects.add(myObject);
                     myObject.setNumber(myObjects.size() - 1);
                 }
@@ -5307,21 +5305,6 @@ public class XWikiDocument implements DocumentModelBridge
         newdoc.setDocumentReference(newDocumentReference);
         newdoc.setContentDirty(true);
         newdoc.getXClass().setDocumentReference(newDocumentReference);
-        Map<DocumentReference, List<BaseObject>> objectClasses = newdoc.getXObjects();
-        if (objectClasses != null) {
-            for (List<BaseObject> objects : objectClasses.values()) {
-                if (objects != null) {
-                    for (BaseObject object : objects) {
-                        if (object != null) {
-                            object.setDocumentReference(newDocumentReference);
-                            // Since GUIDs are supposed to be Unique, although this object holds the same data, it is
-                            // not exactly the same object, so it should have a different identifier.
-                            object.setGuid(UUID.randomUUID().toString());
-                        }
-                    }
-                }
-            }
-        }
 
         XWikiDocumentArchive archive = newdoc.getDocumentArchive();
         if (archive != null) {

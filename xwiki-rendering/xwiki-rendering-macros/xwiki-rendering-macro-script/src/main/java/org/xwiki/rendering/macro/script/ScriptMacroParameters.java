@@ -94,7 +94,7 @@ public class ScriptMacroParameters
     
     /**
      * @return the list of JARs to be added to the script execution class loader, see 
-     *         {@link org.xwiki.rendering.internal.macro.script.DefaultScriptClassLoaderFactory} for more details
+     *         {@link org.xwiki.rendering.internal.macro.script.DefaultAttachmentClassLoaderFactory} for more details
      */
     public String getJars()
     {

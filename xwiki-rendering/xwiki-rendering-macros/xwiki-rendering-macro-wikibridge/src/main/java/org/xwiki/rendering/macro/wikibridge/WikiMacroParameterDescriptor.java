@@ -54,6 +54,11 @@ public class WikiMacroParameterDescriptor implements ParameterDescriptor
     private boolean mandatory;
 
     /**
+     * Default value of the parameter.
+     */
+    private Object defaultValue;
+
+    /**
      * Creates a new {@link WikiMacroParameterDescriptor} instance.
      * 
      * @param id parameter identifier.
@@ -65,6 +70,23 @@ public class WikiMacroParameterDescriptor implements ParameterDescriptor
         this.id = id;
         this.description = description;
         this.mandatory = mandatory;
+    }
+
+    /**
+     * Creates a new {@link WikiMacroParameterDescriptor} instance.
+     * 
+     * @param id parameter identifier.
+     * @param description parameter description.
+     * @param mandatory if the parameter is mandatory.
+     * @param defaultValue parameter default value.
+     * @since 2.3M1
+     */
+    public WikiMacroParameterDescriptor(String id, String description, boolean mandatory, Object defaultValue)
+    {
+        this.id = id;
+        this.description = description;
+        this.mandatory = mandatory;
+        this.defaultValue = defaultValue;
     }
 
     /**
@@ -106,7 +128,7 @@ public class WikiMacroParameterDescriptor implements ParameterDescriptor
      */
     public Object getDefaultValue()
     {
-        return null;
+        return this.defaultValue;
     }
 
     /**

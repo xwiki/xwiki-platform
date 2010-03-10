@@ -191,7 +191,8 @@ public class DefaultWikiMacroFactory extends AbstractLogEnabled implements WikiM
                 String parameterDescription = macroParameter.getStringValue(PARAMETER_DESCRIPTION_PROPERTY);
                 boolean parameterMandatory =
                     (macroParameter.getIntValue(PARAMETER_MANDATORY_PROPERTY) == 0) ? false : true;
-
+                String parameterDefaultValue = macroParameter.getStringValue(PARAMETER_DEFAULT_VALUE_PROPERTY);
+                
                 // Verify parameter name.
                 if (StringUtils.isEmpty(parameterName)) {
                     throw new WikiMacroException(String.format(
@@ -203,10 +204,15 @@ public class DefaultWikiMacroFactory extends AbstractLogEnabled implements WikiM
                     String errorMessage = "Incomplete macro definition in [%s], macro parameter description is empty";
                     getLogger().debug(String.format(errorMessage, documentReference));
                 }
+                
+                // If field empty, assume no default value was provided.
+                if (StringUtils.isEmpty(parameterDefaultValue)) {
+                    parameterDefaultValue = null;
+                }
 
                 // Create the parameter descriptor.
                 parameterDescriptors.add(new WikiMacroParameterDescriptor(parameterName, parameterDescription,
-                    parameterMandatory));
+                    parameterMandatory, parameterDefaultValue));
             }
         }
 

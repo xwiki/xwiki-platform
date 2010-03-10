@@ -111,4 +111,10 @@ public interface WikiMacroConstants
      * Constant for representing parameter mandatory property.
      */
     String PARAMETER_MANDATORY_PROPERTY = "mandatory";
+    
+    /**
+     * Constant for representing parameter defaultValue property.
+     * @since 2.3M1
+     */
+    String PARAMETER_DEFAULT_VALUE_PROPERTY = "defaultValue";
 }

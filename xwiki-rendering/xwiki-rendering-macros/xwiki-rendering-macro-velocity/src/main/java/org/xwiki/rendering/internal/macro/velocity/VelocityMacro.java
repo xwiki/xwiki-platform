@@ -87,7 +87,7 @@ public class VelocityMacro extends AbstractScriptMacro<VelocityMacroParameters>
     /**
      * {@inheritDoc}
      * 
-     * @see AbstractScriptMacro#evaluate(ScriptMacroParameters, String, MacroTransformationContext)
+     * @see AbstractScriptMacro#evaluate
      */
     @Override
     protected String evaluate(VelocityMacroParameters parameters, String content, MacroTransformationContext context)

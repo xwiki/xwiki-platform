@@ -62,18 +62,15 @@ $response.setContentType("text/xml")
 #else ## hibquery == ""
   ######################### DBListProperty query
   #if($p.isRelationalStorage() && $p.isMultiSelect())
-    #set($query = "select distinct list from BaseObject as obj, DBStringListProperty as prop join prop.list list  where obj.className = '${classname}' and obj.id = prop.id.id and prop.id.name = '${fieldname}'")
-    #set($queryResult = $xwiki.search($query.toString(), 30, 0))
+    #set($query =  "select distinct list from BaseObject as obj, DBStringListProperty as prop join prop.list list where obj.name <> '${templatename}' and obj.className='${classname}' and prop.id.id = obj.id and prop.name = '${fieldname}' and lower(list) like '%${input}%'")    #set($queryResult = $xwiki.search($query.toString(), 30, 0))
     #set($results = $queryResult.toArray())
     <?xml version="1.0" encoding="UTF-8"?>
-    <results type="3">
+    <results type="5">
     #foreach($res in $results)
       #set($list = $p.getListFromString($res, $sep, false))
       #set($list = $list.toArray())
       #foreach($word in $list)
-        #if($word.toLowerCase().indexOf($input) >= 0)
           <rs id="$velocityCount" info="">$word</rs>
-        #end
       #end
     #end
     </results>
@@ -88,9 +85,7 @@ $response.setContentType("text/xml")
       #set($list = $p.getListFromString($res, $sep, false))
       #set($list = $list.toArray())
       #foreach($word in $list)
-        #if($word.toLowerCase().indexOf($input) >=0 )
           <rs id="$velocityCount" info="">$word</rs>
-        #end
       #end
     #end
     </results>

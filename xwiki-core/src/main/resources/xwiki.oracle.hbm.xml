@@ -571,7 +571,7 @@
             <column name="XWS_NAME" length="255"/>
         </property>
         <property name="className" type="string">
-            <column name="XWS_CLASSNAME" not-null="true" length="255"/>
+            <column name="XWS_CLASSNAME" length="255"/>
         </property>
 
         <property name="action" type="string">

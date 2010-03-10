@@ -2153,7 +2153,7 @@ public class XWikiDocument implements DocumentModelBridge
             }
             for (BaseObject otherObject : templatedoc.getXObjects().get(reference)) {
                 if (otherObject != null) {
-                    BaseObject myObject = (BaseObject) otherObject.duplicate();
+                    BaseObject myObject = otherObject.duplicate();
                     myObjects.add(myObject);
                     myObject.setNumber(myObjects.size() - 1);
                 }

@@ -41,6 +41,11 @@ import org.xwiki.xml.html.HTMLCleanerConfiguration;
 public class ImageOpenOfficeCleaningTest extends AbstractHTMLCleaningTest
 {
     /**
+     * Mock document access bridge.
+     */
+    private DocumentAccessBridge mockDAB;
+    
+    /**
      * {@inheritDoc}
      */
     @Before
@@ -48,11 +53,7 @@ public class ImageOpenOfficeCleaningTest extends AbstractHTMLCleaningTest
     {
         super.setUp();
 
-        final DocumentAccessBridge mockDAB = getComponentManager().lookup(DocumentAccessBridge.class);
-        this.mockery.checking(new Expectations() {{
-                allowing(mockDAB).getAttachmentURL("Import.Test", "foo.png");
-                will(returnValue("/bridge/foo.png"));
-        }});
+        mockDAB = getComponentManager().lookup(DocumentAccessBridge.class);        
     }
 
     /**
@@ -66,6 +67,11 @@ public class ImageOpenOfficeCleaningTest extends AbstractHTMLCleaningTest
         HTMLCleanerConfiguration configuration = this.openOfficeHTMLCleaner.getDefaultConfiguration();
         configuration.setParameters(Collections.singletonMap("targetDocument", "Import.Test"));
 
+        this.mockery.checking(new Expectations() {{
+            allowing(mockDAB).getAttachmentURL("Import.Test", "foo.png");
+            will(returnValue("/bridge/foo.png"));
+        }});
+        
         Document doc = openOfficeHTMLCleaner.clean(new StringReader(html), configuration);
 
         NodeList nodes = doc.getElementsByTagName("img");
@@ -91,6 +97,11 @@ public class ImageOpenOfficeCleaningTest extends AbstractHTMLCleaningTest
         HTMLCleanerConfiguration configuration = this.openOfficeHTMLCleaner.getDefaultConfiguration();
         configuration.setParameters(Collections.singletonMap("targetDocument", "Import.Test"));
 
+        this.mockery.checking(new Expectations() {{
+            allowing(mockDAB).getAttachmentURL("Import.Test", "foo.png");
+            will(returnValue("/bridge/foo.png"));
+        }});
+        
         Document doc = openOfficeHTMLCleaner.clean(new StringReader(html), configuration);
 
         NodeList nodes = doc.getElementsByTagName("img");
@@ -115,5 +126,29 @@ public class ImageOpenOfficeCleaningTest extends AbstractHTMLCleaningTest
         Node stopLinkComment = span.getNextSibling();
         Assert.assertEquals(Node.COMMENT_NODE, stopLinkComment.getNodeType());
         Assert.assertTrue(stopLinkComment.getNodeValue().startsWith("stopwikilink"));
+    }
+
+    /**
+     * OpenOffice 3.2 server generates relative paths for embedded images. These relative paths should be cleaned and
+     * the image name extracted.
+     */
+    @org.junit.Test
+    public void testRelativePathCleaning()
+    {
+        String html = header + "<img src=\"../../some/path/foo.png\"/>" + footer;
+        HTMLCleanerConfiguration configuration = this.openOfficeHTMLCleaner.getDefaultConfiguration();
+        configuration.setParameters(Collections.singletonMap("targetDocument", "Import.Test"));
+
+        this.mockery.checking(new Expectations() {{
+            allowing(mockDAB).getAttachmentURL("Import.Test", "foo.png");
+            will(returnValue("/bridge/foo.png"));
+        }});
+        
+        Document doc = openOfficeHTMLCleaner.clean(new StringReader(html), configuration);
+        
+        NodeList nodes = doc.getElementsByTagName("img");
+        Assert.assertEquals(1, nodes.getLength());
+        Element image = (Element) nodes.item(0);
+        Assert.assertEquals("/bridge/foo.png", image.getAttribute("src"));
     }
 }

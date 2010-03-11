@@ -73,13 +73,15 @@
           <plugin>
             <groupId>org.codehaus.mojo</groupId>
             <artifactId>clirr-maven-plugin</artifactId>
-            <!--
             <configuration>
               <excludes>
+                <exclude>org.xwiki.model.reference.AttachmentReferenceResolver</exclude>
+                <exclude>org.xwiki.model.reference.DocumentReferenceResolver</exclude>
+                <exclude>org.xwiki.model.reference.EntityReferenceResolver</exclude>
+                <exclude>org.xwiki.model.reference.EntityReferenceSerializer</exclude>
                 <exclude>**/internal/**</exclude>
               </excludes>
             </configuration>
-             -->
           </plugin>
         </plugins>
       </build>

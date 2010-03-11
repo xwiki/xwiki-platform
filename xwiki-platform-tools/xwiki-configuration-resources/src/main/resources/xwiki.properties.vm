@@ -147,13 +147,3 @@
 #-#
 #-# By default obnly jgroups is provided. To add one implements NetworkAdaptor componenet interface. The identifier provided in the configuration is matched with the component role hint.
 #-# Example: observation.remote.networkadapter = jgroups
-
-#-------------------------------------------------------------------------------------
-# Administration
-#-------------------------------------------------------------------------------------
-
-#-# [Since 2.2M2]
-#-# Enable captcha: true|false
-#-#
-#-# Captcha is disabled by default.
-# captcha.enabled = false

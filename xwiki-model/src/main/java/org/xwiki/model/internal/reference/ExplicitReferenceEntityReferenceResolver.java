@@ -17,37 +17,34 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package com.xpn.xwiki.internal.model.reference;
+package org.xwiki.model.internal.reference;
 
 import org.xwiki.component.annotation.Component;
-import org.xwiki.component.annotation.Requirement;
 import org.xwiki.model.EntityType;
-import org.xwiki.model.internal.reference.AbstractReferenceEntityReferenceResolver;
-import org.xwiki.model.reference.EntityReferenceValueProvider;
+import org.xwiki.model.internal.reference.AbstractStringEntityReferenceResolver;
+import org.xwiki.model.reference.EntityReference;
 
 /**
- * Resolve an {@link org.xwiki.model.reference.EntityReference} into a valid and absolute reference (with all required
- * parents filled in). The behavior is the one defined in
- * {@link com.xpn.xwiki.internal.model.reference.CurrentMixedEntityReferenceValueProvider}.
- * 
- * @version $Id$
- * @since 2.3M1
+ * Resolver that resolves a Reference passed as a String into an absolute reference. For missing reference parts, the
+ * resolver takes default values from a parameter which must be of type {@link EntityReference}.
+ *
+ * @version $Id: ExplicitStringEntityReferenceResolver.java 27580 2010-03-11 14:32:23Z vmassol $
+ * @since 2.23
  */
-@Component("currentmixed/reference")
-public class CurrentMixedReferenceEntityReferenceResolver extends AbstractReferenceEntityReferenceResolver
+@Component("explicit/reference")
+public class ExplicitReferenceEntityReferenceResolver extends AbstractReferenceEntityReferenceResolver
 {
-    @Requirement("currentmixed")
-    private EntityReferenceValueProvider provider;
-
     /**
      * {@inheritDoc}
-     * 
-     * @see org.xwiki.model.internal.reference.AbstractReferenceEntityReferenceResolver#getDefaultValue(org.xwiki.model.EntityType,
-     *      java.lang.Object[])
+     *
+     * Expects an EntityReference parameter from which to extract the default values.
+     *
+     * @see AbstractStringEntityReferenceResolver#getDefaultValue
      */
     @Override
     protected String getDefaultValue(EntityType type, Object... parameters)
     {
-        return this.provider.getDefaultValue(type);
+        throw new IllegalArgumentException("The resolver parameter doesn't contain an Entity Reference of type ["
+            + type + "]");
     }
 }

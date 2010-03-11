@@ -19,9 +19,11 @@
  */
 package org.xwiki.officeimporter.internal.filter;
 
+import java.io.File;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.lang.StringUtils;
 import org.w3c.dom.Comment;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -55,14 +57,20 @@ public class ImageFilter extends AbstractHTMLFilter
         List<Element> images = filterDescendants(htmlDocument.getDocumentElement(), new String[] {TAG_IMG});
         for (Element image : images) {
             String src = image.getAttribute(ATTRIBUTE_SRC);
-            // TODO : We might have to verify that src is a file name. (a.k.a not a
-            // url). There might be cases where documents have embedded urls (images).
-            if (!src.equals("") && null != targetDocument && null != docBridge) {
+            if (!StringUtils.isBlank(src) && !StringUtils.isBlank(targetDocument)) {
+                // OpenOffice 3.2 server generates relative image paths, extract image name.
+                int separator = src.lastIndexOf(File.separator);
+                if (-1 != separator) {
+                    src = src.substring(separator + 1);
+                }
+                
+                // Set image source attribute relative to the reference document.  
                 try {
                     image.setAttribute(ATTRIBUTE_SRC, docBridge.getAttachmentURL(targetDocument, src));
                 } catch (Exception ex) {
                     // Do nothing.
                 }
+
                 // The 'align' attribute of images creates a lot of problems. First, OO server has a problem with
                 // center aligning images (it aligns them to left). Next, OO server uses <br clear"xxx"> for
                 // avoiding content wrapping around images which is not valid xhtml. There for, to be consistent and

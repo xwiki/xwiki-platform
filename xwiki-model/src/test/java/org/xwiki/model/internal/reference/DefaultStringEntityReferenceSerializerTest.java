@@ -152,4 +152,14 @@ public class DefaultStringEntityReferenceSerializerTest
         
         Assert.assertEquals("wiki", serializer.serialize(reference.getParent().getParent()));
     }
+
+    @Test
+    public void testSerializeRelativeReference()
+    {
+        EntityReference reference = new EntityReference("page", EntityType.DOCUMENT);
+        Assert.assertEquals("page", serializer.serialize(reference));
+
+        reference = new EntityReference("page", EntityType.DOCUMENT, new EntityReference("space", EntityType.SPACE));
+        Assert.assertEquals("space.page", serializer.serialize(reference));
+    }
 }

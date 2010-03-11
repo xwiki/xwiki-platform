@@ -49,6 +49,8 @@ public interface XWikiCaptchaService
      * It is for velocity scripts to determine whether captchas are needed.
      *
      * @return Is the captcha service enabled in the configuration.
+     * @deprecated since 2.3M1 Captcha should only be enabled/disabled on an application by application basis.
      */
+    @Deprecated
     boolean isEnabled();
 }

@@ -23,7 +23,6 @@ import java.util.List;
 import java.util.ArrayList;
 
 import org.xwiki.captcha.CaptchaVerifier;
-import org.xwiki.captcha.CaptchaConfiguration;
 import org.xwiki.captcha.CaptchaVerifierNotFoundException;
 import org.xwiki.captcha.XWikiCaptchaService;
 import org.xwiki.component.manager.ComponentManager;
@@ -44,10 +43,6 @@ public class DefaultXWikiCaptchaService extends AbstractLogEnabled implements XW
     /** A Map of all captchas by their names. */
     @Requirement
     private ComponentManager componentManager;
-
-    /** A CaptchaConfiguration in which to look for whether the captcha should be enabled. */
-    @Requirement
-    private CaptchaConfiguration configuration;
 
     /**
      * {@inheritDoc}
@@ -88,8 +83,9 @@ public class DefaultXWikiCaptchaService extends AbstractLogEnabled implements XW
      *
      * @see org.xwiki.captcha.XWikiCaptchaService#isEnabled()
      */
+    @Deprecated
     public boolean isEnabled()
     {
-        return configuration.isEnabled();
+        return true;
     }
 }

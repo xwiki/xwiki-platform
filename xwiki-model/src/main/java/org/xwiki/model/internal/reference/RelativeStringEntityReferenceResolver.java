@@ -59,6 +59,6 @@ public class RelativeStringEntityReferenceResolver extends AbstractStringEntityR
     @Override
     public EntityReference resolve(String entityReferenceRepresentation, EntityType type, Object... parameters)
     {
-        return super.resolve(entityReferenceRepresentation, type);
+        return super.resolve(entityReferenceRepresentation, type, parameters);
     }
 }

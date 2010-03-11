@@ -58,4 +58,14 @@ public class RelativeStringEntityReferenceResolverTest
         Assert.assertEquals("space", reference.extractReference(EntityType.SPACE).getName());
         Assert.assertEquals("page", reference.getName());
     }
+
+    @Test
+    public void testResolveDocumentReferenceWithBaseReference() throws Exception
+    {
+        EntityReference reference =
+            resolver.resolve("", EntityType.DOCUMENT, new EntityReference("space", EntityType.SPACE));
+        Assert.assertNull(reference.extractReference(EntityType.WIKI));
+        Assert.assertEquals("space", reference.extractReference(EntityType.SPACE).getName());
+        Assert.assertNull(reference.extractReference(EntityType.DOCUMENT));
+    }
 }

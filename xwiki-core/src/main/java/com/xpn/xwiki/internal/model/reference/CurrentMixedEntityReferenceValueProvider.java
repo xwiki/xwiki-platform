@@ -22,31 +22,37 @@ package com.xpn.xwiki.internal.model.reference;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.Requirement;
 import org.xwiki.model.EntityType;
-import org.xwiki.model.reference.DocumentReference;
-import org.xwiki.model.reference.DocumentReferenceResolver;
-import org.xwiki.model.reference.EntityReferenceResolver;
+import org.xwiki.model.reference.EntityReferenceValueProvider;
 
 /**
- * Specialized version of {@link org.xwiki.model.reference.EntityReferenceResolver} which can be considered a helper
- * component to resolve {@link DocumentReference} objects from their string representation. The behavior is the one
- * defined in {@link com.xpn.xwiki.internal.model.reference.CurrentStringEntityReferenceResolver}.
+ * The behavior is the same as for {@link CurrentEntityReferenceValueProvider} but with the following differences:
+ * <ul>
+ *   <li>if the passed reference doesn't have a page name specified (or if it's empty) the value used is the default
+ *       page name (instead of the page name of the current document's reference).</li>
+ * </ul>
  *
  * @version $Id$
- * @since 2.2M1
+ * @since 2.3M1
  */
-@Component("current")
-public class CurrentStringDocumentReferenceResolver implements DocumentReferenceResolver<String>
+@Component("currentmixed")
+public class CurrentMixedEntityReferenceValueProvider extends CurrentEntityReferenceValueProvider
 {
-    @Requirement("current")
-    private EntityReferenceResolver<String> entityReferenceResolver;
+    @Requirement
+    private EntityReferenceValueProvider defaultProvider;
 
     /**
      * {@inheritDoc}
-     * @see org.xwiki.model.reference.DocumentReferenceResolver#resolve
+     * @see CurrentMixedEntityReferenceValueProvider#getDefaultValue(EntityType)
      */
-    public DocumentReference resolve(String documentReferenceRepresentation, Object... parameters)
+    @Override
+    public String getDefaultValue(EntityType type)
     {
-        return new DocumentReference(this.entityReferenceResolver.resolve(
-            documentReferenceRepresentation, EntityType.DOCUMENT, parameters));
+        String result;
+        if (type == EntityType.DOCUMENT) {
+            result = this.defaultProvider.getDefaultValue(EntityType.DOCUMENT);
+        } else {
+            result = super.getDefaultValue(type);
+        }
+        return result;
     }
 }

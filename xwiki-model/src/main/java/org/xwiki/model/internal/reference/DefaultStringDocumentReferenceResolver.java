@@ -44,11 +44,11 @@ public class DefaultStringDocumentReferenceResolver implements DocumentReference
     /**
      * {@inheritDoc}
      * 
-     * @see org.xwiki.model.reference.DocumentReferenceResolver#resolve(Object)
+     * @see org.xwiki.model.reference.DocumentReferenceResolver#resolve
      */
-    public DocumentReference resolve(String documentReferenceRepresentation)
+    public DocumentReference resolve(String documentReferenceRepresentation, Object... parameters)
     {
         return new DocumentReference(this.entityReferenceResolver.resolve(documentReferenceRepresentation,
-            EntityType.DOCUMENT));
+            EntityType.DOCUMENT, parameters));
     }
 }

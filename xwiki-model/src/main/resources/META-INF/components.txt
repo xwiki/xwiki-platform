@@ -6,5 +6,8 @@ org.xwiki.model.internal.reference.LocalStringEntityReferenceSerializer
 org.xwiki.model.internal.reference.DefaultStringDocumentReferenceResolver
 org.xwiki.model.internal.reference.DefaultReferenceDocumentReferenceResolver
 org.xwiki.model.internal.reference.DefaultStringAttachmentReferenceResolver
+org.xwiki.model.internal.reference.DefaultEntityReferenceValueProvider
+org.xwiki.model.internal.reference.ExplicitStringEntityReferenceResolver
+org.xwiki.model.internal.reference.ExplicitStringDocumentReferenceResolver
 org.xwiki.model.internal.DefaultModelConfiguration
 org.xwiki.model.internal.DefaultModelContext

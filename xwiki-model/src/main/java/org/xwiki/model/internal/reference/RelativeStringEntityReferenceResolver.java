@@ -43,9 +43,9 @@ public class RelativeStringEntityReferenceResolver extends AbstractStringEntityR
 {
     /**
      * {@inheritDoc}
-     * @see AbstractStringEntityReferenceResolver#getDefaultValuesForType(org.xwiki.model.EntityType) 
+     * @see AbstractStringEntityReferenceResolver#getDefaultValue
      */
-    @Override protected String getDefaultValuesForType(EntityType type)
+    @Override protected String getDefaultValue(EntityType type, Object... parameters)
     {
         // Return null to signify to the generic algorithm that we don't want to generate references with default
         // values.
@@ -54,9 +54,10 @@ public class RelativeStringEntityReferenceResolver extends AbstractStringEntityR
 
     /**
      * {@inheritDoc}
-     * @see AbstractStringEntityReferenceResolver#resolve(String, org.xwiki.model.EntityType)
+     * @see AbstractStringEntityReferenceResolver#resolve
      */
-    @Override public EntityReference resolve(String entityReferenceRepresentation, EntityType type)
+    @Override
+    public EntityReference resolve(String entityReferenceRepresentation, EntityType type, Object... parameters)
     {
         return super.resolve(entityReferenceRepresentation, type);
     }

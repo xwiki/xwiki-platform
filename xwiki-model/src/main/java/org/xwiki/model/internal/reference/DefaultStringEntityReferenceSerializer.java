@@ -54,9 +54,9 @@ public class DefaultStringEntityReferenceSerializer implements EntityReferenceSe
 
     /**
      * {@inheritDoc}
-     * @see EntityReferenceSerializer#serialize(org.xwiki.model.reference.EntityReference)
+     * @see EntityReferenceSerializer#serialize
      */
-    public String serialize(EntityReference reference)
+    public String serialize(EntityReference reference, Object... parameters)
     {
         if (reference == null) {
             return null;

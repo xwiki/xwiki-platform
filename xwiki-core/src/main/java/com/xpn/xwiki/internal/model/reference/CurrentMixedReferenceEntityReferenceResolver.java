@@ -22,31 +22,31 @@ package com.xpn.xwiki.internal.model.reference;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.Requirement;
 import org.xwiki.model.EntityType;
-import org.xwiki.model.reference.DocumentReference;
-import org.xwiki.model.reference.DocumentReferenceResolver;
-import org.xwiki.model.reference.EntityReferenceResolver;
+import org.xwiki.model.internal.reference.DefaultReferenceEntityReferenceResolver;
+import org.xwiki.model.reference.EntityReferenceValueProvider;
 
 /**
- * Specialized version of {@link org.xwiki.model.reference.EntityReferenceResolver} which can be considered a helper
- * component to resolve {@link DocumentReference} objects from their string representation. The behavior is the one
- * defined in {@link com.xpn.xwiki.internal.model.reference.CurrentStringEntityReferenceResolver}.
+ * Resolve an {@link org.xwiki.model.reference.EntityReference} into a valid and absolute reference (with all required
+ * parents filled in). The behavior is the one defined in
+ * {@link com.xpn.xwiki.internal.model.reference.CurrentMixedEntityReferenceValueProvider}.
  *
  * @version $Id$
- * @since 2.2M1
+ * @since 2.3M1
  */
-@Component("current")
-public class CurrentStringDocumentReferenceResolver implements DocumentReferenceResolver<String>
+@Component("currentmixed/reference")
+public class CurrentMixedReferenceEntityReferenceResolver extends DefaultReferenceEntityReferenceResolver
 {
-    @Requirement("current")
-    private EntityReferenceResolver<String> entityReferenceResolver;
+    @Requirement("currentmixed")
+    private EntityReferenceValueProvider provider;
 
     /**
      * {@inheritDoc}
-     * @see org.xwiki.model.reference.DocumentReferenceResolver#resolve
+     *
+     * @see DefaultReferenceEntityReferenceResolver#getDefaultValue(org.xwiki.model.EntityType)
      */
-    public DocumentReference resolve(String documentReferenceRepresentation, Object... parameters)
+    @Override
+    protected String getDefaultValue(EntityType type)
     {
-        return new DocumentReference(this.entityReferenceResolver.resolve(
-            documentReferenceRepresentation, EntityType.DOCUMENT, parameters));
+        return this.provider.getDefaultValue(type);
     }
 }

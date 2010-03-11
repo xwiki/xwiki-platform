@@ -19,90 +19,46 @@
  */
 package com.xpn.xwiki.internal.model.reference;
 
-import com.xpn.xwiki.XWikiContext;
-import com.xpn.xwiki.doc.XWikiDocument;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.Requirement;
-import org.xwiki.context.Execution;
 import org.xwiki.model.EntityType;
-import org.xwiki.model.ModelContext;
+import org.xwiki.model.internal.reference.AbstractStringEntityReferenceResolver;
 import org.xwiki.model.internal.reference.DefaultStringEntityReferenceResolver;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
-import org.xwiki.model.reference.EntityReference;
+import org.xwiki.model.reference.EntityReferenceValueProvider;
 
 /**
- * This is an implementation for backward-compatibility. It's behavior is essentially similar to the
- * {@link com.xpn.xwiki.internal.model.reference.CurrentStringDocumentReferenceResolver} implementation except for
- * two detail:
- * <ul>
- * <li>if the document reference doesn't have a name specified it defaults to the default name and not
- * the current document's page name.</li>
- * <li>if the wiki reference isn't specified then the current wiki reference is used (as opposed to the current
- * document reference's wiki reference for
- * {@link com.xpn.xwiki.internal.model.reference.CurrentStringDocumentReferenceResolver}</li>
- * </ul>
- * This is to behave similarly to the old code. However new code should use the
- * {@link com.xpn.xwiki.internal.model.reference.CurrentStringDocumentReferenceResolver} instead as much as possible
- * since this version will eventually be removed.
+ * Resolve a String representing an Entity Reference into an {@link org.xwiki.model.reference.EntityReference} object.
+ * The behavior is the one defined in
+ * {@link com.xpn.xwiki.internal.model.reference.CurrentMixedEntityReferenceValueProvider}.
  *
  * @version $Id$
  * @since 2.2M1
  */
 @Component("currentmixed")
-public class CurrentMixedStringDocumentReferenceResolver extends DefaultStringEntityReferenceResolver
+public class CurrentMixedStringDocumentReferenceResolver extends AbstractStringEntityReferenceResolver
     implements DocumentReferenceResolver<String>
 {
-    @Requirement
-    private ModelContext modelContext;
-
-    @Requirement
-    private Execution execution;
+    @Requirement("currentmixed")
+    private EntityReferenceValueProvider provider;
 
     /**
      * {@inheritDoc}
-     * @see org.xwiki.model.reference.DocumentReferenceResolver#resolve(Object)
+     * @see org.xwiki.model.reference.DocumentReferenceResolver#resolve
      */
-    public DocumentReference resolve(String documentReferenceRepresentation)
+    public DocumentReference resolve(String documentReferenceRepresentation, Object... parameters)
     {
-        return new DocumentReference(resolve(documentReferenceRepresentation, EntityType.DOCUMENT));
+        return new DocumentReference(resolve(documentReferenceRepresentation, EntityType.DOCUMENT, parameters));
     }
 
     /**
      * {@inheritDoc}
-     * @see DefaultStringEntityReferenceResolver#getDefaultValuesForType(org.xwiki.model.EntityType)
+     * @see DefaultStringEntityReferenceResolver#getDefaultValue
      */
-    protected String getDefaultValuesForType(EntityType type)
+    @Override
+    protected String getDefaultValue(EntityType type, Object... parameters)
     {
-        String result;
-
-        switch (type) {
-            case WIKI:
-                EntityReference wikiReference =
-                    this.modelContext.getCurrentEntityReference().extractReference(EntityType.WIKI);
-                result = wikiReference.getName();
-                break;
-            case SPACE:
-                XWikiDocument currentDoc = getContext().getDoc();
-                if (currentDoc == null) {
-                    result = super.getDefaultValuesForType(type);
-                } else {
-                    result = currentDoc.getSpaceName();
-                }
-                break;
-            default:
-                result = super.getDefaultValuesForType(type);
-                break;
-        }
-
-        return result;
-    }
-
-    /**
-     * @return the XWiki Context used to bridge with the old API
-     */
-    private XWikiContext getContext()
-    {
-        return (XWikiContext) this.execution.getContext().getProperty("xwikicontext");
+        return this.provider.getDefaultValue(type);
     }
 }

@@ -20,20 +20,23 @@
 package org.xwiki.model.reference;
 
 import org.xwiki.component.annotation.ComponentRole;
+import org.xwiki.model.EntityType;
 
 /**
- * Generate a different representation of an Entity Reference (eg as a String).
+ * Return default values for specified Entity Reference types. Useful when an Entity Reference value has not been
+ * specified and we need to find a default value for it (the default value returned will depend on the implementations,
+ * some will return default values defined in the XWiki configuration, others will return values taken from the
+ * current document reference, etc).
  *
  * @version $Id$
- * @since 2.2M1
+ * @since 2.3M1
  */
 @ComponentRole
-public interface EntityReferenceSerializer<T>
+public interface EntityReferenceValueProvider
 {
     /**
-     * @param reference the reference to serialize
-     * @param parameters optional parameters. Their meaning depends on the serializer implementation
-     * @return the new representation (eg as a String)
+     * @param type the entity reference type for which to get the default value
+     * @return the default value for the passed type
      */
-    T serialize(EntityReference reference, Object... parameters);
+    String getDefaultValue(EntityType type);
 }

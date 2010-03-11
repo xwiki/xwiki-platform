@@ -33,7 +33,7 @@ import org.xwiki.rendering.listener.Link;
 
 /**
  * Unit tests for {@link XWikiLinkLabelGenerator}.
- * 
+ *
  * @version $Id$
  * @since 2.0M1
  */
@@ -79,7 +79,7 @@ public class XWikiLinkLabelGeneratorTest
         link.setReference("HelloWorld");
 
         mockery.checking(new Expectations() {{
-            allowing(mockDocumentReferenceResolver).resolve(with(any(String.class)));
+            allowing(mockDocumentReferenceResolver).resolve(with(any(String.class)), with(any(Object[].class)));
                 will(returnValue(new DocumentReference("xwiki", "Main", "HelloWorld")));
             allowing(mockDocumentModelBridge).getTitle(); will(returnValue("My title"));
             allowing(mockDocumentAccessBridge).getDocument(with(any(DocumentReference.class)));
@@ -94,7 +94,7 @@ public class XWikiLinkLabelGeneratorTest
     public void testGenerateWhenDocumentFailsToLoad() throws Exception
     {
         mockery.checking(new Expectations() {{
-            allowing(mockDocumentReferenceResolver).resolve(with(any(String.class)));
+            allowing(mockDocumentReferenceResolver).resolve(with(any(String.class)), with(any(Object[].class)));
                 will(returnValue(new DocumentReference("xwiki", "Main", "HelloWorld")));
             allowing(mockDocumentAccessBridge).getDocument(with(any(DocumentReference.class)));
                 will(throwException(new Exception("error")));
@@ -110,7 +110,7 @@ public class XWikiLinkLabelGeneratorTest
         link.setReference("HelloWorld");
 
         mockery.checking(new Expectations() {{
-            allowing(mockDocumentReferenceResolver).resolve(with(any(String.class)));
+            allowing(mockDocumentReferenceResolver).resolve(with(any(String.class)), with(any(Object[].class)));
                 will(returnValue(new DocumentReference("xwiki", "Main", "HelloWorld")));
             allowing(mockDocumentModelBridge).getTitle(); will(returnValue(null));
             allowing(mockDocumentAccessBridge).getDocument(with(any(DocumentReference.class)));
@@ -127,7 +127,7 @@ public class XWikiLinkLabelGeneratorTest
             allowing(mockDocumentModelBridge).getTitle(); will(returnValue("$0"));
             allowing(mockDocumentAccessBridge).getDocument(with(any(DocumentReference.class)));
                 will(returnValue(mockDocumentModelBridge));
-            allowing(mockDocumentReferenceResolver).resolve(with(any(String.class)));
+            allowing(mockDocumentReferenceResolver).resolve(with(any(String.class)), with(any(Object[].class)));
                 will(returnValue(new DocumentReference("$0", "\\", "$0")));
 
         }});

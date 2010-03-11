@@ -17,23 +17,33 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.model.reference;
+package org.xwiki.model.internal.reference;
 
-import org.xwiki.component.annotation.ComponentRole;
+import org.xwiki.component.annotation.Component;
+import org.xwiki.component.annotation.Requirement;
+import org.xwiki.model.EntityType;
+import org.xwiki.model.ModelConfiguration;
+import org.xwiki.model.reference.EntityReferenceValueProvider;
 
 /**
- * Generate a different representation of an Entity Reference (eg as a String).
+ * Uses the Entity Reference values defined in the Model Configuration.
  *
  * @version $Id$
- * @since 2.2M1
+ * @since 2.3M1
+ * @see org.xwiki.model.internal.DefaultModelConfiguration 
  */
-@ComponentRole
-public interface EntityReferenceSerializer<T>
+@Component
+public class DefaultEntityReferenceValueProvider implements EntityReferenceValueProvider
 {
+    @Requirement
+    private ModelConfiguration configuration;
+
     /**
-     * @param reference the reference to serialize
-     * @param parameters optional parameters. Their meaning depends on the serializer implementation
-     * @return the new representation (eg as a String)
+     * {@inheritDoc}
+     * @see org.xwiki.model.reference.EntityReferenceValueProvider#getDefaultValue(org.xwiki.model.EntityType)
      */
-    T serialize(EntityReference reference, Object... parameters);
+    public String getDefaultValue(EntityType type)
+    {
+        return this.configuration.getDefaultReferenceValue(type);
+    }
 }

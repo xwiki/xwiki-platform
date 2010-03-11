@@ -30,8 +30,8 @@ import org.xwiki.model.reference.EntityReferenceResolver;
 /**
  * Specialized version of {@link org.xwiki.model.reference.EntityReferenceResolver} which can be considered a helper
  * component to resolve {@link DocumentReference} objects from Entity Reference (when they miss some parent references
- * or have NULL values). This implementation uses values from the current document reference in the context when parts
- * of the Reference are missing in the Entity Reference representation.
+ * or have NULL values). The behavior is the one defined in
+ * {@link com.xpn.xwiki.internal.model.reference.CurrentEntityReferenceValueProvider}.
  *
  * @version $Id$
  * @since 2.2M1
@@ -45,11 +45,11 @@ public class CurrentReferenceDocumentReferenceResolver implements DocumentRefere
     /**
      * {@inheritDoc}
      *
-     * @see org.xwiki.model.reference.DocumentReferenceResolver#resolve(Object)
+     * @see org.xwiki.model.reference.DocumentReferenceResolver#resolve
      */
-    public DocumentReference resolve(EntityReference documentReferenceRepresentation)
+    public DocumentReference resolve(EntityReference documentReferenceRepresentation, Object... parameters)
     {
         return new DocumentReference(this.entityReferenceResolver.resolve(documentReferenceRepresentation,
-            EntityType.DOCUMENT));
+            EntityType.DOCUMENT, parameters));
     }
 }

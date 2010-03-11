@@ -22,6 +22,7 @@ package com.xpn.xwiki.internal.model.reference;
 import org.junit.Assert;
 import org.junit.Before;
 import org.xwiki.model.EntityType;
+import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.EntityReferenceResolver;
 
@@ -51,7 +52,7 @@ public class CurrentMixedStringDocumentReferenceResolverTest extends AbstractBri
     @org.junit.Test
     public void testResolveDocumentReferenceWhenContextDocument() throws Exception
     {
-        getContext().setDoc(new XWikiDocument("not used", CURRENT_SPACE, "notused"));
+        getContext().setDoc(new XWikiDocument(new DocumentReference("not used", CURRENT_SPACE, "notused")));
 
         getContext().setDatabase("currentwiki");
 

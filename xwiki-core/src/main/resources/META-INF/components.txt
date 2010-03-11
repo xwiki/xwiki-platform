@@ -3,8 +3,12 @@ com.xpn.xwiki.render.DefaultVelocityManager
 com.xpn.xwiki.render.XWikiVelocityContextInitializer
 com.xpn.xwiki.render.XWikiScriptContextInitializer
 com.xpn.xwiki.doc.DefaultDocumentAccessBridge
-com.xpn.xwiki.internal.model.reference.CurrentStringEntityReferenceResolver
+com.xpn.xwiki.internal.model.reference.CurrentEntityReferenceValueProvider
+com.xpn.xwiki.internal.model.reference.CurrentMixedEntityReferenceValueProvider
+com.xpn.xwiki.internal.model.reference.CurrentMixedReferenceEntityReferenceResolver
+com.xpn.xwiki.internal.model.reference.CurrentMixedReferenceDocumentReferenceResolver
 com.xpn.xwiki.internal.model.reference.CurrentReferenceEntityReferenceResolver
+com.xpn.xwiki.internal.model.reference.CurrentStringEntityReferenceResolver
 com.xpn.xwiki.internal.model.reference.CurrentStringDocumentReferenceResolver
 com.xpn.xwiki.internal.model.reference.CurrentMixedStringDocumentReferenceResolver
 com.xpn.xwiki.internal.model.reference.CurrentReferenceDocumentReferenceResolver

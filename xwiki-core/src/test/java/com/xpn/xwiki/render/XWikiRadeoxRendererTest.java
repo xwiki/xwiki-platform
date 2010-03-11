@@ -28,10 +28,11 @@ import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.test.AbstractBridgedXWikiComponentTestCase;
 import com.xpn.xwiki.web.XWikiURLFactory;
+import org.xwiki.model.reference.DocumentReference;
 
 /**
  * Unit tests for {@link com.xpn.xwiki.render.XWikiRadeoxRenderer}.
- * 
+ *
  * @version $Id$
  */
 public class XWikiRadeoxRendererTest extends AbstractBridgedXWikiComponentTestCase
@@ -66,8 +67,8 @@ public class XWikiRadeoxRendererTest extends AbstractBridgedXWikiComponentTestCa
 
         // This is required just to return the current space...
         Mock mockCurrentDocument = mock(XWikiDocument.class);
-        mockCurrentDocument.stubs().method("getSpaceName").will(returnValue("Main"));
-        mockCurrentDocument.stubs().method("getWikiName").will(returnValue("xwiki"));
+        mockCurrentDocument.stubs().method("getDocumentReference").will(returnValue(
+            new DocumentReference("xwiki", "Main", "WebHome")));
         mockCurrentDocument.stubs().method("getFullName").will(returnValue("Main.WebHome"));
         getContext().setDoc((XWikiDocument) mockCurrentDocument.proxy());
     }
@@ -118,9 +119,8 @@ public class XWikiRadeoxRendererTest extends AbstractBridgedXWikiComponentTestCa
         getContext().setURLFactory((XWikiURLFactory) mockUrlFactory.proxy());
 
         Mock mockCurrentDocument = mock(XWikiDocument.class);
-        mockCurrentDocument.stubs().method("getSpaceName").will(returnValue("A+ B"));
-        mockCurrentDocument.stubs().method("getWikiName").will(returnValue("xwiki"));
-        mockCurrentDocument.stubs().method("getName").will(returnValue("C# Examples & Libs? No, I prefer C++"));
+        mockCurrentDocument.stubs().method("getDocumentReference").will(returnValue(
+            new DocumentReference("xwiki", "A+ B", "C# Examples & Libs? No, I prefer C++")));
         mockCurrentDocument.stubs().method("getFullName")
             .will(returnValue("A+ B.C# Examples & Libs? No, I prefer C++"));
         getContext().setDoc((XWikiDocument) mockCurrentDocument.proxy());

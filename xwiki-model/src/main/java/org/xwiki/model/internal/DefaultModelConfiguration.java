@@ -33,7 +33,12 @@ import java.util.Map;
 
 /**
  * Get configuration data from the XWiki configuration using a {@link ConfigurationSource}. If no
- * {@link ConfigurationSource} component is found in the system then default to default values.  
+ * {@link ConfigurationSource} component is found in the system then default to default values:
+ * <ul>
+ *   <li>"xwiki" for the default wiki value</li>
+ *   <li>"Main" for the default space value</li>
+ *   <li>"WebHome" for the default page value</li>
+ * </ul>
  *
  * @version $Id$
  * @since 2.2M1

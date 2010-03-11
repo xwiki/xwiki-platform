@@ -19,14 +19,14 @@
  */
 package com.xpn.xwiki.internal.model.reference;
 
+import com.xpn.xwiki.doc.XWikiDocument;
+import com.xpn.xwiki.test.AbstractBridgedXWikiComponentTestCase;
 import org.junit.Assert;
 import org.junit.Before;
 import org.xwiki.model.EntityType;
+import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.EntityReferenceResolver;
-
-import com.xpn.xwiki.doc.XWikiDocument;
-import com.xpn.xwiki.test.AbstractBridgedXWikiComponentTestCase;
 
 /**
  * Unit tests for {@link com.xpn.xwiki.internal.model.reference.CurrentReferenceEntityReferenceResolver}.
@@ -70,7 +70,7 @@ public class CurrentReferenceEntityReferenceResolverTest extends AbstractBridged
     public void testResolveAttachmentReferenceWhenMissingParentsAndContextDocument()
     {
         getContext().setDatabase(CURRENT_WIKI);
-        getContext().setDoc(new XWikiDocument("docwiki", CURRENT_SPACE, CURRENT_PAGE));
+        getContext().setDoc(new XWikiDocument(new DocumentReference("docwiki", CURRENT_SPACE, CURRENT_PAGE)));
 
         EntityReference reference =
                 resolver.resolve(new EntityReference("filename", EntityType.ATTACHMENT), EntityType.ATTACHMENT);

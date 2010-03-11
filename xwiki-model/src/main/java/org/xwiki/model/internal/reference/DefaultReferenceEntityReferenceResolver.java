@@ -19,24 +19,25 @@
  */
 package org.xwiki.model.internal.reference;
 
-import org.xwiki.component.annotation.Component;
-import org.xwiki.component.annotation.Requirement;
-import org.xwiki.model.EntityType;
-import org.xwiki.model.ModelConfiguration;
-import org.xwiki.model.reference.EntityReference;
-import org.xwiki.model.reference.EntityReferenceResolver;
-import org.xwiki.model.reference.InvalidEntityReferenceException;
-
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.xwiki.component.annotation.Component;
+import org.xwiki.component.annotation.Requirement;
+import org.xwiki.model.EntityType;
+import org.xwiki.model.reference.EntityReference;
+import org.xwiki.model.reference.EntityReferenceResolver;
+import org.xwiki.model.reference.EntityReferenceValueProvider;
+import org.xwiki.model.reference.InvalidEntityReferenceException;
+
 /**
  * Resolve an {@link EntityReference} into a valid and absolute reference (with all required parents filled in).
- * This implementation uses fixed default values when parts of the Reference are missing.
- *
+ * See {@link DefaultEntityReferenceValueProvider} for the behavior used when
+ * Reference values are not defined in the passed reference.
+ * 
  * @version $Id$
  * @since 2.2M1
  */
@@ -44,33 +45,41 @@ import java.util.Map;
 public class DefaultReferenceEntityReferenceResolver implements EntityReferenceResolver<EntityReference>
 {
     @Requirement
-    private ModelConfiguration configuration;
+    private EntityReferenceValueProvider provider;
 
-    private Map<EntityType, List<EntityType>> nextAllowedEntityTypes = new HashMap<EntityType, List<EntityType>>() {{
-        put(EntityType.ATTACHMENT, Arrays.asList(EntityType.DOCUMENT));
-        put(EntityType.DOCUMENT, Arrays.asList(EntityType.SPACE));
-        put(EntityType.SPACE, Arrays.asList(EntityType.WIKI, EntityType.SPACE));
-        put(EntityType.WIKI, Collections.<EntityType>emptyList());
-    }};
+    private Map<EntityType, List<EntityType>> nextAllowedEntityTypes = new HashMap<EntityType, List<EntityType>>()
+    {
+        {
+            put(EntityType.ATTACHMENT, Arrays.asList(EntityType.DOCUMENT));
+            put(EntityType.DOCUMENT, Arrays.asList(EntityType.SPACE));
+            put(EntityType.SPACE, Arrays.asList(EntityType.WIKI, EntityType.SPACE));
+            put(EntityType.WIKI, Collections.<EntityType> emptyList());
+        }
+    };
 
     /**
      * {@inheritDoc}
-     * @see org.xwiki.model.reference.EntityReferenceResolver#resolve(Object, org.xwiki.model.EntityType)
+     * 
+     * @see org.xwiki.model.reference.EntityReferenceResolver#resolve
      * @throws InvalidEntityReferenceException if the passed reference to normalize is invalid (for example if the
-     *         parent references are out of order)
+     *             parent references are out of order)
      */
-    public EntityReference resolve(EntityReference referenceToResolve, EntityType type)
+    public EntityReference resolve(EntityReference referenceToResolve, EntityType type, Object... parameters)
     {
         EntityReference normalizedReference;
 
-        // If the passed type is a supertype of the reference to resolve's type then we need to insert a top level
-        // reference.
-        if (type.ordinal() > referenceToResolve.getType().ordinal()) {
-            normalizedReference = new EntityReference(getDefaultValue(type), type, referenceToResolve.clone());
+        if (referenceToResolve == null) {
+            normalizedReference = new EntityReference(getDefaultValue(type), type);
         } else {
-            normalizedReference = referenceToResolve.clone();
+            // If the passed type is a supertype of the reference to resolve's type then we need to insert a top level
+            // reference.
+            if (type.ordinal() > referenceToResolve.getType().ordinal()) {
+                normalizedReference = new EntityReference(getDefaultValue(type), type, referenceToResolve.clone());
+            } else {
+                normalizedReference = referenceToResolve.clone();
+            }
         }
-
+        
         // Check all references and parent references which have a NULL name and replace them with default values.
         // In addition insert references where needed.
         EntityReference reference = normalizedReference;
@@ -78,13 +87,12 @@ public class DefaultReferenceEntityReferenceResolver implements EntityReferenceR
             List<EntityType> types = this.nextAllowedEntityTypes.get(reference.getType());
             if (reference.getParent() != null && !types.isEmpty() && !types.contains(reference.getParent().getType())) {
                 // The parent reference isn't the allowed parent: insert an allowed reference
-                EntityReference newReference = new EntityReference(
-                    getDefaultValue(types.get(0)), types.get(0), reference.getParent());
+                EntityReference newReference =
+                    new EntityReference(getDefaultValue(types.get(0)), types.get(0), reference.getParent());
                 reference.setParent(newReference);
             } else if (reference.getParent() == null && !types.isEmpty()) {
                 // The top reference isn't the allowed top level reference, add a parent reference
-                EntityReference newReference = new EntityReference(
-                    getDefaultValue(types.get(0)), types.get(0));
+                EntityReference newReference = new EntityReference(getDefaultValue(types.get(0)), types.get(0));
                 reference.setParent(newReference);
             } else if (reference.getParent() != null && types.isEmpty()) {
                 // There's a parent but not of the correct type... it means the reference is invalid
@@ -93,16 +101,18 @@ public class DefaultReferenceEntityReferenceResolver implements EntityReferenceR
             reference = reference.getParent();
         }
 
-        // If the passed type is a subtype of the reference to resolve's type then we extract the reference.
-        if (type.ordinal() < referenceToResolve.getType().ordinal()) {
-            normalizedReference = normalizedReference.extractReference(type);
+        if (referenceToResolve != null) {
+            // If the passed type is a subtype of the reference to resolve's type then we extract the reference.
+            if (type.ordinal() < referenceToResolve.getType().ordinal()) {
+                normalizedReference = normalizedReference.extractReference(type);
+            }
         }
-
+        
         return normalizedReference;
     }
 
     protected String getDefaultValue(EntityType type)
     {
-        return this.configuration.getDefaultReferenceValue(type);
+        return this.provider.getDefaultValue(type);
     }
 }

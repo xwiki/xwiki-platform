@@ -17,7 +17,7 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package com.xpn.xwiki.internal.model.reference;
+package org.xwiki.model.internal.reference;
 
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.Requirement;
@@ -29,15 +29,15 @@ import org.xwiki.model.reference.EntityReferenceResolver;
 /**
  * Specialized version of {@link org.xwiki.model.reference.EntityReferenceResolver} which can be considered a helper
  * component to resolve {@link DocumentReference} objects from their string representation. The behavior is the one
- * defined in {@link com.xpn.xwiki.internal.model.reference.CurrentStringEntityReferenceResolver}.
+ * defined in {@link org.xwiki.model.internal.reference.ExplicitStringEntityReferenceResolver}.
  *
  * @version $Id$
- * @since 2.2M1
+ * @since 2.2.3
  */
-@Component("current")
-public class CurrentStringDocumentReferenceResolver implements DocumentReferenceResolver<String>
+@Component("explicit")
+public class ExplicitStringDocumentReferenceResolver implements DocumentReferenceResolver<String>
 {
-    @Requirement("current")
+    @Requirement("explicit")
     private EntityReferenceResolver<String> entityReferenceResolver;
 
     /**

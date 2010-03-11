@@ -53,15 +53,16 @@ public abstract class AbstractStringEntityReferenceResolver implements EntityRef
 
     /**
      * @param type the entity type for which to return the default value to use (since the use has not specified it)
+     * @param parameters optional parameters. Their meaning depends on the resolver implementation
      * @return the default value to use
      */
-    protected abstract String getDefaultValuesForType(EntityType type);
+    protected abstract String getDefaultValue(EntityType type, Object... parameters);
 
     /**
      * {@inheritDoc}
-     * @see org.xwiki.model.reference.EntityReferenceResolver#resolve(Object, org.xwiki.model.EntityType)
+     * @see org.xwiki.model.reference.EntityReferenceResolver#resolve
      */
-    public EntityReference resolve(String entityReferenceRepresentation, EntityType type)
+    public EntityReference resolve(String entityReferenceRepresentation, EntityType type, Object... parameters)
     {
         // TODO: Once we support nested spaces, handle the possibility of having nested spaces. The format is still
         // to be defined but it could be for example: Wiki:Space1.Space2.Page
@@ -91,10 +92,10 @@ public abstract class AbstractStringEntityReferenceResolver implements EntityRef
             String name;
             if (representation.length() > 0) {
                 char separator = separatorsForType.get(i);
-                name = lastIndexOf(representation, separator, entityTypesForType.get(i));
+                name = lastIndexOf(representation, separator, entityTypesForType.get(i), parameters);
             } else {
                 // There's no definition for the current segment use default values
-                name = getDefaultValuesForType(entityTypesForType.get(i));
+                name = resolveDefaultValue(entityTypesForType.get(i), parameters);
             }
 
             if (name != null) {
@@ -114,7 +115,7 @@ public abstract class AbstractStringEntityReferenceResolver implements EntityRef
         if (representation.length() > 0) {
             name = representation.toString();
         } else {
-            name = getDefaultValuesForType(entityTypesForType.get(separatorsForType.size()));
+            name = resolveDefaultValue(entityTypesForType.get(separatorsForType.size()), parameters);
         }
 
         if (name != null) {
@@ -130,7 +131,8 @@ public abstract class AbstractStringEntityReferenceResolver implements EntityRef
         return reference;
     }
 
-    private String lastIndexOf(StringBuilder representation, char separator, EntityType entityType)
+    private String lastIndexOf(StringBuilder representation, char separator, EntityType entityType,
+        Object... parameters)
     {
         String name = null;
 
@@ -147,7 +149,7 @@ public abstract class AbstractStringEntityReferenceResolver implements EntityRef
                 // Found a valid separator (not escaped), separate content on its left from content on its
                 // right
                 if (j == representation.length() - 1) {
-                    name = getDefaultValuesForType(entityType);
+                    name = resolveDefaultValue(entityType, parameters);
                 } else {
                     name = representation.substring(j + 1, representation.length());
                 }
@@ -168,5 +170,24 @@ public abstract class AbstractStringEntityReferenceResolver implements EntityRef
         }
 
         return name;
+    }
+
+    private String resolveDefaultValue(EntityType type, Object... parameters)
+    {
+        String resolvedDefaultValue = null;
+        if (parameters.length > 0 && parameters[0] instanceof EntityReference) {
+            // Try to extract the type from the passed parameter.
+            EntityReference referenceParameter = (EntityReference) parameters[0];
+            EntityReference extractedReference = referenceParameter.extractReference(type);
+            if (extractedReference != null) {
+                resolvedDefaultValue = extractedReference.getName();
+            }
+        }
+
+        if (resolvedDefaultValue == null) {
+            resolvedDefaultValue = getDefaultValue(type, parameters);
+        }
+
+        return resolvedDefaultValue;
     }
 }

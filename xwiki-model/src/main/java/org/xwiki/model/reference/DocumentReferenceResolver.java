@@ -35,7 +35,8 @@ public interface DocumentReferenceResolver<T>
 {
     /**
      * @param documentReferenceRepresentation the representation of a document reference (eg as a String)
+     * @param parameters optional parameters. Their meaning depends on the resolver implementation
      * @return the valid resolved document reference as an Object
      */
-    DocumentReference resolve(T documentReferenceRepresentation);
+    DocumentReference resolve(T documentReferenceRepresentation, Object... parameters);
 }

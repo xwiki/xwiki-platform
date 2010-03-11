@@ -19,15 +19,14 @@
  */
 package com.xpn.xwiki.internal.model.reference;
 
-import org.junit.Assert;
+import com.xpn.xwiki.doc.XWikiDocument;
+import com.xpn.xwiki.test.AbstractBridgedXWikiComponentTestCase;
+import junit.framework.Assert;
 import org.junit.Before;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.EntityReferenceResolver;
-
-import com.xpn.xwiki.doc.XWikiDocument;
-import com.xpn.xwiki.test.AbstractBridgedXWikiComponentTestCase;
 
 /**
  * Unit tests for {@link com.xpn.xwiki.internal.model.reference.CurrentStringEntityReferenceResolver}.
@@ -38,8 +37,6 @@ import com.xpn.xwiki.test.AbstractBridgedXWikiComponentTestCase;
 public class CurrentEntityReferenceResolverTest extends AbstractBridgedXWikiComponentTestCase
 {
     private static final String CURRENT_WIKI = "currentwiki";
-
-    private static final String CURRENTDOC_WIKI = "currentdocwiki";
 
     private static final String CURRENTDOC_SPACE = "currentdocspace";
 

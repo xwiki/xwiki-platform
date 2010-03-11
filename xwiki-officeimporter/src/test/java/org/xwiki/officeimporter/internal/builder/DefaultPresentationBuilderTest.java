@@ -107,7 +107,7 @@ public class DefaultPresentationBuilderTest extends AbstractOfficeImporterTest
         this.mockery.checking(new Expectations() {{
                 oneOf(mockDocumentConverter).convert(mockInput, "input.ppt", "output.html");
                 will(returnValue(mockOutput));
-                oneOf(mockSerializer).serialize(with(aNonNull(DocumentReference.class)));
+                oneOf(mockSerializer).serialize(with(aNonNull(DocumentReference.class)), with(any(Object[].class)));
                 will(returnValue("xwiki:Main.Test"));
                 // TODO : Remove when DefaultPresentationBuilder#buildPresentationXDOM() is fixed
                 oneOf(mockVelocityMacro).execute(with(any(Object.class)), with(any(String.class)), with(any(MacroTransformationContext.class)));

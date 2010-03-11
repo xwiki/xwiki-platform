@@ -645,7 +645,7 @@ p.legend {
            #end
          #end
        #end
-       #includeForm('XWiki.Configurable')
+       #includeForm('XWiki.ConfigurableClass')
      &lt;/div&gt; ## admin-page-content
      #end
      &lt;div id="admin-page-menu" #if($section != '')class="hidden"#end&gt;
@@ -690,7 +690,7 @@ p.legend {
         #end
         #set($section = '')
         #set($doNotUnlockConfigurableDocuments = true)
-        #includeForm('XWiki.Configurable')
+        #includeForm('XWiki.ConfigurableClass')
        &lt;/ul&gt;
      &lt;/div&gt; ## admin-page-menu
  &lt;/div&gt; ## admin-page

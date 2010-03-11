@@ -22,7 +22,7 @@ package com.xpn.xwiki.internal.model.reference;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.Requirement;
 import org.xwiki.model.EntityType;
-import org.xwiki.model.internal.reference.DefaultStringEntityReferenceResolver;
+import org.xwiki.model.internal.reference.AbstractStringEntityReferenceResolver;
 import org.xwiki.model.reference.EntityReferenceValueProvider;
 
 /**
@@ -34,17 +34,17 @@ import org.xwiki.model.reference.EntityReferenceValueProvider;
  * @since 2.2M1
  */
 @Component("current")
-public class CurrentStringEntityReferenceResolver extends DefaultStringEntityReferenceResolver
+public class CurrentStringEntityReferenceResolver extends AbstractStringEntityReferenceResolver
 {
     @Requirement("current")
     private EntityReferenceValueProvider provider;
 
     /**
      * {@inheritDoc}
-     * @see DefaultStringEntityReferenceResolver#getDefaultValue(org.xwiki.model.EntityType)
+     * @see AbstractStringEntityReferenceResolver#getDefaultValue
      */
     @Override
-    protected String getDefaultValue(EntityType type)
+    protected String getDefaultValue(EntityType type, Object... parameters)
     {
         return this.provider.getDefaultValue(type);
     }

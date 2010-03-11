@@ -45,19 +45,19 @@ public class CurrentMixedStringDocumentReferenceResolver extends AbstractStringE
 
     /**
      * {@inheritDoc}
-     * @see org.xwiki.model.reference.DocumentReferenceResolver#resolve(Object)
+     * @see org.xwiki.model.reference.DocumentReferenceResolver#resolve
      */
-    public DocumentReference resolve(String documentReferenceRepresentation)
+    public DocumentReference resolve(String documentReferenceRepresentation, Object... parameters)
     {
-        return new DocumentReference(resolve(documentReferenceRepresentation, EntityType.DOCUMENT));
+        return new DocumentReference(resolve(documentReferenceRepresentation, EntityType.DOCUMENT, parameters));
     }
 
     /**
      * {@inheritDoc}
-     * @see DefaultStringEntityReferenceResolver#getDefaultValue(org.xwiki.model.EntityType)
+     * @see DefaultStringEntityReferenceResolver#getDefaultValue
      */
     @Override
-    protected String getDefaultValue(EntityType type)
+    protected String getDefaultValue(EntityType type, Object... parameters)
     {
         return this.provider.getDefaultValue(type);
     }

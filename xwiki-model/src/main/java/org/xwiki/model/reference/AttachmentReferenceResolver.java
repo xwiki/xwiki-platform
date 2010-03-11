@@ -35,7 +35,8 @@ public interface AttachmentReferenceResolver<T>
 {
     /**
      * @param attachmentReferenceRepresentation the representation of an attachment reference (eg as a String)
+     * @param parameters optional parameters. Their meaning depends on the resolver implementation
      * @return the valid resolved attachment reference as an Object
      */
-    AttachmentReference resolve(T attachmentReferenceRepresentation);
+    AttachmentReference resolve(T attachmentReferenceRepresentation, Object... parameters);
 }

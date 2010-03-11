@@ -20,31 +20,31 @@
 package org.xwiki.model.internal.reference;
 
 import org.xwiki.component.annotation.Component;
-import org.xwiki.component.annotation.Requirement;
 import org.xwiki.model.EntityType;
-import org.xwiki.model.reference.EntityReferenceValueProvider;
+import org.xwiki.model.internal.reference.AbstractStringEntityReferenceResolver;
+import org.xwiki.model.reference.EntityReference;
 
 /**
- * Generic implementation that resolve {@link org.xwiki.model.reference.EntityReference} objects from their string
- * representation. This implementation uses fixed default values when parts of the Reference are missing in the string
- * representation. Default values are retrieved from the {@link org.xwiki.model.ModelConfiguration} class.  
+ * Resolver that resolves a Reference passed as a String into an absolute reference. For missing reference parts, the
+ * resolver takes default values from a parameter which must be of type {@link EntityReference}.
  *
  * @version $Id$
- * @since 2.2M1
+ * @since 2.23
  */
-@Component
-public class DefaultStringEntityReferenceResolver extends AbstractStringEntityReferenceResolver
+@Component("explicit")
+public class ExplicitStringEntityReferenceResolver extends AbstractStringEntityReferenceResolver
 {
-    @Requirement
-    private EntityReferenceValueProvider provider;
-
     /**
      * {@inheritDoc}
+     *
+     * Expects an EntityReference parameter from which to extract the default values.
+     *
      * @see AbstractStringEntityReferenceResolver#getDefaultValue
      */
     @Override
     protected String getDefaultValue(EntityType type, Object... parameters)
     {
-        return this.provider.getDefaultValue(type);
+        throw new IllegalArgumentException("The resolver parameter doesn't contain an Entity Reference of type ["
+            + type + "]");
     }
 }

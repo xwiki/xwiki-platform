@@ -32,7 +32,8 @@ public interface EntityReferenceSerializer<T>
 {
     /**
      * @param reference the reference to serialize
+     * @param parameters optional parameters. Their meaning depends on the serializer implementation
      * @return the new representation (eg as a String)
      */
-    T serialize(EntityReference reference);
+    T serialize(EntityReference reference, Object... parameters);
 }

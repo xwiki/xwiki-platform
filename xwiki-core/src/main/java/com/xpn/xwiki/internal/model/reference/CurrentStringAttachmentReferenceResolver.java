@@ -42,11 +42,11 @@ public class CurrentStringAttachmentReferenceResolver implements AttachmentRefer
 
     /**
      * {@inheritDoc}
-     * @see org.xwiki.model.reference.AttachmentReferenceResolver#resolve(Object)
+     * @see org.xwiki.model.reference.AttachmentReferenceResolver#resolve
      */
-    public AttachmentReference resolve(String attachmentReferenceRepresentation)
+    public AttachmentReference resolve(String attachmentReferenceRepresentation, Object... parameters)
     {
         return new AttachmentReference(this.entityReferenceResolver.resolve(
-            attachmentReferenceRepresentation, EntityType.ATTACHMENT));
+            attachmentReferenceRepresentation, EntityType.ATTACHMENT, parameters));
     }
 }

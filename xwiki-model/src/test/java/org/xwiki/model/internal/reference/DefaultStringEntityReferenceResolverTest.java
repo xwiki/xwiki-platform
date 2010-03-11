@@ -170,4 +170,14 @@ public class DefaultStringEntityReferenceResolverTest
         Assert.assertEquals(DEFAULT_PAGE, reference.extractReference(EntityType.DOCUMENT).getName());
         Assert.assertEquals(":.@", reference.getName());
     }
+
+    @Test
+    public void testResolveDocumentReferenceWithExplicitReference()
+    {
+        EntityReference reference = resolver.resolve("page", EntityType.DOCUMENT,
+            new EntityReference("space", EntityType.SPACE, new EntityReference("wiki", EntityType.WIKI)));
+        Assert.assertEquals("wiki", reference.extractReference(EntityType.WIKI).getName());
+        Assert.assertEquals("space", reference.extractReference(EntityType.SPACE).getName());
+        Assert.assertEquals("page", reference.getName());
+    }
 }

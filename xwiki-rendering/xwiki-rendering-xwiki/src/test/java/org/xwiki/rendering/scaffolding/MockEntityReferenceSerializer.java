@@ -52,9 +52,9 @@ public class MockEntityReferenceSerializer implements EntityReferenceSerializer<
     /**
      * {@inheritDoc}
      * 
-     * @see EntityReferenceSerializer#serialize(org.xwiki.model.reference.EntityReference)
+     * @see EntityReferenceSerializer#serialize
      */
-    public String serialize(EntityReference documentReference)
+    public String serialize(EntityReference documentReference, Object... parameters)
     {
         return "xwiki:Space.Page";
     }

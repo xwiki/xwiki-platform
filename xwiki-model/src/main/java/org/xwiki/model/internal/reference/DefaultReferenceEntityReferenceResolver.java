@@ -60,11 +60,11 @@ public class DefaultReferenceEntityReferenceResolver implements EntityReferenceR
     /**
      * {@inheritDoc}
      * 
-     * @see org.xwiki.model.reference.EntityReferenceResolver#resolve(Object, org.xwiki.model.EntityType)
+     * @see org.xwiki.model.reference.EntityReferenceResolver#resolve
      * @throws InvalidEntityReferenceException if the passed reference to normalize is invalid (for example if the
      *             parent references are out of order)
      */
-    public EntityReference resolve(EntityReference referenceToResolve, EntityType type)
+    public EntityReference resolve(EntityReference referenceToResolve, EntityType type, Object... parameters)
     {
         EntityReference normalizedReference;
 

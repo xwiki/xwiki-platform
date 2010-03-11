@@ -45,11 +45,11 @@ public class CurrentMixedReferenceDocumentReferenceResolver implements DocumentR
     /**
      * {@inheritDoc}
      *
-     * @see org.xwiki.model.reference.DocumentReferenceResolver#resolve(Object)
+     * @see org.xwiki.model.reference.DocumentReferenceResolver#resolve
      */
-    public DocumentReference resolve(EntityReference documentReferenceRepresentation)
+    public DocumentReference resolve(EntityReference documentReferenceRepresentation, Object... parameters)
     {
         return new DocumentReference(this.entityReferenceResolver.resolve(documentReferenceRepresentation,
-            EntityType.DOCUMENT));
+            EntityType.DOCUMENT, parameters));
     }
 }

@@ -25,7 +25,7 @@
 <hidden>false</hidden>
 <object>
 <class>
-<name>XWiki.Configurable</name>
+<name>XWiki.ConfigurableClass</name>
 <customClass></customClass>
 <customMapping></customMapping>
 <defaultViewSheet></defaultViewSheet>
@@ -135,7 +135,7 @@
 </class>
 <name>XWiki.RegistrationConfig</name>
 <number>0</number>
-<className>XWiki.Configurable</className>
+<className>XWiki.ConfigurableClass</className>
 <guid>d045822c-8279-4176-a382-1f153512898d</guid>
 <property>
 <codeToExecute></codeToExecute>

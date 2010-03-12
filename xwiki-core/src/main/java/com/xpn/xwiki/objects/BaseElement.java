@@ -31,8 +31,12 @@ import org.apache.commons.logging.LogFactory;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
+
+import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
+import org.xwiki.model.reference.EntityReference;
+import org.xwiki.model.reference.EntityReferenceResolver;
 import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.model.reference.WikiReference;
 
@@ -80,6 +84,9 @@ public abstract class BaseElement implements ElementInterface, Serializable
     private EntityReferenceSerializer<String> localEntityReferenceSerializer =
         Utils.getComponent(EntityReferenceSerializer.class, "local");
 
+    private EntityReferenceResolver<String> relativeEntityReferenceResolver = Utils.getComponent(
+        EntityReferenceResolver.class, "relative");
+    
     /**
      * {@inheritDoc}
      *
@@ -142,7 +149,10 @@ public abstract class BaseElement implements ElementInterface, Serializable
         // If the reference is already set, then continue using it. Ideally code calling setName should be modified to
         // call setReference in this case.
         if (this.reference != null) {
-            this.reference = this.currentMixedDocumentReferenceResolver.resolve(name); 
+            // <code>name</name> is supposed to be a full name (spape.page), to set the wiki use #setWiki
+            EntityReference relativeReference = this.relativeEntityReferenceResolver.resolve(name, EntityType.DOCUMENT);
+            this.reference.getLastSpaceReference().setName(relativeReference.extractReference(EntityType.SPACE).getName());
+            this.reference.setName(relativeReference.extractReference(EntityType.DOCUMENT).getName());
         } else {
             this.name = name;
         }
@@ -177,7 +187,17 @@ public abstract class BaseElement implements ElementInterface, Serializable
     public void setWiki(String wiki)
     {
         if (!StringUtils.isEmpty(wiki)) {
-            getDocumentReference().setWikiReference(new WikiReference(wiki));
+            DocumentReference reference = getDocumentReference();
+
+            if (reference != null) {
+                reference.setWikiReference(new WikiReference(wiki));
+            } else {
+                this.reference = new DocumentReference(wiki, "Main", "WebHome");
+
+                if (this.name != null) {
+                    setName(this.name);
+                }
+            }
         }
     }
 

@@ -24,24 +24,26 @@ import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.EntityReference;
 
 /**
- * Generate a string representation of an entity reference but without the wiki reference name specified
- * (eg "space.page" for a document reference). This is an implementation use for backward compatibility only and
- * it should be dropped in the future since there's no reason to not output the wiki name systematically (usually
- * we don't want to print it but only if it's the same as the current wiki).
- *
+ * Generate a string representation of an entity reference but without the wiki reference name specified (eg
+ * "space.page" for a document reference). This is an implementation use for backward compatibility only and it should
+ * be dropped in the future since there's no reason to not output the wiki name systematically (usually we don't want to
+ * print it but only if it's the same as the current wiki).
+ * 
  * @version $Id$
  * @since 2.2M1
  * @deprecated {@link DefaultStringEntityReferenceSerializer} should be used instead
  */
+@Deprecated
 @Component("local")
 public class LocalStringEntityReferenceSerializer extends DefaultStringEntityReferenceSerializer
 {
     /**
      * {@inheritDoc}
-     * @see DefaultStringEntityReferenceSerializer#serializeEntityReference(EntityReference , StringBuilder, boolean)
+     * 
+     * @see DefaultStringEntityReferenceSerializer#serializeEntityReference
      */
     @Override
-    protected void serializeEntityReference(EntityReference currentReference, StringBuilder representation, 
+    protected void serializeEntityReference(EntityReference currentReference, StringBuilder representation,
         boolean isLastReference, Object... parameters)
     {
         if (currentReference.getType() != EntityType.WIKI) {

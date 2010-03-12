@@ -153,6 +153,7 @@ public abstract class BaseElement implements ElementInterface, Serializable
             EntityReference relativeReference = this.relativeEntityReferenceResolver.resolve(name, EntityType.DOCUMENT);
             this.reference.getLastSpaceReference().setName(relativeReference.extractReference(EntityType.SPACE).getName());
             this.reference.setName(relativeReference.extractReference(EntityType.DOCUMENT).getName());
+            this.name = null;
         } else {
             this.name = name;
         }
@@ -191,6 +192,7 @@ public abstract class BaseElement implements ElementInterface, Serializable
 
             if (reference != null) {
                 reference.setWikiReference(new WikiReference(wiki));
+                setDocumentReference(reference);
             } else {
                 this.reference = new DocumentReference(wiki, "Main", "WebHome");
 

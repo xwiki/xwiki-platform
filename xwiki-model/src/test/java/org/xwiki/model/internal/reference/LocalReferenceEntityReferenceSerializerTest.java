@@ -23,40 +23,46 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.xwiki.model.EntityType;
+import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
-import org.xwiki.model.reference.EntityReferenceResolver;
 import org.xwiki.model.reference.EntityReferenceSerializer;
+import org.xwiki.model.reference.SpaceReference;
+import org.xwiki.model.reference.WikiReference;
 
 /**
- * Unit tests for {@link LocalStringEntityReferenceSerializer}.
- *
- * @version $Id$
- * @since 2.2M1
+ * Unit tests for {@link LocalReferenceEntityReferenceSerializer}.
+ * 
+ * @version $Id: LocalStringEntityReferenceSerializerTest.java 26372 2010-01-25 15:49:59Z lucaa $
  */
-public class LocalStringEntityReferenceSerializerTest
+public class LocalReferenceEntityReferenceSerializerTest
 {
-    private EntityReferenceSerializer<String> serializer;
-
-    private EntityReferenceResolver<String> resolver;
+    private EntityReferenceSerializer<EntityReference> serializer;
 
     @Before
     public void setUp()
     {
-        this.serializer = new LocalStringEntityReferenceSerializer();
-        this.resolver = new DefaultStringEntityReferenceResolver();
+        this.serializer = new LocalReferenceEntityReferenceSerializer();
     }
 
     @Test
     public void testSerializeDocumentReference() throws Exception
     {
-        EntityReference reference = resolver.resolve("wiki:space.page", EntityType.DOCUMENT);
-        Assert.assertEquals("space.page", serializer.serialize(reference));
+        EntityReference reference = this.serializer.serialize(new DocumentReference("wiki", "space", "page"));
+
+        Assert.assertEquals(EntityType.DOCUMENT, reference.getType());
+        Assert.assertEquals("page", reference.getName());
+        Assert.assertEquals(EntityType.SPACE, reference.getParent().getType());
+        Assert.assertEquals("space", reference.getParent().getName());
+        Assert.assertNull(reference.getParent().getParent());
     }
-    
+
     @Test
     public void testSerializeSpaceReferenceWithChild()
     {
-        EntityReference reference = resolver.resolve("wiki:space.page", EntityType.DOCUMENT);
-        Assert.assertEquals("space", serializer.serialize(reference.getParent()));
+        EntityReference reference = this.serializer.serialize(new SpaceReference("space", new WikiReference("wiki")));
+
+        Assert.assertEquals(EntityType.SPACE, reference.getType());
+        Assert.assertEquals("space", reference.getName());
+        Assert.assertNull(reference.getParent());
     }
 }

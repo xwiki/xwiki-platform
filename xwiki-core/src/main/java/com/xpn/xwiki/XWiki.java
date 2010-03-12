@@ -290,8 +290,6 @@ public class XWiki implements XWikiDocChangeNotificationInterface
     private List<String> configuredSyntaxes;
 
     /**
-<<<<<<< .working
-=======
      * Used to convert a proper Document Reference to string (standard form).
      */
     private EntityReferenceSerializer<String> defaultEntityReferenceSerializer =
@@ -307,7 +305,6 @@ public class XWiki implements XWikiDocChangeNotificationInterface
         Utils.getComponent(EntityReferenceSerializer.class, "local/reference");
 
     /**
->>>>>>> .merge-right.r27612
      * Used to resolve a string into a proper Document Reference using the current document's reference to fill the
      * blanks, except for the page name for which the default page name is used instead.
      */

@@ -159,8 +159,15 @@ public class DefaultWikiMacro implements WikiMacro
         Map<String, ParameterDescriptor> parameterDescriptors = getDescriptor().getParameterDescriptorMap();
         for (String parameterName : parameterDescriptors.keySet()) {
             ParameterDescriptor parameterDescriptor = parameterDescriptors.get(parameterName);
-            if (parameterDescriptor.isMandatory() && (null == parameters.get(parameterName))) {
+            Object parameterValue = parameters.get(parameterName);
+            if (parameterDescriptor.isMandatory() && (null == parameterValue)) {
                 throw new MacroParameterException(String.format("Parameter [%s] is mandatory", parameterName));
+            }
+            
+            // Set default parameter value if applicable.
+            Object parameterDefaultValue = parameterDescriptor.getDefaultValue();
+            if (parameterValue == null && parameterDefaultValue != null) {
+                parameters.set(parameterName, parameterDefaultValue);
             }
         }
 

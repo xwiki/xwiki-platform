@@ -19,16 +19,26 @@
  */
 package org.xwiki.rendering.internal.macro.wikibridge;
 
+import java.io.StringReader;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Properties;
+
+import org.apache.velocity.VelocityContext;
 import org.jmock.Expectations;
 import org.jmock.Mockery;
-import org.junit.*;
+import org.junit.Assert;
+import org.junit.Before;
 import org.xwiki.bridge.DocumentAccessBridge;
-import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.component.descriptor.DefaultComponentDescriptor;
 import org.xwiki.context.Execution;
+import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.rendering.converter.Converter;
 import org.xwiki.rendering.macro.MacroId;
 import org.xwiki.rendering.macro.descriptor.DefaultContentDescriptor;
+import org.xwiki.rendering.macro.script.ScriptMockSetup;
 import org.xwiki.rendering.macro.wikibridge.WikiMacroDescriptor;
 import org.xwiki.rendering.macro.wikibridge.WikiMacroManager;
 import org.xwiki.rendering.macro.wikibridge.WikiMacroParameterDescriptor;
@@ -36,11 +46,8 @@ import org.xwiki.rendering.macro.wikibridge.WikiMacroVisibility;
 import org.xwiki.rendering.renderer.printer.DefaultWikiPrinter;
 import org.xwiki.rendering.syntax.Syntax;
 import org.xwiki.test.AbstractComponentTestCase;
-
-import java.io.StringReader;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
+import org.xwiki.velocity.VelocityEngine;
+import org.xwiki.velocity.VelocityManager;
 
 /**
  * Unit tests for {@link DefaultWikiMacro}.
@@ -50,10 +57,14 @@ import java.util.List;
  */
 public class DefaultWikiMacroTest extends AbstractComponentTestCase
 {
-    private Mockery mockery = new Mockery();
+    /**
+     * Used for mocking various interfaces.
+     */
+    private Mockery mockery;
 
-    private DocumentAccessBridge mockDocumentAccessBridge;
-
+    /**
+     * Dummy document reference of the document which contains the wiki macro.
+     */
     private DocumentReference wikiMacroDocumentReference;
 
     /**
@@ -66,33 +77,32 @@ public class DefaultWikiMacroTest extends AbstractComponentTestCase
     {
         super.setUp();
 
-        // Document Access Bridge Mock
-        this.mockDocumentAccessBridge = mockery.mock(DocumentAccessBridge.class);
-        DefaultComponentDescriptor<DocumentAccessBridge> descriptorDAB =
-            new DefaultComponentDescriptor<DocumentAccessBridge>();
-        descriptorDAB.setRole(DocumentAccessBridge.class);
-        getComponentManager().registerComponent(descriptorDAB, this.mockDocumentAccessBridge);
-
-        this.wikiMacroDocumentReference = new DocumentReference("wiki", "space", "macroPage");
-
-        mockery.checking(new Expectations() {{
-            allowing(mockDocumentAccessBridge).getCurrentWiki(); will(returnValue("wiki"));
-            allowing(mockDocumentAccessBridge).getCurrentUser(); will(returnValue("dummy"));
-            allowing(mockDocumentAccessBridge).hasProgrammingRights(); will(returnValue(true));
-
-            // This is the document containing the wiki macro that will be put in the context available in the macro
-            // Since we're not testing it here, it can be null.
-            allowing(mockDocumentAccessBridge).getDocument(wikiMacroDocumentReference); will(returnValue(null));
-        }});
-
+        // Script setup.
+        ScriptMockSetup scriptMockSetup = new ScriptMockSetup(getComponentManager());        
+        final DocumentAccessBridge mockDocBridge = scriptMockSetup.bridge;        
+        this.mockery = scriptMockSetup.mockery;                
+        
+        this.wikiMacroDocumentReference = new DocumentReference("wiki", "space", "macroPage");                
         this.wikiMacroManager = getComponentManager().lookup(WikiMacroManager.class);
-
+        
         // Make sure the old XWiki Context is set up in the Execution Context since it's used in
         // DefaultWikiMacro.execute().
         Execution execution = getComponentManager().lookup(Execution.class);
-        execution.getContext().setProperty("xwikicontext", new HashMap<String, Object>());
+        execution.getContext().setProperty("xwikicontext", new HashMap<String, Object>());                
+        
+        mockery.checking(new Expectations() {{
+            allowing(mockDocBridge).getCurrentWiki(); will(returnValue("wiki"));
+            allowing(mockDocBridge).getCurrentUser(); will(returnValue("dummy"));
+
+            // This is the document containing the wiki macro that will be put in the context available in the macro
+            // Since we're not testing it here, it can be null.
+            allowing(mockDocBridge).getDocument(wikiMacroDocumentReference); will(returnValue(null));
+        }});                        
     }
 
+    /**
+     * Test normal wiki macro execution.
+     */
     @org.junit.Test
     public void testExecute() throws Exception
     {
@@ -127,13 +137,67 @@ public class DefaultWikiMacroTest extends AbstractComponentTestCase
 
         // Note: We're using XHTML as the output syntax just to make it easy for asserting.
         Assert.assertEquals("<p>Hello This is <strong>bold</strong></p>", printer.toString());
-    }
+    }    
+    
+    /**
+     * Test default parameter value injection.
+     */
+    @SuppressWarnings("unchecked")
+    @org.junit.Test
+    public void testDefaultParameterValues() throws Exception
+    {                
+        // Velocity Manager mock.
+        final VelocityManager mockVelocityManager = mockery.mock(VelocityManager.class);
+        DefaultComponentDescriptor<VelocityManager> descriptorVM =
+            new DefaultComponentDescriptor<VelocityManager>();
+        descriptorVM.setRole(VelocityManager.class);
+        getComponentManager().registerComponent(descriptorVM, mockVelocityManager);
+        
+        // Initialize velocity engine.
+        final VelocityEngine vEngine = getComponentManager().lookup(VelocityEngine.class);
+        Properties properties = new Properties();
+        properties.setProperty("resource.loader", "file");
+        vEngine.initialize(properties);
+        
+        // Hack into velocity context.
+        Execution execution = getComponentManager().lookup(Execution.class);
+        Map xwikiContext = (Map) execution.getContext().getProperty("xwikicontext");
+        final VelocityContext vContext = new VelocityContext();
+        vContext.put("xcontext", xwikiContext);
+        
+        this.mockery.checking(new Expectations() {{
+            oneOf(mockVelocityManager).getVelocityContext();
+            will(returnValue(vContext));
+            oneOf(mockVelocityManager).getVelocityEngine();
+            will(returnValue(vEngine));
+        }});                
+        
+        List<WikiMacroParameterDescriptor> parameterDescriptors = Arrays.asList(
+            new WikiMacroParameterDescriptor("param1", "This is param1", false, "default_value"));
+        
+        registerWikiMacro("wikimacro1", "{{velocity}}$xcontext.macro.params.param1{{/velocity}}", 
+            parameterDescriptors);
+        
+        Converter converter = getComponentManager().lookup(Converter.class);
 
+        DefaultWikiPrinter printer = new DefaultWikiPrinter();
+        converter.convert(new StringReader("{{wikimacro1/}}"), Syntax.XWIKI_2_0, Syntax.XHTML_1_0, printer);
+
+        // Note: We're using XHTML as the output syntax just to make it easy for asserting.
+        Assert.assertEquals("<p>default_value</p>", printer.toString());
+    }
+    
     private void registerWikiMacro(String macroId, String macroContent) throws Exception
     {
         List<WikiMacroParameterDescriptor> parameterDescriptors = Arrays.asList(
             new WikiMacroParameterDescriptor("param1", "This is param1", true),
             new WikiMacroParameterDescriptor("param2", "This is param2", true));
+        registerWikiMacro(macroId, macroContent, parameterDescriptors);
+    }
+    
+    private void registerWikiMacro(String macroId, String macroContent,
+        List<WikiMacroParameterDescriptor> parameterDescriptors) throws Exception
+    {        
         WikiMacroDescriptor descriptor = new WikiMacroDescriptor(new MacroId(macroId), "Wiki Macro", "Description", "Test",
             WikiMacroVisibility.GLOBAL, new DefaultContentDescriptor(false), parameterDescriptors);
 

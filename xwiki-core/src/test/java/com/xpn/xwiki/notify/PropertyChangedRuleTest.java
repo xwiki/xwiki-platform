@@ -29,6 +29,7 @@ import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.objects.classes.BaseClass;
 import com.xpn.xwiki.test.AbstractBridgedXWikiComponentTestCase;
+import org.xwiki.model.reference.DocumentReference;
 
 /**
  * Tests the {@link PropertyChangedRule} in the notification mechanism. <br />
@@ -47,11 +48,15 @@ public class PropertyChangedRuleTest extends AbstractBridgedXWikiComponentTestCa
 
     private String testClassName = "Test.TestClass";
 
+    private DocumentReference testClassReference = new DocumentReference("xwiki", "Test", "TestClass");
+
     private BaseClass testClass;
 
     private BaseClass otherClass;
 
     private String otherClassName = "Test.OtherClass";
+
+    private DocumentReference testOtherClassReference = new DocumentReference("xwiki", "Test", "OtherClass");
 
     private String testPropertyName = "field";
 
@@ -73,9 +78,9 @@ public class PropertyChangedRuleTest extends AbstractBridgedXWikiComponentTestCa
         this.context = new XWikiContext();
 
         this.mockXWiki = mock(XWiki.class);
-        this.mockXWiki.stubs().method("getClass").with(new IsEqual(this.testClassName), new IsEqual(this.context))
+        this.mockXWiki.stubs().method("getXClass").with(new IsEqual(testClassReference), new IsEqual(this.context))
             .will(returnValue(this.testClass));
-        this.mockXWiki.stubs().method("getClass").with(new IsEqual(this.otherClassName), new IsEqual(this.context))
+        this.mockXWiki.stubs().method("getXClass").with(new IsEqual(testOtherClassReference), new IsEqual(this.context))
             .will(returnValue(this.otherClass));
 
         this.context.setWiki((XWiki) this.mockXWiki.proxy());

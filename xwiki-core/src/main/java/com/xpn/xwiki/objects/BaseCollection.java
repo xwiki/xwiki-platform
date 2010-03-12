@@ -36,6 +36,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.web.Utils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
@@ -50,8 +51,12 @@ import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.objects.classes.BaseClass;
 import com.xpn.xwiki.objects.classes.PropertyClass;
+import org.xwiki.context.Execution;
+import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
+import org.xwiki.model.reference.EntityReference;
+import org.xwiki.model.reference.EntityReferenceResolver;
 import org.xwiki.model.reference.EntityReferenceSerializer;
 
 /**
@@ -75,8 +80,19 @@ public abstract class BaseCollection extends BaseElement implements ObjectInterf
      *       XClass is defined.</li>
      *   <li>If this BaseCollection instance represents an XClass then it's not used.</li>
      * </ul>
+     *
+     * Note that we're saving the XClass reference as a relative reference instead of an absolute one. This is because
+     * We want the ability (for example) to create an XObject relative to the current space or wiki so that a copy of
+     * that XObject would retain that relativity. This is for example useful when copying a Wiki into another Wiki
+     * so that the copied XObject have a XClassReference pointing in the new wiki.
      */
-    protected DocumentReference xClassReference;
+    private EntityReference xClassReference;
+
+    /**
+     * Cache the XClass reference resolved as an absolute reference for improved performance (so that we don't have
+     * to resolve the relative reference every time getXClassReference() is called.
+     */
+    private DocumentReference xClassReferenceCache;
 
     /**
      * List of properties (eg XClass properties, XObject properties, etc).
@@ -96,18 +112,24 @@ public abstract class BaseCollection extends BaseElement implements ObjectInterf
     protected int number;
 
     /**
+     * Used to resolve XClass references in the way they are stored externally (database, xml, etc), ie relative or
+     * absolute.
+     */
+    private EntityReferenceResolver<String> relativeEntityReferenceResolver = Utils.getComponent(
+        EntityReferenceResolver.class, "relative");
+
+    /**
      * Used to convert a proper Class Reference to a string but without the wiki name.
      */
     private EntityReferenceSerializer<String> localEntityReferenceSerializer =
         Utils.getComponent(EntityReferenceSerializer.class, "local");
 
     /**
-     * Used to resolve a string into a proper Class Reference using the current document's reference to fill the
-     * blanks, except for the page name for which the default page name is used instead.
+     * Used to normalize references.
      */
-    private DocumentReferenceResolver currentMixedDocumentReferenceResolver =
-        Utils.getComponent(DocumentReferenceResolver.class, "currentmixed");
-
+    private DocumentReferenceResolver<EntityReference> currentReferenceDocumentReferenceResolver = Utils.getComponent(
+        DocumentReferenceResolver.class, "current/reference");
+    
     public int getId()
     {
         return hashCode();
@@ -148,7 +170,22 @@ public abstract class BaseCollection extends BaseElement implements ObjectInterf
      */
     public DocumentReference getXClassReference()
     {
-        return this.xClassReference;
+        // Ensure we always return an absolute references since we always want well-constructed to be used from outside
+        // this class.
+        if (this.xClassReferenceCache == null && getRelativeXClassReference() != null) {
+            this.xClassReferenceCache = resolveReference(getRelativeXClassReference(),
+                this.currentReferenceDocumentReferenceResolver, getDocumentReference());
+        }
+
+        return this.xClassReferenceCache;
+    }
+
+    /**
+     * @since 2.2.3
+     */
+    private EntityReference getRelativeXClassReference()
+    {
+        return this.xClassReference;        
     }
 
     /**
@@ -169,28 +206,29 @@ public abstract class BaseCollection extends BaseElement implements ObjectInterf
     }
 
     /**
-     * @since 2.2M2
+     * @since 2.2.3
      */
-    public void setXClassReference(DocumentReference xClassReference)
+    public void setXClassReference(EntityReference xClassReference)
     {
         this.xClassReference = xClassReference;
+        this.xClassReferenceCache = null;
     }
 
     /**
      * Note that this method cannot be removed for now since it's used by Hibernate for loading an XObject.
      *
-     * @deprecated since 2.2M2 use {@link #setXClassReference(DocumentReference)} ()} instead
+     * @deprecated since 2.2.3 use {@link #setXClassReference(EntityReference)} ()} instead
      */
     @Deprecated
     public void setClassName(String name)
     {
-        DocumentReference xClassReference = null;
+        EntityReference xClassReference = null;
         if (!StringUtils.isEmpty(name)) {
             // Handle backward compatibility: In the past, for statistics objects we used to use a special class name
             // of "internal". We now check for a null Class Reference instead wherever we were previously checking for
             // "internal".
             if (!"internal".equals(name)) {
-                xClassReference = this.currentMixedDocumentReferenceResolver.resolve(name);
+                xClassReference = this.relativeEntityReferenceResolver.resolve(name, EntityType.DOCUMENT);
             }
         }
         setXClassReference(xClassReference);
@@ -610,7 +648,7 @@ public abstract class BaseCollection extends BaseElement implements ObjectInterf
     public Object clone()
     {
         BaseCollection collection = (BaseCollection) super.clone();
-        collection.setXClassReference(getXClassReference());
+        collection.setXClassReference(getRelativeXClassReference());
         collection.setNumber(getNumber());
         Map fields = getFields();
         Map cfields = new HashMap();
@@ -765,5 +803,69 @@ public abstract class BaseCollection extends BaseElement implements ObjectInterf
         map.put("id", getId());
 
         return map;
+    }
+
+    /**
+     * {@inheritDoc}
+     * @see BaseElement#setDocumentReference(org.xwiki.model.reference.DocumentReference) 
+     * @since 2.2.3
+     */
+    @Override
+    public void setDocumentReference(DocumentReference reference)
+    {
+        super.setDocumentReference(reference);
+
+        // We force to refresh the XClass reference so that next time it's retrieved again it'll be resolved against
+        // the new document reference.
+        this.xClassReferenceCache = null;
+    }
+
+    /**
+     * {@inheritDoc}
+     * @see BaseElement#setWiki(String)
+     * @since 2.2.3
+     */
+    @Override
+    public void setWiki(String wiki)
+    {
+        super.setWiki(wiki);
+
+        // We force to refresh the XClass reference so that next time it's retrieved again it'll be resolved against
+        // the new document reference.
+        this.xClassReferenceCache = null;
+    }
+
+    /**
+     * {@inheritDoc}
+     * @see BaseElement#setName(String)
+     * @since 2.2.3
+     */
+    @Override
+    public void setName(String name)
+    {
+        super.setName(name);
+
+        // We force to refresh the XClass reference so that next time it's retrieved again it'll be resolved against
+        // the new document reference.
+        this.xClassReferenceCache = null;
+    }
+
+    private <T> DocumentReference resolveReference(T referenceToResolve, DocumentReferenceResolver<T> resolver,
+        DocumentReference defaultReference)
+    {
+        XWikiContext xcontext =
+            (XWikiContext) Utils.getComponent(Execution.class).getContext().getProperty("xwikicontext");
+
+        String originalWikiName = xcontext.getDatabase();
+        XWikiDocument originalCurentDocument = xcontext.getDoc();
+        try {
+            xcontext.setDatabase(defaultReference.getWikiReference().getName());
+            xcontext.setDoc(new XWikiDocument(defaultReference));
+
+            return resolver.resolve(referenceToResolve);
+        } finally {
+            xcontext.setDoc(originalCurentDocument);
+            xcontext.setDatabase(originalWikiName);
+        }
     }
 }

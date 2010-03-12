@@ -93,6 +93,7 @@ import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
+import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.model.reference.EntityReferenceValueProvider;
 import org.xwiki.model.reference.SpaceReference;
@@ -297,11 +298,14 @@ public class XWiki implements XWikiDocChangeNotificationInterface
     private EntityReferenceSerializer<String> defaultEntityReferenceSerializer =
         Utils.getComponent(EntityReferenceSerializer.class);
 
-    private EntityReferenceSerializer<String> localEntityReferenceSerializer =
+    private EntityReferenceSerializer<String> localStringEntityReferenceSerializer =
         Utils.getComponent(EntityReferenceSerializer.class, "local");
 
     private EntityReferenceValueProvider defaultEntityReferenceValueProvider =
         Utils.getComponent(EntityReferenceValueProvider.class);
+
+    private EntityReferenceSerializer<EntityReference> localReferenceEntityReferenceSerializer =
+        Utils.getComponent(EntityReferenceSerializer.class, "local/reference");
 
     /**
      * Used to resolve a string into a proper Document Reference using the current document's reference to fill the
@@ -1509,7 +1513,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface
     @Deprecated
     public String getDocumentNameFromPath(String path, XWikiContext context)
     {
-        return this.localEntityReferenceSerializer.serialize(getDocumentReferenceFromPath(path, context));
+        return this.localStringEntityReferenceSerializer.serialize(getDocumentReferenceFromPath(path, context));
     }
 
     /**
@@ -3803,7 +3807,8 @@ public class XWiki implements XWikiDocChangeNotificationInterface
         XWikiDocument groupDoc = getDocument(groupName, context);
 
         BaseObject memberObject = (BaseObject) groupClass.newObject(context);
-        memberObject.setXClassReference(groupClass.getDocumentReference());
+        memberObject.setXClassReference(
+            this.localReferenceEntityReferenceSerializer.serialize(groupClass.getDocumentReference()));
         memberObject.setDocumentReference(groupDoc.getDocumentReference());
         memberObject.setStringValue("member", userName);
         groupDoc.addXObject(groupClass.getDocumentReference(), memberObject);
@@ -5071,7 +5076,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface
     @Deprecated
     public String getDocumentName(XWikiRequest request, XWikiContext context)
     {
-        return this.localEntityReferenceSerializer.serialize(getDocumentReference(request, context));
+        return this.localStringEntityReferenceSerializer.serialize(getDocumentReference(request, context));
     }
 
     /**

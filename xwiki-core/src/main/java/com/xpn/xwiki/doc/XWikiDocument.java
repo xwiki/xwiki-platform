@@ -25,6 +25,7 @@ import java.io.InputStream;
 import java.io.StringReader;
 import java.io.StringWriter;
 import java.lang.ref.SoftReference;
+import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
 import java.net.URL;
 import java.security.MessageDigest;
@@ -43,7 +44,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
-import java.util.UUID;
 import java.util.Vector;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -348,6 +348,16 @@ public class XWikiDocument implements DocumentModelBridge
 
     /**
      * Used to resolve a string into a proper Document Reference using the current document's reference to fill the
+     * blanks.
+     */
+    private DocumentReferenceResolver<String> explicitDocumentReferenceResolver = Utils.getComponent(
+        DocumentReferenceResolver.class, "explicit");
+
+    private EntityReferenceResolver<String> xClassEntityReferenceResolver = Utils.getComponent(
+        EntityReferenceResolver.class, "xclass");
+
+    /**
+     * Used to resolve a string into a proper Document Reference using the current document's reference to fill the
      * blanks, except for the page name for which the default page name is used instead and for the wiki name for which
      * the current wiki is used instead of the current document reference's wiki.
      */
@@ -359,6 +369,12 @@ public class XWikiDocument implements DocumentModelBridge
      */
     private DocumentReferenceResolver<EntityReference> currentReferenceDocumentReferenceResolver = Utils.getComponent(
         DocumentReferenceResolver.class, "current/reference");
+
+    /**
+     * Used to normalize references.
+     */
+    private DocumentReferenceResolver<EntityReference> explicitReferenceDocumentReferenceResolver = Utils.getComponent(
+        DocumentReferenceResolver.class, "explicit/reference");
 
     /**
      * Used to resolve parent references in the way they are stored externally (database, xml, etc), ie relative or
@@ -463,9 +479,7 @@ public class XWikiDocument implements DocumentModelBridge
 
         DocumentReference reference;
         if (contextReference != null) {
-            reference =
-                    resolveReference(name, this.currentDocumentReferenceResolver,
-                        this.currentReferenceDocumentReferenceResolver.resolve(contextReference));
+            reference = this.currentDocumentReferenceResolver.resolve(name, contextReference);
             // Replace the resolved wiki by the passed wiki if not empty/null
             if (!StringUtils.isEmpty(wiki)) {
                 reference.setWikiReference(new WikiReference(wiki));
@@ -644,8 +658,8 @@ public class XWikiDocument implements DocumentModelBridge
         // Ensure we always return absolute document references for the parent since we always want well-constructed
         // references and since we store the parent reference as relative internally.
         if (this.parentReferenceCache == null && getRelativeParentReference() != null) {
-            this.parentReferenceCache = resolveReference(getRelativeParentReference(),
-                this.currentReferenceDocumentReferenceResolver, getDocumentReference());
+            this.parentReferenceCache = this.explicitReferenceDocumentReferenceResolver.resolve(
+                getRelativeParentReference(), getDocumentReference());
         }
 
         return this.parentReferenceCache;
@@ -1837,18 +1851,18 @@ public class XWikiDocument implements DocumentModelBridge
     }
 
     /**
-     * @since 2.2M1
+     * @since 2.2.3
      */
-    public int createXObject(DocumentReference classReference, XWikiContext context) throws XWikiException
+    public int createXObject(EntityReference classReference, XWikiContext context) throws XWikiException
     {
-        String className = this.compactWikiEntityReferenceSerializer.serialize(classReference);
-        BaseObject object = BaseClass.newCustomClassInstance(className, context);
+        DocumentReference absoluteClassReference = resolveClassReference(classReference);
+        BaseObject object = BaseClass.newCustomClassInstance(absoluteClassReference, context);
         object.setDocumentReference(getDocumentReference());
         object.setXClassReference(classReference);
-        List<BaseObject> objects = getXObjects(classReference);
+        List<BaseObject> objects = getXObjects(absoluteClassReference);
         if (objects == null) {
             objects = new ArrayList<BaseObject>();
-            setXObjects(classReference, objects);
+            setXObjects(absoluteClassReference, objects);
         }
         objects.add(object);
         int nb = objects.size() - 1;
@@ -1858,12 +1872,13 @@ public class XWikiDocument implements DocumentModelBridge
     }
 
     /**
-     * @deprecated since 2.2M1 use {@link #createXObject(DocumentReference, XWikiContext)} instead
+     * @deprecated since 2.2M1 use {@link #createXObject(EntityReference, XWikiContext)} instead
      */
     @Deprecated
     public int createNewObject(String className, XWikiContext context) throws XWikiException
     {
-        return createXObject(resolveClassReference(className), context);
+        return createXObject(this.xClassEntityReferenceResolver.resolve(className, EntityType.DOCUMENT,
+            getDocumentReference()), context);
     }
 
     /**
@@ -2145,20 +2160,25 @@ public class XWikiDocument implements DocumentModelBridge
     public void mergeXObjects(XWikiDocument templatedoc)
     {
         // TODO: look for each object if it already exist and add it if it doesn't
-        for (DocumentReference reference : templatedoc.getXObjects().keySet()) {
-            List<BaseObject> myObjects = getXObjects().get(reference);
+        for (Map.Entry<DocumentReference, List<BaseObject>> entry : templatedoc.getXObjects().entrySet()) {
+            List<BaseObject> myObjects = getXObjects().get(entry.getKey());
 
             if (myObjects == null) {
                 myObjects = new ArrayList<BaseObject>();
             }
-            for (BaseObject otherObject : templatedoc.getXObjects().get(reference)) {
-                if (otherObject != null) {
-                    BaseObject myObject = otherObject.duplicate();
-                    myObjects.add(myObject);
-                    myObject.setNumber(myObjects.size() - 1);
+
+            if (!entry.getValue().isEmpty()) {
+                DocumentReference newXClassReference = null;
+                for (BaseObject otherObject : entry.getValue()) {
+                    if (otherObject != null) {
+                        BaseObject myObject = otherObject.duplicate(getDocumentReference());
+                        myObjects.add(myObject);
+                        myObject.setNumber(myObjects.size() - 1);
+                        newXClassReference = myObject.getXClassReference();
+                    }
                 }
+                setXObjects(newXClassReference, myObjects);
             }
-            setXObjects(reference, myObjects);
         }
         setContentDirty(true);
     }
@@ -2181,7 +2201,7 @@ public class XWikiDocument implements DocumentModelBridge
     }
 
     /**
-     * @since 2.3M1
+     * @since 2.2.3
      */
     public void duplicateXObjects(XWikiDocument templatedoc)
     {
@@ -2199,19 +2219,23 @@ public class XWikiDocument implements DocumentModelBridge
             while (objects.size() < tobjects.size()) {
                 objects.add(null);
             }
-            for (int i = 0; i < tobjects.size(); i++) {
-                BaseObject otherObject = tobjects.get(i);
-                if (otherObject != null) {
-                    BaseObject myObject;
-                    if (keepsIdentity) {
-                        myObject = (BaseObject) otherObject.clone();
-                    } else {
-                        myObject = otherObject.duplicate();
+            if (!tobjects.isEmpty()) {
+                DocumentReference newXClassReference = null;
+                for (int i = 0; i < tobjects.size(); i++) {
+                    BaseObject otherObject = tobjects.get(i);
+                    if (otherObject != null) {
+                        BaseObject myObject;
+                        if (keepsIdentity) {
+                            myObject = (BaseObject) otherObject.clone();
+                        } else {
+                            myObject = otherObject.duplicate(getDocumentReference());
+                        }
+                        objects.set(i, myObject);
+                        newXClassReference = myObject.getXClassReference();
                     }
-                    objects.set(i, myObject);
                 }
+                setXObjects(newXClassReference, objects);
             }
-            setXObjects(entry.getKey(), objects);
         }
     }
 
@@ -3039,27 +3063,26 @@ public class XWikiDocument implements DocumentModelBridge
     @Override
     public Object clone()
     {
-        return cloneInternal(true);
+        return cloneInternal(getDocumentReference(), true);
     }
 
     /**
-     * Similar to {@link #clone()} but whereas a clone is an exact copy (with the same GUID), a duplicate keeps the
-     * same data but with a different identity.
+     * Duplicate this document and give it a new name.
      *
-     * @since 2.3M1
+     * @since 2.2.3
      */
-    public XWikiDocument duplicate()
+    public XWikiDocument duplicate(DocumentReference newDocumentReference)
     {
-        return cloneInternal(false);
+        return cloneInternal(newDocumentReference, false);
     }
 
-    private XWikiDocument cloneInternal(boolean keepsIdentity)
+    private XWikiDocument cloneInternal(DocumentReference newDocumentReference, boolean keepsIdentity)
     {
         XWikiDocument doc = null;
         try {
-            doc = getClass().newInstance();
+            Constructor constructor = getClass().getConstructor(DocumentReference.class);
+            doc = (XWikiDocument) constructor.newInstance(newDocumentReference);
 
-            doc.setDocumentReference(getDocumentReference());
             // use version field instead of getRCSVersion because it returns "1.1" if version==null.
             doc.version = this.version;
             doc.setDocumentArchive(getDocumentArchive());
@@ -4420,28 +4443,22 @@ public class XWikiDocument implements DocumentModelBridge
     }
 
     /**
-     * @since 2.2M2
+     * @since 2.2.3
      */
-    public void setProperty(DocumentReference classReference, String fieldName, BaseProperty value)
+    public void setProperty(EntityReference classReference, String fieldName, BaseProperty value)
     {
-        BaseObject bobject = getXObject(classReference);
-        if (bobject == null) {
-            bobject = new BaseObject();
-            addXObject(classReference, bobject);
-        }
-        bobject.setDocumentReference(getDocumentReference());
-        bobject.setXClassReference(classReference);
+        BaseObject bobject = prepareXObject(classReference);
         bobject.safeput(fieldName, value);
-        setContentDirty(true);
     }
 
     /**
-     * @deprecated since 2.2M2 use {@link #setProperty(DocumentReference, String, BaseProperty)} instead
+     * @deprecated since 2.2M2 use {@link #setProperty(EntityReference, String, BaseProperty)} instead
      */
     @Deprecated
     public void setProperty(String className, String fieldName, BaseProperty value)
     {
-        setProperty(resolveClassReference(className), fieldName, value);
+        setProperty(this.xClassEntityReferenceResolver.resolve(className, EntityType.DOCUMENT, getDocumentReference()),
+            fieldName, value);
     }
 
     /**
@@ -4551,28 +4568,22 @@ public class XWikiDocument implements DocumentModelBridge
     }
 
     /**
-     * @since 2.2M2
+     * @since 2.2.3
      */
-    public void setStringValue(DocumentReference classReference, String fieldName, String value)
+    public void setStringValue(EntityReference classReference, String fieldName, String value)
     {
-        BaseObject bobject = getXObject(classReference);
-        if (bobject == null) {
-            bobject = new BaseObject();
-            addXObject(classReference, bobject);
-        }
-        bobject.setDocumentReference(getDocumentReference());
-        bobject.setXClassReference(classReference);
+        BaseObject bobject = prepareXObject(classReference);
         bobject.setStringValue(fieldName, value);
-        setContentDirty(true);
     }
 
     /**
-     * @deprecated since 2.2M2 use {@link #setStringValue(DocumentReference, String, String)} instead
+     * @deprecated since 2.2M2 use {@link #setStringValue(EntityReference, String, String)} instead
      */
     @Deprecated
     public void setStringValue(String className, String fieldName, String value)
     {
-        setStringValue(resolveClassReference(className), fieldName, value);
+        setStringValue(this.xClassEntityReferenceResolver.resolve(className, EntityType.DOCUMENT,
+            getDocumentReference()), fieldName, value);
     }
 
     /**
@@ -4608,103 +4619,79 @@ public class XWikiDocument implements DocumentModelBridge
     }
 
     /**
-     * @since 2.2M2
+     * @since 2.2.3
      */
-    public void setStringListValue(DocumentReference classReference, String fieldName, List value)
+    public void setStringListValue(EntityReference classReference, String fieldName, List value)
     {
-        BaseObject bobject = getXObject(classReference);
-        if (bobject == null) {
-            bobject = new BaseObject();
-            addXObject(classReference, bobject);
-        }
-        bobject.setDocumentReference(getDocumentReference());
-        bobject.setXClassReference(classReference);
+        BaseObject bobject = prepareXObject(classReference);
         bobject.setStringListValue(fieldName, value);
-        setContentDirty(true);
     }
 
     /**
-     * @deprecated since 2.2M2 use {@link #setStringListValue(DocumentReference, String, List)} instead
+     * @deprecated since 2.2M2 use {@link #setStringListValue(EntityReference, String, List)} instead
      */
     @Deprecated
     public void setStringListValue(String className, String fieldName, List value)
     {
-        setStringListValue(resolveClassReference(className), fieldName, value);
+        setStringListValue(this.xClassEntityReferenceResolver.resolve(className, EntityType.DOCUMENT,
+            getDocumentReference()), fieldName, value);
     }
 
     /**
-     * @since 2.2M2
+     * @since 2.2.3
      */
-    public void setDBStringListValue(DocumentReference classReference, String fieldName, List value)
+    public void setDBStringListValue(EntityReference classReference, String fieldName, List value)
     {
-        BaseObject bobject = getXObject(classReference);
-        if (bobject == null) {
-            bobject = new BaseObject();
-            addXObject(classReference, bobject);
-        }
-        bobject.setDocumentReference(getDocumentReference());
-        bobject.setXClassReference(classReference);
+        BaseObject bobject = prepareXObject(classReference);
         bobject.setDBStringListValue(fieldName, value);
-        setContentDirty(true);
     }
 
     /**
-     * @deprecated since 2.2M2 use {@link #setDBStringListValue(DocumentReference, String, List)} instead
+     * @deprecated since 2.2M2 use {@link #setDBStringListValue(EntityReference, String, List)} instead
      */
     @Deprecated
     public void setDBStringListValue(String className, String fieldName, List value)
     {
-        setDBStringListValue(resolveClassReference(className), fieldName, value);
+        setDBStringListValue(this.xClassEntityReferenceResolver.resolve(className, EntityType.DOCUMENT,
+            getDocumentReference()), fieldName, value);
     }
 
     /**
-     * @since 2.2M2
+     * @since 2.2.3
      */
-    public void setLargeStringValue(DocumentReference classReference, String fieldName, String value)
+    public void setLargeStringValue(EntityReference classReference, String fieldName, String value)
     {
-        BaseObject bobject = getXObject(classReference);
-        if (bobject == null) {
-            bobject = new BaseObject();
-            addXObject(classReference, bobject);
-        }
-        bobject.setDocumentReference(getDocumentReference());
-        bobject.setXClassReference(classReference);
+        BaseObject bobject = prepareXObject(classReference);
         bobject.setLargeStringValue(fieldName, value);
-        setContentDirty(true);
     }
 
     /**
-     * @deprecated since 2.2M2 use {@link #setLargeStringValue(DocumentReference, String, String)} instead
+     * @deprecated since 2.2M2 use {@link #setLargeStringValue(EntityReference, String, String)} instead
      */
     @Deprecated
     public void setLargeStringValue(String className, String fieldName, String value)
     {
-        setLargeStringValue(resolveClassReference(className), fieldName, value);
+        setLargeStringValue(this.xClassEntityReferenceResolver.resolve(className, EntityType.DOCUMENT,
+            getDocumentReference()), fieldName, value);
     }
 
     /**
-     * @since 2.2M2
+     * @since 2.2.3
      */
-    public void setIntValue(DocumentReference classReference, String fieldName, int value)
+    public void setIntValue(EntityReference classReference, String fieldName, int value)
     {
-        BaseObject bobject = getXObject(classReference);
-        if (bobject == null) {
-            bobject = new BaseObject();
-            addXObject(classReference, bobject);
-        }
-        bobject.setDocumentReference(getDocumentReference());
-        bobject.setXClassReference(classReference);
+        BaseObject bobject = prepareXObject(classReference);
         bobject.setIntValue(fieldName, value);
-        setContentDirty(true);
     }
 
     /**
-     * @deprecated since 2.2M2 use {@link #setIntValue(DocumentReference, String, int)} instead
+     * @deprecated since 2.2M2 use {@link #setIntValue(EntityReference, String, int)} instead
      */
     @Deprecated
     public void setIntValue(String className, String fieldName, int value)
     {
-        setIntValue(resolveClassReference(className), fieldName, value);
+        setIntValue(this.xClassEntityReferenceResolver.resolve(className, EntityType.DOCUMENT, getDocumentReference()),
+            fieldName, value);
     }
 
     /**
@@ -5055,6 +5042,7 @@ public class XWikiDocument implements DocumentModelBridge
                 if (newObj != null) {
                     BaseObject originalObj = fromDoc.getXObject(newObj.getXClassReference(), newObj.getNumber());
                     if (originalObj == null) {
+                        // TODO: Refactor this so that getDiff() accepts null Object as input.
                         // Only consider added objects, the other case was treated above.
                         originalObj = new BaseObject();
                         originalObj.setXClassReference(newObj.getXClassReference());
@@ -5347,9 +5335,8 @@ public class XWikiDocument implements DocumentModelBridge
         loadAttachments(context);
         loadArchive(context);
 
-        XWikiDocument newdoc = duplicate();
+        XWikiDocument newdoc = duplicate(newDocumentReference);
         newdoc.setOriginalDocument(null);
-        newdoc.setDocumentReference(newDocumentReference);
         newdoc.setContentDirty(true);
         newdoc.getXClass().setDocumentReference(newDocumentReference);
 
@@ -5724,10 +5711,12 @@ public class XWikiDocument implements DocumentModelBridge
         form.setRequest((HttpServletRequest) context.getRequest());
         form.readRequest();
 
-        DocumentReference classReference = this.currentMixedDocumentReferenceResolver.resolve(form.getClassName());
+        EntityReference classReference = this.xClassEntityReferenceResolver.resolve(form.getClassName(),
+            EntityType.DOCUMENT, getDocumentReference());
         BaseObject object = newXObject(classReference, context);
         BaseClass baseclass = object.getXClass(context);
-        baseclass.fromMap(form.getObject(this.localEntityReferenceSerializer.serialize(classReference)), object);
+        baseclass.fromMap(form.getObject(this.localEntityReferenceSerializer.serialize(
+            resolveClassReference(classReference))), object);
 
         return object;
     }
@@ -5744,16 +5733,16 @@ public class XWikiDocument implements DocumentModelBridge
     /**
      * Adds an object from an new object creation form.
      * 
-     * @since 2.2M2
+     * @since 2.2.3
      */
-    public BaseObject addXObjectFromRequest(DocumentReference classReference, XWikiContext context)
+    public BaseObject addXObjectFromRequest(EntityReference classReference, XWikiContext context)
         throws XWikiException
     {
         return addXObjectFromRequest(classReference, "", 0, context);
     }
 
     /**
-     * @deprecated since 2.2M2 use {@link #addXObjectFromRequest(DocumentReference, XWikiContext)}
+     * @deprecated since 2.2M2 use {@link #addXObjectFromRequest(EntityReference, XWikiContext)}
      */
     @Deprecated
     public BaseObject addObjectFromRequest(String className, XWikiContext context) throws XWikiException
@@ -5864,21 +5853,22 @@ public class XWikiDocument implements DocumentModelBridge
     /**
      * Adds object from an new object creation form.
      * 
-     * @since 2.2M2
+     * @since 2.2.3
      */
-    public BaseObject addXObjectFromRequest(DocumentReference classReference, String prefix, int num,
+    public BaseObject addXObjectFromRequest(EntityReference classReference, String prefix, int num,
         XWikiContext context) throws XWikiException
     {
         BaseObject object = newXObject(classReference, context);
         BaseClass baseclass = object.getXClass(context);
-        String newPrefix = prefix + this.localEntityReferenceSerializer.serialize(classReference) + "_" + num;
+        String newPrefix = prefix + this.localEntityReferenceSerializer.serialize(
+            resolveClassReference(classReference)) + "_" + num;
         baseclass.fromMap(Util.getObject(context.getRequest(), newPrefix), object);
 
         return object;
     }
 
     /**
-     * @deprecated since 2.2M2 use {@link #addXObjectFromRequest(DocumentReference, String, int, XWikiContext)}
+     * @deprecated since 2.2M2 use {@link #addXObjectFromRequest(EntityReference, String, int, XWikiContext)}
      */
     @Deprecated
     public BaseObject addObjectFromRequest(String className, String prefix, int num, XWikiContext context)
@@ -5890,16 +5880,16 @@ public class XWikiDocument implements DocumentModelBridge
     /**
      * Adds an object from an new object creation form.
      * 
-     * @since 2.2M2
+     * @since 2.2.3
      */
-    public BaseObject updateXObjectFromRequest(DocumentReference classReference, XWikiContext context)
+    public BaseObject updateXObjectFromRequest(EntityReference classReference, XWikiContext context)
         throws XWikiException
     {
         return updateXObjectFromRequest(classReference, "", context);
     }
 
     /**
-     * @deprecated since 2.2M2 use {@link #updateXObjectFromRequest(DocumentReference, XWikiContext)}
+     * @deprecated since 2.2M2 use {@link #updateXObjectFromRequest(EntityReference, XWikiContext)}
      */
     @Deprecated
     public BaseObject updateObjectFromRequest(String className, XWikiContext context) throws XWikiException
@@ -5910,16 +5900,16 @@ public class XWikiDocument implements DocumentModelBridge
     /**
      * Adds an object from an new object creation form.
      * 
-     * @since 2.2M2
+     * @since 2.2.3
      */
-    public BaseObject updateXObjectFromRequest(DocumentReference classReference, String prefix, XWikiContext context)
+    public BaseObject updateXObjectFromRequest(EntityReference classReference, String prefix, XWikiContext context)
         throws XWikiException
     {
         return updateXObjectFromRequest(classReference, prefix, 0, context);
     }
 
     /**
-     * @deprecated since 2.2M2 use {@link #updateXObjectFromRequest(DocumentReference, String, XWikiContext)}
+     * @deprecated since 2.2M2 use {@link #updateXObjectFromRequest(EntityReference, String, XWikiContext)}
      */
     @Deprecated
     public BaseObject updateObjectFromRequest(String className, String prefix, XWikiContext context)
@@ -5931,54 +5921,56 @@ public class XWikiDocument implements DocumentModelBridge
     /**
      * Adds an object from an new object creation form.
      * 
-     * @since 2.2M2
+     * @since 2.2.3
      */
-    public BaseObject updateXObjectFromRequest(DocumentReference classReference, String prefix, int num,
+    public BaseObject updateXObjectFromRequest(EntityReference classReference, String prefix, int num,
         XWikiContext context) throws XWikiException
     {
+        DocumentReference absoluteClassReference = resolveClassReference(classReference);
         int nb;
-        BaseObject oldobject = getXObject(classReference, num);
+        BaseObject oldobject = getXObject(absoluteClassReference, num);
         if (oldobject == null) {
             nb = createXObject(classReference, context);
-            oldobject = getXObject(classReference, nb);
+            oldobject = getXObject(absoluteClassReference, nb);
         } else {
             nb = oldobject.getNumber();
         }
         BaseClass baseclass = oldobject.getXClass(context);
-        String newPrefix = prefix + this.localEntityReferenceSerializer.serialize(classReference) + "_" + nb;
+        String newPrefix = prefix + this.localEntityReferenceSerializer.serialize(absoluteClassReference) + "_" + nb;
         BaseObject newobject =
                 (BaseObject) baseclass.fromMap(Util.getObject(context.getRequest(), newPrefix), oldobject);
         newobject.setNumber(oldobject.getNumber());
         newobject.setGuid(oldobject.getGuid());
         newobject.setDocumentReference(getDocumentReference());
-        setXObject(classReference, nb, newobject);
+        setXObject(absoluteClassReference, nb, newobject);
 
         return newobject;
     }
 
     /**
-     * @deprecated since 2.2M2 use {@link #updateXObjectFromRequest(DocumentReference, String, int, XWikiContext)}
+     * @deprecated since 2.2M2 use {@link #updateXObjectFromRequest(EntityReference, String, int, XWikiContext)}
      */
     @Deprecated
     public BaseObject updateObjectFromRequest(String className, String prefix, int num, XWikiContext context)
         throws XWikiException
     {
-        return updateXObjectFromRequest(resolveClassReference(className), prefix, num, context);
+        return updateXObjectFromRequest(this.xClassEntityReferenceResolver.resolve(className, EntityType.DOCUMENT,
+            getDocumentReference()), prefix, num, context);
     }
 
     /**
      * Adds an object from an new object creation form.
      * 
-     * @since 2.2M2
+     * @since 2.2.3
      */
-    public List<BaseObject> updateXObjectsFromRequest(DocumentReference classReference, XWikiContext context)
+    public List<BaseObject> updateXObjectsFromRequest(EntityReference classReference, XWikiContext context)
         throws XWikiException
     {
         return updateXObjectsFromRequest(classReference, "", context);
     }
 
     /**
-     * @deprecated since 2.2M2 use {@link #updateXObjectsFromRequest(DocumentReference, XWikiContext)}
+     * @deprecated since 2.2M2 use {@link #updateXObjectsFromRequest(EntityReference, XWikiContext)}
      */
     @Deprecated
     public List<BaseObject> updateObjectsFromRequest(String className, XWikiContext context) throws XWikiException
@@ -5989,16 +5981,17 @@ public class XWikiDocument implements DocumentModelBridge
     /**
      * Adds multiple objects from an new objects creation form.
      * 
-     * @since 2.2M2
+     * @since 2.2.3
      */
-    public List<BaseObject> updateXObjectsFromRequest(DocumentReference classReference, String pref,
+    public List<BaseObject> updateXObjectsFromRequest(EntityReference classReference, String pref,
         XWikiContext context) throws XWikiException
     {
+        DocumentReference absoluteClassReference = resolveClassReference(classReference);
         Map map = context.getRequest().getParameterMap();
         List<Integer> objectsNumberDone = new ArrayList<Integer>();
         List<BaseObject> objects = new ArrayList<BaseObject>();
         Iterator it = map.keySet().iterator();
-        String start = pref + this.localEntityReferenceSerializer.serialize(classReference) + "_";
+        String start = pref + this.localEntityReferenceSerializer.serialize(absoluteClassReference) + "_";
 
         while (it.hasNext()) {
             String name = (String) it.next();
@@ -6017,13 +6010,14 @@ public class XWikiDocument implements DocumentModelBridge
     }
 
     /**
-     * @deprecated since 2.2M2 use {@link #updateXObjectsFromRequest(DocumentReference, String, XWikiContext)}
+     * @deprecated since 2.2M2 use {@link #updateXObjectsFromRequest(EntityReference, String, XWikiContext)}
      */
     @Deprecated
     public List<BaseObject> updateObjectsFromRequest(String className, String pref, XWikiContext context)
         throws XWikiException
     {
-        return updateXObjectsFromRequest(resolveClassReference(className), pref, context);
+        return updateXObjectsFromRequest(this.xClassEntityReferenceResolver.resolve(className, EntityType.DOCUMENT,
+            getDocumentReference()), pref, context);
     }
 
     public boolean isAdvancedContent()
@@ -6566,21 +6560,22 @@ public class XWikiDocument implements DocumentModelBridge
     }
 
     /**
-     * @since 2.2M2
+     * @since 2.2.3
      */
-    public BaseObject newXObject(DocumentReference classReference, XWikiContext context) throws XWikiException
+    public BaseObject newXObject(EntityReference classReference, XWikiContext context) throws XWikiException
     {
         int nb = createXObject(classReference, context);
-        return getXObject(classReference, nb);
+        return getXObject(resolveClassReference(classReference), nb);
     }
 
     /**
-     * @deprecated since 2.2M2 use {@link #newXObject(DocumentReference, XWikiContext)}
+     * @deprecated since 2.2M2 use {@link #newXObject(EntityReference, XWikiContext)}
      */
     @Deprecated
     public BaseObject newObject(String className, XWikiContext context) throws XWikiException
     {
-        return newXObject(resolveClassReference(className), context);
+        return newXObject(this.xClassEntityReferenceResolver.resolve(className, EntityType.DOCUMENT,
+            getDocumentReference()), context);
     }
 
     /**
@@ -7030,24 +7025,6 @@ public class XWikiDocument implements DocumentModelBridge
         return syntax;
     }
 
-    private <T> DocumentReference resolveReference(T referenceToResolve, DocumentReferenceResolver<T> resolver,
-        DocumentReference defaultReference)
-    {
-        XWikiContext xcontext = getXWikiContext();
-
-        String originalWikiName = xcontext.getDatabase();
-        XWikiDocument originalCurentDocument = xcontext.getDoc();
-        try {
-            xcontext.setDatabase(defaultReference.getWikiReference().getName());
-            xcontext.setDoc(new XWikiDocument(defaultReference));
-
-            return resolver.resolve(referenceToResolve);
-        } finally {
-            xcontext.setDoc(originalCurentDocument);
-            xcontext.setDatabase(originalWikiName);
-        }
-    }
-
     private String serializeReference(DocumentReference reference, EntityReferenceSerializer<String> serializer,
         DocumentReference defaultReference)
     {
@@ -7069,7 +7046,7 @@ public class XWikiDocument implements DocumentModelBridge
     /**
      * Backward-compatibility method to use in order to resolve a class reference passed as a String into a
      * DocumentReference proper.
-     * 
+     *
      * @return the resolved class reference but using this document's wiki if the passed String doesn't specify a wiki,
      *         the "XWiki" space if the passed String doesn't specify a space and this document's page if the passed
      *         String doesn't specify a page.
@@ -7079,7 +7056,18 @@ public class XWikiDocument implements DocumentModelBridge
         DocumentReference defaultReference =
                 new DocumentReference(getDocumentReference().getWikiReference().getName(), "XWiki",
                     getDocumentReference().getName());
-        return resolveReference(documentName, this.currentDocumentReferenceResolver, defaultReference);
+        return this.explicitDocumentReferenceResolver.resolve(documentName, defaultReference);
+    }
+
+    /**
+     * Transforms a XClass reference relative to this document into an absolute reference.
+     */
+    private DocumentReference resolveClassReference(EntityReference reference)
+    {
+        DocumentReference defaultReference =
+                new DocumentReference(getDocumentReference().getWikiReference().getName(), "XWiki",
+                    getDocumentReference().getName());
+        return this.explicitReferenceDocumentReferenceResolver.resolve(reference, defaultReference);
     }
 
     /**
@@ -7095,5 +7083,19 @@ public class XWikiDocument implements DocumentModelBridge
     private XWikiContext getXWikiContext()
     {
         return (XWikiContext) this.execution.getContext().getProperty("xwikicontext");
+    }
+
+    private BaseObject prepareXObject(EntityReference classReference)
+    {
+        DocumentReference absoluteClassReference = resolveClassReference(classReference);
+        BaseObject bobject = getXObject(absoluteClassReference);
+        if (bobject == null) {
+            bobject = new BaseObject();
+            addXObject(absoluteClassReference, bobject);
+            bobject.setXClassReference(classReference);
+        }
+        bobject.setDocumentReference(getDocumentReference());
+        setContentDirty(true);
+        return bobject;
     }
 }

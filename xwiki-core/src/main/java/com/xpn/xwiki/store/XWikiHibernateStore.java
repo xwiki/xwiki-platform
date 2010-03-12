@@ -54,8 +54,10 @@ import org.hibernate.mapping.PersistentClass;
 import org.hibernate.mapping.Property;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.Requirement;
+import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
+import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.model.reference.WikiReference;
@@ -718,8 +720,10 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
                 query.setText("name", doc.getFullName());
                 Iterator it = query.list().iterator();
 
-                DocumentReference groupsDocumentReference = new DocumentReference(context.getDatabase(), "XWiki",
-                    "XWikiGroups");
+                EntityReference localGroupEntityReference = new EntityReference("XWikiGroups", EntityType.DOCUMENT,
+                    new EntityReference("XWiki", EntityType.SPACE));
+                DocumentReference groupsDocumentReference = new DocumentReference(context.getDatabase(),
+                    localGroupEntityReference.getParent().getName(), localGroupEntityReference.getName());
 
                 boolean hasGroups = false;
                 while (it.hasNext()) {
@@ -749,7 +753,7 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
                     }
                     if (newobject != null) {
                         newobject.setId(object.getId());
-                        newobject.setXClassReference(object.getXClassReference());
+                        newobject.setClassName(object.getClassName());
                         newobject.setDocumentReference(object.getDocumentReference());
                         newobject.setNumber(object.getNumber());
                         newobject.setGuid(object.getGuid());
@@ -771,7 +775,7 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
                         String member = (String) result[1];
                         BaseObject obj = BaseClass.newCustomClassInstance("XWiki.XWikiGroups", context);
                         obj.setDocumentReference(doc.getDocumentReference());
-                        obj.setXClassReference(groupsDocumentReference);
+                        obj.setXClassReference(localGroupEntityReference);
                         obj.setNumber(number.intValue());
                         obj.setStringValue("member", member);
                         doc.setXObject(groupsDocumentReference, obj.getNumber(), obj);
@@ -1222,7 +1226,7 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
             if (!"".equals(bclass.getCustomClass())) {
                 BaseObject cobject = new BaseObject();
                 cobject.setName(object.getName());
-                cobject.setXClassReference(object.getXClassReference());
+                cobject.setClassName(object.getClassName());
                 cobject.setNumber(object.getNumber());
                 if (object instanceof BaseObject) {
                     cobject.setGuid(((BaseObject) object).getGuid());

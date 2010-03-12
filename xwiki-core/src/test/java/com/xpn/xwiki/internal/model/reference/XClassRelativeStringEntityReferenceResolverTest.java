@@ -22,6 +22,7 @@ package com.xpn.xwiki.internal.model.reference;
 import com.xpn.xwiki.test.AbstractBridgedXWikiComponentTestCase;
 import org.junit.*;
 import org.xwiki.model.EntityType;
+import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.EntityReferenceResolver;
 
@@ -50,5 +51,27 @@ public class XClassRelativeStringEntityReferenceResolverTest extends AbstractBri
         Assert.assertEquals("page", reference.extractReference(EntityType.DOCUMENT).getName());
         Assert.assertEquals("XWiki", reference.extractReference(EntityType.SPACE).getName());
         Assert.assertNull(reference.extractReference(EntityType.WIKI));
+    }
+
+    @Test
+    public void testResolveWhenExplicitParameterAndNoPageInStringRepresentation()
+    {
+        EntityReference reference = this.resolver.resolve("", EntityType.DOCUMENT,
+            new DocumentReference("dummy", "dummy", "page"));
+        Assert.assertEquals("page", reference.extractReference(EntityType.DOCUMENT).getName());
+        Assert.assertEquals("XWiki", reference.extractReference(EntityType.SPACE).getName());
+        Assert.assertNull(reference.extractReference(EntityType.WIKI));
+    }
+
+    @Test
+    public void testResolveWhenNoPageReferenceSpecified()
+    {
+        try {
+            this.resolver.resolve("", EntityType.DOCUMENT);
+            Assert.fail("Should have thrown an exception here");
+        } catch (IllegalArgumentException expected) {
+            Assert.assertEquals("A Reference to a page must be passed as a parameter when the string to resolve "
+                + "doesn't specify a page", expected.getMessage());
+        }
     }
 }

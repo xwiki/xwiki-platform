@@ -165,7 +165,7 @@ public class BaseObject extends BaseCollection implements ObjectInterface, Seria
      * Similar to {@link #clone()} but whereas a clone is an exact copy (with the same GUID), a duplicate keeps the
      * same data but with a different identity.
      *
-     * @since 2.3M1
+     * @since 2.2.3
      */
     public BaseObject duplicate()
     {

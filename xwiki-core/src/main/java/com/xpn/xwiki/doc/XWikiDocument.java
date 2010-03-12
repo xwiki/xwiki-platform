@@ -2200,7 +2200,7 @@ public class XWikiDocument implements DocumentModelBridge
     }
 
     /**
-     * @since 2.3M1
+     * @since 2.2.3
      */
     private void cloneXObjects(XWikiDocument templatedoc, boolean keepsIdentity)
     {

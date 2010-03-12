@@ -1310,7 +1310,6 @@
               **/web/XWikiServletRequest.java,
               **/web/StatusAction.java,
               **/web/PrepareEditForm.java,
-              **/web/UnknownAction.java,
               **/web/LoginErrorAction.java,
               **/web/XWikiServletResponseStub.java,
               **/web/EditBean.java,

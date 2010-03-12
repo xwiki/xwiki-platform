@@ -24,8 +24,21 @@ package com.xpn.xwiki.web;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 
-public class UnknownAction extends XWikiAction {
-
+/**
+ * Action used when the url given to struts is not recognised as a valid action.
+ * Forwards to the action specified in xwiki.cfg parameter:
+ * xwiki.unknownActionResponse
+ * or exception if xwiki.unknownActionResponse is not defined.
+ * 
+ * @version $Id$
+ */
+public class UnknownAction extends XWikiAction 
+{
+    /**
+     * {@inheritDoc}
+     * 
+     * @see XWikiAction#render(com.xpn.xwiki.XWikiContext)
+     */
     public String render(XWikiContext context) throws XWikiException {
         return context.getWiki().Param("xwiki.unknownActionResponse", "exception");
     }

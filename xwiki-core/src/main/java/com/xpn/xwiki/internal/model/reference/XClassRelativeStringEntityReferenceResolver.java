@@ -28,7 +28,8 @@ import org.xwiki.model.reference.EntityReference;
  * Resolve a String representing an Entity Reference into an {@link org.xwiki.model.reference.EntityReference} object.
  * The behavior is the one defined in
  * {@link org.xwiki.model.internal.reference.RelativeStringEntityReferenceResolver} except that it uses a space with
- * the "XWiki" value if no space is specified.
+ * the "XWiki" value if no space is specified and that an optional parameter can be passed to specify what page name
+ * to use if no page is specified in the passed string representation.
  *
  * @version $Id$
  * @since 2.2.3
@@ -47,8 +48,13 @@ public class XClassRelativeStringEntityReferenceResolver extends AbstractStringE
     @Override
     protected String getDefaultValue(EntityType type, Object... parameters)
     {
-        // Return null to signify to the generic algorithm that we don't want to generate references with default
-        // values, in order to obtain a relative reference.
+        if (type == EntityType.DOCUMENT) {
+            // This means that the user has not passed an optional page reference and we don't have a fallback, we
+            // raise an error.
+            throw new IllegalArgumentException("A Reference to a page must be passed as a parameter when the string "
+                + "to resolve doesn't specify a page");
+        }
+
         return null;
     }
 
@@ -60,7 +66,18 @@ public class XClassRelativeStringEntityReferenceResolver extends AbstractStringE
     public EntityReference resolve(String entityReferenceRepresentation, EntityType type,
         Object... parameters)
     {
-        // Note: We voluntarily ignore any passed parameter.
-        return super.resolve(entityReferenceRepresentation, type, new EntityReference("XWiki", EntityType.SPACE));
+        // We allow to pass a page reference in parameter. If the passed representation doesn't contain a page then the
+        // page from the parameter will be used.
+        EntityReference explicitReference = new EntityReference("XWiki", EntityType.SPACE);
+        if (parameters.length > 0 && (parameters[0] instanceof EntityReference)) {
+            EntityReference extractedPageReference =
+                ((EntityReference) parameters[0]).extractReference(EntityType.DOCUMENT);
+            if (extractedPageReference != null) {
+                explicitReference = new EntityReference(extractedPageReference.getName(), EntityType.DOCUMENT,
+                    explicitReference);
+            }
+        }
+
+        return super.resolve(entityReferenceRepresentation, type, explicitReference);
     }
 }

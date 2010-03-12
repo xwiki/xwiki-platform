@@ -20,53 +20,31 @@
 package com.xpn.xwiki.internal.model.reference;
 
 import org.xwiki.component.annotation.Component;
-import org.xwiki.component.annotation.Requirement;
 import org.xwiki.model.EntityType;
-import org.xwiki.model.ModelContext;
-import org.xwiki.model.internal.reference.DefaultStringEntityReferenceSerializer;
-import org.xwiki.model.reference.EntityReference;
 
 /**
- * Generate an entity reference string that doesn't contain the wiki reference part if the passed reference matches
- * the current wiki. The space reference and page references are always printed.
- *
+ * Generate an entity reference string that doesn't contain the wiki reference part if the passed reference matches the
+ * current wiki. The space reference and page references are always printed.
+ * 
  * @version $Id$
  * @since 2.2M1
  */
 @Component("compactwiki")
-public class CompactWikiStringEntityReferenceSerializer extends DefaultStringEntityReferenceSerializer
+public class CompactWikiStringEntityReferenceSerializer extends CompactStringEntityReferenceSerializer
 {
-    @Requirement
-    private ModelContext modelContext;
-
     /**
      * {@inheritDoc}
-     * @see DefaultStringEntityReferenceSerializer#serializeEntityReference(EntityReference, StringBuilder, boolean)
+     * 
+     * @see com.xpn.xwiki.internal.model.reference.CompactStringEntityReferenceSerializer#resolveDefaultValue(org.xwiki.model.EntityType,
+     *      java.lang.Object[])
      */
     @Override
-    protected void serializeEntityReference(EntityReference currentReference, StringBuilder representation, 
-        boolean isLastReference)
+    protected String resolveDefaultValue(EntityType type, Object... parameters)
     {
-        boolean shouldPrint = false;
+        if (type == EntityType.WIKI) {
+            return super.resolveDefaultValue(type, parameters);
+        }
 
-        EntityReference wikiReference = this.modelContext.getCurrentEntityReference().extractReference(EntityType.WIKI);
-        if (wikiReference == null || currentReference.getChild() == null || isLastReference 
-            || representation.length() > 0) {
-            shouldPrint = true;
-        } else {
-            switch (currentReference.getType()) {
-                case WIKI:
-                    if (!wikiReference.getName().equals(currentReference.getName())) {
-                        shouldPrint = true;
-                    }
-                    break;
-                default:
-                    shouldPrint = true;
-                    break;
-            }
-        }
-        if (shouldPrint) {
-            super.serializeEntityReference(currentReference, representation, isLastReference);
-        }
+        return null;
     }
 }

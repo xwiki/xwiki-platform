@@ -257,13 +257,34 @@ public class XWikiDocumentTest extends AbstractBridgedXWikiComponentTestCase
         assertTrue(creator.equals(copy.getCreator()));
     }
 
-    public void testCreationDateAfterDocumentCopy() throws XWikiException, InterruptedException
+    public void testCreationDateAfterDocumentCopy() throws Exception
     {
         Date sourceCreationDate = this.document.getCreationDate();
         Thread.sleep(1000);
         XWikiDocument copy = this.document.copyDocument(this.document.getName() + " Copy", getContext());
 
         assertTrue(copy.getCreationDate().equals(sourceCreationDate));
+    }
+
+    public void testObjectGuidsAfterDocumentCopy() throws Exception
+    {
+        assertTrue(this.document.getXObjects().size() > 0);
+
+        List<String> originalGuids = new ArrayList<String>();
+        for (Map.Entry<DocumentReference, List<BaseObject>> entry : this.document.getXObjects().entrySet()) {
+            for (BaseObject baseObject : entry.getValue()) {
+                originalGuids.add(baseObject.getGuid());
+            }
+        }
+
+        XWikiDocument copy = this.document.copyDocument(this.document.getName() + " Copy", getContext());
+
+        // Verify that the cloned objects have different GUIDs
+        for (Map.Entry<DocumentReference, List<BaseObject>> entry : copy.getXObjects().entrySet()) {
+            for (BaseObject baseObject : entry.getValue()) {
+                assertFalse("Non unique object GUID found!", originalGuids.contains(baseObject.getGuid()));
+            }
+        }
     }
 
     public void testToStringReturnsFullName()
@@ -971,18 +992,29 @@ public class XWikiDocumentTest extends AbstractBridgedXWikiComponentTestCase
     }
 
     /**
-     * Verify that merging objects modify their references to point to the document in which they are cloned into.
+     * Verify that merging objects modify their references to point to the document in which they are cloned into and
+     * that GUID fors merged objects are different from the original GUIDs.
      */
-    public void testMergeObjectsHaveCorrectReference()
+    public void testMergeObjectsHaveCorrectReferenceAndDifferentGuids()
     {
+        List<String> originalGuids = new ArrayList<String>();
+        for (Map.Entry<DocumentReference, List<BaseObject>> entry : this.document.getXObjects().entrySet()) {
+            for (BaseObject baseObject : entry.getValue()) {
+                originalGuids.add(baseObject.getGuid());
+            }
+        }
+
         XWikiDocument doc = new XWikiDocument(new DocumentReference("somewiki", "somespace", "somepage"));
         doc.mergeXObjects(this.document);
+
         assertTrue(doc.getXObjects().size() > 0);
 
         // Verify that the object references point to the doc in which it's cloned.
+        // Verify that GUIDs are not the same as the original ones
         for (Map.Entry<DocumentReference, List<BaseObject>> entry : doc.getXObjects().entrySet()) {
             for (BaseObject baseObject : entry.getValue()) {
                 assertEquals(doc.getDocumentReference(), baseObject.getDocumentReference());
+                assertFalse("Non unique object GUID found!", originalGuids.contains(baseObject.getGuid()));
             }
         }
     }

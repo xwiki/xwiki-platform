@@ -2144,9 +2144,7 @@ public class XWikiDocument implements DocumentModelBridge
             }
             for (BaseObject otherObject : templatedoc.getXObjects().get(reference)) {
                 if (otherObject != null) {
-                    BaseObject myObject = (BaseObject) otherObject.clone();
-                    // BaseObject.clone copies the GUID, so randomize it for the copied object.
-                    myObject.setGuid(UUID.randomUUID().toString());
+                    BaseObject myObject = (BaseObject) otherObject.duplicate();
                     myObjects.add(myObject);
                     myObject.setNumber(myObjects.size() - 1);
                 }
@@ -2170,6 +2168,22 @@ public class XWikiDocument implements DocumentModelBridge
      */
     public void cloneXObjects(XWikiDocument templatedoc)
     {
+        cloneXObjects(templatedoc, true);
+    }
+
+    /**
+     * @since 2.3M1
+     */
+    public void duplicateXObjects(XWikiDocument templatedoc)
+    {
+        cloneXObjects(templatedoc, false);
+    }
+
+    /**
+     * @since 2.3M1
+     */
+    private void cloneXObjects(XWikiDocument templatedoc, boolean keepsIdentity)
+    {
         for (Map.Entry<DocumentReference, List<BaseObject>> entry : templatedoc.getXObjects().entrySet()) {
             List<BaseObject> tobjects = entry.getValue();
             List<BaseObject> objects = new ArrayList<BaseObject>();
@@ -2179,7 +2193,12 @@ public class XWikiDocument implements DocumentModelBridge
             for (int i = 0; i < tobjects.size(); i++) {
                 BaseObject otherObject = tobjects.get(i);
                 if (otherObject != null) {
-                    BaseObject myObject = (BaseObject) otherObject.clone();
+                    BaseObject myObject;
+                    if (keepsIdentity) {
+                        myObject = (BaseObject) otherObject.clone();
+                    } else {
+                        myObject = otherObject.duplicate();
+                    }
                     objects.set(i, myObject);
                 }
             }
@@ -3011,6 +3030,22 @@ public class XWikiDocument implements DocumentModelBridge
     @Override
     public Object clone()
     {
+        return cloneInternal(true);
+    }
+
+    /**
+     * Similar to {@link #clone()} but whereas a clone is an exact copy (with the same GUID), a duplicate keeps the
+     * same data but with a different identity.
+     *
+     * @since 2.3M1
+     */
+    public XWikiDocument duplicate()
+    {
+        return cloneInternal(false);
+    }
+
+    private XWikiDocument cloneInternal(boolean keepsIdentity)
+    {
         XWikiDocument doc = null;
         try {
             doc = getClass().newInstance();
@@ -3052,14 +3087,19 @@ public class XWikiDocument implements DocumentModelBridge
             doc.setSyntaxId(getSyntaxId());
             doc.setHidden(isHidden());
 
-            doc.cloneXObjects(this);
+            if (keepsIdentity) {
+                doc.cloneXObjects(this);
+            } else {
+                doc.duplicateXObjects(this);
+            }
+
             doc.copyAttachments(this);
             doc.elements = this.elements;
 
             doc.originalDocument = this.originalDocument;
         } catch (Exception e) {
             // This should not happen
-            LOG.error("Exception while doc.clone", e);
+            LOG.error("Exception while cloning document", e);
         }
         return doc;
     }
@@ -5298,26 +5338,11 @@ public class XWikiDocument implements DocumentModelBridge
         loadAttachments(context);
         loadArchive(context);
 
-        XWikiDocument newdoc = (XWikiDocument) clone();
+        XWikiDocument newdoc = duplicate();
         newdoc.setOriginalDocument(null);
         newdoc.setDocumentReference(newDocumentReference);
         newdoc.setContentDirty(true);
         newdoc.getXClass().setDocumentReference(newDocumentReference);
-        Map<DocumentReference, List<BaseObject>> objectClasses = newdoc.getXObjects();
-        if (objectClasses != null) {
-            for (List<BaseObject> objects : objectClasses.values()) {
-                if (objects != null) {
-                    for (BaseObject object : objects) {
-                        if (object != null) {
-                            object.setDocumentReference(newDocumentReference);
-                            // Since GUIDs are supposed to be Unique, although this object holds the same data, it is
-                            // not exactly the same object, so it should have a different identifier.
-                            object.setGuid(UUID.randomUUID().toString());
-                        }
-                    }
-                }
-            }
-        }
 
         XWikiDocumentArchive archive = newdoc.getDocumentArchive();
         if (archive != null) {

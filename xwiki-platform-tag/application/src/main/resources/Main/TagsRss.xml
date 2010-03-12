@@ -29,7 +29,7 @@
   ## Build document list.
   ##
   #if("$!request.tag" != '')
-    #set($sql = ", BaseObject as obj, DBStringListProperty as prop where obj.name=doc.fullName and obj.className='XWiki.TagClass' and obj.id=prop.id.id and prop.id.name='tags' and '$request.tag' in elements(prop.list)")
+    #set($sql = ", BaseObject as obj, DBStringListProperty as prop join prop.list item where obj.name=doc.fullName and obj.className='XWiki.TagClass' and obj.id=prop.id.id and prop.id.name='tags' and lower('$request.tag') = lower(item)")
     #set ($title = $msg.get('xe.tag.rss.tag.title', [$request.tag]))
     #set ($description = $msg.get('xe.tag.rss.tag.description', [$request.tag]))
   #else

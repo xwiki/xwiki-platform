@@ -42,10 +42,10 @@ public class LocalStringEntityReferenceSerializer extends DefaultStringEntityRef
      */
     @Override
     protected void serializeEntityReference(EntityReference currentReference, StringBuilder representation, 
-        boolean isLastReference)
+        boolean isLastReference, Object... parameters)
     {
         if (currentReference.getType() != EntityType.WIKI) {
-            super.serializeEntityReference(currentReference, representation, isLastReference);
+            super.serializeEntityReference(currentReference, representation, isLastReference, parameters);
         }
     }
 }

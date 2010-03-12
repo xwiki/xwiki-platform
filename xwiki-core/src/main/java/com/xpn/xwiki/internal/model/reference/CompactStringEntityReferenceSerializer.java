@@ -19,17 +19,12 @@
  */
 package com.xpn.xwiki.internal.model.reference;
 
-import com.xpn.xwiki.doc.XWikiDocument;
-
-import org.xwiki.model.EntityType;
-import org.xwiki.model.ModelContext;
-import org.xwiki.model.internal.reference.DefaultStringEntityReferenceSerializer;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.Requirement;
-import org.xwiki.context.Execution;
-
-import com.xpn.xwiki.XWikiContext;
+import org.xwiki.model.EntityType;
+import org.xwiki.model.internal.reference.DefaultStringEntityReferenceSerializer;
 import org.xwiki.model.reference.EntityReference;
+import org.xwiki.model.reference.EntityReferenceValueProvider;
 
 /**
  * Generate an entity reference string that doesn't contain reference parts that are the same as the current entity in
@@ -42,24 +37,17 @@ import org.xwiki.model.reference.EntityReference;
 @Component("compact")
 public class CompactStringEntityReferenceSerializer extends DefaultStringEntityReferenceSerializer
 {
-    @Requirement
-    private ModelContext modelContext;
-
-    /**
-     * Execution context handler, needed for accessing the XWikiContext.
-     */
-    @Requirement
-    private Execution execution;
+    @Requirement("current")
+    private EntityReferenceValueProvider provider;
 
     /**
      * {@inheritDoc}
      * 
-     * @see org.xwiki.model.internal.reference.DefaultStringEntityReferenceSerializer
-     *      #serializeEntityReference(EntityReference, StringBuilder, boolean)
+     * @see org.xwiki.model.internal.reference.DefaultStringEntityReferenceSerializer#serializeEntityReference(org.xwiki.model.reference.EntityReference, java.lang.StringBuilder, boolean, java.lang.Object[])
      */
     @Override
     protected void serializeEntityReference(EntityReference currentReference, StringBuilder representation,
-        boolean isLastReference)
+        boolean isLastReference, Object... parameters)
     {
         boolean shouldPrint = false;
 
@@ -69,33 +57,12 @@ public class CompactStringEntityReferenceSerializer extends DefaultStringEntityR
         // In addition an entity reference isn't printed only if all parent references are not printed either,
         // otherwise print it. For example "wiki:page" isn't allowed for a Document Reference.
 
-        if (getContext() == null || currentReference.getChild() == null || isLastReference
-            || representation.length() > 0) {
+        if (currentReference.getChild() == null || isLastReference || representation.length() > 0) {
             shouldPrint = true;
         } else {
-            XWikiDocument currentDoc = getContext().getDoc();
-            switch (currentReference.getType()) {
-                case WIKI:
-                    EntityReference wikiReference = this.modelContext.getCurrentEntityReference();
-                    if (wikiReference != null) {
-                        wikiReference = wikiReference.extractReference(EntityType.WIKI);
-                    }
-                    if (wikiReference == null || !wikiReference.getName().equals(currentReference.getName())) {
-                        shouldPrint = true;
-                    }
-                    break;
-                case SPACE:
-                    if (currentDoc == null || !currentDoc.getSpaceName().equals(currentReference.getName())) {
-                        shouldPrint = true;
-                    }
-                    break;
-                case DOCUMENT:
-                    if (currentDoc == null || !currentDoc.getPageName().equals(currentReference.getName())) {
-                        shouldPrint = true;
-                    }
-                    break;
-                default:
-                    break;
+            String defaultName = resolveDefaultValue(currentReference.getType(), parameters);
+            if (defaultName == null || !defaultName.equals(currentReference.getName())) {
+                shouldPrint = true;
             }
         }
 
@@ -104,11 +71,22 @@ public class CompactStringEntityReferenceSerializer extends DefaultStringEntityR
         }
     }
 
-    /**
-     * @return the XWiki Context used to bridge with the old API
-     */
-    private XWikiContext getContext()
+    protected String resolveDefaultValue(EntityType type, Object... parameters)
     {
-        return (XWikiContext) this.execution.getContext().getProperty("xwikicontext");
+        String resolvedDefaultValue = null;
+        if (parameters.length > 0 && parameters[0] instanceof EntityReference) {
+            // Try to extract the type from the passed parameter.
+            EntityReference referenceParameter = (EntityReference) parameters[0];
+            EntityReference extractedReference = referenceParameter.extractReference(type);
+            if (extractedReference != null) {
+                resolvedDefaultValue = extractedReference.getName();
+            }
+        }
+
+        if (resolvedDefaultValue == null) {
+            resolvedDefaultValue = this.provider.getDefaultValue(type);
+        }
+
+        return resolvedDefaultValue;
     }
 }

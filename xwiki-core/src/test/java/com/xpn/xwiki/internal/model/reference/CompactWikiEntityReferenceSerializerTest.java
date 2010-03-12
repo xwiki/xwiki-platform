@@ -32,7 +32,7 @@ import org.xwiki.test.AbstractComponentTestCase;
 
 /**
  * Unit tests for {@link com.xpn.xwiki.internal.model.reference.CompactWikiStringEntityReferenceSerializer}.
- *
+ * 
  * @version $Id$
  * @since 2.2M1
  */
@@ -44,14 +44,15 @@ public class CompactWikiEntityReferenceSerializerTest extends AbstractComponentT
 
     private ModelContext mockModelContext;
 
-    @Override protected void registerComponents() throws Exception
+    @Override
+    protected void registerComponents() throws Exception
     {
         super.registerComponents();
 
         this.mockModelContext = mockery.mock(ModelContext.class);
         DefaultComponentDescriptor<ModelContext> descriptor = new DefaultComponentDescriptor<ModelContext>();
         descriptor.setRole(ModelContext.class);
-        getComponentManager().registerComponent(descriptor, this.mockModelContext);    
+        getComponentManager().registerComponent(descriptor, this.mockModelContext);
 
         this.serializer = getComponentManager().lookup(EntityReferenceSerializer.class, "compactwiki");
     }

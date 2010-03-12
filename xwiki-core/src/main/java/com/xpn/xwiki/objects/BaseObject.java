@@ -36,6 +36,7 @@ import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.objects.classes.BaseClass;
 import com.xpn.xwiki.objects.classes.PropertyClass;
+import org.xwiki.model.reference.DocumentReference;
 
 public class BaseObject extends BaseCollection implements ObjectInterface, Serializable, Cloneable
 {
@@ -172,6 +173,16 @@ public class BaseObject extends BaseCollection implements ObjectInterface, Seria
         // Set a new GUID for the duplicate
         object.setGuid(UUID.randomUUID().toString());
 
+        return object;
+    }
+
+    /**
+     * @since 2.2.3
+     */
+    public BaseObject duplicate(DocumentReference documentReference)
+    {
+        BaseObject object = duplicate();
+        object.setDocumentReference(documentReference);
         return object;
     }
 

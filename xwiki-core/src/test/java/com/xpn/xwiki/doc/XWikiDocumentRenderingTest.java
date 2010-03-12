@@ -138,7 +138,7 @@ public class XWikiDocumentRenderingTest extends AbstractBridgedXWikiComponentTes
         this.baseClass.addNumberField("int", "Int", 10, "integer");
         this.baseClass.addStaticListField("stringlist", "StringList", "value1, value2");
 
-        this.mockXWiki.stubs().method("getClass").will(returnValue(this.baseClass));
+        this.mockXWiki.stubs().method("getXClass").will(returnValue(this.baseClass));
 
         this.baseObject = this.document.newObject(CLASSNAME, getContext());
         this.baseObject.setStringValue("string", "string");

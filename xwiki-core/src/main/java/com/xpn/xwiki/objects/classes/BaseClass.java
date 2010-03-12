@@ -31,6 +31,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import com.xpn.xwiki.web.Utils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.ecs.xhtml.option;
 import org.apache.ecs.xhtml.select;
@@ -52,6 +53,9 @@ import com.xpn.xwiki.plugin.query.XWikiCriteria;
 import com.xpn.xwiki.plugin.query.XWikiQuery;
 import com.xpn.xwiki.validation.XWikiValidationInterface;
 import com.xpn.xwiki.validation.XWikiValidationStatus;
+import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.EntityReference;
+import org.xwiki.model.reference.EntityReferenceSerializer;
 
 /**
  * Represents an XClass, and contains XClass properties. Each field from {@link BaseCollection} is of type
@@ -74,6 +78,9 @@ public class BaseClass extends BaseCollection implements ClassInterface
     private String validationScript;
 
     private String nameField;
+
+    private EntityReferenceSerializer<EntityReference> localReferenceEntityReferenceSerializer =
+        Utils.getComponent(EntityReferenceSerializer.class, "local/reference");
 
     /**
      * Note: This method is overridden to add the deprecation warning so that code using is can see it's deprecated.
@@ -142,14 +149,22 @@ public class BaseClass extends BaseCollection implements ClassInterface
         return null; // To change body of implemented methods use Options | File Templates.
     }
 
+    /**
+     * @deprecated since 2.2.3 use {@link com.xpn.xwiki.doc.XWikiDocument#newXObject}
+     */
+    @Deprecated
     public BaseCollection newObject(XWikiContext context) throws XWikiException
     {
         BaseObject bobj = newCustomClassInstance(context);
-        bobj.setXClassReference(getDocumentReference());
+        bobj.setXClassReference(this.localReferenceEntityReferenceSerializer.serialize(getDocumentReference()));
 
         return bobj;
     }
 
+    /**
+     * @deprecated since 2.2.3 use {@link #fromMap(java.util.Map, com.xpn.xwiki.objects.BaseCollection)}
+     */
+    @Deprecated
     public BaseCollection fromMap(Map map, XWikiContext context) throws XWikiException
     {
         BaseCollection object = newObject(context);
@@ -159,7 +174,6 @@ public class BaseClass extends BaseCollection implements ClassInterface
 
     public BaseCollection fromMap(Map<String, ? extends Object> map, BaseCollection object)
     {
-        object.setXClassReference(getDocumentReference());
         for (PropertyClass property : (Collection<PropertyClass>) getFieldList()) {
             String name = property.getName();
             Object formvalues = map.get(name);
@@ -183,7 +197,6 @@ public class BaseClass extends BaseCollection implements ClassInterface
 
     public BaseCollection fromValueMap(Map map, BaseCollection object)
     {
-        object.setXClassReference(getDocumentReference());
         for (PropertyClass property : (Collection<PropertyClass>) getFieldList()) {
             String name = property.getName();
             Object formvalue = map.get(name);
@@ -830,6 +843,22 @@ public class BaseClass extends BaseCollection implements ClassInterface
         }
     }
 
+    /**
+     * @since 2.2.3
+     */
+    public static BaseObject newCustomClassInstance(DocumentReference classReference, XWikiContext context)
+        throws XWikiException
+    {
+        BaseClass bclass = context.getWiki().getXClass(classReference, context);
+        BaseObject object = (bclass == null) ? new BaseObject() : bclass.newCustomClassInstance(context);
+
+        return object;
+    }
+
+    /**
+     * @deprecated since 2.2.3 use {@link #newCustomClassInstance(String, com.xpn.xwiki.XWikiContext)}
+     */
+    @Deprecated
     public static BaseObject newCustomClassInstance(String className, XWikiContext context) throws XWikiException
     {
         BaseClass bclass = context.getWiki().getClass(className, context);

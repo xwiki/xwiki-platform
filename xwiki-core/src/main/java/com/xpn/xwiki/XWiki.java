@@ -92,6 +92,9 @@ import org.xwiki.cache.eviction.LRUEvictionConfiguration;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
+import org.xwiki.model.reference.EntityReference;
+import org.xwiki.model.reference.EntityReferenceSerializer;
+import org.xwiki.model.reference.EntityReferenceValueProvider;
 import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.model.reference.WikiReference;
 import org.xwiki.observation.ObservationManager;
@@ -287,6 +290,24 @@ public class XWiki implements XWikiDocChangeNotificationInterface
     private List<String> configuredSyntaxes;
 
     /**
+<<<<<<< .working
+=======
+     * Used to convert a proper Document Reference to string (standard form).
+     */
+    private EntityReferenceSerializer<String> defaultEntityReferenceSerializer =
+        Utils.getComponent(EntityReferenceSerializer.class);
+
+    private EntityReferenceSerializer<String> localStringEntityReferenceSerializer =
+        Utils.getComponent(EntityReferenceSerializer.class, "local");
+
+    private EntityReferenceValueProvider defaultEntityReferenceValueProvider =
+        Utils.getComponent(EntityReferenceValueProvider.class);
+
+    private EntityReferenceSerializer<EntityReference> localReferenceEntityReferenceSerializer =
+        Utils.getComponent(EntityReferenceSerializer.class, "local/reference");
+
+    /**
+>>>>>>> .merge-right.r27612
      * Used to resolve a string into a proper Document Reference using the current document's reference to fill the
      * blanks, except for the page name for which the default page name is used instead.
      */
@@ -3823,7 +3844,8 @@ public class XWiki implements XWikiDocChangeNotificationInterface
         XWikiDocument groupDoc = getDocument(groupName, context);
 
         BaseObject memberObject = (BaseObject) groupClass.newObject(context);
-        memberObject.setXClassReference(groupClass.getDocumentReference());
+        memberObject.setXClassReference(
+            this.localReferenceEntityReferenceSerializer.serialize(groupClass.getDocumentReference()));
         memberObject.setDocumentReference(groupDoc.getDocumentReference());
         memberObject.setStringValue("member", userName);
         groupDoc.addXObject(groupClass.getDocumentReference(), memberObject);

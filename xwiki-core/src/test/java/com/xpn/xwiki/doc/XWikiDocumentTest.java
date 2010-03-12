@@ -287,6 +287,22 @@ public class XWikiDocumentTest extends AbstractBridgedXWikiComponentTestCase
         }
     }
 
+    public void testRelativeObjectReferencesAfterDocumentCopy() throws Exception
+    {
+        XWikiDocument copy = this.document.copyDocument(new DocumentReference("copywiki", "copyspace", "copypage"),
+            getContext());
+
+        // Verify that the XObject's XClass reference points to the target wiki and not the old wiki.
+        // This tests the XObject cache.
+        DocumentReference targetXClassReference = new DocumentReference("copywiki", DOCSPACE, DOCNAME);
+        assertNotNull(copy.getXObject(targetXClassReference));
+
+        // Also verify that actual XObject's reference (not from the cache).
+        assertEquals(1, copy.getXObjects().size());
+        BaseObject bobject = copy.getXObjects().get(copy.getXObjects().keySet().iterator().next()).get(0);
+        assertEquals(new DocumentReference("copywiki", DOCSPACE, DOCNAME), bobject.getXClassReference());
+    }
+    
     public void testToStringReturnsFullName()
     {
         assertEquals("Space.Page", this.document.toString());

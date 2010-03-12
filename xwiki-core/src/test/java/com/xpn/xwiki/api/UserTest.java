@@ -28,7 +28,7 @@ public class UserTest extends AbstractBridgedXWikiComponentTestCase
         XWikiDocument doc = new XWikiDocument("XWiki", "Admin");
         BaseClass userClass = new BaseClass();
         userClass.addTextField("email", "email address", 20);
-        mockXWiki.stubs().method("getClass").will(returnValue(userClass));
+        mockXWiki.stubs().method("getXClass").will(returnValue(userClass));
         BaseObject userObj = doc.newObject("XWiki.XWikiUsers", getContext());
         userObj.setStringValue("email", "admin@mail.com");
         mockXWiki.stubs().method("getDocument").will(returnValue(doc));

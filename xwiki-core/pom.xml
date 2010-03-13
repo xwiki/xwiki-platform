@@ -948,7 +948,6 @@
               **/store/jcr/query/JcrQueryExecutor.java,
               **/store/jcr/JackRabbitJCRProvider.java,
               **/store/jcr/XWikiJcrBaseStore.java,
-              **/store/DatabaseProduct.java,
               **/store/XWikiVersioningStoreInterface.java,
               **/store/XWikiHibernateAttachmentStore.java,
               **/store/XWikiCacheStoreInterface.java,

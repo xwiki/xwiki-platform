@@ -30,7 +30,7 @@ package com.xpn.xwiki.store;
  * 
  * @version $Id$
  */
-public class DatabaseProduct
+public final class DatabaseProduct
 {
     /**
      * The product name for Oracle databases.

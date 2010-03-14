@@ -515,7 +515,7 @@ public final class WikiManager
                     WikiManagerMessageTool.ERROR_WIKINAMEFORBIDDEN, newWikiName));
             }
 
-            // Update or create wiki descriptor document that will be save at and of wiki creation.
+            // Update or create wiki descriptor document that will be saved.
             XWikiServer wikiSuperDocToSave = getWikiDescriptorToSave(userWikiSuperDoc, failOnExist, context);
 
             // Check owner

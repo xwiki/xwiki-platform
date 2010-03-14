@@ -152,8 +152,6 @@ public class XWikiHibernateBaseStore implements Initializable
             // we have no opened connections yet.
             String schemaName = getSchemaFromWikiName(context.getDatabase(), null, context);
 
-            System.out.println(schemaName);
-
             String dialect = getConfiguration().getProperty(Environment.DIALECT);
             if ("org.hibernate.dialect.MySQLDialect".equals(dialect)) {
                 getConfiguration().setProperty(Environment.DEFAULT_CATALOG, schemaName);

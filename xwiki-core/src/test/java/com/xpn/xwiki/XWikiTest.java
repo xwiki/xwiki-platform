@@ -281,9 +281,9 @@ public class XWikiTest extends AbstractBridgedXWikiComponentTestCase
         assertEquals("Space.Document", this.xwiki.getDocumentNameFromPath("/view/Space/Document/some/ignored/paths",
             getContext()));
 
-        // Test URL encoding
-        assertEquals("My Space.My Document",
-            this.xwiki.getDocumentNameFromPath("/My%20Space/My%20Document", getContext()));
+        // Test URL encoding and verify an encoded forward slash ("/" - encoded as %2F) works too.
+        assertEquals("My Space.My/Document",
+            this.xwiki.getDocumentNameFromPath("/My%20Space/My%2FDocument", getContext()));
     }
 
     /**

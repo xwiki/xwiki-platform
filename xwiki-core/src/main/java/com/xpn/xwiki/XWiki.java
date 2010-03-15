@@ -1493,8 +1493,11 @@ public class XWiki implements XWikiDocChangeNotificationInterface
     public DocumentReference getDocumentReferenceFromPath(String path, XWikiContext context)
     {
         // TODO: Remove this and use XWikiURLFactory instead in XWikiAction and all entry points.
+
+        // Make sure the path is URL-decoded
+        String decodedPath = Util.decodeURI(path, context);
         List<String> segments = new ArrayList<String>();
-        for (String segment : path.split("/", -1)) {
+        for (String segment : decodedPath.split("/", -1)) {
             segments.add(segment);
         }
         // Remove the first segment if it's empty to cater for cases when the path starts with "/"
@@ -1505,18 +1508,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface
         XWikiEntityURL entityURL = (XWikiEntityURL) this.entityXWikiURLBuilder.build(
             new WikiReference(context.getDatabase()), segments);
 
-        // URL-unencode the parsed document reference parts since the path we get as input can contain URL-encoded
-        // path segments.
-        // TODO: When we move to using XWikiURLFactory this won't be needed anymore.
-        DocumentReference documentReference =
-            new DocumentReference(entityURL.getEntityReference().extractReference(EntityType.DOCUMENT));
-        documentReference.setName(Util.decodeURI(documentReference.getName(), context));
-        documentReference.getLastSpaceReference().setName(
-            Util.decodeURI(documentReference.getLastSpaceReference().getName(), context));
-        documentReference.getWikiReference().setName(
-            Util.decodeURI(documentReference.getWikiReference().getName(), context));
-
-        return documentReference;
+        return new DocumentReference(entityURL.getEntityReference().extractReference(EntityType.DOCUMENT));
     }
 
     /**

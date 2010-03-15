@@ -280,6 +280,10 @@ public class XWikiTest extends AbstractBridgedXWikiComponentTestCase
         assertEquals("Space.Document", this.xwiki.getDocumentNameFromPath("/view/Space/Document/", getContext()));
         assertEquals("Space.Document", this.xwiki.getDocumentNameFromPath("/view/Space/Document/some/ignored/paths",
             getContext()));
+
+        // Test URL encoding
+        assertEquals("My Space.My Document",
+            this.xwiki.getDocumentNameFromPath("/My%20Space/My%20Document", getContext()));
     }
 
     /**

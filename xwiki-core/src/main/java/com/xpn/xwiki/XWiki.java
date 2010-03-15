@@ -1504,7 +1504,19 @@ public class XWiki implements XWikiDocChangeNotificationInterface
 
         XWikiEntityURL entityURL = (XWikiEntityURL) this.entityXWikiURLBuilder.build(
             new WikiReference(context.getDatabase()), segments);
-        return new DocumentReference(entityURL.getEntityReference().extractReference(EntityType.DOCUMENT));
+
+        // URL-unencode the parsed document reference parts since the path we get as input can contain URL-encoded
+        // path segments.
+        // TODO: When we move to using XWikiURLFactory this won't be needed anymore.
+        DocumentReference documentReference =
+            new DocumentReference(entityURL.getEntityReference().extractReference(EntityType.DOCUMENT));
+        documentReference.setName(Util.decodeURI(documentReference.getName(), context));
+        documentReference.getLastSpaceReference().setName(
+            Util.decodeURI(documentReference.getLastSpaceReference().getName(), context));
+        documentReference.getWikiReference().setName(
+            Util.decodeURI(documentReference.getWikiReference().getName(), context));
+
+        return documentReference;
     }
 
     /**

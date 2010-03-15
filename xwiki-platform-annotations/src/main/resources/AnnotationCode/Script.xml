@@ -12,8 +12,8 @@
 <customClass></customClass>
 <contentAuthor>XWiki.Admin</contentAuthor>
 <creationDate>1264860755000</creationDate>
-<date>1267701896000</date>
-<contentUpdateDate>1267701896000</contentUpdateDate>
+<date>1268664277000</date>
+<contentUpdateDate>1268664277000</contentUpdateDate>
 <version>1.0</version>
 <title></title>
 <template></template>
@@ -123,6 +123,9 @@ XWiki.Selection = Class.create({
   wordStep : 1,
 
   initialize : function (container) {
+    if (!container) {
+      return;
+    }
     this.container = container;
     // on IE we listen to the mousedown and remember the position of the mousedown of the selection to know where to display the dialog for annotation creation
     if (!window.getSelection) {
@@ -570,6 +573,9 @@ XWiki.Selection = Class.create({
   selectionService : false,
   // the stack of bubbles, so that we can close them one by one if needed
   bubbles : new Array(),
+  // the currently set filter (pair of field names and their values) that all annotations should be fetched according to. 
+  // It will be updated any time a changed filter event is received
+  currentFilter : {},
 
   initialize : function () {
     this.hookMenuButton();
@@ -588,57 +594,67 @@ XWiki.Selection = Class.create({
     // and initialize the selectionService
     // TODO: get this container from a member or something, so that we're sure all functions use the same container
     this.selectionService = new XWiki.Selection($('xwikicontent'));
+
+    // listen to the filter change events to re-fetch the annotations when it changes
+    document.observe('xwiki:annotations:filter:changed', this.onFilterChange.bindAsEventListener(this));
   },
 
   hookMenuButton : function() {
-    var rightMenu = $('contentmenu').down('.rightmenu');
-    // create and insert if it doesn't exist
-    if (!rightMenu) {
-      rightMenu = new Element('div', {'class':'rightmenu'});
-      // insert it before the left menu
-      var leftMenu = $('contentmenu').down('.leftmenu');
-      if (leftMenu) {
-        leftMenu.insert({before: rightMenu});
-      } else {
-        $('contentmenu').insert({bottom: rightMenu});
+    var contentmenu = $('contentmenu');
+    if (contentmenu) {
+      var rightMenu = contentmenu.down('.rightmenu');
+      // create and insert if it doesn't exist
+      if (!rightMenu) {
+        rightMenu = new Element('div', {'class':'rightmenu'});
+        // insert it before the left menu
+        var leftMenu = contentmenu.down('.leftmenu');
+        if (leftMenu) {
+          leftMenu.insert({before: rightMenu});
+        } else {
+          contentmenu.insert({bottom: rightMenu});
+        }
       }
+      // create the annotations button
+      var annContainer = new Element('div', {'class': 'topmenuentry hasIcon', 'id': 'tmAnnotations'});
+      var annLink = new Element('a', {'class': 'tme', 'href': '#' + this.annTabname});
+      annLink.update("&lt;strong&gt;$msg.get('annotations.title')&lt;/strong&gt;");
+      annContainer.insert({top: annLink});
+      rightMenu.insert({bottom: annContainer});
+  
+      annLink.observe('click', this.toggleSettingsPanel.bind(this));
     }
-    // create the annotations button
-    var annContainer = new Element('div', {'class': 'topmenuentry hasIcon', 'id': 'tmAnnotations'});
-    var annLink = new Element('a', {'class': 'tme', 'href': '#' + this.annTabname});
-    annLink.update("&lt;strong&gt;$msg.get('annotations.title')&lt;/strong&gt;");
-    annContainer.insert({top: annLink});
-    rightMenu.insert({bottom: annContainer});
-
-    annLink.observe('click', this.toggleSettingsPanel.bind(this));
   },
 
   hookTabShortcut : function() {
-    var shortcutsContainer = $('commentsshortcut').up();
-    var annShortcut = new Element('span', {'id' : 'annotationsshortcut'}).update('&lt;a href="#' + this.annTabname + '"&gt;$msg.get("annotations.title")&lt;/a&gt; ');
-    shortcutsContainer.insert({top: annShortcut});
-    var separator = new Element('span', {'class' : 'separator'}).update('|');
-    annShortcut.insert({after : separator});
-
-    annShortcut.observe('click', XWiki.displayDocExtra.bind(XWiki, this.annTabname, 'annotationsinline.vm', true));
+    if ($('commentsshortcut')) {
+      var shortcutsContainer = $('commentsshortcut').up();
+      var annShortcut = new Element('span', {'id' : 'annotationsshortcut'}).update('&lt;a href="#' + this.annTabname + '"&gt;$msg.get("annotations.title")&lt;/a&gt; ');
+      shortcutsContainer.insert({top: annShortcut});
+      var separator = new Element('span', {'class' : 'separator'}).update('|');
+      annShortcut.insert({after : separator});
+  
+      annShortcut.observe('click', XWiki.displayDocExtra.bind(XWiki, this.annTabname, 'annotationsinline.vm', true));
+    }
   },
   
   hookTab : function() {
     // the tab title
     var tabTitlesContainer = $('docExtrasTabsUl');
-    var annTitle = new Element('li', {'id' : this.annTabname + 'tab'}).update('&lt;a href="#' + this.annTabname + '" id="' + this.annTabname + 'link"&gt;$msg.get("annotations.title")&lt;/a&gt;');
-    tabTitlesContainer.insert({top: annTitle});
-
-    annTitle.observe('click', XWiki.displayDocExtra.bind(XWiki, this.annTabname, 'annotationsinline.vm', true));
-
-    // add tab pane here, to fill in with ajax call
-    var tabPaneContainer = $('docextrapanes');
-    var annPane = new Element('div', {'id' : this.annTabname + 'pane', 'class': 'hidden empty'});
-    tabPaneContainer.insert({top: annPane});
-
-    // add the anchor before the annotations pane
-    var anchorsContainer = $('docextraanchors');
-    anchorsContainer.insert({top : new Element('span', {'id' : this.annTabname + 'anchor'}).update("&amp;nbsp;")});
+    if (tabTitlesContainer) {
+      var annTitle = new Element('li', {'id' : this.annTabname + 'tab'}).update('&lt;a href="#' + this.annTabname + '" id="' + this.annTabname + 'link"&gt;$msg.get("annotations.title")&lt;/a&gt;');
+      tabTitlesContainer.insert({top: annTitle});
+  
+      annTitle.observe('click', XWiki.displayDocExtra.bind(XWiki, this.annTabname, 'annotationsinline.vm', true));
+  
+      // add tab pane here, to fill in with ajax call
+      var tabPaneContainer = $('docextrapanes');
+      var annPane = new Element('div', {'id' : this.annTabname + 'pane', 'class': 'hidden empty'});
+      tabPaneContainer.insert({top: annPane});
+  
+      // add the anchor before the annotations pane
+      var anchorsContainer = $('docextraanchors');
+      anchorsContainer.insert({top : new Element('span', {'id' : this.annTabname + 'anchor'}).update("&amp;nbsp;")});
+    }
   },
   
   toggleSettingsPanel : function(event) {
@@ -730,11 +746,63 @@ XWiki.Selection = Class.create({
       this.bubbles.clear();
     }
   },
+  
+  /**
+   * Handles the update of the current filter by re-storing the new filter in this object's state info and re-fetching 
+   * the annotations.
+   */
+  onFilterChange : function(event, newFilter) {
+    // store the current filter
+    this.currentFilter = newFilter;
+    // and, if the annotations are currently visible, re-fetch the annotations and display them
+    var visible = this.displayAnnotationsCheckbox ? this.displayAnnotationsCheckbox.checked : false;
+    if (visible) {
+      this.fetchAnnotations(true);
+    }
+  },
+
+  /**
+   * Returns an array of extra fields that need to be requested from the annotations. 
+   */
+  getExtraFields : function() {
+    // TODO: request for color when it will be used by the annotation displayer and sent by the backend
+    return [];
+  },
+  
+  /**
+   * Returns a map of fieldName, fieldValue pairs that encode the current filter that needs to be applied to the fetched
+   * and rendered annotations.
+   * Namely, the current filter, as set by last filter change event.
+   */
+  getFilter : function() {
+    // return the current filter stored from the last update of the filter
+    return this.currentFilter;
+  },
+  
+  /**
+   * Enriches the set of annotation parameters with the extra requested fields &amp; the filter. The function alters its 
+   * map parameter and returns the altered value.
+   */
+  prepareRequestParameters : function(parameters) {
+    // get all the filter criteria and add them as request parameters
+    var filterMap = this.getFilter();
+    for (var filterName in filterMap) {
+      parameters['filter_' + filterName] = filterMap[filterName];
+    }
+    // get all the extra fields requested and add them to the request
+    var extraFields = this.getExtraFields();
+    for (var i = 0; i &lt; extraFields.length; i++) {
+      parameters['request_field'] = extraFields[i];
+    }
+    
+    return parameters;
+  },
 
   fetchAnnotations : function(andShow) {
     // TODO: fixme, get the URL in a less hardcoded way
     var getAnnotationsURL = '/xwiki/rest/wikis/' + XWiki.currentWiki + '/spaces/' + XWiki.currentSpace + '/pages/' + $$('meta[name=page]')[0].content + '/annotations?media=json';
     new Ajax.Request(getAnnotationsURL, {method: 'GET',
+      parameters: this.prepareRequestParameters({}), 
       onCreate: function() {
         // show nice loading message at page bottom
         this._x_notification = new XWiki.widgets.Notification("$msg.get('annotations.annotated.loading')", "inprogress");
@@ -851,6 +919,7 @@ XWiki.Selection = Class.create({
         new XWiki.widgets.ConfirmedAjaxRequest(
           item.href,
           {
+            parameters: this.prepareRequestParameters({}),  
             onCreate : function() {
               // Disable the button, to avoid a cascade of clicks from impatient users
               item.disabled = true;
@@ -1108,7 +1177,7 @@ XWiki.Selection = Class.create({
     // create the async request to update the annotation
     new Ajax.Request(action, {
       method : method,
-      parameters : parameters,
+      parameters : this.prepareRequestParameters(parameters),
       onCreate : function() {
         // make it load when starting to send the async call
         if (container.parentNode) {
@@ -1334,7 +1403,7 @@ XWiki.Selection = Class.create({
     // aaand submit
     new Ajax.Request(form.action, {
       method : form.method,
-      parameters : formData,
+      parameters : this.prepareRequestParameters(formData),
       onCreate : function() {
         // make it load while update is in progress
         this.createPanel.update(new Element('div', {'class' : 'loading'}));

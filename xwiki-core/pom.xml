@@ -1396,7 +1396,8 @@
               **/user/impl/LDAP/LDAPProfileXClass.java,
               **/user/impl/exo/ExoAuthServiceImpl.java,
               **/user/impl/exo/ExoFilter.java,
-              **/user/impl/exo/ExoGroupServiceImpl.java
+              **/user/impl/exo/ExoGroupServiceImpl.java,
+              **/stats/impl/xwiki/XWikiStatsReader.java
           </excludes>
         </configuration>
       </plugin>

@@ -1923,7 +1923,7 @@ public class XWikiDocument implements DocumentModelBridge
             getXObjects().put(classReference, objects);
         } else {
             for (BaseObject baseObject : objects) {
-                addXObject(classReference, baseObject);
+                addXObject(baseObject);
             }
         }
     }
@@ -2056,7 +2056,9 @@ public class XWikiDocument implements DocumentModelBridge
 
     /**
      * @since 2.2M1
+     * @deprecated use {@link #addXObject(BaseObject)} instead
      */
+    @Deprecated
     public void addXObject(DocumentReference classReference, BaseObject object)
     {
         List<BaseObject> vobj = getXObjects(classReference);
@@ -2068,6 +2070,21 @@ public class XWikiDocument implements DocumentModelBridge
     }
 
     /**
+     * @since 2.2.3
+     */
+    public void addXObject(BaseObject object)
+    {
+        object.setDocumentReference(getDocumentReference());
+
+        List<BaseObject> vobj = getXObjects(object.getXClassReference());
+        if (vobj == null) {
+            setXObject(0, object);
+        } else {
+            setXObject(vobj.size(), object);
+        }
+    }
+    
+    /**
      * @deprecated since 2.2M1 use {@link #addXObject(DocumentReference, BaseObject)} instead
      */
     @Deprecated
@@ -2078,7 +2095,9 @@ public class XWikiDocument implements DocumentModelBridge
 
     /**
      * @since 2.2M1
+     * @deprecated use {@link #setXObject(int, BaseObject)} instead
      */
+    @Deprecated
     public void setXObject(DocumentReference classReference, int nb, BaseObject object)
     {
         if (object != null) {
@@ -2089,6 +2108,26 @@ public class XWikiDocument implements DocumentModelBridge
         if (objects == null) {
             objects = new ArrayList<BaseObject>();
             setXObjects(classReference, objects);
+        }
+        while (nb >= objects.size()) {
+            objects.add(null);
+        }
+        objects.set(nb, object);
+        setContentDirty(true);
+    }
+
+    /**
+     * @since 2.2.3
+     */
+    public void setXObject(int nb, BaseObject object)
+    {
+        object.setDocumentReference(getDocumentReference());
+        object.setNumber(nb);
+
+        List<BaseObject> objects = getXObjects(object.getXClassReference());
+        if (objects == null) {
+            objects = new ArrayList<BaseObject>();
+            setXObjects(object.getXClassReference(), objects);
         }
         while (nb >= objects.size()) {
             objects.add(null);
@@ -3740,7 +3779,7 @@ public class XWikiDocument implements DocumentModelBridge
         for (Element objel : objels) {
             BaseObject bobject = new BaseObject();
             bobject.fromXML(objel);
-            setXObject(bobject.getXClassReference(), bobject.getNumber(), bobject);
+            setXObject(bobject.getNumber(), bobject);
         }
 
         // We have been reading from XML so the document does not need a new version when saved
@@ -5914,7 +5953,7 @@ public class XWikiDocument implements DocumentModelBridge
         newobject.setNumber(oldobject.getNumber());
         newobject.setGuid(oldobject.getGuid());
         newobject.setDocumentReference(getDocumentReference());
-        setXObject(absoluteClassReference, nb, newobject);
+        setXObject(nb, newobject);
 
         return newobject;
     }
@@ -7063,8 +7102,9 @@ public class XWikiDocument implements DocumentModelBridge
         BaseObject bobject = getXObject(absoluteClassReference);
         if (bobject == null) {
             bobject = new BaseObject();
-            addXObject(absoluteClassReference, bobject);
             bobject.setXClassReference(classReference);
+
+            addXObject(bobject);
         }
         bobject.setDocumentReference(getDocumentReference());
         setContentDirty(true);

@@ -3845,7 +3845,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface
             this.localReferenceEntityReferenceSerializer.serialize(groupClass.getDocumentReference()));
         memberObject.setDocumentReference(groupDoc.getDocumentReference());
         memberObject.setStringValue("member", userName);
-        groupDoc.addXObject(groupClass.getDocumentReference(), memberObject);
+        groupDoc.addXObject(memberObject);
         if (groupDoc.isNew()) {
             saveDocument(groupDoc, context.getMessageTool().get("core.comment.addedUserToGroup"), context);
         } else {

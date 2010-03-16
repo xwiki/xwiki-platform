@@ -46,6 +46,8 @@ public class DefaultStringEntityReferenceSerializer implements EntityReferenceSe
             put(EntityType.ATTACHMENT, Arrays.asList("@"));
             put(EntityType.DOCUMENT, Arrays.asList("."));
             put(EntityType.SPACE, Arrays.asList(":", "."));
+            put(EntityType.OBJECT, Arrays.asList("^"));
+            put(EntityType.OBJECT_PROPERTY, Arrays.asList("."));
         }
     };
 
@@ -55,6 +57,8 @@ public class DefaultStringEntityReferenceSerializer implements EntityReferenceSe
             put(EntityType.ATTACHMENT, Arrays.asList("\\@"));
             put(EntityType.DOCUMENT, Arrays.asList("\\."));
             put(EntityType.SPACE, Arrays.asList("\\:", "\\."));
+            put(EntityType.OBJECT, Arrays.asList("\\^"));
+            put(EntityType.OBJECT_PROPERTY, Arrays.asList("\\."));
         }
     };
 

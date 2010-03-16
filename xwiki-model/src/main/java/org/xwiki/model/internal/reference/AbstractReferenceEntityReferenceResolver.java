@@ -45,6 +45,8 @@ public abstract class AbstractReferenceEntityReferenceResolver implements Entity
             put(EntityType.DOCUMENT, Arrays.asList(EntityType.SPACE));
             put(EntityType.SPACE, Arrays.asList(EntityType.WIKI, EntityType.SPACE));
             put(EntityType.WIKI, Collections.<EntityType> emptyList());
+            put(EntityType.OBJECT, Arrays.asList(EntityType.DOCUMENT));
+            put(EntityType.OBJECT_PROPERTY, Arrays.asList(EntityType.OBJECT));
         }
     };
 

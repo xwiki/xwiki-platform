@@ -21,9 +21,11 @@ package org.xwiki.model.internal;
 
 import org.jmock.Expectations;
 import org.jmock.Mockery;
+import org.jmock.integration.junit4.JMock;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.component.util.ReflectionUtils;
 import org.xwiki.configuration.ConfigurationSource;
@@ -32,10 +34,11 @@ import org.xwiki.model.ModelConfiguration;
 
 /**
  * Unit tests for {@link DefaultModelConfiguration}.
- *
+ * 
  * @version $Id$
  * @since 2.2M1
  */
+@RunWith(JMock.class)
 public class DefaultModelConfigurationTest
 {
     private Mockery mockery = new Mockery();
@@ -69,12 +72,19 @@ public class DefaultModelConfigurationTest
                 will(returnValue("defaultSpace"));
             oneOf(mockSource).getProperty(with(equal("model.reference.default.attachment")), with(any(String.class)));
                 will(returnValue("defaultFilename"));
+            oneOf(mockSource).getProperty(with(equal("model.reference.default.object")), with(any(String.class)));
+                will(returnValue("defaultObject"));
+            oneOf(mockSource).getProperty(with(equal("model.reference.default.object_property")), 
+                with(any(String.class)));
+                will(returnValue("defaultProperty"));
         }});
         
         Assert.assertEquals("defaultWiki", this.configuration.getDefaultReferenceValue(EntityType.WIKI));
         Assert.assertEquals("defaultDocument", this.configuration.getDefaultReferenceValue(EntityType.DOCUMENT));
         Assert.assertEquals("defaultSpace", this.configuration.getDefaultReferenceValue(EntityType.SPACE));
         Assert.assertEquals("defaultFilename", this.configuration.getDefaultReferenceValue(EntityType.ATTACHMENT));
+        Assert.assertEquals("defaultObject", this.configuration.getDefaultReferenceValue(EntityType.OBJECT));
+        Assert.assertEquals("defaultProperty", this.configuration.getDefaultReferenceValue(EntityType.OBJECT_PROPERTY));
     }
 
     @Test
@@ -86,11 +96,17 @@ public class DefaultModelConfigurationTest
             oneOf(mockSource).getProperty("model.reference.default.space", "Main"); will(returnValue("Main"));
             oneOf(mockSource).getProperty("model.reference.default.attachment", "filename");
                 will(returnValue("filename"));
+            oneOf(mockSource).getProperty("model.reference.default.object", "object");
+                will(returnValue("Main.WebHome"));
+            oneOf(mockSource).getProperty("model.reference.default.object_property", "property");
+                will(returnValue("property"));
         }});
 
         Assert.assertEquals("xwiki", this.configuration.getDefaultReferenceValue(EntityType.WIKI));
         Assert.assertEquals("WebHome", this.configuration.getDefaultReferenceValue(EntityType.DOCUMENT));
         Assert.assertEquals("Main", this.configuration.getDefaultReferenceValue(EntityType.SPACE));
         Assert.assertEquals("filename", this.configuration.getDefaultReferenceValue(EntityType.ATTACHMENT));
+        Assert.assertEquals("Main.WebHome", configuration.getDefaultReferenceValue(EntityType.OBJECT));
+        Assert.assertEquals("property", configuration.getDefaultReferenceValue(EntityType.OBJECT_PROPERTY));
     }
 }

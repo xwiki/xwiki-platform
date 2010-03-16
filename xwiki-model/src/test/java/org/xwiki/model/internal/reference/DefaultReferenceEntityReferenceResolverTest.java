@@ -59,6 +59,10 @@ public class DefaultReferenceEntityReferenceResolverTest
                 will(returnValue("defwiki"));
                 allowing(mockValueProvider).getDefaultValue(EntityType.DOCUMENT);
                 will(returnValue("defpage"));
+                allowing(mockValueProvider).getDefaultValue(EntityType.OBJECT); 
+                will(returnValue("defobject"));
+                allowing(mockValueProvider).getDefaultValue(EntityType.OBJECT_PROPERTY); 
+                will(returnValue("defproperty"));
             }
         });
     }
@@ -160,6 +164,86 @@ public class DefaultReferenceEntityReferenceResolverTest
         Assert.assertEquals(EntityType.WIKI, reference.getParent().getType());
         Assert.assertEquals("defwiki", reference.getParent().getName());
     }
+
+    /**
+     * Tests that a relative object reference is resolved correctly and completed with the default document parent.
+     */
+    @Test
+    public void testResolveObjectReferenceWhenMissingParents()
+    {
+        EntityReference reference =
+            resolver.resolve(new EntityReference("object", EntityType.OBJECT), EntityType.OBJECT);
+        Assert.assertEquals(EntityType.OBJECT, reference.getType());
+        Assert.assertEquals("object", reference.getName());
+        Assert.assertEquals(EntityType.DOCUMENT, reference.getParent().getType());
+        Assert.assertEquals("defpage", reference.getParent().getName());
+        Assert.assertEquals(EntityType.SPACE, reference.getParent().getParent().getType());
+        Assert.assertEquals("defspace", reference.getParent().getParent().getName());
+        Assert.assertEquals(EntityType.WIKI, reference.getParent().getParent().getParent().getType());
+        Assert.assertEquals("defwiki", reference.getParent().getParent().getParent().getName());
+    }
+
+    /**
+     * Tests that a relative object property is resolved correctly and completed with the default object parent.
+     */
+    @Test
+    public void testResolveObjectPropertyReferenceWhenMissingParents()
+    {
+        EntityReference reference =
+            resolver.resolve(new EntityReference("property", EntityType.OBJECT_PROPERTY), EntityType.OBJECT_PROPERTY);
+        Assert.assertEquals(EntityType.OBJECT_PROPERTY, reference.getType());
+        Assert.assertEquals("property", reference.getName());        
+        Assert.assertEquals(EntityType.OBJECT, reference.getParent().getType());
+        Assert.assertEquals("defobject", reference.getParent().getName());
+        Assert.assertEquals(EntityType.DOCUMENT, reference.getParent().getParent().getType());
+        Assert.assertEquals("defpage", reference.getParent().getParent().getName());
+        Assert.assertEquals(EntityType.SPACE, reference.getParent().getParent().getParent().getType());
+        Assert.assertEquals("defspace", reference.getParent().getParent().getParent().getName());
+        Assert.assertEquals(EntityType.WIKI, reference.getParent().getParent().getParent().getParent().getType());
+        Assert.assertEquals("defwiki", reference.getParent().getParent().getParent().getParent().getName());
+    }
+
+    /**
+     * Test that a document reference, when resolved as an object reference, is correctly completed with the default
+     * values for object name.
+     */
+    @Test
+    public void testResolveObjectReferenceWhenTypeIsDocument()
+    {
+        EntityReference reference =
+            resolver.resolve(new EntityReference("page", EntityType.DOCUMENT, new EntityReference("space",
+                EntityType.SPACE, new EntityReference("wiki", EntityType.WIKI))), EntityType.OBJECT);
+        Assert.assertEquals(EntityType.OBJECT, reference.getType());
+        Assert.assertEquals("defobject", reference.getName());
+        Assert.assertEquals(EntityType.DOCUMENT, reference.getParent().getType());
+        Assert.assertEquals("page", reference.getParent().getName());
+        Assert.assertEquals(EntityType.SPACE, reference.getParent().getParent().getType());
+        Assert.assertEquals("space", reference.getParent().getParent().getName());
+        Assert.assertEquals(EntityType.WIKI, reference.getParent().getParent().getParent().getType());
+        Assert.assertEquals("wiki", reference.getParent().getParent().getParent().getName());
+    }
+
+    /**
+     * Test that a document reference, when resolved as a property reference, is correctly completed with the default
+     * values for object and property name.
+     */
+    @Test
+    public void testResolveObjectPropertyReferenceWhenTypeIsDocument()
+    {
+        EntityReference reference =
+            resolver.resolve(new EntityReference("page", EntityType.DOCUMENT, new EntityReference("space",
+                EntityType.SPACE, new EntityReference("wiki", EntityType.WIKI))), EntityType.OBJECT_PROPERTY);
+        Assert.assertEquals(EntityType.OBJECT_PROPERTY, reference.getType());
+        Assert.assertEquals("defproperty", reference.getName());
+        Assert.assertEquals(EntityType.OBJECT, reference.getParent().getType());
+        Assert.assertEquals("defobject", reference.getParent().getName());
+        Assert.assertEquals(EntityType.DOCUMENT, reference.getParent().getParent().getType());
+        Assert.assertEquals("page", reference.getParent().getParent().getName());
+        Assert.assertEquals(EntityType.SPACE, reference.getParent().getParent().getParent().getType());
+        Assert.assertEquals("space", reference.getParent().getParent().getParent().getName());
+        Assert.assertEquals(EntityType.WIKI, reference.getParent().getParent().getParent().getParent().getType());
+        Assert.assertEquals("wiki", reference.getParent().getParent().getParent().getParent().getName());
+    }    
 
     @Test
     public void testResolveDocumentReferenceWhenNullReference()

@@ -56,6 +56,8 @@ public class DefaultModelConfiguration extends AbstractLogEnabled implements Mod
         put(EntityType.SPACE, "Main");
         put(EntityType.DOCUMENT, "WebHome");
         put(EntityType.ATTACHMENT, "filename");
+        put(EntityType.OBJECT, "object");
+        put(EntityType.OBJECT_PROPERTY, "property");
     }};
 
     /**

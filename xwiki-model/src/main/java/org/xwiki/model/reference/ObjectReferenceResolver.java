@@ -17,46 +17,25 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.model;
+package org.xwiki.model.reference;
+
+import org.xwiki.component.annotation.ComponentRole;
 
 /**
- * Represents a type of entity (ie a Model Object such as a Wiki, a Space, a Document, an Attachment, etc).
+ * Resolve an Object reference defined in a given representation into a validated {@link ObjectReference} object, i.e.
+ * with valid values and a valid hierarchy (e.g. an Object reference must have a parent which is a document reference,
+ * reference values must not be null, etc).
  * 
+ * @param <T> the type of the representation (e.g. a String)
  * @version $Id$
- * @since 2.2M1
+ * @since 2.3M1
  */
-public enum EntityType
+@ComponentRole
+public interface ObjectReferenceResolver<T>
 {
-    // Note that order below is important since it creates an order.
-    // For example: EntityType.WIKI.ordinal() < EntityType.SPACE.ordinal()
-
     /**
-     * Represents a Wiki Entity.
+     * @param objectReferenceRepresentation the representation of an object reference (e.g. as a String)
+     * @return the valid resolved object reference as an object
      */
-    WIKI,
-
-    /**
-     * Represents a Space Entity.
-     */
-    SPACE,
-
-    /**
-     * Represents a Document Entity.
-     */
-    DOCUMENT,
-
-    /**
-     * Represents an Attachment Entity.
-     */
-    ATTACHMENT,
-
-    /**
-     * Represents an Object Entity.
-     */
-    OBJECT,
-
-    /**
-     * Represents an Object Property Entity.
-     */
-    OBJECT_PROPERTY
+    ObjectReference resolve(T objectReferenceRepresentation);
 }

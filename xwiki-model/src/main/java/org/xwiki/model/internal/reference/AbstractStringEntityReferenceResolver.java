@@ -42,6 +42,8 @@ public abstract class AbstractStringEntityReferenceResolver implements EntityRef
         put(EntityType.DOCUMENT, Arrays.asList('.', ':'));
         put(EntityType.ATTACHMENT, Arrays.asList('@', '.', ':'));
         put(EntityType.SPACE, Arrays.asList(':'));
+        put(EntityType.OBJECT, Arrays.asList('^', '.', ':'));
+        put(EntityType.OBJECT_PROPERTY, Arrays.asList('.', '^', '.', ':'));
     }};
 
     private Map<EntityType, List<EntityType>> entityTypes = new HashMap<EntityType, List<EntityType>>() {{
@@ -49,6 +51,10 @@ public abstract class AbstractStringEntityReferenceResolver implements EntityRef
         put(EntityType.ATTACHMENT, Arrays.asList(EntityType.ATTACHMENT, EntityType.DOCUMENT, EntityType.SPACE,
             EntityType.WIKI));
         put(EntityType.SPACE, Arrays.asList(EntityType.SPACE, EntityType.WIKI));
+        put(EntityType.OBJECT, Arrays.asList(EntityType.OBJECT, EntityType.DOCUMENT, EntityType.SPACE,
+            EntityType.WIKI));
+        put(EntityType.OBJECT_PROPERTY, Arrays.asList(EntityType.OBJECT_PROPERTY, EntityType.OBJECT, 
+            EntityType.DOCUMENT, EntityType.SPACE, EntityType.WIKI));
     }};
 
     /**

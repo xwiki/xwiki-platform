@@ -21,6 +21,7 @@ package org.xwiki.model.internal.reference;
 
 import org.junit.Assert;
 import org.junit.Before;
+import org.junit.Test;
 import org.xwiki.component.util.ReflectionUtils;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
@@ -43,7 +44,7 @@ public class ExplicitStringDocumentReferenceResolverTest
             new ExplicitStringEntityReferenceResolver());
     }
 
-    @org.junit.Test
+    @Test
     public void testResolveWithExplicitDocumentReference()
     {
         DocumentReference reference = this.resolver.resolve("", new DocumentReference("wiki", "space", "page"));

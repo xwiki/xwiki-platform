@@ -21,6 +21,7 @@ package org.xwiki.model.internal.reference;
 
 import org.junit.Assert;
 import org.junit.Before;
+import org.junit.Test;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
@@ -42,7 +43,7 @@ public class ExplicitStringEntityReferenceResolverTest
         this.resolver = new ExplicitStringEntityReferenceResolver();
     }
 
-    @org.junit.Test
+    @Test
     public void testResolveWithExplicitDocumentReference()
     {
         EntityReference reference =
@@ -56,7 +57,7 @@ public class ExplicitStringEntityReferenceResolverTest
         Assert.assertEquals(EntityType.WIKI, reference.getParent().getParent().getType());
     }
 
-    @org.junit.Test
+    @Test
     public void testResolveWithExplicitEntityReference()
     {
         EntityReference reference =
@@ -70,7 +71,7 @@ public class ExplicitStringEntityReferenceResolverTest
         Assert.assertEquals(EntityType.WIKI, reference.getParent().getParent().getType());
     }
 
-    @org.junit.Test
+    @Test
     public void testResolveWithAbsoluteReferenceAndNoExplicitReference()
     {
         EntityReference reference = this.resolver.resolve("wiki:space.page", EntityType.DOCUMENT);
@@ -83,7 +84,7 @@ public class ExplicitStringEntityReferenceResolverTest
         Assert.assertEquals(EntityType.WIKI, reference.getParent().getParent().getType());
     }
 
-    @org.junit.Test
+    @Test
     public void testResolveWithExplicitReferenceWithHoles()
     {
         EntityReference reference = this.resolver.resolve("space.page", EntityType.DOCUMENT,
@@ -97,7 +98,7 @@ public class ExplicitStringEntityReferenceResolverTest
         Assert.assertEquals(EntityType.WIKI, reference.getParent().getParent().getType());
     }
     
-    @org.junit.Test
+    @Test
     public void testResolveWithNoExplicitAndPartialReference()
     {
         try {
@@ -109,7 +110,7 @@ public class ExplicitStringEntityReferenceResolverTest
         }
     }
 
-    @org.junit.Test
+    @Test
     public void testResolveWithInvalidParameterType()
     {
         try {
@@ -121,7 +122,7 @@ public class ExplicitStringEntityReferenceResolverTest
         }
     }
 
-    @org.junit.Test
+    @Test
     public void testResolveWithIncompleteExplicitReference()
     {
         try {

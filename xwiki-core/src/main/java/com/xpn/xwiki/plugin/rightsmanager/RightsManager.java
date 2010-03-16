@@ -23,17 +23,15 @@ package com.xpn.xwiki.plugin.rightsmanager;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.Hashtable;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.xwiki.observation.EventListener;
-import org.xwiki.observation.event.DocumentDeleteEvent;
-import org.xwiki.observation.event.Event;
-import org.xwiki.observation.remote.RemoteObservationManagerContext;
+import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.DocumentReferenceResolver;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
@@ -46,15 +44,16 @@ import com.xpn.xwiki.plugin.rightsmanager.utils.AllowDeny;
 import com.xpn.xwiki.plugin.rightsmanager.utils.LevelTree;
 import com.xpn.xwiki.plugin.rightsmanager.utils.RequestLimit;
 import com.xpn.xwiki.plugin.rightsmanager.utils.UsersGroups;
+import com.xpn.xwiki.user.api.XWikiRightService;
 import com.xpn.xwiki.web.Utils;
 
 /**
- * Hidden toolkit use by the plugin API that make all the plugin's actions.
+ * Hidden toolkit used by the plugin API that make all the plugin's actions.
  * 
  * @version $Id$
  * @since XWiki Core 1.1.2, XWiki Core 1.2M2 (public since 1.4M1)
  */
-public final class RightsManager implements EventListener
+public final class RightsManager
 {
     /**
      * Name of the default space where users and groups are stored.
@@ -134,26 +133,21 @@ public final class RightsManager implements EventListener
     // ////////////////////////////////////////////////////////////////////////////
 
     /**
-     * The name of the listener.
-     */
-    private static final String NAME = "rightsmanager";
-
-    /**
-     * The events to match.
-     */
-    private static final List<Event> EVENTS = new ArrayList<Event>()
-    {
-        {
-            add(new DocumentDeleteEvent());
-        }
-    };
-
-    // ////////////////////////////////////////////////////////////////////////////
-
-    /**
      * Unique instance of RightsManager.
      */
     private static RightsManager instance;
+
+    /**
+     * Used to resolve document reference based on another reference.
+     */
+    private DocumentReferenceResolver<String> explicitDocumentReferenceResolver =
+        Utils.getComponent(DocumentReferenceResolver.class, "explicit");
+
+    /**
+     * Used to resolve reference based on context.
+     */
+    private DocumentReferenceResolver<String> currentDocumentReferenceResolver =
+        Utils.getComponent(DocumentReferenceResolver.class, "current");
 
     /**
      * Hidden constructor of RightsManager only access via getInstance().
@@ -174,120 +168,6 @@ public final class RightsManager implements EventListener
         }
 
         return instance;
-    }
-
-    /**
-     * Remove reference to provided user or group in all groups and rights in current wiki.
-     * 
-     * @param userOrGroupWiki the wiki name of the group or user.
-     * @param userOrGroupSpace the space name of the group or user.
-     * @param userOrGroupName the name of the group or user.
-     * @param user indicate if it is a user or a group.
-     * @param context the XWiki context.
-     * @throws XWikiException error when browsing groups or rights.
-     */
-    private void cleanDeletedUserOrGroupInLocalWiki(String userOrGroupWiki, String userOrGroupSpace,
-        String userOrGroupName, boolean user, XWikiContext context) throws XWikiException
-    {
-        removeUserOrGroupFromAllRights(userOrGroupWiki, userOrGroupSpace, userOrGroupName, user, context);
-        context.getWiki().getGroupService(context).removeUserOrGroupFromAllGroups(userOrGroupWiki, userOrGroupSpace,
-            userOrGroupName, context);
-    }
-
-    /**
-     * Remove reference to provided user or group in all groups and rights in all wikis.
-     * 
-     * @param userOrGroupWiki the wiki name of the group or user.
-     * @param userOrGroupSpace the space name of the group or user.
-     * @param userOrGroupName the name of the group or user.
-     * @param user indicate if it is a user or a group.
-     * @param context the XWiki context.
-     * @throws XWikiException error when browsing groups or rights.
-     */
-    private void cleanDeletedUserOrGroup(String userOrGroupWiki, String userOrGroupSpace, String userOrGroupName,
-        boolean user, XWikiContext context) throws XWikiException
-    {
-        if (!context.getWiki().isVirtualMode()) {
-            cleanDeletedUserOrGroupInLocalWiki(userOrGroupWiki, userOrGroupSpace, userOrGroupName, user, context);
-        } else {
-            List<String> wikiList = context.getWiki().getVirtualWikisDatabaseNames(context);
-
-            String database = context.getDatabase();
-            try {
-                boolean foundMainWiki = false;
-
-                for (String wikiName : wikiList) {
-                    if (context.isMainWiki(wikiName)) {
-                        foundMainWiki = true;
-                    }
-
-                    context.setDatabase(wikiName);
-                    cleanDeletedUserOrGroupInLocalWiki(userOrGroupWiki, userOrGroupSpace, userOrGroupName, user,
-                        context);
-                }
-
-                if (!foundMainWiki) {
-                    context.setDatabase(context.getMainXWiki());
-                    cleanDeletedUserOrGroupInLocalWiki(userOrGroupWiki, userOrGroupSpace, userOrGroupName, user,
-                        context);
-                }
-            } finally {
-                context.setDatabase(database);
-            }
-        }
-    }
-
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.observation.EventListener#getName()
-     */
-    public String getName()
-    {
-        return NAME;
-    }
-
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.observation.EventListener#getEvents()
-     */
-    public List<Event> getEvents()
-    {
-        return EVENTS;
-    }
-
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.observation.EventListener#onEvent(org.xwiki.observation.event.Event, java.lang.Object,
-     *      java.lang.Object)
-     */
-    public void onEvent(Event event, Object source, Object data)
-    {
-        // Only take into account local events
-        if (!Utils.getComponent(RemoteObservationManagerContext.class).isRemoteState()) {
-            XWikiDocument document = ((XWikiDocument) source).getOriginalDocument();
-            XWikiContext context = (XWikiContext) data;
-
-            String userOrGroupWiki = document.getDatabase();
-            String userOrGroupSpace = document.getSpace();
-            String userOrGroupName = document.getName();
-
-            if (document.getObject("XWiki.XWikiUsers") != null) {
-                try {
-                    cleanDeletedUserOrGroup(userOrGroupWiki, userOrGroupSpace, userOrGroupName, true, context);
-                } catch (XWikiException e) {
-                    LOG.warn("Error when cleaning for deleted user", e);
-                }
-            } else if (document.getObject("XWiki.XWikiGroups") != null) {
-                try {
-                    cleanDeletedUserOrGroup(userOrGroupWiki, userOrGroupSpace, userOrGroupName, false, context);
-                } catch (XWikiException e) {
-                    LOG.warn("Error when cleaning for deleted group", e);
-                }
-            }
-        }
     }
 
     // Groups and users management
@@ -1201,14 +1081,12 @@ public final class RightsManager implements EventListener
 
         Map<String, Collection<String>> groupCache = groupCacheIn;
         if (groupCache == null) {
-            groupCache = new Hashtable<String, Collection<String>>();
+            groupCache = new HashMap<String, Collection<String>>();
         }
 
-        Collection<String> memberList;
+        Collection<String> memberList = groupCache.get(groupName);
 
-        if (groupCache.containsKey(groupName)) {
-            memberList = groupCache.get(groupName);
-        } else {
+        if (memberList == null) {
             memberList =
                 context.getWiki().getGroupService(context).getAllMembersNamesForGroup(groupName, 0, 0, context);
             groupCache.put(groupName, memberList);
@@ -1227,5 +1105,92 @@ public final class RightsManager implements EventListener
         }
 
         return found;
+    }
+
+    /**
+     * Resolve passed user or group into users references list.
+     * 
+     * @param userOrGroup the user or group
+     * @param context the XWikiContext the XWiki context
+     * @return the list of users references
+     * @throws XWikiException error when getting documents
+     */
+    public Collection<DocumentReference> resolveUsers(DocumentReference userOrGroup, XWikiContext context)
+        throws XWikiException
+    {
+        Collection<DocumentReference> users = new LinkedHashSet<DocumentReference>();
+
+        // Try it as virtual user (guest, superadmin)
+
+        if (userOrGroup.getLastSpaceReference().getName().equals(DEFAULT_USERORGROUP_SPACE)
+            && (userOrGroup.getName().equalsIgnoreCase(XWikiRightService.SUPERADMIN_USER) || userOrGroup.getName()
+                .equals(XWikiRightService.GUEST_USER))) {
+            users.add(userOrGroup);
+        }
+
+        // resolve
+
+        XWikiDocument document = context.getWiki().getDocument(userOrGroup, context);
+
+        if (!document.isNew()) {
+            // Try it as user
+
+            DocumentReference userClassReference =
+                new DocumentReference(document.getDatabase(), DEFAULT_USERORGROUP_SPACE, "XWikiUsers");
+
+            if (document.getXObject(userClassReference) != null) {
+                users.add(userOrGroup);
+            }
+
+            // Try it as group
+
+            DocumentReference groupClassReference =
+                new DocumentReference(document.getDatabase(), DEFAULT_USERORGROUP_SPACE, "XWikiGroups");
+
+            List<BaseObject> members = document.getXObjects(groupClassReference);
+            if (members != null) {
+                for (BaseObject memberObj : members) {
+                    String member = memberObj.getStringValue("member");
+
+                    users.addAll(resolveUsers(this.explicitDocumentReferenceResolver.resolve(member, userOrGroup),
+                        context));
+                }
+            }
+        }
+
+        return users;
+    }
+
+    /**
+     * Resolve passed user or group into users references list.
+     * 
+     * @param userOrGroup the user or group
+     * @param context the XWikiContext the XWiki context
+     * @return the list of users references
+     * @throws XWikiException error when getting documents
+     */
+    public Collection<DocumentReference> resolveUsers(String userOrGroup, XWikiContext context) throws XWikiException
+    {
+        return resolveUsers(this.currentDocumentReferenceResolver.resolve(userOrGroup), context);
+    }
+
+    /**
+     * Resolve passed users and groups into users references list.
+     * 
+     * @param referenceList the list of users and groups
+     * @param context the XWikiContext the XWiki context
+     * @return the list of users references
+     * @throws XWikiException error when getting documents
+     */
+    public Collection<DocumentReference> resolveUsers(List<String> referenceList, XWikiContext context)
+        throws XWikiException
+    {
+        Collection<DocumentReference> users = new LinkedHashSet<DocumentReference>();
+
+        for (String reference : referenceList) {
+            users.addAll(resolveUsers(reference, context));
+        }
+
+        return users;
     }
 }

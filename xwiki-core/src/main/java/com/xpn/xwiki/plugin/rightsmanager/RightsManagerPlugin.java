@@ -75,10 +75,10 @@ public class RightsManagerPlugin extends XWikiDefaultPlugin
         // removed in order to remove that user from its groups.
         // Make sure we allow this plugin to be initialized several times in a row; i.e. don't re-register the
         // listener if it's already registered.
-        RightsManager rightsManager = RightsManager.getInstance();
+        RightsManagerListener rightsManagerListener = RightsManagerListener.getInstance();
         ObservationManager observationManager = Utils.getComponent(ObservationManager.class);
-        if (observationManager.getListener(rightsManager.getName()) == null) {
-            observationManager.addListener(rightsManager);
+        if (observationManager.getListener(rightsManagerListener.getName()) == null) {
+            observationManager.addListener(rightsManagerListener);
         }
     }
 

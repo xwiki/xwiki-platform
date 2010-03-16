@@ -23,8 +23,10 @@ package com.xpn.xwiki.stats.impl;
 
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 
@@ -36,12 +38,13 @@ import org.apache.commons.lang.RandomStringUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-
-import com.xpn.xwiki.XWikiContext;
-import com.xpn.xwiki.XWikiException;
+import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.query.Query;
 import org.xwiki.query.QueryManager;
 
+import com.xpn.xwiki.XWikiContext;
+import com.xpn.xwiki.XWikiException;
+import com.xpn.xwiki.plugin.rightsmanager.RightsManager;
 import com.xpn.xwiki.user.api.XWikiRightService;
 import com.xpn.xwiki.util.Util;
 import com.xpn.xwiki.web.XWikiRequest;
@@ -59,10 +62,25 @@ public final class StatsUtil
     private static final Log LOG = LogFactory.getLog(StatsUtil.class);
 
     /**
+     * Default separator for a list.
+     */
+    private static final String LIST_SEPARATOR = ",";
+
+    /**
+     * Default separator for a list in escaped form.
+     */
+    private static final String ESCAPED_LIST_SEPARATOR = "\\,";
+    
+    /**
      * The name of the property in XWiki configuration file containing the list of cookie domains.
      */
     private static final String CFGPROP_COOKIEDOMAINS = "xwiki.authentication.cookiedomains";
 
+    /**
+     * Separator for the property in XWiki configuration file containing the list of cookie domains.
+     */
+    private static final char CFGPROP_COOKIEDOMAINS_SEP = ',';
+    
     /**
      * The name of the property in XWiki configuration file indicating if statistics are enabled.
      */
@@ -72,6 +90,12 @@ public final class StatsUtil
      * The name of the property in XWiki configuration file indicating if a virtual wiki store statistics by default.
      */
     private static final String CFGPROP_STATS_DEFAULT = "xwiki.stats.default";
+
+    /**
+     * The name of the property in XWiki configuration file containing the list of users and group to filter in
+     * statistics requests.
+     */
+    private static final String CFGPROP_STATS_EXCLUDEDUSERSANDGROUPS = "xwiki.stats.excludedUsersAndGroups";
 
     /**
      * The prefix name of the session property containing recent statistics actions.
@@ -92,6 +116,12 @@ public final class StatsUtil
      * The name of the XWiki preferences property indicating if current wiki store statistics.
      */
     private static final String PREFPROP_STATISTICS = "statistics";
+
+    /**
+     * The name of the XWiki preferences property containing the list of users and group to filter in statistics
+     * requests.
+     */
+    private static final String PREFPROP_EXCLUDEDUSERSANDGROUPS = "statistics_excludedUsersAndGroups";
 
     /**
      * The name of the request property containing the referer.
@@ -158,7 +188,8 @@ public final class StatsUtil
      * <ul>
      * <li>"yyyMMdd" for {@link PeriodType#DAY}</li>
      * <li>"yyyMM" for {@link PeriodType#MONTH}</li>
-     * </ul>.
+     * </ul>
+     * .
      * 
      * @param date the date for which to return an integer representation.
      * @param type the date type. It can be {@link PeriodType#DAY} or {@link PeriodType#MONTH}.
@@ -195,7 +226,8 @@ public final class StatsUtil
     public static String[] getCookieDomains(XWikiContext context)
     {
         if (cookieDomains == null) {
-            cookieDomains = StringUtils.split(context.getWiki().Param(CFGPROP_COOKIEDOMAINS), ",");
+            cookieDomains =
+                StringUtils.split(context.getWiki().Param(CFGPROP_COOKIEDOMAINS), CFGPROP_COOKIEDOMAINS_SEP);
         }
 
         return cookieDomains;
@@ -345,7 +377,7 @@ public final class StatsUtil
                 }
             }
 
-            if ((!context.getUser().equals(XWikiRightService.GUEST_USER_FULLNAME)) 
+            if ((!context.getUser().equals(XWikiRightService.GUEST_USER_FULLNAME))
                 && (visitObject.getUser().equals(XWikiRightService.GUEST_USER_FULLNAME))) {
                 // The user has changed from guest to an authenticated user
                 // We want to record this
@@ -652,5 +684,52 @@ public final class StatsUtil
         }
 
         return referer;
+    }
+
+    /**
+     * The list of users to filter in request.
+     * 
+     * @param context the XWiki context
+     * @return the list of users references
+     * @throws XWikiException error when trying to resolve users
+     */
+    public static Collection<DocumentReference> getFilteredUsers(XWikiContext context) throws XWikiException
+    {
+        List<String> userList;
+
+        String users = context.getWiki().getXWikiPreference(PREFPROP_EXCLUDEDUSERSANDGROUPS, "", context);
+
+        if (StringUtils.isEmpty(users)) {
+            users = context.getWiki().Param(CFGPROP_STATS_EXCLUDEDUSERSANDGROUPS);
+        }
+
+        if (!StringUtils.isBlank(users)) {
+            userList = new ArrayList<String>();
+
+            int begin = 0;
+            boolean escaped = false;
+            for (int i = 0; i < users.length(); ++i) {
+                char c = users.charAt(i);
+
+                if (!escaped) {
+                    if (c == '\\') {
+                        escaped = true;
+                    } else if (c == ',') {
+                        userList.add(users.substring(begin, i).replace(ESCAPED_LIST_SEPARATOR, LIST_SEPARATOR));
+                        begin = i + 1;
+                    }
+                } else {
+                    escaped = false;
+                }
+            }
+
+            if (begin < users.length()) {
+                userList.add(users.substring(begin).replace(ESCAPED_LIST_SEPARATOR, LIST_SEPARATOR));
+            }
+        } else {
+            userList = Collections.emptyList();
+        }
+
+        return RightsManager.getInstance().resolveUsers(userList, context);
     }
 }

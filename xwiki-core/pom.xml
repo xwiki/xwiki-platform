@@ -924,7 +924,8 @@
               **/XWikiPatchUtils.java,
               **/XWikiRCSArchive.java,
               **/XWikiHibernateRecycleBinStore.java,
-              **/migration/AbstractXWikiMigrationManager.java
+              **/migration/AbstractXWikiMigrationManager.java,
+              **/stats/impl/xwiki/XWikiStatsReader.java
           </excludes>
         </configuration>
       </plugin>

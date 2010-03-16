@@ -40,9 +40,14 @@ public interface XWikiRightService
     public static final String SUPERADMIN_USER_FULLNAME = "XWiki." + SUPERADMIN_USER;
     
     /**
+     * The Guest username.
+     */
+    public static final String GUEST_USER = "XWikiGuest";
+    
+    /**
      * The Guest full name.
      */
-    public static final String GUEST_USER_FULLNAME = "XWiki.XWikiGuest";
+    public static final String GUEST_USER_FULLNAME = "XWiki." + GUEST_USER;
     
     public boolean checkAccess(String action, XWikiDocument doc, XWikiContext context) throws XWikiException;
 

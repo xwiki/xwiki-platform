@@ -762,7 +762,7 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
                         object = newobject;
                     }
                     loadXWikiCollection(object, doc, context, false, true);
-                    doc.setXObject(classReference, object.getNumber(), object);
+                    doc.setXObject(object.getNumber(), object);
                 }
 
                 if (hasGroups) {
@@ -780,7 +780,7 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
                         obj.setXClassReference(localGroupEntityReference);
                         obj.setNumber(number.intValue());
                         obj.setStringValue("member", member);
-                        doc.setXObject(groupsDocumentReference, obj.getNumber(), obj);
+                        doc.setXObject(obj.getNumber(), obj);
                     }
                 }
             }

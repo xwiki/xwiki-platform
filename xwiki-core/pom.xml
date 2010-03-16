@@ -1397,6 +1397,7 @@
               **/user/impl/exo/ExoAuthServiceImpl.java,
               **/user/impl/exo/ExoFilter.java,
               **/user/impl/exo/ExoGroupServiceImpl.java,
+              <!-- Small Fan-Out complexity issue but it would need a big refactor to be fixed. -->
               **/stats/impl/xwiki/XWikiStatsReader.java
           </excludes>
         </configuration>

@@ -84,10 +84,12 @@ public class StatsUtilTest extends AbstractBridgedXWikiComponentTestCase
         assertEquals(new HashSet<DocumentReference>(), StatsUtil.getFilteredUsers(getContext()));
 
         this.mockXWiki.stubs().method("Param").will(returnValue("XWiki.XWikiGuest"));
+        this.mockXWiki.stubs().method("getDocument").will(returnValue(new XWikiDocument("xwiki", "XWiki", "XWikiGuest")));
         
         assertEquals(new HashSet<DocumentReference>(Arrays.asList(new DocumentReference("xwiki", "XWiki", "XWikiGuest"))), StatsUtil.getFilteredUsers(getContext()));
         
         this.mockXWiki.stubs().method("Param").will(returnValue("XWiki.supeRadmin"));
+        this.mockXWiki.stubs().method("getDocument").will(returnValue(new XWikiDocument("xwiki", "XWiki", "supeRadmin")));
         
         assertEquals(new HashSet<DocumentReference>(Arrays.asList(new DocumentReference("xwiki", "XWiki", "supeRadmin"))), StatsUtil.getFilteredUsers(getContext()));
         
@@ -98,6 +100,7 @@ public class StatsUtilTest extends AbstractBridgedXWikiComponentTestCase
 
         DocumentReference userReference = new DocumentReference("xwiki", "XWiki", "user");
         final XWikiDocument userDoc = new XWikiDocument(userReference);
+        userDoc.setNew(false);
         userDoc.addXObject(new DocumentReference("xwiki", "XWiki", "XWikiUsers"), new BaseObject());
 
         this.mockXWiki.stubs().method("Param").will(returnValue("XWiki.user"));
@@ -108,6 +111,7 @@ public class StatsUtilTest extends AbstractBridgedXWikiComponentTestCase
 
         DocumentReference user2Reference = new DocumentReference("xwiki", "XWiki", "user2");
         final XWikiDocument user2Doc = new XWikiDocument(user2Reference);
+        user2Doc.setNew(false);
         user2Doc.addXObject(new DocumentReference("xwiki", "XWiki", "XWikiUsers"), new BaseObject());
 
         this.mockXWiki.stubs().method("Param").will(returnValue("XWiki.user,XWiki.user2"));
@@ -118,10 +122,12 @@ public class StatsUtilTest extends AbstractBridgedXWikiComponentTestCase
 
         DocumentReference user3Reference = new DocumentReference("otherwiki", "XWiki", "user3");
         final XWikiDocument user3Doc = new XWikiDocument(user3Reference);
+        user3Doc.setNew(false);
         user3Doc.addXObject(new DocumentReference("otherwiki", "XWiki", "XWikiUsers"), new BaseObject());
 
         DocumentReference groupReference = new DocumentReference("otherwiki", "XWiki", "group");
         final XWikiDocument groupDoc = new XWikiDocument(groupReference);
+        groupDoc.setNew(false);
         BaseObject member = new BaseObject();
         member.setStringValue("member", "user3");
         groupDoc.addXObject(new DocumentReference("otherwiki", "XWiki", "XWikiGroups"), member);

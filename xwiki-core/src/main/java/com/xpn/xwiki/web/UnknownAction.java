@@ -40,6 +40,10 @@ public class UnknownAction extends XWikiAction
      * @see XWikiAction#render(com.xpn.xwiki.XWikiContext)
      */
     public String render(XWikiContext context) throws XWikiException {
-        return context.getWiki().Param("xwiki.unknownActionResponse", "exception");
+        String defaultAction = context.getWiki().Param("xwiki.unknownActionResponse", "exception");
+        // Set the action in the context because code which uses $xcontext.getAction()
+        // should get the desired action instead of "unknown"
+        context.setAction(defaultAction);
+        return defaultAction;
     }
 }

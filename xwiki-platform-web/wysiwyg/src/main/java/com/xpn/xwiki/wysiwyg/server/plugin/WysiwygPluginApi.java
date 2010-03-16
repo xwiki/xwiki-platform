@@ -35,6 +35,14 @@ import com.xpn.xwiki.wysiwyg.client.converter.HTMLConverter;
 public class WysiwygPluginApi extends Api
 {
     /**
+     * The context property which indicates if the current code was called from a template (only Velocity execution) or
+     * from a wiki page (wiki syntax rendering).
+     * 
+     * @see #parseAndRender(String, String)
+     */
+    private static final String IS_IN_RENDERING_ENGINE = "isInRenderingEngine";
+
+    /**
      * The plugin instance.
      */
     private WysiwygPlugin plugin;
@@ -98,11 +106,26 @@ public class WysiwygPluginApi extends Api
      */
     public String parseAndRender(String html, String syntax)
     {
+        // Save the value of the "is in rendering engine" context property.
+        Object isInRenderingEngine = context.get(IS_IN_RENDERING_ENGINE);
+
         try {
+            // This tells display() methods that we are inside the rendering engine and thus that they can return wiki
+            // syntax and not HTML syntax (which is needed when outside the rendering engine, i.e. when we're inside
+            // templates using only Velocity for example).
+            context.put(IS_IN_RENDERING_ENGINE, true);
+
             return Utils.getComponent(HTMLConverter.class).parseAndRender(html, syntax);
         } catch (Exception e) {
             // Leave the previous HTML in case of an exception.
             return html;
+        } finally {
+            // Restore the value of the value of the "is in rendering engine" context property.
+            if (isInRenderingEngine != null) {
+                context.put(IS_IN_RENDERING_ENGINE, isInRenderingEngine);
+            } else {
+                context.remove(IS_IN_RENDERING_ENGINE);
+            }
         }
     }
 }

@@ -925,6 +925,7 @@
               **/XWikiRCSArchive.java,
               **/XWikiHibernateRecycleBinStore.java,
               **/migration/AbstractXWikiMigrationManager.java,
+              <!-- Small Fan-Out complexity issue but it would need a big refactor to be fixed. -->
               **/stats/impl/xwiki/XWikiStatsReader.java
           </excludes>
         </configuration>

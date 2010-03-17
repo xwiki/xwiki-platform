@@ -166,7 +166,7 @@ public class XWikiDocument implements DocumentModelBridge
 
     /**
      * Reference to this document's parent.
-     *
+     * <p>
      * Note that we're saving the parent reference as a relative reference instead of an absolute one because
      * We want the ability (for example) to create a parent reference relative to the current space or wiki so that a
      * copy of this XWikiDocument object would retain that relativity. This is for example useful when copying a Wiki
@@ -175,8 +175,8 @@ public class XWikiDocument implements DocumentModelBridge
     private EntityReference parentReference;
 
     /**
-     * Cache the parent reference resolved as an absolute reference for improved performance (so that we don't have
-     * to resolve the relative reference every time getParentReference() is called.
+     * Cache the parent reference resolved as an absolute reference for improved performance (so that we don't have to
+     * resolve the relative reference every time getParentReference() is called.
      */
     private DocumentReference parentReferenceCache;
 
@@ -343,70 +343,70 @@ public class XWikiDocument implements DocumentModelBridge
      * Used to resolve a string into a proper Document Reference using the current document's reference to fill the
      * blanks.
      */
-    private DocumentReferenceResolver<String> currentDocumentReferenceResolver = Utils.getComponent(
-        DocumentReferenceResolver.class, "current");
+    private DocumentReferenceResolver<String> currentDocumentReferenceResolver =
+        Utils.getComponent(DocumentReferenceResolver.class, "current");
 
     /**
      * Used to resolve a string into a proper Document Reference using the current document's reference to fill the
      * blanks.
      */
-    private DocumentReferenceResolver<String> explicitDocumentReferenceResolver = Utils.getComponent(
-        DocumentReferenceResolver.class, "explicit");
+    private DocumentReferenceResolver<String> explicitDocumentReferenceResolver =
+        Utils.getComponent(DocumentReferenceResolver.class, "explicit");
 
-    private EntityReferenceResolver<String> xClassEntityReferenceResolver = Utils.getComponent(
-        EntityReferenceResolver.class, "xclass");
+    private EntityReferenceResolver<String> xClassEntityReferenceResolver =
+        Utils.getComponent(EntityReferenceResolver.class, "xclass");
 
     /**
      * Used to resolve a string into a proper Document Reference using the current document's reference to fill the
      * blanks, except for the page name for which the default page name is used instead and for the wiki name for which
      * the current wiki is used instead of the current document reference's wiki.
      */
-    private DocumentReferenceResolver<String> currentMixedDocumentReferenceResolver = Utils.getComponent(
-        DocumentReferenceResolver.class, "currentmixed");
+    private DocumentReferenceResolver<String> currentMixedDocumentReferenceResolver =
+        Utils.getComponent(DocumentReferenceResolver.class, "currentmixed");
 
     /**
      * Used to normalize references.
      */
-    private DocumentReferenceResolver<EntityReference> currentReferenceDocumentReferenceResolver = Utils.getComponent(
-        DocumentReferenceResolver.class, "current/reference");
+    private DocumentReferenceResolver<EntityReference> currentReferenceDocumentReferenceResolver =
+        Utils.getComponent(DocumentReferenceResolver.class, "current/reference");
 
     /**
      * Used to normalize references.
      */
-    private DocumentReferenceResolver<EntityReference> explicitReferenceDocumentReferenceResolver = Utils.getComponent(
-        DocumentReferenceResolver.class, "explicit/reference");
+    private DocumentReferenceResolver<EntityReference> explicitReferenceDocumentReferenceResolver =
+        Utils.getComponent(DocumentReferenceResolver.class, "explicit/reference");
 
     /**
      * Used to resolve parent references in the way they are stored externally (database, xml, etc), ie relative or
      * absolute.
      */
-    private EntityReferenceResolver<String> relativeEntityReferenceResolver = Utils.getComponent(
-        EntityReferenceResolver.class, "relative");
+    private EntityReferenceResolver<String> relativeEntityReferenceResolver =
+        Utils.getComponent(EntityReferenceResolver.class, "relative");
 
     /**
      * Used to convert a proper Document Reference to string (compact form).
      */
-    private EntityReferenceSerializer<String> compactEntityReferenceSerializer = Utils.getComponent(
-        EntityReferenceSerializer.class, "compact");
+    private EntityReferenceSerializer<String> compactEntityReferenceSerializer =
+        Utils.getComponent(EntityReferenceSerializer.class, "compact");
 
     /**
      * Used to convert a proper Document Reference to string (standard form).
      */
     private EntityReferenceSerializer<String> defaultEntityReferenceSerializer =
-            Utils.getComponent(EntityReferenceSerializer.class);
+        Utils.getComponent(EntityReferenceSerializer.class);
 
     /**
      * Used to convert a Document Reference to string (compact form without the wiki part if it matches the current
      * wiki).
      */
-    private EntityReferenceSerializer<String> compactWikiEntityReferenceSerializer = Utils.getComponent(
-        EntityReferenceSerializer.class, "compactwiki");
+    private EntityReferenceSerializer<String> compactWikiEntityReferenceSerializer =
+        Utils.getComponent(EntityReferenceSerializer.class, "compactwiki");
 
     /**
      * Used to convert a proper Document Reference to a string but without the wiki name.
      */
-    private EntityReferenceSerializer<String> localEntityReferenceSerializer = Utils.getComponent(
-        EntityReferenceSerializer.class, "local");
+    private EntityReferenceSerializer<String> localEntityReferenceSerializer =
+        Utils.getComponent(EntityReferenceSerializer.class, "local");
 
     /**
      * Used to emulate an inline parsing.
@@ -713,6 +713,7 @@ public class XWikiDocument implements DocumentModelBridge
     /**
      * Convert a full document reference into the proper relative document reference (wiki part is removed if it's the
      * same as document wiki) to store as parent.
+     * 
      * @deprecated since 2.2.3 use {@link #setParentReference(org.xwiki.model.reference.EntityReference)} instead
      */
     @Deprecated
@@ -735,7 +736,7 @@ public class XWikiDocument implements DocumentModelBridge
     @Deprecated
     public void setParent(String parent)
     {
-        // If the passed parent  is an empty string we also need to set the reference to null. The reason is that
+        // If the passed parent is an empty string we also need to set the reference to null. The reason is that
         // in the database we store "" when the parent is empty and thus when Hibernate loads this class it'll call
         // setParent with "" if the parent had not been set when saved.
         if (StringUtils.isEmpty(parent)) {
@@ -2079,6 +2080,11 @@ public class XWikiDocument implements DocumentModelBridge
     }
 
     /**
+     * Add the object to the document.
+     * 
+     * @param object the xobject to add
+     * @throws NullPointerException if the specified object is null because we need the get the class reference from the
+     *             object
      * @since 2.2.3
      */
     public void addXObject(BaseObject object)
@@ -2092,7 +2098,7 @@ public class XWikiDocument implements DocumentModelBridge
             setXObject(vobj.size(), object);
         }
     }
-    
+
     /**
      * @deprecated since 2.2M1 use {@link #addXObject(DocumentReference, BaseObject)} instead
      */
@@ -2126,6 +2132,12 @@ public class XWikiDocument implements DocumentModelBridge
     }
 
     /**
+     * Replaces the object at the specified position and for the specified object xclass.
+     * 
+     * @param nb index of the element to replace
+     * @param object the xobject to insert
+     * @throws NullPointerException if the specified object is null because we need the get the class reference from the
+     *             object
      * @since 2.2.3
      */
     public void setXObject(int nb, BaseObject object)
@@ -2248,32 +2260,34 @@ public class XWikiDocument implements DocumentModelBridge
     }
 
     /**
-     * @since 2.2.3
+     * Copy specified document objects into current document.
+     * 
+     * @param templatedoc the document to copy
+     * @param keepsIdentity if true it does an exact java copy, otherwise it duplicate objects with the new document
+     *            name (and new class names)
      */
     private void cloneXObjects(XWikiDocument templatedoc, boolean keepsIdentity)
     {
+        // clean map
+        this.xObjects.clear();
+
+        // fill map
         for (Map.Entry<DocumentReference, List<BaseObject>> entry : templatedoc.getXObjects().entrySet()) {
             List<BaseObject> tobjects = entry.getValue();
-            List<BaseObject> objects = new ArrayList<BaseObject>();
-            while (objects.size() < tobjects.size()) {
-                objects.add(null);
-            }
-            if (!tobjects.isEmpty()) {
-                DocumentReference newXClassReference = null;
-                for (int i = 0; i < tobjects.size(); i++) {
-                    BaseObject otherObject = tobjects.get(i);
-                    if (otherObject != null) {
-                        BaseObject myObject;
-                        if (keepsIdentity) {
-                            myObject = (BaseObject) otherObject.clone();
-                        } else {
-                            myObject = otherObject.duplicate(getDocumentReference());
-                        }
-                        objects.set(i, myObject);
-                        newXClassReference = myObject.getXClassReference();
+
+            // clone and insert xobjects
+            for (BaseObject otherObject : tobjects) {
+                if (otherObject != null) {
+                    if (keepsIdentity) {
+                        addXObject((BaseObject) otherObject.clone());
+                    } else {
+                        BaseObject newObject = otherObject.duplicate(getDocumentReference());
+                        setXObject(newObject.getNumber(), newObject);
                     }
+                } else if (keepsIdentity) {
+                    // set null object to make sure to have exactly the same thing when cloning a document
+                    addXObject(entry.getKey(), null);
                 }
-                setXObjects(newXClassReference, objects);
             }
         }
     }
@@ -3100,14 +3114,14 @@ public class XWikiDocument implements DocumentModelBridge
     }
 
     @Override
-    public Object clone()
+    public XWikiDocument clone()
     {
         return cloneInternal(getDocumentReference(), true);
     }
 
     /**
      * Duplicate this document and give it a new name.
-     *
+     * 
      * @since 2.2.3
      */
     public XWikiDocument duplicate(DocumentReference newDocumentReference)
@@ -5675,7 +5689,7 @@ public class XWikiDocument implements DocumentModelBridge
                     + syntax.toIdString() + "] instead.", e);
             }
         }
-        
+
         setSyntax(syntax);
     }
 
@@ -5774,8 +5788,7 @@ public class XWikiDocument implements DocumentModelBridge
      * 
      * @since 2.2.3
      */
-    public BaseObject addXObjectFromRequest(EntityReference classReference, XWikiContext context)
-        throws XWikiException
+    public BaseObject addXObjectFromRequest(EntityReference classReference, XWikiContext context) throws XWikiException
     {
         return addXObjectFromRequest(classReference, "", 0, context);
     }
@@ -6022,8 +6035,8 @@ public class XWikiDocument implements DocumentModelBridge
      * 
      * @since 2.2.3
      */
-    public List<BaseObject> updateXObjectsFromRequest(EntityReference classReference, String pref,
-        XWikiContext context) throws XWikiException
+    public List<BaseObject> updateXObjectsFromRequest(EntityReference classReference, String pref, XWikiContext context)
+        throws XWikiException
     {
         DocumentReference absoluteClassReference = resolveClassReference(classReference);
         Map map = context.getRequest().getParameterMap();
@@ -7085,7 +7098,7 @@ public class XWikiDocument implements DocumentModelBridge
     /**
      * Backward-compatibility method to use in order to resolve a class reference passed as a String into a
      * DocumentReference proper.
-     *
+     * 
      * @return the resolved class reference but using this document's wiki if the passed String doesn't specify a wiki,
      *         the "XWiki" space if the passed String doesn't specify a space and this document's page if the passed
      *         String doesn't specify a page.

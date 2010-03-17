@@ -304,6 +304,74 @@ public class XWikiDocumentTest extends AbstractBridgedXWikiComponentTestCase
         assertEquals(new DocumentReference("copywiki", DOCSPACE, DOCNAME), bobject.getXClassReference());
     }
     
+    public void testCloneNullObjects() throws XWikiException
+    {
+        XWikiDocument document = new XWikiDocument(new DocumentReference("wiki", DOCSPACE, DOCNAME));
+        
+        EntityReference relativeClassReference = new EntityReference(DOCNAME, EntityType.DOCUMENT, new EntityReference(DOCSPACE, EntityType.SPACE));
+        DocumentReference classReference = new DocumentReference("wiki", DOCSPACE, DOCNAME);
+        DocumentReference duplicatedClassReference = new DocumentReference("otherwiki", DOCSPACE, DOCNAME);
+
+        // no object
+        XWikiDocument clonedDocument = document.clone();
+        assertTrue(clonedDocument.getXObjects().isEmpty());
+
+        XWikiDocument duplicatedDocument = document.duplicate(new DocumentReference("otherwiki", DOCSPACE, DOCNAME));
+        assertTrue(duplicatedDocument.getXObjects().isEmpty());
+
+        // 1 null object
+        
+        document.addXObject(classReference, null);
+
+        clonedDocument = document.clone();
+        assertEquals(1, clonedDocument.getXObjects(classReference).size());
+        assertEquals(document.getXObjects(classReference), clonedDocument.getXObjects(classReference));
+
+        duplicatedDocument = document.duplicate(new DocumentReference("otherwiki", DOCSPACE, DOCNAME));
+        assertTrue(duplicatedDocument.getXObjects().isEmpty());
+
+        // 1 null object and 1 object
+
+        BaseObject object = new BaseObject();
+        object.setXClassReference(relativeClassReference);
+        document.addXObject(object);
+
+        clonedDocument = document.clone();
+        assertEquals(2, clonedDocument.getXObjects(classReference).size());
+        assertEquals(document.getXObjects(classReference), clonedDocument.getXObjects(classReference));
+        
+        duplicatedDocument = document.duplicate(new DocumentReference("otherwiki", DOCSPACE, DOCNAME));
+        assertEquals(2, duplicatedDocument.getXObjects(duplicatedClassReference).size());
+    }
+    
+    public void testCloneWithAbsoluteClassReference()
+    {
+        XWikiDocument document = new XWikiDocument(new DocumentReference("wiki", DOCSPACE, DOCNAME));
+
+        EntityReference relativeClassReference = new EntityReference(DOCNAME, EntityType.DOCUMENT, new EntityReference(DOCSPACE, EntityType.SPACE));
+        DocumentReference classReference = new DocumentReference("wiki", DOCSPACE, DOCNAME);
+        DocumentReference duplicatedClassReference = new DocumentReference("otherwiki", DOCSPACE, DOCNAME);
+
+        BaseObject object = new BaseObject();
+        object.setXClassReference(relativeClassReference);
+        document.addXObject(object);
+        BaseObject object2 = new BaseObject();
+        object2.setXClassReference(classReference);
+        document.addXObject(object2);
+        BaseObject object3 = new BaseObject();
+        object3.setXClassReference(relativeClassReference);
+        document.addXObject(object3);
+
+        XWikiDocument clonedDocument = document.clone();
+        assertEquals(3, clonedDocument.getXObjects(classReference).size());
+        assertEquals(document.getXObjects(classReference), clonedDocument.getXObjects(classReference));
+
+        XWikiDocument duplicatedDocument = document.duplicate(new DocumentReference("otherwiki", DOCSPACE, DOCNAME));
+        assertNotNull(duplicatedDocument.getXObject(duplicatedClassReference, 0));
+        assertNotNull(duplicatedDocument.getXObject(classReference, 1));
+        assertNotNull(duplicatedDocument.getXObject(duplicatedClassReference, 2));
+    }
+    
     public void testToStringReturnsFullName()
     {
         assertEquals("Space.Page", this.document.toString());

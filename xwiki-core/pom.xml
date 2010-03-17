@@ -913,7 +913,6 @@
               **/api/Document.java,
               **/api/Object.java,
               **/api/Property.java,
-              **/api/Context.java,
               **/api/Element.java,
               **/api/CriteriaService.java,
               **/api/Attachment.java,

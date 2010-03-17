@@ -1932,7 +1932,7 @@ public class XWikiDocument implements DocumentModelBridge
             getXObjects().put(classReference, objects);
         } else {
             for (BaseObject baseObject : objects) {
-                addXObject(baseObject);
+                addXObject(classReference, baseObject);
             }
         }
     }

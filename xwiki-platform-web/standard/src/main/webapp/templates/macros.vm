@@ -1533,8 +1533,7 @@ ${Msz}Mb##
     #end
     #if($colname != '_actions')
       #set($collist2 = "${collist2},${colname}")
-      #set($propClassName = '')
-      #set($propClassName = $colprops.get($colname).get('class'))
+      #set($propClassName = "$!{colprops.get($colname).get('class')}")
       #if($propClassName != '')
         #set($classparams = "${classparams}&${colname}_class=${propClassName}")
       #end

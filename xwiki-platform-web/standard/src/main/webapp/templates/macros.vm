@@ -1570,7 +1570,9 @@ ${Msz}Mb##
     <tr>
       <td class="xwiki-livetable-pagination">
         <span id="${divid}-limits" class="xwiki-livetable-limits"></span>
-        <span id="${divid}-ajax-loader" class="xwiki-livetable-loader"><img src="$xwiki.getSkinFile('icons/xwiki/ajax-loader-large.gif')" alt="$msg.get('xe.livetable.loading')" title="" />$msg.get("xe.livetable.loading")</span>
+        <span id="${divid}-ajax-loader" class="xwiki-livetable-loader hidden">
+          <img src="$xwiki.getSkinFile('icons/xwiki/ajax-loader-large.gif')" alt="$msg.get('xe.livetable.loading')" title="" />
+        </span>
         <span class="controlPagination">
           <span title="$msg.get('xe.pagination.page.prev.title')" class="prevPagination"></span>
           <span title="$msg.get('xe.pagination.page.next.title')" class="nextPagination"></span>
@@ -1586,6 +1588,7 @@ ${Msz}Mb##
         <table class="xwiki-livetable-display">
           <thead class="xwiki-livetable-display-header">
             <tr>
+	    #set($columnCount = 0)
             #foreach($colname in $collist)
               #set($colprop = $colprops.get($colname))
               #if(("$!colprop.filterable" == '' || $colprop.filterable != false) && "$!colname" != '_actions')
@@ -1616,6 +1619,7 @@ ${Msz}Mb##
                 $displayName
                 #if($isFilterable && ("$!colprop.type"=="text"||"$!colprop.type"=="number"))</label>#end
                 #if($isSortable)</a>#end
+                #set($columnCount = $mathtool.add($columnCount, 1))
               </th>
               #end
             #end
@@ -1653,6 +1657,11 @@ ${Msz}Mb##
               #end
             #end
             </tr>
+            <tr class="xwiki-livetable-initial-message">
+              <td colspan="${columnCount}">
+                <div class="warningmessage">$msg.get('xe.livetable.environmentCannotLoadTableMessage')</div>
+              </td>
+            </tr>
           </thead>
           <tbody id="${divid}-display" class="xwiki-livetable-display-body"><tr><td>&nbsp;</td></tr></tbody>
         </table>
@@ -1676,11 +1685,14 @@ ${Msz}Mb##
   </div>
   <script type="text/javascript">
   //<![CDATA[
+  if (typeof XWiki !== "undefined" && typeof XWiki.widgets !== "undefined" && typeof XWiki.widgets.LiveTable !== "undefined") {
+    // Make sure the Livetable widgets exists (It does not in the WYSIWYG for example).
   #if($callback)
     $jsName = new XWiki.widgets.LiveTable("$dataurl", "${divid}", $callback ,{"maxPages":$maxPages, "limit":$count});
   #else
     $jsName = new XWiki.widgets.LiveTable("$dataurl", "${divid}", #livetablecallback($divid $collist $colprops $transprefix) ,{"maxPages":$maxPages, "limit":$count});
   #end
+  }
    //]]>
   </script>
   #if($xwiki.getCurrentContentSyntaxId() == "xwiki/2.0"){{/html}}

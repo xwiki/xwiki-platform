@@ -43,6 +43,12 @@ XWiki.widgets.LiveTable = Class.create({
     // id of the root element that encloses this livetable
     this.domNodeName = domNodeName;
 
+    // Remove, if present, the message that indicates the table cannot execute.
+    // (It can since we are executing JavaScript).
+    if ($(this.domNodeName).down('tr.xwiki-livetable-initial-message')) {
+	  $(this.domNodeName).down('tr.xwiki-livetable-initial-message').remove();
+    }
+    
     // id of the display element (the inner dynamic table) of this livetable
     // defined by convention as the root node id on which is appenned "-display".
     // fallback on the unique "display1" id for backward compatibility.
@@ -201,13 +207,13 @@ XWiki.widgets.LiveTable = Class.create({
 
     var self = this;
 
-    this.loadingStatus.style.display = "block";
+    this.loadingStatus.removeClassName("hidden");
 
     var ajx = new Ajax.Request(url,
     {
       method: 'get',
       onComplete: function( transport ) {
-        self.loadingStatus.style.display = "none";
+        self.loadingStatus.addClassName("hidden");
       },
 
       onSuccess: function( transport ) {
@@ -218,7 +224,7 @@ XWiki.widgets.LiveTable = Class.create({
         }
 
         self.recvReqNo = res.reqNo;
-        self.loadingStatus.style.display = "none";
+        self.loadingStatus.addClassName("hidden");
 
         if(self.tagCloud && res.matchingtags) {
            self.tagCloud.updateTagCloud(res.tags, res.matchingtags);

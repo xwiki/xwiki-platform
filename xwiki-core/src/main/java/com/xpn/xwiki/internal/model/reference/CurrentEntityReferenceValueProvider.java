@@ -19,8 +19,6 @@
  */
 package com.xpn.xwiki.internal.model.reference;
 
-import com.xpn.xwiki.XWikiContext;
-import com.xpn.xwiki.doc.XWikiDocument;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.Requirement;
 import org.xwiki.context.Execution;
@@ -29,19 +27,22 @@ import org.xwiki.model.ModelContext;
 import org.xwiki.model.internal.reference.DefaultEntityReferenceValueProvider;
 import org.xwiki.model.reference.EntityReference;
 
+import com.xpn.xwiki.XWikiContext;
+import com.xpn.xwiki.doc.XWikiDocument;
+
 /**
  * The behavior is the following:
- * <ul>                 
- *   <li>The wiki value used is the default wiki if no wiki was specified in the passed reference (or if it was
- *       empty). Note that this is different from using the current document's wiki value.</li>
- *   <li>The space value used is the space from the current document reference if no space was specified in the passed
- *       reference (or if it was empty). If the current document reference is not defined then the default space
- *       value is used instead.</li>
- *   <li>The page value used is the page from the current document reference if no page was specified in the passed
- *       reference (or if it was empty). If the current document reference is not defined then the default page
- *       value is used instead.</li>
+ * <ul>
+ * <li>The wiki value used is the default wiki if no wiki was specified in the passed reference (or if it was empty).
+ * Note that this is different from using the current document's wiki value.</li>
+ * <li>The space value used is the space from the current document reference if no space was specified in the passed
+ * reference (or if it was empty). If the current document reference is not defined then the default space value is used
+ * instead.</li>
+ * <li>The page value used is the page from the current document reference if no page was specified in the passed
+ * reference (or if it was empty). If the current document reference is not defined then the default page value is used
+ * instead.</li>
  * </ul>
- *
+ * 
  * @version $Id$
  * @since 2.3M1
  */
@@ -57,7 +58,7 @@ public class CurrentEntityReferenceValueProvider extends DefaultEntityReferenceV
     @Override
     public String getDefaultValue(EntityType type)
     {
-        String result;
+        String result = null;
 
         if (type == EntityType.WIKI) {
             EntityReference wikiReference = this.modelContext.getCurrentEntityReference();
@@ -66,21 +67,22 @@ public class CurrentEntityReferenceValueProvider extends DefaultEntityReferenceV
             }
             if (wikiReference != null) {
                 result = wikiReference.getName();
-            } else {
-                result = super.getDefaultValue(type);
             }
         } else if (type == EntityType.SPACE || type == EntityType.DOCUMENT) {
-            XWikiDocument currentDoc = getContext().getDoc();
-            if (currentDoc != null) {
-                if (type == EntityType.SPACE) {
-                    result = currentDoc.getDocumentReference().getLastSpaceReference().getName();
-                } else {
-                    result = currentDoc.getDocumentReference().getName();
+            XWikiContext xcontext = getContext();
+            if (xcontext != null) {
+                XWikiDocument currentDoc = xcontext.getDoc();
+                if (currentDoc != null) {
+                    if (type == EntityType.SPACE) {
+                        result = currentDoc.getDocumentReference().getLastSpaceReference().getName();
+                    } else {
+                        result = currentDoc.getDocumentReference().getName();
+                    }
                 }
-            } else {
-                result = super.getDefaultValue(type);
             }
-        } else {
+        }
+
+        if (result == null) {
             result = super.getDefaultValue(type);
         }
 
@@ -92,6 +94,12 @@ public class CurrentEntityReferenceValueProvider extends DefaultEntityReferenceV
      */
     private XWikiContext getContext()
     {
-        return (XWikiContext) this.execution.getContext().getProperty("xwikicontext");
+        XWikiContext xcontext = null;
+
+        if (this.execution.getContext() != null) {
+            xcontext = (XWikiContext) this.execution.getContext().getProperty("xwikicontext");
+        }
+
+        return xcontext;
     }
 }

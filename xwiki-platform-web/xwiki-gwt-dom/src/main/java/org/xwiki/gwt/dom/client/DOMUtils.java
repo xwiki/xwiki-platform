@@ -103,7 +103,7 @@ public abstract class DOMUtils
      * by the XHTML 1.0 strict DTD.
      */
     private static final String[] HTML_SPECIAL_BLOCK_LEVEL_ELEMENTS =
-        new String[] {HR, "ul", "ol", "dl", "table", "tbody", "thead", "tfoot", "tr"};
+        new String[] {HR, "ul", "ol", "dl", "table", "tbody", "thead", "tfoot", "tr", "form"};
 
     /**
      * The instance in use.

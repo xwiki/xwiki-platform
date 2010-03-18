@@ -341,16 +341,17 @@ public class DefaultWikiService implements WikiService
         try {
             doc = context.getWiki().getDocument(documentReferenceAsString, context);
         } catch (XWikiException e) {
-            // there was a problem with getting the document on the server
+            LOG.error("Failed to get attachment: there was a problem with getting the document on the server.", e);
             return null;
         }
         if (doc.isNew()) {
-            // the document does not exist, therefore nor does the attachment. Return null
+            String documentName = entityReferenceSerializer.serialize(documentReference);
+            LOG.warn(String.format("Failed to get attachment: %s document doesn't exist.", documentName));
             return null;
         }
         // check for the existence of the attachment
         if (doc.getAttachment(cleanedFileName) == null) {
-            // attachment is not there, something bad must have happened
+            LOG.warn(String.format("Failed to get attachment: %s not found.", cleanedFileName));
             return null;
         }
         // all right, now set the reference and url and return

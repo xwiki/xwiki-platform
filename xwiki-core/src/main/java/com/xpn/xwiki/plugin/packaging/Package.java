@@ -522,10 +522,16 @@ public class Package
 
         int status = DocumentInfo.INSTALL_OK;
 
+        // Determine if the user performing the installation is a farm admin.
+        // We allow author preservation from the package only to farm admins.
+        // In order to prevent sub-wiki admins to take control of a farm with forged packages.
+        // We test it once for the whole import in case one of the document break user during the import process.
+        boolean backup = this.backupPack && isFarmAdmin(context);
+
         // Start by installing all documents having a class definition so that their
         // definitions are available when installing documents using them.
         for (DocumentInfo classFile : this.classFiles) {
-            if (installDocument(classFile, isAdmin, context) == DocumentInfo.INSTALL_ERROR) {
+            if (installDocument(classFile, isAdmin, backup, context) == DocumentInfo.INSTALL_ERROR) {
                 status = DocumentInfo.INSTALL_ERROR;
             }
         }
@@ -533,7 +539,7 @@ public class Package
         // Install the remaining documents (without class definitions).
         for (DocumentInfo docInfo : this.files) {
             if (!this.classFiles.contains(docInfo)) {
-                if (installDocument(docInfo, isAdmin, context) == DocumentInfo.INSTALL_ERROR) {
+                if (installDocument(docInfo, isAdmin, backup, context) == DocumentInfo.INSTALL_ERROR) {
                     status = DocumentInfo.INSTALL_ERROR;
                 }
             }
@@ -543,7 +549,26 @@ public class Package
         return status;
     }
 
-    private int installDocument(DocumentInfo doc, boolean isAdmin, XWikiContext context) throws XWikiException
+    /**
+     * Indicate of the user has amin rights on the farm, i.e. that he has admin rights on the main wiki.
+     * 
+     * @param context the XWiki context
+     * @return true if the current user is farm admin
+     */
+    private boolean isFarmAdmin(XWikiContext context)
+    {
+        String wiki = context.getDatabase();
+
+        try {
+            context.setDatabase(context.getMainXWiki());
+
+            return context.getWiki().getRightService().hasAdminRights(context);
+        } finally {
+            context.setDatabase(wiki);
+        }
+    }
+
+    private int installDocument(DocumentInfo doc, boolean isAdmin, boolean backup, XWikiContext context) throws XWikiException
     {
         if (this.preserveVersion && this.withVersions) {
             // Right now importing an archive and the history revisions it contains
@@ -599,16 +624,7 @@ public class Package
                 }
             }
             try {
-                // Determine if the user performing the installation is a farm admin.
-                // Right now, check for programming rights, which is the closer we can get to the notion
-                // of farm admin.
-                // Note: we test the programming right against a "null" document, otherwise the right service
-                // uses the document in the context and verify the PR against it instead of against the context user
-                boolean isFarmAdmin = context.getWiki().getRightService().hasProgrammingRights(null, context);
-
-                if (!this.backupPack || !isFarmAdmin) {
-                    // We allow author preservation from the package only to farm admins,
-                    // In order to prevent sub-wiki admins to take control of a farm with forged packages
+                if (!backup) {
                     doc.getDoc().setAuthor(context.getUser());
                     doc.getDoc().setContentAuthor(context.getUser());
                     // if the import is not a backup pack we set the date to now

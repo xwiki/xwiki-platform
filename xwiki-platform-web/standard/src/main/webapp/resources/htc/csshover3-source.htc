@@ -35,15 +35,19 @@ window.CSSHover = (function(){
     REG_PSEUDO = /[^:]+:([a-z-]+).*/i,
     // Extracts the (eventual) class and the pseudoclass selectors from the affected element in the rule. For example,
     // "ul.menu li:hover .submenu" becomes ":hover" and "ul.menu li.menuitem:hover .submenu" becomes ".menuitem:hover".
-    REG_SELECT = /(\.([a-z0-9_-]+):[a-z]+)|(:[a-z]+)/gi,
+    REG_SELECT = /(\.([a-z0-9_-]+):[a-z]+)|(:[a-z]+)/i,
     // Extracts the generated classname from the modified selector, the one which combines the eventual classname from
     // the original selector and the pseudoclass. For example, it matches "menuitemonhover" from
     // "ul.menu li.menuitemonhover .submenu", obtained from "ul.menu li.menuitem:hover .submenu".
     REG_CLASS = /\.([a-z0-9_-]*on(hover|active|focus|unknown))/i,
     // Matches the IE version (5, 6 or 7) from the user agent string.
     REG_MSIE = /msie (5|6|7)/i,
+    // Matches only IE version 7 from the user agent string.
+    REG_MSIE7 = /msie 7/i,
     // Detects if IE8 runs in compatibility mode.
     REG_COMPAT = /backcompat/i;
+    // Matches relative URLs inside CSS rules.
+    REG_RELATIVE_URL = new RegExp("url\\s*\\(\\s*[\"']?([^/\"'].*?)[\"']?\\s*\\)", 'gi');
 
   // "Borrowed" CSS properties which can be used for attaching the expression. In order to avoid useless repeated
   // executions of the binding method, these must be valid properties. Only four are needed, since at most 4 methods
@@ -91,18 +95,28 @@ window.CSSHover = (function(){
 
     // init, called once ondomcontentready via the exposed window.CSSHover function
     init:function() {
-      // don't run in IE8 standards; expressions don't work in standards mode anyway, 
+      CSSHover.instance = this;
+      // don't run in IE8 standards; expressions don't work in standards mode anyway,
       // and the stuff we're trying to fix should already work properly
-      if(!REG_MSIE.test(navigator.userAgent) && !REG_COMPAT.test(window.document.compatMode)) return;
+      this.compatibilityMode = REG_COMPAT.test(window.document.compatMode);
+      this.isIE7 = REG_MSIE7.test(navigator.userAgent);
+      if(!REG_MSIE.test(navigator.userAgent) && !this.compatibilityMode) return;
 
       // Initialize the default values for the borrowed CSS properties.
       for (var i = 0; i < PROPERTIES.length; ++i) {
         DEFAULT_VALUES[camelize(PROPERTIES[i])] = window.document.getElementById('body').currentStyle[camelize(PROPERTIES[i])];
       }
+      // Gather new styles here. For performance, we don't interactively add rules one by one, but all at the end.
+      this.newRules = '';
       // start parsing the existing stylesheets
       var sheets = window.document.styleSheets, l = sheets.length;
       for(var i=0; i<l; i++) {
         this.parseStylesheet(sheets[i]);
+      }
+      if (this.newRules) {
+        var newSheet = window.document.createElement('style');
+        window.document.documentElement.firstChild.appendChild(newSheet);
+        newSheet.styleSheet.cssText = this.newRules;
       }
     },
 
@@ -136,21 +150,33 @@ window.CSSHover = (function(){
 
     // magic starts here ...
     parseCSSRule:function(rule, sheet) {
-      // The sheet is used to insert new rules into, this must be the same sheet the rule 
-      // came from, to ensure that relative paths keep pointing to the right location.
-
       // only parse a rule if it contains an interactive pseudo.
       var select = rule.selectorText;
-      if(REG_INTERACTIVE.test(select)) {
+      while (REG_INTERACTIVE.test(select)) {
         var style = rule.style.cssText;
+
+        // Make sure relative URLs point to the same location
+        if (style.indexOf('url') > 0) {
+          var baseUrl = sheet.href;
+          var trim = baseUrl.lastIndexOf('/');
+          if (trim >= 0) {
+            baseUrl = baseUrl.substring(0, trim + 1);
+          }
+          style = style.replace(REG_RELATIVE_URL, 'url("' + baseUrl + '$1")');
+        }
 
         // affected elements are found by truncating the selector after the interactive pseudo,
         // eg: "div li:hover" >> "div li", "ul.menu li:hover ul.submenu" >> "ul.menu li".
-        var affected = REG_AFFECTED.exec(select)[1];
+        var affected = REG_AFFECTED.exec(select.replace(/on(hover|focus|unknown|active)/g, ''))[1];
 
         // that pseudo is needed for a classname, and defines the type of interaction (focus, hover, active)
         // eg: "li:hover" >> "onhover", "ul.menu li:hover ul.submenu" >> "onhover".
         var pseudo = select.replace(REG_PSEUDO, 'on$1');
+
+        // IE7 already supports :hover on any element in standards mode
+        if (this.isIE7 && !this.compatibilityMode && pseudo == 'onhover') {
+          return;
+        }
 
         // the new selector is going to use that classname in a new css rule,
         // since IE6 doesn't support multiple classnames, this is merged into one classname
@@ -170,18 +196,19 @@ window.CSSHover = (function(){
 
           // Because the expression is added to the stylesheet, and styles are always applied to html that is
           // dynamically added to the dom, the expression will also trigger for new elements (provided they are selected
-          // by the affected selector). 
+          // by the affected selector).
 
           // Which CSS property to use? getProperty keeps track of used properties for each "affected".
           var property = this.getProperty(affected);
-          sheet.addRule(affected, property + ':expression(CSSHover(this, "'+pseudo+'", "'+className+'", "'+property+'"))');
+          this.newRules += affected + "{" + property + ':expression(CSSHover(this, "'+pseudo+'", "'+property+'"));}\n';
 
           // Hash it, so an identical selector/pseudoclass combo does not duplicate the expression.
           this.callbacks[hash] = true;
         }
 
         // duplicate expressions need not be set, but the style could differ
-        sheet.addRule(newSelect, style);
+        this.newRules += newSelect + "{" + style + "}\n";
+        select = newSelect;
       }
     },
 
@@ -194,7 +221,7 @@ window.CSSHover = (function(){
     },
 
     // Called via the expression, patches individual nodes
-    patch : function(node, type, className, property) {
+    patch : function(node, type, property) {
       // Prevent further calls of this method for the same DOM node by hardcoding a value for the triggering property
       // in the element style, which has a higher priority than the expression rule, and thus making the expression
       // obsolete for this node.
@@ -202,14 +229,14 @@ window.CSSHover = (function(){
       node.style[property] = DEFAULT_VALUES[property];
 
       // just to make sure, also keep track of patched classnames locally on the node
-      if(!node.csshover) node.csshover = [];
+      if(!node.csshover) node.csshover = {};
 
-      // and check for it to prevent duplicate events with the same classname from being set
-      if(!node.csshover[className]) {
-        node.csshover[className] = true;
+      // and check for it to prevent duplicate events with the same type from being set
+      if(!node.csshover[type]) {
+        node.csshover[type] = true;
 
         // create an instance for the given type and class
-        var element = new CSSHoverElement(node, type, className);
+        var element = new CSSHoverElement(node, type);
 
         // and store that instance for unloading later on
         this.elements.push(element);
@@ -229,10 +256,9 @@ window.CSSHover = (function(){
           this.elements[i].unload();
         }
 
-        // and set properties to null 
+        // and set properties to null
         this.elements = [];
         this.callbacks = {};
-
       } catch (e) {
       }
     }
@@ -253,22 +279,36 @@ window.CSSHover = (function(){
     onhover:  { activator: 'onmouseenter', deactivator: 'onmouseleave' },
     onactive: { activator: 'onmousedown',  deactivator: 'onmouseup' },
     onfocus:  { activator: 'onfocus',      deactivator: 'onblur' },
-    onunknown:  { activator: 'onfocus',      deactivator: 'onblur' }
+    onunknown:  { activator: 'onfocus',    deactivator: 'onblur' }
   };
 
   // CSSHoverElement constructor, called via CSSHover.patch
-  function CSSHoverElement(node, type, className) {
+  function CSSHoverElement(node, type) {
 
-    // the CSSHoverElement patches individual nodes by manually applying the events that should 
-    // have fired by the css pseudoclasses, eg mouseenter and mouseleave for :hover. 
+    // the CSSHoverElement patches individual nodes by manually applying the events that should
+    // have fired by the css pseudoclasses, eg mouseenter and mouseleave for :hover.
 
     this.node = node;
     this.type = type;
     var replacer = new RegExp('(^|\\s)'+className+'(\\s|$)', 'g');
 
     // store event handlers for removal onunload
-    this.activator =   function(){ node.className += ' ' + className; };
-    this.deactivator = function(){ node.className = node.className.replace(replacer, ' '); };
+    this.activator = function() {
+      var classNames = node.className.split(/\s+/);
+      for (var i = 0; i < classNames.length; ++i) {
+        node.className += ' ' + classNames[i] + type;
+      }
+      node.className += ' ' + type;
+    };
+    this.deactivator = function() {
+      var classNames = node.className.split(/\s+/);
+      for (var i = 0; i < classNames.length; ++i) {
+        if (node.className.indexOf(classNames[i] + type) >= 0) {
+          node.className = node.className.replace(new RegExp('\\s+' + classNames[i] + type, "gi"), '');
+        }
+      }
+      node.className = node.className.replace(new RegExp('\\s+' + type, "gi"), '');
+    };
 
     // add the events
     node.attachEvent(CSSEvents[type].activator, this.activator);
@@ -279,11 +319,11 @@ window.CSSHover = (function(){
     // onbeforeunload, called via CSSHover.unload
     unload:function() {
 
-      // remove events 
+      // remove events
       this.node.detachEvent(CSSEvents[this.type].activator, this.activator);
       this.node.detachEvent(CSSEvents[this.type].deactivator, this.deactivator);
 
-      // and set properties to null 
+      // and set properties to null
       this.activator = null;
       this.deactivator = null;
       this.node = null;

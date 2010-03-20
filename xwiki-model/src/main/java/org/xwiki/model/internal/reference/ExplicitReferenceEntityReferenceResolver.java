@@ -28,7 +28,7 @@ import org.xwiki.model.reference.EntityReference;
  * Resolver that resolves a Reference passed as a String into an absolute reference. For missing reference parts, the
  * resolver takes default values from a parameter which must be of type {@link EntityReference}.
  *
- * @version $Id: ExplicitStringEntityReferenceResolver.java 27580 2010-03-11 14:32:23Z vmassol $
+ * @version $Id$
  * @since 2.23
  */
 @Component("explicit/reference")

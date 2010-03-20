@@ -30,7 +30,7 @@ import org.xwiki.model.reference.EntityReference;
 /**
  * Unit tests for {@link org.xwiki.model.internal.reference.ExplicitReferenceDocumentReferenceResolver}.
  *
- * @version $Id: ExplicitStringDocumentReferenceResolverTest.java 27580 2010-03-11 14:32:23Z vmassol $
+ * @version $Id$
  * @since 2.2.3
  */
 public class ExplicitReferenceDocumentReferenceResolverTest

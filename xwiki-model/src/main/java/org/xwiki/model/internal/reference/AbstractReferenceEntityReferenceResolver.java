@@ -33,7 +33,7 @@ import org.xwiki.model.reference.InvalidEntityReferenceException;
 /**
  * Resolve an {@link EntityReference} into a valid and absolute reference (with all required parents filled in).
  * 
- * @version $Id: DefaultReferenceEntityReferenceResolver.java 27580 2010-03-11 14:32:23Z vmassol $
+ * @version $Id$
  * @since 2.2.3
  */
 public abstract class AbstractReferenceEntityReferenceResolver implements EntityReferenceResolver<EntityReference>

@@ -38,7 +38,7 @@ import com.xpn.xwiki.web.Utils;
 /**
  * Listener to user and groups events to apply related automatic task like cleaning groups and rights objects.
  * 
- * @version $Id: RightsManager.java 22782 2009-08-18 13:50:24Z tmortagne $
+ * @version $Id$
  * @since XWiki Core 2.2.3
  */
 public final class RightsManagerListener implements EventListener

@@ -29,7 +29,7 @@ import org.xwiki.model.reference.EntityReferenceSerializer;
  * compatibility only and it should be dropped in the future since there's no remove the wiki name systematically
  * (usually we don't want to print it but only if it's the same as the current wiki).
  * 
- * @version $Id: LocalStringEntityReferenceSerializer.java 27598 2010-03-12 10:00:59Z tmortagne $
+ * @version $Id$
  * @since 2.2.3
  * @deprecated {@link DefaultReferenceEntityReferenceSerializer} should be used instead
  */

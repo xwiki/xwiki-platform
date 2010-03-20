@@ -32,7 +32,7 @@ import org.xwiki.model.reference.WikiReference;
 /**
  * Unit tests for {@link LocalReferenceEntityReferenceSerializer}.
  * 
- * @version $Id: LocalStringEntityReferenceSerializerTest.java 26372 2010-01-25 15:49:59Z lucaa $
+ * @version $Id$
  */
 public class LocalReferenceEntityReferenceSerializerTest
 {

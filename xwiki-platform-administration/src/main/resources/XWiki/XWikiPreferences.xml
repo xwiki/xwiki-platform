@@ -2367,7 +2367,7 @@ $xwiki.getDocument("XWiki.AccountValidation").getExternalURL("view", "validkey=$
 <webbgcolor></webbgcolor>
 </property>
 <property>
-<webcopyright>This wiki is licensed under a &lt;a href="http://creativecommons.org/licenses/by/2.0/"&gt;Creative Commons 2.0&lt;/a&gt; license</webcopyright>
+<webcopyright>This wiki is licensed under a &lt;a rel="license" href="http://creativecommons.org/licenses/by/2.0/"&gt;Creative Commons 2.0&lt;/a&gt; license</webcopyright>
 </property>
 </object>
 <content>#includeForm("XWiki.AdminSheet")</content>

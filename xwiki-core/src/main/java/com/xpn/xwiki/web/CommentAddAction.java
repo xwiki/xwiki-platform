@@ -110,9 +110,9 @@ public class CommentAddAction extends XWikiAction
     }
 
     /**
-     * Checks the request parameter captcha_answer against the captcha module.
-     * This makes xwiki-core dependant on xwiki-captcha and should be removed as soon as possible.
-     *
+     * Checks the request parameter captcha_answer against the captcha module. This makes xwiki-core dependant on
+     * xwiki-captcha and should be removed as soon as possible.
+     * 
      * @param context The XWikiContext for getting the request and whether guest comment requires a captcha.
      * @return true if the captcha answer is correct or if no captcha answer and captcha is not required.
      * @throws XWikiException if something goes wrong in the captcha module.
@@ -122,13 +122,13 @@ public class CommentAddAction extends XWikiAction
     {
         String answer = context.getRequest().get("captcha_answer");
         if (answer != null && answer.length() > 0) {
-            org.xwiki.captcha.CaptchaVerifier cv = 
+            org.xwiki.captcha.CaptchaVerifier cv =
                 Utils.getComponent(org.xwiki.captcha.CaptchaVerifier.class, context.getRequest().get("captcha_type"));
             try {
                 return cv.isAnswerCorrect(cv.getUserId(context.getRequest()), answer);
             } catch (Exception e) {
-                throw new XWikiException(XWikiException.MODULE_XWIKI, XWikiException.ERROR_XWIKI_UNKNOWN, 
-                                        "Exception while attempting to verify captcha", e);
+                throw new XWikiException(XWikiException.MODULE_XWIKI, XWikiException.ERROR_XWIKI_UNKNOWN,
+                    "Exception while attempting to verify captcha", e);
             }
         } else {
             return (context.getWiki().getSpacePreferenceAsInt("guest_comment_requires_captcha", 0, context) != 1);

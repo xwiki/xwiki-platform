@@ -20,15 +20,17 @@
  */
 package com.xpn.xwiki.web;
 
+import org.apache.commons.lang.StringUtils;
+import org.apache.velocity.VelocityContext;
+
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
+import com.xpn.xwiki.objects.BaseProperty;
 import com.xpn.xwiki.objects.classes.BaseClass;
 import com.xpn.xwiki.user.api.XWikiRightService;
-
-import org.apache.velocity.VelocityContext;
 
 /**
  * Action used to post a comment on a page, adds a comment object to the document and saves it, requires comment right
@@ -64,6 +66,17 @@ public class CommentAddAction extends XWikiAction
             // TODO The map should be pre-filled with empty strings for all class properties, just like in
             // ObjectAddAction, so that properties missing from the request are still added to the database.
             baseclass.fromMap(oform.getObject(className), object);
+            // Comment author checks
+            if (XWikiRightService.GUEST_USER_FULLNAME.equals(context.getUser())) {
+                // Guests should not be allowed to enter names that look like real XWiki user names.
+                String author = ((BaseProperty) object.get("author")).getValue() + "";
+                author = StringUtils.remove(author, ':');
+                author = StringUtils.removeStart(author, "XWiki.");
+                object.set("author", author, context);
+            } else {
+                // A registered user must always post with his name.
+                object.set("author", context.getUser(), context);
+            }
             doc.setAuthor(context.getUser());
             // Consider comments not being content.
             doc.setContentDirty(false);

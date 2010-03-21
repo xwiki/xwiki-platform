@@ -1,0 +1,14 @@
+##################################################
+# Annotation starting with a special char
+##################################################
+.source
+My mistress' eyes are nothing like the sun;
+.rendered
+<p>My mistress' eyes are nothing like the sun;</p>
+.annotation
+0
+XWiki.XWikiGuest
+Eyes
+' eyes are nothing
+.annotated
+<p>My mistress<span class="annotation ID0">' eyes are nothing</span> like the sun;</p>

@@ -1,0 +1,18 @@
+##################################################
+# Ambiguous annotation, where both context and selection contain only plain text
+##################################################
+.source
+As of some one gently rapping, rapping at my chamber door.
+"'Tis some visitor," I muttered, "tapping at my chamber door 
+Only this, and nothing more."
+.rendered
+<p>As of some one gently rapping, rapping at my chamber door.<br/>"'Tis some visitor," I muttered, "tapping at my chamber door <br/>Only this, and nothing more."</p>
+.annotation
+0
+XWiki.XWikiGuest
+Sharply striking
+rapping
+
+ at my
+.annotated
+<p>As of some one gently rapping, <span class="annotation ID0">rapping</span> at my chamber door.<br/>"'Tis some visitor," I muttered, "tapping at my chamber door <br/>Only this, and nothing more."</p>

@@ -1,0 +1,16 @@
+##################################################
+# Annotation contains an unbreakable space due to formatting
+# see http://jira.xwiki.org/jira/browse/XCONTRIB-70
+##################################################
+.source
+To be, **or not **to be, that is the question:
+.rendered
+<p>To be, <strong>or not&nbsp;</strong>to be, that is the question:</p>
+.annotation
+0
+XWiki.XWikiGuest
+Alternative to being
+# the space between the not and to is unbreakable
+not to be
+.annotated
+<p>To be, <strong>or <span class="annotation ID0">not&nbsp;</span></strong><span class="annotation ID0">to be</span>, that is the question:</p>

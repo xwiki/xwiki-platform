@@ -1,0 +1,20 @@
+##################################################
+# Replace the whole word of the annotation, with a different one, of the same length
+##################################################
+.source
+I have seen roses damasked, red and white,
+.sourceUpdated
+I have seen tulip damasked, red and white,
+.annotation
+0
+XWiki.XWikiGuest
+Flowers
+roses
+.annotationUpdated
+0
+XWiki.XWikiGuest
+Flowers
+roses
+
+
+ALTERED

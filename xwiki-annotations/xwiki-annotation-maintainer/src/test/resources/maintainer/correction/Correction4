@@ -1,0 +1,26 @@
+##################################################
+# Fixing a typo inside an ambiguous annotation, whose selection appears more than once in its context.
+##################################################
+.source
+As of some one gently rapping, rapping at my chamber door.
+"'Tis some visitor," I muttered, "tapping at my chamber door 
+Only this, and nothing more."
+.sourceUpdated
+As of some one gently rapping, raping at my chamber door.
+"'Tis some visitor," I muttered, "tapping at my chamber door 
+Only this, and nothing more."
+.annotation
+0
+XWiki.XWikiGuest
+Sharply striking
+rapping
+rapping, 
+ at my chamber
+.annotationUpdated
+0
+XWiki.XWikiGuest
+Sharply striking
+raping
+rapping, 
+ at my chamber
+UPDATED

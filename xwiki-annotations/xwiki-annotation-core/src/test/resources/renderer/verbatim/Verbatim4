@@ -1,0 +1,14 @@
+##################################################
+# The annotation is entirely inside a block verbatim block
+##################################################
+.source
+{{{To be, or not to be, that is the question:}}}
+.rendered
+<pre>To be, or not to be, that is the question:</pre>
+.annotation
+0
+XWiki.XWikiGuest
+Alternative to being
+or not to be
+.annotated
+<pre>To be, <span class="annotation ID0">or not to be</span>, that is the question:</pre>

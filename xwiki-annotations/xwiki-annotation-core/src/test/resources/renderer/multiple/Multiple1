@@ -1,0 +1,19 @@
+##################################################
+# Two annotations on the same document, test that they are rendered correctly
+##################################################
+.source
+To be, or not to be, that is the question:
+.rendered
+<p>To be, or not to be, that is the question:</p>
+.annotation
+0
+XWiki.XWikiGuest
+Alternative to being
+not to be
+.annotation
+1
+XWiki.XWikiGuest
+Existence expression
+is
+.annotated
+<p>To be, or <span class="annotation ID0">not to be</span>, that <span class="annotation ID1">is</span> the question:</p>

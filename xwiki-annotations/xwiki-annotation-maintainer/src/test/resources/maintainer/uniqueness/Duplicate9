@@ -1,0 +1,20 @@
+##################################################
+# Annotation is duplicated 3 times, context must be unique across all 
+##################################################
+.source
+I have seen roses damasked, red and white,
+.sourceUpdated
+I have seen roses damasked, red and white, been roses, xxrosesxx
+.annotation
+0
+XWiki.XWikiGuest
+Flowers
+roses
+.annotationUpdated
+0
+XWiki.XWikiGuest
+Flowers
+roses
+seen 
+ damasked,
+SAFE

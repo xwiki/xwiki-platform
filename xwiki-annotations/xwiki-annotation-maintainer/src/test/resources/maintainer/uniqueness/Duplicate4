@@ -1,0 +1,24 @@
+##################################################
+# Selection is updated and it becomes duplicate.
+##################################################
+.source
+If hairs be wires, then I would say that 
+
+There could be black wires, grow on her head.
+.sourceUpdated
+If wires be wires, then I would say that 
+
+There could be black wires, grow on her head.
+.annotation
+0
+XWiki.XWikiGuest
+Comparison
+hairs
+.annotationUpdated
+0
+XWiki.XWikiGuest
+Comparison
+wires
+If 
+ be
+UPDATED

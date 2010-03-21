@@ -1,0 +1,21 @@
+##################################################
+# Multiple annotations, ending in the same place
+##################################################
+.source
+As of some one gently rapping, rapping at my chamber door.
+"'Tis some visitor," I muttered, "tapping at my chamber door 
+Only this, and nothing more."
+.rendered
+<p>As of some one gently rapping, rapping at my chamber door.<br/>"'Tis some visitor," I muttered, "tapping at my chamber door <br/>Only this, and nothing more."</p>
+.annotation
+0
+XWiki.XWikiGuest
+Gently sharply striking
+gently rapping
+.annotation
+1
+XWiki.XWikiGuest
+Action of someone
+some one gently rapping
+.annotated
+<p>As of <span class="annotation ID1">some one <span class="annotation ID0">gently rapping</span></span>, rapping at my chamber door.<br/>"'Tis some visitor," I muttered, "tapping at my chamber door <br/>Only this, and nothing more."</p>

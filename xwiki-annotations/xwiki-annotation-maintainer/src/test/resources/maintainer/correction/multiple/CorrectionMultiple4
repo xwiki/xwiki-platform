@@ -1,0 +1,20 @@
+##################################################
+# Modification of the text before an annotation and annotation correction for which the first delete already brings the second addition's modified index outside the annotation.
+##################################################
+.source
+Word 1 Text Word 2 Word 3
+.sourceUpdated
+Word 1 Woxrd 2 Word 3
+.annotation
+0
+XWiki.XWikiGuest
+Annotation 1
+Word 2
+.annotationUpdated
+0
+XWiki.XWikiGuest
+Annotation 1
+Woxrd 2
+
+
+UPDATED

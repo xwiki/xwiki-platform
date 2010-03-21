@@ -1,0 +1,18 @@
+##################################################
+# Ambiguous annotation, where selection starts at some offset inside context, and context contains some formatting before the selection
+##################################################
+.source
+As of some one gently rapping, rapping at my chamber door.
+"'Tis some visitor," I muttered, "tapp**ing** at my chamber door 
+Only this, and nothing more."
+.rendered
+<p>As of some one gently rapping, rapping at my chamber door.<br/>"'Tis some visitor," I muttered, "tapp<strong>ing</strong> at my chamber door <br/>Only this, and nothing more."</p>
+.annotation
+0
+XWiki.XWikiGuest
+The door of EA Poe's chamber
+at my chamber door
+tapping 
+
+.annotated
+<p>As of some one gently rapping, rapping at my chamber door.<br/>"'Tis some visitor," I muttered, "tapp<strong>ing</strong> <span class="annotation ID0">at my chamber door</span> <br/>Only this, and nothing more."</p>

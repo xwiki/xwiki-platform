@@ -1,0 +1,16 @@
+##################################################
+# The annotation is starting in a block verbatim block and ends in plain text
+##################################################
+.source
+{{{To be, or not to be, that is the question:}}}
+
+Whether 'tis nobler in the mind to suffer
+.rendered
+<pre>To be, or not to be, that is the question:</pre><p>Whether 'tis nobler in the mind to suffer</p>
+.annotation
+0
+XWiki.XWikiGuest
+The question
+question: Whether
+.annotated
+<pre>To be, or not to be, that is the <span class="annotation ID0">question:</span></pre><p><span class="annotation ID0">Whether</span> 'tis nobler in the mind to suffer</p>

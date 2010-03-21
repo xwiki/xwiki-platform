@@ -1,0 +1,20 @@
+##################################################
+# Deleting a word right from the end of an annotation
+##################################################
+.source
+I have seen roses wilddamasked, red and white,
+.sourceUpdated
+I have seen roses damasked, red and white,
+.annotation
+0
+XWiki.XWikiGuest
+Flowers
+roses wild
+.annotationUpdated
+0
+XWiki.XWikiGuest
+Flowers
+roses 
+
+
+UPDATED

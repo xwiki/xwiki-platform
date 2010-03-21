@@ -1,0 +1,18 @@
+##################################################
+# Ambiguous annotation, empty selection but with context to identify it
+##################################################
+.source
+As of some one gently rapping, rapping at my chamber door.
+"'Tis some visitor," I muttered, "tapping at my chamber door 
+Only this, and nothing more."
+.rendered
+<p>As of some one gently rapping, rapping at my chamber door.<br/>"'Tis some visitor," I muttered, "tapping at my chamber door <br/>Only this, and nothing more."</p>
+.annotation
+0
+XWiki.XWikiGuest
+The door of EA Poe's chamber
+
+tapp
+ing
+.annotated
+<p>As of some one gently rapping, rapping at my chamber door.<br/>"'Tis some visitor," I muttered, "tapp<span class="annotation ID0"></span>ing at my chamber door <br/>Only this, and nothing more."</p>

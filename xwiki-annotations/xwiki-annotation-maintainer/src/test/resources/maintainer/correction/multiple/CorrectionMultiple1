@@ -1,0 +1,20 @@
+##################################################
+# 2 Typos on the same annotation: 1 addition and 1 deletion
+##################################################
+.source
+To be, or no to ybe, that is the question:
+.sourceUpdated
+To be, or not to be, that is the question:
+.annotation
+0
+XWiki.XWikiGuest
+Alternative to being
+or no to ybe
+.annotationUpdated
+0
+XWiki.XWikiGuest
+Alternative to being
+or not to be
+
+
+UPDATED

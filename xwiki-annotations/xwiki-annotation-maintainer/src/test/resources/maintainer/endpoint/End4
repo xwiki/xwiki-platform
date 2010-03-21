@@ -1,0 +1,20 @@
+##################################################
+# Modifying the content right from the end of an annotation
+##################################################
+.source
+I have seen roses wild damasked, red and white,
+.sourceUpdated
+I have seen roses grey damasked, red and white,
+.annotation
+0
+XWiki.XWikiGuest
+Flowers
+roses wi
+.annotationUpdated
+0
+XWiki.XWikiGuest
+Flowers
+roses gr
+
+
+UPDATED

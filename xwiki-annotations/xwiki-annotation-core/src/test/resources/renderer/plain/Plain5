@@ -1,0 +1,18 @@
+##################################################
+# Annotation is at the beginning of the document
+##################################################
+.source
+If hairs be wires, black wires grow on her head.
+
+I have seen roses damasked, red and white,
+But no such roses see I in her cheeks;
+.rendered
+<p>If hairs be wires, black wires grow on her head.</p><p>I have seen roses damasked, red and white,<br/>But no such roses see I in her cheeks;</p>
+.annotation
+0
+XWiki.XWikiGuest
+Wires wasn't seen as an industrial object.
+If hairs be wires
+.annotated
+# it seems this has also an empty annotation span between the two paragraphs, which shouldn't really be there...
+<p><span class="annotation ID0">If hairs be wires</span>, black wires grow on her head.</p><p>I have seen roses damasked, red and white,<br/>But no such roses see I in her cheeks;</p>

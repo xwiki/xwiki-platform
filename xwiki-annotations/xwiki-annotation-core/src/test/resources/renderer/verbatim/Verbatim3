@@ -1,0 +1,14 @@
+##################################################
+# The annotation contains an entire inline verbatim block
+##################################################
+.source
+To be, or {{{not to}}} be, that is the question:
+.rendered
+<p>To be, or <tt class="wikimodel-verbatim">not to</tt> be, that is the question:</p>
+.annotation
+0
+XWiki.XWikiGuest
+Alternative to being
+or not to be
+.annotated
+<p>To be, <span class="annotation ID0">or&nbsp;</span><tt class="wikimodel-verbatim"><span class="annotation ID0">not to</span></tt><span class="annotation ID0">&nbsp;be</span>, that is the question:</p>

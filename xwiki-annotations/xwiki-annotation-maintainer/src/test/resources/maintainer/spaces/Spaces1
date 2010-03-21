@@ -1,0 +1,25 @@
+##################################################
+# Selection is saved without whitespace between paragraphs and, upon correction, they need to be correctly mapped on the content and updated.
+##################################################
+.source
+I have seen roses wild damasked,
+
+red and white,
+.sourceUpdated
+I have seen roses wild damask'd,
+
+red and white,
+.annotation
+0
+XWiki.XWikiGuest
+Flowers
+damasked,red
+.annotationUpdated
+0
+XWiki.XWikiGuest
+Flowers
+# the updater will add the space here, since it finds a new line and normalizes it
+damask'd, red
+
+
+UPDATED

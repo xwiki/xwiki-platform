@@ -1,0 +1,442 @@
+/*
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+ */
+
+package org.xwiki.annotation.io.internal;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Date;
+import java.util.List;
+
+import org.xwiki.annotation.Annotation;
+import org.xwiki.annotation.io.IOService;
+import org.xwiki.annotation.io.IOServiceException;
+import org.xwiki.annotation.maintainer.AnnotationState;
+import org.xwiki.annotation.reference.TypedStringEntityReferenceResolver;
+import org.xwiki.bridge.DocumentAccessBridge;
+import org.xwiki.component.annotation.Component;
+import org.xwiki.component.annotation.Requirement;
+import org.xwiki.component.logging.AbstractLogEnabled;
+import org.xwiki.context.Execution;
+import org.xwiki.model.EntityType;
+import org.xwiki.model.reference.EntityReference;
+import org.xwiki.model.reference.EntityReferenceSerializer;
+
+import com.xpn.xwiki.XWikiContext;
+import com.xpn.xwiki.XWikiException;
+import com.xpn.xwiki.doc.XWikiDocument;
+import com.xpn.xwiki.objects.BaseObject;
+import com.xpn.xwiki.objects.BaseProperty;
+
+/**
+ * Default {@link IOService} implementation, based on storing annotations in XWiki Objects in XWiki documents. The
+ * targets manipulated by this implementation are XWiki references, such as xwiki:Space.Page for documents or with an
+ * object and property reference if the target is an object property. Use the reference module to generate the
+ * references passed to this module, so that they can be resolved to XWiki content back by this implementation.
+ * 
+ * @version $Id$
+ */
+@Component
+public class DefaultIOService extends AbstractLogEnabled implements IOService
+{
+    /**
+     * The name of the field of the annotation object containing the reference of the content on which the annotation is
+     * added.
+     */
+    private static final String TARGET = "target";
+
+    /**
+     * The execution used to get the deprecated XWikiContext.
+     */
+    @Requirement
+    private Execution execution;
+
+    /**
+     * Entity reference handler to resolve the reference target.
+     */
+    @Requirement
+    private TypedStringEntityReferenceResolver referenceResolver;
+
+    /**
+     * Default entity reference serializer to create document full names.
+     */
+    @Requirement
+    private EntityReferenceSerializer<String> serializer;
+
+    /**
+     * Local entity reference serializer, to create references which are robust to import / export.
+     */
+    @Requirement("local")
+    private EntityReferenceSerializer<String> localSerializer;
+
+    /**
+     * Document access bridge used to get the annotations configuration parameters.
+     */
+    @Requirement
+    private DocumentAccessBridge dab;
+
+    /**
+     * {@inheritDoc} <br />
+     * This implementation saves the added annotation in the document where the target of the annotation is.
+     * 
+     * @see org.xwiki.annotation.io.IOService#addAnnotation(String, org.xwiki.annotation.Annotation)
+     */
+    public void addAnnotation(String target, Annotation annotation) throws IOServiceException
+    {
+        try {
+            // extract the document name from the passed target
+            // by default the fullname is the passed target
+            String documentFullName = target;
+            EntityReference targetReference = referenceResolver.resolve(target, EntityType.DOCUMENT);
+            // try to get a document reference from the passed target reference
+            EntityReference docRef = targetReference.extractReference(EntityType.DOCUMENT);
+            if (docRef != null) {
+                documentFullName = serializer.serialize(docRef);
+            }
+            // now get the document with that name
+            XWikiContext deprecatedContext = getXWikiContext();
+            XWikiDocument document = deprecatedContext.getWiki().getDocument(documentFullName, deprecatedContext);
+            // create a new object in this document to hold the annotation
+            String annotationClassName = getAnnotationClassName();
+            int id = document.createNewObject(annotationClassName, deprecatedContext);
+            BaseObject object = document.getObject(annotationClassName, id);
+            updateObject(object, annotation, deprecatedContext);
+            // and set additional data: author to annotation author, date to now and the annotation target
+            object.set(Annotation.DATE_FIELD, new Date(), deprecatedContext);
+            // TODO: maybe we shouldn't trust what we receive from the caller but set the author from the context.
+            // Or the other way around, set the author of the document from the annotations author.
+            object.set(Annotation.AUTHOR_FIELD, annotation.getAuthor(), deprecatedContext);
+            // store the target of this annotation, serialized with a local serializer, to be exportable and importable
+            // in a different wiki
+            // TODO: figure out if this is the best idea in terms of target serialization
+            // 1/ the good part is that it is a fixed value that can be searched with a query in all objects in the wiki
+            // 2/ the bad part is that copying a document to another space will not also update its annotation targets
+            // 3/ if annotations are stored in the same document they annotate, the targets are only required for object
+            // fields
+            // ftm don't store the type of the reference since we only need to recognize the field, not to also read it.
+            if (targetReference.getType() == EntityType.OBJECT_PROPERTY
+                || targetReference.getType() == EntityType.DOCUMENT) {
+                object.set(TARGET, localSerializer.serialize(targetReference), deprecatedContext);
+            } else {
+                object.set(TARGET, target, deprecatedContext);
+            }
+            // set the author of the document to the current user
+            document.setAuthor(deprecatedContext.getUser());
+            deprecatedContext.getWiki().saveDocument(document,
+                "Added annotation on \"" + annotation.getSelection() + "\"", deprecatedContext);
+        } catch (XWikiException e) {
+            throw new IOServiceException("An exception message has occurred while saving the annotation", e);
+        }
+    }
+
+    /**
+     * {@inheritDoc} <br />
+     * This implementation retrieves all the objects of the annotation class in the document where target points to, and
+     * which have the target set to {@code target}.
+     * 
+     * @see org.xwiki.annotation.io.IOService#getAnnotations(String)
+     */
+    public Collection<Annotation> getAnnotations(String target) throws IOServiceException
+    {
+        try {
+            // parse the target and extract the local reference serialized from it, by the same rules
+            EntityReference targetReference = referenceResolver.resolve(target, EntityType.DOCUMENT);
+            // build the target identifier for the annotation
+            String localTargetId = target;
+            // and the name of the document where it should be stored
+            String docName = target;
+            if (targetReference.getType() == EntityType.DOCUMENT
+                || targetReference.getType() == EntityType.OBJECT_PROPERTY) {
+                localTargetId = localSerializer.serialize(targetReference);
+                docName = serializer.serialize(targetReference.extractReference(EntityType.DOCUMENT));
+            }
+            // get the document
+            XWikiContext deprecatedContext = getXWikiContext();
+            XWikiDocument document = deprecatedContext.getWiki().getDocument(docName, deprecatedContext);
+            // and the annotation class objects in it
+            List<BaseObject> objects = document.getObjects(getAnnotationClassName());
+            // and build a list of Annotation objects
+            List<Annotation> result = new ArrayList<Annotation>();
+            if (objects == null) {
+                return Collections.<Annotation> emptySet();
+            }
+            for (BaseObject object : objects) {
+                // if it's not on the required target, ignore it
+                if (object == null || !localTargetId.equals(object.getStringValue(TARGET))) {
+                    continue;
+                }
+                // use the object number as annotation id
+                result.add(loadAnnotationFromObject(object, deprecatedContext));
+            }
+            return result;
+        } catch (XWikiException e) {
+            throw new IOServiceException("An exception has occurred while loading the annotations", e);
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see org.xwiki.annotation.io.IOService#getAnnotation(java.lang.String, java.lang.String)
+     */
+    public Annotation getAnnotation(String target, String annotationID) throws IOServiceException
+    {
+        try {
+            if (annotationID == null || target == null) {
+                return null;
+            }
+            // parse the target and extract the local reference serialized from it, by the same rules
+            EntityReference targetReference = referenceResolver.resolve(target, EntityType.DOCUMENT);
+            // build the target identifier for the annotation
+            String localTargetId = target;
+            // and the name of the document where it should be stored
+            String docName = target;
+            if (targetReference.getType() == EntityType.DOCUMENT
+                || targetReference.getType() == EntityType.OBJECT_PROPERTY) {
+                localTargetId = localSerializer.serialize(targetReference);
+                docName = serializer.serialize(targetReference.extractReference(EntityType.DOCUMENT));
+            }
+            // get the document
+            XWikiContext deprecatedContext = getXWikiContext();
+            XWikiDocument document = deprecatedContext.getWiki().getDocument(docName, deprecatedContext);
+            // and the annotation class objects in it
+            // parse the annotation id as object index
+            BaseObject object = document.getObject(getAnnotationClassName(), Integer.valueOf(annotationID.toString()));
+            if (object == null || !localTargetId.equals(object.getStringValue(TARGET))) {
+                return null;
+            }
+            // use the object number as annotation id
+            return loadAnnotationFromObject(object, deprecatedContext);
+        } catch (NumberFormatException e) {
+            throw new IOServiceException("Could not parse annotation id " + annotationID, e);
+        } catch (XWikiException e) {
+            throw new IOServiceException("An exception has occurred while loading the annotation with id "
+                + annotationID, e);
+        }
+    }
+
+    /**
+     * {@inheritDoc} <br />
+     * This implementation deletes the annotation object with the object number indicated by {@code annotationID} from
+     * the document indicated by {@code target}, if its stored target matches the passed target.
+     * 
+     * @see org.xwiki.annotation.io.IOService#removeAnnotation(String, String)
+     */
+    public void removeAnnotation(String target, String annotationID) throws IOServiceException
+    {
+        try {
+            if (annotationID == null || target == null) {
+                return;
+            }
+
+            EntityReference targetReference = referenceResolver.resolve(target, EntityType.DOCUMENT);
+            // get the target identifier and the document name from the parsed reference
+            String localTargetId = target;
+            String docName = target;
+            if (targetReference.getType() == EntityType.DOCUMENT
+                || targetReference.getType() == EntityType.OBJECT_PROPERTY) {
+                localTargetId = localSerializer.serialize(targetReference);
+                docName = serializer.serialize(targetReference.extractReference(EntityType.DOCUMENT));
+            }
+            // get the document
+            XWikiContext deprecatedContext = getXWikiContext();
+            XWikiDocument document = deprecatedContext.getWiki().getDocument(docName, deprecatedContext);
+            if (document.isNew()) {
+                // if the document doesn't exist already skip it
+                return;
+            }
+            // and the document object on it
+            BaseObject annotationObject =
+                document.getObject(getAnnotationClassName(), Integer.valueOf(annotationID.toString()));
+
+            // if object exists and its target matches the requested target, delete it
+            if (annotationObject != null && localTargetId.equals(annotationObject.getStringValue(TARGET))) {
+                document.removeObject(annotationObject);
+                document.setAuthor(deprecatedContext.getUser());
+                deprecatedContext.getWiki().saveDocument(document, "Deleted annotation " + annotationID,
+                    deprecatedContext);
+            }
+        } catch (NumberFormatException e) {
+            throw new IOServiceException("An exception has occurred while parsing the annotation id", e);
+        } catch (XWikiException e) {
+            throw new IOServiceException("An exception has occurred while removing the annotation", e);
+        }
+    }
+
+    /**
+     * {@inheritDoc} <br />
+     * Implementation which gets all the annotation class objects in the document pointed by the target, and matches
+     * their ids against the ids in the passed collection of annotations. If they match, they are updated with the new
+     * data in the annotations in annotation.
+     * 
+     * @see org.xwiki.annotation.io.IOService#updateAnnotations(String, java.util.Collection)
+     */
+    public void updateAnnotations(String target, Collection<Annotation> annotations) throws IOServiceException
+    {
+        try {
+            EntityReference targetReference = referenceResolver.resolve(target, EntityType.DOCUMENT);
+            // get the document name from the parsed reference
+            String docName = target;
+            if (targetReference.getType() == EntityType.DOCUMENT
+                || targetReference.getType() == EntityType.OBJECT_PROPERTY) {
+                docName = serializer.serialize(targetReference.extractReference(EntityType.DOCUMENT));
+            }
+            // get the document pointed to by the target
+            XWikiContext deprecatedContext = getXWikiContext();
+            XWikiDocument document = deprecatedContext.getWiki().getDocument(docName, deprecatedContext);
+            boolean updated = false;
+            for (Annotation annotation : annotations) {
+                // parse annotation id as string. If cannot parse, then ignore annotation, is not valid
+                int annId = 0;
+                try {
+                    annId = Integer.parseInt(annotation.getId());
+                } catch (NumberFormatException e) {
+                    continue;
+                }
+                BaseObject object = document.getObject(getAnnotationClassName(), annId);
+                if (object == null) {
+                    continue;
+                }
+                updated = updateObject(object, annotation, deprecatedContext) || updated;
+            }
+            if (updated) {
+                // set the author of the document to the current user
+                document.setAuthor(deprecatedContext.getUser());
+                deprecatedContext.getWiki().saveDocument(document, "Updated annotations", deprecatedContext);
+            }
+        } catch (XWikiException e) {
+            throw new IOServiceException("An exception has occurred while updating the annotation", e);
+        }
+    }
+
+    /**
+     * Helper function to load an annotation object from an xwiki object.
+     * 
+     * @param object the xwiki object to load an annotation from
+     * @param deprecatedContext XWikiContext to make operations on xwiki data
+     * @return the Annotation instance for the annotation stored in BaseObject
+     */
+    protected Annotation loadAnnotationFromObject(BaseObject object, XWikiContext deprecatedContext)
+    {
+        // load the annotation with its ID, special handling of the state since it needs deserialization, special
+        // handling of the original selection which shouldn't be set if it's empty
+        Annotation annotation = new Annotation(object.getNumber() + "");
+        annotation.setState(AnnotationState.valueOf(object.getStringValue(Annotation.STATE_FIELD)));
+        String originalSelection = object.getStringValue(Annotation.ORIGINAL_SELECTION_FIELD);
+        if (originalSelection != null && originalSelection.length() > 0) {
+            annotation.setOriginalSelection(originalSelection);
+        }
+
+        Collection<String> skippedFields =
+            Arrays.asList(new String[] {Annotation.ORIGINAL_SELECTION_FIELD, Annotation.STATE_FIELD});
+        // go through all props and load them in the annotation, except for the ones already loaded
+        // get all the props, filter those that need to be skipped and save the rest
+        for (String propName : object.getPropertyNames()) {
+            if (!skippedFields.contains(propName)) {
+                try {
+                    annotation.set(propName, ((BaseProperty) object.get(propName)).getValue());
+                } catch (XWikiException e) {
+                    getLogger().warn(
+                        "Unable to get property " + propName + " from object " + object.getClassName() + "["
+                            + object.getNumber() + "]. Will not be saved in the annotation.", e);
+                }
+            }
+        }
+        return annotation;
+    }
+
+    /**
+     * Helper function to update object from an annotation.
+     * 
+     * @param object the object to update
+     * @param annotation the annotation to marshal in the object
+     * @param deprecatedContext the XWikiContext execute object operations
+     * @return {@code true} if any modification was done on this object, {@code false} otherwise
+     */
+    protected boolean updateObject(BaseObject object, Annotation annotation, XWikiContext deprecatedContext)
+    {
+        boolean updated = false;
+        // TODO: there's an issue here to solve with (custom) types which need to be serialized before saved. Some do,
+        // some don't.... Custom field types in the annotation map should match the types accepted by the object
+        // special handling for state which needs to be string serialized, since the prop in the class is string and the
+        // state is an enum
+        updated =
+            setIfNotNull(object, Annotation.STATE_FIELD, annotation.getState() == null ? null : annotation.getState()
+                .toString(), deprecatedContext)
+                || updated;
+        // don't reset the state, the date (which will be set now, upon save), and ignore anything that could overwrite
+        // the target. Don't set the author either, will be set by caller, if needed
+        Collection<String> skippedFields =
+            Arrays
+                .asList(new String[] {Annotation.STATE_FIELD, Annotation.DATE_FIELD, Annotation.AUTHOR_FIELD, TARGET});
+        // all fields in the annotation, try to put them in object (I wonder what happens if I can't...)
+        for (String propName : annotation.getFieldNames()) {
+            if (!skippedFields.contains(propName)) {
+                updated = setIfNotNull(object, propName, annotation.get(propName), deprecatedContext) || updated;
+            }
+        }
+        // if it was updated, set the new date of the annotation to now
+        if (updated) {
+            object.set(Annotation.DATE_FIELD, new Date(), deprecatedContext);
+        }
+
+        return updated;
+    }
+
+    /**
+     * Helper function to set a field on an object only if the new value is not null. If you wish to reset the value of
+     * a field, pass the empty string for the new value.
+     * 
+     * @param object the object to set the value of the field
+     * @param fieldName the name of the field to set
+     * @param newValue the new value to set to the field. It will be ignored if it's {@code null}
+     * @param deprecatedContext the XWikiContext
+     * @return {@code true} if the field was set to newValue, {@code false} otherwise
+     */
+    protected boolean setIfNotNull(BaseObject object, String fieldName, Object newValue, XWikiContext deprecatedContext)
+    {
+        if (newValue != null) {
+            object.set(fieldName, newValue, deprecatedContext);
+            return true;
+        }
+        return false;
+    }
+
+    /**
+     * @return the deprecated xwiki context used to manipulate xwiki objects
+     */
+    private XWikiContext getXWikiContext()
+    {
+        return (XWikiContext) execution.getContext().getProperty("xwikicontext");
+    }
+
+    /**
+     * Helper function to return the annotation class from the annotation configuration document.
+     * 
+     * @return the name of the annotation class that describes the annotation structure
+     */
+    protected String getAnnotationClassName()
+    {
+        String configDocument = "AnnotationCode.AnnotationConfig";
+        return (String) dab.getProperty(configDocument, configDocument, "annotationClass");
+    }
+}

@@ -1,0 +1,14 @@
+##################################################
+# Annotation is the full document
+##################################################
+.source
+To be, or not to be, that is the question
+.rendered
+<p>To be, or not to be, that is the question</p>
+.annotation
+0
+XWiki.XWikiGuest
+The most famous line in Shakespeare's writing
+To be, or not to be, that is the question
+.annotated
+<p><span class="annotation ID0">To be, or not to be, that is the question</span></p>

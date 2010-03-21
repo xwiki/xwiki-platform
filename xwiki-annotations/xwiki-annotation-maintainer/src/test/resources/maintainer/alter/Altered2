@@ -1,0 +1,23 @@
+##################################################
+# Modifying the whole content on which the annotation is added.
+# Failing, which proves clearly the need for word based diffs, the users don't edit characters in documents but words
+# The character based diffs don't overlap the whole annotation, some letters are synchronized
+# either we consider that overlapping the start or end of annotation is altered too (which is not really the best idea)
+##################################################
+.source
+I have seen wild roses damasked, red and white,
+.sourceUpdated
+I have noticed some spots on the sky, red and white, 
+.annotation
+0
+XWiki.XWikiGuest
+Flowers
+wild roses
+.annotationUpdated
+0
+XWiki.XWikiGuest
+Flowers
+wild roses
+
+
+ALTERED

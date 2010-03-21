@@ -1,0 +1,21 @@
+##################################################
+# Replace the whole word of the annotation, with a different one, in this case for which one letter is the same. It will be an update, not an alteration.
+# TODO: I wonder if this is good like this... 
+##################################################
+.source
+I have seen roses damasked, red and white,
+.sourceUpdated
+I have seen tulips damasked, red and white,
+.annotation
+0
+XWiki.XWikiGuest
+Flowers
+roses
+.annotationUpdated
+0
+XWiki.XWikiGuest
+Flowers
+tulips
+
+
+UPDATED

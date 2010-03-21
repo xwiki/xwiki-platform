@@ -1,0 +1,23 @@
+##################################################
+# Selection contains spaces at both ends. Test that modifications inside the selection are correctly updated and selection remains on the same content.
+##################################################
+.source
+I have seen roses wikd damasked, red and white,
+.sourceUpdated
+I have seen roses wild damasked, red and white,
+.annotation
+0
+XWiki.XWikiGuest
+Flowers
+ wikd 
+roses
+damasked
+.annotationUpdated
+0
+XWiki.XWikiGuest
+Flowers
+# updater is stripping spaces around the selection and moving them in the context
+wild
+roses 
+ damasked
+UPDATED

@@ -1,0 +1,20 @@
+##################################################
+# Context is to be updated to the last word of the document
+##################################################
+.source
+I have seen roses damasked, red and white
+.sourceUpdated
+I have seen roses and violets damasked, red and white
+.annotation
+0
+XWiki.XWikiGuest
+Conjunction
+and
+.annotationUpdated
+0
+XWiki.XWikiGuest
+Conjunction
+and
+red 
+ white
+SAFE

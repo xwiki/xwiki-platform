@@ -1,0 +1,21 @@
+##################################################
+# Deleting a word right from the end of an annotation
+# Although this looks like edit at the end of an annotation, it's actually crossing the end of the annotation because of the space.
+##################################################
+.source
+I have seen roses wild damasked, red and white,
+.sourceUpdated
+I have seen roses damasked, red and white,
+.annotation
+0
+XWiki.XWikiGuest
+Flowers
+roses wild
+.annotationUpdated
+0
+XWiki.XWikiGuest
+Flowers
+roses dama
+
+
+UPDATED

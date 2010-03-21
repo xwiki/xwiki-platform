@@ -1,0 +1,20 @@
+##################################################
+# Annotation stays unchanged because the modification is after the annotation.
+##################################################
+.source
+To be, or not to be, that is the question:
+.sourceUpdated
+To be, or not to be, that is the big question which is asked:
+.annotation
+0
+XWiki.XWikiGuest
+Annotation
+not to be
+.annotationUpdated
+0
+XWiki.XWikiGuest
+Annotation
+not to be
+
+
+SAFE

@@ -1,0 +1,22 @@
+##################################################
+# Context is updated before and after the annotation, but it doesn't affect the uniqueness of the annotation
+##################################################
+.source
+If hairs be wires, black wires grow on her head.
+.sourceUpdated
+If hairs are wires, green wires grow on her head.
+.annotation
+0
+XWiki.XWikiGuest
+Comparison
+wires
+hairs be 
+, black
+.annotationUpdated
+0
+XWiki.XWikiGuest
+Comparison
+wires
+airs are 
+, green
+SAFE

@@ -1,0 +1,18 @@
+##################################################
+# Annotation is at the end of the document
+##################################################
+.source
+If hairs be wires, black wires grow on her head.
+
+I have seen roses damasked, red and white,
+But no such roses see I in her cheeks
+.rendered
+<p>If hairs be wires, black wires grow on her head.</p><p>I have seen roses damasked, red and white,<br/>But no such roses see I in her cheeks</p>
+.annotation
+0
+XWiki.XWikiGuest
+Shakespeare was potentially visually impaired.
+no such roses see I in her cheeks
+.annotated
+# it seems this has also an empty annotation span between the two paragraphs, which shouldn't really be there...
+<p>If hairs be wires, black wires grow on her head.</p><p>I have seen roses damasked, red and white,<br/>But <span class="annotation ID0">no such roses see I in her cheeks</span></p>

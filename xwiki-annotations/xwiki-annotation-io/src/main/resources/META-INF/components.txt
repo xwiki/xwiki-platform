@@ -1,0 +1,3 @@
+org.xwiki.annotation.io.internal.DefaultIOService
+org.xwiki.annotation.io.internal.DefaultIOTargetService
+org.xwiki.annotation.rights.internal.XWikiAnnotationRightService

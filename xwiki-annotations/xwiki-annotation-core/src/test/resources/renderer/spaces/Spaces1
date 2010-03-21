@@ -1,0 +1,16 @@
+##################################################
+# Selection contains a space, to its right. Test that annotation is rendered correctly, on the same content except for the space
+##################################################
+.source
+I have seen roses wild damasked, red and white,
+.rendered
+<p>I have seen roses wild damasked, red and white,</p>
+.annotation
+0
+XWiki.XWikiGuest
+Flowers
+wild 
+roses 
+damasked
+.annotated
+<p>I have seen roses <span class="annotation ID0">wild</span> damasked, red and white,</p>

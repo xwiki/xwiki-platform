@@ -1,0 +1,14 @@
+##################################################
+# Annotation which touches a generated content macro and some content outside it.
+##################################################
+.source
+Macro test with {{testgeneratedcontent/}} to annotate
+.rendered
+<p>Macro test with some content which is generated to annotate</p>
+.annotation
+0
+XWiki.XWikiGuest
+The content to annotate
+with some content
+.annotated
+<p>Macro test <span class="annotation ID0">with some content</span> which is generated to annotate</p>

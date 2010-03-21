@@ -1,0 +1,19 @@
+##################################################
+# Two plain text annotations, one ending the in word where the other is starting, but not overlapping
+##################################################
+.source
+My mistress' eyes are nothing like the sun;
+.rendered
+<p>My mistress' eyes are nothing like the sun;</p>
+.annotation
+0
+XWiki.XWikiGuest
+Eyes
+eyes are not
+.annotation
+1
+XWiki.XWikiGuest
+Comparison
+ng like
+.annotated
+<p>My mistress' <span class="annotation ID0">eyes are not</span>hi<span class="annotation ID1">ng like</span> the sun;</p>

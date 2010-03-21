@@ -1,0 +1,17 @@
+##################################################
+# Annotation that spans over 2 paragraphs
+##################################################
+.source
+If hairs be wires, black wires grow on her head.
+
+I have seen roses damasked, red and white,
+But no such roses see I in her cheeks;
+.rendered
+<p>If hairs be wires, black wires grow on her head.</p><p>I have seen roses damasked, red and white,<br/>But no such roses see I in her cheeks;</p>
+.annotation
+0
+XWiki.XWikiGuest
+Wires wasn't seen as an industrial object.
+wires grow on her head. I have seen roses damasked
+.annotated
+<p>If hairs be wires, black <span class="annotation ID0">wires grow on her head.</span></p><p><span class="annotation ID0">I have seen roses damasked</span>, red and white,<br/>But no such roses see I in her cheeks;</p>

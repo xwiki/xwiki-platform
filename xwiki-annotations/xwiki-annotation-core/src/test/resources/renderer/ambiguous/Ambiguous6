@@ -1,0 +1,18 @@
+##################################################
+# Ambiguous annotation, with context but without spaces around the selection
+##################################################
+.source
+As of some one gently rapping, rapping at my chamber door.
+"'Tis some visitor," I muttered, "tapping at my chamber door 
+Only this, and nothing more."
+.rendered
+<p>As of some one gently rapping, rapping at my chamber door.<br/>"'Tis some visitor," I muttered, "tapping at my chamber door <br/>Only this, and nothing more."</p>
+.annotation
+0
+XWiki.XWikiGuest
+The door of EA Poe's chamber
+appi
+t
+ng
+.annotated
+<p>As of some one gently rapping, rapping at my chamber door.<br/>"'Tis some visitor," I muttered, "t<span class="annotation ID0">appi</span>ng at my chamber door <br/>Only this, and nothing more."</p>

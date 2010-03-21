@@ -1,0 +1,14 @@
+##################################################
+# Annotation starts and ends in a formatted text
+##################################################
+.source
+To be, **or not** to be, that is the question:
+.rendered
+<p>To be, <strong>or not</strong> to be, that is the question:</p>
+.annotation
+0
+XWiki.XWikiGuest
+Denial
+not
+.annotated
+<p>To be, <strong>or <span class="annotation ID0">not</span></strong> to be, that is the question:</p>

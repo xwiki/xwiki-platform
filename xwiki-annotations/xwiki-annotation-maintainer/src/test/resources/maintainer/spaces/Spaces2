@@ -1,0 +1,26 @@
+##################################################
+# Selection context is saved without whitespace between paragraphs and, upon correction, it needs to be correctly mapped on the content and updated. 
+##################################################
+.source
+I have seen roses and wild damasked,
+
+red and white,
+.sourceUpdated
+I have seen roses and wild damask'd,
+
+red and white,
+.annotation
+0
+XWiki.XWikiGuest
+Flowers
+and
+damasked,red 
+ white
+.annotationUpdated
+0
+XWiki.XWikiGuest
+Flowers
+# the updater will add the space here, since it finds a new line and normalizes it
+and
+damask'd, red 
+ white

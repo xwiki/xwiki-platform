@@ -1,0 +1,20 @@
+##################################################
+# # context is to be updated to the first word of the document
+##################################################
+.source
+have seen roses damasked, red and white,
+.sourceUpdated
+have seen roses damasked, red and white seen,
+.annotation
+0
+XWiki.XWikiGuest
+Sight
+seen
+.annotationUpdated
+0
+XWiki.XWikiGuest
+Sight
+seen
+have 
+ roses
+SAFE

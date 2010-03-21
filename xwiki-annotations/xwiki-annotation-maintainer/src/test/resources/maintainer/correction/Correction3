@@ -1,0 +1,20 @@
+##################################################
+# Fixing a typo in an annotation, a wrong letter.
+##################################################
+.source
+To be, or nor to be, that is the question:
+.sourceUpdated
+To be, or not to be, that is the question:
+.annotation
+0
+XWiki.XWikiGuest
+Alternative to being
+or nor to be
+.annotationUpdated
+0
+XWiki.XWikiGuest
+Alternative to being
+or not to be
+
+
+UPDATED

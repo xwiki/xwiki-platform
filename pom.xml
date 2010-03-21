@@ -149,5 +149,6 @@
     <module>xwiki-formula</module>
     <module>xwiki-classloader</module>
     <module>xwiki-captcha</module>
+    <module>xwiki-annotations</module>
   </modules>
 </project>

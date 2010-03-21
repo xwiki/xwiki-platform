@@ -1,0 +1,19 @@
+##################################################
+# Two plain text annotations, starting at some offsets inside the same word
+##################################################
+.source
+My mistress' eyes are nothing like the sun;
+.rendered
+<p>My mistress' eyes are nothing like the sun;</p>
+.annotation
+0
+XWiki.XWikiGuest
+Mistress
+istress' eyes
+.annotation
+1
+XWiki.XWikiGuest
+Eyes
+tress' eyes are nothing
+.annotated
+<p>My m<span class="annotation ID0">is<span class="annotation ID1">tress' eyes</span></span><span class="annotation ID1">&nbsp;are nothing</span> like the sun;</p>

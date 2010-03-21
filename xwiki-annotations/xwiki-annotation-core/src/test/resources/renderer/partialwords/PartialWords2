@@ -1,0 +1,14 @@
+##################################################
+# Plain text annotation, ending at some offset inside a word rather than at the end of the word
+##################################################
+.source
+To be, or not to be, that is the question:
+.rendered
+<p>To be, or not to be, that is the question:</p>
+.annotation
+0
+XWiki.XWikiGuest
+Question
+is the quest
+.annotated
+<p>To be, or not to be, that <span class="annotation ID0">is the quest</span>ion:</p>

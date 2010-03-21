@@ -1,0 +1,20 @@
+##################################################
+# Annotation stays unchanged because the modification is only in formatting of the text: bold and italics are set on the text
+##################################################
+.source
+To be, or not to be, that is the question:
+.sourceUpdated
+To be, or **not to** //be//, that is the question:
+.annotation
+0
+XWiki.XWikiGuest
+Annotation
+or not to be
+.annotationUpdated
+0
+XWiki.XWikiGuest
+Annotation
+or not to be
+
+
+SAFE

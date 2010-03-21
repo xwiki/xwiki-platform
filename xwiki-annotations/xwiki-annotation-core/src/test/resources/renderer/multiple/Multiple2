@@ -1,0 +1,19 @@
+##################################################
+# Two overlapping annotations on the same document, test that they are rendered correctly
+##################################################
+.source
+To be, or not to be, that is the question:
+.rendered
+<p>To be, or not to be, that is the question:</p>
+.annotation
+0
+XWiki.XWikiGuest
+Choices
+To be, or not to be
+.annotation
+1
+XWiki.XWikiGuest
+One choice
+not to be, that is
+.annotated
+<p><span class="annotation ID0">To be, or <span class="annotation ID1">not to be</span></span><span class="annotation ID1">, that is</span> the question:</p>

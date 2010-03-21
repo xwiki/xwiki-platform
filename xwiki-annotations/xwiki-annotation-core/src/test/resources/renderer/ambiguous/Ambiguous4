@@ -1,0 +1,17 @@
+##################################################
+# Ambiguous annotation, where context (void in this case) indeed appears twice and selection cannot be identified
+##################################################
+.source
+As of some one gently rapping, rapping at my chamber door.
+"'Tis some visitor," I muttered, "tapping at my chamber door 
+Only this, and nothing more."
+.rendered
+<p>As of some one gently rapping, rapping at my chamber door.<br/>"'Tis some visitor," I muttered, "tapping at my chamber door <br/>Only this, and nothing more."</p>
+.annotation
+0
+XWiki.XWikiGuest
+Sharply striking
+rapping
+# expect annotation to be mapped on the first encounter of the selection
+.annotated
+<p>As of some one gently <span class="annotation ID0">rapping</span>, rapping at my chamber door.<br/>"'Tis some visitor," I muttered, "tapping at my chamber door <br/>Only this, and nothing more."</p>

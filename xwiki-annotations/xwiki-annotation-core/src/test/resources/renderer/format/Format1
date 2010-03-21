@@ -1,0 +1,14 @@
+##################################################
+# Annotation starting in one piece of formatted text and ending in another.
+##################################################
+.source
+My **mistress' eyes** are //nothing like the sun//;
+.rendered
+<p>My <strong>mistress' eyes</strong> are <em>nothing like the sun</em>;</p>
+.annotation
+0
+XWiki.XWikiGuest
+Like the sun...
+eyes are nothing
+.annotated
+<p>My <strong>mistress' <span class="annotation ID0">eyes</span></strong><span class="annotation ID0">&nbsp;are&nbsp;</span><em><span class="annotation ID0">nothing</span> like the sun</em>;</p>

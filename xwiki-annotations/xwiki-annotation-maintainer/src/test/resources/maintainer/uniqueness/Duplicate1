@@ -1,0 +1,22 @@
+##################################################
+# Copy-pasting the annotation in a different spot in the document: after the annotation
+##################################################
+.source
+I have seen roses damasked, red and white,
+.sourceUpdated
+I have seen roses damasked, red and white,
+
+seen roses damasked,
+.annotation
+0
+XWiki.XWikiGuest
+Flowers
+roses
+.annotationUpdated
+0
+XWiki.XWikiGuest
+Flowers
+roses
+have seen 
+ damasked,
+SAFE

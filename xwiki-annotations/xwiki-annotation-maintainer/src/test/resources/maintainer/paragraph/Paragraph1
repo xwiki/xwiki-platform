@@ -1,0 +1,29 @@
+##################################################
+# Editing a full annotated paragraph. I.e. modification of the whole annotation selected text.
+# This doesn't prove anything, the fact that diff is on characters can make it fail anytime because of some characters which are matched. See also Altered2.
+##################################################
+.source
+Text
+
+Paragraph 
+
+Word
+.sourceUpdated
+Text
+
+Modification 
+
+Word
+.annotation
+0
+XWiki.XWikiGuest
+Annotation 1
+Paragraph
+.annotationUpdated
+0
+XWiki.XWikiGuest
+Annotation 1
+Modification
+
+
+UPDATED

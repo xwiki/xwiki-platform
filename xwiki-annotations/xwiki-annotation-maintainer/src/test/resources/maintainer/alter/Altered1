@@ -1,0 +1,20 @@
+##################################################
+# Removing the whole content on which the annotation is added.
+##################################################
+.source
+I have seen wild roses damasked, red and white,
+.sourceUpdated
+I have seen red and white,
+.annotation
+0
+XWiki.XWikiGuest
+Flowers
+roses
+.annotationUpdated
+0
+XWiki.XWikiGuest
+Flowers
+roses
+
+
+ALTERED

@@ -1,0 +1,20 @@
+##################################################
+# Deleting the content at the beginning of the annotation and editing at the end
+##################################################
+.source
+I have seen wild roses damasked, red and white,
+.sourceUpdated
+I have seen roses with color, red and white,
+.annotation
+0
+XWiki.XWikiGuest
+Flowers
+ld roses dama
+.annotationUpdated
+0
+XWiki.XWikiGuest
+Flowers
+en roses with
+
+
+UPDATED

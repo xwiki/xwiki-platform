@@ -12,8 +12,8 @@
 <customClass></customClass>
 <contentAuthor>XWiki.Admin</contentAuthor>
 <creationDate>1264860755000</creationDate>
-<date>1268664277000</date>
-<contentUpdateDate>1268664277000</contentUpdateDate>
+<date>1269121797000</date>
+<contentUpdateDate>1269121797000</contentUpdateDate>
 <version>1.0</version>
 <title></title>
 <template></template>
@@ -667,6 +667,7 @@ XWiki.Selection = Class.create({
     }
     if (!this.settingsPanel) {
       new Ajax.Request('$xwiki.getURL("AnnotationCode.Settings", "view", "xpage=plain")', {
+        parameters : {'target' : XWiki.currentWiki + ':' + XWiki.currentSpace + '.' + $$('meta[name=page]')[0].content},
         onCreate: function() {
           // disable the button
           menu.disabled = true;
@@ -751,9 +752,11 @@ XWiki.Selection = Class.create({
    * Handles the update of the current filter by re-storing the new filter in this object's state info and re-fetching 
    * the annotations.
    */
-  onFilterChange : function(event, newFilter) {
+  onFilterChange : function(event) {
     // store the current filter
-    this.currentFilter = newFilter;
+    if (event.memo) {
+      this.currentFilter = event.memo;
+    }
     // and, if the annotations are currently visible, re-fetch the annotations and display them
     var visible = this.displayAnnotationsCheckbox ? this.displayAnnotationsCheckbox.checked : false;
     if (visible) {
@@ -781,28 +784,36 @@ XWiki.Selection = Class.create({
   
   /**
    * Enriches the set of annotation parameters with the extra requested fields &amp; the filter. The function alters its 
-   * map parameter and returns the altered value.
+   * hash parameter and returns the altered value.
    */
-  prepareRequestParameters : function(parameters) {
+  prepareRequestParameters : function(parametersHash) {
     // get all the filter criteria and add them as request parameters
-    var filterMap = this.getFilter();
-    for (var filterName in filterMap) {
-      parameters['filter_' + filterName] = filterMap[filterName];
+    var filterList = this.getFilter();
+    for (var i = 0; i &lt; filterList.length; i++) {
+      var filter = filterList[i];
+      var filterKey = 'filter_' + filter.name;
+      if (!parametersHash.get(filterKey)) {
+        parametersHash.set(filterKey, []);
+      }
+      parametersHash.get(filterKey).push(filter.value);
     }
     // get all the extra fields requested and add them to the request
     var extraFields = this.getExtraFields();
+    if (extraFields.size() &gt; 0) {
+      parametersHash.set('request_field', []);
+    }
     for (var i = 0; i &lt; extraFields.length; i++) {
-      parameters['request_field'] = extraFields[i];
+      parametersHash.get('request_field').push(extraFields[i]);
     }
     
-    return parameters;
+    return parametersHash;
   },
 
   fetchAnnotations : function(andShow) {
     // TODO: fixme, get the URL in a less hardcoded way
     var getAnnotationsURL = '/xwiki/rest/wikis/' + XWiki.currentWiki + '/spaces/' + XWiki.currentSpace + '/pages/' + $$('meta[name=page]')[0].content + '/annotations?media=json';
     new Ajax.Request(getAnnotationsURL, {method: 'GET',
-      parameters: this.prepareRequestParameters({}), 
+      parameters: this.prepareRequestParameters(new Hash()), 
       onCreate: function() {
         // show nice loading message at page bottom
         this._x_notification = new XWiki.widgets.Notification("$msg.get('annotations.annotated.loading')", "inprogress");
@@ -895,7 +906,7 @@ XWiki.Selection = Class.create({
       var container = item.up('.annotation');
       // compute annotation id, which is right after annotation_list_ in the container ID... TODO: this is pretty wrongish...
       var annotationId = container.id.substring(16);
-      this.addEditListener(item, annotationId, container);
+      this.addEditListener(item, annotationId, container.up());
     }.bind(this));
   },
   
@@ -919,7 +930,7 @@ XWiki.Selection = Class.create({
         new XWiki.widgets.ConfirmedAjaxRequest(
           item.href,
           {
-            parameters: this.prepareRequestParameters({}),  
+            parameters: this.prepareRequestParameters(new Hash()),  
             onCreate : function() {
               // Disable the button, to avoid a cascade of clicks from impatient users
               item.disabled = true;
@@ -954,11 +965,8 @@ XWiki.Selection = Class.create({
       item.blur();
       event.stop();
       // and submit the update
-      this.updateAnnotationAsync(container, id, inBubble, item.href, 'POST',
-        {
-          'state' : 'SAFE',
-          'originalSelection' : ''
-        },
+      this.updateAnnotationAsync(container, id, inBubble, item.href, 'POST', 
+        new Hash({'state' : 'SAFE', 'originalSelection' : ''}),
         {
           successText : "$msg.get('annotations.action.validate.success')",
           failureText : "$msg.get('annotations.action.validate.loaderror')"

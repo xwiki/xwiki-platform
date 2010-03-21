@@ -40,6 +40,12 @@ import com.xpn.xwiki.user.api.XWikiRightService;
  */
 public class CommentAddAction extends XWikiAction
 {
+    /** The name of the XWikiComments property identifying the author. */
+    private static final String AUTHOR_PROPERTY_NAME = "author";
+
+    /** The name of the space where user profiles are kept. */
+    private static final String USER_SPACE_PREFIX = "XWiki.";
+
     /**
      * {@inheritDoc}
      * 
@@ -69,13 +75,15 @@ public class CommentAddAction extends XWikiAction
             // Comment author checks
             if (XWikiRightService.GUEST_USER_FULLNAME.equals(context.getUser())) {
                 // Guests should not be allowed to enter names that look like real XWiki user names.
-                String author = ((BaseProperty) object.get("author")).getValue() + "";
+                String author = ((BaseProperty) object.get(AUTHOR_PROPERTY_NAME)).getValue() + "";
                 author = StringUtils.remove(author, ':');
-                author = StringUtils.removeStart(author, "XWiki.");
-                object.set("author", author, context);
+                while (author.startsWith(USER_SPACE_PREFIX)) {
+                    author = StringUtils.removeStart(author, USER_SPACE_PREFIX);
+                }
+                object.set(AUTHOR_PROPERTY_NAME, author, context);
             } else {
                 // A registered user must always post with his name.
-                object.set("author", context.getUser(), context);
+                object.set(AUTHOR_PROPERTY_NAME, context.getUser(), context);
             }
             doc.setAuthor(context.getUser());
             // Consider comments not being content.

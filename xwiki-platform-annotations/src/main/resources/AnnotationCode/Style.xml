@@ -1,0 +1,368 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<xwikidoc>
+<web>AnnotationCode</web>
+<name>Style</name>
+<language></language>
+<defaultLanguage></defaultLanguage>
+<translation>0</translation>
+<parent></parent>
+<creator>XWiki.Admin</creator>
+<author>XWiki.Admin</author>
+<customClass></customClass>
+<contentAuthor>XWiki.Admin</contentAuthor>
+<creationDate>1264863273000</creationDate>
+<date>1267569720000</date>
+<contentUpdateDate>1267569720000</contentUpdateDate>
+<version>1.0</version>
+<title></title>
+<template></template>
+<defaultTemplate></defaultTemplate>
+<validationScript></validationScript>
+<comment></comment>
+<minorEdit>false</minorEdit>
+<syntaxId>xwiki/2.0</syntaxId>
+<hidden>false</hidden>
+<attachment>
+<filename>notesmall.png</filename>
+<filesize>320</filesize>
+<author>XWiki.Admin</author>
+<date>1264956861000</date>
+<version>1.2</version>
+<comment></comment>
+<content>iVBORw0KGgoAAAANSUhEUgAAAAoAAAAKCAYAAACNMs+9AAAAAXNSR0IArs4c6QAAAAZiS0dEAP8A/wD/oL2nkwAAAAlwSFlzAAALEwAACxMBAJqcGAAAAAd0SU1FB9oBHxA5NQ56EXkAAADASURBVBjTfc49bsJAEMXxv52VIyoqqNxRUFpUpPQ1wiXgCjmNjwFNEJErDpBESpEvF8Y0jndn2BQJEsLSjvSkV/ykN9HX7n4dJ8Pc3I64GYyIkyEAJ9ugbYV0FSfbbIwq+Xj2QOg+tqvcqAJ6DEJVMCKAq4JQBIw4wH6GoQPjBLDvQegEzLGB7+dHAOoaptmkDx3Eb/sien2BcbbkUP//exUViLz3ADwVCw8wv+tPl+UFPOM0/evWQdtC9wPWsvkFmCFdzPuHmLgAAAAASUVORK5CYII=</content>
+</attachment>
+<attachment>
+<filename>notesmallred.png</filename>
+<filesize>306</filesize>
+<author>XWiki.Admin</author>
+<date>1264954949000</date>
+<version>1.1</version>
+<comment></comment>
+<content>iVBORw0KGgoAAAANSUhEUgAAAAoAAAAKCAYAAACNMs+9AAAAAXNSR0IArs4c6QAAAAZiS0dEAP8A/wD/oL2nkwAAAAlwSFlzAAALEwAACxMBAJqcGAAAAAd0SU1FB9oBHxAYOYtTSLEAAACySURBVBjTjc8rC8JQGMbx/9F5QT+AlyAWl+xiEZPF7EcRv5EgBrvFYdZgEdlAHcK8gEHQMc6QY9jEMJm+8MATfjzwim2KWfGZbaerLdA7UNYBwDHBnCL3c05JzxAmqMLjSNyd8yU0CeTWmVgoIYDCvv0HlbX7DT2AzTIWeoB2AQ7DfvCoD41m9+tiggFi4UNlZOMA6rqKRAJCKQXAWAgF0KuJyOLEUh/4xvWwu8A9jAvGC6IhS4Z+iqq3AAAAAElFTkSuQmCC</content>
+</attachment>
+<attachment>
+<filename>notesmallblue.png</filename>
+<filesize>334</filesize>
+<author>XWiki.Admin</author>
+<date>1264954949000</date>
+<version>1.1</version>
+<comment></comment>
+<content>iVBORw0KGgoAAAANSUhEUgAAAAoAAAAKCAYAAACNMs+9AAAAAXNSR0IArs4c6QAAAAZiS0dEAP8A/wD/oL2nkwAAAAlwSFlzAAALEwAACxMBAJqcGAAAAAd0SU1FB9oBHxAZDbP8jUUAAADOSURBVBjThY89SgNRFEbPhGcSNJAyVXABImkUbITJHgzWWYSdtaTIEtxLhtRuQAvLFP6hyTjv5765L0XAxjC58DUfh/Nxs/HDYnHSNnmva+gfH9HrGABKH/mphNJFfkMsjGrKb6+GNN1j8ZoblUCI2giqBIyKw8kh0GFq8VQhNoK1+J2xdPGw0X2/sXx+B6D6WHF9cbbX2Lof3GWfL0/cXA6xXyu86L9oDJjJLDGBbDSdJ4BQ696vs5TSXzGazlP/9Hw3FyzRrhG7ofa22AJ3AHmBCSu6CgAAAABJRU5ErkJggg==</content>
+</attachment>
+<attachment>
+<filename>notesmallorange.png</filename>
+<filesize>316</filesize>
+<author>XWiki.Admin</author>
+<date>1264956302000</date>
+<version>1.1</version>
+<comment></comment>
+<content>iVBORw0KGgoAAAANSUhEUgAAAAoAAAAKCAYAAACNMs+9AAAAAXNSR0IArs4c6QAAAAZiS0dEAP8A/wD/oL2nkwAAAAlwSFlzAAALEwAACxMBAJqcGAAAAAd0SU1FB9oBHxAwDfe6Eq4AAAC8SURBVBjThY47CsJAAETfyhaGdILY2ljYW0sKPYK9R/AC1oo3sPEM3kB7BSutt5WAn+C6WfNZCz+FgTgwzfCYGeHmnRVeLcCvg98ArwYA5gT6CDoEc1pL8jSgP6NUy2EgySxkthzMLBIbgY3KQRsheWiIL+XgQ78bdfi/UZ1zmrvFKwj30B0XuDjJqWyqCHXYQm+CCg0kumCTghxMHYBQI+E+f351T0A4576BGgnXbLXfexe4HTmbnGvM+gk9nVqKm3NKMQAAAABJRU5ErkJggg==</content>
+</attachment>
+<object>
+<class>
+<name>XWiki.StyleSheetExtension</name>
+<customClass></customClass>
+<customMapping></customMapping>
+<defaultViewSheet></defaultViewSheet>
+<defaultEditSheet></defaultEditSheet>
+<defaultWeb></defaultWeb>
+<nameField></nameField>
+<validationScript></validationScript>
+<cache>
+<cache>0</cache>
+<displayType>select</displayType>
+<multiSelect>0</multiSelect>
+<name>cache</name>
+<number>5</number>
+<prettyName>Caching policy</prettyName>
+<relationalStorage>0</relationalStorage>
+<separator> </separator>
+<separators> ,|</separators>
+<size>1</size>
+<unmodifiable>0</unmodifiable>
+<values>long|short|default|forbid</values>
+<classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+</cache>
+<code>
+<name>code</name>
+<number>2</number>
+<prettyName>Code</prettyName>
+<rows>20</rows>
+<size>50</size>
+<unmodifiable>0</unmodifiable>
+<classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+</code>
+<name>
+<name>name</name>
+<number>1</number>
+<prettyName>Name</prettyName>
+<size>30</size>
+<unmodifiable>0</unmodifiable>
+<classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+</name>
+<parse>
+<displayFormType>select</displayFormType>
+<displayType>yesno</displayType>
+<name>parse</name>
+<number>4</number>
+<prettyName>Parse content</prettyName>
+<unmodifiable>0</unmodifiable>
+<classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+</parse>
+<use>
+<cache>0</cache>
+<displayType>select</displayType>
+<multiSelect>0</multiSelect>
+<name>use</name>
+<number>3</number>
+<prettyName>Use this extension</prettyName>
+<relationalStorage>0</relationalStorage>
+<separator> </separator>
+<separators> ,|</separators>
+<size>1</size>
+<unmodifiable>0</unmodifiable>
+<values>onDemand=On demand|always=Always</values>
+<classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+</use>
+</class>
+<name>AnnotationCode.Style</name>
+<number>0</number>
+<className>XWiki.StyleSheetExtension</className>
+<guid>0553c88f-475c-42e7-bf67-9160e8b29662</guid>
+<property>
+<cache></cache>
+</property>
+<property>
+<code>## Use the current ColorTheme
+#template('colorThemeInit.vm')
+
+## Generate reference to background image
+#macro(imgURL $name) url($xwiki.getSkinFile("icons/silk/${name}.gif")) #end
+
+## Generate reference to background image
+#macro(attImgURL $name) url($doc.getAttachmentURL("${name}.png")) #end
+
+/* Menu */
+.actionmenu #tmAnnotations {
+  background-image: #imgURL('note') !important;
+  /* Padding, margin and bg-position are adjusted in order to give this element
+     the 'tab' look when active and the settings panel is displayed */
+  background-position: 0 1px;
+  padding-right: 5px !important;
+  padding-top: 0 !important;
+  padding-bottom: 4px;
+  margin-right: 5px !important;
+  margin-top: 2px !important;
+}
+.actionmenu #tmAnnotations a {
+  padding-top: 0 !important;
+}
+.actionmenu .active {
+  background-color: $theme.pageContentBackgroundColor; ##$theme.backgroundSecondaryColor;
+}
+.actionmenu .active a {
+  color: $theme.menuSelectedEntryLinkColor !important;
+}
+
+/* Settings panel */
+.annotationsettings {
+  border: 2px solid $theme.menuBackgroundColor;
+  border-top: none;
+  background: $theme.pageContentBackgroundColor; ## $theme.backgroundSecondaryColor;
+  padding: 8px 23px; /* Padding left,right = padding of the page content - width of the panel's border (25-2) */
+}
+.annotationsettings label {
+  font-weight: bold;
+}
+#annotationsdisplay {
+  vertical-align: middle;
+}
+
+/* Annotations displayed in the text */
+.annotation-highlight {
+  background-color: #FE9; ## $theme.highlightColor;
+}
+## In velocity comment: settings for using the larger images from silk
+.annotation-marker {
+  ##background: transparent #imgURL('note') no-repeat left top;
+  background: transparent #attImgURL('notesmall') no-repeat left top;
+  display: inline-block;
+  ##height: 16px;
+  height: 10px;
+  overflow: hidden;
+  text-indent: -9999px;
+  ##width: 16px;
+  width: 10px;
+  vertical-align: baseline;
+  ##margin: -19px -14px 3px -2px;
+  margin: -15px -7px 5px -3px;
+  z-index: 1;
+  position: relative;
+  cursor: pointer;
+}
+
+/* Annotation boxes */
+.annotation-bubble {
+  background: $theme.backgroundSecondaryColor;
+  border: 1px dotted $theme.borderColor;
+  width: 280px;
+  position: absolute;
+  z-index: 2;
+}
+
+.annotation-box {
+  padding: 2px 12px 4px 6px;
+}
+
+.annotation-bubble .loading {
+  height: 75px;
+}
+
+.annotation-box textarea {
+  width: 99%;
+}
+
+.annotation-box .annotationAuthor {
+  border-bottom: 1px dotted $theme.borderColor;
+  display: block;
+}
+.annotation-box .sep {
+  display: none;
+}
+.annotation-box .annotationDate {
+  padding-top: 3px;
+  margin-right: 51px;
+  display: block;
+}
+.annotationContent {
+  clear: both;
+}
+
+## In velocity comment: settings for using the larger images from silk
+.annotation-box .annotation {
+  ##padding: 0 0 0 18px;
+  ##background: transparent #imgURL('note') left top no-repeat;
+  padding: 0 0 0 14px;
+  background: transparent #attImgURL('notesmall') left 4px no-repeat;
+}
+.annotation-box .buttons {
+  ##padding: 0 0 0 18px;
+  padding: 0 0 0 14px;
+}
+
+/* Make room for the large note_add icon */
+.annotation-box-create .annotation, .annotation-box-create .buttons {
+  padding-left: 18px !important;
+}
+.annotation-box-create .annotation {
+  background: transparent #imgURL('note_add') left top no-repeat !important;
+}
+
+.annotation-box .links {
+  float: right;
+  font-size: 80%;
+  text-transform: lowercase:
+/*  margin: -6px -8px 0 0;
+}
+
+.annotation-box .links a {
+  color: $theme.textColor;
+}
+
+.annotation-box .links a:hover {
+  text-decoration: none;*/
+}
+
+#xwikicontent .annotationAdd {
+  background-image: #imgURL('note_add');
+}
+
+/* Annotations list (extra-tab)*/
+## In velocity comment: settings for using the larger images from silk
+#allAnnotations .annotation {
+  margin: 8px 0;
+  ##padding: 0 0 0 18px;
+  ##background: transparent #imgURL('note') left top no-repeat;
+  padding: 0 0 0 14px;
+  background: transparent #attImgURL('notesmall') left 4px no-repeat;
+}
+#allAnnotations .UPDATED, #xwikicontent .UPDATED, .annotation-bubble .UPDATED {
+  ##background-image: #imgURL('note_error');
+  background-image: #attImgURL('notesmallorange');
+}
+#allAnnotations .ALTERED, #xwikicontent .ALTERED, .annotation-bubble .ALTERED {
+  ##background-image: #imgURL('note_delete');
+  background-image: #attImgURL('notesmallred');
+}
+
+/* General display of an annotation */
+.annotationHeader{
+  padding: 2px 0px 6px;
+}
+#allAnnotations .annotationHeader:hover {
+  background-color: $theme.highlightColor;
+}
+.annotationDate {
+  color: $theme.textSecondaryColor;
+  font-size: 80%;
+}
+.annotationTools {
+  display: block;
+  float: right;
+  margin-top: -1.2em;
+  margin-right: -2px;
+}
+.annotationTools a {
+  background: transparent none no-repeat left top;
+  display: block;
+  float: left;
+  height: 16px;
+  margin:0 0 0 4px;
+  overflow: hidden;
+  text-indent: -9999px;
+  width: 16px;
+}
+.annotationTools .edit {
+  background-image: #imgURL('pencil');
+}
+.annotationTools .delete {
+  background-image: #imgURL('cross');
+}
+.annotationTools .validate {
+  background-image: #imgURL('tick');
+}
+
+.annotationComment {
+  padding: 4px 0;
+}
+
+dt.annotationLabel label {
+  color: $theme.textPrimaryColor;
+  font-variant: small-caps;
+}
+
+.annotationOriginalSelection {
+  color: $theme.textPrimaryColor;
+  font-size: 80%;
+}
+
+.annotationContent dt {
+  margin: 0;
+}
+.annotationContent dd, .annotationContent blockquote {
+  margin-bottom: 10px;
+}</code>
+</property>
+<property>
+<name>Annotations style</name>
+</property>
+<property>
+<parse>1</parse>
+</property>
+<property>
+<use>always</use>
+</property>
+</object>
+<content>
+</content></xwikidoc>

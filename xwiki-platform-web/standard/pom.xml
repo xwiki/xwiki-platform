@@ -62,6 +62,37 @@
       <artifactId>xwiki-rest</artifactId>
       <version>${platform.core.version}</version>
     </dependency>
+    <!-- The annotations modules -->
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-core-annotations-core</artifactId>
+      <version>${platform.core.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-core-annotations-reference</artifactId>
+      <version>${platform.core.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-core-annotations-io</artifactId>
+      <version>${platform.core.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-core-annotations-maintainer</artifactId>
+      <version>${platform.core.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-core-annotations-rest</artifactId>
+      <version>${platform.core.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-core-annotations-velocity</artifactId>
+      <version>${platform.core.version}</version>
+    </dependency>
     <!-- Skin modules
          Note: even though the dependency plugin below doesn't need explicit dependencies set
          to work it's a best practice to put them here since they are real dependencies -->

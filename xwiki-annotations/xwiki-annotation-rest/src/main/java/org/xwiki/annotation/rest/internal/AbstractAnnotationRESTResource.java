@@ -49,6 +49,7 @@ import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
+import com.xpn.xwiki.web.XWikiURLFactory;
 
 /**
  * Base class for the annotation REST services, to implement common functionality to all annotation REST services.
@@ -189,8 +190,16 @@ public abstract class AbstractAnnotationRESTResource extends XWikiResource
         String isInRenderingEngineKey = "isInRenderingEngine";
         XWikiContext context = org.xwiki.rest.Utils.getXWikiContext(componentManager);
         Object isInRenderingEngine = context.get(isInRenderingEngineKey);
+        // set the context url factory to the servlet url factory so that all links get correctly generated as if we
+        // were view-ing the page
+        XWikiURLFactory oldFactory = context.getURLFactory();
+        int oldMode = context.getMode();
         String result = null;
         try {
+            context.setMode(XWikiContext.MODE_SERVLET);
+            XWikiURLFactory urlf =
+                context.getWiki().getURLFactoryService().createURLFactory(context.getMode(), context);
+            context.setURLFactory(urlf);
             // setup documents on the context, and velocity context, and message tool for i18n and all
             setUpDocuments(docName, language);
             // set the current action on the context
@@ -204,6 +213,8 @@ public abstract class AbstractAnnotationRESTResource extends XWikiResource
             } else {
                 context.remove(isInRenderingEngineKey);
             }
+            context.setURLFactory(oldFactory);
+            context.setMode(oldMode);
         }
         return result;
     }
@@ -238,6 +249,8 @@ public abstract class AbstractAnnotationRESTResource extends XWikiResource
             String translatedDocKey = "tdoc";
             context.put(translatedDocKey, tdoc);
             vcontext.put(translatedDocKey, tdoc.newDocument(context));
+            // and render the xwikivars to have all the variables set ($has*, $blacklistedSpaces, etc)
+            context.getWiki().renderTemplate("xwikivars.vm", context);
         } catch (ComponentLookupException e) {
             throw new XWikiException(XWikiException.MODULE_XWIKI_RENDERING,
                 XWikiException.ERROR_XWIKI_RENDERING_VELOCITY_EXCEPTION,

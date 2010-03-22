@@ -29,7 +29,7 @@ import org.xwiki.model.EntityType;
  * Unit test for the Object reference ({@link ObjectReference}).
  * 
  * @version $Id$
- * @since 2.2M2
+ * @since 2.3M1
  */
 public class ObjectReferenceTest
 {
@@ -51,7 +51,7 @@ public class ObjectReferenceTest
     public void testInvalidType()
     {
         try {
-            ObjectReference reference = new ObjectReference(new EntityReference("className", EntityType.DOCUMENT));
+            new ObjectReference(new EntityReference("className", EntityType.DOCUMENT));
             fail("Should have thrown exception");
         } catch (IllegalArgumentException expected) {
             assertEquals("Invalid type [DOCUMENT] for an object reference", expected.getMessage());
@@ -62,7 +62,7 @@ public class ObjectReferenceTest
     public void testInvalidNullParent()
     {
         try {
-            ObjectReference reference = new ObjectReference(new EntityReference("className", EntityType.OBJECT, null));
+            new ObjectReference(new EntityReference("className", EntityType.OBJECT, null));
             fail("Should have thrown exception");
         } catch (IllegalArgumentException expected) {
             assertEquals("Invalid parent reference [null] for an object reference", expected.getMessage());
@@ -76,9 +76,8 @@ public class ObjectReferenceTest
     public void testInvalidParentType()
     {
         try {
-            ObjectReference reference =
-                new ObjectReference(new EntityReference("className", EntityType.OBJECT, new EntityReference("Space",
-                    EntityType.SPACE)));
+            new ObjectReference(new EntityReference("className", EntityType.OBJECT, new EntityReference("Space",
+                EntityType.SPACE)));
             fail("Should have thrown exception");
         } catch (IllegalArgumentException expected) {
             assertEquals("Invalid parent reference [name = [Space], type = [SPACE], parent = [null]] for an object "

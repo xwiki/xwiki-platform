@@ -29,7 +29,7 @@ import org.xwiki.model.EntityType;
  * Unit test for the Property reference ({@link ObjectPropertyReference}).
  * 
  * @version $Id$
- * @since 2.2M2
+ * @since 2.3M1
  */
 public class ObjectPropertyReferenceTest
 {
@@ -52,8 +52,7 @@ public class ObjectPropertyReferenceTest
     public void testInvalidType()
     {
         try {
-            ObjectPropertyReference reference =
-                new ObjectPropertyReference(new EntityReference("space.page", EntityType.DOCUMENT));
+            new ObjectPropertyReference(new EntityReference("space.page", EntityType.DOCUMENT));
             fail("Should have thrown exception");
         } catch (IllegalArgumentException expected) {
             assertEquals("Invalid type [DOCUMENT] for an object property reference", expected.getMessage());
@@ -64,8 +63,7 @@ public class ObjectPropertyReferenceTest
     public void testInvalidNullParent()
     {
         try {
-            ObjectPropertyReference reference =
-                new ObjectPropertyReference(new EntityReference("property", EntityType.OBJECT_PROPERTY, null));
+            new ObjectPropertyReference(new EntityReference("property", EntityType.OBJECT_PROPERTY, null));
             fail("Should have thrown exception");
         } catch (IllegalArgumentException expected) {
             assertEquals("Invalid parent reference [null] for an object property reference", expected.getMessage());
@@ -79,9 +77,8 @@ public class ObjectPropertyReferenceTest
     public void testInvalidParentType()
     {
         try {
-            ObjectPropertyReference reference =
-                new ObjectPropertyReference(new EntityReference("property", EntityType.OBJECT_PROPERTY,
-                    new EntityReference("Space", EntityType.SPACE)));
+            new ObjectPropertyReference(new EntityReference("property", EntityType.OBJECT_PROPERTY,
+                new EntityReference("Space", EntityType.SPACE)));
             fail("Should have thrown exception");
         } catch (IllegalArgumentException expected) {
             assertEquals("Invalid parent reference [name = [Space], type = [SPACE], parent = [null]] for an object "

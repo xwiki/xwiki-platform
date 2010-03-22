@@ -31,8 +31,8 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * Generate a string representation of an entity reference (eg "wiki:space.page" for a document reference in the wiki
- * Wiki, the space Space and the page Page).
+ * Generate a string representation of an entity reference (eg "wiki:space.page" for a document reference in the "wiki"
+ * Wiki, the "space" Space and the "page" Page).
  * 
  * @version $Id$
  * @since 2.2M1
@@ -65,8 +65,7 @@ public class DefaultStringEntityReferenceSerializer implements EntityReferenceSe
     /**
      * {@inheritDoc}
      * 
-     * @see org.xwiki.model.reference.EntityReferenceSerializer#serialize(org.xwiki.model.reference.EntityReference,
-     *      java.lang.Object[])
+     * @see EntityReferenceSerializer#serialize(org.xwiki.model.reference.EntityReference, Object...) 
      */
     public String serialize(EntityReference reference, Object... parameters)
     {

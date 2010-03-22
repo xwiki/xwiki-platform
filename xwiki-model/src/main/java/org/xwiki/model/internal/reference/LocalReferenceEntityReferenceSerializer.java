@@ -26,12 +26,13 @@ import org.xwiki.model.reference.EntityReferenceSerializer;
 
 /**
  * Generate a entity reference but without the wiki reference part. This is an implementation use for backward
- * compatibility only and it should be dropped in the future since there's no remove the wiki name systematically
+ * compatibility only and it should be dropped in the future since there's no reason to remove the wiki name
+ * systematically
  * (usually we don't want to print it but only if it's the same as the current wiki).
  * 
  * @version $Id$
  * @since 2.2.3
- * @deprecated {@link DefaultReferenceEntityReferenceSerializer} should be used instead
+ * @deprecated {@link DefaultStringEntityReferenceSerializer} should be used instead
  */
 @Deprecated
 @Component("local/reference")
@@ -40,8 +41,7 @@ public class LocalReferenceEntityReferenceSerializer implements EntityReferenceS
     /**
      * {@inheritDoc}
      * 
-     * @see org.xwiki.model.reference.EntityReferenceSerializer#serialize(org.xwiki.model.reference.EntityReference,
-     *      java.lang.Object[])
+     * @see EntityReferenceSerializer#serialize(org.xwiki.model.reference.EntityReference, Object...) 
      */
     public EntityReference serialize(EntityReference reference, Object... parameters)
     {

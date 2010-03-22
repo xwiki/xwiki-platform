@@ -28,13 +28,11 @@ import org.xwiki.model.reference.EntityReferenceSerializer;
  */
 public abstract class AbstractTypedStringEntityReferenceSerializer implements TypedStringEntityReferenceSerializer
 {
-
     /**
      * {@inheritDoc} <br />
      * Override to add the protocol in front of the serialization.
      * 
-     * @see org.xwiki.annotation.reference.model.internal.reference.DefaultStringEntityReferenceSerializer
-     *      #serialize(org.xwiki.annotation.reference.model.reference.EntityReference)
+     * @see TypedStringEntityReferenceSerializer#serialize(org.xwiki.model.reference.EntityReference)
      */
     public String serialize(EntityReference reference)
     {

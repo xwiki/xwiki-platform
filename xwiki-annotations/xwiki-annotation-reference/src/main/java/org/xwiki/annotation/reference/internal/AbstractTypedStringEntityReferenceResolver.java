@@ -41,8 +41,7 @@ public abstract class AbstractTypedStringEntityReferenceResolver implements Type
      * serialized reference (e.g. DOCUMENT://Page). In case no type is specified, the second part parameter will be used
      * as the default type.
      * 
-     * @see org.xwiki.annotation.reference.model.internal.reference.AbstractStringEntityReferenceResolver
-     *      #resolve(java.lang.String, org.xwiki.annotation.reference.model.EntityType)
+     * @see TypedStringEntityReferenceResolver#resolve(String, org.xwiki.model.EntityType)
      */
     public EntityReference resolve(String entityReferenceRepresentation, EntityType defaultType)
     {

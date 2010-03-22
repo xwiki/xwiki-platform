@@ -32,6 +32,7 @@ import org.xwiki.annotation.maintainer.AnnotationState;
  * 
  * @see TestDocumentFactory
  * @version $Id$
+ * @since 2.3M1
  */
 public class MockDocument
 {

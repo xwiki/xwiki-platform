@@ -27,6 +27,7 @@ import org.xwiki.annotation.Annotation;
  * Factory for loading mock documents from test files extended for loading documents with updates.
  * 
  * @version $Id$
+ * @since 2.3M1
  */
 public class TestDocumentFactory extends org.xwiki.annotation.TestDocumentFactory
 {

@@ -33,6 +33,7 @@ import org.xwiki.rendering.syntax.Syntax;
  * Plain text renderer that normalizes spaces in the printed text.
  * 
  * @version $Id$
+ * @since 2.3M1
  */
 public class PlainTextNormalizingChainingRenderer extends AbstractChainingPrintRenderer
 {

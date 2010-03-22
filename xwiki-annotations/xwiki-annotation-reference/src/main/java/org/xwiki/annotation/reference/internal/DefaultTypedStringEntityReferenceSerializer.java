@@ -28,6 +28,7 @@ import org.xwiki.model.reference.EntityReferenceSerializer;
  * wiki:Space.Page}).
  * 
  * @version $Id$
+ * @since 2.3M1
  */
 @Component
 public class DefaultTypedStringEntityReferenceSerializer extends AbstractTypedStringEntityReferenceSerializer

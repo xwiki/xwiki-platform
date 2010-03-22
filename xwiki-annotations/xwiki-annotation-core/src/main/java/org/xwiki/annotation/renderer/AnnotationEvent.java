@@ -26,6 +26,7 @@ import org.xwiki.annotation.Annotation;
  * which the event takes place.
  * 
  * @version $Id$
+ * @since 2.3M1
  */
 public class AnnotationEvent
 {

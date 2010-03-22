@@ -51,6 +51,7 @@ import org.xwiki.rendering.transformation.TransformationManager;
  * calls and implementing the rendering of the content based on these data from the 2 services.
  * 
  * @version $Id$
+ * @since 2.3M1
  */
 @Component
 public class DefaultAnnotationService implements AnnotationService

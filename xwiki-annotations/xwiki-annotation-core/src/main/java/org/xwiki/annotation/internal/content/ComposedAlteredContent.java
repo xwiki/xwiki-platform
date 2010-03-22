@@ -27,7 +27,8 @@ import org.xwiki.annotation.content.AlteredContent;
  * original altered content, whose {@link AlteredContent#getContent()} was altered and the {@code altered} altered
  * content was obtained.
  * 
- * @version $Id: AbstractContentAlterer.java 25076 2009-11-16 16:54:59Z lucaa $
+ * @version $Id$
+ * @since 2.3M1
  */
 public class ComposedAlteredContent implements AlteredContent
 {

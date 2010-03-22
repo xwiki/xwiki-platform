@@ -43,6 +43,7 @@ import org.xwiki.test.AbstractComponentTestCase;
  * Renderer tests for the XHTML annotations renderer, from the test files.
  * 
  * @version $Id$
+ * @since 2.3M1
  */
 @RunWith(Parameterized.class)
 public class AnnotationXHTMLRendererTest extends AbstractComponentTestCase

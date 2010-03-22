@@ -38,6 +38,7 @@ import com.xpn.xwiki.XWikiException;
  * Implementation of the rights service based on the XWiki access rights.
  * 
  * @version $Id$
+ * @since 2.3M1
  */
 @Component
 public class XWikiAnnotationRightService extends AbstractLogEnabled implements AnnotationRightService

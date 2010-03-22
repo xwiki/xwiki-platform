@@ -26,6 +26,7 @@ import org.xwiki.component.annotation.ComponentRole;
  * target, wrt to the previous and the current versions of the content.
  * 
  * @version $Id$
+ * @since 2.3M1
  */
 @ComponentRole
 public interface AnnotationMaintainer

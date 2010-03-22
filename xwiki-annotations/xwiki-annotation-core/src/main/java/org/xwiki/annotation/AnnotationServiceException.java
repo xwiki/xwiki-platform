@@ -24,6 +24,7 @@ package org.xwiki.annotation;
  * General wrapping exception.
  * 
  * @version $Id$
+ * @since 2.3M1
  */
 public class AnnotationServiceException extends Exception
 {

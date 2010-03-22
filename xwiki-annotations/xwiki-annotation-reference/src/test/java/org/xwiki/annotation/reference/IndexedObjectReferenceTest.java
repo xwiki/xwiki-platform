@@ -30,6 +30,7 @@ import org.xwiki.model.reference.EntityReference;
  * Tests the {@link IndexedObjectReference} implementation of object names.
  * 
  * @version $Id$
+ * @since 2.3M1
  */
 public class IndexedObjectReferenceTest
 {

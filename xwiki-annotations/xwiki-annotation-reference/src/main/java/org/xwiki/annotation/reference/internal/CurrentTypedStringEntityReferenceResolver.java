@@ -30,6 +30,7 @@ import org.xwiki.model.reference.EntityReferenceResolver;
  * doesn't need to resolve targets wrt to current document.
  * 
  * @version $Id$
+ * @since 2.3M1
  */
 @Component("current")
 public class CurrentTypedStringEntityReferenceResolver extends AbstractTypedStringEntityReferenceResolver

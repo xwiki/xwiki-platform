@@ -35,6 +35,7 @@ import org.xwiki.component.annotation.Component;
  * Implementation of the form url encoded reader for the annotation update requests.
  * 
  * @version $Id$
+ * @since 2.3M1
  */
 @Component("org.xwiki.annotation.rest.internal.representations.FormUrlEncodedAnnotationUpdateRequestReader")
 @Provider

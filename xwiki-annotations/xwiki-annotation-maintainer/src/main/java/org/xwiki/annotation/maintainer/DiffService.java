@@ -27,6 +27,7 @@ import org.xwiki.component.annotation.ComponentRole;
  * Defines the interface of a service providing the differences between two strings.
  * 
  * @version $Id$
+ * @since 2.3M1
  */
 @ComponentRole
 public interface DiffService

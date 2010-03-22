@@ -47,6 +47,7 @@ import org.xwiki.rest.XWikiRestComponent;
  * 
  * @param <T> the type read from the url encoded form
  * @version $Id$
+ * @since 2.3M1
  */
 public abstract class AbstractFormUrlEncodedAnnotationRequestReader<T extends AnnotationRequest> implements
     MessageBodyReader<T>, XWikiRestComponent

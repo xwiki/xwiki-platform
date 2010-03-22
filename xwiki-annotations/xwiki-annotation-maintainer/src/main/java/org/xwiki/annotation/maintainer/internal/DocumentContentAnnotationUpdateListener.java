@@ -41,6 +41,7 @@ import org.xwiki.observation.event.Event;
  * <strong>content</strong> change, to update the selection and context to match the new document content. <br />
  * 
  * @version $Id$
+ * @since 2.3M1
  */
 @Component("document-content-annotation-updater")
 public class DocumentContentAnnotationUpdateListener extends AbstractLogEnabled implements EventListener

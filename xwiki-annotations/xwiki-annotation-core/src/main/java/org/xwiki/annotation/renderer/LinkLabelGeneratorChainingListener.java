@@ -38,6 +38,7 @@ import org.xwiki.rendering.renderer.LinkLabelGenerator;
  * Chaining listener to generate labels for the links without labels and send these labels as events in the chain.
  * 
  * @version $Id$
+ * @since 2.3M1
  */
 public class LinkLabelGeneratorChainingListener extends AbstractChainingListener
 {

@@ -39,6 +39,7 @@ import org.xwiki.model.reference.ObjectReference;
  * </dl>
  * 
  * @version $Id$
+ * @since 2.3M1
  */
 public class IndexedObjectReference extends ObjectReference
 {

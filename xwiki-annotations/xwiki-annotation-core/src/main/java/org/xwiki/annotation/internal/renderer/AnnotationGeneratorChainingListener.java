@@ -49,6 +49,7 @@ import org.xwiki.rendering.syntax.Syntax;
  * and match with the space normalized selection.
  * 
  * @version $Id$
+ * @since 2.3M1
  */
 public class AnnotationGeneratorChainingListener extends QueueListener implements ChainingListener
 {

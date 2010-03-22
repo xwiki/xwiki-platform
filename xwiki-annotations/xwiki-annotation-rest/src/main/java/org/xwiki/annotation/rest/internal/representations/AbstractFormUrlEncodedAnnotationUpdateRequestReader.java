@@ -29,6 +29,7 @@ import org.xwiki.annotation.rest.model.jaxb.ObjectFactory;
  * 
  * @param <T> the type read from the url encoded form
  * @version $Id$
+ * @since 2.3M1
  */
 public abstract class AbstractFormUrlEncodedAnnotationUpdateRequestReader<T extends AnnotationUpdateRequest> extends
     AbstractFormUrlEncodedAnnotationRequestReader<T>

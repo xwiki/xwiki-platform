@@ -32,6 +32,7 @@ import org.xwiki.annotation.content.filter.Filter;
  * syntax characters).
  * 
  * @version $Id$
+ * @since 2.3M1
  */
 public abstract class AbstractFilterContentAlterer extends AbstractContentAlterer
 {

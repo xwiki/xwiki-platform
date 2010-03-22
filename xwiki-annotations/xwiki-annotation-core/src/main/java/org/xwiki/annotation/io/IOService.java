@@ -31,6 +31,7 @@ import org.xwiki.component.annotation.ComponentRole;
  * targets, they can be anything referencable through a string.
  * 
  * @version $Id$
+ * @since 2.3M1
  */
 @ComponentRole
 public interface IOService

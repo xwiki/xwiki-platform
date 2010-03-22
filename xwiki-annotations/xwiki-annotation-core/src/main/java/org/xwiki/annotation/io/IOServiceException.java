@@ -24,6 +24,7 @@ package org.xwiki.annotation.io;
  * Thrown when an input/output error occurs.
  * 
  * @version $Id$
+ * @since 2.3M1
  */
 public class IOServiceException extends Exception
 {

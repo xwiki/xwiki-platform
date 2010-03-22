@@ -33,6 +33,7 @@ import org.xwiki.annotation.maintainer.AnnotationState;
  * Factory to create test documents from corpus files.
  * 
  * @version $Id$
+ * @since 2.3M1
  */
 public class TestDocumentFactory
 {

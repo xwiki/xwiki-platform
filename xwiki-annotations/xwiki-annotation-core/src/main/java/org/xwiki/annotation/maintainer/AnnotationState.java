@@ -24,6 +24,7 @@ package org.xwiki.annotation.maintainer;
  * Used to specify if an annotation target has been altered by a document modification.
  * 
  * @version $Id$
+ * @since 2.3M1
  */
 public enum AnnotationState
 {

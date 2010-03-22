@@ -39,6 +39,7 @@ import org.xwiki.rendering.renderer.LinkLabelGenerator;
  * specific annotation listener.
  * 
  * @version $Id$
+ * @since 2.3M1
  */
 public abstract class AbstractAnnotationRenderer extends AbstractChainingPrintRenderer implements Initializable,
     AnnotationPrintRenderer

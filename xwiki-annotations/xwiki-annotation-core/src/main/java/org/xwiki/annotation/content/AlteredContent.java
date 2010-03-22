@@ -25,6 +25,7 @@ package org.xwiki.annotation.content;
  * altered content.
  * 
  * @version $Id$
+ * @since 2.3M1
  */
 public interface AlteredContent
 {

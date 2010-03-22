@@ -28,6 +28,7 @@ import org.xwiki.component.annotation.Requirement;
  * Default implementation of the annotation maintainer, using a default implementation of the diff service.
  * 
  * @version $Id$
+ * @since 2.3M1
  */
 @Component
 public class DefaultAnnotationMaintainer extends AbstractAnnotationMaintainer

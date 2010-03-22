@@ -24,6 +24,7 @@ package org.xwiki.annotation.maintainer.internal;
  * one and returns them when functions are called.
  * 
  * @version $Id$
+ * @since 2.3M1
  */
 public class ChunksXDelta extends AbstractXDelta
 {

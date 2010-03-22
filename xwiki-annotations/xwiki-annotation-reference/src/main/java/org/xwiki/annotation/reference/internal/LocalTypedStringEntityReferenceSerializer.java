@@ -27,6 +27,7 @@ import org.xwiki.model.reference.EntityReferenceSerializer;
  * Implementation of the typed entity reference serializer which produces references without the wiki part.
  * 
  * @version $Id$
+ * @since 2.3M1
  */
 @Component("local")
 public class LocalTypedStringEntityReferenceSerializer extends AbstractTypedStringEntityReferenceSerializer

@@ -43,6 +43,7 @@ import org.xwiki.rendering.syntax.Syntax;
  * Extends the default XHTML renderer to add handling of annotations.<br />
  * 
  * @version $Id$
+ * @since 2.3M1
  */
 public class AnnotationXHTMLChainingRenderer extends XHTMLChainingRenderer implements ChainingPrintRenderer
 {

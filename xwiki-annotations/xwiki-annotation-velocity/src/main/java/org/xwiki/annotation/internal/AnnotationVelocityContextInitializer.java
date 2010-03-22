@@ -31,6 +31,7 @@ import org.xwiki.velocity.VelocityContextInitializer;
  * Velocity context initializer used to add the annotations service on the velocity context.
  * 
  * @version $Id$
+ * @since 2.3M1
  */
 @Component("annotations")
 public class AnnotationVelocityContextInitializer extends AbstractLogEnabled implements VelocityContextInitializer

@@ -37,6 +37,7 @@ import org.xwiki.rendering.renderer.LinkLabelGenerator;
  * Plain text renderer that renders the current document with normalized spaces.
  * 
  * @version $Id$
+ * @since 2.3M1
  */
 @Component("normalizer-plain/1.0")
 @InstantiationStrategy(ComponentInstantiationStrategy.PER_LOOKUP)

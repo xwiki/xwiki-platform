@@ -32,6 +32,7 @@ import org.xwiki.model.reference.EntityReferenceResolver;
  * parsing {@code XWiki.TagClass[0]#tags} as an object property reference.
  * 
  * @version $Id$
+ * @since 2.3M1
  */
 public abstract class AbstractTypedStringEntityReferenceResolver implements TypedStringEntityReferenceResolver
 {

@@ -32,6 +32,7 @@ import org.xwiki.test.AbstractComponentTestCase;
 
 /**
  * @version $Id$
+ * @since 2.3M1
  */
 @RunWith(Parameterized.class)
 public class WhiteSpaceContentAltererTest extends AbstractComponentTestCase

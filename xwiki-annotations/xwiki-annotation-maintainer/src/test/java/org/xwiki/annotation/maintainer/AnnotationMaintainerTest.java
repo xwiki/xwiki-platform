@@ -48,6 +48,7 @@ import org.xwiki.test.AbstractComponentTestCase;
  * Tests the annotation maintainer that updates annotations when documents change.
  * 
  * @version $Id$
+ * @since 2.3M1
  */
 @RunWith(Parameterized.class)
 public class AnnotationMaintainerTest extends AbstractComponentTestCase

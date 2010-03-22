@@ -40,6 +40,7 @@ import org.xwiki.component.manager.ComponentRepositoryException;
  * functions for the data in the test files.
  * 
  * @version $Id$
+ * @since 2.3M1
  */
 public class AnnotationsMockSetup
 {

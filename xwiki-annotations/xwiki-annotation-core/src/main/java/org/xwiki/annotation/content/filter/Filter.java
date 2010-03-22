@@ -26,6 +26,7 @@ import org.xwiki.component.annotation.ComponentRole;
  * This component defines a filter to be used by alterers. It defines a set of accepted characters.
  * 
  * @version $Id$
+ * @since 2.3M1
  */
 @ComponentRole
 public interface Filter

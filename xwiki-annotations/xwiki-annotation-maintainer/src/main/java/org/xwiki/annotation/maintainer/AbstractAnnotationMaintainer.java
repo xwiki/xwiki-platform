@@ -46,6 +46,7 @@ import org.xwiki.rendering.transformation.TransformationManager;
  * Default implementation for the annotation maintainer.
  * 
  * @version $Id$
+ * @since 2.3M1
  */
 public abstract class AbstractAnnotationMaintainer extends AbstractLogEnabled implements AnnotationMaintainer
 {

@@ -25,6 +25,7 @@ import org.xwiki.component.annotation.ComponentRole;
  * Service to provide functions to check access rights to annotations actions (viewing, adding annotations, editing).
  * 
  * @version $Id$
+ * @since 2.3M1
  */
 @ComponentRole
 public interface AnnotationRightService

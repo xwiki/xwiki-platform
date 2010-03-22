@@ -39,6 +39,7 @@ import org.xwiki.model.reference.EntityReferenceSerializer;
  * implementation.
  * 
  * @version $Id$
+ * @since 2.3M1
  */
 @Component
 public class DefaultIOTargetService implements IOTargetService

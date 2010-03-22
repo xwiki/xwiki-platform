@@ -28,6 +28,7 @@ import org.xwiki.annotation.content.AlteredContent;
  * Offsets maps based implementation of the {@link AlteredContent}.
  * 
  * @version $Id$
+ * @since 2.3M1
  */
 public class OffsetsMapAlteredContent implements AlteredContent
 {

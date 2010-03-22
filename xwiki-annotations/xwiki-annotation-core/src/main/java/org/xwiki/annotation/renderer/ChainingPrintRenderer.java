@@ -26,6 +26,7 @@ import org.xwiki.rendering.renderer.PrintRenderer;
  * A chaining print renderer is a print renderer which can be chained in a listener chain.
  * 
  * @version $Id$
+ * @since 2.3M1
  */
 public interface ChainingPrintRenderer extends ChainingListener, PrintRenderer
 {

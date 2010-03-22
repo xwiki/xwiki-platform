@@ -26,6 +26,7 @@ import org.xwiki.component.annotation.Component;
  * Filters white spaces out of a text.
  * 
  * @version $Id$
+ * @since 2.3M1
  */
 @Component("whitespace")
 public class WhiteSpaceFilter implements Filter

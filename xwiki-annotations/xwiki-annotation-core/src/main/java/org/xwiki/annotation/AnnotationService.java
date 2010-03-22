@@ -34,6 +34,7 @@ import org.xwiki.component.annotation.ComponentRole;
  * 
  * @version $Id$
  * @see {@link org.xwiki.annotation.io.IOTargetService}, {@link org.xwiki.annotation.io.IOTargetService}
+ * @since 2.3M1
  */
 @ComponentRole
 public interface AnnotationService

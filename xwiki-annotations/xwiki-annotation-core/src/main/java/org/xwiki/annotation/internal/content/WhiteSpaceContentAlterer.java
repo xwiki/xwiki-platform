@@ -27,6 +27,7 @@ import org.xwiki.component.annotation.Requirement;
  * Content alterer that filters out all spaces.
  * 
  * @version $Id$
+ * @since 2.3M1
  */
 @Component("whitespace")
 public class WhiteSpaceContentAlterer extends AbstractFilterContentAlterer

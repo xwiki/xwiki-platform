@@ -48,6 +48,7 @@ import com.xpn.xwiki.XWikiException;
 
 /**
  * @version $Id$
+ * @since 2.3M1
  */
 @Component("org.xwiki.annotation.rest.internal.AnnotationsRESTResource")
 @Path("/wikis/{wikiName}/spaces/{spaceName}/pages/{pageName}/annotations")

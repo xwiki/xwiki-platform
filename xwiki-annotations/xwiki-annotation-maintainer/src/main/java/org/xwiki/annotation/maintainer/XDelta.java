@@ -23,6 +23,7 @@ package org.xwiki.annotation.maintainer;
  * This interface models a difference between two pieces of content.
  * 
  * @version $Id$
+ * @since 2.3M1
  */
 public interface XDelta
 {

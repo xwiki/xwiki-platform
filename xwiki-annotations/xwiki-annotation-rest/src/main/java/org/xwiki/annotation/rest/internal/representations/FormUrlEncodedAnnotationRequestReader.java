@@ -32,6 +32,7 @@ import org.xwiki.component.annotation.Component;
 
 /**
  * @version $Id$
+ * @since 2.3M1
  */
 @Component("org.xwiki.annotation.rest.internal.representations.FormUrlEncodedAnnotationRequestReader")
 @Provider

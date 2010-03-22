@@ -34,6 +34,7 @@ import org.xwiki.test.AbstractComponentTestCase;
  * Tests the {@link org.xwiki.annotation.internal.content.SpaceNormalizerContentAlterer}.
  * 
  * @version $Id$
+ * @since 2.3M1
  */
 @RunWith(Parameterized.class)
 public class SpaceNormalizerContentAltererTest extends AbstractComponentTestCase

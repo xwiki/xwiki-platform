@@ -34,6 +34,7 @@ import org.xwiki.rendering.renderer.xhtml.XHTMLLinkRenderer;
  * Renders annotations in the XHTML format.
  * 
  * @version $Id$
+ * @since 2.3M1
  */
 @Component("annotations-xhtml/1.0")
 @InstantiationStrategy(ComponentInstantiationStrategy.PER_LOOKUP)

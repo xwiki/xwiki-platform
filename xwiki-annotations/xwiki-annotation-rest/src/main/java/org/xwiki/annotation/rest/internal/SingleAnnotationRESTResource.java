@@ -46,6 +46,7 @@ import com.xpn.xwiki.XWikiException;
  * This class allow to do delete a single annotation.
  * 
  * @version $Id$
+ * @since 2.3M1
  */
 @Component("org.xwiki.annotation.rest.internal.SingleAnnotationRESTResource")
 @Path("/wikis/{wikiName}/spaces/{spaceName}/pages/{pageName}/annotation/{id}")

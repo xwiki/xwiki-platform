@@ -33,6 +33,7 @@ import org.xwiki.component.annotation.Requirement;
  * non-breakable spaces with regular spaces.
  * 
  * @version $Id$
+ * @since 2.3M1
  */
 @Component("space-normalizer")
 public class SpaceNormalizerContentAlterer extends AbstractContentAlterer

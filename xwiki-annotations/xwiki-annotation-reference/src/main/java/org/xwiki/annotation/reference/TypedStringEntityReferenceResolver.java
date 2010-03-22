@@ -35,6 +35,7 @@ import org.xwiki.model.reference.EntityReference;
  * type should be used together.
  * 
  * @version $Id$
+ * @since 2.3M1
  */
 @ComponentRole
 public interface TypedStringEntityReferenceResolver

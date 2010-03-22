@@ -25,6 +25,7 @@ import org.xwiki.model.reference.EntityReferenceSerializer;
 
 /**
  * @version $Id$
+ * @since 2.3M1
  */
 public abstract class AbstractTypedStringEntityReferenceSerializer implements TypedStringEntityReferenceSerializer
 {

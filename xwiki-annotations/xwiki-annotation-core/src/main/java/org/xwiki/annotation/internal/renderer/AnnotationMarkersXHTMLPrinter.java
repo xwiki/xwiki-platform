@@ -39,6 +39,7 @@ import org.xwiki.rendering.renderer.printer.XHTMLWikiPrinter;
  * handle annotations rendering alone, just using state information from the renderer.
  * 
  * @version $Id$
+ * @since 2.3M1
  */
 public class AnnotationMarkersXHTMLPrinter extends XHTMLWikiPrinter
 {

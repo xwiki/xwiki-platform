@@ -54,6 +54,7 @@ import com.xpn.xwiki.objects.BaseProperty;
  * references passed to this module, so that they can be resolved to XWiki content back by this implementation.
  * 
  * @version $Id$
+ * @since 2.3M1
  */
 @Component
 public class DefaultIOService extends AbstractLogEnabled implements IOService

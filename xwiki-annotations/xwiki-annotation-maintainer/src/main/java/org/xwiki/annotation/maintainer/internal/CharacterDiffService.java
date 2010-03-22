@@ -34,6 +34,7 @@ import org.xwiki.component.annotation.Component;
  * DiffService implementation providing character level differences between content.
  * 
  * @version $Id$
+ * @since 2.3M1
  */
 @Component(hints = {"default", "character" })
 public class CharacterDiffService implements DiffService

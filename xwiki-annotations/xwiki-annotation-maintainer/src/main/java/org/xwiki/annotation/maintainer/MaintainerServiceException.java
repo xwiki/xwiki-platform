@@ -23,6 +23,7 @@ package org.xwiki.annotation.maintainer;
  * Thrown when a maintainer error occurs.
  * 
  * @version $Id$
+ * @since 2.3M1
  */
 public class MaintainerServiceException extends Exception
 {

@@ -40,6 +40,7 @@ import com.xpn.xwiki.XWikiException;
  * accessible exception handling.
  * 
  * @version $Id$
+ * @since 2.3M1
  */
 public class AnnotationVelocityBridge
 {

@@ -37,6 +37,7 @@ import org.xwiki.test.AbstractComponentTestCase;
  * document access bridge access.
  * 
  * @version $Id$
+ * @since 2.3M1
  */
 @RunWith(JMock.class)
 public class DefaultIOTargetServiceTest extends AbstractComponentTestCase

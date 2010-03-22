@@ -23,6 +23,7 @@ import org.xwiki.annotation.maintainer.XDelta;
 
 /**
  * @version $Id$
+ * @since 2.3M1
  */
 public abstract class AbstractXDelta implements XDelta
 {

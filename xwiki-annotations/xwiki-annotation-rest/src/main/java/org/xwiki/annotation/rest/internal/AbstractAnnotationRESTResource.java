@@ -54,6 +54,7 @@ import com.xpn.xwiki.doc.XWikiDocument;
  * Base class for the annotation REST services, to implement common functionality to all annotation REST services.
  * 
  * @version $Id$
+ * @since 2.3M1
  */
 public abstract class AbstractAnnotationRESTResource extends XWikiResource
 {

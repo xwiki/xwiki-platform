@@ -28,6 +28,7 @@ import org.xwiki.rendering.listener.chaining.ListenerChain;
  * purposes at different positions in the chain.
  * 
  * @version $Id$
+ * @since 2.3M1
  */
 public class GeneratorEmptyBlockChainingListener extends EmptyBlockChainingListener
 {

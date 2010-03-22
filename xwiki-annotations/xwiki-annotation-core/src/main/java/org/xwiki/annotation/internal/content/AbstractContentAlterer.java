@@ -27,6 +27,7 @@ import org.xwiki.annotation.content.ContentAlterer;
  * This abstract class is used in order to factor piped alterations logic.
  * 
  * @version $Id$
+ * @since 2.3M1
  */
 public abstract class AbstractContentAlterer implements ContentAlterer
 {

@@ -171,7 +171,7 @@ public class XWikiLDAPAuthServiceImpl extends XWikiAuthServiceImpl
      *         <li>Remove '.'</li>
      *         </ul>
      */
-    private String getValidXWikiUserName(String name)
+    protected String getValidXWikiUserName(String name)
     {
         return name.replace(XWIKI_SPACE_NAME_SEP, "");
     }

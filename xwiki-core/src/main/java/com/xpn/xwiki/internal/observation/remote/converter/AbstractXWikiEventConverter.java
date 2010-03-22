@@ -133,8 +133,7 @@ public abstract class AbstractXWikiEventConverter extends AbstractEventConverter
     {
         HashMap<String, Serializable> remoteDataMap = new HashMap<String, Serializable>();
 
-        remoteDataMap.put(DOC_NAME, new DocumentReference(document.getWikiName(), document.getSpaceName(),
-            document.getPageName()));
+        remoteDataMap.put(DOC_NAME, document.getDocumentReference());
 
         if (!document.isNew()) {
             remoteDataMap.put(DOC_VERSION, document.getVersion());
@@ -165,8 +164,7 @@ public abstract class AbstractXWikiEventConverter extends AbstractEventConverter
         if (remoteDataMap.get(DOC_VERSION) == null) {
             doc = new XWikiDocument(docReference);
         } else {
-            doc = new LazyXWikiDocument();
-            doc.setDocumentReference(docReference);
+            doc = new LazyXWikiDocument(docReference);
             doc.setLanguage((String) remoteDataMap.get(DOC_LANGUAGE));
             doc.setVersion((String) remoteDataMap.get(DOC_VERSION));
         }
@@ -175,8 +173,7 @@ public abstract class AbstractXWikiEventConverter extends AbstractEventConverter
         if (remoteDataMap.get(ORIGDOC_VERSION) == null) {
             origDoc = new XWikiDocument(docReference);
         } else {
-            origDoc = new LazyXWikiDocument();
-            origDoc.setDocumentReference(docReference);
+            origDoc = new LazyXWikiDocument(docReference);
             origDoc.setLanguage((String) remoteDataMap.get(ORIGDOC_LANGUAGE));
             origDoc.setVersion((String) remoteDataMap.get(ORIGDOC_VERSION));
         }

@@ -77,7 +77,7 @@ public class CharacterDiffService implements DiffService
      */
     private XDelta getDelta(String previous, String current, Difference diff)
     {
-        int position = -1;
+        int position;
         String original = "";
         String modified = "";
 

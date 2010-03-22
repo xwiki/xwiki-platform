@@ -38,7 +38,7 @@
   <description>XWiki Platform - Core - Parent POM</description>
   <properties>
     <!-- Versions of XWiki dependencies used in Core modules -->
-    <platform.tag.version>1.11</platform.tag.version>
+    <platform.tag.version>1.12-SNAPSHOT</platform.tag.version>
     <clirr.previous.version>2.2</clirr.previous.version>
   </properties>
   <scm>

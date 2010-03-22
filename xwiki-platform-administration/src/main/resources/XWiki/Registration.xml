@@ -394,7 +394,6 @@ $xwiki.get('ssfx').use('uicomponents/widgets/validation/livevalidation.css')
 ## To disable the captcha on this page, comment out the next two entries.
 ## The captcha image, not an input field but still defined the same way.
 #if($captchaservice
-    &amp;&amp; $captchaservice.isEnabled()
     &amp;&amp; $xcontext.getUser() == "XWiki.XWikiGuest"
     &amp;&amp; $requireCaptcha)
   ## Empty label field used for padding.

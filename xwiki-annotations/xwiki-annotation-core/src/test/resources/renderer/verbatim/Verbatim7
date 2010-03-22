@@ -1,0 +1,15 @@
+##################################################
+# Annotation right before an empty verbatim block.
+##################################################
+.source
+Recent Changes
+{{{}}}
+.rendered
+<p>Recent Changes<br/><tt class="wikimodel-verbatim"></tt></p>
+.annotation
+0
+XWiki.XWikiGuest
+What is recent
+Changes
+.annotated
+<p>Recent <span class="annotation ID0">Changes</span><br/><tt class="wikimodel-verbatim"></tt></p>

@@ -1,0 +1,15 @@
+##################################################
+# Annotation right after a verbatim block with only spaces inside
+##################################################
+.source
+{{{    }}}
+Recent Changes
+.rendered
+<pre>    </pre><p>Recent Changes</p>
+.annotation
+0
+XWiki.XWikiGuest
+How are changes
+Recent
+.annotated
+<pre>    </pre><p><span class="annotation ID0">Recent</span> Changes</p>

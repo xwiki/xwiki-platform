@@ -1,0 +1,15 @@
+##################################################
+# Annotation right after a raw block with only spaces inside.
+##################################################
+.source
+{{testspacesxhtmlrawblock/}}
+Recent Changes
+.rendered
+    <p>Recent Changes</p>
+.annotation
+0
+XWiki.XWikiGuest
+How are changes
+Recent
+.annotated
+    <p><span class="annotation ID0">Recent</span> Changes</p>

@@ -147,12 +147,26 @@ public class AnnotationGeneratorChainingListener extends QueueListener implement
     public void onVerbatim(String protectedString, boolean isInline, Map<String, String> parameters)
     {
         super.onVerbatim(protectedString, isInline, parameters);
+        handleRawText(protectedString);
+    }
+
+    /**
+     * Helper function to help handle raw text, such as the raw blocks or the verbatim blocks.
+     * 
+     * @param text the raw text to handle
+     */
+    private void handleRawText(String text)
+    {
         // normalize the protected string before adding it to the plain text version
-        AlteredContent cleanedContent = selectionAlterer.alter(protectedString);
-        plainTextContent.append(cleanedContent.getContent().toString());
-        eventsMapping.put(plainTextContent.length() - 1, getLast());
-        // also store this event in the list of events with altered content
-        alteredEventsContent.put(getLast(), cleanedContent);
+        AlteredContent cleanedContent = selectionAlterer.alter(text);
+        // put this event in the mapping only if it has indeed generated something
+        String cleanedContentString = cleanedContent.getContent().toString();
+        if (!StringUtils.isEmpty(cleanedContentString)) {
+            plainTextContent.append(cleanedContentString);
+            eventsMapping.put(plainTextContent.length() - 1, getLast());
+            // also store this event in the list of events with altered content
+            alteredEventsContent.put(getLast(), cleanedContent);
+        }
     }
 
     /**
@@ -167,12 +181,7 @@ public class AnnotationGeneratorChainingListener extends QueueListener implement
         super.onRawText(text, syntax);
         // Similar approach to verbatim FTM. In the future, syntax specific cleaner could be used for various syntaxes
         // (which would do the great job for HTML, for example)
-        // normalize the protected string before adding it to the plain text version
-        AlteredContent cleanedContent = selectionAlterer.alter(text);
-        plainTextContent.append(cleanedContent.getContent().toString());
-        eventsMapping.put(plainTextContent.length() - 1, getLast());
-        // also store this event in the list of events with altered content
-        alteredEventsContent.put(getLast(), cleanedContent);
+        handleRawText(text);
     }
 
     /**
@@ -279,7 +288,7 @@ public class AnnotationGeneratorChainingListener extends QueueListener implement
                 // bound or right bound search
                 int offset = isEnd ? index - startIndex + 1 : index - startIndex;
 
-                // adjust this offset the content of this event was altered
+                // adjust this offset if the content of this event was altered
                 AlteredContent alteredEventContent = alteredEventsContent.get(evt);
                 if (alteredEventContent != null) {
                     offset = alteredEventContent.getInitialOffset(offset);

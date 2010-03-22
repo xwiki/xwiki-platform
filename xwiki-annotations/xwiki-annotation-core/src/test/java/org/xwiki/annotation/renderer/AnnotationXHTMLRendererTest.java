@@ -123,7 +123,10 @@ public class AnnotationXHTMLRendererTest extends AbstractComponentTestCase
         addFileToTest("renderer/macros/Macros1");
         addFileToTest("renderer/macros/Macros2");
         addFileToTest("renderer/macros/Macros3");
-        // TODO: add a raw block macro test, just to see how it goes
+        addFileToTest("renderer/macros/Macros4");
+        addFileToTest("renderer/macros/Macros5");
+        addFileToTest("renderer/macros/Macros6");
+        addFileToTest("renderer/macros/Macros7");
 
         // tests where the annotated content is in a table
         addFileToTest("renderer/tables/Tables1");
@@ -136,6 +139,10 @@ public class AnnotationXHTMLRendererTest extends AbstractComponentTestCase
         addFileToTest("renderer/verbatim/Verbatim4");
         addFileToTest("renderer/verbatim/Verbatim5");
         addFileToTest("renderer/verbatim/Verbatim6");
+        addFileToTest("renderer/verbatim/Verbatim7");
+        addFileToTest("renderer/verbatim/Verbatim8");
+        addFileToTest("renderer/verbatim/Verbatim9");
+        addFileToTest("renderer/verbatim/Verbatim10");
 
         // tests where annotations start and/or end in the middle of a word rather than at the beginning or end
         addFileToTest("renderer/partialwords/PartialWords1");

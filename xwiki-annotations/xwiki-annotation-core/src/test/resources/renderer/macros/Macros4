@@ -1,0 +1,15 @@
+##################################################
+# Annotation right before an empty raw block
+##################################################
+.source
+Recent Changes
+{{testemptyxhtmlrawblock/}}
+.rendered
+<p>Recent Changes<br/></p>
+.annotation
+0
+XWiki.XWikiGuest
+What is recent
+Changes
+.annotated
+<p>Recent <span class="annotation ID0">Changes</span><br/></p>

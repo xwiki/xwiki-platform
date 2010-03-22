@@ -38,7 +38,7 @@
 #if($hasAdmin || $isAdvancedUser)
   #set($blacklistedSpaces = [])
 #else
-  #set($blacklistedSpaces = ["Import", "Panels", "Scheduler", "Stats", "XAppClasses", "XAppSheets", "XAppTemplates", "XWiki", "WatchCode", "WatchSheets", "XApp", "WatchAdmin", "Watch", "ColorThemes"])
+  #set($blacklistedSpaces = ["Import", "Panels", "Scheduler", "Stats", "XAppClasses", "XAppSheets", "XAppTemplates", "XWiki", "WatchCode", "WatchSheets", "XApp", "WatchAdmin", "Watch", "ColorThemes", "AnnotationCode"])
 #end
 ## ======================================================================================
 ## Since the WysiwygService does not trigger the evaluation of the xwikivars.vm, we need a way to make this variable

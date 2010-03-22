@@ -47,7 +47,7 @@ public class DefaultStringObjectReferenceResolver implements ObjectReferenceReso
     /**
      * {@inheritDoc}
      * 
-     * @see org.xwiki.model.reference.DocumentReferenceResolver#resolve(Object)
+     * @see ObjectReferenceResolver#resolve(Object) 
      */
     public ObjectReference resolve(String objectReferenceRepresentation)
     {

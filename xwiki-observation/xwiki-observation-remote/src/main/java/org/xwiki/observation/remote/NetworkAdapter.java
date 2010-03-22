@@ -35,4 +35,12 @@ public interface NetworkAdapter
      * @throws RemoteEventException error when trying to start a channel
      */
     void startChannel(String channelId) throws RemoteEventException;
+
+    /**
+     * Stop all running channels.
+     * 
+     * @throws RemoteEventException error when trying to stop a running channel
+     * @since 2.3M1
+     */
+    void stopAllChannels() throws RemoteEventException;
 }

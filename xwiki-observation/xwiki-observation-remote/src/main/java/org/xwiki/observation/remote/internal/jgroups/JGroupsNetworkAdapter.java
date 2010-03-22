@@ -3,8 +3,8 @@ package org.xwiki.observation.remote.internal.jgroups;
 import java.io.IOException;
 import java.io.InputStream;
 import java.text.MessageFormat;
-import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 import org.jgroups.ChannelException;
 import org.jgroups.JChannel;
@@ -52,7 +52,7 @@ public class JGroupsNetworkAdapter extends AbstractLogEnabled implements Network
     /**
      * The network channels.
      */
-    private Map<String, JChannel> channels = new HashMap<String, JChannel>();
+    private Map<String, JChannel> channels = new ConcurrentHashMap<String, JChannel>();
 
     /**
      * {@inheritDoc}
@@ -144,13 +144,13 @@ public class JGroupsNetworkAdapter extends AbstractLogEnabled implements Network
         } catch (ComponentLookupException e) {
             channelReceiver = this.componentManager.lookup(JGroupsReceiver.class);
         }
-        
+
         // create channel
         JChannel channel = new JChannel(channelConf);
-        
+
         channel.setReceiver(channelReceiver);
         channel.setOpt(JChannel.LOCAL, false);
-        
+
         return channel;
     }
 
@@ -181,5 +181,21 @@ public class JGroupsNetworkAdapter extends AbstractLogEnabled implements Network
         }
 
         return configurator;
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see org.xwiki.observation.remote.NetworkAdapter#stopAllChannels()
+     */
+    public void stopAllChannels() throws RemoteEventException
+    {
+        for (Map.Entry<String, JChannel> channelEntry : this.channels.entrySet()) {
+            channelEntry.getValue().close();
+        }
+
+        this.channels.clear();
+
+        getLogger().info("All channels stoped");
     }
 }

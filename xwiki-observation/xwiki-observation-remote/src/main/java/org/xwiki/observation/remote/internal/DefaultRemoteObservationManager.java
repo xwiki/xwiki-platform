@@ -32,13 +32,14 @@ import org.xwiki.context.ExecutionContext;
 import org.xwiki.context.ExecutionContextException;
 import org.xwiki.context.ExecutionContextManager;
 import org.xwiki.observation.ObservationManager;
+import org.xwiki.observation.event.ApplicationStoppedEvent;
 import org.xwiki.observation.remote.LocalEventData;
 import org.xwiki.observation.remote.NetworkAdapter;
 import org.xwiki.observation.remote.RemoteEventData;
 import org.xwiki.observation.remote.RemoteEventException;
-import org.xwiki.observation.remote.RemoteObservationManagerContext;
 import org.xwiki.observation.remote.RemoteObservationManager;
 import org.xwiki.observation.remote.RemoteObservationManagerConfiguration;
+import org.xwiki.observation.remote.RemoteObservationManagerContext;
 import org.xwiki.observation.remote.converter.EventConverterManager;
 
 /**
@@ -141,6 +142,14 @@ public class DefaultRemoteObservationManager extends AbstractLogEnabled implemen
         // if remote event data is not filled it mean the message should not be sent to the network
         if (remoteEvent != null) {
             this.networkAdapter.send(remoteEvent);
+        }
+
+        if (localEvent.getEvent() instanceof ApplicationStoppedEvent) {
+            try {
+                this.networkAdapter.stopAllChannels();
+            } catch (RemoteEventException e) {
+                getLogger().error("Failed to stop channels", e);
+            }
         }
     }
 

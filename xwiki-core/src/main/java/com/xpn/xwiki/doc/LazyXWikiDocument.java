@@ -21,19 +21,25 @@
 package com.xpn.xwiki.doc;
 
 import java.util.Date;
-import java.util.Vector;
+import java.util.List;
+import java.util.Map;
 
+import org.dom4j.Document;
+import org.suigeneris.jrcs.rcs.Version;
 import org.xwiki.context.Execution;
+import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.EntityReference;
 import org.xwiki.rendering.block.XDOM;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.objects.BaseObject;
+import com.xpn.xwiki.objects.classes.BaseClass;
 import com.xpn.xwiki.store.XWikiStoreInterface;
 import com.xpn.xwiki.web.Utils;
 
 /**
- * Read oly lazy loading document.
+ * Read only lazy loading document.
  * 
  * @version $Id$
  * @since 2.0M4
@@ -44,6 +50,20 @@ public class LazyXWikiDocument extends XWikiDocument
      * The real document.
      */
     private XWikiDocument document;
+
+    /**
+     * @deprecated use {@link #LazyXWikiDocument(DocumentReference)} instead
+     */
+    @Deprecated
+    public LazyXWikiDocument()
+    {
+
+    }
+
+    public LazyXWikiDocument(DocumentReference documentReference)
+    {
+        super(documentReference);
+    }
 
     /**
      * Load and return the document in the database.
@@ -57,10 +77,7 @@ public class LazyXWikiDocument extends XWikiDocument
             XWikiContext context =
                 (XWikiContext) Utils.getComponent(Execution.class).getContext().getProperty("xwikicontext");
 
-            XWikiDocument doc = new XWikiDocument();
-            doc.setDatabase(getDatabase());
-            doc.setSpace(getSpace());
-            doc.setName(getName());
+            XWikiDocument doc = new XWikiDocument(getDocumentReference());
             doc.setLanguage(getLanguage());
 
             try {
@@ -101,15 +118,15 @@ public class LazyXWikiDocument extends XWikiDocument
     /**
      * {@inheritDoc}
      * 
-     * @see com.xpn.xwiki.doc.XWikiDocument#getVersion()
+     * @see com.xpn.xwiki.doc.XWikiDocument#getRCSVersion()
      */
     @Override
-    public String getVersion()
+    public Version getRCSVersion()
     {
         if (this.version == null) {
-            return getDocument().getVersion();
+            return getDocument().getRCSVersion();
         } else {
-            return this.version.toString();
+            return this.version;
         }
     }
 
@@ -127,12 +144,34 @@ public class LazyXWikiDocument extends XWikiDocument
     /**
      * {@inheritDoc}
      * 
-     * @see com.xpn.xwiki.doc.XWikiDocument#getObjects(java.lang.String)
+     * @see com.xpn.xwiki.doc.XWikiDocument#getXObjects()
      */
     @Override
-    public Vector<BaseObject> getObjects(String classname)
+    public Map<DocumentReference, List<BaseObject>> getXObjects()
     {
-        return getDocument().getObjects(classname);
+        return getDocument().getXObjects();
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see com.xpn.xwiki.doc.XWikiDocument#getXClass()
+     */
+    @Override
+    public BaseClass getXClass()
+    {
+        return getDocument().getXClass();
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see com.xpn.xwiki.doc.XWikiDocument#getXClassXML()
+     */
+    @Override
+    public String getXClassXML()
+    {
+        return getDocument().getXClassXML();
     }
 
     /**
@@ -155,6 +194,17 @@ public class LazyXWikiDocument extends XWikiDocument
     public String getContentAuthor()
     {
         return getDocument().getContentAuthor();
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see com.xpn.xwiki.doc.XWikiDocument#getCreator()
+     */
+    @Override
+    public String getCreator()
+    {
+        return getDocument().getCreator();
     }
 
     /**
@@ -193,12 +243,34 @@ public class LazyXWikiDocument extends XWikiDocument
     /**
      * {@inheritDoc}
      * 
+     * @see com.xpn.xwiki.doc.XWikiDocument#getMeta()
+     */
+    @Override
+    public String getMeta()
+    {
+        return getDocument().getMeta();
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
      * @see com.xpn.xwiki.doc.XWikiDocument#getTitle()
      */
     @Override
     public String getTitle()
     {
         return getDocument().getTitle();
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see com.xpn.xwiki.doc.XWikiDocument#getFormat()
+     */
+    @Override
+    public String getFormat()
+    {
+        return getDocument().getFormat();
     }
 
     /**
@@ -237,12 +309,23 @@ public class LazyXWikiDocument extends XWikiDocument
     /**
      * {@inheritDoc}
      * 
-     * @see com.xpn.xwiki.doc.XWikiDocument#getParent()
+     * @see com.xpn.xwiki.doc.XWikiDocument#getRelativeParentReference()
      */
     @Override
-    public String getParent()
+    protected EntityReference getRelativeParentReference()
     {
-        return getDocument().getParent();
+        return getDocument().getRelativeParentReference();
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see com.xpn.xwiki.doc.XWikiDocument#getParentReference()
+     */
+    @Override
+    public DocumentReference getParentReference()
+    {
+        return getDocument().getParentReference();
     }
 
     /**
@@ -292,19 +375,9 @@ public class LazyXWikiDocument extends XWikiDocument
     /**
      * {@inheritDoc}
      * 
-     * @see com.xpn.xwiki.doc.XWikiDocument#getMinorEdit1()
-     */
-    @Override
-    protected Boolean getMinorEdit1()
-    {
-        return getDocument().getMinorEdit1();
-    }
-
-    /**
-     * {@inheritDoc}
-     * 
      * @see com.xpn.xwiki.doc.XWikiDocument#getSyntaxId()
      */
+    @Override
     public String getSyntaxId()
     {
         return getDocument().getSyntaxId();
@@ -335,6 +408,17 @@ public class LazyXWikiDocument extends XWikiDocument
     /**
      * {@inheritDoc}
      * 
+     * @see com.xpn.xwiki.doc.XWikiDocument#loadArchive(com.xpn.xwiki.XWikiContext)
+     */
+    @Override
+    public void loadArchive(XWikiContext context) throws XWikiException
+    {
+        getDocument().loadArchive(context);
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
      * @see com.xpn.xwiki.doc.XWikiDocument#getDocumentArchive(com.xpn.xwiki.XWikiContext)
      */
     @Override
@@ -352,6 +436,17 @@ public class LazyXWikiDocument extends XWikiDocument
     public XWikiStoreInterface getStore()
     {
         return getDocument().getStore();
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see com.xpn.xwiki.doc.XWikiDocument#getId()
+     */
+    @Override
+    public long getId()
+    {
+        return getDocument().getId();
     }
 
     /**
@@ -390,11 +485,58 @@ public class LazyXWikiDocument extends XWikiDocument
     /**
      * {@inheritDoc}
      * 
+     * @see com.xpn.xwiki.doc.XWikiDocument#getTagsPossibleValues(com.xpn.xwiki.XWikiContext)
+     */
+    @Override
+    public List<String> getTagsPossibleValues(XWikiContext context)
+    {
+        return getDocument().getTagsPossibleValues(context);
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
      * @see com.xpn.xwiki.doc.XWikiDocument#isFromCache()
      */
     @Override
     public boolean isFromCache()
     {
         return getDocument().isFromCache();
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see com.xpn.xwiki.doc.XWikiDocument#isMostRecent()
+     */
+    @Override
+    public boolean isMostRecent()
+    {
+        return getDocument().isMostRecent();
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see com.xpn.xwiki.doc.XWikiDocument#toXMLDocument(boolean, boolean, boolean, boolean,
+     *      com.xpn.xwiki.XWikiContext)
+     */
+    @Override
+    public Document toXMLDocument(boolean bWithObjects, boolean bWithRendering, boolean bWithAttachmentContent,
+        boolean bWithVersions, XWikiContext context) throws XWikiException
+    {
+        return getDocument()
+            .toXMLDocument(bWithObjects, bWithRendering, bWithAttachmentContent, bWithVersions, context);
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see com.xpn.xwiki.doc.XWikiDocument#getWikiNode()
+     */
+    @Override
+    public Object getWikiNode()
+    {
+        return getDocument().getWikiNode();
     }
 }

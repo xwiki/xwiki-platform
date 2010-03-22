@@ -4841,7 +4841,7 @@ public class XWikiDocument implements DocumentModelBridge
     {
         XWikiDocument tdoc = this;
 
-        if (!((language == null) || (language.equals("")) || language.equals(this.defaultLanguage))) {
+        if (!((language == null) || (language.equals("")) || language.equals(getDefaultLanguage()))) {
             tdoc = new XWikiDocument(getDocumentReference());
             tdoc.setLanguage(language);
             String database = context.getDatabase();
@@ -6054,7 +6054,7 @@ public class XWikiDocument implements DocumentModelBridge
         String[] matches =
             {"<%", "#set", "#include", "#if", "public class", "/* Advanced content */", "## Advanced content",
             "/* Programmatic content */", "## Programmatic content"};
-        String content2 = this.content.toLowerCase();
+        String content2 = getContent().toLowerCase();
         for (int i = 0; i < matches.length; i++) {
             if (content2.indexOf(matches[i].toLowerCase()) != -1) {
                 return true;
@@ -6076,7 +6076,7 @@ public class XWikiDocument implements DocumentModelBridge
             "$xwiki.search(", "$xwiki.createUser", "$xwiki.createNewWiki", "$xwiki.addToAllGroup",
             "$xwiki.sendMessage", "$xwiki.copyDocument", "$xwiki.copyWikiWeb", "$xwiki.parseGroovyFromString",
             "$doc.toXML()", "$doc.toXMLDocument()",};
-        String content2 = this.content.toLowerCase();
+        String content2 = getContent().toLowerCase();
         for (int i = 0; i < matches.length; i++) {
             if (content2.indexOf(matches[i].toLowerCase()) != -1) {
                 return true;
@@ -6473,7 +6473,7 @@ public class XWikiDocument implements DocumentModelBridge
             md5 = MessageDigest.getInstance("MD5");
         } catch (NoSuchAlgorithmException ex) {
             LOG.error("Cannot create MD5 object", ex);
-            return this.hashCode() + "";
+            return hashCode() + "";
         }
 
         try {
@@ -6495,7 +6495,7 @@ public class XWikiDocument implements DocumentModelBridge
             LOG.error("Exception while computing document hash", ex);
         }
 
-        return this.hashCode() + "";
+        return hashCode() + "";
     }
 
     public static String getInternalPropertyName(String propname, XWikiContext context)
@@ -6580,7 +6580,7 @@ public class XWikiDocument implements DocumentModelBridge
     // so we need convert Boolean to boolean
     protected Boolean getMinorEdit1()
     {
-        return Boolean.valueOf(this.isMinorEdit);
+        return Boolean.valueOf(isMinorEdit());
     }
 
     protected void setMinorEdit1(Boolean isMinor)
@@ -6763,7 +6763,7 @@ public class XWikiDocument implements DocumentModelBridge
     {
         try {
             context.setDoc(this);
-            com.xpn.xwiki.api.Document apidoc = this.newDocument(context);
+            com.xpn.xwiki.api.Document apidoc = newDocument(context);
             com.xpn.xwiki.api.Document tdoc = apidoc.getTranslatedDocument();
             VelocityManager velocityManager = Utils.getComponent(VelocityManager.class);
             VelocityContext vcontext = velocityManager.getVelocityContext();
@@ -6784,7 +6784,7 @@ public class XWikiDocument implements DocumentModelBridge
 
     public String getPreviousVersion()
     {
-        return getDocumentArchive().getPrevVersion(this.version).toString();
+        return getDocumentArchive().getPrevVersion(getRCSVersion()).toString();
     }
 
     @Override
@@ -7104,7 +7104,7 @@ public class XWikiDocument implements DocumentModelBridge
      *         parent reference is an implementation detail and from the outside we should only see absolute references
      * @since 2.2.3
      */
-    private EntityReference getRelativeParentReference()
+    protected EntityReference getRelativeParentReference()
     {
         return this.parentReference;
     }

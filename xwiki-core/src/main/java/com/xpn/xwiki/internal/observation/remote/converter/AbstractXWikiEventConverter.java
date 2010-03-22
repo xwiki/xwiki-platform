@@ -133,8 +133,7 @@ public abstract class AbstractXWikiEventConverter extends AbstractEventConverter
     {
         HashMap<String, Serializable> remoteDataMap = new HashMap<String, Serializable>();
 
-        remoteDataMap.put(DOC_NAME, new DocumentReference(document.getWikiName(), document.getSpaceName(),
-            document.getPageName()));
+        remoteDataMap.put(DOC_NAME, document.getDocumentReference());
 
         if (!document.isNew()) {
             remoteDataMap.put(DOC_VERSION, document.getVersion());
@@ -163,26 +162,18 @@ public abstract class AbstractXWikiEventConverter extends AbstractEventConverter
 
         XWikiDocument doc;
         if (remoteDataMap.get(DOC_VERSION) == null) {
-            doc = new XWikiDocument(docReference.getWikiReference().getName(),
-                docReference.getLastSpaceReference().getName(), docReference.getName());
+            doc = new XWikiDocument(docReference);
         } else {
-            doc = new LazyXWikiDocument();
-            doc.setDatabase(docReference.getWikiReference().getName());
-            doc.setSpace(docReference.getLastSpaceReference().getName());
-            doc.setName(docReference.getName());
+            doc = new LazyXWikiDocument(docReference);
             doc.setLanguage((String) remoteDataMap.get(DOC_LANGUAGE));
             doc.setVersion((String) remoteDataMap.get(DOC_VERSION));
         }
 
         XWikiDocument origDoc;
         if (remoteDataMap.get(ORIGDOC_VERSION) == null) {
-            origDoc = new XWikiDocument(docReference.getWikiReference().getName(),
-                docReference.getLastSpaceReference().getName(), docReference.getName());
+            origDoc = new XWikiDocument(docReference);
         } else {
-            origDoc = new LazyXWikiDocument();
-            origDoc.setDatabase(docReference.getWikiReference().getName());
-            origDoc.setSpace(docReference.getLastSpaceReference().getName());
-            origDoc.setName(docReference.getName());
+            origDoc = new LazyXWikiDocument(docReference);
             origDoc.setLanguage((String) remoteDataMap.get(ORIGDOC_LANGUAGE));
             origDoc.setVersion((String) remoteDataMap.get(ORIGDOC_VERSION));
         }

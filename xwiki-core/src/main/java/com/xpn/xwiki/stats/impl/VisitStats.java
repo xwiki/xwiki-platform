@@ -109,7 +109,6 @@ public class VisitStats extends XWikiStats
         super(startDate, periodType);
 
         setName(user);
-        setClassName("internal");
         setStartDate(startDate);
         setUniqueID(uniqueID);
         setCookie(cookie);

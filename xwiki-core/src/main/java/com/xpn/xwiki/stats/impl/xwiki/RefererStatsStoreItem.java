@@ -83,7 +83,7 @@ public class RefererStatsStoreItem extends AbstractStatsStoreItem
      *
      * @see com.xpn.xwiki.stats.impl.xwiki.XWikiStatsStoreItem#store(java.util.List)
      */
-    public void store(List<XWikiStatsStoreItem> stats)
+    public void storeInternal(List<XWikiStatsStoreItem> stats)
     {
         RefererStatsStoreItem lastItem =
             (RefererStatsStoreItem) stats.get(stats.size() - 1);

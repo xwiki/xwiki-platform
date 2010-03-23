@@ -22,10 +22,15 @@
 package com.xpn.xwiki.stats.impl.xwiki;
 
 import java.util.Date;
+import java.util.List;
+
+import org.xwiki.context.Execution;
+import org.xwiki.context.ExecutionContext;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.stats.impl.StatsUtil;
 import com.xpn.xwiki.stats.impl.StatsUtil.PeriodType;
+import com.xpn.xwiki.web.Utils;
 
 /**
  * Base class of interface {@link XWikiStatsStoreItem}.
@@ -66,8 +71,7 @@ public abstract class AbstractStatsStoreItem implements XWikiStatsStoreItem
      * @param periodType the period type.
      * @param context the XWiki context.
      */
-    public AbstractStatsStoreItem(String name, Date periodDate, PeriodType periodType,
-        XWikiContext context)
+    public AbstractStatsStoreItem(String name, Date periodDate, PeriodType periodType, XWikiContext context)
     {
         this.name = name;
 
@@ -77,4 +81,32 @@ public abstract class AbstractStatsStoreItem implements XWikiStatsStoreItem
 
         this.context = (XWikiContext) context.clone();
     }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see com.xpn.xwiki.stats.impl.xwiki.XWikiStatsStoreItem#store(java.util.List)
+     */
+    public void store(List<XWikiStatsStoreItem> statsList)
+    {
+        ExecutionContext econtext = Utils.getComponent(Execution.class).getContext();
+
+        XWikiContext currentContext = (XWikiContext) econtext.getProperty(XWikiContext.EXECUTIONCONTEXT_KEY);
+
+        try {
+            econtext.setProperty(XWikiContext.EXECUTIONCONTEXT_KEY, this.context);
+
+            storeInternal(statsList);
+        } finally {
+            econtext.setProperty(XWikiContext.EXECUTIONCONTEXT_KEY, currentContext);
+        }
+    }
+
+    /**
+     * Store provided statistics into the database.
+     * 
+     * @param statsList the list of statistics item to store.
+     * @since 2.2.4
+     */
+    protected abstract void storeInternal(List<XWikiStatsStoreItem> statsList);
 }

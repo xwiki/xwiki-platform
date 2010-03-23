@@ -73,7 +73,6 @@ public class RefererStats extends XWikiStats
         super(periodDate, periodType);
 
         setName(docName);
-        setClassName("internal");
         String nb = referer + getPeriod();
         setNumber(nb.hashCode());
         setReferer(referer);

@@ -89,8 +89,8 @@ public abstract class BaseCollection extends BaseElement implements ObjectInterf
     private EntityReference xClassReference;
 
     /**
-     * Cache the XClass reference resolved as an absolute reference for improved performance (so that we don't have
-     * to resolve the relative reference every time getXClassReference() is called.
+     * Cache the XClass reference resolved as an absolute reference for improved performance (so that we don't have to
+     * resolve the relative reference every time getXClassReference() is called.
      */
     private DocumentReference xClassReferenceCache;
 
@@ -115,8 +115,8 @@ public abstract class BaseCollection extends BaseElement implements ObjectInterf
      * Used to resolve XClass references in the way they are stored externally (database, xml, etc), ie relative or
      * absolute.
      */
-    private EntityReferenceResolver<String> relativeEntityReferenceResolver = Utils.getComponent(
-        EntityReferenceResolver.class, "relative");
+    private EntityReferenceResolver<String> relativeEntityReferenceResolver =
+        Utils.getComponent(EntityReferenceResolver.class, "relative");
 
     /**
      * Used to convert a proper Class Reference to a string but without the wiki name.
@@ -127,9 +127,9 @@ public abstract class BaseCollection extends BaseElement implements ObjectInterf
     /**
      * Used to normalize references.
      */
-    private DocumentReferenceResolver<EntityReference> currentReferenceDocumentReferenceResolver = Utils.getComponent(
-        DocumentReferenceResolver.class, "current/reference");
-    
+    private DocumentReferenceResolver<EntityReference> currentReferenceDocumentReferenceResolver =
+        Utils.getComponent(DocumentReferenceResolver.class, "current/reference");
+
     public int getId()
     {
         return hashCode();
@@ -185,12 +185,12 @@ public abstract class BaseCollection extends BaseElement implements ObjectInterf
      */
     private EntityReference getRelativeXClassReference()
     {
-        return this.xClassReference;        
+        return this.xClassReference;
     }
 
     /**
      * Note that this method cannot be removed for now since it's used by Hibernate for saving an XObject.
-     *
+     * 
      * @deprecated since 2.2M2 use {@link #getXClassReference()} instead
      */
     @Deprecated
@@ -216,7 +216,7 @@ public abstract class BaseCollection extends BaseElement implements ObjectInterf
 
     /**
      * Note that this method cannot be removed for now since it's used by Hibernate for loading an XObject.
-     *
+     * 
      * @deprecated since 2.2.3 use {@link #setXClassReference(EntityReference)} ()} instead
      */
     @Deprecated
@@ -303,10 +303,13 @@ public abstract class BaseCollection extends BaseElement implements ObjectInterf
         }
 
         DocumentReference classReference = getXClassReference();
-        try {
-            baseClass = context.getWiki().getXClass(classReference, context);
-        } catch (Exception e) {
-            LOG.error("Failed to get class [" + classReference + "]", e);
+
+        if (classReference != null) {
+            try {
+                baseClass = context.getWiki().getXClass(classReference, context);
+            } catch (Exception e) {
+                LOG.error("Failed to get class [" + classReference + "]", e);
+            }
         }
 
         return baseClass;
@@ -685,7 +688,7 @@ public abstract class BaseCollection extends BaseElement implements ObjectInterf
             BaseProperty oldProperty = (BaseProperty) oldCollection.getFields().get(propertyName);
             BaseClass bclass = getXClass(context);
             PropertyClass pclass = (PropertyClass) ((bclass == null) ? null : bclass.getField(propertyName));
-            String propertyType = (pclass == null) ? "" : StringUtils.substringAfterLast(pclass.getClassType(), ".");                
+            String propertyType = (pclass == null) ? "" : StringUtils.substringAfterLast(pclass.getClassType(), ".");
 
             if (oldProperty == null) {
                 // The property exist in the new object, but not in the old one
@@ -707,11 +710,11 @@ public abstract class BaseCollection extends BaseElement implements ObjectInterf
                     String oldPropertyValue =
                         (oldProperty.getValue() instanceof String) ? oldProperty.toText() : pclass.displayView(
                             propertyName, oldCollection, context);
-                    difflist.add(new ObjectDiff(getClassName(), getNumber(), "", "changed", propertyName, propertyType, 
+                    difflist.add(new ObjectDiff(getClassName(), getNumber(), "", "changed", propertyName, propertyType,
                         oldPropertyValue, newPropertyValue));
                 } else {
                     // Cannot get property definition, so use the plain value
-                    difflist.add(new ObjectDiff(getClassName(), getNumber(), "", "changed", propertyName, propertyType, 
+                    difflist.add(new ObjectDiff(getClassName(), getNumber(), "", "changed", propertyName, propertyType,
                         oldProperty.toText(), newProperty.toText()));
                 }
             }
@@ -725,7 +728,7 @@ public abstract class BaseCollection extends BaseElement implements ObjectInterf
             BaseClass bclass = getXClass(context);
             PropertyClass pclass = (PropertyClass) ((bclass == null) ? null : bclass.getField(propertyName));
             String propertyType = (pclass == null) ? "" : StringUtils.substringAfterLast(pclass.getClassType(), ".");
-            
+
             if (newProperty == null) {
                 // The property exists in the old object, but not in the new one
                 if ((oldProperty != null) && (!oldProperty.toText().equals(""))) {
@@ -734,11 +737,11 @@ public abstract class BaseCollection extends BaseElement implements ObjectInterf
                         String oldPropertyValue =
                             (oldProperty.getValue() instanceof String) ? oldProperty.toText() : pclass.displayView(
                                 propertyName, oldCollection, context);
-                        difflist.add(new ObjectDiff(oldCollection.getClassName(), oldCollection.getNumber(), "", 
+                        difflist.add(new ObjectDiff(oldCollection.getClassName(), oldCollection.getNumber(), "",
                             "removed", propertyName, propertyType, oldPropertyValue, ""));
                     } else {
                         // Cannot get property definition, so use the plain value
-                        difflist.add(new ObjectDiff(oldCollection.getClassName(), oldCollection.getNumber(), "", 
+                        difflist.add(new ObjectDiff(oldCollection.getClassName(), oldCollection.getNumber(), "",
                             "removed", propertyName, propertyType, oldProperty.toText(), ""));
                     }
                 }
@@ -807,7 +810,8 @@ public abstract class BaseCollection extends BaseElement implements ObjectInterf
 
     /**
      * {@inheritDoc}
-     * @see BaseElement#setDocumentReference(org.xwiki.model.reference.DocumentReference) 
+     * 
+     * @see BaseElement#setDocumentReference(org.xwiki.model.reference.DocumentReference)
      * @since 2.2.3
      */
     @Override
@@ -822,6 +826,7 @@ public abstract class BaseCollection extends BaseElement implements ObjectInterf
 
     /**
      * {@inheritDoc}
+     * 
      * @see BaseElement#setWiki(String)
      * @since 2.2.3
      */
@@ -837,6 +842,7 @@ public abstract class BaseCollection extends BaseElement implements ObjectInterf
 
     /**
      * {@inheritDoc}
+     * 
      * @see BaseElement#setName(String)
      * @since 2.2.3
      */

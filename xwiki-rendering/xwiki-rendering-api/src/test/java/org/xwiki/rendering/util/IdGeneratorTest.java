@@ -54,4 +54,11 @@ public class IdGeneratorTest extends TestCase
         assertEquals("prefixtext", this.idGenerator.generateUniqueId("prefix", "text"));
         assertEquals("prefixtext-1", this.idGenerator.generateUniqueId("prefix", "te-_$xt"));
     }
+    
+    public void testGenerateUniqueIdFromNonAlphaNum()
+    {
+        assertEquals("Iwithspace", this.idGenerator.generateUniqueId("with space"));
+        assertEquals("Iwithtab", this.idGenerator.generateUniqueId("with\ttab"));
+        assertEquals("IE5AF86E7A081", this.idGenerator.generateUniqueId("\u5BC6\u7801"));
+    }
 }

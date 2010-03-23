@@ -20,13 +20,13 @@
  */
 package com.xpn.xwiki.util;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import org.xwiki.rendering.util.IdGenerator;
 
 import com.xpn.xwiki.XWikiContext;
 
@@ -41,8 +41,10 @@ public class TOCGenerator
     public static Map<String, Map<String, Object>> generateTOC(String content, int init, int max, boolean numbered,
         XWikiContext context)
     {
+        IdGenerator idGenerator = new IdGenerator();
+
         LinkedHashMap<String, Map<String, Object>> tocData = new LinkedHashMap<String, Map<String, Object>>();
-        List<String> processedHeadings = new ArrayList<String>();
+
         int previousNumbers[] = {0, 0, 0, 0, 0, 0, 0};
 
         Pattern pattern = Pattern.compile("(?-s)^[ \\t]*+(1(\\.1){0,5}+)[ \\t]++(.++)$", Pattern.MULTILINE);
@@ -52,14 +54,7 @@ public class TOCGenerator
             String text = matcher.group(3);
             text = context.getWiki().parseContent(text, context);
 
-            int occurence = 0;
-            for (String processed : processedHeadings) {
-                if (processed.equals(text)) {
-                    occurence++;
-                }
-            }
-
-            String id = makeHeadingID(text, occurence, context);
+            String id = idGenerator.generateUniqueId("H", text);
 
             Map<String, Object> tocEntry = new HashMap<String, Object>();
             tocEntry.put(TOC_DATA_LEVEL, new Integer(level));
@@ -86,8 +81,8 @@ public class TOCGenerator
                             }
                         } else {
                             num = 1;
-                            // incremet the previous number if there was already a number assigned
-                            // to any of the depper levels
+                            // increment the previous number if there was already a number assigned
+                            // to any of the deeper levels
                             if (i < level) {
                                 previousNumbers[i] = previousNumbers[i] + 1;
                             }
@@ -105,18 +100,21 @@ public class TOCGenerator
                             }
                         }
                     }
-                    // remeber the number for this leaf level
+                    // remember the number for this leaf level
                     previousNumbers[level] = currentNumber;
 
                     tocEntry.put(TOC_DATA_NUMBERING, number);
                 }
                 tocData.put(id, tocEntry);
-                processedHeadings.add(text);
             }
         }
         return tocData;
     }
 
+    /**
+     * @deprecated use {@link IdGenerator} instead
+     */
+    @Deprecated
     public static String makeHeadingID(String text, int occurence, XWikiContext context)
     {
         text = "H" + text;

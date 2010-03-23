@@ -143,16 +143,16 @@ XWiki.actionButtons.AjaxSaveAndContinue = Class.create({
       if (typeof (event.memo.originalEvent) != 'undefined') {
         event.memo.originalEvent.stop();
       }
-      this.form = event.memo.form;
+      this.form = $(event.memo.form);
       this.savedBox.hide();
       this.failedBox.hide();
       this.savingBox.show();
-      var formData = new Hash(event.memo.form.serialize({hash: true, submit: 'action_saveandcontinue'}));
+      var formData = new Hash(this.form.serialize({hash: true, submit: 'action_saveandcontinue'}));
       if (!Prototype.Browser.Opera) {
         // Opera can't handle properly 204 responses.
         formData.set('ajax', 'true');
       }
-      new Ajax.Request(event.memo.form.action, {
+      new Ajax.Request(this.form.action, {
         method : 'post',
         parameters : formData.toQueryString(),
         onSuccess : this.onSuccess.bindAsEventListener(this),

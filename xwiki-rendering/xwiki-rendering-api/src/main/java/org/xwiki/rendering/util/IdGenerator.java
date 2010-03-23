@@ -52,6 +52,11 @@ public class IdGenerator
         for (int i = 'A'; i <= 'Z'; i++) {
             ALLOWED.set(i);
         }
+
+        ALLOWED.set(':');
+        ALLOWED.set('_');
+        ALLOWED.set('.');
+        ALLOWED.set('-');
     }
 
     /**
@@ -62,12 +67,9 @@ public class IdGenerator
     /**
      * Generate a unique id attribute using the passed text as the seed value. The generated id complies with the XHTML
      * specification. Extract from <a
-     * href="http://www.devguru.com/technologies/xhtml/QuickRef/xhtml_attribute_id.html">DevGuru</a>:
+     * href="http://www.w3.org/TR/xhtml1/#C_8">XHTML RFC</a>:
      * <p>
-     * <quote> "The id attribute is used to assign a identifier value to a tag. Each id must be unique within the
-     * document and each element can only have one id. In XHTML, the id attribute has essentially replaced the use of
-     * the name attribute. The value of the id must start with an alphabetic letter or an underscore. The rest of the
-     * value can contain any alpha/numeric character." </quote>
+     * <quote> "When defining fragment identifiers to be backward-compatible, only strings matching the pattern [A-Za-z][A-Za-z0-9:_.-]* should be used." </quote>
      * </p>
      * 
      * @param text the text used to generate the unique id. For example "Hello world" will generate "Helloworld".
@@ -81,12 +83,9 @@ public class IdGenerator
     /**
      * Generate a unique id attribute using the passed text as the seed value. The generated id complies with the XHTML
      * specification. Extract from <a
-     * href="http://www.devguru.com/technologies/xhtml/QuickRef/xhtml_attribute_id.html">DevGuru</a>:
+     * href="http://www.w3.org/TR/xhtml1/#C_8">XHTML RFC</a>:
      * <p>
-     * <quote> "The id attribute is used to assign a identifier value to a tag. Each id must be unique within the
-     * document and each element can only have one id. In XHTML, the id attribute has essentially replaced the use of
-     * the name attribute. The value of the id must start with an alphabetic letter or an underscore. The rest of the
-     * value can contain any alpha/numeric character." </quote>
+     * <quote> "When defining fragment identifiers to be backward-compatible, only strings matching the pattern [A-Za-z][A-Za-z0-9:_.-]* should be used." </quote>
      * </p>
      * 
      * @param prefix the prefix of the identifier. Has to match [a-zA-Z].
@@ -104,7 +103,7 @@ public class IdGenerator
         idPrefix = EncodingUtil.getAsciiString(URLCodec.encodeUrl(ALLOWED, EncodingUtil.getBytes(idPrefix, "UTF-8")));
 
         // Remove all non alpha numeric characters to make a nice compact id which respect the XHTML specification.
-        idPrefix = (prefix != null ? prefix : "") + idPrefix.replaceAll("[^a-zA-Z0-9]", "");
+        idPrefix = (prefix != null ? prefix : "") + idPrefix.replace("%", "");
 
         int occurence = 0;
         String id = idPrefix;

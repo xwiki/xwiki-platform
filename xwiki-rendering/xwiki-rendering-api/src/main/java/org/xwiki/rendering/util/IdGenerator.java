@@ -19,8 +19,12 @@
  */
 package org.xwiki.rendering.util;
 
+import java.util.BitSet;
 import java.util.HashSet;
 import java.util.Set;
+
+import org.apache.commons.codec.net.URLCodec;
+import org.apache.commons.httpclient.util.EncodingUtil;
 
 /**
  * Stateful generator of id attributes. It's stateful since it remembers the generated ids. Thus a new instance of it
@@ -31,6 +35,25 @@ import java.util.Set;
  */
 public class IdGenerator
 {
+    /**
+     * Alpha-numerical {@link BitSet}.
+     */
+    private static final BitSet ALLOWED = new BitSet(256);
+    static {
+        // digits
+        for (int i = '0'; i <= '9'; i++) {
+            ALLOWED.set(i);
+        }
+
+        // alpha
+        for (int i = 'a'; i <= 'z'; i++) {
+            ALLOWED.set(i);
+        }
+        for (int i = 'A'; i <= 'Z'; i++) {
+            ALLOWED.set(i);
+        }
+    }
+
     /**
      * Contains the already generated ids.
      */
@@ -72,8 +95,16 @@ public class IdGenerator
      */
     public String generateUniqueId(String prefix, String text)
     {
+        String idPrefix = text;
+
+        // clean white space, Helloworld is nicer than Hello20world
+        idPrefix = idPrefix.replaceAll("\\s", "");
+
+        // convert non alpha-numeric characters
+        idPrefix = EncodingUtil.getAsciiString(URLCodec.encodeUrl(ALLOWED, EncodingUtil.getBytes(idPrefix, "UTF-8")));
+
         // Remove all non alpha numeric characters to make a nice compact id which respect the XHTML specification.
-        String idPrefix = (prefix != null ? prefix : "") + text.replaceAll("[^a-zA-Z0-9]", "");
+        idPrefix = (prefix != null ? prefix : "") + idPrefix.replaceAll("[^a-zA-Z0-9]", "");
 
         int occurence = 0;
         String id = idPrefix;

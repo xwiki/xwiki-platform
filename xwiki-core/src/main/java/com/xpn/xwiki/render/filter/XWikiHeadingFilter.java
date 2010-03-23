@@ -20,8 +20,6 @@
 package com.xpn.xwiki.render.filter;
 
 import java.text.MessageFormat;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.logging.Log;
@@ -33,6 +31,7 @@ import org.radeox.filter.CacheFilter;
 import org.radeox.filter.context.FilterContext;
 import org.radeox.filter.regex.LocaleRegexTokenFilter;
 import org.radeox.regex.MatchResult;
+import org.xwiki.rendering.util.IdGenerator;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
@@ -45,7 +44,7 @@ import com.xpn.xwiki.util.TOCGenerator;
  */
 public class XWikiHeadingFilter extends LocaleRegexTokenFilter implements CacheFilter
 {
-    private static Log log = LogFactory.getLog(XWikiHeadingFilter.class);
+    private static final Log LOG = LogFactory.getLog(XWikiHeadingFilter.class);
 
     private final String TOC_NUMBERED = "tocNumbered";
 
@@ -84,31 +83,24 @@ public class XWikiHeadingFilter extends LocaleRegexTokenFilter implements CacheF
         String numbering = "";
 
         RenderContext rcontext = context.getRenderContext();
-        XWikiContext xcontext =
-            ((XWikiRadeoxRenderEngine) rcontext.getRenderEngine()).getXWikiContext();
-        VelocityContext vcontext = (VelocityContext)xcontext.get("vcontext");
+        XWikiContext xcontext = ((XWikiRadeoxRenderEngine) rcontext.getRenderEngine()).getXWikiContext();
+        VelocityContext vcontext = (VelocityContext) xcontext.get("vcontext");
         XWikiDocument doc = xcontext.getDoc();
 
-        log.debug("Processing '" + text + "'");
+        LOG.debug("Processing '" + text + "'");
         // generate unique ID of the heading
-        List<String> processedHeadings = (List<String>) xcontext.get("processedHeadings");
-        if (processedHeadings == null) {
-            processedHeadings = new ArrayList();
-            xcontext.put("processedHeadings", processedHeadings);
+        IdGenerator idGenerator = (IdGenerator) xcontext.get("headingsIdGenerator");
+        if (idGenerator == null) {
+            idGenerator = new IdGenerator();
+            xcontext.put("headingsIdGenerator", idGenerator);
         }
-        id = TOCGenerator.makeHeadingID(text, 0, xcontext);
-        int occurence = 0;
-        while (processedHeadings.contains(id)) {
-            occurence++;
-            id = TOCGenerator.makeHeadingID(text, occurence, xcontext);
-        }
-        processedHeadings.add(id);
-        log.debug("Generated heading id '" + id + "'");
+
+        id = idGenerator.generateUniqueId("H", text);
+        LOG.debug("Generated heading id '" + id + "'");
 
         // add numbering if the flag is set
 
-        if (xcontext.containsKey(TOC_NUMBERED)
-            && ((Boolean) xcontext.get(TOC_NUMBERED)).booleanValue()) {
+        if (xcontext.containsKey(TOC_NUMBERED) && ((Boolean) xcontext.get(TOC_NUMBERED)).booleanValue()) {
             // This is the old place where the data was placed, but this requires programming
             // rights. Instead, we now use vcontext.
             if (xcontext.containsKey(TOC_DATA)) {
@@ -138,8 +130,8 @@ public class XWikiHeadingFilter extends LocaleRegexTokenFilter implements CacheF
                 // executed as it would mean we're trying to render the headings for a null
                 // document and that doesn't make sense...
                 if ((doc != null)
-                    && ((xcontext.getUser() != null) && xcontext.getWiki().getRightService()
-                        .hasAccessLevel("edit", xcontext.getUser(), doc.getFullName(), xcontext))) {
+                    && ((xcontext.getUser() != null) && xcontext.getWiki().getRightService().hasAccessLevel("edit",
+                        xcontext.getUser(), doc.getFullName(), xcontext))) {
                     showEditButton = true;
                 }
             } catch (XWikiException e) {
@@ -174,19 +166,16 @@ public class XWikiHeadingFilter extends LocaleRegexTokenFilter implements CacheF
                         editparams.append("section=").append(sectionNumber);
                     }
                     try {
-                        if ((xcontext.getWiki().isMultiLingual(xcontext))
-                            && (doc.getRealLanguage(xcontext) != null)) {
-                            editparams.append("&amp;language=").append(
-                                doc.getRealLanguage(xcontext));
+                        if ((xcontext.getWiki().isMultiLingual(xcontext)) && (doc.getRealLanguage(xcontext) != null)) {
+                            editparams.append("&amp;language=").append(doc.getRealLanguage(xcontext));
                         }
                     } catch (XWikiException e) {
                     }
 
                     String url = doc.getURL("edit", editparams.toString(), xcontext);
                     return heading + "<span class='edit_section'>&#91;"
-                        + "<a style='text-decoration: none;' title='Edit section: "
-                        + text.replaceAll("'", "&#39;") + "' href='" + url + "'>" + "edit"
-                        + "</a>&#93;</span>";
+                        + "<a style='text-decoration: none;' title='Edit section: " + text.replaceAll("'", "&#39;")
+                        + "' href='" + url + "'>" + "edit" + "</a>&#93;</span>";
                 }
             }
         }

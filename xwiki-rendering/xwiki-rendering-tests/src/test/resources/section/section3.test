@@ -110,17 +110,17 @@ onWord [header]
 endHeader [1, Hunclosedheader]
 endSection
 beginSection
-beginHeader [1, Hkeyvalue]
+beginHeader [1, Hkey3Dvalue]
 onWord [key]
 onSpecialSymbol [=]
 onWord [value]
-endHeader [1, Hkeyvalue]
+endHeader [1, Hkey3Dvalue]
 endSection
 endDocument
 .#-----------------------------------------------------
 .expect|xhtml/1.0
 .#-----------------------------------------------------
-<h6 id="HTitlelevel6"><span>Title level 6</span></h6><h1 id="HTitlelevel1"><span>Title level 1</span></h1><h1 id="HTitlelevel1-1"><span>Title level 1</span></h1><h1 id="HTitlelevel1-2"><span>Title level 1</span></h1><h1 id="HTitlelevel1-3"><span>Title level 1</span></h1><h1 id="HTitlelevel1-4"><span>Title level 1</span></h1><h1 id="HTitlelevel1-5"><span>Title level 1</span></h1><h1 id="HTitlelevel1-6"><span>Title level 1</span></h1><p>some text</p><h1 id="Hunclosedheader"><span>unclosed header</span></h1><h1 id="Hkeyvalue"><span>key=value</span></h1>
+<h6 id="HTitlelevel6"><span>Title level 6</span></h6><h1 id="HTitlelevel1"><span>Title level 1</span></h1><h1 id="HTitlelevel1-1"><span>Title level 1</span></h1><h1 id="HTitlelevel1-2"><span>Title level 1</span></h1><h1 id="HTitlelevel1-3"><span>Title level 1</span></h1><h1 id="HTitlelevel1-4"><span>Title level 1</span></h1><h1 id="HTitlelevel1-5"><span>Title level 1</span></h1><h1 id="HTitlelevel1-6"><span>Title level 1</span></h1><p>some text</p><h1 id="Hunclosedheader"><span>unclosed header</span></h1><h1 id="Hkey3Dvalue"><span>key=value</span></h1>
 .#-----------------------------------------------------
 .expect|xwiki/2.0
 .#-----------------------------------------------------
@@ -148,4 +148,4 @@ some text
 .#-----------------------------------------------------
 .input|xhtml/1.0
 .#-----------------------------------------------------
-<html><h6 id="HTitlelevel6"><span>Title level 6</span></h6><h1 id="HTitlelevel1"><span>Title level 1</span></h1><h1 id="HTitlelevel1-1"><span>Title level 1</span></h1><h1 id="HTitlelevel1-2"><span>Title level 1</span></h1><h1 id="HTitlelevel1-3"><span>Title level 1</span></h1><h1 id="HTitlelevel1-4"><span>Title level 1</span></h1><h1 id="HTitlelevel1-5"><span>Title level 1</span></h1><h1 id="HTitlelevel1-6"><span>Title level 1</span></h1><p>some text</p><h1 id="Hunclosedheader"><span>unclosed header</span></h1><h1 id="Hkeyvalue"><span>key=value</span></h1></html>
+<h6 id="HTitlelevel6"><span>Title level 6</span></h6><h1 id="HTitlelevel1"><span>Title level 1</span></h1><h1 id="HTitlelevel1-1"><span>Title level 1</span></h1><h1 id="HTitlelevel1-2"><span>Title level 1</span></h1><h1 id="HTitlelevel1-3"><span>Title level 1</span></h1><h1 id="HTitlelevel1-4"><span>Title level 1</span></h1><h1 id="HTitlelevel1-5"><span>Title level 1</span></h1><h1 id="HTitlelevel1-6"><span>Title level 1</span></h1><p>some text</p><h1 id="Hunclosedheader"><span>unclosed header</span></h1><h1 id="Hkey3Dvalue"><span>key=value</span></h1>

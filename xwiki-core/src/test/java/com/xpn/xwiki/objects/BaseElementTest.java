@@ -36,7 +36,7 @@ public class BaseElementTest extends AbstractBridgedComponentTestCase
     @Test
     public void testSetWiki() throws Exception
     {
-        TestBaseElement baseElement = new TestBaseElement();
+        BaseElement baseElement = new BaseElement(){};
         
         baseElement.setWiki("wiki");
         
@@ -56,6 +56,3 @@ public class BaseElementTest extends AbstractBridgedComponentTestCase
         Assert.assertEquals("otherpage", baseElement.getDocumentReference().getName());
     }
 }
-
-class TestBaseElement extends BaseElement
-{}

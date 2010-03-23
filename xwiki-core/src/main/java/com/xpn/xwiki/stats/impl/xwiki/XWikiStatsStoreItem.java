@@ -32,13 +32,14 @@ import java.util.List;
 public interface XWikiStatsStoreItem
 {
     /**
-     * @return identifier for this type of store item. This value is used to merge same statistics
-     *         in one database query.
+     * @return identifier for this type of store item. This value is used to merge same statistics in one database
+     *         query.
      */
     String getId();
 
     /**
      * Store provided statistics into the database.
+     * 
      * @param statsList the list of statistics item to store.
      */
     void store(List<XWikiStatsStoreItem> statsList);

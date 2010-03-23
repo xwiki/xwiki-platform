@@ -6,7 +6,7 @@
 <language></language>
 <defaultLanguage></defaultLanguage>
 <translation>0</translation>
-<parent></parent>
+<parent>AnnotationCode.WebHome</parent>
 <creator>XWiki.XWikiGuest</creator>
 <author>XWiki.Admin</author>
 <customClass></customClass>

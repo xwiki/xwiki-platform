@@ -2,18 +2,18 @@
 
 <xwikidoc>
 <web>AnnotationCode</web>
-<name>EditForm</name>
+<name>WebHome</name>
 <language></language>
 <defaultLanguage>en</defaultLanguage>
 <translation>0</translation>
-<parent>AnnotationCode.WebHome</parent>
+<parent>Main.WebHome</parent>
 <creator>XWiki.Admin</creator>
 <author>XWiki.Admin</author>
 <customClass></customClass>
 <contentAuthor>XWiki.Admin</contentAuthor>
-<creationDate>1264977470000</creationDate>
-<date>1266510115000</date>
-<contentUpdateDate>1266510115000</contentUpdateDate>
+<creationDate>1269267162000</creationDate>
+<date>1269338927000</date>
+<contentUpdateDate>1269338927000</contentUpdateDate>
 <version>1.0</version>
 <title></title>
 <template></template>
@@ -23,10 +23,12 @@
 <minorEdit>false</minorEdit>
 <syntaxId>xwiki/2.0</syntaxId>
 <hidden>false</hidden>
-<content>{{velocity filter="none"}}
-{{html clean="false"}}
-#includeTopic('AnnotationCode.Macros')
-#displayEditBox("$!{request.id}", "$!{request.wiki}", "$!{request.space}", "$!{request.page}")
-{{/html}}
+<content>This is the space for the Annotations scripts, powering the annotation feature, with the following documents:
+{{velocity wiki="true"}}
+#foreach($annDoc in $xwiki.getSpaceDocsName($doc.space))
+  #if ($annDoc != "WebHome")
+    * [[$annDoc]]
+  #end
+#end
 {{/velocity}}</content>
 </xwikidoc>

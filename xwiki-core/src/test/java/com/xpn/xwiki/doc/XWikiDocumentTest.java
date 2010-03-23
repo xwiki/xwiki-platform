@@ -408,12 +408,15 @@ public class XWikiDocumentTest extends AbstractBridgedXWikiComponentTestCase
         this.mockXWiki.stubs().method("getEncoding").will(returnValue("iso-8859-1"));
 
         BaseObject object = BaseClass.newCustomClassInstance(classname, getContext());
+        object.setClassName(classname);
         doc.addObject(classname, object);
 
         object = BaseClass.newCustomClassInstance(classname, getContext());
+        object.setClassName(classname);
         doc.addObject(classname, object);
 
         object = BaseClass.newCustomClassInstance(classname, getContext());
+        object.setClassName(classname);
         doc.addObject(classname, object);
 
         doc.setObject(classname, 1, null);

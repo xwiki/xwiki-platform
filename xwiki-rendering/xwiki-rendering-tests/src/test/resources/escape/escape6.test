@@ -11,11 +11,11 @@
 .#-----------------------------------------------------
 beginDocument
 beginSection
-beginHeader [1, Hinheader]
+beginHeader [1, Hinheader3D]
 onWord [inheader]
 onSpace
 onSpecialSymbol [=]
-endHeader [1, Hinheader]
+endHeader [1, Hinheader3D]
 beginParagraph
 onSpecialSymbol [=]
 onSpecialSymbol [=]
@@ -27,7 +27,7 @@ endDocument
 .#-----------------------------------------------------
 .expect|xhtml/1.0
 .#-----------------------------------------------------
-<h1 id="Hinheader"><span>inheader =</span></h1><p>== notheader</p>
+<h1 id="Hinheader3D"><span>inheader =</span></h1><p>== notheader</p>
 .#-----------------------------------------------------
 .expect|xwiki/2.0
 .#-----------------------------------------------------
@@ -37,4 +37,4 @@ endDocument
 .#-----------------------------------------------------
 .input|xhtml/1.0
 .#-----------------------------------------------------
-<html><h1 id="Hinheader"><span>inheader =</span></h1><p>== notheader</p></html>
+<h1 id="Hinheader3D"><span>inheader =</span></h1><p>== notheader</p>

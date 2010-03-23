@@ -81,7 +81,7 @@ public class VisitStatsStoreItem extends AbstractStatsStoreItem
      * 
      * @see com.xpn.xwiki.stats.impl.xwiki.XWikiStatsStoreItem#store(java.util.List)
      */
-    public void store(List<XWikiStatsStoreItem> stats)
+    public void storeInternal(List<XWikiStatsStoreItem> stats)
     {
         VisitStatsStoreItem firstItem = (VisitStatsStoreItem) stats.get(0);
         VisitStats oldVisitStats = firstItem.visitStats.getOldObject();

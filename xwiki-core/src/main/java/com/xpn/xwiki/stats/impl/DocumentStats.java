@@ -73,7 +73,6 @@ public class DocumentStats extends XWikiStats
         super(periodDate, periodType);
         
         setName(docName);
-        setClassName("internal");
         String nb = action + getPeriod();
         setNumber(nb.hashCode());
         setAction(action);

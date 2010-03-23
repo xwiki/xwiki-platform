@@ -81,6 +81,12 @@
          &amp;nbsp;&lt;span class="buttonwrapper"&gt;&lt;a href="$skindoc.getURL()"&gt;$msg.get("admin.customize")&lt;/a&gt;&lt;/span&gt;
          #end
         #end
+        #if($field == 'colorTheme')
+         #set($colorThemeName = $xwiki.getXWikiPreference('colorTheme'))
+         #if($colorThemeName.indexOf('.') != -1)
+           &amp;nbsp;&lt;span class="buttonwrapper"&gt;&lt;a href="$xwiki.getURL($colorThemeName, 'inline')"&gt;$msg.get('admin.customize')&lt;/a&gt;&lt;/span&gt;
+         #end
+        #end
         &lt;/label&gt;
         #if($prop)$doc.displayEdit($prop, "${prefsclassname}_${obj.number}_", $obj)#end 
         &lt;/p&gt;       

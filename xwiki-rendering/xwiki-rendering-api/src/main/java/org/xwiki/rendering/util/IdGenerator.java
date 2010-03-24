@@ -66,10 +66,10 @@ public class IdGenerator
 
     /**
      * Generate a unique id attribute using the passed text as the seed value. The generated id complies with the XHTML
-     * specification. Extract from <a
-     * href="http://www.w3.org/TR/xhtml1/#C_8">XHTML RFC</a>:
+     * specification. Extract from <a href="http://www.w3.org/TR/xhtml1/#C_8">XHTML RFC</a>:
      * <p>
-     * <quote> "When defining fragment identifiers to be backward-compatible, only strings matching the pattern [A-Za-z][A-Za-z0-9:_.-]* should be used." </quote>
+     * <quote>When defining fragment identifiers to be backward-compatible, only strings matching the pattern
+     * [A-Za-z][A-Za-z0-9:_.-]* should be used. </quote>
      * </p>
      * 
      * @param text the text used to generate the unique id. For example "Hello world" will generate "Helloworld".
@@ -82,10 +82,10 @@ public class IdGenerator
 
     /**
      * Generate a unique id attribute using the passed text as the seed value. The generated id complies with the XHTML
-     * specification. Extract from <a
-     * href="http://www.w3.org/TR/xhtml1/#C_8">XHTML RFC</a>:
+     * specification. Extract from <a href="http://www.w3.org/TR/xhtml1/#C_8">XHTML RFC</a>:
      * <p>
-     * <quote> "When defining fragment identifiers to be backward-compatible, only strings matching the pattern [A-Za-z][A-Za-z0-9:_.-]* should be used." </quote>
+     * <quote> When defining fragment identifiers to be backward-compatible, only strings matching the pattern
+     * [A-Za-z][A-Za-z0-9:_.-]* should be used.</quote>
      * </p>
      * 
      * @param prefix the prefix of the identifier. Has to match [a-zA-Z].

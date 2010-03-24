@@ -164,11 +164,12 @@ public class AttachmentData extends IndexData
                 String[] nameParts = this.filename.split("\\.");
                 if (nameParts.length > 1) {
                     contentText =
-                            TextExtractor.getText(content, MIMETYPES.get(nameParts[nameParts.length - 1].toLowerCase()));
+                        TextExtractor.getText(content, MIMETYPES.get(nameParts[nameParts.length - 1].toLowerCase()));
                 }
             }
         } catch (Throwable e) {
-            LOG.error("error getting content of attachment", e);
+            LOG.error("error getting content of attachment [" + this.filename + "] for document [" + doc.getFullName()
+                + "] in wiki [" + doc.getWikiName() + "]", e);
         }
 
         return contentText;

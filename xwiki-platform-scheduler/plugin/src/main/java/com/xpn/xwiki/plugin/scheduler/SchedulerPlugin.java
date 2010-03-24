@@ -44,6 +44,7 @@ import com.xpn.xwiki.api.Api;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.objects.classes.BaseClass;
+import com.xpn.xwiki.objects.classes.TextAreaClass;
 import com.xpn.xwiki.plugin.XWikiDefaultPlugin;
 import com.xpn.xwiki.plugin.XWikiPluginInterface;
 import com.xpn.xwiki.web.XWikiResponse;
@@ -621,7 +622,14 @@ public class SchedulerPlugin extends XWikiDefaultPlugin
         needsUpdate |= bclass.addTextField("jobClass", "Job Class", 60);
         needsUpdate |= bclass.addTextField("status", "Status", 30);
         needsUpdate |= bclass.addTextField("cron", "Cron Expression", 30);
-        needsUpdate |= bclass.addTextAreaField("script", "Job Script", 45, 10);
+        needsUpdate |= bclass.addTextAreaField("script", "Job Script", 60, 10);
+        // make sure that the script field is of type pure text so that wysiwyg editor is never used for it
+        TextAreaClass scriptField = (TextAreaClass) bclass.getField("script");
+        // get editor returns lowercase but the values are actually camelcase
+        if (scriptField.getEditor() != "puretext") {
+            scriptField.setStringValue("editor", "PureText");
+            needsUpdate = true;
+        }
         needsUpdate |= bclass.addTextField("contextUser", "Job execution context user", 30);
         needsUpdate |= bclass.addTextField("contextLang", "Job execution context lang", 30);
         needsUpdate |= bclass.addTextField("contextDatabase", "Job execution context database", 30);

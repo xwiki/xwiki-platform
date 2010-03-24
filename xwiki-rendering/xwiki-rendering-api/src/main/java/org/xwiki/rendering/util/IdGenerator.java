@@ -36,7 +36,7 @@ import org.apache.commons.httpclient.util.EncodingUtil;
 public class IdGenerator
 {
     /**
-     * Alpha-numerical {@link BitSet}.
+     * Id allowed characters {@link BitSet}.
      */
     private static final BitSet ALLOWED = new BitSet(256);
     static {

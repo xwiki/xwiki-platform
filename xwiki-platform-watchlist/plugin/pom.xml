@@ -27,7 +27,7 @@
   <parent>
     <artifactId>xwiki-plugins</artifactId>
     <groupId>com.xpn.xwiki.platform.plugins</groupId>
-    <version>21</version>
+    <version>22-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-plugin-watchlist</artifactId>
   <name>XWiki Platform - Plugins - WatchList Manager</name>
@@ -35,9 +35,9 @@
   <description>XWiki Platform - Plugins - WatchList Manager</description>
   <properties>
     <platform.core.version>2.2.3</platform.core.version>
-    <platform.plugin.scheduler.version>1.17</platform.plugin.scheduler.version>
-    <platform.plugin.mailsender.version>1.13</platform.plugin.mailsender.version>
-    <platform.plugin.activitystream.version>1.6</platform.plugin.activitystream.version>
+    <platform.plugin.scheduler.version>1.18-SNAPSHOT</platform.plugin.scheduler.version>
+    <platform.plugin.mailsender.version>1.14-SNAPSHOT</platform.plugin.mailsender.version>
+    <platform.plugin.activitystream.version>1.7-SNAPSHOT</platform.plugin.activitystream.version>
   </properties>
   <dependencies>
     <dependency>

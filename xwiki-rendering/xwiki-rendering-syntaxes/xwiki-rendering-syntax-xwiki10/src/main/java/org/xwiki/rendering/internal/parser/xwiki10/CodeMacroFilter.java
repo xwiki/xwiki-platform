@@ -80,6 +80,10 @@ public class CodeMacroFilter extends AbstractFilter implements Initializable
         for (; matcher.find(); currentIndex = matcher.end()) {
             String before = escapedContent.substring(currentIndex, matcher.start());
 
+            if (result.length() > 0) {
+                before = CleanUtil.setLeadingNewLines(before, 2);
+            }
+            
             before = CleanUtil.setTrailingNewLines(before, 2);
 
             String macroResult =

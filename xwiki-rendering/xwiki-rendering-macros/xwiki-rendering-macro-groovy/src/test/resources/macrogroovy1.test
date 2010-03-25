@@ -7,6 +7,7 @@ list.each { item ->
   println "* ${item}"
 }
 {{/groovy}}
+
 {{groovy}}
 def list = ["one", var]
 list.each { item ->

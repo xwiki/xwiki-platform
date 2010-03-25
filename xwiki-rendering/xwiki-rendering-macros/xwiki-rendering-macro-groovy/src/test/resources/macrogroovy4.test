@@ -5,6 +5,7 @@
 {{groovy}}
 class MyClass {}
 {{/groovy}}
+
 {{groovy}}
 .# An error would be raised here if MyClass was not visible
 def var = new MyClass()

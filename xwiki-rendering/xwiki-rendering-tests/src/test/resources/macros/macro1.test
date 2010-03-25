@@ -2,10 +2,13 @@
 .input|xwiki/2.0
 .#-----------------------------------------------------
 {{testsimplemacro/}}
+
 {{testsimplemacro param1="value1" param2="value2"/}}
+
 {{testsimplemacro param1="value1" param2="value2"}}
 content
 {{/testsimplemacro}}
+
 {{testsimplemacro}}
 content
 {{/testsimplemacro}}

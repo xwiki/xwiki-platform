@@ -2268,13 +2268,13 @@ var $jsVarName = {
   plugins: '$xwiki.getXWikiPreference("wysiwyg.plugins", "submit line separator embed text valign list indent history format symbol link image table macro import#if($full && $request.sync) sync#end")',
   menu: '$xwiki.getXWikiPreference("wysiwyg.menu", "link image table macro import")',
   toolbar: '$xwiki.getXWikiPreference("wysiwyg.toolbar", "bold italic underline strikethrough | subscript superscript | unorderedlist orderedlist | outdent indent | undo redo | format | hr symbol")',
-  wiki: '$!{editedDocument.wiki.replace("'", "\'")}',
-  space: '$!{editedDocument.space.replace("'", "\'")}',
-  page: '$!{editedDocument.name.replace("'", "\'")}',
+  wiki: '$!{escapetool.javascript($editedDocument.wiki)}',
+  space: '$!{escapetool.javascript($editedDocument.space)}',
+  page: '$!{escapetool.javascript($editedDocument.name)}',
   openofficeServerConnected:#if("$!{oomanager.serverState}" == "Connected")'true'#else'false'#end,
 #if($full && $request.sync)
   // Additional configuration for the real-time editing feature.
-  syncPage: '$!{editedDocument.fullName.replace("'", "\'")}',
+  syncPage: '$!{escapetool.javascript($editedDocument.fullName)}',
 #if($request.reset=="1")
   syncReset: 1,
 #end

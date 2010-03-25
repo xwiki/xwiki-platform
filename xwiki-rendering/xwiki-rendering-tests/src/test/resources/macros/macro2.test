@@ -3,6 +3,7 @@
 .# Verify line break behavior between standalone macros.
 .#-----------------------------------------------------
 {{macro/}}
+
 {{macro/}}
 .#-----------------------------------------------------
 .expect|event/1.0

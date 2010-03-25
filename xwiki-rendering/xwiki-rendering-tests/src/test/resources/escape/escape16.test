@@ -3,6 +3,7 @@
 .# Verify that macro content support -- (basically that XHTML renderer correctly escape it)
 .#-----------------------------------------------------------------------------------------
 {{macro}}--{{/macro}}
+
 [[~~-~~->>reference]]
 image:--
 .#-----------------------------------------------------

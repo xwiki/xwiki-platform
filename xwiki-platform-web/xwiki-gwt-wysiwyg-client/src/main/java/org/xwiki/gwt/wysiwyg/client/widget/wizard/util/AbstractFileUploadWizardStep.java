@@ -29,6 +29,7 @@ import org.xwiki.gwt.wysiwyg.client.wiki.Attachment;
 import org.xwiki.gwt.wysiwyg.client.wiki.WikiServiceAsync;
 
 import com.google.gwt.event.shared.HandlerRegistration;
+import com.google.gwt.http.client.URL;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.FileUpload;
 import com.google.gwt.user.client.ui.FlowPanel;
@@ -141,9 +142,9 @@ public abstract class AbstractFileUploadWizardStep implements WizardStep
         // FIXME: un-hardcode this and make it work with multiwiki
         StringBuffer uploadURL = new StringBuffer();
         uploadURL.append("../../upload/");
-        uploadURL.append(getSpace());
+        uploadURL.append(URL.encodeComponent(getSpace()));
         uploadURL.append('/');
-        uploadURL.append(getPage());
+        uploadURL.append(URL.encodeComponent(getPage()));
 
         return uploadURL.toString();
     }

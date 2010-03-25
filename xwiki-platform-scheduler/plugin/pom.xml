@@ -30,7 +30,7 @@
     <version>21</version>
   </parent>
   <artifactId>xwiki-plugin-scheduler</artifactId>
-  <version>1.17</version>
+  <version>1.18-SNAPSHOT</version>
   <name>XWiki Platform - Plugins - Scheduler</name>
   <packaging>jar</packaging>
   <description>XWiki Platform - Plugins - Scheduler</description>
@@ -71,9 +71,9 @@
   <!-- We must configure SCM in each module. For more information see:
        http://svn.xwiki.org/svnroot/xwiki/platform/pom/trunk/pom.xml -->
   <scm>
-    <connection>scm:svn:http://svn.xwiki.org/svnroot/xwiki/platform/xwiki-plugins/tags/xwiki-plugin-scheduler-1.17</connection>
-    <developerConnection>scm:svn:https://svn.xwiki.org/svnroot/xwiki/platform/xwiki-plugins/tags/xwiki-plugin-scheduler-1.17</developerConnection>
-    <url>http://svn.xwiki.org/svnroot/xwiki/platform/xwiki-plugins/tags/xwiki-plugin-scheduler-1.17</url>
+    <connection>scm:svn:http://svn.xwiki.org/svnroot/xwiki/platform/xwiki-plugins/trunk/scheduler</connection>
+    <developerConnection>scm:svn:https://svn.xwiki.org/svnroot/xwiki/platform/xwiki-plugins/trunk/scheduler</developerConnection>
+    <url>http://svn.xwiki.org/svnroot/xwiki/platform/xwiki-plugins/trunk/scheduler</url>
   </scm>
   <issueManagement>
     <system>jira</system>

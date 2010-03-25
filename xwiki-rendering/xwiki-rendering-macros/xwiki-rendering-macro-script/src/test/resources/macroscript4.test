@@ -5,9 +5,11 @@
 {{script}}
 **bold**
 {{/script}}
+
 {{script wiki=false}}
 **not bold**
 {{/script}}
+
 {{script}}**bold**{{/script}}{{script wiki=false}}**not bold**{{/script}}
 .#-----------------------------------------------------
 .expect|event/1.0

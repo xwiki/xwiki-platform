@@ -238,7 +238,8 @@ public class AnnotationXHTMLRendererTest extends AbstractComponentTestCase
 
         xdom.traverse(renderer);
 
-        assertEquals(docFactory.getDocument(docName).getAnnotatedContent(), printer.toString());
+        assertEquals("[" + docName + "] test failed", docFactory.getDocument(docName).getAnnotatedContent(), printer
+            .toString());
     }
 
     /**
@@ -265,6 +266,7 @@ public class AnnotationXHTMLRendererTest extends AbstractComponentTestCase
 
         xdom.traverse(renderer);
 
-        assertEquals(docFactory.getDocument(docName).getRenderedContent(), printer.toString());
+        assertEquals("[" + docName + "] test failed", docFactory.getDocument(docName).getRenderedContent(), printer
+            .toString());
     }
 }

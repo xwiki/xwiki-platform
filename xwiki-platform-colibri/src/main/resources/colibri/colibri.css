@@ -1196,7 +1196,7 @@ ul.xlist li.xitem div.xitemcontainer ul.xlist {
   border: 1px dotted $theme.borderColor;
 }
 
-.code, .code pre  {
+.code, .code pre, .code *  {
   font-family: courier, "courier new", monospace;
   white-space: pre;
 }
@@ -1446,6 +1446,10 @@ ol.footnotes {
   text-align: center;
 }
 
+.rsschanneltitle span a img {
+  margin-left:5px;
+}
+
 .rssfeed .rssitem {
   padding: 5px;
 }
@@ -1676,6 +1680,10 @@ input#tags {
 /* -------------SmartClient tree overrides---------------*/
 body .listGrid {
   border: none;
+}
+#XWEWrapper {
+  /* Fix double scrollbar in IE7&8 */
+  overflow: hidden !important;
 }
 
 /* -----------------------YUI Trees----------------------*/

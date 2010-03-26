@@ -138,5 +138,9 @@ public class XWikiLinkParserTest extends AbstractComponentTestCase
         link = parser.parse("page\\@notinterwiki");
         Assert.assertEquals("page@notinterwiki", link.getReference());
         Assert.assertNull(link.getInterWikiAlias());
+
+        link = parser.parse("page\\\\?query\\\\string");
+        Assert.assertEquals("page\\", link.getReference());
+        Assert.assertEquals("query\\string", link.getQueryString());
     }
 }

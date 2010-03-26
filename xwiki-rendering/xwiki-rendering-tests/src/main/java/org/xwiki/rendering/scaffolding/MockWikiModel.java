@@ -19,7 +19,6 @@
  */
 package org.xwiki.rendering.scaffolding;
 
-import org.apache.commons.lang.StringUtils;
 import org.xwiki.component.descriptor.ComponentDescriptor;
 import org.xwiki.component.descriptor.DefaultComponentDescriptor;
 import org.xwiki.rendering.wiki.WikiModel;
@@ -54,8 +53,7 @@ public class MockWikiModel implements WikiModel
      */
     public String getAttachmentURL(String documentName, String attachmentName)
     {
-        return "/xwiki/bin/download/" + (documentName == null ? "currentdoc" : documentName.replace(".", "/")) + "/"
-            + attachmentName;
+        return "attachmenturl";
     }
 
     /**
@@ -65,17 +63,7 @@ public class MockWikiModel implements WikiModel
      */
     public String getDocumentEditURL(String documentName, String anchor, String queryString)
     {
-        String result =
-            "/xwiki/bin/edit/" + (StringUtils.isBlank(documentName) ? "currentdoc" : documentName.replace(".", "/"));
-        if (anchor != null) {
-            result = result + "#" + anchor;
-        }
-        if (queryString != null) {
-            result = result + "?" + queryString;
-        } else {
-            result = result + "?parent=xwiki%3ASpace.Page";
-        }
-        return result;
+        return "editurl";
     }
 
     /**
@@ -85,15 +73,7 @@ public class MockWikiModel implements WikiModel
      */
     public String getDocumentViewURL(String documentName, String anchor, String queryString)
     {
-        String result =
-            "/xwiki/bin/view/" + (StringUtils.isBlank(documentName) ? "currentdoc" : documentName.replace(".", "/"));
-        if (anchor != null) {
-            result = result + "#" + anchor;
-        }
-        if (queryString != null) {
-            result = result + "?" + queryString;
-        }
-        return result;
+        return "viewurl";
     }
 
     /**

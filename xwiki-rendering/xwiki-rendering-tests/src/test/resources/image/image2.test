@@ -19,11 +19,11 @@ endDocument
 .#-----------------------------------------------------
 .expect|xhtml/1.0
 .#-----------------------------------------------------
-<p>Inline images <img src="/xwiki/bin/download/currentdoc/existing.attachment" class="wikimodel-freestanding" alt="existing.attachment"/> <img src="/xwiki/bin/download/Space/ExistingPage/existing.attachment" class="wikimodel-freestanding" alt="existing.attachment"/></p>
+<p>Inline images <img src="attachmenturl" class="wikimodel-freestanding" alt="existing.attachment"/> <img src="attachmenturl" class="wikimodel-freestanding" alt="existing.attachment"/></p>
 .#-----------------------------------------------------
 .expect|annotatedxhtml/1.0
 .#-----------------------------------------------------
-<p>Inline images <!--startimage:existing.attachment--><img src="/xwiki/bin/download/currentdoc/existing.attachment" class="wikimodel-freestanding" alt="existing.attachment"/><!--stopimage--> <!--startimage:Space.ExistingPage@existing.attachment--><img src="/xwiki/bin/download/Space/ExistingPage/existing.attachment" class="wikimodel-freestanding" alt="existing.attachment"/><!--stopimage--></p>
+<p>Inline images <!--startimage:existing.attachment--><img src="attachmenturl" class="wikimodel-freestanding" alt="existing.attachment"/><!--stopimage--> <!--startimage:Space.ExistingPage@existing.attachment--><img src="attachmenturl" class="wikimodel-freestanding" alt="existing.attachment"/><!--stopimage--></p>
 .#-----------------------------------------------------
 .expect|xwiki/2.0
 .#-----------------------------------------------------
@@ -31,4 +31,4 @@ Inline images image:existing.attachment image:Space.ExistingPage@existing.attach
 .#-----------------------------------------------------
 .input|xhtml/1.0
 .#-----------------------------------------------------
-<html><p>Inline images <!--startimage:existing.attachment--><img src="/xwiki/bin/download/currentdoc/existing.attachment" class="wikimodel-freestanding" alt="existing.attachment"/><!--stopimage--> <!--startimage:Space.ExistingPage@existing.attachment--><img src="/xwiki/bin/download/Space/ExistingPage/existing.attachment" class="wikimodel-freestanding" alt="existing.attachment"/><!--stopimage--></p></html>
+<html><p>Inline images <!--startimage:existing.attachment--><img src="attachmenturl" class="wikimodel-freestanding" alt="existing.attachment"/><!--stopimage--> <!--startimage:Space.ExistingPage@existing.attachment--><img src="attachmenturl" class="wikimodel-freestanding" alt="existing.attachment"/><!--stopimage--></p></html>

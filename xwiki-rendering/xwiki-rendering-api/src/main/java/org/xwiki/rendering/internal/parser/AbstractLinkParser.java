@@ -23,6 +23,7 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.apache.commons.lang.StringUtils;
 import org.xwiki.component.annotation.Requirement;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
@@ -32,14 +33,16 @@ import org.xwiki.rendering.parser.LinkParser;
 import org.xwiki.rendering.wiki.WikiModel;
 
 /**
- * Generic parsing of link content. This class is a helper class for classes implementing link partsers. 
+ * Generic parsing of link content. This class is a helper class for classes implementing link parsers. 
  * The supported format is as follows: <code>(link)(@interWikiAlias)?</code>, where:
  * <ul>
  * <li><code>link</code>: The full link reference using the following syntax:
  * <code>(reference)(#anchor)?(?queryString)?</code>, where:
  * <ul>
  * <li><code>reference</code>: The link reference. This can be either a URI in the form <code>protocol:path</code>
- * (example: "http://xwiki.org", "mailto:john@smith.com) or a wiki page name (example: "wiki:Space.WebHome").</li>
+ * (example: "http://xwiki.org", "mailto:john@smith.com) or a wiki page name (example: "wiki:Space.WebHome").
+ * Note that in the case of a wiki page name the character "\" is used as the escape character (for example if you
+ * wish to have "#" or "?" in your page name you'll need to write "\#" and "\?").</li>
  * <li><code>anchor</code>: An optional anchor name pointing to an anchor defined in the referenced link. Note that in
  * XWiki anchors are automatically created for titles. Example: "TableOfContentAnchor".</li>
  * <li><code>queryString</code>: An optional query string for specifying parameters that will be used in the rendered
@@ -68,6 +71,18 @@ public abstract class AbstractLinkParser  implements LinkParser
      * URL matching pattern.
      */
     private static final Pattern URL_SCHEME_PATTERN = Pattern.compile("[a-zA-Z0-9+.-]*://");
+
+    /**
+     * Escapes to remove when parsing the raw reference.
+     */
+    private static final String[] ESCAPES = new String[] {ESCAPE_CHAR + SEPARATOR_QUERYSTRING,
+        ESCAPE_CHAR + SEPARATOR_INTERWIKI, ESCAPE_CHAR + SEPARATOR_ANCHOR};
+
+    /**
+     * Replacement chars for the escapes to be removed.
+     */
+    private static final String[] ESCAPE_REPLACEMENTS = new String[] {SEPARATOR_QUERYSTRING, SEPARATOR_INTERWIKI,
+        SEPARATOR_ANCHOR};
 
     /**
      * Used to verify if we're in wiki mode or not by looking up an implementation of {@link WikiModel}.
@@ -120,23 +135,22 @@ public abstract class AbstractLinkParser  implements LinkParser
             // We parse the query string early as it can contain our special delimiter characters
             // (like "."). Note: This means that "@" characters are forbidden in the query string...
 
-            String interwikiAlias = parseElementAfterString(content, "@");
+            String interwikiAlias = parseElementAfterString(content, SEPARATOR_INTERWIKI);
             if (interwikiAlias != null) {
                 link.setInterWikiAlias(interwikiAlias);
                 link.setType(LinkType.INTERWIKI);
             }
 
-            link.setQueryString(parseElementAfterString(content, "?"));
+            link.setQueryString(parseElementAfterString(content, SEPARATOR_QUERYSTRING));
 
-            link.setAnchor(parseElementAfterString(content, "#"));
+            link.setAnchor(parseElementAfterString(content, SEPARATOR_ANCHOR));
 
             // What remains in the content buffer is the page name or the interwiki reference if any.
             // If the content is empty then it means no page was specified. This is allowed and in that
             // case it'll be the renderer deciding what to print.
 
-            // TODO: Check for invalid characters in a page
-
-            link.setReference(content.toString());
+            // Remove escapes for "@", "#" and "?" (if any)
+            link.setReference(removeEscapes(content.toString()));
         }
 
         return link;
@@ -189,7 +203,8 @@ public abstract class AbstractLinkParser  implements LinkParser
         String element = null;
 
         int index = content.lastIndexOf(separator);
-        if (index != -1) {
+        // Check if the element is found and if it's not escaped.
+        if (index == 0 || (index > 0 && content.charAt(index - 1) != ESCAPE_CHAR)) {
             element = content.substring(index + separator.length()).trim();
             content.delete(index, content.length());
         }
@@ -209,5 +224,14 @@ public abstract class AbstractLinkParser  implements LinkParser
             result = false;
         }
         return result;
+    }
+
+    /**
+     * @param reference the reference from which to remove unneeded escapes
+     * @return the cleaned reference
+     */
+    private String removeEscapes(String reference)
+    {
+        return StringUtils.replaceEach(reference, ESCAPES, ESCAPE_REPLACEMENTS);
     }
 }

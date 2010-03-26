@@ -14,11 +14,11 @@ endDocument
 .#-----------------------------------------------------
 .expect|xhtml/1.0
 .#-----------------------------------------------------
-<p><span class="wikilink"><a href="/xwiki/bin/view/Space/ExistingPage"><span class="wikigeneratedlinkcontent">Space.ExistingPage</span></a></span></p>
+<p><span class="wikilink"><a href="viewurl"><span class="wikigeneratedlinkcontent">Space.ExistingPage</span></a></span></p>
 .#-----------------------------------------------------
 .expect|annotatedxhtml/1.0
 .#-----------------------------------------------------
-<p><!--startwikilink:Space.ExistingPage--><span class="wikilink"><a href="/xwiki/bin/view/Space/ExistingPage"><span class="wikigeneratedlinkcontent">Space.ExistingPage</span></a></span><!--stopwikilink--></p>
+<p><!--startwikilink:Space.ExistingPage--><span class="wikilink"><a href="viewurl"><span class="wikigeneratedlinkcontent">Space.ExistingPage</span></a></span><!--stopwikilink--></p>
 .#-----------------------------------------------------
 .expect|xwiki/2.0
 .#-----------------------------------------------------
@@ -26,7 +26,7 @@ endDocument
 .#-----------------------------------------------------
 .input|xhtml/1.0
 .#-----------------------------------------------------
-<html><p><!--startwikilink:Space.ExistingPage--><span class="wikilink"><a href="/xwiki/bin/view/Space/ExistingPage"><span class="wikigeneratedlinkcontent">Space.ExistingPage</span></a></span><!--stopwikilink--></p></html>
+<html><p><!--startwikilink:Space.ExistingPage--><span class="wikilink"><a href="viewurl"><span class="wikigeneratedlinkcontent">Space.ExistingPage</span></a></span><!--stopwikilink--></p></html>
 .#-----------------------------------------------------
 .expect|plain/1.0
 .#-----------------------------------------------------

@@ -21,11 +21,11 @@ endDocument
 .#-----------------------------------------------------
 .expect|xhtml/1.0
 .#-----------------------------------------------------
-<p>Inline attachment <span class="wikiexternallink"><a class="wikimodel-freestanding" href="/xwiki/bin/download/currentdoc/existing.attachment"><span class="wikigeneratedlinkcontent">existing.attachment</span></a></span> <span class="wikiexternallink"><a class="wikimodel-freestanding" href="/xwiki/bin/download/Space/ExistingPage/existing.attachment"><span class="wikigeneratedlinkcontent">existing.attachment</span></a></span></p>
+<p>Inline attachment <span class="wikiexternallink"><a class="wikimodel-freestanding" href="attachmenturl"><span class="wikigeneratedlinkcontent">existing.attachment</span></a></span> <span class="wikiexternallink"><a class="wikimodel-freestanding" href="attachmenturl"><span class="wikigeneratedlinkcontent">existing.attachment</span></a></span></p>
 .#-----------------------------------------------------
 .expect|annotatedxhtml/1.0
 .#-----------------------------------------------------
-<p>Inline attachment <!--startwikilink:attach:existing.attachment--><span class="wikiexternallink"><a class="wikimodel-freestanding" href="/xwiki/bin/download/currentdoc/existing.attachment"><span class="wikigeneratedlinkcontent">existing.attachment</span></a></span><!--stopwikilink--> <!--startwikilink:attach:Space.ExistingPage@existing.attachment--><span class="wikiexternallink"><a class="wikimodel-freestanding" href="/xwiki/bin/download/Space/ExistingPage/existing.attachment"><span class="wikigeneratedlinkcontent">existing.attachment</span></a></span><!--stopwikilink--></p>
+<p>Inline attachment <!--startwikilink:attach:existing.attachment--><span class="wikiexternallink"><a class="wikimodel-freestanding" href="attachmenturl"><span class="wikigeneratedlinkcontent">existing.attachment</span></a></span><!--stopwikilink--> <!--startwikilink:attach:Space.ExistingPage@existing.attachment--><span class="wikiexternallink"><a class="wikimodel-freestanding" href="attachmenturl"><span class="wikigeneratedlinkcontent">existing.attachment</span></a></span><!--stopwikilink--></p>
 .#-----------------------------------------------------
 .expect|xwiki/2.0
 .#-----------------------------------------------------
@@ -33,4 +33,4 @@ Inline attachment attach:existing.attachment attach:Space.ExistingPage@existing.
 .#-----------------------------------------------------
 .input|xhtml/1.0
 .#-----------------------------------------------------
-<html><p>Inline attachment <!--startwikilink:attach:existing.attachment--><span class="wikiexternallink"><a class="wikimodel-freestanding" href="/xwiki/bin/download/currentdoc/existing.attachment"><span class="wikigeneratedlinkcontent">existing.attachment</span></a></span><!--stopwikilink--> <!--startwikilink:attach:Space.ExistingPage@existing.attachment--><span class="wikiexternallink"><a class="wikimodel-freestanding" href="/xwiki/bin/download/Space/ExistingPage/existing.attachment"><span class="wikigeneratedlinkcontent">existing.attachment</span></a></span><!--stopwikilink--></p></html>
+<html><p>Inline attachment <!--startwikilink:attach:existing.attachment--><span class="wikiexternallink"><a class="wikimodel-freestanding" href="attachmenturl"><span class="wikigeneratedlinkcontent">existing.attachment</span></a></span><!--stopwikilink--> <!--startwikilink:attach:Space.ExistingPage@existing.attachment--><span class="wikiexternallink"><a class="wikimodel-freestanding" href="attachmenturl"><span class="wikigeneratedlinkcontent">existing.attachment</span></a></span><!--stopwikilink--></p></html>

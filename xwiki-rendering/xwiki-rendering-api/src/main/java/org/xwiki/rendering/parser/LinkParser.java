@@ -36,6 +36,26 @@ import org.xwiki.rendering.listener.Link;
 public interface LinkParser
 {
     /**
+     * Interwiki link separator.
+     */
+    String SEPARATOR_INTERWIKI = "@";
+
+    /**
+     * Query String separator.
+     */
+    String SEPARATOR_QUERYSTRING = "?";
+
+    /**
+     * Anchor separator.
+     */
+    String SEPARATOR_ANCHOR = "#";
+
+    /**
+     * Escape character to allow "#", "@" and "?" characters in a reference's name.
+     */
+    char ESCAPE_CHAR = '\\';
+
+    /**
      * Parses a link represented as a String into a {@link Link} object.
      * 
      * @param rawLink the string representation of the link to parse (the supported syntax depends on the parser

@@ -16,11 +16,11 @@ endDocument
 .#-----------------------------------------------------
 .expect|xhtml/1.0
 .#-----------------------------------------------------
-<p><span class="wikiexternallink"><a href="http://xwiki.org"><img src="/xwiki/bin/download/currentdoc/attach.png" class="wikimodel-freestanding" alt="attach.png"/></a></span></p>
+<p><span class="wikiexternallink"><a href="http://xwiki.org"><img src="attachmenturl" class="wikimodel-freestanding" alt="attach.png"/></a></span></p>
 .#-----------------------------------------------------
 .expect|annotatedxhtml/1.0
 .#-----------------------------------------------------
-<p><!--startwikilink:http://xwiki.org--><span class="wikiexternallink"><a href="http://xwiki.org"><!--startimage:attach.png--><img src="/xwiki/bin/download/currentdoc/attach.png" class="wikimodel-freestanding" alt="attach.png"/><!--stopimage--></a></span><!--stopwikilink--></p>
+<p><!--startwikilink:http://xwiki.org--><span class="wikiexternallink"><a href="http://xwiki.org"><!--startimage:attach.png--><img src="attachmenturl" class="wikimodel-freestanding" alt="attach.png"/><!--stopimage--></a></span><!--stopwikilink--></p>
 .#-----------------------------------------------------
 .expect|xwiki/2.0
 .#-----------------------------------------------------
@@ -28,4 +28,4 @@ endDocument
 .#-----------------------------------------------------
 .input|xhtml/1.0
 .#-----------------------------------------------------
-<html><p><!--startwikilink:http://xwiki.org--><span class="wikiexternallink"><a href="http://xwiki.org"><!--startimage:attach.png--><img src="/xwiki/bin/download/currentdoc/attach.png" class="wikimodel-freestanding" alt="attach.png"/><!--stopimage--></a></span><!--stopwikilink--></p></html>
+<html><p><!--startwikilink:http://xwiki.org--><span class="wikiexternallink"><a href="http://xwiki.org"><!--startimage:attach.png--><img src="attachmenturl" class="wikimodel-freestanding" alt="attach.png"/><!--stopimage--></a></span><!--stopwikilink--></p></html>

@@ -16,11 +16,11 @@ endDocument
 .#-----------------------------------------------------
 .expect|xhtml/1.0
 .#-----------------------------------------------------
-<p><img src="/xwiki/bin/download/currentdoc/my.png" param1="value1" param2="value2" alt="my.png"/><br/><img src="/xwiki/bin/download/Space/ExistingPage/my.png" alt="my.png"/></p>
+<p><img src="attachmenturl" param1="value1" param2="value2" alt="my.png"/><br/><img src="attachmenturl" alt="my.png"/></p>
 .#-----------------------------------------------------
 .expect|annotatedxhtml/1.0
 .#-----------------------------------------------------
-<p><!--startimage:my.png--><img src="/xwiki/bin/download/currentdoc/my.png" param1="value1" param2="value2" alt="my.png"/><!--stopimage--><br/><!--startimage:Space.ExistingPage@my.png--><img src="/xwiki/bin/download/Space/ExistingPage/my.png" alt="my.png"/><!--stopimage--></p>
+<p><!--startimage:my.png--><img src="attachmenturl" param1="value1" param2="value2" alt="my.png"/><!--stopimage--><br/><!--startimage:Space.ExistingPage@my.png--><img src="attachmenturl" alt="my.png"/><!--stopimage--></p>
 .#-----------------------------------------------------
 .expect|xwiki/2.0
 .#-----------------------------------------------------
@@ -29,4 +29,4 @@ endDocument
 .#-----------------------------------------------------
 .input|xhtml/1.0
 .#-----------------------------------------------------
-<html><p><!--startimage:my.png--><img src="/xwiki/bin/download/currentdoc/my.png" param1="value1" param2="value2" alt="my.png"/><!--stopimage--><br/><!--startimage:Space.ExistingPage@my.png--><img src="/xwiki/bin/download/Space/ExistingPage/my.png" alt="my.png"/><!--stopimage--></p></html>
+<html><p><!--startimage:my.png--><img src="attachmenturl" param1="value1" param2="value2" alt="my.png"/><!--stopimage--><br/><!--startimage:Space.ExistingPage@my.png--><img src="attachmenturl" alt="my.png"/><!--stopimage--></p></html>

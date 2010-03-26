@@ -57,7 +57,6 @@ public class XWikiLinkParserTest extends AbstractComponentTestCase
     @Test
     public void testParseLinksWhenInWikiMode() throws Exception
     {
-
         Link link = parser.parse("");
         Assert.assertEquals("", link.getReference());
         Assert.assertEquals("Reference = []", link.toString());
@@ -123,6 +122,21 @@ public class XWikiLinkParserTest extends AbstractComponentTestCase
         Assert.assertEquals("mywiki:http://xwiki.org", link.getReference());
         Assert.assertEquals(LinkType.DOCUMENT, link.getType());
         Assert.assertEquals("Reference = [mywiki:http://xwiki.org]", link.toString());
+    }
 
+    @Test
+    public void testParseLinksWithEscapes() throws Exception
+    {
+        Link link = parser.parse("\\.\\#notanchor");
+        Assert.assertEquals("\\.#notanchor", link.getReference());
+        Assert.assertNull(link.getAnchor());
+
+        link = parser.parse("page\\?notquerystring");
+        Assert.assertEquals("page?notquerystring", link.getReference());
+        Assert.assertNull(link.getQueryString());
+
+        link = parser.parse("page\\@notinterwiki");
+        Assert.assertEquals("page@notinterwiki", link.getReference());
+        Assert.assertNull(link.getInterWikiAlias());
     }
 }

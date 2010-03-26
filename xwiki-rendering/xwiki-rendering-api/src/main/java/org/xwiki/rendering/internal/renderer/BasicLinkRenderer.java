@@ -19,7 +19,10 @@
  */
 package org.xwiki.rendering.internal.renderer;
 
+import org.apache.commons.lang.StringUtils;
 import org.xwiki.rendering.listener.Link;
+import org.xwiki.rendering.listener.LinkType;
+import org.xwiki.rendering.parser.LinkParser;
 
 /**
  * Generate a string representation of a {@link}'s reference using the format:
@@ -31,6 +34,22 @@ import org.xwiki.rendering.listener.Link;
 public class BasicLinkRenderer
 {
     /**
+     * Escapes to add when rendering a link reference.
+     */
+    private static final String[] ESCAPE_REPLACEMENTS = new String[] {
+        LinkParser.ESCAPE_CHAR + LinkParser.SEPARATOR_QUERYSTRING,
+        LinkParser.ESCAPE_CHAR + LinkParser.SEPARATOR_INTERWIKI,
+        LinkParser.ESCAPE_CHAR + LinkParser.SEPARATOR_ANCHOR};
+
+    /**
+     * Replacement chars for the escapes to add.
+     */
+    private static final String[] ESCAPES = new String[] {
+        LinkParser.SEPARATOR_QUERYSTRING,
+        LinkParser.SEPARATOR_INTERWIKI,
+        LinkParser.SEPARATOR_ANCHOR};
+
+    /**
      * @param link the link for which to generate a string representation
      * @return the string representation using the format:
      *         {@code (reference)[#anchor][?queryString][@interwikialias]}.
@@ -40,7 +59,13 @@ public class BasicLinkRenderer
         StringBuilder buffer = new StringBuilder();
 
         if (link.getReference() != null) {
-            buffer.append(link.getReference());
+            // Make sure we escape special chars: #, @ and ? as they have special meaning in links, but only for
+            // links to documents
+            String normalizedReference = link.getReference();
+            if (link.getType() == LinkType.DOCUMENT) {
+                normalizedReference = StringUtils.replaceEach(link.getReference(), ESCAPES, ESCAPE_REPLACEMENTS);
+            }
+            buffer.append(normalizedReference);
         }
         if (link.getAnchor() != null) {
             buffer.append('#');

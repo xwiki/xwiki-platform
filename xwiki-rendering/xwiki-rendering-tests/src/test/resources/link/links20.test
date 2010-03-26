@@ -15,11 +15,11 @@ endDocument
 .#-----------------------------------------------------
 .expect|xhtml/1.0
 .#-----------------------------------------------------
-<p><span class="wikicreatelink"><a href="/xwiki/bin/edit/\?parent=xwiki%3ASpace.Page"><span class="wikigeneratedlinkcontent">\</span></a></span></p>
+<p><span class="wikicreatelink"><a href="editurl"><span class="wikigeneratedlinkcontent">\</span></a></span></p>
 .#-----------------------------------------------------
 .expect|annotatedxhtml/1.0
 .#-----------------------------------------------------
-<p><!--startwikilink:\\--><span class="wikicreatelink"><a href="/xwiki/bin/edit/\?parent=xwiki%3ASpace.Page"><span class="wikigeneratedlinkcontent">\</span></a></span><!--stopwikilink--></p>
+<p><!--startwikilink:\\--><span class="wikicreatelink"><a href="editurl"><span class="wikigeneratedlinkcontent">\</span></a></span><!--stopwikilink--></p>
 .#-----------------------------------------------------
 .expect|xwiki/2.0
 .#-----------------------------------------------------
@@ -27,4 +27,4 @@ endDocument
 .#-----------------------------------------------------
 .input|xhtml/1.0
 .#-----------------------------------------------------
-<p><!--startwikilink:\\--><span class="wikicreatelink"><a href="/xwiki/bin/edit/\?parent=xwiki%3ASpace.Page"><span class="wikigeneratedlinkcontent">\</span></a></span><!--stopwikilink--></p>
+<p><!--startwikilink:\\--><span class="wikicreatelink"><a href="editurl"><span class="wikigeneratedlinkcontent">\</span></a></span><!--stopwikilink--></p>

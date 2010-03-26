@@ -6,4 +6,4 @@
 .#-----------------------------------------------------
 .expect|xhtml/1.0
 .#-----------------------------------------------------
-<p><span class="wikicreatelink"><a href="/xwiki/bin/edit/ Spa ce/Pa ge ?parent=xwiki%3ASpace.Page">label</a></span></p>
+<p><span class="wikicreatelink"><a href="editurl">label</a></span></p>

@@ -14,7 +14,7 @@ endDocument
 .#-----------------------------------------------------
 .expect|xhtml/1.0
 .#-----------------------------------------------------
-<p><img src="/xwiki/bin/download/wiki:Space/Page/file.ext" class="wikimodel-freestanding" alt="file.ext"/></p>
+<p><img src="attachmenturl" class="wikimodel-freestanding" alt="file.ext"/></p>
 .#-----------------------------------------------------
 .expect|xwiki/2.0
 .#-----------------------------------------------------

@@ -129,7 +129,6 @@ XWiki.Blog = {
 
   initialize : function() {
     XWiki.Blog.addBehaviorToBlogTools();
-    XWiki.Blog.addBehaviorToNewPostForm();
   },
 
   addBehaviorToBlogTools : function() {

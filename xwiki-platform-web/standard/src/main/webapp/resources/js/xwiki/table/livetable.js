@@ -578,10 +578,12 @@ var LiveTableFilter = Class.create({
     for (var i = 0; i < inputs.length; ++i) {
       var key = inputs[i].name;
       if ((inputs[i].type == "radio") || (inputs[i].type == "checkbox")) {
-        if (this.filters[key] && (this.filters[key] == inputs[i].value.strip())) {
-          inputs[i].checked = true;
-        } else {
-          inputs[i].checked = false;
+        if (this.filters[key]) {
+          if (this.filters[key] == inputs[i].value.strip()) {
+            inputs[i].checked = true;
+          } else {
+            inputs[i].checked = false;
+          }
         }
       } else {
         if (this.filters[key]) {
@@ -592,8 +594,11 @@ var LiveTableFilter = Class.create({
 
     var selects = this.filterNode.select("select");
     for (var i = 0; i < selects.length; ++i) {
+      if (!this.filters[selects[i].name]) {
+        continue;
+      }
       for (var j = 0; j < selects[i].options.length; ++j) {
-        if (this.filters[selects[i].name] && (selects[i].options[j].value == this.filters[selects[i].name])) {
+        if (selects[i].options[j].value == this.filters[selects[i].name]) {
           selects[i].options[j].selected = true;
         } else {
           selects[i].options[j].selected = false;

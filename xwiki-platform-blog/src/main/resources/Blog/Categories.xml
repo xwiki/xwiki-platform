@@ -86,8 +86,8 @@
 <content>{{include document="Blog.CategoriesCode"/}}
 {{velocity filter="none"}}
 {{html clean="false" wiki="true"}}
-$xwiki.ssx.use("Blog.ManageCategories")##
-$xwiki.jsx.use("Blog.ManageCategories")##
+$xwiki.ssx.use('Blog.ManageCategories')##
+$xwiki.jsx.use('Blog.ManageCategories')##
 
 &lt;div class="blog-categories-list"&gt;
 #getCategoriesHierarchy($doc.space $tree)
@@ -95,7 +95,7 @@ $xwiki.jsx.use("Blog.ManageCategories")##
 #if($xwiki.hasAccessLevel('edit', $context.user, $doc.fullName))
 * (% class="blog-add-category-label" %)[[$msg.get('xe.blog.categories.addcategory')&gt;&gt;Blog.ManageCategories?xaction=showAddCategory&amp;parentCategory=${doc.fullName}]](%%)
 ##
-#if("$!{request.xaction}" == "showAddCategory" &amp;&amp; "$!{request.parentCategory}" == "${doc.fullName}") #addCategoryForm() #end
+#if("$!{request.xaction}" == 'showAddCategory' &amp;&amp; "$!{request.parentCategory}" == ${doc.fullName}) #addCategoryForm() #end
 ##
 #end
 

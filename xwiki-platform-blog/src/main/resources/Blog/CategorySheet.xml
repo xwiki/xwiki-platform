@@ -61,7 +61,7 @@ $xwiki.jsx.use("Blog.ManageCategories")##
 #if($doc.getObject($blogCategoryClassname))
   #getEntriesForCategory($doc.fullName $discard $totalEntries)
 
-&lt;h1&gt;Category: #getCategoryName($doc) ($totalEntries posts) &lt;a href="$xwiki.getURL('Blog.CategoryRss', 'view', "xpage=plain&amp;amp;category=${doc.fullName}")" title="RSS"&gt;#toolImage('feed' '[RSS]')&lt;/a&gt;&lt;/h1&gt;
+&lt;h1&gt;Category: #getCategoryName($doc) ($totalEntries posts) &lt;a href="$xwiki.getURL('Blog.CategoryRss', 'view', "xpage=plain&amp;amp;category=${escapetool.url($doc.fullName)}")" title="RSS"&gt;#toolImage('feed' '[RSS]')&lt;/a&gt;&lt;/h1&gt;
   #if($context.action != 'inline')
     {{include document="Blog.CreatePost"/}}
     #getCategoriesHierarchy($doc.space $tree)

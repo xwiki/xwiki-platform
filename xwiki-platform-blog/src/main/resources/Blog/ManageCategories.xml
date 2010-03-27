@@ -205,7 +205,7 @@ XWiki.blog.Categories = Class.create({
     form._x_item = item;
     item.up('.blog-category-tools').insert({after : form});
     var category = form.down('input[name=category]');
-    category.value = decodeURIComponent(item.href.substring(item.href.indexOf('category=') + 9));
+    category.value = decodeURIComponent(item.href.substring(item.href.indexOf('category=') + 9).replace(/\+/g, ' '));
     this.activateForm(form);
   },
   ajaxifyRenameForm : function(form) {
@@ -337,7 +337,8 @@ XWiki.blog.Categories = Class.create({
     select.selectedIndex = 0;
     if (item.hasClassName('tool')) {
       item.up('.blog-category-tools').insert({after : form});
-      var option = select.down('option[value=' + decodeURIComponent(item.href.substring(item.href.indexOf('parentCategory=') + 15)) + ']');
+      var selector = 'option[value=\'' + decodeURIComponent(item.href.substring(item.href.indexOf('parentCategory=') + 15).replace(/\+/g, ' ')).replace(/\\/g, "\\\\").replace(/'/g, "\\'") + '\']';
+      var option = select.down(selector);
       if (option) {
         select.selectedIndex = option.index;
       }

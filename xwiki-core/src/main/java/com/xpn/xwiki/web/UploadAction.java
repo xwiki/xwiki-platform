@@ -21,6 +21,7 @@
 package com.xpn.xwiki.web;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -150,8 +151,6 @@ public class UploadAction extends XWikiAction
         XWikiResponse response = context.getResponse();
         String username = context.getUser();
 
-        byte[] data = fileupload.getFileItemData(fieldName, context);
-
         // Read XWikiAttachment
         XWikiAttachment attachment = doc.getAttachment(filename);
 
@@ -159,7 +158,21 @@ public class UploadAction extends XWikiAction
             attachment = new XWikiAttachment();
             doc.getAttachmentList().add(attachment);
         }
-        attachment.setContent(data);
+
+        int fisize = fileupload.getFileItemSize(fieldName, context);
+
+        try {
+            if (fisize > 0) {
+                InputStream fiis = fileupload.getFileItemInputStream(fieldName, context);
+                attachment.setContent(fiis, fisize);
+            } else {
+                attachment.setContent(new byte[0]);
+            }
+        } catch (IOException e) {
+            throw new XWikiException(XWikiException.MODULE_XWIKI_APP,
+                XWikiException.ERROR_XWIKI_APP_UPLOAD_FILE_EXCEPTION, "Exception while reading uploaded parsed file", e);
+        }
+
         attachment.setFilename(filename);
         attachment.setAuthor(username);
 

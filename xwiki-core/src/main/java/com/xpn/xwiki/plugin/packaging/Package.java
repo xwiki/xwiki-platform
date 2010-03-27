@@ -28,7 +28,6 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -49,7 +48,6 @@ import org.dom4j.dom.DOMDocument;
 import org.dom4j.dom.DOMElement;
 import org.dom4j.io.OutputFormat;
 import org.dom4j.io.SAXReader;
-import org.dom4j.io.XMLWriter;
 import org.xwiki.query.QueryException;
 
 import com.xpn.xwiki.XWiki;
@@ -57,6 +55,8 @@ import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiAttachment;
 import com.xpn.xwiki.doc.XWikiDocument;
+import com.xpn.xwiki.internal.xml.UnclosableInputStream;
+import com.xpn.xwiki.internal.xml.XMLWriter;
 import com.xpn.xwiki.objects.classes.BaseClass;
 
 public class Package
@@ -359,10 +359,34 @@ public class Package
         return "";
     }
 
+    /**
+     * Load this package in memory from a byte array. It may be installed later using {@link #install(XWikiContext)}.
+     * Your should prefer {@link #Import(InputStream, XWikiContext) which may avoid loading the package twice in memory.
+     *
+     * @param file a byte array containing the content of a zipped package file
+     * @param context current XWikiContext
+     * @return an empty string, useless.
+     * @throws IOException while reading the ZipFile
+     * @throws XWikiException when package content is broken
+     */
     public String Import(byte file[], XWikiContext context) throws IOException, XWikiException
     {
-        ByteArrayInputStream bais = new ByteArrayInputStream(file);
-        ZipInputStream zis = new ZipInputStream(bais);
+        return Import(new ByteArrayInputStream(file), context);
+    }
+
+    /**
+     * Load this package in memory from an InputStream. It may be installed later using {@link #install(XWikiContext)}.
+     * 
+     * @param file an InputStream of a zipped package file
+     * @param context current XWikiContext
+     * @return an empty string, useless.
+     * @throws IOException while reading the ZipFile
+     * @throws XWikiException when package content is broken
+     * @since 2.3M2
+     */
+    public String Import(InputStream file, XWikiContext context) throws IOException, XWikiException
+    {
+        ZipInputStream zis = new ZipInputStream(file);
         ZipEntry entry;
         Document description = null;
 
@@ -371,8 +395,8 @@ public class Package
             if (description == null) {
                 throw new PackageException(XWikiException.ERROR_XWIKI_UNKNOWN, "Could not find the package definition");
             }
-            bais = new ByteArrayInputStream(file);
-            zis = new ZipInputStream(bais);
+            file.reset();
+            zis = new ZipInputStream(file);
             while ((entry = zis.getNextEntry()) != null) {
                 // Don't read the package.xml file (since we've already read it above),
                 // directories or any file in the META-INF directory (we use that directory
@@ -383,7 +407,7 @@ public class Package
                 } else {
                     XWikiDocument doc = null;
                     try {
-                        doc = readFromXML(readByteArrayFromInputStream(zis, entry.getSize()));
+                        doc = readFromXML(new UnclosableInputStream(zis));
                     } catch (Throwable ex) {
                         LOG.warn("Failed to parse document [" + entry.getName()
                             + "] from XML during import, thus it will not be installed. " + "The error was: "
@@ -568,7 +592,8 @@ public class Package
         }
     }
 
-    private int installDocument(DocumentInfo doc, boolean isAdmin, boolean backup, XWikiContext context) throws XWikiException
+    private int installDocument(DocumentInfo doc, boolean isAdmin, boolean backup, XWikiContext context)
+        throws XWikiException
     {
         if (this.preserveVersion && this.withVersions) {
             // Right now importing an archive and the history revisions it contains
@@ -636,7 +661,7 @@ public class Package
                 if (!this.withVersions) {
                     doc.getDoc().setVersion("1.1");
                 }
-                
+
                 // Does the document to be imported already exists in the wiki ?
                 boolean isNewDocument = previousdoc == null;
 
@@ -645,7 +670,7 @@ public class Package
 
                 // Does the document from the package contains history revisions ?
                 boolean packageHasHistory = this.documentContainsHistory(doc);
-                
+
                 // Reset to initial (1.1) version when we don't want to conserve existing history and either we don't
                 // want the package history or this latter one is empty
                 boolean shouldResetToInitialVersion =
@@ -787,18 +812,6 @@ public class Package
         }
     }
 
-    private ByteArrayInputStream readByteArrayFromInputStream(ZipInputStream zin, long size) throws IOException
-    {
-        ByteArrayOutputStream baos = new ByteArrayOutputStream((size > 0) ? (int) size : 4096);
-        byte[] data = new byte[4096];
-        int cnt;
-        while ((cnt = zin.read(data, 0, 4096)) != -1) {
-            baos.write(data, 0, cnt);
-        }
-
-        return new ByteArrayInputStream(baos.toByteArray());
-    }
-
     /**
      * Create a {@link XWikiDocument} from xml stream.
      * 
@@ -846,80 +859,111 @@ public class Package
         return null;
     }
 
+    /**
+     * You should prefer {@link #toXML(com.xpn.xwiki.internal.xml.XMLWriter)}. If an error occurs, a stacktrace is dump
+     * to logs, and an empty String is returned.
+     * 
+     * @return a package.xml file for the this package
+     */
     public String toXml(XWikiContext context)
     {
-        OutputFormat outputFormat = new OutputFormat("", true);
-        outputFormat.setEncoding(context.getWiki().getEncoding());
-        StringWriter out = new StringWriter();
-        XMLWriter writer = new XMLWriter(out, outputFormat);
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
         try {
-            writer.write(toXmlDocument());
-
-            return out.toString();
+            toXML(baos, context);
+            return baos.toString(context.getWiki().getEncoding());
         } catch (IOException e) {
             e.printStackTrace();
-
             return "";
         }
     }
 
-    private Document toXmlDocument()
+    /**
+     * Write the package.xml file to an {@link com.xpn.xwiki.internal.xml.âxpn.âxwiki.âutil.XMLWriter}
+     * 
+     * @param wr the writer to write to
+     * @throws IOException when an error occurs during streaming operation
+     * @since 2.3M2
+     */
+    public void toXML(XMLWriter wr) throws IOException
     {
-        Document doc = new DOMDocument();
         Element docel = new DOMElement("package");
-        doc.setRootElement(docel);
+        wr.writeOpen(docel);
+
         Element elInfos = new DOMElement("infos");
-        docel.add(elInfos);
+        wr.write(elInfos);
 
         Element el = new DOMElement("name");
         el.addText(this.name);
-        elInfos.add(el);
+        wr.write(el);
 
         el = new DOMElement("description");
         el.addText(this.description);
-        elInfos.add(el);
+        wr.write(el);
 
         el = new DOMElement("licence");
         el.addText(this.licence);
-        elInfos.add(el);
+        wr.write(el);
 
         el = new DOMElement("author");
         el.addText(this.authorName);
-        elInfos.add(el);
+        wr.write(el);
 
         el = new DOMElement("version");
         el.addText(this.version);
-        elInfos.add(el);
+        wr.write(el);
 
         el = new DOMElement("backupPack");
         el.addText(new Boolean(this.backupPack).toString());
-        elInfos.add(el);
+        wr.write(el);
 
         el = new DOMElement("preserveVersion");
         el.addText(new Boolean(this.preserveVersion).toString());
-        elInfos.add(el);
+        wr.write(el);
 
         Element elfiles = new DOMElement("files");
-        docel.add(elfiles);
+        wr.writeOpen(elfiles);
 
         for (DocumentInfo docInfo : this.files) {
             Element elfile = new DOMElement("file");
             elfile.addAttribute("defaultAction", String.valueOf(docInfo.getAction()));
             elfile.addAttribute("language", String.valueOf(docInfo.getLanguage()));
             elfile.addText(docInfo.getFullName());
-            elfiles.add(elfile);
+            wr.write(elfile);
         }
-
-        return doc;
     }
 
-    private void addInfosToZip(ZipOutputStream zos, XWikiContext context)
+    /**
+     * Write the package.xml file to an OutputStream
+     * 
+     * @param out the OutputStream to write to
+     * @param context curent XWikiContext
+     * @throws IOException when an error occurs during streaming operation
+     * @since 2.3M2
+     */
+    public void toXML(OutputStream out, XWikiContext context) throws IOException
+    {
+        XMLWriter wr = new XMLWriter(out, new OutputFormat("", true, context.getWiki().getEncoding()));
+
+        Document doc = new DOMDocument();
+        wr.writeDocumentStart(doc);
+        toXML(wr);
+        wr.writeDocumentEnd(doc);
+    }
+
+    /**
+     * Write the package.xml file to a ZipOutputStream
+     * 
+     * @param zos the ZipOutputStream to write to
+     * @param context curent XWikiContext
+     * @throws IOException when an error occurs during streaming operation
+     */
+    private void addInfosToZip(ZipOutputStream zos, XWikiContext context) throws IOException
     {
         try {
             String zipname = DefaultPackageFileName;
             ZipEntry zipentry = new ZipEntry(zipname);
             zos.putNextEntry(zipentry);
-            zos.write(toXml(context).getBytes(context.getWiki().getEncoding()));
+            toXML(zos, context);
             zos.closeEntry();
         } catch (Exception e) {
             e.printStackTrace();
@@ -960,30 +1004,21 @@ public class Package
         return fileName.toString();
     }
 
+    /**
+     * Write an XML serialized XWikiDocument to a ZipOutputStream
+     * 
+     * @param doc the document to serialize
+     * @param zos the ZipOutputStream to write to
+     * @param withVersions if true, also serialize all document versions
+     * @param context current XWikiContext
+     * @throws XWikiException when an error occurs during documents access
+     * @throws IOException when an error occurs during streaming operation
+     */
     public void addToZip(XWikiDocument doc, ZipOutputStream zos, boolean withVersions, XWikiContext context)
-        throws IOException
+        throws XWikiException, IOException
     {
-        try {
-            String zipname = getPathFromDocument(doc, context);
-            ZipEntry zipentry = new ZipEntry(zipname);
-            zos.putNextEntry(zipentry);
-            String docXml = doc.toXML(true, false, true, withVersions, context);
-
-            // Ensure that a non-admin user do not get to see user's passwords. Note that this
-            // is for backward compatibility for passwords that are stored in clear. As of
-            // XWiki 1.0 RC2 passwords are now hashed and thus it's no longer important that users
-            // get to see them.
-            if (!context.getWiki().getRightService().hasAdminRights(context)) {
-                docXml =
-                    context.getUtil().substitute("s/<password>.*?<\\/password>/<password>********<\\/password>/goi",
-                        docXml);
-            }
-
-            zos.write(docXml.getBytes(context.getWiki().getEncoding()));
-            zos.closeEntry();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+        String zipname = getPathFromDocument(doc, context);
+        doc.addToZip(zos, zipname, withVersions, context);
     }
 
     public void addToDir(XWikiDocument doc, File dir, boolean withVersions, XWikiContext context) throws XWikiException
@@ -1001,14 +1036,8 @@ public class Package
             }
             String filename = getFileNameFromDocument(doc, context);
             File file = new File(spacedir, filename);
-            String xml = doc.toXML(true, false, true, withVersions, context);
-            if (!context.getWiki().getRightService().hasAdminRights(context)) {
-                xml =
-                    context.getUtil().substitute("s/<password>.*?<\\/password>/<password>********<\\/password>/goi",
-                        xml);
-            }
             FileOutputStream fos = new FileOutputStream(file);
-            fos.write(xml.getBytes(context.getWiki().getEncoding()));
+            doc.toXML(fos, true, false, true, withVersions, context);
             fos.flush();
             fos.close();
         } catch (ExcludeDocumentException e) {
@@ -1028,7 +1057,7 @@ public class Package
             String filename = DefaultPackageFileName;
             File file = new File(dir, filename);
             FileOutputStream fos = new FileOutputStream(file);
-            fos.write(toXml(context).getBytes(context.getWiki().getEncoding()));
+            toXML(fos, context);
             fos.flush();
             fos.close();
         } catch (Exception e) {
@@ -1063,11 +1092,6 @@ public class Package
         this.preserveVersion = new Boolean(getElementText(infosEl, "preserveVersion")).booleanValue();
 
         return domdoc;
-    }
-
-    protected void readDependencies()
-    {
-
     }
 
     public void addAllWikiDocuments(XWikiContext context) throws XWikiException

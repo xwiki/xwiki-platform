@@ -24,6 +24,7 @@ import java.io.IOException;
 import java.util.Arrays;
 import java.util.Date;
 
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -323,15 +324,18 @@ public class SkinAction extends XWikiAction
         if (attachment != null) {
             XWiki xwiki = context.getWiki();
             XWikiResponse response = context.getResponse();
-            byte[] data = attachment.getContent(context);
             String mimetype = xwiki.getEngineContext().getMimeType(filename.toLowerCase());
             if (isCssMimeType(mimetype) || isJavascriptMimeType(mimetype)) {
+                byte[] data = attachment.getContent(context);
                 // Always force UTF-8, as this is the assumed encoding for text files.
                 data = context.getWiki().parseContent(new String(data, ENCODING), context).getBytes(ENCODING);
                 response.setCharacterEncoding(ENCODING);
+                setupHeaders(response, mimetype, attachment.getDate(), data.length);
+                response.getOutputStream().write(data);
+            } else {
+                setupHeaders(response, mimetype, attachment.getDate(), attachment.getContentSize(context));
+                IOUtils.copy(attachment.getContentInputStream(context), response.getOutputStream());
             }
-            setupHeaders(response, mimetype, attachment.getDate(), data.length);
-            response.getOutputStream().write(data);
             return true;
         } else {
             LOG.debug("Attachment not found");

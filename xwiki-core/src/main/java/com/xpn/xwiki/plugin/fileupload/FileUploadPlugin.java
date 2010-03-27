@@ -282,15 +282,16 @@ public class FileUploadPlugin extends XWikiDefaultPlugin implements XWikiPluginI
      */
     public byte[] getFileItemData(String formfieldName, XWikiContext context) throws XWikiException
     {
-        FileItem fileitem = getFile(formfieldName, context);
+        int size = getFileItemSize(formfieldName, context);
 
-        if (fileitem == null) {
+        if (size == 0) {
             return null;
         }
 
-        byte[] data = new byte[(int) fileitem.getSize()];
+        byte[] data = new byte[size];
+
         try {
-            InputStream fileis = fileitem.getInputStream();
+            InputStream fileis = getFileItemInputStream(formfieldName, context);
             if (fileis != null) {
                 fileis.read(data);
                 fileis.close();
@@ -305,6 +306,46 @@ public class FileUploadPlugin extends XWikiDefaultPlugin implements XWikiPluginI
         }
 
         return data;
+    }
+
+    /**
+     * Allows to retrieve the contents of an uploaded file as a stream. {@link #loadFileList(XWikiContext)} needs to be
+     * called beforehand.
+     * 
+     * @param formfieldName The name of the form field.
+     * @param context Context of the request.
+     * @return a InputStream on the file content
+     * @throws IOException if I/O problem occurs
+     * @since 2.3M2
+     */
+    public InputStream getFileItemInputStream(String formfieldName, XWikiContext context) throws IOException
+    {
+        FileItem fileitem = getFile(formfieldName, context);
+
+        if (fileitem == null) {
+            return null;
+        }
+
+        return fileitem.getInputStream();
+    }
+
+    /**
+     * Retrieve the size of a file content in byte. {@link #loadFileList(XWikiContext)} needs to be called beforehand.
+     * 
+     * @param formfieldName The name of the form field.
+     * @param context Context of the request.
+     * @return the size of the file in byte
+     * @since 2.3M2
+     */
+    public int getFileItemSize(String formfieldName, XWikiContext context)
+    {
+        FileItem fileitem = getFile(formfieldName, context);
+
+        if (fileitem == null) {
+            return 0;
+        }
+
+        return ((int) fileitem.getSize());
     }
 
     /**

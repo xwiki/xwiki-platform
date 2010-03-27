@@ -22,6 +22,7 @@ package com.xpn.xwiki.plugin.zipexplorer;
 import java.io.ByteArrayInputStream;
 import java.io.DataInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.URLDecoder;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -129,13 +130,11 @@ public class ZipExplorerPlugin extends XWikiDefaultPlugin
         newAttachment.setDate(attachment.getDate());
 
         try {
-            byte[] stream = attachment.getContent(context);
-            ByteArrayInputStream bais = new ByteArrayInputStream(stream);
-            if (!isZipFile(bais)) {
+            if (!isZipFile(attachment.getContentInputStream(context))) {
                 return attachment;
             }
 
-            ZipInputStream zis = new ZipInputStream(bais);
+            ZipInputStream zis = new ZipInputStream(attachment.getContentInputStream(context));
             ZipEntry entry;
 
             while ((entry = zis.getNextEntry()) != null) {
@@ -144,13 +143,16 @@ public class ZipExplorerPlugin extends XWikiDefaultPlugin
                 if (entryName.equals(filename)) {
                     newAttachment.setFilename(entryName);
 
-                    // Note: We're copying the content of the file in the ZIP in memory. This is
-                    // potentially going to cause an error if the file's size is greater than the
-                    // maximum size of a byte[] array in Java or if there's not enough memomry.
-                    byte[] data = IOUtils.toByteArray(zis);
+                    if (entry.getSize() == -1) {
+                        // Note: We're copying the content of the file in the ZIP in memory. This is
+                        // potentially going to cause an error if the file's size is greater than the
+                        // maximum size of a byte[] array in Java or if there's not enough memomry.
+                        byte[] data = IOUtils.toByteArray(zis);
 
-                    newAttachment.setFilesize(data.length);
-                    newAttachment.setContent(data);
+                        newAttachment.setContent(data);
+                    } else {
+                        newAttachment.setContent(zis, (int) entry.getSize());
+                    }
                     break;
                 }
             }
@@ -292,7 +294,7 @@ public class ZipExplorerPlugin extends XWikiDefaultPlugin
      * @param filecontent the content of the file
      * @return true if the file is in zip format (.zip, .jar etc) or false otherwise
      */
-    protected boolean isZipFile(ByteArrayInputStream filecontent)
+    protected boolean isZipFile(InputStream filecontent)
     {
         int standardZipHeader = 0x504b0304;
         try {
@@ -304,8 +306,12 @@ public class ZipExplorerPlugin extends XWikiDefaultPlugin
         } catch (IOException e) {
             // The file doesn't have 4 bytes, so it isn't a zip file
         } finally {
-            // Reset the input stream to the beginning. This is needed for further reading the archive.
-            filecontent.reset();
+            // Reset the input stream to the beginning. This may be needed for further reading the archive.
+            try {
+                filecontent.reset();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         }
         return false;
     }

@@ -21,9 +21,10 @@
 
 package com.xpn.xwiki.doc;
 
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.StringReader;
-import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -39,12 +40,13 @@ import org.dom4j.dom.DOMDocument;
 import org.dom4j.dom.DOMElement;
 import org.dom4j.io.OutputFormat;
 import org.dom4j.io.SAXReader;
-import org.dom4j.io.XMLWriter;
 import org.suigeneris.jrcs.rcs.Archive;
 import org.suigeneris.jrcs.rcs.Version;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
+import com.xpn.xwiki.internal.xml.DOMXMLWriter;
+import com.xpn.xwiki.internal.xml.XMLWriter;
 
 public class XWikiAttachment implements Cloneable
 {
@@ -142,11 +144,19 @@ public class XWikiAttachment implements Cloneable
         return attachment;
     }
 
+    /**
+     * @return the cached filesize in byte of the attachement, stored as metadata
+     */
     public int getFilesize()
     {
         return this.filesize;
     }
 
+    /**
+     * Set cached filesize of the attachement that will be stored as metadata
+     * 
+     * @param filesize in byte
+     */
     public void setFilesize(int filesize)
     {
         if (filesize != this.filesize) {
@@ -154,6 +164,21 @@ public class XWikiAttachment implements Cloneable
         }
 
         this.filesize = filesize;
+    }
+
+    /**
+     * @param context current XWikiContext
+     * @return the real filesize in byte of the attachement. We cannot trust the metadata that may be publicly changed.
+     * @throws XWikiException
+     * @since 2.3M2
+     */
+    public int getContentSize(XWikiContext context) throws XWikiException
+    {
+        if (this.attachment_content == null) {
+            this.doc.loadAttachmentContent(this, context);
+        }
+
+        return this.attachment_content.getSize();
     }
 
     public String getFilename()
@@ -283,63 +308,89 @@ public class XWikiAttachment implements Cloneable
         this.isMetaDataDirty = metaDataDirty;
     }
 
+    /**
+     * Retrieve an attachement as an XML string. You should prefer
+     * {@link #toXML(com.xpn.xwiki.internal.xml.XMLWriter, boolean, boolean, com.xpn.xwiki.XWikiContext) to avoid memory loads
+     * when appropriate.
+     *
+     * @param bWithAttachmentContent if true, binary content of the attachment is included (base64 encoded)
+     * @param bWithVersions if true, all archived versions are also included
+     * @param context current XWikiContext
+     * @return a string containing an XML representation of the attachment
+     * @throws XWikiException when an error occurs during wiki operations
+     */
     public String toStringXML(boolean bWithAttachmentContent, boolean bWithVersions, XWikiContext context)
         throws XWikiException
     {
-        // implement
-        Element ele = toXML(bWithAttachmentContent, bWithVersions, context);
-
-        Document doc = new DOMDocument();
-        doc.setRootElement(ele);
-        OutputFormat outputFormat = new OutputFormat("", true);
-        if ((context == null) || (context.getWiki() == null))
-            outputFormat.setEncoding("UTF-8");
-        else
-            outputFormat.setEncoding(context.getWiki().getEncoding());
-        StringWriter out = new StringWriter();
-        XMLWriter writer = new XMLWriter(out, outputFormat);
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
         try {
-            writer.write(doc);
-            return out.toString();
+            XMLWriter wr = new XMLWriter(baos, new OutputFormat("", true, context.getWiki().getEncoding()));
+            Document doc = new DOMDocument();
+            wr.writeDocumentStart(doc);
+            toXML(wr, bWithAttachmentContent, bWithVersions, context);
+            wr.writeDocumentEnd(doc);
+            return baos.toString(context.getWiki().getEncoding());
         } catch (IOException e) {
             e.printStackTrace();
             return "";
         }
     }
 
+    /**
+     * Retrieve XML representation of attachement's metadata into an {@link Element}.
+     * 
+     * @return a {@link Element} containing an XML representation of the attachment without content
+     * @throws XWikiException when an error occurs during wiki operations
+     */
     public Element toXML(XWikiContext context) throws XWikiException
     {
         return toXML(false, false, context);
     }
 
-    public Element toXML(boolean bWithAttachmentContent, boolean bWithVersions, XWikiContext context)
-        throws XWikiException
+    /**
+     * Write an XML representation of the attachement into an {@link com.xpn.xwiki.internal.xml.XMLWriter}
+     * 
+     * @param wr the XMLWriter to write to
+     * @param bWithAttachmentContent if true, binary content of the attachment is included (base64 encoded)
+     * @param bWithVersions if true, all archive version is also included
+     * @param context current XWikiContext
+     * @throws IOException when an error occurs during streaming operation
+     * @throws XWikiException when an error occurs during xwiki operation
+     * @since 2.3M2
+     */
+    public void toXML(XMLWriter wr, boolean bWithAttachmentContent, boolean bWithVersions, XWikiContext context)
+        throws IOException, XWikiException
     {
+        // IMPORTANT: we don't use SAX apis here because the specified XMLWriter could be a DOMXMLWriter for retro
+        // compatibility reasons
+
         Element docel = new DOMElement("attachment");
+        wr.writeOpen(docel);
+
         Element el = new DOMElement("filename");
         el.addText(getFilename());
-        docel.add(el);
+        wr.write(el);
 
         el = new DOMElement("filesize");
         el.addText("" + getFilesize());
-        docel.add(el);
+        wr.write(el);
 
         el = new DOMElement("author");
         el.addText(getAuthor());
-        docel.add(el);
+        wr.write(el);
 
         long d = getDate().getTime();
         el = new DOMElement("date");
         el.addText("" + d);
-        docel.add(el);
+        wr.write(el);
 
         el = new DOMElement("version");
         el.addText(getVersion());
-        docel.add(el);
+        wr.write(el);
 
         el = new DOMElement("comment");
         el.addText(getComment());
-        docel.add(el);
+        wr.write(el);
 
         if (bWithAttachmentContent) {
             el = new DOMElement("content");
@@ -347,13 +398,11 @@ public class XWikiAttachment implements Cloneable
             loadContent(context);
             XWikiAttachmentContent acontent = getAttachment_content();
             if (acontent != null) {
-                byte[] bcontent = getAttachment_content().getContent();
-                String content = new String(Base64.encodeBase64(bcontent));
-                el.addText(content);
+                wr.writeBase64(el, getAttachment_content().getContentInputStream());
             } else {
                 el.addText("");
+                wr.write(el);
             }
-            docel.add(el);
         }
 
         if (bWithVersions) {
@@ -363,14 +412,39 @@ public class XWikiAttachment implements Cloneable
                 el = new DOMElement("versions");
                 try {
                     el.addText(new String(aarchive.getArchive()));
+                    wr.write(el);
                 } catch (XWikiException e) {
-                    return null;
                 }
-                docel.add(el);
             }
         }
 
-        return docel;
+        wr.writeClose(docel);
+    }
+
+/**
+     * Retrieve XML representation of attachements metadata into an {@link Element}. You should prefer
+     * {@link #toXML(com.xpn.xwiki.internal.xml.XMLWriter, boolean, boolean, com.xpn.xwiki.XWikiContext) to avoid memory loads
+     * when appropriate.
+     *
+     * @param bWithAttachmentContent if true, binary content of the attachment is included (base64 encoded)
+     * @param bWithVersions if true, all archived versions are also included
+     * @param context current XWikiContext
+     * @return an {@link Element} containing an XML representation of the attachment
+     * @throws XWikiException when an error occurs during wiki operations
+     * @since 2.3M2
+     */
+    public Element toXML(boolean bWithAttachmentContent, boolean bWithVersions, XWikiContext context)
+        throws XWikiException
+    {
+        Document doc = new DOMDocument();
+        DOMXMLWriter wr = new DOMXMLWriter(doc, new OutputFormat("", true, context.getWiki().getEncoding()));
+
+        try {
+            toXML(wr, bWithAttachmentContent, bWithVersions, context);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+        return doc.getRootElement();
     }
 
     public void fromXML(String data) throws XWikiException
@@ -433,6 +507,15 @@ public class XWikiAttachment implements Cloneable
         this.attachment_archive = attachment_archive;
     }
 
+    /**
+     * Retrive the content of this attachment as a byte array.
+     * 
+     * @param context current XWikiContext
+     * @return a byte array containing the binary data content of the attachment
+     * @throws XWikiException when an error occurs during wiki operation
+     * @deprecated use {@link #setContent(java.io.InputStream, int)} instead
+     */
+    @Deprecated
     public byte[] getContent(XWikiContext context) throws XWikiException
     {
         if (this.attachment_content == null) {
@@ -440,6 +523,23 @@ public class XWikiAttachment implements Cloneable
         }
 
         return this.attachment_content.getContent();
+    }
+
+    /**
+     * Retrive the content of this attachment as an input stream.
+     * 
+     * @param context current XWikiContext
+     * @return an InputStream to consume for receiving the content of this attachment
+     * @throws XWikiException when an error occurs during wiki operation
+     * @since 2.3M2
+     */
+    public InputStream getContentInputStream(XWikiContext context) throws XWikiException
+    {
+        if (this.attachment_content == null) {
+            this.doc.loadAttachmentContent(this, context);
+        }
+
+        return this.attachment_content.getContentInputStream();
     }
 
     public Archive getArchive()
@@ -500,6 +600,13 @@ public class XWikiAttachment implements Cloneable
         return list;
     }
 
+    /**
+     * Set the content of an attachement from a byte array.
+     * 
+     * @param data a byte array with the binary content of the attachment
+     * @deprecated use {@link #setContent(java.io.InputStream, int)} instead
+     */
+    @Deprecated
     public void setContent(byte[] data)
     {
         if (this.attachment_content == null) {
@@ -508,6 +615,24 @@ public class XWikiAttachment implements Cloneable
         }
 
         this.attachment_content.setContent(data);
+    }
+
+    /**
+     * Set the content of an attachment from an InputStream.
+     * 
+     * @param is the input stream that will be read
+     * @param length the length in byte to read
+     * @throws IOException when an error occurs during streaming operation
+     * @since 2.3M2
+     */
+    public void setContent(InputStream is, int length) throws IOException
+    {
+        if (this.attachment_content == null) {
+            this.attachment_content = new XWikiAttachmentContent();
+            this.attachment_content.setAttachment(this);
+        }
+
+        this.attachment_content.setContent(is, length);
     }
 
     public void loadContent(XWikiContext context) throws XWikiException

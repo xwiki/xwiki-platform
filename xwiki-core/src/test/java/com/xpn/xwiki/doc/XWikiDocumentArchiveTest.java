@@ -21,8 +21,11 @@ package com.xpn.xwiki.doc;
 
 import java.util.Date;
 
+import org.jmock.Mock;
 import org.suigeneris.jrcs.rcs.Version;
 
+import com.xpn.xwiki.XWiki;
+import com.xpn.xwiki.XWikiConfig;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.test.AbstractBridgedXWikiComponentTestCase;
@@ -36,10 +39,19 @@ import com.xpn.xwiki.user.api.XWikiRightService;
 public class XWikiDocumentArchiveTest extends AbstractBridgedXWikiComponentTestCase
 {
     private XWikiContext context;
+
+    private Mock mockXWiki;
+
     protected void setUp() throws Exception
     {
         super.setUp();
+
+        this.mockXWiki = mock(XWiki.class);
+        this.mockXWiki.stubs().method("getEncoding").will(returnValue("iso-8859-1"));
+        this.mockXWiki.stubs().method("getConfig").will(returnValue(new XWikiConfig()));
+
         this.context = new XWikiContext();
+        this.context.setWiki((XWiki) this.mockXWiki.proxy());
     }
     
     /**

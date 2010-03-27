@@ -9,6 +9,8 @@ import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.plugin.XWikiPluginManager;
 import com.xpn.xwiki.util.Util;
 
+import org.apache.commons.io.IOUtils;
+
 public class DownloadRevAction extends XWikiAction
 {
     @Override
@@ -70,10 +72,9 @@ public class DownloadRevAction extends XWikiAction
 
         response.setDateHeader("Last-Modified", attachment.getDate().getTime());
         // Sending the content of the attachment
-        byte[] data = attachment.getContent(context);
-        response.setContentLength(data.length);
         try {
-            response.getOutputStream().write(data);
+            response.setContentLength(attachment.getContentSize(context));
+            IOUtils.copy(attachment.getContentInputStream(context), response.getOutputStream());
         } catch (IOException e) {
             throw new XWikiException(XWikiException.MODULE_XWIKI_APP,
                 XWikiException.ERROR_XWIKI_APP_SEND_RESPONSE_EXCEPTION, "Exception while sending response", e);

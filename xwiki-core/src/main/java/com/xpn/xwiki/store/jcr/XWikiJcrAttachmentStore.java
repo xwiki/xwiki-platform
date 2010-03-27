@@ -43,7 +43,7 @@ public class XWikiJcrAttachmentStore extends XWikiJcrBaseStore implements XWikiA
 	            	Node dirattNode = JcrUtil.getOrCreateSubNode(docNode, "attach", ntXWikiAttachments);
 	            	Node attachNode = JcrUtil.getOrCreateSubNode(dirattNode, attachment.getFilename(), ntXWikiAttachment);
 	            	Node attachContentNode = JcrUtil.getOrCreateSubNode(attachNode, "content", ntXWikiAttachmentContent);
-	            	attachContentNode.setProperty("jcr:data", new ByteArrayInputStream(content.getContent()));
+                        attachContentNode.setProperty("jcr:data", content.getContentInputStream());
 	            	attachContentNode.setProperty("attach", attachNode);
 	            	Node attachArchiveNode = JcrUtil.getOrCreateSubNode(attachNode, "archive", ntXWikiAttachmentArchive);
 	            	attachArchiveNode.setProperty("jcr:data", new ByteArrayInputStream(archive.getArchive()));

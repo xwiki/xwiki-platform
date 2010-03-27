@@ -28,6 +28,8 @@ import com.xpn.xwiki.util.Util;
 
 import java.io.IOException;
 
+import org.apache.commons.io.IOUtils;
+
 public class DownloadAction extends XWikiAction
 {
     /**
@@ -94,19 +96,14 @@ public class DownloadAction extends XWikiAction
         response.setDateHeader("Last-Modified", attachment.getDate().getTime());
 
         // Sending the content of the attachment
-        byte[] data;
         try {
-            data = attachment.getContent(context);
+            response.setContentLength(attachment.getContentSize(context));
+            IOUtils.copy(attachment.getContentInputStream(context), response.getOutputStream());
         } catch (XWikiException e) {
             Object[] args = {filename};
             throw new XWikiException(XWikiException.MODULE_XWIKI_APP,
                 XWikiException.ERROR_XWIKI_APP_ATTACHMENT_NOT_FOUND,
                 "Attachment content {0} not found", null, args);
-        }
-
-        response.setContentLength(data.length);
-        try {
-            response.getOutputStream().write(data);
         } catch (IOException e) {
             throw new XWikiException(XWikiException.MODULE_XWIKI_APP,
                 XWikiException.ERROR_XWIKI_APP_SEND_RESPONSE_EXCEPTION,

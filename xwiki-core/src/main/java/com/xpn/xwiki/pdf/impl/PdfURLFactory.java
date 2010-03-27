@@ -30,6 +30,8 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.net.URL;
 
+import org.apache.commons.io.IOUtils;
+
 public class PdfURLFactory extends XWikiServletURLFactory
 {
     public PdfURLFactory()
@@ -46,10 +48,8 @@ public class PdfURLFactory extends XWikiServletURLFactory
                 XWikiDocument doc = null;
                 doc = context.getWiki().getDocument(web + "." + name, context);
                 XWikiAttachment attachment = doc.getAttachment(filename);
-                byte[] data = new byte[0];
-                data = attachment.getContent(context);
                 FileOutputStream fos = new FileOutputStream(file);
-                fos.write(data);
+                IOUtils.copy(attachment.getContentInputStream(context), fos);
                 fos.close();
             }
             return file.toURL();
@@ -69,10 +69,8 @@ public class PdfURLFactory extends XWikiServletURLFactory
                 XWikiDocument doc = null;
                 doc = context.getWiki().getDocument(web + "." + name, context);
                 XWikiAttachment attachment = doc.getAttachment(filename).getAttachmentRevision(revision, context);
-                byte[] data = new byte[0];
-                data = attachment.getContent(context);
                 FileOutputStream fos = new FileOutputStream(file);
-                fos.write(data);
+                IOUtils.copy(attachment.getContentInputStream(context), fos);
                 fos.close();
             }
             return file.toURL();

@@ -72,7 +72,7 @@ public class ImportAction extends XWikiAction
                 response.setContentType("text/xml");
                 response.setCharacterEncoding(encoding);
                 XWikiAttachment packFile = doc.getAttachment(name);
-                importer.Import(packFile.getContent(context));
+                importer.Import(packFile.getContentInputStream(context));
                 String xml = importer.toXml();
                 byte[] result = xml.getBytes(encoding);
                 response.setContentLength(result.length);
@@ -81,7 +81,7 @@ public class ImportAction extends XWikiAction
             } else if ("import".equals(action)) {
                 // Do the actual import
                 XWikiAttachment packFile = doc.getAttachment(name);
-                importer.Import(packFile.getContent(context));
+                importer.Import(packFile.getContentInputStream(context));
                 String all = request.get("all");
                 if (!"1".equals(all)) {
                     if (pages != null) {

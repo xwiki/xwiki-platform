@@ -22,8 +22,8 @@ package com.xpn.xwiki.doc;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.io.StringReader;
-import java.io.StringWriter;
 import java.lang.ref.SoftReference;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
@@ -66,7 +66,6 @@ import org.dom4j.dom.DOMDocument;
 import org.dom4j.dom.DOMElement;
 import org.dom4j.io.OutputFormat;
 import org.dom4j.io.SAXReader;
-import org.dom4j.io.XMLWriter;
 import org.suigeneris.jrcs.diff.Diff;
 import org.suigeneris.jrcs.diff.DifferentiationFailedException;
 import org.suigeneris.jrcs.diff.Revision;
@@ -118,6 +117,8 @@ import com.xpn.xwiki.content.parsers.RenamePageReplaceLinkHandler;
 import com.xpn.xwiki.content.parsers.ReplacementResultCollection;
 import com.xpn.xwiki.criteria.impl.RevisionCriteria;
 import com.xpn.xwiki.doc.rcs.XWikiRCSNodeInfo;
+import com.xpn.xwiki.internal.xml.DOMXMLWriter;
+import com.xpn.xwiki.internal.xml.XMLWriter;
 import com.xpn.xwiki.objects.BaseCollection;
 import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.objects.BaseProperty;
@@ -3351,108 +3352,273 @@ public class XWikiDocument implements DocumentModelBridge
         return true;
     }
 
+    /**
+     * Convert a {@link Document} into an XML string. You should prefer
+     * {@link #toXML(OutputStream, boolean, boolean, boolean, boolean, XWikiContext)} or
+     * {@link #toXML(com.xpn.xwiki.internal.xml.XMLWriter, boolean, boolean, boolean, boolean, XWikiContext)} when possible
+     * to avoid memory load.
+     *
+     * @param doc the {@link Document} to convert to a String
+     * @param context current XWikiContext
+     *
+     * @return an XML representation of the {@link Document}
+     *
+     * @deprecated this method has nothing to do here and is apparently unused
+     */
+    @Deprecated
     public String toXML(Document doc, XWikiContext context)
     {
-        OutputFormat outputFormat = new OutputFormat("", true);
-        if ((context == null) || (context.getWiki() == null)) {
-            outputFormat.setEncoding("UTF-8");
-        } else {
-            outputFormat.setEncoding(context.getWiki().getEncoding());
-        }
+        String encoding = context.getWiki().getEncoding();
 
-        StringWriter out = new StringWriter();
-        XMLWriter writer = new XMLWriter(out, outputFormat);
+        ByteArrayOutputStream os = new ByteArrayOutputStream();
         try {
-            writer.write(doc);
-            return out.toString();
+            XMLWriter wr = new XMLWriter(os, new OutputFormat("", true, encoding));
+            wr.write(doc);
+            return os.toString(encoding);
+        } catch (IOException e) {
+            LOG.error("Exception while doc.toXML", e);
+            return "";
+        }
+    }
+
+    /**
+     * Retrieve the document in the current context language as an XML string. The rendrered document content and
+     * all XObjects are included. Document attachments and archived versions are excluded.
+     * You should prefer toXML(OutputStream, true, true, false, false, XWikiContext)} or
+     * toXML(com.xpn.xwiki.util.XMLWriter, true, true, false, false, XWikiContext) on the translated document
+     * when possible to reduce memory load.
+     *
+     * @param context current XWikiContext
+     *
+     * @return a string containing an XML representation of the document in the current context language
+     *
+     * @throws XWikiException when an error occurs during wiki operation
+     */
+    public String getXMLContent(XWikiContext context) throws XWikiException
+    {
+        XWikiDocument tdoc = getTranslatedDocument(context);
+        return tdoc.toXML(true, true, false, false, context);
+    }
+
+    /**
+     * Retrieve the document as an XML string. All XObject are included. Rendered content, attachments and archived
+     * version are excluded.
+     * You should prefer toXML(OutputStream, true, false, false, false, XWikiContext)} or
+     * toXML(com.xpn.xwiki.util.XMLWriter, true, false, false, false, XWikiContext) when possible to reduce memory load.
+     *  
+     * @param context current XWikiContext
+     *
+     * @return a string containing an XML representation of the document
+     *
+     * @throws XWikiException when an error occurs during wiki operation
+     */
+    public String toXML(XWikiContext context) throws XWikiException
+    {
+        return toXML(true, false, false, false, context);
+    }
+
+    /**
+     * Retrieve the document as an XML string. All XObjects attachments and archived version are included. Rendered
+     * content is excluded.
+     * You should prefer toXML(OutputStream, true, false, true, true, XWikiContext)} or
+     * toXML(com.xpn.xwiki.util.XMLWriter, true, false, true, true, XWikiContext) when possible to reduce memory load.
+     *
+     * @param context current XWikiContext
+     *
+     * @return a string containing an XML representation of the document
+     *
+     * @throws XWikiException when an error occurs during wiki operation
+     */
+    public String toFullXML(XWikiContext context) throws XWikiException
+    {
+        return toXML(true, false, true, true, context);
+    }
+
+    /**
+     * Serialize the document into a new entry of an ZipOutputStream in XML format. All XObjects and attachments are
+     * included. Rendered content is excluded.
+     *
+     * @param zos the ZipOutputStream to write to
+     * @param zipname the name of the new entry to create
+     * @param withVersions if true, also include archived version of the document
+     * @param context current XWikiContext
+     *
+     * @throws XWikiException when an error occurs during xwiki operations
+     * @throws IOException when an error occurs during streaming operations
+     *
+     * @since 2.3M2
+     */
+    public void addToZip(ZipOutputStream zos, String zipname, boolean withVersions, XWikiContext context)
+        throws XWikiException, IOException
+    {
+        ZipEntry zipentry = new ZipEntry(zipname);
+        zos.putNextEntry(zipentry);
+        toXML(zos, true, false, true, withVersions, context);
+        zos.closeEntry();
+    }
+
+    /**
+     * Serialize the document into a new entry of an ZipOutputStream in XML format. The new entry is named
+     * 'LastSpaceName/DocumentName'. All XObjects and attachments are included. Rendered content is excluded.
+     *
+     * @param zos the ZipOutputStream to write to
+     * @param withVersions if true, also include archived version of the document
+     * @param context current XWikiContext
+     *
+     * @throws XWikiException when an error occurs during xwiki operations
+     * @throws IOException when an error occurs during streaming operations
+     *
+     * @since 2.3M2
+     */
+    public void addToZip(ZipOutputStream zos, boolean withVersions, XWikiContext context) throws XWikiException,
+        IOException
+    {
+        String zipname = 
+                    getDocumentReference().getLastSpaceReference().getName() + "/" + getDocumentReference().getName();
+        String language = getLanguage();
+        if (!StringUtils.isEmpty(language)) {
+            zipname += "." + language;
+        }
+        addToZip(zos, zipname, withVersions, context);
+    }
+
+    /**
+     * Serialize the document into a new entry of an ZipOutputStream in XML format. The new entry is named
+     * 'LastSpaceName/DocumentName'. All XObjects, attachments and archived versions are included. Rendered content
+     * is excluded.
+     *
+     * @param zos the ZipOutputStream to write to
+     * @param withVersions if true, also include archived version of the document
+     * @param context current XWikiContext
+     *
+     * @throws XWikiException when an error occurs during xwiki operations
+     * @throws IOException when an error occurs during streaming operations
+     *
+     * @since 2.3M2
+     */
+    public void addToZip(ZipOutputStream zos, XWikiContext context) throws XWikiException, IOException
+    {
+        addToZip(zos, true, context);
+    }
+
+    /**
+     * Serialize the document to an XML string.
+     * You should prefer {@link #toXML(OutputStream, boolean, boolean, boolean, boolean, XWikiContext)}  or
+     * {@link #toXML(com.xpn.xwiki.internal.xml.XMLWriter, boolean, boolean, boolean, boolean, XWikiContext)}  when possible to
+     * reduce memory load.
+     *
+     * @param bWithObjects include XObjects
+     * @param bWithRendering include the rendered content
+     * @param bWithAttachmentContent include attachments content
+     * @param bWithVersions include archived versions
+     * @param context current XWikiContext
+     *
+     * @return a string containing an XML representation of the document
+     *
+     * @throws XWikiException when an errors occurs during wiki operations
+     */
+    public String toXML(boolean bWithObjects, boolean bWithRendering, boolean bWithAttachmentContent,
+        boolean bWithVersions, XWikiContext context) throws XWikiException
+    {
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        try {
+            toXML(baos, bWithObjects, bWithRendering, bWithAttachmentContent, bWithVersions, context);
+            return baos.toString(context.getWiki().getEncoding());
         } catch (IOException e) {
             e.printStackTrace();
             return "";
         }
     }
 
-    public String getXMLContent(XWikiContext context) throws XWikiException
-    {
-        XWikiDocument tdoc = getTranslatedDocument(context);
-        Document doc = tdoc.toXMLDocument(true, true, false, false, context);
-
-        return toXML(doc, context);
-    }
-
-    public String toXML(XWikiContext context) throws XWikiException
-    {
-        Document doc = toXMLDocument(context);
-
-        return toXML(doc, context);
-    }
-
-    public String toFullXML(XWikiContext context) throws XWikiException
-    {
-        return toXML(true, false, true, true, context);
-    }
-
-    public void addToZip(ZipOutputStream zos, boolean withVersions, XWikiContext context) throws IOException
-    {
-        try {
-            String zipname =
-                    getDocumentReference().getLastSpaceReference().getName() + "/" + getDocumentReference().getName();
-            String language = getLanguage();
-            if (!StringUtils.isEmpty(language)) {
-                zipname += "." + language;
-            }
-            ZipEntry zipentry = new ZipEntry(zipname);
-            zos.putNextEntry(zipentry);
-            zos.write(toXML(true, false, true, withVersions, context).getBytes());
-            zos.closeEntry();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
-
-    public void addToZip(ZipOutputStream zos, XWikiContext context) throws IOException
-    {
-        addToZip(zos, true, context);
-    }
-
-    public String toXML(boolean bWithObjects, boolean bWithRendering, boolean bWithAttachmentContent,
-        boolean bWithVersions, XWikiContext context) throws XWikiException
-    {
-        Document doc = toXMLDocument(bWithObjects, bWithRendering, bWithAttachmentContent, bWithVersions, context);
-
-        return toXML(doc, context);
-    }
-
+    /**
+     * Serialize the document to an XML {@link DOMDocument}. All XObject are included. Rendered content, attachments
+     * and archived version are excluded.
+     * You should prefer toXML(OutputStream, true, false, false, false, XWikiContext)} or
+     * toXML(com.xpn.xwiki.util.XMLWriter, true, false, false, false, XWikiContext) when possible to reduce memory load.
+     *
+     * @param context current XWikiContext
+     *
+     * @return a {@link DOMDocument} containing the serialized document.
+     *
+     * @throws XWikiException when an errors occurs during wiki operations
+     */
     public Document toXMLDocument(XWikiContext context) throws XWikiException
     {
         return toXMLDocument(true, false, false, false, context);
     }
 
+    /**
+     * Serialize the document to an XML {@link DOMDocument}.
+     * You should prefer {@link #toXML(OutputStream, boolean, boolean, boolean, boolean, XWikiContext)}  or
+     * {@link #toXML(com.xpn.xwiki.internal.xml.XMLWriter, boolean, boolean, boolean, boolean, XWikiContext)}  when possible to
+     * reduce memory load.
+     *
+     * @param bWithObjects include XObjects
+     * @param bWithRendering include the rendered content
+     * @param bWithAttachmentContent include attachments content
+     * @param bWithVersions include archived versions
+     * @param context current XWikiContext
+     *
+     * @return a {@link DOMDocument} containing the serialized document.
+     *
+     * @throws XWikiException when an errors occurs during wiki operations
+     */
     public Document toXMLDocument(boolean bWithObjects, boolean bWithRendering, boolean bWithAttachmentContent,
         boolean bWithVersions, XWikiContext context) throws XWikiException
     {
         Document doc = new DOMDocument();
+        DOMXMLWriter wr = new DOMXMLWriter(doc, new OutputFormat("", true, context.getWiki().getEncoding()));
+
+        try {
+            toXML(wr, bWithObjects, bWithRendering, bWithAttachmentContent, bWithVersions, context);
+            return doc;
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    /**
+     * Serialize the document to a {@link com.xpn.xwiki.internal.xml.XMLWriter}.
+     *
+     * @param bWithObjects include XObjects
+     * @param bWithRendering include the rendered content
+     * @param bWithAttachmentContent include attachments content
+     * @param bWithVersions include archived versions
+     * @param context current XWikiContext
+     *
+     * @throws XWikiException when an errors occurs during wiki operations
+     * @throws IOException when an errors occurs during streaming operations
+     * 
+     * @since 2.3M2
+     */
+    public void toXML(XMLWriter wr, boolean bWithObjects, boolean bWithRendering, boolean bWithAttachmentContent,
+        boolean bWithVersions, XWikiContext context) throws XWikiException, IOException
+    {
+        // IMPORTANT: we don't use SAX apis here because the specified XMLWriter could be a DOMXMLWriter for retro
+        // compatibility reasons
+
         Element docel = new DOMElement("xwikidoc");
-        doc.setRootElement(docel);
+        wr.writeOpen(docel);
 
         Element el = new DOMElement("web");
         el.addText(getDocumentReference().getLastSpaceReference().getName());
-        docel.add(el);
+        wr.write(el);
 
         el = new DOMElement("name");
         el.addText(getDocumentReference().getName());
-        docel.add(el);
+        wr.write(el);
 
         el = new DOMElement("language");
         el.addText(getLanguage());
-        docel.add(el);
+        wr.write(el);
 
         el = new DOMElement("defaultLanguage");
         el.addText(getDefaultLanguage());
-        docel.add(el);
+        wr.write(el);
 
         el = new DOMElement("translation");
         el.addText("" + getTranslation());
-        docel.add(el);
+        wr.write(el);
 
         el = new DOMElement("parent");
         if (getRelativeParentReference() == null) {
@@ -3461,46 +3627,46 @@ public class XWikiDocument implements DocumentModelBridge
         } else {
             el.addText(this.defaultEntityReferenceSerializer.serialize(getRelativeParentReference()));
         }
-        docel.add(el);
+        wr.write(el);
 
         el = new DOMElement("creator");
         el.addText(getCreator());
-        docel.add(el);
+        wr.write(el);
 
         el = new DOMElement("author");
         el.addText(getAuthor());
-        docel.add(el);
+        wr.write(el);
 
         el = new DOMElement("customClass");
         el.addText(getCustomClass());
-        docel.add(el);
+        wr.write(el);
 
         el = new DOMElement("contentAuthor");
         el.addText(getContentAuthor());
-        docel.add(el);
+        wr.write(el);
 
         long d = getCreationDate().getTime();
         el = new DOMElement("creationDate");
         el.addText("" + d);
-        docel.add(el);
+        wr.write(el);
 
         d = getDate().getTime();
         el = new DOMElement("date");
         el.addText("" + d);
-        docel.add(el);
+        wr.write(el);
 
         d = getContentUpdateDate().getTime();
         el = new DOMElement("contentUpdateDate");
         el.addText("" + d);
-        docel.add(el);
+        wr.write(el);
 
         el = new DOMElement("version");
         el.addText(getVersion());
-        docel.add(el);
+        wr.write(el);
 
         el = new DOMElement("title");
         el.addText(getTitle());
-        docel.add(el);
+        wr.write(el);
 
         el = new DOMElement("template");
         if (getTemplateDocumentReference() == null) {
@@ -3509,34 +3675,34 @@ public class XWikiDocument implements DocumentModelBridge
         } else {
             el.addText(this.localEntityReferenceSerializer.serialize(getTemplateDocumentReference()));
         }
-        docel.add(el);
+        wr.write(el);
 
         el = new DOMElement("defaultTemplate");
         el.addText(getDefaultTemplate());
-        docel.add(el);
+        wr.write(el);
 
         el = new DOMElement("validationScript");
         el.addText(getValidationScript());
-        docel.add(el);
+        wr.write(el);
 
         el = new DOMElement("comment");
         el.addText(getComment());
-        docel.add(el);
+        wr.write(el);
 
         el = new DOMElement("minorEdit");
         el.addText(String.valueOf(isMinorEdit()));
-        docel.add(el);
+        wr.write(el);
 
         el = new DOMElement("syntaxId");
         el.addText(getSyntaxId());
-        docel.add(el);
+        wr.write(el);
 
         el = new DOMElement("hidden");
         el.addText(String.valueOf(isHidden()));
-        docel.add(el);
+        wr.write(el);
 
         for (XWikiAttachment attach : getAttachmentList()) {
-            docel.add(attach.toXML(bWithAttachmentContent, bWithVersions, context));
+            attach.toXML(wr, bWithAttachmentContent, bWithVersions, context);
         }
 
         if (bWithObjects) {
@@ -3544,7 +3710,7 @@ public class XWikiDocument implements DocumentModelBridge
             BaseClass bclass = getXClass();
             if (bclass.getFieldList().size() > 0) {
                 // If the class has fields, add class definition and field information to XML
-                docel.add(bclass.toXML(null));
+                wr.write(bclass.toXML(null));
             }
 
             // Add Objects (THEIR ORDER IS MOLDED IN STONE!)
@@ -3557,7 +3723,7 @@ public class XWikiDocument implements DocumentModelBridge
                         } else {
                             objclass = obj.getXClass(context);
                         }
-                        docel.add(obj.toXML(objclass));
+                        wr.write(obj.toXML(objclass));
                     }
                 }
             }
@@ -3571,7 +3737,7 @@ public class XWikiDocument implements DocumentModelBridge
         // String newcontent = encodedXMLStringAsUTF8(getContent());
         String newcontent = this.content;
         el.addText(newcontent);
-        docel.add(el);
+        wr.write(el);
 
         if (bWithRendering) {
             el = new DOMElement("renderedcontent");
@@ -3580,21 +3746,44 @@ public class XWikiDocument implements DocumentModelBridge
             } catch (XWikiException e) {
                 el.addText("Exception with rendering content: " + e.getFullMessage());
             }
-            docel.add(el);
+            wr.write(el);
         }
 
         if (bWithVersions) {
             el = new DOMElement("versions");
             try {
                 el.addText(getDocumentArchive(context).getArchive(context));
-                docel.add(el);
+                wr.write(el);
             } catch (XWikiException e) {
                 LOG.error("Document [" + this.defaultEntityReferenceSerializer.serialize(getDocumentReference())
                     + "] has malformed history");
             }
         }
+    }
 
-        return doc;
+    /**
+     * Serialize the document to an OutputStream.
+     *
+     * @param bWithObjects include XObjects
+     * @param bWithRendering include the rendered content
+     * @param bWithAttachmentContent include attachments content
+     * @param bWithVersions include archived versions
+     * @param context current XWikiContext
+     *
+     * @throws XWikiException when an errors occurs during wiki operations
+     * @throws IOException when an errors occurs during streaming operations
+     *
+     * @since 2.3M2
+     */
+    public void toXML(OutputStream out, boolean bWithObjects, boolean bWithRendering, boolean bWithAttachmentContent,
+        boolean bWithVersions, XWikiContext context) throws XWikiException, IOException
+    {
+        XMLWriter wr = new XMLWriter(out, new OutputFormat("", true, context.getWiki().getEncoding()));
+
+        Document doc = new DOMDocument();
+        wr.writeDocumentStart(doc);
+        toXML(wr, bWithObjects, bWithRendering, bWithAttachmentContent, bWithVersions, context);
+        wr.writeDocumentEnd(doc);
     }
 
     protected String encodedXMLStringAsUTF8(String xmlString)

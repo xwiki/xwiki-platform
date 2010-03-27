@@ -17,6 +17,8 @@ import org.apache.commons.io.IOUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import org.apache.commons.io.IOUtils;
+
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiAttachment;
@@ -342,9 +344,8 @@ public class ExportURLFactory extends XWikiServletURLFactory
                     context.getWiki().getDocument(
                         db + XWikiDocument.DB_SPACE_SEP + space + XWikiDocument.SPACE_NAME_SEP + name, context);
             XWikiAttachment attachment = doc.getAttachment(filename);
-            byte[] data = attachment.getContent(context);
             FileOutputStream fos = new FileOutputStream(file);
-            fos.write(data);
+            IOUtils.copy(attachment.getContentInputStream(context), fos);
             fos.close();
         }
 

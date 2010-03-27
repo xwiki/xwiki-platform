@@ -110,6 +110,7 @@ public class ZipExplorerTest extends AbstractBridgedXWikiComponentTestCase
 
         assertEquals("Directory/File.txt", newAttachment.getFilename());
         assertEquals(zipFileContent.length(), newAttachment.getFilesize());
+        assertEquals(zipFileContent.length(), newAttachment.getContentSize(context));
         assertEquals(zipFileContent, new String(newAttachment.getContent(context)));
     }
 
@@ -219,7 +220,11 @@ public class ZipExplorerTest extends AbstractBridgedXWikiComponentTestCase
         mockAttachment.stubs().method("getDoc").will(returnValue(document));
         mockAttachment.stubs().method("getAuthor").will(returnValue("Vincent"));
         mockAttachment.stubs().method("getDate").will(returnValue(new Date()));
-        mockAttachment.stubs().method("getContent").will(returnValue(content));
+        mockAttachment.stubs().method("getFilesize").will(returnValue((content == null) ? 0 : content.length));
+        mockAttachment.stubs().method("getContentSize").will(returnValue((content == null) ? 0 : content.length));
+        mockAttachment.stubs().method("getContent").will(returnValue((content == null) ? new byte[0] : content));
+        mockAttachment.stubs().method("getContentInputStream").will(
+            returnValue(new ByteArrayInputStream((content == null) ? new byte[0] : content)));
         return (XWikiAttachment) mockAttachment.proxy();
     }
 

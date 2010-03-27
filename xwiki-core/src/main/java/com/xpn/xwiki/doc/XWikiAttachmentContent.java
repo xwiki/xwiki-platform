@@ -21,6 +21,11 @@
 
 package com.xpn.xwiki.doc;
 
+import java.io.ByteArrayInputStream;
+import java.io.EOFException;
+import java.io.IOException;
+import java.io.InputStream;
+
 public class XWikiAttachmentContent implements Cloneable
 {
     private XWikiAttachment attachment;
@@ -71,6 +76,12 @@ public class XWikiAttachmentContent implements Cloneable
         return attachmentcontent;
     }
 
+    /**
+     * @return a byte array containing the binary content of the attachment
+     * 
+     * @deprecated use {@link #getContentInputStream()} instead
+     */
+    @Deprecated
     public byte[] getContent()
     {
         if (this.content == null) {
@@ -80,6 +91,14 @@ public class XWikiAttachmentContent implements Cloneable
         }
     }
 
+    /**
+     * Set the content from a byte array
+     *
+     * @param content a byte array containing the binary data of the attachment
+     *
+     * @deprecated use {@link #setContent(java.io.InputStream, int)} instead
+     */
+    @Deprecated
     public void setContent(byte[] content)
     {
         if (content == null) {
@@ -111,5 +130,66 @@ public class XWikiAttachmentContent implements Cloneable
     public void setContentDirty(boolean contentDirty)
     {
         this.isContentDirty = contentDirty;
+    }
+
+    /**
+     * @return an InputStream to read the binary content of this attachment
+     *
+     * @since 2.3M2
+     */
+    public InputStream getContentInputStream()
+    {
+        return new ByteArrayInputStream(getContent());
+    }
+
+    /**
+     * set the content of the attachment from an InputStream
+     *
+     * @param is the input stream that will be read
+     * @param length the length in byte to read
+     * @throws IOException when an error occurs during streaming operation
+     * @since 2.3M2
+     */
+    public void setContent(InputStream is, int len) throws IOException
+    {
+        setContent(readData(is, len));
+    }
+
+    /**
+     * @return the true size of the content of the attachement
+     *
+     * @since 2.3M2
+     */
+    public int getSize()
+    {
+        return content.length;
+    }
+
+    /**
+     * Read an input stream into a byte array
+     *
+     * @param is the input stream to read
+     * @param len the len to read
+     * @return a byte array of size len containing the read data
+     * @throws IOException when an error occurs during streaming operation
+     * @since 2.3M2
+     */
+    private byte[] readData(InputStream is, int len) throws IOException
+    {
+        if (is == null) {
+            return null;
+        }
+
+        int off = 0;
+        byte[] buf = new byte[len];
+        while (len > 0) {
+            int n = is.read(buf, off, len);
+            if (n == -1) {
+                throw new EOFException();
+            }
+            off += n;
+            len -= n;
+        }
+        return buf;
     }
 }

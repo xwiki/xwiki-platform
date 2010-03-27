@@ -1,0 +1,14 @@
+##################################################
+# Simple link with a label, annotation is touching the link
+##################################################
+.source
+To be, or [[not to be>>Space.ExistingPage]], that is the question:
+.rendered
+<p>To be, or <span class="wikilink"><a href="viewurl">not to be</a></span>, that is the question:</p>
+.annotation
+0
+XWiki.XWikiGuest
+Alternative to being
+or not to
+.annotated
+<p>To be, <span class="annotation ID0">or&nbsp;</span><span class="wikilink"><a href="viewurl"><span class="annotation ID0">not to</span> be</a></span>, that is the question:</p>

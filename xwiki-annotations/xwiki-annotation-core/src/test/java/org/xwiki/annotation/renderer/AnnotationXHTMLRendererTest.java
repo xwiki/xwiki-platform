@@ -70,91 +70,91 @@ public class AnnotationXHTMLRendererTest extends AbstractComponentTestCase
 
     static {
         // tests containing only plain text content
-        addFileToTest("renderer/plain/Plain1");
-        addFileToTest("renderer/plain/Plain2");
-        addFileToTest("renderer/plain/Plain3");
-        addFileToTest("renderer/plain/Plain4");
-        addFileToTest("renderer/plain/Plain5");
-        addFileToTest("renderer/plain/Plain6");
+        addFileToTest("renderer/plain/Plain1.test");
+        addFileToTest("renderer/plain/Plain2.test");
+        addFileToTest("renderer/plain/Plain3.test");
+        addFileToTest("renderer/plain/Plain4.test");
+        addFileToTest("renderer/plain/Plain5.test");
+        addFileToTest("renderer/plain/Plain6.test");
 
         // tests containing formatting
-        addFileToTest("renderer/format/Format1");
-        addFileToTest("renderer/format/Format2");
-        addFileToTest("renderer/format/Format3");
-        addFileToTest("renderer/format/Format4");
-        addFileToTest("renderer/format/Format5");
+        addFileToTest("renderer/format/Format1.test");
+        addFileToTest("renderer/format/Format2.test");
+        addFileToTest("renderer/format/Format3.test");
+        addFileToTest("renderer/format/Format4.test");
+        addFileToTest("renderer/format/Format5.test");
 
         // tests containing special characters in the annotated content
-        addFileToTest("renderer/specialchars/SpecialChars1");
-        addFileToTest("renderer/specialchars/SpecialChars2");
-        addFileToTest("renderer/specialchars/SpecialChars3");
+        addFileToTest("renderer/specialchars/SpecialChars1.test");
+        addFileToTest("renderer/specialchars/SpecialChars2.test");
+        addFileToTest("renderer/specialchars/SpecialChars3.test");
 
         // tests for which the selection of the annotation appears more than once in the document content
-        addFileToTest("renderer/ambiguous/Ambiguous1");
-        addFileToTest("renderer/ambiguous/Ambiguous2");
-        addFileToTest("renderer/ambiguous/Ambiguous3");
-        addFileToTest("renderer/ambiguous/Ambiguous4");
-        addFileToTest("renderer/ambiguous/Ambiguous5");
-        addFileToTest("renderer/ambiguous/Ambiguous6");
+        addFileToTest("renderer/ambiguous/Ambiguous1.test");
+        addFileToTest("renderer/ambiguous/Ambiguous2.test");
+        addFileToTest("renderer/ambiguous/Ambiguous3.test");
+        addFileToTest("renderer/ambiguous/Ambiguous4.test");
+        addFileToTest("renderer/ambiguous/Ambiguous5.test");
+        addFileToTest("renderer/ambiguous/Ambiguous6.test");
         // FIXME: fix support for empty selection annotations by making sure that, at each point, for the same
         // annotation, startEvents & end events are sent in this order. FTM the convention is that annotations are
         // closed before are opened, for which reason the annotation is something like: </span><span
         // class="annotation annotationID0">...
-        // addFileToTest("renderer/ambiguous/Ambiguous7");
+        // addFileToTest("renderer/ambiguous/Ambiguous7.test");
 
         // tests in which more than one annotation needs to be rendered in the content
-        addFileToTest("renderer/multiple/Multiple1");
-        addFileToTest("renderer/multiple/Multiple2");
-        addFileToTest("renderer/multiple/Multiple3");
-        addFileToTest("renderer/multiple/Multiple4");
-        addFileToTest("renderer/multiple/Multiple5");
+        addFileToTest("renderer/multiple/Multiple1.test");
+        addFileToTest("renderer/multiple/Multiple2.test");
+        addFileToTest("renderer/multiple/Multiple3.test");
+        addFileToTest("renderer/multiple/Multiple4.test");
+        addFileToTest("renderer/multiple/Multiple5.test");
 
         // tests containing links in the annotated content
-        addFileToTest("renderer/links/Links1");
-        addFileToTest("renderer/links/Links2");
-        addFileToTest("renderer/links/Links3");
-        addFileToTest("renderer/links/Links4");
-        addFileToTest("renderer/links/Links5");
-        addFileToTest("renderer/links/Links6");
-        addFileToTest("renderer/links/Links7");
-        addFileToTest("renderer/links/Links8");
+        addFileToTest("renderer/links/Links1.test");
+        addFileToTest("renderer/links/Links2.test");
+        addFileToTest("renderer/links/Links3.test");
+        addFileToTest("renderer/links/Links4.test");
+        addFileToTest("renderer/links/Links5.test");
+        addFileToTest("renderer/links/Links6.test");
+        addFileToTest("renderer/links/Links7.test");
+        addFileToTest("renderer/links/Links8.test");
 
         // tests containing macros generating content in the annotated content
-        addFileToTest("renderer/macros/Macros1");
-        addFileToTest("renderer/macros/Macros2");
-        addFileToTest("renderer/macros/Macros3");
-        addFileToTest("renderer/macros/Macros4");
-        addFileToTest("renderer/macros/Macros5");
-        addFileToTest("renderer/macros/Macros6");
-        addFileToTest("renderer/macros/Macros7");
+        addFileToTest("renderer/macros/Macros1.test");
+        addFileToTest("renderer/macros/Macros2.test");
+        addFileToTest("renderer/macros/Macros3.test");
+        addFileToTest("renderer/macros/Macros4.test");
+        addFileToTest("renderer/macros/Macros5.test");
+        addFileToTest("renderer/macros/Macros6.test");
+        addFileToTest("renderer/macros/Macros7.test");
 
         // tests where the annotated content is in a table
-        addFileToTest("renderer/tables/Tables1");
-        addFileToTest("renderer/tables/Tables2");
+        addFileToTest("renderer/tables/Tables1.test");
+        addFileToTest("renderer/tables/Tables2.test");
 
         // tests where the annotated content is inside some verbatim blocks
-        addFileToTest("renderer/verbatim/Verbatim1");
-        addFileToTest("renderer/verbatim/Verbatim2");
-        addFileToTest("renderer/verbatim/Verbatim3");
-        addFileToTest("renderer/verbatim/Verbatim4");
-        addFileToTest("renderer/verbatim/Verbatim5");
-        addFileToTest("renderer/verbatim/Verbatim6");
-        addFileToTest("renderer/verbatim/Verbatim7");
-        addFileToTest("renderer/verbatim/Verbatim8");
-        addFileToTest("renderer/verbatim/Verbatim9");
-        addFileToTest("renderer/verbatim/Verbatim10");
+        addFileToTest("renderer/verbatim/Verbatim1.test");
+        addFileToTest("renderer/verbatim/Verbatim2.test");
+        addFileToTest("renderer/verbatim/Verbatim3.test");
+        addFileToTest("renderer/verbatim/Verbatim4.test");
+        addFileToTest("renderer/verbatim/Verbatim5.test");
+        addFileToTest("renderer/verbatim/Verbatim6.test");
+        addFileToTest("renderer/verbatim/Verbatim7.test");
+        addFileToTest("renderer/verbatim/Verbatim8.test");
+        addFileToTest("renderer/verbatim/Verbatim9.test");
+        addFileToTest("renderer/verbatim/Verbatim10.test");
 
         // tests where annotations start and/or end in the middle of a word rather than at the beginning or end
-        addFileToTest("renderer/partialwords/PartialWords1");
-        addFileToTest("renderer/partialwords/PartialWords2");
-        addFileToTest("renderer/partialwords/PartialWords3");
-        addFileToTest("renderer/partialwords/PartialWords4");
-        addFileToTest("renderer/partialwords/PartialWords5");
-        addFileToTest("renderer/partialwords/PartialWords6");
+        addFileToTest("renderer/partialwords/PartialWords1.test");
+        addFileToTest("renderer/partialwords/PartialWords2.test");
+        addFileToTest("renderer/partialwords/PartialWords3.test");
+        addFileToTest("renderer/partialwords/PartialWords4.test");
+        addFileToTest("renderer/partialwords/PartialWords5.test");
+        addFileToTest("renderer/partialwords/PartialWords6.test");
 
-        addFileToTest("renderer/spaces/Spaces1");
-        addFileToTest("renderer/spaces/Spaces2");
-        addFileToTest("renderer/spaces/Spaces3");
+        addFileToTest("renderer/spaces/Spaces1.test");
+        addFileToTest("renderer/spaces/Spaces2.test");
+        addFileToTest("renderer/spaces/Spaces3.test");
     }
 
     /**

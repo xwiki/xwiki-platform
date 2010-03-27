@@ -1,0 +1,14 @@
+##################################################
+# Annotation that starts in a link with a generated label and ends outside it
+##################################################
+.source
+Some link [[Space.ExistingPage]] with generated label
+.rendered
+<p>Some link <span class="wikilink"><a href="viewurl"><span class="wikigeneratedlinkcontent">Space.ExistingPage</span></a></span> with generated label</p>
+.annotation
+0
+XWiki.XWikiGuest
+Link with label
+ExistingPage with
+.annotated
+<p>Some link <span class="wikilink"><a href="viewurl"><span class="wikigeneratedlinkcontent">Space.<span class="annotation ID0">ExistingPage</span></span></a></span><span class="annotation ID0">&nbsp;with</span> generated label</p>

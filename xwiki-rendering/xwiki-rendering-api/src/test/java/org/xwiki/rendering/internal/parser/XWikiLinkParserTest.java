@@ -138,5 +138,12 @@ public class XWikiLinkParserTest extends AbstractComponentTestCase
         link = parser.parse("page\\@notinterwiki");
         Assert.assertEquals("page@notinterwiki", link.getReference());
         Assert.assertNull(link.getInterWikiAlias());
+
+        // Verify that \ can be escaped and that escaped chars in query string, anchors and interwikilinks are escaped
+        link = parser.parse("page\\\\#anchor\\\\?querystring\\\\@interwikilink\\\\");
+        Assert.assertEquals("page\\\\", link.getReference());
+        Assert.assertEquals("anchor\\", link.getAnchor());
+        Assert.assertEquals("querystring\\", link.getQueryString());
+        Assert.assertEquals("interwikilink\\", link.getInterWikiAlias());
     }
 }

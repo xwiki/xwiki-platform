@@ -3,15 +3,15 @@
 .# Verify that we can have #, @ and ? chars and other special chars such as dots in links to
 .# documents and to attachments.
 .#------------------------------------------------------------------------------------------
-[[My\.Page\?a\@b\#c]]
+[[pa\.g\?a\@b\#c\\#anchor\\?querystring\\@interwikilink\\]]
 [[attach:My\@Page@filename]]
 .#-----------------------------------------------------
 .expect|event/1.0
 .#-----------------------------------------------------
 beginDocument
 beginParagraph
-beginLink [Reference = [My\.Page?a@b#c]] [false]
-endLink [Reference = [My\.Page?a@b#c]] [false]
+beginLink [Reference = [pa\.g?a@b#c\\] QueryString = [querystring\] Anchor = [anchor\] InterWikiAlias = [interwikilink\]] [false]
+endLink [Reference = [pa\.g?a@b#c\\] QueryString = [querystring\] Anchor = [anchor\] InterWikiAlias = [interwikilink\]] [false]
 onNewLine
 beginLink [Reference = [attach:My\@Page@filename]] [false]
 endLink [Reference = [attach:My\@Page@filename]] [false]
@@ -20,13 +20,13 @@ endDocument
 .#-----------------------------------------------------
 .expect|annotatedxhtml/1.0
 .#-----------------------------------------------------
-<p><!--startwikilink:My\\.Page\\?a\\@b\\#c--><span class="wikicreatelink"><a href="editurl"><span class="wikigeneratedlinkcontent">My\.Page?a@b#c</span></a></span><!--stopwikilink--><br/><!--startwikilink:attach:My\\@Page@filename--><span class="wikiexternallink"><a href="attachmenturl"><span class="wikigeneratedlinkcontent">Page@filename</span></a></span><!--stopwikilink--></p>
+<p><!--startwikilink:pa\\.g\\?a\\@b\\#c\\\\#anchor\\\\?querystring\\\\@interwikilink\\\\--><span class="wikiexternallink"><a><span class="wikigeneratedlinkcontent">pa\.g?a@b#c\\</span></a></span><!--stopwikilink--><br/><!--startwikilink:attach:My\\@Page@filename--><span class="wikiexternallink"><a href="attachmenturl"><span class="wikigeneratedlinkcontent">Page@filename</span></a></span><!--stopwikilink--></p>
 .#-----------------------------------------------------
 .expect|xwiki/2.0
 .#-----------------------------------------------------
-[[My\.Page\?a\@b\#c]]
+[[pa\.g\?a\@b\#c\\#anchor\\?querystring\\@interwikilink\\]]
 [[attach:My\@Page@filename]]
 .#-----------------------------------------------------
 .input|xhtml/1.0
 .#-----------------------------------------------------
-<html><p><!--startwikilink:My\\.Page\\?a\\@b\\#c--><span class="wikicreatelink"><a href="editurl"><span class="wikigeneratedlinkcontent">My\.Page?a@b#c</span></a></span><!--stopwikilink--><br/><!--startwikilink:attach:My\\@Page@filename--><span class="wikiexternallink"><a href="attachmenturl"><span class="wikigeneratedlinkcontent">Page@filename</span></a></span><!--stopwikilink--></p></html>
+<html><p><!--startwikilink:pa\\.g\\?a\\@b\\#c\\\\#anchor\\\\?querystring\\\\@interwikilink\\\\--><span class="wikiexternallink"><a><span class="wikigeneratedlinkcontent">pa\.g?a@b#c\\</span></a></span><!--stopwikilink--><br/><!--startwikilink:attach:My\\@Page@filename--><span class="wikiexternallink"><a href="attachmenturl"><span class="wikigeneratedlinkcontent">Page@filename</span></a></span><!--stopwikilink--></p></html>

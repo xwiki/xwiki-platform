@@ -237,7 +237,7 @@ public class DOMXMLWriter extends XMLWriter
             }
             parent.pop();
         } catch (EmptyStackException e) {
-            throw new IOException("FATAL: Closing a element that have never been opened", e);
+            throw new IOException("FATAL: Closing a element that have never been opened");
         }
     }
 

@@ -67,9 +67,7 @@ public class PlainTextChainingRendererTest extends AbstractComponentTestCase
         renderer.setPrinter(printer);
 
         Link link = new Link();
-        link.setAnchor("anchor");
-        link.setQueryString("param=value");
-        link.setReference("reference");
+        link.setReference("reference#anchor?param=value");
         link.setType(LinkType.URI);
 
         renderer.beginLink(link, false, Collections.<String, String> emptyMap());

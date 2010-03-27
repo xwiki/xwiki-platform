@@ -34,20 +34,38 @@ import org.xwiki.rendering.parser.LinkParser;
 public class BasicLinkRenderer
 {
     /**
-     * Escapes to add when rendering a link reference.
+     * Escapes to add when rendering a link reference part.
      */
-    private static final String[] ESCAPE_REPLACEMENTS = new String[] {
+    private static final String[] ESCAPE_REPLACEMENTS_REFERENCE = new String[] {
         LinkParser.ESCAPE_CHAR + LinkParser.SEPARATOR_QUERYSTRING,
         LinkParser.ESCAPE_CHAR + LinkParser.SEPARATOR_INTERWIKI,
         LinkParser.ESCAPE_CHAR + LinkParser.SEPARATOR_ANCHOR};
 
     /**
-     * Replacement chars for the escapes to add.
+     * Replacement chars for the escapes to add to the reference part.
      */
-    private static final String[] ESCAPES = new String[] {
+    private static final String[] ESCAPES_REFERENCE = new String[] {
         LinkParser.SEPARATOR_QUERYSTRING,
         LinkParser.SEPARATOR_INTERWIKI,
         LinkParser.SEPARATOR_ANCHOR};
+
+    /**
+     * Escapes to add when rendering a link query string, anchor or interwiki part.
+     */
+    private static final String[] ESCAPE_REPLACEMENTS_EXTRA = new String[] {
+        LinkParser.ESCAPE_CHAR + LinkParser.SEPARATOR_QUERYSTRING,
+        LinkParser.ESCAPE_CHAR + LinkParser.SEPARATOR_INTERWIKI,
+        LinkParser.ESCAPE_CHAR + LinkParser.SEPARATOR_ANCHOR,
+        "" + LinkParser.ESCAPE_CHAR + LinkParser.ESCAPE_CHAR};
+
+    /**
+     * Replacement chars for the escapes to add to the query string, anchor or interwiki part.
+     */
+    private static final String[] ESCAPES_EXTRA = new String[] {
+        LinkParser.SEPARATOR_QUERYSTRING,
+        LinkParser.SEPARATOR_INTERWIKI,
+        LinkParser.SEPARATOR_ANCHOR,
+        "" + LinkParser.ESCAPE_CHAR};
 
     /**
      * @param link the link for which to generate a string representation
@@ -60,26 +78,49 @@ public class BasicLinkRenderer
 
         if (link.getReference() != null) {
             // Make sure we escape special chars: #, @ and ? as they have special meaning in links, but only for
-            // links to documents
+            // links to documents. Also escape \ since it's the escape char.
             String normalizedReference = link.getReference();
-            if (link.getType() == LinkType.DOCUMENT) {
-                normalizedReference = StringUtils.replaceEach(link.getReference(), ESCAPES, ESCAPE_REPLACEMENTS);
+            if (link.getType() != LinkType.URI) {
+                normalizedReference = addEscapesToReferencePart(link.getReference());
             }
             buffer.append(normalizedReference);
         }
-        if (link.getAnchor() != null) {
-            buffer.append('#');
-            buffer.append(link.getAnchor());
-        }
-        if (link.getQueryString() != null) {
-            buffer.append('?');
-            buffer.append(link.getQueryString());
-        }
-        if (link.getInterWikiAlias() != null) {
-            buffer.append('@');
-            buffer.append(link.getInterWikiAlias());
+
+        // Query string, anchor and interwiki parts only make sense for non URI links.
+        if (link.getType() != LinkType.URI) {
+            if (link.getAnchor() != null) {
+                buffer.append('#');
+                buffer.append(addEscapesToExtraParts(link.getAnchor()));
+            }
+            if (link.getQueryString() != null) {
+                buffer.append('?');
+                buffer.append(addEscapesToExtraParts(link.getQueryString()));
+            }
+            if (link.getInterWikiAlias() != null) {
+                buffer.append('@');
+                buffer.append(addEscapesToExtraParts(link.getInterWikiAlias()));
+            }
         }
 
         return buffer.toString();
     }
+
+    /**
+     * @param text the reference to which to add escapes to
+     * @return the modified text
+     */
+    private String addEscapesToReferencePart(String text)
+    {
+        return StringUtils.replaceEach(text, ESCAPES_REFERENCE, ESCAPE_REPLACEMENTS_REFERENCE);
+    }
+
+    /**
+     * @param text the query string, anchor or interwiki parts to which to add escapes to
+     * @return the modified text
+     */
+    private String addEscapesToExtraParts(String text)
+    {
+        return StringUtils.replaceEach(text, ESCAPES_EXTRA, ESCAPE_REPLACEMENTS_EXTRA);
+    }
+
 }

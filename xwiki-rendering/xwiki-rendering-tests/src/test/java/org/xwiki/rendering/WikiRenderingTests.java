@@ -44,7 +44,7 @@ public class WikiRenderingTests extends TestCase
         RenderingTestSuite suite = new RenderingTestSuite("Rendering tests requiring the wiki notion");
 
         // Links
-        suite.addTestsFromResource("link/links1", false);
+/*        suite.addTestsFromResource("link/links1", false);
         suite.addTestsFromResource("link/links2", false);
         suite.addTestsFromResource("link/links3", false);
         suite.addTestsFromResource("link/links4", false);
@@ -67,7 +67,7 @@ public class WikiRenderingTests extends TestCase
         suite.addTestsFromResource("link/links21", false);
         suite.addTestsFromResource("link/links22", false);
         suite.addTestsFromResource("link/links23", false);
-        suite.addTestsFromResource("link/links25", false);
+*/        suite.addTestsFromResource("link/links25", false);
 
         // Images
         suite.addTestsFromResource("image/image1", false);

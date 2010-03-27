@@ -42,9 +42,9 @@ $xwiki.jsx.use($blogScriptsDocumentName)##
   &lt;div&gt;
     &lt;input type="hidden" name="entrySpace" value="$space"/&gt;
     #if($doc.getObject($blogCategoryClassname))
-      &lt;input type="hidden" name="category" value="${doc.fullName}"/&gt;
+      &lt;input type="hidden" name="category" value="${escapetool.xml(${doc.fullName})}"/&gt;
     #end
-    &lt;label class="createPost" for="entryTitle"&gt;$msg.get('xe.blog.post.createpost') &lt;/label&gt;&lt;input type="text" id="entryTitle" name="entryTitle" value="$msg.get('xe.blog.post.title')" class="withTip"/&gt; &lt;span class="buttonwrapper"&gt;&lt;input type="submit" value="$msg.get('xe.blog.post.create')" class="button"/&gt;&lt;/span&gt;
+    &lt;label class="createPost" for="entryTitle"&gt;$msg.get('xe.blog.post.createpost') &lt;/label&gt;&lt;input type="text" id="entryTitle" name="entryTitle" value="$msg.get('xe.blog.post.title')" class="withTip"/&gt; &lt;span class="buttonwrapper"&gt;&lt;input type="submit" value="${escapetool.xml($msg.get('xe.blog.post.create'))}" class="button"/&gt;&lt;/span&gt;
   &lt;/div&gt;
   &lt;/form&gt;
 #else
@@ -60,7 +60,7 @@ $xwiki.jsx.use($blogScriptsDocumentName)##
   #set($parent = $blogDoc.fullName)
   #set($title = $util.encodeURI($name))
   #if("$!request.category" != '')
-    #set($category = "&amp;${blogPostClassname}_${blogPostObjectNumber}_category=${request.category}")
+    #set($category = "&amp;${blogPostClassname}_${blogPostObjectNumber}_category=${escapetool.url(${request.category})}")
   #end
   $response.sendRedirect($xwiki.getURL($postDocName, 'inline', "template=${blogPostTemplate}&amp;parent=${parent}&amp;title=${title}&amp;${blogPostClassname}_0_title=${title}$!{category}"))
 #end## name == ''

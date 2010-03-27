@@ -82,10 +82,10 @@
   #foreach($category in $xwiki.searchDocuments($query))
     #set($categoryDoc = $xwiki.getDocument($category))
     #set($categoryParent = "$!categoryDoc.parent")
-    #if ($categoryParent == "")
+    #if($categoryParent == '')
       #set($categoryParent = $defaultCategoryParent)
     #end
-    #if (!$tree.containsKey($categoryParent))
+    #if(!$tree.containsKey($categoryParent))
       #set($discard = $tree.put($categoryParent, $util.arrayList))
     #end
     #set($discard = $tree.get($categoryParent).add($category))
@@ -97,7 +97,7 @@
 #**
  * Displays the category hierarchy held in the &lt;tt&gt;tree&lt;/tt&gt; parameter.
  * 
- * @param tree The category hierarchy HashMap&lt;String, List&lt;String&gt;&gt; structure, where the key
+ * @param tree The category hierarchy, a HashMap&lt;String, List&lt;String&gt;&gt; structure, where the key
  *        is the name of a category, and the value contains the names of all its subcategories.
  * @param displayMethod Selects how to display the category tree. Possible values are:
  *        &lt;ul&gt;
@@ -212,7 +212,7 @@
  * control for choosing the parent category among existing categories.
  *###
 ## DO NOT CHANGE INDENTATION
-#macro(addCategoryForm) &lt;form action="$doc.getURL()" method="post" class="category-add-form"&gt;&lt;div class='create-category'&gt; &lt;input type="hidden" name="xaction" value="create"/&gt; &lt;label&gt;$msg.get("xe.blog.categories.new")&lt;br/&gt; &lt;input type="text" name="newCategoryName" class="category-name-input"&gt;&lt;/input&gt;&lt;/label&gt;&lt;br/&gt;#if("$!{request.parentCategory}" == "")&lt;label&gt;#* $msg.get("xe.blog.categories.parent")*# Subcategory of:&lt;br/&gt; &lt;select name="newCategoryParent" id="blog_category_selectBox" class="category-add-input"&gt; &lt;option value="${defaultCategoryParent}" selected="selected"&gt;None&lt;/option&gt; $!processedCategories.clear() #displayCategoriesHierarchy($tree 'option') &lt;/select&gt; &lt;br/&gt;&lt;/label&gt;#else&lt;input type="hidden" name="newCategoryParent" value="$!{request.parentCategory}"/&gt;#end&lt;span class="buttonwrapper"&gt;&lt;input class="button" type="submit" value="Add"&gt;&lt;/input&gt;&lt;/span&gt; &lt;a href="$doc.getURL()"&gt;Cancel&lt;/a&gt; &lt;/div&gt;&lt;/form&gt; #end
+#macro(addCategoryForm) &lt;form action="$doc.getURL()" method="post" class="category-add-form"&gt;&lt;div class='create-category'&gt; &lt;input type="hidden" name="xaction" value="create"/&gt; &lt;label&gt;$msg.get('xe.blog.categories.new')&lt;br/&gt; &lt;input type="text" name="newCategoryName" class="category-name-input"&gt;&lt;/input&gt;&lt;/label&gt;&lt;br/&gt;#if("$!{request.parentCategory}" == '')&lt;label&gt;#* $msg.get('xe.blog.categories.parent')*# Subcategory of:&lt;br/&gt; &lt;select name="newCategoryParent" id="blog_category_selectBox" class="category-add-input"&gt; &lt;option value="${defaultCategoryParent}" selected="selected"&gt;None&lt;/option&gt; $!processedCategories.clear() #displayCategoriesHierarchy($tree 'option') &lt;/select&gt; &lt;br/&gt;&lt;/label&gt;#else&lt;input type="hidden" name="newCategoryParent" value="$!{request.parentCategory}"/&gt;#end&lt;span class="buttonwrapper"&gt;&lt;input class="button" type="submit" value="Add"&gt;&lt;/input&gt;&lt;/span&gt; &lt;a href="$doc.getURL()"&gt;Cancel&lt;/a&gt; &lt;/div&gt;&lt;/form&gt; #end
 ##
 ##
 ##
@@ -316,7 +316,7 @@ $!categoryDoc.getObject(${blogCategoryClassname}).getProperty('description').val
  * Generates a form for creating a new category. The form allows to enter the name of the new
  * category, and select a parent category from the existing ones.
  * 
- * @param tree The category hierarchy HashMap&lt;String, List&lt;String&gt;&gt; structure, where the key
+ * @param tree The category hierarchy, a HashMap&lt;String, List&lt;String&gt;&gt; structure, where the key
  *        is the name of a category, and the value contains the names of all its subcategories.
  * @todo When javascript is disabled, a link to "Manage categories" should be displayed instead.
  *       This "form" should be created from javascript.

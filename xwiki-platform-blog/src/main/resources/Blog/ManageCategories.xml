@@ -664,6 +664,7 @@ input.category-name-input {
 </property>
 </object>
 <content>{{include document="Blog.CategoriesCode"/}}
+
 {{velocity filter="none"}}
 {{html clean="false" wiki="true"}}
 #set($space = "$!request.space")

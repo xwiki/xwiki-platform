@@ -24,6 +24,7 @@
 <syntaxId>xwiki/2.0</syntaxId>
 <hidden>true</hidden>
 <content>{{include document="Blog.BlogCode"/}}
+
 {{velocity output="false"}}
 ##
 ##

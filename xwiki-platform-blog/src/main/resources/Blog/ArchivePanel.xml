@@ -101,6 +101,7 @@
 </property>
 <property>
 <content>{{include document="Blog.BlogCode"/}}
+
 {{velocity filter="none"}}
 {{html clean="false" wiki="true"}}
 #set($space = "$!{request.space}")

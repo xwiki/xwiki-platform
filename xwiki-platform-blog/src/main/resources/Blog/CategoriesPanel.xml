@@ -101,6 +101,7 @@
 </property>
 <property>
 <content>{{include document="Blog.CategoriesCode"/}}
+
 {{velocity filter="none"}}
 {{html clean="false" wiki="true"}}
 #panelheader('Blog Categories')

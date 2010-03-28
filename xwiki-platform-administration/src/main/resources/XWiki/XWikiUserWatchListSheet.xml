@@ -105,5 +105,4 @@ $xwiki.ssx.use('Main.Dashboard')##
 &lt;/div&gt;
 {{/html}}
 #end
-{{/velocity}}
-</content></xwikidoc>
+{{/velocity}}</content></xwikidoc>

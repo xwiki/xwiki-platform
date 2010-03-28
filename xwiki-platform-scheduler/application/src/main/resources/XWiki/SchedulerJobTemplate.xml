@@ -131,5 +131,4 @@
 <status></status>
 </property>
 </object>
-<content>{{include document="XWiki.SchedulerJobSheet"/}}
-</content></xwikidoc>
+<content>{{include document="XWiki.SchedulerJobSheet"/}}</content></xwikidoc>

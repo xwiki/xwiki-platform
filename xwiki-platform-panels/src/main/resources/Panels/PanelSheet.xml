@@ -73,7 +73,6 @@ $msg.get($prop.name)#end
       #displayPanelProperty($obj "description")
       #displayPanelProperty($obj "content")
     &lt;/dl&gt;
-  {{/html}}
-#end
+  {{/html}}#end
 {{/velocity}}</content>
 </xwikidoc>

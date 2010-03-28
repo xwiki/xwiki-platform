@@ -22,8 +22,7 @@
 <minorEdit>false</minorEdit>
 <syntaxId>xwiki/2.0</syntaxId>
 <hidden>false</hidden>
-<content>
-{{velocity filter="none"}}
+<content>{{velocity filter="none"}}
 {{html clean="false" wiki="true"}}
 = Existing wiki macro definitions =
 #set($mxwiki=$xwiki.getXWiki())
@@ -36,6 +35,5 @@
   [[$mdoc&gt;&gt;$mdoc]]&lt;br/&gt;
 #end
 {{/html}}
-{{/velocity}}
-</content>
+{{/velocity}}</content>
 </xwikidoc>

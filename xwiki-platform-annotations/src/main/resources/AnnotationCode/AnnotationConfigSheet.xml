@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<xwikidoc>
+<web>AnnotationCode</web>
+<name>AnnotationConfigSheet</name>
+<language></language>
+<defaultLanguage>en</defaultLanguage>
+<translation>0</translation>
+<parent>AnnotationCode.WebHome</parent>
+<creator>XWiki.Admin</creator>
+<author>XWiki.Admin</author>
+<customClass></customClass>
+<contentAuthor>XWiki.Admin</contentAuthor>
+<creationDate>1269603238000</creationDate>
+<date>1269604020000</date>
+<contentUpdateDate>1269604020000</contentUpdateDate>
+<version>1.0</version>
+<title></title>
+<template></template>
+<defaultTemplate></defaultTemplate>
+<validationScript></validationScript>
+<comment></comment>
+<minorEdit>false</minorEdit>
+<syntaxId>xwiki/2.0</syntaxId>
+<hidden>false</hidden>
+<object>
+<class>
+<name>XWiki.SheetClass</name>
+<customClass></customClass>
+<customMapping></customMapping>
+<defaultViewSheet></defaultViewSheet>
+<defaultEditSheet></defaultEditSheet>
+<defaultWeb></defaultWeb>
+<nameField></nameField>
+<validationScript></validationScript>
+<defaultEditMode>
+<name>defaultEditMode</name>
+<number>1</number>
+<prettyName>Default Edit Mode</prettyName>
+<size>15</size>
+<unmodifiable>0</unmodifiable>
+<classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+</defaultEditMode>
+</class>
+<name>AnnotationCode.AnnotationConfigSheet</name>
+<number>0</number>
+<className>XWiki.SheetClass</className>
+<guid>86ce47df-7f95-4132-b273-5349bf160d8a</guid>
+<property>
+<defaultEditMode>inline</defaultEditMode>
+</property>
+</object>
+<content>{{velocity}}
+#set($annotationsConfigClass = $xwiki.getDocument("AnnotationCode.AnnotationConfig").xWikiClass)
+#set($configObj = $doc.getObject($doc.fullName))
+= $msg.get('annotations.config.activate.title') =
+$msg.get('annotations.config.activate.explanation')
+
+**$annotationsConfigClass.get("activated").prettyName**: $doc.display("activated")
+**$annotationsConfigClass.get("exceptionSpaces").prettyName**: #if($context.action == "inline") $doc.display("exceptionSpaces")#else#foreach($space in $configObj.getProperty("exceptionSpaces").value)#if($velocityCount &gt; 1), #end[[$space&gt;&gt;${space}.WebHome]]#end#end
+
+= $msg.get('annotations.config.display.title') =
+**$annotationsConfigClass.get("displayed").prettyName** ($msg.get('annotations.config.notimplemented')): $doc.display("displayed")
+**$annotationsConfigClass.get("displayHighlight").prettyName**: $doc.display("displayHighlight")
+
+= $msg.get('annotations.config.type.title') =
+$msg.get('annotations.config.type.explanation')
+
+**$annotationsConfigClass.get("annotationClass").prettyName**: #if ($context.action == "inline") $doc.display("annotationClass") #else [[$doc.display("annotationClass")&gt;&gt;$doc.display("annotationClass")]] #end
+{{/velocity}}</content>
+</xwikidoc>

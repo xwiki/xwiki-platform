@@ -12,8 +12,8 @@
 <customClass></customClass>
 <contentAuthor>XWiki.Admin</contentAuthor>
 <creationDate>1264860755000</creationDate>
-<date>1269121797000</date>
-<contentUpdateDate>1269121797000</contentUpdateDate>
+<date>1269520419000</date>
+<contentUpdateDate>1269520419000</contentUpdateDate>
 <version>1.0</version>
 <title></title>
 <template></template>
@@ -565,6 +565,8 @@ XWiki.Selection = Class.create({
   fetchedAnnotations : false,
   // the display annotations check box in the settings panel
   displayAnnotationsCheckbox : false,
+  // whether the annotations should be displayed as highlighted or only the icons
+  displayHighlight : true,
   // add annotation shortcuts
   addAnnotationShortcuts : ['Ctrl+M', 'Meta+M', 'Ctrl+I', 'Meta+I'],
   // shortcuts for closing the open dialog, be it create, edit or display
@@ -577,7 +579,8 @@ XWiki.Selection = Class.create({
   // It will be updated any time a changed filter event is received
   currentFilter : {},
 
-  initialize : function () {
+  initialize : function (displayHighlighted) {
+    this.displayHighlight = displayHighlighted;
     this.hookMenuButton();
     this.hookTabShortcut();
     this.hookTab();
@@ -733,8 +736,10 @@ XWiki.Selection = Class.create({
   toggleAnnotations : function(visible) {
     // TODO: #xwikicontent is container specific, get the container from a member or something
     // don't standard toggle because we want to ensure it matches visible
-    $$('#xwikicontent .annotation').invoke(visible ? 'addClassName' : 'removeClassName', 'annotation-highlight');
-    //and hide all annotation markers
+    if (this.displayHighlight) {
+      $$('#xwikicontent .annotation').invoke(visible ? 'addClassName' : 'removeClassName', 'annotation-highlight');
+    }
+    //and toggle all annotation markers
     $$('#xwikicontent .annotation-marker').invoke(visible ? 'removeClassName' : 'addClassName', 'hidden');
     if (!visible) {
       // also close all open bubbles
@@ -746,6 +751,10 @@ XWiki.Selection = Class.create({
       }.bind(this));
       this.bubbles.clear();
     }
+  },
+
+  toggleAnnotationHighlight : function(annotationId, visible) {
+    $$('#xwikicontent .annotation.ID' + annotationId).invoke(visible ? 'addClassName' : 'removeClassName', 'annotation-highlight');
   },
   
   /**
@@ -1054,8 +1063,14 @@ XWiki.Selection = Class.create({
         // enough propagation
         event.stop();
         this.hideBubble(newBubble);
+        if (!this.displayHighlight) {
+          this.toggleAnnotationHighlight(id, false);
+        }
       }
     }.bindAsEventListener(this, newBubble));
+    if (!this.displayHighlight) {
+      this.toggleAnnotationHighlight(id, true);
+    }
 
     // and fetch the annotations display in it
     this.fetchAndShowAnnotationDetails(id, newBubble);
@@ -1442,9 +1457,34 @@ XWiki.Selection = Class.create({
   }
 });
 
-// TODO: add conditions here to load only on activated spaces and only if annotations are activated in the config document
+## Retrieve the annotation settings from the configuration object
+#set($config = 'AnnotationCode.AnnotationConfig')
+#set($configObj = $xwiki.getDocument($config).getObject($config))
+#set($annotationHighlightByDefault = $configObj.getProperty('displayHighlight').value)
+#set($annotationsActivated = $configObj.getProperty('activated').value)
+#set($exceptionSpaces = $configObj.getProperty('exceptionSpaces').value)
 document.observe('dom:loaded', function() {
-  new XWiki.Annotation();
+  #if ($annotationHighlightByDefault &amp;&amp; $annotationHighlightByDefault != 0)
+    var displayHighlight = true;
+  #else
+    var displayHighlight = false;
+  #end
+  #if ($annotationsActivated &amp;&amp; $annotationsActivated != 0)
+    var activated = true;
+  #else
+    var activated = false;
+  #end
+  
+  // parse the exception spaces and check where is the current space in that list
+  var exceptions = [];
+  #foreach($space in $exceptionSpaces)
+    exceptions.push('$space');
+  #end
+  var currentSpaceInExceptions = exceptions.indexOf(XWiki.currentSpace);
+  // if the annotations are activated and the current space is not an exception or the annotations are not activated but the current space is an exception
+  if ((activated &amp;&amp; currentSpaceInExceptions &lt; 0) || (!activated &amp;&amp; currentSpaceInExceptions &gt;= 0)) {
+    new XWiki.Annotation(displayHighlight);
+  }
 });</code>
 </property>
 <property>

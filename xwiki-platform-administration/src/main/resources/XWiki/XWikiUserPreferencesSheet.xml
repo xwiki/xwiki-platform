@@ -59,7 +59,6 @@ $xwiki.ssx.use('Main.Dashboard')##
   #end
   &lt;div class="dashboardspacer"&gt;&amp;nbsp;&lt;/div&gt;
 &lt;/div&gt;
-{{/html}}
-#end
+{{/html}}#end
 {{/velocity}}</content>
 </xwikidoc>

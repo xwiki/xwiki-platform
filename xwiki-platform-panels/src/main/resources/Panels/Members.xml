@@ -118,7 +118,7 @@
 [[$msg.get("xe.panels.members.viewall")&gt;&gt;XWiki.XWikiUsers]]
 #panelfooter()
 {{/html}}
-{{velocity}}</content>
+{{/velocity}}</content>
 </property>
 <property>
 <name>Members</name>

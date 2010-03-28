@@ -455,6 +455,7 @@ document.observe('xwiki:annotations:settings:loaded', function() {
 #end
 
 {{/velocity}}
+
 {{velocity}}
 {{html clean="false"}}
 &lt;div class="annotationsettings"&gt;

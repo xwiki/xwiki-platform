@@ -56,8 +56,7 @@
 <tags/>
 </property>
 </object>
-<content>
-{{velocity}}
+<content>{{velocity}}
 #if($isguest)
   #error($msg.get("xe.officeimporter.notallowed"))  
 #else
@@ -149,6 +148,5 @@
     #end
   #end  
 #end
-{{/velocity}}
-</content>
+{{/velocity}}</content>
 </xwikidoc>

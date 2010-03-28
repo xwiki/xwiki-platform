@@ -24,6 +24,7 @@
 <syntaxId>xwiki/2.0</syntaxId>
 <hidden>true</hidden>
 <content>{{include document="Blog.BlogCode"/}}
+
 {{velocity filter="none"}}
 {{html clean="false" wiki="true"}}
 #if($hasAdmin)

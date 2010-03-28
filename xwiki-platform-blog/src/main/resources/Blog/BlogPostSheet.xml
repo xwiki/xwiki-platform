@@ -51,7 +51,9 @@
 </property>
 </object>
 <content>{{include document="Blog.BlogCode"/}}
+
 {{include document="Blog.CategoriesCode"/}}
+
 {{velocity filter="none"}}
 {{html clean="false" wiki="true"}}
 $xwiki.jsx.use('Blog.ManageCategories', {'mode' : 'select'})##

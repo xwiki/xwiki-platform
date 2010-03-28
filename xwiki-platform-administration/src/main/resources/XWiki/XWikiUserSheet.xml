@@ -508,7 +508,9 @@ $xwiki.jsx.use("XWiki.XWikiUserSheet")##
       #set($tabInclude = $listtool.get($tab, 2))
       &lt;div id="${tabKey}Pane" class="vertical-pane#if($tabKey != $currentCategory) hidden#end"&gt;
         {{/html}}
+
           {{include document="${tabInclude}" /}}
+
         {{html clean="false"}}
       &lt;/div&gt;
     #end

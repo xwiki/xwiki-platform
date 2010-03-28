@@ -12,8 +12,8 @@
 <customClass></customClass>
 <contentAuthor>XWiki.Admin</contentAuthor>
 <creationDate>1264862667000</creationDate>
-<date>1269124868000</date>
-<contentUpdateDate>1269124868000</contentUpdateDate>
+<date>1269604215000</date>
+<contentUpdateDate>1269604215000</contentUpdateDate>
 <version>1.0</version>
 <title></title>
 <template></template>
@@ -71,5 +71,13 @@ annotations.action.validate.loaderror=Failed:
 annotations.filters.show=Refine the display criteria
 annotations.filters.nooption=There are no values to filter for "{0}"
 annotations.filters.anyvalue=any value
-annotations.filters.clearvalue=clear</content>
+annotations.filters.clearvalue=clear
+
+annotations.config.title=Annotations configuration panel
+annotations.config.display.title=Annotation display settings
+annotations.config.type.title=Annotation type settings
+annotations.config.notimplemented=not implemented yet
+annotations.config.activate.title=Annotation activation settings
+annotations.config.activate.explanation=The following two settings allow you to configure in which spaces are annotations active. The first setting specifies the general rule, while the second list specifies the spaces for which the rule shouldn't apply. For example, activated "yes" and exception spaces "XWiki" and "Main" means that annotations will be active on all spaces except for "XWiki" and "Main", while activated "no" and exception spaces "Documents" means that annotations will be active only for the "Documents" space.
+annotations.config.type.explanation=Add properties to this class if you want extra properties for your annotations.</content>
 </xwikidoc>

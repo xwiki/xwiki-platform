@@ -114,6 +114,7 @@
           <style>${gwt.style}</style>
           <disableCastChecking>true</disableCastChecking>
           <disableClassMetadata>true</disableClassMetadata>
+          <soyc>false</soyc>
           <!--
             In order to prevent the "java.lang.InternalError: Can't connect to X11 window server using ':1.0' as the
             value of the DISPLAY variable." error message we have to run the GWT compiler with the headless AWT option.

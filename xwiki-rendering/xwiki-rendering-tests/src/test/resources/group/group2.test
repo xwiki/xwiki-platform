@@ -10,19 +10,18 @@ beginParagraph
 onWord [before]
 onSpace
 onWord [inside]
-onSpace
-onSpecialSymbol [)]
-onSpecialSymbol [)]
-onSpecialSymbol [)]
-onSpace
+endParagraph
+beginParagraph
 onWord [after]
 endParagraph
 endDocument
 .#-----------------------------------------------------
 .expect|xhtml/1.0
 .#-----------------------------------------------------
-<p>before inside ))) after</p>
+<p>before inside</p><p>after</p>
 .#-----------------------------------------------------
 .expect|xwiki/2.0
 .#-----------------------------------------------------
-before inside ~)~)~) after
+before inside
+
+after

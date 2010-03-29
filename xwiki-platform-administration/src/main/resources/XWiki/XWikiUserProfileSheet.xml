@@ -1,5 +1,4 @@
 <?xml version="1.0" encoding="UTF-8"?>
-
 <xwikidoc>
 <web>XWiki</web>
 <name>XWikiUserProfileSheet</name>
@@ -33,6 +32,7 @@
 {{html clean="false" wiki="true"}}
 #set($username = $xwiki.getUserName($doc.fullName, false))
 = $msg.get('platform.core.profile.title', [$username]) =
+
 #if($context.action == 'view')
   &lt;div class="vcard"&gt;
   &lt;span class="fn hidden"&gt;$username&lt;/span&gt;
@@ -94,11 +94,13 @@ $xwiki.ssx.use('Main.Dashboard')##
     #if ($context.action == 'view')
       &lt;div class="userRecentChanges"&gt;
         &lt;h1&gt;$msg.get('platform.core.profile.section.recentChanges')&lt;/h1&gt;
-        {{/html}}
-        #set ($rcAuthor = [$doc.fullName])
-        #set ($rcChangesNb = 10)
-        {{include document="Main.RecentChanges"/}}
-        {{html clean="false"}}
+{{/html}}
+#set ($rcAuthor = [$doc.fullName])
+#set ($rcChangesNb = 10)
+
+{{include document="Main.RecentChanges"/}}
+
+{{html clean="false"}}
       &lt;/div&gt;
     #end
   &lt;/div&gt;
@@ -108,7 +110,5 @@ $xwiki.ssx.use('Main.Dashboard')##
   ## Close the vcard
   &lt;/div&gt;
 #end
-{{/html}}
-#end
-{{/velocity}}</content>
-</xwikidoc>
+{{/html}}#end
+{{/velocity}}</content></xwikidoc>

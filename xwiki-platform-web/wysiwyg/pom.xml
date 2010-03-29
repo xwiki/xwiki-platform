@@ -160,6 +160,7 @@
           <style>${gwt.style}</style>
           <disableCastChecking>true</disableCastChecking>
           <disableClassMetadata>true</disableClassMetadata>
+          <soyc>false</soyc>
           <!-- HACK: We inject the GWT arguments in the out parameter because we have no other option. -->
           <out>target/www-test${gwt.args}</out>
           <testTimeOut>600</testTimeOut>

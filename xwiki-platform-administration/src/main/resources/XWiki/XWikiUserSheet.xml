@@ -1,5 +1,4 @@
 <?xml version="1.0" encoding="UTF-8"?>
-
 <xwikidoc>
 <web>XWiki</web>
 <name>XWikiUserSheet</name>
@@ -507,15 +506,14 @@ $xwiki.jsx.use("XWiki.XWikiUserSheet")##
       #set($tabKey = $listtool.get($tab, 0))
       #set($tabInclude = $listtool.get($tab, 2))
       &lt;div id="${tabKey}Pane" class="vertical-pane#if($tabKey != $currentCategory) hidden#end"&gt;
-        {{/html}}
+{{/html}}
 
-          {{include document="${tabInclude}" /}}
+{{include document="${tabInclude}" /}}
 
-        {{html clean="false"}}
+{{html clean="false"}}
       &lt;/div&gt;
     #end
     &lt;div class="clearfloats"&gt;&amp;nbsp;&lt;/div&gt;
   &lt;/div&gt;
 {{/html}}
-{{/velocity}}</content>
-</xwikidoc>
+{{/velocity}}</content></xwikidoc>

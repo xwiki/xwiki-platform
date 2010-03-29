@@ -27,7 +27,7 @@
 #if(!$obj)
 = $msg.get('xe.admin.users.sheet') =
 
-{{info}}$msg.get('xe.admin.users.applyonusers'){{/info}}
+{{info}}$msg.get('xe.admin.users.applyonusers'){{/info}}##
 #else
 {{html clean="false" wiki="true"}}
 #set($username = $xwiki.getUserName($doc.fullName, false))
@@ -110,5 +110,6 @@ $xwiki.ssx.use('Main.Dashboard')##
   ## Close the vcard
   &lt;/div&gt;
 #end
-{{/html}}#end
+{{/html}}##
+#end
 {{/velocity}}</content></xwikidoc>

@@ -218,6 +218,19 @@ public class XWikiDocumentTest extends AbstractBridgedXWikiComponentTestCase
         assertEquals("Title", this.document.getDisplayTitle(getContext()));
     }
 
+    /**
+     * Verify that if an error happens when evaluation the title, we fallback to the computed title.
+     */
+    public void testGetDisplayWhenVelocityError()
+    {
+        this.document.setContent("Some content");
+        this.document.setTitle("some content that generate a velocity error");
+        this.mockXWikiRenderingEngine.expects(once()).method("interpretText").will(
+            returnValue("... blah blah ... <div id=\"xwikierror105\" ... blah blah ..."));
+
+        assertEquals("Page", this.document.getDisplayTitle(getContext()));
+    }
+
     public void testMinorMajorVersions()
     {
         // there is no version in doc yet, so 1.1

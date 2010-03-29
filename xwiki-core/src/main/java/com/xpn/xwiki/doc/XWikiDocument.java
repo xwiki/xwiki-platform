@@ -1140,13 +1140,21 @@ public class XWikiDocument implements DocumentModelBridge
             if (!StringUtils.isEmpty(title)) {
                 title = context.getWiki().getRenderingEngine().interpretText(title, this, context);
 
-                if (!outputSyntax.equals(Syntax.HTML_4_01) && !outputSyntax.equals(Syntax.XHTML_1_0)) {
-                    XDOM xdom = parseContent(Syntax.HTML_4_01.toIdString(), title);
-                    this.parserUtils.removeTopLevelParagraph(xdom.getChildren());
-                    title = renderXDOM(xdom, outputSyntax);
-                }
+                // If there's been an error during the Velocity evaluation then consider that the title is empty as a
+                // fallback.
+                // TODO: Since interpretText() never throws an exception it's hard to know if there's been an error.
+                // Right now interpretText() returns some HTML when there's an error, so we need to check the returned
+                // result for some marker to decide if an error has occurred... Fix this by refactoring the whole
+                // system used for Velocity evaluation.
+                if (title.indexOf("<div id=\"xwikierror") == -1) {
+                    if (!outputSyntax.equals(Syntax.HTML_4_01) && !outputSyntax.equals(Syntax.XHTML_1_0)) {
+                        XDOM xdom = parseContent(Syntax.HTML_4_01.toIdString(), title);
+                        this.parserUtils.removeTopLevelParagraph(xdom.getChildren());
+                        title = renderXDOM(xdom, outputSyntax);
+                    }
 
-                return title;
+                    return title;
+                }
             }
         } catch (Exception e) {
             LOG.warn("Failed to interpret title of document ["
@@ -3488,7 +3496,6 @@ public class XWikiDocument implements DocumentModelBridge
      * is excluded.
      *
      * @param zos the ZipOutputStream to write to
-     * @param withVersions if true, also include archived version of the document
      * @param context current XWikiContext
      *
      * @throws XWikiException when an error occurs during xwiki operations

@@ -1823,6 +1823,64 @@ public class Document extends Api
         }
     }
 
+    /**
+     * Save the document, the author (contentAuthor) of the code calling this function takes responsibility.
+     * Saves with minorEdit set to false and no edit comment.
+     *
+     * @throws XWikiException if script author is not allowed to save the document or if save operation fails.
+     * @see #saveAsAuthor(String, boolean)
+     * @since 2.3M1
+     */
+    public void saveAsAuthor() throws XWikiException
+    {
+        saveAsAuthor("", false);
+    }
+
+    /**
+     * Save the document, the author (contentAuthor) of the code calling this function takes responsibility.
+     * Saves with minorEdit set to false.
+     *
+     * @param comment The comment to display in document history (what did you change in the document)
+     * @throws XWikiException if script author is not allowed to save the document or if save operation fails.
+     * @see #saveAsAuthor(String, boolean)
+     * @since 2.3M1
+     */
+    public void saveAsAuthor(String comment) throws XWikiException
+    {
+        saveAsAuthor(comment, false);
+    }
+
+    /**
+     * Save the document, the author (contentAuthor) of the code calling this function takes responsibility.
+     * This document will be saved if the author of the document containing the code which calls this function has
+     * edit access to it. The contentAuthor of this document will be set to the author of the calling script, not the 
+     * viewer.
+     * It is unwise to allow this function to be called by the viewer of the script.
+     *
+     * @param comment The comment to display in document history (what did you change in the document)
+     * @param minorEdit Set true to advance the document version number by 0.1 or false to advance version to the next
+     *                  integer + 0.1 eg: 25.1
+     * @throws XWikiException if script author is not allowed to save the document or if save operation fails.
+     * @since 2.3M1
+     */
+    public void saveAsAuthor(String comment, boolean minorEdit) throws XWikiException
+    {
+        String author = getXWikiContext().getDoc().getContentAuthor();
+        if (hasAccessLevel("edit", author)) {
+            String viewer = getXWikiContext().getUser();
+            try {
+                getXWikiContext().setUser(author);
+                saveDocument(comment, minorEdit);
+            } finally {
+                getXWikiContext().setUser(viewer);
+            }
+        } else {
+            java.lang.Object[] args = { author, getXWikiContext().getDoc(), this.doc.getFullName() };
+            throw new XWikiException(XWikiException.MODULE_XWIKI_ACCESS, XWikiException.ERROR_XWIKI_ACCESS_DENIED,
+                "Access denied; user {0}, acting through script in document {1} cannot save document {2}", null, args);
+        }
+    }
+
     protected void saveDocument(String comment, boolean minorEdit) throws XWikiException
     {
         XWikiDocument doc = getDoc();
@@ -1949,6 +2007,31 @@ public class Document extends Api
             java.lang.Object[] args = {this.doc.getFullName()};
             throw new XWikiException(XWikiException.MODULE_XWIKI_ACCESS, XWikiException.ERROR_XWIKI_ACCESS_DENIED,
                 "Access denied in edit mode on document {0}", null, args);
+        }
+    }
+
+    /**
+     * Delete the document, the author (contentAuthor) of the code calling this function takes responsibility.
+     * It is unwise to allow this function to be called by the viewer of the script.
+     *
+     * @throws XWikiException if script author is not allowed to delete the document or if save operation fails.
+     * @since 2.3M1
+     */
+    public void deleteAsAuthor() throws XWikiException
+    {
+        String author = getXWikiContext().getDoc().getContentAuthor();
+        if (hasAccessLevel("delete", author)) {
+            String viewer = getXWikiContext().getUser();
+            try {
+                getXWikiContext().setUser(author);
+                deleteDocument();
+            } finally {
+                getXWikiContext().setUser(viewer);
+            }
+        } else {
+            java.lang.Object[] args = { author, getXWikiContext().getDoc(), this.doc.getFullName() };
+            throw new XWikiException(XWikiException.MODULE_XWIKI_ACCESS, XWikiException.ERROR_XWIKI_ACCESS_DENIED,
+                "Access denied; user {0}, acting through script in document {1} cannot delete document {2}", null, args);
         }
     }
 

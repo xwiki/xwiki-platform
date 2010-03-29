@@ -172,6 +172,53 @@ public class XWiki extends Api
     }
 
     /**
+     * Loads an Document from the database. Rights are checked on the author (contentAuthor) of the document
+     * containing the currently executing script before sending back the loaded document.
+     * 
+     * @param fullName the full name of the XWiki document to be loaded
+     * @return a Document object or null if it is not accessible
+     * @throws XWikiException
+     * @since 2.3M1
+     */
+    public Document getDocumentAsAuthor(String fullName) throws XWikiException
+    {
+        DocumentReference reference;
+
+        // We ignore the passed full name if it's null to match behavior of getDocument
+        if (fullName != null) {
+            // Note: We use the CurrentMixed Resolver since we want to use the default page name if the page isn't
+            // specified in the passed string, rather than use the current document's page name.
+            reference = this.currentMixedDocumentReferenceResolver.resolve(fullName);
+        } else {
+            reference = this.defaultDocumentReferenceResolver.resolve("");
+        }
+
+        return getDocument(reference);
+    }
+
+    /**
+     * Loads an Document from the database. Rights are checked on the author (contentAuthor) of the document
+     * containing the currently executing script before sending back the loaded document.
+     *
+     * @param reference the reference of the XWiki document to be loaded
+     * @return a Document object or null if it is not accessible
+     * @throws XWikiException
+     * @since 2.3M1
+     */
+    public Document getDocumentAsAuthor(DocumentReference reference) throws XWikiException
+    {
+        String author = getXWikiContext().getDoc().getContentAuthor();
+        XWikiDocument doc = this.xwiki.getDocument(reference, getXWikiContext());
+        if (this.xwiki.getRightService().hasAccessLevel("view", author, doc.getFullName(),
+            getXWikiContext()) == false) {
+            return null;
+        }
+
+        Document newdoc = doc.newDocument(getXWikiContext());
+        return newdoc;
+    }
+
+    /**
      * @param fullname the {@link XWikiDocument#getFullName() name} of the document to search for.
      * @param lang an optional {@link XWikiDocument#getLanguage() language} to filter results.
      * @return A list with all the deleted versions of a document in the recycle bin.

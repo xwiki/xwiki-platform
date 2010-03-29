@@ -34,7 +34,7 @@
       &lt;input type="submit" class="button" value="$msg.get("create")"/&gt;
     &lt;/div&gt;
   &lt;/form&gt;
-{{/html}}
+{{/html}}##
 #end
 #macro(createPanel $title)
   #set($docName=$title.replaceAll(':', '%3A'))

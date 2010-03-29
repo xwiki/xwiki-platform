@@ -33,6 +33,7 @@
   ## unauthorized, with a nice i18n message
   $response.sendError(401, $message)
 #end
+
 {{html}}
 ## get create a hashmap with request data about the selection
 #set($annData = $util.hashMap)
@@ -46,5 +47,6 @@
 #includeTopic('AnnotationCode.Macros')
 #displayCreateBox("$!{request.wiki}", "$!{request.space}", "$!{request.page}", $annData)
 {{/html}}
+
 {{velocity}}</content>
 </xwikidoc>

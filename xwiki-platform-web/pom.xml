@@ -53,8 +53,9 @@
     <!-- Versions of XWiki dependencies used in Platform/Web modules -->
     <platform.tool.configuration.version>1.39-SNAPSHOT</platform.tool.configuration.version>
     <platform.core.version>2.2-SNAPSHOT</platform.core.version>
-    <platform.skin.albatross.version>1.27-SNAPSHOT</platform.skin.albatross.version>
-    <platform.skin.toucan.version>1.33-SNAPSHOT</platform.skin.toucan.version>
+    <platform.skin.albatross.version>1.28-SNAPSHOT</platform.skin.albatross.version>
+    <!-- Starting with 1.33 and beyond Colibri skins are not compatible with web 2.2 anymore -->
+    <platform.skin.toucan.version>1.32</platform.skin.toucan.version>
     <!-- Starting with 1.13 and beyond Colibri skins are not compatible with web 2.2 anymore -->
     <platform.skin.colibri.version>1.12-SNAPSHOT</platform.skin.colibri.version>
   </properties>

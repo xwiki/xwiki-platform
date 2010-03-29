@@ -47,6 +47,5 @@
 #includeTopic('AnnotationCode.Macros')
 #displayCreateBox("$!{request.wiki}", "$!{request.space}", "$!{request.page}", $annData)
 {{/html}}
-
-{{velocity}}</content>
+{{/velocity}}</content>
 </xwikidoc>

@@ -24,5 +24,6 @@
 <syntaxId>xwiki/2.0</syntaxId>
 <hidden>false</hidden>
 <content>This is the space for the Annotations scripts, powering the annotation feature.
+
 {{include document="Main.Dashboard" /}}</content>
 </xwikidoc>

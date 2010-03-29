@@ -28,7 +28,7 @@
 #if(!$obj)
 = $msg.get('xe.admin.users.sheet') =
 
-{{info}}$msg.get('xe.admin.users.applyonusers'){{/info}}
+{{info}}$msg.get('xe.admin.users.applyonusers'){{/info}}##
 #else
 {{html clean="false" wiki="true"}}
 $xwiki.ssx.use("XWiki.XWikiUserSheet")##
@@ -103,6 +103,6 @@ $xwiki.ssx.use('Main.Dashboard')##
   &lt;/div&gt;
   &lt;div class="dashboardspacer"&gt;&amp;nbsp;&lt;/div&gt;
 &lt;/div&gt;
-{{/html}}
+{{/html}}##
 #end
 {{/velocity}}</content></xwikidoc>

@@ -178,7 +178,7 @@ public class XWiki extends Api
      * @param fullName the full name of the XWiki document to be loaded
      * @return a Document object or null if it is not accessible
      * @throws XWikiException
-     * @since 2.3M1
+     * @since 2.3M2
      */
     public Document getDocumentAsAuthor(String fullName) throws XWikiException
     {
@@ -193,7 +193,7 @@ public class XWiki extends Api
             reference = this.defaultDocumentReferenceResolver.resolve("");
         }
 
-        return getDocument(reference);
+        return getDocumentAsAuthor(reference);
     }
 
     /**
@@ -203,7 +203,7 @@ public class XWiki extends Api
      * @param reference the reference of the XWiki document to be loaded
      * @return a Document object or null if it is not accessible
      * @throws XWikiException
-     * @since 2.3M1
+     * @since 2.3M2
      */
     public Document getDocumentAsAuthor(DocumentReference reference) throws XWikiException
     {

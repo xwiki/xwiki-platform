@@ -1824,12 +1824,11 @@ public class Document extends Api
     }
 
     /**
-     * Save the document, the author (contentAuthor) of the code calling this function takes responsibility.
-     * Saves with minorEdit set to false and no edit comment.
+     * Save the document if the {@link #getContentAuthor content author} of the script calling this method has 
+     * permission to do so. The author of this document is also set to the said content author.
      *
      * @throws XWikiException if script author is not allowed to save the document or if save operation fails.
-     * @see #saveAsAuthor(String, boolean)
-     * @since 2.3M1
+     * @since 2.3M2
      */
     public void saveAsAuthor() throws XWikiException
     {
@@ -1837,13 +1836,12 @@ public class Document extends Api
     }
 
     /**
-     * Save the document, the author (contentAuthor) of the code calling this function takes responsibility.
-     * Saves with minorEdit set to false.
+     * Save the document if the {@link #getContentAuthor content author} of the script calling this method has 
+     * permission to do so. The author of this document is also set to the said content author.
      *
      * @param comment The comment to display in document history (what did you change in the document)
      * @throws XWikiException if script author is not allowed to save the document or if save operation fails.
-     * @see #saveAsAuthor(String, boolean)
-     * @since 2.3M1
+     * @since 2.3M2
      */
     public void saveAsAuthor(String comment) throws XWikiException
     {
@@ -1851,17 +1849,14 @@ public class Document extends Api
     }
 
     /**
-     * Save the document, the author (contentAuthor) of the code calling this function takes responsibility.
-     * This document will be saved if the author of the document containing the code which calls this function has
-     * edit access to it. The contentAuthor of this document will be set to the author of the calling script, not the 
-     * viewer.
-     * It is unwise to allow this function to be called by the viewer of the script.
+     * Save the document if the {@link #getContentAuthor content author} of the script calling this method has 
+     * permission to do so. The author of this document is also set to the said content author.
      *
      * @param comment The comment to display in document history (what did you change in the document)
      * @param minorEdit Set true to advance the document version number by 0.1 or false to advance version to the next
      *                  integer + 0.1 eg: 25.1
      * @throws XWikiException if script author is not allowed to save the document or if save operation fails.
-     * @since 2.3M1
+     * @since 2.3M2
      */
     public void saveAsAuthor(String comment, boolean minorEdit) throws XWikiException
     {
@@ -2011,11 +2006,11 @@ public class Document extends Api
     }
 
     /**
-     * Delete the document, the author (contentAuthor) of the code calling this function takes responsibility.
-     * It is unwise to allow this function to be called by the viewer of the script.
+     * Delete the document if the {@link #getContentAuthor content author} of the script calling this method has 
+     * permission to do so. The deleter is also set to the said content author.
      *
      * @throws XWikiException if script author is not allowed to delete the document or if save operation fails.
-     * @since 2.3M1
+     * @since 2.3M2
      */
     public void deleteAsAuthor() throws XWikiException
     {

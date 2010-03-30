@@ -19,7 +19,6 @@
  */
 package org.xwiki.officeimporter.internal.filter;
 
-import java.io.File;
 import java.util.List;
 import java.util.Map;
 
@@ -59,7 +58,7 @@ public class ImageFilter extends AbstractHTMLFilter
             String src = image.getAttribute(ATTRIBUTE_SRC);
             if (!StringUtils.isBlank(src) && !StringUtils.isBlank(targetDocument)) {
                 // OpenOffice 3.2 server generates relative image paths, extract image name.
-                int separator = src.lastIndexOf(File.separator);
+                int separator = src.lastIndexOf("/");
                 if (-1 != separator) {
                     src = src.substring(separator + 1);
                 }

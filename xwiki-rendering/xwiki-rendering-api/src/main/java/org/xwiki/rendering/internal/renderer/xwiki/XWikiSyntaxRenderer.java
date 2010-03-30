@@ -21,6 +21,7 @@ package org.xwiki.rendering.internal.renderer.xwiki;
 
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.InstantiationStrategy;
+import org.xwiki.component.annotation.Requirement;
 import org.xwiki.component.descriptor.ComponentInstantiationStrategy;
 import org.xwiki.component.phase.Initializable;
 import org.xwiki.component.phase.InitializationException;
@@ -30,6 +31,7 @@ import org.xwiki.rendering.listener.chaining.GroupStateChainingListener;
 import org.xwiki.rendering.listener.chaining.ListenerChain;
 import org.xwiki.rendering.listener.chaining.LookaheadChainingListener;
 import org.xwiki.rendering.renderer.AbstractChainingPrintRenderer;
+import org.xwiki.rendering.renderer.LinkReferenceSerializer;
 import org.xwiki.rendering.renderer.XWikiSyntaxListenerChain;
 
 /**
@@ -44,6 +46,12 @@ import org.xwiki.rendering.renderer.XWikiSyntaxListenerChain;
 @InstantiationStrategy(ComponentInstantiationStrategy.PER_LOOKUP)
 public class XWikiSyntaxRenderer extends AbstractChainingPrintRenderer implements Initializable
 {
+    /**
+     * Needed by XWikiSyntaxChainingRenderer to serialize wiki link references.
+     */
+    @Requirement
+    private LinkReferenceSerializer linkReferenceSerializer;
+
     /**
      * {@inheritDoc}
      * 
@@ -64,6 +72,6 @@ public class XWikiSyntaxRenderer extends AbstractChainingPrintRenderer implement
         chain.addListener(new GroupStateChainingListener(chain));
         chain.addListener(new BlockStateChainingListener(chain));
         chain.addListener(new ConsecutiveNewLineStateChainingListener(chain));
-        chain.addListener(new XWikiSyntaxChainingRenderer(chain));
+        chain.addListener(new XWikiSyntaxChainingRenderer(chain, this.linkReferenceSerializer));
     }
 }

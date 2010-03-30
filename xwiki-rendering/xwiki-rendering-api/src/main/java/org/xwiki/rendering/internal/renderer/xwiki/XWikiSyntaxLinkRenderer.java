@@ -24,12 +24,13 @@ import java.util.Stack;
 
 import org.apache.commons.lang.StringUtils;
 import org.xwiki.rendering.internal.parser.PlainTextStreamParser;
-import org.xwiki.rendering.internal.renderer.BasicLinkRenderer;
+import org.xwiki.rendering.internal.renderer.DefaultLinkReferenceSerializer;
 import org.xwiki.rendering.internal.renderer.ParametersPrinter;
 import org.xwiki.rendering.internal.renderer.printer.XWikiSyntaxEscapeWikiPrinter;
 import org.xwiki.rendering.listener.Link;
 import org.xwiki.rendering.listener.QueueListener.Event;
 import org.xwiki.rendering.listener.chaining.EventType;
+import org.xwiki.rendering.renderer.LinkReferenceSerializer;
 import org.xwiki.rendering.renderer.XWikiSyntaxListenerChain;
 
 /**
@@ -38,7 +39,7 @@ import org.xwiki.rendering.renderer.XWikiSyntaxListenerChain;
  * @version $Id$
  * @since 2.0M3
  */
-public class XWikiSyntaxLinkRenderer extends BasicLinkRenderer
+public class XWikiSyntaxLinkRenderer
 {
     private ParametersPrinter parametersPrinter = new ParametersPrinter();
 
@@ -46,20 +47,24 @@ public class XWikiSyntaxLinkRenderer extends BasicLinkRenderer
 
     private XWikiSyntaxListenerChain listenerChain;
 
-    public XWikiSyntaxLinkRenderer(XWikiSyntaxListenerChain listenerChain)
+    private LinkReferenceSerializer linkReferenceSerializer;
+
+    public XWikiSyntaxLinkRenderer(XWikiSyntaxListenerChain listenerChain,
+        LinkReferenceSerializer linkReferenceSerializer)
     {
         this.listenerChain = listenerChain;
+        this.linkReferenceSerializer = linkReferenceSerializer;
         this.forceFullSyntax.push(false);
     }
 
     /**
      * {@inheritDoc}
      * 
-     * @see org.xwiki.rendering.internal.renderer.BasicLinkRenderer#renderLinkReference(org.xwiki.rendering.listener.Link)
+     * @see DefaultLinkReferenceSerializer#serialize(org.xwiki.rendering.listener.Link)
      */
-    public String renderLinkReference(Link link)
+    public String serialize(Link link)
     {
-        return super.renderLinkReference(link).replace(">>", "~>~>").replace("||", "~|~|");
+        return this.linkReferenceSerializer.serialize(link).replace(">>", "~>~>").replace("||", "~|~|");
     }
 
     public void beginRenderLink(XWikiSyntaxEscapeWikiPrinter printer, Link link, boolean isFreeStandingURI,
@@ -110,7 +115,7 @@ public class XWikiSyntaxLinkRenderer extends BasicLinkRenderer
     public void endRenderLink(XWikiSyntaxEscapeWikiPrinter printer, Link link, boolean isFreeStandingURI,
         Map<String, String> parameters)
     {
-        printer.print(renderLinkReference(link));
+        printer.print(serialize(link));
 
         // If there were parameters specified, output them separated by the "||" characters
         if (!parameters.isEmpty()) {

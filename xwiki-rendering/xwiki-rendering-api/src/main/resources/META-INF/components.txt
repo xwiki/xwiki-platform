@@ -32,6 +32,7 @@ org.xwiki.rendering.internal.renderer.event.EventBlockRenderer
 org.xwiki.rendering.internal.renderer.plain.PlainTextRendererFactory
 org.xwiki.rendering.internal.renderer.plain.PlainTextRenderer
 org.xwiki.rendering.internal.renderer.plain.PlainTextBlockRenderer
+org.xwiki.rendering.internal.renderer.DefaultLinkReferenceSerializer
 org.xwiki.rendering.internal.converter.DefaultConverter
 org.xwiki.rendering.internal.macro.DefaultMacroCategoryManager
 org.xwiki.rendering.internal.macro.DefaultMacroIdFactory

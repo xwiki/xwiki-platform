@@ -25,7 +25,7 @@ import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.InstantiationStrategy;
 import org.xwiki.component.annotation.Requirement;
 import org.xwiki.component.descriptor.ComponentInstantiationStrategy;
-import org.xwiki.rendering.internal.renderer.BasicLinkRenderer;
+import org.xwiki.rendering.internal.renderer.DefaultLinkReferenceSerializer;
 import org.xwiki.rendering.listener.Link;
 import org.xwiki.rendering.renderer.printer.XHTMLWikiPrinter;
 import org.xwiki.rendering.renderer.xhtml.XHTMLLinkRenderer;
@@ -50,7 +50,7 @@ public class AnnotatedXHTMLLinkRenderer implements XHTMLLinkRenderer
     /**
      * To generate a string representation of a link that we save as an XHTML annotation.
      */
-    private BasicLinkRenderer linkRenderer = new BasicLinkRenderer();
+    private DefaultLinkReferenceSerializer linkReferenceSerializer = new DefaultLinkReferenceSerializer();
     
     /**
      * {@inheritDoc}
@@ -83,7 +83,7 @@ public class AnnotatedXHTMLLinkRenderer implements XHTMLLinkRenderer
         // Add an XML comment as a placeholder so that the XHTML parser can find the document name.
         // Otherwise it would be too difficult to transform a URL into a document name especially since
         // a link can refer to an external URL.
-        getXHTMLWikiPrinter().printXMLComment("startwikilink:" + this.linkRenderer.renderLinkReference(link), true);
+        getXHTMLWikiPrinter().printXMLComment("startwikilink:" + this.linkReferenceSerializer.serialize(link), true);
 
         this.defaultLinkRenderer.beginLink(link, isFreeStandingURI, parameters);
     }

@@ -12,8 +12,8 @@
 <customClass></customClass>
 <contentAuthor>XWiki.Admin</contentAuthor>
 <creationDate>1264860755000</creationDate>
-<date>1269520419000</date>
-<contentUpdateDate>1269520419000</contentUpdateDate>
+<date>1269989069000</date>
+<contentUpdateDate>1269989069000</contentUpdateDate>
 <version>1.0</version>
 <title></title>
 <template></template>
@@ -146,6 +146,10 @@ XWiki.Selection = Class.create({
     this.highlightWrappers = false;
     this.selectionParent = false;
     this.selectionParentInnerHTML = false;
+    // if there is no container to get selection in, selection is always false
+    if (!this.container) {
+      return;
+    }
     if (window.getSelection) { 
       // FF selection &amp; hopefully other browsers 
       if (window.getSelection().rangeCount == 0) {
@@ -559,6 +563,8 @@ XWiki.Selection = Class.create({
 </property>
 <property>
 <code>XWiki.Annotation = Class.create({
+  // the html element corresponding to the annotated content (where annotations are to be added, displayed, etc)
+  annotatedElement : false,
   // tab name of the annotations tab
   annTabname : 'Annotations',
   // whether current displayed doc is the rendered annotated document
@@ -579,8 +585,9 @@ XWiki.Selection = Class.create({
   // It will be updated any time a changed filter event is received
   currentFilter : {},
 
-  initialize : function (displayHighlighted) {
+  initialize : function (displayHighlighted, annotatedElt) {
     this.displayHighlight = displayHighlighted;
+    this.annotatedElement = annotatedElt;
     this.hookMenuButton();
     this.hookTabShortcut();
     this.hookTab();
@@ -595,8 +602,7 @@ XWiki.Selection = Class.create({
     this.registerCloseDialogShortcut();
 
     // and initialize the selectionService
-    // TODO: get this container from a member or something, so that we're sure all functions use the same container
-    this.selectionService = new XWiki.Selection($('xwikicontent'));
+    this.selectionService = new XWiki.Selection(this.annotatedElement);
 
     // listen to the filter change events to re-fetch the annotations when it changes
     document.observe('xwiki:annotations:filter:changed', this.onFilterChange.bindAsEventListener(this));
@@ -734,13 +740,12 @@ XWiki.Selection = Class.create({
   },
 
   toggleAnnotations : function(visible) {
-    // TODO: #xwikicontent is container specific, get the container from a member or something
     // don't standard toggle because we want to ensure it matches visible
     if (this.displayHighlight) {
-      $$('#xwikicontent .annotation').invoke(visible ? 'addClassName' : 'removeClassName', 'annotation-highlight');
+      this.annotatedElement.select('.annotation').invoke(visible ? 'addClassName' : 'removeClassName', 'annotation-highlight');
     }
     //and toggle all annotation markers
-    $$('#xwikicontent .annotation-marker').invoke(visible ? 'removeClassName' : 'addClassName', 'hidden');
+    this.annotatedElement.select('.annotation-marker').invoke(visible ? 'removeClassName' : 'addClassName', 'hidden');
     if (!visible) {
       // also close all open bubbles
       this.bubbles.each(function(bubble){
@@ -754,7 +759,7 @@ XWiki.Selection = Class.create({
   },
 
   toggleAnnotationHighlight : function(annotationId, visible) {
-    $$('#xwikicontent .annotation.ID' + annotationId).invoke(visible ? 'addClassName' : 'removeClassName', 'annotation-highlight');
+    this.annotatedElement.select('.annotation.ID' + annotationId).invoke(visible ? 'addClassName' : 'removeClassName', 'annotation-highlight');
   },
   
   /**
@@ -880,8 +885,7 @@ XWiki.Selection = Class.create({
   },
 
   loadAnnotatedContent : function(annotatedContent, andShow, navigateToPane) {
-    // TODO: store the annotated element in a different way, to have it the same in the instance (when it's an object prop for example)
-    $('xwikicontent').update(annotatedContent.content);
+    this.annotatedElement.update(annotatedContent.content);
     if (annotatedContent.annotations) {
       this.addAnnotationMarkers(annotatedContent.annotations);
     }
@@ -895,12 +899,14 @@ XWiki.Selection = Class.create({
   
   reloadTab : function(navigateToPane) {
     var annotationsPane = $( this.annTabname + 'pane');
-    // reset to initial state
-    annotationsPane.update('');
-    annotationsPane.addClassName('empty');
-    if (!annotationsPane.hasClassName('hidden')) {
-      // reload
-      XWiki.displayDocExtra(this.annTabname, 'annotationsinline.vm', navigateToPane);
+    if (annotationsPane) {
+      // reset to initial state
+      annotationsPane.update('');
+      annotationsPane.addClassName('empty');
+      if (!annotationsPane.hasClassName('hidden')) {
+        // reload
+        XWiki.displayDocExtra(this.annTabname, 'annotationsinline.vm', navigateToPane);
+      }
     }    
   },
 
@@ -1036,7 +1042,7 @@ XWiki.Selection = Class.create({
   addAnnotationMarkers : function(annotations) {
     annotations.each(function(item){
       // get the last span of this annotation
-      var allSpans = $$('#xwikicontent [class~=ID' + item.annotationId + ']');
+      var allSpans = this.annotatedElement.select('[class~=ID' + item.annotationId + ']');
       if (allSpans.size() == 0) {
         return;
       }
@@ -1336,8 +1342,8 @@ XWiki.Selection = Class.create({
    * Execute the add annotation shortcut: get selection, compute context, open dialog, register listeners.
    */
   onAddAnnotationShortcut : function() {
-    // parse the selection on the xwiki content container
-    this.selectionService.computeSelection($('xwikicontent'));
+    // parse the selection
+    this.selectionService.computeSelection();
     var selectionText = this.selectionService.selectionText;
     if (!selectionText) {
       // show an 'invalid selection message'. Shorter time here, otherwise it's a bit confusing...
@@ -1483,7 +1489,8 @@ document.observe('dom:loaded', function() {
   var currentSpaceInExceptions = exceptions.indexOf(XWiki.currentSpace);
   // if the annotations are activated and the current space is not an exception or the annotations are not activated but the current space is an exception
   if ((activated &amp;&amp; currentSpaceInExceptions &lt; 0) || (!activated &amp;&amp; currentSpaceInExceptions &gt;= 0)) {
-    new XWiki.Annotation(displayHighlight);
+    // initialize the annotations on the xwikicontent element which is the document content by default  
+    new XWiki.Annotation(displayHighlight, $('xwikicontent'));
   }
 });</code>
 </property>

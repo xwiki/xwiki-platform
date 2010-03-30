@@ -865,27 +865,8 @@ public class XWikiXmlRpcApiImpl implements XWikiXmlRpcApi
             throw new Exception(String.format("Unable to add attachment. Document locked by %s", doc.getLockingUser()));
         }
 
-        /*
-         * Here we need to switch to the low-level API because the user's API support for attachment is not very well
-         * understandable.
-         */
-        XWikiDocument xwikiDocument = this.xwiki.getDocument(extendedId.getBasePageId(), this.xwikiContext);
-
-        XWikiAttachment xwikiBaseAttachment = xwikiDocument.getAttachment(attachment.getFileName());
-        if (xwikiBaseAttachment == null) {
-            xwikiBaseAttachment = new XWikiAttachment();
-            xwikiDocument.getAttachmentList().add(xwikiBaseAttachment);
-        }
-        xwikiBaseAttachment.setContent(attachmentData);
-        xwikiBaseAttachment.setFilename(attachment.getFileName());
-        xwikiBaseAttachment.setAuthor(user.getName());
-
-        xwikiBaseAttachment.setDoc(xwikiDocument);
-        xwikiDocument.saveAttachmentContent(xwikiBaseAttachment, this.xwikiContext);
-
-        this.xwiki.saveDocument(xwikiDocument, this.xwikiContext);
-
-        com.xpn.xwiki.api.Attachment xwikiAttachment = doc.getAttachment(attachment.getFileName());
+        com.xpn.xwiki.api.Attachment xwikiAttachment = doc.addAttachment(attachment.getFileName(), attachmentData);
+        doc.save();
 
         return DomainObjectFactory.createAttachment(xwikiAttachment).toRawMap();
     }

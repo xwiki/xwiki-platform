@@ -20,18 +20,21 @@
 package org.xwiki.rendering.internal.renderer;
 
 import org.apache.commons.lang.StringUtils;
+import org.xwiki.component.annotation.Component;
 import org.xwiki.rendering.listener.Link;
 import org.xwiki.rendering.listener.LinkType;
 import org.xwiki.rendering.parser.LinkParser;
+import org.xwiki.rendering.renderer.LinkReferenceSerializer;
 
 /**
  * Generate a string representation of a {@link}'s reference using the format:
  * {@code (reference)[#anchor][?queryString][@interwikialias]}.
-
+ *
  * @version $Id$
- * @since 2.1M1
+ * @since 2.3M2
  */
-public class BasicLinkRenderer
+@Component
+public class DefaultLinkReferenceSerializer implements LinkReferenceSerializer
 {
     /**
      * Escapes to add when rendering a link reference part.
@@ -68,11 +71,10 @@ public class BasicLinkRenderer
         "" + LinkParser.ESCAPE_CHAR};
 
     /**
-     * @param link the link for which to generate a string representation
-     * @return the string representation using the format:
-     *         {@code (reference)[#anchor][?queryString][@interwikialias]}.
+     * {@inheritDoc}
+     * @see org.xwiki.rendering.renderer.LinkReferenceSerializer#serialize(org.xwiki.rendering.listener.Link)  
      */
-    public String renderLinkReference(Link link)
+    public String serialize(Link link)
     {
         StringBuilder buffer = new StringBuilder();
 

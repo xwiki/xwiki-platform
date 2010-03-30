@@ -190,7 +190,7 @@ public class XWikiSyntaxChainingRenderer extends AbstractChainingPrintRenderer i
             // Defer printing the link content since we need to gather all nested elements
             pushPrinter(linkLabelPrinter);
         } else if (isFreeStandingURI) {
-            print(getLinkRenderer().renderLinkReference(link));
+            print(getLinkRenderer().serialize(link));
         }
     }
 

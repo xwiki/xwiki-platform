@@ -33,6 +33,7 @@ import org.xwiki.rendering.listener.chaining.BlockStateChainingListener;
 import org.xwiki.rendering.listener.chaining.ListenerChain;
 import org.xwiki.rendering.listener.chaining.StackableChainingListener;
 import org.xwiki.rendering.renderer.AbstractChainingPrintRenderer;
+import org.xwiki.rendering.renderer.LinkReferenceSerializer;
 import org.xwiki.rendering.renderer.XWikiSyntaxListenerChain;
 import org.xwiki.rendering.renderer.printer.DefaultWikiPrinter;
 import org.xwiki.rendering.renderer.printer.VoidWikiPrinter;
@@ -52,6 +53,8 @@ public class XWikiSyntaxChainingRenderer extends AbstractChainingPrintRenderer i
 
     private XWikiSyntaxMacroRenderer macroPrinter;
 
+    private LinkReferenceSerializer linkReferenceSerializer;
+
     // Custom States
 
     private boolean isFirstElementRendered = false;
@@ -60,11 +63,12 @@ public class XWikiSyntaxChainingRenderer extends AbstractChainingPrintRenderer i
 
     private Map<String, String> previousFormatParameters;
 
-    public XWikiSyntaxChainingRenderer(ListenerChain listenerChain)
+    public XWikiSyntaxChainingRenderer(ListenerChain listenerChain, LinkReferenceSerializer linkReferenceSerializer)
     {
         setListenerChain(listenerChain);
 
-        this.linkRenderer = new XWikiSyntaxLinkRenderer(getXWikiSyntaxListenerChain());
+        this.linkReferenceSerializer = linkReferenceSerializer;
+        this.linkRenderer = new XWikiSyntaxLinkRenderer(getXWikiSyntaxListenerChain(), linkReferenceSerializer);
         this.imageRenderer = new XWikiSyntaxImageRenderer();
         this.macroPrinter = new XWikiSyntaxMacroRenderer();
     }
@@ -83,7 +87,8 @@ public class XWikiSyntaxChainingRenderer extends AbstractChainingPrintRenderer i
      */
     public StackableChainingListener createChainingListenerInstance()
     {
-        XWikiSyntaxChainingRenderer renderer = new XWikiSyntaxChainingRenderer(getListenerChain());
+        XWikiSyntaxChainingRenderer renderer = new XWikiSyntaxChainingRenderer(getListenerChain(),
+            this.linkReferenceSerializer);
         renderer.setPrinter(getPrinter());
         return renderer;
     }

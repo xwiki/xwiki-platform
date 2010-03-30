@@ -45,14 +45,15 @@ public class XWikiSyntaxLinkRenderer
 
     private Stack<Boolean> forceFullSyntax = new Stack<Boolean>();
 
-    private LinkReferenceSerializer linkReferenceSerializer;
-
     private XWikiSyntaxListenerChain listenerChain;
 
-    public XWikiSyntaxLinkRenderer(XWikiSyntaxListenerChain listenerChain)
+    private LinkReferenceSerializer linkReferenceSerializer;
+
+    public XWikiSyntaxLinkRenderer(XWikiSyntaxListenerChain listenerChain,
+        LinkReferenceSerializer linkReferenceSerializer)
     {
-        this.linkReferenceSerializer = new DefaultLinkReferenceSerializer();
         this.listenerChain = listenerChain;
+        this.linkReferenceSerializer = linkReferenceSerializer;
         this.forceFullSyntax.push(false);
     }
 

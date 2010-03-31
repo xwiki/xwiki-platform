@@ -74,7 +74,7 @@ public class ExampleTest
         
         // Parse XWiki 2.0 Syntax using a Parser.
         Parser parser = ecm.lookup(Parser.class, Syntax.XWIKI_2_0.toIdString());
-        XDOM xdom = parser.parse(new StringReader("This a [[link>MyPage]]"));
+        XDOM xdom = parser.parse(new StringReader("This a [[link>>MyPage]]"));
         
         // Find all links and make them italic
         for (LinkBlock block : xdom.getChildrenByType(LinkBlock.class, true)) {
@@ -92,6 +92,6 @@ public class ExampleTest
         BlockRenderer renderer = ecm.lookup(BlockRenderer.class, Syntax.XWIKI_2_0.toIdString());
         renderer.render(xdom, printer);
 
-        Assert.assertEquals("This a //[[link>MyPage]]//", printer.toString());
+        Assert.assertEquals("This a //[[link>>MyPage]]//", printer.toString());
     }
 }

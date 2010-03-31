@@ -31,7 +31,7 @@
       #set ($parentReference = $doc.documentReference)
     #else
       #set ($parentReference = $services.model.createDocumentReference($doc.documentReference.wikiReference.name,
-          $doc.documentReference.lastSpaceReference.name, "", "currentmixed/reference"))
+          $doc.documentReference.lastSpaceReference.name, ""))
     #end
     #set ($parent = $services.model.serialize($parentReference, "local"))
   #end

@@ -12,7 +12,7 @@
 ##
 #if($tocreate == "panel")
   #set($docname = $title.replaceAll("/", "%2F"))
-  #set($docReference = $services.model.resolveDocument($docname, "currentmixed"))
+  #set($docReference = $services.model.resolveDocument($docname))
   #if($template == "")
     #set($template="Panels.PanelTemplate")
   #end
@@ -26,7 +26,7 @@
 ## Create page
 ##
 #elseif($tocreate == "page")
-  #set($docReference = $services.model.createDocumentReference("", $space, $page, "currentmixed/reference"))
+  #set($docReference = $services.model.createDocumentReference("", $space, $page))
   #set($redirectaction = "edit")
   ## If no title has been set use the current document's name as the title
   #if ("$!title" == "")
@@ -37,7 +37,7 @@
 ## Create space
 ##
 #elseif($tocreate == 'space')
-  #set($docReference = $services.model.createDocumentReference("", $space, "", "currentmixed/reference"))
+  #set($docReference = $services.model.createDocumentReference("", $space, ""))
   ## TODO : Use a WebHome template ?
   #set($redirectaction = "edit")
   ## If no title has been set use the new space name as the title
@@ -50,7 +50,7 @@
 ##
 #elseif($tocreate == "post")
   #set($docname = "Blog.${title.replaceAll(' ', '')}")
-  #set($docReference = $services.model.resolveDocument($docname, "currentmixed"))
+  #set($docReference = $services.model.resolveDocument($docname))
   #set($redirectaction = "inline")
   #set($redirectparams = "parent=Blog.WebHome&template=XWiki.ArticleClassTemplate&XWiki.ArticleClass_0_title=$etitle")
 #end

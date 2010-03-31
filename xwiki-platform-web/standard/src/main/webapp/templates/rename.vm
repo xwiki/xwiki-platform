@@ -32,29 +32,30 @@
         #error($msg.get('core.rename.emptyName'))
         #template("renameStep1.vm")
       #else
-        #set ($newFullName = "${request.newSpaceName}.${request.newPageName}")
-        #if($xwiki.exists($newFullName))
+        #set($newDocReference = $services.model.createDocumentReference("", $!{request.newSpaceName}, $!{request.newPageName}))
+        #set($newDocReferenceAsString = $services.model.serialize($newDocReference))
+        #if($xwiki.exists($newDocReference))
           $response.setStatus(409)
-          #error("$msg.get('core.rename.alreadyExists', [$newFullName, $xwiki.getURL($newFullName)])")
+          #error("$msg.get('core.rename.alreadyExists', [$newDocReferenceAsString, $xwiki.getURL($newDocReference)])")
           #template("renameStep1.vm")
-        #elseif(!$xwiki.hasAccessLevel('edit', $context.user, $newFullName))
+        #elseif(!$xwiki.hasAccessLevel('edit', $context.user, $newDocReferenceAsString))
           $response.setStatus(403)
-          #error($msg.get('core.rename.targetNotWritable', [$newFullName]))
+          #error($msg.get('core.rename.targetNotWritable', [$newDocReferenceAsString]))
           #template('renameStep1.vm')
         #else
           #set($backlinks = [])
           #set($children = [])
           #foreach($param in $request.parameterNames)
             #if($param.startsWith("backlink_"))
-              #set($discard = $backlinks.add($param.substring(9)))
+              #set($discard = $backlinks.add($services.model.resolveDocument($param.substring(9))))
             #elseif($param.startsWith("child_"))
-              #set($discard = $children.add($param.substring(6)))
+              #set($discard = $children.add($services.model.resolveDocument($param.substring(6))))
             #end
           #end
           ## Save the old document name so that we can display it in the notice box. After the rename the
           ## doc points to the new name!
           #set ($oldDocName = $doc.fullName)
-          $doc.rename($newFullName, $backlinks, $children)
+          $doc.rename($newDocReference, $backlinks, $children)
           #xwikimessageboxstart("$msg.get('notice')" "$msg.get('core.rename.success', [$oldDocName, $doc.fullName, $xwiki.getURL($doc.fullName)])")
           #xwikimessageboxend()
         #end

@@ -12,8 +12,8 @@
 <customClass></customClass>
 <contentAuthor>XWiki.Admin</contentAuthor>
 <creationDate>1264860755000</creationDate>
-<date>1269989069000</date>
-<contentUpdateDate>1269989069000</contentUpdateDate>
+<date>1269991235000</date>
+<contentUpdateDate>1269991235000</contentUpdateDate>
 <version>1.0</version>
 <title></title>
 <template></template>
@@ -934,7 +934,7 @@ XWiki.Selection = Class.create({
     }.bind(this));
   },  
 
-  addDeleteListener : function(item, inBubble) {
+  addDeleteListener : function(item, inBubble, container) {
     item.observe('click', function(event) {
       item.blur();
       event.stop();
@@ -954,7 +954,12 @@ XWiki.Selection = Class.create({
               // check the response to see if all went fine
               if (this.checkResponseCodeAndFail(response)) {
                 return;
-              }              
+              }
+              // hide the bubble if the delete takes place in a bubble
+              if (inBubble) {
+                this.hideBubble(container);
+              }
+              this.fetchedAnnotations = true;
               // reload the received annotated content, with scroll to tab
               this.loadAnnotatedContent(response.responseJSON.annotatedContent, this.displayAnnotationsCheckbox.checked, !inBubble);
             }.bind(this),
@@ -1164,7 +1169,7 @@ XWiki.Selection = Class.create({
     // add the delete and validate listeners to the respective delete buttons
     var deleteButton = container.down('a.delete');
     if (deleteButton) {
-      this.addDeleteListener(deleteButton, inBubble);
+      this.addDeleteListener(deleteButton, inBubble, container);
     }
     var validateButton = container.down('a.validate');
     if (validateButton) {
@@ -1267,7 +1272,7 @@ XWiki.Selection = Class.create({
     // add the delete listener to the delete button
     var deleteButton = container.down('a.delete');
     if (deleteButton) {
-      this.addDeleteListener(deleteButton, inBubble);
+      this.addDeleteListener(deleteButton, inBubble, container);
     }
     var validateButton = container.down('a.validate');
     if (validateButton) {

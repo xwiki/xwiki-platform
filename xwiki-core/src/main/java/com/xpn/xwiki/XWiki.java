@@ -4906,7 +4906,6 @@ public class XWiki implements XWikiDocChangeNotificationInterface
     }
 
     /**
-     * @since 2.2.5
      * @since 2.3M2
      */
     public String getURL(DocumentReference reference, String action, XWikiContext context)
@@ -4915,7 +4914,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface
     }
 
     /**
-     * @deprecated since 2.2.5 and 2.3M2 use {@link #getURL(DocumentReference, String, XWikiContext)}
+     * @deprecated since 2.3M2 use {@link #getURL(DocumentReference, String, XWikiContext)}
      */
     @Deprecated
     public String getURL(String fullname, String action, XWikiContext context)

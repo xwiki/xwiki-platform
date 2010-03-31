@@ -349,7 +349,6 @@ public class XWiki extends Api
      *
      * @param reference the reference of the document to check for its existence
      * @return true if the document exists, false if not
-     * @since 2.2.5
      * @since 2.3M2
      */
     public boolean exists(DocumentReference reference) throws XWikiException
@@ -1748,7 +1747,6 @@ public class XWiki extends Api
      * @param reference the reference to the document for which to return the URL for
      * @return a URL as a string pointing to the wiki document in view mode
      * @throws XWikiException if the URL could not be generated properly
-     * @since 2.2.5
      * @since 2.3M2
      */
     public String getURL(DocumentReference reference) throws XWikiException

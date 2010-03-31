@@ -2198,7 +2198,6 @@ public class Document extends Api
      *
      * @param newReference the reference to the new document
      * @throws XWikiException in case of an error
-     * @since 2.2.5
      * @since 2.3M2
      */
     public void rename(DocumentReference newReference) throws XWikiException
@@ -2285,7 +2284,6 @@ public class Document extends Api
      * @param childDocumentNames the list of references to documents whose parent field will be set to the new document
      *        reference
      * @throws XWikiException in case of an error
-     * @since 2.2.5
      * @since 2.3M2
      */
     public void rename(DocumentReference newReference, List<DocumentReference> backlinkDocumentNames,

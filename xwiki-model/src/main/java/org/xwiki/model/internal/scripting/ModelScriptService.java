@@ -51,6 +51,7 @@ public class ModelScriptService implements ScriptService
      * @param space the space reference name to use (can be empty or null)
      * @param page the page referene name to use (can be empty or null)
      * @return the typed Document Reference object or null if no Resolver with the passed hint could be found
+     * @since 2.3M2
      */
     public DocumentReference createDocumentReference(String wiki, String space, String page)
     {
@@ -94,6 +95,7 @@ public class ModelScriptService implements ScriptService
      * @param stringRepresentation the document reference specified as a String (using the "wiki:space.page" format
      *        and with special characters escaped where required).
      * @return the typed Document Reference object (resolved using the "currentmixed" resolver)
+     * @since 2.3M2
      */
     public DocumentReference resolveDocument(String stringRepresentation)
     {
@@ -122,6 +124,7 @@ public class ModelScriptService implements ScriptService
     /**
      * @param reference the entity reference to transform into a String representation
      * @return the string representation of the passed entity reference (using the "compact" serializer)
+     * @since 2.3M2
      */
     public String serialize(EntityReference reference)
     {

@@ -14,7 +14,7 @@
 <creationDate>1243945864000</creationDate>
 <date>1269848790000</date>
 <contentUpdateDate>1269848790000</contentUpdateDate>
-<version>1.0</version>
+<version>1.1</version>
 <title>$msg.get('annotations.config.title')</title>
 <template></template>
 <defaultTemplate></defaultTemplate>

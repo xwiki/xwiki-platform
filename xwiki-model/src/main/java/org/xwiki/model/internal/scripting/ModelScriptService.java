@@ -45,8 +45,22 @@ public class ModelScriptService implements ScriptService
 
     /**
      * Create a Document Reference from a passed wiki, space and page names, which can be empty strings or null in
+     * which case they are resolved using a "currentmixed/reference" resolver.
+     *
+     * @param wiki the wiki reference name to use (can be empty or null)
+     * @param space the space reference name to use (can be empty or null)
+     * @param page the page referene name to use (can be empty or null)
+     * @return the typed Document Reference object or null if no Resolver with the passed hint could be found
+     */
+    public DocumentReference createDocumentReference(String wiki, String space, String page)
+    {
+        return createDocumentReference(wiki, space, page, "currentmixed/reference");
+    }
+
+    /**
+     * Create a Document Reference from a passed wiki, space and page names, which can be empty strings or null in
      * which case they are resolved against the Resolver having the hint passed as parameter. Valid hints are for
-     * example "default", "current" "currentmixed".
+     * example "default/reference", "current/reference", "currentmixed/reference".
      *
      * @param wiki the wiki reference name to use (can be empty or null)
      * @param space the space reference name to use (can be empty or null)
@@ -79,6 +93,16 @@ public class ModelScriptService implements ScriptService
     /**
      * @param stringRepresentation the document reference specified as a String (using the "wiki:space.page" format
      *        and with special characters escaped where required).
+     * @return the typed Document Reference object (resolved using the "currentmixed" resolver)
+     */
+    public DocumentReference resolveDocument(String stringRepresentation)
+    {
+        return resolveDocument(stringRepresentation, "currentmixed");
+    }
+
+    /**
+     * @param stringRepresentation the document reference specified as a String (using the "wiki:space.page" format
+     *        and with special characters escaped where required).
      * @param hint the hint of the Resolver to use in case any part of the reference is missing (no wiki specified,
      *        no space or no page)
      * @return the typed Document Reference object or null if no Resolver with the passed hint could be found
@@ -93,6 +117,15 @@ public class ModelScriptService implements ScriptService
             result = null;
         }
         return result;
+    }
+
+    /**
+     * @param reference the entity reference to transform into a String representation
+     * @return the string representation of the passed entity reference (using the "compact" serializer)
+     */
+    public String serialize(EntityReference reference)
+    {
+        return serialize(reference, "compact");
     }
 
     /**

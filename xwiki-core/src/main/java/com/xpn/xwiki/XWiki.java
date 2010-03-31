@@ -4871,7 +4871,11 @@ public class XWiki implements XWikiDocChangeNotificationInterface
         return contextPath;
     }
 
-    public String getURL(DocumentReference documentReference, String action, String queryString, String anchor, XWikiContext context)
+    /**
+     * @since 2.2.1
+     */
+    public String getURL(DocumentReference documentReference, String action, String queryString, String anchor, 
+        XWikiContext context)
     {
         XWikiDocument doc = new XWikiDocument(documentReference);
 
@@ -4884,6 +4888,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface
     /**
      * @deprecated since 2.2.1 use {@link #getURL(DocumentReference, String, String, String, XWikiContext)}
      */
+    @Deprecated
     public String getURL(String fullname, String action, String queryString, String anchor, XWikiContext context)
     {
         XWikiDocument doc = new XWikiDocument();
@@ -4900,6 +4905,19 @@ public class XWiki implements XWikiDocChangeNotificationInterface
         return getURL(fullname, action, querystring, null, context);
     }
 
+    /**
+     * @since 2.2.5
+     * @since 2.3M2
+     */
+    public String getURL(DocumentReference reference, String action, XWikiContext context)
+    {
+        return getURL(reference, action, null, null, context);
+    }
+
+    /**
+     * @deprecated since 2.2.5 and 2.3M2 use {@link #getURL(DocumentReference, String, XWikiContext)}
+     */
+    @Deprecated
     public String getURL(String fullname, String action, XWikiContext context)
     {
         return getURL(fullname, action, null, null, context);

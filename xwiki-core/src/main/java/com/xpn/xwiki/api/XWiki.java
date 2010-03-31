@@ -345,6 +345,19 @@ public class XWiki extends Api
     }
 
     /**
+     * Returns whether a document exists or not
+     *
+     * @param reference the reference of the document to check for its existence
+     * @return true if the document exists, false if not
+     * @since 2.2.5
+     * @since 2.3M2
+     */
+    public boolean exists(DocumentReference reference) throws XWikiException
+    {
+        return this.xwiki.exists(reference, getXWikiContext());
+    }
+
+    /**
      * Verify the rights the current user has on a document. If the document requires rights and the user is not
      * authenticated he will be redirected to the login page.
      * 
@@ -1717,13 +1730,30 @@ public class XWiki extends Api
      * XWikiURLFactory object For compatibility with any target environement (and especially the portlet environment) It
      * is important to always use the URL functions to generate URL and never hardcode URLs
      * 
-     * @param fullname page name which includes the attached file
+     * @param fullname the name of the document for which to return the URL for
      * @return a URL as a string pointing to the wiki document in view mode
      * @throws XWikiException if the URL could not be generated properly
      */
     public String getURL(String fullname) throws XWikiException
     {
         return this.xwiki.getURL(fullname, "view", getXWikiContext());
+    }
+
+    /**
+     * API to retrieve the URL of an a Wiki Document in view mode The URL is generated differently depending on the
+     * environement (Servlet, Portlet, PDF, etc..) The URL generation can be modified by implementing a new
+     * XWikiURLFactory object For compatibility with any target environement (and especially the portlet environment) It
+     * is important to always use the URL functions to generate URL and never hardcode URLs
+     *
+     * @param reference the reference to the document for which to return the URL for
+     * @return a URL as a string pointing to the wiki document in view mode
+     * @throws XWikiException if the URL could not be generated properly
+     * @since 2.2.5
+     * @since 2.3M2
+     */
+    public String getURL(DocumentReference reference) throws XWikiException
+    {
+        return this.xwiki.getURL(reference, "view", getXWikiContext());
     }
 
     /**

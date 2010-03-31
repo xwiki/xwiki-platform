@@ -38,6 +38,7 @@ import org.suigeneris.jrcs.diff.DifferentiationFailedException;
 import org.suigeneris.jrcs.diff.delta.Delta;
 import org.suigeneris.jrcs.rcs.Version;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.rendering.parser.ParseException;
 import org.xwiki.rendering.syntax.Syntax;
@@ -92,6 +93,14 @@ public class Document extends Api
      */
     protected Object currentObj;
 
+    /**
+     * Used to resolve a string into a proper Document Reference using the current document's reference to fill the
+     * blanks, except for the page name for which the default page name is used instead and for the wiki name for which
+     * the current wiki is used instead of the current document reference's wiki.
+     */
+    private DocumentReferenceResolver<String> currentMixedDocumentReferenceResolver =
+        Utils.getComponent(DocumentReferenceResolver.class, "currentmixed");
+    
     /**
      * Used to convert a proper Document Reference to string (standard form).
      */
@@ -2179,10 +2188,25 @@ public class Document extends Api
      */
     public void rename(String newDocumentName) throws XWikiException
     {
+        rename(this.currentMixedDocumentReferenceResolver.resolve(newDocumentName));
+    }
+
+    /**
+     * Rename the current document and all the backlinks leading to it. Will also change parent field in all documents
+     * which list the document we are renaming as their parent. See
+     * {@link #rename(String, java.util.List, java.util.List)} for more details.
+     *
+     * @param newReference the reference to the new document
+     * @throws XWikiException in case of an error
+     * @since 2.2.5
+     * @since 2.3M2
+     */
+    public void rename(DocumentReference newReference) throws XWikiException
+    {
         if (hasAccessLevel("delete")
             && this.context.getWiki().checkAccess("edit",
-            this.context.getWiki().getDocument(newDocumentName, this.context), this.context)) {
-            this.doc.rename(newDocumentName, getXWikiContext());
+            this.context.getWiki().getDocument(newReference, this.context), this.context)) {
+            this.doc.rename(newReference, getXWikiContext());
         }
     }
 
@@ -2237,9 +2261,39 @@ public class Document extends Api
     public void rename(String newDocumentName, List<String> backlinkDocumentNames, List<String> childDocumentNames)
         throws XWikiException
     {
+        List<DocumentReference> backlinkDocumentReferences = new ArrayList<DocumentReference>();
+        for (String backlinkDocumentName : backlinkDocumentNames) {
+            backlinkDocumentReferences.add(this.currentMixedDocumentReferenceResolver.resolve(backlinkDocumentName));
+        }
+
+        List<DocumentReference> childDocumentReferences = new ArrayList<DocumentReference>();
+        for (String childDocumentName : childDocumentNames) {
+            childDocumentReferences.add(this.currentMixedDocumentReferenceResolver.resolve(childDocumentName));
+        }
+
+        rename(this.currentMixedDocumentReferenceResolver.resolve(newDocumentName), backlinkDocumentReferences,
+            childDocumentReferences);
+    }
+
+    /**
+     * Same as {@link #rename(String, List)} but the list of documents having the current document as their parent is
+     * passed in parameter.
+     *
+     * @param newReference the reference to the new document
+     * @param backlinkDocumentNames the list of reference to documents to parse and for which links will be modified
+     *        to point to the new renamed document
+     * @param childDocumentNames the list of references to documents whose parent field will be set to the new document
+     *        reference
+     * @throws XWikiException in case of an error
+     * @since 2.2.5
+     * @since 2.3M2
+     */
+    public void rename(DocumentReference newReference, List<DocumentReference> backlinkDocumentNames,
+        List<DocumentReference> childDocumentNames) throws XWikiException
+    {
         if (hasAccessLevel("delete")
             && this.context.getWiki().checkAccess("edit",
-            this.context.getWiki().getDocument(newDocumentName, this.context), this.context)) {
+            this.context.getWiki().getDocument(newReference, this.context), this.context)) {
 
             // Every page given in childDocumentNames has it's parent changed whether it needs it or not.
             // Let's make sure the user has edit permission on any page given which is not actually a child.
@@ -2256,7 +2310,7 @@ public class Document extends Api
                 }
             }
 
-            this.doc.rename(newDocumentName, backlinkDocumentNames, childDocumentNames, getXWikiContext());
+            this.doc.rename(newReference, backlinkDocumentNames, childDocumentNames, getXWikiContext());
         }
     }
 

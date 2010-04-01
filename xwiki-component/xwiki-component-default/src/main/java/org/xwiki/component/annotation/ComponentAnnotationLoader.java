@@ -197,7 +197,10 @@ public class ComponentAnnotationLoader extends AbstractLogEnabled
             BufferedReader in = new BufferedReader(new InputStreamReader(url.openStream(), "UTF-8"));
             String inputLine;
             while ((inputLine = in.readLine()) != null) {
-                annotatedClassNames.add(inputLine);
+                // Make sure we don't add empty lines
+                if (inputLine.trim().length() > 0) {
+                    annotatedClassNames.add(inputLine);
+                }
             }
             in.close();
         }

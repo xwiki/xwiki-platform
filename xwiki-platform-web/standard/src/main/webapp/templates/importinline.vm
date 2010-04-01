@@ -1,7 +1,7 @@
 ##---------------------------------------------------------------------------
 ## If the Document to which XARs will be attached to doesn't exist, then
-## create it. 
-## Note that the upload action could automatically create it but we want to 
+## create it.
+## Note that the upload action could automatically create it but we want to
 ## control the creation so that we can set the parent and thus not make it
 ## orphaned + we set a save comment and make it a minor edit.
 ##---------------------------------------------------------------------------
@@ -22,18 +22,18 @@
 ##---------------------------------------------------------------------------
 ## Import the documents from the selected XAR.
 ##---------------------------------------------------------------------------
-#if("$!{request.action}" == "import")
-<p class="legend">$msg.get("import") #if($request.withversions && $request.withversions=="1")$msg.get("export_addhistory")#end</p>
+#if("$!{request.action}" == 'import')
+<p class="legend">$msg.get('import') #if("$!{request.withversions}" == '1')$msg.get('export_addhistory')#end</p>
 #template("imported.vm")
 ##---------------------------------------------------------------------------
 ## Browse the XARs and let the user select a XAR and the list of documents
 ## to import from that XAR.
 ##---------------------------------------------------------------------------
 #else
-  #set($baseQueryString="editor=$!{request.editor}&amp;section=$!{request.section}")
+  #set($baseQueryString = "editor=$!{request.editor}&amp;section=$!{request.section}")
   #set($ok = $xwiki.jsfx.use('js/xwiki/importer/import.js', true))
   #set($ok = $xwiki.ssfx.use('js/xwiki/importer/import.css', true))
-  #set($attachments = $sorttool.sort($doc.attachmentList, ["date:desc"]))
+  #set($attachments = $sorttool.sort($doc.attachmentList, ['date:desc']))
   <div id="import">
     <div id="packagelist">
       <div class="legend">$msg.get('core.importer.uploadPackage')</div>
@@ -46,7 +46,7 @@
             ## <div><label id="xwikiuploadnamelabel" for="xwikiuploadname">$msg.get('core.viewers.attachments.upload.filename')</label></div>
             <div><input id="xwikiuploadname" type="hidden" name="filename" value="" size="30"/></div>
             <div class="package-upload">
-	       <label for="xwikiuploadfile" class="hidden">$msg.get('core.viewers.attachments.upload.file')</label>
+               <label for="xwikiuploadfile" class="hidden">$msg.get('core.viewers.attachments.upload.file')</label>
                <input id="xwikiuploadfile" type="file" name="filepath" value="" size="30" class="uploadFileInput"/>
                <span class="buttonwrapper">
                  <input type="submit" value="Upload" class="button" />
@@ -60,41 +60,41 @@
       #if($attachments.size() > 0)
       <ul class="xlist">
         #foreach ($attach in $attachments)
-          #set($url = $doc.getURL("import", "${baseQueryString}&amp;file=${attach.filename}"))
-          #if("$!request.file" == "$!attach.filename") #set($extra = "active") #else #set($extra = "") #end
+          #set($url = $doc.getURL('import', "${baseQueryString}&amp;file=${attach.filename}"))
+          #if("$!request.file" == "$!attach.filename") #set($extra = 'active') #else #set($extra = '') #end
           <li class="xitem xhighlight">
             <div class="xitemcontainer package $!extra">
               <div class="name">
-                <a href="$!url" class="package" title="$msg.get("core.importer.selectThisPackage")">
+                <a href="$!url" class="package" title="$msg.get('core.importer.selectThisPackage')">
                   #set($maxnamelength = 40)
                   #packName($attach.filename)
                 </a>
                 <span class="version">$attach.version</span>
                 <span class="xwikibuttonlinks">
-	            #set($redirect = $doc.getURL('import', 'section=Import'))
-                    #set($attachurl = $doc.getAttachmentURL("${attach.filename}", "delattachment", "xredirect=$!{redirect}"))
-                    <a class="deletelink" href="${attachurl}" 
-                         onclick="return confirm('$msg.get("core.viewers.attachments.delete.confirm")');"           
-                         title="$msg.get("core.viewers.attachments.delete.title")"></a>
+                  #set($redirect = $doc.getURL('import', 'section=Import'))
+                  #set($attachurl = $doc.getAttachmentURL(${attach.filename}, 'delattachment', "xredirect=$!{redirect}"))
+                  <a class="deletelink" href="${attachurl}"
+                     onclick="return confirm('$msg.get('core.viewers.attachments.delete.confirm')');"
+                     title="$msg.get('core.viewers.attachments.delete.title')"></a>
                 </span>
               </div>
               <div class="infos">
-                  $msg.get("core.importer.packageInformationExtract", [
-                      "$xwiki.getLocalUserName($attach.author, true)",
-                      "$!xwiki.formatDate($attach.date)"
+                  $msg.get('core.importer.packageInformationExtract', [
+                      $xwiki.getLocalUserName($attach.author, true),
+                      $!xwiki.formatDate($attach.date)
                   ]) - <span class="size">(#dynamicsize($attach.filesize))</span>
-              </div>              
+              </div>
             </div>
           </li>
-        #end    
+        #end
         </ul>
     #else
-      #warning($msg.get("core.importer.noPackageAvailable"))
+      #warning($msg.get('core.importer.noPackageAvailable'))
     #end
     </div> ## packagelistcontainer
     </div> ## packagelist
     <div id="packagecontainer">
-      #if("$!request.file" != "")
+      #if("$!request.file" != '')
         ##
         ## If we get here, it means javascript is not activated on the user's browser (otherwise the attachment link
         ## click would have been intercepted). We display a basic UI (list of checkboxes) to chose which documents in the archive to import.
@@ -107,37 +107,37 @@
           #if(!$ok)
             #error("There was an error reading the file ${request.file}. $!context.import_error")
           #else
-          <div class="legend">$msg.get("core.importer.availableDocuments")</div>
+          <div class="legend">$msg.get('core.importer.availableDocuments')</div>
           <div id="packageDescription">
             <div class="packageinfos">
               <div>
                 <span class="label">$msg.get('core.importer.package')</span>
-                <span class="filename">$attach.filename</span>           
+                <span class="filename">$attach.filename</span>
               </div>
-              #if("$!packager.name" != "")
+              #if("$!packager.name" != '')
               <div>
                 <span class="label">$msg.get('core.importer.package.description')</span>
-                <span class="name">$packager.name</span>         
-              </div>        
+                <span class="name">$packager.name</span>
+              </div>
               #end
-              #if("$!packager.version" != "")
+              #if("$!packager.version" != '')
               <div>
                 <span class="label">$msg.get('core.importer.package.version')</span>
-                <span class="version">$packager.version</span>           
-              </div>        
+                <span class="version">$packager.version</span>
+              </div>
               #end
-              #if("$!packager.authorName" != "")
+              #if("$!packager.authorName" != '')
               <div>
                 <span class="label">$msg.get('core.importer.package.author')</span>
-                <span class="author">$packager.getAuthorName()</span>            
-              </div>        
+                <span class="author">$packager.getAuthorName()</span>
+              </div>
               #end
-              #if("$!packager.licence" != "")
+              #if("$!packager.licence" != '')
               <div>
                 <span class="label">$msg.get('core.importer.package.licence')</span>
-                <span class="licence">$packager.licence</span>           
-              </div>        
-              #end                
+                <span class="licence">$packager.licence</span>
+              </div>
+              #end
             </div>
             <form action="$!{importaction}" method="post" class="static-importer">
               <div>
@@ -145,29 +145,29 @@
                 <input type="hidden" name="name" value="$request.file" />
                 <div id="package">
                   <ul class="xlist package">
-                    #foreach($space in $sorttool.sort($json.get("files").keySet()))
+                    #foreach($space in $sorttool.sort($json.get('files').keySet()))
                     <li class="xitem xunderline">
                       <div class="xitemcontainer">
                       <div class="spacename">$space</div>
                       <div class="clearfloats"></div>
                       <div class="pages">
                       <ul class="xlist pages">
-                       #foreach($document in $sorttool.sort($json.get("files").get($space).keySet()))
-                        #foreach($version in $json.get("files").get($space).get($document))
+                       #foreach($document in $sorttool.sort($json.get('files').get($space).keySet()))
+                        #foreach($version in $json.get('files').get($space).get($document))
                         <li class="xitem xhighlight">
                           <div class="xitemcontainer xpagecontainer">
                             <span class="checkbox">
                             <input type="checkbox" name="pages"
-                                   value="$version.fullName#if("$!version.language" != ""):$version.language#end" checked />
+                                   value="${version.fullName}#if("$!version.language" != ''):${version.language}#end" checked />
                             </span>
                             <span class="documentName">
                             <input type="hidden" name="$version.fullName:$version.language" value="$version.language" />
-                            $document #if("$!version.language" != "") - $version.language #end
-                            </span>       
+                            $document #if("$!version.language" != '') - $version.language #end
+                            </span>
                             <div class="clearfloats"></div>
-                          </div>                          
+                          </div>
                         </li>
-                        #end 
+                        #end
                        #end
                       </ul>
                       </div>
@@ -191,9 +191,9 @@
                 </div>
                 #if($xwiki.hasProgrammingRights())
                 <div class="importOption">
-	                  <input type="checkbox" name="importAsBackup" value="true" #if($packager.isBackupPack())checked="checked"#end/>
-                      $msg.get('core.importer.importAsBackup')
-	            </div>
+                  <input type="checkbox" name="importAsBackup" value="true" #if($packager.isBackupPack())checked="checked"#end/>
+                  $msg.get('core.importer.importAsBackup')
+                </div>
                 #end
                 <span class="buttonwrapper">
                   <input class="button" type="submit" value="$msg.get('core.importer.import')" />

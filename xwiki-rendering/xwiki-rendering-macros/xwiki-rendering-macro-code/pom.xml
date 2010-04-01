@@ -44,18 +44,12 @@
     </dependency>
     <dependency>
       <groupId>org.python</groupId>
-      <artifactId>jython</artifactId>
-      <version>2.5.1-xwiki</version>
-    </dependency>
-    <dependency>
-      <groupId>org.python</groupId>
-      <artifactId>jython-lib</artifactId>
-      <version>2.5.1-xwiki</version>
+      <artifactId>jython-standalone</artifactId>
     </dependency>
     <dependency>
       <groupId>pygments</groupId>
       <artifactId>pygments</artifactId>
-      <version>1.3.1-xwiki</version>
+      <version>1.2.2-xwiki</version>
       <scope>runtime</scope>
     </dependency>
   </dependencies>

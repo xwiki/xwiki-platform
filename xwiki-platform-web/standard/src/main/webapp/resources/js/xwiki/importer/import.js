@@ -22,8 +22,8 @@
     };
 
     // FIXME: we should have those images outside SmartClient library to lessen the dependency towards the library
-    var expandFolderImagePath = "$xwiki.getSkinFile('js/smartclient/skins/Enterprise/images/TreeGrid/opener_closed.gif')";
-    var collapseFolderImagePath = "$xwiki.getSkinFile('js/smartclient/skins/Enterprise/images/TreeGrid/opener_opened.gif')";
+    var expandFolderImagePath = "$xwiki.getSkinFile('js/smartclient/skins/Enterprise/images/TreeGrid/opener_closed.png')";
+    var collapseFolderImagePath = "$xwiki.getSkinFile('js/smartclient/skins/Enterprise/images/TreeGrid/opener_opened.png')";
 
     /**
      * Initialization hook for the rich UI.

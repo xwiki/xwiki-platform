@@ -29,7 +29,7 @@
   <parent>
     <groupId>org.xwiki.platform.tools</groupId>
     <artifactId>xwiki-tools</artifactId>
-    <version>22-SNAPSHOT</version>
+    <version>23-SNAPSHOT</version>
   </parent>
   <artifactId>foxwiki</artifactId>
   <version>1.0-SNAPSHOT</version>

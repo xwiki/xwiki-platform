@@ -12,8 +12,8 @@
 <customClass></customClass>
 <contentAuthor>XWiki.Admin</contentAuthor>
 <creationDate>1264860755000</creationDate>
-<date>1269991235000</date>
-<contentUpdateDate>1269991235000</contentUpdateDate>
+<date>1270567131000</date>
+<contentUpdateDate>1270567131000</contentUpdateDate>
 <version>1.1</version>
 <title></title>
 <template></template>
@@ -571,6 +571,8 @@ XWiki.Selection = Class.create({
   fetchedAnnotations : false,
   // the display annotations check box in the settings panel
   displayAnnotationsCheckbox : false,
+  // flag specifying if the annotations are displayed by default or not
+  displayedByDefault : false,
   // whether the annotations should be displayed as highlighted or only the icons
   displayHighlight : true,
   // add annotation shortcuts
@@ -585,9 +587,20 @@ XWiki.Selection = Class.create({
   // It will be updated any time a changed filter event is received
   currentFilter : {},
 
-  initialize : function (displayHighlighted, annotatedElt) {
+  initialize : function (displayHighlighted, annotatedElt, displayedByDefault) {
     this.displayHighlight = displayHighlighted;
     this.annotatedElement = annotatedElt;
+    this.displayedByDefault = displayedByDefault;
+
+    // if the annotated element does not exist, don't load anything
+    if (!this.annotatedElement) {
+      // and show a warning if the annotations should be shown by default
+      if (this.displayedByDefault) {
+        new XWiki.widgets.Notification("$msg.get('annotations.annotated.error.noannotatedelement')", "warning");
+      }
+      return;
+    }
+
     this.hookMenuButton();
     this.hookTabShortcut();
     this.hookTab();
@@ -606,6 +619,11 @@ XWiki.Selection = Class.create({
 
     // listen to the filter change events to re-fetch the annotations when it changes
     document.observe('xwiki:annotations:filter:changed', this.onFilterChange.bindAsEventListener(this));
+
+    // and get the annotations if they're loaded by default
+    if (displayedByDefault) {
+      this.fetchAnnotations(true);
+    }
   },
 
   hookMenuButton : function() {
@@ -693,6 +711,10 @@ XWiki.Selection = Class.create({
           menu._x_notification.hide();
           // store the displayed annotations checkbox
           this.displayAnnotationsCheckbox = $('annotationsdisplay');
+          // show this checkbox as checked if the annotations are displayed by default and were loaded successfully
+          if (this.displayedByDefault &amp;&amp; this.fetchedAnnotations) {
+            this.displayAnnotationsCheckbox.checked = true;
+          }
           this.attachSettingsListeners();
           $('tmAnnotations').toggleClassName('active');
         }.bind(this),
@@ -873,14 +895,18 @@ XWiki.Selection = Class.create({
    * of the response.
    */
   checkResponseCodeAndFail : function(response) {
-    if (response.responseJSON.responseCode &amp;&amp; response.responseJSON.responseCode != 0) {
-      // response returns a code and says that there is an error
-      response.statusText = response.responseJSON.responseMessage;
-      response.request.options.onFailure(response);
-      return true;
-    } else {
+    if (response.responseJSON &amp;&amp; response.responseJSON.responseCode != null &amp;&amp; response.responseJSON.responseCode == 0) {
       // everything's fine
       return false;
+    } else {
+      // response returns a code and says that there is an error
+      if (response.responseJSON) {
+        response.statusText = response.responseJSON.responseMessage;
+      } else {
+        response.statusText = "$msg.get('annotations.annotated.loaderror.wrongresponse')";
+      }
+      response.request.options.onFailure(response);
+      return true;
     }
   },
 
@@ -1472,13 +1498,24 @@ XWiki.Selection = Class.create({
 #set($config = 'AnnotationCode.AnnotationConfig')
 #set($configObj = $xwiki.getDocument($config).getObject($config))
 #set($annotationHighlightByDefault = $configObj.getProperty('displayHighlight').value)
+#set($annotationsDisplayedByDefault = $configObj.getProperty('displayed').value)
 #set($annotationsActivated = $configObj.getProperty('activated').value)
 #set($exceptionSpaces = $configObj.getProperty('exceptionSpaces').value)
 document.observe('dom:loaded', function() {
+  // if the action on the current document is not view, don't load annotations
+  if (XWiki.contextaction != "view") {
+    return;
+  }
+  
   #if ($annotationHighlightByDefault &amp;&amp; $annotationHighlightByDefault != 0)
     var displayHighlight = true;
   #else
     var displayHighlight = false;
+  #end
+  #if ($annotationsDisplayedByDefault &amp;&amp; $annotationsDisplayedByDefault != 0)
+    var displayed = true;
+  #else
+    var displayed = false;
   #end
   #if ($annotationsActivated &amp;&amp; $annotationsActivated != 0)
     var activated = true;
@@ -1495,7 +1532,7 @@ document.observe('dom:loaded', function() {
   // if the annotations are activated and the current space is not an exception or the annotations are not activated but the current space is an exception
   if ((activated &amp;&amp; currentSpaceInExceptions &lt; 0) || (!activated &amp;&amp; currentSpaceInExceptions &gt;= 0)) {
     // initialize the annotations on the xwikicontent element which is the document content by default  
-    new XWiki.Annotation(displayHighlight, $('xwikicontent'));
+    new XWiki.Annotation(displayHighlight, $('xwikicontent'), displayed);
   }
 });</code>
 </property>

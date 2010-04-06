@@ -12,8 +12,8 @@
 <customClass></customClass>
 <contentAuthor>XWiki.Admin</contentAuthor>
 <creationDate>1264860755000</creationDate>
-<date>1270567131000</date>
-<contentUpdateDate>1270567131000</contentUpdateDate>
+<date>1270590698000</date>
+<contentUpdateDate>1270590698000</contentUpdateDate>
 <version>1.1</version>
 <title></title>
 <template></template>
@@ -621,7 +621,7 @@ XWiki.Selection = Class.create({
     document.observe('xwiki:annotations:filter:changed', this.onFilterChange.bindAsEventListener(this));
 
     // and get the annotations if they're loaded by default
-    if (displayedByDefault) {
+    if (this.displayedByDefault) {
       this.fetchAnnotations(true);
     }
   },
@@ -866,7 +866,9 @@ XWiki.Selection = Class.create({
         this.loadAnnotatedContent(response.responseJSON.annotatedContent, andShow);
         // store the state of the annotations
         this.fetchedAnnotations = true;
-        this.displayAnnotationsCheckbox.checked = true;
+        if (this.displayAnnotationsCheckbox) {
+          this.displayAnnotationsCheckbox.checked = true;
+        }
       }.bind(this),
 
       onFailure: function(response) {
@@ -876,7 +878,9 @@ XWiki.Selection = Class.create({
         }
         // show the error message at the bottom
         this._x_notification.replace(new XWiki.widgets.Notification("$msg.get('annotations.annotated.loaderror')" + failureReason, "error", {timeout : 5}));
-        this.displayAnnotationsCheckbox.checked = false;
+        if (this.displayAnnotationsCheckbox) {
+          this.displayAnnotationsCheckbox.checked = false;
+        }
       }.bind(this),
 
       on0: function (response) {
@@ -885,7 +889,9 @@ XWiki.Selection = Class.create({
 
       onComplete: function() {
         // In the end: re-enable the checkbox
-        this.displayAnnotationsCheckbox.disabled = false;
+        if (this.displayAnnotationsCheckbox) {
+          this.displayAnnotationsCheckbox.disabled = false;
+        }
       }.bind(this)
     });
   },
@@ -987,7 +993,7 @@ XWiki.Selection = Class.create({
               }
               this.fetchedAnnotations = true;
               // reload the received annotated content, with scroll to tab
-              this.loadAnnotatedContent(response.responseJSON.annotatedContent, this.displayAnnotationsCheckbox.checked, !inBubble);
+              this.loadAnnotatedContent(response.responseJSON.annotatedContent, this.displayAnnotationsCheckbox ? this.displayAnnotationsCheckbox.checked : this.displayedByDefault, !inBubble);
             }.bind(this),
             onComplete : function() {
               // In the end: re-enable the button
@@ -1256,7 +1262,7 @@ XWiki.Selection = Class.create({
         }
         this.fetchedAnnotations = true;
         // reload the received annotated content, with scroll to tab
-        this.loadAnnotatedContent(response.responseJSON.annotatedContent, this.displayAnnotationsCheckbox.checked, !inBubble);
+        this.loadAnnotatedContent(response.responseJSON.annotatedContent, this.displayAnnotationsCheckbox ? this.displayAnnotationsCheckbox.checked : this.displayedByDefault, !inBubble);
       }.bind(this),
       onFailure : function(response) {
         var failureReason = response.statusText;
@@ -1473,7 +1479,7 @@ XWiki.Selection = Class.create({
         if (this.checkResponseCodeAndFail(response)) {
           return;
         }
-        this.loadAnnotatedContent(response.responseJSON.annotatedContent, this.displayAnnotationsCheckbox.checked);
+        this.loadAnnotatedContent(response.responseJSON.annotatedContent, this.displayAnnotationsCheckbox ? this.displayAnnotationsCheckbox.checked : this.displayedByDefault);
         this.fetchedAnnotations = true;
         form._x_notification = new XWiki.widgets.Notification("$msg.get('annotations.action.create.success')", "done");
         // and hide the create bubble, skipping selection highlight clear

@@ -60,7 +60,7 @@ $msg.get('annotations.config.activate.explanation')
 **$annotationsConfigClass.get("exceptionSpaces").prettyName**: #if($context.action == "inline") $doc.display("exceptionSpaces")#else#foreach($space in $configObj.getProperty("exceptionSpaces").value)#if($velocityCount &gt; 1), #end[[$space&gt;&gt;${space}.WebHome]]#end#end
 
 = $msg.get('annotations.config.display.title') =
-**$annotationsConfigClass.get("displayed").prettyName** ($msg.get('annotations.config.notimplemented')): $doc.display("displayed")
+**$annotationsConfigClass.get("displayed").prettyName**: $doc.display("displayed")
 **$annotationsConfigClass.get("displayHighlight").prettyName**: $doc.display("displayHighlight")
 
 = $msg.get('annotations.config.type.title') =

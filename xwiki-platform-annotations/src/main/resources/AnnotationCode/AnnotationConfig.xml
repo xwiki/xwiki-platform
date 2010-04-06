@@ -12,8 +12,8 @@
 <customClass></customClass>
 <contentAuthor>XWiki.Admin</contentAuthor>
 <creationDate>1243945864000</creationDate>
-<date>1269848790000</date>
-<contentUpdateDate>1269848790000</contentUpdateDate>
+<date>1270567353000</date>
+<contentUpdateDate>1270567353000</contentUpdateDate>
 <version>1.1</version>
 <title>$msg.get('annotations.config.title')</title>
 <template></template>
@@ -517,6 +517,7 @@
 <property>
 <propertiesToShow>
 <value>displayHighlight</value>
+<value>displayed</value>
 </propertiesToShow>
 </property>
 </object>

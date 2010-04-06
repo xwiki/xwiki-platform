@@ -27,7 +27,7 @@
   <parent>
     <groupId>com.xpn.xwiki.platform.plugins</groupId>
     <artifactId>xwiki-plugins</artifactId>
-    <version>22</version>
+    <version>23-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-plugin-scheduler</artifactId>
   <version>1.19-SNAPSHOT</version>

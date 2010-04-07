@@ -12,8 +12,8 @@
 <customClass></customClass>
 <contentAuthor>XWiki.Admin</contentAuthor>
 <creationDate>1264860755000</creationDate>
-<date>1270590698000</date>
-<contentUpdateDate>1270590698000</contentUpdateDate>
+<date>1270643534000</date>
+<contentUpdateDate>1270643534000</contentUpdateDate>
 <version>1.1</version>
 <title></title>
 <template></template>
@@ -847,7 +847,7 @@ XWiki.Selection = Class.create({
 
   fetchAnnotations : function(andShow) {
     // TODO: fixme, get the URL in a less hardcoded way
-    var getAnnotationsURL = '/xwiki/rest/wikis/' + XWiki.currentWiki + '/spaces/' + XWiki.currentSpace + '/pages/' + $$('meta[name=page]')[0].content + '/annotations?media=json';
+    var getAnnotationsURL = '/xwiki/rest/wikis/' + encodeURIComponent(XWiki.currentWiki) + '/spaces/' + encodeURIComponent(XWiki.currentSpace) + '/pages/' + encodeURIComponent($$('meta[name=page]')[0].content) + '/annotations?media=json';
     new Ajax.Request(getAnnotationsURL, {method: 'GET',
       parameters: this.prepareRequestParameters(new Hash()), 
       onCreate: function() {
@@ -1037,9 +1037,9 @@ XWiki.Selection = Class.create({
         new Ajax.Request('$xwiki.getURL("AnnotationCode.EditForm")', {
           parameters: {
             'xpage' : 'plain',
-            'wiki' : encodeURIComponent(XWiki.currentWiki),
-            'space' : encodeURIComponent(XWiki.currentSpace),
-            'page' : encodeURIComponent($$('meta[name=page]')[0].content),
+            'wiki' : XWiki.currentWiki,
+            'space' : XWiki.currentSpace,
+            'page' : $$('meta[name=page]')[0].content,
             'id' : id
           },
           onCreate : function() {
@@ -1124,9 +1124,9 @@ XWiki.Selection = Class.create({
       parameters: {
         'id' : annotationId,
         'xpage' : 'plain',
-        'wiki' : encodeURIComponent(XWiki.currentWiki),
-        'space' : encodeURIComponent(XWiki.currentSpace),
-        'page' : encodeURIComponent($$('meta[name=page]')[0].content)
+        'wiki' : XWiki.currentWiki,
+        'space' : XWiki.currentSpace,
+        'page' : $$('meta[name=page]')[0].content
       },
       onSuccess: function(response) {
         // display the annotation creation form
@@ -1391,12 +1391,12 @@ XWiki.Selection = Class.create({
       new Ajax.Request('$xwiki.getURL("AnnotationCode.CreateForm")', {
         parameters: {
           'xpage' : 'plain',
-          'selection' : encodeURIComponent(selectionText),
-          'selectionContext' : encodeURIComponent(this.selectionService.selectionContext),
+          'selection' : selectionText,
+          'selectionContext' : this.selectionService.selectionContext,
           'selectionOffset' : this.selectionService.selectionOffset,
-          'wiki' : encodeURIComponent(XWiki.currentWiki),
-          'space' : encodeURIComponent(XWiki.currentSpace),
-          'page' : encodeURIComponent($$('meta[name=page]')[0].content)
+          'wiki' : XWiki.currentWiki,
+          'space' : XWiki.currentSpace,
+          'page' : $$('meta[name=page]')[0].content
         },
         onCreate: function() {
           // create nice loading panel

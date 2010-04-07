@@ -624,6 +624,9 @@ XWiki.Selection = Class.create({
     if (this.displayedByDefault) {
       this.fetchAnnotations(true);
     }
+    
+    // and put the value of the current page in a variable on XWiki, as it should be set along with the space and wiki values
+    XWiki.currentPage = $$('meta[name=page]')[0].content
   },
 
   hookMenuButton : function() {
@@ -694,7 +697,7 @@ XWiki.Selection = Class.create({
     }
     if (!this.settingsPanel) {
       new Ajax.Request('$xwiki.getURL("AnnotationCode.Settings", "view", "xpage=plain")', {
-        parameters : {'target' : XWiki.currentWiki + ':' + XWiki.currentSpace + '.' + $$('meta[name=page]')[0].content},
+        parameters : {'target' : XWiki.currentWiki + ':' + XWiki.currentSpace + '.' + XWiki.currentPage},
         onCreate: function() {
           // disable the button
           menu.disabled = true;
@@ -847,7 +850,7 @@ XWiki.Selection = Class.create({
 
   fetchAnnotations : function(andShow) {
     // TODO: fixme, get the URL in a less hardcoded way
-    var getAnnotationsURL = '/xwiki/rest/wikis/' + encodeURIComponent(XWiki.currentWiki) + '/spaces/' + encodeURIComponent(XWiki.currentSpace) + '/pages/' + encodeURIComponent($$('meta[name=page]')[0].content) + '/annotations?media=json';
+    var getAnnotationsURL = '/xwiki/rest/wikis/' + encodeURIComponent(XWiki.currentWiki) + '/spaces/' + encodeURIComponent(XWiki.currentSpace) + '/pages/' + encodeURIComponent(XWiki.currentPage) + '/annotations?media=json';
     new Ajax.Request(getAnnotationsURL, {method: 'GET',
       parameters: this.prepareRequestParameters(new Hash()), 
       onCreate: function() {
@@ -1039,7 +1042,7 @@ XWiki.Selection = Class.create({
             'xpage' : 'plain',
             'wiki' : XWiki.currentWiki,
             'space' : XWiki.currentSpace,
-            'page' : $$('meta[name=page]')[0].content,
+            'page' : XWiki.currentPage,
             'id' : id
           },
           onCreate : function() {
@@ -1126,7 +1129,7 @@ XWiki.Selection = Class.create({
         'xpage' : 'plain',
         'wiki' : XWiki.currentWiki,
         'space' : XWiki.currentSpace,
-        'page' : $$('meta[name=page]')[0].content
+        'page' : XWiki.currentPage
       },
       onSuccess: function(response) {
         // display the annotation creation form
@@ -1396,7 +1399,7 @@ XWiki.Selection = Class.create({
           'selectionOffset' : this.selectionService.selectionOffset,
           'wiki' : XWiki.currentWiki,
           'space' : XWiki.currentSpace,
-          'page' : $$('meta[name=page]')[0].content
+          'page' : XWiki.currentPage
         },
         onCreate: function() {
           // create nice loading panel

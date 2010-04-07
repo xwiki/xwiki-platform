@@ -620,13 +620,13 @@ XWiki.Selection = Class.create({
     // listen to the filter change events to re-fetch the annotations when it changes
     document.observe('xwiki:annotations:filter:changed', this.onFilterChange.bindAsEventListener(this));
 
+    // and put the value of the current page in a variable on XWiki, as it should be set along with the space and wiki values
+    XWiki.currentPage = $$('meta[name=page]')[0].content
+
     // and get the annotations if they're loaded by default
     if (this.displayedByDefault) {
       this.fetchAnnotations(true);
     }
-    
-    // and put the value of the current page in a variable on XWiki, as it should be set along with the space and wiki values
-    XWiki.currentPage = $$('meta[name=page]')[0].content
   },
 
   hookMenuButton : function() {

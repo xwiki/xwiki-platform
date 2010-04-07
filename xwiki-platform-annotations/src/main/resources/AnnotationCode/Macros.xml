@@ -47,7 +47,7 @@
  *#
 #macro(displayCreateBox $docWiki $docSpace $docPage $annData)
 &lt;div class="annotation-box annotation-box-create"&gt;
-  &lt;form method="POST" action="/xwiki/rest/wikis/${util.encodeURI($docWiki)}/spaces/${util.encodeURI($docSpace)}/pages/${util.encodeURI($docPage)}/annotations?media=json"&gt;
+  &lt;form method="POST" action="/xwiki/rest/wikis/${escapetool.url($docWiki)}/spaces/${escapetool.url($docSpace)}/pages/${escapetool.url($docPage)}/annotations?media=json"&gt;
     &lt;div class="hidden"&gt;
       #foreach($field in $annData.keySet())
          &lt;input type="hidden" name="${field}" value="$!{annData.get(${field})}"/&gt;
@@ -73,7 +73,7 @@
   &lt;div class="annotation-box annotation-box-edit"&gt;
     #if($ann)
       ## TODO: fix this url to be generated less hardcoded
-      #set($editURL = "/xwiki/rest/wikis/" + $$util.encodeURI($docWiki) + "/spaces/" + $util.encodeURI($docSpace) + "/pages/" + $util.encodeURI($docPage) + "/annotation/" + $util.encodeURI($ann.id) + "?method=PUT&amp;media=json")
+      #set($editURL = "/xwiki/rest/wikis/" + $escapetool.url($docWiki) + "/spaces/" + $escapetool.url($docSpace) + "/pages/" + $escapetool.url($docPage) + "/annotation/" + $escapetool.url($ann.id) + "?method=PUT&amp;media=json")
       &lt;form method='POST' action="${editURL}"&gt;
         #displayAnnotation($ann, 'edit')
         #displayAnnotationBoxButtons('edit')
@@ -174,7 +174,7 @@
 #macro(displayAnnotationToolbox $ann $mode $docWiki $docSpace $docPage)
   &lt;span class="annotationTools"&gt;
     #if($mode != 'create' &amp;&amp; $annotations.canEditAnnotation($ann.id, $docWiki, $docSpace, $docPage))
-      #set($editURL = "/xwiki/rest/wikis/" + $util.encodeURI($docWiki) + "/spaces/" + $util.encodeURI($docSpace) + "/pages/" + $util.encodeURI($docPage) + "/annotation/" + $util.encodeURI($ann.id) + "?method=PUT&amp;media=json")
+      #set($editURL = "/xwiki/rest/wikis/" + $escapetool.url($docWiki) + "/spaces/" + $escapetool.url($docSpace) + "/pages/" + $escapetool.url($docPage) + "/annotation/" + $escapetool.url($ann.id) + "?method=PUT&amp;media=json")
       #if ("$!{ann.state}" == 'UPDATED')
         &lt;span class="tool accept"&gt;&lt;a class="validate" href="${editURL}" title="$msg.get('annotations.action.validate.tooltip')"&gt;$msg.get('annotations.action.validate.text')&lt;/a&gt;&lt;/span&gt;
       #end
@@ -183,7 +183,7 @@
         &lt;span class="tool annotationEdit"&gt;&lt;a class="edit" href="${editURL}" title="$msg.get('annotations.action.edit.tooltip')"&gt;$msg.get('annotations.action.edit.text')&lt;/a&gt;&lt;/span&gt;
       #end
       ## TODO: fix this url to be generated less hardcoded
-      #set($deleteURL = "/xwiki/rest/wikis/" + $util.encodeURI($docWiki) + "/spaces/" + $util.encodeURI($docSpace) + "/pages/" + $util.encodeURI($docPage) + "/annotation/" + $util.encodeURI($ann.id) + "?method=DELETE&amp;media=json")
+      #set($deleteURL = "/xwiki/rest/wikis/" + $escapetool.url($docWiki) + "/spaces/" + $escapetool.url($docSpace) + "/pages/" + $escapetool.url($docPage) + "/annotation/" + $escapetool.url($ann.id) + "?method=DELETE&amp;media=json")
       &lt;span class="tool delete"&gt;&lt;a class="delete" href="${deleteURL}" title="$msg.get('annotations.action.delete.tooltip')"&gt;$msg.get('annotations.action.delete.text')&lt;/a&gt;&lt;/span&gt;
     #end
   &lt;/span&gt;

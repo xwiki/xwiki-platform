@@ -20,11 +20,14 @@
  */
 package com.xpn.xwiki.web;
 
+import java.io.IOException;
+
+import javax.servlet.http.HttpServletResponse;
+
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 
-import java.io.IOException;
-
+import org.apache.commons.lang.BooleanUtils;
 import org.apache.commons.lang.StringUtils;
 
 /**
@@ -56,6 +59,7 @@ public class SaveAndContinueAction extends XWikiAction
             back = context.getDoc().getURL("edit", context);
         }
 
+        // This will never be true if "back" comes from request.getHeader("referer")
         if (back != null && back.indexOf("editor=class") >= 0) {
             PropUpdateAction pua = new PropUpdateAction();
             if (pua.propUpdate(context)) {
@@ -66,6 +70,12 @@ public class SaveAndContinueAction extends XWikiAction
             if (sa.save(context)) {
                 sa.render(context);
             }
+        }
+
+        // If this is an ajax request, no need to redirect.
+        if (BooleanUtils.isTrue((Boolean) context.get("ajax"))) {
+            context.getResponse().setStatus(HttpServletResponse.SC_NO_CONTENT);
+            return false;
         }
 
         // Forward back to the originating page

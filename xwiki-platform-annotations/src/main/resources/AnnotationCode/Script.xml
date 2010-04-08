@@ -1510,7 +1510,7 @@ XWiki.Selection = Class.create({
 #set($annotationsDisplayedByDefault = $configObj.getProperty('displayed').value)
 #set($annotationsActivated = $configObj.getProperty('activated').value)
 #set($exceptionSpaces = $configObj.getProperty('exceptionSpaces').value)
-document.observe('dom:loaded', function() {
+document.observe('xwiki:dom:loaded', function() {
   // if the action on the current document is not view, don't load annotations
   if (XWiki.contextaction != "view") {
     return;

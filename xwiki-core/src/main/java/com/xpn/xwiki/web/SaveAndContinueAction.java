@@ -28,7 +28,7 @@ import java.io.IOException;
 import org.apache.commons.lang.StringUtils;
 
 /**
- * Action used for saving and returning to to the edit page rather than viewing changes.
+ * Action used for saving and returning to the edit page rather than viewing changes.
  * 
  * @version $Id$
  */
@@ -50,12 +50,10 @@ public class SaveAndContinueAction extends XWikiAction
             back = request.getParameter("xredirect");
         }
         if (StringUtils.isEmpty(back)) {
-            back = request.getHeader("Referer");
+            back = removeAllParametersFromQueryStringExceptEditor(request.getHeader("Referer"));
         }
         if (StringUtils.isEmpty(back)) {
             back = context.getDoc().getURL("edit", context);
-        } else {
-            back = removeAllParametersFromQueryStringExceptEditor(back);
         }
 
         if (back != null && back.indexOf("editor=class") >= 0) {
@@ -92,7 +90,7 @@ public class SaveAndContinueAction extends XWikiAction
     }
 
     /**
-     * @param url A url to get a modified version of.
+     * @param url the URL to get a modified version of.
      * @return A modified version of the input url where all parameters 
      *         are stripped from the query string except "editor"
      */

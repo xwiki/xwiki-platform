@@ -72,8 +72,8 @@ public class IdGenerator
      * [A-Za-z][A-Za-z0-9:_.-]* should be used. </quote>
      * </p>
      * 
-     * @param text the text used to generate the unique id. For example "Hello world" will generate "Helloworld".
-     * @return the unique id
+     * @param text the text used to generate the unique id
+     * @return the unique id. For example "Hello world" will generate "IHelloworld".
      */
     public String generateUniqueId(String text)
     {
@@ -89,8 +89,8 @@ public class IdGenerator
      * </p>
      * 
      * @param prefix the prefix of the identifier. Has to match [a-zA-Z].
-     * @param text the text used to generate the unique id. For example "Hello world" will generate "Helloworld".
-     * @return the unique id
+     * @param text the text used to generate the unique id
+     * @return the unique id. For example "Hello world" will generate prefix + "Helloworld".
      */
     public String generateUniqueId(String prefix, String text)
     {

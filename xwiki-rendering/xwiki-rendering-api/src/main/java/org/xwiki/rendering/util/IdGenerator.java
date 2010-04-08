@@ -25,6 +25,7 @@ import java.util.Set;
 
 import org.apache.commons.codec.net.URLCodec;
 import org.apache.commons.httpclient.util.EncodingUtil;
+import org.apache.commons.lang.StringUtils;
 
 /**
  * Stateful generator of id attributes. It's stateful since it remembers the generated ids. Thus a new instance of it
@@ -72,6 +73,8 @@ public class IdGenerator
      */
     public String generateUniqueId(String text)
     {
+        // Note: We always use a prefix (and a prefix with alpha characters) so that the generated id is a valid HTML id
+        // (since HTML id must start with an alpha prefix).
         return generateUniqueId("I", text);
     }
 
@@ -89,6 +92,12 @@ public class IdGenerator
      */
     public String generateUniqueId(String prefix, String text)
     {
+        // Verify that the passed prefix contains only alpha characters since the generated id must be a valid HTML id.
+        if (StringUtils.isEmpty(prefix) || !StringUtils.isAlpha(prefix)) {
+            throw new IllegalArgumentException("The prefix [" + prefix
+                + "] should only contain alphanumerical characters and not be empty.");
+        }
+
         String idPrefix = text;
 
         // Clean white space since otherwise they'll get transformed into %20 by the below and thus for

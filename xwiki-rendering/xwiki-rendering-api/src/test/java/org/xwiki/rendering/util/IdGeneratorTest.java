@@ -62,4 +62,26 @@ public class IdGeneratorTest extends TestCase
         assertEquals("Iwithtab", this.idGenerator.generateUniqueId("with\ttab"));
         assertEquals("IE5AF86E7A081", this.idGenerator.generateUniqueId("\u5BC6\u7801"));
     }
+
+    public void testGenerateUniqueIdWhenInvalidEmptyPrefix()
+    {
+        try {
+            this.idGenerator.generateUniqueId("", "whatever");
+            fail("Should have thrown an exception");
+        } catch (IllegalArgumentException expected) {
+            assertEquals("The prefix [] should only contain alphanumerical characters and not be empty.",
+                expected.getMessage());
+        }
+    }
+
+    public void testGenerateUniqueIdWhenInvalidNonAlphaPrefix()
+    {
+        try {
+            this.idGenerator.generateUniqueId("a-b", "whatever");
+            fail("Should have thrown an exception");
+        } catch (IllegalArgumentException expected) {
+            assertEquals("The prefix [a-b] should only contain alphanumerical characters and not be empty.",
+                expected.getMessage());
+        }
+    }
 }

@@ -150,7 +150,7 @@ XWiki.widgets.Notification.getContainer = function() {
   if (!XWiki.widgets.Notification.container) {
     XWiki.widgets.Notification.container = new Element('div', {"class" : "xnotification-container"});
     // Insert the container in the document body.
-    document.body.insert(XWiki.widgets.Notification.container);
+    $(document.body).insert(XWiki.widgets.Notification.container);
     // Register a scroll listener to reposition the notifications at the bottom of the screen in IE.
     if (Prototype.Browser.IE) {
       XWiki.widgets.Notification.container.setStyle({position : 'absolute', 'bottom': '0px'});

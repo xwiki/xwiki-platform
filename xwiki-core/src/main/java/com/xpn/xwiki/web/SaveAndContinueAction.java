@@ -25,33 +25,37 @@ import com.xpn.xwiki.XWikiException;
 
 import java.io.IOException;
 
-public class SaveAndContinueAction extends XWikiAction {
+import org.apache.commons.lang.StringUtils;
+
+/**
+ * Action used for saving and returning to to the edit page rather than viewing changes.
+ * 
+ * @version $Id$
+ */
+public class SaveAndContinueAction extends XWikiAction
+{
+    /**
+     * {@inheritDoc}
+     * 
+     * @see XWikiAction#action(XWikiContext)
+     */
+    @Override
     public boolean action(XWikiContext context) throws XWikiException {
         XWikiRequest request = context.getRequest();
         XWikiResponse response = context.getResponse();
 
+        // Try to find the URL of the edit page which we came from.
         String back = request.getParameter("xcontinue");
-        if (back == null || back.equals("")) {
+        if (StringUtils.isEmpty(back)) {
             back = request.getParameter("xredirect");
-            if (back == null || back.equals("")) {
-                back = request.getHeader("Referer");
-                if (back == null || back.equals("")) {
-                    back = context.getDoc().getURL("edit", context);
-                } else {
-                    int qm = back.indexOf('?');
-                    String base = back.substring(0, qm != -1 ? qm : back.length());
-                    String query = "";
-                    int start = back.indexOf("editor=");
-                    if (start != -1) {
-                        int end = back.indexOf('&', start);
-                        if (end == -1) {
-                            end = back.length();
-                        }
-                        query = query + back.substring(start, end);
-                    }
-                    back = base + "?" + query;
-                }
-            }
+        }
+        if (StringUtils.isEmpty(back)) {
+            back = request.getHeader("Referer");
+        }
+        if (StringUtils.isEmpty(back)) {
+            back = context.getDoc().getURL("edit", context);
+        } else {
+            back = removeAllParametersFromQueryStringExceptEditor(back);
         }
 
         if (back != null && back.indexOf("editor=class") >= 0) {
@@ -65,15 +69,47 @@ public class SaveAndContinueAction extends XWikiAction {
                 sa.render(context);
             }
         }
+
         // Forward back to the originating page
         try {
             response.sendRedirect(back);
         } catch (IOException ignored) {
+            // This exception is ignored because it will only be thrown if content has already been sent to the
+            // response. This should never happen but we have to catch the exception anyway.
         }
         return false;
     }
 
-    public String render(XWikiContext context) throws XWikiException {
+    /**
+     * {@inheritDoc}
+     * 
+     * @see XWikiAction#render(XWikiContext)
+     */
+    @Override
+    public String render(XWikiContext context) throws XWikiException
+    {
         return "exception";
+    }
+
+    /**
+     * @param url A url to get a modified version of.
+     * @return A modified version of the input url where all parameters 
+     *         are stripped from the query string except "editor"
+     */
+    private String removeAllParametersFromQueryStringExceptEditor(String url)
+    {
+        String[] baseAndQuery = url.split("?");
+        // No query string: no change.
+        if (baseAndQuery.length < 2) {
+            return url;
+        }
+
+        String[] queryBeforeAndAfterEditor = baseAndQuery[1].split("editor=");
+        // No editor=* in query string: return URI
+        if (queryBeforeAndAfterEditor.length < 2) {
+            return baseAndQuery[0];
+        }
+
+        return baseAndQuery[0] + "?editor=" + queryBeforeAndAfterEditor[1].split("&")[0];
     }
 }

@@ -1339,7 +1339,6 @@
               **/web/XWikiPortletContext.java,
               **/web/XWikiDefaultURLFactory.java,
               **/web/XWikiPortlet.java,
-              **/web/SaveAndContinueAction.java,
               **/web/PDFAction.java,
               **/web/RollbackAction.java,
               **/web/ExportURLFactory.java,

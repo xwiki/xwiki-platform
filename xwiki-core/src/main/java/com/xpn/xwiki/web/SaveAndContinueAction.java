@@ -106,6 +106,10 @@ public class SaveAndContinueAction extends XWikiAction
      */
     private String removeAllParametersFromQueryStringExceptEditor(String url)
     {
+        if (url == null) {
+            return "";
+        }
+
         String[] baseAndQuery = url.split("\\?");
         // No query string: no change.
         if (baseAndQuery.length < 2) {

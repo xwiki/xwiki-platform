@@ -65,12 +65,7 @@ public class IdGenerator
     private Set<String> generatedIds = new HashSet<String>();
 
     /**
-     * Generate a unique id attribute using the passed text as the seed value. The generated id complies with the XHTML
-     * specification. Extract from <a href="http://www.w3.org/TR/xhtml1/#C_8">XHTML RFC</a>:
-     * <p>
-     * <quote>When defining fragment identifiers to be backward-compatible, only strings matching the pattern
-     * [A-Za-z][A-Za-z0-9:_.-]* should be used. </quote>
-     * </p>
+     * Same as {@link #generateUniqueId(String, String)} but with a fixed prefix of "I".
      * 
      * @param text the text used to generate the unique id
      * @return the unique id. For example "Hello world" will generate "IHelloworld".

@@ -96,7 +96,8 @@ public class IdGenerator
     {
         String idPrefix = text;
 
-        // clean white space, Helloworld is nicer than Hello20world
+        // Clean white space since otherwise they'll get transformed into %20 by the below and thus for
+        // "Hello world" we would get "Hello20world" for the id. It's nicer to get "Helloworld".
         idPrefix = idPrefix.replaceAll("\\s", "");
 
         // convert non alpha-numeric characters

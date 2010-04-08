@@ -141,6 +141,168 @@
 <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
 </propertiesToShow>
 </class>
+<object>
+<class>
+<name>XWiki.JavaScriptExtension</name>
+<customClass></customClass>
+<customMapping></customMapping>
+<defaultViewSheet></defaultViewSheet>
+<defaultEditSheet></defaultEditSheet>
+<defaultWeb></defaultWeb>
+<nameField></nameField>
+<validationScript></validationScript>
+<cache>
+<cache>0</cache>
+<displayType>select</displayType>
+<multiSelect>0</multiSelect>
+<name>cache</name>
+<number>5</number>
+<prettyName>Caching policy</prettyName>
+<relationalStorage>0</relationalStorage>
+<separator> </separator>
+<separators> ,|</separators>
+<size>1</size>
+<unmodifiable>0</unmodifiable>
+<values>long|short|default|forbid</values>
+<classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+</cache>
+<code>
+<name>code</name>
+<number>2</number>
+<prettyName>Code</prettyName>
+<rows>20</rows>
+<size>50</size>
+<unmodifiable>0</unmodifiable>
+<classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+</code>
+<name>
+<name>name</name>
+<number>1</number>
+<prettyName>Name</prettyName>
+<size>30</size>
+<unmodifiable>0</unmodifiable>
+<classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+</name>
+<parse>
+<displayFormType>select</displayFormType>
+<displayType>yesno</displayType>
+<name>parse</name>
+<number>4</number>
+<prettyName>Parse content</prettyName>
+<unmodifiable>0</unmodifiable>
+<classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+</parse>
+<use>
+<cache>0</cache>
+<displayType>select</displayType>
+<multiSelect>0</multiSelect>
+<name>use</name>
+<number>3</number>
+<prettyName>Use this extension</prettyName>
+<relationalStorage>0</relationalStorage>
+<separator> </separator>
+<separators> ,|</separators>
+<size>1</size>
+<unmodifiable>0</unmodifiable>
+<values>currentPage=Always on this page|onDemand=On demand|always=Always on this wiki</values>
+<classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+</use>
+</class>
+<name>XWiki.ConfigurableClass</name>
+<number>0</number>
+<className>XWiki.JavaScriptExtension</className>
+<guid>71fc6ffa-92cb-48f1-9d80-a845d1807b10</guid>
+<property>
+<cache>default</cache>
+</property>
+<property>
+<code>document.observe('dom:loaded', function() {
+  // Hide headers unless they have error messages under them.
+  var elementsInPage = $('admin-page-content').childNodes;
+  var errorShown = false;
+  for (var i = elementsInPage.length - 1; i &gt; -1; i--) {
+    var e = elementsInPage[i];
+    if (e.tagName == 'DIV' &amp;&amp; e.getAttribute('class').indexOf('errormessage') != -1)
+    {
+      errorShown = true;
+    } else if (!errorShown 
+               &amp;&amp; e.tagName == 'H1'
+               &amp;&amp; e.getAttribute('class') == 'wikigeneratedheader'
+               &amp;&amp; e.getAttribute('id').indexOf('HCustomize') == 0) 
+    {
+      e.setAttribute('class', 'hidden');
+      errorShown = false;
+    }
+  }
+
+  // Hide individual submit buttons.
+  var forms = document.getElementsByTagName('form');
+  var inputs = document.getElementsByTagName('input');
+  for (var i = 0; i &lt; inputs.length; i++) {
+    if (inputs[i].getAttribute('type') == 'submit') {
+      inputs[i].setAttribute('class', 'hidden');
+    }
+  }
+
+  // Add a submit button for saving all sections at once.
+  var button = new Element('input', {'type':'submit', 'class':'button', 'value':'$msg.get("admin.save")'});
+  var wrapper = new Element('span', {'class':'buttonwrapper'});
+  var adminButtons = new Element('p', {'class':'admin-buttons'});
+  var bottomButtons = new Element('div', {'class':'bottombuttons'});
+  $('admin-page-content').appendChild(bottomButtons);
+  bottomButtons.appendChild(adminButtons);
+  adminButtons.appendChild(wrapper);
+  wrapper.appendChild(button);
+
+  Event.observe(button, 'click', function() {
+    var forms = $('admin-page-content').getElementsByTagName('form');
+    for (var i = 0; i &lt; forms.length; i++) {
+      Event.fire(document, 'xwiki:actions:save', {'form':forms[i].id, 'continue':true});
+    }
+  });
+});</code>
+</property>
+<property>
+<name></name>
+</property>
+<property>
+<parse>1</parse>
+</property>
+<property>
+<use>onDemand</use>
+</property>
+</object>
+<object>
+<class>
+<name>XWiki.TagClass</name>
+<customClass></customClass>
+<customMapping></customMapping>
+<defaultViewSheet></defaultViewSheet>
+<defaultEditSheet></defaultEditSheet>
+<defaultWeb></defaultWeb>
+<nameField></nameField>
+<validationScript></validationScript>
+<tags>
+<cache>0</cache>
+<displayType>input</displayType>
+<multiSelect>1</multiSelect>
+<name>tags</name>
+<number>1</number>
+<prettyName>Tags</prettyName>
+<relationalStorage>1</relationalStorage>
+<separator>|</separator>
+<separators>|,</separators>
+<size>30</size>
+<unmodifiable>0</unmodifiable>
+<values></values>
+<classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+</tags>
+</class>
+<name>XWiki.ConfigurableClass</name>
+<number>0</number>
+<className>XWiki.TagClass</className>
+<guid>ddb1f0f6-1943-4e80-824a-0718cdbf1892</guid>
+</object>
 <content>{{velocity}}
 #*
  * This part takes the configuration from any documents containing XWiki.ConfigurableClass objects and creates a form 
@@ -199,13 +361,13 @@ $xwiki.jsfx.use('js/xwiki/actionbuttons/actionButtons.js', true)
 ##
 ## This application should not run with programming rights because it evaluates code which may not be trustworthy.
 ## Removing the next line will open a security hole.
-#sandboxDocument($nameOfThisDocument)
+#sandboxDocument()
 ##
 ## This application locks every document in a section while that section is being edited so we should 
 ## check for locks held by the current user on any of the applications configured here and remove them.
 #if(!$doNotUnlockConfigurableDocuments)
   #set($outputList = [])
-  #findNamesOfAppsToConfigure("", $globaladmin, $currentSpace, $outputList)
+  #findNamesOfAppsToConfigure("", $globaladmin, $currentSpace, $outputList)##
   ## We don't want to generate javascript which unlocks the current document just after we got finished locking it.
   #set($discard = $outputList.remove($currentDoc))
   #unlockDocuments($outputList)
@@ -218,28 +380,59 @@ $xwiki.jsfx.use('js/xwiki/actionbuttons/actionButtons.js', true)
 ##
 #if($section &amp;&amp; $section != '')
   ##
+  ## This is for keeping track of whether we have shown the heading yet or not.
+  ## If the heading doesn't need to be shown, but an error occurs in processing, then we show the heading
+  ## so that the user knows what the error relates to.
+  #set($headingShowing = false)
+  ##
   ## Searches the database for names of apps to be configured
   #set($outputList = [])
   #findNamesOfAppsToConfigure($section, $globaladmin, $xwiki.getDocument("$currentDoc").getSpace(), $outputList)
   ##
+  #if($outputList.size() &gt; 0)
+    ## Merge save buttons, remove headings from subsections, and make information links into popups.
+    $xwiki.jsx.use($nameOfThisDocument)
+  #end
+  ##
   #foreach($appName in $outputList)
     ##
-    = $msg.get("admin.customize") __[[$appName&gt;&gt;$appName]]__: =
-    ##
     ## Make sure the current user has permission to edit the configurable application.
-    #if(!$xcontext.hasAccessLevel('edit', $appName))
-      {{error}}$msg.get('xe.admin.configurable.noPermissionThisApplication'){{/error}}
-    #else
-      ##
+    #set($userHasAccessToDocument = $xcontext.hasAccessLevel('edit', $appName))
+    ##
+    ## If the document was not last saved by a user with edit privilage on this page
+    ## then we can't safely display the page but we should warn the viewer.
+    #if($userHasAccessToDocument)
       ## Get the configurable application
       #set($app = $xwiki.getDocument($appName))
       ##
-      ## If the document was not last saved by a user with edit privilage on this page
-      ## then we can't safely display the page but we should warn the viewer.
-      #set($hasAccess = false)
-      #checkDocumentSavedByAuthorizedUser($app, $currentDoc, $hasAccess)
-      #if(!$hasAccess)
+      #set($documentSavedByAuthorizedUser = false)
+      #checkDocumentSavedByAuthorizedUser($app, $currentDoc, $documentSavedByAuthorizedUser)
+    #end
+    ## Will we have to display an error message?
+    #set($displayError = !$userHasAccessToDocument || !$documentSavedByAuthorizedUser)
+    ##
+    ## There is no need to display a heading unless:
+    ## 1. There was already a section before this document.
+    ## 2. This is not the first document in this section.
+    ##
+    ## If we are displaying the heading and there is an error to be shown Javascript will not strip the heading.
+    #if(!$appName.equals($outputList.get(0)) || $sections.contains($section))
+      ## Create a document heading.
+      #showHeading($appName, $displayError, $headingShowing)
+    #end
+    ##
+    #if(!$userHasAccessToDocument)
+      #showHeading($appName, true, $headingShowing)
+
+      {{error}}$msg.get('xe.admin.configurable.noPermissionThisApplication'){{/error}}
+
+    #else
+      ##
+      #if(!$documentSavedByAuthorizedUser)
+        #showHeading($appName, true, $headingShowing)
+
         {{error}}$msg.get('xe.admin.configurable.applicationAuthorNoAdmin', [$app.Author]){{/error}}
+
       #else
         ##
         ## Locking document
@@ -253,21 +446,26 @@ $xwiki.jsfx.use('js/xwiki/actionbuttons/actionButtons.js', true)
           #if($requestURL.indexOf("?") == -1)
             #set($requestURL = "${requestURL}?")
           #end
+          #showHeading($appName, true, $headingShowing)
+
           {{error}}$msg.get("doclockedby") $app.getLockingUser() [[$msg.get("forcelock")&gt;&gt;${requestURL}&amp;forceEdit=1]]{{/error}}
+
         #else
           ## If the document is not already locked, attempt to aquire the lock.
           #if(!$locked)
             ## Try to use an ajax call to lock the document.
-            {{html clean=false wiki=true}}
-              &lt;/p&gt;&lt;noscript&gt;
+            {{html clean=false wiki=true}}&lt;/p&gt;
+              &lt;noscript&gt;
+
                 {{warning}}$msg.get('xe.admin.configurable.cannotLockNoJavascript'){{/warning}}
+
               &lt;/noscript&gt;
               &lt;script type="text/javascript"&gt;
                 document.observe("dom:loaded", function() {
                   new Ajax.Request("$xwiki.getURL($app.getFullName(), 'lock', 'ajax=1')");
                 });
-              &lt;/script&gt;&lt;p&gt;
-            {{/html}}
+              &lt;/script&gt;
+            &lt;p&gt;{{/html}}
             #set($discard = $lockedDocumentNames.add($app.getFullName()))
           #end
           ##------------------------------------------------------------------------------------------------------------
@@ -287,27 +485,25 @@ $xwiki.jsfx.use('js/xwiki/actionbuttons/actionButtons.js', true)
           #end
           #if($configurableObjs.size() == 0)
             ## Internal error, not translated.
+            #showHeading($appName, true, $headingShowing)
+
             {{error}}Internal error: All objects were filtered out for application: $appName.{{/error}}
+
           #else
             #set($formAction = "$xwiki.getURL($app.getFullName(), 'save')")
             #set($formId = "$section.toLowerCase()_$app.getFullName()")
             #set($escapedAppName = $escapetool.html($app.getFullName()))
-            {{html clean=false wiki=false}}
             #foreach($configurableObj in $configurableObjs)
               ## Display the header if one exists.
               #set($heading = $app.getValue('heading', $configurableObj))
               #if($heading &amp;&amp; $heading != '')
-                {{/html}}
                 == #evaluate($heading) ==
-                {{html clean=false wiki=false}}
               #end
               ## If the class specifies custom code to evaluate,
               ## then close the html macro, evaluate it and reopen the macro.
               #set($codeToExecute = "$!app.getValue('codeToExecute', $configurableObj)")
               #if($codeToExecute != '')
-                {{/html}}
                 #evaluate($codeToExecute)
-                {{html clean=false wiki=false}}
               #end
               ##
               ## If propertiesToShow is set, then we will only show the properties contained therein.
@@ -325,20 +521,22 @@ $xwiki.jsfx.use('js/xwiki/actionbuttons/actionButtons.js', true)
               #if($configClassName != '')
                 #set($objClass = $xwiki.getDocument("$configClassName").getxWikiClass())
                 #if(!$objClass || $objClass.getClass().getName().indexOf('.Class') == -1)
-                  {{/html}}
+                  #showHeading($appName, true, $headingShowing)
+
                   {{error}}$msg.get('xe.admin.configurable.configurationClassNonexistant'){{/error}}
-                  {{html clean=false wiki=false}}
+
                 #else
                   ## Use the first object from the document which is of the configuration class.
                   #set($obj = $app.getObject($objClass.getName()))
                   ##
                   #if(!$obj || $obj.getClass().getName().indexOf('.Object') == -1)
-                    {{/html}}
+                    #showHeading($appName, true, $headingShowing)
+
                     {{error}}
                       $msg.get('xe.admin.configurable.noObjectOfConfigurationClassFound',
                         [$objClass.getName(), $app.getFullName()])
                     {{/error}}
-                    {{html clean=false wiki=false}}
+
                   #else
                     #define($formHtml)
                       ## We don't begin the form until we have content for it so that a configurable can specify a 
@@ -371,13 +569,19 @@ $xwiki.jsfx.use('js/xwiki/actionbuttons/actionButtons.js', true)
                     #end## define $formHtml
                     ## Strip pre tags and html macro invocations which $obj.display inserts.
                     ## then prepend application name to ids to prevent id collissions.
+
+                    {{html clean="false" wiki="false"}}&lt;/p&gt;
                     $formHtml.toString().replaceAll('\{\{[/]?html[^}]*\}\}|&lt;[/]?pre&gt;', '').replaceAll(" id='", " id='${escapedAppName}_")
+                    &lt;p&gt;{{/html}}##
+
                   #end## If object exists
                 #end## If class exists
               #end## If class name is specified.
             #end## Foreach configurable object found in this document
             ## If a form was started then we end it.
             #if($insideForm)
+
+              {{html clean="false" wiki="false"}}&lt;/p&gt;
               ## We add in a redirect field to prevent the user from being carried away when they save
               ## if they don't have javascript.
               #set($thisURL = $request.getRequestURL())
@@ -389,21 +593,28 @@ $xwiki.jsfx.use('js/xwiki/actionbuttons/actionButtons.js', true)
               &lt;div class="bottombuttons"&gt;
                 &lt;p class="admin-buttons"&gt;
                   &lt;span class="buttonwrapper"&gt;
-                    ## Text to display on the button
-                    #set($buttonText = "$msg.get('admin.save') $escapedAppName")
+                    ## Text to display on the button. If there is a heading then this button should be labeled
+                    ## that it is for saving this section. Otherwise it should be a generic "save" button.
+                    #if($headingShowing)
+                      #set($buttonText = "$msg.get('admin.save') $escapedAppName")
+                    #else
+                      #set($buttonText = "$msg.get('admin.save')")
+                    #end                      
                     &lt;input class="button" type="submit" name="action_saveandcontinue" value="$buttonText" /&gt;
                   &lt;/span&gt;
                 &lt;/p&gt;
               &lt;/div&gt; ## bottombuttons
               &lt;/form&gt;
               #set($insideForm = false)
+              &lt;p&gt;{{/html}}
+
             #end
-            {{/html}}
           #end## If there are configurable objects
         #end## If document is not locked or forceEdit is enabled
       #end## If app author has permission to edit admin page
     #end## If the current user has permission to edit the configurable application.
   #end## Foreach document name in names to configure
+
   {{html clean=false wiki=false}}
   &lt;script type="text/javascript"&gt;
   /* &lt;![CDATA[ */
@@ -414,7 +625,7 @@ $xwiki.jsfx.use('js/xwiki/actionbuttons/actionButtons.js', true)
   //]]&gt;
   &lt;/script&gt;
   {{/html}}
-  ##
+
   ##
 #else
   ##
@@ -496,6 +707,7 @@ $xwiki.jsfx.use('js/xwiki/actionbuttons/actionButtons.js', true)
       #set($queryString = "editor=$escapetool.url($request.getParameter('editor'))&amp;amp;$queryString")
     #end
   #end
+
   {{html clean=false wiki=false}}
   #foreach($sectionToAdd in $sectionsToAdd)
     #set($icon = $iconBySection.get($sectionToAdd))
@@ -518,10 +730,12 @@ $xwiki.jsfx.use('js/xwiki/actionbuttons/actionButtons.js', true)
     &lt;/li&gt;
   #end
   {{/html}}
-  ##
+
   ## Finally we display an error message if there are any applications which we were unable to view.
   #if($appsUserCannotView.size() &gt; 0)
+
     {{error}}$msg.get('xe.admin.configurable.noViewAccessSomeApplications', [$appsUserCannotView]){{/error}}
+
   #end
 #end## If we should be looking at the main administration page.
 ##
@@ -558,7 +772,7 @@ $xwiki.jsfx.use('js/xwiki/actionbuttons/actionButtons.js', true)
           #end
         });
       &lt;/script&gt;
-    {{/html}}
+    {{/html}}##
   #end## If output list size &gt; 0
 #end## Macro
 ##
@@ -616,7 +830,7 @@ $xwiki.jsfx.use('js/xwiki/actionbuttons/actionButtons.js', true)
  *###
 #macro(sandboxDocument)
   #if($xcontext.hasProgrammingRights())
-    $xcontext.getContext().getDoc().setContentAuthor('XWiki.XWikiGuest')
+    $xcontext.getContext().getDoc().setContentAuthor('XWiki.XWikiGuest')##
   #end
 #end
 ##
@@ -625,7 +839,7 @@ $xwiki.jsfx.use('js/xwiki/actionbuttons/actionButtons.js', true)
  * documents are imported with the name XWiki.XWikiGuest who has no access to anything after import.
  *
  * @param theDoc - Document who's editor should be checked for edit access on this document.
- *#
+ *###
 #macro(checkDocumentSavedByAuthorizedUser, $docToCheck, $currentDoc, $hasAccess)
   ## The system is started and the only user is XWikiGuest who has admin right but gives it up when he imports the default
   ## documents, we are checking to see if this looks like the guest imported the document with the first import.
@@ -640,5 +854,31 @@ $xwiki.jsfx.use('js/xwiki/actionbuttons/actionButtons.js', true)
   #end
   #set($hasAccess = $xwiki.hasAccessLevel("edit", $userToCheck, $currentDoc))
 #end
-{{/velocity}}</content>
-</xwikidoc>
+##
+#*
+ * Show the heading for configuration for a given application.
+ *
+ * $appName (String) Name of the application to show configuration heading for.
+ *
+ * $displayError (boolean) If true, then the heading will be class="applicationHeading errorMessage" and javascript
+ *                         will know not to remove it when it is merging forms.
+ *
+ * $headingAlreadyShowing (boolean) If true then we don't make another heading. Otherwise it is set to true.
+ *###
+#macro(showHeading, $appName, $displayError, $headingAlreadyShowing)
+  #if(!$headingAlreadyShowing)
+    #set($headingAlreadyShowing = true)
+    ## If we are to display an error message, the class should be changed so that javascript doesn't remove the
+    ## heading from over the error message.
+#*
+    #if($displayError)
+      (%class="applicationHeading errorMessage"%)
+    #else
+      (%class="applicationHeading"%)
+    #end*###
+
+      = $msg.get("admin.customize") __[[$appName&gt;&gt;$appName]]__: =
+  ##  (%%)
+  #end
+#end
+{{/velocity}}</content></xwikidoc>

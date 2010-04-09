@@ -1,4 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
+
 <xwikidoc>
 <web>XWiki</web>
 <name>XWikiUserProfileSheet</name>
@@ -24,6 +25,7 @@
 <hidden>false</hidden>
 <content>{{velocity}}
 #set($obj = $doc.getObject("XWiki.XWikiUsers"))
+#set($obfuscateEmail = true)
 #if(!$obj)
 = $msg.get('xe.admin.users.sheet') =
 
@@ -52,22 +54,19 @@ $xwiki.ssx.use('Main.Dashboard')##
         &lt;dd #if($context.action == 'view')class="given-name"#end&gt;$doc.display('first_name')&lt;/dd&gt;
         &lt;dt class="label"&gt;&lt;label&gt;$msg.get('platform.core.profile.lastname')&lt;/label&gt;&lt;/dt&gt;
         &lt;dd #if($context.action == 'view')class="family-name"#end&gt;$doc.display('last_name')&lt;/dd&gt;
-        #if(($obj.getProperty('company') &amp;&amp; $obj.getProperty('company').getValue() != '') || $context.action == 'inline')
+        #if(($obj.getProperty('company') &amp;&amp; $obj.getProperty('company').getValue() != '') || $context.action != 'view')
           &lt;dt class="label"&gt;&lt;label&gt;$msg.get('platform.core.profile.company')&lt;/label&gt;&lt;/dt&gt;
           &lt;dd #if($context.action == 'view')class="org"#end&gt;$doc.display('company')&lt;/dd&gt;
         #end
-        #if(($obj.getProperty('comment') &amp;&amp; $obj.getProperty('comment').getValue() != '') || $context.action == 'inline')
+        #if(($obj.getProperty('comment') &amp;&amp; $obj.getProperty('comment').getValue() != '') || $context.action != 'view')
           &lt;dt class="label"&gt;&lt;label&gt;$msg.get('platform.core.profile.about')&lt;/label&gt;&lt;/dt&gt;
           &lt;dd #if($context.action == 'view')class="note"#end&gt;$doc.display('comment')&lt;/dd&gt;
         #end
       &lt;/dl&gt;
       &lt;h1&gt;$msg.get('platform.core.profile.section.contact')&lt;/h1&gt;
       &lt;dl&gt;
-        ## For security reasons do not display emails by default
-        ## #if(($obj.getProperty('email') &amp;&amp; $obj.getProperty('email').getValue() != '') || $context.action == 'inline')
-        ## &lt;dt class="label"&gt;&lt;label&gt;$msg.get('platform.core.profile.email')&lt;/label&gt;&lt;/dt&gt;
-        ## &lt;dd #if($context.action=="view")class="email"#end&gt;#if($action == "inline")$doc.display('email')#else #set($discard = $doc.display('email'))#obfuscate($discard)#end&lt;/dd&gt;
-        ## #end
+        &lt;dt class="label"&gt;&lt;label&gt;$msg.get('platform.core.profile.email')&lt;/label&gt;&lt;/dt&gt;
+        &lt;dd #if($context.action=="view")class="email"#end&gt;#if($context.action != 'view' || !$obfuscateEmail)$doc.display('email')#else $doc.display('email').replaceAll('@.*', '@ ~-~-~-~-~-~-')#end&lt;/dd&gt;
         &lt;dt class="label"&gt;&lt;label&gt;$msg.get('platform.core.profile.phone')&lt;/label&gt;&lt;/dt&gt;
         &lt;dd #if($context.action == 'view')class="tel"#end&gt;$doc.display('phone')&lt;/dd&gt;
         &lt;dt class="label"&gt;&lt;label&gt;$msg.get('platform.core.profile.address')&lt;/label&gt;&lt;/dt&gt;
@@ -75,14 +74,14 @@ $xwiki.ssx.use('Main.Dashboard')##
       &lt;/dl&gt;
       #set($hasBlog = ($obj.getProperty('blog') &amp;&amp; $obj.getProperty('blog').getValue() != ''))
       #set($hasBlogFeed = ($obj.getProperty('blogfeed') &amp;&amp; $obj.getProperty('blogfeed').getValue() != ''))
-      #if($hasBlog || $hasBlogFeed || $context.action == 'inline')
+      #if($hasBlog || $hasBlogFeed || $context.action != 'view')
        &lt;h1&gt;$msg.get('platform.core.profile.section.links')&lt;/h1&gt;
         &lt;dl&gt;
-          #if($hasBlog || $context.action == 'inline')
+          #if($hasBlog || $context.action != 'view')
             &lt;dt class="label"&gt;&lt;label&gt;$msg.get('platform.core.profile.blog')&lt;/label&gt;&lt;/dt&gt;
             &lt;dd&gt;$doc.display('blog')&lt;/dd&gt;
           #end
-          #if($hasBlogFeed || $context.action == 'inline')
+          #if($hasBlogFeed || $context.action != 'view')
             &lt;dt class="label"&gt;&lt;label&gt;$msg.get('platform.core.profile.blogFeed')&lt;/label&gt;&lt;/dt&gt;
             &lt;dd&gt;$doc.display('blogfeed')&lt;/dd&gt;
           #end

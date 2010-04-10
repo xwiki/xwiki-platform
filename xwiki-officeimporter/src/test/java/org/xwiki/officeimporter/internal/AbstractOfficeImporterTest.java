@@ -43,12 +43,17 @@ public abstract class AbstractOfficeImporterTest extends AbstractComponentTestCa
      * Mock document access bridge.
      */
     protected DocumentAccessBridge mockDocumentAccessBridge;
-    
+
     /**
-     * Mock document name serializer.
+     * Mock (default) string document reference serializer.
      */
-    protected EntityReferenceSerializer mockEntityReferenceSerializer;
-    
+    protected EntityReferenceSerializer mockDefaultStringEntityReferenceSerializer;
+
+    /**
+     * Mock (compactwiki) string document reference serializer.
+     */
+    protected EntityReferenceSerializer mockCompactWikiStringEntityReferenceSerializer;
+
     /**
      * Mock document name factory.
      */
@@ -68,12 +73,20 @@ public abstract class AbstractOfficeImporterTest extends AbstractComponentTestCa
         descriptorDAB.setRole(DocumentAccessBridge.class);
         getComponentManager().registerComponent(descriptorDAB, mockDocumentAccessBridge);
 
-        // Document name serializer.
-        mockEntityReferenceSerializer = this.mockery.mock(EntityReferenceSerializer.class);
-        DefaultComponentDescriptor<EntityReferenceSerializer> descriptorRS =
+        // Mock (default) string document name serializer.
+        mockDefaultStringEntityReferenceSerializer = this.mockery.mock(EntityReferenceSerializer.class, "s1");
+        DefaultComponentDescriptor<EntityReferenceSerializer> descriptorDSRS =
             new DefaultComponentDescriptor<EntityReferenceSerializer>();
-        descriptorRS.setRole(EntityReferenceSerializer.class);
-        getComponentManager().registerComponent(descriptorRS, mockEntityReferenceSerializer);
+        descriptorDSRS.setRole(EntityReferenceSerializer.class);
+        getComponentManager().registerComponent(descriptorDSRS, mockDefaultStringEntityReferenceSerializer);
+        
+        // Mock (compactwiki) string document name serializer.
+        mockCompactWikiStringEntityReferenceSerializer = this.mockery.mock(EntityReferenceSerializer.class, "s2");
+        DefaultComponentDescriptor<EntityReferenceSerializer> descriptorCWSRS =
+            new DefaultComponentDescriptor<EntityReferenceSerializer>();
+        descriptorCWSRS.setRole(EntityReferenceSerializer.class);
+        descriptorCWSRS.setRoleHint("compactwiki");
+        getComponentManager().registerComponent(descriptorCWSRS, mockCompactWikiStringEntityReferenceSerializer);
 
         // Document name factory.
         mockDocumentReferenceResolver = this.mockery.mock(DocumentReferenceResolver.class);

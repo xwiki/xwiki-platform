@@ -68,7 +68,7 @@ public class DefaultXDOMOfficeDocumentSplitter implements XDOMOfficeDocumentSpli
     /**
      * Document name serializer used for serializing document names into strings.
      */
-    @Requirement
+    @Requirement("compactwiki")
     private EntityReferenceSerializer<String> entityReferenceSerializer;
 
     /**

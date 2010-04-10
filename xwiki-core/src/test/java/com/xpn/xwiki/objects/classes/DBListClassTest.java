@@ -20,17 +20,20 @@
  */
 package com.xpn.xwiki.objects.classes;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.jmock.Mock;
 import org.jmock.core.Invocation;
 import org.jmock.core.stub.CustomStub;
 
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
+import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.render.XWikiRenderingEngine;
 import com.xpn.xwiki.store.XWikiHibernateStore;
 import com.xpn.xwiki.store.XWikiStoreInterface;
 import com.xpn.xwiki.test.AbstractBridgedXWikiComponentTestCase;
-import com.xpn.xwiki.doc.XWikiDocument;
 
 /**
  * Unit tests for {@link DBListClass}.
@@ -224,5 +227,26 @@ public class DBListClassTest extends AbstractBridgedXWikiComponentTestCase
             + " from BaseObject as obj, StringProperty as idprop, StringProperty as valueprop"
             + " where obj.className='XWiki.XWikiUsers'" + " and obj.id=idprop.id.id and idprop.id.name='property'"
             + " and obj.id=valueprop.id.id and valueprop.id.name='otherProperty'", dblc.getQuery(getContext()));
+    }
+
+    /** Tests that {@link DBListClass#getList} returns values sorted according to the property's sort option. */
+    public void testGetListIsSorted()
+    {
+        List<ListItem> values = new ArrayList<ListItem>(4);
+        values.add(new ListItem("a", "A"));
+        values.add(new ListItem("c", "D"));
+        values.add(new ListItem("d", "C"));
+        values.add(new ListItem("b", "B"));
+        DBListClass dblc = new DBListClass();
+        dblc.setCache(true);
+        dblc.setCachedDBList(values, getContext());
+
+        assertEquals("Default order was not preserved.", "[a, c, d, b]", dblc.getList(getContext()).toString());
+        dblc.setSort("none");
+        assertEquals("Default order was not preserved.", "[a, c, d, b]", dblc.getList(getContext()).toString());
+        dblc.setSort("id");
+        assertEquals("Items were not ordered by ID.", "[a, b, c, d]", dblc.getList(getContext()).toString());
+        dblc.setSort("value");
+        assertEquals("Items were not ordered by value.", "[a, b, d, c]", dblc.getList(getContext()).toString());
     }
 }

@@ -21,9 +21,12 @@
 
 package com.xpn.xwiki.objects.classes;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.ecs.xhtml.input;
 
 import com.xpn.xwiki.XWiki;
@@ -59,8 +62,26 @@ public class StaticListClass extends ListClass
     @Override
     public List<String> getList(XWikiContext context)
     {
-        String values = getValues();
-        return getListFromString(values);
+        String sort = getSort();
+        if (StringUtils.isEmpty(sort) || "none".equals(sort)) {
+            return getListFromString(getValues());
+        }
+
+        Map<String, ListItem> valuesMap = getMap(context);
+        List<ListItem> values = new ArrayList<ListItem>(valuesMap.size());
+        values.addAll(valuesMap.values());
+
+        if ("id".equals(sort)) {
+            Collections.sort(values, ListItem.ID_COMPARATOR);
+        } else if ("value".equals(sort)) {
+            Collections.sort(values, ListItem.VALUE_COMPARATOR);
+        }
+
+        List<String> result = new ArrayList<String>(values.size());
+        for (ListItem value : values) {
+            result.add(value.getId());
+        }
+        return result;
     }
 
     @Override

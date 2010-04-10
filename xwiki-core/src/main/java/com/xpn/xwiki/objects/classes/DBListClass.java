@@ -22,6 +22,7 @@
 package com.xpn.xwiki.objects.classes;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -119,9 +120,18 @@ public class DBListClass extends ListClass
     public List<String> getList(XWikiContext context)
     {
         List<ListItem> dblist = getDBList(context);
-        List<String> result = new ArrayList<String>();
-        for (int i = 0; i < dblist.size(); i++) {
-            result.add((dblist.get(i)).getId());
+
+        String sort = getSort();
+
+        if ("id".equals(sort)) {
+            Collections.sort(dblist, ListItem.ID_COMPARATOR);
+        } else if ("value".equals(sort)) {
+            Collections.sort(dblist, ListItem.VALUE_COMPARATOR);
+        }
+
+        List<String> result = new ArrayList<String>(dblist.size());
+        for (ListItem value : dblist) {
+            result.add(value.getId());
         }
         return result;
     }

@@ -499,7 +499,7 @@ public abstract class ListClass extends PropertyClass
             }
             radio.addElement(getDisplayValue(rawvalue, name, map, context));
 
-            buffer.append("<span class=\"xwiki-form-listclass\" id=\"xwiki-form-" + name + "-" + count + "\">");
+            buffer.append("<span class=\"xwiki-form-listclass\" id=\"xwiki-form-" + name + "-" + count++ + "\">");
             buffer.append(radio.toString());
             buffer.append("</span>");
         }

@@ -26,6 +26,7 @@ import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.block.HeaderBlock;
+import org.xwiki.rendering.block.SectionBlock;
 import org.xwiki.rendering.block.XDOM;
 import org.xwiki.rendering.renderer.BlockRenderer;
 import org.xwiki.rendering.renderer.printer.DefaultWikiPrinter;
@@ -139,20 +140,17 @@ public class XDOMOfficeDocument implements OfficeDocument
      */
     private String getTitle(Block parent)
     {
-        String result = null;
-
         for (Block block : parent.getChildren()) {
             if (block instanceof HeaderBlock) {
                 String title = renderTitle((HeaderBlock) block);
                 if (!StringUtils.isBlank(title)) {
-                    result = title;
+                    return title;
                 }
-            } else {
-                result = getTitle(block);
+            } else if (block instanceof SectionBlock) {
+                return getTitle(block);
             }
         }
-
-        return result;
+        return null;
     }
 
     /**
@@ -163,16 +161,14 @@ public class XDOMOfficeDocument implements OfficeDocument
      */
     private String renderTitle(HeaderBlock header)
     {
-        String title = null;
         try {
             WikiPrinter printer = new DefaultWikiPrinter();
             BlockRenderer renderer = this.componentManager.lookup(BlockRenderer.class, "plain/1.0");
-            renderer.render(this.xdom, printer);
-            title = printer.toString();
+            renderer.render(header, printer);
+            return printer.toString();
         } catch (ComponentLookupException ex) {
             // Ignore.
         }
-
-        return title;
+        return null;
     }
 }

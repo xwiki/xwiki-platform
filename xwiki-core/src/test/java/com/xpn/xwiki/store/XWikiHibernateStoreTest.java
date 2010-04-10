@@ -41,6 +41,8 @@ public class XWikiHibernateStoreTest extends AbstractBridgedComponentTestCase
         Assert.assertEquals(", doc.date", store.getColumnsForSelectStatement("where 1=1 order by doc.date desc"));
         Assert.assertEquals(", doc.date", store.getColumnsForSelectStatement("where 1=1 order by doc.date asc"));
         Assert.assertEquals(", doc.date", store.getColumnsForSelectStatement("where 1=1 order by doc.date"));
+        Assert.assertEquals(", description", store.getColumnsForSelectStatement("where 1=1 order by description desc"));
+        Assert.assertEquals(", ascendent", store.getColumnsForSelectStatement("where 1=1 order by ascendent asc"));
         Assert.assertEquals(", doc.date, doc.name",
             store.getColumnsForSelectStatement("where 1=1 order by doc.date, doc.name"));
         Assert.assertEquals(", doc.date, doc.name",

@@ -35,8 +35,7 @@ public class CompactWikiStringEntityReferenceSerializer extends CompactStringEnt
     /**
      * {@inheritDoc}
      * 
-     * @see com.xpn.xwiki.internal.model.reference.CompactStringEntityReferenceSerializer#resolveDefaultValue(org.xwiki.model.EntityType,
-     *      java.lang.Object[])
+     * @see CompactStringEntityReferenceSerializer#resolveDefaultValue(org.xwiki.model.EntityType, Object...)
      */
     @Override
     protected String resolveDefaultValue(EntityType type, Object... parameters)

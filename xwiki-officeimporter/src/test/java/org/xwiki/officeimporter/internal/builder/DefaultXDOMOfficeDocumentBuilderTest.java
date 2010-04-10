@@ -101,7 +101,7 @@ public class DefaultXDOMOfficeDocumentBuilderTest extends AbstractOfficeImporter
         final EntityReferenceSerializer referenceSerializer =
             this.mockery.mock(EntityReferenceSerializer.class, "test");
         this.mockery.checking(new Expectations() {{
-            allowing(mockEntityReferenceSerializer).serialize(documentReference);
+            allowing(mockDefaultStringEntityReferenceSerializer).serialize(documentReference);
             will(returnValue("xwiki:Main.Test"));
         }});
 

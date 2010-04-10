@@ -89,41 +89,41 @@ public class DefaultXDOMOfficeDocumentSplitterTest extends AbstractOfficeImporte
 
         // Add expectations to mock document name serializer. 
         this.mockery.checking(new Expectations() {{
-            allowing(mockEntityReferenceSerializer).serialize(baseDocument);
-            will(returnValue("xwiki:Test.Test"));
-            allowing(mockEntityReferenceSerializer).serialize(new DocumentReference("xwiki", "Test", "Heading1"));
-            will(returnValue("xwiki:Test.Heading1"));
-            allowing(mockEntityReferenceSerializer).serialize(new DocumentReference("xwiki", "Test", "Heading11"));
-            will(returnValue("xwiki:Test.Heading11"));
-            allowing(mockEntityReferenceSerializer).serialize(new DocumentReference("xwiki", "Test", "Heading12"));
-            will(returnValue("xwiki:Test.Heading12"));
-            allowing(mockEntityReferenceSerializer).serialize(new DocumentReference("xwiki", "Test", "Heading2"));
-            will(returnValue("xwiki:Test.Heading2"));
+            allowing(mockCompactWikiStringEntityReferenceSerializer).serialize(baseDocument);
+            will(returnValue("Test.Test"));
+            allowing(mockCompactWikiStringEntityReferenceSerializer).serialize(new DocumentReference("xwiki", "Test", "Heading1"));
+            will(returnValue("Test.Heading1"));
+            allowing(mockCompactWikiStringEntityReferenceSerializer).serialize(new DocumentReference("xwiki", "Test", "Heading11"));
+            will(returnValue("Test.Heading11"));
+            allowing(mockCompactWikiStringEntityReferenceSerializer).serialize(new DocumentReference("xwiki", "Test", "Heading12"));
+            will(returnValue("Test.Heading12"));
+            allowing(mockCompactWikiStringEntityReferenceSerializer).serialize(new DocumentReference("xwiki", "Test", "Heading2"));
+            will(returnValue("Test.Heading2"));
         }});
         
         // Add expectations to mock document name factory.         
         this.mockery.checking(new Expectations() {{
-            allowing(mockDocumentReferenceResolver).resolve("xwiki:Test.Test");
+            allowing(mockDocumentReferenceResolver).resolve("Test.Test");
             will(returnValue(new DocumentReference("xwiki", "Test", "Test")));
-            allowing(mockDocumentReferenceResolver).resolve("xwiki:Test.Heading1");
+            allowing(mockDocumentReferenceResolver).resolve("Test.Heading1");
             will(returnValue(new DocumentReference("xwiki", "Test", "Heading1")));
-            allowing(mockDocumentReferenceResolver).resolve("xwiki:Test.Heading11");
+            allowing(mockDocumentReferenceResolver).resolve("Test.Heading11");
             will(returnValue(new DocumentReference("xwiki", "Test", "Heading11")));
-            allowing(mockDocumentReferenceResolver).resolve("xwiki:Test.Heading12");
+            allowing(mockDocumentReferenceResolver).resolve("Test.Heading12");
             will(returnValue(new DocumentReference("xwiki", "Test", "Heading12")));
-            allowing(mockDocumentReferenceResolver).resolve("xwiki:Test.Heading2");
+            allowing(mockDocumentReferenceResolver).resolve("Test.Heading2");
             will(returnValue(new DocumentReference("xwiki", "Test", "Heading2")));
         }});
         
         // Add expectations to mock document access bridge.
         this.mockery.checking(new Expectations() {{
-            allowing(mockDocumentAccessBridge).exists("xwiki:Test.Heading1");
+            allowing(mockDocumentAccessBridge).exists("Test.Heading1");
             will(returnValue(false));
-            allowing(mockDocumentAccessBridge).exists("xwiki:Test.Heading11");
+            allowing(mockDocumentAccessBridge).exists("Test.Heading11");
             will(returnValue(false));
-            allowing(mockDocumentAccessBridge).exists("xwiki:Test.Heading12");
+            allowing(mockDocumentAccessBridge).exists("Test.Heading12");
             will(returnValue(false));
-            allowing(mockDocumentAccessBridge).exists("xwiki:Test.Heading2");
+            allowing(mockDocumentAccessBridge).exists("Test.Heading2");
             will(returnValue(false));
         }});
 

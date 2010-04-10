@@ -91,7 +91,7 @@ public class DefaultXHTMLOfficeDocumentBuilderTest extends AbstractOfficeImporte
         // Create & register a mock entity reference serializer.
         final DocumentReference documentReference = new DocumentReference("xwiki", "Main", "Test");
         this.mockery.checking(new Expectations() {{
-            allowing(mockEntityReferenceSerializer).serialize(documentReference);
+            allowing(mockDefaultStringEntityReferenceSerializer).serialize(documentReference);
                 will(returnValue("xwiki:Main.Test"));
         }});
 

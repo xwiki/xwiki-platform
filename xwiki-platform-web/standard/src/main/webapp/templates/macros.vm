@@ -1701,7 +1701,7 @@ ${Msz}Mb##
 #end
 
 #**
- * Internal macro - Used by the livetable macro to generate a JavaScript annonymous function
+ * Internal macro - Used by the livetable macro to generate a JavaScript anonymous function
  * that is passed to the LiveTable object constructor. This is function is dynamically written
  * according to columns properties passed to the livetable macro.
  *

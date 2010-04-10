@@ -2668,9 +2668,10 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
             String orderByStatement = whereSQL.substring(orderByPos + "order by".length() + 1);
             StringTokenizer tokenizer = new StringTokenizer(orderByStatement, ",");
             while (tokenizer.hasMoreTokens()) {
-                String column = tokenizer.nextToken();
+                String column = tokenizer.nextToken().trim();
                 // Remove "desc" or "asc" from the column found
-                column = column.replaceAll("([d|D][e|E][s|S][c|C])|([a|A][s|S][c|C])", "");
+                column = StringUtils.removeEndIgnoreCase(column, " desc");
+                column = StringUtils.removeEndIgnoreCase(column, " asc");
                 columns.append(", ").append(column.trim());
             }
         }

@@ -113,7 +113,7 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
      */
     @Requirement
     private QueryManager queryManager;
-    
+
     /**
      * Used to convert a string into a proper Document Reference.
      */
@@ -133,7 +133,7 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
      */
     private EntityReferenceSerializer<String> defaultEntityReferenceSerializer =
         Utils.getComponent(EntityReferenceSerializer.class);
-    
+
     /**
      * Used to convert a Document Reference to string (compact form without the wiki part).
      */
@@ -534,7 +534,7 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
                     // migrate values of list properties
                     if (prop instanceof StaticListClass || prop instanceof DBListClass) {
                         ListClass lc = (ListClass) prop;
-                        String[] classes = { DBStringListProperty.class.getName(), StringListProperty.class.getName(),
+                        String[] classes = {DBStringListProperty.class.getName(), StringListProperty.class.getName(),
                             StringProperty.class.getName()}; // @see ListClass#newProperty()
                         for (int i = 0; i < classes.length; i++) {
                             String oldclass = classes[i];
@@ -636,7 +636,7 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
             doc.setNew(false);
 
             // We need to ensure that the saved document becomes the original document
-            doc.setOriginalDocument((XWikiDocument) doc.clone());
+            doc.setOriginalDocument(doc.clone());
 
         } catch (Exception e) {
             Object[] args = {this.defaultEntityReferenceSerializer.serialize(doc.getDocumentReference())};
@@ -786,7 +786,7 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
             }
 
             // We need to ensure that the loaded document becomes the original document
-            doc.setOriginalDocument((XWikiDocument) doc.clone());
+            doc.setOriginalDocument(doc.clone());
 
             if (bTransaction) {
                 endTransaction(context, false, false);
@@ -873,7 +873,7 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
             session.delete(doc);
 
             // We need to ensure that the deleted document becomes the original document
-            doc.setOriginalDocument((XWikiDocument) doc.clone());
+            doc.setOriginalDocument(doc.clone());
 
             if (bTransaction) {
                 endTransaction(context, true);
@@ -924,7 +924,7 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
             if (stats) {
                 query =
                     session.createQuery("select obj.id from " + object.getClass().getName()
-                        + " as obj where obj.id = :id");
+                    + " as obj where obj.id = :id");
             } else {
                 query = session.createQuery("select obj.id from BaseObject as obj where obj.id = :id");
             }
@@ -1155,7 +1155,7 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
                     object.addField(name, property);
                 }
             }
-            
+
             if (bTransaction) {
                 endTransaction(context, false, false);
             }
@@ -1940,16 +1940,16 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
         // renderer uses context.getDoc().getSpace() to find out the space name if no
         // space is specified in the link. A better implementation would be to pass
         // explicitely the current space to the render() method.
-    	ExecutionContext econtext = Utils.getComponent(Execution.class).getContext();
+        ExecutionContext econtext = Utils.getComponent(Execution.class).getContext();
 
-    	List<String> links;
+        List<String> links;
         try {
             // Create new clean context to avoid wiki manager plugin requests in same session
             XWikiContext renderContext = (XWikiContext) context.clone();
 
             renderContext.setDoc(doc);
             econtext.setProperty("xwikicontext", renderContext);
-            
+
             setSession(null, renderContext);
             setTransaction(null, renderContext);
 
@@ -1961,7 +1961,7 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
             // If the rendering fails lets forget backlinks without errors
             links = Collections.emptyList();
         } finally {
-        	econtext.setProperty("xwikicontext", context);
+            econtext.setProperty("xwikicontext", context);
         }
 
         if (links != null) {
@@ -2022,7 +2022,7 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
 
             Query query =
                 session.createQuery("select doc.fullName from XWikiDocument as doc "
-                    + "where (doc.xWikiClassXML is not null and doc.xWikiClassXML like '%')");
+                + "where (doc.xWikiClassXML is not null and doc.xWikiClassXML like '%')");
             Iterator<String> it = query.list().iterator();
             List<String> list = new ArrayList<String>();
             while (it.hasNext()) {
@@ -2110,7 +2110,7 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
     }
 
     /**
-     * @deprecated since 2.2M2 use {@link #searchDocumentReferences(String, List, com.xpn.xwiki.XWikiContext)} 
+     * @deprecated since 2.2M2 use {@link #searchDocumentReferences(String, List, com.xpn.xwiki.XWikiContext)}
      */
     @Deprecated
     public List<String> searchDocumentsNames(String parametrizedSqlClause, List parameterValues, XWikiContext context)
@@ -2641,7 +2641,7 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
                 // Without 'WHERE', but with 'ORDER BY' or 'GROUP BY'
                 result =
                     result.substring(0, idx) + "where doc.hidden <> true or doc.hidden is null "
-                        + result.substring(idx);
+                    + result.substring(idx);
             } else {
                 // Without 'WHERE', 'ORDER BY' or 'GROUP BY'... This should not happen at all.
                 result = result + " where (doc.hidden <> true or doc.hidden is null)";
@@ -3033,7 +3033,7 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
     public List<String> getTranslationList(XWikiDocument doc, XWikiContext context) throws XWikiException
     {
         String hql = "select doc.language from XWikiDocument as doc where doc.space = ? and doc.name = ? "
-                        + "and (doc.language <> '' or (doc.language is not null and '' is null))";
+            + "and (doc.language <> '' or (doc.language is not null and '' is null))";
         ArrayList<String> params = new ArrayList<String>();
         params.add(doc.getSpace());
         params.add(doc.getName());

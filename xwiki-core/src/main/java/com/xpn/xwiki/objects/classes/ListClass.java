@@ -492,16 +492,17 @@ public abstract class ListClass extends PropertyClass
             String value = getElementValue(rawvalue);
             input radio =
                 new input((getDisplayType().equals("radio") && !isMultiSelect()) ? input.radio : input.checkbox, prefix
-                    + name, value);
+                + name, value);
+            radio.setID("xwiki-form-" + name + "-" + count);
 
             if (selectlist.contains(value)) {
                 radio.setChecked(true);
             }
             radio.addElement(getDisplayValue(rawvalue, name, map, context));
 
-            buffer.append("<span class=\"xwiki-form-listclass\" id=\"xwiki-form-" + name + "-" + count++ + "\">");
+            buffer.append("<label class=\"xwiki-form-listclass\" for=\"xwiki-form-" + name + "-" + count++ + "\">");
             buffer.append(radio.toString());
-            buffer.append("</span>");
+            buffer.append("</label>");
         }
 
         org.apache.ecs.xhtml.input hidden = new input(input.hidden, prefix + name, "");

@@ -46,7 +46,7 @@ XWiki.widgets.LiveTable = Class.create({
     // Remove, if present, the message that indicates the table cannot execute.
     // (It can since we are executing JavaScript).
     if ($(this.domNodeName).down('tr.xwiki-livetable-initial-message')) {
-	  $(this.domNodeName).down('tr.xwiki-livetable-initial-message').remove();
+      $(this.domNodeName).down('tr.xwiki-livetable-initial-message').remove();
     }
     
     // id of the display element (the inner dynamic table) of this livetable
@@ -282,6 +282,7 @@ XWiki.widgets.LiveTable = Class.create({
         var elem = this.handler(this.fetchedRows[i], i, this);      
         this.displayNode.appendChild(elem);
         document.fire("xwiki:livetable:newrow", {
+          "data": this.fetchedRows[i],
           "row":elem,
           "table":this
         });
@@ -617,7 +618,7 @@ var LiveTableFilter = Class.create({
     var filters = this.filterNode.select("input", "select");
     for (var i=0;i<filters.length;i++) {
       if (!filters[i].value.blank()) {
-	    if ((filters[i].type != "radio" && filters[i].type != "checkbox") || filters[i].checked) {
+        if ((filters[i].type != "radio" && filters[i].type != "checkbox") || filters[i].checked) {
           result += ("&" + filters[i].name + "=" + encodeURIComponent(filters[i].value));
         }
       }

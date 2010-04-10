@@ -1613,7 +1613,7 @@ ${Msz}Mb##
                 #set($displayName = $colname)
               #end
               #if($colname != '_actions' || $hasAdmin)
-              <th class="xwiki-livetable-display-header-text #if($isSortable)sortable #if($colname == $selectedColumn)selected $defaultOrder#else asc#end#end" #if("$!colprop.type"=="hidden")class="hidden"#end scope="col">
+              <th class="xwiki-livetable-display-header-text $!colprop.headerClass #if($isSortable)sortable #if($colname == $selectedColumn)selected $defaultOrder#else asc#end#end" #if("$!colprop.type"=="hidden")class="hidden"#end scope="col">
                 #if($isSortable)<a rel="${colname}">#end
                 #if($isFilterable && ("$!colprop.type"=="text"||"$!colprop.type"=="number"))<label for="xwiki-livetable-${divid}-filter-${velocityCount}">#end
                 $displayName

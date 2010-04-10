@@ -7,10 +7,10 @@
 ##
 ## Settings, compute what versions should be displayed.
 ##
-  #if($context.action == 'view')
-    #set($viewer = 'viewer=history')
-  #else
+  #if($context.action == 'edit')
     #set($viewer = 'editor=history')
+  #else
+    #set($viewer = 'viewer=history')
   #end
   #set($minorVersions = (!$xwiki.hasMinorEdit()) || ("$!request.showminor" == 'true'))
 ## Revision criteria. The following requests for all versions, filtered by the minorVersions option.

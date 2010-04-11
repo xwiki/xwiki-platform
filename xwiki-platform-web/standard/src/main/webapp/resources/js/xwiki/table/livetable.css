@@ -265,7 +265,8 @@ div.xwikigwt-editfield tr.dialogMiddle td.dialogMiddleCenter div.xwikigwt-editfi
   color: $theme.textColor;
 }
 /* </Dialog Box> */
-/* <Tag Cloud> */
+/* <Tag Cloud & Top Filters>  */
+.xwiki-livetable-topfilters-container,
 .xwiki-livetable-tagcloud-container {
   border: 1px solid $theme.backgroundSecondaryColor;
   border-bottom: 5px solid $theme.backgroundSecondaryColor;
@@ -310,6 +311,7 @@ div.xwiki-livetable-tagcloud ol.tagCloud li.selected span {
   border-bottom: 1px solid $theme.backgroundSecondaryColor;
   border-top: 1px solid $theme.backgroundSecondaryColor;
 }
+.xwiki-livetable-topfilters-tip .tippointer,
 .xwiki-livetable-tagcloud-tip .tippointer {
   position: relative;
   width: 0;
@@ -321,6 +323,12 @@ div.xwiki-livetable-tagcloud ol.tagCloud li.selected span {
   border-left: 20px dotted transparent;
   border-bottom: 0px none;
 }
+div.tipfilters div.splitted {
+  display:inline-block;
+  vertical-align:bottom;
+  width:49%;
+}
+.xwiki-livetable-topfilters-tip .tippointer div, 
 .xwiki-livetable-tagcloud-tip .tippointer div {
   position: absolute;
   width: 0;
@@ -332,7 +340,7 @@ div.xwiki-livetable-tagcloud ol.tagCloud li.selected span {
   border-left: 15px dotted transparent;
   border-bottom: 0 none;
 }
-/* </Tag Cloud> */
+/* </Tag Cloud & Top Filters>*/
 
 /* <Compatibility> */
 /* This section contains rules for backward compatibility with the deprecated (since 1.9M2) ASSTable */

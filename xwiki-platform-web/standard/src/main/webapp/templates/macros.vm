@@ -1520,6 +1520,7 @@ ${Msz}Mb##
   #if("$!options.callback" != '') #set($callback = $options.callback) #end
   #if("$!options.tagCloud" == '' || $options.tagCloud == false) #set($tagcloud=false) #else #set($tagcloud = true) #end
   #if("$!options.javascriptName" != '') #set($jsName = $options.javascriptName) #else #set($jsName = 'livetable') #end
+  #if("$!options.topFilters" != '') #set($topfilters = $options.topFilters) #end
   #set($classname = "$!options.className")
   #set($extraparams = "$!options.extraParams")
   ##
@@ -1550,9 +1551,26 @@ ${Msz}Mb##
   ##
   ## HTML Table
   ##
+<div class="xwiki-livetable-container">
+  #if("$!topfilters" !='') #set($hasTopFilters = true) #else #set($hasTopFilters = false) #end
+  #if($tagcloud || $hasTopFilters)
+  <div class="tipfilters">
+  #end
+  #if($hasTopFilters)
+  <div id="${divid}-topfilters" class="xwiki-livetable-topfilters-tip #if($tagcloud)splitted#end">
+    <div>
+      <div class="xwiki-livetable-topfilters-container">
+      $topfilters
+      </div>
+      <div class="tippointer">
+        <div></div>
+      </div>
+    </div>
+  </div>
+  #end
   #if($tagcloud)
     #set($discard = $xwiki.ssx.use('XWiki.TagCloud'))
-    <div id="${divid}-tagcloud" class="xwiki-livetable-tagcloud-tip hidden">
+    <div id="${divid}-tagcloud" class="xwiki-livetable-tagcloud-tip hidden #if($hasTopFilters)splitted#end">
       <div>
         <div class="xwiki-livetable-tagcloud-container">
           <h2>$msg.get('xe.livetable.tags.help')
@@ -1565,6 +1583,9 @@ ${Msz}Mb##
         </div>
       </div>
     </div>
+  #end
+  #if($tagcloud || $hasTopFilters) 
+  </div>
   #end
   <table id="${divid}" class="xwiki-livetable"#if("$!options.description" != '') summary="$options.description"#end>
     <tr>
@@ -1588,7 +1609,7 @@ ${Msz}Mb##
         <table class="xwiki-livetable-display">
           <thead class="xwiki-livetable-display-header">
             <tr>
-	    #set($columnCount = 0)
+            #set($columnCount = 0)
             #foreach($colname in $collist)
               #set($colprop = $colprops.get($colname))
               #if(("$!colprop.filterable" == '' || $colprop.filterable != false) && "$!colname" != '_actions')
@@ -1613,7 +1634,7 @@ ${Msz}Mb##
                 #set($displayName = $colname)
               #end
               #if($colname != '_actions' || $hasAdmin)
-              <th class="xwiki-livetable-display-header-text $!colprop.headerClass #if($!colprop.type=='hidden')hidden#end #if($isSortable)sortable #if($colname == $selectedColumn)selected $defaultOrder#else asc#end#end scope="col">
+              <th class="xwiki-livetable-display-header-text $!colprop.headerClass #if($!colprop.type=='hidden')hidden#end #if($isSortable)sortable #if($colname == $selectedColumn)selected $defaultOrder#else asc#end#end" scope="col">
                 #if($isSortable)<a rel="${colname}">#end
                 #if($isFilterable && ("$!colprop.type"=="text"||"$!colprop.type"=="number"))<label for="xwiki-livetable-${divid}-filter-${velocityCount}">#end
                 $displayName
@@ -1695,6 +1716,7 @@ ${Msz}Mb##
   }
    //]]>
   </script>
+</div> ## xwiki-livetable-container
   #if($xwiki.getCurrentContentSyntaxId() == "xwiki/2.0"){{/html}}
 
   #else {/pre} #end

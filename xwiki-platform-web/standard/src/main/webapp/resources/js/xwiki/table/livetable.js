@@ -55,7 +55,7 @@ XWiki.widgets.LiveTable = Class.create({
     this.displayNode = $(domNodeName + "-display") || $('display1');
 
     // Node under which all forms controls (input, selects, etc.) will be filters for this table
-    this.filtersNode = options.filtersNode || $(domNodeName).down(".xwiki-livetable-display-filters");
+    this.filtersNode = options.filtersNode || $(domNodeName).up("div.xwiki-livetable-container");
 
     // Array of nodes under which pagination for this livetable will be displayed.
     this.paginationNodes = options.paginationNodes || $(this.domNodeName).select(".xwiki-livetable-pagination");
@@ -617,7 +617,8 @@ var LiveTableFilter = Class.create({
     var result = "";
     var filters = this.filterNode.select("input", "select");
     for (var i=0;i<filters.length;i++) {
-      if (!filters[i].value.blank()) {
+      // Ignore filters with blank value, or inputs under the livetable display body
+      if (!filters[i].value.blank() && typeof filters[i].up('.xwiki-livetable-display-body') == "undefined") {
         if ((filters[i].type != "radio" && filters[i].type != "checkbox") || filters[i].checked) {
           result += ("&" + filters[i].name + "=" + encodeURIComponent(filters[i].value));
         }

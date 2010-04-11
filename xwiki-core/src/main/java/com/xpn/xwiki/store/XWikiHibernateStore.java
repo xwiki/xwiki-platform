@@ -2103,7 +2103,7 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
     /**
      * @since 2.2M2
      */
-    public List<DocumentReference> searchDocumentReferences(String parametrizedSqlClause, List parameterValues,
+    public List<DocumentReference> searchDocumentReferences(String parametrizedSqlClause, List< ? > parameterValues,
         XWikiContext context) throws XWikiException
     {
         return searchDocumentReferences(parametrizedSqlClause, 0, 0, parameterValues, context);
@@ -2113,7 +2113,8 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
      * @deprecated since 2.2M2 use {@link #searchDocumentReferences(String, List, com.xpn.xwiki.XWikiContext)}
      */
     @Deprecated
-    public List<String> searchDocumentsNames(String parametrizedSqlClause, List parameterValues, XWikiContext context)
+    public List<String> searchDocumentsNames(String parametrizedSqlClause, List< ? > parameterValues,
+        XWikiContext context)
         throws XWikiException
     {
         return searchDocumentsNames(parametrizedSqlClause, 0, 0, parameterValues, context);
@@ -2123,7 +2124,7 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
      * @since 2.2M1
      */
     public List<DocumentReference> searchDocumentReferences(String parametrizedSqlClause, int nb, int start,
-        List parameterValues, XWikiContext context) throws XWikiException
+        List< ? > parameterValues, XWikiContext context) throws XWikiException
     {
         String sql = createSQLQuery("select distinct doc.space, doc.name", parametrizedSqlClause);
         return searchDocumentReferencesInternal(sql, nb, start, parameterValues, context);
@@ -2133,8 +2134,8 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
      * @deprecated since 2.2M1 use {@link #searchDocumentReferences(String, int, int, List, XWikiContext)}
      */
     @Deprecated
-    public List<String> searchDocumentsNames(String parametrizedSqlClause, int nb, int start, List parameterValues,
-        XWikiContext context) throws XWikiException
+    public List<String> searchDocumentsNames(String parametrizedSqlClause, int nb, int start,
+        List< ? > parameterValues, XWikiContext context) throws XWikiException
     {
         String sql = createSQLQuery("select distinct doc.space, doc.name", parametrizedSqlClause);
         return searchDocumentsNamesInternal(sql, nb, start, parameterValues, context);
@@ -2203,7 +2204,7 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
      * 
      * @see com.xpn.xwiki.store.XWikiStoreInterface#search(java.lang.String, int, int, com.xpn.xwiki.XWikiContext)
      */
-    public List search(String sql, int nb, int start, XWikiContext context) throws XWikiException
+    public <T> List<T> search(String sql, int nb, int start, XWikiContext context) throws XWikiException
     {
         return search(sql, nb, start, (List) null, context);
     }
@@ -2214,7 +2215,8 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
      * @see com.xpn.xwiki.store.XWikiStoreInterface#search(java.lang.String, int, int, java.util.List,
      *      com.xpn.xwiki.XWikiContext)
      */
-    public List search(String sql, int nb, int start, List parameterValues, XWikiContext context) throws XWikiException
+    public <T> List<T> search(String sql, int nb, int start, List< ? > parameterValues, XWikiContext context)
+        throws XWikiException
     {
         return search(sql, nb, start, null, parameterValues, context);
     }
@@ -2225,7 +2227,7 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
      * @see com.xpn.xwiki.store.XWikiStoreInterface#search(java.lang.String, int, int, java.lang.Object[][],
      *      com.xpn.xwiki.XWikiContext)
      */
-    public List search(String sql, int nb, int start, Object[][] whereParams, XWikiContext context)
+    public <T> List<T> search(String sql, int nb, int start, Object[][] whereParams, XWikiContext context)
         throws XWikiException
     {
         return search(sql, nb, start, whereParams, null, context);
@@ -2237,7 +2239,8 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
      * @see com.xpn.xwiki.store.XWikiStoreInterface#search(java.lang.String, int, int, java.lang.Object[][],
      *      java.util.List, com.xpn.xwiki.XWikiContext)
      */
-    public List search(String sql, int nb, int start, Object[][] whereParams, List parameterValues, XWikiContext context)
+    public <T> List<T> search(String sql, int nb, int start, Object[][] whereParams, List< ? > parameterValues,
+        XWikiContext context)
         throws XWikiException
     {
         boolean bTransaction = true;
@@ -2402,7 +2405,7 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
      * 
      * @see XWikiStoreInterface#countDocuments(String, List, XWikiContext)
      */
-    public int countDocuments(String parametrizedSqlClause, List parameterValues, XWikiContext context)
+    public int countDocuments(String parametrizedSqlClause, List< ? > parameterValues, XWikiContext context)
         throws XWikiException
     {
         String sql = createSQLQuery("select count(distinct doc.fullName)", parametrizedSqlClause);
@@ -2512,7 +2515,7 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
      *      int, java.util.List, com.xpn.xwiki.XWikiContext)
      */
     public List<XWikiDocument> searchDocuments(String wheresql, boolean distinctbylanguage, boolean customMapping,
-        boolean checkRight, int nb, int start, List parameterValues, XWikiContext context) throws XWikiException
+        boolean checkRight, int nb, int start, List< ? > parameterValues, XWikiContext context) throws XWikiException
     {
         boolean bTransaction = true;
         MonitorPlugin monitor = Util.getMonitorPlugin(context);
@@ -2929,7 +2932,7 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
      * @see com.xpn.xwiki.store.XWikiStoreInterface#searchDocuments(java.lang.String, java.util.List,
      *      com.xpn.xwiki.XWikiContext)
      */
-    public List<XWikiDocument> searchDocuments(String wheresql, List parameterValues, XWikiContext context)
+    public List<XWikiDocument> searchDocuments(String wheresql, List< ? > parameterValues, XWikiContext context)
         throws XWikiException
     {
         return searchDocuments(wheresql, 0, 0, parameterValues, context);
@@ -2977,7 +2980,7 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
      * @see com.xpn.xwiki.store.XWikiStoreInterface#searchDocuments(java.lang.String, int, int, java.util.List,
      *      com.xpn.xwiki.XWikiContext)
      */
-    public List<XWikiDocument> searchDocuments(String wheresql, int nb, int start, List parameterValues,
+    public List<XWikiDocument> searchDocuments(String wheresql, int nb, int start, List< ? > parameterValues,
         XWikiContext context) throws XWikiException
     {
         return searchDocuments(wheresql, true, nb, start, parameterValues, context);
@@ -2990,7 +2993,7 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
      *      com.xpn.xwiki.XWikiContext)
      */
     public List<XWikiDocument> searchDocuments(String wheresql, boolean distinctbylanguage, int nb, int start,
-        List parameterValues, XWikiContext context) throws XWikiException
+        List< ? > parameterValues, XWikiContext context) throws XWikiException
     {
         return searchDocuments(wheresql, distinctbylanguage, false, nb, start, parameterValues, context);
     }
@@ -3026,7 +3029,7 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
      *      java.util.List, com.xpn.xwiki.XWikiContext)
      */
     public List<XWikiDocument> searchDocuments(String wheresql, boolean distinctbylanguage, boolean customMapping,
-        int nb, int start, List parameterValues, XWikiContext context) throws XWikiException
+        int nb, int start, List< ? > parameterValues, XWikiContext context) throws XWikiException
     {
         return searchDocuments(wheresql, distinctbylanguage, customMapping, true, nb, start, parameterValues, context);
     }

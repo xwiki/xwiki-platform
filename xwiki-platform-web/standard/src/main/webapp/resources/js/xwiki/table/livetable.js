@@ -209,6 +209,9 @@ XWiki.widgets.LiveTable = Class.create({
 
     this.loadingStatus.removeClassName("hidden");
 
+    // Let code know the table is about to load new entries.
+    document.fire("xwiki:livetable:" + this.domNodeName + ":loadingEntries");
+
     var ajx = new Ajax.Request(url,
     {
       method: 'get',
@@ -229,6 +232,11 @@ XWiki.widgets.LiveTable = Class.create({
         if(self.tagCloud && res.matchingtags) {
            self.tagCloud.updateTagCloud(res.tags, res.matchingtags);
         }
+
+        // Let code know new entries arrived
+        document.fire("xwiki:livetable:" + this.domNodeName + ":receivedEntries", {
+          "data" : res
+        });
 
         self.updateFetchedRows(res);
         self.displayRows(displayOffset, displayLimit);

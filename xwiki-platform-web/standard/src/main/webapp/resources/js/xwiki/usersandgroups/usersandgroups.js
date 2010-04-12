@@ -367,7 +367,8 @@ function displayUsersAndGroups(row, i, table, idx)
   var uorg = table.json.uorg;
   var allows = row.allows;
   var denys = row.denys;
-  var saveUrl = "?xpage=saverights&clsname=" + table.json.clsname + "&fullname=" + row.fullname + "&uorg=" + uorg;
+
+  var saveUrl = window.docviewurl + "?xpage=saverights&clsname=" + table.json.clsname + "&fullname=" + row.fullname + "&uorg=" + uorg;
 
   var tr = document.createElement('tr');
 

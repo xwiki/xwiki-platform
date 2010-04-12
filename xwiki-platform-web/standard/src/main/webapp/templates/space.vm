@@ -13,7 +13,7 @@
 $string
 #end
 #end
-#if($context.getMode()==0) ## Visible only in a page
+#if($isInServletMode) ## Visible only in a page
 <div id="headerspace" class="layoutsection">
 <div class="minwidth"></div>
 <hr/>

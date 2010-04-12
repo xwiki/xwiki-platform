@@ -4,7 +4,7 @@
 ### The uppermost area of each page
 ### Contains the company logo, links to global actions and the search facility
 ###
-#if($context.getMode()==0) ## Visible only in a page
+#if($isInServletMode) ## Visible only in a page
 <div id="headerglobal" class="layoutsection">
 #if($context.action == "view")
 <div class="minwidthb"></div>

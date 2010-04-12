@@ -13,7 +13,7 @@
     $result
   #end
 #end
-#if($context.getMode()==0) ## Visible only in a page
+#if($isInServletMode) ## Visible only in a page
   <div id="hierarchy">
     #computeHierarchy($doc "<a href='${doc.getURL('view')}'>$xwiki.getXMLEncoded($tdoc.getRenderedTitle('plain/1.0'))</a>" 0)
   </div>

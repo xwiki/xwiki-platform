@@ -66,8 +66,8 @@ public class CalendarPlugin extends XWikiDefaultPlugin implements XWikiPluginInt
         BaseClass bclass = doc.getxWikiClass();
         bclass.setName("XWiki.CalendarEvent");
         needsUpdate |= bclass.addTextField("user", "User", 30);
-        needsUpdate |= bclass.addDateField("startDate", "Start Date", "dd/MM/yyyy");
-        needsUpdate |= bclass.addDateField("endDate", "End Date", "dd/MM/yyyy");
+        needsUpdate |= bclass.addDateField("startDate", "Start Date", "MM/dd/yyyy HH:mm");
+        needsUpdate |= bclass.addDateField("endDate", "End Date", "MM/dd/yyyy HH:mm");
         needsUpdate |= bclass.addTextField("title", "Title", 30);
         needsUpdate |= bclass.addTextAreaField("description", "Description", 40, 5);
         needsUpdate |= bclass.addTextField("url", "URL (optional)", 30);

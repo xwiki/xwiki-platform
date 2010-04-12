@@ -73,6 +73,13 @@ public class ActionFilter implements Filter
     private static final String PATH_SEPARATOR = "/";
 
     /**
+     * The name of the request attribute that specifies if the action has been already dispatched. This flag is required
+     * to prevent recursive dispatch loop and allows us to map this filter to INCLUDE and FORWARD. The value of this
+     * request attribute is a string. The associated boolean value is determined using {@link Boolean#valueOf(String)}.
+     */
+    private static final String ATTRIBUTE_ACTION_DISPATCHED = ActionFilter.class.getName() + ".actionDispatched";
+
+    /**
      * Use to access resources.
      */
     private ServletContext servletContext;
@@ -97,7 +104,8 @@ public class ActionFilter implements Filter
         ServletException
     {
         // Only HTTP requests can be dispatched.
-        if (request instanceof HttpServletRequest) {
+        if (request instanceof HttpServletRequest
+            && !Boolean.valueOf((String) request.getAttribute(ATTRIBUTE_ACTION_DISPATCHED))) {
             HttpServletRequest hrequest = (HttpServletRequest) request;
             Enumeration<String> parameterNames = hrequest.getParameterNames();
             while (parameterNames.hasMoreElements()) {
@@ -107,7 +115,10 @@ public class ActionFilter implements Filter
                     RequestDispatcher dispatcher = hrequest.getRequestDispatcher(targetURL);
                     if (dispatcher != null) {
                         LOG.debug("Forwarding request to " + targetURL);
+                        request.setAttribute(ATTRIBUTE_ACTION_DISPATCHED, "true");
                         dispatcher.forward(hrequest, response);
+                        // Allow multiple calls to this filter as long as they are not nested.
+                        request.removeAttribute(ATTRIBUTE_ACTION_DISPATCHED);
                         // If the request was forwarder to another path, don't continue the normal processing chain.
                         return;
                     }

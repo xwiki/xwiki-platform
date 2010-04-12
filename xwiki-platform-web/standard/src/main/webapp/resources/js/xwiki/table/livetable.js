@@ -210,7 +210,12 @@ XWiki.widgets.LiveTable = Class.create({
     this.loadingStatus.removeClassName("hidden");
 
     // Let code know the table is about to load new entries.
+    // 1. Named event (for code interested by that table only)
     document.fire("xwiki:livetable:" + this.domNodeName + ":loadingEntries");
+    // 2. Generic event (for code potentially interested in any livetable)
+    document.fire("xwiki:livetable:loadingEntries", {
+      "tableId" : this.domNodeName
+    });
 
     var ajx = new Ajax.Request(url,
     {
@@ -234,8 +239,14 @@ XWiki.widgets.LiveTable = Class.create({
         }
 
         // Let code know new entries arrived
+        // 1. Named event (for code interested by that table only)
         document.fire("xwiki:livetable:" + this.domNodeName + ":receivedEntries", {
           "data" : res
+        });
+        // 2. Generic event (for code potentially interested in any livetable)
+        document.fire("xwiki:livetable:receivedEntries", {
+          "data" : res,
+          "tableId" : self.domNodeName
         });
 
         self.updateFetchedRows(res);
@@ -289,11 +300,16 @@ XWiki.widgets.LiveTable = Class.create({
       if (this.fetchedRows[i]) {
         var elem = this.handler(this.fetchedRows[i], i, this);      
         this.displayNode.appendChild(elem);
-        document.fire("xwiki:livetable:newrow", {
+        var memo = {
           "data": this.fetchedRows[i],
           "row":elem,
-          "table":this
-        });
+          "table":this,
+          "tableId":this.domNodeName
+        };
+        // 1. Named event (for code interested by that table only)
+        document.fire("xwiki:livetable:" + this.domNodeName + ":newrow", memo);
+        // 2. Generic event (for code potentially interested in any livetable)
+        document.fire("xwiki:livetable:newrow", memo);
       }
     }
     if (this.paginator) this.paginator.refreshPagination();

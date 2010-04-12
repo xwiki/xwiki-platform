@@ -645,6 +645,9 @@ var LiveTableFilter = Class.create({
     for(var i = 0; i < selects.length; i++) {
       Event.observe(selects[i], 'change', this.makeRefreshHandler(this));
     }
+
+    // Allow custom filters to trigger filter change from non-native events
+    document.observe("xwiki:livetable:" + this.table.domNodeName + ":filtersChanged", this.makeRefreshHandler(this));
   },
 
   /**

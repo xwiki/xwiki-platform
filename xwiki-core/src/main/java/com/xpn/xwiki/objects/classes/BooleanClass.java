@@ -20,6 +20,15 @@
  */
 package com.xpn.xwiki.objects.classes;
 
+import java.util.Map;
+
+import org.apache.ecs.xhtml.div;
+import org.apache.ecs.xhtml.input;
+import org.apache.ecs.xhtml.label;
+import org.apache.ecs.xhtml.option;
+import org.apache.ecs.xhtml.select;
+import org.codehaus.plexus.util.StringUtils;
+
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.objects.BaseCollection;
 import com.xpn.xwiki.objects.BaseProperty;
@@ -28,14 +37,6 @@ import com.xpn.xwiki.objects.meta.PropertyMetaClass;
 import com.xpn.xwiki.plugin.query.XWikiCriteria;
 import com.xpn.xwiki.plugin.query.XWikiQuery;
 import com.xpn.xwiki.web.XWikiMessageTool;
-
-import org.apache.ecs.xhtml.div;
-import org.apache.ecs.xhtml.input;
-import org.apache.ecs.xhtml.label;
-import org.apache.ecs.xhtml.option;
-import org.apache.ecs.xhtml.select;
-
-import java.util.Map;
 
 public class BooleanClass extends PropertyClass
 {
@@ -93,8 +94,9 @@ public class BooleanClass extends PropertyClass
     {
         BaseProperty property = newProperty();
         Number nvalue = null;
-        if ((value != null) && (!value.equals("")))
+        if (StringUtils.isNotEmpty(value)) {
             nvalue = new Integer(value);
+        }
         property.setValue(nvalue);
         return property;
     }
@@ -111,8 +113,9 @@ public class BooleanClass extends PropertyClass
     public void displayView(StringBuffer buffer, String name, String prefix, BaseCollection object, XWikiContext context)
     {
         IntegerProperty prop = (IntegerProperty) object.safeget(name);
-        if (prop == null)
+        if (prop == null) {
             return;
+        }
 
         Integer iValue = (Integer) prop.getValue();
         if (iValue != null) {
@@ -168,17 +171,18 @@ public class BooleanClass extends PropertyClass
             Integer ivalue = (prop == null) ? null : (Integer) prop.getValue();
             if (ivalue != null) {
                 int value = ivalue.intValue();
-                if (value == 1)
+                if (value == 1) {
                     options[nb1].setSelected(true);
-                else if (value == 0)
+                } else if (value == 0) {
                     options[nb2].setSelected(true);
+                }
             } else {
                 int value = getDefaultValue();
-                if (value == 1)
+                if (value == 1) {
                     options[nb1].setSelected(true);
-                else if (value == 0)
+                } else if (value == 0) {
                     options[nb2].setSelected(true);
-                else if (value == -1) {
+                } else if (value == -1) {
                     options[0].setSelected(true);
                 }
             }
@@ -230,18 +234,20 @@ public class BooleanClass extends PropertyClass
             Integer ivalue = (prop == null) ? null : (Integer) prop.getValue();
             if (ivalue != null) {
                 int value = ivalue.intValue();
-                if (value == 1)
+                if (value == 1) {
                     radioTrue.setChecked(true);
-                else if (value == 0)
+                } else if (value == 0) {
                     radioFalse.setChecked(true);
+                }
             } else {
                 int value = getDefaultValue();
-                if (value == 1)
+                if (value == 1) {
                     radioTrue.setChecked(true);
-                else if (value == 0)
+                } else if (value == 0) {
                     radioFalse.setChecked(true);
-                else if (value == -1)
+                } else if (value == -1) {
                     radioNone.setChecked(true);
+                }
             }
         } catch (Exception e) {
             // This should not happen
@@ -265,16 +271,18 @@ public class BooleanClass extends PropertyClass
                 Integer ivalue = (Integer) prop.getValue();
                 if (ivalue != null) {
                     int value = ivalue.intValue();
-                    if (value == 1)
+                    if (value == 1) {
                         check.setChecked(true);
-                    else if (value == 0)
+                    } else if (value == 0) {
                         check.setChecked(false);
+                    }
                 } else {
                     int value = getDefaultValue();
-                    if (value == 1)
+                    if (value == 1) {
                         check.setChecked(true);
-                    else
+                    } else {
                         check.setChecked(false);
+                    }
                 }
             }
         } catch (Exception e) {
@@ -363,8 +371,9 @@ public class BooleanClass extends PropertyClass
         String[] data = map.get("");
         if (data != null) {
             Object[] data2 = new Object[data.length];
-            for (int i = 0; i < data.length; i++)
+            for (int i = 0; i < data.length; i++) {
                 data2[i] = fromString(data[i]).getValue();
+            }
             query.setParam(getObject().getName() + "_" + getName(), data2);
         }
     }

@@ -2,7 +2,7 @@
 ## In non-Servlet mode (in Portlet mode for example) we don't display the <HTML>, <HEAD> and <BODY>
 ## elements.
 ## -------------------------------------------------------------------------------------------------------------------
-#if($context.getMode()==0)
+#if($isInServletMode)
 <?xml version="1.0" encoding="$xwiki.encoding" ?>
 ## TODO this should be more specific
 #if("$!request.noDoctype" != "true")
@@ -92,7 +92,7 @@
   ## This is a hack for Exo which needs this for the XWiki portlet to fit in the Portlet window properly. In the 
   ## future Exo should modifies its behavior so that this is not necessary and this will need to be removed
   ## ---------------------------------------------------------------------------------------------------------------
-  <div class="UIApplication" style="overflow: auto">
+  ## <div class="UIApplication" style="overflow: auto">
 #end
 ## These elements will be closed in the footer vm file
 <div id="xwikimaincontainer">

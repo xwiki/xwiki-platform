@@ -174,10 +174,13 @@ public class CalendarData
                     } catch (Exception e) {
                     }
 
-                    String title = "";
+                    String title = "";                    
                     try {
-                        title = (String) ((StringProperty) bobj.get("title")).getValue();
+                        title = (String) ((StringProperty) bobj.get("title")).getValue();                        
                     } catch (Exception e) {
+                    }
+                    if (StringUtils.isBlank(title)) {
+                    	title = doc.getDisplayTitle(context);
                     }
 
                     String url = "";

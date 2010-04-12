@@ -80,6 +80,13 @@ public class SavedRequestRestorerFilter implements Filter
         Pattern.compile("(?:^|&)" + SAVED_REQUESTS_IDENTIFIER + "=([^&]++)");
 
     /**
+     * The name of the request attribute that specifies if this filter has already been applied to the current request.
+     * This flag is required to prevent prevent processing the same request multiple times. The value of this request
+     * attribute is a string. The associated boolean value is determined using {@link Boolean#valueOf(String)}.
+     */
+    private static final String ATTRIBUTE_APPLIED = SavedRequestRestorerFilter.class.getName() + ".applied";
+
+    /**
      * Request Wrapper that inserts data from a previous request into the current request.
      */
     public static class SavedRequestWrapper extends HttpServletRequestWrapper
@@ -285,14 +292,18 @@ public class SavedRequestRestorerFilter implements Filter
         ServletException
     {
         // This filter works only for HTTP requests, because they are the only ones with a session.
-        if (request instanceof HttpServletRequest) {
+        if (request instanceof HttpServletRequest
+            && !Boolean.valueOf((String) request.getAttribute(ATTRIBUTE_APPLIED))) {
             // Get the saved request, if any (returns null if not applicable)
             SavedRequest savedRequest = getSavedRequest((HttpServletRequest) request);
             // Merge the new and the saved request
             request = new SavedRequestWrapper((HttpServletRequest) request, savedRequest);
+            request.setAttribute(ATTRIBUTE_APPLIED, "true");
         }
         // Forward the request
         chain.doFilter(request, response);
+        // Allow multiple calls to this filter as long as they are not nested.
+        request.removeAttribute(ATTRIBUTE_APPLIED);
     }
 
     /**

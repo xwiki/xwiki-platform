@@ -22,12 +22,12 @@ package com.xpn.xwiki.objects.classes;
 
 import java.util.Map;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.ecs.xhtml.div;
 import org.apache.ecs.xhtml.input;
 import org.apache.ecs.xhtml.label;
 import org.apache.ecs.xhtml.option;
 import org.apache.ecs.xhtml.select;
-import org.codehaus.plexus.util.StringUtils;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.objects.BaseCollection;

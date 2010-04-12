@@ -293,17 +293,39 @@ public class BooleanClass extends PropertyClass
         buffer.append(checkNo.toString());
     }
 
+    /**
+     * Search for an internationalizable display text for the current value. The search process is:
+     * <ol>
+     * <li>let V = the internal value of the option, 0 1 or 2, T = the value of the displayType meta-property, and D =
+     * the displayed value</li>
+     * <li>if a message with the key <fieldFullName>_<V> exists, return it as D</li>
+     * <li>else, if a message with the key <T>_<V> exists, return it as D</li>
+     * <li>else return V if V is 0 or 1, or --- if V is 2 (undecided)</li>
+     * </ol>
+     * 
+     * @param context The request context.
+     * @param value The internal value.
+     * @return The text that should be displayed, representing a human-understandable name for the internal value.
+     */
     private String getDisplayValue(XWikiContext context, int value)
     {
         try {
             XWikiMessageTool msg = context.getMessageTool();
-            String strname = getDisplayType() + "_" + value;
-            String result = msg.get(strname);
-            if (result.equals(strname)) {
-                if (value == 2) {
-                    return "---";
+
+            // <classname>_<property>_<value>
+            String key = getFieldFullName() + "_" + value;
+            String result = msg.get(key);
+            if (key.equals(result)) {
+                // <display type>_<value>
+                key = getDisplayType() + "_" + value;
+                result = msg.get(key);
+                if (key.equals(result)) {
+                    // Just return the value
+                    if (value == 2) {
+                        result = "---";
+                    }
+                    result = "" + value;
                 }
-                return "" + value;
             }
             return result;
         } catch (Exception e) {

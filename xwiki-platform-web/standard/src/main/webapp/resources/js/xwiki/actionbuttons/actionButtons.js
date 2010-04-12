@@ -87,10 +87,13 @@ XWiki.actionButtons.EditActions = Class.create({
          location = window.self.location.href;
        }
     }
+    var parts = location.split('#', 2);
+    var fragmentId = (parts.length == 2) ? parts[1] : '';
+    location = parts[0];
     if (location.indexOf('?') == -1) {
       location += '?';
     }
-    window.location = location + '&action_cancel=true'; 
+    window.location = location + '&action_cancel=true' + fragmentId;
   },
   onPreview : function(event) {
     if (!this.validateForm(event.element().form)) {

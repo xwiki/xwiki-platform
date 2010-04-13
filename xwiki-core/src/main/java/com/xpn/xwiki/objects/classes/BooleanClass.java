@@ -323,12 +323,14 @@ public class BooleanClass extends PropertyClass
                     // Just return the value
                     if (value == 2) {
                         result = "---";
+                    } else {
+                        result = "" + value;
                     }
-                    result = "" + value;
                 }
             }
             return result;
         } catch (Exception e) {
+            e.printStackTrace();
             return "" + value;
         }
     }

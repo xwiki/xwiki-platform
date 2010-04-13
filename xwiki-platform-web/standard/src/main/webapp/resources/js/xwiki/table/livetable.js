@@ -55,7 +55,7 @@ XWiki.widgets.LiveTable = Class.create({
     this.displayNode = $(domNodeName + "-display") || $('display1');
 
     // Node under which all forms controls (input, selects, etc.) will be filters for this table
-    this.filtersNode = options.filtersNode || $(domNodeName).up("div.xwiki-livetable-container");
+    this.filtersNode = options.filtersNode || $(domNodeName).up("div.xwiki-livetable-container") || $(domNodeName).down(".xwiki-livetable-display-filters");
 
     // Array of nodes under which pagination for this livetable will be displayed.
     this.paginationNodes = options.paginationNodes || $(this.domNodeName).select(".xwiki-livetable-pagination");

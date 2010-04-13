@@ -50,6 +50,7 @@ import org.apache.lucene.search.TermQuery;
 import org.apache.lucene.store.Directory;
 import org.apache.lucene.store.FSDirectory;
 import org.apache.lucene.util.Version;
+import org.xwiki.context.Execution;
 import org.xwiki.observation.ObservationManager;
 
 import com.xpn.xwiki.XWikiContext;
@@ -477,7 +478,7 @@ public class LucenePlugin extends XWikiDefaultPlugin
         int indexingInterval;
         try {
             indexingInterval =
-                    1000 * Integer.parseInt(this.config.getProperty(LucenePlugin.PROP_INDEXING_INTERVAL, "30"));
+                1000 * Integer.parseInt(this.config.getProperty(LucenePlugin.PROP_INDEXING_INTERVAL, "30"));
         } catch (NumberFormatException e) {
             LOG.warn("Invalid indexing interval in configuration.");
             indexingInterval = 30000;
@@ -518,7 +519,7 @@ public class LucenePlugin extends XWikiDefaultPlugin
         this.config = context.getWiki().getConfig();
         try {
             this.analyzer =
-                    (Analyzer) Class.forName(this.config.getProperty(PROP_ANALYZER, DEFAULT_ANALYZER)).newInstance();
+                (Analyzer) Class.forName(this.config.getProperty(PROP_ANALYZER, DEFAULT_ANALYZER)).newInstance();
         } catch (Exception e) {
             LOG.error("Error instantiating analyzer : ", e);
             LOG.warn("Using default analyzer class: " + DEFAULT_ANALYZER);
@@ -560,8 +561,20 @@ public class LucenePlugin extends XWikiDefaultPlugin
         LOG.debug("Lucene plugin initialized.");
     }
 
+    /**
+     * {@inheritDoc}
+     * 
+     * @see com.xpn.xwiki.plugin.XWikiDefaultPlugin#flushCache(com.xpn.xwiki.XWikiContext)
+     */
     public void flushCache(XWikiContext context)
     {
+        // take care of crappy code calling #flushCache with no context...
+        if (context == null) {
+            context =
+                (XWikiContext) Utils.getComponent(Execution.class).getContext().getProperty(
+                    XWikiContext.EXECUTIONCONTEXT_KEY);
+        }
+
         if (this.indexUpdater != null) {
             Utils.getComponent(ObservationManager.class).removeListener(this.indexUpdater.getName());
 

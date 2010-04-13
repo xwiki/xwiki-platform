@@ -120,7 +120,7 @@ public class IdGenerator
     /**
      * Normalize passed string into valid string.
      * <ul>
-     * <li>Remote white spaces: Clean white space since otherwise they'll get transformed into %20 by the below and thus
+     * <li>Remove white spaces: Clean white space since otherwise they'll get transformed into 20 by the below and thus
      * for "Hello world" we would get "Hello20world" for the id. It's nicer to get "Helloworld".</li>
      * <li>Convert all non allowed characters. See {@link #ALLOWED} for allowed characters.</li>
      * </ul>

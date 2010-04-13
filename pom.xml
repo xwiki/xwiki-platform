@@ -41,9 +41,9 @@
     <clirr.previous.version>2.2</clirr.previous.version>
   </properties>
   <scm>
-    <connection>scm:svn:http://svn.xwiki.org/svnroot/xwiki/platform/core/trunk</connection>
-    <developerConnection>scm:svn:https://svn.xwiki.org/svnroot/xwiki/platform/core/trunk</developerConnection>
-    <url>http://svn.xwiki.org/svnroot/xwiki/platform/core/trunk</url>
+    <connection>scm:svn:http://svn.xwiki.org/svnroot/xwiki/platform/core/branches/xwiki-core-2.3</connection>
+    <developerConnection>scm:svn:https://svn.xwiki.org/svnroot/xwiki/platform/core/branches/xwiki-core-2.3</developerConnection>
+    <url>http://svn.xwiki.org/svnroot/xwiki/platform/core/branches/xwiki-core-2.3</url>
   </scm>
   <issueManagement>
     <system>jira</system>

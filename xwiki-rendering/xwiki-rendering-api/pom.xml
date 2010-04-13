@@ -39,10 +39,6 @@
       <artifactId>commons-lang</artifactId>
     </dependency>
     <dependency>
-      <groupId>commons-httpclient</groupId>
-      <artifactId>commons-httpclient</artifactId>
-    </dependency>
-    <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-core-xml</artifactId>
       <version>${pom.version}</version>
@@ -157,7 +153,6 @@
             org/xwiki/rendering/internal/renderer/event/EventBlockRenderer.java,
             org/xwiki/rendering/internal/parser/XDOMGeneratorListener.java,
             org/xwiki/rendering/internal/transformation/MacroTransformation.java,
-            org/xwiki/rendering/util/IdGenerator.java,
             org/xwiki/rendering/syntax/Syntax.java,
             org/xwiki/rendering/syntax/SyntaxType.java,
             org/xwiki/rendering/listener/chaining/LookaheadChainingListener.java,

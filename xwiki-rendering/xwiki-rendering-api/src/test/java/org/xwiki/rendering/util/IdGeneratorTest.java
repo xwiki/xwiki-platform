@@ -60,7 +60,8 @@ public class IdGeneratorTest extends TestCase
         assertEquals("I:_.-", this.idGenerator.generateUniqueId(":_.-"));
         assertEquals("Iwithspace", this.idGenerator.generateUniqueId("with space"));
         assertEquals("Iwithtab", this.idGenerator.generateUniqueId("with\ttab"));
-        assertEquals("IE5AF86E7A081", this.idGenerator.generateUniqueId("\u5BC6\u7801"));
+        assertEquals("I5BC67801", this.idGenerator.generateUniqueId("\u5BC6\u7801"));
+        assertEquals("I3D", this.idGenerator.generateUniqueId("="));
     }
 
     public void testGenerateUniqueIdWhenInvalidEmptyPrefix()

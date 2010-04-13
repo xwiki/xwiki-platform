@@ -23,8 +23,6 @@ import java.util.BitSet;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.apache.commons.codec.net.URLCodec;
-import org.apache.commons.httpclient.util.EncodingUtil;
 import org.apache.commons.lang.StringUtils;
 
 /**
@@ -61,6 +59,12 @@ public class IdGenerator
     }
 
     /**
+     * A table of hex digits.
+     */
+    private static final char[] HEXDIGIT =
+    {'0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F'};
+
+    /**
      * Contains the already generated ids.
      */
     private Set<String> generatedIds = new HashSet<String>();
@@ -82,8 +86,8 @@ public class IdGenerator
      * Generate a unique id attribute using the passed text as the seed value. The generated id complies with the XHTML
      * specification. Extract from <a href="http://www.w3.org/TR/xhtml1/#C_8">XHTML RFC</a>:
      * <p>
-     * <quote> When defining fragment identifiers to be backward-compatible, only strings matching the pattern
-     * [A-Za-z][A-Za-z0-9:_.-]* should be used.</quote>
+     * <code> When defining fragment identifiers to be backward-compatible, only strings matching the pattern
+     * [A-Za-z][A-Za-z0-9:_.-]* should be used.</code>
      * </p>
      * 
      * @param prefix the prefix of the identifier. Has to match [a-zA-Z].
@@ -98,17 +102,7 @@ public class IdGenerator
                 + "] should only contain alphanumerical characters and not be empty.");
         }
 
-        String idPrefix = text;
-
-        // Clean white space since otherwise they'll get transformed into %20 by the below and thus for
-        // "Hello world" we would get "Hello20world" for the id. It's nicer to get "Helloworld".
-        idPrefix = idPrefix.replaceAll("\\s", "");
-
-        // convert non alpha-numeric characters
-        idPrefix = EncodingUtil.getAsciiString(URLCodec.encodeUrl(ALLOWED, EncodingUtil.getBytes(idPrefix, "UTF-8")));
-
-        // Remove all non alpha numeric characters to make a nice compact id which respect the XHTML specification.
-        idPrefix = (prefix != null ? prefix : "") + idPrefix.replace("%", "");
+        String idPrefix = (prefix != null ? prefix : "") + normalizeId(text);
 
         int occurence = 0;
         String id = idPrefix;
@@ -121,6 +115,70 @@ public class IdGenerator
         this.generatedIds.add(id);
 
         return id;
+    }
+
+    /**
+     * Normalize passed string into valid string.
+     * <ul>
+     * <li>Remote white spaces: Clean white space since otherwise they'll get transformed into %20 by the below and thus
+     * for "Hello world" we would get "Hello20world" for the id. It's nicer to get "Helloworld".</li>
+     * <li>Convert all non allowed characters. See {@link #ALLOWED} for allowed characters.</li>
+     * </ul>
+     * 
+     * @param stringToNormalize the string to normalize
+     * @return the normalized string
+     */
+    private String normalizeId(String stringToNormalize)
+    {
+        int len = stringToNormalize.length();
+        int bufLen = len * 2;
+        if (bufLen < 0) {
+            bufLen = Integer.MAX_VALUE;
+        }
+        StringBuffer outBuffer = new StringBuffer(bufLen);
+
+        for (int x = 0; x < len; x++) {
+            char c = stringToNormalize.charAt(x);
+
+            if (ALLOWED.get(c)) {
+                outBuffer.append(c);
+            } else if (!Character.isWhitespace(c)) {
+                int nibble;
+                boolean skip = true;
+
+                nibble = (c >> 12) & 0xF;
+                if (nibble != 0) {
+                    skip = false;
+                    outBuffer.append(toHex(nibble));
+                }
+
+                nibble = (c >> 8) & 0xF;
+                if (!skip || nibble != 0) {
+                    skip = false;
+                    outBuffer.append(toHex(nibble));
+                }
+
+                nibble = (c >> 4) & 0xF;
+                if (!skip || nibble != 0) {
+                    outBuffer.append(toHex(nibble));
+                }
+
+                outBuffer.append(toHex(c & 0xF));
+            }
+        }
+
+        return outBuffer.toString();
+    }
+
+    /**
+     * Convert a nibble to a hex character.
+     * 
+     * @param nibble the nibble to convert.
+     * @return hex character
+     */
+    private char toHex(int nibble)
+    {
+        return HEXDIGIT[(nibble & 0xF)];
     }
 
     /**

@@ -20,11 +20,21 @@
 package org.xwiki.rendering.internal.parser.wikimodel.xhtml;
 
 import org.wikimodel.wem.IWemListener;
+import org.wikimodel.wem.WikiParameter;
 import org.wikimodel.wem.WikiParameters;
+import org.wikimodel.wem.WikiReference;
 import org.wikimodel.wem.impl.WikiScannerContext;
 import org.wikimodel.wem.xhtml.handler.ReferenceTagHandler;
 import org.wikimodel.wem.xhtml.impl.XhtmlHandler.TagStack;
 import org.wikimodel.wem.xhtml.impl.XhtmlHandler.TagStack.TagContext;
+import org.xwiki.rendering.internal.parser.wikimodel.XWikiGeneratorListener;
+import org.xwiki.rendering.listener.Listener;
+import org.xwiki.rendering.parser.ImageParser;
+import org.xwiki.rendering.parser.LinkParser;
+import org.xwiki.rendering.parser.StreamParser;
+import org.xwiki.rendering.renderer.PrintRenderer;
+import org.xwiki.rendering.renderer.PrintRendererFactory;
+import org.xwiki.rendering.renderer.printer.DefaultWikiPrinter;
 
 /**
  * Override the default WikiModel Reference handler to handle XWiki references since we store some information in
@@ -35,6 +45,35 @@ import org.wikimodel.wem.xhtml.impl.XhtmlHandler.TagStack.TagContext;
  */
 public class XWikiReferenceTagHandler extends ReferenceTagHandler
 {
+    private StreamParser parser;
+
+    private LinkParser linkParser;
+
+    private ImageParser imageParser;
+
+    private PrintRendererFactory xwikiSyntaxPrintRendererFactory;
+
+    private PrintRendererFactory plainRendererFactory;
+
+    /**
+     * @since 2.2.5
+     * @todo Remove the need to pass a Parser when WikiModel implements support for wiki syntax in links. See
+     *       http://code.google.com/p/wikimodel/issues/detail?id=87
+     */
+    public XWikiReferenceTagHandler(StreamParser parser, LinkParser linkParser, ImageParser imageParser,
+        PrintRendererFactory xwikiSyntaxPrintRendererFactory, PrintRendererFactory plainRendererFactory)
+    {
+        this.linkParser = linkParser;
+        this.xwikiSyntaxPrintRendererFactory = xwikiSyntaxPrintRendererFactory;
+        this.imageParser = imageParser;
+        this.plainRendererFactory = plainRendererFactory;
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see org.wikimodel.wem.xhtml.handler.TagHandler#initialize(org.wikimodel.wem.xhtml.impl.XhtmlHandler.TagStack)
+     */
     @Override
     public void initialize(TagStack stack)
     {
@@ -43,13 +82,17 @@ public class XWikiReferenceTagHandler extends ReferenceTagHandler
         stack.setStackParameter("linkParameters", WikiParameters.EMPTY);
     }
 
+    /**
+     * {@inheritDoc}
+     * 
+     * @see org.wikimodel.wem.xhtml.handler.ReferenceTagHandler#begin(org.wikimodel.wem.xhtml.impl.XhtmlHandler.TagStack.TagContext)
+     */
     @Override
     protected void begin(TagContext context)
     {
         boolean isInLink = (Boolean) context.getTagStack().getStackParameter("isInLink");
         if (isInLink) {
-            IWemListener listener =
-                (IWemListener) context.getTagStack().getStackParameter("linkListener");
+            IWemListener listener = (IWemListener) context.getTagStack().getStackParameter("linkListener");
             context.getTagStack().pushScannerContext(new WikiScannerContext(listener));
 
             // Ensure we simulate a new document being parsed
@@ -68,11 +111,31 @@ public class XWikiReferenceTagHandler extends ReferenceTagHandler
             }
 
             setAccumulateContent(false);
+        } else if (!isFreeStandingReference(context)) {
+            DefaultWikiPrinter printer = new DefaultWikiPrinter();
+
+            PrintRenderer linkLabelRenderer = this.xwikiSyntaxPrintRendererFactory.createRenderer(printer);
+            // Make sure to flush whatever the renderer implementation
+            linkLabelRenderer.beginDocument(Listener.EMPTY_PARAMETERS);
+
+            XWikiGeneratorListener xwikiListener =
+                new XWikiGeneratorListener(this.parser, linkLabelRenderer, this.linkParser, this.imageParser,
+                    this.plainRendererFactory, null);
+
+            context.getTagStack().pushScannerContext(new WikiScannerContext(xwikiListener));
+
+            // Ensure we simulate a new document being parsed
+            context.getScannerContext().beginDocument();
         } else {
             super.begin(context);
         }
     }
 
+    /**
+     * {@inheritDoc}
+     * 
+     * @see org.wikimodel.wem.xhtml.handler.ReferenceTagHandler#end(org.wikimodel.wem.xhtml.impl.XhtmlHandler.TagStack.TagContext)
+     */
     @Override
     protected void end(TagContext context)
     {
@@ -82,6 +145,30 @@ public class XWikiReferenceTagHandler extends ReferenceTagHandler
             context.getScannerContext().endDocument();
 
             context.getTagStack().popScannerContext();
+        } else if (!isFreeStandingReference(context)) {
+            // Ensure we simulate a document parsing end
+            context.getScannerContext().endDocument();
+
+            WikiScannerContext scannerContext = context.getTagStack().popScannerContext();
+
+            XWikiGeneratorListener xwikiListener = (XWikiGeneratorListener) scannerContext.getfListener();
+            PrintRenderer linkLabelRenderer = (PrintRenderer) xwikiListener.getListener();
+
+            // Make sure to flush whatever the renderer implementation
+            linkLabelRenderer.endDocument(Listener.EMPTY_PARAMETERS);
+
+            // TODO: it should be replaced by a normal parameters
+            WikiParameter ref = context.getParams().getParameter("href");
+
+            // Make sure we remove the HREF parameters from the list
+            // of parameters since they it's already consumed as link reference.
+            WikiParameters parameters = context.getParams();
+            parameters = parameters.remove("href");
+
+            String label = linkLabelRenderer.getPrinter().toString();
+            WikiReference reference = new WikiReference(ref.getValue(), label, parameters);
+
+            context.getScannerContext().onReference(reference);
         } else {
             super.end(context);
         }

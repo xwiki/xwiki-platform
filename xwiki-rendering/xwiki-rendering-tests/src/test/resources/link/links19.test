@@ -4,8 +4,29 @@
 .# that the XHTML Renderer uses. Note that for now the HREF value is considered containing
 .# XWiki link syntax.
 .#----------------------------------------------------------------------------------------------
-<p><a href="reference">label</a></p>
+<p><a href="http://reference" param1="value1">http://reference</a></p>
 .#-----------------------------------------------------
 .expect|xwiki/2.0
 .#-----------------------------------------------------
-[[label>>reference]]
+.#-----------------------------------------------------
+.expect|event/1.0
+.#-----------------------------------------------------
+beginDocument
+beginParagraph
+beginLink [Reference = [http://reference]] [false] [[param1]=[value1]]
+onWord [http]
+onSpecialSymbol [:]
+onSpecialSymbol [/]
+onSpecialSymbol [/]
+onWord [reference]
+endLink [Reference = [http://reference]] [false] [[param1]=[value1]]
+endParagraph
+endDocument
+.#-----------------------------------------------------
+.expect|xwiki/2.0
+.#-----------------------------------------------------
+[[http:~~/~~/reference>>http://reference||param1="value1"]]
+.#-----------------------------------------------------
+.expect|xhtml/1.0
+.#-----------------------------------------------------
+<p><span class="wikiexternallink"><a param1="value1" href="http://reference">http://reference</a></span></p>

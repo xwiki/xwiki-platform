@@ -128,7 +128,8 @@ public class WikiModelXHTMLParser extends AbstractWikiModelParser
         handlers.put("h4", handler);
         handlers.put("h5", handler);
         handlers.put("h6", handler);
-        handlers.put("a", new XWikiReferenceTagHandler());
+        handlers.put("a", new XWikiReferenceTagHandler(this, this.linkParser, this.imageParser,
+            this.xwikiSyntaxPrintRendererFactory, this.plainRendererFactory));
         handlers.put("img", new XWikiImageTagHandler());
         handlers.put("span", new XWikiSpanTagHandler());
         handlers.put("div", new XWikiDivisionTagHandler());

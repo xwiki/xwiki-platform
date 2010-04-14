@@ -99,7 +99,7 @@ public class FormUrlEncodedObjectReader implements MessageBodyReader<Object>, XW
                 if (name.startsWith(PROPERTY_PREFIX)) {
                     Property property = objectFactory.createProperty();
                     property.setName(name.replace(PROPERTY_PREFIX, ""));
-                    property.setValue(httpServletRequest.getParameter(name));
+                    property.setValue(form.getFirstValue(name));
                     object.getProperties().add(property);
                 }
             }

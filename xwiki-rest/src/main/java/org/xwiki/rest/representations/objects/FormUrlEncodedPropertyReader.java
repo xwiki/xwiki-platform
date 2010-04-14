@@ -81,7 +81,7 @@ public class FormUrlEncodedPropertyReader implements MessageBodyReader<Property>
             while (names.hasMoreElements()) {
                 String name = (String) names.nextElement();
                 if (name.startsWith(PROPERTY_PREFIX)) {
-                    property.setName(name);
+                    property.setName(name.replace(PROPERTY_PREFIX, ""));
                     property.setValue(httpServletRequest.getParameter(name));
                     break;
                 }
@@ -89,8 +89,8 @@ public class FormUrlEncodedPropertyReader implements MessageBodyReader<Property>
         } else {
             for (String name : form.getNames())
                 if (name.startsWith(PROPERTY_PREFIX)) {
-                    property.setName(name);
-                    property.setValue(httpServletRequest.getParameter(name));
+                    property.setName(name.replace(PROPERTY_PREFIX, ""));
+                    property.setValue(form.getFirstValue(name));
                     break;
                 }
         }

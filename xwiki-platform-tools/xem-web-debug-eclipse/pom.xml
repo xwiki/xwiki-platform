@@ -30,14 +30,14 @@
     <version>2.3-SNAPSHOT</version>
   </parent>
   <artifactId>xem-web-debug</artifactId>
-  <version>2.3-SNAPSHOT</version>
+  <version>2.4-SNAPSHOT</version>
   <name>xem-web-debug</name>
   <packaging>war</packaging>
   <description>xem-web-debug</description>
   <scm>
-    <connection>scm:svn:http://svn.xwiki.org/svnroot/xwiki/platform/xwiki-tools/branches/xem-web-debug-eclipse-2.3</connection>
-    <developerConnection>scm:svn:https://svn.xwiki.org/svnroot/xwiki/platform/xwiki-tools/branches/xem-web-debug-eclipse-2.3</developerConnection>
-    <url>http://svn.xwiki.org/svnroot/xwiki/platform/xwiki-tools/branches/xem-web-debug-eclipse-2.3</url>
+    <connection>scm:svn:http://svn.xwiki.org/svnroot/xwiki/platform/xwiki-tools/trunk/xem-web-debug-eclipse</connection>
+    <developerConnection>scm:svn:https://svn.xwiki.org/svnroot/xwiki/platform/xwiki-tools/trunk/xem-web-debug-eclipse</developerConnection>
+    <url>http://svn.xwiki.org/svnroot/xwiki/platform/xwiki-tools/trunk/xem-web-debug-eclipse</url>
   </scm>
   <properties>
     <!-- Used by gwt and wysiwyg modules -->

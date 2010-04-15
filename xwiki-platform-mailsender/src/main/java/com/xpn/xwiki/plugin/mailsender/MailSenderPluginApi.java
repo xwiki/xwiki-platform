@@ -136,6 +136,7 @@ public class MailSenderPluginApi extends PluginApi<MailSenderPlugin> implements 
             return getProtectedPlugin().sendMailFromTemplate(documentFullName, from, to, cc, bcc, language, vcontext,
                 this.context);
         } catch (Exception e) {
+            // If the exception is a null pointer exception there is no message and e.getMessage() is null.
             if (e.getMessage() != null) {
                 this.context.put("error", e.getMessage());
             }

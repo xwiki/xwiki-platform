@@ -41,9 +41,10 @@
         <configuration>
           <includes>
             <include>**/RenderingTests.java</include>
+            <include>**/RangeParserTests.java</include>
           </includes>
-        </configuration>     
-      </plugin>      
+        </configuration>
+      </plugin>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-checkstyle-plugin</artifactId>

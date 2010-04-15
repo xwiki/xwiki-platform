@@ -20,6 +20,7 @@
 package org.xwiki.chart.internal.source;
 
 import java.util.Map;
+import java.util.regex.Pattern;
 
 import org.xwiki.chart.model.ChartModel;
 import org.xwiki.chart.model.DefaultChartModel;
@@ -41,6 +42,9 @@ import org.xwiki.rendering.renderer.printer.WikiPrinter;
  */
 public abstract class AbstractTableBlockDataSource implements ChartDataSource
 {
+    /** The number of letters that can be used in the column identifier. */
+    private static final int LETTER_RANGE_LENGTH = 'Z' - 'A' + 1;
+
     /**
      * Identifies the data range to be used for plotting.
      */
@@ -51,16 +55,51 @@ public abstract class AbstractTableBlockDataSource implements ChartDataSource
      */
     private static final String RANGE_SEPERATOR = "-";
 
-    /**
-     * Regex for specifying a table cell. (for range)
-     */
-    private static final String RANGE_PATTERN = "[A-Z][0-9]+";
-    
+    /** Regex matching a table column (for ranges). */
+    private static final String RANGE_COLUMN_REGEX = "[A-Z]{1,2}";
+
+    /** Regex matching a table row (for ranges). */
+    private static final String RANGE_ROW_REGEX = "[0-9]+";
+
+    /** Regex matching a table cell (for ranges). */
+    private static final String RANGE_CELL_REGEX = RANGE_COLUMN_REGEX + RANGE_ROW_REGEX;
+
+    /** Pattern matching the range separator, useful for splitting the range string. */
+    private static final Pattern RANGE_SEPERATOR_PATTERN = Pattern.compile(RANGE_SEPERATOR);
+
+    /** Pattern matching the column in a cell identifier. */
+    private static final Pattern RANGE_COLUMN_PATTERN = Pattern.compile(RANGE_COLUMN_REGEX);
+
+    /** Pattern matching the cell range. Useful for validating the range parameter. */
+    private static final Pattern RANGE_PATTERN =
+        Pattern.compile("^" + RANGE_CELL_REGEX + RANGE_SEPERATOR + RANGE_CELL_REGEX);
+
     /**
      * Used to convert cell blocks in plain text so that it can be converted to numbers.
      */
     @Requirement("plain/1.0")
     private BlockRenderer plainTextBlockRenderer;
+
+    /**
+     * Converts a column identifier ('G4') into a column index number (6).
+     * 
+     * @param identifier the cell identifier, containing a column ([A-Z]{1,2}) and a row ([0-9]+) specifier
+     * @return the column number extracted from the identifier
+     */
+    public static int getColumnNumberFromIdentifier(String identifier)
+    {
+        int i = 0;
+        int result = -1;
+        char j;
+        while (i < identifier.length()) {
+            j = identifier.charAt(i++);
+            if (!Character.isUpperCase(j)) {
+                break;
+            }
+            result = (result + 1) * LETTER_RANGE_LENGTH + j - 'A';
+        }
+        return result;
+    }
 
     /**
      * {@inheritDoc}
@@ -180,7 +219,8 @@ public abstract class AbstractTableBlockDataSource implements ChartDataSource
     {
         String range = macroParameters.get(RANGE_PARAM);
         if (range != null) {
-            if (!range.matches(RANGE_PATTERN + RANGE_SEPERATOR + RANGE_PATTERN)) {
+
+            if (!RANGE_PATTERN.matcher(range).matches()) {
                 throw new MacroExecutionException(String.format("Invalid range specification: [%s].", range));
             }
 
@@ -189,11 +229,12 @@ public abstract class AbstractTableBlockDataSource implements ChartDataSource
             int endRow;
             int endColumn;
 
-            String[] rangeSegments = range.split(RANGE_SEPERATOR);
-            startColumn = rangeSegments[0].charAt(0) - 'A';
-            endColumn = rangeSegments[1].charAt(0) - 'A';
-            startRow = Integer.parseInt(rangeSegments[0].substring(1)) - 1;
-            endRow = Integer.parseInt(rangeSegments[1].substring(1)) - 1;
+            String[] rangeSegments = RANGE_SEPERATOR_PATTERN.split(range);
+
+            startColumn = getColumnNumberFromIdentifier(rangeSegments[0]);
+            endColumn = getColumnNumberFromIdentifier(rangeSegments[1]);
+            startRow = Integer.parseInt(RANGE_COLUMN_PATTERN.matcher(rangeSegments[0]).replaceFirst("")) - 1;
+            endRow = Integer.parseInt(RANGE_COLUMN_PATTERN.matcher(rangeSegments[1]).replaceFirst("")) - 1;
 
             if (startColumn > endColumn || startRow > endRow) {
                 throw new MacroExecutionException(String.format("Invalid data range: [%s].", range));
@@ -210,7 +251,7 @@ public abstract class AbstractTableBlockDataSource implements ChartDataSource
                 return new int[] {0, 0, rowCount - 1, columnCount - 1};
             }
         }
-        
+
         throw new MacroExecutionException("Data table is incomplete.");
     }
 

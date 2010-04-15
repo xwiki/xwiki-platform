@@ -236,8 +236,6 @@ public class XWikiDocument implements DocumentModelBridge
 
     private int translation;
 
-    private BaseObject tags;
-
     /**
      * Indicates whether the document is 'hidden', meaning that it should not be returned in public search results.
      * WARNING: this is a temporary hack until the new data model is designed and implemented. No code should rely on or
@@ -2883,7 +2881,7 @@ public class XWikiDocument implements DocumentModelBridge
         setMinorEdit(eform.isMinorEdit());
 
         String tags = eform.getTags();
-        if (tags != null) {
+        if (!StringUtils.isEmpty(tags)) {
             setTags(tags, context);
         }
 
@@ -2897,25 +2895,24 @@ public class XWikiDocument implements DocumentModelBridge
     /**
      * add tags to the document.
      */
-    public void setTags(String tags, XWikiContext context) throws XWikiException
+    public void setTags(String tagsStr, XWikiContext context) throws XWikiException
     {
-        loadTags(context);
+        BaseClass tagsClass = context.getWiki().getTagClass(context);
 
-        StaticListClass tagProp =
-                (StaticListClass) this.tags.getXClass(context).getField(XWikiConstant.TAG_CLASS_PROP_TAGS);
-        tagProp.fromString(tags);
-        this.tags.safeput(XWikiConstant.TAG_CLASS_PROP_TAGS, tagProp.fromString(tags));
+        StaticListClass tagProp = (StaticListClass) tagsClass.getField(XWikiConstant.TAG_CLASS_PROP_TAGS);
+
+        BaseObject tags = getObject(XWikiConstant.TAG_CLASS, true, context);
+
+        tags.safeput(XWikiConstant.TAG_CLASS_PROP_TAGS, tagProp.fromString(tagsStr));
+
         setMetaDataDirty(true);
     }
 
     public String getTags(XWikiContext context)
     {
         ListProperty prop = (ListProperty) getTagProperty(context);
-        if (prop != null) {
-            return prop.getTextValue();
-        }
 
-        return null;
+        return prop != null ? prop.getTextValue() : "";
     }
 
     public List<String> getTagsList(XWikiContext context)
@@ -2932,24 +2929,28 @@ public class XWikiDocument implements DocumentModelBridge
 
     private BaseProperty getTagProperty(XWikiContext context)
     {
-        loadTags(context);
-        return ((BaseProperty) this.tags.safeget(XWikiConstant.TAG_CLASS_PROP_TAGS));
-    }
+        BaseObject tags = getObject(XWikiConstant.TAG_CLASS);
 
-    private void loadTags(XWikiContext context)
-    {
-        if (this.tags == null) {
-            this.tags = getObject(XWikiConstant.TAG_CLASS, true, context);
-        }
+        return tags != null ? ((BaseProperty) tags.safeget(XWikiConstant.TAG_CLASS_PROP_TAGS)) : null;
     }
 
     public List<String> getTagsPossibleValues(XWikiContext context)
     {
-        loadTags(context);
-        String possibleValues =
-                ((StaticListClass) this.tags.getXClass(context).getField(XWikiConstant.TAG_CLASS_PROP_TAGS)).getValues();
-        return ListClass.getListFromString(possibleValues);
-        // ((BaseProperty) this.tags.safeget(XWikiConstant.TAG_CLASS_PROP_TAGS)).toString();
+        List<String> list;
+
+        try {
+            BaseClass tagsClass = context.getWiki().getTagClass(context);
+            
+            String possibleValues = ((StaticListClass) tagsClass.getField(XWikiConstant.TAG_CLASS_PROP_TAGS)).getValues();
+
+            return ListClass.getListFromString(possibleValues);
+        } catch (XWikiException e) {
+            LOG.error("Failed to get tag class", e);
+
+            list = Collections.emptyList();
+        }
+
+        return list;
     }
 
     public void readTranslationMetaFromForm(EditForm eform, XWikiContext context) throws XWikiException
@@ -7302,8 +7303,8 @@ public class XWikiDocument implements DocumentModelBridge
     public DocumentReference resolveClassReference(String documentName)
     {
         DocumentReference defaultReference =
-                new DocumentReference(getDocumentReference().getWikiReference().getName(), "XWiki",
-                    getDocumentReference().getName());
+            new DocumentReference(getDocumentReference().getWikiReference().getName(), "XWiki", getDocumentReference()
+                .getName());
         return this.explicitDocumentReferenceResolver.resolve(documentName, defaultReference);
     }
 

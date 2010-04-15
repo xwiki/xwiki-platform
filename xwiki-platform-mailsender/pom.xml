@@ -106,4 +106,23 @@
     <system>jira</system>
     <url>http://jira.xwiki.org/jira/browse/XPMAIL</url>
   </issueManagement>
+  <build>
+    <plugins>
+      <plugin>
+        <!-- Apply the Checkstyle configurations defined in the top level pom.xml file -->
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-checkstyle-plugin</artifactId>
+        <configuration>
+          <excludes>
+            com/xpn/xwiki/plugin/mailsender/Mail.java,
+            com/xpn/xwiki/plugin/mailsender/MailConfiguration.java,
+            com/xpn/xwiki/plugin/mailsender/MailSender.java,
+            com/xpn/xwiki/plugin/mailsender/MimeTypesUtil.java,
+            com/xpn/xwiki/plugin/mailsender/MailSenderPlugin.java,
+            com/xpn/xwiki/plugin/mailsender/MailSenderPluginApi.java
+          </excludes>
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
 </project>

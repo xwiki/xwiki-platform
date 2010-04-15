@@ -1035,7 +1035,7 @@ public class XWikiDocument implements DocumentModelBridge
      * @return the document title. If a title has not been provided, look for a section title in the document's content
      *         and if not found return the page name. The returned title is also interpreted which means it's allowed to
      *         use Velocity, Groovy, etc syntax within a title.
-     * @deprecated use {@link #getRenderedContentTitle(Syntax, XWikiContext)} instead
+     * @deprecated use {@link #getRenderedTitle(Syntax, XWikiContext)} instead
      */
     @Deprecated
     public String getDisplayTitle(XWikiContext context)
@@ -1070,11 +1070,11 @@ public class XWikiDocument implements DocumentModelBridge
     }
 
     /**
-     * Get the rendered version of the first of second level first found header content in the document content.
+     * Get the rendered version of the first or second level first found header content in the document content.
      * <ul>
      * <li>xwiki/1.0: the first found first or second level header content is rendered with
      * {@link XWikiRenderingEngine#interpretText(String, XWikiDocument, XWikiContext)}</li>
-     * <li>xwiki/2.0: the first found first or seconf level content is executed and rendered with renderer for the
+     * <li>xwiki/2.0: the first found first or second level content is executed and rendered with renderer for the
      * provided syntax</li>
      * </ul>
      * 
@@ -1093,7 +1093,9 @@ public class XWikiDocument implements DocumentModelBridge
             List<HeaderBlock> blocks = getXDOM().getChildrenByType(HeaderBlock.class, true);
             if (blocks.size() > 0) {
                 HeaderBlock header = blocks.get(0);
-                if (header.getLevel().compareTo(HeaderLevel.LEVEL2) <= 0) {
+                // Check the header depth after which we should return null if no header was found. 
+                int titleHeaderDepth = (int) context.getWiki().ParamAsLong("xwiki.title.headerdepth", 2);
+                if (header.getLevel().getAsInt() <= titleHeaderDepth) {
                     XDOM headerXDOM = new XDOM(Collections.<Block> singletonList(header));
 
                     // transform

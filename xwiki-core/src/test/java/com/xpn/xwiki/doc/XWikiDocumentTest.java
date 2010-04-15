@@ -219,10 +219,30 @@ public class XWikiDocumentTest extends AbstractBridgedXWikiComponentTestCase
         assertEquals("Title", this.document.getDisplayTitle(getContext()));
     }
 
+    public void testGetRenderedTitleWhenMatchingTitleHeaderDepth()
+    {
+        this.document.setContent("=== level3");
+        this.document.setSyntax(Syntax.XWIKI_2_0);
+
+        this.mockXWiki.stubs().method("ParamAsLong").will(returnValue(3L));
+
+        assertEquals("level3", this.document.getRenderedTitle(Syntax.XHTML_1_0, getContext()));
+    }
+
+    public void testGetRenderedTitleWhenNotMatchingTitleHeaderDepth()
+    {
+        this.document.setContent("=== level3");
+        this.document.setSyntax(Syntax.XWIKI_2_0);
+
+        this.mockXWiki.stubs().method("ParamAsLong").will(returnValue(2L));
+
+        assertEquals("Page", this.document.getRenderedTitle(Syntax.XHTML_1_0, getContext()));
+    }
+
     /**
      * Verify that if an error happens when evaluation the title, we fallback to the computed title.
      */
-    public void testGetDisplayWhenVelocityError()
+    public void testGetDisplayTitleWhenVelocityError()
     {
         this.document.setContent("Some content");
         this.document.setTitle("some content that generate a velocity error");

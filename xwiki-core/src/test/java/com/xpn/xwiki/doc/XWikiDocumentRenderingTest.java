@@ -124,6 +124,7 @@ public class XWikiDocumentRenderingTest extends AbstractBridgedXWikiComponentTes
         this.mockXWiki.stubs().method("getDocument").will(returnValue(this.document));
         this.mockXWiki.stubs().method("getLanguagePreference").will(returnValue("en"));
         this.mockXWiki.stubs().method("exists").will(returnValue(false));
+        this.mockXWiki.stubs().method("ParamAsLong").will(returnValue(2L));
 
         getContext().setWiki((XWiki) this.mockXWiki.proxy());
 

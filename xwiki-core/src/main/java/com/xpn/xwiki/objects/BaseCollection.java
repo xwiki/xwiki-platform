@@ -173,8 +173,8 @@ public abstract class BaseCollection extends BaseElement implements ObjectInterf
         // Ensure we always return an absolute references since we always want well-constructed to be used from outside
         // this class.
         if (this.xClassReferenceCache == null && getRelativeXClassReference() != null) {
-            this.xClassReferenceCache = resolveReference(getRelativeXClassReference(),
-                this.currentReferenceDocumentReferenceResolver, getDocumentReference());
+            this.xClassReferenceCache = this.currentReferenceDocumentReferenceResolver
+                .resolve(getRelativeXClassReference(), getDocumentReference());
         }
 
         return this.xClassReferenceCache;
@@ -854,24 +854,5 @@ public abstract class BaseCollection extends BaseElement implements ObjectInterf
         // We force to refresh the XClass reference so that next time it's retrieved again it'll be resolved against
         // the new document reference.
         this.xClassReferenceCache = null;
-    }
-
-    private <T> DocumentReference resolveReference(T referenceToResolve, DocumentReferenceResolver<T> resolver,
-        DocumentReference defaultReference)
-    {
-        XWikiContext xcontext =
-            (XWikiContext) Utils.getComponent(Execution.class).getContext().getProperty("xwikicontext");
-
-        String originalWikiName = xcontext.getDatabase();
-        XWikiDocument originalCurentDocument = xcontext.getDoc();
-        try {
-            xcontext.setDatabase(defaultReference.getWikiReference().getName());
-            xcontext.setDoc(new XWikiDocument(defaultReference));
-
-            return resolver.resolve(referenceToResolve);
-        } finally {
-            xcontext.setDoc(originalCurentDocument);
-            xcontext.setDatabase(originalWikiName);
-        }
     }
 }

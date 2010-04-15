@@ -136,7 +136,9 @@ public class MailSenderPluginApi extends PluginApi<MailSenderPlugin> implements 
             return getProtectedPlugin().sendMailFromTemplate(documentFullName, from, to, cc, bcc, language, vcontext,
                 this.context);
         } catch (Exception e) {
-            this.context.put("error", e.getMessage());
+            if (e.getMessage() != null) {
+                this.context.put("error", e.getMessage());
+            }
             LOG.error("sendMessageFromTemplate", e);
             return -1;
         }

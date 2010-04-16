@@ -36,7 +36,7 @@
   <properties>
     <platform.core.version>2.2.3</platform.core.version>
     <platform.plugin.scheduler.version>1.18-SNAPSHOT</platform.plugin.scheduler.version>
-    <platform.plugin.mailsender.version>1.14-SNAPSHOT</platform.plugin.mailsender.version>
+    <platform.plugin.mailsender.version>1.15-SNAPSHOT</platform.plugin.mailsender.version>
     <platform.plugin.activitystream.version>1.7-SNAPSHOT</platform.plugin.activitystream.version>
   </properties>
   <dependencies>

@@ -209,6 +209,28 @@ public class InsertHTMLExecutableTest extends RichTextAreaTestCase
     }
 
     /**
+     * Tests if the selected text is correctly deleted when it is followed by a space character.
+     */
+    public void testReplaceTextFollowedBySpace()
+    {
+        deferTest(new Command()
+        {
+            public void execute()
+            {
+                rta.setHTML("<p><span>before</span> after</p>");
+
+                Range range = rta.getDocument().createRange();
+                range.selectNodeContents(getBody().getFirstChild().getFirstChild());
+                select(range);
+
+                assertEquals("before", rta.getDocument().getSelection().toString());
+                assertTrue(executable.execute("start"));
+                assertEquals("<p><span>start</span>&nbsp;after</p>", getBody().getInnerHTML().toLowerCase());
+            }
+        });
+    }
+
+    /**
      * Tests if a button is properly replaced. What is important is that the caret doesn't move inside a sibling node
      * after the selected button is deleted. The caret must remain between nodes so that the HTML fragment is inserted
      * in the right place.

@@ -21,6 +21,7 @@ package org.xwiki.gwt.user.client.ui.rta.cmd.internal;
 
 import org.xwiki.gwt.dom.client.Range;
 import org.xwiki.gwt.dom.client.Selection;
+import org.xwiki.gwt.dom.client.internal.ie.TextRange;
 
 /**
  * Overwrites {@link DeleteExecutableImpl} with a custom implementation for Internet Explorer to overcome a bug in the
@@ -50,6 +51,17 @@ public class DeleteExecutableImplIE extends DeleteExecutableImpl
             selection.addRange(range);
             return true;
         } else {
+            // If the text to be deleted is followed by a space we need to replace it by a non-breaking space because
+            // otherwise IE leaves the DOM tree in an invalid state after the delete command is executed and accessing
+            // the following text node afterwards leads to an "Invalid argument" exception. This odd IE behavior happens
+            // only if the text node containing the space character following the selection is accessed using DOM API
+            // before the delete command is executed. Since we can't know if this text node was accessed or not, we
+            // always replace the following space, if present, with a non-breaking space.
+            TextRange textRange = getTextRange(selection);
+            textRange.collapse(false);
+            if (textRange.moveEnd(TextRange.Unit.CHARACTER, 1) > 0 && " ".equals(textRange.getHTML())) {
+                textRange.setText("\u00A0");
+            }
             return super.deleteSelection(selection);
         }
     }
@@ -61,5 +73,14 @@ public class DeleteExecutableImplIE extends DeleteExecutableImpl
     private native boolean isControlSelection(Selection selection)
     /*-{
         return selection.@org.xwiki.gwt.dom.client.internal.ie.IESelection::nativeSelection.type == 'Control';
+    }-*/;
+
+    /**
+     * @param selection a text selection
+     * @return the text range that delimits the selection
+     */
+    private native TextRange getTextRange(Selection selection)
+    /*-{
+        return selection.@org.xwiki.gwt.dom.client.internal.ie.IESelection::nativeSelection.createRange();
     }-*/;
 }

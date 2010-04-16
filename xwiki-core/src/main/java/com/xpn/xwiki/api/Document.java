@@ -1492,7 +1492,7 @@ public class Document extends Api
     {
         try {
             return getXWikiContext().getWiki().getRightService().hasAccessLevel(level, getXWikiContext().getUser(),
-                this.doc.getFullName(), getXWikiContext());
+                this.doc.getPrefixedFullName(), getXWikiContext());
         } catch (Exception e) {
             return false;
         }
@@ -1502,8 +1502,8 @@ public class Document extends Api
     public boolean hasAccessLevel(String level, String user)
     {
         try {
-            return getXWikiContext().getWiki().getRightService().hasAccessLevel(level, user, this.doc.getFullName(),
-                getXWikiContext());
+            return getXWikiContext().getWiki().getRightService().hasAccessLevel(level, user,
+                this.doc.getPrefixedFullName(), getXWikiContext());
         } catch (Exception e) {
             return false;
         }

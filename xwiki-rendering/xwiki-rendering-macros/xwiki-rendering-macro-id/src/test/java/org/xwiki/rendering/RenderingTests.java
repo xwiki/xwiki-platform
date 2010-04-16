@@ -39,6 +39,7 @@ public class RenderingTests extends TestCase
 
         suite.addTestsFromResource("macroid1", true);
         suite.addTestsFromResource("macroid2", true);
+        suite.addTestsFromResource("macroid3", true);
 
         return new ComponentManagerTestSetup(suite);
     }

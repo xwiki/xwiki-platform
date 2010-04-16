@@ -143,6 +143,11 @@ public class CalendarData
         if (doc == null) {
             return;
         }
+        
+        if (!context.getWiki().getRightService().hasAccessLevel("view", context.getUser(), doc.getFullName(), context)) {
+        	return;
+        }
+        
         if (defaultUser == null) {
             BaseObject bobj = doc.getObject("XWiki.XWikiUsers");
             if (bobj == null) {

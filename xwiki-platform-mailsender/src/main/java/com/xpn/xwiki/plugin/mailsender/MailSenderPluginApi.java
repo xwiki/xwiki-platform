@@ -166,7 +166,10 @@ public class MailSenderPluginApi extends PluginApi<MailSenderPlugin> implements 
         try {
             getProtectedPlugin().sendMail(mail, this.context);
         } catch (Exception e) {
-            this.context.put("error", e.getMessage());
+            // If the exception is a null pointer exception there is no message and e.getMessage() is null.
+            if (e.getMessage() != null) {
+                this.context.put("error", e.getMessage());
+            }
             LOG.error("Failed to send email [" + mail.toString() + "]", e);
             result = -1;
         }
@@ -195,7 +198,10 @@ public class MailSenderPluginApi extends PluginApi<MailSenderPlugin> implements 
         try {
             getProtectedPlugin().sendMail(mail, mailConfiguration, this.context);
         } catch (Exception e) {
-            this.context.put("error", e.getMessage());
+            // If the exception is a null pointer exception there is no message and e.getMessage() is null.
+            if (e.getMessage() != null) {
+                this.context.put("error", e.getMessage());
+            }
             LOG.error("Failed to send email [" + mail.toString() + "] using mail configuration ["
                 + mailConfiguration.toString() + "]", e);
             result = -1;

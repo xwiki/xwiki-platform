@@ -251,8 +251,9 @@ public class Element extends com.google.gwt.dom.client.Element
      */
     public final DocumentFragment getMetaData()
     {
-        DocumentFragment metaData = (DocumentFragment) ((JavaScriptObject) cast()).get(META_DATA_REF);
-        if (metaData == null) {
+        DocumentFragment metaData = (DocumentFragment) getPropertyObject(META_DATA_REF);
+        // We check the node type because the previous cast has no effect in JavaScript.
+        if (metaData == null || metaData.getNodeType() != DOMUtils.DOCUMENT_FRAGMENT_NODE) {
             // There's no saved reference to the meta data.
             // Test if this element has stored meta data.
             if (xHasAttribute(META_DATA_ATTR)) {
@@ -262,7 +263,7 @@ public class Element extends com.google.gwt.dom.client.Element
                 // Set the inner HTML without notifying the listeners to prevent the meta data from being altered.
                 DOMUtils.getInstance().setInnerHTML(container, getAttribute(META_DATA_ATTR));
                 metaData = container.extractContents();
-                ((JavaScriptObject) cast()).set(META_DATA_REF, metaData);
+                setPropertyObject(META_DATA_REF, metaData);
             }
         }
         return metaData;
@@ -277,7 +278,7 @@ public class Element extends com.google.gwt.dom.client.Element
     {
         if (metaData != null) {
             // Save a reference to the meta data for fast retrieval.
-            ((JavaScriptObject) cast()).set(META_DATA_REF, metaData);
+            setPropertyObject(META_DATA_REF, metaData);
             // We have to serialize the meta data and store it using a custom attribute to avoid loosing the meta data
             // over node cloning or copy&paste. The custom attribute used for storing the meta data should be filtered
             // when getting the outer HTML.
@@ -390,6 +391,13 @@ public class Element extends com.google.gwt.dom.client.Element
 
     /**
      * Removes a property from this element.
+     * <p>
+     * NOTE: Dynamic properties (expandos) can't be removed from a DOM node in IE 6 and 7. Setting their value to
+     * {@code null} or {@code undefined} makes them appear in the HTML serialization as attributes. Removing the
+     * corresponding attribute fails in IE7 if the property value is shared between multiple elements, which can happen
+     * if elements are cloned. The only solution we've found is to set the property to an empty JavaScript object in IE.
+     * You should test if the value returned by {@link #getPropertyObject(String)} or {@link #getPropertyJSO(String)} is
+     * not {@code null} and also if it matches your expected type.
      * 
      * @param propertyName the name of the property to be removed
      * @see #setPropertyBoolean(String, boolean)

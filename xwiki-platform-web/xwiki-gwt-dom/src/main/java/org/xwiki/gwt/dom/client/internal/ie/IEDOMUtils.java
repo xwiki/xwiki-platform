@@ -266,7 +266,7 @@ public class IEDOMUtils extends DOMUtils
     public void removeProperty(Element element, String propertyName)
     {
         super.removeProperty(element, propertyName);
-        element.removeAttribute(propertyName);
+        removeAttribute(element, propertyName);
     }
 
     /**

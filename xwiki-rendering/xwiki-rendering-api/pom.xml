@@ -205,9 +205,11 @@
             <groupId>org.codehaus.mojo</groupId>
             <artifactId>clirr-maven-plugin</artifactId>
             <configuration>
-              <!-- TODO: To be removed when we release XWiki 2.4 -->
+              <!-- TODO: To be removed once XWiki 2.3 is released -->
+              <comparisonVersion>2.3-SNAPSHOT</comparisonVersion>
               <excludes>
                 <exclude>**/internal/**</exclude>
+                <!-- TODO: Excludes below to be removed when we release XWiki 2.4 -->
               </excludes>
             </configuration>
           </plugin>

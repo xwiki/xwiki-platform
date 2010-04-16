@@ -24,6 +24,8 @@ import org.xwiki.gwt.dom.client.Range;
 import org.xwiki.gwt.user.client.ui.rta.RichTextArea;
 import org.xwiki.gwt.user.client.ui.rta.cmd.internal.AbstractSelectionExecutable;
 
+import com.google.gwt.dom.client.AnchorElement;
+
 
 /**
  * Executable for the unlink command, to remove a link in the wiki document. The command will be enabled whenever a 
@@ -51,7 +53,7 @@ public class UnlinkExecutable extends AbstractSelectionExecutable
     public boolean execute(String param)
     {
         // Get the selected anchor
-        Element selectedAnchor = LinkExecutableUtils.getSelectedAnchor(rta);
+        AnchorElement selectedAnchor = LinkExecutableUtils.getSelectedAnchor(rta);
         if (selectedAnchor == null) {
             return false;
         }
@@ -72,9 +74,9 @@ public class UnlinkExecutable extends AbstractSelectionExecutable
         }
         if (moveSelection && (isEnd || isBeginning) && selectedAnchor.getOffsetWidth() > 0) {
             // cursor it's at the beginning or at the end, move it out of the anchor
-            moveCaretOuside(rta, selectedAnchor, isEnd);
+            moveCaretOuside(rta, Element.as(selectedAnchor), isEnd);
         } else {
-            selectedAnchor.unwrap();
+            Element.as(selectedAnchor).unwrap();
         }
         return true;
     }

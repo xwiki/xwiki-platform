@@ -24,6 +24,7 @@ import org.xwiki.gwt.dom.client.DocumentFragment;
 import org.xwiki.gwt.dom.client.Element;
 import org.xwiki.gwt.dom.client.Style;
 import org.xwiki.gwt.user.client.StringUtils;
+import org.xwiki.gwt.user.client.ui.rta.cmd.internal.AbstractInsertElementExecutable.ConfigHTMLParser;
 import org.xwiki.gwt.wysiwyg.client.plugin.image.ImageConfig.ImageAlignment;
 
 import com.google.gwt.dom.client.ImageElement;
@@ -34,13 +35,12 @@ import com.google.gwt.dom.client.Node;
  * 
  * @version $Id$
  */
-public class ImageConfigHTMLParser
+public class ImageConfigHTMLParser implements ConfigHTMLParser<ImageConfig, ImageElement>
 {
     /**
-     * Creates a new {@link ImageConfig} from the given {@link ImageElement}.
+     * {@inheritDoc}
      * 
-     * @param image an image DOM element
-     * @return the newly created image configuration object
+     * @see ConfigHTMLParser#parse(com.google.gwt.dom.client.Element)
      */
     public ImageConfig parse(ImageElement image)
     {

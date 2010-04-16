@@ -23,21 +23,17 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.xwiki.gwt.dom.client.Element;
-import org.xwiki.gwt.dom.client.Range;
 import org.xwiki.gwt.user.client.Config;
 import org.xwiki.gwt.user.client.ui.rta.RichTextArea;
 import org.xwiki.gwt.user.client.ui.rta.cmd.Command;
 import org.xwiki.gwt.user.client.ui.rta.cmd.Executable;
 import org.xwiki.gwt.user.client.ui.wizard.Wizard;
 import org.xwiki.gwt.user.client.ui.wizard.WizardListener;
-import org.xwiki.gwt.wysiwyg.client.plugin.image.ImageConfigJSONParser;
 import org.xwiki.gwt.wysiwyg.client.plugin.internal.AbstractPlugin;
 import org.xwiki.gwt.wysiwyg.client.plugin.link.exec.CreateLinkExecutable;
-import org.xwiki.gwt.wysiwyg.client.plugin.link.exec.LinkExecutableUtils;
 import org.xwiki.gwt.wysiwyg.client.plugin.link.exec.UnlinkExecutable;
 import org.xwiki.gwt.wysiwyg.client.plugin.link.ui.LinkWizard;
 import org.xwiki.gwt.wysiwyg.client.plugin.link.ui.LinkWizard.LinkWizardSteps;
-import org.xwiki.gwt.wysiwyg.client.wiki.ResourceName;
 import org.xwiki.gwt.wysiwyg.client.wiki.WikiServiceAsync;
 
 /**
@@ -74,14 +70,19 @@ public class LinkPlugin extends AbstractPlugin implements WizardListener
     private Map<Command, Executable> originalExecutables;
 
     /**
+     * The object used to create link configuration objects.
+     */
+    private LinkConfigFactory linkConfigFactory;
+
+    /**
      * The service used to access the wiki.
      */
     private final WikiServiceAsync wikiService;
 
     /**
-     * The object used to parse image configuration from JSON.
+     * The object used to serialize a {@link LinkConfig} instance to JSON.
      */
-    private final ImageConfigJSONParser imageConfigJSONParser = new ImageConfigJSONParser();
+    private final LinkConfigJSONSerializer linkConfigJSONSerializer = new LinkConfigJSONSerializer();
 
     /**
      * Creates a new link plugin that will use the specified wiki service.
@@ -102,7 +103,7 @@ public class LinkPlugin extends AbstractPlugin implements WizardListener
     {
         super.init(textArea, config);
 
-        // add the custom executables
+        // Register custom executables.
         Executable createLinkExec =
             getTextArea().getCommandManager().registerCommand(Command.CREATE_LINK, new CreateLinkExecutable(textArea));
         Executable unlinkExec =
@@ -120,15 +121,18 @@ public class LinkPlugin extends AbstractPlugin implements WizardListener
         menuExtension = new LinkMenuExtension(this);
         getUIExtensionList().add(menuExtension);
 
-        // Initialize the metadata extractor, to handle link metadatas
+        // Initialize the meta data extractor to handle link meta data.
         metaDataExtractor = new LinkMetaDataExtractor();
-        // do the initial extracting on the loaded document
+        // Do the initial extracting on the loaded document.
         metaDataExtractor.onInnerHTMLChange((Element) getTextArea().getDocument().getDocumentElement());
         getTextArea().getDocument().addInnerHTMLListener(metaDataExtractor);
 
-        // create an empty link handler and add it to the RTA command manager
+        // Create an empty link handler and add it to the command manager
         linkFilter = new EmptyLinkFilter(getTextArea());
         getTextArea().getCommandManager().addCommandListener(linkFilter);
+
+        // Initialize the link configuration factory.
+        linkConfigFactory = new LinkConfigFactory(textArea);
     }
 
     /**
@@ -138,7 +142,7 @@ public class LinkPlugin extends AbstractPlugin implements WizardListener
      */
     public void destroy()
     {
-        // restore previous executables
+        // Restore previous executables.
         if (originalExecutables != null) {
             for (Map.Entry<Command, Executable> entry : originalExecutables.entrySet()) {
                 getTextArea().getCommandManager().registerCommand(entry.getKey(), entry.getValue());
@@ -150,10 +154,10 @@ public class LinkPlugin extends AbstractPlugin implements WizardListener
             metaDataExtractor = null;
         }
 
-        // remove the empty link filter from the text area
+        // Remove the empty link filter from the text area.
         getTextArea().getCommandManager().removeCommandListener(linkFilter);
 
-        // destroy menu extension
+        // Destroy menu extension.
         menuExtension.destroy();
         super.destroy();
     }
@@ -165,9 +169,9 @@ public class LinkPlugin extends AbstractPlugin implements WizardListener
      */
     public void onLinkInsert(LinkConfig.LinkType linkType)
     {
-        LinkConfig linkParams = getLinkParams();
-        linkParams.setType(linkType);
-        dispatchLinkWizard(linkParams);
+        LinkConfig linkConfig = linkConfigFactory.createLinkConfig();
+        linkConfig.setType(linkType);
+        dispatchLinkWizard(linkConfig);
     }
 
     /**
@@ -175,39 +179,36 @@ public class LinkPlugin extends AbstractPlugin implements WizardListener
      */
     public void onLinkEdit()
     {
-        LinkConfig editParams = getLinkParams();
-        dispatchLinkWizard(editParams);
+        dispatchLinkWizard(linkConfigFactory.createLinkConfig());
     }
 
     /**
      * Instantiates and runs the correct wizard for the passed link.
      * 
-     * @param linkParams the parameters of the link to be configured through the wizard
+     * @param linkConfig the link configuration object to be passed to the wizard
      */
-    protected void dispatchLinkWizard(LinkConfig linkParams)
+    protected void dispatchLinkWizard(LinkConfig linkConfig)
     {
-        switch (linkParams.getType()) {
+        switch (linkConfig.getType()) {
             case WIKIPAGE:
             case NEW_WIKIPAGE:
-                getLinkWizard().start(LinkWizardSteps.WIKI_PAGE.toString(), linkParams);
+                getLinkWizard().start(LinkWizardSteps.WIKI_PAGE.toString(), linkConfig);
                 break;
             case ATTACHMENT:
-                getLinkWizard().start(LinkWizardSteps.ATTACHMENT.toString(), linkParams);
+                getLinkWizard().start(LinkWizardSteps.ATTACHMENT.toString(), linkConfig);
                 break;
             case EMAIL:
-                getLinkWizard().start(LinkWizardSteps.EMAIL.toString(), linkParams);
+                getLinkWizard().start(LinkWizardSteps.EMAIL.toString(), linkConfig);
                 break;
             case EXTERNAL:
             default:
-                getLinkWizard().start(LinkWizardSteps.WEB_PAGE.toString(), linkParams);
+                getLinkWizard().start(LinkWizardSteps.WEB_PAGE.toString(), linkConfig);
                 break;
         }
     }
 
     /**
-     * Returns the link wizard.
-     * 
-     * @return the link wizard.
+     * @return the link wizard
      */
     private Wizard getLinkWizard()
     {
@@ -216,90 +217,6 @@ public class LinkPlugin extends AbstractPlugin implements WizardListener
             linkWizard.addWizardListener(this);
         }
         return linkWizard;
-    }
-
-    /**
-     * @return the link parameters for the current position of the cursor.
-     */
-    protected LinkConfig getLinkParams()
-    {
-        String configString = getTextArea().getCommandManager().getStringValue(Command.CREATE_LINK);
-        if (configString != null) {
-            return getEditLinkParams(configString);
-        } else {
-            return getCreateLinkParams();
-        }
-    }
-
-    /**
-     * Prepares the link parameters for a link edition, from the passed link parameter, as returned by the
-     * {@link CreateLinkExecutable#getParameter(RichTextArea)}.
-     * 
-     * @param linkCommandParameter the parameter of the executed {@link Command#CREATE_LINK} command.
-     * @return the link parameters for link editing
-     */
-    protected LinkConfig getEditLinkParams(String linkCommandParameter)
-    {
-        LinkConfig linkParam = new LinkConfig();
-        linkParam.fromJSON(linkCommandParameter);
-        Range range = getTextArea().getDocument().getSelection().getRangeAt(0);
-        Element wrappingAnchor = LinkExecutableUtils.getSelectedAnchor(getTextArea());
-        // check the content of the wrapping anchor, if it's an image, it should be handled specially
-        if (wrappingAnchor.getChildNodes().getLength() == 1
-            && wrappingAnchor.getChildNodes().getItem(0).getNodeName().equalsIgnoreCase("img")) {
-            Range imageRange = getTextArea().getDocument().createRange();
-            imageRange.selectNode(wrappingAnchor.getChildNodes().getItem(0));
-            getTextArea().getDocument().getSelection().removeAllRanges();
-            getTextArea().getDocument().getSelection().addRange(imageRange);
-            String imageParam = getTextArea().getCommandManager().getStringValue(Command.INSERT_IMAGE);
-            if (imageParam != null) {
-                // it's an image selection, set the label readonly and put the image filename in the label text
-                parseLabelFromImage(linkParam, imageParam);
-            } else {
-                linkParam.setLabelText(wrappingAnchor.getInnerText());
-            }
-        }
-        // move the selection around the link, to replace it properly upon edit
-        range.selectNode(wrappingAnchor);
-        getTextArea().getDocument().getSelection().removeAllRanges();
-        getTextArea().getDocument().getSelection().addRange(range);
-
-        return linkParam;
-    }
-
-    /**
-     * Prepares the link parameters for a link creation, i.e. sets the link labels.
-     * 
-     * @return the link parameters for link creation
-     */
-    protected LinkConfig getCreateLinkParams()
-    {
-        LinkConfig config = new LinkConfig();
-        config.setLabel(getTextArea().getDocument().getSelection().getRangeAt(0).toHTML());
-        // Check the special case when the selection is an image and add a link on an image
-        String imageParam = getTextArea().getCommandManager().getStringValue(Command.INSERT_IMAGE);
-        if (imageParam != null) {
-            // it's an image selection, set the label readonly and put the image filename in the label text
-            parseLabelFromImage(config, imageParam);
-        } else {
-            config.setLabelText(getTextArea().getDocument().getSelection().getRangeAt(0).toString());
-            config.setReadOnlyLabel(false);
-        }
-        return config;
-    }
-
-    /**
-     * Helper method to parse an image execution String parameter and fill the passed {@link LinkConfig} from it.
-     * 
-     * @param linkConfig the link configuration object to set the label to
-     * @param imageJSON the JSON serialization of an image configuration object, as returned by the command manager for
-     *            the {@link Command#INSERT_IMAGE} command.
-     */
-    protected void parseLabelFromImage(LinkConfig linkConfig, String imageJSON)
-    {
-        ResourceName imageResource = new ResourceName(imageConfigJSONParser.parse(imageJSON).getReference(), true);
-        linkConfig.setLabelText(imageResource.getFile());
-        linkConfig.setReadOnlyLabel(true);
     }
 
     /**
@@ -312,25 +229,30 @@ public class LinkPlugin extends AbstractPlugin implements WizardListener
     }
 
     /**
-     * {@inheritDoc}. Handles wizard finish by creating the link HTML block from the {@link LinkConfig} setup through
-     * the wizard and executing the {@link Command#CREATE_LINK} with it.
+     * {@inheritDoc}
+     * <p>
+     * Handles wizard finish by creating the link HTML block from the {@link LinkConfig} setup through the wizard and
+     * executing the {@link Command#CREATE_LINK} with it.
+     * 
+     * @see WizardListener#onFinish(Wizard, Object)
      */
     public void onFinish(Wizard sender, Object result)
     {
-        // build the HTML block from the configuration data
-        String linkHTML = LinkHTMLGenerator.getInstance().getLinkHTML((LinkConfig) result);
         // Return the focus to the rich text area.
         getTextArea().setFocus(true);
-        // insert the built HTML
-        getTextArea().getCommandManager().execute(Command.CREATE_LINK, linkHTML);
+        // Insert of update the link.
+        String linkJSON = linkConfigJSONSerializer.serialize((LinkConfig) result);
+        getTextArea().getCommandManager().execute(Command.CREATE_LINK, linkJSON);
     }
 
     /**
-     * {@inheritDoc}.
+     * {@inheritDoc}
+     * 
+     * @see WizardListener#onCancel(Wizard)
      */
     public void onCancel(Wizard sender)
     {
-        // return the focus to the text area
+        // Return the focus to the text area.
         getTextArea().setFocus(true);
     }
 }

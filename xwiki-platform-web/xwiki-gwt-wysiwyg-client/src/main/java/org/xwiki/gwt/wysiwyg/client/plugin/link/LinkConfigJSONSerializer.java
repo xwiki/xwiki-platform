@@ -17,31 +17,33 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.gwt.wysiwyg.client.plugin.image;
+package org.xwiki.gwt.wysiwyg.client.plugin.link;
 
 import org.xwiki.gwt.user.client.ui.rta.cmd.internal.AbstractInsertElementExecutable.AbstractConfigJSONSerializer;
 
 /**
- * Serializes an {@link ImageConfig} to JSON.
+ * Serializes a {@link LinkConfig} to JSON.
  * 
  * @version $Id$
  */
-public class ImageConfigJSONSerializer extends AbstractConfigJSONSerializer<ImageConfig>
+public class LinkConfigJSONSerializer extends AbstractConfigJSONSerializer<LinkConfig>
 {
     /**
      * {@inheritDoc}
      * 
      * @see AbstractConfigJSONSerializer#serialize(Object)
      */
-    public String serialize(ImageConfig imageConfig)
+    public String serialize(LinkConfig linkConfig)
     {
         StringBuffer result = new StringBuffer();
-        append(result, serialize("reference", imageConfig.getReference()));
-        append(result, serialize("url", imageConfig.getImageURL()));
-        append(result, serialize("width", imageConfig.getWidth()));
-        append(result, serialize("height", imageConfig.getHeight()));
-        append(result, serialize("alttext", imageConfig.getAltText()));
-        append(result, serialize("alignment", imageConfig.getAlignment()));
+        append(result, serialize("reference", linkConfig.getReference()));
+        append(result, serialize("url", linkConfig.getUrl()));
+        append(result, serialize("label", linkConfig.getLabel()));
+        append(result, serialize("labelText", linkConfig.getLabelText()));
+        append(result, serialize("readOnlyLabel", linkConfig.isReadOnlyLabel()));
+        append(result, serialize("type", linkConfig.getType()));
+        append(result, serialize("openInNewWindow", linkConfig.isOpenInNewWindow()));
+        append(result, serialize("tooltip", linkConfig.getTooltip()));
 
         return "{" + result.toString() + "}";
     }

@@ -23,6 +23,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.xwiki.gwt.user.client.StringUtils;
+import org.xwiki.gwt.user.client.ui.rta.cmd.internal.AbstractInsertElementExecutable.ConfigHTMLSerializer;
 import org.xwiki.gwt.wysiwyg.client.plugin.image.ImageConfig.ImageAlignment;
 import org.xwiki.gwt.wysiwyg.client.wiki.ResourceName;
 
@@ -32,7 +33,7 @@ import org.xwiki.gwt.wysiwyg.client.wiki.ResourceName;
  * 
  * @version $Id$
  */
-public final class ImageConfigHTMLSerializer
+public final class ImageConfigHTMLSerializer implements ConfigHTMLSerializer<ImageConfig>
 {
     /**
      * Regular expression used to determine if a string can be used as the value of the {@code width} and {@code height}
@@ -57,11 +58,9 @@ public final class ImageConfigHTMLSerializer
     }
 
     /**
-     * Serializes an {@link ImageConfig} object to an HTML fragment that can be used to insert an image into the edited
-     * document.
+     * {@inheritDoc}
      * 
-     * @param imageConfig the image configuration object to be serialized
-     * @return the HTML fragment that can be used to insert the specified image into the edited document
+     * @see ConfigHTMLSerializer#serialize(Object)
      */
     public String serialize(ImageConfig imageConfig)
     {

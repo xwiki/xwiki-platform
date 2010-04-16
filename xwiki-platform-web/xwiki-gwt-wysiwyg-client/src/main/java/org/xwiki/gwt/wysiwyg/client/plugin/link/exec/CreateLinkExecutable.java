@@ -19,18 +19,16 @@
  */
 package org.xwiki.gwt.wysiwyg.client.plugin.link.exec;
 
-import java.util.Arrays;
-import java.util.List;
-
-import org.xwiki.gwt.dom.client.DocumentFragment;
-import org.xwiki.gwt.dom.client.Element;
 import org.xwiki.gwt.dom.client.Range;
 import org.xwiki.gwt.user.client.ui.rta.RichTextArea;
-import org.xwiki.gwt.user.client.ui.rta.cmd.internal.InsertHTMLExecutable;
+import org.xwiki.gwt.user.client.ui.rta.cmd.internal.AbstractInsertElementExecutable;
 import org.xwiki.gwt.wysiwyg.client.plugin.link.LinkConfig;
-import org.xwiki.gwt.wysiwyg.client.plugin.link.LinkConfig.LinkType;
+import org.xwiki.gwt.wysiwyg.client.plugin.link.LinkConfigHTMLParser;
+import org.xwiki.gwt.wysiwyg.client.plugin.link.LinkConfigHTMLSerializer;
+import org.xwiki.gwt.wysiwyg.client.plugin.link.LinkConfigJSONParser;
+import org.xwiki.gwt.wysiwyg.client.plugin.link.LinkConfigJSONSerializer;
 
-import com.google.gwt.core.client.JsArrayString;
+import com.google.gwt.dom.client.AnchorElement;
 import com.google.gwt.dom.client.Node;
 
 /**
@@ -38,13 +36,8 @@ import com.google.gwt.dom.client.Node;
  * 
  * @version $Id$
  */
-public class CreateLinkExecutable extends InsertHTMLExecutable
+public class CreateLinkExecutable extends AbstractInsertElementExecutable<LinkConfig, AnchorElement>
 {
-    /**
-     * The name of the reference attribute of the anchor.
-     */
-    private static final String HREF_ATTRIBUTE_NAME = "href";
-
     /**
      * Creates a new executable that can be used to insert links in the specified rich text area.
      * 
@@ -53,12 +46,17 @@ public class CreateLinkExecutable extends InsertHTMLExecutable
     public CreateLinkExecutable(RichTextArea rta)
     {
         super(rta);
+
+        configHTMLParser = new LinkConfigHTMLParser();
+        configHTMLSerializer = new LinkConfigHTMLSerializer();
+        configJSONParser = new LinkConfigJSONParser();
+        configJSONSerializer = new LinkConfigJSONSerializer();
     }
 
     /**
      * {@inheritDoc}
      * 
-     * @see InsertHTMLExecutable#isEnabled()
+     * @see AbstractInsertElementExecutable#isEnabled()
      */
     public boolean isEnabled()
     {
@@ -66,37 +64,37 @@ public class CreateLinkExecutable extends InsertHTMLExecutable
             return false;
         }
 
-        // Create link is enabled either for creating a new link or for editing an existing link
-        Range range = rta.getDocument().getSelection().getRangeAt(0);
-        // Check if we're editing a link
-        if (LinkExecutableUtils.getSelectedAnchor(rta) != null) {
+        // Create link executable is enabled either for creating a new link or for editing an existing link. Check if
+        // we're editing a link.
+        if (getSelectedElement() != null) {
             return true;
         }
 
-        // if no anchor on ancestor, test all the nodes touched by the selection to not contain an anchor
+        // If no anchor on ancestor, test all the nodes touched by the selection to not contain an anchor.
+        Range range = rta.getDocument().getSelection().getRangeAt(0);
         if (domUtils.getFirstDescendant(range.cloneContents(), LinkExecutableUtils.ANCHOR_TAG_NAME) != null) {
             return false;
         }
 
-        // Check if the selection does not contain any block elements
+        // Check if the selection does not contain any block elements.
         Node commonAncestor = range.getCommonAncestorContainer();
         if (!domUtils.isInline(commonAncestor)) {
-            // The selection may contain a block element, check if it actually does
+            // The selection may contain a block element, check if it actually does.
             Node leaf = domUtils.getFirstLeaf(range);
             Node lastLeaf = domUtils.getLastLeaf(range);
             while (true) {
                 if (leaf != null) {
-                    // Check if it has any non-inline parents up to the commonAncestor
+                    // Check if it has any non-in-line parents up to the commonAncestor.
                     Node parentNode = leaf;
                     while (parentNode != commonAncestor) {
                         if (!domUtils.isInline(parentNode)) {
-                            // Found a non-inline parent, return false
+                            // Found a non-in-line parent, return false.
                             return false;
                         }
                         parentNode = parentNode.getParentNode();
                     }
                 }
-                // Go to next leaf, if any are left
+                // Go to next leaf, if any are left.
                 if (leaf == lastLeaf) {
                     break;
                 } else {
@@ -110,79 +108,22 @@ public class CreateLinkExecutable extends InsertHTMLExecutable
     /**
      * {@inheritDoc}
      * 
-     * @see InsertHTMLExecutable#isExecuted()
+     * @see AbstractInsertElementExecutable#getCacheKeyPrefix()
      */
-    public boolean isExecuted()
+    @Override
+    protected String getCacheKeyPrefix()
     {
-        // if the whole selection is inside an anchor, the command is executed
-        return LinkExecutableUtils.getSelectedAnchor(rta) != null;
+        return CreateLinkExecutable.class.getName();
     }
 
     /**
      * {@inheritDoc}
      * 
-     * @see InsertHTMLExecutable#getParameter()
+     * @see AbstractInsertElementExecutable#getSelectedElement()
      */
-    public String getParameter()
+    @Override
+    protected AnchorElement getSelectedElement()
     {
-        LinkConfig linkConfig = new LinkConfig();
-        Element wrappingAnchor = LinkExecutableUtils.getSelectedAnchor(rta);
-
-        if (wrappingAnchor == null) {
-            return null;
-        }
-
-        // get link metadata
-        DocumentFragment linkMetadata = wrappingAnchor.getMetaData();
-        if (linkMetadata != null) {
-            // process it
-            Node startComment = linkMetadata.getChildNodes().getItem(0);
-            Element wrappingSpan = (Element) linkMetadata.getChildNodes().getItem(1);
-            linkConfig.setType(parseLinkType(wrappingSpan, startComment.getNodeValue().substring(14)));
-            linkConfig.setReference(startComment.getNodeValue().substring(14));
-        } else {
-            // it's an external link
-            linkConfig.setType(LinkType.EXTERNAL);
-        }
-
-        linkConfig.setUrl(wrappingAnchor.getAttribute(HREF_ATTRIBUTE_NAME));
-        linkConfig.setLabel(wrappingAnchor.getInnerHTML());
-        linkConfig.setLabelText(wrappingAnchor.getInnerText());
-        // get all the custom attributes and set them to the linkConfig
-        JsArrayString attrs = wrappingAnchor.getAttributeNames();
-        // skip the href parameters and the metadata one
-        List<String> skipAttrs = Arrays.asList(HREF_ATTRIBUTE_NAME, Element.META_DATA_ATTR, Element.META_DATA_REF);
-        for (int i = 0; i < attrs.length(); i++) {
-            if (!skipAttrs.contains(attrs.get(i))) {
-                linkConfig.setParameter(attrs.get(i), wrappingAnchor.xGetAttribute(attrs.get(i)));
-            }
-        }
-        return linkConfig.toJSON();
-    }
-
-    /**
-     * Parses a link type from its wrapping span and from its reference.
-     * 
-     * @param wrappingSpan the link's wrapping span
-     * @param reference the link reference
-     * @return the link type, as parsed from it's wrapping span and from its reference
-     */
-    private LinkType parseLinkType(Element wrappingSpan, String reference)
-    {
-        String wrappingSpanClass = wrappingSpan.getClassName();
-        if ("wikilink".equals(wrappingSpanClass)) {
-            return LinkType.WIKIPAGE;
-        }
-        if ("wikicreatelink".equals(wrappingSpanClass)) {
-            return LinkType.NEW_WIKIPAGE;
-        }
-        if ("wikiexternallink".equals(wrappingSpanClass)) {
-            if (reference.startsWith("mailto")) {
-                return LinkType.EMAIL;
-            } else if (reference.startsWith("attach")) {
-                return LinkType.ATTACHMENT;
-            }
-        }
-        return LinkType.EXTERNAL;
+        return LinkExecutableUtils.getSelectedAnchor(rta);
     }
 }

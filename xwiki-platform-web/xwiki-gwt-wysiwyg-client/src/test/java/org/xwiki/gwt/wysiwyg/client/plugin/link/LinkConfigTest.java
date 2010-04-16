@@ -22,7 +22,6 @@ package org.xwiki.gwt.wysiwyg.client.plugin.link;
 import org.xwiki.gwt.wysiwyg.client.WysiwygTestCase;
 import org.xwiki.gwt.wysiwyg.client.plugin.link.LinkConfig.LinkType;
 
-
 /**
  * Unit tests for the {@link LinkConfig} class.
  * 
@@ -31,19 +30,28 @@ import org.xwiki.gwt.wysiwyg.client.plugin.link.LinkConfig.LinkType;
 public class LinkConfigTest extends WysiwygTestCase
 {
     /**
+     * The object used to create a {@link LinkConfig} from JSON.
+     */
+    private final LinkConfigJSONParser linkConfigJSONParser = new LinkConfigJSONParser();
+
+    /**
+     * The object used to serialize a {@link LinkConfig} instance to JSON.
+     */
+    private final LinkConfigJSONSerializer linkConfigJSONSerializer = new LinkConfigJSONSerializer();
+
+    /**
      * Test for the parsing of a basic {@link LinkConfig} from a JSON String.
      */
     public void testParseSimpleJSON()
     {
         String jsonString =
-            "{ reference: 'xwiki:Main.WebHome', url: '/xwiki/bin/view/Main/WebHome', label: 'foo', "
-                + "labeltext: 'foo', type: 'WIKIPAGE' }";
-        LinkConfig linkConfig = new LinkConfig();
-        linkConfig.fromJSON(jsonString);
+            "{reference:'xwiki:Main.WebHome', url:'/xwiki/bin/view/Main/WebHome', label:'<em>foo</em>', "
+                + "labelText:'foo', type:'WIKIPAGE'}";
+        LinkConfig linkConfig = linkConfigJSONParser.parse(jsonString);
 
         assertEquals("xwiki:Main.WebHome", linkConfig.getReference());
         assertEquals("/xwiki/bin/view/Main/WebHome", linkConfig.getUrl());
-        assertEquals("foo", linkConfig.getLabel());
+        assertEquals("<em>foo</em>", linkConfig.getLabel());
         assertEquals("foo", linkConfig.getLabelText());
         assertEquals(LinkType.WIKIPAGE, linkConfig.getType());
         assertNull(linkConfig.getTooltip());
@@ -61,46 +69,43 @@ public class LinkConfigTest extends WysiwygTestCase
     {
         LinkConfig linkConfig = new LinkConfig();
         linkConfig.setType(LinkType.NEW_WIKIPAGE);
-        linkConfig.setReference("xwiki:Main.About");
-        linkConfig.setUrl("/xwiki/bin/view/Main/About");
+        linkConfig.setReference("xwiki:Main.AllDocs");
+        linkConfig.setUrl("/xwiki/bin/view/Main/AllDocs");
         // set some parameters that we don't expect serialized
         linkConfig.setWiki("xwiki");
         linkConfig.setSpace("Main");
         linkConfig.setPage("WebHome");
-        linkConfig.setLabel("xwiki <strong>rox</strong>");
-        linkConfig.setLabelText("xwiki rox");
-        linkConfig.setReadOnlyLabel(false);
+        linkConfig.setLabel("<strong>X</strong>Wiki");
+        linkConfig.setLabelText("XWiki");
         String expectedJSON =
-            "{ reference: 'xwiki:Main.About', url: '/xwiki/bin/view/Main/About', label: 'xwiki <strong>rox</strong>', "
-                + "labeltext: 'xwiki rox', type: 'NEW_WIKIPAGE' }";
-        assertEquals(expectedJSON, linkConfig.toJSON());
+            "{reference:'xwiki:Main.About', url:'/xwiki/bin/view/Main/AllDocs', label:'<strong>X</strong>Wiki', "
+                + "labelText:'XWiki', type: 'NEW_WIKIPAGE'}";
+        assertEquals(expectedJSON, linkConfigJSONSerializer.serialize(linkConfig));
     }
 
     /**
-     * Test for the parsing and serialization of a {@link LinkConfig} with the tooltip parameter set.
+     * Test for the parsing and serialization of a {@link LinkConfig} with the tooltip set.
      */
-    public void testTooltipParameter()
+    public void testTooltip()
     {
         String jsonString =
-            "{ reference: 'xwiki:Main.WebHome', url: '/xwiki/bin/view/Main/WebHome', label: 'foo', "
-                + "labeltext: 'foo', type: 'WIKIPAGE', _xtitle: 'This is a foo' }";
-        LinkConfig linkConfig = new LinkConfig();
-        linkConfig.fromJSON(jsonString);
+            "{reference:'xwiki:Main.Dashboard', url:'/xwiki/bin/view/Main/Dashboard', label:'x<em>y</em>z', "
+                + "labelText:'xyz', type:'WIKIPAGE', tooltip:'Tooltip for xyz'}";
+        LinkConfig linkConfig = linkConfigJSONParser.parse(jsonString);
 
-        assertEquals("This is a foo", linkConfig.getTooltip());
+        assertEquals("Tooltip for xyz", linkConfig.getTooltip());
 
         linkConfig = new LinkConfig();
         linkConfig.setType(LinkType.NEW_WIKIPAGE);
-        linkConfig.setReference("xwiki:Main.About");
-        linkConfig.setUrl("/xwiki/bin/view/Main/About");
-        linkConfig.setLabel("xwiki <strong>rox</strong>");
-        linkConfig.setLabelText("xwiki rox");
-        linkConfig.setReadOnlyLabel(false);
-        linkConfig.setTooltip("It really rocks");
+        linkConfig.setReference("xwiki:Main.SpaceIndex");
+        linkConfig.setUrl("/xwiki/bin/view/Main/SpaceIndex");
+        linkConfig.setLabel("<del>abc</del>");
+        linkConfig.setLabelText("abc");
+        linkConfig.setTooltip("abc rocks!");
         String expectedJSON =
-            "{ reference: 'xwiki:Main.About', url: '/xwiki/bin/view/Main/About', label: 'xwiki <strong>rox</strong>', "
-                + "labeltext: 'xwiki rox', type: 'NEW_WIKIPAGE', _xtitle: 'It really rocks' }";
-        assertEquals(expectedJSON, linkConfig.toJSON());
+            "{reference:'xwiki:Main.SpaceIndex', url:'/xwiki/bin/view/Main/SpaceIndex', label:'<del>abc</del>', "
+                + "labelText:'abc', type:'NEW_WIKIPAGE', tooltip:'abc rocks!'}";
+        assertEquals(expectedJSON, linkConfigJSONSerializer.serialize(linkConfig));
     }
 
     /**
@@ -109,89 +114,28 @@ public class LinkConfigTest extends WysiwygTestCase
     public void testNewWindowParameter()
     {
         String jsonString =
-            "{ reference: 'xwiki:Main.WebHome', url: '/xwiki/bin/view/Main/WebHome', label: 'foo', "
-                + "labeltext: 'foo', type: 'WIKIPAGE', _xrel: '__blank' }";
-        LinkConfig linkConfig = new LinkConfig();
-        linkConfig.fromJSON(jsonString);
-
+            "{reference:'xwiki:Main.Test', url:'/xwiki/bin/view/Main/Test', label:'test', "
+                + "labelText:'test', type:'WIKIPAGE', openInNewWindow:'true'}";
+        LinkConfig linkConfig = linkConfigJSONParser.parse(jsonString);
         assertTrue(linkConfig.isOpenInNewWindow());
 
         jsonString =
-            "{ reference: 'xwiki:Main.WebHome', url: '/xwiki/bin/view/Main/WebHome', label: 'foo', "
-                + "labeltext: 'foo', type: 'WIKIPAGE', _xrel: 'else' }";
-        linkConfig = new LinkConfig();
-        linkConfig.fromJSON(jsonString);
-
+            "{reference:'xwiki:Main.WebPreferences', url:'/xwiki/bin/view/Main/WebPreferences', label:'prefs', "
+                + "labelText:'prefs', type:'WIKIPAGE', openInNewWindow:'xyz'}";
+        linkConfig = linkConfigJSONParser.parse(jsonString);
         assertFalse(linkConfig.isOpenInNewWindow());
 
         linkConfig = new LinkConfig();
         linkConfig.setType(LinkType.NEW_WIKIPAGE);
-        linkConfig.setReference("xwiki:Main.About");
-        linkConfig.setUrl("/xwiki/bin/view/Main/About");
-        linkConfig.setLabel("xwiki <strong>rox</strong>");
-        linkConfig.setLabelText("xwiki rox");
-        linkConfig.setReadOnlyLabel(false);
+        linkConfig.setReference("xwiki:Main.X");
+        linkConfig.setUrl("/xwiki/bin/view/Main/X");
+        linkConfig.setLabel("<em>X</em> page");
+        linkConfig.setLabelText("X page");
         linkConfig.setOpenInNewWindow(true);
         String expectedJSON =
-            "{ reference: 'xwiki:Main.About', url: '/xwiki/bin/view/Main/About', label: 'xwiki <strong>rox</strong>', "
-                + "labeltext: 'xwiki rox', type: 'NEW_WIKIPAGE', _xrel: '__blank' }";
-        assertEquals(expectedJSON, linkConfig.toJSON());
-    }
-
-    /**
-     * Test for the parsing and serialization of a {@link LinkConfig} with some custom parameters set.
-     */
-    public void testCustomParameters()
-    {
-        String jsonString =
-            "{ reference: 'xwiki:Main.WebHome', url: '/xwiki/bin/view/Main/WebHome', label: 'foo', "
-                + "labeltext: 'foo', type: 'WIKIPAGE', _xrel: '__blank', _xstyle: 'color: red;', _xcustom: 'foobar' }";
-        LinkConfig linkConfig = new LinkConfig();
-        linkConfig.fromJSON(jsonString);
-
-        assertEquals("foobar", linkConfig.getParameter("custom"));
-        assertEquals("color: red;", linkConfig.getParameter("style"));
-
-        linkConfig = new LinkConfig();
-        linkConfig.setType(LinkType.NEW_WIKIPAGE);
-        linkConfig.setReference("xwiki:Main.About");
-        linkConfig.setUrl("/xwiki/bin/view/Main/About");
-        linkConfig.setLabel("xwiki <strong>rox</strong>");
-        linkConfig.setLabelText("xwiki rox");
-        linkConfig.setReadOnlyLabel(false);
-        linkConfig.setParameter("custom", "xwiki");
-        linkConfig.setParameter("align", "center");
-        String expectedJSON =
-            "{ reference: 'xwiki:Main.About', url: '/xwiki/bin/view/Main/About', label: 'xwiki <strong>rox</strong>', "
-                + "labeltext: 'xwiki rox', type: 'NEW_WIKIPAGE', _xcustom: 'xwiki', _xalign: 'center' }";
-        assertEquals(expectedJSON, linkConfig.toJSON());
-    }
-
-    /**
-     * Test for the parsing and serialization of a {@link LinkConfig} with the class custom parameters set.
-     */
-    public void testClassCustomParameter()
-    {
-        String jsonString =
-            "{ reference: 'xwiki:Main.WebHome', url: '/xwiki/bin/view/Main/WebHome', label: 'foo', "
-                + "labeltext: 'foo', type: 'WIKIPAGE', _xrel: '__blank', _xclass: 'foobar' }";
-        LinkConfig linkConfig = new LinkConfig();
-        linkConfig.fromJSON(jsonString);
-
-        assertEquals("foobar", linkConfig.getParameter("class"));
-
-        linkConfig = new LinkConfig();
-        linkConfig.setType(LinkType.NEW_WIKIPAGE);
-        linkConfig.setReference("xwiki:Main.About");
-        linkConfig.setUrl("/xwiki/bin/view/Main/About");
-        linkConfig.setLabel("xwiki <strong>rox</strong>");
-        linkConfig.setLabelText("xwiki rox");
-        linkConfig.setReadOnlyLabel(false);
-        linkConfig.setParameter("class", "foobar");
-        String expectedJSON =
-            "{ reference: 'xwiki:Main.About', url: '/xwiki/bin/view/Main/About', label: 'xwiki <strong>rox</strong>', "
-                + "labeltext: 'xwiki rox', type: 'NEW_WIKIPAGE', _xclass: 'foobar' }";
-        assertEquals(expectedJSON, linkConfig.toJSON());
+            "{reference:'xwiki:Main.X', url:'/xwiki/bin/view/Main/X', label:'<em>X</em> page', "
+                + "labelText:'X page', type:'NEW_WIKIPAGE', openInNewWindow:'true'}";
+        assertEquals(expectedJSON, linkConfigJSONSerializer.serialize(linkConfig));
     }
 
     /**
@@ -199,61 +143,51 @@ public class LinkConfigTest extends WysiwygTestCase
      */
     public void testSerializationRoundTrip()
     {
-        LinkConfig before = new LinkConfig();
-        before.setType(LinkType.NEW_WIKIPAGE);
-        before.setReference("xwiki:Main.About");
-        before.setUrl("/xwiki/bin/view/Main/About");
-        before.setLabel("xwiki <strong>rox</strong>");
-        before.setReadOnlyLabel(true);
-        before.setTooltip("xwiki \"rox\"");
-        before.setParameter("style", "color: pink;");
+        LinkConfig expected = new LinkConfig();
+        expected.setType(LinkType.NEW_WIKIPAGE);
+        expected.setReference("xwiki:Main.About");
+        expected.setUrl("/xwiki/bin/view/Main/About");
+        expected.setLabel("blah blah");
+        expected.setReadOnlyLabel(true);
+        expected.setTooltip("xwiki \"rox\"");
 
-        String serialization = before.toJSON();
+        LinkConfig actual = linkConfigJSONParser.parse(linkConfigJSONSerializer.serialize(expected));
 
-        LinkConfig after = new LinkConfig();
-        after.fromJSON(serialization);
-
-        assertEquals(before.getReference(), after.getReference());
-        assertEquals(before.getUrl(), after.getUrl());
-        assertEquals(before.getWiki(), after.getWiki());
-        assertNull(after.getWiki());
-        assertEquals(before.getSpace(), after.getSpace());
-        assertNull(after.getSpace());
-        assertEquals(before.getPage(), after.getPage());
-        assertNull(after.getPage());
-        assertEquals(before.getType(), after.getType());
-        assertEquals(before.getLabel(), after.getLabel());
-        assertEquals(before.getLabelText(), after.getLabelText());
-        assertNull(after.getLabelText());
-        assertEquals(before.isReadOnlyLabel(), after.isReadOnlyLabel());
-        assertEquals(before.getTooltip(), after.getTooltip());
-        assertEquals("xwiki \"rox\"", after.getTooltip());
-        assertEquals(before.isOpenInNewWindow(), after.isOpenInNewWindow());
-        assertFalse(after.isOpenInNewWindow());
-        assertEquals(before.getParameter("style"), after.getParameter("style"));
-        assertEquals("color: pink;", after.getParameter("style"));
+        assertEquals(expected.getReference(), actual.getReference());
+        assertEquals(expected.getUrl(), actual.getUrl());
+        assertEquals(expected.getWiki(), actual.getWiki());
+        assertNull(actual.getWiki());
+        assertEquals(expected.getSpace(), actual.getSpace());
+        assertNull(actual.getSpace());
+        assertEquals(expected.getPage(), actual.getPage());
+        assertNull(actual.getPage());
+        assertEquals(expected.getType(), actual.getType());
+        assertEquals(expected.getLabel(), actual.getLabel());
+        assertEquals(expected.getLabelText(), actual.getLabelText());
+        assertNull(actual.getLabelText());
+        assertEquals(expected.isReadOnlyLabel(), actual.isReadOnlyLabel());
+        assertEquals(expected.getTooltip(), actual.getTooltip());
+        assertEquals(expected.isOpenInNewWindow(), actual.isOpenInNewWindow());
+        assertFalse(actual.isOpenInNewWindow());
     }
 
+    /**
+     * Tests that quotes are escaped correctly in the JSON serialization.
+     */
     public void testQuoteIsEscapedCorrecly()
     {
-        LinkConfig before = new LinkConfig();
-        before.setType(LinkType.NEW_WIKIPAGE);
-        before.setReference("xwiki:Main.XWiki'sPowers");
-        before.setUrl("/xwiki/bin/view/Main/XWiki'sPowers");
-        before.setLabel("xwiki <strong>rox</strong>");
-        before.setReadOnlyLabel(true);
-        before.setTooltip("xwiki's the wiki that rox");
+        LinkConfig expected = new LinkConfig();
+        expected.setType(LinkType.NEW_WIKIPAGE);
+        expected.setReference("xwiki:Main.XWiki'sPowers");
+        expected.setUrl("/xwiki/bin/view/Main/XWiki'sPowers");
+        expected.setLabel("xwiki <strong>rox</strong>");
+        expected.setReadOnlyLabel(true);
+        expected.setTooltip("xwiki's the wiki that rox");
 
-        String serialization = before.toJSON();
+        LinkConfig actual = linkConfigJSONParser.parse(linkConfigJSONSerializer.serialize(expected));
 
-        LinkConfig after = new LinkConfig();
-        after.fromJSON(serialization);
-
-        assertEquals(before.getReference(), after.getReference());
-        assertEquals("xwiki:Main.XWiki'sPowers", after.getReference());
-        assertEquals(before.getUrl(), after.getUrl());
-        assertEquals("/xwiki/bin/view/Main/XWiki'sPowers", after.getUrl());
-        assertEquals(before.getTooltip(), after.getTooltip());
-        assertEquals("xwiki's the wiki that rox", after.getTooltip());
+        assertEquals(expected.getReference(), actual.getReference());
+        assertEquals(expected.getUrl(), actual.getUrl());
+        assertEquals(expected.getTooltip(), actual.getTooltip());
     }
 }

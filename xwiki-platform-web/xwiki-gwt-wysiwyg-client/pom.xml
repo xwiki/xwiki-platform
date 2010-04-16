@@ -157,8 +157,6 @@
           <!-- New code should follow checkstyle rules. -->
           <excludes>
             org/xwiki/gwt/wysiwyg/client/diff/**/*,
-            org/xwiki/gwt/wysiwyg/client/plugin/link/LinkConfig.java,
-            org/xwiki/gwt/wysiwyg/client/plugin/link/LinkConfigTest.java,
             org/xwiki/gwt/wysiwyg/client/plugin/sync/SyncPlugin.java,
             org/xwiki/gwt/wysiwyg/client/plugin/sync/SyncTools.java,
             org/xwiki/gwt/wysiwyg/client/Images.java,

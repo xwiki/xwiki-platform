@@ -17,37 +17,39 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.gwt.wysiwyg.client.plugin.image;
+package org.xwiki.gwt.wysiwyg.client.plugin.link;
 
 import org.xwiki.gwt.dom.client.JavaScriptObject;
 import org.xwiki.gwt.user.client.ui.rta.cmd.internal.AbstractInsertElementExecutable.ConfigJSONParser;
-import org.xwiki.gwt.wysiwyg.client.plugin.image.ImageConfig.ImageAlignment;
+import org.xwiki.gwt.wysiwyg.client.plugin.link.LinkConfig.LinkType;
 
 /**
- * Creates {@link ImageConfig} instances from JSON.
+ * Creates {@link LinkConfig} instances from JSON.
  * 
  * @version $Id$
  */
-public class ImageConfigJSONParser implements ConfigJSONParser<ImageConfig>
+public class LinkConfigJSONParser implements ConfigJSONParser<LinkConfig>
 {
     /**
      * {@inheritDoc}
      * 
      * @see ConfigJSONParser#parse(String)
      */
-    public ImageConfig parse(String json)
+    public LinkConfig parse(String json)
     {
         JavaScriptObject jsObj = JavaScriptObject.fromJson(json);
-        ImageConfig imageConfig = new ImageConfig();
-        imageConfig.setReference((String) jsObj.get("reference"));
-        imageConfig.setImageURL((String) jsObj.get("url"));
-        imageConfig.setWidth((String) jsObj.get("width"));
-        imageConfig.setHeight((String) jsObj.get("height"));
-        imageConfig.setAltText((String) jsObj.get("alttext"));
-        String foundAlignment = (String) jsObj.get("alignment");
-        if (foundAlignment != null) {
-            imageConfig.setAlignment(ImageAlignment.valueOf(foundAlignment));
+        LinkConfig linkConfig = new LinkConfig();
+        linkConfig.setReference((String) jsObj.get("reference"));
+        linkConfig.setUrl((String) jsObj.get("url"));
+        linkConfig.setLabel((String) jsObj.get("label"));
+        linkConfig.setLabelText((String) jsObj.get("labelText"));
+        linkConfig.setReadOnlyLabel(Boolean.valueOf((String) jsObj.get("readOnlyLabel")));
+        linkConfig.setOpenInNewWindow(Boolean.valueOf((String) jsObj.get("openInNewWindow")));
+        linkConfig.setTooltip((String) jsObj.get("tooltip"));
+        String type = (String) jsObj.get("type");
+        if (type != null) {
+            linkConfig.setType(LinkType.valueOf(type));
         }
-        return imageConfig;
+        return linkConfig;
     }
 }

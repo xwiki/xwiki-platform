@@ -27,11 +27,11 @@
   <parent>
     <artifactId>xwiki-plugins</artifactId>
     <groupId>com.xpn.xwiki.platform.plugins</groupId>
-    <version>23-SNAPSHOT</version>
+    <version>22</version>
   </parent>
   <artifactId>xwiki-plugin-mailsender</artifactId>
   <name>XWiki Platform - Plugins - Mail Sender</name>
-  <version>1.14-SNAPSHOT</version>
+  <version>1.14</version>
   <description>XWiki Platform - Plugins - Mail Sender</description>
   <properties>
     <platform.core.version>1.9.3</platform.core.version>
@@ -98,9 +98,9 @@
   <!-- We must configure SCM in each module. For more information see:
        http://svn.xwiki.org/svnroot/xwiki/platform/pom/trunk/pom.xml -->
   <scm>
-    <connection>scm:svn:http://svn.xwiki.org/svnroot/xwiki/platform/xwiki-plugins/trunk/mailsender</connection>
-    <developerConnection>scm:svn:https://svn.xwiki.org/svnroot/xwiki/platform/xwiki-plugins/trunk/mailsender</developerConnection>
-    <url>http://svn.xwiki.org/svnroot/xwiki/platform/xwiki-plugins/trunk/mailsender</url>
+    <connection>scm:svn:http://svn.xwiki.org/svnroot/xwiki/platform/xwiki-plugins/tags/xwiki-plugin-mailsender-1.14</connection>
+    <developerConnection>scm:svn:https://svn.xwiki.org/svnroot/xwiki/platform/xwiki-plugins/tags/xwiki-plugin-mailsender-1.14</developerConnection>
+    <url>http://svn.xwiki.org/svnroot/xwiki/platform/xwiki-plugins/tags/xwiki-plugin-mailsender-1.14</url>
   </scm>
   <issueManagement>
     <system>jira</system>

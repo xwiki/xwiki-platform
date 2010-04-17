@@ -417,8 +417,6 @@ public class XWikiDocument implements DocumentModelBridge
      */
     private SyntaxFactory syntaxFactory = Utils.getComponent(SyntaxFactory.class);
 
-    private Execution execution = Utils.getComponent(Execution.class);
-
     /**
      * @since 2.2M1
      */
@@ -6463,7 +6461,7 @@ public class XWikiDocument implements DocumentModelBridge
      * 
      * @return the XWiki context for the current thread
      */
-    private XWikiContext getContext()
+    private XWikiContext getXWikiContext()
     {
         Execution execution = Utils.getComponent(Execution.class);
 
@@ -6491,7 +6489,7 @@ public class XWikiDocument implements DocumentModelBridge
 
         // get the maximum header level
         int sectionDepth = 2;
-        XWikiContext context = getContext();
+        XWikiContext context = getXWikiContext();
         if (context != null) {
             sectionDepth = (int) context.getWiki().getSectionEditingDepth();
         }
@@ -7351,11 +7349,6 @@ public class XWikiDocument implements DocumentModelBridge
     protected EntityReference getRelativeParentReference()
     {
         return this.parentReference;
-    }
-
-    private XWikiContext getXWikiContext()
-    {
-        return (XWikiContext) this.execution.getContext().getProperty("xwikicontext");
     }
 
     private BaseObject prepareXObject(EntityReference classReference)

@@ -1588,16 +1588,24 @@ public class XWikiDocument implements DocumentModelBridge
         }
     }
 
+    /**
+     * @return the {@link XWikiDocumentArchive} for this document. If it is not stored in the document, we get it
+     *         using the current context.
+     */
     public XWikiDocumentArchive getDocumentArchive()
     {
-        // We are using a SoftReference which will allow the archive to be
-        // discarded by the Garbage collector as long as the context is closed (usually during the
-        // request)
-        if (this.archive == null) {
-            return null;
-        } else {
+        // If there is a soft reference, return it.
+        if (this.archive != null && this.archive.get() != null) {
             return this.archive.get();
         }
+
+        XWikiContext xcontext = getXWikiContext();
+        XWikiDocumentArchive arch = getVersioningStore(xcontext).getXWikiDocumentArchive(this, xcontext);
+
+        // Put a copy of the archive in the soft reference for later use if needed.
+        setDocumentArchive(arch);
+
+        return arch;
     }
 
     public void setDocumentArchive(XWikiDocumentArchive arch)

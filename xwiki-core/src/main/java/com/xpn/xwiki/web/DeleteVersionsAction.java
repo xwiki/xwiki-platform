@@ -74,7 +74,6 @@ public class DeleteVersionsAction extends XWikiAction
                     // Only delete the translation
                     context.getWiki().deleteDocument(tdoc, context);
                 }
-                // TODO Make the code in DeleteAction reusable, then call it from here.
             } else {
                 // There are still some versions left.
                 // If we delete the most recent (current) version, then rollback to latest undeleted version.

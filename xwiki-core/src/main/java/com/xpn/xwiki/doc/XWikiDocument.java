@@ -5860,6 +5860,7 @@ public class XWikiDocument implements DocumentModelBridge
      * @see org.xwiki.bridge.DocumentModelBridge#getSyntaxId()
      * @deprecated since 2.3M1, use {link #getSyntax()} instead
      */
+    @Deprecated
     public String getSyntaxId()
     {
         return getSyntax().toIdString();
@@ -5882,6 +5883,7 @@ public class XWikiDocument implements DocumentModelBridge
      * @see #getSyntaxId()
      * @deprecated since 2.3M1, use {link #setSyntax(Syntax)} instead
      */
+    @Deprecated
     public void setSyntaxId(String syntaxId)
     {
         Syntax syntax;
@@ -7023,10 +7025,14 @@ public class XWikiDocument implements DocumentModelBridge
      */
     public String getPreviousVersion()
     {
-        if (getVersion().equals("1.1")) {
-            return null;
+        XWikiDocumentArchive archive = getDocumentArchive();
+        if (archive != null) {
+            Version prevVersion = archive.getPrevVersion(getRCSVersion());
+            if (prevVersion != null) {
+                return prevVersion.toString();
+            }
         }
-        return getDocumentArchive().getPrevVersion(getRCSVersion()).toString();
+        return null;
     }
 
     @Override

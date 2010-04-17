@@ -30,15 +30,20 @@ import java.util.ResourceBundle;
 import java.util.Set;
 import java.util.Vector;
 
-import com.xpn.xwiki.objects.StringProperty;
 import org.jmock.Mock;
+import org.xwiki.model.EntityType;
+import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.EntityReference;
+import org.xwiki.rendering.syntax.Syntax;
 
 import com.xpn.xwiki.XWiki;
+import com.xpn.xwiki.XWikiConfig;
 import com.xpn.xwiki.XWikiConstant;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.api.DocumentSection;
 import com.xpn.xwiki.objects.BaseObject;
+import com.xpn.xwiki.objects.StringProperty;
 import com.xpn.xwiki.objects.classes.BaseClass;
 import com.xpn.xwiki.objects.classes.TextAreaClass;
 import com.xpn.xwiki.render.XWikiRenderingEngine;
@@ -47,10 +52,6 @@ import com.xpn.xwiki.store.XWikiVersioningStoreInterface;
 import com.xpn.xwiki.test.AbstractBridgedXWikiComponentTestCase;
 import com.xpn.xwiki.user.api.XWikiRightService;
 import com.xpn.xwiki.web.XWikiMessageTool;
-import org.xwiki.model.EntityType;
-import org.xwiki.model.reference.DocumentReference;
-import org.xwiki.model.reference.EntityReference;
-import org.xwiki.rendering.syntax.Syntax;
 
 /**
  * Unit tests for {@link XWikiDocument}.
@@ -271,6 +272,47 @@ public class XWikiDocumentTest extends AbstractBridgedXWikiComponentTestCase
         this.document.incrementVersion();
         // increment minor version
         assertEquals("2.2", this.document.getVersion());
+    }
+
+    public void testGetPreviousVersion() throws XWikiException
+    {
+        this.mockXWiki.stubs().method("getEncoding").will(returnValue("UTF-8"));
+        this.mockXWiki.stubs().method("getConfig").will(returnValue(new XWikiConfig()));
+        XWikiContext context = this.getContext();
+        Date now = new Date();
+        XWikiDocumentArchive archiveDoc = new XWikiDocumentArchive(this.document.getId());
+        this.document.setDocumentArchive(archiveDoc);
+
+        assertEquals("1.1", this.document.getVersion());
+        assertNull(this.document.getPreviousVersion());
+
+        this.document.incrementVersion();
+        archiveDoc.updateArchive(this.document, "Admin", now, "", this.document.getRCSVersion(), context);
+        assertEquals("1.1", this.document.getVersion());
+        assertNull(this.document.getPreviousVersion());
+
+        this.document.setMinorEdit(true);
+        this.document.incrementVersion();
+        archiveDoc.updateArchive(this.document, "Admin", now, "", this.document.getRCSVersion(), context);
+        assertEquals("1.2", this.document.getVersion());
+        assertEquals("1.1", this.document.getPreviousVersion());
+
+        this.document.setMinorEdit(false);
+        this.document.incrementVersion();
+        archiveDoc.updateArchive(this.document, "Admin", now, "", this.document.getRCSVersion(), context);
+        assertEquals("2.1", this.document.getVersion());
+        assertEquals("1.2", this.document.getPreviousVersion());
+
+        this.document.setMinorEdit(true);
+        this.document.incrementVersion();
+        archiveDoc.updateArchive(this.document, "Admin", now, "", this.document.getRCSVersion(), context);
+        assertEquals("2.2", this.document.getVersion());
+        assertEquals("2.1", this.document.getPreviousVersion());
+
+        archiveDoc.resetArchive();
+
+        assertEquals("2.2", this.document.getVersion());
+        assertNull(this.document.getPreviousVersion());
     }
 
     public void testAuthorAfterDocumentCopy() throws XWikiException

@@ -19,6 +19,7 @@
  */
 package com.xpn.xwiki.web;
 
+import org.apache.commons.lang.StringUtils;
 import org.suigeneris.jrcs.rcs.Version;
 
 import com.xpn.xwiki.XWikiContext;
@@ -67,6 +68,12 @@ public class DeleteVersionsAction extends XWikiAction
             tdoc.setDocumentArchive(archive);
             // Is this the last remaining version? If so, then recycle the document.
             if (archive.getLatestVersion() == null) {
+                if (StringUtils.isEmpty(language) || language.equals(doc.getDefaultLanguage())) {
+                    context.getWiki().deleteAllDocuments(doc, context);
+                } else {
+                    // Only delete the translation
+                    context.getWiki().deleteDocument(tdoc, context);
+                }
                 // TODO Make the code in DeleteAction reusable, then call it from here.
             } else {
                 // There are still some versions left.

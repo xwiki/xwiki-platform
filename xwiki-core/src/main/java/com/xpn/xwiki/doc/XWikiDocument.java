@@ -1590,7 +1590,7 @@ public class XWikiDocument implements DocumentModelBridge
 
     /**
      * @return the {@link XWikiDocumentArchive} for this document. If it is not stored in the document, we get it
-     *         using the current context.
+     *         using the current context. If there is an exception, null is returned.
      */
     public XWikiDocumentArchive getDocumentArchive()
     {
@@ -1600,12 +1600,20 @@ public class XWikiDocument implements DocumentModelBridge
         }
 
         XWikiContext xcontext = getXWikiContext();
-        XWikiDocumentArchive arch = getVersioningStore(xcontext).getXWikiDocumentArchive(this, xcontext);
 
-        // Put a copy of the archive in the soft reference for later use if needed.
-        setDocumentArchive(arch);
+        try {
+            XWikiDocumentArchive arch = getVersioningStore(xcontext).getXWikiDocumentArchive(this, xcontext);
 
-        return arch;
+            // Put a copy of the archive in the soft reference for later use if needed.
+            setDocumentArchive(arch);
+
+            return arch;
+        } catch (XWikiException e) {
+            // To maintain the behavior of this method we can't throw an exception.
+            // Formerly, null was returned if there was no SoftReference.
+            LOG.warn("Could not get document archive", e);
+            return null;
+        }
     }
 
     public void setDocumentArchive(XWikiDocumentArchive arch)

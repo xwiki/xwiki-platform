@@ -107,12 +107,14 @@
 </property>
 <property>
 <code>Object.extend(XWiki, {
-  userprofile : {    
-    
+  userprofile : {
+
     init : function() {
-      Event.observe($('avatar'), 'mouseover', function() { XWiki.userprofile.displayChangePhoto('true') });
-      Event.observe($('avatar'), 'mouseout', function() { XWiki.userprofile.displayChangePhoto('false') });
-      XWiki.userprofile.adjustTabsContainerHeight();
+      if ($('avatar')) {
+        Event.observe($('avatar'), 'mouseover', function() { XWiki.userprofile.displayChangePhoto('true') });
+        Event.observe($('avatar'), 'mouseout', function() { XWiki.userprofile.displayChangePhoto('false') });
+        XWiki.userprofile.adjustTabsContainerHeight();
+      }
     },
 
     /* 

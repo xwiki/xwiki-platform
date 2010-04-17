@@ -25,11 +25,11 @@ import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
 
-import java.util.List;
-import java.util.ArrayList;
-
-public class RollbackAction extends XWikiAction {
-	public boolean action(XWikiContext context) throws XWikiException {
+public class RollbackAction extends XWikiAction
+{
+    @Override
+    public boolean action(XWikiContext context) throws XWikiException
+    {
         XWiki xwiki = context.getWiki();
         XWikiResponse response = context.getResponse();
         XWikiDocument doc = context.getDoc();
@@ -38,33 +38,23 @@ public class RollbackAction extends XWikiAction {
         String confirm = form.getConfirm();
         String rev = form.getRev();
         String language = form.getLanguage();
-        XWikiDocument tdoc;
 
-        if((confirm == null) || (!confirm.equals("1"))){
+        if ((confirm == null) || (!confirm.equals("1"))) {
             return true;
         }
 
-        if ((language==null)||(language.equals(""))||(language.equals("default"))||(language.equals(doc.getDefaultLanguage()))) {
-            // Need to save parent and defaultLanguage if they have changed
-            tdoc = doc;
-        } else {
-            tdoc = doc.getTranslatedDocument(language, context);
-            if (tdoc == doc) {
-                tdoc = new XWikiDocument(doc.getSpace(), doc.getName());
-                tdoc.setLanguage(language);
-            }
-            tdoc.setTranslation(1);
-        }
-
+        XWikiDocument tdoc = getTranslatedDocument(doc, language, context);
         XWikiDocument newdoc = xwiki.rollback(tdoc, rev, context);
         // forward to view
         String redirect = Utils.getRedirect("view", context);
         sendRedirect(response, redirect);
         return false;
-	}
+    }
 
-    public String render(XWikiContext context) throws XWikiException {
+    @Override
+    public String render(XWikiContext context) throws XWikiException
+    {
         handleRevision(context);
-      	return "rollback";
+        return "rollback";
     }
 }

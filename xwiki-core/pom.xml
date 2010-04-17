@@ -1316,7 +1316,6 @@
               **/web/CancelAction.java,
               **/web/DeleteAction.java,
               **/web/DeleteAttachmentAction.java,
-              **/web/DeleteVersionsAction.java,
               **/web/DotAction.java,
               **/web/DownloadAction.java,
               **/web/DownloadRevAction.java,

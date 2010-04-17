@@ -27,7 +27,7 @@ import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.doc.XWikiDocumentArchive;
 
 /**
- * Struts action for delete document versions.
+ * Struts action for deleting document versions.
  * 
  * @version $Id$
  */
@@ -36,12 +36,15 @@ public class DeleteVersionsAction extends XWikiAction
     /**
      * {@inheritDoc}
      */
+    @Override
     public boolean action(XWikiContext context) throws XWikiException
     {
-        XWikiDocument doc = context.getDoc();
         DeleteVersionsForm form = (DeleteVersionsForm) context.getForm();
 
-        boolean confirm = form.isConfirmed();
+        if (!form.isConfirmed()) {
+            return true;
+        }
+
         Version v1;
         Version v2;
         Version rev = form.getRev();
@@ -52,26 +55,12 @@ public class DeleteVersionsAction extends XWikiAction
             v1 = rev;
             v2 = rev;
         }
-        String language = form.getLanguage();
-        XWikiDocument tdoc;
-
-        if (!confirm) {
-            return true;
-        }
-        if (language == null || language.equals("") || language.equals("default")
-            || language.equals(doc.getDefaultLanguage())) {
-            // Need to save parent and defaultLanguage if they have changed
-            tdoc = doc;
-        } else {
-            tdoc = doc.getTranslatedDocument(language, context);
-            if (tdoc == doc) {
-                tdoc = new XWikiDocument(doc.getSpace(), doc.getName());
-                tdoc.setLanguage(language);
-            }
-            tdoc.setTranslation(1);
-        }
 
         if (v1 != null && v2 != null) {
+            XWikiDocument doc = context.getDoc();
+            String language = form.getLanguage();
+            XWikiDocument tdoc = getTranslatedDocument(doc, language, context);
+
             XWikiDocumentArchive archive = tdoc.getDocumentArchive(context);
             archive.removeVersions(v1, v2, context);
             context.getWiki().getVersioningStore().saveXWikiDocArchive(archive, true, context);
@@ -81,11 +70,9 @@ public class DeleteVersionsAction extends XWikiAction
                 // TODO Make the code in DeleteAction reusable, then call it from here.
             } else {
                 // There are still some versions left.
-                // If we delete the most recent (current) version, then rollback to latest undeleted
-                // version.
+                // If we delete the most recent (current) version, then rollback to latest undeleted version.
                 if (!tdoc.getRCSVersion().equals(archive.getLatestVersion())) {
-                    XWikiDocument newdoc =
-                        archive.loadDocument(archive.getLatestVersion(), context);
+                    XWikiDocument newdoc = archive.loadDocument(archive.getLatestVersion(), context);
                     context.getWiki().getStore().saveXWikiDoc(newdoc, context);
                     context.setDoc(newdoc);
                 }
@@ -111,6 +98,7 @@ public class DeleteVersionsAction extends XWikiAction
     /**
      * {@inheritDoc}
      */
+    @Override
     public String render(XWikiContext context) throws XWikiException
     {
         return "deleteversionsconfirm";

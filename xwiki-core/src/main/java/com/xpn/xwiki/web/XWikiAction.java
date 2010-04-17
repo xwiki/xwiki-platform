@@ -27,6 +27,7 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.log4j.MDC;
@@ -229,14 +230,14 @@ public abstract class XWikiAction extends Action
                 if (e instanceof IOException) {
                     e =
                         new XWikiException(XWikiException.MODULE_XWIKI_APP,
-                            XWikiException.ERROR_XWIKI_APP_SEND_RESPONSE_EXCEPTION, "Exception while sending response",
-                            e);
+                        XWikiException.ERROR_XWIKI_APP_SEND_RESPONSE_EXCEPTION, "Exception while sending response",
+                        e);
                 }
 
                 if (!(e instanceof XWikiException)) {
                     e =
                         new XWikiException(XWikiException.MODULE_XWIKI_APP, XWikiException.ERROR_XWIKI_UNKNOWN,
-                            "Uncaught exception", e);
+                        "Uncaught exception", e);
                 }
 
                 try {
@@ -492,5 +493,35 @@ public abstract class XWikiAction extends Action
                 XWikiException.ERROR_XWIKI_APP_REDIRECT_EXCEPTION, "Exception while sending redirect to page {0}", e,
                 args);
         }
+    }
+
+    /**
+     * Gets the translated version of a document, in the specified language. If the translation does not exist, a new
+     * document translation is created. If the requested language does not correspond to a translation (is not defined
+     * or is the same as the main document), then the main document is returned.
+     * 
+     * @param doc the main (default, untranslated) document to translate
+     * @param language the requested document language
+     * @param context the current request context
+     * @return the translated document, or the original untranslated document if the requested language is not a
+     *         translation
+     * @throws XWikiException if the translation cannot be retrieved from the database
+     */
+    protected XWikiDocument getTranslatedDocument(XWikiDocument doc, String language, XWikiContext context)
+        throws XWikiException
+    {
+        XWikiDocument tdoc;
+        if (StringUtils.isBlank(language) || language.equals("default") || language.equals(doc.getDefaultLanguage())) {
+            tdoc = doc;
+        } else {
+            tdoc = doc.getTranslatedDocument(language, context);
+            if (tdoc == doc) {
+                tdoc = new XWikiDocument(doc.getDocumentReference());
+                tdoc.setLanguage(language);
+                tdoc.setStore(doc.getStore());
+            }
+            tdoc.setTranslation(1);
+        }
+        return tdoc;
     }
 }

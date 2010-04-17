@@ -29,6 +29,7 @@ import com.xpn.xwiki.doc.XWikiLock;
 
 public class CancelAction extends XWikiAction
 {
+    @Override
     public boolean action(XWikiContext context) throws XWikiException
     {
         XWikiRequest request = context.getRequest();
@@ -40,21 +41,7 @@ public class CancelAction extends XWikiAction
         // FIXME Which one should be used: doc.getDefaultLanguage or
         // form.getDefaultLanguage()?
         // String defaultLanguage = ((EditForm)form).getDefaultLanguage();
-        XWikiDocument tdoc;
-
-        // FIXME Is all this really needed?
-        if ((language == null) || (language.equals("")) || (language.equals("default"))
-            || (language.equals(doc.getDefaultLanguage()))) {
-            tdoc = doc;
-        } else {
-            tdoc = doc.getTranslatedDocument(language, context);
-            if (tdoc == doc) {
-                tdoc = new XWikiDocument(doc.getSpace(), doc.getName());
-                tdoc.setLanguage(language);
-                tdoc.setStore(doc.getStore());
-            }
-            tdoc.setTranslation(1);
-        }
+        XWikiDocument tdoc = getTranslatedDocument(doc, language, context);
 
         String username = context.getUser();
         XWikiLock lock = tdoc.getLock(context);

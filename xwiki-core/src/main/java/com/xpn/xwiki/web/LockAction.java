@@ -9,6 +9,7 @@ import com.xpn.xwiki.doc.XWikiLock;
 
 public class LockAction extends XWikiAction
 {
+    @Override
     public boolean action(XWikiContext context) throws XWikiException
     {
         XWikiRequest request = context.getRequest();
@@ -17,29 +18,16 @@ public class LockAction extends XWikiAction
         XWikiForm form = context.getForm();
 
         String language = ((EditForm) form).getLanguage();
-        XWikiDocument tdoc;
-
-        if ((language == null) || (language.equals("")) || (language.equals("default"))
-            || (language.equals(doc.getDefaultLanguage()))) {
-            // Need to save parent and defaultLanguage if they have changed
-            tdoc = doc;
-        } else {
-            tdoc = doc.getTranslatedDocument(language, context);
-            if (tdoc == doc) {
-                tdoc = new XWikiDocument(doc.getSpace(), doc.getName());
-                tdoc.setLanguage(language);
-                tdoc.setStore(doc.getStore());
-            }
-            tdoc.setTranslation(1);
-        }
+        XWikiDocument tdoc = getTranslatedDocument(doc, language, context);
 
         String username = context.getUser();
         XWikiLock lock = tdoc.getLock(context);
         if ((lock == null) || (username.equals(lock.getUserName()))) {
-            if ("inline".equals(request.get("action")))
+            if ("inline".equals(request.get("action"))) {
                 doc.setLock(username, context);
-            else
+            } else {
                 tdoc.setLock(username, context);
+            }
         }
 
         // forward to view

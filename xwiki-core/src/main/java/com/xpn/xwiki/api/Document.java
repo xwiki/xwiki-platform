@@ -266,6 +266,7 @@ public class Document extends Api
      * Get a string representing the previous version of the document.
      * 
      * @return A string representing the previous version of the document.
+     *         If this is the first version then it returns null.
      */
     public String getPreviousVersion()
     {

@@ -7012,8 +7012,14 @@ public class XWikiDocument implements DocumentModelBridge
         }
     }
 
+    /**
+     * @return the String representation of the previous version of this document or null if this is the first version.
+     */
     public String getPreviousVersion()
     {
+        if (getVersion().equals("1.1")) {
+            return null;
+        }
         return getDocumentArchive().getPrevVersion(getRCSVersion()).toString();
     }
 

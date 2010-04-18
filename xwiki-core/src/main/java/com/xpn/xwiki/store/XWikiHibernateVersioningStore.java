@@ -130,10 +130,6 @@ public class XWikiHibernateVersioningStore extends XWikiHibernateBaseStore imple
      */
     public XWikiDocumentArchive getXWikiDocumentArchive(XWikiDocument doc, XWikiContext context) throws XWikiException
     {
-        XWikiDocumentArchive archiveDoc = doc.getDocumentArchive();
-        if (archiveDoc != null) {
-            return archiveDoc;
-        }
         String key = ((doc.getDatabase() == null) ? "xwiki" : doc.getDatabase()) + COLON + doc.getFullName();
         if (!"".equals(doc.getLanguage())) {
             key = key + COLON + doc.getLanguage();

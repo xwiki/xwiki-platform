@@ -184,7 +184,7 @@ tt.wikimodel-verbatim {
 
 /* -----------------Non Existing Links-------------------*/
 span.wikicreatelink a {
-  background: transparent url("$xwiki.getSkinFile('icons/xwiki/create-link.png')") no-repeat scroll right center;
+  background: transparent url("$xwiki.getSkinFile('icons/xwiki/create-link.png')") no-repeat right;
   padding-right: 13px;
   text-decoration: underline;
 }
@@ -226,7 +226,7 @@ span.wikicreatelink a {
 }
 
 .edit_section a {
-  background: transparent url( $xwiki.getSkinFile('icons/xwiki/edit-section.png') ) left top no-repeat;
+  background: transparent url("$xwiki.getSkinFile('icons/xwiki/edit-section.png')") no-repeat left top;
   margin: 0 -52px 0 0;
   overflow: hidden;
   padding: 0 0 0 50px;
@@ -253,7 +253,7 @@ span.wikicreatelink a {
 }
 
 .loading {
-  background: transparent url($xwiki.getSkinFile('icons/xwiki/spinner.gif')) no-repeat center center;
+  background: transparent url("$xwiki.getSkinFile('icons/xwiki/spinner.gif')") no-repeat center;
 }
 
 .separator {
@@ -512,7 +512,7 @@ div.buttonwrapper {
 
 /* ----------------Changes----------------*/
 #changes-info {
-  background: $theme.backgroundSecondaryColor url( $xwiki.getSkinFile('icons/xwiki/diff-header.png') ) no-repeat 50% -30px;
+  background: $theme.backgroundSecondaryColor url("$xwiki.getSkinFile('icons/xwiki/diff-header.png')") no-repeat 50% -30px;
   color: $theme.textPrimaryColor;
   font-size: .9em;
   text-align: center;
@@ -701,7 +701,7 @@ body.main table {
 }
 
 .xwikirenderingerror {
-  background: $theme.backgroundSecondaryColor url($xwiki.getSkinFile("icons/silk/exclamation.gif")) 8px 50% no-repeat;
+  background: $theme.backgroundSecondaryColor url("$xwiki.getSkinFile('icons/silk/exclamation.gif')") no-repeat 8px 50%;
   border: 1px dotted $theme.borderColor;
   color: #e14726;
   display: block;
@@ -863,7 +863,7 @@ div#xwikiobjects input[type="checkbox"], div#xwikiclassproperties input[type="ch
   background: no-repeat 0px 0px;
   height: 16px;
   line-height: 20px;
-  margin-bottom: 4px;  
+  margin-bottom: 4px;
 }
 
 .actionmenu .submenuitem a, .actionmenu .submenuitem a:link, .actionmenu .submenuitem a:visited, .actionmenu .submenuitem a:active {
@@ -876,111 +876,111 @@ div#xwikiobjects input[type="checkbox"], div#xwikiclassproperties input[type="ch
 
 /* Icons */
 .actionmenu .tmWiki {
-  background-image: url($xwiki.getSkinFile('icons/silk/world.gif'));
+  background-image: url("$xwiki.getSkinFile('icons/silk/world.gif')");
 }
 
 .actionmenu .tmAdminWiki {
-  background-image: url($xwiki.getSkinFile('icons/silk/wrench.gif'));
+  background-image: url("$xwiki.getSkinFile('icons/silk/wrench.gif')");
 }
 
 .actionmenu .tmCreateSpace {
-  background-image: url($xwiki.getSkinFile('icons/silk/folder_add.gif'));
+  background-image: url("$xwiki.getSkinFile('icons/silk/folder_add.gif')");
 }
 
 .actionmenu .tmSpace {
-  background-image: url($xwiki.getSkinFile('icons/silk/folder.gif'));
+  background-image: url("$xwiki.getSkinFile('icons/silk/folder.gif')");
 }
 
 .actionmenu .tmAdminSpace {
-  background-image: url($xwiki.getSkinFile('icons/silk/wrench.gif'));
+  background-image: url("$xwiki.getSkinFile('icons/silk/wrench.gif')");
 }
 
 .actionmenu .tmCreatePage, .actionmenu .tmCreatePageFromOffice {
-  background-image: url($xwiki.getSkinFile('icons/silk/page_white_add.gif'));
+  background-image: url("$xwiki.getSkinFile('icons/silk/page_white_add.gif')");
 }
 
 .actionmenu .tmEdit {
-  background-image: url($xwiki.getSkinFile('icons/silk/page_white_edit.gif'));
+  background-image: url("$xwiki.getSkinFile('icons/silk/page_white_edit.gif')");
 }
 
 .actionmenu .tmEditWiki, .actionmenu .tmViewSource {
-  background-image: url($xwiki.getSkinFile('icons/silk/page_white_code.gif'));
+  background-image: url("$xwiki.getSkinFile('icons/silk/page_white_code.gif')");
 }
 
 .actionmenu .tmEditWysiwyg {
-  background-image: url($xwiki.getSkinFile('icons/silk/page_white_edit.gif'));
+  background-image: url("$xwiki.getSkinFile('icons/silk/page_white_edit.gif')");
 }
 
 .actionmenu .tmEditInline {
-  background-image: url($xwiki.getSkinFile('icons/silk/application_form.gif'));
+  background-image: url("$xwiki.getSkinFile('icons/silk/application_form.gif')");
 }
 
 .actionmenu .tmEditRights {
-  background-image: url($xwiki.getSkinFile('icons/silk/lock.gif'));
+  background-image: url("$xwiki.getSkinFile('icons/silk/lock.gif')");
 }
 
 .actionmenu .tmEditObject {
-  background-image: url($xwiki.getSkinFile('icons/silk/brick.gif'));
+  background-image: url("$xwiki.getSkinFile('icons/silk/brick.gif')");
 }
 
 .actionmenu .tmEditClass {
-  background-image: url($xwiki.getSkinFile('icons/silk/box.gif'));
+  background-image: url("$xwiki.getSkinFile('icons/silk/box.gif')");
 }
 
 .actionmenu .tmExportPdf {
-  background-image: url($xwiki.getSkinFile('icons/silk/page_white_acrobat.gif'));
+  background-image: url("$xwiki.getSkinFile('icons/silk/page_white_acrobat.gif')");
 }
 
 .actionmenu .tmExportRtf {
-  background-image: url($xwiki.getSkinFile('icons/silk/page_white_word.gif'));
+  background-image: url("$xwiki.getSkinFile('icons/silk/page_white_word.gif')");
 }
 
 .actionmenu .tmExportHtml {
-  background-image: url($xwiki.getSkinFile('icons/silk/page_white_world.gif'));
+  background-image: url("$xwiki.getSkinFile('icons/silk/page_white_world.gif')");
 }
 
 .actionmenu .tmExportXar {
-  background-image: url($xwiki.getSkinFile('icons/silk/page_white_compressed.gif'));
+  background-image: url("$xwiki.getSkinFile('icons/silk/page_white_compressed.gif')");
 }
 
 .actionmenu .tmPrintPreview {
-  background-image: url($xwiki.getSkinFile('icons/silk/page_white_magnify.gif'));
+  background-image: url("$xwiki.getSkinFile('icons/silk/page_white_magnify.gif')");
 }
 
 .actionmenu .tmActionDelete {
-  background-image: url($xwiki.getSkinFile('icons/silk/cross.gif'));
+  background-image: url("$xwiki.getSkinFile('icons/silk/cross.gif')");
 }
 
 .actionmenu .tmActionRename {
-  background-image: url($xwiki.getSkinFile('icons/silk/textfield_rename.gif'));
+  background-image: url("$xwiki.getSkinFile('icons/silk/textfield_rename.gif')");
 }
 
 .actionmenu .tmActionCopy {
-  background-image: url($xwiki.getSkinFile('icons/silk/page_white_copy.gif'));
+  background-image: url("$xwiki.getSkinFile('icons/silk/page_white_copy.gif')");
 }
 
 .actionmenu .tmUser {
-  background-image: url($xwiki.getSkinFile('icons/silk/user.gif'));
+  background-image: url("$xwiki.getSkinFile('icons/silk/user.gif')");
 }
 
 .actionmenu .tmProfile {
-  background-image: url($xwiki.getSkinFile('icons/silk/vcard.gif'));
+  background-image: url("$xwiki.getSkinFile('icons/silk/vcard.gif')");
 }
 
 .actionmenu .tmUserPreferences {
-  background-image: url($xwiki.getSkinFile('icons/silk/wrench.gif'));
+  background-image: url("$xwiki.getSkinFile('icons/silk/wrench.gif')");
 }
 
 .actionmenu .tmWatchlistManager {
-  background-image: url($xwiki.getSkinFile('icons/silk/star.gif'));
+  background-image: url("$xwiki.getSkinFile('icons/silk/star.gif')");
 }
 
 .actionmenu .tmWatchWiki, .actionmenu .tmWatchSpace, .actionmenu .tmWatchDocument {
-  background-image: url($xwiki.getSkinFile('icons/xwiki/star-gray.png'));
+  background-image: url("$xwiki.getSkinFile('icons/xwiki/star-gray.png')");
 }
 
 .actionmenu .tmUnwatchWiki, .actionmenu .tmUnwatchSpace, .actionmenu .tmUnwatchDocument {
-  background-image: url($xwiki.getSkinFile('icons/xwiki/star-yellow.png'));  
+  background-image: url("$xwiki.getSkinFile('icons/xwiki/star-yellow.png')");
 }
 
 /* @group BUTTONS */
@@ -1156,19 +1156,19 @@ ul.xlist li.space, ul.xlist li.page, ul.xlist li.comment, ul.xlist li.attachment
 }
 
 ul.xlist li.space {
-  background-image: url( $xwiki.getSkinFile('icons/silk/folder.gif') );
+  background-image: url("$xwiki.getSkinFile('icons/silk/folder.gif')");
 }
 
 ul.xlist li.page {
-  background-image: url( $xwiki.getSkinFile('icons/silk/page_white_text.gif') );
+  background-image: url("$xwiki.getSkinFile('icons/silk/page_white_text.gif')");
 }
 
 ul.xlist li.comment {
-  background-image: url( $xwiki.getSkinFile('icons/silk/comment.gif') );
+  background-image: url("$xwiki.getSkinFile('icons/silk/comment.gif')");
 }
 
 ul.xlist li.attachment {
-  background-image: url( $xwiki.getSkinFile('icons/silk/attach.gif') );
+  background-image: url("$xwiki.getSkinFile('icons/silk/attach.gif')");
   padding-bottom: 0;
 }
 
@@ -1212,17 +1212,17 @@ ul.xlist li.xitem div.xitemcontainer ul.xlist {
 }
 
 .infomessage {
-  background-image: url( $xwiki.getSkinFile('icons/silk/information.gif') );
+  background-image: url("$xwiki.getSkinFile('icons/silk/information.gif')");
   color: #369;
 }
 
 .warningmessage {
-  background-image: url( $xwiki.getSkinFile('icons/silk/error.gif') );
+  background-image: url("$xwiki.getSkinFile('icons/silk/error.gif')");
   color: #D5A13D;
 }
 
 .errormessage {
-  background-image: url( $xwiki.getSkinFile('icons/silk/exclamation.gif') );
+  background-image: url("$xwiki.getSkinFile('icons/silk/exclamation.gif')");
   color: #e14726;
 }
 
@@ -1292,7 +1292,7 @@ fieldset.xwikimessage .xwikimessage {
 /* Note that h6 styling is provided in order to ensure backward compatibility after XSCOLIBRI-160 */
 .accordionTabTitleBar h1, .accordionTabTitleBar h6 {
   display:block;
-  background: $theme.panelHeaderBackgroundColor url( $xwiki.getSkinFile('icons/xwiki/accordion.png')) 0 50% no-repeat;
+  background: $theme.panelHeaderBackgroundColor url("$xwiki.getSkinFile('icons/xwiki/accordion.png')") no-repeat left;
   border-bottom: 1px solid $theme.borderColor;
   border-top: 1px solid $theme.pageContentBackgroundColor;
   color: $theme.panelHeaderTextColor;

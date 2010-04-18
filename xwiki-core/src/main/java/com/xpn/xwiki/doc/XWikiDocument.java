@@ -1606,7 +1606,9 @@ public class XWikiDocument implements DocumentModelBridge
             setDocumentArchive(arch);
 
             return arch;
-        } catch (XWikiException e) {
+        } catch (Exception e) {
+            // VersioningStore.getXWikiDocumentArchive may throw an XWikiException, and xcontext or VersioningStore
+            // may be null (tests)
             // To maintain the behavior of this method we can't throw an exception.
             // Formerly, null was returned if there was no SoftReference.
             LOG.warn("Could not get document archive", e);

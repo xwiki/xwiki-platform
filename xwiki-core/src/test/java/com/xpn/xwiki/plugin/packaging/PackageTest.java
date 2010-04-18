@@ -52,6 +52,10 @@ public class PackageTest extends AbstractBridgedXWikiComponentTestCase
         this.mockXWiki = mock(XWiki.class);
         this.mockXWiki.stubs().method("getEncoding").will(returnValue("UTF-8"));
         this.mockXWiki.stubs().method("checkAccess").will(returnValue(true));
+
+        // clone calls getVersioningStore but returning null will be satisfactory for the test.
+        this.mockXWiki.stubs().method("getVersioningStore").will(returnValue(null));
+
         getContext().setWiki((XWiki) this.mockXWiki.proxy());
     }
 

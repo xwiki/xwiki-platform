@@ -136,7 +136,7 @@ public class XWikiHibernateVersioningStore extends XWikiHibernateBaseStore imple
         }
 
         synchronized (key) {
-            archiveDoc = context.getDocumentArchive(key);
+            XWikiDocumentArchive archiveDoc = context.getDocumentArchive(key);
             if (archiveDoc == null) {
                 String db = context.getDatabase();
                 try {

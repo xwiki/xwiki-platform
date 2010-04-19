@@ -78,3 +78,15 @@
   float: none !important;
   overflow: visible !important;
 }
+
+/* Remove shortcuts */
+#document-info>div+div,
+#historyshortcut, #informationshortcut, #annotationsshortcut {
+  display: none;
+}
+.xdocLastModification {
+  width: auto;
+}
+.recentChangesMoreActions {
+  display: none;
+}

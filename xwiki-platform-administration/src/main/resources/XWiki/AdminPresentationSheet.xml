@@ -66,7 +66,9 @@
 #set($params.panels = ['showLeftPanels', 'leftPanels', 'showRightPanels', 'rightPanels'])
 #if("$!editor" == 'globaladmin')
   #set($params.footer = ['webcopyright', 'version'])
+  #set($params.skin = ['skin', 'colorTheme', 'stylesheet', 'stylesheets'])
+#else
+  #set($params.skin = ['skin', 'stylesheet', 'stylesheets'])
 #end
-#set($params.skin = ['skin', 'colorTheme', 'stylesheet', 'stylesheets'])
 #includeForm('XWiki.AdminFieldsDisplaySheet')</content>
 </xwikidoc>

@@ -1332,12 +1332,12 @@ $html
 #set($color = "%232952A3")
 #end
 #if($bgcolor!="")
-#set($bgcolor = $color.replaceAll("#","%23"))
+#set($bgcolor = $bgcolor.replaceAll("#","%23"))
 #else
 #set($bgcolor = "%232952A3")
 #end
 {pre}
-<iframe src="//www.google.com/calendar/embed?title=Test&amp;showTitle=${showTitle}&amp;showNav=${showNav}&amp;showDate=${showDate}&amp;showPrint=${showPrint}&amp;showTabs=${showTabs}&amp;showCalendars=${showCalendars}&amp;showTz=${showTz}&amp;mode=${mode}&amp;height=${height}&amp;wkst=2&amp;hl=${language}&amp;bgcolor=${bgcolor}&amp;src=${id.replaceAll("@","%40")}&amp;color=${color}&amp;ctz=${ctz}" style=" border:solid ${border}px #777 " width="${width}" height="${height}" frameborder="0" scrolling="no"></iframe>
+<iframe src="//www.google.com/calendar/embed?showTitle=${showTitle}&amp;showNav=${showNav}&amp;showDate=${showDate}&amp;showPrint=${showPrint}&amp;showTabs=${showTabs}&amp;showCalendars=${showCalendars}&amp;showTz=${showTz}&amp;mode=${mode}&amp;height=${height}&amp;wkst=2&amp;hl=${language}&amp;bgcolor=${bgcolor}&amp;src=${id.replaceAll("@","%40")}&amp;color=${color}&amp;ctz=${ctz}" style=" border:solid ${border}px #777 " width="${width}" height="${height}" frameborder="0" scrolling="no"></iframe>
 {/pre}
 #end
 #**

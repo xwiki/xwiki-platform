@@ -76,6 +76,24 @@ public class XWikiSyntaxLinkRenderer
 
         printer.flush();
 
+        if (forceFullSyntax(printer, isLastSyntax, isFreeStandingURI, parameters)) {
+            this.forceFullSyntax.push(true);
+
+            printer.print("[[");
+        } else {
+            this.forceFullSyntax.push(false);
+        }
+    }
+
+    public boolean forceFullSyntax(XWikiSyntaxEscapeWikiPrinter printer, boolean isFreeStandingURI,
+        Map<String, String> parameters)
+    {
+        return forceFullSyntax(printer, true, isFreeStandingURI, parameters);
+    }
+
+    public boolean forceFullSyntax(XWikiSyntaxEscapeWikiPrinter printer, boolean isLastSyntax,
+        boolean isFreeStandingURI, Map<String, String> parameters)
+    {
         Event nextEvent = this.listenerChain.getLookaheadChainingListener().getNextEvent();
 
         // force full syntax if
@@ -85,7 +103,7 @@ public class XWikiSyntaxLinkRenderer
         // a another link)
         // 4: it's followed by a character which is not a white space (TODO: find a better way than this endless list of
         // EventType test but it probably need some big refactoring of the printer and XWikiSyntaxLinkRenderer)
-        if (!isFreeStandingURI
+        return !isFreeStandingURI
             || !parameters.isEmpty()
             || (!isLastSyntax && !printer.isAfterWhiteSpace() && (!PlainTextStreamParser.SPECIALSYMBOL_PATTERN.matcher(
                 String.valueOf(printer.getLastPrinted().charAt(printer.getLastPrinted().length() - 1))).matches()))
@@ -94,13 +112,7 @@ public class XWikiSyntaxLinkRenderer
                 && nextEvent.eventType != EventType.END_LINK && nextEvent.eventType != EventType.END_LIST_ITEM
                 && nextEvent.eventType != EventType.END_DEFINITION_DESCRIPTION
                 && nextEvent.eventType != EventType.END_DEFINITION_TERM
-                && nextEvent.eventType != EventType.END_QUOTATION_LINE && nextEvent.eventType != EventType.END_SECTION)) {
-            this.forceFullSyntax.push(true);
-
-            printer.print("[[");
-        } else {
-            this.forceFullSyntax.push(false);
-        }
+                && nextEvent.eventType != EventType.END_QUOTATION_LINE && nextEvent.eventType != EventType.END_SECTION);
     }
 
     public void renderLinkContent(XWikiSyntaxEscapeWikiPrinter printer, String label)

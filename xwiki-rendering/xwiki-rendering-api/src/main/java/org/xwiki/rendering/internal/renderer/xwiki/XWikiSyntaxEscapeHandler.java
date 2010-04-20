@@ -134,8 +134,7 @@ public class XWikiSyntaxEscapeHandler
         // - onWord("hello:") followed by onFormat(ITALIC) which would lead to "hello://" if the ":" wasn't escaped
         // - onWord("{") followed by onMacro() which would lead to "{{{" if the "{" wasn't escaped
         if (escapeLastChar) {
-            accumulatedBuffer.replace(accumulatedBuffer.length() - 1, accumulatedBuffer.length(), ESCAPE_CHAR
-                + accumulatedBuffer.charAt(accumulatedBuffer.length() - 1));
+            accumulatedBuffer.insert(accumulatedBuffer.length() - 1, '~');
         }
 
         // Escape begin link

@@ -5162,15 +5162,32 @@ public class XWiki implements XWikiDocChangeNotificationInterface
             setPhonyDocument(reference, context, vcontext);
             throw new XWikiException(XWikiException.MODULE_XWIKI_ACCESS, XWikiException.ERROR_XWIKI_ACCESS_DENIED,
                 "Access to document {0} has been denied to user {1}", null, args);
-        } else if (checkActive(context) == 0) {
+        } else if (checkActive(context) == 0) {  // if auth_active_check, check if user is inactive
             boolean allow = false;
-            String allowed = Param("xwiki.inactiveuser.allowedpages", "");
-            if (context.getAction().equals("view") && !allowed.equals("")) {
-                String[] allowedList = StringUtils.split(allowed, " ,");
-                for (int i = 0; i < allowedList.length; i++) {
-                    if (allowedList[i].equals(doc.getFullName())) {
-                        allow = true;
-                        break;
+            String action = context.getAction();
+            /*
+             * Allow inactive users to see skins, ressources, SSX, JSX and downloads they could have seen as guest. The
+             * rational behind this behaviour is that inactive users should be able to access the same UI that guests
+             * are used to see, including custom icons, panels, and so on...
+             */
+            if ((action.equals("skin") && (doc.getSpace().equals("skins") || doc.getSpace().equals("resources")))
+                ||
+                ((action.equals("skin") || action.equals("download") || action.equals("ssx") || action.equals("jsx")) &&
+                    getRightService()
+                        .hasAccessLevel("view", XWikiRightService.GUEST_USER_FULLNAME, doc.getPrefixedFullName(),
+                            context))
+                || ((action.equals("view") && doc.getFullName().equals("XWiki.AccountValidation"))))
+            {
+                allow = true;
+            } else {
+                String allowed = Param("xwiki.inactiveuser.allowedpages", "");
+                if (context.getAction().equals("view") && !allowed.equals("")) {
+                    String[] allowedList = StringUtils.split(allowed, " ,");
+                    for (int i = 0; i < allowedList.length; i++) {
+                        if (allowedList[i].equals(doc.getFullName())) {
+                            allow = true;
+                            break;
+                        }
                     }
                 }
             }

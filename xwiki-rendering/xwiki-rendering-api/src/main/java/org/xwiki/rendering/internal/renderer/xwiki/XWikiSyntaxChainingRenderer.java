@@ -87,8 +87,8 @@ public class XWikiSyntaxChainingRenderer extends AbstractChainingPrintRenderer i
      */
     public StackableChainingListener createChainingListenerInstance()
     {
-        XWikiSyntaxChainingRenderer renderer = new XWikiSyntaxChainingRenderer(getListenerChain(),
-            this.linkReferenceSerializer);
+        XWikiSyntaxChainingRenderer renderer =
+            new XWikiSyntaxChainingRenderer(getListenerChain(), this.linkReferenceSerializer);
         renderer.setPrinter(getPrinter());
         return renderer;
     }
@@ -176,6 +176,12 @@ public class XWikiSyntaxChainingRenderer extends AbstractChainingPrintRenderer i
         // TODO: improve the block state renderer to be able to make the difference between what is bufferized
         // before the link and what in the label link
         getXWikiPrinter().setBeforeLink(true);
+        // escape open link syntax when before a link
+        if (getLinkRenderer().forceFullSyntax(getXWikiPrinter(), isFreeStandingURI, parameters)
+            && getXWikiPrinter().getBuffer().length() > 0
+            && getXWikiPrinter().getBuffer().charAt(getXWikiPrinter().getBuffer().length() - 1) == '[') {
+            getXWikiPrinter().setEscapeLastChar(true);
+        }
         getXWikiPrinter().flush();
         getXWikiPrinter().setBeforeLink(false);
 
@@ -187,7 +193,7 @@ public class XWikiSyntaxChainingRenderer extends AbstractChainingPrintRenderer i
             getLinkRenderer().beginRenderLink(getXWikiPrinter(), link, isFreeStandingURI, parameters);
 
             XWikiSyntaxEscapeWikiPrinter linkLabelPrinter =
-                    new XWikiSyntaxEscapeWikiPrinter(new DefaultWikiPrinter(), getXWikiSyntaxListenerChain());
+                new XWikiSyntaxEscapeWikiPrinter(new DefaultWikiPrinter(), getXWikiSyntaxListenerChain());
 
             // Make sure the escape handler knows there is already characters before
             linkLabelPrinter.setOnNewLine(getXWikiPrinter().isOnNewLine());
@@ -346,7 +352,8 @@ public class XWikiSyntaxChainingRenderer extends AbstractChainingPrintRenderer i
         if (getBlockState().isInLine()) {
             if (getXWikiSyntaxListenerChain().getConsecutiveNewLineStateChainingListener().getNewLineCount() > 1) {
                 print("\\\\");
-            } else if (getXWikiSyntaxListenerChain().getLookaheadChainingListener().getNextEvent().eventType.isInlineEnd()) {
+            } else if (getXWikiSyntaxListenerChain().getLookaheadChainingListener().getNextEvent().eventType
+                .isInlineEnd()) {
                 print("\\\\");
             } else {
                 print("\n");

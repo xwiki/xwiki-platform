@@ -127,16 +127,21 @@ public class XWikiSyntaxEscapeWikiPrinter extends LookaheadWikiPrinter
         }
     }
 
+    public void setEscapeLastChar(boolean escapeLastChar)
+    {
+        this.escapeLastChar = escapeLastChar;
+    }
+
     public void setBeforeLink(boolean beforeLink)
     {
         this.escapeHandler.setBeforeLink(beforeLink);
     }
-
+    
     public void setOnNewLine(boolean onNewLine)
     {
         this.escapeHandler.setOnNewLine(onNewLine);
     }
-
+    
     public boolean isOnNewLine()
     {
         return this.escapeHandler.isOnNewLine();

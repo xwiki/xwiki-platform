@@ -27,7 +27,7 @@
   <parent>
     <artifactId>xwiki-plugins</artifactId>
     <groupId>com.xpn.xwiki.platform.plugins</groupId>
-    <version>22</version>
+    <version>23-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-plugin-calendar</artifactId>
   <name>XWiki Platform - Plugins - Calendar</name>

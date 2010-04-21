@@ -179,16 +179,22 @@ public class XWikiRightServiceImplTest extends AbstractBridgedXWikiComponentTest
 
         preferencesObject.setStringValue("users", this.user.getPrefixedFullName());
 
-        getContext().setDatabase("wiki");
+        getContext().setDatabase(this.user.getWikiName());
 
         assertTrue("User from another wiki does not have right on a local wiki when tested from user wiki",
             this.rightService.hasAccessLevel("view", this.user.getPrefixedFullName(), doc.getPrefixedFullName(), true,
                 getContext()));
+        assertTrue("User from another wiki does not have right on a local wiki when tested from user wiki",
+            this.rightService.hasAccessLevel("view", this.user.getFullName(), doc.getPrefixedFullName(), true,
+                getContext()));
 
-        getContext().setDatabase("wiki2");
+        getContext().setDatabase(doc.getWikiName());
 
         assertTrue("User from another wiki does not have right on a local wiki when tested from local wiki",
             this.rightService.hasAccessLevel("view", this.user.getPrefixedFullName(), doc.getPrefixedFullName(), true,
+                getContext()));
+        assertTrue("User from another wiki does not have right on a local wiki when tested from local wiki",
+            this.rightService.hasAccessLevel("view", this.user.getPrefixedFullName(), doc.getFullName(), true,
                 getContext()));
 
         // user group rights
@@ -196,16 +202,22 @@ public class XWikiRightServiceImplTest extends AbstractBridgedXWikiComponentTest
         preferencesObject.removeField("users");
         preferencesObject.setStringValue("groups", this.group.getPrefixedFullName());
 
-        getContext().setDatabase("wiki");
+        getContext().setDatabase(this.user.getWikiName());
 
         assertTrue("User group from another wiki does not have right on a local wiki when tested from user wiki",
             this.rightService.hasAccessLevel("view", this.user.getPrefixedFullName(), doc.getPrefixedFullName(), true,
                 getContext()));
+        assertTrue("User group from another wiki does not have right on a local wiki when tested from user wiki",
+            this.rightService.hasAccessLevel("view", this.user.getFullName(), doc.getPrefixedFullName(), true,
+                getContext()));
 
-        getContext().setDatabase("wiki2");
+        getContext().setDatabase(doc.getWikiName());
 
         assertTrue("User group from another wiki does not have right on a local wiki when tested from local wiki",
             this.rightService.hasAccessLevel("view", this.user.getPrefixedFullName(), doc.getPrefixedFullName(), true,
+                getContext()));
+        assertTrue("User group from another wiki does not have right on a local wiki when tested from local wiki",
+            this.rightService.hasAccessLevel("view", this.user.getPrefixedFullName(), doc.getFullName(), true,
                 getContext()));
     }
 

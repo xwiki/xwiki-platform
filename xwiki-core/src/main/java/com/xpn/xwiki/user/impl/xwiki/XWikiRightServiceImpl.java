@@ -314,7 +314,7 @@ public class XWikiRightServiceImpl implements XWikiRightService
         }
     }
 
-    public boolean checkRight(String name, XWikiDocument doc, String accessLevel, boolean user, boolean allow,
+    public boolean checkRight(String userOrGroupName, XWikiDocument doc, String accessLevel, boolean user, boolean allow,
         boolean global, XWikiContext context) throws XWikiRightNotFoundException, XWikiException
     {
         String className = global ? "XWiki.XWikiGlobalRights" : "XWiki.XWikiRights";
@@ -322,16 +322,16 @@ public class XWikiRightServiceImpl implements XWikiRightService
         boolean found = false;
 
         // Here entity is either a user or a group
-        DocumentReference entityDocumentReference = this.currentMixedDocumentReferenceResolver.resolve(name);
-        String prefixedFullName = this.entityReferenceSerializer.serialize(entityDocumentReference);
-        String shortname = name;
-        int i0 = name.indexOf(":");
+        DocumentReference userOrGroupDocumentReference = this.currentMixedDocumentReferenceResolver.resolve(userOrGroupName);
+        String prefixedFullName = this.entityReferenceSerializer.serialize(userOrGroupDocumentReference);
+        String shortname = userOrGroupName;
+        int i0 = userOrGroupName.indexOf(":");
         if (i0 != -1) {
-            shortname = name.substring(i0 + 1);
+            shortname = userOrGroupName.substring(i0 + 1);
         }
 
         if (LOG.isDebugEnabled()) {
-            LOG.debug("Checking right: " + name + "," + doc.getFullName() + "," + accessLevel + "," + user + ","
+            LOG.debug("Checking right: " + userOrGroupName + "," + doc.getFullName() + "," + accessLevel + "," + user + ","
                 + allow + "," + global);
         }
 
@@ -373,7 +373,7 @@ public class XWikiRightServiceImpl implements XWikiRightService
                         found = true;
 
                         if (LOG.isDebugEnabled()) {
-                            LOG.debug("Checking match: " + name + " in " + users);
+                            LOG.debug("Checking match: " + userOrGroupName + " in " + users);
                         }
 
                         String[] userarray = GroupsClass.getListFromString(users).toArray(new String[0]);
@@ -386,13 +386,13 @@ public class XWikiRightServiceImpl implements XWikiRightService
                         }
 
                         if (LOG.isDebugEnabled()) {
-                            LOG.debug("Checking match: " + name + " in " + StringUtils.join(userarray, ","));
+                            LOG.debug("Checking match: " + userOrGroupName + " in " + StringUtils.join(userarray, ","));
                         }
 
                         // In the case where the document database and the user database is the same
                         // then we allow the usage of the short name, otherwise the fully qualified
                         // name is requested
-                        if (context.getDatabase().equals(entityDocumentReference.getWikiReference().getName())) {
+                        if (context.getDatabase().equals(userOrGroupDocumentReference.getWikiReference().getName())) {
                             if (ArrayUtils.contains(userarray, shortname)) {
                                 if (LOG.isDebugEnabled()) {
                                     LOG.debug("Found matching right in " + users + " for " + shortname);
@@ -413,16 +413,16 @@ public class XWikiRightServiceImpl implements XWikiRightService
                             }
                         }
 
-                        if ((context.getDatabase() != null) && (ArrayUtils.contains(userarray, name))) {
+                        if ((context.getDatabase() != null) && (ArrayUtils.contains(userarray, userOrGroupName))) {
                             if (LOG.isDebugEnabled()) {
-                                LOG.debug("Found matching right in " + users + " for " + name);
+                                LOG.debug("Found matching right in " + users + " for " + userOrGroupName);
                             }
 
                             return true;
                         }
 
                         if (LOG.isDebugEnabled()) {
-                            LOG.debug("Failed match: " + name + " in " + users);
+                            LOG.debug("Failed match: " + userOrGroupName + " in " + users);
                         }
                     }
                 } else {
@@ -447,7 +447,7 @@ public class XWikiRightServiceImpl implements XWikiRightService
         Collection<String> grouplist = new HashSet<String>();
         XWikiGroupService groupService = context.getWiki().getGroupService(context);
 
-        // FIXME: it looks like this code was supposed to get entity groups in current wikis but listGroupsForUser
+        // FIXME: it looks like this code was supposed to get user or group groups in current wikis but listGroupsForUser
         // always return groups from entity wiki, maybe listGroupsForUser changed at some point
         {
             // the key is for the entity <code>prefixedFullName</code> in current wiki
@@ -456,14 +456,14 @@ public class XWikiRightServiceImpl implements XWikiRightService
             Collection<String> tmpGroupList = grouplistcache.get(key);
             if (tmpGroupList == null) {
                 try {
-                    Collection<String> glist = groupService.listGroupsForUser(name, context);
+                    Collection<String> glist = groupService.listGroupsForUser(userOrGroupName, context);
 
                     tmpGroupList = new ArrayList<String>(glist.size());
                     for (String groupName : glist) {
-                        tmpGroupList.add(entityDocumentReference.getWikiReference().getName() + ":" + groupName);
+                        tmpGroupList.add(userOrGroupDocumentReference.getWikiReference().getName() + ":" + groupName);
                     }
                 } catch (Exception e) {
-                    LOG.error("Failed to get groups for user or group [" + name + "]", e);
+                    LOG.error("Failed to get groups for user or group [" + userOrGroupName + "]", e);
 
                     tmpGroupList = Collections.emptyList();
                 }
@@ -474,13 +474,13 @@ public class XWikiRightServiceImpl implements XWikiRightService
             grouplist.addAll(tmpGroupList);
         }
 
-        // Get entity groups in entity wiki
+        // Get user or group groups in user or group wiki
         if (context.getWiki().isVirtualMode() && !context.getDatabase().equalsIgnoreCase(
-            entityDocumentReference.getWikiReference().getName()))
+            userOrGroupDocumentReference.getWikiReference().getName()))
         {
             String database = context.getDatabase();
             try {
-                context.setDatabase(entityDocumentReference.getWikiReference().getName());
+                context.setDatabase(userOrGroupDocumentReference.getWikiReference().getName());
 
                 // the key is for the entity <code>prefixedFullName</code> in entity wiki
                 String key = context.getDatabase() + ":" + prefixedFullName;
@@ -498,7 +498,7 @@ public class XWikiRightServiceImpl implements XWikiRightService
 
                 grouplist.addAll(tmpGroupList);
             } catch (Exception e) {
-                LOG.error("Failed to get groups for user or group [" + name + "]", e);
+                LOG.error("Failed to get groups for user or group [" + userOrGroupName + "]", e);
             } finally {
                 context.setDatabase(database);
             }
@@ -524,7 +524,7 @@ public class XWikiRightServiceImpl implements XWikiRightService
         }
 
         if (LOG.isDebugEnabled()) {
-            LOG.debug("Finished searching for rights for " + name + ": " + found);
+            LOG.debug("Finished searching for rights for " + userOrGroupName + ": " + found);
         }
 
         if (found) {
@@ -534,11 +534,23 @@ public class XWikiRightServiceImpl implements XWikiRightService
         }
     }
 
-    public boolean hasAccessLevel(String accessLevel, String name, String resourceKey, boolean user,
+    public boolean hasAccessLevel(String accessLevel, String userOrGroupName, String entityReference, boolean user,
         XWikiContext context) throws XWikiException
     {
         if (LOG.isDebugEnabled()) {
-            LOG.debug("hasAccessLevel for " + accessLevel + ", " + name + ", " + resourceKey);
+            LOG.debug("hasAccessLevel for " + accessLevel + ", " + userOrGroupName + ", " + entityReference);
+        }
+
+        if (context.getDatabase() != null) {
+            // Make sure to have the prefixed full name of the user or group
+            if (!StringUtils.contains(userOrGroupName, ':')) {
+                userOrGroupName = context.getDatabase() + ":" + userOrGroupName;
+            }
+
+            // Make sure to have the prefixed full name of the resource
+            if (!StringUtils.contains(entityReference, ":")) {
+                entityReference = context.getDatabase() + ":" + entityReference;
+            }
         }
 
         boolean deny = false;
@@ -552,14 +564,14 @@ public class XWikiRightServiceImpl implements XWikiRightService
         if (isReadOnly) {
             if ("edit".equals(accessLevel) || "delete".equals(accessLevel) || "undelete".equals(accessLevel)
                 || "comment".equals(accessLevel) || "register".equals(accessLevel)) {
-                logDeny(name, resourceKey, accessLevel, "server in read-only mode");
+                logDeny(userOrGroupName, entityReference, accessLevel, "server in read-only mode");
 
                 return false;
             }
         }
 
-        if (name.equals(XWikiRightService.GUEST_USER_FULLNAME)
-            || name.endsWith(":" + XWikiRightService.GUEST_USER_FULLNAME)) {
+        if (userOrGroupName.equals(XWikiRightService.GUEST_USER_FULLNAME)
+            || userOrGroupName.endsWith(":" + XWikiRightService.GUEST_USER_FULLNAME)) {
             if (needsAuth(accessLevel, context)) {
                 return false;
             }
@@ -567,18 +579,18 @@ public class XWikiRightServiceImpl implements XWikiRightService
 
         // Fast return for delete right: allow the creator to delete the document
         if (accessLevel.equals("delete") && user) {
-            currentdoc = context.getWiki().getDocument(resourceKey, context);
+            currentdoc = context.getWiki().getDocument(entityReference, context);
             String creator = currentdoc.getCreator();
             if (creator != null) {
-                if (name.equals(creator)) {
-                    logAllow(name, resourceKey, accessLevel, "delete right from document ownership");
+                if (userOrGroupName.equals(creator)) {
+                    logAllow(userOrGroupName, entityReference, accessLevel, "delete right from document ownership");
 
                     return true;
                 }
             }
         }
 
-        allow = isSuperAdminOrProgramming(name, resourceKey, accessLevel, user, context);
+        allow = isSuperAdminOrProgramming(userOrGroupName, entityReference, accessLevel, user, context);
         if ((allow == true) || (accessLevel.equals("programming"))) {
             return allow;
         }
@@ -587,31 +599,35 @@ public class XWikiRightServiceImpl implements XWikiRightService
             // Verify Wiki Owner
             String wikiOwner = context.getWiki().getWikiOwner(database, context);
             if (wikiOwner != null) {
-                if (wikiOwner.equals(name)) {
-                    logAllow(name, resourceKey, accessLevel, "admin level from wiki ownership");
+                if (wikiOwner.equals(userOrGroupName)) {
+                    logAllow(userOrGroupName, entityReference, accessLevel, "admin level from wiki ownership");
 
                     return true;
                 }
             }
 
-            XWikiDocument xwikidoc = context.getWiki().getDocument("XWiki.XWikiPreferences", context);
+            currentdoc = currentdoc == null ? context.getWiki().getDocument(entityReference, context) : currentdoc;
+            // We need to make sure we are in the context of the document which rights is being checked
+            context.setDatabase(currentdoc.getDatabase());
+
+            XWikiDocument entityWikiPreferences = context.getWiki().getDocument("XWiki.XWikiPreferences", context);
 
             // Verify XWiki register right
             if (accessLevel.equals("register")) {
                 try {
-                    allow = checkRight(name, xwikidoc, "register", user, true, true, context);
+                    allow = checkRight(userOrGroupName, entityWikiPreferences, "register", user, true, true, context);
                     if (allow) {
-                        logAllow(name, resourceKey, accessLevel, "register level");
+                        logAllow(userOrGroupName, entityReference, accessLevel, "register level");
 
                         return true;
                     } else {
-                        logDeny(name, resourceKey, accessLevel, "register level");
+                        logDeny(userOrGroupName, entityReference, accessLevel, "register level");
 
                         return false;
                     }
                 } catch (XWikiRightNotFoundException e) {
                     try {
-                        deny = checkRight(name, xwikidoc, "register", user, false, true, context);
+                        deny = checkRight(userOrGroupName, entityWikiPreferences, "register", user, false, true, context);
                         if (deny) {
                             return false;
                         }
@@ -619,16 +635,16 @@ public class XWikiRightServiceImpl implements XWikiRightService
                     }
                 }
 
-                logAllow(name, resourceKey, accessLevel, "register level (no right found)");
+                logAllow(userOrGroupName, entityReference, accessLevel, "register level (no right found)");
 
                 return true;
             }
 
             int maxRecursiveSpaceChecks = context.getWiki().getMaxRecursiveSpaceChecks(context);
             boolean isSuperUser =
-                    isSuperUser(accessLevel, name, resourceKey, user, xwikidoc, maxRecursiveSpaceChecks, context);
+                    isSuperUser(accessLevel, userOrGroupName, entityReference, user, entityWikiPreferences, maxRecursiveSpaceChecks, context);
             if (isSuperUser) {
-                logAllow(name, resourceKey, accessLevel, "admin level");
+                logAllow(userOrGroupName, entityReference, accessLevel, "admin level");
 
                 return true;
             }
@@ -636,14 +652,14 @@ public class XWikiRightServiceImpl implements XWikiRightService
             // check has deny rights
             if (hasDenyRights()) {
                 // First check if this document is denied to the specific user
-                resourceKey = Util.getName(resourceKey, context);
+                entityReference = Util.getName(entityReference, context);
                 try {
                     currentdoc =
-                            (currentdoc == null) ? context.getWiki().getDocument(resourceKey, context) : currentdoc;
-                    deny = checkRight(name, currentdoc, accessLevel, user, false, false, context);
+                            currentdoc == null ? context.getWiki().getDocument(entityReference, context) : currentdoc;
+                    deny = checkRight(userOrGroupName, currentdoc, accessLevel, user, false, false, context);
                     deny_found = true;
                     if (deny) {
-                        logDeny(name, resourceKey, accessLevel, "document level");
+                        logDeny(userOrGroupName, entityReference, accessLevel, "document level");
                         return false;
                     }
                 } catch (XWikiRightNotFoundException e) {
@@ -651,11 +667,11 @@ public class XWikiRightServiceImpl implements XWikiRightService
             }
 
             try {
-                currentdoc = (currentdoc == null) ? context.getWiki().getDocument(resourceKey, context) : currentdoc;
-                allow = checkRight(name, currentdoc, accessLevel, user, true, false, context);
+                currentdoc = currentdoc == null ? context.getWiki().getDocument(entityReference, context) : currentdoc;
+                allow = checkRight(userOrGroupName, currentdoc, accessLevel, user, true, false, context);
                 allow_found = true;
                 if (allow) {
-                    logAllow(name, resourceKey, accessLevel, "document level");
+                    logAllow(userOrGroupName, entityReference, accessLevel, "document level");
 
                     return true;
                 }
@@ -677,10 +693,10 @@ public class XWikiRightServiceImpl implements XWikiRightService
                 if (!webdoc.isNew()) {
                     if (hasDenyRights()) {
                         try {
-                            deny = checkRight(name, webdoc, accessLevel, user, false, true, context);
+                            deny = checkRight(userOrGroupName, webdoc, accessLevel, user, false, true, context);
                             deny_found = true;
                             if (deny) {
-                                logDeny(name, resourceKey, accessLevel, "web level");
+                                logDeny(userOrGroupName, entityReference, accessLevel, "web level");
 
                                 return false;
                             }
@@ -692,10 +708,10 @@ public class XWikiRightServiceImpl implements XWikiRightService
                     // then we cannot check the web rights anymore
                     if (!allow_found) {
                         try {
-                            allow = checkRight(name, webdoc, accessLevel, user, true, true, context);
+                            allow = checkRight(userOrGroupName, webdoc, accessLevel, user, true, true, context);
                             allow_found = true;
                             if (allow) {
-                                logAllow(name, resourceKey, accessLevel, "web level");
+                                logAllow(userOrGroupName, entityReference, accessLevel, "web level");
 
                                 return true;
                             }
@@ -720,10 +736,10 @@ public class XWikiRightServiceImpl implements XWikiRightService
             // through the XWiki.XWikiPreferences Global Rights
             if (hasDenyRights()) {
                 try {
-                    deny = checkRight(name, xwikidoc, accessLevel, user, false, true, context);
+                    deny = checkRight(userOrGroupName, entityWikiPreferences, accessLevel, user, false, true, context);
                     deny_found = true;
                     if (deny) {
-                        logDeny(name, resourceKey, accessLevel, "xwiki level");
+                        logDeny(userOrGroupName, entityReference, accessLevel, "xwiki level");
 
                         return false;
                     }
@@ -735,10 +751,10 @@ public class XWikiRightServiceImpl implements XWikiRightService
             // then we cannot check the web rights anymore
             if (!allow_found) {
                 try {
-                    allow = checkRight(name, xwikidoc, accessLevel, user, true, true, context);
+                    allow = checkRight(userOrGroupName, entityWikiPreferences, accessLevel, user, true, true, context);
                     allow_found = true;
                     if (allow) {
-                        logAllow(name, resourceKey, accessLevel, "xwiki level");
+                        logAllow(userOrGroupName, entityReference, accessLevel, "xwiki level");
 
                         return true;
                     }
@@ -752,22 +768,22 @@ public class XWikiRightServiceImpl implements XWikiRightService
             if (!allow_found) {
                 // Should these rights be denied only if no deny rights were found?
                 if (accessLevel.equals("register") || accessLevel.equals("delete")) {
-                    logDeny(name, resourceKey, accessLevel, "global level (" + accessLevel + " right must be explicit)");
+                    logDeny(userOrGroupName, entityReference, accessLevel, "global level (" + accessLevel + " right must be explicit)");
 
                     return false;
                 } else {
-                    logAllow(name, resourceKey, accessLevel, "global level (no restricting right)");
+                    logAllow(userOrGroupName, entityReference, accessLevel, "global level (no restricting right)");
 
                     return true;
                 }
             } else {
-                logDeny(name, resourceKey, accessLevel, "global level (restricting right was found)");
+                logDeny(userOrGroupName, entityReference, accessLevel, "global level (restricting right was found)");
 
                 return false;
             }
 
         } catch (XWikiException e) {
-            logDeny(name, resourceKey, accessLevel, "global level (exception)", e);
+            logDeny(userOrGroupName, entityReference, accessLevel, "global level (exception)", e);
             e.printStackTrace();
 
             return false;

@@ -24,6 +24,7 @@ import java.util.Collections;
 import org.jmock.Mock;
 import org.jmock.core.Invocation;
 import org.jmock.core.stub.CustomStub;
+import org.xwiki.model.reference.DocumentReference;
 
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
@@ -44,19 +45,13 @@ public class XWikiRightServiceImplTest extends AbstractBridgedXWikiComponentTest
 {
     private XWikiRightServiceImpl rightService;
 
-    private XWikiContext context;
-
     private Mock mockAuthService;
 
     private Mock mockXWiki;
 
-    private static final String GLOBALGROUPNAME = "xwiki:XWiki.XWikiAllGroup";
+    private XWikiDocument user;
 
-    private static final String SHORTGROUPNAME = "XWiki.XWikiAllGroup";
-
-    private static final String GLOBALUSERNAME = "xwiki:XWiki.User";
-
-    private static final String LOCALUSERNAME = "XWiki.User";
+    private XWikiDocument group;
 
     /**
      * {@inheritDoc}
@@ -69,12 +64,43 @@ public class XWikiRightServiceImplTest extends AbstractBridgedXWikiComponentTest
         super.setUp();
         this.rightService = new XWikiRightServiceImpl();
 
-        this.context = new XWikiContext();
-        this.context.setMainXWiki("xwiki");
-        this.context.setDatabase("xwiki");
-
         this.mockAuthService = mock(XWikiGroupService.class, new Class[] {}, new Object[] {});
-        this.mockAuthService.stubs().method("listGroupsForUser").will(
+
+        this.mockXWiki = mock(XWiki.class);
+        this.mockXWiki.stubs().method("isVirtualMode").will(returnValue(true));
+        this.mockXWiki.stubs().method("getGroupService").will(returnValue(this.mockAuthService.proxy()));
+        this.mockXWiki.stubs().method("isReadOnly").will(returnValue(false));
+        this.mockXWiki.stubs().method("getWikiOwner").will(returnValue(null));
+        this.mockXWiki.stubs().method("getMaxRecursiveSpaceChecks").will(returnValue(0));
+        this.mockXWiki.stubs().method("getDocument").with(ANYTHING, eq("WebPreferences"), ANYTHING).will(
+            new CustomStub("Implements XWiki.getDocument")
+            {
+                public Object invoke(Invocation invocation) throws Throwable
+                {
+                    return new XWikiDocument(new DocumentReference(getContext().getDatabase(),
+                        (String) invocation.parameterValues.get(0), "WebPreferences"));
+                }
+            });
+
+        getContext().setWiki((XWiki) this.mockXWiki.proxy());
+
+        this.user = new XWikiDocument(new DocumentReference("wiki", "XWiki", "user"));
+        BaseObject userObject = new BaseObject();
+        userObject.setClassName("XWiki.XWikiUser");
+        this.user.addXObject(userObject);
+        this.mockXWiki.stubs().method("getDocument").with(eq(this.user.getPrefixedFullName()), ANYTHING).will(
+            returnValue(this.user));
+
+        this.group = new XWikiDocument(new DocumentReference("wiki", "XWiki", "group"));
+        BaseObject groupObject = new BaseObject();
+        groupObject.setClassName("XWiki.XWikiGroup");
+        groupObject.setStringValue("member", "XWiki.user");
+        this.group.addXObject(groupObject);
+        this.mockXWiki.stubs().method("getDocument").with(eq(this.group.getPrefixedFullName()), ANYTHING).will(
+            returnValue(this.group));
+        
+        this.mockAuthService.stubs().method("listGroupsForUser").with(eq(this.user.getPrefixedFullName()), ANYTHING).will(returnValue(Collections.singleton(this.group.getFullName())));
+        this.mockAuthService.stubs().method("listGroupsForUser").with(eq(this.user.getFullName()), ANYTHING).will(
             new CustomStub("Implements XWikiGroupService.listGroupsForUser")
             {
                 public Object invoke(Invocation invocation) throws Throwable
@@ -82,19 +108,16 @@ public class XWikiRightServiceImplTest extends AbstractBridgedXWikiComponentTest
                     String member = (String) invocation.parameterValues.get(0);
                     XWikiContext context = (XWikiContext) invocation.parameterValues.get(1);
 
-                    if (context.getDatabase().equals("xwiki") && member.equals(LOCALUSERNAME)) {
-                        return Collections.singleton(SHORTGROUPNAME);
+                    if (context.getDatabase().equals(user.getWikiName())) {
+                        return Collections.singleton(group.getFullName());
                     } else {
                         return Collections.emptyList();
                     }
                 }
             });
-
-        this.mockXWiki = mock(XWiki.class);
-        this.mockXWiki.stubs().method("isVirtualMode").will(returnValue(true));
-        this.mockXWiki.stubs().method("getGroupService").will(returnValue(this.mockAuthService.proxy()));
-
-        this.context.setWiki((XWiki) this.mockXWiki.proxy());
+        
+        this.mockAuthService.stubs().method("listGroupsForUser").with(eq(this.group.getPrefixedFullName()), ANYTHING).will(returnValue(Collections.emptyList()));
+        this.mockAuthService.stubs().method("listGroupsForUser").with(eq(this.group.getFullName()), ANYTHING).will(returnValue(Collections.emptyList()));
     }
 
     /**
@@ -102,14 +125,11 @@ public class XWikiRightServiceImplTest extends AbstractBridgedXWikiComponentTest
      */
     public void testCheckRight() throws XWikiRightNotFoundException, XWikiException
     {
-        XWikiDocument doc = new XWikiDocument();
-        doc.setDatabase("wiki2");
-        doc.setSpace("Space");
-        doc.setName("Page");
+        final XWikiDocument doc = new XWikiDocument(new DocumentReference("wiki2", "Space", "Page"));
 
         Mock mockGlobalRightObj = mock(BaseObject.class, new Class[] {}, new Object[] {});
         mockGlobalRightObj.stubs().method("getStringValue").with(eq("levels")).will(returnValue("view"));
-        mockGlobalRightObj.stubs().method("getStringValue").with(eq("groups")).will(returnValue(GLOBALGROUPNAME));
+        mockGlobalRightObj.stubs().method("getStringValue").with(eq("groups")).will(returnValue(this.group.getPrefixedFullName()));
         mockGlobalRightObj.stubs().method("getStringValue").with(eq("users")).will(returnValue(""));
         mockGlobalRightObj.stubs().method("getIntValue").with(eq("allow")).will(returnValue(1));
         mockGlobalRightObj.stubs().method("setNumber");
@@ -117,14 +137,81 @@ public class XWikiRightServiceImplTest extends AbstractBridgedXWikiComponentTest
 
         doc.addObject("XWiki.XWikiGlobalRights", (BaseObject) mockGlobalRightObj.proxy());
 
-        this.context.setDatabase("wiki2");
+        getContext().setDatabase("wiki2");
 
-        boolean result = this.rightService.checkRight(GLOBALUSERNAME, doc, "view", true, true, true, this.context);
+        boolean result = this.rightService.checkRight(this.user.getPrefixedFullName(), doc, "view", true, true, true, getContext());
 
-        assertTrue(GLOBALUSERNAME + "does not have global view right on wiki2", result);
+        assertTrue(this.user.getPrefixedFullName() + "does not have global view right on wiki2", result);
     }
 
-    /** Test that programming rights are checked on the context user when no context document is set. */
+    public void testHasAccessLevelWhithUserFromAnotherWiki() throws XWikiException
+    {
+        final XWikiDocument doc = new XWikiDocument(new DocumentReference("wiki2", "Space", "Page"));
+
+        final XWikiDocument preferences = new XWikiDocument(new DocumentReference("wiki2", "XWiki", "XWikiPreference"));
+        BaseObject preferencesObject = new BaseObject();
+        preferencesObject.setClassName("XWiki.XWikiGlobalRights");
+        preferencesObject.setStringValue("levels", "view");
+        preferencesObject.setIntValue("allow", 1);
+        preferences.addXObject(preferencesObject);
+
+        this.mockXWiki.stubs().method("getDocument").with(eq("XWiki.XWikiPreferences"), ANYTHING).will(
+            new CustomStub("Implements XWiki.getDocument")
+            {
+                public Object invoke(Invocation invocation) throws Throwable
+                {
+                    if (!getContext().getDatabase().equals("wiki2")) {
+                        new XWikiDocument(new DocumentReference(getContext().getDatabase(), "XWiki", "XWikiPreference"));
+                    }
+
+                    return preferences;
+                }
+            });
+        this.mockXWiki.stubs().method("getDocument").with(eq(doc.getPrefixedFullName()), ANYTHING).will(
+            returnValue(doc));
+
+        getContext().setDatabase("wiki");
+
+        assertFalse("User from another wiki has right on a local wiki", this.rightService.hasAccessLevel("view",
+            this.user.getPrefixedFullName(), doc.getPrefixedFullName(), true, getContext()));
+
+        // direct user rights
+
+        preferencesObject.setStringValue("users", this.user.getPrefixedFullName());
+
+        getContext().setDatabase("wiki");
+
+        assertTrue("User from another wiki does not have right on a local wiki when tested from user wiki",
+            this.rightService.hasAccessLevel("view", this.user.getPrefixedFullName(), doc.getPrefixedFullName(), true,
+                getContext()));
+
+        getContext().setDatabase("wiki2");
+
+        assertTrue("User from another wiki does not have right on a local wiki when tested from local wiki",
+            this.rightService.hasAccessLevel("view", this.user.getPrefixedFullName(), doc.getPrefixedFullName(), true,
+                getContext()));
+
+        // user group rights
+
+        preferencesObject.removeField("users");
+        preferencesObject.setStringValue("groups", this.group.getPrefixedFullName());
+
+        getContext().setDatabase("wiki");
+
+        assertTrue("User group from another wiki does not have right on a local wiki when tested from user wiki",
+            this.rightService.hasAccessLevel("view", this.user.getPrefixedFullName(), doc.getPrefixedFullName(), true,
+                getContext()));
+
+        getContext().setDatabase("wiki2");
+
+        assertTrue("User group from another wiki does not have right on a local wiki when tested from local wiki",
+            this.rightService.hasAccessLevel("view", this.user.getPrefixedFullName(), doc.getPrefixedFullName(), true,
+                getContext()));
+    }
+
+    /**
+     * Test that programming rights are checked on the context user when no context document is set.
+     */
     public void testProgrammingRightsWhenNoContextDocumentIsSet()
     {
         // Setup an XWikiPreferences document granting programming rights to XWiki.Programmer
@@ -136,24 +223,26 @@ public class XWikiRightServiceImplTest extends AbstractBridgedXWikiComponentTest
         mockGlobalRightObj.stubs().method("setNumber");
         mockGlobalRightObj.stubs().method("setDocumentReference");
         prefs.addObject("XWiki.XWikiGlobalRights", (BaseObject) mockGlobalRightObj.proxy());
-        this.mockXWiki.stubs().method("getDocument").with(eq("XWiki.XWikiPreferences"), eq(this.context)).will(
+        this.mockXWiki.stubs().method("getDocument").with(eq("XWiki.XWikiPreferences"), eq(getContext())).will(
             returnValue(prefs));
 
         // Setup the context (no context document)
         this.mockXWiki.stubs().method("getDatabase").will(returnValue("xwiki"));
-        this.context.remove("doc");
-        this.context.remove("sdoc");
+        getContext().remove("doc");
+        getContext().remove("sdoc");
 
         // XWiki.Programmer should have PR, as per the global rights.
-        this.context.setUser("XWiki.Programmer");
-        assertTrue(this.rightService.hasProgrammingRights(this.context));
+        getContext().setUser("XWiki.Programmer");
+        assertTrue(this.rightService.hasProgrammingRights(getContext()));
+
+        this.mockAuthService.stubs().method("listGroupsForUser").with(eq(XWikiRightService.GUEST_USER_FULLNAME), ANYTHING).will(returnValue(Collections.emptyList()));
 
         // Guests should not have PR
-        this.context.setUser(XWikiRightService.GUEST_USER_FULLNAME);
-        assertFalse(this.rightService.hasProgrammingRights(this.context));
+        getContext().setUser(XWikiRightService.GUEST_USER_FULLNAME);
+        assertFalse(this.rightService.hasProgrammingRights(getContext()));
 
         // superadmin should always have PR
-        this.context.setUser(XWikiRightService.SUPERADMIN_USER_FULLNAME);
-        assertTrue(this.rightService.hasProgrammingRights(this.context));
+        getContext().setUser(XWikiRightService.SUPERADMIN_USER_FULLNAME);
+        assertTrue(this.rightService.hasProgrammingRights(getContext()));
     }
 }

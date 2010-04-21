@@ -27,7 +27,7 @@
   <parent>
     <groupId>org.xwiki.platform.applications</groupId>
     <artifactId>xwiki-applications</artifactId>
-    <version>28</version>
+    <version>29-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-application-calendar</artifactId>
   <name>XWiki Platform - Applications - Calendar</name>
@@ -39,7 +39,7 @@
       <groupId>com.xpn.xwiki.platform.plugins</groupId>
       <artifactId>xwiki-plugin-calendar</artifactId>
       <!-- We want to release the calendar plugin and application together. Hence they should have the same version -->
-      <version>1.1</version>
+      <version>1.2-SNAPSHOT</version>
       <scope>runtime</scope>
     </dependency>
   </dependencies>

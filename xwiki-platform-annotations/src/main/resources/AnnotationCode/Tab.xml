@@ -1,5 +1,4 @@
 <?xml version="1.0" encoding="UTF-8"?>
-
 <xwikidoc>
 <web>AnnotationCode</web>
 <name>Tab</name>
@@ -12,8 +11,8 @@
 <customClass></customClass>
 <contentAuthor>XWiki.Admin</contentAuthor>
 <creationDate>1264870914000</creationDate>
-<date>1269121706000</date>
-<contentUpdateDate>1269121706000</contentUpdateDate>
+<date>1271949645000</date>
+<contentUpdateDate>1271949645000</contentUpdateDate>
 <version>1.1</version>
 <title></title>
 <template></template>
@@ -27,13 +26,18 @@
 {{html wiki="false" clean="false"}}
 #includeTopic('AnnotationCode.Macros')
 ## clean=false because otherwise the html macro fails on blockquote
-  &lt;div id="allAnnotations"&gt;
-  #foreach($ann in $annotations.getAnnotations($doc.prefixedFullName))
-  &lt;div&gt;  ## anonymous annotation container
-    #displayAnnotation($ann, 'list', $doc.wiki, $doc.space, $doc.name)
-  &lt;/div&gt;
+  #set($annotationsList = $annotations.getAnnotations($doc.prefixedFullName))
+  #if($annotationsList.size() &gt; 0)
+    &lt;div id="allAnnotations"&gt;
+    #foreach($ann in $annotationsList)
+    &lt;div&gt;  ## anonymous annotation container
+      #displayAnnotation($ann, 'list', $doc.wiki, $doc.space, $doc.name)
+    &lt;/div&gt;
+    #end
+    &lt;/div&gt;
+  #else
+    &lt;p class="noitems"&gt;$msg.get("annotations.tab.info.noannotations")&lt;/p&gt;
   #end
-  &lt;/div&gt;
 {{/html}}
 {{/velocity}}</content>
 </xwikidoc>

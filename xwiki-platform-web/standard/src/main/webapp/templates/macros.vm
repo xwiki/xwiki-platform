@@ -1709,9 +1709,17 @@ ${Msz}Mb##
   if (typeof XWiki !== "undefined" && typeof XWiki.widgets !== "undefined" && typeof XWiki.widgets.LiveTable !== "undefined") {
     // Make sure the Livetable widgets exists (It does not in the WYSIWYG for example).
   #if($callback)
-    $jsName = new XWiki.widgets.LiveTable("$dataurl", "${divid}", $callback ,{"maxPages":$maxPages, "limit":$count});
+    $jsName = new XWiki.widgets.LiveTable("$dataurl", "${divid}", $callback ,{
+                         "maxPages":$maxPages
+	                    ,"limit":$count
+     #if($hasTopFilters),"filterNodes" : [$("${divid}").down(".xwiki-livetable-display-filters"), $('${divid}-topfilters')]#end
+	          });
   #else
-    $jsName = new XWiki.widgets.LiveTable("$dataurl", "${divid}", #livetablecallback($divid $collist $colprops $transprefix) ,{"maxPages":$maxPages, "limit":$count});
+    $jsName = new XWiki.widgets.LiveTable("$dataurl", "${divid}", #livetablecallback($divid $collist $colprops $transprefix), {             
+                         "maxPages":$maxPages
+	                    ,"limit":$count
+     #if($hasTopFilters),"filterNodes" : [$("${divid}").down(".xwiki-livetable-display-filters"), $('${divid}-topfilters')]#end
+	          });
   #end
   }
    //]]>

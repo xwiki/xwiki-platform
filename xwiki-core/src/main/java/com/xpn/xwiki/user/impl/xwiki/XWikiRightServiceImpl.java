@@ -596,8 +596,13 @@ public class XWikiRightServiceImpl implements XWikiRightService
         }
 
         try {
+            currentdoc = currentdoc == null ? context.getWiki().getDocument(entityReference, context) : currentdoc;
+
+            // We need to make sure we are in the context of the document which rights is being checked
+            context.setDatabase(currentdoc.getDatabase());
+
             // Verify Wiki Owner
-            String wikiOwner = context.getWiki().getWikiOwner(database, context);
+            String wikiOwner = context.getWiki().getWikiOwner(currentdoc.getDatabase(), context);
             if (wikiOwner != null) {
                 if (wikiOwner.equals(userOrGroupName)) {
                     logAllow(userOrGroupName, entityReference, accessLevel, "admin level from wiki ownership");
@@ -605,10 +610,6 @@ public class XWikiRightServiceImpl implements XWikiRightService
                     return true;
                 }
             }
-
-            currentdoc = currentdoc == null ? context.getWiki().getDocument(entityReference, context) : currentdoc;
-            // We need to make sure we are in the context of the document which rights is being checked
-            context.setDatabase(currentdoc.getDatabase());
 
             XWikiDocument entityWikiPreferences = context.getWiki().getDocument("XWiki.XWikiPreferences", context);
 

@@ -3055,11 +3055,11 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
 
     /**
      * This is in response to the fact that Hibernate interprets backslashes differently from the database.
-     * Our solution is to simply replace all instances of \ with \\ which makes the first backslash escape the second.
+     * Our solution is simply to replace all instances of \ with \\ which makes the first backslash escape the second.
      *
      * @param sql the uncleaned sql.
-     * @return same as sql except it is guarenteed not to contain groups of odd numbers of backslashes.
-     * @since 2.4M1
+     * @return same as sql except it is guaranteed not to contain groups of odd numbers of backslashes.
+     * @since 2.3
      */
     private String filterSQL(String sql)
     {

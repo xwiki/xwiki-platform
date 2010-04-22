@@ -12,8 +12,8 @@
 <customClass></customClass>
 <contentAuthor>XWiki.Admin</contentAuthor>
 <creationDate>1264862667000</creationDate>
-<date>1270567112000</date>
-<contentUpdateDate>1270567112000</contentUpdateDate>
+<date>1271949711000</date>
+<contentUpdateDate>1271949711000</contentUpdateDate>
 <version>1.1</version>
 <title></title>
 <template></template>
@@ -26,13 +26,17 @@
 <content>annotations.title=Annotations
 annotations.menu.loading=Loading annotations settings
 annotations.menu.loaderror=Failed: 
+annotations.tab.info.noannotations=No annotations for this document
 
 annotations.settings.display=Show annotations 
+annotations.settings.error.wrongsyntax=Annotations are not available for documents in XWiki/1.0 syntax.
+annotations.settings.error.notarget=No document specified to get annotations settings for.
 
 annotations.annotated.loading=Loading annotated document
 annotations.annotated.loaderror=Failed: 
 annotations.annotated.loaderror.wrongresponse=Wrongly formatted server response
 annotations.annotated.error.noannotatedelement=Annotations could not be loaded because the content is not available.
+annotations.annotated.error.wrongsyntax=Annotations are not available for documents in XWiki/1.0 syntax.
 
 annotations.action.edit.text=[Edit]
 annotations.action.edit.tooltip=Edit this annotation
@@ -58,6 +62,7 @@ annotations.action.create.loaderror=Failed:
 annotations.action.create.error.unauthorized=You are not authorized to add annotations on this document. 
 annotations.action.create.error.unauthorizedguest=You are not authorized to add annotations on this document. Try to login first.
 annotations.action.create.helpmessage=To annotate a piece of text, select it and hit {0}.
+annotations.action.create.error.wrongsyntax=Annotations are not available for documents in XWiki/1.0 syntax.
 
 annotations.action.view.hide.text=hide
 annotations.action.view.form.loaderror=Failed: 

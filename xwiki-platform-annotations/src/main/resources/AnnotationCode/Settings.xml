@@ -12,8 +12,8 @@
 <customClass></customClass>
 <contentAuthor>XWiki.Admin</contentAuthor>
 <creationDate>1264870880000</creationDate>
-<date>1269129033000</date>
-<contentUpdateDate>1269129033000</contentUpdateDate>
+<date>1271945477000</date>
+<contentUpdateDate>1271945477000</contentUpdateDate>
 <version>1.1</version>
 <title></title>
 <template></template>
@@ -459,17 +459,28 @@ document.observe('xwiki:annotations:settings:loaded', function() {
 {{velocity}}
 {{html clean="false"}}
 &lt;div class="annotationsettings"&gt;
-  &lt;div class="box plainmessage"&gt;$msg.get("annotations.action.create.helpmessage", ["&lt;strong&gt;Ctrl + M (Meta + M)&lt;/strong&gt;"])&lt;/div&gt;
-  &lt;input type="checkbox" name="annotationsdisplay" id="annotationsdisplay" /&gt;
-  &lt;label for="annotationsdisplay"&gt;$msg.get('annotations.settings.display')&lt;/label&gt;
-  &lt;div class="annotation-filters collapsed"  id="annotation-filters"&gt;
-    &lt;div class="annotation-filters-toggler"&gt;&lt;a href="#annotation-filters"&gt;$msg.get('annotations.filters.show')&lt;/a&gt;&lt;/div&gt;
-    &lt;div class="criteria"&gt;
-      #set($annotationsList = $annotations.getAnnotations($!request.target))
-      #displayAnnotatorCheckboxes($annotationsList)
-    &lt;/div&gt;
-  &lt;/div&gt;
-  &lt;div class="clearfloats" /&gt;
+  #if ("$!{request.target}" != "")
+    ## check the syntax of the target (should be an annotations function called instead of a standard xwiki call)
+    #set($targetDoc = $xwiki.getDocument($!request.target))
+    #set($targetDocSyntax = $targetDoc.syntax)
+    #if (!($targetDocSyntax.type.id == 'xwiki' &amp;&amp; $targetDocSyntax.version == '1.0'))
+      &lt;div class="box plainmessage"&gt;$msg.get("annotations.action.create.helpmessage", ["&lt;strong&gt;Ctrl + M (Meta + M)&lt;/strong&gt;"])&lt;/div&gt;
+      &lt;input type="checkbox" name="annotationsdisplay" id="annotationsdisplay" /&gt;
+      &lt;label for="annotationsdisplay"&gt;$msg.get('annotations.settings.display')&lt;/label&gt;
+      &lt;div class="annotation-filters collapsed"  id="annotation-filters"&gt;
+        &lt;div class="annotation-filters-toggler"&gt;&lt;a href="#annotation-filters"&gt;$msg.get('annotations.filters.show')&lt;/a&gt;&lt;/div&gt;
+        &lt;div class="criteria"&gt;
+          #set($annotationsList = $annotations.getAnnotations($!request.target))
+          #displayAnnotatorCheckboxes($annotationsList)
+        &lt;/div&gt;
+      &lt;/div&gt;
+      &lt;div class="clearfloats" /&gt;
+    #else
+      &lt;div class="box infomessage"&gt;$msg.get("annotations.settings.error.wrongsyntax")&lt;/div&gt;
+    #end
+  #else
+    &lt;div class="box infomessage"&gt;$msg.get("annotations.settings.error.notarget")&lt;/div&gt;
+  #end
 &lt;/div&gt;
 {{/html}}
 {{/velocity}}</content>

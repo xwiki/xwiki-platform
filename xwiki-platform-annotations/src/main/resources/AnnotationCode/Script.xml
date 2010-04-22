@@ -12,8 +12,8 @@
 <customClass></customClass>
 <contentAuthor>XWiki.Admin</contentAuthor>
 <creationDate>1264860755000</creationDate>
-<date>1270643534000</date>
-<contentUpdateDate>1270643534000</contentUpdateDate>
+<date>1271948589000</date>
+<contentUpdateDate>1271948589000</contentUpdateDate>
 <version>1.1</version>
 <title></title>
 <template></template>
@@ -625,7 +625,12 @@ XWiki.Selection = Class.create({
 
     // and get the annotations if they're loaded by default
     if (this.displayedByDefault) {
-      this.fetchAnnotations(true);
+      if (XWiki.docsyntax != 'xwiki/1.0') {
+        this.fetchAnnotations(true);
+      } else {
+        // if the document syntax is 1.0, and annotations should be displayed by default, display a warning, and not display annotations
+        new XWiki.widgets.Notification("$msg.get('annotations.annotated.error.wrongsyntax')", "warning");
+      }
     }
   },
 
@@ -1382,6 +1387,11 @@ XWiki.Selection = Class.create({
    * Execute the add annotation shortcut: get selection, compute context, open dialog, register listeners.
    */
   onAddAnnotationShortcut : function() {
+    // if the document is in 1.0 syntax, prevent the create dialog to be displayed, display a warning and stop everything
+    if (XWiki.docsyntax == 'xwiki/1.0') {
+      new XWiki.widgets.Notification("$msg.get('annotations.action.create.error.wrongsyntax')", "warning");
+      return;
+    }
     // parse the selection
     this.selectionService.computeSelection();
     var selectionText = this.selectionService.selectionText;

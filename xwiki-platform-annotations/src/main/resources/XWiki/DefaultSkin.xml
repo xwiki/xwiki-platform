@@ -12,8 +12,8 @@
 <customClass></customClass>
 <contentAuthor>XWiki.Admin</contentAuthor>
 <creationDate>1167572876000</creationDate>
-<date>1264874479000</date>
-<contentUpdateDate>1264874479000</contentUpdateDate>
+<date>1271948689000</date>
+<contentUpdateDate>1271948689000</contentUpdateDate>
 <version>1.1</version>
 <title>$msg.get("xe.admin.skin")</title>
 <template></template>
@@ -25,13 +25,12 @@
 <hidden>false</hidden>
 <attachment>
 <filename>annotationsinline.vm</filename>
-<filesize>35</filesize>
+<filesize>173</filesize>
 <author>XWiki.Admin</author>
-<date>1264874479000</date>
+<date>1271948689000</date>
 <version>1.0</version>
 <comment></comment>
-<content>I2luY2x1ZGVGb3JtKCJBbm5vdGF0aW9uQ29kZS5UYWIiKQo=</content>
-</attachment>
+<content>IyMgdGhpcyBkb2N1bWVudCBpcyBpbiB4d2lraSAyLjAgc3ludGF4LCBpbmNsdWRlIGl0IHdpdGhvdXQge3ByZX1zIGFyb3VuZCBpdCBpZiBpdCBoYXBwZW5zIHRvIGJlIGluY2x1ZGVkIGZyb20gYSAxLjAgY29udGV4dAokeHdpa2kuaW5jbHVkZUZvcm0oIkFubm90YXRpb25Db2RlLlRhYiIsIGZhbHNlKQo=</content></attachment>
 <object>
 <class>
 <name>XWiki.XWikiSkins</name>

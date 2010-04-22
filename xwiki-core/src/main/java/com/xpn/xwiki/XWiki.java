@@ -90,6 +90,8 @@ import org.xwiki.cache.CacheManager;
 import org.xwiki.cache.config.CacheConfiguration;
 import org.xwiki.cache.eviction.LRUEvictionConfiguration;
 import org.xwiki.component.manager.ComponentLookupException;
+import org.xwiki.context.Execution;
+import org.xwiki.context.ExecutionContext;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.model.reference.EntityReference;
@@ -2745,9 +2747,27 @@ public class XWiki implements XWikiDocChangeNotificationInterface
         return Integer.parseInt(getUserPreference(prefname, context));
     }
 
+    /**
+     * Get XWiki context from execution context.
+     * 
+     * @return the XWiki context for the current thread
+     */
+    private XWikiContext getXWikiContext()
+    {
+        Execution execution = Utils.getComponent(Execution.class);
+
+        ExecutionContext ec = execution.getContext();
+
+        return ec != null ? (XWikiContext) ec.getProperty("xwikicontext") : null;
+    }
+
+    /**
+     * @deprecated user {@link #flushCache(XWikiContext)} instead
+     */
+    @Deprecated
     public void flushCache()
     {
-        flushCache(null);
+        flushCache(getXWikiContext());
     }
 
     public void flushCache(XWikiContext context)

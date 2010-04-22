@@ -92,7 +92,8 @@ public class PropUpdateAction extends XWikiAction
                 xwiki.saveDocument(doc2, msg.get("core.comment.updateClassPropertyName"), true, context);
             }
         }
-        xwiki.flushCache();
+        xwiki.flushCache(context);
+
         return false;
     }
 

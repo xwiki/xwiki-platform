@@ -54,8 +54,10 @@ XWiki.widgets.LiveTable = Class.create({
     // fallback on the unique "display1" id for backward compatibility.
     this.displayNode = $(domNodeName + "-display") || $('display1');
 
-    // Node under which all forms controls (input, selects, etc.) will be filters for this table
-    this.filtersNode = options.filtersNode || $(domNodeName).up("div.xwiki-livetable-container") || $(domNodeName).down(".xwiki-livetable-display-filters");
+    // Nodes under which all forms controls (input, selects, etc.) will be filters for this table
+    this.filtersNodes = [];
+    this.filtersNodes.push(options.filterNodes || $(options.filterNode) || $(domNodeName).down(".xwiki-livetable-display-filters"));
+    this.filtersNodes = this.filtersNodes.flatten().compact();
 
     // Array of nodes under which pagination for this livetable will be displayed.
     this.paginationNodes = options.paginationNodes || $(this.domNodeName).select(".xwiki-livetable-pagination");
@@ -74,10 +76,10 @@ XWiki.widgets.LiveTable = Class.create({
        this.paginator = new LiveTablePagination(this, this.paginationNodes, options.maxPages || 10);
     }
     // Initialize filters
-    if (this.filtersNode) {
+    if (this.filtersNodes.length > 0) {
       var initialFilters = this.permalinks ? this.getFiltersFromHash() : new Object();
-      this.filter = new LiveTableFilter(this, this.filtersNode, initialFilters);
-    }
+      this.filter = new LiveTableFilter(this, this.filtersNodes, initialFilters);
+    } 
 
     if ($(domNodeName + "-tagcloud"))
     {
@@ -574,13 +576,16 @@ var LiveTablePagination = Class.create({
  * The class that deals with the filtering in a table
  */
 var LiveTableFilter = Class.create({
-  initialize: function(table, filterNode, filters)
+  initialize: function(table, filterNodes, filters)
   {
     this.table = table;
-    this.filterNode = $(filterNode);
+    this.filterNodes = filterNodes;
     this.filters = new Object();
-
     this.filters = filters;
+
+    this.inputs = this.filterNodes.invoke('select','input').flatten()
+    this.selects = this.filterNodes.invoke('select','select').flatten();
+
     this.initializeFilters();
 
     this.attachEventHandlers();
@@ -599,34 +604,32 @@ var LiveTableFilter = Class.create({
    */
   initializeFilters: function()
   {
-    var inputs = this.filterNode.select("input");
-    for (var i = 0; i < inputs.length; ++i) {
-      var key = inputs[i].name;
-      if ((inputs[i].type == "radio") || (inputs[i].type == "checkbox")) {
+    for (var i = 0; i < this.inputs.length; ++i) {
+      var key = this.inputs[i].name;
+      if ((this.inputs[i].type == "radio") || (this.inputs[i].type == "checkbox")) {
         if (this.filters[key]) {
-          if (this.filters[key] == inputs[i].value.strip()) {
-            inputs[i].checked = true;
+          if (this.filters[key] == this.inputs[i].value.strip()) {
+            this.inputs[i].checked = true;
           } else {
-            inputs[i].checked = false;
+            this.inputs[i].checked = false;
           }
         }
       } else {
         if (this.filters[key]) {
-          inputs[i].value = this.filters[key];
+          this.inputs[i].value = this.filters[key];
         }
       }
     }
 
-    var selects = this.filterNode.select("select");
-    for (var i = 0; i < selects.length; ++i) {
-      if (!this.filters[selects[i].name]) {
+    for (var i = 0; i < this.selects.length; ++i) {
+      if (!this.filters[this.selects[i].name]) {
         continue;
       }
-      for (var j = 0; j < selects[i].options.length; ++j) {
-        if (selects[i].options[j].value == this.filters[selects[i].name]) {
-          selects[i].options[j].selected = true;
+      for (var j = 0; j < this.selects[i].options.length; ++j) {
+        if (this.selects[i].options[j].value == this.filters[this.selects[i].name]) {
+          this.selects[i].options[j].selected = true;
         } else {
-          selects[i].options[j].selected = false;
+          this.selects[i].options[j].selected = false;
         }
       }
     }
@@ -639,10 +642,10 @@ var LiveTableFilter = Class.create({
     // Then we can write :
     // return Form.serializeElements(Form.getElements(this.domNodeName);
     var result = "";
-    var filters = this.filterNode.select("input", "select");
+    var filters = [this.inputs, this.selects].flatten();
     for (var i=0;i<filters.length;i++) {
-      // Ignore filters with blank value, or inputs under the livetable display body
-      if (!filters[i].value.blank() && typeof filters[i].up('.xwiki-livetable-display-body') == "undefined") {
+      // Ignore filters with blank value
+      if (!filters[i].value.blank()) {
         if ((filters[i].type != "radio" && filters[i].type != "checkbox") || filters[i].checked) {
           result += ("&" + filters[i].name + "=" + encodeURIComponent(filters[i].value));
         }
@@ -654,20 +657,17 @@ var LiveTableFilter = Class.create({
 
   attachEventHandlers: function()
   {
-    var inputs = this.filterNode.getElementsByTagName('input');
-    var selects = this.filterNode.getElementsByTagName('select');
-
-    for(var i = 0; i < inputs.length; i++) {
-      if (inputs[i].type == "text") {
-        Event.observe(inputs[i], 'keyup', this.makeRefreshHandler(this));
+    for(var i = 0; i < this.inputs.length; i++) {
+      if (this.inputs[i].type == "text") {
+        Event.observe(this.inputs[i], 'keyup', this.makeRefreshHandler(this));
       } else {
         //IE is buggy on "change" events for checkboxes and radios
-        Event.observe(inputs[i], 'click', this.makeRefreshHandler(this));
+        Event.observe(this.inputs[i], 'click', this.makeRefreshHandler(this));
       }
     }
 
-    for(var i = 0; i < selects.length; i++) {
-      Event.observe(selects[i], 'change', this.makeRefreshHandler(this));
+    for(var i = 0; i < this.selects.length; i++) {
+      Event.observe(this.selects[i], 'change', this.makeRefreshHandler(this));
     }
 
     // Allow custom filters to trigger filter change from non-native events

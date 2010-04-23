@@ -3056,7 +3056,7 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
      *
      * @param sql the uncleaned sql.
      * @return same as sql except it is guaranteed not to contain groups of odd numbers of backslashes.
-     * @since 2.3
+     * @since 2.2.6
      */
     private String filterSQL(String sql)
     {

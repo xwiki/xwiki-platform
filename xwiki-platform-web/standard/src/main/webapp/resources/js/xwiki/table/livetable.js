@@ -55,10 +55,12 @@ XWiki.widgets.LiveTable = Class.create({
     this.displayNode = $(domNodeName + "-display") || $('display1');
 
     // Nodes under which all forms controls (input, selects, etc.) will be filters for this table
-    this.filtersNodes = [];
-    this.filtersNodes.push(options.filterNodes || $(options.filterNode) || $(domNodeName).down(".xwiki-livetable-display-filters"));
-    this.filtersNodes = this.filtersNodes.flatten().compact();
-
+    this.filtersNodes = [
+          options.filterNodes     // Option API to precise filter nodes (single node or array of nodes)
+       || $(options.filtersNode)  // Deprecated option (kept for backward compatibility)
+       || $(domNodeName).down(".xwiki-livetable-display-filters") // Default filter node when none precised
+    ].flatten().compact();
+    
     // Array of nodes under which pagination for this livetable will be displayed.
     this.paginationNodes = options.paginationNodes || $(this.domNodeName).select(".xwiki-livetable-pagination");
 
@@ -111,7 +113,7 @@ XWiki.widgets.LiveTable = Class.create({
   updateLocationHash: function()
   {
     var currentHash = window.location.hash.substring(1);
-    var filterString = this.filter.serializeFilters();
+    var filterString = this.filter ? this.filter.serializeFilters() : "";
 
     var shouldUpdate = this.lastoffset != 1 || !currentHash.blank() || !filterString.blank();
 

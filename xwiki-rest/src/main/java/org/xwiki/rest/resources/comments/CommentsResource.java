@@ -97,6 +97,10 @@ public class CommentsResource extends XWikiResource
             commentObject.set("comment", comment.getText());
             save = true;
         }
+        
+        if (comment.getReplyTo() != null) {
+            commentObject.set("replyto", comment.getReplyTo());
+        }
 
         if (save) {
             doc.save();

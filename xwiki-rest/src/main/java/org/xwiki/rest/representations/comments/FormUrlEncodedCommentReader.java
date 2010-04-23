@@ -51,6 +51,8 @@ import org.xwiki.rest.model.jaxb.ObjectFactory;
 public class FormUrlEncodedCommentReader implements MessageBodyReader<Comment>, XWikiRestComponent
 {
     private static final String COMMENT_TEXT_FIELD_NAME = "text";
+    
+    private static final String COMMENT_REPLYTO_FIELD_NAME = "replyTo";
 
     public boolean isReadable(Class< ? > type, Type genericType, Annotation[] annotations, MediaType mediaType)
     {
@@ -76,8 +78,20 @@ public class FormUrlEncodedCommentReader implements MessageBodyReader<Comment>, 
          * read data using getParameter()
          */
         if (form.getNames().isEmpty()) {
+            try {
+                comment.setReplyTo(Integer.parseInt(httpServletRequest.getParameter(COMMENT_REPLYTO_FIELD_NAME)));
+            }
+            catch(NumberFormatException e) {
+                // Just ignore, there won't be a reply to.
+            }
             comment.setText(httpServletRequest.getParameter(COMMENT_TEXT_FIELD_NAME));
         } else {
+            try {
+                comment.setReplyTo(Integer.parseInt(form.getFirstValue(COMMENT_REPLYTO_FIELD_NAME)));
+            }
+            catch(NumberFormatException e) {
+             // Just ignore, there won't be a reply to.
+            }
             comment.setText(form.getFirstValue(COMMENT_TEXT_FIELD_NAME));
         }
 

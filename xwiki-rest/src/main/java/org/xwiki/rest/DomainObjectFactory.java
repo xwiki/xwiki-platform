@@ -586,6 +586,11 @@ public class DomainObjectFactory
             comment.setText((String) property.getValue());
         }
 
+        property = xwikiComment.getProperty("replyto");
+        if (property != null) {
+            comment.setReplyTo((Integer) property.getValue());
+        }
+        
         String pageUri =
             UriBuilder.fromUri(baseUri).path(PageResource.class).build(doc.getWiki(), doc.getSpace(), doc.getName())
                 .toString();

@@ -181,6 +181,7 @@
           <element name="date" type="dateTime"></element>
           <element name="highlight" type="string"></element>
           <element name="text" type="string"></element>
+          <element name="replyTo" type="int" nillable="true"></element>
         </sequence>
       </extension>
     </complexContent>

@@ -50,7 +50,7 @@ XWiki.widgets.LiveTable = Class.create({
     }
     
     // id of the display element (the inner dynamic table) of this livetable
-    // defined by convention as the root node id on which is appenned "-display".
+    // defined by convention as the root node id on which is appended "-display".
     // fallback on the unique "display1" id for backward compatibility.
     this.displayNode = $(domNodeName + "-display") || $('display1');
 
@@ -591,13 +591,6 @@ var LiveTableFilter = Class.create({
     this.attachEventHandlers();
   },
 
-  makeRefreshHandler: function(self)
-  {
-    return function() {
-      self.refreshContent();
-    }
-  },
-
   /**
    * Initialize DOM values of the filters elements based on the passed map of name/value.
    * TODO: rewrite this method the other way around (iterate on the map, not on the filters).
@@ -618,20 +611,21 @@ var LiveTableFilter = Class.create({
         if (this.filters[key]) {
           this.inputs[i].value = this.filters[key];
         }
+        this.applyActiveFilterStyle(this.inputs[i]);
       }
     }
 
     for (var i = 0; i < this.selects.length; ++i) {
-      if (!this.filters[this.selects[i].name]) {
-        continue;
-      }
-      for (var j = 0; j < this.selects[i].options.length; ++j) {
-        if (this.selects[i].options[j].value == this.filters[this.selects[i].name]) {
-          this.selects[i].options[j].selected = true;
-        } else {
-          this.selects[i].options[j].selected = false;
+      if (this.filters[this.selects[i].name]) {
+        for (var j = 0; j < this.selects[i].options.length; ++j) {
+          if (this.selects[i].options[j].value == this.filters[this.selects[i].name]) {
+            this.selects[i].options[j].selected = true;
+          } else {
+            this.selects[i].options[j].selected = false;
+          }
         }
       }
+      this.applyActiveFilterStyle(selects[i]);
     }
   },
 
@@ -659,19 +653,27 @@ var LiveTableFilter = Class.create({
   {
     for(var i = 0; i < this.inputs.length; i++) {
       if (this.inputs[i].type == "text") {
-        Event.observe(this.inputs[i], 'keyup', this.makeRefreshHandler(this));
+        Event.observe(this.inputs[i], 'keyup', this.refreshHandler.bind(this));
       } else {
         //IE is buggy on "change" events for checkboxes and radios
-        Event.observe(this.inputs[i], 'click', this.makeRefreshHandler(this));
+        Event.observe(this.inputs[i], 'click', this.refreshHandler.bind(this));
       }
     }
 
     for(var i = 0; i < this.selects.length; i++) {
-      Event.observe(this.selects[i], 'change', this.makeRefreshHandler(this));
+      Event.observe(this.selects[i], 'change', this.refreshHandler.bind(this));
     }
 
     // Allow custom filters to trigger filter change from non-native events
-    document.observe("xwiki:livetable:" + this.table.domNodeName + ":filtersChanged", this.makeRefreshHandler(this));
+    document.observe("xwiki:livetable:" + this.table.domNodeName + ":filtersChanged", this.refreshHandler.bind(this));
+  },
+
+  /**
+   * Refresh event fired by filter changes
+   */
+  refreshHandler : function(event) {
+    this.applyActiveFilterStyle(event.element());
+    this.refreshContent();
   },
 
   /**
@@ -688,6 +690,19 @@ var LiveTableFilter = Class.create({
     this.table.filters = newFilters;
     this.table.showRows(1, this.table.limit);
   // 0 was 1
+  },
+
+  /**
+   * Apply style to livetable filters that are applied
+   */
+  applyActiveFilterStyle: function(element) {
+    if(element && ((element.tagName == "input" && element.type == "text") || element.tagName == "select")) {
+      if ($F(element) != '') {
+        element.addClassName('xwiki-livetable-filter-active');
+      } else {
+        element.removeClassName('xwiki-livetable-filter-active');
+      }
+    }
   }
 });
 

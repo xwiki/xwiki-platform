@@ -155,6 +155,10 @@ thead.xwiki-livetable-display-header td.xwiki-livetable-display-header-filter se
   margin: 0;
   padding: 0 0 0 2px;
 }
+.xwiki-livetable-filter-active {
+  background-color: $theme.highlightColor !important;
+  font-weight: bold;
+}
 /* </ Live Table Header> */
 /* <Live Table Body> */
 tbody.xwiki-livetable-display-body tr {

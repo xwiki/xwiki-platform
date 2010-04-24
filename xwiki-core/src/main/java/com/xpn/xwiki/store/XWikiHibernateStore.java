@@ -2263,7 +2263,7 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
                 sql += generateWhereStatement(whereParams);
             }
 
-            Query query = session.createQuery(sql);
+            Query query = session.createQuery(filterSQL(sql));
 
             // Add values for provided HQL request containing "?" characters where to insert real
             // values.
@@ -2461,7 +2461,7 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
             checkHibernate(context);
             bTransaction = beginTransaction(false, context);
             Session session = getSession(context);
-            Query query = session.createQuery(sql);
+            Query query = session.createQuery(filterSQL(sql));
 
             injectParameterListToQuery(0, query, parameterValues);
 
@@ -2541,7 +2541,7 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
             }
             Session session = getSession(context);
 
-            Query query = session.createQuery(sql);
+            Query query = session.createQuery(filterSQL(sql));
 
             injectParameterListToQuery(0, query, parameterValues);
 
@@ -3051,5 +3051,18 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
     public QueryManager getQueryManager()
     {
         return this.queryManager;
+    }
+
+    /**
+     * This is in response to the fact that Hibernate interprets backslashes differently from the database.
+     * Our solution is to simply replace all instances of \ with \\ which makes the first backslash escape the second.
+     *
+     * @param sql the uncleaned sql.
+     * @return same as sql except it is guarenteed not to contain groups of odd numbers of backslashes.
+     * @since 2.4M1
+     */
+    private String filterSQL(String sql)
+    {
+        return StringUtils.replace(sql, "\\", "\\\\");
     }
 }

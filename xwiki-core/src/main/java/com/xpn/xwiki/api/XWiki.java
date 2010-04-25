@@ -437,6 +437,8 @@ public class XWiki extends Api
 
     /**
      * Transform a text in a XML compatible text
+     * This method uses Apache CharacterFilter which swaps single quote (&#38;)
+     * for left single quotation mark (&#8217;)
      * 
      * @param content text to transform
      * @return encoded result

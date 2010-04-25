@@ -2802,13 +2802,10 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
         }
 
         boolean result = false;
-        Iterator it = doc.getXObjects().values().iterator();
-        while (it.hasNext()) {
-            List objects = (List) it.next();
-            for (int i = 0; i < objects.size(); i++) {
-                BaseObject obj = (BaseObject) objects.get(i);
-                if (obj != null) {
-                    result |= injectCustomMapping(obj.getXClass(context), context);
+        for (List<BaseObject> objectsOfType : doc.getXObjects().values()) {
+            for (BaseObject object : objectsOfType) {
+                if (object != null) {
+                    result |= injectCustomMapping(object.getXClass(context), context);
                 }
             }
         }

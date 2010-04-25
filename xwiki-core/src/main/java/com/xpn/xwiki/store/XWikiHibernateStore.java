@@ -2806,6 +2806,8 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
             for (BaseObject object : objectsOfType) {
                 if (object != null) {
                     result |= injectCustomMapping(object.getXClass(context), context);
+                    // Each class must be mapped only once
+                    break;
                 }
             }
         }

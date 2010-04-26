@@ -30,14 +30,14 @@
   </parent>
   <groupId>com.xpn.xwiki.platform</groupId>
   <artifactId>xwiki-web</artifactId>
-  <version>2.3-SNAPSHOT</version>
+  <version>2.3</version>
   <name>XWiki Platform - Web - Parent POM</name>
   <packaging>pom</packaging>
   <description>Common web resources for all XWiki WARs</description>
   <scm>
-    <connection>scm:svn:http://svn.xwiki.org/svnroot/xwiki/platform/web/branches/xwiki-web-2.3</connection>
-    <developerConnection>scm:svn:https://svn.xwiki.org/svnroot/xwiki/platform/web/branches/xwiki-web-2.3</developerConnection>
-    <url>http://svn.xwiki.org/svnroot/xwiki/platform/web/branches/xwiki-web-2.3</url>
+    <connection>scm:svn:http://svn.xwiki.org/svnroot/xwiki/platform/web/tags/xwiki-web-2.3</connection>
+    <developerConnection>scm:svn:https://svn.xwiki.org/svnroot/xwiki/platform/web/tags/xwiki-web-2.3</developerConnection>
+    <url>http://svn.xwiki.org/svnroot/xwiki/platform/web/tags/xwiki-web-2.3</url>
   </scm>
   <issueManagement>
       <system>jira</system>

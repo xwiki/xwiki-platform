@@ -51,7 +51,7 @@
     <!-- Versions of XWiki dependencies used in Platform/Web modules -->
     <platform.tool.configuration.version>1.39</platform.tool.configuration.version>
     <platform.core.version>2.3</platform.core.version>
-    <platform.skin.albatross.version>1.28</platform.skin.albatross.version>
+    <platform.skin.albatross.version>1.27</platform.skin.albatross.version>
     <platform.skin.toucan.version>1.33</platform.skin.toucan.version>
     <platform.skin.colibri.version>1.15</platform.skin.colibri.version>
   </properties>

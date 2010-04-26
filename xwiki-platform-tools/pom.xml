@@ -27,7 +27,7 @@
   <parent>
     <groupId>org.xwiki.platform.tools</groupId>
     <artifactId>xwiki-tools</artifactId>
-    <version>22</version>
+    <version>23-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-configuration-resources</artifactId>
   <name>XWiki Platform - Tools - XWiki Configuration Resources</name>

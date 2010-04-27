@@ -27,11 +27,11 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-core-parent</artifactId>
-    <version>2.2-SNAPSHOT</version>
+    <version>2.2.6</version>
   </parent>
   <artifactId>xwiki-core-refactoring</artifactId>
   <name>XWiki Platform - Core - Refactoring</name>
-  <version>2.2-SNAPSHOT</version>
+  <version>2.2.6</version>
   <description>XWiki Platform - Core - Refactoring</description>
   <dependencies>
     <dependency>

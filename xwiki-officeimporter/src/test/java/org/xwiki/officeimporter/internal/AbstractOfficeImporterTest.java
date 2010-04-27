@@ -24,6 +24,8 @@ import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.component.descriptor.DefaultComponentDescriptor;
 import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.model.reference.EntityReferenceSerializer;
+import org.xwiki.officeimporter.openoffice.OpenOfficeConverter;
+import org.xwiki.officeimporter.openoffice.OpenOfficeManager;
 import org.xwiki.test.AbstractComponentTestCase;
 
 /**
@@ -58,6 +60,11 @@ public abstract class AbstractOfficeImporterTest extends AbstractComponentTestCa
      * Mock document name factory.
      */
     protected DocumentReferenceResolver mockDocumentReferenceResolver;
+    
+    /**
+     * Mock {@link OpenOfficeManager} component.
+     */
+    protected OpenOfficeManager mockOpenOfficeManager;
 
     /**
      * {@inheritDoc}
@@ -95,5 +102,12 @@ public abstract class AbstractOfficeImporterTest extends AbstractComponentTestCa
         descriptorDRF.setRole(DocumentReferenceResolver.class);
         descriptorDRF.setRoleHint("currentmixed");
         getComponentManager().registerComponent(descriptorDRF, mockDocumentReferenceResolver);
+        
+        // Mock OpenOffice manager.
+        mockOpenOfficeManager = this.mockery.mock(OpenOfficeManager.class);
+        DefaultComponentDescriptor<OpenOfficeManager> descriptorOOM =
+            new DefaultComponentDescriptor<OpenOfficeManager>();
+        descriptorOOM.setRole(OpenOfficeManager.class);
+        getComponentManager().registerComponent(descriptorOOM, mockOpenOfficeManager);                
     }
 }

@@ -26,7 +26,6 @@ import net.sf.jodconverter.office.ExternalProcessOfficeManager;
 import net.sf.jodconverter.office.ManagedProcessOfficeManager;
 import net.sf.jodconverter.office.ManagedProcessOfficeManagerConfiguration;
 import net.sf.jodconverter.office.OfficeConnectionMode;
-import net.sf.jodconverter.office.OfficeException;
 import net.sf.jodconverter.office.OfficeManager;
 
 import org.xwiki.component.annotation.Component;
@@ -51,8 +50,8 @@ public class DefaultOpenOfficeManager extends AbstractLogEnabled implements Open
      * The {@link OpenOfficeConfiguration} component.
      */
     @Requirement
-    private OpenOfficeConfiguration ooConfig;
-    
+    private OpenOfficeConfiguration conf;
+
     /**
      * Used to query global temporary working directory.
      */
@@ -60,63 +59,61 @@ public class DefaultOpenOfficeManager extends AbstractLogEnabled implements Open
     private Container container;
 
     /**
-     * The {@link OfficeManager} used to control / connect openoffice server.
+     * Internal {@link OfficeManager} used to control / connect openoffice server.
      */
-    private OfficeManager officeManager;
+    private OfficeManager jodOOManager;
+
+    /**
+     * Internal {@link OfficeDocumentConverter} used to convert office documents.
+     */
+    private OfficeDocumentConverter jodConverter;
 
     /**
      * Current oo server process state.
      */
-    private ManagerState currentState = ManagerState.NOT_CONNECTED;
+    private ManagerState state;
 
-    /**
-     * Flag indicating whether the officeManager is initialized or not.
-     */
-    private boolean initialized;    
-    
-    /**
-     * The {@link OfficeDocumentConverter} used to convert office documents.
-     */
-    private OfficeDocumentConverter documentConverter;
-    
     /**
      * Used for carrying out document conversion tasks.
      */
     private OpenOfficeConverter converter;
 
     /**
-     * Initializes the internal {@link OfficeManager}.
-     * 
-     * @throws OpenOfficeManagerException if an invalid configuration is detected.
+     * Default constructor.
      */
-    private void initialize() throws OpenOfficeManagerException
+    public DefaultOpenOfficeManager()
     {
-        if (!initialized) {
-            OfficeConnectionMode connectionMode = OfficeConnectionMode.socket(ooConfig.getServerPort());
-            if (ooConfig.getServerType() == OpenOfficeConfiguration.SERVER_TYPE_INTERNAL) {
-                File officeHome = new File(ooConfig.getHomePath());
-                File officeProfile = new File(ooConfig.getProfilePath());
-                ManagedProcessOfficeManagerConfiguration configuration =
-                    new ManagedProcessOfficeManagerConfiguration(connectionMode);
-                configuration.setOfficeHome(officeHome);
-                configuration.setTemplateProfileDir(officeProfile);
-                configuration.setMaxTasksPerProcess(ooConfig.getMaxTasksPerProcess());
-                configuration.setTaskExecutionTimeout(ooConfig.getTaskExecutionTimeout());
-                this.officeManager = new ManagedProcessOfficeManager(configuration);
-            } else if (ooConfig.getServerType() == OpenOfficeConfiguration.SERVER_TYPE_EXTERNAL_LOCAL) {
-                ExternalProcessOfficeManager externalProcessOfficeManager =
-                    new ExternalProcessOfficeManager(connectionMode);
-                externalProcessOfficeManager.setConnectOnStart(true);
-                this.officeManager = externalProcessOfficeManager;
-            } else {
-                this.currentState = ManagerState.CONF_ERROR;
-                throw new OpenOfficeManagerException("Invalid configuration.");
-            }
-            this.documentConverter = new OfficeDocumentConverter(officeManager);
-            File workDir = container.getApplicationContext().getTemporaryDirectory();
-            this.converter = new DefaultOpenOfficeConverter(documentConverter, workDir, getLogger());
-            this.initialized = true;
+        setState(ManagerState.NOT_CONNECTED);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public void initialize() throws OpenOfficeManagerException
+    {
+        OfficeConnectionMode connectionMode = OfficeConnectionMode.socket(conf.getServerPort());
+        if (conf.getServerType() == OpenOfficeConfiguration.SERVER_TYPE_INTERNAL) {
+            File officeHome = new File(conf.getHomePath());
+            File officeProfile = new File(conf.getProfilePath());
+            ManagedProcessOfficeManagerConfiguration configuration =
+                new ManagedProcessOfficeManagerConfiguration(connectionMode);
+            configuration.setOfficeHome(officeHome);
+            configuration.setTemplateProfileDir(officeProfile);
+            configuration.setMaxTasksPerProcess(conf.getMaxTasksPerProcess());
+            configuration.setTaskExecutionTimeout(conf.getTaskExecutionTimeout());
+            this.jodOOManager = new ManagedProcessOfficeManager(configuration);
+        } else if (conf.getServerType() == OpenOfficeConfiguration.SERVER_TYPE_EXTERNAL_LOCAL) {
+            ExternalProcessOfficeManager externalProcessOfficeManager =
+                new ExternalProcessOfficeManager(connectionMode);
+            externalProcessOfficeManager.setConnectOnStart(true);
+            this.jodOOManager = externalProcessOfficeManager;
+        } else {
+            setState(ManagerState.CONF_ERROR);
+            throw new OpenOfficeManagerException("Invalid openoffice server configuration.");
         }
+        this.jodConverter = new OfficeDocumentConverter(jodOOManager);
+        File workDir = container.getApplicationContext().getTemporaryDirectory();
+        this.converter = new DefaultOpenOfficeConverter(jodConverter, workDir, getLogger());
     }
 
     /**
@@ -124,22 +121,22 @@ public class DefaultOpenOfficeManager extends AbstractLogEnabled implements Open
      */
     public ManagerState getState()
     {
-        return currentState;
-    }           
+        return state;
+    }
 
     /**
      * {@inheritDoc}
      */
     public void start() throws OpenOfficeManagerException
     {
-        if (!isConnected()) {
+        if (!checkState(ManagerState.CONNECTED)) {
             initialize();
             try {
-                officeManager.start();
-                currentState = ManagerState.CONNECTED;
+                jodOOManager.start();
+                setState(ManagerState.CONNECTED);
                 getLogger().info("Open Office instance started.");
-            } catch (OfficeException ex) {
-                currentState = ManagerState.ERROR;
+            } catch (Exception ex) {
+                setState(ManagerState.ERROR);
                 throw new OpenOfficeManagerException("Error while connecting / starting openoffice.", ex);
             }
         }
@@ -150,44 +147,53 @@ public class DefaultOpenOfficeManager extends AbstractLogEnabled implements Open
      */
     public void stop() throws OpenOfficeManagerException
     {
-        if (isConnected()) {
+        if (checkState(ManagerState.CONNECTED)) {
             try {
-                officeManager.stop();
-                currentState = ManagerState.NOT_CONNECTED;
+                jodOOManager.stop();
+                setState(ManagerState.NOT_CONNECTED);
                 getLogger().info("Open Office instance stopped.");
-            } catch (OfficeException ex) {
-                currentState = ManagerState.ERROR;
+            } catch (Exception ex) {
+                setState(ManagerState.ERROR);
                 throw new OpenOfficeManagerException("Error while disconnecting / shutting down openoffice.", ex);
-            } finally {
-                this.initialized = false;
             }
         }
     }
 
     /**
-     * {@inheritDoc}    
+     * {@inheritDoc}
      */
     public OpenOfficeConverter getConverter()
-    {        
+    {
         return converter;
     }
 
     /**
-     * Utility method for checking OpenOffice server instance state.
+     * Utility method for setting the current OpenOffice manager state.
      * 
-     * @return true if the OpenOffice server is connected.
+     * @param newState new state.
      */
-    private boolean isConnected()
+    private void setState(ManagerState newState)
     {
-        return (currentState == ManagerState.CONNECTED);
+        this.state = newState;
     }
-    
+
+    /**
+     * Utility method for checking the OpenOffice manager state.
+     * 
+     * @param expectedState expected state.
+     * @return true if OpenOffice manger is in given state, false otherwise.
+     */
+    private boolean checkState(ManagerState expectedState)
+    {
+        return (this.state == expectedState);
+    }
+
     /**
      * {@inheritDoc}
      */
     @Deprecated
     public OfficeDocumentConverter getDocumentConverter()
     {
-        return documentConverter;
-    }        
+        return jodConverter;
+    }
 }

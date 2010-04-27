@@ -28,9 +28,8 @@ import junit.framework.Assert;
 
 import org.jmock.Expectations;
 import org.junit.Before;
-import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.component.util.ReflectionUtils;
-import org.xwiki.model.reference.EntityReferenceSerializer;
+import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.officeimporter.builder.XHTMLOfficeDocumentBuilder;
 import org.xwiki.officeimporter.document.XHTMLOfficeDocument;
 import org.xwiki.officeimporter.internal.AbstractOfficeImporterTest;
@@ -83,8 +82,10 @@ public class DefaultXHTMLOfficeDocumentBuilderTest extends AbstractOfficeImporte
 
         final OpenOfficeConverter mockDocumentConverter = this.mockery.mock(OpenOfficeConverter.class);
         this.mockery.checking(new Expectations() {{
+            oneOf(mockOpenOfficeManager).getConverter();
+            will(returnValue(mockDocumentConverter));
             allowing(mockDocumentConverter).convert(mockInput, "input.doc", "output.html");
-                will(returnValue(mockOutput));
+            will(returnValue(mockOutput));
         }});
         ReflectionUtils.setFieldValue(officeManager, "converter", mockDocumentConverter);
 
@@ -92,7 +93,7 @@ public class DefaultXHTMLOfficeDocumentBuilderTest extends AbstractOfficeImporte
         final DocumentReference documentReference = new DocumentReference("xwiki", "Main", "Test");
         this.mockery.checking(new Expectations() {{
             allowing(mockDefaultStringEntityReferenceSerializer).serialize(documentReference);
-                will(returnValue("xwiki:Main.Test"));
+            will(returnValue("xwiki:Main.Test"));
         }});
 
         XHTMLOfficeDocument document =

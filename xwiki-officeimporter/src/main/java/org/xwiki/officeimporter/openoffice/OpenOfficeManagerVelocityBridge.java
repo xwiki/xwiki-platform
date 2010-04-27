@@ -90,7 +90,6 @@ public class OpenOfficeManagerVelocityBridge
      */
     public boolean startServer()
     {
-        boolean success = false;
         if (!isMainXWiki()) {
             setErrorMessage(ERROR_FORBIDDEN);
         } else if (!docBridge.hasProgrammingRights()) {
@@ -98,13 +97,13 @@ public class OpenOfficeManagerVelocityBridge
         } else {
             try {
                 ooManager.start();
-                success = true;
+                return true;
             } catch (OpenOfficeManagerException ex) {
                 logger.error(ex.getMessage(), ex);
                 setErrorMessage(ex.getMessage());
             }
         }
-        return success;
+        return false;
     }
 
     /**
@@ -114,7 +113,6 @@ public class OpenOfficeManagerVelocityBridge
      */
     public boolean stopServer()
     {
-        boolean success = false;
         if (!isMainXWiki()) {
             setErrorMessage(ERROR_FORBIDDEN);
         } else if (!docBridge.hasProgrammingRights()) {
@@ -122,13 +120,13 @@ public class OpenOfficeManagerVelocityBridge
         } else {
             try {
                 ooManager.stop();
-                success = true;
+                return true;
             } catch (OpenOfficeManagerException ex) {
                 logger.error(ex.getMessage(), ex);
                 setErrorMessage(ex.getMessage());
             }
         }
-        return success;
+        return false;
     }
 
     /**

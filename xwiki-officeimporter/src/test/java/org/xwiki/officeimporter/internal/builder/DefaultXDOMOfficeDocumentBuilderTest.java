@@ -29,14 +29,11 @@ import junit.framework.Assert;
 import org.jmock.Expectations;
 import org.junit.Before;
 import org.xwiki.model.reference.DocumentReference;
-import org.xwiki.component.util.ReflectionUtils;
 import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.officeimporter.builder.XDOMOfficeDocumentBuilder;
-import org.xwiki.officeimporter.builder.XHTMLOfficeDocumentBuilder;
 import org.xwiki.officeimporter.document.XDOMOfficeDocument;
 import org.xwiki.officeimporter.internal.AbstractOfficeImporterTest;
 import org.xwiki.officeimporter.openoffice.OpenOfficeConverter;
-import org.xwiki.officeimporter.openoffice.OpenOfficeManager;
 
 /**
  * Test case for {@link DefaultXDOMOfficeDocumentBuilder}.
@@ -47,19 +44,9 @@ import org.xwiki.officeimporter.openoffice.OpenOfficeManager;
 public class DefaultXDOMOfficeDocumentBuilderTest extends AbstractOfficeImporterTest
 {
     /**
-     * The {@link XHTMLOfficeDocumentBuilder} component.
-     */
-    private XHTMLOfficeDocumentBuilder xhtmlDocumentBuilder;
-
-    /**
      * The {@link XDOMOfficeDocumentBuilder} component.
      */
     private XDOMOfficeDocumentBuilder xdomOfficeDocumentBuilder;
-    
-    /**
-     * Used to setup a mock document converter.
-     */
-    private OpenOfficeManager officeManager;
 
     /**
      * {@inheritDoc}
@@ -68,9 +55,7 @@ public class DefaultXDOMOfficeDocumentBuilderTest extends AbstractOfficeImporter
     public void setUp() throws Exception
     {
         super.setUp();
-        this.xhtmlDocumentBuilder = getComponentManager().lookup(XHTMLOfficeDocumentBuilder.class);
         this.xdomOfficeDocumentBuilder = getComponentManager().lookup(XDOMOfficeDocumentBuilder.class);
-        this.officeManager = getComponentManager().lookup(OpenOfficeManager.class);
     }
 
     /**
@@ -91,10 +76,11 @@ public class DefaultXDOMOfficeDocumentBuilderTest extends AbstractOfficeImporter
 
         final OpenOfficeConverter mockDocumentConverter = this.mockery.mock(OpenOfficeConverter.class);
         this.mockery.checking(new Expectations() {{
-                allowing(mockDocumentConverter).convert(mockInput, "input.doc", "output.html");
-                will(returnValue(mockOutput));            
+            oneOf(mockOpenOfficeManager).getConverter();
+            will(returnValue(mockDocumentConverter));
+            allowing(mockDocumentConverter).convert(mockInput, "input.doc", "output.html");
+            will(returnValue(mockOutput));            
         }});
-        ReflectionUtils.setFieldValue(officeManager, "converter", mockDocumentConverter);
 
         // Create & register a mock document name serializer.
         final DocumentReference documentReference = new DocumentReference("xwiki", "Main", "Test");

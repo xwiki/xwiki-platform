@@ -627,7 +627,7 @@ var LiveTableFilter = Class.create({
           }
         }
       }
-      this.applyActiveFilterStyle(selects[i]);
+      this.applyActiveFilterStyle(this.selects[i]);
     }
   },
 

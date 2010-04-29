@@ -2742,7 +2742,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface
         this.virtualWikiList = new ArrayList<String>();
         // We need to flush the server Cache
         if (this.virtualWikiMap != null) {
-            this.virtualWikiMap.removeAll();
+            this.virtualWikiMap.dispose();
             this.virtualWikiMap = null;
         }
 

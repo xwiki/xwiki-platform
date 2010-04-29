@@ -68,10 +68,10 @@ public class XWikiGroovyRenderer implements XWikiRenderer, XWikiInterpreter
     public void flushCache()
     {
         if (this.cache != null) {
-            this.cache.removeAll();
+            this.cache.dispose();
         }
         if (this.classCache != null) {
-            this.classCache.removeAll();
+            this.classCache.dispose();
         }
 
         XWikiSimpleTemplateEngine.flushCache();

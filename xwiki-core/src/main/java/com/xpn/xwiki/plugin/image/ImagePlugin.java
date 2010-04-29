@@ -187,7 +187,7 @@ public class ImagePlugin extends XWikiDefaultPlugin
     public void flushCache()
     {
         if (this.imageCache != null) {
-            this.imageCache.removeAll();
+            this.imageCache.dispose();
         }
         this.imageCache = null;
     }

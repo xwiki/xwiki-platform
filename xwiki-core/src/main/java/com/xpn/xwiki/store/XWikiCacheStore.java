@@ -196,11 +196,11 @@ public class XWikiCacheStore implements XWikiCacheStoreInterface, EventListener
     public void flushCache()
     {
         if (this.cache != null) {
-            this.cache.removeAll();
+            this.cache.dispose();
             this.cache = null;
         }
         if (this.pageExistCache != null) {
-            this.pageExistCache.removeAll();
+            this.pageExistCache.dispose();
             this.pageExistCache = null;
         }
     }

@@ -5,7 +5,7 @@
 <name>MostViewedPages</name>
 <language></language>
 <defaultLanguage>en</defaultLanguage>
-<translation>1</translation>
+<translation>0</translation>
 <parent>Stats.Document</parent>
 <creator>XWiki.Admin</creator>
 <author>XWiki.Admin</author>

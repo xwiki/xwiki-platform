@@ -389,11 +389,6 @@ $xwiki.jsfx.use('js/xwiki/actionbuttons/actionButtons.js', true)
   #set($outputList = [])
   #findNamesOfAppsToConfigure($section, $globaladmin, $xwiki.getDocument("$currentDoc").getSpace(), $outputList)
   ##
-  #if($outputList.size() &gt; 0)
-    ## Merge save buttons, remove headings from subsections, and make information links into popups.
-    $xwiki.jsx.use($nameOfThisDocument)
-  #end
-  ##
   #foreach($appName in $outputList)
     ##
     ## Make sure the current user has permission to edit the configurable application.
@@ -499,8 +494,7 @@ $xwiki.jsfx.use('js/xwiki/actionbuttons/actionButtons.js', true)
               #if($heading &amp;&amp; $heading != '')
                 == #evaluate($heading) ==
               #end
-              ## If the class specifies custom code to evaluate,
-              ## then close the html macro, evaluate it and reopen the macro.
+              ##
               #set($codeToExecute = "$!app.getValue('codeToExecute', $configurableObj)")
               #if($codeToExecute != '')
                 #evaluate($codeToExecute)
@@ -538,6 +532,11 @@ $xwiki.jsfx.use('js/xwiki/actionbuttons/actionButtons.js', true)
                     {{/error}}
 
                   #else
+                    ##
+                    ## Merge save buttons, remove headings from subsections, and make information links into popups.
+                    ## This is not done if there is only a custom defined form.
+                    $xwiki.jsx.use($nameOfThisDocument)
+                    ##
                     #define($formHtml)
                       ## We don't begin the form until we have content for it so that a configurable can specify a 
                       ## custom form in codeToExecute and if that configurable object is the first of it's kind in that

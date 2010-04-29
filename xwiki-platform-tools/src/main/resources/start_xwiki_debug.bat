@@ -1,5 +1,4 @@
 @echo off
-set LANG=fr_FR.ISO8859-1
 set JETTY_HOME=jetty
 set JETTY_PORT=8080
 set JAVA_OPTS=-Xmx300m

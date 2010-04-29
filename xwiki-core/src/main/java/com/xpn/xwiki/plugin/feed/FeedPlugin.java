@@ -130,7 +130,7 @@ public class FeedPlugin extends XWikiDefaultPlugin implements XWikiPluginInterfa
     public void flushCache()
     {
         if (this.feedCache != null) {
-            this.feedCache.removeAll();
+            this.feedCache.dispose();
         }
         this.feedCache = null;
     }

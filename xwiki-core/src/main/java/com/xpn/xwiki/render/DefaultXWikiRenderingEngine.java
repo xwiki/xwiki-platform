@@ -368,7 +368,7 @@ public class DefaultXWikiRenderingEngine implements XWikiRenderingEngine
             (this.renderers.get(i)).flushCache();
         }
         if (this.cache != null) {
-            this.cache.removeAll();
+            this.cache.dispose();
             this.cache = null;
         }
     }

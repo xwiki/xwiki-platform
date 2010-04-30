@@ -281,7 +281,7 @@
 </welcomeMessage>
 </class>
 <name>XWiki.RegistrationConfig</name>
-<number>1</number>
+<number>0</number>
 <className>XWiki.Registration</className>
 <guid>1a0c3cf7-de63-4f07-8a74-5c30bf880641</guid>
 <property>

@@ -82,7 +82,7 @@ public abstract class AbstractDOMValidator implements Validator
      * mailto.
      */
     protected static final String MAILTO = "mailto:";
-    
+
     /**
      * hidden.
      */
@@ -179,7 +179,7 @@ public abstract class AbstractDOMValidator implements Validator
      * Fieldset element.
      */
     protected static final String ELEM_FIELDSET = "fieldset";
-    
+
     /**
      * Fieldset element.
      */
@@ -261,12 +261,12 @@ public abstract class AbstractDOMValidator implements Validator
      * ID attribute.
      */
     protected static final String ATTR_ID = "id";
-    
+
     /**
      * Content attribute.
      */
     protected static final String ATTR_CONTENT = "content";
-    
+
     /**
      * Charset attribute.
      */
@@ -299,8 +299,8 @@ public abstract class AbstractDOMValidator implements Validator
     {
         try {
             DocumentBuilderFactory docBuilderFactory = DocumentBuilderFactory.newInstance();
-            documentBuilder = docBuilderFactory.newDocumentBuilder();
-            documentBuilder.setEntityResolver(new XMLResourcesEntityResolver());
+            this.documentBuilder = docBuilderFactory.newDocumentBuilder();
+            this.documentBuilder.setEntityResolver(new XMLResourcesEntityResolver());
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
@@ -315,7 +315,7 @@ public abstract class AbstractDOMValidator implements Validator
     {
         try {
             clear();
-            this.document = documentBuilder.parse(document);
+            this.document = this.documentBuilder.parse(document);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
@@ -326,7 +326,7 @@ public abstract class AbstractDOMValidator implements Validator
      */
     public List<ValidationError> getErrors()
     {
-        return errors;
+        return this.errors;
     }
 
     /**
@@ -334,7 +334,7 @@ public abstract class AbstractDOMValidator implements Validator
      */
     public void clear()
     {
-        errors.clear();
+        this.errors.clear();
     }
 
     /**
@@ -347,7 +347,7 @@ public abstract class AbstractDOMValidator implements Validator
      */
     protected void addError(Type errorType, int line, int column, String message)
     {
-        errors.add(new ValidationError(errorType, line, column, message));
+        this.errors.add(new ValidationError(errorType, line, column, message));
     }
 
     /**
@@ -390,7 +390,7 @@ public abstract class AbstractDOMValidator implements Validator
      */
     public boolean containsElement(String tagName)
     {
-        return document.getElementsByTagName(tagName).getLength() > 0;
+        return this.document.getElementsByTagName(tagName).getLength() > 0;
     }
 
     /**
@@ -401,7 +401,7 @@ public abstract class AbstractDOMValidator implements Validator
      */
     public NodeListIterable getElements(String tagName)
     {
-        return new NodeListIterable(document.getElementsByTagName(tagName));
+        return new NodeListIterable(this.document.getElementsByTagName(tagName));
     }
 
     /**
@@ -416,7 +416,7 @@ public abstract class AbstractDOMValidator implements Validator
     {
         try {
             XPathExpression expr = xpath.compile(exprString);
-            return expr.evaluate(document, returnType);
+            return expr.evaluate(this.document, returnType);
         } catch (XPathExpressionException e) {
             e.printStackTrace();
         }
@@ -433,7 +433,7 @@ public abstract class AbstractDOMValidator implements Validator
     public NodeListIterable getElements(Collection<String> tagNames)
     {
         String exprString = StringUtils.join(tagNames, "|" + XPATH_CATCHALL);
-        return new NodeListIterable((NodeList) evaluate(document, exprString, XPathConstants.NODESET));
+        return new NodeListIterable((NodeList) evaluate(this.document, exprString, XPathConstants.NODESET));
     }
 
     /**
@@ -475,8 +475,8 @@ public abstract class AbstractDOMValidator implements Validator
         List<String> childrenTagNames = new ArrayList<String>();
         String exprString = XPATH_CATCHALL + "*";
 
-        NodeListIterable children = new NodeListIterable((NodeList) evaluate(element, exprString, 
-            XPathConstants.NODESET));
+        NodeListIterable children =
+            new NodeListIterable((NodeList) evaluate(element, exprString, XPathConstants.NODESET));
         for (Node child : children) {
             childrenTagNames.add(child.getNodeName());
         }

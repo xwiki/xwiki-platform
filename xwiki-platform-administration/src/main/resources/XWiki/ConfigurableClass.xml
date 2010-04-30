@@ -449,7 +449,8 @@ $xwiki.jsfx.use('js/xwiki/actionbuttons/actionButtons.js', true)
           ## If the document is not already locked, attempt to aquire the lock.
           #if(!$locked)
             ## Try to use an ajax call to lock the document.
-            {{html clean=false wiki=true}}&lt;/p&gt;
+
+            {{html clean=false wiki=true}}
               &lt;noscript&gt;
 
                 {{warning}}$msg.get('xe.admin.configurable.cannotLockNoJavascript'){{/warning}}
@@ -460,7 +461,8 @@ $xwiki.jsfx.use('js/xwiki/actionbuttons/actionButtons.js', true)
                   new Ajax.Request("$xwiki.getURL($app.getFullName(), 'lock', 'ajax=1')");
                 });
               &lt;/script&gt;
-            &lt;p&gt;{{/html}}
+            {{/html}}
+
 
             #set($discard = $lockedDocumentNames.add($app.getFullName()))
           #end
@@ -570,9 +572,9 @@ $xwiki.jsfx.use('js/xwiki/actionbuttons/actionButtons.js', true)
                     ## Strip pre tags and html macro invocations which $obj.display inserts.
                     ## then prepend application name to ids to prevent id collissions.
 
-                    {{html clean="false" wiki="false"}}&lt;/p&gt;
+                    {{html clean="false" wiki="false"}}
                     $formHtml.toString().replaceAll('\{\{[/]?html[^}]*\}\}|&lt;[/]?pre&gt;', '').replaceAll(" id='", " id='${escapedAppName}_")
-                    &lt;p&gt;{{/html}}##
+                    {{/html}}
 
                   #end## If object exists
                 #end## If class exists
@@ -581,7 +583,7 @@ $xwiki.jsfx.use('js/xwiki/actionbuttons/actionButtons.js', true)
             ## If a form was started then we end it.
             #if($insideForm)
 
-              {{html clean="false" wiki="false"}}&lt;/p&gt;
+              {{html clean="false" wiki="false"}}
               ## We add in a redirect field to prevent the user from being carried away when they save
               ## if they don't have javascript.
               #set($thisURL = $request.getRequestURL())
@@ -606,7 +608,7 @@ $xwiki.jsfx.use('js/xwiki/actionbuttons/actionButtons.js', true)
               &lt;/div&gt; ## bottombuttons
               &lt;/form&gt;
               #set($insideForm = false)
-              &lt;p&gt;{{/html}}
+              {{/html}}
 
             #end
           #end## If there are configurable objects

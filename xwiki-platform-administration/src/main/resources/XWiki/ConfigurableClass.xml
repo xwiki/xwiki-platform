@@ -12,8 +12,8 @@
 <customClass></customClass>
 <contentAuthor>XWiki.Admin</contentAuthor>
 <creationDate>1265775370000</creationDate>
-<date>1266578504000</date>
-<contentUpdateDate>1266578504000</contentUpdateDate>
+<date>1272620694000</date>
+<contentUpdateDate>1272620694000</contentUpdateDate>
 <version>1.1</version>
 <title>XWiki.ConfigurableClass</title>
 <template></template>
@@ -461,6 +461,7 @@ $xwiki.jsfx.use('js/xwiki/actionbuttons/actionButtons.js', true)
                 });
               &lt;/script&gt;
             &lt;p&gt;{{/html}}
+
             #set($discard = $lockedDocumentNames.add($app.getFullName()))
           #end
           ##------------------------------------------------------------------------------------------------------------
@@ -613,6 +614,7 @@ $xwiki.jsfx.use('js/xwiki/actionbuttons/actionButtons.js', true)
       #end## If app author has permission to edit admin page
     #end## If the current user has permission to edit the configurable application.
   #end## Foreach document name in names to configure
+
 
   {{html clean=false wiki=false}}
   &lt;script type="text/javascript"&gt;

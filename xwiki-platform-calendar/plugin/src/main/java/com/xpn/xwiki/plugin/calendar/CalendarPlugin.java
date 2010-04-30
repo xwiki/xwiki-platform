@@ -209,7 +209,7 @@ public class CalendarPlugin extends XWikiDefaultPlugin implements XWikiPluginInt
         // emit the HTML calendar
         output.append("<tr class=\"wiki-calendar-daynamerow\">");
         for (int d = 0; d < 7; d++) {
-            output.append("<th>");
+            output.append("<th scope=\"col\">");
             output.append(mDayNames[d]);
             output.append("</th>");
             continue;

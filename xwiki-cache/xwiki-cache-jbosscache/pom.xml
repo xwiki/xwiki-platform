@@ -33,9 +33,9 @@
   <description>XWiki Platform - Core - Cache - JBossCache</description>
   <repositories>
     <repository>
-      <id>JBoss</id>
-      <name>JBoss Maven2 Remote Repository</name>
-      <url>http://repository.jboss.org/maven2</url>
+      <id>jboss-public-repository-group</id>
+      <name>JBoss Public Maven Repository Group</name>
+      <url>https://repository.jboss.org/nexus/content/groups/public/</url>
     </repository>
   </repositories>
   <dependencies>
@@ -52,7 +52,7 @@
     <dependency>
       <groupId>org.jboss.cache</groupId>
       <artifactId>jbosscache-core</artifactId>
-      <version>3.2.1.GA</version>
+      <version>3.2.4.GA</version>
     </dependency>
     <!-- Test Dependencies -->
     <dependency>

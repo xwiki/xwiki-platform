@@ -40,6 +40,7 @@ import org.xwiki.cache.Cache;
 import org.xwiki.cache.CacheException;
 import org.xwiki.cache.config.CacheConfiguration;
 import org.xwiki.cache.eviction.LRUEvictionConfiguration;
+import org.xwiki.rendering.syntax.Syntax;
 
 import com.sun.syndication.feed.synd.SyndCategory;
 import com.sun.syndication.feed.synd.SyndContent;
@@ -491,9 +492,8 @@ public class FeedPlugin extends XWikiDefaultPlugin implements XWikiPluginInterfa
                 context.getWiki().getDocument(
                     prefix + "_" + context.getWiki().clearName(feedname, true, true, context), context);
             objs = doc.getObjects("XWiki.FeedEntryClass");
-            if ((doc.getContent() == null) || doc.getContent().trim().equals("")) {
-                doc.setContent("#includeForm(\"XWiki.FeedEntryClassSheet\")");
-                doc.setSyntaxId(XWikiDocument.XWIKI10_SYNTAXID);
+            if (!StringUtils.isBlank(doc.getContent())) {
+                this.prepareFeedEntryDocument(doc, context);
             }
         }
 
@@ -511,12 +511,19 @@ public class FeedPlugin extends XWikiDefaultPlugin implements XWikiPluginInterfa
                 if (doc.isNew() || force) {
                     // Set the document date to the current date
                     doc.setDate(new Date());
-                    // Set the creation date to the feed date if it exists, otherwise the current date
-                    Date adate = (entry.getPublishedDate() == null) ? new Date() : entry.getPublishedDate();
+                    Date adate;
+                    if (StringUtils.isBlank(context.getWiki().Param("xwiki.plugins.feed.publishedDateIsCreationDate"))) {
+                        // Set the creation date to the feed date if it exists, otherwise the current date
+                        adate = (entry.getPublishedDate() == null) ? new Date() : entry.getPublishedDate(); 
+                    }
+                    else {
+                        // By default use now (fetching date) as document creation date, since the publish date information is made available from
+                        // the XWiki.FeedEntryClass object.
+                        adate = new Date();
+                    }
                     doc.setCreationDate(adate);
-                    if ((doc.getContent() == null) || doc.getContent().trim().equals("")) {
-                        doc.setContent("#includeForm(\"XWiki.FeedEntryClassSheet\")");
-                        doc.setSyntaxId(XWikiDocument.XWIKI10_SYNTAXID);
+                    if (!StringUtils.isBlank(doc.getContent())) {
+                        this.prepareFeedEntryDocument(doc, context);
                     }
                     if (force) {
                         BaseObject obj = doc.getObject("XWiki.FeedEntryClass");
@@ -548,6 +555,35 @@ public class FeedPlugin extends XWikiDefaultPlugin implements XWikiPluginInterfa
         }
 
         return nbtotal;
+    }
+
+    /**
+     * Prepares a feed entry document by setting its content and syntax according to the configuration.
+     * 
+     * @param document the document to prepare as a feed entry document
+     * @param context the XWiki context when preparing the feed entry document
+     */
+    private void prepareFeedEntryDocument(XWikiDocument document, XWikiContext context)
+    {
+        String content;
+        String syntaxId;
+        if (StringUtils.isBlank(context.getWiki().Param("xwiki.plugins.feed.entrySyntaxId"))) {
+            syntaxId = context.getWiki().getDefaultDocumentSyntax();
+        } else {
+            syntaxId = context.getWiki().Param("xwiki.plugins.feed.entrySyntaxId");
+        }
+        if (StringUtils.isBlank(context.getWiki().Param("xwiki.plugins.feed.entryContent"))) {
+            // If entry content is not configured, we do the best guess between XWiki syntaxes 1 and 2
+            content =
+                StringUtils.equals(Syntax.XWIKI_1_0.toIdString(), syntaxId) ? "#includeForm(\"XWiki.FeedEntryClassSheet\")"
+                    : "{{include document=\"XWiki.FeedEntryClassSheet\" /}}";
+        } else {
+            content = context.getWiki().Param("xwiki.plugins.feed.entryContent");
+        }
+        document.setContent(content);
+        // Let the document try to create the Syntax object from the syntax id. If it fails (for example if the syntax ID precised in configuration
+        // does not correspond to any syntax) it will fallback on the document default Syntax ID (which is a XWiki core configuration entry).
+        document.setSyntaxId(syntaxId);
     }
 
     public BaseClass getAggregatorURLClass(XWikiContext context) throws XWikiException

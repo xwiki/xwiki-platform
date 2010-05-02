@@ -353,7 +353,7 @@ public class FeedPlugin extends XWikiDefaultPlugin implements XWikiPluginInterfa
                     nbfeedsErrors++;
                 }
 
-                UpdateThread updateThread = this.updateThreads.get(space);
+                UpdateThread updateThread = this.updateThreads.get(context.getDatabase() + ":" + space);
                 if (updateThread != null) {
                     updateThread.setNbLoadedFeeds(nbfeeds + updateThread.getNbLoadedFeeds());
                     updateThread.setNbLoadedFeedsErrors(nbfeedsErrors + updateThread.getNbLoadedFeedsErrors());
@@ -522,7 +522,7 @@ public class FeedPlugin extends XWikiDefaultPlugin implements XWikiPluginInterfa
                         adate = new Date();
                     }
                     doc.setCreationDate(adate);
-                    if (!StringUtils.isBlank(doc.getContent())) {
+                    if (StringUtils.isBlank(doc.getContent())) {
                         this.prepareFeedEntryDocument(doc, context);
                     }
                     if (force) {

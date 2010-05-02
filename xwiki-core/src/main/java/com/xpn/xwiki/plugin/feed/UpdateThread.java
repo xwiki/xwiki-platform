@@ -24,22 +24,19 @@ package com.xpn.xwiki.plugin.feed;
 import java.util.Date;
 
 import org.xwiki.context.Execution;
-import org.xwiki.context.ExecutionContext;
-import org.xwiki.context.ExecutionContextException;
-import org.xwiki.context.ExecutionContextManager;
+
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
+import com.xpn.xwiki.util.AbstractXWikiRunnable;
 import com.xpn.xwiki.web.Utils;
 
-public class UpdateThread implements Runnable
+public class UpdateThread extends AbstractXWikiRunnable
 {
     protected boolean fullContent;
 
     protected String space;
 
     protected FeedPlugin feedPlugin;
-
-    protected XWikiContext context;
 
     protected int scheduleTimer;
 
@@ -64,27 +61,12 @@ public class UpdateThread implements Runnable
     public UpdateThread(String space, boolean fullContent, int scheduleTimer, FeedPlugin feedPlugin,
         XWikiContext context)
     {
+        super(XWikiContext.EXECUTIONCONTEXT_KEY, context);
+        
         this.fullContent = fullContent;
         this.space = space;
         this.feedPlugin = feedPlugin;
         this.scheduleTimer = scheduleTimer;
-        this.context = context;
-    }
-
-    public void run()
-    {
-        while (true) {
-            update();
-            if (stopUpdate) {
-                feedPlugin.removeUpdateThread(space, this, context);
-                break;
-            }
-            try {
-                Thread.sleep(scheduleTimer);
-            } catch (InterruptedException e) {
-                break;
-            }
-        }
     }
 
     public void update()
@@ -98,33 +80,19 @@ public class UpdateThread implements Runnable
                 nbLoadedArticles = 0;
                 endDate = null;
                 startDate = new Date();
-                Execution execution = null;
+                XWikiContext context = getXWikiContext();
                 try {
-                    // this should be refactored to implement the AbstractXWikiRunnable to handle this
-                    ExecutionContextManager ecim = (ExecutionContextManager) Utils.getComponent(
-                        ExecutionContextManager.class);
-                    execution = (Execution) Utils.getComponent(Execution.class);
-                    // clone the context to avoid multithreading issues
-                    XWikiContext context = (XWikiContext) this.context.clone();
+                    // Make sure store sessions are cleaned up
                     context.getWiki().getStore().cleanUp(context);
-                    ExecutionContext ec = new ExecutionContext();
-                    // Bridge with old XWiki Context, required for old code.
-                    ec.setProperty("xwikicontext", context);
-                    ecim.initialize(ec);
-                    execution.setContext(ec);
                     // update the feeds
                     nbLoadedArticles = feedPlugin.updateFeedsInSpace(space, fullContent, true, false, context);
                 } catch (XWikiException e) {
-                    exception = e;
-                    e.printStackTrace();
-                } catch (ExecutionContextException e) {
                     exception = e;
                     e.printStackTrace();
                 } finally {
                     updateInProgress = false;
                     endDate = new Date();
                     context.getWiki().getStore().cleanUp(context);
-                    execution.removeContext();
                 }
                 // an update has been schedule..
                 if ((forceUpdate == true) && (stopUpdate == false)) {
@@ -138,6 +106,11 @@ public class UpdateThread implements Runnable
         }
     }
 
+    private XWikiContext getXWikiContext()
+    {
+        return (XWikiContext) Utils.getComponent(Execution.class).getContext().getProperty("xwikicontext");
+    }
+    
     public String getSpace()
     {
         return space;
@@ -171,7 +144,7 @@ public class UpdateThread implements Runnable
     public void stopUpdate()
     {
         if (!updateInProgress) {
-            feedPlugin.removeUpdateThread(space, this, context);
+            feedPlugin.removeUpdateThread(space, this, getXWikiContext());
         }
         stopUpdate = true;
     }
@@ -194,5 +167,27 @@ public class UpdateThread implements Runnable
     public void setNbLoadedFeedsErrors(int nbLoadedFeedsErrors)
     {
         this.nbLoadedFeedsErrors = nbLoadedFeedsErrors;
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see {@link AbstractXWikiRunnable#runInternal()}
+     */
+    @Override
+    protected void runInternal()
+    {
+        while (true) {
+            update();
+            if (stopUpdate) {
+                feedPlugin.removeUpdateThread(space, this, getXWikiContext());
+                break;
+            }
+            try {
+                Thread.sleep(scheduleTimer);
+            } catch (InterruptedException e) {
+                break;
+            }
+        }
     }
 }

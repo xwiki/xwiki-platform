@@ -20,8 +20,6 @@ import org.apache.lucene.store.Directory;
 import org.apache.lucene.store.FSDirectory;
 import org.apache.lucene.store.LockObtainFailedException;
 import org.apache.lucene.util.Version;
-import org.xwiki.context.ExecutionContext;
-import org.xwiki.context.ExecutionContextException;
 
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiConfig;
@@ -71,9 +69,9 @@ public class IndexUpdaterTest extends AbstractBridgedXWikiComponentTestCase
 
     private class TestIndexRebuilder extends IndexRebuilder
     {
-        TestIndexRebuilder(IndexUpdater indexUpdater, XWikiContext context, boolean needInitialRebuild)
+        TestIndexRebuilder(IndexUpdater indexUpdater, XWikiContext context)
         {
-            super(indexUpdater, context, needInitialRebuild);
+            super(indexUpdater, context);
         }
 
         @Override
@@ -209,7 +207,8 @@ public class IndexUpdaterTest extends AbstractBridgedXWikiComponentTestCase
 
         LucenePlugin plugin = new LucenePlugin("Monkey", "Monkey", getContext());
         IndexUpdater indexUpdater = new TestIndexUpdater(directory, 100, 1000, plugin, getContext());
-        IndexRebuilder indexRebuilder = new TestIndexRebuilder(indexUpdater, getContext(), true);
+        IndexRebuilder indexRebuilder = new TestIndexRebuilder(indexUpdater, getContext());
+        indexRebuilder.startRebuildIndex(getContext());
 
         this.rebuildDone.acquireUninterruptibly();
 
@@ -233,7 +232,7 @@ public class IndexUpdaterTest extends AbstractBridgedXWikiComponentTestCase
         LucenePlugin plugin = new LucenePlugin("Monkey", "Monkey", getContext());
         IndexUpdater indexUpdater =
                 new TestIndexUpdater(directory, indexingInterval, maxQueueSize, plugin, getContext());
-        IndexRebuilder indexRebuilder = new TestIndexRebuilder(indexUpdater, getContext(), false);
+        IndexRebuilder indexRebuilder = new TestIndexRebuilder(indexUpdater, getContext());
         Thread writerBlocker = new Thread(indexUpdater, "writerBlocker");
         writerBlocker.start();
         plugin.init(indexUpdater, indexRebuilder, getContext());

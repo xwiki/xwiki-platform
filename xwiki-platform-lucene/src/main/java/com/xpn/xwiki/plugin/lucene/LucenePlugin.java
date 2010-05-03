@@ -22,8 +22,8 @@ package com.xpn.xwiki.plugin.lucene;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
-import java.util.Properties;
 
 import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.lang.StringUtils;
@@ -71,6 +71,8 @@ import com.xpn.xwiki.web.Utils;
  */
 public class LucenePlugin extends XWikiDefaultPlugin
 {
+    private static final Log LOG = LogFactory.getLog(LucenePlugin.class);
+
     public static final String DOCTYPE_WIKIPAGE = "wikipage";
 
     public static final String DOCTYPE_ATTACHMENT = "attachment";
@@ -84,8 +86,6 @@ public class LucenePlugin extends XWikiDefaultPlugin
     public static final String PROP_MAX_QUEUE_SIZE = "xwiki.plugins.lucene.maxQueueSize";
 
     private static final String DEFAULT_ANALYZER = "org.apache.lucene.analysis.standard.StandardAnalyzer";
-
-    private static final Log LOG = LogFactory.getLog(LucenePlugin.class);
 
     /**
      * The Lucene text analyzer, can be configured in <tt>xwiki.cfg</tt> using the key {@link #PROP_ANALYZER} (
@@ -102,8 +102,6 @@ public class LucenePlugin extends XWikiDefaultPlugin
      * The thread running the index updater.
      */
     private Thread indexUpdaterThread;
-
-    protected Properties config;
 
     /**
      * List of Lucene indexes used for searching. By default there is only one such index for all the wiki. One searches
@@ -145,6 +143,12 @@ public class LucenePlugin extends XWikiDefaultPlugin
     public int rebuildIndex(XWikiContext context)
     {
         return this.indexRebuilder.startRebuildIndex(context);
+    }
+
+    public int startIndex(Collection<String> wikis, String hqlFilter, boolean clearIndex, boolean onlyNew,
+        XWikiContext context)
+    {
+        return this.indexRebuilder.startIndex(wikis, hqlFilter, clearIndex, onlyNew, context);
     }
 
     /**
@@ -449,9 +453,7 @@ public class LucenePlugin extends XWikiDefaultPlugin
             LOG.debug("Lucene plugin: in init");
         }
 
-        this.config = context.getWiki().getConfig();
-
-        this.indexDirs = this.config.getProperty(PROP_INDEX_DIR);
+        this.indexDirs = context.getWiki().Param(PROP_INDEX_DIR);
         if (StringUtils.isEmpty(this.indexDirs)) {
             File workDir = context.getWiki().getWorkSubdirectory("lucene", context);
             this.indexDirs = workDir.getAbsolutePath();
@@ -477,8 +479,7 @@ public class LucenePlugin extends XWikiDefaultPlugin
     {
         int indexingInterval;
         try {
-            indexingInterval =
-                1000 * Integer.parseInt(this.config.getProperty(LucenePlugin.PROP_INDEXING_INTERVAL, "30"));
+            indexingInterval = 1000 * (int) context.getWiki().ParamAsLong(PROP_INDEXING_INTERVAL, 30);
         } catch (NumberFormatException e) {
             LOG.warn("Invalid indexing interval in configuration.");
             indexingInterval = 30000;
@@ -486,7 +487,7 @@ public class LucenePlugin extends XWikiDefaultPlugin
 
         int maxQueueSize;
         try {
-            maxQueueSize = Integer.parseInt(this.config.getProperty(LucenePlugin.PROP_MAX_QUEUE_SIZE, "1000"));
+            maxQueueSize = (int) context.getWiki().ParamAsLong(LucenePlugin.PROP_MAX_QUEUE_SIZE, 1000);
         } catch (NumberFormatException e) {
             LOG.warn("Invalid max queue size in configuration.");
             maxQueueSize = 1000;
@@ -507,7 +508,12 @@ public class LucenePlugin extends XWikiDefaultPlugin
         } catch (IOException e) {
             LOG.warn("Failed to check if index exists: " + e);
         }
-        IndexRebuilder indexRebuilder = new IndexRebuilder(indexUpdater, context, needInitialRebuild);
+
+        IndexRebuilder indexRebuilder = new IndexRebuilder(indexUpdater, context);
+        if (needInitialRebuild) {
+            indexRebuilder.startRebuildIndex(context);
+            LOG.info("Launched initial lucene indexing");
+        }
 
         init(indexUpdater, indexRebuilder, context);
     }
@@ -516,10 +522,9 @@ public class LucenePlugin extends XWikiDefaultPlugin
     {
         super.init(context);
 
-        this.config = context.getWiki().getConfig();
         try {
             this.analyzer =
-                (Analyzer) Class.forName(this.config.getProperty(PROP_ANALYZER, DEFAULT_ANALYZER)).newInstance();
+                (Analyzer) Class.forName(context.getWiki().Param(PROP_ANALYZER, DEFAULT_ANALYZER)).newInstance();
         } catch (Exception e) {
             LOG.error("Error instantiating analyzer : ", e);
             LOG.warn("Using default analyzer class: " + DEFAULT_ANALYZER);
@@ -535,7 +540,7 @@ public class LucenePlugin extends XWikiDefaultPlugin
         }
 
         if (this.indexDirs == null) {
-            this.indexDirs = this.config.getProperty(PROP_INDEX_DIR);
+            this.indexDirs = context.getWiki().Param(PROP_INDEX_DIR);
             if (StringUtils.isEmpty(this.indexDirs)) {
                 File workDir = context.getWiki().getWorkSubdirectory("lucene", context);
                 this.indexDirs = workDir.getAbsolutePath();
@@ -625,16 +630,16 @@ public class LucenePlugin extends XWikiDefaultPlugin
     {
         String[] dirs = StringUtils.split(indexDirs, ",");
         List<IndexSearcher> searchersList = new ArrayList<IndexSearcher>();
-        for (int i = 0; i < dirs.length; i++) {
+        for (String dir : dirs) {
             while (true) {
                 try {
-                    if (!IndexReader.indexExists(dirs[i])) {
+                    if (!IndexReader.indexExists(dir)) {
                         // If there's no index there, create an empty one; otherwise the reader
                         // constructor will throw an exception and fail to initialize
-                        new IndexWriter(dirs[i], this.analyzer).close();
+                        new IndexWriter(dir, this.analyzer).close();
                     }
 
-                    searchersList.add(new IndexSearcher(dirs[i], true));
+                    searchersList.add(new IndexSearcher(dir, true));
                     break;
                 } catch (CorruptIndexException e) {
                     handleCorruptIndex(context);
@@ -654,9 +659,9 @@ public class LucenePlugin extends XWikiDefaultPlugin
             closeSearchers(this.searchers);
             this.searchers = createSearchers(this.indexDirs, context);
         } catch (Exception e) {
-            LOG.error("Error opening searchers for index dirs " + config.getProperty(PROP_INDEX_DIR), e);
-            throw new RuntimeException("Error opening searchers for index dirs " + config.getProperty(PROP_INDEX_DIR),
-                e);
+            LOG.error("Error opening searchers for index dirs " + context.getWiki().Param(PROP_INDEX_DIR), e);
+            throw new RuntimeException("Error opening searchers for index dirs "
+                + context.getWiki().Param(PROP_INDEX_DIR), e);
         }
     }
 

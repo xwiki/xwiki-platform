@@ -19,6 +19,9 @@
  */
 package com.xpn.xwiki.plugin.lucene;
 
+import java.util.Collection;
+import java.util.Collections;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -60,12 +63,43 @@ public class LucenePluginApi extends PluginApi<LucenePlugin>
     /**
      * Starts a rebuild of the whole index.
      * 
-     * @return Number of documents scheduled for indexing. -1 in case of errors
+     * @return number of documents scheduled for indexing. -1 in case of errors
      */
     public int rebuildIndex()
     {
         if (hasAdminRights()) {
-            return getProtectedPlugin().rebuildIndex(this.context);
+            Collection<String> wikis = null;
+
+            String database = this.context.getDatabase();
+            try {
+                this.context.setDatabase(this.context.getMainXWiki());
+
+                // if not farm administrator, the user does not have right to rebuild index of the whole farm
+                if (!hasAdminRights()) {
+                    wikis = Collections.singletonList(database);
+                }
+            } finally {
+                this.context.setDatabase(database);
+            }
+
+            return getProtectedPlugin().startIndex(wikis, "", true, false, this.context);
+        }
+
+        return REBUILD_NOT_ALLOWED;
+    }
+
+    /**
+     * Starts a rebuild of the whole index.
+     * 
+     * @param hqlFilter
+     * @param clearIndex
+     * @param onlyNew
+     * @return number of documents scheduled for indexing. -1 in case of errors
+     */
+    public int startIndex(Collection<String> wikis, String hqlFilter, boolean clearIndex, boolean onlyNew)
+    {
+        if (hasAdminRights()) {
+            return getProtectedPlugin().startIndex(wikis, hqlFilter, clearIndex, onlyNew, this.context);
         }
 
         return REBUILD_NOT_ALLOWED;

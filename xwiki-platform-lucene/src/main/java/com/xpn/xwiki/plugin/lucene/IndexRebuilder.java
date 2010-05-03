@@ -19,6 +19,8 @@
  */
 package com.xpn.xwiki.plugin.lucene;
 
+import java.io.IOException;
+import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -27,6 +29,14 @@ import java.util.List;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.log4j.MDC;
+import org.apache.lucene.index.Term;
+import org.apache.lucene.search.BooleanClause;
+import org.apache.lucene.search.BooleanQuery;
+import org.apache.lucene.search.IndexSearcher;
+import org.apache.lucene.search.Searcher;
+import org.apache.lucene.search.TermQuery;
+import org.apache.lucene.search.TopDocs;
+import org.apache.lucene.store.Directory;
 import org.xwiki.context.Execution;
 
 import com.xpn.xwiki.XWiki;
@@ -70,28 +80,46 @@ import com.xpn.xwiki.web.Utils;
  */
 public class IndexRebuilder extends AbstractXWikiRunnable
 {
-    /** Logging helper. */
+    /**
+     * Logging helper.
+     */
     private static final Log LOG = LogFactory.getLog(IndexRebuilder.class);
 
-    /** Amount of time (milliseconds) to sleep while waiting for the indexing queue to empty. */
+    /**
+     * Amount of time (milliseconds) to sleep while waiting for the indexing queue to empty.
+     */
     private static final int RETRYINTERVAL = 30000;
 
-    /** The actual object/thread that indexes data. */
+    /**
+     * The actual object/thread that indexes data.
+     */
     private final IndexUpdater indexUpdater;
 
-    /** Variable used for indicating that a rebuild is already in progress. */
+    /**
+     * Variable used for indicating that a rebuild is already in progress.
+     */
     private volatile boolean rebuildInProgress = false;
 
-    public IndexRebuilder(IndexUpdater indexUpdater, XWikiContext context, boolean needInitialBuild)
+    /**
+     * Wikis where to search.
+     */
+    private Collection<String> wikis = null;
+
+    /**
+     * Hibernate filtering query to reindex with.
+     */
+    private String hqlFilter = null;
+
+    /**
+     * Indicate if document already in the Lucene index are updated.
+     */
+    private boolean onlyNew = false;
+
+    public IndexRebuilder(IndexUpdater indexUpdater, XWikiContext context)
     {
         super(XWikiContext.EXECUTIONCONTEXT_KEY, context.clone());
 
         this.indexUpdater = indexUpdater;
-
-        if (needInitialBuild) {
-            this.startRebuildIndex(context);
-            LOG.info("Launched initial lucene indexing");
-        }
     }
 
     private XWikiContext getContext()
@@ -100,16 +128,34 @@ public class IndexRebuilder extends AbstractXWikiRunnable
             XWikiContext.EXECUTIONCONTEXT_KEY);
     }
 
-    public synchronized int startRebuildIndex(XWikiContext context)
+    public int startRebuildIndex(XWikiContext context)
+    {
+        return startIndex(null, "", true, false, context);
+    }
+
+    public synchronized int startIndex(Collection<String> wikis, String hqlFilter, boolean clearIndex, boolean onlyNew,
+        XWikiContext context)
     {
         if (this.rebuildInProgress) {
             LOG.warn("Cannot launch rebuild because a build is in progress");
 
             return LucenePluginApi.REBUILD_IN_PROGRESS;
         } else {
-            this.indexUpdater.cleanIndex();
+            if (clearIndex) {
+                if (wikis == null) {
+                    this.indexUpdater.cleanIndex();
+                } else {
+                    // TODO: clean wikis listed in wikis
+                }
+            }
 
+            if (wikis != null) {
+                this.wikis = new ArrayList<String>(wikis);
+            }
+            this.hqlFilter = hqlFilter;
+            this.onlyNew = onlyNew;
             this.rebuildInProgress = true;
+
             Thread indexRebuilderThread = new Thread(this, "Lucene Index Rebuilder");
             // The JVM should be allowed to shutdown while this thread is running
             indexRebuilderThread.setDaemon(true);
@@ -181,28 +227,30 @@ public class IndexRebuilder extends AbstractXWikiRunnable
      * First empties the index, then fetches all Documents, their translations and their attachments for re-addition to
      * the index.
      * 
-     * @param context
-     * @return total number of documents and attachments successfully added to the indexer queue, -1 when errors
-     *         occurred.
+     * @param context the XWiki context
+     * @return the number of indexed elements
      */
     private int rebuildIndex(XWikiContext context)
     {
         int retval = 0;
 
-        Collection<String> wikiServers;
-        XWiki xwiki = context.getWiki();
-        if (xwiki.isVirtualMode()) {
-            wikiServers = findWikiServers(context);
-            if (LOG.isDebugEnabled()) {
-                LOG.debug("found " + wikiServers.size() + " virtual wikis:");
-                for (String wikiName : wikiServers) {
-                    LOG.debug(wikiName);
+        Collection<String> wikiServers = this.wikis;
+
+        if (wikiServers == null) {
+            XWiki xwiki = context.getWiki();
+            if (xwiki.isVirtualMode()) {
+                wikiServers = findWikiServers(context);
+                if (LOG.isDebugEnabled()) {
+                    LOG.debug("found " + wikiServers.size() + " virtual wikis:");
+                    for (String wikiName : wikiServers) {
+                        LOG.debug(wikiName);
+                    }
                 }
+            } else {
+                // No virtual wiki configuration, just index the wiki the context belongs to
+                wikiServers = new ArrayList<String>();
+                wikiServers.add(context.getDatabase());
             }
-        } else {
-            // No virtual wiki configuration, just index the wiki the context belongs to
-            wikiServers = new ArrayList<String>();
-            wikiServers.add(context.getDatabase());
         }
 
         // Iterate all found virtual wikis
@@ -219,9 +267,9 @@ public class IndexRebuilder extends AbstractXWikiRunnable
     /**
      * Adds the content of a given wiki to the indexUpdater's queue.
      * 
-     * @param wikiName
-     * @param context
-     * @return
+     * @param wikiName the name of the wiki to index
+     * @param context the XWiki context
+     * @return the number of indexed elements
      */
     protected int indexWiki(String wikiName, XWikiContext context)
     {
@@ -229,59 +277,92 @@ public class IndexRebuilder extends AbstractXWikiRunnable
 
         // Number of index entries processed
         int retval = 0;
-        XWiki xwiki = context.getWiki();
+
         String database = context.getDatabase();
 
         try {
             context.setDatabase(wikiName);
-            Collection<String> docNames = null;
+
+            // If only not ealread index document has to be indexed create a Searcher to find out
+            Searcher searcher = this.onlyNew ? createSearcher(this.indexUpdater.getDirectory(), context) : null;
+
             try {
-                docNames = xwiki.getStore().searchDocumentsNames("", context);
+                List<String> documentNames =
+                    context.getWiki().getStore().searchDocumentsNames(this.hqlFilter != null ? this.hqlFilter : "",
+                        context);
+                retval = indexDocuments(wikiName, documentNames, searcher, context);
             } catch (XWikiException e) {
-                LOG.warn(String.format("Error getting document names for wiki [%s].", wikiName), e);
+                LOG.warn(MessageFormat.format("Error getting document names for wiki [{0}] and filter [{1}].",
+                    wikiName, this.hqlFilter), e);
 
                 return -1;
-            }
-
-            for (String docName : docNames) {
-                XWikiDocument document;
-                try {
-                    document = xwiki.getDocument(docName, context);
-                } catch (XWikiException e) {
-                    LOG.error("error fetching document " + wikiName + ":" + docName, e);
-
-                    continue;
-                }
-
-                if (document != null) {
-                    // In order not to load the whole database in memory, we're limiting the number
-                    // of documents that are in the processing queue at a moment. We could use a
-                    // Bounded Queue in the index updater, but that would generate exceptions in the
-                    // rest of the platform, as the index rebuilder could fill the queue, and then a
-                    // user trying to save a document would cause an exception. Thus, it is better
-                    // to limit the index rebuilder thread only, and not the index updater.
-                    while (this.indexUpdater.getQueueSize() > this.indexUpdater.getMaxQueueSize()) {
-                        try {
-                            // Don't leave any database connections open while sleeping
-                            // This shouldn't be needed, but we never know what bugs might be there
-                            context.getWiki().getStore().cleanUp(context);
-                            Thread.sleep(RETRYINTERVAL);
-                        } catch (InterruptedException e) {
-                            return -2;
-                        }
-                    }
-                    this.indexUpdater.add(document, context);
-                    retval++;
-                    retval += addTranslationsOfDocument(document, context);
-                    retval += this.indexUpdater.addAttachmentsOfDocument(document, context);
-                } else {
-                    if (LOG.isInfoEnabled()) {
-                        LOG.info("XWiki delivered null for document name " + wikiName + ":" + docName);
+            } finally {
+                if (searcher != null) {
+                    try {
+                        searcher.close();
+                    } catch (IOException e) {
+                        LOG.error("Failed to close searcher", e);
                     }
                 }
             }
         } finally {
             context.setDatabase(database);
+        }
+
+        return retval;
+    }
+
+    private int indexDocuments(String wikiName, List<String> documentNames, Searcher searcher, XWikiContext context)
+    {
+        int retval = 0;
+
+        for (String documentName : documentNames) {
+            if (searcher == null || !isIndexed(wikiName, documentName, searcher)) {
+                retval += indexDocument(wikiName, documentName, context);
+            }
+        }
+
+        return retval;
+    }
+
+    private int indexDocument(String wikiName, String documentName, XWikiContext context)
+    {
+        int retval = 0;
+
+        XWikiDocument document;
+        try {
+            document = context.getWiki().getDocument(documentName, context);
+        } catch (XWikiException e) {
+            LOG.error("error fetching document " + wikiName + ":" + documentName, e);
+
+            return retval;
+        }
+
+        if (document != null) {
+            // In order not to load the whole database in memory, we're limiting the number
+            // of documents that are in the processing queue at a moment. We could use a
+            // Bounded Queue in the index updater, but that would generate exceptions in the
+            // rest of the platform, as the index rebuilder could fill the queue, and then a
+            // user trying to save a document would cause an exception. Thus, it is better
+            // to limit the index rebuilder thread only, and not the index updater.
+            while (this.indexUpdater.getQueueSize() > this.indexUpdater.getMaxQueueSize()) {
+                try {
+                    // Don't leave any database connections open while sleeping
+                    // This shouldn't be needed, but we never know what bugs might be there
+                    context.getWiki().getStore().cleanUp(context);
+                    Thread.sleep(RETRYINTERVAL);
+                } catch (InterruptedException e) {
+                    return -2;
+                }
+            }
+            this.indexUpdater.add(document, context);
+            retval++;
+            retval += addTranslationsOfDocument(document, context);
+            retval += this.indexUpdater.addAttachmentsOfDocument(document, context);
+        } else {
+            if (LOG.isInfoEnabled()) {
+                LOG.info("XWiki delivered null for document name " + wikiName + ":" + documentName);
+            }
         }
 
         return retval;
@@ -328,5 +409,38 @@ public class IndexRebuilder extends AbstractXWikiRunnable
         }
 
         return retval;
+    }
+
+    public boolean isIndexed(String wikiName, String documentName, Searcher searcher)
+    {
+        boolean exists = false;
+
+        BooleanQuery query = new BooleanQuery();
+        query.add(new TermQuery(new Term(IndexFields.DOCUMENT_FULLNAME, documentName.toLowerCase())),
+            BooleanClause.Occur.MUST);
+        query.add(new TermQuery(new Term(IndexFields.DOCUMENT_WIKI, wikiName.toLowerCase())), BooleanClause.Occur.MUST);
+
+        try {
+            TopDocs topDocs = searcher.search(query, 1);
+
+            exists = topDocs.totalHits > 1;
+        } catch (IOException e) {
+            LOG.error("Faild to search for page [" + wikiName + ":" + documentName + "] in Lucene index", e);
+        }
+
+        return exists;
+    }
+
+    public Searcher createSearcher(Directory directory, XWikiContext context)
+    {
+        Searcher searcher = null;
+
+        try {
+            searcher = new IndexSearcher(directory, true);
+        } catch (Exception e) {
+            LOG.error("Faild to create IndexSearcher for Lucen index [" + directory + "]", e);
+        }
+
+        return searcher;
     }
 }

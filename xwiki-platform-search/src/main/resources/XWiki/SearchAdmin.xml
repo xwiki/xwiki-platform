@@ -1,0 +1,203 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xwikidoc>
+<web>XWiki</web>
+<name>SearchAdmin</name>
+<language></language>
+<defaultLanguage>en</defaultLanguage>
+<translation>0</translation>
+<parent></parent>
+<creator>XWiki.Admin</creator>
+<author>XWiki.Admin</author>
+<customClass></customClass>
+<contentAuthor>XWiki.Admin</contentAuthor>
+<creationDate>1272285137000</creationDate>
+<date>1272900507000</date>
+<contentUpdateDate>1272900507000</contentUpdateDate>
+<version>1.1</version>
+<title>Search administration</title>
+<template></template>
+<defaultTemplate></defaultTemplate>
+<validationScript></validationScript>
+<comment></comment>
+<minorEdit>false</minorEdit>
+<syntaxId>xwiki/2.0</syntaxId>
+<hidden>false</hidden>
+<object>
+<class>
+<name>XWiki.ConfigurableClass</name>
+<customClass></customClass>
+<customMapping></customMapping>
+<defaultViewSheet></defaultViewSheet>
+<defaultEditSheet></defaultEditSheet>
+<defaultWeb></defaultWeb>
+<nameField></nameField>
+<validationScript></validationScript>
+<codeToExecute>
+<editor>---</editor>
+<name>codeToExecute</name>
+<number>7</number>
+<picker>0</picker>
+<prettyName>codeToExecute</prettyName>
+<rows>5</rows>
+<size>40</size>
+<unmodifiable>0</unmodifiable>
+<validationMessage></validationMessage>
+<validationRegExp></validationRegExp>
+<classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+</codeToExecute>
+<configurationClass>
+<name>configurationClass</name>
+<number>3</number>
+<picker>0</picker>
+<prettyName>configurationClass</prettyName>
+<size>30</size>
+<unmodifiable>0</unmodifiable>
+<validationMessage></validationMessage>
+<validationRegExp></validationRegExp>
+<classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+</configurationClass>
+<configureGlobally>
+<defaultValue></defaultValue>
+<displayFormType>checkbox</displayFormType>
+<displayType></displayType>
+<name>configureGlobally</name>
+<number>4</number>
+<prettyName>configureGlobally</prettyName>
+<unmodifiable>0</unmodifiable>
+<validationMessage></validationMessage>
+<validationRegExp></validationRegExp>
+<classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+</configureGlobally>
+<displayInSection>
+<name>displayInSection</name>
+<number>1</number>
+<picker>0</picker>
+<prettyName>displayInSection</prettyName>
+<size>30</size>
+<unmodifiable>0</unmodifiable>
+<validationMessage></validationMessage>
+<validationRegExp></validationRegExp>
+<classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+</displayInSection>
+<heading>
+<name>heading</name>
+<number>2</number>
+<picker>0</picker>
+<prettyName>heading</prettyName>
+<size>30</size>
+<unmodifiable>0</unmodifiable>
+<validationMessage></validationMessage>
+<validationRegExp></validationRegExp>
+<classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+</heading>
+<iconAttachment>
+<name>iconAttachment</name>
+<number>8</number>
+<picker>0</picker>
+<prettyName>iconAttachment</prettyName>
+<size>30</size>
+<unmodifiable>0</unmodifiable>
+<validationMessage></validationMessage>
+<validationRegExp></validationRegExp>
+<classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+</iconAttachment>
+<linkPrefix>
+<name>linkPrefix</name>
+<number>5</number>
+<picker>0</picker>
+<prettyName>linkPrefix</prettyName>
+<size>30</size>
+<unmodifiable>0</unmodifiable>
+<validationMessage></validationMessage>
+<validationRegExp></validationRegExp>
+<classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+</linkPrefix>
+<propertiesToShow>
+<cache>0</cache>
+<displayType>input</displayType>
+<multiSelect>1</multiSelect>
+<name>propertiesToShow</name>
+<number>6</number>
+<picker>0</picker>
+<prettyName>propertiesToShow</prettyName>
+<relationalStorage>1</relationalStorage>
+<separator> </separator>
+<separators> ,|</separators>
+<size>20</size>
+<sort>none</sort>
+<unmodifiable>0</unmodifiable>
+<validationMessage></validationMessage>
+<validationRegExp></validationRegExp>
+<values></values>
+<classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+</propertiesToShow>
+</class>
+<name>XWiki.SearchAdmin</name>
+<number>0</number>
+<className>XWiki.ConfigurableClass</className>
+<guid>301d32cd-cf2a-4b9a-b2c6-182f3c04eeac</guid>
+<property>
+<codeToExecute>{{include document="XWiki.SearchAdmin"/}}</codeToExecute>
+</property>
+<property>
+<configurationClass></configurationClass>
+</property>
+<property>
+<configureGlobally>1</configureGlobally>
+</property>
+<property>
+<displayInSection>Search</displayInSection>
+</property>
+<property>
+<heading></heading>
+</property>
+<property>
+<iconAttachment></iconAttachment>
+</property>
+<property>
+<linkPrefix></linkPrefix>
+</property>
+<property>
+<propertiesToShow/>
+</property>
+</object>
+<content>{{include document="XWiki.SearchCode"/}}
+
+= {{velocity}}$msg.get('search.admin.configuration.title'){{/velocity}} =
+
+{{velocity output="false"}}
+## Create the configuration object if it does not exists
+#if (!$searchConfigObj)
+  #set($searchConfigObj = $searchConfigDoc.getObject($searchConfigClass.name, true))
+  $searchConfigDoc.save()
+#end
+#set($searchEnginePropertyClass = $searchConfigClass.engine)
+
+## Form submission depends on this.
+$xwiki.jsfx.use('js/xwiki/actionbuttons/actionButtons.js', true)
+{{/velocity}}
+
+{{velocity}}
+{{html wiki="true"}}
+&lt;form id="search_XWiki.SearchConfig" method="post" action="${searchConfigDoc.getURL('save')}" onsubmit="cancelCancelEdit()"&gt;
+&lt;fieldset&gt;
+
+&lt;p&gt;
+&lt;label for="XWiki.SearchConfigClass_0_engine"&gt;$searchEnginePropertyClass.prettyName&lt;/label&gt;
+$searchConfigDoc.displayEdit($searchEnginePropertyClass, 'XWiki.SearchConfigClass_0_', $searchConfigObj)
+&lt;/p&gt;
+
+&lt;input class="button" type="submit" name="action_saveandcontinue" value="$msg.get('search.admin.configuration.button')" /&gt;
+
+&lt;/fieldset&gt;
+&lt;/form&gt;
+
+&lt;p&gt;
+$msg.get('search.admin.configuration.seexwikicfg')
+&lt;/p&gt;
+{{/html}}
+{{/velocity}}
+
+= {{velocity}}$msg.get('search.admin.lucene.title'){{/velocity}} =
+
+{{include document="XWiki.LuceneSearchAdmin"}}</content></xwikidoc>

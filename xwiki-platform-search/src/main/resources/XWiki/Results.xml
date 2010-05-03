@@ -1,0 +1,134 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xwikidoc>
+<web>XWiki</web>
+<name>Results</name>
+<language></language>
+<defaultLanguage>en</defaultLanguage>
+<translation>0</translation>
+<parent>Main.WebSearch</parent>
+<creator>XWiki.Admin</creator>
+<author>XWiki.Admin</author>
+<customClass></customClass>
+<contentAuthor>XWiki.Admin</contentAuthor>
+<creationDate>1252454400000</creationDate>
+<date>1271856168000</date>
+<contentUpdateDate>1271856168000</contentUpdateDate>
+<version>1.1</version>
+<title>$msg.get("xe.search.results")</title>
+<template></template>
+<defaultTemplate></defaultTemplate>
+<validationScript></validationScript>
+<comment>Imported from XAR</comment>
+<minorEdit>false</minorEdit>
+<syntaxId>xwiki/2.0</syntaxId>
+<hidden>false</hidden>
+<content>{{velocity}}
+{{html}}
+#set($showdata = 0)
+&lt;div id="searchResults"&gt;
+  #foreach ($item in $list)
+    #set($itemClass = "$item.class")
+    #if($itemClass.contains('lucene'))
+      #set($isLuceneResult = true)
+    #else
+      #set($isLuceneResult = false)
+    #end
+    #if($isLuceneResult)
+      #set($itemfullname = "${item.wiki}:${item.space}.${item.name}")
+    #else
+      #set($itemfullname = "${context.database}:${item}")
+    #end
+    #if ($xwiki.hasAccessLevel('view', $context.user, $itemfullname))
+      &lt;div class="resultItem"&gt;
+      &lt;div class="resultContainer"&gt;
+      #if($isLuceneResult)
+        #set($itemDoc = $item)
+      #else
+        #set($itemDoc = $xwiki.getDocument($item))
+      #end
+      #set($author = $xwiki.getUserName($itemDoc.author))
+      ##*********************************************************##
+      ## Description                                             ##
+      ##*********************************************************##
+      &lt;div class="itemDescription type-${item.type}"&gt;
+        ##*********************************************************##
+        ## Title                                                   ##
+        ##*********************************************************##
+        &lt;h2 class="itemTitle"&gt;
+          #if($isLuceneResult)
+            #if($item.type == 'attachment')
+              &lt;a href="$xwiki.getDocument($itemfullname).getAttachmentURL($item.filename)"&gt;$xwiki.getXMLEncoded($item.filename)&lt;/a&gt;
+            #else
+              &lt;a href="$xwiki.getURL($itemfullname)"&gt;$xwiki.getXMLEncoded($xwiki.getDocument($itemfullname).getDisplayTitle())&lt;/a&gt;
+            #end
+          #else
+            &lt;a href="$xwiki.getURL($itemfullname)"&gt;$xwiki.getXMLEncoded($itemDoc.getDisplayTitle())&lt;/a&gt;
+          #end
+        &lt;/h2&gt;
+        ##*********************************************************##
+        ## Location                                                ##
+        ##*********************************************************##
+        &lt;div class="itemLocation"&gt;
+          $msg.get('xe.search.item.location', [
+          $xwiki.getXMLEncoded($itemDoc.wiki), $xwiki.getURL("${itemDoc.wiki}:Main.WebHome"),
+          $xwiki.getXMLEncoded($itemDoc.space), $xwiki.getURL("${itemDoc.wiki}:${itemDoc.space}.WebHome"),
+          $xwiki.getXMLEncoded($itemDoc.name), $xwiki.getURL($itemfullname)])
+        &lt;/div&gt;
+        ##*********************************************************##
+        ## Modifiers - content update date                         ##
+        ##*********************************************************##
+        &lt;div class="itemModified"&gt;
+          #if ($author == 'XWikiGuest')
+            #set($author = $msg.get('xe.results.guest'))
+          #end
+          $msg.get('xe.search.item.modified', [$author, $xwiki.formatDate($itemDoc.date, 'dd MMM yyyy')])
+        &lt;/div&gt;
+## TODO: Uncomment when the attachment and comment count will be implemented
+##         &lt;div class="itemOthers"&gt;
+          ##*********************************************************##
+          ## Rating                                                  ##
+          ##*********************************************************##
+          #if($xwiki.ratings &amp;&amp; $item.type != 'attachment')
+            #set($avarageRating = $xwiki.ratings.getAverageRating($xwiki.getDocument($itemfullname)).averageVote)
+            #set($percentageRating = $avarageRating * 20)
+            &lt;span class="itemRating" title="$msg.get('xe.search.item.rating.title')"&gt;
+              &lt;span class="currentRating" style="width:$percentageRating%;"&gt;&lt;/span&gt;
+            &lt;/span&gt;
+          #end
+##         &lt;/div&gt;
+      &lt;/div&gt; ## end &lt;div class="itemDescription"&gt;
+      #if($isScored)
+        #set($resval = $itemDoc.score * 100)
+        ##*********************************************************##
+        ## Relevance                                               ##
+        ##*********************************************************##
+        &lt;div class="itemRelevance"&gt;
+          &lt;span class="relevance" title="$msg.get('xe.search.item.relevance.title')"&gt;
+            &lt;span class="currentRelevance" style="width:${resval}%;"&gt;&lt;/span&gt;
+          &lt;/span&gt;
+          &lt;span class="relevanceText"&gt;$resval.intValue()%&lt;/span&gt;
+        &lt;/div&gt;
+      #end ## isScored
+      ##*********************************************************##
+      ## Actions (admins only)                                   ##
+      ##*********************************************************##
+#*
+      #if($xwiki.hasAdminRights())
+          #set($copyURL = $xwiki.getURL('XWiki.CopyDocument', 'view', "sourcedoc=${util.encodeURI($itemfullname)}"))
+          #set($deleteURL = $xwiki.getDocument($itemfullname).getURL('delete'))
+          #set($renameURL = $xwiki.getDocument($itemfullname).getURL('view', 'xpage=rename&amp;amp;step=1'))
+          #set($rightsURL = $xwiki.getDocument($itemfullname).getURL('edit', 'editor=rights'))
+          &lt;div class="itemActions"&gt;
+            &lt;a href="$copyURL" class="tool copy" title="$msg.get('xe.results.copy')"&gt;$msg.get('xe.results.copy')&lt;/a&gt;
+            &lt;a href='$renameURL' class="tool rename" title="$msg.get('xe.results.rename')"&gt;$msg.get('xe.results.rename')&lt;/a&gt;
+            &lt;a href="$deleteURL" class="tool delete" title="$msg.get('xe.results.delete')"&gt;$msg.get('xe.results.delete')&lt;/a&gt;
+            &lt;a href='$rightsURL' class="tool rights" title="$msg.get('xe.results.rights')"&gt;$msg.get('xe.results.rights')&lt;/a&gt;
+          &lt;/div&gt; ## itemActions
+        #end ## has admin rights *# ##
+      &lt;/div&gt; ## resultContainer
+      &lt;/div&gt; ## resultItem
+    #end ## hasAccessLevel
+  #end ## foreach item
+&lt;/div&gt; ## searchResults
+{{/html}}
+{{/velocity}}</content></xwikidoc>

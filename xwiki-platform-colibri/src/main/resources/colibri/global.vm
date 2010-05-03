@@ -39,7 +39,7 @@
   </div> ## companylogo
   </div> ## company
   <div id="globallinks">
-    <form action="$xwiki.getURL('Main.WebSearch')">
+    <form action="#if($xwiki.exists('Main.Search'))$xwiki.getURL('Main.Search')#else$xwiki.getURL('Main.WebSearch')#end">
       <div class="globalsearch">
         <label class="hidden" for="headerglobalsearchinput">$msg.get('panels.search.inputLabel')</label><input class="globalsearchinput withTip" id="headerglobalsearchinput" type="text" name="text" value="$msg.get('panels.search.inputText')" size="15"/><input class="button" type="image" value="$msg.get('panels.search.submit')" alt="$msg.get('panels.search.submit')" src="$xwiki.getSkinFile('icons/xwiki/search.png')"/>
       </div>

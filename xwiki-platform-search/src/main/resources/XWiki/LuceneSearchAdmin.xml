@@ -11,8 +11,8 @@
 <customClass></customClass>
 <contentAuthor>XWiki.Admin</contentAuthor>
 <creationDate>1272286749000</creationDate>
-<date>1272899056000</date>
-<contentUpdateDate>1272899056000</contentUpdateDate>
+<date>1272976855000</date>
+<contentUpdateDate>1272976855000</contentUpdateDate>
 <version>1.1</version>
 <title>Lucene search administration</title>
 <template></template>
@@ -57,11 +57,14 @@
   #end
   ##
   #if ($startindex)
-    $wikis $wikis.class
-    $hqlFilter
-    $clearIndex
-    $onlyNew
     #set($errorcode = $lucene.startIndex($wikis, $hqlFilter, $clearIndex, $onlyNew))
+    #if ($errorcode &gt; 0)
+      {{info}}$msg.get('search.admin.lucene.indexing.message.started'){{/info}}
+    #elseif ($errorcode == -1)
+      {{error}}$msg.get('needadminrights').{{/error}}
+    #elseif ($errorcode == -2)
+      {{warning}}$msg.get('search.admin.lucene.indexing.message.alreadystarted'){{/warning}}
+    #end
   #end
 #else## !hasAdmin
  {{error}}$msg.get('needadminrights').{{/error}}

@@ -30,6 +30,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.codec.binary.Base64;
+import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.securityfilter.authenticator.persistent.DefaultPersistentLoginManager;
@@ -111,16 +112,16 @@ public class MyPersistentLoginManager extends DefaultPersistentLoginManager
     public void setCookieDomains(String[] cdlist)
     {
         if (cdlist != null && cdlist.length > 0) {
-            cookieDomains = new String[cdlist.length];
+            this.cookieDomains = new String[cdlist.length];
             for (int i = 0; i < cdlist.length; ++i) {
                 if (cdlist[i] != null && !cdlist[i].startsWith(".")) {
-                    cookieDomains[i] = ".".concat(cdlist[i]);
+                    this.cookieDomains[i] = ".".concat(cdlist[i]);
                 } else {
-                    cookieDomains[i] = cdlist[i];
+                    this.cookieDomains[i] = cdlist[i];
                 }
             }
         } else {
-            cookieDomains = null;
+            this.cookieDomains = null;
         }
     }
 
@@ -132,7 +133,7 @@ public class MyPersistentLoginManager extends DefaultPersistentLoginManager
      */
     public void setCookiePath(String cp)
     {
-        cookiePath = cp;
+        this.cookiePath = cp;
     }
 
     /**
@@ -148,7 +149,7 @@ public class MyPersistentLoginManager extends DefaultPersistentLoginManager
         if (!sessionCookie) {
             setMaxAge(cookie);
         }
-        cookie.setPath(cookiePath);
+        cookie.setPath(this.cookiePath);
         if (cookieDomain != null) {
             cookie.setDomain(cookieDomain);
         }
@@ -163,11 +164,12 @@ public class MyPersistentLoginManager extends DefaultPersistentLoginManager
      * @param username The username that's being remembered.
      * @param password The password that's being remembered.
      */
+    @Override
     public void rememberLogin(HttpServletRequest request, HttpServletResponse response, String username, String password)
     {
         String protectedUsername = username;
         String protectedPassword = password;
-        if (protection.equals(PROTECTION_ALL) || protection.equals(PROTECTION_ENCRYPTION)) {
+        if (this.protection.equals(PROTECTION_ALL) || this.protection.equals(PROTECTION_ENCRYPTION)) {
             protectedUsername = encryptText(protectedUsername);
             protectedPassword = encryptText(protectedPassword);
             if (protectedUsername == null || protectedPassword == null) {
@@ -196,7 +198,7 @@ public class MyPersistentLoginManager extends DefaultPersistentLoginManager
         Cookie rememberCookie = new Cookie(getCookiePrefix() + COOKIE_REMEMBERME, !sessionCookie + "");
         setupCookie(rememberCookie, sessionCookie, cookieDomain, response);
 
-        if (protection.equals(PROTECTION_ALL) || protection.equals(PROTECTION_VALIDATION)) {
+        if (this.protection.equals(PROTECTION_ALL) || this.protection.equals(PROTECTION_VALIDATION)) {
             String validationHash = getValidationHash(protectedUsername, protectedPassword, getClientIP(request));
             if (validationHash != null) {
                 // Validation
@@ -223,10 +225,10 @@ public class MyPersistentLoginManager extends DefaultPersistentLoginManager
     private void setMaxAge(Cookie cookie)
     {
         try {
-            cookie.setMaxAge(Math.round(60 * 60 * 24 * Float.parseFloat(cookieLife)));
+            cookie.setMaxAge(Math.round(60 * 60 * 24 * Float.parseFloat(this.cookieLife)));
         } catch (Exception e) {
             if (LOG.isErrorEnabled()) {
-                LOG.error("Failed setting cookie Max age with duration " + cookieLife);
+                LOG.error("Failed setting cookie Max age with duration " + this.cookieLife);
             }
         }
     }
@@ -240,7 +242,7 @@ public class MyPersistentLoginManager extends DefaultPersistentLoginManager
     private void addCookie(HttpServletResponse response, Cookie cookie)
     {
         if (LOG.isDebugEnabled()) {
-            LOG.debug("Adding cookie: " + cookie.getDomain() + " " + cookie.getPath() + " " + cookie.getName() + " "
+            LOG.debug("Adding cookie: " + cookie.getDomain() + cookie.getPath() + " " + cookie.getName() + "="
                 + cookie.getValue());
         }
         response.addCookie(cookie);
@@ -257,11 +259,11 @@ public class MyPersistentLoginManager extends DefaultPersistentLoginManager
     private String getCookieDomain(HttpServletRequest request)
     {
         String cookieDomain = null;
-        if (cookieDomains != null) {
+        if (this.cookieDomains != null) {
             String servername = request.getServerName();
-            for (int i = 0; i < cookieDomains.length; i++) {
-                if (servername.indexOf(cookieDomains[i]) != -1) {
-                    cookieDomain = cookieDomains[i];
+            for (int i = 0; i < this.cookieDomains.length; i++) {
+                if (servername.indexOf(this.cookieDomains[i]) != -1) {
+                    cookieDomain = this.cookieDomains[i];
                     break;
                 }
             }
@@ -284,7 +286,7 @@ public class MyPersistentLoginManager extends DefaultPersistentLoginManager
      */
     private String getValidationHash(String username, String password, String clientIP)
     {
-        if (validationKey == null) {
+        if (this.validationKey == null) {
             if (LOG.isErrorEnabled()) {
                 LOG.error("ERROR! >> validationKey not specified...");
                 LOG.error("you are REQUIRED to specify the validatonkey in xwiki.cfg");
@@ -301,14 +303,14 @@ public class MyPersistentLoginManager extends DefaultPersistentLoginManager
             sbValueBeforeMD5.append(FIELD_SEPARATOR);
             sbValueBeforeMD5.append(password.toString());
             sbValueBeforeMD5.append(FIELD_SEPARATOR);
-            if (isTrue(useIP)) {
+            if (isTrue(this.useIP)) {
                 sbValueBeforeMD5.append(clientIP.toString());
                 sbValueBeforeMD5.append(FIELD_SEPARATOR);
             }
-            sbValueBeforeMD5.append(validationKey.toString());
+            sbValueBeforeMD5.append(this.validationKey.toString());
 
-            valueBeforeMD5 = sbValueBeforeMD5.toString();
-            md5.update(valueBeforeMD5.getBytes());
+            this.valueBeforeMD5 = sbValueBeforeMD5.toString();
+            md5.update(this.valueBeforeMD5.getBytes());
 
             byte[] array = md5.digest();
             StringBuffer sb = new StringBuffer();
@@ -319,13 +321,13 @@ public class MyPersistentLoginManager extends DefaultPersistentLoginManager
                 }
                 sb.append(Integer.toHexString(b));
             }
-            valueAfterMD5 = sb.toString();
+            this.valueAfterMD5 = sb.toString();
         } catch (NoSuchAlgorithmException e) {
             LOG.error(e);
         } catch (Exception e) {
             LOG.error(e);
         }
-        return valueAfterMD5;
+        return this.valueAfterMD5;
     }
 
     /**
@@ -339,9 +341,9 @@ public class MyPersistentLoginManager extends DefaultPersistentLoginManager
     public String encryptText(String clearText)
     {
         try {
-            Cipher c1 = Cipher.getInstance(cipherParameters);
-            if (secretKey != null) {
-                c1.init(Cipher.ENCRYPT_MODE, secretKey);
+            Cipher c1 = Cipher.getInstance(this.cipherParameters);
+            if (this.secretKey != null) {
+                c1.init(Cipher.ENCRYPT_MODE, this.secretKey);
                 byte[] clearTextBytes;
                 clearTextBytes = clearText.getBytes();
                 byte[] encryptedText = c1.doFinal(clearTextBytes);
@@ -370,6 +372,7 @@ public class MyPersistentLoginManager extends DefaultPersistentLoginManager
      * @param request The servlet request.
      * @param response The servlet response.
      */
+    @Override
     public void forgetLogin(HttpServletRequest request, HttpServletResponse response)
     {
         ((SecurityRequestWrapper) request).setUserPrincipal(null);
@@ -413,7 +416,7 @@ public class MyPersistentLoginManager extends DefaultPersistentLoginManager
         Cookie cookie = getCookie(request.getCookies(), cookieName);
         if (cookie != null) {
             cookie.setMaxAge(0);
-            cookie.setPath(cookiePath);
+            cookie.setPath(this.cookiePath);
             addCookie(response, cookie);
             String cookieDomain = getCookieDomain(request);
             if (cookieDomain != null) {
@@ -467,11 +470,11 @@ public class MyPersistentLoginManager extends DefaultPersistentLoginManager
      */
     private boolean checkValidation(HttpServletRequest request, HttpServletResponse response)
     {
-        if (protection.equals(PROTECTION_ALL) || protection.equals(PROTECTION_VALIDATION)) {
+        if (this.protection.equals(PROTECTION_ALL) || this.protection.equals(PROTECTION_VALIDATION)) {
             String username = getCookieValue(request.getCookies(), getCookiePrefix() + COOKIE_USERNAME, DEFAULT_VALUE);
             String password = getCookieValue(request.getCookies(), getCookiePrefix() + COOKIE_PASSWORD, DEFAULT_VALUE);
             String cookieHash =
-                    getCookieValue(request.getCookies(), getCookiePrefix() + COOKIE_VALIDATION, DEFAULT_VALUE);
+                getCookieValue(request.getCookies(), getCookiePrefix() + COOKIE_VALIDATION, DEFAULT_VALUE);
             String calculatedHash = getValidationHash(username, password, getClientIP(request));
             if (cookieHash.equals(calculatedHash)) {
                 return true;
@@ -492,13 +495,14 @@ public class MyPersistentLoginManager extends DefaultPersistentLoginManager
      * @return The username value, or <tt>null</tt> if not found or the cookie isn't valid.
      * @todo Also use the URL, in case cookies are disabled [XWIKI-1071].
      */
+    @Override
     public String getRememberedUsername(HttpServletRequest request, HttpServletResponse response)
     {
         String username = getCookieValue(request.getCookies(), getCookiePrefix() + COOKIE_USERNAME, DEFAULT_VALUE);
 
         if (!username.equals(DEFAULT_VALUE)) {
             if (checkValidation(request, response)) {
-                if (protection.equals(PROTECTION_ALL) || protection.equals(PROTECTION_ENCRYPTION)) {
+                if (this.protection.equals(PROTECTION_ALL) || this.protection.equals(PROTECTION_ENCRYPTION)) {
                     username = decryptText(username);
                 }
                 return username;
@@ -515,12 +519,13 @@ public class MyPersistentLoginManager extends DefaultPersistentLoginManager
      * @return The password value, or <tt>null</tt> if not found or the cookie isn't valid.
      * @todo Also use the URL, in case cookies are disabled [XWIKI-1071].
      */
+    @Override
     public String getRememberedPassword(HttpServletRequest request, HttpServletResponse response)
     {
         String password = getCookieValue(request.getCookies(), getCookiePrefix() + COOKIE_PASSWORD, DEFAULT_VALUE);
         if (!password.equals(DEFAULT_VALUE)) {
             if (checkValidation(request, response)) {
-                if (protection.equals(PROTECTION_ALL) || protection.equals(PROTECTION_ENCRYPTION)) {
+                if (this.protection.equals(PROTECTION_ALL) || this.protection.equals(PROTECTION_ENCRYPTION)) {
                     password = decryptText(password);
                 }
                 return password;
@@ -559,9 +564,9 @@ public class MyPersistentLoginManager extends DefaultPersistentLoginManager
             // so here we must re-introduce the = sign needed by Base64.
             // See XWIKI-2211
             byte[] decodedEncryptedText =
-                    Base64.decodeBase64(encryptedText.replaceAll("_", "=").getBytes("ISO-8859-1"));
-            Cipher c1 = Cipher.getInstance(cipherParameters);
-            c1.init(Cipher.DECRYPT_MODE, secretKey);
+                Base64.decodeBase64(encryptedText.replaceAll("_", "=").getBytes("ISO-8859-1"));
+            Cipher c1 = Cipher.getInstance(this.cipherParameters);
+            c1.init(Cipher.DECRYPT_MODE, this.secretKey);
             byte[] decryptedText = c1.doFinal(decodedEncryptedText);
             String decryptedTextString = new String(decryptedText);
             return decryptedTextString;

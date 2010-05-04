@@ -36,6 +36,7 @@ import org.xwiki.container.Container;
 import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.block.ImageBlock;
 import org.xwiki.rendering.block.LinkBlock;
+import org.xwiki.rendering.block.ParagraphBlock;
 import org.xwiki.rendering.listener.Link;
 import org.xwiki.rendering.listener.LinkType;
 import org.xwiki.rendering.listener.URLImage;
@@ -122,7 +123,16 @@ public class ChartMacro extends AbstractMacro<ChartMacroParameters>
         imageBlock.setParameter("alt", title);
         LinkBlock linkBlock = new LinkBlock(Collections.singletonList((Block) imageBlock), link, true);
         linkBlock.setParameter("title", title);
-        return Collections.singletonList((Block) linkBlock);
+
+        // If the macro is used standalone then we need to wrap it in a paragraph block.
+        Block resultBlock;
+        if (context.isInline()) {
+            resultBlock = linkBlock;
+        } else {
+            resultBlock = new ParagraphBlock(Collections.singletonList((Block) linkBlock));
+        }
+
+        return Collections.singletonList(resultBlock);
     }
 
     /**

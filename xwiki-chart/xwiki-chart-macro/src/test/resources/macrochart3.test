@@ -7,4 +7,4 @@
 .#-----------------------------------------------------
 .expect|xhtml/1.0
 .#-----------------------------------------------------
-<span class="wikiexternallink"><a class="wikimodel-freestanding" href="http://localhost/charts/chart.png"><img src="http://localhost/charts/chart.png" class="wikimodel-freestanding"/></a></span>
+<p><span class="wikiexternallink"><a class="wikimodel-freestanding" href="http://localhost/charts/chart.png"><img src="http://localhost/charts/chart.png" class="wikimodel-freestanding"/></a></span></p>

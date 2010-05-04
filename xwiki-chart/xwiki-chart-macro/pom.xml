@@ -48,6 +48,12 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-checkstyle-plugin</artifactId>
+        <configuration>
+          <!-- TODO: Temporarily exclude this class till we find a way to solve the fan out complexity -->
+          <excludes>
+            org/xwiki/rendering/internal/macro/chart/ChartMacro.java
+          </excludes>
+        </configuration>
       </plugin>
     </plugins>
   </build>

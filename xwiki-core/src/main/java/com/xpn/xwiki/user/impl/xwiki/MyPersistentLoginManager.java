@@ -245,7 +245,31 @@ public class MyPersistentLoginManager extends DefaultPersistentLoginManager
             LOG.debug("Adding cookie: " + cookie.getDomain() + cookie.getPath() + " " + cookie.getName() + "="
                 + cookie.getValue());
         }
-        response.addCookie(cookie);
+        // We don't use the container's response.addCookie, since the HttpOnly cookie flag was introduced only recently
+        // in the servlet specification, and we're still using the older 2.4 specification as a minimal requirement for
+        // compatibility with as many containers as possible. Instead, we write the cookie manually as a HTTP header.
+        StringBuilder cookieValue = new StringBuilder(150);
+        cookieValue.append(cookie.getName() + "=");
+        if (StringUtils.isNotEmpty(cookie.getValue())) {
+            cookieValue.append("\"" + cookie.getValue() + "\"");
+        }
+        cookieValue.append("; Version=1");
+        if (cookie.getMaxAge() >= 0) {
+            cookieValue.append("; Max-Age=" + cookie.getMaxAge());
+        } else {
+            cookieValue.append("; Discard");
+        }
+        if (StringUtils.isNotEmpty(cookie.getDomain())) {
+            // IE needs toLowerCase for the domain name
+            cookieValue.append("; Domain=" + cookie.getDomain().toLowerCase());
+        }
+        if (StringUtils.isNotEmpty(cookie.getPath())) {
+            cookieValue.append("; Path=" + cookie.getPath());
+        }
+        // Protect cookies from being used from JavaScript, see http://www.owasp.org/index.php/HttpOnly
+        cookieValue.append("; HttpOnly");
+
+        response.addHeader("Set-Cookie", cookieValue.toString());
     }
 
     /**

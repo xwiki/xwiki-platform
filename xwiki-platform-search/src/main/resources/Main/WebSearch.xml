@@ -11,10 +11,10 @@
 <customClass></customClass>
 <contentAuthor>XWiki.Admin</contentAuthor>
 <creationDate>1252450800000</creationDate>
-<date>1272905693000</date>
-<contentUpdateDate>1272905693000</contentUpdateDate>
+<date>1272986686000</date>
+<contentUpdateDate>1272986686000</contentUpdateDate>
 <version>1.1</version>
-<title>#if("$!{request.text}"=="")$msg.get("xe.search.web")#else$msg.get("xe.search.web.results", [$request.text])#end</title>
+<title>#if("$!{request.text}"=="")$msg.get("search.page.database.title.noquery")#else$msg.get("search.page.database.title.query", [$request.text])#end</title>
 <template></template>
 <defaultTemplate></defaultTemplate>
 <validationScript></validationScript>
@@ -40,8 +40,8 @@ $xwiki.ssfx.use("uicomponents/search/search.css", true)##
   &lt;option value="${space}" #if($selectedSpace == $space)selected="selected"#end&gt;$space&lt;/option&gt;
 #end
 #macro(spaceselect $selectedSpace $spaces)
-  &lt;select name="space" title="$msg.get('xe.search.bar.spaces.title')"&gt;
-    &lt;option value="" #if($selectedSpace == '')selected="selected"#end&gt;$msg.get('xe.search.bar.spaces.all')&lt;/option&gt;
+  &lt;select name="space" title="$msg.get('search.page.bar.spaces.title')"&gt;
+    &lt;option value="" #if($selectedSpace == '')selected="selected"#end&gt;$msg.get('search.page.bar.spaces.all')&lt;/option&gt;
     #foreach($space in $spaces)
       #if (!$blacklistedSpaces.contains($space))
         #spaceoption($space $selectedSpace)
@@ -59,12 +59,12 @@ $xwiki.ssfx.use("uicomponents/search/search.css", true)##
 #if(!$rssmode)
 {{html}}
 &lt;form action="" id="searchBar"&gt;
-    &lt;div class="centered"&gt;
-      &lt;label for="text" class="hidden"&gt;$msg.get('xe.search.query')&lt;/label&gt;
-      &lt;input type="text" id="text" name="text" class="searchQuery #if($text == '') defaultText#end" #if($text == '') value="$msg.get('xe.search.bar.query.tip')" #else value="$xwiki.getXMLEncoded(${text})" #end title="$msg.get('xe.search.bar.query.title')"/&gt;
-      #spaceselect($selectedSpace $spaces)
-      &lt;input type="submit" class="searchButton" value="$msg.get('xe.search.bar.submit')" title="$msg.get('xe.search.bar.submit.title')"/&gt;
-    &lt;/div&gt;
+  &lt;div class="centered"&gt;
+    &lt;label for="text" class="hidden"&gt;$msg.get('search.page.query.label')&lt;/label&gt;
+    &lt;input type="text" id="text" name="text" class="searchQuery #if($text == '') defaultText#end" #if($text == '') value="$msg.get('search.page.bar.query.tip')" #else value="${escapetool.xml($text)}" #end title="$msg.get('search.page.bar.query.title')"/&gt;
+    #spaceselect($selectedSpace $spaces)
+    &lt;input type="submit" class="searchButton" value="$msg.get('search.page.bar.submit')" title="$msg.get('search.page.bar.submit.title')"/&gt;
+  &lt;/div&gt;
 &lt;/form&gt;
 {{/html}}
 #end
@@ -145,8 +145,8 @@ $xwiki.ssfx.use("uicomponents/search/search.css", true)##
     #set ($discard = $feed.setLink($feedURI))
     #set ($discard = $feed.setUri($feedURI))
     #set ($discard = $feed.setAuthor('XWiki'))
-    #set ($discard = $feed.setTitle($msg.get('xe.search.rss', [$text])))
-    #set ($discard = $feed.setDescription($msg.get('xe.search.rss', [$text])))
+    #set ($discard = $feed.setTitle($msg.get('search.rss', [$text])))
+    #set ($discard = $feed.setDescription($msg.get('search.rss', [$text])))
     #set ($discard = $feed.setLanguage($context.language))
     #set ($discard = $feed.setCopyright($xwiki.getXWikiPreference('copyright')))
     $xwiki.feed.getFeedOutput($feed, $xwiki.getXWikiPreference('feed_type', 'rss_2.0'))
@@ -160,7 +160,7 @@ $xwiki.ssfx.use("uicomponents/search/search.css", true)##
       #set($rssURL = $xwiki.getURL($doc.fullName, 'view', "xpage=plain&amp;amp;outputSyntax=plain&amp;space=${selectedSpace}&amp;text=${utext}"))
     #end
     {{html}}
-      &lt;a href="${rssURL}"&gt;&lt;img src="$xwiki.getSkinFile("icons/silk/feed.gif")" alt="RSS icon"/&gt;$msg.get("xe.search.rss", ["[$text]"])&lt;/a&gt;
+      &lt;a href="${rssURL}"&gt;&lt;img src="$xwiki.getSkinFile("icons/silk/feed.gif")" alt="RSS icon"/&gt;$msg.get("search.rss", ["[$text]"])&lt;/a&gt;
     {{/html}}
   #end
 #end

@@ -10,4 +10,4 @@
 .#-----------------------------------------------------
 .expect|xhtml/1.0
 .#-----------------------------------------------------
-<span class="wikiexternallink"><a title="Chart Test" class="wikimodel-freestanding" href="http://localhost/charts/chart.png"><img src="http://localhost/charts/chart.png" class="wikimodel-freestanding" alt="Chart Test"/></a></span>
+<p><span class="wikiexternallink"><a title="Chart Test" class="wikimodel-freestanding" href="http://localhost/charts/chart.png"><img src="http://localhost/charts/chart.png" class="wikimodel-freestanding" alt="Chart Test"/></a></span></p>

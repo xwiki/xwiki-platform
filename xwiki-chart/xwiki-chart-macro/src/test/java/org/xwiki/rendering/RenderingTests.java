@@ -54,6 +54,7 @@ public class RenderingTests extends TestCase
         suite.addTestsFromResource("macrochart2", true);
         suite.addTestsFromResource("macrochart3", true);
         suite.addTestsFromResource("macrochart4", true);
+        suite.addTestsFromResource("macrochart5", true);
 
         ComponentManagerTestSetup testSetup = new ComponentManagerTestSetup(suite);
         setUpMocks(testSetup.getComponentManager());

@@ -1,0 +1,9 @@
+.#-----------------------------------------------------
+.input|xwiki/2.0
+.# Test the output when the macro is used inline
+.#-----------------------------------------------------
+Inline{{testchart type="line"/}}
+.#-----------------------------------------------------
+.expect|xhtml/1.0
+.#-----------------------------------------------------
+<p>Inline<span class="wikiexternallink"><a class="wikimodel-freestanding" href="http://localhost/charts/chart.png"><img src="http://localhost/charts/chart.png" class="wikimodel-freestanding"/></a></span></p>

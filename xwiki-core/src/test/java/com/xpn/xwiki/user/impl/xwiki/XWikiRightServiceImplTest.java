@@ -289,4 +289,63 @@ public class XWikiRightServiceImplTest extends AbstractBridgedXWikiComponentTest
         getContext().setUser(XWikiRightService.SUPERADMIN_USER_FULLNAME);
         assertTrue(this.rightService.hasProgrammingRights(getContext()));
     }
+
+    public void testHasAccessLevelWhithGuestUser() throws XWikiException
+    {
+        final XWikiDocument doc = new XWikiDocument(new DocumentReference("wiki2", "Space", "Page"));
+
+        final XWikiDocument preferences = new XWikiDocument(new DocumentReference("wiki2", "XWiki", "XWikiPreference"));
+        BaseObject preferencesObject = new BaseObject();
+        preferencesObject.setClassName("XWiki.XWikiGlobalRights");
+        preferencesObject.setStringValue("levels", "view");
+        preferencesObject.setIntValue("allow", 1);
+        preferences.addXObject(preferencesObject);
+
+        this.mockXWiki.stubs().method("getDocument").with(eq("XWiki.XWikiPreferences"), ANYTHING).will(
+            new CustomStub("Implements XWiki.getDocument")
+            {
+                public Object invoke(Invocation invocation) throws Throwable
+                {
+                    if (!getContext().getDatabase().equals("wiki2")) {
+                        new XWikiDocument(new DocumentReference(getContext().getDatabase(), "XWiki", "XWikiPreference"));
+                    }
+
+                    return preferences;
+                }
+            });
+        this.mockXWiki.stubs().method("getDocument").with(eq(doc.getPrefixedFullName()), ANYTHING).will(
+            returnValue(doc));
+        this.mockXWiki.stubs().method("getXWikiPreference").with(eq("authenticate_view"), ANYTHING, ANYTHING).will(
+            returnValue("false"));
+        this.mockXWiki.stubs().method("getXWikiPreferenceAsInt").with(eq("authenticate_view"), ANYTHING, ANYTHING)
+            .will(returnValue(0));
+        this.mockXWiki.stubs().method("getSpacePreference").with(eq("authenticate_view"), ANYTHING, ANYTHING).will(
+            returnValue("false"));
+        this.mockXWiki.stubs().method("getSpacePreferenceAsInt").with(eq("authenticate_view"), ANYTHING, ANYTHING)
+            .will(returnValue(0));
+
+        this.mockAuthService.stubs().method("listGroupsForUser").with(eq(XWikiRightService.GUEST_USER_FULLNAME),
+            ANYTHING).will(returnValue(Collections.emptyList()));
+
+        getContext().setDatabase("wiki");
+
+        assertFalse("Guest has wiew right on the document", this.rightService.hasAccessLevel("view",
+            XWikiRightService.GUEST_USER_FULLNAME, doc.getPrefixedFullName(), true, getContext()));
+
+        // direct user rights
+
+        preferencesObject.setStringValue("users", XWikiRightService.GUEST_USER_FULLNAME);
+
+        getContext().setDatabase("wiki");
+
+        assertTrue("Guest does not have right on the document when tested from another wiki", this.rightService
+            .hasAccessLevel("view", XWikiRightService.GUEST_USER_FULLNAME, doc.getPrefixedFullName(), true,
+                getContext()));
+
+        getContext().setDatabase(doc.getDatabase());
+
+        assertTrue("Guest does not have right on the document when tested from the document wiki", this.rightService
+            .hasAccessLevel("view", XWikiRightService.GUEST_USER_FULLNAME, doc.getPrefixedFullName(), true,
+                getContext()));
+    }
 }

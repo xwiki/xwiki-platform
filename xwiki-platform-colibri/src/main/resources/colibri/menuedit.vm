@@ -1,5 +1,5 @@
 #if($isInServletMode)## Visible only in a page
 <div id="maineditmenu" class="actionmenu layoutsubsection">
-$msg.get("core.menu.editing") <a href="$doc.getURL()">$doc.name</a>
+$msg.get("core.menu.editing") <a href="$doc.getURL()">$escapetool.xml($doc.name)</a>
 </div>
 #end

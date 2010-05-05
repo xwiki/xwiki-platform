@@ -541,7 +541,9 @@ public class XWikiRightServiceImpl implements XWikiRightService
             LOG.debug("hasAccessLevel for " + accessLevel + ", " + userOrGroupName + ", " + entityReference);
         }
 
-        if (context.getDatabase() != null) {
+        DocumentReference userOrGroupNameReference = this.currentMixedDocumentReferenceResolver.resolve(userOrGroupName);
+
+        if (!userOrGroupNameReference.getName().equals(XWikiRightService.GUEST_USER) && context.getDatabase() != null) {
             // Make sure to have the prefixed full name of the user or group
             if (!StringUtils.contains(userOrGroupName, ':')) {
                 userOrGroupName = context.getDatabase() + ":" + userOrGroupName;
@@ -570,8 +572,7 @@ public class XWikiRightServiceImpl implements XWikiRightService
             }
         }
 
-        if (userOrGroupName.equals(XWikiRightService.GUEST_USER_FULLNAME)
-            || userOrGroupName.endsWith(":" + XWikiRightService.GUEST_USER_FULLNAME)) {
+        if (userOrGroupNameReference.getName().equals(XWikiRightService.GUEST_USER)) {
             if (needsAuth(accessLevel, context)) {
                 return false;
             }
@@ -809,9 +810,9 @@ public class XWikiRightServiceImpl implements XWikiRightService
         //         the resolved page name.
         // Note 2: we use a resolver since the passed username could contain the wiki and/or space too and we want
         //         to retrieve only the page name
-        DocumentReference documentReference =
+        DocumentReference userReference =
             Utils.getComponent(DocumentReferenceResolver.class).resolve(username);
-        return StringUtils.equalsIgnoreCase(documentReference.getName(), SUPERADMIN_USER);
+        return StringUtils.equalsIgnoreCase(userReference.getName(), SUPERADMIN_USER);
     }
 
     private boolean isSuperAdminOrProgramming(String name, String resourceKey, String accessLevel, boolean user,

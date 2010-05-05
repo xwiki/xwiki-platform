@@ -95,11 +95,24 @@ Lightbox = Class.create({
       clones[i] = document.createElement(treatSpecially[i].tagName);
       var attributes = treatSpecially[i].attributes;
       for(var j = 0; j < attributes.length; j++) {
-        clones[i].setAttribute(attributes[j].name, attributes[j].value);
+        // In IE7 the attributes are there but are empty even if they aren't there.
+        // and apparently IE refuses to parse content in a script element if there is a src attribute.
+        if (attributes[j].value != "") {
+          clones[i].setAttribute(attributes[j].name, attributes[j].value);
+        }
       }
-      clones[i].innerHTML = treatSpecially[i].innerHTML;
-      // Remove element from content.
-      treatSpecially[i].parentNode.removeChild(treatSpecially[i]);
+      try {
+        clones[i].innerHTML = treatSpecially[i].innerHTML;
+        // Remove element from content.
+        treatSpecially[i].parentNode.removeChild(treatSpecially[i]);
+      } catch (ie) {
+        // Now let's try it the IE7 way.
+        // IE doesn't need to have link and style elements handled specially, only Opera.
+        if (clones[i].tagName.toLowerCase() == 'script') {
+          clones[i].text = treatSpecially[i].text;
+          treatSpecially[i].parentNode.removeChild(treatSpecially[i]);
+        }
+      }
     }
 
     // Insert the content.
@@ -119,12 +132,22 @@ Lightbox = Class.create({
       }
       while (i < elements.length) {
         whereToPlace.appendChild(elements[i]);
-        if (elements[i].tagName == 'SCRIPT' && elements[i].src != '') {
+        if (elements[i].tagName.toLowerCase() == 'script' && elements[i].src != '') {
           // In order to make sure the element is loaded before loading the next one, This function ends and then is 
           // restarted by the callback.
-          Event.observe(elements[i], 'load', function() {
-            appendSpecialElements(elements, whereToPlace, onComplete, i + 1);
-          });
+          // IE7 does not allow Event.observe(script, 'load'
+          // Testing for IE < 8
+          if (browser.isIE == true && typeof XDomainRequest == "undefined") {
+            Event.observe(elements[i], 'readystatechange', function(event) {
+              if (event.element().readyState == 'complete') {
+                appendSpecialElements(elements, whereToPlace, onComplete, i + 1);
+              }
+            });
+          } else {
+            Event.observe(elements[i], 'load', function() {
+              appendSpecialElements(elements, whereToPlace, onComplete, i + 1);
+            });
+          }
           return;
         }
         i++;
@@ -139,9 +162,17 @@ Lightbox = Class.create({
       if(Object.isFunction(onComplete)) {
         onComplete();
       }
+
       // Finally, we place a script which fires a dom:loaded event. We are not just manually firing the event 
       // because we want to make sure all other scripts have been loaded and parsed first.
-      whereToPlace.appendChild(new Element("script", {"type" : "text/javascript"}).update('document.fire("dom:loaded");'));
+      var fireScript = document.createElement('script');
+      try {
+        fireScript.innerHTML = 'document.fire("dom:loaded");';
+      } catch (ie) {
+        // IE7
+        fireScript.text = 'document.fire("dom:loaded");';
+      }
+      whereToPlace.appendChild(fireScript);
     }.bind(this));
   },
 

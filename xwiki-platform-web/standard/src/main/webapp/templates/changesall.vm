@@ -11,14 +11,14 @@
 #set($type = "html")
 #end
 #if ($tdoc.realLanguage!="")
-#set($lang = "&language=${tdoc.realLanguage}")
+#set($lang = "&amp;language=${tdoc.realLanguage}")
 #else
 #set($lang = "")
 #end
 $msg.get("currentdifftype"): $type (
-<a href="$doc.getURL("view", "xpage=changesall&type=wiki$lang")">$msg.get("wikidiff")</a>
-<a href="$doc.getURL("view", "xpage=changesall&type=source$lang")">$msg.get("sourcediff")</a>
-<a href="$doc.getURL("view", "xpage=changesall&type=html$lang")">$msg.get("htmldiff")</a>
+<a href="$doc.getURL("view", "xpage=changesall&amp;type=wiki$lang")">$msg.get("wikidiff")</a>
+<a href="$doc.getURL("view", "xpage=changesall&amp;type=source$lang")">$msg.get("sourcediff")</a>
+<a href="$doc.getURL("view", "xpage=changesall&amp;type=html$lang")">$msg.get("htmldiff")</a>
 )
 #set($firstrev = $tdoc.getVersion())
 #set($nextversion = $firstrev)

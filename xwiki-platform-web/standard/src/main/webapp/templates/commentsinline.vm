@@ -90,7 +90,7 @@ $xwiki.ssfx.use('uicomponents/viewers/comments.css', true)
       #foreach($name in $request.getParameterNames())
         #set($queryString = "$!queryString&$name=$escapetool.url($request.get($name))")
       #end
-      $response.sendRedirect("$doc.getURL('view', "captchaAnswerWrong=1&$queryString")");
+      $response.sendRedirect($doc.getURL('view', "captchaAnswerWrong=1&$queryString"));
     #end
     $response.setContentLength(0)
     #stop
@@ -164,7 +164,7 @@ $xwiki.ssfx.use('uicomponents/viewers/comments.css', true)
 ##
 #macro(displayCommentForm)
   #if($xwiki.hasAccessLevel('comment'))
-    <form action="$doc.getURL('commentadd', "xpage=view&viewer=comments#commentform")" method="post" id="AddComment">
+    <form action="$doc.getURL('commentadd', "xpage=view&amp;viewer=comments#commentform")" method="post" id="AddComment">
       <fieldset class="expanded" id="commentform">
         <legend>$msg.get('core.viewers.comments.add.title')</legend>
         #if($context.user != 'XWiki.XWikiGuest')

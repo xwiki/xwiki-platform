@@ -99,7 +99,7 @@ $xwiki.invokeServletAndReturnAsString($url)
 <a href="$doc.getURL("view", "rev=$rev")">$rev</a><span class="xwikisep"> | </span>
 #end
 #if ($tdoc.realLanguage!="")
-<a href="$doc.getURL("view", "xpage=diff&language=${tdoc.realLanguage}")">$msg.get("diff")</a><span class="xwikisep"> | </span>
+<a href="$doc.getURL("view", "xpage=diff&amp;language=${tdoc.realLanguage}")">$msg.get("diff")</a><span class="xwikisep"> | </span>
 #else
 <a href="$doc.getURL("view", "xpage=diff")">$msg.get("history")</a><span class="xwikisep"> | </span>
 #end
@@ -164,7 +164,7 @@ $xwiki.invokeServletAndReturnAsString($url)
 #macro(aim $id)
 #set($onurl = "${request.scheme}://${request.serverName}${xwiki.getSkinFile('aimonline.gif')}")
 #set($offurl = "${request.scheme}://${request.serverName}${xwiki.getSkinFile('aimoffline.gif')}")
-<img border="0" src="http://big.oscar.aol.com/nvludo?on_url=${onurl}&off_url=${offurl}" alt="Online detector"></a>
+<img border="0" src="http://big.oscar.aol.com/nvludo?on_url=${onurl}&amp;off_url=${offurl}" alt="Online detector"></a>
 #end
 ##
 ##
@@ -246,7 +246,7 @@ $xwiki.getUserName("xwiki:${username}")
 #end
 
 #macro(map $address $cp $linktext)
-<a href="http://www.viamichelin.com/viamichelin/fra/dyn/controller/mapPerformPage?strAddress=${address}&strLocation=&strCP=${cp}&strCountry=1424&x=30&y=9">${linktext}</a>
+<a href="http://www.viamichelin.com/viamichelin/fra/dyn/controller/mapPerformPage?strAddress=${address}&amp;strLocation=&amp;strCP=${cp}&amp;strCountry=1424&amp;x=30&amp;y=9">${linktext}</a>
 #end
 
 #macro(mindmap $mindmap $width $height)
@@ -802,8 +802,8 @@ $fn
 <div class="pagedNavigation">
 #if($crtPageNumber > 0)
 #set($prevPage = $crtPageNumber - 1)
-<span class="pagedLink"><a href="$doc.getURL($context.action, "page=0&ipp=${itemsPerPage}")">$msg.get("web.paging.firstPage")</a></span>
-<span class="pagedLink"><a href="$doc.getURL($context.action, "page=${prevPage}&ipp=${itemsPerPage}")">$msg.get("web.paging.previousPage")</a></span>
+<span class="pagedLink"><a href="$doc.getURL($context.action, "page=0&amp;ipp=${itemsPerPage}")">$msg.get("web.paging.firstPage")</a></span>
+<span class="pagedLink"><a href="$doc.getURL($context.action, "page=${prevPage}&amp;ipp=${itemsPerPage}")">$msg.get("web.paging.previousPage")</a></span>
 #else
 <span class="pagedLink inactive">$msg.get("web.paging.firstPage")</span>
 <span class="pagedLink inactive">$msg.get("web.paging.previousPage")</span>
@@ -813,8 +813,8 @@ $fn
 <span class="pagedStatus">$msg.get("web.paging.pageNumberOf", [$displayCrtPageNumber, $displayTotalPages])</span>
 #if($crtPageNumber < $totalPages)
 #set($nextPage = $crtPageNumber + 1)
-<span class="pagedLink"><a href="$doc.getURL($context.action, "page=${nextPage}&ipp=${itemsPerPage}")">$msg.get("web.paging.nextPage")</a></span>
-<span class="pagedLink"><a href="$doc.getURL($context.action, "page=${totalPages}&ipp=${itemsPerPage}")">$msg.get("web.paging.lastPage")</a></span>
+<span class="pagedLink"><a href="$doc.getURL($context.action, "page=${nextPage}&amp;ipp=${itemsPerPage}")">$msg.get("web.paging.nextPage")</a></span>
+<span class="pagedLink"><a href="$doc.getURL($context.action, "page=${totalPages}&amp;ipp=${itemsPerPage}")">$msg.get("web.paging.lastPage")</a></span>
 #else
 <span class="pagedLink inactive">$msg.get("web.paging.nextPage")</span>
 <span class="pagedLink inactive">$msg.get("web.paging.lastPage")</span>
@@ -842,8 +842,8 @@ $fn
     <div class="pagedNavigation">
     #if($currentPageNumber > 1)
       #set($currentPageNumber = $currentPageNumber - 1)
-      <span class="pagedLink"><a href="$doc.getURL($context.action, "page=1&ipp=${itemsPerPage}")#if("$!additionalQueryParams" != "")&amp;$additionalQueryParams#end">$msg.get("web.paging.firstPage")</a></span>
-      <span class="pagedLink"><a href="$doc.getURL($context.action, "page=${currentPageNumber}&ipp=${itemsPerPage}")#if("$!additionalQueryParams" != "")&amp;$additionalQueryParams#end">$msg.get("web.paging.previousPage")</a></span>
+      <span class="pagedLink"><a href="$doc.getURL($context.action, "page=1&amp;ipp=${itemsPerPage}")#if("$!additionalQueryParams" != "")&amp;$additionalQueryParams#end">$msg.get("web.paging.firstPage")</a></span>
+      <span class="pagedLink"><a href="$doc.getURL($context.action, "page=${currentPageNumber}&amp;ipp=${itemsPerPage}")#if("$!additionalQueryParams" != "")&amp;$additionalQueryParams#end">$msg.get("web.paging.previousPage")</a></span>
       #set($currentPageNumber = $currentPageNumber + 1)
     #else
       <span class="pagedLink inactive">$msg.get("web.paging.firstPage")</span>

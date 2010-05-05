@@ -15,7 +15,7 @@
  #foreach($dd in $dds)
   <tr>
    <td>$xwiki.getLocalUserName($dd.getDeleter())</td>
-   <td><a href="$doc.getURL("view", "viewer=recyclebin&id=$dd.getId()")">$xwiki.formatDate($dd.getDate())</a></td>
+   <td><a href="$doc.getURL("view", "viewer=recyclebin&amp;id=$dd.getId()")">$xwiki.formatDate($dd.getDate())</a></td>
    <td>#if($dd.canUndelete()) <a href="$xwiki.getURL($tdoc.getFullName(), "undelete", "id=$dd.getId()")">$msg.get("core.recyclebin.restore")</a> #end</td>
    <td>
     #if($dd.canDelete())

@@ -23,6 +23,11 @@ package com.xpn.xwiki.user.impl.xwiki;
 
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.Locale;
+import java.util.TimeZone;
 
 import javax.crypto.Cipher;
 import javax.servlet.http.Cookie;
@@ -71,6 +76,16 @@ public class MyPersistentLoginManager extends DefaultPersistentLoginManager
      * Default value to use when getting the authentication cookie values.
      */
     private static final String DEFAULT_VALUE = "false";
+
+    /** Date formatter for the cookie "Expires" value. */
+    private static final DateFormat COOKIE_EXPIRE_FORMAT =
+        new SimpleDateFormat("EEE, dd-MMM-yyyy HH:mm:ss z", Locale.US);
+    static {
+        COOKIE_EXPIRE_FORMAT.setTimeZone(TimeZone.getTimeZone("GMT"));
+    }
+
+    /** For performance, cache the often used epoch date which forces a cookie to be removed. */
+    private static final String COOKIE_EXPIRE_NOW = COOKIE_EXPIRE_FORMAT.format(new Date(0));
 
     /**
      * The domain generalization for which the cookies are active. Configured by the xwiki.authentication.cookiedomains
@@ -256,6 +271,14 @@ public class MyPersistentLoginManager extends DefaultPersistentLoginManager
         cookieValue.append("; Version=1");
         if (cookie.getMaxAge() >= 0) {
             cookieValue.append("; Max-Age=" + cookie.getMaxAge());
+            // IE is such a pain, it doesn't understand the modern, safer Max-Age
+            cookieValue.append("; Expires=");
+            if (cookie.getMaxAge() == 0) {
+                cookieValue.append(COOKIE_EXPIRE_NOW);
+            } else {
+                cookieValue.append(COOKIE_EXPIRE_FORMAT.format(new Date(System.currentTimeMillis() + cookie.getMaxAge()
+                    * 1000L)));
+            }
         } else {
             cookieValue.append("; Discard");
         }

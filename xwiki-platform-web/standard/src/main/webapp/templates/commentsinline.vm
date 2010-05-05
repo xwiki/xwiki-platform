@@ -88,9 +88,9 @@ $xwiki.ssfx.use('uicomponents/viewers/comments.css', true)
       $response.sendRedirect("$doc.getURL('view')?viewer=comments");
     #else
       #foreach($name in $request.getParameterNames())
-        #set($queryString = "$!queryString&amp;$name=$escapetool.url($request.get($name))")
+        #set($queryString = "$!queryString&$name=$escapetool.url($request.get($name))")
       #end
-      $response.sendRedirect($doc.getURL('view', "captchaAnswerWrong=1&amp;$queryString"));
+      $response.sendRedirect($doc.getURL('view', "captchaAnswerWrong=1&$queryString"));
     #end
     $response.setContentLength(0)
     #stop

@@ -146,6 +146,9 @@ public class BooleanClass extends PropertyClass
         XWikiContext context)
     {
         select select = new select(prefix + name, 1);
+        select.setName(prefix + name);
+        select.setID(prefix + name);
+
         String String0 = getDisplayValue(context, 0);
         String String1 = getDisplayValue(context, 1);
         int nb1 = 1;

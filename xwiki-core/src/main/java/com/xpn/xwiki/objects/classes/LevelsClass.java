@@ -104,6 +104,8 @@ public class LevelsClass extends ListClass
         select select = new select(prefix + name, 1);
         select.setMultiple(isMultiSelect());
         select.setSize(getSize());
+        select.setName(prefix + name);
+        select.setID(prefix + name);
 
         List<String> list = getList(context);
         List<String> selectlist;

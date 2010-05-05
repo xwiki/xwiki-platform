@@ -12,7 +12,7 @@ $xwiki.ssfx.use('js/xwiki/editors/fullScreenEdit.css', true)
 <div class="hidden">
 <input type="hidden" name="template" value="$!request.template" />
 #if($request.section && $request.section!="")
- #set($xcontinue=$doc.getURL("edit", "editor=wysiwyg&section=$request.section"))
+ #set($xcontinue=$doc.getURL("edit", "editor=wysiwyg&amp;section=$request.section"))
 #else
  #set($xcontinue=$doc.getURL("edit", "editor=wysiwyg"))
 #end

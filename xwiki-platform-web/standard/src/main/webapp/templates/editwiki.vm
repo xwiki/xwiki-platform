@@ -6,7 +6,7 @@
 <div class="hidden">
 <input type="hidden" name="template" value="$!request.template" />
 #if($request.section && $request.section!="")
- #set($xcontinue=$doc.getURL("edit", "editor=wiki&section=$request.section"))
+ #set($xcontinue=$doc.getURL("edit", "editor=wiki&amp;section=$request.section"))
 #else
  #set($xcontinue=$doc.getURL("edit", "editor=wiki"))
 #end

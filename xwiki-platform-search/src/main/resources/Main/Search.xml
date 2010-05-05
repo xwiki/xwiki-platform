@@ -5,14 +5,14 @@
 <language></language>
 <defaultLanguage>en</defaultLanguage>
 <translation>0</translation>
-<parent></parent>
+<parent>Main.WebHome</parent>
 <creator>XWiki.Admin</creator>
 <author>XWiki.Admin</author>
 <customClass></customClass>
 <contentAuthor>XWiki.Admin</contentAuthor>
 <creationDate>1272897865000</creationDate>
-<date>1272898294000</date>
-<contentUpdateDate>1272898294000</contentUpdateDate>
+<date>1273048536000</date>
+<contentUpdateDate>1273048536000</contentUpdateDate>
 <version>1.1</version>
 <title>#if("$!{request.text}"=="")$msg.get("search.page.title.noquery")#else$msg.get("search.page.title.query", [$request.text])#end</title>
 <template></template>

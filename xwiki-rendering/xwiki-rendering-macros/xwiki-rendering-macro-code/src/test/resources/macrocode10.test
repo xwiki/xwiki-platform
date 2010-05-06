@@ -1,6 +1,6 @@
 .#-----------------------------------------------------
 .input|xwiki/2.0
-.# Validate that unsupported syntax not fail and instead genrate a verbatim
+.# Validate that unsupported syntax not fail and instead generate a verbatim
 .#-----------------------------------------------------
 {{code language="notsupportedsyntax"}}Text{{/code}}
 

@@ -19,6 +19,8 @@
  */
 package org.xwiki.rendering;
 
+import java.util.Collections;
+
 import junit.framework.Test;
 import junit.framework.TestCase;
 
@@ -47,6 +49,9 @@ public class RenderingTests extends TestCase
         suite.addTestsFromResource("macrocode8", true);
         suite.addTestsFromResource("macrocode9", true);
         suite.addTestsFromResource("macrocode10", true);
+
+        suite.addTestsFromResource("macrocode11", true, Collections.singletonMap("rendering.macro.code.pygments.style",
+            "colorful"));
 
         return new ComponentManagerTestSetup(suite);
     }

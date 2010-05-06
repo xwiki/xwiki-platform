@@ -32,8 +32,8 @@ class XDOMFormatter(Formatter):
     aliases = ['text', 'null']
     filenames = []
 
-    def __init__(self, listener):
-        Formatter.__init__(self)
+    def __init__(self, listener, **options):
+        Formatter.__init__(self, **options)
         self.listener = listener
 
     def format(self, tokensource, outfile):

@@ -19,17 +19,20 @@
  */
 package org.xwiki.rendering.scaffolding;
 
+import java.io.StringReader;
+import java.util.Map;
+
+import org.jmock.cglib.MockObjectTestCase;
+import org.xwiki.component.manager.ComponentManager;
+import org.xwiki.configuration.ConfigurationSource;
+import org.xwiki.rendering.block.XDOM;
 import org.xwiki.rendering.parser.Parser;
-import org.xwiki.rendering.syntax.SyntaxFactory;
+import org.xwiki.rendering.renderer.BlockRenderer;
 import org.xwiki.rendering.renderer.printer.DefaultWikiPrinter;
 import org.xwiki.rendering.renderer.printer.WikiPrinter;
-import org.xwiki.component.manager.ComponentManager;
-import org.jmock.cglib.MockObjectTestCase;
-
-import java.io.StringReader;
-import org.xwiki.rendering.block.XDOM;
-import org.xwiki.rendering.renderer.BlockRenderer;
+import org.xwiki.rendering.syntax.SyntaxFactory;
 import org.xwiki.rendering.transformation.TransformationManager;
+import org.xwiki.test.MockConfigurationSource;
 
 /**
  * @version $Id$
@@ -49,8 +52,13 @@ public class RenderingTestCase extends MockObjectTestCase
 
     private boolean runTransformations;
 
+    private Map<String, ? > configuration;
+
+    /**
+     * @since 2.4M1
+     */
     public RenderingTestCase(String testName, String input, String expected, String parserId, String targetSyntaxId,
-        boolean runTransformations)
+        boolean runTransformations, Map<String, ? > configuration)
     {
         super(testName);
 
@@ -59,11 +67,29 @@ public class RenderingTestCase extends MockObjectTestCase
         this.parserId = parserId;
         this.targetSyntaxId = targetSyntaxId;
         this.runTransformations = runTransformations;
+        this.configuration = configuration;
     }
 
+    /**
+     * {@inheritDoc}
+     * 
+     * @see junit.framework.TestCase#runTest()
+     */
     @Override
     protected void runTest() throws Throwable
     {
+        if (this.configuration != null) {
+            ConfigurationSource configurationSource = getComponentManager().lookup(ConfigurationSource.class);
+
+            if (configurationSource instanceof MockConfigurationSource) {
+                MockConfigurationSource mockConfigurationSource = (MockConfigurationSource) configurationSource;
+
+                for (Map.Entry<String, ? > entry : this.configuration.entrySet()) {
+                    mockConfigurationSource.setProperty(entry.getKey(), entry.getValue());
+                }
+            }
+        }
+
         Parser parser = getComponentManager().lookup(Parser.class, this.parserId);
         XDOM xdom = parser.parse(new StringReader(this.input));
 

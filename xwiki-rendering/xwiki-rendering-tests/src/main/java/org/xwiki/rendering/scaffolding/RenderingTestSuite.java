@@ -48,6 +48,15 @@ public class RenderingTestSuite extends TestSuite
 
     public void addTestsFromResource(String testResourceName, boolean runTransformations) throws Exception
     {
+        addTestsFromResource(testResourceName, runTransformations, null);
+    }
+
+    /**
+     * @since 2.4M1
+     */
+    public void addTestsFromResource(String testResourceName, boolean runTransformations, Map<String, ? > configuration)
+        throws Exception
+    {
         String resourceName = "/" + testResourceName + ".test";
         Data data;
         try {
@@ -71,7 +80,8 @@ public class RenderingTestSuite extends TestSuite
 
                 RenderingTestCase testCase =
                     new RenderingTestCase(computeTestName(testResourceName, parserId, targetSyntaxId), input,
-                        data.expectations.get(targetSyntaxId), parserId, targetSyntaxId, runTransformations);
+                        data.expectations.get(targetSyntaxId), parserId, targetSyntaxId, runTransformations,
+                        configuration);
                 addTest(testCase);
             }
         }

@@ -60,11 +60,7 @@
   #end
   ##
   #if ($startindex)
-wikis: $wikis
-hqlFilter: $hqlFilter
-clearIndex: $clearIndex
-onlyNew: $onlyNew
-    ###set($errorcode = $lucene.startIndex($wikis, $hqlFilter, $clearIndex, $onlyNew))
+    #set($errorcode = $lucene.startIndex($wikis, $hqlFilter, $clearIndex, $onlyNew))
     #if ($errorcode &gt; 0)
       {{info}}$msg.get('search.admin.lucene.indexing.message.started'){{/info}}
     #elseif ($errorcode == -1)

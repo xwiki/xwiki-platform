@@ -11,8 +11,8 @@
 <customClass></customClass>
 <contentAuthor>XWiki.Admin</contentAuthor>
 <creationDate>1272286749000</creationDate>
-<date>1273059317000</date>
-<contentUpdateDate>1273059317000</contentUpdateDate>
+<date>1273158598000</date>
+<contentUpdateDate>1273158598000</contentUpdateDate>
 <version>1.1</version>
 <title>Lucene search administration</title>
 <template></template>
@@ -51,8 +51,8 @@
       #set($wikis = [$context.database])
     #end
     #set($hqlFilter = $request.hqlFilter)
-    #set($clearIndex = $request.clearIndex)
-    #set($onlyNew = $request.onlyNew)
+    #set($clearIndex = $request.clearIndex == 'on')
+    #set($onlyNew = $request.onlyNew == 'on')
     #set($startindex = true)
   #end
   ##
@@ -90,27 +90,41 @@
 &lt;form action="$xwiki.requestURL" enctype="multipart/form-data" method="post"&gt;
 &lt;fieldset&gt;
 
-&lt;p&gt;
   ## Does not really make sense to reindex the whole farm from a subwiki
   #if ($context.isMainWiki())
-    &lt;label for="indexfarm" class="hidden"&gt;$msg.get('search.admin.lucene.indexing.action.indexfarm')&lt;/label&gt;&lt;input id="indexfarm" name="action" type="radio" value="indexfarm" checked="checked"/&gt;$msg.get('search.admin.lucene.indexing.action.indexfarm')&lt;br/&gt;
+&lt;p&gt;
+    &lt;label for="indexfarm" class="hidden"&gt;$msg.get('search.admin.lucene.indexing.action.indexfarm')&lt;/label&gt;&lt;input id="indexfarm" name="action" type="radio" value="indexfarm" checked="checked"/&gt;$msg.get('search.admin.lucene.indexing.action.indexfarm')
+&lt;/p&gt;
   #end
 
-  &lt;label for="indexcurrentwiki" class="hidden"&gt;$msg.get('search.admin.lucene.indexing.action.indexcurrentwiki')&lt;/label&gt;&lt;input id="indexcurrentwiki" name="action" type="radio" value="indexcurrentwiki" #if(!$context.isMainWiki())checked="checked"#end/&gt;$msg.get('search.admin.lucene.indexing.action.indexcurrentwiki')&lt;br/&gt;
+&lt;p&gt;
+  &lt;label for="indexcurrentwiki" class="hidden"&gt;$msg.get('search.admin.lucene.indexing.action.indexcurrentwiki')&lt;/label&gt;&lt;input id="indexcurrentwiki" name="action" type="radio" value="indexcurrentwiki" #if(!$context.isMainWiki())checked="checked"#end/&gt;$msg.get('search.admin.lucene.indexing.action.indexcurrentwiki')
+&lt;/p&gt;
 
   ## Needs programming right because it takes a custom HQL query which could be dangerous
-  &lt;label for="indexcustom" class="hidden"&gt;$msg.get('search.admin.lucene.indexing.action.indexcustom')&lt;/label&gt;&lt;input id="indexcustom" name="action" type="radio" value="indexcustom" /&gt;$msg.get('search.admin.lucene.indexing.action.indexcustom')&lt;br/&gt;
+&lt;p&gt;
+  &lt;label for="indexcustom" class="hidden"&gt;$msg.get('search.admin.lucene.indexing.action.indexcustom')&lt;/label&gt;&lt;input id="indexcustom" name="action" type="radio" value="indexcustom" /&gt;$msg.get('search.admin.lucene.indexing.action.indexcustom')
+&lt;/p&gt;
 
+&lt;p&gt;
   #if ($context.isMainWiki())
-    &lt;label for="indexcustom_wikis"&gt;$msg.get('search.admin.lucene.indexing.action.indexcustom.wikis')&lt;/label&gt; &lt;input id="indexcustom_wikis" name="wikis" type="text" #if($request.wikis)value="$request.wikis"#end /&gt;&lt;br/&gt;
+    &lt;label for="indexcustom_wikis"&gt;$msg.get('search.admin.lucene.indexing.action.indexcustom.wikis')&lt;/label&gt; &lt;input id="indexcustom_wikis" name="wikis" type="text" #if($request.wikis)value="$request.wikis"#end /&gt;
   #else
     &lt;input id="indexcustom_wikis" name="wikis" value="${context.database}" type="hidden" #if($request.wikis)value="$request.wikis"#end /&gt;
   #end
+&lt;/p&gt;
+
   #if ($hasProgramming &amp;&amp; $context.isMainWiki())
-    &lt;label for="indexcustom_hqlFilter"&gt;$msg.get('search.admin.lucene.indexing.action.indexcustom.hqlfilter')&lt;/label&gt; &lt;input id="indexcustom_hqlFilter" name="hqlFilter" type="text" #if($request.hqlFilter)value="${escapetool.html($request.hqlFilter)}"#end /&gt;&lt;br/&gt;
+&lt;p&gt;
+    &lt;label for="indexcustom_hqlFilter"&gt;$msg.get('search.admin.lucene.indexing.action.indexcustom.hqlfilter')&lt;/label&gt; &lt;input id="indexcustom_hqlFilter" name="hqlFilter" type="text" #if($request.hqlFilter)value="${escapetool.html($request.hqlFilter)}"#end /&gt;
+&lt;/p&gt;
   #end
-  &lt;label for="indexcustom_clearIndex"&gt;$msg.get('search.admin.lucene.indexing.action.indexcustom.clearIndex')&lt;/label&gt; &lt;input id="indexcustom_clearIndex" name="clearIndex" type="checkbox" #if($clearIndex)checked="checked"#end /&gt;&lt;br/&gt;
-  &lt;label for="indexcustom_onlyNew"&gt;$msg.get('search.admin.lucene.indexing.action.indexcustom.onlyNew')&lt;/label&gt; &lt;input id="indexcustom_onlyNew" name="onlyNew" type="checkbox" #if($onlyNew)checked="checked"#end /&gt;&lt;br/&gt;
+
+&lt;p&gt;
+  &lt;label for="indexcustom_clearIndex"&gt;$msg.get('search.admin.lucene.indexing.action.indexcustom.clearIndex')&lt;/label&gt; &lt;input id="indexcustom_clearIndex" name="clearIndex" type="checkbox" #if($clearIndex)checked="checked"#end /&gt;
+&lt;/p&gt;
+&lt;p&gt;
+  &lt;label for="indexcustom_onlyNew"&gt;$msg.get('search.admin.lucene.indexing.action.indexcustom.onlyNew')&lt;/label&gt; &lt;input id="indexcustom_onlyNew" name="onlyNew" type="checkbox" #if($onlyNew)checked="checked"#end /&gt;
 &lt;/p&gt;
 
 &lt;input type="submit" value="$msg.get('search.admin.lucene.indexing.button')" class="button"/&gt;

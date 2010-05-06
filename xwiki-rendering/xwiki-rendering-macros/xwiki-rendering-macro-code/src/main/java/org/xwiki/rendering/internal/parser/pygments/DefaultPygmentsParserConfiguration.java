@@ -38,7 +38,7 @@ public class DefaultPygmentsParserConfiguration implements PygmentsParserConfigu
     private static final String PREFIX = "rendering.macro.code.pygments.";
 
     /**
-     * Defines from where to read the rendering configuration data.
+     * Defines from where to read the Pygments configuration data.
      */
     @Requirement
     private ConfigurationSource configuration;

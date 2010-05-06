@@ -36,7 +36,7 @@ import org.xwiki.validator.framework.NodeListIterable;
 /**
  * Validator allowing to validate (X)HTML content against Dutch Web Guidelines.
  * <p>
- * "There are internationally recognized agreements for creating web sites, known as 125 quality requirements standards
+ *"There are internationally recognized agreements for creating web sites, known as 125 quality requirements standards
  * warrants a significantly better website. The Netherlands government has assembled these international standards in a
  * quality model called the Web Guidelines. This quality model comprises 125 quality requirements for the benefit of
  * better websites."
@@ -62,11 +62,13 @@ public class DutchWebGuidelinesValidator extends AbstractDOMValidator
     private ResourceBundle messages = ResourceBundle.getBundle("DutchWebGuidelines");
 
     /**
-     * Constructor.
+     * {@inheritDoc}
+     * 
+     * @see org.xwiki.validator.Validator#getName()
      */
-    public DutchWebGuidelinesValidator()
+    public String getName()
     {
-        super();
+        return "Dutch Web Guidelines";
     }
 
     /**
@@ -84,9 +86,9 @@ public class DutchWebGuidelinesValidator extends AbstractDOMValidator
     }
 
     /**
-     * Run the validator on the given {@link Document}.
+     * {@inheritDoc}
      * 
-     * @return results of the validation
+     * @see org.xwiki.validator.Validator#validate()
      */
     public List<ValidationError> validate()
     {
@@ -288,8 +290,8 @@ public class DutchWebGuidelinesValidator extends AbstractDOMValidator
 
         // Links must not use the attributes listed below.
         List<String> forbiddenAttributes =
-                Arrays.asList(ATTR_BLUR, ATTR_CHANGE, ATTR_CLICK, ATTR_FOCUS, ATTR_LOAD, ATTR_MOUSEOVER, ATTR_SELECT,
-                    ATTR_SELECT, ATTR_UNLOAD);
+            Arrays.asList(ATTR_BLUR, ATTR_CHANGE, ATTR_CLICK, ATTR_FOCUS, ATTR_LOAD, ATTR_MOUSEOVER, ATTR_SELECT,
+                ATTR_SELECT, ATTR_UNLOAD);
         for (Node linkElement : linkElements) {
             if (!ListUtils.intersection(getAttributeNames(linkElement), forbiddenAttributes).isEmpty()) {
                 assertFalse(Type.ERROR, "rpd1s3.inlineEventHandlers", getAttributeValue(linkElement, ATTR_HREF).equals(
@@ -370,8 +372,8 @@ public class DutchWebGuidelinesValidator extends AbstractDOMValidator
     {
         // Usage of frameset doctype is forbidden
         if (document.getDoctype() != null) {
-            assertFalse(Type.ERROR, "rpd2s5.framesetDoctype", StringUtils.containsIgnoreCase(
-                document.getDoctype().getPublicId(), "frameset"));
+            assertFalse(Type.ERROR, "rpd2s5.framesetDoctype", StringUtils.containsIgnoreCase(document.getDoctype()
+                .getPublicId(), "frameset"));
         }
 
         // Usage of frameset is forbidden
@@ -565,10 +567,9 @@ public class DutchWebGuidelinesValidator extends AbstractDOMValidator
                 if (previousNode != null && nextNode != null) {
                     boolean currentNodeMatches = currentNode.getNodeName().equals(ELEM_BR);
                     boolean previousNodeMatches =
-                            previousNode.getNodeType() == Node.TEXT_NODE
-                                && previousNode.getTextContent().matches(regex);
+                        previousNode.getNodeType() == Node.TEXT_NODE && previousNode.getTextContent().matches(regex);
                     boolean nextNodeMatches =
-                            nextNode.getNodeType() == Node.TEXT_NODE && nextNode.getTextContent().matches(regex);
+                        nextNode.getNodeType() == Node.TEXT_NODE && nextNode.getTextContent().matches(regex);
 
                     assertFalse(Type.ERROR, "rpd3s13.lists", previousNodeMatches && currentNodeMatches
                         && nextNodeMatches);
@@ -794,8 +795,8 @@ public class DutchWebGuidelinesValidator extends AbstractDOMValidator
             for (Node linkChild : new NodeListIterable(link.getChildNodes())) {
                 if (linkChild.getNodeType() == Node.TEXT_NODE) {
                     for (String forbiddenLinkText : forbiddenLinkTexts) {
-                        assertFalse(Type.ERROR, "rpd8s1.link", StringUtils.containsIgnoreCase(
-                            linkChild.getTextContent(), forbiddenLinkText));
+                        assertFalse(Type.ERROR, "rpd8s1.link", StringUtils.containsIgnoreCase(linkChild
+                            .getTextContent(), forbiddenLinkText));
                     }
                 }
             }
@@ -958,8 +959,8 @@ public class DutchWebGuidelinesValidator extends AbstractDOMValidator
             String href = getAttributeValue(link, ATTR_HREF);
             if (href != null && href.startsWith(MAILTO)) {
                 String email = StringUtils.substringAfter(href, MAILTO);
-                assertTrue(Type.ERROR, "rpd8s17.email",
-                    email.matches("^[\\w\\-]([\\.\\w])+[\\w]+@([\\w\\-]+\\.)+[a-zA-Z]{2,4}$"));
+                assertTrue(Type.ERROR, "rpd8s17.email", email
+                    .matches("^[\\w\\-]([\\.\\w])+[\\w]+@([\\w\\-]+\\.)+[a-zA-Z]{2,4}$"));
             }
         }
     }
@@ -1464,7 +1465,7 @@ public class DutchWebGuidelinesValidator extends AbstractDOMValidator
     public void validateRpd16s1()
     {
         NodeListIterable metas =
-                new NodeListIterable((NodeList) evaluate(document, CONTENT_TYPE_META_SELECTOR, XPathConstants.NODESET));
+            new NodeListIterable((NodeList) evaluate(document, CONTENT_TYPE_META_SELECTOR, XPathConstants.NODESET));
 
         assertTrue(Type.ERROR, "rpd16s1.nometa", metas.getNodeList().getLength() > 0);
 
@@ -1480,7 +1481,7 @@ public class DutchWebGuidelinesValidator extends AbstractDOMValidator
     public void validateRpd16s2()
     {
         NodeListIterable metas =
-                new NodeListIterable((NodeList) evaluate(document, CONTENT_TYPE_META_SELECTOR, XPathConstants.NODESET));
+            new NodeListIterable((NodeList) evaluate(document, CONTENT_TYPE_META_SELECTOR, XPathConstants.NODESET));
 
         assertTrue(Type.ERROR, "rpd16s2.nometa", metas.getNodeList().getLength() > 0);
 

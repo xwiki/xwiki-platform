@@ -116,4 +116,14 @@ public class XHTMLValidator implements Validator
     {
         this.errorHandler.clear();
     }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see org.xwiki.validator.Validator#getName()
+     */
+    public String getName()
+    {
+        return "XHTML";
+    }
 }

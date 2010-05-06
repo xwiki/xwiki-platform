@@ -19,44 +19,49 @@
  */
 package org.xwiki.validator;
 
-import java.io.InputStream;
 import java.util.List;
 
+import javax.xml.xpath.XPathConstants;
+
+import org.xwiki.validator.ValidationError.Type;
+import org.xwiki.validator.framework.AbstractDOMValidator;
+
 /**
- * Common Validator interface.
+ * Validator allowing to validate (X)HTML content against some XWiki rules.
  * 
  * @version $Id$
  */
-public interface Validator
+public class XWikiValidator extends AbstractDOMValidator
 {
     /**
-     * Set document to validate.
+     * {@inheritDoc}
      * 
-     * @param document document to validate
+     * @see org.xwiki.validator.Validator#validate()
      */
-    void setDocument(InputStream document);
-    
+    public List<ValidationError> validate()
+    {
+        validateFailingMacros();
+
+        return getErrors();
+    }
+
     /**
-     * Run validation.
+     * Check if there is any rendering error in the generated XHTML.
+     */
+    public void validateFailingMacros()
+    {
+        String exprString = "//*[@class='xwikirenderingerror']";
+        assertFalse(Type.ERROR, "Found rendering error", (Boolean) evaluate(this.document, exprString,
+            XPathConstants.BOOLEAN));
+    }
+
+    /**
+     * {@inheritDoc}
      * 
-     * @return a list of validation errors
+     * @see org.xwiki.validator.Validator#getName()
      */
-    List<ValidationError> validate();
-    
-    /**
-     * Get the list of validation errors.
-     * 
-     * @return a list of validation errors.
-     */
-    List<ValidationError> getErrors();
-    
-    /**
-     * Clear the list of validation errors.
-     */
-    void clear();
-    
-    /**
-     * @return the name of the validator
-     */
-    String getName();
+    public String getName()
+    {
+        return "XWiki";
+    }
 }

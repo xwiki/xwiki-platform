@@ -62,9 +62,9 @@ public class XHTMLValidator implements Validator
         factory.setValidating(true);
 
         try {
-            documentBuilder = factory.newDocumentBuilder();
-            documentBuilder.setEntityResolver(new XMLResourcesEntityResolver());
-            documentBuilder.setErrorHandler(this.errorHandler);
+            this.documentBuilder = factory.newDocumentBuilder();
+            this.documentBuilder.setEntityResolver(new XMLResourcesEntityResolver());
+            this.documentBuilder.setErrorHandler(this.errorHandler);
         } catch (ParserConfigurationException e) {
             throw new RuntimeException(e);
         }
@@ -89,7 +89,7 @@ public class XHTMLValidator implements Validator
     {
         try {
             this.errorHandler.clear();
-            documentBuilder.parse(document);
+            this.documentBuilder.parse(this.document);
         } catch (SAXException e) {
             // Ignore - Let XMLErrorHandler handle it
         } catch (IOException e) {
@@ -106,7 +106,7 @@ public class XHTMLValidator implements Validator
     {
         return this.errorHandler.getErrors();
     }
-    
+
     /**
      * {@inheritDoc}
      * 

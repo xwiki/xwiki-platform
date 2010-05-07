@@ -82,7 +82,7 @@ public class DutchWebGuidelinesValidator extends AbstractDOMValidator
     @Override
     protected void addError(Type errorType, int line, int column, String key)
     {
-        super.addError(errorType, line, column, messages.getString(key));
+        super.addError(errorType, line, column, this.messages.getString(key));
     }
 
     /**
@@ -353,7 +353,7 @@ public class DutchWebGuidelinesValidator extends AbstractDOMValidator
     public void validateRpd2s3()
     {
         // This guideline cannot be automatically tested, however we check that a DOCTYPE has been specified.
-        assertFalse(Type.ERROR, "rpd2s3.noDoctype", document.getDoctype() == null);
+        assertFalse(Type.ERROR, "rpd2s3.noDoctype", this.document.getDoctype() == null);
     }
 
     /**
@@ -362,7 +362,7 @@ public class DutchWebGuidelinesValidator extends AbstractDOMValidator
     public void validateRpd2s4()
     {
         // This guideline cannot be automatically tested, however we check that a DOCTYPE has been specified.
-        assertFalse(Type.ERROR, "rpd2s4.noDoctype", document.getDoctype() == null);
+        assertFalse(Type.ERROR, "rpd2s4.noDoctype", this.document.getDoctype() == null);
     }
 
     /**
@@ -371,8 +371,8 @@ public class DutchWebGuidelinesValidator extends AbstractDOMValidator
     public void validateRpd2s5()
     {
         // Usage of frameset doctype is forbidden
-        if (document.getDoctype() != null) {
-            assertFalse(Type.ERROR, "rpd2s5.framesetDoctype", StringUtils.containsIgnoreCase(document.getDoctype()
+        if (this.document.getDoctype() != null) {
+            assertFalse(Type.ERROR, "rpd2s5.framesetDoctype", StringUtils.containsIgnoreCase(this.document.getDoctype()
                 .getPublicId(), "frameset"));
         }
 
@@ -667,8 +667,8 @@ public class DutchWebGuidelinesValidator extends AbstractDOMValidator
      */
     public void validateRpd6s1()
     {
-        assertTrue(Type.ERROR, "rpd6s1.doctype", StringUtils.containsIgnoreCase(document.getDoctype().getPublicId(),
-            ELEM_HTML));
+        assertTrue(Type.ERROR, "rpd6s1.doctype", StringUtils.containsIgnoreCase(this.document.getDoctype()
+            .getPublicId(), ELEM_HTML));
     }
 
     /**
@@ -1212,7 +1212,8 @@ public class DutchWebGuidelinesValidator extends AbstractDOMValidator
                 if (id != null) {
                     // Looking for the label associated to the input.
                     String exprString = "//label[@for='" + id + "']";
-                    assertTrue(Type.ERROR, message, (Boolean) evaluate(document, exprString, XPathConstants.BOOLEAN));
+                    assertTrue(Type.ERROR, message, (Boolean) evaluate(this.document, exprString,
+                        XPathConstants.BOOLEAN));
                 }
             }
         }
@@ -1252,7 +1253,7 @@ public class DutchWebGuidelinesValidator extends AbstractDOMValidator
             String exprString = "//input[@type='submit']";
             hasSubmit = (Boolean) evaluate(form, exprString, XPathConstants.BOOLEAN);
             exprString = "//input[@type='image']";
-            hasSubmit = hasSubmit || (Boolean) evaluate(document, exprString, XPathConstants.BOOLEAN);
+            hasSubmit = hasSubmit || (Boolean) evaluate(this.document, exprString, XPathConstants.BOOLEAN);
             assertTrue(Type.ERROR, "rpd13s4.submit", hasSubmit);
 
             exprString = "//select[@onchange]";
@@ -1388,7 +1389,7 @@ public class DutchWebGuidelinesValidator extends AbstractDOMValidator
     public void validateRpd13s18()
     {
         String exprString = "//input[@type='reset']";
-        assertFalse(Type.ERROR, "rpd13s18.reset", (Boolean) evaluate(document, exprString, XPathConstants.BOOLEAN));
+        assertFalse(Type.ERROR, "rpd13s18.reset", (Boolean) evaluate(this.document, exprString, XPathConstants.BOOLEAN));
     }
 
     /**
@@ -1465,7 +1466,7 @@ public class DutchWebGuidelinesValidator extends AbstractDOMValidator
     public void validateRpd16s1()
     {
         NodeListIterable metas =
-            new NodeListIterable((NodeList) evaluate(document, CONTENT_TYPE_META_SELECTOR, XPathConstants.NODESET));
+            new NodeListIterable((NodeList) evaluate(this.document, CONTENT_TYPE_META_SELECTOR, XPathConstants.NODESET));
 
         assertTrue(Type.ERROR, "rpd16s1.nometa", metas.getNodeList().getLength() > 0);
 
@@ -1481,7 +1482,7 @@ public class DutchWebGuidelinesValidator extends AbstractDOMValidator
     public void validateRpd16s2()
     {
         NodeListIterable metas =
-            new NodeListIterable((NodeList) evaluate(document, CONTENT_TYPE_META_SELECTOR, XPathConstants.NODESET));
+            new NodeListIterable((NodeList) evaluate(this.document, CONTENT_TYPE_META_SELECTOR, XPathConstants.NODESET));
 
         assertTrue(Type.ERROR, "rpd16s2.nometa", metas.getNodeList().getLength() > 0);
 
@@ -1489,7 +1490,7 @@ public class DutchWebGuidelinesValidator extends AbstractDOMValidator
             String content = getAttributeValue(meta, ATTR_CONTENT);
             assertTrue(Type.ERROR, "rpd16s2.notutf8", StringUtils.containsIgnoreCase(content, "charset=utf-8"));
             assertTrue(Type.ERROR, "rpd16s2.differs", StringUtils.containsIgnoreCase(content, CONTENT_CHARSET_FRAGMENT
-                + document.getXmlEncoding()));
+                + this.document.getXmlEncoding()));
         }
     }
 

@@ -564,7 +564,9 @@ $xwiki.jsfx.use('js/xwiki/actionbuttons/actionButtons.js', true)
                             $escapetool.html($prettyName)
                           #end
                           &lt;/label&gt;
-                          $obj.display($propName, "edit")
+                          ## Have to prepend the app name to prevent id collisions.
+                          $obj.display($propName, "edit").replaceAll("$objClass.getName()_0_$propName", 
+                                                                     "${escapedAppName}_$objClass.getName()_0_$propName")
                           &lt;/p&gt;
                         #end## If property is in propertiesToShow
                       #end## Foreach property in this class
@@ -573,7 +575,7 @@ $xwiki.jsfx.use('js/xwiki/actionbuttons/actionButtons.js', true)
                     ## then prepend application name to ids to prevent id collissions.
 
                     {{html clean="false" wiki="false"}}
-                    $formHtml.toString().replaceAll('\{\{[/]?html[^}]*\}\}|&lt;[/]?pre&gt;', '').replaceAll(" id='", " id='${escapedAppName}_")
+                    $formHtml.toString().replaceAll('\{\{[/]?html[^}]*\}\}|&lt;[/]?pre&gt;', '')
                     {{/html}}
 
                   #end## If object exists

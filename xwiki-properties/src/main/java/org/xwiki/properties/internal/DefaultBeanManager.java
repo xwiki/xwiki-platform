@@ -111,12 +111,12 @@ public class DefaultBeanManager extends AbstractLogEnabled implements BeanManage
         }
 
         for (PropertyDescriptor propertyDescriptor : beanDescriptor.getProperties()) {
-            String propetyId = propertyDescriptor.getId();
-            Object value = values.get(propetyId);
+            String propertyId = propertyDescriptor.getId();
+            Object value = values.get(propertyId);
 
             if (value == null) {
-                propetyId = propetyId.toLowerCase();
-                value = values.get(lowerKeyMap.get(propetyId));
+                propertyId = propertyId.toLowerCase();
+                value = values.get(lowerKeyMap.get(propertyId));
             }
 
             if (value != null) {
@@ -130,13 +130,13 @@ public class DefaultBeanManager extends AbstractLogEnabled implements BeanManage
                         propertyDescriptor.getFied().set(bean, convertedValue);
                     }
                 } catch (Exception e) {
-                    throw new PropertyException("Failed to populate property " + propetyId, e);
+                    throw new PropertyException("Failed to populate property [" + propertyId + "]", e);
                 }
 
                 // "Tick" already populated properties
-                values.remove(propetyId);
+                values.remove(propertyId);
             } else if (propertyDescriptor.isMandatory()) {
-                throw new PropertyMandatoryException(propetyId);
+                throw new PropertyMandatoryException(propertyId);
             }
         }
     }
@@ -153,8 +153,8 @@ public class DefaultBeanManager extends AbstractLogEnabled implements BeanManage
         Validator validator = factory.getValidator();
         Set<ConstraintViolation<Object>> constraintViolations = validator.validate(bean);
         if (!constraintViolations.isEmpty()) {
-            throw new PropertyException("Failed to validate bean: "
-                + constraintViolations.iterator().next().getMessage());
+            throw new PropertyException("Failed to validate bean: ["
+                + constraintViolations.iterator().next().getMessage() + "]");
         }
     }
 

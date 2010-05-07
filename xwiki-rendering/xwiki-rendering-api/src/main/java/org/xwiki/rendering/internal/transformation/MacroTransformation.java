@@ -162,10 +162,10 @@ public class MacroTransformation extends AbstractTransformation
                 // One macro parameter was invalid.
                 // The macro will not be executed and we generate an error message instead of the macro
                 // execution result.
-                generateError(macroHolder.macroBlock, "Invalid macro parameters used for macro: "
-                    + macroHolder.macroBlock.getId(), e);
+                generateError(macroHolder.macroBlock, "Invalid macro parameters used for the ["
+                    + macroHolder.macroBlock.getId() + "] macro", e);
                 getLogger().debug(
-                    "Invalid macro parameter for macro [" + macroHolder.macroBlock.getId() + "]. Internal error: ["
+                    "Invalid macro parameter for the [" + macroHolder.macroBlock.getId() + "] macro. Internal error: ["
                         + e.getMessage() + "]");
 
                 return;
@@ -179,10 +179,11 @@ public class MacroTransformation extends AbstractTransformation
             // The macro will not be executed and we generate an error message instead of the macro
             // execution result.
             // Note: We catch any Exception because we want to never break the whole rendering.
-            generateError(macroHolder.macroBlock, "Failed to execute macro: " + macroHolder.macroBlock.getId(), e);
+            generateError(macroHolder.macroBlock, "Failed to execute the [" + macroHolder.macroBlock.getId()
+                + "] macro", e);
             getLogger().debug(
-                "Failed to execute macro [" + macroHolder.macroBlock.getId() + "]. Internal error [" + e.getMessage()
-                    + "]");
+                "Failed to execute the [" + macroHolder.macroBlock.getId() + "]macro. Internal error ["
+                    + e.getMessage() + "]");
 
             return;
         }
@@ -214,7 +215,7 @@ public class MacroTransformation extends AbstractTransformation
                 generateError(macroBlock, "Unknown macro: " + macroBlock.getId(), "The \"" + macroBlock.getId()
                     + "\" macro is not in the list of registered macros. Verify the "
                     + "spelling or contact your administrator.");
-                getLogger().debug("Failed to locate macro [" + macroBlock.getId() + "]. Ignoring it.");
+                getLogger().debug("Failed to locate the [" + macroBlock.getId() + "] macro. Ignoring it.");
             }
         }
 

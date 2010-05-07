@@ -99,7 +99,23 @@ public class LucenePluginApi extends PluginApi<LucenePlugin>
     public int startIndex(Collection<String> wikis, String hqlFilter, boolean clearIndex, boolean onlyNew)
     {
         if (hasAdminRights()) {
-            return getProtectedPlugin().startIndex(wikis, hqlFilter, clearIndex, onlyNew, this.context);
+            // protected custom list of wikis
+            Collection<String> secureWikis = wikis;
+            String currentWiki = this.context.getDatabase();
+            try {
+                this.context.setDatabase(this.context.getMainXWiki());
+
+                if (!hasAdminRights()) {
+                    secureWikis = Collections.singletonList(currentWiki);
+                }
+            } finally {
+                this.context.setDatabase(currentWiki);
+            }
+
+            // protected hql custom filter
+            String secureHqlFilter = hasProgrammingRights() ? hqlFilter : null;
+
+            return getProtectedPlugin().startIndex(secureWikis, secureHqlFilter, clearIndex, onlyNew, this.context);
         }
 
         return REBUILD_NOT_ALLOWED;
@@ -196,8 +212,7 @@ public class LucenePluginApi extends PluginApi<LucenePlugin>
     {
         try {
             SearchResults retval =
-                    getProtectedPlugin().getSearchResults(query, (String) null, virtualWikiNames, languages,
-                        this.context);
+                getProtectedPlugin().getSearchResults(query, (String) null, virtualWikiNames, languages, this.context);
 
             if (LOG.isDebugEnabled()) {
                 LOG.debug("returning " + retval.getHitcount() + " results");
@@ -374,7 +389,7 @@ public class LucenePluginApi extends PluginApi<LucenePlugin>
     {
         try {
             SearchResults retval =
-                    getProtectedPlugin().getSearchResults(query, sortField, virtualWikiNames, languages, this.context);
+                getProtectedPlugin().getSearchResults(query, sortField, virtualWikiNames, languages, this.context);
 
             if (LOG.isDebugEnabled()) {
                 LOG.debug("returning " + retval.getHitcount() + " results");
@@ -434,7 +449,7 @@ public class LucenePluginApi extends PluginApi<LucenePlugin>
     {
         try {
             SearchResults retval =
-                    getProtectedPlugin().getSearchResults(query, sortField, virtualWikiNames, languages, this.context);
+                getProtectedPlugin().getSearchResults(query, sortField, virtualWikiNames, languages, this.context);
 
             if (LOG.isDebugEnabled()) {
                 LOG.debug("returning " + retval.getHitcount() + " results");

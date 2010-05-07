@@ -77,8 +77,6 @@
 (% id="Hsearch.admin.lucene.status.title" %)
 == {{velocity}}$msg.get('search.admin.lucene.status.title'){{/velocity}} ==
 
-{{velocity}}$msg.get('search.admin.lucene.status.description'){{/velocity}}
-
 |={{velocity}}$msg.get('search.admin.lucene.status.infotitle'){{/velocity}}|={{velocity}}$msg.get('search.admin.lucene.status.valuetitle'){{/velocity}}
 |{{velocity}}$msg.get('search.admin.lucene.status.indexed'){{/velocity}}|{{velocity}}$lucene.luceneDocCount{{/velocity}}
 |{{velocity}}$msg.get('search.admin.lucene.status.indexing'){{/velocity}}|{{velocity}}$lucene.queueSize{{/velocity}}

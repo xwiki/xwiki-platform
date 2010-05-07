@@ -403,8 +403,6 @@ $xwiki.jsfx.use('js/xwiki/actionbuttons/actionButtons.js', true)
       #set($documentSavedByAuthorizedUser = false)
       #checkDocumentSavedByAuthorizedUser($app, $currentDoc, $documentSavedByAuthorizedUser)
     #end
-    ## Will we have to display an error message?
-    #set($displayError = !$userHasAccessToDocument || !$documentSavedByAuthorizedUser)
     ##
     ## There is no need to display a heading unless:
     ## 1. There was already a section before this document.
@@ -413,18 +411,18 @@ $xwiki.jsfx.use('js/xwiki/actionbuttons/actionButtons.js', true)
     ## If we are displaying the heading and there is an error to be shown Javascript will not strip the heading.
     #if(!$appName.equals($outputList.get(0)) || $sections.contains($section))
       ## Create a document heading.
-      #showHeading($appName, $displayError, $headingShowing)
+      #showHeading($appName, $headingShowing)
     #end
     ##
     #if(!$userHasAccessToDocument)
-      #showHeading($appName, true, $headingShowing)
+      #showHeading($appName, $headingShowing)
 
       {{error}}$msg.get('xe.admin.configurable.noPermissionThisApplication'){{/error}}
 
     #else
       ##
       #if(!$documentSavedByAuthorizedUser)
-        #showHeading($appName, true, $headingShowing)
+        #showHeading($appName, $headingShowing)
 
         {{error}}$msg.get('xe.admin.configurable.applicationAuthorNoAdmin', [$app.Author]){{/error}}
 
@@ -441,7 +439,7 @@ $xwiki.jsfx.use('js/xwiki/actionbuttons/actionButtons.js', true)
           #if($requestURL.indexOf("?") == -1)
             #set($requestURL = "${requestURL}?")
           #end
-          #showHeading($appName, true, $headingShowing)
+          #showHeading($appName, $headingShowing)
 
           {{error}}$msg.get("doclockedby") $app.getLockingUser() [[$msg.get("forcelock")&gt;&gt;${requestURL}&amp;forceEdit=1]]{{/error}}
 
@@ -483,7 +481,7 @@ $xwiki.jsfx.use('js/xwiki/actionbuttons/actionButtons.js', true)
           #end
           #if($configurableObjs.size() == 0)
             ## Internal error, not translated.
-            #showHeading($appName, true, $headingShowing)
+            #showHeading($appName, $headingShowing)
 
             {{error}}Internal error: All objects were filtered out for application: $appName.{{/error}}
 
@@ -518,7 +516,7 @@ $xwiki.jsfx.use('js/xwiki/actionbuttons/actionButtons.js', true)
               #if($configClassName != '')
                 #set($objClass = $xwiki.getDocument("$configClassName").getxWikiClass())
                 #if(!$objClass || $objClass.getClass().getName().indexOf('.Class') == -1)
-                  #showHeading($appName, true, $headingShowing)
+                  #showHeading($appName, $headingShowing)
 
                   {{error}}$msg.get('xe.admin.configurable.configurationClassNonexistant'){{/error}}
 
@@ -527,7 +525,7 @@ $xwiki.jsfx.use('js/xwiki/actionbuttons/actionButtons.js', true)
                   #set($obj = $app.getObject($objClass.getName()))
                   ##
                   #if(!$obj || $obj.getClass().getName().indexOf('.Object') == -1)
-                    #showHeading($appName, true, $headingShowing)
+                    #showHeading($appName, $headingShowing)
 
                     {{error}}
                       $msg.get('xe.admin.configurable.noObjectOfConfigurationClassFound',
@@ -865,25 +863,13 @@ $xwiki.jsfx.use('js/xwiki/actionbuttons/actionButtons.js', true)
  *
  * $appName (String) Name of the application to show configuration heading for.
  *
- * $displayError (boolean) If true, then the heading will be class="applicationHeading errorMessage" and javascript
- *                         will know not to remove it when it is merging forms.
- *
  * $headingAlreadyShowing (boolean) If true then we don't make another heading. Otherwise it is set to true.
  *###
-#macro(showHeading, $appName, $displayError, $headingAlreadyShowing)
+#macro(showHeading, $appName, $headingAlreadyShowing)
   #if(!$headingAlreadyShowing)
     #set($headingAlreadyShowing = true)
-    ## If we are to display an error message, the class should be changed so that javascript doesn't remove the
-    ## heading from over the error message.
-#*
-    #if($displayError)
-      (%class="applicationHeading errorMessage"%)
-    #else
-      (%class="applicationHeading"%)
-    #end*###
 
-      = $msg.get("admin.customize") __[[$appName&gt;&gt;$appName]]__: =
-  ##  (%%)
+    = $msg.get("admin.customize") __[[$appName&gt;&gt;$appName]]__: =
   #end
 #end
 {{/velocity}}</content></xwikidoc>

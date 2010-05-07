@@ -162,8 +162,8 @@ public class MacroTransformation extends AbstractTransformation
                 // One macro parameter was invalid.
                 // The macro will not be executed and we generate an error message instead of the macro
                 // execution result.
-                generateError(macroHolder.macroBlock, "Invalid macro parameters used for the ["
-                    + macroHolder.macroBlock.getId() + "] macro", e);
+                generateError(macroHolder.macroBlock, "Invalid macro parameters used for the \""
+                    + macroHolder.macroBlock.getId() + "\" macro", e);
                 getLogger().debug(
                     "Invalid macro parameter for the [" + macroHolder.macroBlock.getId() + "] macro. Internal error: ["
                         + e.getMessage() + "]");

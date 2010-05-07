@@ -567,8 +567,8 @@ $xwiki.jsfx.use('js/xwiki/actionbuttons/actionButtons.js', true)
                           #end
                           &lt;/label&gt;
                           ## Have to prepend the app name to prevent id collisions.
-                          $obj.display($propName, "edit").replaceAll("$objClass.getName()_0_$propName", 
-                                                                     "${escapedAppName}_$objClass.getName()_0_$propName")
+                          $obj.display($propName, "edit").replaceAll(" id='$objClass.getName()_0_$propName", 
+                                                                     " id='${escapedAppName}_$objClass.getName()_0_$propName")
                           &lt;/p&gt;
                         #end## If property is in propertiesToShow
                       #end## Foreach property in this class

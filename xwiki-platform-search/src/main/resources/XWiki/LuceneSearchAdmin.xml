@@ -11,8 +11,8 @@
 <customClass></customClass>
 <contentAuthor>XWiki.Admin</contentAuthor>
 <creationDate>1272286749000</creationDate>
-<date>1273237708000</date>
-<contentUpdateDate>1273237708000</contentUpdateDate>
+<date>1273255038000</date>
+<contentUpdateDate>1273255038000</contentUpdateDate>
 <version>1.1</version>
 <title>Lucene search administration</title>
 <template></template>
@@ -110,7 +110,7 @@
 
 &lt;p&gt;
   #if ($context.isMainWiki())
-    &lt;label for="indexcustom_wikis"&gt;$msg.get('search.admin.lucene.indexing.action.indexcustom.wikis')&lt;/label&gt; &lt;input id="indexcustom_wikis" name="wikis" type="text" value="$!wikisString" /&gt;
+    &lt;label for="indexcustom_wikis"&gt;$msg.get('search.admin.lucene.indexing.action.indexcustom.wikis')&lt;/label&gt; &lt;input id="indexcustom_wikis" name="wikis" type="text" title="$escapetool.xml($msg.get('search.admin.lucene.indexing.action.indexcustom.wikis.title'))" value="$!wikisString" /&gt;
   #else
     &lt;input id="indexcustom_wikis" name="wikis" value="${context.database}" type="hidden" value="$!wikisString" /&gt;
   #end
@@ -118,15 +118,15 @@
 
   #if ($hasProgramming &amp;&amp; $context.isMainWiki())
 &lt;p&gt;
-    &lt;label for="indexcustom_hqlFilter"&gt;$msg.get('search.admin.lucene.indexing.action.indexcustom.hqlfilter')&lt;/label&gt; &lt;input id="indexcustom_hqlFilter" name="hqlFilter" type="text" #if($request.hqlFilter)value="${escapetool.html($request.hqlFilter)}"#end /&gt;
+    &lt;label for="indexcustom_hqlFilter"&gt;$msg.get('search.admin.lucene.indexing.action.indexcustom.hqlfilter')&lt;/label&gt; &lt;input id="indexcustom_hqlFilter" name="hqlFilter" type="text" title="$escapetool.xml($msg.get('search.admin.lucene.indexing.action.indexcustom.hqlfilter.title'))" #if($request.hqlFilter)value="${escapetool.html($request.hqlFilter)}"#end /&gt;
 &lt;/p&gt;
   #end
 
 &lt;p&gt;
-  &lt;label for="indexcustom_clearIndex"&gt;$msg.get('search.admin.lucene.indexing.action.indexcustom.clearIndex')&lt;/label&gt; &lt;input id="indexcustom_clearIndex" name="clearIndex" type="checkbox" #if($clearIndex)checked="checked"#end /&gt;
+  &lt;label for="indexcustom_clearIndex"&gt;$msg.get('search.admin.lucene.indexing.action.indexcustom.clearindex')&lt;/label&gt; &lt;input id="indexcustom_clearIndex" name="clearIndex" type="checkbox" title="$escapetool.xml($msg.get('search.admin.lucene.indexing.action.indexcustom.clearindex.title'))" #if($clearIndex)checked="checked"#end /&gt;
 &lt;/p&gt;
 &lt;p&gt;
-  &lt;label for="indexcustom_onlyNew"&gt;$msg.get('search.admin.lucene.indexing.action.indexcustom.onlyNew')&lt;/label&gt; &lt;input id="indexcustom_onlyNew" name="onlyNew" type="checkbox" #if($onlyNew)checked="checked"#end /&gt;
+  &lt;label for="indexcustom_onlyNew"&gt;$msg.get('search.admin.lucene.indexing.action.indexcustom.onlynew')&lt;/label&gt; &lt;input id="indexcustom_onlyNew" name="onlyNew" type="checkbox" title="$escapetool.xml($msg.get('search.admin.lucene.indexing.action.indexcustom.onlynew.title'))" #if($onlyNew)checked="checked"#end /&gt;
 &lt;/p&gt;
 
 &lt;input type="submit" value="$msg.get('search.admin.lucene.indexing.button')" class="button"/&gt;

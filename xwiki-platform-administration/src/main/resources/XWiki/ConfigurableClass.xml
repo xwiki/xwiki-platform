@@ -222,15 +222,16 @@
   var errorShown = false;
   for (var i = elementsInPage.length - 1; i &gt; -1; i--) {
     var e = elementsInPage[i];
-    if (e.tagName == 'DIV' &amp;&amp; e.getAttribute('class').indexOf('errormessage') != -1)
+    if (e.tagName != undefined &amp;&amp; e.tagName.toLowerCase() == 'div' &amp;&amp; e.getAttribute('class') != undefined &amp;&amp; e.getAttribute('class').indexOf('errormessage') != -1)
     {
       errorShown = true;
     } else if (!errorShown 
-               &amp;&amp; e.tagName == 'H1'
-               &amp;&amp; e.getAttribute('class') == 'wikigeneratedheader'
-               &amp;&amp; e.getAttribute('id').indexOf('HCustomize') == 0) 
+               &amp;&amp; e.tagName != undefined
+               &amp;&amp; e.tagName.toLowerCase() == 'h1'
+               &amp;&amp; e.getAttribute('id') != undefined
+               &amp;&amp; e.getAttribute('id').toLowerCase().indexOf('hcustomize') == 0)
     {
-      e.setAttribute('class', 'hidden');
+      e.parentNode.removeChild(e);
       errorShown = false;
     }
   }
@@ -239,8 +240,8 @@
   var forms = document.getElementsByTagName('form');
   var inputs = document.getElementsByTagName('input');
   for (var i = 0; i &lt; inputs.length; i++) {
-    if (inputs[i].getAttribute('type') == 'submit') {
-      inputs[i].setAttribute('class', 'hidden');
+    if (inputs[i].getAttribute('type') != undefined &amp;&amp; inputs[i].getAttribute('type').toLowerCase() == 'submit') {
+      inputs[i].parentNode.removeChild(inputs[i]);
     }
   }
 
@@ -302,6 +303,9 @@
 <number>0</number>
 <className>XWiki.TagClass</className>
 <guid>ddb1f0f6-1943-4e80-824a-0718cdbf1892</guid>
+<property>
+<tags/>
+</property>
 </object>
 <content>{{velocity}}
 #*

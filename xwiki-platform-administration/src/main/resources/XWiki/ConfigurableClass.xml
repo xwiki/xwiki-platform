@@ -448,6 +448,7 @@ $xwiki.jsfx.use('js/xwiki/actionbuttons/actionButtons.js', true)
           #if(!$locked)
             ## Try to use an ajax call to lock the document.
 
+
             {{html clean=false wiki=true}}
               &lt;noscript&gt;
 
@@ -460,7 +461,6 @@ $xwiki.jsfx.use('js/xwiki/actionbuttons/actionButtons.js', true)
                 });
               &lt;/script&gt;
             {{/html}}
-
 
             #set($discard = $lockedDocumentNames.add($app.getFullName()))
           #end
@@ -572,6 +572,7 @@ $xwiki.jsfx.use('js/xwiki/actionbuttons/actionButtons.js', true)
                     ## Strip pre tags and html macro invocations which $obj.display inserts.
                     ## then prepend application name to ids to prevent id collissions.
 
+
                     {{html clean="false" wiki="false"}}
                     $formHtml.toString().replaceAll('\{\{[/]?html[^}]*\}\}|&lt;[/]?pre&gt;', '')
                     {{/html}}
@@ -616,8 +617,6 @@ $xwiki.jsfx.use('js/xwiki/actionbuttons/actionButtons.js', true)
       #end## If app author has permission to edit admin page
     #end## If the current user has permission to edit the configurable application.
   #end## Foreach document name in names to configure
-
-
   {{html clean=false wiki=false}}
   &lt;script type="text/javascript"&gt;
   /* &lt;![CDATA[ */
@@ -627,8 +626,7 @@ $xwiki.jsfx.use('js/xwiki/actionbuttons/actionButtons.js', true)
   ## TODO: cancel and "submit all" buttons.
   //]]&gt;
   &lt;/script&gt;
-  {{/html}}
-
+  {{/html}}##
   ##
 #else
   ##

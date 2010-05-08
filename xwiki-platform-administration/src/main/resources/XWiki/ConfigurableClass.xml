@@ -558,7 +558,7 @@ $xwiki.jsfx.use('js/xwiki/actionbuttons/actionButtons.js', true)
                           &lt;p&gt;
                           #set($prettyName = "#evaluate($app.displayPrettyName($propName, $obj))")
                           ## App Name is prepended to for= to make label work with id which is modified to prevent collisions.
-                          &lt;label for="${escapedAppName}_$objClass.getName()_0_$propName"&gt;
+                          &lt;label for="${escapedAppName}_$objClass.getName()_$obj.getNumber()_$propName"&gt;
                           #if($linkPrefix != '')
                             #set($linkScript = "$linkPrefix$propName")
                             &lt;a href="$escapetool.html("#evaluate($linkScript)")"&gt;$escapetool.html($prettyName)&lt;/a&gt;
@@ -567,8 +567,8 @@ $xwiki.jsfx.use('js/xwiki/actionbuttons/actionButtons.js', true)
                           #end
                           &lt;/label&gt;
                           ## Have to prepend the app name to prevent id collisions.
-                          $obj.display($propName, "edit").replaceAll(" id='$objClass.getName()_0_$propName", 
-                                                                     " id='${escapedAppName}_$objClass.getName()_0_$propName")
+                          $obj.display($propName, "edit").replaceAll(" id='$objClass.getName()_$obj.getNumber()_$propName",
+                                                                     " id='${escapedAppName}_$objClass.getName()_$obj.getNumber()_$propName")
                           &lt;/p&gt;
                         #end## If property is in propertiesToShow
                       #end## Foreach property in this class

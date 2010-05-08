@@ -29,6 +29,7 @@ import java.util.Map;
 import java.util.Vector;
 
 import org.apache.commons.lang.NotImplementedException;
+import org.apache.commons.lang.StringUtils;
 import org.xwiki.cache.Cache;
 import org.xwiki.cache.CacheException;
 import org.xwiki.cache.CacheManager;
@@ -49,7 +50,6 @@ import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
-import com.xpn.xwiki.objects.classes.ListClass;
 import com.xpn.xwiki.store.XWikiStoreInterface;
 import com.xpn.xwiki.user.api.XWikiGroupService;
 import com.xpn.xwiki.util.Util;
@@ -413,9 +413,9 @@ public class XWikiGroupServiceImpl implements XWikiGroupService, EventListener
                 if (groups != null) {
                     for (BaseObject bobj : groups) {
                         if (bobj != null) {
-                            String members = bobj.getStringValue(FIELD_XWIKIGROUPS_MEMBER);
-                            if (members.length() > 0) {
-                                list.addAll(ListClass.getListFromString(members, " ,", false));
+                            String member = bobj.getStringValue(FIELD_XWIKIGROUPS_MEMBER);
+                            if (StringUtils.isNotEmpty(member)) {
+                                list.add(member);
                             }
                         }
                     }

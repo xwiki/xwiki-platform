@@ -45,7 +45,7 @@ public class XWikiRightServiceImplTest extends AbstractBridgedXWikiComponentTest
 {
     private XWikiRightServiceImpl rightService;
 
-    private Mock mockAuthService;
+    private Mock mockGroupService;
 
     private Mock mockXWiki;
 
@@ -64,11 +64,11 @@ public class XWikiRightServiceImplTest extends AbstractBridgedXWikiComponentTest
         super.setUp();
         this.rightService = new XWikiRightServiceImpl();
 
-        this.mockAuthService = mock(XWikiGroupService.class, new Class[] {}, new Object[] {});
+        this.mockGroupService = mock(XWikiGroupService.class, new Class[] {}, new Object[] {});
 
         this.mockXWiki = mock(XWiki.class);
         this.mockXWiki.stubs().method("isVirtualMode").will(returnValue(true));
-        this.mockXWiki.stubs().method("getGroupService").will(returnValue(this.mockAuthService.proxy()));
+        this.mockXWiki.stubs().method("getGroupService").will(returnValue(this.mockGroupService.proxy()));
         this.mockXWiki.stubs().method("isReadOnly").will(returnValue(false));
         this.mockXWiki.stubs().method("getWikiOwner").will(returnValue(null));
         this.mockXWiki.stubs().method("getMaxRecursiveSpaceChecks").will(returnValue(0));
@@ -85,6 +85,7 @@ public class XWikiRightServiceImplTest extends AbstractBridgedXWikiComponentTest
         getContext().setWiki((XWiki) this.mockXWiki.proxy());
 
         this.user = new XWikiDocument(new DocumentReference("wiki", "XWiki", "user"));
+        getContext().setDatabase(this.user.getWikiName());
         BaseObject userObject = new BaseObject();
         userObject.setClassName("XWiki.XWikiUser");
         this.user.addXObject(userObject);
@@ -92,16 +93,17 @@ public class XWikiRightServiceImplTest extends AbstractBridgedXWikiComponentTest
             returnValue(this.user));
 
         this.group = new XWikiDocument(new DocumentReference("wiki", "XWiki", "group"));
+        getContext().setDatabase(this.group.getWikiName());
         BaseObject groupObject = new BaseObject();
-        groupObject.setClassName("XWiki.XWikiGroup");
+        groupObject.setClassName("XWiki.XWikiGroups");
         groupObject.setStringValue("member", "XWiki.user");
         this.group.addXObject(groupObject);
         this.mockXWiki.stubs().method("getDocument").with(eq(this.group.getPrefixedFullName()), ANYTHING).will(
             returnValue(this.group));
 
-        this.mockAuthService.stubs().method("listGroupsForUser").with(eq(this.user.getPrefixedFullName()), ANYTHING)
+        this.mockGroupService.stubs().method("listGroupsForUser").with(eq(this.user.getPrefixedFullName()), ANYTHING)
             .will(returnValue(Collections.singleton(this.group.getFullName())));
-        this.mockAuthService.stubs().method("listGroupsForUser").with(eq(this.user.getFullName()), ANYTHING).will(
+        this.mockGroupService.stubs().method("listGroupsForUser").with(eq(this.user.getFullName()), ANYTHING).will(
             new CustomStub("Implements XWikiGroupService.listGroupsForUser")
             {
                 public Object invoke(Invocation invocation) throws Throwable
@@ -117,9 +119,9 @@ public class XWikiRightServiceImplTest extends AbstractBridgedXWikiComponentTest
                 }
             });
 
-        this.mockAuthService.stubs().method("listGroupsForUser").with(eq(this.group.getPrefixedFullName()), ANYTHING)
+        this.mockGroupService.stubs().method("listGroupsForUser").with(eq(this.group.getPrefixedFullName()), ANYTHING)
             .will(returnValue(Collections.emptyList()));
-        this.mockAuthService.stubs().method("listGroupsForUser").with(eq(this.group.getFullName()), ANYTHING).will(
+        this.mockGroupService.stubs().method("listGroupsForUser").with(eq(this.group.getFullName()), ANYTHING).will(
             returnValue(Collections.emptyList()));
     }
 
@@ -278,7 +280,7 @@ public class XWikiRightServiceImplTest extends AbstractBridgedXWikiComponentTest
         getContext().setUser("XWiki.Programmer");
         assertTrue(this.rightService.hasProgrammingRights(getContext()));
 
-        this.mockAuthService.stubs().method("listGroupsForUser").with(eq(XWikiRightService.GUEST_USER_FULLNAME),
+        this.mockGroupService.stubs().method("listGroupsForUser").with(eq(XWikiRightService.GUEST_USER_FULLNAME),
             ANYTHING).will(returnValue(Collections.emptyList()));
 
         // Guests should not have PR
@@ -324,7 +326,7 @@ public class XWikiRightServiceImplTest extends AbstractBridgedXWikiComponentTest
         this.mockXWiki.stubs().method("getSpacePreferenceAsInt").with(eq("authenticate_view"), ANYTHING, ANYTHING)
             .will(returnValue(0));
 
-        this.mockAuthService.stubs().method("listGroupsForUser").with(eq(XWikiRightService.GUEST_USER_FULLNAME),
+        this.mockGroupService.stubs().method("listGroupsForUser").with(eq(XWikiRightService.GUEST_USER_FULLNAME),
             ANYTHING).will(returnValue(Collections.emptyList()));
 
         getContext().setDatabase("wiki");

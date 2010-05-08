@@ -547,7 +547,7 @@ $xwiki.jsfx.use('js/xwiki/actionbuttons/actionButtons.js', true)
                       ## custom form in codeToExecute and if that configurable object is the first of it's kind in that
                       ## document, the custom form will not be put inside of our form.
                       #if(!$insideForm)
-                        &lt;form id="$formId" method="post" action="$formAction" onsubmit="cancelCancelEdit()"&gt;
+                        &lt;form id="$formId" method="post" action="$formAction"&gt;
                         &lt;fieldset&gt;
                         #set($insideForm = true)
                       #end

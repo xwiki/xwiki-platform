@@ -1,17 +1,35 @@
+/*
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+ */
 package com.xpn.xwiki.plugin.lucene;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Collections;
 import java.util.Date;
 import java.util.concurrent.Semaphore;
-
-import junit.framework.Test;
-import junit.framework.TestSuite;
 
 import org.apache.lucene.analysis.standard.StandardAnalyzer;
 import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.index.IndexWriter;
 import org.apache.lucene.index.Term;
+import org.apache.lucene.index.IndexWriter.MaxFieldLength;
 import org.apache.lucene.search.IndexSearcher;
 import org.apache.lucene.search.Query;
 import org.apache.lucene.search.TermQuery;
@@ -20,52 +38,37 @@ import org.apache.lucene.store.Directory;
 import org.apache.lucene.store.FSDirectory;
 import org.apache.lucene.store.LockObtainFailedException;
 import org.apache.lucene.util.Version;
+import org.jmock.Mock;
+import org.jmock.core.Invocation;
+import org.jmock.core.stub.CustomStub;
+import org.xwiki.model.reference.DocumentReference;
 
 import com.xpn.xwiki.XWiki;
-import com.xpn.xwiki.XWikiConfig;
 import com.xpn.xwiki.XWikiContext;
-import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.store.XWikiStoreInterface;
 import com.xpn.xwiki.test.AbstractBridgedXWikiComponentTestCase;
 
+/**
+ * Unit tests for {@link IndexUpdater}.
+ * 
+ * @version $Id$
+ */
 public class IndexUpdaterTest extends AbstractBridgedXWikiComponentTestCase
 {
-    /**
-     * @return the suite of tests being tested
-     */
-    public static Test suite()
-    {
-        return new TestSuite(IndexUpdaterTest.class);
-    }
+    private final static String INDEXDIR = "target/lucenetest";
 
-    public class TestXWiki extends XWiki
-    {
-        public XWikiStoreInterface getStore()
-        {
-            return new TestStore();
-        }
+    private final Semaphore rebuildDone = new Semaphore(0);
 
-        public XWikiDocument getDocument(String fullname, XWikiContext context)
-        {
-            return new LoremIpsum();
-        }
+    private final Semaphore writeBlockerWait = new Semaphore(0);
 
-        @Override
-        public XWikiConfig getConfig()
-        {
-            XWikiConfig p = new XWikiConfig();
-            p.setProperty(LucenePlugin.PROP_INDEX_DIR, IndexUpdaterTest.INDEXDIR);
+    private final Semaphore writeBlockerAcquiresLock = new Semaphore(0);
 
-            return p;
-        }
+    private Mock mockXWiki;
 
-        @Override
-        public boolean checkAccess(String action, XWikiDocument doc, XWikiContext context) throws XWikiException
-        {
-            return true;
-        }
-    }
+    private Mock mockXWikiStoreInterface;
+
+    private XWikiDocument loremIpsum;
 
     private class TestIndexRebuilder extends IndexRebuilder
     {
@@ -115,83 +118,44 @@ public class IndexUpdaterTest extends AbstractBridgedXWikiComponentTestCase
         }
     }
 
-    private class LoremIpsum extends XWikiDocument
-    {
-        public LoremIpsum()
-        {
-
-        }
-
-        @Override
-        public String getAuthor()
-        {
-            return "User";
-        }
-
-        @Override
-        public String getCreator()
-        {
-            return "User";
-        }
-
-        @Override
-        public Date getDate()
-        {
-            return new Date(0);
-        }
-
-        @Override
-        public Date getCreationDate()
-        {
-            return new Date(0);
-        }
-
-        @Override
-        public String getName()
-        {
-            return "Ipsum";
-        }
-
-        @Override
-        public String getDisplayTitle(XWikiContext context)
-        {
-            return "Lorem Ipsum";
-        }
-
-        @Override
-        public String getSpace()
-        {
-            return "Lorem";
-        }
-
-        @Override
-        public String getFullName()
-        {
-            return "Lorem.Ipsum";
-        }
-
-        @Override
-        public String getContent()
-        {
-            return "Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.";
-        }
-
-    }
-
-    private final static String INDEXDIR = "target/lucenetest";
-
-    private final Semaphore rebuildDone = new Semaphore(0);
-
-    private final Semaphore writeBlockerWait = new Semaphore(0);
-
-    private final Semaphore writeBlockerAcquiresLock = new Semaphore(0);
-
     @Override
     protected void setUp() throws Exception
     {
         super.setUp();
 
-        getContext().setWiki(new TestXWiki());
+        this.loremIpsum = new TestXWikiDocument(new DocumentReference("wiki", "Lorem", "Ipsum"));
+        this.loremIpsum.setAuthor("User");
+        this.loremIpsum.setCreator("User");
+        this.loremIpsum.setDate(new Date(0));
+        this.loremIpsum.setCreationDate(new Date(0));
+        this.loremIpsum.setTitle("Lorem Ipsum");
+        this.loremIpsum
+            .setContent("Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua."
+                + " Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat."
+                + " Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur."
+                + " Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.");
+
+        this.mockXWikiStoreInterface = mock(XWikiStoreInterface.class);
+        this.mockXWikiStoreInterface.stubs().method("searchDocumentsNames").will(returnValue(Collections.EMPTY_LIST));
+        this.mockXWikiStoreInterface.stubs().method("cleanUp");
+
+        this.mockXWiki = mock(XWiki.class);
+        this.mockXWiki.stubs().method("getDocument").with(eq(this.loremIpsum.getPrefixedFullName()), ANYTHING).will(
+            returnValue(this.loremIpsum));
+        this.mockXWiki.stubs().method("Param").with(ANYTHING, ANYTHING).will(new CustomStub("Implements XWiki.Param")
+        {
+            public Object invoke(Invocation invocation) throws Throwable
+            {
+                return invocation.parameterValues.get(1);
+            }
+        });
+        this.mockXWiki.stubs().method("Param").with(eq(LucenePlugin.PROP_INDEX_DIR)).will(
+            returnValue(IndexUpdaterTest.INDEXDIR));
+        this.mockXWiki.stubs().method("checkAccess").will(returnValue(true));
+        this.mockXWiki.stubs().method("isVirtualMode").will(returnValue(false));
+        this.mockXWiki.stubs().method("getStore").will(returnValue(this.mockXWikiStoreInterface.proxy()));
+
+        getContext().setWiki((XWiki) this.mockXWiki.proxy());
         getContext().setDatabase("wiki");
     }
 
@@ -231,7 +195,7 @@ public class IndexUpdaterTest extends AbstractBridgedXWikiComponentTestCase
 
         LucenePlugin plugin = new LucenePlugin("Monkey", "Monkey", getContext());
         IndexUpdater indexUpdater =
-                new TestIndexUpdater(directory, indexingInterval, maxQueueSize, plugin, getContext());
+            new TestIndexUpdater(directory, indexingInterval, maxQueueSize, plugin, getContext());
         IndexRebuilder indexRebuilder = new TestIndexRebuilder(indexUpdater, getContext());
         Thread writerBlocker = new Thread(indexUpdater, "writerBlocker");
         writerBlocker.start();
@@ -242,8 +206,8 @@ public class IndexUpdaterTest extends AbstractBridgedXWikiComponentTestCase
         Thread indexUpdaterThread = new Thread(indexUpdater, "Lucene Index Updater");
         indexUpdaterThread.start();
 
-        indexUpdater.add(new LoremIpsum(), getContext());
-        indexUpdater.add(new LoremIpsum(), getContext());
+        indexUpdater.add(this.loremIpsum.clone(), getContext());
+        indexUpdater.add(this.loremIpsum.clone(), getContext());
 
         try {
             Thread.sleep(1000);
@@ -286,7 +250,7 @@ public class IndexUpdaterTest extends AbstractBridgedXWikiComponentTestCase
         LucenePlugin plugin = new LucenePlugin("Monkey", "Monkey", getContext());
 
         final IndexUpdater indexUpdater =
-                new TestIndexUpdater(directory, indexingInterval, maxQueueSize, plugin, getContext());
+            new TestIndexUpdater(directory, indexingInterval, maxQueueSize, plugin, getContext());
 
         plugin.init(indexUpdater, getContext());
 
@@ -321,7 +285,8 @@ public class IndexUpdaterTest extends AbstractBridgedXWikiComponentTestCase
 
         try {
             if (!IndexWriter.isLocked(indexUpdater.getDirectory())) {
-                new IndexWriter(indexUpdater.getDirectory(), new StandardAnalyzer(Version.LUCENE_29));
+                new IndexWriter(indexUpdater.getDirectory(), new StandardAnalyzer(Version.LUCENE_29),
+                    MaxFieldLength.LIMITED);
             } else {
                 wasActuallyLocked = true;
             }
@@ -349,7 +314,9 @@ public class IndexUpdaterTest extends AbstractBridgedXWikiComponentTestCase
 
         assertFalse(IndexWriter.isLocked(indexUpdater.getDirectory()));
 
-        IndexWriter w = new IndexWriter(indexUpdater.getDirectory(), new StandardAnalyzer(Version.LUCENE_29));
+        IndexWriter w =
+            new IndexWriter(indexUpdater.getDirectory(), new StandardAnalyzer(Version.LUCENE_29),
+                MaxFieldLength.LIMITED);
         w.close();
     }
 }

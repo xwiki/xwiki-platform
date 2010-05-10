@@ -19,13 +19,15 @@
  */
 package com.xpn.xwiki.plugin.lucene;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.document.Field;
+import org.apache.tika.metadata.Metadata;
+import org.apache.tika.parser.AutoDetectParser;
+import org.apache.tika.parser.ParseContext;
+import org.apache.tika.parser.Parser;
+import org.apache.tika.sax.BodyContentHandler;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.doc.XWikiAttachment;
@@ -39,32 +41,12 @@ import com.xpn.xwiki.doc.XWikiDocument;
  */
 public class AttachmentData extends IndexData
 {
-    /**
-     * Mapping from common file name endings to mime types. This is uses as a fallback when text extraction by using the
-     * mime type delivered by xwiki doesn't work.
-     */
-    static final Map<String, String> MIMETYPES = new HashMap<String, String>();
-
-    static {
-        MIMETYPES.put("pdf", "application/pdf");
-        MIMETYPES.put("doc", "application/msword");
-        MIMETYPES.put("sxw", "application/vnd.sun.xml.writer");
-        MIMETYPES.put("xml", "text/xml");
-        MIMETYPES.put("txt", "text/plain");
-        MIMETYPES.put("ppt", "application/ms-powerpoint");
-        MIMETYPES.put("xls", "application/ms-excel");
-    }
-
     private static final Log LOG = LogFactory.getLog(AttachmentData.class);
 
     private int size;
 
     private String filename;
 
-    /**
-     * @param attachment
-     * @param context
-     */
     public AttachmentData(final XWikiDocument document, final XWikiAttachment attachment, final XWikiContext context)
     {
         super(attachment.getDoc(), context);
@@ -75,6 +57,12 @@ public class AttachmentData extends IndexData
         setFilename(attachment.getFilename());
     }
 
+    /**
+     * {@inheritDoc}
+     * 
+     * @see com.xpn.xwiki.plugin.lucene.IndexData#addDataToLuceneDocument(org.apache.lucene.document.Document,
+     *      com.xpn.xwiki.doc.XWikiDocument, com.xpn.xwiki.XWikiContext)
+     */
     public void addDataToLuceneDocument(Document luceneDoc, XWikiDocument doc, XWikiContext context)
     {
         super.addDataToLuceneDocument(luceneDoc, doc, context);
@@ -135,19 +123,27 @@ public class AttachmentData extends IndexData
     }
 
     /**
-     * @return a string containing the result of {@link IndexData#getFullText} plus the full text content of this
-     *         attachment, as far as it could be extracted.
+     * {@inheritDoc}
+     * <p>
+     * Return a string containing the result of {@link IndexData#getFullText} plus the full text content of this
+     * attachment, as far as it could be extracted.
+     * 
+     * @see com.xpn.xwiki.plugin.lucene.IndexData#getFullText(java.lang.StringBuilder, com.xpn.xwiki.doc.XWikiDocument,
+     *      com.xpn.xwiki.XWikiContext)
      */
-    public String getFullText(XWikiDocument doc, XWikiContext context)
+    @Override
+    protected void getFullText(StringBuilder sb, XWikiDocument doc, XWikiContext context)
     {
-        StringBuffer retval = new StringBuffer(super.getFullText(doc, context));
-        String contentText = null;
-        contentText = getContentAsText(doc, context);
-        if (contentText != null) {
-            retval.append(" ").append(contentText).toString();
-        }
+        super.getFullText(sb, doc, context);
 
-        return retval.toString();
+        String contentText = getContentAsText(doc, context);
+
+        if (contentText != null) {
+            if (sb.length() > 0) {
+                sb.append(" ");
+            }
+            sb.append(getContentAsText(doc, context));
+        }
     }
 
     private String getContentAsText(XWikiDocument doc, XWikiContext context)
@@ -157,19 +153,28 @@ public class AttachmentData extends IndexData
         try {
             XWikiAttachment att = doc.getAttachment(this.filename);
 
-            LOG.debug("have attachment for filename " + this.filename + ": " + att);
+            LOG.debug("Start parsing attachement [" + this.filename + "] in document [" + doc.getPrefixedFullName()
+                + "]");
 
-            byte[] content = att.getContent(context);
-            if (this.filename != null) {
-                String[] nameParts = this.filename.split("\\.");
-                if (nameParts.length > 1) {
-                    contentText =
-                        TextExtractor.getText(content, MIMETYPES.get(nameParts[nameParts.length - 1].toLowerCase()));
-                }
-            }
+            Parser parser = new AutoDetectParser();
+            BodyContentHandler contenthandler = new BodyContentHandler();
+            Metadata metadata = new Metadata();
+            metadata.set(Metadata.RESOURCE_NAME_KEY, this.filename);
+            ParseContext parseContext = new ParseContext();
+            parseContext.set(Parser.class, parser);
+
+            parser.parse(att.getContentInputStream(context), contenthandler, metadata, parseContext);
+
+            String title = metadata.get(Metadata.TITLE);
+
+            LOG.debug("* Type: [" + metadata.get(Metadata.CONTENT_TYPE) + "]");
+            LOG.debug("* Title: [" + title + "]");
+            LOG.debug("* Author: [" + metadata.get(Metadata.AUTHOR) + "]");
+
+            return (title != null ? metadata.get(Metadata.TITLE) + " " : "") + contenthandler.toString();
         } catch (Throwable e) {
-            LOG.error("error getting content of attachment [" + this.filename + "] for document [" + doc.getFullName()
-                + "] in wiki [" + doc.getWikiName() + "]", e);
+            LOG.warn("error getting content of attachment [" + this.filename + "] for document ["
+                + doc.getPrefixedFullName() + "]", e);
         }
 
         return contentText;

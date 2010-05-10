@@ -19,14 +19,11 @@
  */
 package org.xwiki.validator.framework;
 
-import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
 import javax.xml.namespace.QName;
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathExpression;
@@ -34,12 +31,9 @@ import javax.xml.xpath.XPathExpressionException;
 import javax.xml.xpath.XPathFactory;
 
 import org.apache.commons.lang.StringUtils;
-import org.w3c.dom.Document;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
-import org.xwiki.validator.ValidationError;
-import org.xwiki.validator.Validator;
 import org.xwiki.validator.ValidationError.Type;
 
 /**
@@ -47,7 +41,7 @@ import org.xwiki.validator.ValidationError.Type;
  * 
  * @version $Id$
  */
-public abstract class AbstractDOMValidator implements Validator
+public abstract class AbstractDOMValidator extends AbstractXMLValidator
 {
     // XPATH
 
@@ -276,79 +270,6 @@ public abstract class AbstractDOMValidator implements Validator
      * XPath instance.
      */
     protected XPath xpath = XPathFactory.newInstance().newXPath();
-
-    /**
-     * Document to be validated.
-     */
-    protected Document document;
-
-    /**
-     * XML document builder.
-     */
-    private DocumentBuilder documentBuilder;
-
-    /**
-     * Results of the validation.
-     */
-    private List<ValidationError> errors = new ArrayList<ValidationError>();
-
-    /**
-     * Constructor.
-     */
-    public AbstractDOMValidator()
-    {
-        try {
-            DocumentBuilderFactory docBuilderFactory = DocumentBuilderFactory.newInstance();
-            this.documentBuilder = docBuilderFactory.newDocumentBuilder();
-            this.documentBuilder.setEntityResolver(new XMLResourcesEntityResolver());
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.validator.Validator#setDocument(java.io.InputStream)
-     */
-    public void setDocument(InputStream document)
-    {
-        try {
-            clear();
-            this.document = this.documentBuilder.parse(document);
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    /**
-     * @return validator results
-     */
-    public List<ValidationError> getErrors()
-    {
-        return this.errors;
-    }
-
-    /**
-     * Clear the validator errors.
-     */
-    public void clear()
-    {
-        this.errors.clear();
-    }
-
-    /**
-     * Add an error message to the list.
-     * 
-     * @param errorType type of the error
-     * @param line line where the error occurred
-     * @param column where the error occurred
-     * @param message the message to add
-     */
-    protected void addError(Type errorType, int line, int column, String message)
-    {
-        this.errors.add(new ValidationError(errorType, line, column, message));
-    }
 
     /**
      * Asserts that a condition is false. If it isn't it puts an error message in the validation results.

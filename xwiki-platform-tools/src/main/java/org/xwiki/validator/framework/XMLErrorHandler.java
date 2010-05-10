@@ -84,4 +84,12 @@ public class XMLErrorHandler implements ErrorHandler
     {
         return this.errors;
     }
+
+    /**
+     * @param error an error
+     */
+    public void addError(ValidationError error)
+    {
+        this.errors.add(error);
+    }
 }

@@ -19,104 +19,15 @@
  */
 package org.xwiki.validator;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.List;
-
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
-
-import org.xml.sax.SAXException;
-import org.xwiki.validator.framework.XMLErrorHandler;
-import org.xwiki.validator.framework.XMLResourcesEntityResolver;
+import org.xwiki.validator.framework.AbstractXMLValidator;
 
 /**
  * Validate provided input.
  * 
  * @version $Id$
  */
-public class XHTMLValidator implements Validator
+public class XHTMLValidator extends AbstractXMLValidator
 {
-    /**
-     * Error handler.
-     */
-    private XMLErrorHandler errorHandler = new XMLErrorHandler();
-
-    /**
-     * Document to validate.
-     */
-    private InputStream document;
-
-    /**
-     * XML Document builder.
-     */
-    private DocumentBuilder documentBuilder;
-
-    /**
-     * Constructor.
-     */
-    public XHTMLValidator()
-    {
-        DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-        factory.setValidating(true);
-
-        try {
-            this.documentBuilder = factory.newDocumentBuilder();
-            this.documentBuilder.setEntityResolver(new XMLResourcesEntityResolver());
-            this.documentBuilder.setErrorHandler(this.errorHandler);
-        } catch (ParserConfigurationException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.validator.Validator#setDocument(java.io.InputStream)
-     */
-    public void setDocument(InputStream document)
-    {
-        this.document = document;
-    }
-
-    /**
-     * Validate the given XTML document against its DTD.
-     * 
-     * @return list of errors found during validation
-     */
-    public List<ValidationError> validate()
-    {
-        try {
-            this.errorHandler.clear();
-            this.documentBuilder.parse(this.document);
-        } catch (SAXException e) {
-            // Ignore - Let XMLErrorHandler handle it
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-
-        return this.errorHandler.getErrors();
-    }
-
-    /**
-     * @return validation errors
-     */
-    public List<ValidationError> getErrors()
-    {
-        return this.errorHandler.getErrors();
-    }
-
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.validator.Validator#clear()
-     */
-    public void clear()
-    {
-        this.errorHandler.clear();
-    }
-
     /**
      * {@inheritDoc}
      * 

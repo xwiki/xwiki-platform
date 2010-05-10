@@ -19,18 +19,20 @@
  */
 package org.xwiki.validator;
 
-import javax.xml.xpath.XPathConstants;
-
 import org.w3c.dom.Document;
 import org.xwiki.validator.ValidationError.Type;
-import org.xwiki.validator.framework.AbstractDOMValidator;
+import org.xwiki.validator.framework.AbstractXMLValidator;
+
+import com.sun.syndication.io.FeedException;
+import com.sun.syndication.io.ParsingFeedException;
+import com.sun.syndication.io.SyndFeedInput;
 
 /**
- * Validator allowing to validate (X)HTML content against some XWiki rules.
+ * Validate provided input.
  * 
  * @version $Id$
  */
-public class XWikiValidator extends AbstractDOMValidator
+public class RSSValidator extends AbstractXMLValidator
 {
     /**
      * {@inheritDoc}
@@ -40,17 +42,19 @@ public class XWikiValidator extends AbstractDOMValidator
     @Override
     protected void validate(Document document)
     {
-        validateFailingMacros();
-    }
-
-    /**
-     * Check if there is any rendering error in the generated XHTML.
-     */
-    public void validateFailingMacros()
-    {
-        String exprString = "//*[@class='xwikirenderingerror']";
-        assertFalse(Type.ERROR, "Found rendering error", (Boolean) evaluate(this.document, exprString,
-            XPathConstants.BOOLEAN));
+        try {
+            SyndFeedInput input = new SyndFeedInput();
+            input.build(getDocument());
+        } catch (IllegalArgumentException e) {
+            throw new RuntimeException(e);
+        } catch (FeedException e) {
+            if (e instanceof ParsingFeedException) {
+                ParsingFeedException pfe = (ParsingFeedException) e;
+                addError(Type.ERROR, pfe.getLineNumber(), pfe.getColumnNumber(), e.getMessage());
+            } else {
+                addError(Type.ERROR, -1, -1, e.getMessage());
+            }
+        }
     }
 
     /**
@@ -60,6 +64,6 @@ public class XWikiValidator extends AbstractDOMValidator
      */
     public String getName()
     {
-        return "XWiki";
+        return "RSS";
     }
 }

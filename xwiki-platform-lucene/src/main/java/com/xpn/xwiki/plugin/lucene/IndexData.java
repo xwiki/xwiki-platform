@@ -193,8 +193,15 @@ public abstract class IndexData
 
     protected void getFullText(StringBuilder sb, XWikiDocument doc, XWikiContext context)
     {
-        sb.append(this.documentName).append(" ").append(this.documentSpace).append(" ").append(this.author).append(" ").append(
-            this.creator);
+        sb.append(this.documentName).append(" ").append(this.documentSpace);
+
+        if (!StringUtils.isEmpty(this.author)) {
+            sb.append(" ").append(this.author);
+        }
+
+        if (!StringUtils.isEmpty(this.creator)) {
+            sb.append(" ").append(this.creator);
+        }
     }
 
     public abstract String getType();

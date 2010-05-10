@@ -171,7 +171,8 @@ public class AttachmentData extends IndexData
             LOG.debug("* Title: [" + title + "]");
             LOG.debug("* Author: [" + metadata.get(Metadata.AUTHOR) + "]");
 
-            return (title != null ? metadata.get(Metadata.TITLE) + " " : "") + contenthandler.toString();
+            return this.filename + (title != null ? " " + metadata.get(Metadata.TITLE) : "") + " "
+                + contenthandler.toString();
         } catch (Throwable e) {
             LOG.warn("error getting content of attachment [" + this.filename + "] for document ["
                 + doc.getPrefixedFullName() + "]", e);

@@ -130,6 +130,7 @@ public abstract class IndexData
         }
         luceneDoc.add(new Field(IndexFields.DOCUMENT_NAME, this.documentName, Field.Store.YES, Field.Index.ANALYZED));
         luceneDoc.add(new Field(IndexFields.DOCUMENT_WEB, this.documentSpace, Field.Store.YES, Field.Index.ANALYZED));
+        luceneDoc.add(new Field(IndexFields.DOCUMENT_SPACE, this.documentSpace, Field.Store.YES, Field.Index.ANALYZED));
         luceneDoc.add(new Field(IndexFields.DOCUMENT_FULLNAME, this.documentFullName, Field.Store.YES,
             Field.Index.ANALYZED));
         if (this.author != null) {

@@ -56,7 +56,13 @@ public abstract class IndexFields
     /**
      * Name of the web the document belongs to
      */
+    @Deprecated
     public static final String DOCUMENT_WEB = "web";
+    
+    /**
+     * Name of the space the document belongs to
+     */
+    public static final String DOCUMENT_SPACE = "space";
 
     /**
      * FullName of the document (example : Main.WebHome)

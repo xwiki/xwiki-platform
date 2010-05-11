@@ -440,9 +440,13 @@ public class XWikiLDAPUtils
      */
     public boolean isMemberOfGroup(String memberDN, String groupDN, XWikiContext context) throws XWikiException
     {
-        for (String memberDNEntry : getGroupMembers(groupDN, context).keySet()) {
-            if (memberDNEntry.equals(memberDN.toLowerCase())) {
-                return true;
+        Map<String, String> groupMembers = getGroupMembers(groupDN, context);
+
+        if(groupMembers != null) {
+            for (String memberDNEntry : groupMembers.keySet()) {
+                if (memberDNEntry.equals(memberDN.toLowerCase())) {
+                    return true;
+                }
             }
         }
 

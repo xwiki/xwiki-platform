@@ -72,6 +72,18 @@ public abstract class AbstractXMLValidator implements Validator
     }
 
     /**
+     * @param validateXML indicate if the XML input should be validated.
+     */
+    public void setValidateXML(boolean validateXML)
+    {
+        if (validateXML) {
+            this.documentBuilder.setErrorHandler(this.errorHandler);
+        } else {
+            this.documentBuilder.setErrorHandler(null);
+        }
+    }
+
+    /**
      * {@inheritDoc}
      * 
      * @see org.xwiki.validator.Validator#setDocument(java.io.InputStream)

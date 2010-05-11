@@ -100,7 +100,7 @@ public abstract class AbstractXMLValidator implements Validator
             return this.errorHandler.getErrors();
         }
 
-        validate();
+        validate(this.document);
 
         return this.errorHandler.getErrors();
     }

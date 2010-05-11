@@ -59,13 +59,23 @@ public abstract class AbstractXMLValidator implements Validator
      */
     public AbstractXMLValidator()
     {
+        this(true);
+    }
+
+    /**
+     * Constructor.
+     * 
+     * @param validateXML indicate if the XML input should be validated.
+     */
+    public AbstractXMLValidator(boolean validateXML)
+    {
         DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
         factory.setValidating(true);
 
         try {
             this.documentBuilder = factory.newDocumentBuilder();
             this.documentBuilder.setEntityResolver(new XMLResourcesEntityResolver());
-            this.documentBuilder.setErrorHandler(this.errorHandler);
+            setValidateXML(validateXML);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }

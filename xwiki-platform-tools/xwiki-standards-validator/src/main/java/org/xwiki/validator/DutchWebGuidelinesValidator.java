@@ -1031,7 +1031,8 @@ public class DutchWebGuidelinesValidator extends AbstractDOMValidator
         String exprString = "//@style";
         assertFalse(Type.ERROR, "rpd9s1.attr", ((Boolean) evaluate(getElement(ELEM_BODY), exprString,
             XPathConstants.BOOLEAN)));
-        assertFalse(Type.ERROR, "rpd9s1.tag", getChildren(getElement(ELEM_BODY), "style").getNodeList().getLength() > 0);
+        assertFalse(Type.ERROR, "rpd9s1.tag",
+            getChildren(getElement(ELEM_BODY), "style").getNodeList().getLength() > 0);
     }
 
     /**
@@ -1396,7 +1397,8 @@ public class DutchWebGuidelinesValidator extends AbstractDOMValidator
     public void validateRpd13s18()
     {
         String exprString = "//input[@type='reset']";
-        assertFalse(Type.ERROR, "rpd13s18.reset", (Boolean) evaluate(this.document, exprString, XPathConstants.BOOLEAN));
+        assertFalse(Type.ERROR, "rpd13s18.reset", (Boolean) evaluate(this.document, exprString,
+            XPathConstants.BOOLEAN));
     }
 
     /**
@@ -1473,7 +1475,8 @@ public class DutchWebGuidelinesValidator extends AbstractDOMValidator
     public void validateRpd16s1()
     {
         NodeListIterable metas =
-            new NodeListIterable((NodeList) evaluate(this.document, CONTENT_TYPE_META_SELECTOR, XPathConstants.NODESET));
+            new NodeListIterable((NodeList) evaluate(this.document, CONTENT_TYPE_META_SELECTOR,
+                XPathConstants.NODESET));
 
         assertTrue(Type.ERROR, "rpd16s1.nometa", metas.getNodeList().getLength() > 0);
 
@@ -1489,7 +1492,8 @@ public class DutchWebGuidelinesValidator extends AbstractDOMValidator
     public void validateRpd16s2()
     {
         NodeListIterable metas =
-            new NodeListIterable((NodeList) evaluate(this.document, CONTENT_TYPE_META_SELECTOR, XPathConstants.NODESET));
+            new NodeListIterable((NodeList) evaluate(this.document, CONTENT_TYPE_META_SELECTOR,
+                XPathConstants.NODESET));
 
         assertTrue(Type.ERROR, "rpd16s2.nometa", metas.getNodeList().getLength() > 0);
 

@@ -442,7 +442,7 @@ public class XWikiLDAPUtils
     {
         Map<String, String> groupMembers = getGroupMembers(groupDN, context);
 
-        if(groupMembers != null) {
+        if (groupMembers != null) {
             for (String memberDNEntry : groupMembers.keySet()) {
                 if (memberDNEntry.equals(memberDN.toLowerCase())) {
                     return true;

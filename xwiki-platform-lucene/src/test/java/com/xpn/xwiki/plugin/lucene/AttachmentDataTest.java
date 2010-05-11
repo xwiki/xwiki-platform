@@ -88,31 +88,31 @@ public class AttachmentDataTest extends AbstractBridgedXWikiComponentTestCase
 
     public void testGetFullTextFromTxt() throws XWikiException, IOException
     {
-        assertGetFullText("text content\n", "txt.txt");
+        assertGetFullText("txt.txt text content\n", "txt.txt");
     }
 
     public void testGetFullTextFromMSOffice97() throws XWikiException, IOException
     {
-        assertGetFullText("MS Office 97 content\r\n\n", "msoffice97.doc");
+        assertGetFullText("msoffice97.doc MS Office 97 content\r\n\n", "msoffice97.doc");
     }
 
     public void testGetFullTextFromOpenXML() throws XWikiException, IOException
     {
-        assertGetFullText("OpenXML content\n", "openxml.docx");
+        assertGetFullText("openxml.docx OpenXML content\n", "openxml.docx");
     }
 
     public void testGetFullTextFromOpenDocument() throws XWikiException, IOException
     {
-        assertGetFullText("OpenXML content\n", "opendocument.odt");
+        assertGetFullText("opendocument.odt OpenDocument content\n", "opendocument.odt");
     }
 
-    public void testGetFullTextFromOpenPDF() throws XWikiException, IOException
+    public void testGetFullTextFromPDF() throws XWikiException, IOException
     {
-        assertGetFullText("PDF content\n\n", "pdf.pdf");
+        assertGetFullText("pdf.pdf PDF content\n\n", "pdf.pdf");
     }
 
     public void testGetFullTextFromZIP() throws XWikiException, IOException
     {
-        assertGetFullText("zip.txt\nzip content\n\n\n\n", "zip.zip");
+        assertGetFullText("zip.zip zip.txt\nzip content\n\n\n\n", "zip.zip");
     }
 }

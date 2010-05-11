@@ -272,6 +272,24 @@ public abstract class AbstractDOMValidator extends AbstractXMLValidator
     protected XPath xpath = XPathFactory.newInstance().newXPath();
 
     /**
+     * Constructor.
+     */
+    public AbstractDOMValidator()
+    {
+        super();
+    }
+
+    /**
+     * Constructor.
+     * 
+     * @param validateXML indicate if the XML input should be validated.
+     */
+    public AbstractDOMValidator(boolean validateXML)
+    {
+        super(validateXML);
+    }
+
+    /**
      * Asserts that a condition is false. If it isn't it puts an error message in the validation results.
      * 
      * @param errorType type of the error

@@ -33,6 +33,14 @@ import org.xwiki.validator.framework.AbstractDOMValidator;
 public class XWikiValidator extends AbstractDOMValidator
 {
     /**
+     * Constructor.
+     */
+    public XWikiValidator()
+    {
+        super(false);
+    }
+
+    /**
      * {@inheritDoc}
      * 
      * @see org.xwiki.validator.framework.AbstractXMLValidator#validate(org.w3c.dom.Document)

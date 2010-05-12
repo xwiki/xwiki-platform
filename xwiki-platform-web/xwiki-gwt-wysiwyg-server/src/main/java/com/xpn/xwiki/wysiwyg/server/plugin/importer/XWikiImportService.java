@@ -30,13 +30,12 @@ import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.gwt.wysiwyg.client.plugin.importer.ImportService;
 import org.xwiki.gwt.wysiwyg.client.wiki.Attachment;
 import org.xwiki.model.reference.AttachmentReference;
-import org.xwiki.model.reference.AttachmentReferenceResolver;
+import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.officeimporter.OfficeImporter;
 import org.xwiki.xml.html.HTMLCleaner;
 import org.xwiki.xml.html.HTMLCleanerConfiguration;
 import org.xwiki.xml.html.HTMLUtils;
-
 
 /**
  * XWiki specific implementation of {@link ImportService}.
@@ -63,12 +62,6 @@ public class XWikiImportService implements ImportService
      */
     @Requirement
     private EntityReferenceSerializer<String> entityReferenceSerializer;
-
-    /**
-     * The component used to parse attachment references.
-     */
-    @Requirement
-    private AttachmentReferenceResolver<String> attachmentReferenceResolver;
 
     /**
      * The component manager. We need it because we have to access some components dynamically.
@@ -104,8 +97,11 @@ public class XWikiImportService implements ImportService
     public String officeToXHTML(Attachment attachment, Map<String, String> cleaningParams)
     {
         try {
+            DocumentReference parent =
+                new DocumentReference(attachment.getReference().getWikiName(),
+                    attachment.getReference().getSpaceName(), attachment.getReference().getPageName());
             AttachmentReference attachmentReference =
-                this.attachmentReferenceResolver.resolve(attachment.getReference());
+                new AttachmentReference(attachment.getReference().getFileName(), parent);
             // OfficeImporter should be improved to use DocumentName instead of String. This will remove the need for a
             // DocumentNameSerializer.
             return officeImporter.importAttachment(this.entityReferenceSerializer.serialize(attachmentReference

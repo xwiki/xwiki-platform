@@ -20,6 +20,7 @@
 package com.xpn.xwiki.wysiwyg.server.wiki.internal;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
@@ -29,23 +30,18 @@ import org.apache.commons.logging.LogFactory;
 import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.component.annotation.Requirement;
 import org.xwiki.context.Execution;
-import org.xwiki.gwt.wysiwyg.client.plugin.link.LinkConfig;
 import org.xwiki.gwt.wysiwyg.client.wiki.Attachment;
+import org.xwiki.gwt.wysiwyg.client.wiki.EntityConfig;
 import org.xwiki.gwt.wysiwyg.client.wiki.WikiPage;
 import org.xwiki.gwt.wysiwyg.client.wiki.WikiService;
-import org.xwiki.model.EntityType;
-import org.xwiki.model.reference.AttachmentReference;
 import org.xwiki.model.reference.DocumentReference;
-import org.xwiki.model.reference.DocumentReferenceResolver;
-import org.xwiki.model.reference.EntityReference;
-import org.xwiki.model.reference.EntityReferenceSerializer;
-import org.xwiki.model.reference.WikiReference;
 import org.xwiki.rendering.syntax.Syntax;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiAttachment;
 import com.xpn.xwiki.doc.XWikiDocument;
+import com.xpn.xwiki.wysiwyg.server.wiki.LinkService;
 
 /**
  * The default implementation for {@link WikiService}.
@@ -60,23 +56,6 @@ public class DefaultWikiService implements WikiService
     private static final Log LOG = LogFactory.getLog(DefaultWikiService.class);
 
     /**
-     * The name of the view action.
-     */
-    private static final String VIEW_ACTION = "view";
-
-    /**
-     * The component used to serialize XWiki document references.
-     */
-    @Requirement
-    private EntityReferenceSerializer<String> entityReferenceSerializer;
-
-    /**
-     * Used to construct a valid document reference.
-     */
-    @Requirement("default/reference")
-    private DocumentReferenceResolver<EntityReference> defaultReferenceDocumentReferenceResolver;
-
-    /**
      * The component used to access documents. This is temporary till XWiki model is moved into components.
      */
     @Requirement
@@ -85,6 +64,17 @@ public class DefaultWikiService implements WikiService
     /** Execution context handler, needed for accessing the XWikiContext. */
     @Requirement
     private Execution execution;
+
+    /**
+     * The service used to create links.
+     */
+    @Requirement
+    private LinkService linkService;
+
+    /**
+     * The object used to convert between client-side entity references and server-side entity references.
+     */
+    private final EntityReferenceConverter entityReferenceConverter = new EntityReferenceConverter();
 
     /**
      * @return the XWiki context
@@ -183,15 +173,13 @@ public class DefaultWikiService implements WikiService
         XWikiContext xcontext = getXWikiContext();
         String database = xcontext.getDatabase();
         List<DocumentReference> documentReferences = null;
-        List<String> pagesNames = new ArrayList<String>();
-        List<String> params = new ArrayList<String>();
-        params.add(spaceName);
         String query = "where doc.space = ? order by doc.fullName asc";
+        List<String> parameters = Arrays.asList(spaceName);
         try {
             if (wikiName != null) {
                 xcontext.setDatabase(wikiName);
             }
-            documentReferences = xcontext.getWiki().getStore().searchDocumentReferences(query, params, xcontext);
+            documentReferences = xcontext.getWiki().getStore().searchDocumentReferences(query, parameters, xcontext);
         } catch (XWikiException e) {
             LOG.error(e.getLocalizedMessage(), e);
         } finally {
@@ -199,6 +187,7 @@ public class DefaultWikiService implements WikiService
                 xcontext.setDatabase(database);
             }
         }
+        List<String> pagesNames = new ArrayList<String>();
         if (documentReferences != null) {
             for (DocumentReference documentReference : documentReferences) {
                 pagesNames.add(documentReference.getName());
@@ -216,14 +205,11 @@ public class DefaultWikiService implements WikiService
     {
         try {
             XWikiContext context = getXWikiContext();
-            // NOTE: Currently Oracle doesn't support distinct when a row is BLOB or CLOB. As a consequence we cannot
-            // query distinct documents. This is not a problem though as long as we query only the XWikiDocument table,
-            // which shouldn't contain duplicates.
-            List<XWikiDocument> docs =
-                context.getWiki().search(
-                    "select doc from XWikiDocument doc where doc.author='" + context.getUser()
-                        + "' order by doc.date desc", count, start, context);
-            return prepareDocumentResultsList(docs);
+            String query = "where doc.author = ? order by doc.date desc";
+            List<String> parameters = Arrays.asList(context.getUser());
+            List<DocumentReference> documentReferences =
+                context.getWiki().getStore().searchDocumentReferences(query, count, start, parameters, context);
+            return getWikiPages(documentReferences);
         } catch (XWikiException e) {
             LOG.error(e.getLocalizedMessage(), e);
             throw new RuntimeException("Failed to retrieve the lists of recently modified pages.", e);
@@ -238,35 +224,24 @@ public class DefaultWikiService implements WikiService
     public List<WikiPage> getMatchingPages(String keyword, int start, int count)
     {
         try {
-            String quote = "'";
-            String doubleQuote = "''";
-            // FIXME: this fullname comparison with the keyword does not contain the wiki name
-            String escapedKeyword = keyword.replaceAll(quote, doubleQuote).toLowerCase();
-            // add condition for the doc to not be in the list of blacklisted spaces.
-            // TODO: might be a pb with scalability of this
-            String noBlacklistedSpaces = "";
             List<String> blackListedSpaces = getBlackListedSpaces();
-            if (!blackListedSpaces.isEmpty()) {
-                StringBuffer spacesList = new StringBuffer();
-                for (String bSpace : blackListedSpaces) {
-                    if (spacesList.length() > 0) {
-                        spacesList.append(", ");
-                    }
-                    spacesList.append(quote);
-                    spacesList.append(bSpace.replaceAll(quote, doubleQuote));
-                    spacesList.append(quote);
-                }
-                noBlacklistedSpaces = "doc.web not in (" + spacesList.toString() + ") and ";
+            String notInBlackListedSpaces = "";
+            if (blackListedSpaces.size() > 0) {
+                notInBlackListedSpaces =
+                    "doc.web not in (?" + StringUtils.repeat(",?", blackListedSpaces.size() - 1) + ") and ";
             }
-            // NOTE: Currently Oracle doesn't support distinct when a row is BLOB or CLOB. As a consequence we cannot
-            // query distinct documents. This is not a problem though as long as we query only the XWikiDocument table,
-            // which shouldn't contain duplicates.
-            List<XWikiDocument> docs =
-                getXWikiContext().getWiki().search(
-                    "select doc from XWikiDocument as doc where " + noBlacklistedSpaces + "(lower(doc.title) like '%"
-                        + escapedKeyword + "%' or lower(doc.fullName) like '%" + escapedKeyword + "%')", count, start,
-                    getXWikiContext());
-            return prepareDocumentResultsList(docs);
+            String query =
+                "where " + notInBlackListedSpaces + "(lower(doc.title) like '%'||?||'%' or"
+                    + " lower(doc.fullName) like '%'||?||'%')" + " order by doc.fullName asc";
+            List<String> parameters = new ArrayList<String>(blackListedSpaces);
+            // Add twice the keyword, once for the document title and once for the document name.
+            parameters.add(keyword.toLowerCase());
+            parameters.add(keyword.toLowerCase());
+
+            XWikiContext context = getXWikiContext();
+            List<DocumentReference> documentReferences =
+                context.getWiki().getStore().searchDocumentReferences(query, count, start, parameters, context);
+            return getWikiPages(documentReferences);
         } catch (XWikiException e) {
             LOG.error(e.getLocalizedMessage(), e);
             throw new RuntimeException("Failed to search XWiki pages.", e);
@@ -274,68 +249,52 @@ public class DefaultWikiService implements WikiService
     }
 
     /**
-     * Helper function to prepare a list of {@link WikiPage}s (with full name, title, etc) from a list of document
-     * names.
+     * Helper function to create a list of {@link WikiPage}s from a list of document references.
      * 
-     * @param docs the list of the documents to include in the list
-     * @return the list of {@link WikiPage}s corresponding to the passed names
-     * @throws XWikiException if anything goes wrong retrieving the documents
+     * @param documentReferences a list of document references
+     * @return the list of {@link WikiPage}s corresponding to the given document references
+     * @throws XWikiException if anything goes wrong while creating the list of {@link WikiPage}s
      */
-    private List<WikiPage> prepareDocumentResultsList(List<XWikiDocument> docs) throws XWikiException
+    private List<WikiPage> getWikiPages(List<DocumentReference> documentReferences) throws XWikiException
     {
-        List<WikiPage> results = new ArrayList<WikiPage>();
-        for (XWikiDocument doc : docs) {
-            WikiPage page = new WikiPage();
-            page.setName(entityReferenceSerializer.serialize(doc.getDocumentReference()));
-            page.setTitle(doc.getRenderedTitle(Syntax.XHTML_1_0, getXWikiContext()));
-            page.setURL(doc.getURL(VIEW_ACTION, getXWikiContext()));
-            results.add(page);
+        List<WikiPage> wikiPages = new ArrayList<WikiPage>();
+        for (DocumentReference documentReference : documentReferences) {
+            WikiPage wikiPage = new WikiPage();
+            XWikiContext context = getXWikiContext();
+            XWikiDocument document = context.getWiki().getDocument(documentReference, context);
+            wikiPage.setReference(entityReferenceConverter.convert(documentReference));
+            wikiPage.setTitle(document.getRenderedTitle(Syntax.XHTML_1_0, context));
+            wikiPage.setUrl(document.getURL("view", context));
+            wikiPages.add(wikiPage);
         }
-        return results;
+        return wikiPages;
     }
 
     /**
      * {@inheritDoc}
      * 
-     * @see WikiService#getPageLink(String, String, String, String, String)
+     * @see WikiService#getEntityConfig(org.xwiki.gwt.wysiwyg.client.wiki.EntityReference,
+     *      org.xwiki.gwt.wysiwyg.client.wiki.EntityReference)
      */
-    public LinkConfig getPageLink(String wikiName, String spaceName, String pageName, String revision, String anchor)
+    public EntityConfig getEntityConfig(org.xwiki.gwt.wysiwyg.client.wiki.EntityReference origin,
+        org.xwiki.gwt.wysiwyg.client.wiki.EntityReference destination)
     {
-        String queryString = StringUtils.isEmpty(revision) ? null : "rev=" + revision;
-        DocumentReference documentReference = prepareDocumentReference(wikiName, spaceName, pageName);
-        // get the url to the targeted document from the bridge
-        String documentReferenceAsString = this.entityReferenceSerializer.serialize(documentReference);
-        String pageURL = documentAccessBridge.getURL(documentReferenceAsString, VIEW_ACTION, queryString, anchor);
-
-        // get a document name serializer to return the page reference
-        if (queryString != null) {
-            documentReferenceAsString += "?" + queryString;
-        }
-        if (!StringUtils.isEmpty(anchor)) {
-            documentReferenceAsString += "#" + anchor;
-        }
-
-        // create the link reference
-        LinkConfig linkConfig = new LinkConfig();
-        linkConfig.setUrl(pageURL);
-        linkConfig.setReference(documentReferenceAsString);
-
-        return linkConfig;
+        return linkService.getEntityConfig(origin, destination);
     }
 
     /**
      * {@inheritDoc}
      * 
-     * @see WikiService#getAttachment(String, String, String, String)
+     * @see WikiService#getAttachment(org.xwiki.gwt.wysiwyg.client.wiki.EntityReference)
      */
-    public Attachment getAttachment(String wikiName, String spaceName, String pageName, String attachmentName)
+    public Attachment getAttachment(org.xwiki.gwt.wysiwyg.client.wiki.EntityReference attachmentReference)
     {
-        Attachment attach = new Attachment();
-
         XWikiContext context = getXWikiContext();
-        // clean attachment filename to be synchronized with all attachment operations
-        String cleanedFileName = context.getWiki().clearName(attachmentName, false, true, context);
-        DocumentReference documentReference = prepareDocumentReference(wikiName, spaceName, pageName);
+        // Clean attachment filename to be synchronized with all attachment operations.
+        String cleanedFileName = context.getWiki().clearName(attachmentReference.getFileName(), false, true, context);
+        DocumentReference documentReference =
+            new DocumentReference(attachmentReference.getWikiName(), attachmentReference.getSpaceName(),
+                attachmentReference.getPageName());
         XWikiDocument doc;
         try {
             doc = context.getWiki().getDocument(documentReference, context);
@@ -344,70 +303,37 @@ public class DefaultWikiService implements WikiService
             return null;
         }
         if (doc.isNew()) {
-            String documentName = entityReferenceSerializer.serialize(documentReference);
-            LOG.warn(String.format("Failed to get attachment: %s document doesn't exist.", documentName));
+            LOG.warn(String.format("Failed to get attachment: %s document doesn't exist.", documentReference));
             return null;
         }
-        // check for the existence of the attachment
         if (doc.getAttachment(cleanedFileName) == null) {
             LOG.warn(String.format("Failed to get attachment: %s not found.", cleanedFileName));
             return null;
         }
-        // all right, now set the reference and url and return
-        String attachmentReferenceAsString =
-            this.entityReferenceSerializer.serialize(new AttachmentReference(cleanedFileName, documentReference));
-        attach.setReference(attachmentReferenceAsString);
-        attach.setURL(doc.getAttachmentURL(cleanedFileName, context));
 
+        org.xwiki.gwt.wysiwyg.client.wiki.EntityReference foundAttachmentReference =
+            entityReferenceConverter.convert(documentReference);
+        foundAttachmentReference.setType(attachmentReference.getType());
+        foundAttachmentReference.setFileName(cleanedFileName);
+
+        Attachment attach = new Attachment();
+        attach.setReference(foundAttachmentReference);
+        attach.setUrl(doc.getAttachmentURL(cleanedFileName, context));
         return attach;
-    }
-
-    /**
-     * Gets a document reference from the passed parameters, handling the empty wiki, empty space or empty page name.
-     * 
-     * @param wiki the wiki of the document
-     * @param space the space of the document
-     * @param page the page name of the targeted document
-     * @return the completed {@link DocumentReference} corresponding to the passed parameters, with all the missing
-     *         values completed with defaults
-     * @since 2.2M1
-     */
-    protected DocumentReference prepareDocumentReference(String wiki, String space, String page)
-    {
-        // Note: we use the default normalizer instead of the current normalizer because the execution context in which
-        // this component is used doesn't have a current document. This component is used to respond to GWT-RPC requests
-        // which don't have the information required to detect the current document (e.g. these informations can't be
-        // extracted from the request URL).
-
-        EntityReference reference = null;
-        if (!StringUtils.isEmpty(wiki)) {
-            reference = new EntityReference(wiki, EntityType.WIKI);
-        }
-        if (!StringUtils.isEmpty(space)) {
-            reference = new EntityReference(space, EntityType.SPACE, reference);
-        }
-        if (!StringUtils.isEmpty(page)) {
-            reference = new EntityReference(page, EntityType.DOCUMENT, reference);
-        }
-
-        DocumentReference resolvedReference = this.defaultReferenceDocumentReferenceResolver.resolve(reference);
-        if (StringUtils.isEmpty(wiki)) {
-            resolvedReference.setWikiReference(new WikiReference(getXWikiContext().getDatabase()));
-        }
-        return resolvedReference;
     }
 
     /**
      * {@inheritDoc}
      * 
-     * @see WikiService#getImageAttachments(String, String, String)
+     * @see WikiService#getImageAttachments(org.xwiki.gwt.wysiwyg.client.wiki.EntityReference)
      */
-    public List<Attachment> getImageAttachments(String wikiName, String spaceName, String pageName)
+    public List<Attachment> getImageAttachments(org.xwiki.gwt.wysiwyg.client.wiki.EntityReference reference)
     {
         List<Attachment> imageAttachments = new ArrayList<Attachment>();
-        List<Attachment> allAttachments = getAttachments(wikiName, spaceName, pageName);
+        List<Attachment> allAttachments = getAttachments(reference);
         for (Attachment attachment : allAttachments) {
             if (attachment.getMimeType().startsWith("image/")) {
+                attachment.getReference().setType(org.xwiki.gwt.wysiwyg.client.wiki.EntityReference.EntityType.IMAGE);
                 imageAttachments.add(attachment);
             }
         }
@@ -417,21 +343,25 @@ public class DefaultWikiService implements WikiService
     /**
      * {@inheritDoc}
      * 
-     * @see WikiService#getAttachments(String, String, String)
+     * @see WikiService#getAttachments(org.xwiki.gwt.wysiwyg.client.wiki.EntityReference)
      */
-    public List<Attachment> getAttachments(String wikiName, String spaceName, String pageName)
+    public List<Attachment> getAttachments(org.xwiki.gwt.wysiwyg.client.wiki.EntityReference reference)
     {
         try {
             XWikiContext context = getXWikiContext();
             List<Attachment> attachments = new ArrayList<Attachment>();
-            DocumentReference documentReference = prepareDocumentReference(wikiName, spaceName, pageName);
+            DocumentReference documentReference =
+                new DocumentReference(reference.getWikiName(), reference.getSpaceName(), reference.getPageName());
             XWikiDocument doc = context.getWiki().getDocument(documentReference, context);
             for (XWikiAttachment attach : doc.getAttachmentList()) {
+                org.xwiki.gwt.wysiwyg.client.wiki.EntityReference attachmentReference =
+                    entityReferenceConverter.convert(documentReference);
+                attachmentReference.setType(org.xwiki.gwt.wysiwyg.client.wiki.EntityReference.EntityType.ATTACHMENT);
+                attachmentReference.setFileName(attach.getFilename());
+
                 Attachment currentAttach = new Attachment();
-                currentAttach.setFileName(attach.getFilename());
-                currentAttach.setURL(doc.getAttachmentURL(attach.getFilename(), context));
-                currentAttach.setReference(this.entityReferenceSerializer.serialize(new AttachmentReference(attach
-                    .getFilename(), documentReference)));
+                currentAttach.setUrl(doc.getAttachmentURL(attach.getFilename(), context));
+                currentAttach.setReference(attachmentReference);
                 currentAttach.setMimeType(attach.getMimeType(context));
                 attachments.add(currentAttach);
             }
@@ -440,5 +370,29 @@ public class DefaultWikiService implements WikiService
             LOG.error(e.getLocalizedMessage(), e);
             throw new RuntimeException("Failed to retrieve the list of attachments.", e);
         }
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see WikiService#getUploadURL(org.xwiki.gwt.wysiwyg.client.wiki.EntityReference)
+     */
+    public String getUploadURL(org.xwiki.gwt.wysiwyg.client.wiki.EntityReference documentReference)
+    {
+        return documentAccessBridge.getDocumentURL(new DocumentReference(documentReference.getWikiName(),
+            documentReference.getSpaceName(), documentReference.getPageName()), "upload", null, null);
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see WikiService#parseLinkReference(String, org.xwiki.gwt.wysiwyg.client.wiki.EntityReference.EntityType,
+     *      org.xwiki.gwt.wysiwyg.client.wiki.EntityReference)
+     */
+    public org.xwiki.gwt.wysiwyg.client.wiki.EntityReference parseLinkReference(String linkReference,
+        org.xwiki.gwt.wysiwyg.client.wiki.EntityReference.EntityType entityType,
+        org.xwiki.gwt.wysiwyg.client.wiki.EntityReference baseReference)
+    {
+        return linkService.parseLinkReference(linkReference, entityType, baseReference);
     }
 }

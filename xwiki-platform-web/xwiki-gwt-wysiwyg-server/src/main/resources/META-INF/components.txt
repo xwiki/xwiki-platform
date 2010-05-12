@@ -7,3 +7,4 @@ com.xpn.xwiki.wysiwyg.server.plugin.importer.XWikiImportService
 com.xpn.xwiki.wysiwyg.server.plugin.sync.XWikiSyncService
 com.xpn.xwiki.wysiwyg.server.plugin.sync.internal.DefaultSyncEngine
 com.xpn.xwiki.wysiwyg.server.wiki.internal.DefaultWikiService
+com.xpn.xwiki.wysiwyg.server.wiki.internal.DefaultLinkService

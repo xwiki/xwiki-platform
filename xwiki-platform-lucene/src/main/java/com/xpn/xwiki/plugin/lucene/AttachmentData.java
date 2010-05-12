@@ -23,11 +23,13 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.document.Field;
+import org.apache.tika.Tika;
 import org.apache.tika.metadata.Metadata;
 import org.apache.tika.parser.AutoDetectParser;
 import org.apache.tika.parser.ParseContext;
 import org.apache.tika.parser.Parser;
 import org.apache.tika.sax.BodyContentHandler;
+import org.apache.tika.sax.WriteOutContentHandler;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.doc.XWikiAttachment;
@@ -156,23 +158,12 @@ public class AttachmentData extends IndexData
             LOG.debug("Start parsing attachement [" + this.filename + "] in document [" + doc.getPrefixedFullName()
                 + "]");
 
-            Parser parser = new AutoDetectParser();
-            BodyContentHandler contenthandler = new BodyContentHandler();
+            Tika tika = new Tika();
+
             Metadata metadata = new Metadata();
             metadata.set(Metadata.RESOURCE_NAME_KEY, this.filename);
-            ParseContext parseContext = new ParseContext();
-            parseContext.set(Parser.class, parser);
 
-            parser.parse(att.getContentInputStream(context), contenthandler, metadata, parseContext);
-
-            String title = metadata.get(Metadata.TITLE);
-
-            LOG.debug("* Type: [" + metadata.get(Metadata.CONTENT_TYPE) + "]");
-            LOG.debug("* Title: [" + title + "]");
-            LOG.debug("* Author: [" + metadata.get(Metadata.AUTHOR) + "]");
-
-            return this.filename + (title != null ? " " + metadata.get(Metadata.TITLE) : "") + " "
-                + contenthandler.toString();
+            contentText = this.filename + " " + tika.parseToString(att.getContentInputStream(context), metadata);
         } catch (Throwable e) {
             LOG.warn("error getting content of attachment [" + this.filename + "] for document ["
                 + doc.getPrefixedFullName() + "]", e);

@@ -514,33 +514,31 @@ public class XWiki implements XWikiDocChangeNotificationInterface
             }
         }
 
-        synchronized (host) {
-            // Check if this wiki definition exists in the Database
-            XWikiDocument doc = xwiki.getDocument(wikiDefinition, context);
-            if (doc.isNew()) {
-                throw new XWikiException(XWikiException.MODULE_XWIKI, XWikiException.ERROR_XWIKI_DOES_NOT_EXIST,
-                    "The wiki " + host + " does not exist");
-            }
+        // Check if this wiki definition exists in the Database
+        XWikiDocument doc = xwiki.getDocument(wikiDefinition, context);
+        if (doc.isNew()) {
+            throw new XWikiException(XWikiException.MODULE_XWIKI, XWikiException.ERROR_XWIKI_DOES_NOT_EXIST,
+                "The wiki " + host + " does not exist");
+        }
 
-            // Set the wiki owner
-            String wikiOwner = doc.getStringValue(VIRTUAL_WIKI_DEFINITION_CLASSNAME, "owner");
-            if (wikiOwner.indexOf(":") == -1) {
-                wikiOwner = xwiki.getDatabase() + ":" + wikiOwner;
-            }
-            context.setWikiOwner(wikiOwner);
-            context.setWikiServer(doc);
+        // Set the wiki owner
+        String wikiOwner = doc.getStringValue(VIRTUAL_WIKI_DEFINITION_CLASSNAME, "owner");
+        if (wikiOwner.indexOf(":") == -1) {
+            wikiOwner = xwiki.getDatabase() + ":" + wikiOwner;
+        }
+        context.setWikiOwner(wikiOwner);
+        context.setWikiServer(doc);
 
-            wikiName = StringUtils.removeStart(wikiDefinition.getName(), "XWikiServer").toLowerCase();
-            context.setDatabase(wikiName);
-            context.setOriginalDatabase(wikiName);
+        wikiName = StringUtils.removeStart(wikiDefinition.getName(), "XWikiServer").toLowerCase();
+        context.setDatabase(wikiName);
+        context.setOriginalDatabase(wikiName);
 
-            try {
+        try {
             // Let's make sure the virtual wikis are upgraded to the latest database version
-                xwiki.updateDatabase(wikiName, false, context);
-            } catch (HibernateException ex) {
-                // Just report it, hopefully the database is in a good enough state
-                LOG.error("Failed to upgrade database: " + wikiName, ex);
-            }
+            xwiki.updateDatabase(wikiName, false, context);
+        } catch (HibernateException ex) {
+            // Just report it, hopefully the database is in a good enough state
+            LOG.error("Failed to upgrade database: " + wikiName, ex);
         }
         return xwiki;
     }
@@ -920,36 +918,34 @@ public class XWiki implements XWikiDocChangeNotificationInterface
         updateDatabase(wikiName, force, true, context);
     }
 
-    public void updateDatabase(String appname, boolean force, boolean initClasses, XWikiContext context)
+    public void updateDatabase(String wikiName, boolean force, boolean initClasses, XWikiContext context)
         throws HibernateException, XWikiException
     {
-        synchronized (appname) {
-            String database = context.getDatabase();
-
-            try {
-                List<String> wikilist = getVirtualWikiList();
-                context.setDatabase(appname);
-                if (!wikilist.contains(appname)) {
-                    wikilist.add(appname);
+        String database = context.getDatabase();
+        try {
+            List<String> wikiList = getVirtualWikiList();
+            context.setDatabase(wikiName);
+            synchronized (wikiName) {
+                if (!wikiList.contains(wikiName)) {
+                    wikiList.add(wikiName);
                     XWikiHibernateStore store = getHibernateStore();
                     if (store != null) {
                         store.updateSchema(context, force);
                     }
-                }
 
-                // Make sure these classes exists
-                if (initClasses) {
-                    initializeMandatoryClasses(context);
-                    getPluginManager().virtualInit(context);
-                    getRenderingEngine().virtualInit(context);
+                    // Make sure these classes exists
+                    if (initClasses) {
+                        initializeMandatoryClasses(context);
+                        getPluginManager().virtualInit(context);
+                        getRenderingEngine().virtualInit(context);
+                    }
                 }
-
-                // Add initdone which will allow to
-                // bypass some initializations
-                context.put("initdone", "1");
-            } finally {
-                context.setDatabase(database);
             }
+            // Add initdone which will allow to
+            // bypass some initializations
+            context.put("initdone", "1");
+        } finally {
+            context.setDatabase(database);
         }
     }
 

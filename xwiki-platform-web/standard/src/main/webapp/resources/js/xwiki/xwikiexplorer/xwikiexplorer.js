@@ -1052,13 +1052,24 @@ isc.XWETreeGrid.addMethods({
     getValue : function() {
         return this.input.value;
     },
-    
+
+    /**
+     * Selects the tree node corresponding to the given resource.
+     *
+     * @param resource the resource to be selected
+     */
+    selectResource : function(resource) {
+        this.setValue(XWiki.resource.serialize(resource));
+    },
+
     /**
      * Get a property from the selected resource (ex: wiki, space, page, etc). 
      */
     getSelectedResourceProperty : function(propertyName) {
-        return XWiki.resource.get(this.getValue())[propertyName];
-    },   
+        var value = this.getValue();
+        // If the input field is empty then we consider that there's no selected resource.
+        return value.length > 0 ? XWiki.resource.get(value)[propertyName] : null;
+    },
 
     /**
      * Is the selected resource a new page.
@@ -1070,7 +1081,7 @@ isc.XWETreeGrid.addMethods({
           return true;
         }
         return this.getSelectedRecord().isNewPage;
-    },    
+    },
 
     /**
      * Is the selected resource a new attachment.

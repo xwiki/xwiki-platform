@@ -173,7 +173,7 @@ Object.extend(XWiki, {
 
       if (!wiki) { wiki = XWiki.currentWiki; }
       if (!space) { space = XWiki.currentSpace; }
-      if (!pageName) { pageName = "WebHome"; }
+      if (!pageName) { pageName = XWiki.currentPage; }
       if (!attachment) { attachment = ""; }
       if (!anchor) { anchor = ""; }
 
@@ -191,6 +191,44 @@ Object.extend(XWiki, {
           attachment: attachment,
           anchor: anchor
        };
+    },
+
+    /**
+     * Serializes the given resource.
+     *
+     * @param resource the resource to be serialized
+     * @return a string that can be passed to the #get(String) method to reconstruct the resource
+     */
+    serialize: function(resource) {
+        var name = '';
+        if (resource.wiki) {
+            name = resource.wiki;
+        }
+        if (resource.space) {
+            if (name.length > 0) {
+                name += XWiki.constants.wikiSpaceSeparator;
+            }
+            name += resource.space;
+        }
+        if (resource.name) {
+            if (name.length > 0) {
+                name += XWiki.constants.spacePageSeparator;
+            }
+            name += resource.name;
+        }
+        if (resource.attachment) {
+            if (name.length > 0) {
+                name += XWiki.constants.pageAttachmentSeparator;
+            }
+            name += resource.attachment;
+        }
+        if (resource.anchor) {
+            if (name.length > 0) {
+                name += XWiki.constants.anchorSeparator;
+            }
+            name += resource.anchor;
+        }
+        return name;
     }
   },
 

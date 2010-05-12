@@ -27,10 +27,10 @@ import java.util.Map;
 
 import org.apache.commons.lang.StringUtils;
 import org.xwiki.bridge.DocumentAccessBridge;
-import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.context.Execution;
+import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.block.MacroBlock;
 import org.xwiki.rendering.block.XDOM;
@@ -80,6 +80,11 @@ public class DefaultWikiMacro implements WikiMacro
      * The key under which macro transformation context will be available inside macro context.
      */
     private static final String MACRO_CONTEXT_KEY = "context";
+
+    /**
+     * The key under which macro can directly return the resulting {@link List} of {@link Block}.
+     */
+    private static final String MACRO_RESULT_KEY = "result";
 
     /**
      * They key used to access the current context document stored in XWikiContext.
@@ -163,7 +168,7 @@ public class DefaultWikiMacro implements WikiMacro
             if (parameterDescriptor.isMandatory() && (null == parameterValue)) {
                 throw new MacroParameterException(String.format("Parameter [%s] is mandatory", parameterName));
             }
-            
+
             // Set default parameter value if applicable.
             Object parameterDefaultValue = parameterDescriptor.getDefaultValue();
             if (parameterValue == null && parameterDefaultValue != null) {
@@ -208,6 +213,7 @@ public class DefaultWikiMacro implements WikiMacro
         macroContext.put(MACRO_PARAMS_KEY, parameters);
         macroContext.put(MACRO_CONTENT_KEY, macroContent);
         macroContext.put(MACRO_CONTEXT_KEY, context);
+        macroContext.put(MACRO_RESULT_KEY, context);
 
         Map xwikiContext = null;
         Object contextDoc = null;
@@ -245,10 +251,17 @@ public class DefaultWikiMacro implements WikiMacro
             }
         }
 
-        List<Block> result = xdom.getChildren();
-        // If in inline mode remove any top level paragraph.
-        if (context.isInline()) {
-            this.parserUtils.removeTopLevelParagraph(result);
+        Object resultObject = macroContext.get(MACRO_RESULT_KEY);
+
+        List<Block> result;
+        if (resultObject != null && resultObject instanceof List) {
+            result = (List<Block>) macroContext.get(MACRO_RESULT_KEY);
+        } else {
+            result = xdom.getChildren();
+            // If in inline mode remove any top level paragraph.
+            if (context.isInline()) {
+                this.parserUtils.removeTopLevelParagraph(result);
+            }
         }
 
         return result;

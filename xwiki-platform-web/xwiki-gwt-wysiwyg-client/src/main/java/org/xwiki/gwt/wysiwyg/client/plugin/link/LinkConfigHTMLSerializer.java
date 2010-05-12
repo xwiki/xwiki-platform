@@ -22,6 +22,7 @@ package org.xwiki.gwt.wysiwyg.client.plugin.link;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.xwiki.gwt.user.client.EscapeUtils;
 import org.xwiki.gwt.user.client.ui.rta.cmd.internal.AbstractInsertElementExecutable.ConfigHTMLSerializer;
 import org.xwiki.gwt.wysiwyg.client.plugin.link.LinkConfig.LinkType;
 
@@ -56,7 +57,7 @@ public final class LinkConfigHTMLSerializer implements ConfigHTMLSerializer<Link
     {
         StringBuffer html = new StringBuffer();
         html.append("<!--startwikilink:");
-        html.append(config.getReference());
+        html.append(EscapeUtils.escapeComment(config.getReference()));
         html.append("--><span");
         html.append(serializeAttribute("class", CLASS_NAME_MAPPING.get(config.getType())));
         html.append("><a");

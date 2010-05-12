@@ -22,6 +22,7 @@ package org.xwiki.gwt.wysiwyg.client.plugin.image;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.xwiki.gwt.user.client.EscapeUtils;
 import org.xwiki.gwt.user.client.StringUtils;
 import org.xwiki.gwt.user.client.ui.rta.cmd.internal.AbstractInsertElementExecutable.ConfigHTMLSerializer;
 import org.xwiki.gwt.wysiwyg.client.plugin.image.ImageConfig.ImageAlignment;
@@ -65,7 +66,7 @@ public final class ImageConfigHTMLSerializer implements ConfigHTMLSerializer<Ima
     {
         StringBuffer imageHTML = new StringBuffer();
         imageHTML.append("<!--startimage:");
-        imageHTML.append(imageConfig.getReference());
+        imageHTML.append(EscapeUtils.escapeComment(imageConfig.getReference()));
         imageHTML.append("--><img src=\"");
         imageHTML.append(imageConfig.getUrl());
 

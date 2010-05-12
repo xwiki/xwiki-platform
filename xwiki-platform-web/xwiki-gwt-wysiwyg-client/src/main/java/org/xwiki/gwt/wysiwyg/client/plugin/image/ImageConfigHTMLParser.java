@@ -23,6 +23,7 @@ import org.xwiki.gwt.dom.client.DOMUtils;
 import org.xwiki.gwt.dom.client.DocumentFragment;
 import org.xwiki.gwt.dom.client.Element;
 import org.xwiki.gwt.dom.client.Style;
+import org.xwiki.gwt.user.client.EscapeUtils;
 import org.xwiki.gwt.user.client.StringUtils;
 import org.xwiki.gwt.user.client.ui.rta.cmd.internal.AbstractInsertElementExecutable.ConfigHTMLParser;
 import org.xwiki.gwt.wysiwyg.client.plugin.image.ImageConfig.ImageAlignment;
@@ -37,6 +38,11 @@ import com.google.gwt.dom.client.Node;
  */
 public class ImageConfigHTMLParser implements ConfigHTMLParser<ImageConfig, ImageElement>
 {
+    /**
+     * The prefix of the start image comment text.
+     */
+    private static final String START_IMAGE = "startimage:";
+
     /**
      * {@inheritDoc}
      * 
@@ -86,10 +92,10 @@ public class ImageConfigHTMLParser implements ConfigHTMLParser<ImageConfig, Imag
         }
         Node startComment = metaData.getFirstChild();
         if (startComment == null || startComment.getNodeType() != DOMUtils.COMMENT_NODE
-            || !startComment.getNodeValue().startsWith("startimage:")) {
+            || !startComment.getNodeValue().startsWith(START_IMAGE)) {
             return null;
         }
-        return startComment.getNodeValue().substring(11);
+        return EscapeUtils.unescapeBackslash(startComment.getNodeValue().substring(START_IMAGE.length()));
     }
 
     /**

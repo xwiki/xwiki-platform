@@ -21,13 +21,13 @@ package org.xwiki.gwt.wysiwyg.client.plugin.link;
 
 import org.xwiki.gwt.dom.client.DocumentFragment;
 import org.xwiki.gwt.dom.client.Element;
+import org.xwiki.gwt.user.client.EscapeUtils;
 import org.xwiki.gwt.user.client.ui.rta.cmd.internal.AbstractInsertElementExecutable.ConfigHTMLParser;
 import org.xwiki.gwt.wysiwyg.client.plugin.image.ImageConfigHTMLParser;
 import org.xwiki.gwt.wysiwyg.client.plugin.link.LinkConfig.LinkType;
 
 import com.google.gwt.dom.client.AnchorElement;
 import com.google.gwt.dom.client.ImageElement;
-import com.google.gwt.dom.client.Node;
 
 /**
  * Creates an {@link LinkConfig} object from an {@link AnchorElement}.
@@ -54,10 +54,10 @@ public class LinkConfigHTMLParser implements ConfigHTMLParser<LinkConfig, Anchor
         DocumentFragment linkMetadata = Element.as(anchor).getMetaData();
         if (linkMetadata != null) {
             // Process the meta data.
-            Node startComment = linkMetadata.getChildNodes().getItem(0);
+            String startComment = linkMetadata.getChildNodes().getItem(0).getNodeValue();
             Element wrappingSpan = (Element) linkMetadata.getChildNodes().getItem(1);
-            linkConfig.setType(parseLinkType(wrappingSpan, startComment.getNodeValue().substring(14)));
-            linkConfig.setReference(startComment.getNodeValue().substring(14));
+            linkConfig.setReference(EscapeUtils.unescapeBackslash(startComment.substring("startwikilink:".length())));
+            linkConfig.setType(parseLinkType(wrappingSpan, linkConfig.getReference()));
         } else {
             // It's an external link.
             linkConfig.setType(LinkType.EXTERNAL);

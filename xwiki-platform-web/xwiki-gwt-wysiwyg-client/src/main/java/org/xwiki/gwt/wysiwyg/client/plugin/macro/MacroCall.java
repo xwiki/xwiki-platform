@@ -22,6 +22,8 @@ package org.xwiki.gwt.wysiwyg.client.plugin.macro;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.xwiki.gwt.user.client.EscapeUtils;
+
 /**
  * Stores information about a macro call.
  * 
@@ -74,7 +76,7 @@ public class MacroCall
     public MacroCall(String startMacroComment)
     {
         // Unescape the text of the start macro comment.
-        String text = unescape(startMacroComment);
+        String text = EscapeUtils.unescapeBackslash(startMacroComment);
 
         // Extract macro name.
         int start = START_MACRO.length();
@@ -99,7 +101,7 @@ public class MacroCall
                 end++;
             }
 
-            setArgument(argumentName, unescape(text.substring(start, end)));
+            setArgument(argumentName, EscapeUtils.unescapeBackslash(text.substring(start, end)));
 
             // Look for the next argument.
             start = end + 1;
@@ -216,7 +218,7 @@ public class MacroCall
             strBuff.append(content);
         }
 
-        return escapeComment(strBuff.toString());
+        return EscapeUtils.escapeComment(strBuff.toString());
     }
 
     /**
@@ -228,56 +230,5 @@ public class MacroCall
     private String escapeMacroParameterValue(String value)
     {
         return value.replaceAll("([\\\\\\\"])", "\\\\$1");
-    }
-
-    /**
-     * Unescapes characters escaped with backslash.
-     * 
-     * @param text the text to be unescaped
-     * @return the unescaped text
-     */
-    private String unescape(String text)
-    {
-        StringBuffer result = new StringBuffer();
-        boolean escaped = false;
-        for (char c : text.toCharArray()) {
-            if (!escaped && c == '\\') {
-                escaped = true;
-                continue;
-            }
-
-            result.append(c);
-            escaped = false;
-        }
-        return result.toString();
-    }
-
-    /**
-     * Escapes the {@code --} sequence before setting the text of a comment DOM node.
-     * 
-     * @param text the text that needs to be put in a comment node
-     * @return the escaped text, which will be put in a comment node
-     */
-    private String escapeComment(String text)
-    {
-        StringBuffer result = new StringBuffer();
-        char lastChar = 0;
-        for (char c : text.toCharArray()) {
-            if (c == '\\') {
-                // Escape the backslash (the escaping character).
-                result.append('\\');
-            } else if (c == '-' && lastChar == '-') {
-                // Escape the second short dash.
-                result.append('\\');
-            }
-
-            result.append(c);
-            lastChar = c;
-        }
-        if (lastChar == '-') {
-            // If the comment data ends with a short dash, add an escaping character.
-            result.append('\\');
-        }
-        return result.toString();
     }
 }

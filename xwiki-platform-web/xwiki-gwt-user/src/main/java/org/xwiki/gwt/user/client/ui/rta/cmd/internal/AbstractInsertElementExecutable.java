@@ -27,6 +27,7 @@ import org.xwiki.gwt.user.client.Cache.CacheCallback;
 import org.xwiki.gwt.user.client.ui.rta.RichTextArea;
 
 import com.google.gwt.core.client.JsArrayString;
+import com.google.gwt.core.client.JsonUtils;
 
 /**
  * Base class for executables that insert or update HTML elements.
@@ -122,7 +123,7 @@ public abstract class AbstractInsertElementExecutable<C, E extends com.google.gw
          */
         protected String serialize(String property, Object value)
         {
-            return value != null ? property + ":'" + value.toString().replace("'", "\\'") + '\'' : "";
+            return value != null ? property + ":" + JsonUtils.escapeValue(value.toString()) : "";
         }
 
         /**

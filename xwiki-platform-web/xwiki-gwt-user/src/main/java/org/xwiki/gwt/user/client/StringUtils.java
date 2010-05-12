@@ -54,4 +54,14 @@ public class StringUtils
     {
         return str.substring(str.lastIndexOf(pattern) + 1);
     }
+
+    /**
+     * @param expected the expected string
+     * @param actual the actual string
+     * @return {@code true} if the given strings are equal, {@code false} otherwise
+     */
+    public static boolean areEqual(String expected, String actual)
+    {
+        return expected == actual || (expected != null && expected.equals(actual));
+    }
 }

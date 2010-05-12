@@ -280,7 +280,7 @@ public class Wizard implements NavigationListener, CloseHandler<CompositeDialogB
     {
         // unload things from the dialog
         unloadCurrentStep();
-        Object result = currentStep != null ? currentStep.getResult() : null;
+        Object result = getResult();
         currentStep = null;
         // hide UIs
         hideDialog();
@@ -288,6 +288,14 @@ public class Wizard implements NavigationListener, CloseHandler<CompositeDialogB
         for (WizardListener wListener : wizardListeners) {
             wListener.onFinish(this, result);
         }
+    }
+
+    /**
+     * @return the result of this wizard
+     */
+    protected Object getResult()
+    {
+        return currentStep != null ? currentStep.getResult() : null;
     }
 
     /**

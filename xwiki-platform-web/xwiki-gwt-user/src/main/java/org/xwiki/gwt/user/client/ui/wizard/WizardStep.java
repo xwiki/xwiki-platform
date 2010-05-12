@@ -27,7 +27,7 @@ import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Widget;
 
 /**
- * Defines the behaviour of a wizard step.
+ * Defines the behavior of a wizard step.
  * 
  * @version $Id$
  */

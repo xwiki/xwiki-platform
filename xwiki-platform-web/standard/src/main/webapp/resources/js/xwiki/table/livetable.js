@@ -60,10 +60,13 @@ XWiki.widgets.LiveTable = Class.create({
        || $(options.filtersNode)  // Deprecated option (kept for backward compatibility)
        || $(domNodeName).down(".xwiki-livetable-display-filters") // Default filter node when none precised
     ].flatten().compact();
-    
+
     // Array of nodes under which pagination for this livetable will be displayed.
     this.paginationNodes = options.paginationNodes || $(this.domNodeName).select(".xwiki-livetable-pagination");
 
+     // Array of nodes under which a page size control will be displayed
+    this.pageSizeNodes = options.pageSizeNodes || $(this.domNodeName).select(".xwiki-livetable-pagesize");
+    
     if (typeof options == "undefined") {
        options = {};
     }
@@ -72,6 +75,11 @@ XWiki.widgets.LiveTable = Class.create({
     this.action = options.action || "view"; // FIXME check if this can be removed safely.
 
     this.permalinks = options.permalinks || true;
+
+    // Initialize page size control bounds
+    if (typeof this.pageSizeNodes != "undefined") {
+      this.pageSizer = new LiveTablePageSizer(this, this.pageSizeNodes, options.pageSizeBounds, this.limit);
+    }
 
     // Initialize pagination
     if (typeof this.paginationNodes != "undefined") {
@@ -105,6 +113,17 @@ XWiki.widgets.LiveTable = Class.create({
 
     // Show initial rows
     this.showRows(this.currentOffset, this.limit);
+  },
+  
+  /**
+   * Set the page size of the table and refresh the display
+   * @param pageSize The new maximum number of rows to display per page
+   **/
+  setPageSize: function(pageSize)
+  {
+    this.limit = pageSize;
+    this.clearCache();
+    this.showRows(1, parseInt(this.limit));
   },
 
   /**
@@ -225,6 +244,17 @@ XWiki.widgets.LiveTable = Class.create({
     {
       method: 'get',
       onComplete: function( transport ) {
+        // Let code know loading is finished
+        // 1. Named event (for code interested by that table only)
+        document.fire("xwiki:livetable:" + self.domNodeName + ":loadingComplete", {
+          "status" : transport.status
+        });
+        // 2. Generic event (for code potentially interested in any livetable)
+        document.fire("xwiki:livetable:loadingComplete", {
+          "status" : transport.status,
+          "tableId" : self.domNodeName
+        });
+
         self.loadingStatus.addClassName("hidden");
       },
 
@@ -573,6 +603,66 @@ var LiveTablePagination = Class.create({
     }
 });
 
+/**
+ * Helper class to display the page size control
+ **/
+ var LiveTablePageSizer = Class.create({
+   /**
+    * Create a new instance
+    * @param table The LiveTable
+    * @param domNodes An array of nodes indicating where the controls will be created
+    * @param pageSizeBounds The bounds specification for acceptable values (an array of min, max, step)
+    * @param currentPageSize The currently selected page size.
+    **/
+  initialize: function(table, domNodes, pageSizeBounds, currentPageSize) {
+    this.table = table;
+    this.currentValue = currentPageSize;
+    var bounds = pageSizeBounds || [];
+    this.startValue = bounds[0] || 10;
+    this.step = bounds[2] || 10;
+    this.maxValue = bounds[1] || 100;
+    
+    var self = this;
+    this.pageSizeNodes = [];
+    domNodes.each(function(elem) {
+      self.pageSizeNodes.push(elem.down(".xwiki-livetable-pagesize-content"));
+    });
+    
+    this.pageSizeNodes.each(function(elem) {
+      elem.insert(self.createPageSizeSelectControl());
+    });
+  },
+  
+  /**
+   * Create the page size control using a select node and returns it
+   * @return an Element containing the select
+   **/
+  createPageSizeSelectControl: function() {
+    var select = new Element('select', {'class':'pagesizeselect'});
+    for (var i=this.startValue; i<=this.maxValue; i += this.step) {
+      var attrs = {'value':i, 'text':i}
+      if (i == this.currentValue)
+        attrs.selected = true;
+      else {
+        var prevStep = i - this.step;
+        if (this.currentValue > prevStep && this.currentValue < i) {
+          select.appendChild(new Element('option', {'value':this.currentValue, 'text':this.currentValue, selected:true}).update(this.currentValue));
+        }
+      }
+      select.appendChild(new Element('option', attrs).update(i));
+    }
+    select.observe("change", this.changePageSize.bind(this));
+    return select;
+  },
+  
+  /**
+   * Change the page size of the table
+   **/
+  changePageSize: function(event) {
+    var newLimit =  parseInt($F(Event.element(event)));
+    this.table.setPageSize(newLimit);
+  }
+});
 
 /*
  * The class that deals with the filtering in a table
@@ -879,4 +969,3 @@ if(browser.isIE6x) {
 }
 
 })();
-

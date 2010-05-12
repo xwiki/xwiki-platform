@@ -8,12 +8,18 @@
 }
 .xwiki-livetable-loader , .xwiki-livetable-loader img {
   float: left;
+  line-height: 22px;
 }
 .xwiki-livetable-pagination .xwiki-livetable-limits {
   float: left;
+  line-height: 22px;
 }
 .xwiki-livetable-pagination .xwiki-livetable-limits strong {
   font-weight: normal;
+}
+.xwiki-livetable-pagination .xwiki-livetable-pagesize {
+  line-height: 22px;
+  margin-left: 5px;
 }
 .xwiki-livetable-pagination .xwiki-livetable-pagination-content, .xwiki-livetable-pagination .xwiki-livetable-pagination-text {
   display: inline;
@@ -37,6 +43,7 @@
 .pagination {
   float: right;
   margin-right: 10px;
+  line-height: 22px;
 }
 .controlPagination {
   position: relative;

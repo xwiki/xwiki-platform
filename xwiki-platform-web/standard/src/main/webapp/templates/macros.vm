@@ -1521,6 +1521,8 @@ ${Msz}Mb##
   #if("$!options.tagCloud" == '' || $options.tagCloud == false) #set($tagcloud=false) #else #set($tagcloud = true) #end
   #if("$!options.javascriptName" != '') #set($jsName = $options.javascriptName) #else #set($jsName = 'livetable') #end
   #if("$!options.topFilters" != '') #set($topfilters = $options.topFilters) #end
+  #if("$options.pageSize" == '' || $!options.pageSize == false) #set($hasPageSize=false) #else #set($hasPageSize = true) #end
+  #if("$!options.pageSizeBounds" != '') #set($pageSizeBounds = $options.pageSizeBounds) #end
   #set($classname = "$!options.className")
   #set($extraparams = "$!options.extraParams")
   ##
@@ -1591,6 +1593,12 @@ ${Msz}Mb##
     <tr>
       <td class="xwiki-livetable-pagination">
         <span id="${divid}-limits" class="xwiki-livetable-limits"></span>
+  #if($hasPageSize)
+        <span id="${divid}-pagesize" class="xwiki-livetable-pagesize">
+            <span>$msg.get('xe.livetable.pagesize.label')</span>
+            <span class="xwiki-livetable-pagesize-content" ></span>
+        </span>
+  #end
         <span id="${divid}-ajax-loader" class="xwiki-livetable-loader hidden">
           <img src="$xwiki.getSkinFile('icons/xwiki/ajax-loader-large.gif')" alt="$msg.get('xe.livetable.loading')" title="" />
         </span>
@@ -1713,13 +1721,19 @@ ${Msz}Mb##
                          "maxPages":$maxPages
 	                    ,"limit":$count
      #if($hasTopFilters),"filterNodes" : [$("${divid}").down(".xwiki-livetable-display-filters"), $('${divid}-topfilters')]#end
+     #if($hasPageSize && "$!pageSizeBounds" != ''),"pageSizeBounds" : $pageSizeBounds#end
 	          });
   #else
     $jsName = new XWiki.widgets.LiveTable("$dataurl", "${divid}", #livetablecallback($divid $collist $colprops $transprefix), {             
                          "maxPages":$maxPages
 	                    ,"limit":$count
      #if($hasTopFilters),"filterNodes" : [$("${divid}").down(".xwiki-livetable-display-filters"), $('${divid}-topfilters')]#end
+     #if($hasPageSize && "$!pageSizeBounds" != ''),"pageSizeBounds" : $pageSizeBounds#end
 	          });
+  #end
+  #if($!hasPageSize)
+    document.observe("xwiki:livetable:${divid}:loadingEntries", function() { $('${divid}-pagesize').addClassName("hidden"); } );
+    document.observe("xwiki:livetable:${divid}:loadingComplete", function() { $('${divid}-pagesize').removeClassName("hidden"); } );
   #end
   }
    //]]>

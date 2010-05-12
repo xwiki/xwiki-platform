@@ -178,7 +178,6 @@ import com.xpn.xwiki.web.Utils;
 import com.xpn.xwiki.web.XWikiEngineContext;
 import com.xpn.xwiki.web.XWikiMessageTool;
 import com.xpn.xwiki.web.XWikiRequest;
-import com.xpn.xwiki.web.XWikiServletURLFactory;
 import com.xpn.xwiki.web.XWikiURLFactory;
 import com.xpn.xwiki.web.XWikiURLFactoryService;
 import com.xpn.xwiki.web.XWikiURLFactoryServiceImpl;
@@ -262,7 +261,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface
     /**
      * The cache containing the names of the wikis already initialized.
      */
-    private Cache<String> virtualWikiMap;
+    private Cache<DocumentReference> virtualWikiMap;
 
     private boolean isReadOnly = false;
 
@@ -437,95 +436,103 @@ public class XWiki implements XWikiDocChangeNotificationInterface
         return xwikicfgis;
     }
 
+    /**
+     * Return the XWiki object (as in "the Wiki API") corresponding to the requested wiki.
+     * 
+     * @param context the current context
+     * @return an XWiki object configured for the wiki corresponding to the current request
+     * @throws XWikiException if the requested URL does not correspond to a real wiki, or if there's an error in the
+     *             storage
+     */
     public static XWiki getXWiki(XWikiContext context) throws XWikiException
     {
         XWiki xwiki = getMainXWiki(context);
+        if (!xwiki.isVirtualMode()) {
+            return xwiki;
+        }
 
-        if (xwiki.isVirtualMode()) {
-            XWikiRequest request = context.getRequest();
-            String host = "";
+        // Host is full.host.name in DNS-based multiwiki, and wikiname in path-based multiwiki.
+        String host = "";
+        // Canonical name of the wiki (database)
+        String wikiName = "";
+        // wikiDefinition should be the document holding the definition of the virtual wiki, a document in the main
+        // wiki with a XWiki.XWikiServerClass object attached to it
+        DocumentReference wikiDefinition;
+
+        XWikiRequest request = context.getRequest();
+        try {
+            URL requestURL = context.getURL();
+            host = requestURL.getHost();
+        } catch (Exception e) {
+        }
+
+        // In path-based multi-wiki, the wiki name is an element of the request path.
+        // The url is in the form /xwiki (app name)/wiki (servlet name)/wikiname/
+        if ("1".equals(xwiki.Param("xwiki.virtual.usepath", "0"))) {
+            String uri = request.getRequestURI();
+            if (LOG.isDebugEnabled()) {
+                LOG.debug("Request uri is: " + uri);
+            }
+            String[] vhi = uri.split("/");
+            if (vhi.length > 2 && vhi[2].equals(xwiki.Param("xwiki.virtual.usepath.servletpath", "wiki"))) {
+                host = vhi[3];
+            }
+        }
+
+        if (StringUtils.isEmpty(host)) {
+            // Can't find any wiki name, return the main wiki
+            return xwiki;
+        }
+
+        wikiDefinition = xwiki.findWikiServer(host, context);
+
+        if (wikiDefinition == null) {
+            // No definition found based on the full domain name/path wiki name, try to use the first part of the domain
+            // name as the wiki name
+            String servername = StringUtils.substringBefore(host, ".");
+
+            if (!"0".equals(xwiki.Param("xwiki.virtual.autowww"))) {
+                // As a convenience, allow sites starting with www, localhost or using an
+                // IP address not to have to create a XWikiServerXwiki page since we consider
+                // in that case that they're pointing to the main wiki.
+                if (servername.equals("www")
+                    || host.equals("localhost")
+                    || host.matches("[0-9]+\\.|[0-9]+\\.[0-9]+\\.[0-9]")) {
+                    return xwiki;
+                } else {
+                    wikiDefinition =
+                        new DocumentReference("xwiki", "XWiki", "XWikiServer"
+                        + StringUtils.capitalize(servername));
+                }
+            }
+        }
+
+        synchronized (host) {
+            // Check if this wiki definition exists in the Database
+            XWikiDocument doc = xwiki.getDocument(wikiDefinition, context);
+            if (doc.isNew()) {
+                throw new XWikiException(XWikiException.MODULE_XWIKI, XWikiException.ERROR_XWIKI_DOES_NOT_EXIST,
+                    "The wiki " + host + " does not exist");
+            }
+
+            // Set the wiki owner
+            String wikiOwner = doc.getStringValue(VIRTUAL_WIKI_DEFINITION_CLASSNAME, "owner");
+            if (wikiOwner.indexOf(":") == -1) {
+                wikiOwner = xwiki.getDatabase() + ":" + wikiOwner;
+            }
+            context.setWikiOwner(wikiOwner);
+            context.setWikiServer(doc);
+
+            wikiName = StringUtils.removeStart(wikiDefinition.getName(), "XWikiServer").toLowerCase();
+            context.setDatabase(wikiName);
+            context.setOriginalDatabase(wikiName);
+
             try {
-                URL requestURL = context.getURL();
-                host = requestURL.getHost();
-            } catch (Exception e) {
-            }
-
-            // we will use an element of the path to get the host
-            // This only happens if the url is in the form contains /xwiki/wiki_wikiname/
-            if ("1".equals(xwiki.Param("xwiki.virtual.usepath", "0"))) {
-                String uri = request.getRequestURI();
-                if (LOG.isDebugEnabled()) {
-                    LOG.debug("Request uri is: " + uri);
-                }
-                String[] vhi = uri.split("/");
-                if (vhi.length > 2 && vhi[2].equals(xwiki.Param("xwiki.virtual.usepath.servletpath", "wiki"))) {
-                    host = vhi[3];
-                }
-            }
-
-            if (host.equals("")) {
-                return xwiki;
-            }
-
-            String appname = xwiki.findWikiServer(host, context);
-
-            if (appname == null) {
-                String uri = request.getRequestURI();
-                int i1 = host.indexOf(".");
-                String servername = (i1 != -1) ? host.substring(0, i1) : host;
-
-                XWikiURLFactory urlf = context.getURLFactory();
-                if ((urlf != null) && (urlf instanceof XWikiServletURLFactory)
-                    && ("".equals(((XWikiServletURLFactory) urlf).getContextPath()))) {
-                    appname = context.getMainXWiki();
-                } else {
-                    appname = uri.substring(1, uri.indexOf("/", 2));
-                }
-
-                if ("0".equals(xwiki.Param("xwiki.virtual.autowww"))) {
-                    appname = servername;
-                } else {
-                    // As a convenience, allow sites starting with www, localhost or using an
-                    // IP address not to have to create a XWikiServerXwiki page since we consider
-                    // in that case that they're pointing to the main wiki.
-                    if ((servername.equals("www"))
-                        || (host.equals("localhost")
-                        || (context.getUtil().match("m|[0-9]+\\.|[0-9]+\\.[0-9]+\\.[0-9]|", host)))) {
-                        if (appname.equals("xwiki")) {
-                            return xwiki;
-                        }
-                    } else {
-                        appname = servername;
-                    }
-                }
-            }
-
-            synchronized (appname) {
-                // Check if this appname exists in the Database
-                String serverwikipage = getServerWikiPage(appname);
-                XWikiDocument doc = xwiki.getDocument(serverwikipage, context);
-                if (doc.isNew()) {
-                    throw new XWikiException(XWikiException.MODULE_XWIKI, XWikiException.ERROR_XWIKI_DOES_NOT_EXIST,
-                        "The wiki " + appname + " does not exist");
-                }
-
-                // Set the wiki owner
-                String wikiOwner = doc.getStringValue("XWiki.XWikiServerClass", "owner");
-                if (wikiOwner.indexOf(":") == -1) {
-                    wikiOwner = xwiki.getDatabase() + ":" + wikiOwner;
-                }
-                context.setWikiOwner(wikiOwner);
-                context.setWikiServer(doc);
-                context.setDatabase(appname);
-                context.setOriginalDatabase(appname);
-
-                try {
-                    // Let's make sure the virtual wikis are upgraded to the latest database version
-                    xwiki.updateDatabase(appname, false, context);
-                } catch (HibernateException e) {
-                    // Just to report it
-                    e.printStackTrace();
-                }
+            // Let's make sure the virtual wikis are upgraded to the latest database version
+                xwiki.updateDatabase(wikiName, false, context);
+            } catch (HibernateException ex) {
+                // Just report it, hopefully the database is in a good enough state
+                LOG.error("Failed to upgrade database: " + wikiName, ex);
             }
         }
         return xwiki;
@@ -985,12 +992,51 @@ public class XWiki implements XWikiDocChangeNotificationInterface
      * @return the cache containing the names of the wikis already initialized.
      * @since 1.5M2.
      */
-    public Cache<String> getVirtualWikiCache()
+    public Cache<DocumentReference> getVirtualWikiCache()
     {
         return this.virtualWikiMap;
     }
 
-    private String findWikiServer(String host, XWikiContext context) throws XWikiException
+    /**
+     * Searches for the document containing the definition of the virtual wiki corresponding to the specified hostname.
+     * 
+     * @param host the hostname, as specified in the request (for example: {@code forge.xwiki.org})
+     * @param context the current context
+     * @return the name of the document containing the wiki definition, or {@code null} if no wiki corresponds to the
+     *         hostname
+     * @throws XWikiException if a problem occurs while searching the storage
+     */
+    private DocumentReference findWikiServer(String host, XWikiContext context) throws XWikiException
+    {
+        this.ensureVirtualWikiMapExists();
+        DocumentReference wikiName = this.virtualWikiMap.get(host);
+
+        if (wikiName == null) {
+            // Not loaded yet, search for it in the main wiki
+            String hql =
+                ", BaseObject as obj, StringProperty as prop WHERE obj.name=doc.fullName"
+                + " AND doc.space='XWiki' AND doc.name LIKE 'XWikiServer%'"
+                + " AND obj.className='XWiki.XWikiServerClass' AND prop.id.id = obj.id"
+                + " AND prop.id.name = 'server' AND prop.value=?";
+            List<String> parameters = new ArrayList<String>(1);
+            parameters.add(host);
+            try {
+                List<DocumentReference> list =
+                    context.getWiki().getStore().searchDocumentReferences(hql, parameters, context);
+                if ((list != null) && (list.size() > 0)) {
+                    wikiName = list.get(0);
+                }
+
+                this.virtualWikiMap.set(host, wikiName);
+            } catch (XWikiException e) {
+                LOG.warn("Error when searching for wiki name from URL host [" + host + "]", e);
+            }
+        }
+
+        return wikiName;
+    }
+
+    private void ensureVirtualWikiMapExists() throws XWikiException
     {
         synchronized (this) {
             if (this.virtualWikiMap == null) {
@@ -1015,31 +1061,6 @@ public class XWiki implements XWikiDocChangeNotificationInterface
                         XWikiException.ERROR_CACHE_INITIALIZING, "Failed to create new cache", e);
                 }
             }
-        }
-        synchronized (host) {
-            String wikiserver = this.virtualWikiMap.get(host);
-
-            if (wikiserver == null) {
-                String hql =
-                    ", BaseObject as obj, StringProperty as prop where obj.name=doc.fullName"
-                    + " and obj.className='XWiki.XWikiServerClass' and prop.id.id = obj.id "
-                    + "and prop.id.name = 'server' and prop.value='" + host + "'";
-                try {
-                    List<String> list = context.getWiki().getStore().searchDocumentsNames(hql, context);
-                    if ((list != null) && (list.size() > 0)) {
-                        String docname = list.get(0);
-                        if (docname.startsWith("XWiki.XWikiServer")) {
-                            wikiserver = docname.substring("XWiki.XWikiServer".length()).toLowerCase();
-                        }
-                    }
-
-                    this.virtualWikiMap.set(host, wikiserver);
-                } catch (XWikiException e) {
-                    LOG.warn("Error when searching for wiki name from URL host [" + host + "]", e);
-                }
-            }
-
-            return wikiserver;
         }
     }
 
@@ -5199,7 +5220,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface
                 ||
                 ((action.equals("skin") || action.equals("download") || action.equals("ssx") || action.equals("jsx")) &&
                 getRightService().hasAccessLevel("view", XWikiRightService.GUEST_USER_FULLNAME,
-                    doc.getPrefixedFullName(), context))
+                doc.getPrefixedFullName(), context))
                 || ((action.equals("view") && doc.getFullName().equals("XWiki.AccountValidation")))) {
                 allow = true;
             } else {

@@ -473,9 +473,16 @@ public class XWiki implements XWikiDocChangeNotificationInterface
             if (LOG.isDebugEnabled()) {
                 LOG.debug("Request uri is: " + uri);
             }
-            String[] vhi = uri.split("/");
-            if (vhi.length > 2 && vhi[2].equals(xwiki.Param("xwiki.virtual.usepath.servletpath", "wiki"))) {
-                host = vhi[3];
+            // Remove the (eventual) context path from the URI, usually /xwiki
+            uri = stripSegmentFromPath(uri, request.getContextPath());
+            // Remove the (eventual) servlet path from the URI, usually /wiki
+            String servletPath = request.getServletPath();
+            uri = stripSegmentFromPath(uri, servletPath);
+
+            if (servletPath.equals("/" + xwiki.Param("xwiki.virtual.usepath.servletpath", "wiki"))) {
+                // Requested path corresponds to a path-based wiki, now the wiki name is between the first and
+                // second "/"
+                host = StringUtils.substringBefore(StringUtils.removeStart(uri, "/"), "/");
             }
         }
 

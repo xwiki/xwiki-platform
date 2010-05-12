@@ -996,15 +996,6 @@ public class XWiki implements XWikiDocChangeNotificationInterface
     }
 
     /**
-     * @return the cache containing the names of the wikis already initialized.
-     * @since 1.5M2.
-     */
-    public Cache<DocumentReference> getVirtualWikiCache()
-    {
-        return this.virtualWikiMap;
-    }
-
-    /**
      * Searches for the document containing the definition of the virtual wiki corresponding to the specified hostname.
      * 
      * @param host the hostname, as specified in the request (for example: {@code forge.xwiki.org})

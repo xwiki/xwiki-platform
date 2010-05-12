@@ -24,7 +24,6 @@ import java.util.List;
 import org.xwiki.gwt.user.client.StringUtils;
 import org.xwiki.gwt.user.client.ui.ListItem;
 import org.xwiki.gwt.wysiwyg.client.Strings;
-import org.xwiki.gwt.wysiwyg.client.wiki.ResourceName;
 import org.xwiki.gwt.wysiwyg.client.wiki.WikiPage;
 import org.xwiki.gwt.wysiwyg.client.wiki.WikiServiceAsync;
 
@@ -68,18 +67,13 @@ public class SearchSelectorWizardStep extends AbstractPageListSelectorWizardStep
     private TextBox searchBox;
 
     /**
-     * The service used to search wiki pages.
-     */
-    private WikiServiceAsync wikiService;
-
-    /**
-     * Builds a search selector wizard step for the passed edited resource.
+     * Creates a new page selector from search results.
      * 
-     * @param editedResource the currently edited resource (page for which editing is done)
+     * @param wikiService the service used to search wiki pages
      */
-    public SearchSelectorWizardStep(ResourceName editedResource)
+    public SearchSelectorWizardStep(WikiServiceAsync wikiService)
     {
-        super(editedResource);
+        super(wikiService);
 
         getMainPanel().addStyleName("xPagesSearch");
         // create the search widget
@@ -131,7 +125,7 @@ public class SearchSelectorWizardStep extends AbstractPageListSelectorWizardStep
     @Override
     protected void fetchData(AsyncCallback<List<WikiPage>> callback)
     {
-        wikiService.getMatchingPages(getKeyword(), 0, 20, callback);
+        getWikiService().getMatchingPages(getKeyword(), 0, 20, callback);
     }
 
     /**
@@ -177,15 +171,5 @@ public class SearchSelectorWizardStep extends AbstractPageListSelectorWizardStep
         } else {
             super.setActive();
         }
-    }
-
-    /**
-     * Injects the wiki service.
-     * 
-     * @param wikiService the service used to search wiki pages
-     */
-    public void setWikiService(WikiServiceAsync wikiService)
-    {
-        this.wikiService = wikiService;
     }
 }

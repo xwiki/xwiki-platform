@@ -24,7 +24,6 @@ import org.xwiki.gwt.dom.client.Element;
 import org.xwiki.gwt.user.client.ui.rta.cmd.internal.AbstractInsertElementExecutable.ConfigHTMLParser;
 import org.xwiki.gwt.wysiwyg.client.plugin.image.ImageConfigHTMLParser;
 import org.xwiki.gwt.wysiwyg.client.plugin.link.LinkConfig.LinkType;
-import org.xwiki.gwt.wysiwyg.client.wiki.ResourceName;
 
 import com.google.gwt.dom.client.AnchorElement;
 import com.google.gwt.dom.client.ImageElement;
@@ -71,8 +70,7 @@ public class LinkConfigHTMLParser implements ConfigHTMLParser<LinkConfig, Anchor
         if (anchor.getChildNodes().getLength() == 1 && "img".equalsIgnoreCase(anchor.getFirstChild().getNodeName())) {
             // The anchor wraps an image.
             ImageElement image = (ImageElement) anchor.getFirstChild();
-            ResourceName imageResource = new ResourceName(imageConfigHTMLParser.parse(image).getReference(), true);
-            linkConfig.setLabelText(imageResource.getFile());
+            linkConfig.setLabelText(imageConfigHTMLParser.parse(image).getReference());
             linkConfig.setReadOnlyLabel(true);
         } else {
             linkConfig.setLabelText(anchor.getInnerText());

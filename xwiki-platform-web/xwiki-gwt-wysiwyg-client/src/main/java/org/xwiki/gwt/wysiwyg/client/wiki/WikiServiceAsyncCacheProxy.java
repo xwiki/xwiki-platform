@@ -21,7 +21,7 @@ package org.xwiki.gwt.wysiwyg.client.wiki;
 
 import java.util.List;
 
-import org.xwiki.gwt.wysiwyg.client.plugin.link.LinkConfig;
+import org.xwiki.gwt.wysiwyg.client.wiki.EntityReference.EntityType;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
 
@@ -150,44 +150,61 @@ public class WikiServiceAsyncCacheProxy implements WikiServiceAsync
     /**
      * {@inheritDoc}
      * 
-     * @see WikiServiceAsync#getPageLink(String, String, String, String, String, AsyncCallback)
+     * @see WikiServiceAsync#getPageLink(EntityReference, EntityReference, AsyncCallback)
      */
-    public void getPageLink(String wikiName, String spaceName, String pageName, String revision, String anchor,
-        AsyncCallback<LinkConfig> async)
+    public void getEntityConfig(EntityReference origin, EntityReference destination, AsyncCallback<EntityConfig> async)
     {
-        service.getPageLink(wikiName, spaceName, pageName, revision, anchor, async);
+        service.getEntityConfig(origin, destination, async);
     }
 
     /**
      * {@inheritDoc}
      * 
-     * @see WikiServiceAsync#getAttachment(String, String, String, String, AsyncCallback)
+     * @see WikiServiceAsync#getAttachment(EntityReference, AsyncCallback)
      */
-    public void getAttachment(String wikiName, String spaceName, String pageName, String attachmentName,
-        AsyncCallback<Attachment> async)
+    public void getAttachment(EntityReference attachmentReference, AsyncCallback<Attachment> async)
     {
-        service.getAttachment(wikiName, spaceName, pageName, attachmentName, async);
+        service.getAttachment(attachmentReference, async);
     }
 
     /**
      * {@inheritDoc}
      * 
-     * @see WikiServiceAsync#getImageAttachments(String, String, String, AsyncCallback)
+     * @see WikiServiceAsync#getImageAttachments(EntityReference, AsyncCallback)
      */
-    public void getImageAttachments(String wikiName, String spaceName, String pageName,
-        AsyncCallback<List<Attachment>> async)
+    public void getImageAttachments(EntityReference documentReference, AsyncCallback<List<Attachment>> async)
     {
-        service.getImageAttachments(wikiName, spaceName, pageName, async);
+        service.getImageAttachments(documentReference, async);
     }
 
     /**
      * {@inheritDoc}
      * 
-     * @see WikiServiceAsync#getAttachments(String, String, String, AsyncCallback)
+     * @see WikiServiceAsync#getAttachments(EntityReference, AsyncCallback)
      */
-    public void getAttachments(String wikiName, String spaceName, String pageName,
-        AsyncCallback<List<Attachment>> async)
+    public void getAttachments(EntityReference documentReference, AsyncCallback<List<Attachment>> async)
     {
-        service.getAttachments(wikiName, spaceName, pageName, async);
+        service.getAttachments(documentReference, async);
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see WikiServiceAsync#getUploadURL(EntityReference, AsyncCallback)
+     */
+    public void getUploadURL(EntityReference documentReference, AsyncCallback<String> async)
+    {
+        service.getUploadURL(documentReference, async);
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see WikiServiceAsync#parseLinkReference(String, EntityType, EntityReference, AsyncCallback)
+     */
+    public void parseLinkReference(String linkReference, EntityType entityType, EntityReference baseReference,
+        AsyncCallback<EntityReference> async)
+    {
+        service.parseLinkReference(linkReference, entityType, baseReference, async);
     }
 }

@@ -31,8 +31,10 @@ import org.xwiki.gwt.wysiwyg.client.widget.PageSelector;
 import org.xwiki.gwt.wysiwyg.client.widget.SpaceSelector;
 import org.xwiki.gwt.wysiwyg.client.widget.WikiSelector;
 import org.xwiki.gwt.wysiwyg.client.widget.wizard.util.AbstractSelectorWizardStep;
-import org.xwiki.gwt.wysiwyg.client.wiki.ResourceName;
+import org.xwiki.gwt.wysiwyg.client.wiki.EntityLink;
+import org.xwiki.gwt.wysiwyg.client.wiki.EntityReference;
 import org.xwiki.gwt.wysiwyg.client.wiki.WikiServiceAsync;
+import org.xwiki.gwt.wysiwyg.client.wiki.EntityReference.EntityType;
 
 import com.google.gwt.event.dom.client.ChangeEvent;
 import com.google.gwt.event.dom.client.ChangeHandler;
@@ -50,8 +52,8 @@ import com.google.gwt.user.client.ui.Widget;
  * 
  * @version $Id$
  */
-public class ImagesExplorerWizardStep extends AbstractSelectorWizardStep<ImageConfig> implements ChangeHandler,
-    SourcesNavigationEvents
+public class ImagesExplorerWizardStep extends AbstractSelectorWizardStep<EntityLink<ImageConfig>> implements
+    ChangeHandler, SourcesNavigationEvents
 {
     /**
      * Loading class for the time to load the step to which it has been toggled.
@@ -72,11 +74,6 @@ public class ImagesExplorerWizardStep extends AbstractSelectorWizardStep<ImageCo
      * Selector for the page to get images from.
      */
     private PageSelector pageSelector;
-
-    /**
-     * The current resource edited by this wizard step.
-     */
-    private ResourceName editedResource;
 
     /**
      * Flag to mark whether this explorer should show the selector to choose an image from a different wiki or not.
@@ -103,16 +100,12 @@ public class ImagesExplorerWizardStep extends AbstractSelectorWizardStep<ImageCo
     /**
      * Builds an image explorer with the default selection on the passed resource.
      * 
-     * @param editedResource the resource edited by the wizard in which this wizard step appears (the page currently
-     *            edited with the wysiwyg)
      * @param displayWikiSelector whether this explorer should show the selector to choose an image from a different
      *            wiki or not
      * @param wikiService the service used to access the wiki
      */
-    public ImagesExplorerWizardStep(ResourceName editedResource, boolean displayWikiSelector,
-        WikiServiceAsync wikiService)
+    public ImagesExplorerWizardStep(boolean displayWikiSelector, WikiServiceAsync wikiService)
     {
-        this.editedResource = editedResource;
         this.wikiService = wikiService;
 
         Label helpLabel = new Label(Strings.INSTANCE.imageSelectImageLocationHelpLabel());
@@ -121,48 +114,48 @@ public class ImagesExplorerWizardStep extends AbstractSelectorWizardStep<ImageCo
         // initialize selectors, mainPanel
         mainPanel.addStyleName("xImagesExplorer");
         this.displayWikiSelector = displayWikiSelector;
-        mainPanel.add(getSelectorsPanel(editedResource.getWiki(), editedResource.getSpace()));
-        pageWizardStep = new CurrentPageImageSelectorWizardStep(editedResource);
-        pageWizardStep.setWikiService(wikiService);
+        mainPanel.add(getSelectorsPanel());
+        pageWizardStep = new CurrentPageImageSelectorWizardStep(wikiService, true);
         mainPanel.add(pageWizardStep.display());
         mainPanel.setExpandingWidget(pageWizardStep.display(), true);
     }
 
     /**
-     * @param currentWiki the current wiki from which to start selection
-     * @param currentSpace the current space from which to start selection
-     * @return the panel with the selectors to choose the source for the attachments panel.
+     * @return the panel with the selectors to choose the source for the attachments panel
      */
-    private Panel getSelectorsPanel(final String currentWiki, String currentSpace)
+    private Panel getSelectorsPanel()
     {
         // create selectors for the page to get images from
         FlowPanel selectorsPanel = new FlowPanel();
-        wikiSelector = new WikiSelector();
-        wikiSelector.setWikiService(wikiService);
-        spaceSelector = new SpaceSelector(currentWiki);
-        spaceSelector.setWikiService(wikiService);
-        pageSelector = new PageSelector(currentWiki, currentSpace);
-        pageSelector.setWikiService(wikiService);
 
-        // hide this selector by default, until we get to update it from the server
-        wikiSelector.setVisible(false);
+        if (displayWikiSelector) {
+            wikiSelector = new WikiSelector(wikiService);
+            wikiSelector.addChangeHandler(this);
+            selectorsPanel.add(wikiSelector);
+        }
 
-        wikiSelector.addChangeHandler(this);
+        spaceSelector = new SpaceSelector(wikiService);
         spaceSelector.addChangeHandler(this);
+        selectorsPanel.add(spaceSelector);
+
+        pageSelector = new PageSelector(wikiService);
+        selectorsPanel.add(pageSelector);
 
         Button updateImagesListButton = new Button(Strings.INSTANCE.imageUpdateListButton());
         updateImagesListButton.addClickHandler(new ClickHandler()
         {
             public void onClick(ClickEvent event)
             {
-                initCurrentPage(new ResourceName(wikiSelector.getSelectedWiki(), spaceSelector.getSelectedSpace(),
-                    pageSelector.getSelectedPage(), null), null);
+                EntityReference imageReferenceTemplate = new EntityReference();
+                imageReferenceTemplate.setType(EntityType.IMAGE);
+                imageReferenceTemplate.setWikiName(displayWikiSelector ? wikiSelector.getSelectedWiki() : getData()
+                    .getOrigin().getWikiName());
+                imageReferenceTemplate.setSpaceName(spaceSelector.getSelectedSpace());
+                imageReferenceTemplate.setPageName(pageSelector.getSelectedPage());
+                initCurrentPage(imageReferenceTemplate, null);
             }
         });
 
-        selectorsPanel.add(wikiSelector);
-        selectorsPanel.add(spaceSelector);
-        selectorsPanel.add(pageSelector);
         selectorsPanel.add(updateImagesListButton);
         selectorsPanel.addStyleName("xPageChooser");
 
@@ -170,165 +163,111 @@ public class ImagesExplorerWizardStep extends AbstractSelectorWizardStep<ImageCo
     }
 
     /**
-     * Sets the selection to the specified wiki, space and page and reloads the images panel.
+     * Refreshes the list of images with the images attached to the same page as the specified image, and then selects
+     * the specified image.
      * 
-     * @param wiki the wiki to set the selection to
-     * @param space the space to set the selection on
-     * @param page the page to set the selection on
-     * @param fileName the filename of the image to set as currently selected image
-     * @param forceRefresh if a refresh should be forced on the list of wikis, spaces, pages in the list boxes
-     * @param cb callback to handle asynchronous fill of the wiki, space, page list boxes
+     * @param imageReference a reference to the image to be selected
+     * @param cb the object to be notified after the specified image is selected
      */
-    public void setSelection(final String wiki, final String space, final String page, final String fileName,
-        final boolean forceRefresh, final AsyncCallback< ? > cb)
+    public void setSelection(final EntityReference imageReference, final AsyncCallback< ? > cb)
     {
-        wikiService.isMultiWiki(new AsyncCallback<Boolean>()
+        if (displayWikiSelector) {
+            wikiService.isMultiWiki(new AsyncCallback<Boolean>()
+            {
+                public void onFailure(Throwable caught)
+                {
+                    if (cb != null) {
+                        cb.onFailure(caught);
+                    }
+                }
+
+                public void onSuccess(Boolean result)
+                {
+                    if (result) {
+                        setWikiSelection(imageReference, cb);
+                    } else {
+                        setSpaceSelection(imageReference, cb);
+                    }
+                }
+            });
+        } else {
+            setSpaceSelection(imageReference, cb);
+        }
+    }
+
+    /**
+     * Sets the selected wiki based on the specified image and updates the space selector.
+     * 
+     * @param imageReference the image to be selected
+     * @param cb the object to be notified after the specified image is selected
+     */
+    private void setWikiSelection(final EntityReference imageReference, final AsyncCallback< ? > cb)
+    {
+        wikiSelector.refreshList(imageReference.getWikiName(), new AsyncCallback<List<String>>()
         {
+            public void onSuccess(List<String> result)
+            {
+                setSpaceSelection(imageReference, cb);
+            }
+
             public void onFailure(Throwable caught)
             {
                 if (cb != null) {
                     cb.onFailure(caught);
                 }
             }
+        });
+    }
 
-            public void onSuccess(Boolean result)
+    /**
+     * Sets the selected space based on the specified image and updates the page selector.
+     * 
+     * @param imageReference the image to be selected
+     * @param cb the object to be notified after the specified image is selected
+     */
+    private void setSpaceSelection(final EntityReference imageReference, final AsyncCallback< ? > cb)
+    {
+        spaceSelector.setWiki(displayWikiSelector ? imageReference.getWikiName() : getData().getOrigin().getWikiName());
+        spaceSelector.refreshList(imageReference.getSpaceName(), new AsyncCallback<List<String>>()
+        {
+            public void onSuccess(List<String> result)
             {
-                if (result) {
-                    setWikiSelection(wiki, space, page, fileName, forceRefresh, cb);
-                } else {
-                    setSpaceSelection(space, page, fileName, forceRefresh, cb);
+                setPageSelection(imageReference, cb);
+            }
+
+            public void onFailure(Throwable caught)
+            {
+                if (cb != null) {
+                    cb.onFailure(caught);
                 }
             }
         });
     }
 
     /**
-     * Sets the selection on the specified wiki, triggering the space selector update accordingly.
+     * Sets the selected page based on the specified image and updates the list of images accordingly.
      * 
-     * @param selectedWiki the wiki to set as selected
-     * @param space the space to set as selected
-     * @param page the page to set as selected
-     * @param fileName the file to set as selected
-     * @param forceRefresh if a refresh should be forced on the list of wikis, spaces, pages in the list boxes
-     * @param cb callback to handle asynchronous initialization of the wikis list
+     * @param imageReference the image to be selected
+     * @param cb the object to be notified after the specified image is selected
      */
-    private void setWikiSelection(String selectedWiki, final String space, final String page, final String fileName,
-        final boolean forceRefresh, final AsyncCallback< ? > cb)
+    private void setPageSelection(final EntityReference imageReference, final AsyncCallback< ? > cb)
     {
-        if (!displayWikiSelector) {
-            // if the wiki selector doesn't need to be displayed, add the edited resource wiki as the default selected
-            // option so that it's always returned on getSelectedWiki()
-            wikiSelector.clear();
-            if (!StringUtils.isEmpty(editedResource.getWiki())) {
-                wikiSelector.addItem(editedResource.getWiki());
-                wikiSelector.setSelectedIndex(0);
-            }
-            // but keep it invisible
-            wikiSelector.setVisible(false);
-            // set the space selection further
-            setSpaceSelection(space, page, fileName, true, cb);
-        } else {
-            wikiSelector.setVisible(true);
-            if (forceRefresh) {
-                wikiSelector.refreshList(selectedWiki, new AsyncCallback<List<String>>()
-                {
-                    public void onSuccess(List<String> result)
-                    {
-                        setSpaceSelection(space, page, fileName, true, cb);
-                    }
-
-                    public void onFailure(Throwable caught)
-                    {
-                        if (cb != null) {
-                            cb.onFailure(caught);
-                        }
-                    }
-                });
-            } else {
-                // just set the selection
-                if (!wikiSelector.getSelectedWiki().equals(selectedWiki)) {
-                    wikiSelector.setSelectedWiki(selectedWiki);
-                    setSpaceSelection(space, page, fileName, true, cb);
-                }
-            }
-        }
-    }
-
-    /**
-     * Sets the selection on the specified space triggering the page selector update accordingly.
-     * 
-     * @param selectedSpace the space to be set as selected
-     * @param selectedPage the page to be set as selected
-     * @param selectedFile the file to set as selected in the images list
-     * @param forceRefresh if a refresh should be forced on the list of wikis, spaces, pages in the list boxes
-     * @param cb callback to handle asynchronous initialization of the spaces list
-     */
-    private void setSpaceSelection(String selectedSpace, final String selectedPage, final String selectedFile,
-        final boolean forceRefresh, final AsyncCallback< ? > cb)
-    {
-        if (forceRefresh) {
-            // refresh the spaces list
-            spaceSelector.setWiki(wikiSelector.getSelectedWiki());
-            spaceSelector.refreshList(selectedSpace, new AsyncCallback<List<String>>()
+        pageSelector.setWiki(displayWikiSelector ? imageReference.getWikiName() : getData().getOrigin().getWikiName());
+        pageSelector.setSpace(imageReference.getSpaceName());
+        pageSelector.refreshList(imageReference.getPageName(), new AsyncCallback<List<String>>()
+        {
+            public void onSuccess(List<String> result)
             {
-                public void onSuccess(List<String> result)
-                {
-                    setPageSelection(selectedPage, selectedFile, true, cb);
-                }
-
-                public void onFailure(Throwable caught)
-                {
-                    if (cb != null) {
-                        cb.onFailure(caught);
-                    }
-                }
-            });
-        } else {
-            if (!selectedSpace.equals(spaceSelector.getSelectedSpace())) {
-                spaceSelector.setSelectedSpace(selectedSpace);
-                setPageSelection(selectedPage, selectedFile, true, cb);
-            } else {
-                setPageSelection(selectedPage, selectedFile, forceRefresh, cb);
+                initCurrentPage(imageReference, cb);
             }
-        }
-    }
 
-    /**
-     * Sets the selection on the specified page, triggering the images panel update accordingly.
-     * 
-     * @param selectedPage the page to be set as selected
-     * @param selectedFile the file to set as selected in the images list
-     * @param forceRefresh if a refresh should be forced on the list of wikis, spaces, pages in the list boxes
-     * @param cb callback to handle asynchronous initialization of the pages list
-     */
-    private void setPageSelection(String selectedPage, final String selectedFile, boolean forceRefresh,
-        final AsyncCallback< ? > cb)
-    {
-        if (forceRefresh) {
-            pageSelector.setWiki(wikiSelector.getSelectedWiki());
-            pageSelector.setSpace(spaceSelector.getSelectedSpace());
-            pageSelector.refreshList(selectedPage, new AsyncCallback<List<String>>()
+            public void onFailure(Throwable caught)
             {
-                public void onSuccess(List<String> result)
-                {
-                    initCurrentPage(new ResourceName(wikiSelector.getSelectedWiki(), spaceSelector.getSelectedSpace(),
-                        pageSelector.getSelectedPage(), selectedFile), cb);
+                if (cb != null) {
+                    cb.onFailure(caught);
                 }
-
-                public void onFailure(Throwable caught)
-                {
-                    if (cb != null) {
-                        cb.onFailure(caught);
-                    }
-                }
-            });
-        } else {
-            if (!selectedPage.equals(pageSelector.getSelectedPage())) {
-                pageSelector.setSelectedPage(selectedPage);
             }
-            initCurrentPage(new ResourceName(wikiSelector.getSelectedWiki(), spaceSelector.getSelectedSpace(),
-                pageSelector.getSelectedPage(), selectedFile), cb);
-        }
+        });
     }
 
     /**
@@ -354,22 +293,24 @@ public class ImagesExplorerWizardStep extends AbstractSelectorWizardStep<ImageCo
                 }
             });
         } else if (event.getSource() == spaceSelector) {
-            pageSelector.setWiki(wikiSelector.getSelectedWiki());
+            pageSelector.setWiki(displayWikiSelector ? wikiSelector.getSelectedWiki() : getData().getOrigin()
+                .getWikiName());
             pageSelector.setSpace(spaceSelector.getSelectedSpace());
             pageSelector.refreshList(pageSelector.getSelectedPage());
         }
     }
 
     /**
-     * Initializes and displays the page selector panel for the currently selected resource.
+     * Initializes and displays list of images attached to the same page as the specified image, and selects the
+     * specified image.
      * 
-     * @param resource the resource to display the selector panel for
-     * @param cb the callback to handle asynchronous initialization
+     * @param imageReference a reference to the image to be selected after the list of images is updated
+     * @param cb the object to be notified after the list of images is updated
      */
-    protected void initCurrentPage(ResourceName resource, final AsyncCallback< ? > cb)
+    protected void initCurrentPage(EntityReference imageReference, final AsyncCallback< ? > cb)
     {
-        pageWizardStep.setCurrentPage(resource);
         mainPanel.addStyleName(STYLE_LOADING);
+        getData().setDestination(imageReference);
         pageWizardStep.init(getData(), new AsyncCallback<Object>()
         {
             public void onSuccess(Object result)
@@ -448,19 +389,15 @@ public class ImagesExplorerWizardStep extends AbstractSelectorWizardStep<ImageCo
      */
     protected void initializeSelection(AsyncCallback< ? > cb)
     {
-        if (!StringUtils.isEmpty(getData().getReference())
-            || (wikiSelector.getSelectedWiki() == null && spaceSelector.getSelectedSpace() == null && pageSelector
-                .getSelectedPage() == null)) {
-            // if it's the first display (i.e. no selection in the wikiselector, spaceSelector or pageSelector) or an
-            // image needs to be edited, refresh selectors and page list
-            ResourceName r = new ResourceName(getData().getReference(), true);
-            ResourceName resolved = r.resolveRelativeTo(editedResource);
-            setSelection(resolved.getWiki(), resolved.getSpace(), resolved.getPage(), resolved.getFile(), true, cb);
+        if (!StringUtils.isEmpty(getData().getData().getReference())) {
+            // Edit image.
+            setSelection(getData().getDestination(), cb);
+        } else if (pageSelector.getSelectedPage() == null) {
+            // Insert image. No page selected so initialize the list of images.
+            setSelection(getData().getOrigin(), cb);
         } else {
-            // just initialize the step for the space, page, wiki selection in the selectors. I.e. preserve last
-            // selection
-            initCurrentPage(new ResourceName(wikiSelector.getSelectedWiki(), spaceSelector.getSelectedSpace(),
-                pageSelector.getSelectedPage(), null), cb);
+            // Insert image. There is a previous selection, preserve it and re-initialize the list of images.
+            initCurrentPage(pageWizardStep.getData().getDestination(), cb);
         }
     }
 
@@ -507,5 +444,16 @@ public class ImagesExplorerWizardStep extends AbstractSelectorWizardStep<ImageCo
         } else {
             spaceSelector.setFocus(true);
         }
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see AbstractSelectorWizardStep#getResult()
+     */
+    @Override
+    public Object getResult()
+    {
+        return pageWizardStep.getResult();
     }
 }

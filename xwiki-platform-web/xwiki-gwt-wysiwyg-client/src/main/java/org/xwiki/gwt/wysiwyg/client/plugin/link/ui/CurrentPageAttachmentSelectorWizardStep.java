@@ -21,14 +21,12 @@ package org.xwiki.gwt.wysiwyg.client.plugin.link.ui;
 
 import java.util.List;
 
-import org.xwiki.gwt.user.client.StringUtils;
 import org.xwiki.gwt.user.client.ui.ListItem;
 import org.xwiki.gwt.wysiwyg.client.Strings;
 import org.xwiki.gwt.wysiwyg.client.plugin.link.LinkConfig;
-import org.xwiki.gwt.wysiwyg.client.plugin.link.ui.LinkWizard.LinkWizardSteps;
-import org.xwiki.gwt.wysiwyg.client.widget.wizard.util.AbstractListSelectorWizardStep;
+import org.xwiki.gwt.wysiwyg.client.plugin.link.ui.LinkWizard.LinkWizardStep;
+import org.xwiki.gwt.wysiwyg.client.widget.wizard.util.AbstractEntityListSelectorWizardStep;
 import org.xwiki.gwt.wysiwyg.client.wiki.Attachment;
-import org.xwiki.gwt.wysiwyg.client.wiki.ResourceName;
 import org.xwiki.gwt.wysiwyg.client.wiki.WikiServiceAsync;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
@@ -39,27 +37,18 @@ import com.google.gwt.user.client.ui.Label;
  * 
  * @version $Id$
  */
-public class CurrentPageAttachmentSelectorWizardStep extends AbstractListSelectorWizardStep<LinkConfig, Attachment>
+public class CurrentPageAttachmentSelectorWizardStep extends
+    AbstractEntityListSelectorWizardStep<LinkConfig, Attachment>
 {
     /**
-     * The currently edited resource (the currently edited page).
-     */
-    private ResourceName editedResource;
-
-    /**
-     * The service used to retrieve the current page attachments.
-     */
-    private WikiServiceAsync wikiService;
-
-    /**
-     * Builds a selector from the attachments of the specified page.
+     * Builds a selector from the attachments of the link origin page.
      * 
-     * @param editedResource the currently edited resource (page for which editing is done)
+     * @param wikiService the service used to retrieve the attachments of the current page
      */
-    public CurrentPageAttachmentSelectorWizardStep(ResourceName editedResource)
+    public CurrentPageAttachmentSelectorWizardStep(WikiServiceAsync wikiService)
     {
+        super(wikiService);
         getMainPanel().addStyleName("xAttachmentsSelector");
-        this.editedResource = editedResource;
     }
 
     /**
@@ -86,32 +75,7 @@ public class CurrentPageAttachmentSelectorWizardStep extends AbstractListSelecto
     @Override
     protected void fetchData(AsyncCallback<List<Attachment>> callback)
     {
-        wikiService.getAttachments(editedResource.getWiki(), editedResource.getSpace(), editedResource.getPage(),
-            callback);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    protected String getSelection()
-    {
-        if (!StringUtils.isEmpty(getData().getReference())) {
-            ResourceName r = new ResourceName(getData().getReference(), true);
-            return r.getFile();
-        } else if (getSelectedItem() != null && getSelectedItem().getData() != null) {
-            return getSelectedItem().getData().getFileName();
-        }
-        return null;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    protected boolean matchesSelection(Attachment item, String selection)
-    {
-        return selection != null && selection.equals(item.getFileName());
+        getWikiService().getAttachments(getData().getOrigin(), callback);
     }
 
     /**
@@ -122,7 +86,7 @@ public class CurrentPageAttachmentSelectorWizardStep extends AbstractListSelecto
     {
         ListItem<Attachment> item = new ListItem<Attachment>();
         item.setData(data);
-        Label attachmentLabel = new Label(data.getFileName());
+        Label attachmentLabel = new Label(data.getReference().getFileName());
         attachmentLabel.addStyleName("xAttachPreview");
         item.add(attachmentLabel);
         return item;
@@ -150,9 +114,9 @@ public class CurrentPageAttachmentSelectorWizardStep extends AbstractListSelecto
     {
         // check out the selection, if it's a new file option
         if (getSelectedItem() != null && getSelectedItem().getData() == null) {
-            return LinkWizardSteps.ATTACHMENT_UPLOAD.toString();
+            return LinkWizardStep.ATTACHMENT_UPLOAD.toString();
         }
-        return LinkWizardSteps.WIKI_PAGE_CONFIG.toString();
+        return LinkWizardStep.WIKI_PAGE_CONFIG.toString();
     }
 
     /**
@@ -161,48 +125,5 @@ public class CurrentPageAttachmentSelectorWizardStep extends AbstractListSelecto
     public String getStepTitle()
     {
         return Strings.INSTANCE.linkSelectAttachmentTitle();
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    protected void saveSelectedValue()
-    {
-        Attachment selectedAttach = getSelectedItem().getData();
-        if (selectedAttach == null) {
-            // new file option, let's setup the attachment link data accordingly
-            getData().setWiki(editedResource.getWiki());
-            getData().setSpace(editedResource.getSpace());
-            getData().setPage(editedResource.getPage());
-        } else {
-            // check if attachment changed
-            boolean changedAttachment = true;
-            ResourceName editedAttach = new ResourceName(getData().getReference(), true);
-            if (!StringUtils.isEmpty(getData().getReference())
-                && editedAttach.getFile().equals(selectedAttach.getFileName())) {
-                changedAttachment = false;
-            }
-            if (changedAttachment) {
-                // existing file option, set up the LinkConfig
-                // attachment reference has to be relative to the currently edited page
-                // FIXME: move the reference setting logic in a controller
-                ResourceName ref = new ResourceName(selectedAttach.getReference(), true);
-                String attachmentRef = "attach:" + ref.getRelativeTo(editedResource).toString();
-                String attachmentURL = selectedAttach.getURL();
-                getData().setReference(attachmentRef);
-                getData().setUrl(attachmentURL);
-            }
-        }
-    }
-
-    /**
-     * Injects the wiki service.
-     * 
-     * @param wikiService the service used to retrieve the current page attachments
-     */
-    public void setWikiService(WikiServiceAsync wikiService)
-    {
-        this.wikiService = wikiService;
     }
 }

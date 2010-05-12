@@ -21,7 +21,7 @@ package org.xwiki.gwt.wysiwyg.client.wiki;
 
 import java.util.List;
 
-import org.xwiki.gwt.wysiwyg.client.plugin.link.LinkConfig;
+import org.xwiki.gwt.wysiwyg.client.wiki.EntityReference.EntityType;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
 
@@ -83,55 +83,61 @@ public interface WikiServiceAsync
     void getMatchingPages(String keyword, int start, int count, AsyncCallback<List<WikiPage>> async);
 
     /**
-     * Creates a page link (URL, reference) from the given parameters. None of them are mandatory, if one misses, it is
-     * replaced with a default value.
+     * Creates an entity link configuration object (URL, reference) for a link with the specified origin and
+     * destination. The string serialization of the entity reference in the returned {@link EntityConfig} is relative to
+     * the link origin.
      * 
-     * @param wikiName the name of the wiki to which to link
-     * @param spaceName the name of the space of the page. If this parameter is missing, it is replaced with the space
-     *            of the current document in the context.
-     * @param pageName the name of the page to which to link to. If it's missing, it is replaced with "WebHome".
-     * @param revision the value for the page revision to which to link to. If this is missing, the link is made to the
-     *            latest revision, the default view action for the document.
-     * @param anchor the name of the anchor type.
+     * @param origin the origin of the link
+     * @param destination the destination of the link
      * @param async object used for asynchronous communication between server and client.
      */
-    void getPageLink(String wikiName, String spaceName, String pageName, String revision, String anchor,
-        AsyncCallback<LinkConfig> async);
+    void getEntityConfig(EntityReference origin, EntityReference destination, AsyncCallback<EntityConfig> async);
 
     /**
-     * Returns attachment information from the passed parameters, testing if the passed attachment exists. Note that the
-     * {@code attachmentName} name will be cleaned to match the attachment names cleaning rules, and the attachment
-     * reference and URL will be generated with the cleaned name. This function will be used as a method to test the
-     * correct upload of a file to a page.
+     * Returns information about the referenced attachment. Note that the {@code EntityReference#getFileName()} name
+     * will be cleaned to match the attachment names cleaning rules, and the returned attachment serialized reference
+     * and access URL will be generated with the cleaned name.
      * 
-     * @param wikiName the name of the wiki of the page the file is attached to
-     * @param spaceName the name of the space of the page the file is attached to
-     * @param pageName the name of the page the file is attached to
-     * @param attachmentName the uncleaned name of the attachment, which is to be cleaned on the server
+     * @param attachmentReference an attachment reference
      * @param async object used for asynchronous communication between server and client, to return, on success, an
-     *            {@link Attachment} containing the reference and the URL of the attachment, or {@code null} in case the
-     *            attachment was not found
+     *            {@link Attachment} containing the serialized reference and the access URL of the specified attachment,
+     *            or {@code null} in case the attachment was not found
      */
-    void getAttachment(String wikiName, String spaceName, String pageName, String attachmentName,
-        AsyncCallback<Attachment> async);
+    void getAttachment(EntityReference attachmentReference, AsyncCallback<Attachment> async);
 
     /**
      * Returns all the image attachments from the referred page.
      * 
-     * @param wikiName the name of the wiki to get images from
-     * @param spaceName the name of the space to get image attachments from
-     * @param pageName the name of the page to get image attachments from
-     * @param async object used for asynchronous communication between server and client.
+     * @param documentReference a reference to the document to get the images from
+     * @param async object used for asynchronous communication between server and client
      */
-    void getImageAttachments(String wikiName, String spaceName, String pageName, AsyncCallback<List<Attachment>> async);
+    void getImageAttachments(EntityReference documentReference, AsyncCallback<List<Attachment>> async);
 
     /**
      * Returns all the attachments from the referred page.
      * 
-     * @param wikiName the name of the wiki to get attachments from
-     * @param spaceName the name of the space to get attachments from
-     * @param pageName the name of the page to get attachments from
-     * @param async object used for asynchronous communication between server and client.
+     * @param documentReference a reference to the document to get the attachments from
+     * @param async object used for asynchronous communication between server and client
      */
-    void getAttachments(String wikiName, String spaceName, String pageName, AsyncCallback<List<Attachment>> async);
+    void getAttachments(EntityReference documentReference, AsyncCallback<List<Attachment>> async);
+
+    /**
+     * Returns the URL to be used to upload an attachment to the specified document.
+     * 
+     * @param documentReference the document for which to retrieve the upload URL
+     * @param async object used for asynchronous communication between server and client
+     */
+    void getUploadURL(EntityReference documentReference, AsyncCallback<String> async);
+
+    /**
+     * Parses the given link reference and extracts a reference to the linked entity. The returned entity reference is
+     * resolved relative to the given base entity reference.
+     * 
+     * @param linkReference a link reference pointing to an entity of the specified type
+     * @param entityType the type of entity being linked
+     * @param baseReference the entity reference used to resolve the linked entity reference
+     * @param async object used for asynchronous communication between server and client
+     */
+    void parseLinkReference(String linkReference, EntityType entityType, EntityReference baseReference,
+        AsyncCallback<EntityReference> async);
 }

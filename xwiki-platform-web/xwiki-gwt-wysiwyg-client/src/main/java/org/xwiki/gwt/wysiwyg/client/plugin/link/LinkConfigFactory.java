@@ -23,7 +23,6 @@ import org.xwiki.gwt.dom.client.Range;
 import org.xwiki.gwt.user.client.ui.rta.RichTextArea;
 import org.xwiki.gwt.user.client.ui.rta.cmd.Command;
 import org.xwiki.gwt.wysiwyg.client.plugin.image.ImageConfigJSONParser;
-import org.xwiki.gwt.wysiwyg.client.wiki.ResourceName;
 
 /**
  * Creates link configuration objects based on the current selection in the rich text area.
@@ -76,9 +75,8 @@ public class LinkConfigFactory
         // Check the special case when the selection is an image and add a link on an image.
         String imageJSON = rta.getCommandManager().getStringValue(Command.INSERT_IMAGE);
         if (imageJSON != null) {
-            // It's an image selection. Set the label read only and put the image filename in the label text.
-            ResourceName imageResource = new ResourceName(imageConfigJSONParser.parse(imageJSON).getReference(), true);
-            linkConfig.setLabelText(imageResource.getFile());
+            // It's an image selection. Set the label read only and put the image reference in the label text.
+            linkConfig.setLabelText(imageConfigJSONParser.parse(imageJSON).getReference());
             linkConfig.setReadOnlyLabel(true);
         } else {
             linkConfig.setLabelText(range.toString());

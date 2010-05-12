@@ -28,7 +28,6 @@ import org.xwiki.gwt.user.client.ui.wizard.NavigationListenerCollection;
 import org.xwiki.gwt.user.client.ui.wizard.SourcesNavigationEvents;
 import org.xwiki.gwt.user.client.ui.wizard.WizardStep;
 import org.xwiki.gwt.wysiwyg.client.Strings;
-import org.xwiki.gwt.wysiwyg.client.wiki.ResourceName;
 
 import com.google.gwt.event.logical.shared.SelectionEvent;
 import com.google.gwt.event.logical.shared.SelectionHandler;
@@ -81,25 +80,16 @@ public abstract class AbstractSelectorAggregatorWizardStep<T> extends AbstractSe
     private final FlowPanel mainPanel = new FlowPanel();
 
     /**
-     * The current resource edited by this wizard step.
-     */
-    private ResourceName editedResource;
-
-    /**
      * The navigation listeners for this selector step, to pass further potential navigation events launched by
      * aggregated steps.
      */
     private NavigationListenerCollection listeners = new NavigationListenerCollection();
 
     /**
-     * Creates a new aggregator selector wizard step, for the currently edited resource.
-     * 
-     * @param editedResource the currently edited resource
+     * Creates a new aggregator selector wizard step.
      */
-    public AbstractSelectorAggregatorWizardStep(ResourceName editedResource)
+    public AbstractSelectorAggregatorWizardStep()
     {
-        this.editedResource = editedResource;
-
         // instantiate the main panel
         mainPanel.addStyleName("xSelectorAggregatorStep");
 
@@ -408,14 +398,6 @@ public abstract class AbstractSelectorAggregatorWizardStep<T> extends AbstractSe
     public void onSubmit(AsyncCallback<Boolean> async)
     {
         getCurrentStep().onSubmit(async);
-    }
-
-    /**
-     * @return the editedResource
-     */
-    public ResourceName getEditedResource()
-    {
-        return editedResource;
     }
 
     /**

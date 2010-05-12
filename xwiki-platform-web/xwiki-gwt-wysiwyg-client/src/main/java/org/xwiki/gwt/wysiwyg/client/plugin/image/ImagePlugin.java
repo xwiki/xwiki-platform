@@ -29,7 +29,7 @@ import org.xwiki.gwt.wysiwyg.client.Images;
 import org.xwiki.gwt.wysiwyg.client.Strings;
 import org.xwiki.gwt.wysiwyg.client.plugin.image.exec.InsertImageExecutable;
 import org.xwiki.gwt.wysiwyg.client.plugin.image.ui.ImageWizard;
-import org.xwiki.gwt.wysiwyg.client.plugin.image.ui.ImageWizard.ImageWizardSteps;
+import org.xwiki.gwt.wysiwyg.client.plugin.image.ui.ImageWizard.ImageWizardStep;
 import org.xwiki.gwt.wysiwyg.client.plugin.internal.AbstractPlugin;
 import org.xwiki.gwt.wysiwyg.client.plugin.internal.FocusWidgetUIExtension;
 import org.xwiki.gwt.wysiwyg.client.wiki.WikiServiceAsync;
@@ -191,15 +191,15 @@ public class ImagePlugin extends AbstractPlugin implements ClickHandler, WizardL
      */
     public void onImage()
     {
-        ImageConfig config;
-        String imageParam = getTextArea().getCommandManager().getStringValue(Command.INSERT_IMAGE);
-        if (imageParam != null) {
-            config = imageConfigJSONParser.parse(imageParam);
+        ImageConfig imageConfig;
+        String imageJSON = getTextArea().getCommandManager().getStringValue(Command.INSERT_IMAGE);
+        if (imageJSON != null) {
+            imageConfig = imageConfigJSONParser.parse(imageJSON);
         } else {
-            config = new ImageConfig();
-            config.setAltText(getTextArea().getDocument().getSelection().getRangeAt(0).toString());
+            imageConfig = new ImageConfig();
+            imageConfig.setAltText(getTextArea().getDocument().getSelection().getRangeAt(0).toString());
         }
-        imageWizard.start(ImageWizardSteps.IMAGE_SELECTOR.toString(), config);
+        imageWizard.start(ImageWizardStep.IMAGE_SELECTOR.toString(), imageConfig);
     }
 
     /**

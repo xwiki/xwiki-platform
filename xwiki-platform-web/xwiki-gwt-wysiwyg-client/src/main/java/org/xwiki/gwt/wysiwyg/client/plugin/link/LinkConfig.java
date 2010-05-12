@@ -19,14 +19,14 @@
  */
 package org.xwiki.gwt.wysiwyg.client.plugin.link;
 
-import com.google.gwt.user.client.rpc.IsSerializable;
+import org.xwiki.gwt.wysiwyg.client.wiki.EntityConfig;
 
 /**
  * Stores data about a link: reference (wiki, space, page), URL, label, tooltip.
  * 
  * @version $Id$
  */
-public class LinkConfig implements IsSerializable
+public class LinkConfig extends EntityConfig
 {
     /**
      * Enumeration type to store the type of link: wiki external link, link to an existing page, link to a new page,
@@ -40,43 +40,6 @@ public class LinkConfig implements IsSerializable
          */
         EXTERNAL, NEW_WIKIPAGE, WIKIPAGE, ATTACHMENT, EMAIL
     };
-
-    /**
-     * The URL of this link which can be either a relative or an absolute URL.
-     * 
-     * @see #reference
-     */
-    private String url;
-
-    /**
-     * The name of the wiki where the target document of this link is located.
-     * 
-     * @see #reference
-     */
-    private String wiki;
-
-    /**
-     * The name of the space of the target page of this link.
-     * 
-     * @see #reference
-     */
-    private String space;
-
-    /**
-     * The name of the target page of this link.
-     * 
-     * @see #reference
-     */
-    private String page;
-
-    /**
-     * The reference of the link, in the {@code wikiname:spacename.pagename} form. <br />
-     * Note: this value should take priority over wiki, space, page set in this config: if the reference is set, that
-     * this one should be used instead of generating another. Ideally, this should be set with the URL so that no
-     * further computing is necessary for this link. If this and url are not set, they are to be computed from the wiki,
-     * space, page values.
-     */
-    private String reference;
 
     /**
      * The label of this link, in original (HTML) form.
@@ -107,70 +70,6 @@ public class LinkConfig implements IsSerializable
      * Flag indicating if the link should be opened in a new window.
      */
     private boolean openInNewWindow;
-
-    /**
-     * @return the url
-     */
-    public String getUrl()
-    {
-        return url;
-    }
-
-    /**
-     * @param url the url to set
-     */
-    public void setUrl(String url)
-    {
-        this.url = url;
-    }
-
-    /**
-     * @return the wiki
-     */
-    public String getWiki()
-    {
-        return wiki;
-    }
-
-    /**
-     * @param wiki the wiki to set
-     */
-    public void setWiki(String wiki)
-    {
-        this.wiki = wiki;
-    }
-
-    /**
-     * @return the space
-     */
-    public String getSpace()
-    {
-        return space;
-    }
-
-    /**
-     * @param space the space to set
-     */
-    public void setSpace(String space)
-    {
-        this.space = space;
-    }
-
-    /**
-     * @return the page
-     */
-    public String getPage()
-    {
-        return page;
-    }
-
-    /**
-     * @param page the page to set
-     */
-    public void setPage(String page)
-    {
-        this.page = page;
-    }
 
     /**
      * @return the label
@@ -234,22 +133,6 @@ public class LinkConfig implements IsSerializable
     public void setReadOnlyLabel(boolean readOnlyLabel)
     {
         this.readOnlyLabel = readOnlyLabel;
-    }
-
-    /**
-     * @return the reference
-     */
-    public String getReference()
-    {
-        return reference;
-    }
-
-    /**
-     * @param reference the reference to set
-     */
-    public void setReference(String reference)
-    {
-        this.reference = reference;
     }
 
     /**

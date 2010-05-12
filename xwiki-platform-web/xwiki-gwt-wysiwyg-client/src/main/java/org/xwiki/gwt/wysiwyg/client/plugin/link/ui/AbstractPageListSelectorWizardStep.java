@@ -23,10 +23,11 @@ import org.xwiki.gwt.user.client.StringUtils;
 import org.xwiki.gwt.user.client.ui.ListItem;
 import org.xwiki.gwt.wysiwyg.client.Strings;
 import org.xwiki.gwt.wysiwyg.client.plugin.link.LinkConfig;
-import org.xwiki.gwt.wysiwyg.client.plugin.link.ui.LinkWizard.LinkWizardSteps;
-import org.xwiki.gwt.wysiwyg.client.widget.wizard.util.AbstractListSelectorWizardStep;
-import org.xwiki.gwt.wysiwyg.client.wiki.ResourceName;
+import org.xwiki.gwt.wysiwyg.client.plugin.link.ui.LinkWizard.LinkWizardStep;
+import org.xwiki.gwt.wysiwyg.client.widget.wizard.util.AbstractEntityListSelectorWizardStep;
+import org.xwiki.gwt.wysiwyg.client.wiki.EntityReference;
 import org.xwiki.gwt.wysiwyg.client.wiki.WikiPage;
+import org.xwiki.gwt.wysiwyg.client.wiki.WikiServiceAsync;
 
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.Label;
@@ -36,22 +37,18 @@ import com.google.gwt.user.client.ui.Label;
  * 
  * @version $Id$
  */
-public abstract class AbstractPageListSelectorWizardStep extends AbstractListSelectorWizardStep<LinkConfig, WikiPage>
+public abstract class AbstractPageListSelectorWizardStep extends
+    AbstractEntityListSelectorWizardStep<LinkConfig, WikiPage>
 {
     /**
-     * The currently edited resource (the currently edited page).
-     */
-    private ResourceName editedResource;
-
-    /**
-     * Builds a selector from a list of pages of the specified page.
+     * Creates a new selector.
      * 
-     * @param editedResource the currently edited resource (page for which editing is done)
+     * @param wikiService the service used to access the wiki
      */
-    public AbstractPageListSelectorWizardStep(ResourceName editedResource)
+    public AbstractPageListSelectorWizardStep(WikiServiceAsync wikiService)
     {
+        super(wikiService);
         getMainPanel().addStyleName("xPagesSelector");
-        this.editedResource = editedResource;
     }
 
     /**
@@ -76,34 +73,12 @@ public abstract class AbstractPageListSelectorWizardStep extends AbstractListSel
      * {@inheritDoc}
      */
     @Override
-    protected String getSelection()
-    {
-        if (!StringUtils.isEmpty(getData().getReference())) {
-            return getData().getReference();
-        } else if (getSelectedItem() != null && getSelectedItem().getData() != null) {
-            return getSelectedItem().getData().getName();
-        }
-        return null;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    protected boolean matchesSelection(WikiPage item, String selection)
-    {
-        return selection != null && selection.equals(item.getName());
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
     protected ListItem<WikiPage> getListItem(WikiPage data)
     {
         ListItem<WikiPage> item = new ListItem<WikiPage>();
         item.setData(data);
-        Label pageName = new Label(data.getName());
+        Label pageName =
+            new Label(Strings.INSTANCE.entityLocatedIn() + " " + serializeDocumentReference(data.getReference()));
         pageName.addStyleName("xPagePreviewFullname");
         Label title = new Label(data.getTitle());
         title.addStyleName("xPagePreviewTitle");
@@ -112,13 +87,23 @@ public abstract class AbstractPageListSelectorWizardStep extends AbstractListSel
         if (!StringUtils.isEmpty(data.getTitle())) {
             ui.add(title);
         }
-        String prettyName = StringUtils.isEmpty(data.getTitle()) ? "" : data.getTitle() + " - ";
-        prettyName += data.getName();
-        ui.setTitle(prettyName);
+        ui.setTitle(data.getTitle());
         ui.add(pageName);
         ui.addStyleName("xPagePreview");
         item.add(ui);
         return item;
+    }
+
+    /**
+     * Serializes a document reference to be displayed to the user.
+     * 
+     * @param reference a document reference
+     * @return a user friendly string serialization of a document reference
+     */
+    protected String serializeDocumentReference(EntityReference reference)
+    {
+        String separator = " \u00BB ";
+        return reference.getWikiName() + separator + reference.getSpaceName() + separator + reference.getPageName();
     }
 
     /**
@@ -142,9 +127,9 @@ public abstract class AbstractPageListSelectorWizardStep extends AbstractListSel
     {
         // check out the selection, if it's a new page option
         if (getSelectedItem() != null && getSelectedItem().getData() == null) {
-            return LinkWizardSteps.WIKI_PAGE_CREATOR.toString();
+            return LinkWizardStep.WIKI_PAGE_CREATOR.toString();
         }
-        return LinkWizardSteps.WIKI_PAGE_CONFIG.toString();
+        return LinkWizardStep.WIKI_PAGE_CONFIG.toString();
     }
 
     /**
@@ -153,36 +138,5 @@ public abstract class AbstractPageListSelectorWizardStep extends AbstractListSel
     public String getStepTitle()
     {
         return Strings.INSTANCE.linkSelectWikipageTitle();
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    protected void saveSelectedValue()
-    {
-        WikiPage selectedDocument = getSelectedItem().getData();
-        if (selectedDocument == null) {
-            // new page option, let's setup the link data accordingly
-            getData().setWiki(editedResource.getWiki());
-            getData().setSpace(editedResource.getSpace());
-        } else {
-            // check if document changed
-            boolean changedDoc = true;
-            ResourceName editedPage = new ResourceName(getData().getReference(), false).getRelativeTo(editedResource);
-            ResourceName selectedPage =
-                new ResourceName(selectedDocument.getName(), false).getRelativeTo(editedResource);
-            if (!StringUtils.isEmpty(getData().getReference()) && editedPage.equals(selectedPage)) {
-                changedDoc = false;
-            }
-            if (changedDoc) {
-                // existing page option, set up the LinkConfig
-                // page reference has to be relative to the currently edited page
-                // FIXME: move the reference setting logic in a controller
-                ResourceName ref = new ResourceName(selectedDocument.getName(), false);
-                getData().setReference(ref.getRelativeTo(editedResource).toString());
-                getData().setUrl(selectedDocument.getURL());
-            }
-        }
     }
 }

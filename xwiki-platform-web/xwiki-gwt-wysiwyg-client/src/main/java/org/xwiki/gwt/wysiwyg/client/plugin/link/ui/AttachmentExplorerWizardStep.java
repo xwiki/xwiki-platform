@@ -21,9 +21,8 @@ package org.xwiki.gwt.wysiwyg.client.plugin.link.ui;
 
 import org.xwiki.gwt.user.client.StringUtils;
 import org.xwiki.gwt.wysiwyg.client.Strings;
-import org.xwiki.gwt.wysiwyg.client.plugin.link.ui.LinkWizard.LinkWizardSteps;
-import org.xwiki.gwt.wysiwyg.client.wiki.Attachment;
-import org.xwiki.gwt.wysiwyg.client.wiki.ResourceName;
+import org.xwiki.gwt.wysiwyg.client.plugin.link.ui.LinkWizard.LinkWizardStep;
+import org.xwiki.gwt.wysiwyg.client.wiki.EntityReference;
 import org.xwiki.gwt.wysiwyg.client.wiki.WikiServiceAsync;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
@@ -36,46 +35,19 @@ import com.google.gwt.user.client.rpc.AsyncCallback;
 public class AttachmentExplorerWizardStep extends AbstractExplorerWizardStep
 {
     /**
-     * The attachment prefix to use for attached files.
-     */
-    private static final String ATTACH_PREFIX = "attach:";
-
-    /**
-     * The currently edited resource (currently edited page).
-     */
-    private ResourceName editedResource;
-
-    /**
-     * The service used to retrieve the attachments.
-     */
-    private WikiServiceAsync wikiService;
-
-    /**
-     * Creates an attachment selection wizard step for the specified resource to be edited.
+     * Creates a new attachment selection wizard step that allows the user to select an attachment from a tree.
      * 
-     * @param editedResource the currently edited resource
+     * @param wikiService the service to be used for getting information about the selected attachments
      */
-    public AttachmentExplorerWizardStep(ResourceName editedResource)
+    public AttachmentExplorerWizardStep(WikiServiceAsync wikiService)
     {
-        // make this smaller, to fit the toggling bar for the AttachmentSelectorWizardStep
-        // FIXME: so wrong to have this kind of setting here: this WS should be usable with or without the aggregating
-        // step. Also having size information added in more than one single place is very very bad.
-        super(false, true, true, editedResource.toString() + "#Attachments", 455, 280);
-        this.editedResource = editedResource;
-    }
+        // Reduce the size to fit the toggling bar of the attachment selector step which aggregates this step.
+        // FIXME: This wizard step should be usable w/o the aggregating step. Also having size information added in more
+        // than one single place is bad.
+        super(wikiService, false, true, true, 455, 280);
 
-    /**
-     * {@inheritDoc}
-     */
-    protected void initializeSelection(AsyncCallback< ? > initCallback)
-    {
-        String reference = getData().getReference();
-        if (!StringUtils.isEmpty(reference)) {
-            ResourceName r = new ResourceName(reference, true);
-            getExplorer().setValue(r.toString());
-        }
-        // else leave the selection where it was the last time
-        super.initializeSelection(initCallback);
+        setStepTitle(Strings.INSTANCE.linkSelectAttachmentTitle());
+        setHelpLabelText(Strings.INSTANCE.linkSelectAttachmentHelpLabel());
     }
 
     /**
@@ -83,108 +55,38 @@ public class AttachmentExplorerWizardStep extends AbstractExplorerWizardStep
      */
     public String getNextStep()
     {
-        if (getExplorer().isNewAttachment()) {
-            // if a new attachment will be uploaded, invalidate the explorer cache so that the new attachment shows up
-            // in the tree when it will be loaded next. Even if the upload dialog could be canceled and then this is
-            // useless, there is no further point where we could access the explorer to invalidate it.
-            invalidateExplorerData();
-            return LinkWizardSteps.ATTACHMENT_UPLOAD.toString();
-        }
-        return LinkWizardSteps.WIKI_PAGE_CONFIG.toString();
+        return getExplorer().isNewAttachment() ? LinkWizardStep.ATTACHMENT_UPLOAD.toString()
+            : LinkWizardStep.WIKI_PAGE_CONFIG.toString();
     }
 
     /**
      * {@inheritDoc}
      */
-    public String getStepTitle()
+    public void onSubmit(AsyncCallback<Boolean> async)
     {
-        return Strings.INSTANCE.linkSelectAttachmentTitle();
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public void onCancel()
-    {
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public void onSubmit(final AsyncCallback<Boolean> async)
-    {
-        // reset error display
         hideError();
-        // get selected file, get its URL and add it
-        String attachment = getExplorer().getSelectedAttachment();
-        if (StringUtils.isEmpty(attachment) && !getExplorer().isNewAttachment()) {
-            displayError(Strings.INSTANCE.linkNoAttachmentSelectedError());
-            async.onSuccess(false);
-        } else if (StringUtils.isEmpty(getData().getReference())
-            || !getData().getReference().equals(ATTACH_PREFIX + getExplorer().getValue())) {
-            // commit changes only if reference was changed
-            if (getExplorer().isNewAttachment()) {
-                // prepare the link config for the upload attachment step
-                getData().setWiki(getExplorer().getSelectedWiki());
-                getData().setSpace(getExplorer().getSelectedSpace());
-                getData().setPage(getExplorer().getSelectedPage());
+
+        EntityReference attachmentReference = new EntityReference();
+        attachmentReference.setType(getData().getDestination().getType());
+        attachmentReference.setWikiName(getExplorer().getSelectedWiki());
+        attachmentReference.setSpaceName(getExplorer().getSelectedSpace());
+        attachmentReference.setPageName(getExplorer().getSelectedPage());
+        attachmentReference.setFileName(getExplorer().getSelectedAttachment());
+
+        if (getExplorer().isNewAttachment()) {
+            getData().setDestination(attachmentReference);
+            // Invalidate the explorer cache so that the new attachment shows up in the tree when the tree is reloaded.
+            invalidateExplorerData();
+            async.onSuccess(true);
+        } else if (!StringUtils.isEmpty(attachmentReference.getFileName())) {
+            if (getData().getDestination().equals(attachmentReference)) {
                 async.onSuccess(true);
             } else {
-                // FIXME: move the reference setting logic in a controller, along with the async fetching
-                wikiService.getAttachment(getExplorer().getSelectedWiki(), getExplorer().getSelectedSpace(),
-                    getExplorer().getSelectedPage(), getExplorer().getSelectedAttachment(),
-                    new AsyncCallback<Attachment>()
-                    {
-                        public void onSuccess(Attachment result)
-                        {
-                            if (result == null) {
-                                // there was a problem with getting the attachment, call it a failure.
-                                displayError(Strings.INSTANCE.fileGetSubmitError());
-                                async.onSuccess(false);
-                            } else {
-                                ResourceName ref = new ResourceName(result.getReference(), true);
-                                getData().setReference(ATTACH_PREFIX + ref.getRelativeTo(editedResource).toString());
-                                getData().setUrl(result.getURL());
-                                async.onSuccess(true);
-                            }
-                        }
-
-                        public void onFailure(Throwable caught)
-                        {
-                            async.onFailure(caught);
-                        }
-                    });
+                updateLinkConfig(attachmentReference, async);
             }
         } else {
-            async.onSuccess(true);
+            displayError(Strings.INSTANCE.linkNoAttachmentSelectedError());
+            async.onSuccess(false);
         }
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    protected String getHelpLabelText()
-    {
-        return Strings.INSTANCE.linkSelectAttachmentHelpLabel();
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    protected String getDefaultErrorText()
-    {
-        return Strings.INSTANCE.linkNoAttachmentSelectedError();
-    }
-
-    /**
-     * Injects the wiki service.
-     * 
-     * @param wikiService the service used to retrieve the attachments
-     */
-    public void setWikiService(WikiServiceAsync wikiService)
-    {
-        this.wikiService = wikiService;
     }
 }

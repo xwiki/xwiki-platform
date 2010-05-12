@@ -56,10 +56,6 @@ public class LinkConfigTest extends WysiwygTestCase
         assertEquals(LinkType.WIKIPAGE, linkConfig.getType());
         assertNull(linkConfig.getTooltip());
         assertFalse(linkConfig.isReadOnlyLabel());
-        // assert wiki, space and page are not set
-        assertNull(linkConfig.getWiki());
-        assertNull(linkConfig.getSpace());
-        assertNull(linkConfig.getPage());
     }
 
     /**
@@ -71,10 +67,6 @@ public class LinkConfigTest extends WysiwygTestCase
         linkConfig.setType(LinkType.NEW_WIKIPAGE);
         linkConfig.setReference("xwiki:Main.AllDocs");
         linkConfig.setUrl("/xwiki/bin/view/Main/AllDocs");
-        // set some parameters that we don't expect serialized
-        linkConfig.setWiki("xwiki");
-        linkConfig.setSpace("Main");
-        linkConfig.setPage("WebHome");
         linkConfig.setLabel("<strong>X</strong>Wiki");
         linkConfig.setLabelText("XWiki");
         String expectedJSON =
@@ -155,12 +147,6 @@ public class LinkConfigTest extends WysiwygTestCase
 
         assertEquals(expected.getReference(), actual.getReference());
         assertEquals(expected.getUrl(), actual.getUrl());
-        assertEquals(expected.getWiki(), actual.getWiki());
-        assertNull(actual.getWiki());
-        assertEquals(expected.getSpace(), actual.getSpace());
-        assertNull(actual.getSpace());
-        assertEquals(expected.getPage(), actual.getPage());
-        assertNull(actual.getPage());
         assertEquals(expected.getType(), actual.getType());
         assertEquals(expected.getLabel(), actual.getLabel());
         assertEquals(expected.getLabelText(), actual.getLabelText());

@@ -34,8 +34,7 @@ import com.google.gwt.user.client.ui.ListBox;
 public class PageSelector extends ListBox
 {
     /**
-     * The wiki from which to get the pages for this selector. This parameter can be null, and the current wiki will be
-     * used.
+     * The wiki from which to get the pages for this selector.
      */
     private String wiki;
 
@@ -49,31 +48,16 @@ public class PageSelector extends ListBox
     /**
      * The service used to retrieve the list of page names.
      */
-    private WikiServiceAsync wikiService;
+    private final WikiServiceAsync wikiService;
 
     /**
-     * Builds a page selector from the passed space, for the current wiki.
+     * Creates a new page selector that uses the given service to get the list of page names.
      * 
-     * @param space the space for this page selector.
-     * @see #PageSelector(String, String)
+     * @param wikiService the service used to retrieve the list of page names
      */
-    public PageSelector(String space)
+    public PageSelector(WikiServiceAsync wikiService)
     {
-        this(null, space);
-    }
-
-    /**
-     * Builds a page selector for the passed wiki and space. Note that this function does not actually fill the list of
-     * pages, you need to explicitly call {@link #refreshList(String, AsyncCallback)} after this constructor.
-     * 
-     * @param wiki the wiki for this page selector.
-     * @param space the space for this page selector.
-     */
-    public PageSelector(String wiki, String space)
-    {
-        super(false);
-        this.wiki = wiki;
-        this.space = space;
+        this.wikiService = wikiService;
     }
 
     /**
@@ -176,15 +160,5 @@ public class PageSelector extends ListBox
     public void setSpace(String space)
     {
         this.space = space;
-    }
-
-    /**
-     * Inject the wiki service.
-     * 
-     * @param wikiService the service used to retrieve the list of page names
-     */
-    public void setWikiService(WikiServiceAsync wikiService)
-    {
-        this.wikiService = wikiService;
     }
 }

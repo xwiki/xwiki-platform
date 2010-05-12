@@ -34,35 +34,23 @@ import com.google.gwt.user.client.ui.ListBox;
 public class SpaceSelector extends ListBox
 {
     /**
-     * Current wiki for which to get the spaces. If this is null, then the spaces of the current wiki are retrieved.
+     * The wiki whose spaces are listed.
      */
     private String wiki;
 
     /**
      * The service used to retrieve the list of space names.
      */
-    private WikiServiceAsync wikiService;
+    private final WikiServiceAsync wikiService;
 
     /**
-     * Default constructor.
+     * Creates a new space selector that uses the given service to retrieve the list of space names.
      * 
-     * @see #SpaceSelector(String)
+     * @param wikiService the service used to retrieve the list of space names
      */
-    public SpaceSelector()
+    public SpaceSelector(WikiServiceAsync wikiService)
     {
-        this(null);
-    }
-
-    /**
-     * Builds a space selector for the passed wiki. Note that this function does not actually fill the list of spaces,
-     * you need to explicitly call {@link #refreshList(String, AsyncCallback)} after this constructor.
-     * 
-     * @param wiki wiki for which to retrieve the spaces list.
-     */
-    public SpaceSelector(String wiki)
-    {
-        super(false);
-        this.wiki = wiki;
+        this.wikiService = wikiService;
     }
 
     /**
@@ -148,15 +136,5 @@ public class SpaceSelector extends ListBox
     public void setWiki(String wiki)
     {
         this.wiki = wiki;
-    }
-
-    /**
-     * Inject the wiki service.
-     * 
-     * @param wikiService the service used to retrieve the list of space names
-     */
-    public void setWikiService(WikiServiceAsync wikiService)
-    {
-        this.wikiService = wikiService;
     }
 }

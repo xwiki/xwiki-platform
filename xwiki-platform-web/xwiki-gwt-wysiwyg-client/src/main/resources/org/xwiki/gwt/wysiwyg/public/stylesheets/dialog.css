@@ -130,8 +130,8 @@
 }
 
 /* Styles for dialog elements (such as labels, inputs, etc), common to all dialogs */
-.xInfoLabel, .xMacroLabel, .xMacroParameterLabel, .xImporterInfoLabel, 
-.xImporterDialog .xDialogFooter .gwt-CheckBox {
+.xInfoLabel, .xMacroLabel, .xMacroParameterLabel, .xPagePreviewTitle,
+.xImporterInfoLabel, .xImporterDialog .xDialogFooter .gwt-CheckBox {
   color: #666;
   font-weight: bolder;
   margin-bottom: 3px;
@@ -139,7 +139,8 @@
   padding-top: 14px;
 }
 
-.xHelpLabel, .xMacroDescription, .xMacroParameterDescription, .xImporterHelpLabel {
+.xHelpLabel, .xMacroDescription, .xMacroParameterDescription,
+.xPagePreviewFullname, .xImporterHelpLabel {
   color: #777;
   font-size: 90%;
   font-style: italic;

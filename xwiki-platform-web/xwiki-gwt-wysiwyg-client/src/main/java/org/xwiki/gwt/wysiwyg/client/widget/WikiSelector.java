@@ -36,15 +36,17 @@ public class WikiSelector extends ListBox
     /**
      * The service used to retrieve the list of virtual wiki names.
      */
-    private WikiServiceAsync wikiService;
+    private final WikiServiceAsync wikiService;
 
     /**
      * Builds a wiki selector. Note that this function does not actually fill the list of wikis, you need to explicitly
      * call {@link #refreshList(String, AsyncCallback)} after this constructor.
+     * 
+     * @param wikiService the service used to retrieve the list of virtual wiki names
      */
-    public WikiSelector()
+    public WikiSelector(WikiServiceAsync wikiService)
     {
-        super(false);
+        this.wikiService = wikiService;
     }
 
     /**
@@ -110,15 +112,5 @@ public class WikiSelector extends ListBox
                 setSelectedIndex(i);
             }
         }
-    }
-
-    /**
-     * Inject the wiki service.
-     * 
-     * @param wikiService the service used to retrieve the list of virtual wiki names
-     */
-    public void setWikiService(WikiServiceAsync wikiService)
-    {
-        this.wikiService = wikiService;
     }
 }

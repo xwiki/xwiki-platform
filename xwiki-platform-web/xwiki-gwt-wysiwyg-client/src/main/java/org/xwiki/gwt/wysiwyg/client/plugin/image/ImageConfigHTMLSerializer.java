@@ -25,7 +25,6 @@ import java.util.Map;
 import org.xwiki.gwt.user.client.StringUtils;
 import org.xwiki.gwt.user.client.ui.rta.cmd.internal.AbstractInsertElementExecutable.ConfigHTMLSerializer;
 import org.xwiki.gwt.wysiwyg.client.plugin.image.ImageConfig.ImageAlignment;
-import org.xwiki.gwt.wysiwyg.client.wiki.ResourceName;
 
 /**
  * Serializes an {@link ImageConfig} object to an HTML fragment that can be used to insert an image into the edited
@@ -68,12 +67,12 @@ public final class ImageConfigHTMLSerializer implements ConfigHTMLSerializer<Ima
         imageHTML.append("<!--startimage:");
         imageHTML.append(imageConfig.getReference());
         imageHTML.append("--><img src=\"");
-        imageHTML.append(imageConfig.getImageURL());
+        imageHTML.append(imageConfig.getUrl());
 
         imageHTML.append("\" alt=\"");
         String altText = imageConfig.getAltText();
         if (StringUtils.isEmpty(altText)) {
-            altText = new ResourceName(imageConfig.getReference(), true).getFile();
+            altText = imageConfig.getReference();
         }
         imageHTML.append(altText + "\" ");
 

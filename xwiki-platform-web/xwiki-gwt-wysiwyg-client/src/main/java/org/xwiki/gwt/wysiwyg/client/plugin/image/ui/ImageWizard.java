@@ -28,8 +28,13 @@ import org.xwiki.gwt.user.client.ui.wizard.WizardStep;
 import org.xwiki.gwt.user.client.ui.wizard.WizardStepProvider;
 import org.xwiki.gwt.wysiwyg.client.Images;
 import org.xwiki.gwt.wysiwyg.client.Strings;
-import org.xwiki.gwt.wysiwyg.client.wiki.ResourceName;
+import org.xwiki.gwt.wysiwyg.client.plugin.image.ImageConfig;
+import org.xwiki.gwt.wysiwyg.client.widget.wizard.util.AttachmentSelectorAggregatorWizardStep;
+import org.xwiki.gwt.wysiwyg.client.widget.wizard.util.LinkUploadWizardStep;
+import org.xwiki.gwt.wysiwyg.client.wiki.EntityLink;
+import org.xwiki.gwt.wysiwyg.client.wiki.EntityReference;
 import org.xwiki.gwt.wysiwyg.client.wiki.WikiServiceAsync;
+import org.xwiki.gwt.wysiwyg.client.wiki.EntityReference.EntityType;
 
 import com.google.gwt.user.client.ui.Image;
 
@@ -45,7 +50,7 @@ public class ImageWizard extends Wizard implements WizardStepProvider
     /**
      * Enumeration steps handled by this image wizard.
      */
-    public static enum ImageWizardSteps
+    public static enum ImageWizardStep
     {
         /**
          * Steps managed by this wizard: the image selector, the image parameters step and the new image upload step.
@@ -56,11 +61,10 @@ public class ImageWizard extends Wizard implements WizardStepProvider
     /**
      * Map with the instantiated steps to return. Will be lazily initialized upon request.
      */
-    private Map<ImageWizardSteps, WizardStep> stepsMap = new HashMap<ImageWizardSteps, WizardStep>();
+    private Map<ImageWizardStep, WizardStep> stepsMap = new HashMap<ImageWizardStep, WizardStep>();
 
     /**
-     * The resource currently edited by this WYSIWYG, used to determine the context in which image insertion takes
-     * place.
+     * The object used to configure this wizard.
      */
     private final Config config;
 
@@ -91,19 +95,31 @@ public class ImageWizard extends Wizard implements WizardStepProvider
      */
     public WizardStep getStep(String name)
     {
-        ImageWizardSteps requestedStep = parseStepName(name);
+        ImageWizardStep requestedStep = parseStepName(name);
         WizardStep step = stepsMap.get(requestedStep);
         if (step == null) {
             switch (requestedStep) {
                 case IMAGE_SELECTOR:
-                    step = dispatchImageSelectorStep();
+                    boolean selectionLimitedToCurrentPage = "currentpage".equals(config.getParameter("insertimages"));
+                    AttachmentSelectorAggregatorWizardStep<ImageConfig> imageSelector =
+                        new AttachmentSelectorAggregatorWizardStep<ImageConfig>(selectionLimitedToCurrentPage,
+                            wikiService);
+                    imageSelector.setStepTitle(Strings.INSTANCE.imageSelectImageTitle());
+                    imageSelector.setCurrentPageSelector(new CurrentPageImageSelectorWizardStep(wikiService, false));
+                    if (!selectionLimitedToCurrentPage) {
+                        imageSelector.setAllPagesSelector(new ImagesExplorerWizardStep(false, wikiService));
+                    }
+                    step = imageSelector;
                     break;
                 case IMAGE_CONFIG:
                     step = new ImageConfigWizardStep();
                     break;
                 case IMAGE_UPLOAD:
-                    step = new ImageUploadWizardStep(getEditedResource());
-                    ((ImageUploadWizardStep) step).setWikiService(wikiService);
+                    LinkUploadWizardStep<ImageConfig> imageUploadStep =
+                        new LinkUploadWizardStep<ImageConfig>(wikiService);
+                    imageUploadStep.setFileHelpLabel(Strings.INSTANCE.imageUploadHelpLabel());
+                    imageUploadStep.setNextStep(ImageWizardStep.IMAGE_CONFIG.toString());
+                    step = imageUploadStep;
                     break;
                 default:
                     // nothing here, leave it null
@@ -119,46 +135,50 @@ public class ImageWizard extends Wizard implements WizardStepProvider
     }
 
     /**
-     * @return the currently edited resource, from the configuration
+     * {@inheritDoc}
+     * 
+     * @see Wizard#start(String, Object)
      */
-    private ResourceName getEditedResource()
+    @Override
+    public void start(String startStep, Object data)
     {
-        return new ResourceName(config.getParameter("wiki"), config.getParameter("space"), config.getParameter("page"),
-            null);
+        EntityReference origin = new EntityReference();
+        origin.setType(EntityType.DOCUMENT);
+        origin.setWikiName(config.getParameter("wiki"));
+        origin.setSpaceName(config.getParameter("space"));
+        origin.setPageName(config.getParameter("page"));
+        EntityReference destination = new EntityReference();
+        destination.setType(EntityType.IMAGE);
+        EntityLink<ImageConfig> entityLink = new EntityLink<ImageConfig>(origin, destination, (ImageConfig) data);
+
+        super.start(startStep, entityLink);
     }
 
     /**
-     * @return the wizard step for image selector wrt the configuration parameters. If the {@code insertimages}
-     *         parameter with the value {@code currentpage} is not found, then the selector will be enabled for the
-     *         whole wiki, otherwise only for the current page.
+     * {@inheritDoc}
+     * 
+     * @see Wizard#getResult()
      */
-    private WizardStep dispatchImageSelectorStep()
+    @SuppressWarnings("unchecked")
+    @Override
+    protected Object getResult()
     {
-        String insertImages = config.getParameter("insertimages");
-        if ("currentpage".equals(insertImages)) {
-            CurrentPageImageSelectorWizardStep step = new CurrentPageImageSelectorWizardStep(getEditedResource());
-            step.setWikiService(wikiService);
-            return step;
-        } else {
-            ImageSelectorWizardStep step = new ImageSelectorWizardStep(getEditedResource());
-            step.setWikiService(wikiService);
-            return step;
-        }
+        return ((EntityLink<ImageConfig>) super.getResult()).getData();
     }
 
     /**
-     * Parses the specified step name in a {@link ImageWizardSteps} value.
+     * Parses the specified step name in a {@link ImageWizardStep} value.
      * 
      * @param name the name of the step to parse
-     * @return the {@link ImageWizardSteps} {@code enum} value corresponding to the passed name, or {@code null} if no
+     * @return the {@link ImageWizardStep} {@code enum} value corresponding to the passed name, or {@code null} if no
      *         such value exists.
      */
-    private ImageWizardSteps parseStepName(String name)
+    private ImageWizardStep parseStepName(String name)
     {
         // let's be careful about this
-        ImageWizardSteps requestedStep = null;
+        ImageWizardStep requestedStep = null;
         try {
-            requestedStep = ImageWizardSteps.valueOf(name);
+            requestedStep = ImageWizardStep.valueOf(name);
         } catch (IllegalArgumentException e) {
             // nothing, just leave it null if it cannot be found in the enum
         }

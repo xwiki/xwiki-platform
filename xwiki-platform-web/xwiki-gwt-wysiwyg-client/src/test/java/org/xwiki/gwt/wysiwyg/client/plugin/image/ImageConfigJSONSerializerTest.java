@@ -43,7 +43,7 @@ public class ImageConfigJSONSerializerTest extends WysiwygTestCase
      */
     public void testParseAndSerialize()
     {
-        String imageJSON = "{reference:'1',url:'2',width:'3',height:'4',alttext:'5',alignment:'MIDDLE'}";
+        String imageJSON = "{reference:\"1\",url:\"2\",width:\"3\",height:\"4\",alttext:\"5\",alignment:\"MIDDLE\"}";
         assertEquals(imageJSON, imageConfigJSONSerializer.serialize(imageConfigJSONParser.parse(imageJSON)));
     }
 
@@ -53,5 +53,16 @@ public class ImageConfigJSONSerializerTest extends WysiwygTestCase
     public void testNullValuesAreNotSerialized()
     {
         assertEquals("{}", imageConfigJSONSerializer.serialize(imageConfigJSONParser.parse("{url:null}")));
+    }
+
+    /**
+     * Tests that strings are properly escaped.
+     */
+    public void testStringsAreProperlyEscaped()
+    {
+        ImageConfig before = new ImageConfig();
+        before.setAltText("x\ny\\");
+        ImageConfig after = imageConfigJSONParser.parse(imageConfigJSONSerializer.serialize(before));
+        assertEquals(before.getAltText(), after.getAltText());
     }
 }

@@ -24,6 +24,7 @@ import java.util.EnumSet;
 import java.util.List;
 
 import org.xwiki.gwt.user.client.FocusCommand;
+import org.xwiki.gwt.user.client.StringUtils;
 import org.xwiki.gwt.user.client.ui.wizard.NavigationListener;
 import org.xwiki.gwt.user.client.ui.wizard.NavigationListenerCollection;
 import org.xwiki.gwt.user.client.ui.wizard.SourcesNavigationEvents;
@@ -31,6 +32,7 @@ import org.xwiki.gwt.user.client.ui.wizard.WizardStep;
 import org.xwiki.gwt.user.client.ui.wizard.NavigationListener.NavigationDirection;
 import org.xwiki.gwt.wysiwyg.client.Strings;
 import org.xwiki.gwt.wysiwyg.client.plugin.image.ImageConfig;
+import org.xwiki.gwt.wysiwyg.client.wiki.EntityLink;
 
 import com.google.gwt.event.dom.client.KeyCodes;
 import com.google.gwt.event.dom.client.KeyPressEvent;
@@ -62,9 +64,10 @@ public class ImageConfigWizardStep implements WizardStep, KeyPressHandler, Sourc
     private static final String HELP_LABEL_STYLE = "xHelpLabel";
 
     /**
-     * The image data to be edited by this wizard step.
+     * The entity link managed by the wizard step. This wizard step updates the configuration object attached to the
+     * entity link.
      */
-    private ImageConfig imageData;
+    private EntityLink<ImageConfig> entityLink;
 
     /**
      * Collection of {@link NavigationListener}s, to be notified by navigation events from this step. Used to handle
@@ -269,17 +272,18 @@ public class ImageConfigWizardStep implements WizardStep, KeyPressHandler, Sourc
     /**
      * {@inheritDoc}
      */
+    @SuppressWarnings("unchecked")
     public void init(Object data, AsyncCallback< ? > cb)
     {
-        // store the data received as parameter
-        imageData = (ImageConfig) data;
-        // set the step configuration according to the received config data
-        widthBox.setText(imageData.getWidth());
-        heightBox.setText(imageData.getHeight());
-        setImageAlignment(imageData.getAlignment());
-        altTextBox.setText(imageData.getAltText());
+        // Store the data received as parameter.
+        entityLink = (EntityLink<ImageConfig>) data;
+        // Set the step configuration according to the received data.
+        widthBox.setText(entityLink.getData().getWidth());
+        heightBox.setText(entityLink.getData().getHeight());
+        setImageAlignment(entityLink.getData().getAlignment());
+        String altText = entityLink.getData().getAltText();
+        altTextBox.setText(StringUtils.isEmpty(altText) ? entityLink.getDestination().getFileName() : altText);
         cb.onSuccess(null);
-        // and set focus
         DeferredCommand.addCommand(new FocusCommand(widthBox));
     }
 
@@ -296,11 +300,12 @@ public class ImageConfigWizardStep implements WizardStep, KeyPressHandler, Sourc
      */
     public void onSubmit(AsyncCallback<Boolean> async)
     {
-        imageData.setAltText(altTextBox.getText().trim());
-        imageData.setWidth(widthBox.getText().trim());
-        imageData.setHeight(heightBox.getText().trim());
+        String altText = altTextBox.getText().trim();
+        entityLink.getData().setAltText(altText.length() > 0 ? altText : entityLink.getDestination().getFileName());
+        entityLink.getData().setWidth(widthBox.getText().trim());
+        entityLink.getData().setHeight(heightBox.getText().trim());
         ImageConfig.ImageAlignment alignment = getSelectedAlignment();
-        imageData.setAlignment(alignment);
+        entityLink.getData().setAlignment(alignment);
         async.onSuccess(true);
     }
 
@@ -316,7 +321,7 @@ public class ImageConfigWizardStep implements WizardStep, KeyPressHandler, Sourc
      */
     public Object getResult()
     {
-        return imageData;
+        return entityLink;
     }
 
     /**
@@ -324,7 +329,7 @@ public class ImageConfigWizardStep implements WizardStep, KeyPressHandler, Sourc
      */
     public String getNextStep()
     {
-        // this is the last step in the wizard.
+        // This is the last step in the wizard.
         return null;
     }
 

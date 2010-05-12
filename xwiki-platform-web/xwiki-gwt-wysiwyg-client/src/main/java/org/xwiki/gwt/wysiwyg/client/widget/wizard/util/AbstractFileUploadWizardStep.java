@@ -26,10 +26,11 @@ import org.xwiki.gwt.user.client.ui.wizard.WizardStep;
 import org.xwiki.gwt.user.client.ui.wizard.NavigationListener.NavigationDirection;
 import org.xwiki.gwt.wysiwyg.client.Strings;
 import org.xwiki.gwt.wysiwyg.client.wiki.Attachment;
+import org.xwiki.gwt.wysiwyg.client.wiki.EntityReference;
 import org.xwiki.gwt.wysiwyg.client.wiki.WikiServiceAsync;
+import org.xwiki.gwt.wysiwyg.client.wiki.EntityReference.EntityType;
 
 import com.google.gwt.event.shared.HandlerRegistration;
-import com.google.gwt.http.client.URL;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.FileUpload;
 import com.google.gwt.user.client.ui.FlowPanel;
@@ -74,15 +75,24 @@ public abstract class AbstractFileUploadWizardStep implements WizardStep
     private final Label fileErrorLabel = new Label();
 
     /**
-     * The service used to access the uploaded attachments.
+     * The help label for the file input.
      */
-    private WikiServiceAsync wikiService;
+    private final Label fileHelpLabel = new Label();
 
     /**
-     * Default constructor.
+     * The service used to access the uploaded attachments.
      */
-    public AbstractFileUploadWizardStep()
+    private final WikiServiceAsync wikiService;
+
+    /**
+     * Creates a new file upload wizard step that uses the given service to get information about the uploaded files.
+     * 
+     * @param wikiService the service used to access the uploaded attachments
+     */
+    public AbstractFileUploadWizardStep(WikiServiceAsync wikiService)
     {
+        this.wikiService = wikiService;
+
         mainPanel.addStyleName("xUploadPanel");
         fileUploadForm.setEncoding(FormPanel.ENCODING_MULTIPART);
         fileUploadForm.setMethod(FormPanel.METHOD_POST);
@@ -95,16 +105,12 @@ public abstract class AbstractFileUploadWizardStep implements WizardStep
         mandatoryLabel.addStyleName("xMandatory");
         fileLabel.add(mandatoryLabel);
         fileUploadInput.setName(getFileUploadInputName());
-        // FIXME: this should be set from CSS, but it's not possible on all browsers
-        fileUploadInput.getElement().setAttribute("size", "50");
         FlowPanel formPanel = new FlowPanel();
 
         formPanel.add(fileLabel);
-        if (!StringUtils.isEmpty(getFileHelpLabel())) {
-            Label fileHelpLabel = new Label(getFileHelpLabel());
-            fileHelpLabel.setStyleName("xHelpLabel");
-            formPanel.add(fileHelpLabel);
-        }
+        fileHelpLabel.setStyleName("xHelpLabel");
+        fileHelpLabel.setVisible(false);
+        formPanel.add(fileHelpLabel);
 
         fileErrorLabel.addStyleName("xErrorMsg");
         fileErrorLabel.setVisible(false);
@@ -128,30 +134,35 @@ public abstract class AbstractFileUploadWizardStep implements WizardStep
     /**
      * @return the help label for the file input
      */
-    protected abstract String getFileHelpLabel();
+    public String getFileHelpLabel()
+    {
+        return fileHelpLabel.getText();
+    }
 
     /**
-     * Builds the form upload URL for this form, to be called before form submission.
+     * Sets the help label for the file input.
      * 
-     * @return the url to set as the action of the file upload form
+     * @param fileHelpLabelText the new help label text for the file input
      */
-    protected String getUploadURL()
+    public void setFileHelpLabel(String fileHelpLabelText)
     {
-        // use a regular post to the upload action ftm, since REST is throwing an exception and messes up the document
-        // in some cases
-        // FIXME: un-hardcode this and make it work with multiwiki
-        StringBuffer uploadURL = new StringBuffer();
-        uploadURL.append("../../upload/");
-        uploadURL.append(URL.encodeComponent(getSpace()));
-        uploadURL.append('/');
-        uploadURL.append(URL.encodeComponent(getPage()));
+        fileHelpLabel.setVisible(!StringUtils.isEmpty(fileHelpLabelText));
+        fileHelpLabel.setText(fileHelpLabelText);
+    }
 
-        return uploadURL.toString();
+    /**
+     * Requests the upload URL from the server.
+     * 
+     * @param cb the object to be notified when the upload URL is received
+     */
+    protected void getUploadURL(AsyncCallback<String> cb)
+    {
+        wikiService.getUploadURL(getTargetPageReference(), cb);
     }
 
     /**
      * @return the {@code name} attribute of the {@link #fileUploadInput}, to be returned by subclasses implementing
-     *         {@link #getUploadURL()} to set the file upload form data.
+     *         {@link #getUploadURL()} to set the file upload form data
      */
     protected String getFileUploadInputName()
     {
@@ -219,8 +230,31 @@ public abstract class AbstractFileUploadWizardStep implements WizardStep
      */
     public void onSubmit(final AsyncCallback<Boolean> async)
     {
-        // Compute and set the upload URL.
-        fileUploadForm.setAction(getUploadURL());
+        getUploadURL(new AsyncCallback<String>()
+        {
+            public void onFailure(Throwable caught)
+            {
+                async.onFailure(caught);
+            }
+
+            public void onSuccess(String result)
+            {
+                submitTo(result, async);
+            }
+        });
+    }
+
+    /**
+     * Submits the upload form the the specified upload URL and notifies the given call-back when the response is
+     * received.
+     * 
+     * @param uploadURL where to submit the upload form
+     * @param async the object to be notifies when the response is received
+     */
+    private void submitTo(String uploadURL, final AsyncCallback<Boolean> async)
+    {
+        // Set the upload URL.
+        fileUploadForm.setAction(uploadURL);
         // Handle the submit complete event on the file upload form.
         // Note: The registrations array is just a hack to be able to remove the handler from within the handler itself
         // (otherwise we get the "local variable may not have been initialized" compiler error).
@@ -256,8 +290,8 @@ public abstract class AbstractFileUploadWizardStep implements WizardStep
      */
     protected void onSubmitComplete(SubmitCompleteEvent event, final AsyncCallback<Boolean> async)
     {
-        // create the link reference
-        wikiService.getAttachment(getWiki(), getSpace(), getPage(), extractFileName(), new AsyncCallback<Attachment>()
+        // Create the link reference.
+        wikiService.getAttachment(getAttachmentReference(extractFileName()), new AsyncCallback<Attachment>()
         {
             public void onSuccess(Attachment result)
             {
@@ -288,19 +322,25 @@ public abstract class AbstractFileUploadWizardStep implements WizardStep
     protected abstract void onAttachmentUploaded(Attachment attach, AsyncCallback<Boolean> async);
 
     /**
-     * @return the wiki of the document to upload this file to, or null if the default wiki should be used.
+     * @return a reference to the page where the attachment will be uploaded
      */
-    protected abstract String getWiki();
+    protected abstract EntityReference getTargetPageReference();
 
     /**
-     * @return the space of the document to upload this file to, or null if the default space should be used.
+     * @param fileName the name of the file used to upload the attachment
+     * @return a reference to the specified attachment
      */
-    protected abstract String getSpace();
-
-    /**
-     * @return the document to upload this file to, or null if the default document should be used.
-     */
-    protected abstract String getPage();
+    private EntityReference getAttachmentReference(String fileName)
+    {
+        EntityReference targetPageReference = getTargetPageReference();
+        EntityReference attachmentReference = new EntityReference();
+        attachmentReference.setType(EntityType.ATTACHMENT);
+        attachmentReference.setWikiName(targetPageReference.getWikiName());
+        attachmentReference.setSpaceName(targetPageReference.getSpaceName());
+        attachmentReference.setPageName(targetPageReference.getPageName());
+        attachmentReference.setFileName(fileName);
+        return attachmentReference;
+    }
 
     /**
      * @return the filename set in the file upload field.
@@ -355,12 +395,10 @@ public abstract class AbstractFileUploadWizardStep implements WizardStep
     }
 
     /**
-     * Inject the wiki service.
-     * 
-     * @param wikiService the service used to access the uploaded attachments
+     * @return the service used to retrieve information about the uploaded files
      */
-    public void setWikiService(WikiServiceAsync wikiService)
+    public WikiServiceAsync getWikiService()
     {
-        this.wikiService = wikiService;
+        return wikiService;
     }
 }

@@ -28,8 +28,13 @@ import org.xwiki.gwt.user.client.ui.wizard.WizardStep;
 import org.xwiki.gwt.user.client.ui.wizard.WizardStepProvider;
 import org.xwiki.gwt.wysiwyg.client.Images;
 import org.xwiki.gwt.wysiwyg.client.Strings;
-import org.xwiki.gwt.wysiwyg.client.wiki.ResourceName;
+import org.xwiki.gwt.wysiwyg.client.plugin.link.LinkConfig;
+import org.xwiki.gwt.wysiwyg.client.widget.wizard.util.AttachmentSelectorAggregatorWizardStep;
+import org.xwiki.gwt.wysiwyg.client.widget.wizard.util.LinkUploadWizardStep;
+import org.xwiki.gwt.wysiwyg.client.wiki.EntityLink;
+import org.xwiki.gwt.wysiwyg.client.wiki.EntityReference;
 import org.xwiki.gwt.wysiwyg.client.wiki.WikiServiceAsync;
+import org.xwiki.gwt.wysiwyg.client.wiki.EntityReference.EntityType;
 
 import com.google.gwt.user.client.ui.Image;
 
@@ -45,7 +50,7 @@ public class LinkWizard extends Wizard implements WizardStepProvider
     /**
      * Enumeration steps handled by this link wizard.
      */
-    public static enum LinkWizardSteps
+    public static enum LinkWizardStep
     {
         /**
          * Steps managed by this wizard.
@@ -54,9 +59,14 @@ public class LinkWizard extends Wizard implements WizardStepProvider
     };
 
     /**
+     * Maps a link wizard step to the type of entity that step creates links to.
+     */
+    private static final Map<LinkWizardStep, EntityType> WIZARD_STEP_TO_ENTITY_TYPE_MAP;
+
+    /**
      * Map with the instantiated steps to return. Will be lazily initialized upon request.
      */
-    private Map<LinkWizardSteps, WizardStep> stepsMap = new HashMap<LinkWizardSteps, WizardStep>();
+    private Map<LinkWizardStep, WizardStep> stepsMap = new HashMap<LinkWizardStep, WizardStep>();
 
     /**
      * The resource currently edited by this WYSIWYG, used to determine the context in which link creation takes place.
@@ -67,6 +77,12 @@ public class LinkWizard extends Wizard implements WizardStepProvider
      * The service used to access the wiki.
      */
     private final WikiServiceAsync wikiService;
+
+    static {
+        WIZARD_STEP_TO_ENTITY_TYPE_MAP = new HashMap<LinkWizardStep, EntityType>();
+        WIZARD_STEP_TO_ENTITY_TYPE_MAP.put(LinkWizardStep.WIKI_PAGE, EntityType.DOCUMENT);
+        WIZARD_STEP_TO_ENTITY_TYPE_MAP.put(LinkWizardStep.ATTACHMENT, EntityType.ATTACHMENT);
+    }
 
     /**
      * Builds a {@link LinkWizard} from the passed {@link Config}. The configuration is used to get WYSIWYG editor
@@ -90,33 +106,34 @@ public class LinkWizard extends Wizard implements WizardStepProvider
      */
     public WizardStep getStep(String name)
     {
-        LinkWizardSteps requestedStep = parseStepName(name);
+        LinkWizardStep requestedStep = parseStepName(name);
         WizardStep step = stepsMap.get(requestedStep);
         if (step == null) {
             switch (requestedStep) {
                 case EMAIL:
-                    step = new EmailAddressLinkWizardStep();
+                    step = new EmailAddressLinkWizardStep(wikiService);
                     break;
                 case WIKI_PAGE:
-                    step = new PageSelectorWizardStep(getEditedResource());
-                    ((PageSelectorWizardStep) step).setWikiService(wikiService);
+                    step = new PageSelectorWizardStep(wikiService);
                     break;
                 case WIKI_PAGE_CREATOR:
-                    step = new CreateNewPageWizardStep(getEditedResource());
-                    ((CreateNewPageWizardStep) step).setWikiService(wikiService);
+                    step = new CreateNewPageWizardStep(wikiService);
                     break;
                 case ATTACHMENT:
-                    step = dispatchAttachmentSelectorStep();
+                    step = createAttachmentSelectorWizardStep();
                     break;
                 case ATTACHMENT_UPLOAD:
-                    step = new AttachmentUploadWizardStep(getEditedResource());
-                    ((AttachmentUploadWizardStep) step).setWikiService(wikiService);
+                    LinkUploadWizardStep<LinkConfig> attachmentUploadStep =
+                        new LinkUploadWizardStep<LinkConfig>(wikiService);
+                    attachmentUploadStep.setFileHelpLabel(Strings.INSTANCE.linkAttachmentUploadHelpLabel());
+                    attachmentUploadStep.setNextStep(LinkWizardStep.WIKI_PAGE_CONFIG.toString());
+                    step = attachmentUploadStep;
                     break;
                 case WIKI_PAGE_CONFIG:
-                    step = new LinkConfigWizardStep();
+                    step = new LinkConfigWizardStep(wikiService);
                     break;
                 case WEB_PAGE:
-                    step = new WebPageLinkWizardStep();
+                    step = new WebPageLinkWizardStep(wikiService);
                     break;
                 default:
                     // nothing here, leave it null
@@ -132,47 +149,66 @@ public class LinkWizard extends Wizard implements WizardStepProvider
     }
 
     /**
-     * @return the currently edited resource, from the configuration
+     * @return the wizard step to be used for selecting an attachment
      */
-    private ResourceName getEditedResource()
+    private WizardStep createAttachmentSelectorWizardStep()
     {
-        return new ResourceName(config.getParameter("wiki"), config.getParameter("space"), config.getParameter("page"),
-            null);
-    }
-
-    /**
-     * @return the wizard step for attachments selector wrt the configuration parameters. If the {@code linkfiles}
-     *         parameter with the value {@code currentpage} is not found, then the selector will be enabled for the
-     *         whole wiki, otherwise only for the current page.
-     */
-    private WizardStep dispatchAttachmentSelectorStep()
-    {
-        String linkFiles = config.getParameter("linkfiles");
-        if ("currentpage".equals(linkFiles)) {
-            CurrentPageAttachmentSelectorWizardStep step =
-                new CurrentPageAttachmentSelectorWizardStep(getEditedResource());
-            step.setWikiService(wikiService);
-            return step;
-        } else {
-            AttachmentSelectorWizardStep step = new AttachmentSelectorWizardStep(getEditedResource());
-            step.setWikiService(wikiService);
-            return step;
+        boolean selectionLimitedToCurrentPage = "currentpage".equals(config.getParameter("linkfiles"));
+        AttachmentSelectorAggregatorWizardStep<LinkConfig> attachmentSelector =
+            new AttachmentSelectorAggregatorWizardStep<LinkConfig>(selectionLimitedToCurrentPage, wikiService);
+        attachmentSelector.setStepTitle(Strings.INSTANCE.imageSelectImageTitle());
+        attachmentSelector.setCurrentPageSelector(new CurrentPageAttachmentSelectorWizardStep(wikiService));
+        if (!selectionLimitedToCurrentPage) {
+            attachmentSelector.setAllPagesSelector(new AttachmentExplorerWizardStep(wikiService));
         }
+        return attachmentSelector;
     }
 
     /**
-     * Parses the specified step name in a {@link LinkWizardSteps} value.
+     * {@inheritDoc}
+     * 
+     * @see Wizard#start(String, Object)
+     */
+    @Override
+    public void start(String startStep, Object data)
+    {
+        EntityReference origin = new EntityReference();
+        origin.setType(EntityType.DOCUMENT);
+        origin.setWikiName(config.getParameter("wiki"));
+        origin.setSpaceName(config.getParameter("space"));
+        origin.setPageName(config.getParameter("page"));
+        EntityReference destination = new EntityReference();
+        destination.setType(WIZARD_STEP_TO_ENTITY_TYPE_MAP.get(parseStepName(startStep)));
+        EntityLink<LinkConfig> entityLink = new EntityLink<LinkConfig>(origin, destination, (LinkConfig) data);
+
+        super.start(startStep, entityLink);
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see Wizard#getResult()
+     */
+    @SuppressWarnings("unchecked")
+    @Override
+    protected Object getResult()
+    {
+        return ((EntityLink<LinkConfig>) super.getResult()).getData();
+    }
+
+    /**
+     * Parses the specified step name in a {@link LinkWizardStep} value.
      * 
      * @param name the name of the step to parse
-     * @return the {@link LinkWizardSteps} {@code enum} value corresponding to the passed name, or {@code null} if no
+     * @return the {@link LinkWizardStep} {@code enum} value corresponding to the passed name, or {@code null} if no
      *         such value exists.
      */
-    private LinkWizardSteps parseStepName(String name)
+    private LinkWizardStep parseStepName(String name)
     {
         // let's be careful about this
-        LinkWizardSteps requestedStep = null;
+        LinkWizardStep requestedStep = null;
         try {
-            requestedStep = LinkWizardSteps.valueOf(name);
+            requestedStep = LinkWizardStep.valueOf(name);
         } catch (IllegalArgumentException e) {
             // nothing, just leave it null if it cannot be found in the enum
         }

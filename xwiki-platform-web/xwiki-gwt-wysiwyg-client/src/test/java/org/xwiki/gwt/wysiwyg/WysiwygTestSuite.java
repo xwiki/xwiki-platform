@@ -47,7 +47,6 @@ import org.xwiki.gwt.wysiwyg.client.syntax.internal.DefaultSyntaxValidatorManage
 import org.xwiki.gwt.wysiwyg.client.syntax.internal.DefaultValidationRuleTest;
 import org.xwiki.gwt.wysiwyg.client.syntax.internal.DisablingRuleTest;
 import org.xwiki.gwt.wysiwyg.client.syntax.internal.XWikiSyntaxValidatorTest;
-import org.xwiki.gwt.wysiwyg.client.wiki.ResourceNameTest;
 
 import com.google.gwt.junit.tools.GWTTestSuite;
 
@@ -81,8 +80,6 @@ public class WysiwygTestSuite extends GWTTestSuite
         suite.addTestSuite(DefaultValidationRuleTest.class);
         suite.addTestSuite(DisablingRuleTest.class);
         suite.addTestSuite(XWikiSyntaxValidatorTest.class);
-
-        suite.addTestSuite(ResourceNameTest.class);
 
         return suite;
     }

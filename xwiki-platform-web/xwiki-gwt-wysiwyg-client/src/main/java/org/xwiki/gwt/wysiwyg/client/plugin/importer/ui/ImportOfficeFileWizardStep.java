@@ -29,6 +29,9 @@ import org.xwiki.gwt.wysiwyg.client.Strings;
 import org.xwiki.gwt.wysiwyg.client.plugin.importer.ImportServiceAsync;
 import org.xwiki.gwt.wysiwyg.client.widget.wizard.util.AbstractFileUploadWizardStep;
 import org.xwiki.gwt.wysiwyg.client.wiki.Attachment;
+import org.xwiki.gwt.wysiwyg.client.wiki.EntityReference;
+import org.xwiki.gwt.wysiwyg.client.wiki.WikiServiceAsync;
+import org.xwiki.gwt.wysiwyg.client.wiki.EntityReference.EntityType;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.CheckBox;
@@ -79,12 +82,17 @@ public class ImportOfficeFileWizardStep extends AbstractFileUploadWizardStep
      * Instantiates the office document import wizard step.
      * 
      * @param config the object used to configure this wizard step
+     * @param wikiService the component used to upload office documents
      * @param importService the component used to import office documents
      */
-    public ImportOfficeFileWizardStep(Config config, ImportServiceAsync importService)
+    public ImportOfficeFileWizardStep(Config config, WikiServiceAsync wikiService, ImportServiceAsync importService)
     {
+        super(wikiService);
+
         this.config = config;
         this.importService = importService;
+
+        setFileHelpLabel(Strings.INSTANCE.importOfficeFileHelpLabel());
 
         // Add filter styles check box.
         this.filterStylesCheckBox = new CheckBox(Strings.INSTANCE.importOfficeContentFilterStylesCheckBoxLabel());
@@ -104,38 +112,6 @@ public class ImportOfficeFileWizardStep extends AbstractFileUploadWizardStep
         } else {
             return getErrorMessagePanel();
         }
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    protected String getPage()
-    {
-        return config.getParameter("page", "WebHome");
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    protected String getSpace()
-    {
-        return config.getParameter("space", "Main");
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    protected String getWiki()
-    {
-        return config.getParameter("wiki", "xwiki");
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    protected String getFileHelpLabel()
-    {
-        return Strings.INSTANCE.importOfficeFileHelpLabel();
     }
 
     /**
@@ -254,5 +230,21 @@ public class ImportOfficeFileWizardStep extends AbstractFileUploadWizardStep
             errorMessagePanel.add(errorMessageLabel);
         }
         return errorMessagePanel;
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see AbstractFileUploadWizardStep#getTargetPageReference()
+     */
+    @Override
+    protected EntityReference getTargetPageReference()
+    {
+        EntityReference targetPageReference = new EntityReference();
+        targetPageReference.setType(EntityType.DOCUMENT);
+        targetPageReference.setWikiName(config.getParameter("wiki", "xwiki"));
+        targetPageReference.setSpaceName(config.getParameter("space", "Main"));
+        targetPageReference.setPageName(config.getParameter("page", "WebHome"));
+        return targetPageReference;
     }
 }

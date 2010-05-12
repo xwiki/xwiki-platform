@@ -20,6 +20,7 @@
 package org.xwiki.gwt.wysiwyg.client.plugin.link.ui;
 
 import org.xwiki.gwt.wysiwyg.client.Strings;
+import org.xwiki.gwt.wysiwyg.client.wiki.WikiServiceAsync;
 
 /**
  * Wizard step to create a link to a web page (http protocol).
@@ -28,6 +29,16 @@ import org.xwiki.gwt.wysiwyg.client.Strings;
  */
 public class WebPageLinkWizardStep extends AbstractExternalLinkWizardStep
 {
+    /**
+     * Creates a new wizard step for configuring a link to an external web page.
+     * 
+     * @param wikiService the service to be used for parsing the image reference when the link label is an image
+     */
+    public WebPageLinkWizardStep(WikiServiceAsync wikiService)
+    {
+        super(wikiService);
+    }
+
     /**
      * {@inheritDoc}
      * 

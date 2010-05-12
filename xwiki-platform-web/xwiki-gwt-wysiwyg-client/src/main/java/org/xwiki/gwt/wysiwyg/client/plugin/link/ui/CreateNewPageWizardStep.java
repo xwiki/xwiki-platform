@@ -30,8 +30,10 @@ import org.xwiki.gwt.user.client.ui.wizard.WizardStep;
 import org.xwiki.gwt.user.client.ui.wizard.NavigationListener.NavigationDirection;
 import org.xwiki.gwt.wysiwyg.client.Strings;
 import org.xwiki.gwt.wysiwyg.client.plugin.link.LinkConfig;
-import org.xwiki.gwt.wysiwyg.client.plugin.link.ui.LinkWizard.LinkWizardSteps;
-import org.xwiki.gwt.wysiwyg.client.wiki.ResourceName;
+import org.xwiki.gwt.wysiwyg.client.plugin.link.ui.LinkWizard.LinkWizardStep;
+import org.xwiki.gwt.wysiwyg.client.wiki.EntityConfig;
+import org.xwiki.gwt.wysiwyg.client.wiki.EntityLink;
+import org.xwiki.gwt.wysiwyg.client.wiki.EntityReference;
 import org.xwiki.gwt.wysiwyg.client.wiki.WikiServiceAsync;
 
 import com.google.gwt.event.dom.client.KeyCodes;
@@ -74,14 +76,9 @@ public class CreateNewPageWizardStep implements WizardStep, KeyPressHandler, Sou
     private final Label pageNameErrorLabel = new Label();
 
     /**
-     * Link data handled by this wizard step.
+     * The entity link handled by this wizard step.
      */
-    private LinkConfig linkData;
-
-    /**
-     * The resource edited by this wizard step, i.e. the wikipage being edited right now
-     */
-    private ResourceName editedResource;
+    private EntityLink<LinkConfig> entityLink;
 
     /**
      * Collection of {@link NavigationListener}s, to be notified by navigation events from this step. Used to handle
@@ -92,16 +89,17 @@ public class CreateNewPageWizardStep implements WizardStep, KeyPressHandler, Sou
     /**
      * The service used to create a link to a wiki page.
      */
-    private WikiServiceAsync wikiService;
+    private final WikiServiceAsync wikiService;
 
     /**
-     * Creates a new wizard step for the passed edited resource.
+     * Creates a new wizard step that allows the user to create a link to a new page.
      * 
-     * @param editedResource the resource being edited by this wizard step
+     * @param wikiService the service to be used for creating a link to a wiki page
      */
-    public CreateNewPageWizardStep(ResourceName editedResource)
+    public CreateNewPageWizardStep(WikiServiceAsync wikiService)
     {
-        this.editedResource = editedResource;
+        this.wikiService = wikiService;
+
         Panel pageNameLabel = new FlowPanel();
         pageNameLabel.setStyleName("xInfoLabel");
         pageNameLabel.add(new InlineLabel(Strings.INSTANCE.linkNewPageLabel()));
@@ -148,7 +146,7 @@ public class CreateNewPageWizardStep implements WizardStep, KeyPressHandler, Sou
      */
     public String getNextStep()
     {
-        return LinkWizardSteps.WIKI_PAGE_CONFIG.toString();
+        return LinkWizardStep.WIKI_PAGE_CONFIG.toString();
     }
 
     /**
@@ -156,7 +154,7 @@ public class CreateNewPageWizardStep implements WizardStep, KeyPressHandler, Sou
      */
     public Object getResult()
     {
-        return linkData;
+        return entityLink;
     }
 
     /**
@@ -178,9 +176,10 @@ public class CreateNewPageWizardStep implements WizardStep, KeyPressHandler, Sou
     /**
      * {@inheritDoc}
      */
+    @SuppressWarnings("unchecked")
     public void init(Object data, AsyncCallback< ? > cb)
     {
-        linkData = (LinkConfig) data;
+        entityLink = (EntityLink<LinkConfig>) data;
         hideError();
         cb.onSuccess(null);
         DeferredCommand.addCommand(new FocusCommand(pageNameTextBox));
@@ -196,36 +195,34 @@ public class CreateNewPageWizardStep implements WizardStep, KeyPressHandler, Sou
     /**
      * {@inheritDoc}
      */
-    public void onSubmit(final AsyncCallback<Boolean> async)
+    public void onSubmit(final AsyncCallback<Boolean> callback)
     {
         hideError();
-        // get the name of the page from the input
+
         String newPageName = pageNameTextBox.getText().trim();
         if (StringUtils.isEmpty(newPageName)) {
             displayError(Strings.INSTANCE.linkNewPageError());
-            async.onSuccess(false);
+            callback.onSuccess(false);
             DeferredCommand.addCommand(new FocusCommand(pageNameTextBox));
         } else {
-            // call the server to get the page URL and reference
-            // FIXME: move the reference setting logic in a controller, along with the async fetching logic
-            wikiService.getPageLink(linkData.getWiki(), linkData.getSpace(), newPageName, null, null,
-                new AsyncCallback<LinkConfig>()
+            final EntityReference destination = entityLink.getDestination().clone();
+            destination.setPageName(newPageName);
+            wikiService.getEntityConfig(entityLink.getOrigin(), destination, new AsyncCallback<EntityConfig>()
+            {
+                public void onFailure(Throwable caught)
                 {
-                    public void onSuccess(LinkConfig result)
-                    {
-                        linkData.setUrl(result.getUrl());
-                        // set relative reference
-                        ResourceName ref = new ResourceName(result.getReference(), false);
-                        linkData.setReference(ref.getRelativeTo(editedResource).toString());
-                        async.onSuccess(true);
-                    }
+                    callback.onFailure(caught);
+                    DeferredCommand.addCommand(new FocusCommand(pageNameTextBox));
+                }
 
-                    public void onFailure(Throwable caught)
-                    {
-                        async.onSuccess(false);
-                        DeferredCommand.addCommand(new FocusCommand(pageNameTextBox));
-                    }
-                });
+                public void onSuccess(EntityConfig result)
+                {
+                    entityLink.setDestination(destination);
+                    entityLink.getData().setReference(result.getReference());
+                    entityLink.getData().setUrl(result.getUrl());
+                    callback.onSuccess(true);
+                }
+            });
         }
     }
 
@@ -286,15 +283,5 @@ public class CreateNewPageWizardStep implements WizardStep, KeyPressHandler, Sou
     public NavigationDirection getDefaultDirection()
     {
         return NavigationDirection.NEXT;
-    }
-
-    /**
-     * Injects the wiki service.
-     * 
-     * @param wikiService the service used to create links to wiki pages
-     */
-    public void setWikiService(WikiServiceAsync wikiService)
-    {
-        this.wikiService = wikiService;
     }
 }

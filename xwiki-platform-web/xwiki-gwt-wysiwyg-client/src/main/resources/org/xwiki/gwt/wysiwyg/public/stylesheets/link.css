@@ -34,12 +34,15 @@
 }
 
 .xPagePreview .xPagePreviewTitle {
-  margin-bottom: 3px;
-  font-style: italic;
+  padding-top: 0;
+  text-transform: none;
 }
 
 .xPagePreview .xPagePreviewFullname {
+  margin-bottom: 0;
   margin-top: 3px;
+  overflow: hidden;
+  width: 413px;
 }
 
 /* Search tab style */

@@ -288,8 +288,6 @@ public interface Strings extends Constants
 
     String fileUploadNoPathError();
 
-    String fileGetSubmitError();
-
     String image();
 
     String imageTooltip();
@@ -409,4 +407,6 @@ public interface Strings extends Constants
     String importOfficePasteHelpLabel();
 
     String embeddedObject();
+
+    String entityLocatedIn();
 }

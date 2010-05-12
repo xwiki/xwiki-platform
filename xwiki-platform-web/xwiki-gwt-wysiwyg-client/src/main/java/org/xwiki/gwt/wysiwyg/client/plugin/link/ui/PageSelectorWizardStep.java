@@ -26,31 +26,26 @@ import org.xwiki.gwt.user.client.StringUtils;
 import org.xwiki.gwt.user.client.ui.wizard.WizardStep;
 import org.xwiki.gwt.wysiwyg.client.Strings;
 import org.xwiki.gwt.wysiwyg.client.plugin.link.LinkConfig;
-import org.xwiki.gwt.wysiwyg.client.widget.wizard.util.AbstractSelectorAggregatorWizardStep;
-import org.xwiki.gwt.wysiwyg.client.wiki.ResourceName;
+import org.xwiki.gwt.wysiwyg.client.widget.wizard.util.AbstractEntitySelectorAggregatorWizardStep;
 import org.xwiki.gwt.wysiwyg.client.wiki.WikiServiceAsync;
 
-
 /**
- * Creates a page selector aggregator, to switch between the recent changed pages and all pages.
+ * A page selector that aggregates different views for selecting a page: recently modified pages, all pages or page
+ * search.
  * 
  * @version $Id$
  */
-public class PageSelectorWizardStep extends AbstractSelectorAggregatorWizardStep<LinkConfig>
+public class PageSelectorWizardStep extends AbstractEntitySelectorAggregatorWizardStep<LinkConfig>
 {
     /**
-     * The service used to access the wiki.
-     */
-    private WikiServiceAsync wikiService;
-
-    /**
-     * Builds a page selector step for the currently edited resource.
+     * Creates a new page selector, that aggregates different views for selecting a page: recently modified pages, all
+     * pages or page search.
      * 
-     * @param editedResource the resource edited by this aggregator step
+     * @param wikiService the service to be used for creating links to wiki pages
      */
-    public PageSelectorWizardStep(ResourceName editedResource)
+    public PageSelectorWizardStep(WikiServiceAsync wikiService)
     {
-        super(editedResource);
+        super(wikiService);
     }
 
     /**
@@ -59,8 +54,8 @@ public class PageSelectorWizardStep extends AbstractSelectorAggregatorWizardStep
     @Override
     protected String getRequiredStep()
     {
-        // if it's an edited link, require all pages
-        if (!StringUtils.isEmpty(getData().getReference())) {
+        // If it's an edited link, require all pages.
+        if (!StringUtils.isEmpty(getData().getData().getReference())) {
             return Strings.INSTANCE.selectorSelectFromAllPages();
         }
         return null;
@@ -73,19 +68,11 @@ public class PageSelectorWizardStep extends AbstractSelectorAggregatorWizardStep
     protected WizardStep getStepInstance(String name)
     {
         if (name.equals(Strings.INSTANCE.selectorSelectFromRecentPages())) {
-            RecentChangesSelectorWizardStep step = new RecentChangesSelectorWizardStep(getEditedResource());
-            step.setWikiService(wikiService);
-            return step;
-        }
-        if (name.equals(Strings.INSTANCE.selectorSelectFromAllPages())) {
-            WikiPageExplorerWizardStep step = new WikiPageExplorerWizardStep(getEditedResource());
-            step.setWikiService(wikiService);
-            return step;
-        }
-        if (name.equals(Strings.INSTANCE.selectorSelectFromSearchPages())) {
-            SearchSelectorWizardStep step = new SearchSelectorWizardStep(getEditedResource());
-            step.setWikiService(wikiService);
-            return step;
+            return new RecentChangesSelectorWizardStep(getWikiService());
+        } else if (name.equals(Strings.INSTANCE.selectorSelectFromAllPages())) {
+            return new WikiPageExplorerWizardStep(getWikiService());
+        } else if (name.equals(Strings.INSTANCE.selectorSelectFromSearchPages())) {
+            return new SearchSelectorWizardStep(getWikiService());
         }
         return null;
     }
@@ -106,15 +93,5 @@ public class PageSelectorWizardStep extends AbstractSelectorAggregatorWizardStep
     public String getStepTitle()
     {
         return Strings.INSTANCE.linkSelectWikipageTitle();
-    }
-
-    /**
-     * Injects the wiki service.
-     * 
-     * @param wikiService the service used to access the wiki
-     */
-    public void setWikiService(WikiServiceAsync wikiService)
-    {
-        this.wikiService = wikiService;
     }
 }

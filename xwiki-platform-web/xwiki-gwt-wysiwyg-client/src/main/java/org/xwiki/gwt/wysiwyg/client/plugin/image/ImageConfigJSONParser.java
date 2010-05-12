@@ -40,7 +40,7 @@ public class ImageConfigJSONParser implements ConfigJSONParser<ImageConfig>
         JavaScriptObject jsObj = JavaScriptObject.fromJson(json);
         ImageConfig imageConfig = new ImageConfig();
         imageConfig.setReference((String) jsObj.get("reference"));
-        imageConfig.setImageURL((String) jsObj.get("url"));
+        imageConfig.setUrl((String) jsObj.get("url"));
         imageConfig.setWidth((String) jsObj.get("width"));
         imageConfig.setHeight((String) jsObj.get("height"));
         imageConfig.setAltText((String) jsObj.get("alttext"));

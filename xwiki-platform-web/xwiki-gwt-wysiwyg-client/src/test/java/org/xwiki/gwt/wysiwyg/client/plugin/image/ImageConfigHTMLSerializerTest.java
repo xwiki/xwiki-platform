@@ -56,7 +56,7 @@ public class ImageConfigHTMLSerializerTest extends WysiwygTestCase
     {
         ImageConfig imageConfig = new ImageConfig();
         imageConfig.setReference("XWiki.AdminSheet@general.png");
-        imageConfig.setImageURL("http://www.xwiki.org/missing.png");
+        imageConfig.setUrl("http://www.xwiki.org/missing.png");
         imageConfig.setAltText("A missing image.");
         imageConfig.setAlignment(ImageAlignment.TOP);
         imageConfig.setWidth("50");

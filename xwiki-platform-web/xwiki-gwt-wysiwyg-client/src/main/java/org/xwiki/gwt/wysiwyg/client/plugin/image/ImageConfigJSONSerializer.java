@@ -37,7 +37,7 @@ public class ImageConfigJSONSerializer extends AbstractConfigJSONSerializer<Imag
     {
         StringBuffer result = new StringBuffer();
         append(result, serialize("reference", imageConfig.getReference()));
-        append(result, serialize("url", imageConfig.getImageURL()));
+        append(result, serialize("url", imageConfig.getUrl()));
         append(result, serialize("width", imageConfig.getWidth()));
         append(result, serialize("height", imageConfig.getHeight()));
         append(result, serialize("alttext", imageConfig.getAltText()));

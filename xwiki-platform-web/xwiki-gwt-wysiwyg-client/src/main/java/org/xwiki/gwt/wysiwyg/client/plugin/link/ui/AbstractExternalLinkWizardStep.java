@@ -21,6 +21,7 @@ package org.xwiki.gwt.wysiwyg.client.plugin.link.ui;
 
 import org.xwiki.gwt.user.client.FocusCommand;
 import org.xwiki.gwt.wysiwyg.client.Strings;
+import org.xwiki.gwt.wysiwyg.client.wiki.WikiServiceAsync;
 
 import com.google.gwt.user.client.DeferredCommand;
 import com.google.gwt.user.client.rpc.AsyncCallback;
@@ -55,11 +56,14 @@ public abstract class AbstractExternalLinkWizardStep extends LinkConfigWizardSte
     private FlowPanel mainPanel;
 
     /**
-     * Default constructor.
+     * Creates a new wizard step for configuring links to external entities.
+     * 
+     * @param wikiService the service to be used for parsing the image reference when the link label is an image
      */
-    public AbstractExternalLinkWizardStep()
+    public AbstractExternalLinkWizardStep(WikiServiceAsync wikiService)
     {
-        super();
+        super(wikiService);
+
         Panel urlLabel = new FlowPanel();
         urlLabel.setStyleName(INFO_LABEL_STYLE);
         urlLabel.add(new InlineLabel(getURLLabel()));
@@ -101,7 +105,7 @@ public abstract class AbstractExternalLinkWizardStep extends LinkConfigWizardSte
         {
             public void onSuccess(Boolean result)
             {
-                urlTextBox.setText(getLinkData().getUrl() == null ? "" : getLinkData().getUrl());
+                urlTextBox.setText(getLinkConfig().getUrl() == null ? "" : getLinkConfig().getUrl());
                 cb.onSuccess(null);
             }
 
@@ -158,8 +162,8 @@ public abstract class AbstractExternalLinkWizardStep extends LinkConfigWizardSte
     {
         super.saveForm();
         String linkUri = buildURL();
-        getLinkData().setUrl(linkUri);
-        getLinkData().setReference(linkUri);
+        getLinkConfig().setUrl(linkUri);
+        getLinkConfig().setReference(linkUri);
     }
 
     /**

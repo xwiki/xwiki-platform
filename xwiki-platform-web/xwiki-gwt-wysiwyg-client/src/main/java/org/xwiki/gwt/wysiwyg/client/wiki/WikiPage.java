@@ -19,47 +19,17 @@
  */
 package org.xwiki.gwt.wysiwyg.client.wiki;
 
-import com.google.gwt.user.client.rpc.IsSerializable;
-
 /**
  * Stores information about a wiki page.
  * 
  * @version $Id$
  */
-public class WikiPage implements IsSerializable
+public class WikiPage extends Entity
 {
-    /**
-     * The page name.
-     */
-    private String name;
-
     /**
      * The page title.
      */
     private String title;
-
-    /**
-     * The page URL.
-     */
-    private String url;
-
-    /**
-     * @return the page name
-     */
-    public String getName()
-    {
-        return name;
-    }
-
-    /**
-     * Sets the page name.
-     * 
-     * @param name the new page name
-     */
-    public void setName(String name)
-    {
-        this.name = name;
-    }
 
     /**
      * @return the page title
@@ -77,23 +47,5 @@ public class WikiPage implements IsSerializable
     public void setTitle(String title)
     {
         this.title = title;
-    }
-
-    /**
-     * @return the page URL
-     */
-    public String getURL()
-    {
-        return url;
-    }
-
-    /**
-     * Sets the page URL.
-     * 
-     * @param url the new page URL
-     */
-    public void setURL(String url)
-    {
-        this.url = url;
     }
 }

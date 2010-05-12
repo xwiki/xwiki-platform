@@ -19,6 +19,8 @@
  */
 package org.xwiki.gwt.wysiwyg.client.widget.explorer;
 
+import org.xwiki.gwt.wysiwyg.client.wiki.EntityReference;
+
 import com.google.gwt.core.client.JavaScriptObject;
 import com.smartgwt.client.widgets.BaseWidget;
 import com.smartgwt.client.widgets.tree.TreeGrid;
@@ -348,5 +350,23 @@ public class XWikiExplorer extends TreeGrid
         } else {
             return self.htmlElement.clientHeight;
         }
+    }-*/;
+
+    /**
+     * Selects the tree node corresponding to the specified entity and anchor.
+     * 
+     * @param entityReference an entity reference
+     * @param anchor a string identifying a fragment of the specified entity
+     */
+    public native void selectEntity(EntityReference entityReference, String anchor)
+    /*-{
+        var self = this.@com.smartgwt.client.widgets.BaseWidget::getOrCreateJsObj()();
+        self.selectResource({
+            wiki: entityReference.@org.xwiki.gwt.wysiwyg.client.wiki.EntityReference::getWikiName()(),
+            space: entityReference.@org.xwiki.gwt.wysiwyg.client.wiki.EntityReference::getSpaceName()(),
+            name: entityReference.@org.xwiki.gwt.wysiwyg.client.wiki.EntityReference::getPageName()(),
+            attachment: entityReference.@org.xwiki.gwt.wysiwyg.client.wiki.EntityReference::getFileName()(),
+            anchor: anchor
+        });
     }-*/;
 }

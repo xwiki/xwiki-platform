@@ -29,6 +29,10 @@ import org.xwiki.gwt.user.client.ui.wizard.WizardStep;
 import org.xwiki.gwt.user.client.ui.wizard.NavigationListener.NavigationDirection;
 import org.xwiki.gwt.wysiwyg.client.Strings;
 import org.xwiki.gwt.wysiwyg.client.plugin.link.LinkConfig;
+import org.xwiki.gwt.wysiwyg.client.wiki.EntityLink;
+import org.xwiki.gwt.wysiwyg.client.wiki.EntityReference;
+import org.xwiki.gwt.wysiwyg.client.wiki.WikiServiceAsync;
+import org.xwiki.gwt.wysiwyg.client.wiki.EntityReference.EntityType;
 
 import com.google.gwt.event.dom.client.KeyCodes;
 import com.google.gwt.event.dom.client.KeyPressEvent;
@@ -77,9 +81,10 @@ public class LinkConfigWizardStep implements WizardStep, SourcesNavigationEvents
     protected static final String FIELD_ERROR_STYLE = "xErrorField";
 
     /**
-     * The link data to be edited by this wizard step.
+     * The entity link managed by the wizard step. This wizard step updates the configuration object attached to the
+     * entity link.
      */
-    private LinkConfig linkData;
+    private EntityLink<LinkConfig> entityLink;
 
     /**
      * Collection of {@link NavigationListener}s, to be notified by navigation events from this step. Used to handle
@@ -113,10 +118,19 @@ public class LinkConfigWizardStep implements WizardStep, SourcesNavigationEvents
     private final Panel mainPanel = new FlowPanel();
 
     /**
-     * Default constructor.
+     * The service used to parse the image reference when the link label is an image.
      */
-    public LinkConfigWizardStep()
+    private final WikiServiceAsync wikiService;
+
+    /**
+     * Creates a new link configuration wizard step.
+     * 
+     * @param wikiService the service to be used for parsing the image reference in case the link label is an image
+     */
+    public LinkConfigWizardStep(WikiServiceAsync wikiService)
     {
+        this.wikiService = wikiService;
+
         mainPanel.addStyleName(DEFAULT_STYLE_NAME);
         setUpLabelField();
         Label tooltipLabel = new Label(Strings.INSTANCE.linkTooltipLabel());
@@ -166,17 +180,48 @@ public class LinkConfigWizardStep implements WizardStep, SourcesNavigationEvents
     /**
      * {@inheritDoc}
      */
-    public void init(Object data, AsyncCallback< ? > cb)
+    @SuppressWarnings("unchecked")
+    public void init(Object data, final AsyncCallback< ? > callback)
     {
-        // store the data received as parameter
-        linkData = (LinkConfig) data;
-        // set the link text box according to the received config data
-        labelTextBox.setText(linkData.getLabelText());
-        labelTextBox.setEnabled(!linkData.isReadOnlyLabel());
-        tooltipTextBox.setText(linkData.getTooltip() == null ? "" : linkData.getTooltip());
-        newWindowCheckBox.setValue(linkData.isOpenInNewWindow());
+        entityLink = (EntityLink<LinkConfig>) data;
+        LinkConfig linkConfig = entityLink.getData();
+        if (linkConfig.isReadOnlyLabel()) {
+            wikiService.parseLinkReference(linkConfig.getLabelText(), EntityType.IMAGE, entityLink.getOrigin(),
+                new AsyncCallback<EntityReference>()
+                {
+                    public void onFailure(Throwable caught)
+                    {
+                        callback.onFailure(caught);
+                    }
+
+                    public void onSuccess(EntityReference result)
+                    {
+                        init(result, callback);
+                    }
+                });
+        } else {
+            init(null, callback);
+        }
+    }
+
+    /**
+     * Initializes the wizard step based on the underlying link configuration object. If the link label is an image the
+     * UI is adjusted accordingly.
+     * 
+     * @param imageReference a reference to the image that is the link label, or {@code null} if the link label is not
+     *            an image
+     * @param callback the object to be notified after the wizard step has been initialized
+     */
+    private void init(EntityReference imageReference, AsyncCallback< ? > callback)
+    {
+        LinkConfig linkConfig = entityLink.getData();
+        labelTextBox.setText(imageReference != null ? imageReference.getFileName() : linkConfig.getLabelText());
+        labelTextBox.setEnabled(!linkConfig.isReadOnlyLabel());
+        tooltipTextBox.setText(linkConfig.getTooltip() == null ? "" : linkConfig.getTooltip());
+        newWindowCheckBox.setValue(linkConfig.isOpenInNewWindow());
+
         hideErrors();
-        cb.onSuccess(null);
+        callback.onSuccess(null);
         setFocus();
     }
 
@@ -185,8 +230,7 @@ public class LinkConfigWizardStep implements WizardStep, SourcesNavigationEvents
      */
     protected void setFocus()
     {
-        // always in the label textbox
-        DeferredCommand.addCommand(new FocusCommand(labelTextBox));
+        DeferredCommand.addCommand(new FocusCommand(labelTextBox.isEnabled() ? labelTextBox : tooltipTextBox));
     }
 
     /**
@@ -216,9 +260,9 @@ public class LinkConfigWizardStep implements WizardStep, SourcesNavigationEvents
     /**
      * @return the {@link LinkConfig} configured by this wizard step
      */
-    public LinkConfig getLinkData()
+    protected LinkConfig getLinkConfig()
     {
-        return linkData;
+        return entityLink.getData();
     }
 
     /**
@@ -278,7 +322,7 @@ public class LinkConfigWizardStep implements WizardStep, SourcesNavigationEvents
      */
     protected boolean validateForm()
     {
-        if (this.labelTextBox.getText().trim().length() == 0) {
+        if (labelTextBox.getText().trim().length() == 0) {
             displayLabelError(Strings.INSTANCE.linkNoLabelError());
             return false;
         }
@@ -290,15 +334,13 @@ public class LinkConfigWizardStep implements WizardStep, SourcesNavigationEvents
      */
     protected void saveForm()
     {
-        // everything is fine, commit it in the link (the labels)
-        if (!this.labelTextBox.getText().trim().equals(linkData.getLabelText().trim())) {
-            linkData.setLabel(labelTextBox.getText().trim());
-            linkData.setLabelText(labelTextBox.getText().trim());
+        LinkConfig linkConfig = getLinkConfig();
+        if (!linkConfig.isReadOnlyLabel() && !labelTextBox.getText().trim().equals(linkConfig.getLabelText().trim())) {
+            linkConfig.setLabel(labelTextBox.getText().trim());
+            linkConfig.setLabelText(labelTextBox.getText().trim());
         }
-        // commit the tooltip value
-        linkData.setTooltip(getTooltipTextBox().getText());
-        // set the link to open in new window according to user input
-        linkData.setOpenInNewWindow(getNewWindowCheckBox().getValue());
+        linkConfig.setTooltip(getTooltipTextBox().getText());
+        linkConfig.setOpenInNewWindow(getNewWindowCheckBox().getValue());
     }
 
     /**
@@ -313,8 +355,8 @@ public class LinkConfigWizardStep implements WizardStep, SourcesNavigationEvents
      */
     public Object getResult()
     {
-        // always return the (modified) linkData as result of this dialog
-        return linkData;
+        // Always return the modified entity link as result of this wizard step.
+        return entityLink;
     }
 
     /**

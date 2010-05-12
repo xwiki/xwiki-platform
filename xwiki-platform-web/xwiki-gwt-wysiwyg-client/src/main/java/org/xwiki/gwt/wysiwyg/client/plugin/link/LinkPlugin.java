@@ -33,7 +33,7 @@ import org.xwiki.gwt.wysiwyg.client.plugin.internal.AbstractPlugin;
 import org.xwiki.gwt.wysiwyg.client.plugin.link.exec.CreateLinkExecutable;
 import org.xwiki.gwt.wysiwyg.client.plugin.link.exec.UnlinkExecutable;
 import org.xwiki.gwt.wysiwyg.client.plugin.link.ui.LinkWizard;
-import org.xwiki.gwt.wysiwyg.client.plugin.link.ui.LinkWizard.LinkWizardSteps;
+import org.xwiki.gwt.wysiwyg.client.plugin.link.ui.LinkWizard.LinkWizardStep;
 import org.xwiki.gwt.wysiwyg.client.wiki.WikiServiceAsync;
 
 /**
@@ -192,17 +192,17 @@ public class LinkPlugin extends AbstractPlugin implements WizardListener
         switch (linkConfig.getType()) {
             case WIKIPAGE:
             case NEW_WIKIPAGE:
-                getLinkWizard().start(LinkWizardSteps.WIKI_PAGE.toString(), linkConfig);
+                getLinkWizard().start(LinkWizardStep.WIKI_PAGE.toString(), linkConfig);
                 break;
             case ATTACHMENT:
-                getLinkWizard().start(LinkWizardSteps.ATTACHMENT.toString(), linkConfig);
+                getLinkWizard().start(LinkWizardStep.ATTACHMENT.toString(), linkConfig);
                 break;
             case EMAIL:
-                getLinkWizard().start(LinkWizardSteps.EMAIL.toString(), linkConfig);
+                getLinkWizard().start(LinkWizardStep.EMAIL.toString(), linkConfig);
                 break;
             case EXTERNAL:
             default:
-                getLinkWizard().start(LinkWizardSteps.WEB_PAGE.toString(), linkConfig);
+                getLinkWizard().start(LinkWizardStep.WEB_PAGE.toString(), linkConfig);
                 break;
         }
     }

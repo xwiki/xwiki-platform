@@ -46,7 +46,7 @@ public class ImageConfigHTMLParser implements ConfigHTMLParser<ImageConfig, Imag
     {
         ImageConfig config = new ImageConfig();
         config.setReference(parseReference(image));
-        config.setImageURL(image.getSrc());
+        config.setUrl(image.getSrc());
 
         String width = image.getAttribute(Style.WIDTH);
         if (StringUtils.isEmpty(width)) {

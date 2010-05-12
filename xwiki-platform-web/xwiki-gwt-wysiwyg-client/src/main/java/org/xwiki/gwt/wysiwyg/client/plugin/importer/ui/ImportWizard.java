@@ -108,8 +108,7 @@ public class ImportWizard extends Wizard implements WizardStepProvider
         if (null == step) {
             switch (requestedStep) {
                 case OFFICE_FILE:
-                    step = new ImportOfficeFileWizardStep(config, importService);
-                    ((ImportOfficeFileWizardStep) step).setWikiService(wikiService);
+                    step = new ImportOfficeFileWizardStep(config, wikiService, importService);
                     break;
                 case OFFICE_PASTE:
                     step = new ImportOfficePasteWizardStep(importService);

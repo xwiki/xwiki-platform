@@ -19,33 +19,58 @@
  */
 package org.xwiki.gwt.wysiwyg.client.wiki;
 
+import com.google.gwt.user.client.rpc.IsSerializable;
+
 /**
- * Configuration object for an attachment, to be used to transmit data about attachments from the server to the client.
+ * Base class for entity configuration classes.
  * 
  * @version $Id$
  */
-public class Attachment extends Entity
+public class EntityConfig implements IsSerializable
 {
     /**
-     * The mime type of the attached file.
+     * The string serialization of the entity reference.
      */
-    private String mimeType;
+    private String reference;
 
     /**
-     * @return the mime type of the attached file
+     * The entity URL.
      */
-    public String getMimeType()
+    private String url;
+
+    /**
+     * @return the string serialization of the entity reference
+     */
+    public String getReference()
     {
-        return mimeType;
+        return reference;
     }
 
     /**
-     * Sets the mime type of the attached file.
+     * Sets the string serialization of the entity reference.
      * 
-     * @param mimeType a mime type
+     * @param reference the new string serialization of the entity reference
      */
-    public void setMimeType(String mimeType)
+    public void setReference(String reference)
     {
-        this.mimeType = mimeType;
+        this.reference = reference;
+    }
+
+    /**
+     * @return the entity URL
+     */
+    public String getUrl()
+    {
+        return url;
+    }
+
+    /**
+     * Sets the entity URL.
+     * 
+     * @param url the new entity URL
+     */
+    public void setUrl(String url)
+    {
+        this.url = url;
     }
 }

@@ -21,7 +21,6 @@ package org.xwiki.gwt.wysiwyg.client.plugin.link.ui;
 
 import java.util.List;
 
-import org.xwiki.gwt.wysiwyg.client.wiki.ResourceName;
 import org.xwiki.gwt.wysiwyg.client.wiki.WikiPage;
 import org.xwiki.gwt.wysiwyg.client.wiki.WikiServiceAsync;
 
@@ -35,18 +34,13 @@ import com.google.gwt.user.client.rpc.AsyncCallback;
 public class RecentChangesSelectorWizardStep extends AbstractPageListSelectorWizardStep
 {
     /**
-     * The service used to retrieve the list of recently modified pages.
-     */
-    private WikiServiceAsync wikiService;
-
-    /**
-     * Builds a page list selector wizard step for the currently edited resource.
+     * Creates a new page selector based on the recently modified pages.
      * 
-     * @param editedResource the currently edited resource (page for which editing is done)
+     * @param wikiService the service used to retrieve the list of recently modified pages
      */
-    public RecentChangesSelectorWizardStep(ResourceName editedResource)
+    public RecentChangesSelectorWizardStep(WikiServiceAsync wikiService)
     {
-        super(editedResource);
+        super(wikiService);
         getMainPanel().addStyleName("xPagesRecent");
     }
 
@@ -56,16 +50,6 @@ public class RecentChangesSelectorWizardStep extends AbstractPageListSelectorWiz
     @Override
     protected void fetchData(AsyncCallback<List<WikiPage>> callback)
     {
-        wikiService.getRecentlyModifiedPages(0, 20, callback);
-    }
-
-    /**
-     * Injects the wiki service.
-     * 
-     * @param wikiService the service used to retrieve the list of recently modified pages
-     */
-    public void setWikiService(WikiServiceAsync wikiService)
-    {
-        this.wikiService = wikiService;
+        getWikiService().getRecentlyModifiedPages(0, 20, callback);
     }
 }

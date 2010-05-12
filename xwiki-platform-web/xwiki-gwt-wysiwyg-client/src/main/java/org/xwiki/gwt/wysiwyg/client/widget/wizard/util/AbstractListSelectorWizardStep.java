@@ -139,16 +139,18 @@ public abstract class AbstractListSelectorWizardStep<D, L> extends AbstractSelec
      */
     protected void refreshList(final AsyncCallback< ? > cb)
     {
+        // Save the selection before clearing the list and restore it after the list is refilled.
+        final L selectedData = list.getSelectedItem() == null ? null : list.getSelectedItem().getData();
         list.clear();
         fetchData(new AsyncCallback<List<L>>()
         {
             public void onSuccess(List<L> result)
             {
-                fillList(result);
+                fillList(result, selectedData);
                 if (cb != null) {
                     cb.onSuccess(null);
                 }
-                // set this as active, by default setting focus on the list
+                // Set this as active, by default setting focus on the list.
                 setActive();
             }
 
@@ -169,19 +171,19 @@ public abstract class AbstractListSelectorWizardStep<D, L> extends AbstractSelec
     protected abstract void fetchData(AsyncCallback<List<L>> callback);
 
     /**
-     * Fills the preview list with image preview widgets.
+     * Fills the list with the given data and selects the specified item.
      * 
-     * @param itemsList the list of items to select from
+     * @param dataList the list of data to fill the list
+     * @param selectedData the data to be selected
      */
-    protected void fillList(List<L> itemsList)
+    protected void fillList(List<L> dataList, L selectedData)
     {
-        String oldSelection = getSelection();
-        for (L item : itemsList) {
-            ListItem<L> newItem = getListItem(item);
-            list.addItem(newItem);
-            // preserve selection
-            if (matchesSelection(item, oldSelection)) {
-                list.setSelectedItem(newItem);
+        for (L data : dataList) {
+            ListItem<L> item = getListItem(data);
+            list.addItem(item);
+            // Restore the selection.
+            if (data.equals(selectedData) || isSelectedByDefault(data)) {
+                list.setSelectedItem(item);
             }
         }
         ListItem<L> newOptionListItem = getNewOptionListItem();
@@ -191,37 +193,19 @@ public abstract class AbstractListSelectorWizardStep<D, L> extends AbstractSelec
             } else {
                 list.addItem(newOptionListItem);
             }
-            if (oldSelection == null) {
+            if (list.getSelectedItem() == null) {
                 list.setSelectedItem(newOptionListItem);
             }
         }
     }
 
     /**
-     * @return the selection of this wizard step, as a string representation of the value selected in the list or from
-     *         the other settings of the current wizard step. To be used in conjunction with
-     *         {@link #matchesSelection(AbstractSelectorWizardStep, String)} to handle selection preserving upon update
-     *         in this step's list.
-     * @see #matchesSelection(AbstractSelectorWizardStep, String)
+     * @param listItemData a list item data
+     * @return {@code true} of the list item with the given data should be selected by default, {@code false} otherwise
      */
-    protected String getSelection()
+    protected boolean isSelectedByDefault(L listItemData)
     {
-        // by default, toString(), handling nulls nicely
-        return list.getSelectedItem().getData() + "";
-    }
-
-    /**
-     * Compares the current item with the passed string representation of the wizard step's selection.
-     * 
-     * @param item the item to compare with the selection
-     * @param selection the unique representation of the step's selection
-     * @return {@code true} if the item matches the selection, {@code false} otherwise.
-     * @see #getSelection()
-     */
-    protected boolean matchesSelection(L item, String selection)
-    {
-        // by default, equality between string representations, handling nulls nicely
-        return (selection + "").equals(item + "");
+        return false;
     }
 
     /**
@@ -271,17 +255,17 @@ public abstract class AbstractListSelectorWizardStep<D, L> extends AbstractSelec
         }
 
         // all is fine
-        saveSelectedValue();
-        async.onSuccess(true);
+        saveSelectedValue(async);
     }
 
     /**
      * Saves the current selection in this panel in the data managed by this wizard step, if all validation goes well on
-     * the sumbit time.
+     * the submit time.
      * 
+     * @param async the object to be notified after the selected value is saved
      * @see #onSubmit(AsyncCallback)
      */
-    protected abstract void saveSelectedValue();
+    protected abstract void saveSelectedValue(AsyncCallback<Boolean> async);
 
     /**
      * Displays the specified error message and error markers for this wizard step.

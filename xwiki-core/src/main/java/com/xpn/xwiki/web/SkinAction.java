@@ -21,6 +21,7 @@
 package com.xpn.xwiki.web;
 
 import java.io.IOException;
+import java.net.URI;
 import java.util.Arrays;
 import java.util.Date;
 
@@ -76,10 +77,15 @@ public class SkinAction extends XWikiAction
     @Override
     public String render(XWikiContext context) throws XWikiException
     {
-        return render(context.getRequest().getPathInfo(), context);
+        try {
+            return render(context.getRequest().getPathInfo(), context);
+        } catch (IOException e) {
+            context.getResponse().setStatus(404);
+            return "docdoesnotexist";
+        }
     }
 
-    public String render(String path, XWikiContext context) throws XWikiException
+    public String render(String path, XWikiContext context) throws XWikiException, IOException
     {
         XWiki xwiki = context.getWiki();
         // Since skin paths usually contain the name of skin document, it is likely that the context document belongs to
@@ -133,7 +139,7 @@ public class SkinAction extends XWikiAction
                 }
 
                 // Try in the resources directory.
-                if (renderFileFromFilesystem(filename, context)) {
+                if (renderFileFromFilesystem(getResourceFilePath(filename), context)) {
                     found = true;
                     break;
                 }
@@ -159,20 +165,33 @@ public class SkinAction extends XWikiAction
      * 
      * @param filename Name of the file.
      * @param skin Name of the skin to search in.
+     * @throws IOException if filename is invalid
      */
-    public String getSkinFilePath(String filename, String skin)
+    public String getSkinFilePath(String filename, String skin) throws IOException
     {
-        return DELIMITER + SKINS_DIRECTORY + DELIMITER + skin + DELIMITER + filename;
+        String path = URI.create(DELIMITER + SKINS_DIRECTORY + DELIMITER + skin
+            + DELIMITER + filename).normalize().toString();
+        if (!path.startsWith(DELIMITER + SKINS_DIRECTORY)) {
+            LOG.warn("Illegal access, tried to use file [" + path + "] as a skin. Possible break-in attempt!");
+            throw new IOException("Invalid filename: '" + filename + "' for skin '" + skin + "'");
+        }
+        return path;
     }
 
     /**
      * Get the path for the given file in resources.
      * 
      * @param filename Name of the file.
+     * @throws IOException if filename is invalid
      */
-    public String getResourceFilePath(String filename)
+    public String getResourceFilePath(String filename) throws IOException
     {
-        return DELIMITER + RESOURCES_DIRECTORY + DELIMITER + filename;
+        String path = URI.create(DELIMITER + RESOURCES_DIRECTORY + DELIMITER + filename).normalize().toString();
+        if (!path.startsWith(DELIMITER + RESOURCES_DIRECTORY)) {
+            LOG.warn("Illegal access, tried to use file [" + path + "] as a resource. Possible break-in attempt!");
+            throw new IOException("Invalid filename: '" + filename + "'");
+        }
+        return path;
     }
 
     /**
@@ -190,8 +209,9 @@ public class SkinAction extends XWikiAction
      * @param context The current {@link XWikiContext request context}.
      * @return <tt>true</tt> if the attachment was found and the content was successfully sent.
      * @throws XWikiException If the attachment cannot be loaded.
+     * @throws IOException if the filename is invalid
      */
-    private boolean renderSkin(String filename, XWikiDocument doc, XWikiContext context) throws XWikiException
+    private boolean renderSkin(String filename, XWikiDocument doc, XWikiContext context) throws XWikiException, IOException
     {
         if (LOG.isDebugEnabled()) {
             LOG.debug("Rendering file '" + filename + "' within the '" + doc.getFullName() + "' document");

@@ -1780,8 +1780,15 @@ public class XWiki implements XWikiDocChangeNotificationInterface
             }
         }
 
-        String content = getResourceContent("/templates/" + template);
-        return XWikiVelocityRenderer.evaluate(content, "/templates/" + template,
+        // Prevent inclusion of templates from other directories
+        template = URI.create("/templates/" + template).normalize().toString();
+        if (!template.startsWith("/templates/")) {
+            LOG.warn("Illegal access, tried to use file [" + template + "] as a template. Possible break-in attempt!");
+            return "";
+        }
+
+        String content = getResourceContent(template);
+        return XWikiVelocityRenderer.evaluate(content, template,
             (VelocityContext) context.get("vcontext"), context);
     }
 

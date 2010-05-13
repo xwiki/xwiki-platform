@@ -20,6 +20,8 @@
  */
 package com.xpn.xwiki.web;
 
+import java.io.IOException;
+
 import org.jmock.cglib.MockObjectTestCase;
 
 /**
@@ -65,5 +67,55 @@ public class SkinActionTest extends MockObjectTestCase
     public void testNPEJavascriptMimetype()
     {
         assertFalse(this.action.isJavascriptMimeType(null));
+    }
+
+    public void testIncorrectSkinFile()
+    {
+        try {
+            this.action.getSkinFilePath("../../resources/js/xwiki/xwiki.js", "colibri");
+            assertTrue("should fail", false);
+        } catch (IOException e) {
+            // good
+        }
+        try {
+            this.action.getSkinFilePath("../../../", "colibri");
+            assertTrue("should fail", false);
+        } catch (IOException e) {
+            // good
+        }
+        try {
+            this.action.getSkinFilePath("resources/js/xwiki/xwiki.js", "..");
+            assertTrue("should fail", false);
+        } catch (IOException e) {
+            // good
+        }
+        try {
+            this.action.getSkinFilePath("../resources/js/xwiki/xwiki.js", ".");
+            assertTrue("should fail", false);
+        } catch (IOException e) {
+            // good
+        }
+    }
+
+    public void testIncorrectResourceFile()
+    {
+        try {
+            this.action.getResourceFilePath("../../skins/js/xwiki/xwiki.js");
+            assertTrue("should fail", false);
+        } catch (IOException e) {
+            // good
+        }
+        try {
+            this.action.getResourceFilePath("../../../");
+            assertTrue("should fail", false);
+        } catch (IOException e) {
+            // good
+        }
+        try {
+            this.action.getResourceFilePath("../../redirect");
+            assertTrue("should fail", false);
+        } catch (IOException e) {
+            // good
+        }
     }
 }

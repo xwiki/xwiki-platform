@@ -57,7 +57,7 @@ public class XWikiServletContextListener implements ServletContextListener
         // be set up before we start sending events since there can be Observation Listener components that require
         // the Application Context (this is the case for example for the Office Importer Lifecycle Listener).
         StackingComponentEventManager eventManager = new StackingComponentEventManager();
-        ecm.setComponentEventManager(eventManager);
+        this.componentManager.setComponentEventManager(eventManager);
 
         // Initializes XWiki's Container with the Servlet Context.
         try {

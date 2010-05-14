@@ -14,7 +14,7 @@
 <date>1272988584000</date>
 <contentUpdateDate>1272988584000</contentUpdateDate>
 <version>1.1</version>
-<title>#if("$!{request.text}"=="")$msg.get("search.page.lucene.title.query")#else$msg.get("search.page.lucene.title.query", [$request.text])#end</title>
+<title>#if("$!{request.text}"=="")$msg.get("search.page.lucene.title.noquery")#else$msg.get("search.page.lucene.title.query", [$request.text])#end</title>
 <template></template>
 <defaultTemplate></defaultTemplate>
 <validationScript></validationScript>

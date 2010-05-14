@@ -20,6 +20,7 @@
 package org.xwiki.rendering.internal.renderer.wikimodel;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Stack;
@@ -29,6 +30,7 @@ import org.wikimodel.wem.IWemListener;
 import org.wikimodel.wem.WikiFormat;
 import org.wikimodel.wem.WikiParameter;
 import org.wikimodel.wem.WikiParameters;
+import org.xwiki.rendering.internal.parser.wikimodel.XWikiGeneratorListener;
 import org.xwiki.rendering.listener.Image;
 import org.xwiki.rendering.listener.Link;
 import org.xwiki.rendering.listener.ListType;
@@ -136,16 +138,16 @@ public class WikiModelGeneratorListener implements Listener
                     createWikiParameters(parameters).toList()));
                 break;
             case ITALIC:
-                this.wikimodelListener.beginFormat(new WikiFormat(IWemConstants.EM,
-                    createWikiParameters(parameters).toList()));
+                this.wikimodelListener.beginFormat(new WikiFormat(IWemConstants.EM, createWikiParameters(parameters)
+                    .toList()));
                 break;
             case STRIKEDOUT:
                 this.wikimodelListener.beginFormat(new WikiFormat(IWemConstants.STRIKE,
                     createWikiParameters(parameters).toList()));
                 break;
             case UNDERLINED:
-                this.wikimodelListener.beginFormat(new WikiFormat(IWemConstants.INS,
-                    createWikiParameters(parameters).toList()));
+                this.wikimodelListener.beginFormat(new WikiFormat(IWemConstants.INS, createWikiParameters(parameters)
+                    .toList()));
                 break;
             case NONE:
                 this.wikimodelListener.beginFormat(new WikiFormat(createWikiParameters(parameters).toList()));
@@ -162,20 +164,20 @@ public class WikiModelGeneratorListener implements Listener
     {
         switch (format) {
             case BOLD:
-                this.wikimodelListener.endFormat(new WikiFormat(IWemConstants.STRONG,
-                    createWikiParameters(parameters).toList()));
+                this.wikimodelListener.endFormat(new WikiFormat(IWemConstants.STRONG, createWikiParameters(parameters)
+                    .toList()));
                 break;
             case ITALIC:
-                this.wikimodelListener.endFormat(new WikiFormat(IWemConstants.EM,
-                    createWikiParameters(parameters).toList()));
+                this.wikimodelListener.endFormat(new WikiFormat(IWemConstants.EM, createWikiParameters(parameters)
+                    .toList()));
                 break;
             case STRIKEDOUT:
-                this.wikimodelListener.endFormat(new WikiFormat(IWemConstants.STRIKE,
-                    createWikiParameters(parameters).toList()));
+                this.wikimodelListener.endFormat(new WikiFormat(IWemConstants.STRIKE, createWikiParameters(parameters)
+                    .toList()));
                 break;
             case UNDERLINED:
-                this.wikimodelListener.endFormat(new WikiFormat(IWemConstants.INS,
-                    createWikiParameters(parameters).toList()));
+                this.wikimodelListener.endFormat(new WikiFormat(IWemConstants.INS, createWikiParameters(parameters)
+                    .toList()));
                 break;
             case NONE:
                 this.wikimodelListener.endFormat(new WikiFormat(createWikiParameters(parameters).toList()));
@@ -206,7 +208,8 @@ public class WikiModelGeneratorListener implements Listener
 
     public void beginSection(Map<String, String> parameters)
     {
-        this.wikimodelListener.beginSection(this.docLevel, getContext().headerLevel++, createWikiParameters(parameters));
+        this.wikimodelListener
+            .beginSection(this.docLevel, getContext().headerLevel++, createWikiParameters(parameters));
     }
 
     public void beginHeader(HeaderLevel level, String id, Map<String, String> parameters)
@@ -237,7 +240,8 @@ public class WikiModelGeneratorListener implements Listener
 
     public void endSection(Map<String, String> parameters)
     {
-        this.wikimodelListener.beginSection(this.docLevel, getContext().headerLevel--, createWikiParameters(parameters));
+        this.wikimodelListener
+            .beginSection(this.docLevel, getContext().headerLevel--, createWikiParameters(parameters));
     }
 
     public void endHeader(HeaderLevel level, String id, Map<String, String> parameters)
@@ -289,7 +293,8 @@ public class WikiModelGeneratorListener implements Listener
 
     public void onId(String name)
     {
-        // TODO: Find what to do...
+        this.wikimodelListener.onExtensionBlock(XWikiGeneratorListener.EXT_ID, createWikiParameters(Collections
+            .singletonMap("name", name)));
     }
 
     /**

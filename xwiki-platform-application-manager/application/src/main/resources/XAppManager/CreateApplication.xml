@@ -110,7 +110,7 @@
   &lt;/fieldset&gt;
   &lt;fieldset&gt;
     &lt;legend&gt;$msg.get("xapp.legend.validate")&lt;/legend&gt;
-    &lt;input type="submit" value="$msg.get("create")" /&gt;
+    &lt;input class="button" type="submit" value="$msg.get("create")" /&gt;
   &lt;/fieldset&gt;
 &lt;/form&gt;</content>
 </xwikidoc>

@@ -26,11 +26,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 
+import org.xwiki.component.descriptor.DefaultComponentDescriptor;
 import org.xwiki.configuration.ConfigurationSource;
 
 /**
- * Mock {@link ConfigurationSource} that returns an empty list of configuration
- * sources.
+ * Mock {@link ConfigurationSource} that returns an empty list of configuration sources.
  * 
  * @version $Id$
  * @since 1.6M2
@@ -38,6 +38,19 @@ import org.xwiki.configuration.ConfigurationSource;
 public class MockConfigurationSource implements ConfigurationSource
 {
     private Map<String, Object> properties = new HashMap<String, Object>();
+
+    public static DefaultComponentDescriptor<ConfigurationSource> getDescriptor(String roleHint)
+    {
+        DefaultComponentDescriptor<ConfigurationSource> descriptor =
+            new DefaultComponentDescriptor<ConfigurationSource>();
+        descriptor.setRole(ConfigurationSource.class);
+        if (roleHint != null) {
+            descriptor.setRoleHint(roleHint);
+        }
+        descriptor.setImplementation(MockConfigurationSource.class);
+
+        return descriptor;
+    }
 
     public void setProperty(String key, Object value)
     {

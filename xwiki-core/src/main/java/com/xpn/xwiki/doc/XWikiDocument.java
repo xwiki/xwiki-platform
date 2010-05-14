@@ -117,6 +117,7 @@ import com.xpn.xwiki.content.parsers.RenamePageReplaceLinkHandler;
 import com.xpn.xwiki.content.parsers.ReplacementResultCollection;
 import com.xpn.xwiki.criteria.impl.RevisionCriteria;
 import com.xpn.xwiki.doc.rcs.XWikiRCSNodeInfo;
+import com.xpn.xwiki.internal.cache.rendering.RenderingCache;
 import com.xpn.xwiki.internal.xml.DOMXMLWriter;
 import com.xpn.xwiki.internal.xml.XMLWriter;
 import com.xpn.xwiki.objects.BaseCollection;
@@ -416,6 +417,10 @@ public class XWikiDocument implements DocumentModelBridge
      * Used to create proper {@link Syntax} objects.
      */
     private SyntaxFactory syntaxFactory = Utils.getComponent(SyntaxFactory.class);
+
+    private Execution execution = Utils.getComponent(Execution.class);
+
+    private RenderingCache renderingCache = Utils.getComponent(RenderingCache.class);
 
     /**
      * @since 2.2M1
@@ -775,30 +780,37 @@ public class XWikiDocument implements DocumentModelBridge
         // document's context. For example this is true for the Admin page, see
         // http://jira.xwiki.org/jira/browse/XWIKI-4274 for more details.
 
-        String renderedContent;
-        Object isInRenderingEngine = context.get("isInRenderingEngine");
+        String source = getTranslatedContent(context);
 
-        try {
-            // This tells display() methods that we are inside the rendering engine and thus
-            // that they can return wiki syntax and not HTML syntax (which is needed when
-            // outside the rendering engine, i.e. when we're inside templates using only
-            // Velocity for example).
-            context.put("isInRenderingEngine", true);
+        String renderedContent = this.renderingCache.getRenderedContent(getDocumentReference(), source, context);
 
-            // If the Syntax id is "xwiki/1.0" then use the old rendering subsystem. Otherwise use the new one.
-            if (is10Syntax()) {
-                renderedContent = context.getWiki().getRenderingEngine().renderDocument(this, context);
-            } else {
-                renderedContent =
-                        performSyntaxConversion(getTranslatedContent(context), getSyntaxId(), targetSyntax, true);
-            }
-        } finally {
-            if (isInRenderingEngine != null) {
-                context.put("isInRenderingEngine", isInRenderingEngine);
-            } else {
-                context.remove("isInRenderingEngine");
+        if (renderedContent == null) {
+            Object isInRenderingEngine = context.get("isInRenderingEngine");
+
+            try {
+                // This tells display() methods that we are inside the rendering engine and thus
+                // that they can return wiki syntax and not HTML syntax (which is needed when
+                // outside the rendering engine, i.e. when we're inside templates using only
+                // Velocity for example).
+                context.put("isInRenderingEngine", true);
+
+                // If the Syntax id is "xwiki/1.0" then use the old rendering subsystem. Otherwise use the new one.
+                if (is10Syntax()) {
+                    renderedContent = context.getWiki().getRenderingEngine().renderDocument(this, context);
+                } else {
+                    renderedContent = performSyntaxConversion(source, getSyntaxId(), targetSyntax, true);
+                }
+
+                this.renderingCache.setRenderedContent(getDocumentReference(), source, renderedContent, context);
+            } finally {
+                if (isInRenderingEngine != null) {
+                    context.put("isInRenderingEngine", isInRenderingEngine);
+                } else {
+                    context.remove("isInRenderingEngine");
+                }
             }
         }
+
         return renderedContent;
     }
 
@@ -828,41 +840,47 @@ public class XWikiDocument implements DocumentModelBridge
      */
     public String getRenderedContent(String text, String sourceSyntaxId, String targetSyntaxId, XWikiContext context)
     {
-        String result;
-        Map<String, Object> backup = new HashMap<String, Object>();
-        Object isInRenderingEngine = context.get("isInRenderingEngine");
-        try {
-            backupContext(backup, context);
-            setAsContextDoc(context);
+        String result = this.renderingCache.getRenderedContent(getDocumentReference(), text, context);
 
-            // This tells display() methods that we are inside the rendering engine and thus
-            // that they can return wiki syntax and not HTML syntax (which is needed when
-            // outside the rendering engine, i.e. when we're inside templates using only
-            // Velocity for example).
-            context.put("isInRenderingEngine", true);
+        if (result == null) {
+            Map<String, Object> backup = new HashMap<String, Object>();
+            Object isInRenderingEngine = context.get("isInRenderingEngine");
+            try {
+                backupContext(backup, context);
+                setAsContextDoc(context);
 
-            // If the Syntax id is "xwiki/1.0" then use the old rendering subsystem. Otherwise use the new one.
-            if (is10Syntax(sourceSyntaxId)) {
-                result = context.getWiki().getRenderingEngine().renderText(text, this, context);
-            } else {
-                SyntaxFactory syntaxFactory = Utils.getComponent(SyntaxFactory.class);
-                result =
-                        performSyntaxConversion(text, sourceSyntaxId,
-                            syntaxFactory.createSyntaxFromIdString(targetSyntaxId), true);
-            }
-        } catch (Exception e) {
-            // Failed to render for some reason. This method should normally throw an exception but this
-            // requires changing the signature of calling methods too.
-            LOG.warn(e);
-            result = "";
-        } finally {
-            restoreContext(backup, context);
-            if (isInRenderingEngine != null) {
-                context.put("isInRenderingEngine", isInRenderingEngine);
-            } else {
-                context.remove("isInRenderingEngine");
+                // This tells display() methods that we are inside the rendering engine and thus
+                // that they can return wiki syntax and not HTML syntax (which is needed when
+                // outside the rendering engine, i.e. when we're inside templates using only
+                // Velocity for example).
+                context.put("isInRenderingEngine", true);
+
+                // If the Syntax id is "xwiki/1.0" then use the old rendering subsystem. Otherwise use the new one.
+                if (is10Syntax(sourceSyntaxId)) {
+                    result = context.getWiki().getRenderingEngine().renderText(text, this, context);
+                } else {
+                    SyntaxFactory syntaxFactory = Utils.getComponent(SyntaxFactory.class);
+                    result =
+                        performSyntaxConversion(text, sourceSyntaxId, syntaxFactory
+                            .createSyntaxFromIdString(targetSyntaxId), true);
+                }
+
+                this.renderingCache.setRenderedContent(getDocumentReference(), text, result, context);
+            } catch (Exception e) {
+                // Failed to render for some reason. This method should normally throw an exception but this
+                // requires changing the signature of calling methods too.
+                LOG.warn(e);
+                result = "";
+            } finally {
+                restoreContext(backup, context);
+                if (isInRenderingEngine != null) {
+                    context.put("isInRenderingEngine", isInRenderingEngine);
+                } else {
+                    context.remove("isInRenderingEngine");
+                }
             }
         }
+
         return result;
     }
 

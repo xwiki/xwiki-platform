@@ -19,7 +19,9 @@
  */
 package org.xwiki.gwt.wysiwyg.client.wiki;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.xwiki.gwt.wysiwyg.client.wiki.EntityReference.EntityType;
 
@@ -48,6 +50,11 @@ public class WikiServiceAsyncCacheProxy implements WikiServiceAsync
      * Caches the list of the virtual wikis from this multiwiki.
      */
     private List<String> virtualWikiNamesList;
+
+    /**
+     * The map where we cache the upload URLs.
+     */
+    private final Map<EntityReference, String> uploadURLCache = new HashMap<EntityReference, String>();
 
     /**
      * Creates a new cache proxy for the given service.
@@ -192,9 +199,25 @@ public class WikiServiceAsyncCacheProxy implements WikiServiceAsync
      * 
      * @see WikiServiceAsync#getUploadURL(EntityReference, AsyncCallback)
      */
-    public void getUploadURL(EntityReference documentReference, AsyncCallback<String> async)
+    public void getUploadURL(final EntityReference documentReference, final AsyncCallback<String> async)
     {
-        service.getUploadURL(documentReference, async);
+        if (uploadURLCache.containsKey(documentReference)) {
+            async.onSuccess(uploadURLCache.get(documentReference));
+        } else {
+            service.getUploadURL(documentReference, new AsyncCallback<String>()
+            {
+                public void onFailure(Throwable caught)
+                {
+                    async.onFailure(caught);
+                }
+
+                public void onSuccess(String result)
+                {
+                    uploadURLCache.put(documentReference.clone(), result);
+                    async.onSuccess(result);
+                }
+            });
+        }
     }
 
     /**

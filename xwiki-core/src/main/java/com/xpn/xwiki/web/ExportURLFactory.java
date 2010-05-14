@@ -14,10 +14,9 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-
-import org.apache.commons.io.IOUtils;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
@@ -303,12 +302,12 @@ public class ExportURLFactory extends XWikiServletURLFactory
                 newpath.append(".");
                 newpath.append(name);
 
-                if ((anchor != null) && (!anchor.equals(""))) {
+                newpath.append(".html");
+
+                if (!StringUtils.isEmpty(anchor)) {
                     newpath.append("#");
                     newpath.append(anchor);
                 }
-
-                newpath.append(".html");
 
                 return new URL(newpath.toString());
             }

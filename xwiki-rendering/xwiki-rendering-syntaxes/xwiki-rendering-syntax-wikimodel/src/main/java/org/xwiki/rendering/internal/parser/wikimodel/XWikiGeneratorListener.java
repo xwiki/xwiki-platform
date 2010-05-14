@@ -58,6 +58,11 @@ import org.xwiki.rendering.util.IdGenerator;
 public class XWikiGeneratorListener implements IWemListener
 {
     /**
+     * Identifier of the extension used to generate id blocks.
+     */
+    public static final String EXT_ID = "xwiki_id";
+
+    /**
      * Listener(s) for the generated XWiki Events. Organized as a stack so that a buffering listener can hijack all
      * events for a while, for example. All generated events are sent to the top of the stack.
      */
@@ -430,7 +435,7 @@ public class XWikiGeneratorListener implements IWemListener
     public void beginHeader(int level, WikiParameters params)
     {
         // Heading needs to have an id generated from a plaintext representation of its content, so the header start
-        // event will be sent at the end of the header, after reading the content inside and generating the id. 
+        // event will be sent at the end of the header, after reading the content inside and generating the id.
         // For this:
         // buffer all events in a queue until the header ends, and also send them to a print renderer to generate the ID
         CompositeListener composite = new CompositeListener();
@@ -847,7 +852,9 @@ public class XWikiGeneratorListener implements IWemListener
      */
     public void onExtensionBlock(String extensionName, WikiParameters params)
     {
-        // Not used by XWiki Syntax 2.0
+        if (EXT_ID.equals(extensionName)) {
+            getListener().onId(params.getParameter("name").getValue());
+        }
     }
 
     /**
@@ -857,7 +864,9 @@ public class XWikiGeneratorListener implements IWemListener
      */
     public void onExtensionInline(String extensionName, WikiParameters params)
     {
-        // Not used by XWiki Syntax 2.0
+        if (EXT_ID.equals(extensionName)) {
+            getListener().onId(params.getParameter("name").getValue());
+        }
     }
 
     /**

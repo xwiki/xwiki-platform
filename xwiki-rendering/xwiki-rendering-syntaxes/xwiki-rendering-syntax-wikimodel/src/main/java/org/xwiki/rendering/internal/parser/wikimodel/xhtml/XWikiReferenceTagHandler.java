@@ -19,6 +19,8 @@
  */
 package org.xwiki.rendering.internal.parser.wikimodel.xhtml;
 
+import java.util.Collections;
+
 import org.wikimodel.wem.IWemListener;
 import org.wikimodel.wem.WikiParameter;
 import org.wikimodel.wem.WikiParameters;
@@ -112,20 +114,36 @@ public class XWikiReferenceTagHandler extends ReferenceTagHandler
 
             setAccumulateContent(false);
         } else if (!isFreeStandingReference(context)) {
-            DefaultWikiPrinter printer = new DefaultWikiPrinter();
+            WikiParameter ref = context.getParams().getParameter("href");
 
-            PrintRenderer linkLabelRenderer = this.xwikiSyntaxPrintRendererFactory.createRenderer(printer);
-            // Make sure to flush whatever the renderer implementation
-            linkLabelRenderer.beginDocument(Listener.EMPTY_PARAMETERS);
+            if (ref != null) {
+                DefaultWikiPrinter printer = new DefaultWikiPrinter();
 
-            XWikiGeneratorListener xwikiListener =
-                new XWikiGeneratorListener(this.parser, linkLabelRenderer, this.linkParser, this.imageParser,
-                    this.plainRendererFactory, null);
+                PrintRenderer linkLabelRenderer = this.xwikiSyntaxPrintRendererFactory.createRenderer(printer);
+                // Make sure to flush whatever the renderer implementation
+                linkLabelRenderer.beginDocument(Listener.EMPTY_PARAMETERS);
 
-            context.getTagStack().pushScannerContext(new WikiScannerContext(xwikiListener));
+                XWikiGeneratorListener xwikiListener =
+                    new XWikiGeneratorListener(this.parser, linkLabelRenderer, this.linkParser, this.imageParser,
+                        this.plainRendererFactory, null);
 
-            // Ensure we simulate a new document being parsed
-            context.getScannerContext().beginDocument();
+                context.getTagStack().pushScannerContext(new WikiScannerContext(xwikiListener));
+
+                // Ensure we simulate a new document being parsed
+                context.getScannerContext().beginDocument();
+            } else {
+                WikiParameter idName = context.getParams().getParameter("id");
+
+                if (idName == null) {
+                    idName = context.getParams().getParameter("name");
+                }
+
+                if (idName != null) {
+                    WikiParameter parameter = new WikiParameter("name", idName.getValue());
+                    WikiParameters parameters = new WikiParameters(Collections.singletonList(parameter));
+                    context.getScannerContext().onExtensionBlock(XWikiGeneratorListener.EXT_ID, parameters);
+                }
+            }
         } else {
             super.begin(context);
         }
@@ -146,29 +164,30 @@ public class XWikiReferenceTagHandler extends ReferenceTagHandler
 
             context.getTagStack().popScannerContext();
         } else if (!isFreeStandingReference(context)) {
-            // Ensure we simulate a document parsing end
-            context.getScannerContext().endDocument();
-
-            WikiScannerContext scannerContext = context.getTagStack().popScannerContext();
-
-            XWikiGeneratorListener xwikiListener = (XWikiGeneratorListener) scannerContext.getfListener();
-            PrintRenderer linkLabelRenderer = (PrintRenderer) xwikiListener.getListener();
-
-            // Make sure to flush whatever the renderer implementation
-            linkLabelRenderer.endDocument(Listener.EMPTY_PARAMETERS);
-
-            // TODO: it should be replaced by a normal parameters
             WikiParameter ref = context.getParams().getParameter("href");
 
-            // Make sure we remove the HREF parameters from the list
-            // of parameters since they it's already consumed as link reference.
-            WikiParameters parameters = context.getParams();
-            parameters = parameters.remove("href");
+            if (ref != null) {
+                // Ensure we simulate a document parsing end
+                context.getScannerContext().endDocument();
 
-            String label = linkLabelRenderer.getPrinter().toString();
-            WikiReference reference = new WikiReference(ref.getValue(), label, parameters);
+                WikiScannerContext scannerContext = context.getTagStack().popScannerContext();
 
-            context.getScannerContext().onReference(reference);
+                XWikiGeneratorListener xwikiListener = (XWikiGeneratorListener) scannerContext.getfListener();
+                PrintRenderer linkLabelRenderer = (PrintRenderer) xwikiListener.getListener();
+
+                // Make sure to flush whatever the renderer implementation
+                linkLabelRenderer.endDocument(Listener.EMPTY_PARAMETERS);
+
+                // Make sure we remove the HREF parameters from the list
+                // of parameters since they it's already consumed as link reference.
+                WikiParameters parameters = context.getParams();
+                parameters = parameters.remove("href");
+
+                String label = linkLabelRenderer.getPrinter().toString();
+                WikiReference reference = new WikiReference(ref.getValue(), label, parameters);
+
+                context.getScannerContext().onReference(reference);
+            }
         } else {
             super.end(context);
         }

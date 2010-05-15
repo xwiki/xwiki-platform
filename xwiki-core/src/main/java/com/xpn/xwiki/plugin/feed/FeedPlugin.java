@@ -558,7 +558,7 @@ public class FeedPlugin extends XWikiDefaultPlugin implements XWikiPluginInterfa
     }
 
     /**
-     * Prepares a feed entry document by setting its content and syntax according to the configuration.
+     * Prepares a feed entry document by setting its content, syntax and creator according to the configuration.
      * 
      * @param document the document to prepare as a feed entry document
      * @param context the XWiki context when preparing the feed entry document
@@ -580,6 +580,14 @@ public class FeedPlugin extends XWikiDefaultPlugin implements XWikiPluginInterfa
         } else {
             content = context.getWiki().Param("xwiki.plugins.feed.entryContent");
         }
+        String feedEntryCreator =
+            context.getWiki().getXWikiPreference("feed_documentCreator", "xwiki.plugins.feed.documentCreator",
+                XWikiRightService.SUPERADMIN_USER_FULLNAME, context);
+
+        document.setCreator(feedEntryCreator);
+        document.setAuthor(feedEntryCreator);
+        document.setContentAuthor(feedEntryCreator);
+        
         document.setContent(content);
         // Let the document try to create the Syntax object from the syntax id. If it fails (for example if the syntax ID precised in configuration
         // does not correspond to any syntax) it will fallback on the document default Syntax ID (which is a XWiki core configuration entry).

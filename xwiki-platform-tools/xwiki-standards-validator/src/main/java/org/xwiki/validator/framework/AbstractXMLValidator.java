@@ -101,14 +101,18 @@ public abstract class AbstractXMLValidator implements Validator
      */
     public void setDocument(InputStream document)
     {
-        try {
-            clear();
+        this.document = null;
 
-            this.document = this.documentBuilder.parse(document);
-        } catch (SAXException e) {
-            // Ignore - Let XMLErrorHandler handle it
-        } catch (IOException e) {
-            throw new RuntimeException(e);
+        if (document != null) {
+            try {
+                clear();
+
+                this.document = this.documentBuilder.parse(document);
+            } catch (SAXException e) {
+                // Ignore - Let XMLErrorHandler handle it
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
         }
     }
 

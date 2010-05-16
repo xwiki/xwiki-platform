@@ -44,14 +44,13 @@ public class DutchWebGuidelinesValidatorTest extends TestCase
 
     private void setValidatorDocument(InputStream document) throws Exception
     {
-        validator.setValidateXML(true);
         validator.setDocument(document);
     }
 
     private void setValidatorDocument(String content) throws Exception
     {
-        validator.setValidateXML(false);
         validator.setDocument(new ByteArrayInputStream(content.getBytes("UTF-8")));
+        validator.clear();
     }
 
     private String getErrors(DutchWebGuidelinesValidator validator)

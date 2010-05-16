@@ -57,7 +57,7 @@ public abstract class AbstractXMLValidator implements Validator
     /**
      * Indicate if the XML itself is validated.
      */
-    private boolean validateXML;
+    private boolean validateXML = true;
 
     /**
      * Constructor.

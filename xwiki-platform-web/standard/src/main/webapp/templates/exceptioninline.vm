@@ -10,6 +10,6 @@
 #if($exp)
   $msg.get("detailedinformation"):<br/>
   <pre class="xwikierror">
-    $exp.getFullMessage()
+    $escapetool.xml($exp.getFullMessage())
   </pre>
 #end

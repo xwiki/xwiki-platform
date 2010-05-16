@@ -159,7 +159,7 @@ public abstract class AbstractXMLValidator implements Validator
     /**
      * @return the XML document
      */
-    protected Document getDocument()
+    public Document getDocument()
     {
         return this.document;
     }

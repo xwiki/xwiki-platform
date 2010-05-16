@@ -102,7 +102,7 @@
 &lt;dd&gt;$oomanager.serverState&lt;/dd&gt;
 &lt;/dl&gt;
 #if($hasAdmin &amp;&amp; $context.isMainWiki())
-&lt;form action="$xwiki.requestURL" enctype="multipart/form-data" method="post"&gt;
+&lt;form action="$escapetool.xml($xwiki.requestURL)" enctype="multipart/form-data" method="post"&gt;
 &lt;div&gt;
   &lt;strong&gt;$msgActions&lt;/strong&gt;&lt;br/&gt;
   &lt;label for="action1" class="hidden"&gt;$actionStart&lt;/label&gt;

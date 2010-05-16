@@ -55,6 +55,11 @@ public abstract class AbstractXMLValidator implements Validator
     private DocumentBuilder documentBuilder;
 
     /**
+     * Indicate if the XML itself is validated.
+     */
+    private boolean validateXML;
+
+    /**
      * Constructor.
      */
     public AbstractXMLValidator()
@@ -75,7 +80,7 @@ public abstract class AbstractXMLValidator implements Validator
         try {
             this.documentBuilder = factory.newDocumentBuilder();
             this.documentBuilder.setEntityResolver(new XMLResourcesEntityResolver());
-            setValidateXML(validateXML);
+            this.documentBuilder.setErrorHandler(this.errorHandler);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
@@ -86,11 +91,7 @@ public abstract class AbstractXMLValidator implements Validator
      */
     public void setValidateXML(boolean validateXML)
     {
-        if (validateXML) {
-            this.documentBuilder.setErrorHandler(this.errorHandler);
-        } else {
-            this.documentBuilder.setErrorHandler(null);
-        }
+        this.validateXML = validateXML;
     }
 
     /**
@@ -120,6 +121,10 @@ public abstract class AbstractXMLValidator implements Validator
     {
         if (this.document == null) {
             return this.errorHandler.getErrors();
+        }
+
+        if (!this.validateXML) {
+            this.errorHandler.clear();
         }
 
         validate(this.document);

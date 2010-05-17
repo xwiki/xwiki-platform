@@ -330,12 +330,6 @@
             <forward name="status" path="/templates/status.vm"/>
         </action>
 
-        <action path="/lifeblog/"
-                type="com.xpn.xwiki.web.LifeBlogAction"
-                name="lifeblog"
-                scope="request">
-        </action>
-
         <action path="/charting/"
                 type="com.xpn.xwiki.plugin.charts.actions.ChartingAction"
                 name="charting"

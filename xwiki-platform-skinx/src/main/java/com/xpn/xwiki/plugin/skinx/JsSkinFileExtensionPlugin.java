@@ -95,7 +95,7 @@ public class JsSkinFileExtensionPlugin extends AbstractSkinExtensionPlugin
                 result.append("?").append(parameters);
             }
         }
-        result.append("'></script>");
+        result.append("' defer='defer'></script>");
         return result.toString();
     }
 

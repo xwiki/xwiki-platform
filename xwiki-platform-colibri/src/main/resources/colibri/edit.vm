@@ -9,8 +9,9 @@
 $xwiki.jsfx.use('js/scriptaculous/scriptaculous.js')
 $xwiki.jsfx.use('js/xwiki/actionbuttons/actionButtons.js', true)
 #if("$!editor" == '')
-  #set($editor = $request.getParameter('editor'))
-  #if("$!editor" == '')
+  ## Normally no special characters should exist in the editor parameter, so this is just a protection measure.
+  #set($editor = "$!{escapetool.xml($request.getParameter('editor'))}")
+  #if($editor == '')
     #if(($xwiki.getUserPreference('editor') == 'Wysiwyg') && ($doc.SyntaxId != 'xwiki/1.0' || !$doc.isAdvancedContent()))
       #set($editor = 'wysiwyg')
     #else
@@ -35,10 +36,10 @@ $xwiki.jsfx.use('js/xwiki/actionbuttons/actionButtons.js', true)
   ## Pass the section number when the form is submitted in order to affect only the specified section.
   ## We need to test if the section number is present to prevent a NumberFormatException for the empty string.
   #if("$!{request.section}" != '')
-    <input type="hidden" name="section" value="$!{request.section}" />
+    <input type="hidden" name="section" value="$!{escapetool.xml($request.section)}" />
   #end
   ## This input is used by the full screen widget: it stores the selector of the maximized element, so that the full screen can be restored when coming back from preview.
-  <div class="hidden"><input type="hidden" name="x-maximized" value="$!{request.get('x-maximized')}"/></div>
+  <div class="hidden"><input type="hidden" name="x-maximized" value="$!{escapetool.xml($request.get('x-maximized'))}"/></div>
 #end
 ##
 ## Content
@@ -76,7 +77,7 @@ $xwiki.jsfx.use('js/xwiki/actionbuttons/actionButtons.js', true)
       #set($docTitle = $!tdoc.title)
     #end
     <label>$msg.get('titlefield'):
-    <input type="text" id="xwikidoctitleinput" name="title" value="$xwiki.getXMLEncoded("$!docTitle")"/></label>
+    <input type="text" id="xwikidoctitleinput" name="title" value="$escapetool.xml("$!docTitle")"/></label>
   #end
   #template("editmodes.vm")
   #template("edit${editor}.vm")

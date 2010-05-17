@@ -18,18 +18,19 @@
 # core.renderingcache.enabled=true
 
 #-# [Since 2.4M1]
-#-# A list of JAVA regex based patterns matching full documents reference.
+#-# A list of Java regex patterns matching full documents reference.
 # core.renderingcache.documents=wiki:Space\.Page
 # core.renderingcache.documents=wiki:Space\..*
 
 #-# [Since 2.4M1]
-#-# Indicate after which duration (in seconds) a data should be removed from the cache when not used.
+#-# The time (in seconds) after which data should be removed from the cache when not used.
 #-# Default value is 300 (5 min).
 # core.renderingcache.duration=300
 
 #-# [Since 2.4M1]
-#-# The size of the rendering cache. Not that its not the number of document cached but the number of results cached.
-#-# For a same document a variety of result is produced because each action, language and request query string produce unique result.
+#-# The size of the rendering cache. Not that it's not the number of cached documents but the number of cached results.
+#-# (For a single document several cache entries are created, because each action, language and request query string
+#-# produces a unique rendering result)
 #-# Default value is 100.
 # core.renderingcache.size=100
 

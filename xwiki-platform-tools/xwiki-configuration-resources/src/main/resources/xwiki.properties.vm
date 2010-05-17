@@ -12,6 +12,27 @@
 #-# Default value is xwiki/2.0.
 # core.defaultDocumentSyntax = xwiki/1.0
 
+#-# [Since 2.4M1]
+#-# Indicate if the rendering cache is enabled.
+#-# Default value is false.
+# core.renderingcache.enabled=true
+
+#-# [Since 2.4M1]
+#-# A list of JAVA regex based patterns matching full documents reference.
+# core.renderingcache.documents=wiki:Space\.Page
+# core.renderingcache.documents=wiki:Space\..*
+
+#-# [Since 2.4M1]
+#-# Indicate after which duration (in seconds) a data should be removed from the cache when not used.
+#-# Default value is 300 (5 min).
+# core.renderingcache.duration=300
+
+#-# [Since 2.4M1]
+#-# The size of the rendering cache. Not that its not the number of document cached but the number of results cached.
+#-# For a same document a variety of result is produced because each action, language and request query string produce unique result.
+#-# Default value is 100.
+# core.renderingcache.size=100
+
 #-------------------------------------------------------------------------------------
 # Rendering
 #-------------------------------------------------------------------------------------

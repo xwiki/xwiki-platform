@@ -486,7 +486,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface
             }
         }
 
-        if (StringUtils.isEmpty(host)) {
+        if (StringUtils.isEmpty(host) || host.equals(context.getMainXWiki())) {
             // Can't find any wiki name, return the main wiki
             return xwiki;
         }

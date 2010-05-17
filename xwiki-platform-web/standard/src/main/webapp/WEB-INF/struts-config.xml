@@ -323,13 +323,6 @@
             <forward name="logout" path="/templates/logout.vm"/>
         </action>
 
-        <action path="/status/"
-                type="com.xpn.xwiki.web.StatusAction"
-                name="status"
-                scope="request">
-            <forward name="status" path="/templates/status.vm"/>
-        </action>
-
         <action path="/charting/"
                 type="com.xpn.xwiki.plugin.charts.actions.ChartingAction"
                 name="charting"

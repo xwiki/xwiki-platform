@@ -26,6 +26,7 @@ import org.xwiki.model.reference.DocumentReference;
  * Configuration of the rendering cache.
  * 
  * @version $Id$
+ * @since 2.4M1
  */
 @ComponentRole
 public interface RenderingCacheConfiguration

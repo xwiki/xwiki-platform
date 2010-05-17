@@ -36,18 +36,20 @@ import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.observation.EventListener;
 import org.xwiki.observation.ObservationManager;
+import org.xwiki.observation.event.AbstractDocumentEvent;
 import org.xwiki.observation.event.DocumentDeleteEvent;
 import org.xwiki.observation.event.DocumentSaveEvent;
 import org.xwiki.observation.event.DocumentUpdateEvent;
 import org.xwiki.observation.event.Event;
 
-import com.xpn.xwiki.doc.XWikiDocument;
-
 /**
  * Specialized cache component related to documents. It automatically clean the cache when the document is related.
+ * <p>
+ * TODO: add support for dependencies
  * 
  * @param <C> the type of the data stored in the cache
  * @version $Id$
+ * @since 2.4M1
  */
 @Component
 @InstantiationStrategy(ComponentInstantiationStrategy.PER_LOOKUP)
@@ -58,6 +60,60 @@ public class DefaultDocumentCache<C> implements DocumentCache<C>
      */
     private static final List<Event> EVENTS =
         Arrays.<Event> asList(new DocumentSaveEvent(), new DocumentUpdateEvent(), new DocumentDeleteEvent());
+
+    /**
+     * Used to listen to document modification events.
+     * 
+     * @version $Id$
+     */
+    protected class Listener implements EventListener
+    {
+        /**
+         * {@inheritDoc}
+         * 
+         * @see org.xwiki.observation.EventListener#getName()
+         */
+        public String getName()
+        {
+            return name;
+        }
+
+        /**
+         * {@inheritDoc}
+         * 
+         * @see org.xwiki.observation.EventListener#getEvents()
+         */
+        public List<Event> getEvents()
+        {
+            return EVENTS;
+        }
+
+        /**
+         * {@inheritDoc}
+         * 
+         * @see org.xwiki.observation.EventListener#onEvent(org.xwiki.observation.event.Event, java.lang.Object,
+         *      java.lang.Object)
+         */
+        public void onEvent(Event event, Object source, Object data)
+        {
+            String documentReferenceString = ((AbstractDocumentEvent) event).getEventFilter().getFilter();
+
+            Collection<String> keys = mappingCache.get(documentReferenceString);
+
+            if (keys != null) {
+                for (String key : keys) {
+                    cache.remove(key);
+                }
+
+                mappingCache.remove(documentReferenceString);
+            }
+        }
+    }
+
+    /**
+     * The listener used to listen to document modification events.
+     */
+    protected Listener listener = new Listener();
 
     /**
      * Used to initialize the actual cache component.
@@ -91,62 +147,6 @@ public class DefaultDocumentCache<C> implements DocumentCache<C>
      */
     @Requirement
     private ObservationManager observationManager;
-
-    /**
-     * Used to listen to document modification events.
-     * 
-     * @version $Id$
-     */
-    private class Listener implements EventListener
-    {
-        /**
-         * {@inheritDoc}
-         * 
-         * @see org.xwiki.observation.EventListener#getName()
-         */
-        public String getName()
-        {
-            return name;
-        }
-
-        /**
-         * {@inheritDoc}
-         * 
-         * @see org.xwiki.observation.EventListener#getEvents()
-         */
-        public List<Event> getEvents()
-        {
-            return EVENTS;
-        }
-
-        /**
-         * {@inheritDoc}
-         * 
-         * @see org.xwiki.observation.EventListener#onEvent(org.xwiki.observation.event.Event, java.lang.Object,
-         *      java.lang.Object)
-         */
-        public void onEvent(Event event, Object source, Object data)
-        {
-            XWikiDocument document = (XWikiDocument) source;
-
-            String documentReferenceString = serializer.serialize(document.getDocumentReference());
-
-            Collection<String> keys = mappingCache.get(documentReferenceString);
-
-            if (keys != null) {
-                for (String key : keys) {
-                    cache.remove(key);
-                }
-
-                mappingCache.remove(documentReferenceString);
-            }
-        }
-    }
-
-    /**
-     * The listener used to listen to document modification events.
-     */
-    private Listener listener = new Listener();
 
     /**
      * {@inheritDoc}

@@ -34,6 +34,7 @@ import org.xwiki.model.reference.EntityReferenceSerializer;
  * Default implementation of {@link RenderingCacheConfiguration}.
  * 
  * @version $Id$
+ * @since 2.4M1
  */
 @Component
 public class DefaultRenderingCacheConfiguration implements RenderingCacheConfiguration

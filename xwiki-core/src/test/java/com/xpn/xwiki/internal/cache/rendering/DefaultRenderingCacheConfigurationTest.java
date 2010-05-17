@@ -25,9 +25,7 @@ import java.util.Collections;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
-import org.xwiki.component.annotation.Requirement;
 import org.xwiki.configuration.ConfigurationSource;
-import org.xwiki.model.ModelContext;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.test.MockConfigurationSource;
 
@@ -36,8 +34,8 @@ import com.xpn.xwiki.test.AbstractBridgedXWikiComponentTestCase;
 /**
  * Unit test for {@link DefaultRenderingCacheConfiguration}.
  * 
- * @since 2.0M3
  * @version $Id$
+ * @since 2.4M1
  */
 public class DefaultRenderingCacheConfigurationTest extends AbstractBridgedXWikiComponentTestCase
 {

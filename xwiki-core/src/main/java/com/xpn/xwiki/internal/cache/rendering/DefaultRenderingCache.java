@@ -35,6 +35,7 @@ import com.xpn.xwiki.internal.cache.DocumentCache;
  * Default implementation of {@link RenderingCache}.
  * 
  * @version $Id$
+ * @since 2.4M1
  */
 @Component
 public class DefaultRenderingCache implements RenderingCache, Initializable

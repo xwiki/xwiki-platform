@@ -28,6 +28,7 @@ import com.xpn.xwiki.XWikiContext;
  * Cache rendering result.
  * 
  * @version $Id$
+ * @since 2.4M1
  */
 @ComponentRole
 public interface RenderingCache

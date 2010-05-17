@@ -10,6 +10,7 @@ import org.xwiki.model.reference.DocumentReference;
  * 
  * @param <C> the class of the data stored in the cache.
  * @version $Id$
+ * @since 2.4M1
  */
 @ComponentRole
 public interface DocumentCache<C>

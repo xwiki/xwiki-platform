@@ -1413,13 +1413,13 @@ public class XWiki implements XWikiDocChangeNotificationInterface
                     getNotificationManager().verify(doc, originalDocument,
                         XWikiDocChangeNotificationInterface.EVENT_NEW, context);
                     if (om != null) {
-                        om.notify(new DocumentSaveEvent(doc.getWikiName() + ":" + doc.getFullName()), doc, context);
+                        om.notify(new DocumentSaveEvent(doc.getPrefixedFullName()), doc, context);
                     }
                 } else {
                     getNotificationManager().verify(doc, originalDocument,
                         XWikiDocChangeNotificationInterface.EVENT_CHANGE, context);
                     if (om != null) {
-                        om.notify(new DocumentUpdateEvent(doc.getWikiName() + ":" + doc.getFullName()), doc, context);
+                        om.notify(new DocumentUpdateEvent(doc.getPrefixedFullName()), doc, context);
                     }
                 }
             } catch (Exception ex) {
@@ -4237,10 +4237,10 @@ public class XWiki implements XWikiDocChangeNotificationInterface
                 blankDoc.setOriginalDocument(doc);
                 blankDoc.setAuthor(context.getUser());
                 blankDoc.setContentAuthor(context.getUser());
-                om.notify(new DocumentDeleteEvent(doc.getWikiName() + ":" + doc.getFullName()), blankDoc, context);
+                om.notify(new DocumentDeleteEvent(doc.getPrefixedFullName()), blankDoc, context);
             }
         } catch (Exception ex) {
-            LOG.error("Failed to send document delete notifications for document [" + doc.getFullName() + "]", ex);
+            LOG.error("Failed to send document delete notifications for document [" + doc.getPrefixedFullName() + "]", ex);
         }
     }
 

@@ -62,4 +62,29 @@ public class MozillaLinePlugin extends LinePlugin
         }
         domUtils.insertAfter(getTextArea().getDocument().createBRElement(), ancestor);
     }
+
+    /**
+     * {@inheritDoc}
+     * <p>
+     * We overwrite in order to fix a Firefox 3.6 bug which causes the caret to be rendered at the start of the document
+     * when we split a line at its end. It seems Firefox 3.6 doesn't like the fact that the caret ends up inside an
+     * empty text node when the line is split at the end. This wan't the case with older versions of Firefox.
+     * 
+     * @see LinePlugin#splitLine(Node, Range)
+     */
+    @Override
+    protected void splitLine(Node container, Range caret)
+    {
+        super.splitLine(container, caret);
+
+        Node start = caret.getStartContainer();
+        // Firefox 3.6 renders the caret badly when we place it inside an empty text node that is the first child of a
+        // block level element, such as a paragraph. Strangely, if the empty text node is wrapped by an in-line element
+        // like SPAN or STRONG the caret is displayed in the correct position. The caret is also displayed correctly if
+        // we remove the empty text node.
+        if (start.getNodeType() == Node.TEXT_NODE && start.getNodeValue().length() == 0) {
+            caret.setStartBefore(start);
+            start.getParentNode().removeChild(start);
+        }
+    }
 }

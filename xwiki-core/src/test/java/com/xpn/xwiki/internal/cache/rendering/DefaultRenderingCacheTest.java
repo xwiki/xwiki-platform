@@ -17,87 +17,78 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package com.xpn.xwiki.internal.cache;
+package com.xpn.xwiki.internal.cache.rendering;
 
-import junit.framework.Assert;
+import java.util.Collections;
 
 import org.jmock.Mock;
 import org.junit.Before;
 import org.junit.Test;
-import org.xwiki.cache.config.CacheConfiguration;
-import org.xwiki.cache.eviction.LRUEvictionConfiguration;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.observation.ObservationManager;
 import org.xwiki.observation.event.DocumentUpdateEvent;
+import org.xwiki.test.MockConfigurationSource;
 
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.test.AbstractBridgedXWikiComponentTestCase;
 
 /**
- * Unit test for {@link DefaultDocumentCache}.
+ * Unit test for {@link DefaultRenderingCache}.
  * 
  * @version $Id$
  * @since 2.4M1
  */
-public class DefaultDocumentCacheTest extends AbstractBridgedXWikiComponentTestCase
+public class DefaultRenderingCacheTest extends AbstractBridgedXWikiComponentTestCase
 {
     private Mock mockXWiki;
 
     private XWikiDocument document;
 
-    private DefaultDocumentCache<String> cache;
+    private RenderingCache renderingCache;
 
     @Before
     public void setUp() throws Exception
     {
         super.setUp();
 
-        this.cache = (DefaultDocumentCache<String>) getComponentManager().lookup(DocumentCache.class);
-
-        CacheConfiguration cacheConfiguration = new CacheConfiguration();
-        cacheConfiguration.setConfigurationId("documentcachetest");
-        LRUEvictionConfiguration lru = new LRUEvictionConfiguration();
-        cacheConfiguration.put(LRUEvictionConfiguration.CONFIGURATIONID, lru);
-        this.cache.create(cacheConfiguration);
-
         this.document = new XWikiDocument(new DocumentReference("wiki", "space", "page"));
 
         this.mockXWiki = mock(XWiki.class);
         getContext().setWiki((XWiki) this.mockXWiki.proxy());
-        
+
         this.mockXWiki.stubs().method("getDocument").with(eq(this.document.getPrefixedFullName()), ANYTHING).will(
             returnValue(this.document));
+
+        this.renderingCache = getComponentManager().lookup(RenderingCache.class);
     }
 
     @Override
-    protected void tearDown() throws Exception
+    protected void registerComponents() throws Exception
     {
-        this.cache.dispose();
+        super.registerComponents();
 
-        super.tearDown();
+        getConfigurationSource().setProperty("core.renderingcache.enabled", true);
     }
 
     @Test
-    public void testGetSet() throws InterruptedException
+    public void testGetSetRenderedContent() throws Exception
     {
-        this.cache.set("data", this.document.getDocumentReference());
-        this.cache.set("data2", this.document.getDocumentReference(), "ext1", "ext2");
+        MockConfigurationSource source = getConfigurationSource();
 
-        Assert.assertEquals("data", this.cache.get(this.document.getDocumentReference()));
-        Assert.assertEquals("data2", this.cache.get(this.document.getDocumentReference(), "ext1", "ext2"));
-    }
+        source.setProperty("core.renderingcache.documents", Collections.singletonList(this.document
+            .getPrefixedFullName()));
 
-    @Test
-    public void testEventBasedCleanup() throws Exception
-    {
-        this.cache.set("data", this.document.getDocumentReference());
-        this.cache.set("data", this.document.getDocumentReference(), "ext1", "ext2");
+        this.renderingCache.setRenderedContent(this.document.getDocumentReference(), "source", "renderedContent",
+            getContext());
+
+        assertEquals("renderedContent", this.renderingCache.getRenderedContent(this.document.getDocumentReference(),
+            "source", getContext()));
 
         getComponentManager().lookup(ObservationManager.class).notify(
             new DocumentUpdateEvent(this.document.getPrefixedFullName()), this.document, getContext());
 
-        Assert.assertNull(this.cache.get(this.document.getDocumentReference()));
-        Assert.assertNull(this.cache.get(this.document.getDocumentReference(), "ext1", "ext2"));
+        assertNull("renderedContent", this.renderingCache.getRenderedContent(this.document.getDocumentReference(),
+            "source", getContext()));
     }
 }

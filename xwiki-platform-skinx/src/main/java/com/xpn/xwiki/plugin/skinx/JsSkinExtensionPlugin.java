@@ -58,7 +58,7 @@ public class JsSkinExtensionPlugin extends AbstractDocumentSkinExtensionPlugin
         return "<script type='text/javascript' src='"
             + context.getWiki().getURL(documentName, PLUGIN_NAME,
                 "language=" + context.getLanguage() + parametersAsQueryString(documentName, context), context)
-            + "'></script>";
+            + "' defer='defer'></script>";
     }
 
     /**

@@ -71,7 +71,7 @@ public class JsResourceSkinExtensionPlugin extends AbstractResourceSkinExtension
      */
     protected String generateLink(String url)
     {
-        return "<script type=\"text/javascript\" src=\"" + url + "\"></script>\n";
+        return "<script type='text/javascript' src='" + url + "' defer='defer'></script>\n";
     }
 
     /**

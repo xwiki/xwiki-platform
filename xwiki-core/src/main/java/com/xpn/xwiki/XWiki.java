@@ -188,7 +188,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface
     protected static final Log LOG = LogFactory.getLog(XWiki.class);
 
     /** Frequently used Document reference, the class which holds virtual wiki definitions. */
-    private static final DocumentReference VIRTUAL_WIKI_DEFINITION_CLASSNAME =
+    private static final DocumentReference VIRTUAL_WIKI_DEFINITION_CLASS_REFERENCE =
         new DocumentReference("xwiki", "XWiki", "XWikiServerClass");
 
     private XWikiConfig config;
@@ -522,7 +522,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface
         }
 
         // Set the wiki owner
-        String wikiOwner = doc.getStringValue(VIRTUAL_WIKI_DEFINITION_CLASSNAME, "owner");
+        String wikiOwner = doc.getStringValue(VIRTUAL_WIKI_DEFINITION_CLASS_REFERENCE, "owner");
         if (wikiOwner.indexOf(":") == -1) {
             wikiOwner = xwiki.getDatabase() + ":" + wikiOwner;
         }
@@ -1086,7 +1086,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface
                         "The wiki " + servername + " does not exist");
                 }
 
-                wikiOwner = doc.getStringValue(VIRTUAL_WIKI_DEFINITION_CLASSNAME, "owner");
+                wikiOwner = doc.getStringValue(VIRTUAL_WIKI_DEFINITION_CLASS_REFERENCE, "owner");
                 if (wikiOwner.indexOf(":") == -1) {
                     wikiOwner = context.getMainXWiki() + ":" + wikiOwner;
                 }
@@ -2907,7 +2907,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface
 
     private void flushVirtualWikis(XWikiDocument doc)
     {
-        List<BaseObject> bobjects = doc.getXObjects(VIRTUAL_WIKI_DEFINITION_CLASSNAME);
+        List<BaseObject> bobjects = doc.getXObjects(VIRTUAL_WIKI_DEFINITION_CLASS_REFERENCE);
         if (bobjects != null) {
             for (BaseObject bobj : bobjects) {
                 if (bobj != null) {
@@ -4727,13 +4727,13 @@ public class XWiki implements XWikiDocChangeNotificationInterface
                 this.virtualWikiMap.remove(wikiUrl);
 
                 // Create Wiki Server page
-                serverdoc.setStringValue(VIRTUAL_WIKI_DEFINITION_CLASSNAME, "server", wikiUrl);
-                serverdoc.setStringValue(VIRTUAL_WIKI_DEFINITION_CLASSNAME, "owner", wikiAdmin);
+                serverdoc.setStringValue(VIRTUAL_WIKI_DEFINITION_CLASS_REFERENCE, "server", wikiUrl);
+                serverdoc.setStringValue(VIRTUAL_WIKI_DEFINITION_CLASS_REFERENCE, "owner", wikiAdmin);
                 if (description != null) {
-                    serverdoc.setLargeStringValue(VIRTUAL_WIKI_DEFINITION_CLASSNAME, "description", description);
+                    serverdoc.setLargeStringValue(VIRTUAL_WIKI_DEFINITION_CLASS_REFERENCE, "description", description);
                 }
                 if (wikilanguage != null) {
-                    serverdoc.setStringValue(VIRTUAL_WIKI_DEFINITION_CLASSNAME, "language", wikilanguage);
+                    serverdoc.setStringValue(VIRTUAL_WIKI_DEFINITION_CLASS_REFERENCE, "language", wikilanguage);
                 }
                 if (!getDefaultDocumentSyntax().equals(XWikiDocument.XWIKI10_SYNTAXID)) {
                     serverdoc.setContent("{{include document=\"XWiki.XWikiServerForm\"/}}\n");
@@ -4742,7 +4742,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface
                     serverdoc.setContent("#includeForm(\"XWiki.XWikiServerForm\")\n");
                     serverdoc.setSyntaxId(XWikiDocument.XWIKI10_SYNTAXID);
                 }
-                serverdoc.setParentReference(VIRTUAL_WIKI_DEFINITION_CLASSNAME);
+                serverdoc.setParentReference(VIRTUAL_WIKI_DEFINITION_CLASS_REFERENCE);
                 saveDocument(serverdoc, context);
             } else {
                 // If we are not allowed to continue if server page already exists
@@ -4837,7 +4837,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface
                 XWikiDocument doc =
                     getDocument("XWiki.XWikiServer" + database.substring(0, 1).toUpperCase() + database.substring(1),
                     context);
-                BaseObject serverobject = doc.getXObject(VIRTUAL_WIKI_DEFINITION_CLASSNAME);
+                BaseObject serverobject = doc.getXObject(VIRTUAL_WIKI_DEFINITION_CLASS_REFERENCE);
                 if (serverobject != null) {
                     String server = serverobject.getStringValue("server");
                     if (server != null) {
@@ -4877,7 +4877,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface
             try {
                 context.setDatabase(context.getMainXWiki());
                 XWikiDocument doc = getDocument(getServerWikiPage(wikiName), context);
-                BaseObject serverobject = doc.getXObject(VIRTUAL_WIKI_DEFINITION_CLASSNAME);
+                BaseObject serverobject = doc.getXObject(VIRTUAL_WIKI_DEFINITION_CLASS_REFERENCE);
                 if (serverobject != null) {
                     String server = serverobject.getStringValue("server");
                     return "wiki/" + server + "/";
@@ -5887,7 +5887,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface
         if (isVirtualMode()) {
             XWikiDocument wikiServer = context.getWikiServer();
             if (wikiServer != null) {
-                adtype = wikiServer.getStringValue(VIRTUAL_WIKI_DEFINITION_CLASSNAME, "adtype");
+                adtype = wikiServer.getStringValue(VIRTUAL_WIKI_DEFINITION_CLASS_REFERENCE, "adtype");
             }
         } else {
             adtype = getXWikiPreference("adtype", "", context);
@@ -5907,7 +5907,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface
         if (isVirtualMode()) {
             XWikiDocument wikiServer = context.getWikiServer();
             if (wikiServer != null) {
-                adclientid = wikiServer.getStringValue(VIRTUAL_WIKI_DEFINITION_CLASSNAME, "adclientid");
+                adclientid = wikiServer.getStringValue(VIRTUAL_WIKI_DEFINITION_CLASS_REFERENCE, "adclientid");
             }
         } else {
             adclientid = getXWikiPreference("adclientid", "", context);

@@ -609,11 +609,12 @@ var LiveTableFilter = Class.create({
     for (var i = 0; i < this.inputs.length; ++i) {
       var key = this.inputs[i].name;
       if ((this.inputs[i].type == "radio") || (this.inputs[i].type == "checkbox")) {
-        if (this.filters[key]) {
-          if (this.filters[key] == this.inputs[i].value.strip()) {
-            this.inputs[i].checked = true;
+        var filter = this.filters[key];
+        if (filter) {
+          if (Object.isArray(filter)) {
+            this.inputs[i].checked = (filter.indexOf(this.inputs[i].value.strip()) != -1);
           } else {
-            this.inputs[i].checked = false;
+            this.inputs[i].checked = (filter == this.inputs[i].value.strip());
           }
         }
       } else {
@@ -624,14 +625,14 @@ var LiveTableFilter = Class.create({
     }
 
     for (var i = 0; i < this.selects.length; ++i) {
-      if (!this.filters[this.selects[i].name]) {
-        continue;
-      }
-      for (var j = 0; j < this.selects[i].options.length; ++j) {
-        if (this.selects[i].options[j].value == this.filters[this.selects[i].name]) {
-          this.selects[i].options[j].selected = true;
-        } else {
-          this.selects[i].options[j].selected = false;
+      var filter = this.filters[this.selects[i].name];
+      if (filter) {
+        for (var j = 0; j < this.selects[i].options.length; ++j) {
+          if (Object.isArray(filter)) {
+            this.selects[i].options[j].selected = (filter.indexOf(this.selects[i].options[j].value) != -1);
+          } else {
+            this.selects[i].options[j].selected = (this.selects[i].options[j].value == filter);
+          }
         }
       }
     }
@@ -649,7 +650,7 @@ var LiveTableFilter = Class.create({
       // Ignore filters with blank value
       if (!filters[i].value.blank()) {
         if ((filters[i].type != "radio" && filters[i].type != "checkbox") || filters[i].checked) {
-          result += ("&" + filters[i].name + "=" + encodeURIComponent(filters[i].value));
+          result += ("&" + filters[i].serialize());
         }
       }
     }

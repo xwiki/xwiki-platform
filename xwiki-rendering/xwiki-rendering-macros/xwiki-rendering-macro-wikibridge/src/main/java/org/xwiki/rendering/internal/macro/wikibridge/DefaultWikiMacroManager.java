@@ -130,7 +130,7 @@ public class DefaultWikiMacroManager implements WikiMacroManager
 
             DefaultComponentDescriptor<Macro> componentDescriptor = new DefaultComponentDescriptor<Macro>();
             componentDescriptor.setRole(Macro.class);
-            componentDescriptor.setRoleHint(wikiMacro.getId());
+            componentDescriptor.setRoleHint(wikiMacro.getDescriptor().getId().getId());
 
             try {
                 // Register the macro against the right Component Manager, depending on the defined macro visibility.
@@ -139,11 +139,11 @@ public class DefaultWikiMacroManager implements WikiMacroManager
                     new WikiMacroData(componentDescriptor.getRoleHint(), wikiMacro));
             } catch (Exception e) {
                 throw new WikiMacroException(String.format("Failed to register macro [%s] in [%s] for visibility [%s]",
-                    wikiMacro.getId(), documentReference, macroDescriptor.getVisibility()), e);
+                    wikiMacro.getDescriptor().getId().getId(), documentReference, macroDescriptor.getVisibility()), e);
             }
         } else {
             throw new WikiMacroException(String.format("Unable to register macro [%s] in [%s] for visibility [%s] "
-                + "due to insufficient privileges", wikiMacro.getId(), documentReference,
+                + "due to insufficient privileges", wikiMacro.getDescriptor().getId().getId(), documentReference,
                 macroDescriptor.getVisibility()));
         }
     }
@@ -172,12 +172,12 @@ public class DefaultWikiMacroManager implements WikiMacroManager
                 }
             } else {
                 throw new WikiMacroException(String.format("Unable to unregister macro [%s] in [%s] for visibility "
-                    + "[%s] due to insufficient privileges", macroData.getWikiMacro().getId(), documentReference,
-                    macroDescriptor.getVisibility()));
+                    + "[%s] due to insufficient privileges", macroData.getWikiMacro().getDescriptor().getId().getId(),
+                    documentReference, macroDescriptor.getVisibility()));
             }
         } else {
             throw new WikiMacroException(String.format("Macro [%s] in [%s] isn't registered",
-                macroData.getWikiMacro().getId(), documentReference));
+                macroData.getWikiMacro().getDescriptor().getId().getId(), documentReference));
         }
     }
 

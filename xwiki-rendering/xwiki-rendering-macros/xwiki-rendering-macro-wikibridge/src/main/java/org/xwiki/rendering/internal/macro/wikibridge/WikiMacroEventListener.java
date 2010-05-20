@@ -105,7 +105,7 @@ public class WikiMacroEventListener extends AbstractLogEnabled implements EventL
                     if (macroFactory.containsWikiMacro(documentReference)) {
 
                         // Attempt to create a wiki macro.
-                        WikiMacro wikiMacro = null;
+                        WikiMacro wikiMacro;
                         try {
                             wikiMacro = macroFactory.createWikiMacro(documentReference);
                         } catch (WikiMacroException e) {
@@ -132,7 +132,7 @@ public class WikiMacroEventListener extends AbstractLogEnabled implements EventL
             this.wikiMacroManager.registerWikiMacro(documentReference, wikiMacro);
         } catch (WikiMacroException e) {
             getLogger().debug(String.format("Unable to register macro [%s] in document [%s]",
-                wikiMacro.getId(), documentReference), e);
+                wikiMacro.getDescriptor().getId().getId(), documentReference), e);
         }
     }
 

@@ -35,6 +35,11 @@ import org.wikimodel.wem.xhtml.impl.XhtmlHandler.TagStack.TagContext;
  */
 public class XWikiImageTagHandler extends ImgTagHandler
 {
+    /**
+     * {@inheritDoc}
+     * 
+     * @see org.wikimodel.wem.xhtml.handler.TagHandler#initialize(org.wikimodel.wem.xhtml.impl.XhtmlHandler.TagStack)
+     */
     @Override
     public void initialize(TagStack stack)
     {
@@ -43,10 +48,16 @@ public class XWikiImageTagHandler extends ImgTagHandler
         stack.setStackParameter("imageParameters", WikiParameters.EMPTY);
     }
 
+    /**
+     * {@inheritDoc}
+     * 
+     * @see org.wikimodel.wem.xhtml.handler.ReferenceTagHandler#begin(org.wikimodel.wem.xhtml.impl.XhtmlHandler.TagStack.TagContext)
+     */
     @Override
     protected void begin(TagContext context)
     {
         boolean isInImage = (Boolean) context.getTagStack().getStackParameter("isInImage");
+
         if (isInImage) {
             // Verify if it's a freestanding image uri and if so save the information so that we can get it in
             // XWikiCommentHandler.
@@ -55,17 +66,24 @@ public class XWikiImageTagHandler extends ImgTagHandler
             } else {
                 // Save the parameters set on the IMG element so that we can generate the correct image
                 // in the XWiki Comment handler.
-                context.getTagStack().setStackParameter("imageParameters", context.getParams().remove("src"));
+                context.getTagStack().setStackParameter("imageParameters",
+                    removeMeaningfulParameters(context.getParams()));
             }
         } else {
             super.begin(context);
         }
     }
 
+    /**
+     * {@inheritDoc}
+     * 
+     * @see org.wikimodel.wem.xhtml.handler.ImgTagHandler#end(org.wikimodel.wem.xhtml.impl.XhtmlHandler.TagStack.TagContext)
+     */
     @Override
     protected void end(TagContext context)
     {
         boolean isInImage = (Boolean) context.getTagStack().getStackParameter("isInImage");
+
         if (!isInImage) {
             WikiParameter src = context.getParams().getParameter("src");
 
@@ -75,11 +93,25 @@ public class XWikiImageTagHandler extends ImgTagHandler
                 if (isFreeStandingReference(context)) {
                     context.getScannerContext().onImage(src.getValue());
                 } else {
-                    WikiReference reference = new WikiReference(src.getValue(), null, parameters);
+                    WikiReference reference =
+                        new WikiReference(src.getValue(), null, removeMeaningfulParameters(parameters));
 
                     context.getScannerContext().onImage(reference);
                 }
             }
+        }
+    }
+
+    protected WikiParameters removeMeaningfulParameters(WikiParameters parameters)
+    {
+        WikiParameter classParam = parameters.getParameter("class");
+        boolean isFreeStanding =
+            ((classParam != null) && classParam.getValue().equalsIgnoreCase("wikimodel-freestanding"));
+
+        if (isFreeStanding) {
+            return removeFreestanding(parameters).remove("alt").remove("src");
+        } else {
+            return removeFreestanding(parameters).remove("src");
         }
     }
 }

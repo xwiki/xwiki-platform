@@ -21,6 +21,7 @@ package com.xpn.xwiki.plugin.watchlist;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -176,24 +177,12 @@ public class WatchListStore implements EventListener
         // Check that the interval property contains all the available jobs
         StaticListClass intervalClass = (StaticListClass) bclass.get(WATCHLIST_CLASS_INTERVAL_PROP);
         List<String> intervalValues = intervalClass.getList(context);
-        List<String> newInterval = ListUtils.intersection(jobDocumentNames, intervalValues);
-        boolean intervalNeedsUpdate = false;
 
-        // Look for missing jobs, build a complete list
-        for (String jobName : (List<String>) ListUtils.subtract(jobDocumentNames, intervalValues)) {
-            newInterval.add(jobName);
-            intervalNeedsUpdate = true;
-        }
-
-        // Look for outdated jobs
-        if (ListUtils.subtract(intervalValues, jobDocumentNames).size() > 0) {
-            intervalNeedsUpdate = true;
-        }
-
-        // Save the complete list in the interval prop
-        if (intervalNeedsUpdate) {
-            intervalClass.setValues(StringUtils.join(newInterval, "|"));
+        // Look for missing or outdated jobs in the interval list
+        Collections.sort(jobDocumentNames);
+        if (!ListUtils.isEqualList(intervalValues, jobDocumentNames)) {
             needsUpdate = true;
+            intervalClass.setValues(StringUtils.join(jobDocumentNames, "|"));
         }
 
         // Create storage properties
@@ -226,7 +215,7 @@ public class WatchListStore implements EventListener
             needsUpdate = true;
         }
 
-        needsUpdate = initWatchListClassProperties(doc, context);
+        needsUpdate |= initWatchListClassProperties(doc, context);
 
         if (StringUtils.isBlank(doc.getCreator())) {
             needsUpdate = true;

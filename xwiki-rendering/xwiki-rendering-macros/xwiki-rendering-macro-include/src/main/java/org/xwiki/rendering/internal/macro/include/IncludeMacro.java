@@ -36,7 +36,6 @@ import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.block.LinkBlock;
 import org.xwiki.rendering.block.XDOM;
-import org.xwiki.rendering.internal.transformation.MacroTransformation;
 import org.xwiki.rendering.listener.Link;
 import org.xwiki.rendering.listener.LinkType;
 import org.xwiki.rendering.macro.AbstractMacro;
@@ -45,6 +44,7 @@ import org.xwiki.rendering.macro.include.IncludeMacroParameters;
 import org.xwiki.rendering.macro.include.IncludeMacroParameters.Context;
 import org.xwiki.rendering.parser.Parser;
 import org.xwiki.rendering.transformation.MacroTransformationContext;
+import org.xwiki.rendering.transformation.Transformation;
 
 /**
  * @version $Id$
@@ -177,7 +177,7 @@ public class IncludeMacro extends AbstractMacro<IncludeMacroParameters>
         // should be executed by the currently running Macro Transformation.
         if (actualContext == Context.NEW) {
             result =
-                executeWithNewContext(documentName, includedContent, includedSyntax, context.getMacroTransformation());
+                executeWithNewContext(documentName, includedContent, includedSyntax, context.getTransformation());
         } else {
             result = executeWithCurrentContext(documentName, includedContent, includedSyntax);
         }
@@ -206,12 +206,12 @@ public class IncludeMacro extends AbstractMacro<IncludeMacroParameters>
      * @param includedDocumentName the name of the document to include.
      * @param includedContent the content of the document to include.
      * @param includedSyntax the syntax identifier of the provided content.
-     * @param macroTransformation the macro transformation.
+     * @param transformation the macro transformation.
      * @return the result of parsing and transformation of the document to include.
      * @throws MacroExecutionException error when parsing content.
      */
     private List<Block> executeWithNewContext(String includedDocumentName, String includedContent,
-        String includedSyntax, MacroTransformation macroTransformation) throws MacroExecutionException
+        String includedSyntax, Transformation transformation) throws MacroExecutionException
     {
         List<Block> result;
 
@@ -224,8 +224,7 @@ public class IncludeMacro extends AbstractMacro<IncludeMacroParameters>
             Map<String, Object> backupObjects = new HashMap<String, Object>();
             try {
                 this.documentAccessBridge.pushDocumentInContext(backupObjects, includedDocumentName);
-                result = generateIncludedPageDOM(includedDocumentName, includedContent, includedSyntax, 
-                    macroTransformation);
+                result = generateIncludedPageDOM(includedDocumentName, includedContent, includedSyntax, transformation);
             } finally {
                 this.documentAccessBridge.popDocumentFromContext(backupObjects);
             }
@@ -262,12 +261,12 @@ public class IncludeMacro extends AbstractMacro<IncludeMacroParameters>
      * @param includedDocumentName the name of the document to include.
      * @param includedContent the content of the document to include.
      * @param includedSyntax the syntax identifier of the provided content.
-     * @param macroTransformation the macro transformation.
+     * @param transformation the macro transformation.
      * @return the result of parsing and transformation of the document to include.
      * @throws MacroExecutionException error when parsing content.
      */
     private List<Block> generateIncludedPageDOM(String includedDocumentName, String includedContent,
-        String includedSyntax, MacroTransformation macroTransformation) throws MacroExecutionException
+        String includedSyntax, Transformation transformation) throws MacroExecutionException
     {
         XDOM includedDom;
         try {
@@ -278,8 +277,8 @@ public class IncludeMacro extends AbstractMacro<IncludeMacroParameters>
             // included page to be added to the list of macros on the including page so that they're all sorted
             // and executed in the right order. Note that this works only because the Include macro has the highest
             // execution priority and is thus executed first.
-            if (macroTransformation != null) {
-                macroTransformation.transform(includedDom, parser.getSyntax());
+            if (transformation != null) {
+                transformation.transform(includedDom, parser.getSyntax());
             }
         } catch (Exception e) {
             throw new MacroExecutionException("Failed to parse included page [" + includedDocumentName + "]", e);

@@ -21,7 +21,6 @@ package org.xwiki.rendering.transformation;
 
 import org.xwiki.rendering.block.XDOM;
 import org.xwiki.rendering.block.MacroBlock;
-import org.xwiki.rendering.internal.transformation.MacroTransformation;
 import org.xwiki.rendering.syntax.Syntax;
 
 /**
@@ -48,9 +47,9 @@ public class MacroTransformationContext
     private boolean isInline;
 
     /**
-     * See {@link #getMacroTransformation()}.
+     * See {@link #getTransformation()}.
      */
-    private MacroTransformation macroTransformation;
+    private Transformation transformation;
 
     /**
      * The current syntax.
@@ -106,22 +105,24 @@ public class MacroTransformationContext
     }
 
     /**
-     * @param macroTransformation the macro transformation being used
-     * @see #getMacroTransformation()
+     * @param transformation the Transformation being used
+     * @see #getTransformation()
+     * @since 2.4M1
      */
-    public void setMacroTransformation(MacroTransformation macroTransformation)
+    public void setTransformation(Transformation transformation)
     {
-        this.macroTransformation = macroTransformation;
+        this.transformation = transformation;
     }
 
     /**
-     * @return the current Macro Transformation instance being executed. Useful for Macros which need to perform other
-     *         transformations in turn such as the Include macro which needs to execute Macro transformation if the
+     * @return the current Transformation instance being executed. Useful for Macros which need to perform other
+     *         transformations in turn such as the Include macro which needs to execute the transformation if the
      *         included page should be executed in its own context.
+     * @since 2.4M1
      */
-    public MacroTransformation getMacroTransformation()
+    public Transformation getTransformation()
     {
-        return this.macroTransformation;
+        return this.transformation;
     }
 
     /**

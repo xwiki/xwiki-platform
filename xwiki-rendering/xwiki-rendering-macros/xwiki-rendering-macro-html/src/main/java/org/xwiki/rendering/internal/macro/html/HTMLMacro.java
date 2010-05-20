@@ -35,7 +35,6 @@ import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.block.MacroBlock;
 import org.xwiki.rendering.block.RawBlock;
 import org.xwiki.rendering.block.XDOM;
-import org.xwiki.rendering.internal.transformation.MacroTransformation;
 import org.xwiki.rendering.macro.AbstractMacro;
 import org.xwiki.rendering.macro.MacroExecutionException;
 import org.xwiki.rendering.macro.descriptor.DefaultContentDescriptor;
@@ -48,6 +47,7 @@ import org.xwiki.rendering.renderer.PrintRendererFactory;
 import org.xwiki.rendering.renderer.printer.DefaultWikiPrinter;
 import org.xwiki.rendering.renderer.printer.WikiPrinter;
 import org.xwiki.rendering.transformation.MacroTransformationContext;
+import org.xwiki.rendering.transformation.Transformation;
 import org.xwiki.xml.html.HTMLCleaner;
 import org.xwiki.xml.html.HTMLConstants;
 import org.xwiki.xml.html.HTMLUtils;
@@ -136,7 +136,7 @@ public class HTMLMacro extends AbstractMacro<HTMLMacroParameters>
             // a text representing the resulting XHTML content.
             if (parameters.getWiki()) {
                 normalizedContent =
-                    renderWikiSyntax(normalizedContent, context.getMacroTransformation(), context.getSyntax());
+                    renderWikiSyntax(normalizedContent, context.getTransformation(), context.getSyntax());
             }
 
             // Clean the HTML into valid XHTML if the user has asked (it's the default).
@@ -215,12 +215,12 @@ public class HTMLMacro extends AbstractMacro<HTMLMacroParameters>
      * Parse the passed context using a wiki syntax parser and render the result as an XHTML string.
      * 
      * @param content the content to parse
-     * @param macroTransformation the macro transformation to execute macros when wiki is set to true
+     * @param transformation the macro transformation to execute macros when wiki is set to true
      * @param wikiSyntax the wiki syntax used inside the HTML macro
      * @return the output XHTML as a string containing the XWiki Syntax resolved as XHTML
      * @throws MacroExecutionException in case there's a parsing problem
      */
-    private String renderWikiSyntax(String content, MacroTransformation macroTransformation, Syntax wikiSyntax)
+    private String renderWikiSyntax(String content, Transformation transformation, Syntax wikiSyntax)
         throws MacroExecutionException
     {
         String xhtml;
@@ -242,8 +242,8 @@ public class HTMLMacro extends AbstractMacro<HTMLMacroParameters>
                 }
             }
 
-            // Execute transformations
-            macroTransformation.transform(xdom, parser.getSyntax());
+            // Execute the Macro transformation
+            transformation.transform(xdom, parser.getSyntax());
 
             // Render the whole parsed content as a XHTML string
             WikiPrinter printer = new DefaultWikiPrinter();

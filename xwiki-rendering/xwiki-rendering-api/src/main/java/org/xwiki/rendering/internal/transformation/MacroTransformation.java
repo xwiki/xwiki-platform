@@ -109,7 +109,7 @@ public class MacroTransformation extends AbstractTransformation
         // Create a macro execution context with all the information required for macros.
         MacroTransformationContext context = new MacroTransformationContext();
         context.setXDOM(dom);
-        context.setMacroTransformation(this);
+        context.setTransformation(this);
         context.setSyntax(syntax);
 
         // Counter to prevent infinite recursion if a macro generates the same macro for example.

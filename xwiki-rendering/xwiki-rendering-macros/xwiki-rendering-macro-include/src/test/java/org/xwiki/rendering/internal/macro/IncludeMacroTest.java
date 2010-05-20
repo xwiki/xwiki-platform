@@ -27,10 +27,7 @@ import junit.framework.Assert;
 
 import org.jmock.Expectations;
 import org.junit.Test;
-import org.xwiki.component.descriptor.DefaultComponentDescriptor;
-import org.xwiki.model.reference.AttachmentReferenceResolver;
 import org.xwiki.model.reference.DocumentReference;
-import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.block.XDOM;
 import org.xwiki.rendering.internal.macro.include.IncludeMacro;
@@ -45,10 +42,8 @@ import org.xwiki.rendering.renderer.PrintRendererFactory;
 import org.xwiki.rendering.renderer.printer.DefaultWikiPrinter;
 import org.xwiki.rendering.renderer.printer.WikiPrinter;
 import org.xwiki.rendering.syntax.Syntax;
-import org.xwiki.rendering.syntax.SyntaxType;
 import org.xwiki.rendering.transformation.MacroTransformationContext;
 import org.xwiki.rendering.transformation.Transformation;
-import org.xwiki.rendering.wiki.WikiModel;
 import org.xwiki.test.AbstractComponentTestCase;
 import org.xwiki.velocity.VelocityManager;
 
@@ -111,7 +106,7 @@ public class IncludeMacroTest extends AbstractComponentTestCase
         MacroTransformation macroTransformation =
             (MacroTransformation) getComponentManager().lookup(Transformation.class, "macro");
         MacroTransformationContext context = new MacroTransformationContext();
-        context.setMacroTransformation(macroTransformation);
+        context.setTransformation(macroTransformation);
 
         List<Block> blocks = this.includeMacro.execute(parameters, null, context);
 

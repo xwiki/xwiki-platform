@@ -27,7 +27,7 @@ import org.xwiki.gwt.wysiwyg.client.plugin.color.ColorPickerTest;
 import org.xwiki.gwt.wysiwyg.client.plugin.format.exec.FormatBlockExecutableTest;
 import org.xwiki.gwt.wysiwyg.client.plugin.format.exec.RemoveFormatExecutableTest;
 import org.xwiki.gwt.wysiwyg.client.plugin.history.HistoryTest;
-import org.xwiki.gwt.wysiwyg.client.plugin.image.ImageConfigHTMLSerializerTest;
+import org.xwiki.gwt.wysiwyg.client.plugin.image.ImageConfigDOMWriterTest;
 import org.xwiki.gwt.wysiwyg.client.plugin.image.ImageConfigJSONSerializerTest;
 import org.xwiki.gwt.wysiwyg.client.plugin.image.ImageMetaDataExtractorTest;
 import org.xwiki.gwt.wysiwyg.client.plugin.image.exec.InsertImageExecutableTest;
@@ -99,7 +99,7 @@ public class WysiwygTestSuite extends GWTTestSuite
         suite.addTestSuite(RemoveFormatExecutableTest.class);
         suite.addTestSuite(InsertHRExecutableTest.class);
         suite.addTestSuite(ImageConfigJSONSerializerTest.class);
-        suite.addTestSuite(ImageConfigHTMLSerializerTest.class);
+        suite.addTestSuite(ImageConfigDOMWriterTest.class);
         suite.addTestSuite(ImageMetaDataExtractorTest.class);
         suite.addTestSuite(InsertImageExecutableTest.class);
         suite.addTestSuite(LinkMetaDataExtractorTest.class);

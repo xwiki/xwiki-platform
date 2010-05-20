@@ -20,18 +20,16 @@
 package org.xwiki.gwt.wysiwyg.client.plugin.image.exec;
 
 import org.xwiki.gwt.dom.client.Range;
-import org.xwiki.gwt.dom.client.Style;
 import org.xwiki.gwt.user.client.ui.rta.RichTextArea;
 import org.xwiki.gwt.user.client.ui.rta.cmd.internal.AbstractInsertElementExecutable;
 import org.xwiki.gwt.wysiwyg.client.plugin.image.ImageConfig;
-import org.xwiki.gwt.wysiwyg.client.plugin.image.ImageConfigHTMLParser;
-import org.xwiki.gwt.wysiwyg.client.plugin.image.ImageConfigHTMLSerializer;
+import org.xwiki.gwt.wysiwyg.client.plugin.image.ImageConfigDOMReader;
+import org.xwiki.gwt.wysiwyg.client.plugin.image.ImageConfigDOMWriter;
 import org.xwiki.gwt.wysiwyg.client.plugin.image.ImageConfigJSONParser;
 import org.xwiki.gwt.wysiwyg.client.plugin.image.ImageConfigJSONSerializer;
 
 import com.google.gwt.dom.client.ImageElement;
 import com.google.gwt.dom.client.Node;
-import com.google.gwt.dom.client.Style.Unit;
 
 /**
  * Handles the insertion of an image, passed through its corresponding HTML block.
@@ -49,8 +47,8 @@ public class InsertImageExecutable extends AbstractInsertElementExecutable<Image
     {
         super(rta);
 
-        configHTMLParser = new ImageConfigHTMLParser();
-        configHTMLSerializer = new ImageConfigHTMLSerializer();
+        configDOMReader = new ImageConfigDOMReader();
+        configDOMWriter = new ImageConfigDOMWriter();
         configJSONParser = new ImageConfigJSONParser();
         configJSONSerializer = new ImageConfigJSONSerializer();
     }
@@ -95,37 +93,11 @@ public class InsertImageExecutable extends AbstractInsertElementExecutable<Image
     /**
      * {@inheritDoc}
      * 
-     * @see AbstractInsertElementExecutable#merge(com.google.gwt.dom.client.Element, com.google.gwt.dom.client.Element)
+     * @see AbstractInsertElementExecutable#newElement()
      */
-    protected void merge(ImageElement target, ImageElement source)
+    @Override
+    protected ImageElement newElement()
     {
-        // Remove redundant attributes.
-        adjustDimension(target, source, Style.WIDTH);
-        adjustDimension(target, source, Style.HEIGHT);
-
-        super.merge(target, source);
-    }
-
-    /**
-     * Adjusts the specified dimension of the target image based on the source image.
-     * 
-     * @param target the image whose dimension is being adjusted
-     * @param source the image providing the new value for the specified dimension
-     * @param dimension the dimension to adjust, either {@link Style#WIDTH} or {@link Style#HEIGHT}
-     */
-    private void adjustDimension(ImageElement target, ImageElement source, String dimension)
-    {
-        if (source.hasAttribute(dimension)) {
-            // Keep the specified dimension only if it's different than the computed dimension.
-            String specifiedValue = source.getAttribute(dimension);
-            String computedValue = target.getPropertyString(dimension);
-            if (specifiedValue.equals(computedValue) || specifiedValue.equals(computedValue + Unit.PX.getType())) {
-                source.removeAttribute(dimension);
-            }
-        } else {
-            // Restore the dimension of the target image to its default value if the dimension of the source image isn't
-            // specified.
-            target.removeAttribute(dimension);
-        }
+        return rta.getDocument().createImageElement();
     }
 }

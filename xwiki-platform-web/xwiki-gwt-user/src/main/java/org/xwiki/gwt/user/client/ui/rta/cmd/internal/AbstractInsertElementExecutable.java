@@ -19,14 +19,10 @@
  */
 package org.xwiki.gwt.user.client.ui.rta.cmd.internal;
 
-import org.xwiki.gwt.dom.client.DOMUtils;
-import org.xwiki.gwt.dom.client.Element;
-import org.xwiki.gwt.dom.client.Style;
 import org.xwiki.gwt.user.client.StringUtils;
 import org.xwiki.gwt.user.client.Cache.CacheCallback;
 import org.xwiki.gwt.user.client.ui.rta.RichTextArea;
 
-import com.google.gwt.core.client.JsArrayString;
 import com.google.gwt.core.client.JsonUtils;
 
 /**
@@ -40,38 +36,37 @@ public abstract class AbstractInsertElementExecutable<C, E extends com.google.gw
     InsertHTMLExecutable
 {
     /**
-     * Creates a configuration object from an element.
+     * Creates a configuration object from a DOM element.
      * 
-     * @param <C> the type of configuration object returned by the parse method
-     * @param <E> the type of element being parsed
+     * @param <C> the type of configuration object returned by the read method
+     * @param <E> the type of DOM element being read
      */
-    public static interface ConfigHTMLParser<C, E extends com.google.gwt.dom.client.Element>
+    public static interface ConfigDOMReader<C, E extends com.google.gwt.dom.client.Element>
     {
         /**
-         * Creates a new configuration object from the given element.
+         * Reads the configuration from the given DOM element.
          * 
          * @param element a DOM element
          * @return the newly created configuration object
          */
-        C parse(E element);
+        C read(E element);
     }
 
     /**
-     * Serializes a configuration object to an HTML fragment that can be used to insert the corresponding element into
-     * the edited document.
+     * Updates a DOM element from a configuration object.
      * 
-     * @param <C> the type of configuration object that is being serialized to HTML
+     * @param <C> the type of configuration object that is used to update the DOM element
+     * @param <E> the type of DOM element being updated
      */
-    public static interface ConfigHTMLSerializer<C>
+    public static interface ConfigDOMWriter<C, E extends com.google.gwt.dom.client.Element>
     {
         /**
-         * Serializes a configuration object to an HTML fragment that can be used to insert the corresponding element
-         * into the edited document.
+         * Writes the given configuration to the specified DOM element.
          * 
-         * @param config the configuration object to be serialized
-         * @return the HTML fragment that can be used to insert the specified element into the edited document
+         * @param config the configuration object used to update the DOM element
+         * @param element the DOM element being updated
          */
-        String serialize(C config);
+        void write(C config, E element);
     }
 
     /**
@@ -146,12 +141,12 @@ public abstract class AbstractInsertElementExecutable<C, E extends com.google.gw
     /**
      * The object used to extract a configuration object from an element.
      */
-    protected ConfigHTMLParser<C, E> configHTMLParser;
+    protected ConfigDOMReader<C, E> configDOMReader;
 
     /**
-     * The object used to serialize a configuration object to HTML.
+     * The object used to update a DOM element from a configuration object.
      */
-    protected ConfigHTMLSerializer<C> configHTMLSerializer;
+    protected ConfigDOMWriter<C, E> configDOMWriter;
 
     /**
      * The object used to serialize a configuration object to JSON.
@@ -178,23 +173,21 @@ public abstract class AbstractInsertElementExecutable<C, E extends com.google.gw
      * 
      * @see InsertHTMLExecutable#execute(String)
      */
-    @SuppressWarnings("unchecked")
     @Override
     public boolean execute(String json)
     {
-        String html = configHTMLSerializer.serialize(configJSONParser.parse(json));
+        C config = configJSONParser.parse(json);
         E element = getSelectedElement();
         if (element == null) {
             // Insert a new element.
-            return super.execute(html);
-        } else {
-            // Overwrite an existing element.
-            Element container = Element.as(rta.getDocument().createDivElement());
-            // Inner HTML listeners have to be notified in order to extract the meta data.
-            container.xSetInnerHTML(html);
-            merge(element, (E) container.getFirstChild());
-            return true;
+            element = newElement();
+            if (!super.execute(element)) {
+                return false;
+            }
         }
+        // Update the selected element.
+        configDOMWriter.write(config, element);
+        return true;
     }
 
     /**
@@ -228,7 +221,7 @@ public abstract class AbstractInsertElementExecutable<C, E extends com.google.gw
         if (selectedElement == null) {
             return null;
         }
-        return configJSONSerializer.serialize(configHTMLParser.parse(selectedElement));
+        return configJSONSerializer.serialize(configDOMReader.read(selectedElement));
     }
 
     /**
@@ -242,52 +235,7 @@ public abstract class AbstractInsertElementExecutable<C, E extends com.google.gw
     protected abstract E getSelectedElement();
 
     /**
-     * Merges the given elements.
-     * 
-     * @param target the element that will be updated
-     * @param source the element providing the change
+     * @return a new element to be inserted
      */
-    protected void merge(E target, E source)
-    {
-        // Update the content.
-        if (!source.getInnerHTML().equals(target.getInnerHTML())) {
-            DOMUtils.getInstance().deleteNodeContents(target, 0, target.getChildCount());
-            target.appendChild(Element.as(source).extractContents());
-        }
-
-        // Merge complex attributes.
-        // Merge class name attribute.
-        if (!target.getClassName().equals(source.getClassName())) {
-            String[] targetClassNames = target.getClassName().split("\\s+");
-            for (int i = 0; i < targetClassNames.length; i++) {
-                source.addClassName(targetClassNames[i]);
-            }
-        }
-        // Merge style attribute.
-        if (!Element.as(target).xGetAttribute(Style.STYLE_ATTRIBUTE).equals(
-            Element.as(source).xGetAttribute(Style.STYLE_ATTRIBUTE))) {
-            extend((Style) source.getStyle(), (Style) target.getStyle());
-        }
-        // Update all attributes.
-        JsArrayString attributeNames = Element.as(source).getAttributeNames();
-        for (int i = 0; i < attributeNames.length(); i++) {
-            String newValue = Element.as(source).xGetAttribute(attributeNames.get(i));
-            Element.as(target).xSetAttribute(attributeNames.get(i), newValue);
-        }
-    }
-
-    /**
-     * Copies the properties from the source style to the target style only they are not defined in the target style.
-     * 
-     * @param target the style to be extended
-     * @param source the extension source
-     */
-    private native void extend(Style target, Style source)
-    /*-{
-        for(propertyName in source) {
-            if ('' + source[propertyName] != '' && '' + target[propertyName] == '') {
-                target[propertyName] = source[propertyName];
-            }
-        }
-    }-*/;
+    protected abstract E newElement();
 }

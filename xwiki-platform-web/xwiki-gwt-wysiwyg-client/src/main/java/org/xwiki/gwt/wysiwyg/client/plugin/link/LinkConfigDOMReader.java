@@ -22,8 +22,8 @@ package org.xwiki.gwt.wysiwyg.client.plugin.link;
 import org.xwiki.gwt.dom.client.DocumentFragment;
 import org.xwiki.gwt.dom.client.Element;
 import org.xwiki.gwt.user.client.EscapeUtils;
-import org.xwiki.gwt.user.client.ui.rta.cmd.internal.AbstractInsertElementExecutable.ConfigHTMLParser;
-import org.xwiki.gwt.wysiwyg.client.plugin.image.ImageConfigHTMLParser;
+import org.xwiki.gwt.user.client.ui.rta.cmd.internal.AbstractInsertElementExecutable.ConfigDOMReader;
+import org.xwiki.gwt.wysiwyg.client.plugin.image.ImageConfigDOMReader;
 import org.xwiki.gwt.wysiwyg.client.plugin.link.LinkConfig.LinkType;
 
 import com.google.gwt.dom.client.AnchorElement;
@@ -34,19 +34,19 @@ import com.google.gwt.dom.client.ImageElement;
  * 
  * @version $Id$
  */
-public class LinkConfigHTMLParser implements ConfigHTMLParser<LinkConfig, AnchorElement>
+public class LinkConfigDOMReader implements ConfigDOMReader<LinkConfig, AnchorElement>
 {
     /**
      * The object used to extract the image file name when the anchor wraps an image.
      */
-    private final ImageConfigHTMLParser imageConfigHTMLParser = new ImageConfigHTMLParser();
+    private final ImageConfigDOMReader imageConfigHTMLParser = new ImageConfigDOMReader();
 
     /**
      * {@inheritDoc}
      * 
-     * @see ConfigHTMLParser#parse(com.google.gwt.dom.client.Element)
+     * @see ConfigDOMReader#read(com.google.gwt.dom.client.Element)
      */
-    public LinkConfig parse(AnchorElement anchor)
+    public LinkConfig read(AnchorElement anchor)
     {
         LinkConfig linkConfig = new LinkConfig();
 
@@ -57,7 +57,7 @@ public class LinkConfigHTMLParser implements ConfigHTMLParser<LinkConfig, Anchor
             String startComment = linkMetadata.getChildNodes().getItem(0).getNodeValue();
             Element wrappingSpan = (Element) linkMetadata.getChildNodes().getItem(1);
             linkConfig.setReference(EscapeUtils.unescapeBackslash(startComment.substring("startwikilink:".length())));
-            linkConfig.setType(parseLinkType(wrappingSpan, linkConfig.getReference()));
+            linkConfig.setType(readLinkType(wrappingSpan, linkConfig.getReference()));
         } else {
             // It's an external link.
             linkConfig.setType(LinkType.EXTERNAL);
@@ -70,7 +70,7 @@ public class LinkConfigHTMLParser implements ConfigHTMLParser<LinkConfig, Anchor
         if (anchor.getChildNodes().getLength() == 1 && "img".equalsIgnoreCase(anchor.getFirstChild().getNodeName())) {
             // The anchor wraps an image.
             ImageElement image = (ImageElement) anchor.getFirstChild();
-            linkConfig.setLabelText(imageConfigHTMLParser.parse(image).getReference());
+            linkConfig.setLabelText(imageConfigHTMLParser.read(image).getReference());
             linkConfig.setReadOnlyLabel(true);
         } else {
             linkConfig.setLabelText(anchor.getInnerText());
@@ -88,7 +88,7 @@ public class LinkConfigHTMLParser implements ConfigHTMLParser<LinkConfig, Anchor
      * @param reference the link reference
      * @return the link type, as parsed from it's wrapping span and from its reference
      */
-    private LinkType parseLinkType(Element wrappingSpan, String reference)
+    private LinkType readLinkType(Element wrappingSpan, String reference)
     {
         String wrappingSpanClass = wrappingSpan.getClassName();
         if ("wikilink".equals(wrappingSpanClass)) {

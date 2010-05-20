@@ -178,12 +178,16 @@ public abstract class AbstractListSelectorWizardStep<D, L> extends AbstractSelec
      */
     protected void fillList(List<L> dataList, L selectedData)
     {
+        ListItem<L> selectedItem = null;
+        int selectedPriority = 0;
         for (L data : dataList) {
             ListItem<L> item = getListItem(data);
             list.addItem(item);
             // Restore the selection.
-            if (data.equals(selectedData) || isSelectedByDefault(data)) {
-                list.setSelectedItem(item);
+            int priority = (isSelectedByDefault(data) ? 2 : 0) + (data.equals(selectedData) ? 1 : 0);
+            if (priority > selectedPriority) {
+                selectedPriority = priority;
+                selectedItem = item;
             }
         }
         ListItem<L> newOptionListItem = getNewOptionListItem();
@@ -193,10 +197,11 @@ public abstract class AbstractListSelectorWizardStep<D, L> extends AbstractSelec
             } else {
                 list.addItem(newOptionListItem);
             }
-            if (list.getSelectedItem() == null) {
-                list.setSelectedItem(newOptionListItem);
+            if (selectedItem == null) {
+                selectedItem = newOptionListItem;
             }
         }
+        list.setSelectedItem(selectedItem);
     }
 
     /**

@@ -144,6 +144,12 @@ public class Style extends com.google.gwt.dom.client.Style
     public static final Property MARGIN_RIGHT = new Property("margin-right", "marginRight", false, false, "0");
 
     /**
+     * The vertical-align property sets the vertical alignment of an element.
+     */
+    public static final Property VERTICAL_ALIGN =
+        new Property("vertical-align", "verticalAlign", false, false, "baseline");
+
+    /**
      * Standard values for {@link Style#DISPLAY}.
      */
     public static final class Display

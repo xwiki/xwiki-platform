@@ -25,7 +25,7 @@ import org.xwiki.gwt.dom.client.Element;
 import org.xwiki.gwt.dom.client.Style;
 import org.xwiki.gwt.user.client.EscapeUtils;
 import org.xwiki.gwt.user.client.StringUtils;
-import org.xwiki.gwt.user.client.ui.rta.cmd.internal.AbstractInsertElementExecutable.ConfigHTMLParser;
+import org.xwiki.gwt.user.client.ui.rta.cmd.internal.AbstractInsertElementExecutable.ConfigDOMReader;
 import org.xwiki.gwt.wysiwyg.client.plugin.image.ImageConfig.ImageAlignment;
 
 import com.google.gwt.dom.client.ImageElement;
@@ -36,7 +36,7 @@ import com.google.gwt.dom.client.Node;
  * 
  * @version $Id$
  */
-public class ImageConfigHTMLParser implements ConfigHTMLParser<ImageConfig, ImageElement>
+public class ImageConfigDOMReader implements ConfigDOMReader<ImageConfig, ImageElement>
 {
     /**
      * The prefix of the start image comment text.
@@ -46,26 +46,28 @@ public class ImageConfigHTMLParser implements ConfigHTMLParser<ImageConfig, Imag
     /**
      * {@inheritDoc}
      * 
-     * @see ConfigHTMLParser#parse(com.google.gwt.dom.client.Element)
+     * @see ConfigDOMReader#read(com.google.gwt.dom.client.Element)
      */
-    public ImageConfig parse(ImageElement image)
+    public ImageConfig read(ImageElement image)
     {
         ImageConfig config = new ImageConfig();
-        config.setReference(parseReference(image));
+        config.setReference(readReference(image));
         config.setUrl(image.getSrc());
 
-        String width = image.getAttribute(Style.WIDTH);
+        // Image width priority: style attribute > width attribute > width property
+        String width = image.getStyle().getWidth();
         if (StringUtils.isEmpty(width)) {
-            width = image.getStyle().getWidth();
+            width = image.getAttribute(Style.WIDTH);
             if (StringUtils.isEmpty(width)) {
                 width = String.valueOf(image.getWidth());
             }
         }
         config.setWidth(width);
 
-        String height = image.getAttribute(Style.HEIGHT);
+        // Image height priority: style attribute > height attribute > height property
+        String height = image.getStyle().getHeight();
         if (StringUtils.isEmpty(height)) {
-            height = image.getStyle().getHeight();
+            height = image.getAttribute(Style.HEIGHT);
             if (StringUtils.isEmpty(height)) {
                 height = String.valueOf(image.getHeight());
             }
@@ -73,7 +75,7 @@ public class ImageConfigHTMLParser implements ConfigHTMLParser<ImageConfig, Imag
         config.setHeight(height);
 
         config.setAltText(image.getAlt());
-        config.setAlignment(parseImageAlignment(image));
+        config.setAlignment(readImageAlignment(image));
 
         return config;
     }
@@ -84,7 +86,7 @@ public class ImageConfigHTMLParser implements ConfigHTMLParser<ImageConfig, Imag
      * @param image an image element
      * @return the reference of the given image, if specified in its meta data, {@code null} otherwise
      */
-    private String parseReference(ImageElement image)
+    public String readReference(ImageElement image)
     {
         DocumentFragment metaData = Element.as(image).getMetaData();
         if (metaData == null) {
@@ -104,7 +106,7 @@ public class ImageConfigHTMLParser implements ConfigHTMLParser<ImageConfig, Imag
      * @param image the image to parse the alignment for
      * @return the determined alignment, if there is any or {@code null} otherwise
      */
-    private ImageAlignment parseImageAlignment(ImageElement image)
+    public ImageAlignment readImageAlignment(ImageElement image)
     {
         try {
             return ImageAlignment.valueOf(image.getStyle().getVerticalAlign().toUpperCase());

@@ -23,8 +23,8 @@ import org.xwiki.gwt.dom.client.Range;
 import org.xwiki.gwt.user.client.ui.rta.RichTextArea;
 import org.xwiki.gwt.user.client.ui.rta.cmd.internal.AbstractInsertElementExecutable;
 import org.xwiki.gwt.wysiwyg.client.plugin.link.LinkConfig;
-import org.xwiki.gwt.wysiwyg.client.plugin.link.LinkConfigHTMLParser;
-import org.xwiki.gwt.wysiwyg.client.plugin.link.LinkConfigHTMLSerializer;
+import org.xwiki.gwt.wysiwyg.client.plugin.link.LinkConfigDOMReader;
+import org.xwiki.gwt.wysiwyg.client.plugin.link.LinkConfigDOMWriter;
 import org.xwiki.gwt.wysiwyg.client.plugin.link.LinkConfigJSONParser;
 import org.xwiki.gwt.wysiwyg.client.plugin.link.LinkConfigJSONSerializer;
 
@@ -47,8 +47,8 @@ public class CreateLinkExecutable extends AbstractInsertElementExecutable<LinkCo
     {
         super(rta);
 
-        configHTMLParser = new LinkConfigHTMLParser();
-        configHTMLSerializer = new LinkConfigHTMLSerializer();
+        configDOMReader = new LinkConfigDOMReader();
+        configDOMWriter = new LinkConfigDOMWriter();
         configJSONParser = new LinkConfigJSONParser();
         configJSONSerializer = new LinkConfigJSONSerializer();
     }
@@ -125,5 +125,16 @@ public class CreateLinkExecutable extends AbstractInsertElementExecutable<LinkCo
     protected AnchorElement getSelectedElement()
     {
         return LinkExecutableUtils.getSelectedAnchor(rta);
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see AbstractInsertElementExecutable#newElement()
+     */
+    @Override
+    protected AnchorElement newElement()
+    {
+        return rta.getDocument().createAnchorElement();
     }
 }

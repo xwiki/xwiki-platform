@@ -105,11 +105,8 @@ public class XWikiReferenceTagHandler extends ReferenceTagHandler
             if (isFreeStandingReference(context)) {
                 context.getTagStack().setStackParameter("isFreeStandingLink", true);
             } else {
-                // Save the parameters set on the A element so that we can generate the correct link
-                // in the XWiki Comment handler. Note that we must exclude the href parameter.
-                WikiParameters params = context.getParams();
-                params = params.remove("href");
-                context.getTagStack().setStackParameter("linkParameters", params);
+                context.getTagStack().setStackParameter("linkParameters",
+                    removeMeaningfulParameters(context.getParams()));
             }
 
             setAccumulateContent(false);
@@ -164,7 +161,9 @@ public class XWikiReferenceTagHandler extends ReferenceTagHandler
 
             context.getTagStack().popScannerContext();
         } else if (!isFreeStandingReference(context)) {
-            WikiParameter ref = context.getParams().getParameter("href");
+            WikiParameters parameters = context.getParams();
+
+            WikiParameter ref = parameters.getParameter("href");
 
             if (ref != null) {
                 // Ensure we simulate a document parsing end
@@ -178,13 +177,9 @@ public class XWikiReferenceTagHandler extends ReferenceTagHandler
                 // Make sure to flush whatever the renderer implementation
                 linkLabelRenderer.endDocument(Listener.EMPTY_PARAMETERS);
 
-                // Make sure we remove the HREF parameters from the list
-                // of parameters since they it's already consumed as link reference.
-                WikiParameters parameters = context.getParams();
-                parameters = parameters.remove("href");
-
                 String label = linkLabelRenderer.getPrinter().toString();
-                WikiReference reference = new WikiReference(ref.getValue(), label, parameters);
+                WikiReference reference =
+                    new WikiReference(ref.getValue(), label, removeMeaningfulParameters(parameters));
 
                 context.getScannerContext().onReference(reference);
             }

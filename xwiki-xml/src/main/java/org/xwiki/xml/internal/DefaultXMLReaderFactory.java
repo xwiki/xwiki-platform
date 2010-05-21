@@ -61,7 +61,6 @@ public class DefaultXMLReaderFactory implements XMLReaderFactory, Initializable
             this.xercesGrammarPool = Class.forName("org.apache.xerces.util.XMLGrammarPoolImpl").newInstance();
         } catch (Exception e) {
             // There's no Xerces JAR in the classpath, don't do grammar caching for Xerces.
-            throw new InitializationException("xxx", e);
         }
     }
     

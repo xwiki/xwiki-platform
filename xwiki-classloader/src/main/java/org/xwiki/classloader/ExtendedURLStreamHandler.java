@@ -22,13 +22,13 @@ package org.xwiki.classloader;
 import org.xwiki.component.annotation.ComponentRole;
 
 /**
- * Adds the ability for a {@link java.net.URLStreamHandler.URLStreamHandler} implementation to return the protocol
+ * Adds the ability for a {@link java.net.URLStreamHandler} implementation to return the protocol
  * it's managing.
  * 
- * Note that unfortunately we cannot extend {@link java.net.URLStreamHandler.URLStreamHandler} since it's an abstract
+ * Note that unfortunately we cannot extend {@link java.net.URLStreamHandler} since it's an abstract
  * class and not an interface. Thus components implementing this interface need also to extend 
- * {@link java.net.URLStreamHandler.URLStreamHandler} and user code need to cast looked up instance as 
- * {@link java.net.URLStreamHandler.URLStreamHandler} instances to use them as proper stream handlers.
+ * {@link java.net.URLStreamHandler} and user code need to cast looked up instance as
+ * {@link java.net.URLStreamHandler} instances to use them as proper stream handlers.
  * 
  * @version $Id$
  * @since 2.0.1

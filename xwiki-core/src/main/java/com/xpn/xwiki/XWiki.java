@@ -504,7 +504,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface
                 // in that case that they're pointing to the main wiki.
                 if (servername.equals("www")
                     || host.equals("localhost")
-                    || host.matches("[0-9]+\\.|[0-9]+\\.[0-9]+\\.[0-9]")) {
+                    || host.matches("[0-9]{1,3}(?:\\.[0-9]{1,3}){3}")) {
                     return xwiki;
                 } else {
                     wikiDefinition =

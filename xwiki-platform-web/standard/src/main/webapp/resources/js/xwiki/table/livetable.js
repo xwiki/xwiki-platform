@@ -71,10 +71,12 @@ XWiki.widgets.LiveTable = Class.create({
        options = {};
     }
 
-    this.limit = options.limit || 10;
-    this.action = options.action || "view"; // FIXME check if this can be removed safely.
-
     this.permalinks = options.permalinks || true;
+
+    this.lastLimit = options.limit || 10;
+    this.limit = this.getIntegerFromHash("l", this.lastLimit);
+
+    this.action = options.action || "view"; // FIXME check if this can be removed safely.
 
     // Initialize page size control bounds
     if (typeof this.pageSizeNodes != "undefined") {
@@ -102,13 +104,13 @@ XWiki.widgets.LiveTable = Class.create({
     this.totalRows = -1;
     this.fetchedRows = new Array();
     this.getUrl = url;
-    this.lastoffset = 1;
+    this.lastOffset = 1;
     this.sendReqNo = 0;
     this.recvReqNo = 0;
 
     this.observeSortableColumns();   
  
-    var initialPage = this.permalinks ? this.getPageFromHash() : 1;
+    var initialPage = this.getIntegerFromHash("p", this.lastOffset);
     this.currentOffset = (initialPage - 1) * this.limit + 1;
 
     // Show initial rows
@@ -121,9 +123,9 @@ XWiki.widgets.LiveTable = Class.create({
    **/
   setPageSize: function(pageSize)
   {
+    this.lastLimit = this.limit;
     this.limit = pageSize;
-    this.clearCache();
-    this.showRows(1, parseInt(this.limit));
+    this.showRows(1, this.limit);
   },
 
   /**
@@ -134,7 +136,7 @@ XWiki.widgets.LiveTable = Class.create({
     var currentHash = window.location.hash.substring(1);
     var filterString = this.filter ? this.filter.serializeFilters() : "";
 
-    var shouldUpdate = this.lastoffset != 1 || !currentHash.blank() || !filterString.blank();
+    var shouldUpdate = this.lastOffset != 1 || this.limit != this.lastLimit || !currentHash.blank() || !filterString.blank();
 
     if (shouldUpdate) {
       var tables = currentHash.split("|"), newHash = "";
@@ -145,9 +147,10 @@ XWiki.widgets.LiveTable = Class.create({
           newHash += (tables[i] + "|"); 
         }
       }
-      newHash += "t=#{table}&p=#{page}".interpolate({
+      newHash += "t=#{table}&p=#{page}&l=#{pagesize}".interpolate({
         "table" : this.domNodeName,
-        "page" : ((this.lastoffset - 1) / this.limit) + 1
+        "page" : ((this.lastOffset - 1) / this.limit) + 1,
+        "pagesize" : this.limit
       });
 
       newHash += filterString;
@@ -157,21 +160,28 @@ XWiki.widgets.LiveTable = Class.create({
   },
 
   /**
-   * Returns the current page associated to this livetable.
+   * Returns an integer value from hash.
+   *
+   * @param name the of the value to retrieve
+   * @param defaultValue the default value to return if the hash does not contains the named value
+   *        or permalink is disabled
    */
-  getPageFromHash: function()
+  getIntegerFromHash: function(name, defaultValue)
   {
+    if( !this.permalinks ) {
+      return defaultValue
+    }
     var hashString = window.location.hash.substring(1);
     if (!hashString.blank()) {
       var tables = hashString.split("|");
       for (var i=0;i<tables.length;i++) {
         var params = tables[i].toQueryParams();
-        if (params["t"] == this.domNodeName && parseInt(params["p"])) {
-          return parseInt(params["p"]);
+        if (params["t"] == this.domNodeName && parseInt(params[name])) {
+          return parseInt(params[name]);
         }
       }
     }
-    return 1;
+    return defaultValue;
   },
 
   /**
@@ -188,7 +198,7 @@ XWiki.widgets.LiveTable = Class.create({
         if (params["t"] == this.domNodeName) { // that's our table !
           var parameterNames = Object.keys(params), result = new Object();
           for (var j=0;j<parameterNames.length;j++) {
-            if (parameterNames[j] != "t" && parameterNames[j] != "p") { // ignore those reserved params
+            if (parameterNames[j].length != 1 || "tpl".indexOf(parameterNames[j]) == -1) { // ignore those reserved params
               result[parameterNames[j]] = params[parameterNames[j]];
             }
           }
@@ -204,10 +214,10 @@ XWiki.widgets.LiveTable = Class.create({
     * range that must be retrieved from the server, and one defines the range that should be
     * displayed. Two ranges are needed as some of the displayed rows can already be available from
     * a previous request.
-    * @param offset Starting request offset; the index of the first row that should be retrieved.
-    * @param limit Maximum number of rows to retrieve.
-    * @param doffset Starting display offset; the index of the first row that should be displayed.
-    * @param dlimit Maximum number of rows to display.
+    * @param reqOffset Starting request offset; the index of the first row that should be retrieved.
+    * @param reqLimit Maximum number of rows to retrieve.
+    * @param displayOffset Starting display offset; the index of the first row that should be displayed.
+    * @param displayLimit Maximum number of rows to display.
     */
   getRows: function(reqOffset, reqLimit, displayOffset, displayLimit)
   {
@@ -325,7 +335,7 @@ XWiki.widgets.LiveTable = Class.create({
     if (f > this.totalRows) f = this.totalRows;
     var off = (this.totalRows > 0) ? offset : 0;
     var msg = "<strong>" + off + "</strong> - <strong>" + f + "</strong> $msg.get('xe.pagination.results.of') <strong>" + this.totalRows + "</strong>";
-    var msg = msg.toLowerCase();
+    msg = msg.toLowerCase();
 
     this.limitsDisplay.innerHTML = "$msg.get('xe.pagination.results') " + msg;
     this.clearDisplay();
@@ -357,7 +367,7 @@ XWiki.widgets.LiveTable = Class.create({
     */
   showRows: function(offset, limit)
   {
-    this.lastoffset = offset;
+    this.lastOffset = offset;
 
     if (this.permalinks) {
       this.updateLocationHash();
@@ -406,7 +416,7 @@ XWiki.widgets.LiveTable = Class.create({
     */
   deleteAndShiftRows: function(indx)
   {
-    for(i in this.fetchedRows) {
+    for(var i in this.fetchedRows) {
       if(i >= indx)
       this.fetchedRows[i] = this.fetchedRows[''+(parseInt(i)+1)];
     }
@@ -417,7 +427,7 @@ XWiki.widgets.LiveTable = Class.create({
     */
   debugFetchedRows: function() {
     var buf = '';
-    for (i in this.fetchedRows) {
+    for (var i in this.fetchedRows) {
       if (this.fetchedRows[i] != undefined) {
         buf += i+' ';
       }
@@ -433,7 +443,7 @@ XWiki.widgets.LiveTable = Class.create({
     this.deleteAndShiftRows(indx);
 
     // Compute new refresh offset
-    var newoffset = this.lastoffset;
+    var newoffset = this.lastOffset;
     if(indx > this.totalRows - this.limit - 1) {
       newoffset -= 1;
     }
@@ -540,7 +550,7 @@ var LiveTablePagination = Class.create({
       });
       var pages = Math.ceil(this.table.totalRows / this.table.limit);
       var currentMax = (!this.max) ? pages : this.max;
-      var currentPage = Math.floor( this.table.lastoffset / this.table.limit) + 1;
+      var currentPage = Math.floor( this.table.lastOffset / this.table.limit) + 1;
       var startPage = Math.floor(currentPage / currentMax) * currentMax - 1;
       // always display the first page
       if (startPage>1) {
@@ -552,9 +562,8 @@ var LiveTablePagination = Class.create({
          }
       }
       // display pages 
-      var i;
-      for (i=(startPage<=0) ? 1 : startPage;i<=Math.min(startPage + currentMax + 1, pages);i++) {
-         var selected = (currentPage == i) ? true : false
+      for (var i=(startPage<=0) ? 1 : startPage;i<=Math.min(startPage + currentMax + 1, pages);i++) {
+         var selected = (currentPage == i);
          this.pagesNodes.each(function(elem){
              elem.insert(self.createPageLink(i, selected));
          });
@@ -587,14 +596,14 @@ var LiveTablePagination = Class.create({
       this.table.showRows(((parseInt(page) - 1 )* this.table.limit) + 1, this.table.limit);
     },
     gotoPrevPage: function() {
-      var currentPage = Math.floor( this.table.lastoffset / this.table.limit) + 1;
+      var currentPage = Math.floor( this.table.lastOffset / this.table.limit) + 1;
       var prevPage = currentPage - 1;
       if (prevPage > 0) {
         this.table.showRows(((parseInt(prevPage) - 1) * this.table.limit) + 1, this.table.limit);
       }
     },
     gotoNextPage: function() {
-      var currentPage = Math.floor( this.table.lastoffset / this.table.limit) + 1;
+      var currentPage = Math.floor( this.table.lastOffset / this.table.limit) + 1;
       var pages = Math.ceil(this.table.totalRows / this.table.limit);
       var nextPage = currentPage + 1;
       if (nextPage <= pages) {
@@ -640,10 +649,10 @@ var LiveTablePagination = Class.create({
   createPageSizeSelectControl: function() {
     var select = new Element('select', {'class':'pagesizeselect'});
     for (var i=this.startValue; i<=this.maxValue; i += this.step) {
-      var attrs = {'value':i, 'text':i}
-      if (i == this.currentValue)
+      var attrs = {'value':i, 'text':i};
+      if (i == this.currentValue) {
         attrs.selected = true;
-      else {
+      } else {
         var prevStep = i - this.step;
         if (this.currentValue > prevStep && this.currentValue < i) {
           select.appendChild(new Element('option', {'value':this.currentValue, 'text':this.currentValue, selected:true}).update(this.currentValue));
@@ -675,7 +684,7 @@ var LiveTableFilter = Class.create({
     this.filters = new Object();
     this.filters = filters;
 
-    this.inputs = this.filterNodes.invoke('select','input').flatten()
+    this.inputs = this.filterNodes.invoke('select','input').flatten();
     this.selects = this.filterNodes.invoke('select','select').flatten();
 
     this.initializeFilters();
@@ -685,7 +694,6 @@ var LiveTableFilter = Class.create({
 
   /**
    * Initialize DOM values of the filters elements based on the passed map of name/value.
-   * TODO: rewrite this method the other way around (iterate on the map, not on the filters).
    */
   initializeFilters: function()
   {

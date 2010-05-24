@@ -220,7 +220,7 @@ public abstract class AbstractSkinExtensionPlugin extends XWikiDefaultPlugin
     {
         StringBuilder result = new StringBuilder();
         // Using LinkedHashSet to preserve the extensions order.
-        Set<String> extensions = new LinkedHashSet();
+        Set<String> extensions = new LinkedHashSet<String>();
         // First, we add to the import string the extensions that should always be used.
         // TODO Global extensions should be able to select a set of actions for which they are enabled.
         extensions.addAll(getAlwaysUsedExtensions(context));

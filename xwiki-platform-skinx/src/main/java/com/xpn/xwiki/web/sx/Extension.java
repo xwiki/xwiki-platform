@@ -28,10 +28,9 @@ package com.xpn.xwiki.web.sx;
  */
 public interface Extension
 {
-
     /**
-     * @return the full name of the wiki document holding the XWiki class defining this type of extension. For
-     *         example, 'XWiki.JavaScriptExtension' for javascript extensions.
+     * @return the full name of the wiki document holding the XWiki class defining this type of extension. For example,
+     *         'XWiki.JavaScriptExtension' for javascript extensions.
      */
     String getClassName();
 
@@ -44,5 +43,4 @@ public interface Extension
      * @return a compressor associated with the extension.
      */
     SxCompressor getCompressor();
-
 }

@@ -111,8 +111,7 @@ public abstract class AbstractSxAction extends XWikiAction
         }
 
         if (BooleanUtils.toBoolean(StringUtils.defaultIfEmpty(
-                        request.get(COMPRESS_SCRIPT_REQUEST_PARAMETER), "true")))
-        {
+            request.get(COMPRESS_SCRIPT_REQUEST_PARAMETER), "true"))) {
             extensionContent = sxType.getCompressor().compress(extensionContent);
         }
 
@@ -156,7 +155,7 @@ public abstract class AbstractSxAction extends XWikiAction
 
     /**
      * Get the type of extension, depends on the type of action.
-     *
+     * 
      * @return a new object which extends Extension.
      */
     public abstract Extension getExtensionType();

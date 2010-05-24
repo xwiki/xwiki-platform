@@ -48,6 +48,7 @@ public class SsxAction extends AbstractSxAction
      * 
      * @see AbstractSxAction#getExtensionType()
      */
+    @Override
     public Extension getExtensionType()
     {
         return CSSX;

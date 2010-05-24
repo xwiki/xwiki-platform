@@ -19,12 +19,12 @@
  */
 package com.xpn.xwiki.plugin.skinx;
 
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
-import java.util.Collection;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
@@ -38,8 +38,8 @@ import com.xpn.xwiki.notify.XWikiActionNotificationInterface;
 import com.xpn.xwiki.notify.XWikiActionRule;
 import com.xpn.xwiki.notify.XWikiDocChangeNotificationInterface;
 import com.xpn.xwiki.notify.XWikiNotificationRule;
-import com.xpn.xwiki.objects.classes.BaseClass;
 import com.xpn.xwiki.objects.BaseObject;
+import com.xpn.xwiki.objects.classes.BaseClass;
 
 /**
  * Abstract SX plugin for wiki-document-based extensions (Extensions written as object of a XWiki Extension class).
@@ -150,7 +150,7 @@ public abstract class AbstractDocumentSkinExtensionPlugin extends AbstractSkinEx
             Set<String> extensions = new HashSet<String>();
             String query =
                 ", BaseObject as obj, StringProperty as use where obj.className='" + getExtensionClassName() + "'"
-                    + " and obj.name=doc.fullName and use.id.id=obj.id and use.id.name='use' and use.value='always'";
+                + " and obj.name=doc.fullName and use.id.id=obj.id and use.id.name='use' and use.value='always'";
             try {
                 for (String extension : context.getWiki().getStore().searchDocumentsNames(query, context)) {
                     try {
@@ -176,7 +176,7 @@ public abstract class AbstractDocumentSkinExtensionPlugin extends AbstractSkinEx
 
     /**
      * {@inheritDoc}
-     *
+     * 
      * @see com.xpn.xwiki.plugin.skinx.AbstractSkinExtensionPlugin#hasPageExtensions(com.xpn.xwiki.XWikiContext)
      */
     @Override
@@ -254,7 +254,7 @@ public abstract class AbstractDocumentSkinExtensionPlugin extends AbstractSkinEx
                 doc.setTitle("XWiki " + getExtensionName() + " Extension Class");
             }
             if (StringUtils.isBlank(doc.getContent()) || !XWikiDocument.XWIKI20_SYNTAXID.equals(doc.getSyntaxId())) {
-                needsUpdate = true;      
+                needsUpdate = true;
                 doc.setContent("{{include document=\"XWiki.ClassSheet\" /}}");
                 doc.setSyntaxId(XWikiDocument.XWIKI20_SYNTAXID);
             }

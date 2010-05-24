@@ -48,6 +48,7 @@ public class JsxAction extends AbstractSxAction
      * 
      * @see AbstractSxAction#getExtensionType()
      */
+    @Override
     public Extension getExtensionType()
     {
         return JSX;

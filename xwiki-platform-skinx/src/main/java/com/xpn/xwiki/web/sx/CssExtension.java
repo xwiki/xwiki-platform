@@ -69,7 +69,6 @@ public class CssExtension implements Extension
     {
         return new SxCompressor()
         {
-
             public String compress(String source)
             {
                 try {
@@ -82,7 +81,6 @@ public class CssExtension implements Extension
                 }
                 return source;
             }
-
         };
     }
 

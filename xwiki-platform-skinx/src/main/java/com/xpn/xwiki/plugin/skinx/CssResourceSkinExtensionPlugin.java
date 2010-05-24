@@ -56,9 +56,10 @@ public class CssResourceSkinExtensionPlugin extends AbstractResourceSkinExtensio
 
     /**
      * {@inheritDoc}
-     *
+     * 
      * @see AbstractSkinExtensionPlugin#getAction()
      */
+    @Override
     protected String getAction()
     {
         return "ssx";
@@ -66,9 +67,10 @@ public class CssResourceSkinExtensionPlugin extends AbstractResourceSkinExtensio
 
     /**
      * {@inheritDoc}
-     *
+     * 
      * @see AbstractSkinExtensionPlugin#generateLink()
      */
+    @Override
     protected String generateLink(String url)
     {
         return "<link rel='stylesheet' type='text/css' href='" + url + "'/>\n";

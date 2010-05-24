@@ -74,7 +74,7 @@ public class JsExtension implements Extension
     }
 
     /** The JavaScript compressor which is returned by getCompressor. Currently implemented using YUI Compressor. */
-    private class JsCompressor implements SxCompressor
+    private static class JsCompressor implements SxCompressor
     {
         /**
          * {@inheritDoc}
@@ -84,7 +84,7 @@ public class JsExtension implements Extension
         public String compress(String source)
         {
             try {
-                ErrorReporter reporter = (ErrorReporter) this.new CustomErrorReporter();
+                ErrorReporter reporter = new CustomErrorReporter();
                 JavaScriptCompressor compressor = new JavaScriptCompressor(new StringReader(source), reporter);
                 StringWriter out = new StringWriter();
                 compressor.compress(out, -1, true, false, false, false);
@@ -100,7 +100,7 @@ public class JsExtension implements Extension
         }
 
         /** A Javascript error reporter which logs errors with log4j. */
-        private class CustomErrorReporter implements ErrorReporter
+        private static class CustomErrorReporter implements ErrorReporter
         {
             /**
              * {@inheritDoc}

@@ -24,6 +24,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import com.xpn.xwiki.XWikiContext;
+import com.xpn.xwiki.plugin.PluginApi;
 
 /**
  * API for the SkinExtension Plugin.
@@ -40,31 +41,31 @@ public class SkinFileExtensionPluginApi extends SkinExtensionPluginApi
      * @param plugin The wrapped plugin.
      * @param context The current request context.
      * @see PluginApi#PluginApi(com.xpn.xwiki.plugin.XWikiPluginInterface, XWikiContext)
-     */    
+     */
     public SkinFileExtensionPluginApi(AbstractSkinExtensionPlugin plugin, XWikiContext context)
     {
         super(plugin, context);
     }
-    
-    /**
-     * Mark a resource as used in the current result. A resource is registered only once per request, further calls will
-     * not result in additional links, even if it is pulled with different parameters.
-     * 
-     * @param resource The name of the resource to pull.  
-     * @see AbstractSkinExtensionPlugin#use(String, XWikiContext)
-     */
-    @Override
-    public void use(String resource)
-    {        
-        this.use(resource, false);
-    }
-    
+
     /**
      * Mark a resource as used in the current result. A resource is registered only once per request, further calls will
      * not result in additional links, even if it is pulled with different parameters.
      * 
      * @param resource The name of the resource to pull.
-     * @param forceSkinAction True if the resource should be pulled by the 'skin' action. 
+     * @see AbstractSkinExtensionPlugin#use(String, XWikiContext)
+     */
+    @Override
+    public void use(String resource)
+    {
+        this.use(resource, false);
+    }
+
+    /**
+     * Mark a resource as used in the current result. A resource is registered only once per request, further calls will
+     * not result in additional links, even if it is pulled with different parameters.
+     * 
+     * @param resource The name of the resource to pull.
+     * @param forceSkinAction True if the resource should be pulled by the 'skin' action.
      * @see AbstractSkinExtensionPlugin#use(String, XWikiContext)
      */
     public void use(String resource, boolean forceSkinAction)

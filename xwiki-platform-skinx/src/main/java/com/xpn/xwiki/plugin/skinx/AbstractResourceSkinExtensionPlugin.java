@@ -27,6 +27,7 @@ import com.xpn.xwiki.XWikiException;
 
 /**
  * Skin Extension plugin to use extension files from JAR resources.
+ * 
  * @version $Id$
  */
 public abstract class AbstractResourceSkinExtensionPlugin extends AbstractSkinExtensionPlugin
@@ -46,17 +47,17 @@ public abstract class AbstractResourceSkinExtensionPlugin extends AbstractSkinEx
 
     /**
      * Get the action which the url should specify for calling this resource.
-     *
+     * 
      * @return String Action name.
      */
     protected abstract String getAction();
 
     /**
      * Takes a URL string and outputs a link which will cause the browser to load the url.
-     *
+     * 
      * @param url String representation of the url to load (eg: {@code /this/url.js})
-     * @return HTML code linking to the pulled resource
-     *         (eg: {@code <script type="text/javascript" src="/this/url.js"/>})
+     * @return HTML code linking to the pulled resource (eg: {@code <script type="text/javascript" src="/this/url.js"/>}
+     *         )
      */
     protected abstract String generateLink(String url);
 
@@ -65,6 +66,7 @@ public abstract class AbstractResourceSkinExtensionPlugin extends AbstractSkinEx
      * 
      * @see AbstractSkinExtensionPlugin#getLink(String, XWikiContext)
      */
+    @Override
     public String getLink(String resourceName, XWikiContext context)
     {
         // If the current user has access to Main.WebHome, we will use this document in the URL
@@ -76,7 +78,7 @@ public abstract class AbstractResourceSkinExtensionPlugin extends AbstractSkinEx
                 page = context.getDoc().getFullName();
             }
             return generateLink(context.getWiki().getURL(page, getAction(),
-                        "resource=" + resourceName + parametersAsQueryString(resourceName, context), context));
+                "resource=" + resourceName + parametersAsQueryString(resourceName, context), context));
         } catch (XWikiException e) {
             // Do nothing here; we can't access the wiki, so don't link to this resource at all.
             return "";

@@ -33,15 +33,13 @@ import org.apache.commons.io.IOUtils;
  */
 public class SxResourceSource implements SxSource
 {
-    /**
-     * The full path of the resource to use as extension. Exemple: path/to/hello.js
-     */
+    /** The full path of the resource to use as extension. Example: {@code path/to/hello.js}. */
     private String resourceName;
 
     /**
      * Constructor of this source.
      * 
-     * @param resourceName the full path of the resource to use as extension. Exemple: path/to/hello.js
+     * @param resourceName the full path of the resource to use as extension. Example: {@code path/to/hello.js}
      */
     public SxResourceSource(String resourceName)
     {

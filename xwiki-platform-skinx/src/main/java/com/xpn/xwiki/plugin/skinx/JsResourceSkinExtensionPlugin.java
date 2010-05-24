@@ -56,9 +56,10 @@ public class JsResourceSkinExtensionPlugin extends AbstractResourceSkinExtension
 
     /**
      * {@inheritDoc}
-     *
+     * 
      * @see AbstractSkinExtensionPlugin#getAction()
      */
+    @Override
     protected String getAction()
     {
         return "jsx";
@@ -66,9 +67,10 @@ public class JsResourceSkinExtensionPlugin extends AbstractResourceSkinExtension
 
     /**
      * {@inheritDoc}
-     *
+     * 
      * @see AbstractSkinExtensionPlugin#generateLink()
      */
+    @Override
     protected String generateLink(String url)
     {
         return "<script type='text/javascript' src='" + url + "' defer='defer'></script>\n";

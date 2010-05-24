@@ -258,6 +258,19 @@ public abstract class AbstractSkinExtensionPlugin extends XWikiDefaultPlugin
     }
 
     /**
+     * Get a parameter value for a pulled resource.
+     * 
+     * @param parameterName the name of the parameter to retrieve
+     * @param resource the resource for which to retrieve the parameter
+     * @param context the current request context
+     * @return The parameter value for the resource. If this parameter was not given, {@code null} is returned.
+     */
+    protected Object getParameter(String parameterName, String resource, XWikiContext context)
+    {
+        return getParametersForResource(resource, context).get(parameterName);
+    }
+
+    /**
      * This method converts the parameters for an extension to a query string that can be used with
      * {@link com.xpn.xwiki.doc.XWikiDocument#getURL(String, String, String, XWikiContext) getURL()} and printed in the
      * XHTML result. The parameters separator is the escaped &amp;amp;. The query string already starts with an

@@ -24,12 +24,11 @@ import java.util.HashMap;
 import java.util.Map;
 
 import com.xpn.xwiki.XWikiContext;
-import com.xpn.xwiki.plugin.PluginApi;
 
 /**
  * API for the SkinExtension Plugin.
  * 
- * @see PluginApi
+ * @see com.xpn.xwiki.plugin.PluginApi
  * @see SkinExtensionPluginApi
  * @version $Id$
  */
@@ -40,7 +39,7 @@ public class SkinFileExtensionPluginApi extends SkinExtensionPluginApi
      * 
      * @param plugin The wrapped plugin.
      * @param context The current request context.
-     * @see PluginApi#PluginApi(com.xpn.xwiki.plugin.XWikiPluginInterface, XWikiContext)
+     * @see com.xpn.xwiki.plugin.PluginApi#PluginApi(com.xpn.xwiki.plugin.XWikiPluginInterface, XWikiContext)
      */
     public SkinFileExtensionPluginApi(AbstractSkinExtensionPlugin plugin, XWikiContext context)
     {

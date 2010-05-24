@@ -68,10 +68,10 @@ public class CssResourceSkinExtensionPlugin extends AbstractResourceSkinExtensio
     /**
      * {@inheritDoc}
      * 
-     * @see AbstractSkinExtensionPlugin#generateLink()
+     * @see AbstractResourceSkinExtensionPlugin#generateLink(String, String, XWikiContext)
      */
     @Override
-    protected String generateLink(String url)
+    protected String generateLink(String url, String resourceName, XWikiContext context)
     {
         return "<link rel='stylesheet' type='text/css' href='" + url + "'/>\n";
     }

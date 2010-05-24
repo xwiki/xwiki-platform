@@ -23,6 +23,7 @@ package com.xpn.xwiki.plugin.skinx;
 import java.util.Collections;
 import java.util.Set;
 
+import org.apache.commons.lang.BooleanUtils;
 import org.apache.commons.lang.StringUtils;
 
 import com.xpn.xwiki.XWikiContext;
@@ -86,7 +87,7 @@ public class JsSkinFileExtensionPlugin extends AbstractSkinExtensionPlugin
     @Override
     public String getLink(String filename, XWikiContext context)
     {
-        boolean forceSkinAction = (Boolean) getParametersForResource(filename, context).get("forceSkinAction");
+        boolean forceSkinAction = BooleanUtils.toBoolean((Boolean) getParameter("forceSkinAction", filename, context));
         StringBuilder result = new StringBuilder("<script type='text/javascript' src='");
         result.append(context.getWiki().getSkinFile(filename, forceSkinAction, context));
         if (forceSkinAction) {
@@ -95,7 +96,10 @@ public class JsSkinFileExtensionPlugin extends AbstractSkinExtensionPlugin
                 result.append("?").append(parameters);
             }
         }
-        result.append("' defer='defer'></script>");
+        if (BooleanUtils.toBooleanDefaultIfNull((Boolean) getParameter("defer", filename, context), true)) {
+            result.append("' defer='defer");
+        }
+        result.append("'></script>\n");
         return result.toString();
     }
 

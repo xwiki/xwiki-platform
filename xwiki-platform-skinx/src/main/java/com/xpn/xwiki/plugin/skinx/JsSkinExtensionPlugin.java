@@ -1,5 +1,7 @@
 package com.xpn.xwiki.plugin.skinx;
 
+import org.apache.commons.lang.BooleanUtils;
+
 import com.xpn.xwiki.XWikiContext;
 
 /**
@@ -55,10 +57,14 @@ public class JsSkinExtensionPlugin extends AbstractDocumentSkinExtensionPlugin
     @Override
     public String getLink(String documentName, XWikiContext context)
     {
-        return "<script type='text/javascript' src='"
-            + context.getWiki().getURL(documentName, PLUGIN_NAME,
-            "language=" + sanitize(context.getLanguage()) + parametersAsQueryString(documentName, context), context)
-            + "' defer='defer'></script>";
+        StringBuilder result = new StringBuilder("<script type='text/javascript' src='");
+        result.append(context.getWiki().getURL(documentName, PLUGIN_NAME,
+            "language=" + sanitize(context.getLanguage()) + parametersAsQueryString(documentName, context), context));
+        if (BooleanUtils.toBooleanDefaultIfNull((Boolean) getParameter("defer", documentName, context), true)) {
+            result.append("' defer='defer");
+        }
+        result.append("'></script>\n");
+        return result.toString();
     }
 
     /**

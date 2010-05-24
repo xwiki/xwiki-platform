@@ -112,4 +112,4 @@ window.docgeturl = "${doc.getURL('get')}";
 ## Compatibility "aspect" file for deprecated code.
 ## Placed at the very end of the stream so that skin file extensions code can be deprecated easily as well.
 ##
-<script type="text/javascript" src="$xwiki.getSkinFile("js/xwiki/compatibility.js", true)"></script>
+<script type="text/javascript" src="$xwiki.getSkinFile("js/xwiki/compatibility.js", true)" defer="defer"></script>

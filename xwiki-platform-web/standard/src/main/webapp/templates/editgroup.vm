@@ -64,8 +64,12 @@
 </div>
 
 #set($url = $doc.getURL("view", "xpage=getgroupmembers"))
+$xwiki.jsfx.use('js/xwiki/table/livetable.js', true)
+$xwiki.jsfx.use('js/xwiki/usersandgroups/usersandgroups.js', true)
+$xwiki.ssfx.use('js/xwiki/table/livetable.css')
 <script type="text/javascript">
 //<![CDATA[
+ document.observe('xwiki:dom:loading', function() {
   tabl = new ASSTable("$url", 15, "display1", "scrollbar1", "memberstable", displayMembers, true);
    
   //create new ajax suggest
@@ -120,6 +124,7 @@
         // clear errors messages
         $('errMsg').innerHTML = "";
  }
+ });
 //]]>
 </script>
 #else

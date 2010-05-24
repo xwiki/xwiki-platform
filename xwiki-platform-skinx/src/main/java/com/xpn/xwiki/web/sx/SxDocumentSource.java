@@ -88,7 +88,7 @@ public class SxDocumentSource implements SxSource
                 try {
                     CachePolicy cache =
                         CachePolicy.valueOf(StringUtils.upperCase(StringUtils.defaultIfEmpty(sxObj
-                        .getStringValue(CACHE_POLICY_PROPERTY_NAME), "LONG")));
+                            .getStringValue(CACHE_POLICY_PROPERTY_NAME), "LONG")));
                     if (cache.compareTo(finalCache) > 0) {
                         finalCache = cache;
                     }
@@ -122,7 +122,7 @@ public class SxDocumentSource implements SxSource
                 if (parse == 1) {
                     sxContent =
                         this.context.getWiki().getRenderingEngine().interpretText(sxContent, this.document,
-                        this.context);
+                            this.context);
                 }
                 // Also add a newline, in case the different object contents don't end with a blank
                 // line, and could cause syntax errors when concatenated.

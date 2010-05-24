@@ -20,6 +20,8 @@
  */
 package com.xpn.xwiki.plugin.skinx;
 
+import org.apache.commons.lang.BooleanUtils;
+
 import com.xpn.xwiki.XWikiContext;
 
 /**
@@ -68,12 +70,17 @@ public class JsResourceSkinExtensionPlugin extends AbstractResourceSkinExtension
     /**
      * {@inheritDoc}
      * 
-     * @see AbstractSkinExtensionPlugin#generateLink()
+     * @see AbstractResourceSkinExtensionPlugin#generateLink(String, String, XWikiContext)
      */
     @Override
-    protected String generateLink(String url)
+    protected String generateLink(String url, String resourceName, XWikiContext context)
     {
-        return "<script type='text/javascript' src='" + url + "' defer='defer'></script>\n";
+        StringBuilder result = new StringBuilder("<script type='text/javascript' src='").append(url).append("'");
+        if (BooleanUtils.toBooleanDefaultIfNull((Boolean) getParameter("defer", resourceName, context), true)) {
+            result.append(" defer='defer'");
+        }
+        result.append("></script>\n");
+        return result.toString();
     }
 
     /**

@@ -1714,7 +1714,8 @@ ${Msz}Mb##
   </div>
   <script type="text/javascript">
   //<![CDATA[
- document.observe('xwiki:dom:loading', function() {
+(function() {
+ var startup = function() {
   if (typeof XWiki !== "undefined" && typeof XWiki.widgets !== "undefined" && typeof XWiki.widgets.LiveTable !== "undefined") {
     // Make sure the Livetable widgets exists (It does not in the WYSIWYG for example).
   #if($callback)
@@ -1737,7 +1738,13 @@ ${Msz}Mb##
     document.observe("xwiki:livetable:${divid}:loadingComplete", function() { $('${divid}-pagesize').removeClassName("hidden"); } );
   #end
   }
- });
+ }
+ if ((typeof(XWiki) != 'undefined') && (typeof(XWiki.widgets) != 'undefined') && (typeof(XWiki.widgets.LiveTable) != 'undefined')) {
+   startup();
+ } else {
+   document.observe('xwiki:dom:loading', startup);
+ }
+})();
    //]]>
   </script>
 </div> ## xwiki-livetable-container

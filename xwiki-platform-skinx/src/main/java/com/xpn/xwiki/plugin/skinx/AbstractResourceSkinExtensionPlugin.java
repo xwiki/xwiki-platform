@@ -78,7 +78,7 @@ public abstract class AbstractResourceSkinExtensionPlugin extends AbstractSkinEx
                 page = context.getDoc().getFullName();
             }
             return generateLink(context.getWiki().getURL(page, getAction(),
-                "resource=" + resourceName + parametersAsQueryString(resourceName, context), context));
+                "resource=" + sanitize(resourceName) + parametersAsQueryString(resourceName, context), context));
         } catch (XWikiException e) {
             // Do nothing here; we can't access the wiki, so don't link to this resource at all.
             return "";

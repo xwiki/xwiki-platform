@@ -2199,10 +2199,9 @@ $xwiki.jsfx.use("js/xwiki/wysiwyg/xwe/XWikiWysiwyg.js", {"forceSkinAction": true
   * @param $fieldValue the rich form field value to be set as the input for the WYSIWYG editor; if there is a conversion
   *            error on the current session for the specified field then this value is discarded and the value provided
   *            by the ConversionFilter is used instead
-  * @return $wysiwyg_inputURLQueryString the query string to be used with the input URL in order to have the given value
-  *            as the input for the WYSIWYG editor
+  * @param $parameters WYSIWYG editor configuration parameter map to put the input URL query string in
   *#
-#macro(wysiwyg_input $fieldId $fieldValue)
+#macro(wysiwyg_input $fieldId $fieldValue $parameters)
 ##
 ## In real-time mode the input value must be the empty string (this is a temporary limitation).
 ##
@@ -2254,7 +2253,7 @@ $request.getSession().setAttribute("com.xpn.xwiki.wysiwyg.input", $wysiwygInput)
 ##
 ## Build the query string for the input URL.
 ##
-#set($wysiwyg_inputURLQueryString = "xpage=wysiwyginput&key=${wysiwygInputKey}&render=${renderFieldValue}")
+#set($ok = $parameters.put('inputURLQueryString', "xpage=wysiwyginput&key=${wysiwygInputKey}&render=${renderFieldValue}"))
 #end
 
 #**
@@ -2264,12 +2263,11 @@ $request.getSession().setAttribute("com.xpn.xwiki.wysiwyg.input", $wysiwygInput)
   *
   * @param $editedDocument the document whose objects are being edited
   * @param $propertyId identifies the rich text object property for which to set the WYSIWYG input
-  * @return $wysiwyg_inputURLQueryString the query string to be used with the input URL in order to have the property
-  *            value as the input for the WYSIWYG editor
+  * @param $parameters WYSIWYG editor configuration parameter map to put the input URL in
   *#
-#macro(wysiwyg_inputProperty $editedDocument $propertyId)
+#macro(wysiwyg_inputProperty $editedDocument $propertyId $parameters)
 #if("$!propertyId" == "content")
-#wysiwyg_input("content" $editedDocument.content)
+#wysiwyg_input("content" $editedDocument.content $parameters)
 #else
 #set($found = false)
 #foreach($entry in $editedDocument.xWikiObjects.entrySet())
@@ -2281,7 +2279,7 @@ $request.getSession().setAttribute("com.xpn.xwiki.wysiwyg.input", $wysiwygInput)
 #if($propertyId.startsWith($classNameAndObjectNumber))
 #set($propertyName = $propertyId.substring($classNameAndObjectNumber.length()))
 ## Make sure the property value is always a string. Use the empty string for unset properties.
-#wysiwyg_input($propertyId "$!{object.getProperty($propertyName).getValue()}")
+#wysiwyg_input($propertyId "$!{object.getProperty($propertyName).getValue()}" $parameters)
 #set($found = true)
 #break
 #end ## If object number matches..
@@ -2292,73 +2290,85 @@ $request.getSession().setAttribute("com.xpn.xwiki.wysiwyg.input", $wysiwygInput)
 #end ## If class name matches..
 #end ## foreach class name
 #end
+#set($ok = $parameters.put('inputURL', $editedDocument.getExternalURL('edit', $parameters.remove('inputURLQueryString'))))
 #end
 
 #**
   * Creates the input hidden whose value will be used to cache the state of the WYSIWYG editor in order to preserve it
   * when the user navigates away from the edit page and restore it when the user comes back.
+  *
+  * @param $parameters WYSIWYG editor configuration parameter map to put the cache id in
   *#
-#macro(wysiwyg_createCache)
-#set($wysiwyg_cacheId = "wysiwygCache${util.generateRandomString(4)}")
-<input type="hidden" id="$!wysiwyg_cacheId" />
+#macro(wysiwyg_createCache $parameters)
+#set($ok = $parameters.put('cacheId', "wysiwygCache$!{util.generateRandomString(4)}"))
+<input type="hidden" id="$!{parameters.cacheId}" />
 #end
 
 #**
-  * Stores the WYSIWYG configuration in a JavaScript variable.
+  * Writes the WYSIWYG configuration parameters to a JavaScript variable.
   *
-  * @param $jsVarName the name of the JavaScript variable to store the WYSIWYG configuration
-  * @param $editedDocument the document being edited
-  * @param $fieldId identifies the form field to be replaced by the WYSIWYG editor
-  * @param $full {@code true} to use a fully-fledged editor, {@code false} to use the compact editor
+  * @param $jsVarName the name of the JavaScript variable to write the WYSIWYG configuration parameter to
+  * @param $parameters WYSIWYG editor configuration parameters
   *#
-#macro(wysiwyg_storeConfig $jsVarName $editedDocument $fieldId $full)
+#macro(wysiwyg_writeConfig $jsVarName $parameters)
 <script type="text/javascript">
 //<![CDATA[
 var $jsVarName = {
-  hookId: '$!{fieldId}',
-  cacheId: '$!{wysiwyg_cacheId}',
-  syntax: '$!{editedDocument.syntaxId}',
-#if("$!wysiwyg_inputURLQueryString" != "")
-  ## We get this content in edit mode so that we are able to detect the edit context in the javascript transformations 
-  ## executed on the document. This does not affect the way the document is rendered, since the used template handles 
-  ## it anyway, it only affects the way the javascript variables are set (XWiki.contextaction = "edit") and other 
-  ## velocity variables potentially used in wysiwyginput.vm.
-  inputURL: '$!{editedDocument.getExternalURL("edit", $wysiwyg_inputURLQueryString)}',
+#set($separator = '')
+#foreach($entry in $parameters.entrySet())
+  ${separator}$entry.key: '$!{escapetool.javascript($entry.value)}'
+#set($separator = ',')
 #end
-#if($full)
-  displayTabs: true,
-  defaultEditor: "wysiwyg",
-#end
-  plugins: '$xwiki.getXWikiPreference("wysiwyg.plugins", "submit line separator embed text valign list indent history format symbol link image table macro import#if($full && $request.sync) sync#end")',
-  menu: '$xwiki.getXWikiPreference("wysiwyg.menu", "link image table macro import")',
-  toolbar: '$xwiki.getXWikiPreference("wysiwyg.toolbar", "bold italic underline strikethrough | subscript superscript | unorderedlist orderedlist | outdent indent | undo redo | format | hr symbol")',
-  wiki: '$!{escapetool.javascript($editedDocument.wiki)}',
-  space: '$!{escapetool.javascript($editedDocument.space)}',
-  page: '$!{escapetool.javascript($editedDocument.name)}',
-  openofficeServerConnected:#if("$!{oomanager.serverState}" == "Connected")'true'#else'false'#end,
-#if($full && $request.sync)
-  // Additional configuration for the real-time editing feature.
-  syncPage: '$!{escapetool.javascript($editedDocument.fullName)}',
-#if($request.reset=="1")
-  syncReset: 1,
-#end
-#end
-  debug: #if($request.debug)'true'#else'false'#end
 };
 //]]>
 </script>
 #end
 
 #**
-  * Creates a new WYSIWYG editor instance to edit the specified field of the given document.
+  * Stores the WYSIWYG configuration in a map of (parameter, value) pairs.
   *
+  * @param $parameters the map of parameters where the WYSIWYG configuration will be stored
   * @param $editedDocument the document being edited
   * @param $fieldId identifies the form field to be replaced by the WYSIWYG editor
-  * @param $full {@code true} to create a fully-fledged editor, {@code false} to create a compact editor
+  * @param $full {@code true} to use a fully-fledged editor, {@code false} to use the compact editor
   *#
-#macro(wysiwyg_createEditor $editedDocument $fieldId $full)
+#macro(wysiwyg_storeConfig $parameters $editedDocument $fieldId $full)
+#if(!$parameters.containsKey('hookId'))
+#set($ok = $parameters.put('hookId', $fieldId))
+#end
+#set($ok = $parameters.put('syntax', $editedDocument.syntaxId))
+#if($full)
+#set($ok = $parameters.put('displayTabs', 'true'))
+#set($ok = $parameters.put('defaultEditor', 'wysiwyg'))
+#end
+#set($ok = $parameters.put('plugins', $xwiki.getXWikiPreference('wysiwyg.plugins', "submit line separator embed text valign list indent history format symbol link image table macro import#if($full && $request.sync) sync#end")))
+#set($ok = $parameters.put('menu', $xwiki.getXWikiPreference('wysiwyg.menu', 'link image table macro import')))
+#set($ok = $parameters.put('toolbar', $xwiki.getXWikiPreference('wysiwyg.toolbar', 'bold italic underline strikethrough | subscript superscript | unorderedlist orderedlist | outdent indent | undo redo | format | hr symbol')))
+#set($ok = $parameters.put('wiki', $editedDocument.wiki))
+#set($ok = $parameters.put('space', $editedDocument.space))
+#set($ok = $parameters.put('page', $editedDocument.name))
+#if("$!{oomanager.serverState}" == "Connected")
+#set($ok = $parameters.put('openofficeServerConnected', 'true'))
+#end
+#if($full && $request.sync)
+#set($ok = $parameters.put('syncPage', $editedDocument.fullName))
+#if("$!{request.reset}" != "")
+#set($ok = $parameters.put('syncReset', $request.reset))
+#end
+#end
+#if("$!{request.debug}" != "")
+#set($ok = $parameters.put('debug', $request.debug))
+#end
+#end
+
+#**
+  * Creates a new WYSIWYG editor instance using the given configuration parameters.
+  *
+  * @param $parameters WYSIWYG editor configuration parameters
+  *#
+#macro(wysiwyg_createEditor $parameters)
 #set($jsVarName = "wysiwygConfig${util.generateRandomString(4)}")
-#wysiwyg_storeConfig($jsVarName $editedDocument $fieldId $full)
+#wysiwyg_writeConfig($jsVarName $parameters)
 <script type="text/javascript">
 //<![CDATA[
 Wysiwyg.onModuleLoad(function() {
@@ -2378,30 +2388,60 @@ Wysiwyg.onModuleLoad(function() {
   * @param $full {@code true} to use a fully-fledged editor, {@code false} to use a compact editor
   *#
 #macro(wysiwyg_editProperty $editedDocument $propertyId $full)
-## Hide the plain text area.
-#wysiwyg_hide($propertyId)
-## Import required JavaScript files (lazy=false).
-#wysiwyg_import(false)
-## Set the input value for the editor.
-#wysiwyg_inputProperty($editedDocument $propertyId)
-## Display conversion errors, if present.
-#wysiwyg_displayConversionError($propertyId)
-## Create the cache.
-#wysiwyg_createCache()
-## Create the editor UI.
-#wysiwyg_createEditor($editedDocument $propertyId $full)
+#set($parameters = $util.hashMap)
+#wysiwyg_storeConfig($parameters $editedDocument $propertyId $full)
+#wysiwyg_editPropertyCustom($editedDocument $propertyId $parameters)
 #end
 
 #**
-  * Loads the GWT-based WYSIWYG editor for the specified object properties.
+  * Loads the GWT-based WYSIWYG editor for the specified object property, using the given configuration parameters. The
+  * special "content" document property is also supported.
+  *
+  * @param $editedDocument the document whose objects are being edited
+  * @param $propertyIds A comma separated list of property identifiers. An example of a property identifier is "XWiki.ArticleClass_0_content".
+  * @param $parameters WYSIWYG editor configuration parameters
+  *#
+#macro(wysiwyg_editPropertyCustom $editedDocument $propertyId $parameters)
+## Hide the plain text area.
+#wysiwyg_hide($parameters.hookId)
+## Import required JavaScript files (lazy=false).
+#wysiwyg_import(false)
+## Set the input value for the editor.
+#wysiwyg_inputProperty($editedDocument $propertyId $parameters)
+## Display conversion errors, if present.
+#wysiwyg_displayConversionError($propertyId)
+## Create the cache.
+#wysiwyg_createCache($parameters)
+## Create the editor UI.
+#wysiwyg_createEditor($parameters)
+#end
+
+#**
+  * Loads the GWT-based WYSIWYG editor for the specified object properties, using the default configuration.
   *
   * @param $editedDocument the document whose objects are being edited
   * @param $propertyIds A comma separated list of property identifiers. An example of a property identifier is "XWiki.ArticleClass_0_content".
   * @param $full {@code true} to use a fully-fledged editor, {@code false} to use a compact editor
   *#
 #macro(wysiwyg_editProperties $editedDocument $propertyIds $full)
+#set($parameters = $util.hashMap)
+#wysiwyg_storeConfig($parameters $editedDocument '' $full)
+#wysiwyg_editPropertiesCustom($editedDocument $propertyIds $parameters)
+#end
+
+#**
+  * Loads the GWT-based WYSIWYG editor for the specified object properties, using the given configuration parameters.
+  *
+  * @param $editedDocument the document whose objects are being edited
+  * @param $propertyIds A comma separated list of property identifiers. An example of a property identifier is "XWiki.ArticleClass_0_content".
+  * @param $parameters WYSIWYG editor configuration parameters
+  *#
+#macro(wysiwyg_editPropertiesCustom $editedDocument $propertyIds $parameters)
+#set($instanceParameters = $util.hashMap)
+#set($ok = $instanceParameters.putAll($parameters))
 #set($propertyIds = "$!propertyIds")
 #foreach($propertyId in $propertyIds.split(","))
-#wysiwyg_editProperty($editedDocument $propertyId $full)
+#set($ok = $instanceParameters.put('hookId', $propertyId))
+#wysiwyg_editPropertyCustom($editedDocument $propertyId $instanceParameters)
 #end
 #end

@@ -536,7 +536,7 @@ $xwiki.jsfx.use('js/xwiki/actionbuttons/actionButtons.js', true)
                           ## Step 2: Select only content between first &lt; and last &gt; because $obj.display inserts html macros.
                           ##         Careful not to remove html macros from the content because they are not escaped!
                           ## Step 3: Prepend app name to all ID tags to prevent id collision with multiple apps on one page.
-                          $out.substring($out.indexOf('&lt;'), $out.lastIndexOf('&gt;')).replaceAll(
+                          $out.substring($out.indexOf('&lt;'), $mathtool.add(1, $out.lastIndexOf('&gt;'))).replaceAll(
                                                      " id='$objClass.getName()_$obj.getNumber()_$propName",
                                                      " id='${escapedAppName}_$objClass.getName()_$obj.getNumber()_$propName")
                           &lt;/p&gt;
@@ -596,8 +596,6 @@ $xwiki.jsfx.use('js/xwiki/actionbuttons/actionButtons.js', true)
   document.observe('xwiki:dom:loaded', function() {
     XWiki.actionButtons.EditActions = Object.extend(XWiki.actionButtons.EditActions, {addShortcuts : function() { }});
   });
-  ##
-  ## TODO: cancel and "submit all" buttons.
   //]]&gt;
   &lt;/script&gt;
   {{/html}}##

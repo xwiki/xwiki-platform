@@ -111,6 +111,7 @@ public class SimpleRenderingTests extends TestCase
         suite.addTestsFromResource("table/table5", false);
         suite.addTestsFromResource("table/table6", false);
         suite.addTestsFromResource("table/table7", false);
+        suite.addTestsFromResource("table/table8", false);
 
         // Macros
         suite.addTestsFromResource("macros/macro1", false);

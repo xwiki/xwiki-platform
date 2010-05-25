@@ -71,12 +71,23 @@ XWiki.widgets.LiveTable = Class.create({
        options = {};
     }
 
-    this.permalinks = options.permalinks || true;
-
-    this.lastLimit = options.limit || 10;
-    this.limit = this.getIntegerFromHash("l", this.lastLimit);
-
     this.action = options.action || "view"; // FIXME check if this can be removed safely.
+
+    // Initialize table params that are used for permalinks
+    this.limit = options.limit || 10;
+    this.lastOffset = 1;
+    $(this.domNodeName).select('th.sortable').each(function(el) {
+        if (el.hasClassName('selected')) {
+          this.selectedColumn = el;
+        }
+      },this);
+
+    // If permalinks is enable, load initial hash, using the URL hash if available or the default above
+    this.permalinks = new LiveTableHash(this,(typeof options.permalinks == "undefined" || options.permalinks));
+
+    // Get params from permalinks
+    this.limit = this.permalinks.getLimit();
+    var initialPage = this.permalinks.getPage();
 
     // Initialize page size control bounds
     if (typeof this.pageSizeNodes != "undefined") {
@@ -87,10 +98,10 @@ XWiki.widgets.LiveTable = Class.create({
     if (typeof this.paginationNodes != "undefined") {
        this.paginator = new LiveTablePagination(this, this.paginationNodes, options.maxPages || 10);
     }
+
     // Initialize filters
     if (this.filtersNodes.length > 0) {
-      var initialFilters = this.permalinks ? this.getFiltersFromHash() : new Object();
-      this.filter = new LiveTableFilter(this, this.filtersNodes, initialFilters);
+      this.filter = new LiveTableFilter(this, this.filtersNodes, this.permalinks.getFilters());
     } 
 
     if ($(domNodeName + "-tagcloud"))
@@ -104,13 +115,12 @@ XWiki.widgets.LiveTable = Class.create({
     this.totalRows = -1;
     this.fetchedRows = new Array();
     this.getUrl = url;
-    this.lastOffset = 1;
     this.sendReqNo = 0;
     this.recvReqNo = 0;
 
-    this.observeSortableColumns();   
+    // Initialize sort column and observe sort events
+    this.observeSortableColumns(this.permalinks.getSortColumn(), this.permalinks.getSortDirection());
  
-    var initialPage = this.getIntegerFromHash("p", this.lastOffset);
     this.currentOffset = (initialPage - 1) * this.limit + 1;
 
     // Show initial rows
@@ -126,87 +136,6 @@ XWiki.widgets.LiveTable = Class.create({
     this.lastLimit = this.limit;
     this.limit = pageSize;
     this.showRows(1, this.limit);
-  },
-
-  /**
-   * Re-write location hash with current page and filters values
-   */
-  updateLocationHash: function()
-  {
-    var currentHash = window.location.hash.substring(1);
-    var filterString = this.filter ? this.filter.serializeFilters() : "";
-
-    var shouldUpdate = this.lastOffset != 1 || this.limit != this.lastLimit || !currentHash.blank() || !filterString.blank();
-
-    if (shouldUpdate) {
-      var tables = currentHash.split("|"), newHash = "";
-      for (var i=0;i<tables.length;i++) {
-        var params = tables[i].toQueryParams();
-        if (params["t"] != this.domNodeName) {
-          // Don't override other tables params
-          newHash += (tables[i] + "|"); 
-        }
-      }
-      newHash += "t=#{table}&p=#{page}&l=#{pagesize}".interpolate({
-        "table" : this.domNodeName,
-        "page" : ((this.lastOffset - 1) / this.limit) + 1,
-        "pagesize" : this.limit
-      });
-
-      newHash += filterString;
-
-      window.location.hash = "#" + newHash;
-    }
-  },
-
-  /**
-   * Returns an integer value from hash.
-   *
-   * @param name the of the value to retrieve
-   * @param defaultValue the default value to return if the hash does not contains the named value
-   *        or permalink is disabled
-   */
-  getIntegerFromHash: function(name, defaultValue)
-  {
-    if( !this.permalinks ) {
-      return defaultValue
-    }
-    var hashString = window.location.hash.substring(1);
-    if (!hashString.blank()) {
-      var tables = hashString.split("|");
-      for (var i=0;i<tables.length;i++) {
-        var params = tables[i].toQueryParams();
-        if (params["t"] == this.domNodeName && parseInt(params[name])) {
-          return parseInt(params[name]);
-        }
-      }
-    }
-    return defaultValue;
-  },
-
-  /**
-   * Retrieve this table filters as filter key/filter value object from the window location hash.
-   * Returns an empty object if no filter is defined in the hash for this table.
-   */
-  getFiltersFromHash: function()
-  {
-    var hashString = window.location.hash.substring(1);
-    if (!hashString.blank()) {
-      var tables = hashString.split("|");
-      for (var i=0;i<tables.length;i++) {
-        var params = tables[i].toQueryParams();
-        if (params["t"] == this.domNodeName) { // that's our table !
-          var parameterNames = Object.keys(params), result = new Object();
-          for (var j=0;j<parameterNames.length;j++) {
-            if (parameterNames[j].length != 1 || "tpl".indexOf(parameterNames[j]) == -1) { // ignore those reserved params
-              result[parameterNames[j]] = params[parameterNames[j]];
-            }
-          }
-          return result;
-        }
-      }
-    }
-    return new Object();
   },
 
   /**
@@ -369,9 +298,8 @@ XWiki.widgets.LiveTable = Class.create({
   {
     this.lastOffset = offset;
 
-    if (this.permalinks) {
-      this.updateLocationHash();
-    }
+    // Update permalinks
+    this.permalinks.update();
 
     // This is some debugging string.
     var buff  = 'request to display rows '+offset+' to '+(offset+limit)+' <br />\n';
@@ -464,16 +392,44 @@ XWiki.widgets.LiveTable = Class.create({
   /**
    * Return the URL fragment with sort parameters depending on the state of the table.
    */
-  getSortURLFragment:function() {
-    var fragment = "&sort=";
-    if (typeof $(this.domNodeName).down("th.selected a") != "undefined") {
-       fragment += $(this.domNodeName).down("th.selected a").getAttribute('rel');
-    }
-    fragment += "&dir=";
-    if (typeof $(this.domNodeName).down("th.selected") != "undefined") {
-       fragment += ($(this.domNodeName).down("th.selected").hasClassName('desc') ? 'desc' : 'asc');
+  getSortURLFragment:function()
+  {
+    var column = this.getSortColumn();
+    var fragment = "";
+    if( column != null ) {
+      fragment += "&sort=" + column;
+      var direction = this.getSortDirection();
+      if( direction != null ) {
+        return fragment += "&dir=" + direction;
+      }
     }
     return fragment;
+  },
+
+  /**
+   * Return the name of the current sorted column, null if no sortable column is selected
+   */
+  getSortColumn: function()
+  {
+    if (!this.selectedColumn) {
+      return null;
+    }
+    var a = this.selectedColumn.down("a");
+    if (!a) {
+      return null;
+    }
+    return a.getAttribute('rel');
+  },
+
+  /**
+   * Return the sorting direction of the current sorted column, null if no sortable column is selected
+   */
+  getSortDirection: function()
+  {
+    if (!this.selectedColumn) {
+      return null;
+    }
+    return (this.selectedColumn.hasClassName('desc') ? 'desc' : 'asc');
   },
 
   /**
@@ -487,15 +443,36 @@ XWiki.widgets.LiveTable = Class.create({
 
   /**
    * Iterate over the column headers that have the sortable class to observe sort changes when user clicks the column header.
+   *
+   * @param column the sort column to select initially
+   * @param direction the sort direction for the sort column selected
    */
-  observeSortableColumns: function(){
+  observeSortableColumns: function(column, direction)
+  {
     var self = this;
     $(this.domNodeName).select('th.sortable').each(function(el) {
-      if (el.hasClassName('selected')) {
-         self.selectedColumn = el;
-      }
-      if(!el.hasClassName('desc') && !el.hasClassName('asc')) { // no order set in the HTML. Force desc
-         el.addClassName('desc');
+      var colname = el.down("a") ? el.down("a").getAttribute("rel") : null;
+      if (colname == column) {
+        self.selectedColumn = el;
+        el.addClassName('selected');
+        if (direction == "asc") {
+          if (el.hasClassName('desc')) {
+            el.removeClassName('desc');
+          }
+          el.addClassName("asc")
+        } else {
+          if (el.hasClassName('asc')) {
+            el.removeClassName('asc');
+          }
+          el.addClassName("desc")
+        }
+      } else {
+        if (el.hasClassName('selected')) {
+          el.removeClassName('selected');
+        }
+        if (!el.hasClassName('desc') && !el.hasClassName('asc')) { // no order set in the HTML. Force desc
+          el.addClassName('desc');
+        }
       }
       Event.observe(el, "click", function(event) {
          var elem = event.element();
@@ -527,6 +504,146 @@ XWiki.widgets.LiveTable = Class.create({
 });
 
 /**
+ * Helper class to manage permalinks
+ **/
+var LiveTableHash = Class.create({
+  /**
+   * new LiveTableHash( table, enable )
+   * @param table the livetable link to this hash
+   * @param enable if false, the hash will be disabled (not updated)
+   */
+  initialize: function(table, enable)
+  {
+    this.table = table;
+    this.enable = enable;
+    this.loadFromHash();
+  },
+
+  /**
+   * Returns the parameters for the current table from hash.
+   * If permalink is disabled, or there is no parameter for the current table in hash, returns null
+   */
+  loadFromHash: function()
+  {
+    this.params = this.getTableParams();
+    this.filters = new Object();
+
+    if (!this.enable) return;
+
+    var hashString = window.location.hash.substring(1);
+    if (!hashString.blank()) {
+      var tables = hashString.split("|");
+      for (var i = 0; i < tables.length; i++) {
+        var params = tables[i].toQueryParams();
+        if (params["t"] == this.table.domNodeName) {
+          for (var param in params) {
+            if (param.length == 1 && "tplsd".indexOf(param) != -1) {
+              this.params[param] = params[param];
+            } else {
+              this.filters[param] = params[param];
+            }
+          }
+        }
+      }
+    }
+  },
+
+  /**
+   * Returns a parameter map of current livetable state
+   */
+  getTableParams: function()
+  {
+    var result = new Object();
+    result["t"] = this.table.domNodeName;
+    result["p"] = ((this.table.lastOffset - 1) / this.table.limit) + 1;
+    result["l"] = this.table.limit;
+    if (this.table.getSortColumn() != null) {
+      result["s"] = this.table.getSortColumn();
+      result["d"] = this.table.getSortDirection();
+    }
+    return result;
+  },
+
+  /**
+   * Get helpers, private
+   */
+  getParam: function(name) { return this.params[name]; },
+  getIntParam: function(name) { return parseInt(this.params[name]); },
+
+  /**
+   * Return individual parameter from permlinks hash
+   */
+  getLimit: function() { return this.getIntParam("l"); },
+  getPage: function() { return this.getIntParam("p"); },
+  getSortColumn: function() { return this.getParam("s"); },
+  getSortDirection: function() { return this.getParam("d"); },
+
+  /**
+   * Returns filters from permalink hash
+   * Note: Currently filters are not kept/updated after initialization
+   *
+   */
+  getFilters: function(name)
+  {
+    return this.filters;
+  },
+
+  /**
+   * Serialize permalink parameters to query string.
+   * This function ensure serialization is always applied in the same order so that comparing strings is meaningful
+   *
+   * @param newParams Optional argument to serialize future parameters in place of current ones
+   */
+  serializeParams: function(newParams)
+  {
+    var params = $H((newParams) ? newParams : this.params);
+    params = params.inject({}, function(params, pair)
+    {
+      params[pair.key] = encodeURIComponent(pair.value);
+      return params;
+    });
+
+    var result = "t=#{t}&p=#{p}&l=#{l}".interpolate(params);
+    if (params["s"]) {
+      result += "&s=#{s}&d=#{d}".interpolate(params);
+    }
+    return result;
+  },
+
+  /**
+   * Re-write location hash with current page and filters values
+   * Nothing is done if the hash is disabled
+   */
+  update: function()
+  {
+    if (!this.enable) return;
+
+    var params = this.getTableParams();
+    var paramsString = this.serializeParams(params);
+    var filterString = this.table.filter ? this.table.filter.serializeFilters() : "";
+
+    var shouldUpdate = !filterString.blank() || (paramsString != this.serializeParams());
+
+    if (shouldUpdate) {
+      var currentHash = window.location.hash.substring(1);
+      var tables = currentHash.split("|"), newHash = "";
+      for (var i = 0; i < tables.length; i++) {
+        if (tables[i].toQueryParams()["t"] != params["t"]) {
+          // Don't override other tables params
+          newHash += (tables[i] + "|");
+        }
+      }
+      newHash += paramsString;
+      newHash += filterString;
+
+      this.params = params;
+      this.filters = null; //better, but useless: this.filters = filterString.toQueryParams();
+      window.location.hash = "#" + newHash;
+    }
+  }
+});
+
+  /**
  * Helper class to display pagination
  */
 var LiveTablePagination = Class.create({
@@ -681,8 +798,7 @@ var LiveTableFilter = Class.create({
   {
     this.table = table;
     this.filterNodes = filterNodes;
-    this.filters = new Object();
-    this.filters = filters;
+    this.filters = filters || new Object();
 
     this.inputs = this.filterNodes.invoke('select','input').flatten();
     this.selects = this.filterNodes.invoke('select','select').flatten();

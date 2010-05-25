@@ -104,8 +104,17 @@
   {pre}
   &lt;script type="text/javascript"&gt;
   //&lt;![CDATA[
-          var ta = new XWiki.widgets.LiveTable("$url", "groupstable", displayGroups); 
-          Event.observe($('addNewGroup'), "click", makeAddHandler("$addnewurl", "$saveurl", "$redirecturl"));
+    (function() {
+      var startup = function() {
+        var ta = new XWiki.widgets.LiveTable("$url", "groupstable", displayGroups);
+        Event.observe($('addNewGroup'), "click", makeAddHandler("$addnewurl", "$saveurl", "$redirecturl"));
+      }
+      if ((typeof(XWiki) != 'undefined') &amp;&amp; (typeof(XWiki.widgets) != 'undefined') &amp;&amp; (typeof(XWiki.widgets.LiveTable) != 'undefined')) {
+        startup();
+      } else {
+        document.observe('xwiki:dom:loading', startup);
+      }
+    })();
   //]]&gt;
   &lt;/script&gt;
   {/pre}

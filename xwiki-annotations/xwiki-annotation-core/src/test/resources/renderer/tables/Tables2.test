@@ -6,11 +6,11 @@
 |LXVI|Tired with all these, for restful death I cry,
 |CXXX|My mistress' eyes are nothing like the sun;
 .rendered
-<table><tr><th>Poem</th><th>Quote</th></tr><tr><td>LXVI</td><td>Tired with all these, for restful death I cry,</td></tr><tr><td>CXXX</td><td>My mistress' eyes are nothing like the sun;</td></tr></table>
+<table><tr><th scope="col">Poem</th><th scope="col">Quote</th></tr><tr><td>LXVI</td><td>Tired with all these, for restful death I cry,</td></tr><tr><td>CXXX</td><td>My mistress' eyes are nothing like the sun;</td></tr></table>
 .annotation
 0
 XWiki.XWikiGuest
 130th sonnet of Shakespeare
 CXXX My mistress' eyes
 .annotated
-<table><tr><th>Poem</th><th>Quote</th></tr><tr><td>LXVI</td><td>Tired with all these, for restful death I cry,</td></tr><tr><td><span class="annotation ID0">CXXX</span></td><td><span class="annotation ID0">My mistress' eyes</span> are nothing like the sun;</td></tr></table>
+<table><tr><th scope="col">Poem</th><th scope="col">Quote</th></tr><tr><td>LXVI</td><td>Tired with all these, for restful death I cry,</td></tr><tr><td><span class="annotation ID0">CXXX</span></td><td><span class="annotation ID0">My mistress' eyes</span> are nothing like the sun;</td></tr></table>

@@ -6,11 +6,11 @@
 |LXVI|Tired with all these, for restful death I cry,
 |CXXX|My mistress' eyes are nothing like the sun;
 .rendered
-<table><tr><th>Poem</th><th>Quote</th></tr><tr><td>LXVI</td><td>Tired with all these, for restful death I cry,</td></tr><tr><td>CXXX</td><td>My mistress' eyes are nothing like the sun;</td></tr></table>
+<table><tr><th scope="col">Poem</th><th scope="col">Quote</th></tr><tr><td>LXVI</td><td>Tired with all these, for restful death I cry,</td></tr><tr><td>CXXX</td><td>My mistress' eyes are nothing like the sun;</td></tr></table>
 .annotation
 0
 XWiki.XWikiGuest
 Alternative to being
 Tired with all these
 .annotated
-<table><tr><th>Poem</th><th>Quote</th></tr><tr><td>LXVI</td><td><span class="annotation ID0">Tired with all these</span>, for restful death I cry,</td></tr><tr><td>CXXX</td><td>My mistress' eyes are nothing like the sun;</td></tr></table>
+<table><tr><th scope="col">Poem</th><th scope="col">Quote</th></tr><tr><td>LXVI</td><td><span class="annotation ID0">Tired with all these</span>, for restful death I cry,</td></tr><tr><td>CXXX</td><td>My mistress' eyes are nothing like the sun;</td></tr></table>

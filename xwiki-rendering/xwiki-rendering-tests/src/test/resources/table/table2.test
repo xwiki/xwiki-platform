@@ -85,7 +85,7 @@ endDocument
 .#-----------------------------------------------------
 .expect|xhtml/1.0
 .#-----------------------------------------------------
-<table><tr><th></th><th>col1</th><th>col2</th></tr><tr><th>line1</th><td>cell11</td><td>cell12</td></tr><tr><th>line2</th><td>cell21</td><td>cell22</td></tr></table><table><tr><th></th><th>col1</th><th>col2</th></tr><tr><th>line1</th><td>cell11</td><td>cell12</td></tr><tr><th>line2</th><td>cell21</td><td>cell22</td></tr></table>
+<table><tr><th scope="col"></th><th scope="col">col1</th><th scope="col">col2</th></tr><tr><th scope="row">line1</th><td>cell11</td><td>cell12</td></tr><tr><th scope="row">line2</th><td>cell21</td><td>cell22</td></tr></table><table><tr><th scope="col"></th><th scope="col">col1</th><th scope="col">col2</th></tr><tr><th scope="row">line1</th><td>cell11</td><td>cell12</td></tr><tr><th scope="row">line2</th><td>cell21</td><td>cell22</td></tr></table>
 .#-----------------------------------------------------
 .expect|xwiki/2.0
 .#-----------------------------------------------------
@@ -99,4 +99,4 @@ endDocument
 .#-----------------------------------------------------
 .input|xhtml/1.0
 .#-----------------------------------------------------
-<html><table><tr><th></th><th>col1</th><th>col2</th></tr><tr><th>line1</th><td>cell11</td><td>cell12</td></tr><tr><th>line2</th><td>cell21</td><td>cell22</td></tr></table><table><tr><th></th><th>col1</th><th>col2</th></tr><tr><th>line1</th><td>cell11</td><td>cell12</td></tr><tr><th>line2</th><td>cell21</td><td>cell22</td></tr></table></html>
+<table><tr><th scope="col"></th><th scope="col">col1</th><th scope="col">col2</th></tr><tr><th scope="row">line1</th><td>cell11</td><td>cell12</td></tr><tr><th scope="row">line2</th><td>cell21</td><td>cell22</td></tr></table><table><tr><th scope="col"></th><th scope="col">col1</th><th scope="col">col2</th></tr><tr><th scope="row">line1</th><td>cell11</td><td>cell12</td></tr><tr><th scope="row">line2</th><td>cell21</td><td>cell22</td></tr></table>

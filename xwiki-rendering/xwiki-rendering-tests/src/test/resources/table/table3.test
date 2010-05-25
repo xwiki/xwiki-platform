@@ -43,7 +43,7 @@ endDocument
 .#-----------------------------------------------------
 .expect|xhtml/1.0
 .#-----------------------------------------------------
-<table a="b"><tr c="d"><th e="f"><span g="h">cell1</span></th><td i="j"><span k="l">cell2</span></td></tr></table><table a="b"><tr c="d"><th e="f"><span g="h">cell1</span></th><td i="j"><span k="l">cell2</span></td></tr></table>
+<table a="b"><tr c="d"><th e="f" scope="col"><span g="h">cell1</span></th><td i="j"><span k="l">cell2</span></td></tr></table><table a="b"><tr c="d"><th e="f" scope="col"><span g="h">cell1</span></th><td i="j"><span k="l">cell2</span></td></tr></table>
 .#-----------------------------------------------------
 .expect|xwiki/2.0
 .#-----------------------------------------------------
@@ -55,4 +55,4 @@ endDocument
 .#-----------------------------------------------------
 .input|xhtml/1.0
 .#-----------------------------------------------------
-<html><table a="b"><tr c="d"><th e="f"><span g="h">cell1</span></th><td i="j"><span k="l">cell2</span></td></tr></table><table a="b"><tr c="d"><th e="f"><span g="h">cell1</span></th><td i="j"><span k="l">cell2</span></td></tr></table></html>
+<table a="b"><tr c="d"><th e="f" scope="col"><span g="h">cell1</span></th><td i="j"><span k="l">cell2</span></td></tr></table><table a="b"><tr c="d"><th e="f" scope="col"><span g="h">cell1</span></th><td i="j"><span k="l">cell2</span></td></tr></table>

@@ -28,16 +28,16 @@ import org.xwiki.rendering.listener.Image;
 import org.xwiki.rendering.listener.Link;
 import org.xwiki.rendering.listener.ListType;
 import org.xwiki.rendering.listener.chaining.BlockStateChainingListener;
-import org.xwiki.rendering.listener.chaining.ListenerChain;
 import org.xwiki.rendering.listener.chaining.EmptyBlockChainingListener;
+import org.xwiki.rendering.listener.chaining.ListenerChain;
 import org.xwiki.rendering.listener.chaining.BlockStateChainingListener.Event;
-import org.xwiki.rendering.syntax.Syntax;
-import org.xwiki.rendering.syntax.SyntaxType;
 import org.xwiki.rendering.renderer.AbstractChainingPrintRenderer;
 import org.xwiki.rendering.renderer.printer.WikiPrinter;
 import org.xwiki.rendering.renderer.printer.XHTMLWikiPrinter;
 import org.xwiki.rendering.renderer.xhtml.XHTMLImageRenderer;
 import org.xwiki.rendering.renderer.xhtml.XHTMLLinkRenderer;
+import org.xwiki.rendering.syntax.Syntax;
+import org.xwiki.rendering.syntax.SyntaxType;
 
 /**
  * Convert listener events to XHTML.
@@ -418,12 +418,12 @@ public class XHTMLChainingRenderer extends AbstractChainingPrintRenderer
     @Override
     public void onId(String name)
     {
-    	// Don't use the "name" attribute (see http://www.w3.org/TR/html4/struct/links.html#h-12.2.3).
-    	// If the id s in a paragraph use <span id="..."> and if in a standalone block then use
-    	// <div id="...">.
+        // Don't use the "name" attribute (see http://www.w3.org/TR/html4/struct/links.html#h-12.2.3).
+        // If the id s in a paragraph use <span id="..."> and if in a standalone block then use
+        // <div id="...">.
         if (getBlockState().isInLine()) {
-            // Note: We're using <span><span/> and not <span/> since some browsers do not support the 
-        	// <span/> syntax (FF3) when the content type is set to HTML instead of XHTML.
+            // Note: We're using <span><span/> and not <span/> since some browsers do not support the
+            // <span/> syntax (FF3) when the content type is set to HTML instead of XHTML.
             getXHTMLWikiPrinter().printXMLStartElement("span", new String[][] {{"id", name}});
             getXHTMLWikiPrinter().printXMLEndElement("span");
         } else {
@@ -643,7 +643,22 @@ public class XHTMLChainingRenderer extends AbstractChainingPrintRenderer
     @Override
     public void beginTableHeadCell(Map<String, String> parameters)
     {
-        getXHTMLWikiPrinter().printXMLStartElement("th", parameters);
+        // Find proper scope attribute value
+        Map<String, String> parametersWithScope;
+        if (!parameters.containsKey("scope")) {
+            parametersWithScope = new LinkedHashMap<String, String>(parameters);
+
+            if (getBlockState().getCellRow() == 0 || getBlockState().getCellCol() > 0) {
+                parametersWithScope.put("scope", "col");
+            } else {
+                parametersWithScope.put("scope", "row");
+            }
+        } else {
+            parametersWithScope = parameters;
+        }
+
+        // Write th element
+        getXHTMLWikiPrinter().printXMLStartElement("th", parametersWithScope);
     }
 
     /**

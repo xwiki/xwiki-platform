@@ -64,4 +64,4 @@ head2
 .#-----------------------------------------------------
 .expect|xhtml/1.0
 .#-----------------------------------------------------
-<table><tr><th><div><p>head1</p><p>head2</p></div></th></tr><tr><td><div><ul><li>item</li></ul></div></td></tr></table><ul><li><div><table><tr><td>cell</td></tr></table></div></li></ul>
+<table><tr><th scope="col"><div><p>head1</p><p>head2</p></div></th></tr><tr><td><div><ul><li>item</li></ul></div></td></tr></table><ul><li><div><table><tr><td>cell</td></tr></table></div></li></ul>

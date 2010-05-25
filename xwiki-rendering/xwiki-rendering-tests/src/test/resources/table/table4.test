@@ -30,7 +30,7 @@ endDocument
 .#-----------------------------------------------------
 .expect|xhtml/1.0
 .#-----------------------------------------------------
-<table><tr><th>cell1<br/>cell1bis</th></tr><tr><td>cell2<br/><br/>cell2bis</td></tr></table>
+<table><tr><th scope="col">cell1<br/>cell1bis</th></tr><tr><td>cell2<br/><br/>cell2bis</td></tr></table>
 .#-----------------------------------------------------
 .expect|xwiki/2.0
 .#-----------------------------------------------------
@@ -41,4 +41,4 @@ cell1bis
 .#-----------------------------------------------------
 .input|xhtml/1.0
 .#-----------------------------------------------------
-<html><table><tr><th>cell1<br/>cell1bis</th></tr><tr><td>cell2<br/><br/>cell2bis</td></tr></table></html>
+<table><tr><th scope="col">cell1<br/>cell1bis</th></tr><tr><td>cell2<br/><br/>cell2bis</td></tr></table>

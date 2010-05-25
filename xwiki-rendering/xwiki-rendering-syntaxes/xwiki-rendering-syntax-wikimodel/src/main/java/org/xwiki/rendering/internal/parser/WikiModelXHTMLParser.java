@@ -36,6 +36,7 @@ import org.xwiki.rendering.internal.parser.wikimodel.xhtml.XWikiHeaderTagHandler
 import org.xwiki.rendering.internal.parser.wikimodel.xhtml.XWikiImageTagHandler;
 import org.xwiki.rendering.internal.parser.wikimodel.xhtml.XWikiReferenceTagHandler;
 import org.xwiki.rendering.internal.parser.wikimodel.xhtml.XWikiSpanTagHandler;
+import org.xwiki.rendering.internal.parser.wikimodel.xhtml.XWikiTableDataTagHandler;
 import org.xwiki.rendering.parser.ImageParser;
 import org.xwiki.rendering.parser.LinkParser;
 import org.xwiki.rendering.parser.ParseException;
@@ -133,6 +134,7 @@ public class WikiModelXHTMLParser extends AbstractWikiModelParser
         handlers.put("img", new XWikiImageTagHandler());
         handlers.put("span", new XWikiSpanTagHandler());
         handlers.put("div", new XWikiDivisionTagHandler());
+        handlers.put("th", new XWikiTableDataTagHandler());
 
         XhtmlParser parser = new XhtmlParser();
         parser.setExtraHandlers(handlers);

@@ -593,7 +593,9 @@ $xwiki.jsfx.use('js/xwiki/actionbuttons/actionButtons.js', true)
   &lt;script type="text/javascript"&gt;
   /* &lt;![CDATA[ */
   ## Alt+Shift+S presses the first saveAndContinue button it finds, not what we want so we will disable edit shortcuts.
-  XWiki.actionButtons.EditActions = Object.extend(XWiki.actionButtons.EditActions, {addShortcuts : function() { }});
+  document.observe('xwiki:dom:loaded', function() {
+    XWiki.actionButtons.EditActions = Object.extend(XWiki.actionButtons.EditActions, {addShortcuts : function() { }});
+  });
   ##
   ## TODO: cancel and "submit all" buttons.
   //]]&gt;

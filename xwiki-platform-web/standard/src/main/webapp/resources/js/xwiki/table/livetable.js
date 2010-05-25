@@ -71,7 +71,7 @@ XWiki.widgets.LiveTable = Class.create({
     this.limit = options.limit || 10;
     this.action = options.action || "view"; // FIXME check if this can be removed safely.
 
-    this.permalinks = options.permalinks || true;
+    this.permalinks = (typeof options.permalinks == "undefined" || options.permalinks);
 
     // Initialize pagination
     if (typeof this.paginationNodes != "undefined") {

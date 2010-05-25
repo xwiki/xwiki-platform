@@ -656,8 +656,8 @@ var LiveTablePagination = Class.create({
          self.pagesNodes.push(elem.down(".xwiki-livetable-pagination-content"));
       });
       this.max = max;
-      $(this.table.domNodeName).select("span.prevPagination").invoke("observe", "click", this.gotoPrevPage.bind(this));
-      $(this.table.domNodeName).select("span.nextPagination").invoke("observe", "click", this.gotoNextPage.bind(this));
+      $(this.table.domNodeName).select("a.prevPagination").invoke("observe", "click", this.gotoPrevPage.bind(this));
+      $(this.table.domNodeName).select("a.nextPagination").invoke("observe", "click", this.gotoNextPage.bind(this));
     },
     refreshPagination: function()
     {
@@ -698,12 +698,13 @@ var LiveTablePagination = Class.create({
       }
     },
     createPageLink:function(page, selected) {
-        var pageSpan = new Element("span", {'class':'pagenumber'}).update(page);
+        var pageSpan = new Element("a", {'class':'pagenumber', 'href':'#'}).update(page);
         if (selected) {
            pageSpan.addClassName("selected");
         }
         var self = this;
         pageSpan.observe("click", function(ev){
+            ev.stop();
             self.gotoPage(ev.element().innerHTML);
         });
         return pageSpan;
@@ -712,14 +713,16 @@ var LiveTablePagination = Class.create({
     {
       this.table.showRows(((parseInt(page) - 1 )* this.table.limit) + 1, this.table.limit);
     },
-    gotoPrevPage: function() {
+    gotoPrevPage: function(ev) {
+      ev.stop();
       var currentPage = Math.floor( this.table.lastOffset / this.table.limit) + 1;
       var prevPage = currentPage - 1;
       if (prevPage > 0) {
         this.table.showRows(((parseInt(prevPage) - 1) * this.table.limit) + 1, this.table.limit);
       }
     },
-    gotoNextPage: function() {
+    gotoNextPage: function(ev) {
+      ev.stop();
       var currentPage = Math.floor( this.table.lastOffset / this.table.limit) + 1;
       var pages = Math.ceil(this.table.totalRows / this.table.limit);
       var nextPage = currentPage + 1;

@@ -24,19 +24,19 @@
 .xwiki-livetable-pagination .xwiki-livetable-pagination-content, .xwiki-livetable-pagination .xwiki-livetable-pagination-text {
   display: inline;
 }
-.xwiki-livetable-pagination span.pagenumber {
+.xwiki-livetable-pagination a.pagenumber {
   color: $theme.textPrimaryColor;
   cursor: pointer;
 }
-.xwiki-livetable-pagination span.pagenumber:hover {
+.xwiki-livetable-pagination a.pagenumber:hover {
   color: $theme.linkColor;
   text-decoration: underline;
 }
-.xwiki-livetable-pagination span.selected {
+.xwiki-livetable-pagination a.selected {
   color: $theme.textColor;
   font-weight: bold;
 }
-.xwiki-livetable-pagination span.pagenumber:focus {
+.xwiki-livetable-pagination a.pagenumber:focus {
   outline: 1px dotted $theme.linkColor;
 }
 /* <Pagination>*/
@@ -54,7 +54,7 @@
   padding: 0 !important;
   float: right;
 }
-.controlPagination span {
+.controlPagination a {
   position: absolute;
   top: 0;
   left: 0;
@@ -63,21 +63,21 @@
   overflow: hidden;
   border: none;
 }
-.controlPagination span.prevPagination , .controlPagination span.noPrevPagination, .controlPagination span.nextPagination, .controlPagination span.noNextPagination {
+.controlPagination a.prevPagination , .controlPagination span.noPrevPagination, .controlPagination a.nextPagination, .controlPagination span.noNextPagination {
   background-image: url("$xwiki.getSkinFile('icons/xwiki/pagination-controls.png')");
   width: 21px;
   height: 22px;
 }
-.controlPagination span.prevPagination:hover, .controlPagination span.nextPagination:hover {
+.controlPagination a.prevPagination:hover, .controlPagination a.nextPagination:hover {
   cursor: pointer;
 }
-.controlPagination span.prevPagination {
+.controlPagination a.prevPagination {
   background-position: left top;
 }
 .controlPagination span.noPrevPagination {
   background-position: left bottom;
 }
-.controlPagination span.nextPagination {
+.controlPagination a.nextPagination {
   background-position: right top;
   left: 21px;
 }

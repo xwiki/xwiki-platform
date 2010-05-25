@@ -1603,8 +1603,8 @@ ${Msz}Mb##
           <img src="$xwiki.getSkinFile('icons/xwiki/ajax-loader-large.gif')" alt="$msg.get('xe.livetable.loading')" title="" />
         </span>
         <span class="controlPagination">
-          <span title="$msg.get('xe.pagination.page.prev.title')" class="prevPagination"></span>
-          <span title="$msg.get('xe.pagination.page.next.title')" class="nextPagination"></span>
+          <a title="$msg.get('xe.pagination.page.prev.title')" class="prevPagination" href="#"><span class="hidden">$msg.get('xe.pagination.page.prev.title')</span></a>
+          <a title="$msg.get('xe.pagination.page.next.title')" class="nextPagination" href="#"><span class="hidden">$msg.get('xe.pagination.page.next.title')</span></a>
         </span>
         <span class="pagination">
           <span class="xwiki-livetable-pagination-text">$msg.get("xe.pagination.page")</span>
@@ -1699,8 +1699,8 @@ ${Msz}Mb##
     <tr>
       <td class="xwiki-livetable-pagination">
         <span class="controlPagination">
-          <span title="$msg.get('xe.pagination.page.prev.title')" class="prevPagination"></span>
-          <span title="$msg.get('xe.pagination.page.next.title')" class="nextPagination"></span>
+          <a title="$msg.get('xe.pagination.page.prev.title')" class="prevPagination" href="#"><span class="hidden">$msg.get('xe.pagination.page.prev.title')</span></a>
+          <a title="$msg.get('xe.pagination.page.next.title')" class="nextPagination" href="#"><span class="hidden">$msg.get('xe.pagination.page.next.title')</span></a>
         </span>
         <span class="pagination">
           <span class="xwiki-livetable-pagination-text">$msg.get('xe.pagination.page')</span>

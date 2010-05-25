@@ -133,7 +133,6 @@ XWiki.widgets.LiveTable = Class.create({
    **/
   setPageSize: function(pageSize)
   {
-    this.lastLimit = this.limit;
     this.limit = pageSize;
     this.showRows(1, this.limit);
   },

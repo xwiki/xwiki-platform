@@ -1,5 +1,4 @@
 <?xml version="1.0" encoding="UTF-8"?>
-
 <xwikidoc>
 <web>XWiki</web>
 <name>AdminGroupsSheet</name>
@@ -102,7 +101,7 @@
   #set($addnewurl = $xwiki.getURL("XWiki.XWikiGroups", "view", "xpage=addnewgroup"))
   #set($saveurl = $xwiki.getURL("XWiki.XWikiGroups", "view"))
   #set($redirecturl = $xwiki.getDocument("XWiki.XWikiPreferences").getURL("admin", "editor=${editor}&amp;section=Groups")) 
-  {pre}      
+  {pre}
   &lt;script type="text/javascript"&gt;
   //&lt;![CDATA[
           var ta = new XWiki.widgets.LiveTable("$url", "groupstable", displayGroups); 
@@ -118,5 +117,4 @@
  &lt;div id="xwikieditcontent"&gt;
   &lt;p&gt;$xwiki.parseMessage("editgroupsredirect")&lt;/p&gt;
  &lt;/div&gt;
-#end</content>
-</xwikidoc>
+#end</content></xwikidoc>

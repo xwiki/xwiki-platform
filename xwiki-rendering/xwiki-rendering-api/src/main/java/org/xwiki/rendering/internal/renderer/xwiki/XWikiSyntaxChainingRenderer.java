@@ -236,20 +236,37 @@ public class XWikiSyntaxChainingRenderer extends AbstractChainingPrintRenderer i
     public void beginFormat(Format format, Map<String, String> parameters)
     {
         // If the previous format had parameters and the parameters are different from the current ones then close them
-        if (this.previousFormatParameters != null && !this.previousFormatParameters.equals(parameters)) {
-            this.previousFormatParameters = null;
-            printParameters(parameters, false);
+        if (this.previousFormatParameters != null) {
+            if (parameters.isEmpty()) {
+                //print("(%%)");
+                //this.previousFormatParameters = null;
+            } else if (!this.previousFormatParameters.equals(parameters)) {
+                this.previousFormatParameters = null;
+                printParameters(parameters, false);
+            } else {
+                this.previousFormatParameters = null;
+            }
         } else if (this.previousFormatParameters == null) {
-            this.previousFormatParameters = null;
             printParameters(parameters, false);
-        } else {
-            this.previousFormatParameters = null;
         }
+
         switch (format) {
             case BOLD:
+                // Handle empty formatting parameters.
+                if (this.previousFormatParameters != null) {
+                    getPrinter().print("(%%)");
+                    this.previousFormatParameters = null;
+                }
+
                 getXWikiPrinter().printBeginBold();
                 break;
             case ITALIC:
+                // Handle empty formatting parameters.
+                if (this.previousFormatParameters != null) {
+                    getPrinter().print("(%%)");
+                    this.previousFormatParameters = null;
+                }
+
                 getXWikiPrinter().printBeginItalic();
                 break;
             case STRIKEDOUT:

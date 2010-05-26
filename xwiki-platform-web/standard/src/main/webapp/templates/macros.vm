@@ -2266,8 +2266,9 @@ $request.getSession().setAttribute("com.xpn.xwiki.wysiwyg.input", $wysiwygInput)
   * @param $parameters WYSIWYG editor configuration parameter map to put the input URL in
   *#
 #macro(wysiwyg_inputProperty $editedDocument $propertyId $parameters)
+#set($propertyValue = '')
 #if("$!propertyId" == "content")
-#wysiwyg_input("content" $editedDocument.content $parameters)
+#set($propertyValue = $editedDocument.content)
 #else
 #set($found = false)
 #foreach($entry in $editedDocument.xWikiObjects.entrySet())
@@ -2279,7 +2280,7 @@ $request.getSession().setAttribute("com.xpn.xwiki.wysiwyg.input", $wysiwygInput)
 #if($propertyId.startsWith($classNameAndObjectNumber))
 #set($propertyName = $propertyId.substring($classNameAndObjectNumber.length()))
 ## Make sure the property value is always a string. Use the empty string for unset properties.
-#wysiwyg_input($propertyId "$!{object.getProperty($propertyName).getValue()}" $parameters)
+#set($propertyValue = "$!{object.getProperty($propertyName).getValue()}")
 #set($found = true)
 #break
 #end ## If object number matches..
@@ -2290,6 +2291,7 @@ $request.getSession().setAttribute("com.xpn.xwiki.wysiwyg.input", $wysiwygInput)
 #end ## If class name matches..
 #end ## foreach class name
 #end
+#wysiwyg_input($propertyId $propertyValue $parameters)
 #set($ok = $parameters.put('inputURL', $editedDocument.getExternalURL('edit', $parameters.remove('inputURLQueryString'))))
 #end
 

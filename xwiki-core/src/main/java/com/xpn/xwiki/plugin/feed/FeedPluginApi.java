@@ -602,41 +602,8 @@ public class FeedPluginApi extends PluginApi<FeedPlugin>
         return value != null && !value.equals(defaultValue);
     }
 
-    /**
-     * Fills the missing feed meta data fields with default values.
-     */
-    private Map<String, Object> fillDefaultFeedMetadata(Map<String, Object> metadata)
-    {
-        XWiki xwiki = getXWikiContext().getWiki();
-        XWikiDocument doc = getXWikiContext().getDoc();
-
-        if (metadata.get("author") == null) {
-            metadata.put("author", xwiki.getUserName(doc.getAuthor(), null, false, getXWikiContext()));
-        }
-
-        if (!keyHasValue(metadata, "copyright", "")) {
-            metadata.put("copyright", xwiki.getSpaceCopyright(getXWikiContext()));
-        }
-
-        if (!keyHasValue(metadata, "encoding", "")) {
-            metadata.put("encoding", xwiki.getEncoding());
-        }
-
-        if (!keyHasValue(metadata, "url", "")) {
-            metadata.put("url", "http://" + getXWikiContext().getRequest().getServerName());
-        }
-
-        if (!keyHasValue(metadata, "language", "")) {
-            metadata.put("language", doc.getDefaultLanguage());
-        }
-
-        return metadata;
-    }
-
     private Map<String, Object> fillWebFeedMetadata(Map<String, Object> metadata)
     {
-        fillDefaultFeedMetadata(metadata);
-
         // these strings should be taken from a resource bundle
         String title = "Feed for document changes";
         String description = title;
@@ -653,7 +620,6 @@ public class FeedPluginApi extends PluginApi<FeedPlugin>
     {
         // Make sure that we don't have an immutable Map
         Map<String, Object> result = new HashMap<String, Object>(metadata);
-        fillDefaultFeedMetadata(result);
 
         // these strings should be taken from a resource bundle
         String title = "Personal Wiki Blog";

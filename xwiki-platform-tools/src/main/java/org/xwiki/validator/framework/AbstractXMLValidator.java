@@ -75,7 +75,7 @@ public abstract class AbstractXMLValidator implements Validator
     public AbstractXMLValidator(boolean validateXML)
     {
         DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-        factory.setValidating(true);
+        factory.setValidating(validateXML);
 
         try {
             this.documentBuilder = factory.newDocumentBuilder();

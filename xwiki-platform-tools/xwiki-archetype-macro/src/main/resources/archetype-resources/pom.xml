@@ -56,7 +56,7 @@
   <dependencies>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-core-rendering-parser-wikimodel</artifactId>
+      <artifactId>xwiki-core-rendering-syntax-wikimodel</artifactId>
       <version>${platform.core.version}</version>
     </dependency>
     <!-- Testing dependencies -->

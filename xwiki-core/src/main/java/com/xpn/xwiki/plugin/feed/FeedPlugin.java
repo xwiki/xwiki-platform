@@ -51,6 +51,7 @@ import com.sun.syndication.feed.synd.SyndFeedImpl;
 import com.sun.syndication.feed.synd.SyndImage;
 import com.sun.syndication.feed.synd.SyndImageImpl;
 import com.sun.syndication.io.SyndFeedOutput;
+import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.api.Api;
@@ -963,7 +964,7 @@ public class FeedPlugin extends XWikiDefaultPlugin implements XWikiPluginInterfa
         Map<String, Object> metadata, XWikiContext context) throws XWikiException
     {
         SyndFeed feed = getFeed(list, source, sourceParams, context);
-        fillFeedMetadata(feed, metadata);
+        fillFeedMetadata(feed, metadata, context);
         return feed;
     }
 
@@ -974,20 +975,53 @@ public class FeedPlugin extends XWikiDefaultPlugin implements XWikiPluginInterfa
         Map<String, Object> sourceParams, Map<String, Object> metadata, XWikiContext context) throws XWikiException
     {
         SyndFeed feed = getFeed(query, count, start, source, sourceParams, context);
-        fillFeedMetadata(feed, metadata);
+        fillFeedMetadata(feed, metadata, context);
         return feed;
     }
 
-    private void fillFeedMetadata(SyndFeed feed, Map<String, Object> metadata)
+    private void fillFeedMetadata(SyndFeed feed, Map<String, Object> metadata, XWikiContext context)
     {
-        feed.setAuthor(String.valueOf(metadata.get("author")));
-        feed.setDescription(String.valueOf(metadata.get("description")));
-        feed.setCopyright(String.valueOf(metadata.get("copyright")));
-        feed.setEncoding(String.valueOf(metadata.get("encoding")));
+        XWiki xwiki = context.getWiki();
+        XWikiDocument doc = context.getDoc();
+
+        if (metadata.containsKey("author")) {
+            feed.setAuthor(String.valueOf(metadata.get("author")));
+        } else if (doc != null) {
+            metadata.put("author", xwiki.getUserName(doc.getAuthor(), null, false, context));
+        }
+
+        if (metadata.containsKey("description")) {
+            feed.setDescription(String.valueOf(metadata.get("description")));
+        }
+
+        if (metadata.containsKey("copyright")) {
+            feed.setCopyright(String.valueOf(metadata.get("copyright")));
+        } else {
+            metadata.put("copyright", xwiki.getSpaceCopyright(context));
+        }
+
+        if (metadata.containsKey("encoding")) {
+            feed.setEncoding(String.valueOf(metadata.get("encoding")));
+        } else {
+            metadata.put("encoding", xwiki.getEncoding());
+        }
+
         // TODO: rename "url" to "link" for consistency ?
-        feed.setLink(String.valueOf(metadata.get("url")));
-        feed.setTitle(String.valueOf(metadata.get("title")));
-        feed.setLanguage(String.valueOf(metadata.get("language")));
+        if (metadata.containsKey("url")) {
+            feed.setLink(String.valueOf(metadata.get("url")));
+        } else {
+            metadata.put("url", "http://" + context.getRequest().getServerName());
+        }
+
+        if (metadata.containsKey("title")) {
+            feed.setTitle(String.valueOf(metadata.get("title")));
+        }
+
+        if (metadata.containsKey("language")) {
+            feed.setLanguage(String.valueOf(metadata.get("language")));
+        } else {
+            metadata.put("language", doc.getDefaultLanguage());
+        }
     }
 
     /**
@@ -995,6 +1029,10 @@ public class FeedPlugin extends XWikiDefaultPlugin implements XWikiPluginInterfa
      */
     public String getFeedOutput(SyndFeed feed, String type, XWikiContext context)
     {
+        if (feed.getEncoding() == null) {
+            feed.setEncoding(context.getWiki().getEncoding());
+        }
+        
         feed.setFeedType(type);
         StringWriter writer = new StringWriter();
         SyndFeedOutput output = new SyndFeedOutput();

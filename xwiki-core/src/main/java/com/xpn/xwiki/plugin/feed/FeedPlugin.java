@@ -1029,10 +1029,6 @@ public class FeedPlugin extends XWikiDefaultPlugin implements XWikiPluginInterfa
      */
     public String getFeedOutput(SyndFeed feed, String type, XWikiContext context)
     {
-        if (feed.getEncoding() == null) {
-            feed.setEncoding(context.getWiki().getEncoding());
-        }
-        
         feed.setFeedType(type);
         StringWriter writer = new StringWriter();
         SyndFeedOutput output = new SyndFeedOutput();

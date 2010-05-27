@@ -101,7 +101,7 @@ window.addNewMember = function(uorg, name)
                          if(nr == 0) $('errMsg').innerHTML = "$msg.get('xe.admin.groups.addUser.duplicate')";
                          else {
                                 var end = editgrouptable.limit;
-                                var start = editgrouptable.lastoffset;
+                                var start = editgrouptable.lastOffset;
                                 editgrouptable.clearCache();
                                 if(start &lt; 1)  start = 1;
                                 editgrouptable.getRows(start, end, start, end);

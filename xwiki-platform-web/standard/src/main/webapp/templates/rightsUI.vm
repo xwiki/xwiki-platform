@@ -179,8 +179,10 @@
         </table>
         <script type="text/javascript">
         //<![CDATA[
-        var activeRights = [#foreach($i in [0..$maxlevel])"$levelsRights.get($i)",#end];
-        var saveUrl = "$saveUrl";
+    (function() {
+      var startup = function() {
+        window.activeRights = [#foreach($i in [0..$maxlevel])"$levelsRights.get($i)",#end];
+        window.saveUrl = "$saveUrl";
         saveUrl.replace(/&amp;/g, "&");
         window.currentUser = "$context.user";
         window.unregUser = "XWiki.XWikiGuest";
@@ -201,6 +203,13 @@
         #if($guest_comment_captcha_prop)
     Event.observe($('guest_comment_requires_captcha'), 'click', setBooleanPropertyFromLiveCheckbox($('guest_comment_requires_captcha'), '$doc.getURL("save")', 'XWiki.XWikiPreferences', 0));
         #end
+      }
+      if ((typeof(XWiki) != 'undefined') && (typeof(XWiki.widgets) != 'undefined') && (typeof(XWiki.widgets.LiveTable) != 'undefined')) {
+        startup();
+      } else {
+        document.observe('xwiki:dom:loading', startup);
+      }
+    })();
         //]]>
         </script>
     </div> ## xwikieditcontent

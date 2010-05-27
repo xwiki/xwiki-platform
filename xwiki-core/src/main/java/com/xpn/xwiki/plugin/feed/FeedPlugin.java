@@ -515,10 +515,10 @@ public class FeedPlugin extends XWikiDefaultPlugin implements XWikiPluginInterfa
                     Date adate;
                     if (StringUtils.isBlank(context.getWiki().Param("xwiki.plugins.feed.publishedDateIsCreationDate"))) {
                         // Set the creation date to the feed date if it exists, otherwise the current date
-                        adate = (entry.getPublishedDate() == null) ? new Date() : entry.getPublishedDate(); 
-                    }
-                    else {
-                        // By default use now (fetching date) as document creation date, since the publish date information is made available from
+                        adate = (entry.getPublishedDate() == null) ? new Date() : entry.getPublishedDate();
+                    } else {
+                        // By default use now (fetching date) as document creation date, since the publish date
+                        // information is made available from
                         // the XWiki.FeedEntryClass object.
                         adate = new Date();
                     }
@@ -576,7 +576,8 @@ public class FeedPlugin extends XWikiDefaultPlugin implements XWikiPluginInterfa
         if (StringUtils.isBlank(context.getWiki().Param("xwiki.plugins.feed.entryContent"))) {
             // If entry content is not configured, we do the best guess between XWiki syntaxes 1 and 2
             content =
-                StringUtils.equals(Syntax.XWIKI_1_0.toIdString(), syntaxId) ? "#includeForm(\"XWiki.FeedEntryClassSheet\")"
+                StringUtils.equals(Syntax.XWIKI_1_0.toIdString(), syntaxId)
+                    ? "#includeForm(\"XWiki.FeedEntryClassSheet\")"
                     : "{{include document=\"XWiki.FeedEntryClassSheet\" /}}";
         } else {
             content = context.getWiki().Param("xwiki.plugins.feed.entryContent");
@@ -588,10 +589,12 @@ public class FeedPlugin extends XWikiDefaultPlugin implements XWikiPluginInterfa
         document.setCreator(feedEntryCreator);
         document.setAuthor(feedEntryCreator);
         document.setContentAuthor(feedEntryCreator);
-        
+
         document.setContent(content);
-        // Let the document try to create the Syntax object from the syntax id. If it fails (for example if the syntax ID precised in configuration
-        // does not correspond to any syntax) it will fallback on the document default Syntax ID (which is a XWiki core configuration entry).
+        // Let the document try to create the Syntax object from the syntax id. If it fails (for example if the syntax
+        // ID precised in configuration
+        // does not correspond to any syntax) it will fallback on the document default Syntax ID (which is a XWiki core
+        // configuration entry).
         document.setSyntaxId(syntaxId);
     }
 
@@ -987,7 +990,7 @@ public class FeedPlugin extends XWikiDefaultPlugin implements XWikiPluginInterfa
         if (metadata.containsKey("author")) {
             feed.setAuthor(String.valueOf(metadata.get("author")));
         } else if (doc != null) {
-            metadata.put("author", xwiki.getUserName(doc.getAuthor(), null, false, context));
+            feed.setAuthor(xwiki.getUserName(doc.getAuthor(), null, false, context));
         }
 
         if (metadata.containsKey("description")) {
@@ -997,20 +1000,20 @@ public class FeedPlugin extends XWikiDefaultPlugin implements XWikiPluginInterfa
         if (metadata.containsKey("copyright")) {
             feed.setCopyright(String.valueOf(metadata.get("copyright")));
         } else {
-            metadata.put("copyright", xwiki.getSpaceCopyright(context));
+            feed.setCopyright(xwiki.getSpaceCopyright(context));
         }
 
         if (metadata.containsKey("encoding")) {
             feed.setEncoding(String.valueOf(metadata.get("encoding")));
         } else {
-            metadata.put("encoding", xwiki.getEncoding());
+            feed.setEncoding(xwiki.getEncoding());
         }
 
         // TODO: rename "url" to "link" for consistency ?
         if (metadata.containsKey("url")) {
             feed.setLink(String.valueOf(metadata.get("url")));
         } else {
-            metadata.put("url", "http://" + context.getRequest().getServerName());
+            feed.setLink("http://" + context.getRequest().getServerName());
         }
 
         if (metadata.containsKey("title")) {
@@ -1019,8 +1022,8 @@ public class FeedPlugin extends XWikiDefaultPlugin implements XWikiPluginInterfa
 
         if (metadata.containsKey("language")) {
             feed.setLanguage(String.valueOf(metadata.get("language")));
-        } else {
-            metadata.put("language", doc.getDefaultLanguage());
+        } else if (doc != null) {
+            feed.setLanguage(doc.getDefaultLanguage());
         }
     }
 

@@ -655,8 +655,8 @@ var LiveTablePagination = Class.create({
          self.pagesNodes.push(elem.down(".xwiki-livetable-pagination-content"));
       });
       this.max = max;
-      $(this.table.domNodeName).select("a.prevPagination").invoke("observe", "click", this.gotoPrevPage.bind(this));
-      $(this.table.domNodeName).select("a.nextPagination").invoke("observe", "click", this.gotoNextPage.bind(this));
+      $(this.table.domNodeName).select(".prevPagination").invoke("observe", "click", this.gotoPrevPage.bind(this));
+      $(this.table.domNodeName).select(".nextPagination").invoke("observe", "click", this.gotoNextPage.bind(this));
     },
     refreshPagination: function()
     {

@@ -5,7 +5,7 @@
 <h1><span>$msg.get('core.rename.title', [$xwiki.getXMLEncoded($doc.fullName)])</span></h1>
 #set($newname = $msg.get("core.rename.inputPrompt"))
 <form action="?xpage=rename&amp;step=2" method="post"
-    onsubmit="if(this.newPageName.value=='${newname}') this.newPageName.value=''">
+    onsubmit="if(this.newPageName.value=='${escapetool.xml($newname)}') this.newPageName.value=''">
   <h2><span>$msg.get("core.rename.title.newName")</span></h2>
   #set($pweb = $doc.space)
   <div class="padded">
@@ -18,7 +18,7 @@
           <select name="newSpaceName">
             #set ($spaces = $xwiki.getSpaces())
             #foreach ($space in $spaces)
-              <option #if ($space == $pweb) selected #end>$space</option>
+              <option #if ($space == $pweb) selected="selected" #end>$space</option>
             #end
           </select>
         </td>
@@ -38,13 +38,13 @@
     <h2><span>$msg.get("core.rename.title.updateDocs")</span></h2>
     #foreach($backlink in $backlinks)
       #if(!$xwiki.hasAccessLevel("edit", $context.user, $backlink))
-        #set ($alink = "<a href='$xwiki.getURL($backlink)' target='_blank' style='color: #999;'>$backlink</a>")
+        #set ($alink = "<a href='$xwiki.getURL($backlink)' rel='__blank' style='color: #999;'>$backlink</a>")
         <div><input type="checkbox" disabled="disabled"/> $alink</div>
       #elseif($xwiki.getDocument($backlink).isProgrammaticContent())
-        #set ($alink = "<a href='$xwiki.getURL($backlink)' target='_blank' style='color: #900;'>$backlink</a>")
+        #set ($alink = "<a href='$xwiki.getURL($backlink)' rel='_blank' style='color: #900;'>$backlink</a>")
         <div><input type="checkbox" name="backlink_$backlink"/> $alink</div>
       #else
-        #set ($alink = "<a href='$xwiki.getURL($backlink)' target='_blank'>$backlink</a>")
+        #set ($alink = "<a href='$xwiki.getURL($backlink)' rel='_blank'>$backlink</a>")
         <div><input type="checkbox" name="backlink_$backlink" checked="checked"/> $alink</div>
       #end
     #end
@@ -54,13 +54,13 @@
     <h2><span>$msg.get("core.rename.title.updateChildren")</span></h2>
     #foreach($child in $children)
       #if(!$xwiki.hasAccessLevel("edit", $context.user, $child))
-        #set ($alink = "<a href='$xwiki.getURL($child)' target='_blank' style='color: #999;'>$child</a>")
+        #set ($alink = "<a href='$xwiki.getURL($child)' rel='_blank' style='color: #999;'>$child</a>")
         <div><input type="checkbox" disabled="disabled"/> $alink</div>
       #elseif($xwiki.getDocument($backlink).isProgrammaticContent())
-        #set ($alink = "<a href='$xwiki.getURL($child)' target='_blank' style='color: #900;'>$child</a>")
+        #set ($alink = "<a href='$xwiki.getURL($child)' rel='_blank' style='color: #900;'>$child</a>")
         <div><input type="checkbox" name="child_$child"/> $alink</div>
       #else
-        #set ($alink = "<a href='$xwiki.getURL($child)' target='_blank'>$child</a>")
+        #set ($alink = "<a href='$xwiki.getURL($child)' rel='_blank'>$child</a>")
         <div><input type="checkbox" name="child_$child" checked="checked"/> $alink</div>
       #end
     #end

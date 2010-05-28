@@ -257,6 +257,11 @@
           name="download"
           scope="request">
       </action>
+      <action path="/temp/"
+          type="com.xpn.xwiki.web.TempResourceAction"
+          name="temp"
+          scope="request">
+      </action>
       <action path="/downloadrev/"
               type="com.xpn.xwiki.web.DownloadRevAction"
               name="dowloadrev"

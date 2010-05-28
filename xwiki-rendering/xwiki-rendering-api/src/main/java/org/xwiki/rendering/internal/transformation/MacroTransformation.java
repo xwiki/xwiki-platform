@@ -50,8 +50,8 @@ import org.xwiki.rendering.transformation.TransformationContext;
 import org.xwiki.rendering.transformation.TransformationException;
 
 /**
- * Look for all {@link org.xwiki.rendering.block.MacroBlock} blocks in the passed Document and iteratively execute each
- * Macro in the correct order. Macros can:
+ * Look for all {@link org.xwiki.rendering.block.MacroBlock} blocks in the passed {@link Block} and iteratively execute
+ * each Macro in the correct order. Macros can:
  * <ul>
  * <li>provide a hint specifying when they should run (priority)</li>
  * <li>generate other Macros</li>

@@ -31,6 +31,7 @@ import org.xwiki.rendering.renderer.BlockRenderer;
 import org.xwiki.rendering.renderer.printer.DefaultWikiPrinter;
 import org.xwiki.rendering.renderer.printer.WikiPrinter;
 import org.xwiki.rendering.syntax.SyntaxFactory;
+import org.xwiki.rendering.transformation.TransformationContext;
 import org.xwiki.rendering.transformation.TransformationManager;
 import org.xwiki.test.MockConfigurationSource;
 
@@ -96,7 +97,10 @@ public class RenderingTestCase extends MockObjectTestCase
         if (this.runTransformations) {
             SyntaxFactory syntaxFactory = getComponentManager().lookup(SyntaxFactory.class);
             TransformationManager transformationManager = getComponentManager().lookup(TransformationManager.class);
-            transformationManager.performTransformations(xdom, syntaxFactory.createSyntaxFromIdString(this.parserId));
+            TransformationContext txContext = new TransformationContext();
+            txContext.setXDOM(xdom);
+            txContext.setSyntax(syntaxFactory.createSyntaxFromIdString(this.parserId));
+            transformationManager.performTransformations(xdom, txContext);
         }
 
         BlockRenderer renderer = getComponentManager().lookup(BlockRenderer.class, this.targetSyntaxId);

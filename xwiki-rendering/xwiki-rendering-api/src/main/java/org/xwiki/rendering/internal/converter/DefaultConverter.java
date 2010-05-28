@@ -13,6 +13,7 @@ import org.xwiki.rendering.parser.Parser;
 import org.xwiki.rendering.syntax.Syntax;
 import org.xwiki.rendering.renderer.BlockRenderer;
 import org.xwiki.rendering.renderer.printer.WikiPrinter;
+import org.xwiki.rendering.transformation.TransformationContext;
 import org.xwiki.rendering.transformation.TransformationException;
 import org.xwiki.rendering.transformation.TransformationManager;
 
@@ -57,7 +58,11 @@ public class DefaultConverter implements Converter
 
         // Step 2: Run transformations
         try {
-            this.transformationManager.performTransformations(xdom, sourceSyntax);
+            TransformationContext context = new TransformationContext();
+            context.setXDOM(xdom);
+            context.setSyntax(sourceSyntax);
+
+            this.transformationManager.performTransformations(xdom, context);
         } catch (TransformationException e) {
             throw new ConversionException("Failed to execute some transformations", e);
         }

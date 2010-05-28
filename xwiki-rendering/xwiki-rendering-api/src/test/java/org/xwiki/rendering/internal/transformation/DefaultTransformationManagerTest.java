@@ -19,12 +19,12 @@
  */
 package org.xwiki.rendering.internal.transformation;
 
+import org.junit.Test;
 import org.xwiki.rendering.block.XDOM;
 import org.xwiki.rendering.syntax.Syntax;
-import org.xwiki.rendering.syntax.SyntaxType;
+import org.xwiki.rendering.transformation.TransformationContext;
 import org.xwiki.rendering.transformation.TransformationManager;
 import org.xwiki.test.AbstractComponentTestCase;
-import org.junit.Test;
 
 /**
  * Unit tests for {@link DefaultTransformationManager}.
@@ -37,6 +37,9 @@ public class DefaultTransformationManagerTest extends AbstractComponentTestCase
     public void testTransformations() throws Exception 
     {
         TransformationManager manager = getComponentManager().lookup(TransformationManager.class);
-        manager.performTransformations(XDOM.EMPTY, new Syntax(SyntaxType.XWIKI, "2.0"));
+        TransformationContext txContext = new TransformationContext();
+        txContext.setXDOM(XDOM.EMPTY);
+        txContext.setSyntax(Syntax.XWIKI_2_0);
+        manager.performTransformations(XDOM.EMPTY, txContext);
     }
 }

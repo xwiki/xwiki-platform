@@ -99,6 +99,7 @@ import org.xwiki.rendering.renderer.printer.DefaultWikiPrinter;
 import org.xwiki.rendering.renderer.printer.WikiPrinter;
 import org.xwiki.rendering.syntax.Syntax;
 import org.xwiki.rendering.syntax.SyntaxFactory;
+import org.xwiki.rendering.transformation.TransformationContext;
 import org.xwiki.rendering.transformation.TransformationException;
 import org.xwiki.rendering.transformation.TransformationManager;
 import org.xwiki.rendering.util.ParserUtils;
@@ -1116,7 +1117,10 @@ public class XWikiDocument implements DocumentModelBridge
 
                     // transform
                     try {
-                        Utils.getComponent(TransformationManager.class).performTransformations(headerXDOM, getSyntax());
+                        TransformationContext txContext = new TransformationContext();
+                        txContext.setXDOM(headerXDOM);
+                        txContext.setSyntax(getSyntax());
+                        Utils.getComponent(TransformationManager.class).performTransformations(headerXDOM, txContext);
                     } catch (TransformationException e) {
                         throw new XWikiException(XWikiException.MODULE_XWIKI_RENDERING,
                             XWikiException.ERROR_XWIKI_UNKNOWN, "Failed to transform document", e);
@@ -1208,7 +1212,10 @@ public class XWikiDocument implements DocumentModelBridge
                         XDOM headerXDOM = new XDOM(Collections.<Block> singletonList(header));
 
                         // transform
-                        Utils.getComponent(TransformationManager.class).performTransformations(headerXDOM, getSyntax());
+                        TransformationContext context = new TransformationContext();
+                        context.setXDOM(headerXDOM);
+                        context.setSyntax(getSyntax());
+                        Utils.getComponent(TransformationManager.class).performTransformations(headerXDOM, context);
 
                         // render
                         Block headerBlock = headerXDOM.getChildren().get(0);
@@ -7269,7 +7276,10 @@ public class XWikiDocument implements DocumentModelBridge
                 // Transform XDOM
                 TransformationManager transformations = Utils.getComponent(TransformationManager.class);
                 SyntaxFactory syntaxFactory = Utils.getComponent(SyntaxFactory.class);
-                transformations.performTransformations(content, syntaxFactory.createSyntaxFromIdString(currentSyntaxId));
+                TransformationContext txContext = new TransformationContext();
+                txContext.setXDOM(content);
+                txContext.setSyntax(syntaxFactory.createSyntaxFromIdString(currentSyntaxId));
+                transformations.performTransformations(content, txContext);
             }
 
             // Render XDOM

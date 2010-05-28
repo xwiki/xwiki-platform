@@ -57,14 +57,15 @@ public class XWikiSyntaxLinkRenderer
         this.forceFullSyntax.push(false);
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see DefaultLinkReferenceSerializer#serialize(org.xwiki.rendering.listener.Link)
-     */
-    public String serialize(Link link)
+    public String serialize(Link link, boolean isFreeStanding)
     {
-        return this.linkReferenceSerializer.serialize(link).replace(">>", "~>~>").replace("||", "~|~|");
+        String result = this.linkReferenceSerializer.serialize(link);
+        
+        if (!isFreeStanding) {
+            result = result.replace("~", "~~").replace(">>", "~>~>").replace("||", "~|~|");
+        }
+        
+        return result;
     }
 
     public void beginRenderLink(XWikiSyntaxEscapeWikiPrinter printer, Link link, boolean isFreeStandingURI,
@@ -127,7 +128,7 @@ public class XWikiSyntaxLinkRenderer
     public void endRenderLink(XWikiSyntaxEscapeWikiPrinter printer, Link link, boolean isFreeStandingURI,
         Map<String, String> parameters)
     {
-        printer.print(serialize(link));
+        printer.print(serialize(link, isFreeStandingURI));
 
         // If there were parameters specified, output them separated by the "||" characters
         if (!parameters.isEmpty()) {

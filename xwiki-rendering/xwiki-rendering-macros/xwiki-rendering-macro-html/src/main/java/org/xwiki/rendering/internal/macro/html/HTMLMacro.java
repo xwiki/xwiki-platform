@@ -33,6 +33,7 @@ import org.xwiki.component.annotation.Requirement;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.block.MacroBlock;
+import org.xwiki.rendering.block.MacroMarkerBlock;
 import org.xwiki.rendering.block.RawBlock;
 import org.xwiki.rendering.block.XDOM;
 import org.xwiki.rendering.macro.AbstractMacro;
@@ -40,12 +41,12 @@ import org.xwiki.rendering.macro.MacroExecutionException;
 import org.xwiki.rendering.macro.descriptor.DefaultContentDescriptor;
 import org.xwiki.rendering.macro.html.HTMLMacroParameters;
 import org.xwiki.rendering.parser.Parser;
-import org.xwiki.rendering.syntax.Syntax;
-import org.xwiki.rendering.syntax.SyntaxType;
 import org.xwiki.rendering.renderer.PrintRenderer;
 import org.xwiki.rendering.renderer.PrintRendererFactory;
 import org.xwiki.rendering.renderer.printer.DefaultWikiPrinter;
 import org.xwiki.rendering.renderer.printer.WikiPrinter;
+import org.xwiki.rendering.syntax.Syntax;
+import org.xwiki.rendering.syntax.SyntaxType;
 import org.xwiki.rendering.transformation.MacroTransformationContext;
 import org.xwiki.rendering.transformation.Transformation;
 import org.xwiki.xml.html.HTMLCleaner;
@@ -91,8 +92,8 @@ public class HTMLMacro extends AbstractMacro<HTMLMacroParameters>
     private ComponentManager componentManager;
 
     /**
-     * Factory to create special XHTML renderer for the HTML Macro. We override the default XHTML renderer since we
-     * want special behaviors, for example to not escape special symbols (since we don't want to escape HTML tags for
+     * Factory to create special XHTML renderer for the HTML Macro. We override the default XHTML renderer since we want
+     * special behaviors, for example to not escape special symbols (since we don't want to escape HTML tags for
      * example).
      */
     @Requirement("xhtmlmacro/1.0")
@@ -136,7 +137,7 @@ public class HTMLMacro extends AbstractMacro<HTMLMacroParameters>
             // a text representing the resulting XHTML content.
             if (parameters.getWiki()) {
                 normalizedContent =
-                    renderWikiSyntax(normalizedContent, context.getTransformation(), context.getSyntax());
+                    renderWikiSyntax(normalizedContent, context.getTransformation(), context.getSyntax(), context);
             }
 
             // Clean the HTML into valid XHTML if the user has asked (it's the default).
@@ -217,11 +218,12 @@ public class HTMLMacro extends AbstractMacro<HTMLMacroParameters>
      * @param content the content to parse
      * @param transformation the macro transformation to execute macros when wiki is set to true
      * @param wikiSyntax the wiki syntax used inside the HTML macro
+     * @param context the context of the macros transformation process
      * @return the output XHTML as a string containing the XWiki Syntax resolved as XHTML
      * @throws MacroExecutionException in case there's a parsing problem
      */
-    private String renderWikiSyntax(String content, Transformation transformation, Syntax wikiSyntax)
-        throws MacroExecutionException
+    private String renderWikiSyntax(String content, Transformation transformation, Syntax wikiSyntax,
+        MacroTransformationContext context) throws MacroExecutionException
     {
         String xhtml;
 
@@ -242,13 +244,21 @@ public class HTMLMacro extends AbstractMacro<HTMLMacroParameters>
                 }
             }
 
+            MacroBlock htmlMacroBlock = context.getCurrentMacroBlock();
+
+            MacroMarkerBlock htmlMacroMarker =
+                new MacroMarkerBlock(htmlMacroBlock.getId(), htmlMacroBlock.getParameters(), htmlMacroBlock
+                    .getContent(), xdom.getChildren(), htmlMacroBlock.isInline());
+
             // Execute the Macro transformation
-            transformation.transform(xdom, parser.getSyntax());
+            transformation.transform(htmlMacroMarker, context.getTransformationContext());
 
             // Render the whole parsed content as a XHTML string
             WikiPrinter printer = new DefaultWikiPrinter();
             PrintRenderer renderer = this.xhtmlRendererFactory.createRenderer(printer);
-            xdom.traverse(renderer);
+            for (Block block : htmlMacroMarker.getChildren()) {
+                block.traverse(renderer);
+            }
 
             xhtml = printer.toString();
 

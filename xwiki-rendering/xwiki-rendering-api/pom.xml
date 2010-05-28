@@ -210,6 +210,7 @@
                 <exclude>**/internal/**</exclude>
                 <!-- TODO: Excludes below to be removed when we release XWiki 2.4 -->
                 <exclude>org/xwiki/rendering/transformation/MacroTransformationContext</exclude>
+                <exclude>org/xwiki/rendering/transformation/Transformation</exclude>
               </excludes>
             </configuration>
           </plugin>

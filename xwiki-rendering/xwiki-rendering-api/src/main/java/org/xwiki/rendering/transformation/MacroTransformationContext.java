@@ -19,8 +19,8 @@
  */
 package org.xwiki.rendering.transformation;
 
-import org.xwiki.rendering.block.XDOM;
 import org.xwiki.rendering.block.MacroBlock;
+import org.xwiki.rendering.block.XDOM;
 import org.xwiki.rendering.syntax.Syntax;
 
 /**
@@ -32,14 +32,14 @@ import org.xwiki.rendering.syntax.Syntax;
 public class MacroTransformationContext
 {
     /**
+     * The context of the transformation process.
+     */
+    private TransformationContext transformationContext;
+
+    /**
      * The macro currently being processed.
      */
     private MacroBlock currentMacroBlock;
-
-    /**
-     * The complete {@link XDOM} of the page currently being transformed.
-     */
-    private XDOM xdom;
 
     /**
      * Whether the macro is called in inline mode or not.
@@ -52,9 +52,32 @@ public class MacroTransformationContext
     private Transformation transformation;
 
     /**
-     * The current syntax.
+     * Constructor.
      */
-    private Syntax syntax;
+    public MacroTransformationContext()
+    {
+        this.transformationContext = new TransformationContext();
+    }
+
+    /**
+     * Constructor.
+     * 
+     * @param transformationContext the context of the transformation process.
+     * @since 2.4M1
+     */
+    public MacroTransformationContext(TransformationContext transformationContext)
+    {
+        this.transformationContext = transformationContext;
+    }
+
+    /**
+     * @return the context of the transformation process.
+     * @since 2.4M1
+     */
+    public TransformationContext getTransformationContext()
+    {
+        return this.transformationContext;
+    }
 
     /**
      * @param currentMacroBlock the macro currently being processed.
@@ -77,7 +100,7 @@ public class MacroTransformationContext
      */
     public void setXDOM(XDOM xdom)
     {
-        this.xdom = xdom;
+        this.transformationContext.setXDOM(xdom);
     }
 
     /**
@@ -85,7 +108,7 @@ public class MacroTransformationContext
      */
     public XDOM getXDOM()
     {
-        return this.xdom;
+        return this.transformationContext.getXDOM();
     }
 
     /**
@@ -130,7 +153,7 @@ public class MacroTransformationContext
      */
     public void setSyntax(Syntax syntax)
     {
-        this.syntax = syntax;
+        this.transformationContext.setSyntax(syntax);
     }
 
     /**
@@ -138,6 +161,6 @@ public class MacroTransformationContext
      */
     public Syntax getSyntax()
     {
-        return syntax;
+        return this.transformationContext.getSyntax();
     }
 }

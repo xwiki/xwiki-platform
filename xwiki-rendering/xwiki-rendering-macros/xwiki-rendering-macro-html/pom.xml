@@ -44,6 +44,13 @@
       <version>${pom.version}</version>
       <scope>test</scope>
     </dependency>
+    
+    <!-- Test dependencies -->
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-core-rendering-macro-toc</artifactId>
+      <version>${pom.version}</version>
+    </dependency>
   </dependencies>
   <build>
     <plugins>

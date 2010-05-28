@@ -1,0 +1,22 @@
+.#---------------------------------------------------------------
+.input|xwiki/2.0
+.# Verify inner macros have access to the whole document
+.#---------------------------------------------------------------
+{{html wiki="true"}}
+{{toc/}}
+{{/html}}
+
+= header =
+.#-----------------------------------------------------
+.expect|event/1.0
+.#-----------------------------------------------------
+beginDocument
+beginMacroMarkerStandalone [html] [wiki=true] [{{toc/}}]
+onRawText [<ul><li><span class="wikilink"><a href="#Hheader">header</a></span></li></ul>] [xhtml/1.0]
+endMacroMarkerStandalone [html] [wiki=true] [{{toc/}}]
+beginSection
+beginHeader [1, Hheader]
+onWord [header]
+endHeader [1, Hheader]
+endSection
+endDocument

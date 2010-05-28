@@ -46,6 +46,7 @@ import org.xwiki.rendering.macro.MacroManager;
 import org.xwiki.rendering.syntax.Syntax;
 import org.xwiki.rendering.transformation.AbstractTransformation;
 import org.xwiki.rendering.transformation.MacroTransformationContext;
+import org.xwiki.rendering.transformation.TransformationContext;
 import org.xwiki.rendering.transformation.TransformationException;
 
 /**
@@ -106,28 +107,42 @@ public class MacroTransformation extends AbstractTransformation
      */
     public void transform(XDOM dom, Syntax syntax) throws TransformationException
     {
-        // Create a macro execution context with all the information required for macros.
-        MacroTransformationContext context = new MacroTransformationContext();
+        TransformationContext context = new TransformationContext();
+
         context.setXDOM(dom);
-        context.setTransformation(this);
         context.setSyntax(syntax);
+
+        transform((Block) dom, context);
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see org.xwiki.rendering.transformation.Transformation#transform(org.xwiki.rendering.block.Block,
+     *      org.xwiki.rendering.transformation.TransformationContext)
+     */
+    public void transform(Block rootBlock, TransformationContext context) throws TransformationException
+    {
+        // Create a macro execution context with all the information required for macros.
+        MacroTransformationContext macroContext = new MacroTransformationContext(context);
+        macroContext.setTransformation(this);
 
         // Counter to prevent infinite recursion if a macro generates the same macro for example.
         int executions = 0;
-        List<MacroBlock> macroBlocks = dom.getChildrenByType(MacroBlock.class, true);
+        List<MacroBlock> macroBlocks = rootBlock.getChildrenByType(MacroBlock.class, true);
         while (!macroBlocks.isEmpty() && executions < this.maxMacroExecutions) {
-            transformOnce(context, syntax);
+            transformOnce(rootBlock, macroContext, context.getSyntax());
 
             // TODO: Make this less inefficient by caching the blocks list.
-            macroBlocks = dom.getChildrenByType(MacroBlock.class, true);
+            macroBlocks = rootBlock.getChildrenByType(MacroBlock.class, true);
             executions++;
         }
     }
 
-    private void transformOnce(MacroTransformationContext context, Syntax syntax)
+    private void transformOnce(Block rootBlock, MacroTransformationContext context, Syntax syntax)
     {
         // 1) Get highest priority macro to execute
-        MacroHolder macroHolder = getHighestPriorityMacro(context.getXDOM(), syntax);
+        MacroHolder macroHolder = getHighestPriorityMacro(rootBlock, syntax);
         if (macroHolder == null) {
             return;
         }
@@ -172,8 +187,8 @@ public class MacroTransformation extends AbstractTransformation
             }
 
             newBlocks =
-                    ((Macro<Object>) macroHolder.macro).execute(macroParameters, macroHolder.macroBlock.getContent(),
-                        context);
+                ((Macro<Object>) macroHolder.macro).execute(macroParameters, macroHolder.macroBlock.getContent(),
+                    context);
         } catch (Throwable e) {
             // The Macro failed to execute.
             // The macro will not be executed and we generate an error message instead of the macro
@@ -200,12 +215,12 @@ public class MacroTransformation extends AbstractTransformation
     /**
      * @return the macro with the highest priority for the passed syntax or null if no macro is found
      */
-    private MacroHolder getHighestPriorityMacro(XDOM xdom, Syntax syntax)
+    private MacroHolder getHighestPriorityMacro(Block rootBlock, Syntax syntax)
     {
         List<MacroHolder> macroHolders = new ArrayList<MacroHolder>();
 
         // 1) Sort the macros by priority to find the highest priority macro to execute
-        for (MacroBlock macroBlock : xdom.getChildrenByType(MacroBlock.class, true)) {
+        for (MacroBlock macroBlock : rootBlock.getChildrenByType(MacroBlock.class, true)) {
             try {
                 Macro< ? > macro = this.macroManager.getMacro(new MacroId(macroBlock.getId(), syntax));
                 macroHolders.add(new MacroHolder(macro, macroBlock));
@@ -227,8 +242,8 @@ public class MacroTransformation extends AbstractTransformation
 
     private Block wrapInMacroMarker(MacroBlock macroBlockToWrap, List<Block> newBlocks)
     {
-        return new MacroMarkerBlock(macroBlockToWrap.getId(), macroBlockToWrap.getParameters(),
-            macroBlockToWrap.getContent(), newBlocks, macroBlockToWrap.isInline());
+        return new MacroMarkerBlock(macroBlockToWrap.getId(), macroBlockToWrap.getParameters(), macroBlockToWrap
+            .getContent(), newBlocks, macroBlockToWrap.isInline());
     }
 
     private void generateError(MacroBlock macroToReplace, String message, String description)
@@ -237,7 +252,7 @@ public class MacroTransformation extends AbstractTransformation
 
         Map<String, String> errorBlockParams = Collections.singletonMap("class", "xwikirenderingerror");
         Map<String, String> errorDescriptionBlockParams =
-                Collections.singletonMap("class", "xwikirenderingerrordescription hidden");
+            Collections.singletonMap("class", "xwikirenderingerrordescription hidden");
 
         Block descriptionBlock = new VerbatimBlock(description, macroToReplace.isInline());
 

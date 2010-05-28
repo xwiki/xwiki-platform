@@ -137,6 +137,7 @@ public class XWikiRightServiceImpl implements XWikiRightService
             actionMap.put("jsx", "view");
             actionMap.put("ssx", "view");
             actionMap.put("tex", "view");
+            actionMap.put("temp", "view");
             actionMap.put("unknown", "view");
         }
 

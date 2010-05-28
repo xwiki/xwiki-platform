@@ -257,6 +257,13 @@
       <groupId>commons-beanutils</groupId>
       <artifactId>commons-beanutils</artifactId>
     </dependency>
+    
+    <!-- For extracting metadata from various document types -->
+    <dependency>
+      <groupId>org.apache.tika</groupId>
+      <artifactId>tika-core</artifactId>
+      <version>0.7</version>
+    </dependency>
 
     <!-- Logging -->
     <dependency>

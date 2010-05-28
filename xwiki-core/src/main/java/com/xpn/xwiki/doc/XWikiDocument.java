@@ -1605,14 +1605,26 @@ public class XWikiDocument implements DocumentModelBridge
     }
 
     /**
-     * @return the {@link XWikiDocumentArchive} for this document. If it is not stored in the document, we get it
-     *         using the current context. If there is an exception, null is returned.
+     * @return the {@link XWikiDocumentArchive} for this document.
+     *         If it is not stored in the document, null is returned.
      */
     public XWikiDocumentArchive getDocumentArchive()
     {
         // If there is a soft reference, return it.
-        if (this.archive != null && this.archive.get() != null) {
+        if (this.archive != null) {
             return this.archive.get();
+        }
+        return null;
+    }
+
+    /**
+     * @return the {@link XWikiDocumentArchive} for this document. If it is not stored in the document, we get it
+     *         using the current context. If there is an exception, null is returned.
+     */
+    public XWikiDocumentArchive loadDocumentArchive()
+    {
+        if (getDocumentArchive() != null) {
+            return getDocumentArchive();
         }
 
         XWikiContext xcontext = getXWikiContext();
@@ -7045,7 +7057,7 @@ public class XWikiDocument implements DocumentModelBridge
      */
     public String getPreviousVersion()
     {
-        XWikiDocumentArchive archive = getDocumentArchive();
+        XWikiDocumentArchive archive = loadDocumentArchive();
         if (archive != null) {
             Version prevVersion = archive.getPrevVersion(getRCSVersion());
             if (prevVersion != null) {

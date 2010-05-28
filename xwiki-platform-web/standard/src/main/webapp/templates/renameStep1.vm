@@ -28,7 +28,7 @@
           $msg.get("core.rename.newpage")
         </td>
         <td>
-          <input type="text" name="newPageName" value="${newname}" class="panelinput withTip"/>
+          <input type="text" name="newPageName" value="${escapetool.xml($newname)}" class="panelinput withTip"/>
         </td>
       </tr>
     </table>

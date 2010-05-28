@@ -350,6 +350,14 @@ public interface Strings extends Constants
 
     String imageNoImageSelectedError();
 
+    String imageExternal();
+
+    String imageExternalLocationLabel();
+
+    String imageExternalLocationHelpLabel();
+
+    String imageExternalLocationNotSpecifiedError();
+
     String table();
 
     String tableRowsLabel();

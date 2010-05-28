@@ -29,7 +29,6 @@ import org.xwiki.gwt.user.client.ui.wizard.WizardStepProvider;
 import org.xwiki.gwt.wysiwyg.client.Images;
 import org.xwiki.gwt.wysiwyg.client.Strings;
 import org.xwiki.gwt.wysiwyg.client.plugin.image.ImageConfig;
-import org.xwiki.gwt.wysiwyg.client.widget.wizard.util.AttachmentSelectorAggregatorWizardStep;
 import org.xwiki.gwt.wysiwyg.client.widget.wizard.util.LinkUploadWizardStep;
 import org.xwiki.gwt.wysiwyg.client.wiki.EntityLink;
 import org.xwiki.gwt.wysiwyg.client.wiki.EntityReference;
@@ -101,15 +100,10 @@ public class ImageWizard extends Wizard implements WizardStepProvider
             switch (requestedStep) {
                 case IMAGE_SELECTOR:
                     boolean selectionLimitedToCurrentPage = "currentpage".equals(config.getParameter("insertimages"));
-                    AttachmentSelectorAggregatorWizardStep<ImageConfig> imageSelector =
-                        new AttachmentSelectorAggregatorWizardStep<ImageConfig>(selectionLimitedToCurrentPage,
+                    boolean allowExternalImages = Boolean.valueOf(config.getParameter("allowExternalImages", "true"));
+                    step =
+                        new ImageSelectorAggregatorWizardStep(selectionLimitedToCurrentPage, allowExternalImages,
                             wikiService);
-                    imageSelector.setStepTitle(Strings.INSTANCE.imageSelectImageTitle());
-                    imageSelector.setCurrentPageSelector(new CurrentPageImageSelectorWizardStep(wikiService, false));
-                    if (!selectionLimitedToCurrentPage) {
-                        imageSelector.setAllPagesSelector(new ImagesExplorerWizardStep(false, wikiService));
-                    }
-                    step = imageSelector;
                     break;
                 case IMAGE_CONFIG:
                     step = new ImageConfigWizardStep();

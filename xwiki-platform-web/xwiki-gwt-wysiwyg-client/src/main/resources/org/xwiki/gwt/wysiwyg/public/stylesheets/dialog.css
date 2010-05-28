@@ -110,16 +110,19 @@
   background-color: #eeeeee;
 }
 
-.xDialogBody .gwt-TabPanel .gwt-TabBar .gwt-TabBarItem {
+.xDialogBody .gwt-TabBar .gwt-TabBarItem {
   background-color: #eeeeee;
-  height: 25px;
-  line-height: 19px;
   font-weight: normal;
   padding: 0 6px;
   margin-left: 0;
 }
 
-.xDialogBody .gwt-TabPanel .gwt-TabBar .gwt-TabBarItem-selected {
+.xDialogBody .gwt-TabBar .gwt-TabBarItem .gwt-Label {
+  height: 25px;
+  line-height: 25px;
+}
+
+.xDialogBody .gwt-TabBar .gwt-TabBarItem-selected {
   background-color: #ffffff;
 }
 
@@ -158,9 +161,9 @@
 
 .xLinkToUrl .gwt-TextBox, .xLinkConfig .gwt-TextBox, 
 .xLinkToNewPage .gwt-TextBox, .xUploadPanel .gwt-FileUpload,
-.xImageConfig .gwt-TextBox, .xMacroParameter .textInput,
-.xTablePanel .gwt-TextBox, .xImporterTabPanel .gwt-FileUpload, 
-.xExplorer input, .xSearchForm input {
+.xExternalImage .gwt-TextBox, .xImageConfig .gwt-TextBox,
+.xMacroParameter .textInput, .xTablePanel .gwt-TextBox,
+.xImporterTabPanel .gwt-FileUpload, .xExplorer input, .xSearchForm input {
   width: 433px;
   border: 1px solid #AAA;
   padding: 2px;

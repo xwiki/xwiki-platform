@@ -89,8 +89,8 @@ public class XWikiServletContextListener implements ServletContextListener
         // Class that need to lookup then just need to get it from the XWikiContext instance.
         // This is of course not necessary for XWiki components since they just need to implement
         // the Composable interface to get access to the Component Manager or better they simply
-        // need to define the Components they require as field members and configure the Plexus
-        // deployment descriptors (components.xml) so that they are automatically injected.
+        // need to declare their components requirements using the @Requirement annotation of the xwiki
+        // component manager together with a private class member, for automatic injection by the CM on init.
         servletContextEvent.getServletContext().setAttribute(
             org.xwiki.component.manager.ComponentManager.class.getName(), this.componentManager);
     }

@@ -94,7 +94,7 @@ XWiki.widgets.LiveTable = Class.create({
     this.totalRows = -1;
     this.fetchedRows = new Array();
     this.getUrl = url;
-    this.lastoffset = 1;
+    this.lastOffset = 1;
     this.sendReqNo = 0;
     this.recvReqNo = 0;
 
@@ -115,7 +115,7 @@ XWiki.widgets.LiveTable = Class.create({
     var currentHash = window.location.hash.substring(1);
     var filterString = this.filter ? this.filter.serializeFilters() : "";
 
-    var shouldUpdate = this.lastoffset != 1 || !currentHash.blank() || !filterString.blank();
+    var shouldUpdate = this.lastOffset != 1 || !currentHash.blank() || !filterString.blank();
 
     if (shouldUpdate) {
       var tables = currentHash.split("|"), newHash = "";
@@ -128,7 +128,7 @@ XWiki.widgets.LiveTable = Class.create({
       }
       newHash += "t=#{table}&p=#{page}".interpolate({
         "table" : this.domNodeName,
-        "page" : ((this.lastoffset - 1) / this.limit) + 1
+        "page" : ((this.lastOffset - 1) / this.limit) + 1
       });
 
       newHash += filterString;
@@ -327,7 +327,7 @@ XWiki.widgets.LiveTable = Class.create({
     */
   showRows: function(offset, limit)
   {
-    this.lastoffset = offset;
+    this.lastOffset = offset;
 
     if (this.permalinks) {
       this.updateLocationHash();
@@ -403,7 +403,7 @@ XWiki.widgets.LiveTable = Class.create({
     this.deleteAndShiftRows(indx);
 
     // Compute new refresh offset
-    var newoffset = this.lastoffset;
+    var newoffset = this.lastOffset;
     if(indx > this.totalRows - this.limit - 1) {
       newoffset -= 1;
     }
@@ -510,7 +510,7 @@ var LiveTablePagination = Class.create({
       });
       var pages = Math.ceil(this.table.totalRows / this.table.limit);
       var currentMax = (!this.max) ? pages : this.max;
-      var currentPage = Math.floor( this.table.lastoffset / this.table.limit) + 1;
+      var currentPage = Math.floor( this.table.lastOffset / this.table.limit) + 1;
       var startPage = Math.floor(currentPage / currentMax) * currentMax - 1;
       // always display the first page
       if (startPage>1) {
@@ -557,14 +557,14 @@ var LiveTablePagination = Class.create({
       this.table.showRows(((parseInt(page) - 1 )* this.table.limit) + 1, this.table.limit);
     },
     gotoPrevPage: function() {
-      var currentPage = Math.floor( this.table.lastoffset / this.table.limit) + 1;
+      var currentPage = Math.floor( this.table.lastOffset / this.table.limit) + 1;
       var prevPage = currentPage - 1;
       if (prevPage > 0) {
         this.table.showRows(((parseInt(prevPage) - 1) * this.table.limit) + 1, this.table.limit);
       }
     },
     gotoNextPage: function() {
-      var currentPage = Math.floor( this.table.lastoffset / this.table.limit) + 1;
+      var currentPage = Math.floor( this.table.lastOffset / this.table.limit) + 1;
       var pages = Math.ceil(this.table.totalRows / this.table.limit);
       var nextPage = currentPage + 1;
       if (nextPage <= pages) {

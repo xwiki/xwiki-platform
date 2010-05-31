@@ -100,23 +100,33 @@
 </property>
 <property>
 <content>#if($hasEdit || $showEmptyPanels)
-#panelheader($msg.get("create"))
-&lt;form method="post" action="$doc.getURL("view", "xpage=create")"&gt;
-&lt;div class="padded centered"&gt;
-&lt;label for="tocreate" class="hidden"&gt;$msg.get("xe.panels.new.itemType")&lt;/label&gt;
-&lt;select id="tocreate" name="tocreate" class="panelselect"&gt;
-  &lt;option value="page"&gt;$msg.get("xe.panels.new.page")&lt;/option&gt;
-  &lt;option value="space"&gt;$msg.get("xe.panels.new.space")&lt;/option&gt;
-&lt;/select&gt;
-&lt;/div&gt;
-&lt;div class="padded centered"&gt;
-&lt;input type="hidden" name="template" value="" /&gt;
-&lt;label for="title" class="hidden"&gt;$msg.get("xe.panels.new.name")&lt;/label&gt;
-&lt;input type="text" id="title" name="title" value="$msg.get("xe.panels.new.name")" class="panelinput" onfocus="if(this.value=='$msg.get("xe.panels.new.name")') this.value=''" onblur="if(this.value=='') this.value='$msg.get("xe.panels.new.name")'"/&gt;
-&lt;/div&gt;
-&lt;div class="padded centered"&gt;
-&lt;input type="submit" class="button" value="$msg.get("create")"/&gt;
-&lt;/div&gt;
+#panelheader($msg.get("core.create.pageTitle"))
+#set($panelId = $util.generateRandomString(4))
+&lt;form method="post" action="$doc.getURL('view', 'xpage=create')" onsubmit="cancelCancelEdit()"&gt;
+  &lt;div class="padded centered"&gt;
+    &lt;input type="hidden" name="tocreate" value="page"/&gt;
+    &lt;dl&gt;
+      &lt;dt&gt;
+        #set($spaceInputId = "space$!{panelId}")
+        &lt;label for="$spaceInputId"&gt;$msg.get('core.create.space')&lt;/label&gt;
+      &lt;/dt&gt;
+      &lt;dd&gt;
+        #set($space = $doc.documentReference.lastSpaceReference.name)
+        &lt;input type="text" id="$spaceInputId" name="space" value="$!space"/&gt;
+      &lt;/dd&gt;
+      &lt;dt&gt;
+        #set($pageInputId = "page$!{panelId}")
+        &lt;label for="$pageInputId"&gt;$msg.get('core.create.page')&lt;/label&gt;
+      &lt;/dt&gt;
+      &lt;dd&gt;
+        #set($pageText = $msg.get('core.create.pageText'))
+        &lt;input type="text" id="$pageInputId" name="page" value="$pageText" onfocus="if(this.value=='$pageText') this.value=''" onblur="if(this.value=='') this.value='$pageText'"/&gt;
+      &lt;/dd&gt;
+    &lt;/dl&gt;
+    #set($parent = $services.model.serialize($doc.documentReference, "local"))
+    &lt;input type="hidden" name="parent" value="$!parent"/&gt;
+    &lt;input type="submit" class="button" value="$msg.get('create')"/&gt;
+  &lt;/div&gt;
 &lt;/form&gt;
 #panelfooter()
 #end</content>

@@ -75,7 +75,7 @@ public class TempResourceAction extends XWikiAction
         String uri = request.getRequestURI();
 
         // Locate the temporary file.
-        File tempFile = getTempFile(uri);
+        File tempFile = getTemporaryFile(uri);
         if (null == tempFile) {
             throw new XWikiException(XWikiException.MODULE_XWIKI_APP, XWikiException.ERROR_XWIKI_APP_URL_EXCEPTION,
                 "Invalid temporary resource URL");
@@ -107,7 +107,7 @@ public class TempResourceAction extends XWikiAction
      * @param uri request URI.
      * @return temporary file corresponding to the specified URI or null if no such file can be located.
      */
-    private File getTempFile(String uri)
+    private File getTemporaryFile(String uri)
     {
         Matcher matcher = URI_PATTERN.matcher(uri);
         File result = null;

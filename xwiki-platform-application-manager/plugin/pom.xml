@@ -31,10 +31,10 @@
   </parent>
   <artifactId>xwiki-plugin-application-manager</artifactId>
   <name>XWiki Platform - Plugins - Application Manager</name>
-  <version>1.12-SNAPSHOT</version>
+  <version>1.12</version>
   <description>XWiki Platform - Plugins - Application Manager</description>
   <properties>
-    <platform.core.version>2.3.1</platform.core.version>
+    <platform.core.version>2.0.5</platform.core.version>
   </properties>
   <dependencies>
     <dependency>
@@ -72,9 +72,9 @@
   <!-- We must configure SCM in each module. For more information see:
        http://svn.xwiki.org/svnroot/xwiki/platform/pom/trunk/pom.xml -->
   <scm>
-    <connection>scm:svn:http://svn.xwiki.org/svnroot/xwiki/platform/xwiki-plugins/trunk/application-manager</connection>
-    <developerConnection>scm:svn:https://svn.xwiki.org/svnroot/xwiki/platform/xwiki-plugins/trunk/application-manager</developerConnection>
-    <url>http://svn.xwiki.org/svnroot/xwiki/platform/xwiki-plugins/trunk/application-manager</url>
+    <connection>scm:svn:http://svn.xwiki.org/svnroot/xwiki/platform/xwiki-plugins/tags/xwiki-plugin-application-manager-1.12</connection>
+    <developerConnection>scm:svn:https://svn.xwiki.org/svnroot/xwiki/platform/xwiki-plugins/tags/xwiki-plugin-application-manager-1.12</developerConnection>
+    <url>http://svn.xwiki.org/svnroot/xwiki/platform/xwiki-plugins/tags/xwiki-plugin-application-manager-1.12</url>
   </scm>
   <issueManagement>
     <system>jira</system>

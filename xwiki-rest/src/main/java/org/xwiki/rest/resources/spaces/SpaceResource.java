@@ -19,9 +19,6 @@
  */
 package org.xwiki.rest.resources.spaces;
 
-import java.util.Collections;
-import java.util.List;
-
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;

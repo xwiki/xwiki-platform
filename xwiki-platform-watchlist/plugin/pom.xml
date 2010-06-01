@@ -35,7 +35,7 @@
   <description>XWiki Platform - Plugins - WatchList Manager</description>
   <properties>
     <platform.core.version>2.3.1</platform.core.version>
-    <platform.plugin.scheduler.version>1.18</platform.plugin.scheduler.version>
+    <platform.plugin.scheduler.version>1.19</platform.plugin.scheduler.version>
     <platform.plugin.mailsender.version>1.14</platform.plugin.mailsender.version>
     <platform.plugin.activitystream.version>1.6</platform.plugin.activitystream.version>
   </properties>

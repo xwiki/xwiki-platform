@@ -49,11 +49,12 @@
     <smartgwt.version>2.0</smartgwt.version>
     <junit.version>3.8.2</junit.version>
     <!-- Versions of XWiki dependencies used in Platform/Web modules -->
-    <platform.tool.configuration.version>1.40-SNAPSHOT</platform.tool.configuration.version>
-    <platform.core.version>2.3-SNAPSHOT</platform.core.version>
-    <platform.skin.albatross.version>1.28-SNAPSHOT</platform.skin.albatross.version>
-    <platform.skin.toucan.version>1.34-SNAPSHOT</platform.skin.toucan.version>
-    <platform.skin.colibri.version>1.16-SNAPSHOT</platform.skin.colibri.version>
+    <platform.tool.configuration.version>1.39</platform.tool.configuration.version>
+    <platform.core.version>2.3.1</platform.core.version>
+    <platform.skin.albatross.version>1.27</platform.skin.albatross.version>
+    <platform.skin.toucan.version>1.33</platform.skin.toucan.version>
+    <!-- The last colibri version compatible with XE 2.3.x is 1.15 -->
+    <platform.skin.colibri.version>1.15</platform.skin.colibri.version>
   </properties>
   <profiles>
     <profile>

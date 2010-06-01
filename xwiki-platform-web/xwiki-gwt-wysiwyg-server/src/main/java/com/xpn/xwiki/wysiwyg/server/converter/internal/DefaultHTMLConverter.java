@@ -33,6 +33,7 @@ import org.xwiki.rendering.renderer.BlockRenderer;
 import org.xwiki.rendering.renderer.printer.DefaultWikiPrinter;
 import org.xwiki.rendering.renderer.printer.WikiPrinter;
 import org.xwiki.rendering.syntax.SyntaxFactory;
+import org.xwiki.rendering.transformation.TransformationContext;
 import org.xwiki.rendering.transformation.TransformationManager;
 
 
@@ -124,7 +125,10 @@ public class DefaultHTMLConverter implements HTMLConverter
             XDOM xdom = parser.parse(new StringReader(source));
 
             // Execute transformations
-            transformationManager.performTransformations(xdom, syntaxFactory.createSyntaxFromIdString(syntaxId));
+            TransformationContext txContext = new TransformationContext();
+            txContext.setXDOM(xdom);
+            txContext.setSyntax(syntaxFactory.createSyntaxFromIdString(syntaxId));
+            transformationManager.performTransformations(xdom, txContext);
 
             // Render
             WikiPrinter printer = new DefaultWikiPrinter();
@@ -152,7 +156,10 @@ public class DefaultHTMLConverter implements HTMLConverter
             XDOM xdom = xhtmlParser.parse(new StringReader(html));
 
             // Execute transformations
-            transformationManager.performTransformations(xdom, syntaxFactory.createSyntaxFromIdString(syntax));
+            TransformationContext txContext = new TransformationContext();
+            txContext.setXDOM(xdom);
+            txContext.setSyntax(syntaxFactory.createSyntaxFromIdString(syntax));
+            transformationManager.performTransformations(xdom, txContext);
 
             // Render
             WikiPrinter printer = new DefaultWikiPrinter();

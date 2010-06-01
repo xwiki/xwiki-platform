@@ -27,7 +27,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-core-component</artifactId>
-    <version>2.3.1</version>
+    <version>2.3-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-core-component-default</artifactId>
   <name>XWiki Platform - Core - Component - Default Implementation</name>

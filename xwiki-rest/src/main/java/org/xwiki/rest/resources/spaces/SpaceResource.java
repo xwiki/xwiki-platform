@@ -52,9 +52,6 @@ public class SpaceResource extends XWikiResource
         try {
             Utils.getXWikiContext(componentManager).setDatabase(wikiName);
 
-            List<String> spaceNames = Utils.getXWikiApi(componentManager).getSpaces();
-            Collections.sort(spaceNames);
-
             String homeId = Utils.getPageId(wikiName, spaceName, "WebHome");
             Document home = null;
 

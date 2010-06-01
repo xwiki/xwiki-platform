@@ -1,0 +1,29 @@
+.#---------------------------------------------------------------------------------------------------------
+.input|xwiki/2.0
+.#---------------------------------------------------------------------------------------------------------
+image:http://thor.info.uaic.ro/~evalica/img/x_logo_xwiki.png
+[[image:http://thor.info.uaic.ro/~~evalica/img/x_logo_xwiki.png]]
+[[http://thor.info.uaic.ro/~~evalica/img/x_logo_xwiki.png]]
+.#-----------------------------------------------------
+.expect|event/1.0
+.#-----------------------------------------------------
+beginDocument
+beginParagraph
+onImage: [http://thor.info.uaic.ro/~evalica/img/x_logo_xwiki.png] [true]
+onNewLine
+onImage: [http://thor.info.uaic.ro/~evalica/img/x_logo_xwiki.png] [false]
+onNewLine
+beginLink [Reference = [http://thor.info.uaic.ro/~evalica/img/x_logo_xwiki.png]] [false]
+endLink [Reference = [http://thor.info.uaic.ro/~evalica/img/x_logo_xwiki.png]] [false]
+endParagraph
+endDocument
+.#-----------------------------------------------------
+.expect|annotatedxhtml/1.0
+.#-----------------------------------------------------
+<p><!--startimage:http://thor.info.uaic.ro/~evalica/img/x_logo_xwiki.png--><img src="http://thor.info.uaic.ro/~evalica/img/x_logo_xwiki.png" class="wikimodel-freestanding" alt="http://thor.info.uaic.ro/~evalica/img/x_logo_xwiki.png"/><!--stopimage--><br/><!--startimage:http://thor.info.uaic.ro/~evalica/img/x_logo_xwiki.png--><img src="http://thor.info.uaic.ro/~evalica/img/x_logo_xwiki.png" alt="http://thor.info.uaic.ro/~evalica/img/x_logo_xwiki.png"/><!--stopimage--><br/><!--startwikilink:http://thor.info.uaic.ro/~evalica/img/x_logo_xwiki.png--><span class="wikiexternallink"><a href="http://thor.info.uaic.ro/~evalica/img/x_logo_xwiki.png"><span class="wikigeneratedlinkcontent">http://thor.info.uaic.ro/~evalica/img/x_logo_xwiki.png</span></a></span><!--stopwikilink--></p>
+.#-----------------------------------------------------
+.expect|xwiki/2.0
+.#-----------------------------------------------------
+image:http://thor.info.uaic.ro/~evalica/img/x_logo_xwiki.png
+[[image:http://thor.info.uaic.ro/~~evalica/img/x_logo_xwiki.png]]
+[[http://thor.info.uaic.ro/~~evalica/img/x_logo_xwiki.png]]

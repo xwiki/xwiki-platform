@@ -21,6 +21,7 @@ package org.xwiki.gwt.wysiwyg.client;
 
 import org.xwiki.gwt.dom.client.JavaScriptObject;
 import org.xwiki.gwt.user.client.Config;
+import org.xwiki.gwt.user.client.NativeActionHandler;
 import org.xwiki.gwt.user.client.NativeAsyncCallback;
 import org.xwiki.gwt.user.client.internal.DefaultConfig;
 import org.xwiki.gwt.user.client.ui.rta.RichTextArea;
@@ -32,6 +33,7 @@ import org.xwiki.gwt.wysiwyg.client.converter.HTMLConverterAsync;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.logical.shared.CloseEvent;
 import com.google.gwt.event.logical.shared.CloseHandler;
+import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.user.client.DOM;
 import com.google.gwt.user.client.Element;
 import com.google.gwt.user.client.Window;
@@ -193,6 +195,22 @@ public class WysiwygEditorApi
     }
 
     /**
+     * Creates an action handler that wraps the given JavaScript function and registers it for the specified action.
+     * 
+     * @param actionName the name of the action to listen to
+     * @param jsHandler the JavaScript function to be called when the specified action occurs
+     * @return the registration for the event, to be used for removing the handler
+     */
+    public HandlerRegistration addActionHandler(String actionName, JavaScriptObject jsHandler)
+    {
+        if (editor != null) {
+            return editor.getRichTextEditor().getTextArea().addActionHandler(actionName,
+                new NativeActionHandler(jsHandler));
+        }
+        return null;
+    }
+
+    /**
      * Publishes the JavaScript API that can be used to create and control {@link WysiwygEditor}s.
      */
     public static native void publish()
@@ -218,6 +236,15 @@ public class WysiwygEditorApi
         }
         $wnd.WysiwygEditor.prototype.getCommandManager = function() {
             return this.instance.@org.xwiki.gwt.wysiwyg.client.WysiwygEditorApi::getCommandManagerApi()();
+        }
+        $wnd.WysiwygEditor.prototype.addActionHandler = function(actionName, handler) {
+            var registration = this.instance.@org.xwiki.gwt.wysiwyg.client.WysiwygEditorApi::addActionHandler(Ljava/lang/String;Lorg/xwiki/gwt/dom/client/JavaScriptObject;)(actionName, handler);
+            return function() {
+                if (registration) {
+                    registration.@com.google.gwt.event.shared.HandlerRegistration::removeHandler()();
+                    registration = null;
+                }
+            };
         }
     }-*/;
 }

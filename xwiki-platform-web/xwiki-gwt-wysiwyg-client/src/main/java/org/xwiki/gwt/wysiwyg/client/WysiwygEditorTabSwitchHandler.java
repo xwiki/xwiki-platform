@@ -23,6 +23,7 @@ package org.xwiki.gwt.wysiwyg.client;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.xwiki.gwt.user.client.ActionEvent;
 import org.xwiki.gwt.user.client.CancelableAsyncCallback;
 import org.xwiki.gwt.user.client.Console;
 import org.xwiki.gwt.user.client.ui.rta.Reloader;
@@ -157,18 +158,33 @@ public class WysiwygEditorTabSwitchHandler implements SelectionHandler<Integer>,
         if (event.getItem() == currentlySelectedTab) {
             // Tab already selected.
             event.cancel();
-        } else if (currentlySelectedTab == WysiwygEditor.WYSIWYG_TAB_INDEX && !editor.getRichTextEditor().isLoading()) {
-            // Notify the plug-ins that the content of the rich text area is about to be submitted.
-            // We have to do this before the tabs are actually switched because plug-ins can't access the computed style
-            // of the rich text area when it is hidden.
-            editor.getRichTextEditor().getTextArea().getCommandManager().execute(SUBMIT);
-            // Save the DOM selection before the rich text area is hidden.
-            domSelectionPreserver.saveSelection();
-        } else if (currentlySelectedTab == WysiwygEditor.SOURCE_TAB_INDEX && !editor.getPlainTextEditor().isLoading()) {
-            // Save the source selection before the plain text area is hidden.
-            sourceRange[0] = editor.getPlainTextEditor().getTextArea().getCursorPos();
-            sourceRange[1] = editor.getPlainTextEditor().getTextArea().getSelectionLength();
+            return;
         }
+
+        switch (currentlySelectedTab) {
+            case WysiwygEditor.WYSIWYG_TAB_INDEX:
+                if (!editor.getRichTextEditor().isLoading()) {
+                    // Notify the plug-ins that the content of the rich text area is about to be submitted.
+                    // We have to do this before the tabs are actually switched because plug-ins can't access the
+                    // computed style of the rich text area when it is hidden.
+                    editor.getRichTextEditor().getTextArea().getCommandManager().execute(SUBMIT);
+                    // Save the DOM selection before the rich text area is hidden.
+                    domSelectionPreserver.saveSelection();
+                }
+                break;
+            case WysiwygEditor.SOURCE_TAB_INDEX:
+                if (!editor.getPlainTextEditor().isLoading()) {
+                    // Save the source selection before the plain text area is hidden.
+                    sourceRange[0] = editor.getPlainTextEditor().getTextArea().getCursorPos();
+                    sourceRange[1] = editor.getPlainTextEditor().getTextArea().getSelectionLength();
+                }
+                break;
+            default:
+                break;
+        }
+
+        String[] actionNames = new String[] {"showingWysiwyg", "showingSource"};
+        ActionEvent.fire(editor.getRichTextEditor().getTextArea(), actionNames[event.getItem()]);
     }
 
     /**
@@ -291,6 +307,9 @@ public class WysiwygEditorTabSwitchHandler implements SelectionHandler<Integer>,
         editor.getPlainTextEditor().getTextArea().setFocus(true);
         // Restore the selected text or place the caret at start.
         editor.getPlainTextEditor().getTextArea().setSelectionRange(sourceRange[0], sourceRange[1]);
+        // Notify action listeners that the source tab was loaded. We fire the action event here because this method is
+        // called both when the source text area is reloaded and when it is just redisplayed.
+        ActionEvent.fire(editor.getRichTextEditor().getTextArea(), "showSource");
     }
 
     /**
@@ -406,5 +425,8 @@ public class WysiwygEditorTabSwitchHandler implements SelectionHandler<Integer>,
         editor.getRichTextEditor().getTextArea().setFocus(true);
         // Restore the DOM selection.
         domSelectionPreserver.restoreSelection();
+        // Notify action listeners that the WYSIWYG tab was loaded. We fire the action event here because this method is
+        // called both when the rich text area is reloaded and when it is just redisplayed.
+        ActionEvent.fire(editor.getRichTextEditor().getTextArea(), "showWysiwyg");
     }
 }

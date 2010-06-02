@@ -206,6 +206,14 @@ Wysiwyg.onModuleLoad(function() {
     var WysiwygEditorAspect = function() {
         WysiwygEditorAspect.base.constructor.apply(this, arguments);
         if (this.getRichTextArea()) {
+            // Register action listeners.
+            var onAction = function(actionName) {
+                document.fire('xwiki:wysiwyg:' + actionName, {'instance': this});
+            }
+            var actionNames = ['loaded', 'showingSource', 'showSource', 'showingWysiwyg', 'showWysiwyg'];
+            for(var i = 0; i < actionNames.length; i++) {
+                this.addActionHandler(actionNames[i], onAction.bind(this));
+            }
             // If the editor was successfully created then fire a custom event.
             document.fire('xwiki:wysiwyg:created', {'instance': this});
         }

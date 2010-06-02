@@ -19,6 +19,7 @@
  */
 package org.xwiki.gwt.wysiwyg.client;
 
+import org.xwiki.gwt.user.client.ActionEvent;
 import org.xwiki.gwt.user.client.Config;
 import org.xwiki.gwt.user.client.DeferredUpdater;
 import org.xwiki.gwt.user.client.HandlerRegistrationCollection;
@@ -203,6 +204,8 @@ public class RichTextEditorController implements Updatable, MouseUpHandler, KeyU
             fillMenu();
             toolBarController.fill(config, pluginManager);
             initTextArea();
+
+            ActionEvent.fire(getRichTextEditor().getTextArea(), "loaded");
         }
     }
 

@@ -186,7 +186,12 @@ public class XarMojo extends AbstractXarMojo
         infoElement.add(el);
 
         el = new DOMElement("description");
-        el.addText(this.project.getDescription());
+        String description = this.project.getDescription();
+        if (description == null) {
+            el.addText("");
+        } else {
+            el.addText(description);
+        }
         infoElement.add(el);
 
         el = new DOMElement("licence");

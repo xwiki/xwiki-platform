@@ -27,7 +27,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki</artifactId>
-    <version>32-SNAPSHOT</version>
+    <version>32</version>
     <relativePath>../pom</relativePath>
   </parent>
   <groupId>org.xwiki.platform</groupId>
@@ -38,7 +38,7 @@
   <description>XWiki Platform - Core - Parent POM</description>
   <properties>
     <!-- Versions of XWiki dependencies used in Core modules -->
-    <clirr.previous.version>2.2</clirr.previous.version>
+    <clirr.previous.version>2.3</clirr.previous.version>
   </properties>
   <scm>
     <connection>scm:svn:http://svn.xwiki.org/svnroot/xwiki/platform/core/trunk</connection>

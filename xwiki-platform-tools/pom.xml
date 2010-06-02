@@ -27,7 +27,7 @@
   <parent>
     <artifactId>xwiki-tools</artifactId>
     <groupId>org.xwiki.platform.tools</groupId>
-    <version>23</version>
+    <version>24-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-standards-validator</artifactId>
   <name>XWiki Platform - Tools - Web Standards Validator</name>

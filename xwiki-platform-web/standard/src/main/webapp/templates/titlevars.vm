@@ -18,7 +18,7 @@
 ## ensure we don't break existing documents that have not yet migrated to the
 ## new way.
 ## ----------------------------------------------------------------------------------
-#set ($titleToDisplay = $tdoc.displayTitle)
+#set ($titleToDisplay = "$!{escapetool.xml($tdoc.displayTitle)}")
 #if ($tdoc.title.length() == 0 || $xwiki.isTitleInCompatibilityMode())
   ## Look for first H1-H6 either in lowercase or uppercase
   #set ($regexResult = $regextool.find($renderedContent, "<([hH][1-6]).*?>(?:<span>)?(.*?)(?:</span>)?</[hH][1-6]>"))

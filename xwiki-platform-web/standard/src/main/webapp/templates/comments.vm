@@ -5,7 +5,7 @@
 #if("$!request.xpage" == 'comments')
   $response.sendRedirect($doc.getURL('view', 'viewer=comments'))
 #else
-  <div id="document-title"><h1>$msg.get('core.viewers.comments.title', [$xwiki.getXMLEncoded($doc.displayTitle), $doc.getURL()])</h1></div>
+  <div id="document-title"><h1>$msg.get('core.viewers.comments.title', [$escapetool.xml($doc.displayTitle), $doc.getURL()])</h1></div>
   #template("shortcuts.vm")
   #template("commentsinline.vm")
 #end

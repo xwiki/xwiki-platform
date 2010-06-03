@@ -6,7 +6,7 @@
 #set($discard = $parents.add($parent))
 #set($pdoc = $xwiki.getDocument($parent).getTranslatedDocument())
 #set($pdocurl = $pdoc.getURL("view"))
-#set($nstring = "<a href='$pdocurl'>$xwiki.getXMLEncoded(${pdoc.getRenderedTitle('plain/1.0')})</a> &gt; $string")
+#set($nstring = "<a href='$pdocurl'>$escapetool.xml(${pdoc.getRenderedTitle('plain/1.0')})</a> &gt; $string")
 #set($level = $level + 1)
 #breadcrumb($pdoc $nstring $level)
 #else
@@ -18,8 +18,8 @@ $string
 <div class="minwidth"></div>
 <hr/>
   <div id="breadcrumbs">
-    <span class="breadcrumbspace"><a href="$spaceViewUrl">$xwiki.getXMLEncoded(${doc.space})</a>: </span>
-#breadcrumb($doc "<a href='${doc.getURL('view')}'>$xwiki.getXMLEncoded($tdoc.getRenderedTitle('plain/1.0'))</a>" 0)
+    <span class="breadcrumbspace"><a href="$spaceViewUrl">$escapetool.xml(${doc.space})</a>: </span>
+#breadcrumb($doc "<a href='${doc.getURL('view')}'>$escapetool.xml($tdoc.getRenderedTitle('plain/1.0'))</a>" 0)
   </div>
 <hr/>
 </div>

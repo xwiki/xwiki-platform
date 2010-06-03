@@ -27,8 +27,8 @@ $xwiki.ssfx.use('uicomponents/widgets/notification.css', true)
 XWiki.webapppath = "${xwiki.webAppPath}";
 XWiki.servletpath = "${xwiki.servletPath}";
 XWiki.contextPath = "${request.contextPath}";
-XWiki.mainWiki = "${context.mainWikiName}";
-XWiki.currentWiki = "${context.database}";
+XWiki.mainWiki = "$!{escapetool.javascript(${context.mainWikiName})}";
+XWiki.currentWiki = "$!{escapetool.javascript(${context.database})}";
 XWiki.currentSpace = "$!{escapetool.javascript($doc.space)}";
 XWiki.currentPage = "$!{escapetool.javascript($doc.name)}";
 XWiki.editor = "$!{escapetool.javascript($editor)}";

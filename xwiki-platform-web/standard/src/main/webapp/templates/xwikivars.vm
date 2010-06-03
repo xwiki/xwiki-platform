@@ -48,16 +48,16 @@
 ## preference and all public API will do the hidden spaces filtering by default. 
 ## ======================================================================================
 #set($dump = $request.getSession().setAttribute("blacklistedSpaces", $blacklistedSpaces))
-#set($parent ="<a href='$parentDoc.getURL()'>$xwiki.getXMLEncoded(${parentDoc.displayTitle})</a>")
+#set($parent ="<a href='$parentDoc.getURL()'>$escapetool.xml(${parentDoc.displayTitle})</a>")
 #if($tdoc)
-#set($headertitle = "<a href='$viewUrl'>$xwiki.getXMLEncoded(${tdoc.displayTitle})</a>")
+#set($headertitle = "<a href='$viewUrl'>$escapetool.xml(${tdoc.displayTitle})</a>")
 #else
-#set($headertitle = "<a href='$viewUrl'>$xwiki.getXMLEncoded(${doc.displayTitle})</a>")
+#set($headertitle = "<a href='$viewUrl'>$escapetool.xml(${doc.displayTitle})</a>")
 #end
 #set($skin=$xwiki.getSkin())
-#set($copyright=$xwiki.getSpaceCopyright())
+#set($copyright = "$!{escapetool.xml($xwiki.getSpaceCopyright())}")
 #set($xwikimode=$context.getMode())
-#set($logredir = $xwiki.getFormEncoded($xwiki.getRequestURL()))
+#set($logredir = $escapetool.xml($xwiki.getRequestURL()))
 ##
 #if($xwiki.exists("XWiki.MaintenanceInfo"))
 #set($maintenanceinfo = "XWiki.MaintenanceInfo")
@@ -73,7 +73,7 @@
 #end
 ## Check revision option
 #if ($request.rev)
-#set($revparams="rev=${request.rev}")
+#set($revparams = "rev=$!{escapetool.xml(${request.rev})}")
 #else
 #set($revparams = "")
 #end

@@ -11,13 +11,13 @@
   #set ($adminapppresent = $xwiki.exists('XWiki.AdminSheet'))
   #if(!$hasAdminWikiRights && $adminapppresent)
     #xwikitopmenuentrystart($adminspaceaction $msg.get('core.menu.admin') 'tmAdmin')
-    #submenuitem($adminspaceaction $msg.get('core.menu.admin.space', [$doc.space]) 'tmAdminspace')
+    #submenuitem($adminspaceaction $msg.get('core.menu.admin.space', ["$!{escapetool.xml($doc.space)}"]) 'tmAdminspace')
     #xwikitopmenuentryend()
   #else
     #if ($adminapppresent)
       #xwikitopmenuentrystart($adminwikiaction $msg.get('core.menu.admin') 'tmAdmin')
       #submenuitem($adminwikiaction $msg.get('core.menu.admin.wiki') 'tmAdminwiki')
-      #submenuitem($adminspaceaction $msg.get('core.menu.admin.space', [$xwiki.getXMLEncoded($doc.space)]) 'tmAdminspace')
+      #submenuitem($adminspaceaction $msg.get('core.menu.admin.space', ["$!{escapetool.xml($doc.space)}"]) 'tmAdminspace')
       #xwikitopmenuentryend()
     #else
       #xwikitopmenuentry($importaction $msg.get('core.menu.admin') 'tmAdmin')
@@ -37,8 +37,8 @@
 ##
 ##if($hasEdit)
 ### #xwikitopmenuentrystart($doc.getURL($editaction, $!languageparams) $msg.get('core.menu.create') 'tmCreate')
-##xwikitopmenuentrystart($xwiki.getURL('XWiki.CreateSubpage', 'view', "parent=${doc.fullName}") $msg.get('core.menu.create') 'tmCreate')
-##submenuitem($xwiki.getURL('XWiki.CreatePage', 'view', "parent=${doc.fullName}") $msg.get('core.menu.create.page') 'tmCreatePage')
+##xwikitopmenuentrystart($xwiki.getURL('XWiki.CreateSubpage', 'view', "parent=$!{escapetool.url(${doc.fullName})}") $msg.get('core.menu.create') 'tmCreate')
+##submenuitem($xwiki.getURL('XWiki.CreatePage', 'view', "parent=$!{escapetool.url(${doc.fullName})}") $msg.get('core.menu.create.page') 'tmCreatePage')
 ##submenuitem($xwiki.getURL('XWiki.CreatePage', 'view', 'tocreate=space') $msg.get('core.menu.create.space') 'tmCreateSpace')
 ##submenuitem($xwiki.getURL('Blog.CreateBlogPost') $msg.get('core.menu.create.blogpost') 'tmCreateBlogPost')
 ##if($xwiki.hasAccessLevel('edit', 'Main.EventCalendar'))#submenuitem($xwiki.getURL('Main.EventCalendar') $msg.get('core.menu.create.event') 'tmCreateCalendarEvent')#end
@@ -51,7 +51,7 @@
 #if($isAdvancedUser)
 #xwikitopmenuentrystart($doc.getURL($editaction, $!languageparams) $msg.get('core.menu.edit') 'tmEdit')
 #submenuitem($doc.getURL('edit', "$!{languageparams}&amp;editor=wiki") $msg.get('core.menu.edit.wiki') 'tmEditWiki')
-#submenuitem($doc.getURL('edit', "$!languageparams&amp;editor=wysiwyg") $msg.get('core.menu.edit.wysiwyg') 'tmEditWysiwyg')
+#submenuitem($doc.getURL('edit', "$!{languageparams}&amp;editor=wysiwyg") $msg.get('core.menu.edit.wysiwyg') 'tmEditWysiwyg')
 #submenuitem($doc.getURL('inline', $!languageparams) $msg.get('core.menu.edit.inline') 'tmEditInline')
 #submenuseparator()
 #submenuitem($doc.getURL('edit', 'editor=rights') $msg.get('core.menu.edit.rights') 'tmEditRights')
@@ -113,7 +113,7 @@
 #submenuitem($doc.getURL('export', "format=pdf&amp;$!docvariant") $msg.get('core.menu.export.pdf') 'tmExportPdf')
 #submenuitem($doc.getURL('export', "format=rtf&amp;$!docvariant") $msg.get('core.menu.export.rtf') 'tmExportRtf')
 #submenuitem($doc.getURL('export', "format=html&amp;$!docvariant") $msg.get('core.menu.export.html') 'tmExportHtml')
-#submenuitem($doc.getURL('export', "format=xar&amp;name=$util.encodeURI($doc.fullName)&amp;pages=$util.encodeURI($doc.fullName)&amp;$!docvariant") $msg.get('core.menu.export.xar') 'tmExportXar')
+#submenuitem($doc.getURL('export', "format=xar&amp;name=$escapetool.url($doc.fullName)&amp;pages=$escapetool.url($doc.fullName)&amp;$!docvariant") $msg.get('core.menu.export.xar') 'tmExportXar')
 #xwikitopmenuentryend()
 ##
 ## Actions menu
@@ -183,13 +183,13 @@ function watchlist(action)
   #end
   #submenuseparator()
   #if (!$isSpaceWatched)
-    #submenuitem("javascript:watchlist('addspace')" $msg.get('core.menu.watchlist.add.space', [$xwiki.getXMLEncoded($doc.space)]) 'tmWatchSpace')
+    #submenuitem("javascript:watchlist('addspace')" $msg.get('core.menu.watchlist.add.space', [$escapetool.xml($doc.space)]) 'tmWatchSpace')
   #else
     #submenuitem("javascript:watchlist('removespace')" $msg.get('core.menu.watchlist.remove.space') 'tmUnwatchSpace')
   #end
   #submenuseparator()
   #if (!$isWikiWatched)
-    #submenuitem("javascript:watchlist('addwiki')" $msg.get('core.menu.watchlist.add.wiki', [$xwiki.getXMLEncoded($doc.wiki)]) 'tmWatchWiki')
+    #submenuitem("javascript:watchlist('addwiki')" $msg.get('core.menu.watchlist.add.wiki', [$escapetool.xml($doc.wiki)]) 'tmWatchWiki')
   #else
     #submenuitem("javascript:watchlist('removewiki')" $msg.get('core.menu.watchlist.remove.wiki') 'tmUnwatchWiki')
   #end

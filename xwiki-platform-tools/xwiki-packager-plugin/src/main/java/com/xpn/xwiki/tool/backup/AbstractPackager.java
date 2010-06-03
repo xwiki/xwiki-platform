@@ -54,14 +54,13 @@ public class AbstractPackager
      */
     protected XWikiContext createXWikiContext(String databaseName, File hibernateConfig) throws Exception
     {
-        XWikiContext context = new XWikiContext();
-
         EmbeddableComponentManager ecm = new EmbeddableComponentManager();
         ecm.initialize(this.getClass().getClassLoader());
-        
-        // We need to initialize the Component Manager so that the components can be looked up
-        context.put(ComponentManager.class.getName(), ecm);
         Utils.setComponentManager(ecm);
+
+        // We need to initialize the Component Manager so that the components can be looked up
+        XWikiContext context = new XWikiContext();
+        context.put(ComponentManager.class.getName(), ecm);
 
         // Initialize the Container fields (request, response, session).
         ExecutionContextManager ecim = Utils.getComponent(ExecutionContextManager.class);

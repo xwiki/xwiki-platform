@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xwikidoc>
+<web>XWiki</web>
+<name>AdminTemplatesSheet</name>
+<language></language>
+<defaultLanguage>en</defaultLanguage>
+<translation>0</translation>
+<parent>XWiki.XWikiPreferences</parent>
+<creator>XWiki.Admin</creator>
+<author>XWiki.Admin</author>
+<customClass></customClass>
+<contentAuthor>XWiki.Admin</contentAuthor>
+<creationDate>1274777649000</creationDate>
+<date>1274777649000</date>
+<contentUpdateDate>1274777649000</contentUpdateDate>
+<version>1.1</version>
+<title>Admin Templates Sheet</title>
+<template></template>
+<defaultTemplate></defaultTemplate>
+<validationScript></validationScript>
+<comment></comment>
+<minorEdit>false</minorEdit>
+<syntaxId>xwiki/2.0</syntaxId>
+<hidden>false</hidden>
+<content>{{velocity}}
+= $msg.get('admin.templates.createprovider') =
+
+{{html}}
+  &lt;form action="$doc.getURL('create')" method="post"&gt;
+    &lt;input type="hidden" name="parent" value="XWiki.TemplateProviderClass"/&gt;
+    &lt;input type="hidden" name="template" value="XWiki.TemplateProviderTemplate"/&gt;
+    &lt;label for="space"&gt;$msg.get('admin.templates.createprovider.space')&lt;/label&gt;
+    &lt;input type="text" id="space" name="space" value="XWiki" size="8"/&gt;
+    &lt;label for="page"&gt;$msg.get('admin.templates.createprovider.page')&lt;/label&gt;
+    &lt;input type="text" id="page" name="page" value="$msg.get('admin.templates.createprovider.defaultdocname')" class="withTip"'/&gt;    
+    &lt;input type="submit" value="$msg.get('admin.templates.createprovider.create')" class="button"/&gt;&lt;/span&gt;  
+  &lt;/form&gt;
+{{/html}}
+
+#set($availableProviders = $xwiki.searchDocuments(", BaseObject obj where doc.fullName=obj.name and obj.className='XWiki.TemplateProviderClass' and doc.fullName!='XWiki.TemplateProviderTemplate'"))
+#if($availableProviders.size() &gt; 0)
+
+= $msg.get('admin.templates.providerslist') =
+
+  #foreach($providerFullname in $availableProviders)
+    * [[$xwiki.getDocument($providerFullname).getTitle()&gt;&gt;$providerFullname]]
+  #end
+#end
+{{/velocity}}</content>
+</xwikidoc>

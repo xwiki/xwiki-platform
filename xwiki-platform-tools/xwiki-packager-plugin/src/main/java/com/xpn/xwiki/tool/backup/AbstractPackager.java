@@ -64,8 +64,8 @@ public class AbstractPackager
         Utils.setComponentManager(ecm);
 
         // Initialize the Container fields (request, response, session).
-        ExecutionContextManager ecim = (ExecutionContextManager) Utils.getComponent(ExecutionContextManager.class);
-        Execution execution = (Execution) Utils.getComponent(Execution.class);
+        ExecutionContextManager ecim = Utils.getComponent(ExecutionContextManager.class);
+        Execution execution = Utils.getComponent(Execution.class);
         try {
             ExecutionContext ec = new ExecutionContext();
 

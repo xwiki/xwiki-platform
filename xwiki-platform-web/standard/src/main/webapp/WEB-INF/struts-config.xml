@@ -115,6 +115,12 @@
                 scope="request">
             <forward name="edit" path="/templates/edit.vm"/>
         </action>
+        <action path="/create/" 
+                type="com.xpn.xwiki.web.CreateAction" 
+                name="create"
+                scope="request">
+            <forward name="create" path="/templates/create.vm" />
+        </action>
 
         <action path="/inline/"
                 type="com.xpn.xwiki.web.InlineAction"

@@ -411,6 +411,56 @@ Object.extend(XWiki, {
           }
       }
   },
+  
+  /**
+   * Display a modal box allowing to create the new document from a template when clicking on broken links.
+   */
+  insertCreatePageFromTemplateModalBoxes: function() {
+	  // Insert links only in view mode and for xwiki/2.0 documents.
+	  if (XWiki.docsyntax == "xwiki/2.0" && XWiki.contextaction == "view" && XWiki.hasEdit) {
+		  XWiki.widgets.CreatePagePopup = Class.create(XWiki.widgets.ModalPopup, {
+			  initialize : function($super, interactionParameters) {
+			      var content =  new Element('div', {'class': 'modal-popup'});
+		          content.insert(interactionParameters.content);
+				  $super(
+						  content,
+						  {
+							  "show"  : { method : this.showDialog,  keys : [] },
+							  "close" : { method : this.closeDialog, keys : ['Esc'] }
+						  },
+						  {
+							  displayCloseButton : true,
+							  verticalPosition : "center",
+							  backgroundColor : "#FFF"
+						  }
+				  );
+				  this.showDialog();
+				  this.setClass("createpage-modal-popup");
+			  }
+		  });
+
+		  var spans = document.body.select("span.wikicreatelink"); 
+		  for (var i = 0; i < spans.length; i++) {
+			  spans[i].down('a').observe('click', function(event) {				  
+				  new Ajax.Request(event.currentTarget.href + '&xpage=createinline&ajax=1', {
+					  method:'get',
+					  onSuccess: function(transport) {
+					      var redirect = transport.getHeader('redirect');
+			              if (redirect) {
+			            	window.location = redirect;
+			              } else {
+				            new XWiki.widgets.CreatePagePopup({content: transport.responseText});
+			              }
+				  	  },
+				      onFailure: function() {
+				  	    new XWiki.widgets.Notification("$msg.get('core.create.ajax.error')", 'error', {inactive: true}).show();
+	                  }
+                  });				  
+				  event.stop();
+			  });
+		  }
+	  }
+  },
 
   /**
    * Watchlist methods.
@@ -541,6 +591,7 @@ Object.extend(XWiki, {
       this.makeRenderingErrorsExpandable();
       this.fixLinksTargetAttribute();
       this.insertSectionEditLinks();
+      this.insertCreatePageFromTemplateModalBoxes();
       this.watchlist.initialize();
 
       document.fire("xwiki:dom:loaded");

@@ -35,8 +35,10 @@ import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
+import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.EntityReferenceSerializer;
 
 import com.xpn.xwiki.XWikiContext;
@@ -62,6 +64,8 @@ public class XWikiRightServiceImpl implements XWikiRightService
 
     private static final List<String> ALLLEVELS =
             Arrays.asList("admin", "view", "edit", "comment", "delete", "undelete", "register", "programming");
+
+    private static final EntityReference DEFAULTUSERSPACE = new EntityReference("XWiki", EntityType.SPACE);
 
     private static Map<String, String> actionMap;
 
@@ -94,7 +98,9 @@ public class XWikiRightServiceImpl implements XWikiRightService
     protected void logDeny(String name, String resourceKey, String accessLevel, String info, Exception e)
     {
         if (LOG.isDebugEnabled()) {
-            LOG.debug("Access has been denied for (" + name + "," + resourceKey + "," + accessLevel + ") at " + info, e);
+            LOG
+                .debug("Access has been denied for (" + name + "," + resourceKey + "," + accessLevel + ") at " + info,
+                    e);
         }
     }
 
@@ -274,8 +280,7 @@ public class XWikiRightServiceImpl implements XWikiRightService
 
         try {
             needsAuth =
-                    context.getWiki().getXWikiPreference("authenticate_" + right, "", context).toLowerCase().equals(
-                        "yes");
+                context.getWiki().getXWikiPreference("authenticate_" + right, "", context).toLowerCase().equals("yes");
         } catch (Exception e) {
         }
 
@@ -286,7 +291,7 @@ public class XWikiRightServiceImpl implements XWikiRightService
 
         try {
             needsAuth |=
-                    context.getWiki().getSpacePreference("authenticate_" + right, "", context).toLowerCase().equals("yes");
+                context.getWiki().getSpacePreference("authenticate_" + right, "", context).toLowerCase().equals("yes");
         } catch (Exception e) {
         }
 
@@ -314,15 +319,16 @@ public class XWikiRightServiceImpl implements XWikiRightService
         }
     }
 
-    public boolean checkRight(String userOrGroupName, XWikiDocument doc, String accessLevel, boolean user, boolean allow,
-        boolean global, XWikiContext context) throws XWikiRightNotFoundException, XWikiException
+    public boolean checkRight(String userOrGroupName, XWikiDocument doc, String accessLevel, boolean user,
+        boolean allow, boolean global, XWikiContext context) throws XWikiRightNotFoundException, XWikiException
     {
         String className = global ? "XWiki.XWikiGlobalRights" : "XWiki.XWikiRights";
         String fieldName = user ? "users" : "groups";
         boolean found = false;
 
         // Here entity is either a user or a group
-        DocumentReference userOrGroupDocumentReference = this.currentMixedDocumentReferenceResolver.resolve(userOrGroupName);
+        DocumentReference userOrGroupDocumentReference =
+            this.currentMixedDocumentReferenceResolver.resolve(userOrGroupName);
         String prefixedFullName = this.entityReferenceSerializer.serialize(userOrGroupDocumentReference);
         String shortname = userOrGroupName;
         int i0 = userOrGroupName.indexOf(":");
@@ -331,8 +337,8 @@ public class XWikiRightServiceImpl implements XWikiRightService
         }
 
         if (LOG.isDebugEnabled()) {
-            LOG.debug("Checking right: " + userOrGroupName + "," + doc.getFullName() + "," + accessLevel + "," + user + ","
-                + allow + "," + global);
+            LOG.debug("Checking right: " + userOrGroupName + "," + doc.getFullName() + "," + accessLevel + "," + user
+                + "," + allow + "," + global);
         }
 
         Vector<BaseObject> vobj = doc.getObjects(className);
@@ -447,7 +453,8 @@ public class XWikiRightServiceImpl implements XWikiRightService
         Collection<String> grouplist = new HashSet<String>();
         XWikiGroupService groupService = context.getWiki().getGroupService(context);
 
-        // FIXME: it looks like this code was supposed to get user or group groups in current wikis but listGroupsForUser
+        // FIXME: it looks like this code was supposed to get user or group groups in current wikis but
+        // listGroupsForUser
         // always return groups from entity wiki, maybe listGroupsForUser changed at some point
         {
             // the key is for the entity <code>prefixedFullName</code> in current wiki
@@ -541,18 +548,19 @@ public class XWikiRightServiceImpl implements XWikiRightService
             LOG.debug("hasAccessLevel for " + accessLevel + ", " + userOrGroupName + ", " + entityReference);
         }
 
-        DocumentReference userOrGroupNameReference = this.currentMixedDocumentReferenceResolver.resolve(userOrGroupName);
+        DocumentReference userOrGroupNameReference =
+            this.currentMixedDocumentReferenceResolver.resolve(userOrGroupName);
 
         if (!userOrGroupNameReference.getName().equals(XWikiRightService.GUEST_USER) && context.getDatabase() != null) {
             // Make sure to have the prefixed full name of the user or group
-            if (!StringUtils.contains(userOrGroupName, ':')) {
-                userOrGroupName = context.getDatabase() + ":" + userOrGroupName;
-            }
+            userOrGroupName =
+                this.entityReferenceSerializer.serialize(this.currentMixedDocumentReferenceResolver.resolve(
+                    userOrGroupName, DEFAULTUSERSPACE));
 
             // Make sure to have the prefixed full name of the resource
-            if (!StringUtils.contains(entityReference, ":")) {
-                entityReference = context.getDatabase() + ":" + entityReference;
-            }
+            entityReference =
+                this.entityReferenceSerializer.serialize(this.currentMixedDocumentReferenceResolver
+                    .resolve(entityReference));
         }
 
         boolean deny = false;

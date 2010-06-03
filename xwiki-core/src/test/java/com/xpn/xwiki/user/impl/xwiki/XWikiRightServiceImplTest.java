@@ -85,6 +85,8 @@ public class XWikiRightServiceImplTest extends AbstractBridgedXWikiComponentTest
         getContext().setWiki((XWiki) this.mockXWiki.proxy());
 
         this.user = new XWikiDocument(new DocumentReference("wiki", "XWiki", "user"));
+        this.user.setNew(false);
+        getContext().setDatabase(this.user.getWikiName());
         BaseObject userObject = new BaseObject();
         userObject.setClassName("XWiki.XWikiUser");
         this.user.addXObject(userObject);
@@ -92,6 +94,8 @@ public class XWikiRightServiceImplTest extends AbstractBridgedXWikiComponentTest
             returnValue(this.user));
 
         this.group = new XWikiDocument(new DocumentReference("wiki", "XWiki", "group"));
+        this.group.setNew(false);
+        getContext().setDatabase(this.group.getWikiName());
         BaseObject groupObject = new BaseObject();
         groupObject.setClassName("XWiki.XWikiGroup");
         groupObject.setStringValue("member", "XWiki.user");
@@ -159,6 +163,7 @@ public class XWikiRightServiceImplTest extends AbstractBridgedXWikiComponentTest
         preferencesObject.setStringValue("levels", "view");
         preferencesObject.setIntValue("allow", 1);
         preferences.addXObject(preferencesObject);
+        preferences.setNew(false);
 
         this.mockXWiki.stubs().method("getDocument").with(eq("XWiki.XWikiPreferences"), ANYTHING).will(
             new CustomStub("Implements XWiki.getDocument")
@@ -250,6 +255,31 @@ public class XWikiRightServiceImplTest extends AbstractBridgedXWikiComponentTest
             "Wiki owner group from another wiki does not have right on a local wiki when tested from local wiki",
             this.rightService.hasAccessLevel("view", this.user.getPrefixedFullName(), doc.getFullName(), true,
                 getContext()));
+    }
+    
+    public void testHasAccessLevelWhithOnlyPageAsReference() throws XWikiException
+    {
+        final XWikiDocument doc = new XWikiDocument(new DocumentReference("wiki", "Space", "Page"));
+
+        final XWikiDocument preferences = new XWikiDocument(new DocumentReference(doc.getWikiName(), doc.getSpaceName(), "WebPreferences"));
+        BaseObject preferencesObject = new BaseObject();
+        preferencesObject.setClassName("XWiki.XWikiGlobalRights");
+        preferencesObject.setStringValue("levels", "view");
+        preferencesObject.setIntValue("allow", 1);
+        preferences.addXObject(preferencesObject);
+        preferences.setNew(false);
+
+        this.mockXWiki.stubs().method("getDocument").with(eq(preferences.getSpaceName()), eq(preferences.getPageName()), ANYTHING).will(returnValue(preferences));
+        this.mockXWiki.stubs().method("getDocument").with(eq("XWiki.XWikiPreferences"), ANYTHING).will(
+            returnValue(new XWikiDocument(new DocumentReference(getContext().getDatabase(), "XWiki", "XWikiPreferences"))));
+        this.mockXWiki.stubs().method("getDocument").with(eq(doc.getPrefixedFullName()), ANYTHING).will(
+            returnValue(doc));
+
+        getContext().setDatabase("wiki");
+        getContext().setDoc(doc);
+
+        assertFalse("Failed to check right with only page name", this.rightService.hasAccessLevel("view",
+            this.user.getPageName(), doc.getPageName(), true, getContext()));
     }
 
     /**

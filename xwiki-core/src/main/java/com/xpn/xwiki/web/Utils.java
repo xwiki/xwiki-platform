@@ -64,7 +64,7 @@ public class Utils
         Utils.class.getCanonicalName() + "_placeholders_enabled";
 
     /**
-     * The component manager used by {@link #getComponent(String)} and {@link #getComponent(String, String)}. It is
+     * The component manager used by {@link #getComponent(Class)} and {@link #getComponent(Class, String)}. It is
      * useful for any non component code that need to initialize/access components.
      */
     private static ComponentManager componentManager;
@@ -579,8 +579,8 @@ public class Utils
     }
 
     /**
-     * @param componentManager the component manager used by {@link #getComponent(String)} and
-     *            {@link #getComponent(String, String)}
+     * @param componentManager the component manager used by {@link #getComponent(Class)} and
+     *            {@link #getComponent(Class, String)}
      */
     public static void setComponentManager(ComponentManager componentManager)
     {
@@ -588,7 +588,7 @@ public class Utils
     }
 
     /**
-     * @return the component manager used by {@link #getComponent(String)} and {@link #getComponent(String, String)}
+     * @return the component manager used by {@link #getComponent(Class)} and {@link #getComponent(Class, String)}
      */
     public static ComponentManager getComponentManager()
     {

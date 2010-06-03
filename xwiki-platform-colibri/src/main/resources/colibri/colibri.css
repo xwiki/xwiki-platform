@@ -17,7 +17,7 @@ html, body, div, span, applet, object, iframe,
   fieldset, form, label, legend,
   table, caption, tbody, tfoot, thead, tr, th, td {
   border: 0;
-  font-family: sans-serif;
+  font-family: inherit;
   font-size: 100%;
   font-style: inherit;
   font-weight: inherit;
@@ -35,6 +35,7 @@ html, body, div, span, applet, object, iframe,
 body {
   background-color: $theme.pageBackgroundColor;
   color: $theme.textColor;
+  font-family: sans-serif;
   font-size: 87.5%; /* 10px */
   min-width: 970px;
 }

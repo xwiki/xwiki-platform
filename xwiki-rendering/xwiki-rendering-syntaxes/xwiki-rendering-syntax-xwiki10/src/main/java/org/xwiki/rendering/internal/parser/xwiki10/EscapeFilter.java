@@ -62,6 +62,11 @@ public class EscapeFilter extends AbstractFilter implements Initializable
      */
     public String filter(String content, FilterContext filterContext)
     {
+        return filter(content, filterContext, true);
+    }
+
+    public String filter(String content, FilterContext filterContext, boolean clean)
+    {
         StringBuffer result = new StringBuffer();
 
         Matcher matcher = ESCAPE_PATTERN.matcher(content);
@@ -69,15 +74,19 @@ public class EscapeFilter extends AbstractFilter implements Initializable
         for (; matcher.find(); currentIndex = matcher.end()) {
             result.append(content.substring(currentIndex, matcher.start()));
 
-            if (matcher.group(2) != null) {
-                String escaped = matcher.group(2);
-                if ("\\".equals(escaped)) {
-                    result.append("\\\\");
+            if (clean) {
+                if (matcher.group(2) != null) {
+                    String escaped = matcher.group(2);
+                    if ("\\".equals(escaped)) {
+                        result.append("\\\\");
+                    } else {
+                        result.append(filterContext.addProtectedContent(matcher.group(2), ESCAPE_SUFFIX, true));
+                    }
                 } else {
-                    result.append(filterContext.addProtectedContent(matcher.group(2), ESCAPE_SUFFIX, true));
+                    result.append(filterContext.addProtectedContent("\\", ESCAPE_SUFFIX, true));
                 }
             } else {
-                result.append(filterContext.addProtectedContent("\\", ESCAPE_SUFFIX, true));
+                result.append(filterContext.addProtectedContent(matcher.group(0), ESCAPE_SUFFIX, true));
             }
         }
 

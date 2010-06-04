@@ -47,11 +47,10 @@ public class CodeMacroFilter extends AbstractFilter implements Initializable
     @Requirement("code")
     private RadeoxMacroConverter codeMacroConverter;
 
-    @Requirement("escape")
-    private Filter escapeFilter;
-
     @Requirement("unescape")
     private Filter unescapeFilter;
+
+    private EscapeFilter escapeFilter = new EscapeFilter();
 
     /**
      * {@inheritDoc}
@@ -73,7 +72,7 @@ public class CodeMacroFilter extends AbstractFilter implements Initializable
     {
         StringBuffer result = new StringBuffer();
 
-        String escapedContent = this.escapeFilter.filter(content, filterContext);
+        String escapedContent = this.escapeFilter.filter(content, filterContext, false);
 
         Matcher matcher = CODEMACRO_PATTERN.matcher(escapedContent);
         int currentIndex = 0;
@@ -83,7 +82,7 @@ public class CodeMacroFilter extends AbstractFilter implements Initializable
             if (result.length() > 0) {
                 before = CleanUtil.setLeadingNewLines(before, 2);
             }
-            
+
             before = CleanUtil.setTrailingNewLines(before, 2);
 
             String macroResult =

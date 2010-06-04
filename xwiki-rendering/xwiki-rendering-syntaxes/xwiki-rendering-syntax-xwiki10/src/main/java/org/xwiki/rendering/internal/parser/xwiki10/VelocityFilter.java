@@ -33,6 +33,7 @@ import org.xwiki.rendering.parser.xwiki10.FilterContext;
 import org.xwiki.rendering.parser.xwiki10.util.CleanUtil;
 import org.xwiki.velocity.internal.util.InvalidVelocityException;
 import org.xwiki.velocity.internal.util.VelocityBlock;
+import org.xwiki.velocity.internal.util.VelocityBlock.VelocityType;
 
 /**
  * Register all Velocity comments in order to protect them from following filters. Protect velocity comments, convert
@@ -131,6 +132,7 @@ public class VelocityFilter extends AbstractFilter implements Initializable
         boolean inVelocityMacro = false;
         int i = 0;
 
+        StringBuffer velocityBlock = new StringBuffer();
         for (; i < array.length;) {
             char c = array[i];
 
@@ -140,13 +142,41 @@ public class VelocityFilter extends AbstractFilter implements Initializable
             context.setProtectedBlock(true);
             context.setType(null);
 
-            StringBuffer velocityBlock = new StringBuffer();
+            velocityBlock.setLength(0);
 
             try {
                 if (c == '#') {
                     i = this.velocityParser.getKeyWord(array, i, velocityBlock, context);
                 } else if (c == '$') {
                     i = this.velocityParser.getVar(array, i, velocityBlock, context);
+                } else if (c == '\\') {
+                    if (array.length > i + 1) {
+                        char escapedChar = array[i + 1];
+
+                        if (escapedChar == '\\') {
+                            c = escapedChar;
+                            i++;
+                        } else {
+                            int newI = i + 1;
+                            if (escapedChar == '#') {
+                                newI = this.velocityParser.getKeyWord(array, newI, velocityBlock, context);
+                            } else if (escapedChar == '$') {
+                                newI = this.velocityParser.getVar(array, newI, velocityBlock, context);
+                            }
+
+                            if ((context.isVelocity() && context.getType() != VelocityType.COMMENT)
+                                || context.isConversion()) {
+                                c = escapedChar;
+                                i++;
+                            }
+
+                            context.setVelocity(false);
+                            context.setConversion(false);
+                            context.setInline(true);
+                            context.setProtectedBlock(true);
+                            context.setType(null);
+                        }
+                    }
                 }
             } catch (InvalidVelocityException e) {
                 getLogger().debug("Not a valid Velocity block at char [" + i + "]", e);
@@ -169,10 +199,10 @@ public class VelocityFilter extends AbstractFilter implements Initializable
                     }
                 }
 
-                velocityBuffer.append(context.isProtectedBlock() ? filterContext.addProtectedContent(
-                    velocityBlock.toString(), (velocityBlock.charAt(velocityBlock.length() - 1) == '\n'
-                        ? VELOCITYNOOUTPUT_SF : VELOCITY_SF)
-                        + context.getType(), context.isInline()) : velocityBlock);
+                velocityBuffer.append(context.isProtectedBlock() ? filterContext.addProtectedContent(velocityBlock
+                    .toString(), (velocityBlock.charAt(velocityBlock.length() - 1) == '\n' ? VELOCITYNOOUTPUT_SF
+                    : VELOCITY_SF)
+                    + context.getType(), context.isInline()) : velocityBlock);
             } else {
                 StringBuffer nonVelocityBuffer = inVelocityMacro ? afterVelocityBuffer : beforeVelocityBuffer;
 

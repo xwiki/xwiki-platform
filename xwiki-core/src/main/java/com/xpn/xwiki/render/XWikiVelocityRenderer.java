@@ -67,7 +67,7 @@ public class XWikiVelocityRenderer implements XWikiRenderer, XWikiInterpreter
         if (StringUtils.containsNone(content, VELOCITY_CHARACTERS)) {
             return content;
         }
-        VelocityManager velocityManager = (VelocityManager) Utils.getComponent(VelocityManager.class);
+        VelocityManager velocityManager = Utils.getComponent(VelocityManager.class);
         VelocityContext vcontext = velocityManager.getVelocityContext();
         Document previousdoc = (Document) vcontext.get("doc");
 

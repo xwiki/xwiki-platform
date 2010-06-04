@@ -112,7 +112,7 @@ public class XWikiVelocityRenderer implements XWikiRenderer, XWikiInterpreter
     {
         StringWriter writer = new StringWriter();
         try {
-            VelocityManager velocityManager = (VelocityManager) Utils.getComponent(VelocityManager.class);
+            VelocityManager velocityManager = Utils.getComponent(VelocityManager.class);
             velocityManager.getVelocityEngine().evaluate(vcontext, writer, name, content);
             return writer.toString();
         } catch (Exception e) {

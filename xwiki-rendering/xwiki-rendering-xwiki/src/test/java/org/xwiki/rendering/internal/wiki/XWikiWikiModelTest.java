@@ -53,7 +53,7 @@ public class XWikiWikiModelTest
 
             // The test is here: we verify that getURL is called with the query string already encoded since getURL()
             // doesn't encode it.
-            oneOf(mockDocumentAccessBridge).getURL("Space.Page\u20AC", "edit", "parent=wiki%3ASpace.Page%E2%82%AC",
+            oneOf(mockDocumentAccessBridge).getURL("Space.Page\u20AC", "create", "parent=wiki%3ASpace.Page%E2%82%AC",
                 "anchor");
         }});
 

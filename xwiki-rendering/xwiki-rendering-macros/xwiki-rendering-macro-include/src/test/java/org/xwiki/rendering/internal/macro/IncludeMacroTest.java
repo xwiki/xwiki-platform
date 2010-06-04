@@ -29,7 +29,6 @@ import org.jmock.Expectations;
 import org.junit.Test;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.rendering.block.Block;
-import org.xwiki.rendering.block.XDOM;
 import org.xwiki.rendering.internal.macro.include.IncludeMacro;
 import org.xwiki.rendering.internal.transformation.MacroTransformation;
 import org.xwiki.rendering.macro.Macro;
@@ -37,15 +36,14 @@ import org.xwiki.rendering.macro.MacroExecutionException;
 import org.xwiki.rendering.macro.include.IncludeMacroParameters;
 import org.xwiki.rendering.macro.include.IncludeMacroParameters.Context;
 import org.xwiki.rendering.macro.script.ScriptMockSetup;
-import org.xwiki.rendering.renderer.PrintRenderer;
 import org.xwiki.rendering.renderer.PrintRendererFactory;
-import org.xwiki.rendering.renderer.printer.DefaultWikiPrinter;
-import org.xwiki.rendering.renderer.printer.WikiPrinter;
 import org.xwiki.rendering.syntax.Syntax;
 import org.xwiki.rendering.transformation.MacroTransformationContext;
 import org.xwiki.rendering.transformation.Transformation;
 import org.xwiki.test.AbstractComponentTestCase;
 import org.xwiki.velocity.VelocityManager;
+
+import static org.xwiki.rendering.scaffolding.BlockAssert.*;
 
 /**
  * Unit tests for {@link IncludeMacro}.
@@ -59,6 +57,8 @@ public class IncludeMacroTest extends AbstractComponentTestCase
 
     private IncludeMacro includeMacro;
 
+    private PrintRendererFactory rendererFactory;
+
     @Override
     protected void registerComponents() throws Exception
     {
@@ -66,6 +66,7 @@ public class IncludeMacroTest extends AbstractComponentTestCase
         
         this.mockSetup = new ScriptMockSetup(getComponentManager());
         this.includeMacro = (IncludeMacro) getComponentManager().lookup(Macro.class, "include");
+        this.rendererFactory = getComponentManager().lookup(PrintRendererFactory.class, "event/1.0");
     }
 
     @Test
@@ -110,7 +111,7 @@ public class IncludeMacroTest extends AbstractComponentTestCase
 
         List<Block> blocks = this.includeMacro.execute(parameters, null, context);
 
-        assertBlocks(expected, blocks);
+        assertBlocks(expected, blocks, this.rendererFactory);
     }
 
     @Test
@@ -136,7 +137,7 @@ public class IncludeMacroTest extends AbstractComponentTestCase
 
         List<Block> blocks = this.includeMacro.execute(parameters, null, new MacroTransformationContext());
 
-        assertBlocks(expected, blocks);
+        assertBlocks(expected, blocks, this.rendererFactory);
     }
 
     @Test
@@ -184,20 +185,6 @@ public class IncludeMacroTest extends AbstractComponentTestCase
 
         List<Block> blocks = this.includeMacro.execute(parameters, null, new MacroTransformationContext());
 
-        assertBlocks(expected, blocks);
-    }
-
-    private void assertBlocks(String expected, List<Block> blocks) throws Exception
-    {
-        // Assert the result by parsing it through the EventsRenderer to generate easily
-        // assertable events.
-        XDOM dom = new XDOM(blocks);
-        WikiPrinter printer = new DefaultWikiPrinter();
-
-        PrintRendererFactory factory = getComponentManager().lookup(PrintRendererFactory.class, "event/1.0");
-        PrintRenderer eventRenderer = factory.createRenderer(printer);
-
-        dom.traverse(eventRenderer);
-        Assert.assertEquals(expected, printer.toString());
+        assertBlocks(expected, blocks, this.rendererFactory);
     }
 }

@@ -22,7 +22,7 @@
     #set ($parentReference = $services.model.createDocumentReference($doc.documentReference.wikiReference.name, 
       $doc.documentReference.lastSpaceReference.name, ""))
   #end
-  #set($rparent = $services.model.serialize($parentReference, "local"))  
+  #set($rparent = $escapetool.url($services.model.serialize($parentReference, "local")))  
 #end
 #set($template = "$!request.getParameter('template')")
 #set($redirectparams = "parent=${rparent}&template=${template}")
@@ -38,7 +38,11 @@
 #end
 #set($title = "$!request.getParameter('title')")
 #if($title == '')
-  #set($title = $page)
+  #if($tocreate == 'page')
+    #set($title = $escapetool.url($page))
+  #else
+    #set($title = $escapetool.url($space))
+  #end
 #end
 #set($redirectparams = "${redirectparams}&title=${title}")
 ## ---------------------------------------------------------------------------------------------------------
@@ -70,7 +74,7 @@
   ## If a space is ready to be created, redirect to the space home in edit mode
   ##
   #set ($docReference = $services.model.createDocumentReference($context.wiki, $space, "WebHome"))
-  #set($redirecturl = $xwiki.getDocument($docReference).getURL('edit'))
+  #set($redirecturl = $xwiki.getDocument($docReference).getURL('edit', $redirectparams))
 #end
 #if($tocreate == 'page' && $space != '' && $page != ''  
     && ($paramsMap.containsKey('template') || $availableTemplateProviders.isEmpty()))

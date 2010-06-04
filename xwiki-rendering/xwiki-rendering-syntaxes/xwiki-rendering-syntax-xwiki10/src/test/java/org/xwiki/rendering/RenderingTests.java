@@ -78,9 +78,10 @@ public class RenderingTests extends TestCase
         suite.addTestsFromResource("macros/velocity/error1", false);
 
         // Radeox Macros
+        suite.addTestsFromResource("macros/radeox/code1", false);
+        suite.addTestsFromResource("macros/radeox/code2", false);
         suite.addTestsFromResource("macros/radeox/attach1", false);
         suite.addTestsFromResource("macros/radeox/image1", false);
-        suite.addTestsFromResource("macros/radeox/code1", false);
         suite.addTestsFromResource("macros/radeox/table1", false);
         suite.addTestsFromResource("macros/radeox/quote1", false);
         suite.addTestsFromResource("macros/radeox/style1", false);
@@ -135,6 +136,7 @@ public class RenderingTests extends TestCase
         suite.addTestsFromResource("escape/escape1", false);
         suite.addTestsFromResource("escape/escape2", false);
         suite.addTestsFromResource("escape/escape3", false);
+        suite.addTestsFromResource("escape/escape4", false);
 
         // Cleaning
         suite.addTestsFromResource("cleaning/cleaning1", false);

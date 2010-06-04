@@ -63,9 +63,9 @@ some text
 <table>
 <tr><td></td></tr>
 </table>
-<p/>
-<br/>## commented ## commented
 
+## commented ## commented
+<p/>
 #* commented *#
 
 #if ($var > 0)

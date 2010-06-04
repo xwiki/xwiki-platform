@@ -86,7 +86,7 @@ public class DefaultVelocityFactory extends AbstractLogEnabled implements Veloci
             engine = this.velocityEngines.get(key);
         } else {
             try {
-                engine = (VelocityEngine) this.componentManager.lookup(VelocityEngine.class);
+                engine = this.componentManager.lookup(VelocityEngine.class);
             } catch (ComponentLookupException e) {
                 throw new XWikiVelocityException("Failed to create Velocity Engine", e);
             }

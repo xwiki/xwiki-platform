@@ -36,14 +36,15 @@ endMacroMarkerStandalone [velocity] [] [#macro(somemacro)
 #somemacro()]
 beginMacroMarkerStandalone [velocity] [] [#somemacro()]
 beginParagraph
-onSpecialSymbol [#]
-onWord [somemacro]
-onSpecialSymbol [(]
-onSpecialSymbol [)]
+onSpecialSymbol ["]
+onWord [macro]
+onSpace
+onWord [content]
+onSpecialSymbol ["]
 endParagraph
 endMacroMarkerStandalone [velocity] [] [#somemacro()]
 endDocument
 .#-----------------------------------------------------
 .expect|xhtml/1.0
 .#-----------------------------------------------------
-<p>"macro content"</p><p>#somemacro()</p>
+<p>"macro content"</p><p>"macro content"</p>

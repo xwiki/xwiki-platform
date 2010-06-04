@@ -20,13 +20,14 @@
 package org.xwiki.rendering.internal.macro;
 
 import org.apache.velocity.VelocityContext;
+import org.xwiki.component.phase.Initializable;
+import org.xwiki.component.phase.InitializationException;
 import org.xwiki.velocity.VelocityEngine;
 import org.xwiki.velocity.XWikiVelocityException;
 import org.xwiki.velocity.VelocityManager;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.Requirement;
 import org.xwiki.component.manager.ComponentManager;
-import org.xwiki.component.manager.ComponentLookupException;
 
 import java.util.Properties;
 
@@ -38,12 +39,32 @@ import java.util.Properties;
  * @since 1.5M2
  */
 @Component
-public class MockVelocityManager implements VelocityManager
+public class MockVelocityManager implements VelocityManager, Initializable
 {
     @Requirement
     private ComponentManager componentManager;
 
+    /**
+     * Note that we use a single Velocity Engine instance in this Mock.
+     */
+    @Requirement
+    private VelocityEngine velocityEngine;
+
     private VelocityContext velocityContext = new VelocityContext();
+
+    public void initialize() throws InitializationException
+    {
+        try {
+            // Configure the Velocity Engine not to use the Resource Webapp Loader since we don't
+            // need it and we would need to setup the Container component's ApplicationContext
+            // otherwise.
+            Properties properties = new Properties();
+            properties.setProperty("resource.loader", "file");
+            this.velocityEngine.initialize(properties);
+        } catch (XWikiVelocityException e) {
+            throw new InitializationException("Failed to initialize Velocity Engine", e);
+        }
+    }
 
     public VelocityContext getVelocityContext()
     {
@@ -52,20 +73,6 @@ public class MockVelocityManager implements VelocityManager
 
     public VelocityEngine getVelocityEngine() throws XWikiVelocityException
     {
-        VelocityEngine engine;
-        try {
-            engine = this.componentManager.lookup(VelocityEngine.class);
-        } catch (ComponentLookupException e) {
-            throw new XWikiVelocityException("Failed to look up Velocity Engine", e);
-        }
-
-        // Configure the Velocity Engine not to use the Resource Webapp Loader since we don't
-        // need it and we would need to setup the Container component's ApplicationContext
-        // otherwise.
-        Properties properties = new Properties();
-        properties.setProperty("resource.loader", "file");
-        engine.initialize(properties);
-
-        return engine;
+        return this.velocityEngine;
     }
 }

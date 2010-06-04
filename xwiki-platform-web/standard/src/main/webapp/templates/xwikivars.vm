@@ -55,7 +55,7 @@
 #set($headertitle = "<a href='$viewUrl'>$escapetool.xml(${doc.displayTitle})</a>")
 #end
 #set($skin=$xwiki.getSkin())
-#set($copyright = "$!{escapetool.xml($xwiki.getSpaceCopyright())}")
+#set($copyright = $xwiki.getSpaceCopyright())
 #set($xwikimode=$context.getMode())
 #set($logredir = $escapetool.xml($xwiki.getRequestURL()))
 ##

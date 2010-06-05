@@ -19,4 +19,10 @@
 text
 {{/info}}
 
+$var
+
+{{velocity filter="none"}}
+{{html clean="false" wiki="true"}}$var{{/html}}
+{{/velocity}}
+
 text

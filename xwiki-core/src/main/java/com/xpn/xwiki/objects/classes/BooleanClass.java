@@ -266,6 +266,9 @@ public class BooleanClass extends PropertyClass
         XWikiContext context)
     {
         org.apache.ecs.xhtml.input check = new input(input.checkbox, prefix + name, 1);
+        check.setID(prefix + name);
+        // If the (visible) checkbox is unchecked, it will not post anything back so the hidden input by the same
+        // name will post back 0 and the save function will save the first entry it finds.
         org.apache.ecs.xhtml.input checkNo = new input(input.hidden, prefix + name, 0);
 
         try {

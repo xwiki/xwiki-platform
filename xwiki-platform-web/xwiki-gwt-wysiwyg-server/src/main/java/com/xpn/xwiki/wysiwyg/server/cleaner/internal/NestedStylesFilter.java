@@ -38,9 +38,9 @@ import org.xwiki.xml.html.filter.HTMLFilter;
 import com.steadystate.css.parser.CSSOMParser;
 
 /**
- * Merges the values of the {@code style} attribute from nested elements and applies the result directly to the inner
- * text to overcome the fact that some wiki syntaxes (e.g. xwiki/2.0) don't support nested custom parameters and the
- * renderer they use doesn't know how to merge the style parameter.
+ * Merges the values of the {@code style} attribute from nested in-line HTML elements and applies the result directly to
+ * the inner text to overcome the fact that some wiki syntaxes (e.g. xwiki/2.0) don't support nested custom in-line
+ * parameters and the renderer they use doesn't know how to merge the style parameter.
  * 
  * @version $Id$
  */
@@ -80,7 +80,29 @@ public class NestedStylesFilter implements HTMLFilter
      * The list of CSS properties that are merged and applied directly to the inner text.
      */
     private static final List<String> MERGED_PROPERTIES =
-        Arrays.asList(new String[] {"background-color", "color", "font-family", "font-size"});
+        Arrays.asList(new String[] {"background-color", "color", "font-family", "font-size", "font-style",
+            "font-weight", "text-decoration", "vertical-align"});
+
+    /**
+     * The list of most important HTML elements that can have both in-line and block-level content, as specified by the
+     * XHTML 1.0 strict DTD.
+     */
+    private static final List<String> HTML_FLOW_CONTAINERS =
+        Arrays.asList(new String[] {"body", "li", "td", "th", "dd", "div", "blockquote"});
+
+    /**
+     * The list of most important block-level HTML elements that can have only in-line content, as specified by the
+     * XHTML 1.0 strict DTD.
+     */
+    private static final List<String> HTML_BLOCK_LEVEL_INLINE_CONTAINERS =
+        Arrays.asList(new String[] {"p", "h1", "h2", "h3", "h4", "h5", "h6", "pre", "dt", "address"});
+
+    /**
+     * The list of most important block-level HTML elements that can have only special content, or no content at all, as
+     * specified by the XHTML 1.0 strict DTD.
+     */
+    private static final List<String> HTML_SPECIAL_BLOCK_LEVEL_ELEMENTS =
+        Arrays.asList(new String[] {"hr", "ul", "ol", "dl", "table", "tbody", "thead", "tfoot", "tr", "form"});
 
     /**
      * The object used to parse the style attribute.
@@ -149,8 +171,8 @@ public class NestedStylesFilter implements HTMLFilter
 
     /**
      * @param node a DOM node
-     * @return {@code true} if the given node is an element whose style attribute contains at least one of the
-     *         {@link #MERGED_PROPERTIES}, {@code false} otherwise
+     * @return {@code true} if the given node is an in-line HTML element whose style attribute contains at least one of
+     *         the {@link #MERGED_PROPERTIES}, {@code false} otherwise
      */
     private boolean isStyled(Node node)
     {
@@ -158,7 +180,7 @@ public class NestedStylesFilter implements HTMLFilter
             return false;
         }
         Element element = (Element) node;
-        if (!element.hasAttribute(STYLE_ATTRIBUTE)) {
+        if (!element.hasAttribute(STYLE_ATTRIBUTE) || isBlock(element)) {
             return false;
         }
         CSSStyleDeclaration style = parseStyleAttribute(element.getAttribute(STYLE_ATTRIBUTE));
@@ -170,6 +192,18 @@ public class NestedStylesFilter implements HTMLFilter
             }
         }
         return false;
+    }
+
+    /**
+     * @param element an HTML element
+     * @return {@code true} if the given element is a block-level element as specified in the XHTML 1.0 strict DTD,
+     *         {@code false} otherwise
+     */
+    private boolean isBlock(Element element)
+    {
+        String tagName = element.getTagName().toLowerCase();
+        return HTML_FLOW_CONTAINERS.contains(tagName) || HTML_BLOCK_LEVEL_INLINE_CONTAINERS.contains(tagName)
+            || HTML_SPECIAL_BLOCK_LEVEL_ELEMENTS.contains(tagName);
     }
 
     /**

@@ -27,12 +27,12 @@ import java.util.List;
 import java.util.Map;
 
 import org.xwiki.bridge.DocumentAccessBridge;
-import org.xwiki.model.reference.AttachmentReference;
-import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.Requirement;
 import org.xwiki.component.logging.AbstractLogEnabled;
 import org.xwiki.component.manager.ComponentManager;
+import org.xwiki.model.reference.AttachmentReference;
+import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.officeimporter.OfficeImporter;
 import org.xwiki.officeimporter.OfficeImporterException;
@@ -183,7 +183,10 @@ public class DefaultOfficeImporter extends AbstractLogEnabled implements OfficeI
                 xhtmlOfficeDocumentBuilder.build(attachmentStream, strAttachmentFileName, documentReference,
                     shouldFilterStyles(params));
             HTMLUtils.stripHTMLEnvelope(xhtmlDoc.getContentDocument());
-            result = xhtmlDoc.getContentAsString();
+            boolean omitXMLDeclaration = Boolean.valueOf(params.get("omitXMLDeclaration"));
+            boolean omitDocumentType = Boolean.valueOf(params.get("omitDocumentType"));
+            // We can't use xhtmlDoc.getContentAsString() because it includes the XML declaration and the document type.
+            result = HTMLUtils.toString(xhtmlDoc.getContentDocument(), omitXMLDeclaration, omitDocumentType);
             attachArtifacts(strDocumentName, xhtmlDoc.getArtifacts());
         }
         return result;

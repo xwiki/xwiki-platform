@@ -94,6 +94,12 @@
       <artifactId>commons-logging</artifactId>
       <scope>provided</scope>
     </dependency>
+    <dependency>
+      <!-- For merging styles in NestedStyleFilter -->
+      <groupId>net.sourceforge.cssparser</groupId>
+      <artifactId>cssparser</artifactId>
+      <version>0.9.5</version>
+    </dependency>
     <!-- Test dependencies -->
     <dependency>
       <groupId>junit</groupId>

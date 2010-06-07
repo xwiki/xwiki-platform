@@ -30,7 +30,6 @@ import org.xwiki.xml.html.HTMLCleanerConfiguration;
 import org.xwiki.xml.html.HTMLUtils;
 import org.xwiki.xml.html.filter.HTMLFilter;
 
-
 /**
  * Default HTML cleaner for the WYSIWYG editor's output.
  * 
@@ -63,6 +62,7 @@ public class DefaultHTMLCleaner implements HTMLCleaner
         filters.add(new StandAloneMacroFilter());
         filters.add(new EmptyAttributeFilter());
         filters.add(new NestedAnchorsFilter());
+        filters.add(new NestedStylesFilter());
         filters.addAll(config.getFilters());
         config.setFilters(filters);
 

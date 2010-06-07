@@ -96,6 +96,8 @@ public class ImportOfficeFileWizardStep extends AbstractFileUploadWizardStep
 
         // Add filter styles check box.
         this.filterStylesCheckBox = new CheckBox(Strings.INSTANCE.importOfficeContentFilterStylesCheckBoxLabel());
+        // The filter styles check box should be checked by default.
+        this.filterStylesCheckBox.setValue(true);
         getMainPanel().add(filterStylesCheckBox);
 
         // Read wysiwyg configuration for openoffice server availability.

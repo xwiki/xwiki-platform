@@ -106,6 +106,10 @@ public class XWikiImportService implements ImportService
         try {
             AttachmentReference attachmentReference =
                 this.attachmentReferenceResolver.resolve(attachment.getReference());
+            // Omit the XML declaration and the document type because the returned XHTML is inserted at the caret
+            // position or replaces the current selection in the rich text area.
+            cleaningParams.put("omitXMLDeclaration", Boolean.TRUE.toString());
+            cleaningParams.put("omitDocumentType", Boolean.TRUE.toString());
             // OfficeImporter should be improved to use DocumentName instead of String. This will remove the need for a
             // DocumentNameSerializer.
             return officeImporter.importAttachment(this.entityReferenceSerializer.serialize(attachmentReference

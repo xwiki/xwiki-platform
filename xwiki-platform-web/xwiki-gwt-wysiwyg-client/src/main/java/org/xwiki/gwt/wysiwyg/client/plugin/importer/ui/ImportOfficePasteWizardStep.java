@@ -102,6 +102,8 @@ public class ImportOfficePasteWizardStep implements WizardStep
 
         // Filter styles check box.
         this.filterStylesCheckBox = new CheckBox(Strings.INSTANCE.importOfficeContentFilterStylesCheckBoxLabel());
+        // The filter styles check box should be checked by default.
+        this.filterStylesCheckBox.setValue(true);
         mainPanel.add(filterStylesCheckBox);
     }
 

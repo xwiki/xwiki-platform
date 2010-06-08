@@ -149,6 +149,10 @@
 ##
 #set($documentName = 'XWiki.Registration')
 ##
+## Security measure: 
+## If this document is changed such that it must have programming permission in order to run, change this to false.
+#set($sandbox = true)
+##
 ## Load the configuration from a seperate document.
 #loadConfig('XWiki.RegistrationConfig')
 ##
@@ -162,6 +166,17 @@ $xwiki.get('ssfx').use('uicomponents/widgets/validation/livevalidation.css')
 #set($fieldMandatoryStar = $failureMessageParams)
 ##
 #*
+ * You may include this document in other documents using {{include document="XWiki.Registration"/}}
+ * To specify that the user is invited and should be allowed to register even if Guest does not have permission to
+ * register, set $invited to true. NOTE: The including script must have programming permission to do this.
+ *
+ * To specify some code which should run after registration is successfully completed, set
+ * $doAfterRegistration to a define block of velocity code like so:
+ * #define($doAfterRegistration)
+ *   some code
+ * #end
+ * Output from running this code will not be printed.
+ *
  * The fields which will be seen on the registration page are defined here.
  * $fields is an array and each field is a Map. The names shown below are Map keys.
  * 
@@ -394,6 +409,7 @@ $xwiki.get('ssfx').use('uicomponents/widgets/validation/livevalidation.css')
 ## To disable the captcha on this page, comment out the next two entries.
 ## The captcha image, not an input field but still defined the same way.
 #if($captchaservice
+    &amp;&amp; !$invited
     &amp;&amp; $xcontext.getUser() == "XWiki.XWikiGuest"
     &amp;&amp; $requireCaptcha)
   ## Empty label field used for padding.
@@ -476,10 +492,24 @@ $xwiki.get('ssfx').use('uicomponents/widgets/validation/livevalidation.css')
   $response.sendRedirect("$xwiki.getURL($doc.getFullName(), 'edit')?editor=wiki")
 #end
 ##
+## If this document has PR and is not included from another document then it's author should be set to Guest 
+## for the duration of it's execution in order to improve security.
+## Note we compare document ids because
+#if($sandbox
+    &amp;&amp; $xcontext.hasProgrammingRights()
+    &amp;&amp; $xcontext.getDoc().getDocumentReference().equals($xwiki.getDocument($documentName).getDocumentReference()))
+##
+  #set($discard = $xcontext.getDoc().setAuthor('XWiki.XWikiGuest'))
+#end
+##
 ## Access level to register must be explicitly checked because it is only checked in XWiki.prepareDocuments
 ## and this page is accessible through view action.
 #if(!$xcontext.hasAccessLevel('register', $doc.getFullName))
-  $response.sendRedirect("$xwiki.getURL($doc.getFullName(), 'login')")
+  ## Make an exception if another document with programming permission (Invitation app) has included this 
+  ## document and set $invited to true.
+  #if(!$invited || !$xcontext.hasProgrammingRights())
+    $response.sendRedirect("$xwiki.getURL($doc.getFullName(), 'login')")
+  #end
 #end
 ## If this is true, then assume the registration page is being viewed inside of a lightbox
 #if($request.get('xpage'))
@@ -494,7 +524,7 @@ $heading
   #set($discard = "#validateFields($fields, $request)")
   ## If server side validation was successfull, create the user
   #if(!$registrationFailed)
-    #createUser($fields, $request, $response)
+    #createUser($fields, $request, $response, $doAfterRegistration)
   #end
 #end
 ## If the registration was not successful or if the user hasn't submitted the info yet
@@ -653,8 +683,9 @@ $heading
  *
  * @param $request An XWikiRequest object which made the register request.
  * @param $response The XWikiResponse object to send any redirects to.
+ * @param $doAfterRegistration code block to run after registration completes successfully.
  *###
-#macro(createUser, $fields, $request, $response)
+#macro(createUser, $fields, $request, $response, $doAfterRegistration)
   ## See if email verification is required and register the user.
   #if($xwiki.getXWikiPreferenceAsInt('use_email_verification', 0) == 1)
     #set($reg = $xwiki.createUser(true))
@@ -685,6 +716,10 @@ $heading
       #if($field.get('doAfterRegistration'))
         #evaluate($field.get('doAfterRegistration'))
       #end
+    #end
+    ## If there is a "global" doAfterRegistration, do that as well.
+    #if($doAfterRegistration)
+      #set($discard = $doAfterRegistration.toString())
     #end
     ## Define some strings which may be used by autoLogin or loginButton
     #set($userName = $!request.get('xwikiname'))

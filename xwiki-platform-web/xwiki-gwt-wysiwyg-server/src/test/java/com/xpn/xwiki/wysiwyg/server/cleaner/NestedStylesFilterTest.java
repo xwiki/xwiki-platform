@@ -52,17 +52,18 @@ public class NestedStylesFilterTest extends AbstractHTMLFilterTest
     public void testMergeStyles() throws Exception
     {
         Document document =
-            parseXHTMLFragment("<p>12<span style=\"font-family:Courier New;" + " font-size:24pt\">"
-                + "34<span style=\"color:red; background-color:yellow\">56</span>78</span>90</p>");
+            parseXHTMLFragment("<p>ab<span style=\"color: red;\">cd"
+                + "<span style=\"background-color: yellow;\">ef</span>gh</span>"
+                + "ij<span style=\"font-family: monospace;\">kl"
+                + "<span style=\"font-size: 24pt;\">mn</span>op</span>rs</p>");
 
         filter.filter(document, null);
 
         String expected =
-            "<p>12<span style=\"font-family:Courier New; font-size:24pt\">"
-                + "<span style=\"font-family: Courier New; font-size: 24pt\">34</span>"
-                + "<span style=\"color:red; background-color:yellow\">"
-                + "<span style=\"background-color: yellow; color: red; font-family: Courier New; font-size: 24pt\">"
-                + "56</span></span><span style=\"font-family: Courier New; font-size: 24pt\">78</span></span>90</p>";
+            "<p>ab<span style=\"color: red;\">cd<span style=\"background-color: yellow; color: red\">ef</span>"
+                + "<span style=\"color: red\">gh</span></span>ij<span style=\"font-family: monospace;\">kl"
+                + "<span style=\"font-family: monospace; font-size: 24pt\">mn</span>"
+                + "<span style=\"font-family: monospace\">op</span></span>rs</p>";
         String actual = HTMLUtils.toString(document);
         assertEquals(xhtmlFragment(expected), actual);
     }

@@ -455,7 +455,7 @@
         addDocumentToSpace: function(list, space, page) 
         {
             var trList = this.packageDocuments[space][page], self = this;
-            trList.each(function(infos) {
+            trList.sortBy(function(s){return s.language}).each(function(infos) {
                 var displayName = page + (infos.language == "" ? "" :  (" - " + infos.language));
                 
                 var pageItem = new Element("li", {'class':'xitem xhighlight'});

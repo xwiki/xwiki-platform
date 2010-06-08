@@ -17,6 +17,8 @@
 
 .# Make sure xwiki/2.0 renderer is handling inline parameters properly
 before(% style="color:red" %)x(%%)**y**after
+
+12**34(% style="color: rgb(255, 0, 0);" %)56(%%)78**90
 .#-----------------------------------------------------
 .expect|event/1.0
 .#-----------------------------------------------------
@@ -65,11 +67,22 @@ onWord [y]
 endFormat [BOLD]
 onWord [after]
 endParagraph
+beginParagraph
+onWord [12]
+beginFormat [BOLD]
+onWord [34]
+beginFormat [NONE] [[style]=[color: rgb(255, 0, 0);]]
+onWord [56]
+endFormat [NONE] [[style]=[color: rgb(255, 0, 0);]]
+onWord [78]
+endFormat [BOLD]
+onWord [90]
+endParagraph
 endDocument
 .#-----------------------------------------------------
 .expect|xhtml/1.0
 .#-----------------------------------------------------
-<p param1="value1" param2="value2"><span param3="value3">hello</span> world</p><p><span param4="valueA">hello&nbsp;</span><span param4="valueB">world</span></p><p><strong><span param5="value4">hello</span></strong><span param5="value4">&nbsp;world</span></p><p><span param6="valueA">hello&nbsp;</span><span param7="valueB">world</span></p><p>before<span style="color:red">x</span><strong>y</strong>after</p>
+<p param1="value1" param2="value2"><span param3="value3">hello</span> world</p><p><span param4="valueA">hello&nbsp;</span><span param4="valueB">world</span></p><p><strong><span param5="value4">hello</span></strong><span param5="value4">&nbsp;world</span></p><p><span param6="valueA">hello&nbsp;</span><span param7="valueB">world</span></p><p>before<span style="color:red">x</span><strong>y</strong>after</p><p>12<strong>34<span style="color: rgb(255, 0, 0);">56</span>78</strong>90</p>
 .#-----------------------------------------------------
 .expect|xwiki/2.0
 .#-----------------------------------------------------
@@ -83,7 +96,9 @@ endDocument
 (% param6="valueA" %)hello (% param7="valueB" %)world
 
 before(% style="color:red" %)x(%%)**y**after
+
+12**34(% style="color: rgb(255, 0, 0);" %)56(%%)78**90
 .#-----------------------------------------------------
 .input|xhtml/1.0
 .#-----------------------------------------------------
-<p param1="value1" param2="value2"><span param3="value3">hello</span> world</p><p><span param4="valueA">hello&nbsp;</span><span param4="valueB">world</span></p><p><strong><span param5="value4">hello</span></strong><span param5="value4">&nbsp;world</span></p><p><span param6="valueA">hello&nbsp;</span><span param7="valueB">world</span></p><p>before<span style="color:red">x</span><strong>y</strong>after</p>
+<p param1="value1" param2="value2"><span param3="value3">hello</span> world</p><p><span param4="valueA">hello&nbsp;</span><span param4="valueB">world</span></p><p><strong><span param5="value4">hello</span></strong><span param5="value4">&nbsp;world</span></p><p><span param6="valueA">hello&nbsp;</span><span param7="valueB">world</span></p><p>before<span style="color:red">x</span><strong>y</strong>after</p><p>12<strong>34<span style="color: rgb(255, 0, 0);">56</span>78</strong>90</p>

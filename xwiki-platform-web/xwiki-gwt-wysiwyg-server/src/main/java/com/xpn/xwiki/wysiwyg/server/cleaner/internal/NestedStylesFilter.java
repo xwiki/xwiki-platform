@@ -110,31 +110,35 @@ public class NestedStylesFilter implements HTMLFilter
     private final CSSOMParser cssParser = new CSSOMParser();
 
     /**
+     * The stack of styled ancestors.
+     */
+    private final Stack<Element> styledAncestors = new Stack<Element>();
+
+    /**
+     * Flag indicating if the merged style is applied by wrapping the text nodes or by updating the style of the last
+     * styled ancestor. We wrap all the text nodes in a nested style group, except the first one.
+     */
+    private boolean wrapTextNodes;
+
+    /**
      * {@inheritDoc}
      * 
      * @see HTMLFilter#filter(Document, Map)
      */
     public void filter(Document document, Map<String, String> parameters)
     {
-        final Stack<Element> styledAncestors = new Stack<Element>();
+        styledAncestors.clear();
+        wrapTextNodes = false;
         iterate(document, new Visitor()
         {
             public void enter(Node node)
             {
-                if (isStyled(node)) {
-                    styledAncestors.push((Element) node);
-                }
+                NestedStylesFilter.this.enter(node);
             }
 
             public void leave(Node node)
             {
-                if (!styledAncestors.isEmpty()) {
-                    if (styledAncestors.peek().equals(node)) {
-                        styledAncestors.pop();
-                    } else if (node.getNodeType() == Node.TEXT_NODE) {
-                        mergeStyles(node, styledAncestors);
-                    }
-                }
+                NestedStylesFilter.this.leave(node);
             }
         });
     }
@@ -165,6 +169,40 @@ public class NestedStylesFilter implements HTMLFilter
                     node = node.getNextSibling();
                     visitor.leave(toLeave);
                 }
+            }
+        }
+    }
+
+    /**
+     * Enters the given node.
+     * 
+     * @param node a DOM node
+     */
+    private void enter(Node node)
+    {
+        if (isStyled(node)) {
+            styledAncestors.push((Element) node);
+        }
+    }
+
+    /**
+     * Leaves the given node.
+     * 
+     * @param node a DOM node
+     */
+    private void leave(Node node)
+    {
+        if (!styledAncestors.isEmpty()) {
+            if (styledAncestors.peek().equals(node)) {
+                styledAncestors.pop();
+                if (styledAncestors.isEmpty()) {
+                    // We're leaving a nested style group.
+                    wrapTextNodes = false;
+                }
+            } else if (node.getNodeType() == Node.TEXT_NODE && (wrapTextNodes || styledAncestors.size() > 1)) {
+                mergeStyles(node, styledAncestors, wrapTextNodes);
+                // We're inside a nested style group.
+                wrapTextNodes = true;
             }
         }
     }
@@ -227,13 +265,11 @@ public class NestedStylesFilter implements HTMLFilter
      * 
      * @param node the node to be styled
      * @param styledAncestors the list of element ancestors for which {@link #isStyled(Node)} returns {@code true}
+     * @param wrapNode flag indicating if the merged style should be applied by wrapping the given node or by updating
+     *            the style of the last styled ancestor
      */
-    private void mergeStyles(Node node, Stack<Element> styledAncestors)
+    private void mergeStyles(Node node, Stack<Element> styledAncestors, boolean wrapNode)
     {
-        Element wrapper = styledAncestors.peek().getOwnerDocument().createElement("span");
-        node.getParentNode().replaceChild(wrapper, node);
-        wrapper.appendChild(node);
-
         // Merge the style attributes from all the ancestors.
         StringBuilder mergedStyleAttribute = new StringBuilder();
         for (Element ancestor : styledAncestors) {
@@ -257,6 +293,13 @@ public class NestedStylesFilter implements HTMLFilter
         }
 
         // Apply the style.
-        wrapper.setAttribute(STYLE_ATTRIBUTE, filteredStyle.getCssText());
+        if (wrapNode) {
+            Element wrapper = styledAncestors.peek().getOwnerDocument().createElement("span");
+            node.getParentNode().replaceChild(wrapper, node);
+            wrapper.appendChild(node);
+            wrapper.setAttribute(STYLE_ATTRIBUTE, filteredStyle.getCssText());
+        } else {
+            styledAncestors.peek().setAttribute(STYLE_ATTRIBUTE, filteredStyle.getCssText());
+        }
     }
 }

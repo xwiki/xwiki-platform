@@ -250,6 +250,7 @@ public class XWikiGeneratorListener implements IWemListener
                 parameters = Listener.EMPTY_PARAMETERS;
             }
 
+            boolean parametersConsumed = false;
             if (formatStyles.size() > 0) {
                 for (ListIterator<WikiStyle> it = formatStyles.listIterator(formatStyles.size()); it.hasPrevious();) {
                     WikiStyle style = it.previous();
@@ -260,10 +261,17 @@ public class XWikiGeneratorListener implements IWemListener
                             getListener().endFormat(convertFormat(style), Listener.EMPTY_PARAMETERS);
                         } else {
                             getListener().endFormat(convertFormat(style), parameters);
+                            parametersConsumed = true;
                         }
                     }
+
+                    if (xorStyles != null && xorStyles.contains(style)) {
+                        xorStyles.remove(style);
+                    }
                 }
-            } else {
+            }
+
+            if (!parametersConsumed && parameters != Listener.EMPTY_PARAMETERS) {
                 getListener().endFormat(Format.NONE, parameters);
             }
         }
@@ -327,25 +335,29 @@ public class XWikiGeneratorListener implements IWemListener
      */
     public void beginFormat(WikiFormat format)
     {
-        List<WikiStyle> endFormatStyles = this.lastEndFormat != null ? this.lastEndFormat.getStyles() : null;
-        List<WikiParameter> endFormatParameters = this.lastEndFormat != null ? this.lastEndFormat.getParams() : null;
-
-        List<WikiStyle> formatStyles = format.getStyles();
-
-        if (this.lastEndFormat != null) {
-            // Exclude this format parameters and styles from previous end format
-            flushFormat(endFormatStyles, endFormatParameters, formatStyles);
-        }
-
         // Get the styles: the styles are wiki syntax styles (i.e. styles which have a wiki syntax such as bold, italic
         // ,etc).
         // As opposed to format parameters which don't have any specific wiki syntax (they have a generic wiki syntax
         // such as (% a='b' %) for example in XWiki Syntax 2.0.
-        List<WikiStyle> styles = format.getStyles();
+        List<WikiStyle> formatStyles = format.getStyles();
+        List<WikiParameter> formatParameters = format.getParams();
+
+        List<WikiStyle> endFormatStyles;
+        List<WikiParameter> endFormatParameters;
+        if (this.lastEndFormat != null) {
+            endFormatStyles = this.lastEndFormat.getStyles();
+            endFormatParameters = this.lastEndFormat.getParams();
+
+            // Exclude this format parameters and styles from previous end format
+            flushFormat(endFormatStyles, endFormatParameters, formatStyles);
+        } else {
+            endFormatStyles = null;
+            endFormatParameters = null;
+        }
 
         // If there's any style or parameter defined, do something. The reason we need to check for this is because
         // wikimodel sends an empty begin/endFormat event before starting an inline block (such as a paragraph).
-        if (styles.size() > 0 || format.getParams().size() > 0) {
+        if (formatStyles.size() > 0 || formatParameters.size() > 0) {
             // Generate nested FormatBlock blocks since XWiki uses nested Format blocks whereas Wikimodel doesn't.
             //
             // Simple Use Case: (% a='b' %)**//hello//**(%%)
@@ -380,15 +392,15 @@ public class XWikiGeneratorListener implements IWemListener
             // ____WordBlock(world)
 
             Map<String, String> parameters;
-            if (format.getParams().size() > 0) {
-                parameters = convertParameters(new WikiParameters(format.getParams()));
+            if (formatParameters.size() > 0) {
+                parameters = convertParameters(new WikiParameters(formatParameters));
             } else {
                 parameters = Listener.EMPTY_PARAMETERS;
             }
 
-            if (styles.size() > 0) {
+            if (formatStyles.size() > 0) {
                 boolean parametersConsumed = false;
-                for (WikiStyle style : styles) {
+                for (WikiStyle style : formatStyles) {
                     // Exclude previous format styles
                     if (endFormatStyles == null || !endFormatStyles.contains(style)) {
                         if (!parametersConsumed) {

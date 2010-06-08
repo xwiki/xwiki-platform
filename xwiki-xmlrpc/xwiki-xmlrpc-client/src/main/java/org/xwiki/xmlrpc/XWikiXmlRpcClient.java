@@ -456,7 +456,7 @@ public class XWikiXmlRpcClient
 
     public Comment getComment(String commentId) throws XmlRpcException
     {
-        Object object = invokeRpc("removePage", this.token, commentId);
+        Object object = invokeRpc("getComment", this.token, commentId);
         return new Comment((Map) object);
     }
 

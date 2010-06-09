@@ -31,10 +31,12 @@ import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.context.Execution;
 import org.xwiki.context.ExecutionContext;
 import org.xwiki.context.ExecutionContextManager;
+import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.block.LinkBlock;
+import org.xwiki.rendering.block.MacroMarkerBlock;
 import org.xwiki.rendering.block.XDOM;
 import org.xwiki.rendering.listener.Link;
 import org.xwiki.rendering.listener.LinkType;
@@ -65,15 +67,13 @@ public class IncludeMacro extends AbstractMacro<IncludeMacroParameters>
     private ComponentManager componentManager;
 
     /**
-     * Used to get the current context that we clone if the users asks to execute the included page in its
-     * own context.
+     * Used to get the current context that we clone if the users asks to execute the included page in its own context.
      */
     @Requirement
     private Execution execution;
 
     /**
-     * Used in order to clone the execution context when the user asks to execute the included page in its
-     * own context.
+     * Used in order to clone the execution context when the user asks to execute the included page in its own context.
      */
     @Requirement
     private ExecutionContextManager executionContextManager;
@@ -104,8 +104,8 @@ public class IncludeMacro extends AbstractMacro<IncludeMacroParameters>
      */
     public IncludeMacro()
     {
-        super("Include", DESCRIPTION, IncludeMacroParameters.class);        
-        
+        super("Include", DESCRIPTION, IncludeMacroParameters.class);
+
         // The include macro must execute first since if it runs with the current context it needs to bring
         // all the macros from the included page before the other macros are executed.
         setPriority(10);
@@ -145,19 +145,27 @@ public class IncludeMacro extends AbstractMacro<IncludeMacroParameters>
             throw new MacroExecutionException(
                 "You must specify a 'document' parameter pointing to the document to include.");
         }
-        
+
+        DocumentReference documentReference = resolve(context.getCurrentMacroBlock(), documentName);
+
+        if (context.getCurrentMacroBlock() != null) {
+            checkRecursiveInclusion(context.getCurrentMacroBlock(), documentReference);
+        }
+
         Context actualContext = parameters.getContext();
 
         // Retrieve the included document's content
         String includedContent;
         String includedSyntax;
         try {
-            if (this.documentAccessBridge.isDocumentViewable(documentName)) {
+            if (this.documentAccessBridge.isDocumentViewable(documentReference)) {
+                // TODO: use macro source informations to resolve document reference besed on the macro source instead
+                // of the context
                 includedContent = this.documentAccessBridge.getDocumentContent(documentName);
                 includedSyntax = this.documentAccessBridge.getDocumentSyntaxId(documentName);
             } else {
-                throw new MacroExecutionException(
-                    "Current user doesn't have view rights on document [" + documentName + "]");
+                throw new MacroExecutionException("Current user doesn't have view rights on document [" + documentName
+                    + "]");
             }
         } catch (Exception e) {
             throw new MacroExecutionException("Failed to get content for Document [" + documentName + "]", e);
@@ -177,9 +185,9 @@ public class IncludeMacro extends AbstractMacro<IncludeMacroParameters>
         // should be executed by the currently running Macro Transformation.
         if (actualContext == Context.NEW) {
             result =
-                executeWithNewContext(documentName, includedContent, includedSyntax, context.getTransformation());
+                executeWithNewContext(documentReference, includedContent, includedSyntax, context.getTransformation());
         } else {
-            result = executeWithCurrentContext(documentName, includedContent, includedSyntax);
+            result = executeWithCurrentContext(documentReference, includedContent, includedSyntax);
         }
 
         // We need to handle the case when there are relative links specified in the content of the included document.
@@ -191,8 +199,9 @@ public class IncludeMacro extends AbstractMacro<IncludeMacroParameters>
             Link link = block.getLink();
             if (link.getType() == LinkType.DOCUMENT) {
                 // It's a link to a document, make the reference absolute
-                String resolvedReference = this.defaultEntityReferenceSerializer.serialize(
-                    this.currentDocumentReferenceResolver.resolve(link.getReference()));
+                String resolvedReference =
+                    this.defaultEntityReferenceSerializer.serialize(this.currentDocumentReferenceResolver.resolve(link
+                        .getReference()));
                 link.setReference(resolvedReference);
             }
         }
@@ -201,16 +210,75 @@ public class IncludeMacro extends AbstractMacro<IncludeMacroParameters>
     }
 
     /**
+     * Protect form recursive inclusion.
+     * 
+     * @param currrentBlock the child block to check
+     * @param documentReference the reference of the document being included
+     * @throws MacroExecutionException recursive inclusion has been found
+     */
+    private void checkRecursiveInclusion(Block currrentBlock, DocumentReference documentReference)
+        throws MacroExecutionException
+    {
+        Block parentBlock = currrentBlock.getParent();
+
+        if (parentBlock != null) {
+            if (parentBlock instanceof MacroMarkerBlock) {
+                MacroMarkerBlock parentMacro = (MacroMarkerBlock) parentBlock;
+
+                if (isRecursive(parentMacro, documentReference)) {
+                    throw new MacroExecutionException("Found recursive inclusion of document [" + documentReference
+                        + "]");
+                }
+            }
+
+            checkRecursiveInclusion(parentBlock, documentReference);
+        }
+    }
+
+    /**
+     * Indicate if the provided macro is an include macro wit the provided included document.
+     * 
+     * @param parentMacro the macro block to check
+     * @param documentReference the document reference to compare to
+     * @return true if the documents are the same
+     */
+    private boolean isRecursive(MacroMarkerBlock parentMacro, DocumentReference documentReference)
+    {
+        if (parentMacro.getId().equals("include")) {
+            DocumentReference parentDocumentReference = resolve(parentMacro, parentMacro.getParameter("document"));
+
+            return documentReference.equals(parentDocumentReference);
+        }
+
+        return false;
+    }
+
+    /**
+     * Convert document name into proper {@link DocumentReference}.
+     * 
+     * @param block the block from which to resolve the document reference
+     * @param documentName the document name
+     * @return the document reference
+     */
+    private DocumentReference resolve(Block block, String documentName)
+    {
+        // TODO: use macro source informations to resolve document reference besed on the macro source instead of the
+        // context
+
+        return this.currentDocumentReferenceResolver.resolve(documentName);
+    }
+
+    /**
      * Parse and execute target document content in a new context.
      * 
-     * @param includedDocumentName the name of the document to include.
+     * @param includedDocumentReference the name of the document to include.
      * @param includedContent the content of the document to include.
      * @param includedSyntax the syntax identifier of the provided content.
      * @param transformation the macro transformation.
      * @return the result of parsing and transformation of the document to include.
      * @throws MacroExecutionException error when parsing content.
      */
-    private List<Block> executeWithNewContext(String includedDocumentName, String includedContent,
+    private List<Block> executeWithNewContext(DocumentReference includedDocumentReference, String includedContent,
         String includedSyntax, Transformation transformation) throws MacroExecutionException
     {
         List<Block> result;
@@ -218,19 +286,20 @@ public class IncludeMacro extends AbstractMacro<IncludeMacroParameters>
         try {
             // Push new Execution Context to isolate the contexts (Velocity, Groovy, etc).
             ExecutionContext clonedEc = this.executionContextManager.clone(this.execution.getContext());
-            
+
             this.execution.pushContext(clonedEc);
 
             Map<String, Object> backupObjects = new HashMap<String, Object>();
             try {
-                this.documentAccessBridge.pushDocumentInContext(backupObjects, includedDocumentName);
-                result = generateIncludedPageDOM(includedDocumentName, includedContent, includedSyntax, transformation);
+                this.documentAccessBridge.pushDocumentInContext(backupObjects, includedDocumentReference);
+                result =
+                    generateIncludedPageDOM(includedDocumentReference, includedContent, includedSyntax, transformation);
             } finally {
                 this.documentAccessBridge.popDocumentFromContext(backupObjects);
             }
 
         } catch (Exception e) {
-            throw new MacroExecutionException("Failed to render page [" + includedDocumentName 
+            throw new MacroExecutionException("Failed to render page [" + includedDocumentReference
                 + "] in new context", e);
         } finally {
             // Reset the Execution Context as before
@@ -243,29 +312,29 @@ public class IncludeMacro extends AbstractMacro<IncludeMacroParameters>
     /**
      * Parse and execute target document content in a the current context.
      * 
-     * @param includedDocumentName the name of the document to include.
+     * @param includedDocumentReference the name of the document to include.
      * @param includedContent the content of the document to include.
      * @param includedSyntax the syntax identifier of the provided content.
      * @return the result of parsing and transformation of the document to include.
      * @throws MacroExecutionException error when parsing content.
      */
-    private List<Block> executeWithCurrentContext(String includedDocumentName, String includedContent,
+    private List<Block> executeWithCurrentContext(DocumentReference includedDocumentReference, String includedContent,
         String includedSyntax) throws MacroExecutionException
     {
-        return generateIncludedPageDOM(includedDocumentName, includedContent, includedSyntax, null);
+        return generateIncludedPageDOM(includedDocumentReference, includedContent, includedSyntax, null);
     }
 
     /**
      * Parse and execute target document content.
      * 
-     * @param includedDocumentName the name of the document to include.
+     * @param includedDocumentReference the name of the document to include.
      * @param includedContent the content of the document to include.
      * @param includedSyntax the syntax identifier of the provided content.
      * @param transformation the macro transformation.
      * @return the result of parsing and transformation of the document to include.
      * @throws MacroExecutionException error when parsing content.
      */
-    private List<Block> generateIncludedPageDOM(String includedDocumentName, String includedContent,
+    private List<Block> generateIncludedPageDOM(DocumentReference includedDocumentReference, String includedContent,
         String includedSyntax, Transformation transformation) throws MacroExecutionException
     {
         XDOM includedDom;
@@ -281,7 +350,7 @@ public class IncludeMacro extends AbstractMacro<IncludeMacroParameters>
                 transformation.transform(includedDom, parser.getSyntax());
             }
         } catch (Exception e) {
-            throw new MacroExecutionException("Failed to parse included page [" + includedDocumentName + "]", e);
+            throw new MacroExecutionException("Failed to parse included page [" + includedDocumentReference + "]", e);
         }
 
         return includedDom.getChildren();

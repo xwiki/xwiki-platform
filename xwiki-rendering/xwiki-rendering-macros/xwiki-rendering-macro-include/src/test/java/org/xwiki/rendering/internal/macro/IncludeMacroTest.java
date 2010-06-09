@@ -20,6 +20,7 @@
 package org.xwiki.rendering.internal.macro;
 
 import java.io.StringWriter;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -29,6 +30,8 @@ import org.jmock.Expectations;
 import org.junit.Test;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.rendering.block.Block;
+import org.xwiki.rendering.block.MacroBlock;
+import org.xwiki.rendering.block.MacroMarkerBlock;
 import org.xwiki.rendering.internal.macro.include.IncludeMacro;
 import org.xwiki.rendering.internal.transformation.MacroTransformation;
 import org.xwiki.rendering.macro.Macro;
@@ -88,13 +91,15 @@ public class IncludeMacroTest extends AbstractComponentTestCase
             "#set ($myvar = 'hello')");
 
         this.mockSetup.mockery.checking(new Expectations() {{
-            oneOf(mockSetup.bridge).isDocumentViewable(with(any(String.class))); will(returnValue(true));
+            oneOf(mockSetup.bridge).isDocumentViewable(with(any(DocumentReference.class))); will(returnValue(true));
             oneOf(mockSetup.bridge).getDocumentContent(with(any(String.class))); 
                 will(returnValue("{{velocity}}$myvar{{/velocity}}"));
             oneOf(mockSetup.bridge).getDocumentSyntaxId(with(any(String.class)));
                 will(returnValue(Syntax.XWIKI_2_0.toIdString()));
-            oneOf(mockSetup.bridge).pushDocumentInContext(with(any(Map.class)), with(any(String.class)));
+            oneOf(mockSetup.bridge).pushDocumentInContext(with(any(Map.class)), with(any(DocumentReference.class)));
             oneOf(mockSetup.bridge).popDocumentFromContext(with(any(Map.class)));
+            oneOf(mockSetup.documentReferenceResolver).resolve("wiki:Space.Page");
+                will(returnValue(new DocumentReference("wiki", "Space", "Page")));
         }});
         this.includeMacro.setDocumentAccessBridge(this.mockSetup.bridge);
 
@@ -122,11 +127,13 @@ public class IncludeMacroTest extends AbstractComponentTestCase
             + "endDocument";
 
         this.mockSetup.mockery.checking(new Expectations() {{
-            oneOf(mockSetup.bridge).isDocumentViewable(with(any(String.class))); will(returnValue(true));
+            oneOf(mockSetup.bridge).isDocumentViewable(with(any(DocumentReference.class))); will(returnValue(true));
             oneOf(mockSetup.bridge).getDocumentContent(with(any(String.class))); 
                 will(returnValue("{{someMacro/}}"));
             oneOf(mockSetup.bridge).getDocumentSyntaxId(with(any(String.class)));
                 will(returnValue(Syntax.XWIKI_2_0.toIdString()));
+            oneOf(mockSetup.documentReferenceResolver).resolve("wiki:Space.Page");
+                will(returnValue(new DocumentReference("wiki", "Space", "Page")));
         }});
         
         this.includeMacro.setDocumentAccessBridge(mockSetup.bridge);
@@ -168,15 +175,17 @@ public class IncludeMacroTest extends AbstractComponentTestCase
             + "endDocument";
 
         this.mockSetup.mockery.checking(new Expectations() {{
-            oneOf(mockSetup.bridge).isDocumentViewable(with(any(String.class))); will(returnValue(true));
+            oneOf(mockSetup.bridge).isDocumentViewable(with(any(DocumentReference.class))); will(returnValue(true));
             oneOf(mockSetup.bridge).getDocumentContent("includedWiki:includedSpace.includedPage");
                 will(returnValue("[[page]]"));
             oneOf(mockSetup.bridge).getDocumentSyntaxId(with(any(String.class)));
                 will(returnValue(Syntax.XWIKI_2_0.toIdString()));
-            oneOf(mockSetup.bridge).pushDocumentInContext(with(any(Map.class)), with(any(String.class)));
+            oneOf(mockSetup.bridge).pushDocumentInContext(with(any(Map.class)), with(any(DocumentReference.class)));
             oneOf(mockSetup.bridge).popDocumentFromContext(with(any(Map.class)));
             oneOf(mockSetup.documentReferenceResolver).resolve("page");
                 will(returnValue(new DocumentReference("wiki", "space", "page")));
+            oneOf(mockSetup.documentReferenceResolver).resolve("includedWiki:includedSpace.includedPage");
+                will(returnValue(new DocumentReference("includedWiki", "includedSpace", "includedPage")));
         }});
         
         IncludeMacroParameters parameters = new IncludeMacroParameters();
@@ -186,5 +195,38 @@ public class IncludeMacroTest extends AbstractComponentTestCase
         List<Block> blocks = this.includeMacro.execute(parameters, null, new MacroTransformationContext());
 
         assertBlocks(expected, blocks, this.rendererFactory);
+    }
+    
+    @Test
+    public void testIncludeMacroWithRecursiveInclude() throws Exception
+    {
+        this.mockSetup.mockery.checking(new Expectations() {{
+            oneOf(mockSetup.documentReferenceResolver).resolve("wiki:Space.Page");
+                will(returnValue(new DocumentReference("wiki", "Space", "Page")));
+            oneOf(mockSetup.documentReferenceResolver).resolve("Space.Page");
+                will(returnValue(new DocumentReference("wiki", "Space", "Page")));
+        }});
+        
+        this.includeMacro.setDocumentAccessBridge(mockSetup.bridge);
+
+        MacroBlock includeMacro = new  MacroBlock("include", Collections.singletonMap("document", "wiki:Space.Page"), false);
+        new MacroMarkerBlock("include", Collections.singletonMap("document", "Space.Page"), Collections.<Block>singletonList(includeMacro), false);
+        MacroTransformationContext context = new MacroTransformationContext();
+        context.setCurrentMacroBlock(includeMacro);
+
+        IncludeMacroParameters parameters = new IncludeMacroParameters();
+        parameters.setDocument("wiki:Space.Page");
+        parameters.setContext(Context.CURRENT);
+        
+        List<Block> blocks;
+        try {
+            blocks = this.includeMacro.execute(parameters, null, context);
+            
+            Assert.fail("The include macro did not checked the recusive inclusion");
+        } catch (MacroExecutionException e) {
+            if (!e.getMessage().startsWith("Found recursive inclusion")) {
+                throw e;
+            }
+        }
     }
 }

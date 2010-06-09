@@ -48,6 +48,7 @@
       <artifactId>xwiki-core-model</artifactId>
       <version>${pom.version}</version>
     </dependency>
+
     <!-- Testing dependencies -->
     <dependency>
       <groupId>org.xwiki.platform</groupId>
@@ -92,6 +93,11 @@
         <!-- Apply the Checkstyle configurations defined in the top level pom.xml file -->
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-checkstyle-plugin</artifactId>
+        <configuration>
+          <excludes>
+            org/xwiki/rendering/internal/macro/include/IncludeMacro.java
+          </excludes>
+        </configuration>
       </plugin>
     </plugins>
   </build>

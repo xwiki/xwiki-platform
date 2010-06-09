@@ -504,7 +504,7 @@ $xwiki.get('ssfx').use('uicomponents/widgets/validation/livevalidation.css')
 ##
 ## Access level to register must be explicitly checked because it is only checked in XWiki.prepareDocuments
 ## and this page is accessible through view action.
-#if(!$xcontext.hasAccessLevel('register', $doc.getFullName))
+#if(!$xcontext.hasAccessLevel('register', 'XWiki.XWikiPreferences'))
   ## Make an exception if another document with programming permission (Invitation app) has included this 
   ## document and set $invited to true.
   #if(!$invited || !$xcontext.hasProgrammingRights())

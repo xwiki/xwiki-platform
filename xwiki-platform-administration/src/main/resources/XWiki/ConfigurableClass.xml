@@ -418,7 +418,7 @@ $xwiki.jsfx.use('js/xwiki/actionbuttons/actionButtons.js', true)
             ## Try to use an ajax call to lock the document.
 
 
-            {{html clean=false wiki=true}}
+            {{html wiki=true}}
               &lt;noscript&gt;
 
                 {{warning}}$msg.get('xe.admin.configurable.cannotLockNoJavascript'){{/warning}}
@@ -467,7 +467,9 @@ $xwiki.jsfx.use('js/xwiki/actionbuttons/actionButtons.js', true)
               ##
               #set($codeToExecute = "$!app.getValue('codeToExecute', $configurableObj)")
               #if($codeToExecute != '')
-                #evaluate($codeToExecute)
+                (%class="codeToExecute"%)(((##
+                  #evaluate($codeToExecute)##
+                )))
               #end
               ##
               ## If propertiesToShow is set, then we will only show the properties contained therein.
@@ -545,7 +547,7 @@ $xwiki.jsfx.use('js/xwiki/actionbuttons/actionButtons.js', true)
                     #end## define $formHtml
 
 
-                    {{html clean="false" wiki="false"}}
+                    {{html}}
                     $formHtml.toString()
                     {{/html}}
 
@@ -556,7 +558,7 @@ $xwiki.jsfx.use('js/xwiki/actionbuttons/actionButtons.js', true)
             ## If a form was started then we end it.
             #if($insideForm)
 
-              {{html clean="false" wiki="false"}}
+              {{html}}
               ## We add in a redirect field to prevent the user from being carried away when they save
               ## if they don't have javascript.
               #set($thisURL = $request.getRequestURL())
@@ -589,7 +591,9 @@ $xwiki.jsfx.use('js/xwiki/actionbuttons/actionButtons.js', true)
       #end## If app author has permission to edit admin page
     #end## If the current user has permission to edit the configurable application.
   #end## Foreach document name in names to configure
-  {{html clean=false wiki=false}}
+
+
+  {{html}}
   &lt;script type="text/javascript"&gt;
   /* &lt;![CDATA[ */
   ## Alt+Shift+S presses the first saveAndContinue button it finds, not what we want so we will disable edit shortcuts.
@@ -681,7 +685,8 @@ $xwiki.jsfx.use('js/xwiki/actionbuttons/actionButtons.js', true)
     #end
   #end
 
-  {{html clean=false wiki=false}}
+  ## Setting this to clean causes everything to end up in a &lt;p&gt; block producing invalid xhtml
+  {{html clean=false}}
   #foreach($sectionToAdd in $sectionsToAdd)
     #set($icon = $iconBySection.get($sectionToAdd))
     #if(!$icon)
@@ -737,7 +742,7 @@ $xwiki.jsfx.use('js/xwiki/actionbuttons/actionButtons.js', true)
     #set($sql = ", XWikiLock lock where lock.docId=doc.id and lock.userName='$xcontext.getUser()' and (${sql})")
     #set($namesOfdocumentsToUnlock = $xwiki.searchDocuments($sql))
     ## Use ajax and hope the user runs javascript.
-    {{html clean=false wiki=false}}
+    {{html}}
       &lt;script type="text/javascript"&gt;
         document.observe("dom:loaded", function() {
           #foreach($nameOflockedDocument in $namesOfdocumentsToUnlock)

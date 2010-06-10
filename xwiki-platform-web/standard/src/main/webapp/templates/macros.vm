@@ -1663,7 +1663,7 @@ ${Msz}Mb##
                 #set($class = $xwiki.getDocument($propClassName).getxWikiClass())
                 #set($list = '')
                 #set($list = $class.get($colname).getListValues())
-                <select id="xwiki-livetable-${divid}-filter-${velocityCount}" name='${colname}'><option value=''>none</option>
+                <select id="xwiki-livetable-${divid}-filter-${velocityCount}" name='${colname}'><option value=''>$msg.get('xe.livetable.select.all')</option>
                 #set($map = $class.get($colname).getMapValues())
                 #foreach($listitem in $list)
                   <option value="$listitem">$map.get($listitem).getValue()</option>

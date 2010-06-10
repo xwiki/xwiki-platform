@@ -1781,7 +1781,6 @@ ul.xwikitabbar {
     width: 100%;
     height: 30px;
     border-bottom: none;
-
 }
 
 #xwikieditor ul.xwikitabbar {
@@ -1789,77 +1788,74 @@ ul.xwikitabbar {
 }
 
 #xwikicontent ul.xwikitabbar {
-    overflow: hidden;
-    margin: 0;
-    border-bottom: 0 solid #555;
+  overflow: hidden;
+  margin: 0;
+  border-bottom: 0 solid #555;
 }
 
 .xwikitabbar li {
-    position: relative;
-    display: inline;
-    height: 30px;
-    line-height: 30px;
-    list-style-type: none;
-    margin-right: 2px;
-    text-align: center;
-    display: block;
-    float: left;
-    width: 106px;
-    border: none;
+  position: relative;
+  display: inline;
+  height: 30px;
+  line-height: 30px;
+  list-style-type: none;
+  margin-right: 2px;
+  text-align: center;
+  display: block;
+  float: left;
+  width: 106px;
+  border: none;
 }
 
 .xwikitabbar li#xwikiorphansview {
-    width: 206px;
-    background-image: url( images/tab2.png );
+  width: 206px;
+  background-image: url( images/tab2.png );
 }
 
 .xwikitabbar li#xwikiorphansview a {
-    background-image: url( images/tab2.png );
+  background-image: url( images/tab2.png );
+}
+
+.xwikitabbar li a {
+  background: transparent url(images/tab.png) no-repeat 0 0;
+  display: block;
+  font-size: 0.85em;
+  font-weight: normal;
+  height: 30px;
+  letter-spacing: -0.5px;
+  line-height: 34px !important;
+  margin-top: 0;
+  padding: 0 3px;
+  text-decoration: none;
 }
 
 .xwikitabbar li:hover {
-    background-position: top center;
+  background-position: top;
 }
 
-.xwikitabbar li a {
-	background:transparent url(images/tab.png) no-repeat scroll left top;
-	display:block;
-	font-size:0.85em;
-	font-weight:normal;
-	height:30px;
-	letter-spacing:-0.5px;
-	line-height:34px !important;
-	margin-top:0px;
-	padding:0pt 3px;
-	text-decoration:none;
-}
-
-.xwikitabbar li a:hover {
-    text-decoration: none;
-    background-position: top center;
-}
-
-.xwikitabbar li.active a,
-    .xwikitabbar li.active a:hover {
-    cursor: default;
-    background-position: top center;
-}
-
-.xwikitabbar li a {
-    color: #111;
-}
-
-.xwikitabbar li.active a {
-    color: #333;
-    font-weight: bold;
-}
-
-.xwikitabbar li {
+.xwikitabbar li:hover a {
+  text-decoration: none;
+  background-position: top;
 }
 
 .xwikitabbar li.active {
-    background-position: top right;
-    border: none;
+  background-position: top right;
+  border: none;
+  cursor: default;
+}
+
+.xwikitabbar li.active a, .xwikitabbar li.active:hover a {
+  cursor: default;
+  background-position: top;
+}
+
+.xwikitabbar li a {
+  color: #111;
+}
+
+.xwikitabbar li.active a {
+  color: #333;
+  font-weight: bold;
 }
 
 #xwikichangespace {
@@ -3645,7 +3641,7 @@ div.panellayoutcontainer-1col, div.panellayoutcontainer-2col, div.panellayoutcon
 }
 
 * html ul.xwikitabbar li a {
-    line-height: 1em;
+  line-height: 1em;
 }
 
 * html .roundedbox,

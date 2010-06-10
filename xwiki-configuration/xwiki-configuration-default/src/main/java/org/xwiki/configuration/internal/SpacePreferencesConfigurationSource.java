@@ -22,6 +22,7 @@ package org.xwiki.configuration.internal;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.model.reference.WikiReference;
 
@@ -41,6 +42,10 @@ public class SpacePreferencesConfigurationSource extends AbstractDocumentConfigu
 
     private static final String CLASS_PAGE_NAME = "XWikiPreferences";
 
+    /**
+     * {@inheritDoc}
+     * @see org.xwiki.configuration.internal.AbstractDocumentConfigurationSource#getClassReference() 
+     */
     @Override
     protected DocumentReference getClassReference()
     {
@@ -58,17 +63,26 @@ public class SpacePreferencesConfigurationSource extends AbstractDocumentConfigu
         return classReference;
     }
 
+    /**
+     * {@inheritDoc}
+     * @see AbstractDocumentConfigurationSource#getDocumentReference()
+     */
     @Override
     protected DocumentReference getDocumentReference()
     {
+        // Note: We would normally use a Reference Resolver here but since the Model module uses the Configuration
+        // module we cannot use one as otherwise we would create a cyclic build dependency...
+
         DocumentReference documentReference = null;
 
+        // Get the current document reference to extract the wiki and space names.
         DocumentReference currentDocumentReference = getDocumentAccessBridge().getCurrentDocumentReference();
+        
         if (currentDocumentReference != null) {
             // Add the current spaces and current wiki references to the Web Preferences document reference to form
             // an absolute reference.
-            documentReference = new DocumentReference(DOCUMENT_NAME, null);
-            documentReference.setParent(currentDocumentReference.extractReference(EntityType.SPACE));
+            documentReference = new DocumentReference(new EntityReference(DOCUMENT_NAME, EntityType.DOCUMENT,
+                currentDocumentReference.extractReference(EntityType.SPACE)));
         }
 
         return documentReference;

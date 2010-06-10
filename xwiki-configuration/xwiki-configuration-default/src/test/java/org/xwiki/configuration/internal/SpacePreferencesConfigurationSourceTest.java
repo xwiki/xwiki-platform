@@ -55,15 +55,19 @@ public class SpacePreferencesConfigurationSourceTest extends AbstractComponentTe
         ConfigurationSource source = getComponentManager().lookup(ConfigurationSource.class, "space");
 
         final DocumentReference webPreferencesReference = new DocumentReference("wiki", "space", "WebPreferences");
+        final DocumentReference currentDocument = new DocumentReference("wiki", "space", "page");
+
         mockery.checking(new Expectations() {{
             allowing(bridge).getCurrentDocumentReference();
-                will(returnValue(new DocumentReference("wiki", "space", "page")));
+                will(returnValue(currentDocument));
             oneOf(bridge).getProperty(webPreferencesReference, webPreferencesReference, "key");
                 will(returnValue("value"));
         }});
 
         String result = source.getProperty("key", String.class);
+
         Assert.assertEquals("value", result);
+        Assert.assertEquals(currentDocument.getName(), currentDocument.getParent().getChild().getName());
     }
 
     private <T> T registerComponentMock(ComponentManager componentManager, Class<T> componentRoleClass) throws Exception

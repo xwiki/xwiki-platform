@@ -223,9 +223,9 @@ public class IncludeMacroTest extends AbstractComponentTestCase
             blocks = this.includeMacro.execute(parameters, null, context);
             
             Assert.fail("The include macro did not checked the recusive inclusion");
-        } catch (MacroExecutionException e) {
-            if (!e.getMessage().startsWith("Found recursive inclusion")) {
-                throw e;
+        } catch (MacroExecutionException expected) {
+            if (!expected.getMessage().startsWith("Found recursive inclusion")) {
+                throw expected;
             }
         }
     }

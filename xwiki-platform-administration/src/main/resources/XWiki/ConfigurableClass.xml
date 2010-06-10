@@ -509,15 +509,19 @@ $xwiki.jsfx.use('js/xwiki/actionbuttons/actionButtons.js', true)
                     ## This is not done if there is only a custom defined form.
                     $xwiki.jsx.use($nameOfThisDocument)
                     ##
+                    ## We don't begin the form until we have content for it so that a configurable can specify a 
+                    ## custom form in codeToExecute and if that configurable object is the first of it's kind in that
+                    ## document, the custom form will not be put inside of our form.
+                    #if(!$insideForm)
+                      ## We are opening a form and fieldset without closing it, thus we cannot clean this html.
+
+                      {{html clean=false}}
+                      &lt;form id="$formId" method="post" action="$formAction"&gt;
+                      &lt;fieldset&gt;
+                      {{/html}}
+                      #set($insideForm = true)
+                    #end
                     #define($formHtml)
-                      ## We don't begin the form until we have content for it so that a configurable can specify a 
-                      ## custom form in codeToExecute and if that configurable object is the first of it's kind in that
-                      ## document, the custom form will not be put inside of our form.
-                      #if(!$insideForm)
-                        &lt;form id="$formId" method="post" action="$formAction"&gt;
-                        &lt;fieldset&gt;
-                        #set($insideForm = true)
-                      #end
                       #foreach($propName in $objClass.getPropertyNames())
                         #if($propertiesToShow.size() &gt; 0 &amp;&amp; !$propertiesToShow.contains($propName))
                           ## Silently skip over this property.
@@ -558,7 +562,8 @@ $xwiki.jsfx.use('js/xwiki/actionbuttons/actionButtons.js', true)
             ## If a form was started then we end it.
             #if($insideForm)
 
-              {{html}}
+              ## This is closing an open form which was opened above, we cannot clean this html.
+              {{html clean=false}}
               ## We add in a redirect field to prevent the user from being carried away when they save
               ## if they don't have javascript.
               #set($thisURL = $request.getRequestURL())
@@ -685,7 +690,7 @@ $xwiki.jsfx.use('js/xwiki/actionbuttons/actionButtons.js', true)
     #end
   #end
 
-  ## Setting this to clean causes everything to end up in a &lt;p&gt; block producing invalid xhtml
+  ## This is an html fragment and thus cannot be cleaned
   {{html clean=false}}
   #foreach($sectionToAdd in $sectionsToAdd)
     #set($icon = $iconBySection.get($sectionToAdd))

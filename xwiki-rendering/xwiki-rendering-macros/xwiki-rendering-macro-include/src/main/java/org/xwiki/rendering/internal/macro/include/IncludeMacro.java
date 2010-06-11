@@ -348,10 +348,7 @@ public class IncludeMacro extends AbstractMacro<IncludeMacroParameters>
             // and executed in the right order. Note that this works only because the Include macro has the highest
             // execution priority and is thus executed first.
             if (transformation != null) {
-                TransformationContext transformationContext = new TransformationContext();
-                transformationContext.setXDOM(includedDom);
-                transformationContext.setSyntax(parser.getSyntax());
-                transformation.transform(includedDom, transformationContext);
+                transformation.transform(includedDom, new TransformationContext(includedDom, parser.getSyntax()));
             }
         } catch (Exception e) {
             throw new MacroExecutionException("Failed to parse included page [" + includedDocumentReference + "]", e);

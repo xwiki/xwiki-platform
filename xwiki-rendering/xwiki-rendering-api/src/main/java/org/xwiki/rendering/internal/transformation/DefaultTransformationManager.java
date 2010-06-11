@@ -70,12 +70,7 @@ public class DefaultTransformationManager implements TransformationManager, Init
      */
     public void performTransformations(XDOM dom, Syntax syntax) throws TransformationException
     {
-        TransformationContext context = new TransformationContext();
-
-        context.setXDOM(dom);
-        context.setSyntax(syntax);
-
-        performTransformations(dom, context);
+        performTransformations(dom, new TransformationContext(dom, syntax));
     }
 
     /**

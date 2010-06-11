@@ -1117,9 +1117,7 @@ public class XWikiDocument implements DocumentModelBridge
 
                     // transform
                     try {
-                        TransformationContext txContext = new TransformationContext();
-                        txContext.setXDOM(headerXDOM);
-                        txContext.setSyntax(getSyntax());
+                        TransformationContext txContext = new TransformationContext(headerXDOM, getSyntax());
                         Utils.getComponent(TransformationManager.class).performTransformations(headerXDOM, txContext);
                     } catch (TransformationException e) {
                         throw new XWikiException(XWikiException.MODULE_XWIKI_RENDERING,
@@ -1212,9 +1210,7 @@ public class XWikiDocument implements DocumentModelBridge
                         XDOM headerXDOM = new XDOM(Collections.<Block> singletonList(header));
 
                         // transform
-                        TransformationContext context = new TransformationContext();
-                        context.setXDOM(headerXDOM);
-                        context.setSyntax(getSyntax());
+                        TransformationContext context = new TransformationContext(headerXDOM, getSyntax());
                         Utils.getComponent(TransformationManager.class).performTransformations(headerXDOM, context);
 
                         // render
@@ -7276,9 +7272,8 @@ public class XWikiDocument implements DocumentModelBridge
                 // Transform XDOM
                 TransformationManager transformations = Utils.getComponent(TransformationManager.class);
                 SyntaxFactory syntaxFactory = Utils.getComponent(SyntaxFactory.class);
-                TransformationContext txContext = new TransformationContext();
-                txContext.setXDOM(content);
-                txContext.setSyntax(syntaxFactory.createSyntaxFromIdString(currentSyntaxId));
+                TransformationContext txContext = new TransformationContext(content,
+                    syntaxFactory.createSyntaxFromIdString(currentSyntaxId));
                 transformations.performTransformations(content, txContext);
             }
 

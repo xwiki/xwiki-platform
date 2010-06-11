@@ -97,9 +97,8 @@ public class RenderingTestCase extends MockObjectTestCase
         if (this.runTransformations) {
             SyntaxFactory syntaxFactory = getComponentManager().lookup(SyntaxFactory.class);
             TransformationManager transformationManager = getComponentManager().lookup(TransformationManager.class);
-            TransformationContext txContext = new TransformationContext();
-            txContext.setXDOM(xdom);
-            txContext.setSyntax(syntaxFactory.createSyntaxFromIdString(this.parserId));
+            TransformationContext txContext = new TransformationContext(xdom,
+                syntaxFactory.createSyntaxFromIdString(this.parserId));
             transformationManager.performTransformations(xdom, txContext);
         }
 

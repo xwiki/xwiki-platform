@@ -31,7 +31,7 @@ import org.xwiki.rendering.syntax.Syntax;
 public class TransformationContext
 {
     /**
-     * The complete {@link XDOM} of the page currently being transformed.
+     * The complete {@link XDOM} of the content currently being transformed.
      */
     private XDOM xdom;
 
@@ -41,7 +41,28 @@ public class TransformationContext
     private Syntax syntax;
 
     /**
-     * @param xdom the complete {@link XDOM} of the page currently being transformed.
+     * Default constructor that doesn't set the XDOM or the Syntax. This is because setting the XDOM and the Syntax is
+     * optional and only required by some Macros to behave as expected.
+     */
+    public TransformationContext()
+    {
+        // Voluntarily empty.
+    }
+
+    /**
+     * Some macros require the XDOM and the Syntax to be set.
+     *
+     * @param xdom see {@link #setXDOM(org.xwiki.rendering.block.XDOM)}
+     * @param syntax see {@link #setSyntax(org.xwiki.rendering.syntax.Syntax)}
+     */
+    public TransformationContext(XDOM xdom, Syntax syntax)
+    {
+        setXDOM(xdom);
+        setSyntax(syntax);
+    }
+
+    /**
+     * @param xdom the complete {@link XDOM} of the content currently being transformed.
      */
     public void setXDOM(XDOM xdom)
     {
@@ -49,7 +70,7 @@ public class TransformationContext
     }
 
     /**
-     * @return the complete {@link XDOM} of the page currently being transformed.
+     * @return the complete {@link XDOM} of the content currently being transformed.
      */
     public XDOM getXDOM()
     {

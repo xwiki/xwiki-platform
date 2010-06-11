@@ -107,12 +107,7 @@ public class MacroTransformation extends AbstractTransformation
      */
     public void transform(XDOM dom, Syntax syntax) throws TransformationException
     {
-        TransformationContext context = new TransformationContext();
-
-        context.setXDOM(dom);
-        context.setSyntax(syntax);
-
-        transform(dom, context);
+        transform(dom, new TransformationContext(dom, syntax));
     }
 
     /**

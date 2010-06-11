@@ -37,9 +37,6 @@ public class DefaultTransformationManagerTest extends AbstractComponentTestCase
     public void testTransformations() throws Exception 
     {
         TransformationManager manager = getComponentManager().lookup(TransformationManager.class);
-        TransformationContext txContext = new TransformationContext();
-        txContext.setXDOM(XDOM.EMPTY);
-        txContext.setSyntax(Syntax.XWIKI_2_0);
-        manager.performTransformations(XDOM.EMPTY, txContext);
+        manager.performTransformations(XDOM.EMPTY, new TransformationContext(XDOM.EMPTY, Syntax.XWIKI_2_0));
     }
 }

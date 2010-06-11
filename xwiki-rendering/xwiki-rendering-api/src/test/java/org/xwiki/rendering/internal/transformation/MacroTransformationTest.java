@@ -72,10 +72,7 @@ public class MacroTransformationTest extends AbstractXWikiComponentTestCase
         XDOM dom = new XDOM(Arrays.asList((Block) new MacroBlock("testsimplemacro",
             Collections.<String, String>emptyMap(), false)));
         
-        TransformationContext context = new TransformationContext();
-        context.setXDOM(dom);
-        context.setSyntax(Syntax.XWIKI_2_0);
-        this.transformation.transform(dom, context);
+        this.transformation.transform(dom, new TransformationContext(dom, Syntax.XWIKI_2_0));
 
         WikiPrinter printer = new DefaultWikiPrinter();
         getComponentManager().lookup(BlockRenderer.class, Syntax.EVENT_1_0.toIdString()).render(dom, printer);
@@ -100,10 +97,7 @@ public class MacroTransformationTest extends AbstractXWikiComponentTestCase
         XDOM dom = new XDOM(Arrays.asList((Block) new MacroBlock("testnestedmacro",
             Collections.<String, String>emptyMap(), false)));
     
-        TransformationContext context = new TransformationContext();
-        context.setXDOM(dom);
-        context.setSyntax(Syntax.XWIKI_2_0);
-        this.transformation.transform(dom, context);
+        this.transformation.transform(dom, new TransformationContext(dom, Syntax.XWIKI_2_0));
 
         WikiPrinter printer = new DefaultWikiPrinter();
         getComponentManager().lookup(BlockRenderer.class, Syntax.EVENT_1_0.toIdString()).render(dom, printer);
@@ -124,10 +118,7 @@ public class MacroTransformationTest extends AbstractXWikiComponentTestCase
         XDOM dom = new XDOM(Arrays.asList((Block) new MacroBlock("testrecursivemacro",
             Collections.<String, String>emptyMap(), false)));
     
-        TransformationContext context = new TransformationContext();
-        context.setXDOM(dom);
-        context.setSyntax(Syntax.XWIKI_2_0);
-        this.transformation.transform(dom, context);
+        this.transformation.transform(dom, new TransformationContext(dom, Syntax.XWIKI_2_0));
 
         WikiPrinter printer = new DefaultWikiPrinter();
         getComponentManager().lookup(BlockRenderer.class, Syntax.EVENT_1_0.toIdString()).render(dom, printer);
@@ -161,10 +152,7 @@ public class MacroTransformationTest extends AbstractXWikiComponentTestCase
             new MacroBlock("testsimplemacro", Collections.<String, String>emptyMap(), false),
             new MacroBlock("testprioritymacro", Collections.<String, String>emptyMap(), false)));
 
-        TransformationContext context = new TransformationContext();
-        context.setXDOM(dom);
-        context.setSyntax(Syntax.XWIKI_2_0);
-        this.transformation.transform(dom, context);
+        this.transformation.transform(dom, new TransformationContext(dom, Syntax.XWIKI_2_0));
 
         WikiPrinter printer = new DefaultWikiPrinter();
         getComponentManager().lookup(BlockRenderer.class, Syntax.EVENT_1_0.toIdString()).render(dom, printer);
@@ -182,9 +170,7 @@ public class MacroTransformationTest extends AbstractXWikiComponentTestCase
             new MacroBlock("testsimplemacro", Collections.<String, String>emptyMap(), false),
             new MacroBlock("testcontentmacro", Collections.<String, String>emptyMap(), "content", false)));
 
-    	TransformationContext context = new TransformationContext();
-        context.setXDOM(dom);
-        context.setSyntax(Syntax.XWIKI_2_0);
+        TransformationContext context = new TransformationContext(dom, Syntax.XWIKI_2_0);
         this.transformation.transform(dom, context);
 
         WikiPrinter printer = new DefaultWikiPrinter();

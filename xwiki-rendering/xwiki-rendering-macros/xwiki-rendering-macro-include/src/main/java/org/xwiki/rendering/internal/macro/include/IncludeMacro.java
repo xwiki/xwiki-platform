@@ -47,6 +47,7 @@ import org.xwiki.rendering.macro.include.IncludeMacroParameters.Context;
 import org.xwiki.rendering.parser.Parser;
 import org.xwiki.rendering.transformation.MacroTransformationContext;
 import org.xwiki.rendering.transformation.Transformation;
+import org.xwiki.rendering.transformation.TransformationContext;
 
 /**
  * @version $Id$
@@ -347,7 +348,10 @@ public class IncludeMacro extends AbstractMacro<IncludeMacroParameters>
             // and executed in the right order. Note that this works only because the Include macro has the highest
             // execution priority and is thus executed first.
             if (transformation != null) {
-                transformation.transform(includedDom, parser.getSyntax());
+                TransformationContext transformationContext = new TransformationContext();
+                transformationContext.setXDOM(includedDom);
+                transformationContext.setSyntax(parser.getSyntax());
+                transformation.transform(includedDom, transformationContext);
             }
         } catch (Exception e) {
             throw new MacroExecutionException("Failed to parse included page [" + includedDocumentReference + "]", e);

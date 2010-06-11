@@ -19,9 +19,8 @@
  */
 package org.xwiki.officeimporter.openoffice;
 
+import org.artofsolving.jodconverter.OfficeDocumentConverter;
 import org.xwiki.component.annotation.ComponentRole;
-
-import net.sf.jodconverter.OfficeDocumentConverter;
 
 /**
  * Component interface for managing openoffice server connection / process.

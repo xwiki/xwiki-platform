@@ -27,11 +27,10 @@ import java.io.InputStream;
 import java.util.HashMap;
 import java.util.Map;
 
-import net.sf.jodconverter.DefaultDocumentFormatRegistry;
-import net.sf.jodconverter.DocumentFormat;
-import net.sf.jodconverter.DocumentFormatRegistry;
-
 import org.apache.commons.io.IOUtils;
+import org.artofsolving.jodconverter.document.DefaultDocumentFormatRegistry;
+import org.artofsolving.jodconverter.document.DocumentFormat;
+import org.artofsolving.jodconverter.document.DocumentFormatRegistry;
 import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.Requirement;

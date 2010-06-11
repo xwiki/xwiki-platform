@@ -21,13 +21,10 @@ package org.xwiki.officeimporter.internal.openoffice;
 
 import java.io.File;
 
-import net.sf.jodconverter.OfficeDocumentConverter;
-import net.sf.jodconverter.office.ExternalProcessOfficeManager;
-import net.sf.jodconverter.office.ManagedProcessOfficeManager;
-import net.sf.jodconverter.office.ManagedProcessOfficeManagerConfiguration;
-import net.sf.jodconverter.office.OfficeConnectionMode;
-import net.sf.jodconverter.office.OfficeManager;
-
+import org.artofsolving.jodconverter.OfficeDocumentConverter;
+import org.artofsolving.jodconverter.office.DefaultOfficeManagerConfiguration;
+import org.artofsolving.jodconverter.office.ExternalOfficeManagerConfiguration;
+import org.artofsolving.jodconverter.office.OfficeManager;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.Requirement;
 import org.xwiki.component.logging.AbstractLogEnabled;
@@ -87,52 +84,57 @@ public class DefaultOpenOfficeManager extends AbstractLogEnabled implements Open
     }
 
     /**
-     * {@inheritDoc}
+     * Initialize JodConverter.
+     * 
+     * @throws OpenOfficeManagerException when failed to initialize
      */
     public void initialize() throws OpenOfficeManagerException
     {
-        OfficeConnectionMode connectionMode = OfficeConnectionMode.socket(conf.getServerPort());
-        if (conf.getServerType() == OpenOfficeConfiguration.SERVER_TYPE_INTERNAL) {
-            File officeHome = new File(conf.getHomePath());
-            File officeProfile = new File(conf.getProfilePath());
-            ManagedProcessOfficeManagerConfiguration configuration =
-                new ManagedProcessOfficeManagerConfiguration(connectionMode);
+        if (this.conf.getServerType() == OpenOfficeConfiguration.SERVER_TYPE_INTERNAL) {
+            File officeHome = new File(this.conf.getHomePath());
+            File officeProfile = new File(this.conf.getProfilePath());
+            DefaultOfficeManagerConfiguration configuration = new DefaultOfficeManagerConfiguration();
+            configuration.setPortNumber(this.conf.getServerPort());
             configuration.setOfficeHome(officeHome);
             configuration.setTemplateProfileDir(officeProfile);
-            configuration.setMaxTasksPerProcess(conf.getMaxTasksPerProcess());
-            configuration.setTaskExecutionTimeout(conf.getTaskExecutionTimeout());
-            this.jodOOManager = new ManagedProcessOfficeManager(configuration);
+            configuration.setMaxTasksPerProcess(this.conf.getMaxTasksPerProcess());
+            configuration.setTaskExecutionTimeout(this.conf.getTaskExecutionTimeout());
+            this.jodOOManager = configuration.buildOfficeManager();
         } else if (conf.getServerType() == OpenOfficeConfiguration.SERVER_TYPE_EXTERNAL_LOCAL) {
-            ExternalProcessOfficeManager externalProcessOfficeManager =
-                new ExternalProcessOfficeManager(connectionMode);
+            ExternalOfficeManagerConfiguration externalProcessOfficeManager = new ExternalOfficeManagerConfiguration();
+            externalProcessOfficeManager.setPortNumber(this.conf.getServerPort());
             externalProcessOfficeManager.setConnectOnStart(true);
-            this.jodOOManager = externalProcessOfficeManager;
+            this.jodOOManager = externalProcessOfficeManager.buildOfficeManager();
         } else {
             setState(ManagerState.CONF_ERROR);
             throw new OpenOfficeManagerException("Invalid openoffice server configuration.");
         }
-        this.jodConverter = new OfficeDocumentConverter(jodOOManager);
+        this.jodConverter = new OfficeDocumentConverter(this.jodOOManager);
         File workDir = container.getApplicationContext().getTemporaryDirectory();
-        this.converter = new DefaultOpenOfficeConverter(jodConverter, workDir, getLogger());
+        this.converter = new DefaultOpenOfficeConverter(this.jodConverter, workDir, getLogger());
     }
 
     /**
      * {@inheritDoc}
+     * 
+     * @see org.xwiki.officeimporter.openoffice.OpenOfficeManager#getState()
      */
     public ManagerState getState()
     {
-        return state;
+        return this.state;
     }
 
     /**
      * {@inheritDoc}
+     * 
+     * @see org.xwiki.officeimporter.openoffice.OpenOfficeManager#start()
      */
     public void start() throws OpenOfficeManagerException
     {
         if (!checkState(ManagerState.CONNECTED)) {
             initialize();
             try {
-                jodOOManager.start();
+                this.jodOOManager.start();
                 setState(ManagerState.CONNECTED);
                 getLogger().info("Open Office instance started.");
             } catch (Exception ex) {
@@ -144,12 +146,14 @@ public class DefaultOpenOfficeManager extends AbstractLogEnabled implements Open
 
     /**
      * {@inheritDoc}
+     * 
+     * @see org.xwiki.officeimporter.openoffice.OpenOfficeManager#stop()
      */
     public void stop() throws OpenOfficeManagerException
     {
         if (checkState(ManagerState.CONNECTED)) {
             try {
-                jodOOManager.stop();
+                this.jodOOManager.stop();
                 setState(ManagerState.NOT_CONNECTED);
                 getLogger().info("Open Office instance stopped.");
             } catch (Exception ex) {
@@ -161,10 +165,12 @@ public class DefaultOpenOfficeManager extends AbstractLogEnabled implements Open
 
     /**
      * {@inheritDoc}
+     * 
+     * @see org.xwiki.officeimporter.openoffice.OpenOfficeManager#getConverter()
      */
     public OpenOfficeConverter getConverter()
     {
-        return converter;
+        return this.converter;
     }
 
     /**
@@ -190,10 +196,12 @@ public class DefaultOpenOfficeManager extends AbstractLogEnabled implements Open
 
     /**
      * {@inheritDoc}
+     * 
+     * @see org.xwiki.officeimporter.openoffice.OpenOfficeManager#getDocumentConverter()
      */
     @Deprecated
     public OfficeDocumentConverter getDocumentConverter()
     {
-        return jodConverter;
+        return this.jodConverter;
     }
 }

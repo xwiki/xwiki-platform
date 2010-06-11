@@ -19,8 +19,7 @@
  */
 package org.xwiki.officeimporter.internal.openoffice;
 
-import net.sf.jodconverter.office.OfficeUtils;
-
+import org.artofsolving.jodconverter.office.OfficeUtils;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.Requirement;
 import org.xwiki.configuration.ConfigurationSource;

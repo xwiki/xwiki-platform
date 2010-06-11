@@ -58,7 +58,7 @@ public interface OpenOfficeConfiguration
     int getServerType();
     
     /**
-     * @return port number used for connecting to the openoffice server instance. 
+     * @return port number used for connecting to the openoffice server instance.
      */
     int getServerPort();
 

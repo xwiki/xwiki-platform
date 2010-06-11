@@ -26,9 +26,8 @@ import java.io.InputStream;
 import java.util.HashMap;
 import java.util.Map;
 
-import net.sf.jodconverter.OfficeDocumentConverter;
-
 import org.apache.commons.io.IOUtils;
+import org.artofsolving.jodconverter.OfficeDocumentConverter;
 import org.xwiki.component.logging.Logger;
 import org.xwiki.officeimporter.openoffice.OpenOfficeConverter;
 import org.xwiki.officeimporter.openoffice.OpenOfficeConverterException;

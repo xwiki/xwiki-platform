@@ -118,7 +118,7 @@ public class SyntaxType
     @Override
     public int hashCode()
     {
-        // Random number. See http://www.geocities.com/technofundo/tech/java/equalhash.html for the detail of this
+        // Random number. See http://www.technofundo.com/tech/java/equalhash.html for the detail of this
         // algorithm.
         // Note that the name isn't part of the hashCode computation since it's not part of the Syntax type's identity
         int hash = 7;
@@ -136,7 +136,7 @@ public class SyntaxType
     {
         boolean result;
 
-        // See http://www.geocities.com/technofundo/tech/java/equalhash.html for the detail of this algorithm.
+        // See http://www.technofundo.com/tech/java/equalhash.html for the detail of this algorithm.
         if (this == object) {
             result = true;
         } else {

@@ -105,7 +105,7 @@ public class MacroId
     @Override
     public int hashCode()
     {
-        // Random number. See http://www.geocities.com/technofundo/tech/java/equalhash.html for the detail of this
+        // Random number. See http://www.technofundo.com/tech/java/equalhash.html for the detail of this
         // algorithm.
         int hash = 7;
         hash = 31 * hash + (null == getId() ? 0 : getId().hashCode());
@@ -123,7 +123,7 @@ public class MacroId
     {
         boolean result;
 
-        // See http://www.geocities.com/technofundo/tech/java/equalhash.html for the detail of this algorithm.
+        // See http://www.technofundo.com/tech/java/equalhash.html for the detail of this algorithm.
         if (this == object) {
             result = true;
         } else {

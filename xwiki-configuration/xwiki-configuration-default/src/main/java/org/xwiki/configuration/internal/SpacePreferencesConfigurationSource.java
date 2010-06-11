@@ -22,13 +22,11 @@ package org.xwiki.configuration.internal;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.DocumentReference;
-import org.xwiki.model.reference.SpaceReference;
-import org.xwiki.model.reference.WikiReference;
 
 /**
- * Configuration source taking its data in the Space Preferences wiki document
- * (using data from the XWiki.XWikiPreferences object attached to that document). 
- *  
+ * Configuration source taking its data in the Space Preferences wiki document (using data from the
+ * XWiki.XWikiPreferences object attached to that document).
+ * 
  * @version $Id$
  * @since 2.0M2
  */
@@ -36,11 +34,16 @@ import org.xwiki.model.reference.WikiReference;
 public class SpacePreferencesConfigurationSource extends AbstractDocumentConfigurationSource
 {
     private static final String DOCUMENT_NAME = "WebPreferences";
-    
+
     private static final String CLASS_SPACE_NAME = "XWiki";
 
     private static final String CLASS_PAGE_NAME = "XWikiPreferences";
 
+    /**
+     * {@inheritDoc}
+     * 
+     * @see org.xwiki.configuration.internal.AbstractDocumentConfigurationSource#getClassReference()
+     */
     @Override
     protected DocumentReference getClassReference()
     {
@@ -50,25 +53,34 @@ public class SpacePreferencesConfigurationSource extends AbstractDocumentConfigu
         if (currentDocumentReference != null) {
             // Add the current current wiki references to the XWiki Preferences class reference to form
             // an absolute reference.
-            SpaceReference spaceReference = new SpaceReference(CLASS_SPACE_NAME, (WikiReference) null);
-            classReference = new DocumentReference(CLASS_PAGE_NAME, spaceReference);
-            spaceReference.setParent(currentDocumentReference.extractReference(EntityType.WIKI));
+            classReference =
+                new DocumentReference(CLASS_PAGE_NAME, CLASS_SPACE_NAME, currentDocumentReference.extractReference(
+                    EntityType.WIKI).getName());
         }
 
         return classReference;
     }
 
+    /**
+     * {@inheritDoc}
+     * 
+     * @see AbstractDocumentConfigurationSource#getDocumentReference()
+     */
     @Override
     protected DocumentReference getDocumentReference()
     {
+        // Note: We would normally use a Reference Resolver here but since the Model module uses the Configuration
+        // module we cannot use one as otherwise we would create a cyclic build dependency...
+
         DocumentReference documentReference = null;
 
+        // Get the current document reference to extract the wiki and space names.
         DocumentReference currentDocumentReference = getDocumentAccessBridge().getCurrentDocumentReference();
+
         if (currentDocumentReference != null) {
             // Add the current spaces and current wiki references to the Web Preferences document reference to form
             // an absolute reference.
-            documentReference = new DocumentReference(DOCUMENT_NAME, null);
-            documentReference.setParent(currentDocumentReference.extractReference(EntityType.SPACE));
+            documentReference = new DocumentReference(DOCUMENT_NAME, currentDocumentReference.getLastSpaceReference());
         }
 
         return documentReference;

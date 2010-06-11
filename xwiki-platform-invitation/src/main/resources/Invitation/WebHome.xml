@@ -1,0 +1,777 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xwikidoc>
+<web>Invitation</web>
+<name>WebHome</name>
+<language></language>
+<defaultLanguage>en</defaultLanguage>
+<translation>0</translation>
+<parent>Main.WebHome</parent>
+<creator>XWiki.Admin</creator>
+<author>XWiki.Admin</author>
+<customClass></customClass>
+<contentAuthor>XWiki.Admin</contentAuthor>
+<creationDate>1271083477000</creationDate>
+<date>1271850308000</date>
+<contentUpdateDate>1271850308000</contentUpdateDate>
+<version>1.1</version>
+<title>$msg.get('xe.invitation.heading')</title>
+<template></template>
+<defaultTemplate></defaultTemplate>
+<validationScript></validationScript>
+<comment></comment>
+<minorEdit>false</minorEdit>
+<syntaxId>xwiki/2.0</syntaxId>
+<hidden>false</hidden>
+<class>
+<name>Invitation.WebHome</name>
+<customClass></customClass>
+<customMapping></customMapping>
+<defaultViewSheet></defaultViewSheet>
+<defaultEditSheet></defaultEditSheet>
+<defaultWeb></defaultWeb>
+<nameField></nameField>
+<validationScript></validationScript>
+<allowUsersOfOtherWikis>
+<defaultValue></defaultValue>
+<displayFormType>checkbox</displayFormType>
+<displayType></displayType>
+<name>allowUsersOfOtherWikis</name>
+<number>4</number>
+<prettyName>Let users of other wikis send</prettyName>
+<unmodifiable>0</unmodifiable>
+<validationMessage></validationMessage>
+<validationRegExp></validationRegExp>
+<classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+</allowUsersOfOtherWikis>
+<commonPage>
+<name>commonPage</name>
+<number>18</number>
+<picker>0</picker>
+<prettyName>common</prettyName>
+<size>30</size>
+<unmodifiable>0</unmodifiable>
+<validationMessage></validationMessage>
+<validationRegExp></validationRegExp>
+<classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+</commonPage>
+<emailClass>
+<name>emailClass</name>
+<number>5</number>
+<picker>0</picker>
+<prettyName>Email message XClass</prettyName>
+<size>30</size>
+<unmodifiable>0</unmodifiable>
+<validationMessage></validationMessage>
+<validationRegExp></validationRegExp>
+<classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+</emailClass>
+<emailContainer>
+<name>emailContainer</name>
+<number>9</number>
+<picker>0</picker>
+<prettyName>Document containing email XObjects</prettyName>
+<size>30</size>
+<unmodifiable>0</unmodifiable>
+<validationMessage></validationMessage>
+<validationRegExp></validationRegExp>
+<classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+</emailContainer>
+<emailRegex>
+<name>emailRegex</name>
+<number>7</number>
+<picker>0</picker>
+<prettyName>Regular expression for validating email addresses</prettyName>
+<size>30</size>
+<unmodifiable>0</unmodifiable>
+<validationMessage></validationMessage>
+<validationRegExp></validationRegExp>
+<classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+</emailRegex>
+<from_address>
+<name>from_address</name>
+<number>1</number>
+<picker>0</picker>
+<prettyName>Email "from" address</prettyName>
+<size>30</size>
+<unmodifiable>0</unmodifiable>
+<validationMessage></validationMessage>
+<validationRegExp></validationRegExp>
+<classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+</from_address>
+<guestsActionsPage>
+<name>guestsActionsPage</name>
+<number>14</number>
+<picker>0</picker>
+<prettyName>guestsActions</prettyName>
+<size>30</size>
+<unmodifiable>0</unmodifiable>
+<validationMessage></validationMessage>
+<validationRegExp></validationRegExp>
+<classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+</guestsActionsPage>
+<javamail_extra_props>
+<editor>---</editor>
+<name>javamail_extra_props</name>
+<number>15</number>
+<picker>0</picker>
+<prettyName>Javamail extra properties</prettyName>
+<rows>5</rows>
+<size>40</size>
+<unmodifiable>0</unmodifiable>
+<validationMessage></validationMessage>
+<validationRegExp></validationRegExp>
+<classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+</javamail_extra_props>
+<mainPage>
+<name>mainPage</name>
+<number>19</number>
+<picker>0</picker>
+<prettyName>mainPage</prettyName>
+<size>30</size>
+<unmodifiable>0</unmodifiable>
+<validationMessage></validationMessage>
+<validationRegExp></validationRegExp>
+<classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+</mainPage>
+<membersActionsPage>
+<name>membersActionsPage</name>
+<number>16</number>
+<picker>0</picker>
+<prettyName>membersActions</prettyName>
+<size>30</size>
+<unmodifiable>0</unmodifiable>
+<validationMessage></validationMessage>
+<validationRegExp></validationRegExp>
+<classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+</membersActionsPage>
+<membersCommonPage>
+<name>membersCommonPage</name>
+<number>17</number>
+<picker>0</picker>
+<prettyName>membersCommon</prettyName>
+<size>30</size>
+<unmodifiable>0</unmodifiable>
+<validationMessage></validationMessage>
+<validationRegExp></validationRegExp>
+<classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+</membersCommonPage>
+<messageBodyTemplate>
+<editor>---</editor>
+<name>messageBodyTemplate</name>
+<number>3</number>
+<picker>0</picker>
+<prettyName>Email message body HTML template</prettyName>
+<rows>5</rows>
+<size>40</size>
+<unmodifiable>0</unmodifiable>
+<validationMessage></validationMessage>
+<validationRegExp></validationRegExp>
+<classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+</messageBodyTemplate>
+<smtp_port>
+<name>smtp_port</name>
+<number>13</number>
+<picker>0</picker>
+<prettyName>Smtp port</prettyName>
+<size>30</size>
+<unmodifiable>0</unmodifiable>
+<validationMessage></validationMessage>
+<validationRegExp></validationRegExp>
+<classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+</smtp_port>
+<smtp_server>
+<name>smtp_server</name>
+<number>12</number>
+<picker>0</picker>
+<prettyName>Smtp server host name</prettyName>
+<size>30</size>
+<unmodifiable>0</unmodifiable>
+<validationMessage></validationMessage>
+<validationRegExp></validationRegExp>
+<classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+</smtp_server>
+<smtp_server_password>
+<name>smtp_server_password</name>
+<number>11</number>
+<picker>0</picker>
+<prettyName>Smtp password</prettyName>
+<size>30</size>
+<unmodifiable>0</unmodifiable>
+<validationMessage></validationMessage>
+<validationRegExp></validationRegExp>
+<classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+</smtp_server_password>
+<smtp_server_username>
+<name>smtp_server_username</name>
+<number>10</number>
+<picker>0</picker>
+<prettyName>Smtp username</prettyName>
+<size>30</size>
+<unmodifiable>0</unmodifiable>
+<validationMessage></validationMessage>
+<validationRegExp></validationRegExp>
+<classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+</smtp_server_username>
+<subjectLineTemplate>
+<name>subjectLineTemplate</name>
+<number>2</number>
+<picker>0</picker>
+<prettyName>Email subject line template</prettyName>
+<size>30</size>
+<unmodifiable>0</unmodifiable>
+<validationMessage></validationMessage>
+<validationRegExp></validationRegExp>
+<classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+</subjectLineTemplate>
+<usersMayPersonalizeMessage>
+<defaultValue></defaultValue>
+<displayFormType>checkbox</displayFormType>
+<displayType></displayType>
+<name>usersMayPersonalizeMessage</name>
+<number>8</number>
+<prettyName>Let users personalize messages</prettyName>
+<unmodifiable>0</unmodifiable>
+<validationMessage></validationMessage>
+<validationRegExp></validationRegExp>
+<classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+</usersMayPersonalizeMessage>
+<usersMaySendToMultiple>
+<defaultValue></defaultValue>
+<displayFormType>checkbox</displayFormType>
+<displayType></displayType>
+<name>usersMaySendToMultiple</name>
+<number>6</number>
+<prettyName>Let users send to multiple addresses</prettyName>
+<unmodifiable>0</unmodifiable>
+<validationMessage></validationMessage>
+<validationRegExp></validationRegExp>
+<classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+</usersMaySendToMultiple>
+<messageBodyTemplatePlain>
+<editor>---</editor>
+<name>messageBodyTemplatePlain</name>
+<number>20</number>
+<picker>0</picker>
+<prettyName>Message body plain text template</prettyName>
+<rows>5</rows>
+<size>40</size>
+<unmodifiable>0</unmodifiable>
+<validationMessage></validationMessage>
+<validationRegExp></validationRegExp>
+<classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+</messageBodyTemplatePlain>
+</class>
+<object>
+<class>
+<name>XWiki.XWikiRights</name>
+<customClass></customClass>
+<customMapping></customMapping>
+<defaultViewSheet></defaultViewSheet>
+<defaultEditSheet></defaultEditSheet>
+<defaultWeb></defaultWeb>
+<nameField></nameField>
+<validationScript></validationScript>
+<allow>
+<defaultValue>1</defaultValue>
+<displayFormType>select</displayFormType>
+<displayType>allow</displayType>
+<name>allow</name>
+<number>4</number>
+<prettyName>Allow/Deny</prettyName>
+<unmodifiable>0</unmodifiable>
+<classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+</allow>
+<groups>
+<cache>0</cache>
+<displayType>select</displayType>
+<multiSelect>1</multiSelect>
+<name>groups</name>
+<number>1</number>
+<prettyName>Groups</prettyName>
+<relationalStorage>0</relationalStorage>
+<separator> </separator>
+<size>5</size>
+<unmodifiable>0</unmodifiable>
+<usesList>1</usesList>
+<classType>com.xpn.xwiki.objects.classes.GroupsClass</classType>
+</groups>
+<levels>
+<cache>0</cache>
+<displayType>select</displayType>
+<multiSelect>1</multiSelect>
+<name>levels</name>
+<number>2</number>
+<prettyName>Levels</prettyName>
+<relationalStorage>0</relationalStorage>
+<separator> </separator>
+<size>3</size>
+<unmodifiable>0</unmodifiable>
+<classType>com.xpn.xwiki.objects.classes.LevelsClass</classType>
+</levels>
+<users>
+<cache>0</cache>
+<displayType>select</displayType>
+<multiSelect>1</multiSelect>
+<name>users</name>
+<number>3</number>
+<prettyName>Users</prettyName>
+<relationalStorage>0</relationalStorage>
+<separator> </separator>
+<size>5</size>
+<unmodifiable>0</unmodifiable>
+<usesList>1</usesList>
+<classType>com.xpn.xwiki.objects.classes.UsersClass</classType>
+</users>
+</class>
+<name>Invitation.Invitation</name>
+<number>0</number>
+<className>XWiki.XWikiRights</className>
+<guid>649d5273-d662-4248-abf0-94953088e98a</guid>
+<property>
+<allow>1</allow>
+</property>
+<property>
+<groups>XWiki.XWikiAllGroup,</groups>
+</property>
+<property>
+<levels>view</levels>
+</property>
+<property>
+<users></users>
+</property>
+</object>
+<content>{{include document="Invitation.InvitationCommon"/}}
+{{include document="Invitation.InvitationMembersCommon"/}}
+{{velocity}}
+#*
+ * Invitation Application
+ * This script is only for sending messages and users who are not allowed to send mail need not have access to
+ * view this page.
+ *
+ * Macros in this script don't rely on any variables except those which are passed to them and the following:
+ *
+ * $doc the com.xpn.xwiki.api.Document object representing the document containing this code.
+ * $msg the internationalization message provider containing a get(String) and a get(String, List) function
+ * $xcontext the com.xpn.xwiki.Context object for this request
+ * $xwiki an object of the com.xpn.xwiki.api.XWiki class.
+ *
+ * Macros also depend on other macros but only other macros which are contained in this script.
+ *
+ * This script relies on the following documents:
+ *
+ * InvitationCommon
+ *
+ * InvitationMembersCommon
+ * 
+ *
+ * This script is affected by the following documents:
+ *
+ * InvitationMessages stores all of the mail message objects. If this does not exist it will be created.
+ *                    May be changed in the configuration.
+ *
+ * InvitationMailClass the class for mail message objects. May be changed in the configuration.
+ *
+ * InvitationConfig configuration for this code. Contains an XObject of the class defined in this document.
+ *                  If it does not exist it will be created with default values.
+ *
+ *###
+#if($xcontext.getUser() == 'XWiki.XWikiGuest')
+  ## Only members should ever have access to this document, enforce this through XWiki permissions system,
+  ## this is a last effort in the event of incorrect settings.
+  #stop
+#end
+##
+## is the user a mail admin TODO: change this.
+#set($isAdmin = $hasEdit)
+##
+## Load config and mail.
+#set($config = {})
+#loadInvitationConfig($config)
+#set($mail = {})
+#loadInvitationMail($config, $mail)
+##
+## Load CSS
+$xwiki.get('ssx').use($config.get('commonPage'))
+##
+## Don't load comments, history, etc.
+#set($docextras = [])
+##
+##---------------------------------------------------------------------
+## Decide what we should do.
+##---------------------------------------------------------------------
+##
+#if($xcontext.getAction() != 'view')
+  ## The administration application includes this page so we will not do anything.
+#elseif(!$isAdmin &amp;&amp; "#isUserReportedSpammer($mail.values())" != 'false')
+  ## The current user has been reported as a spammer, they are not allowed to send more mail until
+  ## the situation has been investigated.
+
+  ## A message which you sent was reported as spam and your privilege to send mail has been suspended...
+  (%id="invitation-permission-error"%)((({{error}}$msg.get('xe.invitation.userIsReportedSpammer'){{/error}})))
+  ##
+#elseif(!$isAdmin
+        &amp;&amp; $config.get('allowUsersOfOtherWikis') != '1'
+        &amp;&amp; $doc.getWiki() != $xwiki.getDocument($xcontext.getUser()).getWiki())
+  ## Users of other subwikis are not allowed to send mail.
+  (%id="invitation-permission-error"%)((({{error}}$msg.get('xe.invitation.onlyMembersCanSendMail')
+  $msg.get('xe.invitation.youAreAMemberOfOtherWiki', [$xwiki.getDocument($xcontext.getUser()).getWiki()]){{/error}})))
+#else
+  ## The user is authorized to send mail &lt;-------------------------------------------------------
+  ## Get the list of email addresses to send to.
+  #set($userMaySendToMultiple = ($isAdmin || $config.get('usersMaySendToMultiple') == '1'))
+  #set($recipientString = $escapetool.xml("$!request.get('recipients')"))
+  #set($recipients = [])
+  #getRecipients($recipientString, $userMaySendToMultiple, $recipients)
+  ##
+  ## get subject line and message body if allowed...
+  #set($userMayPersonalizeMessage = ($isAdmin || $config.get('usersMayPersonalizeMessage') == '1'))
+  #if($userMayPersonalizeMessage)
+    #set($subjectLine = $request.get('subjectLine'))
+    #set($messageBody = $request.get('messageBody'))
+  #else
+    #set($subjectLine = '')
+    #set($messageBody = '')
+  #end
+  ##
+  #if("$!request.get('sendMail')" != '')
+    #generateAndSendMail($config,
+                         $recipients,
+                         $subjectLine,
+                         $messageBody)
+    ## Reload mail so footer information is correct.
+    #set($mail = {})
+    #loadInvitationMail($config, $mail)
+  #else
+    ## The user wants to write and preview a message.
+    #displayForm($recipientString,
+                 $subjectLine,
+                 $messageBody,
+                 $userMaySendToMultiple,
+                 $userMayPersonalizeMessage)
+    #set($messages = [])
+    ## No recipients ('',) because we are just creating it to preview.
+    #set($emailContainer = $xwiki.getDocumentAsAuthor($config.get('emailContainer')))
+    #generateMailFromTemplate($config.get('subjectLineTemplate'),
+                              $config.get('messageBodyTemplate'),
+                              $config.get('emailClass'),
+                              [],
+                              $config.get('emailRegex'),
+                              $subjectLine,
+                              $messageBody,
+                              $messages,
+                              $emailContainer)
+    #set($invalidAddresses = [])
+    #validateAddressFormat($recipients, $config.get('emailRegex'), $invalidAddresses)
+    #displayMessage($messages.get(0), $recipients, $invalidAddresses)
+  #end
+  #invitationFooter($mail, $request.getParameterMap(), $isAdmin, $config)
+#end##if user has permission to send
+##
+##---------------------------------------------------------------------
+## The macros (Nothing below this point is run directly)
+##---------------------------------------------------------------------
+##
+#*
+ * Generate and send an email message.
+ *
+ * $messages (List&lt;XObject&gt;) a list of invitation email messages.
+ *
+ * $config (XObject) configuration for the inviter.
+ *
+ * $emailContainer (Document) the document contaning the mail message.
+ *###
+#macro(generateAndSendMail, $config, $recipients, $messageSubject, $messageContent)
+  #set($messages = [])
+  #set($emailContainer = $xwiki.getDocumentAsAuthor($config.get('emailContainer')))
+  #generateMailFromTemplate($config.get('subjectLineTemplate'),
+                            $config.get('messageBodyTemplate'),
+                            $config.get('emailClass'),
+                            $recipients,
+                            $config.get('emailRegex'),
+                            $messageSubject,
+                            $messageContent,
+                            $messages,
+                            $emailContainer)
+  ##
+  #if($messages.size() > 0)
+    #sendMail($messages, $config, $emailContainer)
+    #set($errors = [])
+    #foreach($message in $messages)
+      #set($status = $message.getProperty('status').getValue())
+      #if($status != 'pending')
+        #set($discard = $errors.add($message))
+      #end
+    #end
+    (%class="invitation"%)(((
+
+      (%id="invitation-action-message"%)(((##
+      #if($errors.size() &gt; 0)
+        ## An error has occured while sending the message.
+        {{error}}$msg.get('xe.invitation.errorWhileSending'){{/error}}##
+      #else
+        ## Your message has been sent.
+        {{info}}$msg.get('xe.invitation.successSending'){{/info}}##
+      #end
+      )))
+
+      #displayMessageTable($messages, ['sentDate', 'recipient', 'status'])
+     )))
+    #displayMessage($messages.get(0), $recipients)
+  #else
+
+
+    (%id="invitation-action-message"%)((({{error}}$msg.get('xe.invitation.noValidMessagesToSend'){{/error}})))
+
+  #end
+#end
+#*
+ * Send an email message.
+ *
+ * $messages (List&lt;XObject&gt;) a list of invitation email messages.
+ *
+ * $config (XObject) configuration for the inviter.
+ *
+ * $emailContainer (Document) the document contaning the mail messages.
+ *###
+#macro(sendMail, $messages, $config, $emailContainer)
+  ##
+  ## Get mail sender plugin.
+  #set($sender = $xwiki.get('mailsender'))
+  ##
+  ## If parameters are set in the local config, use them, otherwise use global defaults.
+  #set($senderConfig = $sender.createMailConfiguration($xwiki))
+  #if($config.containsKey('smtp_server'))
+    $senderConfig.setHost($config.get('smtp_server'))##
+  #end
+  #if($config.containsKey('smtp_port'))
+    $senderConfig.setPort($mathtool.toInteger($config.get('smtp_port')))##
+  #end
+  #if($config.containsKey('smtp_server_username'))
+    $senderConfig.setSmtpUsername($config.get('smtp_server_username'))##
+  #end
+  #if($config.containsKey('smtp_server_password'))
+    $senderConfig.setSmtpPassword($config.get('smtp_server_password'))##
+  #end
+  #if($config.containsKey('javamail_extra_props'))
+    $senderConfig.setExtraProperties($config.get('javamail_extra_props'))##
+  #end
+  ##
+  #foreach($message in $messages)
+    #set($mailObj = $sender.createMail())
+    ##
+    #if($config.containsKey('from_address'))
+      $mailObj.setFrom($config.get('from_address'))##
+    #end
+    ##
+    ## Set recipients
+    #set($recipient = $message.getProperty('recipient').getValue())##
+    $mailObj.setTo($recipient)##
+    ##
+    ## Set the subject line and message body.
+    $mailObj.setSubject($message.getProperty('subjectLine').getValue())##
+    ##
+    ## If text part is not set then we get an NPE when trying to craft a multipart message.
+    $mailObj.setTextPart('')##
+    ## Put all in email div so that we can apply CSS only to the email and not to the preview.
+    $mailObj.setHtmlPart("&lt;div style='font-size:87.5%;'&gt;$message.getProperty('messageBody').getValue()&lt;/div&gt;")##
+    ##
+    ## Send the message
+    #if("$sender.sendMail($mailObj, $senderConfig)" != 0)
+      #setMessageStatus($message, 'sendingFailed')##
+    #else
+      #setMessageStatus($message, 'pending', $msg.get('xe.invitation.messageSentLogEntry'))##
+    #end
+    ## Comment = "Added Email Message."
+    $emailContainer.saveAsAuthor($msg.get('xe.invitation.sendMail.addMessageSaveComment'))
+  #end
+#end
+##
+#*
+ * Generate invitation XObjects from a template, user input, and a set of recipients.
+ *
+ * $subjectLineTemplate (String) this will be evaluated as velocity and placed in the email subject line.
+ *                               You may refer to $messageID and $subjectLine in the code.
+ *
+ * $messageBodyTemplate (String) this will be evaluated as velocity and placed in the email message body.
+ *                               You may refer to $messageID, $messageBody, You may also use xwiki2.0 syntax
+ *                               in the template.
+ *
+ * $emailClass (String) the document name of the XClass representing email messages.
+ *
+ * $recipients (List&lt;String&gt;) email addresses to send this message to.
+ *
+ * $emailRegex (String) the regular expression to validate the email addresses against. Undefined behavior will result
+ *                      from an invalid expression.
+ *
+ * $userSuppliedSubject (String) the message subject. This can be modified or ignored by the template.
+ *
+ * $userSuppliedContent (String) the message content. This can be modified or ignored by the template.
+ *
+ * $messages (List&lt;XObject&gt;) this list will be populated with mail objects for each recipient.
+ *
+ * $emailContainer (Document) the document where the mail object will be stored for later review.
+ *###
+#macro(generateMailFromTemplate, $subjectLineTemplate, $messageBodyTemplate, $emailClass, $recipients, $emailRegex, 
+                                 $userSuppliedSubject, $userSuppliedContent, $messages, $emailContainer)
+  #if($recipients &amp;&amp; $recipients.size() &gt; 0)
+    #set($sendTo = [])
+    #set($discard = $sendTo.addAll($recipients))
+    #set($invalid = [])
+    #validateAddressFormat($recipients, $emailRegex, $invalid)
+    #set($discard = $sendTo.removeAll($invalid))
+    #set($messageGroupID = $mathtool.getRandom())
+  #else
+    ## If we're just doing a test run, no recipients but we still want to generate a message.
+    #set($sendTo = [''])
+  #end
+  ##
+  #foreach($recipient in $sendTo)
+    #set($message = $emailContainer.newObject($emailClass))
+    $message.set('sendingUser', $context.getUser())##
+    $message.set('sentDate', '')##
+    $message.set('messageGroupID', $messageGroupID)##
+    $message.set('recipient', $recipient)##
+    ## Set the message id to a random number string, set it to $messageID variable so it can be used by the template.
+    #set($messageID = "$mathtool.getRandom().toString().replaceAll('\.','')##
+                       $mathtool.getRandom().toString().replaceAll('\.','')##
+                       $mathtool.getRandom().toString().replaceAll('\.','')")
+    $message.set('messageID', $messageID)##
+    ##
+    ## Need to make $subjectLine and $messageBody available to $doc.getRenderedContent.
+    #set($subjectLine = "$!userSuppliedSubject")
+    #set($messageBody = "$!userSuppliedContent")
+    ##
+    ## Generate the message from the template - html in the subject line is ignored by the mail client.
+    $message.set('subjectLine', "$doc.getRenderedContent($subjectLineTemplate, 'xwiki/2.0', 'plain/1.0')")##
+    $message.set('messageBody', "$doc.getRenderedContent($messageBodyTemplate, 'xwiki/2.0')")##
+    #set($discard = $messages.add($message))
+  #end
+#end
+##
+#*
+ * Check the format of an email address against a regular expression.
+ *
+ * $allAddresses (List&lt;String&gt;) The list of addresses to validate.
+ *
+ * $emailRegex (String) The regular expression to validate the email addresses agains. Undefined behavior will result
+ *                      from an invalid expression.
+ *
+ * $invalidAddresses (List&lt;String&gt;) this List will be populated with addresses from $allAddresses which are invalid.
+ *###
+#macro(validateAddressFormat, $allAddresses, $emailRegex, $invalidAddresses)
+  #foreach($address in $allAddresses)
+    #if("$!address" == '')
+      ## Empty address, do nothing.
+    #elseif(!$xcontext.getUtil().match($emailRegex, $address))
+      #set($discard = $invalidAddresses.add($address))
+    #end
+  #end
+#end
+##
+#*
+ * Display a form for typing up an invitation email.
+ *
+ * $recipientString (String) what should be filled in to the field for recipients.
+ *
+ * $subjectLine (String) what should be put in the subject line by default.
+ *
+ * $messageBody (String) what should be put in the content of the message by default.
+ *
+ * $userMaySendToMultiple (Boolean) true if the current user has permission send to multiple addresses at once.
+ *
+ * $userMayPersonalizeMessage (Boolean) true if the user may add their own subject line and message content.
+ *###
+#macro(displayForm, $recipientString, $subjectLine, $messageBody, $userMaySendToMultiple, $userMayPersonalizeMessage)
+
+  {{html clean="false" wiki="false"}}
+  &lt;form id="invitation-sender-form" action="$doc.getURL('view')" method="post" class="invitation"&gt;
+   &lt;dl&gt;
+    ## Who you are inviting:
+    &lt;dt&gt;&lt;label for="recipients"&gt;$msg.get('xe.invitation.toLabel')&lt;/label&gt;&lt;/dt&gt;
+    ## If the user has edit access on this document, then we should allow them to send to multiple email addresses.
+    #if($userMaySendToMultiple)
+      &lt;dd&gt;
+       &lt;textarea cols="75" name="recipients" rows="3" id="recipients"&gt;##
+        $!recipientString##
+       &lt;/textarea&gt;
+      &lt;/dd&gt;
+    #else
+      &lt;dd&gt;&lt;input type="text" size="54" name="recipients" id="recipients" value="$!recipientString" /&gt;&lt;/dd&gt;
+    #end
+    #if($userMayPersonalizeMessage)
+      &lt;div&gt;
+       ## Subject line:
+       &lt;dt&gt;&lt;label for="subjectLine"&gt;$msg.get('xe.invitation.subjectLabel')&lt;/label&gt;&lt;/dt&gt;
+       &lt;dd&gt;
+        &lt;input type="text" size="54" name="subjectLine" id="subjectLine" value="$!escapetool.html($!subjectLine)" /&gt;
+       &lt;/dd&gt;
+       ## Invitation message:
+       &lt;dt&gt;&lt;label for="messageBody"&gt;$msg.get('xe.invitation.contentLabel')&lt;/label&gt;&lt;/dt&gt;
+       &lt;dd&gt;
+        &lt;textarea cols="75" name="messageBody" rows="10" id="messageBody"&gt;##
+         $!escapetool.xml($!messageBody)##
+        &lt;/textarea&gt;
+       &lt;/dd&gt;
+      &lt;/div&gt;
+    #end
+   &lt;/dl&gt;
+   &lt;div class="bottombuttons"&gt;
+    &lt;div class="buttons"&gt;
+     &lt;span class="buttonwrapper"&gt;
+      ## Preview
+      &lt;input type="submit" class="button" name="preview" value="$msg.get('xe.invitation.displayForm.preview')" /&gt;
+     &lt;/span&gt;
+     &lt;span class="buttonwrapper"&gt;
+      ## Send Mail
+      &lt;input type="submit" class="button" name="sendMail" value="$msg.get('xe.invitation.displayForm.sendMail')" /&gt;
+     &lt;/span&gt;
+    &lt;/div&gt;
+   &lt;/div&gt;
+  &lt;/form&gt;
+  {{/html}}
+
+#end
+##
+#*
+ * Has mail sent by the current user been reported as spam?
+ * will return 'false' if not otherwise will return 'true'
+ * if a message was reported as spam but an admin has marked the situation
+ * as handled then this macro will return 'false'
+ *
+ * $messages (Collection&lt;XObject&gt;) objects representing all email messages.
+ *###
+#macro(isUserReportedSpammer, $messages)
+  #set($out = 'false')
+  #foreach($message in $messages)
+     #if($message.getProperty('sendingUser').getValue() == $xcontext.getUser()
+          &amp;&amp; $message.getProperty('status').getValue() == 'reported')
+     ##
+       #set($out = 'true')
+     #end
+  #end
+  $out##
+#end
+##
+#*
+ * Get the list of recipients from the user input string.
+ * Splits on space but is tolerent of commas.
+ *
+ * $recipientString (String) the String input by the user eg: "alice@example.com bob@example.com"
+ *
+ * $userMaySendToMultiple (Boolean) is the user allowed to send to multiple addresses at once?
+ *
+ * $recipientsOut (List&lt;String&gt;) is populated with one or more email addresses.
+ *###
+#macro(getRecipients, $recipientString, $userMaySendToMultiple, $recipientsOut)
+  #if($userMaySendToMultiple)
+    #set($recipientsArray = $recipientString.replaceAll(', ', ' ').split(' '))
+    ## Split gives us an array, we need a Collection.
+    #foreach($recip in $recipientsArray)
+      #set($discard = $recipientsOut.add($recip))
+    #end
+  #else
+    ## If the user can't edit this page, we won't let them sent to multiple addresses.
+    #set($discard = $recipientsOut.add($recipientString))
+  #end
+#end
+{{/velocity}}</content></xwikidoc>

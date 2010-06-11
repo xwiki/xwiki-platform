@@ -40,7 +40,7 @@
   </scm>
   <properties>
     <!-- Used by gwt and wysiwyg modules -->
-    <gwt.version>2.0.0</gwt.version>
+    <gwt.version>2.0.3</gwt.version>
     <smartgwt.version>2.0</smartgwt.version>
     <!-- XEM dependencies -->
     <platform.plugin.applicationmanager.version>1.12-SNAPSHOT</platform.plugin.applicationmanager.version>
@@ -104,6 +104,12 @@
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-web-gwt-wysiwyg-client</artifactId>
       <version>${pom.version}</version>
+    </dependency>
+    <dependency>
+      <!-- For merging styles in NestedStyleFilter -->
+      <groupId>net.sourceforge.cssparser</groupId>
+      <artifactId>cssparser</artifactId>
+      <version>0.9.5</version>
     </dependency>
 
     <!-- GWT core dependencies -->

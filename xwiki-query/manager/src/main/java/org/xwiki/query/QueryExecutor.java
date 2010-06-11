@@ -24,8 +24,8 @@ import java.util.List;
 import org.xwiki.component.annotation.ComponentRole;
 
 /**
- * Interface for execute a queries.
- * Components should be registered with hint = query language.
+ * Execute a query for a given language (one implementation per language).
+ *
  * @see Query
  * @version $Id$
  * @since 1.6M1

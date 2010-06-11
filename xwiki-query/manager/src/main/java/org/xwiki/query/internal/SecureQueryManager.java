@@ -26,7 +26,9 @@ import org.xwiki.query.QueryException;
 import org.xwiki.query.QueryExecutorManager;
 
 /**
- * QueryManager implementation for use in scripts.
+ * QueryManager implementation to use in scripts (uses a secure {@link org.xwiki.query.QueryExecutorManager} which
+ * performs checks for rights). 
+ * 
  * @version $Id$
  */
 @Component("secure")

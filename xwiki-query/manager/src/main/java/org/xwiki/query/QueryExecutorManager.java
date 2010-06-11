@@ -24,7 +24,11 @@ import java.util.Set;
 import org.xwiki.component.annotation.ComponentRole;
 
 /**
- * Executes queries for several languages.
+ * Execute queries (supported languages are returned by {@link #getLanguages()}).
+ *
+ * <p>For implementers, Language support is added by using the {@link org.xwiki.query.QueryExecutor} for the given
+ * language to support.</p>
+ *
  * @see QueryExecutor
  * @version $Id$
  */

@@ -24,7 +24,9 @@ import java.util.Map;
 
 /**
  * This is a Query interface, representing all queries in various languages for various stores.
- * @see javax.jcr.query.Query
+ * 
+ * <p>Note that it was modeled after the JCR Query interface.</p>
+ *
  * @version $Id$
  * @since 1.6M1   
  */

@@ -25,7 +25,6 @@ import org.xwiki.query.QueryExecutorManager;
 
 /**
  * This is default QueryManager implementation.
- * Languages are added via injecting {@link QueryExecutor} components with hint=language to {@link DefaultQueryManager#executors} field.
  * 
  * @version $Id$
  * @since 1.6M1

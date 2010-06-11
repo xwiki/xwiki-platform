@@ -46,6 +46,7 @@ import org.xwiki.rendering.parser.Parser;
 import org.xwiki.rendering.syntax.SyntaxFactory;
 import org.xwiki.rendering.transformation.MacroTransformationContext;
 import org.xwiki.rendering.transformation.Transformation;
+import org.xwiki.rendering.transformation.TransformationContext;
 import org.xwiki.rendering.util.ParserUtils;
 
 /**
@@ -237,7 +238,9 @@ public class DefaultWikiMacro implements WikiMacro
             xwikiContext.put(CONTEXT_DOCUMENT_KEY, docBridge.getDocument(getDocumentReference()));
 
             // Perform internal macro transformations.
-            macroTransformation.transform(xdom, syntaxFactory.createSyntaxFromIdString(syntaxId));
+            TransformationContext txContext = new TransformationContext(xdom,
+                syntaxFactory.createSyntaxFromIdString(syntaxId));
+            macroTransformation.transform(xdom, txContext);
         } catch (Exception ex) {
             throw new MacroExecutionException("Error while performing internal macro transformations", ex);
         } finally {

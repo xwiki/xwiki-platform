@@ -112,7 +112,7 @@ public class MacroTransformation extends AbstractTransformation
         context.setXDOM(dom);
         context.setSyntax(syntax);
 
-        transform((Block) dom, context);
+        transform(dom, context);
     }
 
     /**

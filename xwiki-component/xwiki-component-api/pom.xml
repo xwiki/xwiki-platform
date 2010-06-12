@@ -63,30 +63,5 @@
       </plugin>
     </plugins>
   </build>
-  <profiles>
-    <profile>
-      <!-- We run Clirr in a profile since Cobertura interferes with Clirr and thus we run
-           Cobertura instrumentation in a special profile (when the Cobertura profile is
-           executed, the Clirr one isn't). -->
-      <id>clirr</id>
-      <activation>
-        <activeByDefault>true</activeByDefault>
-      </activation>
-      <build>
-        <plugins>
-          <plugin>
-            <groupId>org.codehaus.mojo</groupId>
-            <artifactId>clirr-maven-plugin</artifactId>
-            <!-- <configuration>
-              <excludes>
-                <exclude>**/internal/**</exclude>
-                <exclude>org/xwiki/component/</exclude>
-              </excludes>
-            </configuration> -->
-          </plugin>
-        </plugins>
-      </build>
-    </profile>
-  </profiles>
 </project>
        

@@ -145,7 +145,7 @@ public class XWikiAttachment implements Cloneable
     }
 
     /**
-     * @return the cached filesize in byte of the attchement, stored as metadata
+     * @return the cached filesize in byte of the attachment, stored as metadata
      */
     public int getFilesize()
     {

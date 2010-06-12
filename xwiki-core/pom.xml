@@ -1404,6 +1404,33 @@
   </build>
   <profiles>
     <profile>
+      <!-- We run Clirr in a profile since Cobertura interferes with Clirr and thus we run
+           Cobertura instrumentation in a special profile (when the Cobertura profile is
+           executed, the Clirr one isn't). -->
+      <id>clirr</id>
+      <activation>
+        <activeByDefault>true</activeByDefault>
+      </activation>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.codehaus.mojo</groupId>
+            <artifactId>clirr-maven-plugin</artifactId>
+            <configuration>
+              <comparisonVersion>2.3</comparisonVersion>
+              <includes>
+                <include>**/api/**</include>
+              </includes>
+              <excludes>
+                <exclude>**/internal/**</exclude>
+                <!-- TODO: Excludes below to be removed when we release XWiki 2.4 -->
+              </excludes>
+            </configuration>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+    <profile>
       <!-- Use this profile to weave the Log Aspect to trace all method calls. This is useful for
            debugging XWiki, especially in the case when you cannot debug the application (for
            example when you cannot reproduce the problem on your machine you can send an

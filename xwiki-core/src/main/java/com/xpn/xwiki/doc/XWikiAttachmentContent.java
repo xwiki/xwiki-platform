@@ -146,7 +146,7 @@ public class XWikiAttachmentContent implements Cloneable
      * set the content of the attachment from an InputStream
      *
      * @param is the input stream that will be read
-     * @param length the length in byte to read
+     * @param len the length in byte to read
      * @throws IOException when an error occurs during streaming operation
      * @since 2.3M2
      */
@@ -156,7 +156,7 @@ public class XWikiAttachmentContent implements Cloneable
     }
 
     /**
-     * @return the true size of the content of the attachement
+     * @return the true size of the content of the attachment
      *
      * @since 2.3M2
      */

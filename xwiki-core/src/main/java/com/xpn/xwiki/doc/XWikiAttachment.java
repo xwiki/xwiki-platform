@@ -145,7 +145,7 @@ public class XWikiAttachment implements Cloneable
     }
 
     /**
-     * @return the cached filesize in byte of the attachement, stored as metadata
+     * @return the cached filesize in byte of the attchement, stored as metadata
      */
     public int getFilesize()
     {
@@ -153,7 +153,7 @@ public class XWikiAttachment implements Cloneable
     }
 
     /**
-     * Set cached filesize of the attachement that will be stored as metadata
+     * Set cached filesize of the attachment that will be stored as metadata
      * 
      * @param filesize in byte
      */
@@ -168,7 +168,7 @@ public class XWikiAttachment implements Cloneable
 
     /**
      * @param context current XWikiContext
-     * @return the real filesize in byte of the attachement. We cannot trust the metadata that may be publicly changed.
+     * @return the real filesize in byte of the attachment. We cannot trust the metadata that may be publicly changed.
      * @throws XWikiException
      * @since 2.3M2
      */
@@ -309,7 +309,7 @@ public class XWikiAttachment implements Cloneable
     }
 
     /**
-     * Retrieve an attachement as an XML string. You should prefer
+     * Retrieve an attachment as an XML string. You should prefer
      * {@link #toXML(com.xpn.xwiki.internal.xml.XMLWriter, boolean, boolean, com.xpn.xwiki.XWikiContext) to avoid memory loads
      * when appropriate.
      *
@@ -337,7 +337,7 @@ public class XWikiAttachment implements Cloneable
     }
 
     /**
-     * Retrieve XML representation of attachement's metadata into an {@link Element}.
+     * Retrieve XML representation of attachment's metadata into an {@link Element}.
      * 
      * @return a {@link Element} containing an XML representation of the attachment without content
      * @throws XWikiException when an error occurs during wiki operations
@@ -348,7 +348,7 @@ public class XWikiAttachment implements Cloneable
     }
 
     /**
-     * Write an XML representation of the attachement into an {@link com.xpn.xwiki.internal.xml.XMLWriter}
+     * Write an XML representation of the attachment into an {@link com.xpn.xwiki.internal.xml.XMLWriter}
      * 
      * @param wr the XMLWriter to write to
      * @param bWithAttachmentContent if true, binary content of the attachment is included (base64 encoded)
@@ -422,7 +422,7 @@ public class XWikiAttachment implements Cloneable
     }
 
 /**
-     * Retrieve XML representation of attachements metadata into an {@link Element}. You should prefer
+     * Retrieve XML representation of attachment's metadata into an {@link Element}. You should prefer
      * {@link #toXML(com.xpn.xwiki.internal.xml.XMLWriter, boolean, boolean, com.xpn.xwiki.XWikiContext) to avoid memory loads
      * when appropriate.
      *
@@ -601,7 +601,7 @@ public class XWikiAttachment implements Cloneable
     }
 
     /**
-     * Set the content of an attachement from a byte array.
+     * Set the content of an attachment from a byte array.
      * 
      * @param data a byte array with the binary content of the attachment
      * @deprecated use {@link #setContent(java.io.InputStream, int)} instead

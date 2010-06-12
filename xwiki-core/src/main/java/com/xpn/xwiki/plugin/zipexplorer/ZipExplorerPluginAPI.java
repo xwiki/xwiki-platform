@@ -77,7 +77,7 @@ public class ZipExplorerPluginAPI extends PluginApi<ZipExplorerPlugin>
     }
 
     /**
-     * Finds the ZIP attachement with passed name from the passed document matching and parse the ZIP to generate a list
+     * Finds the ZIP attachment with passed name from the passed document matching and parse the ZIP to generate a list
      * of {@link com.xpn.xwiki.objects.classes.ListItem} elements representing a tree view of all directories and files
      * in the ZIP. For example the following zip:
      * 
@@ -111,7 +111,7 @@ public class ZipExplorerPluginAPI extends PluginApi<ZipExplorerPlugin>
      * @param document the document containing the ZIP file as an attachment
      * @param attachmentName the name under which the ZIP file is attached in the document
      * @param fileName the filename to concatenate at the end of the attachment URL
-     * @return the attachment URL of the passed attachement located in the passed document to which the passed filename
+     * @return the attachment URL of the passed attachment located in the passed document to which the passed filename
      *         has been suffixed.
      */
     public String getFileLink(Document document, String attachmentName, String fileName)

@@ -231,7 +231,7 @@ public class XWikiHibernateAttachmentStore extends XWikiHibernateBaseStore imple
                     context.setDatabase(attachdb);
                 }
 
-                // Delete the three attachement entries
+                // Delete the three attachment entries
                 try {
                     loadAttachmentContent(attachment, context, false);
                     try {

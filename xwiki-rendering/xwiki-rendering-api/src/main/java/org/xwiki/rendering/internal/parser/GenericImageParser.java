@@ -21,7 +21,7 @@ package org.xwiki.rendering.internal.parser;
 
 import org.xwiki.component.annotation.Component;
 import org.xwiki.rendering.listener.Attachment;
-import org.xwiki.rendering.listener.DefaultAttachement;
+import org.xwiki.rendering.listener.DefaultAttachment;
 
 /**
  * Since we need to have wiki syntax-specific image parsers, this generic parser supports external images and
@@ -41,6 +41,6 @@ public class GenericImageParser extends AbstractImageParser
     @Override
     protected Attachment parseAttachment(String attachment)
     {
-        return new DefaultAttachement(null, attachment);
+        return new DefaultAttachment(null, attachment);
     }
 }

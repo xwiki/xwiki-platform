@@ -21,7 +21,7 @@ package org.xwiki.rendering.internal.parser;
 
 import org.xwiki.component.annotation.Component;
 import org.xwiki.rendering.listener.Attachment;
-import org.xwiki.rendering.listener.DefaultAttachement;
+import org.xwiki.rendering.listener.DefaultAttachment;
 import org.xwiki.rendering.parser.AttachmentParser;
 
 /**
@@ -56,6 +56,6 @@ public class DefaultAttachmentParser implements AttachmentParser
             attachmentName = attachmentLocation;
         }
 
-        return new DefaultAttachement(documentName, attachmentName);
+        return new DefaultAttachment(documentName, attachmentName);
     }
 }

@@ -30,7 +30,7 @@ import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.Requirement;
 import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.block.ImageBlock;
-import org.xwiki.rendering.listener.DefaultAttachement;
+import org.xwiki.rendering.listener.DefaultAttachment;
 import org.xwiki.rendering.listener.DocumentImage;
 import org.xwiki.rendering.listener.Image;
 import org.xwiki.rendering.listener.URLImage;
@@ -100,7 +100,7 @@ public class UserAvatarMacro extends AbstractMacro<UserAvatarMacroParameters>
 
         image =
             StringUtils.isBlank(fileName) ? new URLImage(skinAccessBridge.getSkinFile("noavatar.png"))
-                : new DocumentImage(new DefaultAttachement(userName, fileName));
+                : new DocumentImage(new DefaultAttachment(userName, fileName));
 
         ImageBlock imageBlock = new ImageBlock(image, false);
         String shortName = userName.split("[.]")[1];

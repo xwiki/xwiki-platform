@@ -4084,16 +4084,16 @@ public class XWikiDocument implements DocumentModelBridge
 
     public void saveAllAttachments(XWikiContext context) throws XWikiException
     {
-        for (XWikiAttachment attachement : this.attachmentList) {
-            saveAttachmentContent(attachement, context);
+        for (XWikiAttachment attachment : this.attachmentList) {
+            saveAttachmentContent(attachment, context);
         }
     }
 
     public void saveAllAttachments(boolean updateParent, boolean transaction, XWikiContext context)
         throws XWikiException
     {
-        for (XWikiAttachment attachement : this.attachmentList) {
-            saveAttachmentContent(attachement, updateParent, transaction, context);
+        for (XWikiAttachment attachment : this.attachmentList) {
+            saveAttachmentContent(attachment, updateParent, transaction, context);
         }
     }
 

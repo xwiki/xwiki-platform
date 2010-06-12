@@ -23,9 +23,9 @@ package org.xwiki.rendering.listener;
  * Default implementation of {@link Attachment}.
  * 
  * @version $Id$
- * @since 1.7.1
+ * @since 2.4M2
  */
-public class DefaultAttachement implements Attachment
+public class DefaultAttachment implements Attachment
 {
     /**
      * The name of the document containing the attachment.
@@ -41,7 +41,7 @@ public class DefaultAttachement implements Attachment
      * @param documentName the name of the document containing the attachment.
      * @param attachmentName the name of the attachment.
      */
-    public DefaultAttachement(String documentName, String attachmentName)
+    public DefaultAttachment(String documentName, String attachmentName)
     {
         this.documentName = documentName;
         this.attachmentName = attachmentName;

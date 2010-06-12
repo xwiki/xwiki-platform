@@ -364,7 +364,7 @@ public class ExportURLFactory extends XWikiServletURLFactory
         try {
             return createAttachmentURL(filename, web, name, xwikidb, context);
         } catch (Exception e) {
-            LOG.error("Failed to create attachement URL", e);
+            LOG.error("Failed to create attachment URL", e);
 
             return super.createAttachmentURL(filename, web, name, action, null, xwikidb, context);
         }
@@ -383,7 +383,7 @@ public class ExportURLFactory extends XWikiServletURLFactory
         try {
             return createAttachmentURL(filename, web, name, xwikidb, context);
         } catch (Exception e) {
-            LOG.error("Failed to create attachement URL", e);
+            LOG.error("Failed to create attachment URL", e);
 
             return super.createAttachmentRevisionURL(filename, web, name, revision, xwikidb, context);
         }

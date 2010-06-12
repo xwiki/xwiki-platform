@@ -65,8 +65,8 @@ public interface XWikiPluginInterface {
     Api getPluginApi(XWikiPluginInterface plugin, XWikiContext context);
 
     /**
-     * Plugin extension point allowing the plugin to perform modifications to an attachement when the
-     * user clicks on an attachement in a document. The plugin is passed the original attachement and it has
+     * Plugin extension point allowing the plugin to perform modifications to an attachment when the
+     * user clicks on an attachment in a document. The plugin is passed the original attachment and it has
      * to return the new modified attachment.
      *
      * @param attachment the original attachment

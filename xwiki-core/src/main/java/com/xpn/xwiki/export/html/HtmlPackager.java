@@ -274,7 +274,7 @@ public class HtmlPackager
         File file = new File(context.getWiki().getEngineContext().getRealPath("/resources/"));
         addDirToZip(file, zos, "resources" + ZIPPATH_SEPARATOR, urlf.getExporteSkinFiles());
 
-        // Add attachements and generated skin files files to ZIP file
+        // Add attachments and generated skin files files to ZIP file
         addDirToZip(tempdir, zos, "", null);
 
         zos.setComment(description);

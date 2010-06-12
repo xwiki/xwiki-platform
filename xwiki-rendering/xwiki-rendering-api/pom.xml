@@ -212,6 +212,7 @@
                 <exclude>org/xwiki/rendering/transformation/MacroTransformationContext</exclude>
                 <exclude>org/xwiki/rendering/transformation/Transformation</exclude>
                 <exclude>org/xwiki/rendering/transformation/TransformationManager</exclude>
+                <exclude>org/xwiki/rendering/listener/DefaultAttachement</exclude>
               </excludes>
             </configuration>
           </plugin>

@@ -43,7 +43,7 @@ public class XWQLQueryExecutor implements QueryExecutor
     public QueryManager getQueryManager() throws ComponentLookupException
     {
         // we can't inject QueryManager because of cyclic dependency.
-        return (QueryManager) componentManager.lookup(QueryManager.class);
+        return this.componentManager.lookup(QueryManager.class);
     }
 
     public <T> List<T> execute(Query query) throws QueryException
@@ -51,8 +51,8 @@ public class XWQLQueryExecutor implements QueryExecutor
         Query nativeQuery;
         try {
             nativeQuery = getQueryManager().createQuery(
-                translator.translate(query.getStatement()),
-                translator.getOutputLanguage());
+                this.translator.translate(query.getStatement()),
+                this.translator.getOutputLanguage());
             nativeQuery.setLimit(query.getLimit());
             nativeQuery.setOffset(query.getOffset());
             nativeQuery.setWiki(query.getWiki());
@@ -66,7 +66,8 @@ public class XWQLQueryExecutor implements QueryExecutor
         } catch (Exception e) {
             if (e instanceof QueryException)
                 throw (QueryException)e;
-            throw new QueryException("Exception while translate XWQL query to " + translator.getOutputLanguage(), query, e);
+            throw new QueryException("Exception while translating [" + query.getStatement() + "] XWQL query to the ["
+                + translator.getOutputLanguage() + "] language", query, e);
         }
     }
 

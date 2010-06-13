@@ -187,7 +187,7 @@
                 <exclude>org/xwiki/rendering/scaffolding/RenderingTestCase</exclude>
                 <exclude>org/xwiki/officeimporter/openoffice/OpenOfficeManager</exclude>
                 <!-- CLIRR has problems locating the ManagerState inner class inside OpenOfficeManager so we have to
-                     exclude it for the moment -->
+                     exclude it for the moment. See http://bit.ly/c5Jnho -->
                 <exclude>org/xwiki/officeimporter/openoffice/OpenOfficeManager$ManagerState</exclude>
               </excludes>
             </configuration>

@@ -79,13 +79,6 @@
             </archive>
           </configuration>
         </plugin>
-        <plugin>
-          <groupId>org.codehaus.mojo</groupId>
-          <artifactId>clirr-maven-plugin</artifactId>
-          <configuration>
-            <comparisonVersion>${clirr.previous.version}</comparisonVersion>
-          </configuration>
-        </plugin>
       </plugins>
     </pluginManagement>
     <plugins>
@@ -181,7 +174,7 @@
             <groupId>org.codehaus.mojo</groupId>
             <artifactId>clirr-maven-plugin</artifactId>
             <configuration>
-              <comparisonVersion>2.3</comparisonVersion>
+              <comparisonVersion>${clirr.previous.version}</comparisonVersion>
               <excludes>
                 <exclude>**/internal/**</exclude>
                 <!-- TODO: Excludes below to be removed when we release XWiki 2.4 -->

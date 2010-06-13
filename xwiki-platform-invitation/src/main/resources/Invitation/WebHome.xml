@@ -755,6 +755,7 @@ $xwiki.get('ssx').use($config.get('commonPage'))
 #*
  * Get the list of recipients from the user input string.
  * Splits on space but is tolerent of commas.
+ * Each email in the list may only appear in the output once (no duplicates.)
  *
  * $recipientString (String) the String input by the user eg: "alice@example.com bob@example.com"
  *
@@ -765,10 +766,11 @@ $xwiki.get('ssx').use($config.get('commonPage'))
 #macro(getRecipients, $recipientString, $userMaySendToMultiple, $recipientsOut)
   #if($userMaySendToMultiple)
     #set($recipientsArray = $recipientString.replaceAll(', ', ' ').split(' '))
-    ## Split gives us an array, we need a Collection.
+    #set($recipientMap = {})
     #foreach($recip in $recipientsArray)
-      #set($discard = $recipientsOut.add($recip))
+      #set($discard = $recipientMap.put($recip, 0))
     #end
+    #set($discard = $recipientsOut.addAll($recipientMap.keySet()))
   #else
     ## If the user can't edit this page, we won't let them sent to multiple addresses.
     #set($discard = $recipientsOut.add($recipientString))

@@ -150,25 +150,9 @@
         </plugins>
       </build>
     </profile>
-    <profile>
-      <!-- See platform/core/pom.xml -->
-      <id>clirr</id>
-      <activation>
-        <activeByDefault>true</activeByDefault>
-      </activation>
-      <build>
-        <plugins>
-          <plugin>
-            <groupId>org.codehaus.mojo</groupId>
-            <artifactId>clirr-maven-plugin</artifactId>
-            <configuration>
-              <excludes>
-                <exclude>**</exclude>
-              </excludes>
-            </configuration>
-          </plugin>
-        </plugins>
-      </build>
-    </profile>
   </profiles>
+  <properties>
+    <!-- Skip Clirr execution since this project only generates an artifact that aggregates other XWiki artifacts -->
+    <xwiki.clirr.skip>true</xwiki.clirr.skip>
+  </properties>
 </project>

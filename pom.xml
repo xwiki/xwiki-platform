@@ -185,6 +185,7 @@
                 <exclude>org/xwiki/rendering/transformation/TransformationManager</exclude>
                 <exclude>org/xwiki/rendering/listener/DefaultAttachement</exclude>
                 <exclude>org/xwiki/rendering/scaffolding/RenderingTestCase</exclude>
+                <exclude>org/xwiki/officeimporter/openoffice/OpenOfficeManager</exclude>
               </excludes>
             </configuration>
           </plugin>

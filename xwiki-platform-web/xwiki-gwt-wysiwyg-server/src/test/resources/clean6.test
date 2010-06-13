@@ -1,0 +1,6 @@
+#
+# Tests that the FONT tag is cleaned before the nested styles filter is applied.
+#
+<p><span style="font-family: courier new"><font color="red">xwiki</font></span></p>
+---
+<p><span style="font-family: courier new"><span style="color: red; font-family: courier new">xwiki</span></span></p>

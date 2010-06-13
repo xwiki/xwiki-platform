@@ -1,0 +1,7 @@
+#
+# Tests that nested font family is properly merged.
+#
+<p><span style="font-family: times new roman">x<span style="font-family: arial black">y</span>z</span></p>
+---
+<p><span style="font-family: times new roman">x<span style="font-family: arial black">y</span>\
+<span style="font-family: times new roman">z</span></span></p>

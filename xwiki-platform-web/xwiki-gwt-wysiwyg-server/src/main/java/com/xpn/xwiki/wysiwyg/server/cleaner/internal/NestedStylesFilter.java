@@ -272,7 +272,12 @@ public class NestedStylesFilter implements HTMLFilter
     {
         // Merge the style attributes from all the ancestors.
         StringBuilder mergedStyleAttribute = new StringBuilder();
-        for (Element ancestor : styledAncestors) {
+        // CSSStyleDeclaration implementation uses currently a list to store the declared properties and properties that
+        // appear multiple times are not merged. As a consequence, when querying the value of a property only its first
+        // occurence is taken into account. We iterate starting from the top styled ancestor to give priority to the
+        // most recent styled ancestors.
+        for (int i = styledAncestors.size() - 1; i >= 0; i--) {
+            Element ancestor = styledAncestors.get(i);
             if (mergedStyleAttribute.length() > 0
                 && mergedStyleAttribute.charAt(mergedStyleAttribute.length() - 1) != ';') {
                 mergedStyleAttribute.append(';');

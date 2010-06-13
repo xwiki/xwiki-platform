@@ -168,7 +168,13 @@
            executed, the Clirr one isn't). -->
       <id>clirr</id>
       <activation>
-        <activeByDefault>true</activeByDefault>
+        <property>
+          <!-- The Clirr profile is activated by default if the clirr.skip property is not defined and when defined
+               if its value is different than "true" -->
+          <name>!clirr.skip</name>
+          <value>!true</value>
+        </property>
+        <!--activeByDefault>true</activeByDefault-->
       </activation>
       <build>
         <plugins>

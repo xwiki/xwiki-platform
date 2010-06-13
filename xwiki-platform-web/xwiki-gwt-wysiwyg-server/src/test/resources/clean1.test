@@ -1,0 +1,11 @@
+#
+# Tests that nested styles are merged. If no styles have been merged in the current nested style group then the merged 
+# style is applied on the parent element; otherwise the text node is wrapped by a SPAN element and the merged style is 
+# applied on it.
+#
+<p>1<span style="color: red;">2<span style="background-color: yellow;">3</span>4</span>5\
+<span style="font-family: monospace;">6<span style="font-size: 24pt;">7</span>8</span>9</p>
+---
+<p>1<span style="color: red;">2<span style="background-color: yellow; color: red">3</span><span style="color: red">\
+4</span></span>5<span style="font-family: monospace;">6<span style="font-family: monospace; font-size: 24pt">7</span>\
+<span style="font-family: monospace">8</span></span>9</p>

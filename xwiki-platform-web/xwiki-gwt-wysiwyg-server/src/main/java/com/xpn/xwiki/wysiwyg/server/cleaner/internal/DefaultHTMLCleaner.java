@@ -62,8 +62,9 @@ public class DefaultHTMLCleaner implements HTMLCleaner
         filters.add(new StandAloneMacroFilter());
         filters.add(new EmptyAttributeFilter());
         filters.add(new NestedAnchorsFilter());
-        filters.add(new NestedStylesFilter());
         filters.addAll(config.getFilters());
+        // The nested styles filter must be applied at the end, on the cleaned document.
+        filters.add(new NestedStylesFilter());
         config.setFilters(filters);
 
         Document document = cleaner.clean(new StringReader(dirtyHTML), config);

@@ -143,7 +143,9 @@ public class DefaultRightService implements RightService
             .put("save", EDIT)
             .put("preview", EDIT)
             .put("lock", EDIT)
-            .put("cancel", VIEW);
+            .put("cancel", VIEW)
+            .put("delattachment", EDIT)
+            .put("upload", EDIT);
 
         for (Right level : values()) {
             if (!level.equals(ILLEGAL)) {

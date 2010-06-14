@@ -173,6 +173,10 @@
               <comparisonVersion>${clirr.previous.version}</comparisonVersion>
               <excludes>
                 <exclude>**/internal/**</exclude>
+                <!-- CLIRR has problems locating the ManagerState inner class inside OpenOfficeManager so we have to
+                     exclude it for the moment. See http://bit.ly/c5Jnho Remove this exclude when the problem is fixed
+                     in CLIRR. -->
+                <exclude>org/xwiki/officeimporter/openoffice/OpenOfficeManager$ManagerState</exclude>
                 <!-- TODO: Excludes below to be removed when we release XWiki 2.4 -->
                 <exclude>org/xwiki/rendering/transformation/MacroTransformationContext</exclude>
                 <exclude>org/xwiki/rendering/transformation/Transformation</exclude>
@@ -180,9 +184,6 @@
                 <exclude>org/xwiki/rendering/listener/DefaultAttachement</exclude>
                 <exclude>org/xwiki/rendering/scaffolding/RenderingTestCase</exclude>
                 <exclude>org/xwiki/officeimporter/openoffice/OpenOfficeManager</exclude>
-                <!-- CLIRR has problems locating the ManagerState inner class inside OpenOfficeManager so we have to
-                     exclude it for the moment. See http://bit.ly/c5Jnho -->
-                <exclude>org/xwiki/officeimporter/openoffice/OpenOfficeManager$ManagerState</exclude>
               </excludes>
             </configuration>
           </plugin>

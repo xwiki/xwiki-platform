@@ -29,62 +29,15 @@
     <artifactId>xwiki-core-parent</artifactId>
     <version>2.4-SNAPSHOT</version>
   </parent>
-  <artifactId>xwiki-core-velocity</artifactId>
-  <name>XWiki Platform - Core - Velocity</name>
+  <artifactId>xwiki-core-management</artifactId>
+  <name>XWiki Platform - Core - Management</name>
   <packaging>jar</packaging>
-  <description>XWiki Platform - Core - Velocity</description>
+  <description>XWiki Platform - Core - Management</description>
   <dependencies>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-core-component-api</artifactId>
       <version>${pom.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-core-configuration-api</artifactId>
-      <version>${pom.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-core-container-api</artifactId>
-      <version>${pom.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-core-container-servlet</artifactId>
-      <version>${pom.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-core-script</artifactId>
-      <version>${pom.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-core-management</artifactId>
-      <version>${pom.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>javax.servlet</groupId>
-      <artifactId>servlet-api</artifactId>
-      <version>2.4</version>
-      <scope>provided</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.apache.velocity</groupId>
-      <artifactId>velocity</artifactId>
-      <version>1.6.2</version>
-    </dependency>
-    <dependency>
-      <groupId>velocity-tools</groupId>
-      <artifactId>velocity-tools</artifactId>
-      <version>1.4</version>
-    </dependency>
-    <dependency>
-      <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-core-shared-tests</artifactId>
-      <version>${pom.version}</version>
-      <scope>test</scope>
     </dependency>
   </dependencies>
   <build>
@@ -103,5 +56,9 @@
       </plugin>
     </plugins>
   </build>
+  <properties>
+    <!-- Skip Clirr execution since this is the first release of this module. Remove once XE 2.4M2 is released. -->
+    <xwiki.clirr.skip>true</xwiki.clirr.skip>
+  </properties>
 </project>
        

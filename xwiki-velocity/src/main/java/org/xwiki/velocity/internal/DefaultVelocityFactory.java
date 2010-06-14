@@ -29,9 +29,12 @@ import org.xwiki.component.annotation.Requirement;
 import org.xwiki.component.logging.AbstractLogEnabled;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
+import org.xwiki.management.JMXBeanRegistration;
 import org.xwiki.velocity.VelocityEngine;
 import org.xwiki.velocity.VelocityFactory;
 import org.xwiki.velocity.XWikiVelocityException;
+import org.xwiki.velocity.internal.jmx.JMXVelocityEngine;
+import org.xwiki.velocity.internal.jmx.JMXVelocityEngineMBean;
 
 /**
  * Default implementation for {@link VelocityFactory}.
@@ -47,6 +50,12 @@ public class DefaultVelocityFactory extends AbstractLogEnabled implements Veloci
      */
     @Requirement
     private ComponentManager componentManager;
+
+    /**
+     * In order to register the Velocity MBean for management.
+     */
+    @Requirement
+    private JMXBeanRegistration jmxRegistration;
 
     /**
      * A cache of Velocity Engines. See {@link org.xwiki.velocity.VelocityFactory} for more details as to why we need
@@ -93,6 +102,12 @@ public class DefaultVelocityFactory extends AbstractLogEnabled implements Veloci
             engine.initialize(properties);
             this.velocityEngines.put(key, engine);
         }
+
+        // Register a JMX MBean for providing information about the created Velocity Engine (template namespaces,
+        // macros, etc).
+        JMXVelocityEngineMBean mbean = new JMXVelocityEngine(engine);
+        this.jmxRegistration.registerMBean(mbean, "type=Velocity,domain=Engines,name=" + key);
+
         return engine;
     }
 }

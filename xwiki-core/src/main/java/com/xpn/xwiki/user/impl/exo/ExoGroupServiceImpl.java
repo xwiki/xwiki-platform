@@ -40,10 +40,9 @@ import org.exoplatform.services.organization.UserHandler;
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
-import com.xpn.xwiki.user.api.XWikiGroupService;
 import com.xpn.xwiki.user.impl.xwiki.XWikiGroupServiceImpl;
 
-public class ExoGroupServiceImpl extends XWikiGroupServiceImpl implements XWikiGroupService
+public class ExoGroupServiceImpl extends XWikiGroupServiceImpl
 {
     private static OrganizationService organizationService;
 

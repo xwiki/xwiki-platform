@@ -59,17 +59,18 @@ public class JMXVelocityEngineTest extends AbstractComponentTestCase
             new OpenType[]{SimpleType.STRING, macroNameType});
 
         Assert.assertEquals(1, data.values().size());
-        Assert.assertTrue(data.containsValue(new CompositeDataSupport(rowType, columnNames, new Object[]{"<global>", 
-            new String[]{}})));
+        Assert.assertTrue("Found unexpected result: " + data.toString(), data.containsValue(
+            new CompositeDataSupport(rowType, columnNames, new Object[]{"<global>", new String[]{}})));
 
         StringWriter out = new StringWriter();
         engine.evaluate(new VelocityContext(), out, "testmacronamespace", "#macro(testmacro)#end");
         data = jmxBean.getTemplates();
 
         Assert.assertEquals(2, data.values().size());
-        Assert.assertTrue(data.containsValue(new CompositeDataSupport(rowType, columnNames, new Object[]{"<global>",
-            new String[]{}})));
-        Assert.assertTrue(data.containsValue(new CompositeDataSupport(rowType, columnNames,
-            new Object[]{"testmacronamespace", new String[]{"testmacro"}})));
+        Assert.assertTrue("Found unexpected result: " + data.toString(), data.containsValue(
+            new CompositeDataSupport(rowType, columnNames, new Object[]{"<global>", new String[]{}})));
+        Assert.assertTrue("Found unexpected result: " + data.toString(), data.containsValue(
+            new CompositeDataSupport(rowType, columnNames,
+                new Object[]{"testmacronamespace", new String[]{"testmacro"}})));
     }
 }

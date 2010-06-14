@@ -207,17 +207,15 @@ public class DefaultRightService implements RightService
         if (user == null) {
             needsAuth = needsAuth(right, context);
             try {
-                /* TODO Why is authentication disabled in this case?
+
                 if (context.getMode() != XWikiContext.MODE_XMLRPC) {
-                */
-                user = context.getWiki().checkAuth(context);
-                    /*
-                    } else {
-                user = new XWikiUser(context.getUser());
-                // } */
+                    user = context.getWiki().checkAuth(context);
+                } else {
+                    user = new XWikiUser(RightService.GUEST_USER_FULLNAME);
+                }
 
                 if ((user == null) && (needsAuth)) {
-                    //                    logDeny("unauthentified", doc.getFullName(), right, "Authentication needed");
+                    logDeny(null, doc.getDocumentReference(), right, "Authentication needed");
                     if (context.getRequest() != null
                         && !context.getWiki().Param("xwiki.hidelogin", "false").equalsIgnoreCase("true")) {
                         context.getWiki().getAuthService().showLogin(context);
@@ -322,34 +320,43 @@ public class DefaultRightService implements RightService
      */
     public boolean hasProgrammingRights(XWikiDocument doc, XWikiContext context)
     {
-        String author = doc.getContentAuthor();
-        if (author == null || author.equals("")) {
-            LOG.debug("Denied programming rights on " + doc.getFullName());
-            return false;
+        DocumentReference user;
+        String wikiname;
+
+        if (doc != null) {
+            String username = doc.getContentAuthor();
+            if (username == null || username.equals("")) {
+                logDeny(null, doc.getDocumentReference(), PROGRAM, "No content author.");
+                return false;
+            }
+            wikiname = doc.getDocumentReference().getWikiReference().getName();
+            user = resolveUserName(username, wikiname);
+        } else {
+            user = getUserReference(context);
+            wikiname = context.getDatabase();
         }
 
-        DocumentReference document = doc.getDocumentReference();
-        DocumentReference user = resolveUserName(author, document.getWikiReference().getName());
-        return checkAccess(PROGRAM, user, document, context);
+        EntityReference wiki = new EntityReference(wikiname, EntityType.WIKI, null);
+        return checkAccess(PROGRAM, user, wiki, context);
     }
 
     
     /**
      * @param right The right that will be checked.
      * @param user The user that will be checked
-     * @param document The document that will be checked.
+     * @param entity The document that will be checked.
      * @param context The current context.
      * @return {@code true} if and only if the given user have the
      * given right on the given document.
      */
     private boolean checkAccess(Right right,
                                 DocumentReference user,
-                                DocumentReference document,
+                                EntityReference entity,
                                 XWikiContext context)
     {
         AccessLevel accessLevel;
         try {
-            accessLevel = getAccessLevel(user, document);
+            accessLevel = getAccessLevel(user, entity);
         } catch (Exception e) {
             LOG.error("Failed to check admin right for user [" + context.getUser() + "]", e);
             return false;
@@ -357,16 +364,16 @@ public class DefaultRightService implements RightService
 
         if (context.getWiki().isReadOnly()) {
             if (right == EDIT || right == DELETE || right == COMMENT || right == REGISTER) {
-                logDeny(user, document, right, "server in read-only mode");
+                logDeny(user, entity, right, "server in read-only mode");
                 return true;
             }
         }
 
         if (accessLevel.get(right) == RightState.ALLOW) {
-            logAllow(user, document, right, "");
+            logAllow(user, entity, right, "");
             return true;
         } else {
-            logDeny(user, document, right, "");
+            logDeny(user, entity, right, "");
             return false;
         }
     }
@@ -396,10 +403,14 @@ public class DefaultRightService implements RightService
      */
     private DocumentReference getUserReference(XWikiContext context)
     {
-        String username = context.getUser();
-        if (username == null) {
+        XWikiUser user = context.getXWikiUser();
+        String username;
+        LOG.debug("Getting user from context: " + user);
+        if (user == null) {
             username = GUEST_USER_FULLNAME;
-        } 
+        } else {
+            username = user.getUser();
+        }
         String wikiname = context.getDatabase();
         return resolveUserName(username, wikiname);
     }
@@ -474,15 +485,15 @@ public class DefaultRightService implements RightService
     /**
      * Log allow conclusion.
      * @param user The user name that was checked.
-     * @param document The page that was checked.
+     * @param entity The page that was checked.
      * @param right The action that was requested.
      * @param info Additional information.
      */
-    private void logAllow(DocumentReference user, DocumentReference document, Right right, String info)
+    private void logAllow(DocumentReference user, EntityReference entity, Right right, String info)
     {
         if (LOG.isDebugEnabled()) {
             String userName = entityReferenceSerializer.serialize(user);
-            String docName = entityReferenceSerializer.serialize(document);
+            String docName = entityReferenceSerializer.serialize(entity);
             Formatter f = new Formatter();
             LOG.debug(f.format("Access has been granted for (%s,%s,%s): %s",
                                userName, docName, right.toString(), info));
@@ -492,15 +503,15 @@ public class DefaultRightService implements RightService
     /**
      * Log deny conclusion.
      * @param user The user name that was checked.
-     * @param document The page that was checked.
+     * @param entity The page that was checked.
      * @param right The action that was requested.
      * @param info Additional information.
      */
-    protected void logDeny(DocumentReference user, DocumentReference document,  Right right, String info)
+    protected void logDeny(DocumentReference user, EntityReference entity,  Right right, String info)
     {
         if (LOG.isInfoEnabled()) {
             String userName = entityReferenceSerializer.serialize(user);
-            String docName = entityReferenceSerializer.serialize(document);
+            String docName = entityReferenceSerializer.serialize(entity);
             Formatter f = new Formatter();
             LOG.info(f.format("Access has been denied for (%s,%s,%s): %s",
                               userName, docName, right.toString(), info));

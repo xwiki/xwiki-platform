@@ -39,6 +39,7 @@ import com.xpn.xwiki.web.Utils;
 
 import java.util.Collection;
 import java.util.LinkedList;
+import java.util.List;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -50,6 +51,18 @@ import org.apache.commons.logging.LogFactory;
  */
 final class XWikiUtils
 {
+    /** Name of document where wiki rights are stored. */
+    static final String WIKI_DOC = "XWikiPreferences";
+
+    /** Name of the space where wiki document is stored. */
+    static final String WIKI_SPACE = "XWiki";
+
+    /** Name of document where space rights are stored. */
+    static final String SPACE_DOC = "WebPreferences";
+
+    /** Name of group class. */
+    static final String GROUP_CLASS = "XWiki.XWikiGroups";
+
     /**
      * The logging tool.
      */
@@ -141,6 +154,19 @@ final class XWikiUtils
         }
     }
 
+    /**
+     * @param source an xwiki document, that has just been updated.
+     * @return true if and only if the xwiki document corresponds to a group.
+     */
+    public static boolean isGroupDocument(Object source)
+    {
+        XWikiDocument doc = (XWikiDocument) source;
+        DocumentReference docRef = doc.getDocumentReference();
+        DocumentReferenceResolver<String> resolver = Utils.getComponent(DocumentReferenceResolver.class);
+        DocumentReference groupClass = resolver.resolve(GROUP_CLASS, docRef);
+        List objects = doc.getXObjects(groupClass);
+        return objects != null && objects.size() > 0;
+    }
 
     /**
      * Obtain a document reference to the {@link XWikiDocument} given

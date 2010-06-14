@@ -22,14 +22,9 @@
  */
 package org.xwiki.security.internal;
 
+import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.DocumentReference;
-import org.xwiki.model.EntityType;
-
-import org.xwiki.observation.EventListener;
-import org.xwiki.observation.event.Event;
-import org.xwiki.observation.event.DocumentDeleteEvent;
-import org.xwiki.observation.event.DocumentUpdateEvent;
 
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.Requirement;
@@ -53,9 +48,6 @@ import org.apache.commons.logging.LogFactory;
 import java.util.List;
 import java.util.LinkedList;
 import java.util.Collection;
-import java.util.Arrays;
-import java.util.concurrent.locks.ReadWriteLock;
-import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 /**
  * The default implementation for the right loader.
@@ -63,21 +55,12 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
  * @version $Id: $
  */
 @Component
-public class DefaultRightLoader implements RightLoader, EventListener
+public class DefaultRightLoader implements RightLoader
 {
     /**
      * The logging tool.
      */
     private static final Log LOG = LogFactory.getLog(DefaultRightLoader.class);
-
-    /** Name of document where wiki rights are stored. */
-    private static final String WIKI_DOC = "XWikiPreferences";
-
-    /** Name of the space where wiki document is stored. */
-    private static final String WIKI_SPACE = "XWiki";
-
-    /** Name of document where space rights are stored. */
-    private static final String SPACE_DOC = "WebPreferences";
 
     /** Maximum number of attempts at loading an entry. */
     private static final int MAX_RETRIES = 5;
@@ -85,14 +68,11 @@ public class DefaultRightLoader implements RightLoader, EventListener
     /** Resolver for the user, group and rights objects. */
     @Requirement private RightResolver rightResolver;
 
-    /**
-     * We use a fair read-write lock to suspend the delivery of
-     * document update events while there are loads in progress.
-     */
-    private final ReadWriteLock readWriteLock = new ReentrantReadWriteLock(true);
-
     /** The right cache. */
     @Requirement private RightCache rightCache;
+
+    /** Event listener responsible for invalidating cache entries. */
+    @Requirement private RightCacheInvalidator rightCacheInvalidator;
 
     /** Factory object for producing RightsObject instances from the corresponding xwiki rights objects. */
     @Requirement private RightsObjectFactory rightsObjectFactory;
@@ -104,7 +84,7 @@ public class DefaultRightLoader implements RightLoader, EventListener
         int retries = 0;
     RETRY: 
         while (true) {
-            readWriteLock.readLock().lock();
+            rightCacheInvalidator.suspend();
 
             try {
                 retries++;
@@ -124,7 +104,7 @@ public class DefaultRightLoader implements RightLoader, EventListener
                     continue RETRY;
                 }
             } finally {
-                readWriteLock.readLock().unlock();
+                rightCacheInvalidator.resume();
             }
             LOG.error("Failed to load the cache in "
                       + retries
@@ -161,7 +141,7 @@ public class DefaultRightLoader implements RightLoader, EventListener
             foundObjects = entry.getType() == RightCacheEntry.Type.HAVE_OBJECTS;
         }
 
-        if (foundObjects) {
+        if (foundObjects || entity.getType() == EntityType.WIKI) {
             return loadUserAtEntity(user, entity);
         } else {
             return loadRequiredEntries(user, entity.getParent());
@@ -192,20 +172,11 @@ public class DefaultRightLoader implements RightLoader, EventListener
          */
         RightCacheKey userParentKey = rightCache.getRightCacheKey(userParent);
         getRightsObjects(userParentKey, userParent);
-        /*
-         * Parent entries of the user entry are group entries in
-         * addition to the space entry of the user page.
-         */
-        Collection<RightCacheKey> parents = new LinkedList();
-        parents.add(userParentKey);
-        for (DocumentReference group : groups) {
-            parents.add(rightCache.getRightCacheKey(group));
-        }
 
         RightCacheKey userKey   = rightCache.getRightCacheKey(user);
         RightCacheKey entityKey = rightCache.getRightCacheKey(entity);
         RightCacheEntry entry = loadRightsObjects(user);
-        rightCache.addWithMultipleParents(userKey, parents, entry);
+        rightCache.add(userKey, entry);
 
         List<Collection<RightsObject>> rightsObjects
             = getRightsObjects(entityKey, entity);
@@ -244,24 +215,6 @@ public class DefaultRightLoader implements RightLoader, EventListener
             if (entry == null) {
                 entry = loadRightsObjects(group);
                 rightCache.add(groupKey, entry);
-            } else if (!(entry instanceof GroupEntry)) {
-                /*
-                 * This group was already loaded into the cache as a
-                 * regular document entry (i.e., the group document
-                 * has been viewed, but no users in the group have,
-                 * until now, been active).  We must convert it to a
-                 * group entry, so we will recognize it as such when
-                 * it is removed from the cache, and then be able to
-                 * invalidate any user entry for newly added users to
-                 * the group.
-                 */
-                rightCache.remove(groupKey);
-                Collection<Object> objs = entry.getObjects(Object.class);
-                GroupEntry groupEntry = new GroupEntry(group);
-                for (Object obj : objs) {
-                    groupEntry.addObject(obj);
-                }
-                rightCache.add(groupKey, groupEntry);
             }
         }
         return groups;
@@ -333,13 +286,19 @@ public class DefaultRightLoader implements RightLoader, EventListener
         boolean global;
         switch (entity.getType()) {
             case SPACE:
-                EntityReference spaceDoc = new EntityReference(SPACE_DOC, EntityType.DOCUMENT, entity.clone());
+                EntityReference spaceDoc = new EntityReference(XWikiUtils.SPACE_DOC,
+                                                               EntityType.DOCUMENT,
+                                                               entity.clone());
                 docRef = new DocumentReference(spaceDoc);
                 global = true;
                 break;
             case WIKI:
-                EntityReference space = new EntityReference(WIKI_SPACE, EntityType.SPACE, entity.clone());
-                EntityReference wikiDoc = new EntityReference(WIKI_DOC, EntityType.DOCUMENT, space);
+                EntityReference space = new EntityReference(XWikiUtils.WIKI_SPACE,
+                                                            EntityType.SPACE,
+                                                            entity.clone());
+                EntityReference wikiDoc = new EntityReference(XWikiUtils.WIKI_DOC,
+                                                              EntityType.DOCUMENT,
+                                                              space);
                 docRef = new DocumentReference(wikiDoc);
                 global = true;
                 break;
@@ -357,7 +316,7 @@ public class DefaultRightLoader implements RightLoader, EventListener
         RightCacheEntry entry;
         Collection<RightsObject> objs = rightsObjectFactory.getInstances(docRef, global);
 
-        if (objs.size() == 0) {
+        if (objs.size() == 0 && entity.getType() != EntityType.WIKI) {
             entry = RightCacheEntry.HAVE_NO_RIGHT_OBJECT_ENTRY;
         } else {
             ObjectEntry objEntry = new ObjectEntry();
@@ -369,64 +328,4 @@ public class DefaultRightLoader implements RightLoader, EventListener
         return entry;
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.observation.EventListener#getName()
-     */
-    public String getName()
-    {
-        return getClass().getName();
-    }
-
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.observation.EventListener#getEvents()
-     */
-    public List<Event> getEvents()
-    {
-        Event[] events = {
-            new DocumentUpdateEvent(),
-            new DocumentDeleteEvent()
-        };
-        return Arrays.asList(events);
-    }
-
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.observation.EventListener#onEvent(org.xwiki.observation.event.Event, java.lang.Object,
-     *      java.lang.Object)
-     */
-    public void onEvent(Event event, Object source, Object data)
-    {
-        DocumentReference ref = XWikiUtils.getDocumentReference(source);
-        readWriteLock.writeLock().lock();
-        try {
-            deliverUpdateEvent(ref);
-        } finally {
-            readWriteLock.writeLock().unlock();
-        }
-    }
-
-    /**
-     * Describe <code>deliverUpdateEvent</code> method here.
-     *
-     * @param ref Reference to the document that should be
-     * invalidated.
-     */
-    private void deliverUpdateEvent(DocumentReference ref)
-    {
-        if (ref.getName().equals(WIKI_DOC) && ref.getParent().getName().equals(WIKI_SPACE)) {
-            RightCacheKey wikiKey = rightCache.getRightCacheKey(ref.getWikiReference());
-            rightCache.remove(wikiKey);
-        } else if (ref.getName().equals(SPACE_DOC)) {
-            RightCacheKey spaceKey = rightCache.getRightCacheKey(ref.getParent());
-            rightCache.remove(spaceKey);
-        } else {
-            RightCacheKey key = rightCache.getRightCacheKey(ref);
-            rightCache.remove(key);
-        }
-    }
 }

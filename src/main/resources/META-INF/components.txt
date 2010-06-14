@@ -1,5 +1,6 @@
 org.xwiki.security.internal.DefaultRightService
 org.xwiki.security.internal.DefaultRightCache
+org.xwiki.security.internal.DefaultRightCacheInvalidator
 org.xwiki.security.internal.DefaultRightLoader
 org.xwiki.security.internal.DefaultRightResolver
 org.xwiki.security.internal.DefaultRightsObjectFactory

@@ -35,6 +35,7 @@ import com.xpn.xwiki.web.Utils;
 public class MockXWiki extends XWiki
 {
     Map<DocumentReference, MockDocument> documents = new HashMap();
+    Map<String, String> wikiOwners = new HashMap();
 
     private final XWiki mainXWiki;
     private String cacheCapacity = "500";
@@ -80,5 +81,19 @@ public class MockXWiki extends XWiki
     public void setCacheCapacity(Integer value)
     {
         cacheCapacity = value.toString();
+    }
+
+    @Override
+    public String getWikiOwner(String wikiName, XWikiContext context)
+    {
+        String userName = wikiOwners.get(wikiName);
+        if (userName == null) {
+            return "xwiki:XWiki.Admin";
+        }
+        return userName;
+    }
+
+    public void setWikiOwner(String wikiName, String userName) {
+        wikiOwners.put(wikiName, userName);
     }
 }

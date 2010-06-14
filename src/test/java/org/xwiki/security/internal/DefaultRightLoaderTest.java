@@ -42,6 +42,8 @@ import java.util.List;
 import static java.util.Collections.EMPTY_LIST;
 import static java.util.Collections.EMPTY_SET;
 
+import org.xwiki.observation.EventListener;
+
 public class DefaultRightLoaderTest extends AbstractTestCase
 {
     @Test 
@@ -52,6 +54,10 @@ public class DefaultRightLoaderTest extends AbstractTestCase
         DocumentReference userZ = docRefResolver.resolve("xwiki:XWiki.userZ");
         DocumentReference admin = docRefResolver.resolve("xwiki:XWiki.Admin");
 
+        MockDocument wikiDocument = new MockDocument("xwiki:XWiki.XWikiPreferences", "xwiki:XWiki.Admin");
+        MockDocument allGroupDocument = MockDocument.newGroupDocument("xwiki:XWiki.XWikiAllGroup", 
+                                                                      new String[]{"wikiY:XWiki.userX", 
+                                                                                   "wikiY:XWiki.userY" });
         wiki.add(new MockDocument(userX, "xwiki:XWiki.Admin")
                  .allowLocal(asList(new Right[]{EDIT }),
                              asList(new String[]{"wikiY:XWiki.userX"}),
@@ -59,7 +65,9 @@ public class DefaultRightLoaderTest extends AbstractTestCase
             .add(new MockDocument(userY, "xwiki:XWiki.Admin")
                  .allowLocal(asList(new Right[]{EDIT }),
                              asList(new String[]{"wikiY:XWiki.userY"}),
-                             EMPTY_LIST ));
+                             EMPTY_LIST ))
+            .add(wikiDocument)
+            .add(allGroupDocument);
 
         try {
             mockery.checking(new Expectations() {{
@@ -73,6 +81,7 @@ public class DefaultRightLoaderTest extends AbstractTestCase
 
             RightLoader loader = getComponentManager().lookup(RightLoader.class);
             RightCache  cache  = getComponentManager().lookup(RightCache.class);
+            RightCacheInvalidator invalidator = getComponentManager().lookup(RightCacheInvalidator.class);
 
             AccessLevel edit = AccessLevel.DEFAULT_ACCESS_LEVEL.clone();
             edit.allow(EDIT);
@@ -95,15 +104,9 @@ public class DefaultRightLoaderTest extends AbstractTestCase
 
             entry = cache.get(cache.getRightCacheKey(userX.getParent().getParent()));
             assertTrue(entry != null);
-            assertTrue(entry.getType() == RightCacheEntry.Type.HAVE_NO_OBJECTS);
+            assertTrue(entry.getType() == RightCacheEntry.Type.HAVE_OBJECTS);
 
-            wiki.add(new MockDocument("wikiY:XWiki.WebPreferences", "xwiki:XWiki.Admin")
-                     .denyGlobal(asList(new Right[]{COMMENT }),
-                                 EMPTY_LIST,
-                                 asList(new String[]{"XWiki.XWikiAllGroup"}))
-                     );
-
-            cache.remove(cache.getRightCacheKey(new EntityReference("xwiki", EntityType.WIKI, null)));
+            ((EventListener) invalidator).onEvent(null, wikiDocument, null);
 
             entry = cache.get(cache.getRightCacheKey(userX), cache.getRightCacheKey(userX));
             assertTrue(entry == null);
@@ -117,10 +120,35 @@ public class DefaultRightLoaderTest extends AbstractTestCase
             entry = cache.get(cache.getRightCacheKey(userX.getParent().getParent()));
             assertTrue(entry == null);
 
+            wikiDocument.denyGlobal(asList(new Right[]{COMMENT }),
+                                    EMPTY_LIST,
+                                    asList(new String[]{"wikiY:XWiki.XWikiAllGroup" }));
+
             AccessLevel editNoComment = edit.clone();
             editNoComment.deny(COMMENT);
             level = loader.load(userX, userX);
             assertTrue(level.equals(editNoComment));
+
+            mockery.checking(new Expectations() {{
+                allowing(mockGroupService).getAllMembersNamesForGroup("xwiki:XWiki.GroupX", 100, 0, xwikiContext);
+                will(returnValue(asList(new String[]{"wikiY:XWiki.userX"})));
+            }});
+            MockDocument group = MockDocument.newGroupDocument("XWiki.GroupX", new String[] {"wikiY:XWiki.userX" } );
+            wiki.add(group);
+            ((EventListener) invalidator).onEvent(null, group, null);
+
+            entry = cache.get(cache.getRightCacheKey(userX));
+            assertTrue("Invalidating cache after group update", entry == null);
+
+            entry = cache.get(cache.getRightCacheKey(userX), cache.getRightCacheKey(userX));
+            assertTrue("Invalidating cache after group update", entry == null);
+
+            entry = cache.get(cache.getRightCacheKey(userX.getParent()));
+            assertTrue("Invalidating cache after group update", entry != null);
+
+            entry = cache.get(cache.getRightCacheKey(userX.getParent().getParent()));
+            assertTrue("Invalidating cache after group update", entry != null);
+            
 
         } catch (Exception e) {
             LOG.error("Caught exception.", e);

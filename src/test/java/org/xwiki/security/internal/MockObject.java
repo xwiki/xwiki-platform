@@ -33,6 +33,7 @@ public class MockObject extends BaseObject
     private String users;
     private String groups;
     private String levels;
+    private String member;
     private int allow;
 
     @Override
@@ -44,6 +45,9 @@ public class MockObject extends BaseObject
     @Override
     public String getStringValue(String name)
     {
+        if (name.equals("member")) {
+            return member;
+        }
         if (name.equals("users")) {
             return users;
         }
@@ -110,5 +114,10 @@ public class MockObject extends BaseObject
             });
         o.users = join(users);
         o.groups = join(groups);
+    }
+
+    public void setMember(String member)
+    {
+        this.member = member;
     }
 }

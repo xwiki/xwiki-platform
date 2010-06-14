@@ -51,11 +51,11 @@ public class DefaultRightResolverTest  extends AbstractTestCase
     public void testRightResolver()
     {
         try {
-            wiki.add(new MockDocument(docRefResolver.resolve("wikiY:SpaceX.DocY"), "wikiX:XWiki.UserY"));
+            wiki.add(new MockDocument(docRefResolver.resolve("wikiY:SpaceX.DocY"), "wikiY:XWiki.UserY"));
 
             Right[] rights = {ADMIN, PROGRAM };
-            DocumentReference[] groups = { uResolver.resolve("GroupX", "wikiX"), uResolver.resolve("SpaceY.GroupY") };
-            DocumentReference[] users  = { uResolver.resolve("UserX", "wikiX") };
+            DocumentReference[] groups = { uResolver.resolve("GroupX", "wikiY"), uResolver.resolve("SpaceY.GroupY") };
+            DocumentReference[] users  = { uResolver.resolve("UserX", "wikiY") };
 
             RightsObject o = new MockRightsObject(new HashSet(asList(rights)),
                                                   ALLOW,
@@ -63,8 +63,8 @@ public class DefaultRightResolverTest  extends AbstractTestCase
                                                   new HashSet(asList(groups)));
 
             final DocumentReference doc = docRefResolver.resolve("wikiY:SpaceX.DocY");
-            DocumentReference userX = uResolver.resolve("UserX", "wikiX");
-            DocumentReference userY = uResolver.resolve("UserY", "wikiX");
+            DocumentReference userX = uResolver.resolve("UserX", "wikiY");
+            DocumentReference userY = uResolver.resolve("UserY", "wikiY");
             
             RightCacheKey key = new RightCacheKey() { public EntityReference getEntityReference() { return doc; }};
 

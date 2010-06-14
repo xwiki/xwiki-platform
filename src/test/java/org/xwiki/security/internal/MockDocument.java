@@ -37,6 +37,7 @@ public class MockDocument extends XWikiDocument
 {
     private List<BaseObject> globalRights = new LinkedList();
     private List<BaseObject> localRights = new LinkedList();
+    private List<BaseObject> groups = new LinkedList();
 
     public MockDocument(DocumentReference docRef, String creator)
     {
@@ -52,6 +53,9 @@ public class MockDocument extends XWikiDocument
     @Override
     public List<BaseObject> getXObjects(DocumentReference classRef)
     {
+        if (classRef.getName().equals("XWikiGroups")) {
+            return groups;
+        }
         if (classRef.getName().equals("XWikiGlobalRights")) {
             return globalRights;
         } else {
@@ -81,5 +85,22 @@ public class MockDocument extends XWikiDocument
     {
         globalRights.add(MockObject.getDeny(levels, users, groups));
         return this;
+    }
+
+    public MockDocument addMember(String name)
+    {
+        MockObject o = new MockObject();
+        o.setMember(name);
+        groups.add(o);
+        return this;
+    }
+
+    public static MockDocument newGroupDocument(String name, String[] members)
+    {
+        MockDocument doc = new MockDocument(name, "xwiki:XWiki.Admin");
+        for (String member : members) {
+            doc.addMember(member);
+        }
+        return doc;
     }
 }

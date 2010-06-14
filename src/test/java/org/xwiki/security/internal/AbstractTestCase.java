@@ -72,6 +72,8 @@ public abstract class AbstractTestCase extends AbstractComponentTestCase
 
     protected XWikiContext xwikiContext;
 
+    protected RightCacheInvalidator invalidator;
+
     @Before
     public void initializeTests() throws Exception
     {
@@ -90,6 +92,7 @@ public abstract class AbstractTestCase extends AbstractComponentTestCase
             mockGroupService = mockery.mock(XWikiGroupService.class);
             wiki.setGroupService(mockGroupService);
             execution.getContext().setProperty(XWikiContext.EXECUTIONCONTEXT_KEY, xwikiContext);
+            invalidator = getComponentManager().lookup(RightCacheInvalidator.class);
         } catch (Exception e) {
             LOG.error("Caught exception", e);
             throw e;

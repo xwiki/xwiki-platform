@@ -150,7 +150,7 @@ public class DefaultRightResolver implements RightResolver
 
         assert (!iterator.hasPrevious() && ref == null);
 
-        postProcess(accessLevel);
+        postProcess(user, entity, accessLevel);
 
         return accessLevel.getExistingInstance();
     }
@@ -158,13 +158,22 @@ public class DefaultRightResolver implements RightResolver
     /**
      * Fill out default values, allow additional rights in case of
      * program or admin rights, etc.
+     * @param user The user, whose rights are to be determined.
+     * @param entity The entity, which the user wants to access.
      * @param accessLevel The accumulated result.
      */
-    private void postProcess(AccessLevel accessLevel)
+    private void postProcess(DocumentReference user, EntityReference entity, AccessLevel accessLevel)
     {
         for (Right right : Right.values()) {
             if (accessLevel.get(right) == UNDETERMINED) {
-                accessLevel.set(right, AccessLevel.DEFAULT_ACCESS_LEVEL.get(right));
+                if (!user.getWikiReference().getName().equals(entity.getRoot().getName())) {
+                    /*
+                     * Deny all by default for users from another wiki.
+                     */
+                    accessLevel.deny(right);
+                } else {
+                    accessLevel.set(right, AccessLevel.DEFAULT_ACCESS_LEVEL.get(right));
+                }
             }
         }
 
@@ -196,12 +205,9 @@ public class DefaultRightResolver implements RightResolver
     {
         AccessLevel currentLevel = new AccessLevel();
 
-        if (ref.getParent() == null && ref.getChild() != null 
-            && ref.getChild().getType() == EntityType.WIKI) {
-            /*
-             * We are moving from virtual wiki to main wiki.
-             */
-        }
+        boolean mainWikiInheritance = ref.getParent() == null 
+            && ref.getChild() != null 
+            && ref.getChild().getType() == EntityType.WIKI;
 
         for (Right right : enabledRights.get(ref.getType())) {
             boolean foundAllow = false;

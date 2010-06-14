@@ -20,26 +20,19 @@
  */
 package org.xwiki.security.internal;
 
-import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.component.annotation.ComponentRole;
 
 /**
- * A right cache entry that represents a group.
+ * The instance of this class monitors updates and invalidates right
+ * cache entries whenever necessary.
  * @version $Id: $
  */
-class GroupEntry extends ObjectEntry
+@ComponentRole
+public interface RightCacheInvalidator
 {
-    /** Store the document reference that represents the group. */
-    private final DocumentReference groupReference;
+    /** Suspend delivery of invalidation events. */
+    void suspend();
 
-    /** @param groupReference The document reference that represents the group. */
-    public GroupEntry(DocumentReference groupReference)
-    {
-        this.groupReference = groupReference;
-    }
-
-    /** @return the document reference that represents the group. */
-    public DocumentReference getGroupReference()
-    {
-        return groupReference;
-    }
+    /** Resume delivery of invalidation events. */
+    void resume();
 }

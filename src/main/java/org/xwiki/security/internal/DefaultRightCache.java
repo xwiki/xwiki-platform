@@ -43,7 +43,6 @@ import org.xwiki.component.phase.Initializable;
 import org.xwiki.security.RightCache;
 import org.xwiki.security.RightCacheEntry;
 import org.xwiki.security.RightCacheKey;
-import org.xwiki.security.RightServiceException;
 import org.xwiki.security.ParentEntryEvictedException;
 import org.xwiki.security.ConflictingInsertionException;
 
@@ -586,15 +585,6 @@ public class DefaultRightCache implements RightCache, Initializable
             String key = event.getEntry().getKey();
             removeChildren(key);
             removeParentRelation(key);
-            if (event.getEntry() instanceof GroupEntry) {
-                GroupEntry groupEntry = (GroupEntry) event.getEntry();
-                try {
-                    LOG.debug("Invalidating the members of the group " + groupEntry.getGroupReference());
-                    XWikiUtils.invalidateGroupMembers(groupEntry.getGroupReference(), DefaultRightCache.this);
-                } catch (RightServiceException e) {
-                    LOG.error("Caught exception while invalidating group members.", e);
-                }
-            }
             LOG.debug("Cache entry removed: " + key);
         }
 

@@ -25,13 +25,12 @@ import org.junit.Test;
 import org.xwiki.test.AbstractComponentTestCase;
 import org.xwiki.velocity.VelocityEngine;
 
-import javax.management.openmbean.ArrayType;
-import javax.management.openmbean.CompositeDataSupport;
-import javax.management.openmbean.CompositeType;
-import javax.management.openmbean.OpenType;
-import javax.management.openmbean.SimpleType;
+import javax.management.openmbean.CompositeData;
 import javax.management.openmbean.TabularData;
 import java.io.StringWriter;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Properties;
 
 /**
@@ -51,26 +50,22 @@ public class JMXVelocityEngineTest extends AbstractComponentTestCase
 
         TabularData data = jmxBean.getTemplates();
 
-        ArrayType macroNameType = new ArrayType(1, SimpleType.STRING);
-        String[] columnNames = new String[] {"templateName", "macroNames"};
-        String[] descriptions = new String[] {"The Template Name (namespace)", "The names of registered Macros"};
-        CompositeType rowType = new CompositeType("template",
-            "Template management data (namespaces, macros) for a row", columnNames, descriptions,
-            new OpenType[]{SimpleType.STRING, macroNameType});
-
         Assert.assertEquals(1, data.values().size());
-        Assert.assertTrue("Found unexpected result: " + data.toString(), data.containsValue(
-            new CompositeDataSupport(rowType, columnNames, new Object[]{"<global>", new String[]{}})));
+        CompositeData cd = ((CompositeData) data.values().iterator().next());
+        Assert.assertEquals("<global>", cd.get("templateName"));
+        Assert.assertEquals(0, ((String[])cd.get("macroNames")).length);
 
         StringWriter out = new StringWriter();
         engine.evaluate(new VelocityContext(), out, "testmacronamespace", "#macro(testmacro)#end");
         data = jmxBean.getTemplates();
 
         Assert.assertEquals(2, data.values().size());
-        Assert.assertTrue("Found unexpected result: " + data.toString(), data.containsValue(
-            new CompositeDataSupport(rowType, columnNames, new Object[]{"<global>", new String[]{}})));
-        Assert.assertTrue("Found unexpected result: " + data.toString(), data.containsValue(
-            new CompositeDataSupport(rowType, columnNames,
-                new Object[]{"testmacronamespace", new String[]{"testmacro"}})));
+        Map<String, String[]> retrievedData = new HashMap<String, String[]>();
+        for (CompositeData cdata : (Collection<CompositeData>) data.values()) {
+            retrievedData.put((String) cdata.get("templateName"), (String[]) cdata.get("macroNames"));
+        }
+        Assert.assertEquals(0, retrievedData.get("<global>").length);
+        Assert.assertEquals(1, retrievedData.get("testmacronamespace").length);
+        Assert.assertEquals("testmacro", retrievedData.get("testmacronamespace")[0]);
     }
 }

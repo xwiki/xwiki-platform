@@ -140,6 +140,8 @@ public class DefaultRightService implements RightService
             .put("unknown", VIEW)
             .put("programming", PROGRAM)
             .put("edit", EDIT)
+            .put("save", EDIT)
+            .put("preview", EDIT)
             .put("lock", EDIT)
             .put("cancel", VIEW);
 

@@ -177,7 +177,7 @@ public class DefaultVelocityManager implements VelocityManager
         String cacheKey = getVelocityEngineCacheKey(skin, xcontext);
 
         // Get the Velocity Engine to use
-        VelocityFactory velocityFactory = (VelocityFactory) Utils.getComponent(VelocityFactory.class);
+        VelocityFactory velocityFactory = Utils.getComponent(VelocityFactory.class);
         VelocityEngine velocityEngine;
         if (velocityFactory.hasVelocityEngine(cacheKey)) {
             velocityEngine = velocityFactory.getVelocityEngine(cacheKey);

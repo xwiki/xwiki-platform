@@ -172,11 +172,20 @@ public class DefaultRightLoader implements RightLoader
          */
         RightCacheKey userParentKey = rightCache.getRightCacheKey(userParent);
         getRightsObjects(userParentKey, userParent);
+        /*
+         * Parent entries of the user entry are group entries in
+         * addition to the space entry of the user page.
+         */
+        Collection<RightCacheKey> parents = new LinkedList();
+        parents.add(userParentKey);
+        for (DocumentReference group : groups) {
+            parents.add(rightCache.getRightCacheKey(group));
+        }
 
         RightCacheKey userKey   = rightCache.getRightCacheKey(user);
         RightCacheKey entityKey = rightCache.getRightCacheKey(entity);
         RightCacheEntry entry = loadRightsObjects(user);
-        rightCache.add(userKey, entry);
+        rightCache.addWithMultipleParents(userKey, parents, entry);
 
         List<Collection<RightsObject>> rightsObjects
             = getRightsObjects(entityKey, entity);

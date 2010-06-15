@@ -170,7 +170,7 @@ public class DefaultXWikiRenderingEngineTest extends AbstractBridgedXWikiCompone
         XWikiDocument document = new XWikiDocument();
 
         // Prove that the renderers are in the right order by default.
-        assertEquals(myEngine.getRendererNames(), new ArrayList<String>(){{
+        assertEquals(engine.getRendererNames(), new ArrayList<String>(){{
             add("mapping");
             add("groovy");
             add("velocity");
@@ -179,14 +179,14 @@ public class DefaultXWikiRenderingEngineTest extends AbstractBridgedXWikiCompone
             add("xwiki");
         }});
 
-        assertEquals(groovyFirst, myEngine.renderText(text, document, getContext()));
+        assertEquals(groovyFirst, engine.renderText(text, document, getContext()));
 
         xwiki.getConfig().put("xwiki.render.renderingorder",
                               "macromapping, velocity, groovy, plugin, wiki, wikiwiki");
 
         DefaultXWikiRenderingEngine myEngine = new DefaultXWikiRenderingEngine(xwiki, getContext());
 
-        assertEquals(engine.getRendererNames(), new ArrayList<String>(){{
+        assertEquals(myEngine.getRendererNames(), new ArrayList<String>(){{
             add("mapping");
             add("velocity");
             add("groovy");
@@ -195,6 +195,6 @@ public class DefaultXWikiRenderingEngineTest extends AbstractBridgedXWikiCompone
             add("xwiki");
         }});
 
-        assertEquals(velocityFirst, engine.renderText(text, document, getContext()));
+        assertEquals(velocityFirst, myEngine.renderText(text, document, getContext()));
     }
 }

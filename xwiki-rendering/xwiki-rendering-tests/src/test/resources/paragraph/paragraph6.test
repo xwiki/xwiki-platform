@@ -16,9 +16,13 @@
 (% param6="valueA" %)hello (% param7="valueB" %)world
 
 .# Make sure xwiki/2.0 renderer is handling inline parameters properly
-before(% style="color:red" %)x(%%)**y**after
+before(% param="value" %)x(%%)**y**after
 
-12**34(% style="color: rgb(255, 0, 0);" %)56(%%)78**90
+12**34(% param="value" %)56(%%)78**90
+
+(% param="value" %)1//2//(%%)//3//
+
+(% param1="value1" %)**1**(% param2="value2" %)**2**
 .#-----------------------------------------------------
 .expect|event/1.0
 .#-----------------------------------------------------
@@ -59,9 +63,9 @@ endFormat [NONE] [[param7]=[valueB]]
 endParagraph
 beginParagraph
 onWord [before]
-beginFormat [NONE] [[style]=[color:red]]
+beginFormat [NONE] [[param]=[value]]
 onWord [x]
-endFormat [NONE] [[style]=[color:red]]
+endFormat [NONE] [[param]=[value]]
 beginFormat [BOLD]
 onWord [y]
 endFormat [BOLD]
@@ -71,18 +75,37 @@ beginParagraph
 onWord [12]
 beginFormat [BOLD]
 onWord [34]
-beginFormat [NONE] [[style]=[color: rgb(255, 0, 0);]]
+beginFormat [NONE] [[param]=[value]]
 onWord [56]
-endFormat [NONE] [[style]=[color: rgb(255, 0, 0);]]
+endFormat [NONE] [[param]=[value]]
 onWord [78]
 endFormat [BOLD]
 onWord [90]
+endParagraph
+beginParagraph
+beginFormat [NONE] [[param]=[value]]
+onWord [1]
+beginFormat [ITALIC]
+onWord [2]
+endFormat [ITALIC]
+endFormat [NONE] [[param]=[value]]
+beginFormat [ITALIC]
+onWord [3]
+endFormat [ITALIC]
+endParagraph
+beginParagraph
+beginFormat [BOLD] [[param1]=[value1]]
+onWord [1]
+endFormat [BOLD] [[param1]=[value1]]
+beginFormat [BOLD] [[param2]=[value2]]
+onWord [2]
+endFormat [BOLD] [[param2]=[value2]]
 endParagraph
 endDocument
 .#-----------------------------------------------------
 .expect|xhtml/1.0
 .#-----------------------------------------------------
-<p param1="value1" param2="value2"><span param3="value3">hello</span> world</p><p><span param4="valueA">hello&nbsp;</span><span param4="valueB">world</span></p><p><strong><span param5="value4">hello</span></strong><span param5="value4">&nbsp;world</span></p><p><span param6="valueA">hello&nbsp;</span><span param7="valueB">world</span></p><p>before<span style="color:red">x</span><strong>y</strong>after</p><p>12<strong>34<span style="color: rgb(255, 0, 0);">56</span>78</strong>90</p>
+<p param1="value1" param2="value2"><span param3="value3">hello</span> world</p><p><span param4="valueA">hello&nbsp;</span><span param4="valueB">world</span></p><p><strong><span param5="value4">hello</span></strong><span param5="value4">&nbsp;world</span></p><p><span param6="valueA">hello&nbsp;</span><span param7="valueB">world</span></p><p>before<span param="value">x</span><strong>y</strong>after</p><p>12<strong>34<span param="value">56</span>78</strong>90</p><p><span param="value">1<em>2</em></span><em>3</em></p><p><strong><span param1="value1">1</span></strong><strong><span param2="value2">2</span></strong></p>
 .#-----------------------------------------------------
 .expect|xwiki/2.0
 .#-----------------------------------------------------
@@ -95,10 +118,14 @@ endDocument
 
 (% param6="valueA" %)hello (% param7="valueB" %)world
 
-before(% style="color:red" %)x(%%)**y**after
+before(% param="value" %)x(%%)**y**after
 
-12**34(% style="color: rgb(255, 0, 0);" %)56(%%)78**90
+12**34(% param="value" %)56(%%)78**90
+
+(% param="value" %)1//2//(%%)//3//
+
+(% param1="value1" %)**1**(% param2="value2" %)**2**
 .#-----------------------------------------------------
 .input|xhtml/1.0
 .#-----------------------------------------------------
-<p param1="value1" param2="value2"><span param3="value3">hello</span> world</p><p><span param4="valueA">hello&nbsp;</span><span param4="valueB">world</span></p><p><strong><span param5="value4">hello</span></strong><span param5="value4">&nbsp;world</span></p><p><span param6="valueA">hello&nbsp;</span><span param7="valueB">world</span></p><p>before<span style="color:red">x</span><strong>y</strong>after</p><p>12<strong>34<span style="color: rgb(255, 0, 0);">56</span>78</strong>90</p>
+<p param1="value1" param2="value2"><span param3="value3">hello</span> world</p><p><span param4="valueA">hello&nbsp;</span><span param4="valueB">world</span></p><p><strong><span param5="value4">hello</span></strong><span param5="value4">&nbsp;world</span></p><p><span param6="valueA">hello&nbsp;</span><span param7="valueB">world</span></p><p>before<span param="value">x</span><strong>y</strong>after</p><p>12<strong>34<span param="value">56</span>78</strong>90</p><p><span param="value">1<em>2</em></span><em>3</em></p><p><strong><span param1="value1">1</span></strong><strong><span param2="value2">2</span></strong></p>

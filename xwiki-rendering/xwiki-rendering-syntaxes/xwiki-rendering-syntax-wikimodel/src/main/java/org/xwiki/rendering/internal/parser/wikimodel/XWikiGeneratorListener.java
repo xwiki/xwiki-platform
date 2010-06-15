@@ -19,10 +19,14 @@
  */
 package org.xwiki.rendering.internal.parser.wikimodel;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.Map;
+import java.util.Set;
 import java.util.Stack;
 
 import org.wikimodel.wem.IWemConstants;
@@ -79,6 +83,8 @@ public class XWikiGeneratorListener implements IWemListener
     private PrintRendererFactory plainRendererFactory;
 
     private int documentDepth = 0;
+
+    private Stack<WikiFormat> currentFormatStack = new Stack<WikiFormat>();
 
     private WikiFormat lastEndFormat = null;
 
@@ -190,89 +196,74 @@ public class XWikiGeneratorListener implements IWemListener
 
     private void flushFormat()
     {
+        flushFormat(null, null);
+    }
+
+    private void flushFormat(List<WikiStyle> xorStyles, List<WikiParameter> xorParameters)
+    {
         if (this.lastEndFormat != null) {
-            flushFormat(null);
-            this.lastEndFormat = null;
+            flushFormat(this.lastEndFormat.getStyles(), this.lastEndFormat.getParams(), xorStyles, xorParameters);
         }
     }
 
-    private void flushFormat(List<WikiStyle> xorStyles)
-    {
-        flushFormat(this.lastEndFormat.getStyles(), this.lastEndFormat.getParams(), xorStyles);
-    }
-
     private void flushFormat(List<WikiStyle> formatStyles, List<WikiParameter> formatParameters,
-        List<WikiStyle> xorStyles)
+        List<WikiStyle> xorStyles, List<WikiParameter> xorParameters)
     {
-        // Get the styles: the styles are wiki syntax styles (i.e. styles which have a wiki syntax such as bold,
-        // italic ,etc). As opposed to format parameters which don't have any specific wiki syntax (they have a generic
-        // wiki syntax such as (% a='b' %) for example in XWiki Syntax 2.0.
-        // If there's any style or parameter defined, do something. The reason we need to check for this is because
-        // wikimodel sends an empty begin/endFormat event before starting an inline block (such as a paragraph).
-        if (formatStyles.size() > 0 || formatParameters.size() > 0) {
-            // Generate nested FormatBlock blocks since XWiki uses nested Format blocks whereas Wikimodel doesn't.
-            //
-            // Simple Use Case: (% a='b' %)**//hello//**(%%)
-            // WikiModel Events:
-            // __beginFormat(params: a='b', styles = BOLD, ITALIC)
-            // __onWord(hello)
-            // __endFormat(params: a='b', styles = BOLD, ITALIC)
-            // XWiki Blocks:
-            // __FormatBLock(params: a='b', format = BOLD)
-            // ____FormatBlock(format = ITALIC)
-            //
-            // More complex Use Case: **(% a='b' %)hello**world
-            // WikiModel Events:
-            // __beginFormat(params: a='b', styles = BOLD)
-            // __onWord(hello)
-            // __endFormat(params: a='b', styles = BOLD)
-            // __beginFormat(params: a='b')
-            // __onWord(world)
-            // __endFormat(params: a='b')
-            // XWiki Blocks:
-            // __FormatBlock(params: a='b', format = BOLD)
-            // ____WordBlock(hello)
-            // __FormatBlock(params: a='b')
-            // ____WordBlock(world)
+        Set<WikiStyle> stylesToClose = new HashSet<WikiStyle>();
+        Set<WikiParameter> parametersToClose = new HashSet<WikiParameter>();
 
-            // TODO: We should instead have the following which would allow to simplify XWikiSyntaxChaining Renderer
-            // which currently has to check if the next format has the same params as the previous format to decide
-            // whether to print it or not.
-            // __FormatBlock(params: a='b')
-            // ____FormatBlock(format = BOLD)
-            // ______WordBlock(hello)
-            // ____WordBlock(world)
+        if (xorStyles != null) {
+            for (WikiStyle style : formatStyles) {
+                if (!xorStyles.contains(style)) {
+                    stylesToClose.add(style);
+                }
+            }
+        } else {
+            stylesToClose.addAll(formatStyles);
+        }
 
+        if (xorParameters != null) {
+            for (WikiParameter parameter : formatParameters) {
+                if (!xorParameters.contains(parameter)) {
+                    parametersToClose.add(parameter);
+                }
+            }
+        } else {
+            parametersToClose.addAll(formatParameters);
+        }
+
+        for (; !stylesToClose.isEmpty() || !parametersToClose.isEmpty(); this.currentFormatStack.pop()) {
+            WikiFormat currentFormat = this.currentFormatStack.peek();
+
+            List<WikiStyle> currentFormatStyles = currentFormat.getStyles();
+            WikiStyle currentFormatStyle = currentFormatStyles.isEmpty() ? null : currentFormatStyles.get(0);
+            List<WikiParameter> currentFormatParameters = currentFormat.getParams();
+
+            // XOR
+            stylesToClose.remove(currentFormatStyle);
+            parametersToClose.removeAll(currentFormatParameters);
+
+            // send event
             Map<String, String> parameters;
-            if (formatParameters.size() > 0) {
-                parameters = convertParameters(new WikiParameters(formatParameters));
+            if (!currentFormatParameters.isEmpty()) {
+                parameters = convertParameters(new WikiParameters(currentFormatParameters));
             } else {
                 parameters = Listener.EMPTY_PARAMETERS;
             }
 
-            boolean parametersConsumed = false;
-            if (formatStyles.size() > 0) {
-                for (ListIterator<WikiStyle> it = formatStyles.listIterator(formatStyles.size()); it.hasPrevious();) {
-                    WikiStyle style = it.previous();
-
-                    // Exclude next format styles
-                    if (xorStyles == null || !xorStyles.contains(style)) {
-                        if (it.hasPrevious()) {
-                            getListener().endFormat(convertFormat(style), Listener.EMPTY_PARAMETERS);
-                        } else {
-                            getListener().endFormat(convertFormat(style), parameters);
-                            parametersConsumed = true;
-                        }
-                    }
-
-                    if (xorStyles != null && xorStyles.contains(style)) {
-                        xorStyles.remove(style);
-                    }
-                }
-            }
-
-            if (!parametersConsumed && parameters != Listener.EMPTY_PARAMETERS) {
+            if (currentFormatStyle != null) {
+                getListener().endFormat(convertFormat(currentFormatStyle), parameters);
+            } else {
                 getListener().endFormat(Format.NONE, parameters);
+            }
+        }
+
+        for (WikiFormat format : this.currentFormatStack) {
+            if (xorStyles != null) {
+                xorStyles.removeAll(format.getStyles());
+            }
+            if (xorParameters != null) {
+                xorParameters.removeAll(format.getParams());
             }
         }
 
@@ -335,84 +326,41 @@ public class XWikiGeneratorListener implements IWemListener
      */
     public void beginFormat(WikiFormat format)
     {
-        // Get the styles: the styles are wiki syntax styles (i.e. styles which have a wiki syntax such as bold, italic
-        // ,etc).
-        // As opposed to format parameters which don't have any specific wiki syntax (they have a generic wiki syntax
-        // such as (% a='b' %) for example in XWiki Syntax 2.0.
         List<WikiStyle> formatStyles = format.getStyles();
         List<WikiParameter> formatParameters = format.getParams();
-
-        List<WikiStyle> endFormatStyles;
-        List<WikiParameter> endFormatParameters;
-        if (this.lastEndFormat != null) {
-            endFormatStyles = this.lastEndFormat.getStyles();
-            endFormatParameters = this.lastEndFormat.getParams();
-
-            // Exclude this format parameters and styles from previous end format
-            flushFormat(endFormatStyles, endFormatParameters, formatStyles);
-        } else {
-            endFormatStyles = null;
-            endFormatParameters = null;
-        }
 
         // If there's any style or parameter defined, do something. The reason we need to check for this is because
         // wikimodel sends an empty begin/endFormat event before starting an inline block (such as a paragraph).
         if (formatStyles.size() > 0 || formatParameters.size() > 0) {
-            // Generate nested FormatBlock blocks since XWiki uses nested Format blocks whereas Wikimodel doesn't.
-            //
-            // Simple Use Case: (% a='b' %)**//hello//**(%%)
-            // WikiModel Events:
-            // __beginFormat(params: a='b', styles = BOLD, ITALIC)
-            // __onWord(hello)
-            // __endFormat(params: a='b', styles = BOLD, ITALIC)
-            // XWiki Blocks:
-            // __FormatBLock(params: a='b', format = BOLD)
-            // ____FormatBlock(format = ITALIC)
-            //
-            // More complex Use Case: **(% a='b' %)hello**world
-            // WikiModel Events:
-            // __beginFormat(params: a='b', styles = BOLD)
-            // __onWord(hello)
-            // __endFormat(params: a='b', styles = BOLD)
-            // __beginFormat(params: a='b')
-            // __onWord(world)
-            // __endFormat(params: a='b')
-            // XWiki Blocks:
-            // __FormatBlock(params: a='b', format = BOLD)
-            // ____WordBlock(hello)
-            // __FormatBlock(params: a='b')
-            // ____WordBlock(world)
+            flushFormat(formatStyles, formatParameters);
 
-            // TODO: We should instead have the following which would allow to simplify XWikiSyntaxChaining Renderer
-            // which currently has to check if the next format has the same params as the previous format to decide
-            // whether to print it or not.
-            // __FormatBlock(params: a='b')
-            // ____FormatBlock(format = BOLD)
-            // ______WordBlock(hello)
-            // ____WordBlock(world)
+            // If everything is already part of the current style
+            if (formatStyles.size() > 0 || formatParameters.size() > 0) {
+                Map<String, String> parameters;
+                if (formatParameters.size() > 0) {
+                    parameters = convertParameters(new WikiParameters(formatParameters));
+                } else {
+                    parameters = Listener.EMPTY_PARAMETERS;
+                }
 
-            Map<String, String> parameters;
-            if (formatParameters.size() > 0) {
-                parameters = convertParameters(new WikiParameters(formatParameters));
-            } else {
-                parameters = Listener.EMPTY_PARAMETERS;
-            }
-
-            if (formatStyles.size() > 0) {
-                boolean parametersConsumed = false;
-                for (WikiStyle style : formatStyles) {
-                    // Exclude previous format styles
-                    if (endFormatStyles == null || !endFormatStyles.contains(style)) {
+                if (formatStyles.size() > 0) {
+                    boolean parametersConsumed = false;
+                    for (WikiStyle style : formatStyles) {
+                        // Exclude previous format styles
                         if (!parametersConsumed) {
                             getListener().beginFormat(convertFormat(style), parameters);
                             parametersConsumed = true;
+                            this.currentFormatStack
+                                .push(new WikiFormat(Collections.singleton(style), formatParameters));
                         } else {
                             getListener().beginFormat(convertFormat(style), Listener.EMPTY_PARAMETERS);
+                            this.currentFormatStack.push(new WikiFormat(style));
                         }
                     }
+                } else {
+                    getListener().beginFormat(Format.NONE, parameters);
+                    this.currentFormatStack.push(new WikiFormat(formatParameters));
                 }
-            } else {
-                getListener().beginFormat(Format.NONE, parameters);
             }
         }
     }
@@ -640,6 +588,8 @@ public class XWikiGeneratorListener implements IWemListener
      */
     public void endFormat(WikiFormat format)
     {
+        // If there's any style or parameter defined, do something. The reason we need to check for this is because
+        // wikimodel sends an empty begin/endFormat event before starting an inline block (such as a paragraph).
         if (format.getStyles().size() > 0 || format.getParams().size() > 0) {
             this.lastEndFormat = format;
         }

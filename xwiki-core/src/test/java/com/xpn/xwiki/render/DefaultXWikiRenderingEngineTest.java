@@ -20,6 +20,7 @@
  */
 package com.xpn.xwiki.render;
 
+import java.util.ArrayList;
 import java.io.ByteArrayInputStream;
 
 import javax.servlet.ServletContext;
@@ -33,6 +34,8 @@ import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.test.AbstractBridgedXWikiComponentTestCase;
 import com.xpn.xwiki.web.Utils;
 import com.xpn.xwiki.web.XWikiServletContext;
+import com.xpn.xwiki.user.api.XWikiRightService;
+import com.xpn.xwiki.user.impl.xwiki.XWikiRightServiceImpl;
 
 /**
  * Unit tests for {@link DefaultXWikiRenderingEngine}.
@@ -42,6 +45,8 @@ import com.xpn.xwiki.web.XWikiServletContext;
 public class DefaultXWikiRenderingEngineTest extends AbstractBridgedXWikiComponentTestCase
 {
     private DefaultXWikiRenderingEngine engine;
+
+    private XWiki xwiki;
 
     /**
      * {@inheritDoc}
@@ -65,7 +70,7 @@ public class DefaultXWikiRenderingEngineTest extends AbstractBridgedXWikiCompone
             returnValue(new ByteArrayInputStream("".getBytes())));
         XWikiServletContext engineContext = new XWikiServletContext((ServletContext) mockServletContext.proxy());
 
-        XWiki xwiki = new XWiki(config, getContext(), engineContext, false)
+        xwiki = new XWiki(config, getContext(), engineContext, false)
         {
             public String getSkin(XWikiContext context)
             {
@@ -86,6 +91,17 @@ public class DefaultXWikiRenderingEngineTest extends AbstractBridgedXWikiCompone
             {
 
             }
+
+            public XWikiRightService getRightService()
+            {
+                return new XWikiRightServiceImpl()
+                {
+                    public boolean hasProgrammingRights(XWikiDocument doc, XWikiContext context)
+                    {
+                        return true;
+                    }
+                };
+            }
         };
         xwiki.setVersion("1.0");
 
@@ -95,6 +111,9 @@ public class DefaultXWikiRenderingEngineTest extends AbstractBridgedXWikiCompone
         xwiki.getConfig().setProperty("xwiki.render.velocity.macrolist", "");
 
         this.engine = (DefaultXWikiRenderingEngine) xwiki.getRenderingEngine();
+
+        // Make sure the wiki in the context will say that we have programming permission.
+        getContext().setWiki(this.xwiki);
     }
 
     public void testRenderTextWhenUsingCodeMacro() throws Exception
@@ -134,5 +153,48 @@ public class DefaultXWikiRenderingEngineTest extends AbstractBridgedXWikiCompone
         Utils.enablePlaceholders(getContext());
         String out = engine.renderText(text, document, getContext());
         assertTrue(out.contains(link));
+    }
+
+    public void testRenderGroovy() throws Exception
+    {
+        assertEquals("hello world", engine.renderText("<% println(\"hello world\"); %>", 
+                                        new XWikiDocument(), getContext()));
+    }
+
+    public void testSwitchOrderOfRenderers() throws Exception
+    {
+        String text = "#set($x = '<' + '% println(\"hello world\"); %' + '>')\n$x";
+        String velocityFirst = "hello world";
+        String groovyFirst = "<% println(\"hello world\"); %>";
+
+        XWikiDocument document = new XWikiDocument();
+
+        // Prove that the renderers are in the right order by default.
+        assertEquals(engine.getRendererNames(), new ArrayList<String>(){{
+            add("mapping");
+            add("velocity");
+            add("groovy");
+            add("plugin");
+            add("wiki");
+            add("xwiki");
+        }});
+
+        assertEquals(velocityFirst, engine.renderText(text, document, getContext()));
+
+        xwiki.getConfig().put("xwiki.render.renderingorder",
+                              "macromapping, groovy, velocity, plugin, wiki, wikiwiki");
+
+        DefaultXWikiRenderingEngine myEngine = new DefaultXWikiRenderingEngine(xwiki, getContext());
+
+        assertEquals(myEngine.getRendererNames(), new ArrayList<String>(){{
+            add("mapping");
+            add("groovy");
+            add("velocity");
+            add("plugin");
+            add("wiki");
+            add("xwiki");
+        }});
+
+        assertEquals(groovyFirst, myEngine.renderText(text, document, getContext()));
     }
 }

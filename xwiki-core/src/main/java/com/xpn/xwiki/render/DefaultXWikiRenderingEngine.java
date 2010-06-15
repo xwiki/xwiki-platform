@@ -49,6 +49,10 @@ public class DefaultXWikiRenderingEngine implements XWikiRenderingEngine
 {
     private static final Log LOG = LogFactory.getLog(XWikiRenderingEngine.class);
 
+    /** The default order in which the rendering engines will be run on the input. */
+    private final String[] defaultRenderingOrder =
+        new String[]{"macromapping", "velocity", "groovy", "plugin", "wiki", "wikiwiki"};
+
     private List<XWikiRenderer> renderers = new ArrayList<XWikiRenderer>();
 
     private HashMap<String, XWikiRenderer> renderermap = new LinkedHashMap<String, XWikiRenderer>();
@@ -57,25 +61,41 @@ public class DefaultXWikiRenderingEngine implements XWikiRenderingEngine
 
     public DefaultXWikiRenderingEngine(XWiki xwiki, XWikiContext context) throws XWikiException
     {
-        if (xwiki.Param("xwiki.render.macromapping", "1").equals("1")) {
-            addRenderer("mapping", new XWikiMacrosMappingRenderer(xwiki, context));
+        String[] renderingOrder = xwiki.getConfig().getPropertyAsList("xwiki.render.renderingorder");
+        if (renderingOrder == null || renderingOrder.length == 0) {
+            renderingOrder = defaultRenderingOrder;
         }
-        // addRenderer(new XWikiJSPRenderer());
-        if (xwiki.Param("xwiki.render.velocity", "1").equals("1")) {
-            addRenderer("velocity", new XWikiVelocityRenderer());
+
+        for (int i = 0; i < renderingOrder.length; i++) {
+            if (xwiki.Param("xwiki.render." + renderingOrder[i], "1").equals("1")) {
+
+                if (renderingOrder[i].equals("macromapping")) {
+                    addRenderer("mapping", new XWikiMacrosMappingRenderer(xwiki, context));
+
+                } else if (renderingOrder[i].equals("velocity")) {
+                    addRenderer("velocity", new XWikiVelocityRenderer());
+
+                } else if (renderingOrder[i].equals("groovy")) {
+                    addRenderer("groovy", new XWikiGroovyRenderer());
+
+                } else if (renderingOrder[i].equals("plugin")) {
+                    addRenderer("plugin", new XWikiPluginRenderer());
+
+                } else if (renderingOrder[i].equals("wiki")) {
+                    addRenderer("wiki", new XWikiRadeoxRenderer(false));
+
+                } else if (renderingOrder[i].equals("wikiwiki")) {
+                    if (xwiki.Param("xwiki.render.wikiwiki", "0").equals("1")) {
+                        addRenderer("xwiki", new XWikiWikiBaseRenderer(true, true));
+                    } else {
+                        addRenderer("xwiki", new XWikiWikiBaseRenderer(false, true));
+                    }
+                }
+            }
         }
-        if (xwiki.Param("xwiki.render.groovy", "1").equals("1")) {
-            addRenderer("groovy", new XWikiGroovyRenderer());
-        }
-        if (xwiki.Param("xwiki.render.plugin", "1").equals("1")) {
-            addRenderer("plugin", new XWikiPluginRenderer());
-        }
-        if (xwiki.Param("xwiki.render.wiki", "1").equals("1")) {
-            addRenderer("wiki", new XWikiRadeoxRenderer(false));
-        }
-        if (xwiki.Param("xwiki.render.wikiwiki", "0").equals("1")) {
-            addRenderer("xwiki", new XWikiWikiBaseRenderer(true, true));
-        } else {
+
+        // If there is no wikiwiki renderer, we must add it because it's the base renderer
+        if (renderermap.get("xwiki") == null) {
             addRenderer("xwiki", new XWikiWikiBaseRenderer(false, true));
         }
 

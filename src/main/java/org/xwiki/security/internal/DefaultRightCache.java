@@ -55,6 +55,8 @@ import java.util.Set;
 import java.util.TreeSet;
 import java.util.List;
 import java.util.LinkedList;
+import java.util.concurrent.locks.ReadWriteLock;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 /**
  * A cache for fast access right checking.
@@ -87,6 +89,9 @@ public class DefaultRightCache implements RightCache, Initializable
      * entries.
      */ 
     private final Map<String, Node> parentRelations = new TreeMap();
+
+    /** Fair read-write lock. */
+    private final ReadWriteLock readWriteLock = new ReentrantReadWriteLock(true);
 
     @Override
     public void initialize()
@@ -288,35 +293,50 @@ public class DefaultRightCache implements RightCache, Initializable
      * @throws ConflictingInsertionException when another thread have
      * inserted this entry, but with a different content.
      */
-    private synchronized void addEntry(String key, Object parentObject, RightCacheEntry entry)
+    private void addEntry(String key, Object parentObject, RightCacheEntry entry)
         throws ParentEntryEvictedException, ConflictingInsertionException
     {
-        RightCacheEntry old = cache.get(key);
-        if (old != null) {
-            if (old.equals(entry)) {
-                // Another thread have already inserted this entry.
-                return;
-            } else {
-                // Another thread have inserted an entry which is
-                // different from this entry!
-                throw new ConflictingInsertionException();
+        readWriteLock.writeLock().lock();
+        try {
+            RightCacheEntry old = cache.get(key);
+            if (old != null) {
+                if (old.equals(entry)) {
+                    // Another thread have already inserted this entry.
+                    return;
+                } else {
+                    // Another thread have inserted an entry which is
+                    // different from this entry!
+                    throw new ConflictingInsertionException();
+                }
             }
+            addParentRelation(parentObject, key);
+            cache.set(key, entry);
+        } finally {
+            readWriteLock.writeLock().unlock();
         }
-        addParentRelation(parentObject, key);
-        cache.set(key, entry);
     }
 
     @Override
-    public synchronized RightCacheEntry get(RightCacheKey entity)
+    public RightCacheEntry get(RightCacheKey entity)
     {
-        return cache.get(generateKey(entity));
+        readWriteLock.readLock().lock();
+        try {
+            return cache.get(generateKey(entity));
+        } finally {
+            readWriteLock.readLock().unlock();
+        }
     }
 
     @Override
-    public synchronized RightCacheEntry get(RightCacheKey user, RightCacheKey entity)
+    public RightCacheEntry get(RightCacheKey user, RightCacheKey entity)
     {
         LOG.debug("Getting " + user.getEntityReference() + " at " + entity.getEntityReference());
-        return cache.get(generateKey(user, entity));
+        readWriteLock.readLock().lock();
+        try {
+            return cache.get(generateKey(user, entity));
+        } finally {
+            readWriteLock.readLock().unlock();
+        }
     }
 
     @Override
@@ -336,11 +356,16 @@ public class DefaultRightCache implements RightCache, Initializable
      * entry will also be removed.
      * @param key The key of the entry.
      */
-    private synchronized void remove(String key)
+    private void remove(String key)
     {
-        removeChildren(key);
-        removeParentRelation(key);
-        removeEntryNoChildren(key);
+        readWriteLock.writeLock().lock();
+        try {
+            removeChildren(key);
+            removeParentRelation(key);
+            removeEntryNoChildren(key);
+        } finally {
+            readWriteLock.writeLock().unlock();
+        }
     }
 
     /**

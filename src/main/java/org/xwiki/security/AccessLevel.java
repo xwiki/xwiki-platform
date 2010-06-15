@@ -25,7 +25,7 @@ package org.xwiki.security;
 import java.util.TreeSet;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.NavigableSet;
+import java.util.SortedSet;
 
 import java.lang.ref.WeakReference;
 import java.lang.ref.ReferenceQueue;
@@ -59,7 +59,7 @@ public class AccessLevel implements RightCacheEntry, Cloneable, Comparable<Acces
     private static final int RO_MASK =  1 << 31;
 
     /** Pool of existing instances. */
-    private static NavigableSet<ALWeakRef> pool = new TreeSet();
+    private static SortedSet<ALWeakRef> pool = new TreeSet();
     /** Reference queue for removing cleared references.  */
     private static ReferenceQueue<AccessLevel> refQueue = new ReferenceQueue();
 
@@ -134,8 +134,9 @@ public class AccessLevel implements RightCacheEntry, Cloneable, Comparable<Acces
      */
     private ALWeakRef getFromPool(ALWeakRef member)
     {
-        for (ALWeakRef ref : pool.subSet(member, true, member, true)) {
-            return ref;
+        SortedSet<ALWeakRef> tail = pool.tailSet(member);
+        if (tail.size() > 0 && member.equals(tail.first())) {
+            return tail.first();
         }
         return null;
     }

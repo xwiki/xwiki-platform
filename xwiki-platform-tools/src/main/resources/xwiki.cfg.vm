@@ -290,10 +290,10 @@ xwiki.authentication.unauthorized_code=200
 
 
 #---------------------------------------
-# Rendering
+# XWiki Syntax 1.0 Rendering Engine
 #
 
-#-# Disable particular renderers (in the old rendering engine).
+#-# Disable particular renderers.
 #-# Macro mapping
 # xwiki.render.macromapping=1
 #-# Velocity interpreter
@@ -307,10 +307,9 @@ xwiki.authentication.unauthorized_code=200
 #-# Simple wiki syntax rendering 
 # xwiki.render.wikiwiki=0
 
+#-# [Since 2.4M1]
 #-# Rendering order: content will be rendered by the first renderer on the list, output rendered by the second, etc.
-#-# Default: macromapping, velocity, groovy, plugin, wiki, wikiwiki
-#-# To protect against velocity content becoming groovy code, it is recommended to leave the following line active.
-xwiki.render.renderingorder=macromapping, groovy, velocity, plugin, wiki, wikiwiki
+#xwiki.render.renderingorder=macromapping, groovy, velocity, plugin, wiki, wikiwiki
 
 #-# Maximum number of documents to keep in the rendered cache
 # xwiki.render.cache.capacity=100

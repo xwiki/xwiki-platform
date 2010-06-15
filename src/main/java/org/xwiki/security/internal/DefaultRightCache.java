@@ -307,13 +307,13 @@ public class DefaultRightCache implements RightCache, Initializable
     }
 
     @Override
-    public RightCacheEntry get(RightCacheKey entity)
+    public synchronized RightCacheEntry get(RightCacheKey entity)
     {
         return cache.get(generateKey(entity));
     }
 
     @Override
-    public RightCacheEntry get(RightCacheKey user, RightCacheKey entity)
+    public synchronized RightCacheEntry get(RightCacheKey user, RightCacheKey entity)
     {
         LOG.debug("Getting " + user.getEntityReference() + " at " + entity.getEntityReference());
         return cache.get(generateKey(user, entity));

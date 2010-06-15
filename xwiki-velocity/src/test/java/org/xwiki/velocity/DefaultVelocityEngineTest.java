@@ -107,4 +107,27 @@ public class DefaultVelocityEngineTest extends AbstractXWikiComponentTestCase
                 + ".newInstance())$object.size()");
         assertEquals("0", writer.toString());
     }
+
+    public void testMacroIsolation() throws Exception
+    {
+        this.engine.initialize(new Properties());
+        Context context = new org.apache.velocity.VelocityContext();
+        this.engine.evaluate(context, new StringWriter(), "template1", "#macro(mymacro)test#end");
+        StringWriter writer = new StringWriter();
+        this.engine.evaluate(context, writer, "template2", "#mymacro");
+        assertEquals("#mymacro", writer.toString());
+    }
+
+    public void testConfigureMacrosToBeGlobal() throws Exception
+    {
+        Properties properties = new Properties();
+        // Force macros to be global
+        properties.put("velocimacro.permissions.allow.inline.local.scope", "false");
+        this.engine.initialize(properties);
+        Context context = new org.apache.velocity.VelocityContext();
+        this.engine.evaluate(context, new StringWriter(), "template1", "#macro(mymacro)test#end");
+        StringWriter writer = new StringWriter();
+        this.engine.evaluate(context, writer, "template2", "#mymacro");
+        assertEquals("test", writer.toString());
+    }
 }

@@ -307,6 +307,11 @@ xwiki.authentication.unauthorized_code=200
 #-# Simple wiki syntax rendering 
 # xwiki.render.wikiwiki=0
 
+#-# Rendering order: content will be rendered by the first renderer on the list, output rendered by the second, etc.
+#-# Default: macromapping, velocity, groovy, plugin, wiki, wikiwiki
+#-# To protect against velocity content becoming groovy code, it is recommended to leave the following line active.
+xwiki.render.renderingorder=macromapping, groovy, velocity, plugin, wiki, wikiwiki
+
 #-# Maximum number of documents to keep in the rendered cache
 # xwiki.render.cache.capacity=100
 

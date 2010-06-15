@@ -51,7 +51,7 @@ public class DefaultXWikiRenderingEngine implements XWikiRenderingEngine
 
     /** The default order in which the rendering engines will be run on the input. */
     private final String[] defaultRenderingOrder =
-        new String[]{"macromapping", "velocity", "groovy", "plugin", "wiki", "wikiwiki"};
+        new String[]{"macromapping", "groovy", "velocity", "plugin", "wiki", "wikiwiki"};
 
     private List<XWikiRenderer> renderers = new ArrayList<XWikiRenderer>();
 

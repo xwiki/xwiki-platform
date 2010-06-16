@@ -143,8 +143,9 @@ public class DefaultRightService implements RightService
             .put("save", EDIT)
             .put("preview", EDIT)
             .put("lock", EDIT)
-            .put("cancel", VIEW)
+            .put("cancel", EDIT)
             .put("delattachment", EDIT)
+            .put("inline", EDIT)
             .put("upload", EDIT);
 
         for (Right level : values()) {
@@ -172,31 +173,6 @@ public class DefaultRightService implements RightService
     }
 
     /**
-     * Describe <code>handleLogin</code> method here.
-     *
-     * @param doc a <code>XWikiDocument</code> value
-     * @param context a <code>XWikiContext</code> value
-     * @return a <code>boolean</code> value
-     * @exception XWikiException if an error occurs
-     */
-    private boolean handleLogin(XWikiDocument doc, XWikiContext context) throws XWikiException {
-        XWikiUser user = context.getWiki().checkAuth(context);
-        String username;
-
-        if (user == null) {
-            username = RightService.GUEST_USER_FULLNAME;
-        } else {
-            username = user.getUser();
-        }
-
-        // Save the user
-        context.setUser(username);
-        logAllow(getUserReference(context), doc.getDocumentReference(), LOGIN, "login/logout pages");
-
-        return true;
-    }
-
-    /**
      * @param right Right to authenticate.
      * @param doc Document that is being accessed.
      * @param context The current context
@@ -220,11 +196,6 @@ public class DefaultRightService implements RightService
 
                 if ((user == null) && (needsAuth)) {
                     logDeny(null, doc.getDocumentReference(), right, "Authentication needed");
-                    if (context.getRequest() != null
-                        && !context.getWiki().Param("xwiki.hidelogin", "false").equalsIgnoreCase("true")) {
-                        context.getWiki().getAuthService().showLogin(context);
-                    }
-
                     return null;
                 }
             } catch (XWikiException e) {
@@ -245,6 +216,33 @@ public class DefaultRightService implements RightService
         }
 
     }
+
+    /**
+     * Show the login page, unless the wiki is configured otherwise.
+     * @param context the context
+     */
+    private void showLogin(XWikiContext context)
+    {
+        try {
+            if (context.getRequest() != null
+                && !context.getWiki().Param("xwiki.hidelogin", "false").equalsIgnoreCase("true")) {
+                context.getWiki().getAuthService().showLogin(context);
+            }
+        } catch (XWikiException e) {
+            LOG.error("Failed to show login page.", e);
+        }
+    }
+
+    /**
+     * @param userRef a reference to a user profile document.
+     * @return {@code true} if and only if the user is a guest.
+     */
+    private boolean userIsGuest(DocumentReference userRef)
+    {
+        return userRef.getName().equals(GUEST_USER)
+            && userRef.getSpaceReferences().size() == 1
+            && XWIKI_SPACE_PREFIX.startsWith(userRef.getLastSpaceReference().getName());
+    }
     
     /**
      * {@inheritDoc}
@@ -253,17 +251,20 @@ public class DefaultRightService implements RightService
     {
         Right right = actionToRight(action);
 
-        if (right == LOGIN) {
-            return handleLogin(doc, context);
-        }
-
         DocumentReference document = doc.getDocumentReference();
         DocumentReference user = authenticateUser(right, doc, context);
-        if (user == null) {
-            return false;
+
+        boolean allow = false;
+
+        if (user != null) {
+            allow = checkAccess(right, user, document, context);
         }
 
-        return checkAccess(right, user, document, context);
+        if (!allow && (user == null || userIsGuest(user))) {
+            showLogin(context);
+        }
+
+        return allow;
     }
 
     /**

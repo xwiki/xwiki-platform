@@ -299,14 +299,14 @@ $xwiki.get('ssx').use($config.get('commonPage'))
  * $message (XObject) the message to display history for.
  *###
 #macro(displayMessageHistory, $message)
+
     (%id="message-history-table" class="invitation"%)(((
-
-    |=$msg.get('xe.invitation.displayMessageHistory.messageStatusSetTo')##
-      |=$msg.get('xe.invitation.displayMessageHistory.setByUser')##
-        |=$msg.get('xe.invitation.displayMessageHistory.logEntry')
-    $message.getProperty('history').getValue()
-
+     |=(%class="status-set-to"%)$msg.get('xe.invitation.displayMessageHistory.messageStatusSetTo')##
+       |=$msg.get('xe.invitation.displayMessageHistory.setByUser')##
+         |=(%class="log-entry"%)$msg.get('xe.invitation.displayMessageHistory.logEntry')
+     $message.getProperty('history').getValue()
     )))
+
     #displayMessage($mail.get($messageID))  
 #end
 ##
@@ -408,7 +408,9 @@ $xwiki.get('ssx').use($config.get('commonPage'))
                                      $msg.get('xe.invitation.doUserActionOnMultipleMessages.cancel.memoLabel'),
                                      $msg.get('xe.invitation.doUserActionOnMultipleMessages.confirmLabel'),
                                      {'inspect': $inspect})
-      #displayMessageTableInDiv($messages, ['sentDate', 'sendingUser', 'subjectLine'], $isAdmin)
+      (%class="invitation right-side"%)(((
+        #displayMessageTable($messages, ['sentDate', 'sendingUser', 'subjectLine'], $isAdmin)
+      )))
     #end
   #elseif($action == 'notSpam')
     ## Declare message not spam &lt;-----------------------------------------------------------------

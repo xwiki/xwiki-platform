@@ -1,2 +1,4 @@
 org.xwiki.rendering.internal.macro.script.DefaultScriptMacro
 org.xwiki.rendering.internal.macro.script.DefaultAttachmentClassLoaderFactory
+org.xwiki.rendering.internal.macro.script.DefaultScriptMacroUtils
+org.xwiki.rendering.internal.macro.script.DefaultScriptMacroConfiguration

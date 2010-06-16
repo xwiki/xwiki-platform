@@ -20,7 +20,6 @@
 package org.xwiki.rendering.macro.script;
 
 import java.io.StringReader;
-import java.net.URLClassLoader;
 import java.util.Collections;
 import java.util.List;
 
@@ -35,6 +34,7 @@ import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.block.MacroBlock;
 import org.xwiki.rendering.block.XDOM;
 import org.xwiki.rendering.internal.macro.script.AttachmentClassLoaderFactory;
+import org.xwiki.rendering.internal.macro.script.ScriptMacroUtils;
 import org.xwiki.rendering.macro.AbstractMacro;
 import org.xwiki.rendering.macro.MacroExecutionException;
 import org.xwiki.rendering.macro.descriptor.ContentDescriptor;
@@ -49,8 +49,10 @@ import org.xwiki.rendering.util.ParserUtils;
  * @param <P> the type of macro parameters bean.
  * @version $Id$
  * @since 1.7M3
+ * @todo This class is on the edge of a fanout violation and needs to be refactored and split up.
  */
 public abstract class AbstractScriptMacro<P extends ScriptMacroParameters> extends AbstractMacro<P>
+    implements ScriptMacro
 {
     /**
      * The default description of the script macro content.
@@ -104,6 +106,12 @@ public abstract class AbstractScriptMacro<P extends ScriptMacroParameters> exten
      * Used to clean result of the parser syntax.
      */
     private ParserUtils parserUtils = new ParserUtils();
+
+    /**
+     * Used to check for nested scripts.
+     */
+    @Requirement
+    private ScriptMacroUtils scriptUtils;
 
     /**
      * @param macroName the name of the macro (eg "groovy")
@@ -196,6 +204,11 @@ public abstract class AbstractScriptMacro<P extends ScriptMacroParameters> exten
             try {
                 Thread.currentThread().setContextClassLoader(newClassLoader);
 
+                // 0) Abort execution if the script is nested
+                if (scriptUtils.isScriptNested(context.getCurrentMacroBlock())) {
+                    throw new MacroExecutionException("Nested scripts are not allowed");
+                }
+
                 // 1) Run script engine on macro block content
                 String scriptResult = evaluate(parameters, content, context);
 
@@ -238,7 +251,7 @@ public abstract class AbstractScriptMacro<P extends ScriptMacroParameters> exten
      * @return the class loader to use for executing the script
      * @throws Exception in case of an error in building the class loader
      */
-    private URLClassLoader findClassLoader(String jarsParameterValue, ClassLoader parent) throws Exception
+    private ClassLoader findClassLoader(String jarsParameterValue, ClassLoader parent) throws Exception
     {
         // We cache the Class Loader for improved performances and we check if the saved class loader had the same
         // jar parameters value as the current execution. If not, we compute a new class loader.

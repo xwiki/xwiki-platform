@@ -17,33 +17,25 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.rendering.macro.script;
+package org.xwiki.rendering.internal.macro.script;
 
-import junit.framework.Test;
-import junit.framework.TestCase;
-
-import org.xwiki.rendering.scaffolding.RenderingTestSuite;
-import org.xwiki.test.ComponentManagerTestSetup;
+import org.xwiki.component.annotation.ComponentRole;
+import org.xwiki.rendering.block.MacroBlock;
 
 /**
- * All Rendering integration tests defined in text files using a special format.
+ * An internal component for accessing script macro-related utility methods.
  * 
  * @version $Id$
- * @since 2.0M1
+ * @since 2.4M2
  */
-public class RenderingTests extends TestCase
+@ComponentRole
+public interface ScriptMacroUtils
 {
-    public static Test suite() throws Exception
-    {
-        RenderingTestSuite suite = new RenderingTestSuite("Test all Parsers/Renderers");
-
-        suite.addTestsFromResource("macroscript1", true);
-        suite.addTestsFromResource("macroscript2", true);
-        suite.addTestsFromResource("macroscript4", true);
-
-        ComponentManagerTestSetup testSetup = new ComponentManagerTestSetup(suite);
-        new ScriptMockSetup(testSetup.getComponentManager());
-
-        return testSetup;
-    }
+    /**
+     * Check if the given macro block is nested inside a script macro.
+     * 
+     * @param currentBlock the block to check
+     * @return true if the block is a ancestor of a script macro block
+     */
+    boolean isScriptNested(MacroBlock currentBlock);
 }

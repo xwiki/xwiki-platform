@@ -249,6 +249,8 @@ public class HTMLMacro extends AbstractMacro<HTMLMacroParameters>
             MacroMarkerBlock htmlMacroMarker =
                 new MacroMarkerBlock(htmlMacroBlock.getId(), htmlMacroBlock.getParameters(), htmlMacroBlock
                     .getContent(), xdom.getChildren(), htmlMacroBlock.isInline());
+            // otherwise the HTML block will not be able to access the parent DOM
+            htmlMacroMarker.setParent(htmlMacroBlock.getParent());
 
             // Execute the Macro transformation
             transformation.transform(htmlMacroMarker, context.getTransformationContext());

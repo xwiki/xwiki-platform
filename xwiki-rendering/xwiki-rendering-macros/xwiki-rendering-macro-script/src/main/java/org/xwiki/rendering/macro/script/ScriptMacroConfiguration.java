@@ -19,31 +19,28 @@
  */
 package org.xwiki.rendering.macro.script;
 
-import junit.framework.Test;
-import junit.framework.TestCase;
-
-import org.xwiki.rendering.scaffolding.RenderingTestSuite;
-import org.xwiki.test.ComponentManagerTestSetup;
+import org.xwiki.component.annotation.ComponentRole;
 
 /**
- * All Rendering integration tests defined in text files using a special format.
+ * Configuration properties for the Script macro.
+ *
+ * You can override the default values for each of the configuration properties below by defining them in XWiki's global
+ * configuration file using a prefix of "rendering.macro.script" followed by the property name. For example:
+ * <code>rendering.macro.script.nestedscripts.enabled = 1</code>
  * 
  * @version $Id$
- * @since 2.0M1
+ * @since 2.4M2
  */
-public class RenderingTests extends TestCase
+@ComponentRole
+public interface ScriptMacroConfiguration
 {
-    public static Test suite() throws Exception
-    {
-        RenderingTestSuite suite = new RenderingTestSuite("Test all Parsers/Renderers");
-
-        suite.addTestsFromResource("macroscript1", true);
-        suite.addTestsFromResource("macroscript2", true);
-        suite.addTestsFromResource("macroscript4", true);
-
-        ComponentManagerTestSetup testSetup = new ComponentManagerTestSetup(suite);
-        new ScriptMockSetup(testSetup.getComponentManager());
-
-        return testSetup;
-    }
+    /**
+     * Allowing nested scripting macros, for example {{velocity}}{{groovy}}...{{/groovy}}{{/velocity}} is potentially
+     * insecure, because an insufficiently escaped user data might allow script injection attacks.
+     * 
+     * Default: 0 (disabled)
+     * 
+     * @return true if nested scripts are allowed
+     */
+    boolean isNestedScriptsEnabled();
 }

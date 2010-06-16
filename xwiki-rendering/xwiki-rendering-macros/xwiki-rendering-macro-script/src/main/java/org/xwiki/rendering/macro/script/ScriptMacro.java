@@ -19,31 +19,16 @@
  */
 package org.xwiki.rendering.macro.script;
 
-import junit.framework.Test;
-import junit.framework.TestCase;
-
-import org.xwiki.rendering.scaffolding.RenderingTestSuite;
-import org.xwiki.test.ComponentManagerTestSetup;
 
 /**
- * All Rendering integration tests defined in text files using a special format.
+ * An interface used to distinguish script macros from the rest. The most important difference
+ * is that script macros cannot be nested.
  * 
  * @version $Id$
- * @since 2.0M1
+ * @since 2.4M2
  */
-public class RenderingTests extends TestCase
+public interface ScriptMacro
 {
-    public static Test suite() throws Exception
-    {
-        RenderingTestSuite suite = new RenderingTestSuite("Test all Parsers/Renderers");
 
-        suite.addTestsFromResource("macroscript1", true);
-        suite.addTestsFromResource("macroscript2", true);
-        suite.addTestsFromResource("macroscript4", true);
-
-        ComponentManagerTestSetup testSetup = new ComponentManagerTestSetup(suite);
-        new ScriptMockSetup(testSetup.getComponentManager());
-
-        return testSetup;
-    }
 }
+

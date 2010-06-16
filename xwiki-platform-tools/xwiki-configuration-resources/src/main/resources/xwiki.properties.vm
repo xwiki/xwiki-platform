@@ -62,6 +62,12 @@
 # rendering.macroCategories = toc:My Category
 # rendering.macroCategories = script:My Other Category
 
+#-# [Since 2.4M2]
+#-# Can a script macro contain another script macro? 
+#-#
+#-# The default is false to protect velocity content against becoming code.
+# rendering.macro.script.nestedscripts.enabled = false
+
 #-------------------------------------------------------------------------------------
 # Cache
 #-------------------------------------------------------------------------------------

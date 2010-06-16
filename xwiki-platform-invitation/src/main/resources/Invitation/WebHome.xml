@@ -263,6 +263,156 @@
 </class>
 <object>
 <class>
+<name>XWiki.ConfigurableClass</name>
+<customClass></customClass>
+<customMapping></customMapping>
+<defaultViewSheet></defaultViewSheet>
+<defaultEditSheet></defaultEditSheet>
+<defaultWeb></defaultWeb>
+<nameField></nameField>
+<validationScript></validationScript>
+<codeToExecute>
+<editor>---</editor>
+<name>codeToExecute</name>
+<number>7</number>
+<picker>0</picker>
+<prettyName>codeToExecute</prettyName>
+<rows>5</rows>
+<size>40</size>
+<unmodifiable>0</unmodifiable>
+<validationMessage></validationMessage>
+<validationRegExp></validationRegExp>
+<classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+</codeToExecute>
+<configurationClass>
+<name>configurationClass</name>
+<number>3</number>
+<picker>0</picker>
+<prettyName>configurationClass</prettyName>
+<size>30</size>
+<unmodifiable>0</unmodifiable>
+<validationMessage></validationMessage>
+<validationRegExp></validationRegExp>
+<classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+</configurationClass>
+<configureGlobally>
+<defaultValue></defaultValue>
+<displayFormType>checkbox</displayFormType>
+<displayType></displayType>
+<name>configureGlobally</name>
+<number>4</number>
+<prettyName>configureGlobally</prettyName>
+<unmodifiable>0</unmodifiable>
+<validationMessage></validationMessage>
+<validationRegExp></validationRegExp>
+<classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+</configureGlobally>
+<displayInSection>
+<name>displayInSection</name>
+<number>1</number>
+<picker>0</picker>
+<prettyName>displayInSection</prettyName>
+<size>30</size>
+<unmodifiable>0</unmodifiable>
+<validationMessage></validationMessage>
+<validationRegExp></validationRegExp>
+<classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+</displayInSection>
+<heading>
+<name>heading</name>
+<number>2</number>
+<picker>0</picker>
+<prettyName>heading</prettyName>
+<size>30</size>
+<unmodifiable>0</unmodifiable>
+<validationMessage></validationMessage>
+<validationRegExp></validationRegExp>
+<classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+</heading>
+<iconAttachment>
+<name>iconAttachment</name>
+<number>8</number>
+<picker>0</picker>
+<prettyName>iconAttachment</prettyName>
+<size>30</size>
+<unmodifiable>0</unmodifiable>
+<validationMessage></validationMessage>
+<validationRegExp></validationRegExp>
+<classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+</iconAttachment>
+<linkPrefix>
+<name>linkPrefix</name>
+<number>5</number>
+<picker>0</picker>
+<prettyName>linkPrefix</prettyName>
+<size>30</size>
+<unmodifiable>0</unmodifiable>
+<validationMessage></validationMessage>
+<validationRegExp></validationRegExp>
+<classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+</linkPrefix>
+<propertiesToShow>
+<cache>0</cache>
+<displayType>input</displayType>
+<multiSelect>1</multiSelect>
+<name>propertiesToShow</name>
+<number>6</number>
+<picker>0</picker>
+<prettyName>propertiesToShow</prettyName>
+<relationalStorage>1</relationalStorage>
+<separator> </separator>
+<separators> ,|</separators>
+<size>20</size>
+<sort>none</sort>
+<unmodifiable>0</unmodifiable>
+<validationMessage></validationMessage>
+<validationRegExp></validationRegExp>
+<values></values>
+<classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+</propertiesToShow>
+</class>
+<name>Invitation.WebHome</name>
+<number>0</number>
+<className>XWiki.ConfigurableClass</className>
+<guid>1c92a63a-fb97-41e7-8fb5-adb134b4b4f0</guid>
+<property>
+<codeToExecute>## If there is no Invitation.InvitationConfig then create one.
+## TODO Find a nicer way to handle this.
+#if(!$xwiki.exists('Invitation.InvitationConfig'))
+  {{include document="Invitation.WebHome" context="new" output="false"/}}
+  #if($request.getParameter('redirected'))
+    {{error}}$msg.get('xe.invitation.failedToCreateDocuments'){{/error}}
+  #else
+    $response.sendRedirect(
+      $request.getRequestURL().append("?").append(
+        $request.getQueryString()).append("&amp;redirected=1").toString())
+  #end
+#end</codeToExecute>
+</property>
+<property>
+<configurationClass></configurationClass>
+</property>
+<property>
+<configureGlobally>1</configureGlobally>
+</property>
+<property>
+<displayInSection>Invitation</displayInSection>
+</property>
+<property>
+<heading></heading>
+</property>
+<property>
+<iconAttachment></iconAttachment>
+</property>
+<property>
+<linkPrefix></linkPrefix>
+</property>
+<property>
+<propertiesToShow/>
+</property>
+</object>
+<object>
+<class>
 <name>XWiki.XWikiRights</name>
 <customClass></customClass>
 <customMapping></customMapping>
@@ -323,7 +473,7 @@
 <classType>com.xpn.xwiki.objects.classes.UsersClass</classType>
 </users>
 </class>
-<name>Invitation.Invitation</name>
+<name>Invitation.WebHome</name>
 <number>0</number>
 <className>XWiki.XWikiRights</className>
 <guid>649d5273-d662-4248-abf0-94953088e98a</guid>
@@ -493,7 +643,7 @@ $xwiki.get('ssx').use($config.get('commonPage'))
                             $messages,
                             $emailContainer)
   ##
-  #if($messages.size() > 0)
+  #if($messages.size() &gt; 0)
     #sendMail($messages, $config, $emailContainer)
     #set($errors = [])
     #foreach($message in $messages)

@@ -224,6 +224,13 @@ public class MacroTransformation extends AbstractTransformation
         return macroHolders.size() > 0 ? macroHolders.get(0) : null;
     }
 
+    /**
+     * Wrap the output of a macro block with a {@link MacroMarkerBlock}.
+     * 
+     * @param macroBlockToWrap the block that should be replaced
+     * @param newBlocks list of blocks to wrap
+     * @return the wrapper
+     */
     private Block wrapInMacroMarker(MacroBlock macroBlockToWrap, List<Block> newBlocks)
     {
         return new MacroMarkerBlock(macroBlockToWrap.getId(), macroBlockToWrap.getParameters(),

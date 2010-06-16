@@ -108,10 +108,38 @@
   width: 450px;
 }
 
+/* Keep the table from overflowing */
+.invitation .message-table table, .invitation .history-table table {
+  table-layout: fixed;
+  word-wrap: break-word;
+}
+.invitation table th.checkbox {
+  width: 5%
+}
+.invitation table th.sentDate {
+  width: 15%
+}
+.invitation table th.recipient {
+  width: 30%
+}
+.invitation table th.history {
+  width: 14%
+}
+/* For message history table */
+.invitation table th.status-set-to {
+  width: 10%
+}
+.invitation table th.log-entry {
+  width: 60%
+}
+
 .invitation-preview {
   background-color: #FCFCFC;
   border: 1px solid $theme.get('menuSelectedEntryBackgroundColor');
   padding: 3px;
+}
+
+.invitation-preview, .right-side {
   margin-left: 30px;
 }
 

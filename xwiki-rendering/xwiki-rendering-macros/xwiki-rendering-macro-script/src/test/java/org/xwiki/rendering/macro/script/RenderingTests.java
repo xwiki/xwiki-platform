@@ -39,7 +39,7 @@ public class RenderingTests extends TestCase
 
         suite.addTestsFromResource("macroscript1", true);
         suite.addTestsFromResource("macroscript2", true);
-        suite.addTestsFromResource("macroscript4", true);
+        suite.addTestsFromResource("macroscript3", true);
 
         ComponentManagerTestSetup testSetup = new ComponentManagerTestSetup(suite);
         new ScriptMockSetup(testSetup.getComponentManager());

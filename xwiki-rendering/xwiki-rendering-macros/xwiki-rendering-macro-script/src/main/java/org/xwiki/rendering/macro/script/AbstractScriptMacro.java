@@ -34,7 +34,7 @@ import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.block.MacroBlock;
 import org.xwiki.rendering.block.XDOM;
 import org.xwiki.rendering.internal.macro.script.AttachmentClassLoaderFactory;
-import org.xwiki.rendering.internal.macro.script.ScriptMacroUtils;
+import org.xwiki.rendering.internal.macro.script.ScriptMacroValidator;
 import org.xwiki.rendering.macro.AbstractMacro;
 import org.xwiki.rendering.macro.MacroExecutionException;
 import org.xwiki.rendering.macro.descriptor.ContentDescriptor;
@@ -49,8 +49,8 @@ import org.xwiki.rendering.util.ParserUtils;
  * @param <P> the type of macro parameters bean.
  * @version $Id$
  * @since 1.7M3
- * @todo This class is on the edge of a fanout violation and needs to be refactored and split up.
  */
+// TODO: This class is on the edge of a fanout violation and needs to be refactored and split up.
 public abstract class AbstractScriptMacro<P extends ScriptMacroParameters> extends AbstractMacro<P>
     implements ScriptMacro
 {
@@ -108,10 +108,10 @@ public abstract class AbstractScriptMacro<P extends ScriptMacroParameters> exten
     private ParserUtils parserUtils = new ParserUtils();
 
     /**
-     * Used to check for nested scripts.
+     * Validators to make sure script macro is valid.
      */
-    @Requirement
-    private ScriptMacroUtils scriptUtils;
+    @Requirement(role = ScriptMacroValidator.class)
+    private List<ScriptMacroValidator> validators;
 
     /**
      * @param macroName the name of the macro (eg "groovy")
@@ -204,16 +204,16 @@ public abstract class AbstractScriptMacro<P extends ScriptMacroParameters> exten
             try {
                 Thread.currentThread().setContextClassLoader(newClassLoader);
 
-                // 0) Abort execution if the script is nested
-                if (scriptUtils.isScriptNested(context.getCurrentMacroBlock())) {
-                    throw new MacroExecutionException("Nested scripts are not allowed");
+                // 1) Abort execution if the script is nested
+                for (ScriptMacroValidator validator : this.validators) {
+                    validator.validate(parameters, content, context);
                 }
 
-                // 1) Run script engine on macro block content
+                // 2) Run script engine on macro block content
                 String scriptResult = evaluate(parameters, content, context);
 
                 if (parameters.isOutput()) {
-                    // 2) Run the wiki syntax parser on the script-rendered content
+                    // 3) Run the wiki syntax parser on the script-rendered content
                     result = parseScriptResult(scriptResult, parameters, context);
                 }
             } finally {

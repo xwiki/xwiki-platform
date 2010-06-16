@@ -20,22 +20,27 @@
 package org.xwiki.rendering.internal.macro.script;
 
 import org.xwiki.component.annotation.ComponentRole;
-import org.xwiki.rendering.block.MacroBlock;
+import org.xwiki.rendering.macro.MacroExecutionException;
+import org.xwiki.rendering.macro.script.ScriptMacroParameters;
+import org.xwiki.rendering.transformation.MacroTransformationContext;
 
 /**
- * An internal component for accessing script macro-related utility methods.
+ * For validating a macro to make sure it is allowed to run.
  * 
+ * @param <P> the type of macro parameters bean.
  * @version $Id$
  * @since 2.4M2
  */
 @ComponentRole
-public interface ScriptMacroUtils
+public interface ScriptMacroValidator<P extends ScriptMacroParameters>
 {
     /**
-     * Check if the given macro block is nested inside a script macro.
+     * Check if the given macro block is valid.
      * 
-     * @param currentBlock the block to check
-     * @return true if the block is a ancestor of a script macro block
+     * @param parameters the macro parameters in the form of a bean defined by the {@link Macro} implementation
+     * @param content the content of the macro
+     * @param context the context of the macros transformation process
+     * @throws MacroExecutionException if macro is invalid
      */
-    boolean isScriptNested(MacroBlock currentBlock);
+    void validate(P parameters, String content, MacroTransformationContext context) throws MacroExecutionException;
 }

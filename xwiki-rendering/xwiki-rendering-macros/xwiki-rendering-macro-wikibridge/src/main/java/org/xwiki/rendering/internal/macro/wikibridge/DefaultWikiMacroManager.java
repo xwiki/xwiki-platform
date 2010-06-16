@@ -159,7 +159,7 @@ public class DefaultWikiMacroManager implements WikiMacroManager
         if (macroData != null) {
             WikiMacroDescriptor macroDescriptor = (WikiMacroDescriptor) macroData.getWikiMacro().getDescriptor();
 
-            // Verify that the user has the right to register this wiki macro the chosen visibility
+            // Verify that the user has the right to unregister this wiki macro for the chosen visibility
             if (isAllowed(documentReference, macroDescriptor.getVisibility())) {
                 try {
                     findComponentManager(macroDescriptor.getVisibility()).unregisterComponent(Macro.class,

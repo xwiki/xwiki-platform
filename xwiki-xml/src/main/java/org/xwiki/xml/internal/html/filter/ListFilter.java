@@ -19,7 +19,6 @@
  */
 package org.xwiki.xml.internal.html.filter;
 
-import java.util.List;
 import java.util.Map;
 
 import org.w3c.dom.Document;
@@ -27,23 +26,19 @@ import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.xml.html.filter.AbstractHTMLFilter;
-import org.xwiki.xml.html.filter.ElementSelector;
 
 /**
- * Transform non XHTML list into XHTML valid lists. Specifically, move &lt;ul&gt; or &lt;ol&gt; element nested inside
- * a &lt;ul&gt; or &lt;ol&gt; element inside the previous &lt;li&gt; element.
- *
- * For example:
- * <code><pre>
+ * Transform non XHTML list into XHTML valid lists. Specifically, move &lt;ul&gt; and &lt;ol&gt; elements (and any other
+ * nodes that are not allowed) nested inside a &lt;ul&gt; or &lt;ol&gt; element inside the previous &lt;li&gt; element.
+ * <p>
+ * For example: <code><pre>
  *   <ul>
  *     <li>item1</li>
  *     <ul>
  *       <li>item2</li>
  *     </ul>
  *   </ul>
- * </pre></code>
- * becomes
- * <code><pre>
+ * </pre></code> becomes <code><pre>
  *   <ul>
  *     <li>item1
  *       <ul>
@@ -52,7 +47,7 @@ import org.xwiki.xml.html.filter.ElementSelector;
  *     </li>
  *   </ul>
  * </pre></code>
- *
+ * 
  * @version $Id$
  * @since 1.6M1
  */
@@ -62,40 +57,60 @@ public class ListFilter extends AbstractHTMLFilter
 
     /**
      * {@inheritDoc}
-     * 
-     * <p>The {@link ListFilter} does not use any cleaningParameters passed in.</p>
+     * <p>
+     * The {@link ListFilter} does not use any cleaningParameters passed in.
      */
     public void filter(Document document, Map<String, String> cleaningParameters)
     {
-        // Collect all nested lists.
-        List<Element> nestedLists =
-            filterDescendants(document.getDocumentElement(), new String[] {TAG_UL, TAG_OL}, new ElementSelector()
-            {
-                public boolean isSelected(Element element)
-                {
-                    String parentNodeName = element.getParentNode().getNodeName();
-                    return parentNodeName.equalsIgnoreCase(TAG_UL) || parentNodeName.equalsIgnoreCase(TAG_OL);
-                }
-            });
-        for (Element nestedList : nestedLists) {            
-            Element parent = (Element) nestedList.getParentNode();
-            // Look for the previous sibling that is an Element. If there are none it means we're in the following
-            // situation "<ul><ul>" and we need to insert a <li> element to generate "<ul><li><ul>".
-            // If there's one check that it's a <li>. It means that we're in the following situation "<ul><li/><ul>"
-            // and we need to move the <ul> inside the <li>.
-            Node previousElement = nestedList.getPreviousSibling();
-            while (null != previousElement && !(previousElement instanceof Element)) {
-                previousElement = previousElement.getPreviousSibling();
-            }
-            if (null == previousElement) {
-                // This means we have <ul><ul>. We need to insert a <li> element.
-                Element li = document.createElement(TAG_LI);
-                parent.insertBefore(li, nestedList);
-                li.appendChild(parent.removeChild(nestedList));                
-            } else {
-                // Move it inside the previous sibling
-                previousElement.appendChild(parent.removeChild(nestedList));
-            }
+        // Iterate all lists and fix them.
+        for (Element list : filterDescendants(document.getDocumentElement(), new String[] {TAG_UL, TAG_OL})) {
+            filter(list);
         }
-    }    
+    }
+
+    /**
+     * Transforms the given list in a valid XHTML list by moving the nodes that are not allowed inside &lt;ul&gt; and
+     * &lt;ol&gt; in &lt;li&gt; elements.
+     * 
+     * @param list the list to be filtered
+     */
+    private void filter(Element list)
+    {
+        // Iterate all the child nodes of the given list to see who's allowed and who's not allowed inside it.
+        Node child = list.getFirstChild();
+        Node previousListItem = null;
+        while (child != null) {
+            Node nextSibling = child.getNextSibling();
+            if (isAllowedInsideList(child)) {
+                // Save a reference to the previous list item. Note that the previous list item is not necessarily the
+                // previous sibling.
+                if (child.getNodeName().equalsIgnoreCase(TAG_LI)) {
+                    previousListItem = child;
+                }
+            } else {
+                if (previousListItem == null) {
+                    // Create a new list item to be able to move the invalid child.
+                    previousListItem = list.getOwnerDocument().createElement(TAG_LI);
+                    list.insertBefore(previousListItem, child);
+                    // Hide the marker of the list item to make the list look the same after it is cleaned.
+                    ((Element) previousListItem).setAttribute(ATTRIBUTE_STYLE, "list-style-type: none");
+                }
+                // Move the child node at the end of the previous list item because it is not allowed where it is now.
+                previousListItem.appendChild(child);
+            }
+            child = nextSibling;
+        }
+    }
+
+    /**
+     * Checks if a given node is allowed or not as a child of a &lt;ul&gt; or &lt;ol&gt; element.
+     * 
+     * @param node the node to be checked
+     * @return {@code true} if the given node is allowed inside an ordered or unordered list, {@code false} otherwise
+     */
+    private boolean isAllowedInsideList(Node node)
+    {
+        return (node.getNodeType() != Node.ELEMENT_NODE || node.getNodeName().equalsIgnoreCase(TAG_LI))
+            && (node.getNodeType() != Node.TEXT_NODE || node.getNodeValue().trim().length() == 0);
+    }
 }

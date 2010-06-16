@@ -120,14 +120,22 @@ public class DefaultHTMLCleanerTest extends AbstractXWikiComponentTestCase
         assertHTML("<ul><li>item1<ul><li>item2</li></ul></li></ul>", "<ul><li>item1</li><ul><li>item2</li></ul></ul>");
         assertHTML("<ul><li>item1<ul><li>item2<ul><li>item3</li></ul></li></ul></li></ul>",
             "<ul><li>item1</li><ul><li>item2</li><ul><li>item3</li></ul></ul></ul>");
-        assertHTML("<ul><li><ul><li>item</li></ul></li></ul>", "<ul><ul><li>item</li></ul></ul>");
-        assertHTML("<ul> <li><ul><li>item</li></ul></li></ul>", "<ul> <ul><li>item</li></ul></ul>");
+        assertHTML("<ul><li style=\"list-style-type: none\"><ul><li>item</li></ul></li></ul>",
+            "<ul><ul><li>item</li></ul></ul>");
+        assertHTML("<ul> <li style=\"list-style-type: none\"><ul><li>item</li></ul></li></ul>",
+            "<ul> <ul><li>item</li></ul></ul>");
         assertHTML("<ul><li>item1<ol><li>item2</li></ol></li></ul>", "<ul><li>item1</li><ol><li>item2</li></ol></ul>");
         assertHTML("<ol><li>item1<ol><li>item2<ol><li>item3</li></ol></li></ol></li></ol>",
             "<ol><li>item1</li><ol><li>item2</li><ol><li>item3</li></ol></ol></ol>");
-        assertHTML("<ol><li><ol><li>item</li></ol></li></ol>", "<ol><ol><li>item</li></ol></ol>");
-        assertHTML("<ul><li>item1<ul><li><ul><li>item2</li></ul></li><li>item3</li></ul></li></ul>",
-            "<ul><li>item1</li><ul><ul><li>item2</li></ul><li>item3</li></ul></ul>");
+        assertHTML("<ol><li style=\"list-style-type: none\"><ol><li>item</li></ol></li></ol>",
+            "<ol><ol><li>item</li></ol></ol>");
+        assertHTML("<ul><li>item1<ul><li style=\"list-style-type: none\"><ul><li>item2</li></ul></li>"
+            + "<li>item3</li></ul></li></ul>", "<ul><li>item1</li><ul><ul><li>item2</li></ul><li>item3</li></ul></ul>");
+
+        assertHTML("<ul>\n\n<li style=\"list-style-type: none\"><p>text</p></li></ul>", "<ul>\n\n<p>text</p></ul>");
+        assertHTML("<ul><li>item<p>text</p></li><!--x-->  </ul>", "<ul><li>item</li><!--x-->  <p>text</p></ul>");
+        assertHTML("<ul> \n<li style=\"list-style-type: none\"><em>1</em>2<ins>3</ins></li><!--x--><li>item</li></ul>",
+            "<ul> \n<em>1</em><!--x-->2<ins>3</ins><li>item</li></ul>");
     }
 
     /**

@@ -79,6 +79,7 @@
                 <exclude>org/xwiki/model/reference/DocumentReferenceResolver</exclude>
                 <exclude>org/xwiki/model/reference/EntityReferenceResolver</exclude>
                 <exclude>org/xwiki/model/reference/EntityReferenceSerializer</exclude>
+                <exclude>org/xwiki/model/ModelContext</exclude>
                 <exclude>**/internal/**</exclude>
               </excludes>
             </configuration>

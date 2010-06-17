@@ -30,7 +30,6 @@ import org.xwiki.gwt.wysiwyg.client.syntax.SyntaxValidator;
 import org.xwiki.gwt.wysiwyg.client.syntax.ValidationRule;
 import org.xwiki.gwt.wysiwyg.client.syntax.rule.ImageSelectionBehaviourRule;
 
-
 /**
  * Base class for syntax-specific validators. It includes by default syntax-independent rules.
  * 
@@ -85,6 +84,8 @@ public class DefaultSyntaxValidator implements SyntaxValidator
         addValidationRule(new DefaultValidationRule("backcolor", Command.BACK_COLOR));
         addValidationRule(new DefaultValidationRule("hr", Command.INSERT_HORIZONTAL_RULE));
         addValidationRule(new DefaultValidationRule("symbol", Command.INSERT_HTML));
+        addValidationRule(new DefaultValidationRule("importfile", Command.INSERT_HTML));
+        addValidationRule(new DefaultValidationRule("importpaste", Command.INSERT_HTML));
         // Add the validation rule for the image selection behavior.
         addValidationRule(new ImageSelectionBehaviourRule());
     }

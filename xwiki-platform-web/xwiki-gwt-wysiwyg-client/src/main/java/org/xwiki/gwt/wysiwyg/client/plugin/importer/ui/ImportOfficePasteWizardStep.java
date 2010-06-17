@@ -29,6 +29,8 @@ import org.xwiki.gwt.user.client.ui.wizard.NavigationListener.NavigationDirectio
 import org.xwiki.gwt.wysiwyg.client.Strings;
 import org.xwiki.gwt.wysiwyg.client.plugin.importer.ImportServiceAsync;
 
+import com.google.gwt.event.dom.client.LoadEvent;
+import com.google.gwt.event.dom.client.LoadHandler;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.CheckBox;
 import com.google.gwt.user.client.ui.FlowPanel;
@@ -43,7 +45,7 @@ import com.google.gwt.user.client.ui.Widget;
  * @version $Id$
  * @since 2.0.1
  */
-public class ImportOfficePasteWizardStep implements WizardStep
+public class ImportOfficePasteWizardStep implements WizardStep, LoadHandler
 {
     /**
      * Main UI of this wizard.
@@ -98,6 +100,7 @@ public class ImportOfficePasteWizardStep implements WizardStep
         // Text area panel.
         textArea = new RichTextArea();
         textArea.addStyleName("xImportOfficeContentEditor");
+        textArea.addLoadHandler(this);
         mainPanel.add(textArea);
 
         // Filter styles check box.
@@ -121,7 +124,6 @@ public class ImportOfficePasteWizardStep implements WizardStep
     public void init(Object data, AsyncCallback< ? > cb)
     {
         textArea.setHTML("");
-        textArea.setFocus(true);
         cb.onSuccess(null);
     }
 
@@ -228,5 +230,19 @@ public class ImportOfficePasteWizardStep implements WizardStep
         // force HTMLCleaner to avoid parsing of namespace information.
         params.put("namespacesAware", Boolean.toString(false));
         return params;
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see LoadHandler#onLoad(LoadEvent)
+     */
+    public void onLoad(LoadEvent event)
+    {
+        if (event.getSource() == textArea) {
+            // The rich text area where the content is pasted is reloaded each time this wizard step is displayed so we
+            // use the load event to focus the text area. Note that we can't focus if the rich text area isn't loaded.
+            textArea.setFocus(true);
+        }
     }
 }

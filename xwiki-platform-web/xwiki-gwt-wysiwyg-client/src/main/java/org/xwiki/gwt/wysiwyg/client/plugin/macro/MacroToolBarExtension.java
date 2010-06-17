@@ -25,7 +25,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.xwiki.gwt.user.client.HandlerRegistrationCollection;
-import org.xwiki.gwt.wysiwyg.client.Strings;
+import org.xwiki.gwt.wysiwyg.client.Messages;
 import org.xwiki.gwt.wysiwyg.client.plugin.internal.FocusWidgetUIExtension;
 
 import com.google.gwt.event.dom.client.ClickEvent;
@@ -99,7 +99,7 @@ public class MacroToolBarExtension implements ClickHandler
         if (plugin.getTextArea().getCommandManager().isSupported(MacroPlugin.INSERT)) {
             PushButton button = new PushButton();
             registrations.add(button.addClickHandler(this));
-            button.setTitle(Strings.INSTANCE.macroInsertTooltip(macroId));
+            button.setTitle(Messages.INSTANCE.macroInsertTooltip(macroId));
             button.addStyleName("macro-" + macroId);
             toolBarExtension.addFeature(MACRO_NAMESPACE + macroId, button);
             macroIds.put(button, macroId);

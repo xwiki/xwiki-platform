@@ -227,6 +227,7 @@ h1 {
 }
 
 #document-title h1 {
+  border-bottom: 1px solid #ccc;
   font-size: 2.15em;
   letter-spacing: -1px;
 }

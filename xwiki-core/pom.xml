@@ -810,6 +810,14 @@
       <scope>runtime</scope>
     </dependency>
 
+    <!-- Used to mock XWiki class -->
+    <dependency>
+      <groupId>org.jmock</groupId>
+      <artifactId>jmock-legacy</artifactId>
+      <version>2.5.1</version>
+      <scope>test</scope>
+    </dependency>
+
     <!-- Build tools -->
     <!-- Needed for backward compatibility Aspects -->
     <dependency>

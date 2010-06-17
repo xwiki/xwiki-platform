@@ -25,22 +25,21 @@ import java.util.List;
 import java.util.Vector;
 
 import org.apache.commons.lang.StringUtils;
-import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.Requirement;
 import org.xwiki.component.logging.AbstractLogEnabled;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.context.Execution;
-import org.xwiki.model.reference.EntityReferenceSerializer;
+import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.rendering.internal.macro.wikibridge.DefaultWikiMacro;
 import org.xwiki.rendering.macro.MacroId;
 import org.xwiki.rendering.macro.descriptor.ContentDescriptor;
 import org.xwiki.rendering.macro.descriptor.DefaultContentDescriptor;
 import org.xwiki.rendering.macro.descriptor.MacroDescriptor;
 import org.xwiki.rendering.macro.wikibridge.WikiMacro;
-import org.xwiki.rendering.macro.wikibridge.WikiMacroFactory;
-import org.xwiki.rendering.macro.wikibridge.WikiMacroException;
 import org.xwiki.rendering.macro.wikibridge.WikiMacroDescriptor;
+import org.xwiki.rendering.macro.wikibridge.WikiMacroException;
+import org.xwiki.rendering.macro.wikibridge.WikiMacroFactory;
 import org.xwiki.rendering.macro.wikibridge.WikiMacroParameterDescriptor;
 import org.xwiki.rendering.macro.wikibridge.WikiMacroVisibility;
 
@@ -71,12 +70,6 @@ public class DefaultWikiMacroFactory extends AbstractLogEnabled implements WikiM
     private Execution execution;
 
     /**
-     * Used to serialize document names into strings.
-     */
-    @Requirement
-    private EntityReferenceSerializer<String> entityRefefenceSerializer;
-
-    /**
      * Utility method for accessing XWikiContext.
      * 
      * @return the XWikiContext.
@@ -94,8 +87,7 @@ public class DefaultWikiMacroFactory extends AbstractLogEnabled implements WikiM
     {
         XWikiDocument doc;
         try {
-            doc = getContext().getWiki().getDocument(this.entityRefefenceSerializer.serialize(documentReference),
-                getContext());
+            doc = getContext().getWiki().getDocument(documentReference, getContext());
         } catch (XWikiException ex) {
             throw new WikiMacroException(String.format(
                 "Could not build macro from : [%s], unable to load document", documentReference), ex);
@@ -241,8 +233,7 @@ public class DefaultWikiMacroFactory extends AbstractLogEnabled implements WikiM
     {
         boolean result;
         try {
-            XWikiDocument doc = getContext().getWiki().getDocument(
-                this.entityRefefenceSerializer.serialize(documentReference), getContext());
+            XWikiDocument doc = getContext().getWiki().getDocument(documentReference, getContext());
             BaseObject macroDefinition = doc.getObject(WIKI_MACRO_CLASS);
             result = (null != macroDefinition);
         } catch (XWikiException ex) {

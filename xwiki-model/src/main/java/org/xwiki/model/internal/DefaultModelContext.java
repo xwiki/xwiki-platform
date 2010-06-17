@@ -19,24 +19,36 @@
  */
 package org.xwiki.model.internal;
 
+import java.util.Map;
+
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.Requirement;
 import org.xwiki.context.Execution;
+import org.xwiki.context.ExecutionContext;
+import org.xwiki.model.EntityType;
 import org.xwiki.model.ModelContext;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.WikiReference;
 
-import java.util.Map;
-
 /**
  * Default implementation bridging to the old XWiki Context to get current Model Reference Objects.
- *
+ * 
  * @version $Id$
  * @since 2.2M1
  */
 @Component
 public class DefaultModelContext implements ModelContext
 {
+    /**
+     * Key of the XWikiContext located in the {@link ExecutionContext}.
+     */
+    public static final String XCONTEXT_KEY = "xwikicontext";
+    
+    /**
+     * Key of the wiki name located in the XWikiContext.
+     */
+    private static final String WIKINAME_KEY = "wiki";
+    
     /**
      * The Execution Context from which we get the old XWiki Context from which we get the current Model Reference
      * Objects.
@@ -46,22 +58,68 @@ public class DefaultModelContext implements ModelContext
 
     /**
      * {@inheritDoc}
+     * 
      * @see org.xwiki.model.ModelContext#getCurrentEntityReference()
      */
     public EntityReference getCurrentEntityReference()
     {
-        WikiReference result;
+        WikiReference result = null;
+
         // TODO: This is bridge to the old XWiki Context since we currently don't store the current entity in the
         // new Execution Context yet. Remove when we do so.
-        try {
-            Map<String, Object> xcontext =
-                (Map<String, Object>) this.execution.getContext().getProperty("xwikicontext");
-            result = new WikiReference((String) xcontext.get("wiki")); 
-        } catch (Exception e) {
-            // Shouldn't happen in normal cases. Could happen if the context doesn't contain the old XWiki Context
-            // but that would be a bug in the initialization system somewhere.
-            result = null;
+        ExecutionContext econtext = this.execution.getContext();
+
+        if (econtext != null) {
+            Map<String, Object> xcontext = (Map<String, Object>) econtext.getProperty(XCONTEXT_KEY);
+
+            if (xcontext != null) {
+                String wikiName = (String) xcontext.get(WIKINAME_KEY);
+
+                if (wikiName != null) {
+                    result = new WikiReference(wikiName);
+                }
+            }
         }
-        return result;        
+
+        return result;
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see org.xwiki.model.ModelContext#setCurrentEntityReference(org.xwiki.model.reference.EntityReference)
+     */
+    public void setCurrentEntityReference(EntityReference entityReference)
+    {
+        // TODO: This is bridge to the old XWiki Context since we currently don't store the current entity in the
+        // new Execution Context yet. Remove when we do so.
+        ExecutionContext econtext = this.execution.getContext();
+
+        if (econtext != null) {
+            Map<String, Object> xcontext = (Map<String, Object>) econtext.getProperty(XCONTEXT_KEY);
+
+            if (xcontext != null) {
+                xcontext.put(WIKINAME_KEY, extractWikiName(entityReference));
+            }
+        }
+    }
+
+    /**
+     * Extract wiki name from provided entity reference.
+     * 
+     * @param entityReference the entity reference
+     * @return the wiki name, null if no wiki name can be found.
+     */
+    private String extractWikiName(EntityReference entityReference)
+    {
+        String wikiName = null;
+        if (entityReference != null) {
+            EntityReference wikiReference = entityReference.extractReference(EntityType.WIKI);
+            if (wikiReference != null) {
+                wikiName = wikiReference.getName();
+            }
+        }
+
+        return wikiName;
     }
 }

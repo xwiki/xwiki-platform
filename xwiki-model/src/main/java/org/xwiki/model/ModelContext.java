@@ -36,4 +36,10 @@ public interface ModelContext
      * @return the reference to the current entity located in the Execution Context or null if there's none
      */
     EntityReference getCurrentEntityReference();
+
+    /**
+     * @param entityReference the reference to the current entity located in the Execution Context
+     * @since 2.4M2
+     */
+    void setCurrentEntityReference(EntityReference entityReference);
 }

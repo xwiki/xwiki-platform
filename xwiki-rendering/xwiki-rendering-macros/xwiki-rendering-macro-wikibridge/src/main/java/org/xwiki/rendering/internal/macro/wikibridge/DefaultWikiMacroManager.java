@@ -23,12 +23,14 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.xwiki.bridge.DocumentAccessBridge;
-import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.Requirement;
 import org.xwiki.component.descriptor.DefaultComponentDescriptor;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
+import org.xwiki.model.ModelContext;
+import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.EntityReference;
 import org.xwiki.rendering.macro.Macro;
 import org.xwiki.rendering.macro.wikibridge.WikiMacro;
 import org.xwiki.rendering.macro.wikibridge.WikiMacroDescriptor;
@@ -46,17 +48,23 @@ import org.xwiki.rendering.macro.wikibridge.WikiMacroVisibility;
 public class DefaultWikiMacroManager implements WikiMacroManager
 {
     /**
-     * The Root {@link ComponentManager}, used to look up specific component manager for registering
-     * Wiki Macros against the proper one (depending on the Macro visibility).
+     * The Root {@link ComponentManager}, used to look up specific component manager for registering Wiki Macros against
+     * the proper one (depending on the Macro visibility).
      */
     @Requirement
     private ComponentManager rootComponentManager;
 
     /**
-     * The {@link org.xwiki.bridge.DocumentAccessBridge} component.
+     * The {@link DocumentAccessBridge} component.
      */
     @Requirement
     private DocumentAccessBridge bridge;
+
+    /**
+     * The {@link ModelContext} component.
+     */
+    @Requirement
+    private ModelContext modelContext;
 
     /**
      * Map of wiki macros against document names. This is used to de-register wiki macros when corresponding documents
@@ -80,13 +88,20 @@ public class DefaultWikiMacroManager implements WikiMacroManager
         private WikiMacro wikiMacro;
 
         /**
+         * @see #getAuthor()
+         */
+        private String author;
+
+        /**
          * @param hint see {@link #getHint()}
          * @param wikiMacro see {@link #getWikiMacro()}
+         * @param author see {@link #getAuthor()}
          */
-        public WikiMacroData(String hint, WikiMacro wikiMacro)
+        public WikiMacroData(String hint, WikiMacro wikiMacro, String author)
         {
             this.hint = hint;
             this.wikiMacro = wikiMacro;
+            this.author = author;
         }
 
         /**
@@ -104,10 +119,19 @@ public class DefaultWikiMacroManager implements WikiMacroManager
         {
             return this.wikiMacro;
         }
+
+        /**
+         * @return the author of the macro
+         */
+        public String getAuthor()
+        {
+            return author;
+        }
     }
-    
+
     /**
      * {@inheritDoc}
+     * 
      * @see WikiMacroManager#hasWikiMacro(org.xwiki.model.reference.DocumentReference)
      * @since 2.2M1
      */
@@ -118,6 +142,7 @@ public class DefaultWikiMacroManager implements WikiMacroManager
 
     /**
      * {@inheritDoc}
+     * 
      * @see WikiMacroManager#registerWikiMacro(org.xwiki.model.reference.DocumentReference , WikiMacro)
      * @since 2.2M1
      */
@@ -127,7 +152,6 @@ public class DefaultWikiMacroManager implements WikiMacroManager
 
         // Verify that the user has the right to register this wiki macro the chosen visibility
         if (isAllowed(documentReference, macroDescriptor.getVisibility())) {
-
             DefaultComponentDescriptor<Macro> componentDescriptor = new DefaultComponentDescriptor<Macro>();
             componentDescriptor.setRole(Macro.class);
             componentDescriptor.setRoleHint(wikiMacro.getDescriptor().getId().getId());
@@ -135,8 +159,8 @@ public class DefaultWikiMacroManager implements WikiMacroManager
             try {
                 // Register the macro against the right Component Manager, depending on the defined macro visibility.
                 findComponentManager(macroDescriptor.getVisibility()).registerComponent(componentDescriptor, wikiMacro);
-                this.wikiMacroMap.put(documentReference,
-                    new WikiMacroData(componentDescriptor.getRoleHint(), wikiMacro));
+                this.wikiMacroMap.put(documentReference, new WikiMacroData(componentDescriptor.getRoleHint(),
+                    wikiMacro, this.bridge.getCurrentUser()));
             } catch (Exception e) {
                 throw new WikiMacroException(String.format("Failed to register macro [%s] in [%s] for visibility [%s]",
                     wikiMacro.getDescriptor().getId().getId(), documentReference, macroDescriptor.getVisibility()), e);
@@ -150,6 +174,7 @@ public class DefaultWikiMacroManager implements WikiMacroManager
 
     /**
      * {@inheritDoc}
+     * 
      * @see WikiMacroManager#unregisterWikiMacro(org.xwiki.model.reference.DocumentReference)
      * @since 2.2M1
      */
@@ -161,7 +186,14 @@ public class DefaultWikiMacroManager implements WikiMacroManager
 
             // Verify that the user has the right to unregister this wiki macro for the chosen visibility
             if (isAllowed(documentReference, macroDescriptor.getVisibility())) {
+                String currentUser = this.bridge.getCurrentUser();
+                EntityReference currentEntityReference = this.modelContext.getCurrentEntityReference();
                 try {
+                    // Put the proper context information to let components manager use the proper keys to find
+                    // components to unregister
+                    this.bridge.setCurrentUser(macroData.getAuthor());
+                    this.modelContext.setCurrentEntityReference(documentReference);
+
                     findComponentManager(macroDescriptor.getVisibility()).unregisterComponent(Macro.class,
                         macroData.getHint());
                     this.wikiMacroMap.remove(documentReference);
@@ -169,6 +201,9 @@ public class DefaultWikiMacroManager implements WikiMacroManager
                     throw new WikiMacroException(String.format("Failed to unregister macro [%s] in [%s] for "
                         + "visibility [%s]", macroData.getHint(), documentReference, macroDescriptor.getVisibility()),
                         e);
+                } finally {
+                    this.bridge.setCurrentUser(currentUser);
+                    this.modelContext.setCurrentEntityReference(currentEntityReference);
                 }
             } else {
                 throw new WikiMacroException(String.format("Unable to unregister macro [%s] in [%s] for visibility "
@@ -176,8 +211,8 @@ public class DefaultWikiMacroManager implements WikiMacroManager
                     documentReference, macroDescriptor.getVisibility()));
             }
         } else {
-            throw new WikiMacroException(String.format("Macro [%s] in [%s] isn't registered",
-                macroData.getWikiMacro().getDescriptor().getId().getId(), documentReference));
+            throw new WikiMacroException(String.format("Macro [%s] in [%s] isn't registered", macroData.getWikiMacro()
+                .getDescriptor().getId().getId(), documentReference));
         }
     }
 
@@ -186,9 +221,9 @@ public class DefaultWikiMacroManager implements WikiMacroManager
      * @param visibility the visibility required
      * @return true if the current user is allowed to register or unregister the wiki macro contained in the passed
      *         document name and with the passed visibility. Global visibility require programming rights on the
-     *         document (to ensure they cannot be defined by standard users in a wiki farm - since only farm admins
-     *         have programming rights in a farm). Current user and current wiki visibility simply require edit rights
-     *         on the document.
+     *         document (to ensure they cannot be defined by standard users in a wiki farm - since only farm admins have
+     *         programming rights in a farm). Current user and current wiki visibility simply require edit rights on the
+     *         document.
      * @since 2.2M1
      */
     private boolean isAllowed(DocumentReference documentReference, WikiMacroVisibility visibility)
@@ -216,8 +251,8 @@ public class DefaultWikiMacroManager implements WikiMacroManager
     /**
      * @param visibility the visibility required
      * @return the Component Manager to use to register/unregister the wiki macro. The Component Manager to use depends
-     *         on the macro visibility. For example a macro that has the "current user" visibility must be
-     *         registered against the User Component Manager.    
+     *         on the macro visibility. For example a macro that has the "current user" visibility must be registered
+     *         against the User Component Manager.
      * @throws ComponentLookupException if the Component Manager for the specified visibility cannot be found
      */
     private ComponentManager findComponentManager(WikiMacroVisibility visibility) throws ComponentLookupException
@@ -234,7 +269,7 @@ public class DefaultWikiMacroManager implements WikiMacroManager
             default:
                 cm = this.rootComponentManager;
         }
-        
+
         return cm;
     }
 }

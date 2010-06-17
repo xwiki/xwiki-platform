@@ -819,6 +819,16 @@ public class DefaultDocumentAccessBridge implements DocumentAccessBridge
     /**
      * {@inheritDoc}
      * 
+     * @see DocumentAccessBridge#setCurrentUser(String)
+     */
+    public void setCurrentUser(String userName)
+    {
+        getContext().setUser(userName);
+    }
+    
+    /**
+     * {@inheritDoc}
+     * 
      * @see DocumentAccessBridge#getDefaultEncoding()
      */
     public String getDefaultEncoding()

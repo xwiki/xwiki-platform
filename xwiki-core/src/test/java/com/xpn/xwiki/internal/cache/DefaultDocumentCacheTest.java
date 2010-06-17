@@ -66,7 +66,7 @@ public class DefaultDocumentCacheTest extends AbstractBridgedXWikiComponentTestC
         this.mockXWiki = mock(XWiki.class);
         getContext().setWiki((XWiki) this.mockXWiki.proxy());
         
-        this.mockXWiki.stubs().method("getDocument").with(eq(this.document.getPrefixedFullName()), ANYTHING).will(
+        this.mockXWiki.stubs().method("getDocument").with(eq(this.document.getDocumentReference()), ANYTHING).will(
             returnValue(this.document));
     }
 

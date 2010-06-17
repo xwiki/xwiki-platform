@@ -67,7 +67,7 @@ public abstract class AbstractPlugin implements Plugin
     /**
      * @return {@link #config}
      */
-    protected Config getConfig()
+    public Config getConfig()
     {
         return config;
     }

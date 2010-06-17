@@ -80,6 +80,11 @@ public class MacroPlugin extends AbstractPlugin implements DoubleClickHandler
     private MacroMenuExtension menuExtension;
 
     /**
+     * The object used to extend the tool bar with buttons for easy macro insertion, skipping the macro selection step.
+     */
+    private MacroToolBarExtension toolBarExtension;
+
+    /**
      * The macro service used to retrieve macro descriptors.
      */
     private final MacroServiceAsync macroService;
@@ -117,6 +122,11 @@ public class MacroPlugin extends AbstractPlugin implements DoubleClickHandler
 
         menuExtension = new MacroMenuExtension(this);
         getUIExtensionList().add(menuExtension.getExtension());
+
+        toolBarExtension = new MacroToolBarExtension(this);
+        if (toolBarExtension.getExtension().getFeatures().length > 0) {
+            getUIExtensionList().add(toolBarExtension.getExtension());
+        }
     }
 
     /**
@@ -127,6 +137,7 @@ public class MacroPlugin extends AbstractPlugin implements DoubleClickHandler
     public void destroy()
     {
         menuExtension.destroy();
+        toolBarExtension.destroy();
 
         getTextArea().getCommandManager().unregisterCommand(REFRESH);
         getTextArea().getCommandManager().unregisterCommand(COLLAPSE);
@@ -167,6 +178,16 @@ public class MacroPlugin extends AbstractPlugin implements DoubleClickHandler
     public void insert()
     {
         wizard.insert();
+    }
+
+    /**
+     * Skip the select macro wizard step and go directly to the edit macro wizard step for the specified macro.
+     * 
+     * @param macroId a macro identifier
+     */
+    public void insert(String macroId)
+    {
+        wizard.insert(macroId);
     }
 
     /**

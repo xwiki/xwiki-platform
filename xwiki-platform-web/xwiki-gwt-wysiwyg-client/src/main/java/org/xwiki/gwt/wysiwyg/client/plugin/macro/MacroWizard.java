@@ -129,6 +129,19 @@ public class MacroWizard implements WizardListener
     }
 
     /**
+     * Casts the <em>insert macro</em> spell on the underlying rich text area, allowing the user to insert the specified
+     * macro in place of the current selection or at the current caret position.
+     * 
+     * @param macroId a macro identifier
+     */
+    public void insert(String macroId)
+    {
+        MacroCall macroCall = new MacroCall();
+        macroCall.setName(macroId);
+        getInsertWizard().start(EDIT_STEP_NAME, macroCall);
+    }
+
+    /**
      * {@inheritDoc}
      * 
      * @see WizardListener#onCancel(Wizard)

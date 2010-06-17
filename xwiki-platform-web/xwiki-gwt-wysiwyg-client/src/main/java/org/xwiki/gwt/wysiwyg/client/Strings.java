@@ -20,14 +20,14 @@
 package org.xwiki.gwt.wysiwyg.client;
 
 import com.google.gwt.core.client.GWT;
-import com.google.gwt.i18n.client.Constants;
+import com.google.gwt.i18n.client.Messages;
 
 /**
- * This {@link Constants} interface is used to make user interface strings internationalizable.
+ * A collection of {@link Messages} used to localize the user interface.
  * 
  * @version $Id$
  */
-public interface Strings extends Constants
+public interface Strings extends Messages
 {
     /**
      * An instance of this string bundle that can be used anywhere in the code to obtain i18n strings.
@@ -135,6 +135,8 @@ public interface Strings extends Constants
     String macroEditDialogCaption();
 
     String macroInsert();
+
+    String macroInsertTooltip(String macroName);
 
     String macroInsertDialogCaption();
 

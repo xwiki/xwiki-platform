@@ -426,6 +426,16 @@ public class MockDocumentAccessBridge implements DocumentAccessBridge
     /**
      * {@inheritDoc}
      * 
+     * @see org.xwiki.bridge.DocumentAccessBridge#setCurrentUser(java.lang.String)
+     */
+    public void setCurrentUser(String userName)
+    {
+        throw new RuntimeException("Not implemented");
+    }
+    
+    /**
+     * {@inheritDoc}
+     * 
      * @see DocumentAccessBridge#getDefaultEncoding()
      */
     public String getDefaultEncoding()

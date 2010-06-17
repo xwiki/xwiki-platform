@@ -418,7 +418,8 @@
     #set($n = $util.getNewline())
     #set($messageBodyTemplate = '{{velo' + 'city}}' + "$n" + '#set($discard = "#template('
                               + "$escapetool.getS()" + 'colorThemeInit.vm' + "$escapetool.getS()"
-                              + ')")' + "$n" + '#set($userName = $xwiki.getUserName($xco'
+                              + ')")' + "$n" + '#if("$!theme" == "")' + "$n" + ' #set($theme = {"linkColor":'
+                              + '"#4791BC"})' + "$n" + '#end' + "$n" + '#set($userName = $xwiki.getUserName($xco'
                               + 'ntext.getUser(), false))' + "$n" + '#set($wikiName = $xwiki.getReques'
                               + 'tURL().replaceAll("http://([^/:]*).*$", "$1"))' + "$n" + '#set($guest'
                               + 'ActionsURL = $xwiki.getDocumentAsAuthor($config.get("guestsActionsPag'
@@ -426,14 +427,14 @@
                               + "$escapetool.getS()" + 'linkColor' + "$escapetool.getS()" + ');te'
                               + 'xt-decoration:none;")' + "$n" + '#set($bigText = "font-size:130%;")'
                               + "$n" + '#set($joinLink = "float:left;")' + "$n" + '#set($declineLink '
-                              + '= "color:#f88;float:right;")' + "$n$n" + '$msg.get("xe.invi'
+                              + '= "color:#f88;float:right;text-decoration:none;")' + "$n$n" + '$msg.get("xe.invi'
                               + 'tation.emailContent.userHasInvitedYouToJoinWiki", [$userName, $wikiNa'
                               + 'me])' + "$n$n" + '{{html clean=false}}' + "$n" + '#if("$!me'
                               + 'ssageBody" != "")' + "$n" + '  &lt;p style="$bigText"&gt;' + "$n" + '  $!'
                               + 'escapetool.html($!messageBody)' + "$n" + '  &lt;/p&gt;' + "$n" + '#end'
                               + "$n" + '&lt;br/&gt;&lt;br/&gt;' + "$n" + '&lt;a href="${guestActionsURL}?doAction_ac'
-                              + 'cept=y&amp;messageID=$messageID" style="$bigText$joinLink"&gt;' + "$n" + ' $'
-                              + 'msg.get("xe.invitation.emailContent.joinLink")' + "$n" + '&lt;/a&gt;'
+                              + 'cept=y&amp;messageID=$messageID" style="$bigText$joinLink$linkStyle"&gt;' + "$n"
+                              + '$msg.get("xe.invitation.emailContent.joinLink")' + "$n" + '&lt;/a&gt;'
                               + "$n" + '&lt;a href="${guestActionsURL}?doAction_decline=y&amp;messageID=$mes'
                               + 'sageID" style="$bigText$declineLink"&gt;' + "$n" + ' $msg.get("xe.invita'
                               + 'tion.emailContent.declineLink")' + "$n" + '&lt;/a&gt;' + "$n" + '&lt;hr style='
@@ -468,8 +469,8 @@
     #set($configDoc = $xwiki.getDocumentAsAuthor($configDocNameInternal))
     ## If no configuration document exists, create one and save it.
     #if($configDoc.isNew())
-      #set($configDocContent = '{{velo' + 'city}}{{info}}$msg.get("xe.invitation.configInfo"){{/info}}{{/velo' 
-                + 'city}}')
+      #set($configDocContent = '{{velo' + 'city}}{{info}}$msg.get("xe.invitation.internalDocument", ["'
+                               + "$configDocNameInternal" + '"]){{/info}}{{/velo' + 'city}}')
       $configDoc.setContent($configDocContent)
       #set($configObj = $configDoc.newObject($configClassNameInternal))
       #foreach($key in $config.keySet())
@@ -556,8 +557,8 @@
   ## If this doesn't already exist, it's created.
   #set($emailContainer = $xwiki.getDocumentAsAuthor($config.get('emailContainer')))
   #if($emailContainer.isNew())
-    #set($emailContainerContent = '{{velo' + 'city}}{{info}}$msg.get("xe.invitation.emailContainerInfo"){{/info}}{{/velo'
-                + 'city}}')
+    #set($emailContainerContent = '{{velo' + 'city}}{{info}}$msg.get("xe.invitation.internalDocument", ["'
+                                  + "$config.get('emailContainer')" + '"]){{/info}}{{/velo' + 'city}}')
     #set($discard = $emailContainer.setContent($emailContainerContent))
   #end
   ##

@@ -690,26 +690,26 @@ $xwiki.get('ssx').use($config.get('commonPage'))
   ##
   ## If parameters are set in the local config, use them, otherwise use global defaults.
   #set($senderConfig = $sender.createMailConfiguration($xwiki))
-  #if($config.containsKey('smtp_server'))
+  #if("$!config.get('smtp_server')" != '')
     $senderConfig.setHost($config.get('smtp_server'))##
   #end
-  #if($config.containsKey('smtp_port'))
+  #if("$!config.get('smtp_port')" != '')
     $senderConfig.setPort($mathtool.toInteger($config.get('smtp_port')))##
   #end
-  #if($config.containsKey('smtp_server_username'))
+  #if("$!config.get('smtp_server_username')" != '')
     $senderConfig.setSmtpUsername($config.get('smtp_server_username'))##
   #end
-  #if($config.containsKey('smtp_server_password'))
+  #if("$config.containsKey('smtp_server_password')" != '')
     $senderConfig.setSmtpPassword($config.get('smtp_server_password'))##
   #end
-  #if($config.containsKey('javamail_extra_props'))
+  #if("$config.containsKey('javamail_extra_props')" != '')
     $senderConfig.setExtraProperties($config.get('javamail_extra_props'))##
   #end
   ##
   #foreach($message in $messages)
     #set($mailObj = $sender.createMail())
     ##
-    #if($config.containsKey('from_address'))
+    #if("$config.get('from_address')" != '')
       $mailObj.setFrom($config.get('from_address'))##
     #end
     ##

@@ -558,9 +558,17 @@ public interface DocumentAccessBridge
     /**
      * Utility method to retrieve the current user.
      * 
-     * @return The current user.
+     * @return the current user.
      */
     String getCurrentUser();
+
+    /**
+     * Utility method to set the current user.
+     * 
+     * @param userName the current user
+     * @since 2.4M2
+     */
+    void setCurrentUser(String userName);
 
     /**
      * @return The default encoding for the current wiki.

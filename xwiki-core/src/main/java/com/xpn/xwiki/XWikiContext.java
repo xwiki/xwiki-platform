@@ -66,7 +66,11 @@ public class XWikiContext extends Hashtable<Object, Object>
     public static final int MODE_GWT_DEBUG = 6;
 
     public static final String EXECUTIONCONTEXT_KEY = "xwikicontext";
+    
+    private static final String WIKI_KEY = "wiki";
 
+    private static final String ORIGINAL_WIKI_KEY = "originalWiki";
+    
     private boolean finished = false;
 
     private XWiki wiki;
@@ -83,11 +87,7 @@ public class XWikiContext extends Hashtable<Object, Object>
 
     private String orig_database;
 
-    private static final String ORIGINAL_WIKI_KEY = "originalWiki";
-
     private String database;
-
-    private static final String WIKI_KEY = "wiki";
 
     private XWikiUser user;
 
@@ -133,7 +133,7 @@ public class XWikiContext extends Hashtable<Object, Object>
      */
     private DocumentReferenceResolver currentMixedDocumentReferenceResolver =
         Utils.getComponent(DocumentReferenceResolver.class, "currentmixed");
-    
+
     public XWikiContext()
     {
     }
@@ -207,18 +207,62 @@ public class XWikiContext extends Hashtable<Object, Object>
     {
         this.database = database;
         if (database == null) {
-            remove(WIKI_KEY);
+            super.remove(WIKI_KEY);
         } else {
-            put(WIKI_KEY, database);
+            super.put(WIKI_KEY, database);
         }
         if (this.orig_database == null) {
             this.orig_database = database;
             if (database == null) {
-                remove(ORIGINAL_WIKI_KEY);
+                super.remove(ORIGINAL_WIKI_KEY);
             } else {
-                put(ORIGINAL_WIKI_KEY, database);
+                super.put(ORIGINAL_WIKI_KEY, database);
             }
         }
+    }
+
+    /**
+     * {@inheritDoc}
+     * <p>
+     * Make sure to keep {@link #database} field and map synchronized.
+     * 
+     * @see java.util.Hashtable#put(java.lang.Object, java.lang.Object)
+     */
+    @Override
+    public synchronized Object put(Object key, Object value)
+    {
+        Object previous;
+        
+        if (WIKI_KEY.equals(key)) {
+            previous = get(WIKI_KEY);
+            setDatabase((String)value);
+        } else {
+            previous = super.put(key, value);
+        }
+        
+        return previous;
+    }
+    
+    /**
+     * {@inheritDoc}
+     * <p>
+     * Make sure to keep {@link #database} field and map synchronized.
+     * 
+     * @see java.util.Hashtable#remove(java.lang.Object)
+     */
+    @Override
+    public synchronized Object remove(Object key)
+    {
+        Object previous;
+        
+        if (WIKI_KEY.equals(key)) {
+            previous = get(WIKI_KEY);
+            setDatabase(null);
+        } else {
+            previous = super.remove(key);
+        }
+        
+        return previous;
     }
 
     public String getOriginalDatabase()
@@ -280,7 +324,7 @@ public class XWikiContext extends Hashtable<Object, Object>
 
     public void setUser(String user)
     {
-        this.user = new XWikiUser(user);
+        setUser(user, false);
     }
 
     public String getUser()

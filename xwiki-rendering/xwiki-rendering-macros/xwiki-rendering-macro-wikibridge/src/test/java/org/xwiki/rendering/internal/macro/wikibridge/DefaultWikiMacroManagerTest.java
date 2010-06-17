@@ -24,13 +24,13 @@ import java.util.ArrayList;
 import org.jmock.Expectations;
 import org.jmock.Mockery;
 import org.junit.Assert;
+import org.junit.Before;
 import org.xwiki.bridge.DocumentAccessBridge;
-import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.component.descriptor.DefaultComponentDescriptor;
-import org.xwiki.rendering.internal.macro.wikibridge.DefaultWikiMacro;
+import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.rendering.macro.Macro;
-import org.xwiki.rendering.macro.MacroManager;
 import org.xwiki.rendering.macro.MacroId;
+import org.xwiki.rendering.macro.MacroManager;
 import org.xwiki.rendering.macro.descriptor.DefaultContentDescriptor;
 import org.xwiki.rendering.macro.wikibridge.WikiMacroDescriptor;
 import org.xwiki.rendering.macro.wikibridge.WikiMacroException;
@@ -71,11 +71,18 @@ public class DefaultWikiMacroManagerTest extends AbstractComponentTestCase
             new DefaultComponentDescriptor<DocumentAccessBridge>();
         descriptorDAB.setRole(DocumentAccessBridge.class);
         getComponentManager().registerComponent(descriptorDAB, this.mockDocumentAccessBridge);
+    }
+
+    @Before
+    @Override
+    public void setUp() throws Exception
+    {
+        super.setUp();
 
         this.macroManager = getComponentManager().lookup(MacroManager.class);
         this.wikiMacroManager = getComponentManager().lookup(WikiMacroManager.class);
     }
-
+    
     @org.junit.Test
     public void testRegisterWikiMacroWhenGlobalVisibilityAndAllowed() throws Exception
     {

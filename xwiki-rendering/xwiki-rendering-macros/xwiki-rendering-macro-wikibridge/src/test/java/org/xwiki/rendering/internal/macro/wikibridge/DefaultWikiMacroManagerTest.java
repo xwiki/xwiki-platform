@@ -92,6 +92,7 @@ public class DefaultWikiMacroManagerTest extends AbstractComponentTestCase
         mockery.checking(new Expectations() {{
             allowing(mockDocumentAccessBridge).getCurrentWiki(); will(returnValue("wiki"));
             allowing(mockDocumentAccessBridge).getCurrentUser(); will(returnValue("dummy"));
+            allowing(mockDocumentAccessBridge).setCurrentUser("dummy");
             allowing(mockDocumentAccessBridge).hasProgrammingRights(); will(returnValue(true));
         }});
 

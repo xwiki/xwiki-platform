@@ -1,18 +1,32 @@
+/*
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+ */
 package com.xpn.xwiki.internal;
 
-import org.hibernate.HibernateException;
 import org.jmock.Expectations;
-import org.jmock.Mockery;
-import org.jmock.lib.legacy.ClassImposteriser;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
-import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.observation.EventListener;
-import org.xwiki.observation.ObservationManager;
 import org.xwiki.observation.event.DocumentSaveEvent;
 import org.xwiki.rendering.macro.Macro;
 import org.xwiki.rendering.macro.wikibridge.WikiMacroManager;
@@ -25,6 +39,11 @@ import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.test.AbstractBridgedComponentTestCase;
 import com.xpn.xwiki.user.api.XWikiRightService;
 
+/**
+ * Various general tests on wiki macros.
+ * 
+ * @version $Id$
+ */
 public class WikiMacrosTest extends AbstractBridgedComponentTestCase
 {
     private WikiMacroManager macroManager;
@@ -85,22 +104,29 @@ public class WikiMacrosTest extends AbstractBridgedComponentTestCase
     {
         final DocumentSaveEvent documentSaveEvent = new DocumentSaveEvent("wiki.Space.Name");
 
-        getMockery().checking(new Expectations() {{
-            allowing(xwiki).getDocument(with(equal(macroDocument.getDocumentReference())), with(any(XWikiContext.class))); will(returnValue(macroDocument));
-            allowing(rightService).hasAccessLevel(with(any(String.class)), with(any(String.class)), with(any(String.class)), with(any(XWikiContext.class))); will(returnValue(true));
-        }});
-        
+        getMockery().checking(new Expectations()
+        {
+            {
+                allowing(xwiki).getDocument(with(equal(macroDocument.getDocumentReference())),
+                    with(any(XWikiContext.class)));
+                will(returnValue(macroDocument));
+                allowing(rightService).hasAccessLevel(with(any(String.class)), with(any(String.class)),
+                    with(any(String.class)), with(any(XWikiContext.class)));
+                will(returnValue(true));
+            }
+        });
+
         this.macroObject.setStringValue("visibility", "Current Wiki");
-        
+
         this.wikiMacroEventListener.onEvent(documentSaveEvent, this.macroDocument, getContext());
-        
+
         Macro testMacro = getWikiComponentManager().lookup(Macro.class, "macroid");
-        
+
         Assert.assertEquals("macroid", testMacro.getDescriptor().getId().getId());
-        
+
         try {
             testMacro = getComponentManager().lookup(Macro.class, "macroid");
-        
+
             Assert.fail("Found macro with wiki visibility in global componenet manager");
         } catch (ComponentLookupException expected) {
         }
@@ -110,20 +136,27 @@ public class WikiMacrosTest extends AbstractBridgedComponentTestCase
     public void testUnRegisterWikiMacroWithDifferentVisibilityKeys() throws Exception
     {
         final DocumentSaveEvent documentSaveEvent = new DocumentSaveEvent("wiki.Space.Name");
-        
-        getMockery().checking(new Expectations() {{
-            allowing(xwiki).getDocument(with(equal(macroDocument.getDocumentReference())), with(any(XWikiContext.class))); will(returnValue(macroDocument));
-            allowing(rightService).hasAccessLevel(with(any(String.class)), with(any(String.class)), with(any(String.class)), with(any(XWikiContext.class))); will(returnValue(true));
-        }});
-        
+
+        getMockery().checking(new Expectations()
+        {
+            {
+                allowing(xwiki).getDocument(with(equal(macroDocument.getDocumentReference())),
+                    with(any(XWikiContext.class)));
+                will(returnValue(macroDocument));
+                allowing(rightService).hasAccessLevel(with(any(String.class)), with(any(String.class)),
+                    with(any(String.class)), with(any(XWikiContext.class)));
+                will(returnValue(true));
+            }
+        });
+
         this.macroObject.setStringValue("visibility", "Current User");
 
         getContext().setUser("XWiki.user");
-        
+
         this.wikiMacroEventListener.onEvent(documentSaveEvent, this.macroDocument, getContext());
-        
+
         Macro testMacro = getUserComponentManager().lookup(Macro.class, "macroid");
-        
+
         Assert.assertEquals("macroid", testMacro.getDescriptor().getId().getId());
 
         // register with another user
@@ -131,17 +164,17 @@ public class WikiMacrosTest extends AbstractBridgedComponentTestCase
         getContext().setUser("XWiki.user2");
 
         this.wikiMacroEventListener.onEvent(documentSaveEvent, this.macroDocument, getContext());
-        
+
         testMacro = getUserComponentManager().lookup(Macro.class, "macroid");
-        
+
         Assert.assertEquals("macroid", testMacro.getDescriptor().getId().getId());
-        
+
         // validate that the macro as been properly unregistered for former user
         getContext().setUser("XWiki.user");
 
         try {
             testMacro = getUserComponentManager().lookup(Macro.class, "macroid");
-        
+
             Assert.fail("The macro has not been properly unregistered");
         } catch (ComponentLookupException expected) {
         }

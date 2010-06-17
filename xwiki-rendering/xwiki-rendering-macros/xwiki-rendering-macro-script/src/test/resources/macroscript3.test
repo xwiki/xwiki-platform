@@ -1,52 +1,27 @@
 .#-----------------------------------------------------
 .input|xwiki/2.0
-.# Validate wiki=false option
+.# Validate that inner macro is transformed also
 .#-----------------------------------------------------
 {{script}}
-**bold**
+{{script}}
+script here
 {{/script}}
-
-{{script wiki=false}}
-**not bold**
 {{/script}}
-
-{{script}}**bold**{{/script}}{{script wiki=false}}**not bold**{{/script}}
 .#-----------------------------------------------------
 .expect|event/1.0
 .#-----------------------------------------------------
 beginDocument
-beginMacroMarkerStandalone [script] [] [**bold**]
+beginMacroMarkerStandalone [script] [] [{{script}}
+script here
+{{/script}}]
+beginMacroMarkerStandalone [script] [] [script here]
 beginParagraph
-beginFormat [BOLD]
-onWord [bold]
-endFormat [BOLD]
-endParagraph
-endMacroMarkerStandalone [script] [] [**bold**]
-beginMacroMarkerStandalone [script] [wiki=false] [**not bold**]
-beginParagraph
-onSpecialSymbol [*]
-onSpecialSymbol [*]
-onWord [not]
+onWord [script]
 onSpace
-onWord [bold]
-onSpecialSymbol [*]
-onSpecialSymbol [*]
+onWord [here]
 endParagraph
-endMacroMarkerStandalone [script] [wiki=false] [**not bold**]
-beginParagraph
-beginMacroMarkerInline [script] [] [**bold**]
-beginFormat [BOLD]
-onWord [bold]
-endFormat [BOLD]
-endMacroMarkerInline [script] [] [**bold**]
-beginMacroMarkerInline [script] [wiki=false] [**not bold**]
-onSpecialSymbol [*]
-onSpecialSymbol [*]
-onWord [not]
-onSpace
-onWord [bold]
-onSpecialSymbol [*]
-onSpecialSymbol [*]
-endMacroMarkerInline [script] [wiki=false] [**not bold**]
-endParagraph
+endMacroMarkerStandalone [script] [] [script here]
+endMacroMarkerStandalone [script] [] [{{script}}
+script here
+{{/script}}]
 endDocument

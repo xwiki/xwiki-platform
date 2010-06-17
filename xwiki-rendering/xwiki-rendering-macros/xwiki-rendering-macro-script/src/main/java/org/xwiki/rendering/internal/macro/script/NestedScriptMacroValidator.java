@@ -40,18 +40,21 @@ import org.xwiki.rendering.transformation.MacroTransformationContext;
 @Component("nested")
 public class NestedScriptMacroValidator<P extends ScriptMacroParameters> implements ScriptMacroValidator<P>
 {
-    /** Used to get a macro by id. */
+    /**
+     * Used to find the type of a Macro defined by a Macro Marker block; we're interested to prevent nested scripts
+     * only in Script macros. 
+     */
     @Requirement
     private MacroManager macroManager;
 
     /**
      * {@inheritDoc}
-     * @see ScriptMacroValidator#validate(P, String, MacroTransformationContext)
+     * @see ScriptMacroValidator#validate 
      */
     public void validate(P parameters, String content, MacroTransformationContext context) 
         throws MacroExecutionException
     {
-        // traverse the XDOM tree up to the root
+        // Traverse the XDOM tree up to the root
         MacroMarkerBlock parent = context.getCurrentMacroBlock().getParentBlockByType(MacroMarkerBlock.class);
         while (parent != null) {
             String parentId = parent.getId();
@@ -59,11 +62,11 @@ public class NestedScriptMacroValidator<P extends ScriptMacroParameters> impleme
                 if (macroManager.getMacro(new MacroId(parentId)) instanceof ScriptMacro) {
                     throw new MacroExecutionException("Nested scripts are not allowed");
                 } else if ("include".equals(parentId)) {
-                    // included documents intercept the chain of nested script macros with XWiki syntax
+                    // Included documents intercept the chain of nested script macros with XWiki syntax
                     return;
                 }
             } catch (MacroLookupException exception) {
-                // shouldn't happen, the parent macro was already successfully executed earlier
+                // Shouldn't happen, the parent macro was already successfully executed earlier
             }
             parent = parent.getParentBlockByType(MacroMarkerBlock.class);
         }

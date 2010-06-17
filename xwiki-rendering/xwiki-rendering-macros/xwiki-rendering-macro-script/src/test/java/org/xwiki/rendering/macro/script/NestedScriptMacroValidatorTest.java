@@ -25,7 +25,6 @@ import java.util.LinkedList;
 import java.util.Map;
 
 import org.jmock.Expectations;
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.xwiki.rendering.block.Block;
@@ -42,9 +41,8 @@ import org.xwiki.rendering.transformation.MacroTransformationContext;
 import org.xwiki.test.AbstractMockingComponentTest;
 import org.xwiki.test.annotation.ComponentTest;
 
-
 /**
- * Tests nested script macro validator.
+ * Unit tests for {@link org.xwiki.rendering.internal.macro.script.NestedScriptMacroValidator}.
  * 
  * @version $Id$
  * @since 2.4M2
@@ -52,7 +50,7 @@ import org.xwiki.test.annotation.ComponentTest;
 @ComponentTest(value = NestedScriptMacroValidator.class)
 public class NestedScriptMacroValidatorTest extends AbstractMockingComponentTest
 {
-    /** Nested script validator to test. */
+    /** Nested script validator under test. */
     private ScriptMacroValidator<?> validator;
 
     /**
@@ -64,7 +62,7 @@ public class NestedScriptMacroValidatorTest extends AbstractMockingComponentTest
     {
         super.setUp();
 
-        // fake macro manager returns a script macro for "script" and null else
+        // Mock macro manager returns a script macro for "script" and null otherwise.
         final MacroManager macroManager = getComponentManager().lookup(MacroManager.class);
         final ScriptMacro scriptMacro = new DefaultScriptMacro();
         getMockery().checking(new Expectations() {{
@@ -77,39 +75,25 @@ public class NestedScriptMacroValidatorTest extends AbstractMockingComponentTest
         this.validator = getComponentManager().lookup(ScriptMacroValidator.class, "nested");
     }
 
-    @Test
-    public void testNoNestedScript()
+    @Test(expected = MacroExecutionException.class)
+    public void testNoNestedScript() throws Exception
     {
         MacroTransformationContext context = buildContext("script", "script");
-        try {
-            validator.validate(null, null, context);
-            Assert.fail("Nested scripts are allowed");
-        } catch (MacroExecutionException exception) {
-            // expected
-        }
+        this.validator.validate(null, null, context);
     }
 
-    @Test
-    public void testNoNestedScriptInHtml()
+    @Test(expected = MacroExecutionException.class)
+    public void testNoNestedScriptInHtml() throws Exception
     {
         MacroTransformationContext context = buildContext("script", "html", "script");
-        try {
-            validator.validate(null, null, context);
-            Assert.fail("Nested scripts are allowed inside HTML macro");
-        } catch (MacroExecutionException exception) {
-            // expected
-        }
+        this.validator.validate(null, null, context);
     }
 
     @Test
-    public void testIncludeInterceptsNestedChain()
+    public void testIncludeInterceptsNestedChain() throws Exception
     {
         MacroTransformationContext context = buildContext("script", "include", "script");
-        try {
-            validator.validate(null, null, context);
-        } catch (MacroExecutionException exception) {
-            Assert.fail("Nested scripts are forbidden inside include macro");
-        }
+        this.validator.validate(null, null, context);
     }
 
     /**

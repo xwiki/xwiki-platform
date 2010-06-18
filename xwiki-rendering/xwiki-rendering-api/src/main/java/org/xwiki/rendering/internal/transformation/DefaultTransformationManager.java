@@ -27,15 +27,17 @@ import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.Requirement;
 import org.xwiki.component.phase.Initializable;
 import org.xwiki.component.phase.InitializationException;
+import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.block.XDOM;
 import org.xwiki.rendering.syntax.Syntax;
-import org.xwiki.rendering.transformation.TransformationManager;
 import org.xwiki.rendering.transformation.Transformation;
+import org.xwiki.rendering.transformation.TransformationContext;
 import org.xwiki.rendering.transformation.TransformationException;
+import org.xwiki.rendering.transformation.TransformationManager;
 
 /**
- * Calls all existing transformations (executed by priority) on an existing XDOM object to generate a new 
- * transformed XDOM.
+ * Calls all existing transformations (executed by priority) on an existing XDOM object to generate a new transformed
+ * XDOM.
  * 
  * @version $Id$
  * @since 1.5M2
@@ -68,8 +70,19 @@ public class DefaultTransformationManager implements TransformationManager, Init
      */
     public void performTransformations(XDOM dom, Syntax syntax) throws TransformationException
     {
+        performTransformations(dom, new TransformationContext(dom, syntax));
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see org.xwiki.rendering.transformation.TransformationManager#performTransformations(org.xwiki.rendering.block.Block,
+     *      org.xwiki.rendering.transformation.TransformationContext)
+     */
+    public void performTransformations(Block block, TransformationContext context) throws TransformationException
+    {
         for (Transformation transformation : this.transformations) {
-            transformation.transform(dom, syntax);
+            transformation.transform(block, context);
         }
     }
 }

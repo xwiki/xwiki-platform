@@ -29,6 +29,7 @@ import org.jmock.cglib.MockObjectTestCase;
 import java.io.StringReader;
 import org.xwiki.rendering.block.XDOM;
 import org.xwiki.rendering.renderer.BlockRenderer;
+import org.xwiki.rendering.transformation.TransformationContext;
 import org.xwiki.rendering.transformation.TransformationManager;
 
 /**
@@ -70,7 +71,8 @@ public class RenderingTestCase extends MockObjectTestCase
         if (this.runTransformations) {
             SyntaxFactory syntaxFactory = getComponentManager().lookup(SyntaxFactory.class);
             TransformationManager transformationManager = getComponentManager().lookup(TransformationManager.class);
-            transformationManager.performTransformations(xdom, syntaxFactory.createSyntaxFromIdString(this.parserId));
+            TransformationContext txContext = new TransformationContext(xdom, syntaxFactory.createSyntaxFromIdString(this.parserId));
+            transformationManager.performTransformations(xdom, txContext);
         }
 
         BlockRenderer renderer = getComponentManager().lookup(BlockRenderer.class, this.targetSyntaxId);

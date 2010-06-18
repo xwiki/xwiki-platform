@@ -46,11 +46,12 @@ import org.xwiki.rendering.macro.MacroManager;
 import org.xwiki.rendering.syntax.Syntax;
 import org.xwiki.rendering.transformation.AbstractTransformation;
 import org.xwiki.rendering.transformation.MacroTransformationContext;
+import org.xwiki.rendering.transformation.TransformationContext;
 import org.xwiki.rendering.transformation.TransformationException;
 
 /**
- * Look for all {@link org.xwiki.rendering.block.MacroBlock} blocks in the passed Document and iteratively execute each
- * Macro in the correct order. Macros can:
+ * Look for all {@link org.xwiki.rendering.block.MacroBlock} blocks in the passed {@link Block} and iteratively execute
+ * each Macro in the correct order. Macros can:
  * <ul>
  * <li>provide a hint specifying when they should run (priority)</li>
  * <li>generate other Macros</li>
@@ -106,28 +107,37 @@ public class MacroTransformation extends AbstractTransformation
      */
     public void transform(XDOM dom, Syntax syntax) throws TransformationException
     {
+        transform(dom, new TransformationContext(dom, syntax));
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see org.xwiki.rendering.transformation.Transformation#transform(org.xwiki.rendering.block.Block,
+     *      org.xwiki.rendering.transformation.TransformationContext)
+     */
+    public void transform(Block rootBlock, TransformationContext context) throws TransformationException
+    {
         // Create a macro execution context with all the information required for macros.
-        MacroTransformationContext context = new MacroTransformationContext();
-        context.setXDOM(dom);
-        context.setMacroTransformation(this);
-        context.setSyntax(syntax);
+        MacroTransformationContext macroContext = new MacroTransformationContext(context);
+        macroContext.setTransformation(this);
 
         // Counter to prevent infinite recursion if a macro generates the same macro for example.
         int executions = 0;
-        List<MacroBlock> macroBlocks = dom.getChildrenByType(MacroBlock.class, true);
+        List<MacroBlock> macroBlocks = rootBlock.getChildrenByType(MacroBlock.class, true);
         while (!macroBlocks.isEmpty() && executions < this.maxMacroExecutions) {
-            transformOnce(context, syntax);
+            transformOnce(rootBlock, macroContext, context.getSyntax());
 
             // TODO: Make this less inefficient by caching the blocks list.
-            macroBlocks = dom.getChildrenByType(MacroBlock.class, true);
+            macroBlocks = rootBlock.getChildrenByType(MacroBlock.class, true);
             executions++;
         }
     }
 
-    private void transformOnce(MacroTransformationContext context, Syntax syntax)
+    private void transformOnce(Block rootBlock, MacroTransformationContext context, Syntax syntax)
     {
         // 1) Get highest priority macro to execute
-        MacroHolder macroHolder = getHighestPriorityMacro(context.getXDOM(), syntax);
+        MacroHolder macroHolder = getHighestPriorityMacro(rootBlock, syntax);
         if (macroHolder == null) {
             return;
         }
@@ -199,12 +209,12 @@ public class MacroTransformation extends AbstractTransformation
     /**
      * @return the macro with the highest priority for the passed syntax or null if no macro is found
      */
-    private MacroHolder getHighestPriorityMacro(XDOM xdom, Syntax syntax)
+    private MacroHolder getHighestPriorityMacro(Block rootBlock, Syntax syntax)
     {
         List<MacroHolder> macroHolders = new ArrayList<MacroHolder>();
 
         // 1) Sort the macros by priority to find the highest priority macro to execute
-        for (MacroBlock macroBlock : xdom.getChildrenByType(MacroBlock.class, true)) {
+        for (MacroBlock macroBlock : rootBlock.getChildrenByType(MacroBlock.class, true)) {
             try {
                 Macro< ? > macro = this.macroManager.getMacro(new MacroId(macroBlock.getId(), syntax));
                 macroHolders.add(new MacroHolder(macro, macroBlock));

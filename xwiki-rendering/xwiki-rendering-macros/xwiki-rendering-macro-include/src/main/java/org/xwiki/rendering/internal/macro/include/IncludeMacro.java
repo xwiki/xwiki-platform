@@ -36,7 +36,6 @@ import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.block.LinkBlock;
 import org.xwiki.rendering.block.XDOM;
-import org.xwiki.rendering.internal.transformation.MacroTransformation;
 import org.xwiki.rendering.listener.Link;
 import org.xwiki.rendering.listener.LinkType;
 import org.xwiki.rendering.macro.AbstractMacro;
@@ -45,6 +44,7 @@ import org.xwiki.rendering.macro.include.IncludeMacroParameters;
 import org.xwiki.rendering.macro.include.IncludeMacroParameters.Context;
 import org.xwiki.rendering.parser.Parser;
 import org.xwiki.rendering.transformation.MacroTransformationContext;
+import org.xwiki.rendering.transformation.Transformation;
 
 /**
  * @version $Id$
@@ -177,7 +177,7 @@ public class IncludeMacro extends AbstractMacro<IncludeMacroParameters>
         // should be executed by the currently running Macro Transformation.
         if (actualContext == Context.NEW) {
             result =
-                executeWithNewContext(documentName, includedContent, includedSyntax, context.getMacroTransformation());
+                executeWithNewContext(documentName, includedContent, includedSyntax, context.getTransformation());
         } else {
             result = executeWithCurrentContext(documentName, includedContent, includedSyntax);
         }
@@ -211,7 +211,7 @@ public class IncludeMacro extends AbstractMacro<IncludeMacroParameters>
      * @throws MacroExecutionException error when parsing content.
      */
     private List<Block> executeWithNewContext(String includedDocumentName, String includedContent,
-        String includedSyntax, MacroTransformation macroTransformation) throws MacroExecutionException
+        String includedSyntax, Transformation macroTransformation) throws MacroExecutionException
     {
         List<Block> result;
 
@@ -267,7 +267,7 @@ public class IncludeMacro extends AbstractMacro<IncludeMacroParameters>
      * @throws MacroExecutionException error when parsing content.
      */
     private List<Block> generateIncludedPageDOM(String includedDocumentName, String includedContent,
-        String includedSyntax, MacroTransformation macroTransformation) throws MacroExecutionException
+        String includedSyntax, Transformation macroTransformation) throws MacroExecutionException
     {
         XDOM includedDom;
         try {

@@ -19,9 +19,8 @@
  */
 package org.xwiki.rendering.transformation;
 
-import org.xwiki.rendering.block.XDOM;
 import org.xwiki.rendering.block.MacroBlock;
-import org.xwiki.rendering.internal.transformation.MacroTransformation;
+import org.xwiki.rendering.block.XDOM;
 import org.xwiki.rendering.syntax.Syntax;
 
 /**
@@ -33,14 +32,14 @@ import org.xwiki.rendering.syntax.Syntax;
 public class MacroTransformationContext
 {
     /**
+     * The context of the transformation process.
+     */
+    private TransformationContext transformationContext;
+
+    /**
      * The macro currently being processed.
      */
     private MacroBlock currentMacroBlock;
-
-    /**
-     * The complete {@link XDOM} of the page currently being transformed.
-     */
-    private XDOM xdom;
 
     /**
      * Whether the macro is called in inline mode or not.
@@ -48,14 +47,37 @@ public class MacroTransformationContext
     private boolean isInline;
 
     /**
-     * See {@link #getMacroTransformation()}.
+     * See {@link #getTransformation()}.
      */
-    private MacroTransformation macroTransformation;
+    private Transformation transformation;
 
     /**
-     * The current syntax.
+     * Constructor.
      */
-    private Syntax syntax;
+    public MacroTransformationContext()
+    {
+        this.transformationContext = new TransformationContext();
+    }
+
+    /**
+     * Constructor.
+     * 
+     * @param transformationContext the context of the transformation process.
+     * @since 2.4M1
+     */
+    public MacroTransformationContext(TransformationContext transformationContext)
+    {
+        this.transformationContext = transformationContext;
+    }
+
+    /**
+     * @return the context of the transformation process.
+     * @since 2.4M1
+     */
+    public TransformationContext getTransformationContext()
+    {
+        return this.transformationContext;
+    }
 
     /**
      * @param currentMacroBlock the macro currently being processed.
@@ -78,7 +100,7 @@ public class MacroTransformationContext
      */
     public void setXDOM(XDOM xdom)
     {
-        this.xdom = xdom;
+        this.transformationContext.setXDOM(xdom);
     }
 
     /**
@@ -86,7 +108,7 @@ public class MacroTransformationContext
      */
     public XDOM getXDOM()
     {
-        return this.xdom;
+        return this.transformationContext.getXDOM();
     }
 
     /**
@@ -106,22 +128,24 @@ public class MacroTransformationContext
     }
 
     /**
-     * @param macroTransformation the macro transformation being used
-     * @see #getMacroTransformation()
+     * @param transformation the Transformation being used
+     * @see #getTransformation()
+     * @since 2.4M1
      */
-    public void setMacroTransformation(MacroTransformation macroTransformation)
+    public void setTransformation(Transformation transformation)
     {
-        this.macroTransformation = macroTransformation;
+        this.transformation = transformation;
     }
 
     /**
-     * @return the current Macro Transformation instance being executed. Useful for Macros which need to perform other
-     *         transformations in turn such as the Include macro which needs to execute Macro transformation if the
+     * @return the current Transformation instance being executed. Useful for Macros which need to perform other
+     *         transformations in turn such as the Include macro which needs to execute the transformation if the
      *         included page should be executed in its own context.
+     * @since 2.4M1
      */
-    public MacroTransformation getMacroTransformation()
+    public Transformation getTransformation()
     {
-        return this.macroTransformation;
+        return this.transformation;
     }
 
     /**
@@ -129,7 +153,7 @@ public class MacroTransformationContext
      */
     public void setSyntax(Syntax syntax)
     {
-        this.syntax = syntax;
+        this.transformationContext.setSyntax(syntax);
     }
 
     /**
@@ -137,6 +161,6 @@ public class MacroTransformationContext
      */
     public Syntax getSyntax()
     {
-        return syntax;
+        return this.transformationContext.getSyntax();
     }
 }

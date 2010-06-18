@@ -111,7 +111,7 @@ public class IncludeMacroTest extends AbstractComponentTestCase
         MacroTransformation macroTransformation =
             (MacroTransformation) getComponentManager().lookup(Transformation.class, "macro");
         MacroTransformationContext context = new MacroTransformationContext();
-        context.setMacroTransformation(macroTransformation);
+        context.setTransformation(macroTransformation);
 
         List<Block> blocks = this.includeMacro.execute(parameters, null, context);
 

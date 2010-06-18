@@ -70,6 +70,7 @@ public class TransformationContext
      * @return an id representing the transformation being evaluated. It's a free form name that Transformations can
      *         use, for example if they need to perform some caching based on a key. For example the Velocity Macro
      *         is using this id to pass it to the underlying Velocity Engine so that it caches macros using this key. 
+     * @since 2.4M2
      */
     public String getId()
     {
@@ -78,6 +79,7 @@ public class TransformationContext
 
     /**
      * @param id see {@link #getId()}
+     * @since 2.4M2
      */
     public void setId(String id)
     {

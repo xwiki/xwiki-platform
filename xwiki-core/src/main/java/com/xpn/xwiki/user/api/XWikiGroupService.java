@@ -21,12 +21,14 @@
 
 package com.xpn.xwiki.user.api;
 
+import java.util.Collection;
+import java.util.List;
+
+import org.xwiki.model.reference.DocumentReference;
+
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
-
-import java.util.Collection;
-import java.util.List;
 
 /**
  * Interface giving access to users and groups management.
@@ -49,6 +51,9 @@ public interface XWikiGroupService
     @Deprecated
     public Collection<String> listGroupsForUser(String username, XWikiContext context) throws XWikiException;
 
+    /**
+     * Adding the user to the group cache.
+     */
     public void addUserToGroup(String user, String database, String group, XWikiContext context) throws XWikiException;
 
     /**
@@ -166,7 +171,7 @@ public interface XWikiGroupService
     int countAllMatchedGroups(Object[][] matchFields, XWikiContext context) throws XWikiException;
 
     /**
-     * Get all groups containing provided member.
+     * Get all groups containing provided member in the provided member wiki.
      * 
      * @param member the name of the member (user or group).
      * @param nb the maximum number of result to return.
@@ -178,6 +183,20 @@ public interface XWikiGroupService
      */
     public Collection<String> getAllGroupsNamesForMember(String member, int nb, int start, XWikiContext context)
         throws XWikiException;
+
+    /**
+     * Get all groups containing provided member in the current wiki.
+     * 
+     * @param memberReference the member. Can be either user or group.
+     * @param limit the maximum number of result to return.
+     * @param offset the index of the first found member to return.
+     * @param context the XWiki context.
+     * @return the {@link Collection} of {@link DocumentReference} containing representing groups.
+     * @throws XWikiException error when browsing groups.
+     * @since 2.4M2
+     */
+    public Collection<DocumentReference> getAllGroupsReferencesForMember(DocumentReference memberReference, int limit,
+        int offset, XWikiContext context) throws XWikiException;
 
     /**
      * Get all members provided group contains.

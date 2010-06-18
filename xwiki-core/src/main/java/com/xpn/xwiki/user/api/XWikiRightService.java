@@ -43,12 +43,22 @@ public interface XWikiRightService
      * The Guest username.
      */
     public static final String GUEST_USER = "XWikiGuest";
-    
+      
     /**
      * The Guest full name.
      */
     public static final String GUEST_USER_FULLNAME = "XWiki." + GUEST_USER;
 
+    /**
+     * The AllGroup username.
+     */
+    public static final String ALLGROUP_GROUP = "XWikiAllGroup";
+
+    /**
+     * The AllGroup full name.
+     */
+    public static final String ALLGROUP_GROUP_FULLNAME = "XWiki." + ALLGROUP_GROUP;
+    
     /**
      * Checks if the wiki current user has the right to execute (@code action} on the document {@code doc}, along with
      * redirecting to the login if it's not the case and there is no logged in user (the user is the guest user).

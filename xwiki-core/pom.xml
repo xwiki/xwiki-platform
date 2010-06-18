@@ -1426,9 +1426,9 @@
               <includes>
                 <include>**/api/**</include>
               </includes>
-              <exclude>
+              <excludes>
                 <exclude>com/xpn/xwiki/user/api/XWikiGroupService</exclude>
-              </exclude>
+              </excludes>
             </configuration>
           </plugin>
         </plugins>

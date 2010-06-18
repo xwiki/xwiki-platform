@@ -14,7 +14,7 @@
 <date>1271850308000</date>
 <contentUpdateDate>1271850308000</contentUpdateDate>
 <version>1.1</version>
-<title>$msg.get('xe.invitation.heading')</title>
+<title></title>
 <template></template>
 <defaultTemplate></defaultTemplate>
 <validationScript></validationScript>
@@ -545,6 +545,8 @@ $xwiki.get('ssx').use($config.get('commonPage'))
 ##
 ## Don't load comments, history, etc.
 #set($docextras = [])
+##
+#displayInvitationHeader($request.getParameterMap(), $config)
 ##
 ##---------------------------------------------------------------------
 ## Decide what we should do.

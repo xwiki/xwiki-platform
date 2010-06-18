@@ -335,4 +335,100 @@
     #end
   #end
 #end
+##
+#*
+ * Get a "breadcrumb trail" based on the way users are expected to navigate through the members' actions.
+ * Each entry in the list is a link except for the last (which is the page the user is currently on)
+ * output might look like ['[[Invitation]]', '[[My invitations]]', 'Invitations in this message group']
+ * * [[output]] denotes that the output is a link.
+ *
+ * $parameterMap (Map&lt;String, String&gt;) map obtained by calling getParameterMap on the servlet request object.
+ *
+ * $config (Map&lt;String, String&gt;) configuration for invitation application.
+ *
+ * $trail (List&lt;String&gt;) this list will be populated with entries into the breadcrumb trail.
+ *###
+#macro(getInvitationBreadcrumbTrail, $parameterMap, $config, $trail)
+  #if($parameterMap &amp;&amp; $parameterMap.get('inspect') &amp;&amp; $parameterMap.get('inspect').size() &gt; 0)
+    #set($inspect = $parameterMap.get('inspect').get(0))
+  #end
+  ##
+  #if($doc.getFullName() == $config.get('mainPage'))
+    ## Invitation
+    #set($discard = $trail.add($msg.get('xe.invitation.heading')))
+  #else
+    #set($discard = $trail.add("[[$msg.get('xe.invitation.heading')&gt;&gt;$config.get('mainPage')]]"))
+    #if($doc.getFullName() == $config.get('membersActionsPage'))
+      ##
+      ## Administration
+      #if($inspect.contains('AsAdmin'))
+        #if($inspect == 'allAsAdmin')
+          ## [[Invitation]]  --&gt;  All invitations
+          #set($discard = $trail.add($msg.get('xe.invitation.adminTools.allInvitationsLink')))
+        #else
+          #set($allAsAdminLink = "[[$msg.get('xe.invitation.adminTools.allInvitationsLink')&gt;&gt;"
+                                 + "$config.get('membersActionsPage')?inspect=allAsAdmin]]")
+          #set($discard = $trail.add($allAsAdminLink))
+          #if($inspect == 'groupAsAdmin')
+            ## [[Invitation]]  --&gt;  [[All invitations]]  --&gt;  Invitations in group
+            #set($discard = $trail.add($msg.get('xe.invitation.tools.invitationsInGroup')))
+          #elseif($inspect == 'historyAsAdmin')
+            ## [[Invitation]]  --&gt;  [[All invitations]]  --&gt;  [[Invitations in group]]  --&gt;  History of this invitation
+            #set($allInGroupAsAdminLink = "[[$msg.get('xe.invitation.tools.invitationsInGroup')&gt;&gt;"
+                                          + "$config.get('membersActionsPage')?inspect=groupAsAdmin&amp;"
+                                          + "messageID=$escapetool.xml($parameterMap.get('messageID').get(0))]]")
+            #set($discard = $trail.add($allInGroupAsAdminLink))
+            #set($discard = $trail.add($msg.get('xe.invitation.tools.invitationHistory')))
+          #end
+        #end
+      ##
+      ## For user.
+      #else
+        #if($inspect == 'all')
+          ## [[Invitation]] --&gt; My Invitations
+          #set($discard = $trail.add($msg.get('xe.invitation.tools.myInvitationsLink')))
+        #else
+          #set($myInvitationsLink = "[[$msg.get('xe.invitation.tools.myInvitationsLink')&gt;&gt;"
+                                    + "$config.get('membersActionsPage')?inspect=all]]")
+          #set($discard = $trail.add($myInvitationsLink))
+          #if($inspect == 'group')
+            #set($discard = $trail.add($msg.get('xe.invitation.tools.invitationsInGroup')))
+          #else
+            #set($myInvitationsinGroupLink = "[[$msg.get('xe.invitation.tools.invitationsInGroup')&gt;&gt;"
+                                             + "$config.get('membersActionsPage')?inspect=group&amp;amp;messageID="
+                                             + "$escapetool.xml($parameterMap.get('messageID').get(0))]]")
+            #set($discard = $trail.add($myInvitationsinGroupLink))
+            #if($inspect == 'history')
+              #set($discard = $trail.add($msg.get('xe.invitation.tools.invitationHistory')))
+            #end
+          #end
+        #end## If not inspect 'all'
+      #end## If not inspecting as admin
+    #end## If we're on InvitationMemberActions
+  #end## If we're not on the main page
+#end## Macro
+##
+#*
+ * Display the header for at the top of the page.
+ *
+ * $parameterMap (Map&lt;String, String&gt;) map obtained by calling getParameterMap on the servlet request object.
+ *
+ * $config (Map&lt;String, String&gt;) configuration for invitation application.
+ *###
+#macro(displayInvitationHeader, $parameterMap, $config)
+  #set($breadcrumbTrail = [])
+  #getInvitationBreadcrumbTrail($parameterMap, $config, $breadcrumbTrail)
+  #if($breadcrumbTrail.size() &gt; 0)
+    #if($breadcrumbTrail.size() &gt; 1)
+      #foreach($entry in $breadcrumbTrail)
+        #if($velocityCount &gt; 1)
+          #**#  &#187;  ##
+        #end
+        $entry##
+      #end
+    #end
+
+    = $breadcrumbTrail.get($mathtool.add($breadcrumbTrail.size(), -1)) =
+  #end
+#end
 {{/velocity}}</content></xwikidoc>

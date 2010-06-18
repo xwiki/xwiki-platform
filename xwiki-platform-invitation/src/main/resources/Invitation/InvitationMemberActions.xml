@@ -158,11 +158,6 @@ $xwiki.get('ssx').use($config.get('commonPage'))
 ## Don't load comments, history, etc.
 #set($docextras = [])
 ##
-#set($inspect = $request.getParameter('inspect'))
-## Decide what we should do.
-#if("$!inspect" != '')
-  #inspectMessages($mail, $inspect, $isAdmin, $request.getParameter('messageID'))
-#end
 #set($action = [])
 #getUserAction($request.getParameterMap(), $action)
 #if($action.size() &gt; 0)
@@ -176,6 +171,13 @@ $xwiki.get('ssx').use($config.get('commonPage'))
                                   $mail,
                                   $xwiki.getDocumentAsAuthor($config.get('emailContainer')))
   #inspectMessages($mail, $inspect, $isAdmin, $messageID)
+#else
+  ## Inspect messages without doing any action.
+  #set($inspect = $request.getParameter('inspect'))
+  #if("$!inspect" != '')
+    #displayInvitationHeader($request.getParameterMap(), $config)
+    #inspectMessages($mail, $inspect, $isAdmin, $request.getParameter('messageID'))
+  #end
 #end
 #invitationFooter($mail, $request.getParameterMap(), $isAdmin, $config)
 ##

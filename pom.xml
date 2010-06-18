@@ -134,5 +134,6 @@
     <module>xwiki-classloader</module>
     <module>xwiki-captcha</module>
     <module>xwiki-annotations</module>
+    <module>xwiki-management</module>
   </modules>
 </project>

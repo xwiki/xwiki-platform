@@ -17,29 +17,23 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.model;
+package org.xwiki.velocity.internal.jmx;
 
-import org.xwiki.component.annotation.ComponentRole;
-import org.xwiki.model.reference.EntityReference;
+import javax.management.openmbean.TabularData;
 
 /**
- * Allows accessing Model Objects for current objects (current document, current wiki, current space, etc) placed in the
- * Execution Context.
- * 
+ * MBean API related to Velocity Engines. Supports the following features:
+ * <ul>
+ *   <li>Retrieve list of template namespaces along with the name of macros registered in each template namespace</li>
+ * </ul>
+ *
  * @version $Id$
- * @since 2.2M1
+ * @since 2.3.2
  */
-@ComponentRole
-public interface ModelContext
+public interface JMXVelocityEngineMBean
 {
     /**
-     * @return the reference to the current entity located in the Execution Context or null if there's none
+     * @return the list of template namespaces along with the name of macros registered in each template namespace
      */
-    EntityReference getCurrentEntityReference();
-
-    /**
-     * @param entityReference the reference to the current entity located in the Execution Context
-     * @since 2.3.2
-     */
-    void setCurrentEntityReference(EntityReference entityReference);
+    TabularData getTemplates();
 }

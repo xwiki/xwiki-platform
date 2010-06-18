@@ -41,6 +41,11 @@ public class TransformationContext
     private Syntax syntax;
 
     /**
+     * @see #getId(). Note that the id is optional.
+     */
+    private String id;
+
+    /**
      * Default constructor that doesn't set the XDOM or the Syntax. This is because setting the XDOM and the Syntax is
      * optional and only required by some Macros to behave as expected.
      */
@@ -59,6 +64,26 @@ public class TransformationContext
     {
         setXDOM(xdom);
         setSyntax(syntax);
+    }
+
+    /**
+     * @return an id representing the transformation being evaluated. It's a free form name that Transformations can
+     *         use, for example if they need to perform some caching based on a key. For example the Velocity Macro
+     *         is using this id to pass it to the underlying Velocity Engine so that it caches macros using this key.
+     * @since 2.3.2
+     */
+    public String getId()
+    {
+        return this.id;
+    }
+
+    /**
+     * @param id see {@link #getId()}
+     * @since 2.3.2
+     */
+    public void setId(String id)
+    {
+        this.id = id;
     }
 
     /**

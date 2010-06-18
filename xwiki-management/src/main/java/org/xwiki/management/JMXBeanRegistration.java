@@ -17,29 +17,23 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.model;
+package org.xwiki.management;
 
 import org.xwiki.component.annotation.ComponentRole;
-import org.xwiki.model.reference.EntityReference;
 
 /**
- * Allows accessing Model Objects for current objects (current document, current wiki, current space, etc) placed in the
- * Execution Context.
- * 
+ * Registers MBeans against the default platform MBean Server.
+ *
  * @version $Id$
- * @since 2.2M1
+ * @since 2.3.2
  */
 @ComponentRole
-public interface ModelContext
+public interface JMXBeanRegistration
 {
     /**
-     * @return the reference to the current entity located in the Execution Context or null if there's none
+     * @param mbean the mbean instance to register
+     * @param name the name under which to register, for example "type=Velocity,domain=Engines,name=someName". Note
+     *        that the domain is registered by default and shouldn't be passed
      */
-    EntityReference getCurrentEntityReference();
-
-    /**
-     * @param entityReference the reference to the current entity located in the Execution Context
-     * @since 2.3.2
-     */
-    void setCurrentEntityReference(EntityReference entityReference);
+    void registerMBean(Object mbean, String name);
 }

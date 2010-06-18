@@ -163,4 +163,24 @@ public class MacroTransformationContext
     {
         return this.transformationContext.getSyntax();
     }
+
+    /**
+     * @return an id representing the transformation being evaluated. It's a free form name that Transformations can
+     *         use, for example if they need to perform some caching based on a key. For example the Velocity Macro
+     *         is using this id to pass it to the underlying Velocity Engine so that it caches macros using this key.
+     * @since 2.3.2
+     */
+    public String getId()
+    {
+        return this.transformationContext.getId();
+    }
+
+    /**
+     * @param id see {@link #getId()}
+     * @since 2.3.2
+     */
+    public void setId(String id)
+    {
+        this.transformationContext.setId(id);
+    }
 }

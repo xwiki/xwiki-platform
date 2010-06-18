@@ -566,7 +566,7 @@ public interface DocumentAccessBridge
      * Utility method to set the current user.
      * 
      * @param userName the current user
-     * @since 2.4M2
+     * @since 2.3.2
      */
     void setCurrentUser(String userName);
 

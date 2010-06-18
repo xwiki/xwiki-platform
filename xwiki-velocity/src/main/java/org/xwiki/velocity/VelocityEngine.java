@@ -68,4 +68,12 @@ public interface VelocityEngine
      * @throws XWikiVelocityException in case of error
      */
     boolean evaluate(Context context, Writer out, String templateName, Reader source) throws XWikiVelocityException;
+
+    /**
+     * Clear the internal Velocity Macro cache for the passed namespace.
+     *
+     * @param templateName the namespacefor which to remove all cached Velocity macros
+     * @since 2.3.2
+     */
+    void clearMacroNamespace(String templateName);
 }

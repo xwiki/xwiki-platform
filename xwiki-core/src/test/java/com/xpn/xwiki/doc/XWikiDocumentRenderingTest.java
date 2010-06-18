@@ -21,10 +21,14 @@ package com.xpn.xwiki.doc;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Properties;
 
+import com.xpn.xwiki.api.Document;
+import org.apache.velocity.VelocityContext;
 import org.jmock.Mock;
 import org.jmock.core.Invocation;
 import org.jmock.core.stub.CustomStub;
+import org.xwiki.component.descriptor.DefaultComponentDescriptor;
 import org.xwiki.rendering.syntax.Syntax;
 
 import com.xpn.xwiki.XWiki;
@@ -37,6 +41,11 @@ import com.xpn.xwiki.store.XWikiStoreInterface;
 import com.xpn.xwiki.store.XWikiVersioningStoreInterface;
 import com.xpn.xwiki.test.AbstractBridgedXWikiComponentTestCase;
 import com.xpn.xwiki.user.api.XWikiRightService;
+import org.xwiki.velocity.VelocityEngine;
+import org.xwiki.velocity.VelocityFactory;
+import org.xwiki.velocity.VelocityManager;
+import org.xwiki.velocity.internal.jmx.JMXVelocityEngine;
+import org.xwiki.velocity.internal.jmx.JMXVelocityEngineMBean;
 
 /**
  * Unit tests for {@link XWikiDocument}.
@@ -288,5 +297,57 @@ public class XWikiDocumentRenderingTest extends AbstractBridgedXWikiComponentTes
         this.document.setContent("content not in section\n");
 
         assertEquals("", this.document.extractTitle());
+    }
+
+    /**
+     * See XWIKI-5277 for details.
+     */
+    public void testGetRenderedContentCleansVelocityMacroCache() throws Exception
+    {
+        // Make sure we start not in the rendering engine since this is what happens in real: a document is
+        // called by a template thus outside of the rendering engine.
+        getContext().remove("isInRenderingEngine");
+
+        // We display a text area since we know that rendering a text area will call getRenderedContent inside our top
+        // level getRenderedContent call, thus testing that velocity macros are not removed during nested calls to
+        // getRenderedContent.
+        this.baseObject.setLargeStringValue("area", "{{velocity}}#macro(testmacrocache)ok#end{{/velocity}}");
+        this.document.setContent("{{velocity}}$doc.display(\"area\")#testmacrocache{{/velocity}}");
+        this.document.setSyntax(Syntax.XWIKI_2_0);
+
+        // Register a Mock for the VelocityManager to bypass skin APIs that we would need to mock otherwise.
+        VelocityManager originalVelocityManager = getComponentManager().lookup(VelocityManager.class);
+        Mock mockVelocityManager = mock(VelocityManager.class);
+        DefaultComponentDescriptor<VelocityManager> descriptor = new DefaultComponentDescriptor<VelocityManager>();
+        descriptor.setRole(VelocityManager.class);
+
+        // We need to put the current doc in the Velocity Context since it's normally set before the rendering is
+        // called in the execution flow.
+        VelocityContext vcontext = originalVelocityManager.getVelocityContext();
+        vcontext.put("doc", new Document(this.document, getContext()));
+
+        getComponentManager().registerComponent(descriptor, (VelocityManager) mockVelocityManager.proxy());
+        mockVelocityManager.stubs().method("getVelocityContext").will(returnValue(vcontext));
+
+        VelocityEngine vengine =
+            getComponentManager().lookup(VelocityFactory.class).createVelocityEngine("default", new Properties());
+        // Save the number of cached macro templates in the Velocity engine so that we can compare after the
+        // document is rendered.
+        JMXVelocityEngineMBean mbean = new JMXVelocityEngine(vengine);
+        int cachedMacroNamespaceSize = mbean.getTemplates().values().size();
+
+        mockVelocityManager.stubs().method("getVelocityEngine").will(returnValue(vengine));
+
+        // $doc.display will ask for the syntax of the current document so we need to mock it.
+        this.mockXWiki.stubs().method("getCurrentContentSyntaxId").with(eq("xwiki/2.0"), ANYTHING).will(returnValue(
+            "xwiki/2.0"));
+
+        // Verify that the macro located inside the TextArea has been taken into account when executing the doc's
+        // content.
+        assertEquals("<p>ok</p>", this.document.getRenderedContent(getContext()));
+
+        // Now verify that the Velocity Engine doesn't contain any more cached macro namespace to prove that
+        // getRenderedContent has correctly cleaned the Velocity macro cache.
+        assertEquals(cachedMacroNamespaceSize, mbean.getTemplates().values().size());
     }
 }

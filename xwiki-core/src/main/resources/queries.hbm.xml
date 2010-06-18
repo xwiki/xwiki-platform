@@ -25,6 +25,13 @@
       and obj.id = prop.id.id and prop.id.name='member'
       and (prop.value=:username or prop.value=:shortname or prop.value=:veryshortname)
   </query>
+  <query name="listGroupsForUserInOtherWiki">
+    select distinct doc.fullName from XWikiDocument as doc, BaseObject as obj, StringProperty as prop
+    where obj.name = doc.fullName
+      and obj.className='XWiki.XWikiGroups'
+      and obj.id = prop.id.id and prop.id.name='member'
+      and prop.value=:prefixedmembername
+  </query>
   <query name="getAllUsers">
     select distinct doc.fullName from XWikiDocument as doc, BaseObject as obj
     where obj.name=doc.fullName and obj.className='XWiki.XWikiUsers'

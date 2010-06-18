@@ -1,2 +1,3 @@
 org.xwiki.rendering.internal.macro.script.DefaultScriptMacro
 org.xwiki.rendering.internal.macro.script.DefaultAttachmentClassLoaderFactory
+org.xwiki.rendering.internal.macro.script.NestedScriptMacroValidator

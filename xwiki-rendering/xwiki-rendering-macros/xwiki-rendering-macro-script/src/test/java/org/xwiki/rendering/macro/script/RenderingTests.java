@@ -22,7 +22,11 @@ package org.xwiki.rendering.macro.script;
 import junit.framework.Test;
 import junit.framework.TestCase;
 
+import org.jmock.Expectations;
+import org.xwiki.component.descriptor.DefaultComponentDescriptor;
+import org.xwiki.rendering.internal.macro.script.ScriptMacroValidator;
 import org.xwiki.rendering.scaffolding.RenderingTestSuite;
+import org.xwiki.rendering.transformation.MacroTransformationContext;
 import org.xwiki.test.ComponentManagerTestSetup;
 
 /**
@@ -44,7 +48,20 @@ public class RenderingTests extends TestCase
         suite.addTestsFromResource("macroscript5", true);
 
         ComponentManagerTestSetup testSetup = new ComponentManagerTestSetup(suite);
-        new ScriptMockSetup(testSetup.getComponentManager());
+        ScriptMockSetup setup = new ScriptMockSetup(testSetup.getComponentManager());
+
+        // fake nested script validator never fails
+        final ScriptMacroValidator<ScriptMacroParameters> nestedValidator
+            = setup.mockery.mock(ScriptMacroValidator.class, "nested");
+        setup.mockery.checking(new Expectations() {{
+            atLeast(1).of(nestedValidator).validate(with(any(ScriptMacroParameters.class)), with(any(String.class)),
+                with(any(MacroTransformationContext.class)));
+        }});
+        DefaultComponentDescriptor<ScriptMacroValidator> validatorDescriptor
+            = new DefaultComponentDescriptor<ScriptMacroValidator>();
+        validatorDescriptor.setRole(ScriptMacroValidator.class);
+        validatorDescriptor.setRoleHint("nested");
+        testSetup.getComponentManager().registerComponent(validatorDescriptor, nestedValidator);
 
         return testSetup;
     }

@@ -43,8 +43,9 @@
 }
 
 .xDialogCaption {
-  white-space: nowrap;
   height: 27px;
+  line-height: 27px;
+  white-space: nowrap;
 }
 
 .xDialogCloseIcon {

@@ -406,8 +406,6 @@ public interface Strings extends Constants
 
     String importOfficeFileHelpLabel();
 
-    String importOfficePasteMenuItemCaption();
-
     String importOfficePasteWizardStepTitle();
 
     String importOfficePasteInfoLabel();

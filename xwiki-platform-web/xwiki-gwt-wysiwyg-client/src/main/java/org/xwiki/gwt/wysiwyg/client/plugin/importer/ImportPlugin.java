@@ -101,10 +101,10 @@ public class ImportPlugin extends AbstractPlugin implements WizardListener, Clic
         this.importMenuExtension = new ImportMenuExtension(this);
         getUIExtensionList().add(importMenuExtension);
 
-        addFeature("importfile", ImportWizardStep.OFFICE_FILE, Images.INSTANCE.importOfficeFileMenuEntryIcon(),
+        addFeature("import:officefile", ImportWizardStep.OFFICE_FILE, Images.INSTANCE.importOfficeFileMenuEntryIcon(),
             Strings.INSTANCE.importOfficeFileMenuItemCaption());
-        addFeature("importpaste", ImportWizardStep.OFFICE_PASTE, Images.INSTANCE.importOfficePasteMenuEntryIcon(),
-            Strings.INSTANCE.importOfficePasteMenuItemCaption());
+        addFeature("paste", ImportWizardStep.OFFICE_PASTE, Images.INSTANCE.paste(),
+            Strings.INSTANCE.paste());
         if (toolBarExtension.getFeatures().length > 0) {
             getUIExtensionList().add(toolBarExtension);
         }
@@ -135,14 +135,6 @@ public class ImportPlugin extends AbstractPlugin implements WizardListener, Clic
     public void onImportOfficeFile()
     {
         getImportWizard().start(ImportWizardStep.OFFICE_FILE.toString(), null);
-    }
-
-    /**
-     * Method invoked by {@link ImportMenuExtension} when "Import -> Office Content" menu item is clicked.
-     */
-    public void onImportOfficePaste()
-    {
-        getImportWizard().start(ImportWizardStep.OFFICE_PASTE.toString(), null);
     }
 
     /**

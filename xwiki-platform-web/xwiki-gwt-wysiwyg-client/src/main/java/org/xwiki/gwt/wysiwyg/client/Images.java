@@ -72,8 +72,8 @@ public interface Images extends ClientBundle
     @Source("import_office_file.gif")
     ImageResource importOfficeFileMenuEntryIcon();
 
-    @Source("import_office_paste.gif")
-    ImageResource importOfficePasteMenuEntryIcon();
+    @Source("paste.gif")
+    ImageResource paste();
 
     @Source("indent.gif")
     ImageResource indent();

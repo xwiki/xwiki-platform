@@ -65,22 +65,9 @@ public class ImportMenuExtension extends MenuItemUIExtension
             });
         importOfficeFileMenuItem.setIcon(Images.INSTANCE.importOfficeFileMenuEntryIcon());
 
-        // Office Paste Import.
-        MenuItem importOfficePasteMenuItem =
-            new MenuItem(Strings.INSTANCE.importOfficePasteMenuItemCaption(), new Command()
-            {
-                public void execute()
-                {
-                    importPlugin.onImportOfficePaste();
-
-                }
-            });
-        importOfficePasteMenuItem.setIcon(Images.INSTANCE.importOfficePasteMenuEntryIcon());
-
         importMenu = new MenuBar(true);
         importMenu.setAnimationEnabled(false);
         importMenu.addItem(importOfficeFileMenuItem);
-        importMenu.addItem(importOfficePasteMenuItem);
 
         importMenuEntry = new MenuItem(Strings.INSTANCE.importMenuEntryCaption(), importMenu);
         importMenuEntry.setIcon(Images.INSTANCE.importMenuEntryIcon());

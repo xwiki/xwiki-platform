@@ -490,8 +490,10 @@
 <users></users>
 </property>
 </object>
-<content>{{include document="Invitation.InvitationCommon"/}}
-{{include document="Invitation.InvitationMembersCommon"/}}
+<content>{{include document="Invitation.InvitationCommon" /}}
+
+{{include document="Invitation.InvitationMembersCommon" /}}
+
 {{velocity}}
 #*
  * Invitation Application
@@ -851,7 +853,6 @@ $xwiki.get('ssx').use($config.get('commonPage'))
       &lt;dd&gt;&lt;input type="text" size="54" name="recipients" id="recipients" value="$!recipientString" /&gt;&lt;/dd&gt;
     #end
     #if($userMayPersonalizeMessage)
-      &lt;div&gt;
        ## Subject line:
        &lt;dt&gt;&lt;label for="subjectLine"&gt;$msg.get('xe.invitation.subjectLabel')&lt;/label&gt;&lt;/dt&gt;
        &lt;dd&gt;
@@ -864,7 +865,6 @@ $xwiki.get('ssx').use($config.get('commonPage'))
          $!escapetool.xml($!messageBody)##
         &lt;/textarea&gt;
        &lt;/dd&gt;
-      &lt;/div&gt;
     #end
    &lt;/dl&gt;
    &lt;div class="bottombuttons"&gt;

@@ -54,7 +54,7 @@ public class RenderingTests extends TestCase
         final ScriptMacroValidator<ScriptMacroParameters> nestedValidator
             = setup.mockery.mock(ScriptMacroValidator.class, "nested");
         setup.mockery.checking(new Expectations() {{
-            allowing(nestedValidator).validate(with(any(ScriptMacroParameters.class)), with(any(String.class)),
+            atLeast(1).of(nestedValidator).validate(with(any(ScriptMacroParameters.class)), with(any(String.class)),
                 with(any(MacroTransformationContext.class)));
         }});
         DefaultComponentDescriptor<ScriptMacroValidator> validatorDescriptor

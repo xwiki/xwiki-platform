@@ -187,6 +187,7 @@
                 <exclude>org/xwiki/officeimporter/openoffice/OpenOfficeManager</exclude>
                 <exclude>org/xwiki/model/ModelContext</exclude>
                 <exclude>org/xwiki/bridge/DocumentAccessBridge</exclude>
+                <exclude>org/xwiki/velocity/VelocityEngine</exclude>
               </excludes>
             </configuration>
           </plugin>

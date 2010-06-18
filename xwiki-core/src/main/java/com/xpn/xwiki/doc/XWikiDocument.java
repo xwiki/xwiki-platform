@@ -146,6 +146,7 @@ import com.xpn.xwiki.web.ObjectAddForm;
 import com.xpn.xwiki.web.Utils;
 import com.xpn.xwiki.web.XWikiMessageTool;
 import com.xpn.xwiki.web.XWikiRequest;
+import org.xwiki.velocity.XWikiVelocityException;
 
 public class XWikiDocument implements DocumentModelBridge
 {
@@ -799,7 +800,10 @@ public class XWikiDocument implements DocumentModelBridge
                 if (is10Syntax()) {
                     renderedContent = context.getWiki().getRenderingEngine().renderDocument(this, context);
                 } else {
-                    renderedContent = performSyntaxConversion(source, getSyntaxId(), targetSyntax, true);
+                    TransformationContext txContext = new TransformationContext();
+                    txContext.setSyntax(getSyntax());
+                    txContext.setId(this.defaultEntityReferenceSerializer.serialize(getDocumentReference()));
+                    renderedContent = performSyntaxConversion(source, targetSyntax, txContext);
                 }
 
                 this.renderingCache.setRenderedContent(getDocumentReference(), source, renderedContent, context);
@@ -808,6 +812,30 @@ public class XWikiDocument implements DocumentModelBridge
                     context.put("isInRenderingEngine", isInRenderingEngine);
                 } else {
                     context.remove("isInRenderingEngine");
+                }
+            }
+
+            // Since we configure Velocity to have local macros (i.e. macros visible only to the local context),
+            // since Velocity caches the velocity macros in a local cache (we use key which is the absolute
+            // document reference) and since documents can include other documents or panels, we need to make sure we
+            // empty the local Velocity macro cache at the end of the rendering for the document as otherwise the
+            // local Velocity macro caches will keep growing as users create new pages.
+            //
+            // Note that we check if we are in the rendering engine as this cleanup must be done only once after the
+            // document has been rendered but this method can be called recursively. We know it's the initial entry
+            // point when isInRendering is false...
+            if (isInRenderingEngine == null || isInRenderingEngine == Boolean.FALSE) {
+                String documentName = this.defaultEntityReferenceSerializer.serialize(getDocumentReference());
+                try {
+                    Utils.getComponent(VelocityManager.class).getVelocityEngine().clearMacroNamespace(documentName);
+                } catch (XWikiVelocityException e) {
+                    // Failed to get the Velocity Engine and this to clear Velocity Macro cache. Log this as a warning
+                    // but continue since it's not absolutely critical.
+                    LOG.warn("Failed to clear Velocity Macro cache for the [" + documentName
+                        + "] namespace. Reason = [" + e.getMessage() + "]");
+                }
+                if (LOG.isDebugEnabled()) {
+                    LOG.debug("Velocity maro cache cleared for namespace [" + documentName + "]");
                 }
             }
         }
@@ -861,9 +889,11 @@ public class XWikiDocument implements DocumentModelBridge
                     result = context.getWiki().getRenderingEngine().renderText(text, this, context);
                 } else {
                     SyntaxFactory syntaxFactory = Utils.getComponent(SyntaxFactory.class);
-                    result =
-                        performSyntaxConversion(text, sourceSyntaxId, syntaxFactory
-                            .createSyntaxFromIdString(targetSyntaxId), true);
+                    TransformationContext txContext = new TransformationContext();
+                    txContext.setSyntax(syntaxFactory.createSyntaxFromIdString(sourceSyntaxId));
+                    txContext.setId(this.defaultEntityReferenceSerializer.serialize(getDocumentReference()));
+                    result = performSyntaxConversion(text, syntaxFactory.createSyntaxFromIdString(targetSyntaxId),
+                        txContext);
                 }
 
                 this.renderingCache.setRenderedContent(getDocumentReference(), text, result, context);
@@ -7130,7 +7160,7 @@ public class XWikiDocument implements DocumentModelBridge
     public void convertSyntax(Syntax targetSyntax, XWikiContext context) throws XWikiException
     {
         // convert content
-        setContent(performSyntaxConversion(getContent(), getSyntaxId(), targetSyntax, false));
+        setContent(performSyntaxConversion(getContent(), getSyntaxId(), targetSyntax));
 
         // convert objects
         Map<DocumentReference, List<BaseObject>> objectsByClass = getXObjects();
@@ -7145,8 +7175,7 @@ public class XWikiDocument implements DocumentModelBridge
                             LargeStringProperty field = (LargeStringProperty) bobject.getField(textAreaClass.getName());
 
                             if (field != null) {
-                                field.setValue(performSyntaxConversion(field.getValue(), getSyntaxId(), targetSyntax,
-                                    false));
+                                field.setValue(performSyntaxConversion(field.getValue(), getSyntaxId(), targetSyntax));
                             }
                         }
                     }
@@ -7233,21 +7262,21 @@ public class XWikiDocument implements DocumentModelBridge
 
     /**
      * Convert the passed content from the passed syntax to the passed new syntax.
-     * 
+     *
      * @param content the content to convert
-     * @param currentSyntaxId the syntax of the current content to convert
      * @param targetSyntax the new syntax after the conversion
-     * @param transform indicate if transformations has to be applied or not
+     * @param txContext the context when Transformation are executed or null if transformation shouldn't be executed
      * @return the converted content in the new syntax
      * @throws XWikiException if an exception occurred during the conversion process
+     * @since 2.4M2
      */
-    private static String performSyntaxConversion(String content, String currentSyntaxId, Syntax targetSyntax,
-        boolean transform) throws XWikiException
+    private static String performSyntaxConversion(String content, Syntax targetSyntax, TransformationContext txContext)
+        throws XWikiException
     {
         try {
-            XDOM dom = parseContent(currentSyntaxId, content);
+            XDOM dom = parseContent(txContext.getSyntax().toIdString(), content);
 
-            return performSyntaxConversion(dom, currentSyntaxId, targetSyntax, transform);
+            return performSyntaxConversion(dom, targetSyntax, txContext);
         } catch (Exception e) {
             throw new XWikiException(XWikiException.MODULE_XWIKI_RENDERING, XWikiException.ERROR_XWIKI_UNKNOWN,
                 "Failed to convert document to syntax [" + targetSyntax + "]", e);
@@ -7256,24 +7285,47 @@ public class XWikiDocument implements DocumentModelBridge
 
     /**
      * Convert the passed content from the passed syntax to the passed new syntax.
-     * 
-     * @param content the XDOM content to convert, the XDOM can be modified during the transformation
+     *
+     * @param content the content to convert
      * @param currentSyntaxId the syntax of the current content to convert
      * @param targetSyntax the new syntax after the conversion
-     * @param transform indicate if transformations has to be applied or not
      * @return the converted content in the new syntax
      * @throws XWikiException if an exception occurred during the conversion process
+     * @since 2.4M2
      */
-    private static String performSyntaxConversion(XDOM content, String currentSyntaxId, Syntax targetSyntax,
-        boolean transform) throws XWikiException
+    private static String performSyntaxConversion(String content, String currentSyntaxId, Syntax targetSyntax)
+        throws XWikiException
     {
         try {
-            if (transform) {
+            XDOM dom = parseContent(currentSyntaxId, content);
+
+            return performSyntaxConversion(dom, targetSyntax, null);
+        } catch (Exception e) {
+            throw new XWikiException(XWikiException.MODULE_XWIKI_RENDERING, XWikiException.ERROR_XWIKI_UNKNOWN,
+                "Failed to convert document to syntax [" + targetSyntax + "]", e);
+        }
+    }
+
+    /**
+     * Convert the passed content from the passed syntax to the passed new syntax.
+     *
+     * @param content the XDOM content to convert, the XDOM can be modified during the transformation
+     * @param targetSyntax the new syntax after the conversion
+     * @param txContext the context when Transformation are executed or null if transformation shouldn't be executed
+     * @return the converted content in the new syntax
+     * @throws XWikiException if an exception occurred during the conversion process
+     * @since 2.4M2
+     */
+    private static String performSyntaxConversion(XDOM content, Syntax targetSyntax, TransformationContext txContext)
+        throws XWikiException
+    {
+        try {
+            if (txContext != null) {
                 // Transform XDOM
                 TransformationManager transformations = Utils.getComponent(TransformationManager.class);
-                SyntaxFactory syntaxFactory = Utils.getComponent(SyntaxFactory.class);
-                TransformationContext txContext = new TransformationContext(content,
-                    syntaxFactory.createSyntaxFromIdString(currentSyntaxId));
+                if (txContext.getXDOM() == null) {
+                    txContext.setXDOM(content);
+                }
                 transformations.performTransformations(content, txContext);
             }
 

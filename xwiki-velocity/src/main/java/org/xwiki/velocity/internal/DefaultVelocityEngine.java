@@ -202,6 +202,16 @@ public class DefaultVelocityEngine extends AbstractLogEnabled implements Velocit
     }
 
     /**
+     * {@inheritDoc}
+     * @see VelocityEngine#clearMacroNamespace(String)
+     * @since 2.4M2
+     */
+    public void clearMacroNamespace(String templateName)
+    {
+        this.rsvc.dumpVMNamespace(templateName);
+    }
+
+    /**
      * Provides access to the {@link org.apache.velocity.app.VelocityEngine Velocity Engine}, which can be used to call
      * all Velocity services.
      * 

@@ -107,8 +107,15 @@ public class VelocityMacro extends AbstractScriptMacro<VelocityMacroParameters>
             }
 
             StringWriter writer = new StringWriter();
-            this.velocityManager.getVelocityEngine().evaluate(velocityContext, writer, "velocity macro",
-                cleanedContent);
+
+            // Use the Transformation id as the name passed to the Velocity Engine. This name is used internally
+            // by Velocity as a cache index key for caching macros.
+            String key = context.getTransformationContext().getId();
+            if (key == null) {
+                key = "unknown namespace";
+            }
+
+            this.velocityManager.getVelocityEngine().evaluate(velocityContext, writer, key, cleanedContent);
             result = writer.toString();
 
             if (filter != null) {

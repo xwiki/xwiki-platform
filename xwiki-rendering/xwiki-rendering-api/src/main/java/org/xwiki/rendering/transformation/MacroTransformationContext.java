@@ -163,4 +163,20 @@ public class MacroTransformationContext
     {
         return this.transformationContext.getSyntax();
     }
+
+    /**
+     * @see org.xwiki.rendering.transformation.TransformationContext#getId()
+     */
+    public String getId()
+    {
+        return this.transformationContext.getId();
+    }
+
+    /**
+     * @see org.xwiki.rendering.transformation.TransformationContext#setId(String)
+     */
+    public void setId(String id)
+    {
+        this.transformationContext.setId(id);
+    }
 }

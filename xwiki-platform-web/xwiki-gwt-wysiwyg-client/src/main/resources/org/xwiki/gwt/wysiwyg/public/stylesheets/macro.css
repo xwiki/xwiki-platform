@@ -54,3 +54,9 @@
 .xMacroSelector .xListBox {
   overflow: auto;
 }
+
+.xMacroButton {
+  background-image: url(../images/macro.gif);
+  background-position: center center;
+  background-repeat: no-repeat;
+}

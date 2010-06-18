@@ -100,6 +100,7 @@ public class MacroToolBarExtension implements ClickHandler
             PushButton button = new PushButton();
             registrations.add(button.addClickHandler(this));
             button.setTitle(Messages.INSTANCE.macroInsertTooltip(macroId));
+            button.addStyleName("xMacroButton");
             button.addStyleName("macro-" + macroId);
             toolBarExtension.addFeature(MACRO_NAMESPACE + macroId, button);
             macroIds.put(button, macroId);

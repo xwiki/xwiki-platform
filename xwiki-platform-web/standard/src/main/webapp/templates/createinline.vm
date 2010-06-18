@@ -179,19 +179,20 @@ $xwiki.get('ssfx').use('uicomponents/widgets/validation/livevalidation.css')##
 ## Display the form.
 ## ---------------------------------------------------------------------------------------------------------
 <form action="$doc.getURL('create')" method="post">
+  <div>
   <input type="hidden" name="tocreate" value="$tocreate"/>
   #if($tocreate == 'page')
     ## ---------------------------------------------------------------------------------------------------------
     ## Page creation
     ## ---------------------------------------------------------------------------------------------------------
     #set($jsValidationInitializersContainer = $util.getArrayList())      
-    <input type="hidden" name="parent" value="$rparent"/>
-    <dl>
-      ## ---------------------------------------------------------------------------------------------------------
-      ## Template field
-      ## ---------------------------------------------------------------------------------------------------------
-      #if(!$availableTemplateProviders.isEmpty() && $template == '')
-        #set($jsSpaceInclusionValidationContainer = $util.getArrayList())
+    <input type="hidden" name="parent" value="$rparent"/>    
+    ## ---------------------------------------------------------------------------------------------------------
+    ## Template field
+    ## ---------------------------------------------------------------------------------------------------------
+    #if(!$availableTemplateProviders.isEmpty() && $template == '')
+      #set($jsSpaceInclusionValidationContainer = $util.getArrayList())
+      <dl>
         <dt>
           <label for="page">$msg.get('core.create.template')</label>
         </dt>      
@@ -242,27 +243,31 @@ $xwiki.get('ssfx').use('uicomponents/widgets/validation/livevalidation.css')##
           });
         //]]>
         </script>
-      #else
-        <input type="hidden" id="template" name="template" value="$template" />
-      #end
-      ## ---------------------------------------------------------------------------------------------------------
-      ## Space field
-      ## ---------------------------------------------------------------------------------------------------------        
-      #if($space == '')
+      </dl>
+    #else
+      <input type="hidden" id="template" name="template" value="$template" />
+    #end
+    ## ---------------------------------------------------------------------------------------------------------
+    ## Space field
+    ## ---------------------------------------------------------------------------------------------------------        
+    #if($space == '')
+      <dl>
         <dt>
           <label for="space">$msg.get('core.create.space')</label>
         </dt>
         <dd>                     
           <input type="text" id="space" name="space" value="$defaultSpace"/>
         </dd>
-        #set($discard = $jsValidationInitializersContainer.add("XWiki.createPage.initSpaceValidator();"))
-      #else
-        <input type="hidden" id="space" name="space" value="$space" />
-      #end
-      ## ---------------------------------------------------------------------------------------------------------
-      ## Page field
-      ## ---------------------------------------------------------------------------------------------------------        
-      #if($page == '')
+      </dl>
+      #set($discard = $jsValidationInitializersContainer.add("XWiki.createPage.initSpaceValidator();"))
+    #else
+      <input type="hidden" id="space" name="space" value="$space" />
+    #end
+    ## ---------------------------------------------------------------------------------------------------------
+    ## Page field
+    ## ---------------------------------------------------------------------------------------------------------        
+    #if($page == '')
+      <dl>
         <dt>
           <label for="page">$msg.get('core.create.page')</label>
         </dt>
@@ -270,11 +275,11 @@ $xwiki.get('ssfx').use('uicomponents/widgets/validation/livevalidation.css')##
           #set ($pageText = $msg.get('core.create.pageText'))
           <input type="text" id="page" name="page" value="$pageText" onfocus="if(this.value=='$pageText') this.value=''" onblur="if(this.value=='') this.value='$pageText'"/>
         </dd>
-        #set($discard = $jsValidationInitializersContainer.add("XWiki.createPage.initPageValidator();"))
-       #else
-        <input type="hidden" id="page" name="page" value="$page" />
-      #end
-    </dl>       
+      </dl>
+      #set($discard = $jsValidationInitializersContainer.add("XWiki.createPage.initPageValidator();"))
+    #else
+      <input type="hidden" id="page" name="page" value="$page" />
+    #end
     ## ---------------------------------------------------------------------------------------------------------
     ## Output JavaScript validation code
     ## ---------------------------------------------------------------------------------------------------------
@@ -302,4 +307,5 @@ $xwiki.get('ssfx').use('uicomponents/widgets/validation/livevalidation.css')##
     <input type="hidden" name="parent" value="$!parent"/>
   #end
   <input type="submit" class="button" value="$msg.get('create')"/>
+  </div>
 </form>

@@ -165,7 +165,9 @@ public class MacroTransformationContext
     }
 
     /**
-     * @see org.xwiki.rendering.transformation.TransformationContext#getId()
+     * @return an id representing the transformation being evaluated. It's a free form name that Transformations can
+     *         use, for example if they need to perform some caching based on a key. For example the Velocity Macro
+     *         is using this id to pass it to the underlying Velocity Engine so that it caches macros using this key.
      */
     public String getId()
     {
@@ -173,7 +175,7 @@ public class MacroTransformationContext
     }
 
     /**
-     * @see org.xwiki.rendering.transformation.TransformationContext#setId(String)
+     * @param id see {@link #getId()}
      */
     public void setId(String id)
     {

@@ -22,6 +22,7 @@ package org.xwiki.validator;
 import org.w3c.dom.Document;
 import org.xwiki.validator.ValidationError.Type;
 import org.xwiki.validator.framework.AbstractXMLValidator;
+import org.xwiki.validator.framework.XMLErrorHandler;
 
 import com.sun.syndication.io.FeedException;
 import com.sun.syndication.io.ParsingFeedException;
@@ -34,6 +35,17 @@ import com.sun.syndication.io.SyndFeedInput;
  */
 public class RSSValidator extends AbstractXMLValidator
 {
+    /**
+     * {@inheritDoc}
+     * 
+     * @see org.xwiki.validator.framework.AbstractXMLValidator#createXMLErrorHandler()
+     */
+    @Override
+    protected XMLErrorHandler createXMLErrorHandler()
+    {
+        return new RSSErrorHandler();
+    }
+
     /**
      * {@inheritDoc}
      * 

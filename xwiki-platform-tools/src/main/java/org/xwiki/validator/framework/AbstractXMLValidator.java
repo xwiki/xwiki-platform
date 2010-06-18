@@ -76,6 +76,8 @@ public abstract class AbstractXMLValidator implements Validator
     {
         setValidateXML(validateXML);
 
+        this.errorHandler = createXMLErrorHandler();
+
         DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
         factory.setValidating(true);
 
@@ -86,6 +88,14 @@ public abstract class AbstractXMLValidator implements Validator
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
+    }
+
+    /**
+     * @return the error handler to use when parsing the xml content
+     */
+    protected XMLErrorHandler createXMLErrorHandler()
+    {
+        return new XMLErrorHandler();
     }
 
     /**

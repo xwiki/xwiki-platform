@@ -150,10 +150,11 @@ public class XWikiDocumentRenderingTest extends AbstractBridgedXWikiComponentTes
         this.baseObject.setStringListValue("stringlist", Arrays.asList("VALUE1", "VALUE2"));
     }
 
-    public void testScriptContext() throws XWikiException
+    public void testCurrentDocumentVariableIsInjectedBeforeRendering() throws XWikiException
     {
+        // Verifies we can access the doc variable from a groovy macro.
         this.document.setContent("{{groovy}}print(doc);{{/groovy}}");
-        this.document.setSyntaxId("xwiki/2.0");
+        this.document.setSyntax(Syntax.XWIKI_2_0);
 
         assertEquals("<p>Space.Page</p>", this.document.getRenderedContent(getContext()));
     }

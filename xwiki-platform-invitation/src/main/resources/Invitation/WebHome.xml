@@ -585,7 +585,7 @@ $xwiki.get('ssx').use($config.get('commonPage'))
     #set($messageBody = '')
   #end
   ##
-  #if("$!request.get('sendMail')" != '')
+  #if("$!request.get('sendMail')" != '' &amp;&amp; $request.getMethod().toLowerCase() == 'post')
     #generateAndSendMail($config,
                          $recipients,
                          $subjectLine,

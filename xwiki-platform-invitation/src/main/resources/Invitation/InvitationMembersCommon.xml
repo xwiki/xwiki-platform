@@ -226,7 +226,7 @@
    ## User Tools
    = $msg.get('xe.invitation.tools.heading') =
    ## Invite friends.
-   #if($doc.getFullName() != $config.get('mainPage'))
+   #if($doc.getFullName() != $config.get('mainPage') || $parameterMap.size() &gt; 0)
      * [[$msg.get('xe.invitation.tools.senderLink')&gt;&gt;$config.get('mainPage')]]
    #else
      * **$msg.get('xe.invitation.tools.senderLink')**
@@ -293,11 +293,6 @@
        ## Inspect all as admin is selected.
        * **$msg.get('xe.invitation.adminTools.allInvitationsLink')**
      #end
-   #end
-   #if($doc.getFullName() != $config.get('mainPage') || $parameterMap.size() &gt; 0)
-     ## Return to the main page
-
-     **[[$msg.get('xe.invitation.returnToMainPage')&gt;&gt;$config.get('mainPage')]]**
    #end
   )))
 #end

@@ -19,52 +19,6 @@
  */
 package com.xpn.xwiki.store;
 
-import java.io.Serializable;
-import java.lang.reflect.Field;
-import java.sql.Connection;
-import java.sql.Statement;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.StringTokenizer;
-import java.util.UUID;
-
-import org.apache.commons.lang.ArrayUtils;
-import org.apache.commons.lang.StringUtils;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-import org.hibernate.EntityMode;
-import org.hibernate.FlushMode;
-import org.hibernate.ObjectNotFoundException;
-import org.hibernate.Query;
-import org.hibernate.Session;
-import org.hibernate.SessionFactory;
-import org.hibernate.Transaction;
-import org.hibernate.cfg.Configuration;
-import org.hibernate.cfg.Settings;
-import org.hibernate.connection.ConnectionProvider;
-import org.hibernate.impl.SessionFactoryImpl;
-import org.hibernate.mapping.PersistentClass;
-import org.hibernate.mapping.Property;
-import org.xwiki.component.annotation.Component;
-import org.xwiki.component.annotation.Requirement;
-import org.xwiki.context.Execution;
-import org.xwiki.context.ExecutionContext;
-import org.xwiki.model.EntityType;
-import org.xwiki.model.reference.DocumentReference;
-import org.xwiki.model.reference.DocumentReferenceResolver;
-import org.xwiki.model.reference.EntityReference;
-import org.xwiki.model.reference.EntityReferenceSerializer;
-import org.xwiki.model.reference.SpaceReference;
-import org.xwiki.model.reference.WikiReference;
-import org.xwiki.query.QueryManager;
-
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
@@ -100,6 +54,51 @@ import com.xpn.xwiki.render.XWikiRenderer;
 import com.xpn.xwiki.stats.impl.XWikiStats;
 import com.xpn.xwiki.util.Util;
 import com.xpn.xwiki.web.Utils;
+import org.apache.commons.lang.ArrayUtils;
+import org.apache.commons.lang.StringUtils;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.hibernate.EntityMode;
+import org.hibernate.FlushMode;
+import org.hibernate.ObjectNotFoundException;
+import org.hibernate.Query;
+import org.hibernate.Session;
+import org.hibernate.SessionFactory;
+import org.hibernate.Transaction;
+import org.hibernate.cfg.Configuration;
+import org.hibernate.cfg.Settings;
+import org.hibernate.connection.ConnectionProvider;
+import org.hibernate.impl.SessionFactoryImpl;
+import org.hibernate.mapping.PersistentClass;
+import org.hibernate.mapping.Property;
+import org.xwiki.component.annotation.Component;
+import org.xwiki.component.annotation.Requirement;
+import org.xwiki.context.Execution;
+import org.xwiki.context.ExecutionContext;
+import org.xwiki.model.EntityType;
+import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.DocumentReferenceResolver;
+import org.xwiki.model.reference.EntityReference;
+import org.xwiki.model.reference.EntityReferenceSerializer;
+import org.xwiki.model.reference.SpaceReference;
+import org.xwiki.model.reference.WikiReference;
+import org.xwiki.query.QueryManager;
+
+import java.io.Serializable;
+import java.lang.reflect.Field;
+import java.sql.Connection;
+import java.sql.Statement;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.StringTokenizer;
+import java.util.UUID;
 
 @Component
 public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWikiStoreInterface
@@ -704,10 +703,10 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
             String cxml = doc.getXClassXML();
             if (cxml != null) {
                 bclass.fromXML(cxml);
-                bclass.setName(doc.getFullName());
+                bclass.setDocumentReference(doc.getDocumentReference());
                 doc.setXClass(bclass);
             } else if (useClassesTable(false, context)) {
-                bclass.setName(doc.getFullName());
+                bclass.setDocumentReference(doc.getDocumentReference());
                 bclass = loadXWikiClass(bclass, context, false);
                 doc.setXClass(bclass);
             }
@@ -751,7 +750,7 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
                     if (classReference.equals(doc.getDocumentReference())) {
                         newobject = bclass.newCustomClassInstance(context);
                     } else {
-                        newobject = BaseClass.newCustomClassInstance(object.getClassName(), context);
+                        newobject = BaseClass.newCustomClassInstance(classReference, context);
                     }
                     if (newobject != null) {
                         newobject.setId(object.getId());
@@ -775,7 +774,7 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
                         Object[] result = (Object[]) it2.next();
                         Integer number = (Integer) result[0];
                         String member = (String) result[1];
-                        BaseObject obj = BaseClass.newCustomClassInstance("XWiki.XWikiGroups", context);
+                        BaseObject obj = BaseClass.newCustomClassInstance(groupsDocumentReference, context);
                         obj.setDocumentReference(doc.getDocumentReference());
                         obj.setXClassReference(localGroupEntityReference);
                         obj.setNumber(number.intValue());
@@ -1227,7 +1226,7 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
             // In case of custom class we need to force it as BaseObject to delete the xwikiobject row
             if (!"".equals(bclass.getCustomClass())) {
                 BaseObject cobject = new BaseObject();
-                cobject.setName(object.getName());
+                cobject.setDocumentReference(object.getDocumentReference());
                 cobject.setClassName(object.getClassName());
                 cobject.setNumber(object.getNumber());
                 if (object instanceof BaseObject) {

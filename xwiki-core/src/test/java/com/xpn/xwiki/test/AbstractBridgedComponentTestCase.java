@@ -48,6 +48,7 @@ public class AbstractBridgedComponentTestCase extends AbstractComponentTestCase
     private Mockery mockery = new Mockery()
     {
         {
+            // Used to be able to mock class instances (and not only interfaces).
             setImposteriser(ClassImposteriser.INSTANCE);
         }
     };

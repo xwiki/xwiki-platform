@@ -910,7 +910,7 @@ public class XWikiDocumentTest extends AbstractBridgedXWikiComponentTestCase
         assertEquals("<i>italic</i>", this.document.getRenderedContent(getContext()));
     }
 
-    public void testGetRenderedContentForDocumentWithTranslation() throws XWikiException
+    public void testGetRenderedContent() throws XWikiException
     {
         this.document.setContent("**bold**");
         this.document.setSyntaxId("xwiki/2.0");

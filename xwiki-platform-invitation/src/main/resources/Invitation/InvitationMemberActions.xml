@@ -101,8 +101,10 @@
 <users></users>
 </property>
 </object>
-<content>{{include document="Invitation.InvitationCommon"/}}
-{{include document="Invitation.InvitationMembersCommon"/}}
+<content>{{include document="Invitation.InvitationCommon" /}}
+
+{{include document="Invitation.InvitationMembersCommon" /}}
+
 {{velocity}}
 #*
  * Invitation Application

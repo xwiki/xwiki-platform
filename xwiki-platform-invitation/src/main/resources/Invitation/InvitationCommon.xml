@@ -433,14 +433,14 @@
                               + 'ssageBody" != "")' + "$n" + '  &lt;p style="$bigText"&gt;' + "$n" + '  $!'
                               + 'escapetool.html($!messageBody)' + "$n" + '  &lt;/p&gt;' + "$n" + '#end'
                               + "$n" + '&lt;br/&gt;&lt;br/&gt;' + "$n" + '&lt;a href="${guestActionsURL}?doAction_ac'
-                              + 'cept=y&amp;messageID=$messageID" style="$bigText$joinLink$linkStyle"&gt;' + "$n"
+                              + 'cept=y&amp;amp;messageID=$messageID" style="$bigText$joinLink$linkStyle"&gt;' + "$n"
                               + '$msg.get("xe.invitation.emailContent.joinLink")' + "$n" + '&lt;/a&gt;'
-                              + "$n" + '&lt;a href="${guestActionsURL}?doAction_decline=y&amp;messageID=$mes'
+                              + "$n" + '&lt;a href="${guestActionsURL}?doAction_decline=y&amp;amp;messageID=$mes'
                               + 'sageID" style="$bigText$declineLink"&gt;' + "$n" + ' $msg.get("xe.invita'
                               + 'tion.emailContent.declineLink")' + "$n" + '&lt;/a&gt;' + "$n" + '&lt;hr style='
-                              + '"clear:both"&gt;' + "$n" + '$msg.get("xe.invitation.emailContent.reportM'
+                              + '"clear:both" /&gt;' + "$n" + '$msg.get("xe.invitation.emailContent.reportM'
                               + 'essage", ["&lt;a href=$escapetool.getQ()${guestActionsURL}?doA'
-                              + 'ction_report=y&amp;messageID=$messageID$escapetool.getQ() style=$escapetool.getQ()$linkStyle$escapetool.getQ()&gt;'
+                              + 'ction_report=y&amp;amp;messageID=$messageID$escapetool.getQ() style=$escapetool.getQ()$linkStyle$escapetool.getQ()&gt;'
                               + '", "&lt;/a&gt;"])' + "$n" + '{{/html}}' + "$n" + '{{/'
                               + 'velocity}}')
     $config.put('messageBodyTemplate', $messageBodyTemplate)

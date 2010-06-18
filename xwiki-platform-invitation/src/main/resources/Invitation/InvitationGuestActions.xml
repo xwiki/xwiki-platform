@@ -101,7 +101,8 @@
 <users>XWiki.XWikiGuest</users>
 </property>
 </object>
-<content>{{include document="Invitation.InvitationCommon"/}}
+<content>{{include document="Invitation.InvitationCommon" /}}
+
 {{velocity}}
 #*
  * Invitation Application

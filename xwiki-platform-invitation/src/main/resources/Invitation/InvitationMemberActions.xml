@@ -160,7 +160,7 @@ $xwiki.get('ssx').use($config.get('commonPage'))
 ##
 #set($action = [])
 #getUserAction($request.getParameterMap(), $action)
-#if($action.size() &gt; 0)
+#if($action.size() &gt; 0 &amp;&amp; $request.getMethod().toLowerCase() == 'post')
   #set($action = $action.get(0))
   #doUserActionOnMultipleMessages($request.getParameterValues('messageID'),
                                   $action,

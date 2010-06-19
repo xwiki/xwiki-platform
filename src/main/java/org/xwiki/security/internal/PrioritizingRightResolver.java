@@ -38,15 +38,23 @@ import org.xwiki.model.reference.EntityReference;
 import java.util.Collection;
 import java.util.List;
 import java.util.ListIterator;
+import java.util.Map;
+import java.util.EnumMap;
 
 /**
  * The default implementation for the right resolver.
  *
  * @version $Id: $
  */
-@Component
-public class DefaultRightResolver extends AbstractRightResolver
+@Component("priority")
+public class PrioritizingRightResolver extends AbstractRightResolver
 {
+    /** Priority of rights specified for users. */
+    private static final int USER_PRIORITY = Integer.MAX_VALUE;
+
+    /** Priority of rights specified for "all group". */
+    private static final int ALL_GROUP_PRIORITY = 0;
+
     @Override
     public AccessLevel resolve(DocumentReference user,
                                EntityReference entity,
@@ -64,13 +72,6 @@ public class DefaultRightResolver extends AbstractRightResolver
                 accessLevel.allow(right);
             }
             return accessLevel.getExistingInstance();
-        }
-
-        /*
-         * Creator is granted delete-rights.
-         */
-        if (isCreator(user, entity)) {
-            accessLevel.allow(DELETE);
         }
 
         /*
@@ -112,7 +113,14 @@ public class DefaultRightResolver extends AbstractRightResolver
                      */
                     accessLevel.deny(right);
                 } else {
-                    accessLevel.set(right, AccessLevel.DEFAULT_ACCESS_LEVEL.get(right));
+                    /*
+                     * Creator is granted delete-rights, by default.
+                     */
+                    if (right == DELETE && isCreator(user, entity)) {
+                        accessLevel.allow(DELETE);
+                    } else {
+                        accessLevel.set(right, AccessLevel.DEFAULT_ACCESS_LEVEL.get(right));
+                    }
                 }
             }
         }
@@ -144,24 +152,14 @@ public class DefaultRightResolver extends AbstractRightResolver
                          AccessLevel accessLevel)
     {
         AccessLevel currentLevel = new AccessLevel();
+        Map<Right, Integer> priorities = new EnumMap(Right.class);
 
         for (Right right : enabledRights.get(ref.getType())) {
             boolean foundAllow = false;
             for (RightsObject obj : rightsObjects) {
                 if (obj.checkRight(right)) {
-                    if (obj.getState() == ALLOW) {
-                        foundAllow = true;
-                    }
-                    resolveLevel(right, user, groups, obj, ref, currentLevel);
+                    resolveLevel(right, user, groups, obj, ref, priorities, currentLevel);
                 }
-            }
-            if (foundAllow && currentLevel.get(right) == UNDETERMINED) {
-                /*
-                 * The same behavior as the old implementation. I.e.,
-                 * an allow means implicit deny for everyone else.
-                 */
-                currentLevel.deny(right);
-
             }
         }
         mergeLevels(currentLevel, accessLevel, ref);
@@ -175,6 +173,7 @@ public class DefaultRightResolver extends AbstractRightResolver
      * @param groups The groups where the user is a member.
      * @param obj The currently considered rights object.
      * @param ref An entity reference that represents the current level in the document hierarchy.
+     * @param priorities The accumulated priorities of each right in the current level.
      * @param accessLevel The accumulated result at the current level.
      */
     private void resolveLevel(Right right,
@@ -182,6 +181,7 @@ public class DefaultRightResolver extends AbstractRightResolver
                               Collection<DocumentReference> groups,
                               RightsObject obj,
                               EntityReference ref,
+                              Map<Right, Integer> priorities,
                               AccessLevel accessLevel)
     {
         if (right == PROGRAM && ref.getParent() != null) {
@@ -192,11 +192,11 @@ public class DefaultRightResolver extends AbstractRightResolver
         }
 
         if (obj.checkUser(user)) {
-            resolveConflict(obj.getState(), right, accessLevel);
+            resolveConflict(obj.getState(), right, USER_PRIORITY, priorities, accessLevel);
         } else {
             for (DocumentReference group : groups) {
                 if (obj.checkGroup(group)) {
-                    resolveConflict(obj.getState(), right, accessLevel);
+                    resolveConflict(obj.getState(), right, getPriority(group), priorities, accessLevel);
                     break;
                 }
             }
@@ -207,19 +207,31 @@ public class DefaultRightResolver extends AbstractRightResolver
      * Resolve conflicting rights within the current level in the document hierarchy.
      * @param state The state to consider setting.
      * @param right The right that is being concerned.
+     * @param priority The priority to use for this particular right match.
+     * @param priorities Priority that was used for previous matches.
      * @param accessLevel The accumulated result.
      */
-    private void resolveConflict(RightState state, Right right, AccessLevel accessLevel)
+    private void resolveConflict(RightState state,
+                                 Right right,
+                                 int priority,
+                                 Map<Right, Integer> priorities,
+                                 AccessLevel accessLevel)
     {
         if (accessLevel.get(right) == UNDETERMINED) {
             accessLevel.set(right, state);
+            priorities.put(right, priority);
             return;
         }
         if (state == UNDETERMINED) {
             return;
         }
         if (accessLevel.get(right) != state) {
-            accessLevel.set(right, tieResolution.get(right));
+            if (priority > priorities.get(right)) {
+                accessLevel.set(right, state);
+                priorities.put(right, priority);
+            } else {
+                accessLevel.set(right, tieResolution.get(right));
+            }
         }
     }
 
@@ -252,6 +264,19 @@ public class DefaultRightResolver extends AbstractRightResolver
                     accessLevel.allow(right);
                 }
             }
+        }
+    }
+
+    /**
+     * @param group A group identifier.
+     * @return the priority for the group.
+     */
+    private int getPriority(DocumentReference group)
+    {
+        if (group.getName().equals("XWikiAllGroup")) {
+            return ALL_GROUP_PRIORITY;
+        } else {
+            return ALL_GROUP_PRIORITY + 1;
         }
     }
 }

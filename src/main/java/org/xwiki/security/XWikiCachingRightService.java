@@ -30,20 +30,20 @@ import com.xpn.xwiki.doc.XWikiDocument;
 
 import com.xpn.xwiki.web.Utils;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-
 /**
  * Class for plugging in to xwiki.
  * @version $Id: $
  */
 public class XWikiCachingRightService implements XWikiRightService
 {
-    /** Logger. */
-    private static final Log LOG = LogFactory.getLog(RightService.class);
-
     /** The actual right service compoennt. */
-    private final RightService rightService = Utils.getComponent(RightService.class);
+    private final RightService rightService;
+
+    {
+        RightServiceConfigurationManager m;
+        m = Utils.getComponent(RightServiceConfigurationManager.class);
+        rightService = m.getConfiguredRightService();
+    }
 
     @Override
     public boolean checkAccess(String action, XWikiDocument doc, XWikiContext context)

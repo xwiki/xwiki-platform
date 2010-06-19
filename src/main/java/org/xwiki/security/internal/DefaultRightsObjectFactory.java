@@ -24,6 +24,7 @@ package org.xwiki.security.internal;
 
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.Requirement;
+import org.xwiki.component.logging.AbstractLogEnabled;
 
 import org.xwiki.security.RightsObject;
 import org.xwiki.security.RightsObjectFactory;
@@ -43,21 +44,13 @@ import java.util.Collection;
 import java.util.List;
 import java.util.LinkedList;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-
 /**
  * Implementation of the rights object factory interface.
  * @version $Id: $
  */
 @Component
-public class DefaultRightsObjectFactory implements RightsObjectFactory
+public class DefaultRightsObjectFactory extends AbstractLogEnabled implements RightsObjectFactory
 {
-    /**
-     * The logging tool.
-     */
-    private static final Log LOG = LogFactory.getLog(DefaultRightLoader.class);
-
     /** Resolver for user and group names. */
     @Requirement("user") private DocumentReferenceResolver<String> resolver;
 
@@ -97,7 +90,7 @@ public class DefaultRightsObjectFactory implements RightsObjectFactory
         if (baseObjs != null) {
             for (BaseObject obj : baseObjs) {
                 if (obj == null) {
-                    LOG.error("There was a null object!");
+                    getLogger().error("There was a null object!");
                 } else {
                     rightsObjs.add(global
                                    ? new GlobalRightsObject(obj, resolver, wikiName)

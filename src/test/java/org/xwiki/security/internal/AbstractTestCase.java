@@ -56,7 +56,7 @@ public abstract class AbstractTestCase extends AbstractComponentTestCase
     /**
      * The logging tool.
      */
-    protected static final Log LOG = LogFactory.getLog(DefaultRightCacheTest.class);
+    protected final Log LOG = LogFactory.getLog(this.getClass());
 
     protected RightResolver resolver;
 

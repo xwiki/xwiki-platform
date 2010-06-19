@@ -22,6 +22,7 @@ package org.xwiki.security.internal;
 
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.Requirement;
+import org.xwiki.component.logging.AbstractLogEnabled;
 
 import org.xwiki.security.RightService;
 import org.xwiki.security.RightServiceException;
@@ -40,13 +41,7 @@ import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.model.reference.EntityReferenceSerializer;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-
-import java.util.LinkedList;
 import java.util.List;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Formatter;
 
 import com.xpn.xwiki.XWikiContext;
@@ -60,16 +55,8 @@ import com.xpn.xwiki.user.api.XWikiUser;
  * @version $Id: $
  */
 @Component
-public class DefaultRightService implements RightService
+public class DefaultRightService extends AbstractLogEnabled implements RightService
 {
-    /** Logger. */
-    private static final Log LOG = LogFactory.getLog(RightService.class);
-
-    /** Map containing all known actions. */
-    private static Map<String, Right> actionMap;
-    /** List of all rights, as strings. */
-    private static List<String> allRights = new LinkedList();
-
     /** The cached rights. */
     @Requirement private RightCache rightCache;
 
@@ -86,90 +73,19 @@ public class DefaultRightService implements RightService
     @Requirement private EntityReferenceSerializer<String> entityReferenceSerializer;
 
     /**
-     * Putter to circumvent the checkstyle max number of statements.
-     */
-    private static class Putter
-    {
-        /**
-         * @param key Action string.
-         * @param value Right value.
-         * @return This object.
-         */
-        Putter put(String key, Right value)
-        {
-            actionMap.put(key, value);
-            return this;
-        }
-    }
-
-    static {
-        actionMap = new HashMap();
-        new Putter()
-            .put("login", LOGIN)
-            .put("logout", LOGIN)
-            .put("loginerror", LOGIN)
-            .put("loginsubmit", LOGIN)
-            .put("view", VIEW)
-            .put("viewrev", VIEW)
-            .put("get", VIEW)
-            //        actionMap.put("downloadrev", "download"); Huh??
-            .put("downloadrev", VIEW)
-            .put("plain", VIEW)
-            .put("raw", VIEW)
-            .put("attach", VIEW)
-            .put("charting", VIEW)
-            .put("skin", VIEW)
-            .put("download", VIEW)
-            .put("dot", VIEW)
-            .put("svg", VIEW)
-            .put("pdf", VIEW)
-            .put("delete", DELETE)
-            .put("deleteversions", ADMIN)
-            //        actionMap.put("undelete", "undelete"); Huh??
-            .put("undelete", EDIT)
-            .put("reset", DELETE)
-            .put("commentadd", COMMENT)
-            .put("register", REGISTER)
-            .put("redirect", VIEW)
-            .put("admin", ADMIN)
-            .put("export", VIEW)
-            .put("import", ADMIN)
-            .put("jsx", VIEW)
-            .put("ssx", VIEW)
-            .put("tex", VIEW)
-            .put("unknown", VIEW)
-            .put("programming", PROGRAM)
-            .put("edit", EDIT)
-            .put("save", EDIT)
-            .put("preview", EDIT)
-            .put("lock", EDIT)
-            .put("cancel", EDIT)
-            .put("delattachment", EDIT)
-            .put("inline", EDIT)
-            .put("upload", EDIT);
-
-        for (Right level : values()) {
-            if (!level.equals(ILLEGAL)) {
-                allRights.add(level.toString());
-            }
-        }
-    }
-
-    /**
      * Convert an action to a right.
      * @param action String representation of action.
      * @return The corresponding right, or {@link ILLEGAL}.
      */
     protected final Right actionToRight(String action)
     {
-        Right level = actionMap.get(action);
-        if (level == null)
+        Right right = Right.actionToRight(action);
+        if (right == ILLEGAL)
         {
             Formatter f = new Formatter();
-            LOG.error(f.format("No action named '%s'", action.toString()));
-            return ILLEGAL;
+            getLogger().error(f.format("No action named '%s'", action.toString()).toString());
         }
-        return level;
+        return right;
     }
 
     /**
@@ -199,7 +115,7 @@ public class DefaultRightService implements RightService
                     return null;
                 }
             } catch (XWikiException e) {
-                LOG.error("Caught exception while authenticating user.", e);
+                getLogger().error("Caught exception while authenticating user.", e);
                 return null;
             }
 
@@ -229,7 +145,7 @@ public class DefaultRightService implements RightService
                 context.getWiki().getAuthService().showLogin(context);
             }
         } catch (XWikiException e) {
-            LOG.error("Failed to show login page.", e);
+            getLogger().error("Failed to show login page.", e);
         }
     }
 
@@ -249,7 +165,11 @@ public class DefaultRightService implements RightService
      */
     public boolean checkAccess(String action, XWikiDocument doc, XWikiContext context) throws XWikiException
     {
+        getLogger().debug("checkAccess for action " + action);
+
         Right right = actionToRight(action);
+
+        boolean userWasAuthenticated = context.getUser() != null;
 
         DocumentReference document = doc.getDocumentReference();
         DocumentReference user = authenticateUser(right, doc, context);
@@ -260,7 +180,7 @@ public class DefaultRightService implements RightService
             allow = checkAccess(right, user, document, context);
         }
 
-        if (!allow && (user == null || userIsGuest(user))) {
+        if (!allow && !userWasAuthenticated) {
             showLogin(context);
         }
 
@@ -297,12 +217,12 @@ public class DefaultRightService implements RightService
     {
         String wikiname = context.getDatabase();
         DocumentReference document = resolveDocName(docname, wikiname);
-        LOG.debug("Resolved '" + docname + "' into " + document);
+        getLogger().debug("Resolved '" + docname + "' into " + document);
         DocumentReference user = resolveUserName(username, wikiname);
         Right right = Right.toRight(rightname);
         if (right == Right.ILLEGAL) {
             Formatter f = new Formatter();
-            LOG.error(f.format("No such right: '%s'", rightname));
+            getLogger().error(f.format("No such right: '%s'", rightname).toString());
         }
         return checkAccess(right, user, document, context);
     }
@@ -363,7 +283,7 @@ public class DefaultRightService implements RightService
         try {
             accessLevel = getAccessLevel(user, entity);
         } catch (Exception e) {
-            LOG.error("Failed to check admin right for user [" + context.getUser() + "]", e);
+            getLogger().error("Failed to check admin right for user [" + context.getUser() + "]", e);
             return false;
         }
 
@@ -398,7 +318,7 @@ public class DefaultRightService implements RightService
      */
     public List<String> listAllLevels(XWikiContext context) throws XWikiException
     {
-        return allRights;
+        return Right.getAllRightsAsString();
     }
 
     /**
@@ -410,7 +330,7 @@ public class DefaultRightService implements RightService
     {
         XWikiUser user = context.getXWikiUser();
         String username;
-        LOG.debug("Getting user from context: " + user);
+        getLogger().debug("Getting user from context: " + user);
         if (user == null) {
             username = GUEST_USER_FULLNAME;
         } else {
@@ -437,10 +357,10 @@ public class DefaultRightService implements RightService
             if (entry == null) {
                 AccessLevel level = rightLoader.load(user, entity);
                 Formatter f = new Formatter();
-                LOG.debug(f.format("1. Loaded a new entry for %s@%s into cache: %s",
-                                   entityReferenceSerializer.serialize(user),
-                                   entityReferenceSerializer.serialize(entity),
-                                   level));
+                getLogger().debug(f.format("1. Loaded a new entry for %s@%s into cache: %s",
+                                           entityReferenceSerializer.serialize(user),
+                                           entityReferenceSerializer.serialize(entity),
+                                           level).toString());
                 return level;
             }
             switch (entry.getType()) {
@@ -451,24 +371,24 @@ public class DefaultRightService implements RightService
                     if (entry == null) {
                         AccessLevel level = rightLoader.load(user, entity);
                         Formatter f = new Formatter();
-                        LOG.debug(f.format("2. Loaded a new entry for %s@%s into cache: %s",
-                                           entityReferenceSerializer.serialize(user),
-                                           entityReferenceSerializer.serialize(entity),
-                                           level));
+                        getLogger().debug(f.format("2. Loaded a new entry for %s@%s into cache: %s",
+                                                   entityReferenceSerializer.serialize(user),
+                                                   entityReferenceSerializer.serialize(entity),
+                                                   level).toString());
                         return level;
                     } else {
                         if (entry.getType() == RightCacheEntry.Type.ACCESS_LEVEL) {
-                            LOG.debug("Got cached entry for "
+                            getLogger().debug("Got cached entry for "
                                       + entityReferenceSerializer.serialize(user)
                                       + "@"
                                       + entityReferenceSerializer.serialize(entity) + ": " + entry);
                             return (AccessLevel) entry;
                         } else {
                             Formatter f = new Formatter();
-                            LOG.error(f.format("The cached entry for '%s' at '$s' was of incorrect type: %s", 
-                                               user.toString(),
-                                               ref.toString(),
-                                               entry.getType().toString()));
+                            getLogger().error(f.format("The cached entry for '%s' at '$s' was of incorrect type: %s", 
+                                                       user.toString(),
+                                                       ref.toString(),
+                                                       entry.getType().toString()).toString());
                             throw new RuntimeException();
                         }
                     }
@@ -476,14 +396,14 @@ public class DefaultRightService implements RightService
                     break;
                 default:
                     Formatter f = new Formatter();
-                    LOG.error(f.format("The cached entry for '%s' was of incorrect type: %s", 
-                                       ref.toString(),
-                                       entry.getType().toString()));
+                    getLogger().error(f.format("The cached entry for '%s' was of incorrect type: %s", 
+                                               ref.toString(),
+                                               entry.getType().toString()).toString());
                     throw new RuntimeException();
             }
         }
 
-        LOG.debug("Returning default access level.");
+        getLogger().debug("Returning default access level.");
         return AccessLevel.DEFAULT_ACCESS_LEVEL;
     }
 
@@ -496,12 +416,12 @@ public class DefaultRightService implements RightService
      */
     private void logAllow(DocumentReference user, EntityReference entity, Right right, String info)
     {
-        if (LOG.isDebugEnabled()) {
+        if (getLogger().isDebugEnabled()) {
             String userName = entityReferenceSerializer.serialize(user);
             String docName = entityReferenceSerializer.serialize(entity);
             Formatter f = new Formatter();
-            LOG.debug(f.format("Access has been granted for (%s,%s,%s): %s",
-                               userName, docName, right.toString(), info));
+            getLogger().debug(f.format("Access has been granted for (%s,%s,%s): %s",
+                                       userName, docName, right.toString(), info).toString());
         }
     }
 
@@ -514,12 +434,12 @@ public class DefaultRightService implements RightService
      */
     protected void logDeny(DocumentReference user, EntityReference entity,  Right right, String info)
     {
-        if (LOG.isInfoEnabled()) {
+        if (getLogger().isInfoEnabled()) {
             String userName = entityReferenceSerializer.serialize(user);
             String docName = entityReferenceSerializer.serialize(entity);
             Formatter f = new Formatter();
-            LOG.info(f.format("Access has been denied for (%s,%s,%s): %s",
-                              userName, docName, right.toString(), info));
+            getLogger().info(f.format("Access has been denied for (%s,%s,%s): %s",
+                                      userName, docName, right.toString(), info).toString());
         }
     }
     
@@ -533,10 +453,10 @@ public class DefaultRightService implements RightService
      */
     protected void logDeny(String name, String resourceKey, String accessLevel, String info, Exception e)
     {
-        if (LOG.isDebugEnabled()) {
+        if (getLogger().isDebugEnabled()) {
             Formatter f = new Formatter();
-            LOG.debug(f.format("Access has been denied for (%s,%s,%s) at %s",
-                               name, resourceKey, accessLevel, info), e);
+            getLogger().debug(f.format("Access has been denied for (%s,%s,%s) at %s",
+                                       name, resourceKey, accessLevel, info).toString(), e);
         }
     }
 
@@ -556,7 +476,7 @@ public class DefaultRightService implements RightService
                 }
             } catch (NumberFormatException e) {
                 Formatter f = new Formatter();
-                LOG.warn(f.format("Failed to interpete preference value: '%s'", value));
+                getLogger().warn(f.format("Failed to interpete preference value: '%s'", value).toString());
             }
         }
         return null;

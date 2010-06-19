@@ -1,8 +1,11 @@
 org.xwiki.security.internal.DefaultRightService
+org.xwiki.security.internal.DefaultRightServiceConfigurationManager
 org.xwiki.security.internal.DefaultRightCache
+org.xwiki.security.internal.DefaultRightCacheConfiguration
 org.xwiki.security.internal.DefaultRightCacheInvalidator
 org.xwiki.security.internal.DefaultRightLoader
 org.xwiki.security.internal.DefaultRightResolver
+org.xwiki.security.internal.PrioritizingRightResolver
 org.xwiki.security.internal.DefaultRightsObjectFactory
 org.xwiki.security.internal.UserAndGroupReferenceResolver
 org.xwiki.security.internal.RightCacheKeyEntityReferenceSerializer

@@ -20,6 +20,11 @@
  */
 package org.xwiki.security;
 
+import java.util.LinkedList;
+import java.util.List;
+import java.util.HashMap;
+import java.util.Map;
+
 /**
  * Enumeration of the possible rights.
  * @version $Id: $
@@ -45,11 +50,90 @@ public enum Right
     /** Illegal value. */
      ILLEGAL(8, "illegal");
 
+    /** Map containing all known actions. */
+    private static Map<String, Right> actionMap = new HashMap();
+    /** List of all rights, as strings. */
+    private static List<String> allRights = new LinkedList();
+
     /** The numeric value of this access right. */
     private final int value;
 
     /** The string representation. */
     private final String stringRepr;
+
+    /**
+     * Putter to circumvent the checkstyle max number of statements.
+     */
+    private static class Putter
+    {
+        /**
+         * @param key Action string.
+         * @param value Right value.
+         * @return This object.
+         */
+        Putter put(String key, Right value)
+        {
+            actionMap.put(key, value);
+            return this;
+        }
+    }
+
+    static {
+        new Putter()
+            .put(LOGIN.toString(), LOGIN)
+            .put(VIEW.toString(), VIEW)
+            .put(DELETE.toString(), DELETE)
+            .put(ADMIN.toString(), ADMIN)
+            .put(PROGRAM.toString(), PROGRAM)
+            .put(EDIT.toString(), EDIT)
+            .put(REGISTER.toString(), REGISTER)
+            .put("logout", LOGIN)
+            .put("loginerror", LOGIN)
+            .put("loginsubmit", LOGIN)
+            .put("viewrev", VIEW)
+            .put("get", VIEW)
+            //        actionMap.put("downloadrev", "download"); Huh??
+            .put("downloadrev", VIEW)
+            .put("plain", VIEW)
+            .put("raw", VIEW)
+            .put("attach", VIEW)
+            .put("charting", VIEW)
+            .put("skin", VIEW)
+            .put("download", VIEW)
+            .put("dot", VIEW)
+            .put("svg", VIEW)
+            .put("pdf", VIEW)
+            .put("deleteversions", ADMIN)
+            //        actionMap.put("undelete", "undelete"); Huh??
+            .put("undelete", EDIT)
+            .put("reset", DELETE)
+            .put("commentadd", COMMENT)
+            .put("redirect", VIEW)
+            .put("export", VIEW)
+            .put("import", ADMIN)
+            .put("jsx", VIEW)
+            .put("ssx", VIEW)
+            .put("tex", VIEW)
+            .put("unknown", VIEW)
+            .put("save", EDIT)
+            .put("preview", EDIT)
+            .put("lock", EDIT)
+            .put("cancel", EDIT)
+            .put("delattachment", EDIT)
+            .put("inline", EDIT)
+            .put("propadd", EDIT)
+            .put("propupdate", EDIT)
+            .put("objectadd", EDIT)
+            .put("objectremove", EDIT)
+            .put("rollback", EDIT)
+            .put("upload", EDIT);
+
+        for (Right level : values()) {
+            if (!level.equals(ILLEGAL)) {
+                allRights.add(level.toString());
+            }
+        }
+    }
 
     /**
      * @param value Numeric value.
@@ -78,7 +162,7 @@ public enum Right
     /**
      * Convert a string to a right.
      * @param string String representation of right.
-     * @return The corresponding Right instance, or Right.ILLEGAL.
+     * @return The corresponding Right instance, or {@code ILLEGAL}.
      */
     public static Right toRight(String string)
     {
@@ -88,5 +172,28 @@ public enum Right
             }
         }
         return ILLEGAL;
+    }
+
+    /**
+     * Map an action represented by a string to a right.
+     * @param action String representation of action.
+     * @return right The corresponding Right instance, or
+     * {@code ILLEGAL}.
+     */
+    public static Right actionToRight(String action)
+    {
+        Right right = actionMap.get(action);
+        if (right == null) {
+            return ILLEGAL;
+        }
+        return right;
+    }
+
+    /**
+     * @return a list of the string representation of all valid rights.
+     */
+    public static List<String> getAllRightsAsString()
+    {
+        return allRights;
     }
 }

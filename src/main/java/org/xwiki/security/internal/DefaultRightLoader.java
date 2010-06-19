@@ -28,6 +28,7 @@ import org.xwiki.model.reference.DocumentReference;
 
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.Requirement;
+import org.xwiki.component.logging.AbstractLogEnabled;
 
 import org.xwiki.security.RightLoader;
 import org.xwiki.security.RightCache;
@@ -42,9 +43,6 @@ import org.xwiki.security.RightsObject;
 import org.xwiki.security.RightsObjectFactory;
 import org.xwiki.security.AccessLevel;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-
 import java.util.List;
 import java.util.LinkedList;
 import java.util.Collection;
@@ -55,18 +53,13 @@ import java.util.Collection;
  * @version $Id: $
  */
 @Component
-public class DefaultRightLoader implements RightLoader
+public class DefaultRightLoader extends AbstractLogEnabled implements RightLoader
 {
-    /**
-     * The logging tool.
-     */
-    private static final Log LOG = LogFactory.getLog(DefaultRightLoader.class);
-
     /** Maximum number of attempts at loading an entry. */
     private static final int MAX_RETRIES = 5;
 
     /** Resolver for the user, group and rights objects. */
-    @Requirement private RightResolver rightResolver;
+    @Requirement("priority") private RightResolver rightResolver;
 
     /** The right cache. */
     @Requirement private RightCache rightCache;
@@ -91,24 +84,24 @@ public class DefaultRightLoader implements RightLoader
                 return loadRequiredEntries(user, entity);
             } catch (ParentEntryEvictedException e) {
                 if (retries < MAX_RETRIES) {
-                    LOG.debug("The parent entry was evicted. Have tried " 
-                             + retries
-                             + " times.  Trying again...");
+                    getLogger().debug("The parent entry was evicted. Have tried " 
+                                      + retries
+                                      + " times.  Trying again...");
                     continue RETRY;
                 }
             } catch (ConflictingInsertionException e) {
                 if (retries < MAX_RETRIES) {
-                    LOG.debug("There were conflicting insertions.  Have tried "
-                              + retries
-                              + " times.  Retrying...");
+                    getLogger().debug("There were conflicting insertions.  Have tried "
+                                      + retries
+                                      + " times.  Retrying...");
                     continue RETRY;
                 }
             } finally {
                 rightCacheInvalidator.resume();
             }
-            LOG.error("Failed to load the cache in "
-                      + retries
-                      + " attempts.  Giving up.");
+            getLogger().error("Failed to load the cache in "
+                              + retries
+                              + " attempts.  Giving up.");
             throw new RightServiceException();
         }
     }
@@ -191,7 +184,10 @@ public class DefaultRightLoader implements RightLoader
             = getRightsObjects(entityKey, entity);
 
         AccessLevel accessLevel = rightResolver.resolve(user, entity, entityKey, groups, rightsObjects);
-        LOG.debug("Adding " + userKey.getEntityReference() + "@" + entityKey.getEntityReference() + ": " + accessLevel);
+        getLogger().debug("Adding "
+                          + userKey.getEntityReference() + "@"
+                          + entityKey.getEntityReference() + ": "
+                          + accessLevel);
         rightCache.addUserAtEntity(userKey, entityKey, accessLevel);
         return accessLevel;
     }
@@ -275,7 +271,7 @@ public class DefaultRightLoader implements RightLoader
                     String message = "There is an entry of type "
                         + ref.getType()
                         + " in the right cache!";
-                    LOG.error(message);
+                    getLogger().error(message);
                     throw new RightServiceException(message);
             }
         }
@@ -316,9 +312,9 @@ public class DefaultRightLoader implements RightLoader
                 global = false;
                 break;
             default:
-                LOG.error("Rights on entities of type "
-                          + entity.getType()
-                          + " is not supported by this loader!");
+                getLogger().error("Rights on entities of type "
+                                  + entity.getType()
+                                  + " is not supported by this loader!");
                 throw new EntityTypeNotSupportedException(entity.getType(), this);
         }
 

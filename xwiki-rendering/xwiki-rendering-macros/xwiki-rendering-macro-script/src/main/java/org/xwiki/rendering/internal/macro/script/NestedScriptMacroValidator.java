@@ -32,42 +32,45 @@ import org.xwiki.rendering.transformation.MacroTransformationContext;
 
 /**
  * Make sure script macros are not nested.
- * 
- * @param <P> the type of macro parameters bean.
+ *
  * @version $Id$
+ * @param <P> the type of macro parameters bean.
  * @since 2.3.2
  */
 @Component("nested")
 public class NestedScriptMacroValidator<P extends ScriptMacroParameters> implements ScriptMacroValidator<P>
 {
-    /** Used to get a macro by id. */
+    /**
+     * Used to get a macro by id.
+     */
     @Requirement
     private MacroManager macroManager;
 
     /**
      * {@inheritDoc}
+     *
      * @see ScriptMacroValidator#validate
      */
-    public void validate(P parameters, String content, MacroTransformationContext context) 
+    public void validate(P parameters, String content, MacroTransformationContext context)
         throws MacroExecutionException
     {
-        // traverse the XDOM tree up to the root
-       if (context.getCurrentMacroBlock() != null) {
-           MacroMarkerBlock parent = context.getCurrentMacroBlock().getParentBlockByType(MacroMarkerBlock.class);
+        // Traverse the XDOM tree up to the root
+        if (context.getCurrentMacroBlock() != null) {
+            MacroMarkerBlock parent = context.getCurrentMacroBlock().getParentBlockByType(MacroMarkerBlock.class);
             while (parent != null) {
                 String parentId = parent.getId();
                 try {
                     if (macroManager.getMacro(new MacroId(parentId)) instanceof ScriptMacro) {
                         throw new MacroExecutionException("Nested scripts are not allowed");
                     } else if ("include".equals(parentId)) {
-                        // included documents intercept the chain of nested script macros with XWiki syntax
+                        // Included documents intercept the chain of nested script macros with XWiki syntax
                         return;
                     }
                 } catch (MacroLookupException exception) {
-                    // shouldn't happen, the parent macro was already successfully executed earlier
+                    // Shouldn't happen, the parent macro was already successfully executed earlier
                 }
                 parent = parent.getParentBlockByType(MacroMarkerBlock.class);
             }
-       }
+        }
     }
 }

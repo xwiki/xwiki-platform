@@ -216,7 +216,7 @@ $xwiki.ssfx.use("uicomponents/search/search.css", true)##
         #set ($discard = $feed.setDescription($msg.get('search.rss', [$text])))
         #set ($discard = $feed.setLanguage($context.language))
         #set ($discard = $feed.setCopyright($xwiki.getXWikiPreference('copyright')))
-        {{html clean="false"}}$xwiki.feed.getFeedOutput($feed, 'rss_2.0'){{/html}}
+        {{{$xwiki.feed.getFeedOutput($feed, 'rss_2.0')}}}
       #else
         #set ($list = $results)
         #set ($isScored = true)

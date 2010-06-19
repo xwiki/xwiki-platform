@@ -22,43 +22,17 @@ package org.xwiki.observation.event;
 import org.xwiki.observation.event.filter.EventFilter;
 
 /**
- * Base class for all document {@link Event events}.
+ * An Event that supports {@link EventFilter}s.
  * 
  * @version $Id$
+ * @since 2.4M2
  */
-public abstract class AbstractDocumentEvent extends AbstractFilterableEvent
+public interface FilterableEvent extends Event
 {
     /**
-     * The version identifier for this Serializable class. Increment only if the <i>serialized</i> form of the class
-     * changes.
+     * Retrieves the filter used to match this event against other events, used in {@link #matches(Object)}.
+     *
+     * @return the event's filter
      */
-    private static final long serialVersionUID = 1L;
-
-    /**
-     * This event will match any other document event of the same type.
-     */
-    public AbstractDocumentEvent()
-    {
-        super();
-    }
-
-    /**
-     * This event will match only events of the same type affecting the same document.
-     * 
-     * @param documentName the name of the document related to this event
-     */
-    public AbstractDocumentEvent(String documentName)
-    {
-        super(documentName);
-    }
-
-    /**
-     * Constructor using a custom {@link EventFilter}.
-     * 
-     * @param eventFilter the filter to use for matching events
-     */
-    public AbstractDocumentEvent(EventFilter eventFilter)
-    {
-        super(eventFilter);
-    }
+    EventFilter getEventFilter();
 }

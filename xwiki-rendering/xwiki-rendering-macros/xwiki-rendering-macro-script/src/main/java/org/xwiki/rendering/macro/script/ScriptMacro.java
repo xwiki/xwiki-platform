@@ -25,7 +25,7 @@ package org.xwiki.rendering.macro.script;
  * is that script macros cannot be nested.
  * 
  * @version $Id$
- * @since 2.4M2
+ * @since 2.3.2
  */
 public interface ScriptMacro
 {

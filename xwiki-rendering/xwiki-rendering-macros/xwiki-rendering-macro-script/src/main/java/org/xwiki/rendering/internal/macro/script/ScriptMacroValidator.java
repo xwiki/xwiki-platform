@@ -29,7 +29,7 @@ import org.xwiki.rendering.transformation.MacroTransformationContext;
  * 
  * @param <P> the type of macro parameters bean.
  * @version $Id$
- * @since 2.4M2
+ * @since 2.3.2
  */
 @ComponentRole
 public interface ScriptMacroValidator<P extends ScriptMacroParameters>

@@ -193,7 +193,7 @@ public interface XWikiGroupService
      * @param context the XWiki context.
      * @return the {@link Collection} of {@link DocumentReference} containing representing groups.
      * @throws XWikiException error when browsing groups.
-     * @since 2.4M2
+     * @since 2.3.2
      */
     public Collection<DocumentReference> getAllGroupsReferencesForMember(DocumentReference memberReference, int limit,
         int offset, XWikiContext context) throws XWikiException;

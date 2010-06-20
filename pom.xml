@@ -188,6 +188,8 @@
                 <exclude>org/xwiki/model/ModelContext</exclude>
                 <exclude>org/xwiki/bridge/DocumentAccessBridge</exclude>
                 <exclude>org/xwiki/velocity/VelocityEngine</exclude>
+                <exclude>org/xwiki/rendering/macro/script/AbstractScriptMacro</exclude>
+                <exclude>org/xwiki/rendering/macro/script/AbstractJSR223ScriptMacro</exclude>
               </excludes>
             </configuration>
           </plugin>

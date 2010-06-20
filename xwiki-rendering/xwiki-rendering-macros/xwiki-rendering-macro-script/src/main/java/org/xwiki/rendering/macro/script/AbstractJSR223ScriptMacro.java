@@ -20,6 +20,7 @@
 package org.xwiki.rendering.macro.script;
 
 import java.io.StringWriter;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -35,6 +36,7 @@ import org.apache.commons.lang.StringUtils;
 import org.xwiki.component.annotation.Requirement;
 import org.xwiki.context.ExecutionContext;
 import org.xwiki.rendering.block.Block;
+import org.xwiki.rendering.block.XDOM;
 import org.xwiki.rendering.macro.MacroExecutionException;
 import org.xwiki.rendering.macro.descriptor.ContentDescriptor;
 import org.xwiki.rendering.transformation.MacroTransformationContext;
@@ -52,8 +54,8 @@ public abstract class AbstractJSR223ScriptMacro<P extends JSR223ScriptMacroParam
     /**
      * Key under which the Script Engines are saved in the Execution Context, see {@link #execution}.
      */
-    private static final String EXECUTION_CONTEXT_ENGINE_KEY = "scriptEngines"; 
-    
+    private static final String EXECUTION_CONTEXT_ENGINE_KEY = "scriptEngines";
+
     /**
      * Used to get the current script context to give to script engine evaluation method.
      */
@@ -162,60 +164,91 @@ public abstract class AbstractJSR223ScriptMacro<P extends JSR223ScriptMacroParam
     /**
      * {@inheritDoc}
      * 
-     * @see AbstractScriptMacro#evaluate(ScriptMacroParameters, String, MacroTransformationContext) 
+     * @see AbstractScriptMacro#evaluate(ScriptMacroParameters, String, MacroTransformationContext)
      */
     @Override
-    protected String evaluate(P parameters, String content, MacroTransformationContext context)
+    protected List<Block> evaluateBlock(P parameters, String content, MacroTransformationContext context)
         throws MacroExecutionException
     {
         if (StringUtils.isEmpty(content)) {
-            return "";
+            return Collections.emptyList();
         }
 
         String engineName = getScriptEngineName(parameters, context);
 
-        String scriptResult;
+        List<Block> result;
         if (engineName != null) {
-
             try {
                 ScriptEngine engine = getScriptEngine(engineName);
-                
+
                 if (engine != null) {
-                    ScriptContext scriptContext = getScriptContext();
-
-                    StringWriter stringWriter = new StringWriter();
-
-                    // set writer in script context
-                    scriptContext.setWriter(stringWriter);
-
-                    eval(content, engine, scriptContext);
-
-                    // remove writer script from context
-                    scriptContext.setWriter(null);
-
-                    scriptResult = stringWriter.toString();
+                    result = evaluateBlock(engine, parameters, content, context);
                 } else {
                     throw new MacroExecutionException("Can't find script engine with name [" + engineName + "]");
                 }
             } catch (ScriptException e) {
                 throw new MacroExecutionException("Failed to evaluate Script Macro for content [" + content + "]", e);
             }
-            
+
         } else {
             // If no language identifier is provided, don't evaluate content
-            scriptResult = content;
+            result = parseScriptResult(content, parameters, context);
         }
 
-        return scriptResult;
+        return result;
+    }
+
+    /**
+     * Execute provided script and return {@link Block} based result.
+     * 
+     * @param engine the script engine to use to evaluate the script.
+     * @param parameters the macro parameters.
+     * @param content the script to execute.
+     * @param context the context of the macro transformation.
+     * @return the result of script execution.
+     * @throws ScriptException failed to evaluate script
+     * @throws MacroExecutionException failed to evaluate provided content.
+     */
+    protected List<Block> evaluateBlock(ScriptEngine engine, P parameters, String content,
+        MacroTransformationContext context) throws ScriptException, MacroExecutionException
+    {
+        List<Block> result;
+
+        ScriptContext scriptContext = getScriptContext();
+
+        StringWriter stringWriter = new StringWriter();
+
+        // set writer in script context
+        scriptContext.setWriter(stringWriter);
+
+        try {
+            Object scriptResult = eval(content, engine, scriptContext);
+
+            if (scriptResult instanceof XDOM) {
+                result = ((XDOM) scriptResult).getChildren();
+            } else if (scriptResult instanceof Block) {
+                result = Collections.singletonList((Block) scriptResult);
+            } else if (scriptResult instanceof List && !((List) scriptResult).isEmpty()
+                && ((List) scriptResult).get(0) instanceof Block) {
+                result = (List<Block>) scriptResult;
+            } else {
+                // Run the wiki syntax parser on the script-rendered content
+                result = parseScriptResult(stringWriter.toString(), parameters, context);
+            }
+        } finally {
+            // remove writer script from context
+            scriptContext.setWriter(null);
+        }
+
+        return result;
     }
 
     /**
      * @param engineName the script engine name (eg "groovy", etc)
-     * @return the Script engine to use to evaluate the script 
+     * @return the Script engine to use to evaluate the script
      * @throws MacroExecutionException in case of an error in parsing the jars parameter
      */
-    private ScriptEngine getScriptEngine(String engineName)
-        throws MacroExecutionException
+    private ScriptEngine getScriptEngine(String engineName) throws MacroExecutionException
     {
         // Look for a script engine in the Execution Context since we want the same engine to be used
         // for all evals during the same execution lifetime.
@@ -227,14 +260,14 @@ public abstract class AbstractJSR223ScriptMacro<P extends JSR223ScriptMacroParam
         // we ensure in AbstractScriptMacro to reuse the same thread context ClassLoader during the whole
         // request execution.
         ExecutionContext executionContext = this.execution.getContext();
-        Map<String, ScriptEngine> scriptEngines = 
+        Map<String, ScriptEngine> scriptEngines =
             (Map<String, ScriptEngine>) executionContext.getProperty(EXECUTION_CONTEXT_ENGINE_KEY);
         if (scriptEngines == null) {
             scriptEngines = new HashMap<String, ScriptEngine>();
             executionContext.setProperty(EXECUTION_CONTEXT_ENGINE_KEY, scriptEngines);
         }
         ScriptEngine engine = scriptEngines.get(engineName);
-        
+
         if (engine == null) {
             ScriptEngineManager sem = new ScriptEngineManager();
             engine = sem.getEngineByName(engineName);
@@ -243,7 +276,7 @@ public abstract class AbstractJSR223ScriptMacro<P extends JSR223ScriptMacroParam
 
         return engine;
     }
-    
+
     /**
      * Execute the script.
      * 
@@ -277,7 +310,7 @@ public abstract class AbstractJSR223ScriptMacro<P extends JSR223ScriptMacroParam
 
         return engine.compile(content);
     }
-    
+
     /**
      * Indicate if the script is executable in the current context.
      * <p>
@@ -289,5 +322,5 @@ public abstract class AbstractJSR223ScriptMacro<P extends JSR223ScriptMacroParam
     protected boolean canExecuteScript()
     {
         return this.documentAccessBridge.hasProgrammingRights();
-    }    
+    }
 }

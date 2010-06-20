@@ -51,8 +51,8 @@ import org.xwiki.rendering.util.ParserUtils;
  * @since 1.7M3
  */
 // TODO: This class is on the edge of a fanout violation and needs to be refactored and split up.
-public abstract class AbstractScriptMacro<P extends ScriptMacroParameters> extends AbstractMacro<P>
-    implements ScriptMacro
+public abstract class AbstractScriptMacro<P extends ScriptMacroParameters> extends AbstractMacro<P> implements
+    ScriptMacro
 {
     /**
      * The default description of the script macro content.
@@ -210,11 +210,10 @@ public abstract class AbstractScriptMacro<P extends ScriptMacroParameters> exten
                 }
 
                 // 2) Run script engine on macro block content
-                String scriptResult = evaluate(parameters, content, context);
+                List<Block> blocks = evaluateBlock(parameters, content, context);
 
                 if (parameters.isOutput()) {
-                    // 3) Run the wiki syntax parser on the script-rendered content
-                    result = parseScriptResult(scriptResult, parameters, context);
+                    result = blocks;
                 }
             } finally {
                 // Restore original class loader
@@ -256,7 +255,7 @@ public abstract class AbstractScriptMacro<P extends ScriptMacroParameters> exten
         // We cache the Class Loader for improved performances and we check if the saved class loader had the same
         // jar parameters value as the current execution. If not, we compute a new class loader.
         ExtendedURLClassLoader cl =
-                (ExtendedURLClassLoader) this.execution.getContext().getProperty(EXECUTION_CONTEXT_CLASSLOADER_KEY);
+            (ExtendedURLClassLoader) this.execution.getContext().getProperty(EXECUTION_CONTEXT_CLASSLOADER_KEY);
 
         if (cl == null) {
             if (!StringUtils.isEmpty(jarsParameterValue)) {
@@ -266,7 +265,7 @@ public abstract class AbstractScriptMacro<P extends ScriptMacroParameters> exten
             }
         } else {
             String cachedJarsParameterValue =
-                    (String) this.execution.getContext().getProperty(EXECUTION_CONTEXT_JARPARAMS_KEY);
+                (String) this.execution.getContext().getProperty(EXECUTION_CONTEXT_JARPARAMS_KEY);
             if (cachedJarsParameterValue != jarsParameterValue) {
                 cl = createOrExtendClassLoader(false, jarsParameterValue, cl);
             }
@@ -358,9 +357,54 @@ public abstract class AbstractScriptMacro<P extends ScriptMacroParameters> exten
      * @param context the context of the macro transformation.
      * @return the result of script execution.
      * @throws MacroExecutionException failed to evaluate provided content.
+     * @deprecated since 2.4M2 use {@link #evaluateString(ScriptMacroParameters, String, MacroTransformationContext)}
+     *             instead
      */
-    protected abstract String evaluate(P parameters, String content, MacroTransformationContext context)
-        throws MacroExecutionException;
+    @Deprecated
+    protected String evaluate(P parameters, String content, MacroTransformationContext context)
+        throws MacroExecutionException
+    {
+        return "";
+    }
+
+    /**
+     * Execute provided script and return {@link String} based result.
+     * 
+     * @param parameters the macro parameters.
+     * @param content the script to execute.
+     * @param context the context of the macro transformation.
+     * @return the result of script execution.
+     * @throws MacroExecutionException failed to evaluate provided content.
+     */
+    protected String evaluateString(P parameters, String content, MacroTransformationContext context)
+        throws MacroExecutionException
+    {
+        // Call old method for retro-compatibility
+        return evaluate(parameters, content, context);
+    }
+
+    /**
+     * Execute provided script and return {@link Block} based result.
+     * 
+     * @param parameters the macro parameters.
+     * @param content the script to execute.
+     * @param context the context of the macro transformation.
+     * @return the result of script execution.
+     * @throws MacroExecutionException failed to evaluate provided content.
+     */
+    protected List<Block> evaluateBlock(P parameters, String content, MacroTransformationContext context)
+        throws MacroExecutionException
+    {
+        String scriptResult = evaluateString(parameters, content, context);
+
+        List<Block> result = Collections.emptyList();
+        if (parameters.isOutput()) {
+            // Run the wiki syntax parser on the script-rendered content
+            result = parseScriptResult(scriptResult, parameters, context);
+        }
+
+        return result;
+    }
 
     /**
      * Get the parser of the current wiki syntax.

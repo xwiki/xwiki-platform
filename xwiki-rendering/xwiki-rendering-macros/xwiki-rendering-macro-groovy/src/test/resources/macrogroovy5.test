@@ -1,0 +1,15 @@
+.#--------------------------------------------------------
+.input|xwiki/2.0
+.# Ensure that it's possible to directly return the macro resulting blocks.
+.#--------------------------------------------------------
+{{groovy}}
+return new org.xwiki.rendering.block.WordBlock("word")
+{{/groovy}}
+.#-----------------------------------------------------
+.expect|event/1.0
+.#-----------------------------------------------------
+beginDocument
+beginMacroMarkerStandalone [groovy] [] [return new org.xwiki.rendering.block.WordBlock("word")]
+onWord [word]
+endMacroMarkerStandalone [groovy] [] [return new org.xwiki.rendering.block.WordBlock("word")]
+endDocument

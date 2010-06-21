@@ -53,7 +53,7 @@
 ## ---------------------------------------------------------------------------------------------------------
 ## Build the list of available template providers
 ## ---------------------------------------------------------------------------------------------------------
-#set($templateProviders = $xwiki.queryManager.xwql("from doc.object(XWiki.TemplateProviderClass) as template where doc.fullName not like 'XWiki.TemplateProviderTemplate'").execute())
+#set($templateProviders = $services.query.xwql("from doc.object(XWiki.TemplateProviderClass) as template where doc.fullName not like 'XWiki.TemplateProviderTemplate'").execute())
 #set($availableTemplateProviders = $util.getArrayList())
 #foreach($templateProvider in $templateProviders)
   #set($tpobj = $xwiki.getDocument($templateProvider).getObject('XWiki.TemplateProviderClass'))

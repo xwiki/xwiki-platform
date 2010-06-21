@@ -26,16 +26,11 @@
 var Scriptaculous = {
   Version: '1.8.3',
   require: function(libraryName) {
-    try{
-      // inserting via DOM fails in Safari 2.0, so brute force approach
-      document.write('<script type="text/javascript" src="'+libraryName+'"><\/script>');
-    } catch(e) {
-      // for xhtml+xml served content, fall back to DOM methods
-      var script = document.createElement('script');
-      script.type = 'text/javascript';
-      script.src = libraryName;
-      document.getElementsByTagName('head')[0].appendChild(script);
-    }
+    // Changed in XWiki to work as a defered script
+    var script = document.createElement('script');
+    script.type = 'text/javascript';
+    script.src = libraryName;
+    document.getElementsByTagName('head')[0].appendChild(script);
   },
   REQUIRED_PROTOTYPE: '1.6.0.3',
   load: function() {

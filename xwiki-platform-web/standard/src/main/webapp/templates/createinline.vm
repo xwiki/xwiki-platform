@@ -14,18 +14,14 @@
 ## we're creating a new page and default it to the current document's space home page if we're creating a
 ## new space.
 ## ---------------------------------------------------------------------------------------------------------
-#set($rparent = "$!request.getParameter('parent')")
-#if($rparent == '')
-  #if ($tocreate == 'page')
-    #set ($parentReference = $doc.documentReference)
-  #else
-    #set ($parentReference = $services.model.createDocumentReference($doc.documentReference.wikiReference.name, 
-      $doc.documentReference.lastSpaceReference.name, ""))
-  #end
-  #set($rparent = $escapetool.url($services.model.serialize($parentReference, "local")))  
+#set($parent = "$!request.getParameter('parent')")
+#if($parent == '' && $tocreate == 'page')
+  #set ($parentReference = $services.model.createDocumentReference($doc.documentReference.wikiReference.name, 
+    $doc.documentReference.lastSpaceReference.name, ""))
+  #set($parent = $escapetool.url($services.model.serialize($parentReference, "local")))
 #end
 #set($template = "$!request.getParameter('template')")
-#set($redirectparams = "parent=${rparent}&template=${template}")
+#set($redirectparams = "parent=${parent}&template=${template}")
 ## ---------------------------------------------------------------------------------------------------------
 ## Set the space, page, title variables from the current doc if its new, from the passed parameters if any
 ## ---------------------------------------------------------------------------------------------------------
@@ -57,7 +53,7 @@
 ## ---------------------------------------------------------------------------------------------------------
 ## Build the list of available template providers
 ## ---------------------------------------------------------------------------------------------------------
-#set($templateProviders = $xwiki.searchDocuments(", BaseObject obj where doc.fullName=obj.name and obj.className='XWiki.TemplateProviderClass' and doc.fullName != 'XWiki.TemplateProviderTemplate'"))
+#set($templateProviders = $xwiki.queryManager.xwql("from doc.object(XWiki.TemplateProviderClass) as template where doc.fullName not like 'XWiki.TemplateProviderTemplate'").execute())
 #set($availableTemplateProviders = $util.getArrayList())
 #foreach($templateProvider in $templateProviders)
   #set($tpobj = $xwiki.getDocument($templateProvider).getObject('XWiki.TemplateProviderClass'))
@@ -186,7 +182,7 @@ $xwiki.get('ssfx').use('uicomponents/widgets/validation/livevalidation.css')##
     ## Page creation
     ## ---------------------------------------------------------------------------------------------------------
     #set($jsValidationInitializersContainer = $util.getArrayList())      
-    <input type="hidden" name="parent" value="$rparent"/>    
+    <input type="hidden" name="parent" value="$parent"/>    
     ## ---------------------------------------------------------------------------------------------------------
     ## Template field
     ## ---------------------------------------------------------------------------------------------------------

@@ -52,6 +52,13 @@ public class PropertyMetaClass extends BaseClass implements PropertyInterface
         name_class.setSize(40);
         safeput("name", name_class);
 
+        BooleanClass disabled_class = new BooleanClass(this);
+        disabled_class.setName("disabled");
+        disabled_class.setPrettyName("Disabled");
+        disabled_class.setDisplayType("yesno");
+        disabled_class.setDisplayFormType("checkbox");
+        safeput("disabled", disabled_class);
+
         StringClass prettyname_class = new StringClass(this);
         prettyname_class.setName("prettyName");
         prettyname_class.setPrettyName("Pretty Name");

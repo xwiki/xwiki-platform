@@ -167,6 +167,35 @@ public class BaseClass extends BaseCollection implements ClassInterface
     }
 
     /**
+     * Mark a property as disabled. A disabled property should not be editable, but existing object values are still
+     * kept in the database.
+     * 
+     * @param name the name of the property to disable
+     */
+    public void disableField(String name)
+    {
+        PropertyClass pclass = (PropertyClass) safeget(name);
+
+        if (pclass != null) {
+            pclass.setDisabled(true);
+        }
+    }
+
+    /**
+     * Re-enable a property. This field will appear again in object instances.
+     * 
+     * @param name the name of the property to enable
+     */
+    public void enableField(String name)
+    {
+        PropertyClass pclass = (PropertyClass) safeget(name);
+
+        if (pclass != null) {
+            pclass.setDisabled(false);
+        }
+    }
+
+    /**
      * {@inheritDoc}
      * 
      * @see com.xpn.xwiki.objects.BaseCollection#get(java.lang.String)

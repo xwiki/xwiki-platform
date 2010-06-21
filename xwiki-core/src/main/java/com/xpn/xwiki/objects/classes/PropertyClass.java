@@ -68,6 +68,7 @@ public class PropertyClass extends BaseCollection implements PropertyClassInterf
         setPrettyName(prettyname);
         setxWikiClass(xWikiClass);
         setUnmodifiable(false);
+        setDisabled(false);
     }
 
     public BaseClass getxWikiClass()
@@ -474,6 +475,34 @@ public class PropertyClass extends BaseCollection implements PropertyClassInterf
             setIntValue("unmodifiable", 1);
         } else {
             setIntValue("unmodifiable", 0);
+        }
+    }
+
+    /**
+     * See if this property is disabled or not. A disabled property should not be editable, but existing object values
+     * are still kept in the database.
+     * 
+     * @return {@code true} if this property is disabled and should not be used, {@code false} otherwise
+     * @see #setDisabled(boolean)
+     */
+    public boolean isDisabled()
+    {
+        return (getIntValue("disabled", 0) == 1);
+    }
+
+    /**
+     * Disable or re-enable this property. A disabled property should not be editable, but existing object values are
+     * still kept in the database.
+     * 
+     * @param disabled whether the property is disabled or not
+     * @see #isDisabled()
+     */
+    public void setDisabled(boolean disabled)
+    {
+        if (disabled) {
+            setIntValue("disabled", 1);
+        } else {
+            setIntValue("disabled", 0);
         }
     }
 

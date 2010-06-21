@@ -11,6 +11,13 @@
   font-variant: normal;
   color: $theme.textPrimaryColor;
 }
+#body .xclass-title h2 span {
+  border: none;
+  color: inherit;
+  display: inline;
+  margin: 0;
+  position: static;
+}
 /* Basic form elements styling */
 #xwikiobjects input, #xwikiobjects textarea,
 #xwikiclassproperties input, #xwikiclassproperties textarea {
@@ -60,7 +67,7 @@
 }
 
 /* XObject */
-.xobject-title {
+.xobject-title, .add_xobject-title {
   position: relative;
   border: none;
   cursor: default;
@@ -78,13 +85,13 @@
   margin: 0;
   padding: 4px 4px 4px 10px;
   border: none;
+  color: $theme.textColor;
 }
 .xobject-content {
   padding: 4px 14px 8px;
   border: none;
   margin-bottom: 2px;
 }
-
 /* XProperty */
 .xobject dl, .xproperty dl {
   margin: 0;
@@ -93,8 +100,8 @@
   font-size: 75%;
   font-weight: bold;
 }
-#body .xobject-title h3, #body .xclass-title {
-  padding-left: 14px;
+#body .xobject-title h3, #body .xclass-title, .add_xobject-title {
+  padding-left: 14px !important; /* important for toucan */
 }
 .xobject-title:hover, .xclass-title:hover, .xproperty-title:hover {
   cursor: default;
@@ -207,14 +214,43 @@
 .collapsable dt .collapsed {
   background-image: url("$xwiki.getSkinFile('icons/silk/bullet_toggle_plus.gif')");
 }
-/* XProperty reordering in the class editor */
-.xproperty-title .move {
-  display: block;
-  overflow: hidden;
-  position: absolute;
-  right: 0;
-  top: 2px;
-  padding: 2px;
+/* Disabled/Deprecated */
+.disabled {
+  opacity: 0.5;
+}
+.disabled * {
+  font-style: italic;
+}
+.disabled .xproperty-title h2, #body #xwikiclassproperties .disabled dt label, #body #xwikiobjects dt.disabled label {
+  color: $theme.textColor;
+}
+.syncProperties {
+  font-weight: 900;
+  display: inline-block;
+  padding: 2px 0 2px 22px;
+  background: transparent url("$xwiki.getSkinFile('icons/silk/cross.gif')") left center no-repeat;
+  margin-left: -22px;
+}
+/* XProperty tools */
+.disabletool label {
+  font-weight: 900;
+}
+.xproperty-title .tools {
+  float: right;
+  margin-top: -18px;
+}
+.xproperty-title .tools .tool {
+  width: 16px;
+  height: 16px;
+  float: left;
+  background: transparent none center no-repeat;
+  text-indent: -9999px;
+}
+.xproperty-title .tools .delete {
+  background-image: url($xwiki.getSkinFile('icons/silk/cross.gif'));
+}
+.xproperty-title .tools .move {
+  background-image: url($xwiki.getSkinFile('icons/datamodel/move.png'));
   cursor: move;
 }
 .dragged .xproperty-title {
@@ -256,4 +292,65 @@
 }
 .PasswordClass h2 {
   background-image: url("$xwiki.getSkinFile('icons/datamodel/password.png')");
+}
+#add_xproperty {
+  background: transparent url("$xwiki.getSkinFile('icons/silk/bullet_add.gif')") left center no-repeat;
+  padding-left: 14px;
+  margin-left: 16px;
+}
+#body #xwikiclassproperties #add_xproperty label,
+#body #xwikiobjects #add_xobject label {
+  margin: 0;
+  text-transform: none;
+  font-style: italic;
+  font-size: 100%;
+  font-weight: normal;
+  display: inline;
+  color: $theme.linkColor;
+}
+
+#xwikiclassproperties #add_xproperty input, #xwikiclassproperties #add_xproperty select,
+#xwikiobjects #add_xobject input, #xwikiobjects #add_xobject select {
+  width: auto !important;
+}
+
+#add_xobject {
+  margin: 1em 0 0;
+}
+
+#add_xobject .add_xobject-title {
+  background-position: left 0.5em;
+  padding-top: 8px;
+  margin-top: 8px;
+  border-top: none;
+}
+
+.add_xobject-title {
+  width: auto;
+  font-style: italic;
+  background: transparent url("$xwiki.getSkinFile('icons/silk/bullet_add.gif')") no-repeat left center;
+  display: inline;
+  color: $theme.linkColor;
+  font-size: 80%;
+  padding-top: 2px;
+  margin-top: 8px;
+  border-top: 1px dotted $theme.borderColor;
+}
+.xclass-content .add_xobject-title {
+  display: block;
+}
+.add_xobject-title a {
+  color: $theme.linkColor;
+  text-decoration: none;
+  display: block;
+  padding: 2px 0;
+}
+.add_xobject-title a:hover{
+  text-decoration: underline;
+  background-color: $theme.highlightColor;
+}
+
+#switch-xclass {
+  text-align: right;
+  margin: 4px 0 -16px;
 }

@@ -302,8 +302,8 @@ public class BaseClass extends BaseCollection implements ClassInterface
 
     /**
      * Retrieves deprecated properties of the given object compared to the class. A deprecated property is a property
-     * which exists in the Object but doesn't exist anymore in the Class. This is used for synchronization of existing
-     * or imported Objects with respect to the modifications of their associated Class.
+     * which exists in the Object but doesn't exist anymore in the Class, or which has the wrong data type. This is used
+     * for synchronization of existing or imported Objects with respect to the modifications of their associated Class.
      * 
      * @param object the instance of this class where to look for undefined properties
      * @return an unmodifiable list containing the properties of the object which don't exist in the class
@@ -321,6 +321,13 @@ public class BaseClass extends BaseCollection implements ClassInterface
         for (BaseProperty property : objectProperties) {
             if (safeget(property.getName()) == null) {
                 deprecatedObjectProperties.add(property);
+            } else {
+                String propertyClass = ((PropertyClass) safeget(property.getName())).newProperty().getClassType();
+                String objectPropertyClass = property.getClassType();
+
+                if (!propertyClass.equals(objectPropertyClass)) {
+                    deprecatedObjectProperties.add(property);
+                }
             }
         }
 

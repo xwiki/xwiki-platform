@@ -375,6 +375,7 @@ public abstract class AbstractScriptMacro<P extends ScriptMacroParameters> exten
      * @param context the context of the macro transformation.
      * @return the result of script execution.
      * @throws MacroExecutionException failed to evaluate provided content.
+     * @since 2.4M2
      */
     protected String evaluateString(P parameters, String content, MacroTransformationContext context)
         throws MacroExecutionException
@@ -391,6 +392,7 @@ public abstract class AbstractScriptMacro<P extends ScriptMacroParameters> exten
      * @param context the context of the macro transformation.
      * @return the result of script execution.
      * @throws MacroExecutionException failed to evaluate provided content.
+     * @since 2.4M2
      */
     protected List<Block> evaluateBlock(P parameters, String content, MacroTransformationContext context)
         throws MacroExecutionException

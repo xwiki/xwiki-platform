@@ -35,6 +35,7 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.apache.commons.fileupload.FileItem;
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang.BooleanUtils;
 import org.apache.commons.lang.RandomStringUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
@@ -741,5 +742,16 @@ public class Utils
         }
 
         return result;
+    }
+
+    /**
+     * Verify if the current request is an AJAX request.
+     * 
+     * @param context the current request context
+     * @return True if this is an AJAX request, false otherwise.
+     */
+    public static Boolean isAjaxRequest(XWikiContext context)
+    {
+        return BooleanUtils.isTrue((Boolean) context.get("ajax"));
     }
 }

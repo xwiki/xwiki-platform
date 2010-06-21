@@ -22,7 +22,8 @@ package com.xpn.xwiki.web;
 
 import java.io.IOException;
 
-import org.apache.commons.lang.BooleanUtils;
+import javax.servlet.http.HttpServletResponse;
+
 import org.apache.commons.lang.StringUtils;
 import org.apache.velocity.VelocityContext;
 
@@ -77,8 +78,8 @@ public class ObjectRemoveAction extends XWikiAction
         doc.setAuthor(username);
         xwiki.saveDocument(doc, context.getMessageTool().get("core.comment.deleteObject"), true, context);
 
-        if (BooleanUtils.isTrue((Boolean) context.get("ajax"))) {
-            response.setStatus(204);
+        if (Utils.isAjaxRequest(context)) {
+            response.setStatus(HttpServletResponse.SC_NO_CONTENT);
             response.setContentLength(0);
         } else {
             // forward to edit
@@ -96,9 +97,9 @@ public class ObjectRemoveAction extends XWikiAction
     @Override
     public String render(XWikiContext context) throws XWikiException
     {
-        if (BooleanUtils.isTrue((Boolean) context.get("ajax"))) {
+        if (Utils.isAjaxRequest(context)) {
             XWikiResponse response = context.getResponse();
-            response.setStatus(409);
+            response.setStatus(HttpServletResponse.SC_CONFLICT);
             response.setContentType("text/plain");
             try {
                 response.getWriter().write("failed");

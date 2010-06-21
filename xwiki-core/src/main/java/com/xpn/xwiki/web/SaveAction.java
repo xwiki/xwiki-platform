@@ -22,7 +22,6 @@ package com.xpn.xwiki.web;
 
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.commons.lang.BooleanUtils;
 import org.apache.velocity.VelocityContext;
 
 import com.xpn.xwiki.XWiki;
@@ -174,7 +173,7 @@ public class SaveAction extends PreviewAction
             return true;
         }
         // forward to view
-        if (BooleanUtils.isTrue((Boolean) context.get("ajax"))) {
+        if (Utils.isAjaxRequest(context)) {
             context.getResponse().setStatus(HttpServletResponse.SC_NO_CONTENT);
         } else {
             sendRedirect(context.getResponse(), Utils.getRedirect("view", context));

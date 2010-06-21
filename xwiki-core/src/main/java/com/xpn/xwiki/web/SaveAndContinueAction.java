@@ -27,7 +27,6 @@ import javax.servlet.http.HttpServletResponse;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 
-import org.apache.commons.lang.BooleanUtils;
 import org.apache.commons.lang.StringUtils;
 
 /**
@@ -73,7 +72,7 @@ public class SaveAndContinueAction extends XWikiAction
         }
 
         // If this is an ajax request, no need to redirect.
-        if (BooleanUtils.isTrue((Boolean) context.get("ajax"))) {
+        if (Utils.isAjaxRequest(context)) {
             context.getResponse().setStatus(HttpServletResponse.SC_NO_CONTENT);
             return false;
         }

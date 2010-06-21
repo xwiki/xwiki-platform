@@ -223,7 +223,7 @@ public class BaseClass extends BaseCollection implements ClassInterface
      * Get the list of enabled (the default, normal state) property definitions that exist in this class. The resulting
      * list is unmodifiable, but the contained elements are live.
      * 
-     * @return an unmodifiable list with the enabled properties of the class
+     * @return an unmodifiable list containing the enabled properties of the class
      * @see PropertyClass#isDisabled()
      */
     public List<PropertyClass> getEnabledProperties()
@@ -250,7 +250,7 @@ public class BaseClass extends BaseCollection implements ClassInterface
      * Get the list of disabled property definitions that exist in this class. The resulting list is unmodifiable, but
      * the contained elements are live.
      * 
-     * @return an unmodifiable list with the disabled properties of the class
+     * @return an unmodifiable list containing the disabled properties of the class
      * @see PropertyClass#isDisabled()
      */
     public List<PropertyClass> getDisabledProperties()
@@ -278,7 +278,9 @@ public class BaseClass extends BaseCollection implements ClassInterface
      * properties in a class, since the object could have been created and stored before some of the class properties
      * were added. The resulting list is unmodifiable, but the contained elements are live.
      * 
-     * @return an unmodifiable list with the disabled properties of the given object
+     * @param object the instance of this class where the disabled properties must exist
+     * @return an unmodifiable list containing the disabled properties of the given object
+     * @see PropertyClass#isDisabled()
      */
     public List<PropertyClass> getDisabledObjectProperties(BaseObject object)
     {
@@ -300,10 +302,11 @@ public class BaseClass extends BaseCollection implements ClassInterface
 
     /**
      * Retrieves deprecated properties of the given object compared to the class. A deprecated property is a property
-     * which exists in the BaseObject but doesn't exist anymore in the BaseClass. This is used for synchronization of
-     * existing or imported Objects with respect to the modifications of their associated Class.
+     * which exists in the Object but doesn't exist anymore in the Class. This is used for synchronization of existing
+     * or imported Objects with respect to the modifications of their associated Class.
      * 
-     * @return an unmodifiable list with the properties of the object which don't exist in the class
+     * @param object the instance of this class where to look for undefined properties
+     * @return an unmodifiable list containing the properties of the object which don't exist in the class
      */
     public List<BaseProperty> getDeprecatedObjectProperties(BaseObject object)
     {

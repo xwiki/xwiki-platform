@@ -104,6 +104,7 @@ public class StaticListClass extends ListClass
             input.setSize(getSize());
             input.setName(prefix + name);
             input.setID(prefix + name);
+            input.setDisabled(isDisabled());
 
             if (isPicker()) {
                 input.addAttribute("autocomplete", "off");
@@ -138,6 +139,7 @@ public class StaticListClass extends ListClass
 
         if (!getDisplayType().equals("input")) {
             org.apache.ecs.xhtml.input hidden = new input(input.hidden, prefix + name, "");
+            hidden.setDisabled(isDisabled());
             buffer.append(hidden);
         }
     }

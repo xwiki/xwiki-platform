@@ -105,6 +105,7 @@ public class PasswordClass extends StringClass
         input.setType("password");
         input.setName(prefix + name);
         input.setSize(getSize());
+        input.setDisabled(isDisabled());
         buffer.append(input.toString());
     }
 

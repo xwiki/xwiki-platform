@@ -103,6 +103,7 @@ public class StringClass extends PropertyClass
         input.setName(prefix + name);
         input.setID(prefix + name);
         input.setSize(getSize());
+        input.setDisabled(isDisabled());
         
         if(isPicker()) {
         	input.addAttribute("autocomplete", "off");

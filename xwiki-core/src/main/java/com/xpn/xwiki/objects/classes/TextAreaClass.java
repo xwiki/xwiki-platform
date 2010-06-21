@@ -167,6 +167,7 @@ public class TextAreaClass extends StringClass
         textarea.setID(tname);
         textarea.setCols(getSize());
         textarea.setRows(getRows() + (isWysiwyg ? 2 : 0));
+        textarea.setDisabled(isDisabled());
 
         // Let's add the Wysiwyg JS
         if (isWysiwyg) {

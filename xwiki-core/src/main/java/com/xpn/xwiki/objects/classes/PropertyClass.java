@@ -186,6 +186,7 @@ public class PropertyClass extends BaseCollection implements PropertyClassInterf
         input.setType("text");
         input.setName(prefix + name);
         input.setID(prefix + name);
+        input.setDisabled(isDisabled());
         buffer.append(input.toString());
     }
 

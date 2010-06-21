@@ -145,6 +145,7 @@ public class NumberClass extends PropertyClass
         input.setName(prefix + name);
         input.setID(prefix + name);
         input.setSize(getSize());
+        input.setDisabled(isDisabled());
         buffer.append(input.toString());
     }
 

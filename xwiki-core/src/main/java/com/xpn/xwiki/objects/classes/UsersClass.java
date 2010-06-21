@@ -112,6 +112,7 @@ public class UsersClass extends ListClass
         select.setSize(getSize());
         select.setName(prefix + name);
         select.setID(prefix + name);
+        select.setDisabled(isDisabled());
 
         List<String> list;
         if (isUsesList()) {
@@ -165,19 +166,23 @@ public class UsersClass extends ListClass
             input in = new input();
             in.setName(prefix + "newuser");
             in.setSize(15);
+            in.setDisabled(isDisabled());
             buffer.append("<br />");
             buffer.append(in.toString());
 
-            button button = new button();
-            button.setTagText("Add");
+            if (!isDisabled()) {
+                button button = new button();
+                button.setTagText("Add");
 
-            button.setOnClick("addUser(this.form,'" + prefix + "'); return false;");
-            buffer.append(button.toString());
+                button.setOnClick("addUser(this.form,'" + prefix + "'); return false;");
+                buffer.append(button.toString());
+            }
         }
 
         input in = new input();
         in.setType("hidden");
         in.setName(prefix + name);
+        in.setDisabled(isDisabled());
         buffer.append(in.toString());
     }
 

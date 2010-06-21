@@ -449,6 +449,7 @@ public abstract class ListClass extends PropertyClass
             input.setSize(getSize());
             input.setName(prefix + name);
             input.setID(prefix + name);
+            input.setDisabled(isDisabled());
             buffer.append(input.toString());
         } else if (getDisplayType().equals("radio") || getDisplayType().equals("checkbox")) {
             displayRadioEdit(buffer, name, prefix, object, context);
@@ -494,6 +495,7 @@ public abstract class ListClass extends PropertyClass
                 new input((getDisplayType().equals("radio") && !isMultiSelect()) ? input.radio : input.checkbox, prefix
                 + name, value);
             radio.setID("xwiki-form-" + name + "-" + count);
+            radio.setDisabled(isDisabled());
 
             if (selectlist.contains(value)) {
                 radio.setChecked(true);
@@ -547,6 +549,7 @@ public abstract class ListClass extends PropertyClass
         select.setSize(getSize());
         select.setName(prefix + name);
         select.setID(prefix + name);
+        select.setDisabled(isDisabled());
 
         List<String> list = getList(context);
         Map<String, ListItem> map = getMap(context);

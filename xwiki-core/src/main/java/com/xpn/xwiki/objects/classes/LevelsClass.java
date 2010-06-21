@@ -106,6 +106,7 @@ public class LevelsClass extends ListClass
         select.setSize(getSize());
         select.setName(prefix + name);
         select.setID(prefix + name);
+        select.setDisabled(isDisabled());
 
         List<String> list = getList(context);
         List<String> selectlist;
@@ -136,6 +137,7 @@ public class LevelsClass extends ListClass
         input in = new input();
         in.setType("hidden");
         in.setName(prefix + name);
+        in.setDisabled(isDisabled());
         buffer.append(in.toString());
     }
 

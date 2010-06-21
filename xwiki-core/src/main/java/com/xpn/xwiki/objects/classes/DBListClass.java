@@ -501,6 +501,7 @@ public class DBListClass extends ListClass
                         hidden.setID(prefix + name);
                         hidden.setName(prefix + name);
                         hidden.setType("hidden");
+                        hidden.setDisabled(isDisabled());
                         if (val != null && !val.equals("")) {
                             hidden.setValue(val);
                         }
@@ -535,6 +536,7 @@ public class DBListClass extends ListClass
                 input.setValue(val);
             }
 
+            input.setDisabled(isDisabled());
             buffer.append(input.toString());
         } else if (getDisplayType().equals("radio") || getDisplayType().equals("checkbox")) {
             displayRadioEdit(buffer, name, prefix, object, context);

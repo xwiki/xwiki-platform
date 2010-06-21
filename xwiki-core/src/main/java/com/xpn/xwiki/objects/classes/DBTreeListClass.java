@@ -286,6 +286,7 @@ public class DBTreeListClass extends DBListClass
         select.setSize(getSize());
         select.setName(prefix + name);
         select.setID(prefix + name);
+        select.setDisabled(isDisabled());
 
         Map<String, ListItem> map = getMap(context);
         Map<String, List<ListItem>> treemap = getTreeMap(context);

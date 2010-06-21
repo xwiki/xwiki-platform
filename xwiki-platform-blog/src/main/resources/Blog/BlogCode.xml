@@ -599,7 +599,7 @@ $!xwiki.jsx.use($blogScriptsDocumentName)##
 #macro(displayEntryContent $entryDoc $entryObj $onlyExtract)
   &lt;div class="#if($onlyExtract)entry-summary#{else}entry-content#end"&gt;
   #getEntryContent($entryDoc $entryObj $onlyExtract $entryContent)
-  {{html wiki="false"}}$entryDoc.getRenderedContent($entryContent, $entryDoc.getSyntaxId()){{/html}}
+  {{html wiki="false"}}$entryDoc.getRenderedContent($entryContent, $entryDoc.getSyntax().toIdString()){{/html}}
   &lt;/div&gt; ## entry-content
 #end
 ##

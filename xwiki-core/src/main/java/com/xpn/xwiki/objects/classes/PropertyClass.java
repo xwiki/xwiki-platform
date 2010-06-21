@@ -49,7 +49,8 @@ import com.xpn.xwiki.validation.XWikiValidationStatus;
  * 
  * @version $Id$
  */
-public class PropertyClass extends BaseCollection implements PropertyClassInterface, PropertyInterface
+public class PropertyClass extends BaseCollection implements PropertyClassInterface, PropertyInterface,
+    Comparable<PropertyClass>
 {
     private BaseClass object;
 
@@ -570,5 +571,25 @@ public class PropertyClass extends BaseCollection implements PropertyClassInterf
 
     public void flushCache()
     {
+    }
+
+    /**
+     * Compares two property definitions based on their index number.
+     * 
+     * @param other the other property definition to be compared with
+     * @return a negative integer, zero, or a positive integer as this object is less than, equal to, or greater than
+     *         the specified object.
+     * @see #getNumber()
+     */
+    public int compareTo(PropertyClass other)
+    {
+        int result = this.getNumber() - other.getNumber();
+
+        // This should never happen, but just to remove the randomness in case it does happen, also compare their names.
+        if (result == 0) {
+            result = this.getName().compareTo(other.getName());
+        }
+
+        return result;
     }
 }

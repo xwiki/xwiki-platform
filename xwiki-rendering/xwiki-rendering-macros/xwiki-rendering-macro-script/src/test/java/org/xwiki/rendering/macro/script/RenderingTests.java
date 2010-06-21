@@ -51,7 +51,7 @@ public class RenderingTests extends TestCase
         ScriptMockSetup setup = new ScriptMockSetup(testSetup.getComponentManager());
 
         // fake nested script validator never fails
-        final ScriptMacroValidator<ScriptMacroParameters> nestedValidator
+        final ScriptMacroValidator nestedValidator
             = setup.mockery.mock(ScriptMacroValidator.class, "nested");
         setup.mockery.checking(new Expectations() {{
             atLeast(1).of(nestedValidator).validate(with(any(ScriptMacroParameters.class)), with(any(String.class)),

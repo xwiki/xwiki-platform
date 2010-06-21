@@ -51,7 +51,7 @@ import org.xwiki.test.annotation.ComponentTest;
 public class NestedScriptMacroValidatorTest extends AbstractMockingComponentTest
 {
     /** Nested script validator under test. */
-    private ScriptMacroValidator<?> validator;
+    private ScriptMacroValidator validator;
 
     /**
      * @see org.xwiki.test.AbstractMockingComponentTest#setUp()

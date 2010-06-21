@@ -64,7 +64,7 @@ $xwiki.jsfx.use('js/xwiki/actionbuttons/actionButtons.js', true)
   <div id="xwikieditor" class="layoutsection">
   <div id="xwikieditorinner">
   <div class="leftsidecolumns">
-  <div id="editcolumn" class="editor">
+  <div id="editcolumn" class="editor editor-${editor}">
   <div class="alleditcontent">
   <div id="editmenu" class="actionmenu">
   #template("editmenu.vm")

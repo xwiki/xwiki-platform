@@ -35,7 +35,7 @@ public interface Query
     /**
      * Indicator for Hibernate Query Language.
      */
-    String HQL   = "hql";
+    String HQL = "hql";
 
     /**
      * Indicator for XPath language.

@@ -2839,7 +2839,9 @@ public class XWiki extends Api
 
     /**
      * @return secure {@link QueryManager} for execute queries to store.
+     * @deprecated since XE 2.4M2 use the Query Manager Script Service
      */
+    @Deprecated
     public QueryManager getQueryManager()
     {
         return Utils.getComponent(QueryManager.class, "secure");

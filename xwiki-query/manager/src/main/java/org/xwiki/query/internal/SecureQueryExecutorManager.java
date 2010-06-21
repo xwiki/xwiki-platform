@@ -65,7 +65,7 @@ public class SecureQueryExecutorManager implements QueryExecutorManager
         if (!Query.XWQL.equals(query.getLanguage()) && !getBridge().hasProgrammingRights()) {
             throw new QueryException("Query languages others than XWQL requires programming right", query, null);
         }
-        if (query.getStatement().toLowerCase().startsWith("select") && !getBridge().hasProgrammingRights()) {
+        if (query.getStatement().trim().toLowerCase().startsWith("select") && !getBridge().hasProgrammingRights()) {
             throw new QueryException("Full form XWQL statements requires programming right", query, null);
         }
         return getNestedQueryExecutorManager().execute(query);

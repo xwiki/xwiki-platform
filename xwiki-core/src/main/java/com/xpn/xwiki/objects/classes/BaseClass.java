@@ -84,6 +84,7 @@ public class BaseClass extends BaseCollection implements ClassInterface
 
     private String nameField;
 
+    @SuppressWarnings("unchecked")
     private EntityReferenceSerializer<EntityReference> localReferenceEntityReferenceSerializer =
         Utils.getComponent(EntityReferenceSerializer.class, "local/reference");
 
@@ -156,7 +157,7 @@ public class BaseClass extends BaseCollection implements ClassInterface
     @Override
     public void addField(String name, PropertyInterface element)
     {
-        Set properties = getPropertyList();
+        Set<String> properties = getPropertyList();
         if (!properties.contains(name)) {
             if (((BaseCollection) element).getNumber() == 0) {
                 ((BaseCollection) element).setNumber(properties.size() + 1);
@@ -238,14 +239,14 @@ public class BaseClass extends BaseCollection implements ClassInterface
      * @deprecated since 2.2.3 use {@link #fromMap(java.util.Map, com.xpn.xwiki.objects.BaseCollection)}
      */
     @Deprecated
-    public BaseCollection fromMap(Map map, XWikiContext context) throws XWikiException
+    public BaseCollection fromMap(Map<String, ? > map, XWikiContext context) throws XWikiException
     {
         BaseCollection object = newObject(context);
 
         return fromMap(map, object);
     }
 
-    public BaseCollection fromMap(Map<String, ? extends Object> map, BaseCollection object)
+    public BaseCollection fromMap(Map<String, ? > map, BaseCollection object)
     {
         for (PropertyClass property : (Collection<PropertyClass>) getFieldList()) {
             String name = property.getName();
@@ -268,7 +269,7 @@ public class BaseClass extends BaseCollection implements ClassInterface
         return object;
     }
 
-    public BaseCollection fromValueMap(Map map, BaseCollection object)
+    public BaseCollection fromValueMap(Map<String, ? > map, BaseCollection object)
     {
         for (PropertyClass property : (Collection<PropertyClass>) getFieldList()) {
             String name = property.getName();

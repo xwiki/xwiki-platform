@@ -21,26 +21,6 @@
 
 package com.xpn.xwiki.objects;
 
-import com.xpn.xwiki.XWikiContext;
-import com.xpn.xwiki.XWikiException;
-import com.xpn.xwiki.objects.classes.BaseClass;
-import com.xpn.xwiki.objects.classes.PropertyClass;
-import com.xpn.xwiki.web.Utils;
-import org.apache.commons.lang.StringUtils;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-import org.dom4j.Document;
-import org.dom4j.Element;
-import org.dom4j.dom.DOMDocument;
-import org.dom4j.io.OutputFormat;
-import org.dom4j.io.XMLWriter;
-import org.xwiki.model.EntityType;
-import org.xwiki.model.reference.DocumentReference;
-import org.xwiki.model.reference.DocumentReferenceResolver;
-import org.xwiki.model.reference.EntityReference;
-import org.xwiki.model.reference.EntityReferenceResolver;
-import org.xwiki.model.reference.EntityReferenceSerializer;
-
 import java.io.IOException;
 import java.io.StringWriter;
 import java.util.ArrayList;
@@ -56,6 +36,26 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.apache.commons.lang.StringUtils;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.dom4j.Document;
+import org.dom4j.Element;
+import org.dom4j.dom.DOMDocument;
+import org.dom4j.io.OutputFormat;
+import org.dom4j.io.XMLWriter;
+import org.xwiki.model.EntityType;
+import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.DocumentReferenceResolver;
+import org.xwiki.model.reference.EntityReference;
+import org.xwiki.model.reference.EntityReferenceResolver;
+import org.xwiki.model.reference.EntityReferenceSerializer;
+
+import com.xpn.xwiki.XWikiContext;
+import com.xpn.xwiki.objects.classes.BaseClass;
+import com.xpn.xwiki.objects.classes.PropertyClass;
+import com.xpn.xwiki.web.Utils;
+
 /**
  * Base class for representing an element having a collection of properties. For example:
  * <ul>
@@ -63,7 +63,7 @@ import java.util.Set;
  *   <li>an XObject definition (composed of XObject properties)</li>
  *   <li>an XWikiStats object (composed of stats properties)</li>
  * </ul>
- *
+ * 
  * @version $Id$
  */
 public abstract class BaseCollection extends BaseElement implements ObjectInterface, Cloneable
@@ -692,9 +692,9 @@ public abstract class BaseCollection extends BaseElement implements ObjectInterf
                 if ((newProperty != null) && (!newProperty.toText().equals(""))) {
                     String newPropertyValue =
                         (newProperty.getValue() instanceof String) ? newProperty.toText()
-                            : ((PropertyClass) getXClass(context).getField(propertyName)).displayView(propertyName,
-                                this, context);
-                    difflist.add(new ObjectDiff(getClassName(), getNumber(), "", "added", propertyName, propertyType, 
+                        : ((PropertyClass) getXClass(context).getField(propertyName)).displayView(propertyName,
+                        this, context);
+                    difflist.add(new ObjectDiff(getClassName(), getNumber(), "", "added", propertyName, propertyType,
                         "", newPropertyValue));
                 }
             } else if (!oldProperty.toText().equals(((newProperty == null) ? "" : newProperty.toText()))) {
@@ -703,10 +703,10 @@ public abstract class BaseCollection extends BaseElement implements ObjectInterf
                     // Put the values as they would be displayed in the interface
                     String newPropertyValue =
                         (newProperty.getValue() instanceof String) ? newProperty.toText() : pclass.displayView(
-                            propertyName, this, context);
+                        propertyName, this, context);
                     String oldPropertyValue =
                         (oldProperty.getValue() instanceof String) ? oldProperty.toText() : pclass.displayView(
-                            propertyName, oldCollection, context);
+                        propertyName, oldCollection, context);
                     difflist.add(new ObjectDiff(getClassName(), getNumber(), "", "changed", propertyName, propertyType,
                         oldPropertyValue, newPropertyValue));
                 } else {
@@ -733,7 +733,7 @@ public abstract class BaseCollection extends BaseElement implements ObjectInterf
                         // Put the values as they would be displayed in the interface
                         String oldPropertyValue =
                             (oldProperty.getValue() instanceof String) ? oldProperty.toText() : pclass.displayView(
-                                propertyName, oldCollection, context);
+                            propertyName, oldCollection, context);
                         difflist.add(new ObjectDiff(oldCollection.getClassName(), oldCollection.getNumber(), "",
                             "removed", propertyName, propertyType, oldPropertyValue, ""));
                     } else {

@@ -49,7 +49,8 @@ var Scriptaculous = {
         Scriptaculous.REQUIRED_PROTOTYPE);
 
     var js = /scriptaculous\.js(\?.*)?$/;
-    $$('head script[src]').findAll(function(s) {
+    // Changed in XWiki from findAll to select because SmartGWT overwrites findAll
+    $$('head script[src]').select(function(s) {
       return s.src.match(js);
     }).each(function(s) {
       var path = s.src.replace(js, ''),

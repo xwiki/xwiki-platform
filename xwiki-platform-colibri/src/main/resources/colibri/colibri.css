@@ -620,7 +620,10 @@ body.hideright #footerglobal {
   *  Layout elements for Colibri skin in edit mode
 -------------------------------------------------------------- */
 .alleditcontent {
-  margin: 0 225px 25px 20px;
+  margin: 0 25px 25px 20px;
+}
+.editor-wiki .alleditcontent, .editor-wysiwyg .alleditcontent {
+  margin-right: 225px;
 }
 
 .alleditcontent label, .metamodifs {

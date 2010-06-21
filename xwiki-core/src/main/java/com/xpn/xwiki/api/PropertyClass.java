@@ -45,7 +45,7 @@ import com.xpn.xwiki.util.Programming;
  * 
  * @version $Id$
  */
-public class PropertyClass extends Collection
+public class PropertyClass extends Collection implements Comparable<PropertyClass>
 {
     /**
      * Default API constructor that creates a wrapper for a {@link com.xpn.xwiki.objects.classes.PropertyClass}, given a
@@ -206,5 +206,18 @@ public class PropertyClass extends Collection
             // sense, since the property does not have a list of possible values at all (like, a number property).
             return null;
         }
+    }
+
+    /**
+     * Compares two property definitions based on their index number.
+     * 
+     * @param other the other property definition to be compared with
+     * @return a negative integer, zero, or a positive integer as this object is less than, equal to, or greater than
+     *         the specified object.
+     * @see #getNumber()
+     */
+    public int compareTo(PropertyClass other)
+    {
+        return this.getBasePropertyClass().compareTo(other.getBasePropertyClass());
     }
 }

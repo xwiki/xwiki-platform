@@ -4687,8 +4687,11 @@ Form.EventObserver = Class.create(Abstract.EventObserver, {
     document.addEventListener('DOMContentLoaded', fireContentLoadedEvent, false);
   } else {
     document.observe('readystatechange', checkReadyState);
+    // Disabled in XWiki since it conflicts with defered scripts
+    /*
     if (window == top)
       timer = pollDoScroll.defer();
+    */
   }
 
   Event.observe(window, 'load', fireContentLoadedEvent);

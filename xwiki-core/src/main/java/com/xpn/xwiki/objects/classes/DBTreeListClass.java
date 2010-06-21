@@ -362,9 +362,9 @@ public class DBTreeListClass extends DBListClass
                     if (hasClassname) {
                         sql =
                             "select distinct doc.fullName, doc.fullName, "
-                                + (hasParentField ? parentField : "doc.parent")
-                                + " from XWikiDocument as doc, BaseObject as obj"
-                                + " where doc.fullName=obj.name and obj.className='" + classname + "'";
+                            + (hasParentField ? parentField : "doc.parent")
+                            + " from XWikiDocument as doc, BaseObject as obj"
+                            + " where doc.fullName=obj.name and obj.className='" + classname + "'";
                     } else {
                         // If none of the first 3 properties is specified, return a query that
                         // always returns no rows (only with the parent field no query can be made)
@@ -390,7 +390,7 @@ public class DBTreeListClass extends DBListClass
                 // columns is an object property.
                 boolean usesObj =
                     hasClassname || idField.startsWith("obj.") || valueField.startsWith("obj.")
-                        || parentField.startsWith("obj.");
+                    || parentField.startsWith("obj.");
                 // The document is needed if one of the selected columns is a document property, or
                 // if there is no classname specified and at least one of the selected columns is
                 // not an object property.

@@ -23,6 +23,7 @@ package com.xpn.xwiki.objects.classes;
 
 import org.apache.ecs.xhtml.textarea;
 import org.apache.velocity.VelocityContext;
+
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseCollection;
@@ -97,23 +98,29 @@ public class TextAreaClass extends StringClass
         }
 
         if (editor != null) {
-            if (editor.equals("text"))
+            if (editor.equals("text")) {
                 return false;
-            if (editor.equals("puretext"))
+            }
+            if (editor.equals("puretext")) {
                 return false;
-            if (editor.equals("wysiwyg"))
+            }
+            if (editor.equals("wysiwyg")) {
                 return true;
+            }
         }
 
         editor = getEditor();
 
         if (editor != null) {
-            if (editor.equals("text"))
+            if (editor.equals("text")) {
                 return false;
-            if (editor.equals("puretext"))
+            }
+            if (editor.equals("puretext")) {
                 return false;
-            if (editor.equals("wysiwyg"))
+            }
+            if (editor.equals("wysiwyg")) {
                 return true;
+            }
         }
 
         if ((context != null) && (context.getWiki() != null)) {
@@ -121,12 +128,15 @@ public class TextAreaClass extends StringClass
         }
 
         if (editor != null) {
-            if (editor.equals("text"))
+            if (editor.equals("text")) {
                 return false;
-            if (editor.equals("puretext"))
+            }
+            if (editor.equals("puretext")) {
                 return false;
-            if (editor.equals("wysiwyg"))
+            }
+            if (editor.equals("wysiwyg")) {
                 return true;
+            }
         }
 
         return false;

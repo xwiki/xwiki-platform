@@ -64,13 +64,14 @@ public class PasswordClass extends StringClass
         this(null);
     }
 
+    @Override
     public BaseProperty fromString(String value)
     {
         if (value.equals(FORM_PASSWORD_PLACEHODLER)) {
             return null;
         }
         BaseProperty property = newProperty();
-        if(value.startsWith(HASH_IDENTIFIER + SEPARATOR) || value.startsWith(CRYPT_IDENTIFIER + SEPARATOR)) {
+        if (value.startsWith(HASH_IDENTIFIER + SEPARATOR) || value.startsWith(CRYPT_IDENTIFIER + SEPARATOR)) {
             property.setValue(value);
         } else {
             property.setValue(getProcessedPassword(value));
@@ -78,12 +79,14 @@ public class PasswordClass extends StringClass
         return property;
     }
 
+    @Override
     public void displayHidden(StringBuffer buffer, String name, String prefix,
         BaseCollection object, XWikiContext context)
     {
         // Passwords cannot go through the preview interface, so we don't do something here..
     }
 
+    @Override
     public void displayView(StringBuffer buffer, String name, String prefix,
         BaseCollection object, XWikiContext context)
     {
@@ -93,6 +96,7 @@ public class PasswordClass extends StringClass
         }
     }
 
+    @Override
     public void displayEdit(StringBuffer buffer, String name, String prefix,
         BaseCollection object, XWikiContext context)
     {
@@ -110,7 +114,6 @@ public class PasswordClass extends StringClass
     }
 
     /**
-     * 
      * @return One of 'Clear', 'Hash' or 'Encrypt'.
      */
     public String getStorageType()
@@ -126,7 +129,6 @@ public class PasswordClass extends StringClass
     }
 
     /**
-     * 
      * @return The hash algorithm configured for this XProperty.
      */
     public String getHashAlgorithm()
@@ -139,7 +141,6 @@ public class PasswordClass extends StringClass
     }
 
     /**
-     * 
      * @return The encryption algorithm configured for this XProperty.
      */
     public String getCryptAlgorithm()
@@ -152,8 +153,7 @@ public class PasswordClass extends StringClass
     }
 
     /**
-     * 
-     * @param password 
+     * @param password
      * @return The algorithm used for the given password.
      */
     public String getAlgorithmFromPassword(String password)
@@ -169,10 +169,9 @@ public class PasswordClass extends StringClass
     }
 
     /**
-     * Transforms a plain text password so that it has the same encryption as a password stored in
-     * the database. The current configuration for this password XProperty cannot be used, as the
-     * user might have a different encryption mechanism (for example, if the user was imported, or
-     * the password was not yet upgraded).
+     * Transforms a plain text password so that it has the same encryption as a password stored in the database. The
+     * current configuration for this password XProperty cannot be used, as the user might have a different encryption
+     * mechanism (for example, if the user was imported, or the password was not yet upgraded).
      * 
      * @param storedPassword The stored password, which gives the storage type and algorithm.
      * @param plainPassword The plain text password to be encrypted.
@@ -227,8 +226,9 @@ public class PasswordClass extends StringClass
                 new StringBuffer(HASH_IDENTIFIER + SEPARATOR + algorithmName + SEPARATOR);
             for (int j = 0; j < digest.length; ++j) {
                 int b = digest[j] & 0xFF;
-                if (b < 0x10)
+                if (b < 0x10) {
                     sb.append('0');
+                }
                 sb.append(Integer.toHexString(b));
             }
             return sb.toString();

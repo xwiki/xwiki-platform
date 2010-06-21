@@ -118,7 +118,7 @@ public class StaticListClass extends ListClass
 
                 String script =
                     "\"" + path + "?xpage=suggest&amp;classname=" + classname + "&amp;fieldname=" + fieldname
-                        + "&amp;firCol=" + firstCol + "&amp;secCol=" + secondCol + "&amp;\"";
+                    + "&amp;firCol=" + firstCol + "&amp;secCol=" + secondCol + "&amp;\"";
                 String varname = "\"input\"";
                 String seps = "\"" + this.getSeparators() + "\"";
                 if (isMultiSelect()) {

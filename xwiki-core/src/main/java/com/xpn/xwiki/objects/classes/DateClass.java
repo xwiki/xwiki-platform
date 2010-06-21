@@ -21,27 +21,27 @@
 
 package com.xpn.xwiki.objects.classes;
 
-import com.xpn.xwiki.XWikiContext;
-import com.xpn.xwiki.objects.BaseCollection;
-import com.xpn.xwiki.objects.BaseProperty;
-import com.xpn.xwiki.objects.DateProperty;
-import com.xpn.xwiki.objects.meta.PropertyMetaClass;
-import com.xpn.xwiki.plugin.query.XWikiQuery;
-import com.xpn.xwiki.plugin.query.XWikiCriteria;
-import com.xpn.xwiki.web.XWikiMessageTool;
-import org.apache.ecs.xhtml.input;
-import org.apache.ecs.xhtml.link;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-import org.dom4j.Element;
-
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
 import java.util.Map;
 
-public class DateClass  extends PropertyClass
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.apache.ecs.xhtml.input;
+import org.dom4j.Element;
+
+import com.xpn.xwiki.XWikiContext;
+import com.xpn.xwiki.objects.BaseCollection;
+import com.xpn.xwiki.objects.BaseProperty;
+import com.xpn.xwiki.objects.DateProperty;
+import com.xpn.xwiki.objects.meta.PropertyMetaClass;
+import com.xpn.xwiki.plugin.query.XWikiCriteria;
+import com.xpn.xwiki.plugin.query.XWikiQuery;
+import com.xpn.xwiki.web.XWikiMessageTool;
+
+public class DateClass extends PropertyClass
 {
     private static final Log LOG = LogFactory.getLog(DateClass.class);
 
@@ -54,48 +54,60 @@ public class DateClass  extends PropertyClass
         setPicker(1);
     }
 
-    public DateClass() {
+    public DateClass()
+    {
         this(null);
     }
 
-    public int getPicker() {
+    public int getPicker()
+    {
         return getIntValue("picker");
     }
 
-    public void setPicker(int picker) {
+    public void setPicker(int picker)
+    {
         setIntValue("picker", picker);
     }
 
-    public int getSize() {
+    public int getSize()
+    {
         return getIntValue("size");
     }
 
-    public void setSize(int size) {
+    public void setSize(int size)
+    {
         setIntValue("size", size);
     }
 
-    public int getEmptyIsToday() {
+    public int getEmptyIsToday()
+    {
         return getIntValue("emptyIsToday");
     }
 
-    public void setEmptyIsToday(int emptyIsToday) {
+    public void setEmptyIsToday(int emptyIsToday)
+    {
         setIntValue("emptyIsToday", emptyIsToday);
     }
 
-    public String getDateFormat() {
+    public String getDateFormat()
+    {
         return getStringValue("dateFormat");
     }
 
-    public void setDateFormat(String dformat) {
+    public void setDateFormat(String dformat)
+    {
         setStringValue("dateFormat", dformat);
     }
 
-    public BaseProperty fromString(String value) {
+    @Override
+    public BaseProperty fromString(String value)
+    {
         BaseProperty property = newProperty();
 
-        if ((value==null)||(value.equals(""))) {
-            if (getEmptyIsToday()==1)
-             property.setValue(new Date());
+        if ((value == null) || (value.equals(""))) {
+            if (getEmptyIsToday() == 1) {
+                property.setValue(new Date());
+            }
             return property;
         }
 
@@ -108,24 +120,30 @@ public class DateClass  extends PropertyClass
         return property;
     }
 
-    public BaseProperty newProperty() {
+    @Override
+    public BaseProperty newProperty()
+    {
         BaseProperty property = new DateProperty();
         property.setName(getName());
         return property;
     }
 
-    public String toFormString(BaseProperty property) {
-        if (property.getValue()==null)
-         return "";
+    public String toFormString(BaseProperty property)
+    {
+        if (property.getValue() == null) {
+            return "";
+        }
         SimpleDateFormat sdf = new SimpleDateFormat(getDateFormat());
         return sdf.format(property.getValue());
     }
 
-    public BaseProperty newPropertyfromXML(Element ppcel) {
+    @Override
+    public BaseProperty newPropertyfromXML(Element ppcel)
+    {
         String value = ppcel.getText();
         BaseProperty property = newProperty();
 
-        if ((value==null)||(value.equals(""))) {
+        if ((value == null) || (value.equals(""))) {
             property.setValue(new Date());
             return property;
         }
@@ -153,16 +171,22 @@ public class DateClass  extends PropertyClass
         return property;
     }
 
-    public void displayView(StringBuffer buffer, String name, String prefix, BaseCollection object, XWikiContext context) {
+    @Override
+    public void displayView(StringBuffer buffer, String name, String prefix, BaseCollection object, XWikiContext context)
+    {
         BaseProperty prop = (BaseProperty) object.safeget(name);
         buffer.append(toFormString(prop));
     }
 
-    public void displayEdit(StringBuffer buffer, String name, String prefix, BaseCollection object, XWikiContext context) {
+    @Override
+    public void displayEdit(StringBuffer buffer, String name, String prefix, BaseCollection object, XWikiContext context)
+    {
         input input = new input();
 
         BaseProperty prop = (BaseProperty) object.safeget(name);
-        if (prop!=null) input.setValue(toFormString(prop));
+        if (prop != null) {
+            input.setValue(toFormString(prop));
+        }
 
         input.setType("text");
         input.setName(prefix + name);
@@ -172,7 +196,10 @@ public class DateClass  extends PropertyClass
         buffer.append(input.toString());
     }
 
-    public void displaySearch(StringBuffer buffer, String name, String prefix, XWikiCriteria criteria, XWikiContext context) {
+    @Override
+    public void displaySearch(StringBuffer buffer, String name, String prefix, XWikiCriteria criteria,
+        XWikiContext context)
+    {
         input input1 = new input();
         input1.setType("text");
         input1.setName(prefix + name + "_morethan");
@@ -181,7 +208,7 @@ public class DateClass  extends PropertyClass
         String fieldFullName = getFieldFullName();
 
         Date value = (Date) criteria.getParameter(fieldFullName + "_morethan");
-        if (value!=null) {
+        if (value != null) {
             DateProperty dprop = new DateProperty();
             dprop.setValue(value);
             input1.setValue(toFormString(dprop));
@@ -190,35 +217,38 @@ public class DateClass  extends PropertyClass
         input input2 = new input();
 
         input2.setType("text");
-        input2.setName(prefix + name+ "_lessthan");
+        input2.setName(prefix + name + "_lessthan");
         input2.setID(prefix + name);
         input2.setSize(getSize());
         value = (Date) criteria.getParameter(fieldFullName + "_lessthan");
-        if (value!=null) {
+        if (value != null) {
             DateProperty dprop = new DateProperty();
             dprop.setValue(value);
             input2.setValue(toFormString(dprop));
         }
 
         XWikiMessageTool msg = context.getMessageTool();
-        buffer.append((msg==null) ? "from" : msg.get("from"));
+        buffer.append((msg == null) ? "from" : msg.get("from"));
         buffer.append(input1.toString());
-        buffer.append((msg==null) ? "from" : msg.get("to"));
+        buffer.append((msg == null) ? "from" : msg.get("to"));
         buffer.append(input2.toString());
     }
 
     @Override
-    public void fromSearchMap(XWikiQuery query, Map<String, String[]> map) {
-        String[] data  = map.get("");
-        if ((data!=null)&&(data.length==1))
+    public void fromSearchMap(XWikiQuery query, Map<String, String[]> map)
+    {
+        String[] data = map.get("");
+        if ((data != null) && (data.length == 1)) {
             query.setParam(getObject().getName() + "_" + getName(), fromString(data[0]).getValue());
-        else {
-            data  = map.get("lessthan");
-            if ((data!=null)&&(data.length==1))
+        } else {
+            data = map.get("lessthan");
+            if ((data != null) && (data.length == 1)) {
                 query.setParam(getObject().getName() + "_" + getName() + "_lessthan", fromString(data[0]).getValue());
-            data  = map.get("morethan");
-            if ((data!=null)&&(data.length==1))
+            }
+            data = map.get("morethan");
+            if ((data != null) && (data.length == 1)) {
                 query.setParam(getObject().getName() + "_" + getName() + "_morethan", fromString(data[0]).getValue());
+            }
 
         }
     }

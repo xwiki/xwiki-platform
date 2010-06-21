@@ -26,6 +26,7 @@ import java.util.Map;
 
 import org.apache.ecs.xhtml.input;
 
+import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.objects.BaseCollection;
 import com.xpn.xwiki.objects.BaseProperty;
@@ -33,9 +34,6 @@ import com.xpn.xwiki.objects.StringProperty;
 import com.xpn.xwiki.objects.meta.PropertyMetaClass;
 import com.xpn.xwiki.plugin.query.XWikiCriteria;
 import com.xpn.xwiki.plugin.query.XWikiQuery;
-
-import com.xpn.xwiki.XWiki;
-import com.xpn.xwiki.XWikiException;
 
 public class StringClass extends PropertyClass
 {
@@ -65,7 +63,7 @@ public class StringClass extends PropertyClass
     {
         setIntValue("size", size);
     }
-    
+
     public boolean isPicker()
     {
         return (getIntValue("picker") == 1);
@@ -75,7 +73,8 @@ public class StringClass extends PropertyClass
     {
         setIntValue("picker", picker ? 1 : 0);
     }
-    
+
+    @Override
     public BaseProperty fromString(String value)
     {
         BaseProperty property = newProperty();
@@ -83,6 +82,7 @@ public class StringClass extends PropertyClass
         return property;
     }
 
+    @Override
     public BaseProperty newProperty()
     {
         BaseProperty property = new StringProperty();
@@ -90,6 +90,7 @@ public class StringClass extends PropertyClass
         return property;
     }
 
+    @Override
     public void displayEdit(StringBuffer buffer, String name, String prefix,
         BaseCollection object, XWikiContext context)
     {
@@ -104,25 +105,28 @@ public class StringClass extends PropertyClass
         input.setID(prefix + name);
         input.setSize(getSize());
         input.setDisabled(isDisabled());
-        
-        if(isPicker()) {
-        	input.addAttribute("autocomplete", "off");
-        	String path = "";
-       	 	XWiki xwiki = context.getWiki();
-       	 	path = xwiki.getURL("Main.WebHome", "view", context);
-        	
-        	String classname = this.getObject().getName();
-       	 	String fieldname = this.getName();
-       	 	String secondCol = "-", firstCol = "-";
-       	 	
-       	 	String script = "\""+path+"?xpage=suggest&amp;classname="+classname+"&amp;fieldname="+fieldname+"&amp;firCol="+firstCol+"&amp;secCol="+secondCol+"&amp;\"";
-    	 	String varname = "\"input\"";
-    	 	input.setOnFocus("new ajaxSuggest(this, {script:"+script+", varname:"+varname+"} )");
+
+        if (isPicker()) {
+            input.addAttribute("autocomplete", "off");
+            String path = "";
+            XWiki xwiki = context.getWiki();
+            path = xwiki.getURL("Main.WebHome", "view", context);
+
+            String classname = this.getObject().getName();
+            String fieldname = this.getName();
+            String secondCol = "-", firstCol = "-";
+
+            String script =
+                "\"" + path + "?xpage=suggest&amp;classname=" + classname + "&amp;fieldname=" + fieldname
+                    + "&amp;firCol=" + firstCol + "&amp;secCol=" + secondCol + "&amp;\"";
+            String varname = "\"input\"";
+            input.setOnFocus("new ajaxSuggest(this, {script:" + script + ", varname:" + varname + "} )");
         }
-        
+
         buffer.append(input.toString());
     }
 
+    @Override
     public void displaySearch(StringBuffer buffer, String name, String prefix,
         XWikiCriteria criteria, XWikiContext context)
     {
@@ -139,6 +143,7 @@ public class StringClass extends PropertyClass
         buffer.append(input.toString());
     }
 
+    @Override
     public void makeQuery(Map<String, Object> map, String prefix, XWikiCriteria query, List<String> criteriaList)
     {
         String value = (String) map.get(prefix);

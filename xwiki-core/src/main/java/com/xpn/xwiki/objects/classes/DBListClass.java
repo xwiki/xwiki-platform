@@ -203,7 +203,7 @@ public class DBListClass extends ListClass
                     if (hasClassname) {
                         sql =
                             "select distinct doc.fullName from XWikiDocument as doc, BaseObject as obj"
-                                + " where doc.fullName=obj.name and obj.className='" + classname + "'";
+                            + " where doc.fullName=obj.name and obj.className='" + classname + "'";
                     } else {
                         // If none of the 3 properties is specified, return a query that always
                         // returns no rows.
@@ -514,7 +514,7 @@ public class DBListClass extends ListClass
 
                 String script =
                     "\"" + path + "?xpage=suggest&amp;classname=" + classname + "&amp;fieldname=" + fieldname
-                        + "&amp;firCol=" + firstCol + "&amp;secCol=" + secondCol + "&amp;\"";
+                    + "&amp;firCol=" + firstCol + "&amp;secCol=" + secondCol + "&amp;\"";
                 String varname = "\"input\"";
                 String seps = "\"" + this.getSeparators() + "\"";
                 if (isMultiSelect()) {

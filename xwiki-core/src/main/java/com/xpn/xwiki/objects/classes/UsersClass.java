@@ -41,8 +41,8 @@ public class UsersClass extends ListClass
         List<String> list;
         try {
             list =
-                    (List<String>) context.getWiki().getGroupService(context).getAllMatchedUsers(null, false, 0, 0,
-                        null, context);
+                (List<String>) context.getWiki().getGroupService(context).getAllMatchedUsers(null, false, 0, 0,
+                null, context);
         } catch (XWikiException e) {
             // TODO add log exception
             list = new ArrayList<String>();

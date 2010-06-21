@@ -1355,7 +1355,6 @@
               **/web/PreviewForm.java,
               **/web/PropAddAction.java,
               **/web/PropAddForm.java,
-              **/web/PropDeleteAction.java,
               **/web/PropUpdateAction.java,
               **/web/RedirectAction.java,
               **/web/RegisterAction.java,

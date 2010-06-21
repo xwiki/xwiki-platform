@@ -20,35 +20,44 @@
  */
 package com.xpn.xwiki.web;
 
-import java.util.Collections;
-
-import com.xpn.xwiki.XWiki;
-import com.xpn.xwiki.XWikiContext;
-import com.xpn.xwiki.XWikiException;
-import com.xpn.xwiki.doc.XWikiDocument;
-import com.xpn.xwiki.objects.classes.BaseClass;
-
 /**
- * Action for removing a property definition from the current class. The property to remove is specified in the {@code
- * propname} request parameter, and the class is the one defined in the requested document.
+ * Struts Form for the class {@link PropDeleteAction property delete}, {@link PropDisableAction property disable} and
+ * {@link PropEnableAction property enable} actions.
  * 
  * @version $Id$
  * @since 2.4M2
  */
-public class PropDeleteAction extends AbstractPropChangeAction
+public class PropChangeForm extends XWikiForm
 {
+    /** The name of the class property to remove. */
+    private String propertyName;
+
     /**
      * {@inheritDoc}
      */
     @Override
-    public void changePropertyDefinition(BaseClass xclass, String propertyName, XWikiContext context)
-        throws XWikiException
+    public void readRequest()
     {
-        XWiki xwiki = context.getWiki();
-        XWikiDocument doc = context.getDoc();
+        setPropertyName(getRequest().getParameter("propname"));
+    }
 
-        xclass.removeField(propertyName);
-        xwiki.saveDocument(doc, context.getMessageTool().get("core.model.xclass.deleteClassProperty.versionSummary",
-            Collections.singletonList(propertyName)), true, context);
+    /**
+     * Getter for the {@link #propertyName property name}.
+     * 
+     * @return the property name specified in the request
+     */
+    public String getPropertyName()
+    {
+        return this.propertyName;
+    }
+
+    /**
+     * Setter for the {@link #propertyName property name}.
+     * 
+     * @param propertyName the property name specified in the request
+     */
+    public void setPropertyName(String propertyName)
+    {
+        this.propertyName = propertyName;
     }
 }

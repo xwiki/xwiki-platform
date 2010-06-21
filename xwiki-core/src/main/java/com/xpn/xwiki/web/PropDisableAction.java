@@ -29,13 +29,13 @@ import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.classes.BaseClass;
 
 /**
- * Action for removing a property definition from the current class. The property to remove is specified in the {@code
+ * Action for disabling a property definition of the current class. The property to disable is specified in the {@code
  * propname} request parameter, and the class is the one defined in the requested document.
  * 
  * @version $Id$
  * @since 2.4M2
  */
-public class PropDeleteAction extends AbstractPropChangeAction
+public class PropDisableAction extends AbstractPropChangeAction
 {
     /**
      * {@inheritDoc}
@@ -47,8 +47,8 @@ public class PropDeleteAction extends AbstractPropChangeAction
         XWiki xwiki = context.getWiki();
         XWikiDocument doc = context.getDoc();
 
-        xclass.removeField(propertyName);
-        xwiki.saveDocument(doc, context.getMessageTool().get("core.model.xclass.deleteClassProperty.versionSummary",
+        xclass.disableField(propertyName);
+        xwiki.saveDocument(doc, context.getMessageTool().get("core.model.xclass.disableClassProperty.versionSummary",
             Collections.singletonList(propertyName)), true, context);
     }
 }

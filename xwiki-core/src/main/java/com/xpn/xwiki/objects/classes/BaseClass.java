@@ -25,6 +25,7 @@ import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -216,6 +217,111 @@ public class BaseClass extends BaseCollection implements ClassInterface
     public void put(String name, PropertyInterface property)
     {
         safeput(name, property);
+    }
+
+    /**
+     * Get the list of enabled (the default, normal state) property definitions that exist in this class. The resulting
+     * list is unmodifiable, but the contained elements are live.
+     * 
+     * @return an unmodifiable list with the enabled properties of the class
+     * @see PropertyClass#isDisabled()
+     */
+    public List<PropertyClass> getEnabledProperties()
+    {
+        @SuppressWarnings("unchecked")
+        Collection<PropertyClass> allProperties = getFieldList();
+        if (allProperties == null) {
+            return Collections.emptyList();
+        }
+
+        List<PropertyClass> enabledProperties = new ArrayList<PropertyClass>(allProperties.size());
+
+        for (PropertyClass property : allProperties) {
+            if (property != null && !property.isDisabled()) {
+                enabledProperties.add(property);
+            }
+        }
+
+        Collections.sort(enabledProperties);
+        return Collections.unmodifiableList(enabledProperties);
+    }
+
+    /**
+     * Get the list of disabled property definitions that exist in this class. The resulting list is unmodifiable, but
+     * the contained elements are live.
+     * 
+     * @return an unmodifiable list with the disabled properties of the class
+     * @see PropertyClass#isDisabled()
+     */
+    public List<PropertyClass> getDisabledProperties()
+    {
+        @SuppressWarnings("unchecked")
+        Collection<PropertyClass> allProperties = getFieldList();
+        if (allProperties == null) {
+            return Collections.emptyList();
+        }
+
+        List<PropertyClass> disabledProperties = new ArrayList<PropertyClass>();
+
+        for (PropertyClass property : allProperties) {
+            if (property != null && property.isDisabled()) {
+                disabledProperties.add(property);
+            }
+        }
+
+        Collections.sort(disabledProperties);
+        return Collections.unmodifiableList(disabledProperties);
+    }
+
+    /**
+     * Get the list of disabled properties that exist in a given object. This list is a subset of all the disabled
+     * properties in a class, since the object could have been created and stored before some of the class properties
+     * were added. The resulting list is unmodifiable, but the contained elements are live.
+     * 
+     * @return an unmodifiable list with the disabled properties of the given object
+     */
+    public List<PropertyClass> getDisabledObjectProperties(BaseObject object)
+    {
+        List<PropertyClass> disabledProperties = getDisabledProperties();
+        if (disabledProperties == null) {
+            return Collections.emptyList();
+        }
+
+        List<PropertyClass> disabledObjectProperties = new ArrayList<PropertyClass>(disabledProperties.size());
+
+        for (PropertyClass property : disabledProperties) {
+            if (object.get(property.getName()) != null) {
+                disabledObjectProperties.add(property);
+            }
+        }
+
+        return Collections.unmodifiableList(disabledObjectProperties);
+    }
+
+    /**
+     * Retrieves deprecated properties of the given object compared to the class. A deprecated property is a property
+     * which exists in the BaseObject but doesn't exist anymore in the BaseClass. This is used for synchronization of
+     * existing or imported Objects with respect to the modifications of their associated Class.
+     * 
+     * @return an unmodifiable list with the properties of the object which don't exist in the class
+     */
+    public List<BaseProperty> getDeprecatedObjectProperties(BaseObject object)
+    {
+        @SuppressWarnings("unchecked")
+        Collection<BaseProperty> objectProperties = object.getFieldList();
+        if (objectProperties == null) {
+            return Collections.emptyList();
+        }
+
+        List<BaseProperty> deprecatedObjectProperties = new ArrayList<BaseProperty>();
+
+        for (BaseProperty property : objectProperties) {
+            if (safeget(property.getName()) == null) {
+                deprecatedObjectProperties.add(property);
+            }
+        }
+
+        return Collections.unmodifiableList(deprecatedObjectProperties);
     }
 
     public BaseProperty fromString(String value)

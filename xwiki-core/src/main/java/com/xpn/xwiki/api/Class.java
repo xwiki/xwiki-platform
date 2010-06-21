@@ -16,7 +16,6 @@
  * License along with this software; if not, write to the Free
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
- *
  */
 package com.xpn.xwiki.api;
 
@@ -69,6 +68,7 @@ public class Class extends Collection
      * @return a list of enabled property names
      * @see #getEnabledProperties()
      * @see PropertyClass#isDisabled()
+     * @since 2.4M2
      */
     public List<String> getEnabledPropertyNames()
     {
@@ -88,6 +88,7 @@ public class Class extends Collection
      * @return a list of disabled property names
      * @see #getDisabledProperties()
      * @see PropertyClass#isDisabled()
+     * @since 2.4M2
      */
     public List<String> getDisabledPropertyNames()
     {
@@ -110,6 +111,7 @@ public class Class extends Collection
      * @return a list of disabled property names
      * @see #getDisabledObjectProperties(Object)
      * @see PropertyClass#isDisabled()
+     * @since 2.4M2
      */
     public List<String> getDisabledObjectPropertyNames(Object object)
     {
@@ -132,6 +134,7 @@ public class Class extends Collection
      * @param object the instance of this class where to look for undefined properties
      * @return a list of deprecated property names
      * @see #getDeprecatedObjectProperties(Object)
+     * @since 2.4M2
      */
     public List<String> getDeprecatedObjectPropertyNames(Object object)
     {
@@ -171,6 +174,7 @@ public class Class extends Collection
      * @return a list containing the enabled properties of the class
      * @see PropertyClass#isDisabled()
      * @see #getEnabledPropertyNames()
+     * @since 2.4M2
      */
     public List<PropertyClass> getEnabledProperties()
     {
@@ -192,6 +196,7 @@ public class Class extends Collection
      * @return a list containing the disabled properties of the class
      * @see PropertyClass#isDisabled()
      * @see #getDisabledPropertyNames()
+     * @since 2.4M2
      */
     public List<PropertyClass> getDisabledProperties()
     {
@@ -216,6 +221,7 @@ public class Class extends Collection
      * @return a list containing the disabled properties of the given object
      * @see PropertyClass#isDisabled()
      * @see #getDisabledObjectPropertyNames(Object)
+     * @since 2.4M2
      */
     public List<PropertyClass> getDisabledObjectProperties(Object object)
     {
@@ -238,6 +244,7 @@ public class Class extends Collection
      * @param object the instance of this class where to look for undefined properties
      * @return a list containing the properties of the object which don't exist in the class
      * @see #getDeprecatedObjectPropertyNames(Object)
+     * @since 2.4M2
      */
     public List<Property> getDeprecatedObjectProperties(Object object)
     {

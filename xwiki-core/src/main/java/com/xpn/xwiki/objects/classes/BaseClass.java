@@ -16,9 +16,7 @@
  * License along with this software; if not, write to the Free
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
- *
  */
-
 package com.xpn.xwiki.objects.classes;
 
 import java.io.StringReader;
@@ -173,6 +171,7 @@ public class BaseClass extends BaseCollection implements ClassInterface
      * kept in the database.
      * 
      * @param name the name of the property to disable
+     * @since 2.4M2
      */
     public void disableField(String name)
     {
@@ -187,6 +186,7 @@ public class BaseClass extends BaseCollection implements ClassInterface
      * Re-enable a property. This field will appear again in object instances.
      * 
      * @param name the name of the property to enable
+     * @since 2.4M2
      */
     public void enableField(String name)
     {
@@ -225,6 +225,7 @@ public class BaseClass extends BaseCollection implements ClassInterface
      * 
      * @return an unmodifiable list containing the enabled properties of the class
      * @see PropertyClass#isDisabled()
+     * @since 2.4M2
      */
     public List<PropertyClass> getEnabledProperties()
     {
@@ -252,6 +253,7 @@ public class BaseClass extends BaseCollection implements ClassInterface
      * 
      * @return an unmodifiable list containing the disabled properties of the class
      * @see PropertyClass#isDisabled()
+     * @since 2.4M2
      */
     public List<PropertyClass> getDisabledProperties()
     {
@@ -281,6 +283,7 @@ public class BaseClass extends BaseCollection implements ClassInterface
      * @param object the instance of this class where the disabled properties must exist
      * @return an unmodifiable list containing the disabled properties of the given object
      * @see PropertyClass#isDisabled()
+     * @since 2.4M2
      */
     public List<PropertyClass> getDisabledObjectProperties(BaseObject object)
     {
@@ -307,6 +310,7 @@ public class BaseClass extends BaseCollection implements ClassInterface
      * 
      * @param object the instance of this class where to look for undefined properties
      * @return an unmodifiable list containing the properties of the object which don't exist in the class
+     * @since 2.4M2
      */
     public List<BaseProperty> getDeprecatedObjectProperties(BaseObject object)
     {

@@ -753,6 +753,7 @@ public class Utils
      * 
      * @param context the current request context
      * @return True if this is an AJAX request, false otherwise.
+     * @since 2.4M2
      */
     public static Boolean isAjaxRequest(XWikiContext context)
     {

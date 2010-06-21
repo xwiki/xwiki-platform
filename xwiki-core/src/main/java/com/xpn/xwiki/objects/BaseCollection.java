@@ -16,9 +16,7 @@
  * License along with this software; if not, write to the Free
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
- *
  */
-
 package com.xpn.xwiki.objects;
 
 import java.io.IOException;
@@ -231,16 +229,6 @@ public abstract class BaseCollection extends BaseElement implements ObjectInterf
         setXClassReference(xClassReference);
     }
 
-    public void checkField(String name)
-    {
-        /*
-         * // Let's stop checking.. This is a pain if (getxWikiClass(context).safeget(name)==null) { Object[] args = {
-         * name, getxWikiClass(context).getName() }; throw new XWikiException( XWikiException.MODULE_XWIKI_CLASSES,
-         * XWikiException.ERROR_XWIKI_CLASSES_FIELD_DOES_NOT_EXIST, "Field {0} does not exist in class {1}", null,
-         * args); }
-         */
-    }
-
     /**
      * {@inheritDoc}
      * 
@@ -255,10 +243,10 @@ public abstract class BaseCollection extends BaseElement implements ObjectInterf
      * {@inheritDoc}
      * 
      * @see com.xpn.xwiki.objects.ObjectInterface#get(java.lang.String)
+     * @since 2.4M2
      */
     public PropertyInterface get(String name)
     {
-        checkField(name);
         return safeget(name);
     }
 
@@ -280,11 +268,10 @@ public abstract class BaseCollection extends BaseElement implements ObjectInterf
      * {@inheritDoc}
      * 
      * @see com.xpn.xwiki.objects.ObjectInterface#put(java.lang.String, com.xpn.xwiki.objects.PropertyInterface)
+     * @since 2.4M2
      */
     public void put(String name, PropertyInterface property)
     {
-        // TODO: order?
-        checkField(name);
         safeput(name, property);
     }
 
@@ -793,6 +780,9 @@ public abstract class BaseCollection extends BaseElement implements ObjectInterf
         return toXMLString();
     }
 
+    /**
+     * @since 2.4M2
+     */
     public Map<String, Object> getCustomMappingMap()
     {
         Map<String, Object> map = new HashMap<String, Object>();

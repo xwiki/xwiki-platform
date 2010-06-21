@@ -16,7 +16,6 @@
  * License along with this software; if not, write to the Free
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
- *
  */
 package com.xpn.xwiki.web;
 
@@ -35,6 +34,7 @@ import com.xpn.xwiki.objects.BaseProperty;
  * Synchronizes the objects in a document with their current classes, by removing any deprecated properties.
  * 
  * @version $Id$
+ * @since 2.4M2
  */
 public class ObjectsSynchronizeAction extends XWikiAction
 {

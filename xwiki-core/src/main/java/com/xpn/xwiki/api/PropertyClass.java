@@ -16,9 +16,7 @@
  * License along with this software; if not, write to the Free
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
- *
  */
-
 package com.xpn.xwiki.api;
 
 import java.util.List;
@@ -175,6 +173,7 @@ public class PropertyClass extends Collection implements Comparable<PropertyClas
      * are still kept in the database.
      * 
      * @return {@code true} if this property is disabled and should not be used, {@code false} otherwise
+     * @since 2.4M2
      */
     public boolean isDisabled()
     {
@@ -226,6 +225,7 @@ public class PropertyClass extends Collection implements Comparable<PropertyClas
      * @return a negative integer, zero, or a positive integer as this object is less than, equal to, or greater than
      *         the specified object.
      * @see #getNumber()
+     * @since 2.4M2
      */
     public int compareTo(PropertyClass other)
     {

@@ -16,7 +16,6 @@
  * License along with this software; if not, write to the Free
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
- *
  */
 package com.xpn.xwiki.objects.classes;
 
@@ -30,6 +29,7 @@ import com.xpn.xwiki.test.AbstractBridgedXWikiComponentTestCase;
  * Unit tests for the base {@link PropertyClass} class.
  * 
  * @version $Id$
+ * @since 2.4M2
  */
 public class PropertyClassTest extends AbstractBridgedXWikiComponentTestCase
 {

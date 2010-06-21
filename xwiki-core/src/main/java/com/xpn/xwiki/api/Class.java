@@ -20,12 +20,15 @@
  */
 package com.xpn.xwiki.api;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
+import java.util.List;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.objects.BaseObject;
+import com.xpn.xwiki.objects.BaseProperty;
 import com.xpn.xwiki.objects.classes.BaseClass;
 
 public class Class extends Collection
@@ -61,6 +64,88 @@ public class Class extends Collection
     }
 
     /**
+     * Get the names of the class properties that are enabled.
+     * 
+     * @return a list of enabled property names
+     * @see #getEnabledProperties()
+     * @see PropertyClass#isDisabled()
+     */
+    public List<String> getEnabledPropertyNames()
+    {
+        List<com.xpn.xwiki.objects.classes.PropertyClass> properties = this.getBaseClass().getEnabledProperties();
+        List<String> result = new ArrayList<String>(properties.size());
+        for (com.xpn.xwiki.objects.classes.PropertyClass property : properties) {
+            if (property != null) {
+                result.add(property.getName());
+            }
+        }
+        return result;
+    }
+
+    /**
+     * Get the names of the class properties that are disabled.
+     * 
+     * @return a list of disabled property names
+     * @see #getDisabledProperties()
+     * @see PropertyClass#isDisabled()
+     */
+    public List<String> getDisabledPropertyNames()
+    {
+        List<com.xpn.xwiki.objects.classes.PropertyClass> properties = this.getBaseClass().getDisabledProperties();
+        List<String> result = new ArrayList<String>(properties.size());
+        for (com.xpn.xwiki.objects.classes.PropertyClass property : properties) {
+            if (property != null) {
+                result.add(property.getName());
+            }
+        }
+        return result;
+    }
+
+    /**
+     * Get the names of the class properties that are disabled, and exist in the given object. This list is a subset of
+     * all the disabled properties in a class, since the object could have been created and stored before some of the
+     * class properties were added.
+     * 
+     * @param object the instance of this class where the disabled properties must exist
+     * @return a list of disabled property names
+     * @see #getDisabledObjectProperties(Object)
+     * @see PropertyClass#isDisabled()
+     */
+    public List<String> getDisabledObjectPropertyNames(Object object)
+    {
+        List<com.xpn.xwiki.objects.classes.PropertyClass> properties =
+            this.getBaseClass().getDisabledObjectProperties(object.getBaseObject());
+        List<String> result = new ArrayList<String>(properties.size());
+        for (com.xpn.xwiki.objects.classes.PropertyClass property : properties) {
+            if (property != null) {
+                result.add(property.getName());
+            }
+        }
+        return result;
+    }
+
+    /**
+     * Get the names of deprecated properties of the given object compared to the class. A deprecated property is a
+     * property which exists in the Object but doesn't exist anymore in the Class. This is used for synchronization of
+     * existing or imported Objects with respect to the modifications of their associated Class.
+     * 
+     * @param object the instance of this class where to look for undefined properties
+     * @return a list of deprecated property names
+     * @see #getDeprecatedObjectProperties(Object)
+     */
+    public List<String> getDeprecatedObjectPropertyNames(Object object)
+    {
+        List<BaseProperty> properties = this.getBaseClass().getDeprecatedObjectProperties(object.getBaseObject());
+        List<String> result = new ArrayList<String>(properties.size());
+        for (BaseProperty property : properties) {
+            if (property != null) {
+                result.add(property.getName());
+            }
+        }
+        return result;
+    }
+
+    /**
      * @return an array with the properties of the class
      */
     @Override
@@ -78,6 +163,93 @@ public class Class extends Collection
         }
         Arrays.sort(properties, new PropertyComparator());
         return properties;
+    }
+
+    /**
+     * Get the list of enabled (the default, normal state) property definitions that exist in this class.
+     * 
+     * @return a list containing the enabled properties of the class
+     * @see PropertyClass#isDisabled()
+     * @see #getEnabledPropertyNames()
+     */
+    public List<PropertyClass> getEnabledProperties()
+    {
+        List<com.xpn.xwiki.objects.classes.PropertyClass> enabledProperties =
+            getBaseClass().getEnabledProperties();
+
+        List<PropertyClass> result = new ArrayList<PropertyClass>(enabledProperties.size());
+
+        for (com.xpn.xwiki.objects.classes.PropertyClass property : enabledProperties) {
+            result.add(new PropertyClass(property, getXWikiContext()));
+        }
+
+        return result;
+    }
+
+    /**
+     * Get the list of disabled property definitions that exist in this class.
+     * 
+     * @return a list containing the disabled properties of the class
+     * @see PropertyClass#isDisabled()
+     * @see #getDisabledPropertyNames()
+     */
+    public List<PropertyClass> getDisabledProperties()
+    {
+        List<com.xpn.xwiki.objects.classes.PropertyClass> disabledProperties =
+            getBaseClass().getDisabledProperties();
+
+        List<PropertyClass> result = new ArrayList<PropertyClass>(disabledProperties.size());
+
+        for (com.xpn.xwiki.objects.classes.PropertyClass property : disabledProperties) {
+            result.add(new PropertyClass(property, getXWikiContext()));
+        }
+
+        return result;
+    }
+
+    /**
+     * Get the list of disabled properties that exist in a given object. This list is a subset of all the disabled
+     * properties in a class, since the object could have been created and stored before some of the class properties
+     * were added.
+     * 
+     * @param object the instance of this class where the disabled properties must exist
+     * @return a list containing the disabled properties of the given object
+     * @see PropertyClass#isDisabled()
+     * @see #getDisabledObjectPropertyNames(Object)
+     */
+    public List<PropertyClass> getDisabledObjectProperties(Object object)
+    {
+        List<com.xpn.xwiki.objects.classes.PropertyClass> disabledObjectProperties =
+            getBaseClass().getDisabledObjectProperties(object.getBaseObject());
+
+        List<PropertyClass> result = new ArrayList<PropertyClass>(disabledObjectProperties.size());
+        for (com.xpn.xwiki.objects.classes.PropertyClass property : disabledObjectProperties) {
+            result.add(new PropertyClass(property, getXWikiContext()));
+        }
+
+        return result;
+    }
+
+    /**
+     * Retrieves deprecated properties of the given object compared to the class. A deprecated property is a property
+     * which exists in the Object but doesn't exist anymore in the Class. This is used for synchronization of existing
+     * or imported Objects with respect to the modifications of their associated Class.
+     * 
+     * @param object the instance of this class where to look for undefined properties
+     * @return a list containing the properties of the object which don't exist in the class
+     * @see #getDeprecatedObjectPropertyNames(Object)
+     */
+    public List<Property> getDeprecatedObjectProperties(Object object)
+    {
+        List<BaseProperty> deprecatedObjectProperties =
+            getBaseClass().getDeprecatedObjectProperties(object.getBaseObject());
+
+        List<Property> result = new ArrayList<Property>(deprecatedObjectProperties.size());
+        for (BaseProperty property : deprecatedObjectProperties) {
+            result.add(new Property(property, getXWikiContext()));
+        }
+
+        return result;
     }
 
     /**

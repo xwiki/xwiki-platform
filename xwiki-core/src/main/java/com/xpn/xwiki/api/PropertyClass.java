@@ -171,6 +171,17 @@ public class PropertyClass extends Collection implements Comparable<PropertyClas
     }
 
     /**
+     * See if this property is disabled or not. A disabled property should not be editable, but existing object values
+     * are still kept in the database.
+     * 
+     * @return {@code true} if this property is disabled and should not be used, {@code false} otherwise
+     */
+    public boolean isDisabled()
+    {
+        return getBasePropertyClass().isDisabled();
+    }
+
+    /**
      * If the property is a {@link ListClass}, returns the possible values. These are the internal values (keys), and
      * not the user-friendly or translated values that would be displayed to the user.
      * 

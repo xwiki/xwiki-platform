@@ -231,7 +231,7 @@ public abstract class BaseCollection extends BaseElement implements ObjectInterf
         setXClassReference(xClassReference);
     }
 
-    public void checkField(String name) throws XWikiException
+    public void checkField(String name)
     {
         /*
          * // Let's stop checking.. This is a pain if (getxWikiClass(context).safeget(name)==null) { Object[] args = {
@@ -256,7 +256,7 @@ public abstract class BaseCollection extends BaseElement implements ObjectInterf
      * 
      * @see com.xpn.xwiki.objects.ObjectInterface#get(java.lang.String)
      */
-    public PropertyInterface get(String name) throws XWikiException
+    public PropertyInterface get(String name)
     {
         checkField(name);
         return safeget(name);
@@ -281,7 +281,7 @@ public abstract class BaseCollection extends BaseElement implements ObjectInterf
      * 
      * @see com.xpn.xwiki.objects.ObjectInterface#put(java.lang.String, com.xpn.xwiki.objects.PropertyInterface)
      */
-    public void put(String name, PropertyInterface property) throws XWikiException
+    public void put(String name, PropertyInterface property)
     {
         // TODO: order?
         checkField(name);
@@ -793,7 +793,7 @@ public abstract class BaseCollection extends BaseElement implements ObjectInterf
         return toXMLString();
     }
 
-    public Map<String, Object> getCustomMappingMap() throws XWikiException
+    public Map<String, Object> getCustomMappingMap()
     {
         Map<String, Object> map = new HashMap<String, Object>();
         for (String name : this.fields.keySet()) {

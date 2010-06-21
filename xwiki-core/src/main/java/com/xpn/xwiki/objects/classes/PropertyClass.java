@@ -118,18 +118,6 @@ public class PropertyClass extends BaseCollection implements PropertyClassInterf
         this.id = id;
     }
 
-    @Override
-    public void checkField(String name) throws XWikiException
-    {
-        // Let's stop checking
-        /*
-         * if ((getxWikiClass(context).safeget(name)==null)&& (getxWikiClass(context).safeget("meta" + name)==null)){
-         * Object[] args = { name, getxWikiClass(context).getName() }; throw new XWikiException(
-         * XWikiException.MODULE_XWIKI_CLASSES, XWikiException.ERROR_XWIKI_CLASSES_FIELD_DOES_NOT_EXIST, "Field {0} does
-         * not exist in class {1}", null, args); }
-         */
-    }
-
     public String toString(BaseProperty property)
     {
         return property.toText();

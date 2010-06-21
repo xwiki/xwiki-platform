@@ -65,8 +65,8 @@ public class Utils
         Utils.class.getCanonicalName() + "_placeholders_enabled";
 
     /**
-     * The component manager used by {@link #getComponent(Class)} and {@link #getComponent(Class, String)}. It is
-     * useful for any non component code that need to initialize/access components.
+     * The component manager used by {@link #getComponent(Class)} and {@link #getComponent(Class, String)}. It is useful
+     * for any non component code that need to initialize/access components.
      */
     private static ComponentManager componentManager;
 
@@ -150,7 +150,7 @@ public class Utils
         // the content is fully rendered. The rendering code can use Utils.createPlaceholder.
         // Initialize the placeholder map
         enablePlaceholders(context);
-        String content;
+        String content = "";
         try {
             content = context.getWiki().evaluateTemplate(template + ".vm", context);
             // Replace all placeholders with the protected values
@@ -163,8 +163,12 @@ public class Utils
             }
 
             // get Error template "This template does not exist
-            content = context.getWiki().parseTemplate("templatedoesnotexist.vm", context);
-            content = content.trim();
+            try {
+                content = context.getWiki().evaluateTemplate("templatedoesnotexist.vm", context);
+                content = content.trim();
+            } catch (IOException ex) {
+                // Cannot write output, can't do anything else
+            }
         }
 
         if (!context.isFinished()) {

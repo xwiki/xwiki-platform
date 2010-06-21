@@ -27,12 +27,11 @@ import org.xwiki.rendering.transformation.MacroTransformationContext;
 /**
  * For validating a macro to make sure it is allowed to run.
  * 
- * @param <P> the type of macro parameters bean.
  * @version $Id$
  * @since 2.4M2
  */
 @ComponentRole
-public interface ScriptMacroValidator<P extends ScriptMacroParameters>
+public interface ScriptMacroValidator
 {
     /**
      * Check if the given macro block is valid.
@@ -42,5 +41,6 @@ public interface ScriptMacroValidator<P extends ScriptMacroParameters>
      * @param context the context of the macros transformation process
      * @throws MacroExecutionException if macro is invalid
      */
-    void validate(P parameters, String content, MacroTransformationContext context) throws MacroExecutionException;
+    void validate(ScriptMacroParameters parameters, String content, MacroTransformationContext context)
+        throws MacroExecutionException;
 }

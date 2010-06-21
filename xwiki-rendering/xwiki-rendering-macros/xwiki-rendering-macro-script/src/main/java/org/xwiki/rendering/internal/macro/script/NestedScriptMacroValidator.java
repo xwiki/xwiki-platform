@@ -33,25 +33,25 @@ import org.xwiki.rendering.transformation.MacroTransformationContext;
 /**
  * Make sure script macros are not nested.
  * 
- * @param <P> the type of macro parameters bean.
  * @version $Id$
  * @since 2.4M2
  */
 @Component("nested")
-public class NestedScriptMacroValidator<P extends ScriptMacroParameters> implements ScriptMacroValidator<P>
+public class NestedScriptMacroValidator implements ScriptMacroValidator
 {
     /**
-     * Used to find the type of a Macro defined by a Macro Marker block; we're interested to prevent nested scripts
-     * only in Script macros. 
+     * Used to find the type of a Macro defined by a Macro Marker block; we're interested to prevent nested scripts only
+     * in Script macros.
      */
     @Requirement
     private MacroManager macroManager;
 
     /**
      * {@inheritDoc}
-     * @see ScriptMacroValidator#validate 
+     * 
+     * @see ScriptMacroValidator#validate
      */
-    public void validate(P parameters, String content, MacroTransformationContext context) 
+    public void validate(ScriptMacroParameters parameters, String content, MacroTransformationContext context)
         throws MacroExecutionException
     {
         // Traverse the XDOM tree up to the root

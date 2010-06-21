@@ -28,27 +28,24 @@ import com.xpn.xwiki.test.AbstractBridgedComponentTestCase;
 
 /**
  * Unit tests for the {@link BaseElement} class.
- * 
+ *
  * @version $Id$
  */
 public class BaseElementTest extends AbstractBridgedComponentTestCase
 {
     @Test
-    public void testSetWiki() throws Exception
+    public void testSetReferenceGetName() throws Exception
     {
-        BaseElement baseElement = new BaseElement(){};
-        
-        baseElement.setWiki("wiki");
-        
-        Assert.assertEquals("wiki", baseElement.getWiki());
-        
-        baseElement.setName("space.page");
-        
+        BaseElement baseElement = new BaseElement()
+        {
+        };
+
+        baseElement.setDocumentReference(new DocumentReference("wiki", "space", "page"));
         Assert.assertEquals("space.page", baseElement.getName());
         Assert.assertEquals("wiki", baseElement.getDocumentReference().getWikiReference().getName());
         Assert.assertEquals("space", baseElement.getDocumentReference().getLastSpaceReference().getName());
         Assert.assertEquals("page", baseElement.getDocumentReference().getName());
-        
+
         baseElement.setDocumentReference(new DocumentReference("otherwiki", "otherspace", "otherpage"));
         Assert.assertEquals("otherspace.otherpage", baseElement.getName());
         Assert.assertEquals("otherwiki", baseElement.getDocumentReference().getWikiReference().getName());

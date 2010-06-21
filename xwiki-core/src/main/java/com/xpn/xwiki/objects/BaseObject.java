@@ -31,20 +31,41 @@ import java.util.UUID;
 import org.apache.commons.lang.StringUtils;
 import org.dom4j.Element;
 import org.dom4j.dom.DOMElement;
+import org.xwiki.model.EntityType;
+import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.DocumentReferenceResolver;
+import org.xwiki.model.reference.EntityReference;
+import org.xwiki.model.reference.EntityReferenceResolver;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.objects.classes.BaseClass;
 import com.xpn.xwiki.objects.classes.PropertyClass;
-import org.xwiki.model.reference.DocumentReference;
+import com.xpn.xwiki.web.Utils;
 
 public class BaseObject extends BaseCollection implements ObjectInterface, Serializable, Cloneable
 {
     private String guid = UUID.randomUUID().toString();
 
     /**
+     * Used to resolve a string into a proper Document Reference using the current document's reference to fill the
+     * blanks, except for the page name for which the default page name is used instead and for the wiki name for which
+     * the current wiki is used instead of the current document reference's wiki.
+     */
+    private DocumentReferenceResolver<String> currentMixedDocumentReferenceResolver =
+        Utils.getComponent(DocumentReferenceResolver.class, "currentmixed");
+
+    /**
+     * Used here to merge setName() and setWiki() calls into the DocumentReference.
+     */
+    private EntityReferenceResolver<String> relativeEntityReferenceResolver = Utils.getComponent(
+        EntityReferenceResolver.class, "relative");
+
+    /**
+     * {@inheritDoc}
+     *
      * Note: This method is overridden to add the deprecation warning so that code using it can see it's deprecated.
-     * 
+     *
      * @deprecated since 2.2M2 use {@link #getDocumentReference()}
      */
     @Deprecated
@@ -55,15 +76,26 @@ public class BaseObject extends BaseCollection implements ObjectInterface, Seria
     }
 
     /**
-     * Note: This method is overridden to add the deprecation warning so that code using it can see it's deprecated.
+     * {@inheritDoc}
      * 
+     * Note: BaseElement.setName() does not support setting reference anymore since 2.4M2.
+     *
      * @deprecated since 2.2M2 use {@link #setDocumentReference(org.xwiki.model.reference.DocumentReference)}
      */
     @Deprecated
     @Override
     public void setName(String name)
     {
-        super.setName(name);
+        DocumentReference reference = getDocumentReference();
+
+        if (reference != null) {
+            EntityReference relativeReference = this.relativeEntityReferenceResolver.resolve(name, EntityType.DOCUMENT);
+            reference.getLastSpaceReference().setName(relativeReference.extractReference(EntityType.SPACE).getName());
+            reference.setName(relativeReference.extractReference(EntityType.DOCUMENT).getName());
+        } else {
+            reference = this.currentMixedDocumentReferenceResolver.resolve(name);
+        }
+        setDocumentReference(reference);
     }
 
     /**

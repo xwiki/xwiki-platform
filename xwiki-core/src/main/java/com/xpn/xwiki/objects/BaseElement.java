@@ -23,22 +23,17 @@ package com.xpn.xwiki.objects;
 
 import java.io.Serializable;
 
-import com.xpn.xwiki.web.Utils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.EntityReferenceSerializer;
+import org.xwiki.model.reference.WikiReference;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
-
-import org.xwiki.model.EntityType;
-import org.xwiki.model.reference.DocumentReference;
-import org.xwiki.model.reference.DocumentReferenceResolver;
-import org.xwiki.model.reference.EntityReference;
-import org.xwiki.model.reference.EntityReferenceResolver;
-import org.xwiki.model.reference.EntityReferenceSerializer;
-import org.xwiki.model.reference.WikiReference;
+import com.xpn.xwiki.web.Utils;
 
 /**
  * Base class for representing an element having a name (either a reference of a free form name) and a pretty name.
@@ -64,14 +59,6 @@ public abstract class BaseElement implements ElementInterface, Serializable
     private String prettyName;
 
     /**
-     * Used to resolve a string into a proper Document Reference using the current document's reference to fill the
-     * blanks, except for the page name for which the default page name is used instead and for the wiki name for which
-     * the current wiki is used instead of the current document reference's wiki.
-     */
-    private DocumentReferenceResolver currentMixedDocumentReferenceResolver =
-        Utils.getComponent(DocumentReferenceResolver.class, "currentmixed");
-
-    /**
      * Used to convert a Document Reference to string (compact form without the wiki part if it matches the current
      * wiki).
      */
@@ -84,9 +71,6 @@ public abstract class BaseElement implements ElementInterface, Serializable
     private EntityReferenceSerializer<String> localEntityReferenceSerializer =
         Utils.getComponent(EntityReferenceSerializer.class, "local");
 
-    private EntityReferenceResolver<String> relativeEntityReferenceResolver = Utils.getComponent(
-        EntityReferenceResolver.class, "relative");
-    
     /**
      * {@inheritDoc}
      *
@@ -95,14 +79,13 @@ public abstract class BaseElement implements ElementInterface, Serializable
      */
     public DocumentReference getDocumentReference()
     {
-        DocumentReference reference = this.reference;
-
-        // If the reference is null then parse the name as a reference.
-        if (reference == null && this.name != null) {
-            reference = this.currentMixedDocumentReferenceResolver.resolve(this.name);
+        // Object using name without setting a reference are not allowed to retrieve the reference
+        if (this.reference == null && this.name != null) {
+            throw new IllegalStateException(
+                "BaseElement#getDocumentReference could not be called when a non-reference Name has been set.");
         }
 
-        return reference;
+        return this.reference;
     }
 
     /**
@@ -114,14 +97,12 @@ public abstract class BaseElement implements ElementInterface, Serializable
      */
     public String getName()
     {
-        String name = this.name;
-
         // If the name is null then serialize the reference as a string.
-        if (name == null && this.reference != null) {
-            name = this.localEntityReferenceSerializer.serialize(this.reference);
+        if (this.name == null && this.reference != null) {
+            this.name = this.localEntityReferenceSerializer.serialize(this.reference);
         }
 
-        return name;
+        return this.name;
     }
 
     /**
@@ -146,17 +127,12 @@ public abstract class BaseElement implements ElementInterface, Serializable
      */
     public void setName(String name)
     {
-        // If the reference is already set, then continue using it. Ideally code calling setName should be modified to
-        // call setReference in this case.
+        // If a reference is already set, then you cannot set a name
         if (this.reference != null) {
-            // <code>name</name> is supposed to be a full name (spape.page), to set the wiki use #setWiki
-            EntityReference relativeReference = this.relativeEntityReferenceResolver.resolve(name, EntityType.DOCUMENT);
-            this.reference.getLastSpaceReference().setName(relativeReference.extractReference(EntityType.SPACE).getName());
-            this.reference.setName(relativeReference.extractReference(EntityType.DOCUMENT).getName());
-            this.name = null;
-        } else {
-            this.name = name;
+            throw new IllegalStateException("BaseElement#setName could not be called when a reference has been set.");
         }
+
+        this.name = name;
     }
 
     public String getPrettyName()
@@ -187,6 +163,12 @@ public abstract class BaseElement implements ElementInterface, Serializable
     @Deprecated
     public void setWiki(String wiki)
     {
+        // Object using name without setting a reference are not allowed to set a wiki reference
+        if (this.reference == null && this.name != null) {
+            throw new IllegalStateException(
+                "BaseElement#setWiki could not be called when a non-reference Name has been set.");
+        }
+
         if (!StringUtils.isEmpty(wiki)) {
             DocumentReference reference = getDocumentReference();
 
@@ -216,19 +198,27 @@ public abstract class BaseElement implements ElementInterface, Serializable
             return true;
         }
 
-        if (el == null || !(el instanceof BaseElement)) {
+        if (el == null || !(el.getClass().equals(this.getClass()))) {
             return false;
         }
 
         BaseElement element = (BaseElement) el;
 
-        DocumentReference elementReference = element.getDocumentReference();
-        if (elementReference == null) {
-            if (getDocumentReference() != null) {
+        if (element.reference != null) {
+            if (!element.reference.equals(this.reference)) {
                 return false;
             }
-        } else if (!elementReference.equals(getDocumentReference())) {
-            return false;
+        } else {
+            if (this.reference != null) {
+                return false;
+            }
+            if (element.name == null) {
+                if (this.name != null) {
+                    return false;
+                }
+            } else if (!element.name.equals(this.name)) {
+                return false;
+            }
         }
 
         if (element.getPrettyName() == null) {
@@ -236,10 +226,6 @@ public abstract class BaseElement implements ElementInterface, Serializable
                 return false;
             }
         } else if (!element.getPrettyName().equals(getPrettyName())) {
-            return false;
-        }
-
-        if (!(element.getClass().equals(this.getClass()))) {
             return false;
         }
 

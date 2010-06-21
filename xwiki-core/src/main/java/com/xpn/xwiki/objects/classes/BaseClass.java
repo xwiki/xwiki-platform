@@ -31,7 +31,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import com.xpn.xwiki.web.Utils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.ecs.xhtml.option;
 import org.apache.ecs.xhtml.select;
@@ -40,6 +39,12 @@ import org.dom4j.DocumentException;
 import org.dom4j.Element;
 import org.dom4j.dom.DOMElement;
 import org.dom4j.io.SAXReader;
+import org.xwiki.model.EntityType;
+import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.DocumentReferenceResolver;
+import org.xwiki.model.reference.EntityReference;
+import org.xwiki.model.reference.EntityReferenceResolver;
+import org.xwiki.model.reference.EntityReferenceSerializer;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
@@ -48,14 +53,14 @@ import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.objects.BaseProperty;
 import com.xpn.xwiki.objects.ObjectDiff;
 import com.xpn.xwiki.objects.PropertyInterface;
+import com.xpn.xwiki.objects.meta.MetaClass;
+import com.xpn.xwiki.objects.meta.PropertyMetaClass;
 import com.xpn.xwiki.plugin.query.OrderClause;
 import com.xpn.xwiki.plugin.query.XWikiCriteria;
 import com.xpn.xwiki.plugin.query.XWikiQuery;
 import com.xpn.xwiki.validation.XWikiValidationInterface;
 import com.xpn.xwiki.validation.XWikiValidationStatus;
-import org.xwiki.model.reference.DocumentReference;
-import org.xwiki.model.reference.EntityReference;
-import org.xwiki.model.reference.EntityReferenceSerializer;
+import com.xpn.xwiki.web.Utils;
 
 /**
  * Represents an XClass, and contains XClass properties. Each field from {@link BaseCollection} is of type
@@ -83,7 +88,25 @@ public class BaseClass extends BaseCollection implements ClassInterface
         Utils.getComponent(EntityReferenceSerializer.class, "local/reference");
 
     /**
+     * Used to resolve a string into a proper Document Reference using the current document's reference to fill the
+     * blanks, except for the page name for which the default page name is used instead and for the wiki name for which
+     * the current wiki is used instead of the current document reference's wiki.
+     */
+    private DocumentReferenceResolver<String> currentMixedDocumentReferenceResolver =
+        Utils.getComponent(DocumentReferenceResolver.class, "currentmixed");
+
+    /**
+     * Used here to merge setName() and setWiki() calls into the DocumentReference.
+     */
+    private EntityReferenceResolver<String> relativeEntityReferenceResolver = Utils.getComponent(
+        EntityReferenceResolver.class, "relative");
+
+
+    /**
+     * {@inheritDoc}
+     *
      * Note: This method is overridden to add the deprecation warning so that code using is can see it's deprecated.
+     *
      * @deprecated since 2.2M2 use {@link #getDocumentReference()}
      */
     @Deprecated
@@ -93,13 +116,32 @@ public class BaseClass extends BaseCollection implements ClassInterface
     }
 
     /**
-     * Note: This method is overridden to add the deprecation warning so that code using is can see it's deprecated.
+     * Note: BaseElement#setName() does not support setting reference anymore since 2.4M2. This was broken and
+     * has been replaced by this overridden method. See XWIKI-5285
+     *
+     * {@inheritDoc}
+     *
      * @deprecated since 2.2M2 use {@link #setDocumentReference(org.xwiki.model.reference.DocumentReference)}
      */
     @Deprecated
     @Override public void setName(String name)
     {
-        super.setName(name);
+        if (this instanceof MetaClass || this instanceof PropertyMetaClass) {
+            super.setName(name);
+        } else {
+            DocumentReference reference = getDocumentReference();
+
+            if (reference != null) {
+                EntityReference relativeReference =
+                    this.relativeEntityReferenceResolver.resolve(name, EntityType.DOCUMENT);
+                reference.getLastSpaceReference()
+                    .setName(relativeReference.extractReference(EntityType.SPACE).getName());
+                reference.setName(relativeReference.extractReference(EntityType.DOCUMENT).getName());
+            } else {
+                reference = this.currentMixedDocumentReferenceResolver.resolve(name);
+            }
+            setDocumentReference(reference);
+        }
     }
 
     /**
@@ -856,7 +898,7 @@ public class BaseClass extends BaseCollection implements ClassInterface
     }
 
     /**
-     * @deprecated since 2.2.3 use {@link #newCustomClassInstance(String, com.xpn.xwiki.XWikiContext)}
+     * @deprecated since 2.2.3 use {@link #newCustomClassInstance(DocumentReference classReference, com.xpn.xwiki.XWikiContext)}
      */
     @Deprecated
     public static BaseObject newCustomClassInstance(String className, XWikiContext context) throws XWikiException

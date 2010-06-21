@@ -100,13 +100,13 @@ public class Document extends Api
      */
     private DocumentReferenceResolver<String> currentMixedDocumentReferenceResolver =
         Utils.getComponent(DocumentReferenceResolver.class, "currentmixed");
-    
+
     /**
      * Used to convert a proper Document Reference to string (standard form).
      */
     private EntityReferenceSerializer<String> defaultEntityReferenceSerializer =
         Utils.getComponent(EntityReferenceSerializer.class);
-    
+
     /**
      * Used to convert a proper Document Reference to a string but without the wiki name.
      */
@@ -265,8 +265,8 @@ public class Document extends Api
     /**
      * Get a string representing the previous version of the document.
      * 
-     * @return A string representing the previous version of the document.
-     *         If this is the first version then it returns null.
+     * @return A string representing the previous version of the document. If this is the first version then it returns
+     *         null.
      */
     public String getPreviousVersion()
     {
@@ -420,6 +420,7 @@ public class Document extends Api
      * @return The syntax id representing the syntax used for the document.
      * @deprecated since 2.3M1 use {@link #getSyntax()} instead
      */
+    @Deprecated
     public String getSyntaxId()
     {
         return this.doc.getSyntaxId();
@@ -1411,7 +1412,7 @@ public class Document extends Api
         } catch (Exception e) {
             java.lang.Object[] args =
                 {(origdoc != null) ? origdoc.getFullName() : null, (origdoc != null) ? origdoc.getVersion() : null,
-            (newdoc != null) ? newdoc.getVersion() : null};
+                (newdoc != null) ? newdoc.getVersion() : null};
             List list = new ArrayList();
             XWikiException xe =
                 new XWikiException(XWikiException.MODULE_XWIKI_DIFF, XWikiException.ERROR_XWIKI_DIFF_ATTACHMENT_ERROR,
@@ -1834,9 +1835,9 @@ public class Document extends Api
     }
 
     /**
-     * Save the document if the {@link #getContentAuthor content author} of the script calling this method has 
+     * Save the document if the {@link #getContentAuthor content author} of the script calling this method has
      * permission to do so. The author of this document is also set to the said content author.
-     *
+     * 
      * @throws XWikiException if script author is not allowed to save the document or if save operation fails.
      * @since 2.3M2
      */
@@ -1846,9 +1847,9 @@ public class Document extends Api
     }
 
     /**
-     * Save the document if the {@link #getContentAuthor content author} of the script calling this method has 
+     * Save the document if the {@link #getContentAuthor content author} of the script calling this method has
      * permission to do so. The author of this document is also set to the said content author.
-     *
+     * 
      * @param comment The comment to display in document history (what did you change in the document)
      * @throws XWikiException if script author is not allowed to save the document or if save operation fails.
      * @since 2.3M2
@@ -1859,12 +1860,12 @@ public class Document extends Api
     }
 
     /**
-     * Save the document if the {@link #getContentAuthor content author} of the script calling this method has 
+     * Save the document if the {@link #getContentAuthor content author} of the script calling this method has
      * permission to do so. The author of this document is also set to the said content author.
-     *
+     * 
      * @param comment The comment to display in document history (what did you change in the document)
      * @param minorEdit Set true to advance the document version number by 0.1 or false to advance version to the next
-     *                  integer + 0.1 eg: 25.1
+     *            integer + 0.1 eg: 25.1
      * @throws XWikiException if script author is not allowed to save the document or if save operation fails.
      * @since 2.3M2
      */
@@ -1880,7 +1881,7 @@ public class Document extends Api
                 getXWikiContext().setUser(viewer);
             }
         } else {
-            java.lang.Object[] args = { author, getXWikiContext().getDoc(), this.doc.getFullName() };
+            java.lang.Object[] args = {author, getXWikiContext().getDoc(), this.doc.getFullName()};
             throw new XWikiException(XWikiException.MODULE_XWIKI_ACCESS, XWikiException.ERROR_XWIKI_ACCESS_DENIED,
                 "Access denied; user {0}, acting through script in document {1} cannot save document {2}", null, args);
         }
@@ -2016,9 +2017,9 @@ public class Document extends Api
     }
 
     /**
-     * Delete the document if the {@link #getContentAuthor content author} of the script calling this method has 
+     * Delete the document if the {@link #getContentAuthor content author} of the script calling this method has
      * permission to do so. The deleter is also set to the said content author.
-     *
+     * 
      * @throws XWikiException if script author is not allowed to delete the document or if save operation fails.
      * @since 2.3M2
      */
@@ -2034,7 +2035,7 @@ public class Document extends Api
                 getXWikiContext().setUser(viewer);
             }
         } else {
-            java.lang.Object[] args = { author, getXWikiContext().getDoc(), this.doc.getFullName() };
+            java.lang.Object[] args = {author, getXWikiContext().getDoc(), this.doc.getFullName()};
             throw new XWikiException(XWikiException.MODULE_XWIKI_ACCESS, XWikiException.ERROR_XWIKI_ACCESS_DENIED,
                 "Access denied; user {0}, acting through script in document {1} cannot delete document {2}", null, args);
         }
@@ -2196,7 +2197,7 @@ public class Document extends Api
      * Rename the current document and all the backlinks leading to it. Will also change parent field in all documents
      * which list the document we are renaming as their parent. See
      * {@link #rename(String, java.util.List, java.util.List)} for more details.
-     *
+     * 
      * @param newReference the reference to the new document
      * @throws XWikiException in case of an error
      * @since 2.3M2
@@ -2278,12 +2279,12 @@ public class Document extends Api
     /**
      * Same as {@link #rename(String, List)} but the list of documents having the current document as their parent is
      * passed in parameter.
-     *
+     * 
      * @param newReference the reference to the new document
-     * @param backlinkDocumentNames the list of reference to documents to parse and for which links will be modified
-     *        to point to the new renamed document
+     * @param backlinkDocumentNames the list of reference to documents to parse and for which links will be modified to
+     *            point to the new renamed document
      * @param childDocumentNames the list of references to documents whose parent field will be set to the new document
-     *        reference
+     *            reference
      * @throws XWikiException in case of an error
      * @since 2.3M2
      */

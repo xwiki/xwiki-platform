@@ -27,7 +27,7 @@ import org.junit.Test;
 /**
  * Unit tests for the {@link BaseClass} class.
  *
- * @version $Id:$
+ * @version $Id$
  */
 public class BaseClassTest extends AbstractBridgedComponentTestCase
 {

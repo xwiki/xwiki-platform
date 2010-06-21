@@ -40,6 +40,11 @@ public class Class extends Collection
         return (BaseClass) getCollection();
     }
 
+    /**
+     * Returns a String table of the property names.
+     * 
+     * @see com.xpn.xwiki.api.Collection#getPropertyNames()
+     */
     @Override
     public java.lang.Object[] getPropertyNames()
     {

@@ -21,21 +21,16 @@
 
 package com.xpn.xwiki.objects.classes;
 
-import com.xpn.xwiki.XWikiContext;
-import com.xpn.xwiki.XWikiException;
-import com.xpn.xwiki.objects.BaseCollection;
-import com.xpn.xwiki.objects.BaseObject;
-import com.xpn.xwiki.objects.BaseProperty;
-import com.xpn.xwiki.objects.ObjectDiff;
-import com.xpn.xwiki.objects.PropertyInterface;
-import com.xpn.xwiki.objects.meta.MetaClass;
-import com.xpn.xwiki.objects.meta.PropertyMetaClass;
-import com.xpn.xwiki.plugin.query.OrderClause;
-import com.xpn.xwiki.plugin.query.XWikiCriteria;
-import com.xpn.xwiki.plugin.query.XWikiQuery;
-import com.xpn.xwiki.validation.XWikiValidationInterface;
-import com.xpn.xwiki.validation.XWikiValidationStatus;
-import com.xpn.xwiki.web.Utils;
+import java.io.StringReader;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
 import org.apache.commons.lang.StringUtils;
 import org.apache.ecs.xhtml.option;
 import org.apache.ecs.xhtml.select;
@@ -51,20 +46,26 @@ import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.EntityReferenceResolver;
 import org.xwiki.model.reference.EntityReferenceSerializer;
 
-import java.io.StringReader;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import com.xpn.xwiki.XWikiContext;
+import com.xpn.xwiki.XWikiException;
+import com.xpn.xwiki.objects.BaseCollection;
+import com.xpn.xwiki.objects.BaseObject;
+import com.xpn.xwiki.objects.BaseProperty;
+import com.xpn.xwiki.objects.ObjectDiff;
+import com.xpn.xwiki.objects.PropertyInterface;
+import com.xpn.xwiki.objects.meta.MetaClass;
+import com.xpn.xwiki.objects.meta.PropertyMetaClass;
+import com.xpn.xwiki.plugin.query.OrderClause;
+import com.xpn.xwiki.plugin.query.XWikiCriteria;
+import com.xpn.xwiki.plugin.query.XWikiQuery;
+import com.xpn.xwiki.validation.XWikiValidationInterface;
+import com.xpn.xwiki.validation.XWikiValidationStatus;
+import com.xpn.xwiki.web.Utils;
 
 /**
  * Represents an XClass, and contains XClass properties. Each field from {@link BaseCollection} is of type
  * {@link PropertyClass} and defines a single XClass property.
- *
+ * 
  * @version $Id$
  */
 public class BaseClass extends BaseCollection implements ClassInterface
@@ -102,14 +103,15 @@ public class BaseClass extends BaseCollection implements ClassInterface
 
 
     /**
-     * Note: This method is overridden to add the deprecation warning so that code using is can see it's deprecated.
-     *
      * {@inheritDoc}
-     *
+     * 
+     * Note: This method is overridden to add the deprecation warning so that code using is can see it's deprecated.
+     * 
      * @deprecated since 2.2M2 use {@link #getDocumentReference()}
      */
     @Deprecated
-    @Override public String getName()
+    @Override
+    public String getName()
     {
         return super.getName();
     }
@@ -123,7 +125,8 @@ public class BaseClass extends BaseCollection implements ClassInterface
      * @deprecated since 2.2M2 use {@link #setDocumentReference(org.xwiki.model.reference.DocumentReference)}
      */
     @Deprecated
-    @Override public void setName(String name)
+    @Override
+    public void setName(String name)
     {
         if (this instanceof MetaClass || this instanceof PropertyMetaClass) {
             super.setName(name);
@@ -1119,13 +1122,13 @@ public class BaseClass extends BaseCollection implements ClassInterface
         for (PropertyClass newProperty : (Collection<PropertyClass>) getFieldList()) {
             String propertyName = newProperty.getName();
             PropertyClass oldProperty = (PropertyClass) oldClass.get(propertyName);
-            String propertyType = StringUtils.substringAfterLast(newProperty.getClassType(), ".");            
+            String propertyType = StringUtils.substringAfterLast(newProperty.getClassType(), ".");
 
             if (oldProperty == null) {
-                difflist.add(new ObjectDiff(getClassName(), getNumber(), "", "added", propertyName, propertyType, "", 
+                difflist.add(new ObjectDiff(getClassName(), getNumber(), "", "added", propertyName, propertyType, "",
                     ""));
             } else if (!oldProperty.equals(newProperty)) {
-                difflist.add(new ObjectDiff(getClassName(), getNumber(), "", "changed", propertyName, propertyType, "", 
+                difflist.add(new ObjectDiff(getClassName(), getNumber(), "", "changed", propertyName, propertyType, "",
                     ""));
             }
         }
@@ -1136,7 +1139,7 @@ public class BaseClass extends BaseCollection implements ClassInterface
             String propertyType = StringUtils.substringAfterLast(oldProperty.getClassType(), ".");
 
             if (newProperty == null) {
-                difflist.add(new ObjectDiff(getClassName(), getNumber(), "", "removed", propertyName, propertyType, "", 
+                difflist.add(new ObjectDiff(getClassName(), getNumber(), "", "removed", propertyName, propertyType, "",
                     ""));
             }
         }

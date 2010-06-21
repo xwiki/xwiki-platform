@@ -46,6 +46,12 @@
                    type="com.xpn.xwiki.web.EditForm"/>
         <form-bean name="propadd"
                    type="com.xpn.xwiki.web.PropAddForm"/>
+        <form-bean name="propdisable"
+                   type="com.xpn.xwiki.web.PropChangeForm"/>
+        <form-bean name="propenable"
+                   type="com.xpn.xwiki.web.PropChangeForm"/>
+        <form-bean name="propdelete"
+                   type="com.xpn.xwiki.web.PropChangeForm"/>
         <form-bean name="objectadd"
                    type="com.xpn.xwiki.web.ObjectAddForm"/>
         <form-bean name="commentadd"
@@ -216,6 +222,18 @@
             <forward name="propadd" path="/templates/edit.vm"/>
         </action>
 
+        <action path="/propdisable/"
+                type="com.xpn.xwiki.web.PropDisableAction"
+                name="propdisable"
+                scope="request">
+        </action>
+
+        <action path="/propenable/"
+                type="com.xpn.xwiki.web.PropEnableAction"
+                name="propenable"
+                scope="request">
+        </action>
+
         <action path="/propdelete/"
                 type="com.xpn.xwiki.web.PropDeleteAction"
                 name="propdelete"
@@ -237,6 +255,11 @@
             <forward name="commentadd" path="/templates/edit.vm"/>
         </action>
 
+        <action path="/objectsync/"
+                type="com.xpn.xwiki.web.ObjectsSynchronizeAction"
+                name="objectsync"
+                scope="request">
+        </action>
         <action path="/objectremove/"
                 type="com.xpn.xwiki.web.ObjectRemoveAction"
                 name="objectremove"

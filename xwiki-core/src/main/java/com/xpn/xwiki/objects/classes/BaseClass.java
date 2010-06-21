@@ -295,8 +295,12 @@ public class BaseClass extends BaseCollection implements ClassInterface
         List<PropertyClass> disabledObjectProperties = new ArrayList<PropertyClass>(disabledProperties.size());
 
         for (PropertyClass property : disabledProperties) {
-            if (object.get(property.getName()) != null) {
-                disabledObjectProperties.add(property);
+            try {
+                if (object.get(property.getName()) != null) {
+                    disabledObjectProperties.add(property);
+                }
+            } catch (XWikiException ex) {
+                // Not really gonna happen
             }
         }
 

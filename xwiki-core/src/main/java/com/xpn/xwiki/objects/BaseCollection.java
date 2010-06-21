@@ -50,6 +50,7 @@ import org.xwiki.model.reference.EntityReferenceResolver;
 import org.xwiki.model.reference.EntityReferenceSerializer;
 
 import com.xpn.xwiki.XWikiContext;
+import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.objects.classes.BaseClass;
 import com.xpn.xwiki.objects.classes.PropertyClass;
 import com.xpn.xwiki.web.Utils;
@@ -243,9 +244,8 @@ public abstract class BaseCollection extends BaseElement implements ObjectInterf
      * {@inheritDoc}
      * 
      * @see com.xpn.xwiki.objects.ObjectInterface#get(java.lang.String)
-     * @since 2.4M2
      */
-    public PropertyInterface get(String name)
+    public PropertyInterface get(String name) throws XWikiException
     {
         return safeget(name);
     }
@@ -268,9 +268,8 @@ public abstract class BaseCollection extends BaseElement implements ObjectInterf
      * {@inheritDoc}
      * 
      * @see com.xpn.xwiki.objects.ObjectInterface#put(java.lang.String, com.xpn.xwiki.objects.PropertyInterface)
-     * @since 2.4M2
      */
-    public void put(String name, PropertyInterface property)
+    public void put(String name, PropertyInterface property) throws XWikiException
     {
         safeput(name, property);
     }
@@ -783,7 +782,7 @@ public abstract class BaseCollection extends BaseElement implements ObjectInterf
     /**
      * @since 2.4M2
      */
-    public Map<String, Object> getCustomMappingMap()
+    public Map<String, Object> getCustomMappingMap() throws XWikiException
     {
         Map<String, Object> map = new HashMap<String, Object>();
         for (String name : this.fields.keySet()) {

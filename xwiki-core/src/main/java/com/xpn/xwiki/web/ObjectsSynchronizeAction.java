@@ -49,11 +49,23 @@ public class ObjectsSynchronizeAction extends XWikiAction
         XWiki xwiki = context.getWiki();
         XWikiResponse response = context.getResponse();
         XWikiDocument doc = context.getDoc();
+        XWikiRequest request = context.getRequest();
 
-        for (List<BaseObject> classObjects : doc.getXObjects().values()) {
-            for (BaseObject object : classObjects) {
-                for (BaseProperty property : object.getXClass(context).getDeprecatedObjectProperties(object)) {
-                    object.removeField(property.getName());
+        String className = request.getParameter("classname");
+        String objectNumber = request.getParameter("object");
+
+        if (className != null && objectNumber != null) {
+            try {
+                BaseObject object = doc.getObject(className, Integer.valueOf(objectNumber));
+                synchronizeObject(object, context);
+            } catch (Exception ex) {
+                // Wrong parameters, non-existing object
+                return true;
+            }
+        } else {
+            for (List<BaseObject> classObjects : doc.getXObjects().values()) {
+                for (BaseObject object : classObjects) {
+                    synchronizeObject(object, context);
                 }
             }
         }
@@ -66,9 +78,33 @@ public class ObjectsSynchronizeAction extends XWikiAction
             response.setContentLength(0);
         } else {
             // forward to edit
-            String redirect = Utils.getRedirect("edit", context);
+            String redirect = Utils.getRedirect("edit", "editor=object", context);
             sendRedirect(response, redirect);
         }
         return false;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public String render(XWikiContext context) throws XWikiException
+    {
+        context.getResponse().setStatus(HttpServletResponse.SC_NOT_FOUND);
+        context.put("message", "core.model.xobject.synchronizeObjects.error.missingObject");
+        return "exception";
+    }
+
+    /**
+     * Remove deprecated fields (properties deleted from the XClass) from an object.
+     * 
+     * @param object the object to synchronize
+     * @param context the current request context
+     */
+    private void synchronizeObject(BaseObject object, XWikiContext context)
+    {
+        for (BaseProperty property : object.getXClass(context).getDeprecatedObjectProperties(object)) {
+            object.removeField(property.getName());
+        }
     }
 }

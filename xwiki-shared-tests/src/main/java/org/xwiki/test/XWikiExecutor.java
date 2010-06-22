@@ -76,6 +76,18 @@ public class XWikiExecutor
 
     private String executionDirectory;
 
+    /**
+     * Was XWiki server already started. We don't try to stop it if it was already started.
+     */
+    private boolean wasStarted;
+
+    private class Response
+    {
+        public boolean timedOut;
+        public byte[] responseBody;
+        public int responseCode;
+    }
+    
     public XWikiExecutor(int index)
     {
         this.project = new Project();
@@ -111,13 +123,23 @@ public class XWikiExecutor
 
     public String getExecutionDirectory()
     {
+        if (this.executionDirectory == null) {
+            throw new RuntimeException("Invalid configuration for the execution directory. The "
+                + "[xwikiExecutionDirectory] system property must be specified.");
+        }
         return this.executionDirectory;
     }
 
     public void start() throws Exception
     {
-        startXWikiInSeparateThread();
-        waitForXWikiToLoad();
+        // First, verify if XWiki is started. If it is then don't start it again.
+        this.wasStarted = !isXWikiStarted(getURL(), 5).timedOut;
+        if (!this.wasStarted) {
+            startXWikiInSeparateThread();
+            waitForXWikiToLoad();
+        } else {
+            System.out.println("XWiki server is already started!");
+        }
     }
 
     private void startXWikiInSeparateThread()
@@ -181,38 +203,52 @@ public class XWikiExecutor
         // Wait till the main page becomes available which means the server is started fine
         System.out.println("Checking that XWiki is up and running...");
 
+        Response response = isXWikiStarted(getURL(), TIMEOUT_SECONDS);
+        if (response.timedOut) {
+            String message = "Failed to start XWiki in [" + TIMEOUT_SECONDS + "] seconds, last error code ["
+                + response.responseCode + ", message [" + new String(response.responseBody) + "]";
+            System.out.println(message);
+            stop();
+            throw new RuntimeException(message);
+        } else {
+            System.out.println("Server is answering to [" + getURL() + "]... cool");
+        }
+    }
+
+    public Response isXWikiStarted(String url, int timeout) throws Exception
+    {
         HttpClient client = new HttpClient();
-        String url = "http://localhost:" + getPort() + "/xwiki/bin/view/Main/WebHome";
 
         boolean connected = false;
-        boolean timedOut = false;
         long startTime = System.currentTimeMillis();
-        int responseCode = -1;
-        byte[] responseBody = new byte[0];
-        while (!connected && !timedOut) {
+        Response response = new Response();
+        response.timedOut = false;
+        response.responseCode = -1;
+        response.responseBody = new byte[0];
+        while (!connected && !response.timedOut) {
             GetMethod method = new GetMethod(url);
 
             // Don't retry automatically since we're doing that in the algorithm below
             method.getParams().setParameter(HttpMethodParams.RETRY_HANDLER,
                 new DefaultHttpMethodRetryHandler(0, false));
-            // Set a socket timeout to ensure the server has no chance of not ansering to our request...
+            // Set a socket timeout to ensure the server has no chance of not answering to our request...
             method.getParams().setParameter(HttpMethodParams.SO_TIMEOUT, new Integer(10000));
-            
+
             try {
                 // Execute the method.
-                responseCode = client.executeMethod(method);
+                response.responseCode = client.executeMethod(method);
 
                 // We must always read the response body.
-                responseBody = method.getResponseBody();
+                response.responseBody = method.getResponseBody();
 
                 if (DEBUG) {
-                    System.out.println("Result of pinging [" + url + "] = [" + responseCode + "], Message = ["
-                        + new String(responseBody) + "]");
+                    System.out.println("Result of pinging [" + url + "] = [" + response.responseCode + "], Message = ["
+                        + new String(response.responseBody) + "]");
                 }
 
                 // check the http response code is either not an error, either "unauthorized"
                 // (which is the case for products that deny view for guest, for example).
-                connected = (responseCode < 400 || responseCode == 401);
+                connected = (response.responseCode < 400 || response.responseCode == 401);
             } catch (Exception e) {
                 // Do nothing as it simply means the server is not ready yet...
             } finally {
@@ -220,24 +256,17 @@ public class XWikiExecutor
                 method.releaseConnection();
             }
             Thread.sleep(500L);
-            timedOut = (System.currentTimeMillis() - startTime > TIMEOUT_SECONDS * 1000L);
+            response.timedOut = (System.currentTimeMillis() - startTime > timeout * 1000L);
         }
-
-        if (timedOut) {
-            String message = "Failed to start XWiki in [" + TIMEOUT_SECONDS + "] seconds, last error code ["
-                + responseCode + ", message [" + new String(responseBody) + "]";
-            System.out.println(message);
-            stop();
-            throw new RuntimeException(message);
-        } else {
-            System.out.println("Server is answering to [" + url + "]... cool"); 
-        }
+        return response;
     }
 
     public void stop() throws Exception
     {
-        // Stop XWiki
-        createStopTask().execute();
+        // Stop XWiki if it was started by start()
+        if (!this.wasStarted) {
+            createStopTask().execute();
+        }
     }
 
     public String getWebInfDirectory()
@@ -318,5 +347,10 @@ public class XWikiExecutor
         } finally {
             fos.close();
         }
+    }
+
+    private String getURL()
+    {
+        return "http://localhost:" + getPort() + "/xwiki/bin/view/Main/WebHome";
     }
 }

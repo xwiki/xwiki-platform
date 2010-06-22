@@ -1350,15 +1350,25 @@ document.observe('dom:loaded', function() {
   XWiki.Document.currentPage = ($$("meta[name=page]").length > 0) ? $$("meta[name=page]")[0].content : "WebHome";
   XWiki.Document.URLTemplate = "$xwiki.getURL('__space__.__page__', '__action__')";
   XWiki.Document.RestURLTemplate = "${request.contextPath}/rest/wikis/__wiki__/spaces/__space__/pages/__page__";
-  XWiki.Document.RestSearchURLStub = "${request.contextPath}/rest/wikis/__wiki__/search";
-  XWiki.Document.getRestSearchURL = function(wiki) {
+  XWiki.Document.WikiSearchURLStub = "${request.contextPath}/rest/wikis/__wiki__/search";
+  XWiki.Document.SpaceSearchURLStub = "${request.contextPath}/rest/wikis/__wiki__/spaces/__space__/search";
+  XWiki.Document.getRestSearchURL = function(queryString, space, wiki) {
     wiki = wiki || XWiki.Document.currentWiki;
-    return XWiki.Document.RestSearchURLStub.replace("__wiki__", wiki);
+    var url;
+    if (space) {
+      url = XWiki.Document.SpaceSearchURLStub.replace("__wiki__", wiki).replace("__space__", space);
+    } else {
+      url = XWiki.Document.WikiSearchURLStub.replace("__wiki__", wiki);
+    }
+    if (queryString) {
+      url += "?" + queryString;
+    }
+    return url;
   };
   XWiki.currentDocument = new XWiki.Document();
 });
 
-/*
+/**
  * Small JS improvement, which automatically hides and reinserts the default text for input fields, acting as a tip.
  *
  * To activate this behavior on an input element, add the "withTip" classname to it.

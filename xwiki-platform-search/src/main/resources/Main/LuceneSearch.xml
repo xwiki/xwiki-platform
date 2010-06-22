@@ -49,14 +49,14 @@ $xwiki.ssfx.use("uicomponents/search/search.css", true)##
 #set($spaces = $xwiki.spaces)
 #set($selectedSpace = "$!request.space")
 #if($selectedSpace != '' &amp;&amp; !$blacklistedSpaces.contains($selectedSpace))
-  #set($extraClause = " AND web:${selectedSpace}")
+  #set($extraClause = " AND space:${selectedSpace}")
 #end
 ## ----------------------------------------------------------------------
 ## Exclude Blacklisted spaces ($blacklistedSpaces is set in xwikivars.vm)
 ## Also exclude WebPreferences.
 ## ----------------------------------------------------------------------
 #foreach ($blacklistedSpace in $blacklistedSpaces)
-  #set ($extraClause = " AND NOT web:${blacklistedSpace}${extraClause}")
+  #set ($extraClause = " AND NOT space:${blacklistedSpace}${extraClause}")
 #end
 #if(!$hasAdmin &amp;&amp; !$isAdvancedUser)
   #set ($extraClause = " AND NOT name:WebPreferences${extraClause}")
@@ -208,7 +208,7 @@ $xwiki.ssfx.use("uicomponents/search/search.css", true)##
         #set ($list = $util.arrayList)
         #foreach ($item in $results)
           #if ($item.type != "attachment")
-            #set ($ok = $list.add(0, "${item.web}.${item.name}"))
+            #set ($ok = $list.add(0, "${item.space}.${item.name}"))
           #end
         #end
         #set ($feed = $xwiki.feed.getDocumentFeed($list, $util.getHashMap()))

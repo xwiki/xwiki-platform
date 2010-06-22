@@ -76,7 +76,7 @@ $xwiki.jsfx.use('js/xwiki/actionbuttons/actionButtons.js', true)
     #if("$!docTitle" == '')
       #set($docTitle = $!tdoc.title)
     #end
-    <label>$msg.get('titlefield'):
+    <label for="xwikidoctitleinput">$msg.get('titlefield'):
     <input type="text" id="xwikidoctitleinput" name="title" value="$escapetool.xml("$!docTitle")"/></label>
   #end
   #template("editmodes.vm")

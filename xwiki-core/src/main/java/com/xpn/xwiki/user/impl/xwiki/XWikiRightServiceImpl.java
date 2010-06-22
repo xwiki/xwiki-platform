@@ -120,7 +120,7 @@ public class XWikiRightServiceImpl implements XWikiRightService
             actionMap.put("view", "view");
             actionMap.put("viewrev", "view");
             actionMap.put("get", "view");
-            actionMap.put("downloadrev", "download");
+            actionMap.put("downloadrev", "view");
             actionMap.put("plain", "view");
             actionMap.put("raw", "view");
             actionMap.put("attach", "view");

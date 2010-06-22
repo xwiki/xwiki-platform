@@ -151,7 +151,6 @@ $xwiki.jsfx.use('js/xwiki/editors/dataeditors.js', true)##
   </div>
 </div> ## properties
 <div class="bottombuttons">#template("editactions.vm")</div>
-</div> ## properties
 </div> ## xwikieditcontent
 </form>
 #end

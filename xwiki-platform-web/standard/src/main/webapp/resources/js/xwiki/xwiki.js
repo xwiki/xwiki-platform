@@ -1391,3 +1391,29 @@ document.observe('dom:loaded', function() {
     item.observe('blur', onBlur.bindAsEventListener(item));
   });
 });
+
+/**
+ * Small JS improvement, which suggests document names (doc.fullName) when typing in an input.
+ *
+ * To activate this behavior on an input elements, ad the "suggestDocuments" classname to it.
+ */
+document.observe('dom:loaded', function() {
+  if (typeof(XWiki.widgets.Suggest) != "undefined") {
+    $$("input.suggestDocuments").each(function(item) {
+      // Create the Suggest.
+      new XWiki.widgets.Suggest(item, {
+        // This document also provides the suggestions.
+        script: XWiki.Document.getRestSearchURL("scope=name&number=10&media=json&"),
+        varname: "q",
+        noresults: "Document not found",
+        json: true,
+        resultsParameter : "searchResults",
+        resultId : "id",
+        resultValue : "pageFullName",
+        resultInfo : "pageFullName",
+        timeout : 30000,
+        parentContainer : item.up()
+      });
+    });
+  }
+});

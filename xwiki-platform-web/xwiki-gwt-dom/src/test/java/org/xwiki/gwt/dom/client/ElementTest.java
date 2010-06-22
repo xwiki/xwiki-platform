@@ -24,6 +24,8 @@ import java.util.List;
 
 import com.google.gwt.core.client.JsArrayString;
 import com.google.gwt.dom.client.Style.FontWeight;
+import com.google.gwt.junit.DoNotRunWith;
+import com.google.gwt.junit.Platform;
 
 /**
  * Unit tests for {@link Element}.
@@ -336,5 +338,28 @@ public class ElementTest extends DOMTestCase
 
         assertTrue(clone.xHasAttribute(bob));
         assertTrue(element.xHasAttribute(alice));
+    }
+
+    /**
+     * Tests that the computed style is correctly determined when the style property is explicitly set to {@code
+     * inherit}.
+     * <p>
+     * Note: We don't run this test with HtmlUnit because the font-family of the inner element is incorrectly computed
+     * as {@code inherit}. We fixed this bug for IE.
+     */
+    @DoNotRunWith(Platform.HtmlUnit)
+    public void testGetComputedStyleWhenPropertyIsExplicitlySetToInherit()
+    {
+        Element inner = Element.as(getDocument().createSpanElement());
+        inner.getStyle().setProperty(Style.FONT_FAMILY.getJSName(), Style.Float.INHERIT);
+        inner.appendChild(getDocument().createTextNode("computed"));
+
+        Element outer = Element.as(getDocument().createSpanElement());
+        outer.getStyle().setProperty(Style.FONT_FAMILY.getJSName(), "comic sans");
+        outer.appendChild(inner);
+
+        getContainer().appendChild(outer);
+        assertEquals(outer.getComputedStyleProperty(Style.FONT_FAMILY.getJSName()), inner
+            .getComputedStyleProperty(Style.FONT_FAMILY.getJSName()));
     }
 }

@@ -1,4 +1,4 @@
-#if($doc.syntaxId == "xwiki/1.0")
+#if($doc.syntax.toIdString() == "xwiki/1.0")
 #set($formname = "edit")
 #set($saveaction = "save")
 #set($previewenabled = true)

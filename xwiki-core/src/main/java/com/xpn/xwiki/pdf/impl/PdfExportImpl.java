@@ -26,6 +26,7 @@ import info.informatica.doc.dom4j.XHTMLDocumentFactory;
 import info.informatica.doc.style.css.dom.DOMCSSStyleSheet;
 import info.informatica.doc.xml.dtd.DefaultEntityResolver;
 
+import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -35,6 +36,8 @@ import java.io.Reader;
 import java.io.StringReader;
 import java.io.StringWriter;
 import java.io.UnsupportedEncodingException;
+import java.util.Collections;
+import java.util.Map;
 import java.util.Properties;
 
 import javax.xml.parsers.DocumentBuilder;
@@ -68,6 +71,9 @@ import org.w3c.dom.Document;
 import org.w3c.tidy.Tidy;
 import org.xml.sax.InputSource;
 import org.xwiki.container.Container;
+import org.xwiki.officeimporter.openoffice.OpenOfficeConverter;
+import org.xwiki.officeimporter.openoffice.OpenOfficeManager;
+import org.xwiki.officeimporter.openoffice.OpenOfficeManager.ManagerState;
 import org.xwiki.xml.EntityResolver;
 
 import com.xpn.xwiki.XWikiContext;
@@ -157,7 +163,7 @@ public class PdfExportImpl implements PdfExport
     public String getXhtmlxsl(XWikiContext context) throws XWikiException
     {
         String xsl = getPDFTemplateField("xhtmlxsl", context);
-        if ((xsl == null) || ("".equals(xsl.trim()))) {
+        if (StringUtils.isBlank(xsl)) {
             return this.xhtmlxsl;
         } else {
             return xsl;
@@ -174,15 +180,60 @@ public class PdfExportImpl implements PdfExport
         if (log.isDebugEnabled()) {
             log.debug("Final XHTML for export: " + xhtml);
         }
-        // XSL Transformation to XML-FO
-        String xmlfo = convertXHtmlToXMLFO(xhtml, context);
 
-        // Debug output
-        if (log.isDebugEnabled()) {
-            log.debug("XSL-FO source: " + xmlfo);
+        OpenOfficeManager OpenOfficeManager = Utils.getComponent(OpenOfficeManager.class);
+
+        // If OpenOffice server is connected use it instead of FOP which does not support RTF very well
+        // Only switch to openoffice server for RTF because FOP is supposedly a lot more powerful for PDF
+        if (type != PDF && OpenOfficeManager.getState() == ManagerState.CONNECTED) {
+            exportOffice(xhtml, out, type, context);
+        } else {
+            // XSL Transformation to XML-FO
+            String xmlfo = convertXHtmlToXMLFO(xhtml, context);
+
+            // Debug output
+            if (log.isDebugEnabled()) {
+                log.debug("XSL-FO source: " + xmlfo);
+            }
+
+            exportXMLFO(xmlfo, out, type);
         }
+    }
 
-        exportXMLFO(xmlfo, out, type);
+    public void exportOffice(String xhtml, OutputStream out, int type, XWikiContext context) throws XWikiException
+    {
+        String html = xhtml;
+
+        // FIXME: put that in some XSL translformation instead (no time and knowledge to do that before 2.4)
+        // html = applyXsl(xhtml, getXhtmlOfficexsl(context));
+        html = html.replaceAll("(<div[^>]+class=\"pdftoc\"[^>]*>)", "<p style=\"page-break-before: always;\" />\n$1");
+        html = html.replaceAll("(<div[^>]+id=\"xwikimaincontainer\"[^>]*>)", "<p style=\"page-break-before: always;\" />\n$1");
+
+        // OpenOffice does not support XHTML so we remove the XML marker and let it parse it as if it was HTML content
+        html = html.substring(xhtml.indexOf("?>") + 2);
+
+        // id attribute on body element makes openoffice converter to fail
+        html = html.replaceFirst("(<body[^>]+)id=\"body\"([^>]*>)", "$1$2");
+        
+        OpenOfficeManager OpenOfficeManager = Utils.getComponent(OpenOfficeManager.class);
+
+        OpenOfficeConverter documentConverter = OpenOfficeManager.getConverter();
+
+        String inputFileName = "export_input.html";
+        String outputFileName = "export_output" + (type == PdfExportImpl.RTF ? ".rtf" : ".pdf");
+
+        Map<String, InputStream> inputStreams =
+            Collections.<String, InputStream> singletonMap(inputFileName, new ByteArrayInputStream(html.getBytes()));
+
+        try {
+            Map<String, byte[]> ouput = documentConverter.convert(inputStreams, inputFileName, outputFileName);
+
+            out.write(ouput.values().iterator().next());
+        } catch (Exception e) {
+            throw new XWikiException(XWikiException.MODULE_XWIKI_EXPORT,
+                XWikiException.ERROR_XWIKI_APP_SEND_RESPONSE_EXCEPTION, "Exception while exporting "
+                    + (type == PdfExportImpl.RTF ? "RTF" : "PDF"), e);
+        }
     }
 
     public void exportXMLFO(String xmlfo, OutputStream out, int type) throws XWikiException
@@ -195,7 +246,7 @@ public class PdfExportImpl implements PdfExport
 
             // Construct fop with desired output format
             Fop fop =
-                fopFactory.newFop((type == PdfExportImpl.RTF) ? MimeConstants.MIME_RTF : MimeConstants.MIME_PDF,
+                fopFactory.newFop(type == PdfExportImpl.RTF ? MimeConstants.MIME_RTF : MimeConstants.MIME_PDF,
                     foUserAgent, out);
 
             // Setup JAXP using identity transformer
@@ -223,10 +274,12 @@ public class PdfExportImpl implements PdfExport
             }
         } catch (IllegalStateException e) {
             throw new XWikiException(XWikiException.MODULE_XWIKI_EXPORT,
-                XWikiException.ERROR_XWIKI_APP_SEND_RESPONSE_EXCEPTION, "Exception while exporting PDF", e);
+                XWikiException.ERROR_XWIKI_APP_SEND_RESPONSE_EXCEPTION, "Exception while exporting "
+                    + (type == PdfExportImpl.RTF ? "RTF" : "PDF"), e);
         } catch (Exception e) {
             throw new XWikiException(XWikiException.MODULE_XWIKI_EXPORT,
-                XWikiException.ERROR_XWIKI_EXPORT_PDF_FOP_FAILED, "Exception while exporting PDF", e);
+                XWikiException.ERROR_XWIKI_EXPORT_PDF_FOP_FAILED, "Exception while exporting "
+                    + (type == PdfExportImpl.RTF ? "RTF" : "PDF"), e);
         }
     }
 

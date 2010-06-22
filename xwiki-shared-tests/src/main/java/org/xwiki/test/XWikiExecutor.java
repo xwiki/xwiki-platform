@@ -133,7 +133,7 @@ public class XWikiExecutor
     public void start() throws Exception
     {
         // First, verify if XWiki is started. If it is then don't start it again.
-        this.wasStarted = !isXWikiStarted(getURL(), 5).timedOut;
+        this.wasStarted = !isXWikiStarted(getURL(), 15).timedOut;
         if (!this.wasStarted) {
             startXWikiInSeparateThread();
             waitForXWikiToLoad();

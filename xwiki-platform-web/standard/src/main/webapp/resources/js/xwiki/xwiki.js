@@ -1295,6 +1295,69 @@ function BrowserDetect() {
 }
 var browser = new BrowserDetect();
 
+/**
+ * XWiki Model access APIs.
+ */
+XWiki.Document = Class.create({
+  /**
+   * Constructor. All parameters are optional, and default to the current document location.
+   */
+  initialize : function(page, space, wiki) {
+    this.page = page || XWiki.Document.currentPage;
+    this.space = space || XWiki.Document.currentSpace;
+    this.wiki = wiki || XWiki.Document.currentWiki;
+  },
+  /**
+   * Gets an URL pointing to this document.
+   */
+  getURL : function(action, queryString, fragment) {
+    action = action || 'view';
+    var url = XWiki.Document.URLTemplate;
+    url = url.replace("__space__", encodeURIComponent(this.space));
+    url = url.replace("__page__", (this.page == 'WebHome') ? '' : encodeURIComponent(this.page));
+    url = url.replace("__action__/", (action == 'view') ? '' : (encodeURIComponent(action) + "/"));
+    if (queryString) {
+      url += '?' + queryString;
+    }
+    if (fragment) {
+      url += '#' + fragment;
+    }
+    return url;
+  },
+  /**
+   * Gets an URL which points to the REST location for accessing this document.
+   */
+  getRestURL : function(entity, queryString) {
+    entity = entity || '';
+    var url = XWiki.Document.RestURLTemplate;
+    url = url.replace("__wiki__", this.wiki);
+    url = url.replace("__space__", this.space);
+    url = url.replace("__page__", this.page);
+    if (entity) {
+      url += "/" + entity;
+    }
+    if (queryString) {
+      url += '?' + queryString;
+    }
+    return url;
+  }
+});
+
+/* Initialize the document URL factory, and create XWiki.currentDocument. */
+document.observe('dom:loaded', function() {
+  XWiki.Document.currentWiki = ($$("meta[name=wiki]").length > 0) ? $$("meta[name=wiki]")[0].content : "xwiki";
+  XWiki.Document.currentSpace = ($$("meta[name=space]").length > 0) ? $$("meta[name=space]")[0].content : "Main";
+  XWiki.Document.currentPage = ($$("meta[name=page]").length > 0) ? $$("meta[name=page]")[0].content : "WebHome";
+  XWiki.Document.URLTemplate = "$xwiki.getURL('__space__.__page__', '__action__')";
+  XWiki.Document.RestURLTemplate = "${request.contextPath}/rest/wikis/__wiki__/spaces/__space__/pages/__page__";
+  XWiki.Document.RestSearchURLStub = "${request.contextPath}/rest/wikis/__wiki__/search";
+  XWiki.Document.getRestSearchURL = function(wiki) {
+    wiki = wiki || XWiki.Document.currentWiki;
+    return XWiki.Document.RestSearchURLStub.replace("__wiki__", wiki);
+  };
+  XWiki.currentDocument = new XWiki.Document();
+});
+
 /*
  * Small JS improvement, which automatically hides and reinserts the default text for input fields, acting as a tip.
  *

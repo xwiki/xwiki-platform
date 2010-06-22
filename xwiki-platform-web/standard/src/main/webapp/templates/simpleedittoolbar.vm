@@ -39,9 +39,9 @@
 #set($discard = $syntax20Elements.add(['img', '[[image:', ']]', 'image']))
 #set($discard = $syntax20Elements.add(['html', '\n{{html}}\n', '\n{{/html}}\n', 'html']))
 #set($discard = $syntax20Elements.add(['velocity', '\n{{velocity}}\n', '\n{{/velocity}}\n', 'cog']))
-#if($doc.syntaxId == 'xwiki/1.0')
+#if($doc.syntax.toIdString() == 'xwiki/1.0')
   #set($syntaxElements = $syntax10Elements)
-#elseif($doc.syntaxId == "xwiki/2.0")
+#elseif($doc.syntax.toIdString() == "xwiki/2.0")
   #set($syntaxElements = $syntax20Elements)
 #end
 // <![CDATA[

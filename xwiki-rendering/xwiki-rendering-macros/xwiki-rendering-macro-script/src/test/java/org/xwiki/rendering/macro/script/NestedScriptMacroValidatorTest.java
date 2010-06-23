@@ -47,7 +47,7 @@ import org.xwiki.test.annotation.ComponentTest;
  * @version $Id$
  * @since 2.4M2
  */
-@ComponentTest(value = NestedScriptMacroValidator.class)
+@ComponentTest(NestedScriptMacroValidator.class)
 public class NestedScriptMacroValidatorTest extends AbstractMockingComponentTest
 {
     /** Nested script validator under test. */

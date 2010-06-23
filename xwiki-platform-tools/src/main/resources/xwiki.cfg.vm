@@ -484,6 +484,10 @@ xwiki.title.compatibility=1
 #-# The default value is 2.
 # xwiki.title.headerdepth=2
 
+#-# Defines if setting the title field must be mandatory in the WYSIWYG and Wiki editors. It is mandatory when this
+#-# property is set to 1. The default value is 0 (not mandatory).
+# xwiki.title.mandatory=0
+
 #---------------------------------------
 # Extensions
 #

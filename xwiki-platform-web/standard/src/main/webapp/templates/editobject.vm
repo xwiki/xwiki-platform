@@ -4,15 +4,19 @@
 ###
 ## Macros
 ##
+#*
+ * Displays a class name without its space prefix
+ *#
 #macro(cleanClassname $classname)$classname.substring($classname.indexOf('.')).substring(1)#end
 ##
-##
-##
+#*
+ * Display an object
+ *#
 #macro(displayObject $obj $class $props $firstfield)
   <div id="xobject_${class.name}_${obj.number}" class="xobject">
   <div id="xobject_${class.name}_${obj.number}_title" class="xobject-title"><h3>#cleanClassname(${class.name}) ${obj.number}: $doc.display($firstfield, $obj)
-    <a href="$doc.getURL("objectremove", "classname=${class.name}&amp;classid=${obj.number}&amp;xredirect=${doc.getURL('edit', 'editor=object')}")" class="xobject-action delete" title="Remove this object">$msg.get("removethisobject")</a>
-    #if(!$hasCustomObject) <a href="$doc.getURL("edit", "editor=object&amp;classname=${class.name}&amp;object=${obj.number}")" class="xobject-action edit" title="Edit only this object">$msg.get("editthisobject")</a> #end
+    <a href="$doc.getURL('objectremove', "classname=${class.name}&amp;classid=${obj.number}&amp;xredirect=${doc.getURL('edit', 'editor=object')}")" class="xobject-action delete" title="$msg.get('core.editors.object.removeObject.tooltip')">$msg.get('core.editors.object.removeObject')</a>
+    #if(!$hasCustomObject) <a href="$doc.getURL("edit", "editor=object&amp;classname=${class.name}&amp;object=${obj.number}")" class="xobject-action edit" title="$msg.get('core.editors.object.editSingleObject.tooltip')">$msg.get('core.editors.object.editSingleObject')</a> #end
   </h3></div>
   <div id="xobject_${class.name}_${obj.number}_content" class="xobject-content"><div>
     <dl>
@@ -25,55 +29,195 @@
       #set($properties = $class.properties)
     #end
     #foreach($prop in $properties)
-      <dt class="label"><label for="${class.name}_${obj.number}_$prop.name">$prop.prettyName</label></dt>
-      <dd>$doc.displayEdit($prop, "${class.name}_${obj.number}_" , $obj)</dd>
+      <dt class="label#if($prop.isDisabled()) disabled#end"><label for="${class.name}_${obj.number}_$prop.name">$prop.prettyName</label></dt>
+      <dd#if($prop.isDisabled()) class="disabled"#end>$doc.displayEdit($prop, "${class.name}_${obj.number}_" , $obj)</dd>
     #end
     </dl>
+    #set($deprecatedProperties = $class.getDeprecatedObjectProperties($obj))
+    #if($deprecatedProperties.size() > 0)
+    <div class="box warningmessage deprecatedProperties">
+      <strong>$msg.get('core.editors.object.removeDeprecatedProperties.info', [${class.name}])</strong>
+      <dl>
+      #foreach($prop in $deprecatedProperties)
+      <dt class="label disabled"><label>$prop.name:</label></dt>
+      <dd class="disabled">$prop.value</dd>
+      #end
+      </dl>
+      <div><a class="syncProperties" href='$doc.getURL("objectsync", "classname=${class.name}&amp;object=${obj.number}")' title="$msg.get('core.editors.object.removeDeprecatedProperties.link.tooltip')">$msg.get('core.editors.object.removeDeprecatedProperties.link')</a></div>
+    </div>
+    #end
   </div></div>## xobject-content
   </div>## xobject
 #end
 ##
-##
-##
-#macro(displayClass $class)
-  #set($props = $class.getProperties())
+#*
+ * Determine the title field of the class, the field that should be displayed as a summary of the object.
+ *#
+#macro(getTitleField $props)
+  #set($foundStringProperty = false)
+  ## As a backup, use the first field of the class; will be overwritten later by better values
+  #if($props.size() > 0)
+    #set($titleField = $props.get(0).name)
+  #end
   #foreach($prop in $props)
-    #if ($velocityCount==1)
-      #set($firstfield = $prop.name)
+    ## A property containing 'title' or 'name' has precedence
+    #if($prop.name.toLowerCase().indexOf('title') >= 0 || $prop.name.toLowerCase().indexOf('name') >= 0)
+      #set($titleField = $prop.name)
+      #break
+    ## String properties have precedence over other types
+    #elseif ($prop.type == 'StringClass' && !$foundStringProperty)
+      #set($titleField = $prop.name)
+      #set($foundStringProperty = true)
     #end
   #end
+#end
+##
+#*
+ * Display a class
+ *#
+#macro(displayClass $class)
+  #set($props = $class.getProperties())
+  #getTitleField($props)
   <div id="xclass_${class.name}" class="xclass">
-    <div id="xclass_${class.name}_title" class="xclass-title"><h2>Objects of type $class.name</h2></div>
-    <div id="xclass_${class.name}_content" class="xclass-content"><div>
     #if($hasCustomObject)
       #set($object = $doc.getObject($class.name, $customObject))
       #if($object)
-        #set($objects = [$object])
+        <div id="xclass_${class.name}_title" class="xclass-title"><h2>$class.name</h2></div>
+        <div id="xclass_${class.name}_content" class="xclass-content"><div>
+        #displayObject($object $class $props $titleField)
+        </div></div>
       #else
-        #set($objects = [])
-        #warning($msg.get("nosuchobject"))
+        #warning($msg.get('core.editors.object.noObject'))
       #end
     #else
       #set($objects = $doc.getObjects($class.name))
+      #set($objectCount = $listtool.size($objects))
+      <div id="xclass_${class.name}_title" class="xclass-title"><h2>$msg.get('core.editors.object.objectsForClass', [$class.name]) <span id="xclass_${class.name}_xobject_nb" class="xclass_xobject_nb">($objectCount)</span></h2></div>
+      <div id="xclass_${class.name}_content" class="xclass-content"><div>
+      #foreach($object in $objects)
+        #displayObject($object $class $props $titleField)
+      #end
+      #displayAddObject($class)
+      </div></div>
     #end
-    #foreach($object in $objects)
-      #displayObject($object $class $props $firstfield)
-    #end
-    </div></div>
   </div>
 #end
 ##
 ##
+#**
+ * Display a control for adding an object of a given class
+ *#
+#macro(displayAddObject $class)
+  <div id="add_xobject_${class.name}" class="add_xobject">
+   <div id="add_xobject_${class.name}_title" class="add_xobject-title">
+   <a href="$doc.getURL('edit', "xpage=editobject&amp;xaction=addObject&amp;className=$util.encodeURI(${class.name})&amp;xredirect=$util.encodeURI(${doc.getURL('edit', 'editor=object')})")"  class="xobject-add-control" title="$msg.get('core.editors.object.newObjectForClass.tooltip', ["#cleanClassname(${class.name})"])">$msg.get('core.editors.object.newObjectForClass', ["#cleanClassname(${class.name})"])</a>
+   </div>
+  </div>
+#end
 ##
 ##
-#if("$!request.xpage" == 'editobject')
+#**
+ * Display a control for adding an object from a chosen class
+ *#
+#macro(displayAddObjectChooseClass)
+  <div id="add_xobject" class="add_xobject"> <label for="classname" class="add_xobject-title">$msg.get('core.editors.object.add.label'):</label>
+  <select name="classname" size="1">
+    <option value="-">$msg.get('core.editors.object.add.selectClass')</option>
+    ## Existing classes are enumerated, grouped by space name.
+    ## The list is already sorted alphabetically
+#set($prevSpace = '')
+#foreach ($classname in $xwiki.classList)
+  #set($classdoc = $xwiki.getDocument($classname))
+  #if($classdoc.space != $prevSpace)
+    #if($prevSpace != '')
+      </optgroup>
+    #end
+    <optgroup label="$classdoc.space">
+    #set($prevSpace = $classdoc.space)
+  #end
+  <option value="$classdoc.fullName">$classdoc.name</option>
+#end
+#if($prevSpace != '')
+  </optgroup>
+#end
+</select>
+<span class="buttonwrapper"><input type="submit" name="action_objectadd" value="$msg.get('core.editors.object.add.submit')" class="button xobject-add-control"/></span>
+  </div> ## add_object
+#end
+##
+##
+#**
+ * Check if there are deleted properties in the classes of the existing objects.
+ * If so, provide a control to synchronize property sets of these objects.
+ *#
+#macro (checkPropertyDeprecation)
+  #set($allClasses = $doc.getxWikiClasses())
+  #set($mustSync = false)
+  #foreach($class in $allClasses)
+    #set($objects = $doc.getObjects($class.name))
+    #foreach ($object in $objects)
+      #if($class.getDeprecatedObjectProperties($object).size() > 0)
+        #set($mustSync = true)
+        #break
+      #end
+    #end
+    #if($mustSync) #break #end
+  #end
+  #if ($mustSync)
+    <div class="box warningmessage deprecatedProperties">
+      $msg.get('core.editors.object.removeDeprecatedProperties.all.info')
+      <div><a class="syncProperties syncAllProperties" href="$doc.getURL('objectsync')" title="$msg.get('core.editors.object.removeDeprecatedProperties.all.link.tooltip')">$msg.get('core.editors.object.removeDeprecatedProperties.all.link')</a></div>
+    </div>
+  #end
+#end ## checkPropertyDeprecation
+##
+##---------------------------------
+## Done with macro definitions, now the actual content
+##
+##
+## Ajax object add:
+#if("$!{request.xaction}" == 'addObject')
+  #set($class = $xwiki.getClass(${request.className}))
+  #set($props = $class.getProperties())
+  #if ($listtool.isEmpty($props))
+    $response.setStatus(404)
+    #error($msg.get('core.editors.object.add.invalidClassName', [$request.className]))
+  #else
+    #set($isNewClass = $listtool.isEmpty($doc.getObjects(${request.className})))
+    #set($newobj = $doc.newObject(${request.className}))
+    #set($discard = $doc.save())
+    #if("$!{request.xredirect}" != '')
+      $response.sendRedirect($request.xredirect)
+    #else
+      ## Display
+      #if($isNewClass)
+        #displayClass($class)
+      #else
+        #foreach($prop in $props)
+          #if ($velocityCount==1)
+            #set($firstfield = $prop.name)
+            #break
+          #end
+        #end ## foreach prop
+        #displayObject($newobj $class $props $firstfield)
+      #end ## is new class
+    #end ## xredirect
+  #end ## class exists
+##
+##
+##
+##
+#elseif("$!request.xpage" == 'editobject')
+  ## Old (pre 1.0) way of using this template
   $response.sendRedirect($doc.getURL('edit', 'editor=object'))
 #else
+  ## Actual Object editor
   $xwiki.ssfx.use('js/xwiki/editors/dataeditors.css', true)##
   $xwiki.jsfx.use('js/xwiki/editors/dataeditors.js', true)##
   ## Insert JS and CSS needed for the fullscreen edit feature
   $xwiki.jsfx.use('js/xwiki/editors/fullScreenEdit.js', {'forceSkinAction': true, 'language': ${context.language}})##
-  $xwiki.ssfx.use('js/xwiki/editors/fullScreenEdit.css', true)##
+  $xwiki.ssfx.use('js/xwiki/editors/fullScreenEdit.css')##
+  ## Some parameters
   #set($formname = 'update')
   #set($saveaction = 'save')
   #set($hasCustomClass = ("$!{request.classname.trim()}" != ''))
@@ -87,14 +231,16 @@
   #if($hasCustomClass || $hasCustomObject || $hasCustomField)
     #set($fullEditorURL = "$doc.getURL('edit', 'editor=object')")
     <div class="more-actions">
-      <a href='$fullEditorURL' class='edit-all' title='Edit only this object'>&laquo;Edit all the objects defined in this document</a>
+      <a href='$fullEditorURL' class='edit-all' title="$msg.get('core.editors.object.editAllObjects')">$msg.get('core.editors.object.editAllObjects')</a>
     </div>
   #end
   #set($redirect = $xwiki.getRequestURL())
   <form id="update" method="post" action="$doc.getURL("save")" onsubmit="cancelCancelEdit()">
-  <div id="xwikieditcontent">
-  ## This input is used by the full screen widget: it stores the selector of the maximized element, so that the full screen can be restored when coming back from preview.
-  <input type="hidden" name="x-maximized" value="$!{request.get('x-maximized')}" />
+  <div id="xwikieditcontent" class="clear">
+  <div id="document-title"><h1>$msg.get('core.editors.object.title', [$xwiki.getXMLEncoded($doc.displayTitle), $doc.getURL()])</h1></div>
+
+  #checkPropertyDeprecation()
+
   #set($q = 'editor=object')
   #if($hasCustomClass)
     #set($customClass = ${request.classname})
@@ -115,8 +261,16 @@
       #set($q = "${q}&amp;property=${customField}")
     #end
   #end
-    <div class="hidden"><input type="hidden" name="xcontinue" value="$doc.getURL($context.action, $q)"/></div>
+    <div class="hidden">
+      <input type="hidden" name="xcontinue" value="$doc.getURL($context.action, $q)"/>
+      ## A submit button that captures "enter" on the form, placed before the "objectadd" submit button,
+      ## to prevent from accidentally adding objects when pressing enter.
+      #editActionButton('preview', 'preview')
+    </div>
     <div id="xwikiobjects">
+  #if(!$hasCustomClass)
+    #displayAddObjectChooseClass()
+  #end
   #foreach($class in $classes)
     #displayClass($class)
   #end
@@ -124,4 +278,4 @@
   </div>## xwikieditcontent
   <div class="bottombuttons">#template("editactions.vm")</div>
   </form>
-#end ## request.page
+#end ## request.xaction

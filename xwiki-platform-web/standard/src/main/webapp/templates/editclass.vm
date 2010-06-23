@@ -69,7 +69,7 @@ $xwiki.jsfx.use('js/xwiki/editors/dataeditors.js', true)##
     <div id="xproperty_${field.name}_content" class="xproperty-content"><div>
       <div class="disabletool">
         #set($propDef = $field.xWikiClass.get('disabled'))
-        <label>$doc.displayEdit($propDef, "${field.name}_" , $field) $propDef.getPrettyName()</label>
+        <label for="${field.name}_disaled">$doc.displayEdit($propDef, "${field.name}_" , $field) $propDef.getPrettyName()</label>
       </div>
       <dl>
         #foreach ($classprop in $field.xWikiClass.propertyNames)

@@ -3179,8 +3179,9 @@ public class XWiki implements XWikiDocChangeNotificationInterface
 
         needsUpdate |= bclass.addNumberField("upload_maxsize", "Maximum Upload Size", 5, "long");
 
-        // Syntax
+        // Document editing
         needsUpdate |= bclass.addTextField("core.defaultDocumentSyntax", "Default document syntax", 60);
+        needsUpdate |= bclass.addBooleanField("xwiki.title.mandatory", "Make document title field mandatory", "yesno");
 
         // for tags
         needsUpdate |= bclass.addBooleanField("tags", "Activate the tagging", "yesno");

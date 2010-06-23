@@ -52,22 +52,22 @@ $xwiki.ssfx.use('uicomponents/pagination/pagination.css', true)##
 ## Print the table header
         <tr>
         #if ($totalVersions > 1)
-          <th>$msg.get('core.viewers.history.from')</th>
-          <th>$msg.get('core.viewers.history.to')</th>
+          <th scope="col">$msg.get('core.viewers.history.from')</th>
+          <th scope="col">$msg.get('core.viewers.history.to')</th>
         #end
-          <th>$msg.get('core.viewers.history.version')</th>
-          <th>$msg.get('core.viewers.history.author')</th>
-          <th>$msg.get('core.viewers.history.date')</th>
+          <th scope="col">$msg.get('core.viewers.history.version')</th>
+          <th scope="col">$msg.get('core.viewers.history.author')</th>
+          <th scope="col">$msg.get('core.viewers.history.date')</th>
 ## Might be disabled in certain wikis.
         #if($xwiki.hasEditComment())
-          <th>$msg.get('core.viewers.history.comment')</th>
+          <th scope="col">$msg.get('core.viewers.history.comment')</th>
         #end
 ## Editors see the Revert button.
         #if($hasEdit && !$hasAdmin)
-          <th></th>
+          <th scope="col"></th>
 ## Admins see the Revert and Delete buttons.
         #elseif($hasAdmin)
-          <th colspan="2"></th>
+          <th scope="col" colspan="2"></th>
         #end
         </tr>
 ##

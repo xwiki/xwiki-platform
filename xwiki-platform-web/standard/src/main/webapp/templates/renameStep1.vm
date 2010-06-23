@@ -9,29 +9,21 @@
   <h2><span>$msg.get("core.rename.title.newName")</span></h2>
   #set($pweb = $doc.space)
   <div class="padded">
-    <table border="0">
-      <tr>
-        <td>
-          $msg.get("core.rename.newspace")
-        </td>
-        <td>
-          <select name="newSpaceName">
-            #set ($spaces = $xwiki.getSpaces())
-            #foreach ($space in $spaces)
-              <option #if ($space == $pweb) selected="selected" #end>$space</option>
-            #end
-          </select>
-        </td>
-      </tr>
-      <tr>
-        <td>
-          <label for="newPageName">$msg.get("core.rename.newpage")</label>
-        </td>
-        <td>
-          <input type="text" id="newPageName" name="newPageName" value="${escapetool.xml($newname)}" class="panelinput withTip"/>
-        </td>
-      </tr>
-    </table>
+    <dl>
+      <dt><label for="newSpaceName">$msg.get("core.rename.newspace")</label></dt>
+      <dd>
+        <select id="newSpaceName" name="newSpaceName">
+          #set ($spaces = $xwiki.getSpaces())
+          #foreach ($space in $spaces)
+            <option #if ($space == $pweb) selected="selected" #end>$space</option>
+          #end
+        </select>
+      </dd>
+      <dt><label for="newPageName">$msg.get("core.rename.newpage")</label></dt>
+      <dd>
+        <input type="text" id="newPageName" name="newPageName" value="${escapetool.xml($newname)}" class="panelinput withTip"/>
+      </dd>
+    </dl>
   </div>
   #set($backlinks = $doc.getBacklinks())
   #if($backlinks.size() > 0)

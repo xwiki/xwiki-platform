@@ -18,7 +18,7 @@
 #set($hasInlinks = false)
 #set($fullmsg = '')
 #if($links && $links.size() > 0)
-  #set($tmpmsg = '</p><ul style="text-align: left;">')
+  #set($tmpmsg = '</p><ul>')
   #foreach($docname in $links)
     #set($rdoc = $xwiki.getDocument($docname).getTranslatedDocument())
     #set($tmpmsg = "${tmpmsg}<li><a href=${quote}${rdoc.getURL('view')}${quote}>$xwiki.getXMLEncoded(${rdoc.displayTitle})</a></li>")
@@ -29,7 +29,7 @@
   #set($hasInlinks = true)
 #end
 #if($orphans && $orphans.size() > 0)
-  #set($tmpmsg = '</p><ul style="text-align: left;">')
+  #set($tmpmsg = '</p><ul>')
   #foreach($docname in $orphans)
     #set($rdoc = $xwiki.getDocument($docname).getTranslatedDocument())
     #set($tmpmsg = "${tmpmsg}<li><a href=${quote}${rdoc.getURL('view')}${quote}>$xwiki.getXMLEncoded(${rdoc.displayTitle})</a></li>")

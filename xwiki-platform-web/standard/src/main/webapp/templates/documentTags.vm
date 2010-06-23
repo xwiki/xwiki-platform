@@ -105,7 +105,7 @@
 ##   #end
   #if($hasedit)
     #if($xwiki.tag)
-      <div class="tag-tool tag-add">#if("$!{request.showTagAddForm}" == '')<a href="$doc.getURL('view', "showTagAddForm=true&amp;$!{request.queryString}#${tagsId}")" title="$msg.get('core.tags.add.tooltip')">[+]</a>#else #displayAddForm()#end</div>
+      <div class="tag-tool tag-add">#if("$!{request.showTagAddForm}" == '')<a href="$doc.getURL('view', "showTagAddForm=true&amp;${escapetool.xml($!{request.queryString})}#${tagsId}")" title="$msg.get('core.tags.add.tooltip')">[+]</a>#else #displayAddForm()#end</div>
     #else
       ## TODO
     #end

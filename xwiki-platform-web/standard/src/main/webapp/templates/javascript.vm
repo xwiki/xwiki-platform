@@ -46,6 +46,8 @@ window.docgeturl = "${doc.getURL('get')}";
 // ]]>
 </script>
 #if(($context.action=="inline")||($context.action=="edit") || ($context.action=="admin"))
+$xwiki.get('jsfx').use('uicomponents/widgets/validation/livevalidation_prototype.js')
+$xwiki.get('ssfx').use('uicomponents/widgets/validation/livevalidation.css')
 <script type="text/javascript">
 // <![CDATA[
  var cancelEditNextOnunload;

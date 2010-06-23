@@ -72,7 +72,7 @@ $xwiki.jsfx.use('js/xwiki/actionbuttons/actionButtons.js', true)
       #set($docTitle = $!tdoc.title)
     #end
     <label>$msg.get('titlefield'):
-    <input type="text" id="xwikidoctitleinput" name="title" value="$escapetool.xml("$!docTitle")"/></label>
+    <input type="text" id="xwikidoctitleinput" name="title" value="$escapetool.xml("$!docTitle")" #if($xwiki.getXWikiPreference('xwiki.title.mandatory') == 1)class="required"#end/></label>
   #end
   #template("editmodes.vm")
   #template("edit${editor}.vm")

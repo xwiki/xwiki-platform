@@ -23,6 +23,7 @@ import java.io.StringReader;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.lang.StringUtils;
 import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.Requirement;
@@ -66,6 +67,12 @@ public class MacroContentTableBlockDataSource extends AbstractTableBlockDataSour
     protected TableBlock getTableBlock(String macroContent, Map<String, String> macroParameters)
         throws MacroExecutionException
     {
+        // Since we are using an inline source the macro content cannot be empty/null.
+        if (StringUtils.isEmpty(macroContent)) {
+            throw new MacroExecutionException("A Chart Macro using an inline source must have a data table defined in "
+                + "its macro content.");
+        }
+
         // Get the current document name.
         String documentName = this.entityReferenceSerializer.serialize(this.docBridge.getCurrentDocumentReference());
         

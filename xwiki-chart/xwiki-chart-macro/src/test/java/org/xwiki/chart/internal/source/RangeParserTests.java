@@ -1,4 +1,4 @@
-package org.xwiki.rendering.macro.chart.internal.source;
+package org.xwiki.chart.internal.source;
 
 import junit.framework.TestCase;
 

@@ -95,8 +95,8 @@ public class MacroContentTableBlockDataSourceTest extends AbstractMockingCompone
             this.source.getTableBlock(null, Collections.<String, String>emptyMap());
             Assert.fail("Should have thrown an exception");
         } catch (MacroExecutionException expected) {
-            Assert.assertEquals("A Chart Macro using an inline source must have a data table defined in its macro "
-                + "content.", expected.getMessage());
+            Assert.assertEquals("A Chart Macro using an inline source must have a data table defined in its content.",
+                expected.getMessage());
         }
     }
 
@@ -107,8 +107,8 @@ public class MacroContentTableBlockDataSourceTest extends AbstractMockingCompone
             this.source.getTableBlock("", Collections.<String, String>emptyMap());
             Assert.fail("Should have thrown an exception");
         } catch (MacroExecutionException expected) {
-            Assert.assertEquals("A Chart Macro using an inline source must have a data table defined in its macro "
-                + "content.", expected.getMessage());
+            Assert.assertEquals("A Chart Macro using an inline source must have a data table defined in its content.",
+                expected.getMessage());
         }
     }
 

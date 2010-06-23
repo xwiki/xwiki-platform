@@ -70,7 +70,7 @@ public class MacroContentTableBlockDataSource extends AbstractTableBlockDataSour
         // Since we are using an inline source the macro content cannot be empty/null.
         if (StringUtils.isEmpty(macroContent)) {
             throw new MacroExecutionException("A Chart Macro using an inline source must have a data table defined in "
-                + "its macro content.");
+                + "its content.");
         }
 
         // Get the current document name.

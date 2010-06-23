@@ -121,7 +121,7 @@
  *#
 #macro(displayAddObjectChooseClass)
   <div id="add_xobject" class="add_xobject"> <label for="classname" class="add_xobject-title">$msg.get('core.editors.object.add.label'):</label>
-  <select name="classname" size="1">
+  <select id="classname" name="classname" size="1">
     <option value="-">$msg.get('core.editors.object.add.selectClass')</option>
     ## Existing classes are enumerated, grouped by space name.
     ## The list is already sorted alphabetically

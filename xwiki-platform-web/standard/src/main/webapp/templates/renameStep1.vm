@@ -25,10 +25,10 @@
       </tr>
       <tr>
         <td>
-          $msg.get("core.rename.newpage")
+          <label for="newPageName">$msg.get("core.rename.newpage")</label>
         </td>
         <td>
-          <input type="text" name="newPageName" value="${escapetool.xml($newname)}" class="panelinput withTip"/>
+          <input type="text" id="newPageName" name="newPageName" value="${escapetool.xml($newname)}" class="panelinput withTip"/>
         </td>
       </tr>
     </table>
@@ -38,14 +38,14 @@
     <h2><span>$msg.get("core.rename.title.updateDocs")</span></h2>
     #foreach($backlink in $backlinks)
       #if(!$xwiki.hasAccessLevel("edit", $context.user, $backlink))
-        #set ($alink = "<a href='$xwiki.getURL($backlink)' rel='__blank' style='color: #999;'>$backlink</a>")
-        <div><input type="checkbox" disabled="disabled"/> $alink</div>
+        #set ($alink = "<a href='$xwiki.getURL($backlink)' rel='__blank' style='color: #999;'><label for='backlink_$velocityCount'>$backlink</label></a>")
+        <div><input id="backlink_$velocityCount" type="checkbox" disabled="disabled"/> $alink</div>
       #elseif($xwiki.getDocument($backlink).isProgrammaticContent())
-        #set ($alink = "<a href='$xwiki.getURL($backlink)' rel='_blank' style='color: #900;'>$backlink</a>")
-        <div><input type="checkbox" name="backlink_$backlink"/> $alink</div>
+        #set ($alink = "<a href='$xwiki.getURL($backlink)' rel='_blank' style='color: #900;'><label for='backlink_$velocityCount'>$backlink</label></a>")
+        <div><input id="backlink_$velocityCount" type="checkbox" name="backlink_$backlink"/> $alink</div>
       #else
-        #set ($alink = "<a href='$xwiki.getURL($backlink)' rel='_blank'>$backlink</a>")
-        <div><input type="checkbox" name="backlink_$backlink" checked="checked"/> $alink</div>
+        #set ($alink = "<a href='$xwiki.getURL($backlink)' rel='_blank'><label for='backlink_$velocityCount'>$backlink</label></a>")
+        <div><input id="backlink_$velocityCount" type="checkbox" name="backlink_$backlink" checked="checked"/> $alink</div>
       #end
     #end
   #end
@@ -54,14 +54,14 @@
     <h2><span>$msg.get("core.rename.title.updateChildren")</span></h2>
     #foreach($child in $children)
       #if(!$xwiki.hasAccessLevel("edit", $context.user, $child))
-        #set ($alink = "<a href='$xwiki.getURL($child)' rel='_blank' style='color: #999;'>$child</a>")
-        <div><input type="checkbox" disabled="disabled"/> $alink</div>
+        #set ($alink = "<a href='$xwiki.getURL($child)' rel='_blank' style='color: #999;'><label for='children_$velocityCount'>$child</label></a>")
+        <div><input id="children_$velocityCount" type="checkbox" disabled="disabled"/> $alink</div>
       #elseif($xwiki.getDocument($backlink).isProgrammaticContent())
-        #set ($alink = "<a href='$xwiki.getURL($child)' rel='_blank' style='color: #900;'>$child</a>")
-        <div><input type="checkbox" name="child_$child"/> $alink</div>
+        #set ($alink = "<a href='$xwiki.getURL($child)' rel='_blank' style='color: #900;'><label for='children_$velocityCount'>$child</label></a>")
+        <div><input id="children_$velocityCount" type="checkbox" name="child_$child"/> $alink</div>
       #else
-        #set ($alink = "<a href='$xwiki.getURL($child)' rel='_blank'>$child</a>")
-        <div><input type="checkbox" name="child_$child" checked="checked"/> $alink</div>
+        #set ($alink = "<a href='$xwiki.getURL($child)' rel='_blank'><label for='children_$velocityCount'>$child</label></a>")
+        <div><input id="children_$velocityCount" type="checkbox" name="child_$child" checked="checked"/> $alink</div>
       #end
     #end
   #end

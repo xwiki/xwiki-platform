@@ -60,8 +60,8 @@
       </td>
     </tr>
     #end
-    <tr><td>$msg.get("core.copy.targetdoc"):</td>
-    <td><input type="text" name="targetdoc" value="$!{request.targetdoc}" size="60" /></td></tr>
+    <tr><td><label for="targetdoc">$msg.get("core.copy.targetdoc")</label>:</td>
+    <td><input type="text" id="targetdoc" name="targetdoc" value="$!{request.targetdoc}" size="60" /></td></tr>
     </table>
     <div><span class="buttonwrapper"><input type="submit" value="Copy" class="button"/></span></div>
     </form>

@@ -27,13 +27,15 @@
 
 {{html}}
   &lt;form action="$doc.getURL('create')" method="post"&gt;
-    &lt;input type="hidden" name="parent" value="XWiki.TemplateProviderClass"/&gt;
-    &lt;input type="hidden" name="template" value="XWiki.TemplateProviderTemplate"/&gt;
-    &lt;label for="space"&gt;$msg.get('admin.templates.createprovider.space')&lt;/label&gt;
-    &lt;input type="text" id="space" name="space" value="XWiki" size="8"/&gt;
-    &lt;label for="page"&gt;$msg.get('admin.templates.createprovider.page')&lt;/label&gt;
-    &lt;input type="text" id="page" name="page" value="$msg.get('admin.templates.createprovider.defaultdocname')" class="withTip"'/&gt;    
-    &lt;input type="submit" value="$msg.get('admin.templates.createprovider.create')" class="button"/&gt;&lt;/span&gt;  
+    &lt;div&gt;
+      &lt;input type="hidden" name="parent" value="XWiki.TemplateProviderClass"/&gt;
+      &lt;input type="hidden" name="template" value="XWiki.TemplateProviderTemplate"/&gt;
+      &lt;label for="space"&gt;$msg.get('admin.templates.createprovider.space')&lt;/label&gt;
+      &lt;input type="text" id="space" name="space" value="XWiki" size="8"/&gt;
+      &lt;label for="page"&gt;$msg.get('admin.templates.createprovider.page')&lt;/label&gt;
+      &lt;input type="text" id="page" name="page" value="$msg.get('admin.templates.createprovider.defaultdocname')" class="withTip"'/&gt;    
+      &lt;input type="submit" value="$msg.get('admin.templates.createprovider.create')" class="button"/&gt;
+    &lt;/div&gt;  
   &lt;/form&gt;
 {{/html}}
 

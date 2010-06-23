@@ -7,14 +7,14 @@
   <input type="hidden" name="xeditaction" value="$!context.action"/>
   #if((!$tdoc.isNew()) && (!$minorFieldAdded) && ($xwiki.hasMinorEdit()))
     #set($minorFieldAdded = 1)
-    <label for="minorEdit">$msg.get('core.minoredit')</label>: <input type="checkbox" name="minorEdit" id="minorEdit" #if($request.minorEdit)checked="checked" #end/>
+    <label>$msg.get('core.minoredit'): <input type="checkbox" name="minorEdit" id="minorEdit" #if($request.minorEdit)checked="checked" #end/></label>
   #end
   #if((!$commentFieldAdded)&&($xwiki.hasEditComment()))
     #set($commentFieldAdded = 1)
     #if($xwiki.isEditCommentFieldHidden())
       <input type="hidden" name="comment" id="comment" value="$!{request.comment}" />
     #else
-      <label for="commentinput">$msg.get("core.comment")</label>: <input type="text" id="commentinput" name="comment" value="$!{request.comment}" size="40" title="Enter a brief description of the modification" />
+      <label>$msg.get("core.comment"): <input type="text" name="comment" value="$!{request.comment}" size="40" title="Enter a brief description of the modification" /></label>
     #end
   #end
   </div> ## metamodifs

@@ -48,12 +48,14 @@
     #submenuitem("$doc.getURL('create', 'tocreate=space')" $msg.get('core.menu.create.space') 'tmCreateSpace', '')
   #end
   #if ($hasWatch)
-    #set ($isWikiWatched = $xwiki.watchlist.isWikiWatched())
-    #if (!$isWikiWatched)
-      #submenuitem("$doc.getURL('view', 'xpage=watch&amp;do=addwiki')&amp;xredirect=$doc.getURL()" $msg.get('core.menu.watchlist.add.wiki', [$escapetool.xml($doc.wiki)]) 'tmWatchWiki', '')
-    #else
-      #submenuitem("$doc.getURL('view', 'xpage=watch&amp;do=removewiki')&amp;xredirect=$doc.getURL()" $msg.get('core.menu.watchlist.remove.wiki') 'tmUnwatchWiki', '')
+    #set($watchClasses = '')
+    #set($unwatchClasses = 'hidden')
+    #if($xwiki.watchlist.isWikiWatched())
+      #set($watchClasses = 'hidden')
+      #set($unwatchClasses = '')
     #end
+    #submenuitem("$doc.getURL('view', 'xpage=watch&amp;do=addwiki')&amp;xredirect=$doc.getURL()" $msg.get('core.menu.watchlist.add.wiki', [$escapetool.xml($doc.wiki)]) 'tmWatchWiki', $watchClasses)
+    #submenuitem("$doc.getURL('view', 'xpage=watch&amp;do=removewiki')&amp;xredirect=$doc.getURL()" $msg.get('core.menu.watchlist.remove.wiki') 'tmUnwatchWiki', $unwatchClasses)    
   #end
   #if($hasGlobalAdmin)
     #set ($adminwikiaction = $!xwiki.getURL('XWiki.XWikiPreferences', 'admin'))
@@ -83,12 +85,14 @@
     #end
   #end
   #if ($hasWatch)
-    #set ($isSpaceWatched = $xwiki.watchlist.isSpaceWatched())
-    #if (!$isSpaceWatched)
-      #submenuitem("$doc.getURL('view', 'xpage=watch&amp;do=addspace')&amp;xredirect=$doc.getURL()" $msg.get('core.menu.watchlist.add.space', [$escapetool.xml($doc.space)]) 'tmWatchSpace', '')
-    #else
-      #submenuitem("$doc.getURL('view', 'xpage=watch&amp;do=removespace')&amp;xredirect=$doc.getURL()" $msg.get('core.menu.watchlist.remove.space') 'tmUnwatchSpace', '')
+    #set($watchClasses = '')
+    #set($unwatchClasses = 'hidden')
+    #if($xwiki.watchlist.isSpaceWatched())
+      #set($watchClasses = 'hidden')
+      #set($unwatchClasses = '')
     #end
+    #submenuitem("$doc.getURL('view', 'xpage=watch&amp;do=addspace')&amp;xredirect=$doc.getURL()" $msg.get('core.menu.watchlist.add.space', [$escapetool.xml($doc.space)]) 'tmWatchSpace', $watchClasses)
+    #submenuitem("$doc.getURL('view', 'xpage=watch&amp;do=removespace')&amp;xredirect=$doc.getURL()" $msg.get('core.menu.watchlist.remove.space') 'tmUnwatchSpace', $unwatchClasses)
   #end
   #if($hasSpaceAdmin)
     #set ($adminspaceaction = $!xwiki.getURL("${doc.space}.WebPreferences", 'admin'))

@@ -4,12 +4,14 @@
 ## Watch menu
 ##
 #if ($hasWatch && !$doc.isNew())
-  #set ($isDocWatched = $xwiki.watchlist.isDocumentWatched())
-  #if ($isDocWatched)
-    #xwikitopmenuentry("$doc.getURL('view', 'xpage=watch&amp;do=removedocument')&amp;xredirect=$doc.getURL()" $msg.get('core.menu.watchlist.remove.page') 'tmUnwatchDocument' 'hasIcon')
-  #else
-    #xwikitopmenuentry("$doc.getURL('view', 'xpage=watch&amp;do=adddocument')&amp;xredirect=$doc.getURL()" $msg.get('core.menu.watchlist.add.page') 'tmWatchDocument' 'hasIcon')
+  #set($watchClasses = 'hasIcon')
+  #set($unwatchClasses = 'hasIcon hidden')
+  #if($xwiki.watchlist.isDocumentWatched())
+    #set($watchClasses = 'hasIcon hidden')
+    #set($unwatchClasses = 'hasIcon')
   #end
+  #xwikitopmenuentry("$doc.getURL('view', 'xpage=watch&amp;do=adddocument')&amp;xredirect=$doc.getURL()" $msg.get('core.menu.watchlist.add') 'tmWatchDocument' $watchClasses)
+  #xwikitopmenuentry("$doc.getURL('view', 'xpage=watch&amp;do=removedocument')&amp;xredirect=$doc.getURL()" $msg.get('core.menu.watchlist.remove') 'tmUnwatchDocument' $unwatchClasses)  
 #end
 </div>
 <div class="leftmenu">

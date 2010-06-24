@@ -723,4 +723,5 @@
     $msg.get('xe.invitation.messageStatus.unknown', [$escapetool.xml($status)])##
   #end
 #end
-{{/velocity}}</content></xwikidoc>
+{{/velocity}}</content>
+</xwikidoc>

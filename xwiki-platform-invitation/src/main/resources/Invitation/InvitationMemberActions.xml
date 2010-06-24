@@ -597,4 +597,5 @@ $xwiki.get('ssx').use($config.get('commonPage'))
     #end
   #end
 #end
-{{/velocity}}</content></xwikidoc>
+{{/velocity}}</content>
+</xwikidoc>

@@ -426,4 +426,5 @@
     = $breadcrumbTrail.get($mathtool.add($breadcrumbTrail.size(), -1)) =
   #end
 #end
-{{/velocity}}</content></xwikidoc>
+{{/velocity}}</content>
+</xwikidoc>

@@ -487,94 +487,59 @@ Object.extend(XWiki, {
    * Watchlist methods.
    */
   watchlist : {
-
+ 
     /**
-     * Update the given menu (menuview or contentmenu). Allows to update the menu icon without page reload.
-     */
-    updateMenu : function(menu) {
-      new Ajax.Updater(
-              menu,
-              window.docgeturl + "?xpage=xpart&vm=" + menu + ".vm",
-              {
-                method: 'get',
-                onComplete: XWiki.watchlist.initialize
-              });
+     * Mapping between link IDs and associated actions.
+     */    
+    actionsMap : {
+    	'tmWatchDocument' : 'adddocument',
+        'tmUnwatchDocument' : 'removedocument',
+        'tmWatchSpace' : 'addspace',
+        'tmUnwatchSpace' : 'removespace',
+        'tmWatchWiki' : 'addwiki',
+        'tmUnwatchWiki' : 'removewiki'
     },
 
     /**
-     * Add or remove the current document from the current user's watchlist.
-     *
-     * @param add True to add the document to the user's watchlist, false to remove it.
+     * Mapping allowing to know which action to display when a previous action has been executed.
      */
-    toggleDocument : function(add) {
-      var action = "removedocument";
-      if (add) {
-        action = "adddocument";
-      }
-      var surl = window.docgeturl + "?xpage=watch&do=" + action;
-      var myAjax = new Ajax.Request(
-        surl,
-        {
-          method: 'get',
-          onComplete: function() { XWiki.watchlist.updateMenu("contentmenu"); }
-        });
+    flowMap : {
+        'tmWatchDocument' : 'tmUnwatchDocument',
+        'tmUnwatchDocument' : 'tmWatchDocument',
+        'tmWatchSpace' : 'tmUnwatchSpace',
+        'tmUnwatchSpace' : 'tmWatchSpace',
+        'tmWatchWiki' : 'tmUnwatchWiki',
+        'tmUnwatchWiki' : 'tmWatchWiki'
     },
-
+    
     /**
-     * Add or remove the current space from the current user's watchlist.
+     * Execute a watchlist action (add or remove the given document/space/wiki from watchlist).
      *
-     * @param add True to add the space to the user's watchlist, false to remove it.
+     * @param element the element that fired the action.
      */
-    toggleSpace : function(add) {
-        var action = "removespace";
-        if (add) {
-          action = "addspace";
-        }
-        var surl = window.docgeturl + "?xpage=watch&do=" + action;
+    executeAction : function(element) {
+        var surl = window.docgeturl + "?xpage=watch&do=" + this.actionsMap[element.id];        
         var myAjax = new Ajax.Request(
           surl,
           {
             method: 'get',
-            onComplete: function() { XWiki.watchlist.updateMenu("menuview"); }
+            onComplete: function() {
+        	  if (element.nodeName == 'A') {
+                element.parentNode.toggleClassName('hidden');        		
+                $(XWiki.watchlist.flowMap[element.id]).parentNode.toggleClassName('hidden');
+        	  } else {
+                element.toggleClassName('hidden');        		
+                $(XWiki.watchlist.flowMap[element.id]).toggleClassName('hidden');
+              }
+            }
           });
-    },
-
-    /**
-     * Add or remove the current wiki from the current user's watchlist.
-     *
-     * @param add True to add the wiki to the user's watchlist, false to remove it.
-     */
-    toggleWiki : function(add) {
-        var action = "removewiki";
-        if (add) {
-          action = "addwiki";
-        }
-        var surl = window.docgeturl + "?xpage=watch&do=" + action;
-        var myAjax = new Ajax.Request(
-          surl,
-          {
-            method: 'get',
-            onComplete: function() { XWiki.watchlist.updateMenu("menuview"); }
-          });
-    },
-
-    /**
-     * Buttons mapping for watchlist UI.
-     */
-    buttonMapping : {
-        'tmWatchDocument' : function() { XWiki.watchlist.toggleDocument(true); },
-        'tmUnwatchDocument' : function() { XWiki.watchlist.toggleDocument(false); },
-        'tmWatchSpace' : function() { XWiki.watchlist.toggleSpace(true); },
-        'tmUnwatchSpace' : function() { XWiki.watchlist.toggleSpace(false); },
-        'tmWatchWiki' : function() { XWiki.watchlist.toggleWiki(true); },
-        'tmUnwatchWiki' : function() { XWiki.watchlist.toggleWiki(false); }
     },
 
     /**
      * Initialize watchlist UI.
      */
     initialize: function() {
-        for (button in XWiki.watchlist.buttonMapping) {
+        for (button in XWiki.watchlist.actionsMap) {
           if ($(button) != null) {
             var element = $(button);
             var self = this;
@@ -586,11 +551,12 @@ Object.extend(XWiki, {
             // unregister previously registered handler if any
             element.stopObserving('click');
             element.observe('click', function(event) {
+            	Event.stop(event);
                 var element = event.element();
                 while (element.id == '') {
                     element = element.parentNode;
                 }
-                XWiki.watchlist.buttonMapping[element.id](); Event.stop(event);
+                XWiki.watchlist.executeAction(element);                 
               });
           }
         }

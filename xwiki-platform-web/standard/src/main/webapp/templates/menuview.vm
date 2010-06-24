@@ -146,55 +146,42 @@
 ## Watch menu
 ##
 #if ($hasWatch && !$doc.isNew())
-<script type="text/javascript">
-//<![CDATA[
-function watchlist(action)
-{
-  var surl = "$doc.getURL('view', 'xpage=watch&do=')" + action;
-  var myAjax = new Ajax.Request(
-    surl,
-    {
-      method: 'get',
-      onComplete: function() {
-          new Ajax.Updater(
-          'menuview',
-          "$doc.getURL('view', 'xpage=xpart&vm=menuview.vm')",
-          {
-            method: 'get',
-            evalScripts: true
-          })
-        }
-    });
-}
-//]]>
-</script>
   #set ($isDocWatched = $xwiki.watchlist.isDocumentWatched())
   #set ($isSpaceWatched = $xwiki.watchlist.isSpaceWatched())
   #set ($isWikiWatched = $xwiki.watchlist.isWikiWatched())
   #if ($isDocWatched || $isSpaceWatched || $isWikiWatched)
-    #xwikitopmenuentrystart("javascript:watchlist('removedocument')" $msg.get('core.menu.watch') 'tmWatched')
+    #xwikitopmenuentrystart("#" $msg.get('core.menu.watch') 'tmWatched')
   #else
-    #xwikitopmenuentrystart("javascript:watchlist('adddocument')" $msg.get('core.menu.watch') 'tmWatch')
+    #xwikitopmenuentrystart("#" $msg.get('core.menu.watch') 'tmWatch')
   #end
-  #if (!$isDocWatched)
-    #submenuitem("javascript:watchlist('adddocument')" $msg.get('core.menu.watchlist.add.page') 'tmWatchPage')
-  #else
-    #submenuitem("javascript:watchlist('removedocument')" $msg.get('core.menu.watchlist.remove.page') 'tmUnwatchPage')
+  #set($watchClasses = '')
+  #set($unwatchClasses = 'hidden')
+  #if($isDocWatched)
+    #set($watchClasses = 'hidden')
+    #set($unwatchClasses = '')
   #end
+  #submenuitem("$doc.getURL('view', 'xpage=watch&amp;do=adddocument')&amp;xredirect=$doc.getURL()" $msg.get('core.menu.watchlist.add.document') 'tmWatchDocument' $watchClasses)
+  #submenuitem("$doc.getURL('view', 'xpage=watch&amp;do=removedocument')&amp;xredirect=$doc.getURL()" $msg.get('core.menu.watchlist.remove.document') 'tmUnwatchDocument' $unwatchClasses)
   #submenuseparator()
-  #if (!$isSpaceWatched)
-    #submenuitem("javascript:watchlist('addspace')" $msg.get('core.menu.watchlist.add.space', [$escapetool.xml($doc.space)]) 'tmWatchSpace')
-  #else
-    #submenuitem("javascript:watchlist('removespace')" $msg.get('core.menu.watchlist.remove.space') 'tmUnwatchSpace')
+  #set($watchClasses = '')
+  #set($unwatchClasses = 'hidden')
+  #if($isSpaceWatched)
+    #set($watchClasses = 'hidden')
+    #set($unwatchClasses = '')
   #end
+  #submenuitem("$doc.getURL('view', 'xpage=watch&amp;do=addspace')&amp;xredirect=$doc.getURL()" $msg.get('core.menu.watchlist.add.space', [$escapetool.xml($doc.space)]) 'tmWatchSpace', $watchClasses)
+  #submenuitem("$doc.getURL('view', 'xpage=watch&amp;do=removespace')&amp;xredirect=$doc.getURL()" $msg.get('core.menu.watchlist.remove.space') 'tmUnwatchSpace', $unwatchClasses)
   #submenuseparator()
-  #if (!$isWikiWatched)
-    #submenuitem("javascript:watchlist('addwiki')" $msg.get('core.menu.watchlist.add.wiki', [$escapetool.xml($doc.wiki)]) 'tmWatchWiki')
-  #else
-    #submenuitem("javascript:watchlist('removewiki')" $msg.get('core.menu.watchlist.remove.wiki') 'tmUnwatchWiki')
+  #set($watchClasses = '')
+  #set($unwatchClasses = 'hidden')
+  #if($isWikiWatched)
+    #set($watchClasses = 'hidden')
+    #set($unwatchClasses = '')
   #end
+  #submenuitem("$doc.getURL('view', 'xpage=watch&amp;do=addwiki')&amp;xredirect=$doc.getURL()" $msg.get('core.menu.watchlist.add.wiki', [$escapetool.xml($doc.wiki)]) 'tmWatchWiki', $watchClasses)
+  #submenuitem("$doc.getURL('view', 'xpage=watch&amp;do=removewiki')&amp;xredirect=$doc.getURL()" $msg.get('core.menu.watchlist.remove.wiki') 'tmUnwatchWiki', $unwatchClasses)
   #submenuseparator()
-  #submenuitem($xwiki.getURL('XWiki.WatchListManager', 'view') $msg.get('core.menu.watchlist.management') 'tmWatchlistManager')
+  #submenuitem($xwiki.getURL($context.user, 'view', 'category=watchlist') $msg.get('core.menu.watchlist.management') 'tmWatchlistManager')
   #xwikitopmenuentryend()
 #end
 </div>

@@ -61,7 +61,7 @@ function fireContentLoad(contentLoadTriggerId) {
     #set($content = $request.source)
   #elseif($request.getParameterMap().containsKey("html"))
     #set($render = false)
-    #set($content = $xwiki.wysiwyg.parseAndRender($request.html, $tdoc.getSyntaxId()))
+    #set($content = $xwiki.wysiwyg.parseAndRender($request.html, $tdoc.getSyntax().toIdString()))
   #end
 #end
 ## We don't always have to render the content:
@@ -70,7 +70,7 @@ function fireContentLoad(contentLoadTriggerId) {
 #if($render)
   ## We render using the Annotated XHTML Renderer since we need the extra metadata in order to be able to do full
   ## Round tripping between HTML and Wiki syntax.
-  #set($content = $tdoc.getRenderedContent($content, $tdoc.getSyntaxId(), "annotatedxhtml/1.0"))
+  #set($content = $tdoc.getRenderedContent($content, $tdoc.getSyntax().toIdString(), "annotatedxhtml/1.0"))
 #end
 <body id="body" class="main">$content<script id="__contentLoadTrigger" type="text/javascript"><!--
 fireContentLoad('__contentLoadTrigger')

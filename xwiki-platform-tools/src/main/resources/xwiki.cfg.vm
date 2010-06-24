@@ -363,7 +363,7 @@ xwiki.authentication.ldap.bind_DN=cn={0},department=USER,department=INFORMATIK,d
 xwiki.authentication.ldap.bind_pass={1}
 
 #-# Bypass standard LDAP bind validation by doing a direct password comparison.
-#-# If you don't know what you do, don't use that it. It's covering very rare and bad use cases.
+#-# If you don't know what you do, don't use that. It's covering very rare and bad use cases.
 #-# 0: disable
 #-# 1: enable
 # xwiki.authentication.ldap.validate_password=0

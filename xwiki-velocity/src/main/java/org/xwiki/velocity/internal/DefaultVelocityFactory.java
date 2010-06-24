@@ -68,7 +68,7 @@ public class DefaultVelocityFactory extends AbstractLogEnabled implements Veloci
      * 
      * @see VelocityFactory#hasVelocityEngine(String)
      */
-    public boolean hasVelocityEngine(String key)
+    public synchronized boolean hasVelocityEngine(String key)
     {
         return this.velocityEngines.containsKey(key);
     }
@@ -78,7 +78,7 @@ public class DefaultVelocityFactory extends AbstractLogEnabled implements Veloci
      * 
      * @see VelocityFactory#getVelocityEngine(String)
      */
-    public VelocityEngine getVelocityEngine(String key)
+    public synchronized VelocityEngine getVelocityEngine(String key)
     {
         return this.velocityEngines.get(key);
     }
@@ -88,28 +88,23 @@ public class DefaultVelocityFactory extends AbstractLogEnabled implements Veloci
      * 
      * @see VelocityFactory#createVelocityEngine(String, Properties)
      */
-    public VelocityEngine createVelocityEngine(String key, Properties properties) throws XWikiVelocityException
+    public synchronized VelocityEngine createVelocityEngine(String key, Properties properties)
+        throws XWikiVelocityException
     {
-        synchronized (this.velocityEngines) {
-            VelocityEngine engine;
-            if (this.velocityEngines.containsKey(key)) {
-                engine = this.velocityEngines.get(key);
-            } else {
-                try {
-                    engine = this.componentManager.lookup(VelocityEngine.class);
-                } catch (ComponentLookupException e) {
-                    throw new XWikiVelocityException("Failed to create Velocity Engine", e);
-                }
-                engine.initialize(properties);
-                this.velocityEngines.put(key, engine);
-            }
-
-            // Register a JMX MBean for providing information about the created Velocity Engine (template namespaces,
-            // macros, etc).
-            JMXVelocityEngineMBean mbean = new JMXVelocityEngine(engine);
-            this.jmxRegistration.registerMBean(mbean, "type=Velocity,domain=Engines,name=" + key);
-
-            return engine;
+        VelocityEngine engine;
+        try {
+            engine = this.componentManager.lookup(VelocityEngine.class);
+        } catch (ComponentLookupException e) {
+            throw new XWikiVelocityException("Failed to create Velocity Engine", e);
         }
+        engine.initialize(properties);
+        this.velocityEngines.put(key, engine);
+
+        // Register a JMX MBean for providing information about the created Velocity Engine (template namespaces,
+        // macros, etc).
+        JMXVelocityEngineMBean mbean = new JMXVelocityEngine(engine);
+        this.jmxRegistration.registerMBean(mbean, "type=Velocity,domain=Engines,name=" + key);
+
+        return engine;
     }
 }

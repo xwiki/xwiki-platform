@@ -263,7 +263,7 @@
   #if($!entryDoc.syntaxId == 'xwiki/1.0')
     #set($desc = $entryContent)
   #else
-    #set($desc = $entryDoc.getRenderedContent($entryContent, $entryDoc.getSyntaxId()))
+    #set($desc = $entryDoc.getRenderedContent($entryContent, $entryDoc.getSyntax().toIdString()))
   #end
   #set($desc = $escapetool.xml($desc))
   &lt;item rdf:about="$entryUrl"&gt;

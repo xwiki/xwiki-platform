@@ -296,7 +296,6 @@
     <extension>js</extension>
     <mime-type>text/javascript</mime-type>
   </mime-mapping>
-
   <mime-mapping>
     <extension>css</extension>
     <mime-type>text/css</mime-type>
@@ -311,6 +310,36 @@
   <mime-mapping>
     <extension>bmp</extension>
     <mime-type>image/bmp</mime-type>
+  </mime-mapping>
+
+  <!-- MS Office mime mappings. We add these to provide out-of-the-box support for downloading Office files as
+       attachments. This is for convenience as this is normally a Servlet Container set up but some containers
+       do not have these defined by default. For docx/ppt/xlsx this means they will be recognized by IE as zip
+       files. See http://littletechthoughts.blogspot.com/2009/01/ie-changes-docx-xlsx-pptx-to-zip-while.html
+       for more details. -->
+  <mime-mapping>
+    <extension>doc</extension>
+    <mime-type>application/msword</mime-type>
+  </mime-mapping>
+  <mime-mapping>
+    <extension>xls</extension>
+    <mime-type>application/vnd.ms-excel</mime-type>
+  </mime-mapping>
+  <mime-mapping>
+    <extension>ppt</extension>
+    <mime-type>application/vnd.ms-powerpoint</mime-type>
+  </mime-mapping>
+  <mime-mapping>
+    <extension>docx</extension>
+    <mime-type>application/vnd.openxmlformats-officedocument.wordprocessingml.document</mime-type>
+  </mime-mapping>
+  <mime-mapping>
+    <extension>xlsx</extension>
+    <mime-type>application/vnd.openxmlformats-officedocument.spreadsheetml.sheet</mime-type>
+  </mime-mapping>
+  <mime-mapping>
+    <extension>pptx</extension>
+    <mime-type>application/vnd.openxmlformats-officedocument.presentationml.presentation</mime-type>
   </mime-mapping>
 
   <!-- Redirects to the Main.WebHome page if the user calls the root of the webapp, i.e.

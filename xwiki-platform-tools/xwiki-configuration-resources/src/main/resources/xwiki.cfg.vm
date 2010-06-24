@@ -362,10 +362,11 @@ xwiki.authentication.ldap.port=389
 xwiki.authentication.ldap.bind_DN=cn={0},department=USER,department=INFORMATIK,department=1230,o=MP
 xwiki.authentication.ldap.bind_pass={1}
 
-#-# Force to check password after LDAP connection
+#-# Bypass standard LDAP bind validation by doing a direct password comparison.
+#-# If you don't know what you do, don't use that it. It's covering very rare and bad use cases.
 #-# 0: disable
 #-# 1: enable
-xwiki.authentication.ldap.validate_password=0
+# xwiki.authentication.ldap.validate_password=0
 
 #-# only members of the following group will be verified in the LDAP
 #-# otherwise only users that are found after searching starting from the base_DN
@@ -398,7 +399,7 @@ xwiki.authentication.ldap.fields_mapping=last_name=sn,first_name=givenName,email
 
 #-# [Since 1.3M2, XWikiLDAPAuthServiceImpl]
 #-# on every login update the mapped attributes from LDAP to XWiki otherwise this happens only once when the XWiki account is created.
-xwiki.authentication.ldap.update_user=1
+# xwiki.authentication.ldap.update_user=1
 
 #-# [Since 1.3M2, XWikiLDAPAuthServiceImpl]
 #-# mapps XWiki groups to LDAP groups, separator is "|"

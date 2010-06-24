@@ -173,15 +173,20 @@ $xwiki.get('ssx').use($config.get('commonPage'))
                                   $mail,
                                   $xwiki.getDocumentAsAuthor($config.get('emailContainer')))
   #inspectMessages($mail, $inspect, $isAdmin, $messageID)
+  #invitationFooter($mail, $request.getParameterMap(), $isAdmin, $config)
 #else
   ## Inspect messages without doing any action.
   #set($inspect = $request.getParameter('inspect'))
   #if("$!inspect" != '')
     #displayInvitationHeader($request.getParameterMap(), $config)
     #inspectMessages($mail, $inspect, $isAdmin, $request.getParameter('messageID'))
+    #invitationFooter($mail, $request.getParameterMap(), $isAdmin, $config)
+  #else
+    ##
+    ## No orders, Lets just explain what this page is for.
+    {{info}}$msg.get("xe.invitation.internalDocument", ["${doc.getSpace()}.WebHome"]){{/info}}
   #end
 #end
-#invitationFooter($mail, $request.getParameterMap(), $isAdmin, $config)
 ##
 ## Prevent $mail and config from leaking if this page is included in another page.
 #set($mail = 0)

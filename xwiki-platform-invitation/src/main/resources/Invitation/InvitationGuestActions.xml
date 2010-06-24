@@ -159,6 +159,8 @@
             $request.getParameter('confirm'),
             $mail,
             $emailContainer)
+#else
+  {{info}}$msg.get("xe.invitation.internalDocument", ["${doc.getSpace()}.WebHome"]){{/info}}
 #end
 ##
 ##---------------------------------------------------------------------

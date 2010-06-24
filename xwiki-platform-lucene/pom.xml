@@ -34,7 +34,7 @@
   <version>1.19-SNAPSHOT</version>
   <description>XWiki Platform - Plugins - Lucene search</description>
   <properties>
-    <platform.core.version>2.3-SNAPSHOT</platform.core.version>
+    <platform.core.version>2.3.1</platform.core.version>
   </properties>
   <dependencies>
     <dependency>

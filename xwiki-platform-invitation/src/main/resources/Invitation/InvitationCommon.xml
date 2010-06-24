@@ -642,6 +642,8 @@ $msg.get("xe.invitation.emailContent.reportMessage", ["&lt;a href=$escapetool.ge
 #if($request.getParameter('test') == '1')
   {{info}}testLoadInvitationConfig{{/info}}
   #testLoadInvitationConfig()
+#elseif($doc.getName() == 'InvitationCommon')
+  {{info}}$msg.get("xe.invitation.internalDocument", ["${doc.getSpace()}.WebHome"]){{/info}}
 #end
 ##
 #*

@@ -416,8 +416,8 @@ public class XWikiLDAPAuthServiceImpl extends XWikiAuthServiceImpl
         if ("1".equals(config.getLDAPParam("ldap_validate_password", "0", context))) {
             String passwordField = config.getLDAPParam("ldap_password_field", "userPassword", context);
             if (!connector.checkPassword(ldapDn, password, passwordField)) {
-                LOG.debug("Password comparision failed, are you really sure you need validate_password ?" +
-                    " If you don't enable it, it does not mean user credentiels are not validated." +
+                LOG.debug("Password comparison failed, are you really sure you need validate_password ?" +
+                    " If you don't enable it, it does not mean user credentials are not validated." +
                     " The goal of this property is to bypass standard LDAP bind" +
                     " which is usually bad unless you really know what you do.");
                 

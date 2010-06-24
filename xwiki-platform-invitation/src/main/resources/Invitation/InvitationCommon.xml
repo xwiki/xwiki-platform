@@ -265,6 +265,363 @@
 <users>XWiki.XWikiGuest</users>
 </property>
 </object>
+<object>
+<class>
+<name>Invitation.WebHome</name>
+<customClass></customClass>
+<customMapping></customMapping>
+<defaultViewSheet></defaultViewSheet>
+<defaultEditSheet></defaultEditSheet>
+<defaultWeb></defaultWeb>
+<nameField></nameField>
+<validationScript></validationScript>
+<allowUsersOfOtherWikis>
+<defaultValue></defaultValue>
+<disabled>0</disabled>
+<displayFormType>checkbox</displayFormType>
+<displayType></displayType>
+<name>allowUsersOfOtherWikis</name>
+<number>4</number>
+<prettyName>Let users of other wikis send</prettyName>
+<unmodifiable>0</unmodifiable>
+<validationMessage></validationMessage>
+<validationRegExp></validationRegExp>
+<classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+</allowUsersOfOtherWikis>
+<commonPage>
+<disabled>0</disabled>
+<name>commonPage</name>
+<number>18</number>
+<picker>0</picker>
+<prettyName>common</prettyName>
+<size>30</size>
+<unmodifiable>0</unmodifiable>
+<validationMessage></validationMessage>
+<validationRegExp></validationRegExp>
+<classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+</commonPage>
+<emailClass>
+<disabled>0</disabled>
+<name>emailClass</name>
+<number>5</number>
+<picker>0</picker>
+<prettyName>Email message XClass</prettyName>
+<size>30</size>
+<unmodifiable>0</unmodifiable>
+<validationMessage></validationMessage>
+<validationRegExp></validationRegExp>
+<classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+</emailClass>
+<emailContainer>
+<disabled>0</disabled>
+<name>emailContainer</name>
+<number>9</number>
+<picker>0</picker>
+<prettyName>Document containing email XObjects</prettyName>
+<size>30</size>
+<unmodifiable>0</unmodifiable>
+<validationMessage></validationMessage>
+<validationRegExp></validationRegExp>
+<classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+</emailContainer>
+<emailRegex>
+<disabled>0</disabled>
+<name>emailRegex</name>
+<number>7</number>
+<picker>0</picker>
+<prettyName>Regular expression for validating email addresses</prettyName>
+<size>30</size>
+<unmodifiable>0</unmodifiable>
+<validationMessage></validationMessage>
+<validationRegExp></validationRegExp>
+<classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+</emailRegex>
+<from_address>
+<disabled>0</disabled>
+<name>from_address</name>
+<number>1</number>
+<picker>0</picker>
+<prettyName>Email "from" address</prettyName>
+<size>30</size>
+<unmodifiable>0</unmodifiable>
+<validationMessage></validationMessage>
+<validationRegExp></validationRegExp>
+<classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+</from_address>
+<guestsActionsPage>
+<disabled>0</disabled>
+<name>guestsActionsPage</name>
+<number>14</number>
+<picker>0</picker>
+<prettyName>guestsActions</prettyName>
+<size>30</size>
+<unmodifiable>0</unmodifiable>
+<validationMessage></validationMessage>
+<validationRegExp></validationRegExp>
+<classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+</guestsActionsPage>
+<javamail_extra_props>
+<disabled>0</disabled>
+<editor>---</editor>
+<name>javamail_extra_props</name>
+<number>15</number>
+<picker>0</picker>
+<prettyName>Javamail extra properties</prettyName>
+<rows>5</rows>
+<size>40</size>
+<unmodifiable>0</unmodifiable>
+<validationMessage></validationMessage>
+<validationRegExp></validationRegExp>
+<classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+</javamail_extra_props>
+<mainPage>
+<disabled>0</disabled>
+<name>mainPage</name>
+<number>19</number>
+<picker>0</picker>
+<prettyName>mainPage</prettyName>
+<size>30</size>
+<unmodifiable>0</unmodifiable>
+<validationMessage></validationMessage>
+<validationRegExp></validationRegExp>
+<classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+</mainPage>
+<membersActionsPage>
+<disabled>0</disabled>
+<name>membersActionsPage</name>
+<number>16</number>
+<picker>0</picker>
+<prettyName>membersActions</prettyName>
+<size>30</size>
+<unmodifiable>0</unmodifiable>
+<validationMessage></validationMessage>
+<validationRegExp></validationRegExp>
+<classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+</membersActionsPage>
+<membersCommonPage>
+<disabled>0</disabled>
+<name>membersCommonPage</name>
+<number>17</number>
+<picker>0</picker>
+<prettyName>membersCommon</prettyName>
+<size>30</size>
+<unmodifiable>0</unmodifiable>
+<validationMessage></validationMessage>
+<validationRegExp></validationRegExp>
+<classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+</membersCommonPage>
+<messageBodyTemplate>
+<disabled>0</disabled>
+<editor>---</editor>
+<name>messageBodyTemplate</name>
+<number>3</number>
+<picker>0</picker>
+<prettyName>Email message body HTML template</prettyName>
+<rows>5</rows>
+<size>40</size>
+<unmodifiable>0</unmodifiable>
+<validationMessage></validationMessage>
+<validationRegExp></validationRegExp>
+<classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+</messageBodyTemplate>
+<messageBodyTemplatePlain>
+<disabled>0</disabled>
+<editor>---</editor>
+<name>messageBodyTemplatePlain</name>
+<number>20</number>
+<picker>0</picker>
+<prettyName>Message body plain text template</prettyName>
+<rows>5</rows>
+<size>40</size>
+<unmodifiable>0</unmodifiable>
+<validationMessage></validationMessage>
+<validationRegExp></validationRegExp>
+<classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+</messageBodyTemplatePlain>
+<smtp_port>
+<disabled>0</disabled>
+<name>smtp_port</name>
+<number>13</number>
+<picker>0</picker>
+<prettyName>Smtp port</prettyName>
+<size>30</size>
+<unmodifiable>0</unmodifiable>
+<validationMessage></validationMessage>
+<validationRegExp></validationRegExp>
+<classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+</smtp_port>
+<smtp_server>
+<disabled>0</disabled>
+<name>smtp_server</name>
+<number>12</number>
+<picker>0</picker>
+<prettyName>Smtp server host name</prettyName>
+<size>30</size>
+<unmodifiable>0</unmodifiable>
+<validationMessage></validationMessage>
+<validationRegExp></validationRegExp>
+<classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+</smtp_server>
+<smtp_server_password>
+<disabled>0</disabled>
+<name>smtp_server_password</name>
+<number>11</number>
+<picker>0</picker>
+<prettyName>Smtp password</prettyName>
+<size>30</size>
+<unmodifiable>0</unmodifiable>
+<validationMessage></validationMessage>
+<validationRegExp></validationRegExp>
+<classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+</smtp_server_password>
+<smtp_server_username>
+<disabled>0</disabled>
+<name>smtp_server_username</name>
+<number>10</number>
+<picker>0</picker>
+<prettyName>Smtp username</prettyName>
+<size>30</size>
+<unmodifiable>0</unmodifiable>
+<validationMessage></validationMessage>
+<validationRegExp></validationRegExp>
+<classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+</smtp_server_username>
+<subjectLineTemplate>
+<disabled>0</disabled>
+<name>subjectLineTemplate</name>
+<number>2</number>
+<picker>0</picker>
+<prettyName>Email subject line template</prettyName>
+<size>30</size>
+<unmodifiable>0</unmodifiable>
+<validationMessage></validationMessage>
+<validationRegExp></validationRegExp>
+<classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+</subjectLineTemplate>
+<usersMayPersonalizeMessage>
+<defaultValue></defaultValue>
+<disabled>0</disabled>
+<displayFormType>checkbox</displayFormType>
+<displayType></displayType>
+<name>usersMayPersonalizeMessage</name>
+<number>8</number>
+<prettyName>Let users personalize messages</prettyName>
+<unmodifiable>0</unmodifiable>
+<validationMessage></validationMessage>
+<validationRegExp></validationRegExp>
+<classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+</usersMayPersonalizeMessage>
+<usersMaySendToMultiple>
+<defaultValue></defaultValue>
+<disabled>0</disabled>
+<displayFormType>checkbox</displayFormType>
+<displayType></displayType>
+<name>usersMaySendToMultiple</name>
+<number>6</number>
+<prettyName>Let users send to multiple addresses</prettyName>
+<unmodifiable>0</unmodifiable>
+<validationMessage></validationMessage>
+<validationRegExp></validationRegExp>
+<classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+</usersMaySendToMultiple>
+</class>
+<name>Invitation.InvitationCommon</name>
+<number>0</number>
+<className>Invitation.WebHome</className>
+<guid>5b0a8220-404d-4d1b-b162-0ebcf323181e</guid>
+<property>
+<allowUsersOfOtherWikis>0</allowUsersOfOtherWikis>
+</property>
+<property>
+<commonPage>Invitation.InvitationCommon</commonPage>
+</property>
+<property>
+<emailClass>Invitation.InvitationMailClass</emailClass>
+</property>
+<property>
+<emailContainer>Invitation.InvitationMessages</emailContainer>
+</property>
+<property>
+<emailRegex>/^([^@\s]+)@((?:[-a-zA-Z0-9]+\.)+[a-zA-Z]{2,})$/</emailRegex>
+</property>
+<property>
+<from_address>no-reply@localhost.localdomain</from_address>
+</property>
+<property>
+<guestsActionsPage>Invitation.InvitationGuestActions</guestsActionsPage>
+</property>
+<property>
+<javamail_extra_props></javamail_extra_props>
+</property>
+<property>
+<mainPage>Invitation.WebHome</mainPage>
+</property>
+<property>
+<membersActionsPage>Invitation.InvitationMemberActions</membersActionsPage>
+</property>
+<property>
+<membersCommonPage>Invitation.InvitationMembersCommon</membersCommonPage>
+</property>
+<property>
+<messageBodyTemplate>{{velocity}}
+#set($discard = "#template('colorThemeInit.vm')")
+#if("$!theme" == "")
+ #set($theme = {"linkColor":"#4791BC"})
+#end
+#set($userName = $xwiki.getUserName($xcontext.getUser(), false))
+#set($wikiName = $xwiki.getRequestURL().replaceAll("http://([^/:]*).*$", "$1"))
+#set($guestActionsURL = $xwiki.getDocumentAsAuthor($config.get("guestsActionsPage")).getExternalURL())
+#set($linkStyle = "color:$theme.get('linkColor');text-decoration:none;")
+#set($bigText = "font-size:130%;")
+#set($joinLink = "float:left;")
+#set($declineLink = "color:#f88;float:right;text-decoration:none;")
+
+$msg.get("xe.invitation.emailContent.userHasInvitedYouToJoinWiki", [$userName, $wikiName])
+
+{{html clean=false}}
+#if("$!messageBody" != "")
+  &lt;p style="$bigText"&gt;
+  $!escapetool.html($!messageBody)
+  &lt;/p&gt;
+#end
+&lt;p style="margin-top:30px"&gt;
+&lt;a href="${guestActionsURL}?doAction_accept=y&amp;amp;messageID=$messageID" style="$bigText$joinLink$linkStyle"&gt;
+$msg.get("xe.invitation.emailContent.joinLink")
+&lt;/a&gt;
+&lt;a href="${guestActionsURL}?doAction_decline=y&amp;amp;messageID=$messageID" style="$bigText$declineLink"&gt;
+ $msg.get("xe.invitation.emailContent.declineLink")
+&lt;/a&gt;&lt;/p&gt;
+&lt;hr style="clear:both" /&gt;
+$msg.get("xe.invitation.emailContent.reportMessage", ["&lt;a href=$escapetool.getQ()${guestActionsURL}?doAction_report=y&amp;amp;messageID=$messageID$escapetool.getQ() style=$escapetool.getQ()$linkStyle$escapetool.getQ()&gt;", "&lt;/a&gt;"])
+{{/html}}
+{{/velocity}}</messageBodyTemplate>
+</property>
+<property>
+<messageBodyTemplatePlain>{{velocity}}
+#set($userName = $xwiki.getUserName($xcontext.getUser(), false))#set($wikiName = $xwiki.getRequestURL().replaceAll("http://([^/:]*).*$", "$1"))#set($guestActionsURL = $xwiki.getDocumentAsAuthor($config.get("guestsActionsPage")).getExternalURL())$msg.get("xe.invitation.emailContent.userHasInvitedYouToJoinWiki", [$userName, $wikiName])#if("$!messageBody" != "")  $messageBody#end$msg.get("xe.invitation.emailContent.joinLink")${guestActionsURL}?doAction_accept=y&amp;messageID=$messageID$msg.get("xe.invitation.emailContent.declineLink")${guestActionsURL}?doAction_decline=y&amp;messageID=$messageID$msg.get("xe.invitation.emailContent.reportMessage", ["", "$util.getNewline()${guestActionsURL}?doAction_decline=y&amp;messageID=$messageID"]){{/velocity}}</messageBodyTemplatePlain>
+</property>
+<property>
+<smtp_port>25</smtp_port>
+</property>
+<property>
+<smtp_server>localhost</smtp_server>
+</property>
+<property>
+<smtp_server_password></smtp_server_password>
+</property>
+<property>
+<smtp_server_username></smtp_server_username>
+</property>
+<property>
+<subjectLineTemplate>{{velocity}}$msg.get("xe.invitation.emailContent.subjectLine", [$xcontext.getUser().replaceAll("^[^\.]*.", ""), $xwiki.getRequestURL().replaceAll("http://([^/:]*).*$", "$1"), $!subjectLine]){{/velocity}}</subjectLineTemplate>
+</property>
+<property>
+<usersMayPersonalizeMessage>1</usersMayPersonalizeMessage>
+</property>
+<property>
+<usersMaySendToMultiple>0</usersMaySendToMultiple>
+</property>
+</object>
 <content>{{velocity}}
 #*
  * Invitation Application
@@ -399,78 +756,22 @@
     #else
       #set($configClassNameInternal = $configClassName)
     #end
-    ## If no configuration specified then use hardcoded defaults.
-    $config.put('emailRegex', '/^([^@\s]+)@((?:[-a-zA-Z0-9]+\.)+[a-zA-Z]{2,})$/')
-    $config.put('emailClass', "${doc.getSpace()}.InvitationMailClass")
-    $config.put('emailContainer', "${doc.getSpace()}.InvitationMessages")
-    ## working documents.
-    $config.put('guestsActionsPage', "${doc.getSpace()}.InvitationGuestActions")
-    $config.put('membersActionsPage', "${doc.getSpace()}.InvitationMemberActions")
-    $config.put('membersCommonPage', "${doc.getSpace()}.InvitationMembersCommon")
-    $config.put('commonPage', "${doc.getSpace()}.InvitationCommon")
-    $config.put('mainPage', "${doc.getSpace()}.WebHome")
-    ##
-    #set($subjectLineTemplate = '{{velo' + 'city}}$msg.get("xe.invitation.emailContent.subjectLine", ['
-                                + '$xcontext.getUser().replaceAll("^[^\.]*.", ""), '
-                                + '$xwiki.getRequestURL().replaceAll("http://([^/:]*).*$", "$1"), '
-                                + '$!subjectLine]){{/velo' + 'city}}')
-    $config.put('subjectLineTemplate', $subjectLineTemplate)
-    #set($n = $util.getNewline())
-    #set($messageBodyTemplate = '{{velo' + 'city}}' + "$n" + '#set($discard = "#template('
-                              + "$escapetool.getS()" + 'colorThemeInit.vm' + "$escapetool.getS()"
-                              + ')")' + "$n" + '#if("$!theme" == "")' + "$n" + ' #set($theme = {"linkColor":'
-                              + '"#4791BC"})' + "$n" + '#end' + "$n" + '#set($userName = $xwiki.getUserName($xco'
-                              + 'ntext.getUser(), false))' + "$n" + '#set($wikiName = $xwiki.getReques'
-                              + 'tURL().replaceAll("http://([^/:]*).*$", "$1"))' + "$n" + '#set($guest'
-                              + 'ActionsURL = $xwiki.getDocumentAsAuthor($config.get("guestsActionsPag'
-                              + 'e")).getExternalURL())' + "$n" + '#set($linkStyle = "color:$theme.get('
-                              + "$escapetool.getS()" + 'linkColor' + "$escapetool.getS()" + ');te'
-                              + 'xt-decoration:none;")' + "$n" + '#set($bigText = "font-size:130%;")'
-                              + "$n" + '#set($joinLink = "float:left;")' + "$n" + '#set($declineLink '
-                              + '= "color:#f88;float:right;text-decoration:none;")' + "$n$n" + '$msg.get("xe.invi'
-                              + 'tation.emailContent.userHasInvitedYouToJoinWiki", [$userName, $wikiNa'
-                              + 'me])' + "$n$n" + '{{html clean=false}}' + "$n" + '#if("$!me'
-                              + 'ssageBody" != "")' + "$n" + '  &lt;p style="$bigText"&gt;' + "$n" + '  $!'
-                              + 'escapetool.html($!messageBody)' + "$n" + '  &lt;/p&gt;' + "$n" + '#end'
-                              + "$n" + '&lt;p style="margin-top:30px"&gt;' + "$n" + '&lt;a href="${guestActionsURL}?doAction_ac'
-                              + 'cept=y&amp;amp;messageID=$messageID" style="$bigText$joinLink$linkStyle"&gt;' + "$n"
-                              + '$msg.get("xe.invitation.emailContent.joinLink")' + "$n" + '&lt;/a&gt;'
-                              + "$n" + '&lt;a href="${guestActionsURL}?doAction_decline=y&amp;amp;messageID=$mes'
-                              + 'sageID" style="$bigText$declineLink"&gt;' + "$n" + ' $msg.get("xe.invita'
-                              + 'tion.emailContent.declineLink")' + "$n" + '&lt;/a&gt;&lt;/p&gt;' + "$n" + '&lt;hr style='
-                              + '"clear:both" /&gt;' + "$n" + '$msg.get("xe.invitation.emailContent.reportM'
-                              + 'essage", ["&lt;a href=$escapetool.getQ()${guestActionsURL}?doA'
-                              + 'ction_report=y&amp;amp;messageID=$messageID$escapetool.getQ() style=$escapetool.getQ()$linkStyle$escapetool.getQ()&gt;'
-                              + '", "&lt;/a&gt;"])' + "$n" + '{{/html}}' + "$n" + '{{/'
-                              + 'velocity}}')
-    $config.put('messageBodyTemplate', $messageBodyTemplate)
-    #set($messageBodyTemplatePlain = 
-                                '{{velo' + 'city}}' + "$n" + '#set($userName = $xwiki.getUserName($xco'
-                              + 'ntext.getUser(), false))#set($wikiName = $xwiki.getRequestURL().repla'
-                              + 'ceAll("http://([^/:]*).*$", "$1"))#set($guestActionsURL = $xwiki.getD'
-                              + 'ocumentAsAuthor($config.get("guestsActionsPage")).getExternalURL())'
-                              + '$msg.get("xe.invitation.emailContent.userH'
-                              + 'asInvitedYouToJoinWiki", [$userName, $wikiName])#if("$!messageBody" !'
-                              + '= "")  $messageBody#end$msg.get("xe.invitation.emailContent.joinLink"'
-                              + ')${guestActionsURL}?doAction_accept=y&amp;messageID=$messageID$msg.get("x'
-                              + 'e.invitation.emailContent.declineLink")${guestActionsURL}?doAction_de'
-                              + 'cline=y&amp;messageID=$messageID$msg.get("xe.invitation.emailContent.repo'
-                              + 'rtMessage", ["", "$util.getNewline()${guestActionsURL}?doAction_decli'
-                              + 'ne=y&amp;messageID=$messageID"]){{/velo' + 'city}}')
-    $config.put('messageBodyTemplatePlain', $messageBodyTemplatePlain)
-    $config.put('allowUsersOfOtherWikis', 0)
-    $config.put('usersMayPersonalizeMessage', 1)
-    $config.put('usersMaySendToMultiple', 0)
-    $config.put('from_address', 'no-reply@localhost.localdomain')
-    $config.put('smtp_port', '25')
-    $config.put('smtp_server', 'localhost')
     ##
     ## Load some parameters from the configuration.
     #set($configDoc = $xwiki.getDocumentAsAuthor($configDocNameInternal))
+    ##
     ## If no configuration document exists, create one and save it.
     #if($configDoc.isNew())
+      ##
+      ## load the default configuration from this document.
+      #set($thisDocument = $xwiki.getDocumentAsAuthor("${doc.getSpace()}.InvitationCommon"))
+      #set($defaultConfigObj = $thisDocument.getObject($configClassNameInternal))
+      #foreach($element in $defaultConfigObj.getProperties())
+        $config.put($element.getName(), $defaultConfigObj.getProperty($element.getName()).getValue())
+      #end
+      ##
       #set($configDocContent = '{{velo' + 'city}}{{info}}$msg.get("xe.invitation.internalDocument", ["'
-                               + "$configDocNameInternal" + '"]){{/info}}{{/velo' + 'city}}')
+                               + "$!config.get('mainPage')" + '"]){{/info}}{{/velo' + 'city}}')
       $configDoc.setContent($configDocContent)
       #set($configObj = $configDoc.newObject($configClassNameInternal))
       #foreach($key in $config.keySet())

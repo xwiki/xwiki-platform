@@ -76,7 +76,7 @@ $xwiki.jsfx.use('js/xwiki/editors/dataeditors.js', true)##
           #set($propDef = $field.xWikiClass.get($classprop))
           #if($hiddenProperties.indexOf($propDef.name) == -1)
             #if($propDef.type.indexOf('Boolean') != -1)
-              <dt class="boolean-property">$doc.displayEdit($propDef, "${field.name}_" , $field) $propDef.getPrettyName()</dt>
+              <dt class="boolean-property"><label class="hidden" for="${field.name}_$classprop">$propDef.getPrettyName()</label>$doc.displayEdit($propDef, "${field.name}_" , $field) $propDef.getPrettyName()</dt>
             #else
               <dt><label for="${field.name}_$classprop">$propDef.getPrettyName() $!{propertyDetails.get($classprop)}</label></dt>
               <dd>$doc.displayEdit($propDef, "${field.name}_" , $field)</dd>

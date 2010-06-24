@@ -416,6 +416,10 @@ public class XWikiLDAPAuthServiceImpl extends XWikiAuthServiceImpl
         if ("1".equals(config.getLDAPParam("ldap_validate_password", "0", context))) {
             String passwordField = config.getLDAPParam("ldap_password_field", "userPassword", context);
             if (!connector.checkPassword(ldapDn, password, passwordField)) {
+                LOG.debug("Password comparision failed, are you really sure you need validate_password ?" +
+                    " If you don't enable it it does not mean use credentiel are not validated." +
+                    " The goal of this property is to bypass standard LDAP bind.");
+                
                 throw new XWikiException(XWikiException.MODULE_XWIKI_USER, XWikiException.ERROR_XWIKI_USER_INIT,
                     "LDAP authentication failed:" + " could not validate the password: wrong password for " + ldapDn);
             }

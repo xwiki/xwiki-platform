@@ -71,7 +71,7 @@ public abstract class IndexData
         setDocumentTitle(doc.getRenderedTitle(Syntax.PLAIN_1_0, context));
         setDocumentSpace(doc.getSpace());
         setDocumentFullName(doc.getFullName());
-        setWiki(doc.getDatabase() == null ? context.getDatabase() : doc.getDatabase());
+        setWiki(doc.getWikiName() == null ? context.getDatabase() : doc.getWikiName());
         setFullName(new StringBuffer(this.wiki).append(":").append(this.documentSpace).append(".").append(
             this.documentName).toString());
         setLanguage(doc.getLanguage());

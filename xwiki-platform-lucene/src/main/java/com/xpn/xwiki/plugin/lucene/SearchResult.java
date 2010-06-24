@@ -93,7 +93,7 @@ public class SearchResult
             this.filename = doc.get(IndexFields.FILENAME);
             Document document;
             final String fullDocName =
-                    new StringBuffer(this.wiki).append(":").append(this.space).append(".").append(this.name).toString();
+                new StringBuffer(this.wiki).append(":").append(this.space).append(".").append(this.name).toString();
             try {
                 document = xwiki.getDocument(fullDocName);
                 this.url = document.getAttachmentURL(this.filename, "download");

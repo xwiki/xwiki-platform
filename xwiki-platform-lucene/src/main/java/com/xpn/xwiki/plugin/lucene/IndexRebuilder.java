@@ -376,7 +376,7 @@ public class IndexRebuilder extends AbstractXWikiRunnable
         try {
             translations = document.getTranslationList(wikiContext);
         } catch (XWikiException e) {
-            LOG.error("error getting list of translations from document " + document.getFullName(), e);
+            LOG.error("error getting list of translations from document " + document, e);
 
             return 0;
         }
@@ -386,8 +386,7 @@ public class IndexRebuilder extends AbstractXWikiRunnable
                 this.indexUpdater.add(document.getTranslatedDocument(lang, wikiContext), wikiContext);
                 retval++;
             } catch (XWikiException e) {
-                LOG.error("Error getting translated document for document " + document.getFullName() + " and language "
-                    + lang, e);
+                LOG.error("Error getting translated document for document " + document + " and language " + lang, e);
             }
         }
 

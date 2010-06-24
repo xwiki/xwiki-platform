@@ -19,23 +19,23 @@
  */
 package com.xpn.xwiki.plugin.lucene;
 
-import com.xpn.xwiki.XWikiContext;
-import com.xpn.xwiki.doc.XWikiDocument;
-import com.xpn.xwiki.objects.BaseObject;
-import com.xpn.xwiki.objects.classes.BaseClass;
-import com.xpn.xwiki.objects.BaseProperty;
-import com.xpn.xwiki.objects.classes.StaticListClass;
-import com.xpn.xwiki.objects.PropertyInterface;
-import com.xpn.xwiki.objects.classes.PasswordClass;
-import com.xpn.xwiki.objects.classes.ListItem;
+import java.util.List;
+import java.util.Map;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.document.Field;
 
-import java.util.Map;
-import java.util.List;
+import com.xpn.xwiki.XWikiContext;
+import com.xpn.xwiki.doc.XWikiDocument;
+import com.xpn.xwiki.objects.BaseObject;
+import com.xpn.xwiki.objects.BaseProperty;
+import com.xpn.xwiki.objects.PropertyInterface;
+import com.xpn.xwiki.objects.classes.BaseClass;
+import com.xpn.xwiki.objects.classes.ListItem;
+import com.xpn.xwiki.objects.classes.PasswordClass;
+import com.xpn.xwiki.objects.classes.StaticListClass;
 
 /**
  * Holds all data but the content of a wiki page to be indexed. The content is retrieved at indexing time, which should
@@ -98,10 +98,8 @@ public class DocumentData extends IndexData
      */
     private void getObjectContentAsText(StringBuilder sb, XWikiDocument doc, XWikiContext context)
     {
-        LOG.info(doc.getFullName());
-
-        for (String className : doc.getxWikiObjects().keySet()) {
-            for (BaseObject obj : doc.getObjects(className)) {
+        for (List<BaseObject> objects : doc.getXObjects().values()) {
+            for (BaseObject obj : objects) {
                 extractObjectContent(sb, obj, context);
             }
         }
@@ -114,7 +112,7 @@ public class DocumentData extends IndexData
         baseProperty = (BaseProperty) baseObject.getField(property);
         // XXX Can baseProperty really be null?
         if (baseProperty != null && baseProperty.getValue() != null) {
-            PropertyInterface prop = baseObject.getxWikiClass(context).getField(property);
+            PropertyInterface prop = baseObject.getXClass(context).getField(property);
             if (!(prop instanceof PasswordClass)) {
                 contentText.append(baseProperty.getValue().toString());
             }
@@ -137,8 +135,8 @@ public class DocumentData extends IndexData
         XWikiContext context)
     {
         super.addDataToLuceneDocument(luceneDoc, doc, context);
-        for (String className : doc.getxWikiObjects().keySet()) {
-            for (BaseObject obj : doc.getObjects(className)) {
+        for (List<BaseObject> objects : doc.getXObjects().values()) {
+            for (BaseObject obj : objects) {
                 if (obj != null) {
                     luceneDoc.add(new Field(IndexFields.OBJECT, obj.getClassName(), Field.Store.YES,
                         Field.Index.ANALYZED));
@@ -154,7 +152,7 @@ public class DocumentData extends IndexData
     private void indexProperty(Document luceneDoc, BaseObject baseObject, String propertyName, XWikiContext context)
     {
         String fieldFullName = baseObject.getClassName() + "." + propertyName;
-        BaseClass bClass = baseObject.getxWikiClass(context);
+        BaseClass bClass = baseObject.getXClass(context);
         PropertyInterface prop = bClass.getField(propertyName);
 
         if (prop instanceof PasswordClass) {

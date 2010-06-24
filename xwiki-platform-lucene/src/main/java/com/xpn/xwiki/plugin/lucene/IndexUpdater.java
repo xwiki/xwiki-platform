@@ -266,7 +266,7 @@ public class IndexUpdater extends AbstractXWikiRunnable implements EventListener
         while (true) {
             try {
                 IndexWriter w =
-                        new IndexWriter(this.directory, this.analyzer, create, IndexWriter.MaxFieldLength.LIMITED);
+                    new IndexWriter(this.directory, this.analyzer, create, IndexWriter.MaxFieldLength.LIMITED);
                 w.setUseCompoundFile(true);
 
                 return w;
@@ -350,7 +350,7 @@ public class IndexUpdater extends AbstractXWikiRunnable implements EventListener
             try {
                 add(document, attachment, context);
             } catch (Exception e) {
-                LOG.error("error retrieving attachment of document " + document.getFullName(), e);
+                LOG.error("error retrieving attachment of document " + document, e);
             }
         }
 
@@ -392,11 +392,11 @@ public class IndexUpdater extends AbstractXWikiRunnable implements EventListener
             if (event instanceof ActionExecutionEvent) {
                 // Modified attachement
                 if (LOG.isDebugEnabled()) {
-                    LOG.debug("upload action notification for doc " + document.getName());
+                    LOG.debug("upload action notification for doc " + document);
                 }
 
                 // Retrieve the latest version (with the file just attached)
-                XWikiDocument basedoc = context.getWiki().getDocument(document.getFullName(), context);
+                XWikiDocument basedoc = context.getWiki().getDocument(document.getDocumentReference(), context);
                 List<XWikiAttachment> attachments = basedoc.getAttachmentList();
                 /*
                  * XXX Race condition: if two or more attachments are added before we find the "newest attachment"

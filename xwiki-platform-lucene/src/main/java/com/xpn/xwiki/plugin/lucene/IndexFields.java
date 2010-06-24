@@ -58,7 +58,7 @@ public abstract class IndexFields
      */
     @Deprecated
     public static final String DOCUMENT_WEB = "web";
-    
+
     /**
      * Name of the space the document belongs to
      */

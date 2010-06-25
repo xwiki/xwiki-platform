@@ -2338,7 +2338,7 @@ var $jsVarName = {
 #if(!$parameters.containsKey('hookId'))
 #set($ok = $parameters.put('hookId', $fieldId))
 #end
-#set($ok = $parameters.put('syntax', $editedDocument.syntaxId))
+#set($ok = $parameters.put('syntax', $editedDocument.syntax.toIdString()))
 #if($full)
 #set($ok = $parameters.put('displayTabs', 'true'))
 #set($ok = $parameters.put('defaultEditor', 'wysiwyg'))

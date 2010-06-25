@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<xwikidoc>
+<web>XWiki</web>
+<name>XWikiUserWatchListSheet</name>
+<language></language>
+<defaultLanguage>en</defaultLanguage>
+<translation>0</translation>
+<parent>XWiki.XWikiUserSheet</parent>
+<creator>XWiki.Admin</creator>
+<author>XWiki.Admin</author>
+<customClass></customClass>
+<contentAuthor>XWiki.Admin</contentAuthor>
+<creationDate>1264167993000</creationDate>
+<date>1264167993000</date>
+<contentUpdateDate>1264167993000</contentUpdateDate>
+<version>1.1</version>
+<title></title>
+<template></template>
+<defaultTemplate></defaultTemplate>
+<validationScript></validationScript>
+<comment></comment>
+<minorEdit>false</minorEdit>
+<syntaxId>xwiki/2.0</syntaxId>
+<hidden>false</hidden>
+<content>{{velocity}}
+#set($obj = $doc.getObject("XWiki.XWikiUsers"))
+#if(!$obj)
+= $msg.get('xe.admin.users.sheet') =
+
+{{info}}$msg.get('xe.admin.users.applyonusers'){{/info}}##
+#else
+{{html clean="false" wiki="true"}}
+$xwiki.ssx.use("XWiki.XWikiUserSheet")##
+$xwiki.ssx.use('Main.Dashboard')##
+&lt;div class="dashboard dashboard${context.action}"&gt;
+  &lt;div class="dashboardleft"&gt;
+    &lt;div class="watchlistManagement"&gt;
+      #if($context.action == 'view' &amp;&amp; $hasEdit)
+        &lt;div class="editProfileCategory"&gt;&lt;a href="$doc.getURL('inline', 'category=watchlist')"&gt;&lt;span class="hidden"&gt;$msg.get('platform.core.profile.category.watchlist.edit')&lt;/span&gt;&lt;/a&gt;&lt;/div&gt;
+      #end
+      &lt;h1&gt;$msg.get('platform.core.profile.section.watchlistManagement')&lt;/h1&gt;
+      &lt;dl&gt;
+        &lt;dt class="label"&gt;&lt;label&gt;$msg.get('platform.core.profile.watchlist.notifier')&lt;/label&gt;&lt;/dt&gt;
+        #set($notifiers = $xwiki.searchDocuments(", BaseObject obj where doc.fullName=obj.name and obj.className='XWiki.WatchListJobClass'"))
+        #set($currentNotifier = $doc.display('interval', 'view'))
+        &lt;dd&gt;
+          #if($context.action=='view')
+            #if("$!currentNotifier" != "")
+              $xwiki.getDocument($currentNotifier).getDisplayTitle()
+            #end
+          #else
+            &lt;select name="XWiki.WatchListClass_0_interval"&gt;
+              &lt;option value=""&gt;&amp;nbsp;&lt;/option&gt;
+              #foreach($notifier in $notifiers)
+                &lt;option value="$notifier"#if($notifier==$currentNotifier) selected="selected"#end&gt;$xwiki.getDocument($notifier).getDisplayTitle()&lt;/option&gt;
+              #end
+            &lt;/select&gt;
+          #end
+        &lt;/dd&gt;
+      &lt;/dl&gt;
+    &lt;/div&gt;
+  &lt;/div&gt;
+  &lt;div class="dashboardright"&gt;
+    #if ($context.action == 'view')
+      &lt;div class="watchlistRss"&gt;
+        &lt;h1&gt;$msg.get('watchlist.staytuned.rss')&lt;/h1&gt;
+        &lt;a id="watchlistRssLink" rel="_blank" href="$xwiki.getURL("XWiki.WatchListRss", "view", "xpage=plain&amp;amp;outputSyntax=plain")"&gt;$msg.get("watchlist.staytuned.rss.info")&lt;/a&gt;
+      &lt;/div&gt;
+    #end
+    #if ($context.action == 'view')
+      &lt;div class="watchlistElements"&gt;
+        &lt;h1&gt;$msg.get('platform.core.profile.section.watchlistElements')&lt;/h1&gt;
+        #set($collist = ["type", "wiki","space", "document"])
+        #set($colprops = { 
+                  "type": { "sortable":false },
+                  "wiki": { "sortable":false },
+                  "space": { "sortable":false },
+                  "document": { "sortable":false }})
+        #set($options = { "resultPage" : "XWiki.XWikiUserWatchListLiveTableResults",
+                  "rowCount": 10,
+                  "description": "This table lists all watched elements.",
+                  "translationPrefix": "watchlist.table.",
+                  "callback": "function (row, i, table) {
+                                  var tr = new Element('tr');
+                                  tr.insert(new Element('td').insert(new Element('span').addClassName(row.type + 'WatchlistType')));
+                                  tr.insert(new Element('td').insert(new Element('a', { href : row.wikiUrl}).update(row.wikiName)));
+                                  if (row.spaceUrl != '') {
+                                    tr.insert(new Element('td').insert(new Element('a', { href : row.spaceUrl}).update(row.spaceName)));
+                                  } else {
+                                    tr.insert(new Element('td').update(row.spaceName));
+                                  }
+                                  if (row.pageUrl != '') {
+                                    tr.insert(new Element('td').insert(new Element('a', { href : row.pageUrl}).update(row.pageName)));
+                                  } else {
+                                    tr.insert(new Element('td').update(row.pageName));
+                                  }
+                                  return tr;
+                               }" })
+          #livetable("mywatchlist" $collist $colprops $options)
+      &lt;/div&gt;
+    #end
+  &lt;/div&gt;
+  &lt;div class="dashboardspacer"&gt;&amp;nbsp;&lt;/div&gt;
+&lt;/div&gt;
+{{/html}}##
+#end
+{{/velocity}}</content></xwikidoc>

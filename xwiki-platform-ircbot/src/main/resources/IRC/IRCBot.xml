@@ -342,7 +342,7 @@ class IRCBot extends PircBot
                 }
                 doc.creator = "IRCBot"
                 // Ensure we're using the same syntax for the new doc as the template is using.
-                doc.syntaxId = archiveClassTemplate.syntaxId
+                doc.syntaxId = archiveClassTemplate.syntax.toIdString()
             } else {
                 throw new Exception("Document ${archiveClassName} doesn't exist in wiki ${context.database}")
             }

@@ -260,7 +260,7 @@
   #set($entryUrl = $entryDoc.getExternalURL('view', "language=${entryDoc.realLanguage}"))
   #getEntryObject($entryDoc $entryObj)
   #getEntryContent($entryDoc $entryObj true $entryContent)
-  #if($!entryDoc.syntaxId == 'xwiki/1.0')
+  #if($!entryDoc.syntax.toIdString() == 'xwiki/1.0')
     #set($desc = $entryContent)
   #else
     #set($desc = $entryDoc.getRenderedContent($entryContent, $entryDoc.getSyntax().toIdString()))

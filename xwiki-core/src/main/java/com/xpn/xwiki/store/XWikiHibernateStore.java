@@ -454,8 +454,12 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
             // Let's update the class XML since this is the new way to store it
             // TODO If all the properties are removed, the old xml stays?
             BaseClass bclass = doc.getXClass();
-            if ((bclass != null) && (bclass.getFieldList().size() > 0)) {
-                doc.setXClassXML(bclass.toXMLString());
+            if (bclass != null) {
+                if (bclass.getFieldList().size() > 0) {
+                    doc.setXClassXML(bclass.toXMLString());
+                } else {
+                    doc.setXClassXML("");
+                }
             }
 
             if (doc.hasElement(XWikiDocument.HAS_ATTACHMENTS)) {

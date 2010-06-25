@@ -8,7 +8,7 @@ $xwiki.jsfx.use('js/xwiki/actionbuttons/actionButtons.js', true)
 <div id="document-title"><h1>$tdoc.displayTitle</h1></div>
 #template("shortcuts.vm")
 <div id="xwikicontent">
-$tdoc.getRenderedContent($tdoc.content, $tdoc.getSyntaxId())
+$tdoc.getRenderedContent($tdoc.content, $tdoc.getSyntax().toIdString())
 </div> ## xwikicontent
 <div class="bottombuttons">#template("previewactions.vm")</div>
 </div> ## mainContentArea

@@ -453,7 +453,7 @@ $xwiki.jsx.use("XWiki.XWikiUserSheet")##
   #set($discard = $categories.add(['preferences', $msg.get('platform.core.profile.category.preferences'), 'XWiki.XWikiUserPreferencesSheet', 'icons/silk/wrench.gif']))
 #end
 ## TODO: add APIs to be able to display users watchlists to admins
-#if($isMyProfile)
+#if($isMyProfile &amp;&amp; $hasWatch)
   #set($discard = $categories.add(['watchlist', $msg.get('platform.core.profile.category.watchlist'), 'XWiki.XWikiUserWatchListSheet', 'icons/silk/star.gif']))
 #end
 ##

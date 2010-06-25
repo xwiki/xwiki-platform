@@ -11,7 +11,7 @@
 ## Note: The document name is not internally used to determine if a user has programming access level. We pass XWiki.XWikiPreferences for consistency with the call for global admin
 #set($hasProgramming = $xwiki.hasAccessLevel("programming", $context.user, "XWiki.XWikiPreferences"))
 #set($hasSpaceAdmin = $xwiki.hasAccessLevel("admin", $context.user, "${doc.space}.WebPreferences"))
-#set($hasWatch = $xwiki.watchlist && !$isGuest && !$isSuperAdmin)
+#set($hasWatch = $xwiki.watchlist && !$isGuest && !$isSuperAdmin && $xwiki.exists($services.model.serialize($services.model.createDocumentReference($context.wiki, 'XWiki', 'XWikiUserWatchListSheet'), 'local')))
 #set($isReadOnly = $xwiki.isReadOnly())
 #set($spaceViewUrl = $spaceDoc.getURL("view"))
 #set($viewUrl = $doc.getURL("view"))

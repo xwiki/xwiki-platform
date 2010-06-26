@@ -32,6 +32,7 @@
   <option name="KEEP_BLANK_LINES_IN_CODE" value="1" />
   <option name="KEEP_BLANK_LINES_BEFORE_RBRACE" value="0" />
   <option name="BLANK_LINES_AROUND_FIELD" value="1" />
+  <option name="SPACE_WITHIN_ARRAY_INITIALIZER_BRACES" value="true" />
   <option name="CLASS_COUNT_TO_USE_IMPORT_ON_DEMAND" value="99" />
   <option name="NAMES_COUNT_TO_USE_IMPORT_ON_DEMAND" value="99" />
   <option name="IMPORT_LAYOUT_TABLE">

@@ -19,7 +19,7 @@
  */
 package org.xwiki.query.xwql.internal.hql;
 
-import org.xwiki.query.jpql.JPQLParser;
+import org.xwiki.query.jpql.internal.JPQLParser;
 import org.xwiki.query.jpql.node.Start;
 import org.xwiki.query.xwql.internal.QueryAnalyzer;
 import org.xwiki.query.xwql.internal.QueryContext;

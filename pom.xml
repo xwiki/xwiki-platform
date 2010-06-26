@@ -192,6 +192,7 @@
                 <exclude>org/xwiki/rendering/macro/script/AbstractJSR223ScriptMacro</exclude>
                 <!-- Moved internal classes that should have been in the internal package to the internal package -->
                 <exclude>org/xwiki/query/xwql/**/*</exclude>
+                <exclude>org/xwiki/query/jpql/**/*</exclude>
               </excludes>
             </configuration>
           </plugin>

@@ -17,9 +17,10 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.query.jpql;
+package org.xwiki.query.jpql.internal;
 
 import junit.framework.TestCase;
+import org.xwiki.query.jpql.internal.JPQLParser;
 
 public class JPQLParserTest extends TestCase
 {

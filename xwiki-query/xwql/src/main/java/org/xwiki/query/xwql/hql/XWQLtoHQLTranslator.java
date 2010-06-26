@@ -21,7 +21,7 @@ package org.xwiki.query.xwql.hql;
 
 import org.xwiki.query.jpql.JPQLParser;
 import org.xwiki.query.jpql.node.Start;
-import org.xwiki.query.xwql.QueryAnalizer;
+import org.xwiki.query.xwql.QueryAnalyzer;
 import org.xwiki.query.xwql.QueryContext;
 import org.xwiki.query.xwql.QueryTranslator;
 import org.xwiki.query.Query;
@@ -50,7 +50,7 @@ public class XWQLtoHQLTranslator implements QueryTranslator
         Start tree = parser.parse(input);
         QueryContext context = new QueryContext(tree, getDocumentAccessBridge());
         // analize query and store info in context
-        tree.apply(new QueryAnalizer(context));
+        tree.apply(new QueryAnalyzer(context));
 
         Printer printer = getPrinter(context);
         return printer.print();

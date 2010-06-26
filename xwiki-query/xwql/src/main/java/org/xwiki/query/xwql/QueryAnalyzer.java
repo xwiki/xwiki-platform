@@ -29,9 +29,13 @@ import org.xwiki.query.jpql.node.AXObjectDecl;
 import org.xwiki.query.jpql.node.AXPath;
 import org.xwiki.query.xwql.QueryContext.ObjectInfo;
 
-public class QueryAnalizer extends DepthFirstAdapter
+/**
+ * @version $Id$
+ * @since 2.4M2
+ */
+public class QueryAnalyzer extends DepthFirstAdapter
 {
-    public QueryAnalizer(QueryContext context)
+    public QueryAnalyzer(QueryContext context)
     {
         this.context = context;
     }

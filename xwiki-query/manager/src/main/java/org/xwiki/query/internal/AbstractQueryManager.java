@@ -28,18 +28,18 @@ import org.xwiki.query.QueryManager;
 
 /**
  * Base QueryManager implementation.
- * 
+ *
  * @version $Id$
  * @since 2.0M1
  */
 public abstract class AbstractQueryManager implements QueryManager
 {
     /**
-     * @return the query executor manager to use. This allows extending classes to provide their version of it 
-     *         (for example using the Default manager or the Secure one or any other)
+     * @return the query executor manager to use. This allows extending classes to provide their version of it (for
+     *         example using the Default manager or the Secure one or any other)
      */
     protected abstract QueryExecutorManager getQueryExecutorManager();
- 
+
     /**
      * {@inheritDoc}
      */

@@ -25,7 +25,7 @@ import org.xwiki.query.QueryExecutorManager;
 
 /**
  * This is default QueryManager implementation.
- * 
+ *
  * @version $Id$
  * @since 1.6M1
  */

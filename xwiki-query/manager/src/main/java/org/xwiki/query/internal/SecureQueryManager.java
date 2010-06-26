@@ -27,8 +27,8 @@ import org.xwiki.query.QueryExecutorManager;
 
 /**
  * QueryManager implementation to use in scripts (uses a secure {@link org.xwiki.query.QueryExecutorManager} which
- * performs checks for rights). 
- * 
+ * performs checks for rights).
+ *
  * @version $Id$
  */
 @Component("secure")
@@ -59,5 +59,5 @@ public class SecureQueryManager extends AbstractQueryManager
     public Query xwql(String statement) throws QueryException
     {
         return createQuery(statement, Query.XWQL);
-    }    
+    }
 }

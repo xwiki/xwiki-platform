@@ -26,8 +26,8 @@ import org.xwiki.component.annotation.ComponentRole;
 /**
  * Execute a query for a given language (one implementation per language).
  *
- * @see Query
  * @version $Id$
+ * @see Query
  * @since 1.6M1
  */
 @ComponentRole

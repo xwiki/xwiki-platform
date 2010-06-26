@@ -29,12 +29,13 @@ import org.xwiki.query.QueryExecutor;
 
 /**
  * Stores all information needed for execute a query.
+ *
  * @version $Id$
  * @since 1.6M1
  */
 public class DefaultQuery implements Query
 {
-    /** 
+    /**
      * field for {@link Query#getStatement()}.
      */
     private String statement;
@@ -78,9 +79,10 @@ public class DefaultQuery implements Query
      * field for {@link #getExecuter()}.
      */
     private QueryExecutor executer;
-    
+
     /**
      * Create a Query.
+     *
      * @param statement query statement
      * @param language query language
      * @param executor QueryExecutor component for execute the query.
@@ -95,6 +97,7 @@ public class DefaultQuery implements Query
 
     /**
      * Create a named Query.
+     *
      * @param queryName name of the query.
      * @param executor QueryExecutor component for execute the query.
      */
@@ -158,7 +161,8 @@ public class DefaultQuery implements Query
     /**
      * {@inheritDoc}
      */
-    public Query bindValue(int index, Object val) {
+    public Query bindValue(int index, Object val)
+    {
         positionalParameters.put(index, val);
         return this;
     }
@@ -166,7 +170,8 @@ public class DefaultQuery implements Query
     /**
      * {@inheritDoc}
      */
-    public Query bindValues(List<Object> values) {
+    public Query bindValues(List<Object> values)
+    {
         for (int i = 0; i < values.size(); i++) {
             bindValue(i + 1, values.get(i));
         }
@@ -218,7 +223,8 @@ public class DefaultQuery implements Query
     /**
      * {@inheritDoc}
      */
-    public Map<Integer, Object> getPositionalParameters() {
+    public Map<Integer, Object> getPositionalParameters()
+    {
         return positionalParameters;
     }
 

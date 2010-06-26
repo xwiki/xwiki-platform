@@ -25,7 +25,6 @@ import org.xwiki.query.xwql.internal.QueryAnalyzer;
 import org.xwiki.query.xwql.internal.QueryContext;
 import org.xwiki.query.xwql.internal.QueryTranslator;
 import org.xwiki.query.Query;
-
 import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.Requirement;
@@ -41,7 +40,7 @@ public class XWQLtoHQLTranslator implements QueryTranslator
         input = input.trim();
         String lcInput = input.toLowerCase();
         String addition = "select doc.fullName from Document as doc ";
-        if (lcInput.startsWith("where") | lcInput.startsWith("order") || lcInput.length()==0) {
+        if (lcInput.startsWith("where") | lcInput.startsWith("order") || lcInput.length() == 0) {
             input = addition + input;
         } else if (lcInput.startsWith("from")) {
             input = addition + "," + input.substring(4);
@@ -66,7 +65,8 @@ public class XWQLtoHQLTranslator implements QueryTranslator
         return new Printer(context, this);
     }
 
-    public DocumentAccessBridge getDocumentAccessBridge() {
+    public DocumentAccessBridge getDocumentAccessBridge()
+    {
         return documentAccessBridge;
     }
 }

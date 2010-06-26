@@ -71,21 +71,27 @@ public class QueryContext
         return aliasGenerator;
     }
 
-    public class DocumentInfo {
+    public class DocumentInfo
+    {
         public String alias;
 
         /**
-         * Map from unnamed object's class name to description.
-         * unnamed object is object declaration in where clause: "where doc.object('Class').prop=1"
+         * Map from unnamed object's class name to description. unnamed object is object declaration in where clause:
+         * "where doc.object('Class').prop=1"
          */
         public Map<String, ObjectInfo> unnamedObjects = new HashMap<String, ObjectInfo>();
     }
 
-    public class ObjectInfo {
+    public class ObjectInfo
+    {
         public String docAlias;
+
         public String className;
+
         public String alias;
+
         public String customMappingAlias;
+
         /**
          * Properties appeared in query
          */
@@ -98,9 +104,10 @@ public class QueryContext
             this.alias = objAlias;
         }
 
-        public PropertyInfo addProperty(String propname, PPath location) {
+        public PropertyInfo addProperty(String propname, PPath location)
+        {
             PropertyInfo prop = properties.get(propname);
-            if (prop==null) {
+            if (prop == null) {
                 prop = new PropertyInfo(propname, this);
                 properties.put(propname, prop);
             }
@@ -108,7 +115,8 @@ public class QueryContext
             return prop;
         }
 
-        public boolean isCustomMapped() throws Exception {
+        public boolean isCustomMapped() throws Exception
+        {
             for (PropertyInfo p : properties.values()) {
                 if (p.isCustomMapped()) {
                     return true;
@@ -118,23 +126,29 @@ public class QueryContext
         }
     }
 
-    public class PropertyInfo {
+    public class PropertyInfo
+    {
         public ObjectInfo object;
+
         public String name;
+
         public String alias;
 
-        public PropertyInfo(String name, ObjectInfo object) {
+        public PropertyInfo(String name, ObjectInfo object)
+        {
             this.name = name;
             this.object = object;
         }
 
         public List<PPath> locations = new ArrayList<PPath>();
 
-        public String getType() throws Exception {
+        public String getType() throws Exception
+        {
             return documentAccessBridge.getPropertyType(object.className, name);
         }
 
-        public boolean isCustomMapped() throws Exception {
+        public boolean isCustomMapped() throws Exception
+        {
             return documentAccessBridge.isPropertyCustomMapped(object.className, name);
         }
 
@@ -156,7 +170,8 @@ public class QueryContext
      */
     private Map<PXObjectDecl, ObjectInfo> nodeToObject = new HashMap<PXObjectDecl, ObjectInfo>();
 
-    public ObjectInfo addObject(String docAlias, String className, String objAlias, PXObjectDecl node) {
+    public ObjectInfo addObject(String docAlias, String className, String objAlias, PXObjectDecl node)
+    {
         DocumentInfo di = getDocument(docAlias);
         if (di == null) {
             throw new InvalidQueryException("Can't find document alias [" + docAlias + "]");
@@ -171,9 +186,10 @@ public class QueryContext
         return res;
     }
 
-    public void addDocument(String alias) {
+    public void addDocument(String alias)
+    {
         if (documents.get(alias) != null && !"doc".equals(alias)) {
-            throw new InvalidQueryException("Redeclaration of document ["+alias+"]");
+            throw new InvalidQueryException("Redeclaration of document [" + alias + "]");
         }
         documents.put(alias, new DocumentInfo());
     }
@@ -188,7 +204,8 @@ public class QueryContext
         return objects.get(objAlias);
     }
 
-    public ObjectInfo getObject(PXObjectDecl node) {
+    public ObjectInfo getObject(PXObjectDecl node)
+    {
         return nodeToObject.get(node);
     }
 

@@ -23,8 +23,9 @@ import org.xwiki.query.xwql.internal.QueryContext.ObjectInfo;
 
 public class ObjectPrinter
 {
-    void print(ObjectInfo obj, Printer printer) throws Exception {
-        if (obj.alias==null) {
+    void print(ObjectInfo obj, Printer printer) throws Exception
+    {
+        if (obj.alias == null) {
             // unnamed object
             obj.alias = printer.getContext().getAliasGenerator().generate("_o");
             printer.from.append(", BaseObject as ").append(obj.alias);

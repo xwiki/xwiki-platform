@@ -22,18 +22,20 @@ package org.xwiki.query.xwql.internal.hql;
 import org.xwiki.query.xwql.internal.QueryContext;
 import org.xwiki.query.xwql.internal.QueryContext.ObjectInfo;
 import org.xwiki.query.xwql.internal.QueryContext.PropertyInfo;
-
 import org.xwiki.bridge.DocumentAccessBridge;
 
 public class Printer
 {
     QueryContext context;
+
     XWQLtoHQLTranslator parent;
 
     ObjectPrinter objectPrinter = new ObjectPrinter();
+
     PropertyPrinter propertyPrinter = new PropertyPrinter();
 
     StringBuilder from = new StringBuilder();
+
     StringBuilder where = new StringBuilder();
 
     public Printer(QueryContext context, XWQLtoHQLTranslator parent)
@@ -62,7 +64,8 @@ public class Printer
         return propertyPrinter;
     }
 
-    String print() throws Exception {
+    String print() throws Exception
+    {
         for (ObjectInfo obj : context.getObjects()) {
             getObjectPrinter().print(obj, this);
             for (PropertyInfo prop : obj.properties.values()) {

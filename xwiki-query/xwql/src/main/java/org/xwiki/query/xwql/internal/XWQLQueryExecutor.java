@@ -64,8 +64,9 @@ public class XWQLQueryExecutor implements QueryExecutor
             }
             return nativeQuery.execute();
         } catch (Exception e) {
-            if (e instanceof QueryException)
-                throw (QueryException)e;
+            if (e instanceof QueryException) {
+                throw (QueryException) e;
+            }
             throw new QueryException("Exception while translating [" + query.getStatement() + "] XWQL query to the ["
                 + translator.getOutputLanguage() + "] language", query, e);
         }

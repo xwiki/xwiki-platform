@@ -31,12 +31,13 @@ import org.xwiki.query.QueryExecutorManager;
 
 /**
  * {@link QueryExecutorManager} with access rights checking.
+ *
  * @version $Id$
  */
 //Note that we force the Component annotation so that this component is only registered as a QueryExecutorManager
 //and not a QueryExecutor too since we don't want this manager to be visible to users as a valid QueryExecutor
 //component.
-@Component(value = "secure", roles = { QueryExecutorManager.class })
+@Component(value = "secure", roles = {QueryExecutorManager.class})
 public class SecureQueryExecutorManager implements QueryExecutorManager
 {
     /**

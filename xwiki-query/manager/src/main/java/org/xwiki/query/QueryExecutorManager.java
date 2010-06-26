@@ -29,8 +29,8 @@ import org.xwiki.component.annotation.ComponentRole;
  * <p>For implementers, Language support is added by using the {@link org.xwiki.query.QueryExecutor} for the given
  * language to support.</p>
  *
- * @see QueryExecutor
  * @version $Id$
+ * @see QueryExecutor
  */
 @ComponentRole
 public interface QueryExecutorManager extends QueryExecutor

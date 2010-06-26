@@ -24,11 +24,11 @@ import java.util.Map;
 
 /**
  * This is a Query interface, representing all queries in various languages for various stores.
- * 
+ *
  * <p>Note that it was modeled after the JCR Query interface.</p>
  *
  * @version $Id$
- * @since 1.6M1   
+ * @since 1.6M1
  */
 public interface Query
 {
@@ -36,12 +36,10 @@ public interface Query
      * Indicator for Hibernate Query Language.
      */
     String HQL = "hql";
-
     /**
      * Indicator for XPath language.
      */
     String XPATH = "xpath";
-
     /**
      * Indicator for XWiki Query Language.
      */
@@ -59,6 +57,7 @@ public interface Query
 
     /**
      * if the query is named, then {@link #getStatement()} returns a name of the query, else - a query statement.
+     *
      * @return is the query named.
      */
     boolean isNamed();
@@ -77,6 +76,7 @@ public interface Query
 
     /**
      * Bind named parameter var with value val in query statement.
+     *
      * @param var variable in query statement (:var).
      * @param val value of the variable.
      * @return this query.
@@ -84,18 +84,20 @@ public interface Query
     Query bindValue(String var, Object val);
 
     /**
-     * Bind positional parameter (?index in JPQL) with value val in query statement.
-     * It is recommended to use named parameters if it acceptable. see {@link #bindValue(String, Object)}
-     * @param index index of positional parameter. Index starting number is depends on store system.
-     *  According JPQL standard index should start from 1.
+     * Bind positional parameter (?index in JPQL) with value val in query statement. It is recommended to use named
+     * parameters if it acceptable. see {@link #bindValue(String, Object)}
+     *
+     * @param index index of positional parameter. Index starting number is depends on store system. According JPQL
+     * standard index should start from 1.
      * @param val value of the variable.
      * @return this query.
      */
     Query bindValue(int index, Object val);
 
     /**
-     * Bind list of positional parameters values.
-     * values[i] became  i+1 positional parameter according JPQL. So it works only for "?index" parameters.
+     * Bind list of positional parameters values. values[i] became  i+1 positional parameter according JPQL. So it works
+     * only for "?index" parameters.
+     *
      * @param values list of positional parameters values.
      * @return this query.
      * @see #bindValue(int, Object)

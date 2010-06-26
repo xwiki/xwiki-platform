@@ -65,7 +65,7 @@ public class QueryAnalyzer extends DepthFirstAdapter
     public void caseAXObjectDecl(AXObjectDecl node)
     {
         String path[] = splitPath(node.getId().toString());
-        if (path.length!=2) {
+        if (path.length != 2) {
             throw new InvalidQueryException("docalias.object('classname') expected, but got:" + node.toString());
         }
         String docalias = path[0];
@@ -81,7 +81,7 @@ public class QueryAnalyzer extends DepthFirstAdapter
         if ("object".equals(method)) {
             context.addObject(docalias, className, alias, node);
         } else {
-            throw new InvalidQueryException("document's method + ["+method+"] is unsupported");
+            throw new InvalidQueryException("document's method + [" + method + "] is unsupported");
         }
     }
 
@@ -90,7 +90,7 @@ public class QueryAnalyzer extends DepthFirstAdapter
     {
         String path[] = splitPath(node.toString());
         QueryContext.ObjectInfo obj = context.getObject(path[0]);
-        if (path.length>=2 && obj!=null) {
+        if (path.length >= 2 && obj != null) {
             obj.addProperty(path[1], node);
         }
     }
@@ -108,13 +108,14 @@ public class QueryAnalyzer extends DepthFirstAdapter
     {
         return StringUtils.split(str.trim(), ".");
     }
-    
+
     public static String unquote(String str)
     {
         str = str.trim();
         if (str.startsWith("'") && str.endsWith("'")
-            || str.startsWith("\"") && str.endsWith("\"")) {
-            str = str.substring(1, str.length()-1);
+            || str.startsWith("\"") && str.endsWith("\""))
+        {
+            str = str.substring(1, str.length() - 1);
         }
         return str;
     }

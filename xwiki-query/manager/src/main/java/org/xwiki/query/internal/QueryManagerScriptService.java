@@ -75,6 +75,6 @@ public class QueryManagerScriptService implements ScriptService
      */
     public Query createQuery(String statement, String language) throws QueryException
     {
-        return this.secureQueryManager.createQuery(statement, language);        
+        return this.secureQueryManager.createQuery(statement, language);
     }
 }

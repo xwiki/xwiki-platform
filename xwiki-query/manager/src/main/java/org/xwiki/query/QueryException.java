@@ -21,6 +21,7 @@ package org.xwiki.query;
 
 /**
  * Encapsulate a error while processing or executing a query.
+ *
  * @version $Id$
  * @since 1.6M1
  */

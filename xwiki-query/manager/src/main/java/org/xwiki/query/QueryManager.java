@@ -25,21 +25,23 @@ import org.xwiki.component.annotation.ComponentRole;
 
 /**
  * This interface encapsulates methods for the management of search queries.
- * @see javax.jcr.query.QueryManager
+ *
  * @version $Id$
+ * @see javax.jcr.query.QueryManager
  * @since 1.6M1
  */
 @ComponentRole
 public interface QueryManager
 {
     /**
-     * Create query for given statement and language.
-     * Use createQuery("statement", Query.LANGUAGE).
-     * For example: createQuery("select doc.name from XWikiDocument doc", Query.HQL).
+     * Create query for given statement and language. Use createQuery("statement", Query.LANGUAGE). For example:
+     * createQuery("select doc.name from XWikiDocument doc", Query.HQL).
+     *
      * @param statement query statement.
-     * @param language language of the query. Must be one of {@link #getLanguages()}. Use {@link Query}.LANGUAGE for indication.
+     * @param language language of the query. Must be one of {@link #getLanguages()}. Use {@link Query}.LANGUAGE for
+     * indication.
      * @return a Query object.
-     * @throws QueryException if language is not supported 
+     * @throws QueryException if language is not supported
      */
     Query createQuery(String statement, String language) throws QueryException;
 

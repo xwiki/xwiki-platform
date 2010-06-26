@@ -27,7 +27,8 @@ import org.xwiki.query.xwql.internal.QueryContext.PropertyInfo;
 
 public class PropertyPrinter
 {
-    void print(PropertyInfo prop, Printer printer) throws Exception {
+    void print(PropertyInfo prop, Printer printer) throws Exception
+    {
         if (prop.isCustomMapped()) {
             // just replace object alias to customMappingAlias
             for (PPath p : prop.locations) {
@@ -39,7 +40,7 @@ public class PropertyPrinter
             if (className != null) {
                 prop.alias = printer.getContext().getAliasGenerator().generate(prop.object.alias + "_" + prop.name);
                 printer.from.append(", ")
-                    .append(className).append( " as ").append(prop.alias);
+                    .append(className).append(" as ").append(prop.alias);
                 printer.where.append(" and ")
                     .append(prop.alias).append(".id.id=").append(prop.object.alias).append(".id").append(" and ")
                     .append(prop.alias).append(".id.name").append("='").append(prop.name).append("'");
@@ -47,7 +48,7 @@ public class PropertyPrinter
                 for (PPath p : prop.locations) {
                     String s = prop.alias + "." + prop.getValueField();
                     if (className.endsWith("DBStringListProperty") && p.parent() instanceof PSelectExpression) {
-                        s = "elements("+s+")";
+                        s = "elements(" + s + ")";
                     }
                     p.replaceBy(new APath(new TId(s)));
                 }

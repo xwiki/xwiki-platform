@@ -19,6 +19,7 @@ import org.xwiki.query.QueryExecutorManager;
 
 /**
  * Tests for {@link SecureQueryExecutorManager}
+ *
  * @version $Id$
  */
 @RunWith(JMock.class)
@@ -28,7 +29,8 @@ public class SecureQueryExecutorManagerTest
 
     DocumentAccessBridge dab = context.mock(DocumentAccessBridge.class);
 
-    SecureQueryExecutorManager qem = new SecureQueryExecutorManager() {
+    SecureQueryExecutorManager qem = new SecureQueryExecutorManager()
+    {
         @Override
         protected DocumentAccessBridge getBridge()
         {
@@ -38,11 +40,13 @@ public class SecureQueryExecutorManagerTest
         @Override
         protected QueryExecutorManager getNestedQueryExecutorManager()
         {
-            return new QueryExecutorManager() {
+            return new QueryExecutorManager()
+            {
                 public Set<String> getLanguages()
                 {
                     return Collections.emptySet();
                 }
+
                 public <T> List<T> execute(Query query) throws QueryException
                 {
                     return Collections.emptyList();
@@ -64,10 +68,11 @@ public class SecureQueryExecutorManagerTest
     @Test
     public void testWithProgrammingRight() throws QueryException
     {
-        context.checking(new Expectations() {{
-            allowing(dab).hasProgrammingRights();
-            will(returnValue(true));
-        }});
+        context.checking(new Expectations()
+        {{
+                allowing(dab).hasProgrammingRights();
+                will(returnValue(true));
+            }});
         // all queries allowed
         createQuery("where doc.space='Main'", "xwql").execute();
         createQuery("from doc.objects(XWiki.XWikiUsers) as u", "xwql").execute();
@@ -80,27 +85,33 @@ public class SecureQueryExecutorManagerTest
     @Test
     public void testWithoutProgrammingRight() throws QueryException
     {
-        context.checking(new Expectations() {{
-            allowing(dab).hasProgrammingRights();
-            will(returnValue(false));
-        }});
+        context.checking(new Expectations()
+        {{
+                allowing(dab).hasProgrammingRights();
+                will(returnValue(false));
+            }});
         createQuery("where doc.space='WebHome'", "xwql").execute(); // OK
         createQuery("from doc.objects(XWiki.XWikiUsers) as u", "xwql").execute(); // OK
         try {
             createQuery("select u from Document as doc, doc.objects(XWiki.XWikiUsers) as u", "xwql").execute();
             fail("full form xwql should not allowed");
-        } catch (QueryException e) {}
+        } catch (QueryException e) {
+        }
         try {
             createQuery("some hql query", "hql").execute();
             fail("hql should not allowed");
-        } catch (QueryException e) {}
+        } catch (QueryException e) {
+        }
         try {
             createQuery("where doc.space='Main'", "xwql").setWiki("somewiki").execute();
             fail("Query#setWiki should not allowed");
-        } catch (QueryException e) {}
+        } catch (QueryException e) {
+        }
         try {
             createNamedQuery("somename").execute();
             fail("named queries should not allowed");
-        } catch (QueryException e) {};
+        } catch (QueryException e) {
+        }
+        ;
     }
 }

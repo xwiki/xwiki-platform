@@ -39,7 +39,8 @@ public class TreePrinter extends DepthFirstAdapter
         return printer;
     }
 
-    protected QueryContext getContext() {
+    protected QueryContext getContext()
+    {
         return getPrinter().context;
     }
 
@@ -62,20 +63,20 @@ public class TreePrinter extends DepthFirstAdapter
     @Override
     public void inASelectStatement(ASelectStatement node)
     {
-        super.inASelectStatement(node);        
-        if (node.getWhereClause()==null) {
+        super.inASelectStatement(node);
+        if (node.getWhereClause() == null) {
             // needed for #outAWhereClause
             node.setWhereClause(new AWhereClause());
-        } else if (printer.where.length()>0){
+        } else if (printer.where.length() > 0) {
             AWhereClause where = (AWhereClause) node.getWhereClause();
             // where := ( where )
             where.setConditionalExpression(
                 new ASingleConditionalExpression(
                     new ASingleConditionalTerm(
                         new AConditionalFactor(null,
-                            new ABrConditionalPrimary(new TLbr(), 
+                            new ABrConditionalPrimary(new TLbr(),
                                 where.getConditionalExpression(),
-                                new TRbr() )))));
+                                new TRbr())))));
         }
     }
 
@@ -98,16 +99,16 @@ public class TreePrinter extends DepthFirstAdapter
     public void outAFromClause(AFromClause node)
     {
         String from = getPrinter().from.toString();
-        if (from.length()>0) {
-            builder.append(' ').append( from );
+        if (from.length() > 0) {
+            builder.append(' ').append(from);
         }
     }
 
     @Override
     public void outAWhereClause(AWhereClause node)
     {
-        if (getPrinter().where.length()>0) {
-            if (node.getWhere()==null) {
+        if (getPrinter().where.length() > 0) {
+            if (node.getWhere() == null) {
                 builder.append(" WHERE 1=1 ");
             }
             builder.append(getPrinter().where.toString());

@@ -190,6 +190,8 @@
                 <exclude>org/xwiki/velocity/VelocityEngine</exclude>
                 <exclude>org/xwiki/rendering/macro/script/AbstractScriptMacro</exclude>
                 <exclude>org/xwiki/rendering/macro/script/AbstractJSR223ScriptMacro</exclude>
+                <!-- Moved internal classes that should have been in the internal package to the internal package -->
+                <exclude>org/xwiki/query/xwql/**/*</exclude>
               </excludes>
             </configuration>
           </plugin>

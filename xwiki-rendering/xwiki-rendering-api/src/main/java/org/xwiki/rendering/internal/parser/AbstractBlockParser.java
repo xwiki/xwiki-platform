@@ -21,6 +21,9 @@ package org.xwiki.rendering.internal.parser;
 
 import java.io.Reader;
 
+import org.xwiki.component.annotation.Requirement;
+import org.xwiki.component.manager.ComponentLookupException;
+import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.rendering.block.XDOM;
 import org.xwiki.rendering.parser.ParseException;
 import org.xwiki.rendering.parser.Parser;
@@ -35,9 +38,25 @@ import org.xwiki.rendering.parser.StreamParser;
 public abstract class AbstractBlockParser implements Parser
 {
     /**
+     * Used to lookup the {@link StreamParser} for the syntax.
+     */
+    @Requirement
+    private ComponentManager componentManager;
+
+    /**
      * @return the {@link StreamParser} to use to parser the input content
      */
-    protected abstract StreamParser getStreamParser();
+    protected StreamParser getStreamParser()
+    {
+        StreamParser streamParser;
+        try {
+            streamParser = this.componentManager.lookup(StreamParser.class, getSyntax().toIdString());
+        } catch (ComponentLookupException e) {
+            throw new RuntimeException("Failed to create [" + getSyntax().toString() + "] renderer", e);
+        }
+
+        return streamParser;
+    }
 
     /**
      * {@inheritDoc}

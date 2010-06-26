@@ -20,8 +20,6 @@
 package org.xwiki.rendering.internal.parser;
 
 import org.xwiki.component.annotation.Component;
-import org.xwiki.component.annotation.Requirement;
-import org.xwiki.rendering.parser.StreamParser;
 import org.xwiki.rendering.syntax.Syntax;
 
 /**
@@ -34,12 +32,6 @@ import org.xwiki.rendering.syntax.Syntax;
 public class PlainTextBlockParser extends AbstractBlockParser
 {
     /**
-     * The stream based parser.
-     */
-    @Requirement("plain/1.0")
-    private StreamParser plainStreamParser;
-
-    /**
      * {@inheritDoc}
      * 
      * @see org.xwiki.rendering.parser.Parser#getSyntax()
@@ -47,16 +39,5 @@ public class PlainTextBlockParser extends AbstractBlockParser
     public Syntax getSyntax()
     {
         return Syntax.PLAIN_1_0;
-    }
-
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.rendering.internal.parser.AbstractBlockParser#getStreamParser()
-     */
-    @Override
-    protected StreamParser getStreamParser()
-    {
-        return plainStreamParser;
     }
 }

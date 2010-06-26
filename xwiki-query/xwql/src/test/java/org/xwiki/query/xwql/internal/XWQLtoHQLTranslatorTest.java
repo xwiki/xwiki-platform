@@ -17,7 +17,7 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.query.xwql;
+package org.xwiki.query.xwql.internal;
 
 import static org.junit.Assert.fail;
 
@@ -30,7 +30,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.xwiki.bridge.DocumentAccessBridge;
-import org.xwiki.query.xwql.hql.XWQLtoHQLTranslator;
+import org.xwiki.query.xwql.internal.hql.XWQLtoHQLTranslator;
 
 @RunWith(JMock.class)
 public class XWQLtoHQLTranslatorTest

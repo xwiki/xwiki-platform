@@ -17,7 +17,7 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.query.xwql;
+package org.xwiki.query.xwql.internal;
 
 import org.apache.commons.lang.StringUtils;
 import org.xwiki.query.jpql.analysis.DepthFirstAdapter;
@@ -27,7 +27,6 @@ import org.xwiki.query.jpql.node.ARangeVariableDeclaration;
 import org.xwiki.query.jpql.node.ASelectStatement;
 import org.xwiki.query.jpql.node.AXObjectDecl;
 import org.xwiki.query.jpql.node.AXPath;
-import org.xwiki.query.xwql.QueryContext.ObjectInfo;
 
 /**
  * @version $Id$
@@ -90,7 +89,7 @@ public class QueryAnalyzer extends DepthFirstAdapter
     public void caseAPath(APath node)
     {
         String path[] = splitPath(node.toString());
-        ObjectInfo obj = context.getObject(path[0]);
+        QueryContext.ObjectInfo obj = context.getObject(path[0]);
         if (path.length>=2 && obj!=null) {
             obj.addProperty(path[1], node);
         }
@@ -99,7 +98,7 @@ public class QueryAnalyzer extends DepthFirstAdapter
     @Override
     public void outAXPath(AXPath node)
     {
-        ObjectInfo obj = context.getObject(node.getXObjectDecl());
+        QueryContext.ObjectInfo obj = context.getObject(node.getXObjectDecl());
         String path[] = splitPath(node.getProperty().toString());
         obj.addProperty(path[0], node);
         super.outAXPath(node);

@@ -17,11 +17,11 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.query.xwql.hql;
+package org.xwiki.query.xwql.internal.hql;
 
-import org.xwiki.query.xwql.QueryContext;
-import org.xwiki.query.xwql.QueryContext.ObjectInfo;
-import org.xwiki.query.xwql.QueryContext.PropertyInfo;
+import org.xwiki.query.xwql.internal.QueryContext;
+import org.xwiki.query.xwql.internal.QueryContext.ObjectInfo;
+import org.xwiki.query.xwql.internal.QueryContext.PropertyInfo;
 
 import org.xwiki.bridge.DocumentAccessBridge;
 

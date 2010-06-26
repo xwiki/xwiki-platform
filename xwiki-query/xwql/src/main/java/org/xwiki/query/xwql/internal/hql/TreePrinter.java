@@ -17,11 +17,11 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.query.xwql.hql;
+package org.xwiki.query.xwql.internal.hql;
 
 import org.xwiki.query.jpql.analysis.DepthFirstAdapter;
 import org.xwiki.query.jpql.node.*;
-import org.xwiki.query.xwql.QueryContext;
+import org.xwiki.query.xwql.internal.QueryContext;
 
 public class TreePrinter extends DepthFirstAdapter
 {

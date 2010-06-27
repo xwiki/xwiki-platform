@@ -86,21 +86,32 @@ public class SecureQueryExecutorManagerTest extends AbstractMockingComponentTest
 
         createQuery("where doc.space='WebHome'", "xwql").execute(); // OK
         createQuery("from doc.objects(XWiki.XWikiUsers) as u", "xwql").execute(); // OK
+
         try {
             createQuery("select u from Document as doc, doc.objects(XWiki.XWikiUsers) as u", "xwql").execute();
             fail("full form xwql should not allowed");
         } catch (QueryException expected) {
         }
+
+        // Make sure leading spaces are ignored when looking for a full form query
+        try {
+            createQuery(" select u from Document as doc", "xwql").execute();
+            fail("full form xwql should not allowed");
+        } catch (QueryException expected) {
+        }
+
         try {
             createQuery("some hql query", "hql").execute();
             fail("hql should not allowed");
         } catch (QueryException expected) {
         }
+
         try {
             createQuery("where doc.space='Main'", "xwql").setWiki("somewiki").execute();
             fail("Query#setWiki should not allowed");
         } catch (QueryException expected) {
         }
+
         try {
             createNamedQuery("somename").execute();
             fail("named queries should not allowed");

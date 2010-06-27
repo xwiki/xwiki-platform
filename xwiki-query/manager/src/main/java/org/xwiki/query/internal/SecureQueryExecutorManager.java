@@ -63,6 +63,7 @@ public class SecureQueryExecutorManager implements QueryExecutorManager
         if (query.isNamed() && !getBridge().hasProgrammingRights()) {
             throw new QueryException("Named queries requires programming right", query, null);
         }
+        // TODO: Make it possible to use HQL without programming rights for non-full statements.
         if (!Query.XWQL.equals(query.getLanguage()) && !getBridge().hasProgrammingRights()) {
             throw new QueryException("Query languages others than XWQL require programming right", query, null);
         }

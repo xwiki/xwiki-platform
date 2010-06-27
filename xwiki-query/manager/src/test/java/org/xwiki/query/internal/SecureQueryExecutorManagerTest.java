@@ -1,79 +1,73 @@
+/*
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+ */
 package org.xwiki.query.internal;
 
 import static org.junit.Assert.fail;
 
-import java.util.Collections;
-import java.util.List;
-import java.util.Set;
-
 import org.jmock.Expectations;
-import org.jmock.Mockery;
-import org.jmock.integration.junit4.JMock;
-import org.jmock.integration.junit4.JUnit4Mockery;
+import org.junit.Before;
 import org.junit.Test;
-import org.junit.runner.RunWith;
 import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.query.Query;
 import org.xwiki.query.QueryException;
 import org.xwiki.query.QueryExecutorManager;
+import org.xwiki.test.AbstractMockingComponentTest;
+import org.xwiki.test.annotation.ComponentTest;
 
 /**
  * Tests for {@link SecureQueryExecutorManager}
  *
  * @version $Id$
  */
-@RunWith(JMock.class)
-public class SecureQueryExecutorManagerTest
+@ComponentTest(SecureQueryExecutorManager.class)
+public class SecureQueryExecutorManagerTest extends AbstractMockingComponentTest
 {
-    Mockery context = new JUnit4Mockery();
+    private QueryExecutorManager qem;
 
-    DocumentAccessBridge dab = context.mock(DocumentAccessBridge.class);
+    private DocumentAccessBridge dab;
 
-    SecureQueryExecutorManager qem = new SecureQueryExecutorManager()
+    @Before
+    public void setUp() throws Exception
     {
-        @Override
-        protected DocumentAccessBridge getBridge()
-        {
-            return dab;
-        }
+        super.setUp();
 
-        @Override
-        protected QueryExecutorManager getNestedQueryExecutorManager()
-        {
-            return new QueryExecutorManager()
-            {
-                public Set<String> getLanguages()
-                {
-                    return Collections.emptySet();
-                }
+        this.qem = getComponentManager().lookup(QueryExecutorManager.class, "secure");
 
-                public <T> List<T> execute(Query query) throws QueryException
-                {
-                    return Collections.emptyList();
-                }
-            };
-        }
-    };
+        final QueryExecutorManager nestedQueryExecutorManager =
+            getComponentManager().lookup(QueryExecutorManager.class);
+        getMockery().checking(new Expectations() {{
+            allowing(nestedQueryExecutorManager).execute(with(any(Query.class)));
+        }});
 
-    private Query createQuery(String stmt, String lang)
-    {
-        return new DefaultQuery(stmt, lang, qem);
-    }
-
-    private Query createNamedQuery(String name)
-    {
-        return new DefaultQuery(name, qem);
+        this.dab = getComponentManager().lookup(DocumentAccessBridge.class);
     }
 
     @Test
     public void testWithProgrammingRight() throws QueryException
     {
-        context.checking(new Expectations()
-        {{
-                allowing(dab).hasProgrammingRights();
+        getMockery().checking(new Expectations() {{
+            allowing(dab).hasProgrammingRights();
                 will(returnValue(true));
-            }});
-        // all queries allowed
+        }});
+
+        // All queries allowed
         createQuery("where doc.space='Main'", "xwql").execute();
         createQuery("from doc.objects(XWiki.XWikiUsers) as u", "xwql").execute();
         createQuery("select u from Document as doc, doc.objects(XWiki.XWikiUsers) as u", "xwql").execute();
@@ -85,33 +79,42 @@ public class SecureQueryExecutorManagerTest
     @Test
     public void testWithoutProgrammingRight() throws QueryException
     {
-        context.checking(new Expectations()
-        {{
-                allowing(dab).hasProgrammingRights();
+        getMockery().checking(new Expectations() {{
+            allowing(dab).hasProgrammingRights();
                 will(returnValue(false));
-            }});
+        }});
+
         createQuery("where doc.space='WebHome'", "xwql").execute(); // OK
         createQuery("from doc.objects(XWiki.XWikiUsers) as u", "xwql").execute(); // OK
         try {
             createQuery("select u from Document as doc, doc.objects(XWiki.XWikiUsers) as u", "xwql").execute();
             fail("full form xwql should not allowed");
-        } catch (QueryException e) {
+        } catch (QueryException expected) {
         }
         try {
             createQuery("some hql query", "hql").execute();
             fail("hql should not allowed");
-        } catch (QueryException e) {
+        } catch (QueryException expected) {
         }
         try {
             createQuery("where doc.space='Main'", "xwql").setWiki("somewiki").execute();
             fail("Query#setWiki should not allowed");
-        } catch (QueryException e) {
+        } catch (QueryException expected) {
         }
         try {
             createNamedQuery("somename").execute();
             fail("named queries should not allowed");
-        } catch (QueryException e) {
+        } catch (QueryException expected) {
         }
-        ;
+    }
+
+    private Query createQuery(String stmt, String lang)
+    {
+        return new DefaultQuery(stmt, lang, this.qem);
+    }
+
+    private Query createNamedQuery(String name)
+    {
+        return new DefaultQuery(name, this.qem);
     }
 }

@@ -1,5 +1,4 @@
 <?xml version="1.0" encoding="UTF-8"?>
-
 <xwikidoc>
 <web>XWiki</web>
 <name>AdminRegistrationSheet</name>
@@ -27,4 +26,5 @@
 #set($params = $util.hashMap)
 #set($params.registration = ['use_email_verification', 'auth_active_check', 'validation_email_content', 'confirmation_email_content', 'invitation_email_content'])
 #includeForm('XWiki.AdminFieldsDisplaySheet')
-</content></xwikidoc>
+</content>
+</xwikidoc>

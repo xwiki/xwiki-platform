@@ -126,4 +126,5 @@
  &lt;div id="xwikieditcontent"&gt;
   &lt;p&gt;$xwiki.parseMessage("editgroupsredirect")&lt;/p&gt;
  &lt;/div&gt;
-#end</content></xwikidoc>
+#end</content>
+</xwikidoc>

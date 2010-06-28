@@ -1,5 +1,4 @@
 <?xml version="1.0" encoding="UTF-8"?>
-
 <xwikidoc>
 <web>XWiki</web>
 <name>XWikiUserProfileSheet</name>
@@ -111,4 +110,5 @@ $xwiki.ssx.use('Main.Dashboard')##
 #end
 {{/html}}##
 #end
-{{/velocity}}</content></xwikidoc>
+{{/velocity}}</content>
+</xwikidoc>

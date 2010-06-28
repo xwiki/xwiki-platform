@@ -1,5 +1,4 @@
 <?xml version="1.0" encoding="UTF-8"?>
-
 <xwikidoc>
 <web>XWiki</web>
 <name>ForgotUsername</name>
@@ -274,4 +273,5 @@ $msg.get("xe.admin.passwordreset.enteremail")
     &lt;a href="$xwiki.getURL("XWiki.XWikiLogin", "login", "")"&gt;$msg.get("xe.admin.passwordreset.login") &amp;raquo;&lt;/a&gt;
   #end
 #end
-</content></xwikidoc>
+</content>
+</xwikidoc>

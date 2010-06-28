@@ -21,6 +21,7 @@ package org.xwiki.rendering.internal.parser.wikimodel;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -65,6 +66,27 @@ public class XWikiGeneratorListener implements IWemListener
      * Identifier of the extension used to generate id blocks.
      */
     public static final String EXT_ID = "xwiki_id";
+
+    private static final Map<WikiStyle, Format> STYLES_CONVERTER = new HashMap<WikiStyle, Format>();
+
+    static {
+        STYLES_CONVERTER.put(IWemConstants.CODE, Format.MONOSPACE);
+        STYLES_CONVERTER.put(IWemConstants.EM, Format.ITALIC);
+        STYLES_CONVERTER.put(IWemConstants.DEL, Format.STRIKEDOUT);
+        STYLES_CONVERTER.put(IWemConstants.INS, Format.UNDERLINED);
+        STYLES_CONVERTER.put(IWemConstants.MONO, Format.MONOSPACE);
+        STYLES_CONVERTER.put(IWemConstants.STRIKE, Format.STRIKEDOUT);
+        STYLES_CONVERTER.put(IWemConstants.STRONG, Format.BOLD);
+        STYLES_CONVERTER.put(IWemConstants.SUB, Format.SUBSCRIPT);
+        STYLES_CONVERTER.put(IWemConstants.SUP, Format.SUPERSCRIPT);
+        STYLES_CONVERTER.put(IWemConstants.TT, Format.MONOSPACE);
+
+        // TODO: what is the best conversion for theses ?
+        STYLES_CONVERTER.put(IWemConstants.BIG, Format.NONE);
+        STYLES_CONVERTER.put(IWemConstants.CITE, Format.NONE);
+        STYLES_CONVERTER.put(IWemConstants.REF, Format.NONE);
+        STYLES_CONVERTER.put(IWemConstants.SMALL, Format.NONE);
+    }
 
     /**
      * Listener(s) for the generated XWiki Events. Organized as a stack so that a buffering listener can hijack all
@@ -161,23 +183,9 @@ public class XWikiGeneratorListener implements IWemListener
 
     private Format convertFormat(WikiStyle style)
     {
-        Format result;
+        Format result = STYLES_CONVERTER.get(style);
 
-        if (style == IWemConstants.STRONG) {
-            result = Format.BOLD;
-        } else if (style == IWemConstants.EM) {
-            result = Format.ITALIC;
-        } else if (style == IWemConstants.STRIKE) {
-            result = Format.STRIKEDOUT;
-        } else if (style == IWemConstants.INS) {
-            result = Format.UNDERLINED;
-        } else if (style == IWemConstants.SUP) {
-            result = Format.SUPERSCRIPT;
-        } else if (style == IWemConstants.SUB) {
-            result = Format.SUBSCRIPT;
-        } else if (style == IWemConstants.MONO) {
-            result = Format.MONOSPACE;
-        } else {
+        if (result == null) {
             result = Format.NONE;
         }
 

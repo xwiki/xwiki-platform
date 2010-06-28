@@ -34,7 +34,7 @@
       &lt;input type="text" id="space" name="space" value="XWiki" size="8"/&gt;
       &lt;label for="page"&gt;$msg.get('admin.templates.createprovider.page')&lt;/label&gt;
       &lt;input type="text" id="page" name="page" value="$msg.get('admin.templates.createprovider.defaultdocname')" class="withTip"'/&gt;    
-      &lt;input type="submit" value="$msg.get('admin.templates.createprovider.create')" class="button"/&gt;
+      &lt;input id="createTemplateProvider" type="submit" value="$msg.get('admin.templates.createprovider.create')" class="button"/&gt;
     &lt;/div&gt;  
   &lt;/form&gt;
 {{/html}}

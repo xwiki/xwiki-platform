@@ -1,5 +1,4 @@
 <?xml version="1.0" encoding="UTF-8"?>
-
 <xwikidoc>
 <web>XWiki</web>
 <name>XWikiUserWatchListLiveTableResults</name>
@@ -41,8 +40,9 @@
 ## Wikis
 #foreach($wiki in $wikis)
   #if("$!wiki" != '')
-    #set($wikiUrl = $xwiki.getURL("${wiki}:Main.WebHome"))
-    #set($discard = $elements.add([$wiki, $wikiType, $wiki, $wikiUrl, $msg.get('watchlist.table.allspaces'), '', $msg.get('watchlist.table.alldocuments'), '']))
+    #set($wikiRef = $services.model.createDocumentReference($wiki, '', ''))
+    #set($wikiDoc = $xwiki.getDocument($wikiRef))
+    #set($discard = $elements.add([$wiki, $wikiType, $wiki, $wikiDoc.getURL(), $msg.get('watchlist.table.allspaces'), '', $msg.get('watchlist.table.alldocuments'), '', $wikiDoc.getURL('view', 'xpage=watch&amp;do=removewiki')]))
   #end
 #end
 ## Spaces
@@ -51,23 +51,28 @@
     #set($wiki = $space.substring(0, $space.indexOf(':')))
     #set($dotsindex = $space.indexOf(':') + 1)
     #set($spaceName = $space.substring($dotsindex))
-    #set($wikiUrl = $xwiki.getURL("${wiki}:Main.WebHome"))
-    #set($spaceUrl = $xwiki.getURL("${wiki}:${space}.WebHome"))
-    #set($discard = $elements.add([$space, $spaceType, $wiki, $wikiUrl, $spaceName, $spaceUrl, $msg.get('watchlist.table.alldocuments'), '']))
+    #set($wikiRef = $services.model.createDocumentReference($wiki, '', ''))
+    #set($spaceRef = $services.model.createDocumentReference($wiki, $spaceName, ''))
+    #set($wikiDoc = $xwiki.getDocument($wikiRef))
+    #set($spaceDoc = $xwiki.getDocument($spaceRef))
+    #set($discard = $elements.add([$space, $spaceType, $wiki, $wikiDoc.getURL(), $spaceName, $spaceDoc.getURL(), $msg.get('watchlist.table.alldocuments'), '', $spaceDoc.getURL('view', 'xpage=watch&amp;do=removespace')]))
   #end
 #end
 ## Pages
 #foreach($page in $pages)
   #if ("$!page" != '')
     #set($wiki = $page.substring(0, $page.indexOf(':')))
-    #set($wikiUrl = $xwiki.getURL("${wiki}:Main.WebHome"))
     #set($dotsindex = $page.indexOf(':') + 1)
-    #set($space = $page.substring($dotsindex, $page.indexOf('.')))
-    #set($spaceUrl = $xwiki.getURL("${wiki}:${space}.WebHome"))
+    #set($spaceName = $page.substring($dotsindex, $page.indexOf('.')))
     #set($dotindex = $page.indexOf('.') + 1)
     #set($pageName = $page.substring($dotindex))
-    #set($pageUrl = $xwiki.getURL($page))
-    #set($discard = $elements.add([$page, $pageType, $wiki, $wikiUrl, $space, $spaceUrl, $pageName, $pageUrl]))
+    #set($wikiRef = $services.model.createDocumentReference($wiki, '', ''))
+    #set($spaceRef = $services.model.createDocumentReference($wiki, $spaceName, ''))
+    #set($pageRef = $services.model.createDocumentReference($wiki, $spaceName, $pageName))
+    #set($wikiDoc = $xwiki.getDocument($wikiRef))
+    #set($spaceDoc = $xwiki.getDocument($spaceRef))
+    #set($pageDoc = $xwiki.getDocument($pageRef))
+    #set($discard = $elements.add([$page, $pageType, $wiki, $wikiDoc.getURL(), $spaceName, $spaceDoc.getURL(), $pageName, $pageDoc.getURL(), $pageDoc.getURL('view', 'xpage=watch&amp;do=removedocument')]))
   #end
 #end
 ##
@@ -89,11 +94,11 @@
         "spaceName" : "$!listtool.get($element, 4)",
         "spaceUrl"  : "$!listtool.get($element, 5)",
         "pageName"  : "$!listtool.get($element, 6)",
-        "pageUrl"   : "$!listtool.get($element, 7)"
+        "pageUrl"   : "$!listtool.get($element, 7)",
+        "deleteUrl" : "$!listtool.get($element, 8)"
       }
     #end
   ]
 }
 #end
-{{/velocity}}</content>
-</xwikidoc>
+{{/velocity}}</content></xwikidoc>

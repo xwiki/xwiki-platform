@@ -62,7 +62,7 @@
       <dependency>
         <groupId>org.python</groupId>
         <artifactId>jython-standalone</artifactId>
-        <version>2.5.1-xwiki</version>
+        <version>2.5.2b1-xwiki</version>
       </dependency>
     </dependencies>
   </dependencyManagement>

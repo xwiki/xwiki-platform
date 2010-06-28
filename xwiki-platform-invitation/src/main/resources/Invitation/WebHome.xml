@@ -387,14 +387,18 @@
 <property>
 <codeToExecute>## If there is no Invitation.InvitationConfig then create one.
 ## TODO Find a nicer way to handle this.
-#if(!$xwiki.exists('Invitation.InvitationConfig'))
-  {{include document="Invitation.WebHome" context="new" output="false"/}}
-  #if($request.getParameter('redirected'))
+#if($xwiki.getDocument('Invitation.InvitationConfig').isNew())
+  {{include document="Invitation.WebHome" context="new"/}}
+  #if($request.getParameter('redirected') == 3)
     {{error}}$msg.get('xe.invitation.failedToCreateDocuments'){{/error}}
   #else
+    #set($redirected = 1)
+    #if($request.getParameter('redirected'))
+      #set($redirected = $mathtool.add(1, $request.getParameter('redirected')))
+    #end
     $response.sendRedirect(
       $request.getRequestURL().append("?").append(
-        $request.getQueryString()).append("&amp;redirected=1").toString())
+        $request.getQueryString().replaceAll('&amp;redirected=.*', '')).append("&amp;redirected=$redirected").toString())
   #end
 #end</codeToExecute>
 </property>

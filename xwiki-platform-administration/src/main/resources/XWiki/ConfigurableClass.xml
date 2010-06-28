@@ -852,4 +852,5 @@ $xwiki.jsfx.use('js/xwiki/actionbuttons/actionButtons.js', true)
     = $msg.get("admin.customize") __[[$appName&gt;&gt;$appName]]__: =
   #end
 #end
-{{/velocity}}</content></xwikidoc>
+{{/velocity}}</content>
+</xwikidoc>

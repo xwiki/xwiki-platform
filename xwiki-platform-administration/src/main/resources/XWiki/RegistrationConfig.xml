@@ -1,5 +1,4 @@
 <?xml version="1.0" encoding="UTF-8"?>
-
 <xwikidoc>
 <web>XWiki</web>
 <name>RegistrationConfig</name>
@@ -159,7 +158,7 @@
 <linkPrefix>$xwiki.getURL('XWiki.RegistrationHelp')#</linkPrefix>
 </property>
 <property>
-<propertiesToShow/>
+<propertiesToShow></propertiesToShow>
 </property>
 </object>
 <object>

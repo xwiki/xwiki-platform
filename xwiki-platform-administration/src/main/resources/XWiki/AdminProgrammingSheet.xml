@@ -1,5 +1,4 @@
 <?xml version="1.0" encoding="UTF-8"?>
-
 <xwikidoc>
 <web>XWiki</web>
 <name>AdminProgrammingSheet</name>
@@ -27,4 +26,5 @@
 #set($params = $util.hashMap)
 #set($params.programming = ['macros_languages', 'macros_velocity', 'macros_groovy', 'macros_mapping', 'notification_pages', 'documentBundles'])
 #includeForm('XWiki.AdminFieldsDisplaySheet')
-</content></xwikidoc>
+</content>
+</xwikidoc>

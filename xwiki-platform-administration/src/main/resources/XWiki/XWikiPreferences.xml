@@ -2710,7 +2710,10 @@ Your account on $wikiname has been successfully activated. You can now login at 
 #end
 &lt;a href="$xwiki.getURL("Doc.WebHome","view")"&gt;Doc&lt;/a&gt;&lt;span&gt; | &lt;/span&gt;
 &lt;a href="$xwiki.getURL("XWiki.RegisterNewUser","view")"&gt;Register&lt;/a&gt;&lt;span&gt; | &lt;/span&gt;
-</menu></property><property><meta>&lt;meta name="revisit-after" content="7 days" /&gt;
+</menu>
+</property>
+<property>
+<meta>&lt;meta name="revisit-after" content="7 days" /&gt;
 &lt;meta name="description" content="$xwiki.getXMLEncoded($!doc.getRenderedTitle("plain/1.0"))" /&gt;
 #set($keywords = "wiki,$!doc.getTags()")
 &lt;meta name="keywords" content="$xwiki.getXMLEncoded($keywords.replaceAll('[|,]', ' ').trim())" /&gt;
@@ -2803,4 +2806,5 @@ $xwiki.getDocument("XWiki.AccountValidation").getExternalURL("view", "validkey=$
 <webcopyright>This wiki is licensed under a &lt;a rel="license" href="http://creativecommons.org/licenses/by/2.0/"&gt;Creative Commons 2.0&lt;/a&gt; license</webcopyright>
 </property>
 </object>
-<content>#includeForm("XWiki.AdminSheet")</content></xwikidoc>
+<content>#includeForm("XWiki.AdminSheet")</content>
+</xwikidoc>

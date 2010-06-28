@@ -1,5 +1,4 @@
 <?xml version="1.0" encoding="UTF-8"?>
-
 <xwikidoc>
 <web>XWiki</web>
 <name>DefaultSkin</name>
@@ -219,4 +218,5 @@
 
 * &lt;a href="$doc.getURL('edit', 'editor=object&amp;amp;classname=XWiki.XWikiSkins')"&gt;$msg.get('xe.admin.skin.editskin')&lt;/a&gt;
 * [$msg.get('xe.admin.skin.testskin')&gt;Main.WebHome?skin=${doc.fullName}]
-</content></xwikidoc>
+</content>
+</xwikidoc>

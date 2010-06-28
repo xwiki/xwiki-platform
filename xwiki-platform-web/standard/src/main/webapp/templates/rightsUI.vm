@@ -78,6 +78,8 @@
                   #end
                 </select>
             </div>
+        #elseif ("$!editor" == "rights")
+          <div id="document-title"><h1>$msg.get('core.editors.rights.title', [$xwiki.getXMLEncoded($doc.displayTitle), $doc.getURL()])</h1></div>
         #end ## editor = spacerights
         <table id="usersandgroupstable" class="xwiki-livetable#if("$!editor"!="") $editor#end">
 	      <tr>

@@ -1,5 +1,4 @@
 <?xml version="1.0" encoding="UTF-8"?>
-
 <xwikidoc>
 <web>XWiki</web>
 <name>XWikiUserWatchListSheet</name>
@@ -71,7 +70,7 @@ $xwiki.ssx.use('Main.Dashboard')##
     #if ($context.action == 'view')
       &lt;div class="watchlistElements"&gt;
         &lt;h1&gt;$msg.get('platform.core.profile.section.watchlistElements')&lt;/h1&gt;
-        #set($collist = ["type", "wiki","space", "document"])
+        #set($collist = ["type", "wiki","space", "document", "actions"])
         #set($colprops = { 
                   "type": { "sortable":false },
                   "wiki": { "sortable":false },
@@ -95,6 +94,27 @@ $xwiki.ssx.use('Main.Dashboard')##
                                   } else {
                                     tr.insert(new Element('td').update(row.pageName));
                                   }
+                                  var deleteLink = new Element('a', {
+                                    href : row.deleteUrl
+                                  });
+                                  deleteLink.insert(new Element('img', {  
+                                    'src' : '/xwiki/resources/icons/silk/cross.gif'
+                                  }));
+                                  deleteLink.observe('click', function(event) {
+                                    Event.stop(event);
+                                    var surl = row.deleteUrl;        
+                                    var myAjax = new Ajax.Request(
+                                      surl,
+                                      {
+                                        method: 'get',
+                                        onComplete: function() {
+                                          this.clearCache();
+                                          this.showRows(this.currentOffset, this.limit);
+                                        }.bind(this)
+                                      });
+                                  }.bind(this));
+                                  tr.insert(new Element('td').insert(deleteLink));
+
                                   return tr;
                                }" })
           #livetable("mywatchlist" $collist $colprops $options)

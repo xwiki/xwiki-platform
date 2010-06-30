@@ -31,15 +31,15 @@
   </parent>
   <artifactId>xwiki-application-invitation</artifactId>
   <name>XWiki Platform - Applications - Invitation</name>
-  <version>1.0</version>
+  <version>1.1-SNAPSHOT</version>
   <packaging>xar</packaging>
   <description>Application allowing users to invite friends to join a wiki by email.</description>
   <!-- We must configure SCM in each module. For more information see:
        http://svn.xwiki.org/svnroot/xwiki/platform/pom/trunk/pom.xml -->
   <scm>
-    <connection>scm:svn:http://svn.xwiki.org/svnroot/xwiki/platform/xwiki-applications/tags/xwiki-application-invitation-1.0</connection>
-    <developerConnection>scm:svn:https://svn.xwiki.org/svnroot/xwiki/platform/xwiki-applications/tags/xwiki-application-invitation-1.0</developerConnection>
-    <url>http://svn.xwiki.org/svnroot/xwiki/platform/xwiki-applications/tags/xwiki-application-invitation-1.0</url>
+    <connection>scm:svn:http://svn.xwiki.org/svnroot/xwiki/platform/xwiki-applications/trunk/invitation</connection>
+    <developerConnection>scm:svn:https://svn.xwiki.org/svnroot/xwiki/platform/xwiki-applications/trunk/invitation</developerConnection>
+    <url>http://svn.xwiki.org/svnroot/xwiki/platform/xwiki-applications/trunk/invitation</url>
   </scm>
   <issueManagement>
     <system>jira</system>

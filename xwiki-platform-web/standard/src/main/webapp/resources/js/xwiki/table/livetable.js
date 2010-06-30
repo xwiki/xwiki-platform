@@ -288,10 +288,10 @@ XWiki.widgets.LiveTable = Class.create({
 
     // Let code know displaying is finished
     // 1. Named event (for code interested by that table only)
-    document.fire("xwiki:livetable:" + self.domNodeName + ":displayComplete")
+    document.fire("xwiki:livetable:" + this.domNodeName + ":displayComplete")
     // 2. Generic event (for code potentially interested in any livetable)
     document.fire("xwiki:livetable:displayComplete", {
-      "tableId" : self.domNodeName
+      "tableId" : this.domNodeName
     });
   },
 
@@ -397,10 +397,10 @@ XWiki.widgets.LiveTable = Class.create({
 
     // Let code know displaying is finished
     // 1. Named event (for code interested by that table only)
-    document.fire("xwiki:livetable:" + self.domNodeName + ":displayComplete")
+    document.fire("xwiki:livetable:" + this.domNodeName + ":displayComplete")
     // 2. Generic event (for code potentially interested in any livetable)
     document.fire("xwiki:livetable:displayComplete", {
-      "tableId" : self.domNodeName
+      "tableId" : this.domNodeName
     });
   },
 

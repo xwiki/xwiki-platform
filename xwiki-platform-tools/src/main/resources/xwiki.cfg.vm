@@ -358,9 +358,14 @@ xwiki.authentication.ldap.server=127.0.0.1
 xwiki.authentication.ldap.port=389
 
 #-# LDAP login, empty = anonymous access, otherwise specify full dn
-#-# {0} is replaced with the username, {1} with the password
+#-# {0} is replaced with the user name, {1} with the password
 xwiki.authentication.ldap.bind_DN=cn={0},department=USER,department=INFORMATIK,department=1230,o=MP
 xwiki.authentication.ldap.bind_pass={1}
+
+#-# LDAP query to search the user in the LDAP database (in case a static admin user is provided in xwiki.authentication.ldap.bind_DN)
+#-# {0} is replaced with the user uid field name and {1} with the user name
+#-# The default is ({0}={1})
+# xwiki.authentication.ldap.ldap_user_search_fmt=({0}={1})
 
 #-# Bypass standard LDAP bind validation by doing a direct password comparison.
 #-# If you don't know what you do, don't use that. It's covering very rare and bad use cases.

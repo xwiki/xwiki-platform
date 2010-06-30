@@ -631,6 +631,7 @@ function toggleForm(form){
  * @return
  */
 function togglePanelVisibility(element, cookieName){
+  element = $(element);
   element.toggleClassName("collapsed");
   if (cookieName) {
     if (element.hasClassName("collapsed")) {

@@ -285,6 +285,14 @@ XWiki.widgets.LiveTable = Class.create({
       }
     }
     if (this.paginator) this.paginator.refreshPagination();
+
+    // Let code know displaying is finished
+    // 1. Named event (for code interested by that table only)
+    document.fire("xwiki:livetable:" + self.domNodeName + ":displayComplete")
+    // 2. Generic event (for code potentially interested in any livetable)
+    document.fire("xwiki:livetable:displayComplete", {
+      "tableId" : self.domNodeName
+    });
   },
 
   /**
@@ -386,6 +394,14 @@ XWiki.widgets.LiveTable = Class.create({
     }
                                      
     if (this.paginator) this.paginator.refreshPagination();
+
+    // Let code know displaying is finished
+    // 1. Named event (for code interested by that table only)
+    document.fire("xwiki:livetable:" + self.domNodeName + ":displayComplete")
+    // 2. Generic event (for code potentially interested in any livetable)
+    document.fire("xwiki:livetable:displayComplete", {
+      "tableId" : self.domNodeName
+    });
   },
 
   /**

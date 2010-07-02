@@ -19,8 +19,15 @@
  */
 package org.xwiki.rendering.macro.python;
 
+import javax.script.ScriptContext;
+import javax.script.SimpleScriptContext;
+
+import org.jmock.Expectations;
+import org.xwiki.component.descriptor.DefaultComponentDescriptor;
+import org.xwiki.component.embed.EmbeddableComponentManager;
 import org.xwiki.rendering.macro.script.ScriptMockSetup;
 import org.xwiki.rendering.scaffolding.RenderingTestSuite;
+import org.xwiki.script.ScriptContextManager;
 import org.xwiki.test.ComponentManagerTestSetup;
 
 import junit.framework.Test;
@@ -49,8 +56,25 @@ public class RenderingTests extends TestCase
         suite.addTestsFromResource("macropython3", true);
 
         ComponentManagerTestSetup testSetup = new ComponentManagerTestSetup(suite);
-        new ScriptMockSetup(testSetup.getComponentManager());
+        setUpMocks(testSetup.getComponentManager());
 
         return testSetup;
+    }
+    
+    public static void setUpMocks(EmbeddableComponentManager componentManager) throws Exception
+    {
+        ScriptMockSetup mockSetup = new ScriptMockSetup(componentManager);
+        
+        // Script Context Mock
+        final ScriptContextManager mockScriptContextManager = mockSetup.mockery.mock(ScriptContextManager.class);
+        final SimpleScriptContext scriptContext = new SimpleScriptContext();
+        scriptContext.setAttribute("var", "value", ScriptContext.ENGINE_SCOPE);
+        mockSetup.mockery.checking(new Expectations() {{
+            allowing(mockScriptContextManager).getScriptContext(); will(returnValue(scriptContext));
+        }});
+        DefaultComponentDescriptor<ScriptContextManager> descriptorSCM =
+            new DefaultComponentDescriptor<ScriptContextManager>();
+        descriptorSCM.setRole(ScriptContextManager.class);
+        componentManager.registerComponent(descriptorSCM, mockScriptContextManager);
     }
 }

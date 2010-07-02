@@ -2,7 +2,7 @@
 .input|xwiki/2.0
 .#-----------------------------------------------------
 {{python}}
-demo = [1, 3, 6, 10, 15, 21, "lots"]
+demo = [1, 3, 6, 10, 15, 21, "lots", var]
 
 size = len(demo)
 print "Number of elements is ",size
@@ -16,7 +16,7 @@ while counter > 0:
 .expect|event/1.0
 .#-----------------------------------------------------
 beginDocument
-beginMacroMarkerStandalone [python] [] [demo = [1, 3, 6, 10, 15, 21, "lots"]
+beginMacroMarkerStandalone [python] [] [demo = [1, 3, 6, 10, 15, 21, "lots", var]
 
 size = len(demo)
 print "Number of elements is ",size
@@ -35,7 +35,15 @@ onSpace
 onWord [is]
 onSpace
 onSpace
+onWord [8]
+onNewLine
+onWord [El]
+onSpace
 onWord [7]
+onSpace
+onWord [val]
+onSpace
+onWord [value]
 onNewLine
 onWord [El]
 onSpace
@@ -93,7 +101,7 @@ onWord [val]
 onSpace
 onWord [1]
 endParagraph
-endMacroMarkerStandalone [python] [] [demo = [1, 3, 6, 10, 15, 21, "lots"]
+endMacroMarkerStandalone [python] [] [demo = [1, 3, 6, 10, 15, 21, "lots", var]
 
 size = len(demo)
 print "Number of elements is ",size

@@ -50,7 +50,7 @@
     #set($guest = "XWiki.XWikiGuest")
     #foreach($obj in $doc.getObjects($clsname)) ## XWiki.XWikiGlobalRights or XWiki.XWikiRights
       #set($pers = "$!obj.getProperty('users').getValue()")
-      #if($pers.matches("^(.*,)?${guest}(,.*)?$"))
+      #if($pers.matches("^(.*,)?${regextool.quote($guest)}(,.*)?$"))
         #if($obj.getProperty('allow').getValue() == 1)
           #set($rightValue = 1)
         #else

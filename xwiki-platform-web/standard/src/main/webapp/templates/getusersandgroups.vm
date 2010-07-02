@@ -111,7 +111,7 @@ $response.setContentType("application/x-json")
   ## Get the rights for that user or group
   #foreach($obj in $doc.getObjects($clsname)) ## $clsname = XWiki.XWikiGlobalRights or XWiki.XWikiRights
     #set($pers = "$!obj.getProperty($uorg).getValue()")
-    #if(($pers != "") && ($pers.matches("^(.*,)?${username}(,.*)?$")) )  
+    #if(($pers != "") && ($pers.matches("^(.*,)?${regextool.quote($username)}(,.*)?$")) )  
       #foreach($right in $!obj.getProperty('levels').getValue().split(","))
         #set($right = $right.trim())
         #if($right != "")

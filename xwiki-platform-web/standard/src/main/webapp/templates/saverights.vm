@@ -9,7 +9,7 @@
 
 #foreach($obj in $doc.getObjects($clsname)) ## XWiki.XWikiGlobalRights or XWiki.XWikiRights
   #set($pers = "$!obj.getProperty($uorg).getValue()")
-  #if($pers.matches("${fullname},?")) ## found the rule containing that person
+  #if($pers.matches("${regextool.quote($fullname)},?")) ## found the rule containing that person
     #set($levels = "$obj.getProperty('levels').getValue()") ## get the levels
     #if($obj.getProperty('allow').getValue() == 1) ## found allow rule
       ### if action = allow, add the right to the allow rule, if it does not exist; 
@@ -70,7 +70,7 @@
         #end
       #end
     #end ## end get property
-  #elseif($pers.matches("^(.*,)?${fullname}(,.*)?$")) ## The person is in a multiple selection rule, remove it from there.
+  #elseif($pers.matches("^(.*,)?${regextool.quote($fullname)}(,.*)?$")) ## The person is in a multiple selection rule, remove it from there.
     #set($pers = $pers.replaceAll("^${fullname}(,|$)", ""))
     #set($pers = $pers.replaceAll("(^|,)${fullname}(,|$)", "$2"))
     $doc.getObject($clsname, $obj.number).set($uorg, $pers)

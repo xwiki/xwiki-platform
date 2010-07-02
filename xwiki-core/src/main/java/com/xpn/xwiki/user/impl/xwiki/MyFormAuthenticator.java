@@ -22,6 +22,7 @@
 package com.xpn.xwiki.user.impl.xwiki;
 
 import java.io.IOException;
+import java.net.URLEncoder;
 import java.security.Principal;
 
 import javax.servlet.http.HttpServletRequest;
@@ -79,8 +80,14 @@ public class MyFormAuthenticator extends FormAuthenticator implements XWikiAuthe
         }
 
         // Redirect to login page
+        StringBuilder redirectBack = new StringBuilder(request.getRequestURI());
+        if (StringUtils.isNotEmpty(request.getQueryString())) {
+            redirectBack.append('?');
+            redirectBack.append(request.getQueryString());
+        }
         response.sendRedirect(response.encodeRedirectURL(request.getContextPath() + this.loginPage + "?"
-            + SavedRequestRestorerFilter.SAVED_REQUESTS_IDENTIFIER + "=" + savedRequestId));
+            + SavedRequestRestorerFilter.SAVED_REQUESTS_IDENTIFIER + "=" + savedRequestId +
+            "&xredirect=" + URLEncoder.encode(redirectBack.toString(), "UTF-8")));
 
         return;
     }

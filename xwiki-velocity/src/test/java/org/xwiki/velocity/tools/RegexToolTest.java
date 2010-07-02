@@ -97,4 +97,14 @@ public class RegexToolTest
         Pattern p = tool.compile("*");
         Assert.assertNull(p);
     }
+    
+    /**
+     * Escaping a string containing regex syntax characters.
+     */
+    @Test
+    public void testQuote()
+    {
+        RegexTool tool = new RegexTool();
+        Assert.assertEquals(Pattern.quote("^(\\)[]"), tool.quote("^(\\)[]"));
+    }
 }

@@ -966,29 +966,26 @@ public class XWiki implements XWikiDocChangeNotificationInterface
      */
     public List<String> getVirtualWikisDatabaseNames(XWikiContext context) throws XWikiException
     {
-        List<String> databaseNames = new ArrayList<String>();
-
         String database = context.getDatabase();
         try {
             context.setDatabase(context.getMainXWiki());
 
-            String hql =
-                ", BaseObject as obj, StringProperty as prop where obj.name=doc.fullName"
-                + " and doc.space = 'XWiki'"
-                + " and obj.name <> 'XWiki.XWikiServerClassTemplate' and obj.className='XWiki.XWikiServerClass' "
-                + "and prop.id.id = obj.id ";
+            String hql = ", BaseObject as obj where doc.space = 'XWiki' and obj.name=doc.fullName"
+                + " and obj.name <> 'XWiki.XWikiServerClassTemplate' and obj.className='XWiki.XWikiServerClass' ";
             List<DocumentReference> list = getStore().searchDocumentReferences(hql, context);
+            List<String> databaseNames = new ArrayList<String>(list.size());
 
+            int prefixLength = "XWikiServer".length();
             for (DocumentReference docname : list) {
                 if (docname.getName().startsWith("XWikiServer")) {
-                    databaseNames.add(docname.getName().substring("XWikiServer".length()).toLowerCase());
+                    databaseNames.add(docname.getName().substring(prefixLength).toLowerCase());
                 }
             }
+
+            return databaseNames;
         } finally {
             context.setDatabase(database);
         }
-
-        return databaseNames;
     }
 
     /**

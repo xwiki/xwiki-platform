@@ -9,6 +9,9 @@ image~:something
 attach~:something
 mailto~:something
 dummy:something
+image~:
+attach~:
+mailto~:
 .#-----------------------------------------------------
 .expect|event/1.0
 .#-----------------------------------------------------
@@ -41,12 +44,21 @@ onNewLine
 onWord [dummy]
 onSpecialSymbol [:]
 onWord [something]
+onNewLine
+onWord [image]
+onSpecialSymbol [:]
+onNewLine
+onWord [attach]
+onSpecialSymbol [:]
+onNewLine
+onWord [mailto]
+onSpecialSymbol [:]
 endParagraph
 endDocument
 .#-----------------------------------------------------
 .expect|xhtml/1.0
 .#-----------------------------------------------------
-<p>something:<em>whatever</em><br/>hello://world<br/>image:something<br/>attach:something<br/>mailto:something<br/>dummy:something</p>
+<p>something:<em>whatever</em><br/>hello://world<br/>image:something<br/>attach:something<br/>mailto:something<br/>dummy:something<br/>image:<br/>attach:<br/>mailto:</p>
 .#-----------------------------------------------------
 .expect|xwiki/2.0
 .#-----------------------------------------------------
@@ -56,7 +68,10 @@ image~:something
 attach~:something
 mailto~:something
 dummy:something
+image~:
+attach~:
+mailto~:
 .#-----------------------------------------------------
 .input|xhtml/1.0
 .#-----------------------------------------------------
-<html><p>something:<em>whatever</em><br/>hello://world<br/>image:something<br/>attach:something<br/>mailto:something<br/>dummy:something</p></html>
+<p>something:<em>whatever</em><br/>hello://world<br/>image:something<br/>attach:something<br/>mailto:something<br/>dummy:something<br/>image:<br/>attach:<br/>mailto:</p>

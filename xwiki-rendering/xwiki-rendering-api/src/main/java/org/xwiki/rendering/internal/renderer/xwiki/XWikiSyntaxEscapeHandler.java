@@ -173,10 +173,9 @@ public class XWikiSyntaxEscapeHandler
     private void escapeURI(StringBuffer accumulatedBuffer, String match)
     {
         int pos = accumulatedBuffer.indexOf(match);
-        if (pos > -1 && accumulatedBuffer.length() > pos + match.length()
-            && accumulatedBuffer.charAt(pos + match.length()) > 32) {
+        if (pos > -1) {
             // Escape the ":" symbol
-            accumulatedBuffer.replace(pos + match.length() - 1, pos + match.length(), "~:");
+            accumulatedBuffer.insert(pos + match.length() - 1, '~');
         }
     }
 

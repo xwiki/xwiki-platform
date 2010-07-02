@@ -583,9 +583,10 @@ public class BaseClass extends BaseCollection implements ClassInterface
                 j++;
             }
 
-            List list = cel.elements();
+            @SuppressWarnings("unchecked")
+            List<Element> list = cel.elements();
             for (int i = j; i < list.size(); i++) {
-                Element pcel = (Element) list.get(i);
+                Element pcel = list.get(i);
                 String name = pcel.getName();
                 String classType = pcel.element("classType").getText();
                 PropertyClass property = (PropertyClass) Class.forName(classType).newInstance();

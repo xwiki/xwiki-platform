@@ -79,7 +79,7 @@ public class XWikiConfig extends Properties
     /**
      * {@inheritDoc}
      * <p>
-     * This method trims the spaces arond the value.
+     * This method trims the spaces around the value.
      * </p>
      * 
      * @see java.util.Properties#getProperty(java.lang.String, java.lang.String)
@@ -93,7 +93,7 @@ public class XWikiConfig extends Properties
     /**
      * {@inheritDoc}
      * <p>
-     * This method trims the spaces arond the value.
+     * This method trims the spaces around the value.
      * </p>
      * 
      * @see java.util.Properties#getProperty(java.lang.String)

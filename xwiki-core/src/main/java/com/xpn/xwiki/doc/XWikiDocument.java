@@ -1140,7 +1140,7 @@ public class XWikiDocument implements DocumentModelBridge
             List<HeaderBlock> blocks = getXDOM().getChildrenByType(HeaderBlock.class, true);
             if (blocks.size() > 0) {
                 HeaderBlock header = blocks.get(0);
-                // Check the header depth after which we should return null if no header was found. 
+                // Check the header depth after which we should return null if no header was found.
                 int titleHeaderDepth = (int) context.getWiki().ParamAsLong("xwiki.title.headerdepth", 2);
                 if (header.getLevel().getAsInt() <= titleHeaderDepth) {
                     XDOM headerXDOM = new XDOM(Collections.<Block> singletonList(header));
@@ -2043,8 +2043,7 @@ public class XWikiDocument implements DocumentModelBridge
         BaseObject result = null;
         List<BaseObject> objects = getXObjects().get(classReference);
         if (objects != null) {
-            for (int i = 0; i < objects.size(); i++) {
-                BaseObject object = objects.get(i);
+            for (BaseObject object : objects) {
                 if (object != null) {
                     result = object;
                     break;
@@ -2188,7 +2187,7 @@ public class XWikiDocument implements DocumentModelBridge
     }
 
     /**
-     * @deprecated since 2.2M1 use {@link #addXObject(DocumentReference, BaseObject)} instead
+     * @deprecated since 2.2M1 use {@link #addXObject(BaseObject)} instead
      */
     @Deprecated
     public void addObject(String className, BaseObject object)
@@ -7262,7 +7261,7 @@ public class XWikiDocument implements DocumentModelBridge
 
     /**
      * Convert the passed content from the passed syntax to the passed new syntax.
-     *
+     * 
      * @param content the content to convert
      * @param targetSyntax the new syntax after the conversion
      * @param txContext the context when Transformation are executed or null if transformation shouldn't be executed
@@ -7285,7 +7284,7 @@ public class XWikiDocument implements DocumentModelBridge
 
     /**
      * Convert the passed content from the passed syntax to the passed new syntax.
-     *
+     * 
      * @param content the content to convert
      * @param currentSyntaxId the syntax of the current content to convert
      * @param targetSyntax the new syntax after the conversion
@@ -7308,7 +7307,7 @@ public class XWikiDocument implements DocumentModelBridge
 
     /**
      * Convert the passed content from the passed syntax to the passed new syntax.
-     *
+     * 
      * @param content the XDOM content to convert, the XDOM can be modified during the transformation
      * @param targetSyntax the new syntax after the conversion
      * @param txContext the context when Transformation are executed or null if transformation shouldn't be executed

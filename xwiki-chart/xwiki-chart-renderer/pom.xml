@@ -40,13 +40,6 @@
     <dependency>
       <groupId>jfree</groupId>
       <artifactId>jfreechart</artifactId>
-      <version>1.0.11</version>
-      <exclusions>
-        <exclusion>
-          <groupId>gnujaxp</groupId>
-          <artifactId>gnujaxp</artifactId>
-        </exclusion>
-      </exclusions>             
     </dependency>
     <!-- Testing dependencies -->
     <dependency>

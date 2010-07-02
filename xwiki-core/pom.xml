@@ -130,29 +130,9 @@
       <version>4.3</version>
     </dependency>
 
-    <!-- Version 1.0.0-rc1 has some bad dependencies in the POM. This is fixed in 1.0.0 but unfortunately we're
-         using an API (setDataAreaRatio()) that has disappeared in 1.0.0 so we need to fix this before we can
-         move to 1.0.0 or beyond... See http://jira.xwiki.org/jira/browse/XWIKI-390.
-         Note: when we move to using the central repo version we'll only need 1 dependency on jfreechart -->
     <dependency>
       <groupId>jfree</groupId>
       <artifactId>jfreechart</artifactId>
-      <version>1.0.0-rc1-xwiki</version>
-      <exclusions>
-        <exclusion>
-          <groupId>gnujaxp</groupId>
-          <artifactId>gnujaxp</artifactId>
-        </exclusion>
-        <exclusion>
-          <groupId>junit</groupId>
-          <artifactId>junit</artifactId>
-        </exclusion>
-      </exclusions>
-    </dependency>
-    <dependency>
-      <groupId>jfree</groupId>
-      <artifactId>jcommon</artifactId>
-      <version>1.0.5</version>
     </dependency>
 
     <!-- See http://jira.codehaus.org/browse/MEV-488 -->

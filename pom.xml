@@ -64,6 +64,12 @@
         <artifactId>jython-standalone</artifactId>
         <version>2.5.2b1-xwiki</version>
       </dependency>
+      <!-- JFreeChart -->
+      <dependency>
+        <groupId>jfree</groupId>
+        <artifactId>jfreechart</artifactId>
+        <version>1.0.13</version>
+      </dependency>
     </dependencies>
   </dependencyManagement>
   <build>

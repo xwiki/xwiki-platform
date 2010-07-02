@@ -45,7 +45,6 @@ import com.xpn.xwiki.plugin.charts.params.ChartParams;
 
 public class ChartCustomizer
 {
-
     public static void customizeRenderer(AbstractRenderer renderer, ChartParams params)
     {
         if (params.get(ChartParams.RENDERER_COLOR) != null) {
@@ -167,11 +166,6 @@ public class ChartCustomizer
 
     public static void customizePlot(Plot plot, ChartParams params)
     {
-        if (params.get(ChartParams.HEIGHT) != null && params.get(ChartParams.WIDTH) != null) {
-            plot.setDataAreaRatio(params.getInteger(ChartParams.HEIGHT).intValue()
-                / params.getInteger(ChartParams.WIDTH).intValue());
-        }
-
         if (params.get(ChartParams.PLOT_BACKGROUND_COLOR) != null) {
             plot.setBackgroundPaint(params.getColor(ChartParams.PLOT_BACKGROUND_COLOR));
         }

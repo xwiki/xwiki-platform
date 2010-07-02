@@ -125,4 +125,21 @@ public class RegexTool
             return null;
         }
     }
+
+    /**
+     * Returns a literal pattern <code>String</code> for the specified <code>String</code>.
+     * <p>
+     * This method produces a <code>String</code> that can be used to create a <code>Pattern</code> that would match the
+     * string <code>s</code> as if it were a literal pattern.
+     * </p>
+     * Metacharacters or escape sequences in the input sequence will be given no special meaning.
+     * 
+     * @param s The string to be literalized
+     * @return A literal string replacement
+     * @since 2.4M2
+     */
+    public String quote(String s)
+    {
+        return Pattern.quote(s);
+    }
 }

@@ -22,14 +22,11 @@ package org.xwiki.annotation.io.internal;
 import static org.junit.Assert.assertEquals;
 
 import org.jmock.Expectations;
-import org.jmock.Mockery;
 import org.jmock.integration.junit4.JMock;
-import org.jmock.integration.junit4.JUnit4Mockery;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.xwiki.annotation.io.IOTargetService;
 import org.xwiki.bridge.DocumentAccessBridge;
-import org.xwiki.component.descriptor.DefaultComponentDescriptor;
 import org.xwiki.test.AbstractComponentTestCase;
 
 /**
@@ -53,11 +50,6 @@ public class DefaultIOTargetServiceTest extends AbstractComponentTestCase
     private DocumentAccessBridge dabMock;
 
     /**
-     * Mockery to mock the document access bridge.
-     */
-    private Mockery mockery = new JUnit4Mockery();
-
-    /**
      * {@inheritDoc}
      * 
      * @see org.xwiki.test.AbstractComponentTestCase#registerComponents()
@@ -68,11 +60,7 @@ public class DefaultIOTargetServiceTest extends AbstractComponentTestCase
         super.registerComponents();
 
         // register the dab
-        dabMock = mockery.mock(DocumentAccessBridge.class);
-        DefaultComponentDescriptor<DocumentAccessBridge> descriptor =
-            new DefaultComponentDescriptor<DocumentAccessBridge>();
-        descriptor.setRole(DocumentAccessBridge.class);
-        getComponentManager().registerComponent(descriptor, dabMock);
+        this.dabMock = registerMockComponent(DocumentAccessBridge.class);
     }
 
     /**
@@ -92,7 +80,7 @@ public class DefaultIOTargetServiceTest extends AbstractComponentTestCase
     @Test
     public void testGettersWhenTargetIsTypedDocument() throws Exception
     {
-        mockery.checking(new Expectations()
+        getMockery().checking(new Expectations()
         {
             {
                 oneOf(dabMock).getDocumentContent("wiki:Space.Page");
@@ -110,7 +98,7 @@ public class DefaultIOTargetServiceTest extends AbstractComponentTestCase
     @Test
     public void testGettersWhenTargetIsNonTypedDocument() throws Exception
     {
-        mockery.checking(new Expectations()
+        getMockery().checking(new Expectations()
         {
             {
                 oneOf(dabMock).getDocumentContent("wiki:Space.Page");
@@ -128,7 +116,7 @@ public class DefaultIOTargetServiceTest extends AbstractComponentTestCase
     @Test
     public void testGettersWhenTargetIsNonTypedRelativeDocument() throws Exception
     {
-        mockery.checking(new Expectations()
+        getMockery().checking(new Expectations()
         {
             {
                 // default resolver should be used
@@ -147,7 +135,7 @@ public class DefaultIOTargetServiceTest extends AbstractComponentTestCase
     @Test
     public void testGettersWhenTargetIsTypedRelativeDocument() throws Exception
     {
-        mockery.checking(new Expectations()
+        getMockery().checking(new Expectations()
         {
             {
                 // default resolver should be used
@@ -166,7 +154,7 @@ public class DefaultIOTargetServiceTest extends AbstractComponentTestCase
     @Test
     public void testGettersWhenTargetIsTypedSpace() throws Exception
     {
-        mockery.checking(new Expectations()
+        getMockery().checking(new Expectations()
         {
             {
                 // default resolver should be used
@@ -186,7 +174,7 @@ public class DefaultIOTargetServiceTest extends AbstractComponentTestCase
     @Test
     public void testGettersWhenTargetIsEmptyString() throws Exception
     {
-        mockery.checking(new Expectations()
+        getMockery().checking(new Expectations()
         {
             {
                 // default resolver should be used. Note that this will fail if default values change, not very well
@@ -207,7 +195,7 @@ public class DefaultIOTargetServiceTest extends AbstractComponentTestCase
     @Test
     public void testGetterWhenTargetIsTypedIndexedObjectProperty() throws Exception
     {
-        mockery.checking(new Expectations()
+        getMockery().checking(new Expectations()
         {
             {
                 oneOf(dabMock).getProperty("wiki:Space.Page", "XWiki.Class", 1, "property");
@@ -225,7 +213,7 @@ public class DefaultIOTargetServiceTest extends AbstractComponentTestCase
     @Test
     public void testGetterWhenTargetIsTypedDefaultObjectProperty() throws Exception
     {
-        mockery.checking(new Expectations()
+        getMockery().checking(new Expectations()
         {
             {
                 oneOf(dabMock).getProperty("wiki:Space.Page", "XWiki.Class", "property");
@@ -243,7 +231,7 @@ public class DefaultIOTargetServiceTest extends AbstractComponentTestCase
     @Test
     public void testGetterWhenTargetIsTypedObjectPropertyInRelativeDocument() throws Exception
     {
-        mockery.checking(new Expectations()
+        getMockery().checking(new Expectations()
         {
             {
                 oneOf(dabMock).getProperty("xwiki:Main.Page", "XWiki.Class", "property");
@@ -261,7 +249,7 @@ public class DefaultIOTargetServiceTest extends AbstractComponentTestCase
     @Test
     public void testGetterWhenTargetIsNonTypedObjectProperty() throws Exception
     {
-        mockery.checking(new Expectations()
+        getMockery().checking(new Expectations()
         {
             {
                 // target will be parsed as document, because document is the default
@@ -280,7 +268,7 @@ public class DefaultIOTargetServiceTest extends AbstractComponentTestCase
     @Test
     public void testGetterWhenTargetIsTypedIndexedRelativeObjectProperty() throws Exception
     {
-        mockery.checking(new Expectations()
+        getMockery().checking(new Expectations()
         {
             {
                 // this will fail if defaults fail, not very well isolated

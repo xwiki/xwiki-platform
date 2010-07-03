@@ -20,9 +20,7 @@
 package com.xpn.xwiki.internal.model.reference;
 
 import org.jmock.Expectations;
-import org.jmock.Mockery;
 import org.junit.Assert;
-import org.xwiki.component.descriptor.DefaultComponentDescriptor;
 import org.xwiki.model.ModelContext;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
@@ -40,8 +38,6 @@ public class CompactWikiEntityReferenceSerializerTest extends AbstractComponentT
 {
     private EntityReferenceSerializer<EntityReference> serializer;
 
-    private Mockery mockery = new Mockery();
-
     private ModelContext mockModelContext;
 
     @Override
@@ -49,11 +45,7 @@ public class CompactWikiEntityReferenceSerializerTest extends AbstractComponentT
     {
         super.registerComponents();
 
-        this.mockModelContext = mockery.mock(ModelContext.class);
-        DefaultComponentDescriptor<ModelContext> descriptor = new DefaultComponentDescriptor<ModelContext>();
-        descriptor.setRole(ModelContext.class);
-        getComponentManager().registerComponent(descriptor, this.mockModelContext);
-
+        this.mockModelContext = registerMockComponent(ModelContext.class);
         this.serializer = getComponentManager().lookup(EntityReferenceSerializer.class, "compactwiki");
     }
 
@@ -62,7 +54,7 @@ public class CompactWikiEntityReferenceSerializerTest extends AbstractComponentT
     {
         DocumentReference reference = new DocumentReference("wiki", "space", "page");
 
-        this.mockery.checking(new Expectations() {{
+        getMockery().checking(new Expectations() {{
             allowing(mockModelContext).getCurrentEntityReference(); will(returnValue(new WikiReference("wiki")));
         }});
 
@@ -75,7 +67,7 @@ public class CompactWikiEntityReferenceSerializerTest extends AbstractComponentT
     {
         DocumentReference reference = new DocumentReference("wiki", "space", "page");
 
-        this.mockery.checking(new Expectations() {{
+        getMockery().checking(new Expectations() {{
             allowing(mockModelContext).getCurrentEntityReference(); will(returnValue(new WikiReference("otherwiki")));
         }});
 

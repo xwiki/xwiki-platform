@@ -19,12 +19,10 @@
  */
 package org.xwiki.officeimporter.internal;
 
-import org.jmock.Mockery;
 import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.component.descriptor.DefaultComponentDescriptor;
 import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.model.reference.EntityReferenceSerializer;
-import org.xwiki.officeimporter.openoffice.OpenOfficeConverter;
 import org.xwiki.officeimporter.openoffice.OpenOfficeManager;
 import org.xwiki.test.AbstractComponentTestCase;
 
@@ -36,11 +34,6 @@ import org.xwiki.test.AbstractComponentTestCase;
  */
 public abstract class AbstractOfficeImporterTest extends AbstractComponentTestCase
 {
-    /**
-     * Mockery for creating mock objects.
-     */
-    protected Mockery mockery = new Mockery();
-
     /**
      * Mock document access bridge.
      */
@@ -74,21 +67,17 @@ public abstract class AbstractOfficeImporterTest extends AbstractComponentTestCa
         super.registerComponents();
 
         // Document Access Bridge Mock
-        mockDocumentAccessBridge = mockery.mock(DocumentAccessBridge.class);
-        DefaultComponentDescriptor<DocumentAccessBridge> descriptorDAB =
-            new DefaultComponentDescriptor<DocumentAccessBridge>();
-        descriptorDAB.setRole(DocumentAccessBridge.class);
-        getComponentManager().registerComponent(descriptorDAB, mockDocumentAccessBridge);
+        this.mockDocumentAccessBridge = registerMockComponent(DocumentAccessBridge.class);
 
         // Mock (default) string document name serializer.
-        mockDefaultStringEntityReferenceSerializer = this.mockery.mock(EntityReferenceSerializer.class, "s1");
+        this.mockDefaultStringEntityReferenceSerializer = getMockery().mock(EntityReferenceSerializer.class, "s1");
         DefaultComponentDescriptor<EntityReferenceSerializer> descriptorDSRS =
             new DefaultComponentDescriptor<EntityReferenceSerializer>();
         descriptorDSRS.setRole(EntityReferenceSerializer.class);
         getComponentManager().registerComponent(descriptorDSRS, mockDefaultStringEntityReferenceSerializer);
         
         // Mock (compactwiki) string document name serializer.
-        mockCompactWikiStringEntityReferenceSerializer = this.mockery.mock(EntityReferenceSerializer.class, "s2");
+        mockCompactWikiStringEntityReferenceSerializer = getMockery().mock(EntityReferenceSerializer.class, "s2");
         DefaultComponentDescriptor<EntityReferenceSerializer> descriptorCWSRS =
             new DefaultComponentDescriptor<EntityReferenceSerializer>();
         descriptorCWSRS.setRole(EntityReferenceSerializer.class);
@@ -96,18 +85,9 @@ public abstract class AbstractOfficeImporterTest extends AbstractComponentTestCa
         getComponentManager().registerComponent(descriptorCWSRS, mockCompactWikiStringEntityReferenceSerializer);
 
         // Document name factory.
-        mockDocumentReferenceResolver = this.mockery.mock(DocumentReferenceResolver.class);
-        DefaultComponentDescriptor<DocumentReferenceResolver> descriptorDRF =
-            new DefaultComponentDescriptor<DocumentReferenceResolver>();
-        descriptorDRF.setRole(DocumentReferenceResolver.class);
-        descriptorDRF.setRoleHint("currentmixed");
-        getComponentManager().registerComponent(descriptorDRF, mockDocumentReferenceResolver);
-        
+        this.mockDocumentReferenceResolver = registerMockComponent(DocumentReferenceResolver.class, "currentmixed");
+
         // Mock OpenOffice manager.
-        mockOpenOfficeManager = this.mockery.mock(OpenOfficeManager.class);
-        DefaultComponentDescriptor<OpenOfficeManager> descriptorOOM =
-            new DefaultComponentDescriptor<OpenOfficeManager>();
-        descriptorOOM.setRole(OpenOfficeManager.class);
-        getComponentManager().registerComponent(descriptorOOM, mockOpenOfficeManager);                
+        this.mockOpenOfficeManager = registerMockComponent(OpenOfficeManager.class);
     }
 }

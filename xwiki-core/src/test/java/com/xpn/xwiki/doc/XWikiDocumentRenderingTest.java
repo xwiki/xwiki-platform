@@ -316,18 +316,14 @@ public class XWikiDocumentRenderingTest extends AbstractBridgedXWikiComponentTes
         this.document.setContent("{{velocity}}$doc.display(\"area\")#testmacrocache{{/velocity}}");
         this.document.setSyntax(Syntax.XWIKI_2_0);
 
-        // Register a Mock for the VelocityManager to bypass skin APIs that we would need to mock otherwise.
-        VelocityManager originalVelocityManager = getComponentManager().lookup(VelocityManager.class);
-        Mock mockVelocityManager = mock(VelocityManager.class);
-        DefaultComponentDescriptor<VelocityManager> descriptor = new DefaultComponentDescriptor<VelocityManager>();
-        descriptor.setRole(VelocityManager.class);
-
         // We need to put the current doc in the Velocity Context since it's normally set before the rendering is
         // called in the execution flow.
+        VelocityManager originalVelocityManager = getComponentManager().lookup(VelocityManager.class);
         VelocityContext vcontext = originalVelocityManager.getVelocityContext();
         vcontext.put("doc", new Document(this.document, getContext()));
 
-        getComponentManager().registerComponent(descriptor, (VelocityManager) mockVelocityManager.proxy());
+        // Register a Mock for the VelocityManager to bypass skin APIs that we would need to mock otherwise.
+        Mock mockVelocityManager = registerMockComponent(VelocityManager.class);
         mockVelocityManager.stubs().method("getVelocityContext").will(returnValue(vcontext));
 
         VelocityEngine vengine =

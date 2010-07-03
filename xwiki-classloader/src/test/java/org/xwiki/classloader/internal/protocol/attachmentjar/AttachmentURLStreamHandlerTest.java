@@ -33,7 +33,6 @@ import org.junit.Test;
 import org.xwiki.model.reference.AttachmentReference;
 import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.classloader.ExtendedURLStreamHandler;
-import org.xwiki.component.descriptor.DefaultComponentDescriptor;
 import org.xwiki.model.reference.AttachmentReferenceResolver;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.test.AbstractComponentTestCase;
@@ -46,8 +45,6 @@ import org.xwiki.test.AbstractComponentTestCase;
  */
 public class AttachmentURLStreamHandlerTest extends AbstractComponentTestCase
 {
-    private Mockery mockery = new Mockery();
-    
     private AttachmentReferenceResolver arf;
     private DocumentAccessBridge dab;
     
@@ -58,18 +55,8 @@ public class AttachmentURLStreamHandlerTest extends AbstractComponentTestCase
     {
         super.registerComponents();
 
-        this.arf = this.mockery.mock(AttachmentReferenceResolver.class);
-        DefaultComponentDescriptor<AttachmentReferenceResolver> descriptorARF =
-            new DefaultComponentDescriptor<AttachmentReferenceResolver>();
-        descriptorARF.setRole(AttachmentReferenceResolver.class);
-        descriptorARF.setRoleHint("current");
-        getComponentManager().registerComponent(descriptorARF, this.arf);
-
-        this.dab = this.mockery.mock(DocumentAccessBridge.class);
-        DefaultComponentDescriptor<DocumentAccessBridge> descriptorDAB =
-            new DefaultComponentDescriptor<DocumentAccessBridge>();
-        descriptorDAB.setRole(DocumentAccessBridge.class);
-        getComponentManager().registerComponent(descriptorDAB, this.dab);
+        this.arf = registerMockComponent(AttachmentReferenceResolver.class, "current");
+        this.dab = registerMockComponent(DocumentAccessBridge.class);
         
         this.handler = getComponentManager().lookup(ExtendedURLStreamHandler.class, "attachmentjar");
     }
@@ -95,7 +82,7 @@ public class AttachmentURLStreamHandlerTest extends AbstractComponentTestCase
         
         final AttachmentReference attachmentReference = new AttachmentReference("filename",
             new DocumentReference("wiki", "space", "page"));
-        mockery.checking(new Expectations() {{
+        getMockery().checking(new Expectations() {{
             oneOf(arf).resolve("Space.Page@filename"); will(returnValue(attachmentReference));
             oneOf(dab).getAttachmentContent(attachmentReference);
                 will(returnValue(new ByteArrayInputStream("content".getBytes())));
@@ -122,7 +109,7 @@ public class AttachmentURLStreamHandlerTest extends AbstractComponentTestCase
     {
         URL url = new URL(null, "attachmentjar://some%20page", (URLStreamHandler) this.handler);
         
-        mockery.checking(new Expectations() {{
+        getMockery().checking(new Expectations() {{
             oneOf(arf).resolve("some page");
         }});
         

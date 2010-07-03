@@ -19,8 +19,11 @@
  */
 package org.xwiki.test;
 
+import org.jmock.Mockery;
 import org.junit.After;
 import org.junit.Before;
+import org.xwiki.component.descriptor.ComponentDescriptor;
+import org.xwiki.component.descriptor.DefaultComponentDescriptor;
 import org.xwiki.component.embed.EmbeddableComponentManager;
 
 /**
@@ -32,6 +35,8 @@ public class AbstractComponentTestCase
 {
     private XWikiComponentInitializer initializer = new XWikiComponentInitializer();
 
+    private Mockery mockery = new Mockery();
+    
     /**
      * Tests that require fine-grained initializations can override this method and not call super.
      */
@@ -80,5 +85,51 @@ public class AbstractComponentTestCase
     public MockConfigurationSource getConfigurationSource()
     {
         return this.initializer.getConfigurationSource();
+    }
+
+    /**
+     * @since 2.4M2
+     */
+    public Mockery getMockery()
+    {
+        return this.mockery;
+    }
+
+    /**
+     * @since 2.4M2
+     */
+    public <T> T registerMockComponent(Class<T> role, String hint) throws Exception
+    {
+        DefaultComponentDescriptor<T> descriptor = createComponentDescriptor(role);
+        descriptor.setRoleHint(hint);
+        return registerMockComponent(descriptor);
+    }
+
+    /**
+     * @since 2.4M2
+     */
+    public <T> T registerMockComponent(Class<T> role) throws Exception
+    {
+        return registerMockComponent(createComponentDescriptor(role));
+    }
+
+    /**
+     * @since 2.4M2
+     */
+    private <T> T registerMockComponent(ComponentDescriptor<T> descriptor) throws Exception
+    {
+        T instance = this.mockery.mock(descriptor.getRole());
+        getComponentManager().registerComponent(descriptor, instance);
+        return instance;
+    }
+
+    /**
+     * @since 2.4M2
+     */
+    private <T> DefaultComponentDescriptor<T> createComponentDescriptor(Class<T> role)
+    {
+        DefaultComponentDescriptor<T> descriptor = new DefaultComponentDescriptor<T>();
+        descriptor.setRole(role);
+        return descriptor;
     }
 }

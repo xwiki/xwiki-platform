@@ -80,8 +80,8 @@ public class DefaultXHTMLOfficeDocumentBuilderTest extends AbstractOfficeImporte
         final Map<String, byte[]> mockOutput = new HashMap<String, byte[]>();
         mockOutput.put("output.html", "<html><head><title></tile></head><body></body></html>".getBytes());
 
-        final OpenOfficeConverter mockDocumentConverter = this.mockery.mock(OpenOfficeConverter.class);
-        this.mockery.checking(new Expectations() {{
+        final OpenOfficeConverter mockDocumentConverter = getMockery().mock(OpenOfficeConverter.class);
+        getMockery().checking(new Expectations() {{
             oneOf(mockOpenOfficeManager).getConverter();
             will(returnValue(mockDocumentConverter));
             allowing(mockDocumentConverter).convert(mockInput, "input.doc", "output.html");
@@ -91,7 +91,7 @@ public class DefaultXHTMLOfficeDocumentBuilderTest extends AbstractOfficeImporte
 
         // Create & register a mock entity reference serializer.
         final DocumentReference documentReference = new DocumentReference("xwiki", "Main", "Test");
-        this.mockery.checking(new Expectations() {{
+        getMockery().checking(new Expectations() {{
             allowing(mockDefaultStringEntityReferenceSerializer).serialize(documentReference);
             will(returnValue("xwiki:Main.Test"));
         }});

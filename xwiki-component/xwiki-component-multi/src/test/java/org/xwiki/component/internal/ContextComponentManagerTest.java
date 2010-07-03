@@ -22,7 +22,6 @@ package org.xwiki.component.internal;
 import junit.framework.Assert;
 
 import org.jmock.Expectations;
-import org.jmock.Mockery;
 import org.jmock.States;
 import org.junit.Test;
 import org.xwiki.bridge.DocumentAccessBridge;
@@ -41,11 +40,6 @@ import org.xwiki.test.AbstractComponentTestCase;
  */
 public class ContextComponentManagerTest extends AbstractComponentTestCase
 {
-    /**
-     * Mockery for creating mock objects.
-     */
-    private Mockery mockery = new Mockery();
-    
     /**
      * Mock document access bridge.
      */
@@ -69,19 +63,15 @@ public class ContextComponentManagerTest extends AbstractComponentTestCase
         super.registerComponents();
 
         // Document Access Bridge Mock
-        mockDocumentAccessBridge = mockery.mock(DocumentAccessBridge.class);
-        DefaultComponentDescriptor<DocumentAccessBridge> descriptorDAB =
-            new DefaultComponentDescriptor<DocumentAccessBridge>();
-        descriptorDAB.setRole(DocumentAccessBridge.class);
-        getComponentManager().registerComponent(descriptorDAB, mockDocumentAccessBridge);
+        this.mockDocumentAccessBridge = registerMockComponent(DocumentAccessBridge.class);
     }
 
     @Test
     public void testRegisterComponentInUserComponentManager() throws Exception
     {
-        final States state  = mockery.states("test");
+        final States state  = getMockery().states("test");
 
-        mockery.checking(new Expectations() {{
+        getMockery().checking(new Expectations() {{
             allowing(mockDocumentAccessBridge).getCurrentUser(); when(state.isNot("otheruser"));
                 will(returnValue("user1")); 
         }});
@@ -100,7 +90,7 @@ public class ContextComponentManagerTest extends AbstractComponentTestCase
         
         // Now verify that we cannot look it up anymore if there's another user in the context
         state.become("otheruser");
-        mockery.checking(new Expectations() {{
+        getMockery().checking(new Expectations() {{
             oneOf(mockDocumentAccessBridge).getCurrentUser(); will(returnValue("user2")); 
             oneOf(mockDocumentAccessBridge).getCurrentWiki(); will(returnValue("wiki"));
         }});
@@ -116,9 +106,9 @@ public class ContextComponentManagerTest extends AbstractComponentTestCase
     @Test
     public void testRegisterComponentInWikiComponentManager() throws Exception
     {
-        final States state  = mockery.states("test");
+        final States state  = getMockery().states("test");
 
-        mockery.checking(new Expectations() {{
+        getMockery().checking(new Expectations() {{
             allowing(mockDocumentAccessBridge).getCurrentWiki();  when(state.isNot("otherwiki"));
                 will(returnValue("wiki1"));
             allowing(mockDocumentAccessBridge).getCurrentUser(); when(state.isNot("otherwiki"));
@@ -138,7 +128,7 @@ public class ContextComponentManagerTest extends AbstractComponentTestCase
         
         // Now verify that we cannot look it up anymore if there's another wiki in the context
         state.become("otherwiki");
-        mockery.checking(new Expectations() {{
+        getMockery().checking(new Expectations() {{
             oneOf(mockDocumentAccessBridge).getCurrentUser(); will(returnValue("user")); 
             allowing(mockDocumentAccessBridge).getCurrentWiki(); will(returnValue("wiki2"));
         }});
@@ -153,9 +143,9 @@ public class ContextComponentManagerTest extends AbstractComponentTestCase
     @Test
     public void testRegisterComponentInRootComponentManager() throws Exception
     {
-        final States state  = mockery.states("test");
+        final States state  = getMockery().states("test");
 
-        mockery.checking(new Expectations() {{
+        getMockery().checking(new Expectations() {{
             allowing(mockDocumentAccessBridge).getCurrentWiki();  when(state.isNot("otherwiki"));
                 will(returnValue("wiki"));
             allowing(mockDocumentAccessBridge).getCurrentUser(); when(state.isNot("otherwiki"));

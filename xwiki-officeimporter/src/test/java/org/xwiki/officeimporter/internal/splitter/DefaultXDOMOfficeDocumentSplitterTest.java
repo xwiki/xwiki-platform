@@ -88,7 +88,7 @@ public class DefaultXDOMOfficeDocumentSplitterTest extends AbstractOfficeImporte
         final DocumentReference baseDocument = new DocumentReference("xwiki", "Test", "Test");
 
         // Add expectations to mock document name serializer. 
-        this.mockery.checking(new Expectations() {{
+        getMockery().checking(new Expectations() {{
             allowing(mockCompactWikiStringEntityReferenceSerializer).serialize(baseDocument);
             will(returnValue("Test.Test"));
             allowing(mockCompactWikiStringEntityReferenceSerializer).serialize(new DocumentReference("xwiki", "Test", "Heading1"));
@@ -102,7 +102,7 @@ public class DefaultXDOMOfficeDocumentSplitterTest extends AbstractOfficeImporte
         }});
         
         // Add expectations to mock document name factory.         
-        this.mockery.checking(new Expectations() {{
+        getMockery().checking(new Expectations() {{
             allowing(mockDocumentReferenceResolver).resolve("Test.Test");
             will(returnValue(new DocumentReference("xwiki", "Test", "Test")));
             allowing(mockDocumentReferenceResolver).resolve("Test.Heading1");
@@ -116,7 +116,7 @@ public class DefaultXDOMOfficeDocumentSplitterTest extends AbstractOfficeImporte
         }});
         
         // Add expectations to mock document access bridge.
-        this.mockery.checking(new Expectations() {{
+        getMockery().checking(new Expectations() {{
             allowing(mockDocumentAccessBridge).exists("Test.Heading1");
             will(returnValue(false));
             allowing(mockDocumentAccessBridge).exists("Test.Heading11");

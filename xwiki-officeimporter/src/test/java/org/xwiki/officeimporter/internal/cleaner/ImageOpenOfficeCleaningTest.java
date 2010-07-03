@@ -67,7 +67,7 @@ public class ImageOpenOfficeCleaningTest extends AbstractHTMLCleaningTest
         HTMLCleanerConfiguration configuration = this.openOfficeHTMLCleaner.getDefaultConfiguration();
         configuration.setParameters(Collections.singletonMap("targetDocument", "Import.Test"));
 
-        this.mockery.checking(new Expectations() {{
+        getMockery().checking(new Expectations() {{
             allowing(mockDAB).getAttachmentURL("Import.Test", "foo.png");
             will(returnValue("/bridge/foo.png"));
         }});
@@ -97,7 +97,7 @@ public class ImageOpenOfficeCleaningTest extends AbstractHTMLCleaningTest
         HTMLCleanerConfiguration configuration = this.openOfficeHTMLCleaner.getDefaultConfiguration();
         configuration.setParameters(Collections.singletonMap("targetDocument", "Import.Test"));
 
-        this.mockery.checking(new Expectations() {{
+        getMockery().checking(new Expectations() {{
             allowing(mockDAB).getAttachmentURL("Import.Test", "foo.png");
             will(returnValue("/bridge/foo.png"));
         }});
@@ -139,7 +139,7 @@ public class ImageOpenOfficeCleaningTest extends AbstractHTMLCleaningTest
         HTMLCleanerConfiguration configuration = this.openOfficeHTMLCleaner.getDefaultConfiguration();
         configuration.setParameters(Collections.singletonMap("targetDocument", "Import.Test"));
 
-        this.mockery.checking(new Expectations() {{
+        getMockery().checking(new Expectations() {{
             allowing(mockDAB).getAttachmentURL("Import.Test", "foo.png");
             will(returnValue("/bridge/foo.png"));
         }});

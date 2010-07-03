@@ -19,7 +19,10 @@
  */
 package org.xwiki.test;
 
+import org.jmock.Mock;
 import org.jmock.cglib.MockObjectTestCase;
+import org.xwiki.component.descriptor.ComponentDescriptor;
+import org.xwiki.component.descriptor.DefaultComponentDescriptor;
 import org.xwiki.component.embed.EmbeddableComponentManager;
 
 /**
@@ -95,5 +98,43 @@ public abstract class AbstractXWikiComponentTestCase extends MockObjectTestCase
     public MockConfigurationSource getConfigurationSource()
     {
         return this.initializer.getConfigurationSource();
+    }
+
+    /**
+     * @since 2.4M2
+     */
+    public <T> Mock registerMockComponent(Class<T> role, String hint) throws Exception
+    {
+        DefaultComponentDescriptor<T> descriptor = createComponentDescriptor(role);
+        descriptor.setRoleHint(hint);
+        return registerMockComponent(descriptor);
+    }
+
+    /**
+     * @since 2.4M2
+     */
+    public <T> Mock registerMockComponent(Class<T> role) throws Exception
+    {
+        return registerMockComponent(createComponentDescriptor(role));
+    }
+
+    /**
+     * @since 2.4M2
+     */
+    private <T> Mock registerMockComponent(ComponentDescriptor<T> descriptor) throws Exception
+    {
+        Mock mock = mock(descriptor.getRole());
+        getComponentManager().registerComponent(descriptor, (T) mock.proxy());
+        return mock;
+    }
+
+    /**
+     * @since 2.4M2
+     */
+    private <T> DefaultComponentDescriptor<T> createComponentDescriptor(Class<T> role)
+    {
+        DefaultComponentDescriptor<T> descriptor = new DefaultComponentDescriptor<T>();
+        descriptor.setRole(role);
+        return descriptor;
     }
 }

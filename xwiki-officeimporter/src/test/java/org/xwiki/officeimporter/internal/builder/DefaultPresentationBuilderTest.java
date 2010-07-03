@@ -29,7 +29,6 @@ import junit.framework.Assert;
 
 import org.jmock.Expectations;
 import org.junit.Before;
-import org.xwiki.component.descriptor.DefaultComponentDescriptor;
 import org.xwiki.component.util.ReflectionUtils;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReferenceSerializer;
@@ -79,11 +78,7 @@ public class DefaultPresentationBuilderTest extends AbstractOfficeImporterTest
         this.officeManager = getComponentManager().lookup(OpenOfficeManager.class);
         
         // TODO : Remove when DefaultPresentationBuilder#buildPresentationXDOM() is fixed
-        this.mockVelocityMacro = this.mockery.mock(Macro.class);
-        DefaultComponentDescriptor<Macro> descriptor = new DefaultComponentDescriptor<Macro>();
-        descriptor.setRole(Macro.class);
-        descriptor.setRoleHint("velocity");
-        getComponentManager().registerComponent(descriptor, this.mockVelocityMacro);
+        this.mockVelocityMacro = registerMockComponent(Macro.class, "velocity");
     }
     
     /**
@@ -101,10 +96,10 @@ public class DefaultPresentationBuilderTest extends AbstractOfficeImporterTest
         final Map<String, byte[]> mockOutput = new HashMap<String, byte[]>();
         mockOutput.put("output.html", "<html><head><title></tile></head><body><p>Slide1</p></body></html>".getBytes());
 
-        final OpenOfficeConverter mockDocumentConverter = this.mockery.mock(OpenOfficeConverter.class);
-        final EntityReferenceSerializer mockSerializer = this.mockery.mock(EntityReferenceSerializer.class);
+        final OpenOfficeConverter mockDocumentConverter = getMockery().mock(OpenOfficeConverter.class);
+        final EntityReferenceSerializer mockSerializer = getMockery().mock(EntityReferenceSerializer.class);
         final DocumentReference reference = new DocumentReference("xwiki", "Main", "Test");
-        this.mockery.checking(new Expectations() {{
+        getMockery().checking(new Expectations() {{
             oneOf(mockOpenOfficeManager).getConverter();
             will(returnValue(mockDocumentConverter));
             oneOf(mockDocumentConverter).convert(mockInput, "input.ppt", "output.html");

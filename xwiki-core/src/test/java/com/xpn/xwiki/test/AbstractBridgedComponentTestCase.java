@@ -28,7 +28,6 @@ import org.jmock.Mockery;
 import org.jmock.lib.legacy.ClassImposteriser;
 import org.junit.After;
 import org.junit.Before;
-import org.xwiki.component.descriptor.DefaultComponentDescriptor;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.container.Container;
 import org.xwiki.context.Execution;
@@ -79,14 +78,10 @@ public class AbstractBridgedComponentTestCase extends AbstractComponentTestCase
         Container c = getComponentManager().lookup(Container.class);
         c.setApplicationContext(new TestApplicationContext());
 
-        final CoreConfiguration mockCoreConfiguration = this.mockery.mock(CoreConfiguration.class);
+        final CoreConfiguration mockCoreConfiguration = registerMockComponent(CoreConfiguration.class);
         this.mockery.checking(new Expectations() {{
             allowing(mockCoreConfiguration).getDefaultDocumentSyntax(); will(returnValue(Syntax.XWIKI_1_0));
         }});
-
-        DefaultComponentDescriptor<CoreConfiguration> descriptor = new DefaultComponentDescriptor<CoreConfiguration>();
-        descriptor.setRole(CoreConfiguration.class);
-        getComponentManager().registerComponent(descriptor, mockCoreConfiguration);
     }
 
     @After

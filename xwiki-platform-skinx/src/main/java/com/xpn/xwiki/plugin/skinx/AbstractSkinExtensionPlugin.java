@@ -20,6 +20,8 @@
 
 package com.xpn.xwiki.plugin.skinx;
 
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedHashSet;
@@ -27,7 +29,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.Map.Entry;
 
-import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -307,10 +308,11 @@ public abstract class AbstractSkinExtensionPlugin extends XWikiDefaultPlugin
     protected String sanitize(String value)
     {
         String result = value;
-        result = StringUtils.replace(result, "\"", "%22");
-        result = StringUtils.replace(result, "'", "%27");
-        result = StringUtils.replace(result, "<", "%3C");
-        result = StringUtils.replace(result, ">", "%3E");
+        try {
+            result = URLEncoder.encode(value, "UTF-8");
+        } catch (UnsupportedEncodingException ex) {
+            // Should never happen.
+        }
         return result;
     }
 

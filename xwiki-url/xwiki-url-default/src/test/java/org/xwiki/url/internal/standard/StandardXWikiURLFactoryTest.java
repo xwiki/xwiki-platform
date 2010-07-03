@@ -20,11 +20,8 @@
 package org.xwiki.url.internal.standard;
 
 import org.jmock.Expectations;
-import org.jmock.Mockery;
 import org.junit.Assert;
 import org.junit.Test;
-import org.xwiki.component.descriptor.DefaultComponentDescriptor;
-import org.xwiki.model.reference.AttachmentReference;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.WikiReference;
@@ -58,21 +55,11 @@ public class StandardXWikiURLFactoryTest extends AbstractComponentTestCase
 
     private StandardURLConfiguration mockConfiguration;
 
-    private Mockery mockery = new Mockery();
-
-    @Override protected void registerComponents() throws Exception
+    @Override
+    protected void registerComponents() throws Exception
     {
-        this.mockConfiguration = this.mockery.mock(StandardURLConfiguration.class);
-        DefaultComponentDescriptor<StandardURLConfiguration> descriptorUC =
-            new DefaultComponentDescriptor<StandardURLConfiguration>();
-        descriptorUC.setRole(StandardURLConfiguration.class);
-        getComponentManager().registerComponent(descriptorUC, this.mockConfiguration);
-
-        this.mockHostResolver = this.mockery.mock(HostResolver.class);
-        DefaultComponentDescriptor<HostResolver> descriptorHR =
-            new DefaultComponentDescriptor<HostResolver>();
-        descriptorHR.setRole(HostResolver.class);
-        getComponentManager().registerComponent(descriptorHR, this.mockHostResolver);
+        this.mockConfiguration = registerMockComponent(StandardURLConfiguration.class);
+        this.mockHostResolver = registerMockComponent(HostResolver.class);
 
         this.factory = getComponentManager().lookup(XWikiURLFactory.class, "standard");
     }
@@ -171,7 +158,7 @@ public class StandardXWikiURLFactoryTest extends AbstractComponentTestCase
     private XWikiURL createURL(String url, final boolean isDomainBasedWikiFormat, final String expectedHost)
         throws Exception
     {
-        this.mockery.checking(new Expectations() {{
+        getMockery().checking(new Expectations() {{
             allowing(mockHostResolver).resolve(expectedHost);
                 will(returnValue(new WikiReference("Wiki")));
             allowing(mockConfiguration).isPathBasedMultiWikiFormat();

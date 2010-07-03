@@ -27,7 +27,6 @@ import org.jmock.Mockery;
 import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.classloader.ExtendedURLClassLoader;
 import org.xwiki.classloader.URIClassLoader;
-import org.xwiki.component.descriptor.DefaultComponentDescriptor;
 import org.xwiki.model.reference.AttachmentReferenceResolver;
 import org.xwiki.rendering.internal.macro.script.AttachmentClassLoaderFactory;
 import org.xwiki.rendering.internal.macro.script.DefaultAttachmentClassLoaderFactory;
@@ -41,8 +40,6 @@ import org.xwiki.test.AbstractComponentTestCase;
  */
 public class DefaultAttachmentClassLoaderFactoryTest extends AbstractComponentTestCase
 {
-    private Mockery mockery = new Mockery();
-    
     private AttachmentClassLoaderFactory factory;
     
     private AttachmentReferenceResolver arf;
@@ -54,20 +51,8 @@ public class DefaultAttachmentClassLoaderFactoryTest extends AbstractComponentTe
     {
         super.registerComponents();
 
-        this.arf = this.mockery.mock(AttachmentReferenceResolver.class);
-        DefaultComponentDescriptor<AttachmentReferenceResolver> descriptorARF =
-            new DefaultComponentDescriptor<AttachmentReferenceResolver>();
-        descriptorARF.setRole(AttachmentReferenceResolver.class);
-        descriptorARF.setRoleHint("current");
-        getComponentManager().registerComponent(descriptorARF, this.arf);
-
-        this.dab = this.mockery.mock(DocumentAccessBridge.class);
-        DefaultComponentDescriptor<DocumentAccessBridge> descriptorDAB =
-            new DefaultComponentDescriptor<DocumentAccessBridge>();
-        descriptorDAB.setRole(DocumentAccessBridge.class);
-        getComponentManager().registerComponent(descriptorDAB, this.dab);
-
-
+        this.arf = registerMockComponent(AttachmentReferenceResolver.class, "current");
+        this.dab = registerMockComponent(DocumentAccessBridge.class);
 
         this.factory = getComponentManager().lookup(AttachmentClassLoaderFactory.class);
     }

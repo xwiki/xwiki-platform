@@ -47,8 +47,6 @@ public class DefaultMacroCategoryManagerTest extends AbstractComponentTestCase
 {
     private MacroCategoryManager macroCategoryManager;
     
-    private Mockery context = new Mockery();
-
     @Before
     public void setUp() throws Exception
     {
@@ -83,13 +81,13 @@ public class DefaultMacroCategoryManagerTest extends AbstractComponentTestCase
     public void testGetMacroNamesForCategory() throws Exception
     {        
         // Create two mock macros.
-        final Macro testMacro1 = context.mock(Macro.class, "mock1");
-        final Macro testMacro2 = context.mock(Macro.class, "mock2");
-        this.context.checking(new Expectations(){{
+        final Macro testMacro1 = getMockery().mock(Macro.class, "mock1");
+        final Macro testMacro2 = getMockery().mock(Macro.class, "mock2");
+        getMockery().checking(new Expectations(){{
             allowing(testMacro1).getDescriptor();
             will(returnValue(new DefaultMacroDescriptor("Test macro - 1")));
         }});
-        this.context.checking(new Expectations(){{
+        getMockery().checking(new Expectations(){{
             allowing(testMacro2).getDescriptor();
             will(returnValue(new DefaultMacroDescriptor("Test macro - 2")));
         }});
@@ -127,18 +125,12 @@ public class DefaultMacroCategoryManagerTest extends AbstractComponentTestCase
     @Test
     public void testGetMacroIdsWithSyntaxSpecificMacros() throws Exception
     {
-        // Create a mock macro.
-        final Macro mockMacro = context.mock(Macro.class);
-        this.context.checking(new Expectations(){{
+        // Create a mock macro and register it against CM as a xwiki/2.0 specific macro.
+        final Macro mockMacro = registerMockComponent(Macro.class, "mytestmacro/xwiki/2.0");
+        getMockery().checking(new Expectations(){{
             allowing(mockMacro).getDescriptor();
             will(returnValue(new DefaultMacroDescriptor("Test macro")));
         }});
-        
-        // Register this macro against CM as a xwiki/2.0 specific macro.
-        DefaultComponentDescriptor<Macro> descriptor = new DefaultComponentDescriptor<Macro>();
-        descriptor.setRole(Macro.class);
-        descriptor.setRoleHint("mytestmacro/xwiki/2.0");
-        getComponentManager().registerComponent(descriptor, mockMacro);
         
         // Override the macro category for this macro. 
         DefaultRenderingConfiguration configuration =

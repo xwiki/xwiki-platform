@@ -43,7 +43,7 @@ public class DefaultComponentDescriptor<T> extends DefaultComponentRole<T> imple
         this.implementation = implementation;
     }
 
-    public Class<  ? extends T> getImplementation()
+    public Class<? extends T> getImplementation()
     {
         return implementation;
     }

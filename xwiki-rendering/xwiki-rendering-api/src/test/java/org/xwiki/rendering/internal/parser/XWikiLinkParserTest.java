@@ -19,10 +19,7 @@
  */
 package org.xwiki.rendering.internal.parser;
 
-import org.jmock.Mockery;
 import org.junit.*;
-import org.xwiki.component.descriptor.ComponentInstantiationStrategy;
-import org.xwiki.component.descriptor.DefaultComponentDescriptor;
 import org.xwiki.rendering.listener.Link;
 import org.xwiki.rendering.listener.LinkType;
 import org.xwiki.rendering.parser.LinkParser;
@@ -37,20 +34,12 @@ public class XWikiLinkParserTest extends AbstractComponentTestCase
 {
     private LinkParser parser;
 
-    private Mockery mockery = new Mockery();
-
     @Override
     protected void registerComponents() throws Exception
     {
         // Create a Mock WikiModel implementation so that the link parser works in wiki mode
-        WikiModel mockWikiModel = this.mockery.mock(WikiModel.class); 
-
-        DefaultComponentDescriptor<WikiModel> componentDescriptor = new DefaultComponentDescriptor<WikiModel>();
-        componentDescriptor.setRole(WikiModel.class);
-        componentDescriptor.setInstantiationStrategy(ComponentInstantiationStrategy.SINGLETON);
-        componentDescriptor.setImplementation(null);
-
-        getComponentManager().registerComponent(componentDescriptor, mockWikiModel);
+        registerMockComponent(WikiModel.class);
+        
         this.parser = getComponentManager().lookup(LinkParser.class, "xwiki/2.0");
     }
 

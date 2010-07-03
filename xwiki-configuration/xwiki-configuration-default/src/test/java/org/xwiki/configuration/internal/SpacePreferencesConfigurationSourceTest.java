@@ -20,12 +20,9 @@
 package org.xwiki.configuration.internal;
 
 import org.jmock.Expectations;
-import org.jmock.Mockery;
 import org.junit.Assert;
 import org.junit.Test;
 import org.xwiki.bridge.DocumentAccessBridge;
-import org.xwiki.component.descriptor.DefaultComponentDescriptor;
-import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.configuration.ConfigurationSource;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.test.AbstractComponentTestCase;
@@ -38,15 +35,13 @@ import org.xwiki.test.AbstractComponentTestCase;
  */
 public class SpacePreferencesConfigurationSourceTest extends AbstractComponentTestCase
 {
-    private Mockery mockery = new Mockery();
-
     private DocumentAccessBridge bridge;
 
     @Override
     protected void registerComponents() throws Exception
     {
         super.registerComponents();
-        this.bridge = registerComponentMock(getComponentManager(), DocumentAccessBridge.class); 
+        this.bridge = registerMockComponent(DocumentAccessBridge.class);
     }
 
     @Test
@@ -57,7 +52,7 @@ public class SpacePreferencesConfigurationSourceTest extends AbstractComponentTe
         final DocumentReference webPreferencesReference = new DocumentReference("wiki", "space", "WebPreferences");
         final DocumentReference currentDocument = new DocumentReference("wiki", "space", "page");
 
-        mockery.checking(new Expectations() {{
+        getMockery().checking(new Expectations() {{
             allowing(bridge).getCurrentDocumentReference();
                 will(returnValue(currentDocument));
             oneOf(bridge).getProperty(webPreferencesReference, webPreferencesReference, "key");
@@ -69,15 +64,5 @@ public class SpacePreferencesConfigurationSourceTest extends AbstractComponentTe
         Assert.assertEquals("value", result);
         // Check that the current document reference is not modified
         Assert.assertEquals(currentDocument.getName(), currentDocument.getParent().getChild().getName());
-    }
-
-    private <T> T registerComponentMock(ComponentManager componentManager, Class<T> componentRoleClass) throws Exception
-    {
-        T instance = this.mockery.mock(componentRoleClass);
-        DefaultComponentDescriptor<T> descriptor =
-            new DefaultComponentDescriptor<T>();
-        descriptor.setRole(componentRoleClass);
-        componentManager.registerComponent(descriptor, instance);
-        return instance;            
     }
 }

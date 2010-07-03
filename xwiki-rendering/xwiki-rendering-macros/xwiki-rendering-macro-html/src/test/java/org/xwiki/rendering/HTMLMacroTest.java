@@ -19,11 +19,9 @@
  */
 package org.xwiki.rendering;
 
-import org.jmock.Mockery;
 import org.junit.Assert;
 import org.junit.Before;
 import org.xwiki.bridge.DocumentAccessBridge;
-import org.xwiki.component.descriptor.DefaultComponentDescriptor;
 import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.rendering.internal.macro.html.HTMLMacro;
 import org.xwiki.rendering.macro.Macro;
@@ -40,8 +38,6 @@ import org.xwiki.test.AbstractComponentTestCase;
  */
 public class HTMLMacroTest extends AbstractComponentTestCase
 {
-    private Mockery context = new Mockery();
-
     /**
      * {@inheritDoc}
      * 
@@ -52,17 +48,8 @@ public class HTMLMacroTest extends AbstractComponentTestCase
     {
         super.setUp();
 
-        DocumentAccessBridge mockDocumentAccessBridge = this.context.mock(DocumentAccessBridge.class);
-        DefaultComponentDescriptor<DocumentAccessBridge> descriptorDAB =
-            new DefaultComponentDescriptor<DocumentAccessBridge>();
-        descriptorDAB.setRole(DocumentAccessBridge.class);
-        getComponentManager().registerComponent(descriptorDAB, mockDocumentAccessBridge);
-
-        EntityReferenceSerializer mockEntityReferenceSerializer = this.context.mock(EntityReferenceSerializer.class);
-        DefaultComponentDescriptor<EntityReferenceSerializer> descriptorERS =
-            new DefaultComponentDescriptor<EntityReferenceSerializer>();
-        descriptorERS.setRole(EntityReferenceSerializer.class);
-        getComponentManager().registerComponent(descriptorERS, mockEntityReferenceSerializer);
+        registerMockComponent(DocumentAccessBridge.class);
+        registerMockComponent(EntityReferenceSerializer.class);
     }
 
     /**

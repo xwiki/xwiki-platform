@@ -87,8 +87,19 @@ XWiki.editors.FullScreenEditing = Class.create({
   addWysiwyg20Listener : function () {
     document.observe('xwiki:wysiwyg:created', this.wysiwyg20Created.bindAsEventListener(this));
   },
-  wysiwyg20Created : function(event, memo) {
-    // TODO: Implement me
+  wysiwyg20Created : function(event) {
+    var item = $(event.memo.instance.getRichTextArea()).up(".xRichTextEditor");
+    this.addBehavior(item);
+    // Remove the old maximize link inserted for the plain textarea before the WYSIWYG was loaded
+    while (true) {
+      item = item.up();
+      if (!item) {
+        return;
+      } else if (item.previous(".fullScreenEditLinkContainer")) {
+        item.previous(".fullScreenEditLinkContainer").remove();
+        return;
+      }
+    }
   },
   // Some simple functions that help deciding what kind of editor is the target element
   isWikiContent : function (textarea) {
@@ -472,12 +483,6 @@ XWiki.editors.FullScreenEditing = Class.create({
 });
 
 // Create the fullscreen behavior on startup.
-// Don't listen to dom:loaded, since the WYSIWYG editors are loaded later.
-Event.observe(window, 'load', function() {
-  if(Prototype.Browser.IE) {
-    // In IE there is a race condition between the WYSIWYGs and this script. Allow the WYSIWYG to initialize before inserting buttons.
-    setTimeout("new XWiki.editors.FullScreenEditing();", 500);
-  } else {
-    new XWiki.editors.FullScreenEditing();
-  }
+document.observe('xwiki:dom:loaded', function() {
+  new XWiki.editors.FullScreenEditing();
 });

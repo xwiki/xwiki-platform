@@ -311,7 +311,8 @@ public abstract class AbstractSkinExtensionPlugin extends XWikiDefaultPlugin
         try {
             result = URLEncoder.encode(value, "UTF-8");
         } catch (UnsupportedEncodingException ex) {
-            // Should never happen.
+            // Should never happen since the UTF-8 encoding is always available in the platform,
+            // see http://java.sun.com/j2se/1.5.0/docs/api/java/nio/charset/Charset.html
         }
         return result;
     }

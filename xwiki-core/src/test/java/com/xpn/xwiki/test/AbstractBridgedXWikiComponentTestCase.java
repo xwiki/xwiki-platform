@@ -38,7 +38,10 @@ import com.xpn.xwiki.web.Utils;
  * 
  * @version $Id$
  * @since 1.6M1
+ *
+ * @deprecated use JUnit 4.x and {@link com.xpn.xwiki.test.AbstractBridgedComponentTestCase}
  */
+@Deprecated
 public abstract class AbstractBridgedXWikiComponentTestCase extends AbstractXWikiComponentTestCase
 {
     private XWikiContext context;

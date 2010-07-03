@@ -19,11 +19,16 @@
  */
 package org.xwiki.rendering.internal.configuration;
 
-import org.xwiki.component.annotation.Component;
-import org.xwiki.rendering.scaffolding.AbstractXWikiRenderingTestCase;
+import java.util.Properties;
+
+import org.jmock.Expectations;
+import org.junit.Before;
+import org.xwiki.configuration.ConfigurationSource;
 import org.xwiki.rendering.configuration.RenderingConfiguration;
 import org.junit.Assert;
 import org.junit.Test;
+import org.xwiki.test.AbstractMockingComponentTest;
+import org.xwiki.test.annotation.ComponentTest;
 
 /**
  * Unit tests for {@link org.xwiki.rendering.internal.configuration.XWikiRenderingConfiguration}.
@@ -31,15 +36,40 @@ import org.junit.Test;
  * @version $Id$
  * @since 2.0M1
  */
-@Component
-public class XWikiRenderingConfigurationTest extends AbstractXWikiRenderingTestCase
+@ComponentTest(XWikiRenderingConfiguration.class)
+public class XWikiRenderingConfigurationTest extends AbstractMockingComponentTest
 {
-    @Test
-    public void testDefaultConfiguration() throws Exception
+    private RenderingConfiguration configuration;
+
+    @Before
+    public void setUp() throws Exception
     {
-        RenderingConfiguration configuration = getComponentManager().lookup(RenderingConfiguration.class);
-        Assert.assertEquals("%p", configuration.getLinkLabelFormat());
-        Assert.assertNotNull(configuration.getMacroCategories());
-        Assert.assertEquals(0, configuration.getMacroCategories().size());
+        super.setUp();
+        this.configuration = getComponentManager().lookup(RenderingConfiguration.class);
+    }
+
+    @Test
+    public void testGetLinkLabelFormat() throws Exception
+    {
+        final ConfigurationSource source = getComponentManager().lookup(ConfigurationSource.class);
+        getMockery().checking(new Expectations() {{
+            allowing(source).getProperty("rendering.linkLabelFormat", "%p");
+                will(returnValue("%p"));
+        }});
+
+        Assert.assertEquals("%p", this.configuration.getLinkLabelFormat());
+    }
+
+    @Test
+    public void testGetMacroCategories() throws Exception
+    {
+        final ConfigurationSource source = getComponentManager().lookup(ConfigurationSource.class);
+        getMockery().checking(new Expectations() {{
+            allowing(source).getProperty("rendering.macroCategories", Properties.class);
+                will(returnValue(new Properties()));
+        }});
+
+        Assert.assertNotNull(this.configuration.getMacroCategories());
+        Assert.assertEquals(0, this.configuration.getMacroCategories().size());
     }
 }

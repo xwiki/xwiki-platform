@@ -184,12 +184,17 @@ tt.wikimodel-verbatim {
 }
 
 /* -----------------Non Existing Links-------------------*/
+/* xwiki/2.0 create links */
 span.wikicreatelink a {
-  background: transparent url("$xwiki.getSkinFile('icons/xwiki/create-link.png')") no-repeat right;
-  padding-right: 13px;
   text-decoration: underline;
 }
-
+span.wikicreatelink a:after {
+  content: "?";
+  color: $theme.pageContentBackgroundColor;
+  background-color: $theme.linkColor;
+  text-decoration: underline;
+}
+/* xwiki/1.0 create links */
 .wikicreatelinktext {
   text-decoration: underline;
 }

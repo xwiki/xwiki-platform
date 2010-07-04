@@ -21,7 +21,7 @@ $xwiki.ssfx.use('js/xwiki/editors/fullScreenEdit.css', true)##
     #end
     #set($p = $p * 10)
   #end
-  <textarea readonly="readonly" class="wiki-code">
+  <textarea readonly="readonly" class="wiki-code" rows="25" cols="80">
 #foreach($line in $contentLines)
 $doc.name.format("%${positions}d:", $velocityCount) $line
 #end</textarea>

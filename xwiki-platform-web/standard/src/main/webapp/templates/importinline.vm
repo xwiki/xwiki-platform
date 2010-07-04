@@ -80,7 +80,7 @@
               </div>
               <div class="infos">
                   $msg.get('core.importer.packageInformationExtract', [
-                      $xwiki.getLocalUserName($attach.author, true),
+                      $xwiki.getUserName($attach.author, true),
                       $!xwiki.formatDate($attach.date)
                   ]) - <span class="size">(#dynamicsize($attach.filesize))</span>
               </div>

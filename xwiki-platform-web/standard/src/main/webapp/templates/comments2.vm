@@ -14,7 +14,7 @@
 <div class="xwikidatatitle">
 <a href="" onclick="showhide('xwikicommentscontent'); return false">$msg.get("Comments")</a>:
 $!comments.size() $msg.get("comments") #if($comments.size()>0) $msg.get("by")
-$!xwiki.getLocalUserName($doc.display('author','view',$comments.get(0))) ...
+$!xwiki.getUserName($doc.display('author','view',$comments.get(0))) ...
 #end
 </div>
 </div>
@@ -24,7 +24,7 @@ $!xwiki.getLocalUserName($doc.display('author','view',$comments.get(0))) ...
 #foreach($comment in $comments)
 #set($count=$count+1)
 <div id="xwikicomment_${count}" class="xwikicomment" >
-$!xwiki.getLocalUserName($doc.display('author','view',$comment))
+$!xwiki.getUserName($doc.display('author','view',$comment))
 #set($date = $doc.display("date","view",$comment))
 #if($date != "")
 $date

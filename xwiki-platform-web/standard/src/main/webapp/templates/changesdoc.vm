@@ -53,7 +53,7 @@
       <div class="changes-info-title">$msg.get('core.viewers.diff.from', [$rev1])</div>
       <div class="changes-info-content">
       #if($origdoc)
-        $msg.get('core.viewers.diff.editedBy', [$xwiki.getLocalUserName($origdoc.author)])
+        $msg.get('core.viewers.diff.editedBy', [$xwiki.getUserName($origdoc.author)])
         <br />
         $msg.get('core.viewers.diff.editedOn', [$xwiki.formatDate($origdoc.date)])
       #end
@@ -63,7 +63,7 @@
       <div class="changes-info-title">$msg.get('core.viewers.diff.to', [$rev2])</div>
       <div class="changes-info-content">
       #if($newdoc)
-        $msg.get('core.viewers.diff.editedBy', [$xwiki.getLocalUserName($newdoc.author)])
+        $msg.get('core.viewers.diff.editedBy', [$xwiki.getUserName($newdoc.author)])
         <br />
         $msg.get('core.viewers.diff.editedOn', [$xwiki.formatDate($newdoc.date)])
       #end

@@ -28,7 +28,7 @@
         </td>
         <td><a href="$url">$version</a></td>
         <td>$attachrev.getFilesize()</td>
-        <td>$xwiki.getLocalUserName($attachrev.getAuthor())</td>
+        <td>$xwiki.getUserName($attachrev.getAuthor())</td>
         <td>$xwiki.formatDate($attachrev.getDate())</td>
     </tr>
 #end

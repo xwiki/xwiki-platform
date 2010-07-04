@@ -44,7 +44,7 @@
                             #set($bentrydoc = $xwiki.getDocument($item))
                             <td>* <a href="#" onclick="document.forms[0].wiki_page.value='$bentrydoc.name';if ('$doc.space' != '$bentrydoc.space') document.forms[0].wiki_space.value='$bentrydoc.space'; else document.forms[0].wiki_space.value=''; return false;">
                                 $bentrydoc.name</a>  $msg.get("inspace") $bentrydoc.space $msg.get("wikiweb"), $msg.get("lastmodifiedby")
-                                $xwiki.getLocalUserName($bentrydoc.author) $msg.get("lastmodifiedon") $xwiki.formatDate($bentrydoc.date,"MMMM dd, yyyy HH:mm")
+                                $xwiki.getUserName($bentrydoc.author) $msg.get("lastmodifiedon") $xwiki.formatDate($bentrydoc.date,"MMMM dd, yyyy HH:mm")
                             </td>
                         </tr>
                 #end

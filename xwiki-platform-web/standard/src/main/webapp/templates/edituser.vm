@@ -4,7 +4,7 @@
 #set($force = $!request.get("force"))
 #if (($doc.getLocked()==true)&&(!$force))
 <div>
-$msg.get("doclockedby") $xwiki.getLocalUserName($doc.getLockingUser()).
+$msg.get("doclockedby") $xwiki.getUserName($doc.getLockingUser()).
 <br />
 <a href="javascript:window.lb.lbLoadForm('$doc.getURL("inline", "$!request.getQueryString()&force=1")')">$msg.get("forcelock")</a>
 </div>

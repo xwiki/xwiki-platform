@@ -13,7 +13,7 @@
           #end
           <tr>
             <td align="left"> * <a href="#" onclick="document.forms[0].attach_file.value='$attach.filename'; return false;" >$attach.filename</a>
-            $msg.get("attachedby") $xwiki.getLocalUserName($attach.author) on $xwiki.formatDate($attach.date)</td>
+            $msg.get("attachedby") $xwiki.getUserName($attach.author) on $xwiki.formatDate($attach.date)</td>
           </tr>
         #end
         #set( $counter = $counter + 1)

@@ -27,7 +27,7 @@
             </a>
           #end
         </td><td align="center"><a href="$doc.getAttachmentURL("${attach.filename}", "download")" onclick="document.forms[0].href.value='$attach.filename'; return false;" >$attach.filename</a></td>
-        <td align="center">$attach.version</td><td align="center">$xwiki.getLocalUserName($attach.author)</td>
+        <td align="center">$attach.version</td><td align="center">$xwiki.getUserName($attach.author)</td>
       </tr>
     #end
     #set( $counter = $counter + 1)

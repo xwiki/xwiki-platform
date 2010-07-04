@@ -32,7 +32,7 @@ import org.xwiki.rendering.parser.ParseException;
 import org.xwiki.rendering.parser.Parser;
 import org.xwiki.rendering.syntax.Syntax;
 import org.xwiki.test.AbstractMockingComponentTestCase;
-import org.xwiki.test.annotation.RequirementMock;
+import org.xwiki.test.annotation.MockingRequirement;
 
 import java.io.Reader;
 import java.util.Collections;
@@ -44,7 +44,7 @@ import java.util.Collections;
  */
 public class MacroContentTableBlockDataSourceTest extends AbstractMockingComponentTestCase
 {
-    @RequirementMock
+    @MockingRequirement
     private MacroContentTableBlockDataSource source;
 
     /**

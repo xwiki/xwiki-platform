@@ -29,7 +29,7 @@ import org.xwiki.query.Query;
 import org.xwiki.query.QueryException;
 import org.xwiki.query.QueryExecutorManager;
 import org.xwiki.test.AbstractMockingComponentTestCase;
-import org.xwiki.test.annotation.RequirementMock;
+import org.xwiki.test.annotation.MockingRequirement;
 
 /**
  * Tests for {@link SecureQueryExecutorManager}
@@ -38,7 +38,7 @@ import org.xwiki.test.annotation.RequirementMock;
  */
 public class SecureQueryExecutorManagerTest extends AbstractMockingComponentTestCase
 {
-    @RequirementMock
+    @MockingRequirement
     private SecureQueryExecutorManager qem;
 
     private DocumentAccessBridge dab;

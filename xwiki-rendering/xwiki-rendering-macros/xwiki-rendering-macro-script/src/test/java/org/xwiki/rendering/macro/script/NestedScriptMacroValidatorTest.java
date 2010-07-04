@@ -38,7 +38,7 @@ import org.xwiki.rendering.macro.MacroId;
 import org.xwiki.rendering.macro.MacroManager;
 import org.xwiki.rendering.transformation.MacroTransformationContext;
 import org.xwiki.test.AbstractMockingComponentTestCase;
-import org.xwiki.test.annotation.RequirementMock;
+import org.xwiki.test.annotation.MockingRequirement;
 
 /**
  * Unit tests for {@link org.xwiki.rendering.internal.macro.script.NestedScriptMacroValidator}.
@@ -48,7 +48,7 @@ import org.xwiki.test.annotation.RequirementMock;
  */
 public class NestedScriptMacroValidatorTest extends AbstractMockingComponentTestCase
 {
-    @RequirementMock
+    @MockingRequirement
     private NestedScriptMacroValidator validator;
 
     /**

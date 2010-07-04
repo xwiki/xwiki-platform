@@ -37,7 +37,7 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
 @Retention(RUNTIME)
 @Target(FIELD)
 @Inherited
-public @interface RequirementMock
+public @interface MockingRequirement
 {
     /**
      * @return the role if the component implementation implements several roles.

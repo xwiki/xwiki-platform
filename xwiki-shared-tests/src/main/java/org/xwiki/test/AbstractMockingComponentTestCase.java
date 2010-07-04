@@ -27,7 +27,7 @@ import org.xwiki.component.descriptor.ComponentDescriptor;
 import org.xwiki.component.descriptor.DefaultComponentDescriptor;
 import org.xwiki.component.embed.EmbeddableComponentManager;
 import org.xwiki.component.util.ReflectionUtils;
-import org.xwiki.test.annotation.RequirementMock;
+import org.xwiki.test.annotation.MockingRequirement;
 
 import java.lang.reflect.Field;
 import java.util.Arrays;
@@ -39,8 +39,8 @@ import java.util.Set;
  * Unit tests for Components should extend this class instead of the older
  * {@link org.xwiki.test.AbstractComponentTestCase} test class.
  *
- * To use this class, define one or several fields annotated with {@link RequirementMock}. These fields will have all
- * their dependencies mocked.
+ * To use this class, define one or several fields annotated with {@link org.xwiki.test.annotation.MockingRequirement}.
+ * These fields will have all their dependencies mocked.
  *
  * @version $Id$
  * @since 2.2M1
@@ -61,19 +61,19 @@ public class AbstractMockingComponentTestCase extends AbstractMockingTestCase
         // Step 1: Register all components available
         this.loader.initialize(this.componentManager, getClass().getClassLoader());
 
-        // Step 2: Inject all fields annotated with @RequirementMock.
+        // Step 2: Inject all fields annotated with @MockingRequirement.
         for (Field field : ReflectionUtils.getAllFields(getClass())) {
-            RequirementMock requirementMock = field.getAnnotation(RequirementMock.class);
-            if (requirementMock != null) {
-                Class< ? > componentRoleClass = findComponentRoleClass(field, requirementMock);
+            MockingRequirement mockingRequirement = field.getAnnotation(MockingRequirement.class);
+            if (mockingRequirement != null) {
+                Class< ? > componentRoleClass = findComponentRoleClass(field, mockingRequirement);
                 for (ComponentDescriptor descriptor :
                     factory.createComponentDescriptors(field.getType(), componentRoleClass))
                 {
                     // Only use the descriptor for the specified hint
-                    if ((requirementMock.hint().length() > 0 && requirementMock.hint().equals(descriptor.getRoleHint()))
-                      || requirementMock.hint().length() == 0)
+                    if ((mockingRequirement.hint().length() > 0 && mockingRequirement.hint().equals(
+                        descriptor.getRoleHint())) || mockingRequirement.hint().length() == 0)
                     {
-                        registerMockDependencies(descriptor, requirementMock);
+                        registerMockDependencies(descriptor, mockingRequirement);
                         getComponentManager().registerComponent(descriptor);
                         ReflectionUtils.setFieldValue(this, field.getName(),
                             getComponentManager().lookup(descriptor.getRole(), descriptor.getRoleHint()));
@@ -84,10 +84,10 @@ public class AbstractMockingComponentTestCase extends AbstractMockingTestCase
         }
     }
 
-    private void registerMockDependencies(ComponentDescriptor descriptor, RequirementMock requirementMock)
+    private void registerMockDependencies(ComponentDescriptor descriptor, MockingRequirement mockingRequirement)
         throws Exception
     {
-        List<Class < ? >> exceptions = Arrays.asList(requirementMock.exceptions());
+        List<Class < ? >> exceptions = Arrays.asList(mockingRequirement.exceptions());
         Collection<ComponentDependency<?>> dependencyDescriptors = descriptor.getComponentDependencies();
         for (ComponentDependency<?> dependencyDescriptor : dependencyDescriptors) {
             // Only register a mock if it isn't an exception
@@ -101,16 +101,16 @@ public class AbstractMockingComponentTestCase extends AbstractMockingTestCase
         }
     }
 
-    private Class< ? > findComponentRoleClass(Field field, RequirementMock requirementMock)
+    private Class< ? > findComponentRoleClass(Field field, MockingRequirement mockingRequirement)
     {
         Class< ? > componentRoleClass;
 
         Set<Class< ? >> componentRoleClasses = this.loader.findComponentRoleClasses(field.getType());
-        if (!Object.class.getName().equals(requirementMock.value().getName())) {
-            if (!componentRoleClasses.contains(requirementMock.value())) {
+        if (!Object.class.getName().equals(mockingRequirement.value().getName())) {
+            if (!componentRoleClasses.contains(mockingRequirement.value())) {
                 throw new RuntimeException("Specified Component Role not found in component");
             } else {
-                componentRoleClass = requirementMock.value();
+                componentRoleClass = mockingRequirement.value();
             }
         } else {
             if (componentRoleClasses.size() > 1) {

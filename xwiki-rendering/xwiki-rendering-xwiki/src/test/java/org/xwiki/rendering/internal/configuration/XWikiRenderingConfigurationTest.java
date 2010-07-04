@@ -26,7 +26,7 @@ import org.xwiki.configuration.ConfigurationSource;
 import org.junit.Assert;
 import org.junit.Test;
 import org.xwiki.test.AbstractMockingComponentTestCase;
-import org.xwiki.test.annotation.RequirementMock;
+import org.xwiki.test.annotation.MockingRequirement;
 
 /**
  * Unit tests for {@link org.xwiki.rendering.internal.configuration.XWikiRenderingConfiguration}.
@@ -36,7 +36,7 @@ import org.xwiki.test.annotation.RequirementMock;
  */
 public class XWikiRenderingConfigurationTest extends AbstractMockingComponentTestCase
 {
-    @RequirementMock
+    @MockingRequirement
     private XWikiRenderingConfiguration configuration;
 
     @Test

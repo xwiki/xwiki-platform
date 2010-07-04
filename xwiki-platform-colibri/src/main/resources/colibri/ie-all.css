@@ -45,3 +45,11 @@ fieldset.xwikimessage {
 table.xwikilogintable input#j_password , table.xwikilogintable input#j_username{
   width: 160px;
 }
+
+/* xwiki/2.0 create links.
+   Since IE7 doesn't understand :after, use a static image to display the question mark.
+   This should be in ie-7.css, but that file doesn't exist yet. */
+*+html span.wikicreatelink a {
+  background: transparent url("$xwiki.getSkinFile('icons/xwiki/create-link.png')") no-repeat right;
+  padding-right: 13px;
+}

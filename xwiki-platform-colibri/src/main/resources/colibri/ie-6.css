@@ -72,3 +72,10 @@ ul.xlist , ul.xlist ul{
 .commentthread {
   line-height: 0px;
 }
+
+/* xwiki/2.0 create links.
+   Since IE6 doesn't understand :after, use a static image to display the question mark. */
+span.wikicreatelink a {
+  background: transparent url("$xwiki.getSkinFile('icons/xwiki/create-link.png')") no-repeat right;
+  padding-right: 13px;
+}

@@ -684,9 +684,9 @@ p.legend {
                 #set ($aiconurl = $adoc.getAttachmentURL($aiconname))
               #end
             #end
-            #set($query = "editor=${editor}&amp;amp;section=${asection}")
+            #set($query = "editor=$escapetool.url(${editor})&amp;amp;section=$escapetool.url(${asection})")
             #if($editor != 'globaladmin')
-             #set($query = $query + "&amp;amp;space=${currentSpace}")
+             #set($query = $query + "&amp;amp;space=$escapetool.url(${currentSpace})")
             #end
             #set($dotindx = $asection.indexOf('.'))
             #if($dotindx &gt; 0) #set($name = $asection.replaceAll("\.", "_")) #else #set($name = $asection) #end

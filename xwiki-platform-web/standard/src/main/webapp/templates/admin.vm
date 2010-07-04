@@ -9,27 +9,27 @@
 ##-------------------------------------------------
 ## Determine which editor to use (global or space)
 ##-------------------------------------------------
-#if((!$editor) || ($editor == ""))
-  #set($editor = $request.getParameter("editor"))
-  #if((!$editor) || ($editor == ""))
-    #if($doc.fullName == "XWiki.XWikiPreferences")
-      #set($editor = "globaladmin")
-    #elseif($doc.name == "WebPreferences")
-      #set($editor = "spaceadmin")
+#if("$!{editor}" == '')
+  #set($editor = "$!{escapetool.xml($request.getParameter('editor'))}")
+  #if($editor == '')
+    #if($doc.fullName == 'XWiki.XWikiPreferences')
+      #set($editor = 'globaladmin')
+    #elseif($doc.name == 'WebPreferences')
+      #set($editor = 'spaceadmin')
     #else
-      #set($editor = "globaladmin") ## default editor
+      #set($editor = 'globaladmin') ## default editor
     #end
   #end
 #end
 ##-------------------------------------------------
 ##   Determine the current space, section and admin doc
 ##-------------------------------------------------
-#set($currentSpace = $request.space)
-#if(!$currentSpace)
- #set($currentSpace = $doc.space)
+#set($currentSpace = "$!{request.space}")
+#if($currentSpace == '')
+  #set($currentSpace = $doc.space)
 #end
-#if($editor == "globaladmin")
-  #set($currentDoc = "XWiki.XWikiPreferences")
+#if($editor == 'globaladmin')
+  #set($currentDoc = 'XWiki.XWikiPreferences')
 #else
   #set($currentDoc = "${currentSpace}.WebPreferences")
 #end

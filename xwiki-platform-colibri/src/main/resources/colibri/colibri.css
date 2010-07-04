@@ -189,10 +189,22 @@ span.wikicreatelink a {
   text-decoration: underline;
 }
 span.wikicreatelink a:after {
+  /* Let's make a nice rounded question mark */
   content: "?";
+  text-decoration: none;
+  font-size: 80%;
+  font-weight: 900;
+  /* Contrast with the link text */
   color: $theme.pageContentBackgroundColor;
   background-color: $theme.linkColor;
-  text-decoration: underline;
+  /* Leave a bit of distance from the text */
+  margin-left: 0.1em;
+  /* Make it round */
+  padding: 0 0.3em;
+  /* 1.2em is the standard line height */
+  border-radius: 1.2em;
+  /* Raise the box with the standard text depth, so that it sits right on the line */
+  vertical-align: 0.2em;
 }
 /* xwiki/1.0 create links */
 .wikicreatelinktext {
@@ -200,10 +212,17 @@ span.wikicreatelink a:after {
 }
 
 .wikicreatelinkqm {
-  background-color: $theme.buttonPrimaryBackgroundColor;
-  color: $theme.buttonPrimaryTextColor;
-  margin: 0 0 0 3px;
-  padding: 0 3px;
+  font-size: 80%;
+  font-weight: 900;
+  /* Contrast with the link text */
+  color: $theme.pageContentBackgroundColor;
+  background-color: $theme.linkColor;
+  /* Leave a bit of distance from the text */
+  margin-left: 0.1em;
+  /* Make it round */
+  padding: 0 0.3em;
+  /* 1.2em is the standard line height */
+  border-radius: 1.2em;
 }
 
 /* ---------------------Lists----------------------------*/

@@ -6,7 +6,7 @@
     #set($discard = $parents.add($parent))
     #set($pdoc = $xwiki.getDocument($parent).getTranslatedDocument())
     #set($pdocurl = $pdoc.getURL("view"))
-    #set($nstring = "<a href='$pdocurl'>$xwiki.getXMLEncoded(${pdoc.getRenderedTitle('plain/1.0')})</a> <span class='separator'>&raquo;</span> $result")
+    #set($nstring = "<a href='$pdocurl'>$escapetool.xml(${pdoc.getRenderedTitle('plain/1.0')})</a> <span class='separator'>&raquo;</span> $result")
     #set($level = $level + 1)
     #computeHierarchy($pdoc $nstring $level)
   #else
@@ -15,6 +15,6 @@
 #end
 #if($isInServletMode) ## Visible only in a page
   <div id="hierarchy">
-    #computeHierarchy($doc "<a href='${doc.getURL('view')}'>$xwiki.getXMLEncoded($tdoc.getRenderedTitle('plain/1.0'))</a>" 0)
+    #computeHierarchy($doc "<a href='${doc.getURL('view')}'>$escapetool.xml($tdoc.getRenderedTitle('plain/1.0'))</a>" 0)
   </div>
 #end

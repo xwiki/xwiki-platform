@@ -1,6 +1,6 @@
 #set($title = $pdfdoc.display("title", "rendered"))
 #if((!$title)||($title==""))
-$xwiki.getXMLEncoded($!doc.space) - $xwiki.getXMLEncoded($!doc.displayTitle)
+$escapetool.xml($!doc.space) - $escapetool.xml($!doc.displayTitle)
 #else
-$xwiki.getXMLEncoded($title)
+$escapetool.xml($title)
 #end

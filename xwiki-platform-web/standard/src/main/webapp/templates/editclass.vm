@@ -125,7 +125,7 @@ $xwiki.jsfx.use('js/xwiki/editors/dataeditors.js', true)##
 #set($redirect = $xwiki.getRequestURL())
 ##
 ##
-<div id="document-title"><h1>$msg.get('core.editors.class.title', [$xwiki.getXMLEncoded($doc.fullName), $doc.getURL()])</h1></div>
+<div id="document-title"><h1>$msg.get('core.editors.class.title', [$escapetool.xml($doc.fullName), $doc.getURL()])</h1></div>
 #classSwitcher()
 ##
 ##

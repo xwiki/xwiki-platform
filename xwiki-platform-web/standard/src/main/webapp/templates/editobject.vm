@@ -237,7 +237,7 @@
   #set($redirect = $xwiki.getRequestURL())
   <form id="update" method="post" action="$doc.getURL("save")" onsubmit="cancelCancelEdit()">
   <div id="xwikieditcontent" class="clear">
-  <div id="document-title"><h1>$msg.get('core.editors.object.title', [$xwiki.getXMLEncoded($doc.displayTitle), $doc.getURL()])</h1></div>
+  <div id="document-title"><h1>$msg.get('core.editors.object.title', [$escapetool.xml($doc.displayTitle), $doc.getURL()])</h1></div>
 
   #checkPropertyDeprecation()
 

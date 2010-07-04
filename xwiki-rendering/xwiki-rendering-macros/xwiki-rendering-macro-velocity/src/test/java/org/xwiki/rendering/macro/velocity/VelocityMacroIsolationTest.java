@@ -42,7 +42,7 @@ public class VelocityMacroIsolationTest extends AbstractComponentTestCase
     @Override
     protected void registerComponents() throws Exception
     {
-        new ScriptMockSetup(getComponentManager());
+        new ScriptMockSetup(getMockery(), getComponentManager());
         this.velocityMacro = getComponentManager().lookup(Macro.class, "velocity");
     }
 

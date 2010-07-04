@@ -19,7 +19,6 @@
  */
 package org.xwiki.test;
 
-import org.jmock.Mockery;
 import org.junit.After;
 import org.junit.Before;
 import org.xwiki.component.descriptor.ComponentDescriptor;
@@ -30,13 +29,13 @@ import org.xwiki.component.embed.EmbeddableComponentManager;
  * Tests which needs to have XWiki Components set up should extend this class which makes the Component Manager
  * available. Use this class for JUnit 4.x tests. For JUnit 3.x tests use {@link AbstractXWikiComponentTestCase}
  * instead.
+ *
+ * Since XWiki 2.2M1 you should prefer using {@link org.xwiki.test.AbstractMockingComponentTestCase} instead.
  */
-public class AbstractComponentTestCase
+public class AbstractComponentTestCase extends AbstractMockingTestCase
 {
     private XWikiComponentInitializer initializer = new XWikiComponentInitializer();
 
-    private Mockery mockery = new Mockery();
-    
     /**
      * Tests that require fine-grained initializations can override this method and not call super.
      */
@@ -88,15 +87,7 @@ public class AbstractComponentTestCase
     }
 
     /**
-     * @since 2.4M2
-     */
-    public Mockery getMockery()
-    {
-        return this.mockery;
-    }
-
-    /**
-     * @since 2.4M2
+     * @since 2.4RC1
      */
     public <T> T registerMockComponent(Class<T> role, String hint) throws Exception
     {
@@ -106,7 +97,7 @@ public class AbstractComponentTestCase
     }
 
     /**
-     * @since 2.4M2
+     * @since 2.4RC1
      */
     public <T> T registerMockComponent(Class<T> role) throws Exception
     {
@@ -114,17 +105,17 @@ public class AbstractComponentTestCase
     }
 
     /**
-     * @since 2.4M2
+     * @since 2.4RC1
      */
     private <T> T registerMockComponent(ComponentDescriptor<T> descriptor) throws Exception
     {
-        T instance = this.mockery.mock(descriptor.getRole());
+        T instance = getMockery().mock(descriptor.getRole());
         getComponentManager().registerComponent(descriptor, instance);
         return instance;
     }
 
     /**
-     * @since 2.4M2
+     * @since 2.4RC1
      */
     private <T> DefaultComponentDescriptor<T> createComponentDescriptor(Class<T> role)
     {

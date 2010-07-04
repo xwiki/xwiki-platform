@@ -23,6 +23,7 @@ import junit.framework.Test;
 import junit.framework.TestCase;
 
 import org.jmock.Expectations;
+import org.jmock.Mockery;
 import org.xwiki.component.descriptor.DefaultComponentDescriptor;
 import org.xwiki.rendering.internal.macro.script.ScriptMacroValidator;
 import org.xwiki.rendering.scaffolding.RenderingTestSuite;
@@ -48,12 +49,12 @@ public class RenderingTests extends TestCase
         suite.addTestsFromResource("macroscript5", true);
 
         ComponentManagerTestSetup testSetup = new ComponentManagerTestSetup(suite);
-        ScriptMockSetup setup = new ScriptMockSetup(testSetup.getComponentManager());
+        Mockery mockery = new Mockery();
+        ScriptMockSetup setup = new ScriptMockSetup(mockery, testSetup.getComponentManager());
 
         // fake nested script validator never fails
-        final ScriptMacroValidator nestedValidator
-            = setup.mockery.mock(ScriptMacroValidator.class, "nested");
-        setup.mockery.checking(new Expectations() {{
+        final ScriptMacroValidator nestedValidator = mockery.mock(ScriptMacroValidator.class, "nested");
+        mockery.checking(new Expectations() {{
             atLeast(1).of(nestedValidator).validate(with(any(ScriptMacroParameters.class)), with(any(String.class)),
                 with(any(MacroTransformationContext.class)));
         }});

@@ -187,6 +187,7 @@
               <comparisonVersion>${clirr.previous.version}</comparisonVersion>
               <excludes>
                 <exclude>**/internal/**</exclude>
+                <exclude>**/test/**</exclude>
                 <!-- CLIRR has problems locating the ManagerState inner class inside OpenOfficeManager so we have to
                      exclude it for the moment. See http://bit.ly/c5Jnho Remove this exclude when the problem is fixed
                      in CLIRR. -->

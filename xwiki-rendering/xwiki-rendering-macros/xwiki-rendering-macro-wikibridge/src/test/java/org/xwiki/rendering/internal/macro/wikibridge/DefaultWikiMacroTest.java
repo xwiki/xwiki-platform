@@ -31,7 +31,6 @@ import javax.script.ScriptContext;
 
 import org.apache.velocity.VelocityContext;
 import org.jmock.Expectations;
-import org.jmock.Mockery;
 import org.junit.Assert;
 import org.junit.Before;
 import org.xwiki.bridge.DocumentAccessBridge;
@@ -49,7 +48,6 @@ import org.xwiki.rendering.macro.wikibridge.WikiMacroParameterDescriptor;
 import org.xwiki.rendering.macro.wikibridge.WikiMacroVisibility;
 import org.xwiki.rendering.renderer.printer.DefaultWikiPrinter;
 import org.xwiki.rendering.syntax.Syntax;
-import org.xwiki.script.ScriptContextInitializer;
 import org.xwiki.script.ScriptContextManager;
 import org.xwiki.test.AbstractComponentTestCase;
 import org.xwiki.velocity.VelocityEngine;
@@ -63,11 +61,6 @@ import org.xwiki.velocity.VelocityManager;
  */
 public class DefaultWikiMacroTest extends AbstractComponentTestCase
 {
-    /**
-     * Used for mocking various interfaces.
-     */
-    private Mockery mockery;
-
     /**
      * Dummy document reference of the document which contains the wiki macro.
      */
@@ -84,9 +77,8 @@ public class DefaultWikiMacroTest extends AbstractComponentTestCase
         super.setUp();
 
         // Script setup.
-        ScriptMockSetup scriptMockSetup = new ScriptMockSetup(getComponentManager());
+        ScriptMockSetup scriptMockSetup = new ScriptMockSetup(getMockery(), getComponentManager());
         final DocumentAccessBridge mockDocBridge = scriptMockSetup.bridge;
-        this.mockery = scriptMockSetup.mockery;
 
         this.wikiMacroDocumentReference = new DocumentReference("wiki", "space", "macroPage");
         this.wikiMacroManager = getComponentManager().lookup(WikiMacroManager.class);
@@ -99,7 +91,7 @@ public class DefaultWikiMacroTest extends AbstractComponentTestCase
         getComponentManager().lookup(ScriptContextManager.class).getScriptContext().setAttribute("xcontext", xcontext,
             ScriptContext.ENGINE_SCOPE);
 
-        mockery.checking(new Expectations() {{
+        getMockery().checking(new Expectations() {{
             allowing(mockDocBridge).getCurrentWiki(); will(returnValue("wiki"));
             allowing(mockDocBridge).getCurrentUser(); will(returnValue("dummy"));
 
@@ -182,7 +174,7 @@ public class DefaultWikiMacroTest extends AbstractComponentTestCase
     public void testDefaultParameterValues() throws Exception
     {
         // Velocity Manager mock.
-        final VelocityManager mockVelocityManager = mockery.mock(VelocityManager.class);
+        final VelocityManager mockVelocityManager = getMockery().mock(VelocityManager.class);
         DefaultComponentDescriptor<VelocityManager> descriptorVM = new DefaultComponentDescriptor<VelocityManager>();
         descriptorVM.setRole(VelocityManager.class);
         getComponentManager().registerComponent(descriptorVM, mockVelocityManager);
@@ -199,7 +191,7 @@ public class DefaultWikiMacroTest extends AbstractComponentTestCase
         final VelocityContext vContext = new VelocityContext();
         vContext.put("xcontext", xwikiContext);
 
-        this.mockery.checking(new Expectations() {{
+        getMockery().checking(new Expectations() {{
             oneOf(mockVelocityManager).getVelocityContext();
             will(returnValue(vContext));
             oneOf(mockVelocityManager).getVelocityEngine();

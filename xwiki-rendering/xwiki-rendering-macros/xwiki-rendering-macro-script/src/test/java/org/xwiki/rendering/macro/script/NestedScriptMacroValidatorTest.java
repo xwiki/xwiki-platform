@@ -33,13 +33,12 @@ import org.xwiki.rendering.block.MacroMarkerBlock;
 import org.xwiki.rendering.block.XDOM;
 import org.xwiki.rendering.internal.macro.script.DefaultScriptMacro;
 import org.xwiki.rendering.internal.macro.script.NestedScriptMacroValidator;
-import org.xwiki.rendering.internal.macro.script.ScriptMacroValidator;
 import org.xwiki.rendering.macro.MacroExecutionException;
 import org.xwiki.rendering.macro.MacroId;
 import org.xwiki.rendering.macro.MacroManager;
 import org.xwiki.rendering.transformation.MacroTransformationContext;
-import org.xwiki.test.AbstractMockingComponentTest;
-import org.xwiki.test.annotation.ComponentTest;
+import org.xwiki.test.AbstractMockingComponentTestCase;
+import org.xwiki.test.annotation.RequirementMock;
 
 /**
  * Unit tests for {@link org.xwiki.rendering.internal.macro.script.NestedScriptMacroValidator}.
@@ -47,14 +46,13 @@ import org.xwiki.test.annotation.ComponentTest;
  * @version $Id$
  * @since 2.4M2
  */
-@ComponentTest(NestedScriptMacroValidator.class)
-public class NestedScriptMacroValidatorTest extends AbstractMockingComponentTest
+public class NestedScriptMacroValidatorTest extends AbstractMockingComponentTestCase
 {
-    /** Nested script validator under test. */
-    private ScriptMacroValidator validator;
+    @RequirementMock
+    private NestedScriptMacroValidator validator;
 
     /**
-     * @see org.xwiki.test.AbstractMockingComponentTest#setUp()
+     * @see org.xwiki.test.AbstractMockingComponentTestCase#setUp()
      */
     @Before
     @Override
@@ -71,8 +69,6 @@ public class NestedScriptMacroValidatorTest extends AbstractMockingComponentTest
             allowing(macroManager).getMacro(with(any(MacroId.class)));
                 will(returnValue(null));
         }});
-
-        this.validator = getComponentManager().lookup(ScriptMacroValidator.class, "nested");
     }
 
     @Test(expected = MacroExecutionException.class)

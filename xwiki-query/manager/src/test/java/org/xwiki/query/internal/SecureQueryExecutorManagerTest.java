@@ -28,18 +28,18 @@ import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.query.Query;
 import org.xwiki.query.QueryException;
 import org.xwiki.query.QueryExecutorManager;
-import org.xwiki.test.AbstractMockingComponentTest;
-import org.xwiki.test.annotation.ComponentTest;
+import org.xwiki.test.AbstractMockingComponentTestCase;
+import org.xwiki.test.annotation.RequirementMock;
 
 /**
  * Tests for {@link SecureQueryExecutorManager}
  *
  * @version $Id$
  */
-@ComponentTest(SecureQueryExecutorManager.class)
-public class SecureQueryExecutorManagerTest extends AbstractMockingComponentTest
+public class SecureQueryExecutorManagerTest extends AbstractMockingComponentTestCase
 {
-    private QueryExecutorManager qem;
+    @RequirementMock
+    private SecureQueryExecutorManager qem;
 
     private DocumentAccessBridge dab;
 
@@ -47,8 +47,6 @@ public class SecureQueryExecutorManagerTest extends AbstractMockingComponentTest
     public void setUp() throws Exception
     {
         super.setUp();
-
-        this.qem = getComponentManager().lookup(QueryExecutorManager.class, "secure");
 
         final QueryExecutorManager nestedQueryExecutorManager =
             getComponentManager().lookup(QueryExecutorManager.class);

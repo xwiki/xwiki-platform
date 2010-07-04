@@ -23,6 +23,7 @@ import javax.script.ScriptContext;
 import javax.script.SimpleScriptContext;
 
 import org.jmock.Expectations;
+import org.jmock.Mockery;
 import org.xwiki.component.descriptor.DefaultComponentDescriptor;
 import org.xwiki.component.embed.EmbeddableComponentManager;
 import org.xwiki.rendering.macro.script.ScriptMockSetup;
@@ -63,13 +64,14 @@ public class RenderingTests extends TestCase
     
     public static void setUpMocks(EmbeddableComponentManager componentManager) throws Exception
     {
-        ScriptMockSetup mockSetup = new ScriptMockSetup(componentManager);
+        Mockery mockery = new Mockery();
+        ScriptMockSetup mockSetup = new ScriptMockSetup(mockery, componentManager);
         
         // Script Context Mock
-        final ScriptContextManager mockScriptContextManager = mockSetup.mockery.mock(ScriptContextManager.class);
+        final ScriptContextManager mockScriptContextManager = mockery.mock(ScriptContextManager.class);
         final SimpleScriptContext scriptContext = new SimpleScriptContext();
         scriptContext.setAttribute("var", "value", ScriptContext.ENGINE_SCOPE);
-        mockSetup.mockery.checking(new Expectations() {{
+        mockery.checking(new Expectations() {{
             allowing(mockScriptContextManager).getScriptContext(); will(returnValue(scriptContext));
         }});
         DefaultComponentDescriptor<ScriptContextManager> descriptorSCM =

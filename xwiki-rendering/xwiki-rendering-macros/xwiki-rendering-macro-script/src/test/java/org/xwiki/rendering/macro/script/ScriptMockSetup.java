@@ -36,8 +36,6 @@ import org.xwiki.rendering.wiki.WikiModel;
  */
 public class ScriptMockSetup
 {
-    public Mockery mockery;
-    
     public DocumentAccessBridge bridge;
     
     public AttachmentReferenceResolver attachmentReferenceResolver;
@@ -46,10 +44,16 @@ public class ScriptMockSetup
 
     public WikiModel wikiModel;
 
+    /**
+     * @since 2.4RC1
+     */
     public ScriptMockSetup(ComponentManager componentManager) throws Exception
     {
-        mockery = new Mockery();
+        this(new Mockery(), componentManager);
+    }
 
+    public ScriptMockSetup(Mockery mockery, ComponentManager componentManager) throws Exception
+    {
         // Document Access Bridge Mock setup
         bridge = mockery.mock(DocumentAccessBridge.class);
         mockery.checking(new Expectations() {{

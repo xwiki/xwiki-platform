@@ -28,12 +28,11 @@ import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.block.XDOM;
 import org.xwiki.rendering.macro.MacroExecutionException;
-import org.xwiki.rendering.macro.chart.ChartDataSource;
 import org.xwiki.rendering.parser.ParseException;
 import org.xwiki.rendering.parser.Parser;
 import org.xwiki.rendering.syntax.Syntax;
-import org.xwiki.test.AbstractMockingComponentTest;
-import org.xwiki.test.annotation.ComponentTest;
+import org.xwiki.test.AbstractMockingComponentTestCase;
+import org.xwiki.test.annotation.RequirementMock;
 
 import java.io.Reader;
 import java.util.Collections;
@@ -43,13 +42,13 @@ import java.util.Collections;
  * @version $Id$
  * @since 2.4M2
  */
-@ComponentTest(MacroContentTableBlockDataSource.class)
-public class MacroContentTableBlockDataSourceTest extends AbstractMockingComponentTest
+public class MacroContentTableBlockDataSourceTest extends AbstractMockingComponentTestCase
 {
+    @RequirementMock
     private MacroContentTableBlockDataSource source;
 
     /**
-     * @see org.xwiki.test.AbstractMockingComponentTest#setUp()
+     * @see org.xwiki.test.AbstractMockingComponentTestCase#setUp()
      */
     @Before
     @Override
@@ -83,9 +82,6 @@ public class MacroContentTableBlockDataSourceTest extends AbstractMockingCompone
                     }
                 }));
         }});
-
-
-        this.source = (MacroContentTableBlockDataSource) getComponentManager().lookup(ChartDataSource.class, "inline");
     }
 
     @Test

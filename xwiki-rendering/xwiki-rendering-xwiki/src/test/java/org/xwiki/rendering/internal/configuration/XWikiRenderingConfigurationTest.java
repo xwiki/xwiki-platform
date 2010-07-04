@@ -22,13 +22,11 @@ package org.xwiki.rendering.internal.configuration;
 import java.util.Properties;
 
 import org.jmock.Expectations;
-import org.junit.Before;
 import org.xwiki.configuration.ConfigurationSource;
-import org.xwiki.rendering.configuration.RenderingConfiguration;
 import org.junit.Assert;
 import org.junit.Test;
-import org.xwiki.test.AbstractMockingComponentTest;
-import org.xwiki.test.annotation.ComponentTest;
+import org.xwiki.test.AbstractMockingComponentTestCase;
+import org.xwiki.test.annotation.RequirementMock;
 
 /**
  * Unit tests for {@link org.xwiki.rendering.internal.configuration.XWikiRenderingConfiguration}.
@@ -36,17 +34,10 @@ import org.xwiki.test.annotation.ComponentTest;
  * @version $Id$
  * @since 2.0M1
  */
-@ComponentTest(XWikiRenderingConfiguration.class)
-public class XWikiRenderingConfigurationTest extends AbstractMockingComponentTest
+public class XWikiRenderingConfigurationTest extends AbstractMockingComponentTestCase
 {
-    private RenderingConfiguration configuration;
-
-    @Before
-    public void setUp() throws Exception
-    {
-        super.setUp();
-        this.configuration = getComponentManager().lookup(RenderingConfiguration.class);
-    }
+    @RequirementMock
+    private XWikiRenderingConfiguration configuration;
 
     @Test
     public void testGetLinkLabelFormat() throws Exception

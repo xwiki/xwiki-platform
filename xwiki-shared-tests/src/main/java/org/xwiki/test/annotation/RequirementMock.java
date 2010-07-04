@@ -16,32 +16,41 @@
  * License along with this software; if not, write to the Free
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
- *
  */
 package org.xwiki.test.annotation;
-
-import static java.lang.annotation.ElementType.TYPE;
-import static java.lang.annotation.RetentionPolicy.RUNTIME;
 
 import java.lang.annotation.Documented;
 import java.lang.annotation.Inherited;
 import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
 
+import static java.lang.annotation.ElementType.FIELD;
+import static java.lang.annotation.RetentionPolicy.RUNTIME;
+
 /**
- * Defines a component test used by {@link org.xwiki.test.AbstractMockingComponentTest}.
+ * Defines a field that needs to be injected with a mocked component.
  *
  * @version $Id$
- * @since 2.2M1
+ * @since 2.4RC1
  */
 @Documented
 @Retention(RUNTIME)
-@Target(TYPE)
+@Target(FIELD)
 @Inherited
-public @interface ComponentTest
+public @interface RequirementMock
 {
     /**
-     * @return the class of the component under test
+     * @return the role if the component implementation implements several roles.
      */
-    Class< ? > value();
+    Class< ? > value() default Object.class;
+
+    /**
+     * @return the hint if thre component implementation has several roles.
+     */
+    String hint() default "";
+
+    /**
+     * @return a list of implementation classes that shouldn't be mocked (ie the real implementation should be used)
+     */
+    Class< ? >[] exceptions() default { };
 }

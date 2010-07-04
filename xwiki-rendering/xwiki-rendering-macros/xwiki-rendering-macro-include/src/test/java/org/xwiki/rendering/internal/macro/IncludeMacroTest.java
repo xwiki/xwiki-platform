@@ -67,7 +67,7 @@ public class IncludeMacroTest extends AbstractComponentTestCase
     {
         super.registerComponents();
         
-        this.mockSetup = new ScriptMockSetup(getComponentManager());
+        this.mockSetup = new ScriptMockSetup(getMockery(), getComponentManager());
         this.includeMacro = (IncludeMacro) getComponentManager().lookup(Macro.class, "include");
         this.rendererFactory = getComponentManager().lookup(PrintRendererFactory.class, "event/1.0");
     }
@@ -90,7 +90,7 @@ public class IncludeMacroTest extends AbstractComponentTestCase
         velocityManager.getVelocityEngine().evaluate(velocityManager.getVelocityContext(), writer, "template",
             "#set ($myvar = 'hello')");
 
-        this.mockSetup.mockery.checking(new Expectations() {{
+        getMockery().checking(new Expectations() {{
             oneOf(mockSetup.bridge).isDocumentViewable(with(any(DocumentReference.class))); will(returnValue(true));
             oneOf(mockSetup.bridge).getDocumentContent(with(any(String.class))); 
                 will(returnValue("{{velocity}}$myvar{{/velocity}}"));
@@ -126,7 +126,7 @@ public class IncludeMacroTest extends AbstractComponentTestCase
             + "onMacroStandalone [someMacro] []\n"
             + "endDocument";
 
-        this.mockSetup.mockery.checking(new Expectations() {{
+        getMockery().checking(new Expectations() {{
             oneOf(mockSetup.bridge).isDocumentViewable(with(any(DocumentReference.class))); will(returnValue(true));
             oneOf(mockSetup.bridge).getDocumentContent(with(any(String.class))); 
                 will(returnValue("{{someMacro/}}"));
@@ -174,7 +174,7 @@ public class IncludeMacroTest extends AbstractComponentTestCase
             + "endParagraph\n"
             + "endDocument";
 
-        this.mockSetup.mockery.checking(new Expectations() {{
+        getMockery().checking(new Expectations() {{
             oneOf(mockSetup.bridge).isDocumentViewable(with(any(DocumentReference.class))); will(returnValue(true));
             oneOf(mockSetup.bridge).getDocumentContent("includedWiki:includedSpace.includedPage");
                 will(returnValue("[[page]]"));
@@ -200,7 +200,7 @@ public class IncludeMacroTest extends AbstractComponentTestCase
     @Test
     public void testIncludeMacroWithRecursiveInclude() throws Exception
     {
-        this.mockSetup.mockery.checking(new Expectations() {{
+        getMockery().checking(new Expectations() {{
             oneOf(mockSetup.documentReferenceResolver).resolve("wiki:Space.Page");
                 will(returnValue(new DocumentReference("wiki", "Space", "Page")));
             oneOf(mockSetup.documentReferenceResolver).resolve("Space.Page");

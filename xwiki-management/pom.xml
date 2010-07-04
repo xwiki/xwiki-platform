@@ -57,7 +57,7 @@
     </plugins>
   </build>
   <properties>
-    <!-- Skip Clirr execution since this is the first release of this module. Remove once XE 2.4M2 is released. -->
+    <!-- Skip Clirr execution since this is the first release of this module. Remove once XE 2.4 is released. -->
     <xwiki.clirr.skip>true</xwiki.clirr.skip>
   </properties>
 </project>

@@ -245,7 +245,7 @@
   }
 
   // Add a submit button for saving all sections at once.
-  var button = new Element('input', {'type':'submit', 'class':'button', 'value':'$msg.get("admin.save")'});
+  var button = new Element('input', {'type':'submit', 'class':'button', 'value':'$msg.get("admin.save")', 'name':'formactionsac'});
   var wrapper = new Element('span', {'class':'buttonwrapper'});
   var adminButtons = new Element('p', {'class':'admin-buttons'});
   var bottomButtons = new Element('div', {'class':'bottombuttons'});

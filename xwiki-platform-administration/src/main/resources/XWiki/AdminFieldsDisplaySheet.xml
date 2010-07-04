@@ -63,8 +63,8 @@
    &lt;/fieldset&gt;
   #end
   &lt;div class="hidden"&gt;
-    &lt;input type="hidden" name="xcontinue" value="$xwiki.getURL($currentDoc, 'admin', "editor=${editor}&amp;amp;section=${section}&amp;amp;space=${currentSpace}")" /&gt;
-    &lt;input type="hidden" name="xredirect" value="$xwiki.getURL($currentDoc, "admin", "editor=${editor}&amp;amp;section=${section}&amp;amp;space=${currentSpace}")" /&gt;
+    &lt;input type="hidden" name="xcontinue" value="$xwiki.getURL($currentDoc, 'admin', "editor=${escapetool.url(${editor})}&amp;amp;section=${escapetool.url(${section})}&amp;amp;space=${escapetool.url(${currentSpace})}")" /&gt;
+    &lt;input type="hidden" name="xredirect" value="$xwiki.getURL($currentDoc, 'admin', "editor=${escapetool.url(${editor})}&amp;amp;section=${escapetool.url(${section})}&amp;amp;space=${escapetool.url(${currentSpace})}")" /&gt;
     &lt;input type="hidden" name="classname" value="XWiki.XWikiPreferences" /&gt;
   &lt;/div&gt;
   &lt;div class="bottombuttons"&gt;

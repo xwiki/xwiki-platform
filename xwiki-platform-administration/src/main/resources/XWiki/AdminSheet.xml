@@ -613,7 +613,7 @@ p.legend {
     &lt;div id="admin-page"&gt;
      &lt;div id="admin-page-header"&gt;
         &lt;div class="admin-page-header-spacer"&gt;&amp;nbsp;&lt;/div&gt;
-        &lt;h1 id="admin-header"&gt;#if($section == '')$msg.get("admin.${editor}")#else $sectionname#end&lt;/h1&gt;
+        &lt;h1 id="admin-header"&gt;#if($section == '')$escapetool.xml($msg.get("admin.${editor}"))#else $escapetool.xml($sectionname)#end&lt;/h1&gt;
         &lt;div id="change-context"&gt;
           &lt;label for="goto-select" class="hidden"&gt;$msg.get('admin.placetoadminister')&lt;/label&gt;
           &lt;select id="goto-select"&gt;
@@ -625,7 +625,7 @@ p.legend {
             &lt;optgroup label="$msg.get('admin.gotospaceadministration')"&gt;
               #foreach($spaceitem in $xwiki.spaces)
                 #if ($xwiki.hasAccessLevel('admin', $context.user, "${spaceitem}.WebPreferences"))
-                  &lt;option value="$xwiki.getURL("${spaceitem}.WebPreferences", 'admin')" #if("$!{currentSpace}" == ${spaceitem} &amp;&amp; "$!{editor}" != 'globaladmin')selected="selected"#end&gt;$spaceitem&lt;/option&gt;
+                  &lt;option value="$xwiki.getURL("${spaceitem}.WebPreferences", 'admin')" #if("$!{currentSpace}" == ${spaceitem} &amp;&amp; "$!{editor}" != 'globaladmin')selected="selected"#end&gt;$escapetool.xml($spaceitem)&lt;/option&gt;
                 #end
               #end
             &lt;/optgroup&gt;
@@ -637,7 +637,7 @@ p.legend {
      &lt;/div&gt; ## admin-page-header
      #if($section != '')
      &lt;div id="admin-page-content"&gt;
-       &lt;div class="$sectionname"&gt;&lt;/div&gt;
+       &lt;div class="$escapetool.xml($sectionname)"&gt;&lt;/div&gt;
        ##------------------------------------------------------------------------------------------------------------
        ## The Administration allows editing other pages from different applications inside the admin context (UI)
        ##------------------------------------------------------------------------------------------------------------

@@ -890,9 +890,11 @@ var LiveTableFilter = Class.create({
     for(var i = 0; i < this.inputs.length; i++) {
       if (this.inputs[i].type == "text") {
         Event.observe(this.inputs[i], 'keyup', this.refreshHandler.bind(this));
+        Event.observe(this.inputs[i], 'change', this.refreshHandler.bind(this));
       } else {
         //IE is buggy on "change" events for checkboxes and radios
         Event.observe(this.inputs[i], 'click', this.refreshHandler.bind(this));
+        Event.observe(this.inputs[i], 'change', this.refreshHandler.bind(this));
       }
     }
 

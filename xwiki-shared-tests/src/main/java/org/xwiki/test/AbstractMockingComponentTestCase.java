@@ -59,6 +59,7 @@ public class AbstractMockingComponentTestCase extends AbstractMockingTestCase
         this.componentManager = new EmbeddableComponentManager();
 
         // Step 1: Register all components available
+        // TODO: Remove this so that tests are executed faster. Need to offer a way to register components manually.
         this.loader.initialize(this.componentManager, getClass().getClassLoader());
 
         // Step 2: Inject all fields annotated with @MockingRequirement.

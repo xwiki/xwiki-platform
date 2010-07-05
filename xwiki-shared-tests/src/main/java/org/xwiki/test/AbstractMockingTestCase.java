@@ -20,6 +20,9 @@
 package org.xwiki.test;
 
 import org.jmock.Mockery;
+import org.jmock.integration.junit4.JMock;
+import org.jmock.integration.junit4.JUnit4Mockery;
+import org.junit.runner.RunWith;
 
 /**
  * Offers a JMock 2.x Mockery object.
@@ -27,9 +30,10 @@ import org.jmock.Mockery;
  * @version $Id$
  * @since 2.4RC1
  */
+@RunWith(JMock.class)
 public class AbstractMockingTestCase
 {
-    private Mockery mockery = new Mockery();
+    private Mockery mockery = new JUnit4Mockery();
 
     public Mockery getMockery()
     {

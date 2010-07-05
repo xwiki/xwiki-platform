@@ -22,6 +22,7 @@ package org.xwiki.model.internal;
 import org.jmock.Expectations;
 import org.jmock.Mockery;
 import org.jmock.integration.junit4.JMock;
+import org.jmock.integration.junit4.JUnit4Mockery;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -41,7 +42,7 @@ import org.xwiki.model.ModelConfiguration;
 @RunWith(JMock.class)
 public class DefaultModelConfigurationTest
 {
-    private Mockery mockery = new Mockery();
+    private Mockery mockery = new JUnit4Mockery();
 
     private ModelConfiguration configuration;
 

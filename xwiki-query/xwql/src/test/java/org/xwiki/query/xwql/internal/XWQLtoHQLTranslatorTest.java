@@ -35,11 +35,11 @@ import org.xwiki.query.xwql.internal.hql.XWQLtoHQLTranslator;
 @RunWith(JMock.class)
 public class XWQLtoHQLTranslatorTest
 {
-    Mockery context = new JUnit4Mockery();
+    private Mockery context = new JUnit4Mockery();
 
-    DocumentAccessBridge dab = context.mock(DocumentAccessBridge.class);
+    private DocumentAccessBridge dab = context.mock(DocumentAccessBridge.class);
 
-    XWQLtoHQLTranslator translator = new XWQLtoHQLTranslator()
+    private XWQLtoHQLTranslator translator = new XWQLtoHQLTranslator()
     {
         @Override
         public DocumentAccessBridge getDocumentAccessBridge()

@@ -28,7 +28,7 @@ import org.xwiki.xml.html.HTMLCleaner;
  * @version $Id$
  * @since 1.8M2
  */
-public class AbstractHTMLCleaningTest extends AbstractOfficeImporterTest
+public abstract class AbstractHTMLCleaningTest extends AbstractOfficeImporterTest
 {
     /**
      * Beginning of the test html document.

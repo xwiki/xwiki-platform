@@ -36,7 +36,6 @@ import org.xwiki.test.AbstractComponentTestCase;
  * @version $Id$
  * @since 2.3M1
  */
-@RunWith(JMock.class)
 public class DefaultIOTargetServiceTest extends AbstractComponentTestCase
 {
     /**

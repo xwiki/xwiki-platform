@@ -107,7 +107,8 @@ public class DefaultPresentationBuilderTest extends AbstractOfficeImporterTest
             oneOf(mockSerializer).serialize(with(aNonNull(DocumentReference.class)), with(any(Object[].class)));
             will(returnValue("xwiki:Main.Test"));
             // TODO : Remove when DefaultPresentationBuilder#buildPresentationXDOM() is fixed
-            oneOf(mockVelocityMacro).execute(with(any(Object.class)), with(any(String.class)), with(any(MacroTransformationContext.class)));
+            allowing(mockVelocityMacro).execute(with(any(Object.class)), with(any(String.class)), 
+                with(any(MacroTransformationContext.class)));
             will(returnValue(Arrays.<Block>asList(new WordBlock("presentationcontent"))));
         }});
         ReflectionUtils.setFieldValue(presentationBuilder, "serializer", mockSerializer);

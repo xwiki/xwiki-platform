@@ -22,9 +22,7 @@ package org.xwiki.annotation.io.internal;
 import static org.junit.Assert.assertEquals;
 
 import org.jmock.Expectations;
-import org.jmock.integration.junit4.JMock;
 import org.junit.Test;
-import org.junit.runner.RunWith;
 import org.xwiki.annotation.io.IOTargetService;
 import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.test.AbstractComponentTestCase;

@@ -104,6 +104,7 @@ import org.xwiki.rendering.transformation.TransformationException;
 import org.xwiki.rendering.transformation.TransformationManager;
 import org.xwiki.rendering.util.ParserUtils;
 import org.xwiki.velocity.VelocityManager;
+import org.xwiki.velocity.XWikiVelocityException;
 
 import com.xpn.xwiki.CoreConfiguration;
 import com.xpn.xwiki.XWiki;
@@ -146,7 +147,6 @@ import com.xpn.xwiki.web.ObjectAddForm;
 import com.xpn.xwiki.web.Utils;
 import com.xpn.xwiki.web.XWikiMessageTool;
 import com.xpn.xwiki.web.XWikiRequest;
-import org.xwiki.velocity.XWikiVelocityException;
 
 public class XWikiDocument implements DocumentModelBridge
 {
@@ -2670,7 +2670,9 @@ public class XWikiDocument implements DocumentModelBridge
             PropertyClass pclass = (PropertyClass) obj.getXClass(context).get(fieldname);
             String prefix = pref + obj.getXClass(context).getName() + "_" + obj.getNumber() + "_";
 
-            if (pclass.isCustomDisplayed(context)) {
+            if (pclass == null) {
+                return "";
+            } else if (pclass.isCustomDisplayed(context)) {
                 pclass.displayCustom(result, fieldname, prefix, type, obj, context);
             } else if (type.equals("view")) {
                 pclass.displayView(result, fieldname, prefix, obj, context);
@@ -2753,8 +2755,7 @@ public class XWikiDocument implements DocumentModelBridge
             // TODO: It would better to check if the field exists rather than catching an exception
             // raised by a NPE as this is currently the case here...
             LOG.warn("Failed to display field [" + fieldname + "] in [" + type + "] mode for Object of Class ["
-                + this.defaultEntityReferenceSerializer.serialize(obj.getDocumentReference()) + "]");
-            ex.printStackTrace();
+                + this.defaultEntityReferenceSerializer.serialize(obj.getDocumentReference()) + "]", ex);
             return "";
         } finally {
             restoreContext(backup, context);

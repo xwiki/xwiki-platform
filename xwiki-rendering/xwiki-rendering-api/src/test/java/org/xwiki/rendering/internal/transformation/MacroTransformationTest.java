@@ -23,6 +23,7 @@ import java.util.Arrays;
 import java.util.Collections;
 
 import org.apache.commons.lang.StringUtils;
+import org.junit.*;
 import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.block.MacroBlock;
 import org.xwiki.rendering.block.XDOM;
@@ -32,14 +33,14 @@ import org.xwiki.rendering.renderer.printer.WikiPrinter;
 import org.xwiki.rendering.syntax.Syntax;
 import org.xwiki.rendering.transformation.Transformation;
 import org.xwiki.rendering.transformation.TransformationContext;
-import org.xwiki.test.AbstractXWikiComponentTestCase;
+import org.xwiki.test.AbstractMockingComponentTestCase;
 
 /**
  * Unit tests for {@link MacroTransformation}.
  * 
  * @version $Id$
  */
-public class MacroTransformationTest extends AbstractXWikiComponentTestCase
+public class MacroTransformationTest extends AbstractMockingComponentTestCase
 {
     private Transformation transformation;
     
@@ -48,8 +49,9 @@ public class MacroTransformationTest extends AbstractXWikiComponentTestCase
      * 
      * @see org.xwiki.test.AbstractXWikiComponentTestCase#setUp()
      */
+    @Before
     @Override
-    protected void setUp() throws Exception
+    public void setUp() throws Exception
     {
         super.setUp();
 
@@ -59,6 +61,7 @@ public class MacroTransformationTest extends AbstractXWikiComponentTestCase
     /**
      * Test that a simple macro is correctly evaluated.
      */
+    @Test
     public void testSimpleMacroTransform() throws Exception
     {
         String expected = "beginDocument\n"
@@ -76,12 +79,13 @@ public class MacroTransformationTest extends AbstractXWikiComponentTestCase
 
         WikiPrinter printer = new DefaultWikiPrinter();
         getComponentManager().lookup(BlockRenderer.class, Syntax.EVENT_1_0.toIdString()).render(dom, printer);
-        assertEquals(expected, printer.toString());
+        Assert.assertEquals(expected, printer.toString());
     }
 
     /**
      * Test that a macro can generate another macro.
      */
+    @Test
     public void testNestedMacroTransform() throws Exception
     {
         String expected = "beginDocument\n"
@@ -101,12 +105,13 @@ public class MacroTransformationTest extends AbstractXWikiComponentTestCase
 
         WikiPrinter printer = new DefaultWikiPrinter();
         getComponentManager().lookup(BlockRenderer.class, Syntax.EVENT_1_0.toIdString()).render(dom, printer);
-        assertEquals(expected, printer.toString());
+        Assert.assertEquals(expected, printer.toString());
     }
     
     /**
      * Test that we have a safeguard against infinite recursive macros.
      */
+    @Test
     public void testInfiniteRecursionMacroTransform() throws Exception
     {
         String expected = "beginDocument\n"
@@ -122,12 +127,13 @@ public class MacroTransformationTest extends AbstractXWikiComponentTestCase
 
         WikiPrinter printer = new DefaultWikiPrinter();
         getComponentManager().lookup(BlockRenderer.class, Syntax.EVENT_1_0.toIdString()).render(dom, printer);
-        assertEquals(expected, printer.toString());
+        Assert.assertEquals(expected, printer.toString());
     }
     
     /**
      * Test that macro priorities are working.
      */
+    @Test
     public void testPrioritiesMacroTransform() throws Exception
     {
         String expected = "beginDocument\n"
@@ -156,12 +162,13 @@ public class MacroTransformationTest extends AbstractXWikiComponentTestCase
 
         WikiPrinter printer = new DefaultWikiPrinter();
         getComponentManager().lookup(BlockRenderer.class, Syntax.EVENT_1_0.toIdString()).render(dom, printer);
-        assertEquals(expected, printer.toString());
+        Assert.assertEquals(expected, printer.toString());
     }
     
     /**
      * Test that macro with same priorities execute in the order in which they are defined.
      */
+    @Test
     public void testMacroWithSamePriorityExecuteOnPageOrder() throws Exception
     {
         // Both macros have the same priorities and thus "testsimplemacro" should be executed first and generate
@@ -186,7 +193,7 @@ public class MacroTransformationTest extends AbstractXWikiComponentTestCase
             + "onWord [content]\n"
             + "endMacroMarkerStandalone [testcontentmacro] [] [content]\n"
             + "endDocument";
-        assertEquals(expected, printer.toString());
+        Assert.assertEquals(expected, printer.toString());
 
         // We must also test the other order ("testcontentmacro" before "testsimplemacro") to ensure for example that 
         // there's no lexical order on Macro class names for example.
@@ -210,6 +217,6 @@ public class MacroTransformationTest extends AbstractXWikiComponentTestCase
             + "endParagraph\n"
             + "endMacroMarkerStandalone [testsimplemacro] []\n"
             + "endDocument";
-        assertEquals(expected, printer.toString());
+        Assert.assertEquals(expected, printer.toString());
     }
 }

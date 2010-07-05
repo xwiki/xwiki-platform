@@ -69,12 +69,14 @@ public class XWiki extends Api
     /**
      * @see com.xpn.xwiki.internal.model.reference.CurrentMixedStringDocumentReferenceResolver
      */
+    @SuppressWarnings("unchecked")
     private DocumentReferenceResolver<String> currentMixedDocumentReferenceResolver = Utils.getComponent(
         DocumentReferenceResolver.class, "currentmixed");
 
     /**
      * @see org.xwiki.model.internal.reference.DefaultStringDocumentReferenceResolver
      */
+    @SuppressWarnings("unchecked")
     private DocumentReferenceResolver<String> defaultDocumentReferenceResolver = Utils.getComponent(
         DocumentReferenceResolver.class);
 
@@ -153,7 +155,7 @@ public class XWiki extends Api
 
     /**
      * Loads an Document from the database. Rights are checked before sending back the document.
-     *
+     * 
      * @param reference the reference of the XWiki document to be loaded
      * @return a Document object or null if it is not accessible
      * @throws XWikiException
@@ -346,7 +348,7 @@ public class XWiki extends Api
 
     /**
      * Returns whether a document exists or not
-     *
+     * 
      * @param reference the reference of the document to check for its existence
      * @return true if the document exists, false if not
      * @since 2.3M2
@@ -1745,7 +1747,7 @@ public class XWiki extends Api
      * environement (Servlet, Portlet, PDF, etc..) The URL generation can be modified by implementing a new
      * XWikiURLFactory object For compatibility with any target environement (and especially the portlet environment) It
      * is important to always use the URL functions to generate URL and never hardcode URLs
-     *
+     * 
      * @param reference the reference to the document for which to return the URL for
      * @return a URL as a string pointing to the wiki document in view mode
      * @throws XWikiException if the URL could not be generated properly
@@ -2953,7 +2955,7 @@ public class XWiki extends Api
      * If the current document can't be found, the method assume that the executed document is the context document
      * (it's generally the case when a document is directly rendered with
      * {@link XWikiDocument#getRenderedContent(XWikiContext)} for example).
-     *
+     * 
      * @return the syntax identifier
      */
     public String getCurrentContentSyntaxId()

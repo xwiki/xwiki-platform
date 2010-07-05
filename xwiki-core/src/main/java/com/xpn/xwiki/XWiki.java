@@ -3007,15 +3007,13 @@ public class XWiki implements XWikiDocChangeNotificationInterface
      */
     public BaseClass getSheetClass(XWikiContext context) throws XWikiException
     {
-        XWikiDocument doc = getDocument(XWikiConstant.SHEET_CLASS, context);
+        XWikiDocument doc = getDocument(new DocumentReference(context.getDatabase(), "XWiki", "SheetClass"), context);
         boolean needsUpdate = doc.isNew();
 
         BaseClass bclass = doc.getXClass();
         if (context.get("initdone") != null) {
             return bclass;
         }
-
-        bclass.setName(XWikiConstant.SHEET_CLASS);
 
         // Note: Ideally we don't want a special field in the sheet class but XWiki classes must have at
         // least one field or they're not saved. Thus we are introducing a "defaultEditMode" which will

@@ -44,11 +44,6 @@ public class MacroTransformationTest extends AbstractMockingComponentTestCase
 {
     private Transformation transformation;
     
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.test.AbstractXWikiComponentTestCase#setUp()
-     */
     @Before
     @Override
     public void setUp() throws Exception

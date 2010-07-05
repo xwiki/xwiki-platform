@@ -18,7 +18,7 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  *
  */
-package org.xwiki.velocity;
+package org.xwiki.velocity.internal;
 
 import java.io.StringReader;
 import java.io.StringWriter;
@@ -28,6 +28,7 @@ import java.util.Properties;
 
 import org.apache.velocity.context.Context;
 import org.xwiki.test.AbstractXWikiComponentTestCase;
+import org.xwiki.velocity.VelocityEngine;
 import org.xwiki.velocity.internal.DefaultVelocityEngine;
 
 /**

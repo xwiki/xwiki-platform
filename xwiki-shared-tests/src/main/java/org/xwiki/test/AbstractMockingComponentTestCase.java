@@ -75,6 +75,7 @@ public class AbstractMockingComponentTestCase extends AbstractMockingTestCase
                     {
                         registerMockDependencies(descriptor, mockingRequirement);
                         getComponentManager().registerComponent(descriptor);
+                        configure();
                         ReflectionUtils.setFieldValue(this, field.getName(),
                             getComponentManager().lookup(descriptor.getRole(), descriptor.getRoleHint()));
                         break;
@@ -82,6 +83,16 @@ public class AbstractMockingComponentTestCase extends AbstractMockingTestCase
                 }
             }
         }
+    }
+
+    /**
+     * Provides a hook so that users of this class can perform configuration before the component
+     * is looked up. This allows for example the ability to set expectations on mocked components
+     * used in Initializable.initialize() methods.
+     */
+    public void configure() throws Exception
+    {
+        // Do nothing by default, this method is supposed to be overriden if needed.        
     }
 
     private void registerMockDependencies(ComponentDescriptor descriptor, MockingRequirement mockingRequirement)
@@ -113,7 +124,9 @@ public class AbstractMockingComponentTestCase extends AbstractMockingTestCase
                 componentRoleClass = mockingRequirement.value();
             }
         } else {
-            if (componentRoleClasses.size() > 1) {
+            if (componentRoleClasses.isEmpty()) {
+                throw new RuntimeException("Couldn't find roles for component [" + field.getType() + "]");
+            } else if (componentRoleClasses.size() > 1) {
                 throw new RuntimeException(
                     "Components with several roles must explicitely specify which role to use.");
             } else {

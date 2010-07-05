@@ -133,14 +133,14 @@ public class XWikiGroupServiceImpl implements XWikiGroupService, EventListener
     /**
      * Used to convert a string into a proper Document Reference.
      */
-    private DocumentReferenceResolver<String> currentMixedDocumentReferenceResolver =
-        Utils.getComponent(DocumentReferenceResolver.class, "currentmixed");
+    private DocumentReferenceResolver<String> currentMixedDocumentReferenceResolver = Utils.getComponent(
+        DocumentReferenceResolver.class, "currentmixed");
 
-    private EntityReferenceSerializer<String> entityReferenceSerializer =
-        Utils.getComponent(EntityReferenceSerializer.class);
+    private EntityReferenceSerializer<String> entityReferenceSerializer = Utils
+        .getComponent(EntityReferenceSerializer.class);
 
-    private EntityReferenceSerializer<String> localWikiEntityReferenceSerializer =
-        Utils.getComponent(EntityReferenceSerializer.class, "local");
+    private EntityReferenceSerializer<String> localWikiEntityReferenceSerializer = Utils.getComponent(
+        EntityReferenceSerializer.class, "local");
 
     /**
      * {@inheritDoc}
@@ -313,7 +313,7 @@ public class XWikiGroupServiceImpl implements XWikiGroupService, EventListener
                     String member = bobj.getStringValue(FIELD_XWIKIGROUPS_MEMBER);
 
                     if (isMemberEquals(member, memberWiki, memberSpace, memberName, context)) {
-                        needUpdate = groupDocument.removeObject(bobj);
+                        needUpdate = groupDocument.removeXObject(bobj);
                     }
                 }
             }
@@ -642,7 +642,10 @@ public class XWikiGroupServiceImpl implements XWikiGroupService, EventListener
 
             try {
                 groups =
-                    context.getWiki().getStore().getQueryManager()
+                    context
+                        .getWiki()
+                        .getStore()
+                        .getQueryManager()
                         .createQuery(
                             "/*/*[obj/XWiki/" + (user ? CLASS_SUFFIX_XWIKIUSERS : CLASS_SUFFIX_XWIKIGROUPS)
                                 + "]/@fullName", Query.XPATH).setLimit(nb).setOffset(start).execute();
@@ -812,15 +815,20 @@ public class XWikiGroupServiceImpl implements XWikiGroupService, EventListener
                         || (memberReference.getLastSpaceReference().getName().equals("XWiki") && memberReference
                             .getName().equals(XWikiRightService.GUEST_USER))) {
                         query =
-                            context.getWiki().getStore().getQueryManager().getNamedQuery("listGroupsForUser")
-                                .bindValue("username", prefixedFullName).bindValue("shortname",
-                                    this.localWikiEntityReferenceSerializer.serialize(memberReference)).bindValue(
-                                    "veryshortname", memberReference.getName());
+                            context
+                                .getWiki()
+                                .getStore()
+                                .getQueryManager()
+                                .getNamedQuery("listGroupsForUser")
+                                .bindValue("username", prefixedFullName)
+                                .bindValue("shortname",
+                                    this.localWikiEntityReferenceSerializer.serialize(memberReference))
+                                .bindValue("veryshortname", memberReference.getName());
                     } else {
                         query =
                             context.getWiki().getStore().getQueryManager()
-                                .getNamedQuery("listGroupsForUserInOtherWiki").bindValue("prefixedmembername",
-                                    prefixedFullName);
+                                .getNamedQuery("listGroupsForUserInOtherWiki")
+                                .bindValue("prefixedmembername", prefixedFullName);
                     }
 
                     query.setOffset(offset);
@@ -878,8 +886,8 @@ public class XWikiGroupServiceImpl implements XWikiGroupService, EventListener
         Boolean orderAsc, XWikiContext context) throws XWikiException
     {
         // TODO: add cache mechanism.
-        XWikiDocument groupDocument = new XWikiDocument();
-        groupDocument.setFullName(group);
+        XWikiDocument groupDocument = new XWikiDocument(this.currentMixedDocumentReferenceResolver.resolve(group));
+
         Map<String, Object> parameterValues = new HashMap<String, Object>();
         // //////////////////////////////////////
         // Create the query string
@@ -902,9 +910,7 @@ public class XWikiGroupServiceImpl implements XWikiGroupService, EventListener
             query.setOffset(start);
             query.setLimit(nb);
 
-            if (groupDocument.getDatabase() != null) {
-                query.setWiki(groupDocument.getDatabase());
-            }
+            query.setWiki(groupDocument.getDocumentReference().getWikiReference().getName());
 
             return query.execute();
         } catch (QueryException ex) {

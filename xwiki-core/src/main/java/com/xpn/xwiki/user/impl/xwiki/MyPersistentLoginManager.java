@@ -78,8 +78,8 @@ public class MyPersistentLoginManager extends DefaultPersistentLoginManager
     private static final String DEFAULT_VALUE = "false";
 
     /** Date formatter for the cookie "Expires" value. */
-    private static final DateFormat COOKIE_EXPIRE_FORMAT =
-        new SimpleDateFormat("EEE, dd-MMM-yyyy HH:mm:ss z", Locale.US);
+    private static final DateFormat COOKIE_EXPIRE_FORMAT = new SimpleDateFormat("EEE, dd-MMM-yyyy HH:mm:ss z",
+        Locale.US);
     static {
         COOKIE_EXPIRE_FORMAT.setTimeZone(TimeZone.getTimeZone("GMT"));
     }

@@ -62,8 +62,8 @@ public class XWikiRightServiceImpl implements XWikiRightService
 {
     private static final Log LOG = LogFactory.getLog(XWikiRightServiceImpl.class);
 
-    private static final List<String> ALLLEVELS =
-        Arrays.asList("admin", "view", "edit", "comment", "delete", "undelete", "register", "programming");
+    private static final List<String> ALLLEVELS = Arrays.asList("admin", "view", "edit", "comment", "delete",
+        "undelete", "register", "programming");
 
     private static final EntityReference DEFAULTUSERSPACE = new EntityReference("XWiki", EntityType.SPACE);
 
@@ -72,14 +72,14 @@ public class XWikiRightServiceImpl implements XWikiRightService
     /**
      * Used to convert a string into a proper Document Reference.
      */
-    private DocumentReferenceResolver<String> currentMixedDocumentReferenceResolver =
-        Utils.getComponent(DocumentReferenceResolver.class, "currentmixed");
+    private DocumentReferenceResolver<String> currentMixedDocumentReferenceResolver = Utils.getComponent(
+        DocumentReferenceResolver.class, "currentmixed");
 
     /**
      * Used to convert a proper Document Name to string.
      */
-    private EntityReferenceSerializer<String> entityReferenceSerializer =
-        Utils.getComponent(EntityReferenceSerializer.class);
+    private EntityReferenceSerializer<String> entityReferenceSerializer = Utils
+        .getComponent(EntityReferenceSerializer.class);
 
     protected void logAllow(String username, String page, String action, String info)
     {
@@ -98,9 +98,7 @@ public class XWikiRightServiceImpl implements XWikiRightService
     protected void logDeny(String name, String resourceKey, String accessLevel, String info, Exception e)
     {
         if (LOG.isDebugEnabled()) {
-            LOG
-                .debug("Access has been denied for (" + name + "," + resourceKey + "," + accessLevel + ") at " + info,
-                    e);
+            LOG.debug("Access has been denied for (" + name + "," + resourceKey + "," + accessLevel + ") at " + info, e);
         }
     }
 
@@ -478,8 +476,9 @@ public class XWikiRightServiceImpl implements XWikiRightService
                 }
             } catch (XWikiRightNotFoundException e) {
             } catch (Exception e) {
-                LOG.error("Failed to chech right [" + accessLevel + "] for group [" + group + "] on document ["
-                    + doc.getPrefixedFullName() + "]", e);
+                LOG.error(
+                    "Failed to chech right [" + accessLevel + "] for group [" + group + "] on document ["
+                        + doc.getPrefixedFullName() + "]", e);
             }
         }
 
@@ -522,9 +521,7 @@ public class XWikiRightServiceImpl implements XWikiRightService
                     tmpGroupList.add(this.entityReferenceSerializer.serialize(groupReference));
                 }
             } catch (Exception e) {
-                LOG
-                    .error("Failed to get groups for user or group [" + prefixedFullName + "] in wiki [" + wiki + "]",
-                        e);
+                LOG.error("Failed to get groups for user or group [" + prefixedFullName + "] in wiki [" + wiki + "]", e);
 
                 tmpGroupList = Collections.emptyList();
             } finally {

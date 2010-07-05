@@ -19,34 +19,40 @@
  *
  */
 
-
 package com.xpn.xwiki.user.impl.xwiki;
 
-import javax.servlet.FilterConfig;
-import javax.servlet.ServletContext;
 import java.util.Enumeration;
 import java.util.Hashtable;
 
-public class MyFilterConfig implements FilterConfig {
+import javax.servlet.FilterConfig;
+import javax.servlet.ServletContext;
+
+public class MyFilterConfig implements FilterConfig
+{
     protected Hashtable params = new Hashtable();
 
-    public String getFilterName() {
+    public String getFilterName()
+    {
         return null;
     }
 
-    public ServletContext getServletContext() {
+    public ServletContext getServletContext()
+    {
         return null;
     }
 
-    public String getInitParameter(String s) {
+    public String getInitParameter(String s)
+    {
         return (String) params.get(s);
     }
 
-    public Enumeration getInitParameterNames() {
+    public Enumeration getInitParameterNames()
+    {
         return params.keys();
     }
 
-    public void setInitParameter(String key, String s) {
+    public void setInitParameter(String key, String s)
+    {
         params.put(key, s);
     }
 }

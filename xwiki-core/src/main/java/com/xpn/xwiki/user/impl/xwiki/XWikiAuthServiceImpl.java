@@ -40,19 +40,20 @@ import org.securityfilter.config.SecurityConfig;
 import org.securityfilter.filter.SecurityRequestWrapper;
 import org.securityfilter.realm.SimplePrincipal;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.DocumentReferenceResolver;
+import org.xwiki.model.reference.EntityReferenceSerializer;
 
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
+import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.objects.classes.PasswordClass;
 import com.xpn.xwiki.plugin.ldap.LDAPPlugin;
 import com.xpn.xwiki.user.api.XWikiAuthService;
 import com.xpn.xwiki.user.api.XWikiUser;
 import com.xpn.xwiki.util.Util;
 import com.xpn.xwiki.web.Utils;
-import org.xwiki.model.reference.DocumentReferenceResolver;
-import org.xwiki.model.reference.EntityReferenceSerializer;
 
 /**
  * Default implementation of {@link XWikiAuthService}.
@@ -66,18 +67,18 @@ public class XWikiAuthServiceImpl extends AbstractXWikiAuthService
     /**
      * Used to convert a string into a proper Document Name.
      */
-    private DocumentReferenceResolver currentDocumentReferenceResolver =
-        Utils.getComponent(DocumentReferenceResolver.class, "current");
+    private DocumentReferenceResolver<String> currentDocumentReferenceResolver = Utils.getComponent(
+        DocumentReferenceResolver.class, "current");
 
     /**
-     * Used to convert a Document Reference to a username to a string. Note that we must be careful not to include
-     * the wiki name as part of the serialized name since user names are saved in the database (for example as the
-     * document author when you create a new document) and we're only supposed to save the wiki part when the user
-     * is from another wiki. This should probably be fixed in the future though but it requires changing existing
-     * code that depend on this behavior.
+     * Used to convert a Document Reference to a username to a string. Note that we must be careful not to include the
+     * wiki name as part of the serialized name since user names are saved in the database (for example as the document
+     * author when you create a new document) and we're only supposed to save the wiki part when the user is from
+     * another wiki. This should probably be fixed in the future though but it requires changing existing code that
+     * depend on this behavior.
      */
-    private EntityReferenceSerializer<String> compactWikiEntityReferenceSerializer =
-        Utils.getComponent(EntityReferenceSerializer.class, "compactwiki");
+    private EntityReferenceSerializer<String> compactWikiEntityReferenceSerializer = Utils.getComponent(
+        EntityReferenceSerializer.class, "compactwiki");
 
     /**
      * Each wiki has its own authenticator.
@@ -126,30 +127,30 @@ public class XWikiAuthServiceImpl extends AbstractXWikiAuthService
                 if (xwiki.Param("xwiki.authentication.defaultpage") != null) {
                     sconfig.setDefaultPage(xwiki.Param("xwiki.authentication.defaultpage"));
                 } else {
-                    sconfig.setDefaultPage(stripContextPathFromURL(context.getURLFactory().createURL(
-                        context.getWiki().getDefaultSpace(context), context.getWiki().getDefaultPage(context), "view",
-                        context), context));
+                    sconfig.setDefaultPage(stripContextPathFromURL(
+                        context.getURLFactory().createURL(context.getWiki().getDefaultSpace(context),
+                            context.getWiki().getDefaultPage(context), "view", context), context));
                 }
 
                 if (xwiki.Param("xwiki.authentication.loginpage") != null) {
                     sconfig.setLoginPage(xwiki.Param("xwiki.authentication.loginpage"));
                 } else {
-                    sconfig.setLoginPage(stripContextPathFromURL(context.getURLFactory().createURL("XWiki",
-                        "XWikiLogin", "login", context), context));
+                    sconfig.setLoginPage(stripContextPathFromURL(
+                        context.getURLFactory().createURL("XWiki", "XWikiLogin", "login", context), context));
                 }
 
                 if (xwiki.Param("xwiki.authentication.logoutpage") != null) {
                     sconfig.setLogoutPage(xwiki.Param("xwiki.authentication.logoutpage"));
                 } else {
-                    sconfig.setLogoutPage(stripContextPathFromURL(context.getURLFactory().createURL("XWiki",
-                        "XWikiLogout", "logout", context), context));
+                    sconfig.setLogoutPage(stripContextPathFromURL(
+                        context.getURLFactory().createURL("XWiki", "XWikiLogout", "logout", context), context));
                 }
 
                 if (xwiki.Param("xwiki.authentication.errorpage") != null) {
                     sconfig.setErrorPage(xwiki.Param("xwiki.authentication.errorpage"));
                 } else {
-                    sconfig.setErrorPage(stripContextPathFromURL(context.getURLFactory().createURL("XWiki",
-                        "XWikiLogin", "loginerror", context), context));
+                    sconfig.setErrorPage(stripContextPathFromURL(
+                        context.getURLFactory().createURL("XWiki", "XWikiLogin", "loginerror", context), context));
                 }
 
                 MyPersistentLoginManager persistent = new MyPersistentLoginManager();
@@ -199,8 +200,8 @@ public class XWikiAuthServiceImpl extends AbstractXWikiAuthService
                 sconfig.setPersistentLoginManager(persistent);
 
                 MyFilterConfig fconfig = new MyFilterConfig();
-                fconfig.setInitParameter(FormAuthenticator.LOGIN_SUBMIT_PATTERN_KEY, xwiki.Param(
-                    "xwiki.authentication.loginsubmitpage", "/loginsubmit/XWiki/XWikiLogin"));
+                fconfig.setInitParameter(FormAuthenticator.LOGIN_SUBMIT_PATTERN_KEY,
+                    xwiki.Param("xwiki.authentication.loginsubmitpage", "/loginsubmit/XWiki/XWikiLogin"));
 
                 authenticator.init(fconfig, sconfig);
             }
@@ -524,7 +525,7 @@ public class XWikiAuthServiceImpl extends AbstractXWikiAuthService
         String user;
 
         // First let's look in the cache
-        if (context.getWiki().exists("XWiki." + username, context)) {
+        if (context.getWiki().exists(new DocumentReference(context.getDatabase(), "XWiki", username), context)) {
             user = "XWiki." + username;
         } else {
             // Note: The result of this search depends on the Database. If the database is
@@ -550,12 +551,13 @@ public class XWikiAuthServiceImpl extends AbstractXWikiAuthService
         try {
             boolean result = false;
             XWikiDocument doc = context.getWiki().getDocument(username, context);
+            BaseObject userObject = doc.getObject("XWiki.XWikiUsers");
             // We only allow empty password from users having a XWikiUsers object.
-            if (doc.getObject("XWiki.XWikiUsers") != null) {
-                String passwd = doc.getStringValue("XWiki.XWikiUsers", "password");
+            if (userObject != null) {
+                String passwd = userObject.getStringValue("password");
                 password =
-                        ((PasswordClass) context.getWiki().getClass("XWiki.XWikiUsers", context).getField("password")).getEquivalentPassword(
-                            passwd, password);
+                    ((PasswordClass) context.getWiki().getUserClass(context).getField("password"))
+                        .getEquivalentPassword(passwd, password);
 
                 result = (password.equals(passwd));
             }
@@ -608,7 +610,8 @@ public class XWikiAuthServiceImpl extends AbstractXWikiAuthService
 
         if (createuser != null) {
             String wikiname = context.getWiki().clearName(user, true, true, context);
-            XWikiDocument userdoc = context.getWiki().getDocument("XWiki." + wikiname, context);
+            XWikiDocument userdoc =
+                context.getWiki().getDocument(new DocumentReference(context.getDatabase(), "XWiki", wikiname), context);
             if (userdoc.isNew()) {
                 if (LOG.isDebugEnabled()) {
                     LOG.debug("User page does not exist for user " + user);

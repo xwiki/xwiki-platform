@@ -2,9 +2,10 @@ package com.xpn.xwiki.user.impl.xwiki;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import com.xpn.xwiki.user.api.XWikiUser;
+
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
+import com.xpn.xwiki.user.api.XWikiUser;
 
 /**
  * Implements a authentication mecanism which is trusting the App Server authentication. If it fails it falls back to

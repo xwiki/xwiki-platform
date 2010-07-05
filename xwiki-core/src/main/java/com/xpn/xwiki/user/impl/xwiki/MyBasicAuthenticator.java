@@ -119,10 +119,10 @@ public class MyBasicAuthenticator extends BasicAuthenticator implements XWikiAut
     }
 
     /**
-     * Parse the username out of the BASIC authorization header string.
+     * Parse the user name out of the BASIC authorization header string.
      * 
      * @param decoded
-     * @return username parsed out of decoded string
+     * @return user name parsed out of decoded string
      */
     public static String parseUsername(String decoded)
     {

@@ -119,7 +119,7 @@ public class LDAPAuthServiceImpl extends XWikiAuthServiceImpl
                             log.debug("Looking for user again " + susername);
 							principal = GetUserPrincipal(susername, context);
 						}
-						context.getWiki().flushCache();
+						context.getWiki().flushCache(context);
                    }
                    if (principal ==null) {
                        if (log.isDebugEnabled())

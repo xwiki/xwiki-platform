@@ -22,12 +22,16 @@ package org.xwiki.velocity.internal;
 import java.util.Collections;
 import java.util.Properties;
 
+import org.apache.velocity.tools.generic.ListTool;
+import org.apache.velocity.util.introspection.SecureUberspector;
 import org.jmock.Expectations;
 import org.junit.Assert;
 import org.junit.Test;
 import org.xwiki.configuration.ConfigurationSource;
 import org.xwiki.test.AbstractMockingComponentTestCase;
 import org.xwiki.test.annotation.MockingRequirement;
+import org.xwiki.velocity.introspection.ChainingUberspector;
+import org.xwiki.velocity.introspection.DeprecatedCheckUberspector;
 
 /**
  * Unit tests for {@link DefaultVelocityConfiguration}.
@@ -49,6 +53,8 @@ public class DefaultVelocityConfigurationTest extends AbstractMockingComponentTe
         getMockery().checking(new Expectations() {{
             allowing(source).getProperty("velocity.tools", Properties.class);
             will(returnValue(Collections.emptyMap()));
+            allowing(source).getProperty("velocity.properties", Properties.class);
+            will(returnValue(Collections.emptyMap()));
         }});
     }
 
@@ -56,7 +62,24 @@ public class DefaultVelocityConfigurationTest extends AbstractMockingComponentTe
     public void testDefaultToolsPresent() throws Exception
     {
         // Verify for example that the List tool is present.
-        Assert.assertEquals("org.apache.velocity.tools.generic.ListTool",
-            this.configuration.getTools().get("listtool"));
+        Assert.assertEquals(ListTool.class.getName(), this.configuration.getTools().get("listtool"));
+    }
+
+    @Test
+    public void testDefaultPropertiesPresent() throws Exception
+    {
+        // Verify that the secure uberspector is set by default
+        Assert.assertEquals(ChainingUberspector.class.getName(),
+            this.configuration.getProperties().getProperty("runtime.introspector.uberspect"));
+        Assert.assertEquals(SecureUberspector.class.getName() + ","  + DeprecatedCheckUberspector.class.getName(),
+            this.configuration.getProperties().getProperty("runtime.introspector.uberspect.chainClasses"));
+
+        // Verify that null values are allowed by default
+        Assert.assertEquals(Boolean.TRUE.toString(),
+            this.configuration.getProperties().getProperty("directive.set.null.allowed"));
+
+        // Verify that Macros are isolated by default
+        Assert.assertEquals(Boolean.TRUE.toString(),
+            this.configuration.getProperties().getProperty("velocimacro.permissions.allow.inline.local.scope"));
     }
 }

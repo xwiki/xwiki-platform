@@ -27,45 +27,65 @@ import java.util.List;
 import java.util.Properties;
 
 import org.apache.velocity.context.Context;
-import org.xwiki.test.AbstractXWikiComponentTestCase;
-import org.xwiki.velocity.VelocityEngine;
-import org.xwiki.velocity.internal.DefaultVelocityEngine;
+import org.apache.velocity.util.introspection.SecureUberspector;
+import org.jmock.Expectations;
+import org.junit.Assert;
+import org.junit.Test;
+import org.xwiki.test.AbstractMockingComponentTestCase;
+import org.xwiki.test.annotation.MockingRequirement;
+import org.xwiki.velocity.VelocityConfiguration;
+import org.xwiki.velocity.introspection.ChainingUberspector;
+import org.xwiki.velocity.introspection.DeprecatedCheckUberspector;
 
 /**
  * Unit tests for {@link DefaultVelocityEngine}.
  */
-public class DefaultVelocityEngineTest extends AbstractXWikiComponentTestCase
+public class DefaultVelocityEngineTest extends AbstractMockingComponentTestCase
 {
-    private VelocityEngine engine;
+    @MockingRequirement
+    private DefaultVelocityEngine engine;
 
     @Override
-    protected void setUp() throws Exception
+    public void configure() throws Exception
     {
-        super.setUp();
-        this.engine = getComponentManager().lookup(VelocityEngine.class);
+        final Properties properties = new Properties();
+        properties.put("runtime.introspector.uberspect", ChainingUberspector.class.getName());
+        properties.put("runtime.introspector.uberspect.chainClasses",
+            SecureUberspector.class.getName() + ","  + DeprecatedCheckUberspector.class.getName());
+        properties.put("directive.set.null.allowed", Boolean.TRUE.toString());
+        properties.put("velocimacro.permissions.allow.inline.local.scope", Boolean.TRUE.toString());
+
+        final VelocityConfiguration configuration = getComponentManager().lookup(VelocityConfiguration.class);
+        getMockery().checking(new Expectations() {{
+            oneOf(configuration).getProperties();
+            will(returnValue(properties));
+        }});
     }
 
+    @Test
     public void testEvaluateReader() throws Exception
     {
         this.engine.initialize(new Properties());
         StringWriter writer = new StringWriter();
         this.engine.evaluate(new org.apache.velocity.VelocityContext(), writer, "mytemplate",
             new StringReader("#set($foo='hello')$foo World"));
-        assertEquals("hello World", writer.toString());
+        Assert.assertEquals("hello World", writer.toString());
     }
 
+    @Test
     public void testEvaluateString() throws Exception
     {
         this.engine.initialize(new Properties());
         StringWriter writer = new StringWriter();
         this.engine.evaluate(new org.apache.velocity.VelocityContext(), writer, "mytemplate",
             "#set($foo='hello')$foo World");
-        assertEquals("hello World", writer.toString());
+        Assert.assertEquals("hello World", writer.toString());
     }
 
     /**
      * Verify that the default configuration doesn't allow calling Class.forName.
      */
+    @Test
     public void testSecureUberspectorActiveByDefault() throws Exception
     {
         this.engine.initialize(new Properties());
@@ -73,12 +93,13 @@ public class DefaultVelocityEngineTest extends AbstractXWikiComponentTestCase
         this.engine.evaluate(new org.apache.velocity.VelocityContext(), writer, "mytemplate",
             "#set($foo = 'test')#set($object = $foo.class.forName('java.util.ArrayList')"
                 + ".newInstance())$object.size()");
-        assertEquals("$object.size()", writer.toString());
+        Assert.assertEquals("$object.size()", writer.toString());
     }
 
     /**
      * Verify that the default configuration allows #setting existing variables to null.
      */
+    @Test
     public void testSettingNullAllowedByDefault() throws Exception
     {
         this.engine.initialize(new Properties());
@@ -92,9 +113,10 @@ public class DefaultVelocityEngineTest extends AbstractXWikiComponentTestCase
         context.put("list", list);
         this.engine.evaluate(context, writer, "mytemplate", "#set($foo = true)${foo}#set($foo = $null)${foo}\n"
             + "#foreach($i in $list)${velocityCount}=$!{i} #end");
-        assertEquals("true${foo}\n1=1 2= 3=3 ", writer.toString());
+        Assert.assertEquals("true${foo}\n1=1 2= 3=3 ", writer.toString());
     }
 
+    @Test
     public void testOverrideConfiguration() throws Exception
     {
         // For example try setting a non secure Uberspector.
@@ -106,9 +128,10 @@ public class DefaultVelocityEngineTest extends AbstractXWikiComponentTestCase
         this.engine.evaluate(new org.apache.velocity.VelocityContext(), writer, "mytemplate",
             "#set($foo = 'test')#set($object = $foo.class.forName('java.util.ArrayList')"
                 + ".newInstance())$object.size()");
-        assertEquals("0", writer.toString());
+        Assert.assertEquals("0", writer.toString());
     }
 
+    @Test
     public void testMacroIsolation() throws Exception
     {
         this.engine.initialize(new Properties());
@@ -116,9 +139,10 @@ public class DefaultVelocityEngineTest extends AbstractXWikiComponentTestCase
         this.engine.evaluate(context, new StringWriter(), "template1", "#macro(mymacro)test#end");
         StringWriter writer = new StringWriter();
         this.engine.evaluate(context, writer, "template2", "#mymacro");
-        assertEquals("#mymacro", writer.toString());
+        Assert.assertEquals("#mymacro", writer.toString());
     }
 
+    @Test
     public void testConfigureMacrosToBeGlobal() throws Exception
     {
         Properties properties = new Properties();
@@ -129,6 +153,6 @@ public class DefaultVelocityEngineTest extends AbstractXWikiComponentTestCase
         this.engine.evaluate(context, new StringWriter(), "template1", "#macro(mymacro)test#end");
         StringWriter writer = new StringWriter();
         this.engine.evaluate(context, writer, "template2", "#mymacro");
-        assertEquals("test", writer.toString());
+        Assert.assertEquals("test", writer.toString());
     }
 }

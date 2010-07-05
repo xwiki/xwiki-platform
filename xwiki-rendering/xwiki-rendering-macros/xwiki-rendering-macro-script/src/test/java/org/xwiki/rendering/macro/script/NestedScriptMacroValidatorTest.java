@@ -52,14 +52,10 @@ public class NestedScriptMacroValidatorTest extends AbstractMockingComponentTest
     private NestedScriptMacroValidator validator;
 
     /**
-     * @see org.xwiki.test.AbstractMockingComponentTestCase#setUp()
+     * @see org.xwiki.test.AbstractMockingComponentTestCase#configure()
      */
-    @Before
-    @Override
-    public void setUp() throws Exception
+    public void configure() throws Exception
     {
-        super.setUp();
-
         // Mock macro manager returns a script macro for "script" and null otherwise.
         final MacroManager macroManager = getComponentManager().lookup(MacroManager.class);
         final ScriptMacro scriptMacro = new DefaultScriptMacro();

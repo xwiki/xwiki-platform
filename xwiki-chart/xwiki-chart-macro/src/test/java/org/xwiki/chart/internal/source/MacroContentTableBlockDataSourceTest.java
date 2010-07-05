@@ -48,14 +48,10 @@ public class MacroContentTableBlockDataSourceTest extends AbstractMockingCompone
     private MacroContentTableBlockDataSource source;
 
     /**
-     * @see org.xwiki.test.AbstractMockingComponentTestCase#setUp()
+     * @see org.xwiki.test.AbstractMockingComponentTestCase#configure()
      */
-    @Before
-    @Override
-    public void setUp() throws Exception
+    public void configure() throws Exception
     {
-        super.setUp();
-
         // Mock components
         final EntityReferenceSerializer<String> serializer =
             getComponentManager().lookup(EntityReferenceSerializer.class);
@@ -63,13 +59,13 @@ public class MacroContentTableBlockDataSourceTest extends AbstractMockingCompone
         final ComponentManager cm = getComponentManager().lookup(ComponentManager.class);
         final DocumentReference currentDocumentReference = new DocumentReference("wiki", "space", "page");
         getMockery().checking(new Expectations() {{
-            oneOf(dab).getCurrentDocumentReference();
+            allowing(dab).getCurrentDocumentReference();
                 will(returnValue(currentDocumentReference));
-            oneOf(serializer).serialize(currentDocumentReference);
+            allowing(serializer).serialize(currentDocumentReference);
                 will(returnValue("wiki:space.page"));
-            oneOf(dab).getDocumentSyntaxId("wiki:space.page");
+            allowing(dab).getDocumentSyntaxId("wiki:space.page");
                 will(returnValue("xwiki/2.0"));
-            oneOf(cm).lookup(Parser.class, "xwiki/2.0");
+            allowing(cm).lookup(Parser.class, "xwiki/2.0");
                 will(returnValue(new Parser() {
                     public Syntax getSyntax()
                     {

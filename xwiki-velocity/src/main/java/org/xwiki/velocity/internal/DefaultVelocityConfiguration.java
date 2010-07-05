@@ -27,12 +27,16 @@ import org.apache.velocity.tools.generic.ListTool;
 import org.apache.velocity.tools.generic.MathTool;
 import org.apache.velocity.tools.generic.NumberTool;
 import org.apache.velocity.tools.generic.SortTool;
+import org.apache.velocity.tools.view.servlet.WebappLoader;
+import org.apache.velocity.util.introspection.SecureUberspector;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.Requirement;
 import org.xwiki.component.phase.Initializable;
 import org.xwiki.component.phase.InitializationException;
 import org.xwiki.configuration.ConfigurationSource;
 import org.xwiki.velocity.VelocityConfiguration;
+import org.xwiki.velocity.introspection.ChainingUberspector;
+import org.xwiki.velocity.introspection.DeprecatedCheckUberspector;
 import org.xwiki.velocity.tools.RegexTool;
 
 /**
@@ -84,17 +88,14 @@ public class DefaultVelocityConfiguration implements Initializable, VelocityConf
         // Default Velocity properties
         this.defaultProperties.setProperty("resource.loader", "webapp");
         this.defaultProperties.setProperty("directive.set.null.allowed", Boolean.TRUE.toString());
-        this.defaultProperties.setProperty("webapp.resource.loader.class",
-            "org.apache.velocity.tools.view.servlet.WebappLoader");
+        this.defaultProperties.setProperty("webapp.resource.loader.class", WebappLoader.class.getName());
         this.defaultProperties.setProperty("velocimacro.messages.on", Boolean.FALSE.toString());
         this.defaultProperties.setProperty("resource.manager.logwhenfound", Boolean.FALSE.toString());
         this.defaultProperties.setProperty("velocimacro.permissions.allow.inline.local.scope", Boolean.TRUE.toString());
         // Prevents users from writing dangerous Velocity code like using Class.forName or Java threading APIs.
-        this.defaultProperties.setProperty("runtime.introspector.uberspect",
-            "org.xwiki.velocity.introspection.ChainingUberspector");
+        this.defaultProperties.setProperty("runtime.introspector.uberspect", ChainingUberspector.class.getName());
         this.defaultProperties.setProperty("runtime.introspector.uberspect.chainClasses",
-            "org.apache.velocity.util.introspection.SecureUberspector,"
-                + "org.xwiki.velocity.introspection.DeprecatedCheckUberspector");
+            SecureUberspector.class.getName() + "," + DeprecatedCheckUberspector.class.getName());
     }
 
     /**

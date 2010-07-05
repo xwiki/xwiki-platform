@@ -101,7 +101,7 @@ public class DefaultVelocityEngine extends AbstractLogEnabled implements Velocit
         // it's used to load resources from the webapp directory in WebapLoader.
         String resourceLoader = 
             properties.getProperty(RESOURCE_LOADER, velocityProperties.getProperty(RESOURCE_LOADER));
-        if (resourceLoader.equals("webapp")) {
+        if (resourceLoader != null && resourceLoader.equals("webapp")) {
             ApplicationContext context = this.container.getApplicationContext();
             if (context instanceof ServletApplicationContext) {
                 getEngine().setApplicationAttribute("javax.servlet.ServletContext",

@@ -26,15 +26,18 @@ import java.util.Set;
 
 import javax.validation.ConstraintViolation;
 import javax.validation.Validation;
+import javax.validation.ValidationException;
 import javax.validation.Validator;
 import javax.validation.ValidatorFactory;
 
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.Requirement;
 import org.xwiki.component.logging.AbstractLogEnabled;
+import org.xwiki.component.phase.Initializable;
+import org.xwiki.component.phase.InitializationException;
 import org.xwiki.properties.BeanDescriptor;
-import org.xwiki.properties.ConverterManager;
 import org.xwiki.properties.BeanManager;
+import org.xwiki.properties.ConverterManager;
 import org.xwiki.properties.PropertyDescriptor;
 import org.xwiki.properties.PropertyException;
 import org.xwiki.properties.PropertyMandatoryException;
@@ -53,19 +56,40 @@ import org.xwiki.properties.RawProperties;
  * @since 2.0M2
  */
 @Component
-public class DefaultBeanManager extends AbstractLogEnabled implements BeanManager
+public class DefaultBeanManager extends AbstractLogEnabled implements BeanManager, Initializable
 {
     /**
      * Cache the already parsed classes.
      */
-    private Map<Class< ? >, BeanDescriptor> beanDescriptorCache =
-        Collections.synchronizedMap(new HashMap<Class< ? >, BeanDescriptor>());
+    private Map<Class< ? >, BeanDescriptor> beanDescriptorCache = Collections
+        .synchronizedMap(new HashMap<Class< ? >, BeanDescriptor>());
 
     /**
      * The {@link ConverterManager} component.
      */
     @Requirement
     private ConverterManager converterManager;
+
+    /**
+     * Factory to use to get new JSR 303 validators.
+     */
+    private ValidatorFactory validatorFactory;
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see org.xwiki.component.phase.Initializable#initialize()
+     */
+    public void initialize() throws InitializationException
+    {
+        try {
+            this.validatorFactory = Validation.buildDefaultValidatorFactory();
+        } catch (ValidationException e) {
+            getLogger().debug("Unable to find a default provider");
+
+            return;
+        }
+    }
 
     /**
      * {@inheritDoc}
@@ -149,12 +173,13 @@ public class DefaultBeanManager extends AbstractLogEnabled implements BeanManage
      */
     private void validateBean(Object bean) throws PropertyException
     {
-        ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
-        Validator validator = factory.getValidator();
-        Set<ConstraintViolation<Object>> constraintViolations = validator.validate(bean);
-        if (!constraintViolations.isEmpty()) {
-            throw new PropertyException("Failed to validate bean: ["
-                + constraintViolations.iterator().next().getMessage() + "]");
+        if (this.validatorFactory != null) {
+            Validator validator = this.validatorFactory.getValidator();
+            Set<ConstraintViolation<Object>> constraintViolations = validator.validate(bean);
+            if (!constraintViolations.isEmpty()) {
+                throw new PropertyException("Failed to validate bean: ["
+                    + constraintViolations.iterator().next().getMessage() + "]");
+            }
         }
     }
 

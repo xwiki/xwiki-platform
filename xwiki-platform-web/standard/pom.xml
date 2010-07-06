@@ -122,6 +122,16 @@
       <version>1.5.8</version>
       <scope>runtime</scope>
     </dependency>
+    <!-- needed for JSR 303 (Bean Validation) clients such as xwiki-core properties. 
+         It is just one JSR 303 implements among others so it's distribution decision to choose this one.
+         Note that hibernate-validator depends on Java 6 since 4.1 branch.
+    -->
+    <dependency>
+      <groupId>org.hibernate</groupId>
+      <artifactId>hibernate-validator</artifactId>
+      <version>4.0.2.GA</version>
+      <scope>runtime</scope>
+    </dependency>
     <!-- Captcha component -->
     <dependency>
       <groupId>org.xwiki.platform</groupId>

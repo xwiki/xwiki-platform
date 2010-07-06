@@ -1,5 +1,4 @@
-<?xml version="1.0" encoding="ISO-8859-1"?>
-
+<?xml version="1.0" encoding="UTF-8"?>
 <xwikidoc>
 <web>WikiManager</web>
 <name>CreateNewWiki</name>
@@ -12,9 +11,9 @@
 <customClass></customClass>
 <contentAuthor>XWiki.Admin</contentAuthor>
 <creationDate>1186676964000</creationDate>
-<date>1233157893000</date>
-<contentUpdateDate>1233157893000</contentUpdateDate>
-<version>4.1</version>
+<date>1278409257000</date>
+<contentUpdateDate>1278409257000</contentUpdateDate>
+<version>1.1</version>
 <title>CreateNewWiki</title>
 <template></template>
 <defaultTemplate></defaultTemplate>
@@ -35,14 +34,15 @@
 <validationScript></validationScript>
 <tags>
 <cache>0</cache>
+<disabled>0</disabled>
 <displayType>input</displayType>
 <multiSelect>1</multiSelect>
 <name>tags</name>
 <number>1</number>
 <prettyName>Tags</prettyName>
 <relationalStorage>1</relationalStorage>
-<separator> </separator>
-<separators> ,|</separators>
+<separator>|</separator>
+<separators>|,</separators>
 <size>30</size>
 <unmodifiable>0</unmodifiable>
 <values></values>
@@ -453,7 +453,7 @@
       &lt;tr&gt;
         &lt;td&gt;
           &lt;dl&gt;
-           &lt;dt&gt;$msg.get("wikimanager.prop.wiki.wikiname")&lt;/dt&gt;
+           &lt;dt&gt;&lt;label  for="wikiname"&gt;$msg.get("wikimanager.prop.wiki.wikiname")&lt;/label&gt;&lt;/dt&gt;
            &lt;dd&gt;
              &lt;input size="40" id="wikiname" name="wikiname" type="text" onchange="wikiNameChanged();" onkeyup="wikiNameChanged();" /&gt;
              &lt;br /&gt;
@@ -478,7 +478,7 @@
       &lt;tr&gt;
         &lt;td&gt;
           &lt;dl&gt;
-            &lt;dt&gt;$msg.get("wikimanager.prop.wiki.wikiprettyname")&lt;/dt&gt;
+            &lt;dt&gt;&lt;label for="XWiki.XWikiServerClass_0_wikiprettyname"&gt;$msg.get("wikimanager.prop.wiki.wikiprettyname")&lt;/label&gt;&lt;/dt&gt;
             &lt;dd&gt;&lt;input size="40" id="XWiki.XWikiServerClass_0_wikiprettyname" name="XWiki.XWikiServerClass_0_wikiprettyname" type="text" onchange="prettyNameChanged();" /&gt;&lt;/dd&gt;
           &lt;/dl&gt;
         &lt;/td&gt;
@@ -487,7 +487,7 @@
       &lt;tr&gt;
         &lt;td&gt;
           &lt;dl&gt;
-            &lt;dt&gt;$msg.get("wikimanager.prop.wiki.description")&lt;/dt&gt;
+            &lt;dt&gt;&lt;label for="XWiki.XWikiServerClass_0_description"&gt;$msg.get("wikimanager.prop.wiki.description")&lt;/label&gt;&lt;/dt&gt;
             &lt;dd&gt;$wikidocument.display("description", "edit")&lt;/dd&gt;
           &lt;/dl&gt;
         &lt;/td&gt;
@@ -496,7 +496,7 @@
       &lt;tr&gt;
         &lt;td&gt;
           &lt;dl&gt;
-            &lt;dt&gt;$msg.get("wikimanager.prop.wiki.server")&lt;/dt&gt;
+            &lt;dt&gt;&lt;label for="XWiki.XWikiServerClass_0_server"&gt;$msg.get("wikimanager.prop.wiki.server")&lt;/label&gt;&lt;/dt&gt;
             &lt;dd&gt;&lt;input size="40" id="XWiki.XWikiServerClass_0_server" name="XWiki.XWikiServerClass_0_server" type="text" onchange="domainNameChanged();" /&gt;&lt;/dd&gt;
           &lt;/dl&gt;
         &lt;/td&gt;
@@ -505,7 +505,7 @@
       &lt;tr&gt;
         &lt;td&gt;
           &lt;dl&gt;
-            &lt;dt&gt;$msg.get("wikimanager.prop.wiki.owner")&lt;/dt&gt;
+            &lt;dt&gt;&lt;label for="XWiki.XWikiServerClass_0_owner"&gt;$msg.get("wikimanager.prop.wiki.owner")&lt;/label&gt;&lt;/dt&gt;
             &lt;dd&gt;$wikidocument.display("owner", "edit")&lt;/dd&gt;
           &lt;/dl&gt;
         &lt;/td&gt;
@@ -636,7 +636,7 @@
       &lt;br /&gt;
       #if ($request.stepbystep) &lt;input type="hidden" name="stepbystep" value="$request.stepbystep" /&gt; #end
       #if ($request.doc) &lt;input type="hidden" name="doc" value="$request.doc" /&gt; #end
-      &lt;input type="submit" id="actioncreatebutton" name="actioncreate" value="${msg.get("create")}" onclick="return validate();" /&gt;
+      &lt;input class="button" type="submit" id="actioncreatebutton" name="actioncreate" value="${msg.get("create")}" onclick="return validate();" /&gt;
     &lt;/div&gt;
   &lt;/div&gt;
 &lt;/form&gt;
@@ -656,5 +656,4 @@
 #end
 // ]]&gt;
 &lt;/script&gt;
-{/pre}</content>
-</xwikidoc>
+{/pre}</content></xwikidoc>

@@ -159,6 +159,7 @@
     <module>xwiki-webdav</module>
     <module>xwiki-officeimporter</module>
     <module>xwiki-rest</module>
+    <module>xwiki-rest-model</module>
     <module>xwiki-refactoring</module>
     <module>xwiki-chart</module>
     <module>xwiki-properties</module>

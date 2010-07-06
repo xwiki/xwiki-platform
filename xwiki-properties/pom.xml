@@ -40,16 +40,22 @@
       <version>${pom.version}</version>
     </dependency>
     <dependency>
+      <groupId>javax.validation</groupId>
+      <artifactId>validation-api</artifactId>
+      <version>1.0.0.GA</version>
+    </dependency>
+    <dependency>
       <groupId>commons-beanutils</groupId>
       <artifactId>commons-beanutils</artifactId>
     </dependency>
+
+    <!-- Tests dependencies -->
     <dependency>
       <groupId>org.hibernate</groupId>
       <artifactId>hibernate-validator</artifactId>
-      <version>4.0.0.GA</version>
+      <version>4.0.2.GA</version>
+      <scope>test</scope>
     </dependency>
-    
-    <!-- Tests dependencies -->
     <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-core-shared-tests</artifactId>
@@ -59,9 +65,9 @@
   </dependencies>
   <repositories>
     <repository>
-      <id>JBoss</id>
-      <name>JBoss Maven2 Remote Repository</name>
-      <url>http://repository.jboss.org/maven2</url>
+      <id>jboss-public-repository-group</id>
+      <name>JBoss Public Maven Repository Group</name>
+      <url>https://repository.jboss.org/nexus/content/groups/public/</url>
     </repository>
   </repositories>
   <build>

@@ -85,9 +85,7 @@ public class DefaultBeanManager extends AbstractLogEnabled implements BeanManage
         try {
             this.validatorFactory = Validation.buildDefaultValidatorFactory();
         } catch (ValidationException e) {
-            getLogger().debug("Unable to find a default provider");
-
-            return;
+            getLogger().warn("Unable to find a default provider", e);
         }
     }
 

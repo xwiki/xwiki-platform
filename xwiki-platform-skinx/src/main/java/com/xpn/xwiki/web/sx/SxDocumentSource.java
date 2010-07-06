@@ -20,13 +20,20 @@
  */
 package com.xpn.xwiki.web.sx;
 
+import java.io.StringWriter;
+
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.velocity.VelocityContext;
+import org.xwiki.velocity.VelocityEngine;
+import org.xwiki.velocity.VelocityManager;
+import org.xwiki.velocity.XWikiVelocityException;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
+import com.xpn.xwiki.web.Utils;
 
 /**
  * Wiki Document source for Skin Extensions. This is the standard source for Skin Extensions, using an XWiki object of
@@ -120,9 +127,22 @@ public class SxDocumentSource implements SxSource
                 String sxContent = sxObj.getLargeStringValue(CONTENT_PROPERTY_NAME);
                 int parse = sxObj.getIntValue(PARSE_CONTENT_PROPERTY_NAME);
                 if (parse == 1) {
-                    sxContent =
-                        this.context.getWiki().getRenderingEngine().interpretText(sxContent, this.document,
-                            this.context);
+                    try {
+                        StringWriter writer = new StringWriter();
+                        VelocityManager velocityManager = Utils.getComponent(VelocityManager.class);
+                        VelocityEngine engine = velocityManager.getVelocityEngine();
+                        try {
+                            VelocityContext vcontext = velocityManager.getVelocityContext();
+                            velocityManager.getVelocityEngine().evaluate(vcontext, writer,
+                                this.document.getPrefixedFullName(), sxContent);
+                            return writer.toString();
+                        } finally {
+                            engine.clearMacroNamespace(this.document.getPrefixedFullName());
+                        }
+                    } catch (XWikiVelocityException ex) {
+                        LOG.warn("Velocity errors while parsing skin extension [" + this.document.getPrefixedFullName()
+                            + "]: " + ex.getMessage());
+                    }
                 }
                 // Also add a newline, in case the different object contents don't end with a blank
                 // line, and could cause syntax errors when concatenated.

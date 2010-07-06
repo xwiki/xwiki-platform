@@ -1,5 +1,4 @@
-<?xml version="1.0" encoding="ISO-8859-1"?>
-
+<?xml version="1.0" encoding="UTF-8"?>
 <xwikidoc>
 <web>XAppCode</web>
 <name>ExportAppCode</name>
@@ -12,8 +11,8 @@
 <customClass></customClass>
 <contentAuthor>XWiki.Admin</contentAuthor>
 <creationDate>1192218584000</creationDate>
-<date>1204111302000</date>
-<contentUpdateDate>1205423816000</contentUpdateDate>
+<date>1278410830000</date>
+<contentUpdateDate>1278410830000</contentUpdateDate>
 <version>1.1</version>
 <title></title>
 <template></template>
@@ -21,6 +20,8 @@
 <validationScript></validationScript>
 <comment></comment>
 <minorEdit>false</minorEdit>
+<syntaxId>xwiki/1.0</syntaxId>
+<hidden>false</hidden>
 <object>
 <class>
 <name>XWiki.TagClass</name>
@@ -33,14 +34,15 @@
 <validationScript></validationScript>
 <tags>
 <cache>0</cache>
+<disabled>0</disabled>
 <displayType>input</displayType>
 <multiSelect>1</multiSelect>
 <name>tags</name>
 <number>1</number>
 <prettyName>Tags</prettyName>
 <relationalStorage>1</relationalStorage>
-<separator> </separator>
-<separators> ,|</separators>
+<separator>|</separator>
+<separators>|,</separators>
 <size>30</size>
 <unmodifiable>0</unmodifiable>
 <values></values>
@@ -50,6 +52,7 @@
 <name>XAppCode.ExportAppCode</name>
 <number>0</number>
 <className>XWiki.TagClass</className>
+<guid>db138765-efc6-488b-9ae7-50a123b9aa69</guid>
 <property>
 <tags/>
 </property>
@@ -84,9 +87,8 @@
         &lt;input type="checkbox" id="recurse" name="recurse" value="1" checked="checked"/&gt;&lt;label for="recurse"&gt;$msg.get("xapp.answer.exportapp.recursive")&lt;/label&gt;&lt;br/&gt;
         &lt;input type="checkbox" id="withdetails" name="withdetails" value="1"/&gt;&lt;label for="withdetails"&gt;$msg.get("xapp.answer.exportapp.withdetails")&lt;/label&gt;
 
-        #xwikimessageboxsubmit($msg.get("ok"))
+        #submitButton("exportok", $null, $msg.get("ok"))
       #xwikimessageboxend()
     &lt;/form&gt;
   #end
-#end</content>
-</xwikidoc>
+#end</content></xwikidoc>

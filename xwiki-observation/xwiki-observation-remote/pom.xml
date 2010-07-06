@@ -59,6 +59,7 @@
       <artifactId>xwiki-core-context</artifactId>
       <version>${pom.version}</version>
     </dependency>
+    <!-- Note that jgroups depends on Java 6 since 2.9 branch. -->
     <dependency>
       <groupId>jgroups</groupId>
       <artifactId>jgroups</artifactId>

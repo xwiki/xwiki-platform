@@ -31,7 +31,7 @@ import org.xwiki.model.reference.EntityReference;
  * This is useful in cases when we need to store a reference relative to another reference (for example for storing
  * Parent references in a Document, since we want these references to stay relative if the user has specified a
  * relative reference, and absolute if the user has specified an absolute reference).
- * </p>
+ * <p>
  * In other words, this implementation just transforms a String representation into a {@link EntityReference}
  * representation without resolving any missing parts (space, wiki, etc).
  *  

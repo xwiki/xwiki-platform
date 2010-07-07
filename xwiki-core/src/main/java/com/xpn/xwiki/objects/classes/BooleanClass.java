@@ -228,7 +228,14 @@ public class BooleanClass extends PropertyClass
         labelFalse.addElement(StringFalse);
         divFalse.addElement(labelFalse);
 
-        radioTrue.setID(prefix + name);
+        radioNone.setID(prefix + name + "_none");
+        labelTrue.setFor(prefix + name + "_none");
+        
+        radioNone.setID(prefix + name);
+        labelTrue.setFor(prefix + name);
+        
+        radioFalse.setID(prefix + name + "_false");
+        labelFalse.setFor(prefix + name + "_false");
 
         if (getDefaultValue() == -1) {
             inputs = new div[] {divNone, divTrue, divFalse};

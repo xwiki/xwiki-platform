@@ -85,7 +85,7 @@ public class DefaultBeanManager extends AbstractLogEnabled implements BeanManage
         try {
             this.validatorFactory = Validation.buildDefaultValidatorFactory();
         } catch (ValidationException e) {
-            getLogger().warn("Unable to find default JSR 303 provider", e);
+            getLogger().warn("Unable to find default JSR 303 provider. There will be no Java bean validation.");
         }
     }
 

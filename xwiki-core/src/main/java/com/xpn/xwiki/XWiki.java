@@ -341,8 +341,8 @@ public class XWiki implements XWikiDocChangeNotificationInterface
         DocumentReferenceResolver.class, "currentmixed");
 
     @SuppressWarnings("unchecked")
-    private EntityReferenceResolver<String> explicitEntityReferenceResolver = Utils.getComponent(
-        EntityReferenceResolver.class, "explicit");
+    private EntityReferenceResolver<String> relativeEntityReferenceResolver = Utils.getComponent(
+        EntityReferenceResolver.class, "relative");
 
     private SyntaxFactory syntaxFactory = Utils.getComponent(SyntaxFactory.class);
 
@@ -3545,7 +3545,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface
             }
 
             int result =
-                createUser(xwikiname, map, this.explicitEntityReferenceResolver.resolve(parent, EntityType.DOCUMENT),
+                createUser(xwikiname, map, this.relativeEntityReferenceResolver.resolve(parent, EntityType.DOCUMENT),
                     content, syntax, userRights, context);
 
             if ((result > 0) && (withValidation)) {
@@ -3857,7 +3857,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface
             }
         }
 
-        return createUser(userName, map, this.explicitEntityReferenceResolver.resolve(parent, EntityType.DOCUMENT),
+        return createUser(userName, map, this.relativeEntityReferenceResolver.resolve(parent, EntityType.DOCUMENT),
             content, syntax, userRights, context);
     }
 

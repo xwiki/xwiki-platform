@@ -25,11 +25,13 @@ import java.util.List;
 import java.util.Set;
 
 import org.apache.commons.lang.StringUtils;
-import org.xwiki.model.reference.DocumentReference;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.Requirement;
 import org.xwiki.component.logging.AbstractLogEnabled;
 import org.xwiki.context.Execution;
+import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.model.reference.WikiReference;
 import org.xwiki.rendering.macro.wikibridge.WikiMacro;
@@ -54,6 +56,9 @@ import com.xpn.xwiki.user.api.XWikiRightService;
 @Component
 public class DefaultWikiMacroInitializer extends AbstractLogEnabled implements WikiMacroInitializer, WikiMacroConstants
 {
+    /** Logging helper object. */
+    private static final Log LOG = LogFactory.getLog(DefaultWikiMacroInitializer.class);
+
     /**
      * The {@link org.xwiki.rendering.macro.wikibridge.WikiMacroFactory} component.
      */
@@ -109,45 +114,52 @@ public class DefaultWikiMacroInitializer extends AbstractLogEnabled implements W
             }
 
             for (String wikiName : wikiNames) {
-                // Set the context to be in that wiki so that both the search for XWikiMacro class objects and the
-                // registration of macros refistered for the current wiki will work.
-                // TODO: In the future when we have APIs for it, move the code to set the current wiki and the current
-                // user (see below) to the WikiMacroManager's implementation.
-                xcontext.setDatabase(wikiName);
-
-                // Search for all those documents with macro definitions and for each register the macro
-                for (Object[] wikiMacroDocumentData : getWikiMacroDocumentData(xcontext)) {
-                    // In the database the space and page names are always specified for a document. However the wiki
-                    // part isn't so we need to replace the wiki reference with the current wiki.
-                    DocumentReference wikiMacroDocumentReference = new DocumentReference(
-                        (String) wikiMacroDocumentData[1], new SpaceReference((String) wikiMacroDocumentData[0],
-                            new WikiReference(wikiName)));
-
-                    String wikiMacroDocumentAuthor = (String) wikiMacroDocumentData[2];
-                    try {
-                        WikiMacro macro = wikiMacroFactory.createWikiMacro(wikiMacroDocumentReference);
-
-                        // Set the author in the context to be the author who last modified the document containing
-                        // the wiki macro class definition, so that if the Macro has the "Current User" visibility
-                        // the correct user will be found in the Execution Context.
-                        String originalAuthor = xcontext.getUser();
-                        try {
-                            xcontext.setUser(wikiMacroDocumentAuthor);
-                            wikiMacroManager.registerWikiMacro(wikiMacroDocumentReference, macro);
-                        } finally {
-                            xcontext.setUser(originalAuthor);
-                        }
-                    } catch (WikiMacroException ex) {
-                        // Just log the exception and skip to the next.
-                        getLogger().error(ex.getMessage(), ex);
-                    }
-                }
+                registerMacrosForWiki(wikiName, xcontext);
             }
         } finally {
             xcontext.setDatabase(originalWiki);
         }
     }
 
+    /**
+     * Search and register all the macros from the given wiki.
+     * 
+     * @param wikiName the name of the wiki to process, lowercase database name
+     * @param xcontext the current request context
+     */
+    private void registerMacrosForWiki(String wikiName, XWikiContext xcontext)
+    {
+        try {
+            LOG.debug("Registering wiki macros for wiki " + wikiName);
+            // Set the context to be in that wiki so that both the search for XWikiMacro class objects and the
+            // registration of macros registered for the current wiki will work.
+            // TODO: In the future when we have APIs for it, move the code to set the current wiki and the current user
+            // (see below) to the WikiMacroManager's implementation.
+            xcontext.setDatabase(wikiName);
+
+            // Search for all those documents with macro definitions and for each register the macro
+            for (Object[] wikiMacroDocumentData : getWikiMacroDocumentData(xcontext)) {
+                // In the database the space and page names are always specified for a document. However the wiki
+                // part isn't, so we need to replace the wiki reference with the current wiki.
+                DocumentReference wikiMacroDocumentReference = new DocumentReference(
+                    (String) wikiMacroDocumentData[1], new SpaceReference((String) wikiMacroDocumentData[0],
+                    new WikiReference(wikiName)));
+
+                registerMacro(wikiMacroDocumentReference, (String) wikiMacroDocumentData[2], xcontext);
+            }
+        } catch (Exception ex) {
+            LOG.warn("Failed to register macros for wiki [" + wikiName + "]: " + ex.getMessage());
+        }
+    }
+
+    /**
+     * Search for all wiki macros in the current wiki.
+     * 
+     * @param xcontext the current request context
+     * @return a list of documents containing wiki macros, each item as a vector of 3 strings: space name, document
+     *         name, last author of the document
+     * @throws Exception if the database search fails
+     */
     private List<Object[]> getWikiMacroDocumentData(XWikiContext xcontext) throws Exception
     {
         // TODO: Use the query manager instead
@@ -162,6 +174,36 @@ public class DefaultWikiMacroInitializer extends AbstractLogEnabled implements W
         }
 
         return wikiMacroDocumentData;
+    }
+
+    /**
+     * Register a wiki macro in the component manager, if the macro author has the required rights.
+     * 
+     * @param wikiMacroDocumentReference the document holding the macro definition
+     * @param wikiMacroDocumentAuthor the author of the macro document
+     * @param xcontext the current request context
+     */
+    private void registerMacro(DocumentReference wikiMacroDocumentReference, String wikiMacroDocumentAuthor,
+        XWikiContext xcontext)
+    {
+        LOG.debug("Found macro: " + wikiMacroDocumentReference);
+
+        String originalAuthor = xcontext.getUser();
+        try {
+            WikiMacro macro = this.wikiMacroFactory.createWikiMacro(wikiMacroDocumentReference);
+
+            // Set the author in the context to be the author who last modified the document containing
+            // the wiki macro class definition, so that if the Macro has the "Current User" visibility
+            // the correct user will be found in the Execution Context.
+            xcontext.setUser(wikiMacroDocumentAuthor);
+            this.wikiMacroManager.registerWikiMacro(wikiMacroDocumentReference, macro);
+            LOG.debug("Registered macro " + wikiMacroDocumentReference);
+        } catch (WikiMacroException ex) {
+            // Just log the exception and skip to the next.
+            getLogger().error(ex.getMessage(), ex);
+        } finally {
+            xcontext.setUser(originalAuthor);
+        }
     }
 
     private boolean setWikiMacroClassesDocumentFields(XWikiDocument doc, String title)

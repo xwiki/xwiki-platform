@@ -11,8 +11,8 @@
 <customClass></customClass>
 <contentAuthor>XWiki.Admin</contentAuthor>
 <creationDate>1186676964000</creationDate>
-<date>1278409257000</date>
-<contentUpdateDate>1278409257000</contentUpdateDate>
+<date>1278497425000</date>
+<contentUpdateDate>1278497425000</contentUpdateDate>
 <version>1.1</version>
 <title>CreateNewWiki</title>
 <template></template>
@@ -156,12 +156,12 @@
 #set ($WSTEPNAME_SUMMARY = "wstep_summary")
 #set ($WSTEPLIST = [$WSTEPNAME_INTRO, $WSTEPNAME_WIKINAME, $WSTEPNAME_WIKIDESC, $WSTEPNAME_DATAFROM, $WSTEPNAME_USERS, $WSTEPNAME_SUMMARY])
 #set ($ISWIKINAMEAVAILABLE = $xwiki.getDocument("WikiCode.IsWikiOrDatabaseAvailableService").URL)
-#set ($MSG_ERROR_WIKIALREADYEXISTS = "&lt;div class=\"errormessage\"&gt;&lt;span class=\"messagetype\"&gt;$msg.get('error'): &lt;/span&gt;$msg.get('wikimanager.wikiname.error.wikialreadyexists')&lt;/div&gt;")
-#set ($MSG_WARNING_DATABASEALREADYEXISTS = "&lt;div class=\"warningmessage\"&gt;&lt;span class=\"messagetype\"&gt;$msg.get('warning'): &lt;/span&gt;$msg.get('wikimanager.wikiname.error.databasealreadyexists')&lt;/div&gt;")
-#set ($MSG_ERROR_DATABASEALREADYEXISTS = "&lt;div class=\"errormessage\"&gt;&lt;span class=\"messagetype\"&gt;$msg.get('error'): &lt;/span&gt;$msg.get('wikimanager.wikiname.error.databasealreadyexists')&lt;/div&gt;")
-#set ($MSG_ERROR_WIKINAMEALREADYUSED = "&lt;div class=\"errormessage\"&gt;&lt;span class=\"messagetype\"&gt;$msg.get('error'): &lt;/span&gt;$msg.get('wikimanager.wikiname.error.alreadyused')&lt;/div&gt;")
-#set ($MSG_ERROR_WIKINAMEEMPTY = "&lt;div class=\"errormessage\"&gt;&lt;span class=\"messagetype\"&gt;$msg.get('error'): &lt;/span&gt;$msg.get('wikimanager.wikiname.error.empty')&lt;/div&gt;")
-#set ($MSG_INFO_WIKINAMEVALID = "&lt;div class=\"infomessage\"&gt;&lt;span class=\"messagetype\"&gt;$msg.get('info'): &lt;/span&gt;$msg.get('wikimanager.wikiname.info.valid')&lt;/div&gt;")
+#set ($MSG_ERROR_WIKIALREADYEXISTS = "&lt;span class=\"errormessage\"&gt;&lt;span class=\"messagetype\"&gt;$msg.get('error'): &lt;/span&gt;$msg.get('wikimanager.wikiname.error.wikialreadyexists')&lt;/span&gt;")
+#set ($MSG_WARNING_DATABASEALREADYEXISTS = "&lt;span class=\"warningmessage\"&gt;&lt;span class=\"messagetype\"&gt;$msg.get('warning'): &lt;/span&gt;$msg.get('wikimanager.wikiname.error.databasealreadyexists')&lt;/span&gt;")
+#set ($MSG_ERROR_DATABASEALREADYEXISTS = "&lt;span class=\"errormessage\"&gt;&lt;span class=\"messagetype\"&gt;$msg.get('error'): &lt;/span&gt;$msg.get('wikimanager.wikiname.error.databasealreadyexists')&lt;/span&gt;")
+#set ($MSG_ERROR_WIKINAMEALREADYUSED = "&lt;span class=\"errormessage\"&gt;&lt;span class=\"messagetype\"&gt;$msg.get('error'): &lt;/span&gt;$msg.get('wikimanager.wikiname.error.alreadyused')&lt;/span&gt;")
+#set ($MSG_ERROR_WIKINAMEEMPTY = "&lt;span class=\"errormessage\"&gt;&lt;span class=\"messagetype\"&gt;$msg.get('error'): &lt;/span&gt;$msg.get('wikimanager.wikiname.error.empty')&lt;/span&gt;")
+#set ($MSG_INFO_WIKINAMEVALID = "&lt;span class=\"infomessage\"&gt;&lt;span class=\"messagetype\"&gt;$msg.get('info'): &lt;/span&gt;$msg.get('wikimanager.wikiname.info.valid')&lt;/span&gt;")
 ##
 ############################################################################################
 ## REQUEST PARAMETERS
@@ -446,117 +446,83 @@
   #############################################################################
   ##
   &lt;div id="$WSTEPNAME_WIKINAME"&gt;
-    #if ($wstepbystep)
-      1.1 $msg.get("wikimanager.title.createwiki.wikiname")
-    #end
-    &lt;table&gt;
-      &lt;tr&gt;
-        &lt;td&gt;
-          &lt;dl&gt;
-           &lt;dt&gt;&lt;label  for="wikiname"&gt;$msg.get("wikimanager.prop.wiki.wikiname")&lt;/label&gt;&lt;/dt&gt;
-           &lt;dd&gt;
-             &lt;input size="40" id="wikiname" name="wikiname" type="text" onchange="wikiNameChanged();" onkeyup="wikiNameChanged();" /&gt;
-             &lt;br /&gt;
-             &lt;div id="wikinamevalidation"&gt;&lt;/div&gt;
-             &lt;div id="forcewikinamediv"&gt;&lt;input id="forcewikiname" name="forcewikiname" type="checkbox" #if ($failonexist == false)checked="true"#end onchange="forceWikiNameChanged();"/&gt;$msg.get("wikimanager.wikiname.force")&lt;/div&gt;
-           &lt;/dd&gt;
-         &lt;/dl&gt;
-        &lt;/td&gt;
-        #if ($documentation) &lt;td&gt;$msg.get("wikimanager.doc.createwiki.wikiname")&lt;/td&gt; #end
-      &lt;/tr&gt;
-    &lt;/table&gt;
+    1.1 $msg.get("wikimanager.title.createwiki.wikiname")
+
+    &lt;dl&gt;
+      &lt;dt&gt;&lt;label  for="wikiname"&gt;$msg.get("wikimanager.prop.wiki.wikiname")&lt;/label&gt;&lt;/dt&gt;
+      #if ($documentation) &lt;dd&gt;$msg.get("wikimanager.doc.createwiki.wikiname")&lt;/dd&gt; #end
+      &lt;dd&gt;
+        &lt;input size="40" id="wikiname" name="wikiname" type="text" onchange="wikiNameChanged();" onkeyup="wikiNameChanged();" /&gt;
+        &lt;span id="wikinamevalidation"&gt;&lt;/span&gt;
+        &lt;div id="forcewikinamediv"&gt;&lt;input id="forcewikiname" name="forcewikiname" type="checkbox" #if ($failonexist == false)checked="true"#end onchange="forceWikiNameChanged();"/&gt;$msg.get("wikimanager.wikiname.force")&lt;/div&gt;
+      &lt;/dd&gt;
+    &lt;/dl&gt;
   &lt;/div&gt;
   ##
   #############################################################################
   ##
   &lt;div id="$WSTEPNAME_WIKIDESC"&gt;
-    #if ($wstepbystep)
-      1.1 $msg.get("wikimanager.title.createwiki.desc")
-      #if ($documentation) $msg.get("wikimanager.doc.createwiki.desc") #end
-    #end
-    &lt;table&gt;
-      &lt;tr&gt;
-        &lt;td&gt;
-          &lt;dl&gt;
-            &lt;dt&gt;&lt;label for="XWiki.XWikiServerClass_0_wikiprettyname"&gt;$msg.get("wikimanager.prop.wiki.wikiprettyname")&lt;/label&gt;&lt;/dt&gt;
-            &lt;dd&gt;&lt;input size="40" id="XWiki.XWikiServerClass_0_wikiprettyname" name="XWiki.XWikiServerClass_0_wikiprettyname" type="text" onchange="prettyNameChanged();" /&gt;&lt;/dd&gt;
-          &lt;/dl&gt;
-        &lt;/td&gt;
-        #if ($documentation) &lt;td&gt;$msg.get("wikimanager.doc.createwiki.desc.wikiprettyname")&lt;/td&gt; #end
-      &lt;/tr&gt;
-      &lt;tr&gt;
-        &lt;td&gt;
-          &lt;dl&gt;
-            &lt;dt&gt;&lt;label for="XWiki.XWikiServerClass_0_description"&gt;$msg.get("wikimanager.prop.wiki.description")&lt;/label&gt;&lt;/dt&gt;
-            &lt;dd&gt;$wikidocument.display("description", "edit")&lt;/dd&gt;
-          &lt;/dl&gt;
-        &lt;/td&gt;
-        #if ($documentation) &lt;td&gt;$msg.get("wikimanager.doc.createwiki.desc.description")&lt;/td&gt; #end
-      &lt;/tr&gt;
-      &lt;tr&gt;
-        &lt;td&gt;
-          &lt;dl&gt;
-            &lt;dt&gt;&lt;label for="XWiki.XWikiServerClass_0_server"&gt;$msg.get("wikimanager.prop.wiki.server")&lt;/label&gt;&lt;/dt&gt;
-            &lt;dd&gt;&lt;input size="40" id="XWiki.XWikiServerClass_0_server" name="XWiki.XWikiServerClass_0_server" type="text" onchange="domainNameChanged();" /&gt;&lt;/dd&gt;
-          &lt;/dl&gt;
-        &lt;/td&gt;
-        #if ($documentation) &lt;td&gt;$msg.get("wikimanager.doc.createwiki.desc.server.creation", [$ALIASSUFFIX])&lt;/td&gt; #end
-      &lt;/tr&gt;
-      &lt;tr&gt;
-        &lt;td&gt;
-          &lt;dl&gt;
-            &lt;dt&gt;&lt;label for="XWiki.XWikiServerClass_0_owner"&gt;$msg.get("wikimanager.prop.wiki.owner")&lt;/label&gt;&lt;/dt&gt;
-            &lt;dd&gt;$wikidocument.display("owner", "edit")&lt;/dd&gt;
-          &lt;/dl&gt;
-        &lt;/td&gt;
-        #if ($documentation) &lt;td&gt;$msg.get("wikimanager.doc.createwiki.desc.owner")&lt;/td&gt; #end
-      &lt;/tr&gt;
-    &lt;/table&gt;
+    1.1 $msg.get("wikimanager.title.createwiki.desc")
+    #if ($documentation) $msg.get("wikimanager.doc.createwiki.desc") #end
+
+    &lt;dl&gt;
+      &lt;dt&gt;&lt;label for="XWiki.XWikiServerClass_0_wikiprettyname"&gt;$msg.get("wikimanager.prop.wiki.wikiprettyname")&lt;/label&gt;&lt;/dt&gt;
+      #if ($documentation) &lt;dd&gt;$msg.get("wikimanager.doc.createwiki.desc.wikiprettyname")&lt;/dd&gt; #end
+      &lt;dd&gt;&lt;input size="40" id="XWiki.XWikiServerClass_0_wikiprettyname" name="XWiki.XWikiServerClass_0_wikiprettyname" type="text" onchange="prettyNameChanged();" /&gt;&lt;/dd&gt;
+    &lt;/dl&gt;
+
+    &lt;dl&gt;
+      &lt;dt&gt;&lt;label for="XWiki.XWikiServerClass_0_description"&gt;$msg.get("wikimanager.prop.wiki.description")&lt;/label&gt;&lt;/dt&gt;
+      #if ($documentation) &lt;td&gt;$msg.get("wikimanager.doc.createwiki.desc.description")&lt;/td&gt; #end
+      &lt;dd&gt;$wikidocument.display("description", "edit")&lt;/dd&gt;
+    &lt;/dl&gt;
+
+    &lt;dl&gt;
+      &lt;dt&gt;&lt;label for="XWiki.XWikiServerClass_0_server"&gt;$msg.get("wikimanager.prop.wiki.server")&lt;/label&gt;&lt;/dt&gt;
+      #if ($documentation) &lt;dd&gt;$msg.get("wikimanager.doc.createwiki.desc.server.creation", [$ALIASSUFFIX])&lt;/dd&gt; #end
+      &lt;dd&gt;&lt;input size="40" id="XWiki.XWikiServerClass_0_server" name="XWiki.XWikiServerClass_0_server" type="text" onchange="domainNameChanged();" /&gt;&lt;/dd&gt;
+    &lt;/dl&gt;
+
+    &lt;dl&gt;
+      &lt;dt&gt;&lt;label for="XWiki.XWikiServerClass_0_owner"&gt;$msg.get("wikimanager.prop.wiki.owner")&lt;/label&gt;&lt;/dt&gt;
+      #if ($documentation) &lt;dd&gt;$msg.get("wikimanager.doc.createwiki.desc.owner")&lt;/dd&gt; #end
+      &lt;dd&gt;$wikidocument.display("owner", "edit")&lt;/dd&gt;
+    &lt;/dl&gt;
   &lt;/div&gt;
   ##
   #############################################################################
   ##
   &lt;div id="$WSTEPNAME_DATAFROM"&gt;
-    #if ($wstepbystep)
-      1.1 $msg.get("wikimanager.title.createwiki.datafrom")
-      #if ($documentation) $msg.get("wikimanager.doc.createwiki.datafrom") #end
-    #end
-    &lt;table&gt;
-      &lt;tr&gt;
-        &lt;td&gt;
-          &lt;dl&gt;
-            &lt;dt&gt;&lt;label for="wikitemplate"&gt;$msg.get("wikimanager.wikitemplate")&lt;/label&gt;&lt;/dt&gt;
-            &lt;dd&gt;
-              #set ($listtemplate=$WikiManager.getWikiTemplateList())
-              &lt;select #if($listtemplate.size() == 0)disabled="disabled"#end name="wikitemplate" id="wikitemplate"&gt;
-                &lt;option value=""&gt;---&lt;/option&gt;
-                #foreach ($template in $listtemplate)
-                  &lt;option value="$template.wikiName"&gt;#if($template.wikiPrettyName != "")$template.wikiPrettyName#else$template.wikiName#end&lt;/option&gt;
-                #end
-              &lt;/select&gt;
-            &lt;/dd&gt;
-          &lt;/dl&gt;
-        &lt;/td&gt;
-        #if ($documentation) &lt;td&gt;$msg.get("wikimanager.doc.createwiki.datafrom.template")&lt;/td&gt; #end
-      &lt;/tr&gt;
-      &lt;tr&gt;
-        &lt;td&gt;
-          &lt;dl&gt;
-            &lt;dt&gt;&lt;label for="wikipackage"&gt;$msg.get("wikimanager.wikipackage")&lt;/label&gt;&lt;/dt&gt;
-            &lt;dd&gt;
-              #set ($listpackage=$doc.getAttachmentList())
-              &lt;select #if($listpackage.size() == 0)disabled="disabled"#end name="wikipackage" id="wikipackage"&gt;
-                &lt;option value=""&gt;---&lt;/option&gt;
-                #foreach ($package in $listpackage)
-                  &lt;option value="$package.getFilename()"&gt;$package.getFilename()&lt;/option&gt;
-                #end
-              &lt;/select&gt;
-            &lt;/dd&gt;
-          &lt;/dl&gt;
-        &lt;/td&gt;
-        #if ($documentation) &lt;td&gt;$msg.get("wikimanager.doc.createwiki.datafrom.package")&lt;/td&gt; #end
-      &lt;/tr&gt;
-    &lt;/table&gt;
+    1.1 $msg.get("wikimanager.title.createwiki.datafrom")
+    #if ($documentation) $msg.get("wikimanager.doc.createwiki.datafrom") #end
+
+    &lt;dl&gt;
+      &lt;dt&gt;&lt;label for="wikitemplate"&gt;$msg.get("wikimanager.wikitemplate")&lt;/label&gt;&lt;/dt&gt;
+      #if ($documentation) &lt;dd&gt;$msg.get("wikimanager.doc.createwiki.datafrom.template")&lt;/dd&gt; #end
+      &lt;dd&gt;
+        #set ($listtemplate=$WikiManager.getWikiTemplateList())
+        &lt;select #if($listtemplate.size() == 0)disabled="disabled"#end name="wikitemplate" id="wikitemplate"&gt;
+          &lt;option value=""&gt;---&lt;/option&gt;
+          #foreach ($template in $listtemplate)
+            &lt;option value="$template.wikiName"&gt;#if($template.wikiPrettyName != "")$template.wikiPrettyName#else$template.wikiName#end&lt;/option&gt;
+          #end
+        &lt;/select&gt;
+      &lt;/dd&gt;
+    &lt;/dl&gt;
+
+    &lt;dl&gt;
+      &lt;dt&gt;&lt;label for="wikipackage"&gt;$msg.get("wikimanager.wikipackage")&lt;/label&gt;&lt;/dt&gt;
+      #if ($documentation) &lt;dd&gt;$msg.get("wikimanager.doc.createwiki.datafrom.package")&lt;/dd&gt; #end
+      &lt;dd&gt;
+        #set ($listpackage=$doc.getAttachmentList())
+        &lt;select #if($listpackage.size() == 0)disabled="disabled"#end name="wikipackage" id="wikipackage"&gt;
+          &lt;option value=""&gt;---&lt;/option&gt;
+          #foreach ($package in $listpackage)
+            &lt;option value="$package.getFilename()"&gt;$package.getFilename()&lt;/option&gt;
+          #end
+        &lt;/select&gt;
+      &lt;/dd&gt;
+    &lt;/dl&gt;
   &lt;/div&gt;
   ##
   #############################################################################
@@ -565,39 +531,26 @@
   #set ($users = $rightsmanager.usersApi.allGlobalUsersNames)
   #set ($groups = $rightsmanager.groupsApi.allGlobalGroupsNames)
   &lt;div id="$WSTEPNAME_USERS"&gt;
-    #if ($wstepbystep)
-      1.1 $msg.get("wikimanager.title.createwiki.members")
-      #if ($documentation) $msg.get("wikimanager.doc.createwiki.members") #end
-    #end
-    &lt;table&gt;
-      &lt;tr&gt;
-        &lt;td&gt;
-          &lt;dl&gt;
-            &lt;dt&gt;&lt;label for="readersusers"&gt;$msg.get("wikimanager.readers")&lt;/label&gt;&lt;/dt&gt;
-            &lt;dd&gt;#printUsersAndGroups($users $groups "readers" $readeruserlist $readergrouplist false)&lt;/dd&gt;
-          &lt;/dl&gt;
-        &lt;/td&gt;
-        #if ($documentation) &lt;td&gt;$msg.get("wikimanager.doc.createwiki.members.readers")&lt;/td&gt; #end
-      &lt;/tr&gt;
-      &lt;tr&gt;
-        &lt;td&gt;
-          &lt;dl&gt;
-            &lt;dt&gt;&lt;label for="writersusers"&gt;$msg.get("wikimanager.writers")&lt;/label&gt;&lt;/dt&gt;
-            &lt;dd&gt;#printUsersAndGroups($users $groups "writers" $writeruserlist $writergrouplist false)&lt;/dd&gt;
-          &lt;/dl&gt;
-        &lt;/td&gt;
-        #if ($documentation) &lt;td&gt;$msg.get("wikimanager.doc.createwiki.members.writers")&lt;/td&gt; #end
-      &lt;/tr&gt;
-      &lt;tr&gt;
-        &lt;td&gt;
-          &lt;dl&gt;
-            &lt;dt&gt;&lt;label for="adminsusers"&gt;$msg.get("wikimanager.admins")&lt;/label&gt;&lt;/dt&gt;
-            &lt;dd&gt;#printUsersAndGroups($users $groups "admins" $adminuserlist $admingrouplist false)&lt;/dd&gt;
-          &lt;/dl&gt;
-        &lt;/td&gt;
-        #if ($documentation) &lt;td&gt;$msg.get("wikimanager.doc.createwiki.members.administrators")&lt;/td&gt; #end
-      &lt;/tr&gt;
-    &lt;/table&gt;
+    1.1 $msg.get("wikimanager.title.createwiki.members")
+    #if ($documentation) $msg.get("wikimanager.doc.createwiki.members") #end
+
+    &lt;dl&gt;
+      &lt;dt&gt;&lt;label for="readersusers"&gt;$msg.get("wikimanager.readers")&lt;/label&gt;&lt;/dt&gt;
+      #if ($documentation) &lt;td&gt;$msg.get("wikimanager.doc.createwiki.members.readers")&lt;/td&gt; #end
+      &lt;dd&gt;#printUsersAndGroups($users $groups "readers" $readeruserlist $readergrouplist false)&lt;/dd&gt;
+    &lt;/dl&gt;
+
+    &lt;dl&gt;
+      &lt;dt&gt;&lt;label for="writersusers"&gt;$msg.get("wikimanager.writers")&lt;/label&gt;&lt;/dt&gt;
+      #if ($documentation) &lt;td&gt;$msg.get("wikimanager.doc.createwiki.members.writers")&lt;/td&gt; #end
+      &lt;dd&gt;#printUsersAndGroups($users $groups "writers" $writeruserlist $writergrouplist false)&lt;/dd&gt;
+    &lt;/dl&gt;
+
+    &lt;dl&gt;
+      &lt;dt&gt;&lt;label for="adminsusers"&gt;$msg.get("wikimanager.admins")&lt;/label&gt;&lt;/dt&gt;
+      #if ($documentation) &lt;td&gt;$msg.get("wikimanager.doc.createwiki.members.administrators")&lt;/td&gt; #end
+      &lt;dd&gt;#printUsersAndGroups($users $groups "admins" $adminuserlist $admingrouplist false)&lt;/dd&gt;
+    &lt;/dl&gt;
   &lt;/div&gt;
   ##
   #############################################################################

@@ -86,9 +86,9 @@ public class DefaultWikiMacroInitializer extends AbstractLogEnabled implements W
      * {@inheritDoc}
      */
     public void registerExistingWikiMacros() throws Exception
-    {                
+    {
         XWikiContext xcontext = getContext();
-        
+
         // Check whether xwiki classes required for defining wiki macros are present.
         XWikiDocument wikiMacroClass = xcontext.getWiki().getDocument(WIKI_MACRO_CLASS, xcontext);
         XWikiDocument wikiMacroParameterClass = xcontext.getWiki().getDocument(WIKI_MACRO_PARAMETER_CLASS, xcontext);
@@ -167,7 +167,7 @@ public class DefaultWikiMacroInitializer extends AbstractLogEnabled implements W
     private boolean setWikiMacroClassesDocumentFields(XWikiDocument doc, String title)
     {
         boolean needsUpdate = false;
-        
+
         if (StringUtils.isBlank(doc.getCreator())) {
             needsUpdate = true;
             doc.setCreator(XWikiRightService.SUPERADMIN_USER);
@@ -185,11 +185,11 @@ public class DefaultWikiMacroInitializer extends AbstractLogEnabled implements W
             doc.setTitle(title);
         }
         if (StringUtils.isBlank(doc.getContent()) || !Syntax.XWIKI_2_0.equals(doc.getSyntax())) {
-            needsUpdate = true;      
+            needsUpdate = true;
             doc.setContent("{{include document=\"XWiki.ClassSheet\" /}}");
             doc.setSyntax(Syntax.XWIKI_2_0);
         }
-        
+
         return needsUpdate;
     }
 
@@ -205,7 +205,7 @@ public class DefaultWikiMacroInitializer extends AbstractLogEnabled implements W
         BaseClass bclass = doc.getXClass();
 
         boolean needsUpdate = false;
-        
+
         needsUpdate |= setWikiMacroClassesDocumentFields(doc, "XWiki Wiki Macro Class");
         needsUpdate |= bclass.addTextField(MACRO_ID_PROPERTY, "Macro id", 30);
         needsUpdate |= bclass.addTextField(MACRO_NAME_PROPERTY, "Macro name", 30);
@@ -254,7 +254,7 @@ public class DefaultWikiMacroInitializer extends AbstractLogEnabled implements W
         if (doc.isNew()) {
             doc.setParent("XWiki.WebHome");
         }
-        
+
         xcontext.getWiki().saveDocument(doc, xcontext);
     }
 }

@@ -2534,7 +2534,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface
     {
         // Find out what is the default language from the XWiki preferences settings.
         String defaultLanguage = context.getWiki().getXWikiPreference("default_language", "", context);
-        if (defaultLanguage == null || defaultLanguage.equals("")) {
+        if (StringUtils.isEmpty(defaultLanguage)) {
             defaultLanguage = "en";
         }
         return defaultLanguage.toLowerCase();

@@ -75,8 +75,8 @@ public class DefaultVelocityEngine extends AbstractLogEnabled implements Velocit
     private VelocityConfiguration velocityConfiguration;
 
     /**
-     * The Container component. We need it in order to store the ServletContext as a property in the Application 
-     * Context so that the Velocity Tools WebappLoader can find it.
+     * The Container component. We need it in order to store the ServletContext as a property in the Application Context
+     * so that the Velocity Tools WebappLoader can find it.
      */
     @Requirement
     private Container container;
@@ -99,12 +99,12 @@ public class DefaultVelocityEngine extends AbstractLogEnabled implements Velocit
         this.engine = new org.apache.velocity.app.VelocityEngine();
 
         Properties velocityProperties = this.velocityConfiguration.getProperties();
-        
+
         // If the Velocity configuration uses the
         // <code>org.apache.velocity.tools.view.servlet.WebappLoader</code> Velocity Tools class
         // then we need to set the ServletContext object as a Velocity Application Attribute as
         // it's used to load resources from the webapp directory in WebapLoader.
-        String resourceLoader = 
+        String resourceLoader =
             properties.getProperty(RESOURCE_LOADER, velocityProperties.getProperty(RESOURCE_LOADER));
         if (resourceLoader != null && resourceLoader.equals("webapp")) {
             ApplicationContext context = this.container.getApplicationContext();
@@ -208,6 +208,7 @@ public class DefaultVelocityEngine extends AbstractLogEnabled implements Velocit
 
     /**
      * {@inheritDoc}
+     * 
      * @see VelocityEngine#clearMacroNamespace(String)
      * @since 2.4M2
      */

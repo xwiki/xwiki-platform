@@ -229,9 +229,9 @@ public class BooleanClass extends PropertyClass
         divFalse.addElement(labelFalse);
 
         radioNone.setID(prefix + name + "_none");
-        labelTrue.setFor(prefix + name + "_none");
+        labelNone.setFor(prefix + name + "_none");
         
-        radioNone.setID(prefix + name);
+        radioTrue.setID(prefix + name);
         labelTrue.setFor(prefix + name);
         
         radioFalse.setID(prefix + name + "_false");

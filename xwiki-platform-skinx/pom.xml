@@ -34,7 +34,7 @@
   <version>1.16-SNAPSHOT</version>
   <description>XWiki Platform - Plugins - Skin Extensions</description>
   <properties>
-    <platform.core.version>2.4-milestone-2</platform.core.version>
+    <platform.core.version>2.4-SNAPSHOT</platform.core.version>
   </properties>
   <dependencies>
     <dependency>

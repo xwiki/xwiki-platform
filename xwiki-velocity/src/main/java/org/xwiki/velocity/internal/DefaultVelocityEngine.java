@@ -24,6 +24,8 @@ import java.io.Reader;
 import java.io.StringReader;
 import java.io.Writer;
 import java.util.Enumeration;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Properties;
 
 import org.apache.velocity.context.Context;
@@ -83,6 +85,9 @@ public class DefaultVelocityEngine extends AbstractLogEnabled implements Velocit
      * See the comment in {@link #init(org.apache.velocity.runtime.RuntimeServices)}.
      */
     private RuntimeServices rsvc;
+
+    /** Counter for the number of active rendering processes using each namespace. */
+    private final Map<String, Integer> namespaceUsageCount = new HashMap<String, Integer>();
 
     /**
      * {@inheritDoc}
@@ -209,6 +214,49 @@ public class DefaultVelocityEngine extends AbstractLogEnabled implements Velocit
     public void clearMacroNamespace(String templateName)
     {
         this.rsvc.dumpVMNamespace(templateName);
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see VelocityEngine#startedUsingMacroNamespace(String)
+     * @since 2.4RC1
+     */
+    public void startedUsingMacroNamespace(String namespace)
+    {
+        synchronized (this.namespaceUsageCount) {
+            Integer count = this.namespaceUsageCount.get(namespace);
+            if (count == null) {
+                count = Integer.valueOf(0);
+            }
+            count = count + 1;
+            this.namespaceUsageCount.put(namespace, count);
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see VelocityEngine#stoppedUsingMacroNamespace(String)
+     * @since 2.4RC1
+     */
+    public void stoppedUsingMacroNamespace(String namespace)
+    {
+        synchronized (this.namespaceUsageCount) {
+            Integer count = this.namespaceUsageCount.get(namespace);
+            if (count == null) {
+                // This shouldn't happen
+                this.log(LogChute.WARN_ID, "Wrong usage count for namespace [" + namespace + "]");
+                return;
+            }
+            count = count - 1;
+            if (count <= 0) {
+                this.namespaceUsageCount.remove(namespace);
+                this.clearMacroNamespace(namespace);
+            } else {
+                this.namespaceUsageCount.put(namespace, count);
+            }
+        }
     }
 
     /**

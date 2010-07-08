@@ -133,11 +133,12 @@ public class SxDocumentSource implements SxSource
                         VelocityEngine engine = velocityManager.getVelocityEngine();
                         try {
                             VelocityContext vcontext = velocityManager.getVelocityContext();
+                            engine.startedUsingMacroNamespace(this.document.getPrefixedFullName());
                             velocityManager.getVelocityEngine().evaluate(vcontext, writer,
                                 this.document.getPrefixedFullName(), sxContent);
                             return writer.toString();
                         } finally {
-                            engine.clearMacroNamespace(this.document.getPrefixedFullName());
+                            engine.stoppedUsingMacroNamespace(this.document.getPrefixedFullName());
                         }
                     } catch (XWikiVelocityException ex) {
                         LOG.warn("Velocity errors while parsing skin extension [" + this.document.getPrefixedFullName()

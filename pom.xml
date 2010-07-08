@@ -34,16 +34,16 @@
   <artifactId>xwiki-core-parent</artifactId>
   <name>XWiki Platform - Core - Parent POM</name>
   <packaging>pom</packaging>
-  <version>2.4-rc-1</version>
+  <version>2.4-SNAPSHOT</version>
   <description>XWiki Platform - Core - Parent POM</description>
   <properties>
     <!-- Versions of XWiki dependencies used in Core modules -->
     <clirr.previous.version>2.3</clirr.previous.version>
   </properties>
   <scm>
-    <connection>scm:svn:http://svn.xwiki.org/svnroot/xwiki/platform/core/tags/xwiki-core-2.4-rc-1</connection>
-    <developerConnection>scm:svn:https://svn.xwiki.org/svnroot/xwiki/platform/core/tags/xwiki-core-2.4-rc-1</developerConnection>
-    <url>http://svn.xwiki.org/svnroot/xwiki/platform/core/tags/xwiki-core-2.4-rc-1</url>
+    <connection>scm:svn:http://svn.xwiki.org/svnroot/xwiki/platform/core/trunk</connection>
+    <developerConnection>scm:svn:https://svn.xwiki.org/svnroot/xwiki/platform/core/trunk</developerConnection>
+    <url>http://svn.xwiki.org/svnroot/xwiki/platform/core/trunk</url>
   </scm>
   <issueManagement>
     <system>jira</system>

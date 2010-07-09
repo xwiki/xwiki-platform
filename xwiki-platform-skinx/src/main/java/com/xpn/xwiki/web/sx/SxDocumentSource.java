@@ -136,7 +136,7 @@ public class SxDocumentSource implements SxSource
                             engine.startedUsingMacroNamespace(this.document.getPrefixedFullName());
                             velocityManager.getVelocityEngine().evaluate(vcontext, writer,
                                 this.document.getPrefixedFullName(), sxContent);
-                            return writer.toString();
+                            sxContent = writer.toString();
                         } finally {
                             engine.stoppedUsingMacroNamespace(this.document.getPrefixedFullName());
                         }

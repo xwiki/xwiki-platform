@@ -34,7 +34,7 @@
   <version>1.13</version>
   <description>XWiki Platform - Plugins - Skin Extensions</description>
   <properties>
-    <platform.core.version>2.3-SNAPSHOT</platform.core.version>
+    <platform.core.version>2.3.2</platform.core.version>
   </properties>
   <dependencies>
     <dependency>

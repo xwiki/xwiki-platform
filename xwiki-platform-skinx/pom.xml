@@ -31,7 +31,7 @@
   </parent>
   <artifactId>xwiki-plugin-skinx</artifactId>
   <name>XWiki Platform - Plugins - Skin Extensions</name>
-  <version>1.13-SNAPSHOT</version>
+  <version>1.13.1</version>
   <description>XWiki Platform - Plugins - Skin Extensions</description>
   <properties>
     <platform.core.version>2.3.2</platform.core.version>
@@ -55,9 +55,9 @@
   <!-- We must configure SCM in each module. For more information see:
        http://svn.xwiki.org/svnroot/xwiki/platform/pom/trunk/pom.xml -->
   <scm>
-    <connection>scm:svn:http://svn.xwiki.org/svnroot/xwiki/platform/xwiki-plugins/branches/xwiki-plugin-skinx-1.13</connection>
-    <developerConnection>scm:svn:https://svn.xwiki.org/svnroot/xwiki/platform/xwiki-plugins/branches/xwiki-plugin-skinx-1.13</developerConnection>
-    <url>http://svn.xwiki.org/svnroot/xwiki/platform/xwiki-plugins/branches/xwiki-plugin-skinx-1.13</url>
+    <connection>scm:svn:http://svn.xwiki.org/svnroot/xwiki/platform/xwiki-plugins/tags/xwiki-plugin-skinx-1.13.1</connection>
+    <developerConnection>scm:svn:https://svn.xwiki.org/svnroot/xwiki/platform/xwiki-plugins/tags/xwiki-plugin-skinx-1.13.1</developerConnection>
+    <url>http://svn.xwiki.org/svnroot/xwiki/platform/xwiki-plugins/tags/xwiki-plugin-skinx-1.13.1</url>
   </scm>
   <issueManagement>
     <system>jira</system>

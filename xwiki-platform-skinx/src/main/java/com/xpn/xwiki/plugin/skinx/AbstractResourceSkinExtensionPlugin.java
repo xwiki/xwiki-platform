@@ -71,7 +71,7 @@ public abstract class AbstractResourceSkinExtensionPlugin extends AbstractSkinEx
         // to serve the resource. This way, the resource can be efficiently cached, since it has a
         // common URL for any page.
         try {
-            String page = context.getWiki().getDefaultWeb(context) + "." + context.getWiki().getDefaultPage(context);
+            String page = context.getWiki().getDefaultSpace(context) + "." + context.getWiki().getDefaultPage(context);
             if (!context.getWiki().getRightService().hasAccessLevel("view", context.getUser(), page, context)) {
                 page = context.getDoc().getFullName();
             }

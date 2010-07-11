@@ -27,6 +27,7 @@
 #if(!$obj)
 {{info}}$msg.get('xe.admin.users.applyonusers'){{/info}}##
 #else
+$doc.use($obj)
 $xwiki.ssx.use("XWiki.XWikiUserSheet")##
 $xwiki.ssx.use('Main.Dashboard')##
 {{html wiki="true"}}

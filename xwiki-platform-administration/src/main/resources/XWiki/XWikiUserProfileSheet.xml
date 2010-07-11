@@ -30,6 +30,7 @@
 
 {{info}}$msg.get('xe.admin.users.applyonusers'){{/info}}##
 #else
+$doc.use($obj)
 {{html clean="false" wiki="true"}}
 #set($username = $xwiki.getUserName($doc.fullName, false))
 = $msg.get('platform.core.profile.title', [$username]) =

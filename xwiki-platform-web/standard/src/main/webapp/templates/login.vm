@@ -1,16 +1,15 @@
-#if($context.user!="XWiki.XWikiGuest")
-#if($request.xredirect)
-$response.sendRedirect($request.xredirect)
-#else
-$response.sendRedirect($xwiki.getURL("Main.WebHome"))
-#end
-#elseif($doc.fullName != "XWiki.XWikiLogin")
-#set($qs = "")
-#set($qs = $request.queryString)
-#if(!$request.getParameter("xredirect"))
-#set($qs = "xredirect=$util.encodeURI($doc.getURL('view'))&${qs}")
-#end
-$response.sendRedirect($xwiki.getURL("XWiki.XWikiLogin", "login", $qs))
+#if ($context.user != 'XWiki.XWikiGuest')
+  #if ($request.xredirect)
+    $response.sendRedirect($request.xredirect)
+  #else
+    $response.sendRedirect($xwiki.getURL('Main.WebHome'))
+  #end
+#elseif($doc.fullName != 'XWiki.XWikiLogin')
+  #set($qs = "$!{request.queryString}")
+  #if(!$request.getParameter('xredirect'))
+    #set($qs = "xredirect=$escapetool.url($doc.getURL('view'))&${qs}")
+  #end
+  $response.sendRedirect($xwiki.getURL('XWiki.XWikiLogin', 'login', $qs))
 #else
 ###
 ### Login page
@@ -19,37 +18,37 @@ $response.sendRedirect($xwiki.getURL("XWiki.XWikiLogin", "login", $qs))
 #template("startpage.vm")
 <div class="main layoutsubsection">
 <div id="mainContentArea">
-<form id="loginForm" action="$doc.getURL("loginsubmit")" method="post">
-<div class="hidden"><input type="hidden" name="xredirect" value="$!request.xredirect"/>
-#if("$!request.srid" != "")
-<input type="hidden" name="srid" value="$!request.srid"/>
+<form id="loginForm" action="$doc.getURL('loginsubmit')" method="post">
+<div class="hidden"><input type="hidden" name="xredirect" value="$!{escapetool.xml($request.xredirect)}"/>
+#if("$!request.srid" != '')
+  <input type="hidden" name="srid" value="$!escapetool.xml($request.srid)"/>
 #end
 </div>
-#xwikimessageboxstart($msg.get("login") "")
+#xwikimessageboxstart($msg.get('login') '')
 #set($message = $msg.get($xwiki.parseMessage()))
 #if($message)
-<!-- previous login errors -->
-#error($message)
+  <!-- previous login errors -->
+  #error($message)
 #end
-<table class="xwikilogintable" summary="$msg.get("loginform")">
+<table class="xwikilogintable" summary="$msg.get('loginform')">
   <tr>
-    <th><label for="j_username">$msg.get("username"):</label></th>
+    <th><label for="j_username">$msg.get('username'):</label></th>
     <td><input type="text" id="j_username" name="j_username" value=""/></td>
   </tr>
   <tr>
-    <th><label for="j_password">$msg.get("password"):</label></th>
+    <th><label for="j_password">$msg.get('password'):</label></th>
     <td><input type="password" id="j_password" name="j_password" value=""/></td>
   </tr>
   <tr>
     <td colspan="2" style="text-align: left;">
       <input id="rememberme" type="checkbox" name="j_rememberme" value="true"/>
-      <label for="rememberme">$msg.get("remembermeonthiscomp")</label>
+      <label for="rememberme">$msg.get('remembermeonthiscomp')</label>
     </td>
   </tr>
 </table>
 <div class="buttons"><span class="buttonwrapper"><input type="submit" class="button" value="$msg.get('login')"/></span></div>
 ## TODO: Replace this with an interface extension once IX are implemented
-#if($xwiki.exists("XWiki.ResetPassword"))
+#if($xwiki.exists('XWiki.ResetPassword'))
   <div style="font-size: 70%; margin-top: 2em;">Forgot your <a href="$xwiki.getURL('XWiki.ForgotUsername')">username</a> or <a href="$xwiki.getURL('XWiki.ResetPassword')">password</a>?</div>
 #end
 #xwikimessageboxend()

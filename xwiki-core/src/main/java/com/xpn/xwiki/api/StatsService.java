@@ -50,18 +50,52 @@ public class StatsService extends Api
     }
 
     /**
+     * Indicate if statistics service is globally enabled. Note that it is possible for statistics to be enabled at the
+     * global level, yet disabled in most or even all wikis. When statistics are globally enabled, session statistics
+     * are available. To check if document statistics are enabled for the current wiki, use
+     * {@link #isEnabledForCurrentWiki()}.
+     * <p>
+     * To be true the <code>xwiki.stats</code> setting in xwiki.cfg has to be <code>1</code>.
+     * </p>
+     * 
+     * @return {@code true} if the statistics module is enabled
+     */
+    public boolean isEnabledGlobally()
+    {
+        return StatsUtil.isStatsEnabled(this.context);
+    }
+
+    /**
      * Indicate if statistics service is enabled for the current wiki.
      * <p>
      * To be true the <code>xwiki.stats</code> in xwiki.cfg has to be <code>1</code> and
      * <code>xwiki.stats.default</code> too.
      * </p>
      * <p>
-     * <code>xwiki.stats.default</code> can be overwrited by <code>statistics</code> in
-     * <code>XWikiPreferences</code>.
+     * <code>xwiki.stats.default</code> can be overwritten by <code>statistics</code> in <code>XWikiPreferences</code>.
      * </p>
      * 
      * @return true if statistics are enabled for the context's wiki.
      */
+    public boolean isEnabledForCurrentWiki()
+    {
+        return StatsUtil.isWikiStatsEnabled(this.context);
+    }
+
+    /**
+     * Indicate if statistics service is enabled for the current wiki.
+     * <p>
+     * To be true the <code>xwiki.stats</code> in xwiki.cfg has to be <code>1</code> and
+     * <code>xwiki.stats.default</code> too.
+     * </p>
+     * <p>
+     * <code>xwiki.stats.default</code> can be overwritten by <code>statistics</code> in <code>XWikiPreferences</code>.
+     * </p>
+     * 
+     * @return true if statistics are enabled for the context's wiki.
+     * @deprecated use {@link #isEnabledForCurrentWiki()}
+     */
+    @Deprecated
     public boolean isEnabled()
     {
         return StatsUtil.isWikiStatsEnabled(context);

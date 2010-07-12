@@ -301,6 +301,10 @@ div.userInfo, div.userPreferences, div.watchlistManagement {
   background-color: $theme.backgroundSecondaryColor;
 }
 
+.userInfo img {
+  max-width: 100%;
+}
+
 div.userInfo input[type="text"], div.userInfo input[type="password"], div.userInfo textarea, div.userInfo select, div.userPreferences select {
   width: 100%;
 }

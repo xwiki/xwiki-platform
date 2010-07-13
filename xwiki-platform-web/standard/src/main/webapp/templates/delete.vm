@@ -12,7 +12,7 @@
 #set($links = $doc.getBacklinks())
 #set($orphans = $xwiki.searchDocuments(' where doc.fullName <> ? and (doc.parent = ? or (doc.parent = ? and doc.space = ?))', [${doc.fullName}, ${doc.fullName}, ${doc.name}, ${doc.space}]))
 #if($request.xredirect)
-  #set($redirectparam = "&amp;xredirect=$util.encodeURI($request.xredirect)")
+  #set($redirectparam = "&amp;xredirect=$escapetool.url($request.xredirect)")
 #end
 #set($quote = '"')
 #set($hasInlinks = false)

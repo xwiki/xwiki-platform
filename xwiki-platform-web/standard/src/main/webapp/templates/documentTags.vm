@@ -1,7 +1,7 @@
 #template("xwikivars.vm")
 #set($tagsId = 'xdocTags')
 #set($tagErrorMessage = '')
-#set($xredirect = $util.encodeURI($doc.getURL('view', "#${tagsId}")))
+#set($xredirect = $escapetool.url($doc.getURL('view', "#${tagsId}")))
 ##
 ##
 ##

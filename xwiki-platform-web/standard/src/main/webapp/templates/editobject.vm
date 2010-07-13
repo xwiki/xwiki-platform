@@ -110,7 +110,7 @@
 #macro(displayAddObject $class)
   <div id="add_xobject_${class.name}" class="add_xobject">
    <div id="add_xobject_${class.name}_title" class="add_xobject-title">
-   <a href="$doc.getURL('edit', "xpage=editobject&amp;xaction=addObject&amp;className=$util.encodeURI(${class.name})&amp;xredirect=$util.encodeURI(${doc.getURL('edit', 'editor=object')})")"  class="xobject-add-control" title="$msg.get('core.editors.object.newObjectForClass.tooltip', ["#cleanClassname(${class.name})"])">$msg.get('core.editors.object.newObjectForClass', ["#cleanClassname(${class.name})"])</a>
+   <a href="$doc.getURL('edit', "xpage=editobject&amp;xaction=addObject&amp;className=$escapetool.url(${class.name})&amp;xredirect=$escapetool.url(${doc.getURL('edit', 'editor=object')})")" class="xobject-add-control" title="$msg.get('core.editors.object.newObjectForClass.tooltip', ["#cleanClassname(${class.name})"])">$msg.get('core.editors.object.newObjectForClass', ["#cleanClassname(${class.name})"])</a>
    </div>
   </div>
 #end

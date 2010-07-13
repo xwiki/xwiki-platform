@@ -60,7 +60,7 @@
   #submenuitem($doc.getURL('export', "format=rtf&amp;$!docvariant") $msg.get('core.menu.export.rtf') 'tmExportRtf', '')
   #submenuitem($doc.getURL('export', "format=html&amp;$!docvariant") $msg.get('core.menu.export.html') 'tmExportHtml', '')
   #if($hasAdmin)
-    #submenuitem($doc.getURL('export', "format=xar&amp;name=$util.encodeURI($doc.fullName)&amp;pages=$util.encodeURI($doc.fullName)&amp;$!docvariant") $msg.get('core.menu.export.xar') 'tmExportXar', '')
+    #submenuitem($doc.getURL('export', "format=xar&amp;name=$escapetool.url($doc.fullName)&amp;pages=$escapetool.url($doc.fullName)&amp;$!docvariant") $msg.get('core.menu.export.xar') 'tmExportXar', '')
   #end
   #xwikitopmenuentryend()
 #end

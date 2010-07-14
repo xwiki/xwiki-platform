@@ -79,9 +79,9 @@ public class DownloadAction extends XWikiAction
         String mimetype = attachment.getMimeType(context);
         response.setContentType(mimetype);
 
-        long lastModifOnClient = request.getDateHeader("If-Modified-Since");
-        long lastModifOnServer = attachment.getDate().getTime();
-        if (lastModifOnClient != -1 && lastModifOnClient >= lastModifOnServer) {
+        long lastModifiedOnClient = request.getDateHeader("If-Modified-Since");
+        long lastModifiedOnServer = attachment.getDate().getTime();
+        if (lastModifiedOnClient != -1 && lastModifiedOnClient >= lastModifiedOnServer) {
              response.setStatus(XWikiResponse.SC_NOT_MODIFIED);
              return null;
         }

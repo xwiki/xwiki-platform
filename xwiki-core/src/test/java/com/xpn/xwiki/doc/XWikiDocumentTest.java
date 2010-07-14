@@ -1189,4 +1189,11 @@ public class XWikiDocumentTest extends AbstractBridgedXWikiComponentTestCase
             }
         }
     }
+
+    /** Check that a new empty document has empty content (used to have a new line before 2.5). */
+    public void testInitialContent()
+    {
+        XWikiDocument doc = new XWikiDocument(new DocumentReference("somewiki", "somespace", "somepage"));
+        assertEquals("", doc.getContent());
+    }
 }

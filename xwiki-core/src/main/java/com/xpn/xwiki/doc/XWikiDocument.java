@@ -7269,7 +7269,7 @@ public class XWikiDocument implements DocumentModelBridge
         this.contentUpdateDate.setTime((this.contentUpdateDate.getTime() / 1000) * 1000);
         this.creationDate = new Date();
         this.creationDate.setTime((this.creationDate.getTime() / 1000) * 1000);
-        this.content = "\n";
+        this.content = "";
         this.format = "";
         this.author = "";
         this.language = "";

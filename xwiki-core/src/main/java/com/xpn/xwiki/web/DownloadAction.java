@@ -79,6 +79,13 @@ public class DownloadAction extends XWikiAction
         String mimetype = attachment.getMimeType(context);
         response.setContentType(mimetype);
 
+        long lastModifOnClient = request.getDateHeader("If-Modified-Since");
+        long lastModifOnServer = attachment.getDate().getTime();
+        if (lastModifOnClient != -1 && lastModifOnClient >= lastModifOnServer) {
+             response.setStatus(XWikiResponse.SC_NOT_MODIFIED);
+             return null;
+        }
+
         String ofilename =
             Util.encodeURI(attachment.getFilename(), context).replaceAll("\\+", " ");
 
@@ -88,12 +95,13 @@ public class DownloadAction extends XWikiAction
         // dialog box. However, all mime types that cannot be displayed by the browser do prompt a
         // Save dialog box (exe, zip, xar, etc).
         String dispType = "inline";
+
         if ("1".equals(request.getParameter("force-download"))) {
             dispType = "attachment";
         }
         response.addHeader("Content-disposition", dispType + "; filename=\"" + ofilename + "\"");
 
-        response.setDateHeader("Last-Modified", attachment.getDate().getTime());
+        response.setDateHeader("Last-Modified", lastModifiedOnServer);
 
         // Sending the content of the attachment
         try {

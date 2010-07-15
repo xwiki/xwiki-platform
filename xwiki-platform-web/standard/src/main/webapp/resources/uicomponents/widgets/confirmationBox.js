@@ -50,12 +50,14 @@ XWiki.widgets.ConfirmationBox = Class.create(XWiki.widgets.ModalPopup, {
     if (typeof (this.behavior.onYes) == 'function') {
       this.behavior.onYes();
     }
+    this.dialog.remove();
   },
   onNo : function() {
     this.closeDialog();
     if (typeof (this.behavior.onNo) == 'function') {
       this.behavior.onNo();
     }
+    this.dialog.remove();
   }
 });
 } // if the parent widget is defined

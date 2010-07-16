@@ -98,7 +98,7 @@
 </property>
 <property>
 <content>#panelheader($msg.get("xe.statistics.pages.mostedited"))
-#if($xwiki.statsService.enabled)
+#if($xwiki.statsService.enabledForCurrentWiki)
 #set($scope=$xwiki.criteriaService.scopeFactory.ALL_PAGES)
 #set($period=$xwiki.criteriaService.periodFactory.ALL_TIME)
 #set($interval=$xwiki.criteriaService.rangeFactory.createHeadRange(5))

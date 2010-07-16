@@ -21,7 +21,7 @@
 <validationScript></validationScript>
 <comment></comment>
 <minorEdit>false</minorEdit>
-<content>#if($xwiki.statsService.enabled)
+<content>#if($xwiki.statsService.enabledForCurrentWiki)
 #displayPanelLayout(2 ["Stats.MostViewedPages", "Stats.MostEditedPages", "Stats.MostViewedSpaces", "Stats.MostEditedSpaces"])
 #else
 #printStatisticsDisabled()

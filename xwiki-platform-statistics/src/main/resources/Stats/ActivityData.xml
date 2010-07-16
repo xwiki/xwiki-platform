@@ -54,7 +54,7 @@
 <tags/>
 </property>
 </object>
-<content>#if($xwiki.statsService.enabled)
+<content>#if($xwiki.statsService.enabledForCurrentWiki)
 1 $msg.get("xe.statistics.current.week")
 
 #set($scope = $xwiki.criteriaService.scopeFactory.ALL)

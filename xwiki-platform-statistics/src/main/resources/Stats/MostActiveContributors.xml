@@ -98,7 +98,7 @@
 </property>
 <property>
 <content>#panelheader($msg.get("xe.statistics.contributors.mostactive"))
-#if($xwiki.statsService.enabled)
+#if($xwiki.statsService.enabledForCurrentWiki)
 #set($period=$xwiki.criteriaService.periodFactory.ALL_TIME)
 #set($interval=$xwiki.criteriaService.rangeFactory.createHeadRange(5))
 #set($stats=$xwiki.statsService.getVisitStatistics('save',$period,$interval))

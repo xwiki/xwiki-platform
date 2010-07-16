@@ -98,7 +98,7 @@
 </property>
 <property>
 <content>#panelheader($msg.get("xe.statistics.current.week.caps"))
-#if($xwiki.statsService.enabled)
+#if($xwiki.statsService.enabledForCurrentWiki)
 #if(not $chartWidth)
 #set($chartWidth=250)
 #end

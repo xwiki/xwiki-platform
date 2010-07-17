@@ -15,7 +15,7 @@
         <select id="newSpaceName" name="newSpaceName">
           #set ($spaces = $xwiki.getSpaces())
           #foreach ($space in $spaces)
-            <option #if ($space == $pweb) selected="selected" #end>$space</option>
+            <option #if ($space == $pweb) selected="selected" #end>$escapetool.xml($space)</option>
           #end
         </select>
       </dd>
@@ -30,30 +30,24 @@
     <h2><span>$msg.get('core.rename.title.updateDocs')</span></h2>
     #foreach($backlink in $backlinks)
       #if(!$xwiki.hasAccessLevel('edit', $context.user, $backlink))
-        #set ($alink = "<a href='$xwiki.getURL($backlink)' rel='__blank'><label for='backlink_$velocityCount'>$escapetool.xml($backlink)</label></a>")
-        <div><input id="backlink_$velocityCount" type="checkbox" disabled="disabled"/> $alink</div>
+        <div><input id="backlink_$velocityCount" type="checkbox" disabled="disabled"/> <a href='$xwiki.getURL($backlink)' rel='__blank'><label for='backlink_$velocityCount'>$escapetool.xml($backlink)</label></a></div>
       #elseif($xwiki.getDocument($backlink).isProgrammaticContent())
-        #set ($alink = "<a href='$xwiki.getURL($backlink)' rel='__blank'><label for='backlink_$velocityCount'>$escapetool.xml($backlink)</label></a>")
-        <div><input id="backlink_$velocityCount" type="checkbox" name="backlink_$escapetool.xml($backlink)"/> $alink</div>
+        <div><input id="backlink_$velocityCount" type="checkbox" name="backlink_$escapetool.xml($backlink)"/> <a href='$xwiki.getURL($backlink)' rel='__blank'><label for='backlink_$velocityCount'>$escapetool.xml($backlink)</label></a></div>
       #else
-        #set ($alink = "<a href='$xwiki.getURL($backlink)' rel='__blank'><label for='backlink_$velocityCount'>$escapetool.xml($backlink)</label></a>")
-        <div><input id="backlink_$velocityCount" type="checkbox" name="backlink_$escapetool.xml($backlink)" checked="checked"/> $alink</div>
+        <div><input id="backlink_$velocityCount" type="checkbox" name="backlink_$escapetool.xml($backlink)" checked="checked"/> <a href='$xwiki.getURL($backlink)' rel='__blank'><label for='backlink_$velocityCount'>$escapetool.xml($backlink)</label></a></div>
       #end
     #end
   #end
   #set($children = $doc.getChildren())
   #if($children.size() > 0)
-    <h2><span>$msg.get("core.rename.title.updateChildren")</span></h2>
+    <h2><span>$msg.get('core.rename.title.updateChildren')</span></h2>
     #foreach($child in $children)
       #if(!$xwiki.hasAccessLevel('edit', $context.user, $child))
-        #set ($alink = "<a href='$xwiki.getURL($child)' rel='__blank'><label for='children_$velocityCount'>$escapetool.xml($child)</label></a>")
-        <div><input id="children_$velocityCount" type="checkbox" disabled="disabled"/> $alink</div>
+        <div><input id="children_$velocityCount" type="checkbox" disabled="disabled"/> <a href='$xwiki.getURL($child)' rel='__blank'><label for='children_$velocityCount'>$escapetool.xml($child)</label></a></div>
       #elseif($xwiki.getDocument($child).isProgrammaticContent())
-        #set ($alink = "<a href='$xwiki.getURL($child)' rel='__blank'><label for='children_$velocityCount'>$escapetool.xml($child)</label></a>")
-        <div><input id="children_$velocityCount" type="checkbox" name="child_$escapetool.xml($child)"/> $alink</div>
+        <div><input id="children_$velocityCount" type="checkbox" name="child_$escapetool.xml($child)"/> <a href='$xwiki.getURL($child)' rel='__blank'><label for='children_$velocityCount'>$escapetool.xml($child)</label></a></div>
       #else
-        #set ($alink = "<a href='$xwiki.getURL($child)' rel='__blank'><label for='children_$velocityCount'>$escapetool.xml($child)</label></a>")
-        <div><input id="children_$velocityCount" type="checkbox" name="child_$escapetool.xml($child)" checked="checked"/> $alink</div>
+        <div><input id="children_$velocityCount" type="checkbox" name="child_$escapetool.xml($child)" checked="checked"/> <a href='$xwiki.getURL($child)' rel='__blank'><label for='children_$velocityCount'>$escapetool.xml($child)</label></a></div>
       #end
     #end
   #end

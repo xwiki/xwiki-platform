@@ -38,8 +38,8 @@ $!xwiki.ssx.use('Stats.Style')
 #if ($docStats)
 &lt;tr&gt;
 &lt;td class="numeric"&gt;$item.pageViews&lt;/td&gt;
-&lt;td&gt;&lt;div class="ellipsis" title="$docStats.name"&gt;[$docStats.name&amp;gt;${docStats.space}.$docStats.name.replaceAll('@','%40')]&lt;/div&gt;&lt;/td&gt;
-&lt;td&gt;&lt;div class="ellipsis" title="$docStats.space"&gt;[$docStats.space&amp;gt;${docStats.space}.WebHome]&lt;/div&gt;&lt;/td&gt;
+&lt;td&gt;&lt;div class="ellipsis" title="$escapetool.xml($docStats.name)"&gt;&lt;a href="$docStats.getURL()"&gt;$escapetool.xml($docStats.name)&lt;/a&gt;&lt;/div&gt;&lt;/td&gt;
+&lt;td&gt;&lt;div class="ellipsis" title="$escapetool.xml($docStats.space)"&gt;&lt;a href="$xwiki.getURL("${docStats.space}.WebHome")"&gt;$escapetool.xml($docStats.space)&lt;/a&gt;&lt;/div&gt;&lt;/td&gt;
 &lt;/tr&gt;
 #end
 #end
@@ -58,7 +58,7 @@ $!xwiki.ssx.use('Stats.Style')
 #foreach($item in $stats)
 &lt;tr&gt;
 &lt;td class="numeric"&gt;$item.pageViews&lt;/td&gt;
-&lt;td&gt;&lt;div class="ellipsis" title="$item.name"&gt;[$item.name&amp;gt;${item.name}.WebHome]&lt;/div&gt;&lt;/td&gt;
+&lt;td&gt;&lt;div class="ellipsis" title="$escapetool.xml($item.name)"&gt;&lt;a href="$xwiki.getURL("${item.name}.WebHome")"&gt;$escapetool.xml($item.name)&lt;/a&gt;&lt;/div&gt;&lt;/td&gt;
 &lt;/tr&gt;
 #end
 &lt;/tbody&gt;
@@ -100,7 +100,7 @@ $!xwiki.ssx.use('Stats.Style')
 #foreach($item in $stats)
 &lt;tr&gt;
 &lt;td class="numeric"&gt;$item.pageViews&lt;/td&gt;
-&lt;td&gt;&lt;div class="ellipsis" title="$item.URL.host"&gt;&lt;a href="$item.referer"&gt;$item.URL.host&lt;/a&gt;&lt;/div&gt;&lt;/td&gt;
+&lt;td&gt;&lt;div class="ellipsis" title="$escapetool.xml($item.URL.host)"&gt;&lt;a href="$escapetool.xml($item.referer)"&gt;$escapetool.xml($item.URL.host)&lt;/a&gt;&lt;/div&gt;&lt;/td&gt;
 &lt;/tr&gt;
 #end
 &lt;/tbody&gt;

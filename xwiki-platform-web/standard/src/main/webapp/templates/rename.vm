@@ -13,11 +13,11 @@
 #else
   #template("startpage.vm")
   ## TODO: Improve the interface, splitting the operation into more steps.
-  #if((!$step) || ($step == ""))
-    #set($step = $request.getParameter("step"))
+  #if("$!{step}" == '')
+    #set($step = "$!{request.getParameter('step')}")
   #end
-  #if((!$step) || ($step == ""))
-    #set($step = "1")
+  #if("$!{step}" == '')
+    #set($step = '1')
   #end
   #set($step = $util.parseInt("$step"))
   <div class="main layoutsubsection">
@@ -27,16 +27,16 @@
       #template("renameStep1.vm")
     #else
       ## Do the rename. It's the form in renameStep1.vm page that calls this page with step=2.
-      #if((!$request.newPageName) || ($request.newPageName.trim().equals("")))
+      #if("$!{request.newPageName.trim()}" == '')
         $response.setStatus(400)
         #error($msg.get('core.rename.emptyName'))
         #template("renameStep1.vm")
       #else
-        #set($newDocReference = $services.model.createDocumentReference("", $!{request.newSpaceName}, $!{request.newPageName}))
+        #set($newDocReference = $services.model.createDocumentReference('', $!{request.newSpaceName}, $!{request.newPageName}))
         #set($newDocReferenceAsString = $services.model.serialize($newDocReference))
         #if($xwiki.exists($newDocReference))
           $response.setStatus(409)
-          #error("$msg.get('core.rename.alreadyExists', [$newDocReferenceAsString, $xwiki.getURL($newDocReference)])")
+          #error($msg.get('core.rename.alreadyExists', [$newDocReferenceAsString, $xwiki.getURL($newDocReference)]))
           #template("renameStep1.vm")
         #elseif(!$xwiki.hasAccessLevel('edit', $context.user, $newDocReferenceAsString))
           $response.setStatus(403)

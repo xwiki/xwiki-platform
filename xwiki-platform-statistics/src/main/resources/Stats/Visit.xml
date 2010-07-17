@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="ISO-8859-1"?>
+<?xml version="1.0" encoding="UTF-8"?>
 
 <xwikidoc>
 <web>Stats</web>
@@ -21,10 +21,10 @@
 <validationScript></validationScript>
 <comment></comment>
 <minorEdit>false</minorEdit>
-<content>#if($xwiki.statsService.enabledForCurrentWiki)
-#displayPanelLayout(2 ["Stats.MostActiveContributors", "Stats.LeastActiveContributors"])
+<content>#if ($xwiki.statsService.enabledForCurrentWiki)
+  #displayPanelLayout(2 ['Stats.MostActiveContributors', 'Stats.LeastActiveContributors'])
 #else
-#printStatisticsDisabled()
+  #printStatisticsDisabled()
 #end
 #includeMacros("Stats.Macros")</content>
 </xwikidoc>

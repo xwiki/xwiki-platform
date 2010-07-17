@@ -248,7 +248,7 @@ $xwiki.ssfx.use('uicomponents/viewers/comments.css', true)
     </div>
     <div>
       <span class="buttonwrapper"><input type="submit" name="action_save" class="button" value="$msg.get('core.viewers.comments.edit.save')"/></span>
-      <span class="buttonwrapper"><a class="cancel secondary button" href="$doc.getURL('view', 'viewer=comments')">$msg.get('core.viewers.comments.add.cancel')</a></span>
+      <span class="buttonwrapper"><a class="cancel secondary button" href="$doc.getURL('view', 'viewer=comments')">$msg.get('core.viewers.comments.edit.cancel')</a></span>
     </div>
 
     </div>## xwikicomment

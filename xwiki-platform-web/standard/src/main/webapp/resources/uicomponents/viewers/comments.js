@@ -147,7 +147,7 @@ XWiki.viewers.Comments = Class.create({
               onSuccess : function(response) {
                 // Hide other comment editing forms (allow only one comment to be edited at a time)
                 if (this.editing) {
-                  this.cancelEdit(this.editing);
+                  this.cancelEdit(false, this.editing);
                 }
                 // Replace the comment text with a form for editing it
                 var comment = item.up(this.xcommentSelector);
@@ -155,7 +155,7 @@ XWiki.viewers.Comments = Class.create({
                 item._x_editForm = comment.previous();
                 this.addSubmitListener(item._x_editForm);
                 this.addPreview(item._x_editForm);
-                item._x_editForm.down('input[type=reset]').observe('click', this.cancelEdit.bind(this, item));
+                item._x_editForm.down('a.cancel').observe('click', this.cancelEdit.bindAsEventListener(this, item));
                 comment.hide();
                 item._x_notification.hide();
                 // Currently editing: this comment
@@ -184,7 +184,10 @@ XWiki.viewers.Comments = Class.create({
   /**
    * Cancel edit
    */
-  cancelEdit : function (editActivator) {
+  cancelEdit : function (event, editActivator) {
+    if (event) {
+      event.stop();
+    }
     var comment = editActivator.up(this.xcommentSelector);
     editActivator._x_editForm.hide();
     comment.show();
@@ -293,7 +296,7 @@ XWiki.viewers.Comments = Class.create({
       this.initialLocation = new Element("span", {className : "hidden"});
       $('_comments').insert(this.initialLocation);
       // If the form is inside a thread, as a reply form, move it back to the bottom.
-      this.form.down("input[name='action_cancel']").observe('click', this.resetForm.bindAsEventListener(this));
+      this.form.down('a.cancel').observe('click', this.resetForm.bindAsEventListener(this));
     }
   },
   /**
@@ -374,10 +377,10 @@ XWiki.viewers.Comments = Class.create({
     form.previewButton.down('input').value = "$msg.get('core.viewers.comments.preview.button.preview')";
   },
   resetForm : function (event) {
+    if (event) {
+      event.stop();
+    }
     if (this.form.up('.commentthread')) {
-      if (event) {
-        event.stop();
-      }
       // Show the comment's reply button
       this.form.up(".commentthread").previous(this.xcommentSelector).down('a.commentreply').show();
       // Put the form back to its initial location and clear the contents

@@ -185,7 +185,7 @@ $xwiki.ssfx.use('uicomponents/viewers/comments.css', true)
         #end
         <div>
           <span class="buttonwrapper"><input type="submit" value="$msg.get('core.viewers.comments.add.submit')" class="button"/></span>
-          <span class="buttonwrapper"><input #if("$!replyTo" == '') type="reset" #else type="submit" #end value="$msg.get('core.viewers.comments.add.cancel')" class="button" name="action_cancel"/></span> 
+          <span class="buttonwrapper"><a class="cancel secondary button" href="$doc.getURL()">$msg.get('core.viewers.comments.add.cancel')</a></span>
         </div>
       </fieldset>
     </form>
@@ -248,7 +248,7 @@ $xwiki.ssfx.use('uicomponents/viewers/comments.css', true)
     </div>
     <div>
       <span class="buttonwrapper"><input type="submit" name="action_save" class="button" value="$msg.get('core.viewers.comments.edit.save')"/></span>
-      <span class="buttonwrapper"><input type="reset" name="action_cancel" class="button" value="$msg.get('core.viewers.comments.edit.cancel')"/></span>
+      <span class="buttonwrapper"><a class="cancel secondary button" href="$doc.getURL('view', 'viewer=comments')">$msg.get('core.viewers.comments.add.cancel')</a></span>
     </div>
 
     </div>## xwikicomment

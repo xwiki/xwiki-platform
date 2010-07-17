@@ -30,10 +30,10 @@
     <h2><span>$msg.get('core.rename.title.updateDocs')</span></h2>
     #foreach($backlink in $backlinks)
       #if(!$xwiki.hasAccessLevel('edit', $context.user, $backlink))
-        #set ($alink = "<a href='$xwiki.getURL($backlink)' rel='__blank' style='color: #999;'><label for='backlink_$velocityCount'>$escapetool.xml($backlink)</label></a>")
+        #set ($alink = "<a href='$xwiki.getURL($backlink)' rel='__blank'><label for='backlink_$velocityCount'>$escapetool.xml($backlink)</label></a>")
         <div><input id="backlink_$velocityCount" type="checkbox" disabled="disabled"/> $alink</div>
       #elseif($xwiki.getDocument($backlink).isProgrammaticContent())
-        #set ($alink = "<a href='$xwiki.getURL($backlink)' rel='__blank' style='color: #900;'><label for='backlink_$velocityCount'>$escapetool.xml($backlink)</label></a>")
+        #set ($alink = "<a href='$xwiki.getURL($backlink)' rel='__blank'><label for='backlink_$velocityCount'>$escapetool.xml($backlink)</label></a>")
         <div><input id="backlink_$velocityCount" type="checkbox" name="backlink_$escapetool.xml($backlink)"/> $alink</div>
       #else
         #set ($alink = "<a href='$xwiki.getURL($backlink)' rel='__blank'><label for='backlink_$velocityCount'>$escapetool.xml($backlink)</label></a>")
@@ -46,10 +46,10 @@
     <h2><span>$msg.get("core.rename.title.updateChildren")</span></h2>
     #foreach($child in $children)
       #if(!$xwiki.hasAccessLevel('edit', $context.user, $child))
-        #set ($alink = "<a href='$xwiki.getURL($child)' rel='__blank' style='color: #999;'><label for='children_$velocityCount'>$escapetool.xml($child)</label></a>")
+        #set ($alink = "<a href='$xwiki.getURL($child)' rel='__blank'><label for='children_$velocityCount'>$escapetool.xml($child)</label></a>")
         <div><input id="children_$velocityCount" type="checkbox" disabled="disabled"/> $alink</div>
       #elseif($xwiki.getDocument($child).isProgrammaticContent())
-        #set ($alink = "<a href='$xwiki.getURL($child)' rel='__blank' style='color: #900;'><label for='children_$velocityCount'>$escapetool.xml($child)</label></a>")
+        #set ($alink = "<a href='$xwiki.getURL($child)' rel='__blank'><label for='children_$velocityCount'>$escapetool.xml($child)</label></a>")
         <div><input id="children_$velocityCount" type="checkbox" name="child_$escapetool.xml($child)"/> $alink</div>
       #else
         #set ($alink = "<a href='$xwiki.getURL($child)' rel='__blank'><label for='children_$velocityCount'>$escapetool.xml($child)</label></a>")

@@ -111,6 +111,7 @@ XWiki.viewers.Attachments = Class.create({
   /** Add a reset listener that resets the number of file fields to 1. */
   resetOnCancel : function() {
     Event.observe(this.form, 'reset', this.onReset.bindAsEventListener(this));
+    Event.observe(this.form.down('.cancel'), 'click', this.onReset.bindAsEventListener(this));
   },
   /** Creates and inserts a new file input field. */
   addField : function(event) {
@@ -159,6 +160,9 @@ XWiki.viewers.Attachments = Class.create({
   },
   /** Form reset listener. It resets the number of file fields to just one. */
   onReset : function(event) {
+    if (event) {
+      event.stop();
+    }
     this.form.getInputs("file").each(function(item) {
       item.up().remove();
     });

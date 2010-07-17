@@ -69,7 +69,7 @@ if (XWiki && XWiki.WebDAV) { XWiki.WebDAV.displayDavLinks($('_attachments')); }
     <div><label class="hidden" for="xwikiuploadfile">$msg.get('core.viewers.attachments.upload.file')</label><input id="xwikiuploadfile" type="file" name="filepath" value="" size="40" class="uploadFileInput"/></div>
     <div>
     <span class="buttonwrapper"><input type="submit" value="$msg.get('core.viewers.attachments.upload.submit')" class="button"/></span>
-    <span class="buttonwrapper"><input type="reset" value="$msg.get('core.viewers.attachments.upload.cancel')" class="button"/></span>
+    <span class="buttonwrapper"><a class="cancel secondary button" href="$doc.getURL()">$msg.get('core.viewers.attachments.upload.cancel')</a></span> 
     </div>
   </fieldset>
   </div>

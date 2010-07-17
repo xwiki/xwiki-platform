@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="ISO-8859-1"?>
+<?xml version="1.0" encoding="UTF-8"?>
 
 <xwikidoc>
 <web>Stats</web>
@@ -97,22 +97,22 @@
 <category>Information</category>
 </property>
 <property>
-<content>#panelheader($msg.get("xe.statistics.current.month.caps"))
-#if($xwiki.statsService.enabledForCurrentWiki)
-#if(not $chartWidth)
-#set($chartWidth=250)
-#end
-#if(not $chartHeight)
-#set($chartHeight=150)
-#end
-#set($pattern='yyyy.MM.dd')
-#set($currentMonth=$xwiki.criteriaService.periodFactory.currentMonth)
-#set($monthStart=$!xwiki.jodatime.getDateTime($currentMonth.start))
-#set($monthEnd=$!xwiki.jodatime.getDateTime($currentMonth.end))
-#set($dtf=$xwiki.jodatime.getDateTimeFormatterForPattern($pattern))
-&lt;div style="text-align:center;"&gt;{chart:type=time|source=type:table;doc:Stats.ActivityData;table_number:1;ignore_alpha:true|date_format=type:custom;pattern:$pattern|height=$chartHeight|width=$chartWidth|domain_axis_date_format_override=type:custom;pattern:dd|domain_axis_lower_date=value:$dtf.print($monthStart);type:custom;pattern:$pattern|domain_axis_upper_date=value:$dtf.print($monthEnd);type:custom;pattern:$pattern|domain_axis_date_tick_unit=unit:day;count:3|domain_axis_tick_mark_position:ende|title=${msg.get("xe.statistics.current.month.caps")}}&lt;/div&gt;
+<content>#panelheader($msg.get('xe.statistics.current.month.caps'))
+#if ($xwiki.statsService.enabledForCurrentWiki)
+  #if (not $chartWidth)
+    #set ($chartWidth = 250)
+  #end
+  #if (not $chartHeight)
+    #set ($chartHeight = 150)
+  #end
+  #set ($pattern = 'yyyy.MM.dd')
+  #set ($currentMonth = $xwiki.criteriaService.periodFactory.currentMonth)
+  #set ($monthStart = $!xwiki.jodatime.getDateTime($currentMonth.start))
+  #set ($monthEnd = $!xwiki.jodatime.getDateTime($currentMonth.end))
+  #set ($dtf = $xwiki.jodatime.getDateTimeFormatterForPattern($pattern))
+  &lt;div style="text-align:center;"&gt;{chart:type=time|source=type:table;doc:Stats.ActivityData;table_number:1;ignore_alpha:true|date_format=type:custom;pattern:$pattern|height=$chartHeight|width=$chartWidth|domain_axis_date_format_override=type:custom;pattern:dd|domain_axis_lower_date=value:$dtf.print($monthStart);type:custom;pattern:$pattern|domain_axis_upper_date=value:$dtf.print($monthEnd);type:custom;pattern:$pattern|domain_axis_date_tick_unit=unit:day;count:3|domain_axis_tick_mark_position:ende|title=${msg.get('xe.statistics.current.month.caps')}}&lt;/div&gt;
 #else
-#printStatisticsDisabled()
+  #printStatisticsDisabled()
 #end
 #panelfooter()
 #includeMacros("Stats.Macros")</content>
@@ -125,39 +125,6 @@
 </property>
 <property>
 <type>view</type>
-</property>
-</object>
-<object>
-<class>
-<name>XWiki.TagClass</name>
-<customClass></customClass>
-<customMapping></customMapping>
-<defaultViewSheet></defaultViewSheet>
-<defaultEditSheet></defaultEditSheet>
-<defaultWeb></defaultWeb>
-<nameField></nameField>
-<validationScript></validationScript>
-<tags>
-<cache>0</cache>
-<displayType>input</displayType>
-<multiSelect>1</multiSelect>
-<name>tags</name>
-<number>1</number>
-<prettyName>Tags</prettyName>
-<relationalStorage>1</relationalStorage>
-<separator> </separator>
-<separators> ,|</separators>
-<size>30</size>
-<unmodifiable>0</unmodifiable>
-<values></values>
-<classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
-</tags>
-</class>
-<name>Stats.CurrentMonthActivity</name>
-<number>0</number>
-<className>XWiki.TagClass</className>
-<property>
-<tags/>
 </property>
 </object>
 <content>#includeForm("Panels.PanelSheet")</content>

@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="ISO-8859-1"?>
+<?xml version="1.0" encoding="UTF-8"?>
 
 <xwikidoc>
 <web>Stats</web>
@@ -97,19 +97,19 @@
 <category>Information</category>
 </property>
 <property>
-<content>#panelheader($msg.get("xe.statistics.pages.mostviewed"))
-#if($xwiki.statsService.enabledForCurrentWiki)
-#set($scope=$xwiki.criteriaService.scopeFactory.ALL_PAGES)
-#set($period=$xwiki.criteriaService.periodFactory.ALL_TIME)
-#set($interval=$xwiki.criteriaService.rangeFactory.createHeadRange(5))
-#set($stats=$xwiki.statsService.getDocumentStatistics("view",$scope,$period,$interval))
-#if($stats.size() &gt; 0)
-#printPageStats($stats)
+<content>#panelheader($msg.get('xe.statistics.pages.mostviewed'))
+#if ($xwiki.statsService.enabledForCurrentWiki)
+  #set ($scope = $xwiki.criteriaService.scopeFactory.ALL_PAGES)
+  #set ($period = $xwiki.criteriaService.periodFactory.ALL_TIME)
+  #set ($interval = $xwiki.criteriaService.rangeFactory.createHeadRange(5))
+  #set ($stats = $xwiki.statsService.getDocumentStatistics('view', $scope, $period, $interval))
+  #if ($stats.size() &gt; 0)
+    #printPageStats($stats)
+  #else
+    #printNoStatisticsData()
+  #end
 #else
-#printNoStatisticsData()
-#end
-#else
-#printStatisticsDisabled()
+  #printStatisticsDisabled()
 #end
 #panelfooter()
 #includeMacros("Stats.Macros")</content>
@@ -122,39 +122,6 @@
 </property>
 <property>
 <type>view</type>
-</property>
-</object>
-<object>
-<class>
-<name>XWiki.TagClass</name>
-<customClass></customClass>
-<customMapping></customMapping>
-<defaultViewSheet></defaultViewSheet>
-<defaultEditSheet></defaultEditSheet>
-<defaultWeb></defaultWeb>
-<nameField></nameField>
-<validationScript></validationScript>
-<tags>
-<cache>0</cache>
-<displayType>input</displayType>
-<multiSelect>1</multiSelect>
-<name>tags</name>
-<number>1</number>
-<prettyName>Tags</prettyName>
-<relationalStorage>1</relationalStorage>
-<separator> </separator>
-<separators> ,|</separators>
-<size>30</size>
-<unmodifiable>0</unmodifiable>
-<values></values>
-<classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
-</tags>
-</class>
-<name>Stats.MostViewedPages</name>
-<number>0</number>
-<className>XWiki.TagClass</className>
-<property>
-<tags/>
 </property>
 </object>
 <content>#includeForm("Panels.PanelSheet")</content>

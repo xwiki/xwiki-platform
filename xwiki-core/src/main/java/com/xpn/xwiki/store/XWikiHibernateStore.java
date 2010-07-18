@@ -2026,7 +2026,7 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
 
             Query query =
                 session.createQuery("select doc.fullName from XWikiDocument as doc "
-                + "where (doc.xWikiClassXML is not null and doc.xWikiClassXML like '%')");
+                + "where (doc.xWikiClassXML is not null and doc.xWikiClassXML like '<%')");
             Iterator<String> it = query.list().iterator();
             List<String> list = new ArrayList<String>();
             while (it.hasNext()) {

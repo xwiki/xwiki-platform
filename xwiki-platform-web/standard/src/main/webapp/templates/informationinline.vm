@@ -3,7 +3,7 @@
 ###
 <div id="informationcontent" class="xwikiintracontent">
 <div id="_information">
-  <div id="informationleft" style="float:left; width: 49.9%;">
+  <div id="informationleft" class="half column">
     <dl>
       <dt>$msg.get('core.viewers.information.parent')</dt>
       <dd>
@@ -25,7 +25,7 @@
       </dd>
     </dl>
   </div>## informationleft
-  <div id="informationright" style="float:right; width: 50.1%;">
+  <div id="informationright" class="half column">
     <dl>
       #if($tdoc.realLanguage != $doc.realLanguage)
         <dt>$msg.get('core.viewers.information.translationCreation', [$tdoc.realLanguage])</dt>

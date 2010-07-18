@@ -705,19 +705,19 @@ $!xwiki.jsx.use($blogScriptsDocumentName)##
     &lt;div class="pagingLinks"&gt;
     #getRequestedWeek($weekDate)
     $weekDate.addWeeks(-1)##
-    (% class="prevPage" %)**[[&amp;laquo; $msg.get('xe.blog.code.previousweek')&gt;&gt;$doc.name?year=$weekDate.weekyear&amp;week=$weekDate.weekOfWeekyear]]**(%%)
+    (% class="prevPage" %)**[[&amp;#171; $msg.get('xe.blog.code.previousweek')&gt;&gt;$doc.name?year=$weekDate.weekyear&amp;week=$weekDate.weekOfWeekyear]]**(%%)
     #sep()
     $weekDate.addWeeks(2)## 2 because we already subtracted 1 above
-    (% class="nextPage" %)**[[$msg.get('xe.blog.code.nextweek') &amp;raquo;&gt;&gt;$doc.name?year=$weekDate.weekyear&amp;week=$weekDate.weekOfWeekyear]]**(%%)
+    (% class="nextPage" %)**[[$msg.get('xe.blog.code.nextweek') &amp;#187;&gt;&gt;$doc.name?year=$weekDate.weekyear&amp;week=$weekDate.weekOfWeekyear]]**(%%)
     &lt;/div&gt;
   #elseif($displayType == 'monthly')
     &lt;div class="pagingLinks"&gt;
     #getRequestedMonth($monthDate)
     $monthDate.addMonths(-1)##
-    (% class="prevPage" %)**[[&amp;laquo; $msg.get('xe.blog.code.previousmonth')&gt;&gt;$doc.name?year=$monthDate.year&amp;month=$monthDate.monthOfYear]]**(%%)
+    (% class="prevPage" %)**[[&amp;#171; $msg.get('xe.blog.code.previousmonth')&gt;&gt;$doc.name?year=$monthDate.year&amp;month=$monthDate.monthOfYear]]**(%%)
     #sep()
     $monthDate.addMonths(2)## 2 because we already subtracted 1 above
-    (% class="nextPage" %)**[[$msg.get('xe.blog.code.nextmonth') &amp;raquo;&gt;&gt;$doc.name?year=$monthDate.year&amp;month=$monthDate.monthOfYear]]**(%%)
+    (% class="nextPage" %)**[[$msg.get('xe.blog.code.nextmonth') &amp;#187;&gt;&gt;$doc.name?year=$monthDate.year&amp;month=$monthDate.monthOfYear]]**(%%)
     &lt;/div&gt;
   #elseif($displayType == 'all')
   #else
@@ -734,7 +734,7 @@ $!xwiki.jsx.use($blogScriptsDocumentName)##
       &lt;div class="pagingLinks"&gt;
       #if ($currentPageNumber &lt; $totalPages)
         #set($currentPageNumber = $currentPageNumber + 1)
-        (% class="prevPage" %)**[[&amp;laquo; $msg.get('xe.blog.code.olderposts')&gt;&gt;$doc.name?page=${currentPageNumber}&amp;ipp=${itemsPerPage}$queryString]]**(%%)
+        (% class="prevPage" %)**[[&amp;#171; $msg.get('xe.blog.code.olderposts')&gt;&gt;$doc.name?page=${currentPageNumber}&amp;ipp=${itemsPerPage}$queryString]]**(%%)
         #set($currentPageNumber = $currentPageNumber - 1)
       #end
       #if ($currentPageNumber &gt; 1)
@@ -742,7 +742,7 @@ $!xwiki.jsx.use($blogScriptsDocumentName)##
           #sep()
         #end
         #set($currentPageNumber = $currentPageNumber - 1)
-        (% class="nextPage" %)**[[$msg.get('xe.blog.code.newerposts') &amp;raquo;&gt;&gt;$doc.name?page=${currentPageNumber}&amp;ipp=${itemsPerPage}$queryString]]**(%%)
+        (% class="nextPage" %)**[[$msg.get('xe.blog.code.newerposts') &amp;#187;&gt;&gt;$doc.name?page=${currentPageNumber}&amp;ipp=${itemsPerPage}$queryString]]**(%%)
         #set($currentPageNumber = $currentPageNumber + 1)
       #end
       &lt;span class="clear"&gt;&lt;/span&gt;

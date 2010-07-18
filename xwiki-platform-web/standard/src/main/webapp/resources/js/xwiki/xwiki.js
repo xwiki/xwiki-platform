@@ -1362,7 +1362,7 @@ document.observe('dom:loaded', function() {
  *
  * To activate this behavior on an input element, add the "withTip" classname to it.
  */
-document.observe('dom:loaded', function() {
+document.observe('xwiki:dom:loaded', function() {
   var onFocus = function() {
     if (this.value==this.defaultValue) {
       this.value="";
@@ -1384,9 +1384,9 @@ document.observe('dom:loaded', function() {
 /**
  * Small JS improvement, which suggests document names (doc.fullName) when typing in an input.
  *
- * To activate this behavior on an input elements, ad the "suggestDocuments" classname to it.
+ * To activate this behavior on an input elements, add the "suggestDocuments" classname to it.
  */
-document.observe('dom:loaded', function() {
+document.observe('xwiki:dom:loaded', function() {
   if (typeof(XWiki.widgets.Suggest) != "undefined") {
     $$("input.suggestDocuments").each(function(item) {
       // Create the Suggest.
@@ -1403,6 +1403,24 @@ document.observe('dom:loaded', function() {
         timeout : 30000,
         parentContainer : item.up()
       });
+    });
+  }
+});
+
+/**
+ * Small JS improvement, which blocks normal browser autocomplete for fields which use an AJAX suggest,
+ * and initializes the suggest object early instead of waiting for the field to be focused.
+ *
+ * To activate this behavior on an input elements, add the "suggested" classname to it.
+ */
+document.observe('xwiki:dom:loaded', function() {
+  if (typeof(XWiki.widgets.Suggest) != "undefined") {
+    $$(".suggested").each(function(item) {
+      item.setAttribute("autocomplete", "off");
+      if (typeof item.onfocus === "function") {
+        item.onfocus();
+        item.removeAttribute("onfocus");
+      }
     });
   }
 });

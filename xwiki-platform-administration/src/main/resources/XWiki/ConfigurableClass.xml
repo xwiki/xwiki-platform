@@ -41,6 +41,7 @@
 <nameField></nameField>
 <validationScript></validationScript>
 <codeToExecute>
+<disabled>0</disabled>
 <editor>---</editor>
 <name>codeToExecute</name>
 <number>7</number>
@@ -54,6 +55,7 @@
 <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
 </codeToExecute>
 <configurationClass>
+<disabled>0</disabled>
 <name>configurationClass</name>
 <number>3</number>
 <picker>0</picker>
@@ -66,6 +68,7 @@
 </configurationClass>
 <configureGlobally>
 <defaultValue></defaultValue>
+<disabled>0</disabled>
 <displayFormType>checkbox</displayFormType>
 <displayType></displayType>
 <name>configureGlobally</name>
@@ -77,6 +80,7 @@
 <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
 </configureGlobally>
 <displayInSection>
+<disabled>0</disabled>
 <name>displayInSection</name>
 <number>1</number>
 <picker>0</picker>
@@ -88,6 +92,7 @@
 <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
 </displayInSection>
 <heading>
+<disabled>0</disabled>
 <name>heading</name>
 <number>2</number>
 <picker>0</picker>
@@ -99,6 +104,7 @@
 <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
 </heading>
 <iconAttachment>
+<disabled>0</disabled>
 <name>iconAttachment</name>
 <number>8</number>
 <picker>0</picker>
@@ -110,6 +116,7 @@
 <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
 </iconAttachment>
 <linkPrefix>
+<disabled>0</disabled>
 <name>linkPrefix</name>
 <number>5</number>
 <picker>0</picker>
@@ -122,6 +129,7 @@
 </linkPrefix>
 <propertiesToShow>
 <cache>0</cache>
+<disabled>0</disabled>
 <displayType>input</displayType>
 <multiSelect>1</multiSelect>
 <name>propertiesToShow</name>
@@ -152,6 +160,7 @@
 <validationScript></validationScript>
 <cache>
 <cache>0</cache>
+<disabled>0</disabled>
 <displayType>select</displayType>
 <multiSelect>0</multiSelect>
 <name>cache</name>
@@ -166,6 +175,7 @@
 <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
 </cache>
 <code>
+<disabled>0</disabled>
 <name>code</name>
 <number>2</number>
 <prettyName>Code</prettyName>
@@ -175,6 +185,7 @@
 <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
 </code>
 <name>
+<disabled>0</disabled>
 <name>name</name>
 <number>1</number>
 <prettyName>Name</prettyName>
@@ -183,6 +194,7 @@
 <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
 </name>
 <parse>
+<disabled>0</disabled>
 <displayFormType>select</displayFormType>
 <displayType>yesno</displayType>
 <name>parse</name>
@@ -193,6 +205,7 @@
 </parse>
 <use>
 <cache>0</cache>
+<disabled>0</disabled>
 <displayType>select</displayType>
 <multiSelect>0</multiSelect>
 <name>use</name>
@@ -299,7 +312,7 @@
  * $doNotUnlockConfigurableDocuments - boolean - If true then this code will not make any attempt to unlock configurable
  *                                               documents. By default it does because it locks any document in the 
  *                                               section which is being configured which would lead to a lot of stray
- *                                               locks if they weren't all cancelled. Only recommended if this page is
+ *                                               locks if they weren't all canceled. Only recommended if this page is
  *                                               being included twice in the same page.
  *###
 ## Constants:
@@ -343,7 +356,7 @@ $xwiki.jsfx.use('js/xwiki/actionbuttons/actionButtons.js', true)
 #end
 ##
 ##------------------------------------------------------------------------------------------------------------
-## If $section exists then we are viewing the admin page for a perticular section.
+## If $section exists then we are viewing the admin page for a particular section.
 ## eg: 'Registration', 'Presentation', 'Import' etc.
 ##------------------------------------------------------------------------------------------------------------
 ##
@@ -363,7 +376,7 @@ $xwiki.jsfx.use('js/xwiki/actionbuttons/actionButtons.js', true)
     ## Make sure the current user has permission to edit the configurable application.
     #set($userHasAccessToDocument = $xcontext.hasAccessLevel('edit', $appName))
     ##
-    ## If the document was not last saved by a user with edit privilage on this page
+    ## If the document was not last saved by a user with edit privilege on this page
     ## then we can't safely display the page but we should warn the viewer.
     #if($userHasAccessToDocument)
       ## Get the configurable application
@@ -405,17 +418,17 @@ $xwiki.jsfx.use('js/xwiki/actionbuttons/actionButtons.js', true)
         ## If the document is locked and not by the current user and forceEdit is not set true,
         #if($locked &amp;&amp; $app.getLockingUser() != $xcontext.getUser() &amp;&amp; !$request.getParameter('forceEdit'))
           #set($requestURL = "$request.getRequestURL()")
-          #if($requestURL.indexOf("?") == -1)
+          #if($requestURL.indexOf('?') == -1)
             #set($requestURL = "${requestURL}?")
           #end
           #showHeading($appName, $headingShowing)
 
-          {{error}}$msg.get("doclockedby") $app.getLockingUser() [[$msg.get("forcelock")&gt;&gt;${requestURL}&amp;forceEdit=1]]{{/error}}
+          {{error}}$msg.get('doclockedby') $app.getLockingUser() [[$msg.get('forcelock')&gt;&gt;${requestURL}&amp;forceEdit=1]]{{/error}}
 
         #else
-          ## If the document is not already locked, attempt to aquire the lock.
+          ## If the document is not already locked, attempt to acquire the lock.
           #if(!$locked)
-            ## Try to use an ajax call to lock the document.
+            ## Try to use an AJAX call to lock the document.
 
 
             {{html wiki=true}}
@@ -425,7 +438,7 @@ $xwiki.jsfx.use('js/xwiki/actionbuttons/actionButtons.js', true)
 
               &lt;/noscript&gt;
               &lt;script type="text/javascript"&gt;
-                document.observe("dom:loaded", function() {
+                document.observe("xwiki:dom:loaded", function() {
                   new Ajax.Request("$xwiki.getURL($app.getFullName(), 'lock', 'ajax=1')");
                 });
               &lt;/script&gt;
@@ -438,7 +451,7 @@ $xwiki.jsfx.use('js/xwiki/actionbuttons/actionButtons.js', true)
           ##
           ## Get all objects of the "ConfigurableClass" from this document.
           #set($allConfigurableObjs = $app.getObjects($nameOfThisDocument))
-          ## Seperate out the objects which are for this section.
+          ## Separate out the objects which are for this section.
           #set($configurableObjs = [])
           #foreach($configurableObj in $allConfigurableObjs)
             #if($app.getValue('displayInSection', $configurableObj) == $section)
@@ -455,9 +468,9 @@ $xwiki.jsfx.use('js/xwiki/actionbuttons/actionButtons.js', true)
             {{error}}Internal error: All objects were filtered out for application: $appName.{{/error}}
 
           #else
-            #set($formAction = "$xwiki.getURL($app.getFullName(), 'save')")
-            #set($formId = "$section.toLowerCase()_$app.getFullName()")
-            #set($escapedAppName = $escapetool.html($app.getFullName()))
+            #set($formAction = $xwiki.getURL($app.getFullName(), 'save'))
+            #set($formId = "${section.toLowerCase()}_${app.getFullName()}")
+            #set($escapedAppName = $escapetool.xml($app.getFullName()))
             #foreach($configurableObj in $configurableObjs)
               ## Display the header if one exists.
               #set($heading = $app.getValue('heading', $configurableObj))
@@ -485,7 +498,7 @@ $xwiki.jsfx.use('js/xwiki/actionbuttons/actionButtons.js', true)
               ## otherwise assume custom forms are used instead.
               #set($configClassName = "$!app.getValue('configurationClass', $configurableObj)")
               #if($configClassName != '')
-                #set($objClass = $xwiki.getDocument("$configClassName").getxWikiClass())
+                #set($objClass = $xwiki.getDocument($configClassName).getxWikiClass())
                 #if(!$objClass || $objClass.getClass().getName().indexOf('.Class') == -1)
                   #showHeading($appName, $headingShowing)
 
@@ -532,13 +545,13 @@ $xwiki.jsfx.use('js/xwiki/actionbuttons/actionButtons.js', true)
                           &lt;label for="${escapedAppName}_$objClass.getName()_$obj.getNumber()_$propName"&gt;
                           #if($linkPrefix != '')
                             #set($linkScript = "$linkPrefix$propName")
-                            &lt;a href="$escapetool.html("#evaluate($linkScript)")"&gt;$escapetool.html($prettyName)&lt;/a&gt;
+                            &lt;a href="$escapetool.xml("#evaluate($linkScript)")"&gt;$escapetool.xml($prettyName)&lt;/a&gt;
                           #else
-                            $escapetool.html($prettyName)
+                            $escapetool.xml($prettyName)
                           #end
                           &lt;/label&gt;
                           ## Step 1: Strip pre tags which $obj.display inserts, this won't affect content because it's escaped.
-                          #set($out = $obj.display($propName, "edit").replaceAll('&lt;[/]?pre&gt;', ''))
+                          #set($out = $obj.display($propName, 'edit').replaceAll('&lt;[/]?pre&gt;', ''))
                           ## Step 2: Select only content between first &lt; and last &gt; because $obj.display inserts html macros.
                           ##         Careful not to remove html macros from the content because they are not escaped!
                           ## Step 3: Prepend app name to all ID tags to prevent id collision with multiple apps on one page.
@@ -570,7 +583,7 @@ $xwiki.jsfx.use('js/xwiki/actionbuttons/actionButtons.js', true)
               #if($request.getQueryString() &amp;&amp; $request.getQueryString().length() &gt; 0)
                 #set($thisURL = "${thisURL}?$request.getQueryString()")
               #end
-              &lt;input type="hidden" id="${escapedAppName}_redirect" name="$redirectParameter" value="$escapetool.html($thisURL)" /&gt;
+              &lt;input type="hidden" id="${escapedAppName}_redirect" name="$redirectParameter" value="$escapetool.xml($thisURL)" /&gt;
               &lt;/fieldset&gt;
               &lt;div class="bottombuttons"&gt;
                 &lt;p class="admin-buttons"&gt;
@@ -616,12 +629,12 @@ $xwiki.jsfx.use('js/xwiki/actionbuttons/actionButtons.js', true)
   ##------------------------------------------------------------------------------------------------------------
   ##
   ## If there is no list called sections then we set sections to an empty list.
-  #if(!$sections || $sections.getClass().getName().indexOf("List") == -1)
+  #if(!$sections || $sections.getClass().getName().indexOf('List') == -1)
     #set($sections = [])
   #end
   ##
   ## We have to create a list of documents which the current user doesn't have permission to view.
-  ## So we can add an error messsage to the bottom of the page if there are any.
+  ## So we can add an error message to the bottom of the page if there are any.
   #set($appsUserCannotView = [])
   ##
   ## A list of sections (to be added) which the user is not allowed to edit, icons will be displayed with a message
@@ -665,14 +678,14 @@ $xwiki.jsfx.use('js/xwiki/actionbuttons/actionButtons.js', true)
           #set($discard = $iconBySection.put($displayInSection, $app.getAttachmentURL($attachment.getFilename())))
         #end
         ##
-        ## If the user doesn't have edit access to the application, we want to should show a message on the icon
+        ## If the user doesn't have edit access to the application, we want to show a message on the icon
         #if(!$xcontext.hasAccessLevel("edit", $app.getFullName()))
           #if(!$sectionsUserCannotEdit.contains($displayInSection))
             #set($discard = $sectionsUserCannotEdit.add($displayInSection))
           #end
         #elseif($sectionsUserCannotEdit.contains($displayInSection))
           ## If the user didn't have access to the section before but does have access to _this_ app which is
-          ## configured in the section, then the section becomes accessable.
+          ## configured in the section, then the section becomes accessible.
           #set($discard = $sectionsUserCannotEdit.remove($displayInSection))
         #end
       #end## If section doesn't exist or user doesn't have access.
@@ -697,15 +710,15 @@ $xwiki.jsfx.use('js/xwiki/actionbuttons/actionButtons.js', true)
     #if(!$icon)
       #set($icon = $defaultIcon)
     #end
-    &lt;li class="$escapetool.html($sectionToAdd).replaceAll(' ', '_')"&gt;
+    &lt;li class="$escapetool.xml($sectionToAdd).replaceAll(' ', '_')"&gt;
       #set($hasAccess = !$sectionsUserCannotEdit.contains($sectionToAdd))
       #if($hasAccess)
         &lt;a href="$xwiki.getURL($currentDoc, $xcontext.getAction(), "$queryString$escapetool.url($sectionToAdd)")"&gt;
       #else
         &lt;a title="$msg.get('xe.admin.configurable.sectionIconNoAccessTooltip')"&gt;
       #end
-      &lt;img src="$icon" alt="$escapetool.html($sectionToAdd) icon"/&gt;
-      $escapetool.html($sectionToAdd)
+      &lt;img src="$icon" alt="$escapetool.xml($sectionToAdd) icon"/&gt;
+      $escapetool.xml($sectionToAdd)
       #if(!$hasAccess)
         &lt;br/&gt;&lt;span class="errormessage"&gt;$msg.get('xe.admin.configurable.sectionIconNoAccess')&lt;/span&gt;
       #end
@@ -818,7 +831,7 @@ $xwiki.jsfx.use('js/xwiki/actionbuttons/actionButtons.js', true)
 #end
 ##
 #*
- * Try to determine whether a document was edited by a user who has edit right on this page. This is trickey because
+ * Try to determine whether a document was edited by a user who has edit right on this page. This is tricky because
  * documents are imported with the name XWiki.XWikiGuest who has no access to anything after import.
  *
  * @param theDoc - Document who's editor should be checked for edit access on this document.

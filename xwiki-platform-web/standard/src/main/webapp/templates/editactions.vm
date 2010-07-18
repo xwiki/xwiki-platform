@@ -1,25 +1,25 @@
 ### Buttons displayed in the edit interface: cancel, preview (when enabled), save and continue, save and view.
 ###
-#if("$!showactions" != '0')
-  #set($keyboardShortcutsEnabled = ($editor!="wysiwyg"))
+#if ("$!showactions" != '0')
+  #set ($keyboardShortcutsEnabled = ($editor != 'wysiwyg'))
   ## This allows the preview form to redirect back to the correct editor when pressing "Back to edit":
   <div class="metamodifs">
-  <input type="hidden" name="xeditaction" value="$!context.action"/>
-  #if((!$tdoc.isNew()) && (!$minorFieldAdded) && ($xwiki.hasMinorEdit()))
-    #set($minorFieldAdded = 1)
+  <input type="hidden" name="xeditaction" value="$!context.action" />
+  #if ((!$tdoc.isNew()) && (!$minorFieldAdded) && ($xwiki.hasMinorEdit()))
+    #set ($minorFieldAdded = 1)
     <label for="minorEdit">$msg.get('core.minoredit'): <input type="checkbox" name="minorEdit" id="minorEdit" #if($request.minorEdit)checked="checked" #end/></label>
   #end
-  #if((!$commentFieldAdded)&&($xwiki.hasEditComment()))
-    #set($commentFieldAdded = 1)
-    #if($xwiki.isEditCommentFieldHidden())
-      <input type="hidden" name="comment" id="comment" value="$!{request.comment}" />
+  #if ((!$commentFieldAdded) && $xwiki.hasEditComment())
+    #set ($commentFieldAdded = 1)
+    #if ($xwiki.isEditCommentFieldHidden())
+      <input type="hidden" name="comment" id="comment" value="$!{escapetool.xml($request.comment)}" />
     #else
-      <label for="commentinput">$msg.get("core.comment"): <input type="text" id="commentinput" name="comment" value="$!{request.comment}" size="40" title="Enter a brief description of the modification" /></label>
+      <label for="commentinput">$msg.get('core.comment'): <input type="text" id="commentinput" name="comment" value="$!{escapetool.xml($request.comment)}" size="40" title="Enter a brief description of the modification" /></label>
     #end
   #end
   </div> ## metamodifs
   <div class="buttons">
-    #if($previewenabled) #editActionButton('preview', 'preview') #end
+    #if ($previewenabled) #editActionButton('preview', 'preview') #end
     #editActionButton('saveandcontinue', 'saveandcontinue')
     #editActionButton($saveaction, 'saveandview')
     #editActionButton('cancel', 'cancel')

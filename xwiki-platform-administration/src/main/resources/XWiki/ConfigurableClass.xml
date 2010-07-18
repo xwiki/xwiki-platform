@@ -554,10 +554,12 @@ $xwiki.jsfx.use('js/xwiki/actionbuttons/actionButtons.js', true)
                           #set($out = $obj.display($propName, 'edit').replaceAll('&lt;[/]?pre&gt;', ''))
                           ## Step 2: Select only content between first &lt; and last &gt; because $obj.display inserts html macros.
                           ##         Careful not to remove html macros from the content because they are not escaped!
-                          ## Step 3: Prepend app name to all ID tags to prevent id collision with multiple apps on one page.
+                          ## Step 3: Prepend app name to all ID and FOR attributes to prevent id collision with multiple apps on one page.
                           $out.substring($out.indexOf('&lt;'), $mathtool.add(1, $out.lastIndexOf('&gt;'))).replaceAll(
                                                      " id='$objClass.getName()_$obj.getNumber()_$propName",
-                                                     " id='${escapedAppName}_$objClass.getName()_$obj.getNumber()_$propName")
+                                                     " id='${escapedAppName}_$objClass.getName()_$obj.getNumber()_$propName").replaceAll(
+                                                     " for='$objClass.getName()_$obj.getNumber()_$propName",
+                                                     " for='${escapedAppName}_$objClass.getName()_$obj.getNumber()_$propName")
                           &lt;/p&gt;
                         #end## If property is in propertiesToShow
                       #end## Foreach property in this class

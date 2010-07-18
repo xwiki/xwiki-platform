@@ -148,7 +148,7 @@ public class Document extends Api
     protected XWikiDocument getDoc()
     {
         if (!this.cloned) {
-            this.doc = (XWikiDocument) this.doc.clone();
+            this.doc = this.doc.clone();
             this.cloned = true;
         }
 
@@ -750,7 +750,7 @@ public class Document extends Api
 
     public Map<String, Vector<Object>> getxWikiObjects()
     {
-        Map<DocumentReference, List<BaseObject>> map = this.doc.getXObjects();
+        Map<DocumentReference, List<BaseObject>> map = this.getDoc().getXObjects();
         Map<String, Vector<Object>> resultmap = new HashMap<String, Vector<Object>>();
         for (Map.Entry<DocumentReference, List<BaseObject>> entry : map.entrySet()) {
             List<BaseObject> objects = entry.getValue();
@@ -763,10 +763,10 @@ public class Document extends Api
 
     protected Vector<Object> getXObjects(List<BaseObject> objects)
     {
-        Vector<Object> result = new Vector<Object>();
         if (objects == null) {
-            return result;
+            return new Vector<Object>(0);
         }
+        Vector<Object> result = new Vector<Object>(objects.size());
         for (BaseObject bobj : objects) {
             if (bobj != null) {
                 result.add(newObjectApi(bobj, getXWikiContext()));
@@ -777,14 +777,14 @@ public class Document extends Api
 
     public Vector<Object> getObjects(String className)
     {
-        List<BaseObject> objects = this.doc.getXObjects(this.doc.resolveClassReference(className));
+        List<BaseObject> objects = this.getDoc().getXObjects(this.doc.resolveClassReference(className));
         return getXObjects(objects);
     }
 
     public Object getFirstObject(String fieldname)
     {
         try {
-            BaseObject obj = this.doc.getFirstObject(fieldname, getXWikiContext());
+            BaseObject obj = this.getDoc().getFirstObject(fieldname, getXWikiContext());
             if (obj == null) {
                 return null;
             } else {
@@ -798,7 +798,7 @@ public class Document extends Api
     public Object getObject(String classname, String key, String value, boolean failover)
     {
         try {
-            BaseObject obj = this.doc.getObject(classname, key, value, failover);
+            BaseObject obj = this.getDoc().getObject(classname, key, value, failover);
             if (obj == null) {
                 return null;
             } else {
@@ -825,7 +825,7 @@ public class Document extends Api
             return getObjects(classname);
         }
         try {
-            Vector<BaseObject> allObjects = this.doc.getObjects(classname);
+            Vector<BaseObject> allObjects = this.getDoc().getObjects(classname);
             if (allObjects == null || allObjects.size() == 0) {
                 return result;
             } else {
@@ -849,7 +849,7 @@ public class Document extends Api
     public Object getObject(String classname, String key, String value)
     {
         try {
-            BaseObject obj = this.doc.getObject(classname, key, value);
+            BaseObject obj = this.getDoc().getObject(classname, key, value);
             if (obj == null) {
                 return null;
             } else {
@@ -887,7 +887,7 @@ public class Document extends Api
     public Object getObject(String classname, int nb)
     {
         try {
-            BaseObject obj = this.doc.getObject(classname, nb);
+            BaseObject obj = this.getDoc().getObject(classname, nb);
             if (obj == null) {
                 return null;
             } else {

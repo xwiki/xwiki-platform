@@ -6,7 +6,7 @@
 #set($discard = $parents.add($parent))
 #set($pdoc = $xwiki.getDocument($parent).getTranslatedDocument())
 #set($pdocurl = $pdoc.getURL("view"))
-#set($nstring = "<a href='$pdocurl'>$escapetool.xml(${pdoc.getRenderedTitle('plain/1.0')})</a> &raquo; $string")
+#set($nstring = "<a href='$pdocurl'>$escapetool.xml(${pdoc.getRenderedTitle('plain/1.0')})</a> &#187; $string")
 #set($level = $level + 1)
 #breadcrumb($pdoc $nstring $level)
 #else

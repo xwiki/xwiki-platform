@@ -6,7 +6,7 @@
     #set($discard = $parents.add($parent))
     #set($pdoc = $xwiki.getDocument($parent).getTranslatedDocument())
     #set($pdocurl = $pdoc.getURL("view"))
-    #set($nstring = "<a href='$pdocurl'>$escapetool.xml(${pdoc.getRenderedTitle('plain/1.0')})</a> <span class='separator'>&raquo;</span> $result")
+    #set($nstring = "<a href='$pdocurl'>$escapetool.xml(${pdoc.getRenderedTitle('plain/1.0')})</a> <span class='separator'>&#187;</span> $result")
     #set($level = $level + 1)
     #computeHierarchy($pdoc $nstring $level)
   #else

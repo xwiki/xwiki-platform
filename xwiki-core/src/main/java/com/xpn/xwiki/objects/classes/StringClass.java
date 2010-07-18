@@ -107,7 +107,7 @@ public class StringClass extends PropertyClass
         input.setDisabled(isDisabled());
 
         if (isPicker()) {
-            input.addAttribute("autocomplete", "off");
+            input.setClass("suggested");
             String path = "";
             XWiki xwiki = context.getWiki();
             path = xwiki.getURL("Main.WebHome", "view", context);

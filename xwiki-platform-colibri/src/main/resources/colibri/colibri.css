@@ -285,6 +285,18 @@ span.wikicreatelink a:after {
   color: $theme.textSecondaryColor;
 }
 
+.column {
+  float: left;
+}
+.half {
+  /* Rounding errors with 50%, might end up with one more pixel which pushes the column down. */
+  width: 49.9%;
+}
+.third {
+  /* Rounding errors with 33.3%, might end up with one more pixel which pushes the column down. */
+  width: 33.2%;
+}
+
 /* @group VIEW LAYOUT */
 /* --------------------------------------------------------------
   * Layout elements for Colibri skin in view mode

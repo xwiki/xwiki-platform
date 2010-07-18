@@ -259,18 +259,18 @@ $msg.get("xe.admin.passwordreset.enteremail")
   #if($results.size() == 0)
     $msg.get("xe.admin.passwordreset.noaccountregistered")
 
-    [&amp;laquo; $msg.get("xe.admin.passwordreset.differentaddress")&gt;$doc.fullName] | &lt;a href="$xwiki.getURL("XWiki.XWikiLogin", "login", "")"&gt;$msg.get("xe.admin.passwordreset.login") &amp;raquo;&lt;/a&gt;
+    [&amp;#171; $msg.get("xe.admin.passwordreset.differentaddress")&gt;$doc.fullName] | &lt;a href="$xwiki.getURL("XWiki.XWikiLogin", "login", "")"&gt;$msg.get("xe.admin.passwordreset.login") &amp;#187;&lt;/a&gt;
   #elseif($results.size() == 1)
     $msg.get("xe.admin.passwordreset.usernameis") *${xwiki.getDocument($results.get(0)).name}*
 
-    &lt;a href="$xwiki.getURL("XWiki.XWikiLogin", "login", "")"&gt;$msg.get("xe.admin.passwordreset.login") &amp;raquo;&lt;/a&gt;
+    &lt;a href="$xwiki.getURL("XWiki.XWikiLogin", "login", "")"&gt;$msg.get("xe.admin.passwordreset.login") &amp;#187;&lt;/a&gt;
   #else
     $msg.get("xe.admin.passwordreset.multipleusernames")
     #foreach($item in $results)
       * *${xwiki.getDocument($item).name}*
     #end
 
-    &lt;a href="$xwiki.getURL("XWiki.XWikiLogin", "login", "")"&gt;$msg.get("xe.admin.passwordreset.login") &amp;raquo;&lt;/a&gt;
+    &lt;a href="$xwiki.getURL("XWiki.XWikiLogin", "login", "")"&gt;$msg.get("xe.admin.passwordreset.login") &amp;#187;&lt;/a&gt;
   #end
 #end
 </content>

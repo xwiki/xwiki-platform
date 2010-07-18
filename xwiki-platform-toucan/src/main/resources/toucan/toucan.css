@@ -125,6 +125,18 @@ body.editbody .clearfloats {
     background-repeat: no-repeat;
 }
 
+.column {
+  float: left;
+}
+.half {
+  /* Rounding errors with 50%, might end up with one more pixel which pushes the column down. */
+  width: 49.9%;
+}
+.third {
+  /* Rounding errors with 33.3%, might end up with one more pixel which pushes the column down. */
+  width: 33.2%;
+}
+
 a img {
     border: none;
 }

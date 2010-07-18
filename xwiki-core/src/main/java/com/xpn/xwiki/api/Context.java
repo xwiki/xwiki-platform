@@ -37,7 +37,7 @@ import com.xpn.xwiki.web.XWikiURLFactory;
  * predefined variable for scripting inside any wiki page. You can access it using <code>$context</code> in Velocity
  * scripts or simply <code>xcontext</code> in Groovy ones. The <code>Context</code> class provides a means of getting
  * contextual information about the current request or configuring XWiki on the fly.
- *
+ * 
  * @version $Id$
  */
 public class Context extends Api
@@ -554,5 +554,16 @@ public class Context extends Api
     public void setDisplayMode(String mode)
     {
         getXWikiContext().put("display", mode);
+    }
+
+    /**
+     * Retrieves the information about the currently executing macro. This method is only useful inside wiki macros.
+     * 
+     * @return macro information, normally a {@link java.util.Map} containing the macro {@code content}, the {@code
+     *         params}, and the macro execution {@code context}
+     */
+    public java.lang.Object getMacro()
+    {
+        return getXWikiContext().get("macro");
     }
 }

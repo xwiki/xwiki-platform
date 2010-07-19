@@ -152,7 +152,8 @@
 #set($config = {})
 #loadInvitationConfig($config)
 #set($mail = {})
-#loadInvitationMail($config, $mail)
+#set($emailContainer = $xwiki.getDocumentAsAuthor($config.get('emailContainer')))
+#loadInvitationMail($config, $emailContainer, $mail)
 ##
 ## Load CSS
 $xwiki.get('ssx').use($config.get('commonPage'))
@@ -171,7 +172,7 @@ $xwiki.get('ssx').use($config.get('commonPage'))
                                   $request.getParameter('inspect'),
                                   $isAdmin,
                                   $mail,
-                                  $xwiki.getDocumentAsAuthor($config.get('emailContainer')))
+                                  $emailContainer)
   #inspectMessages($mail, $inspect, $isAdmin, $messageID)
   #invitationFooter($mail, $request.getParameterMap(), $isAdmin, $config)
 #else

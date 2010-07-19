@@ -850,15 +850,14 @@ $msg.get("xe.invitation.emailContent.reportMessage", ["&lt;a href=$escapetool.ge
 #**
  * Load mail from mail containing document.
  *
- * $config (Map&lt;String, String&gt;) will be used to get 'emailContainer' which should be the document name of a
- *                               document containing email XObjects.
+ * $config (Map&lt;String, String&gt;) will be used to get the name of the email class.
+ *
+ * $emailContainer (Document) the document to get the email from.
  *
  * $mail (Map&lt;String, XObject&gt;) will be populated with email message XObjects by their messageID.
  *###
-#macro(loadInvitationMail, $config, $mail)
-  ## Load the document containing all of the invitation mail.
+#macro(loadInvitationMail, $config, $emailContainer, $mail)
   ## If this doesn't already exist, it's created.
-  #set($emailContainer = $xwiki.getDocumentAsAuthor($config.get('emailContainer')))
   #if($emailContainer.isNew())
     #set($emailContainerContent = '{{velo' + 'city}}{{info}}$msg.get("xe.invitation.internalDocument", ["'
                                   + "$config.get('emailContainer')" + '"]){{/info}}{{/velo' + 'city}}')

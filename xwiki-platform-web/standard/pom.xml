@@ -101,19 +101,19 @@
       <artifactId>xwiki-skin-albatross</artifactId>
       <version>${platform.skin.albatross.version}</version>
       <type>zip</type>
-    </dependency>         
+    </dependency>
     <dependency>
       <groupId>org.xwiki.platform.skins</groupId>
       <artifactId>xwiki-skin-toucan</artifactId>
       <version>${platform.skin.toucan.version}</version>
       <type>zip</type>
-    </dependency>         
+    </dependency>
     <dependency>
       <groupId>org.xwiki.platform.skins</groupId>
       <artifactId>xwiki-skin-colibri</artifactId>
       <version>${platform.skin.colibri.version}</version>
       <type>zip</type>
-    </dependency>         
+    </dependency>
     <!-- needed for slf4j clients such as QueryPlugin and JCRStore 
          It is deployment time logging configuration, so it is here instead of xwiki-core. -->
     <dependency>
@@ -367,7 +367,7 @@
       </build>
     </profile>
     <profile>
-      <id>jettyrun</id>      
+      <id>jettyrun</id>
       <build>
         <plugins>
           <!-- Run 'mvn install -Pjettyrun' to execute xwiki in Jetty. Useful for testing.
@@ -469,8 +469,8 @@
                   <goal>compress</goal>
                 </goals>
               </execution>
-            </executions>        
-          </plugin>          
+            </executions>
+          </plugin>
         </plugins>
       </build>
     </profile>

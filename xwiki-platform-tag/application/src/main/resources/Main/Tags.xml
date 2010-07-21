@@ -187,7 +187,7 @@ $xwiki.ssx.use('Main.Dashboard')##
 #set($do = "$!{request.get('do')}")
 #set($tag = "$!{request.get('tag')}")
 #set($urlEscapedTag = $escapetool.url($tag))
-#set($htmlEscapedTag = $escapetool.html($tag))
+#set($htmlEscapedTag = $escapetool.xml($tag))
 ##
 ## Macro displayTagAppTitle. Display level1 title of this app.
 ##
@@ -212,7 +212,7 @@ $xwiki.ssx.use('Main.Dashboard')##
   ##
   #displayTagAppTitle($urlEscapedTag $htmlEscapedTag true)
   #if("$!{request.get('renamedTag')}" != '')
-    #set($htmlEscapedRenamedTag = $escapetool.html($request.get('renamedTag')))
+    #set($htmlEscapedRenamedTag = $escapetool.xml($request.get('renamedTag')))
     #info($msg.get('xe.tag.rename.success', [$htmlEscapedRenamedTag]))
   #end
   #set($list = $xwiki.tag.getDocumentsWithTag($tag))
@@ -257,7 +257,7 @@ $xwiki.ssx.use('Main.Dashboard')##
    #set($urlEscapedRenameTo = $escapetool.url($renameTo))
    $response.sendRedirect($doc.getURL('view', "do=viewTag&amp;tag=${urlEscapedRenameTo}&amp;renamedTag=${urlEscapedTag}"))
   #else
-    #set($htmlEscapedRenameTo = $escapetool.html($renameTo))
+    #set($htmlEscapedRenameTo = $escapetool.xml($renameTo))
     #error($msg.get('xe.tag.rename.failure', [$htmlEscapedTag, $htmlEscapedRenameTo]))
   #end
 #elseif($do == 'prepareDelete')
@@ -289,7 +289,7 @@ $xwiki.ssx.use('Main.Dashboard')##
   #set($tags = $xwiki.tag.getTags(true))
   #set($title = 'All Tags')
   #if("$!{request.get('deletedTag')}" != '')
-    #set($htmlEscapedTag = $escapetool.html($request.get('deletedTag')))
+    #set($htmlEscapedTag = $escapetool.xml($request.get('deletedTag')))
     #info($msg.get('xe.tag.delete.success', [$htmlEscapedTag]))
   #end
   #set($docextras = [])

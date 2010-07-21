@@ -20,6 +20,7 @@
 package org.xwiki.rendering.scaffolding;
 
 import java.io.BufferedReader;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.HashMap;
@@ -46,7 +47,7 @@ public class RenderingTestSuite extends TestSuite
         super(name);
     }
 
-    public void addTestsFromResource(String testResourceName, boolean runTransformations) throws Exception
+    public void addTestsFromResource(String testResourceName, boolean runTransformations)
     {
         addTestsFromResource(testResourceName, runTransformations, null);
     }
@@ -55,7 +56,6 @@ public class RenderingTestSuite extends TestSuite
      * @since 2.4M1
      */
     public void addTestsFromResource(String testResourceName, boolean runTransformations, Map<String, ? > configuration)
-        throws Exception
     {
         String resourceName = "/" + testResourceName + ".test";
         Data data;
@@ -99,7 +99,7 @@ public class RenderingTestSuite extends TestSuite
      * &lt;/code&gt;
      * </pre>
      */
-    private Data readTestData(InputStream source, String resourceName) throws Exception
+    private Data readTestData(InputStream source, String resourceName) throws IOException
     {
         Data data = new Data();
 
@@ -165,7 +165,7 @@ public class RenderingTestSuite extends TestSuite
         return data;
     }
 
-    private void saveBuffer(StringBuffer buffer, Map map, Map<String, String> inputs, String keyName) throws Exception
+    private void saveBuffer(StringBuffer buffer, Map map, Map<String, String> inputs, String keyName)
     {
         // Remove the last newline since our test format forces an additional new lines
         // at the end of input texts.

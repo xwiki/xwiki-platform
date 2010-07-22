@@ -170,7 +170,7 @@ public class PeriodFactory
     public static Period createSinceMonthsPeriod(int numberOfMonths)
     {
         DateTime dt = new DateTime();
-        return createPeriod(dt.minusWeeks(numberOfMonths).getMillis(), dt.getMillis());
+        return createPeriod(dt.minusMonths(numberOfMonths).getMillis(), dt.getMillis());
     }
 
     /**

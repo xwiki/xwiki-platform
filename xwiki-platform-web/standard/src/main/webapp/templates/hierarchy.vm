@@ -5,10 +5,15 @@
   #if(($parent != '') && ($level < 6) && (!$parents.contains($parent)))
     #set($discard = $parents.add($parent))
     #set($pdoc = $xwiki.getDocument($parent).getTranslatedDocument())
-    #set($pdocurl = $pdoc.getURL("view"))
-    #set($nstring = "<a href='$pdocurl'>$escapetool.xml(${pdoc.getRenderedTitle('plain/1.0')})</a> <span class='separator'>&#187;</span> $result")
-    #set($level = $level + 1)
-    #computeHierarchy($pdoc $nstring $level)
+    #if ($pdoc)
+      #set ($pdocurl = $pdoc.getURL('view'))
+      #set ($nstring = "<a href='$pdocurl'>$escapetool.xml(${pdoc.getRenderedTitle('plain/1.0')})</a> <span class='separator'>&#187;</span> $result")
+      #set ($level = $level + 1)
+      #computeHierarchy($pdoc $nstring $level)
+    #else
+      ## No access to the parent document
+      <a href='$xwiki.getURL($parent)'>$escapetool.xml(${parent})</a> <span class='separator'>&#187;</span> $result
+    #end
   #else
     $result
   #end

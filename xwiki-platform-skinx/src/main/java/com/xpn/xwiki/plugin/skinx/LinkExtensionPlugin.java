@@ -5,6 +5,8 @@ import java.util.Map;
 import java.util.Set;
 import java.util.Map.Entry;
 
+import org.apache.commons.lang.StringEscapeUtils;
+
 import com.xpn.xwiki.XWikiContext;
 
 /**
@@ -45,10 +47,12 @@ public class LinkExtensionPlugin extends AbstractSkinExtensionPlugin
     public String getLink(String link, XWikiContext context)
     {
         Map<String, Object> params = getParametersForResource(link, context);
-        StringBuilder result = new StringBuilder("<link href=\"" + sanitize(link) + "\"");
+        StringBuilder result = new StringBuilder("<link href=\"" + StringEscapeUtils.escapeXml(link) + "\"");
         for (Entry<String, Object> entry : params.entrySet()) {
             result.append(" ");
-            result.append(sanitize(entry.getKey())).append("='").append(sanitize(entry.getValue().toString()));
+            result.append(StringEscapeUtils.escapeXml(entry.getKey()));
+            result.append("='");
+            result.append(StringEscapeUtils.escapeXml(entry.getValue().toString()));
             result.append("'");
         }
         result.append("/>");

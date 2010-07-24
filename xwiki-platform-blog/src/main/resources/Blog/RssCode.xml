@@ -40,7 +40,7 @@
   ## Create a Jodatime date formatter that will be used to format dates
   #set($dateFormatter = $xwiki.jodatime.getDateTimeFormatterForPattern("yyyy-MM-dd'T'hh:mm:ssZZ"))
   ## Set the right mimetype
-  $!response.setContentType('application/rdf+xml')##
+  $!response.setContentType('application/rss+xml')##
   #setBlogRssCacheSettings()
   #printBlogRssHeader()
   #printBlogRssChannelDescription($blogDoc $entries)
@@ -61,7 +61,7 @@
   ## Create a Jodatime date formatter that will be used to format dates
   #set($dateFormatter = $xwiki.jodatime.getDateTimeFormatterForPattern("yyyy-MM-dd'T'hh:mm:ssZZ"))
   ## Set the right mimetype
-  $!response.setContentType('application/rdf+xml')##
+  $!response.setContentType('application/rss+xml')##
   #setBlogRssCacheSettings()
   #printBlogRssHeader()
   #printGlobalBlogRssChannelDescription($entries)
@@ -84,7 +84,7 @@
   ## Create a Jodatime date formatter that will be used to format dates
   #set($dateFormatter = $xwiki.jodatime.getDateTimeFormatterForPattern("yyyy-MM-dd'T'hh:mm:ssZZ"))
   ## Set the right mimetype
-  $!response.setContentType('application/rdf+xml')##
+  $!response.setContentType('application/rss+xml')##
   #setBlogRssCacheSettings()
   #printBlogRssHeader()
   #printBlogCategoryRssChannelDescription($categoryDoc $entries)

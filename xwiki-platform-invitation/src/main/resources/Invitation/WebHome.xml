@@ -870,7 +870,7 @@ $xwiki.get('ssx').use($config.get('commonPage'))
        ## Subject line:
        &lt;dt&gt;&lt;label for="subjectLine"&gt;$msg.get('xe.invitation.subjectLabel')&lt;/label&gt;&lt;/dt&gt;
        &lt;dd&gt;
-        &lt;input type="text" size="54" name="subjectLine" id="subjectLine" value="$!escapetool.html($!subjectLine)" /&gt;
+        &lt;input type="text" size="54" name="subjectLine" id="subjectLine" value="$!escapetool.xml($!subjectLine)" /&gt;
        &lt;/dd&gt;
        ## Invitation message:
        &lt;dt&gt;&lt;label for="messageBody"&gt;$msg.get('xe.invitation.contentLabel')&lt;/label&gt;&lt;/dt&gt;

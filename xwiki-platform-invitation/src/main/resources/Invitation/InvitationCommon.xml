@@ -581,7 +581,7 @@ $msg.get("xe.invitation.emailContent.userHasInvitedYouToJoinWiki", [$userName, $
 {{html clean=false}}
 #if("$!messageBody" != "")
   &lt;p style="$bigText"&gt;
-  $!escapetool.html($!messageBody)
+  $!escapetool.xml($!messageBody)
   &lt;/p&gt;
 #end
 &lt;p style="margin-top:30px"&gt;

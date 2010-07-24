@@ -27,7 +27,7 @@
 
 {{velocity filter="none"}}
 #if("$!{request.xpage}" == 'plain' || "$!{request.xpage}" == 'rdf')
-$response.setContentType('application/rdf+xml')
+$response.setContentType('application/rss+xml')
 {{html clean="false" wiki="false"}}
 ##
 ##

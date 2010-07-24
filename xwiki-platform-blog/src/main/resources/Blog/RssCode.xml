@@ -138,7 +138,7 @@
     #getWikiLogo($logoUrl)
     &lt;image rdf:resource="$logoUrl"/&gt;
     &lt;dc:language&gt;$blogDoc.defaultLanguage&lt;/dc:language&gt;
-    &lt;dc:rights&gt;$escapetool.xml($xwiki.webCopyright)&lt;/dc:rights&gt;
+    &lt;dc:rights&gt;$escapetool.xml($xwiki.spaceCopyright)&lt;/dc:rights&gt;
     ## TODO: Usually this is not something meaningful. Maybe add some Blog object properties for these.
     ## &lt;dc:publisher&gt;$escapetool.xml($xwiki.getUserName($blogDoc.author, false))&lt;/dc:publisher&gt;
     ## &lt;dc:creator&gt;$escapetool.xml($xwiki.getUserName($blogDoc.creator, false))&lt;/dc:creator&gt;
@@ -172,7 +172,7 @@
     &lt;description&gt;Most recent blog posts in the wiki&lt;/description&gt;
     #getWikiLogo($logoUrl)
     &lt;image rdf:resource="$logoUrl"/&gt;
-    &lt;dc:rights&gt;$escapetool.xml($xwiki.webCopyright)&lt;/dc:rights&gt;
+    &lt;dc:rights&gt;$escapetool.xml($xwiki.spaceCopyright)&lt;/dc:rights&gt;
     &lt;dc:publisher&gt;XWiki&lt;/dc:publisher&gt;
     &lt;items&gt;
       &lt;rdf:Seq&gt;
@@ -201,7 +201,7 @@
     &lt;link&gt;$categoryDoc.getExternalURL()&lt;/link&gt;
     ## TODO: Add a Description field in the blog class
     &lt;description&gt;Most recent blog posts in the $categoryDoc.display('name') category&lt;/description&gt;
-    &lt;dc:rights&gt;$escapetool.xml($xwiki.webCopyright)&lt;/dc:rights&gt;
+    &lt;dc:rights&gt;$escapetool.xml($xwiki.spaceCopyright)&lt;/dc:rights&gt;
     &lt;items&gt;
       &lt;rdf:Seq&gt;
       ## This is just a list of blog entries, which are detailed below.

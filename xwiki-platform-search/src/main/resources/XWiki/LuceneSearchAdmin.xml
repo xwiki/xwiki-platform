@@ -118,7 +118,7 @@
 
   #if ($hasProgramming &amp;&amp; $context.isMainWiki())
 &lt;p&gt;
-    &lt;label for="indexcustom_hqlFilter"&gt;$msg.get('search.admin.lucene.indexing.action.indexcustom.hqlfilter')&lt;/label&gt; &lt;input id="indexcustom_hqlFilter" name="hqlFilter" type="text" title="$escapetool.xml($msg.get('search.admin.lucene.indexing.action.indexcustom.hqlfilter.title'))" #if($request.hqlFilter)value="${escapetool.html($request.hqlFilter)}"#end /&gt;
+    &lt;label for="indexcustom_hqlFilter"&gt;$msg.get('search.admin.lucene.indexing.action.indexcustom.hqlfilter')&lt;/label&gt; &lt;input id="indexcustom_hqlFilter" name="hqlFilter" type="text" title="$escapetool.xml($msg.get('search.admin.lucene.indexing.action.indexcustom.hqlfilter.title'))" #if($request.hqlFilter)value="${escapetool.xml($request.hqlFilter)}"#end /&gt;
 &lt;/p&gt;
   #end
 

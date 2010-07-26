@@ -1333,7 +1333,7 @@ XWiki.Document = Class.create({
 });
 
 /* Initialize the document URL factory, and create XWiki.currentDocument. */
-document.observe('dom:loaded', function() {
+document.observe('xwiki:dom:loading', function() {
   XWiki.Document.currentWiki = ($$("meta[name=wiki]").length > 0) ? $$("meta[name=wiki]")[0].content : "xwiki";
   XWiki.Document.currentSpace = ($$("meta[name=space]").length > 0) ? $$("meta[name=space]")[0].content : "Main";
   XWiki.Document.currentPage = ($$("meta[name=page]").length > 0) ? $$("meta[name=page]")[0].content : "WebHome";

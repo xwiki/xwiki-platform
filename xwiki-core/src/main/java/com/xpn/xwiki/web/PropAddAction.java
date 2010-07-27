@@ -20,6 +20,8 @@
  */
 package com.xpn.xwiki.web;
 
+import javax.servlet.http.HttpServletResponse;
+
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
@@ -44,6 +46,8 @@ public class PropAddAction extends XWikiAction
 
         if (!Util.isValidXMLElementName(propName)) {
             context.put("message", "propertynamenotcorrect");
+            response.setStatus(HttpServletResponse.SC_BAD_REQUEST, context.getMessageTool().get(
+                "propertynamenotcorrect"));
             return true;
         }
 

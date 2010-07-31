@@ -20,6 +20,10 @@
 #end
 #if($isInServletMode) ## Visible only in a page
   <div id="hierarchy">
-    #computeHierarchy($doc "<a href='${doc.getURL('view')}'>$escapetool.xml($tdoc.getRenderedTitle('plain/1.0'))</a>" 0)
+    #if ($context.action == 'edit')
+      #computeHierarchy($doc "<a href='${doc.getURL('view')}'>$escapetool.xml($tdoc.getRenderedTitle('plain/1.0'))</a>" 0)
+    #else
+      #computeHierarchy($doc "<span class='current'>$escapetool.xml($tdoc.getRenderedTitle('plain/1.0'))</span>" 0)
+    #end
   </div>
 #end

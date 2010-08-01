@@ -136,13 +136,13 @@ public class XWikiHibernateAttachmentStore extends XWikiHibernateBaseStore imple
     public void saveAttachmentsContent(List<XWikiAttachment> attachments, XWikiDocument doc, boolean bParentUpdate,
         XWikiContext context, boolean bTransaction) throws XWikiException
     {
+        if (attachments == null) {
+            return;
+        }
         try {
             if (bTransaction) {
                 checkHibernate(context);
                 bTransaction = beginTransaction(context);
-            }
-            if (attachments == null) {
-                return;
             }
             Iterator<XWikiAttachment> it = attachments.iterator();
             while (it.hasNext()) {

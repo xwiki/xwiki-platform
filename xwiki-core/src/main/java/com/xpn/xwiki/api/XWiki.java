@@ -163,14 +163,19 @@ public class XWiki extends Api
      */
     public Document getDocument(DocumentReference reference) throws XWikiException
     {
-        XWikiDocument doc = this.xwiki.getDocument(reference, getXWikiContext());
-        if (this.xwiki.getRightService().hasAccessLevel("view", getXWikiContext().getUser(), doc.getFullName(),
-            getXWikiContext()) == false) {
-            return null;
-        }
+        try {
+            XWikiDocument doc = this.xwiki.getDocument(reference, getXWikiContext());
+            if (this.xwiki.getRightService().hasAccessLevel("view", getXWikiContext().getUser(), doc.getFullName(),
+                getXWikiContext()) == false) {
+                return null;
+            }
 
-        Document newdoc = doc.newDocument(getXWikiContext());
-        return newdoc;
+            Document newdoc = doc.newDocument(getXWikiContext());
+            return newdoc;
+        } catch (Exception ex) {
+            LOG.warn("Failed to access document " + reference + ": " + ex.getMessage());
+            return new Document(new XWikiDocument(reference), getXWikiContext());
+        }
     }
 
     /**

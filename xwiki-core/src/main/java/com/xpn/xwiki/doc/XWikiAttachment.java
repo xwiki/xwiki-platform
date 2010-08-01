@@ -115,11 +115,12 @@ public class XWikiAttachment implements Cloneable
      * 
      * @see java.lang.Object#clone()
      */
+    @Override
     public Object clone()
     {
         XWikiAttachment attachment = null;
         try {
-            attachment = (XWikiAttachment) getClass().newInstance();
+            attachment = getClass().newInstance();
         } catch (Exception e) {
             // This should not happen
             LOG.error("exception while attach.clone", e);
@@ -283,10 +284,11 @@ public class XWikiAttachment implements Cloneable
 
     public boolean isContentDirty()
     {
-        if (this.attachment_content == null)
+        if (this.attachment_content == null) {
             return false;
-        else
+        } else {
             return this.attachment_content.isContentDirty();
+        }
     }
 
     public void incrementVersion()
@@ -591,7 +593,7 @@ public class XWikiAttachment implements Cloneable
         Version v = new Version("1.1");
         while (true) {
             list.add(v);
-            if (v.toString().equals(version.toString())) {
+            if (v.toString().equals(this.version.toString())) {
                 break;
             }
             v.next();
@@ -643,7 +645,7 @@ public class XWikiAttachment implements Cloneable
             } catch (Exception ex) {
                 LOG.warn(String.format("Failed to load content for attachment [%s@%s]. "
                     + "This attachment is broken, please consider re-uploading it. " + "Internal error: %s",
-                    getFilename(), (doc != null) ? doc.getFullName() : "<unknown>", ex.getMessage()));
+                    getFilename(), (this.doc != null) ? this.doc.getFullName() : "<unknown>", ex.getMessage()));
             }
         }
     }
@@ -657,7 +659,7 @@ public class XWikiAttachment implements Cloneable
             } catch (Exception ex) {
                 LOG.warn(String.format("Failed to load archive for attachment [%s@%s]. "
                     + "This attachment is broken, please consider re-uploading it. " + "Internal error: %s",
-                    getFilename(), (doc != null) ? doc.getFullName() : "<unknown>", ex.getMessage()));
+                    getFilename(), (this.doc != null) ? this.doc.getFullName() : "<unknown>", ex.getMessage()));
             }
         }
 

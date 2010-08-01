@@ -119,8 +119,8 @@ public class XMLWriter extends org.dom4j.io.XMLWriter
      */
     public void writeDocumentEnd(Document doc) throws IOException
     {
-        if (!parent.isEmpty()) {
-            writeClose(parent.firstElement());
+        if (!this.parent.isEmpty()) {
+            writeClose(this.parent.firstElement());
         }
         writePrintln();
         flush();
@@ -142,7 +142,7 @@ public class XMLWriter extends org.dom4j.io.XMLWriter
     public void write(Element element, Reader rd) throws IOException
     {
         writeOpen(element);
-        IOUtils.copy(rd, writer);
+        IOUtils.copy(rd, this.writer);
         writeClose(element);
     }
 
@@ -163,7 +163,7 @@ public class XMLWriter extends org.dom4j.io.XMLWriter
     {
         writeOpen(element);
         flush();
-        IOUtils.copy(is, out);
+        IOUtils.copy(is, this.out);
         writeClose(element);
     }
 
@@ -201,7 +201,7 @@ public class XMLWriter extends org.dom4j.io.XMLWriter
     public void writeOpen(Element element) throws IOException
     {
         super.writeOpen(element);
-        parent.push(element);
+        this.parent.push(element);
     }
 
     /**
@@ -218,9 +218,9 @@ public class XMLWriter extends org.dom4j.io.XMLWriter
     @Override
     public void writeClose(Element element) throws IOException
     {
-        while (parent.peek() != element) {
-            super.writeClose(parent.pop());
+        while (this.parent.peek() != element) {
+            super.writeClose(this.parent.pop());
         }
-        super.writeClose(parent.pop());
+        super.writeClose(this.parent.pop());
     }
 }

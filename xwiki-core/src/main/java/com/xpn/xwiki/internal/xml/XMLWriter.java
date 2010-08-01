@@ -181,7 +181,7 @@ public class XMLWriter extends org.dom4j.io.XMLWriter
     {
         writeOpen(element);
         flush();
-        Base64OutputStream base64 = new Base64OutputStream(new UnclosableOutputStream(out), true, 0, null);
+        Base64OutputStream base64 = new Base64OutputStream(new UnclosableOutputStream(this.out));
         IOUtils.copy(is, base64);
         base64.close();
         writeClose(element);

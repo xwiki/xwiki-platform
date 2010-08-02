@@ -18,7 +18,6 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  *
  */
-
 package com.xpn.xwiki.web;
 
 import java.net.MalformedURLException;
@@ -57,7 +56,13 @@ public class XWikiServletURLFactory extends XWikiDefaultURLFactory
         this.contextPath = contextPath;
     }
 
-    // Used by tests
+    /**
+     * Creates a new URL factory that uses the server URL and context path specified by the given XWiki context. This
+     * constructor should be used only in tests. Make sure {@link XWikiContext#setURL(URL)} is called before this
+     * constructor.
+     * 
+     * @param context
+     */
     public XWikiServletURLFactory(XWikiContext context)
     {
         init(context);
@@ -70,23 +75,11 @@ public class XWikiServletURLFactory extends XWikiDefaultURLFactory
      */
     public void init(XWikiContext context)
     {
-        URL url = context.getURL();
-        if (url == null) {
-            // Cannot initialize, probably running tests...
-            return;
-        }
-
-        this.contextPath = context.getWiki().getWebAppPath(context);
-
+        contextPath = context.getWiki().getWebAppPath(context);
         try {
-            // if we force the protocol in xwiki.cfg then we need to change what we received from the context
-            String protocol = context.getWiki().Param("xwiki.url.protocol");
-            if (protocol != null && !protocol.equalsIgnoreCase(url.getProtocol())) {
-                url = new URL(protocol + "://" + url.getHost() + (url.getPort() != 1 ? ":" + url.getPort() : ""));
-            }
-            this.serverURL = new URL(url, "/");
+            serverURL = new URL(getProtocol(context) + "://" + getHost(context));
         } catch (MalformedURLException e) {
-            // This can't happen
+            // This can't happen.
         }
     }
 
@@ -97,7 +90,47 @@ public class XWikiServletURLFactory extends XWikiDefaultURLFactory
      */
     public String getContextPath()
     {
-        return this.contextPath;
+        return contextPath;
+    }
+
+    /**
+     * @param context the XWiki context used to access the request object
+     * @return the value of the {@code xwiki.url.protocol} configuration parameter, if defined, otherwise the protocol
+     *         used to make the request to the proxy server if we are behind one, otherwise the protocol of the URL used
+     *         to make the current request
+     */
+    private String getProtocol(XWikiContext context)
+    {
+        // Tests usually set the context URL but don't set the request object.
+        String protocol = context.getURL().getProtocol();
+        if (context.getRequest() != null) {
+            protocol = context.getRequest().getScheme();
+            if ("http".equalsIgnoreCase(protocol) && context.getRequest().isSecure()) {
+                // This can happen in reverse proxy mode, if the proxy server receives HTTPS requests and forwards them
+                // as HTTP to the internal web server running XWiki.
+                protocol = "https";
+            }
+        }
+        // Detected protocol can be overwritten by configuration.
+        return context.getWiki().Param("xwiki.url.protocol", protocol);
+    }
+
+    /**
+     * @param context the XWiki context used to access the request object
+     * @return the proxy host, if we are behind one, otherwise the host of the URL used to make the current request
+     */
+    private String getHost(XWikiContext context)
+    {
+        // Tests usually set the context URL but don't set the request object.
+        if (context.getRequest() != null) {
+            // Check reverse-proxy mode (e.g. Apache's mod_proxy_http).
+            String proxyHost = StringUtils.substringBefore(context.getRequest().getHeader("x-forwarded-host"), ",");
+            if (!StringUtils.isEmpty(proxyHost)) {
+                return proxyHost;
+            }
+        }
+        URL url = context.getURL();
+        return url.getHost() + (url.getPort() < 0 ? "" : (":" + url.getPort()));
     }
 
     /**
@@ -112,24 +145,7 @@ public class XWikiServletURLFactory extends XWikiDefaultURLFactory
 
     public URL getServerURL(String xwikidb, XWikiContext context) throws MalformedURLException
     {
-        URL serverURL = this.serverURL;
-        if (context.getRequest() != null) { // necessary to the tests
-            final String host = context.getRequest().getHeader("x-forwarded-host"); // apache
-            // modproxy host
-            if (host != null) {
-                int comaind = host.indexOf(',');
-                final String host1 = comaind > 0 ? host.substring(0, comaind) : host;
-                if (!host1.equals("")) {
-                    String protocol = context.getWiki().Param("xwiki.url.protocol", context.getRequest().getScheme());
-                    serverURL = new URL(protocol + "://" + host1);
-                }
-            }
-        }
-        if (xwikidb == null) {
-            return serverURL;
-        }
-
-        if (xwikidb.equals(context.getOriginalDatabase())) {
+        if (xwikidb == null || xwikidb.equals(context.getOriginalDatabase())) {
             return serverURL;
         }
 
@@ -141,11 +157,7 @@ public class XWikiServletURLFactory extends XWikiDefaultURLFactory
         }
 
         URL url = context.getWiki().getServerURL(xwikidb, context);
-        if (url == null) {
-            return serverURL;
-        } else {
-            return url;
-        }
+        return url == null ? serverURL : url;
     }
 
     /**
@@ -455,7 +467,7 @@ public class XWikiServletURLFactory extends XWikiDefaultURLFactory
             }
 
             String surl = url.toString();
-            if (!surl.startsWith(this.serverURL.toString())) {
+            if (!surl.startsWith(getServerURL(context).toString())) {
                 // External URL: leave it as is.
                 return surl;
             } else {

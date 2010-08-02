@@ -48,10 +48,15 @@ public class ExportURLFactoryTest extends AbstractBridgedXWikiComponentTestCase
         super.setUp();
 
         this.mockXWiki = mock(XWiki.class);
+        this.mockXWiki.stubs().method("getWebAppPath").will(returnValue("/xwiki"));
+        this.mockXWiki.stubs().method("Param").will(returnValue(null));
         getContext().setWiki((XWiki) this.mockXWiki.proxy());
+        getContext().setURL(new URL("http://www.xwiki.org/"));
 
         // The URLFactory uses a request to determine the values for the context and servlet path.
         Mock mockXWikiResquest = mock(XWikiRequest.class, new Class[] {}, new Object[] {});
+        mockXWikiResquest.stubs().method("getScheme").will(returnValue("http"));
+        mockXWikiResquest.stubs().method("isSecure").will(returnValue(false));
         mockXWikiResquest.stubs().method("getServletPath").will(returnValue("/bin"));
         mockXWikiResquest.stubs().method("getContextPath").will(returnValue("/xwiki"));
         mockXWikiResquest.stubs().method("getHeader").will(returnValue(null));

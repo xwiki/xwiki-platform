@@ -516,12 +516,23 @@ xwiki.plugins=$xwikiCfgPlugins
 #-# Note: Statistics are disabled by default for improved performances/space.
 xwiki.stats.default=0
 
+#-# Deprecated since 2.5M1. Use "xwiki.stats.request.excludedUsersAndGroups" instead.
+# xwiki.stats.excludedUsersAndGroups=XWiki.Admin,XWiki.XWikiGuest
+
+#-# [Since 2.5M1]
 #-# List of users and groups to filter from the visit search request result. Entities are comma separated and can be relative.
 #-# "XWiki.Admin" means "XWiki.Admin" user on the wiki where the search is done and "xwiki:XWiki.Admin" only filter admin user
 #-# from main wiki.
 #-# For example, the following filter default admin user and unregistered user from the most active contributor graph
 #-# on Stats.WebHome page:
-# xwiki.stats.excludedUsersAndGroups=XWiki.Admin,XWiki.XWikiGuest
+# xwiki.stats.request.excludedUsersAndGroups
+
+#-# [Since 2.5M1]
+#-# List of users and groups to skip when storing statistics to the database. Entities are comma separated and can be relative.
+#-# "XWiki.Admin" means "XWiki.Admin" user on the wiki where the search is done and "xwiki:XWiki.Admin" only filter admin user
+#-# from main wiki.
+#-# For example, the following filter avoid storing statistics for the user "HiddenUser":
+# xwiki.stats.excludedUsersAndGroups=XWiki.HiddenUser
 
 #-# It is also possible to choose a different stats service to record statistics separately from XWiki.
 # xwiki.stats.class=com.xpn.xwiki.stats.impl.XWikiStatsServiceImpl

@@ -80,7 +80,7 @@ public class SearchResult
         this.id = doc.get(IndexFields.DOCUMENT_ID);
         this.title = doc.get(IndexFields.DOCUMENT_TITLE);
         this.name = doc.get(IndexFields.DOCUMENT_NAME);
-        this.space = doc.get(IndexFields.DOCUMENT_WEB);
+        this.space = doc.get(IndexFields.DOCUMENT_SPACE);
         this.wiki = doc.get(IndexFields.DOCUMENT_WIKI);
         this.fullName = doc.get(IndexFields.DOCUMENT_FULLNAME);
         this.type = doc.get(IndexFields.DOCUMENT_TYPE);
@@ -96,9 +96,11 @@ public class SearchResult
                 new StringBuffer(this.wiki).append(":").append(this.space).append(".").append(this.name).toString();
             try {
                 document = xwiki.getDocument(fullDocName);
-                this.url = document.getAttachmentURL(this.filename, "download");
+                if (document != null) {
+                    this.url = document.getAttachmentURL(this.filename, "download");
+                }
             } catch (XWikiException e) {
-                LOG.error("error retrieving url for attachment " + this.filename + " of document " + fullDocName, e);
+                LOG.error("error retrieving url for attachment [" + this.filename + "] of document [" + fullDocName + "]", e);
             }
         } else {
             this.objects = doc.getValues("object");

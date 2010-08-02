@@ -714,6 +714,8 @@ public final class StatsUtil
     /**
      * The list of users.
      * 
+     * @param pref field name in XWikiPreference
+     * @param cfg field name in xwiki.cfg file
      * @param context the XWiki context
      * @return the list of users references
      * @throws XWikiException error when trying to resolve users

@@ -30,6 +30,7 @@ import java.util.Map;
 import org.apache.commons.collections.buffer.CircularFifoBuffer;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.observation.EventListener;
 import org.xwiki.observation.ObservationManager;
 import org.xwiki.observation.event.ActionExecutionEvent;
@@ -79,6 +80,12 @@ public class XWikiStatsServiceImpl implements XWikiStatsService, EventListener
             add(new ActionExecutionEvent(DownloadAction.ACTION_NAME));
         }
     };
+
+    /**
+     * Used to resolve reference based on context.
+     */
+    private DocumentReferenceResolver<String> currentDocumentReferenceResolver = Utils.getComponent(
+        DocumentReferenceResolver.class, "current");
 
     /**
      * The statistics storing thread.
@@ -188,8 +195,14 @@ public class XWikiStatsServiceImpl implements XWikiStatsService, EventListener
             }
         }
 
-        if (StatsUtil.isWikiStatsEnabled(context)) {
-            this.statsRegister.addStats(document, action, context);
+        try {
+            if (StatsUtil.isWikiStatsEnabled(context)
+                && !StatsUtil.getStorageFilteredUsers(context).contains(
+                    this.currentDocumentReferenceResolver.resolve(context.getUser()))) {
+                this.statsRegister.addStats(document, action, context);
+            }
+        } catch (Exception e) {
+            LOG.error("Faild to get filter users list", e);
         }
     }
 

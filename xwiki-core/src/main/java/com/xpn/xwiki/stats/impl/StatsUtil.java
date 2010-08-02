@@ -70,7 +70,7 @@ public final class StatsUtil
      * Default separator for a list in escaped form.
      */
     private static final String ESCAPED_LIST_SEPARATOR = "\\,";
-    
+
     /**
      * The name of the property in XWiki configuration file containing the list of cookie domains.
      */
@@ -80,7 +80,7 @@ public final class StatsUtil
      * Separator for the property in XWiki configuration file containing the list of cookie domains.
      */
     private static final char CFGPROP_COOKIEDOMAINS_SEP = ',';
-    
+
     /**
      * The name of the property in XWiki configuration file indicating if statistics are enabled.
      */
@@ -91,11 +91,22 @@ public final class StatsUtil
      */
     private static final String CFGPROP_STATS_DEFAULT = "xwiki.stats.default";
 
+    @Deprecated
+    private static final String DEPRECATED_CFGPROP_STATS_EXCLUDEDUSERSANDGROUPS = "xwiki.stats.excludedUsersAndGroups";
+
     /**
      * The name of the property in XWiki configuration file containing the list of users and group to filter in
-     * statistics requests.
+     * statistics view requests.
      */
-    private static final String CFGPROP_STATS_EXCLUDEDUSERSANDGROUPS = "xwiki.stats.excludedUsersAndGroups";
+    private static final String CFGPROP_STATS_EXCLUDEDUSERSANDGROUPS_REQUEST =
+        "xwiki.stats.request.excludedUsersAndGroups";
+
+    /**
+     * The name of the property in XWiki configuration file containing the list of users and group to filter in
+     * statistics storage.
+     */
+    private static final String CFGPROP_STATS_EXCLUDEDUSERSANDGROUPS_STORAGE =
+        "xwiki.stats.storage.excludedUsersAndGroups";
 
     /**
      * The prefix name of the session property containing recent statistics actions.
@@ -117,11 +128,20 @@ public final class StatsUtil
      */
     private static final String PREFPROP_STATISTICS = "statistics";
 
+    @Deprecated
+    private static final String DEPRECATED_PREFPROP_EXCLUDEDUSERSANDGROUPS = "statistics_excludedUsersAndGroups";
+
     /**
-     * The name of the XWiki preferences property containing the list of users and group to filter in statistics
+     * The name of the XWiki preferences property containing the list of users and group to filter in statistics view
      * requests.
      */
-    private static final String PREFPROP_EXCLUDEDUSERSANDGROUPS = "statistics_excludedUsersAndGroups";
+    private static final String PREFPROP_EXCLUDEDUSERSANDGROUPS_REQUEST = "statistics_request_excludedUsersAndGroups";
+
+    /**
+     * The name of the XWiki preferences property containing the list of users and group to filter in statistics
+     * storage.
+     */
+    private static final String PREFPROP_EXCLUDEDUSERSANDGROUPS_STORAGE = "statistics_storage_excludedUsersAndGroups";
 
     /**
      * The name of the request property containing the referer.
@@ -537,23 +557,22 @@ public final class StatsUtil
         final String sdate = "date";
         if (qm.hasLanguage(Query.XPATH)) {
             try {
-                solist = qm.createQuery("//element(*, xwiki:object)[@:{fieldName}=:{fieldValue}"
-                    + " and @endDate>:{date}]  order by @endDate descending", Query.XPATH)
-                    .bindValue("fieldName", fieldName)
-                    .bindValue(sfieldValue, fieldValue)
-                    .bindValue(sdate, currentDate)
-                    .execute();
+                solist =
+                    qm.createQuery(
+                        "//element(*, xwiki:object)[@:{fieldName}=:{fieldValue}"
+                            + " and @endDate>:{date}]  order by @endDate descending", Query.XPATH)
+                        .bindValue("fieldName", fieldName).bindValue(sfieldValue, fieldValue)
+                        .bindValue(sdate, currentDate).execute();
             } catch (Exception e) {
                 LOG.error("Failed to search visit object in the jcr store from cookie name", e);
             }
         } else if (qm.hasLanguage(Query.HQL)) {
             try {
-                solist = qm.createQuery("from VisitStats as obj "
-                    + "where obj." + fieldName + "=:fieldValue and obj.endDate > :date"
-                    + " order by obj.endDate desc", Query.HQL)
-                    .bindValue(sfieldValue, fieldValue)
-                    .bindValue(sdate, currentDate)
-                    .execute();
+                solist =
+                    qm.createQuery(
+                        "from VisitStats as obj " + "where obj." + fieldName + "=:fieldValue and obj.endDate > :date"
+                            + " order by obj.endDate desc", Query.HQL).bindValue(sfieldValue, fieldValue)
+                        .bindValue(sdate, currentDate).execute();
             } catch (Exception e) {
                 LOG.error("Failed to search visit object in the database from " + fieldName, e);
             }
@@ -687,20 +706,21 @@ public final class StatsUtil
     }
 
     /**
-     * The list of users to filter in request.
+     * The list of users.
      * 
      * @param context the XWiki context
      * @return the list of users references
      * @throws XWikiException error when trying to resolve users
      */
-    public static Collection<DocumentReference> getFilteredUsers(XWikiContext context) throws XWikiException
+    private static Collection<DocumentReference> getFilteredUsers(String pref, String cfg, XWikiContext context)
+        throws XWikiException
     {
         List<String> userList;
 
-        String users = context.getWiki().getXWikiPreference(PREFPROP_EXCLUDEDUSERSANDGROUPS, "", context);
+        String users = context.getWiki().getXWikiPreference(pref, "", context);
 
         if (StringUtils.isEmpty(users)) {
-            users = context.getWiki().Param(CFGPROP_STATS_EXCLUDEDUSERSANDGROUPS);
+            users = context.getWiki().Param(cfg);
         }
 
         if (!StringUtils.isBlank(users)) {
@@ -731,5 +751,37 @@ public final class StatsUtil
         }
 
         return RightsManager.getInstance().resolveUsers(userList, context);
+    }
+
+    /**
+     * The list of users to filter when storing statistics.
+     * 
+     * @param context the XWiki context
+     * @return the list of users references
+     * @throws XWikiException error when trying to resolve users
+     */
+    public static Collection<DocumentReference> getStorageFilteredUsers(XWikiContext context) throws XWikiException
+    {
+        // TODO: cache
+        return getFilteredUsers(PREFPROP_EXCLUDEDUSERSANDGROUPS_STORAGE, CFGPROP_STATS_EXCLUDEDUSERSANDGROUPS_STORAGE,
+            context);
+    }
+
+    /**
+     * The list of users to filter in view request.
+     * 
+     * @param context the XWiki context
+     * @return the list of users references
+     * @throws XWikiException error when trying to resolve users
+     */
+    public static Collection<DocumentReference> getRequestFilteredUsers(XWikiContext context) throws XWikiException
+    {
+        // TODO: cache
+        Collection<DocumentReference> users =
+            getFilteredUsers(PREFPROP_EXCLUDEDUSERSANDGROUPS_REQUEST, CFGPROP_STATS_EXCLUDEDUSERSANDGROUPS_REQUEST,
+                context);
+
+        return users != null ? users : getFilteredUsers(DEPRECATED_PREFPROP_EXCLUDEDUSERSANDGROUPS,
+            DEPRECATED_CFGPROP_STATS_EXCLUDEDUSERSANDGROUPS, context);
     }
 }

@@ -407,7 +407,7 @@ public class XWikiStatsReader
 
         StringBuffer userListWhere = new StringBuffer();
         try {
-            for (DocumentReference user : StatsUtil.getFilteredUsers(context)) {
+            for (DocumentReference user : StatsUtil.getRequestFilteredUsers(context)) {
                 if (userListWhere.length() > 0) {
                     userListWhere.append(", ");
                 }

@@ -31,6 +31,7 @@ import org.xwiki.gwt.wysiwyg.client.converter.HTMLConverter;
 import org.xwiki.gwt.wysiwyg.client.converter.HTMLConverterAsync;
 
 import com.google.gwt.core.client.GWT;
+import com.google.gwt.core.client.JsArrayString;
 import com.google.gwt.event.logical.shared.CloseEvent;
 import com.google.gwt.event.logical.shared.CloseHandler;
 import com.google.gwt.event.shared.HandlerRegistration;
@@ -211,6 +212,27 @@ public class WysiwygEditorApi
     }
 
     /**
+     * @param name the name of a configuration parameter
+     * @return the value of the specified editor configuration parameter
+     */
+    public String getParameter(String name)
+    {
+        return editor.getConfig().getParameter(name);
+    }
+
+    /**
+     * @return the list of editor configuration parameters
+     */
+    public JsArrayString getParameterNames()
+    {
+        JsArrayString parameterNames = JavaScriptObject.createArray().cast();
+        for (String parameterName : editor.getConfig().getParameterNames()) {
+            parameterNames.push(parameterName);
+        }
+        return parameterNames;
+    }
+
+    /**
      * Publishes the JavaScript API that can be used to create and control {@link WysiwygEditor}s.
      */
     public static native void publish()
@@ -245,6 +267,12 @@ public class WysiwygEditorApi
                     registration = null;
                 }
             };
+        }
+        $wnd.WysiwygEditor.prototype.getParameter = function(name) {
+            return this.instance.@org.xwiki.gwt.wysiwyg.client.WysiwygEditorApi::getParameter(Ljava/lang/String;)(name);
+        }
+        $wnd.WysiwygEditor.prototype.getParameterNames = function() {
+            return this.instance.@org.xwiki.gwt.wysiwyg.client.WysiwygEditorApi::getParameterNames()();
         }
     }-*/;
 }

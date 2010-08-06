@@ -241,11 +241,7 @@
       <name>Public online Restlet repository</name>
       <url>http://maven.restlet.org</url>
     </repository>
-    <repository>
-      <id>maven2-repository.dev.java.net.2</id>
-      <name>Java.net Repository for Maven</name>
-      <url>http://download.java.net/maven/2</url>
-    </repository>
+
     <!-- TODO: remove maven1 repository as soon as jaxb 2.1.10 is available on maven2 repositories -->
     <repository>
       <id>maven2-repository.dev.java.net.1</id>

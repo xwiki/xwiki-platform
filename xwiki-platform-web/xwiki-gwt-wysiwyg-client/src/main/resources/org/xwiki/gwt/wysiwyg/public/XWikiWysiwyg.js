@@ -21,6 +21,11 @@ var Wysiwyg =
     onModuleLoadQueue: [],
 
     /**
+     * All the WYSIWYG editor instances, mapped to their hookId.
+     */
+    instances: {},
+
+    /**
      * Loads the WYSIWYG code on demand.
      */
     load : function()
@@ -198,6 +203,13 @@ var Wysiwyg =
 
         // Prevent further calls to this method.
         this.hookGwtOnLoad = function(){};
+    },
+
+    /**
+     * @return the WYSIWYG editor instance associated with the given hookId
+     */
+    getInstance: function(hookId) {
+        return this.instances[hookId];
     }
 };
 
@@ -216,6 +228,8 @@ Wysiwyg.onModuleLoad(function() {
             }
             // If the editor was successfully created then fire a custom event.
             document.fire('xwiki:wysiwyg:created', {'instance': this});
+            // Update the list of WYSIWYG editor instances.
+            Wysiwyg.instances[this.getParameter('hookId')] = this;
         }
     }
     WysiwygEditorAspect.prototype = new WysiwygEditor;

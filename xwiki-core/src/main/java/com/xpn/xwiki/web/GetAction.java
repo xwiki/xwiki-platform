@@ -63,6 +63,10 @@ public class GetAction extends XWikiAction
     {
         handleRevision(context);
 
+        // In case a search engine spider should end up calling the /get/ action, point them to the view action with
+        // a Content-Location header. http://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html#sec14.14
+        context.getResponse().setHeader("Content-Location", context.getDoc().getURL("view", context));
+
         return GET_ACTION;
     }
 }

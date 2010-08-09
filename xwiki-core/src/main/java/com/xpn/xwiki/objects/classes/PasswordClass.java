@@ -219,6 +219,7 @@ public class PasswordClass extends StringClass
     public String getPasswordHash(String password, String algorithmName)
     {
         try {
+            log.debug("Hashing password");
             MessageDigest hashAlgorithm = MessageDigest.getInstance(algorithmName);
             hashAlgorithm.update(password.getBytes());
             byte[] digest = hashAlgorithm.digest();

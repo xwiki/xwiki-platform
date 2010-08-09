@@ -168,6 +168,7 @@
     <module>xwiki-captcha</module>
     <module>xwiki-annotations</module>
     <module>xwiki-management</module>
+    <module>xwiki-crypto</module>
   </modules>
   <profiles>
     <profile>

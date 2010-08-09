@@ -635,13 +635,43 @@ public class DefaultDocumentAccessBridge implements DocumentAccessBridge
      */
     public String getDocumentURL(DocumentReference documentReference, String action, String queryString, String anchor)
     {
-        XWikiContext xcontext = getContext();
+        return getDocumentURL(documentReference, action, queryString, anchor, false);
+    }
 
-        // If the document name is empty then use the current document
+    /**
+     * {@inheritDoc}
+     * 
+     * @see org.xwiki.bridge.DocumentAccessBridge#getDocumentURL(org.xwiki.model.reference.DocumentReference,
+     *      java.lang.String, java.lang.String, java.lang.String, boolean)
+     */
+    public String getDocumentURL(final DocumentReference documentReference,
+                                 final String action,
+                                 final String queryString,
+                                 final String anchor,
+                                 final boolean isFullURL)
+    {
         if (documentReference == null) {
-            return xcontext.getWiki().getURL(xcontext.getDoc().getFullName(), action, queryString, anchor, xcontext);
+            return this.getDocumentURL(this.getContext().getDoc().getDocumentReference(),
+                                       action,
+                                       queryString,
+                                       anchor,
+                                       isFullURL);
+        }
+        if (isFullURL) {
+            return this.getContext().getURLFactory().createExternalURL(
+                       documentReference.getLastSpaceReference().getName(),
+                       documentReference.getName(),
+                       action,
+                       queryString,
+                       anchor,
+                       documentReference.getWikiReference().getName(),
+                       this.getContext()).toString();
         } else {
-            return xcontext.getWiki().getURL(documentReference, action, queryString, anchor, xcontext);
+            return this.getContext().getWiki().getURL(documentReference,
+                                                      action,
+                                                      queryString,
+                                                      anchor,
+                                                      this.getContext());
         }
     }
 

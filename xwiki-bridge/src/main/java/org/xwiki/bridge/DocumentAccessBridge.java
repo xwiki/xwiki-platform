@@ -427,6 +427,27 @@ public interface DocumentAccessBridge
     String getDocumentURL(DocumentReference documentReference, String action, String queryString, String anchor);
 
     /**
+     * Retrieves the relitive (without the hostname) or absolute (with the hostname) URL that can be used to access 
+     * a document, using a specific action.
+     * 
+     * @param documentReference the reference of the document to access
+     * @param action The "mode" in which the document is accessed, for example <code>view</code> to view the document,
+     *            <code>edit</code> to open the document for modifications, etc.
+     * @param queryString An optional query string to append to the URL, use <code>null</code> or an empty string to
+     *            skip.
+     * @param anchor An optional URL fragment to append to the URL, use <code>null</code> or an empty string to skip.
+     * @param isFullURL if true then the URL will be an absolute URL which contains the host name, and protocol.
+     * @return A <code>String</code> representation of the URL, starting with the path segment of the URL (without
+     *         protocol, host and port), for example <code>/xwiki/bin/save/Main/WebHome?content=abc</code>.
+     * @since 2.2.1
+     */
+    String getDocumentURL(final DocumentReference documentReference,
+                          final String action,
+                          final String queryString,
+                          final String anchor,
+                          final boolean isFullURL);
+
+    /**
      * Retrieves the internal (without the hostname) URL that can be used to access a document, using a specific action.
      * 
      * @param documentReference the reference of the document to access

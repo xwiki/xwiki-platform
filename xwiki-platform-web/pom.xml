@@ -53,7 +53,7 @@
     <platform.core.version>${pom.version}</platform.core.version>
     <platform.skin.albatross.version>1.28-SNAPSHOT</platform.skin.albatross.version>
     <platform.skin.toucan.version>1.35-SNAPSHOT</platform.skin.toucan.version>
-    <platform.skin.colibri.version>1.19-SNAPSHOT</platform.skin.colibri.version>
+    <platform.skin.colibri.version>1.20-SNAPSHOT</platform.skin.colibri.version>
   </properties>
   <profiles>
     <profile>

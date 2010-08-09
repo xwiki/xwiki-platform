@@ -439,7 +439,7 @@ public interface DocumentAccessBridge
      * @param isFullURL if true then the URL will be an absolute URL which contains the host name, and protocol.
      * @return A <code>String</code> representation of the URL, starting with the path segment of the URL (without
      *         protocol, host and port), for example <code>/xwiki/bin/save/Main/WebHome?content=abc</code>.
-     * @since 2.2.1
+     * @since 2.5M1
      */
     String getDocumentURL(final DocumentReference documentReference,
                           final String action,

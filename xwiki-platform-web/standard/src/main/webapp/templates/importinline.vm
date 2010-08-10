@@ -171,6 +171,7 @@
                        #end
                       </ul>
                       </div>
+					  </div>
                     </li>
                     #end
                 </ul>
@@ -199,6 +200,7 @@
                   <input class="button" type="submit" value="$msg.get('core.importer.import')" />
                 </span>
               </div>
+			  </div>
             </form>
           </div>
           #end ## package is valid

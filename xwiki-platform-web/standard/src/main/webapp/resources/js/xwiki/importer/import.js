@@ -260,7 +260,7 @@
 	                                       .insert(translations["importAsBackup"])  );	
             }
             
-            var submit = new Element("div").update(new Element("span", {'class':'buttonwrapper'}));
+            var submit = new Element("span", {'class':'buttonwrapper'});
             var button = new Element("input", {'type':'submit', 'value': translations["import"], 'class':'button'});
             button.observe("click", this.onPackageSubmit.bind(this));
             submit.insert(button);

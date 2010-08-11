@@ -1,6 +1,6 @@
 ## ---------------------------------------------------------------------------------------------------------
-## Since this template can be used for creating a Page or a Space, check the passed "tocreate" parameter 
-## which can be either "page" or "space". If no "tocreate" parameter is passed then we default to creating a Page. 
+## Since this template can be used for creating a Page or a Space, check the passed "tocreate" parameter
+## which can be either "page" or "space". If no "tocreate" parameter is passed then we default to creating a Page.
 ## ---------------------------------------------------------------------------------------------------------
 #if("$!request.getParameter('tocreate')" == 'space')
   #set($tocreate = 'space')
@@ -14,26 +14,26 @@
 ## we're creating a new page and default it to the current document's space home page if we're creating a
 ## new space.
 ## ---------------------------------------------------------------------------------------------------------
-#set($parent = "$!request.getParameter('parent')")
-#if($parent == '' && $tocreate == 'page')
-  #set ($parentReference = $services.model.createDocumentReference($doc.documentReference.wikiReference.name, 
-    $doc.documentReference.lastSpaceReference.name, ""))
-  #set($parent = $escapetool.url($services.model.serialize($parentReference, "local")))
+#set ($parent = "$!request.getParameter('parent')")
+#if ($parent == '' && $tocreate == 'page')
+  #set ($parentReference = $services.model.createDocumentReference($doc.documentReference.wikiReference.name,
+    $doc.documentReference.lastSpaceReference.name, ''))
+  #set ($parent = $services.model.serialize($parentReference, 'local'))
 #end
 #set($template = "$!request.getParameter('template')")
-#set($redirectparams = "parent=${parent}&template=${template}")
+#set($redirectparams = "parent=$!{escapetool.url($parent)}&template=$!{escapetool.url($template)}")
 ## ---------------------------------------------------------------------------------------------------------
 ## Set the space, page, title variables from the current doc if its new, from the passed parameters if any
 ## ---------------------------------------------------------------------------------------------------------
-#if($doc.isNew())
-  #set($space = $doc.getSpace())
-  #set($page = $doc.getName())
+#if ($doc.isNew())
+  #set ($space = $doc.getSpace())
+  #set ($page = $doc.getName())
 #else
-  #set($space = "$!request.getParameter('space')")
-  #set($page = "$!request.getParameter('page')")
+  #set ($space = "$!request.getParameter('space')")
+  #set ($page = "$!request.getParameter('page')")
 #end
-#set($title = "$!request.getParameter('title')")
-#if($title == '')
+#set ($title = "$!{escapetool.url($request.getParameter('title'))}")
+#if ($title == '')
   #if($tocreate == 'page')
     #set($title = $escapetool.url($page))
   #else
@@ -43,60 +43,60 @@
 #set($redirectparams = "${redirectparams}&title=${title}")
 ## ---------------------------------------------------------------------------------------------------------
 ## Determine the edit action (edit/inline) for the newly created document, if a template is passed it is
-## used to determine the action. Default is 'edit'. 
+## used to determine the action. Default is 'edit'.
 ## ---------------------------------------------------------------------------------------------------------
-#if($template != '' && $xwiki.exists($template))
-  #set($editAction = $xwiki.getDocument($template).getDefaultEditMode())
+#if ($template != '' && $xwiki.exists($template))
+  #set ($editAction = $xwiki.getDocument($template).getDefaultEditMode())
 #else
-  #set($editAction = 'edit')
+  #set ($editAction = 'edit')
 #end
 ## ---------------------------------------------------------------------------------------------------------
 ## Build the list of available template providers
 ## ---------------------------------------------------------------------------------------------------------
-#set($templateProviders = $services.query.xwql("from doc.object(XWiki.TemplateProviderClass) as template where doc.fullName not like 'XWiki.TemplateProviderTemplate'").execute())
-#set($availableTemplateProviders = $util.getArrayList())
-#foreach($templateProvider in $templateProviders)
-  #set($tpobj = $xwiki.getDocument($templateProvider).getObject('XWiki.TemplateProviderClass'))
-  #if($tpobj.getProperty('spaces').getValue().isEmpty() || $tpobj.getProperty('spaces').getValue().contains($doc.space))
-    #set($discard = $availableTemplateProviders.add($tpobj))
+#set ($templateProviders = $services.query.xwql("from doc.object(XWiki.TemplateProviderClass) as template where doc.fullName not like 'XWiki.TemplateProviderTemplate'").execute())
+#set ($availableTemplateProviders = $util.getArrayList())
+#foreach ($templateProvider in $templateProviders)
+  #set ($tpobj = $xwiki.getDocument($templateProvider).getObject('XWiki.TemplateProviderClass'))
+  #if ($tpobj.getProperty('spaces').getValue().isEmpty() || $tpobj.getProperty('spaces').getValue().contains($doc.space))
+    #set ($discard = $availableTemplateProviders.add($tpobj))
   #end
 #end
 ## ---------------------------------------------------------------------------------------------------------
 ## Perform a redirection to the edit mode if required
 ## ---------------------------------------------------------------------------------------------------------
-#set($paramsMap = $request.getParameterMap())
-#if($tocreate == 'space' && $space != '')
+#set ($paramsMap = $request.getParameterMap())
+#if ($tocreate == 'space' && $space != '')
   ##
   ## If a space is ready to be created, redirect to the space home in edit mode
   ##
-  #set ($docReference = $services.model.createDocumentReference($context.wiki, $space, "WebHome"))
-  #set($redirecturl = $xwiki.getDocument($docReference).getURL('edit', $redirectparams))
+  #set ($docReference = $services.model.createDocumentReference($context.wiki, $space, 'WebHome'))
+  #set ($redirecturl = $xwiki.getDocument($docReference).getURL('edit', $redirectparams))
 #end
-#if($tocreate == 'page' && $space != '' && $page != ''  
+#if ($tocreate == 'page' && $space != '' && $page != ''
     && ($paramsMap.containsKey('template') || $availableTemplateProviders.isEmpty()))
   ##
   ## If a page is ready to be created, redirect to the specified page in the specified edit action
   ##
   #set ($docReference = $services.model.createDocumentReference($context.wiki, $space, $page))
-  #set($redirecturl = $xwiki.getDocument($docReference).getURL($editAction, $redirectparams))  
+  #set ($redirecturl = $xwiki.getDocument($docReference).getURL($editAction, $redirectparams))
   ##
   ## Check that the chosen space is allowed with the given template, if not:
   ## - Cancel the redirect
   ## - Display a message
   ## - Reset the space variable (the user will have to chose the space again)
   ##
-  #if(!$availableTemplateProviders.isEmpty() && $template != '')
-    #set($templateProviderResult = $xwiki.searchDocuments(", BaseObject obj, StringProperty prop where doc.fullName=obj.name and obj.className='XWiki.TemplateProviderClass' and obj.id=prop.id.id and prop.id.name='template' and prop.value=?", [$template]))
+  #if (!$availableTemplateProviders.isEmpty() && $template != '')
+    #set ($templateProviderResult = $xwiki.searchDocuments(", BaseObject obj, StringProperty prop where doc.fullName=obj.name and obj.className='XWiki.TemplateProviderClass' and obj.id=prop.id.id and prop.id.name='template' and prop.value=?", [$template]))
     ## If the template does not have an associated template provider, the result of the query is empty
-    #if(!$templateProviderResult.isEmpty())
-      #set($templateProvider = $templateProviderResult.get(0))
-      #set($tpobj = $xwiki.getDocument($templateProvider).getObject('XWiki.TemplateProviderClass'))
-      #set($allowedSpaces = $tpobj.getProperty('spaces').getValue())
+    #if (!$templateProviderResult.isEmpty())
+      #set ($templateProvider = $templateProviderResult.get(0))
+      #set ($tpobj = $xwiki.getDocument($templateProvider).getObject('XWiki.TemplateProviderClass'))
+      #set ($allowedSpaces = $tpobj.getProperty('spaces').getValue())
       #if(!$allowedSpaces.isEmpty() && !$allowedSpaces.contains($space))
-        #set($space = '')
-        #set($redirecturl = '')
+        #set ($space = '')
+        #set ($redirecturl = '')
         <div class="box errormessage">
-          #if($allowedSpaces.size() == 1)
+          #if ($allowedSpaces.size() == 1)
             $msg.get('core.create.template.allowedspace.inline', [$tpobj.display('name', 'view'), $allowedSpaces.get(0)])
           #else
             $msg.get('core.create.template.allowedspaces.inline', [$tpobj.display('name', 'view'), $allowedSpaces.toString()])
@@ -110,9 +110,9 @@
   #if($paramsMap.containsKey('ajax'))
     ##
     ## If this template is displayed from a modal popup, send a header in the response notifying that a redirect
-    ## must be performed in the calling page. 
+    ## must be performed in the calling page.
     ##
-    $response.setHeader("redirect", $redirecturl)
+    $response.setHeader('redirect', $redirecturl)
   #else
     ##
     ## Perform the redirect
@@ -133,41 +133,41 @@ $xwiki.get('ssfx').use('uicomponents/widgets/validation/livevalidation.css')##
 //<![CDATA[
   XWiki.createPage = {
     spaceValidator : {},
-    pageValidator : {}, 
+    pageValidator : {},
     currentSpaceInclusionParameters : {},
-    /*
-    ** Create Page Field Validator 
-    */
-    initPageValidator : function() {                  
+    /**
+     * Create Page Field Validator.
+     */
+    initPageValidator : function() {
       this.pageValidator = new LiveValidation('page', { validMessage: "$msg.get('core.create.validation.valid')" });
       this.pageValidator.add(Validate.Presence, {
         failureMessage: "$msg.get('core.create.validation.mandatoryfield')"
       });
-    },         
-    /*
-    ** Create Space Field Validator 
-    */     
-    initSpaceValidator : function() {                  
+    },
+    /**
+     * Create Space Field Validator.
+     */
+    initSpaceValidator : function() {
       this.spaceValidator = new LiveValidation('space', { validMessage: "$msg.get('core.create.validation.valid')" });
       this.spaceValidator.add(Validate.Presence, {
          failureMessage: "$msg.get('core.create.validation.mandatoryfield')"
       });
     },
-    /*
-    ** Update Space Field Validator, allows to specify a list of allowed spaces for the field
-    */ 
+    /**
+     * Update Space Field Validator, allows to specify a list of allowed spaces for the field.
+     */
     updateSpaceValidator : function(values, failureMessage) {
       if(values.length > 0) {
-        this.currentSpaceInclusionParameters = { 
+        this.currentSpaceInclusionParameters = {
           within: values,
-          failureMessage: failureMessage 
+          failureMessage: failureMessage
         };
         this.spaceValidator.add(Validate.Inclusion, this.currentSpaceInclusionParameters);
       } else {
         this.spaceValidator.remove(Validate.Inclusion, this.currentSpaceInclusionParameters);
       }
       this.spaceValidator.validate();
-    }   
+    }
   };
 //]]>
 </script>
@@ -181,8 +181,8 @@ $xwiki.get('ssfx').use('uicomponents/widgets/validation/livevalidation.css')##
     ## ---------------------------------------------------------------------------------------------------------
     ## Page creation
     ## ---------------------------------------------------------------------------------------------------------
-    #set($jsValidationInitializersContainer = $util.getArrayList())      
-    <input type="hidden" name="parent" value="$parent"/>    
+    #set ($jsValidationInitializersContainer = $util.getArrayList())
+    <input type="hidden" name="parent" value="$!{escapetool.xml($parent)}"/>
     ## ---------------------------------------------------------------------------------------------------------
     ## Template field
     ## ---------------------------------------------------------------------------------------------------------
@@ -191,21 +191,21 @@ $xwiki.get('ssfx').use('uicomponents/widgets/validation/livevalidation.css')##
       <dl>
         <dt>
           <label for="page">$msg.get('core.create.template')</label>
-        </dt>      
+        </dt>
         <dd>
-          <label for="xwiki-create-form-0" class="xwiki-form-listclass">            
-            <input id="xwiki-create-form-0" type="radio" name="template" value="" checked="checked">
+          <label for="xwiki-create-form-0" class="xwiki-form-listclass">
+            <input id="xwiki-create-form-0" type="radio" name="template" value="" checked="checked"/>
             $msg.get('core.create.template.empty')
           </label>
           #set($discard = $jsSpaceInclusionValidationContainer.add(['xwiki-create-form-0', [], '']))
-          #foreach($tpobj in $availableTemplateProviders)            
+          #foreach($tpobj in $availableTemplateProviders)
             #set($inputId = "xwiki-create-form-${velocityCount}")
             <label for="$inputId" class="xwiki-form-listclass">
-              <input id="$inputId" type="radio" name="template" value="${tpobj.getProperty('template').getValue()}">
-              $tpobj.display('name', 'view')
+              <input id="$inputId" type="radio" name="template" value="$escapetool.xml(${tpobj.getProperty('template').getValue()})"/>
+              $escapetool.xml($tpobj.display('name', 'view'))
             </label>
             #set($jsAllowedSpacesArray = '')## Reset previous value
-            #set($allowedSpaces = $tpobj.getProperty('spaces').getValue())              
+            #set($allowedSpaces = $tpobj.getProperty('spaces').getValue())
             #if($space == '' && !$allowedSpaces.isEmpty())
               #foreach($allowedSpace in $allowedSpaces)
                 #if($velocityCount == 1)
@@ -225,23 +225,23 @@ $xwiki.get('ssfx').use('uicomponents/widgets/validation/livevalidation.css')##
             #set($discard = $jsSpaceInclusionValidationContainer.add([$inputId, "[${jsAllowedSpacesArray}]", $message]))
           #end
         </dd>
-        ## ---------------------------------------------------------------------------------------------------------
-        ## Output JavaScript code that will update validation rules for document space (depends on template)
-        ## ---------------------------------------------------------------------------------------------------------
-        <script type="text/javascript">
-        //<![CDATA[
-          Event.observe(document, 'xwiki:dom:loaded', function() {       
-            #foreach($validator in $jsSpaceInclusionValidationContainer)
-              $("$validator.get(0)").observe('click', function() {
-                XWiki.createPage.updateSpaceValidator($validator.get(1), "$validator.get(2)");
-              }.bindAsEventListener(XWiki.createPage));
-            #end
-          });
-        //]]>
-        </script>
       </dl>
+      ## ---------------------------------------------------------------------------------------------------------
+      ## Output JavaScript code that will update validation rules for document space (depends on template)
+      ## ---------------------------------------------------------------------------------------------------------
+      <script type="text/javascript">
+      //<![CDATA[
+        Event.observe(document, 'xwiki:dom:loaded', function() {
+          #foreach($validator in $jsSpaceInclusionValidationContainer)
+            $("$validator.get(0)").observe('click', function() {
+              XWiki.createPage.updateSpaceValidator($validator.get(1), "$validator.get(2)");
+            }.bindAsEventListener(XWiki.createPage));
+          #end
+        });
+      //]]>
+      </script>
     #else
-      <input type="hidden" id="template" name="template" value="$template" />
+      <input type="hidden" id="template" name="template" value="$!{escapetool.xml($template)}" />
     #end
     ## ---------------------------------------------------------------------------------------------------------
     ## Space field
@@ -251,17 +251,17 @@ $xwiki.get('ssfx').use('uicomponents/widgets/validation/livevalidation.css')##
         <dt>
           <label for="space">$msg.get('core.create.space')</label>
         </dt>
-        <dd>                     
-          <input type="text" id="space" name="space" value="$defaultSpace"/>
+        <dd>
+          <input type="text" id="space" name="space" value="$!{escapetool.xml($defaultSpace)}"/>
         </dd>
       </dl>
       #set($discard = $jsValidationInitializersContainer.add("XWiki.createPage.initSpaceValidator();"))
     #else
-      <input type="hidden" id="space" name="space" value="$space" />
+      <input type="hidden" id="space" name="space" value="$!{escapetool.xml($space)}" />
     #end
     ## ---------------------------------------------------------------------------------------------------------
     ## Page field
-    ## ---------------------------------------------------------------------------------------------------------        
+    ## ---------------------------------------------------------------------------------------------------------
     #if($page == '')
       <dl>
         <dt>
@@ -269,12 +269,12 @@ $xwiki.get('ssfx').use('uicomponents/widgets/validation/livevalidation.css')##
         </dt>
         <dd>
           #set ($pageText = $msg.get('core.create.pageText'))
-          <input type="text" id="page" name="page" value="$pageText" onfocus="if(this.value=='$pageText') this.value=''" onblur="if(this.value=='') this.value='$pageText'"/>
+          <input type="text" id="page" name="page" value="$pageText" class="withTip"/>
         </dd>
       </dl>
       #set($discard = $jsValidationInitializersContainer.add("XWiki.createPage.initPageValidator();"))
     #else
-      <input type="hidden" id="page" name="page" value="$page" />
+      <input type="hidden" id="page" name="page" value="$!{escapetool.xml($page)}" />
     #end
     ## ---------------------------------------------------------------------------------------------------------
     ## Output JavaScript validation code
@@ -291,7 +291,7 @@ $xwiki.get('ssfx').use('uicomponents/widgets/validation/livevalidation.css')##
   #else
     ## ---------------------------------------------------------------------------------------------------------
     ## Space creation
-    ## ---------------------------------------------------------------------------------------------------------    
+    ## ---------------------------------------------------------------------------------------------------------
     <dl>
       <dt>
         <label for="space">$msg.get('core.create.space')</label>
@@ -300,7 +300,7 @@ $xwiki.get('ssfx').use('uicomponents/widgets/validation/livevalidation.css')##
         <input type="text" id="space" name="space"/>
       </dd>
     </dl>
-    <input type="hidden" name="parent" value="$!parent"/>
+    <input type="hidden" name="parent" value="$!{escapetool.xml($parent)}"/>
   #end
   <input type="submit" class="button" value="$msg.get('create')"/>
   </div>

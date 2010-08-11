@@ -9,7 +9,7 @@
     #set($tocreate = $request.getParameter('tocreate'))
     #if(!$tocreate || ($tocreate == '') || ($tocreate != 'space'))
       #if($doc.isNew())
-        #set ($title = $msg.get('core.create.newPageTitle', [$doc.fullName]))
+        #set ($title = $msg.get('core.create.newPageTitle', [$!{escapetool.xml($doc.fullName)}]))
       #else
         #set ($title = $msg.get('core.create.pageTitle'))
       #end

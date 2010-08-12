@@ -134,7 +134,7 @@
 
 #-# [Since 2.0M1]
 #-# Velocity configuration properties. The format is
-#-# velocity.property.<Velocity property name> = <value>
+#-# velocity.properties = <Velocity property name> = <value>
 #-# Default values (no need to add them)
 #-#   velocity.properties = resource.loader = webapp
 #-#   velocity.properties = directive.set.null.allowed = true

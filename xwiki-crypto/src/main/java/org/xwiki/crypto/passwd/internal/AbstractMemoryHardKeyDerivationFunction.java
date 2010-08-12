@@ -54,7 +54,7 @@ public abstract class AbstractMemoryHardKeyDerivationFunction implements MemoryH
     private final transient int defaultMillisecondsOfProcessorTime = 200;
 
     /** The default length in bytes of the derived key (output). */
-    private final transient int defaultDerivedKeyLength = 64;
+    private final transient int defaultDerivedKeyLength = 32;
 
     /**
      * {@inheritDoc}

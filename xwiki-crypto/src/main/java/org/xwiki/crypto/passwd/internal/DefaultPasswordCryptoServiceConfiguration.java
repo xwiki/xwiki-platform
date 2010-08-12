@@ -48,6 +48,7 @@ public class DefaultPasswordCryptoServiceConfiguration
         {
             setProperty("millisecondsOfProcessorTimeToSpend", "200");
             setProperty("numberOfKilobytesOfMemoryToUse", "1024");
+            setProperty("derivedKeyLength", "32");
         }
     };
 

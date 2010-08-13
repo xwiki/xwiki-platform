@@ -217,6 +217,9 @@ public class XWikiAuthServiceImpl extends AbstractXWikiAuthService
 
     public XWikiUser checkAuth(XWikiContext context) throws XWikiException
     {
+        // Debug time taken.
+        long time = System.currentTimeMillis();
+
         XWiki xwiki = context.getWiki();
         HttpServletRequest request = null;
         HttpServletResponse response = null;
@@ -319,6 +322,9 @@ public class XWikiAuthServiceImpl extends AbstractXWikiAuthService
             LOG.error("Failed to authenticate", e);
 
             return null;
+        } finally {
+            LOG.debug("XWikiAuthServiceImpl.checkAuth(XWikiContext) took " + (System.currentTimeMillis() - time)
+                      + " milliseconds to run.");
         }
     }
 
@@ -548,18 +554,16 @@ public class XWikiAuthServiceImpl extends AbstractXWikiAuthService
 
     protected boolean checkPassword(String username, String password, XWikiContext context) throws XWikiException
     {
+        long time = System.currentTimeMillis();
         try {
             boolean result = false;
-            XWikiDocument doc = context.getWiki().getDocument(username, context);
-            BaseObject userObject = doc.getObject("XWiki.XWikiUsers");
+
+            final XWikiDocument doc = context.getWiki().getDocument(username, context);
+            final BaseObject userObject = doc.getObject("XWiki.XWikiUsers");
             // We only allow empty password from users having a XWikiUsers object.
             if (userObject != null) {
-                String passwd = userObject.getStringValue("password");
-                password =
-                    ((PasswordClass) context.getWiki().getUserClass(context).getField("password"))
-                        .getEquivalentPassword(passwd, password);
-
-                result = (password.equals(passwd));
+                final String stored = userObject.getStringValue("password");
+                result = new PasswordClass().getEquivalentPassword(stored, password).equals(stored);
             }
 
             if (LOG.isDebugEnabled()) {
@@ -568,6 +572,7 @@ public class XWikiAuthServiceImpl extends AbstractXWikiAuthService
                 } else {
                     LOG.debug("Password check for user " + username + " failed");
                 }
+                LOG.debug((System.currentTimeMillis() - time) + " milliseconds spent validating password.");
             }
 
             return result;

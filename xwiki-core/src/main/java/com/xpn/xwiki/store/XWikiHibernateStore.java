@@ -812,6 +812,9 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
                 monitor.endTimer("hibernate");
             }
         }
+
+        log.debug("Loaded XWikiDocument: " + doc.getFullName());
+
         return doc;
     }
 

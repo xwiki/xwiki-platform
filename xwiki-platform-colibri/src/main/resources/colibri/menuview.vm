@@ -24,7 +24,7 @@
 #if ($isSuperAdmin)
   #xwikitopmenuentry('#' $!msg.get('superadmin') 'tmUser' 'hasIcon')
 #else
-  #xwikitopmenuentrystart($xwiki.getURL($context.user, 'view') $!xwiki.getUserName($context.user, false) 'tmUser' 'hasIcon')
+  #xwikitopmenuentrystart($xwiki.getURL($context.user, 'view') "$msg.get('core.menu.type.profile')__SEPARATOR__$!xwiki.getUserName($context.user, false)" 'tmUser' 'hasIcon')
   #submenuitem($xwiki.getURL($context.user, 'view') $msg.get('core.menu.profile') 'tmProfile', '')
   #submenuitem($xwiki.getURL($context.user, 'view', 'category=preferences') $msg.get('core.menu.userPreferences') 'tmUserPreferences', '')
   #if($hasWatch)
@@ -36,17 +36,42 @@
 </div>
 <div class="leftmenu">
 ##
-## Wiki
+## Create
 ##
-#set ($isAdminAppInstalled = $xwiki.exists('XWiki.AdminSheet'))
-#set ($displayWikiSubmenu = $hasWatch || $hasCreateSpace || $hasGlobalAdmin)
-#if(!$displayWikiSubmenu)
-  #xwikitopmenuentry($xwiki.getURL('Main.WebHome', 'view') $context.getDatabase() 'tmWiki' 'hasIcon')
-#else
-  #xwikitopmenuentrystart($xwiki.getURL('Main.WebHome', 'view') $context.getDatabase() 'tmWiki' 'hasIcon')
+#set ($displayCreateSubmenu = $hasCreateSpace || $hasCreatePage)
+#if($displayCreateSubmenu)
+  #xwikitopmenuentrystart('' $msg.get('core.menu.create') 'tmCreate' 'hasIcon')
   #if ($hasCreateSpace)
     #submenuitem("$doc.getURL('create', 'tocreate=space')" $msg.get('core.menu.create.space') 'tmCreateSpace', '')
   #end
+  #submenuseparator()
+  #if ($hasCreatePage)
+    #submenuitem("$doc.getURL('create')" $msg.get('core.menu.create.page') 'tmCreatePage', '')
+    ## Only display the Office Importer menu action if the Office Importer application is installed
+    #set($officeImporterMainDocument = $xwiki.getDocument('XWiki.OfficeImporter'))
+    #if("$!{officeImporterMainDocument.isNew()}" == 'false')
+      #submenuitem($officeImporterMainDocument.getURL('view', "&amp;parent=$!{escapetool.url($doc.fullName)}") $msg.get('core.menu.create.pageFromOffice') 'tmCreatePageFromOffice', '')
+    #end
+  #end
+  #submenuseparator()
+  #submenuitem("$doc.getURL('view')#Comments" $msg.get('core.menu.create.comment') 'tmCreateComment', '')
+  #submenuitem("$doc.getURL('view')#Attachments" $msg.get('core.menu.create.attachment') 'tmCreateAttachment', '')
+  #xwikitopmenuentryend()
+#end
+##
+## Wiki
+##
+#set($isAdminAppInstalled = $xwiki.exists('XWiki.AdminSheet'))
+#set($displayWikiSubmenu = $hasWatch || $hasGlobalAdmin)
+#set($wikiEntryText = $msg.get('core.menu.type.wiki'))
+#if($xwiki.isVirtualMode() && $xwiki.wikimanager)
+  #set($wikiName = $xwiki.wikimanager.getWikiDocument($context.getDatabase()).getWikiPrettyName())
+  #set($wikiEntryText = "${wikiEntryText}__SEPARATOR__${wikiName}")
+#end
+#if(!$displayWikiSubmenu)
+  #xwikitopmenuentry($xwiki.getURL('Main.WebHome', 'view') $wikiEntryText 'tmWiki' 'hasIcon')
+#else
+  #xwikitopmenuentrystart($xwiki.getURL('Main.WebHome', 'view') $wikiEntryText 'tmWiki' 'hasIcon')
   #if ($hasWatch)
     #set($watchClasses = '')
     #set($unwatchClasses = 'hidden')
@@ -66,24 +91,19 @@
       #xwikitopmenuentry($importaction $msg.get('core.menu.admin') 'tmAdmin')
     #end
   #end
+  #submenuseparator()
+  #submenuitem("$xwiki.getURL('Main.AllDocs')" $msg.get('core.menu.wiki.documentindex') 'tmWikiDocumentIndex' '')
   #xwikitopmenuentryend()
 #end
 ##
 ## Space
 ##
-#set ($displaySpaceSubmenu = $hasWatch || $hasCreatePage || $hasSpaceAdmin)
+#set ($displaySpaceSubmenu = $hasWatch || $hasSpaceAdmin)
+#xwikitopmenuseparator()
 #if(!$displaySpaceSubmenu)
-  #xwikitopmenuentry($xwiki.getURL("${doc.space}.WebHome", 'view') "$!{escapetool.xml($doc.space)}" 'tmSpace' 'hasIcon')
+  #xwikitopmenuentry($xwiki.getURL("${doc.space}.WebHome", 'view') "$msg.get('core.menu.type.space')__SEPARATOR__$!{escapetool.xml($doc.space)}" 'tmSpace' 'hasIcon')
 #else
-  #xwikitopmenuentrystart($xwiki.getURL("${doc.space}.WebHome", 'view') "$!{escapetool.xml($doc.space)}" 'tmSpace' 'hasIcon')
-  #if ($hasCreatePage)
-    #submenuitem("$doc.getURL('create')" $msg.get('core.menu.create.page') 'tmCreatePage', '')
-    ## Only display the Office Importer menu action if the Office Importer application is installed
-    #set($officeImporterMainDocument = $xwiki.getDocument('XWiki.OfficeImporter'))
-    #if("$!{officeImporterMainDocument.isNew()}" == 'false')
-      #submenuitem($officeImporterMainDocument.getURL('view', "&amp;parent=$!{escapetool.url($doc.fullName)}") $msg.get('core.menu.create.pageFromOffice') 'tmCreatePageFromOffice', '')
-    #end
-  #end
+  #xwikitopmenuentrystart($xwiki.getURL("${doc.space}.WebHome", 'view') "$msg.get('core.menu.type.space')__SEPARATOR__$!{escapetool.xml($doc.space)}" 'tmSpace' 'hasIcon')
   #if ($hasWatch)
     #set($watchClasses = '')
     #set($unwatchClasses = 'hidden')
@@ -98,7 +118,50 @@
     #set ($adminspaceaction = $!xwiki.getURL("${doc.space}.WebPreferences", 'admin'))
     #submenuitem($adminspaceaction $msg.get('core.menu.admin.space', [$escapetool.xml($doc.space)]) 'tmAdminSpace')
   #end
+  #submenuseparator()
+  #set($spaceIndexUrl = $xwiki.getURL('Main.SpaceIndex', 'view',"space=${doc.space}"))
+  #submenuitem($spaceIndexUrl $msg.get('core.menu.space.documentindex') 'tmSpaceDocumentIndex' '')
   #xwikitopmenuentryend()
+#end
+##
+## Page
+##
+#set ($displayPageSubmenu = $hasWatch)
+#xwikitopmenuseparator()
+#if(!$displayPageSubmenu)
+  #xwikitopmenuentry($xwiki.getURL("${doc.name}", 'view') "$msg.get('core.menu.type.page')__SEPARATOR__$!{escapetool.xml($doc.name)}" 'tmPage' 'hasIcon')
+#else
+  #xwikitopmenuentrystart($xwiki.getURL("${doc.name}", 'view') "$msg.get('core.menu.type.page')__SEPARATOR__$!{escapetool.xml($doc.name)}" 'tmPage' 'hasIcon')
+  #if ($hasWatch && !$doc.isNew())
+    #set($watchClasses = 'hasIcon')
+    #set($unwatchClasses = 'hasIcon hidden')
+    #if($xwiki.watchlist.isDocumentWatched())
+      #set($watchClasses = 'hasIcon hidden')
+      #set($unwatchClasses = 'hasIcon')
+    #end
+    #submenuitem("$doc.getURL('view', 'xpage=watch&amp;do=adddocument')&amp;xredirect=$doc.getURL()" $msg.get('core.menu.watchlist.add.page') 'tmWatchDocument' $watchClasses)
+    #submenuitem("$doc.getURL('view', 'xpage=watch&amp;do=removedocument')&amp;xredirect=$doc.getURL()" $msg.get('core.menu.watchlist.remove.page') 'tmUnwatchDocument' $unwatchClasses)  
+  #end
+  #set ($canDelete = !$doc.isNew() && $xwiki.checkAccess($doc.fullName, 'delete'))
+  #if($canDelete || $xwiki.hasProgrammingRights())
+    #submenuseparator()
+  #end
+  #if($xwiki.hasProgrammingRights())
+    #submenuitem($doc.getURL('view', 'xpage=copy') $msg.get('core.menu.copy') 'tmActionCopy', '')
+  #end
+  #if($canDelete)
+    #submenuitem($doc.getURL('view', 'xpage=rename&amp;step=1') $msg.get('core.menu.rename') 'tmActionRename', '')
+    #submenuitem($doc.getURL('delete', $!languageparams) $msg.get('core.menu.delete') 'tmActionDelete', '')
+  #end
+  #xwikitopmenuentryend()
+  #if($canDelete && $keyboardShortcutsEnabled)
+    <script type="text/javascript">
+      //<![CDATA[
+      shortcut.add("$msg.get('core.shortcuts.view.delete')",function() { location.href="$doc.getURL('delete', $!languageparams)"; }, { 'type':'keypress', 'propagate':false, 'disable_in_input':true });
+      shortcut.add("$msg.get('core.shortcuts.view.rename')",function() { location.href="$doc.getURL('view', 'xpage=rename&amp;step=1')"; }, { 'type':'keypress', 'propagate':false, 'disable_in_input':true });
+      //]]>
+    </script>
+  #end
 #end
 </div>
 </div>

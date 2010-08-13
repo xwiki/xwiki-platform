@@ -811,6 +811,10 @@ div#xwikiobjects input[type="checkbox"], div#xwikiclassproperties input[type="ch
   float: none;
 }
 
+#maineditmenu .topmenuentry , #maineditmenu .tmetype {
+  float: none;
+}
+
 /* General */
 .actionmenu {
   background-color: $theme.menuBackgroundColor;
@@ -832,7 +836,7 @@ div#xwikiobjects input[type="checkbox"], div#xwikiclassproperties input[type="ch
 .leftmenu {
   position: absolute;
   left: 0;
-  padding-left: 15px;
+  padding-left: 25px;
 }
 
 .rightmenu {
@@ -853,7 +857,10 @@ div#xwikiobjects input[type="checkbox"], div#xwikiclassproperties input[type="ch
 }
 
 .submenu .submenuseparator {
-  display: none;
+  border-top: 1px solid $theme.textSecondaryColor;
+  display: block;
+  line-height: 1px;
+  margin: 7px 5px 7px 0;
 }
 
 .actionmenu .hasIcon {
@@ -863,11 +870,27 @@ div#xwikiobjects input[type="checkbox"], div#xwikiclassproperties input[type="ch
 .tme-extensible {
   display: block;
 }
+
+.tmetype{
+  color: $theme.menuLinkColor;
+  float: left;
+  font: normal normal 700 0.8em/1.8em sans-serif;
+  padding: 2px 5px 0 20px;
+  text-transform: uppercase;
+}
+
 .menuarrow {
   color: $theme.menuLinkColor;
-  font-size: .5em;
-  line-height: 1.8em;
+  font-size: 8px;
+  line-height: 22px;
   margin-right: 10px;
+}
+
+.topmenuentry .separator {
+  display: inline-block;
+  font-size: .85em;
+  line-height: 1.8em;
+  margin: 0 3px 0 -3px;
 }
 
 /* Links */
@@ -877,17 +900,31 @@ div#xwikiobjects input[type="checkbox"], div#xwikiclassproperties input[type="ch
   float: left;
   font: normal normal 700 0.8em/1.8em sans-serif;
   margin-right: -5px;
-  padding: 2px 10px 0 0px;
+  padding: 2px 10px 0 0;
   width: auto;
   white-space: nowrap;
   text-transform: uppercase;
 }
+
 .actionmenu a:link, .actionmenu a:visited  {
   cursor: pointer;
 }
 
 .actionmenu .hasIcon a.tme {
   padding-left: 20px;
+}
+
+.actionmenu .hasIcon a.hastype, .actionmenu a.hastype {
+  padding-left: 0;
+  text-transform: none;
+}
+
+.actionmenu a.hastype strong {
+  font-weight: 400;
+}
+
+.actionmenu a strong {
+  line-height: 1.8em;
 }
 
 .dropdownnolink a.tme:hover {
@@ -908,13 +945,36 @@ div#xwikiobjects input[type="checkbox"], div#xwikiclassproperties input[type="ch
 
 .actionmenu .submenuitem a, .actionmenu .submenuitem a:link, .actionmenu .submenuitem a:visited, .actionmenu .submenuitem a:active {
   float: none;
+  font-weight: normal;
   height: auto;
   line-height: 1.2em;
   padding: 2px 20px 0;
   text-align: left;
+  text-transform: none;
+}
+
+.actionmenu .tmCreate {
+  background-color: #4D9244; /* $theme.buttonPrimaryBackgroundColor */
+  bottom: -4px;
+  height: 1.85em;
+  margin-right: 2em;
+  padding-left: 10px;
+  position: relative;
+  top: 0;
+}
+
+.tmCreate .submenu {
+  margin-left: -15px;
+  margin-top: -4px;
+  padding-top: 5px;
 }
 
 /* Icons */
+.actionmenu .tmCreate {
+  background-image: url("$xwiki.getSkinFile('icons/silk/add.gif')");
+  background-position:  10px 3px;
+}
+
 .actionmenu .tmWiki {
   background-image: url("$xwiki.getSkinFile('icons/silk/world.gif')");
 }
@@ -935,8 +995,20 @@ div#xwikiobjects input[type="checkbox"], div#xwikiclassproperties input[type="ch
   background-image: url("$xwiki.getSkinFile('icons/silk/wrench.gif')");
 }
 
+.actionmenu .tmPage {
+  background-image: url("$xwiki.getSkinFile('icons/silk/page_white_text.gif')");
+}
+
 .actionmenu .tmCreatePage, .actionmenu .tmCreatePageFromOffice {
   background-image: url("$xwiki.getSkinFile('icons/silk/page_white_add.gif')");
+}
+
+.actionmenu .tmCreateComment {
+  background-image: url("$xwiki.getSkinFile('icons/silk/comment_add.gif')");
+}
+
+.actionmenu .tmCreateAttachment{
+  background-image: url("$xwiki.getSkinFile('icons/xwiki/attach_add.gif')");
 }
 
 .actionmenu .tmEdit {
@@ -1021,6 +1093,10 @@ div#xwikiobjects input[type="checkbox"], div#xwikiclassproperties input[type="ch
 
 .actionmenu .tmUnwatchWiki, .actionmenu .tmUnwatchSpace, .actionmenu .tmUnwatchDocument {
   background-image: url("$xwiki.getSkinFile('icons/xwiki/star-yellow.png')");
+}
+
+.actionmenu .tmWikiDocumentIndex, .actionmenu .tmSpaceDocumentIndex {
+  background-image: url("$xwiki.getSkinFile('icons/silk/book_open.gif')");
 }
 
 /* @group BUTTONS */

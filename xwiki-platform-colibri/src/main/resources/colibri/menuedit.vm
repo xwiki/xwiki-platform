@@ -1,5 +1,5 @@
 #if($isInServletMode)## Visible only in a page
 <div id="maineditmenu" class="actionmenu layoutsubsection">
-$msg.get("core.menu.editing") <a href="$doc.getURL()">$escapetool.xml($doc.name)</a>
+  #xwikitopmenuentry($doc.getURL() "$msg.get('core.menu.editing')$!{escapetool.xml($doc.name)}" '' '')
 </div>
 #end

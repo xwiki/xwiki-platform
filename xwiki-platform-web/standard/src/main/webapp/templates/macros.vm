@@ -1085,8 +1085,16 @@ $doc.display("content", $obj)
 ### @param linktext The menu item text
 ###
 #macro(xwikitopmenuentrystart $actionurl $linktext $id $class)
+#set($sep = '__SEPARATOR__')
 <div id="$id" class="$id topmenuentry dropdownmenuentry #if($actionurl == '')dropdownnolink#end $!class" onmouseover="showsubmenu(this);" onmouseout="hidesubmenu(this);">
-<span class="tme-extensible"><a class="tme"#if ($actionurl != '') href="$actionurl"#end><strong>$linktext</strong></a><span class="menuarrow">&#9660;</span><span class="hidden menucolon">: </span></span><span class="submenu hidden">
+<span class="tme-extensible">
+  #if (!$linktext.contains($sep)) <a class="tme"#if ($actionurl != '') href="$actionurl"#end><strong>$linktext</strong></a>
+  #else
+    #set ($linktextwords = $linktext.split($sep))
+    <span class="tmetype">$linktextwords.get(0): </span><a class="tme hastype" href="$actionurl"><strong>$linktextwords.get(1)</strong></a>
+  #end
+  <span class="menuarrow">&#9660;</span><span class="hidden menucolon">: </span>
+</span><span class="submenu hidden">
 #end
 
 ###
@@ -1098,7 +1106,14 @@ $doc.display("content", $obj)
 ### @param linktext The menu item text
 ###
 #macro(xwikitopmenuentry $actionurl $linktext $id $class)
-<div id="$id" class="$id topmenuentry $!class"><a class="tme" href="$actionurl"><strong>$linktext</strong></a></div>
+#set($sep = '__SEPARATOR__')
+<div id="$id" class="$id topmenuentry $!class">
+  #if (! $linktext.contains($sep)) <a class="tme" href="$actionurl"><strong>$linktext</strong></a>
+  #else
+    #set ($linktextwords = $linktext.split($sep))
+    <span class="tmetype">$linktextwords.get(0): </span><a class="tme hastype" href="$actionurl"><strong>$linktextwords.get(1)</strong></a>
+  #end
+</div>
 #end
 
 ###
@@ -1124,6 +1139,12 @@ $doc.display("content", $obj)
 <span class="submenuitem disable">$text</span>
 #end
 
+###
+###    Toplevel Menu entry separator
+###
+#macro(xwikitopmenuseparator)
+<div class="topmenuentry"><span class="separator">&raquo;</span></div>
+#end
 
 ###
 ###    Menu submenu separator
@@ -1234,7 +1255,7 @@ $html
 #**
  * Displays a public google calendar with all buttons and displays
  * The size of the display is 800x600
- * 
+ *
  * This macro displays the public part of the calendar specified. However if the visiting user is logged in in Google Calendar and has rights to the private part of the calendar then the information will be displayed.
  *
  * @param id ID of the google account to display the calendar for
@@ -1247,7 +1268,7 @@ $html
 
 #**
  * Displays a public google calendar with all buttons and displays and a custom size
- * 
+ *
  * @param id ID of the google account to display the calendar for
  * @param width Width of the calendar
  * @param height Height of the calendar
@@ -1266,7 +1287,7 @@ $html
 
 #**
  * Displays a private google calendar with all buttons
- * 
+ *
  * @param id ID of the google account to display the calendar for
  * @param token Private token giving access to the Calendar. This token is 32 chars long and can be retrieved in the "Agenda Details" when accessing your "Private URL" of your calendar. You should use this parameter with care as it will display all your calendar events to anybody that can access the page in which you use this macro
  *#
@@ -1278,7 +1299,7 @@ $html
 
 #**
  * Displays a private google calendar with all buttons
- * 
+ *
  * @param id ID of the google account to display the calendar for
  * @param token Private token giving access to the Calendar. This token is 32 chars long and can be retrieved in the "Agenda Details" when accessing your "Private URL" of your calendar. You should use this parameter with care as it will display all your calendar events to anybody that can access the page in which you use this macro
  * @param width Width of the calendar
@@ -1300,7 +1321,7 @@ $html
  * Displays a public or private google calendar with a wide range of settings
  * You can check the effect of these settings using the Google Calendar Embed Helper
  * http://www.google.com/calendar/embedhelper
- * 
+ *
  * @param id ID of the google account to display the calendar for
  * @param token Private token giving access to the Calendar. This token is 32 chars long and can be retrieved in the "Agenda Details" when accessing your "Private URL" of your calendar. You should use this parameter with care as it will display all your calendar events to anybody that can access the page in which you use this macro
  * @param width Width of the calendar
@@ -1343,7 +1364,7 @@ $html
 #**
  * Displays a list of documents.
  * Only documents that the current user is allowed to view will be displayed.
- * 
+ *
  * @param docNames list of document names.
  * @param displaySpaces true to group documents by space.
  * @param blacklistedSpaces spaces to exclude from the list.
@@ -1586,7 +1607,7 @@ ${Msz}Mb##
       </div>
     </div>
   #end
-  #if($tagcloud || $hasTopFilters) 
+  #if($tagcloud || $hasTopFilters)
   </div>
   #end
   <table id="${divid}" class="xwiki-livetable"#if("$!options.description" != '') summary="$options.description"#end>
@@ -1634,7 +1655,7 @@ ${Msz}Mb##
               ## - If defined the displayName passed as a column option wins
               ## - If not, and if a i18n prefix has been passed, we use the localization tool with the prefix + the column name
               ## - Finally, we fall back on the column name
-              #if("$!colprop.displayName" != '') 
+              #if("$!colprop.displayName" != '')
                 #set($displayName = $colprop.displayName)
               #elseif($transprefix != '')
                 #set($displayName = $msg.get("${transprefix}${colname}"))
@@ -1726,7 +1747,7 @@ ${Msz}Mb##
      #if($hasPageSize && "$!pageSizeBounds" != ''),"pageSizeBounds" : $pageSizeBounds#end
 	          });
   #else
-    $jsName = new XWiki.widgets.LiveTable("$dataurl", "${divid}", #livetablecallback($divid $collist $colprops $transprefix), {             
+    $jsName = new XWiki.widgets.LiveTable("$dataurl", "${divid}", #livetablecallback($divid $collist $colprops $transprefix), {
                          "maxPages":$maxPages
 	                    ,"limit":$count
      #if($hasTopFilters),"filterNodes" : [$("${divid}").down(".xwiki-livetable-display-filters"), $('${divid}-topfilters')]#end

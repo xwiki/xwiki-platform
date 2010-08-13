@@ -66,6 +66,9 @@
 #set($wikiEntryText = $msg.get('core.menu.type.wiki'))
 #if($xwiki.isVirtualMode() && $xwiki.wikimanager)
   #set($wikiName = $xwiki.wikimanager.getWikiDocument($context.getDatabase()).getWikiPrettyName())
+  #if("$!wikiName.trim()" == '')
+    #set($wikiName = $context.getDatabase())
+  #end
   #set($wikiEntryText = "${wikiEntryText}__SEPARATOR__${wikiName}")
 #end
 #if(!$displayWikiSubmenu)
@@ -79,8 +82,8 @@
       #set($watchClasses = 'hidden')
       #set($unwatchClasses = '')
     #end
-    #submenuitem("$doc.getURL('view', 'xpage=watch&amp;do=addwiki')&amp;xredirect=$doc.getURL()" $msg.get('core.menu.watchlist.add.wiki', [$escapetool.xml($doc.wiki)]) 'tmWatchWiki', $watchClasses)
-    #submenuitem("$doc.getURL('view', 'xpage=watch&amp;do=removewiki')&amp;xredirect=$doc.getURL()" $msg.get('core.menu.watchlist.remove.wiki') 'tmUnwatchWiki', $unwatchClasses)    
+    #submenuitem("$doc.getURL('view', 'xpage=watch&amp;do=addwiki')&amp;xredirect=$escapetool.url($doc.getURL())" $msg.get('core.menu.watchlist.add.wiki', [$escapetool.xml($doc.wiki)]) 'tmWatchWiki', $watchClasses)
+    #submenuitem("$doc.getURL('view', 'xpage=watch&amp;do=removewiki')&amp;xredirect=$escapetool.url($doc.getURL())" $msg.get('core.menu.watchlist.remove.wiki') 'tmUnwatchWiki', $unwatchClasses)    
   #end
   #if($hasGlobalAdmin)
     #set ($adminwikiaction = $!xwiki.getURL('XWiki.XWikiPreferences', 'admin'))
@@ -111,15 +114,15 @@
       #set($watchClasses = 'hidden')
       #set($unwatchClasses = '')
     #end
-    #submenuitem("$doc.getURL('view', 'xpage=watch&amp;do=addspace')&amp;xredirect=$doc.getURL()" $msg.get('core.menu.watchlist.add.space', [$escapetool.xml($doc.space)]) 'tmWatchSpace', $watchClasses)
-    #submenuitem("$doc.getURL('view', 'xpage=watch&amp;do=removespace')&amp;xredirect=$doc.getURL()" $msg.get('core.menu.watchlist.remove.space') 'tmUnwatchSpace', $unwatchClasses)
+    #submenuitem("$doc.getURL('view', 'xpage=watch&amp;do=addspace')&amp;xredirect=$escapetool.url($doc.getURL())" $msg.get('core.menu.watchlist.add.space', [$escapetool.xml($doc.space)]) 'tmWatchSpace', $watchClasses)
+    #submenuitem("$doc.getURL('view', 'xpage=watch&amp;do=removespace')&amp;xredirect=$escapetool.url($doc.getURL())" $msg.get('core.menu.watchlist.remove.space') 'tmUnwatchSpace', $unwatchClasses)
   #end
   #if($hasSpaceAdmin)
     #set ($adminspaceaction = $!xwiki.getURL("${doc.space}.WebPreferences", 'admin'))
     #submenuitem($adminspaceaction $msg.get('core.menu.admin.space', [$escapetool.xml($doc.space)]) 'tmAdminSpace')
   #end
   #submenuseparator()
-  #set($spaceIndexUrl = $xwiki.getURL('Main.SpaceIndex', 'view',"space=${doc.space}"))
+  #set($spaceIndexUrl = $xwiki.getURL('Main.SpaceIndex', 'view',"space=${escapetool.xml($doc.space)}"))
   #submenuitem($spaceIndexUrl $msg.get('core.menu.space.documentindex') 'tmSpaceDocumentIndex' '')
   #xwikitopmenuentryend()
 #end
@@ -139,8 +142,8 @@
       #set($watchClasses = 'hasIcon hidden')
       #set($unwatchClasses = 'hasIcon')
     #end
-    #submenuitem("$doc.getURL('view', 'xpage=watch&amp;do=adddocument')&amp;xredirect=$doc.getURL()" $msg.get('core.menu.watchlist.add.page') 'tmWatchDocument' $watchClasses)
-    #submenuitem("$doc.getURL('view', 'xpage=watch&amp;do=removedocument')&amp;xredirect=$doc.getURL()" $msg.get('core.menu.watchlist.remove.page') 'tmUnwatchDocument' $unwatchClasses)  
+    #submenuitem("$doc.getURL('view', 'xpage=watch&amp;do=adddocument')&amp;xredirect=$escapetool.url($doc.getURL())" $msg.get('core.menu.watchlist.add.page') 'tmWatchDocument' $watchClasses)
+    #submenuitem("$doc.getURL('view', 'xpage=watch&amp;do=removedocument')&amp;xredirect=$escapetool.url($doc.getURL())" $msg.get('core.menu.watchlist.remove.page') 'tmUnwatchDocument' $unwatchClasses)  
   #end
   #set ($canDelete = !$doc.isNew() && $xwiki.checkAccess($doc.fullName, 'delete'))
   #if($canDelete || $xwiki.hasProgrammingRights())

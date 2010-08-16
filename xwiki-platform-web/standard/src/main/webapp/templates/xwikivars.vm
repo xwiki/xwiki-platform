@@ -1,21 +1,22 @@
 #template("frequentlyUsedDocs.vm")
-#set($isGuest = $context.getUser().equals("XWiki.XWikiGuest"))
+#set($isGuest = $context.getUser().equals('XWiki.XWikiGuest'))
 #set($isSuperAdmin = ($context.user == 'XWiki.superadmin'))
-#set($hasEdit = $xwiki.hasAccessLevel("edit"))
-#set($hasAdmin = $xwiki.hasAccessLevel("admin"))
+#set($hasEdit = $xwiki.hasAccessLevel('edit'))
+#set($hasAdmin = $xwiki.hasAccessLevel('admin'))
+#set($hasComment = $xwiki.hasAccessLevel('comment'))
 ## Note: In order to know if the user has the right to create a space we compute a space name that doesn't exist and check edit rights on that space
-#set($hasCreateSpace = $xwiki.hasAccessLevel("edit", "${doc.space}${mathtool.random(0, 999)}.DocumentReservedForInternalXWikiUsage"))
+#set($hasCreateSpace = $xwiki.hasAccessLevel('edit', "${doc.space}${mathtool.random(0, 999)}.DocumentReservedForInternalXWikiUsage"))
 ## Note: In order to know if the user has the right to create a page we compute a page name that doesn't exist and check edit rights on that page 
-#set($hasCreatePage = $xwiki.hasAccessLevel("edit", "${doc.space}.DocumentReservedForInternalXWikiUsage${mathtool.random(0, 999)}"))
-#set($hasGlobalAdmin = $xwiki.hasAccessLevel("admin", $context.user, "XWiki.XWikiPreferences"))
+#set($hasCreatePage = $xwiki.hasAccessLevel('edit', "${doc.space}.DocumentReservedForInternalXWikiUsage${mathtool.random(0, 999)}"))
+#set($hasGlobalAdmin = $xwiki.hasAccessLevel('admin', $context.user, 'XWiki.XWikiPreferences'))
 ## Note: The document name is not internally used to determine if a user has programming access level. We pass XWiki.XWikiPreferences for consistency with the call for global admin
-#set($hasProgramming = $xwiki.hasAccessLevel("programming", $context.user, "XWiki.XWikiPreferences"))
-#set($hasSpaceAdmin = $xwiki.hasAccessLevel("admin", $context.user, "${doc.space}.WebPreferences"))
+#set($hasProgramming = $xwiki.hasAccessLevel('programming', $context.user, 'XWiki.XWikiPreferences'))
+#set($hasSpaceAdmin = $xwiki.hasAccessLevel('admin', $context.user, "${doc.space}.WebPreferences"))
 #set($hasWatch = $xwiki.watchlist && !$isGuest && !$isSuperAdmin && $xwiki.exists($services.model.serialize($services.model.createDocumentReference($context.wiki, 'XWiki', 'XWikiUserWatchListSheet'), 'local')))
 #set($isReadOnly = $xwiki.isReadOnly())
-#set($spaceViewUrl = $spaceDoc.getURL("view"))
-#set($viewUrl = $doc.getURL("view"))
-#set($userObj = $!crtUserDoc.getObject("XWiki.XWikiUsers",0))
+#set($spaceViewUrl = $spaceDoc.getURL('view'))
+#set($viewUrl = $doc.getURL('view'))
+#set($userObj = $!crtUserDoc.getObject('XWiki.XWikiUsers',0))
 ## =====================================================================================
 ## Advanced users are:
 ## - super admin

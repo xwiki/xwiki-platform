@@ -6,7 +6,8 @@
   ##
   ## Edit menu
   ##
-  #set($currentEditorTitle = $msg.get("core.menu.edit.currentEditor", [$msg.get("core.menu.edit.${editor}")]))  
+  #set($editorName = $msg.get("core.menu.edit.${editor}"))
+  #set($currentEditorTitle = $msg.get("core.menu.edit.currentEditor", ["__SEPARATOR__ $editorName"]))  
   #set($currentEditorId = "tmEdit${editor.substring(0, 1).toUpperCase()}${editor.substring(1)}")
   #if($isAdvancedUser)
     #xwikitopmenuentrystart('' $currentEditorTitle 'tmCurrentEditor' "$currentEditorId hasIcon")

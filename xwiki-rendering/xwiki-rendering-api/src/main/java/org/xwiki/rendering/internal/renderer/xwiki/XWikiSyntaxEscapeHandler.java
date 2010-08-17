@@ -72,6 +72,9 @@ public class XWikiSyntaxEscapeHandler
         // Note: This needs to be the first replacement since other replacements below also use the tilde symbol
         replaceAll(accumulatedBuffer, ESCAPE_CHAR, ESCAPE_CHAR + ESCAPE_CHAR);
 
+        // Escape anything that looks like starting of custom parameters
+        replaceAll(accumulatedBuffer, "(%", ESCAPE_CHAR + "(%");
+
         // When in a paragraph we need to escape symbols that are at beginning of lines and that could be confused
         // with list items, headers or tables.
         if (blockStateListener.isInLine() && isOnNewLine()) {

@@ -314,7 +314,11 @@
   #if ($newWiki)
     #if (!$firstEntry) &lt;/ul&gt;&lt;/li&gt;&lt;/ul&gt;&lt;/li&gt; #else #set($firstEntry = false) #end
     #set($previousEvent = "")
-    &lt;li&gt;&lt;a href="#$event.getWiki()" style="$rightColumnAStyle"&gt;$event.getWiki()&lt;/a&gt;
+    #set($wikiName = "$!xwiki.wikimanager.getWikiDocument($event.getWiki()).getWikiPrettyName()")
+    #if($wikiName == "")
+      #set($wikiName = $event.getWiki())
+    #end
+    &lt;li&gt;&lt;a href="#$event.getWiki()" style="$rightColumnAStyle"&gt;$wikiName&lt;/a&gt;
     &lt;ul style="$rightColumnUlStyle"&gt;
   #end
   #set($newSpace = ($event.getSpace() != $previousEvent.getSpace()))
@@ -353,8 +357,12 @@ $msg.get("watchlist.notification.email.multipleUpdates.intro")
   #if ($newWiki)
     #if (!$firstEntry) &lt;/div&gt;&lt;/div&gt;&lt;/div&gt; #else #set($firstEntry = false) #end
     #set($previousEvent = "")
+    #set($wikiName = "$!xwiki.wikimanager.getWikiDocument($event.getWiki()).getWikiPrettyName()")
+    #if($wikiName == "")
+      #set($wikiName = $event.getWiki())
+    #end
     &lt;div class="wiki" style="$wikiDivStyle"&gt;
-    &lt;h1 style="$h1Style"&gt;&lt;img src="cid:wiki.gif" style="$iconStyle" ${iconAttrs} /&gt;&lt;a name="$event.getWiki()"&gt;&lt;span&gt;&amp;nbsp;&lt;/span&gt;&lt;/a&gt;$event.getWiki()&lt;/h1&gt;
+    &lt;h1 style="$h1Style"&gt;&lt;img src="cid:wiki.gif" style="$iconStyle" ${iconAttrs} /&gt;&lt;a name="$event.getWiki()"&gt;&lt;span&gt;&amp;nbsp;&lt;/span&gt;&lt;/a&gt;$wikiName&lt;/h1&gt;
   #end
   #set($newSpace = ($event.getSpace() != $previousEvent.getSpace()))
   #if ($newSpace)

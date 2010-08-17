@@ -4,15 +4,15 @@
 #set($previewenabled = true)
 <script type="text/javascript" src="$xwiki.getSkinFile("js/xwiki/wysiwyg/tinymce/tiny_mce/tiny_mce.js")"></script>
 <script type="text/javascript" src="$xwiki.getSkinFile("js/xwiki/wysiwyg/tinymce/wiki_editor/wiki_editor.js")"></script>
-#set($xredirect=$!request.getParameter("xredirect"))
+#set($xredirect = "$!{escapetool.xml($request.getParameter('xredirect'))}")
 ## <form id="edit" method="post" action="$doc.getURL("preview")" onsubmit="tinyMCE.triggerSave();">
 ## #set($editactions = "top")
 ## <div class="topbuttons">#template("editactions.vm")</div>
 <div>
 <div class="hidden">
-<input type="hidden" name="template" value="$!request.template" />
+<input type="hidden" name="template" value="$!{escapetool.xml($request.template)}" />
 #if($request.section && $request.section!="")
- #set($xcontinue=$doc.getURL("edit", "editor=wysiwyg&amp;section=$request.section"))
+ #set($xcontinue=$doc.getURL("edit", "editor=wysiwyg&amp;section=$!{escapetool.xml($request.section)}"))
 #else
  #set($xcontinue=$doc.getURL("edit", "editor=wysiwyg"))
 #end

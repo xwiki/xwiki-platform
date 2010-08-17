@@ -31,6 +31,12 @@ import com.xpn.xwiki.api.Document;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.doc.XWikiLock;
 
+/**
+ * Action used for saving and proceeding to view the saved page.
+ * Used as a generic action for saving documents.
+ * 
+ * @version $Id:$
+ */
 public class SaveAction extends PreviewAction
 {
     /** The identifier of the save action. */
@@ -192,17 +198,7 @@ public class SaveAction extends PreviewAction
         XWikiException e = (XWikiException) context.get("exception");
         if ((e != null) && (e.getCode() == XWikiException.ERROR_XWIKI_APP_DOCUMENT_NOT_EMPTY)) {
             return "docalreadyexists";
-        } else if (e != null) {
-            return "exception";
-        } else {
-            // If display mode is edit we failed because of validation
-            if ("edit".equals(context.get("display"))) {
-                return "inline";
-            } else {
-                // If captcha is not correct it will require to confirm again
-                context.put("recheckcaptcha", new Boolean(true));
-                return super.render(context);
-            }
         }
+        return "exception";
     }
 }

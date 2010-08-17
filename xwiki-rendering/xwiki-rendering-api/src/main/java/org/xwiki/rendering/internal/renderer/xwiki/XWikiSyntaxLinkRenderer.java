@@ -24,7 +24,6 @@ import java.util.Stack;
 
 import org.apache.commons.lang.StringUtils;
 import org.xwiki.rendering.internal.parser.PlainTextStreamParser;
-import org.xwiki.rendering.internal.renderer.DefaultLinkReferenceSerializer;
 import org.xwiki.rendering.internal.renderer.ParametersPrinter;
 import org.xwiki.rendering.internal.renderer.printer.XWikiSyntaxEscapeWikiPrinter;
 import org.xwiki.rendering.listener.Link;
@@ -60,11 +59,11 @@ public class XWikiSyntaxLinkRenderer
     public String serialize(Link link, boolean isFreeStanding)
     {
         String result = this.linkReferenceSerializer.serialize(link);
-        
+
         if (!isFreeStanding) {
             result = result.replace("~", "~~").replace(">>", "~>~>").replace("||", "~|~|");
         }
-        
+
         return result;
     }
 

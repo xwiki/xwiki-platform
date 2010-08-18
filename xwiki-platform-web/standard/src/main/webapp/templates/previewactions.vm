@@ -6,31 +6,31 @@
     #set($backToEditAction = 'edit')
   #end
   #set($keyboardShortcutsEnabled = true)
-  #set($editor = "$!request.xcontinue")
-  #if($editor == '')
-    #set($editor = "$!request.getHeader('Referer')")
-    #if($editor == '')
-      #if($doc.content.indexOf("includeForm(")!=-1)
-        #set($editor=$tdoc.getURL('inline', "$!docvariant"))
+  #set($editorUrl = "$!request.xcontinue")
+  #if($editorUrl == '')
+    #set($editorUrl = "$!request.getHeader('Referer')")
+    #if($editorUrl == '')
+      #if($doc.content.indexOf("includeForm(") != -1)
+        #set($editorUrl = $tdoc.getURL('inline', "$!docvariant"))
       #else
         #if($xwiki.getUserPreference('editor') == 'Wysiwyg' && (!$tdoc.isAdvancedContent()))
-          #set($editor=$tdoc.getURL("edit", "editor=wysiwyg&amp;$docvariant"))
+          #set($editorUrl = $tdoc.getURL("edit", "editor=wysiwyg&amp;$docvariant"))
         #else
-          #set($editor=$tdoc.getURL("edit", "editor=wiki&amp;$docvariant"))
+          #set($editorUrl = $tdoc.getURL("edit", "editor=wiki&amp;$docvariant"))
         #end
       #end
     #end
   #end
-<form id="backtoedit" action="$editor" method="post">
+<form id="backtoedit" action="$!{escapetool.xml($editorUrl)}" method="post">
   <div>
   #foreach($param in $request.getParameterNames())
     #if(!$param.startsWith('action_'))
       #foreach($value in $request.getParameterValues($param))
-        <input type="hidden" name="$param" value="$xwiki.getFormEncoded($value)"/>
+        <input type="hidden" name="$!{escapetool.xml($param)}" value="$!{escapetool.xml($value)}"/>
       #end
     #end
   #end
-  #editActionButton($backToEditAction, 'backtoedit')
+  #editActionButton("$!{escapetool.xml($backToEditAction)}", 'backtoedit')
   #editActionButton('saveandcontinue', 'saveandcontinue')
   #editActionButton('save', 'saveandview')
   #editActionButton('cancel', 'cancel')

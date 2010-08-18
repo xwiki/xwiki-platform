@@ -20,7 +20,7 @@
     #set($sourcedoc = "$!{request.sourcedoc}")
     #set($targetdoc = "$!{request.targetdoc}")
     #if("$!request.language" != "" && "$!{request.language}" != 'ALL')
-      #set($language = $request.language)
+      #set($language = "$!{escapetool.xml($request.language)}")
     #end
     #set($sourcewiki = $context.database)
     #set($targetwiki = $context.database)
@@ -35,15 +35,15 @@
       #set($fromurl = $xwiki.getURL("$prefixedSourcedoc"))
       #set($tourl = $xwiki.getURL("$prefixedTargetdoc"))
     #end
-    #set($sourcelink = "<a href='${fromurl}'>$prefixedSourcedoc #if($language)($language)#end</a>")
-    #set($targetlink = "<a href='${tourl}'>$prefixedTargetdoc</a>")
+    #set($sourcelink = "<a href='${fromurl}'>$!{escapetool.xml($prefixedSourcedoc)} #if($language)($language)#end</a>")
+    #set($targetlink = "<a href='${tourl}'>$!{escapetool.xml($prefixedTargetdoc)}</a>")
     #info("$msg.get('core.copy.copyingdoc', [$sourcelink, $targetlink])")
     #else
     <form action="">
     <div class="hidden"><input type="hidden" name="xpage" value="copy" /></div>
     <dl>
       <dt>$msg.get("core.copy.sourcedoc"):</dt>
-      <dd>$doc.fullName <input type="hidden" name="sourcedoc" value="$doc.fullName" size="60"/></dd>
+      <dd>$!{escapetool.xml($doc.fullName)} <input type="hidden" name="sourcedoc" value="$!{escapetool.xml($doc.fullName)}" size="60"/></dd>
       #set ($docTranslations = $doc.getTranslationList())
       #if ($docTranslations.size() > 0)
       <dt><label for="language">$msg.get("language")</label>:</dt>
@@ -59,7 +59,7 @@
       </dd>
       #end
       <dt><label for="targetdoc">$msg.get("core.copy.targetdoc")</label>:</dt>
-      <dd><input type="text" id="targetdoc" name="targetdoc" value="$!{request.targetdoc}" size="60" /></dd>
+      <dd><input type="text" id="targetdoc" name="targetdoc" value="$!{escapetool.xml($targetdoc)}" size="60" /></dd>
     </dl>
     <div><span class="buttonwrapper"><input type="submit" value="Copy" class="button"/></span></div>
     </form>

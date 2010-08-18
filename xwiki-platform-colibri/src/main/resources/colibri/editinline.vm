@@ -35,22 +35,20 @@ $xwiki.ssfx.use('js/xwiki/editors/fullScreenEdit.css', true)##
 ##
 ## Can edit. Display the form
 ##
-#set($xredirect=$!request.getParameter("xredirect"))
-#set($xnotification=$!request.getParameter("xnotification"))
 <form id="inline" method="post" action="$doc.getURL("preview")">
 <div>
 <div class="hidden"><input type="hidden" name="xcontinue" value="$doc.getURL("inline")"/></div>
 ## This input is used by the full screen widget: it stores the selector of the maximized element, so that the full screen can be restored when coming back from preview.
-<input type="hidden" name="x-maximized" value="$!{request.get('x-maximized')}" />
-<input type="hidden" name="xredirect" value="$!xredirect" />
-<input type="hidden" name="xnotification" value="$!xnotification" />
-<input type="hidden" name="template" value="$!request.template" />
-<input type="hidden" name="language" value="$!doc.language" />
+<input type="hidden" name="x-maximized" value="$!{escapetool.xml(${request.get('x-maximized')})}" />
+<input type="hidden" name="xredirect" value="$!{escapetool.xml($request.get('xredirect'))}" />
+<input type="hidden" name="xnotification" value="$!{escapetool.xml($request.get('xnotification'))}" />
+<input type="hidden" name="template" value="$!{escapetool.xml($request.template)}" />
+<input type="hidden" name="language" value="$!{escapetool.xml($doc.language)}" />
 #if("$!request.parent" != '')
-  <input type="hidden" name="parent" value="$escapetool.html($!request.parent)" />
+  <input type="hidden" name="parent" value="$escapetool.xml($!request.parent)" />
 #end
 #if("$!request.title" != '')
-  <input type="hidden" name="title" value="$escapetool.html($!request.title)" />
+  <input type="hidden" name="title" value="$escapetool.xml($!request.title)" />
 #end
 ## ----------------------------
 ## Display the rendered content

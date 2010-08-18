@@ -41,13 +41,13 @@
 #end
 #if($xwiki.hasRecycleBin())
   #if($hasInlinks)
-    #set($fullmsg="${fullmsg}${msg.get('core.recyclebin.confirmWithInlinks')}")
+    #set($fullmsg = "${fullmsg}${msg.get('core.recyclebin.confirmWithInlinks')}")
   #else
     #set($fullmsg = $msg.get('core.recyclebin.confirm'))
   #end
 #else
   #if($hasInlinks)
-    #set($fullmsg="${fullmsg}${msg.get('core.delete.confirmWithInlinks')}")
+    #set($fullmsg = "${fullmsg}${msg.get('core.delete.confirmWithInlinks')}")
   #else
     #set($fullmsg = $msg.get('core.delete.confirm'))
   #end
@@ -58,18 +58,18 @@
     <form action="" method="post">
       <div class="hidden">
         <input type="hidden" name="confirm" value="1"/>
-        <input type="hidden" name="id" value="$request.id"/>
+        <input type="hidden" name="id" value="$!{escapetool.xml($request.id)}"/>
         #if("$!{request.xredirect}" != '')
-          <input type="hidden" name="xredirect" value="$request.xredirect"/>
+          <input type="hidden" name="xredirect" value="$!{escapetool.xml($request.xredirect)}"/>
         #end
       </div>
       <div class="buttonwrapper"><input type="submit" class="button" value="$msg.get('yes')"/></div>
       #if("$!{request.xredirect}" != '')
-        #set($cancelUrl = $request.xredirect)
+        #set($cancelUrl = "$request.xredirect")
       #else
         #set($cancelUrl = $doc.getURL())
       #end
-      <div class="buttonwrapper"><a class="secondary button" href="${cancelUrl}">$msg.get('no')</a></div>
+      <div class="buttonwrapper"><a class="secondary button" href="$!{escapetool.xml(${cancelUrl})}">$msg.get('no')</a></div>
     </form>
   #xwikimessageboxend()
 #end

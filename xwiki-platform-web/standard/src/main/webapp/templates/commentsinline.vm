@@ -37,7 +37,7 @@ $xwiki.ssfx.use('uicomponents/viewers/comments.css', true)
 #set($xCommentClass = 'XWiki.XWikiComments')
 ##
 #if(!$replyTo)
-  #set($replyTo = $escapetool.html($!request.get('replyto')))
+  #set($replyTo = $escapetool.xml($!request.get('replyto')))
 #end
 ##
 #set($requestedByAjax = ($request.getHeader('X-Requested-With') == 'XMLHttpRequest'))
@@ -56,10 +56,10 @@ $xwiki.ssfx.use('uicomponents/viewers/comments.css', true)
 ##
 ## If $fillInFields, then set variables for each field.
 #if($fillInFields)
-  #set($author = $!escapetool.html($request.get("${xCommentClass}_author")))
-  #set($comment = $!escapetool.html($request.get("${xCommentClass}_comment")))
+  #set($author = $!escapetool.xml($request.get("${xCommentClass}_author")))
+  #set($comment = $!escapetool.xml($request.get("${xCommentClass}_comment")))
   #if("$!replyTo" == '')
-    #set($replyTo = $escapetool.html($!request.get("${xCommentClass}_replyto")))
+    #set($replyTo = $escapetool.xml($!request.get("${xCommentClass}_replyto")))
   #end
 #end
 ##
@@ -67,7 +67,7 @@ $xwiki.ssfx.use('uicomponents/viewers/comments.css', true)
   #set($author = $msg.get('core.viewers.comments.add.guestName.default'))
 #end
 ##
-#set($xredirect = $!escapetool.html($request.get("xredirect")))
+#set($xredirect = $!escapetool.xml($request.get("xredirect")))
 #if("$!xredirect" == '')
   #set($xredirect = "$doc.getURL('view')?$request.getQueryString()")
 #end

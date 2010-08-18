@@ -20,7 +20,8 @@
     #set($sourcedoc = "$!{request.sourcedoc}")
     #set($targetdoc = "$!{request.targetdoc}")
     #if("$!request.language" != "" && "$!{request.language}" != 'ALL')
-      #set($language = "$!{escapetool.xml($request.language)}")
+      #set($language = "$!{request.language}")
+      #set($escapedLanguage = "$!{escapetool.xml($request.language)}")
     #end
     #set($sourcewiki = $context.database)
     #set($targetwiki = $context.database)
@@ -28,14 +29,14 @@
     #set($ok = $xwiki.copyDocument($sourcedoc, $targetdoc, $sourcewiki, $targetwiki, $language, false, true))
     #set($prefixedSourcedoc = "#if($sourcewiki!=$context.database)$sourcewiki:#end$sourcedoc")
     #set($prefixedTargetdoc = "#if($targetwiki!=$context.database)$targetwiki:#end$targetdoc")
-    #if($language)
-      #set($fromurl = $xwiki.getURL("$prefixedSourcedoc", "view", "language=${language}"))
-      #set($tourl = $xwiki.getURL("$prefixedTargetdoc", "view", "language=${language}"))
+    #if($escapedLanguage)
+      #set($fromurl = $xwiki.getURL("$prefixedSourcedoc", "view", "language=${escapedLanguage}"))
+      #set($tourl = $xwiki.getURL("$prefixedTargetdoc", "view", "language=${escapedLanguage}"))
     #else
       #set($fromurl = $xwiki.getURL("$prefixedSourcedoc"))
       #set($tourl = $xwiki.getURL("$prefixedTargetdoc"))
     #end
-    #set($sourcelink = "<a href='${fromurl}'>$!{escapetool.xml($prefixedSourcedoc)} #if($language)($language)#end</a>")
+    #set($sourcelink = "<a href='${fromurl}'>$!{escapetool.xml($prefixedSourcedoc)} #if($escapedLanguage)($escapedLanguage)#end</a>")
     #set($targetlink = "<a href='${tourl}'>$!{escapetool.xml($prefixedTargetdoc)}</a>")
     #info("$msg.get('core.copy.copyingdoc', [$sourcelink, $targetlink])")
     #else

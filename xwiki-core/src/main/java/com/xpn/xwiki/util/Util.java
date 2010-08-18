@@ -37,7 +37,9 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Hashtable;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
+import java.util.MissingResourceException;
 import java.util.Set;
 import java.util.Vector;
 
@@ -879,5 +881,55 @@ public class Util
         }
 
         return Thread.currentThread().getContextClassLoader().getResourceAsStream(resource);
+    }
+
+    /**
+     * Normalize the given language code. Converts the given language code to lower case and checks its validity (i.e.
+     * whether it is an ISO 639 language code or the string "default").
+     * <p><pre>
+     * Util.normalizeLanguage(null)      = null
+     * Util.normalizeLanguage("")        = ""
+     * Util.normalizeLanguage("  ")      = ""
+     * Util.normalizeLanguage("default") = "default"
+     * Util.normalizeLanguage("DeFault") = "default"
+     * Util.normalizeLanguage("invalid") = "default"
+     * Util.normalizeLanguage("en")      = "en"
+     * Util.normalizeLanguage("DE_at")   = "de_AT"
+     * </pre></p>
+     * 
+     * @param languageCode the language code to normalize
+     * @return normalized language code or the string "default" if the code is invalid
+     */
+    public static String normalizeLanguage(String languageCode)
+    {
+        if (languageCode == null) {
+            return null;
+        }
+        if (StringUtils.isBlank(languageCode)) {
+            return "";
+        }
+        // handle language_COUNTRY case
+        final String separator = "_";
+        String[] parts = languageCode.toLowerCase().split(separator);
+        String result = parts[0];
+        if (parts.length > 1) {
+            parts[1] = parts[1].toUpperCase();
+            // NOTE cannot use Locale#toString(), because it would change some language codes
+            result = parts[0] + separator + parts[1];
+        }
+        // handle the "default" case
+        final String defaultLanguage = "default";
+        if (defaultLanguage.equals(result)) {
+            return defaultLanguage;
+        }
+        try {
+            Locale l = new Locale(parts[0], parts.length > 1 ? parts[1] : "");
+            // Will throw an exception if the language code is not valid
+            l.getISO3Language();
+            return result;
+        } catch (MissingResourceException ex) {
+            LOG.warn("Invalid language: " + languageCode);
+        }
+        return defaultLanguage;
     }
 }

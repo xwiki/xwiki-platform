@@ -58,16 +58,16 @@ $response.setContentType("application/x-json")
 "totalrows": $countGroups,
 "returnedrows": #if($countGroups < $limit) $countGroups #else $limit #end,
 "offset": $offset,
-"reqNo": $request.reqNo,
+"reqNo": $util.parseInt($request.reqNo),
 "rows": [
 #foreach( $group in $groups )
   #set($wikiname = $group.getWiki())
   #if($wikiname != "xwiki" || $wikiname == $context.database) #set($wikiname = "local") #end
    #set( $grs = $xwiki.rightsmanager.getAllGroupsForUser( $group.fullName ) )
    #if( $velocityCount > 1 ) , #end
-   {"username"      : "$group.name", 
-    "fullname"      : "$group.fullName",
-    "wikiname"      : "$wikiname",
+   {"username"      : "$!{escapetool.javascript($group.name)}", 
+    "fullname"      : "$!{escapetool.javascript($group.fullName)}",
+    "wikiname"      : "$!{escapetool.javascript($wikiname)}",
     "members"       : "$xwiki.rightsmanager.countAllMembersNamesForGroup($group.fullName)", 
     "userurl"       : "$xwiki.getURL($group.fullName)",
     "usersaveurl"   : "$group.getURL('save')",

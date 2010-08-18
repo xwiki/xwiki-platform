@@ -91,11 +91,11 @@ $response.setContentType("application/x-json")
 ### json starts
 {
 "totalrows": $matchedCount,
-"reqNo"    : $request.reqNo,
+"reqNo"    : $util.parseInt($request.reqNo),
 "returnedrows": #if($matchedCount < $limit) $matchedCount #else $limit #end,
 "offset"   : $offset,
-"clsname"  : "$clsname",
-"uorg"     : "$uorg",
+"clsname"  : "$!{escapetool.javascript($clsname)}",
+"uorg"     : "$!{escapetool.javascript($uorg)}",
 "rows": [
 #foreach($user in $users)
   #set($wikiname = $user.getWiki())
@@ -127,9 +127,9 @@ $response.setContentType("application/x-json")
       #end
     #end
   #end ## foreach rights object
- {"username"   : "$user.name",
-  "fullname"   : #if($wikiname=="xwiki") "$user.getPrefixedFullName()" #else "$user.fullName" #end,
-  "wikiname"   : "$wikiname", 
+ {"username"   : "$!{escapetool.javascript($user.name)}",
+  "fullname"   : #if($wikiname=="xwiki") "$!{escapetool.javascript($user.getPrefixedFullName())}" #else "$!{escapetool.javascript($user.fullName)}" #end,
+  "wikiname"   : "$!{escapetool.javascript($wikiname)}",
   "userurl"    : "$xwiki.getURL($user.fullName)",
   "allows"     : "$allows.keySet()",
   "denys"      : "$denys.keySet()",

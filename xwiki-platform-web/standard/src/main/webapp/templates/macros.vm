@@ -162,9 +162,9 @@ $xwiki.invokeServletAndReturnAsString($url)
 ## Displays the status for the given AIM id
 ##
 #macro(aim $id)
-#set($onurl = "${request.scheme}://${request.serverName}${xwiki.getSkinFile('aimonline.gif')}")
-#set($offurl = "${request.scheme}://${request.serverName}${xwiki.getSkinFile('aimoffline.gif')}")
-<img border="0" src="http://big.oscar.aol.com/nvludo?on_url=${onurl}&amp;off_url=${offurl}" alt="Online detector"></a>
+#set($onurl = "${escapetool.url(${request.scheme})}://${escapetool.url(${request.serverName})}${xwiki.getSkinFile('aimonline.gif')}")
+#set($offurl = "${escapetool.url(${request.scheme})}://${escapetool.url(${request.serverName})}${xwiki.getSkinFile('aimoffline.gif')}")
+<img border="0" src="http://big.oscar.aol.com/nvludo?on_url=${escapetool.url(${onurl})}&amp;off_url=${escapetool.url(${offurl})}" alt="Online detector"></a>
 #end
 ##
 ##
@@ -172,9 +172,9 @@ $xwiki.invokeServletAndReturnAsString($url)
 ## Displays the status for the given MSN id
 ##
 #macro(msn $id)
-#set($onurl = "${request.serverName}${xwiki.getSkinFile('msnonline.gif')}")
-#set($offurl = "${request.serverName}${xwiki.getSkinFile('msnoffline.gif')}")
-<img border="0" src="http://turdinc.kicks-ass.net:6969/msn/${id}/onurl=${onurl}/offurl=${offurl}/unknownurl=${offurl}" />
+#set($onurl = "${escapetool.url(${request.serverName})}${xwiki.getSkinFile('msnonline.gif')}")
+#set($offurl = "${escapetool.url(${request.serverName})}${xwiki.getSkinFile('msnoffline.gif')}")
+<img border="0" src="http://turdinc.kicks-ass.net:6969/msn/${id}/onurl=${escapetool.url(${onurl})}/offurl=${escapetool.url(${offurl})}/unknownurl=${escapetool.url(${offurl})}" />
 #end
 ##
 ##
@@ -264,10 +264,10 @@ $xwiki.getUserName("xwiki:${username}")
 #set($mmurl = $mindmap)
 #else
 #set($mmurl1 = $doc.getAttachmentURL($mindmap,"download"))
-#set($mmurl = "${request.scheme}://${request.serverName}:${request.serverPort}${mmurl1}")
+#set($mmurl = "${escapetool.url(${request.scheme})}://${escapetool.url(${request.serverName})}:${escapetool.url(${request.serverPort})}${mmurl1}")
 #end
 #end
-<applet code="freemind.main.FreeMindApplet.class" archive="${request.contextPath}/freemind/freemind.jar" width="${width}" height="${height}">
+<applet code="freemind.main.FreeMindApplet.class" archive="${escapetool.xml(${request.contextPath})}/freemind/freemind.jar" width="${escapetool.xml(${width})}" height="${escapetool.xml(${height})}">
 <param name="type" value="application/x-java-applet;version=1.4" />
 <param name="scriptable" value="false" />
 <param name="modes" value="freemind.modes.browsemode.BrowseMode" />
@@ -343,6 +343,10 @@ $xwiki.getUserName("xwiki:${username}")
 </div>
 #end
 
+##
+## Warning: Written in syntax xwiki/1.0, there is no way to properly escape the links
+## Do not use
+##
 #macro(exportPackage)
 #set($export = $request.get("export"))
 #if ($export == "1")
@@ -415,6 +419,10 @@ $xwiki.getUserName("xwiki:${username}")
 #end
 #end
 
+##
+## Warning: Written in syntax xwiki/1.0, there is no way to properly escape the links
+## Do not use
+##
 #macro(importPackage)
 #set($toexport = $request.get("export"))
 #if($toexport == "1")
@@ -536,7 +544,7 @@ $xwiki.getUserName("xwiki:${username}")
   #if(!$picturelist.containsKey($username))
     #set($picture = "<img src='")
     #set($picture = $picture.concat($xwiki.getSkinFile('noavatar.png')))
-    #set($picture = $picture.concat("' alt='$username' title='$username'/>"))
+    #set($picture = $picture.concat("' alt='${escapetool.xml($username)}' title='${escapetool.xml($username)}'/>"))
     #set($profiledoc = $xwiki.getDocument($username))
     #if(!$profiledoc.isNew())
       #if($profiledoc.attachmentList.size() != 0)
@@ -548,9 +556,9 @@ $xwiki.getUserName("xwiki:${username}")
               #set($picture = "<img src='")
               #set($picture = $picture.concat($pictureurl))
               #set($picture = $picture.concat("' alt='"))
-              #set($picture = $picture.concat($username))
+              #set($picture = $picture.concat(${escapetool.xml($username)}))
               #set($picture = $picture.concat("' title='"))
-              #set($picture = $picture.concat($username))
+              #set($picture = $picture.concat(${escapetool.xml($username)}))
               #set($picture = $picture.concat("'/>"))
               #break
             #end

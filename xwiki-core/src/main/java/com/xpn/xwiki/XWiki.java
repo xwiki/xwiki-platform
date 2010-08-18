@@ -2371,7 +2371,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface
     {
         // First we look in the cookies
         if (useCookie) {
-            String result = getUserPreferenceFromCookie(prefname, context);
+            String result = Util.normalizeLanguage(getUserPreferenceFromCookie(prefname, context));
             if (result != null) {
                 return result;
             }
@@ -2420,9 +2420,8 @@ public class XWiki implements XWikiDocChangeNotificationInterface
         // from the XWiki preferences settings. Otherwise set a cookie to remember the language
         // in use.
         try {
-            language = context.getRequest().getParameter("language");
+            language = Util.normalizeLanguage(context.getRequest().getParameter("language"));
             if ((language != null) && (!language.equals(""))) {
-                language = language.toLowerCase();
                 if (language.equals("default")) {
                     // forgetting language cookie
                     Cookie cookie = new Cookie("language", "");
@@ -2447,7 +2446,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface
         // from a cookie.
         try {
             // First we get the language from the cookie
-            language = getUserPreferenceFromCookie("language", context);
+            language = Util.normalizeLanguage(getUserPreferenceFromCookie("language", context));
             if ((language != null) && (!language.equals(""))) {
                 context.setLanguage(language);
                 return language;
@@ -2461,7 +2460,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface
             XWikiDocument userdoc = null;
             userdoc = getDocument(user, context);
             if (userdoc != null) {
-                language = userdoc.getStringValue("XWiki.XWikiUsers", "default_language").toLowerCase();
+                language = Util.normalizeLanguage(userdoc.getStringValue("XWiki.XWikiUsers", "default_language"));
                 if (!language.equals("")) {
                     context.setLanguage(language);
                     return language;
@@ -2534,10 +2533,10 @@ public class XWiki implements XWikiDocChangeNotificationInterface
     {
         // Find out what is the default language from the XWiki preferences settings.
         String defaultLanguage = context.getWiki().getXWikiPreference("default_language", "", context);
-        if (StringUtils.isEmpty(defaultLanguage)) {
+        if (StringUtils.isBlank(defaultLanguage)) {
             defaultLanguage = "en";
         }
-        return defaultLanguage.toLowerCase();
+        return Util.normalizeLanguage(defaultLanguage);
     }
 
     public String getDocLanguagePreferenceNew(XWikiContext context)
@@ -2561,7 +2560,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface
 
         // Get request language
         try {
-            requestLanguage = context.getRequest().getParameter("language");
+            requestLanguage = Util.normalizeLanguage(context.getRequest().getParameter("language"));
         } catch (Exception ex) {
         }
 
@@ -2589,7 +2588,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface
 
         // Get language from cookie
         try {
-            cookieLanguage = getUserPreferenceFromCookie("language", context);
+            cookieLanguage = Util.normalizeLanguage(getUserPreferenceFromCookie("language", context));
         } catch (Exception e) {
         }
 
@@ -2637,14 +2636,14 @@ public class XWiki implements XWikiDocChangeNotificationInterface
         boolean setCookie = false;
 
         if (!context.getWiki().isMultiLingual(context)) {
-            language = context.getWiki().getXWikiPreference("default_language", "", context);
+            language = Util.normalizeLanguage(context.getWiki().getXWikiPreference("default_language", "", context));
             context.setInterfaceLanguage(language);
             return language;
         }
 
         // Get request language
         try {
-            requestLanguage = context.getRequest().getParameter("interfacelanguage");
+            requestLanguage = Util.normalizeLanguage(context.getRequest().getParameter("interfacelanguage"));
         } catch (Exception ex) {
         }
 
@@ -2676,7 +2675,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface
 
         // Get language from cookie
         try {
-            cookieLanguage = getUserPreferenceFromCookie("interfacelanguage", context);
+            cookieLanguage = Util.normalizeLanguage(getUserPreferenceFromCookie("interfacelanguage", context));
         } catch (Exception e) {
         }
 

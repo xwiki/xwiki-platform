@@ -1,20 +1,19 @@
 package com.xpn.xwiki.web;
 
-import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
+import com.xpn.xwiki.util.Util;
 
 public class ResetVersionsAction extends XWikiAction
 {
     @Override
     public boolean action(XWikiContext context) throws XWikiException
     {
-        XWiki xwiki = context.getWiki();
         XWikiRequest request = context.getRequest();
         XWikiResponse response = context.getResponse();
         XWikiDocument doc = context.getDoc();
-        String language = context.getRequest().getParameter("language");
+        String language = Util.normalizeLanguage(context.getRequest().getParameter("language"));
 
         String confirm = request.getParameter("confirm");
         if ((confirm != null) && (confirm.equals("1"))) {
@@ -36,10 +35,7 @@ public class ResetVersionsAction extends XWikiAction
     @Override
     public String render(XWikiContext context) throws XWikiException
     {
-        XWiki xwiki = context.getWiki();
         XWikiRequest request = context.getRequest();
-        XWikiResponse response = context.getResponse();
-        XWikiDocument doc = context.getDoc();
         String confirm = request.getParameter("confirm");
         if ((confirm != null) && (confirm.equals("1"))) {
             return "resetversionsdone";

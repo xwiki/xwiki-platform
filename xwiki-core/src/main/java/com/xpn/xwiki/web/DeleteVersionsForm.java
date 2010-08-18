@@ -21,6 +21,8 @@ package com.xpn.xwiki.web;
 
 import org.suigeneris.jrcs.rcs.Version;
 
+import com.xpn.xwiki.util.Util;
+
 /**
  * Struts form for {@link DeleteVersionsAction}.
  * @version $Id$
@@ -44,7 +46,7 @@ public class DeleteVersionsForm extends XWikiForm
         rev1 = getVersion(request.getParameter("rev1"));
         rev2 = getVersion(request.getParameter("rev2"));
         rev =  getVersion(request.getParameter("rev"));
-        language = request.getParameter("language");
+        language = Util.normalizeLanguage(request.getParameter("language"));
         confirm = request.getParameter("confirm") != null;
     }
     /**

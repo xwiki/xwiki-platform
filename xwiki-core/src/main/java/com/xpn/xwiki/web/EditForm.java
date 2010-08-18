@@ -26,6 +26,8 @@ import java.util.Map;
 
 import org.apache.commons.lang.math.NumberUtils;
 
+import com.xpn.xwiki.util.Util;
+
 public class EditForm extends XWikiForm
 {
 
@@ -144,7 +146,7 @@ public class EditForm extends XWikiForm
 
     public void setLanguage(String language)
     {
-        this.language = language;
+        this.language = Util.normalizeLanguage(language);
     }
 
     public int getObjectNumbers(String prefix)
@@ -214,7 +216,7 @@ public class EditForm extends XWikiForm
 
     public void setDefaultLanguage(String defaultLanguage)
     {
-        this.defaultLanguage = defaultLanguage;
+        this.defaultLanguage = Util.normalizeLanguage(defaultLanguage);
     }
 
     public String getTitle()

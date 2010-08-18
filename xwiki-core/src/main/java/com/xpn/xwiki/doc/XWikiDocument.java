@@ -5098,7 +5098,7 @@ public class XWikiDocument implements DocumentModelBridge
 
     public void setLanguage(String language)
     {
-        this.language = language;
+        this.language = Util.normalizeLanguage(language);
     }
 
     public String getDefaultLanguage()

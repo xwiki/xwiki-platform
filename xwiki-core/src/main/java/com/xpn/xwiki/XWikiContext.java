@@ -354,7 +354,7 @@ public class XWikiContext extends Hashtable<Object, Object>
 
     public void setLanguage(String language)
     {
-        this.language = language;
+        this.language = Util.normalizeLanguage(language);
         if (language == null) {
             remove(LANGUAGE_KEY);
         } else {

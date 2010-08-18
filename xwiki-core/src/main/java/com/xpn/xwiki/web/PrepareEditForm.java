@@ -21,6 +21,8 @@
 
 package com.xpn.xwiki.web;
 
+import com.xpn.xwiki.util.Util;
+
 
 
 public class PrepareEditForm extends XWikiForm {
@@ -78,7 +80,7 @@ public class PrepareEditForm extends XWikiForm {
     }
 
     public void setDefaultLanguage(String defaultLanguage) {
-        this.defaultLanguage = defaultLanguage;
+        this.defaultLanguage = Util.normalizeLanguage(defaultLanguage);
     }
 
     public boolean isLockForce() {

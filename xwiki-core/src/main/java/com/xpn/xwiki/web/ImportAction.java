@@ -29,6 +29,7 @@ import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.plugin.packaging.DocumentInfo;
 import com.xpn.xwiki.plugin.packaging.DocumentInfoAPI;
 import com.xpn.xwiki.plugin.packaging.PackageAPI;
+import com.xpn.xwiki.util.Util;
 
 /**
  * XWiki Action responsible for importing XAR archives.
@@ -91,7 +92,7 @@ public class ImportAction extends XWikiAction
                         }
 
                         for (String pageName : pages) {
-                            String language = request.get("language_" + pageName);
+                            String language = Util.normalizeLanguage(request.get("language_" + pageName));
                             String actionName = "action_" + pageName;
                             if (!StringUtils.isBlank(language)) {
                                 actionName += ("_" + language);

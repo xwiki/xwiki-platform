@@ -21,6 +21,8 @@
 
 package com.xpn.xwiki.web;
 
+import com.xpn.xwiki.util.Util;
+
 public class RollbackForm extends XWikiForm {
     private String rev;
     private String language;
@@ -46,7 +48,7 @@ public class RollbackForm extends XWikiForm {
     }
 
     public void setLanguage(String language) {
-        this.language = language;
+        this.language = Util.normalizeLanguage(language);
     }
 
 	public String getConfirm() {

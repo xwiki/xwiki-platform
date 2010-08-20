@@ -38,7 +38,7 @@
   <description>XWiki Platform - Core - Parent POM</description>
   <properties>
     <!-- Versions of XWiki dependencies used in Core modules -->
-    <clirr.previous.version>2.3</clirr.previous.version>
+    <clirr.previous.version>2.4</clirr.previous.version>
   </properties>
   <scm>
     <connection>scm:svn:http://svn.xwiki.org/svnroot/xwiki/platform/core/trunk</connection>
@@ -194,20 +194,7 @@
                      exclude it for the moment. See http://bit.ly/c5Jnho Remove this exclude when the problem is fixed
                      in CLIRR. -->
                 <exclude>org/xwiki/officeimporter/openoffice/OpenOfficeManager$ManagerState</exclude>
-                <!-- TODO: Excludes below to be removed when we release XWiki 2.4 -->
-                <exclude>org/xwiki/rendering/transformation/MacroTransformationContext</exclude>
-                <exclude>org/xwiki/rendering/transformation/Transformation</exclude>
-                <exclude>org/xwiki/rendering/transformation/TransformationManager</exclude>
-                <exclude>org/xwiki/rendering/listener/DefaultAttachement</exclude>
-                <exclude>org/xwiki/rendering/scaffolding/RenderingTestCase</exclude>
-                <exclude>org/xwiki/officeimporter/openoffice/OpenOfficeManager</exclude>
-                <exclude>org/xwiki/model/ModelContext</exclude>
-                <exclude>org/xwiki/bridge/DocumentAccessBridge</exclude>
-                <exclude>org/xwiki/velocity/VelocityEngine</exclude>
-                <exclude>org/xwiki/rendering/macro/script/AbstractJSR223ScriptMacro</exclude>
-                <!-- Moved internal classes that should have been in the internal package to the internal package -->
-                <exclude>org/xwiki/query/xwql/**/*</exclude>
-                <exclude>org/xwiki/query/jpql/**/*</exclude>
+                <!-- TODO: Excludes below to be removed when we release XWiki 2.5 -->
               </excludes>
             </configuration>
           </plugin>

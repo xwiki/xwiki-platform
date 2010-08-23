@@ -86,11 +86,6 @@ public class DefaultWikiMacro implements WikiMacro
      * The key under which macro can directly return the resulting {@link List} of {@link Block}.
      */
     private static final String MACRO_RESULT_KEY = "result";
-    
-    /**
-     * The key under which macro can access the document where it's defined.
-     */
-    private static final String MACRO_DOC_KEY = "document";
 
     /**
      * They key used to access the current context document stored in XWikiContext.
@@ -219,8 +214,7 @@ public class DefaultWikiMacro implements WikiMacro
         macroContext.put(MACRO_PARAMS_KEY, parameters);
         macroContext.put(MACRO_CONTENT_KEY, macroContent);
         macroContext.put(MACRO_CONTEXT_KEY, context);
-        macroContext.put(MACRO_RESULT_KEY, null);
-        macroContext.put(MACRO_DOC_KEY, null);
+        macroContext.put(MACRO_RESULT_KEY, context);
 
         Map xwikiContext = null;
         Object contextDoc = null;

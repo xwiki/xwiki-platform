@@ -82,9 +82,7 @@ public class UploadAction extends XWikiAction
 
         XWikiDocument doc = (XWikiDocument) context.getDoc().clone();
 
-        // TODO This code does not use transactions properly. Each attachment uses its own transaction, thus in case of
-        // error some of the attachments will be saved (just the content), while the document will not link to them, and
-        // the attachment metadata will not be stored.
+        // The document is saved for each attachment in the group.
         FileUploadPlugin fileupload = (FileUploadPlugin) context.get("fileuploadplugin");
         Map<String, String> fileNames = new HashMap<String, String>();
         List<String> wrongFileNames = new ArrayList<String>();
@@ -110,9 +108,6 @@ public class UploadAction extends XWikiAction
                 failedFiles.add(file.getKey());
             }
         }
-
-        // Also save the document and attachment metadata
-        context.getWiki().saveDocument(doc, context);
 
         LOG.debug("Found files to upload: " + fileNames);
         LOG.debug("Failed attachments: " + failedFiles);
@@ -195,11 +190,10 @@ public class UploadAction extends XWikiAction
         } else {
             comment = context.getMessageTool().get("core.comment.uploadAttachmentComment", params);
         }
-        doc.setComment(comment);
 
-        // Save the attachment content and archive
+        // Save the document.
         try {
-            doc.saveAttachmentContent(attachment, false, true, context);
+            context.getWiki().saveDocument(doc, comment, context);
         } catch (XWikiException e) {
             // check Exception is ERROR_XWIKI_APP_JAVA_HEAP_SPACE when saving Attachment
             if (e.getCode() == XWikiException.ERROR_XWIKI_APP_JAVA_HEAP_SPACE) {

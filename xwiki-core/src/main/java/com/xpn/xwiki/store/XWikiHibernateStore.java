@@ -1696,6 +1696,11 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
                 session.update(attachment);
             }
 
+            // We must save the content of the attachment.
+            // updateParent and bTransaction must be false because the content should be saved in the same transaction
+            // as the attachment and if the parent doc needs to be updated, this function will do it.
+            context.getWiki().getAttachmentStore().saveAttachmentContent(attachment, false, context, false);
+
             if (parentUpdate) {
                 context.getWiki().getStore().saveXWikiDoc(attachment.getDoc(), context, false);
             }

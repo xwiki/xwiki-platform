@@ -99,6 +99,7 @@ public class RefererStatsStoreItem extends AbstractStatsStoreItem
 
         // Load old statistics object from database
         try {
+            // TODO Fix use of deprecated call.
             store.loadXWikiCollection(refererStat, context, true);
         } catch (XWikiException e) {
             if (LOG.isDebugEnabled()) {
@@ -111,6 +112,7 @@ public class RefererStatsStoreItem extends AbstractStatsStoreItem
 
         // Re-save statistics object
         try {
+            // TODO Fix use of deprecated call.
             store.saveXWikiCollection(refererStat, context, true);
         } catch (XWikiException e) {
             LOG.error("Failed to save referer statictics object [" + getId() + "]");

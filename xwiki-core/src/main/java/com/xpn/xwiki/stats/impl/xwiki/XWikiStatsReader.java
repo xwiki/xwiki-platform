@@ -546,6 +546,7 @@ public class XWikiStatsReader
         XWikiHibernateStore store = context.getWiki().getHibernateStore();
         DocumentStats object = new DocumentStats(docname, action, month, PeriodType.MONTH);
         try {
+            // TODO Fix use of deprecated call.
             store.loadXWikiCollection(object, context, true);
             return object;
         } catch (XWikiException e) {

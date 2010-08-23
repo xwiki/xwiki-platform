@@ -99,6 +99,7 @@ public class VisitStatsStoreItem extends AbstractStatsStoreItem
             // other one because the ID info have changed
             if (oldVisitStats != null) {
                 try {
+                    // TODO Fix use of deprecated call.
                     store.deleteXWikiCollection(oldVisitStats, this.context, true, true);
                 } catch (Exception e) {
                     if (LOG.isWarnEnabled()) {
@@ -107,6 +108,7 @@ public class VisitStatsStoreItem extends AbstractStatsStoreItem
                 }
             }
 
+            // TODO Fix use of deprecated call.
             store.saveXWikiCollection(newVisitStats, this.context, true);
         } catch (XWikiException e) {
             LOG.error("Failed to save visit statictics object [" + getId() + "]");

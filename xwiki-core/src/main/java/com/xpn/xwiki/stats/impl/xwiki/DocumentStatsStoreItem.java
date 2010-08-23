@@ -110,6 +110,7 @@ public class DocumentStatsStoreItem extends AbstractStatsStoreItem
 
         // Load old statistics object from database
         try {
+            // TODO Fix use of deprecated call.
             store.loadXWikiCollection(documentStat, context, true);
         } catch (XWikiException e) {
             if (LOG.isDebugEnabled()) {
@@ -129,6 +130,7 @@ public class DocumentStatsStoreItem extends AbstractStatsStoreItem
 
         // Re-save statistics object
         try {
+            // TODO Fix use of deprecated call.
             store.saveXWikiCollection(documentStat, context, true);
         } catch (XWikiException e) {
             LOG.error("Failed to save document statictics object [" + getId() + "]");

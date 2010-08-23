@@ -3955,6 +3955,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface
         if (groupDoc.isNew()) {
             saveDocument(groupDoc, context.getMessageTool().get("core.comment.addedUserToGroup"), context);
         } else {
+            // TODO Fix use of deprecated call.
             getHibernateStore().saveXWikiObject(memberObject, context, true);
         }
 

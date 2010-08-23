@@ -1025,7 +1025,6 @@
               **/objects/ObjectInterface.java,
               **/objects/PropertyInterface.java,
               **/objects/StringListProperty.java,
-              **/objects/StringProperty.java,
               **/pdf/api/PdfExport.java,
               **/pdf/impl/PdfExportImpl.java,
               **/pdf/impl/PdfURLFactory.java,

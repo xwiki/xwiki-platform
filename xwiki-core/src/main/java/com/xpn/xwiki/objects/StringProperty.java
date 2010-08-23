@@ -22,10 +22,12 @@
 package com.xpn.xwiki.objects;
 
 
-
-public class StringProperty extends BaseStringProperty {
-
-    public StringProperty() {
-      super();
-    }
+/**
+ * XProperty for containing a string of limited size (default 255 characters max).
+ * 
+ * @version $Id:$
+ */
+public class StringProperty extends BaseStringProperty
+{
+    // No different from BaseStringProperty, only exists for Hibernate mapping.
 }

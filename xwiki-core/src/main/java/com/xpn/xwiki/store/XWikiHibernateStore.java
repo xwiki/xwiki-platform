@@ -1430,13 +1430,11 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
                 endTransaction(context, true);
             }
         } catch (Exception e) {
+            // Something went wrong, collect some information.
             final BaseCollection obj = property.getObject();
             final Object[] args = {(obj != null) ? obj.getName() : "unknown", property.getName()};
-            throw new XWikiException(XWikiException.MODULE_XWIKI_STORE,
-                                     XWikiException.ERROR_XWIKI_STORE_HIBERNATE_LOADING_OBJECT,
-                                     "Exception while saving property {1} of object {0}", e, args);
 
-        } finally {
+            // Try to roll back the transaction if this is in it's own transaction.
             try {
                 if (bTransaction) {
                     this.endTransaction(context, false);
@@ -1444,6 +1442,11 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
             } catch (Exception e) {
                 // Not a lot we can do here if there was an exception committing and an exception rolling back.
             }
+
+            // Throw the exception.
+            throw new XWikiException(XWikiException.MODULE_XWIKI_STORE,
+                                     XWikiException.ERROR_XWIKI_STORE_HIBERNATE_LOADING_OBJECT,
+                                     "Exception while saving property {1} of object {0}", e, args);
         }
     }
 

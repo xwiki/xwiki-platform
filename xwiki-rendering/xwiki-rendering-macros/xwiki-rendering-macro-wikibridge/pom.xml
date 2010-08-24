@@ -94,7 +94,6 @@
         <artifactId>maven-checkstyle-plugin</artifactId>
         <configuration>
           <excludes>
-            org/xwiki/rendering/internal/macro/wikibridge/WikiMacroEventListener.java,
             org/xwiki/rendering/internal/macro/wikibridge/DefaultWikiMacro.java
           </excludes>
         </configuration>

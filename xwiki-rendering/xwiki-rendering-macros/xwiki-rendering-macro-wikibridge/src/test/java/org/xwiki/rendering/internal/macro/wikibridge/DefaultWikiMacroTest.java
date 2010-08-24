@@ -33,6 +33,7 @@ import org.apache.velocity.VelocityContext;
 import org.jmock.Expectations;
 import org.junit.Assert;
 import org.junit.Before;
+import org.junit.Test;
 import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.component.descriptor.DefaultComponentDescriptor;
 import org.xwiki.context.Execution;
@@ -46,6 +47,7 @@ import org.xwiki.rendering.macro.wikibridge.WikiMacroDescriptor;
 import org.xwiki.rendering.macro.wikibridge.WikiMacroManager;
 import org.xwiki.rendering.macro.wikibridge.WikiMacroParameterDescriptor;
 import org.xwiki.rendering.macro.wikibridge.WikiMacroVisibility;
+import org.xwiki.rendering.parser.Parser;
 import org.xwiki.rendering.renderer.printer.DefaultWikiPrinter;
 import org.xwiki.rendering.syntax.Syntax;
 import org.xwiki.script.ScriptContextManager;
@@ -71,10 +73,14 @@ public class DefaultWikiMacroTest extends AbstractComponentTestCase
      */
     private WikiMacroManager wikiMacroManager;
 
+    private Parser xwiki20Parser;
+
     @Before
     public void setUp() throws Exception
     {
         super.setUp();
+
+        this.xwiki20Parser = getComponentManager().lookup(Parser.class, "xwiki/2.0");
 
         // Script setup.
         ScriptMockSetup scriptMockSetup = new ScriptMockSetup(getMockery(), getComponentManager());
@@ -104,7 +110,7 @@ public class DefaultWikiMacroTest extends AbstractComponentTestCase
     /**
      * Test normal wiki macro execution.
      */
-    @org.junit.Test
+    @Test
     public void testExecute() throws Exception
     {
         registerWikiMacro("wikimacro1", "This is **bold**");
@@ -123,7 +129,7 @@ public class DefaultWikiMacroTest extends AbstractComponentTestCase
      * When a wiki macro is used in inline mode and its code starts with a macro, that nested macro is made inline. In
      * other words, the nested macro should not generate extra paragraph elements.
      */
-    @org.junit.Test
+    @Test
     public void testExecuteWhenInlineAndWithMacro() throws Exception
     {
         registerWikiMacro("wikimacro1", "This is **bold**");
@@ -144,7 +150,7 @@ public class DefaultWikiMacroTest extends AbstractComponentTestCase
      * A wiki macro can directly provide the list of blocks insstead of having to rendering them to let
      * {@link DefaultWikiMacro} re-parse it.
      */
-    @org.junit.Test
+    @Test
     public void testExecuteWhenWikiMacroDirectlyProvideTheResult() throws Exception
     {
         Collections.singletonList(new WordBlock("result"));
@@ -169,8 +175,7 @@ public class DefaultWikiMacroTest extends AbstractComponentTestCase
     /**
      * Test default parameter value injection.
      */
-    @SuppressWarnings("unchecked")
-    @org.junit.Test
+    @Test
     public void testDefaultParameterValues() throws Exception
     {
         // Velocity Manager mock.
@@ -228,9 +233,9 @@ public class DefaultWikiMacroTest extends AbstractComponentTestCase
                 WikiMacroVisibility.GLOBAL, new DefaultContentDescriptor(false), parameterDescriptors);
 
         DefaultWikiMacro wikiMacro =
-            new DefaultWikiMacro(wikiMacroDocumentReference, true, descriptor, macroContent, "xwiki/2.0",
-                getComponentManager());
+            new DefaultWikiMacro(wikiMacroDocumentReference, true, descriptor,
+                this.xwiki20Parser.parse(new StringReader(macroContent)), Syntax.XWIKI_2_0, getComponentManager());
 
-        wikiMacroManager.registerWikiMacro(wikiMacroDocumentReference, wikiMacro);
+        this.wikiMacroManager.registerWikiMacro(wikiMacroDocumentReference, wikiMacro);
     }
 }

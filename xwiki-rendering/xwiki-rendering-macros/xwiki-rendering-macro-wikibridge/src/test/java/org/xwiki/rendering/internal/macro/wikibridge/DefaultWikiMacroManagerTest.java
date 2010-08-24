@@ -19,6 +19,7 @@
  */
 package org.xwiki.rendering.internal.macro.wikibridge;
 
+import java.io.StringReader;
 import java.util.ArrayList;
 
 import org.jmock.Expectations;
@@ -34,6 +35,8 @@ import org.xwiki.rendering.macro.wikibridge.WikiMacroException;
 import org.xwiki.rendering.macro.wikibridge.WikiMacroManager;
 import org.xwiki.rendering.macro.wikibridge.WikiMacroParameterDescriptor;
 import org.xwiki.rendering.macro.wikibridge.WikiMacroVisibility;
+import org.xwiki.rendering.parser.Parser;
+import org.xwiki.rendering.syntax.Syntax;
 import org.xwiki.test.AbstractComponentTestCase;
 
 /**
@@ -55,8 +58,11 @@ public class DefaultWikiMacroManagerTest extends AbstractComponentTestCase
     private MacroManager macroManager;
 
     private DocumentAccessBridge mockDocumentAccessBridge;
+    
+    private Parser xwiki20Parser;
 
-    @Override protected void registerComponents() throws Exception
+    @Override
+    protected void registerComponents() throws Exception
     {
         super.registerComponents();
 
@@ -69,6 +75,8 @@ public class DefaultWikiMacroManagerTest extends AbstractComponentTestCase
     public void setUp() throws Exception
     {
         super.setUp();
+
+        this.xwiki20Parser = getComponentManager().lookup(Parser.class, "xwiki/2.0");
 
         this.macroManager = getComponentManager().lookup(MacroManager.class);
         this.wikiMacroManager = getComponentManager().lookup(WikiMacroManager.class);
@@ -210,7 +218,7 @@ public class DefaultWikiMacroManagerTest extends AbstractComponentTestCase
         WikiMacroDescriptor descriptor = new WikiMacroDescriptor(new MacroId("testwikimacro"), "Test Wiki Macro", "Description", 
             "Test", visibility, new DefaultContentDescriptor(), new ArrayList<WikiMacroParameterDescriptor>());
         DefaultWikiMacro wikiMacro = new DefaultWikiMacro(wikiMacroDocReference, true, descriptor,
-            "== Test ==", "xwiki/2.0", getComponentManager());
+            this.xwiki20Parser.parse(new StringReader("== Test ==")), Syntax.XWIKI_2_0, getComponentManager());
 
         return wikiMacro;
     }

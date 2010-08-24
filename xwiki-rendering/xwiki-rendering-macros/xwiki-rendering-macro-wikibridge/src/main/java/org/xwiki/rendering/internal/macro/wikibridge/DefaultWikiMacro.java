@@ -20,19 +20,17 @@
 
 package org.xwiki.rendering.internal.macro.wikibridge;
 
-import java.io.StringReader;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.commons.lang.StringUtils;
 import org.xwiki.bridge.DocumentAccessBridge;
-import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.context.Execution;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.block.MacroBlock;
+import org.xwiki.rendering.block.ParagraphBlock;
 import org.xwiki.rendering.block.XDOM;
 import org.xwiki.rendering.macro.Macro;
 import org.xwiki.rendering.macro.MacroExecutionException;
@@ -41,13 +39,10 @@ import org.xwiki.rendering.macro.descriptor.ParameterDescriptor;
 import org.xwiki.rendering.macro.parameter.MacroParameterException;
 import org.xwiki.rendering.macro.wikibridge.WikiMacro;
 import org.xwiki.rendering.macro.wikibridge.WikiMacroParameters;
-import org.xwiki.rendering.parser.ParseException;
-import org.xwiki.rendering.parser.Parser;
-import org.xwiki.rendering.syntax.SyntaxFactory;
+import org.xwiki.rendering.syntax.Syntax;
 import org.xwiki.rendering.transformation.MacroTransformationContext;
 import org.xwiki.rendering.transformation.Transformation;
 import org.xwiki.rendering.transformation.TransformationContext;
-import org.xwiki.rendering.util.ParserUtils;
 
 /**
  * Default implementation of {@link WikiMacro}.
@@ -58,12 +53,17 @@ import org.xwiki.rendering.util.ParserUtils;
 public class DefaultWikiMacro implements WikiMacro
 {
     /**
+     * They key used to access the current context document stored in XWikiContext.
+     */
+    private static final String CONTEXT_DOCUMENT_KEY = "doc";
+
+    /**
      * The key under which macro context will be available in the XWikiContext for scripts.
      */
     private static final String MACRO_KEY = "macro";
 
     /**
-     * Macro hint for {@link Transformation} component. Same as MACRO_KEY (Check style fix)
+     * Macro hint for {@link Transformation} component. Same as MACRO_KEY (Check style fix).
      */
     private static final String MACRO_HINT = MACRO_KEY;
 
@@ -88,9 +88,10 @@ public class DefaultWikiMacro implements WikiMacro
     private static final String MACRO_RESULT_KEY = "result";
 
     /**
-     * They key used to access the current context document stored in XWikiContext.
+     * The key under which macro can access the document where it's defined. Same as CONTEXT_DOCUMENT_KEY (Check style
+     * fix).
      */
-    private static final String CONTEXT_DOCUMENT_KEY = "doc";
+    private static final String MACRO_DOC_KEY = CONTEXT_DOCUMENT_KEY;
 
     /**
      * The {@link MacroDescriptor} for this macro.
@@ -110,22 +111,17 @@ public class DefaultWikiMacro implements WikiMacro
     /**
      * Macro content.
      */
-    private String content;
+    private XDOM content;
 
     /**
      * Syntax id.
      */
-    private String syntaxId;
+    private Syntax syntax;
 
     /**
      * The component manager used to lookup other components.
      */
     private ComponentManager componentManager;
-
-    /**
-     * Used to clean result of the parser syntax.
-     */
-    private ParserUtils parserUtils;
 
     /**
      * Constructs a new {@link DefaultWikiMacro}.
@@ -134,19 +130,18 @@ public class DefaultWikiMacro implements WikiMacro
      * @param supportsInlineMode says if macro support inline mode or not
      * @param descriptor the {@link MacroDescriptor} describing this macro.
      * @param macroContent macro content to be evaluated.
-     * @param syntaxId syntax of the macroContent.
+     * @param syntax syntax of the macroContent source.
      * @param componentManager {@link ComponentManager} component used to look up for other components.
      * @since 2.3M1
      */
     public DefaultWikiMacro(DocumentReference macroDocumentReference, boolean supportsInlineMode,
-        MacroDescriptor descriptor, String macroContent, String syntaxId, ComponentManager componentManager)
+        MacroDescriptor descriptor, XDOM macroContent, Syntax syntax, ComponentManager componentManager)
     {
         this.macroDocumentReference = macroDocumentReference;
         this.supportsInlineMode = supportsInlineMode;
         this.descriptor = descriptor;
         this.content = macroContent;
-        this.syntaxId = syntaxId;
-        this.parserUtils = new ParserUtils();
+        this.syntax = syntax;
         this.componentManager = componentManager;
     }
 
@@ -155,9 +150,138 @@ public class DefaultWikiMacro implements WikiMacro
      * 
      * @see org.xwiki.rendering.macro.Macro#execute(Object, String, MacroTransformationContext)
      */
-    @SuppressWarnings("unchecked")
     public List<Block> execute(WikiMacroParameters parameters, String macroContent, MacroTransformationContext context)
         throws MacroExecutionException
+    {
+        validate(parameters, macroContent);
+
+        // Parse the wiki macro content.
+        XDOM xdom = prepareWikiMacroContent(context);
+
+        // Prepare macro context.
+        Map<String, Object> macroContext = new HashMap<String, Object>();
+        macroContext.put(MACRO_PARAMS_KEY, parameters);
+        macroContext.put(MACRO_CONTENT_KEY, macroContent);
+        macroContext.put(MACRO_CONTEXT_KEY, context);
+        macroContext.put(MACRO_RESULT_KEY, null);
+        macroContext.put(MACRO_DOC_KEY, null);
+
+        Map<String, Object> xwikiContext = null;
+        Object contextDoc = null;
+        try {
+            Execution execution = this.componentManager.lookup(Execution.class);
+            DocumentAccessBridge docBridge = this.componentManager.lookup(DocumentAccessBridge.class);
+            Transformation macroTransformation = this.componentManager.lookup(Transformation.class, MACRO_HINT);
+
+            // Place macro context inside xwiki context ($context.macro).
+            xwikiContext = (Map<String, Object>) execution.getContext().getProperty("xwikicontext");
+            xwikiContext.put(MACRO_KEY, macroContext);
+
+            // Save current context document.
+            contextDoc = xwikiContext.get(CONTEXT_DOCUMENT_KEY);
+
+            // Set the macro definition document as the context document, this is required to give the macro access to
+            // it's context ($context.macro) which holds macro parameters, macro content and other important structures.
+            // This workaround ensures that macro code is evaluated with programming rights, which in turn ensures that
+            // $context.macro is accessible within the macro code.
+            xwikiContext.put(CONTEXT_DOCUMENT_KEY, docBridge.getDocument(getDocumentReference()));
+
+            // Perform internal macro transformations.
+            TransformationContext txContext = new TransformationContext(xdom, this.syntax);
+            macroTransformation.transform(xdom, txContext);
+        } catch (Exception ex) {
+            throw new MacroExecutionException("Error while performing internal macro transformations", ex);
+        } finally {
+            if (null != xwikiContext) {
+                // Remove macro context from XWiki context.
+                xwikiContext.remove(MACRO_KEY);
+                if (null != contextDoc) {
+                    // Reset the context document.
+                    xwikiContext.put(CONTEXT_DOCUMENT_KEY, contextDoc);
+                }
+            }
+        }
+
+        return extractResult(xdom, macroContext, context);
+    }
+
+    /**
+     * Extract result of the wiki macro execution.
+     * 
+     * @param xdom the wiki macro content
+     * @param macroContext the wiki macro context
+     * @param context the macro execution context
+     * @return the result
+     */
+    private List<Block> extractResult(XDOM xdom, Map<String, Object> macroContext, MacroTransformationContext context)
+    {
+        Object resultObject = macroContext.get(MACRO_RESULT_KEY);
+
+        List<Block> result;
+        if (resultObject != null && resultObject instanceof List) {
+            result = (List<Block>) macroContext.get(MACRO_RESULT_KEY);
+        } else {
+            result = xdom.getChildren();
+            // If in inline mode remove any top level paragraph.
+            if (context.isInline()) {
+                removeTopLevelParagraph(result);
+            }
+        }
+
+        return result;
+    }
+
+    /**
+     * Removes any top level paragraph since for example for the following use case we don't want an extra paragraph
+     * block: <code>= hello {{velocity}}world{{/velocity}}</code>.
+     * 
+     * @param blocks the blocks to check and convert
+     */
+    private void removeTopLevelParagraph(List<Block> blocks)
+    {
+        // Remove any top level paragraph so that the result of a macro can be used inline for example.
+        // We only remove the paragraph if there's only one top level element and if it's a paragraph.
+        if ((blocks.size() == 1) && blocks.get(0) instanceof ParagraphBlock) {
+            Block paragraphBlock = blocks.remove(0);
+            blocks.addAll(0, paragraphBlock.getChildren());
+        }
+    }
+
+    /**
+     * Clone and filter wiki macro content depending of the context.
+     * 
+     * @param context the macro execution context
+     * @return the cleaned wiki macro content
+     */
+    private XDOM prepareWikiMacroContent(MacroTransformationContext context)
+    {
+        XDOM xdom = this.content.clone();
+
+        // Macro code segment is always parsed into a separate xdom document. Now if this code segment starts with
+        // another macro block, it will always be interpreted as a block macro regardless of the current wiki macro's
+        // context (because as far as the nested macro is concerned, it starts on a new line). This will introduce
+        // unnecessary paragraph elements when the wiki macro is used inline, so we need to force such opening macro
+        // blocks to behave as inline macros if the wiki macro is used inline.
+        if (context.isInline()) {
+            List<Block> children = xdom.getChildren();
+            if (children.size() > 0 && children.get(0) instanceof MacroBlock) {
+                MacroBlock old = (MacroBlock) children.get(0);
+                MacroBlock replacement = new MacroBlock(old.getId(), old.getParameters(), old.getContent(), true);
+                xdom.replaceChild(replacement, old);
+            }
+        }
+
+        return xdom;
+    }
+
+    /**
+     * Check validity of the given macro parameters and content.
+     * 
+     * @param parameters the macro parameters
+     * @param macroContent the macro content
+     * @throws MacroExecutionException given parameters of content is invalid
+     */
+    private void validate(WikiMacroParameters parameters, String macroContent) throws MacroExecutionException
     {
         // First verify that all mandatory parameters are provided.
         // Note that we currently verify automatically mandatory parameters in Macro Transformation but for the moment
@@ -179,95 +303,10 @@ public class DefaultWikiMacro implements WikiMacro
 
         // Verify the a macro content is not empty if it was declared mandatory.
         if (getDescriptor().getContentDescriptor() != null && getDescriptor().getContentDescriptor().isMandatory()) {
-            if (StringUtils.isEmpty(macroContent)) {
+            if (macroContent == null || macroContent.length() == 0) {
                 throw new MacroExecutionException("Missing macro content: this macro requires content (a body)");
             }
         }
-
-        // Parse the wiki macro content.
-        XDOM xdom;
-        try {
-            Parser parser = componentManager.lookup(Parser.class, syntaxId);
-            xdom = parser.parse(new StringReader(this.content));
-        } catch (ComponentLookupException ex) {
-            throw new MacroExecutionException("Could not find a parser for macro content", ex);
-        } catch (ParseException ex) {
-            throw new MacroExecutionException("Error while parsing macro content", ex);
-        }
-
-        // Macro code segment is always parsed into a separate xdom document. Now if this code segment starts with
-        // another macro block, it will always be interpreted as a block macro regardless of the current wiki macro's
-        // context (because as far as the nested macro is concerned, it starts on a new line). This will introduce
-        // unnecessary paragraph elements when the wiki macro is used inline, so we need to force such opening macro
-        // blocks to behave as inline macros if the wiki macro is used inline.
-        if (context.isInline()) {
-            List<Block> children = xdom.getChildren();
-            if (children.size() > 0 && children.get(0) instanceof MacroBlock) {
-                MacroBlock old = (MacroBlock) children.get(0);
-                MacroBlock replacement = new MacroBlock(old.getId(), old.getParameters(), old.getContent(), true);
-                xdom.replaceChild(replacement, old);
-            }
-        }
-
-        // Prepare macro context.
-        Map<String, Object> macroContext = new HashMap<String, Object>();
-        macroContext.put(MACRO_PARAMS_KEY, parameters);
-        macroContext.put(MACRO_CONTENT_KEY, macroContent);
-        macroContext.put(MACRO_CONTEXT_KEY, context);
-        macroContext.put(MACRO_RESULT_KEY, context);
-
-        Map xwikiContext = null;
-        Object contextDoc = null;
-        try {
-            Execution execution = componentManager.lookup(Execution.class);
-            DocumentAccessBridge docBridge = componentManager.lookup(DocumentAccessBridge.class);
-            SyntaxFactory syntaxFactory = componentManager.lookup(SyntaxFactory.class);
-            Transformation macroTransformation = componentManager.lookup(Transformation.class, MACRO_HINT);
-
-            // Place macro context inside xwiki context ($context.macro).
-            xwikiContext = (Map) execution.getContext().getProperty("xwikicontext");
-            xwikiContext.put(MACRO_KEY, macroContext);
-
-            // Save current context document.
-            contextDoc = xwikiContext.get(CONTEXT_DOCUMENT_KEY);
-
-            // Set the macro definition document as the context document, this is required to give the macro access to
-            // it's context ($context.macro) which holds macro parameters, macro content and other important structures.
-            // This workaround ensures that macro code is evaluated with programming rights, which in turn ensures that
-            // $context.macro is accessible within the macro code.
-            xwikiContext.put(CONTEXT_DOCUMENT_KEY, docBridge.getDocument(getDocumentReference()));
-
-            // Perform internal macro transformations.
-            TransformationContext txContext = new TransformationContext(xdom,
-                syntaxFactory.createSyntaxFromIdString(syntaxId));
-            macroTransformation.transform(xdom, txContext);
-        } catch (Exception ex) {
-            throw new MacroExecutionException("Error while performing internal macro transformations", ex);
-        } finally {
-            if (null != xwikiContext) {
-                // Remove macro context from xwiki context.
-                xwikiContext.remove(MACRO_KEY);
-                if (null != contextDoc) {
-                    // Reset the context document.
-                    xwikiContext.put(CONTEXT_DOCUMENT_KEY, contextDoc);
-                }
-            }
-        }
-
-        Object resultObject = macroContext.get(MACRO_RESULT_KEY);
-
-        List<Block> result;
-        if (resultObject != null && resultObject instanceof List) {
-            result = (List<Block>) macroContext.get(MACRO_RESULT_KEY);
-        } else {
-            result = xdom.getChildren();
-            // If in inline mode remove any top level paragraph.
-            if (context.isInline()) {
-                this.parserUtils.removeTopLevelParagraph(result);
-            }
-        }
-
-        return result;
     }
 
     /**
@@ -310,6 +349,7 @@ public class DefaultWikiMacro implements WikiMacro
         if (getPriority() != macro.getPriority()) {
             return getPriority() - macro.getPriority();
         }
+
         return this.getClass().getSimpleName().compareTo(macro.getClass().getSimpleName());
     }
 

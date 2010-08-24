@@ -20,6 +20,7 @@
 
 package com.xpn.xwiki.internal;
 
+import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Vector;
@@ -28,9 +29,11 @@ import org.apache.commons.lang.StringUtils;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.Requirement;
 import org.xwiki.component.logging.AbstractLogEnabled;
+import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.context.Execution;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.rendering.block.XDOM;
 import org.xwiki.rendering.internal.macro.wikibridge.DefaultWikiMacro;
 import org.xwiki.rendering.macro.MacroId;
 import org.xwiki.rendering.macro.descriptor.ContentDescriptor;
@@ -42,6 +45,8 @@ import org.xwiki.rendering.macro.wikibridge.WikiMacroException;
 import org.xwiki.rendering.macro.wikibridge.WikiMacroFactory;
 import org.xwiki.rendering.macro.wikibridge.WikiMacroParameterDescriptor;
 import org.xwiki.rendering.macro.wikibridge.WikiMacroVisibility;
+import org.xwiki.rendering.parser.ParseException;
+import org.xwiki.rendering.parser.Parser;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
@@ -220,9 +225,19 @@ public class DefaultWikiMacroFactory extends AbstractLogEnabled implements WikiM
         MacroDescriptor macroDescriptor = new WikiMacroDescriptor(id, macroName, macroDescription, macroDefaultCategory,
             macroVisibility, contentDescriptor, parameterDescriptors);
 
+        XDOM xdom;
+        try {
+            Parser parser = componentManager.lookup(Parser.class, doc.getSyntax().toIdString());
+            xdom = parser.parse(new StringReader(macroCode));
+        } catch (ComponentLookupException ex) {
+            throw new WikiMacroException("Could not find a parser for macro content", ex);
+        } catch (ParseException ex) {
+            throw new WikiMacroException("Error while parsing macro content", ex);
+        }
+        
         // Create & return the macro.
-        return new DefaultWikiMacro(documentReference, macroSupportsInlineMode, macroDescriptor, macroCode,
-            doc.getSyntaxId(), componentManager);
+        return new DefaultWikiMacro(documentReference, macroSupportsInlineMode, macroDescriptor, xdom,
+            doc.getSyntax(), this.componentManager);
     }
 
     /**

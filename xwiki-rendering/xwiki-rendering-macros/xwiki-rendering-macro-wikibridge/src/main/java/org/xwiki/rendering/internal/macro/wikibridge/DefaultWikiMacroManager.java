@@ -137,7 +137,7 @@ public class DefaultWikiMacroManager implements WikiMacroManager
      */
     public boolean hasWikiMacro(DocumentReference documentReference)
     {
-        return (null != wikiMacroMap.get(documentReference));
+        return (null != this.wikiMacroMap.get(documentReference));
     }
 
     /**
@@ -211,8 +211,7 @@ public class DefaultWikiMacroManager implements WikiMacroManager
                     documentReference, macroDescriptor.getVisibility()));
             }
         } else {
-            throw new WikiMacroException(String.format("Macro [%s] in [%s] isn't registered", macroData.getWikiMacro()
-                .getDescriptor().getId().getId(), documentReference));
+            throw new WikiMacroException(String.format("Macro in [%s] isn't registered", documentReference));
         }
     }
 

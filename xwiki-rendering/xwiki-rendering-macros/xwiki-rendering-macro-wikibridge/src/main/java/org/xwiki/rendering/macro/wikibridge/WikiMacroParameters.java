@@ -28,7 +28,7 @@ import org.xwiki.properties.RawProperties;
 
 /**
  * Generic parameters class for all wiki macros.
- *
+ * 
  * @version $Id$
  * @since 2.0M2
  */
@@ -38,23 +38,23 @@ public class WikiMacroParameters implements RawProperties
      * A map holding all the parameter and their values.
      */
     private Map<String, Object> parametersMap;
-    
+
     /**
      * Creates a new {@link WikiMacroParameters} instance.
      */
     public WikiMacroParameters()
     {
-        parametersMap = new HashMap<String, Object>();
+        this.parametersMap = new HashMap<String, Object>();
     }
-    
+
     /**
      * {@inheritDoc}
      */
     public void set(String propertyName, Object value)
     {
-        parametersMap.put(propertyName, value);
+        this.parametersMap.put(propertyName, value);
     }
-    
+
     /**
      * Returns the set of parameter names provided by user.
      * 
@@ -62,9 +62,9 @@ public class WikiMacroParameters implements RawProperties
      */
     public Set<String> getParameterNames()
     {
-        return Collections.unmodifiableSet(parametersMap.keySet());
+        return Collections.unmodifiableSet(this.parametersMap.keySet());
     }
-    
+
     /**
      * Returns the parameter value associated with the propertyName provided.
      * 
@@ -73,6 +73,6 @@ public class WikiMacroParameters implements RawProperties
      */
     public Object get(String propertyName)
     {
-        return parametersMap.get(propertyName);
+        return this.parametersMap.get(propertyName);
     }
 }

@@ -26,7 +26,7 @@ import org.xwiki.model.reference.EntityReference;
 
 /**
  * A cache for fast access right checking.
- * @version $Id: $
+ * @version $Id$
  */
 @ComponentRole
 public interface RightCache

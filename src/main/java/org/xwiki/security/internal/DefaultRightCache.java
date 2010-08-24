@@ -53,7 +53,7 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 /**
  * A cache for fast access right checking.
- * @version $Id: $
+ * @version $Id$
  */
 @Component
 public class DefaultRightCache extends AbstractLogEnabled implements RightCache, Initializable

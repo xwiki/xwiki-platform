@@ -47,7 +47,7 @@ import org.apache.commons.logging.LogFactory;
 /**
  * This class contains utility functions for accessing various xwiki
  * objecst, such as the XWikiGroupService.
- * @version $Id: $
+ * @version $Id$
  */
 final class XWikiUtils
 {

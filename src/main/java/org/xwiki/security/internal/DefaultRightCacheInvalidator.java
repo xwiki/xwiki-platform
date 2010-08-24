@@ -46,7 +46,7 @@ import org.xwiki.component.logging.AbstractLogEnabled;
 /**
  * The instance of this class monitors updates and invalidates right
  * cache entries whenever necessary.
- * @version $Id: $
+ * @version $Id$
  */
 @Component
 public class DefaultRightCacheInvalidator extends AbstractLogEnabled implements RightCacheInvalidator, EventListener

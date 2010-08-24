@@ -40,7 +40,7 @@ import org.xwiki.security.RightResolver;
 
 /**
  * Default factory for right service.
- * @version $Id: $
+ * @version $Id$
  */
 @Component
 @InstantiationStrategy(PER_LOOKUP)

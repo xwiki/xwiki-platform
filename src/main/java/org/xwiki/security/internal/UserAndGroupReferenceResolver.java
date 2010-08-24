@@ -32,7 +32,7 @@ import org.xwiki.model.reference.EntityReferenceResolver;
  * component to resolve {@link DocumentReference} objects from their string representation.  This resolver
  * is specialized for generating document references of user and group documents.  The resolve
  * 
- * @version $Id: $
+ * @version $Id$
  */
 @Component(hints = { "user", "group" })
 public class UserAndGroupReferenceResolver implements DocumentReferenceResolver<String>

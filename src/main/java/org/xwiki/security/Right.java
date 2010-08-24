@@ -27,7 +27,7 @@ import java.util.Map;
 
 /**
  * Enumeration of the possible rights.
- * @version $Id: $
+ * @version $Id$
  */
 public enum Right
 {

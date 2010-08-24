@@ -21,7 +21,7 @@
 package org.xwiki.security;
 
 /**
- * @version $Id: $
+ * @version $Id$
  */
 public class RightServiceException extends Exception
 {

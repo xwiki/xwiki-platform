@@ -30,7 +30,7 @@ package org.xwiki.security;
  * Thus, the appropriate action is to restart the attempt to load the
  * cache when catching this, after the lock that blocks the event
  * delivery has ben released and reaquired.
- * @version $Id: $
+ * @version $Id$
  */
 public class ConflictingInsertionException extends Exception
 {

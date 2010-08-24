@@ -27,7 +27,7 @@ import java.util.Collection;
 
 /**
  * Factory interface for generating instances of RightsObjects.
- * @version $Id: $
+ * @version $Id$
  */
 @ComponentRole
 public interface RightsObjectFactory

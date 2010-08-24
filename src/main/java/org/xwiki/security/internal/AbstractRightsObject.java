@@ -41,7 +41,7 @@ import java.util.EnumSet;
 
 /**
  * Wrapper around xwiki rights objects.
- * @version $Id: $
+ * @version $Id$
  */
 public abstract class AbstractRightsObject implements RightsObject
 {

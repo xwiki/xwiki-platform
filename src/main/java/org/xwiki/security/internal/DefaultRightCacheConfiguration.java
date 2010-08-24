@@ -41,7 +41,7 @@ import org.xwiki.security.RightCacheEntry;
 
 /**
  * Default configuration for right cache.
- * @version $Id: $
+ * @version $Id$
  */
 @Component
 @InstantiationStrategy(PER_LOOKUP)

@@ -24,7 +24,7 @@ import org.xwiki.component.annotation.ComponentRole;
 
 /**
  * Interface for configuring the right service component.
- * @version $Id: $
+ * @version $Id$
  */
 @ComponentRole
 public interface RightServiceConfigurationManager

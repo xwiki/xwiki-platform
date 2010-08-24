@@ -52,7 +52,7 @@ import com.xpn.xwiki.user.api.XWikiUser;
 /**
  * The default right service.
  *
- * @version $Id: $
+ * @version $Id$
  */
 @Component
 public class DefaultRightService extends AbstractLogEnabled implements RightService

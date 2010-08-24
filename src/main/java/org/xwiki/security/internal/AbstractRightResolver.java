@@ -44,7 +44,7 @@ import org.apache.commons.lang.StringUtils;
 
 /**
  * Abstract super class for right resolvers.
- * @version $Id: $
+ * @version $Id$
  */
 abstract class AbstractRightResolver extends AbstractLogEnabled implements RightResolver
 {

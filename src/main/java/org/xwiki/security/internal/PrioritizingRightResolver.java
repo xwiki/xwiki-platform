@@ -44,7 +44,7 @@ import java.util.EnumMap;
 /**
  * The default implementation for the right resolver.
  *
- * @version $Id: $
+ * @version $Id$
  */
 @Component("priority")
 public class PrioritizingRightResolver extends AbstractRightResolver

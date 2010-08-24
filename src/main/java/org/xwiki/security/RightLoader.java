@@ -27,7 +27,7 @@ import org.xwiki.model.reference.DocumentReference;
 
 /**
  * Component for loading rights into a right cache.
- * @version $Id: $
+ * @version $Id$
  */
 @ComponentRole
 public interface RightLoader

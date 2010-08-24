@@ -51,7 +51,7 @@ import com.xpn.xwiki.user.api.XWikiRightService;
 /**
  * Unit tests for {@link com.xpn.xwiki.user.impl.xwiki.XWikiRightServiceImpl}.
  * 
- * @version $Id: XWikiRightServiceImplTest.java 28526 2010-04-22 13:39:32Z tmortagne $
+ * @version $Id$
  */
 public class XWikiRightServiceTest extends AbstractTestCase
 {

@@ -27,7 +27,7 @@ import org.xwiki.component.annotation.Component;
 
 /**
  * A serializer used by the right cache for generating keys.
- * @version $Id: $
+ * @version $Id$
  */
 @Component("rightcachekey")
 public class RightCacheKeyEntityReferenceSerializer implements EntityReferenceSerializer<String>

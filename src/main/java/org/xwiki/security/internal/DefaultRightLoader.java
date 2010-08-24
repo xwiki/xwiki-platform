@@ -50,7 +50,7 @@ import java.util.Collection;
 /**
  * The default implementation for the right loader.
  *
- * @version $Id: $
+ * @version $Id$
  */
 @Component
 public class DefaultRightLoader extends AbstractLogEnabled implements RightLoader

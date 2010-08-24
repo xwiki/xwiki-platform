@@ -46,7 +46,7 @@ import java.util.LinkedList;
 
 /**
  * Implementation of the rights object factory interface.
- * @version $Id: $
+ * @version $Id$
  */
 @Component
 public class DefaultRightsObjectFactory extends AbstractLogEnabled implements RightsObjectFactory

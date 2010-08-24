@@ -42,7 +42,7 @@ import java.util.ListIterator;
 /**
  * The default implementation for the right resolver.
  *
- * @version $Id: $
+ * @version $Id$
  */
 @Component
 public class DefaultRightResolver extends AbstractRightResolver

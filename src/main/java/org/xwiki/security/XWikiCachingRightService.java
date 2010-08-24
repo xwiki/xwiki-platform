@@ -32,7 +32,7 @@ import com.xpn.xwiki.web.Utils;
 
 /**
  * Class for plugging in to xwiki.
- * @version $Id: $
+ * @version $Id$
  */
 public class XWikiCachingRightService implements XWikiRightService
 {

@@ -28,7 +28,7 @@ import java.util.LinkedList;
 /**
  * A right cache entry that caches objects, which may be of type
  * RightsObject or GroupObject.
- * @version $Id: $
+ * @version $Id$
  */
 class ObjectEntry implements RightCacheEntry
 {

@@ -31,7 +31,7 @@ import java.util.List;
 /**
  * A RightResolver will compute the access levels given a username, a
  * list of groups, and a hierarchy of rights objects.
- * @version $Id: $
+ * @version $Id$
  */
 @ComponentRole
 public interface RightResolver

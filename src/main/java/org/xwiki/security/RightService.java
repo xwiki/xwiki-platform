@@ -31,7 +31,7 @@ import com.xpn.xwiki.doc.XWikiDocument;
 
 /**
  * This is the API for checking the access rights of users on wiki documents.
- * @version $Id: $
+ * @version $Id$
  * @since
  */
 @ComponentRole

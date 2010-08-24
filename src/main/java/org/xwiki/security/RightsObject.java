@@ -24,7 +24,7 @@ import org.xwiki.model.reference.DocumentReference;
 
 /**
  * Wrapper around xwiki rights objects.
- * @version $Id: $
+ * @version $Id$
  */
 public interface RightsObject
 {

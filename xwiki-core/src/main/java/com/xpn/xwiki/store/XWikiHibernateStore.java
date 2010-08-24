@@ -105,7 +105,7 @@ import com.xpn.xwiki.web.Utils;
 /**
  * The XWiki Hibernate database driver.
  *
- * @version $Id:$
+ * @version $Id$
  */
 @Component
 public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWikiStoreInterface
@@ -1400,63 +1400,49 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
      * @deprecated This is internal to XWikiHibernateStore and may be removed in the future.
      */
     @Deprecated
-    public void saveXWikiProperty(PropertyInterface property, XWikiContext context, boolean bTransaction)
+    public void saveXWikiProperty(final PropertyInterface property,
+                                  final XWikiContext context,
+                                  final boolean runInOwnTransaction)
         throws XWikiException
     {
+        // Clone runInOwnTransaction so the value passed is not altered.
+        boolean bTransaction = runInOwnTransaction;
         try {
             if (bTransaction) {
-                checkHibernate(context);
-                bTransaction = beginTransaction(context);
+                this.checkHibernate(context);
+                bTransaction = this.beginTransaction(context);
             }
-            Session session = getSession(context);
-            Query query =
-                session
-                    .createQuery("select prop.name from BaseProperty as prop where prop.id.id = :id and prop.id.name= :name");
+
+            final Session session = this.getSession(context);
+
+            final Query query = session.createQuery(
+                "select prop.name from BaseProperty as prop where prop.id.id = :id and prop.id.name= :name");
             query.setInteger("id", property.getId());
             query.setString("name", property.getName());
+
             if (query.uniqueResult() == null) {
                 session.save(property);
             } else {
                 session.update(property);
             }
 
-            /*
-             * // I'm using a local transaction // There might be implications to this for a wider transaction
-             * Transaction ltransaction = session.beginTransaction(); // Use to chose what to delete boolean isSave =
-             * false; try { Query query = session.createQuery("select prop.name from BaseProperty as prop where
-             * prop.id.id = :id and prop.id.name= :name"); query.setInteger("id", property.getId());
-             * query.setString("name", property.getName()); if (query.uniqueResult()==null) { isSave = true;
-             * session.save(property); } else { isSave = false; session.update(property); } session.flush();
-             * ltransaction.commit(); } catch (Exception e) { // We can't clean-up ListProperties if (property
-             * instanceof ListProperty) throw e; // This seems to have failed.. // This is an attempt to cleanup a
-             * potential mess // This code is only called if the tables are in an incoherent state // (Example: data in
-             * xwikiproperties and no data in xwikiintegers or vice-versa) // TODO: verify of the code works with longer
-             * transactions BaseProperty prop2; // Depending on save/update there is too much data either // in the
-             * BaseProperty table or in the inheritated property table // We need to delete this data if (isSave) prop2
-             * = (BaseProperty) property; else prop2 = new BaseProperty(); prop2.setName(property.getName());
-             * prop2.setObject(property.getObject()); ltransaction.rollback(); // We need to run the delete in a
-             * separate session // This is not a problem since this is cleaning up Session session2 =
-             * getSessionFactory().openSession(); Transaction transaction2 = session2.beginTransaction();
-             * session2.delete(prop2); session2.flush(); // I don't understand why I can't run this in the general
-             * session // This might make transactions fail if (!isSave) session2.save(property); transaction2.commit();
-             * session2.close(); }
-             */
             if (bTransaction) {
                 endTransaction(context, true);
             }
         } catch (Exception e) {
-            BaseCollection obj = property.getObject();
-            Object[] args = {(obj != null) ? obj.getName() : "unknown", property.getName()};
+            final BaseCollection obj = property.getObject();
+            final Object[] args = {(obj != null) ? obj.getName() : "unknown", property.getName()};
             throw new XWikiException(XWikiException.MODULE_XWIKI_STORE,
-                XWikiException.ERROR_XWIKI_STORE_HIBERNATE_LOADING_OBJECT,
-                "Exception while saving property {1} of object {0}", e, args);
+                                     XWikiException.ERROR_XWIKI_STORE_HIBERNATE_LOADING_OBJECT,
+                                     "Exception while saving property {1} of object {0}", e, args);
 
         } finally {
             try {
                 if (bTransaction) {
-                    endTransaction(context, false);
+                    this.endTransaction(context, false);
                 }
             } catch (Exception e) {
+                // Not a lot we can do here if there was an exception committing and an exception rolling back.
             }
         }
     }

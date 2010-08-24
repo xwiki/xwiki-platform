@@ -25,6 +25,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.xwiki.bridge.DocumentAccessBridge;
+import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.context.Execution;
 import org.xwiki.model.reference.DocumentReference;
@@ -86,12 +87,6 @@ public class DefaultWikiMacro implements WikiMacro
      * The key under which macro can directly return the resulting {@link List} of {@link Block}.
      */
     private static final String MACRO_RESULT_KEY = "result";
-
-    /**
-     * The key under which macro can access the document where it's defined. Same as CONTEXT_DOCUMENT_KEY (Check style
-     * fix).
-     */
-    private static final String MACRO_DOC_KEY = CONTEXT_DOCUMENT_KEY;
 
     /**
      * The {@link MacroDescriptor} for this macro.
@@ -159,13 +154,26 @@ public class DefaultWikiMacro implements WikiMacro
         XDOM xdom = prepareWikiMacroContent(context);
 
         // Prepare macro context.
-        Map<String, Object> macroContext = new HashMap<String, Object>();
-        macroContext.put(MACRO_PARAMS_KEY, parameters);
-        macroContext.put(MACRO_CONTENT_KEY, macroContent);
-        macroContext.put(MACRO_CONTEXT_KEY, context);
-        macroContext.put(MACRO_RESULT_KEY, null);
-        macroContext.put(MACRO_DOC_KEY, null);
+        Map<String, Object> macroBinding = new HashMap<String, Object>();
+        macroBinding.put(MACRO_PARAMS_KEY, parameters);
+        macroBinding.put(MACRO_CONTENT_KEY, macroContent);
+        macroBinding.put(MACRO_CONTEXT_KEY, context);
+        macroBinding.put(MACRO_RESULT_KEY, null);
 
+        // Extension point to add more wiki macro bindings
+        try {
+            List<WikiMacroBindingInitializer> bindingInitializers =
+                this.componentManager.lookupList(WikiMacroBindingInitializer.class);
+
+            for (WikiMacroBindingInitializer bindingInitializer : bindingInitializers) {
+                bindingInitializer.initialize(this.macroDocumentReference, parameters, macroContent, context,
+                    macroBinding);
+            }
+        } catch (ComponentLookupException e) {
+            // TODO: we should probably log something but that should never happen
+        }
+
+        // Execute the macro
         Map<String, Object> xwikiContext = null;
         Object contextDoc = null;
         try {
@@ -175,7 +183,7 @@ public class DefaultWikiMacro implements WikiMacro
 
             // Place macro context inside xwiki context ($context.macro).
             xwikiContext = (Map<String, Object>) execution.getContext().getProperty("xwikicontext");
-            xwikiContext.put(MACRO_KEY, macroContext);
+            xwikiContext.put(MACRO_KEY, macroBinding);
 
             // Save current context document.
             contextDoc = xwikiContext.get(CONTEXT_DOCUMENT_KEY);
@@ -202,7 +210,7 @@ public class DefaultWikiMacro implements WikiMacro
             }
         }
 
-        return extractResult(xdom, macroContext, context);
+        return extractResult(xdom, macroBinding, context);
     }
 
     /**

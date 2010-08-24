@@ -145,7 +145,7 @@ public class DefaultWikiMacroTest extends AbstractComponentTestCase
         // Note: We're using XHTML as the output syntax just to make it easy for asserting.
         Assert.assertEquals("<p>Hello This is <strong>bold</strong></p>", printer.toString());
     }
-
+    
     /**
      * A wiki macro can directly provide the list of blocks insstead of having to rendering them to let
      * {@link DefaultWikiMacro} re-parse it.
@@ -153,8 +153,6 @@ public class DefaultWikiMacroTest extends AbstractComponentTestCase
     @Test
     public void testExecuteWhenWikiMacroDirectlyProvideTheResult() throws Exception
     {
-        Collections.singletonList(new WordBlock("result"));
-
         registerWikiMacro(
             "wikimacrowithresult",
             "{{groovy}}"

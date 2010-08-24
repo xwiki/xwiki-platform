@@ -5765,12 +5765,12 @@ public class XWiki implements XWikiDocChangeNotificationInterface
         try {
             userdoc = getDocument(user, context);
             if (userdoc == null) {
-                return user;
+                return StringEscapeUtils.escapeXml(user);
             }
 
             BaseObject userobj = userdoc.getObject("XWiki.XWikiUsers");
             if (userobj == null) {
-                return userdoc.getName();
+                return StringEscapeUtils.escapeXml(userdoc.getName());
             }
 
             Set<String> proplist = userobj.getPropertyList();

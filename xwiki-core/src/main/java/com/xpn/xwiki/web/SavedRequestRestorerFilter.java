@@ -164,13 +164,13 @@ public class SavedRequestRestorerFilter implements Filter
          */
         @SuppressWarnings("unchecked")
         @Override
-        public Map getParameterMap()
+        public Map<String, String[]> getParameterMap()
         {
             if (this.savedRequest == null) {
                 return super.getParameterMap();
             } else {
                 // First put the saved (old) request data in the map, so that the new data overrides it.
-                Map map = new HashMap(this.savedRequest.getParameterMap());
+                Map<String, String[]> map = new HashMap<String, String[]>(this.savedRequest.getParameterMap());
                 map.putAll(super.getParameterMap());
                 return Collections.unmodifiableMap(map);
             }
@@ -183,9 +183,8 @@ public class SavedRequestRestorerFilter implements Filter
          *         name of a request parameter; or an empty <code>Enumeration</code> if the request has no parameters
          * @see javax.servlet.ServletRequest#getParameterNames()
          */
-        @SuppressWarnings("unchecked")
         @Override
-        public Enumeration getParameterNames()
+        public Enumeration<String> getParameterNames()
         {
             return Collections.enumeration(getParameterMap().keySet());
         }
@@ -254,8 +253,7 @@ public class SavedRequestRestorerFilter implements Filter
          * @return A map with all the stored parameters.
          * @see javax.servlet.ServletRequest#getParameterMap()
          */
-        @SuppressWarnings("unchecked")
-        public Map getParameterMap()
+        public Map<String, String[]> getParameterMap()
         {
             return this.parameters;
         }

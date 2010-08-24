@@ -31,8 +31,22 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
+/**
+ * XWiki servlet implementation.
+ * 
+ * @version $Id$
+ */
 public class XWikiServlet extends HttpServlet
 {
+    /** Serial version ID. */
+    private static final long serialVersionUID = 1L;
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see javax.servlet.http.HttpServlet#service(javax.servlet.http.HttpServletRequest, javax.servlet.http.HttpServletResponse)
+     */
+    @Override
     protected void service(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse)
         throws ServletException, IOException
     {

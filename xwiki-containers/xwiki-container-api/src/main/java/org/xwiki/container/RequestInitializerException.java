@@ -21,16 +21,32 @@
 package org.xwiki.container;
 
 /**
+ * Thrown when request initialization fails.
+ * 
  * @version $Id$
  * @since 1.5M1
  */
 public class RequestInitializerException extends Exception
 {
+    /** Serial version ID. */
+    private static final long serialVersionUID = 1L;
+
+    /**
+     * Create new {@link RequestInitializerException}.
+     * 
+     * @param message the detail message
+     */
     public RequestInitializerException(String message)
     {
         super(message);
     }
 
+    /**
+     * Create new {@link RequestInitializerException}.
+     * 
+     * @param message the detail message
+     * @param throwable exception cause
+     */
     public RequestInitializerException(String message, Throwable throwable)
     {
         super(message, throwable);

@@ -30,7 +30,9 @@ import org.xwiki.container.RequestInitializerException;
 import org.xwiki.container.RequestInitializerManager;
 
 /**
- * Default implementation for {@link org.xwiki.container.RequestInitializerManager}
+ * Default implementation for {@link org.xwiki.container.RequestInitializerManager}.
+ *
+ * @version $Id$
  * @see org.xwiki.container.RequestInitializerManager
  */
 @Component
@@ -51,7 +53,7 @@ public class DefaultRequestInitializerManager implements RequestInitializerManag
     {
         // Find all request interceptors and call them to initialize the Request
         try {
-            for (Object interceptor: this.componentManager.lookupList(RequestInitializer.class)) {
+            for (Object interceptor : this.componentManager.lookupList(RequestInitializer.class)) {
                 ((RequestInitializer) interceptor).initialize(request);
             }
         } catch (ComponentLookupException e) {

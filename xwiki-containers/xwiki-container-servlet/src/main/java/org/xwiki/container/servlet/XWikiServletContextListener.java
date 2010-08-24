@@ -33,17 +33,20 @@ import org.xwiki.observation.ObservationManager;
 import org.xwiki.observation.event.ApplicationStartedEvent;
 import org.xwiki.observation.event.ApplicationStoppedEvent;
 
+/**
+ * Implementation of the {@link ServletContextListener}. Initializes component manager and application context.
+ * 
+ * @version $Id$
+ */
 public class XWikiServletContextListener implements ServletContextListener
 {
-    /**
-     * The component manager used to lookup for other components.
-     */
+    /** The component manager used to lookup other components. */
     private ComponentManager componentManager;
 
     /**
      * {@inheritDoc}
      * 
-     * @see ServletContextListener#contextInitialized(javax.servlet.ServletContextEvent) 
+     * @see javax.servlet.ServletContextListener#contextInitialized(javax.servlet.ServletContextEvent)
      */
     public void contextInitialized(ServletContextEvent servletContextEvent)
     {
@@ -97,6 +100,8 @@ public class XWikiServletContextListener implements ServletContextListener
 
     /**
      * {@inheritDoc}
+     * 
+     * @see javax.servlet.ServletContextListener#contextDestroyed(javax.servlet.ServletContextEvent)
      */
     public void contextDestroyed(ServletContextEvent sce)
     {

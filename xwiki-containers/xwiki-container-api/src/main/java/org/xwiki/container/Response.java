@@ -23,6 +23,11 @@ package org.xwiki.container;
 import java.io.IOException;
 import java.io.OutputStream;
 
+/**
+ * Represents a server response.
+ * 
+ * @version $Id$
+ */
 public interface Response
 {
     /**

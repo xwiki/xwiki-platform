@@ -20,18 +20,32 @@
  */
 package org.xwiki.container.portlet;
 
+/**
+ * Thrown when initialization of a portlet container fails.
+ * 
+ * @version $Id$
+ */
 public class PortletContainerException extends Exception
 {
-    /**
-     * Provides an id for serialization 
-     */
+    /** Provides an id for serialization. */
     private static final long serialVersionUID = -6443781790761502516L;
 
+    /**
+     * Create new {@link PortletContainerException}.
+     * 
+     * @param message the detail message
+     */
     public PortletContainerException(String message)
     {
         super(message);
     }
 
+    /**
+     * Create new {@link PortletContainerException}.
+     * 
+     * @param message the detail message
+     * @param throwable the exception cause
+     */
     public PortletContainerException(String message, Throwable throwable)
     {
         super(message, throwable);

@@ -1350,7 +1350,6 @@
               **/web/RollbackAction.java,
               **/web/RollbackForm.java,
               **/web/SaveAction.java,
-              **/web/SavedRequestRestorerFilter.java,
               **/web/SetCharacterEncodingFilter.java,
               **/web/SkinAction.java,
               **/web/StatusAction.java,

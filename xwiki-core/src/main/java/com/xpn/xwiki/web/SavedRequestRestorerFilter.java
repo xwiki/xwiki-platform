@@ -291,19 +291,20 @@ public class SavedRequestRestorerFilter implements Filter
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException,
         ServletException
     {
+        ServletRequest filteredRequest = request;
         // This filter works only for HTTP requests, because they are the only ones with a session.
         if (request instanceof HttpServletRequest
-            && !Boolean.valueOf((String) request.getAttribute(ATTRIBUTE_APPLIED))) {
+                && !Boolean.valueOf((String) request.getAttribute(ATTRIBUTE_APPLIED))) {
             // Get the saved request, if any (returns null if not applicable)
             SavedRequest savedRequest = getSavedRequest((HttpServletRequest) request);
             // Merge the new and the saved request
-            request = new SavedRequestWrapper((HttpServletRequest) request, savedRequest);
-            request.setAttribute(ATTRIBUTE_APPLIED, "true");
+            filteredRequest = new SavedRequestWrapper((HttpServletRequest) request, savedRequest);
+            filteredRequest.setAttribute(ATTRIBUTE_APPLIED, "true");
         }
         // Forward the request
-        chain.doFilter(request, response);
+        chain.doFilter(filteredRequest, response);
         // Allow multiple calls to this filter as long as they are not nested.
-        request.removeAttribute(ATTRIBUTE_APPLIED);
+        filteredRequest.removeAttribute(ATTRIBUTE_APPLIED);
     }
 
     /**

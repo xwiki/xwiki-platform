@@ -26,6 +26,7 @@ import java.util.List;
 import javax.ws.rs.core.UriBuilder;
 import javax.ws.rs.core.UriBuilderException;
 
+import org.apache.commons.lang.StringUtils;
 import org.xwiki.query.Query;
 import org.xwiki.query.QueryException;
 import org.xwiki.rest.Relations;
@@ -199,7 +200,7 @@ public class BaseSearchResult extends XWikiResource
                     searchResult.setPageName(pageName);
 
                     String pageUri;
-                    if ("".equals(language)) {
+                    if (StringUtils.isBlank(language)) {
                         pageUri =
                             UriBuilder.fromUri(uriInfo.getBaseUri()).path(PageResource.class).build(wikiName,
                                 spaceName, pageName).toString();

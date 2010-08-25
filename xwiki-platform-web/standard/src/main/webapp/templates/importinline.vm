@@ -161,7 +161,7 @@
                                    value="${version.fullName}#if("$!version.language" != ''):${version.language}#end" checked />
                             </span>
                             <span class="documentName">
-                            <input type="hidden" name="$!{escapetool.xml($version.fullName:$version.language)}" value="$!{escapetool.xml($version.language)}" />
+                            <input type="hidden" name="$!{escapetool.xml($version.fullName):$!{escapetool.xml($version.language)}" value="$!{escapetool.xml($version.language)}" />
                             $document #if("$!version.language" != '') - $version.language #end
                             </span>
                             <div class="clearfloats"></div>

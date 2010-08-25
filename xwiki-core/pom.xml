@@ -117,13 +117,6 @@
       <version>1.0.1B</version>
     </dependency>
 
-    <!-- Flickrj (http://flickrj.sourceforge.net/). To be uploaded on the central repository -->
-    <dependency>
-      <groupId>flickrj</groupId>
-      <artifactId>flickrapi</artifactId>
-      <version>1.0a7</version>
-    </dependency>
-
     <dependency>
       <groupId>com.novell.ldap</groupId>
       <artifactId>jldap</artifactId>
@@ -1131,8 +1124,6 @@
               **/plugin/feed/SyndEntrySource.java,
               **/plugin/feed/UpdateThread.java,
               **/plugin/feed/XWikiFeedFetcher.java,
-              **/plugin/flickr/FlickrPluginApi.java,
-              **/plugin/flickr/FlickrPlugin.java,
               **/plugin/google/GooglePluginApi.java,
               **/plugin/google/GooglePlugin.java,
               **/plugin/graphviz/GraphVizMacro.java,

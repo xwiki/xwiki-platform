@@ -49,7 +49,7 @@ import com.xpn.xwiki.test.AbstractBridgedComponentTestCase;
 /**
  * Unit tests for {@link DefaultWikiMacro} in the context of XWiki core.
  * 
- * @version $Id: DefaultWikiMacroTest.java 30725 2010-08-24 09:11:58Z tmortagne $
+ * @version $Id$
  * @since 2.5M1
  */
 public class DefaultWikiMacroTest extends AbstractBridgedComponentTestCase

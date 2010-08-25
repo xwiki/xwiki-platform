@@ -25,7 +25,7 @@ package com.xpn.xwiki.objects;
 /**
  * Base string XProperty which all types of string XProperties extend.
  *
- * $Id:$
+ * $Id$
  */
 public class BaseStringProperty extends BaseProperty
 {

@@ -35,7 +35,7 @@ import com.xpn.xwiki.doc.XWikiLock;
  * Action used for saving and proceeding to view the saved page.
  * Used as a generic action for saving documents.
  * 
- * @version $Id:$
+ * @version $Id$
  */
 public class SaveAction extends PreviewAction
 {

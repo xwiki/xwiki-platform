@@ -1439,7 +1439,7 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
                 if (bTransaction) {
                     this.endTransaction(context, false);
                 }
-            } catch (Exception e) {
+            } catch (Exception ee) {
                 // Not a lot we can do here if there was an exception committing and an exception rolling back.
             }
 

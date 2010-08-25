@@ -71,7 +71,7 @@ $xwiki.jsfx.use('js/xwiki/actionbuttons/actionButtons.js', true)
   </div>
   <div id="mainEditArea">
   #template("hierarchy.vm")
-  #if($editor == 'wiki' || $editor == 'wysiwyg')
+  #if (($editor == 'wiki' || $editor == 'wysiwyg') && !$request.section)
     #set($docTitle = $request.getParameter('title'))
     #if("$!docTitle" == '')
       #set($docTitle = $!tdoc.title)

@@ -1,6 +1,5 @@
 org.xwiki.rendering.internal.macro.script.DefaultAttachmentClassLoaderFactory
 org.xwiki.rendering.internal.macro.script.DefaultScriptMacro
-org.xwiki.rendering.internal.macro.script.NestedScriptMacroValidator
 org.xwiki.rendering.internal.macro.script.NestedScriptMacroValidatorListener
 org.xwiki.rendering.internal.macro.script.PermissionCheckerListener
 org.xwiki.rendering.internal.macro.script.ScriptClassLoaderHandlerListener

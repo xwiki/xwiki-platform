@@ -19,16 +19,14 @@
  */
 package org.xwiki.rendering.internal.macro.script;
 
-import java.util.Collections;
-import java.util.List;
-
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.Requirement;
-import org.xwiki.observation.EventListener;
 import org.xwiki.observation.event.CancelableEvent;
-import org.xwiki.observation.event.Event;
-import org.xwiki.observation.event.ScriptEvaluationStartsEvent;
-import org.xwiki.rendering.macro.MacroExecutionException;
+import org.xwiki.rendering.block.MacroMarkerBlock;
+import org.xwiki.rendering.macro.MacroId;
+import org.xwiki.rendering.macro.MacroLookupException;
+import org.xwiki.rendering.macro.MacroManager;
+import org.xwiki.rendering.macro.script.ScriptMacro;
 import org.xwiki.rendering.macro.script.ScriptMacroParameters;
 import org.xwiki.rendering.transformation.MacroTransformationContext;
 
@@ -41,11 +39,14 @@ import org.xwiki.rendering.transformation.MacroTransformationContext;
  * @since 2.5M1
  */
 @Component("nestedscriptmacrovalidator")
-public class NestedScriptMacroValidatorListener implements EventListener
+public class NestedScriptMacroValidatorListener extends AbstractScriptCheckerListener
 {
-    /** FIXME Nested script macro validator. */
-    @Requirement("nested")
-    private ScriptMacroValidator validator;
+    /**
+     * Used to find the type of a Macro defined by a Macro Marker block; we're interested to prevent nested scripts only
+     * in Script macros.
+     */
+    @Requirement
+    private MacroManager macroManager;
 
     /**
      * {@inheritDoc}
@@ -60,27 +61,27 @@ public class NestedScriptMacroValidatorListener implements EventListener
     /**
      * {@inheritDoc}
      * 
-     * @see org.xwiki.observation.EventListener#getEvents()
+     * @see AbstractScriptCheckerListener#check(CancelableEvent, MacroTransformationContext, ScriptMacroParameters)
      */
-    public List<Event> getEvents()
+    @Override
+    protected void check(CancelableEvent event, MacroTransformationContext context, ScriptMacroParameters parameters)
     {
-        return Collections.singletonList((Event) new ScriptEvaluationStartsEvent());
-    }
-
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.observation.EventListener#onEvent(org.xwiki.observation.event.Event, java.lang.Object, java.lang.Object)
-     */
-    public void onEvent(Event event, Object source, Object data)
-    {
-        if (event instanceof ScriptEvaluationStartsEvent) {
-            MacroTransformationContext context = (MacroTransformationContext) source;
-            String content = context.getCurrentMacroBlock().getContent();
-            try {
-                validator.validate((ScriptMacroParameters) data, content, context);
-            } catch (MacroExecutionException exception) {
-                ((CancelableEvent) event).cancel(exception.getMessage());
+        // Traverse the XDOM tree up to the root
+        if (context.getCurrentMacroBlock() != null) {
+            MacroMarkerBlock parent = context.getCurrentMacroBlock().getParentBlockByType(MacroMarkerBlock.class);
+            while (parent != null) {
+                String parentId = parent.getId();
+                try {
+                    if (macroManager.getMacro(new MacroId(parentId)) instanceof ScriptMacro) {
+                        event.cancel("Nested scripts are not allowed");
+                    } else if ("include".equals(parentId)) {
+                        // Included documents intercept the chain of nested script macros with XWiki syntax
+                        return;
+                    }
+                } catch (MacroLookupException exception) {
+                    // Shouldn't happen, the parent macro was already successfully executed earlier
+                }
+                parent = parent.getParentBlockByType(MacroMarkerBlock.class);
             }
         }
     }

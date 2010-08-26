@@ -44,6 +44,7 @@ import org.xwiki.rendering.macro.MacroId;
 import org.xwiki.rendering.macro.descriptor.DefaultContentDescriptor;
 import org.xwiki.rendering.macro.script.ScriptMockSetup;
 import org.xwiki.rendering.macro.wikibridge.WikiMacroDescriptor;
+import org.xwiki.rendering.macro.wikibridge.WikiMacroFactory;
 import org.xwiki.rendering.macro.wikibridge.WikiMacroManager;
 import org.xwiki.rendering.macro.wikibridge.WikiMacroParameterDescriptor;
 import org.xwiki.rendering.macro.wikibridge.WikiMacroVisibility;
@@ -105,6 +106,19 @@ public class DefaultWikiMacroTest extends AbstractComponentTestCase
             // Since we're not testing it here, it can be null.
             allowing(mockDocBridge).getDocument(wikiMacroDocumentReference); will(returnValue(null));
         }});
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see org.xwiki.test.AbstractComponentTestCase#registerComponents()
+     */
+    @Override
+    protected void registerComponents() throws Exception
+    {
+        super.registerComponents();
+        // some tests fail because the lookup of this component fails (the implementation is defined in xwiki-core)
+        registerMockComponent(WikiMacroFactory.class);
     }
 
     /**

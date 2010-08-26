@@ -489,7 +489,6 @@ xwiki.plugins=\
                     com.xpn.xwiki.plugin.feed.FeedPlugin,\
                     com.xpn.xwiki.plugin.ldap.LDAPPlugin,\
                     com.xpn.xwiki.plugin.google.GooglePlugin,\
-                    com.xpn.xwiki.plugin.flickr.FlickrPlugin,\
                     com.xpn.xwiki.plugin.mail.MailPlugin,\
                     com.xpn.xwiki.plugin.packaging.PackagePlugin,\
                     com.xpn.xwiki.plugin.query.QueryPlugin,\

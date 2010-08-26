@@ -3261,7 +3261,7 @@ public class XWikiDocument implements DocumentModelBridge
         setHidden(document.isHidden());
 
         cloneXObjects(document);
-        copyAttachments(document);
+        cloneAttachments(document);
         this.elements = document.elements;
 
         this.originalDocument = document.originalDocument;
@@ -3328,11 +3328,12 @@ public class XWikiDocument implements DocumentModelBridge
 
             if (keepsIdentity) {
                 doc.cloneXObjects(this);
+                doc.cloneAttachments(this);
             } else {
                 doc.duplicateXObjects(this);
+                doc.copyAttachments(this);
             }
 
-            doc.copyAttachments(this);
             doc.elements = this.elements;
 
             doc.originalDocument = this.originalDocument;
@@ -3343,6 +3344,34 @@ public class XWikiDocument implements DocumentModelBridge
         return doc;
     }
 
+    /**
+     * Clone attachments from another document.
+     * This implementation expects that this document is the same as the other document and thus attachments will be
+     * saved in the database in the same place as the ones which they are cloning.
+     *
+     * @param sourceDocument an XWikiDocument to copy attachments from
+     */
+    private void cloneAttachments(final XWikiDocument sourceDocument)
+    {
+        this.getAttachmentList().clear();
+        for (XWikiAttachment attach : sourceDocument.getAttachmentList()) {
+            XWikiAttachment newAttach = (XWikiAttachment) attach.clone();
+
+            // Document is set to this because if this document is renamed then the attachment will have a new id
+            // and be saved somewhere different.
+            newAttach.setDoc(this);
+
+            this.getAttachmentList().add(newAttach);
+        }
+    }
+
+    /**
+     * Copy attachments from one document to another.
+     * This implementation expects that you are copying the attachment from one document to another and thus it
+     * should be saved seperately from the original in the database.
+     *
+     * @param sourceDocument an XWikiDocument to copy attachments from
+     */
     public void copyAttachments(XWikiDocument sourceDocument)
     {
         getAttachmentList().clear();
@@ -3351,9 +3380,12 @@ public class XWikiDocument implements DocumentModelBridge
             XWikiAttachment attachment = attit.next();
             XWikiAttachment newattachment = (XWikiAttachment) attachment.clone();
             newattachment.setDoc(this);
+
+            // TODO: Why must attachment content must be set dirty --cjdelisle
             if (newattachment.getAttachment_content() != null) {
                 newattachment.getAttachment_content().setContentDirty(true);
             }
+
             getAttachmentList().add(newattachment);
         }
         setContentDirty(true);

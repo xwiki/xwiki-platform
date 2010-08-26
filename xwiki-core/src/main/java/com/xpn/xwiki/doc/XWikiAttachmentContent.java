@@ -71,7 +71,9 @@ public class XWikiAttachmentContent implements Cloneable
         }
 
         attachmentcontent.setAttachment(getAttachment());
-        attachmentcontent.setContent(getContent());
+
+        // setContent makes isContentDirty true which if this.isContentDirty == false then it's not a valid clone.
+        attachmentcontent.content = this.getContent();
 
         return attachmentcontent;
     }

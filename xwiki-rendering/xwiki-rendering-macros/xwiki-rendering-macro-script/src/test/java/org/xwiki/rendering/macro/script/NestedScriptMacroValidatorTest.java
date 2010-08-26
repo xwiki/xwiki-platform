@@ -24,16 +24,18 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.Map;
 
+import junit.framework.Assert;
+
 import org.jmock.Expectations;
-import org.junit.Before;
 import org.junit.Test;
+import org.xwiki.observation.event.CancelableEvent;
+import org.xwiki.observation.event.ScriptEvaluationStartsEvent;
 import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.block.MacroBlock;
 import org.xwiki.rendering.block.MacroMarkerBlock;
 import org.xwiki.rendering.block.XDOM;
 import org.xwiki.rendering.internal.macro.script.DefaultScriptMacro;
-import org.xwiki.rendering.internal.macro.script.NestedScriptMacroValidator;
-import org.xwiki.rendering.macro.MacroExecutionException;
+import org.xwiki.rendering.internal.macro.script.NestedScriptMacroValidatorListener;
 import org.xwiki.rendering.macro.MacroId;
 import org.xwiki.rendering.macro.MacroManager;
 import org.xwiki.rendering.transformation.MacroTransformationContext;
@@ -49,11 +51,12 @@ import org.xwiki.test.annotation.MockingRequirement;
 public class NestedScriptMacroValidatorTest extends AbstractMockingComponentTestCase
 {
     @MockingRequirement
-    private NestedScriptMacroValidator validator;
+    private NestedScriptMacroValidatorListener validator;
 
     /**
      * @see org.xwiki.test.AbstractMockingComponentTestCase#configure()
      */
+    @Override
     public void configure() throws Exception
     {
         // Mock macro manager returns a script macro for "script" and null otherwise.
@@ -67,25 +70,31 @@ public class NestedScriptMacroValidatorTest extends AbstractMockingComponentTest
         }});
     }
 
-    @Test(expected = MacroExecutionException.class)
+    @Test
     public void testNoNestedScript() throws Exception
     {
         MacroTransformationContext context = buildContext("script", "script");
-        this.validator.validate(null, null, context);
+        CancelableEvent event = new ScriptEvaluationStartsEvent();
+        this.validator.onEvent(event, context, null);
+        Assert.assertTrue(event.isCanceled());
     }
 
-    @Test(expected = MacroExecutionException.class)
+    @Test
     public void testNoNestedScriptInHtml() throws Exception
     {
         MacroTransformationContext context = buildContext("script", "html", "script");
-        this.validator.validate(null, null, context);
+        CancelableEvent event = new ScriptEvaluationStartsEvent();
+        this.validator.onEvent(event, context, null);
+        Assert.assertTrue(event.isCanceled());
     }
 
     @Test
     public void testIncludeInterceptsNestedChain() throws Exception
     {
         MacroTransformationContext context = buildContext("script", "include", "script");
-        this.validator.validate(null, null, context);
+        CancelableEvent event = new ScriptEvaluationStartsEvent();
+        this.validator.onEvent(event, context, null);
+        Assert.assertFalse(event.isCanceled());
     }
 
     /**

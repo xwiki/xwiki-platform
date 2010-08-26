@@ -19,13 +19,17 @@
  */
 package org.xwiki.rendering.macro.script;
 
+import java.util.Collections;
+
 import junit.framework.Test;
 import junit.framework.TestCase;
 
 import org.jmock.Expectations;
 import org.jmock.Mockery;
 import org.xwiki.component.descriptor.DefaultComponentDescriptor;
-import org.xwiki.rendering.internal.macro.script.ScriptMacroValidator;
+import org.xwiki.observation.EventListener;
+import org.xwiki.observation.event.Event;
+import org.xwiki.observation.event.ScriptEvaluationStartsEvent;
 import org.xwiki.rendering.scaffolding.RenderingTestSuite;
 import org.xwiki.rendering.transformation.MacroTransformationContext;
 import org.xwiki.test.ComponentManagerTestSetup;
@@ -50,18 +54,23 @@ public class RenderingTests extends TestCase
 
         ComponentManagerTestSetup testSetup = new ComponentManagerTestSetup(suite);
         Mockery mockery = new Mockery();
-        ScriptMockSetup setup = new ScriptMockSetup(mockery, testSetup.getComponentManager());
+        new ScriptMockSetup(mockery, testSetup.getComponentManager());
 
         // fake nested script validator never fails
-        final ScriptMacroValidator nestedValidator = mockery.mock(ScriptMacroValidator.class, "nested");
+        final EventListener nestedValidator
+            = mockery.mock(EventListener.class, "nestedscriptmacrovalidator");
         mockery.checking(new Expectations() {{
-            atLeast(1).of(nestedValidator).validate(with(any(ScriptMacroParameters.class)), with(any(String.class)),
-                with(any(MacroTransformationContext.class)));
+            atLeast(1).of(nestedValidator).onEvent(with(any(Event.class)), with(any(MacroTransformationContext.class)),
+                with(any(ScriptMacroParameters.class)));
+            allowing(nestedValidator).getName();
+                will(returnValue("nestedscriptmacrovalidator"));
+            allowing(nestedValidator).getEvents();
+                will(returnValue(Collections.singletonList((Event) new ScriptEvaluationStartsEvent())));
         }});
-        DefaultComponentDescriptor<ScriptMacroValidator> validatorDescriptor
-            = new DefaultComponentDescriptor<ScriptMacroValidator>();
-        validatorDescriptor.setRole(ScriptMacroValidator.class);
-        validatorDescriptor.setRoleHint("nested");
+        DefaultComponentDescriptor<EventListener> validatorDescriptor
+            = new DefaultComponentDescriptor<EventListener>();
+        validatorDescriptor.setRole(EventListener.class);
+        validatorDescriptor.setRoleHint("nestedscriptmacrovalidator");
         testSetup.getComponentManager().registerComponent(validatorDescriptor, nestedValidator);
 
         return testSetup;

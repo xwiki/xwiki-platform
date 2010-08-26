@@ -21,7 +21,6 @@ package org.xwiki.rendering.internal.macro.wikibridge;
 
 import java.io.StringReader;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -38,7 +37,6 @@ import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.component.descriptor.DefaultComponentDescriptor;
 import org.xwiki.context.Execution;
 import org.xwiki.model.reference.DocumentReference;
-import org.xwiki.rendering.block.WordBlock;
 import org.xwiki.rendering.converter.Converter;
 import org.xwiki.rendering.macro.MacroId;
 import org.xwiki.rendering.macro.descriptor.DefaultContentDescriptor;
@@ -74,8 +72,15 @@ public class DefaultWikiMacroTest extends AbstractComponentTestCase
      */
     private WikiMacroManager wikiMacroManager;
 
+    /** XWiki/2.0 parser. */
     private Parser xwiki20Parser;
 
+    /**
+     * {@inheritDoc}
+     * 
+     * @see org.xwiki.test.AbstractComponentTestCase#setUp()
+     */
+    @Override
     @Before
     public void setUp() throws Exception
     {
@@ -204,7 +209,7 @@ public class DefaultWikiMacroTest extends AbstractComponentTestCase
 
         // Hack into velocity context.
         Execution execution = getComponentManager().lookup(Execution.class);
-        Map xwikiContext = (Map) execution.getContext().getProperty("xwikicontext");
+        Map<?, ?> xwikiContext = (Map<?, ?>) execution.getContext().getProperty("xwikicontext");
         final VelocityContext vContext = new VelocityContext();
         vContext.put("xcontext", xwikiContext);
 

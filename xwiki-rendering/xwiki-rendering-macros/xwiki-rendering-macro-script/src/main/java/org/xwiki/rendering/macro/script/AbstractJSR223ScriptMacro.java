@@ -33,6 +33,7 @@ import javax.script.ScriptEngineManager;
 import javax.script.ScriptException;
 
 import org.apache.commons.lang.StringUtils;
+import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.component.annotation.Requirement;
 import org.xwiki.context.ExecutionContext;
 import org.xwiki.rendering.block.Block;
@@ -61,6 +62,10 @@ public abstract class AbstractJSR223ScriptMacro<P extends JSR223ScriptMacroParam
      */
     @Requirement
     private ScriptContextManager scriptContextManager;
+
+    /** Used to check if the current document's author has programming rights. */
+    @Requirement
+    private DocumentAccessBridge documentAccessBridge;
 
     /**
      * @param macroName the name of the macro (eg "groovy")

@@ -24,17 +24,16 @@ import java.util.Collections;
 import java.util.List;
 
 import org.apache.commons.lang.StringUtils;
-import org.xwiki.bridge.DocumentAccessBridge;
-import org.xwiki.classloader.ExtendedURLClassLoader;
 import org.xwiki.component.annotation.Requirement;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.context.Execution;
+import org.xwiki.observation.ObservationManager;
+import org.xwiki.observation.event.ScriptEvaluationFinishedEvent;
+import org.xwiki.observation.event.ScriptEvaluationStartsEvent;
 import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.block.MacroBlock;
 import org.xwiki.rendering.block.XDOM;
-import org.xwiki.rendering.internal.macro.script.AttachmentClassLoaderFactory;
-import org.xwiki.rendering.internal.macro.script.ScriptMacroValidator;
 import org.xwiki.rendering.macro.AbstractMacro;
 import org.xwiki.rendering.macro.MacroExecutionException;
 import org.xwiki.rendering.macro.descriptor.ContentDescriptor;
@@ -43,14 +42,19 @@ import org.xwiki.rendering.parser.Parser;
 import org.xwiki.rendering.transformation.MacroTransformationContext;
 import org.xwiki.rendering.util.ParserUtils;
 
+
 /**
  * Base Class for script evaluation macros.
+ * <p>
+ * It is not obvious to see how macro execution works just from looking at the code. A lot of checking and
+ * initialization is done in listeners to the {@link ScriptEvaluationStartsEvent} and
+ * {@link ScriptEvaluationFinishedEvent}. E.g. the check for programming rights for JSR223 scripts, check for nested
+ * script macros and selecting the right class loader is done there.</p>
  * 
  * @param <P> the type of macro parameters bean.
  * @version $Id$
  * @since 1.7M3
  */
-// TODO: This class is on the edge of a fanout violation and needs to be refactored and split up.
 public abstract class AbstractScriptMacro<P extends ScriptMacroParameters> extends AbstractMacro<P> implements
     ScriptMacro
 {
@@ -60,25 +64,15 @@ public abstract class AbstractScriptMacro<P extends ScriptMacroParameters> exten
     protected static final String CONTENT_DESCRIPTION = "the script to execute";
 
     /**
-     * Key under which the class loader used by script executions is saved in the Execution Context, see
-     * {@link #execution}.
-     */
-    private static final String EXECUTION_CONTEXT_CLASSLOADER_KEY = "scriptClassLoader";
-
-    /**
-     * Key under which the jar params used for the last macro execution are cached in the Execution Context.
-     */
-    private static final String EXECUTION_CONTEXT_JARPARAMS_KEY = "scriptJarParams";
-
-    /**
      * Used to find if the current document's author has programming rights.
+     * @deprecated since 2.5M1 (not used any more)
      */
     @Requirement
-    protected DocumentAccessBridge documentAccessBridge;
+    @Deprecated
+    protected org.xwiki.bridge.DocumentAccessBridge documentAccessBridge;
 
     /**
-     * Used to set the classLoader to be used by scripts across invocations. We save it in the Execution Context to be
-     * sure it's the same classLoader used.
+     * Used by subclasses.
      */
     @Requirement
     protected Execution execution;
@@ -97,21 +91,13 @@ public abstract class AbstractScriptMacro<P extends ScriptMacroParameters> exten
     private Parser plainTextParser;
 
     /**
-     * Used to create a custom class loader that knows how to support JARs attached to wiki page.
-     */
-    @Requirement
-    private AttachmentClassLoaderFactory attachmentClassLoaderFactory;
-
-    /**
      * Used to clean result of the parser syntax.
      */
     private ParserUtils parserUtils = new ParserUtils();
 
-    /**
-     * Validators to make sure script macro is valid.
-     */
-    @Requirement(role = ScriptMacroValidator.class)
-    private List<ScriptMacroValidator> validators;
+    /** Observation manager used to sent evaluation events. */
+    @Requirement
+    private ObservationManager observation;
 
     /**
      * @param macroName the name of the macro (eg "groovy")
@@ -193,20 +179,12 @@ public abstract class AbstractScriptMacro<P extends ScriptMacroParameters> exten
         List<Block> result = Collections.emptyList();
 
         if (!StringUtils.isEmpty(content)) {
-
-            // Set the context class loader to the script CL to ensure that any script engine using the context
-            // classloader will work just fine.
-            // Note: We must absolutely ensure that we always use the same context CL during the whole execution
-            // request since JSR223 script engines (for example) that create internal class loaders need to
-            // continue using these class loaders (where classes defined in scripts have been loaded for example).
-            ClassLoader originalClassLoader = Thread.currentThread().getContextClassLoader();
-            ClassLoader newClassLoader = getClassLoader(parameters.getJars(), originalClassLoader);
             try {
-                Thread.currentThread().setContextClassLoader(newClassLoader);
-
-                // 1) Abort execution if the script is nested
-                for (ScriptMacroValidator validator : this.validators) {
-                    validator.validate(parameters, content, context);
+                // send evaluation starts event
+                ScriptEvaluationStartsEvent event = new ScriptEvaluationStartsEvent(getDescriptor().getId().getId());
+                observation.notify(event, context, parameters);
+                if (event.isCanceled()) {
+                    throw new MacroExecutionException(event.getReason());
                 }
 
                 // 2) Run script engine on macro block content
@@ -216,92 +194,13 @@ public abstract class AbstractScriptMacro<P extends ScriptMacroParameters> exten
                     result = blocks;
                 }
             } finally {
-                // Restore original class loader
-                Thread.currentThread().setContextClassLoader(originalClassLoader);
+                // send evaluation finished event
+                observation.notify(new ScriptEvaluationFinishedEvent(getDescriptor().getId().getId()), context,
+                        parameters);
             }
         }
 
         return result;
-    }
-
-    /**
-     * @param jarsParameterValue the value of the macro parameters used to pass extra URLs that should be in the
-     *            execution class loader
-     * @param parent the parent classloader for the classloader to create (if it doesn't already exist)
-     * @return the class loader to use for executing the script
-     * @throws MacroExecutionException in case of an error in building the class loader
-     */
-    protected ClassLoader getClassLoader(String jarsParameterValue, ClassLoader parent) throws MacroExecutionException
-    {
-        try {
-            return findClassLoader(jarsParameterValue, parent);
-        } catch (MacroExecutionException mee) {
-            throw mee;
-        } catch (Exception e) {
-            throw new MacroExecutionException("Failed to add JAR URLs to the current class loader for ["
-                + jarsParameterValue + "]", e);
-        }
-    }
-
-    /**
-     * @param jarsParameterValue the value of the macro parameters used to pass extra URLs that should be in the
-     *            execution class loader
-     * @param parent the parent classloader for the classloader to create (if it doesn't already exist)
-     * @return the class loader to use for executing the script
-     * @throws Exception in case of an error in building the class loader
-     */
-    private ClassLoader findClassLoader(String jarsParameterValue, ClassLoader parent) throws Exception
-    {
-        // We cache the Class Loader for improved performances and we check if the saved class loader had the same
-        // jar parameters value as the current execution. If not, we compute a new class loader.
-        ExtendedURLClassLoader cl =
-            (ExtendedURLClassLoader) this.execution.getContext().getProperty(EXECUTION_CONTEXT_CLASSLOADER_KEY);
-
-        if (cl == null) {
-            if (!StringUtils.isEmpty(jarsParameterValue)) {
-                cl = createOrExtendClassLoader(true, jarsParameterValue, parent);
-            } else {
-                cl = this.attachmentClassLoaderFactory.createAttachmentClassLoader("", parent);
-            }
-        } else {
-            String cachedJarsParameterValue =
-                (String) this.execution.getContext().getProperty(EXECUTION_CONTEXT_JARPARAMS_KEY);
-            if (cachedJarsParameterValue != jarsParameterValue) {
-                cl = createOrExtendClassLoader(false, jarsParameterValue, cl);
-            }
-        }
-        this.execution.getContext().setProperty(EXECUTION_CONTEXT_CLASSLOADER_KEY, cl);
-
-        return cl;
-    }
-
-    /**
-     * @param createNewClassLoader if true create a new classloader and if false extend an existing one with the passed
-     *            additional jars
-     * @param jarsParameterValue the value of the macro parameters used to pass extra URLs that should be in the
-     *            execution class loader
-     * @param classLoader the parent classloader for the classloader to create or the classloader to extend, depending
-     *            on the value of the createNewClassLoader parameter
-     * @return the new classloader or the extended one
-     * @throws Exception in case of an error in building or extending the class loader
-     */
-    private ExtendedURLClassLoader createOrExtendClassLoader(boolean createNewClassLoader, String jarsParameterValue,
-        ClassLoader classLoader) throws Exception
-    {
-        ExtendedURLClassLoader cl;
-        if (canHaveJarsParameters()) {
-            if (createNewClassLoader) {
-                cl = this.attachmentClassLoaderFactory.createAttachmentClassLoader(jarsParameterValue, classLoader);
-            } else {
-                cl = (ExtendedURLClassLoader) classLoader;
-                this.attachmentClassLoaderFactory.extendAttachmentClassLoader(jarsParameterValue, cl);
-            }
-            this.execution.getContext().setProperty(EXECUTION_CONTEXT_JARPARAMS_KEY, jarsParameterValue);
-        } else {
-            throw new MacroExecutionException(
-                "You cannot pass additional jars since you don't have programming rights");
-        }
-        return cl;
     }
 
     /**
@@ -442,17 +341,5 @@ public abstract class AbstractScriptMacro<P extends ScriptMacroParameters> exten
             throw new MacroExecutionException("Failed to parse content [" + content + "] with Syntax parser ["
                 + parser.getSyntax() + "]", e);
         }
-    }
-
-    /**
-     * Note that this method allows extending classes to override it to allow jars parameters to be used without
-     * programming rights for example or to use some other conditions.
-     * 
-     * @return true if the user can use the macro parameter used to pass additional JARs to the classloader used to
-     *         evaluate a script
-     */
-    protected boolean canHaveJarsParameters()
-    {
-        return this.documentAccessBridge.hasProgrammingRights();
     }
 }

@@ -197,6 +197,7 @@
                 <!-- TODO: Excludes below to be removed when we release XWiki 2.5 -->
                 <exclude>org/xwiki/bridge/DocumentAccessBridge</exclude>
                 <exclude>org/xwiki/rendering/macro/script/AbstractScriptMacro</exclude>
+                <exclude>org/xwiki/rendering/macro/script/AbstractJSR223ScriptMacro</exclude>
               </excludes>
             </configuration>
           </plugin>

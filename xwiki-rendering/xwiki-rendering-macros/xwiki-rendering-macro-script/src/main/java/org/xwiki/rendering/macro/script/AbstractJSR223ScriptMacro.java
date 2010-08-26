@@ -33,7 +33,6 @@ import javax.script.ScriptEngineManager;
 import javax.script.ScriptException;
 
 import org.apache.commons.lang.StringUtils;
-import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.component.annotation.Requirement;
 import org.xwiki.context.ExecutionContext;
 import org.xwiki.rendering.block.Block;
@@ -51,6 +50,7 @@ import org.xwiki.script.ScriptContextManager;
  * @since 1.7M3
  */
 public abstract class AbstractJSR223ScriptMacro<P extends JSR223ScriptMacroParameters> extends AbstractScriptMacro<P>
+    implements PrivilegedScriptMacro
 {
     /**
      * Key under which the Script Engines are saved in the Execution Context, see {@link #execution}.
@@ -62,10 +62,6 @@ public abstract class AbstractJSR223ScriptMacro<P extends JSR223ScriptMacroParam
      */
     @Requirement
     private ScriptContextManager scriptContextManager;
-
-    /** Used to check if the current document's author has programming rights. */
-    @Requirement
-    private DocumentAccessBridge documentAccessBridge;
 
     /**
      * @param macroName the name of the macro (eg "groovy")
@@ -125,23 +121,6 @@ public abstract class AbstractJSR223ScriptMacro<P extends JSR223ScriptMacroParam
     public boolean supportsInlineMode()
     {
         return true;
-    }
-
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.rendering.macro.script.AbstractScriptMacro#execute(java.lang.Object, java.lang.String,
-     *      org.xwiki.rendering.transformation.MacroTransformationContext)
-     */
-    @Override
-    public List<Block> execute(P parameters, String content, MacroTransformationContext context)
-        throws MacroExecutionException
-    {
-        if (!canExecuteScript()) {
-            throw new MacroExecutionException("You don't have the right to execute this script");
-        }
-
-        return super.execute(parameters, content, context);
     }
 
     /**
@@ -314,18 +293,5 @@ public abstract class AbstractJSR223ScriptMacro<P extends JSR223ScriptMacroParam
         // TODO: add caching
 
         return engine.compile(content);
-    }
-
-    /**
-     * Indicate if the script is executable in the current context.
-     * <p>
-     * For example with not protected script engine, we are testing if the current dcument's author has "programming"
-     * right.
-     * 
-     * @return true if the script can be evaluated, false otherwise.
-     */
-    protected boolean canExecuteScript()
-    {
-        return this.documentAccessBridge.hasProgrammingRights();
     }
 }

@@ -34,6 +34,7 @@ import org.xwiki.context.Execution;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.model.reference.WikiReference;
+import org.xwiki.rendering.macro.wikibridge.InsufficientPrivilegesException;
 import org.xwiki.rendering.macro.wikibridge.WikiMacro;
 import org.xwiki.rendering.macro.wikibridge.WikiMacroException;
 import org.xwiki.rendering.macro.wikibridge.WikiMacroFactory;
@@ -198,6 +199,10 @@ public class DefaultWikiMacroInitializer extends AbstractLogEnabled implements W
             xcontext.setUser(wikiMacroDocumentAuthor);
             this.wikiMacroManager.registerWikiMacro(wikiMacroDocumentReference, macro);
             LOG.debug("Registered macro " + wikiMacroDocumentReference);
+        } catch (InsufficientPrivilegesException ex) {
+            // Just log the exception and skip to the next.
+            // We only log at the debug level here as this is not really an error
+            getLogger().debug(ex.getMessage(), ex);
         } catch (WikiMacroException ex) {
             // Just log the exception and skip to the next.
             getLogger().error(ex.getMessage(), ex);

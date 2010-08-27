@@ -30,6 +30,7 @@ import org.xwiki.rendering.macro.Macro;
 import org.xwiki.rendering.macro.MacroId;
 import org.xwiki.rendering.macro.MacroManager;
 import org.xwiki.rendering.macro.descriptor.DefaultContentDescriptor;
+import org.xwiki.rendering.macro.wikibridge.InsufficientPrivilegesException;
 import org.xwiki.rendering.macro.wikibridge.WikiMacroDescriptor;
 import org.xwiki.rendering.macro.wikibridge.WikiMacroException;
 import org.xwiki.rendering.macro.wikibridge.WikiMacroManager;
@@ -146,7 +147,7 @@ public class DefaultWikiMacroManagerTest extends AbstractComponentTestCase
         Assert.assertEquals(0, registeredMacro.compareTo(wikiMacro));
     }
 
-    @org.junit.Test
+    @org.junit.Test(expected=InsufficientPrivilegesException.class)
     public void testRegisterWikiMacroWhenGlobalVisibilityAndNotAllowed() throws Exception
     {
         final DefaultWikiMacro wikiMacro = generateWikiMacro(WikiMacroVisibility.GLOBAL);
@@ -156,18 +157,10 @@ public class DefaultWikiMacroManagerTest extends AbstractComponentTestCase
             allowing(mockDocumentAccessBridge).hasProgrammingRights(); will(returnValue(false));
         }});
 
-        try {
-            wikiMacroManager.registerWikiMacro(wikiMacro.getDocumentReference(), wikiMacro);
-            Assert.fail("Should have raised an exception here");
-        } catch (WikiMacroException e) {
-            Assert.assertEquals("Unable to register macro [testwikimacro] in "
-                + "[name = [TestWikiMacro], type = [DOCUMENT], parent = [name = [Main], type = [SPACE], "
-                + "parent = [name = [xwiki], type = [WIKI], parent = [null]]]] for visibility [GLOBAL] due to "
-                + "insufficient privileges", e.getMessage());
-        }
+        wikiMacroManager.registerWikiMacro(wikiMacro.getDocumentReference(), wikiMacro);
     }
 
-    @org.junit.Test
+    @org.junit.Test(expected=InsufficientPrivilegesException.class)
     public void testRegisterWikiMacroWhenWikiVisibilityAndNotAllowed() throws Exception
     {
         final DefaultWikiMacro wikiMacro = generateWikiMacro(WikiMacroVisibility.WIKI);
@@ -178,18 +171,10 @@ public class DefaultWikiMacroManagerTest extends AbstractComponentTestCase
                 will(returnValue(false));
         }});
 
-        try {
-            wikiMacroManager.registerWikiMacro(wikiMacro.getDocumentReference(), wikiMacro);
-            Assert.fail("Should have raised an exception here");
-        } catch (WikiMacroException e) {
-            Assert.assertEquals("Unable to register macro [testwikimacro] in [name = [TestWikiMacro], "
-                + "type = [DOCUMENT], parent = [name = [Main], type = [SPACE], parent = [name = [xwiki], "
-                + "type = [WIKI], parent = [null]]]] for visibility [WIKI] due to insufficient privileges",
-                e.getMessage());
-        }
+        wikiMacroManager.registerWikiMacro(wikiMacro.getDocumentReference(), wikiMacro);
     }
 
-    @org.junit.Test
+    @org.junit.Test(expected=InsufficientPrivilegesException.class)
     public void testRegisterWikiMacroWhenUserVisibilityAndNotAllowed() throws Exception
     {
         final DefaultWikiMacro wikiMacro = generateWikiMacro(WikiMacroVisibility.USER);
@@ -200,15 +185,7 @@ public class DefaultWikiMacroManagerTest extends AbstractComponentTestCase
                 will(returnValue(false));
         }});
 
-        try {
-            wikiMacroManager.registerWikiMacro(wikiMacro.getDocumentReference(), wikiMacro);
-            Assert.fail("Should have raised an exception here");
-        } catch (WikiMacroException e) {
-            Assert.assertEquals("Unable to register macro [testwikimacro] in [name = [TestWikiMacro], "
-                + "type = [DOCUMENT], parent = [name = [Main], type = [SPACE], parent = [name = [xwiki], "
-                + "type = [WIKI], parent = [null]]]] for visibility [USER] due to insufficient privileges",
-                e.getMessage());
-        }
+        wikiMacroManager.registerWikiMacro(wikiMacro.getDocumentReference(), wikiMacro);
     }
 
     private DefaultWikiMacro generateWikiMacro(WikiMacroVisibility visibility) throws Exception

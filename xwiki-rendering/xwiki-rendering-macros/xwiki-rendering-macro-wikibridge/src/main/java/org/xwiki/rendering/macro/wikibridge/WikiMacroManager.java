@@ -42,18 +42,18 @@ public interface WikiMacroManager
      *
      * @param documentReference the name of the document which contains the wiki macro
      * @param wikiMacro the {@link org.xwiki.rendering.macro.wikibridge.WikiMacro} instance
-     * @exception WikiMacroException if a problem happened when registering the macro (document doesn't exist,
-     *            not enough privilege, etc)
+     * @exception InsufficientPrivilegesException if asked visibility is not allowed
+     * @exception WikiMacroException if a problem happened when registering the macro (document doesn't exist, etc.)
      * @since 2.2.M1
      */
-    void registerWikiMacro(DocumentReference documentReference, WikiMacro wikiMacro) throws WikiMacroException;
+    void registerWikiMacro(DocumentReference documentReference, WikiMacro wikiMacro)
+        throws InsufficientPrivilegesException, WikiMacroException;
 
     /**
      * Unregisters the wiki macro defined on the given document (if there is one).
      * 
      * @param documentReference the name of the document which contains the wiki macro
-     * @exception WikiMacroException if a problem happened when registering the macro (document doesn't exist,
-     *            not enough privilege, etc)
+     * @exception WikiMacroException if a problem happened when registering the macro (document doesn't exist, etc)
      * @since 2.2.M1
      */
     void unregisterWikiMacro(DocumentReference documentReference) throws WikiMacroException;

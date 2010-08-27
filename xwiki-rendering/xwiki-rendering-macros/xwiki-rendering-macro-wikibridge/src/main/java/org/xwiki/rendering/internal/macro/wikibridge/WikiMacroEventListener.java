@@ -33,6 +33,7 @@ import org.xwiki.observation.event.DocumentDeleteEvent;
 import org.xwiki.observation.event.DocumentSaveEvent;
 import org.xwiki.observation.event.DocumentUpdateEvent;
 import org.xwiki.observation.event.Event;
+import org.xwiki.rendering.macro.wikibridge.InsufficientPrivilegesException;
 import org.xwiki.rendering.macro.wikibridge.WikiMacro;
 import org.xwiki.rendering.macro.wikibridge.WikiMacroFactory;
 import org.xwiki.rendering.macro.wikibridge.WikiMacroException;
@@ -140,6 +141,9 @@ public class WikiMacroEventListener extends AbstractLogEnabled implements EventL
             getLogger().debug(
                 String.format("Unable to register macro [%s] in document [%s]", wikiMacro.getDescriptor().getId()
                     .getId(), documentReference), e);
+        } catch (InsufficientPrivilegesException e) {
+            getLogger().debug(String.format("Insufficient privileges for registering macro [%s] in document [%s]",
+                wikiMacro.getDescriptor().getId().getId(), documentReference), e);
         }
     }
 

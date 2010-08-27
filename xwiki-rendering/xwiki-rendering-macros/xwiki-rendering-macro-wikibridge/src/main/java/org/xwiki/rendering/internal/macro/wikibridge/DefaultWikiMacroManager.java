@@ -32,6 +32,7 @@ import org.xwiki.model.ModelContext;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.rendering.macro.Macro;
+import org.xwiki.rendering.macro.wikibridge.InsufficientPrivilegesException;
 import org.xwiki.rendering.macro.wikibridge.WikiMacro;
 import org.xwiki.rendering.macro.wikibridge.WikiMacroDescriptor;
 import org.xwiki.rendering.macro.wikibridge.WikiMacroException;
@@ -146,7 +147,8 @@ public class DefaultWikiMacroManager implements WikiMacroManager
      * @see WikiMacroManager#registerWikiMacro(org.xwiki.model.reference.DocumentReference , WikiMacro)
      * @since 2.2M1
      */
-    public void registerWikiMacro(DocumentReference documentReference, WikiMacro wikiMacro) throws WikiMacroException
+    public void registerWikiMacro(DocumentReference documentReference, WikiMacro wikiMacro)
+        throws InsufficientPrivilegesException, WikiMacroException
     {
         WikiMacroDescriptor macroDescriptor = (WikiMacroDescriptor) wikiMacro.getDescriptor();
 
@@ -166,9 +168,9 @@ public class DefaultWikiMacroManager implements WikiMacroManager
                     wikiMacro.getDescriptor().getId().getId(), documentReference, macroDescriptor.getVisibility()), e);
             }
         } else {
-            throw new WikiMacroException(String.format("Unable to register macro [%s] in [%s] for visibility [%s] "
-                + "due to insufficient privileges", wikiMacro.getDescriptor().getId().getId(), documentReference,
-                macroDescriptor.getVisibility()));
+            throw new InsufficientPrivilegesException(String.format(
+                "Unable to register macro [%s] in [%s] for visibility [%s] due to insufficient privileges", wikiMacro
+                    .getDescriptor().getId().getId(), documentReference, macroDescriptor.getVisibility()));
         }
     }
 

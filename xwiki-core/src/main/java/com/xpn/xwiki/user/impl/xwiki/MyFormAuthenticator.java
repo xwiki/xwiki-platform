@@ -78,16 +78,22 @@ public class MyFormAuthenticator extends FormAuthenticator implements XWikiAuthe
             // Save this request
             savedRequestId = SavedRequestRestorerFilter.saveRequest(request);
         }
+        String sridParameter = SavedRequestRestorerFilter.SAVED_REQUESTS_IDENTIFIER + "=" + savedRequestId;
 
         // Redirect to login page
         StringBuilder redirectBack = new StringBuilder(request.getRequestURI());
+        redirectBack.append('?');
+        String delimiter = "";
         if (StringUtils.isNotEmpty(request.getQueryString())) {
-            redirectBack.append('?');
             redirectBack.append(request.getQueryString());
+            delimiter = "&";
         }
-        response.sendRedirect(response.encodeRedirectURL(request.getContextPath() + this.loginPage + "?"
-            + SavedRequestRestorerFilter.SAVED_REQUESTS_IDENTIFIER + "=" + savedRequestId +
-            "&xredirect=" + URLEncoder.encode(redirectBack.toString(), "UTF-8")));
+        if (!request.getParameterMap().containsKey(SavedRequestRestorerFilter.SAVED_REQUESTS_IDENTIFIER)) {
+            redirectBack.append(delimiter);
+            redirectBack.append(sridParameter);
+        }
+        response.sendRedirect(response.encodeRedirectURL(request.getContextPath() + this.loginPage
+            + "?" + sridParameter + "&xredirect=" + URLEncoder.encode(redirectBack.toString(), "UTF-8")));
 
         return;
     }

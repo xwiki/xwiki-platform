@@ -51,6 +51,7 @@ import javax.xml.parsers.ParserConfigurationException;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.ArrayUtils;
+import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -622,10 +623,8 @@ public class Util
 
     public static String getHTMLExceptionMessage(XWikiException xe, XWikiContext context)
     {
-        String title;
-        String text;
-        title = xe.getMessage();
-        text = com.xpn.xwiki.XWiki.getFormEncoded(xe.getFullMessage());
+        String title = StringEscapeUtils.escapeXml(xe.getMessage());
+        String text = StringEscapeUtils.escapeXml(xe.getFullMessage());
         String id = (String) context.get("xwikierrorid");
         if (id == null) {
             id = "1";

@@ -7,7 +7,7 @@
 #template("header.vm")
 <div class="layoutsection">
   <div id="contentcolumn" class="content hideleft hideright">
-    #xwikimessageboxstart($msg.get('rollback') $msg.get('readytorollback').concat(' ').concat($request.get('rev')).concat('?'))
+    #xwikimessageboxstart($msg.get('rollback') "$msg.get('readytorollback') $!{escapetool.xml($request.get('rev'))}?")
     <form action="" method="post">
       <div>
         <input type="hidden" name="confirm" value="1" />

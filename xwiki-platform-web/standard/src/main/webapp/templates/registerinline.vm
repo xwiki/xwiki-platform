@@ -18,7 +18,7 @@
     #end
   #elseif($reg)
     #set($xwname = "XWiki.${request.xwikiname}")
-    #info($msg.get('core.register.successful', [$xwiki.getUserName($xwname), $request.xwikiname]))
+    #info($msg.get('core.register.successful', [$xwiki.getUserName($xwname), ${escapetool.xml($request.xwikiname)}]))
   #end
   #if(!$reg || $reg < 0)
     <form id="register" action="" method="post">

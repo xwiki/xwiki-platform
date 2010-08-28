@@ -36,11 +36,11 @@
         #set($newDocReferenceAsString = $services.model.serialize($newDocReference))
         #if($xwiki.exists($newDocReference))
           $response.setStatus(409)
-          #error($msg.get('core.rename.alreadyExists', [$newDocReferenceAsString, $xwiki.getURL($newDocReference)]))
+          #error($msg.get('core.rename.alreadyExists', [${escapetool.xml($newDocReferenceAsString)}, $xwiki.getURL($newDocReference)]))
           #template("renameStep1.vm")
         #elseif(!$xwiki.hasAccessLevel('edit', $context.user, $newDocReferenceAsString))
           $response.setStatus(403)
-          #error($msg.get('core.rename.targetNotWritable', [$newDocReferenceAsString]))
+          #error($msg.get('core.rename.targetNotWritable', [${escapetool.xml($newDocReferenceAsString)}]))
           #template('renameStep1.vm')
         #else
           #set($backlinks = [])
@@ -56,7 +56,7 @@
           ## doc points to the new name!
           #set ($oldDocName = $doc.fullName)
           $doc.rename($newDocReference, $backlinks, $children)
-          #xwikimessageboxstart("$msg.get('notice')" "$msg.get('core.rename.success', [$oldDocName, $doc.fullName, $xwiki.getURL($doc.fullName)])")
+          #xwikimessageboxstart("$msg.get('notice')" "$msg.get('core.rename.success', [${escapetool.xml($oldDocName)}, ${escapetool.xml($doc.fullName)}, $xwiki.getURL($doc.fullName)])")
           #xwikimessageboxend()
         #end
       #end

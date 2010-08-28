@@ -516,7 +516,29 @@ public class XWiki extends Api
     }
 
     /**
-     * Priviledged API allowing to run a search on the database returning a list of data This search is send to the
+     * Privileged API allowing to run a search on the database returning a list of data. The HQL where clause uses
+     * parameters (question marks) instead of values, and the actual values are passed in the parameters list. This
+     * allows generating a query which will automatically encode the passed values (like escaping single quotes). This
+     * API is recommended to be used over the other similar methods where the values are passed inside the where clause
+     * and for which manual encoding/escaping is needed to avoid SQL injections or bad queries.
+     * 
+     * @param parameterizedWhereClause query to be run (HQL)
+     * @param parameterValues the where clause values that replace the question marks
+     * @return a list of rows, where each row has either the selected data type ({@link XWikiDocument}, {@code String},
+     *         {@code Integer}, etc.), or {@code Object[]} if more than one column was selected
+     * @throws XWikiException
+     */
+    public <T> List<T> search(String parameterizedWhereClause, List< ? > parameterValues) throws XWikiException
+    {
+        if (hasProgrammingRights()) {
+            return this.xwiki.getStore().search(parameterizedWhereClause, 0, 0, parameterValues, getXWikiContext());
+        }
+
+        return Collections.emptyList();
+    }
+
+    /**
+     * Privileged API allowing to run a search on the database returning a list of data. This search is sent to the
      * store engine (Hibernate HQL, JCR XPATH or other)
      * 
      * @param wheresql Query to be run (HQL, XPath)
@@ -529,6 +551,32 @@ public class XWiki extends Api
     {
         if (hasProgrammingRights()) {
             return this.xwiki.search(wheresql, nb, start, getXWikiContext());
+        }
+
+        return Collections.emptyList();
+    }
+
+    /**
+     * Privileged API allowing to run a search on the database returning a list of data. The HQL where clause uses
+     * parameters (question marks) instead of values, and the actual values are passed in the paremeters list. This
+     * allows generating a query which will automatically encode the passed values (like escaping single quotes). This
+     * API is recommended to be used over the other similar methods where the values are passed inside the where clause
+     * and for which manual encoding/escaping is needed to avoid sql injections or bad queries.
+     * 
+     * @param parameterizedWhereClause query to be run (HQL)
+     * @param maxResults maximum number of results to return; if 0 all results are returned
+     * @param startOffset skip the first N results; if 0 no items are skipped
+     * @param parameterValues the where clause values that replace the question marks
+     * @return a list of rows, where each row has either the selected data type ({@link XWikiDocument}, {@code String},
+     *         {@code Integer}, etc.), or {@code Object[]} if more than one column was selected
+     * @throws XWikiException
+     */
+    public <T> List<T> search(String parameterizedWhereClause, int maxResults, int startOffset,
+        List< ? > parameterValues) throws XWikiException
+    {
+        if (hasProgrammingRights()) {
+            return this.xwiki.getStore().search(parameterizedWhereClause, maxResults, startOffset, parameterValues,
+                getXWikiContext());
         }
 
         return Collections.emptyList();
@@ -598,7 +646,7 @@ public class XWiki extends Api
     }
 
     /**
-     * Priviledged API allowing to search for document names matching a query return only a limited number of elements
+     * Privileged API allowing to search for document names matching a query return only a limited number of elements
      * and skipping the first rows. The return values contain the list of columns specified in addition to the document
      * space and name The query part is the same as searchDocuments
      * 

@@ -713,19 +713,20 @@ public class XWiki extends Api
      * &lt;/code&gt;
      * </pre>
      * 
-     * @param parametrizedSqlClause the HQL where clause. For example <code>" where doc.fullName
+     * @param parameterizedWhereClause the HQL where clause. For example <code>" where doc.fullName
      *        <> ? and (doc.parent = ? or (doc.parent = ? and doc.space = ?))"</code>
-     * @param nb the number of rows to return. If 0 then all rows are returned
-     * @param start the number of rows to skip. If 0 don't skip any row
+     * @param maxResults the number of rows to return. If 0 then all rows are returned
+     * @param startOffset the number of rows to skip. If 0 don't skip any row
      * @param parameterValues the where clause values that replace the question marks (?)
      * @return a list of document names
      * @throws XWikiException in case of error while performing the query
      */
-    public List<String> searchDocuments(String parametrizedSqlClause, int nb, int start, List< ? > parameterValues)
+    public List<String> searchDocuments(String parameterizedWhereClause, int maxResults, int startOffset,
+        List< ? > parameterValues)
         throws XWikiException
     {
-        return this.xwiki.getStore().searchDocumentsNames(parametrizedSqlClause, nb, start, parameterValues,
-            getXWikiContext());
+        return this.xwiki.getStore().searchDocumentsNames(parameterizedWhereClause, maxResults, startOffset,
+            parameterValues, getXWikiContext());
     }
 
     /**
@@ -733,24 +734,25 @@ public class XWiki extends Api
      * 
      * @see #searchDocuments(String, int, int, java.util.List)
      */
-    public List<String> searchDocuments(String parametrizedSqlClause, List< ? > parameterValues) throws XWikiException
+    public List<String> searchDocuments(String parameterizedWhereClause, List< ? > parameterValues)
+        throws XWikiException
     {
-        return this.xwiki.getStore().searchDocumentsNames(parametrizedSqlClause, parameterValues, getXWikiContext());
+        return this.xwiki.getStore().searchDocumentsNames(parameterizedWhereClause, parameterValues, getXWikiContext());
     }
 
     /**
      * API allowing to count the total number of documents that would be returned by a parameterized query.
      * 
-     * @param parametrizedSqlClause the parameterized query to use, similar to the ones accepted by
+     * @param parameterizedWhereClause the parameterized query to use, similar to the ones accepted by
      *            {@link #searchDocuments(String, List)}. If possible, it should not contain <code>order by</code> or
      *            <code>group</code> clauses, since this kind of queries are not portable.
      * @param parameterValues The parameter values that replace the question marks.
      * @return The number of documents that matched the query.
      * @throws XWikiException if there was a problem executing the query.
      */
-    public int countDocuments(String parametrizedSqlClause, List< ? > parameterValues) throws XWikiException
+    public int countDocuments(String parameterizedWhereClause, List< ? > parameterValues) throws XWikiException
     {
-        return this.xwiki.getStore().countDocuments(parametrizedSqlClause, parameterValues, getXWikiContext());
+        return this.xwiki.getStore().countDocuments(parameterizedWhereClause, parameterValues, getXWikiContext());
     }
 
     /**
@@ -758,24 +760,24 @@ public class XWiki extends Api
      * {@link #searchDocuments(String, int, int, java.util.List)} for more details.
      * 
      * @param wikiName the name of the wiki where to search.
-     * @param parametrizedSqlClause the HQL where clause. For example <code>" where doc.fullName
+     * @param parameterizedWhereClause the HQL where clause. For example <code>" where doc.fullName
      *        <> ? and (doc.parent = ? or (doc.parent = ? and doc.space = ?))"</code>
-     * @param nb the number of rows to return. If 0 then all rows are returned
-     * @param start the number of rows to skip. If 0 don't skip any row
+     * @param maxResults the number of rows to return. If 0 then all rows are returned
+     * @param startOffset the number of rows to skip. If 0 don't skip any row
      * @param parameterValues the where clause values that replace the question marks (?)
      * @return a list of document full names (Space.Name).
      * @see #searchDocuments(String, int, int, java.util.List)
      * @throws XWikiException in case of error while performing the query
      */
-    public List<String> searchDocumentsNames(String wikiName, String parametrizedSqlClause, int nb, int start,
-        List< ? > parameterValues) throws XWikiException
+    public List<String> searchDocumentsNames(String wikiName, String parameterizedWhereClause, int maxResults,
+        int startOffset, List< ? > parameterValues) throws XWikiException
     {
         String database = this.context.getDatabase();
 
         try {
             this.context.setDatabase(wikiName);
 
-            return searchDocuments(parametrizedSqlClause, nb, start, parameterValues);
+            return searchDocuments(parameterizedWhereClause, maxResults, startOffset, parameterValues);
         } finally {
             this.context.setDatabase(database);
         }

@@ -670,8 +670,54 @@ body.hideright #footerglobal {
   text-transform: uppercase;
 }
 
-#xwikidoctitleinput, .metamodifs input[type="text"] {
+#xwikidoctitleinput, .metamodifs input[type="text"], .alleditcontent #parentinput input {
   width: 99.8%;
+}
+
+.editbody #hierarchy {
+  display: inline-block;
+}
+
+/* "Edit parent" icon */
+.edit-meta-tools {
+  display: inline-block;
+  vertical-align: middle;
+}
+#mainEditArea:target #hierarchy, #mainEditArea:target .edit-meta-tools {
+  display: none;
+}
+.edit-meta-tools a {
+  display: inline-block;
+  width: 16px;
+  height: 16px;
+  overflow: hidden;
+  text-indent: -9999px;
+  background: transparent none left top no-repeat;
+  margin-left: 4px;
+}
+.edit-meta-tools a.edit-parent {
+  background-image: url("$xwiki.getSkinFile('icons/xwiki/parent_edit.gif')");
+}
+.edit-meta-tools a.hide-edit-parent {
+  background-image: url("$xwiki.getSkinFile('icons/silk/chart_organisation.gif')");
+}
+
+/* Parent editing area */
+#mainEditArea #parentinput {
+  display: none;
+  background: $theme.backgroundSecondaryColor;
+  padding: 4px 12px;
+  margin: 0 -12px 8px -12px;
+  font-size: 90%;
+}
+#mainEditArea:target #parentinput, #mainEditArea #parentinput.active {
+  display: block;
+}
+#parentinput label {
+  margin: 0;
+}
+#parentinput input {
+  color: $theme.linkColor;
 }
 
 .inlinebody dt {
@@ -1104,6 +1150,7 @@ div#xwikiobjects input[type="checkbox"], div#xwikiclassproperties input[type="ch
   * Button elements different containers
 -------------------------------------------------------------- */
 .buttonwrapper {
+  display: inline-block;
   margin: 5px 5px 0 0;
 }
 input.button, .buttonwrapper a:visited, .buttonwrapper a:link, .buttonwrapper a:active {

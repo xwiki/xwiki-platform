@@ -59,7 +59,7 @@ $response.setContentType("application/x-json")
 "totalrows": $countUsers,
 "returnedrows": #if($countUsers < $limit) $countUsers #else $limit #end,
 "offset": $offset,
-"reqNo": $request.reqNo,
+"reqNo": $util.parseInt($request.reqNo),
 "rows": [
 #foreach( $user in $users )
    #if($context.user == $user.fullName)
@@ -70,11 +70,11 @@ $response.setContentType("application/x-json")
    #set($wikiname = $user.getWiki())
    #if($wikiname != "xwiki" || $wikiname == $context.database) #set($wikiname = "local") #end
    #if( $velocityCount > 1 ) , #end
-   {"username"      : "$user.name", 
-    "fullname"      : "$user.fullName",
-    "wikiname"      : "$wikiname",
-    "firstname"     : "$user.getObject('XWiki.XWikiUsers').get('first_name')", 
-    "lastname"      : "$user.getObject('XWiki.XWikiUsers').get('last_name')",
+   {"username"      : "$!{escapetool.javascript($user.name)}", 
+    "fullname"      : "$!{escapetool.javascript($user.fullName)}",
+    "wikiname"      : "$!{escapetool.javascript($wikiname)}",
+    "firstname"     : "$!{escapetool.javascript($user.getObject('XWiki.XWikiUsers').get('first_name'))}", 
+    "lastname"      : "$!{escapetool.javascript($user.getObject('XWiki.XWikiUsers').get('last_name'))}",
     "userurl"       : "$xwiki.getURL($user.fullName)",
     "usersaveurl"   : "$user.getURL("save")",
     "userinlineurl" : "$user.getURL("inline", "xpage=edituser")",

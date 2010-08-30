@@ -47,7 +47,7 @@
         #set ($extraText = $docextralink.get(1))
         #set ($extraCount = $docextralink.get(2))
         #if($velocityCount > 1) <span class="separator">|</span> #end
-        <span id="${extraAnchor}shortcut"><a href="$doc.getURL('view', "viewer=${extraAnchor}")">${extraText}</a>#if($extraCount != -1) <span class="itemCount">(${extraCount})</span>#end</span>
+        <span id="${escapetool.xml(${extraAnchor})}shortcut"><a href="$doc.getURL('view', "viewer=$!{escapetool.url(${extraAnchor})}")">${escapetool.xml(${extraText})}</a>#if($extraCount != -1) <span class="itemCount">(${escapetool.xml(${extraCount})})</span>#end</span>
       #end
     </div>
     <div class="clearfloats"></div>

@@ -21,6 +21,13 @@ $string
     <span class="breadcrumbspace"><a href="$spaceViewUrl">$escapetool.xml(${doc.space})</a>: </span>
 #breadcrumb($doc "<a href='${doc.getURL('view')}'>$escapetool.xml($tdoc.getRenderedTitle('plain/1.0'))</a>" 0)
   </div>
+  #if($context.action == 'edit' && ($editor == 'wiki' || $editor == 'wysiwyg'))
+    <div class='edit-meta-tools'><a id='editParentTrigger' class='tool edit-parent' href='#headerspace' title="$msg.get('core.editors.content.parentField.edit.title')">[$msg.get('core.editors.content.parentField.edit')]</a></div>
+    <div id="parentinput">
+      <label for="xwikidocparentinput">$msg.get('core.editors.content.parentField.label') <a id='hideEditParentTrigger' href='#'>$msg.get('core.editors.content.parentField.edit.hide')</a>
+      <input type="text" id="xwikidocparentinput" name="parent" value="$!{tdoc.parent}" size="30" class="suggestDocuments"/></label>
+    </div>
+  #end
 <hr/>
 </div>
 #end

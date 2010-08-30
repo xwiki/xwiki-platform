@@ -1425,3 +1425,84 @@ document.observe('xwiki:dom:loaded', function() {
     });
   }
 });
+
+/*
+ * AJAX improvements for setting the document parent.
+ */
+document.observe('xwiki:dom:loaded', function() {
+  var hierarchyElement   = $('hierarchy');
+  var breadcrumbsElement = $('breadcrumbs');
+  var editParentTrigger  = $('editParentTrigger');
+  var parentInputSection = $('parentinput');
+  var parentInputField   = $('xwikidocparentinput');
+  var titleInputField    = $('xwikidoctitleinput');
+
+  /** Hides the parent input field when focusing out of the parent field. */
+  function hideParentSection(event) {
+    if (event) {
+      event.stop();
+    }
+    parentInputSection.removeClassName('active');
+    editParentTrigger.addClassName('edit-parent');
+    editParentTrigger.removeClassName('hide-edit-parent');
+  }
+  /** Displays the parent input field when clicking on the "Edit parent" button. */
+  function showParentSection(event) {
+    if (event) {
+      event.stop();
+    }
+    parentInputSection.addClassName('active');
+    parentInputField.focus();
+    editParentTrigger.removeClassName('edit-parent');
+    editParentTrigger.addClassName('hide-edit-parent');
+  }
+  /** Toggles the visibility of the parent input field. */
+  function toggleParentSectionVisibility (event) {
+    event.stop();
+    event.element().blur();
+    if (editParentTrigger.hasClassName('edit-parent')) {
+      showParentSection();
+    } else {
+      hideParentSection();
+    }
+  }
+
+  if ($('hideEditParentTrigger')) {
+    $('hideEditParentTrigger').style.display = 'none';
+  }
+  if (editParentTrigger) {
+    editParentTrigger.observe('click', toggleParentSectionVisibility);
+  }
+  if (parentInputField) {
+    if (hierarchyElement || breadcrumbsElement) {
+      ['blur', 'change', 'xwiki:suggest:selected'].each(function(monitoredEvent) {
+        parentInputField.observe(monitoredEvent, function () {
+          new Ajax.Request(XWiki.currentDocument.getURL('edit'), {
+            parameters: {
+              xpage: 'xpart',
+              vm: (hierarchyElement ? 'hierarchy.vm' : 'space.vm'),
+              parent : parentInputField.value,
+              title : titleInputField.value
+            },
+            onSuccess : function(response) {
+              if (hierarchyElement) {
+                hierarchyElement.replace(response.responseText);
+                hierarchyElement = $('hierarchy');
+              } else {
+                var tmp = new Element('div');
+                tmp.update(response.responseText);
+                breadcrumbsElement.replace(tmp.down('[id=breadcrumbs]'));
+                breadcrumbsElement = $('breadcrumbs');
+              }
+            }
+          });
+        });
+      });
+    }
+    $('body').observe('click', function (event) {
+      if (!event.element().descendantOf(parentInputSection) && event.element() != parentInputSection && event.element() != editParentTrigger) {
+        hideParentSection();
+      }
+    })
+  }
+});

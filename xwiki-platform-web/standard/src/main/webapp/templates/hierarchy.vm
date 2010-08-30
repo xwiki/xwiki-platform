@@ -1,3 +1,4 @@
+#template('xwikivars.vm')
 #set($parents = $util.arrayList)
 #set($discard = $parents.add($doc.fullName))
 #macro(computeHierarchy $doc $result $level)

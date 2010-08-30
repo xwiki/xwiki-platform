@@ -1,0 +1,9 @@
+#set($docTitle = $request.getParameter('title'))
+#if("$!docTitle" == '')
+  #set($docTitle = $!tdoc.title)
+#end
+  <div id="titleinput">
+    <label for="xwikidoctitleinput">$msg.get('core.editors.content.titleField.label')
+    <input type="text" id="xwikidoctitleinput" name="title" value="$escapetool.xml("$!docTitle")" #if($xwiki.getXWikiPreference('xwiki.title.mandatory') == 1)class="required"#end/></label>
+  </div>
+<div class="clearfloats"></div>

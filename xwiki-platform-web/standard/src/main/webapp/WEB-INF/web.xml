@@ -22,7 +22,7 @@
        without affecting the whole container (and the other applications hosted). -->
   <filter>
     <filter-name>Set Character Encoding</filter-name>
-    <filter-class>com.xpn.xwiki.web.SetCharacterEncodingFilter</filter-class>
+    <filter-class>org.xwiki.container.servlet.filters.internal.SetCharacterEncodingFilter</filter-class>
     <!-- The encoding to use. This must be the same as the one in xwiki.cfg (hopefully only one
          encoding will be used later). -->
     <init-param>

@@ -28,10 +28,11 @@ import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
 
-import com.xpn.xwiki.web.Utils;
 import org.apache.commons.collections.map.LRUMap;
 import org.apache.commons.lang.StringUtils;
 import org.apache.xmlrpc.server.XmlRpcServer;
+import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.DocumentReferenceResolver;
 
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.doc.XWikiDocumentArchive;
@@ -40,14 +41,13 @@ import com.xpn.xwiki.user.api.XWikiRightService;
 import com.xpn.xwiki.user.api.XWikiUser;
 import com.xpn.xwiki.util.Util;
 import com.xpn.xwiki.validation.XWikiValidationStatus;
+import com.xpn.xwiki.web.Utils;
 import com.xpn.xwiki.web.XWikiEngineContext;
 import com.xpn.xwiki.web.XWikiForm;
 import com.xpn.xwiki.web.XWikiMessageTool;
 import com.xpn.xwiki.web.XWikiRequest;
 import com.xpn.xwiki.web.XWikiResponse;
 import com.xpn.xwiki.web.XWikiURLFactory;
-import org.xwiki.model.reference.DocumentReference;
-import org.xwiki.model.reference.DocumentReferenceResolver;
 
 public class XWikiContext extends Hashtable<Object, Object>
 {
@@ -66,11 +66,11 @@ public class XWikiContext extends Hashtable<Object, Object>
     public static final int MODE_GWT_DEBUG = 6;
 
     public static final String EXECUTIONCONTEXT_KEY = "xwikicontext";
-    
+
     private static final String WIKI_KEY = "wiki";
 
     private static final String ORIGINAL_WIKI_KEY = "originalWiki";
-    
+
     private boolean finished = false;
 
     private XWiki wiki;
@@ -118,9 +118,11 @@ public class XWikiContext extends Hashtable<Object, Object>
     private int archiveCacheSize = 20;
 
     // Used to avoid recursive loading of documents if there are recursives usage of classes
+    @SuppressWarnings("unchecked")
     private Map<DocumentReference, BaseClass> classCache = Collections.synchronizedMap(new LRUMap(this.classCacheSize));
 
     // Used to avoid reloading archives in the same request
+    @SuppressWarnings("unchecked")
     private Map<String, XWikiDocumentArchive> archiveCache =
         Collections.synchronizedMap(new LRUMap(this.archiveCacheSize));
 
@@ -131,6 +133,7 @@ public class XWikiContext extends Hashtable<Object, Object>
      * blanks, except for the page name for which the default page name is used instead and for the wiki name for which
      * the current wiki is used instead of the current document reference's wiki.
      */
+    @SuppressWarnings("unchecked")
     private DocumentReferenceResolver<String> currentMixedDocumentReferenceResolver =
         Utils.getComponent(DocumentReferenceResolver.class, "currentmixed");
 
@@ -232,17 +235,17 @@ public class XWikiContext extends Hashtable<Object, Object>
     public synchronized Object put(Object key, Object value)
     {
         Object previous;
-        
+
         if (WIKI_KEY.equals(key)) {
             previous = get(WIKI_KEY);
-            setDatabase((String)value);
+            setDatabase((String) value);
         } else {
             previous = super.put(key, value);
         }
-        
+
         return previous;
     }
-    
+
     /**
      * {@inheritDoc}
      * <p>
@@ -254,14 +257,14 @@ public class XWikiContext extends Hashtable<Object, Object>
     public synchronized Object remove(Object key)
     {
         Object previous;
-        
+
         if (WIKI_KEY.equals(key)) {
             previous = get(WIKI_KEY);
             setDatabase(null);
         } else {
             previous = super.remove(key);
         }
-        
+
         return previous;
     }
 

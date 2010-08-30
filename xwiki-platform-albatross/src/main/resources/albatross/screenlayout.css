@@ -161,9 +161,44 @@ Space header, footer
 }
 #breadcrumbs {
   padding-left: 40px;
+  display: inline-block;
 }
 * html #breadcrumbs {
   width: 100%;
+}
+
+/* "Edit parent" icon */
+.edit-meta-tools {
+  display: inline-block;
+  vertical-align: middle;
+}
+#headerspace:target #breadcrumbs, #headerspace:target .edit-meta-tools {
+  display: none;
+}
+.edit-meta-tools a {
+  display: inline-block;
+  width: 16px;
+  height: 16px;
+  overflow: hidden;
+  text-indent: -9999px;
+  background: transparent none left top no-repeat;
+  margin-left: 4px;
+}
+.edit-meta-tools a.edit-parent {
+  background-image: url("$xwiki.getSkinFile('icons/xwiki/parent_edit.gif')");
+}
+.edit-meta-tools a.hide-edit-parent {
+  background-image: url("$xwiki.getSkinFile('icons/silk/chart_organisation.gif')");
+}
+
+/* Parent editing area */
+#headerspace #parentinput {
+  display: none;
+  padding-left: 4px;
+  font-size: 90%;
+}
+#headerspace:target #parentinput, #headerspace #parentinput.active {
+  display: inline-block;
 }
 
 #footerglobal, #headerspace {

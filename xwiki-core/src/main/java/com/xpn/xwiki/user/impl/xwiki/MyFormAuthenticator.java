@@ -36,10 +36,10 @@ import org.securityfilter.authenticator.FormAuthenticator;
 import org.securityfilter.filter.SecurityRequestWrapper;
 import org.securityfilter.filter.URLPatternMatcher;
 import org.securityfilter.realm.SimplePrincipal;
+import org.xwiki.container.servlet.filters.SavedRequestManager;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
-import com.xpn.xwiki.web.SavedRequestRestorerFilter;
 
 public class MyFormAuthenticator extends FormAuthenticator implements XWikiAuthenticator
 {
@@ -73,12 +73,12 @@ public class MyFormAuthenticator extends FormAuthenticator implements XWikiAuthe
     @Override
     public void showLogin(HttpServletRequest request, HttpServletResponse response) throws IOException
     {
-        String savedRequestId = request.getParameter(SavedRequestRestorerFilter.SAVED_REQUESTS_IDENTIFIER);
+        String savedRequestId = request.getParameter(SavedRequestManager.getSavedRequestIdentifier());
         if (StringUtils.isEmpty(savedRequestId)) {
             // Save this request
-            savedRequestId = SavedRequestRestorerFilter.saveRequest(request);
+            savedRequestId = SavedRequestManager.saveRequest(request);
         }
-        String sridParameter = SavedRequestRestorerFilter.SAVED_REQUESTS_IDENTIFIER + "=" + savedRequestId;
+        String sridParameter = SavedRequestManager.getSavedRequestIdentifier() + "=" + savedRequestId;
 
         // Redirect to login page
         StringBuilder redirectBack = new StringBuilder(request.getRequestURI());
@@ -88,7 +88,7 @@ public class MyFormAuthenticator extends FormAuthenticator implements XWikiAuthe
             redirectBack.append(request.getQueryString());
             delimiter = "&";
         }
-        if (!request.getParameterMap().containsKey(SavedRequestRestorerFilter.SAVED_REQUESTS_IDENTIFIER)) {
+        if (!request.getParameterMap().containsKey(SavedRequestManager.getSavedRequestIdentifier())) {
             redirectBack.append(delimiter);
             redirectBack.append(sridParameter);
         }
@@ -270,7 +270,7 @@ public class MyFormAuthenticator extends FormAuthenticator implements XWikiAuthe
     {
         String savedURL = request.getParameter("xredirect");
         if (StringUtils.isEmpty(savedURL)) {
-            savedURL = SavedRequestRestorerFilter.getOriginalUrl(request);
+            savedURL = SavedRequestManager.getOriginalUrl(request);
         }
 
         if (!StringUtils.isEmpty(savedURL)) {

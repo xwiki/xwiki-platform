@@ -73,6 +73,7 @@
             **/servlet/ServletRequest.java,
             **/servlet/ServletResponse.java,
             **/servlet/ServletSession.java,
+            **/servlet/filters/internal/SetCharacterEncodingFilter.java,
             **/servlet/internal/DefaultServletContainerInitializer.java
           </excludes>
         </configuration>

@@ -19,7 +19,7 @@
  *
  */
 
-package com.xpn.xwiki.web;
+package org.xwiki.container.servlet.filters.internal;
 
 import java.io.IOException;
 

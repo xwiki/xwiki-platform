@@ -4,5 +4,5 @@
 #set($editorPanelsObjects = "Panels.ObjectEditorWelcome,Panels.AddObject")
 #set($editorPanelsClass = "Panels.AddClassProperty,Panels.ClassSwitcher")
 #set($editorPanelsRights = "Panels.RightsEditorWelcome,Panels.RightsTips")
-## No Panels for the histoty editor mode in Albatross
+## No Panels for the history editor mode in Albatross
 #set($editorPanelsHistory = "")

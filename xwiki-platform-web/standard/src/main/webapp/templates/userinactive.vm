@@ -17,7 +17,7 @@
 $msg.get("accountnotactive_email")
 <form action="${confirmdoc.getURL()}" method="post">
 <div>
-<input type="hidden" name="xwikiname" value="$context.user" />
+<input type="hidden" name="xwikiname" value="${escapetool.xml($context.user)}" />
 <input type="text" name="validkey" size="16" />
 <span class="buttonwrapper"><input type="submit" value="$msg.get('confirmaccount')" class="button"/></span>
 </div>

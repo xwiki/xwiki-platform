@@ -5,10 +5,10 @@
 #set($param = "")
 #if($request.getParameter("section"))
     #set($sectionNumbers = $request.getParameter("section"))
-    #set($param = "section=$sectionNumbers")
+    #set($param = "section=$!{escapetool.url($sectionNumbers)}")
 #end
-#if ($sectionNumber != 0)
-    #set($param = "section=$sectionNumber")    
+#if ($sectionNumber && $sectionNumber != 0)
+    #set($param = "section=$!{escapetool.url($sectionNumber)}")
 #end
 <h4 id="xwikieditorstitles">$msg.get("chooseeditor")</h4>
 <div class="floatcontainer">

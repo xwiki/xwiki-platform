@@ -5,20 +5,20 @@
 <script type="text/javascript" src="$xwiki.getSkinFile("js/xwiki/wysiwyg/tinymce/wiki_editor/wiki_editor.js")"></script>
 <script type="text/javascript">
 //<![CDATA[
-	wikiEditor.init({
-		elements : "$editors",
-	    language: "en",
-		mode: "exact",
-		content_css: "$xwiki.getSkinFile("style.css")",
-		debug : false,
-		remove_linebreaks : false,
-		plugins: 'table, contextmenu, paste, searchreplace',
+    wikiEditor.init({
+        elements : "$!{escapetool.javascript($editors)}",
+        language: "en",
+        mode: "exact",
+        content_css: "$xwiki.getSkinFile("style.css")",
+        debug : false,
+        remove_linebreaks : false,
+        plugins: 'table, contextmenu, paste, searchreplace',
         wiki_use_style: '$xwiki.useWysiwygStyleToolbar()',
         wiki_images_path : '${doc.getURL('download')}/',
         wiki_attach_path : '${doc.URL}',
         wiki_macro_path : '${doc.URL}',
         wiki_plugins: 'core, attachments, macros'
-	});
+    });
 //]]>
 </script>
 #elseif($xwiki.wysiwyg.isSyntaxSupported($doc.syntax.toIdString()))

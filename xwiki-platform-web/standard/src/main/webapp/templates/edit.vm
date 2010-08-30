@@ -29,8 +29,8 @@ $xwiki.jsfx.use('js/xwiki/actionbuttons/actionButtons.js', true)
 #template("xwikivars.vm")
 #template("layoutvars.vm")
 #template("htmlheader.vm")
-#template("header.vm")
 #template("menuedit.vm")
+#template("header.vm")
 #if($editor == 'wiki' || $editor == 'wysiwyg')
   <form id="edit" method="post" action="$doc.getURL('preview')" >
   ## Pass the section number when the form is submitted in order to affect only the specified section.
@@ -64,8 +64,9 @@ $xwiki.jsfx.use('js/xwiki/actionbuttons/actionButtons.js', true)
   <div id="xwikieditor" class="layoutsection">
   <div id="xwikieditorinner">
   <div class="leftsidecolumns">
-  <div id="editcolumn" class="editor">
+  <div id="editcolumn" class="editor editor-${editor}">
   <div class="alleditcontent">
+  <div id="mainEditArea">
   #if (($editor == 'wiki' || $editor == 'wysiwyg') && !$request.section)
     #set($docTitle = $request.getParameter('title'))
     #if("$!docTitle" == '')
@@ -76,6 +77,7 @@ $xwiki.jsfx.use('js/xwiki/actionbuttons/actionButtons.js', true)
   #end
   #template("editmodes.vm")
   #template("edit${editor}.vm")
+  </div> ## mainEditArea
   </div> ## alleditcontent
   </div> ## editcolumn
   <div class="clearfloats"></div>

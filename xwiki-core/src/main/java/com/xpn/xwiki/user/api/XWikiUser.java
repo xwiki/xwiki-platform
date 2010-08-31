@@ -24,12 +24,22 @@ package com.xpn.xwiki.user.api;
 import java.util.Collection;
 
 import org.apache.commons.lang.StringUtils;
+import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.DocumentReferenceResolver;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
+import com.xpn.xwiki.web.Utils;
 
 public class XWikiUser
 {
+    /**
+     * @see com.xpn.xwiki.internal.model.reference.CurrentMixedStringDocumentReferenceResolver
+     */
+    @SuppressWarnings("unchecked")
+    private DocumentReferenceResolver<String> currentMixedDocumentReferenceResolver = Utils.getComponent(
+        DocumentReferenceResolver.class, "currentmixed");
+    
     private String user;
 
     private boolean main;
@@ -48,6 +58,11 @@ public class XWikiUser
     public String getUser()
     {
         return user;
+    }
+    
+    private DocumentReference getUserReference(XWikiContext context)
+    {
+        return this.currentMixedDocumentReferenceResolver.resolve(getUser());
     }
 
     public void setUser(String user)
@@ -69,9 +84,16 @@ public class XWikiUser
     {
         if (!StringUtils.isEmpty(getUser())) {
             XWikiGroupService groupService = context.getWiki().getGroupService(context);
-            Collection groups = groupService.getAllGroupsNamesForMember(getUser(), 0, 0, context);
-            return groups.contains(groupName);
+            
+            DocumentReference groupReference = this.currentMixedDocumentReferenceResolver.resolve(groupName);
+            
+            Collection<DocumentReference> groups = groupService.getAllGroupsReferencesForMember(getUserReference(context), 0, 0, context);
+            
+            if (groups.contains(groupReference)) {
+                return true;
+            }
         }
+
         return false;
     }
 

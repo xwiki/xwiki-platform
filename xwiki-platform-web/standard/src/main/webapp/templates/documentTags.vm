@@ -6,7 +6,7 @@
 ##
 ##
 #macro(displayTag $tag)
-  <span class="tag-wrapper"><span class="tag"><a href="$xwiki.getURL('Main.Tags', 'view', "do=viewTag&amp;tag=$escapetool.url($tag)")">$escapetool.xml($tag)</a></span>#if($hasedit)<span class="separator">[</span><a href="$doc.getURL('view', "xpage=documentTags&amp;xaction=delete&amp;tag=$escapetool.url($tag)&amp;xredirect=${xredirect}")" class="tag-tool tag-delete" title="$msg.get('core.tags.remove.tooltip')">X</a><span class="separator">]</span>#end</span>
+  <span class="tag-wrapper"><span class="tag"><a href="$xwiki.getURL('Main.Tags', 'view', "do=viewTag&amp;tag=$!{escapetool.url($tag)}")">$!{escapetool.xml($tag)}</a></span>#if($hasedit)<span class="separator">[</span><a href="$doc.getURL('view', "xpage=documentTags&amp;xaction=delete&amp;tag=$!{escapetool.url($tag)}&amp;xredirect=${xredirect}")" class="tag-tool tag-delete" title="$msg.get('core.tags.remove.tooltip')">X</a><span class="separator">]</span>#end</span>
 #end
 ##
 #macro(removeTag $tag)
@@ -105,7 +105,7 @@
 ##   #end
   #if($hasedit)
     #if($xwiki.tag)
-      <div class="tag-tool tag-add">#if("$!{request.showTagAddForm}" == '')<a href="$doc.getURL('view', "showTagAddForm=true&amp;${escapetool.url($!{request.queryString})}#${tagsId}")" title="$msg.get('core.tags.add.tooltip')">[+]</a>#else #displayAddForm()#end</div>
+      <div class="tag-tool tag-add">#if("$!{request.showTagAddForm}" == '')<a href="$doc.getURL('view', "showTagAddForm=true&amp;$!{escapetool.url(${request.queryString})}#${tagsId}")" title="$msg.get('core.tags.add.tooltip')">[+]</a>#else #displayAddForm()#end</div>
     #else
       ## TODO
     #end

@@ -49,7 +49,8 @@
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-core-context</artifactId>
       <version>${pom.version}</version>
-    </dependency>        
+    </dependency>
+
     <!-- Make sure the Multi Components components are available for the tests -->
     <dependency>
       <groupId>org.xwiki.platform</groupId>
@@ -74,6 +75,12 @@
       <artifactId>xwiki-core-rendering-macro-script</artifactId>
       <version>${pom.version}</version>
       <type>test-jar</type>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-core-rendering-macro-toc</artifactId>
+      <version>${pom.version}</version>
       <scope>test</scope>
     </dependency>
   </dependencies>

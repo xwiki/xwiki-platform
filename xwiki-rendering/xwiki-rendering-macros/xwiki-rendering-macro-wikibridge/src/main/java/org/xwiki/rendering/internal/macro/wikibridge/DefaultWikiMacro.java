@@ -31,6 +31,7 @@ import org.xwiki.context.Execution;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.block.MacroBlock;
+import org.xwiki.rendering.block.MacroMarkerBlock;
 import org.xwiki.rendering.block.ParagraphBlock;
 import org.xwiki.rendering.block.XDOM;
 import org.xwiki.rendering.macro.Macro;
@@ -194,9 +195,18 @@ public class DefaultWikiMacro implements WikiMacro
             // $context.macro is accessible within the macro code.
             xwikiContext.put(CONTEXT_DOCUMENT_KEY, docBridge.getDocument(getDocumentReference()));
 
+            MacroBlock wikiMacroBlock = context.getCurrentMacroBlock();
+            MacroMarkerBlock wikiMacroMarker =
+                new MacroMarkerBlock(wikiMacroBlock.getId(), wikiMacroBlock.getParameters(), wikiMacroBlock
+                    .getContent(), xdom.getChildren(), wikiMacroBlock.isInline());
+            // otherwise the HTML block will not be able to access the parent DOM
+            wikiMacroMarker.setParent(wikiMacroBlock.getParent());
+
             // Perform internal macro transformations.
-            TransformationContext txContext = new TransformationContext(xdom, this.syntax);
-            macroTransformation.transform(xdom, txContext);
+            TransformationContext txContext = new TransformationContext(context.getXDOM(), this.syntax);
+            macroTransformation.transform(wikiMacroBlock, txContext);
+            
+            return extractResult(wikiMacroBlock.getChildren(), macroBinding, context);
         } catch (Exception ex) {
             throw new MacroExecutionException("Error while performing internal macro transformations", ex);
         } finally {
@@ -209,8 +219,6 @@ public class DefaultWikiMacro implements WikiMacro
                 }
             }
         }
-
-        return extractResult(xdom, macroBinding, context);
     }
 
     /**
@@ -221,7 +229,7 @@ public class DefaultWikiMacro implements WikiMacro
      * @param context the macro execution context
      * @return the result
      */
-    private List<Block> extractResult(XDOM xdom, Map<String, Object> macroContext, MacroTransformationContext context)
+    private List<Block> extractResult(List<Block> blocks, Map<String, Object> macroContext, MacroTransformationContext context)
     {
         Object resultObject = macroContext.get(MACRO_RESULT_KEY);
 
@@ -229,7 +237,7 @@ public class DefaultWikiMacro implements WikiMacro
         if (resultObject != null && resultObject instanceof List) {
             result = (List<Block>) macroContext.get(MACRO_RESULT_KEY);
         } else {
-            result = xdom.getChildren();
+            result = blocks;
             // If in inline mode remove any top level paragraph.
             if (context.isInline()) {
                 removeTopLevelParagraph(result);

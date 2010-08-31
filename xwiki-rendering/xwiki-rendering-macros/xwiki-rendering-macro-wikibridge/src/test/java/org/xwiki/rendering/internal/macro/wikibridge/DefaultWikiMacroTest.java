@@ -166,6 +166,24 @@ public class DefaultWikiMacroTest extends AbstractComponentTestCase
     }
     
     /**
+     * Check that macro used inside wiki macro are executed as part of the document.
+     */
+    @Test
+    public void testExecuteWhenInnerMacro() throws Exception
+    {
+        registerWikiMacro("wikimacro1", "{{toc/}}");
+
+        Converter converter = getComponentManager().lookup(Converter.class);
+
+        DefaultWikiPrinter printer = new DefaultWikiPrinter();
+        converter.convert(new StringReader("= heading\n\n{{wikimacro1 param1=\"value1\" param2=\"value2\"/}}"),
+            Syntax.XWIKI_2_0, Syntax.XHTML_1_0, printer);
+
+        // Note: We're using XHTML as the output syntax just to make it easy for asserting.
+        Assert.assertEquals("<h1 id=\"Hheading\"><span>heading</span></h1>", printer.toString());
+    }
+    
+    /**
      * A wiki macro can directly provide the list of blocks insstead of having to rendering them to let
      * {@link DefaultWikiMacro} re-parse it.
      */

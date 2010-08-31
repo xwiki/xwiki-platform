@@ -204,9 +204,9 @@ public class DefaultWikiMacro implements WikiMacro
 
             // Perform internal macro transformations.
             TransformationContext txContext = new TransformationContext(context.getXDOM(), this.syntax);
-            macroTransformation.transform(wikiMacroBlock, txContext);
+            macroTransformation.transform(wikiMacroMarker, txContext);
             
-            return extractResult(wikiMacroBlock.getChildren(), macroBinding, context);
+            return extractResult(wikiMacroMarker.getChildren(), macroBinding, context);
         } catch (Exception ex) {
             throw new MacroExecutionException("Error while performing internal macro transformations", ex);
         } finally {

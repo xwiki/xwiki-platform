@@ -100,8 +100,8 @@ public class DefaultWikiMacroTest extends AbstractComponentTestCase
         Map<String, Object> xcontext = new HashMap<String, Object>();
         Execution execution = getComponentManager().lookup(Execution.class);
         execution.getContext().setProperty("xwikicontext", xcontext);
-        getComponentManager().lookup(ScriptContextManager.class).getScriptContext().setAttribute("xcontext", xcontext,
-            ScriptContext.ENGINE_SCOPE);
+        getComponentManager().lookup(ScriptContextManager.class).getScriptContext()
+            .setAttribute("xcontext", xcontext, ScriptContext.ENGINE_SCOPE);
 
         getMockery().checking(new Expectations() {{
             allowing(mockDocBridge).getCurrentWiki(); will(returnValue("wiki"));
@@ -164,7 +164,7 @@ public class DefaultWikiMacroTest extends AbstractComponentTestCase
         // Note: We're using XHTML as the output syntax just to make it easy for asserting.
         Assert.assertEquals("<p>Hello This is <strong>bold</strong></p>", printer.toString());
     }
-    
+
     /**
      * Check that macro used inside wiki macro are executed as part of the document.
      */
@@ -180,9 +180,12 @@ public class DefaultWikiMacroTest extends AbstractComponentTestCase
             Syntax.XWIKI_2_0, Syntax.XHTML_1_0, printer);
 
         // Note: We're using XHTML as the output syntax just to make it easy for asserting.
-        Assert.assertEquals("<h1 id=\"Hheading\"><span>heading</span></h1>", printer.toString());
+        Assert
+            .assertEquals("<h1 id=\"Hheading\"><span>heading</span></h1>"
+                + "<ul><li><span class=\"wikilink\"><a href=\"#Hheading\">heading</a></span></li></ul>",
+                printer.toString());
     }
-    
+
     /**
      * A wiki macro can directly provide the list of blocks insstead of having to rendering them to let
      * {@link DefaultWikiMacro} re-parse it.
@@ -227,7 +230,7 @@ public class DefaultWikiMacroTest extends AbstractComponentTestCase
 
         // Hack into velocity context.
         Execution execution = getComponentManager().lookup(Execution.class);
-        Map<?, ?> xwikiContext = (Map<?, ?>) execution.getContext().getProperty("xwikicontext");
+        Map< ? , ? > xwikiContext = (Map< ? , ? >) execution.getContext().getProperty("xwikicontext");
         final VelocityContext vContext = new VelocityContext();
         vContext.put("xcontext", xwikiContext);
 

@@ -775,6 +775,7 @@ $msg.get("xe.invitation.emailContent.reportMessage", ["&lt;a href=$escapetool.ge
       #set($configDocContent = '{{velo' + 'city}}{{info}}$msg.get("xe.invitation.internalDocument", ["'
                                + "$!config.get('mainPage')" + '"]){{/info}}{{/velo' + 'city}}')
       $configDoc.setContent($configDocContent)
+      $configDoc.setParent($configClassNameInternal)
       #set($configObj = $configDoc.newObject($configClassNameInternal))
       #foreach($key in $config.keySet())
         $configObj.set($key, $config.get($key))

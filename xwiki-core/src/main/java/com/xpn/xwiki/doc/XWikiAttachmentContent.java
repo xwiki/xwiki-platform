@@ -63,19 +63,14 @@ public class XWikiAttachmentContent implements Cloneable
     @Override
     public Object clone()
     {
-        XWikiAttachmentContent attachmentcontent = null;
-        try {
-            attachmentcontent = (XWikiAttachmentContent) getClass().newInstance();
-        } catch (Exception e) {
-            // This should not happen
-        }
+        final XWikiAttachmentContent newContent = new XWikiAttachmentContent(this.getAttachment());
 
-        attachmentcontent.setAttachment(getAttachment());
+        // This points the new attachment to the same array, behavior is not guarenteed if the byte array is mutated.
+        newContent.setContent(this.getContent());
 
-        // setContent makes isContentDirty true which if this.isContentDirty == false then it's not a valid clone.
-        attachmentcontent.content = this.getContent();
+        newContent.setContentDirty(this.isContentDirty());
 
-        return attachmentcontent;
+        return newContent;
     }
 
     /**

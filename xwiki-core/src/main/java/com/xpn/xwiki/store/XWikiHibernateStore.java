@@ -1786,9 +1786,21 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
             if (parentUpdate) {
                 context.getWiki().getStore().saveXWikiDoc(attachment.getDoc(), context, false);
             }
+
             if (bTransaction) {
                 endTransaction(context, true);
             }
+
+            // Mark the attachment content and metadata as not dirty.
+            // Ideally this would only happen if the transaction is committed successfully but since an unsuccessful
+            // transaction will most likely be accompanied by an exception, the cache will not have a chance to save
+            // the copy of the document with erronious information. If this is not set here, the cache will return
+            // a copy of the attachment which claims to be dirty although it isn't.
+            attachment.setMetaDataDirty(false);
+            if (attachment.isContentDirty()) {
+                attachment.getAttachment_content().setContentDirty(false);
+            }
+
         } catch (Exception e) {
             Object[] args = {attachment.getFilename(), attachment.getDoc().getFullName()};
             throw new XWikiException(XWikiException.MODULE_XWIKI_STORE,

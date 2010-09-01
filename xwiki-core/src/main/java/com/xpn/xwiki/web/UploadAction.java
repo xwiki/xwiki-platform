@@ -194,12 +194,6 @@ public class UploadAction extends XWikiAction
         // Save the document.
         try {
             context.getWiki().saveDocument(doc, comment, context);
-
-            // The document has been saved and now the attachment is nolonger out of sync with the database (dirty)
-            // This must be marked as not dirty manually.
-            // TODO: Handle this in store in such a way that it remains dirty if the transaction is rolled back (fails)
-            attachment.getAttachment_content().setContentDirty(false);
-
         } catch (XWikiException e) {
             // check Exception is ERROR_XWIKI_APP_JAVA_HEAP_SPACE when saving Attachment
             if (e.getCode() == XWikiException.ERROR_XWIKI_APP_JAVA_HEAP_SPACE) {

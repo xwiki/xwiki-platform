@@ -970,7 +970,7 @@ public class Document extends Api
     public List<Attachment> getAttachmentList()
     {
         List<Attachment> apis = new ArrayList<Attachment>();
-        for (XWikiAttachment attachment : this.doc.getAttachmentList()) {
+        for (XWikiAttachment attachment : this.getDoc().getAttachmentList()) {
             apis.add(new Attachment(this, attachment, getXWikiContext()));
         }
         return apis;
@@ -2065,7 +2065,7 @@ public class Document extends Api
     public int addAttachments(String fieldName) throws XWikiException
     {
         if (!hasAccessLevel("edit")) {
-            java.lang.Object[] args = {this.doc.getFullName()};
+            java.lang.Object[] args = {this.getDoc().getFullName()};
             throw new XWikiException(XWikiException.MODULE_XWIKI_ACCESS, XWikiException.ERROR_XWIKI_ACCESS_DENIED,
                 "Access denied in edit mode on document {0}", null, args);
         }
@@ -2100,7 +2100,7 @@ public class Document extends Api
             filename = filename.replaceAll("\\+", " ");
 
             if ((data != null) && (data.length > 0)) {
-                XWikiAttachment attachment = this.doc.addAttachment(filename, data, getXWikiContext());
+                XWikiAttachment attachment = this.getDoc().addAttachment(filename, data, getXWikiContext());
                 getDoc().saveAttachmentContent(attachment, getXWikiContext());
                 // commenting because this was already done by addAttachment
                 // getDoc().getAttachmentList().add(attachment);
@@ -2118,7 +2118,7 @@ public class Document extends Api
     public Attachment addAttachment(String fileName, InputStream iStream)
     {
         try {
-            return new Attachment(this, this.doc.addAttachment(fileName, iStream, getXWikiContext()), getXWikiContext());
+            return new Attachment(this, this.getDoc().addAttachment(fileName, iStream, getXWikiContext()), getXWikiContext());
         } catch (XWikiException e) {
             // TODO Log the error and let the user know about it
         } catch (IOException e) {
@@ -2130,7 +2130,7 @@ public class Document extends Api
     public Attachment addAttachment(String fileName, byte[] data)
     {
         try {
-            return new Attachment(this, this.doc.addAttachment(fileName, data, getXWikiContext()), getXWikiContext());
+            return new Attachment(this, this.getDoc().addAttachment(fileName, data, getXWikiContext()), getXWikiContext());
         } catch (XWikiException e) {
             // TODO Log the error and let the user know about it
         }
@@ -2207,7 +2207,7 @@ public class Document extends Api
         if (hasAccessLevel("delete")
             && this.context.getWiki().checkAccess("edit",
             this.context.getWiki().getDocument(newReference, this.context), this.context)) {
-            this.doc.rename(newReference, getXWikiContext());
+            this.getDoc().rename(newReference, getXWikiContext());
         }
     }
 
@@ -2245,7 +2245,7 @@ public class Document extends Api
         if (hasAccessLevel("delete")
             && this.context.getWiki().checkAccess("edit",
             this.context.getWiki().getDocument(newDocumentName, this.context), this.context)) {
-            this.doc.rename(newDocumentName, backlinkDocumentNames, getXWikiContext());
+            this.getDoc().rename(newDocumentName, backlinkDocumentNames, getXWikiContext());
         }
     }
 
@@ -2310,7 +2310,7 @@ public class Document extends Api
                 }
             }
 
-            this.doc.rename(newReference, backlinkDocumentNames, childDocumentNames, getXWikiContext());
+            this.getDoc().rename(newReference, backlinkDocumentNames, childDocumentNames, getXWikiContext());
         }
     }
 

@@ -1436,7 +1436,7 @@ public class Document extends Api
      */
     public DocumentStats getCurrentMonthPageStats(String action)
     {
-        Scope scope = ScopeFactory.createPageScope(this.doc.getFullName());
+        Scope scope = ScopeFactory.createPageScope(this.getFullName());
         Range range = RangeFactory.ALL;
         Period period = PeriodFactory.getCurrentMonth();
         XWikiStatsService statisticsService = getXWikiContext().getWiki().getStatsService(getXWikiContext());
@@ -1473,7 +1473,7 @@ public class Document extends Api
      */
     public List<RefererStats> getCurrentMonthRefStats()
     {
-        Scope scope = ScopeFactory.createPageScope(this.doc.getFullName());
+        Scope scope = ScopeFactory.createPageScope(this.getFullName());
         Range range = RangeFactory.ALL;
         Period period = PeriodFactory.getCurrentMonth();
         XWikiStatsService statisticsService = getXWikiContext().getWiki().getStatsService(getXWikiContext());
@@ -1494,7 +1494,7 @@ public class Document extends Api
     {
         try {
             return getXWikiContext().getWiki().getRightService().hasAccessLevel(level, getXWikiContext().getUser(),
-                this.doc.getPrefixedFullName(), getXWikiContext());
+                this.getPrefixedFullName(), getXWikiContext());
         } catch (Exception e) {
             return false;
         }
@@ -1505,7 +1505,7 @@ public class Document extends Api
     {
         try {
             return getXWikiContext().getWiki().getRightService().hasAccessLevel(level, user,
-                this.doc.getPrefixedFullName(), getXWikiContext());
+                this.getPrefixedFullName(), getXWikiContext());
         } catch (Exception e) {
             return false;
         }
@@ -1828,7 +1828,7 @@ public class Document extends Api
         if (hasProgrammingRights()) {
             saveDocument(comment, minorEdit);
         } else {
-            java.lang.Object[] args = {this.doc.getFullName()};
+            java.lang.Object[] args = {this.getFullName()};
             throw new XWikiException(XWikiException.MODULE_XWIKI_ACCESS, XWikiException.ERROR_XWIKI_ACCESS_DENIED,
                 "Access denied with no programming rights document {0}", null, args);
         }
@@ -1881,7 +1881,7 @@ public class Document extends Api
                 getXWikiContext().setUser(viewer);
             }
         } else {
-            java.lang.Object[] args = {author, getXWikiContext().getDoc(), this.doc.getFullName()};
+            java.lang.Object[] args = {author, getXWikiContext().getDoc(), this.getFullName()};
             throw new XWikiException(XWikiException.MODULE_XWIKI_ACCESS, XWikiException.ERROR_XWIKI_ACCESS_DENIED,
                 "Access denied; user {0}, acting through script in document {1} cannot save document {2}", null, args);
         }
@@ -2010,7 +2010,7 @@ public class Document extends Api
         if (hasAccessLevel("delete")) {
             deleteDocument();
         } else {
-            java.lang.Object[] args = {this.doc.getFullName()};
+            java.lang.Object[] args = {this.getFullName()};
             throw new XWikiException(XWikiException.MODULE_XWIKI_ACCESS, XWikiException.ERROR_XWIKI_ACCESS_DENIED,
                 "Access denied in edit mode on document {0}", null, args);
         }
@@ -2035,7 +2035,7 @@ public class Document extends Api
                 getXWikiContext().setUser(viewer);
             }
         } else {
-            java.lang.Object[] args = {author, getXWikiContext().getDoc(), this.doc.getFullName()};
+            java.lang.Object[] args = {author, getXWikiContext().getDoc(), this.getFullName()};
             throw new XWikiException(XWikiException.MODULE_XWIKI_ACCESS, XWikiException.ERROR_XWIKI_ACCESS_DENIED,
                 "Access denied; user {0}, acting through script in document {1} cannot delete document {2}", null, args);
         }
@@ -2046,7 +2046,7 @@ public class Document extends Api
         if (hasProgrammingRights()) {
             deleteDocument();
         } else {
-            java.lang.Object[] args = {this.doc.getFullName()};
+            java.lang.Object[] args = {this.getFullName()};
             throw new XWikiException(XWikiException.MODULE_XWIKI_ACCESS, XWikiException.ERROR_XWIKI_ACCESS_DENIED,
                 "Access denied with no programming rights document {0}", null, args);
         }
@@ -2065,7 +2065,7 @@ public class Document extends Api
     public int addAttachments(String fieldName) throws XWikiException
     {
         if (!hasAccessLevel("edit")) {
-            java.lang.Object[] args = {this.getDoc().getFullName()};
+            java.lang.Object[] args = {this.getFullName()};
             throw new XWikiException(XWikiException.MODULE_XWIKI_ACCESS, XWikiException.ERROR_XWIKI_ACCESS_DENIED,
                 "Access denied in edit mode on document {0}", null, args);
         }

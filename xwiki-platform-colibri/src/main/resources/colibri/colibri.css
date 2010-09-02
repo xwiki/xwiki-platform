@@ -676,6 +676,7 @@ body.hideright #footerglobal {
 
 .editbody #hierarchy {
   display: inline-block;
+  border-right: 1px solid $theme.pageContentBackgroundColor; /* Fixes an IE8 layout issue */
 }
 
 /* "Edit parent" icon */
@@ -687,7 +688,7 @@ body.hideright #footerglobal {
   display: none;
 }
 .edit-meta-tools a {
-  display: inline-block;
+  display: block;
   width: 16px;
   height: 16px;
   overflow: hidden;
@@ -710,7 +711,11 @@ body.hideright #footerglobal {
   margin: 0 -12px 8px -12px;
   font-size: 90%;
 }
-#mainEditArea:target #parentinput, #mainEditArea #parentinput.active {
+/* Don't combine the following two rules, otherwise IE will fail to recognize either of them */
+#mainEditArea:target #parentinput {
+  display: block;
+}
+#mainEditArea #parentinput.active {
   display: block;
 }
 #parentinput label {

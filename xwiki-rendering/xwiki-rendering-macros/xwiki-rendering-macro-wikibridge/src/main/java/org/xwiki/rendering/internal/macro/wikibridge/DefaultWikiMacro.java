@@ -199,7 +199,7 @@ public class DefaultWikiMacro implements WikiMacro
             MacroMarkerBlock wikiMacroMarker =
                 new MacroMarkerBlock(wikiMacroBlock.getId(), wikiMacroBlock.getParameters(), wikiMacroBlock
                     .getContent(), xdom.getChildren(), wikiMacroBlock.isInline());
-            // otherwise the HTML block will not be able to access the parent DOM
+            // otherwise the inner macros will not be able to access the parent DOM
             wikiMacroMarker.setParent(wikiMacroBlock.getParent());
 
             // Perform internal macro transformations.

@@ -179,11 +179,11 @@ public class JBossCacheCacheConfiguration extends AbstractCacheConfigurationLoad
 
         if (config != null) {
             for (IndividualCacheLoaderConfig iconfig : config.getIndividualCacheLoaderConfigs()) {
-                if (iconfig instanceof FileCacheLoaderConfig) {
-                    FileCacheLoaderConfig ficonfig = (FileCacheLoaderConfig) iconfig;
-
-                    if (ficonfig.getLocation() == null || ficonfig.getLocation().trim().length() == 0) {
-                        ficonfig.setLocation(createTempDir());
+                if (iconfig.getClassName().equals("org.jboss.cache.loader.FileCacheLoader")) {
+                    String location = (String)iconfig.getProperties().get("location");
+                    
+                    if (location == null || location.trim().length() == 0) {
+                        iconfig.getProperties().put("location", createTempDir());
                     }
                 }
             }

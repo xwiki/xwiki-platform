@@ -1155,7 +1155,6 @@ div#xwikiobjects input[type="checkbox"], div#xwikiclassproperties input[type="ch
   * Button elements different containers
 -------------------------------------------------------------- */
 .buttonwrapper {
-  display: inline-block;
   margin: 5px 5px 0 0;
 }
 input.button, .buttonwrapper a:visited, .buttonwrapper a:link, .buttonwrapper a:active {

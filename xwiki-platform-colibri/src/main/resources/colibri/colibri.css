@@ -1157,6 +1157,9 @@ div#xwikiobjects input[type="checkbox"], div#xwikiclassproperties input[type="ch
 .buttonwrapper {
   margin: 5px 5px 0 0;
 }
+.buttonwrapper .button {
+  vertical-align: middle;
+}
 input.button, .buttonwrapper a:visited, .buttonwrapper a:link, .buttonwrapper a:active {
   background-color: $theme.buttonPrimaryBackgroundColor;
   background-image: none;

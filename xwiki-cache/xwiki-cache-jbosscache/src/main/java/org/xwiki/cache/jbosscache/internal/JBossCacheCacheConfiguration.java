@@ -34,7 +34,6 @@ import org.jboss.cache.config.EvictionRegionConfig;
 import org.jboss.cache.config.CacheLoaderConfig.IndividualCacheLoaderConfig;
 import org.jboss.cache.config.parsing.XmlConfigurationParser;
 import org.jboss.cache.eviction.LRUAlgorithmConfig;
-import org.jboss.cache.loader.FileCacheLoaderConfig;
 import org.xwiki.cache.config.CacheConfiguration;
 import org.xwiki.cache.eviction.EntryEvictionConfiguration;
 import org.xwiki.cache.eviction.LRUEvictionConfiguration;
@@ -67,6 +66,11 @@ public class JBossCacheCacheConfiguration extends AbstractCacheConfigurationLoad
      * The extension of JBossCache properties files.
      */
     private static final String PROPS_EXT = ".xml";
+    
+    /**
+     * Name of the JBossCache properties containing filesystem cache location.
+     */
+    private static final String JBCPROP_LOCATION = "location";
 
     /**
      * The JBossCache configuration.
@@ -180,10 +184,10 @@ public class JBossCacheCacheConfiguration extends AbstractCacheConfigurationLoad
         if (config != null) {
             for (IndividualCacheLoaderConfig iconfig : config.getIndividualCacheLoaderConfigs()) {
                 if (iconfig.getClassName().equals("org.jboss.cache.loader.FileCacheLoader")) {
-                    String location = (String)iconfig.getProperties().get("location");
-                    
+                    String location = (String) iconfig.getProperties().get(JBCPROP_LOCATION);
+
                     if (location == null || location.trim().length() == 0) {
-                        iconfig.getProperties().put("location", createTempDir());
+                        iconfig.getProperties().put(JBCPROP_LOCATION, createTempDir());
                     }
                 }
             }

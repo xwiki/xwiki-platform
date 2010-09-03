@@ -23,13 +23,13 @@ import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.Requirement;
 import org.xwiki.observation.event.CancelableEvent;
 import org.xwiki.rendering.block.MacroMarkerBlock;
+import org.xwiki.rendering.macro.Macro;
 import org.xwiki.rendering.macro.MacroId;
 import org.xwiki.rendering.macro.MacroLookupException;
 import org.xwiki.rendering.macro.MacroManager;
 import org.xwiki.rendering.macro.script.ScriptMacro;
 import org.xwiki.rendering.macro.script.ScriptMacroParameters;
 import org.xwiki.rendering.transformation.MacroTransformationContext;
-
 
 /**
  * Listens to {@link org.xwiki.observation.event.ScriptEvaluationStartsEvent} and cancels the evaluation if the script
@@ -72,10 +72,16 @@ public class NestedScriptMacroValidatorListener extends AbstractScriptCheckerLis
             while (parent != null) {
                 String parentId = parent.getId();
                 try {
-                    if (macroManager.getMacro(new MacroId(parentId)) instanceof ScriptMacro) {
+                    Macro< ? > macro = this.macroManager.getMacro(new MacroId(parentId));
+                    if (macro instanceof ScriptMacro) {
                         event.cancel("Nested scripts are not allowed");
+                    } else if (macro instanceof NestedScriptMacroEnabled) {
+                        // This macro has the right to produce script macro whatever the parent.
+                        return;
                     } else if ("include".equals(parentId)) {
                         // Included documents intercept the chain of nested script macros with XWiki syntax
+                        // TODO: find cleaner way. I don't think we can make include macro depends on script macro to
+                        // use NestedScriptMacroEnabled, we should maybe find something more generic
                         return;
                     }
                 } catch (MacroLookupException exception) {
@@ -86,4 +92,3 @@ public class NestedScriptMacroValidatorListener extends AbstractScriptCheckerLis
         }
     }
 }
-

@@ -34,6 +34,7 @@ import org.xwiki.rendering.block.MacroBlock;
 import org.xwiki.rendering.block.MacroMarkerBlock;
 import org.xwiki.rendering.block.ParagraphBlock;
 import org.xwiki.rendering.block.XDOM;
+import org.xwiki.rendering.internal.macro.script.NestedScriptMacroEnabled;
 import org.xwiki.rendering.macro.Macro;
 import org.xwiki.rendering.macro.MacroExecutionException;
 import org.xwiki.rendering.macro.descriptor.MacroDescriptor;
@@ -52,7 +53,7 @@ import org.xwiki.rendering.transformation.TransformationContext;
  * @version $Id$
  * @since 2.0M1
  */
-public class DefaultWikiMacro implements WikiMacro
+public class DefaultWikiMacro implements WikiMacro, NestedScriptMacroEnabled
 {
     /**
      * They key used to access the current context document stored in XWikiContext.

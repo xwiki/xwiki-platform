@@ -50,7 +50,13 @@
       <artifactId>xwiki-core-context</artifactId>
       <version>${pom.version}</version>
     </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-core-rendering-macro-script</artifactId>
+      <version>${pom.version}</version>
+    </dependency>
 
+    <!-- Test dependencies -->
     <!-- Make sure the Multi Components components are available for the tests -->
     <dependency>
       <groupId>org.xwiki.platform</groupId>

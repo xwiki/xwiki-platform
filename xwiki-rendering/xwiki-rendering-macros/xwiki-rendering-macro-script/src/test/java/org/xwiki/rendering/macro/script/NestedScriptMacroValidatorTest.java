@@ -62,9 +62,12 @@ public class NestedScriptMacroValidatorTest extends AbstractMockingComponentTest
         // Mock macro manager returns a script macro for "script" and null otherwise.
         final MacroManager macroManager = getComponentManager().lookup(MacroManager.class);
         final ScriptMacro scriptMacro = new DefaultScriptMacro();
+        final TestNestedScriptMacroEnabled nestedScriptMacroEnabled = new TestNestedScriptMacroEnabled();
         getMockery().checking(new Expectations() {{
             allowing(macroManager).getMacro(with(new MacroId("script")));
                 will(returnValue(scriptMacro));
+                allowing(macroManager).getMacro(with(new MacroId("nestedscriptmacroenabled")));
+                will(returnValue(nestedScriptMacroEnabled));
             allowing(macroManager).getMacro(with(any(MacroId.class)));
                 will(returnValue(null));
         }});
@@ -92,6 +95,15 @@ public class NestedScriptMacroValidatorTest extends AbstractMockingComponentTest
     public void testIncludeInterceptsNestedChain() throws Exception
     {
         MacroTransformationContext context = buildContext("script", "include", "script");
+        CancelableEvent event = new ScriptEvaluationStartsEvent();
+        this.validator.onEvent(event, context, null);
+        Assert.assertFalse(event.isCanceled());
+    }
+    
+    @Test
+    public void testNestedScriptMacroEnabledInterceptsNestedChain() throws Exception
+    {
+        MacroTransformationContext context = buildContext("script", "nestedscriptmacroenabled", "script");
         CancelableEvent event = new ScriptEvaluationStartsEvent();
         this.validator.onEvent(event, context, null);
         Assert.assertFalse(event.isCanceled());

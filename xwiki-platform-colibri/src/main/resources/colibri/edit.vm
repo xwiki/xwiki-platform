@@ -81,16 +81,18 @@ $xwiki.jsfx.use('js/xwiki/actionbuttons/actionButtons.js', true)
     //<![CDATA[
       // Manage switch from wiki to wysiwyg, content must be preserved between those editors.
       Event.observe($('tmEditWysiwyg'), "click", function(event) {
+        #if($doc.syntax.toIdString() == "xwiki/1.0")
         if (checkAdvancedContent('$msg.get("checkadvancedcontent")') == false) {
           Event.stop(event);
           return;
         }
+        #end
         document.forms.${formname}.action='$doc.getURL("edit", "editor=wysiwyg&$languageparams")';
         document.forms.${formname}.submit();
         Event.stop(event);
       });
 
-      // Manage switch from wiki to wysiwyg, content must be preserved between those editors.
+      // Manage switch from wysiwyg to wiki, content must be preserved between those editors.
       Event.observe($('tmEditWiki'), "click", function(event) {
         document.forms.${formname}.action='$doc.getURL("edit", "editor=wiki&$languageparams")';
         document.forms.${formname}.submit();

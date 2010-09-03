@@ -4266,7 +4266,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface
         context.put("idoc", includingDoc);
         context.put("sdoc", includedDoc);
         try {
-            result = includedDoc.getRenderedContent(context);
+            result = includedDoc.getRenderedContent(Syntax.XHTML_1_0, false, context);
         } finally {
             // Remove including doc or set the previous one
             if (idoc == null) {

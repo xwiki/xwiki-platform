@@ -1828,7 +1828,9 @@ function (row, i, table) {
           #end
           td.observe("click", function(event){
             var tag = event.element().down("span");
-            editProperty(row.page, "${propClassName}", "${colname}", function(value) { tag.innerHTML = value});
+            if (!tag)
+             tag = event.element();
+            editProperty(row.doc_fullname, "${propClassName}", "${colname}", function(value) { tag.innerHTML = value});
           });
         ## Author
         #elseif($colprop.link == "author")

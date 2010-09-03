@@ -162,21 +162,20 @@ Space header, footer
 #breadcrumbs {
   padding-left: 40px;
   display: inline-block;
-}
-* html #breadcrumbs {
-  width: 100%;
+  float: left;
 }
 
 /* "Edit parent" icon */
 .edit-meta-tools {
   display: inline-block;
   vertical-align: middle;
+  float: left;
 }
 #headerspace:target #breadcrumbs, #headerspace:target .edit-meta-tools {
   display: none;
 }
 .edit-meta-tools a {
-  display: inline-block;
+  display: block;
   width: 16px;
   height: 16px;
   overflow: hidden;
@@ -196,8 +195,16 @@ Space header, footer
   display: none;
   padding-left: 4px;
   font-size: 90%;
+  vertical-align: baseline;
 }
-#headerspace:target #parentinput, #headerspace #parentinput.active {
+#headerspace #parentinput * {
+  vertical-align: baseline;
+}
+/* Don't combine the following two rules, otherwise IE will fail to recognize either of them */
+#headerspace:target #parentinput {
+  display: inline-block;
+}
+#headerspace #parentinput.active {
   display: inline-block;
 }
 

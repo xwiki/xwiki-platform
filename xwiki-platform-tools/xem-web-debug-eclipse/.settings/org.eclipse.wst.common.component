@@ -3,7 +3,6 @@
     <wb-module deploy-name="xem-web-debug">
         <wb-resource deploy-path="/" source-path="/src/main/webapp"/>
         <wb-resource deploy-path="/WEB-INF/classes" source-path="/src/main/java"/>
-        <dependent-module archiveName="xwiki-core.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/xwiki-core/xwiki-core">
         <property name="java-output-path"/>
         <property name="context-root" value="xwiki"/>
     </wb-module>

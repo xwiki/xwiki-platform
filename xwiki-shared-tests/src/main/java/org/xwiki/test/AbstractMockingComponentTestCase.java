@@ -93,7 +93,7 @@ public class AbstractMockingComponentTestCase extends AbstractMockingTestCase
      */
     public void configure() throws Exception
     {
-        // Do nothing by default, this method is supposed to be overriden if needed.        
+        // Do nothing by default, this method is supposed to be overridden if needed.        
     }
 
     private void registerMockDependencies(ComponentDescriptor descriptor, MockingRequirement mockingRequirement)

@@ -6,6 +6,7 @@
     "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="$context.language" xml:lang="$context.language">
 <head>
+<title>WYSIWYG Editor Input Template</title>
 <meta http-equiv="Content-Type" content="text/html; charset=$xwiki.encoding" />
 ## Include the stylesheets that affect the content in view mode.
 #template("stylesheets.vm")

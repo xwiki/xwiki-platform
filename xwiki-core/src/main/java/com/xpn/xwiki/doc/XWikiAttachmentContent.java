@@ -26,33 +26,62 @@ import java.io.EOFException;
 import java.io.IOException;
 import java.io.InputStream;
 
+/**
+ * The content of an attachment.
+ * Objects of this class hold the actual content which will be downloaded when a user downloads an attachment.
+ *
+ * @version $Id$
+ */
 public class XWikiAttachmentContent implements Cloneable
 {
+    /** The XWikiAttachment (attachment metadata) which this attachment content is associated with. */
     private XWikiAttachment attachment;
 
+    /** The content of the attachment. */
     private byte[] content;
 
-    private boolean isContentDirty = false;
+    /** True if the content is out of sync with the content stored in the database and thus needs to be saved. */
+    private boolean isContentDirty;
 
+    /**
+     * Constructor with associated attachment specified.
+     *
+     * @param attachment the attachment which this is the content for.
+     */
     public XWikiAttachmentContent(XWikiAttachment attachment)
     {
         this();
-
-        setAttachment(attachment);
+        this.setAttachment(attachment);
     }
 
+    /**
+     * The default Constructor.
+     * For creating content which will be associated with an attachment later.
+     */
     public XWikiAttachmentContent()
     {
         this.content = new byte[0];
     }
 
+    /**
+     * This is used so that Hibernate will associate this content with the right attachment (metadata).
+     *
+     * @return the id of the attachment (metadata) which this content is associated with.
+     */
     public long getId()
     {
         return this.attachment.getId();
     }
 
+    /**
+     * This function does nothing and exists only for Hibernate to be able to load a value which is not used.
+     *
+     * @param id is ignored.
+     */
     public void setId(long id)
     {
+        // Do nothing here.
+        // The id is taken from the attachment which is set in XWikiHibernateAttachmentStore#loadAttachmentContent.
     }
 
     /**
@@ -74,7 +103,7 @@ public class XWikiAttachmentContent implements Cloneable
     }
 
     /**
-     * @return a byte array containing the binary content of the attachment
+     * @return a byte array containing the binary content of the attachment.
      * 
      * @deprecated use {@link #getContentInputStream()} instead
      */
@@ -89,7 +118,7 @@ public class XWikiAttachmentContent implements Cloneable
     }
 
     /**
-     * Set the content from a byte array
+     * Set the content from a byte array.
      *
      * @param content a byte array containing the binary data of the attachment
      *
@@ -109,28 +138,45 @@ public class XWikiAttachmentContent implements Cloneable
         }
     }
 
+    /**
+     * @return which attachment (Metadata) this content belongs to.
+     */
     public XWikiAttachment getAttachment()
     {
         return this.attachment;
     }
 
+    /**
+     * @param attachment which attachment (metadata) this content is to be associated with.
+     */
     public void setAttachment(XWikiAttachment attachment)
     {
         this.attachment = attachment;
     }
 
+    /**
+     * Is the content "dirty" meaning out of sync with the database.
+     *
+     * @return true if the content is out of sync with the database and in need of saving.
+     */
     public boolean isContentDirty()
     {
         return this.isContentDirty;
     }
 
+    /**
+     * Set the content as "dirty" meaning out of sync with the database.
+     *
+     * @param contentDirty if true then the content is regarded as out of sync with the database and in need of
+     *                     saving, otherwise it's considered saved.
+     */
     public void setContentDirty(boolean contentDirty)
     {
         this.isContentDirty = contentDirty;
     }
 
     /**
-     * @return an InputStream to read the binary content of this attachment
+     * @return an InputStream to read the binary content of this attachment.
      *
      * @since 2.3M2
      */
@@ -140,7 +186,7 @@ public class XWikiAttachmentContent implements Cloneable
     }
 
     /**
-     * set the content of the attachment from an InputStream
+     * Set the content of the attachment from an InputStream.
      *
      * @param is the input stream that will be read
      * @param len the length in byte to read
@@ -153,7 +199,7 @@ public class XWikiAttachmentContent implements Cloneable
     }
 
     /**
-     * @return the true size of the content of the attachment
+     * @return the true size of the content of the attachment.
      *
      * @since 2.3M2
      */
@@ -163,16 +209,19 @@ public class XWikiAttachmentContent implements Cloneable
     }
 
     /**
-     * Read an input stream into a byte array
+     * Read an input stream into a byte array.
      *
      * @param is the input stream to read
-     * @param len the len to read
+     * @param length the number of bytes of the stream to read.
      * @return a byte array of size len containing the read data
      * @throws IOException when an error occurs during streaming operation
      * @since 2.3M2
      */
-    private byte[] readData(InputStream is, int len) throws IOException
+    private byte[] readData(InputStream is, int length) throws IOException
     {
+        // We don't want to modify the input so we must copy it.
+        int len = length;
+
         if (is == null) {
             return null;
         }

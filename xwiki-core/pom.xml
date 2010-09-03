@@ -932,7 +932,6 @@
               **/doc/rcs/XWikiPatchUtils.java,
               **/doc/rcs/XWikiRCSArchive.java,
               **/doc/XWikiAttachmentArchive.java,
-              **/doc/XWikiAttachmentContent.java,
               **/doc/XWikiAttachment.java,
               **/doc/XWikiDocument.java,
               **/doc/XWikiLink.java,

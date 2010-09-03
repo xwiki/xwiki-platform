@@ -1,1 +1,0 @@
-Model classes are automatically generated from src/main/resource/xwiki.rest.model.xsd in the org.xwiki.rest.model.jaxb package.

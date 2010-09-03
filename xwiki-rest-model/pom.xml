@@ -55,7 +55,6 @@
             <arg>-Xfluent-api</arg>
           </args>
           <schemaDirectory>src/main/resources</schemaDirectory>
-          <generateDirectory>${basedir}/src/main/java</generateDirectory>
           <generatePackage>org.xwiki.rest.model.jaxb</generatePackage>
           <verbose>true</verbose>
           <removeOldOutput>false</removeOldOutput>

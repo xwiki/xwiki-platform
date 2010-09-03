@@ -3,15 +3,7 @@
     <wb-module deploy-name="xem-web-debug">
         <wb-resource deploy-path="/" source-path="/src/main/webapp"/>
         <wb-resource deploy-path="/WEB-INF/classes" source-path="/src/main/java"/>
-        <dependent-module archiveName="xwiki-core-rendering-macro-wikibridge.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/xwiki-core-rendering-macro-wikibridge/xwiki-core-rendering-macro-wikibridge">
-            <dependency-type>uses</dependency-type>
-        </dependent-module>
-        <dependent-module archiveName="xwiki-core-rendering-parser-wikimodel.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/xwiki-core-rendering-syntax-wikimodel/xwiki-core-rendering-syntax-wikimodel">
-            <dependency-type>uses</dependency-type>
-        </dependent-module>
         <dependent-module archiveName="xwiki-core.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/xwiki-core/xwiki-core">
-            <dependency-type>uses</dependency-type>
-        </dependent-module>
         <property name="java-output-path"/>
         <property name="context-root" value="xwiki"/>
     </wb-module>

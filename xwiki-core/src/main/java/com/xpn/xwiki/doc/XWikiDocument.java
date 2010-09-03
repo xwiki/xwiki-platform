@@ -777,6 +777,11 @@ public class XWikiDocument implements DocumentModelBridge
 
     public String getRenderedContent(Syntax targetSyntax, XWikiContext context) throws XWikiException
     {
+        return getRenderedContent(targetSyntax, true, context);
+    }
+    
+    public String getRenderedContent(Syntax targetSyntax, boolean isolateVelocityMacros, XWikiContext context) throws XWikiException
+    {
         // Note: We are currently duplicating code from the other getRendered signature because some calling
         // code is expecting that the rendering will happen in the calling document's context and not in this
         // document's context. For example this is true for the Admin page, see
@@ -786,13 +791,13 @@ public class XWikiDocument implements DocumentModelBridge
 
         String renderedContent = this.renderingCache.getRenderedContent(getDocumentReference(), source, context);
 
-        String documentName = this.defaultEntityReferenceSerializer.serialize(getDocumentReference());
+        String documentName = this.defaultEntityReferenceSerializer.serialize(isolateVelocityMacros ? getDocumentReference() : context.getDoc().getDocumentReference());
 
         if (renderedContent == null) {
             Object isInRenderingEngine = context.get("isInRenderingEngine");
 
             // Mark that we're starting to use the current document as a macro namespace
-            if (isInRenderingEngine == null || isInRenderingEngine == Boolean.FALSE) {
+            if (isolateVelocityMacros && (isInRenderingEngine == null || isInRenderingEngine == Boolean.FALSE)) {
                 try {
                     Utils.getComponent(VelocityManager.class).getVelocityEngine().startedUsingMacroNamespace(
                         documentName);
@@ -841,7 +846,7 @@ public class XWikiDocument implements DocumentModelBridge
                 // Note that we check if we are in the rendering engine as this cleanup must be done only once after the
                 // document has been rendered but this method can be called recursively. We know it's the initial entry
                 // point when isInRenderingEngine is false...
-                if (isInRenderingEngine == null || isInRenderingEngine == Boolean.FALSE) {
+                if (isolateVelocityMacros && (isInRenderingEngine == null || isInRenderingEngine == Boolean.FALSE)) {
                     try {
                         Utils.getComponent(VelocityManager.class).getVelocityEngine().stoppedUsingMacroNamespace(
                             documentName);
@@ -929,7 +934,7 @@ public class XWikiDocument implements DocumentModelBridge
                     SyntaxFactory syntaxFactory = Utils.getComponent(SyntaxFactory.class);
                     TransformationContext txContext = new TransformationContext();
                     txContext.setSyntax(syntaxFactory.createSyntaxFromIdString(sourceSyntaxId));
-                    txContext.setId(this.defaultEntityReferenceSerializer.serialize(getDocumentReference()));
+                    txContext.setId(documentName);
                     result = performSyntaxConversion(text, syntaxFactory.createSyntaxFromIdString(targetSyntaxId),
                         txContext);
                 }

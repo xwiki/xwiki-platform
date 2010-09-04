@@ -901,6 +901,7 @@ div#xwikiobjects input[type="checkbox"], div#xwikiclassproperties input[type="ch
   display: block;
   float: left;
   margin-right: 5px;
+  min-height: 22px;
 }
 
 .rightmenu .topmenuentry {

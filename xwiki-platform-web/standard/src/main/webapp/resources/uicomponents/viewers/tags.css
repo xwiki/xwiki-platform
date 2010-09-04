@@ -9,6 +9,9 @@
 .tag-wrapper .separator {
   display: none;
 }
+.tag {
+  word-wrap: break-word;
+}
 a.tag-delete, a.tag-delete:visited {
   color: $theme.pageContentBackgroundColor;
   font-size: 70%;

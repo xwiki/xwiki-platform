@@ -515,7 +515,7 @@ public class XWikiAttachment implements Cloneable
      * @param context current XWikiContext
      * @return a byte array containing the binary data content of the attachment
      * @throws XWikiException when an error occurs during wiki operation
-     * @deprecated use {@link #setContent(java.io.InputStream, int)} instead
+     * @deprecated use {@link #getContentInputStream(XWikiContext)} instead
      */
     @Deprecated
     public byte[] getContent(XWikiContext context) throws XWikiException

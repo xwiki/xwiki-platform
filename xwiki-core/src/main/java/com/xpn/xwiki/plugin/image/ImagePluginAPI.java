@@ -20,36 +20,90 @@
  */
 package com.xpn.xwiki.plugin.image;
 
-import com.xpn.xwiki.XWikiContext;
-import com.xpn.xwiki.doc.XWikiAttachment;
-import com.xpn.xwiki.plugin.PluginApi;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.DocumentReferenceResolver;
 
+import com.xpn.xwiki.XWikiContext;
+import com.xpn.xwiki.XWikiException;
+import com.xpn.xwiki.doc.XWikiAttachment;
+import com.xpn.xwiki.doc.XWikiDocument;
+import com.xpn.xwiki.plugin.PluginApi;
+import com.xpn.xwiki.web.Utils;
+
+/**
+ * @version $Id$
+ */
 public class ImagePluginAPI extends PluginApi<ImagePlugin>
 {
+    /** Logging helper object. */
+    private static final Log LOG = LogFactory.getLog(ImagePluginAPI.class);
+
+    /**
+     * Used to resolve a string into a proper Document Reference using the current document's reference to fill the
+     * blanks, except for the page name for which the default page name is used instead and for the wiki name for which
+     * the current wiki is used instead of the current document reference's wiki.
+     */
+    @SuppressWarnings("unchecked")
+    private DocumentReferenceResolver<String> currentMixedDocumentReferenceResolver =
+        Utils.getComponent(DocumentReferenceResolver.class, "currentmixed");
+
+    /**
+     * Creates a new instance of this plugin API.
+     * 
+     * @param imagePlugin the underlying image plugin that is exposed by this API
+     * @param context the XWiki context
+     */
     public ImagePluginAPI(ImagePlugin imagePlugin, XWikiContext context)
     {
         super(imagePlugin, context);
     }
 
+    /**
+     * Detects the height of an image attached to a wiki page.
+     * 
+     * @param pageName the name of a wiki page
+     * @param attachmentName the name of an image attached to the specified page
+     * @return the height of the specified image
+     */
     public int getHeight(String pageName, String attachmentName)
     {
         try {
-            XWikiAttachment attachment =
-                getXWikiContext().getWiki().getDocument(pageName, getXWikiContext()).getAttachment(attachmentName);
-            return getProtectedPlugin().getHeight(attachment, getXWikiContext());
+            return getProtectedPlugin().getHeight(getAttachment(pageName, attachmentName), getXWikiContext());
         } catch (Exception e) {
+            LOG.error(String.format("Failed to detect the height of %s attached to %s.", attachmentName, pageName), e);
             return -1;
         }
     }
 
+    /**
+     * Detects the width of an image attached to a wiki page.
+     * 
+     * @param pageName the name of a wiki page
+     * @param attachmentName the name of an image attached to the specified page
+     * @return the width of the specified image
+     */
     public int getWidth(String pageName, String attachmentName)
     {
         try {
-            XWikiAttachment attachment =
-                getXWikiContext().getWiki().getDocument(pageName, getXWikiContext()).getAttachment(attachmentName);
-            return getProtectedPlugin().getWidth(attachment, getXWikiContext());
+            return getProtectedPlugin().getWidth(getAttachment(pageName, attachmentName), getXWikiContext());
         } catch (Exception e) {
+            LOG.error(String.format("Failed to detect the width of %s attached to %s.", attachmentName, pageName), e);
             return -1;
         }
+    }
+
+    /**
+     * @param pageName the name of a wiki page
+     * @param attachmentName the name of an attachment of the specified page
+     * @return the specified attachment
+     * @throws XWikiException if retrieving the attachment fails
+     */
+    private XWikiAttachment getAttachment(String pageName, String attachmentName) throws XWikiException
+    {
+        DocumentReference documentReference = currentMixedDocumentReferenceResolver.resolve(pageName);
+        XWikiDocument document = getXWikiContext().getWiki().getDocument(documentReference, getXWikiContext());
+        return document.getAttachment(attachmentName);
     }
 }

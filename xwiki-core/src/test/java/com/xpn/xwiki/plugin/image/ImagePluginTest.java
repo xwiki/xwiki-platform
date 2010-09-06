@@ -21,13 +21,13 @@ package com.xpn.xwiki.plugin.image;
 
 import java.io.File;
 
-import com.xpn.xwiki.test.AbstractBridgedXWikiComponentTestCase;
 import org.jmock.Mock;
 import org.xwiki.cache.CacheFactory;
 
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.doc.XWikiAttachment;
+import com.xpn.xwiki.test.AbstractBridgedXWikiComponentTestCase;
 
 /**
  * Unit tests for the {@link com.xpn.xwiki.plugin.image.ImagePlugin} class.
@@ -52,20 +52,6 @@ public class ImagePluginTest extends AbstractBridgedXWikiComponentTestCase
         this.plugin = new ImagePlugin("image", ImagePlugin.class.getName(), getContext());
     }
 
-    public void testIsSuportedImageFormat()
-    {
-        // supported
-        assertTrue(plugin.isSupportedImageFormat("image/png"));
-        assertTrue(plugin.isSupportedImageFormat("image/jpeg"));
-        assertTrue(plugin.isSupportedImageFormat("image/gif"));
-        assertTrue(plugin.isSupportedImageFormat("image/jpg"));
-        assertTrue(plugin.isSupportedImageFormat("image/bmp"));
-
-        // not supported
-        assertFalse(plugin.isSupportedImageFormat("image/eps"));
-        assertFalse(plugin.isSupportedImageFormat("image/tiff"));
-    }
-
     public void testDownloadAttachmentWithUnsupportedFileType()
     {
         Mock attachmentMock = mock(XWikiAttachment.class);
@@ -73,5 +59,4 @@ public class ImagePluginTest extends AbstractBridgedXWikiComponentTestCase
         XWikiAttachment attachment = (XWikiAttachment) attachmentMock.proxy();
         assertSame(attachment, plugin.downloadAttachment(attachment, new XWikiContext()));
     }
-
 }

@@ -1128,8 +1128,6 @@
               **/plugin/graphviz/GraphVizMacro.java,
               **/plugin/graphviz/GraphVizPluginApi.java,
               **/plugin/graphviz/GraphVizPlugin.java,
-              **/plugin/image/ImagePluginAPI.java,
-              **/plugin/image/ImagePlugin.java,
               **/plugin/ldap/LDAPPluginApi.java,
               **/plugin/ldap/LDAPPlugin.java,
               **/plugin/mail/MailPluginApi.java,

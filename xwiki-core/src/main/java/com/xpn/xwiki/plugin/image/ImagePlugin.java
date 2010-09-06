@@ -18,21 +18,14 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  *
  */
-
 package com.xpn.xwiki.plugin.image;
 
-import java.awt.Container;
-import java.awt.Graphics2D;
 import java.awt.Image;
-import java.awt.MediaTracker;
-import java.awt.RenderingHints;
-import java.awt.Toolkit;
-import java.awt.image.BufferedImage;
+import java.awt.image.RenderedImage;
+import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
-
-import javax.imageio.ImageIO;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
@@ -46,49 +39,25 @@ import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.api.Api;
 import com.xpn.xwiki.doc.XWikiAttachment;
-import com.xpn.xwiki.plugin.PluginException;
 import com.xpn.xwiki.plugin.XWikiDefaultPlugin;
 import com.xpn.xwiki.plugin.XWikiPluginInterface;
 
+/**
+ * @version $Id$
+ */
 public class ImagePlugin extends XWikiDefaultPlugin
 {
-    /** Logging helper object. */
-    protected static final Log LOG = LogFactory.getLog(ImagePlugin.class);
-
-    /** The image formats supported by the image plugin. */
-    public enum SupportedFormat
-    {
-        JPG(1, "image/jpg"), JPEG(1, "image/jpeg"), PNG(2, "image/png"), GIF(3, "image/gif"), BMP(4, "image/bmp");
-
-        /** The mime type associated to the supported format. */
-        private String mimeType;
-
-        /** A integer code used to generate the image cache key. */
-        private int code;
-
-        SupportedFormat(int code, String mimeType)
-        {
-            this.mimeType = mimeType;
-            this.code = code;
-        }
-
-        public int getCode()
-        {
-            return this.code;
-        }
-
-        public String getMimeType()
-        {
-            return this.mimeType;
-        }
-    }
+    /**
+     * Logging helper object.
+     */
+    private static final Log LOG = LogFactory.getLog(ImagePlugin.class);
 
     /**
      * The name used for retrieving this plugin from the context.
      * 
      * @see XWikiPluginInterface#getName()
      */
-    public static String PLUGIN_NAME = "image";
+    private static final String PLUGIN_NAME = "image";
 
     /**
      * Cache for already served images.
@@ -96,13 +65,26 @@ public class ImagePlugin extends XWikiDefaultPlugin
     private Cache<byte[]> imageCache;
 
     /**
-     * The size of the cache. This parameter can be configured using the key <tt>xwiki.plugin.image.cache.capacity</tt>.
+     * The size of the cache. This parameter can be configured using the key {@code xwiki.plugin.image.cache.capacity}.
      */
     private int capacity = 50;
 
     /**
-     * {@inheritDoc}
+     * Default JPEG image quality.
+     */
+    private float defaultQuality = 0.3f;
+
+    /**
+     * The object used to process images.
+     */
+    private final ImageProcessor imageProcessor = new ImageProcessor();
+
+    /**
+     * Creates a new instance of this plugin.
      * 
+     * @param name the name of the plugin
+     * @param className the class name
+     * @param context the XWiki context
      * @see XWikiDefaultPlugin#XWikiDefaultPlugin(String,String,com.xpn.xwiki.XWikiContext)
      */
     public ImagePlugin(String name, String className, XWikiContext context)
@@ -138,43 +120,57 @@ public class ImagePlugin extends XWikiDefaultPlugin
     {
         super.init(context);
         initCache(context);
+
+        String defaultQualityParam = context.getWiki().Param("xwiki.plugin.image.defaultQuality");
+        if (!StringUtils.isBlank(defaultQualityParam) && StringUtils.isNumeric(defaultQualityParam.trim())) {
+            try {
+                defaultQuality = Math.max(0, Math.min(1, Float.parseFloat(defaultQualityParam.trim())));
+            } catch (NumberFormatException e) {
+                LOG.warn(String.format("Failed to parse xwiki.plugin.image.defaultQuality configuration parameter. "
+                    + "Using %s as the default image quality.", defaultQuality), e);
+            }
+        }
     }
 
-    public void initCache(XWikiContext context)
+    /**
+     * Tries to initializes the image cache. If the initialization fails the image cache remains {@code null}.
+     * 
+     * @param context the XWiki context
+     */
+    private void initCache(XWikiContext context)
     {
         CacheConfiguration configuration = new CacheConfiguration();
 
         configuration.setConfigurationId("xwiki.plugin.image");
 
-        // Set folder to store cache
+        // Set folder to store cache.
         File tempDir = context.getWiki().getTempDirectory(context);
         File imgTempDir = new File(tempDir, configuration.getConfigurationId());
         try {
             imgTempDir.mkdirs();
         } catch (Exception ex) {
-            LOG.warn("Cannot create temporary files", ex);
+            LOG.warn("Cannot create temporary files.", ex);
         }
         configuration.put("cache.path", imgTempDir.getAbsolutePath());
-
-        // Set cache constraints
+        // Set cache constraints.
         LRUEvictionConfiguration lru = new LRUEvictionConfiguration();
         configuration.put(LRUEvictionConfiguration.CONFIGURATIONID, lru);
 
-        String capacityParam = "";
-        try {
-            capacityParam = context.getWiki().Param("xwiki.plugin.image.cache.capacity");
-            if (!StringUtils.isBlank(capacityParam) && StringUtils.isNumeric(capacityParam.trim())) {
-                this.capacity = Integer.parseInt(capacityParam.trim());
+        String capacityParam = context.getWiki().Param("xwiki.plugin.image.cache.capacity");
+        if (!StringUtils.isBlank(capacityParam) && StringUtils.isNumeric(capacityParam.trim())) {
+            try {
+                capacity = Integer.parseInt(capacityParam.trim());
+            } catch (NumberFormatException e) {
+                LOG.warn(String.format("Failed to parse xwiki.plugin.image.cache.capacity configuration parameter. "
+                    + "Using %s as the cache capacity.", capacity), e);
             }
-        } catch (NumberFormatException ex) {
-            LOG.error("Error in ImagePlugin reading capacity: " + capacityParam, ex);
         }
-        lru.setMaxEntries(this.capacity);
+        lru.setMaxEntries(capacity);
 
         try {
-            this.imageCache = context.getWiki().getLocalCacheFactory().newCache(configuration);
+            imageCache = context.getWiki().getLocalCacheFactory().newCache(configuration);
         } catch (CacheException e) {
-            LOG.error("Error initializing the image cache", e);
+            LOG.error("Error initializing the image cache.", e);
         }
     }
 
@@ -193,212 +189,206 @@ public class ImagePlugin extends XWikiDefaultPlugin
     }
 
     /**
+     * {@inheritDoc}
+     * <p>
      * Allows to scale images server-side, in order to have real thumbnails for reduced traffic. The new image
      * dimensions are passed in the request as the {@code width} and {@code height} parameters. If only one of the
-     * dimensions is specified, then the other one is comupted to preserve the original aspect ratio of the image.
+     * dimensions is specified, then the other one is computed to preserve the original aspect ratio of the image.
+     * 
+     * @see XWikiDefaultPlugin#downloadAttachment(XWikiAttachment, XWikiContext)
      */
     @Override
     public XWikiAttachment downloadAttachment(XWikiAttachment attachment, XWikiContext context)
     {
-        int height = 0;
-        int width = 0;
-        XWikiAttachment attachmentClone = null;
-
-        if (!this.isSupportedImageFormat(attachment.getMimeType(context))) {
+        if (!imageProcessor.isMimeTypeSupported(attachment.getMimeType(context))) {
             return attachment;
         }
 
-        String sheight = context.getRequest().getParameter("height");
-        String swidth = context.getRequest().getParameter("width");
+        int height = -1;
+        try {
+            height = Integer.parseInt(context.getRequest().getParameter("height"));
+        } catch (NumberFormatException e) {
+            // Ignore.
+        }
+
+        int width = -1;
+        try {
+            width = Integer.parseInt(context.getRequest().getParameter("width"));
+        } catch (NumberFormatException e) {
+            // Ignore.
+        }
+
+        float quality = -1;
+        try {
+            quality = Float.parseFloat(context.getRequest().getParameter("quality"));
+        } catch (NumberFormatException e) {
+            // Ignore.
+        } catch (NullPointerException e) {
+            // Ignore.
+        }
 
         // If no scaling is needed, return the original image.
-        if ((StringUtils.isBlank(sheight) || !StringUtils.isNumeric(sheight))
-            && (StringUtils.isBlank(swidth) || !StringUtils.isNumeric(swidth))) {
+        if (height <= 0 && width <= 0 && quality < 0) {
             return attachment;
-        }
-
-        if (this.imageCache == null) {
-            initCache(context);
         }
 
         try {
-            if (sheight != null) {
-                height = Integer.parseInt(sheight);
-            }
-            if (swidth != null) {
-                width = Integer.parseInt(swidth);
-            }
-
-            attachmentClone = (XWikiAttachment) attachment.clone();
-            String key =
-                attachmentClone.getId() + "-" + attachmentClone.getVersion() + "-" + SupportedFormat.PNG.getCode()
-                    + "-" + width + "-" + height;
-
-            if (this.imageCache != null) {
-                byte[] data = this.imageCache.get(key);
-
-                if (data != null) {
-                    attachmentClone.setContent(data);
-                } else {
-                    if (width == 0) {
-                        attachmentClone = this.getImageByHeight(attachmentClone, height, context);
-                    } else if (height == 0) {
-                        attachmentClone = this.getImageByWidth(attachmentClone, width, context);
-                    } else {
-                        attachmentClone = this.getImage(attachmentClone, width, height, context);
-                    }
-
-                    this.imageCache.set(key, attachmentClone.getContent(context));
-                }
-            } else {
-                attachmentClone = this.getImageByHeight(attachmentClone, height, context);
-            }
+            // Transform the image attachment before is it downloaded.
+            return downloadImage(attachment, width, height, quality, context);
         } catch (Exception e) {
-            attachmentClone = attachment;
+            LOG.warn("Failed to transform image attachment.", e);
+            return attachment;
         }
-        return attachmentClone;
     }
 
-    public XWikiAttachment getImageByHeight(XWikiAttachment attachment, int thumbnailHeight, XWikiContext context)
-        throws Exception
-    {
-        if (getType(attachment.getMimeType(context)) == 0) {
-            throw new PluginException(PLUGIN_NAME, XWikiException.ERROR_XWIKI_NOT_IMPLEMENTED,
-                "Only JPG, GIF, PNG or BMP images are supported.");
-        }
-
-        Image imgOri = getImage(attachment, context);
-
-        int imgOriWidth = imgOri.getWidth(null);
-        int imgOriHeight = imgOri.getHeight(null);
-
-        if (thumbnailHeight >= imgOriHeight) {
-            throw new PluginException(PLUGIN_NAME, XWikiException.ERROR_XWIKI_DIFF_METADATA_ERROR,
-                "Thumbnail image not created: the height is higher than the original one.");
-        }
-
-        double imageRatio = (double) imgOriWidth / (double) imgOriHeight;
-        int thumbnailWidth = (int) (thumbnailHeight * imageRatio);
-        createThumbnail(thumbnailWidth, thumbnailHeight, imgOri, attachment);
-        return attachment;
-    }
-
-    public XWikiAttachment getImage(XWikiAttachment attachment, int thumbnailWidth, int thumbnailHeight,
+    /**
+     * Transforms the given image (i.e. shrinks the image and changes its quality) before it is downloaded.
+     * 
+     * @param image the image to be downloaded
+     * @param width the desired image width; use a value less than or equal to 0 to preserve image aspect ratio; if this
+     *            is greater than the current width then the image is not resized
+     * @param height the desired image height; use a value less than or equal to 0 to preserve image aspect ratio; if
+     *            this is greater than the current height then the image is not resized
+     * @param quality the desired compression quality
+     * @param context the XWiki context
+     * @return the transformed image
+     * @throws Exception if transforming the image fails
+     */
+    private XWikiAttachment downloadImage(XWikiAttachment image, int width, int height, float quality,
         XWikiContext context) throws Exception
     {
-
-        if (getType(attachment.getMimeType(context)) == 0) {
-            throw new PluginException(PLUGIN_NAME, XWikiException.ERROR_XWIKI_NOT_IMPLEMENTED,
-                "Only JPG, GIF, PNG or BMP images are supported.");
+        if (imageCache == null) {
+            initCache(context);
+            if (imageCache == null) {
+                return shrinkImage(image, width, height, quality, context);
+            }
         }
-
-        Image imgOri = getImage(attachment, context);
-
-        int imgOriWidth = imgOri.getWidth(null);
-        int imgOriHeight = imgOri.getHeight(null);
-
-        if (thumbnailHeight >= imgOriHeight) {
-            throw new PluginException(PLUGIN_NAME, XWikiException.ERROR_XWIKI_DIFF_METADATA_ERROR,
-                "Thumbnail image not created: the height is higher than the original one.");
+        String key = String.format("%s-%s-%s-%s-%s", image.getId(), image.getVersion(), width, height, quality);
+        byte[] data = imageCache.get(key);
+        XWikiAttachment thumbnail;
+        if (data != null) {
+            thumbnail = (XWikiAttachment) image.clone();
+            thumbnail.setContent(new ByteArrayInputStream(data), data.length);
+        } else {
+            thumbnail = shrinkImage(image, width, height, quality, context);
+            imageCache.set(key, thumbnail.getContent(context));
         }
-
-        if (thumbnailWidth >= imgOriWidth) {
-            throw new PluginException(PLUGIN_NAME, XWikiException.ERROR_XWIKI_DIFF_METADATA_ERROR,
-                "Thumbnail image not created: the width is higher than the original one.");
-        }
-
-        createThumbnail(thumbnailWidth, thumbnailHeight, imgOri, attachment);
-        return attachment;
+        return thumbnail;
     }
 
-    private Image getImage(XWikiAttachment attachment, XWikiContext context) throws XWikiException,
-        InterruptedException
+    /**
+     * Reduces the size (i.e. the number of bytes) of an image by scaling its width and height and by reducing its
+     * compression quality. This helps decreasing the time needed to download the image attachment.
+     * 
+     * @param attachment the image to be shrunk
+     * @param requestedWidth the requested width; use a value less than or equal to 0 to preserve image aspect ratio; if
+     *            this is greater than the current width then the image is not resized
+     * @param requestedHeight the requested height; use a value less than or equal to 0 to preserve image aspect ratio;
+     *            if this is greater than the current height then the image is not resized
+     * @param requestedQuality the desired compression quality
+     * @param context the XWiki context
+     * @return the modified image attachment
+     * @throws Exception if shrinking the image fails
+     */
+    private XWikiAttachment shrinkImage(XWikiAttachment attachment, int requestedWidth, int requestedHeight,
+        float requestedQuality, XWikiContext context) throws Exception
     {
-        Toolkit tk = Toolkit.getDefaultToolkit();
-        Image imgOri = tk.createImage(attachment.getContent(context));
+        Image image = imageProcessor.readImage(attachment.getContentInputStream(context));
 
-        MediaTracker mediaTracker = new MediaTracker(new Container());
-        mediaTracker.addImage(imgOri, 0);
-        mediaTracker.waitForID(0);
-        return imgOri;
-    }
+        // Compute the new image dimension.
+        int currentWidth = image.getWidth(null);
+        int currentHeight = image.getHeight(null);
+        int[] dimensions = reduceImageDimensions(currentWidth, currentHeight, requestedWidth, requestedHeight);
 
-    public XWikiAttachment getImageByWidth(XWikiAttachment attachment, int thumbnailWidth, XWikiContext context)
-        throws Exception
-    {
-
-        if (getType(attachment.getMimeType(context)) == 0) {
-            throw new PluginException(PLUGIN_NAME, XWikiException.ERROR_XWIKI_NOT_IMPLEMENTED,
-                "Only JPG, GIF, PNG or BMP images are supported.");
+        float quality = requestedQuality;
+        if (quality < 0) {
+            // If no scaling is needed and the quality parameter is not specified, return the original image.
+            if (dimensions[0] == currentWidth && dimensions[1] == currentHeight) {
+                return attachment;
+            }
+            quality = defaultQuality;
         }
 
-        Image imgOri = getImage(attachment, context);
-        int imgOriWidth = imgOri.getWidth(null);
-        int imgOriHeight = imgOri.getHeight(null);
+        // Scale the image to the new dimensions.
+        RenderedImage shrunkImage = imageProcessor.scaleImage(image, dimensions[0], dimensions[1]);
 
-        if (thumbnailWidth >= imgOriWidth) {
-            throw new PluginException(PLUGIN_NAME, XWikiException.ERROR_XWIKI_DIFF_METADATA_ERROR,
-                "Thumbnail image not created: the width is higher than the original one.");
-        }
-
-        double imageRatio = (double) imgOriWidth / (double) imgOriHeight;
-        int thumbnailHeight = (int) (thumbnailWidth / imageRatio);
-
-        createThumbnail(thumbnailWidth, thumbnailHeight, imgOri, attachment);
-        return attachment;
-    }
-
-    private void createThumbnail(int thumbnailWidth, int thumbnailHeight, Image imgOri, XWikiAttachment attachment)
-        throws IOException
-    {
-        // draw original image to thumbnail image object and
-        // scale it to the new size on-the-fly
-        BufferedImage imgTN = new BufferedImage(thumbnailWidth, thumbnailHeight, BufferedImage.TYPE_INT_RGB);
-        Graphics2D graphics2D = imgTN.createGraphics();
-        graphics2D.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BICUBIC);
-        graphics2D.drawImage(imgOri, 0, 0, thumbnailWidth, thumbnailHeight, null);
-
-        // save thumbnail image to bout
+        // Write the shrunk image to a byte array output stream.
         ByteArrayOutputStream bout = new ByteArrayOutputStream();
-        ImageIO.write(imgTN, "PNG", bout);
-        attachment.setContent(bout.toByteArray());
+        imageProcessor.writeImage(shrunkImage, attachment.getMimeType(context), quality, bout);
+
+        // Create an image attachment for the shrunk image.
+        XWikiAttachment thumbnail = (XWikiAttachment) attachment.clone();
+        thumbnail.setContent(new ByteArrayInputStream(bout.toByteArray()), bout.size());
+
+        return thumbnail;
     }
 
     /**
-     * @return the type of the image, as an integer code, used in the generation of the key of the image cache
+     * Computes the new image dimension which:
+     * <ul>
+     * <li>uses the requested width and height only if both are smaller than the current values</li>
+     * <li>preserves the aspect ratio when width or height is not specified.</li>
+     * </ul>
+     * 
+     * @param currentWidth the current image width
+     * @param currentHeight the current image height
+     * @param requestedWidth the desired image width; use a value less than or equal to 0 to preserve image aspect
+     *            ratio; if this is greater than the current width then the image is not resized
+     * @param requestedHeight the desired image height; use a value less than or equal to 0 to preserve image aspect
+     *            ratio; if this is greater than the current width then the image is not resized
+     * @return new width and height values
      */
-    public static int getType(String mimeType)
+    private int[] reduceImageDimensions(int currentWidth, int currentHeight, int requestedWidth, int requestedHeight)
     {
-        for (SupportedFormat f : SupportedFormat.values()) {
-            if (f.getMimeType().equals(mimeType)) {
-                return f.getCode();
+        double aspectRatio = (double) currentWidth / (double) currentHeight;
+
+        int width = currentWidth;
+        int height = currentHeight;
+
+        if (requestedWidth > 0 && requestedHeight > 0) {
+            // Both width and height are specified.
+            if (requestedWidth < currentWidth && requestedHeight < currentHeight) {
+                width = requestedWidth;
+                height = requestedHeight;
+            }
+        } else if (requestedWidth > 0) {
+            // Only width is specified.
+            if (requestedWidth < currentWidth) {
+                width = requestedWidth;
+                height = (int) (requestedWidth / aspectRatio);
+            }
+        } else if (requestedHeight > 0) {
+            // Only height is specified.
+            if (requestedHeight < currentHeight) {
+                width = (int) (requestedHeight * aspectRatio);
+                height = requestedHeight;
             }
         }
-        return 0;
+
+        return new int[] {width, height};
     }
 
     /**
-     * @return true if the passed mime type is supported by the plugin, false otherwise.
+     * @param attachment an image attachment
+     * @param context the XWiki context
+     * @return the width of the specified image
+     * @throws IOException if reading the image from the attachment content fails
+     * @throws XWikiException if reading the attachment content fails
      */
-    public boolean isSupportedImageFormat(String mimeType)
+    public int getWidth(XWikiAttachment attachment, XWikiContext context) throws IOException, XWikiException
     {
-        for (SupportedFormat f : SupportedFormat.values()) {
-            if (f.getMimeType().equals(mimeType)) {
-                return true;
-            }
-        }
-        return false;
+        return imageProcessor.readImage(attachment.getContentInputStream(context)).getWidth(null);
     }
 
-    public int getWidth(XWikiAttachment attachment, XWikiContext context) throws InterruptedException, XWikiException
+    /**
+     * @param attachment an image attachment
+     * @param context the XWiki context
+     * @return the height of the specified image
+     * @throws IOException if reading the image from the attachment content fails
+     * @throws XWikiException if reading the attachment content fails
+     */
+    public int getHeight(XWikiAttachment attachment, XWikiContext context) throws IOException, XWikiException
     {
-        Image imgOri = getImage(attachment, context);
-        return imgOri.getWidth(null);
-    }
-
-    public int getHeight(XWikiAttachment attachment, XWikiContext context) throws InterruptedException, XWikiException
-    {
-        Image imgOri = getImage(attachment, context);
-        return imgOri.getHeight(null);
+        return imageProcessor.readImage(attachment.getContentInputStream(context)).getHeight(null);
     }
 }

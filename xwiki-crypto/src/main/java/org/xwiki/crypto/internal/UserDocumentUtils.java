@@ -21,7 +21,6 @@ package org.xwiki.crypto.internal;
 
 import org.xwiki.component.annotation.ComponentRole;
 
-
 /**
  * Means by which to get a string representation of the user page for the current user for inclusion in a certificate.
  * This component has no cryptographic code.

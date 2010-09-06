@@ -25,7 +25,6 @@ import java.security.PrivateKey;
 import java.security.PublicKey;
 import java.security.GeneralSecurityException;
 
-
 /**
  * Wrapper which contains a {@link PrivateKey} and the corresponding {@link XWikiX509Certificate}.
  * This class is capable of holding a chain of certificates from the user's certificate back to the root certificate.

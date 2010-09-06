@@ -59,7 +59,7 @@ public interface PasswordCryptoService
      *
      * @param message the message to encrypt.
      * @param password which will be needed to decrypt the text.
-     * @return raw ciphertext which can be decrypted back to data using {@link #decryptBytes(String, String)}
+     * @return raw ciphertext which can be decrypted back to data using {@link #decryptBytes(byte[], String)}
      * @throws GeneralSecurityException if something goes wrong.
      */
     byte[] encryptBytes(final byte[] message, final String password)

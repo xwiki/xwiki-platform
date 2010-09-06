@@ -27,9 +27,8 @@ import org.junit.Before;
 
 import org.xwiki.test.AbstractComponentTestCase;
 
-
 /**
- * Tests {@link DefaultPasswdCryptoService}.
+ * Tests {@link org.xwiki.crypto.passwd.internal.DefaultPasswordCryptoService}.
  * 
  * @version $Id$
  * @since 2.5

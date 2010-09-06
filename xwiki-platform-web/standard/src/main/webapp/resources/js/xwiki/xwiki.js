@@ -1506,3 +1506,118 @@ document.observe('xwiki:dom:loaded', function() {
     })
   }
 });
+
+/*
+ * JS improvement for keeping the content menu visible on the screen when scrolling down.
+ */
+document.observe("xwiki:dom:loaded", function() {
+  var menu = $('contentmenu') || $('editmenu'); // Both for view and edit
+  var content = $('mainContentArea') || $('mainEditArea'); // Both for view and edit
+  createGhost(menu);
+  if (menu && content) {
+    // Resize the fixed menu when the window width changes
+    Event.observe(window, 'resize', function() {
+      if (menu.style.position == 'fixed') {
+        menu.style.width = content.getWidth() + 'px';
+        if (typeof(menu.__fm_extra) != 'undefined') {
+          if (menu.__fm_extra.getStyle('padding-left').replace(/[^a-z]/g, '') == 'px') {
+            var boxExtra = menu.__fm_extra.getStyle('border-left-width').replace(/[^0-9.]/g, '') - 0;
+            boxExtra += menu.__fm_extra.getStyle('padding-left').replace(/[^0-9.]/g, '') - 0;
+            boxExtra += menu.__fm_extra.getStyle('padding-right').replace(/[^0-9.]/g, '') - 0;
+            boxExtra += menu.__fm_extra.getStyle('border-right-width').replace(/[^0-9.]/g, '') - 0;
+          } else {
+            boxExtra = 50; // magic number 50 = standard left+right padding
+          }
+          menu.__fm_extra.style.width = (content.getWidth() - boxExtra) + 'px';
+        }
+      }
+    });
+    if (!browser.isIE6x) { // IE6 is too dumb to be supported
+      Event.observe(window, 'scroll', handleScroll);
+      // Make sure the annotations settings panel shows up in the right place
+      document.observe('xwiki:annotations:settings:loaded', handleScroll);
+    }
+  }
+
+  /**
+   * Ensures that the content menu is always visible when scrolling down.
+   */
+  function handleScroll() {
+    var menuExtras = $$('.annotationsettings');
+    var extraHeight = 0;
+    if (menuExtras && menuExtras.size() > 0) {
+      menu.__fm_extra = menuExtras[0];
+      createGhost(menu.__fm_extra);
+      extraHeight = menu.__fm_extra.getHeight();
+    }
+    var menuHeight = menu.getHeight();
+    var menuMaxTop = content.cumulativeOffset().top + content.getHeight() - menuHeight - extraHeight;
+    var menuMinTop = content.cumulativeOffset().top - menuHeight - extraHeight;
+    if (document.viewport.getScrollOffsets().top >= menuMinTop && document.viewport.getScrollOffsets().top < menuMaxTop) {
+      var menuWidth = content.getWidth();
+      var menuLeft = content.cumulativeOffset().left;
+      makeFixed(menu, 0, menuLeft, menuWidth);
+      makeFixed(menu.__fm_extra, menuHeight, menuLeft, (menuWidth - 50)); // magic number 50 = left+right padding
+    } else if (document.viewport.getScrollOffsets().top >= menuMaxTop) {
+      makeAbsolute(menu, menuMaxTop);
+      makeAbsolute(menu.__fm_extra, menuMaxTop + menuHeight);
+    } else {
+      makeScrollable(menu);
+      makeScrollable(menu.__fm_extra);
+    }
+  }
+
+  /**
+   * Creates a clone of the provided element, which has the same size and position.
+   * This clone prevents layout changes when moving the element outside its parent.
+   * The clone will be stored in the __fm_ghost property of the element and is inserted
+   * after the element in the DOM. The clone is not visible initially.
+   * 
+   * @param element the element whose position and dimesions should be cloned
+   */
+  function createGhost(element) {
+    if (typeof(element.__fm_ghost) == 'undefined') {
+      element.__fm_ghost = new Element('div');
+      element.__fm_ghost.hide();
+      element.insert({'after' : element.__fm_ghost});
+    }
+    element.__fm_ghost.clonePosition(element, {setWidth : false});
+  }
+  /**
+   * Pins the provided element at a certain position inside the window. The element's clone is made
+   * visible to prevent layout changes.
+   * 
+   * @see #createGhost
+   */
+  function makeFixed(element, top, left, width) {
+    if (element) {
+      element.style.position = 'fixed';
+      element.style.top = top + 'px';
+      element.style.left = left + 'px';
+      element.style.width = width + 'px';
+      element.__fm_ghost.show();
+    }
+  }
+  /**
+   * Keeps the provided element at a certain position inside the document.
+   */
+  function makeAbsolute(element, top) {
+    if (element) {
+      element.style.position = 'absolute';
+      element.style.top = top + 'px';
+      element.__fm_ghost.show();
+    }
+  }
+  /**
+   * Restores the provided element to its original position in the document.
+   */
+  function makeScrollable(element) {
+    if (element) {
+      element.style.position = '';
+      element.style.top = '';
+      element.style.left = '';
+      element.style.width = '';
+      element.__fm_ghost.hide();
+    }
+  }
+});

@@ -171,6 +171,7 @@
   border-top: none;
   background: $theme.pageContentBackgroundColor; ## $theme.backgroundSecondaryColor;
   padding: 8px 23px; /* Padding left,right = padding of the page content - width of the panel's border (25-2) */
+  z-index: 998; /* Right below the submenu. */
 }
 .annotationsettings label {
   font-weight: bold;

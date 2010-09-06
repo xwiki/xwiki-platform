@@ -22,7 +22,6 @@ package org.xwiki.rest.resources.attachments;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.URL;
 import java.util.Enumeration;
 
 import javax.mail.BodyPart;
@@ -39,20 +38,16 @@ import javax.ws.rs.QueryParam;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
-import javax.ws.rs.core.UriBuilder;
 import javax.ws.rs.core.Response.Status;
+import javax.ws.rs.core.UriBuilder;
 
 import org.xwiki.component.annotation.Component;
-import org.xwiki.rest.DomainObjectFactory;
 import org.xwiki.rest.Utils;
-import org.xwiki.rest.model.jaxb.Attachment;
 import org.xwiki.rest.model.jaxb.Attachments;
 import org.xwiki.rest.resources.BaseAttachmentsResource;
 
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.api.Document;
-import com.xpn.xwiki.doc.XWikiAttachment;
-import com.xpn.xwiki.doc.XWikiDocument;
 
 /**
  * @version $Id$
@@ -143,8 +138,8 @@ public class AttachmentsResource extends BaseAttachmentsResource
 
         /* Clear the fileName */
         attachmentName =
-            Utils.getXWikiContext(componentManager).getWiki().clearName(attachmentName, false, true,
-                Utils.getXWikiContext(componentManager));
+            Utils.getXWikiContext(componentManager).getWiki()
+                .clearName(attachmentName, false, true, Utils.getXWikiContext(componentManager));
 
         byte[] buffer = new byte[4096];
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
@@ -163,47 +158,16 @@ public class AttachmentsResource extends BaseAttachmentsResource
         baos.flush();
 
         /* Attach the file */
-        boolean existed = false;
+        AttachmentInfo attachmentInfo = storeAttachment(doc, attachmentName, baos.toByteArray());
 
-        XWikiDocument xwikiDocument =
-            Utils.getXWiki(componentManager).getDocument(doc.getPrefixedFullName(),
-                Utils.getXWikiContext(componentManager));
-        XWikiAttachment xwikiAttachment = xwikiDocument.getAttachment(attachmentName);
-        if (xwikiAttachment == null) {
-            xwikiAttachment = new XWikiAttachment();
-            xwikiDocument.getAttachmentList().add(xwikiAttachment);
+        if (attachmentInfo.isAlreadyExisting()) {
+            return Response.status(Status.ACCEPTED).entity(attachmentInfo.getAttachment()).build();
         } else {
-            existed = true;
-        }
-
-        xwikiAttachment.setContent(baos.toByteArray());
-        xwikiAttachment.setAuthor(Utils.getXWikiUser(componentManager));
-        xwikiAttachment.setFilename(attachmentName);
-        xwikiAttachment.setDoc(xwikiDocument);
-
-        xwikiDocument.saveAttachmentContent(xwikiAttachment, Utils.getXWikiContext(componentManager));
-
-        doc.save();
-
-        URL url =
-            Utils.getXWikiContext(componentManager).getURLFactory().createAttachmentURL(attachmentName, spaceName,
-                doc.getName(), "download", null, wikiName, Utils.getXWikiContext(componentManager));
-        String attachmentXWikiAbsoluteUrl = url.toString();
-        String attachmentXWikiRelativeUrl =
-            Utils.getXWikiContext(componentManager).getURLFactory()
-                .getURL(url, Utils.getXWikiContext(componentManager));
-
-        Attachment attachment =
-            DomainObjectFactory.createAttachment(objectFactory, uriInfo.getBaseUri(), new com.xpn.xwiki.api.Attachment(
-                doc, xwikiAttachment, Utils.getXWikiContext(componentManager)), attachmentXWikiRelativeUrl,
-                attachmentXWikiAbsoluteUrl);
-
-        if (existed) {
-            return Response.status(Status.ACCEPTED).entity(attachment).build();
-        } else {
-            return Response.created(
-                UriBuilder.fromUri(uriInfo.getBaseUri()).path(AttachmentResource.class).build(wikiName, spaceName,
-                    pageName, attachmentName)).entity(attachment).build();
+            return Response
+                .created(
+                    UriBuilder.fromUri(uriInfo.getBaseUri()).path(AttachmentResource.class)
+                        .build(wikiName, spaceName, pageName, attachmentName)).entity(attachmentInfo.getAttachment())
+                .build();
         }
     }
 

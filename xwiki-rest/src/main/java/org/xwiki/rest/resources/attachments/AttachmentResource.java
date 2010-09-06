@@ -19,8 +19,6 @@
  */
 package org.xwiki.rest.resources.attachments;
 
-import java.net.URL;
-
 import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
 import javax.ws.rs.PUT;
@@ -31,10 +29,8 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 
 import org.xwiki.component.annotation.Component;
-import org.xwiki.rest.DomainObjectFactory;
 import org.xwiki.rest.Utils;
-import org.xwiki.rest.XWikiResource;
-import org.xwiki.rest.model.jaxb.Attachment;
+import org.xwiki.rest.resources.BaseAttachmentsResource;
 
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.api.Document;
@@ -46,7 +42,7 @@ import com.xpn.xwiki.doc.XWikiDocument;
  */
 @Component("org.xwiki.rest.resources.attachments.AttachmentResource")
 @Path("/wikis/{wikiName}/spaces/{spaceName}/pages/{pageName}/attachments/{attachmentName}")
-public class AttachmentResource extends XWikiResource
+public class AttachmentResource extends BaseAttachmentsResource
 {
     @GET
     public Response getAttachment(@PathParam("wikiName") String wikiName, @PathParam("spaceName") String spaceName,
@@ -76,44 +72,19 @@ public class AttachmentResource extends XWikiResource
         if (!doc.hasAccessLevel("edit", Utils.getXWikiUser(componentManager))) {
             throw new WebApplicationException(Status.UNAUTHORIZED);
         }
+        
+        /* Clear the fileName */
+        attachmentName =
+            Utils.getXWikiContext(componentManager).getWiki()
+                .clearName(attachmentName, false, true, Utils.getXWikiContext(componentManager));
 
-        boolean existed = false;
+        /* Attach the file */
+        AttachmentInfo attachmentInfo = storeAttachment(doc, attachmentName, content);
 
-        XWikiDocument xwikiDocument =
-            Utils.getXWiki(componentManager).getDocument(doc.getPrefixedFullName(),
-                Utils.getXWikiContext(componentManager));
-        XWikiAttachment xwikiAttachment = xwikiDocument.getAttachment(attachmentName);
-        if (xwikiAttachment == null) {
-            xwikiAttachment = new XWikiAttachment();
-            xwikiDocument.getAttachmentList().add(xwikiAttachment);
+        if (attachmentInfo.isAlreadyExisting()) {
+            return Response.status(Status.ACCEPTED).entity(attachmentInfo.getAttachment()).build();
         } else {
-            existed = true;
-        }
-
-        xwikiAttachment.setContent(content);
-        xwikiAttachment.setAuthor(Utils.getXWikiUser(componentManager));
-        xwikiAttachment.setFilename(attachmentName);
-        xwikiAttachment.setDoc(xwikiDocument);
-
-        Utils.getXWiki(componentManager).saveDocument(xwikiDocument, Utils.getXWikiContext(componentManager));
-
-        URL url =
-            Utils.getXWikiContext(componentManager).getURLFactory().createAttachmentURL(attachmentName, spaceName,
-                doc.getName(), "download", null, wikiName, Utils.getXWikiContext(componentManager));
-        String attachmentXWikiAbsoluteUrl = url.toString();
-        String attachmentXWikiRelativeUrl =
-            Utils.getXWikiContext(componentManager).getURLFactory()
-                .getURL(url, Utils.getXWikiContext(componentManager));
-
-        Attachment attachment =
-            DomainObjectFactory.createAttachment(objectFactory, uriInfo.getBaseUri(), new com.xpn.xwiki.api.Attachment(
-                doc, xwikiAttachment, Utils.getXWikiContext(componentManager)), attachmentXWikiRelativeUrl,
-                attachmentXWikiAbsoluteUrl);
-
-        if (existed) {
-            return Response.status(Status.ACCEPTED).entity(attachment).build();
-        } else {
-            return Response.created(uriInfo.getAbsolutePath()).entity(attachment).build();
+            return Response.created(uriInfo.getAbsolutePath()).entity(attachmentInfo.getAttachment()).build();
         }
 
     }

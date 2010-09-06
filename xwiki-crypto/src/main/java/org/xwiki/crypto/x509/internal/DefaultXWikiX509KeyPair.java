@@ -45,7 +45,7 @@ import org.xwiki.crypto.x509.XWikiX509KeyPair;
  * Wrapper for storing a {@link PrivateKey} and the corresponding {@link XWikiX509Certificate}.
  * 
  * @version $Id$
- * @since 2.5
+ * @since 2.5M1
  */
 public class DefaultXWikiX509KeyPair implements XWikiX509KeyPair
 {

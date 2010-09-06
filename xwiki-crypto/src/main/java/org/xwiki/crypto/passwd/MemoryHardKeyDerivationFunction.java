@@ -29,7 +29,7 @@ import org.xwiki.component.annotation.ComponentRole;
  * A. Compute the hash in significantly fewer processor cycles than the implementation.
  * B. Compute the hash with significantly less memory requirement than the implementation.
  *
- * @since 2.5
+ * @since 2.5M1
  * @version $Id$
  */
 @ComponentRole

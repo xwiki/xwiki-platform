@@ -43,7 +43,7 @@ import javax.security.auth.x500.X500Principal;
  * Wrapper class for a X509 certificate.
  * 
  * @version $Id$
- * @since 2.5
+ * @since 2.5M1
  */
 public abstract class AbstractX509CertificateWrapper extends X509Certificate
 {

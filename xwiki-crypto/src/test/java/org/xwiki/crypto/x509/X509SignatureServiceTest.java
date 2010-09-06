@@ -32,7 +32,7 @@ import org.xwiki.test.AbstractComponentTestCase;
  * Prove that X509SignatureService can sign and verify text and can verify text signed in firefox.
  * 
  * @version $Id$
- * @since 2.5
+ * @since 2.5M1
  */
 public class X509SignatureServiceTest extends AbstractComponentTestCase
 {

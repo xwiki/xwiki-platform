@@ -33,7 +33,7 @@ import org.xwiki.test.AbstractComponentTestCase;
  * KeyService test, insure that the key service is able to make keys without throwing an exception.
  * 
  * @version $Id$
- * @since 2.5
+ * @since 2.5M1
  */
 public class X509KeyServiceTest extends AbstractComponentTestCase
 {

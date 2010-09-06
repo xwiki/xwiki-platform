@@ -32,7 +32,7 @@ import org.xwiki.crypto.passwd.MemoryHardKeyDerivationFunction;
  * Be careful, this class is serializable, serialization and deserialization should yield a function which provides
  * the same password to key mapping, and make sure fields unnecessary to this are declared transient.
  *
- * @since 2.5
+ * @since 2.5M1
  * @version $Id$
  */
 public abstract class AbstractMemoryHardKeyDerivationFunction implements MemoryHardKeyDerivationFunction

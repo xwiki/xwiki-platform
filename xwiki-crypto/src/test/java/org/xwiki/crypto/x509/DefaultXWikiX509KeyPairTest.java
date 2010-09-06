@@ -34,7 +34,7 @@ import org.xwiki.test.AbstractComponentTestCase;
  * Tests the {@link DefaultXWikiX509KeyPair} implementation.
  * 
  * @version $Id$
- * @since 2.5
+ * @since 2.5M1
  */
 public class DefaultXWikiX509KeyPairTest extends AbstractComponentTestCase
 {

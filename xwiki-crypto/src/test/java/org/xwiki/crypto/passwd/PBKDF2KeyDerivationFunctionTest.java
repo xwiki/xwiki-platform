@@ -35,7 +35,7 @@ import org.xwiki.crypto.internal.SerializationUtils;
 /**
  * Tests PBKDF2KeyDerivationFunctionTest to ensure conformance with PKCS#5v2 standard for PBKDF2.
  *
- * @since 2.5
+ * @since 2.5M1
  * @version $Id$
  */
 public class PBKDF2KeyDerivationFunctionTest

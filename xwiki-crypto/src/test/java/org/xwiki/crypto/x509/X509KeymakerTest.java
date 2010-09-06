@@ -36,7 +36,7 @@ import org.xwiki.crypto.x509.internal.X509Keymaker;
  * Test the {@link X509Keymaker} class.
  * 
  * @version $Id$
- * @since 2.5
+ * @since 2.5M1
  */
 public class X509KeymakerTest
 {

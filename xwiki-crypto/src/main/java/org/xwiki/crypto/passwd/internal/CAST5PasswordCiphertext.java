@@ -28,7 +28,7 @@ import org.bouncycastle.crypto.paddings.PaddedBufferedBlockCipher;
  * A password ciphertext service implementing CAST5.
  *
  * @version $Id$
- * @since 2.5
+ * @since 2.5M1
  */
 public class CAST5PasswordCiphertext extends AbstractPasswordCiphertext
 {

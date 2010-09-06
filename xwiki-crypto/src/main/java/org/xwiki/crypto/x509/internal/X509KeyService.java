@@ -36,7 +36,7 @@ import org.xwiki.crypto.x509.XWikiX509KeyPair;
  * Service allowing a user to create keys and X509 certificates.
  * 
  * @version $Id$
- * @since 2.5
+ * @since 2.5M1
  */
 public class X509KeyService
 {

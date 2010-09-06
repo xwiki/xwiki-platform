@@ -33,7 +33,7 @@ import org.xwiki.crypto.passwd.KeyDerivationFunction;
  * The abstract key derivation function.
  * Provides guess/trial based determination of the correct number of iterations for a given processor time requirement.
  *
- * @since 2.5
+ * @since 2.5M1
  * @version $Id$
  */
 public abstract class AbstractKeyDerivationFunction implements KeyDerivationFunction, Serializable

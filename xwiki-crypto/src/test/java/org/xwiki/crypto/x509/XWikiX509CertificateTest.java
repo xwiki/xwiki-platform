@@ -36,7 +36,7 @@ import org.xwiki.crypto.internal.Convert;
  * Tests {@link XWikiX509Certificate}.
  * 
  * @version $Id$
- * @since 2.5
+ * @since 2.5M1
  */
 public class XWikiX509CertificateTest
 {

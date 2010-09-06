@@ -42,7 +42,7 @@ import org.xwiki.crypto.passwd.KeyDerivationFunction;
  * also subclasses should avoid using fields since this class is serialized to produce the ciphertext.</p>
  *
  * @version $Id$
- * @since 2.5
+ * @since 2.5M1
  */
 public abstract class AbstractPasswordCiphertext implements PasswordCiphertext
 {

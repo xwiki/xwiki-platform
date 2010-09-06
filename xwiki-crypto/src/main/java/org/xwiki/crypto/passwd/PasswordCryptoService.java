@@ -27,7 +27,7 @@ import org.xwiki.component.annotation.ComponentRole;
  * Service allowing users to encrypt and decrypt text using a password.
  * 
  * @version $Id$
- * @since 2.5
+ * @since 2.5M1
  */
 @ComponentRole
 public interface PasswordCryptoService

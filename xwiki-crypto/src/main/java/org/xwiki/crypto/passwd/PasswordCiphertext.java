@@ -30,7 +30,7 @@ import java.security.GeneralSecurityException;
  * It can be serialized and deserialized and the same password will be able to decrypt it.
  *
  * @version $Id$
- * @since 2.5
+ * @since 2.5M1
  */
 public interface PasswordCiphertext extends Serializable
 {

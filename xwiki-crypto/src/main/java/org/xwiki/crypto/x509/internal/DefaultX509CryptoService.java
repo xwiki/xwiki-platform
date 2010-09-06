@@ -37,7 +37,7 @@ import org.xwiki.crypto.x509.XWikiX509KeyPair;
  * Service allowing a user to sign text, determine the validity and signer of already signed text, and create keys.
  * 
  * @version $Id$
- * @since 2.5
+ * @since 2.5M1
  */
 @Component
 @InstantiationStrategy(ComponentInstantiationStrategy.SINGLETON)

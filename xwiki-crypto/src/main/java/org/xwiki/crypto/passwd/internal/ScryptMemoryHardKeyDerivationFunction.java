@@ -34,7 +34,7 @@ import org.bouncycastle.crypto.digests.SHA256Digest;
  * The existance of this shortcut has been confirmend with the designer of Scrypt who claimed it was for cases when
  * decryption was necessary on a system with less memory than the system used to encrypt the data.
  *
- * @since 2.5
+ * @since 2.5M1
  * @version $Id$
  */
 public class ScryptMemoryHardKeyDerivationFunction extends AbstractMemoryHardKeyDerivationFunction

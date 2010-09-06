@@ -54,7 +54,7 @@ import org.xwiki.crypto.passwd.PasswordCryptoServiceConfiguration;
  * recovered. The output is a string of base-64 text without any header or footer as with encrypt.
  *
  * @version $Id$
- * @since 2.5
+ * @since 2.5M1
  */
 @Component
 public class DefaultPasswordCryptoService implements PasswordCryptoService

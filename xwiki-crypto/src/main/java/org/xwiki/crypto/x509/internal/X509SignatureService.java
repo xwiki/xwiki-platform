@@ -46,7 +46,7 @@ import org.xwiki.crypto.x509.XWikiX509KeyPair;
  * PKCS#7 signed data objects with embedded signer certificate and detached content.
  * 
  * @version $Id$
- * @since 2.5
+ * @since 2.5M1
  */
 public class X509SignatureService
 {

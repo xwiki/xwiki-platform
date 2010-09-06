@@ -37,7 +37,7 @@ import org.xwiki.crypto.internal.SerializationUtils;
 /**
  * Tests Scrypt against test outputs given in reference document.
  *
- * @since 2.5
+ * @since 2.5M1
  * @version $Id$
  */
 public class ScryptMemoryHardKeyDerivationFunctionTest extends ScryptMemoryHardKeyDerivationFunction

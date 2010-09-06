@@ -28,7 +28,7 @@ import org.xwiki.component.annotation.ComponentRole;
  * create keys, and register new certificates.
  * 
  * @version $Id$
- * @since 2.5
+ * @since 2.5M1
  */
 @ComponentRole
 public interface X509CryptoService

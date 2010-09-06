@@ -32,7 +32,7 @@ import org.xwiki.script.service.ScriptService;
  * create keys, and register new certificates.
  * 
  * @version $Id$
- * @since 2.5
+ * @since 2.5M1
  */
 @Component(roles = { ScriptService.class }, hints = { "crypto" })
 public class CryptoScriptService implements ScriptService

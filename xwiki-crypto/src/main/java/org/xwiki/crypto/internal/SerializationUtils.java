@@ -30,7 +30,7 @@ import java.io.IOException;
 /**
  * Utilities for serialization and deserialization.
  *
- * @since 2.5
+ * @since 2.5M1
  * @version $Id$
  */
 public final class SerializationUtils

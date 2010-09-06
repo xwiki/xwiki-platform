@@ -32,7 +32,7 @@ import org.bouncycastle.crypto.params.KeyParameter;
  * This is an implementation of the PBKDF2 which is defined as part of RSA's PKCS#5
  * see: http://www.ietf.org/rfc/rfc2898.txt
  *
- * @since 2.5
+ * @since 2.5M1
  * @version $Id$
  */
 public class PBKDF2KeyDerivationFunction extends AbstractKeyDerivationFunction

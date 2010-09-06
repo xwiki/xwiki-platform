@@ -31,7 +31,7 @@ import org.xwiki.model.reference.EntityReferenceSerializer;
  * Default implementation of {@link UserDocumentUtils}.
  * 
  * @version $Id$
- * @since 2.5
+ * @since 2.5M1
  */
 @Component
 public class DefaultUserDocumentUtils implements UserDocumentUtils

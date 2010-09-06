@@ -48,7 +48,7 @@ import org.bouncycastle.x509.extension.SubjectKeyIdentifierStructure;
  * Keymaker allows you to create keypairs and X509Certificates.
  * 
  * @version $Id$
- * @since 2.5
+ * @since 2.5M1
  */
 public class X509Keymaker
 {

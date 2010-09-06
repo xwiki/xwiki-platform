@@ -30,7 +30,7 @@ import org.xwiki.crypto.passwd.KeyDerivationFunction;
 /**
  * Default password verification function wraps a key derivation function and stores the hash output.
  *
- * @since 2.5
+ * @since 2.5M1
  * @version $Id$
  */
 public class DefaultPasswordVerificationFunction implements PasswordVerificationFunction

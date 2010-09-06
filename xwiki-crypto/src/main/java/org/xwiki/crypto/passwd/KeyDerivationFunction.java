@@ -32,7 +32,7 @@ import org.xwiki.component.annotation.ComponentRole;
  * validated, you must call getSerialized() and initialize the next function with that output.
  * Each time a password is to be hashed, it should be done so with a new instance.
  *
- * @since 2.5
+ * @since 2.5M1
  * @version $Id$
  */
 @ComponentRole

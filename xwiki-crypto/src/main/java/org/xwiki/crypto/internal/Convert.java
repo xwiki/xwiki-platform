@@ -30,7 +30,7 @@ import org.bouncycastle.util.encoders.Base64;
  * UTF-8 because it is always available and base64 alphabet is a subset of UTF-8.
  * 
  * @version $Id$
- * @since 2.5
+ * @since 2.5M1
  */
 public final class Convert
 {

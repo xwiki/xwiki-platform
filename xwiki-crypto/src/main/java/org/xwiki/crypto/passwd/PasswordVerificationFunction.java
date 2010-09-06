@@ -28,7 +28,7 @@ import java.io.IOException;
  * stores the hashed password given it. While this is quite wrong for encryption, it is exactly what is needed
  * for verifying a password. Implementations are expected to wrap a key derivation function and store it's output.
  *
- * @since 2.5
+ * @since 2.5M1
  * @version $Id$
  */
 public interface PasswordVerificationFunction extends Serializable

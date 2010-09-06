@@ -31,7 +31,7 @@ import org.xwiki.test.AbstractComponentTestCase;
  * Tests {@link org.xwiki.crypto.passwd.internal.DefaultPasswordCryptoService}.
  * 
  * @version $Id$
- * @since 2.5
+ * @since 2.5M1
  */
 public class DefaultPasswordCryptoServiceTest extends AbstractComponentTestCase
 {

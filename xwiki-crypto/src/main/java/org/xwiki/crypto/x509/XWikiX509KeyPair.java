@@ -30,7 +30,7 @@ import java.security.GeneralSecurityException;
  * This class is capable of holding a chain of certificates from the user's certificate back to the root certificate.
  * 
  * @version $Id$
- * @since 2.5
+ * @since 2.5M1
  */
 public interface XWikiX509KeyPair extends Serializable
 {

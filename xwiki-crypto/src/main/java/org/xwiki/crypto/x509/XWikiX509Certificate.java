@@ -43,7 +43,7 @@ import org.xwiki.crypto.x509.internal.AbstractX509CertificateWrapper;
  * it would just have to be casted every time somebody wanted to use it with non xwiki-crypto cryptographic apis.
  * 
  * @version $Id$
- * @since 2.5
+ * @since 2.5M1
  */
 public class XWikiX509Certificate extends AbstractX509CertificateWrapper
 {

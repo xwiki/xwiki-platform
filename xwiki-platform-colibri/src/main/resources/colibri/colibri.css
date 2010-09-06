@@ -869,7 +869,8 @@ div#xwikiobjects input[type="checkbox"], div#xwikiclassproperties input[type="ch
 /* General */
 .actionmenu {
   background-color: $theme.menuBackgroundColor;
-  height: 22px !important;
+  height: 1.6em;
+  min-height: 22px;
   width: 100%;
   position: relative;
   left: 0;
@@ -1008,7 +1009,6 @@ div#xwikiobjects input[type="checkbox"], div#xwikiclassproperties input[type="ch
 .actionmenu .tmCreate {
   background-color: #4D9244; /* $theme.buttonPrimaryBackgroundColor */
   bottom: -4px;
-  height: 1.85em;
   margin-right: 2em;
   padding-left: 10px;
   position: relative;

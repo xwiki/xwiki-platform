@@ -95,9 +95,7 @@ public class AttachmentResource extends XWikiResource
         xwikiAttachment.setFilename(attachmentName);
         xwikiAttachment.setDoc(xwikiDocument);
 
-        xwikiDocument.saveAttachmentContent(xwikiAttachment, Utils.getXWikiContext(componentManager));
-
-        doc.save();
+        Utils.getXWiki(componentManager).saveDocument(xwikiDocument, Utils.getXWikiContext(componentManager));
 
         URL url =
             Utils.getXWikiContext(componentManager).getURLFactory().createAttachmentURL(attachmentName, spaceName,

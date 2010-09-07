@@ -25,9 +25,9 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <parent>
-    <artifactId>xwiki-plugins</artifactId>
     <groupId>com.xpn.xwiki.platform.plugins</groupId>
-    <version>25-SNAPSHOT</version>
+    <artifactId>xwiki-plugins</artifactId>
+    <version>26-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-plugin-calendar</artifactId>
   <name>XWiki Platform - Plugins - Calendar</name>

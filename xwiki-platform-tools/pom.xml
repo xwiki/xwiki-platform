@@ -52,6 +52,7 @@
     <module>xwiki-jetty-resources</module>
     <module>xwiki-rootwebapp</module>
     <module>xwiki-archetype-macro</module>
+    <module>xwiki-standards-validator</module>
     <module>foxwiki</module>
   </modules>
 </project>

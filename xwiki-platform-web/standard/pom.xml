@@ -138,6 +138,12 @@
       <artifactId>xwiki-core-captcha</artifactId>
       <version>${platform.core.version}</version>
     </dependency>
+    <!-- Crypto Module -->
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-core-crypto</artifactId>
+      <version>${platform.core.version}</version>
+    </dependency>
   </dependencies>
   <build>
     <plugins>

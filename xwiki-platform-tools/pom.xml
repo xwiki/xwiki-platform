@@ -27,7 +27,7 @@
   <parent>
     <groupId>org.xwiki.platform.tools</groupId>
     <artifactId>xwiki-tools</artifactId>
-    <version>25-SNAPSHOT</version>
+    <version>26-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-xar-plugin</artifactId>
   <name>XWiki Platform - Tools - XAR Plugin</name>

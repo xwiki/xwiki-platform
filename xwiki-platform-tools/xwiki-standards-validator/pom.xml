@@ -25,9 +25,9 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <parent>
-    <artifactId>xwiki-tools</artifactId>
     <groupId>org.xwiki.platform.tools</groupId>
-    <version>25-SNAPSHOT</version>
+    <artifactId>xwiki-tools</artifactId>
+    <version>26-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-standards-validator</artifactId>
   <name>XWiki Platform - Tools - Web Standards Validator</name>

@@ -27,7 +27,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki</artifactId>
-    <version>34-SNAPSHOT</version>
+    <version>34</version>
     <relativePath>../pom</relativePath>
   </parent>
   <groupId>org.xwiki.platform</groupId>
@@ -207,5 +207,5 @@
         <xwiki.clirr.skip>false</xwiki.clirr.skip>
       </properties>
     </profile>
-  </profiles>      
+  </profiles>
 </project>

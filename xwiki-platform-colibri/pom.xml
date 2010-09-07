@@ -27,7 +27,7 @@
   <parent>
     <groupId>org.xwiki.platform.skins</groupId>
     <artifactId>xwiki-skins</artifactId>
-    <version>24-SNAPSHOT</version>
+    <version>24</version>
   </parent>
   <artifactId>xwiki-skin-colibri</artifactId>
   <name>XWiki Platform - Skins - Colibri</name>
@@ -42,7 +42,7 @@
     <dependency>
       <groupId>org.xwiki.platform.skins</groupId>
       <artifactId>xwiki-skin-albatross</artifactId>
-      <version>1.29-SNAPSHOT</version>
+      <version>1.29</version>
       <type>zip</type>
       <scope>runtime</scope>
     </dependency>

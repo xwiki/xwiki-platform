@@ -22,6 +22,7 @@ package org.xwiki.component.annotation;
 
 import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.lang.annotation.Annotation;
 import java.net.URL;
@@ -52,13 +53,18 @@ public class ComponentAnnotationLoader extends AbstractLogEnabled
      * Location in the classloader of the file defining the list of component implementation class to parser for
      * annotations.
      */
-    private static final String COMPONENT_LIST = "META-INF/components.txt";
+    public static final String COMPONENT_LIST = "META-INF/components.txt";
 
     /**
      * Location in the classloader of the file specifying which component implementation to use when several with the
      * same role/hint are found.
      */
-    private static final String COMPONENT_OVERRIDE_LIST = "META-INF/component-overrides.txt";
+    public static final String COMPONENT_OVERRIDE_LIST = "META-INF/component-overrides.txt";
+
+    /**
+     * The encoding used to parse component list files.
+     */
+    private static final String COMPONENT_LIST_ENCODING = "UTF-8";
 
     /**
      * Factory to create a Component Descriptor from an annotated class.
@@ -78,8 +84,8 @@ public class ComponentAnnotationLoader extends AbstractLogEnabled
      * Loads all components defined using annotations.
      * 
      * @param manager the component manager to use to dynamically register components
-     * @param classLoader the classloader to use to look for the Component list declaration file ({@code
-     *            META-INF/components.txt})
+     * @param classLoader the classloader to use to look for the Component list declaration file (
+     *            {@code META-INF/components.txt})
      */
     public void initialize(ComponentManager manager, ClassLoader classLoader)
     {
@@ -90,6 +96,26 @@ public class ComponentAnnotationLoader extends AbstractLogEnabled
             List<String> componentClassNames = getDeclaredComponents(classLoader, COMPONENT_LIST);
             List<String> componentOverrideClassNames = getDeclaredComponents(classLoader, COMPONENT_OVERRIDE_LIST);
 
+            initialize(manager, classLoader, componentClassNames, componentOverrideClassNames);
+        } catch (Exception e) {
+            // Make sure we make the calling code fail in order to fail fast and prevent the application to start
+            // if something is amiss.
+            throw new RuntimeException("Failed to get the list of components to load", e);
+        }
+    }
+
+    /**
+     * @param manager the component manager to use to dynamically register components
+     * @param classLoader the classloader to use to look for the Component list declaration file (
+     *            {@code META-INF/components.txt})
+     * @param componentClassNames the list of components to load
+     * @param componentOverrideClassNames the list of components to override
+     * @since 2.5M2
+     */
+    public void initialize(ComponentManager manager, ClassLoader classLoader, List<String> componentClassNames,
+        List<String> componentOverrideClassNames)
+    {
+        try {
             // 2) For each component class name found, load its class and use introspection to find the necessary
             // annotations required to create a Component Descriptor.
             Map<RoleHint, ComponentDescriptor> descriptorMap = new HashMap<RoleHint, ComponentDescriptor>();
@@ -107,15 +133,17 @@ public class ComponentAnnotationLoader extends AbstractLogEnabled
                         if (descriptorMap.containsKey(roleHint)) {
                             // Is the component in the override list?
                             ComponentDescriptor existingDescriptor = descriptorMap.get(roleHint);
-                            if (!componentOverrideClassNames.contains(existingDescriptor.getImplementation().getName())) {
+                            if (!componentOverrideClassNames.contains(existingDescriptor.getImplementation().getName()))
+                            {
                                 descriptorMap.put(new RoleHint(componentRoleClass, descriptor.getRoleHint()),
                                     descriptor);
 
                                 if (!componentOverrideClassNames.contains(descriptor.getImplementation().getName())) {
-                                    getLogger().warn("Component [" + existingDescriptor.getImplementation().getName()
-                                        + "] is being overwritten by component ["
-                                        + descriptor.getImplementation().getName() + "] for Role/Hint [" + roleHint
-                                        + "]. It will not be possible to look it up.");
+                                    getLogger().warn(
+                                        "Component [" + existingDescriptor.getImplementation().getName()
+                                            + "] is being overwritten by component ["
+                                            + descriptor.getImplementation().getName() + "] for Role/Hint [" + roleHint
+                                            + "]. It will not be possible to look it up.");
                                 }
                             }
                         } else {
@@ -177,7 +205,7 @@ public class ComponentAnnotationLoader extends AbstractLogEnabled
     }
 
     /**
-     * Get all components listed in the passed resource files.
+     * Get all components listed in the passed resource file.
      * 
      * @param classLoader the classloader to use to find the resources
      * @param location the name of the resources to look for
@@ -191,19 +219,42 @@ public class ComponentAnnotationLoader extends AbstractLogEnabled
         while (urls.hasMoreElements()) {
             URL url = urls.nextElement();
 
-            // Read all components definition from the URL
-            // Always force UTF-8 as the encoding, since these files are read from the official jars, and those are
-            // generated on an 8-bit system.
-            BufferedReader in = new BufferedReader(new InputStreamReader(url.openStream(), "UTF-8"));
-            String inputLine;
-            while ((inputLine = in.readLine()) != null) {
-                // Make sure we don't add empty lines
-                if (inputLine.trim().length() > 0) {
-                    annotatedClassNames.add(inputLine);
-                }
+            InputStream componentListStream = url.openStream();
+
+            try {
+                annotatedClassNames.addAll(getDeclaredComponents(componentListStream));
+            } finally {
+                componentListStream.close();
             }
-            in.close();
         }
+
+        return annotatedClassNames;
+    }
+
+    /**
+     * Get all components listed in the passed resource stream.
+     * 
+     * @param componentListStream the stream to parse
+     * @return the list of component implementation class names
+     * @throws IOException in case of an error loading the component list resource
+     * @since 2.5M2
+     */
+    public List<String> getDeclaredComponents(InputStream componentListStream) throws IOException
+    {
+        List<String> annotatedClassNames = new ArrayList<String>();
+
+        // Read all components definition from the URL
+        // Always force UTF-8 as the encoding, since these files are read from the official jars, and those are
+        // generated on an 8-bit system.
+        BufferedReader in = new BufferedReader(new InputStreamReader(componentListStream, COMPONENT_LIST_ENCODING));
+        String inputLine;
+        while ((inputLine = in.readLine()) != null) {
+            // Make sure we don't add empty lines
+            if (inputLine.trim().length() > 0) {
+                annotatedClassNames.add(inputLine);
+            }
+        }
+
         return annotatedClassNames;
     }
 }

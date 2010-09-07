@@ -39,10 +39,22 @@ public class CryptoScriptService implements ScriptService
 {
     /** The x509/CMS service. */
     @Requirement
-    public X509CryptoService x509;
+    private X509CryptoService x509;
 
     /** The password encryption and password hashing/protection service. */
     @Requirement
-    public PasswordCryptoService passwd;
+    private PasswordCryptoService passwd;
+
+    /** @return the x509/CMS service. */
+    public X509CryptoService getX509()
+    {
+        return this.x509;
+    }
+
+    /** @return the password encryption and password hashing/protection service. */
+    public PasswordCryptoService getPasswd()
+    {
+        return this.passwd;
+    }
 }
 

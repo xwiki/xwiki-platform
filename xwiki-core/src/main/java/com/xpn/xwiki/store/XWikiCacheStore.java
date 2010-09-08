@@ -187,9 +187,15 @@ public class XWikiCacheStore implements XWikiCacheStoreInterface, EventListener
             // We need to flush so that caches
             // on the cluster are informed about the change
             getCache().remove(key);
-            getCache().set(key, doc);
             getPageExistCache().remove(key);
-            getPageExistCache().set(key, new Boolean(true));
+
+            /*
+             * We do not want to save the document in the cache at this time.
+             * If we did, this would introduce the possibility for cache incoherince if the document is not saved
+             * in the database properly.
+             * In addition, the attachments uploaded to the document stay with it so we want the document in it's
+             * current form to be garbage collected as soon as the request is complete.
+             */
         }
     }
 

@@ -30,6 +30,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
+import java.net.JarURLConnection;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -55,8 +56,6 @@ import java.util.jar.Attributes;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 import java.util.jar.Manifest;
-
-import org.xwiki.classloader.internal.protocol.jar.JarURLConnection;
 
 import edu.emory.mathcs.util.classloader.ResourceHandle;
 import edu.emory.mathcs.util.classloader.ResourceUtils;

@@ -57,7 +57,6 @@ import edu.emory.mathcs.util.classloader.ResourceHandle;
  * 
  * @see java.io.File#toURL
  * @see java.io.File#toURI
- * 
  * @version $Id$d
  * @since 2.0.1
  */
@@ -391,11 +390,13 @@ public class URIClassLoader extends ExtendedURLClassLoader
         {
             this.handlerFactory = handlerFactory;
             try {
-                this.loader = new ResourceLoader(handlerFactory.createURLStreamHandler("jar"));
+                this.loader =
+                    new ResourceLoader(handlerFactory != null ? handlerFactory.createURLStreamHandler("jar") : null);
                 URL[] urls = new URL[uris.length];
                 for (int i = 0; i < uris.length; i++) {
                     urls[i] =
-                        new URL(null, uris[i].toString(), handlerFactory.createURLStreamHandler(uris[i].getScheme()));
+                        new URL(null, uris[i].toString(), handlerFactory != null
+                            ? handlerFactory.createURLStreamHandler(uris[i].getScheme()) : null);
                 }
                 this.urls = urls;
             } catch (MalformedURLException e) {
@@ -406,7 +407,9 @@ public class URIClassLoader extends ExtendedURLClassLoader
         public synchronized void addURI(URI uri)
         {
             try {
-                URL url = new URL(null, uri.toString(), handlerFactory.createURLStreamHandler(uri.getScheme()));
+                URL url =
+                    new URL(null, uri.toString(), handlerFactory != null ? handlerFactory.createURLStreamHandler(uri
+                        .getScheme()) : null);
                 int len = this.urls.length;
                 URL[] urls = new URL[len + 1];
                 System.arraycopy(this.urls, 0, urls, 0, len);

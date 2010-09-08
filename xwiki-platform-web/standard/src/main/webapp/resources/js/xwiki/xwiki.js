@@ -1513,8 +1513,8 @@ document.observe('xwiki:dom:loaded', function() {
 document.observe("xwiki:dom:loaded", function() {
   var menu = $('contentmenu') || $('editmenu'); // Both for view and edit
   var content = $('mainContentArea') || $('mainEditArea'); // Both for view and edit
-  createGhost(menu);
   if (menu && content) {
+    createGhost(menu);
     // Resize the fixed menu when the window width changes
     Event.observe(window, 'resize', function() {
       if (menu.style.position == 'fixed') {

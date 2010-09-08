@@ -178,25 +178,23 @@ public class XWikiCacheStore implements XWikiCacheStoreInterface, EventListener
     public void saveXWikiDoc(XWikiDocument doc, XWikiContext context, boolean bTransaction) throws XWikiException
     {
         String key = getKey(doc, context);
-        synchronized (key) {
-            this.store.saveXWikiDoc(doc, context, bTransaction);
-            doc.setStore(this.store);
-            // Make sure cache is initialized
-            initCache(context);
+        this.store.saveXWikiDoc(doc, context, bTransaction);
+        doc.setStore(this.store);
+        // Make sure cache is initialized
+        initCache(context);
 
-            // We need to flush so that caches
-            // on the cluster are informed about the change
-            getCache().remove(key);
-            getPageExistCache().remove(key);
+        // We need to flush so that caches
+        // on the cluster are informed about the change
+        getCache().remove(key);
+        getPageExistCache().remove(key);
 
-            /*
-             * We do not want to save the document in the cache at this time.
-             * If we did, this would introduce the possibility for cache incoherince if the document is not saved
-             * in the database properly.
-             * In addition, the attachments uploaded to the document stay with it so we want the document in it's
-             * current form to be garbage collected as soon as the request is complete.
-             */
-        }
+        /*
+         * We do not want to save the document in the cache at this time.
+         * If we did, this would introduce the possibility for cache incoherince if the document is not saved
+         * in the database properly.
+         * In addition, the attachments uploaded to the document stay with it so we want the document in it's
+         * current form to be garbage collected as soon as the request is complete.
+         */
     }
 
     public void flushCache()
@@ -226,13 +224,11 @@ public class XWikiCacheStore implements XWikiCacheStoreInterface, EventListener
 
             String key = getKey(doc, context);
 
-            synchronized (key) {
-                if (getCache() != null) {
-                    getCache().remove(key);
-                }
-                if (getPageExistCache() != null) {
-                    getPageExistCache().remove(key);
-                }
+            if (getCache() != null) {
+                getCache().remove(key);
+            }
+            if (getPageExistCache() != null) {
+                getPageExistCache().remove(key);
             }
         }
     }
@@ -273,36 +269,34 @@ public class XWikiCacheStore implements XWikiCacheStoreInterface, EventListener
         // Make sure cache is initialized
         initCache(context);
 
-        synchronized (key) {
+        if (log.isDebugEnabled()) {
+            log.debug("Cache: Trying to get doc " + key + " from cache");
+        }
+
+        XWikiDocument cachedoc = getCache().get(key);
+
+        if (cachedoc != null) {
+            doc = cachedoc;
+            doc.setFromCache(true);
+
             if (log.isDebugEnabled()) {
-                log.debug("Cache: Trying to get doc " + key + " from cache");
+                log.debug("Cache: got doc " + key + " from cache");
+            }
+        } else {
+            if (log.isDebugEnabled()) {
+                log.debug("Cache: Trying to get doc " + key + " for real");
             }
 
-            XWikiDocument cachedoc = getCache().get(key);
+            doc = this.store.loadXWikiDoc(doc, context);
+            doc.setStore(this.store);
 
-            if (cachedoc != null) {
-                doc = cachedoc;
-                doc.setFromCache(true);
-
-                if (log.isDebugEnabled()) {
-                    log.debug("Cache: got doc " + key + " from cache");
-                }
-            } else {
-                if (log.isDebugEnabled()) {
-                    log.debug("Cache: Trying to get doc " + key + " for real");
-                }
-
-                doc = this.store.loadXWikiDoc(doc, context);
-                doc.setStore(this.store);
-
-                if (log.isDebugEnabled()) {
-                    log.debug("Cache: Got doc " + key + " for real");
-                    log.debug("Cache: put doc " + key + " in cache");
-                }
-
-                getCache().set(key, doc);
-                getPageExistCache().set(key, new Boolean(!doc.isNew()));
+            if (log.isDebugEnabled()) {
+                log.debug("Cache: Got doc " + key + " for real");
+                log.debug("Cache: put doc " + key + " in cache");
             }
+
+            getCache().set(key, doc);
+            getPageExistCache().set(key, new Boolean(!doc.isNew()));
         }
 
         if (log.isDebugEnabled()) {
@@ -315,16 +309,15 @@ public class XWikiCacheStore implements XWikiCacheStoreInterface, EventListener
     public void deleteXWikiDoc(XWikiDocument doc, XWikiContext context) throws XWikiException
     {
         String key = getKey(doc, context);
-        synchronized (key) {
-            this.store.deleteXWikiDoc(doc, context);
 
-            // Make sure cache is initialized
-            initCache(context);
+        this.store.deleteXWikiDoc(doc, context);
 
-            getCache().remove(key);
-            getPageExistCache().remove(key);
-            getPageExistCache().set(key, new Boolean(false));
-        }
+        // Make sure cache is initialized
+        initCache(context);
+
+        getCache().remove(key);
+        getPageExistCache().remove(key);
+        getPageExistCache().set(key, new Boolean(false));
     }
 
     public List<String> getClassList(XWikiContext context) throws XWikiException
@@ -753,21 +746,19 @@ public class XWikiCacheStore implements XWikiCacheStoreInterface, EventListener
     {
         String key = getKey(doc, context);
         initCache(context);
-        synchronized (key) {
-            try {
-                Boolean result = getPageExistCache().get(key);
+        try {
+            Boolean result = getPageExistCache().get(key);
 
-                if (result != null) {
-                    return result;
-                }
-            } catch (Exception e) {
+            if (result != null) {
+                return result;
             }
-
-            boolean result = this.store.exists(doc, context);
-            getPageExistCache().set(key, new Boolean(result));
-
-            return result;
+        } catch (Exception e) {
         }
+
+        boolean result = this.store.exists(doc, context);
+        getPageExistCache().set(key, new Boolean(result));
+
+        return result;
     }
 
     public Cache<XWikiDocument> getCache()

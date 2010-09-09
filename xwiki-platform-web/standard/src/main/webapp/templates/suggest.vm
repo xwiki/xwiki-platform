@@ -2,8 +2,8 @@ $response.setContentType("text/xml")
 ##
 #set($classname = $request.get("classname"))
 #set($fieldname = $request.get("fieldname"))
-#set($firCol = $request.get("firCol"))
-#set($secCol = $request.get("secCol"))
+#set($firCol = "$!{request.get('firCol')}")
+#set($secCol = "$!{request.get('secCol')}")
 #set($templatename = $classname + 'Template')
 #set($p = $xwiki.getDocument($classname).getxWikiClass().get($fieldname).getPropertyClass())
 #set($hibquery = "$!p.getSql()")
@@ -13,7 +13,7 @@ $response.setContentType("text/xml")
 ## TODO: What if the user is actually typing in the middle of the input string? The actual word for
 ## which the autocompletion is triggered should be sent from JS.
 ##
-#set($input = $request.get("input").toLowerCase())
+#set($input = "$!{request.get('input').toLowerCase()}")
 #set($sep = "$!{p.getSeparators()}")
 #if($p.isMultiSelect() && ($sep != "")) ### has separators
   #set($input_words = $util.split($input, $sep))
@@ -34,14 +34,14 @@ $response.setContentType("text/xml")
   #end
   #set($whereidx = $hibquery.toLowerCase().indexOf("where"))
   #if($whereidx < 0)
-    #set($like = " where lower("+ $likeCol + ") like '%" + $input + "%'")
+    #set($like = " where lower("+ $likeCol.replaceAll("[^a-zA-Z0-9_.]", "") + ") like ?")
     #set($hibquery = $hibquery.concat($like))
   #else
     #set($whereidx = $whereidx + 5)
-    #set($like = " lower("+ $firCol + ") like '%" + $input + "%' and")
+    #set($like = " lower("+ $firCol.replaceAll("[^a-zA-Z0-9_.]", "") + ") like ? and")
     #set($hibquery = "${hibquery.substring(0, $whereidx)}${like}${hibquery.substring($whereidx)}")
   #end
-  #set($results = $xwiki.search($hibquery, 30, 0))
+  #set($results = $xwiki.search($hibquery, 30, 0, ["%${input}%"]))
   <?xml version="1.0" encoding="UTF-8"?>
   <results type="${resultsType}">
   #foreach($res in $results)
@@ -55,26 +55,26 @@ $response.setContentType("text/xml")
       #end
     #end
     #if(($info != '-') && ($rs != '-'))
-      <rs id="" info="$info">$rs</rs>
+      <rs id="" info="$!{escapetool.xml($info)}">$!{escapetool.xml($rs)}</rs>
     #end
   #end
   </results>
 #else ## hibquery == ""
   ######################### DBListProperty query
   #if($p.isRelationalStorage() && $p.isMultiSelect())
-    #set($query =  "select distinct list from BaseObject as obj, DBStringListProperty as prop join prop.list list where obj.name <> '${templatename}' and obj.className='${classname}' and prop.id.id = obj.id and prop.id.name = '${fieldname}' and lower(list) like '%${input}%'")    
-    #set($queryResult = $xwiki.search($query.toString(), 30, 0))
+    #set($query = "select distinct list from BaseObject as obj, DBStringListProperty as prop join prop.list list where obj.name <> ? and obj.className = ? and prop.id.id = obj.id and prop.id.name = ? and lower(list) like ?")
+    #set($queryResult = $xwiki.search($query, 30, 0, [${templatename}, ${classname}, ${fieldname}, "%${input}%"]))
     #set($results = $queryResult.toArray())
     <?xml version="1.0" encoding="UTF-8"?>
     <results type="3">
     #foreach($res in $results)
-      <rs id="$velocityCount" info="">$res</rs>
+      <rs id="$velocityCount" info="">$!{escapetool.xml($res)}</rs>
     #end
     </results>
   ######################### StringListProperty query
   #elseif($p.isMultiSelect())
-    #set($query =  "select distinct prop.textValue from BaseObject as obj, StringListProperty as prop where obj.name <> '${templatename}' and obj.className='${classname}' and prop.id.id = obj.id   and prop.name = '${fieldname}' and lower(prop.textValue) like '%${input}%'")
-    #set($queryResult = $xwiki.search($query.toString(), 30, 0))
+    #set($query = "select distinct prop.textValue from BaseObject as obj, StringListProperty as prop where obj.name <> ? and obj.className = ? and prop.id.id = obj.id and prop.name = ? and lower(prop.textValue) like ?")
+    #set($queryResult = $xwiki.search($query, 30, 0, [${templatename}, ${classname}, ${fieldname}, "%${input}%"]))
     #set($results = $queryResult.toArray())
     <?xml version="1.0" encoding="UTF-8"?>
     <results type="5">
@@ -82,19 +82,19 @@ $response.setContentType("text/xml")
       #set($list = $p.getListFromString($res, $sep, false))
       #set($list = $list.toArray())
       #foreach($word in $list)
-          <rs id="$velocityCount" info="">$word</rs>
+          <rs id="$velocityCount" info="">$!{escapetool.xml($word)}</rs>
       #end
     #end
     </results>
   ######################### StringProperty query
   #else
-    #set($query =  "select distinct prop.value from BaseObject as obj, StringProperty as prop where obj.className='${classname}' and obj.name<>'${templatename}' and prop.id.id = obj.id and prop.id.name='${fieldname}' and lower(prop.value) like '%${input}%'")
-    #set($queryResult = $xwiki.search($query.toString(), 30, 0))
+    #set($query = "select distinct prop.value from BaseObject as obj, StringProperty as prop where obj.className = ? and obj.name <> ? and prop.id.id = obj.id and prop.id.name = ? and lower(prop.value) like ?")
+    #set($queryResult = $xwiki.search($query.toString(), 30, 0, [${classname}, ${templatename}, ${fieldname}, "%${input}%"]))
     #set($results = $queryResult.toArray())
     <?xml version="1.0" encoding="UTF-8"?>
     <results type="8">
     #foreach($res in $results)
-      <rs id="$velocityCount" info="">$res</rs>
+      <rs id="$velocityCount" info="">$!{escapetool.xml($res)}</rs>
     #end
     </results>
   #end

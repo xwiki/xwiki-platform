@@ -74,7 +74,7 @@
 #end
 ## Check revision option
 #if ($request.rev)
-#set($revparams = "rev=$!{escapetool.xml(${request.rev})}")
+#set($revparams = "rev=$!{escapetool.url(${request.rev})}")
 #else
 #set($revparams = "")
 #end

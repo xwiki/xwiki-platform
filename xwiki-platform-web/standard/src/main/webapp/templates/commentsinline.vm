@@ -110,7 +110,7 @@ $xwiki.ssfx.use('uicomponents/viewers/comments.css', true)
 ##
 ##
 ##
-#macro(displayThread $key $commentThreads)
+#macro(displayThread $key $commentThreads, $commentDoc)
   ## If request parameter replyto is specified then we show the form under that comment.
   #if($replyTo == "$key")
     #displayCommentForm()
@@ -134,7 +134,7 @@ $xwiki.ssfx.use('uicomponents/viewers/comments.css', true)
 ##
 ##
 ##
-#macro(displayComment $comment)
+#macro(displayComment $comment, $commentDoc)
   <div id="xwikicomment_${comment.number}" class="xwikicomment#if($comment.getProperty('author').value == $doc.creator) commentByCreator#end">
     ##<div class="commentavatar">#useravatar($comment.author)</div>
     <div class="commentheader">
@@ -156,7 +156,7 @@ $xwiki.ssfx.use('uicomponents/viewers/comments.css', true)
       #end
       </span>## commenttools
     </div>## commentheader
-    <div class="commentcontent">$doc.display('comment', 'view', $comment)</div>
+    <div class="commentcontent">$commentDoc.getRenderedContent($comment.getProperty('comment').getValue(), $doc.getSyntax().toIdString())</div>
   </div>## xwikicomment
 #end
 ##
@@ -302,7 +302,11 @@ $xwiki.ssfx.use('uicomponents/viewers/comments.css', true)
   #foreach($comment in $comments)
     #addCommentToThreads($comment, $commentThreads, $rootKey)
   #end
-  #displayThread($rootKey, $commentThreads)
+  ##
+  ## Comments will be rendered in the context of this document.
+  #set($commentDoc = $xwiki.getDocument('XWiki.XWikiComments'))
+  ##
+  #displayThread($rootKey, $commentThreads, $commentDoc)
 #else
   <p class="noitems">$msg.get('core.viewers.comments.noComments')</p>
 #end

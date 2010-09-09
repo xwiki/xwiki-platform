@@ -31,7 +31,6 @@ import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.net.URLConnection;
 import java.net.URLDecoder;
 import java.net.URLStreamHandlerFactory;
 import java.security.Permission;
@@ -48,7 +47,7 @@ import java.util.jar.Manifest;
  * @version $Id$
  * @since 2.0.1
  */
-public class JarURLConnection extends java.net.JarURLConnection
+public class JarURLConnection extends java.net.URLConnection
 {
     private URLStreamHandlerFactory handlerFactory;
 
@@ -63,11 +62,6 @@ public class JarURLConnection extends java.net.JarURLConnection
     private URL jarFileURL;
 
     private String entryName;
-
-    /**
-     * The connection to the JAR file URL, if the connection has been initiated. This should be set by connect.
-     */
-    protected URLConnection jarFileURLConnection;
 
     public JarURLConnection(URL url, JarOpener opener, URLStreamHandlerFactory handlerFactory) throws IOException
     {

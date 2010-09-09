@@ -30,7 +30,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
-import java.net.JarURLConnection;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -528,9 +527,16 @@ public class ResourceLoader
                 }
 
                 // load the JAR
-                JarURLConnection conn = (JarURLConnection) base.openConnection();
-                this.perm = conn.getPermission();
-                JarFile jar = conn.getJarFile();
+                URLConnection connection = base.openConnection();
+                this.perm = connection.getPermission();
+                
+                JarFile jar;
+                if (connection instanceof org.xwiki.classloader.internal.protocol.jar.JarURLConnection) {
+                    jar =  ((org.xwiki.classloader.internal.protocol.jar.JarURLConnection)connection).getJarFile();
+                } else {
+                    jar =  ((java.net.JarURLConnection)connection).getJarFile();
+                }
+
                 // conservatively check if index is accurate, that is, does not
                 // contain entries which are not in the JAR file
                 if (index != null) {

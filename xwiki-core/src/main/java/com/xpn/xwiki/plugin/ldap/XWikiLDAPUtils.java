@@ -418,6 +418,10 @@ public class XWikiLDAPUtils
                         groupMembers = members;
                         cache.set(groupDN, groupMembers);
                     }
+                } else {
+                    if (LOG.isDebugEnabled()) {
+                        LOG.debug("Found cache entry for group [" + groupDN + "]");
+                    }
                 }
             }
         } catch (CacheException e) {

@@ -1008,17 +1008,13 @@ div#xwikiobjects input[type="checkbox"], div#xwikiclassproperties input[type="ch
 
 .actionmenu .tmCreate {
   background-color: #4D9244; /* $theme.buttonPrimaryBackgroundColor */
-  bottom: -4px;
   margin-right: 2em;
   padding-left: 10px;
   position: relative;
-  top: 0;
 }
 
 .tmCreate .submenu {
   margin-left: -15px;
-  margin-top: -4px;
-  padding-top: 5px;
 }
 
 /* Icons */

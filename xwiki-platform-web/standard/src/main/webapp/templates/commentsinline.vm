@@ -304,7 +304,8 @@ $xwiki.ssfx.use('uicomponents/viewers/comments.css', true)
   #end
   ##
   ## Comments will be rendered in the context of this document.
-  #set($commentDoc = $xwiki.getDocument('XWiki.XWikiComments'))
+  ## api.XWiki.createDocument has no author and is thus has no permissions.
+  #set($commentDoc = $xwiki.createDocument())
   ##
   #displayThread($rootKey, $commentThreads, $commentDoc)
 #else

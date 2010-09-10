@@ -11,8 +11,8 @@
 <customClass></customClass>
 <contentAuthor>XWiki.Admin</contentAuthor>
 <creationDate>1274890129000</creationDate>
-<date>1274890177000</date>
-<contentUpdateDate>1274890177000</contentUpdateDate>
+<date>1284044519000</date>
+<contentUpdateDate>1284044519000</contentUpdateDate>
 <version>1.1</version>
 <title>#if("$!{request.text}"=="")$msg.get("search.page.database.title.noquery")#else$msg.get("search.page.database.title.query", [$request.text])#end</title>
 <template></template>
@@ -160,7 +160,7 @@ $xwiki.ssfx.use("uicomponents/search/search.css", true)##
       #set($rssURL = $xwiki.getURL($doc.fullName, 'view', "xpage=plain&amp;amp;outputSyntax=plain&amp;space=${selectedSpace}&amp;text=${utext}"))
     #end
     {{html}}
-      &lt;a href="${rssURL}"&gt;&lt;img src="$xwiki.getSkinFile("icons/silk/feed.gif")" alt="RSS icon"/&gt;$msg.get("search.rss", ["[$text]"])&lt;/a&gt;
+      &lt;a href="${rssURL}"&gt;&lt;img src="$xwiki.getSkinFile("icons/silk/feed.gif")" alt="RSS icon"/&gt;$msg.get("search.rss", ["[$escapetool.xml($text)]"])&lt;/a&gt;
     {{/html}}
   #end
 #end

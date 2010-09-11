@@ -100,15 +100,6 @@
 &lt;div&gt;$msg.get("xe.panels.rights.welcome")&lt;/div&gt;
 &lt;div&gt;$msg.get("xe.panels.rights.explanation")&lt;/div&gt;
 &lt;div&gt;&lt;strong&gt;$msg.get("xe.panels.rights.warning")&lt;/strong&gt; $msg.get("xe.panels.rights.noauthentication")&lt;/div&gt;
-#if($xwiki.rightsmanager.defaultUi == "stable")
-&lt;form id="objectadd" method="post" action="$doc.getURL("objectadd")" onsubmit="cancelCancelEdit()"&gt;
-&lt;div class="centered padded"&gt;
-&lt;input type="hidden" name="xredirect" value="$doc.getURL("edit", "editor=rights")"/&gt;
-&lt;input type="hidden" name="classname" value="$class.name"/&gt;
-&lt;input type="submit" value="$msg.get("addrightentry")" class="button"/&gt;
-&lt;/div&gt;
-&lt;/form&gt;
-#end
 #panelfooter()</content>
 </property>
 <property>

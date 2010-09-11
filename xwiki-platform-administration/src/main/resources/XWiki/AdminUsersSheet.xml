@@ -26,14 +26,6 @@
 #set($formname = "update")
 #set($saveaction = "save")
 ##
-## set the new interface from xwiki.cfg
-##
-#set($interface = $xwiki.rightsmanager.defaultUi)
-##############################
-## display the new interface
-##############################
-#if($interface == "new")
-##
 ## inject needed JS and CSS files
 ##
 #set($ok = $xwiki.jsfx.use("js/xwiki/lightbox/lightbox.js", true))
@@ -124,12 +116,5 @@
    &lt;/script&gt;
   {/pre}
 &lt;/div&gt; ## end of xwikieditcontent
-##############################
-## display the old interface
-##############################
-#else 
- &lt;div id="xwikieditcontent"&gt;
-  &lt;p&gt;$xwiki.parseMessage("editusersredirect")&lt;/p&gt;
- &lt;/div&gt;
-#end</content>
+</content>
 </xwikidoc>

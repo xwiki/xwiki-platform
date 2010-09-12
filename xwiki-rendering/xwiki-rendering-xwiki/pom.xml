@@ -54,6 +54,12 @@
       <artifactId>xwiki-core-script</artifactId>
       <version>${pom.version}</version>
     </dependency>
+    <dependency>
+      <!-- For parsing the CSS from the style attribute. -->
+      <groupId>net.sourceforge.cssparser</groupId>
+      <artifactId>cssparser</artifactId>
+      <version>0.9.5</version>
+    </dependency>
     <!-- Testing dependencies -->
     <dependency>
       <groupId>org.xwiki.platform</groupId>

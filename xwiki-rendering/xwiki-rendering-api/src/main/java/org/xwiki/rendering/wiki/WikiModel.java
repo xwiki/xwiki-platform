@@ -19,13 +19,15 @@
  */
 package org.xwiki.rendering.wiki;
 
+import java.util.Map;
+
 import org.xwiki.component.annotation.ComponentRole;
 
 /**
  * Bridge between the Rendering module and a Wiki Model. Contains wiki APIs required by Rendering classes such as
- * Renderers. For example the XHTML Link Renderer needs to know if a wiki document exists in order to know how to 
- * generate the HTML (in order to display a question mark for non existing documents) and it also needs to get the
- * URL pointing the wiki document. 
+ * Renderers. For example the XHTML Link Renderer needs to know if a wiki document exists in order to know how to
+ * generate the HTML (in order to display a question mark for non existing documents) and it also needs to get the URL
+ * pointing the wiki document.
  * 
  * @version $Id$
  * @since 2.0M1
@@ -34,36 +36,48 @@ import org.xwiki.component.annotation.ComponentRole;
 public interface WikiModel
 {
     /**
-     * @param documentName the document name of the document containing the attachment. The syntax used depends on 
-     *        the underlying wiki system used. For example for XWiki a valid documentName would be 
-     *        {@code wiki:Space.Page}
+     * @param documentName the document name of the document containing the attachment. The syntax used depends on the
+     *            underlying wiki system used. For example for XWiki a valid documentName would be
+     *            {@code wiki:Space.Page}
      * @param attachmentName the name of the attachment in the passed document wikip page
      * @return the URL to the attachment
      */
     String getAttachmentURL(String documentName, String attachmentName);
 
     /**
-     * @param documentName the document name as a String. The syntax used depends on 
-     *        the underlying wiki system used. For example for XWiki a valid documentName would be 
-     *        {@code wiki:Space.Page}
+     * Generate image specific URL. The difference with {@link #getAttachmentURL(String, String)} is that in some
+     * implementation we want to make a distinction between displayed image and a simple link targeting an attachment
+     * file.
+     *
+     * @param documentName the document name of the document containing the attachment. The syntax used depends on the
+     *            underlying wiki system used. For example for XWiki a valid documentName would be
+     *            {@code wiki:Space.Page}
+     * @param attachmentName the name of the attachment in the passed document wiki page
+     * @param parameters custom parameters
+     * @return the URL to the image
+     * @since 2.5M2
+     */
+    String getImageURL(String documentName, String attachmentName, Map<String, String> parameters);
+
+    /**
+     * @param documentName the document name as a String. The syntax used depends on the underlying wiki system used.
+     *            For example for XWiki a valid documentName would be {@code wiki:Space.Page}
      * @return true if the document exists and can be viewed or false otherwise
      */
     boolean isDocumentAvailable(String documentName);
 
     /**
-     * @param documentName the document name as a String. The syntax used depends on 
-     *        the underlying wiki system used. For example for XWiki a valid documentName would be 
-     *        {@code wiki:Space.Page}
+     * @param documentName the document name as a String. The syntax used depends on the underlying wiki system used.
+     *            For example for XWiki a valid documentName would be {@code wiki:Space.Page}
      * @param anchor an anchor pointing to some place inside the document or null
      * @param queryString a query string specifying some parameters or null
      * @return the URL to view the specified wiki document
      */
     String getDocumentViewURL(String documentName, String anchor, String queryString);
-    
+
     /**
-     * @param documentName the document name as a String. The syntax used depends on 
-     *        the underlying wiki system used. For example for XWiki a valid documentName would be 
-     *        {@code wiki:Space.Page}
+     * @param documentName the document name as a String. The syntax used depends on the underlying wiki system used.
+     *            For example for XWiki a valid documentName would be {@code wiki:Space.Page}
      * @param anchor an anchor pointing to some place inside the document or null
      * @param queryString a query string specifying some parameters or null
      * @return the URL to edit the specified wiki document

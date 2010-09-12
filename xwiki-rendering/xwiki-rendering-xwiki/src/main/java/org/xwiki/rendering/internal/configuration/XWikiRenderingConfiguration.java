@@ -19,12 +19,12 @@
  */
 package org.xwiki.rendering.internal.configuration;
 
+import java.util.Properties;
+
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.Requirement;
 import org.xwiki.configuration.ConfigurationSource;
 import org.xwiki.rendering.configuration.RenderingConfiguration;
-
-import java.util.Properties;
 
 /**
  * All configuration options for the rendering subsystem.
@@ -46,7 +46,7 @@ public class XWikiRenderingConfiguration implements RenderingConfiguration
     private static final String DEFAULT_LINK_LABEL_FORMAT = "%p";
 
     /**
-     * Defines from where to read the rendering configuration data. 
+     * Defines from where to read the rendering configuration data.
      */
     @Requirement
     private ConfigurationSource configuration;
@@ -58,16 +58,46 @@ public class XWikiRenderingConfiguration implements RenderingConfiguration
      */
     public String getLinkLabelFormat()
     {
-      return this.configuration.getProperty(PREFIX + "linkLabelFormat", DEFAULT_LINK_LABEL_FORMAT);
+        return this.configuration.getProperty(PREFIX + "linkLabelFormat", DEFAULT_LINK_LABEL_FORMAT);
     }
 
     /**
      * {@inheritDoc}
-     *
+     * 
      * @see org.xwiki.rendering.configuration.RenderingConfiguration#getMacroCategories()
      */
     public Properties getMacroCategories()
     {
         return this.configuration.getProperty(PREFIX + "macroCategories", Properties.class);
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see org.xwiki.rendering.configuration.RenderingConfiguration#getImageWidthLimit()
+     */
+    public int getImageWidthLimit()
+    {
+        return this.configuration.getProperty(PREFIX + "imageWidthLimit", -1);
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see org.xwiki.rendering.configuration.RenderingConfiguration#getImageHeightLimit()
+     */
+    public int getImageHeightLimit()
+    {
+        return this.configuration.getProperty(PREFIX + "imageHeightLimit", -1);
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see org.xwiki.rendering.configuration.RenderingConfiguration#isIncludeImageDimensionsInImageURL()
+     */
+    public boolean isIncludeImageDimensionsInImageURL()
+    {
+        return this.configuration.getProperty(PREFIX + "includeImageDimensionsInImageURL", true);
     }
 }

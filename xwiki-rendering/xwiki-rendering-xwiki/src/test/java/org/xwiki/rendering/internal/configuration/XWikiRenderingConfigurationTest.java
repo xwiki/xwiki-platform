@@ -22,9 +22,9 @@ package org.xwiki.rendering.internal.configuration;
 import java.util.Properties;
 
 import org.jmock.Expectations;
-import org.xwiki.configuration.ConfigurationSource;
 import org.junit.Assert;
 import org.junit.Test;
+import org.xwiki.configuration.ConfigurationSource;
 import org.xwiki.test.AbstractMockingComponentTestCase;
 import org.xwiki.test.annotation.MockingRequirement;
 
@@ -43,10 +43,13 @@ public class XWikiRenderingConfigurationTest extends AbstractMockingComponentTes
     public void testGetLinkLabelFormat() throws Exception
     {
         final ConfigurationSource source = getComponentManager().lookup(ConfigurationSource.class);
-        getMockery().checking(new Expectations() {{
-            allowing(source).getProperty("rendering.linkLabelFormat", "%p");
+        getMockery().checking(new Expectations()
+        {
+            {
+                allowing(source).getProperty("rendering.linkLabelFormat", "%p");
                 will(returnValue("%p"));
-        }});
+            }
+        });
 
         Assert.assertEquals("%p", this.configuration.getLinkLabelFormat());
     }
@@ -55,12 +58,60 @@ public class XWikiRenderingConfigurationTest extends AbstractMockingComponentTes
     public void testGetMacroCategories() throws Exception
     {
         final ConfigurationSource source = getComponentManager().lookup(ConfigurationSource.class);
-        getMockery().checking(new Expectations() {{
-            allowing(source).getProperty("rendering.macroCategories", Properties.class);
+        getMockery().checking(new Expectations()
+        {
+            {
+                allowing(source).getProperty("rendering.macroCategories", Properties.class);
                 will(returnValue(new Properties()));
-        }});
+            }
+        });
 
         Assert.assertNotNull(this.configuration.getMacroCategories());
         Assert.assertEquals(0, this.configuration.getMacroCategories().size());
+    }
+
+    @Test
+    public void testGetImageWidthLimit() throws Exception
+    {
+        final ConfigurationSource source = getComponentManager().lookup(ConfigurationSource.class);
+        getMockery().checking(new Expectations()
+        {
+            {
+                allowing(source).getProperty("rendering.imageWidthLimit", -1);
+                will(returnValue(100));
+            }
+        });
+
+        Assert.assertEquals(100, this.configuration.getImageWidthLimit());
+    }
+
+    @Test
+    public void testGetImageHeightLimit() throws Exception
+    {
+        final ConfigurationSource source = getComponentManager().lookup(ConfigurationSource.class);
+        getMockery().checking(new Expectations()
+        {
+            {
+                allowing(source).getProperty("rendering.imageHeightLimit", -1);
+                will(returnValue(150));
+            }
+        });
+
+        Assert.assertEquals(150, this.configuration.getImageHeightLimit());
+    }
+
+    @Test
+    public void testIsIncludeImageDimensionsInImageURL() throws Exception
+    {
+        final ConfigurationSource source = getComponentManager().lookup(ConfigurationSource.class);
+        getMockery().checking(new Expectations()
+        {
+            {
+                allowing(source).getProperty("rendering.includeImageDimensionsInImageURL", true);
+                will(returnValue(false));
+            }
+        });
+
+        Assert.assertFalse(this.configuration.isIncludeImageDimensionsInImageURL());
     }
 }

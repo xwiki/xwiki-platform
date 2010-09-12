@@ -42,10 +42,9 @@ import org.xwiki.rendering.wiki.WikiModel;
  * Default implementation for rendering images as XHTML. We handle both cases:
  * <ul>
  * <li>when inside a wiki (ie when an implementation of {@link WikiModel} is provided.</li>
- * <li>when outside of a wiki. In this case we only handle external images and document images don't 
- *     display anything.</li>
+ * <li>when outside of a wiki. In this case we only handle external images and document images don't display anything.</li>
  * </ul>
- * 
+ *
  * @version $Id$
  * @since 2.0M3
  */
@@ -68,6 +67,7 @@ public class DefaultXHTMLImageRenderer implements XHTMLImageRenderer, Initializa
 
     /**
      * {@inheritDoc}
+     *
      * @see Initializable#initialize()
      */
     public void initialize() throws InitializationException
@@ -83,7 +83,7 @@ public class DefaultXHTMLImageRenderer implements XHTMLImageRenderer, Initializa
 
     /**
      * {@inheritDoc}
-     * 
+     *
      * @see XHTMLImageRenderer#setXHTMLWikiPrinter(XHTMLWikiPrinter)
      */
     public void setXHTMLWikiPrinter(XHTMLWikiPrinter printer)
@@ -103,7 +103,7 @@ public class DefaultXHTMLImageRenderer implements XHTMLImageRenderer, Initializa
 
     /**
      * {@inheritDoc}
-     * 
+     *
      * @see XHTMLImageRenderer#onImage(Image, boolean, Map)
      */
     public void onImage(Image image, boolean isFreeStandingURI, Map<String, String> parameters)
@@ -118,8 +118,9 @@ public class DefaultXHTMLImageRenderer implements XHTMLImageRenderer, Initializa
             // that would not honor this contract.
             if (this.wikiModel != null) {
                 DocumentImage documentImage = DocumentImage.class.cast(image);
-                imageURL = this.wikiModel.getAttachmentURL(documentImage.getDocumentName(),
-                    documentImage.getAttachmentName());
+                imageURL =
+                    this.wikiModel.getImageURL(documentImage.getDocumentName(), documentImage.getAttachmentName(),
+                        parameters);
             } else {
                 throw new RuntimeException("Invalid Image type. In non wiki mode, all image types must be URL images.");
             }

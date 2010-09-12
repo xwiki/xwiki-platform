@@ -45,6 +45,21 @@ public class DefaultRenderingConfiguration implements RenderingConfiguration
     private Properties macroCategories = new Properties();
 
     /**
+     * @see #getImageWidthLimit()
+     */
+    private int imageWidthLimit = -1;
+
+    /**
+     * @see #getImageHeightLimit()
+     */
+    private int imageHeightLimit = -1;
+
+    /**
+     * @see #isIncludeImageDimensionsInImageURL()
+     */
+    private boolean includeImageDimensionsInImageURL = true;
+
+    /**
      * {@inheritDoc}
      * 
      * @see org.xwiki.rendering.configuration.RenderingConfiguration#getLinkLabelFormat()
@@ -83,5 +98,67 @@ public class DefaultRenderingConfiguration implements RenderingConfiguration
         // This method is useful for those using the XWiki Rendering in standalone mode since it allows the rendering
         // to work even without a configuration store.
         this.macroCategories.setProperty(macroId.toString(), category);
+    }
+
+    /**
+     * {@inheritDoc}
+     *
+     * @see org.xwiki.rendering.configuration.RenderingConfiguration#getImageWidthLimit()
+     */
+    public int getImageWidthLimit()
+    {
+        return this.imageWidthLimit;
+    }
+
+    /**
+     * @param imageWidthLimit the maximum image width when there's no user supplied width
+     */
+    public void setImageWidthLimit(int imageWidthLimit)
+    {
+        // This method is useful for those using the XWiki Rendering in standalone mode since it allows the rendering
+        // to work even without a configuration store.
+        this.imageWidthLimit = imageWidthLimit;
+    }
+
+    /**
+     * {@inheritDoc}
+     *
+     * @see org.xwiki.rendering.configuration.RenderingConfiguration#getImageHeightLimit()
+     */
+    public int getImageHeightLimit()
+    {
+        return this.imageHeightLimit;
+    }
+
+    /**
+     * @param imageHeightLimit the maximum image height when there's no user supplied height
+     */
+    public void setImageHeightLimit(int imageHeightLimit)
+    {
+        // This method is useful for those using the XWiki Rendering in standalone mode since it allows the rendering
+        // to work even without a configuration store.
+        this.imageHeightLimit = imageHeightLimit;
+    }
+
+    /**
+     * {@inheritDoc}
+     *
+     * @see org.xwiki.rendering.configuration.RenderingConfiguration#isIncludeImageDimensionsInImageURL()
+     */
+    public boolean isIncludeImageDimensionsInImageURL()
+    {
+        return this.includeImageDimensionsInImageURL;
+    }
+
+    /**
+     * @param includeImageDimensionsInImageURL {@code true} to include image dimensions extracted from the image
+     *            parameters in the image URL so that the image can be resized on the server side before being
+     *            downloaded, {@code false} otherwise
+     */
+    public void setIncludeImageDimensionsInImageURL(boolean includeImageDimensionsInImageURL)
+    {
+        // This method is useful for those using the XWiki Rendering in standalone mode since it allows the rendering
+        // to work even without a configuration store.
+        this.includeImageDimensionsInImageURL = includeImageDimensionsInImageURL;
     }
 }

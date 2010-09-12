@@ -62,6 +62,31 @@
 # rendering.macroCategories = toc:My Category
 # rendering.macroCategories = script:My Other Category
 
+#-# [Since 2.5M2]
+#-# Sepecifies whether the image dimensions should be extracted from the image parameters and included in the image URL
+#-# or not. When image dimensions are included in the image URL the image can be resized on the server side before being
+#-# downloaded, improving thus the page loading speed.
+#-#
+#-# Default value is true.
+# rendering.includeImageDimensionsInImageURL = true
+
+#-# [Since 2.5M2]
+#-# One way to improve page load speed is to resize images on the server side just before rendering the page. The 
+#-# rendering module can use the image width provided by the user to scale the image (See
+#-# rendering.includeImageDimensionsInImageURL configuration parameter). When the user doesn't specify the image width
+#-# the rendering module can limit the width of the image based on this configuration parameter.
+#-#
+#-# The default value is -1 which means image width is not limited by default. Use a value greater than 0 to limit the
+#-# image width (pixels). Note that the aspect ratio is kept even when both the width and the height of the image are
+#-# limited.
+# rendering.imageWidthLimit = 1024
+# rendering.imageWidthLimit = -1
+
+#-# [Since 2.5M2]
+#-# See rendering.imageWidthLimit
+# rendering.imageHeightLimit = 768
+# rendering.imageHeightLimit = -1
+
 #-------------------------------------------------------------------------------------
 # Cache
 #-------------------------------------------------------------------------------------

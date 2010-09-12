@@ -19,6 +19,8 @@
  */
 package org.xwiki.rendering.scaffolding;
 
+import java.util.Map;
+
 import org.xwiki.component.descriptor.ComponentDescriptor;
 import org.xwiki.component.descriptor.DefaultComponentDescriptor;
 import org.xwiki.rendering.wiki.WikiModel;
@@ -54,6 +56,16 @@ public class MockWikiModel implements WikiModel
     public String getAttachmentURL(String documentName, String attachmentName)
     {
         return "attachmenturl";
+    }
+
+    /**
+     * {@inheritDoc}
+     *
+     * @see WikiModel#getImageURL(String, String, Map)
+     */
+    public String getImageURL(String documentName, String attachmentName, Map<String, String> parameters)
+    {
+        return getAttachmentURL(documentName, attachmentName);
     }
 
     /**

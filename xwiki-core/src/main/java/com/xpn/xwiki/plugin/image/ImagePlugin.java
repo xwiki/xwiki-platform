@@ -41,6 +41,7 @@ import com.xpn.xwiki.api.Api;
 import com.xpn.xwiki.doc.XWikiAttachment;
 import com.xpn.xwiki.plugin.XWikiDefaultPlugin;
 import com.xpn.xwiki.plugin.XWikiPluginInterface;
+import com.xpn.xwiki.web.Utils;
 
 /**
  * @version $Id$
@@ -77,7 +78,7 @@ public class ImagePlugin extends XWikiDefaultPlugin
     /**
      * The object used to process images.
      */
-    private final ImageProcessor imageProcessor = new ImageProcessor();
+    private final ImageProcessor imageProcessor = Utils.getComponent(ImageProcessor.class);
 
     /**
      * Creates a new instance of this plugin.
@@ -245,10 +246,10 @@ public class ImagePlugin extends XWikiDefaultPlugin
      * Transforms the given image (i.e. shrinks the image and changes its quality) before it is downloaded.
      * 
      * @param image the image to be downloaded
-     * @param width the desired image width; use a value less than or equal to 0 to preserve image aspect ratio; if this
-     *            is greater than the current width then the image is not resized
-     * @param height the desired image height; use a value less than or equal to 0 to preserve image aspect ratio; if
-     *            this is greater than the current height then the image is not resized
+     * @param width the desired image width; this value is taken into account only if it is greater than zero and less
+     *            than the current image width
+     * @param height the desired image height; this value is taken into account only if it is greater than zero and less
+     *            than the current image height
      * @param quality the desired compression quality
      * @param context the XWiki context
      * @return the transformed image
@@ -257,20 +258,23 @@ public class ImagePlugin extends XWikiDefaultPlugin
     private XWikiAttachment downloadImage(XWikiAttachment image, int width, int height, float quality,
         XWikiContext context) throws Exception
     {
+        boolean keepAspectRatio = Boolean.valueOf(context.getRequest().getParameter("keepAspectRatio"));
         if (imageCache == null) {
             initCache(context);
             if (imageCache == null) {
-                return shrinkImage(image, width, height, quality, context);
+                return shrinkImage(image, width, height, keepAspectRatio, quality, context);
             }
         }
-        String key = String.format("%s-%s-%s-%s-%s", image.getId(), image.getVersion(), width, height, quality);
+        String key =
+            String.format("%s;%s;%s;%s;%s;%s", image.getId(), image.getVersion(), width, height, keepAspectRatio,
+                quality);
         byte[] data = imageCache.get(key);
         XWikiAttachment thumbnail;
         if (data != null) {
             thumbnail = (XWikiAttachment) image.clone();
             thumbnail.setContent(new ByteArrayInputStream(data), data.length);
         } else {
-            thumbnail = shrinkImage(image, width, height, quality, context);
+            thumbnail = shrinkImage(image, width, height, keepAspectRatio, quality, context);
             imageCache.set(key, thumbnail.getContent(context));
         }
         return thumbnail;
@@ -281,24 +285,28 @@ public class ImagePlugin extends XWikiDefaultPlugin
      * compression quality. This helps decreasing the time needed to download the image attachment.
      * 
      * @param attachment the image to be shrunk
-     * @param requestedWidth the requested width; use a value less than or equal to 0 to preserve image aspect ratio; if
-     *            this is greater than the current width then the image is not resized
-     * @param requestedHeight the requested height; use a value less than or equal to 0 to preserve image aspect ratio;
-     *            if this is greater than the current height then the image is not resized
+     * @param requestedWidth the desired image width; this value is taken into account only if it is greater than zero
+     *            and less than the current image width
+     * @param requestedHeight the desired image height; this value is taken into account only if it is greater than zero
+     *            and less than the current image height
+     * @param keepAspectRatio {@code true} to preserve the image aspect ratio even when both requested dimensions are
+     *            properly specified (in this case the image will be resized to best fit the rectangle with the
+     *            requested width and height), {@code false} otherwise
      * @param requestedQuality the desired compression quality
      * @param context the XWiki context
      * @return the modified image attachment
      * @throws Exception if shrinking the image fails
      */
     private XWikiAttachment shrinkImage(XWikiAttachment attachment, int requestedWidth, int requestedHeight,
-        float requestedQuality, XWikiContext context) throws Exception
+        boolean keepAspectRatio, float requestedQuality, XWikiContext context) throws Exception
     {
         Image image = imageProcessor.readImage(attachment.getContentInputStream(context));
 
         // Compute the new image dimension.
         int currentWidth = image.getWidth(null);
         int currentHeight = image.getHeight(null);
-        int[] dimensions = reduceImageDimensions(currentWidth, currentHeight, requestedWidth, requestedHeight);
+        int[] dimensions =
+            reduceImageDimensions(currentWidth, currentHeight, requestedWidth, requestedHeight, keepAspectRatio);
 
         float quality = requestedQuality;
         if (quality < 0) {
@@ -332,37 +340,47 @@ public class ImagePlugin extends XWikiDefaultPlugin
      * 
      * @param currentWidth the current image width
      * @param currentHeight the current image height
-     * @param requestedWidth the desired image width; use a value less than or equal to 0 to preserve image aspect
-     *            ratio; if this is greater than the current width then the image is not resized
-     * @param requestedHeight the desired image height; use a value less than or equal to 0 to preserve image aspect
-     *            ratio; if this is greater than the current width then the image is not resized
+     * @param requestedWidth the desired image width; this value is taken into account only if it is greater than zero
+     *            and less than the current image width
+     * @param requestedHeight the desired image height; this value is taken into account only if it is greater than zero
+     *            and less than the current image height
+     * @param keepAspectRatio {@code true} to preserve the image aspect ratio even when both requested dimensions are
+     *            properly specified (in this case the image will be resized to best fit the rectangle with the
+     *            requested width and height), {@code false} otherwise
      * @return new width and height values
      */
-    private int[] reduceImageDimensions(int currentWidth, int currentHeight, int requestedWidth, int requestedHeight)
+    private int[] reduceImageDimensions(int currentWidth, int currentHeight, int requestedWidth, int requestedHeight,
+        boolean keepAspectRatio)
     {
         double aspectRatio = (double) currentWidth / (double) currentHeight;
 
         int width = currentWidth;
         int height = currentHeight;
 
-        if (requestedWidth > 0 && requestedHeight > 0) {
-            // Both width and height are specified.
-            if (requestedWidth < currentWidth && requestedHeight < currentHeight) {
-                width = requestedWidth;
-                height = requestedHeight;
-            }
-        } else if (requestedWidth > 0) {
-            // Only width is specified.
-            if (requestedWidth < currentWidth) {
-                width = requestedWidth;
-                height = (int) (requestedWidth / aspectRatio);
-            }
-        } else if (requestedHeight > 0) {
-            // Only height is specified.
-            if (requestedHeight < currentHeight) {
+        if (requestedWidth <= 0 || requestedWidth >= currentWidth) {
+            // Ignore the requested width. Check the requested height.
+            if (requestedHeight > 0 && requestedHeight < currentHeight) {
+                // Reduce the height, keeping aspect ratio.
                 width = (int) (requestedHeight * aspectRatio);
                 height = requestedHeight;
             }
+        } else if (requestedHeight <= 0 || requestedHeight >= currentHeight) {
+            // Ignore the requested height. Reduce the width, keeping aspect ratio.
+            width = requestedWidth;
+            height = (int) (requestedWidth / aspectRatio);
+        } else if (keepAspectRatio) {
+            // Reduce the width and check if the corresponding height is less than the requested height.
+            width = requestedWidth;
+            height = (int) (requestedWidth / aspectRatio);
+            if (height > requestedHeight) {
+                // We have to reduce the height instead and compute the width based on it.
+                width = (int) (requestedHeight * aspectRatio);
+                height = requestedHeight;
+            }
+        } else {
+            // Reduce both width and height, possibly loosing aspect ratio.
+            width = requestedWidth;
+            height = requestedHeight;
         }
 
         return new int[] {width, height};

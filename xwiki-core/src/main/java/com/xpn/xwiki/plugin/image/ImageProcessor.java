@@ -20,32 +20,22 @@
  */
 package com.xpn.xwiki.plugin.image;
 
-import java.awt.Graphics2D;
 import java.awt.Image;
-import java.awt.RenderingHints;
-import java.awt.image.BufferedImage;
 import java.awt.image.RenderedImage;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.util.Arrays;
-import java.util.Iterator;
 
-import javax.imageio.IIOImage;
-import javax.imageio.ImageIO;
-import javax.imageio.ImageWriteParam;
-import javax.imageio.ImageWriter;
-import javax.imageio.plugins.jpeg.JPEGImageWriteParam;
-import javax.imageio.stream.ImageOutputStream;
+import org.xwiki.component.annotation.ComponentRole;
 
 /**
  * Component used to process images.
- * <p>
- * TODO: Make this a real component.
  * 
  * @version $Id$
+ * @since 2.5M2
  */
-public class ImageProcessor
+@ComponentRole
+public interface ImageProcessor
 {
     /**
      * Reads an image from an input stream.
@@ -54,10 +44,7 @@ public class ImageProcessor
      * @return the read image
      * @throws IOException if reading the image fails
      */
-    public Image readImage(InputStream inputStream) throws IOException
-    {
-        return ImageIO.read(inputStream);
-    }
+    Image readImage(InputStream inputStream) throws IOException;
 
     /**
      * Encodes the given image to match the specified mime type, if possible, and writes it to the output stream, using
@@ -70,34 +57,7 @@ public class ImageProcessor
      * @param out the output stream to write the image to
      * @throws IOException if writing the image fails
      */
-    public void writeImage(RenderedImage image, String mimeType, float quality, OutputStream out) throws IOException
-    {
-        if ("image/jpeg".equals(mimeType)) {
-            // Find a JPEG writer.
-            ImageWriter writer = null;
-            Iterator<ImageWriter> iter = ImageIO.getImageWritersByMIMEType(mimeType);
-            if (iter.hasNext()) {
-                writer = (ImageWriter) iter.next();
-            }
-            JPEGImageWriteParam iwp = new JPEGImageWriteParam(null);
-            iwp.setCompressionMode(ImageWriteParam.MODE_EXPLICIT);
-            iwp.setCompressionQuality(quality);
-
-            // Prepare output file.
-            ImageOutputStream ios = ImageIO.createImageOutputStream(out);
-            writer.setOutput(ios);
-
-            // Write the image.
-            writer.write(null, new IIOImage(image, null, null), iwp);
-
-            // Cleanup.
-            ios.flush();
-            writer.dispose();
-            ios.close();
-        } else {
-            ImageIO.write(image, "png", out);
-        }
-    }
+    void writeImage(RenderedImage image, String mimeType, float quality, OutputStream out) throws IOException;
 
     /**
      * Scales the given image to the specified dimensions.
@@ -107,26 +67,11 @@ public class ImageProcessor
      * @param height the new image height
      * @return the scaled image
      */
-    public RenderedImage scaleImage(Image image, int width, int height)
-    {
-        // Draw the given image to a buffered image object and scale it to the new size on-the-fly.
-        BufferedImage bufferedImage = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
-        Graphics2D graphics2D = bufferedImage.createGraphics();
-        graphics2D.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BICUBIC);
-        // We should test the return code here because an exception can be throw but caught.
-        if (!graphics2D.drawImage(image, 0, 0, width, height, null)) {
-            // Conversion failed.
-            throw new RuntimeException("Failed to resize image.");
-        }
-        return bufferedImage;
-    }
+    RenderedImage scaleImage(Image image, int width, int height);
 
     /**
      * @param mimeType the mime type to be checked
      * @return {@code true} if the given mime type is supported, {@code false} otherwise
      */
-    public boolean isMimeTypeSupported(String mimeType)
-    {
-        return Arrays.asList(ImageIO.getReaderMIMETypes()).contains(mimeType);
-    }
+    boolean isMimeTypeSupported(String mimeType);
 }

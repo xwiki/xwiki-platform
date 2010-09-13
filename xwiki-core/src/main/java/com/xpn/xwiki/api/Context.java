@@ -34,7 +34,7 @@ import com.xpn.xwiki.web.XWikiURLFactory;
 /**
  * The <code>Context</code> class represents a secure proxy for the XWiki context, which in turn represents the
  * execution environment for all the wiki pages. An instance of the <code>Context</code> class is available as a
- * predefined variable for scripting inside any wiki page. You can access it using <code>$context</code> in Velocity
+ * predefined variable for scripting inside any wiki page. You can access it using <code>$xcontext</code> in Velocity
  * scripts or simply <code>xcontext</code> in Groovy ones. The <code>Context</code> class provides a means of getting
  * contextual information about the current request or configuring XWiki on the fly.
  * 

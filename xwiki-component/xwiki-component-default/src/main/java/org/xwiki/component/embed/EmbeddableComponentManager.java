@@ -50,7 +50,7 @@ import org.xwiki.component.util.ReflectionUtils;
 public class EmbeddableComponentManager implements ComponentManager
 {
     private ComponentEventManager eventManager;
-    
+
     private ComponentManager parent;
 
     private Map<RoleHint< ? >, ComponentDescriptor< ? >> descriptors =
@@ -68,12 +68,14 @@ public class EmbeddableComponentManager implements ComponentManager
         ComponentAnnotationLoader loader = new ComponentAnnotationLoader();
         loader.enableLogging(new CommonsLoggingLogger(loader.getClass()));
         loader.initialize(this, classLoader);
-        
+
         // Extension point to allow component to manipulate ComponentManager initialized state.
         try {
             List<ComponentManagerInitializer> initializers = this.lookupList(ComponentManagerInitializer.class);
-            
-            initializers.indexOf(this);
+
+            for (ComponentManagerInitializer initializer : initializers) {
+                initializer.initialize(this);
+            }
         } catch (ComponentLookupException e) {
             // Should never happen
         }
@@ -315,7 +317,7 @@ public class EmbeddableComponentManager implements ComponentManager
     {
         this.eventManager = eventManager;
     }
-    
+
     /**
      * {@inheritDoc}
      * 

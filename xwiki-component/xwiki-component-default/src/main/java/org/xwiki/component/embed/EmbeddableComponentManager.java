@@ -31,6 +31,7 @@ import org.xwiki.component.descriptor.ComponentInstantiationStrategy;
 import org.xwiki.component.internal.Composable;
 import org.xwiki.component.internal.RoleHint;
 import org.xwiki.component.logging.CommonsLoggingLogger;
+import org.xwiki.component.logging.Logger;
 import org.xwiki.component.manager.ComponentEventManager;
 import org.xwiki.component.manager.ComponentLifecycleException;
 import org.xwiki.component.manager.ComponentLookupException;
@@ -57,6 +58,8 @@ public class EmbeddableComponentManager implements ComponentManager
         new HashMap<RoleHint< ? >, ComponentDescriptor< ? >>();
 
     private Map<RoleHint< ? >, Object> components = new HashMap<RoleHint< ? >, Object>();
+    
+    private Logger logger = new CommonsLoggingLogger(EmbeddableComponentManager.class);
 
     /**
      * Load all component annotations and register them as components.
@@ -78,6 +81,7 @@ public class EmbeddableComponentManager implements ComponentManager
             }
         } catch (ComponentLookupException e) {
             // Should never happen
+            this.logger.error("Failed to lookup ComponentManagerInitializer componenets", e);
         }
     }
 

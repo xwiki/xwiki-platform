@@ -81,7 +81,7 @@ public class EmbeddableComponentManager implements ComponentManager
             }
         } catch (ComponentLookupException e) {
             // Should never happen
-            this.logger.error("Failed to lookup ComponentManagerInitializer componenets", e);
+            this.logger.error("Failed to lookup ComponentManagerInitializer components", e);
         }
     }
 

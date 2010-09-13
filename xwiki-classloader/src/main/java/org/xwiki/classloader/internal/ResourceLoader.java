@@ -803,7 +803,11 @@ public class ResourceLoader
             fetchNext();
             if (next == null)
                 throw new NoSuchElementException();
-            return next;
+            
+            Object nextElement = next;
+            next = null;
+            
+            return nextElement;
         }
 
         private void fetchNext()

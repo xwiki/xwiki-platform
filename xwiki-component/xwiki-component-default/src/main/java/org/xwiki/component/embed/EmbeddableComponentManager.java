@@ -35,6 +35,7 @@ import org.xwiki.component.manager.ComponentEventManager;
 import org.xwiki.component.manager.ComponentLifecycleException;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
+import org.xwiki.component.manager.ComponentManagerInitializer;
 import org.xwiki.component.manager.ComponentRepositoryException;
 import org.xwiki.component.phase.Initializable;
 import org.xwiki.component.phase.LogEnabled;
@@ -67,6 +68,15 @@ public class EmbeddableComponentManager implements ComponentManager
         ComponentAnnotationLoader loader = new ComponentAnnotationLoader();
         loader.enableLogging(new CommonsLoggingLogger(loader.getClass()));
         loader.initialize(this, classLoader);
+        
+        // Extension point to allow component to manipulate ComponentManager initialized state.
+        try {
+            List<ComponentManagerInitializer> initializers = this.lookupList(ComponentManagerInitializer.class);
+            
+            initializers.indexOf(this);
+        } catch (ComponentLookupException e) {
+            // Should never happen
+        }
     }
 
     /**

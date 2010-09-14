@@ -55,7 +55,7 @@
     <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-web-gwt-wysiwyg-client</artifactId>
-      <version>${pom.version}</version>
+      <version>${project.version}</version>
       <scope>provided</scope>
     </dependency>
     <!-- XWiki dependencies -->
@@ -160,7 +160,7 @@
                 <artifactItem>
                   <groupId>org.xwiki.platform</groupId>
                   <artifactId>xwiki-web-gwt-wysiwyg-client</artifactId>
-                  <version>${pom.version}</version>
+                  <version>${project.version}</version>
                   <classifier>shared</classifier>
                   <outputDirectory>${project.build.directory}/${project.build.finalName}/WEB-INF/lib</outputDirectory>
                 </artifactItem>

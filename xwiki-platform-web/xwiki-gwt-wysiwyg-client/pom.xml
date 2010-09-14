@@ -47,7 +47,7 @@
     <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-web-gwt-user</artifactId>
-      <version>${pom.version}</version>
+      <version>${project.version}</version>
     </dependency>
     <dependency>
       <!-- SmartGWT is used only for its tree widget. -->
@@ -71,7 +71,7 @@
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-web-gwt-user</artifactId>
       <classifier>tests</classifier>
-      <version>${pom.version}</version>
+      <version>${project.version}</version>
       <scope>test</scope>
     </dependency>
     <dependency>

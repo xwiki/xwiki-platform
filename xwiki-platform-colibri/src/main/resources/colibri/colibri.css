@@ -556,6 +556,7 @@ div.buttonwrapper {
   position: relative;
 }
 /* Create a theme-able arrow using CSS generated divs */
+/* Special rules for IE6/7 in ie-all.css */
 #changes-info:before, #changes-info:after {
   content: "";
   display: block;
@@ -574,13 +575,6 @@ div.buttonwrapper {
   border-left: 3em solid $theme.pageContentBackgroundColor;
   border-top: 2em solid transparent;
   border-bottom: 2em solid transparent;
-}
-/* IE6/7 don't understand :before and :after, so just display a plain image instead */
-* html #changes-info {
-  background: $theme.backgroundSecondaryColor url("$xwiki.getSkinFile('icons/xwiki/diff-header.png')") no-repeat 50% 2.5em;
-}
-*+html #changes-info {
-  background: $theme.backgroundSecondaryColor url("$xwiki.getSkinFile('icons/xwiki/diff-header.png')") no-repeat 50% 2.5em;
 }
 
 #changes-info-boxes {
@@ -601,11 +595,7 @@ div.buttonwrapper {
 #changes-info-box-to {
   margin-left: 51%;
 }
-/* IE7 has problems with percentage margins, this will just leave the "to" box floating on the right  */
-*+html #changes-info-box-to {
-  margin-left: 0;
-}
-
+/* Special rule for IE7 in ie-all.css */
 
 .changes-info-title {
   font-size: 1.4em;

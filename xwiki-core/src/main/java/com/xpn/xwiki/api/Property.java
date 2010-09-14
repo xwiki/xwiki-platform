@@ -18,28 +18,33 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  *
  */
+
 package com.xpn.xwiki.api;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.objects.BaseProperty;
 
+/**
+ * Property is a single attribute of an XWiki {@link com.xpn.xwiki.api.Object}.
+ *
+ * @version $Id$
+ */
 public class Property extends Element
 {
+    /**
+     * The Constructor.
+     *
+     * @param property the internal {@link com.xpn.xwiki.objects.BaseProperty} to wrap.
+     * @param context the XWikiContext which may be used to get information about the current request.
+     */
     public Property(BaseProperty property, XWikiContext context)
     {
         super(property, context);
     }
 
-    protected BaseProperty getBaseProperty()
-    {
-        return (BaseProperty) element;
-    }
-
-    public String getName()
-    {
-        return element.getName();
-    }
-
+    /**
+     * @return the internal {@link com.xpn.xwiki.objects.BaseProperty} which this Property wraps.
+     */
     public BaseProperty getProperty()
     {
         if (hasProgrammingRights()) {
@@ -49,8 +54,12 @@ public class Property extends Element
         }
     }
 
+    /**
+     * @return the actual value of the property, as a String, Number or List.
+     */
     public java.lang.Object getValue()
     {
+        // This is evil, any property which happens to be called 'password' will be masked. TODO fix.
         if (element.getName().equals("password")
             && !getXWikiContext().getWiki().getRightService().hasProgrammingRights(
                 getXWikiContext())) {

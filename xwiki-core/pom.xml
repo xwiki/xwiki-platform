@@ -896,7 +896,6 @@
               **/api/Document.java,
               **/api/DocumentSection.java,
               **/api/Object.java,
-              **/api/Property.java,
               **/api/Util.java,
               **/api/XWiki.java,
               **/atom/lifeblog/LifeblogServices.java,

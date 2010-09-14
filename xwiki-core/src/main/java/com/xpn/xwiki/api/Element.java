@@ -33,7 +33,7 @@ import com.xpn.xwiki.objects.BaseElement;
 public class Element extends Api
 {
     /** The internal element which this wraps. */
-    protected BaseElement element;
+    protected final BaseElement element;
 
     /**
      * The Constructor.

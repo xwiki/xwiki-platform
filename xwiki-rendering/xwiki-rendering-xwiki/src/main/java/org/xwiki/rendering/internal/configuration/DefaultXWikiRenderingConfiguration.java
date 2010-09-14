@@ -40,11 +40,6 @@ public class DefaultXWikiRenderingConfiguration implements XWikiRenderingConfigu
     private static final String PREFIX = "rendering.";
 
     /**
-     * Prefix for configuration keys that are specific to the XWiki implementation of the Rendering module.
-     */
-    private static final String XWIKI_SPECIFIC_PREFIX = PREFIX + "xwiki.";
-
-    /**
      * @see #getLinkLabelFormat()
      */
     private static final String DEFAULT_LINK_LABEL_FORMAT = "%p";
@@ -82,7 +77,7 @@ public class DefaultXWikiRenderingConfiguration implements XWikiRenderingConfigu
      */
     public int getImageWidthLimit()
     {
-        return this.configuration.getProperty(XWIKI_SPECIFIC_PREFIX + "imageWidthLimit", -1);
+        return this.configuration.getProperty(PREFIX + "imageWidthLimit", -1);
     }
 
     /**
@@ -92,7 +87,7 @@ public class DefaultXWikiRenderingConfiguration implements XWikiRenderingConfigu
      */
     public int getImageHeightLimit()
     {
-        return this.configuration.getProperty(XWIKI_SPECIFIC_PREFIX + "imageHeightLimit", -1);
+        return this.configuration.getProperty(PREFIX + "imageHeightLimit", -1);
     }
 
     /**
@@ -102,6 +97,6 @@ public class DefaultXWikiRenderingConfiguration implements XWikiRenderingConfigu
      */
     public boolean isImageDimensionsIncludedInImageURL()
     {
-        return this.configuration.getProperty(XWIKI_SPECIFIC_PREFIX + "imageDimensionsIncludedInImageURL", true);
+        return this.configuration.getProperty(PREFIX + "imageDimensionsIncludedInImageURL", true);
     }
 }

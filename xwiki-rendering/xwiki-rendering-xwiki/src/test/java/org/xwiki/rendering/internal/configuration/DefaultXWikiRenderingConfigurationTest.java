@@ -77,7 +77,7 @@ public class DefaultXWikiRenderingConfigurationTest extends AbstractMockingCompo
         getMockery().checking(new Expectations()
         {
             {
-                allowing(source).getProperty("rendering.xwiki.imageWidthLimit", -1);
+                allowing(source).getProperty("rendering.imageWidthLimit", -1);
                 will(returnValue(100));
             }
         });
@@ -92,7 +92,7 @@ public class DefaultXWikiRenderingConfigurationTest extends AbstractMockingCompo
         getMockery().checking(new Expectations()
         {
             {
-                allowing(source).getProperty("rendering.xwiki.imageHeightLimit", -1);
+                allowing(source).getProperty("rendering.imageHeightLimit", -1);
                 will(returnValue(150));
             }
         });
@@ -107,7 +107,7 @@ public class DefaultXWikiRenderingConfigurationTest extends AbstractMockingCompo
         getMockery().checking(new Expectations()
         {
             {
-                allowing(source).getProperty("rendering.xwiki.imageDimensionsIncludedInImageURL", true);
+                allowing(source).getProperty("rendering.imageDimensionsIncludedInImageURL", true);
                 will(returnValue(false));
             }
         });

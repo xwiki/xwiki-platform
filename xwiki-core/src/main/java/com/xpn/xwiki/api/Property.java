@@ -45,6 +45,14 @@ public class Property extends Element
     /**
      * @return the internal {@link com.xpn.xwiki.objects.BaseProperty} which this Property wraps.
      */
+    protected BaseProperty getBaseProperty()
+    {
+        return (BaseProperty) element;
+    }
+
+    /**
+     * @return the internal {@link com.xpn.xwiki.objects.BaseProperty} which this Property wraps.
+     */
     public BaseProperty getProperty()
     {
         if (hasProgrammingRights()) {

@@ -83,7 +83,7 @@
               <parameters>
                 <parameter>
                   <name>appversion</name>
-                  <value>${pom.version}</value>
+                  <value>${project.version}</value>
                 </parameter>
               </parameters>
             </transformationSet>

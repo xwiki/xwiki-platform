@@ -38,7 +38,7 @@ import com.google.gwt.dom.client.Style.VerticalAlign;
  * 
  * @version $Id$
  */
-public final class ImageConfigDOMWriter implements ConfigDOMWriter<ImageConfig, ImageElement>
+public class ImageConfigDOMWriter implements ConfigDOMWriter<ImageConfig, ImageElement>
 {
     /**
      * Regular expression used to determine if a string can be used as the value of the {@code width} and {@code height}
@@ -95,7 +95,7 @@ public final class ImageConfigDOMWriter implements ConfigDOMWriter<ImageConfig, 
      * @param dimension the dimension to be updated, i.e. {@link Style#WIDTH} or {@link Style#HEIGHT}
      * @param value the new dimension value
      */
-    private void updateDimension(ImageElement image, String dimension, String value)
+    protected void updateDimension(ImageElement image, String dimension, String value)
     {
         if (StringUtils.isEmpty(value)) {
             image.removeAttribute(dimension);

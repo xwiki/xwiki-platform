@@ -46,6 +46,11 @@ public class InsertImageExecutableTest extends RichTextAreaTestCase
     private InsertImageExecutable executable;
 
     /**
+     * The URL of a blank image that can be used in tests that require a real image.
+     */
+    private String blankImageURL;
+
+    /**
      * The object used to extract the image meta data.
      */
     private final ImageMetaDataExtractor metaDataExtractor = new ImageMetaDataExtractor();
@@ -60,6 +65,7 @@ public class InsertImageExecutableTest extends RichTextAreaTestCase
         super.gwtSetUp();
 
         executable = new InsertImageExecutable(rta);
+        blankImageURL = GWT.getModuleBaseURL() + "clear.cache.gif";
     }
 
     /**
@@ -257,13 +263,12 @@ public class InsertImageExecutableTest extends RichTextAreaTestCase
         range.setEnd(getBody().getFirstChild().getFirstChild(), 2);
         select(range);
 
-        String imageURL = GWT.getModuleBaseURL() + "clear.cache.gif?width=23&height=17&keepAspectRatio=true";
+        String imageURL = blankImageURL + "?width=23&height=17&keepAspectRatio=true";
         String imageJSON = "{reference:'Main.Test@logo.png',url:'" + imageURL + "',width:'150px',height:'100'}";
         rta.getDocument().addInnerHTMLListener(metaDataExtractor);
         assertTrue(executable.execute(imageJSON));
         rta.getDocument().removeInnerHTMLListener(metaDataExtractor);
-        assertEquals(GWT.getModuleBaseURL() + "clear.cache.gif?width=150&height=100", executable.getSelectedElement()
-            .getSrc());
+        assertEquals(blankImageURL + "?width=150&height=100", executable.getSelectedElement().getSrc());
     }
 
     /**
@@ -292,12 +297,45 @@ public class InsertImageExecutableTest extends RichTextAreaTestCase
         range.setEnd(getBody().getFirstChild().getFirstChild(), 2);
         select(range);
 
-        String imageURL = GWT.getModuleBaseURL() + "clear.cache.gif";
-        String imageJSON = "{reference:'Main.Test@logo.jpg',url:'" + imageURL + "'}";
+        String imageJSON = "{reference:'Main.Test@logo.jpg',url:'" + blankImageURL + "'}";
         rta.getDocument().addInnerHTMLListener(metaDataExtractor);
         assertTrue(executable.execute(imageJSON));
         rta.getDocument().removeInnerHTMLListener(metaDataExtractor);
-        assertEquals(imageURL + "?width=" + (rta.getDocument().getClientWidth() - 22), executable.getSelectedElement()
-            .getSrc());
+        assertEquals(blankImageURL + "?width=" + (rta.getDocument().getClientWidth() - 22), executable
+            .getSelectedElement().getSrc());
+    }
+
+    /**
+     * Tests that images with relative dimensions are properly resized.
+     */
+    public void testResizeImageWithRelativeDimensions()
+    {
+        deferTest(new Command()
+        {
+            public void execute()
+            {
+                doTestResizeImageWithRelativeDimensions();
+            }
+        });
+    }
+
+    /**
+     * Tests that images with relative dimensions are properly resized.
+     */
+    private void doTestResizeImageWithRelativeDimensions()
+    {
+        rta.setHTML("<p>#</p>");
+
+        Range range = rta.getDocument().createRange();
+        range.selectNodeContents(getBody().getFirstChild().getFirstChild());
+        select(range);
+
+        rta.getDocument().addInnerHTMLListener(metaDataExtractor);
+        assertTrue(executable.execute("{reference:'x',url:'" + blankImageURL + "',width:'20%'}"));
+        int computedWidth = executable.getSelectedElement().getWidth();
+        // Double the image width.
+        assertTrue(executable.execute(executable.getParameter().replace("20%", "40%")));
+        rta.getDocument().removeInnerHTMLListener(metaDataExtractor);
+        assertEquals(2 * computedWidth, executable.getSelectedElement().getWidth());
     }
 }

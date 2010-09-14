@@ -56,7 +56,7 @@ public class InsertImageExecutable extends AbstractInsertElementExecutable<Image
         super(rta);
 
         configDOMReader = new ImageConfigDOMReader();
-        configDOMWriter = new ImageConfigDOMWriter();
+        configDOMWriter = GWT.create(ImageConfigDOMWriter.class);
         configJSONParser = new ImageConfigJSONParser();
         configJSONSerializer = new ImageConfigJSONSerializer();
     }

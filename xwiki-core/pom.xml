@@ -895,7 +895,6 @@
               **/api/CriteriaService.java,
               **/api/Document.java,
               **/api/DocumentSection.java,
-              **/api/Element.java,
               **/api/Object.java,
               **/api/Property.java,
               **/api/Util.java,

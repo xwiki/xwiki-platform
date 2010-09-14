@@ -25,6 +25,7 @@ import org.xwiki.gwt.dom.client.Document;
 import org.xwiki.gwt.dom.client.IFrameElement;
 import org.xwiki.gwt.dom.client.JavaScriptObject;
 import org.xwiki.gwt.user.client.Strings;
+import org.xwiki.gwt.user.client.URLUtils;
 
 import com.google.gwt.event.dom.client.LoadEvent;
 import com.google.gwt.event.dom.client.LoadHandler;
@@ -34,7 +35,6 @@ import com.google.gwt.http.client.RequestBuilder;
 import com.google.gwt.http.client.RequestCallback;
 import com.google.gwt.http.client.RequestException;
 import com.google.gwt.http.client.Response;
-import com.google.gwt.http.client.URL;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 
 /**
@@ -106,29 +106,12 @@ public class Reloader implements RequestCallback, LoadHandler
         }
         try {
             // Make a new reload request.
-            request = requestBuilder.sendRequest(serialize(params), this);
+            request = requestBuilder.sendRequest(URLUtils.serializeQueryStringParameters(params), this);
             // Update the call-back if the reload request was successfully sent.
             this.callback = callback;
         } catch (RequestException e) {
             callback.onFailure(e);
         }
-    }
-
-    /**
-     * Serializes the given parameters in order to be send with a {@code post} HTTP request that has the {@code
-     * Content-type} header set to {@code application/x-www-form-urlencoded}.
-     * 
-     * @param params the parameters to be serialized
-     * @return a string that can be used as post data
-     */
-    private String serialize(Map<String, String> params)
-    {
-        StringBuffer postData = new StringBuffer();
-        for (Map.Entry<String, String> entry : params.entrySet()) {
-            postData.append(URL.encodeComponent(entry.getKey())).append('=').append(
-                URL.encodeComponent(entry.getValue())).append('&');
-        }
-        return postData.toString();
     }
 
     /**

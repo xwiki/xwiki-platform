@@ -22,7 +22,6 @@ package org.xwiki.gwt.wysiwyg.client.plugin.image.exec;
 import org.xwiki.gwt.dom.client.Element;
 import org.xwiki.gwt.dom.client.Range;
 import org.xwiki.gwt.dom.client.Style;
-import org.xwiki.gwt.user.client.ui.rta.cmd.Executable;
 import org.xwiki.gwt.wysiwyg.client.RichTextAreaTestCase;
 import org.xwiki.gwt.wysiwyg.client.plugin.image.ImageConfig;
 import org.xwiki.gwt.wysiwyg.client.plugin.image.ImageConfigJSONParser;
@@ -30,6 +29,7 @@ import org.xwiki.gwt.wysiwyg.client.plugin.image.ImageConfigJSONSerializer;
 import org.xwiki.gwt.wysiwyg.client.plugin.image.ImageMetaDataExtractor;
 import org.xwiki.gwt.wysiwyg.client.plugin.image.ImageConfig.ImageAlignment;
 
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.dom.client.ImageElement;
 import com.google.gwt.user.client.Command;
 
@@ -43,7 +43,7 @@ public class InsertImageExecutableTest extends RichTextAreaTestCase
     /**
      * The executable being tested.
      */
-    private Executable executable;
+    private InsertImageExecutable executable;
 
     /**
      * The object used to extract the image meta data.
@@ -137,8 +137,8 @@ public class InsertImageExecutableTest extends RichTextAreaTestCase
         range.selectNode(getBody().getFirstChild().getChild(1));
         select(range);
 
-        assertEquals("{reference:'Space.Page@missing.png',url:'http://www.xwiki.org/missing.png',"
-            + "width:'70',height:'35%',alttext:'A missing image.',alignment:'RIGHT'}", executable.getParameter());
+        assertEquals("{reference:\"Space.Page@missing.png\",url:\"http://www.xwiki.org/missing.png\",width:\"70\","
+            + "height:\"35%\",alttext:\"A missing image.\",alignment:\"RIGHT\"}", executable.getParameter());
 
         range.setStart(getBody().getFirstChild().getFirstChild(), 1);
         range.setEnd(getBody().getFirstChild().getLastChild(), 0);
@@ -175,8 +175,8 @@ public class InsertImageExecutableTest extends RichTextAreaTestCase
         select(range);
 
         String imageJSON =
-            "{reference:'Main.Test@missing.png',url:'http://www.xwiki.org/missing.png',"
-                + "width:'70',height:'35%',alttext:'A missing image.',alignment:'CENTER'}";
+            "{reference:\"Main.Test@missing.png\",url:\"http://www.xwiki.org/missing.png?width=70\","
+                + "width:\"70\",height:\"35%\",alttext:\"A missing image.\",alignment:\"CENTER\"}";
         rta.getDocument().addInnerHTMLListener(metaDataExtractor);
         assertTrue(executable.execute(imageJSON));
         rta.getDocument().removeInnerHTMLListener(metaDataExtractor);
@@ -229,5 +229,75 @@ public class InsertImageExecutableTest extends RichTextAreaTestCase
         assertEquals("40", image.getAttribute(Style.HEIGHT));
         assertEquals("<!--startimage:" + imageConfig.getReference() + "-->" + Element.INNER_HTML_PLACEHOLDER
             + "<!--stopimage-->", image.getAttribute(Element.META_DATA_ATTR));
+    }
+
+    /**
+     * Tests that image dimensions are included in the image URL when they are specified.
+     */
+    public void testIfImageDimensionsAreIncludedInImageURL()
+    {
+        deferTest(new Command()
+        {
+            public void execute()
+            {
+                doTestIfImageDimensionsAreIncludedInImageURL();
+            }
+        });
+    }
+
+    /**
+     * Tests that image dimensions are included in the image URL when they are specified.
+     */
+    private void doTestIfImageDimensionsAreIncludedInImageURL()
+    {
+        rta.setHTML("<p>321</p>");
+
+        Range range = rta.getDocument().createRange();
+        range.setStart(getBody().getFirstChild().getFirstChild(), 1);
+        range.setEnd(getBody().getFirstChild().getFirstChild(), 2);
+        select(range);
+
+        String imageURL = GWT.getModuleBaseURL() + "clear.cache.gif?width=23&height=17&keepAspectRatio=true";
+        String imageJSON = "{reference:'Main.Test@logo.png',url:'" + imageURL + "',width:'150px',height:'100'}";
+        rta.getDocument().addInnerHTMLListener(metaDataExtractor);
+        assertTrue(executable.execute(imageJSON));
+        rta.getDocument().removeInnerHTMLListener(metaDataExtractor);
+        assertEquals(GWT.getModuleBaseURL() + "clear.cache.gif?width=150&height=100", executable.getSelectedElement()
+            .getSrc());
+    }
+
+    /**
+     * Tests that image width is limited to rich text area width when it is not specified.
+     */
+    public void testImageWidthIsLimitedToRichTextAreaWidth()
+    {
+        deferTest(new Command()
+        {
+            public void execute()
+            {
+                doTestImageWidthIsLimitedToRichTextAreaWidth();
+            }
+        });
+    }
+
+    /**
+     * Tests that image width is limited to rich text area width when it is not specified.
+     */
+    private void doTestImageWidthIsLimitedToRichTextAreaWidth()
+    {
+        rta.setHTML("<p>xyz</p>");
+
+        Range range = rta.getDocument().createRange();
+        range.setStart(getBody().getFirstChild().getFirstChild(), 1);
+        range.setEnd(getBody().getFirstChild().getFirstChild(), 2);
+        select(range);
+
+        String imageURL = GWT.getModuleBaseURL() + "clear.cache.gif";
+        String imageJSON = "{reference:'Main.Test@logo.jpg',url:'" + imageURL + "'}";
+        rta.getDocument().addInnerHTMLListener(metaDataExtractor);
+        assertTrue(executable.execute(imageJSON));
+        rta.getDocument().removeInnerHTMLListener(metaDataExtractor);
+        assertEquals(imageURL + "?width=" + (rta.getDocument().getClientWidth() - 22), executable.getSelectedElement()
+            .getSrc());
     }
 }

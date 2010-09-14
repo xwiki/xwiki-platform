@@ -19,7 +19,14 @@
  */
 package org.xwiki.gwt.wysiwyg.client.plugin.image.exec;
 
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
+
 import org.xwiki.gwt.dom.client.Range;
+import org.xwiki.gwt.dom.client.Style;
+import org.xwiki.gwt.user.client.StringUtils;
+import org.xwiki.gwt.user.client.URLUtils;
 import org.xwiki.gwt.user.client.ui.rta.RichTextArea;
 import org.xwiki.gwt.user.client.ui.rta.cmd.internal.AbstractInsertElementExecutable;
 import org.xwiki.gwt.wysiwyg.client.plugin.image.ImageConfig;
@@ -28,6 +35,7 @@ import org.xwiki.gwt.wysiwyg.client.plugin.image.ImageConfigDOMWriter;
 import org.xwiki.gwt.wysiwyg.client.plugin.image.ImageConfigJSONParser;
 import org.xwiki.gwt.wysiwyg.client.plugin.image.ImageConfigJSONSerializer;
 
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.dom.client.ImageElement;
 import com.google.gwt.dom.client.Node;
 
@@ -51,6 +59,32 @@ public class InsertImageExecutable extends AbstractInsertElementExecutable<Image
         configDOMWriter = new ImageConfigDOMWriter();
         configJSONParser = new ImageConfigJSONParser();
         configJSONSerializer = new ImageConfigJSONSerializer();
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see AbstractInsertElementExecutable#execute(org.xwiki.gwt.user.client.Config)
+     */
+    @Override
+    protected boolean execute(ImageConfig config)
+    {
+        // Backup the image URL.
+        String url = config.getUrl();
+        boolean internal = !StringUtils.areEqual(config.getReference(), url);
+        if (internal) {
+            // Resize internal images on the server side when possible.
+            // Use a blank image just to be able to determine the width and height of the image element in pixels
+            // (matching the width/height attributes or the style attribute) before requesting the real image. The
+            // computed width and height are used to adjust the image URL so that the image is resized on the server.
+            config.setUrl(GWT.getModuleBaseURL() + "clear.cache.gif");
+        }
+        boolean success = super.execute(config);
+        if (success && internal) {
+            // Attached image. Change the image URL to resize the image on the server.
+            updateURL(getSelectedElement(), url);
+        }
+        return success;
     }
 
     /**
@@ -99,5 +133,55 @@ public class InsertImageExecutable extends AbstractInsertElementExecutable<Image
     protected ImageElement newElement()
     {
         return rta.getDocument().createImageElement();
+    }
+
+    /**
+     * Updates the URL of the given image. If image width and height are specified they are added to the query string in
+     * order to resize the image on the server side.
+     * 
+     * @param image the image whose URL is updated
+     * @param url the new image URL
+     */
+    private void updateURL(ImageElement image, String url)
+    {
+        int width = image.getWidth();
+        int height = image.getHeight();
+        // Put width and height information in the query string in order to resize images on the server side.
+        Map<String, List<String>> parameters = URLUtils.parseQueryString(URLUtils.getQueryString(url));
+        parameters.remove(Style.WIDTH);
+        parameters.remove(Style.HEIGHT);
+        parameters.remove("keepAspectRatio");
+        if (isDimensionSpecified(image, Style.WIDTH)) {
+            parameters.put(Style.WIDTH, Arrays.asList(new String[] {String.valueOf(width)}));
+            if (isDimensionSpecified(image, Style.HEIGHT)) {
+                parameters.put(Style.HEIGHT, Arrays.asList(new String[] {String.valueOf(height)}));
+            }
+        } else {
+            // Width is unspecified.
+            if (isDimensionSpecified(image, Style.HEIGHT)) {
+                parameters.put(Style.HEIGHT, Arrays.asList(new String[] {String.valueOf(height)}));
+            } else {
+                // If image width and height are unspecified limit the image width to fit the rich text area (leaving
+                // space for the vertical scroll bar).
+                int widthLimit = image.getOwnerDocument().getClientWidth() - 22;
+                if (widthLimit > 0) {
+                    parameters.put(Style.WIDTH, Arrays.asList(new String[] {String.valueOf(widthLimit)}));
+                }
+            }
+        }
+
+        // Update the image URL.
+        image.setSrc(URLUtils.setQueryString(url, parameters));
+    }
+
+    /**
+     * @param image an image element
+     * @param dimension either {@code width} or {@code height}
+     * @return {@code true} if the specified dimension is explicitly set on the given image element
+     */
+    private boolean isDimensionSpecified(ImageElement image, String dimension)
+    {
+        return image.getPropertyInt(dimension) > 0
+            && (!StringUtils.isEmpty(image.getStyle().getProperty(dimension)) || image.hasAttribute(dimension));
     }
 }

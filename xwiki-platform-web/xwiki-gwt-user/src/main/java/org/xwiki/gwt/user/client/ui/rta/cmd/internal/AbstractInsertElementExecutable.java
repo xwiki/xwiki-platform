@@ -176,7 +176,18 @@ public abstract class AbstractInsertElementExecutable<C, E extends com.google.gw
     @Override
     public boolean execute(String json)
     {
-        C config = configJSONParser.parse(json);
+        return execute(configJSONParser.parse(json));
+    }
+
+    /**
+     * Inserts a new element if none is selected, otherwise updates the selected element. In both cases the given
+     * configuration object is used to set the attributes of the target element.
+     * 
+     * @param config the object used to configure the newly created element or the selected element
+     * @return {@code true} if inserting a new element or updating the selected one succeeded, {@code false} otherwise
+     */
+    protected boolean execute(C config)
+    {
         E element = getSelectedElement();
         if (element == null) {
             // Insert a new element.

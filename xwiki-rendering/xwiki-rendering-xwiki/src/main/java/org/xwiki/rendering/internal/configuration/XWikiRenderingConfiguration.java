@@ -19,85 +19,53 @@
  */
 package org.xwiki.rendering.internal.configuration;
 
-import java.util.Properties;
-
-import org.xwiki.component.annotation.Component;
-import org.xwiki.component.annotation.Requirement;
-import org.xwiki.configuration.ConfigurationSource;
+import org.xwiki.component.annotation.ComponentRole;
 import org.xwiki.rendering.configuration.RenderingConfiguration;
 
 /**
- * All configuration options for the rendering subsystem.
+ * Extends {@link RenderingConfiguration} with XWiki specific configuration properties.
  * 
  * @version $Id$
  * @since 2.0M1
  */
-@Component
-public class XWikiRenderingConfiguration implements RenderingConfiguration
+@ComponentRole
+public interface XWikiRenderingConfiguration extends RenderingConfiguration
 {
     /**
-     * Prefix for configuration keys for the Rendering module.
+     * @return {@code true} to include the image dimensions extracted from the image parameters in the image URL,
+     *         {@code false} otherwise; when image dimensions are included in the image URL the image can be resized on
+     *         the server side before being downloaded.
+     * @since 2.5M2
      */
-    private static final String PREFIX = "rendering.";
+    boolean isImageDimensionsIncludedInImageURL();
 
     /**
-     * @see org.xwiki.rendering.configuration.RenderingConfiguration#getLinkLabelFormat()
-     */
-    private static final String DEFAULT_LINK_LABEL_FORMAT = "%p";
-
-    /**
-     * Defines from where to read the rendering configuration data.
-     */
-    @Requirement
-    private ConfigurationSource configuration;
-
-    /**
-     * {@inheritDoc}
+     * One way to improve page load speed is to resize images on the server side just before rendering the page. The
+     * rendering module can use the image width provided by the user to scale the image. When the user doesn't specify
+     * the image width the rendering module can limit the width of the image based on this configuration parameter.
+     * <p>
+     * The default value is {@code -1} which means image width is not limited by default. Use a value greater than 0 to
+     * limit the image width (pixels). Note that the aspect ratio is kept even when both the width and the height of the
+     * image are limited.
      * 
-     * @see org.xwiki.rendering.configuration.RenderingConfiguration#getLinkLabelFormat()
+     * @return the maximum image width when there's no user supplied width
+     * @see #isIncludeImageDimensionsInImageURL()
+     * @since 2.5M2
      */
-    public String getLinkLabelFormat()
-    {
-        return this.configuration.getProperty(PREFIX + "linkLabelFormat", DEFAULT_LINK_LABEL_FORMAT);
-    }
+    int getImageWidthLimit();
 
     /**
-     * {@inheritDoc}
+     * One way to improve page load speed is to resize images on the server side just before rendering the page. The
+     * rendering module can use the image height provided by the user to scale the image. When the user doesn't specify
+     * the image height the rendering module can limit the height of the image based on this configuration parameter.
+     * <p>
+     * The default value is {@code -1} which means image height is not limited by default. Use a value greater than 0 to
+     * limit the image height (pixels). Note that the aspect ratio is kept even when both the width and the height of
+     * the image are limited.
      * 
-     * @see org.xwiki.rendering.configuration.RenderingConfiguration#getMacroCategories()
+     * @return the maximum image height when there's no user supplied height
+     * @see #isIncludeImageDimensionsInImageURL()
+     * @since 2.5M2
      */
-    public Properties getMacroCategories()
-    {
-        return this.configuration.getProperty(PREFIX + "macroCategories", Properties.class);
-    }
-
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.rendering.configuration.RenderingConfiguration#getImageWidthLimit()
-     */
-    public int getImageWidthLimit()
-    {
-        return this.configuration.getProperty(PREFIX + "imageWidthLimit", -1);
-    }
-
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.rendering.configuration.RenderingConfiguration#getImageHeightLimit()
-     */
-    public int getImageHeightLimit()
-    {
-        return this.configuration.getProperty(PREFIX + "imageHeightLimit", -1);
-    }
-
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.rendering.configuration.RenderingConfiguration#isIncludeImageDimensionsInImageURL()
-     */
-    public boolean isIncludeImageDimensionsInImageURL()
-    {
-        return this.configuration.getProperty(PREFIX + "includeImageDimensionsInImageURL", true);
-    }
+    int getImageHeightLimit();
 }

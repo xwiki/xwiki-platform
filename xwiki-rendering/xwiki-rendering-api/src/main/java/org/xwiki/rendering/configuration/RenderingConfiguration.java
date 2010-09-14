@@ -50,7 +50,7 @@ public interface RenderingConfiguration
      * </ul>
      * Note that if the page title is empty or not defined then it defaults to %p. This is also the case
      * if the title cannot be retrieved for the document.
-     *
+     * 
      * The default is "%p". Some examples: "%s.%p", "%w:%s.%p".
      *
      * @return the format to use to display link labels when the user hasn't specified a label
@@ -63,42 +63,4 @@ public interface RenderingConfiguration
      *         descriptor (ie defined by the macro author) will be used
      */
     Properties getMacroCategories();
-
-    /**
-     * @return {@code true} to include the image dimensions extracted from the image parameters in the image URL,
-     *             {@code false} otherwise; when image dimensions are included in the image URL the image can be resized
-     *             on the server side before being downloaded.
-     * @since 2.5M2
-     */
-    boolean isIncludeImageDimensionsInImageURL();
-
-    /**
-     * One way to improve page load speed is to resize images on the server side just before rendering the page. The
-     * rendering module can use the image width provided by the user to scale the image. When the user doesn't specify
-     * the image width the rendering module can limit the width of the image based on this configuration parameter.
-     * <p>
-     * The default value is {@code -1} which means image width is not limited by default. Use a value greater than 0 to
-     * limit the image width (pixels). Note that the aspect ratio is kept even when both the width and the height of the
-     * image are limited.
-     *
-     * @return the maximum image width when there's no user supplied width
-     * @see #isIncludeImageDimensionsInImageURL()
-     * @since 2.5M2
-     */
-    int getImageWidthLimit();
-
-    /**
-     * One way to improve page load speed is to resize images on the server side just before rendering the page. The
-     * rendering module can use the image height provided by the user to scale the image. When the user doesn't specify
-     * the image height the rendering module can limit the height of the image based on this configuration parameter.
-     * <p>
-     * The default value is {@code -1} which means image height is not limited by default. Use a value greater than 0 to
-     * limit the image height (pixels). Note that the aspect ratio is kept even when both the width and the height of
-     * the image are limited.
-     *
-     * @return the maximum image height when there's no user supplied height
-     * @see #isIncludeImageDimensionsInImageURL()
-     * @since 2.5M2
-     */
-    int getImageHeightLimit();
 }

@@ -30,7 +30,7 @@ import org.junit.Test;
 import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReferenceSerializer;
-import org.xwiki.rendering.configuration.RenderingConfiguration;
+import org.xwiki.rendering.internal.configuration.XWikiRenderingConfiguration;
 import org.xwiki.test.AbstractMockingComponentTestCase;
 import org.xwiki.test.annotation.MockingRequirement;
 
@@ -79,13 +79,14 @@ public class XWikiWikiModelTest extends AbstractMockingComponentTestCase
     public void testGetImageURLWhenBothWidthAndHeightAttributesAreSpecified() throws Exception
     {
         final DocumentAccessBridge documentAccessBridge = getComponentManager().lookup(DocumentAccessBridge.class);
-        final RenderingConfiguration configuration = getComponentManager().lookup(RenderingConfiguration.class);
+        final XWikiRenderingConfiguration configuration =
+            getComponentManager().lookup(XWikiRenderingConfiguration.class);
         getMockery().checking(new Expectations()
         {
             {
                 oneOf(documentAccessBridge).getAttachmentURL("", "");
                 will(returnValue(""));
-                oneOf(configuration).isIncludeImageDimensionsInImageURL();
+                oneOf(configuration).isImageDimensionsIncludedInImageURL();
                 will(returnValue(true));
             }
         });
@@ -105,13 +106,14 @@ public class XWikiWikiModelTest extends AbstractMockingComponentTestCase
     public void testGetImageURLWhenIncludingImageDimensionsIsForbidden() throws Exception
     {
         final DocumentAccessBridge documentAccessBridge = getComponentManager().lookup(DocumentAccessBridge.class);
-        final RenderingConfiguration configuration = getComponentManager().lookup(RenderingConfiguration.class);
+        final XWikiRenderingConfiguration configuration =
+            getComponentManager().lookup(XWikiRenderingConfiguration.class);
         getMockery().checking(new Expectations()
         {
             {
                 oneOf(documentAccessBridge).getAttachmentURL("", "");
                 will(returnValue(""));
-                oneOf(configuration).isIncludeImageDimensionsInImageURL();
+                oneOf(configuration).isImageDimensionsIncludedInImageURL();
                 will(returnValue(false));
             }
         });
@@ -130,13 +132,14 @@ public class XWikiWikiModelTest extends AbstractMockingComponentTestCase
     public void testGetImageURLWhenBothWidthAndHeightCSSPropertiesAreSpecified() throws Exception
     {
         final DocumentAccessBridge documentAccessBridge = getComponentManager().lookup(DocumentAccessBridge.class);
-        final RenderingConfiguration configuration = getComponentManager().lookup(RenderingConfiguration.class);
+        final XWikiRenderingConfiguration configuration =
+            getComponentManager().lookup(XWikiRenderingConfiguration.class);
         getMockery().checking(new Expectations()
         {
             {
                 oneOf(documentAccessBridge).getAttachmentURL("", "");
                 will(returnValue(""));
-                oneOf(configuration).isIncludeImageDimensionsInImageURL();
+                oneOf(configuration).isImageDimensionsIncludedInImageURL();
                 will(returnValue(true));
             }
         });
@@ -154,13 +157,14 @@ public class XWikiWikiModelTest extends AbstractMockingComponentTestCase
     public void testGetImageURLWhenOnlyWidthAttributeIsSpecified() throws Exception
     {
         final DocumentAccessBridge documentAccessBridge = getComponentManager().lookup(DocumentAccessBridge.class);
-        final RenderingConfiguration configuration = getComponentManager().lookup(RenderingConfiguration.class);
+        final XWikiRenderingConfiguration configuration =
+            getComponentManager().lookup(XWikiRenderingConfiguration.class);
         getMockery().checking(new Expectations()
         {
             {
                 oneOf(documentAccessBridge).getAttachmentURL("", "");
                 will(returnValue(""));
-                oneOf(configuration).isIncludeImageDimensionsInImageURL();
+                oneOf(configuration).isImageDimensionsIncludedInImageURL();
                 will(returnValue(true));
             }
         });
@@ -179,13 +183,14 @@ public class XWikiWikiModelTest extends AbstractMockingComponentTestCase
     public void testGetImageURLWhenOnlyHeightCSSPropertyIsSpecified() throws Exception
     {
         final DocumentAccessBridge documentAccessBridge = getComponentManager().lookup(DocumentAccessBridge.class);
-        final RenderingConfiguration configuration = getComponentManager().lookup(RenderingConfiguration.class);
+        final XWikiRenderingConfiguration configuration =
+            getComponentManager().lookup(XWikiRenderingConfiguration.class);
         getMockery().checking(new Expectations()
         {
             {
                 oneOf(documentAccessBridge).getAttachmentURL("", "");
                 will(returnValue(""));
-                oneOf(configuration).isIncludeImageDimensionsInImageURL();
+                oneOf(configuration).isImageDimensionsIncludedInImageURL();
                 will(returnValue(true));
             }
         });
@@ -204,13 +209,14 @@ public class XWikiWikiModelTest extends AbstractMockingComponentTestCase
     public void testGetImageURLWhenBothWidthAndHeightAreUnspecifiedAndImageSizeIsLimited() throws Exception
     {
         final DocumentAccessBridge documentAccessBridge = getComponentManager().lookup(DocumentAccessBridge.class);
-        final RenderingConfiguration configuration = getComponentManager().lookup(RenderingConfiguration.class);
+        final XWikiRenderingConfiguration configuration =
+            getComponentManager().lookup(XWikiRenderingConfiguration.class);
         getMockery().checking(new Expectations()
         {
             {
                 oneOf(documentAccessBridge).getAttachmentURL("", "");
                 will(returnValue(""));
-                oneOf(configuration).isIncludeImageDimensionsInImageURL();
+                oneOf(configuration).isImageDimensionsIncludedInImageURL();
                 will(returnValue(true));
                 oneOf(configuration).getImageWidthLimit();
                 will(returnValue(200));
@@ -232,13 +238,14 @@ public class XWikiWikiModelTest extends AbstractMockingComponentTestCase
     public void testGetImageURLWhenBothWidthAndHeightAreUnspecifiedAndOnlyImageWidthIsLimited() throws Exception
     {
         final DocumentAccessBridge documentAccessBridge = getComponentManager().lookup(DocumentAccessBridge.class);
-        final RenderingConfiguration configuration = getComponentManager().lookup(RenderingConfiguration.class);
+        final XWikiRenderingConfiguration configuration =
+            getComponentManager().lookup(XWikiRenderingConfiguration.class);
         getMockery().checking(new Expectations()
         {
             {
                 oneOf(documentAccessBridge).getAttachmentURL("", "");
                 will(returnValue(""));
-                oneOf(configuration).isIncludeImageDimensionsInImageURL();
+                oneOf(configuration).isImageDimensionsIncludedInImageURL();
                 will(returnValue(true));
                 oneOf(configuration).getImageWidthLimit();
                 will(returnValue(25));
@@ -262,13 +269,14 @@ public class XWikiWikiModelTest extends AbstractMockingComponentTestCase
     public void testGetImageURLWhenBothWidthAndHeightAreUnspecifiedAndImageSizeIsNotLimited() throws Exception
     {
         final DocumentAccessBridge documentAccessBridge = getComponentManager().lookup(DocumentAccessBridge.class);
-        final RenderingConfiguration configuration = getComponentManager().lookup(RenderingConfiguration.class);
+        final XWikiRenderingConfiguration configuration =
+            getComponentManager().lookup(XWikiRenderingConfiguration.class);
         getMockery().checking(new Expectations()
         {
             {
                 oneOf(documentAccessBridge).getAttachmentURL("", "");
                 will(returnValue(""));
-                oneOf(configuration).isIncludeImageDimensionsInImageURL();
+                oneOf(configuration).isImageDimensionsIncludedInImageURL();
                 will(returnValue(true));
                 oneOf(configuration).getImageWidthLimit();
                 will(returnValue(-1));
@@ -290,13 +298,14 @@ public class XWikiWikiModelTest extends AbstractMockingComponentTestCase
     public void testGetImageURLWhenAttachmentURLHasFragmentIdentifier() throws Exception
     {
         final DocumentAccessBridge documentAccessBridge = getComponentManager().lookup(DocumentAccessBridge.class);
-        final RenderingConfiguration configuration = getComponentManager().lookup(RenderingConfiguration.class);
+        final XWikiRenderingConfiguration configuration =
+            getComponentManager().lookup(XWikiRenderingConfiguration.class);
         getMockery().checking(new Expectations()
         {
             {
                 oneOf(documentAccessBridge).getAttachmentURL("", "");
                 will(returnValue("test#fragment"));
-                oneOf(configuration).isIncludeImageDimensionsInImageURL();
+                oneOf(configuration).isImageDimensionsIncludedInImageURL();
                 will(returnValue(true));
             }
         });
@@ -315,13 +324,14 @@ public class XWikiWikiModelTest extends AbstractMockingComponentTestCase
     public void testGetImageURLWhenAttachmentURLHasQueryStringAndFragmentIdentifier() throws Exception
     {
         final DocumentAccessBridge documentAccessBridge = getComponentManager().lookup(DocumentAccessBridge.class);
-        final RenderingConfiguration configuration = getComponentManager().lookup(RenderingConfiguration.class);
+        final XWikiRenderingConfiguration configuration =
+            getComponentManager().lookup(XWikiRenderingConfiguration.class);
         getMockery().checking(new Expectations()
         {
             {
                 oneOf(documentAccessBridge).getAttachmentURL("", "");
                 will(returnValue("test?param=value#fragment"));
-                oneOf(configuration).isIncludeImageDimensionsInImageURL();
+                oneOf(configuration).isImageDimensionsIncludedInImageURL();
                 will(returnValue(true));
             }
         });
@@ -339,13 +349,14 @@ public class XWikiWikiModelTest extends AbstractMockingComponentTestCase
     public void testGetImageURLWhenBothStyleAndDimensionParametersAreSpecified() throws Exception
     {
         final DocumentAccessBridge documentAccessBridge = getComponentManager().lookup(DocumentAccessBridge.class);
-        final RenderingConfiguration configuration = getComponentManager().lookup(RenderingConfiguration.class);
+        final XWikiRenderingConfiguration configuration =
+            getComponentManager().lookup(XWikiRenderingConfiguration.class);
         getMockery().checking(new Expectations()
         {
             {
                 oneOf(documentAccessBridge).getAttachmentURL("", "");
                 will(returnValue(""));
-                oneOf(configuration).isIncludeImageDimensionsInImageURL();
+                oneOf(configuration).isImageDimensionsIncludedInImageURL();
                 will(returnValue(true));
             }
         });

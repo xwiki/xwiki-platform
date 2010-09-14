@@ -199,7 +199,6 @@
                 <exclude>org/xwiki/rendering/macro/script/AbstractScriptMacro</exclude>
                 <exclude>org/xwiki/rendering/macro/script/AbstractJSR223ScriptMacro</exclude>
                 <exclude>org/xwiki/rendering/wiki/WikiModel</exclude>
-                <exclude>org/xwiki/rendering/configuration/RenderingConfiguration</exclude>
               </excludes>
             </configuration>
           </plugin>

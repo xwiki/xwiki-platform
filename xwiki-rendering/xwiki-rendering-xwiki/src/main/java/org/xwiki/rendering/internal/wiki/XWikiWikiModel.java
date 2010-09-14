@@ -33,7 +33,7 @@ import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.Requirement;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReferenceSerializer;
-import org.xwiki.rendering.configuration.RenderingConfiguration;
+import org.xwiki.rendering.internal.configuration.XWikiRenderingConfiguration;
 import org.xwiki.rendering.wiki.WikiModel;
 
 import com.steadystate.css.parser.CSSOMParser;
@@ -66,7 +66,7 @@ public class XWikiWikiModel implements WikiModel
      * The component used to access configuration parameters.
      */
     @Requirement
-    private RenderingConfiguration renderingConfiguration;
+    private XWikiRenderingConfiguration xwikiRenderingConfiguration;
 
     /**
      * The component used to access the underlying XWiki model.
@@ -144,11 +144,11 @@ public class XWikiWikiModel implements WikiModel
             } else {
                 // If image width and height are unspecified or if they are not expressed in pixels then limit the image
                 // size to best fit the rectangle specified in the configuration (keeping aspect ratio).
-                int widthLimit = renderingConfiguration.getImageWidthLimit();
+                int widthLimit = xwikiRenderingConfiguration.getImageWidthLimit();
                 if (widthLimit > 0) {
                     queryString.append('&').append(WIDTH).append('=').append(widthLimit);
                 }
-                int heightLimit = renderingConfiguration.getImageHeightLimit();
+                int heightLimit = xwikiRenderingConfiguration.getImageHeightLimit();
                 if (heightLimit > 0) {
                     queryString.append('&').append(HEIGHT).append('=').append(heightLimit);
                 }
@@ -175,7 +175,7 @@ public class XWikiWikiModel implements WikiModel
     public String getImageURL(String documentName, String attachmentName, Map<String, String> parameters)
     {
         String url = getAttachmentURL(documentName, attachmentName);
-        if (!renderingConfiguration.isIncludeImageDimensionsInImageURL()) {
+        if (!xwikiRenderingConfiguration.isImageDimensionsIncludedInImageURL()) {
             return url;
         }
 

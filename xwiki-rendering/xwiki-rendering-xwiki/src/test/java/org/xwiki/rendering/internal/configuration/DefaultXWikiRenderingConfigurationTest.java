@@ -29,15 +29,15 @@ import org.xwiki.test.AbstractMockingComponentTestCase;
 import org.xwiki.test.annotation.MockingRequirement;
 
 /**
- * Unit tests for {@link org.xwiki.rendering.internal.configuration.XWikiRenderingConfiguration}.
+ * Unit tests for {@link org.xwiki.rendering.internal.configuration.DefaultXWikiRenderingConfiguration}.
  * 
  * @version $Id$
  * @since 2.0M1
  */
-public class XWikiRenderingConfigurationTest extends AbstractMockingComponentTestCase
+public class DefaultXWikiRenderingConfigurationTest extends AbstractMockingComponentTestCase
 {
-    @MockingRequirement
-    private XWikiRenderingConfiguration configuration;
+    @MockingRequirement(XWikiRenderingConfiguration.class)
+    private DefaultXWikiRenderingConfiguration configuration;
 
     @Test
     public void testGetLinkLabelFormat() throws Exception
@@ -77,7 +77,7 @@ public class XWikiRenderingConfigurationTest extends AbstractMockingComponentTes
         getMockery().checking(new Expectations()
         {
             {
-                allowing(source).getProperty("rendering.imageWidthLimit", -1);
+                allowing(source).getProperty("rendering.xwiki.imageWidthLimit", -1);
                 will(returnValue(100));
             }
         });
@@ -92,7 +92,7 @@ public class XWikiRenderingConfigurationTest extends AbstractMockingComponentTes
         getMockery().checking(new Expectations()
         {
             {
-                allowing(source).getProperty("rendering.imageHeightLimit", -1);
+                allowing(source).getProperty("rendering.xwiki.imageHeightLimit", -1);
                 will(returnValue(150));
             }
         });
@@ -101,17 +101,17 @@ public class XWikiRenderingConfigurationTest extends AbstractMockingComponentTes
     }
 
     @Test
-    public void testIsIncludeImageDimensionsInImageURL() throws Exception
+    public void testIsImageDimensionsIncludedInImageURL() throws Exception
     {
         final ConfigurationSource source = getComponentManager().lookup(ConfigurationSource.class);
         getMockery().checking(new Expectations()
         {
             {
-                allowing(source).getProperty("rendering.includeImageDimensionsInImageURL", true);
+                allowing(source).getProperty("rendering.xwiki.imageDimensionsIncludedInImageURL", true);
                 will(returnValue(false));
             }
         });
 
-        Assert.assertFalse(this.configuration.isIncludeImageDimensionsInImageURL());
+        Assert.assertFalse(this.configuration.isImageDimensionsIncludedInImageURL());
     }
 }

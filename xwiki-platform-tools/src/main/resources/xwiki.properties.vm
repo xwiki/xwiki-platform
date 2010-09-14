@@ -68,7 +68,7 @@
 #-# downloaded, improving thus the page loading speed.
 #-#
 #-# Default value is true.
-# rendering.xwiki.imageDimensionsIncludedInImageURL = true
+# rendering.imageDimensionsIncludedInImageURL = true
 
 #-# [Since 2.5M2]
 #-# One way to improve page load speed is to resize images on the server side just before rendering the page. The 
@@ -79,13 +79,13 @@
 #-# The default value is -1 which means image width is not limited by default. Use a value greater than 0 to limit the
 #-# image width (pixels). Note that the aspect ratio is kept even when both the width and the height of the image are
 #-# limited.
-# rendering.xwiki.imageWidthLimit = 1024
-# rendering.xwiki.imageWidthLimit = -1
+# rendering.imageWidthLimit = 1024
+# rendering.imageWidthLimit = -1
 
 #-# [Since 2.5M2]
 #-# See rendering.imageWidthLimit
-# rendering.xwiki.imageHeightLimit = 768
-# rendering.xwiki.imageHeightLimit = -1
+# rendering.imageHeightLimit = 768
+# rendering.imageHeightLimit = -1
 
 #-------------------------------------------------------------------------------------
 # Cache

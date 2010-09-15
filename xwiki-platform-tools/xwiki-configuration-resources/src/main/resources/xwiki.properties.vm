@@ -267,3 +267,23 @@
 #crypto.passwd.keyDerivationFunctionPropertiesForPasswordVerification = millisecondsOfProcessorTimeToSpend = 200
 #crypto.passwd.keyDerivationFunctionPropertiesForPasswordVerification = numberOfKilobytesOfMemoryToUse = 1024
 #crypto.passwd.keyDerivationFunctionPropertiesForPasswordVerification = derivedKeyLength = 32
+
+#-------------------------------------------------------------------------------------
+# CSRF token component
+#-------------------------------------------------------------------------------------
+
+#-# [Since 2.5M2]
+#-# Controls whether secret token validation mechanism should be used (to prevent CSRF attacks).
+#-#
+#-# If enabled, all actions requiring "comment", "edit", "delete", "admin" or "programming" rights
+#-# will check that the parameter "form_token" with the value of a random secret token is present
+#-# in the request.
+#-# This feature requires CSRFToken component.
+#-# 
+#-# Valid values:
+#-#   0: Disabled
+#-#   1: Enabled
+#-#
+#-# Default value is 0
+# core.csrftoken.enabled = 0
+

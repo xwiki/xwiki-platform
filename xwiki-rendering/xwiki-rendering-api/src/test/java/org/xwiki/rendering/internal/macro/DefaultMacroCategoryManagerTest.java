@@ -24,7 +24,6 @@ import java.util.Set;
 import junit.framework.Assert;
 
 import org.jmock.Expectations;
-import org.jmock.Mockery;
 import org.junit.Before;
 import org.junit.Test;
 import org.xwiki.component.descriptor.DefaultComponentDescriptor;

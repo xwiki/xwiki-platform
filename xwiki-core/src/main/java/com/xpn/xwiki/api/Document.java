@@ -706,7 +706,7 @@ public class Document extends Api
 
     public Class getxWikiClass()
     {
-        BaseClass bclass = this.doc.getXClass();
+        BaseClass bclass = this.getDoc().getXClass();
         if (bclass == null) {
             return null;
         } else {
@@ -716,7 +716,7 @@ public class Document extends Api
 
     public Class[] getxWikiClasses()
     {
-        List<BaseClass> list = this.doc.getXClasses(getXWikiContext());
+        List<BaseClass> list = this.getDoc().getXClasses(getXWikiContext());
         if (list == null) {
             return null;
         }
@@ -983,7 +983,7 @@ public class Document extends Api
 
     public Vector<Object> getComments(boolean asc)
     {
-        return getXObjects(this.doc.getComments(asc));
+        return getXObjects(this.getDoc().getComments(asc));
     }
 
     public void use(Object object)
@@ -1214,7 +1214,7 @@ public class Document extends Api
 
     public Attachment getAttachment(String filename)
     {
-        XWikiAttachment attach = this.doc.getAttachment(filename);
+        XWikiAttachment attach = this.getDoc().getAttachment(filename);
         if (attach == null) {
             return null;
         } else {
@@ -1562,14 +1562,14 @@ public class Document extends Api
         if (object != null) {
             return this.doc.display(classOrFieldName, object, getXWikiContext());
         }
-        return this.doc.getObject(classOrFieldName);
+        return this.getDoc().getObject(classOrFieldName);
     }
 
     public java.lang.Object getValue(String fieldName)
     {
         Object object;
         if (this.currentObj == null) {
-            object = new Object(this.doc.getFirstObject(fieldName, getXWikiContext()), getXWikiContext());
+            object = new Object(this.getDoc().getFirstObject(fieldName, getXWikiContext()), getXWikiContext());
         } else {
             object = this.currentObj;
         }
@@ -1615,7 +1615,7 @@ public class Document extends Api
 
     public List<String> getTagList()
     {
-        return this.doc.getTagsList(getXWikiContext());
+        return this.getDoc().getTagsList(getXWikiContext());
     }
 
     public List<String> getTagsPossibleValues()

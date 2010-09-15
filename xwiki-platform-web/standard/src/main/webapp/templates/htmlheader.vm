@@ -75,15 +75,11 @@
     #template("javascript.vm")
   </head>
   ## TODO: fix this from css
-  #if(($context.action=="inline") || ($context.action=="edit"))
-    <body onload="prepareCancelEdit();" id="body" class="wiki-${context.database} ${context.action}body #if($showLeftPanels == "0")hideleft#end#if($showRightPanels == "0")hideright#end#if($hidecolumns && ($!hidecolumns == 1))hidelefthideright#end">
-  #elseif($context.action == "admin")
-    <body onload="prepareCancelEdit();" id="body" class="wiki-${context.database} viewbody #if($showLeftPanels == "0")hideleft#end#if($showRightPanels == "0")hideright#end#if($hidecolumns && ($!hidecolumns == 1))hidelefthideright#end">
-  #elseif( $context.action == "import" || $context.action == "export" )
-    <body id="body" class="wiki-${context.database} viewbody #if($showLeftPanels == "0")hideleft#end#if($showRightPanels == "0")hideright#end#if($hidecolumns && ($!hidecolumns == 1))hidelefthideright#end">
-  #else
-    <body id="body" class="wiki-${context.database} ${context.action}body #if($showLeftPanels == "0")hideleft#end#if($showRightPanels == "0")hideright#end#if($hidecolumns && ($!hidecolumns == 1))hidelefthideright#end">
+  #set($bodyAction = $context.action)
+  #if($context.action == "admin" || $context.action == "import" || $context.action == "export")
+    #set($bodyAction = "view")
   #end
+  <body id="body" class="wiki-${context.database} ${bodyAction}body #if($showLeftPanels == "0")hideleft#end#if($showRightPanels == "0")hideright#end#if($hidecolumns && ($!hidecolumns == 1))hidelefthideright#end">
 #else
   #template("stylesheets2.vm")
   #template("javascript.vm")

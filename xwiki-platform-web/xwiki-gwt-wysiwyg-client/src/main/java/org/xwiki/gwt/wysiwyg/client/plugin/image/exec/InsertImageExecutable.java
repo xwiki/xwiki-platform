@@ -28,6 +28,7 @@ import org.xwiki.gwt.wysiwyg.client.plugin.image.ImageConfigDOMWriter;
 import org.xwiki.gwt.wysiwyg.client.plugin.image.ImageConfigJSONParser;
 import org.xwiki.gwt.wysiwyg.client.plugin.image.ImageConfigJSONSerializer;
 
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.dom.client.ImageElement;
 import com.google.gwt.dom.client.Node;
 
@@ -48,7 +49,7 @@ public class InsertImageExecutable extends AbstractInsertElementExecutable<Image
         super(rta);
 
         configDOMReader = new ImageConfigDOMReader();
-        configDOMWriter = new ImageConfigDOMWriter();
+        configDOMWriter = GWT.create(ImageConfigDOMWriter.class);
         configJSONParser = new ImageConfigJSONParser();
         configJSONSerializer = new ImageConfigJSONSerializer();
     }

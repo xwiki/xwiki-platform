@@ -176,18 +176,7 @@ public abstract class AbstractInsertElementExecutable<C, E extends com.google.gw
     @Override
     public boolean execute(String json)
     {
-        return execute(configJSONParser.parse(json));
-    }
-
-    /**
-     * Inserts a new element if none is selected, otherwise updates the selected element. In both cases the given
-     * configuration object is used to set the attributes of the target element.
-     * 
-     * @param config the object used to configure the newly created element or the selected element
-     * @return {@code true} if inserting a new element or updating the selected one succeeded, {@code false} otherwise
-     */
-    protected boolean execute(C config)
-    {
+        C config = configJSONParser.parse(json);
         E element = getSelectedElement();
         if (element == null) {
             // Insert a new element.
@@ -197,8 +186,22 @@ public abstract class AbstractInsertElementExecutable<C, E extends com.google.gw
             }
         }
         // Update the selected element.
-        configDOMWriter.write(config, element);
+        write(config, element);
         return true;
+    }
+
+    /**
+     * Updates the attributes of the given element based on the given configuration object.
+     * <p>
+     * Note: This method was added mainly to allow derived classes to adjust the configuration object before the element
+     * is updated.
+     * 
+     * @param config the object used to update the attributes of the given element
+     * @param element the element whose attributes are being updated
+     */
+    protected void write(C config, E element)
+    {
+        configDOMWriter.write(config, element);
     }
 
     /**

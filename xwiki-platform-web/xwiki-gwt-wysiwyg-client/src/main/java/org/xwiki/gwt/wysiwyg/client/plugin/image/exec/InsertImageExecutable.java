@@ -64,27 +64,25 @@ public class InsertImageExecutable extends AbstractInsertElementExecutable<Image
     /**
      * {@inheritDoc}
      * 
-     * @see AbstractInsertElementExecutable#execute(org.xwiki.gwt.user.client.Config)
+     * @see AbstractInsertElementExecutable#write(Object, com.google.gwt.dom.client.Element)
      */
     @Override
-    protected boolean execute(ImageConfig config)
+    protected void write(ImageConfig config, ImageElement image)
     {
-        // Backup the image URL.
+        // Backup the new image URL.
         String url = config.getUrl();
         boolean internal = !StringUtils.areEqual(config.getReference(), url);
         if (internal) {
-            // Resize internal images on the server side when possible.
-            // Use a blank image just to be able to determine the width and height of the image element in pixels
-            // (matching the width/height attributes or the style attribute) before requesting the real image. The
-            // computed width and height are used to adjust the image URL so that the image is resized on the server.
-            config.setUrl(GWT.getModuleBaseURL() + "clear.cache.gif");
+            // We keep the current image URL because we want to resize the current image before requesting the new
+            // image. This way we can use the computed width/height to adjust the URL of the new image so that it is
+            // resized on the server.
+            config.setUrl(image.getSrc());
         }
-        boolean success = super.execute(config);
-        if (success && internal) {
-            // Attached image. Change the image URL to resize the image on the server.
+        super.write(config, image);
+        if (internal) {
+            // Adjust the new image URL so that the image is resized on the server.
             updateURL(getSelectedElement(), url);
         }
-        return success;
     }
 
     /**
@@ -132,7 +130,13 @@ public class InsertImageExecutable extends AbstractInsertElementExecutable<Image
     @Override
     protected ImageElement newElement()
     {
-        return rta.getDocument().createImageElement();
+        ImageElement image = rta.getDocument().createImageElement();
+        // Ensure the image URL is initially set. Use a blank image just to be able to determine the width and height of
+        // the image element in pixels (matching the width/height attributes or the style attribute) before requesting
+        // the real image. The computed width and height are used to adjust the real image URL so that the image is
+        // resized on the server.
+        image.setSrc(GWT.getModuleBaseURL() + "clear.cache.gif");
+        return image;
     }
 
     /**

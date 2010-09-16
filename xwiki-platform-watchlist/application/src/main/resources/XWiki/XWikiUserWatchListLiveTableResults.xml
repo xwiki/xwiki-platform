@@ -23,7 +23,7 @@
 <syntaxId>xwiki/2.0</syntaxId>
 <hidden>false</hidden>
 <content>{{velocity wiki="false"}}
-#if($context.action == 'get')
+#if($xcontext.action == 'get')
 ##
 ## Constants
 ##

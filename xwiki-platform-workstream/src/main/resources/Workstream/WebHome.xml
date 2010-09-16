@@ -74,10 +74,10 @@ $xwiki.jsx.use("Workstream.Javascript") ## Inject JS using SX
 ## -------------------------
 #set($as = $xwiki.activitystream)
 #if($request.status)
-#if(!$context.user.equals("XWiki.XWikiGuest"))
+#if(!$xcontext.user.equals("XWiki.XWikiGuest"))
  #if(!$request.status.equals("") &amp;&amp; $request.status.length() &lt;= $maxChars)
   ## Add the update to a stream with the user wiki name as stream name
-  #set($ok=$as.addActivityEvent($context.user, "workstream", $xwiki.getXMLEncoded($request.status)))
+  #set($ok=$as.addActivityEvent($xcontext.user, "workstream", $xwiki.getXMLEncoded($request.status)))
   #info($msg.get('workstream.statusupdated'))
  #elseif($request.status.size() &gt; $maxChars)
   #warning($msg.get('workstream.statustoolong',["$maxChars"]))
@@ -88,7 +88,7 @@ $xwiki.jsx.use("Workstream.Javascript") ## Inject JS using SX
 #end
 ## 2. The status update form
 ## -------------------------
-#if(!$context.user.equals("XWiki.XWikiGuest")) ## Everybody authenticated can use the workstream.
+#if(!$xcontext.user.equals("XWiki.XWikiGuest")) ## Everybody authenticated can use the workstream.
 1.1.1 Update your status
 &lt;form id="status-update" action="$doc.getURL('view')" method="post"&gt;
 &lt;div&gt;

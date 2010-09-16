@@ -35,7 +35,7 @@ import com.xpn.xwiki.wysiwyg.server.WysiwygEditorScriptService;
  * 
  * @version $Id$
  */
-@Component("xwe")
+@Component("wysiwyg")
 public class DefaultWysiwygEditorScriptService implements WysiwygEditorScriptService
 {
     /**

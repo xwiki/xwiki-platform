@@ -31,7 +31,7 @@
 ## pretty dirtish but it's so gonna do the job: don't display this form to users which don't have the right to create annotations, instead send a nice unauthorized message
 #if(!$annotations.canAddAnnotation("$!{request.wiki}", "$!{request.space}", "$!{request.page}"))
   #set($message = $msg.get("annotations.action.create.error.unauthorized"))
-  #if ($context.user.equals("XWiki.XWikiGuest"))
+  #if ($xcontext.user.equals("XWiki.XWikiGuest"))
     #set($message = $msg.get("annotations.action.create.error.unauthorizedguest"))
   #end
   ## unauthorized, with a nice i18n message
@@ -46,7 +46,7 @@
 #set($dispose = $annData.put("selectionOffset", $!request.selectionOffset))
 ## pretend that annotation author is current user, and annotation date is now
 ##Even if they get sent to the server, the server will overwrite with anything's logged in in there anyway
-#set($dispose = $annData.put("author", $context.user))
+#set($dispose = $annData.put("author", $xcontext.user))
 #set($dispose = $annData.put("date", $util.date))
 #displayCreateBox("$!{request.wiki}", "$!{request.space}", "$!{request.page}", $annData)
 {{/html}}

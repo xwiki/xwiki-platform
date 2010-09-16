@@ -278,7 +278,6 @@
 #-# If enabled, all actions requiring "comment", "edit", "delete", "admin" or "programming" rights
 #-# will check that the parameter "form_token" with the value of a random secret token is present
 #-# in the request.
-#-# This feature requires CSRFToken component.
 #-# 
 #-# Valid values:
 #-#   0: Disabled

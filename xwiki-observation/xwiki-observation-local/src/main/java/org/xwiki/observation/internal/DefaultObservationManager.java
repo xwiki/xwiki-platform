@@ -28,7 +28,11 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.Requirement;
+import org.xwiki.component.descriptor.ComponentDescriptor;
 import org.xwiki.component.logging.AbstractLogEnabled;
+import org.xwiki.component.manager.ComponentDescriptorAddedEvent;
+import org.xwiki.component.manager.ComponentDescriptorEvent;
+import org.xwiki.component.manager.ComponentDescriptorRemovedEvent;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.component.phase.Initializable;
@@ -146,10 +150,11 @@ public class DefaultObservationManager extends AbstractLogEnabled implements Obs
 
         // If the passed event listener name is already registered, log a warning
         if (previousListener != null) {
-            getLogger().warn("The [" + eventListener.getClass().getName() + "] listener has overwritten a previously "
-                + "registered listener [" + previousListener.getClass().getName()
-                + "] since they both are registered under the same id [" + eventListener.getName() + "]."
-                + " In the future consider removing a Listener first if you really want to register it again.");
+            getLogger().warn(
+                "The [" + eventListener.getClass().getName() + "] listener has overwritten a previously "
+                    + "registered listener [" + previousListener.getClass().getName()
+                    + "] since they both are registered under the same id [" + eventListener.getName() + "]."
+                    + " In the future consider removing a Listener first if you really want to register it again.");
         }
 
         // For each event defined for this listener, add it to the Event Map.
@@ -166,7 +171,7 @@ public class DefaultObservationManager extends AbstractLogEnabled implements Obs
                 // Add an event to existing RegisteredListener object
                 RegisteredListener registeredListener = eventListeners.get(eventListener.getName());
                 if (registeredListener == null) {
-                    eventListeners.put(eventListener.getName(), new RegisteredListener(eventListener, event)); 
+                    eventListeners.put(eventListener.getName(), new RegisteredListener(eventListener, event));
                 } else {
                     registeredListener.addEvent(event);
                 }
@@ -182,9 +187,8 @@ public class DefaultObservationManager extends AbstractLogEnabled implements Obs
     public void removeListener(String listenerName)
     {
         this.listenersByName.remove(listenerName);
-        for (Map.Entry<Class< ? extends Event>, Map<String, RegisteredListener>> entry
-            : this.listenersByEvent.entrySet())
-        {
+        for (Map.Entry<Class< ? extends Event>, Map<String, RegisteredListener>> entry : this.listenersByEvent
+            .entrySet()) {
             entry.getValue().remove(listenerName);
             if (entry.getValue().isEmpty()) {
                 this.listenersByEvent.remove(entry.getKey());
@@ -248,6 +252,11 @@ public class DefaultObservationManager extends AbstractLogEnabled implements Obs
         if (allEventRegListeners != null) {
             notify(allEventRegListeners.values(), event, source, data);
         }
+
+        // handle component added/removed
+        if (event instanceof ComponentDescriptorEvent) {
+            onComponentEvent((ComponentDescriptorEvent) event, (ComponentDescriptor<EventListener>) data);
+        }
     }
 
     /**
@@ -288,5 +297,59 @@ public class DefaultObservationManager extends AbstractLogEnabled implements Obs
     public void notify(Event event, Object source)
     {
         notify(event, source, null);
+    }
+
+    /**
+     * A component as been modified.
+     * 
+     * @param componentEvent the event
+     * @param data the descriptor of the modified component
+     */
+    private void onComponentEvent(ComponentDescriptorEvent componentEvent, ComponentDescriptor<EventListener> data)
+    {
+        if (componentEvent.getRole() == EventListener.class) {
+            if (componentEvent instanceof ComponentDescriptorAddedEvent) {
+                componentAdded((ComponentDescriptorAddedEvent) componentEvent,
+                    (ComponentDescriptor<EventListener>) data);
+            } else {
+                componentRemoved((ComponentDescriptorRemovedEvent) componentEvent,
+                    (ComponentDescriptor<EventListener>) data);
+            }
+        }
+    }
+
+    /**
+     * @param event event object containing the new component descriptor
+     * @param descriptor the component descriptor removed from component manager
+     */
+    private void componentAdded(ComponentDescriptorAddedEvent event, ComponentDescriptor<EventListener> descriptor)
+    {
+        try {
+            EventListener eventListener = this.componentManager.lookup(EventListener.class, event.getRoleHint());
+
+            if (getListener(eventListener.getName()) != eventListener) {
+                addListener(eventListener);
+            }
+        } catch (ComponentLookupException e) {
+            getLogger().error("Failed to lookup event listener corresponding to the component registration event", e);
+        }
+    }
+
+    /**
+     * @param event event object containing the removed component descriptor
+     * @param descriptor the component descriptor removed from component manager
+     */
+    private void componentRemoved(ComponentDescriptorRemovedEvent event, ComponentDescriptor< ? > descriptor)
+    {
+        EventListener removedEventListener = null;
+        for (EventListener eventListener : this.listenersByName.values()) {
+            if (eventListener.getClass() == descriptor.getImplementation()) {
+                removedEventListener = eventListener;
+            }
+        }
+
+        if (removedEventListener != null) {
+            removeListener(removedEventListener.getName());
+        }
     }
 }

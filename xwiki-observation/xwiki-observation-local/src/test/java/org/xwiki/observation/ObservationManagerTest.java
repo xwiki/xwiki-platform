@@ -77,7 +77,7 @@ public class ObservationManagerTest
     }
 
     @Test
-    public void testRemoveListener() 
+    public void testRemoveListener()
     {
         final EventListener listener = this.context.mock(EventListener.class);
         final Event event = this.context.mock(Event.class);
@@ -206,7 +206,8 @@ public class ObservationManagerTest
             allowing(listener).getName(); will(returnValue("mylistener"));
             allowing(listener).getEvents(); will(returnValue(Arrays.asList(AllEvent.ALLEVENT)));
             // The check is performed here, we verify that a warning is correctly logged
-            oneOf(logger).warn("The [$Proxy6] listener has overwritten a previously registered listener [$Proxy6] "
+            oneOf(logger).warn("The [" + listener.getClass().getName()
+                + "] listener has overwritten a previously registered listener [" + listener.getClass().getName() + "] "
                 + "since they both are registered under the same id [mylistener]. In the future consider removing a "
                 + "Listener first if you really want to register it again.");
         }});

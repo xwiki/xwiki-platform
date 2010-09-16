@@ -1,7 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?>
-
-<!--
- *
+/*
  * See the NOTICE file distributed with this work for additional
  * information regarding copyright ownership.
  *
@@ -20,24 +17,25 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  *
--->
+ */
+package org.xwiki.component.manager;
 
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
-  <modelVersion>4.0.0</modelVersion>
-  <parent>
-    <groupId>org.xwiki.platform</groupId>
-    <artifactId>xwiki-core-parent</artifactId>
-    <version>2.5-SNAPSHOT</version>
-  </parent>
-  <artifactId>xwiki-core-component</artifactId>
-  <name>XWiki Platform - Core - Component - Parent POM</name>
-  <packaging>pom</packaging>
-  <description>XWiki Platform - Core - Component - Parent POM</description>
-  <modules>
-    <module>xwiki-component-api</module>
-    <module>xwiki-component-observation</module>
-    <module>xwiki-component-default</module>
-    <module>xwiki-component-multi</module>
-  </modules>
-</project>
-       
+import org.xwiki.observation.event.Event;
+
+/**
+ * Base interface for all componets descriptor events.
+ * 
+ * @version $Id$
+ */
+public interface ComponentDescriptorEvent extends Event
+{
+    /**
+     * @return the role of the component
+     */
+    Class< ? > getRole();
+
+    /**
+     * @return the role hint of the component
+     */
+    String getRoleHint();
+}

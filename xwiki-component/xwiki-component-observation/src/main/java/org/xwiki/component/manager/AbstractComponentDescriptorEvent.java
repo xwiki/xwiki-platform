@@ -19,18 +19,22 @@
  */
 package org.xwiki.component.manager;
 
-import org.xwiki.observation.event.Event;
-
 /**
  * Base class for events about components descriptors.
  * 
  * @version $Id$
  * @since 2.0M2
  */
-public abstract class AbstractComponentDescriptorEvent implements Event
+public abstract class AbstractComponentDescriptorEvent implements ComponentDescriptorEvent
 {
+    /**
+     * Component role.
+     */
     private Class< ? > role;
 
+    /**
+     * Component role hint.
+     */
     private String roleHint;
 
     /**
@@ -50,7 +54,8 @@ public abstract class AbstractComponentDescriptorEvent implements Event
     }
 
     /**
-     * @param role the component role/rolehint to watch
+     * @param role the component role to watch
+     * @param roleHint the component rolehint to watch
      */
     public AbstractComponentDescriptorEvent(Class< ? > role, String roleHint)
     {
@@ -88,7 +93,7 @@ public abstract class AbstractComponentDescriptorEvent implements Event
             if (getRole() == null) {
                 result = true;
             } else {
-                AbstractComponentDescriptorEvent event = (AbstractComponentDescriptorEvent) otherEvent;
+                ComponentDescriptorEvent event = (ComponentDescriptorEvent) otherEvent;
                 // It's possible Class reference are not the same when it coming for different ClassLoader so we
                 // compare class names
                 if (getRole().getName().equals(event.getRole().getName())) {

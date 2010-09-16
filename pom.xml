@@ -200,6 +200,27 @@
                 <exclude>org/xwiki/rendering/macro/script/AbstractScriptMacro</exclude>
                 <exclude>org/xwiki/rendering/macro/script/AbstractJSR223ScriptMacro</exclude>
                 <exclude>org/xwiki/rendering/wiki/WikiModel</exclude>
+                <!-- Not really API changes, just moved to another project -->
+                <exclude>org/xwiki/component/manager/AbstractComponentDescriptorEvent</exclude>
+                <exclude>org/xwiki/component/manager/ComponentDescriptorAddedEvent</exclude>
+                <exclude>org/xwiki/component/manager/ComponentDescriptorRemovedEvent</exclude>
+                <exclude>org/xwiki/observation/EventListener</exclude>
+                <exclude>org/xwiki/observation/ObservationManager</exclude>
+                <exclude>org/xwiki/observation/event/AbstractDocumentEvent</exclude>
+                <exclude>org/xwiki/observation/event/AbstractFilterableEvent</exclude>
+                <exclude>org/xwiki/observation/event/ActionExecutionEvent</exclude>
+                <exclude>org/xwiki/observation/event/AllEvent</exclude>
+                <exclude>org/xwiki/observation/event/ApplicationStartedEvent</exclude>
+                <exclude>org/xwiki/observation/event/ApplicationStoppedEvent</exclude>
+                <exclude>org/xwiki/observation/event/DocumentDeleteEvent</exclude>
+                <exclude>org/xwiki/observation/event/DocumentSaveEvent</exclude>
+                <exclude>org/xwiki/observation/event/DocumentUpdateEvent</exclude>
+                <exclude>org/xwiki/observation/event/Event</exclude>
+                <exclude>org/xwiki/observation/event/FilterableEvent</exclude>
+                <exclude>org/xwiki/observation/event/filter/AlwaysMatchingEventFilter</exclude>
+                <exclude>org/xwiki/observation/event/filter/EventFilter</exclude>
+                <exclude>org/xwiki/observation/event/filter/FixedNameEventFilter</exclude>
+                <exclude>org/xwiki/observation/event/filter/RegexEventFilter</exclude>
               </excludes>
             </configuration>
           </plugin>

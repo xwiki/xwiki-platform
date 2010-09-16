@@ -43,6 +43,14 @@
       <artifactId>resin-quercus</artifactId>
       <version>3.2.1</version>
     </dependency>
+
+    <!-- Quercus needs the servlet API to properly initialize -->
+    <dependency>
+      <groupId>javax.servlet</groupId>
+      <artifactId>servlet-api</artifactId>
+      <scope>runtime</scope>
+    </dependency>
+
     <!-- Testing dependencies -->
     <dependency>
       <groupId>org.xwiki.platform</groupId>
@@ -51,11 +59,11 @@
       <type>test-jar</type>
       <scope>test</scope>
     </dependency>
-    <!-- Quercus needs the servlet API to properly initialize -->
     <dependency>
-      <groupId>javax.servlet</groupId>
-      <artifactId>servlet-api</artifactId>
-      <scope>runtime</scope>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-core-observation-local</artifactId>
+      <version>${project.version}</version>
+      <scope>test</scope>
     </dependency>
   </dependencies>
   <build>

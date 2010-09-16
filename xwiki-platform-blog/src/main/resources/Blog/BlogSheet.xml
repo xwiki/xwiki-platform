@@ -58,7 +58,7 @@
 ##
 ##
 #showBlogInfo($doc)
-#if($context.action != 'inline')
+#if($xcontext.action != 'inline')
   #printBlog($doc)
 #end
 {{/html}}

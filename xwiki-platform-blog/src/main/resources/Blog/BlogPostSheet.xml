@@ -61,7 +61,7 @@ $xwiki.ssx.use('Blog.ManageCategories')##
 #getEntryObject($doc $entryObj)
 #if("$!entryObj" == '')
   #warning($msg.get('xe.blog.sheet.notpost'))
-#elseif($context.action != 'inline')
+#elseif($xcontext.action != 'inline')
   ## View mode
   #isPublished($entryObj $isPublished)
   #isHidden($entryObj $isHidden)
@@ -84,7 +84,7 @@ $xwiki.ssx.use('Blog.ManageCategories')##
   #template('tagedit.vm')
   #isPublished($entryObj $isPublished)
   #if($isPublished)
-    #if($doc.creator == $context.user)
+    #if($doc.creator == $xcontext.user)
       #publishMessageBox($msg.get('xe.blog.sheet.publicationdate', [${doc.display('publishDate', 'view', $entryObj)}]))
       #set($hideArticle = ${doc.display('hidden', 'edit', $entryObj)})
       #hideMessageBox($msg.get('xe.blog.sheet.hidearticle', [${hideArticle}]))

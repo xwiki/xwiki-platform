@@ -28,7 +28,7 @@
   #set($newContent = '#includeForm("Blog.BlogPostSheet")')
   #set($query = ", BaseObject obj where obj.name = doc.fullName and obj.className = 'XWiki.ArticleClass'")
   #foreach($article in $xwiki.searchDocuments($query))
-    #if($xwiki.hasAccessLevel('edit', $context.user, $article))
+    #if($xwiki.hasAccessLevel('edit', $xcontext.user, $article))
       #set($articleDoc = $xwiki.getDocument($article))
     #set($articleObj = $articleDoc.getObject('XWiki.ArticleClass'))
       #set($entryObj = $articleDoc.newObject('Blog.BlogPostClass'))

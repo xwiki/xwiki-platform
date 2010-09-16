@@ -15,6 +15,7 @@ XWiki.actionButtons.EditActions = Class.create({
   initialize : function() {
     this.addListeners();
     this.addShortcuts();
+    this.addValidators();
   },
   addListeners : function() {
     $$('input[name=action_cancel]').each(function(item) {
@@ -50,7 +51,26 @@ XWiki.actionButtons.EditActions = Class.create({
       }
     }
   },
+  validators : new Array(), 
+  addValidators : function() {
+    // Add live presence validation for inputs with classname 'required'.
+    var inputs = document.body.select("input.required");
+    for (var i = 0; i < inputs.length; i++) {
+      var input = inputs[i];
+      var validator = new LiveValidation(input, { validMessage: "" });
+      validator.add(Validate.Presence, {
+        failureMessage: "$msg.get('core.editors.validation.mandatoryField')"
+      });
+      validator.validate();
+      this.validators.push(validator);
+    }
+  },
   validateForm : function(form) {
+    for (var i = 0; i < this.validators.length; i++) {
+      if (!this.validators[i].validate()) {
+        return false;
+      }
+    }
     #if($xwiki.isEditCommentMandatory())
       var commentField = form.comment
       while (commentField.value == "") {

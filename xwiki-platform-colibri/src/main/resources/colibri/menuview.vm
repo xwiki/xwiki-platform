@@ -5,7 +5,7 @@
 ##
 ## User
 ##
-#if(!$context.action.startsWith('login'))
+#if(!$xcontext.action.startsWith('login'))
   #if($isGuest)
     #set($loginurl = $xwiki.getURL('XWiki.XWikiLogin', 'login', "xredirect=$escapetool.url($xwiki.getRequestURL())"))
     #xwikitopmenuentry($!loginurl $!msg.get('login') 'tmLogin')
@@ -24,11 +24,11 @@
 #if ($isSuperAdmin)
   #xwikitopmenuentry('#' $!msg.get('superadmin') 'tmUser' 'hasIcon')
 #else
-  #xwikitopmenuentrystart($xwiki.getURL($context.user, 'view') "$msg.get('core.menu.type.profile')__SEPARATOR__$!xwiki.getUserName($context.user, false)" 'tmUser' 'hasIcon')
-  #submenuitem($xwiki.getURL($context.user, 'view') $msg.get('core.menu.profile') 'tmProfile', '')
-  #submenuitem($xwiki.getURL($context.user, 'view', 'category=preferences') $msg.get('core.menu.userPreferences') 'tmUserPreferences', '')
+  #xwikitopmenuentrystart($xwiki.getURL($xcontext.user, 'view') "$msg.get('core.menu.type.profile')__SEPARATOR__$!xwiki.getUserName($xcontext.user, false)" 'tmUser' 'hasIcon')
+  #submenuitem($xwiki.getURL($xcontext.user, 'view') $msg.get('core.menu.profile') 'tmProfile', '')
+  #submenuitem($xwiki.getURL($xcontext.user, 'view', 'category=preferences') $msg.get('core.menu.userPreferences') 'tmUserPreferences', '')
   #if($hasWatch)
-    #submenuitem($xwiki.getURL($context.user, 'view', 'category=watchlist') $msg.get('core.menu.watchlist.management') 'tmWatchlistManager', '')
+    #submenuitem($xwiki.getURL($xcontext.user, 'view', 'category=watchlist') $msg.get('core.menu.watchlist.management') 'tmWatchlistManager', '')
   #end
   #xwikitopmenuentryend()
 #end
@@ -91,9 +91,9 @@
 #set($displayWikiSubmenu = $hasWatch || $hasGlobalAdmin)
 #set($wikiEntryText = $msg.get('core.menu.type.wiki'))
 #if($xwiki.isVirtualMode() && $xwiki.wikimanager)
-  #set($wikiName = $xwiki.wikimanager.getWikiDocument($context.getDatabase()).getWikiPrettyName())
+  #set($wikiName = $xwiki.wikimanager.getWikiDocument($xcontext.getDatabase()).getWikiPrettyName())
   #if("$!wikiName.trim()" == '')
-    #set($wikiName = $context.getDatabase())
+    #set($wikiName = $xcontext.getDatabase())
   #end
   #set($wikiEntryText = "${wikiEntryText}__SEPARATOR__${wikiName}")
 #end

@@ -6,7 +6,7 @@
 ###
 #if($isInServletMode) ## Visible only in a page
 <div id="headerglobal" class="layoutsection">
-#if($context.action == "view")
+#if($xcontext.action == "view")
 <div class="minwidthb"></div>
 #else
 <div class="minwidthd"></div>

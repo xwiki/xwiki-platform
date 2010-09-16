@@ -17,7 +17,7 @@
     #set($showinformation = $xwiki.getSpacePreference('showinformation'))
   #end
   #set($docextralinks = $util.arrayList)
-  #if($context.action == 'view' && $viewer != 'content')
+  #if($xcontext.action == 'view' && $viewer != 'content')
     #set ($discard = $docextralinks.add(['content', $msg.get('core.links.content'), -1]))
   #end
   #if($viewer != 'comments' && $showcomments != false && $showcomments != "no" && $showcomments != "0" && $showcomments != "false")

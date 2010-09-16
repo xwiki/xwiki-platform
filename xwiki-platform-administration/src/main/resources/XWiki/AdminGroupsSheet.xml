@@ -37,7 +37,7 @@
 ## url to get the groups for displaying them in the ajax-based table
 ##
 #set($url = $doc.getURL('get', 'xpage=getgroups'))
-#if($context.database != "xwiki") 
+#if($xcontext.database != "xwiki") 
   #set($mainwk = false) 
 #else 
   #set($mainwk = true) 

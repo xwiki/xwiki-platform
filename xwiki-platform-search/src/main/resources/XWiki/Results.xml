@@ -36,9 +36,9 @@
     #if($isLuceneResult)
       #set($itemfullname = "${item.wiki}:${item.space}.${item.name}")
     #else
-      #set($itemfullname = "${context.database}:${item}")
+      #set($itemfullname = "${xcontext.database}:${item}")
     #end
-    #if ($xwiki.hasAccessLevel('view', $context.user, $itemfullname))
+    #if ($xwiki.hasAccessLevel('view', $xcontext.user, $itemfullname))
       &lt;div class="resultItem"&gt;
       &lt;div class="resultContainer"&gt;
       #if($isLuceneResult)

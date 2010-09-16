@@ -93,7 +93,7 @@ $xwiki.ssfx.use("uicomponents/search/search.css", true)##
     #set ($webClause = "${webClause} doc.space='$space' and")
   #end
   #macro(addelement $item $list)
-    #if($xwiki.hasAccessLevel('view', $context.user, "${context.database}:${item}"))
+    #if($xwiki.hasAccessLevel('view', $xcontext.user, "${xcontext.database}:${item}"))
       #set($itemdoc = $xwiki.getDocument($item))
       ## All items will be sorted by the date; since the list is obtained from several queries, we can't order in the HQL.
       ## Prefix all item names with the date for sorting the combined results.
@@ -147,7 +147,7 @@ $xwiki.ssfx.use("uicomponents/search/search.css", true)##
     #set ($discard = $feed.setAuthor('XWiki'))
     #set ($discard = $feed.setTitle($msg.get('search.rss', [$text])))
     #set ($discard = $feed.setDescription($msg.get('search.rss', [$text])))
-    #set ($discard = $feed.setLanguage($context.language))
+    #set ($discard = $feed.setLanguage($xcontext.language))
     #set ($discard = $feed.setCopyright($xwiki.getXWikiPreference('copyright')))
     {{{$xwiki.feed.getFeedOutput($feed, $xwiki.getXWikiPreference('feed_type', 'rss_2.0'))}}}
   #else

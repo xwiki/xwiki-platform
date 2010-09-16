@@ -237,8 +237,8 @@
           <includeTestSourceDirectory>true</includeTestSourceDirectory>
           <!-- New code should follow checkstyle rules. -->
           <excludes>
-            com/xpn/xwiki/wysiwyg/server/plugin/sync/internal/DefaultSyncEngine.java,
-            com/xpn/xwiki/wysiwyg/server/plugin/sync/SyncTest.java
+            com/xpn/xwiki/wysiwyg/server/internal/plugin/sync/DefaultSyncEngine.java,
+            com/xpn/xwiki/wysiwyg/server/internal/plugin/sync/DefaultSyncEngineTest.java
           </excludes>
         </configuration>
       </plugin>

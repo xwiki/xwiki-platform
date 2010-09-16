@@ -32,10 +32,10 @@
 {{html clean="false" wiki="true"}}
 $xwiki.ssx.use("XWiki.XWikiUserSheet")##
 $xwiki.ssx.use('Main.Dashboard')##
-&lt;div class="dashboard dashboard${context.action}"&gt;
+&lt;div class="dashboard dashboard${xcontext.action}"&gt;
   &lt;div class="dashboardleft"&gt;
     &lt;div class="watchlistManagement"&gt;
-      #if($context.action == 'view' &amp;&amp; $hasEdit)
+      #if($xcontext.action == 'view' &amp;&amp; $hasEdit)
         &lt;div class="editProfileCategory"&gt;&lt;a href="$doc.getURL('inline', 'category=watchlist')"&gt;&lt;span class="hidden"&gt;$msg.get('platform.core.profile.category.watchlist.edit')&lt;/span&gt;&lt;/a&gt;&lt;/div&gt;
       #end
       &lt;h1&gt;$msg.get('platform.core.profile.section.watchlistManagement')&lt;/h1&gt;
@@ -44,7 +44,7 @@ $xwiki.ssx.use('Main.Dashboard')##
         #set($notifiers = $xwiki.searchDocuments(", BaseObject obj where doc.fullName=obj.name and obj.className='XWiki.WatchListJobClass'"))
         #set($currentNotifier = $doc.display('interval', 'view'))
         &lt;dd&gt;
-          #if($context.action=='view')
+          #if($xcontext.action=='view')
             #if("$!currentNotifier" != "")
               $xwiki.getDocument($currentNotifier).getDisplayTitle()
             #end
@@ -61,13 +61,13 @@ $xwiki.ssx.use('Main.Dashboard')##
     &lt;/div&gt;
   &lt;/div&gt;
   &lt;div class="dashboardright"&gt;
-    #if ($context.action == 'view')
+    #if ($xcontext.action == 'view')
       &lt;div class="watchlistRss"&gt;
         &lt;h1&gt;$msg.get('watchlist.staytuned.rss')&lt;/h1&gt;
         &lt;a id="watchlistRssLink" rel="_blank" href="$xwiki.getURL("XWiki.WatchListRss", "view", "xpage=plain&amp;amp;outputSyntax=plain")"&gt;$msg.get("watchlist.staytuned.rss.info")&lt;/a&gt;
       &lt;/div&gt;
     #end
-    #if ($context.action == 'view')
+    #if ($xcontext.action == 'view')
       &lt;div class="watchlistElements"&gt;
         &lt;h1&gt;$msg.get('platform.core.profile.section.watchlistElements')&lt;/h1&gt;
         #set($collist = ["type", "wiki","space", "document", "actions"])

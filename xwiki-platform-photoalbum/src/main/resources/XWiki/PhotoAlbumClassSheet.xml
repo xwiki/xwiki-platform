@@ -63,7 +63,7 @@
 
 $doc.display("description", $obj)
 
-#if($context.action != "inline")
+#if($xcontext.action != "inline")
 
   #set($diapo = $request.get("diapo"))
   #if(!$diapo)

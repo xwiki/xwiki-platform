@@ -8,3 +8,4 @@ com.xpn.xwiki.wysiwyg.server.internal.plugin.sync.XWikiSyncService
 com.xpn.xwiki.wysiwyg.server.internal.plugin.sync.DefaultSyncEngine
 com.xpn.xwiki.wysiwyg.server.internal.wiki.DefaultWikiService
 com.xpn.xwiki.wysiwyg.server.internal.wiki.DefaultLinkService
+com.xpn.xwiki.wysiwyg.server.internal.DefaultWysiwygEditorScriptService

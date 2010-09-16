@@ -17,22 +17,26 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package com.xpn.xwiki.wysiwyg.server.plugin;
+package com.xpn.xwiki.wysiwyg.server.internal;
 
+import org.xwiki.component.annotation.Component;
+import org.xwiki.component.annotation.Requirement;
+import org.xwiki.component.manager.ComponentManager;
+import org.xwiki.context.Execution;
 import org.xwiki.gwt.wysiwyg.client.converter.HTMLConverter;
 import org.xwiki.rendering.parser.Parser;
 import org.xwiki.rendering.renderer.PrintRendererFactory;
 
 import com.xpn.xwiki.XWikiContext;
-import com.xpn.xwiki.api.Api;
-import com.xpn.xwiki.web.Utils;
+import com.xpn.xwiki.wysiwyg.server.WysiwygEditorScriptService;
 
 /**
- * Api for the WysiwygPlugin.
+ * Default implementation of {@link WysiwygEditorScriptService}.
  * 
  * @version $Id$
  */
-public class WysiwygPluginApi extends Api
+@Component("xwe")
+public class DefaultWysiwygEditorScriptService implements WysiwygEditorScriptService
 {
     /**
      * The context property which indicates if the current code was called from a template (only Velocity execution) or
@@ -43,54 +47,40 @@ public class WysiwygPluginApi extends Api
     private static final String IS_IN_RENDERING_ENGINE = "isInRenderingEngine";
 
     /**
-     * The plugin instance.
+     * The component manager. We need it because we have to access components dynamically.
      */
-    private WysiwygPlugin plugin;
+    @Requirement
+    private ComponentManager componentManager;
+
+    /** Execution context handler, needed for accessing the XWikiContext. */
+    @Requirement
+    private Execution execution;
 
     /**
-     * Creates a new API instance for the given plug-in in the specified context.
+     * The component used to convert HTML to wiki syntax.
+     */
+    @Requirement
+    private HTMLConverter htmlConverter;
+
+    /**
+     * @return the XWiki context
+     * @deprecated avoid using this method; try using the document access bridge instead
+     */
+    private XWikiContext getXWikiContext()
+    {
+        return (XWikiContext) execution.getContext().getProperty("xwikicontext");
+    }
+
+    /**
+     * {@inheritDoc}
      * 
-     * @param plugin The underlying plug-in of this plug-in API.
-     * @param context The XWiki context.
-     */
-    public WysiwygPluginApi(WysiwygPlugin plugin, XWikiContext context)
-    {
-        super(context);
-        setPlugin(plugin);
-    }
-
-    /**
-     * @return The underlying plug-in of this plug-in API.
-     * @see #plugin
-     */
-    public WysiwygPlugin getPlugin()
-    {
-        if (hasProgrammingRights()) {
-            return plugin;
-        }
-        return null;
-    }
-
-    /**
-     * @param plugin The underlying plug-in of this plug-in API.
-     * @see #plugin
-     */
-    public void setPlugin(WysiwygPlugin plugin)
-    {
-        this.plugin = plugin;
-    }
-
-    /**
-     * Checks if there is a parser and a renderer available for the specified syntax.
-     * 
-     * @param syntaxId the syntax identifier, like <em>xwiki/2.0</em>
-     * @return {@code true} if the specified syntax is currently supported by the editor, {@code false} otherwise
+     * @see WysiwygEditorScriptService#isSyntaxSupported(String)
      */
     public boolean isSyntaxSupported(String syntaxId)
     {
         try {
-            Utils.getComponent(Parser.class, syntaxId);
-            Utils.getComponent(PrintRendererFactory.class, syntaxId);
+            componentManager.lookup(Parser.class, syntaxId);
+            componentManager.lookup(PrintRendererFactory.class, syntaxId);
             return true;
         } catch (Exception e) {
             return false;
@@ -98,33 +88,31 @@ public class WysiwygPluginApi extends Api
     }
 
     /**
-     * Parses the given HTML fragment and renders the result in annotated XHTML syntax.
+     * {@inheritDoc}
      * 
-     * @param html the HTML fragment to be rendered
-     * @param syntax the storage syntax
-     * @return the XHTML result of rendering the given HTML fragment
+     * @see WysiwygEditorScriptService#parseAndRender(String, String)
      */
     public String parseAndRender(String html, String syntax)
     {
         // Save the value of the "is in rendering engine" context property.
-        Object isInRenderingEngine = context.get(IS_IN_RENDERING_ENGINE);
+        Object isInRenderingEngine = getXWikiContext().get(IS_IN_RENDERING_ENGINE);
 
         try {
             // This tells display() methods that we are inside the rendering engine and thus that they can return wiki
             // syntax and not HTML syntax (which is needed when outside the rendering engine, i.e. when we're inside
             // templates using only Velocity for example).
-            context.put(IS_IN_RENDERING_ENGINE, true);
+            getXWikiContext().put(IS_IN_RENDERING_ENGINE, true);
 
-            return Utils.getComponent(HTMLConverter.class).parseAndRender(html, syntax);
+            return htmlConverter.parseAndRender(html, syntax);
         } catch (Exception e) {
             // Leave the previous HTML in case of an exception.
             return html;
         } finally {
             // Restore the value of the value of the "is in rendering engine" context property.
             if (isInRenderingEngine != null) {
-                context.put(IS_IN_RENDERING_ENGINE, isInRenderingEngine);
+                getXWikiContext().put(IS_IN_RENDERING_ENGINE, isInRenderingEngine);
             } else {
-                context.remove(IS_IN_RENDERING_ENGINE);
+                getXWikiContext().remove(IS_IN_RENDERING_ENGINE);
             }
         }
     }

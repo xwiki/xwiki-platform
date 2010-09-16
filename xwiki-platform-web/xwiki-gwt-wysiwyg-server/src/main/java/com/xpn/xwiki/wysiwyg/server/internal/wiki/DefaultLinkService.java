@@ -32,6 +32,7 @@ import org.xwiki.rendering.listener.LinkType;
 import org.xwiki.rendering.parser.LinkParser;
 import org.xwiki.rendering.renderer.LinkReferenceSerializer;
 
+import com.xpn.xwiki.wysiwyg.server.wiki.EntityReferenceConverter;
 import com.xpn.xwiki.wysiwyg.server.wiki.LinkService;
 
 /**

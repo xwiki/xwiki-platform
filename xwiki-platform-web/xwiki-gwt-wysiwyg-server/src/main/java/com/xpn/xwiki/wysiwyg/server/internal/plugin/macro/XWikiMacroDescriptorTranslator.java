@@ -28,6 +28,7 @@ import org.xwiki.gwt.wysiwyg.client.plugin.macro.ParameterDescriptor;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.web.XWikiMessageTool;
+import com.xpn.xwiki.wysiwyg.server.plugin.macro.MacroDescriptorTranslator;
 
 /**
  * XWiki specific implementation of {@link MacroDescriptorTranslator}.

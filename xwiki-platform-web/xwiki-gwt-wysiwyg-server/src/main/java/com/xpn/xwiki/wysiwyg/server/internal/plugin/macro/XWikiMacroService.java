@@ -40,6 +40,8 @@ import org.xwiki.rendering.macro.MacroManager;
 import org.xwiki.rendering.syntax.Syntax;
 import org.xwiki.rendering.syntax.SyntaxFactory;
 
+import com.xpn.xwiki.wysiwyg.server.plugin.macro.MacroDescriptorTranslator;
+
 /**
  * XWiki specific implementation of {@link MacroService}.
  * 

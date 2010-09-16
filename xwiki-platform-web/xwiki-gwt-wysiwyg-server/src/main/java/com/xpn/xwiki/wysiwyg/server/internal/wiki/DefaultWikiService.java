@@ -41,6 +41,7 @@ import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiAttachment;
 import com.xpn.xwiki.doc.XWikiDocument;
+import com.xpn.xwiki.wysiwyg.server.wiki.EntityReferenceConverter;
 import com.xpn.xwiki.wysiwyg.server.wiki.LinkService;
 
 /**

@@ -144,6 +144,12 @@
       <artifactId>xwiki-core-crypto</artifactId>
       <version>${platform.core.version}</version>
     </dependency>
+    <!-- CSRF protection -->
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-core-csrftoken</artifactId>
+      <version>${platform.core.version}</version>
+    </dependency>
   </dependencies>
   <build>
     <plugins>

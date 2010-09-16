@@ -124,7 +124,7 @@
   #set($ok=$scheduler.scheduleJob($jobObj))
   #if($ok==false) 
 
-   {{error}}$context.get('error'){{/error}}
+   {{error}}$xcontext.get('error'){{/error}}
 
   #else
    #set($jobName = "$jobObj.get('jobName')")
@@ -139,7 +139,7 @@
   #set($ok=$scheduler.pauseJob($jobObj))
   #if($ok==false) 
 
-   {{error}}$context.get('error'){{/error}}
+   {{error}}$xcontext.get('error'){{/error}}
 
   #else
 
@@ -153,7 +153,7 @@
   #set($ok=$scheduler.resumeJob($jobObj))
   #if($ok==false)
 
-   {{error}}$context.get('error'){{/error}}
+   {{error}}$xcontext.get('error'){{/error}}
 
   #else
 
@@ -167,7 +167,7 @@
   #set($ok=$scheduler.unscheduleJob($jobObj))
   #if($ok==false)
 
-   {{error}}$context.get('error'){{/error}}
+   {{error}}$xcontext.get('error'){{/error}}
 
   #else
 
@@ -187,7 +187,7 @@
     $response.sendRedirect($deleteRedirect)
    #else
 
-    {{error}}$context.get('error'){{/error}}
+    {{error}}$xcontext.get('error'){{/error}}
 
    #end
   #else
@@ -201,7 +201,7 @@
   #set($ok=$scheduler.triggerJob($jobObj))
   #if($ok==false)
 
-   {{error}}$context.get('error'){{/error}}
+   {{error}}$xcontext.get('error'){{/error}}
 
   #else
 

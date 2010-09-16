@@ -66,15 +66,15 @@ $!doc.display('cron')
 
 **$msg.get("xe.scheduler.job.script")**
 
-#if($context.action=="inline")
+#if($xcontext.action=="inline")
 $!doc.display("script")
-#elseif($context.action=="view" &amp;&amp; "$!job.getProperty('script').value" !="")
+#elseif($xcontext.action=="view" &amp;&amp; "$!job.getProperty('script').value" !="")
 {{code language="java"}}
 $job.getProperty('script').value
 {{/code}}
 #end
 
-#if($context.action=="inline")
+#if($xcontext.action=="inline")
 {{info}}$msg.get('xe.scheduler.job.scriptexplanation')){{/info}}
 
 {{info}}"Below some example of valid cron expression, from the [[official quartz scheduler documentation&gt;&gt;http://www.opensymphony.com/quartz/api/org/quartz/CronExpression.html&gt;_blank]]:
@@ -86,7 +86,7 @@ $job.getProperty('script').value
 | ** 0 15 10 ? * 6L** | Fire at 10:15am on the last Friday of every month
 {{/info}}
 
-#elseif($context.action=="view")
+#elseif($xcontext.action=="view")
 [[$msg.get("xe.scheduler.job.backtolist")&gt;&gt;Scheduler.WebHome]]
 #end
 #else

@@ -463,27 +463,6 @@ Object.extend(XWiki, {
   },
   
   /**
-   * Enable live validation for inputs with classname 'required'.
-   */
-  initRequiredInputsValidation: function(content) {
-    // apply this transformation only in the inline and edit modes
-    if (XWiki.contextaction == "edit" || XWiki.contextaction == "inline") {
-      if (typeof content == "undefined") {
-        content = document.body;
-      }
-      var inputs = content.select("input.required");
-      for (var i = 0; i < inputs.length; i++) {
-        var input = inputs[i];
-        var validator = new LiveValidation(input, { validMessage: "" });
-        validator.add(Validate.Presence, {
-          failureMessage: "$msg.get('core.editors.validation.mandatoryField')"
-        });
-        validator.validate();
-      }
-    }
-  },
-
-  /**
    * Watchlist methods.
    */
   watchlist : {
@@ -579,7 +558,6 @@ Object.extend(XWiki, {
       this.fixLinksTargetAttribute();
       this.insertSectionEditLinks();
       this.insertCreatePageFromTemplateModalBoxes();
-      this.initRequiredInputsValidation();
       this.watchlist.initialize();
 
       document.fire("xwiki:dom:loaded");

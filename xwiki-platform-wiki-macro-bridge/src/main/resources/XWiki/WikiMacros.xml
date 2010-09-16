@@ -26,7 +26,7 @@
 
 {{velocity}}
 #set($mxwiki = $xwiki.getXWiki())
-#set($mcontext = $context.getContext())
+#set($mcontext = $xcontext.getContext())
 #set($sql = "select doc.fullName from XWikiDocument doc, BaseObject obj where doc.fullName=obj.name and obj.className='XWiki.WikiMacroClass'")
 #set($mdocs = $mxwiki.getStore().search($sql, 0, 0, $mcontext))
 {{info}}[$listtool.size($mdocs)] wiki macro definition(s) found:{{/info}}

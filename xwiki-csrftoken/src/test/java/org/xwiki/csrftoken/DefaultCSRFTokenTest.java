@@ -22,10 +22,12 @@ package org.xwiki.csrftoken;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
-import java.util.Map;
-import java.util.TreeMap;
+import java.util.HashMap;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
 
 import junit.framework.Assert;
 
@@ -36,9 +38,7 @@ import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.container.Container;
 import org.xwiki.container.servlet.ServletRequest;
 import org.xwiki.csrftoken.internal.DefaultCSRFToken;
-import org.xwiki.model.ModelContext;
 import org.xwiki.model.reference.DocumentReference;
-import org.xwiki.model.reference.WikiReference;
 import org.xwiki.test.AbstractMockingComponentTestCase;
 import org.xwiki.test.annotation.MockingRequirement;
 
@@ -50,11 +50,11 @@ import org.xwiki.test.annotation.MockingRequirement;
  */
 public class DefaultCSRFTokenTest extends AbstractMockingComponentTestCase
 {
-    /** Resubmission URL. */
-    private static final String resubmitUrl = "http://host/xwiki/bin/view/XWiki/Resubmit";
-
     /** URL of the current document. */
     private static final String mockDocumentUrl = "http://host/xwiki/bin/save/Main/Test";
+
+    /** Resubmission URL. */
+    private static final String resubmitUrl = mockDocumentUrl;
 
     /** Tested CSRF token component. */
     @MockingRequirement
@@ -101,20 +101,28 @@ public class DefaultCSRFTokenTest extends AbstractMockingComponentTestCase
             }
         });
         // request
+        final HttpSession mockSession = getMockery().mock(HttpSession.class);
         final HttpServletRequest httpRequest = getMockery().mock(HttpServletRequest.class);
         final ServletRequest servletRequest = new ServletRequest(httpRequest);
-        // tree map preserves order
-        final Map<String, String[]> mockParams = new TreeMap<String, String[]>();
-        mockParams.put("a", new String[] {"b"});
-        mockParams.put("form_token", new String[] {"", null, "xyz", "xyz"});
-        mockParams.put("c", new String[] {"d e/f"});
         getMockery().checking(new Expectations()
         {
             {
                 allowing(httpRequest).getRequestURL();
                 will(returnValue(new StringBuffer(mockDocumentUrl)));
+                allowing(httpRequest).getRequestURI();
+                will(returnValue(mockDocumentUrl));
                 allowing(httpRequest).getParameterMap();
-                will(returnValue(mockParams));
+                will(returnValue(new HashMap<String, String[]>()));
+                allowing(httpRequest).getSession();
+                will(returnValue(mockSession));
+            }
+        });
+        // session
+        getMockery().checking(new Expectations()
+        {
+            {
+                allowing(mockSession).getAttribute(with(any(String.class)));
+                will(returnValue(new HashMap<String, Object>()));
             }
         });
         // container
@@ -124,15 +132,6 @@ public class DefaultCSRFTokenTest extends AbstractMockingComponentTestCase
             {
                 allowing(mockContainer).getRequest();
                 will(returnValue(servletRequest));
-            }
-        });
-        // model
-        final ModelContext mockModel = getComponentManager().lookup(ModelContext.class);
-        getMockery().checking(new Expectations()
-        {
-            {
-                allowing(mockModel).getCurrentEntityReference();
-                will(returnValue(new WikiReference("wiki")));
             }
         });
     }
@@ -211,9 +210,12 @@ public class DefaultCSRFTokenTest extends AbstractMockingComponentTestCase
     {
         String url = this.csrf.getResubmissionURL();
         try {
-            String redirect = URLEncoder.encode(mockDocumentUrl + "?a=b&c=d+e%2Ff", "utf-8");
+            // srid is random, extract it from the url
+            Matcher matcher = Pattern.compile(".*srid%3D([a-zA-Z0-9]+).*").matcher(url);
+            String srid = matcher.matches() ? matcher.group(1) : "asdf";
+            String resubmit = URLEncoder.encode(mockDocumentUrl + "?srid=" + srid, "utf-8");
             String back = URLEncoder.encode(mockDocumentUrl, "utf-8");
-            String expected = resubmitUrl + "?xredirect=" + redirect + "&xback=" + back;
+            String expected = resubmitUrl + "?resubmit=" + resubmit + "&xback=" + back + "&xpage=resubmit";
             Assert.assertEquals("Invalid resubmission URL", expected, url);
         } catch (UnsupportedEncodingException exception) {
             Assert.fail("Should not happen: " + exception.getMessage());

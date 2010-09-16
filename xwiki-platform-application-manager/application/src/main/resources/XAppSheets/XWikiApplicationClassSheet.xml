@@ -70,38 +70,38 @@
   ##
   #set($app = $Appmanager.getApplicationDocument($doc.getValue("appname", $object)))
   ##
-  #if($context.action == "view")
+  #if($xcontext.action == "view")
     1 Application \"#if($app.appprettyname &amp;&amp; $app.appprettyname.trim() != "")$app.appprettyname#else$app.appname#end\"
   #end
   ##
   &lt;dl&gt;
     #foreach($prop in $class.properties)
       &lt;dt&gt; ${prop.prettyName} &lt;/dt&gt;
-      #if($context.action == "view" &amp;&amp; $prop.name == "documents")
+      #if($xcontext.action == "view" &amp;&amp; $prop.name == "documents")
         &lt;dd&gt;
           #foreach($docfullname in $app.getDocumentsNames(false, false))
             [$docfullname&gt;$docfullname]
           #end
         &lt;/dd&gt;
-      #elseif($context.action == "view" &amp;&amp; $prop.name == "docstoinclude")
+      #elseif($xcontext.action == "view" &amp;&amp; $prop.name == "docstoinclude")
         &lt;dd&gt;
           #foreach($docfullname in $app.getDocsNameToInclude(false))
             [$docfullname&gt;$docfullname]
           #end
         &lt;/dd&gt;
-      #elseif($context.action == "view" &amp;&amp; $prop.name == "docstolink")
+      #elseif($xcontext.action == "view" &amp;&amp; $prop.name == "docstolink")
         &lt;dd&gt;
           #foreach($docfullname in $app.getDocsNameToLink(false))
             [$docfullname&gt;$docfullname]
           #end
         &lt;/dd&gt;
-      #elseif($context.action == "view" &amp;&amp; $prop.name == "translationdocs")
+      #elseif($xcontext.action == "view" &amp;&amp; $prop.name == "translationdocs")
         &lt;dd&gt;
           #foreach($docfullname in $app.getTranslationDocs())
             [$docfullname&gt;$docfullname]
           #end
         &lt;/dd&gt;
-      #elseif($context.action == "view" &amp;&amp; $prop.name == "applications")
+      #elseif($xcontext.action == "view" &amp;&amp; $prop.name == "applications")
         &lt;dd&gt;
           #foreach($appname in $app.getApplications())
             [$appname&gt;$Appmanager.getApplicationDocument($appname).fullName]

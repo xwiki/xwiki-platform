@@ -120,7 +120,7 @@ $msg.get("xapp.totalnumberofapp") : $listApp.size()
 ##
 #############################################################################
 ##
-#if($context.hasAdminRights())
+#if($xcontext.hasAdminRights())
   1.1 $msg.get("xapp.availablefilestoimport")
   ##
   #set($listpackage=$doc.getAttachmentList())

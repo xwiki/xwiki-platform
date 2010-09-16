@@ -138,7 +138,7 @@
 <content>#panelheader($msg.get("xe.panels.orphaned"))
 #set ($query = "where doc.parent is null or doc.parent='' and doc.name &lt;&gt; 'WebHome' order by doc.name asc")
 #foreach ($item in $xwiki.searchDocuments("${query}"))
-#if ($xwiki.hasAccessLevel("view", $context.user, "${context.database}:${item}"))
+#if ($xwiki.hasAccessLevel("view", $xcontext.user, "${xcontext.database}:${item}"))
 #set($bentrydoc = $xwiki.getDocument($item))
 * [${bentrydoc.fullName}]
 #end

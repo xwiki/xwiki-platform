@@ -61,7 +61,7 @@
 #set($showdata = 0)
 #set($showEmptyPanels = 1)
 #if("$!{currSpace}" != "")
-    #set($accessLevel = $xwiki.hasAccessLevel("admin", $context.user, "${currSpace}.WebPreferences"))
+    #set($accessLevel = $xwiki.hasAccessLevel("admin", $xcontext.user, "${currSpace}.WebPreferences"))
 #else
     #set($accessLevel = $xwiki.hasAdminRights())
 #end
@@ -88,7 +88,7 @@
       #end
       #foreach ($item in $panelsList)
         ## stats panels can't be seen by non global admins
-        #if($xwiki.hasAccessLevel("view", $context.user, $item))
+        #if($xwiki.hasAccessLevel("view", $xcontext.user, $item))
           #set($obj = $xwiki.getDocument($item).getObject("Panels.PanelClass"))
           #if($obj.type == 'view')
             #set($arrayList = $categoryMap.get($obj.category))

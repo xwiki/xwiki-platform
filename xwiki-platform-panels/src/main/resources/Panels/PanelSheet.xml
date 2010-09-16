@@ -62,7 +62,7 @@ $msg.get($prop.name)#end
   #set($class = $obj.xWikiClass)
   #macro(displayPanelProperty $obj $propName)
     &lt;dt&gt;
-      #if ($context.action == 'inline')
+      #if ($xcontext.action == 'inline')
         &lt;label for="${class.getName()}_${obj.number}_${propName}"&gt;$msg.get("${class.getName()}_${propName}")&lt;/label&gt;
       #else
         $msg.get("${class.getName()}_${propName}")

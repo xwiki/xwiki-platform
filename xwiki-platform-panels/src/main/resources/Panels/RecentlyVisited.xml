@@ -109,7 +109,7 @@
   #panelheader($msg.get('panels.recentlyVisited.title'))
   #set($first = true)
   #foreach($docname in $recentlyViewed)
-    #if($xwiki.hasAccessLevel('view', $context.getUser(), $docname))
+    #if($xwiki.hasAccessLevel('view', $xcontext.getUser(), $docname))
       #set($rdoc = $xwiki.getDocument($docname).getTranslatedDocument())
       #if($first == true)
         #set($first = false)

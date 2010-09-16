@@ -64,7 +64,7 @@
     #elseif ($result == $Exception.ERROR_XWIKI_ACCESS_DENIED)
       #error($msg.get("notallowed"))
     #else
-      #error($msg.get("wikimanager.errordeletewiki", [$wikiname, $context.lastexception]))
+      #error($msg.get("wikimanager.errordeletewiki", [$wikiname, $xcontext.lastexception]))
     #end
   #else
     #xwikimessagebox($msg.get("wikimanager.answer.deletewiki.title") $msg.get("wikimanager.answer.deletewiki.msg", [$wikiname]) $doc.getURL("view", "$!request.queryString&amp;confirm=1") $doc.getURL("view") $msg.get("yes") $msg.get("no"))

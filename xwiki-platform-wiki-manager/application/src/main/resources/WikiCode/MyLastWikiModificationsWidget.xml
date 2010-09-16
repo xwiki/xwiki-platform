@@ -100,8 +100,8 @@
 </property>
 <property>
 <content>#panelheader($msg.get("wikimanager.widget.mylastmodifications.title"))
-  #set($usermodifications = "${context.user}")
-  #set($usermodificationswiki = "${context.database}")
+  #set($usermodifications = "${xcontext.user}")
+  #set($usermodificationswiki = "${xcontext.database}")
   #includeInContext("WikiCode.LastWikiModificationsCode")
 #panelfooter()</content>
 </property>

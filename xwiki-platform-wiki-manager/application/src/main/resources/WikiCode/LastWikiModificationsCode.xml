@@ -107,8 +107,8 @@
         #set($added = $allwikinamelist.add($wikidoc.wikiName))
       #end
       ##
-      #if(!$allwikinamelist.contains($context.mainWikiName))
-        #set($added = $allwikinamelist.add($context.mainWikiName))
+      #if(!$allwikinamelist.contains($xcontext.mainWikiName))
+        #set($added = $allwikinamelist.add($xcontext.mainWikiName))
       #end
     #end
     ##
@@ -118,7 +118,7 @@
 ##
 #set($sql = "where 1=1")
 #if($usermodifications)
-  #if($context.database != $usermodificationswiki)
+  #if($xcontext.database != $usermodificationswiki)
     #set($sql = "${sql} and doc.author='${usermodificationswiki}:${usermodifications}'")
   #else
     #set($sql = "${sql} and doc.author='${usermodifications}'")

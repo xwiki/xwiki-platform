@@ -118,16 +118,16 @@
 #############################################################################
   ##
   #if(!$allwikilist.isEmpty())
-      #set($currentwiki = $context.database)
+      #set($currentwiki = $xcontext.database)
       #foreach($wikidoc in $allwikilist)
         #set($firstWikiAlias = $wikidoc.firstWikiAlias)
-        $context.setDatabase($wikidoc.wikiName)
-        #if($xwiki.hasAccessLevel("view", "${currentwiki}:${context.localUser}", "XWiki.XWikiPreferences"))
-          $context.setDatabase($currentwiki)
+        $xcontext.setDatabase($wikidoc.wikiName)
+        #if($xwiki.hasAccessLevel("view", "${currentwiki}:${xcontext.localUser}", "XWiki.XWikiPreferences"))
+          $xcontext.setDatabase($currentwiki)
           #displaymodification($wikidoc.wikiName $firstWikiAlias.homePageUrl $wikidoc.creationDate $formatDate $wikidoc.creator true)
         #end
       #end
-      $context.setDatabase($currentwiki)
+      $xcontext.setDatabase($currentwiki)
   #end
   ##
 #panelfooter()</content>

@@ -120,7 +120,7 @@
   #if(!$allwikilist.isEmpty())
     #foreach($wikidoc in $allwikilist)
       #set($firstWikiAlias = $wikidoc.firstWikiAlias)
-      #if($firstWikiAlias.owner == $context.user)
+      #if($firstWikiAlias.owner == $xcontext.user)
         #displaymodification($wikidoc.wikiName $firstWikiAlias.homePageUrl $wikidoc.creationDate $formatDate $wikidoc.creator true)
       #end
     #end

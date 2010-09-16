@@ -795,7 +795,7 @@ $xwiki.get('ssx').use($config.get('commonPage'))
   ##
   #foreach($recipient in $sendTo)
     #set($message = $emailContainer.newObject($emailClass))
-    $message.set('sendingUser', $context.getUser())##
+    $message.set('sendingUser', $xcontext.getUser())##
     $message.set('sentDate', '')##
     $message.set('messageGroupID', $messageGroupID)##
     $message.set('recipient', $recipient)##

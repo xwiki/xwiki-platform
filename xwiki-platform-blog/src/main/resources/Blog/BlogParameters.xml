@@ -47,7 +47,7 @@
 #set($blogScriptsDocumentName = 'Blog.BlogScripts')
 #set($blogPublisher = $xwiki.getDocument('Blog.Publisher'))
 ## Misc
-#set($thisURL = $doc.getURL($context.action, $request.queryString))
+#set($thisURL = $doc.getURL($xcontext.action, $request.queryString))
 ##
 ##
 ##

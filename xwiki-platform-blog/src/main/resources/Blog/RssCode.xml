@@ -101,7 +101,7 @@
   ## Internally cache the rendered RSS for 30 minutes, for better performance
   ## TODO: This is disabled for security reasons. Since the cache doesn't take into account the current user, it might
   ## serve hidden/unpublished entries to non-creators.
-  ## $!context.setCacheDuration(1800)
+  ## $!xcontext.setCacheDuration(1800)
   ## Instruct the client to cache the response for 1 hour
   #set($expires = $xwiki.jodatime.getMutableDateTime())##
   $!expires.addHours(1)##

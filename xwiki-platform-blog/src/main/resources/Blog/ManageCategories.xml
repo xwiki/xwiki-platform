@@ -688,7 +688,7 @@ input.category-name-input {
   #elseif($xwiki.exists($newFullName))
     $response.setStatus(409)
     #error($msg.get('core.rename.alreadyExists', [$newFullName, $xwiki.getURL($newFullName)]))
-  #elseif(!$xwiki.hasAccessLevel('edit', $context.user, $newFullName))
+  #elseif(!$xwiki.hasAccessLevel('edit', $xcontext.user, $newFullName))
     $response.setStatus(403)
     #error($msg.get('core.rename.targetNotWritable', [$newFullName]))
   #else

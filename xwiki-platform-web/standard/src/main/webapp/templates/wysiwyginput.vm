@@ -62,7 +62,7 @@ function fireContentLoad(contentLoadTriggerId) {
     #set($content = $request.source)
   #elseif($request.getParameterMap().containsKey("html"))
     #set($render = false)
-    #set($content = $xwiki.wysiwyg.parseAndRender($request.html, $tdoc.getSyntax().toIdString()))
+    #set($content = $services.xwe.parseAndRender($request.html, $tdoc.getSyntax().toIdString()))
   #end
 #end
 ## We don't always have to render the content:

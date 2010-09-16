@@ -63,7 +63,7 @@
   #elseif ($result == $Exception.ERROR_XWIKI_ACCESS_DENIED)
     #error($msg.get("notallowed"))
   #else
-    #error($msg.get("wikimanager.errorsettemplate", [$wikiname, $context.lastexception]))
+    #error($msg.get("wikimanager.errorsettemplate", [$wikiname, $xcontext.lastexception]))
   #end
 #end</content>
 </xwikidoc>

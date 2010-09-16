@@ -145,7 +145,7 @@ $msg.get("wikimanager.totalnumberofwiki") : $wikiList.size()
           #end
         &lt;/td&gt;
         &lt;td&gt;
-          #if(($WikiManager.canDeleteWiki()) &amp;&amp; ($wiki.WikiName != $context.mainWikiName)) [$msg.get("delete")&gt;?action=delete&amp;amp;wikiname=$wiki.WikiName] |#end &lt;a href="$wiki.getURL("view")"&gt;$msg.get("wikimanager.action.settings")&lt;/a&gt;&lt;/td&gt;
+          #if(($WikiManager.canDeleteWiki()) &amp;&amp; ($wiki.WikiName != $xcontext.mainWikiName)) [$msg.get("delete")&gt;?action=delete&amp;amp;wikiname=$wiki.WikiName] |#end &lt;a href="$wiki.getURL("view")"&gt;$msg.get("wikimanager.action.settings")&lt;/a&gt;&lt;/td&gt;
       &lt;/tr&gt;
     #end
   &lt;/table&gt;

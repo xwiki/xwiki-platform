@@ -64,7 +64,7 @@
     1 Wiki "$wiki.wikiName"
     ##
     #set ($firstalias = $wikiAliasList.get(0))
-    #if ($context.action == "view")
+    #if ($xcontext.action == "view")
       1.1 $msg.get("wikimanager.title.wikisettings")
     #else
       &lt;fieldset&gt;
@@ -122,11 +122,11 @@
             &lt;/p&gt;
           &lt;/dd&gt;
       &lt;/dl&gt;
-    #if ($context.action != "view")
+    #if ($xcontext.action != "view")
       &lt;/fieldset&gt;
     #end
     ##
-    #if ($context.action == "view")
+    #if ($xcontext.action == "view")
       1.1 $msg.get("wikimanager.title.createnewalias")
       ##
       &lt;form method="get" action=""&gt;
@@ -140,12 +140,12 @@
     #end
     ##
     #if ($wikiAliasList.size() &gt; 1)
-      #if ($context.action == "view")
+      #if ($xcontext.action == "view")
         1.1 $msg.get("wikimanager.title.viewaliases")
       #end
       ##
       #foreach($wikiAlias in $wikiAliasList.subList(1, $wikiAliasList.size()))
-        #if ($context.action == "view")
+        #if ($xcontext.action == "view")
           &lt;form method="get" action="$doc.getURL("view")"&gt;
         #end
             &lt;fieldset&gt;
@@ -168,14 +168,14 @@
                     &lt;/p&gt;
                   &lt;/dd&gt;
               &lt;/dl&gt;
-        #if ($context.action == "view")
+        #if ($xcontext.action == "view")
   	          &lt;br /&gt;
               &lt;input type="hidden" name="action" value="delete"/&gt;
               &lt;input type="hidden" name="domain" value="$wikiAlias.server"/&gt;
               &lt;input type="submit" class="button" value="$msg.get("delete")"/&gt;
         #end
             &lt;/fieldset&gt;
-        #if ($context.action == "view")
+        #if ($xcontext.action == "view")
           &lt;/form&gt;
         #end
       #end

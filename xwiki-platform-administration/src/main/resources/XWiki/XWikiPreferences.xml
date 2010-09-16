@@ -2721,7 +2721,7 @@ Your account on $wikiname has been successfully activated. You can now login at 
 &lt;meta name="rating" content="General" /&gt;
 &lt;meta name="author" content="$xwiki.getXMLEncoded($!xwiki.getLocalUserName($doc.getAuthor(), false))" /&gt;
 &lt;meta http-equiv="reply-to" content="" /&gt;
-&lt;meta name="language" content="$!context.language" /&gt;
+&lt;meta name="language" content="$!xcontext.language" /&gt;
 ## We verify that we don't display RSS feeds on the login page since it causes problems if these feeds are
 ## protected. In addition it makes the login redirect to the feeds page in some cases.
 #if($doc.fullName != "XWiki.XWikiLogin")

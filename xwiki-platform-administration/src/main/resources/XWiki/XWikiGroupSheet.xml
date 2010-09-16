@@ -22,7 +22,7 @@
 <minorEdit>false</minorEdit>
 <syntaxId>xwiki/1.0</syntaxId>
 <hidden>false</hidden>
-<content>#set($mainwk = $context.isMainWiki())
+<content>#set($mainwk = $xcontext.isMainWiki())
 $xwiki.jsfx.use("js/xwiki/usersandgroups/usersandgroups.js", true)
 $xwiki.ssfx.use("js/xwiki/usersandgroups/usersandgroups.css")
 $xwiki.jsfx.use("js/xwiki/table/livetable.js", true)
@@ -35,7 +35,7 @@ $xwiki.ssfx.use("js/xwiki/table/livetable.css", true)
     'ajaxActions': {'delete': true}
    }
 })
-#if($hasAdmin &amp;&amp; $context.action == 'inline')
+#if($hasAdmin &amp;&amp; $xcontext.action == 'inline')
   #set($columns = ['member', '_actions'])
 #else
   #set($columns = ['member'])
@@ -44,7 +44,7 @@ $xwiki.ssfx.use("js/xwiki/table/livetable.css", true)
 ##
 ##
 ##
-#if($context.action == "inline")
+#if($xcontext.action == "inline")
   &lt;div id="addNewMember"&gt;
     &lt;table&gt;
       &lt;tr&gt;&lt;td class="addlabel"&gt;$msg.get("xe.admin.groups.addUser") #if(!$mainwk)&lt;/td&gt;

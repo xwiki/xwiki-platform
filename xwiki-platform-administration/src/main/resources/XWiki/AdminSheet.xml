@@ -569,7 +569,7 @@ p.legend {
 ## Administration Sheet,used to display a common UI for some wiki features (presentation, users,
 ## groups, rights etc.) at global / space level and also for several applications.
 ##**************************************************************************************************
-#if($context.action == 'view')
+#if($xcontext.action == 'view')
   $response.sendRedirect($xwiki.getURL($doc.getFullName(), 'admin', $request.getQueryString()))
 #else
     ##----------------------------------------------------------------------------
@@ -617,14 +617,14 @@ p.legend {
         &lt;div id="change-context"&gt;
           &lt;label for="goto-select" class="hidden"&gt;$msg.get('admin.placetoadminister')&lt;/label&gt;
           &lt;select id="goto-select"&gt;
-            #if ($xwiki.hasAccessLevel('admin', $context.user, 'XWiki.XWikiPreferences'))
+            #if ($xwiki.hasAccessLevel('admin', $xcontext.user, 'XWiki.XWikiPreferences'))
               &lt;optgroup label="$msg.get('admin.gotoglobaladministration')"&gt;
               &lt;option value="$xwiki.getURL('XWiki.XWikiPreferences', 'admin')" #if("$!{editor}"=="globaladmin")selected="selected"#end&gt;$msg.get('admin.globaladministration')&lt;/option&gt;
               &lt;/optgroup&gt;
             #end
             &lt;optgroup label="$msg.get('admin.gotospaceadministration')"&gt;
               #foreach($spaceitem in $xwiki.spaces)
-                #if ($xwiki.hasAccessLevel('admin', $context.user, "${spaceitem}.WebPreferences"))
+                #if ($xwiki.hasAccessLevel('admin', $xcontext.user, "${spaceitem}.WebPreferences"))
                   &lt;option value="$xwiki.getURL("${spaceitem}.WebPreferences", 'admin')" #if("$!{currentSpace}" == ${spaceitem} &amp;&amp; "$!{editor}" != 'globaladmin')selected="selected"#end&gt;$escapetool.xml($spaceitem)&lt;/option&gt;
                 #end
               #end
@@ -642,7 +642,7 @@ p.legend {
        ## The Administration allows editing other pages from different applications inside the admin context (UI)
        ##------------------------------------------------------------------------------------------------------------
        #if("$!{request.editmode}" == 'inline' &amp;&amp; $xwiki.exists($section))
-         $context.setDisplayMode('edit')
+         $xcontext.setDisplayMode('edit')
          #includeForm('XWiki.AdminInlineSheet')
        ##--------------------------------------------------------------------------------------------------------------
        ## The Administration app., along with its default sections, dynamically includes and display pages from apps.

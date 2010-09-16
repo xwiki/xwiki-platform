@@ -35,53 +35,53 @@ $doc.use($obj)
 #set($username = $xwiki.getUserName($doc.fullName, false))
 = $msg.get('platform.core.profile.title', [$username]) =
 
-#if($context.action == 'view')
+#if($xcontext.action == 'view')
   &lt;div class="vcard"&gt;
   &lt;span class="fn hidden"&gt;$username&lt;/span&gt;
 #end
 $xwiki.ssx.use("XWiki.XWikiUserSheet")##
 $xwiki.ssx.use('Main.Dashboard')##
-&lt;div class="dashboard dashboard${context.action}"&gt;
+&lt;div class="dashboard dashboard${xcontext.action}"&gt;
   &lt;div class="dashboardleft"&gt;
     &lt;div class="userInfo"&gt;
-      #if($context.action == 'view' &amp;&amp; $hasEdit)
+      #if($xcontext.action == 'view' &amp;&amp; $hasEdit)
         &lt;div class="editProfileCategory"&gt;&lt;a href="$doc.getURL('inline', 'category=profile')"&gt;&lt;span class="hidden"&gt;$msg.get('platform.core.profile.category.profile.edit')&lt;/span&gt;&lt;/a&gt;&lt;/div&gt;
       #end
       ## Please do not insert extra empty lines here (as it affects the validity of the rendered xhtml)
       &lt;h1&gt;$msg.get('platform.core.profile.section.personal')&lt;/h1&gt;
       &lt;dl&gt;
         &lt;dt class="label"&gt;&lt;label&gt;$msg.get('platform.core.profile.firstname')&lt;/label&gt;&lt;/dt&gt;
-        &lt;dd #if($context.action == 'view')class="given-name"#end&gt;$doc.display('first_name')&lt;/dd&gt;
+        &lt;dd #if($xcontext.action == 'view')class="given-name"#end&gt;$doc.display('first_name')&lt;/dd&gt;
         &lt;dt class="label"&gt;&lt;label&gt;$msg.get('platform.core.profile.lastname')&lt;/label&gt;&lt;/dt&gt;
-        &lt;dd #if($context.action == 'view')class="family-name"#end&gt;$doc.display('last_name')&lt;/dd&gt;
-        #if(($obj.getProperty('company') &amp;&amp; $obj.getProperty('company').getValue() != '') || $context.action != 'view')
+        &lt;dd #if($xcontext.action == 'view')class="family-name"#end&gt;$doc.display('last_name')&lt;/dd&gt;
+        #if(($obj.getProperty('company') &amp;&amp; $obj.getProperty('company').getValue() != '') || $xcontext.action != 'view')
           &lt;dt class="label"&gt;&lt;label&gt;$msg.get('platform.core.profile.company')&lt;/label&gt;&lt;/dt&gt;
-          &lt;dd #if($context.action == 'view')class="org"#end&gt;$doc.display('company')&lt;/dd&gt;
+          &lt;dd #if($xcontext.action == 'view')class="org"#end&gt;$doc.display('company')&lt;/dd&gt;
         #end
-        #if(($obj.getProperty('comment') &amp;&amp; $obj.getProperty('comment').getValue() != '') || $context.action != 'view')
+        #if(($obj.getProperty('comment') &amp;&amp; $obj.getProperty('comment').getValue() != '') || $xcontext.action != 'view')
           &lt;dt class="label"&gt;&lt;label&gt;$msg.get('platform.core.profile.about')&lt;/label&gt;&lt;/dt&gt;
-          &lt;dd #if($context.action == 'view')class="note"#end&gt;$doc.display('comment')&lt;/dd&gt;
+          &lt;dd #if($xcontext.action == 'view')class="note"#end&gt;$doc.display('comment')&lt;/dd&gt;
         #end
       &lt;/dl&gt;
       &lt;h1&gt;$msg.get('platform.core.profile.section.contact')&lt;/h1&gt;
       &lt;dl&gt;
         &lt;dt class="label"&gt;&lt;label&gt;$msg.get('platform.core.profile.email')&lt;/label&gt;&lt;/dt&gt;
-        &lt;dd #if($context.action=="view")class="email"#end&gt;#if($context.action != 'view' || !$obfuscateEmail)$doc.display('email')#else $doc.display('email').replaceAll('@.*', '@ ~-~-~-~-~-~-')#end&lt;/dd&gt;
+        &lt;dd #if($xcontext.action=="view")class="email"#end&gt;#if($xcontext.action != 'view' || !$obfuscateEmail)$doc.display('email')#else $doc.display('email').replaceAll('@.*', '@ ~-~-~-~-~-~-')#end&lt;/dd&gt;
         &lt;dt class="label"&gt;&lt;label&gt;$msg.get('platform.core.profile.phone')&lt;/label&gt;&lt;/dt&gt;
-        &lt;dd #if($context.action == 'view')class="tel"#end&gt;$doc.display('phone')&lt;/dd&gt;
+        &lt;dd #if($xcontext.action == 'view')class="tel"#end&gt;$doc.display('phone')&lt;/dd&gt;
         &lt;dt class="label"&gt;&lt;label&gt;$msg.get('platform.core.profile.address')&lt;/label&gt;&lt;/dt&gt;
-        &lt;dd #if($context.action == 'view')class="adr"#end&gt;$doc.display('address')&lt;/dd&gt;
+        &lt;dd #if($xcontext.action == 'view')class="adr"#end&gt;$doc.display('address')&lt;/dd&gt;
       &lt;/dl&gt;
       #set($hasBlog = ($obj.getProperty('blog') &amp;&amp; $obj.getProperty('blog').getValue() != ''))
       #set($hasBlogFeed = ($obj.getProperty('blogfeed') &amp;&amp; $obj.getProperty('blogfeed').getValue() != ''))
-      #if($hasBlog || $hasBlogFeed || $context.action != 'view')
+      #if($hasBlog || $hasBlogFeed || $xcontext.action != 'view')
        &lt;h1&gt;$msg.get('platform.core.profile.section.links')&lt;/h1&gt;
         &lt;dl&gt;
-          #if($hasBlog || $context.action != 'view')
+          #if($hasBlog || $xcontext.action != 'view')
             &lt;dt class="label"&gt;&lt;label&gt;$msg.get('platform.core.profile.blog')&lt;/label&gt;&lt;/dt&gt;
             &lt;dd&gt;$doc.display('blog')&lt;/dd&gt;
           #end
-          #if($hasBlogFeed || $context.action != 'view')
+          #if($hasBlogFeed || $xcontext.action != 'view')
             &lt;dt class="label"&gt;&lt;label&gt;$msg.get('platform.core.profile.blogFeed')&lt;/label&gt;&lt;/dt&gt;
             &lt;dd&gt;$doc.display('blogfeed')&lt;/dd&gt;
           #end
@@ -90,7 +90,7 @@ $xwiki.ssx.use('Main.Dashboard')##
     &lt;/div&gt;
   &lt;/div&gt;
   &lt;div class="dashboardright"&gt;
-    #if ($context.action == 'view')
+    #if ($xcontext.action == 'view')
       &lt;div class="userRecentChanges"&gt;
         &lt;h1&gt;$msg.get('platform.core.profile.section.recentChanges')&lt;/h1&gt;
 {{/html}}
@@ -105,7 +105,7 @@ $xwiki.ssx.use('Main.Dashboard')##
   &lt;/div&gt;
   &lt;div class="dashboardspacer"&gt;&amp;nbsp;&lt;/div&gt;
 &lt;/div&gt;
-#if($context.action == 'view')
+#if($xcontext.action == 'view')
   ## Close the vcard
   &lt;/div&gt;
 #end

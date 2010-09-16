@@ -21,7 +21,7 @@
     });
 //]]>
 </script>
-#elseif($services.xwe.isSyntaxSupported($doc.syntax.toIdString()))
+#elseif($services.wysiwyg.isSyntaxSupported($doc.syntax.toIdString()))
 ## Load the rich text object properties using a compact WYSIWYG editor.
 #wysiwyg_editProperties($doc $editors false)
 #else

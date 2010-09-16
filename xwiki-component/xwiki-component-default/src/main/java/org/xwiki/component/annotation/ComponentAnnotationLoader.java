@@ -165,6 +165,20 @@ public class ComponentAnnotationLoader extends AbstractLogEnabled
         }
     }
 
+    public List<ComponentDescriptor> getComponentsDescriptors(Class< ? > componentClass)
+    {
+        List<ComponentDescriptor> descriptors = new ArrayList<ComponentDescriptor>();
+
+        Map<RoleHint, ComponentDescriptor> descriptorMap = new HashMap<RoleHint, ComponentDescriptor>();
+
+        // Look for ComponentRole annotations and register one component per ComponentRole found
+        for (Class< ? > componentRoleClass : findComponentRoleClasses(componentClass)) {
+            descriptors.addAll(this.factory.createComponentDescriptors(componentClass, componentRoleClass));
+        }
+
+        return descriptors;
+    }
+
     /**
      * Finds the interfaces that implement component roles by looking recursively in all interfaces of the passed
      * component implementation class. If the roles annotation value is specified then use the specified list instead of

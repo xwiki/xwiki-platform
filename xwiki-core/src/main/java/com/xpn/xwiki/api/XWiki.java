@@ -214,7 +214,7 @@ public class XWiki extends Api
      */
     public Document getDocumentAsAuthor(DocumentReference reference) throws XWikiException
     {
-        String author = getXWikiContext().getDoc().getContentAuthor();
+        String author = this.getEffectiveScriptAuthorName();
         XWikiDocument doc = this.xwiki.getDocument(reference, getXWikiContext());
         if (this.xwiki.getRightService().hasAccessLevel("view", author, doc.getFullName(),
             getXWikiContext()) == false) {

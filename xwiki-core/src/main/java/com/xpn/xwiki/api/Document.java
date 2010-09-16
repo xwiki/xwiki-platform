@@ -1871,7 +1871,7 @@ public class Document extends Api
      */
     public void saveAsAuthor(String comment, boolean minorEdit) throws XWikiException
     {
-        String author = getXWikiContext().getDoc().getContentAuthor();
+        String author = this.getEffectiveScriptAuthorName();
         if (hasAccessLevel("edit", author)) {
             String viewer = getXWikiContext().getUser();
             try {
@@ -2025,7 +2025,7 @@ public class Document extends Api
      */
     public void deleteAsAuthor() throws XWikiException
     {
-        String author = getXWikiContext().getDoc().getContentAuthor();
+        String author = this.getEffectiveScriptAuthorName();
         if (hasAccessLevel("delete", author)) {
             String viewer = getXWikiContext().getUser();
             try {

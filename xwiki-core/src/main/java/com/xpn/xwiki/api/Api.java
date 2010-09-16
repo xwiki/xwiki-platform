@@ -25,6 +25,7 @@ import java.util.List;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
+import com.xpn.xwiki.user.api.XWikiRightService;
 
 /**
  * Base class for all API Objects. API Objects are the Java Objects that can be manipulated from Velocity or Groovy in
@@ -73,6 +74,11 @@ public class Api
      */
     public boolean hasProgrammingRights()
     {
+        // There is never programming right after privileges have been dropped.
+        if (getEffectiveScriptAuthorName() == XWikiRightService.GUEST_USER) {
+            return false;
+        }
+
         com.xpn.xwiki.XWiki xwiki = this.context.getWiki();
         return xwiki.getRightService().hasProgrammingRights(this.context);
     }
@@ -127,5 +133,25 @@ public class Api
     protected Document convert(XWikiDocument xdoc)
     {
         return xdoc == null ? null : xdoc.newDocument(this.context);
+    }
+
+    /**
+     * Get the name of the content author of the current document for security checking.
+     * If {@link Context#dropPermissions()} has been called then this will return the guest user no matter
+     * who the real author is.
+     * If there is no current document then the guest user is returned because there is no reason for script to
+     * have any permission if does not exist in any document.
+     *
+     * @return the name of the document author or guest.
+     */
+    String getEffectiveScriptAuthorName()
+    {
+        if (!"true".equals(this.getXWikiContext().get("hasDroppedPermissions"))) {
+            final XWikiDocument doc = this.getXWikiContext().getDoc();
+            if (doc != null) {
+                return doc.getAuthor();
+            }
+        }
+        return XWikiRightService.GUEST_USER;
     }
 }

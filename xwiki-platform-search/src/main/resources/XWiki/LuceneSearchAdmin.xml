@@ -29,29 +29,29 @@
 {{velocity}}
 #if ($hasAdmin)
   #if ($request.action == 'indexfarm')
-    #if ($context.isMainWiki())
+    #if ($xcontext.isMainWiki())
       #set($clearIndex = true)
       #set($onlyNew = false)
       #set($startindex = true)
-    #else## !$context.isMainWiki()
+    #else## !$xcontext.isMainWiki()
       {{error}}$msg.get('needadminrights').{{/error}}
     #end
   #elseif ($request.action == 'indexcurrentwiki')
-    #set($wikis = [$context.database])
-    #set($wikisString = "${context.database}")
+    #set($wikis = [$xcontext.database])
+    #set($wikisString = "${xcontext.database}")
     #set($clearIndex = true)
     #set($onlyNew = false)
     #set($startindex = true)
   #elseif ($request.action == 'indexcustom')
-    #if ($context.isMainWiki())
+    #if ($xcontext.isMainWiki())
       #if ($request.wikis)
         #set($wikisArray = $request.wikis.split(','))
         #set($wikis = $wikisArray.subList(0, $wikisArray.size()))
         #set($wikisString = $request.wikis)
       #end
-    #else## !$context.isMainWiki()
-      #set($wikis = [$context.database])
-      #set($wikisString = "${context.database}")
+    #else## !$xcontext.isMainWiki()
+      #set($wikis = [$xcontext.database])
+      #set($wikisString = "${xcontext.database}")
     #end
     #set($hqlFilter = $request.hqlFilter)
     #set($clearIndex = $request.clearIndex == 'on')
@@ -93,14 +93,14 @@
 &lt;fieldset&gt;
 
   ## Does not really make sense to reindex the whole farm from a subwiki
-  #if ($context.isMainWiki())
+  #if ($xcontext.isMainWiki())
 &lt;p&gt;
     &lt;label for="indexfarm" class="hidden"&gt;$msg.get('search.admin.lucene.indexing.action.indexfarm')&lt;/label&gt;&lt;input id="indexfarm" name="action" type="radio" value="indexfarm" #if (!$request.action || $request.action == 'indexfarm')checked="checked"#end/&gt;$msg.get('search.admin.lucene.indexing.action.indexfarm')
 &lt;/p&gt;
   #end
 
 &lt;p&gt;
-  &lt;label for="indexcurrentwiki" class="hidden"&gt;$msg.get('search.admin.lucene.indexing.action.indexcurrentwiki')&lt;/label&gt;&lt;input id="indexcurrentwiki" name="action" type="radio" value="indexcurrentwiki" #if((!$context.isMainWiki() &amp;&amp; !$request.action) || $request.action == 'indexcurrentwiki'))checked="checked"#end/&gt;$msg.get('search.admin.lucene.indexing.action.indexcurrentwiki')
+  &lt;label for="indexcurrentwiki" class="hidden"&gt;$msg.get('search.admin.lucene.indexing.action.indexcurrentwiki')&lt;/label&gt;&lt;input id="indexcurrentwiki" name="action" type="radio" value="indexcurrentwiki" #if((!$xcontext.isMainWiki() &amp;&amp; !$request.action) || $request.action == 'indexcurrentwiki'))checked="checked"#end/&gt;$msg.get('search.admin.lucene.indexing.action.indexcurrentwiki')
 &lt;/p&gt;
 
   ## Needs programming right because it takes a custom HQL query which could be dangerous
@@ -109,14 +109,14 @@
 &lt;/p&gt;
 
 &lt;p&gt;
-  #if ($context.isMainWiki())
+  #if ($xcontext.isMainWiki())
     &lt;label for="indexcustom_wikis"&gt;$msg.get('search.admin.lucene.indexing.action.indexcustom.wikis')&lt;/label&gt; &lt;input id="indexcustom_wikis" name="wikis" type="text" title="$escapetool.xml($msg.get('search.admin.lucene.indexing.action.indexcustom.wikis.title'))" value="$!wikisString" /&gt;
   #else
-    &lt;input id="indexcustom_wikis" name="wikis" value="${context.database}" type="hidden" value="$!wikisString" /&gt;
+    &lt;input id="indexcustom_wikis" name="wikis" value="${xcontext.database}" type="hidden" value="$!wikisString" /&gt;
   #end
 &lt;/p&gt;
 
-  #if ($hasProgramming &amp;&amp; $context.isMainWiki())
+  #if ($hasProgramming &amp;&amp; $xcontext.isMainWiki())
 &lt;p&gt;
     &lt;label for="indexcustom_hqlFilter"&gt;$msg.get('search.admin.lucene.indexing.action.indexcustom.hqlfilter')&lt;/label&gt; &lt;input id="indexcustom_hqlFilter" name="hqlFilter" type="text" title="$escapetool.xml($msg.get('search.admin.lucene.indexing.action.indexcustom.hqlfilter.title'))" #if($request.hqlFilter)value="${escapetool.xml($request.hqlFilter)}"#end /&gt;
 &lt;/p&gt;

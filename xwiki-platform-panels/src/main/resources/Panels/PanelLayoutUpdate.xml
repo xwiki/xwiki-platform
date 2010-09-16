@@ -34,7 +34,7 @@
 ##
 ## Check to see if the current user has admin rights on the current preferences document.
 ##
-#if(!$xwiki.hasAccessLevel("admin", $context.user, $prefsdocument))
+#if(!$xwiki.hasAccessLevel("admin", $xcontext.user, $prefsdocument))
   #xwikimessageboxstart("$msg.get('panelwizard.placemanager')" "")
   $msg.get("panelwizard.notadmininplace", $place)
   #xwikimessageboxend()

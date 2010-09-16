@@ -1,4 +1,4 @@
-#if ($context.user != 'XWiki.XWikiGuest')
+#if ($xcontext.user != 'XWiki.XWikiGuest')
   #if ($request.xredirect)
     $response.sendRedirect($request.xredirect)
   #else

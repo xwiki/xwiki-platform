@@ -9,7 +9,7 @@
 <dt><label for="licence">$msg.get('export_licence')</label></dt>
   <dd><input type="text" name="licence" id="licence" value=""/></dd>
 <dt><label for="author">$msg.get('export_author')</label></dt>
-  <dd><input type="text" name="author" id="author" value="$context.user"/></dd>
+  <dd><input type="text" name="author" id="author" value="$xcontext.user"/></dd>
 <dt><label for="version">$msg.get('export_version')</label></dt>
   <dd><input type="text" name="version" id="version" value=""/></dd>
 </dl>

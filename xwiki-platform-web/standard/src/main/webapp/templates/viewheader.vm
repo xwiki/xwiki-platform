@@ -85,7 +85,7 @@
       <div id="xwikimoreactionsitems">
 ## View section
         <div class="xwikimenutitle">$msg.get("view")</div>
-        #if($context.action=="viewrev")
+        #if($xcontext.action=="viewrev")
           #xwikiitem($doc.getURL("view","xpage=code&$!{revparams}") "raw")
         #else
           #xwikiitem($doc.getURL("viewrev","xpage=code&$!{revparams}") "raw")
@@ -120,7 +120,7 @@
             #xwikiitem($doc.getURL("inline") "editinline")
             #xwikiitem($doc.getURL("edit", "xpage=editobject") "editobject")
           #end
-          #if(($hasadmin||($context.user.equals($doc.creator))) && !$isReadOnly)
+          #if(($hasadmin||($xcontext.user.equals($doc.creator))) && !$isReadOnly)
             #xwikiitem($doc.getURL("reset") "resetversions")
             #xwikiitem($doc.getURL("delete") "delete")
           #end

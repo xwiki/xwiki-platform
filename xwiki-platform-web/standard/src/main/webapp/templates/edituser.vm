@@ -19,7 +19,7 @@ $cdoc.getRenderedContent()
 #end
 </form>
 ## add link to the complete profile of the currently logged user
-#if($context.user == $doc.getFullName())
+#if($xcontext.user == $doc.getFullName())
 $msg.get("rightsmanager.edituserprofile")&nbsp;&nbsp;<a href="$doc.getURL()">$msg.get("rightsmanager.userprofile")</a>
 #end
 <br /><br />

@@ -71,7 +71,7 @@
 #elseif (($tdoc.getLocked() == true) && (!$force))
   $response.setStatus(423)
   #xwikimessageboxstart($msg.get("notice") "$msg.get('doclockedby') $xwiki.getUserName($doc.getLockingUser())")
-  <a href="$doc.getURL($context.action, "$!{request.getQueryString().replaceAll('&', '&amp;').replaceAll('&amp;amp;', '&amp;')}&amp;force=1")">$msg.get("forcelock")</a>
+  <a href="$doc.getURL($xcontext.action, "$!{request.getQueryString().replaceAll('&', '&amp;').replaceAll('&amp;amp;', '&amp;')}&amp;force=1")">$msg.get("forcelock")</a>
   #xwikimessageboxend()
 #else
   #if($xwiki.exists("XWiki.AdminSheet"))

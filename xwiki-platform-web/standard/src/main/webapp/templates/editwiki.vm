@@ -25,7 +25,7 @@ $xwiki.getTextArea($tdoc.content)
 </div> ## noname
 <div class="bottombuttons">#template("editactions.vm")</div>
 ## Insert JS and CSS needed for the fullscreen edit feature
-$xwiki.jsfx.use('js/xwiki/editors/fullScreenEdit.js', {'forceSkinAction': true, 'language': ${context.language}})
+$xwiki.jsfx.use('js/xwiki/editors/fullScreenEdit.js', {'forceSkinAction': true, 'language': ${xcontext.language}})
 $xwiki.ssfx.use('js/xwiki/editors/fullScreenEdit.css', true)
 ## Autosave feature
 $xwiki.jsfx.use('js/xwiki/editors/autosave.js', true)

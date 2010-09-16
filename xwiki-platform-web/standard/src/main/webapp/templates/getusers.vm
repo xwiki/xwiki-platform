@@ -62,13 +62,13 @@ $response.setContentType("application/x-json")
 "reqNo": $util.parseInt($request.reqNo),
 "rows": [
 #foreach( $user in $users )
-   #if($context.user == $user.fullName)
+   #if($xcontext.user == $user.fullName)
     #set($grayed = true)
    #else
     #set($grayed = false)
   #end
    #set($wikiname = $user.getWiki())
-   #if($wikiname != "xwiki" || $wikiname == $context.database) #set($wikiname = "local") #end
+   #if($wikiname != "xwiki" || $wikiname == $xcontext.database) #set($wikiname = "local") #end
    #if( $velocityCount > 1 ) , #end
    {"username"      : "$!{escapetool.javascript($user.name)}", 
     "fullname"      : "$!{escapetool.javascript($user.fullName)}",

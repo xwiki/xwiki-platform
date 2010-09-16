@@ -18,7 +18,7 @@
 #set($discard = $syntax10Elements.add(['h4', '\n1.1.1.1 ', '\n', 'text_heading_4']))
 #set($discard = $syntax10Elements.add(['hr', '\n----\n', '', 'text_horizontalrule']))
 #set($discard = $syntax10Elements.add(['img', '{image:', '}', 'image']))
-#set($tmp = '#sign("' + $context.user + '")')
+#set($tmp = '#sign("' + $xcontext.user + '")')
 #set($discard = $syntax10Elements.add(['sign', $tmp, '', 'text_signature']))
 #set($syntax20Elements = [])
 #set($discard = $syntax20Elements.add(['bold', '**', '**', 'text_bold']))

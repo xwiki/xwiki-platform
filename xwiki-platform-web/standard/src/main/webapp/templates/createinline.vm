@@ -69,7 +69,7 @@
   ##
   ## If a space is ready to be created, redirect to the space home in edit mode
   ##
-  #set ($docReference = $services.model.createDocumentReference($context.wiki, $space, 'WebHome'))
+  #set ($docReference = $services.model.createDocumentReference($xcontext.wiki, $space, 'WebHome'))
   #set ($redirecturl = $xwiki.getDocument($docReference).getURL('edit', $redirectparams))
 #end
 #if ($tocreate == 'page' && $space != '' && $page != ''
@@ -77,7 +77,7 @@
   ##
   ## If a page is ready to be created, redirect to the specified page in the specified edit action
   ##
-  #set ($docReference = $services.model.createDocumentReference($context.wiki, $space, $page))
+  #set ($docReference = $services.model.createDocumentReference($xcontext.wiki, $space, $page))
   #set ($redirecturl = $xwiki.getDocument($docReference).getURL($editAction, $redirectparams))
   ##
   ## Check that the chosen space is allowed with the given template, if not:

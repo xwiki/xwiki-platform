@@ -6,7 +6,7 @@
 ### TODO: Document version to return to? (rev and language)
 ###
 #template("xwikivars.vm")
-#if($doc.getObject("XWiki.XWikiUsers") && ($context.user == $doc.fullName || $hasAdmin))
+#if($doc.getObject("XWiki.XWikiUsers") && ($xcontext.user == $doc.fullName || $hasAdmin))
 #set($date = $doc.attachmentList.get(0).date)
 #set($name = $doc.attachmentList.get(0).filename)
 #foreach($attachment in $doc.attachmentList)

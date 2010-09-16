@@ -216,7 +216,7 @@
   $xwiki.ssfx.use('js/xwiki/editors/dataeditors.css', true)##
   $xwiki.jsfx.use('js/xwiki/editors/dataeditors.js', true)##
   ## Insert JS and CSS needed for the fullscreen edit feature
-  $xwiki.jsfx.use('js/xwiki/editors/fullScreenEdit.js', {'forceSkinAction': true, 'language': ${context.language}})##
+  $xwiki.jsfx.use('js/xwiki/editors/fullScreenEdit.js', {'forceSkinAction': true, 'language': ${xcontext.language}})##
   $xwiki.ssfx.use('js/xwiki/editors/fullScreenEdit.css')##
   ## Some parameters
   #set($formname = 'update')
@@ -263,7 +263,7 @@
     #end
   #end
     <div class="hidden">
-      <input type="hidden" name="xcontinue" value="$doc.getURL($context.action, $q)"/>
+      <input type="hidden" name="xcontinue" value="$doc.getURL($xcontext.action, $q)"/>
       ## A submit button that captures "enter" on the form, placed before the "objectadd" submit button,
       ## to prevent from accidentally adding objects when pressing enter.
       #editActionButton('preview', 'preview')

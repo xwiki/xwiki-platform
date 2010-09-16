@@ -7,5 +7,5 @@
 #set($spaceDoc = $!spaceHome)
 #set($parentDoc = $!{xwiki.getDocument($tdoc.parent).getTranslatedDocument()})
 #set($preferencesDoc = $!xwiki.getDocument("XWiki.XWikiPreferences"))
-#set($crtUserDoc = $!xwiki.getDocument($context.user))
+#set($crtUserDoc = $!xwiki.getDocument($xcontext.user))
 #set($searchDoc = $!xwiki.getDocument("Main.WebSearch"))

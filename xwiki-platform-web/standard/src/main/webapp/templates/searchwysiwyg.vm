@@ -15,7 +15,7 @@
   <ul>
   #set ($currentSpaceEscaped = $escapetool.xml($escapetool.javascript($doc.space)))
   #foreach ($item in $documents)
-    #if ($xwiki.hasAccessLevel('view', "${context.database}:${item}"))
+    #if ($xwiki.hasAccessLevel('view', "${xcontext.database}:${item}"))
       <li>
       #set ($bentrydoc = $xwiki.getDocument($item))
       ## JavaScript inside HTML!

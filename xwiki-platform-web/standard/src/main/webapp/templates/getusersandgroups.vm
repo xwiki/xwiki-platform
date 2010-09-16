@@ -99,7 +99,7 @@ $response.setContentType("application/x-json")
 "rows": [
 #foreach($user in $users)
   #set($wikiname = $user.getWiki())
-  #if($wikiname != "xwiki" || $wikiname == $context.database) #set($wikiname = "local") #end
+  #if($wikiname != "xwiki" || $wikiname == $xcontext.database) #set($wikiname = "local") #end
   #if($wikiname == "xwiki")
     #set($username = $user.getPrefixedFullName())
   #else

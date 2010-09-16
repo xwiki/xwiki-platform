@@ -4,7 +4,7 @@
   #set ($keyboardShortcutsEnabled = ($editor != 'wysiwyg'))
   ## This allows the preview form to redirect back to the correct editor when pressing "Back to edit":
   <div class="metamodifs">
-  <input type="hidden" name="xeditaction" value="$!context.action" />
+  <input type="hidden" name="xeditaction" value="$!xcontext.action" />
   #if ((!$tdoc.isNew()) && (!$minorFieldAdded) && ($xwiki.hasMinorEdit()))
     #set ($minorFieldAdded = 1)
     <label for="minorEdit">$msg.get('core.minoredit'): <input type="checkbox" name="minorEdit" id="minorEdit" #if($request.minorEdit)checked="checked" #end/></label>

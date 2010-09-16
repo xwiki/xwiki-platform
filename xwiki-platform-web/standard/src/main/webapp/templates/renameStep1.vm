@@ -29,7 +29,7 @@
   #if($backlinks.size() > 0)
     <h2><span>$msg.get('core.rename.title.updateDocs')</span></h2>
     #foreach($backlink in $backlinks)
-      #if(!$xwiki.hasAccessLevel('edit', $context.user, $backlink))
+      #if(!$xwiki.hasAccessLevel('edit', $xcontext.user, $backlink))
         <div><input id="backlink_$velocityCount" type="checkbox" disabled="disabled"/> <a href='$xwiki.getURL($backlink)' rel='__blank'><label for='backlink_$velocityCount'>$escapetool.xml($backlink)</label></a></div>
       #elseif($xwiki.getDocument($backlink).isProgrammaticContent())
         <div><input id="backlink_$velocityCount" type="checkbox" name="backlink_$escapetool.xml($backlink)"/> <a href='$xwiki.getURL($backlink)' rel='__blank'><label for='backlink_$velocityCount'>$escapetool.xml($backlink)</label></a></div>
@@ -42,7 +42,7 @@
   #if($children.size() > 0)
     <h2><span>$msg.get('core.rename.title.updateChildren')</span></h2>
     #foreach($child in $children)
-      #if(!$xwiki.hasAccessLevel('edit', $context.user, $child))
+      #if(!$xwiki.hasAccessLevel('edit', $xcontext.user, $child))
         <div><input id="children_$velocityCount" type="checkbox" disabled="disabled"/> <a href='$xwiki.getURL($child)' rel='__blank'><label for='children_$velocityCount'>$escapetool.xml($child)</label></a></div>
       #elseif($xwiki.getDocument($child).isProgrammaticContent())
         <div><input id="children_$velocityCount" type="checkbox" name="child_$escapetool.xml($child)"/> <a href='$xwiki.getURL($child)' rel='__blank'><label for='children_$velocityCount'>$escapetool.xml($child)</label></a></div>

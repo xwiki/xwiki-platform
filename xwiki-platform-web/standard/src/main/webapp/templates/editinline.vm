@@ -1,5 +1,5 @@
 ## Insert JS and CSS needed for the fullscreen edit feature
-$xwiki.jsfx.use('js/xwiki/editors/fullScreenEdit.js', {'forceSkinAction': true, 'language': ${context.language}})##
+$xwiki.jsfx.use('js/xwiki/editors/fullScreenEdit.js', {'forceSkinAction': true, 'language': ${xcontext.language}})##
 $xwiki.ssfx.use('js/xwiki/editors/fullScreenEdit.css', true)##
 #set($formname = "inline")
 #set($saveaction = "save")
@@ -15,7 +15,7 @@ $xwiki.ssfx.use('js/xwiki/editors/fullScreenEdit.css', true)##
   <div class="layoutsection">
   $response.setStatus(423)
   #set($newquerystring = "$!{request.getQueryString().replaceAll('&', '&amp;').replaceAll('&amp;amp;', '&amp;')}&amp;force=1")
-  #set($forceEditURL = $doc.getURL($context.action, ${newquerystring}))
+  #set($forceEditURL = $doc.getURL($xcontext.action, ${newquerystring}))
   #xwikimessageboxstart($msg.get("notice") "$msg.get('doclockedby') $xwiki.getUserName($doc.getLockingUser())")
     <a href="$forceEditURL">$msg.get('forcelock')</a>
   #xwikimessageboxend()

@@ -29,7 +29,7 @@ $escapetool.xml($pdfheader)
 </title>
 <meta http-equiv="Content-Type" content="text/html; charset=$xwiki.encoding" />
 </head>
-<body id="body" class="${context.action}body" pdfcover="${displayPdfCover}" pdftoc="${displayPdfToc}">
+<body id="body" class="${xcontext.action}body" pdfcover="${displayPdfCover}" pdftoc="${displayPdfToc}">
 <div class="pdfheader">
 $pdfdoc.use("XWiki.PDFClass")
 #set($pdfheader = $pdfdoc.display("header","rendered"))

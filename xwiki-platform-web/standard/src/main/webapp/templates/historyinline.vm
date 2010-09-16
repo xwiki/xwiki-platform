@@ -7,7 +7,7 @@
 ##
 ## Settings, compute what versions should be displayed.
 ##
-#if ($context.action == 'edit')
+#if ($xcontext.action == 'edit')
   #set ($viewer = 'editor=history')
 #else
   #set ($viewer = 'viewer=history')
@@ -109,7 +109,7 @@ $xwiki.ssfx.use('uicomponents/pagination/pagination.css', true)##
 ## Print the page navigation links, if needed.
 ## Since the history can be viewed both in edit and view mode, and these modes use a different parameter name, detect
 ## and set the right parameter here.
-#if ($context.action == 'view')
+#if ($xcontext.action == 'view')
   #set ($viewer = 'viewer=history')
 #else
   #set ($viewer = 'editor=history')

@@ -6,7 +6,7 @@
 ###
 #if($isInServletMode) ## Visible only in a page
 <div id="headerglobal" class="layoutsection">
-#if($context.action == "view")
+#if($xcontext.action == "view")
 <div class="minwidthb"></div>
 #else
 <div class="minwidthd"></div>
@@ -31,13 +31,13 @@
   <div id="globallinks">
     <div id="globalmenu">
 #if (!$isGuest)
-#if ($context.user == 'XWiki.superadmin')
+#if ($xcontext.user == 'XWiki.superadmin')
       $!msg.get("superadmin") #sep()
 #else
-      <a class="glink" href="$!xwiki.getURL($context.user, "view")" id="headeruser">$!xwiki.getUserName($context.user, false)</a> #sep()
+      <a class="glink" href="$!xwiki.getURL($xcontext.user, "view")" id="headeruser">$!xwiki.getUserName($xcontext.user, false)</a> #sep()
 #end
 #end
-#if(!$context.action.startsWith("login"))
+#if(!$xcontext.action.startsWith("login"))
   #if($isGuest)
     #set($loginurl = $xwiki.getURL('XWiki.XWikiLogin', 'login', "xredirect=$escapetool.url($xwiki.getRequestURL())"))
       <a class="glink" href="$!loginurl" id="headerlogin">$!msg.get('login')</a>#sep()

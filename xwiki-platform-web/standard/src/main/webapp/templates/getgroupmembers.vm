@@ -23,14 +23,14 @@ $response.setContentType('application/x-json')
 "offset": $offset,
 "rows": [
 #foreach( $m in $members )
-    #if($context.user == $m && $doc.fullName == 'XWiki.XWikiAdminGroup')
+    #if($xcontext.user == $m && $doc.fullName == 'XWiki.XWikiAdminGroup')
       #set($grayed = true)
     #else
       #set($grayed = false)
     #end
     #set($mdoc = $xwiki.getDocument($m))
     #set($wikiname = $mdoc.getWiki())
-    #if($wikiname != 'xwiki' || $wikiname == $context.database) #set($wikiname = 'local') #end
+    #if($wikiname != 'xwiki' || $wikiname == $xcontext.database) #set($wikiname = 'local') #end
     #if( $velocityCount > 1 ) , #end
    {
     "fullname"     : "$m",
@@ -40,8 +40,8 @@ $response.setContentType('application/x-json')
     "docurl"       : "$doc.getURL()",
     "grayed"       : "$grayed",
 ## livetable data
-    "doc_viewable" : "${xwiki.hasAccessLevel('view', $context.user, $m)}",
-    "doc_hasadmin" : "${xwiki.hasAccessLevel('admin', $context.user, $doc)}",
+    "doc_viewable" : "${xwiki.hasAccessLevel('view', $xcontext.user, $m)}",
+    "doc_hasadmin" : "${xwiki.hasAccessLevel('admin', $xcontext.user, $doc)}",
     "member"   : "$xwiki.getUserName($m, false)#if($hasAdmin || $isAdvancedUser) (#if($wikiname != 'local')$wikiname:#end$m)#end",
     "member_url" : "$xwiki.getURL($m)",
     "doc_delete_url" : "$doc.getURL('view', "xpage=deletegroupmember&fullname=${m}&ajax=true")"

@@ -181,7 +181,7 @@
   #submenuitem("$doc.getURL('view', 'xpage=watch&amp;do=addwiki')&amp;xredirect=$doc.getURL()" $msg.get('core.menu.watchlist.add.wiki', [$escapetool.xml($doc.wiki)]) 'tmWatchWiki', $watchClasses)
   #submenuitem("$doc.getURL('view', 'xpage=watch&amp;do=removewiki')&amp;xredirect=$doc.getURL()" $msg.get('core.menu.watchlist.remove.wiki') 'tmUnwatchWiki', $unwatchClasses)
   #submenuseparator()
-  #submenuitem($xwiki.getURL($context.user, 'view', 'category=watchlist') $msg.get('core.menu.watchlist.management') 'tmWatchlistManager')
+  #submenuitem($xwiki.getURL($xcontext.user, 'view', 'category=watchlist') $msg.get('core.menu.watchlist.management') 'tmWatchlistManager')
   #xwikitopmenuentryend()
 #end
 </div>

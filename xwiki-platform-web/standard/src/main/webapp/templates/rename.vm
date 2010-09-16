@@ -38,7 +38,7 @@
           $response.setStatus(409)
           #error($msg.get('core.rename.alreadyExists', [${escapetool.xml($newDocReferenceAsString)}, $xwiki.getURL($newDocReference)]))
           #template("renameStep1.vm")
-        #elseif(!$xwiki.hasAccessLevel('edit', $context.user, $newDocReferenceAsString))
+        #elseif(!$xwiki.hasAccessLevel('edit', $xcontext.user, $newDocReferenceAsString))
           $response.setStatus(403)
           #error($msg.get('core.rename.targetNotWritable', [${escapetool.xml($newDocReferenceAsString)}]))
           #template('renameStep1.vm')

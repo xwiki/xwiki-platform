@@ -23,7 +23,7 @@
     <td id="buff"></td>
 </tr>
 </table>
-#if($context.action == "inline")
+#if($xcontext.action == "inline")
  <div id="addNewMember">
      <table cellpadding="5" cellspacing="5">
      <tr>

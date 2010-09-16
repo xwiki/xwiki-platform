@@ -299,7 +299,7 @@ $xwiki.getUserName("xwiki:${username}")
   #set ($numbered = $boolean.valueOf($numbered))
  #end
  #set ($tocData = ${tdoc.getTOC($init, $max, $numbered)})
- #set ($context.tocData = $tocData)
+ #set ($xcontext.tocData = $tocData)
  #set ($lastLevel = $init - 1)
  #set ($depth = 0)
  #set ($openeditem = true)
@@ -363,7 +363,7 @@ $xwiki.getUserName("xwiki:${username}")
   <tr><td>Name</td><td>Export</td><td colspan="3">Default Action</td></tr>
   <tr><td colspan="2"></td><td>overwrite</td><td>merge objects</td><td>skip</td></tr>
   #foreach ($doc in $docs)
-    #if ($xwiki.hasAccessLevel("view", "${context.database}:${SpaceName}.${doc}"))
+    #if ($xwiki.hasAccessLevel("view", "${xcontext.database}:${SpaceName}.${doc}"))
 
     <tr><td>[${doc}>${SpaceName}.${doc}]</td><td><input type="checkbox" name="ToExport" value="${SpaceName}.${doc}" /></td><td><input type="radio" name="${SpaceName}.${doc}_default" value="overwrite" checked="true" /></td> <td><input type="radio" name="${SpaceName}.${doc}_default" value="merge" /></td> <td><input type="radio" name="${SpaceName}.${doc}_default" value="skip" /></td> </tr>
 
@@ -381,7 +381,7 @@ $xwiki.getUserName("xwiki:${username}")
     <tr><td>Name</td><td>Export</td><td colspan="3">Default Action</td></tr>
     <tr><td colspan="2"></td><td>overwrite</td><td>merge objects</td><td>skip</td></tr>
     #foreach ($doc in $docs)
-      #if ($xwiki.hasAccessLevel("view", "${context.database}:XWiki.${doc}"))
+      #if ($xwiki.hasAccessLevel("view", "${xcontext.database}:XWiki.${doc}"))
 
       <tr><td>[${doc}>XWiki.${doc}]</td><td><input type="checkbox" name="ToExport" value="XWiki.${doc}" /></td><td><input type="radio" name="XWiki.${doc}_default" value="overwrite" checked="true" /></td> <td><input type="radio" name="XWiki.${doc}_default" value="merge" /></td> <td><input type="radio" name="XWiki.${doc}_default" value="skip" /></td> </tr>
 
@@ -810,8 +810,8 @@ $fn
 <div class="pagedNavigation">
 #if($crtPageNumber > 0)
 #set($prevPage = $crtPageNumber - 1)
-<span class="pagedLink"><a href="$doc.getURL($context.action, "page=0&amp;ipp=${itemsPerPage}")">$msg.get("web.paging.firstPage")</a></span>
-<span class="pagedLink"><a href="$doc.getURL($context.action, "page=${prevPage}&amp;ipp=${itemsPerPage}")">$msg.get("web.paging.previousPage")</a></span>
+<span class="pagedLink"><a href="$doc.getURL($xcontext.action, "page=0&amp;ipp=${itemsPerPage}")">$msg.get("web.paging.firstPage")</a></span>
+<span class="pagedLink"><a href="$doc.getURL($xcontext.action, "page=${prevPage}&amp;ipp=${itemsPerPage}")">$msg.get("web.paging.previousPage")</a></span>
 #else
 <span class="pagedLink inactive">$msg.get("web.paging.firstPage")</span>
 <span class="pagedLink inactive">$msg.get("web.paging.previousPage")</span>
@@ -821,8 +821,8 @@ $fn
 <span class="pagedStatus">$msg.get("web.paging.pageNumberOf", [$displayCrtPageNumber, $displayTotalPages])</span>
 #if($crtPageNumber < $totalPages)
 #set($nextPage = $crtPageNumber + 1)
-<span class="pagedLink"><a href="$doc.getURL($context.action, "page=${nextPage}&amp;ipp=${itemsPerPage}")">$msg.get("web.paging.nextPage")</a></span>
-<span class="pagedLink"><a href="$doc.getURL($context.action, "page=${totalPages}&amp;ipp=${itemsPerPage}")">$msg.get("web.paging.lastPage")</a></span>
+<span class="pagedLink"><a href="$doc.getURL($xcontext.action, "page=${nextPage}&amp;ipp=${itemsPerPage}")">$msg.get("web.paging.nextPage")</a></span>
+<span class="pagedLink"><a href="$doc.getURL($xcontext.action, "page=${totalPages}&amp;ipp=${itemsPerPage}")">$msg.get("web.paging.lastPage")</a></span>
 #else
 <span class="pagedLink inactive">$msg.get("web.paging.nextPage")</span>
 <span class="pagedLink inactive">$msg.get("web.paging.lastPage")</span>
@@ -850,8 +850,8 @@ $fn
     <div class="pagedNavigation">
     #if($currentPageNumber > 1)
       #set($currentPageNumber = $currentPageNumber - 1)
-      <span class="pagedLink"><a href="$doc.getURL($context.action, "page=1&amp;ipp=${itemsPerPage}")#if("$!additionalQueryParams" != "")&amp;$additionalQueryParams#end">$msg.get("web.paging.firstPage")</a></span>
-      <span class="pagedLink"><a href="$doc.getURL($context.action, "page=${currentPageNumber}&amp;ipp=${itemsPerPage}")#if("$!additionalQueryParams" != "")&amp;$additionalQueryParams#end">$msg.get("web.paging.previousPage")</a></span>
+      <span class="pagedLink"><a href="$doc.getURL($xcontext.action, "page=1&amp;ipp=${itemsPerPage}")#if("$!additionalQueryParams" != "")&amp;$additionalQueryParams#end">$msg.get("web.paging.firstPage")</a></span>
+      <span class="pagedLink"><a href="$doc.getURL($xcontext.action, "page=${currentPageNumber}&amp;ipp=${itemsPerPage}")#if("$!additionalQueryParams" != "")&amp;$additionalQueryParams#end">$msg.get("web.paging.previousPage")</a></span>
       #set($currentPageNumber = $currentPageNumber + 1)
     #else
       <span class="pagedLink inactive">$msg.get("web.paging.firstPage")</span>
@@ -860,8 +860,8 @@ $fn
     <span class="pagedStatus">$msg.get("web.paging.pageNumberOf", [$currentPageNumber, $totalPages])</span>
     #if($currentPageNumber < $totalPages)
       #set($currentPageNumber = $currentPageNumber + 1)
-      <span class="pagedLink"><a href="$doc.getURL($context.action, "page=${currentPageNumber}&amp;ipp=${itemsPerPage}")#if("$!additionalQueryParams" != "")&amp;$additionalQueryParams#end">$msg.get("web.paging.nextPage")</a></span>
-      <span class="pagedLink"><a href="$doc.getURL($context.action, "page=${totalPages}&amp;ipp=${itemsPerPage}")#if("$!additionalQueryParams" != "")&amp;$additionalQueryParams#end">$msg.get("web.paging.lastPage")</a></span>
+      <span class="pagedLink"><a href="$doc.getURL($xcontext.action, "page=${currentPageNumber}&amp;ipp=${itemsPerPage}")#if("$!additionalQueryParams" != "")&amp;$additionalQueryParams#end">$msg.get("web.paging.nextPage")</a></span>
+      <span class="pagedLink"><a href="$doc.getURL($xcontext.action, "page=${totalPages}&amp;ipp=${itemsPerPage}")#if("$!additionalQueryParams" != "")&amp;$additionalQueryParams#end">$msg.get("web.paging.lastPage")</a></span>
       #set($currentPageNumber = $currentPageNumber - 1)
     #else
       <span class="pagedLink inactive">$msg.get("web.paging.nextPage")</span>
@@ -993,7 +993,7 @@ $fn
 ### @param title The panel caption title
 ###
 #macro(panelheader $title)
-#set($cookieName = "${context.user}_${panel}")
+#set($cookieName = "${xcontext.user}_${panel}")
 #set($expanded = $xwiki.getUserPreferenceFromCookie($cookieName))
 #if(!$expanded)
   #set($expanded = 'expanded')
@@ -1022,7 +1022,7 @@ $fn
 #end
 
 #macro(largepanelheader $title)
-#set($cookieName = "${context.user}_${panel}")
+#set($cookieName = "${xcontext.user}_${panel}")
 #set($expanded = $xwiki.getUserPreferenceFromCookie($cookieName))
 #if(!$expanded)
   #set($expanded = 'expanded')
@@ -1380,7 +1380,7 @@ $html
 #macro(displayDocumentList $docNames $displaySpaces $blacklistedSpaces)
   #set($documentList = $util.getArrayList())
   #foreach($docName in $docNames)
-    #if($xwiki.hasAccessLevel("view", $context.user, $docName))
+    #if($xwiki.hasAccessLevel("view", $xcontext.user, $docName))
       #set($document = $xwiki.getDocument($docName).getTranslatedDocument())
       #if(!$blacklistedSpaces.contains($document.getSpace()))
         #set($discard = $documentList.add($document))

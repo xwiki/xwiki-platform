@@ -1,4 +1,4 @@
-#set($editors = $context.getEditorWysiwyg())
+#set($editors = $xcontext.getEditorWysiwyg())
 #if($editors)
 #if($doc.syntax.toIdString() == "xwiki/1.0")
 <script type="text/javascript" src="$xwiki.getSkinFile("js/xwiki/wysiwyg/tinymce/tiny_mce/tiny_mce.js")"></script>

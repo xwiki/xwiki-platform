@@ -62,7 +62,7 @@ $response.setContentType("application/x-json")
 "rows": [
 #foreach( $group in $groups )
   #set($wikiname = $group.getWiki())
-  #if($wikiname != "xwiki" || $wikiname == $context.database) #set($wikiname = "local") #end
+  #if($wikiname != "xwiki" || $wikiname == $xcontext.database) #set($wikiname = "local") #end
    #set( $grs = $xwiki.rightsmanager.getAllGroupsForUser( $group.fullName ) )
    #if( $velocityCount > 1 ) , #end
    {"username"      : "$!{escapetool.javascript($group.name)}", 

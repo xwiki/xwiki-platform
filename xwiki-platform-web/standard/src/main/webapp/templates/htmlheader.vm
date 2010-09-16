@@ -9,7 +9,7 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
     "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 #end
-<html xmlns="http://www.w3.org/1999/xhtml" lang="$context.language" xml:lang="$context.language">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="$xcontext.language" xml:lang="$xcontext.language">
   <head>
     ## ---------------------------------------------------------------------------------------------------------------
     ## Ensure that the Content-Type meta directive is the first one in the header.
@@ -43,7 +43,7 @@
     ## ---------------------------------------------------------------------------------------------------------------
     ## Universal edit button. See http://universaleditbutton.org
     ## ---------------------------------------------------------------------------------------------------------------
-    #if($context.action=="view")
+    #if($xcontext.action=="view")
       <link rel="alternate" type="application/x-wiki" title="Edit" href="$doc.getURL("edit")" />
     #end
     ## ---------------------------------------------------------------------------------------------------------------
@@ -61,11 +61,11 @@
     <meta name="space" content="$escapetool.xml($doc.space)"/>
     <meta name="page" content="$escapetool.xml($doc.name)"/>
     <meta name="version" content="$doc.version"/>
-    <meta name="restURL" content="${request.contextPath}/rest/wikis/${context.database}/spaces/$escapetool.url(${doc.space})/pages/$escapetool.url(${doc.name})"/>
+    <meta name="restURL" content="${request.contextPath}/rest/wikis/${xcontext.database}/spaces/$escapetool.url(${doc.space})/pages/$escapetool.url(${doc.name})"/>
     ## ---------------------------------------------------------------------------------------------------------------
     ## Localize GWT applications.
     ## ---------------------------------------------------------------------------------------------------------------
-    <meta name="gwt:property" content="locale=$!{context.language}" />
+    <meta name="gwt:property" content="locale=$!{xcontext.language}" />
     ## ---------------------------------------------------------------------------------------------------------------
     ## Add user-defined Meta directives
     ## ---------------------------------------------------------------------------------------------------------------
@@ -79,11 +79,11 @@
     #template("javascript.vm")
   </head>
   ## TODO: fix this from css
-  #set($bodyAction = $context.action)
-  #if($context.action == "admin" || $context.action == "import" || $context.action == "export")
+  #set($bodyAction = $xcontext.action)
+  #if($xcontext.action == "admin" || $xcontext.action == "import" || $xcontext.action == "export")
     #set($bodyAction = "view")
   #end
-  <body id="body" class="wiki-${context.database} ${bodyAction}body #if($showLeftPanels == "0")hideleft#end#if($showRightPanels == "0")hideright#end#if($hidecolumns && ($!hidecolumns == 1))hidelefthideright#end">
+  <body id="body" class="wiki-${xcontext.database} ${bodyAction}body #if($showLeftPanels == "0")hideleft#end#if($showRightPanels == "0")hideright#end#if($hidecolumns && ($!hidecolumns == 1))hidelefthideright#end">
 #else
   #template("stylesheets2.vm")
   #template("javascript.vm")

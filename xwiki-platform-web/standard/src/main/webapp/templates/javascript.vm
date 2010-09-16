@@ -27,13 +27,13 @@ $xwiki.ssfx.use('uicomponents/widgets/notification.css', true)
 XWiki.webapppath = "${xwiki.webAppPath}";
 XWiki.servletpath = "${xwiki.servletPath}";
 XWiki.contextPath = "${request.contextPath}";
-XWiki.mainWiki = "$!{escapetool.javascript(${context.mainWikiName})}";
-XWiki.currentWiki = "$!{escapetool.javascript(${context.database})}";
+XWiki.mainWiki = "$!{escapetool.javascript(${xcontext.mainWikiName})}";
+XWiki.currentWiki = "$!{escapetool.javascript(${xcontext.database})}";
 XWiki.currentSpace = "$!{escapetool.javascript($doc.space)}";
 XWiki.currentPage = "$!{escapetool.javascript($doc.name)}";
 XWiki.editor = "$!{escapetool.javascript($editor)}";
 XWiki.viewer = "$!{escapetool.javascript($viewer)}";
-XWiki.contextaction = "${context.getAction()}";
+XWiki.contextaction = "${xcontext.getAction()}";
 XWiki.docisnew = $!doc.isNew();
 XWiki.docsyntax = "$!doc.getSyntax().toIdString()";
 XWiki.blacklistedSpaces = [ #foreach($space in $blacklistedSpaces)#if($velocityCount > 1),#end"$space"#end ];
@@ -45,7 +45,7 @@ window.docsaveurl = "${doc.getURL('save')}";
 window.docgeturl = "${doc.getURL('get')}";
 // ]]>
 </script>
-#if(($context.action=="inline")||($context.action=="edit") || ($context.action=="admin"))
+#if(($xcontext.action=="inline")||($xcontext.action=="edit") || ($xcontext.action=="admin"))
 $xwiki.get('jsfx').use('uicomponents/widgets/validation/livevalidation_prototype.js')
 $xwiki.get('ssfx').use('uicomponents/widgets/validation/livevalidation.css')
 <script type="text/javascript">
@@ -76,7 +76,7 @@ $xwiki.get('ssfx').use('uicomponents/widgets/validation/livevalidation.css')
 
  function lockEdit(){
     if (lockEditFlag==false) {
-#if($context.action=="inline")
+#if($xcontext.action=="inline")
       var surl = "$doc.getExternalURL("lock")?action=inline&ajax=1&${docvariant.replaceAll("&amp;", "&")}";
 #else
       var surl = "$doc.getExternalURL("lock")?ajax=1&${docvariant.replaceAll("&amp;", "&")}";

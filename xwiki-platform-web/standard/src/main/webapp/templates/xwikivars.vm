@@ -1,6 +1,6 @@
 #template("frequentlyUsedDocs.vm")
-#set($isGuest = $context.getUser().equals('XWiki.XWikiGuest'))
-#set($isSuperAdmin = ($context.user == 'XWiki.superadmin'))
+#set($isGuest = $xcontext.getUser().equals('XWiki.XWikiGuest'))
+#set($isSuperAdmin = ($xcontext.user == 'XWiki.superadmin'))
 #set($hasEdit = $xwiki.hasAccessLevel('edit'))
 #set($hasAdmin = $xwiki.hasAccessLevel('admin'))
 #set($hasComment = $xwiki.hasAccessLevel('comment'))
@@ -8,11 +8,11 @@
 #set($hasCreateSpace = $xwiki.hasAccessLevel('edit', "${doc.space}${mathtool.random(0, 999)}.DocumentReservedForInternalXWikiUsage"))
 ## Note: In order to know if the user has the right to create a page we compute a page name that doesn't exist and check edit rights on that page 
 #set($hasCreatePage = $xwiki.hasAccessLevel('edit', "${doc.space}.DocumentReservedForInternalXWikiUsage${mathtool.random(0, 999)}"))
-#set($hasGlobalAdmin = $xwiki.hasAccessLevel('admin', $context.user, 'XWiki.XWikiPreferences'))
+#set($hasGlobalAdmin = $xwiki.hasAccessLevel('admin', $xcontext.user, 'XWiki.XWikiPreferences'))
 ## Note: The document name is not internally used to determine if a user has programming access level. We pass XWiki.XWikiPreferences for consistency with the call for global admin
-#set($hasProgramming = $xwiki.hasAccessLevel('programming', $context.user, 'XWiki.XWikiPreferences'))
-#set($hasSpaceAdmin = $xwiki.hasAccessLevel('admin', $context.user, "${doc.space}.WebPreferences"))
-#set($hasWatch = $xwiki.watchlist && !$isGuest && !$isSuperAdmin && $xwiki.exists($services.model.serialize($services.model.createDocumentReference($context.wiki, 'XWiki', 'XWikiUserWatchListSheet'), 'local')))
+#set($hasProgramming = $xwiki.hasAccessLevel('programming', $xcontext.user, 'XWiki.XWikiPreferences'))
+#set($hasSpaceAdmin = $xwiki.hasAccessLevel('admin', $xcontext.user, "${doc.space}.WebPreferences"))
+#set($hasWatch = $xwiki.watchlist && !$isGuest && !$isSuperAdmin && $xwiki.exists($services.model.serialize($services.model.createDocumentReference($xcontext.wiki, 'XWiki', 'XWikiUserWatchListSheet'), 'local')))
 #set($isReadOnly = $xwiki.isReadOnly())
 #set($spaceViewUrl = $spaceDoc.getURL('view'))
 #set($viewUrl = $doc.getURL('view'))
@@ -57,7 +57,7 @@
 #end
 #set($skin=$xwiki.getSkin())
 #set($copyright = $xwiki.getSpaceCopyright())
-#set($xwikimode=$context.getMode())
+#set($xwikimode=$xcontext.getMode())
 #set($logredir = $escapetool.xml($xwiki.getRequestURL()))
 ##
 #if($xwiki.exists("XWiki.MaintenanceInfo"))

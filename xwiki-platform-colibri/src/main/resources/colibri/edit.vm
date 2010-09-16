@@ -4,60 +4,64 @@
 ### General wrapper for edit actions
 ###
 ##
-## Determine what editor to show
-##
-$xwiki.jsfx.use('js/scriptaculous/scriptaculous.js')
-$xwiki.jsfx.use('js/xwiki/actionbuttons/actionButtons.js', true)
-#if("$!editor" == '')
-  ## Normally no special characters should exist in the editor parameter, so this is just a protection measure.
-  #set($editor = "$!{escapetool.xml($request.getParameter('editor'))}")
-  #if($editor == '')
-    #if(($xwiki.getUserPreference('editor') == 'Wysiwyg') && ($doc.syntax.toIdString() != 'xwiki/1.0' || !$doc.isAdvancedContent()))
-      #set($editor = 'wysiwyg')
-    #else
-      #set($editor = 'wiki')
-    #end
-  #end
-#end
-##
-## "Compute" the title
-##
-#set($title = $xwiki.parseContent($msg.get('editpageTitle')))
-##
-## Header
-##
-#template("xwikivars.vm")
-#template("layoutvars.vm")
-#template("htmlheader.vm")
-#template("menuedit.vm")
-#template("header.vm")
-#if($editor == 'wiki' || $editor == 'wysiwyg')
-  <form id="edit" method="post" action="$doc.getURL('preview')" >
-  ## Pass the section number when the form is submitted in order to affect only the specified section.
-  ## We need to test if the section number is present to prevent a NumberFormatException for the empty string.
-  #if("$!{request.section}" != '')
-    <input type="hidden" name="section" value="$!{escapetool.xml($request.section)}" />
-  #end
-  ## This input is used by the full screen widget: it stores the selector of the maximized element, so that the full screen can be restored when coming back from preview.
-  <div class="hidden"><input type="hidden" name="x-maximized" value="$!{escapetool.xml($request.get('x-maximized'))}"/></div>
-#end
-##
-## Content
-##
 ## Is the document being edited by another user?
 ## If yes, warn about it and show a forcing link:
 ##
-#set($force = $!request.get('force'))
-#if (($tdoc.getLocked()==true)&&(!$force))
-  <div class="layoutsection">
-  $response.setStatus(423)
-  #set($newquerystring = "$!{request.getQueryString().replaceAll('&', '&amp;').replaceAll('&amp;amp;', '&amp;')}&amp;force=1")
-  #set($forceEditURL = $doc.getURL($context.action, ${newquerystring}))
-  #xwikimessageboxstart($msg.get('notice') "$msg.get('doclockedby') $xwiki.getUserName($doc.getLockingUser())")
+#if($tdoc.getLocked() && "$!request.get('force')" == '')
+  #template("startpage.vm")
+  <div class="main layoutsubsection">
+   <div id="mainContentArea">
+    ##
+    $response.setStatus(423)
+    #set($newquerystring = "$!{request.getQueryString().replaceAll('&', '&amp;').replaceAll('&amp;amp;', '&amp;')}"
+                         + '&amp;force=1')
+    #set($forceEditURL = $doc.getURL($xcontext.getAction(), ${newquerystring}))
+    #xwikimessageboxstart($msg.get('notice') "$msg.get('doclockedby') $xwiki.getUserName($doc.getLockingUser())")
     <a href="$forceEditURL">$msg.get('forcelock')</a>
-  #xwikimessageboxend()
-  </div>
+    #xwikimessageboxend()
+    ##
+   </div>## mainContentArea
+  </div>## main layoutsubsection
+  #template("endpage.vm")
 #else
+  ##
+  ## Determine what editor to show
+  ##
+  $xwiki.jsfx.use('js/scriptaculous/scriptaculous.js')
+  $xwiki.jsfx.use('js/xwiki/actionbuttons/actionButtons.js', true)
+  #if("$!editor" == '')
+    ## Normally no special characters should exist in the editor parameter, so this is just a protection measure.
+    #set($editor = "$!{escapetool.xml($request.getParameter('editor'))}")
+    #if($editor == '')
+      #if(($xwiki.getUserPreference('editor') == 'Wysiwyg') && ($doc.syntax.toIdString() != 'xwiki/1.0' || !$doc.isAdvancedContent()))
+        #set($editor = 'wysiwyg')
+      #else
+        #set($editor = 'wiki')
+      #end
+    #end
+  #end
+  ##
+  ## "Compute" the title
+  ##
+  #set($title = $xwiki.parseContent($msg.get('editpageTitle')))
+  ##
+  ## Header
+  ##
+  #template("xwikivars.vm")
+  #template("layoutvars.vm")
+  #template("htmlheader.vm")
+  #template("menuedit.vm")
+  #template("header.vm")
+  #if($editor == 'wiki' || $editor == 'wysiwyg')
+    <form id="edit" method="post" action="$doc.getURL('preview')" >
+    ## Pass the section number when the form is submitted in order to affect only the specified section.
+    ## We need to test if the section number is present to prevent a NumberFormatException for the empty string.
+    #if("$!{request.section}" != '')
+      <input type="hidden" name="section" value="$!{escapetool.xml($request.section)}" />
+    #end
+    ## This input is used by the full screen widget: it stores the selector of the maximized element, so that the full screen can be restored when coming back from preview.
+    <div class="hidden"><input type="hidden" name="x-maximized" value="$!{escapetool.xml($request.get('x-maximized'))}"/></div>
+  #end
   ##################
   ##   Edit zone  ##
   ##################
@@ -109,12 +113,12 @@ $xwiki.jsfx.use('js/xwiki/actionbuttons/actionButtons.js', true)
   <div class="clearfloats"></div>
   </div> ## xwikieditorinner
   </div> ## xwikieditor
+  ##
+  ## Footer
+  ##
+  #if($editor == 'wiki' || $editor == 'wysiwyg')
+    </form>
+  #end
+  #template("footer.vm")
+  #template("htmlfooter.vm")
 #end
-##
-## Footer
-##
-#if($editor == 'wiki' || $editor == 'wysiwyg')
-  </form>
-#end
-#template("footer.vm")
-#template("htmlfooter.vm")

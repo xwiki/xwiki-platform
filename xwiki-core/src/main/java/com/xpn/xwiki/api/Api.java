@@ -75,7 +75,7 @@ public class Api
     public boolean hasProgrammingRights()
     {
         // There is never programming right after privileges have been dropped.
-        if (getEffectiveScriptAuthorName() == XWikiRightService.GUEST_USER) {
+        if (hasDroppedPermissions()) {
             return false;
         }
 
@@ -146,12 +146,20 @@ public class Api
      */
     String getEffectiveScriptAuthorName()
     {
-        if (!"true".equals(this.getXWikiContext().get("hasDroppedPermissions"))) {
+        if (!hasDroppedPermissions()) {
             final XWikiDocument doc = this.getXWikiContext().getDoc();
             if (doc != null) {
                 return doc.getAuthor();
             }
         }
         return XWikiRightService.GUEST_USER;
+    }
+
+    /**
+     * @return true if the code has dropped it's permissions by calling {@link Context#dropPermissions()}
+     */
+    private boolean hasDroppedPermissions()
+    {
+        return "true".equals(this.getXWikiContext().get("hasDroppedPermissions"));
     }
 }

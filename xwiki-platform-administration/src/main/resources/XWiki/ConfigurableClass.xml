@@ -719,8 +719,10 @@ $xwiki.jsfx.use('js/xwiki/actionbuttons/actionButtons.js', true)
       #else
         &lt;a title="$msg.get('xe.admin.configurable.sectionIconNoAccessTooltip')"&gt;
       #end
+      &lt;span&gt;
       &lt;img src="$icon" alt="$escapetool.xml($sectionToAdd) icon"/&gt;
       $escapetool.xml($sectionToAdd)
+      &lt;/span&gt;
       #if(!$hasAccess)
         &lt;br/&gt;&lt;span class="errormessage"&gt;$msg.get('xe.admin.configurable.sectionIconNoAccess')&lt;/span&gt;
       #end

@@ -107,12 +107,12 @@ public class ObjectResource extends BaseObjectsResource
             throw new WebApplicationException(Status.UNAUTHORIZED);
         }
 
-        com.xpn.xwiki.objects.BaseObject baseObject = getBaseObject(doc, className, objectNumber);
-        if (baseObject == null) {
+        com.xpn.xwiki.api.Object object = doc.getObject(className, objectNumber);
+        if(object == null) {
             throw new WebApplicationException(Status.NOT_FOUND);
         }
-
-        baseObject.getDocument(Utils.getXWikiContext(componentManager)).removeObject(baseObject);
+        
+        doc.removeObject(object);
 
         doc.save();
     }

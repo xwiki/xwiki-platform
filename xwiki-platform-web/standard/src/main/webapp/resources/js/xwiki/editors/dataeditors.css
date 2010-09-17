@@ -95,10 +95,6 @@
 .xobject dl, .xproperty dl {
   margin: 0;
 }
-.xobject-content dt, .xproperty-content dt {
-  font-size: 75%;
-  font-weight: bold;
-}
 #body .xobject-title h3, #body .xclass-title, .add_xobject-title {
   padding-left: 14px !important; /* important for toucan */
 }

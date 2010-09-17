@@ -42,7 +42,6 @@ body {
 
 a:link, a:active, a:visited {
   color: $theme.linkColor;
-  text-decoration: none;
 }
 
 a:hover {

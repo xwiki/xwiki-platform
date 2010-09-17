@@ -72,7 +72,7 @@ public class AttachmentResource extends BaseAttachmentsResource
         if (!doc.hasAccessLevel("edit", Utils.getXWikiUser(componentManager))) {
             throw new WebApplicationException(Status.UNAUTHORIZED);
         }
-        
+
         /* Clear the fileName */
         attachmentName =
             Utils.getXWikiContext(componentManager).getWiki()
@@ -114,7 +114,7 @@ public class AttachmentResource extends BaseAttachmentsResource
 
         xwikiDocument.deleteAttachment(baseXWikiAttachment, Utils.getXWikiContext(componentManager));
 
-        doc.save();
+        Utils.getXWiki(componentManager).saveDocument(xwikiDocument, Utils.getXWikiContext(componentManager));
     }
 
 }

@@ -218,5 +218,8 @@ XWiki.actionButtons.AjaxSaveAndContinue = Class.create({
 });
 document.observe('dom:loaded', function() {
   new XWiki.actionButtons.EditActions();
-  new XWiki.actionButtons.AjaxSaveAndContinue();
+  // In preview mode, the &continue part of the save&continue should lead back to the edit action.
+  if (!$(document.body).hasClassName("previewbody")) {
+    new XWiki.actionButtons.AjaxSaveAndContinue();
+  }
 });

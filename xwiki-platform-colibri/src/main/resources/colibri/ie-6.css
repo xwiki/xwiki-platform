@@ -23,14 +23,14 @@ ol, ul {
 }
 
 input#xwikidoctitleinput {
-  width: 99.8%;	
+  width: 99.8%;
 }
 
 h1 span, h2 span, h3 span, h4 span  {
   position: relative;
 }
 
-.buttonwrapper  a{
+.buttonwrapper a {
   line-height: 26px !important;
   padding: 3px 5px;
 }
@@ -40,12 +40,12 @@ fieldset.xwikimessage {
   width: 27em;
 }
 
-.xwikiintracontent fieldset label{
+.xwikiintracontent fieldset label {
   display: block;
   margin: 5px 0px;
 }
 
-ul.xlist , ul.xlist ul{
+ul.xlist, ul.xlist ul {
   display: inline-block;
 }
 

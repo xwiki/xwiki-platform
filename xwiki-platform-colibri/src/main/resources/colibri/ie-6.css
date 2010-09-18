@@ -75,3 +75,9 @@ span.wikicreatelink a {
   background: transparent url("$xwiki.getSkinFile('icons/xwiki/create-link.png')") no-repeat right;
   padding-right: 13px;
 }
+
+/* XAADMINISTRATION-75, crazy impossible bug in IE6. This is already stated in some other places as well, but IE6 sets a
+   4px top padding for the Rights icon in the administration UI. */
+#admin-icons li {
+  padding: 0;
+}

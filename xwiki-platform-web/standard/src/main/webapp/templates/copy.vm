@@ -25,7 +25,7 @@
     #end
     #set($sourcewiki = $xcontext.database)
     #set($targetwiki = $xcontext.database)
-    #if($targetdoc != "")
+    #if($targetdoc != "" && $!{services.csrf.isTokenValid("$!{request.getParameter('form_token')}")})
     #set($ok = $xwiki.copyDocument($sourcedoc, $targetdoc, $sourcewiki, $targetwiki, $language, false, true))
     #set($prefixedSourcedoc = "#if($sourcewiki!=$xcontext.database)$sourcewiki:#end$sourcedoc")
     #set($prefixedTargetdoc = "#if($targetwiki!=$xcontext.database)$targetwiki:#end$targetdoc")

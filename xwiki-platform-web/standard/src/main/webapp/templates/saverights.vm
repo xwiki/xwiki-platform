@@ -7,6 +7,7 @@
 #set($founda = false)
 #set($foundd = false)
 
+#if ($!{services.csrf.isTokenValid("$!{request.getParameter('form_token')}")})
 #foreach($obj in $doc.getObjects($clsname)) ## XWiki.XWikiGlobalRights or XWiki.XWikiRights
   #set($pers = "$!obj.getProperty($uorg).getValue()")
   #if($pers.matches("${regextool.quote($fullname)},?")) ## found the rule containing that person
@@ -101,3 +102,4 @@
 #end
 $doc.save($msg.get("platform.core.rightsManagement.saveComment", [${action}, ${right}, ${fullname}]), true)
 SUCCESS
+#end

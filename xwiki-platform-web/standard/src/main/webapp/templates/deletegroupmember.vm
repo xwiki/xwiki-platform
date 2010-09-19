@@ -7,6 +7,7 @@
   #set($discard = $doc.newObject("XWiki.XWikiGroups"))
   added empty group
 #end
+#if ($!{services.csrf.isTokenValid("$!{request.getParameter('form_token')}")})
 #set($discard = $doc.save())
 #if($request.ajax)
   ok
@@ -14,4 +15,7 @@
   $response.sendRedirect($request.xredirect)
 #else
   $response.sendRedirect($doc.getURL('view'))
+#end
+#else
+  notallowed
 #end

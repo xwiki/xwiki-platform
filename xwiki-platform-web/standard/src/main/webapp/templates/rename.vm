@@ -25,6 +25,9 @@
     #if($step == 1)
       ## Display the rename form
       #template("renameStep1.vm")
+    #elseif(!${services.csrf.isTokenValid("$!{request.getParameter('form_token')}")})
+      ## CSRF protection
+      $response.sendRedirect("$!{services.csrf.getResubmissionURL()}")
     #else
       ## Do the rename. It's the form in renameStep1.vm page that calls this page with step=2.
       #if("$!{request.newPageName.trim()}" == '')

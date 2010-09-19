@@ -41,7 +41,11 @@
     #info("$msg.get('core.copy.copyingdoc', [$sourcelink, $targetlink])")
     #else
     <form action="">
-    <div class="hidden"><input type="hidden" name="xpage" value="copy" /></div>
+    <div class="hidden">
+      ## CSRF prevention
+      <input type="hidden" name="form_token" value="$!{services.csrf.getToken()}" />
+      <input type="hidden" name="xpage" value="copy" />
+    </div>
     <dl>
       <dt>$msg.get("core.copy.sourcedoc"):</dt>
       <dd>$!{escapetool.xml($doc.fullName)} <input type="hidden" name="sourcedoc" value="$!{escapetool.xml($doc.fullName)}" size="60"/></dd>

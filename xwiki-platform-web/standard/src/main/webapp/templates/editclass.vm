@@ -64,7 +64,7 @@ $xwiki.jsfx.use('js/xwiki/editors/dataeditors.js', true)##
     <div id="xproperty_${field.name}_title" class="xproperty-title ${field.type}">
       <h2>$!{escapetool.xml($doc.displayView($field.xWikiClass.get('prettyName'), "${field.name}_" , $field))}
       ($doc.displayView($field.xWikiClass.get('name'), "${field.name}_" , $field): $xwiki.metaclass.get($field.classType).prettyName)</h2>
-      <div class="tools propertyTools"><a href='$doc.getURL('propdelete', "propname=${field.name}")' title="$msg.get('core.editors.class.deleteProperty.tooltip', [${field.name}])" class="tool delete">$msg.get('core.editors.class.deleteProperty.text')</a></div>
+      <div class="tools propertyTools"><a href='$doc.getURL('propdelete', "propname=${field.name}&amp;form_token=$!{services.csrf.getToken()}")' title="$msg.get('core.editors.class.deleteProperty.tooltip', [${field.name}])" class="tool delete">$msg.get('core.editors.class.deleteProperty.text')</a></div>
     </div>
     <div id="xproperty_${field.name}_content" class="xproperty-content"><div>
       <div class="disabletool">
@@ -134,6 +134,8 @@ $xwiki.jsfx.use('js/xwiki/editors/dataeditors.js', true)##
 ##
 ##
 <div class="hidden">
+  ## CSRF prevention
+  <input type="hidden" id="form_token" name="form_token" value="$!{services.csrf.getToken()}" />
   <input type="hidden" name="xcontinue" value="$doc.getURL('edit', 'editor=class')"/>
   ## A submit button that captures "enter" on the form, placed before the "propadd" submit button,
   ## to prevent from accidentally adding properties when pressing enter.

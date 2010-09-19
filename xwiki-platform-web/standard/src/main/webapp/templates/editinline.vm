@@ -27,6 +27,8 @@ $xwiki.ssfx.use('js/xwiki/editors/fullScreenEdit.css', true)##
 <form id="inline" method="post" action="$doc.getURL("preview")">
 <div>
 <div class="hidden"><input type="hidden" name="xcontinue" value="$doc.getURL("inline")"/></div>
+## CSRF prevention
+<input type="hidden" name="form_token" value="$!{services.csrf.getToken()}" />
 ## This input is used by the full screen widget: it stores the selector of the maximized element, so that the full screen can be restored when coming back from preview.
 <input type="hidden" name="x-maximized" value="$!{escapetool.xml(${request.get('x-maximized')})}" />
 <input type="hidden" name="xredirect" value="$!{escapetool.xml($request.get('xredirect'))}" />

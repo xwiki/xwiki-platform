@@ -16,7 +16,7 @@
 #macro(displayObject $obj $class $props $firstfield)
   <div id="xobject_${escapetool.xml($class.name)}_${obj.number}" class="xobject">
   <div id="xobject_${escapetool.xml($class.name)}_${obj.number}_title" class="xobject-title"><h3>#cleanClassname(${class.name}) ${obj.number}: $!{escapetool.xml($doc.display($firstfield, $obj))}
-    <a href="$doc.getURL('objectremove', "classname=${escapetool.url($class.name)}&amp;classid=${obj.number}&amp;xredirect=${escapetool.url($doc.getURL('edit', 'editor=object'))}")" class="xobject-action delete" title="$msg.get('core.editors.object.removeObject.tooltip')">$msg.get('core.editors.object.removeObject')</a>
+    <a href="$doc.getURL('objectremove', "form_token=$!{services.csrf.getToken()}&amp;classname=${escapetool.url($class.name)}&amp;classid=${obj.number}&amp;xredirect=${escapetool.url($doc.getURL('edit', 'editor=object'))}")" class="xobject-action delete" title="$msg.get('core.editors.object.removeObject.tooltip')">$msg.get('core.editors.object.removeObject')</a>
     #if(!$hasCustomObject) <a href="$doc.getURL("edit", "editor=object&amp;classname=${escapetool.url($class.name)}&amp;object=${obj.number}")" class="xobject-action edit" title="$msg.get('core.editors.object.editSingleObject.tooltip')">$msg.get('core.editors.object.editSingleObject')</a> #end
   </h3></div>
   <div id="xobject_${escapetool.xml($class.name)}_${obj.number}_content" class="xobject-content"><div>
@@ -263,6 +263,8 @@
     #end
   #end
     <div class="hidden">
+      ## CSRF prevention
+      <input type="hidden" name="form_token" value="$!{services.csrf.getToken()}" />
       <input type="hidden" name="xcontinue" value="$doc.getURL($xcontext.action, $q)"/>
       ## A submit button that captures "enter" on the form, placed before the "objectadd" submit button,
       ## to prevent from accidentally adding objects when pressing enter.

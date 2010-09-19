@@ -40,6 +40,8 @@
       ## Let the user upload XAR files.
       <form action="$doc.getURL('upload')" enctype="multipart/form-data" method="post" id="AddAttachment">
         <div>
+          ## CSRF prevention
+          <input type="hidden" name="form_token" value="$!{services.csrf.getToken()}" />
           <input type="hidden" name="xredirect" value="$!{escapetool.xml($redirect)}" />
           <fieldset id="attachform">
             ## Temporarily disabled, until we fix attachment name handling
@@ -72,7 +74,7 @@
                 <span class="version">$attach.version</span>
                 <span class="xwikibuttonlinks">
                   #set($redirect = $doc.getURL('import', 'section=Import'))
-                  #set($attachurl = $doc.getAttachmentURL(${attach.filename}, 'delattachment', "xredirect=$!{redirect}"))
+                  #set($attachurl = $doc.getAttachmentURL(${attach.filename}, 'delattachment', "xredirect=$!{redirect}&amp;form_token=$!{services.csrf.getToken()}"))
                   <a class="deletelink" href="${attachurl}"
                      onclick="return confirm('$msg.get('core.viewers.attachments.delete.confirm')');"
                      title="$msg.get('core.viewers.attachments.delete.title')"></a>
@@ -141,6 +143,8 @@
             </div>
             <form action="$!{importaction}" method="post" class="static-importer">
               <div>
+                ## CSRF prevention
+                <input type="hidden" name="form_token" value="$!{services.csrf.getToken()}" />
                 <input type="hidden" name="action" value="import" />
                 <input type="hidden" name="name" value="$!{escapetool.xml($request.file)}" />
                 <div id="package">

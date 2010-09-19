@@ -71,7 +71,8 @@ $xwiki.ssfx.use('js/xwiki/table/livetable.css')
 //<![CDATA[
 (function() {
  var startup = function() {
-  tabl = new ASSTable("$url", 15, "display1", "scrollbar1", "memberstable", displayMembers, true);
+  var callback = function(row, i, table) { return displayMembers(row, i, table, form_token) };
+  tabl = new ASSTable("$url", 15, "display1", "scrollbar1", "memberstable", callback, true);
    
   //create new ajax suggest
    suggesturl = "$doc.getURL()" + "?xpage=uorgsuggest" + "&" + "classname=XWiki.XWikiUsers" + "&" + "wiki=local";
@@ -96,6 +97,7 @@ $xwiki.ssfx.use('js/xwiki/table/livetable.css')
      if(name) 
      {
              var url = "$doc.getURL("view")" + "?xpage=adduorg" + "&" + "uorg=" + uorg + "&" + "name=" + name;
+             url += "&amp;form_token=$!{services.csrf.getToken()}";
              new Ajax.Request(url, 
              {
                method: 'get',

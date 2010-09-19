@@ -152,7 +152,7 @@ $xwiki.ssfx.use('uicomponents/viewers/comments.css', true)
         #end
       #end
       #if($hasEdit) 
-        <span class="commenttool commentdelete"><a class="delete" href="$doc.getURL('objectremove', "classname=${xCommentClass}&amp;classid=${comment.number}&amp;xredirect=$xredirect")" title="$msg.get('core.viewers.comments.delete')">$msg.get('core.viewers.comments.delete')</a></span>
+        <span class="commenttool commentdelete"><a class="delete" href="$doc.getURL('objectremove', "form_token=$!{services.csrf.getToken()}&amp;classname=${xCommentClass}&amp;classid=${comment.number}&amp;xredirect=$xredirect")" title="$msg.get('core.viewers.comments.delete')">$msg.get('core.viewers.comments.delete')</a></span>
       #end
       </span>## commenttools
     </div>## commentheader
@@ -174,6 +174,8 @@ $xwiki.ssfx.use('uicomponents/viewers/comments.css', true)
           <label for="${xCommentClass}_author">$msg.get('core.viewers.comments.add.guestName.prompt') <input type="text" id="${xCommentClass}_author" name="${xCommentClass}_author" value="$author"/></label>
           <strong><a href='$xwiki.getURL('XWiki.XWikiLogin', 'login', "xredirect=$escapetool.url($xwiki.getRequestURL())")'>$msg.get('login')</a></strong>
         #end
+        ## CSRF prevention
+        <input type="hidden" name="form_token" value="$!{services.csrf.getToken()}" />
         <input type="hidden" name="${xCommentClass}_date" value=""/>
         <input type="hidden" name="${xCommentClass}_replyto" value="$!replyTo"/>
         <div class="commentcontainer">
@@ -242,6 +244,8 @@ $xwiki.ssfx.use('uicomponents/viewers/comments.css', true)
     </div>## commentheader
     <div class="commentcontent">$doc.display('comment', 'edit', $comment)</div>
     <div class="hidden">
+      ## CSRF prevention
+      <input type="hidden" name="form_token" value="$!{services.csrf.getToken()}" />
       <input type="hidden" name="comment" value="$msg.get('core.viewers.comments.edit.versionComment', [${comment.number}])"/>
       <input type="hidden" name="minorEdit" value="true"/>
       <input type="hidden" name="xredirect" value="$xredirect">

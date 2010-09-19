@@ -23,7 +23,7 @@ $xwiki.ssfx.use('js/xwiki/viewers/attachments.css', true)
     #if($hasEdit || $hasAdmin)
       <span class="xwikibuttonlinks">
       ## Delete attachment link
-      <a class="deletelink" href="$doc.getAttachmentURL(${attach.filename}, 'delattachment', "xredirect=$escapetool.url(${redirect})")"  title="$msg.get('core.viewers.attachments.deleteTitle', [$escapetool.xml($attach.filename)])">$msg.get('core.viewers.attachments.delete')</a>
+      <a class="deletelink" href="$doc.getAttachmentURL(${attach.filename}, 'delattachment', "form_token=$!{services.csrf.getToken()}&amp;xredirect=$escapetool.url(${redirect})")"  title="$msg.get('core.viewers.attachments.deleteTitle', [$escapetool.xml($attach.filename)])">$msg.get('core.viewers.attachments.delete')</a>
       ## Dav Edit attachment link. We display the link hidden by default, and let the WebDAV JSX extension display it if
       ## the browser supports Dav Edit 
       #set($documentUrl=$doc.getExternalURL("download"))
@@ -60,6 +60,8 @@ if (XWiki && XWiki.WebDAV) { XWiki.WebDAV.displayDavLinks($('_attachments')); }
 #if($hasEdit || $hasAdmin)
   <form action="$doc.getURL("upload")" enctype="multipart/form-data" method="post" id="AddAttachment">
   <div>
+  ## CSRF prevention
+  <input type="hidden" name="form_token" value="$!{services.csrf.getToken()}" />
   <input type="hidden" name="xredirect" value="$escapetool.xml($redirect)" />
   <fieldset id="attachform">
     <legend>$msg.get('core.viewers.attachments.upload.title')</legend>

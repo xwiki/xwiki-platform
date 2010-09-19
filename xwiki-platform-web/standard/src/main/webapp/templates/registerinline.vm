@@ -23,6 +23,8 @@
   #if(!$reg || $reg < 0)
     <form id="register" action="" method="post">
       <div>
+        ## CSRF prevention
+        <input type="hidden" name="form_token" value="$!{services.csrf.getToken()}" />
         <input type="hidden" name="template" value="XWiki.XWikiUserTemplate" />
         <input type="hidden" name="register" value="1"/>
         #set($class = $xwiki.getClass('XWiki.XWikiUsers'))

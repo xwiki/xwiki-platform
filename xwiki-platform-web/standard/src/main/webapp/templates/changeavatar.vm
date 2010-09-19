@@ -15,7 +15,7 @@
 #set($name = $attachment.filename)
 #end
 #end
-$response.sendRedirect($doc.getURL("save", "XWiki.XWikiUsers_0_avatar=$name"))
+$response.sendRedirect($doc.getURL("save", "XWiki.XWikiUsers_0_avatar=$name&form_token=$!{request.getParameter('form_token')}"))
 #else
 $response.sendRedirect($doc.getURL("view"))
 #end

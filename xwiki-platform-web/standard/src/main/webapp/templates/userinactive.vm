@@ -17,6 +17,8 @@
 $msg.get("accountnotactive_email")
 <form action="${confirmdoc.getURL()}" method="post">
 <div>
+## CSRF prevention
+<input type="hidden" name="form_token" value="$!{services.csrf.getToken()}" />
 <input type="hidden" name="xwikiname" value="${escapetool.xml($xcontext.user)}" />
 <input type="text" name="validkey" size="16" />
 <span class="buttonwrapper"><input type="submit" value="$msg.get('confirmaccount')" class="button"/></span>

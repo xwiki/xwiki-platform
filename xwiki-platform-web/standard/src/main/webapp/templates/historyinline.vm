@@ -47,6 +47,8 @@ $xwiki.ssfx.use('uicomponents/pagination/pagination.css', true)##
     #set ($formname = 'historyform')
     <form id="$formname" action="$doc.getURL('view', "viewer=changes&amp;$docvariant")" method="post">
       <div id="_history">
+      ## CSRF prevention
+      <input type="hidden" name="form_token" value="$!{services.csrf.getToken()}" />
       <div class="centered">
       <table class="xwikidatatable" summary="$msg.get('core.viewers.history.summary', [$escapetool.xml($doc.displayTitle), $versions.get($util.add($versions.size(), -1)), $versions.get(0)])">
 ## Print the table header
@@ -94,11 +96,11 @@ $xwiki.ssfx.use('uicomponents/pagination/pagination.css', true)##
       #if ($tdoc.getRCSVersion()==$version)
         <td><span class="currentversionlabel">$msg.get('core.viewers.history.currentVersion')</span></td>
       #else
-        <td class="xwikibuttonlink"><a href="$tdoc.getURL('rollback', "rev=$version$lang")" onclick="if (confirm('$msg.get('core.viewers.history.confirmRollback', [$version])')){this.href += '&amp;confirm=1'; return true;} return false;">$msg.get('core.viewers.history.rollback')</a></td>
+        <td class="xwikibuttonlink"><a href="$tdoc.getURL('rollback', "form_token=$!{services.csrf.getToken()}&amp;rev=$version$lang")" onclick="if (confirm('$msg.get('core.viewers.history.confirmRollback', [$version])')){this.href += '&amp;confirm=1'; return true;} return false;">$msg.get('core.viewers.history.rollback')</a></td>
       #end
     #end
     #if ($hasAdmin)
-      <td class="xwikibuttonlink"><a href="$tdoc.getURL('deleteversions',"rev=$version$lang")" onclick="if (confirm('$msg.get('core.viewers.history.confirmDeleteSingle', [$version])')){this.href += '&amp;confirm=1'; return true;} return false;">$msg.get('core.viewers.history.deleteSingle')</a></td>
+      <td class="xwikibuttonlink"><a href="$tdoc.getURL('deleteversions',"form_token=$!{services.csrf.getToken()}&amp;rev=$version$lang")" onclick="if (confirm('$msg.get('core.viewers.history.confirmDeleteSingle', [$version])')){this.href += '&amp;confirm=1'; return true;} return false;">$msg.get('core.viewers.history.deleteSingle')</a></td>
     #end
     </tr>
   #end ## foreach

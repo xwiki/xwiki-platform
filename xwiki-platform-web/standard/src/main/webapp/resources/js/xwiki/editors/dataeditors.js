@@ -222,11 +222,13 @@ XWiki.editors.XDataEditors = Class.create({
     $$('input[name=action_propadd]').each(function(item){
       item._x_propnameElt = $('propname');
       item._x_proptypeElt = $('proptype');
+      item._x_form_tokenElt = $('form_token');
+      var token = item._x_form_tokenElt ? item._x_form_tokenElt.value : "";
       item.observe('click', function(event) {
         item.blur();
         event.stop();
         if (!item.disabled && item._x_propnameElt.value != '' && item._x_proptypeElt.selectedIndex >= 0) {
-          var ref = this.urlAddPropertyTemplate + "?propname=" + item._x_propnameElt.value + "&proptype=" + item._x_proptypeElt.options[item._x_proptypeElt.selectedIndex].value + "&xredirect=" + encodeURIComponent(this.urlEditTemplate + "?xpage=editclass&xaction=displayProperty&propName=" + item._x_propnameElt.value);
+          var ref = this.urlAddPropertyTemplate + "?propname=" + item._x_propnameElt.value + "&proptype=" + item._x_proptypeElt.options[item._x_proptypeElt.selectedIndex].value + "&xredirect=" + encodeURIComponent(this.urlEditTemplate + "?xpage=editclass&xaction=displayProperty&propName=" + item._x_propnameElt.value) + "&form_token=" + item._x_form_tokenElt.value;
           new Ajax.Request(
             /* Ajax request URL */
             ref,

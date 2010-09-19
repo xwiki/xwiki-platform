@@ -44,7 +44,7 @@ $response.setContentType('application/x-json')
     "doc_hasadmin" : "${xwiki.hasAccessLevel('admin', $xcontext.user, $doc)}",
     "member"   : "$xwiki.getUserName($m, false)#if($hasAdmin || $isAdvancedUser) (#if($wikiname != 'local')$wikiname:#end$m)#end",
     "member_url" : "$xwiki.getURL($m)",
-    "doc_delete_url" : "$doc.getURL('view', "xpage=deletegroupmember&fullname=${m}&ajax=true")"
+    "doc_delete_url" : "$doc.getURL('view', "xpage=deletegroupmember&fullname=${m}&ajax=true&form_token=$!{services.csrf.getToken()}")"
    }
 #end
 ]}

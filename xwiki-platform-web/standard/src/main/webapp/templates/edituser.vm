@@ -17,6 +17,8 @@ $msg.get("doclockedby") $xwiki.getUserName($doc.getLockingUser()).
 $cdoc.getRenderedContent()
 </div>
 #end
+## CSRF prevention
+<div class="hidden"><input type="hidden" name="form_token" value="$!{services.csrf.getToken()}" /></div>
 </form>
 ## add link to the complete profile of the currently logged user
 #if($xcontext.user == $doc.getFullName())

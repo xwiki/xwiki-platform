@@ -1,7 +1,11 @@
 #set($attachments = $doc.attachmentList)
 <div id="xwikiattachmentscontent" class="xwikidatacontent">
   <form id="attach" action="$doc.getURL('upload')" enctype="multipart/form-data" method="post">
+    <div class="hidden">
+    ## CSRF prevention
+    <input type="hidden" name="form_token" value="$!{services.csrf.getToken()}" />
     <input type="hidden" name="xredirect" value="" />
+    </div>
     <p>
       ##$msg.get('choosetargetfilename'):
       ##<input type="text" name="filename" value="" size="20" />

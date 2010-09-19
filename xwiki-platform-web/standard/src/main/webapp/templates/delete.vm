@@ -52,11 +52,13 @@
     #set($fullmsg = $msg.get('core.delete.confirm'))
   #end
 #end
-#xwikimessagebox($msg.get('core.delete') $fullmsg $doc.getURL('delete', "confirm=1$!{redirectparam}&amp;$languageparams") $doc.getURL('view') $msg.get('yes') $msg.get('no'))
+#xwikimessagebox($msg.get('core.delete') $fullmsg $doc.getURL('delete', "confirm=1$!{redirectparam}&amp;form_token=$!{services.csrf.getToken()}&amp;$languageparams") $doc.getURL('view') $msg.get('yes') $msg.get('no'))
 #else ## request.id
   #xwikimessageboxstart($msg.get('core.delete') $msg.get('core.recyclebin.completelyDeleteConfirm'))
     <form action="" method="post">
       <div class="hidden">
+        ## CSRF prevention
+        <input type="hidden" name="form_token" value="$!{services.csrf.getToken()}" />
         <input type="hidden" name="confirm" value="1"/>
         <input type="hidden" name="id" value="$!{escapetool.xml($request.id)}"/>
         #if("$!{request.xredirect}" != '')

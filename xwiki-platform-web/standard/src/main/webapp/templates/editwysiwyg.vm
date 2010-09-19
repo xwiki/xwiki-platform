@@ -10,6 +10,8 @@
 ## <div class="topbuttons">#template("editactions.vm")</div>
 <div>
 <div class="hidden">
+## CSRF prevention
+<input type="hidden" name="form_token" value="$!{services.csrf.getToken()}" />
 <input type="hidden" name="template" value="$!{escapetool.xml($request.template)}" />
 #if($request.section && $request.section!="")
  #set($xcontinue=$doc.getURL("edit", "editor=wysiwyg&amp;section=$!{escapetool.xml($request.section)}"))

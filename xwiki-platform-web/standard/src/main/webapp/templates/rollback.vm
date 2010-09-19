@@ -10,6 +10,8 @@
     #xwikimessageboxstart($msg.get('rollback') "$msg.get('readytorollback') $!{escapetool.xml($request.get('rev'))}?")
     <form action="" method="post">
       <div>
+        ## CSRF prevention
+        <input type="hidden" name="form_token" value="$!{services.csrf.getToken()}" />
         <input type="hidden" name="confirm" value="1" />
         <span class="buttonwrapper"><input type="submit" class="button" value="$msg.get('yes')"/></span>
         <span class="buttonwrapper"><a class="secondary button" href="$doc.getURL('view')">$msg.get('no')</a></span>

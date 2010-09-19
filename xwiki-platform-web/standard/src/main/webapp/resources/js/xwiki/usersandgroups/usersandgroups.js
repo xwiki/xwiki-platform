@@ -196,7 +196,7 @@ MSCheckbox = Class.create({
 /**
   * user list element creator. Used in adminusers.vm.
   */
-function displayUsers(row, i, table)
+function displayUsers(row, i, table, form_token)
 {
   var userurl = row.userurl;
   var usersaveurl = row.usersaveurl;
@@ -246,7 +246,7 @@ function displayUsers(row, i, table)
       del.className = 'icon-manageg';
     } else {
       del.src = '$xwiki.getSkinFile("js/xwiki/usersandgroups/img/clear.png")';
-      Event.observe(del, 'click', deleteUserOrGroup(i, table, row.fullname, "user"));
+      Event.observe(del, 'click', deleteUserOrGroup(i, table, row.fullname, "user", form_token));
       del.className = 'icon-manage';
     }
     del.title = "$msg.get('delete')";
@@ -258,7 +258,7 @@ function displayUsers(row, i, table)
 }
 
 /** group list element creator **/
-function displayGroups(row, i, table)
+function displayGroups(row, i, table, form_token)
 {
   var userurl = row.userurl;
   var userinlineurl = row.userinlineurl;
@@ -296,7 +296,7 @@ function displayGroups(row, i, table)
     var del = document.createElement('img');
     del.src = '$xwiki.getSkinFile("js/xwiki/usersandgroups/img/clear.png")';
     del.title = "$msg.get('delete')";
-    Event.observe(del, 'click', deleteUserOrGroup(i, table, row.fullname, "group"));
+    Event.observe(del, 'click', deleteUserOrGroup(i, table, row.fullname, "group", form_token));
     del.className = 'icon-manage';
 
     //edit user
@@ -316,7 +316,7 @@ function displayGroups(row, i, table)
 }
 
 /** group members list element creator **/
-function displayMembers(row, i, table)
+function displayMembers(row, i, table, form_token)
 {
   var tr = document.createElement('tr');
   var membername = document.createElement("td");
@@ -345,7 +345,7 @@ function displayMembers(row, i, table)
       del.className = 'icon-manageg';
     } else {
       del.src = '$xwiki.getSkinFile("js/xwiki/usersandgroups/img/clear.png")';
-      Event.observe(del, 'click', deleteMember(i, table, row.fullname, row.docurl));
+      Event.observe(del, 'click', deleteMember(i, table, row.fullname, row.docurl, form_token));
       del.className = 'icon-manage';
     }
     del.title = "$msg.get('delete')";
@@ -361,7 +361,7 @@ function displayMembers(row, i, table)
   * Used in adminglobalrights.vm, adminspacerights.vm, editrights.vm.
   * @todo allows and denys should be arrays, not strings.
   */
-function displayUsersAndGroups(row, i, table, idx)
+function displayUsersAndGroups(row, i, table, idx, form_token)
 {
   var userurl = row.userurl;
   var uorg = table.json.uorg;
@@ -369,6 +369,9 @@ function displayUsersAndGroups(row, i, table, idx)
   var denys = row.denys;
 
   var saveUrl = window.docviewurl + "?xpage=saverights&clsname=" + table.json.clsname + "&fullname=" + row.fullname + "&uorg=" + uorg;
+  if (form_token != undefined) {
+      saveUrl += "&form_token=" + form_token;
+  }
 
   var tr = document.createElement('tr');
 
@@ -414,10 +417,13 @@ function editUserOrGroup(userinlineurl, usersaveurl, userredirecturl)
 
 
 //function to delete a user with ajax
-function deleteUserOrGroup(i, table, docname, uorg)
+function deleteUserOrGroup(i, table, docname, uorg, form_token)
 {
   return function() {
     var url = "?xpage=deleteuorg&docname=" + docname;
+    if (form_token != undefined) {
+        url += "&form_token=" + form_token;
+    }
     if (uorg == "user") {
       if (confirm("$msg.get('rightsmanager.confirmdeleteuser').replaceAll('"', '\\"')".replace('__name__', docname))) {
         new Ajax.Request(url, {
@@ -441,10 +447,13 @@ function deleteUserOrGroup(i, table, docname, uorg)
 }
 
 //deletes a member of a group (only the object)
-function deleteMember(i, table, docname, docurl)
+function deleteMember(i, table, docname, docurl, form_token)
 {
   return function() {
     var url = docurl + "?xpage=deletegroupmember&fullname=" + docname;
+    if (form_token != undefined) {
+      url += "&form_token=" + form_token;
+    }
     if (confirm("$msg.get('rightsmanager.confirmdeletemember').replaceAll('"', '\\"')")) {
       new Ajax.Request(url, {
         method: 'get',

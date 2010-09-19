@@ -54,13 +54,17 @@
   #template("header.vm")
   #if($editor == 'wiki' || $editor == 'wysiwyg')
     <form id="edit" method="post" action="$doc.getURL('preview')" >
+    <div class="hidden">
+    ## CSRF prevention
+    <input type="hidden" name="form_token" value="$!{services.csrf.getToken()}" />
     ## Pass the section number when the form is submitted in order to affect only the specified section.
     ## We need to test if the section number is present to prevent a NumberFormatException for the empty string.
     #if("$!{request.section}" != '')
       <input type="hidden" name="section" value="$!{escapetool.xml($request.section)}" />
     #end
     ## This input is used by the full screen widget: it stores the selector of the maximized element, so that the full screen can be restored when coming back from preview.
-    <div class="hidden"><input type="hidden" name="x-maximized" value="$!{escapetool.xml($request.get('x-maximized'))}"/></div>
+    <input type="hidden" name="x-maximized" value="$!{escapetool.xml($request.get('x-maximized'))}"/>
+    </div>
   #end
   ##################
   ##   Edit zone  ##

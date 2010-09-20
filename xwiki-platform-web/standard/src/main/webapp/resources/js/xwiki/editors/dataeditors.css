@@ -68,6 +68,7 @@
 
 /* XObject */
 .xobject-title, .add_xobject-title {
+  position: relative;
   border: none;
   cursor: default;
   background: transparent;

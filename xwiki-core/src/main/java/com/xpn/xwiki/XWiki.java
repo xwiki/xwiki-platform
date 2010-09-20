@@ -941,6 +941,8 @@ public class XWiki implements XWikiDocChangeNotificationInterface
     public void updateDatabase(String wikiName, boolean force, boolean initClasses, XWikiContext context)
         throws HibernateException, XWikiException
     {
+        LOG.warn("Starting updating database");
+        
         String database = context.getDatabase();
         try {
             List<String> wikiList = getVirtualWikiList();
@@ -955,6 +957,8 @@ public class XWiki implements XWikiDocChangeNotificationInterface
 
                     // Make sure these classes exists
                     if (initClasses) {
+                        LOG.warn("Starting initialize wiki");
+
                         initializeMandatoryClasses(context);
                         getPluginManager().virtualInit(context);
                         getRenderingEngine().virtualInit(context);
@@ -3042,6 +3046,8 @@ public class XWiki implements XWikiDocChangeNotificationInterface
      */
     public BaseClass getUserClass(XWikiContext context) throws XWikiException
     {
+        LOG.warn("Starting updating user class");
+        
         XWikiDocument doc;
         boolean needsUpdate = false;
 
@@ -3049,6 +3055,8 @@ public class XWiki implements XWikiDocChangeNotificationInterface
 
         BaseClass bclass = doc.getXClass();
         if (context.get("initdone") != null) {
+            LOG.warn("Init already done: " + bclass);
+
             return bclass;
         }
 
@@ -3077,7 +3085,11 @@ public class XWiki implements XWikiDocChangeNotificationInterface
         needsUpdate |= setClassDocumentFields(doc, "XWiki User Class");
 
         if (needsUpdate) {
+            LOG.warn("Starting saving user class");
+
             saveDocument(doc, context);
+            
+            LOG.warn("User class saved");
         }
 
         return bclass;

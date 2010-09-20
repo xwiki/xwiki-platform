@@ -2757,10 +2757,17 @@ h1#admin-header {
 
 #admin-icons li {
   list-style-type: none;
-  width: 124px;
-  float: left;
+  display: inline-block;
+  width: 125px;
   margin: 15px;
   text-align: center;
+}
+/* For IE6/7, which don't really understand inline-block on block elements */
+* html #admin-icons li {
+  display: inline;
+}
+*+html #admin-icons li {
+  display: inline;
 }
 
 #admin-icons li a {

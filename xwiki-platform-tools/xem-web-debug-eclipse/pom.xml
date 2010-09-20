@@ -47,6 +47,12 @@
     <platform.plugin.wikimanager.version>1.19-SNAPSHOT</platform.plugin.wikimanager.version>
   </properties>
   <dependencies>
+   <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-core-extension-manager</artifactId>
+      <version>2.5-SNAPSHOT</version>
+    </dependency>
+  
     <!-- needed for slf4j clients such as QueryPlugin and JCRStore 
          It is deployment time logging configuration, so it is here instead of xwiki-core. -->
     <dependency>
@@ -93,6 +99,24 @@
     <dependency>
       <groupId>com.xpn.xwiki.platform</groupId>
       <artifactId>xwiki-core</artifactId>
+      <version>${platform.core.version}</version>
+    </dependency>
+    <!-- Captcha component -->
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-core-captcha</artifactId>
+      <version>${platform.core.version}</version>
+    </dependency>
+    <!-- Crypto Module -->
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-core-crypto</artifactId>
+      <version>${platform.core.version}</version>
+    </dependency>
+    <!-- CSRF protection -->
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-core-csrftoken</artifactId>
       <version>${platform.core.version}</version>
     </dependency>
 
@@ -208,6 +232,7 @@
       <artifactId>xwiki-plugin-activitystream</artifactId>
       <version>${platform.activitystream.version}</version>
     </dependency>
+
     <!-- XEM plugins -->
     <dependency>
       <groupId>com.xpn.xwiki.platform.plugins</groupId>
@@ -220,6 +245,7 @@
       <version>${platform.plugin.wikimanager.version}</version>
     </dependency>
   </dependencies>
+
   <!-- Sometime M2EClipse can't resolve repositories declared in dependencies -->
   <repositories>
     <repository>

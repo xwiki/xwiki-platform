@@ -2761,6 +2761,7 @@ h1#admin-header {
   width: 125px;
   margin: 15px;
   text-align: center;
+  vertical-align: top;
 }
 /* For IE6/7, which don't really understand inline-block on block elements */
 * html #admin-icons li {

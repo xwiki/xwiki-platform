@@ -1,5 +1,4 @@
 <?xml version="1.0" encoding="UTF-8"?>
-
 <xwikidoc>
 <web>Panels</web>
 <name>PanelWizard</name>
@@ -360,7 +359,9 @@ XVq9K2VEJiSMaOtaeISGyPbWWy9oz4jXRgORpHPiOcFunz+jeccQEWSHsYHmAsS/vXPiV5eQDfpi
       window.showLeftColumn = $showLeftPanels;
       window.showRightColumn = $showRightPanels;
       var obj = {div:'panellistaccordion', no:0, height:512};  
-      Event.observe(window,'load',createAccordion.bind(this,obj));
+      document.observe('xwiki:dom:loaded', function () {
+        createAccordion.bind(this, obj);
+      });
       //]]&gt;
       &lt;/script&gt;
       &lt;script type="text/javascript" src="$xwiki.getSkinFile("js/xwiki/panelwizard/panelWizard.js")"&gt;&lt;/script&gt;

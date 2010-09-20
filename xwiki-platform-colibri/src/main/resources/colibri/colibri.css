@@ -901,6 +901,7 @@ div#xwikiobjects input[type="checkbox"], div#xwikiclassproperties input[type="ch
   position: relative;
   left: 0;
   top: 0;
+  z-index: 999;
 }
 
 .actionmenu .submenu {

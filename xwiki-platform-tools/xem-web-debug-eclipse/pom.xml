@@ -46,13 +46,7 @@
     <platform.plugin.applicationmanager.version>1.13-SNAPSHOT</platform.plugin.applicationmanager.version>
     <platform.plugin.wikimanager.version>1.19-SNAPSHOT</platform.plugin.wikimanager.version>
   </properties>
-  <dependencies>
-   <dependency>
-      <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-core-extension-manager</artifactId>
-      <version>2.5-SNAPSHOT</version>
-    </dependency>
-  
+  <dependencies> 
     <!-- needed for slf4j clients such as QueryPlugin and JCRStore 
          It is deployment time logging configuration, so it is here instead of xwiki-core. -->
     <dependency>

@@ -21,9 +21,9 @@ html {
 }
 
 body.main {
-  background-color: $!{theme.pageContentBackgroundColor} !important;
+  background-color: $theme.pageContentBackgroundColor !important;
   background-image: none !important;
-  color: $!{theme.textColor} !important;
+  color: $theme.textColor !important;
   /*
     We use float:left in order to remove the body from the normal flow and thus prevent collapsing margins between
     body and its first in-flow block-level child. Otherwise the vertical scroll bar would be visible because of the

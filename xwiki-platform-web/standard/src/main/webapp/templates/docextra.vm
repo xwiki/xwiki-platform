@@ -1,6 +1,8 @@
 ##
 ## Document footer: tags, creation date, modification date
 ##
+## There is no need for document extras to have permissions.
+$xcontext.dropPermissions()
 ##
 <div id="xdocFooter">
   #template("documentTags.vm")

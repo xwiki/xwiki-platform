@@ -3,6 +3,8 @@
 ###
 ### General wrapper for edit actions
 ###
+## Since we are in edit mode, the document's permissions should not be needed.
+$xcontext.dropPermissions()
 ##
 ## Determine what editor to show
 ##

@@ -20,6 +20,10 @@
 #else
   #set ($renderedContent = $cdoc.getRenderedContent())
 #end
+##
+## Drop permissions as they are nolonger needed.
+$xcontext.dropPermissions()
+##
 ## ----------------------------------------------------------------------------
 ## Compute title to display and modify rendered content accordingly.
 ## ----------------------------------------------------------------------------

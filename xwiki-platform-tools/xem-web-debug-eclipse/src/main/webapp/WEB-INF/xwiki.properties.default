@@ -146,3 +146,94 @@
 #-#
 #-# By default obnly jgroups is provided. To add one implements NetworkAdaptor componenet interface. The identifier provided in the configuration is matched with the component role hint.
 #-# Example: observation.remote.networkadapter = jgroups
+
+#-------------------------------------------------------------------------------------
+# Cryptographic services
+#-------------------------------------------------------------------------------------
+
+#-# [Since 2.5M1]
+#-# Which cipher should be used for encrypting text with a password.
+#-#
+#-# Options are:
+#-# CAST5PasswordCiphertext (Uses CAST-5 cipher engine with a 128 bit key)
+#-# AESPasswordCiphertext (Uses AES cipher engine with a 128 bit key)
+#-#
+#-# NOTE: Encrypted text can still be decrypted even if the cipher or key function has changed.
+#-#
+#crypto.passwd.passwordCiphertext = CAST5PasswordCiphertext
+
+#-# [Since 2.5M1]
+#-# Which key derivation function to use.
+#-# Since the easiest attack on password encrypted text is to guess passwords, this function ensures that verification
+#-# of a password takes a long time for the computer and is inherently difficult to parallelize.
+#-#
+#-# Options are:
+#-# ScryptMemoryHardKeyDerivationFunction (Uses the scrypt key function which forces password guessers to expend a
+#-#                                        a configurable amount of processor time and memory to validate guesses
+#-#                                        Scrypt is conjectured to be 260 times the strength of PBKDF2
+#-#                                        Function definition available here: http://www.tarsnap.com/scrypt.html)
+#-# PBKDF2KeyDerivationFunction (Uses password based key derivation function 2 (PBKDF2) developed by RSA labs as part
+#-#                              of the PKCS#5 standard. This function uses a configurable amount of processor time
+#-#                              but an insignificant amount of memory.
+#-#                              Function definition available here: http://www.apps.ietf.org/rfc/rfc2898.html#sec-5.2)
+#-#
+#crypto.passwd.keyDerivationFunctionClassForEncryption = ScryptMemoryHardKeyDerivationFunction
+
+#-# [Since 2.5M1]
+#-# Define the properties for initializing the dey derivation functions for encryption.
+#-#
+#-# millisecondsOfProcessorTimeToSpend is used to test run the key function and decide how many iterations it should
+#-#                                    use. Remember this amount of time will be required to convert the password to
+#-#                                    the decryption key every time the text needs to be decrypted.
+#-# numberOfKilobytesOfMemoryToUse will be ignored unless a memory hard function such as scrypt is chosen in which
+#-#                                case it will be used to define how much memory should be required to derive the
+#-#                                decryption key from the password.
+#-#
+#-# CAUTION: If numberOfKilobytesOfMemoryToUse is set too large, the computer may be able to encrypt a piece of text
+#-#          when it has lots of free memory available, then be unable to decrypt that text when less memory is
+#-#          available. Unless you are very paranoid, 1 megabyte (1024) is plenty of strength.
+#-#
+#crypto.passwd.keyDerivationFunctionPropertiesForEncryption = millisecondsOfProcessorTimeToSpend = 200
+#crypto.passwd.keyDerivationFunctionPropertiesForEncryption = numberOfKilobytesOfMemoryToUse = 1024
+
+#-# [Since 2.5M1]
+#-# Which key derivation function to use for protecting (hashing) passwords.
+#-# Options include:
+#-# ScryptMemoryHardKeyDerivationFunction (See above for more information)
+#-# PBKDF2KeyDerivationFunction (See above for more information)
+#-#
+#crypto.passwd.keyDerivationFunctionClassForPasswordVerification = ScryptMemoryHardKeyDerivationFunction
+
+#-# [Since 2.5M1]
+#-# Properties to use when initializing key derivation functions for password protection.
+#-#
+#-# millisecondsOfProcessorTimeToSpend (See above for description.)
+#-# numberOfKilobytesOfMemoryToUse (See above for description.)
+#-# derivedKeyLength is the number of bytes of length which the output key should be. In a password verification
+#-#                  context, this is only valid for decreasing the chance of a collision.
+#-#
+#-# CAUTION: If numberOfKilobytesOfMemoryToUse is set too large, the computer may be able to protect a password
+#-#          when it has lots of free memory available, then be unable to validate that password when less memory is
+#-#          available. Unless you are very paranoid, 1 megabyte (1024) is plenty of strength.
+#-#
+#crypto.passwd.keyDerivationFunctionPropertiesForPasswordVerification = millisecondsOfProcessorTimeToSpend = 200
+#crypto.passwd.keyDerivationFunctionPropertiesForPasswordVerification = numberOfKilobytesOfMemoryToUse = 1024
+#crypto.passwd.keyDerivationFunctionPropertiesForPasswordVerification = derivedKeyLength = 32
+
+#-------------------------------------------------------------------------------------
+# CSRF token component
+#-------------------------------------------------------------------------------------
+
+#-# [Since 2.5M2]
+#-# Controls whether secret token validation mechanism should be used (to prevent CSRF attacks).
+#-#
+#-# If enabled, all actions requiring "comment", "edit", "delete", "admin" or "programming" rights
+#-# will check that the parameter "form_token" with the value of a random secret token is present
+#-# in the request.
+#-# 
+#-# Valid values:
+#-#   0: Disabled
+#-#   1: Enabled
+#-#
+#-# Default value is 0
+# core.csrftoken.enabled = 0

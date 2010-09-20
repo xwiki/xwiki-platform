@@ -1,3 +1,4 @@
+#template('colorThemeInit.vm')
 /*
   The BODY element can have a smaller width and height than the HTML element allowing the user to click inside the HTML
   element but outside of the BODY element. In IE this leads to the HTML element being activated and the selection
@@ -20,13 +21,9 @@ html {
 }
 
 body.main {
-  /*
-    We force the background color to white because the Albatross skin uses a dark background color which makes the text
-    difficult to read. The best solution would be to have a separate style sheet which affects only the page content
-    and to import it without the rest of the style sheets.
-  */
-  background-color: #FFFFFF !important;
+  background-color: $!{theme.pageContentBackgroundColor} !important;
   background-image: none !important;
+  color: $!{theme.textColor} !important;
   /*
     We use float:left in order to remove the body from the normal flow and thus prevent collapsing margins between
     body and its first in-flow block-level child. Otherwise the vertical scroll bar would be visible because of the

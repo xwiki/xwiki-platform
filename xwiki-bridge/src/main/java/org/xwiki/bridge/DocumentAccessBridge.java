@@ -412,6 +412,16 @@ public interface DocumentAccessBridge
         throws Exception;
 
     /**
+     * Returns the current version of a document attachment.
+     * 
+     * @param attachmentReference identifies the attachment to access
+     * @return the current version of the specified attachment, {@code null} if the attachment does not exist
+     * @throws Exception if the document cannot be accessed
+     * @since 2.5M2
+     */
+    String getAttachmentVersion(AttachmentReference attachmentReference) throws Exception;
+
+    /**
      * Retrieves the internal (without the hostname) URL that can be used to access a document, using a specific action.
      * 
      * @param documentReference the reference of the document to access

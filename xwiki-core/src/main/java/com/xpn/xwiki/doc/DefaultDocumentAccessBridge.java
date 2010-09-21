@@ -630,6 +630,19 @@ public class DefaultDocumentAccessBridge implements DocumentAccessBridge
     /**
      * {@inheritDoc}
      * 
+     * @see DocumentAccessBridge#getAttachmentVersion(AttachmentReference)
+     */
+    public String getAttachmentVersion(AttachmentReference attachmentReference) throws Exception
+    {
+        XWikiContext xcontext = getContext();
+        XWikiDocument doc = xcontext.getWiki().getDocument(attachmentReference.getDocumentReference(), xcontext);
+        XWikiAttachment attachment = doc.getAttachment(attachmentReference.getName());
+        return attachment == null ? null : attachment.getVersion();
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
      * @see org.xwiki.bridge.DocumentAccessBridge#getDocumentURL(org.xwiki.model.reference.DocumentReference,
      *      java.lang.String, java.lang.String, java.lang.String)
      */

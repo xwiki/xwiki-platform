@@ -945,6 +945,12 @@ public class XWiki implements XWikiDocChangeNotificationInterface
         try {
             List<String> wikiList = getVirtualWikiList();
 
+            // Make sure the wiki is updated
+            if (force) {
+                wikiList.remove(wikiName);
+                context.remove("initdone");
+            }
+
             context.setDatabase(wikiName);
             synchronized (wikiName) {
                 if (!wikiList.contains(wikiName)) {

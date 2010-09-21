@@ -46,7 +46,7 @@
     <platform.plugin.applicationmanager.version>1.13-SNAPSHOT</platform.plugin.applicationmanager.version>
     <platform.plugin.wikimanager.version>1.19-SNAPSHOT</platform.plugin.wikimanager.version>
   </properties>
-  <dependencies> 
+  <dependencies>
     <!-- needed for slf4j clients such as QueryPlugin and JCRStore 
          It is deployment time logging configuration, so it is here instead of xwiki-core. -->
     <dependency>
@@ -88,7 +88,39 @@
       <artifactId>postgresql</artifactId>
       <version>8.2-504.jdbc3</version>
     </dependency>
-    
+
+     <!-- The annotations modules -->
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-core-annotations-core</artifactId>
+      <version>${platform.core.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-core-annotations-reference</artifactId>
+      <version>${platform.core.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-core-annotations-io</artifactId>
+      <version>${platform.core.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-core-annotations-maintainer</artifactId>
+      <version>${platform.core.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-core-annotations-rest</artifactId>
+      <version>${platform.core.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-core-annotations-velocity</artifactId>
+      <version>${platform.core.version}</version>
+    </dependency>
+
     <!-- Needed for Web -->
     <dependency>
       <groupId>com.xpn.xwiki.platform</groupId>

@@ -1,0 +1,4 @@
+org.xwiki.officepreview.internal.DefaultOfficePreviewScriptService
+org.xwiki.officepreview.internal.DefaultOfficePreviewConfiguration
+org.xwiki.officepreview.internal.DefaultOfficePreviewBuilder
+org.xwiki.officepreview.internal.PresentationOfficePreviewBuilder

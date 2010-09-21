@@ -121,6 +121,14 @@ window.addNewMember = function(uorg, name)
         $('errMsg').innerHTML = "";
      return new ajaxSuggest(input, { script: suggesturl, varname:'input' } );
 }
+ changeWiki = function(obj)
+ {
+     if(suggesturl.indexOf("&amp;" + "wiki=") &gt;= 0)
+            suggesturl = suggesturl.substring(0, suggesturl.indexOf("&amp;" + "wiki="));
+     suggesturl += "&amp;" + "wiki=" + obj.options[obj.selectedIndex].value.trim();
+        // clear errors messages
+        $('errMsg').innerHTML = "";
+ }
 // ]]&gt;
 &lt;/script&gt;
 {/pre}

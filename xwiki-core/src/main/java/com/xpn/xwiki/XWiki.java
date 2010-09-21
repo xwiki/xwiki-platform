@@ -520,18 +520,17 @@ public class XWiki implements XWikiDocChangeNotificationInterface
             // name as the wiki name
             String servername = StringUtils.substringBefore(host, ".");
 
-            if (!"0".equals(xwiki.Param("xwiki.virtual.autowww"))) {
-                // As a convenience, allow sites starting with www, localhost or using an
-                // IP address not to have to create a XWikiServerXwiki page since we consider
-                // in that case that they're pointing to the main wiki.
-                if (servername.equals("www") || host.equals("localhost")
-                    || host.matches("[0-9]{1,3}(?:\\.[0-9]{1,3}){3}")) {
+            // As a convenience, allow sites starting with www, localhost or using an
+            // IP address not to have to create a XWikiServerXwiki page since we consider
+            // in that case that they're pointing to the main wiki.
+            if (!"0".equals(xwiki.Param("xwiki.virtual.autowww"))
+                    && (servername.equals("www") || host.equals("localhost")
+                    || host.matches("[0-9]{1,3}(?:\\.[0-9]{1,3}){3}"))) {
                     return xwiki;
-                } else {
-                    wikiDefinition =
-                        new DocumentReference("xwiki", "XWiki", "XWikiServer" + StringUtils.capitalize(servername));
-                }
             }
+
+            wikiDefinition =
+                new DocumentReference("xwiki", "XWiki", "XWikiServer" + StringUtils.capitalize(servername));
         }
 
         // Check if this wiki definition exists in the Database

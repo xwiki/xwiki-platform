@@ -944,6 +944,13 @@ public class XWiki implements XWikiDocChangeNotificationInterface
         String database = context.getDatabase();
         try {
             List<String> wikiList = getVirtualWikiList();
+
+            // Make sure the wiki is updated
+            if (force) {
+                wikiList.remove(wikiName);
+                context.remove("initdone");
+            }
+
             context.setDatabase(wikiName);
             synchronized (wikiName) {
                 if (!wikiList.contains(wikiName)) {
@@ -961,6 +968,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface
                     }
                 }
             }
+
             // Add initdone which will allow to
             // bypass some initializations
             context.put("initdone", "1");

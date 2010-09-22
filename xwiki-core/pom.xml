@@ -790,6 +790,11 @@
       <version>${project.version}</version>
       <scope>runtime</scope>
     </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-core-csrftoken</artifactId>
+      <version>${pom.version}</version>
+    </dependency>
 
     <!-- Used to mock XWiki class -->
     <dependency>

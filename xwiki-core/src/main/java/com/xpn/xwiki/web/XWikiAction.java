@@ -40,6 +40,7 @@ import org.xwiki.container.Container;
 import org.xwiki.container.servlet.ServletContainerException;
 import org.xwiki.container.servlet.ServletContainerInitializer;
 import org.xwiki.context.Execution;
+import org.xwiki.csrftoken.CSRFToken;
 import org.xwiki.observation.ObservationManager;
 import org.xwiki.observation.event.ActionExecutionEvent;
 import org.xwiki.velocity.VelocityManager;
@@ -523,5 +524,32 @@ public abstract class XWikiAction extends Action
             tdoc.setTranslation(1);
         }
         return tdoc;
+    }
+
+    /**
+     * Perform CSRF check and redirect to the resubmission page if needed.
+     * Throws an exception if the access should be denied, returns false if the check failed and
+     * the user will be redirected to a resubmission page.
+     * 
+     * @param context current xwiki context containing the request
+     * @return true if the check succeeded, false if resubmission is needed
+     * @throws XWikiException if the check fails
+     */
+    protected boolean csrfTokenCheck(XWikiContext context) throws XWikiException
+    {
+        CSRFToken csrf = Utils.getComponent(CSRFToken.class);
+        try {
+            String token = context.getRequest().getParameter("form_token");
+            if (!csrf.isTokenValid(token)) {
+                sendRedirect(context.getResponse(), csrf.getResubmissionURL());
+                return false;
+            }
+        } catch (XWikiException exception) {
+            // too bad
+            throw new XWikiException(XWikiException.MODULE_XWIKI_ACCESS,
+                XWikiException.ERROR_XWIKI_ACCESS_DENIED,
+                "Access denied, secret token verification failed", exception);
+        }
+        return true;
     }
 }

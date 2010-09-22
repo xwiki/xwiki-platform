@@ -98,7 +98,8 @@
   //&lt;![CDATA[
     (function() {
       var startup = function() {
-        var ta = new XWiki.widgets.LiveTable("$url", "groupstable", displayGroups);
+        var callback = function(row, i, table) { return displayGroups(row, i, table, "$!{services.csrf.getToken()}"); };
+        var ta = new XWiki.widgets.LiveTable("$url", "groupstable", callback);
         Event.observe($('addNewGroup'), "click", makeAddHandler("$addnewurl", "$saveurl", "$redirecturl"));
       }
       if ((typeof(XWiki) != 'undefined') &amp;&amp; (typeof(XWiki.widgets) != 'undefined') &amp;&amp; (typeof(XWiki.widgets.LiveTable) != 'undefined')) {

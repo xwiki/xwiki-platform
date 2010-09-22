@@ -48,13 +48,18 @@
     <gwt.version>2.0.3</gwt.version>
     <smartgwt.version>2.0</smartgwt.version>
     <junit.version>3.8.2</junit.version>
+
     <!-- Versions of XWiki dependencies used in Platform/Web modules -->
-    <!-- Lock down configuration resources versions because it's not compatible with 2.4 branch anymore -->
+    <!-- Lock down configuration resources to 1.42 version because it's not compatible with 2.4 branch anymore -->
     <platform.tool.configuration.version>1.42</platform.tool.configuration.version>
-    <platform.core.version>2.4.1</platform.core.version>
-    <!-- Lock down skins versions because they are not compatible with 2.4 branch anymore -->
+
+    <platform.core.version>${project.version}</platform.core.version>
+
+    <!-- Lock down albatross skins to 1.28 version because it's not compatible with 2.4 branch anymore -->
     <platform.skin.albatross.version>1.28</platform.skin.albatross.version>
+    <!-- Lock down toucan skins to 1.28 version because they are not compatible with 2.4 branch anymore -->
     <platform.skin.toucan.version>1.35</platform.skin.toucan.version>
+    <!-- Lock down colibri skins to 1.28 version because they are not compatible with 2.4 branch anymore -->
     <platform.skin.colibri.version>1.19</platform.skin.colibri.version>
   </properties>
   <profiles>

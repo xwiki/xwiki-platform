@@ -43,7 +43,6 @@ import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.officeimporter.builder.XDOMOfficeDocumentBuilder;
 import org.xwiki.officeimporter.document.XDOMOfficeDocument;
-import org.xwiki.officepreview.OfficePreviewConfiguration;
 import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.block.XDOM;
 import org.xwiki.test.AbstractMockingComponentTestCase;
@@ -125,15 +124,11 @@ public class DefaultOfficePreviewBuilderTest extends AbstractMockingComponentTes
     {
         super.configure();
 
-        final OfficePreviewConfiguration configuration = getComponentManager().lookup(OfficePreviewConfiguration.class);
         final CacheManager cacheManager = getComponentManager().lookup(CacheManager.class);
         previewCache = getMockery().mock(Cache.class);
         getMockery().checking(new Expectations()
         {
             {
-                oneOf(configuration).getCacheSize();
-                will(returnValue(10));
-
                 oneOf(cacheManager).createNewCache(with(aNonNull(CacheConfiguration.class)));
                 will(returnValue(previewCache));
             }

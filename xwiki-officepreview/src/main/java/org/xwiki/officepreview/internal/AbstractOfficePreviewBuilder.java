@@ -30,7 +30,6 @@ import org.xwiki.cache.Cache;
 import org.xwiki.cache.CacheException;
 import org.xwiki.cache.CacheManager;
 import org.xwiki.cache.config.CacheConfiguration;
-import org.xwiki.cache.eviction.LRUEvictionConfiguration;
 import org.xwiki.component.annotation.Requirement;
 import org.xwiki.component.logging.AbstractLogEnabled;
 import org.xwiki.component.phase.Initializable;
@@ -40,7 +39,6 @@ import org.xwiki.model.reference.AttachmentReference;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.officepreview.OfficePreviewBuilder;
-import org.xwiki.officepreview.OfficePreviewConfiguration;
 import org.xwiki.rendering.block.XDOM;
 
 /**
@@ -56,12 +54,6 @@ public abstract class AbstractOfficePreviewBuilder extends AbstractLogEnabled im
      * Default encoding used for encoding wiki, space, page and attachment names.
      */
     private static final String DEFAULT_ENCODING = "UTF-8";
-
-    /**
-     * Used to read configuration details.
-     */
-    @Requirement
-    protected OfficePreviewConfiguration conf;
 
     /**
      * Used to access the temporary directory.
@@ -98,13 +90,11 @@ public abstract class AbstractOfficePreviewBuilder extends AbstractLogEnabled im
     public void initialize() throws InitializationException
     {
         CacheConfiguration config = new CacheConfiguration();
-        LRUEvictionConfiguration lec = new LRUEvictionConfiguration();
-        lec.setMaxEntries(conf.getCacheSize());
-        config.put(LRUEvictionConfiguration.CONFIGURATIONID, lec);
+        config.setConfigurationId("officepreview");
         try {
             previewsCache = cacheManager.createNewCache(config);
-        } catch (CacheException ex) {
-            throw new InitializationException("Error while initializing previews cache.", ex);
+        } catch (CacheException e) {
+            throw new InitializationException("Failed to create cache.", e);
         }
     }
 

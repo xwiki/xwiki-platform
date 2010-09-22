@@ -22,8 +22,6 @@ package com.xpn.xwiki.web;
 import java.util.ArrayList;
 
 import org.apache.commons.lang.math.NumberUtils;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
@@ -33,10 +31,18 @@ import com.xpn.xwiki.doc.XWikiAttachment;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.util.Util;
 
+/**
+ * Delete attachment xwiki action.
+ * 
+ * @version $Id$
+ */
 public class DeleteAttachmentAction extends XWikiAction
 {
-    private static final Log LOG = LogFactory.getLog(DeleteAttachmentAction.class);
-
+    /**
+     * {@inheritDoc}
+     * 
+     * @see com.xpn.xwiki.web.XWikiAction#action(com.xpn.xwiki.XWikiContext)
+     */
     @Override
     public boolean action(XWikiContext context) throws XWikiException
     {
@@ -82,7 +88,7 @@ public class DeleteAttachmentAction extends XWikiAction
             filename = Util.decodeURI(requestUri.substring(requestUri.lastIndexOf("/") + 1), context);
         }
 
-        XWikiDocument newdoc = (XWikiDocument) doc.clone();
+        XWikiDocument newdoc = doc.clone();
 
         // An attachment can be indicated either using an id, or using the filename.
         if (request.getParameter("id") != null) {

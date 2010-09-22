@@ -1331,7 +1331,6 @@
               **/web/PropAddForm.java,
               **/web/PropUpdateAction.java,
               **/web/RedirectAction.java,
-              **/web/RegisterAction.java,
               **/web/ResetVersionsAction.java,
               **/web/RollbackAction.java,
               **/web/RollbackForm.java,

@@ -30,10 +30,22 @@ import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.doc.XWikiLock;
 
+/**
+ * Administration xwiki action.
+ * 
+ * @version $Id$
+ */
 public class AdminAction extends XWikiAction
 {
-    private static final Log log = LogFactory.getLog(AdminAction.class);
+    /** The logger. */
+    private static final Log LOG = LogFactory.getLog(AdminAction.class);
 
+    /**
+     * {@inheritDoc}
+     * 
+     * @see com.xpn.xwiki.web.XWikiAction#render(com.xpn.xwiki.XWikiContext)
+     */
+    @Override
     public String render(XWikiContext context) throws XWikiException
     {
         XWikiRequest request = context.getRequest();
@@ -68,8 +80,7 @@ public class AdminAction extends XWikiAction
             String language = context.getWiki().getLanguagePreference(context);
             String languagefromrequest = context.getRequest().getParameter("language");
             String languagetoedit =
-                ((languagefromrequest == null) || (languagefromrequest.equals(""))) ? language
-                    : languagefromrequest;
+                ((languagefromrequest == null) || (languagefromrequest.equals(""))) ? language : languagefromrequest;
 
             if ((languagetoedit == null) || (languagetoedit.equals("default"))) {
                 languagetoedit = "";
@@ -91,10 +102,10 @@ public class AdminAction extends XWikiAction
                 // If the translated doc object is the same as the doc object
                 // this means the translated doc did not exists so we need to create it
                 if ((tdoc == doc)) {
-                    tdoc = new XWikiDocument(doc.getSpace(), doc.getName());
+                    tdoc = new XWikiDocument(doc.getDocumentReference());
                     tdoc.setLanguage(languagetoedit);
                     tdoc.setContent(doc.getContent());
-                    tdoc.setSyntaxId(doc.getSyntaxId());
+                    tdoc.setSyntax(doc.getSyntax());
                     tdoc.setAuthor(context.getUser());
                     tdoc.setStore(doc.getStore());
                     context.put("tdoc", tdoc);
@@ -102,7 +113,7 @@ public class AdminAction extends XWikiAction
                 }
             }
 
-            XWikiDocument tdoc2 = (XWikiDocument) tdoc.clone();
+            XWikiDocument tdoc2 = tdoc.clone();
             if (content != null && !content.equals("")) {
                 tdoc2.setContent(content);
             }
@@ -120,15 +131,14 @@ public class AdminAction extends XWikiAction
             /* Setup a lock */
             try {
                 XWikiLock lock = tdoc.getLock(context);
-                if ((lock == null) || (lock.getUserName().equals(context.getUser()))
-                    || (peform.isLockForce())) {
+                if ((lock == null) || (lock.getUserName().equals(context.getUser())) || (peform.isLockForce())) {
                     tdoc.setLock(context.getUser(), context);
                 }
             } catch (Exception e) {
                 e.printStackTrace();
                 // Lock should never make XWiki fail
                 // But we should log any related information
-                log.error("Exception while setting up lock", e);
+                LOG.error("Exception while setting up lock", e);
             }
         }
 

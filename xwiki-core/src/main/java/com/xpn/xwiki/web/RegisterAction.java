@@ -20,41 +20,64 @@
  */
 package com.xpn.xwiki.web;
 
+import org.apache.velocity.VelocityContext;
+
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
-import com.xpn.xwiki.doc.XWikiDocument;
-import org.apache.velocity.VelocityContext;
 
-public class RegisterAction extends XWikiAction {
-	public boolean action(XWikiContext context) throws XWikiException {
+/**
+ * Register xwiki action.
+ * 
+ * @version $Id$
+ */
+public class RegisterAction extends XWikiAction
+{
+    /** Name of the corresponding template and URL parameter. */
+    private static final String REGISTER = "register";
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see com.xpn.xwiki.web.XWikiAction#action(com.xpn.xwiki.XWikiContext)
+     */
+    @Override
+    public boolean action(XWikiContext context) throws XWikiException
+    {
         XWiki xwiki = context.getWiki();
         XWikiRequest request = context.getRequest();
         XWikiResponse response = context.getResponse();
-        XWikiDocument doc = context.getDoc();
 
-        String register = request.getParameter("register");
-        if ((register!=null)&&(register.equals("1"))) {
+        String register = request.getParameter(REGISTER);
+        if (register != null && register.equals("1")) {
             int useemail = xwiki.getXWikiPreferenceAsInt("use_email_verification", 0, context);
             int result;
-            if (useemail==1)
-             result = xwiki.createUser(true, "edit", context);
-            else
-             result = xwiki.createUser(context);
+            if (useemail == 1) {
+                result = xwiki.createUser(true, "edit", context);
+            } else {
+                result = xwiki.createUser(context);
+            }
             VelocityContext vcontext = (VelocityContext) context.get("vcontext");
             vcontext.put("reg", new Integer(result));
         }
 
         String redirect = Utils.getRedirect(request, null);
-        if (redirect==null)
+        if (redirect == null) {
             return true;
-        else {
+        } else {
             sendRedirect(response, redirect);
             return false;
         }
-	}
-	
-	public String render(XWikiContext context) throws XWikiException {
-        return "register";
-	}
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see com.xpn.xwiki.web.XWikiAction#render(com.xpn.xwiki.XWikiContext)
+     */
+    @Override
+    public String render(XWikiContext context) throws XWikiException
+    {
+        return REGISTER;
+    }
 }

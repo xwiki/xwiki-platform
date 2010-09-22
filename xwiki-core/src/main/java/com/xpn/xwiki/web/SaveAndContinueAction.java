@@ -43,23 +43,11 @@ public class SaveAndContinueAction extends XWikiAction
      */
     @Override
     public boolean action(XWikiContext context) throws XWikiException {
-        XWikiRequest request = context.getRequest();
-        XWikiResponse response = context.getResponse();
-
-        // Try to find the URL of the edit page which we came from.
-        String back = request.getParameter("xcontinue");
-        if (StringUtils.isEmpty(back)) {
-            back = request.getParameter("xredirect");
-        }
-        if (StringUtils.isEmpty(back)) {
-            back = removeAllParametersFromQueryStringExceptEditor(request.getHeader("Referer"));
-        }
-        if (StringUtils.isEmpty(back)) {
-            back = context.getDoc().getURL("edit", context);
-        }
+        // Try to find the URL of the edit page which we came from
+        String back = findBackURL(context);
 
         // This will never be true if "back" comes from request.getHeader("referer")
-        if (back != null && back.indexOf("editor=class") >= 0) {
+        if (back != null && back.contains("editor=class")) {
             PropUpdateAction pua = new PropUpdateAction();
             if (pua.propUpdate(context)) {
                 pua.render(context);
@@ -79,7 +67,7 @@ public class SaveAndContinueAction extends XWikiAction
 
         // Forward back to the originating page
         try {
-            response.sendRedirect(back);
+            context.getResponse().sendRedirect(back);
         } catch (IOException ignored) {
             // This exception is ignored because it will only be thrown if content has already been sent to the
             // response. This should never happen but we have to catch the exception anyway.
@@ -96,6 +84,28 @@ public class SaveAndContinueAction extends XWikiAction
     public String render(XWikiContext context) throws XWikiException
     {
         return "exception";
+    }
+
+    /**
+     * Try to find the URL of the edit page which we came from.
+     * 
+     * @param context current xwiki context
+     * @return URL of the edit page
+     */
+    private String findBackURL(XWikiContext context)
+    {
+        XWikiRequest request = context.getRequest();
+        String back = request.getParameter("xcontinue");
+        if (StringUtils.isEmpty(back)) {
+            back = request.getParameter("xredirect");
+        }
+        if (StringUtils.isEmpty(back)) {
+            back = removeAllParametersFromQueryStringExceptEditor(request.getHeader("Referer"));
+        }
+        if (StringUtils.isEmpty(back)) {
+            back = context.getDoc().getURL("edit", context);
+        }
+        return back;
     }
 
     /**

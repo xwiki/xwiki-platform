@@ -52,7 +52,10 @@ $msg.get('xe.blog.migration.pleaseconfirm')
 
 {{html clean="false" wiki="true"}}
   &lt;form action="$doc.getURL()" method="post"&gt;
-    &lt;div&gt;&lt;input type="submit" name="migrate" value="$msg.get('xe.blog.migration.confirm')"/&gt;&lt;/div&gt;
+    &lt;div&gt;
+    &lt;input type="hidden" name="form_token" value="$!{services.csrf.getToken()}" /&gt;
+    &lt;input type="submit" name="migrate" value="$msg.get('xe.blog.migration.confirm')"/&gt;
+    &lt;/div&gt;
   &lt;/form&gt;
 {{/html}}
 

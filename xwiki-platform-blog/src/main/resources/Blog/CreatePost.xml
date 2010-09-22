@@ -41,6 +41,7 @@ $xwiki.jsx.use($blogScriptsDocumentName)##
   #end
   &lt;form action="${xwiki.getURL('Blog.CreatePost', 'view', 'xpage=plain')}" id="newBlogPost" method="post"&gt;
   &lt;div&gt;
+    &lt;input type="hidden" name="form_token" value="$!{services.csrf.getToken()}" /&gt;
     &lt;input type="hidden" name="entrySpace" value="$space"/&gt;
     #if($doc.getObject($blogCategoryClassname))
       &lt;input type="hidden" name="category" value="${escapetool.xml(${doc.fullName})}"/&gt;
@@ -63,7 +64,7 @@ $xwiki.jsx.use($blogScriptsDocumentName)##
   #if("$!request.category" != '')
     #set($category = "&amp;${blogPostClassname}_${blogPostObjectNumber}_category=${escapetool.url(${request.category})}")
   #end
-  $response.sendRedirect($xwiki.getURL($postDocName, 'inline', "template=${blogPostTemplate}&amp;parent=${parent}&amp;title=${title}&amp;${blogPostClassname}_0_title=${title}$!{category}"))
+  $response.sendRedirect($xwiki.getURL($postDocName, 'inline', "template=${blogPostTemplate}&amp;parent=${parent}&amp;title=${title}&amp;${blogPostClassname}_0_title=${title}$!{category}&amp;form_token=$!{request.getParameter('form_token')}"))
 #end## name == ''
 #elseif("$!request.entryTitle" != '')## !hasEdit &amp;&amp; form submitted
   #template('accessdenied.vm')

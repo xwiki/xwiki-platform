@@ -533,9 +533,9 @@ $!xwiki.jsx.use($blogScriptsDocumentName)##
   ## Only published articles can be hidden. Unpublished articles are considered already hidden.
   #if($isPublished &amp;&amp; $entryDoc.creator == $xcontext.user &amp;&amp; $xwiki.hasAccessLevel('edit', $xcontext.user, $entryDoc.fullName))
     #if ($isHidden)
-      &lt;a class="blog-tool-show" href="$entryDoc.getURL('save', "${entryObj.getxWikiClass().getName()}_${entryObj.number}_hidden=0&amp;amp;comment=${escapetool.url($msg.get('xe.blog.code.madevisible'))}&amp;amp;xredirect=${escapetool.url($thisURL)}")" title="${escapetool.xml($msg.get('xe.blog.code.makevisible'))}"&gt;#toolImage('lock_open', 'show ')&lt;/a&gt;##
+      &lt;a class="blog-tool-show" href="$entryDoc.getURL('save', "${entryObj.getxWikiClass().getName()}_${entryObj.number}_hidden=0&amp;amp;comment=${escapetool.url($msg.get('xe.blog.code.madevisible'))}&amp;amp;xredirect=${escapetool.url($thisURL)}&amp;amp;form_token=$!{services.csrf.getToken()}")" title="${escapetool.xml($msg.get('xe.blog.code.makevisible'))}"&gt;#toolImage('lock_open', 'show ')&lt;/a&gt;##
     #else
-      &lt;a class="blog-tool-hide" href="$entryDoc.getURL('save', "${entryObj.getxWikiClass().getName()}_${entryObj.number}_hidden=1&amp;amp;comment=${escapetool.url($msg.get('xe.blog.code.hid'))}&amp;amp;xredirect=${escapetool.url($thisURL)}")" title="${escapetool.xml($msg.get('xe.blog.code.hide'))}"&gt;#toolImage('lock' 'hide ')&lt;/a&gt;##
+      &lt;a class="blog-tool-hide" href="$entryDoc.getURL('save', "${entryObj.getxWikiClass().getName()}_${entryObj.number}_hidden=1&amp;amp;comment=${escapetool.url($msg.get('xe.blog.code.hid'))}&amp;amp;xredirect=${escapetool.url($thisURL)}&amp;amp;form_token=$!{services.csrf.getToken()}")" title="${escapetool.xml($msg.get('xe.blog.code.hide'))}"&gt;#toolImage('lock' 'hide ')&lt;/a&gt;##
     #end
   #end
 #end

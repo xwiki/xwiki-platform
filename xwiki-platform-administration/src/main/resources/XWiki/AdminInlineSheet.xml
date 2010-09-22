@@ -33,6 +33,7 @@
   &lt;div&gt;
     &lt;div class="hidden"&gt;&lt;input type="hidden" name="xcontinue" value="$doc.getURL('admin', "${request.queryString}&amp;editmode=inline").replaceAll('&amp;','&amp;amp;')" /&gt;&lt;/div&gt;
     &lt;input type="hidden" name="xredirect" value="$doc.getURL('admin', "editor=${editor}&amp;section=${section}&amp;space=XWiki").replaceAll('&amp;','&amp;amp;')" /&gt;
+    &lt;input type="hidden" name="form_token" value="$!{services.csrf.getToken()}" /&gt;
     &lt;input type="hidden" name="xnotification" value="$!xnotification" /&gt;
     &lt;input type="hidden" name="template" value="$!request.template" /&gt;
     &lt;input type="hidden" name="language" value="$!doc.language" /&gt;

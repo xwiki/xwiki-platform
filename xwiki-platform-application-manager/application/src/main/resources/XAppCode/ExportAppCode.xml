@@ -80,6 +80,7 @@
   #else
     &lt;form id="exportForm" action="" method="get"&gt;
       #xwikimessageboxstart($msg.get("xapp.answer.exportapp.title", [$appname]) "")
+        &lt;input type="hidden" name="form_token" value="$!{services.csrf.getToken()}" /&gt;
         &lt;input type="hidden" id="confirm" name="confirm" value="1" /&gt;
         &lt;input type="hidden" id="action" name="action" value="$action" /&gt;
         &lt;input type="hidden" id="appname" name="appname" value="$appname" /&gt;

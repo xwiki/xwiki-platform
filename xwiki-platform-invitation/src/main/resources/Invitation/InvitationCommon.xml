@@ -929,6 +929,7 @@ $msg.get("xe.invitation.emailContent.reportMessage", ["&lt;a href=$escapetool.ge
       &lt;input type="hidden" name="messageID" value="$escapetool.xml($id)" /&gt;
     #end
     &lt;input type="hidden" name="confirm" value="y" /&gt;
+    &lt;input type="hidden" name="form_token" value="$!{services.csrf.getToken()}" /&gt;
     #if($additionalParameters &amp;&amp; $additionalParameters.size() &gt; 0)
       #foreach($param in $additionalParameters.keySet())
         &lt;input type="hidden" name="$escapetool.xml($param)" value="$escapetool.xml($additionalParameters.get($param))" /&gt;

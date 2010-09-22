@@ -737,7 +737,9 @@ $xwiki.get('ssx').use($config.get('commonPage'))
     #set($messageBody = '')
   #end
   ##
-  #if("$!request.get('sendMail')" != '' &amp;&amp; $request.getMethod().toLowerCase() == 'post')
+  #if("$!request.get('sendMail')" != ''
+      &amp;&amp; $request.getMethod().toLowerCase() == 'post'
+      &amp;&amp; ${services.csrf.isTokenValid("$!{request.getParameter('form_token')}")})
     #generateAndSendMail($config,
                          $recipients,
                          $subjectLine,

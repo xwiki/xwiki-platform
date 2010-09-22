@@ -239,6 +239,7 @@ $xwiki.ssx.use('Main.Dashboard')##
   #displayTagAppTitle($urlEscapedTag $htmlEscapedTag false)
   &lt;form id="renameForm" action="$doc.getURL()" method="post"&gt;
    &lt;div&gt;
+    &lt;input type="hidden" name="form_token" value="$!{services.csrf.getToken()}" /&gt;
     &lt;input name="do" type="hidden" value="renameTag" /&gt;
     &lt;input name="tag" type="hidden" value="$htmlEscapedTag" /&gt;
     $msg.get('xe.tag.rename.renameto', [$htmlEscapedTag]) &lt;input type="text" name="renameTo" /&gt; &lt;span class="buttonwrapper"&gt;&lt;input type="submit" value="$msg.get('xe.tag.rename')" class="button"/&gt;&lt;/span&gt;
@@ -267,6 +268,7 @@ $xwiki.ssx.use('Main.Dashboard')##
   #displayTagAppTitle($urlEscapedTag $htmlEscapedTag false)
   &lt;form id="deleteForm" action="$doc.getURL()" method="post"&gt;
    &lt;div&gt;
+    &lt;input type="hidden" name="form_token" value="$!{services.csrf.getToken()}" /&gt;
     &lt;input name="do" type="hidden" value="deleteTag" /&gt;
     &lt;input name="tag" type="hidden" value="$htmlEscapedTag" /&gt;
     &lt;span class="buttonwrapper"&gt;&lt;input type="submit" value="$msg.get('xe.tag.delete', [$htmlEscapedTag])" class="button/&gt;&lt;/span&gt;

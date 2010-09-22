@@ -114,6 +114,7 @@ $xwiki.jsx.use("Workstream.Javascript")
 &lt;div class="chars-left-container"&gt;&lt;span id="workstream-chars-left-panel" class="chars-left-regular"&gt;&lt;/span&gt;$msg.get('workstream.charsleft')&lt;/div&gt;
 &lt;textarea id="workstream-status-box-panel" name="status" cols="80" onkeyup="countCharsLeftInPanel()"; maxlength="$maxChars" rows="6"&gt;$msg.get('workstream.whatareyouworkingon')&lt;/textarea&gt;
 &lt;div&gt;
+&lt;input type="hidden" name="form_token" value="$!{services.csrf.getToken()}" /&gt;
 &lt;/div&gt;
 &lt;br /&gt;
 &lt;span class="buttonwrapper"&gt;

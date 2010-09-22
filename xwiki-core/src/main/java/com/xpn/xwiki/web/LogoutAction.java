@@ -20,6 +20,8 @@
  */
 package com.xpn.xwiki.web;
 
+import org.xwiki.csrftoken.CSRFToken;
+
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 
@@ -29,6 +31,10 @@ public class LogoutAction extends XWikiAction
     {
         XWikiRequest request = context.getRequest();
         XWikiResponse response = context.getResponse();
+
+        // clear CSRF token
+        CSRFToken csrf = Utils.getComponent(CSRFToken.class);
+        csrf.clearToken();
 
         String redirect;
         redirect = context.getRequest().getParameter("xredirect");

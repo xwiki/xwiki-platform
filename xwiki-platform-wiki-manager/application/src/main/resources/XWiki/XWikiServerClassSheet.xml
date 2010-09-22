@@ -132,6 +132,7 @@
       &lt;form method="get" action=""&gt;
         &lt;fieldset&gt;
           &lt;legend&gt;Create new alias&lt;/legend&gt;
+          &lt;input type="hidden" name="form_token" value="$!{services.csrf.getToken()}" /&gt;
           &lt;input type="hidden" name="action" value="create"/&gt;
           &lt;label for="inputdomain"&gt;$msg.get("wikimanager.prop.alias.server")&lt;/label&gt;: &lt;input id="inputdomain" type="text" name="domain" class="wikialiasinput"/&gt;
           &lt;input type="submit" class="button" value="$msg.get("create")"/&gt;
@@ -170,6 +171,7 @@
               &lt;/dl&gt;
         #if ($xcontext.action == "view")
   	          &lt;br /&gt;
+              &lt;input type="hidden" name="form_token" value="$!{services.csrf.getToken()}" /&gt;
               &lt;input type="hidden" name="action" value="delete"/&gt;
               &lt;input type="hidden" name="domain" value="$wikiAlias.server"/&gt;
               &lt;input type="submit" class="button" value="$msg.get("delete")"/&gt;

@@ -24,7 +24,7 @@
 <syntaxId>xwiki/2.0</syntaxId>
 <hidden>true</hidden>
 <content>{{velocity filter="none"}}
-#if($request.migrate)
+#if($request.migrate &amp;&amp; $!{services.csrf.isTokenValid("$!{request.getParameter('form_token')}")})
   #set($newContent = '#includeForm("Blog.BlogPostSheet")')
   #set($query = ", BaseObject obj where obj.name = doc.fullName and obj.className = 'XWiki.ArticleClass'")
   #foreach($article in $xwiki.searchDocuments($query))

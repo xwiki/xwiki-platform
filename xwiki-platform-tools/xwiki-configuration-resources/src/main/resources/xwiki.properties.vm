@@ -286,3 +286,12 @@
 #-# Default value is 0
 # core.csrftoken.enabled = 0
 
+#-------------------------------------------------------------------------------------
+# Office Preview
+#-------------------------------------------------------------------------------------
+
+#-# [Since 2.5M2]
+#-# The maximum number of previews the office preview component is allowed to cache.
+#-#
+#-# Default value is 10.
+# officepreview.cacheSize = 10

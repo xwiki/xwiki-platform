@@ -547,7 +547,7 @@ $xwiki.jsx.use($paneldoc.fullName)##
   #end
   ## Use the syntax and content received from the client, as the user might have made some changes that are not on saved yet.
   #set($void = $translatedDoc.setSyntaxId($oldSyntax))
-  #if (!$translatedDoc.convertSyntax($newSyntaxId))
+  #if (!$translatedDoc.convertSyntax($newSyntaxId) || !${services.csrf.isTokenValid("$!{request.getParameter('form_token')}")})
     #set($error = true)
   #else
     #set($void = $translatedDoc.save("Document converted from syntax $oldSyntax to syntax $newSyntaxId"))

@@ -81,6 +81,7 @@ Photo|Title|Description|Comments
 
 &lt;form action="" id="newdoc"&gt;
 &lt;div&gt;
+&lt;input type="hidden" name="form_token" value="$!{services.csrf.getToken()}" /&gt;
 &lt;input type="hidden" name="parent" value="Photos.WebHome" /&gt;
 &lt;input type="hidden" name="template" value="XWiki.PhotoAlbumClassTemplate" /&gt;
 &lt;input type="hidden" name="sheet" value="1" /&gt;

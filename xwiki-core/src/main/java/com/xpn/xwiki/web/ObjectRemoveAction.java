@@ -66,6 +66,11 @@ public class ObjectRemoveAction extends XWikiAction
     @Override
     public boolean action(XWikiContext context) throws XWikiException
     {
+        // CSRF prevention
+        if (!csrfTokenCheck(context)) {
+            return false;
+        }
+
         XWiki xwiki = context.getWiki();
         XWikiResponse response = context.getResponse();
         String username = context.getUser();
@@ -74,6 +79,7 @@ public class ObjectRemoveAction extends XWikiAction
         if (obj == null) {
             return true;
         }
+
         doc.removeObject(obj);
         doc.setAuthor(username);
         xwiki.saveDocument(doc, context.getMessageTool().get("core.comment.deleteObject"), true, context);

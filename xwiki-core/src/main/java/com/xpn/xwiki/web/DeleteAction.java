@@ -55,6 +55,10 @@ public class DeleteAction extends XWikiAction
         if (!"1".equals(request.getParameter(CONFIRM_PARAM))) {
             return true;
         }
+        // CSRF prevention
+        if (!csrfTokenCheck(context)) {
+            return false;
+        }
 
         String sindex = request.getParameter("id");
         if (sindex != null && xwiki.hasRecycleBin(context)) {

@@ -43,6 +43,11 @@ public class SaveAndContinueAction extends XWikiAction
      */
     @Override
     public boolean action(XWikiContext context) throws XWikiException {
+        // CSRF prevention
+        if (!csrfTokenCheck(context)) {
+            return false;
+        }
+
         // Try to find the URL of the edit page which we came from
         String back = findBackURL(context);
 

@@ -40,21 +40,24 @@ public class DeleteVersionsAction extends XWikiAction
     @Override
     public boolean action(XWikiContext context) throws XWikiException
     {
-        DeleteVersionsForm form = (DeleteVersionsForm) context.getForm();
+        // CSRF prevention
+        if (!csrfTokenCheck(context)) {
+            return false;
+        }
 
+        DeleteVersionsForm form = (DeleteVersionsForm) context.getForm();
         if (!form.isConfirmed()) {
             return true;
         }
 
         Version v1;
         Version v2;
-        Version rev = form.getRev();
-        if (rev == null) {
+        if (form.getRev() == null) {
             v1 = form.getRev1();
             v2 = form.getRev2();
         } else {
-            v1 = rev;
-            v2 = rev;
+            v1 = form.getRev();
+            v2 = form.getRev();
         }
 
         if (v1 != null && v2 != null) {

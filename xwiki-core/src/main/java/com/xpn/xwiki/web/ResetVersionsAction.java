@@ -17,6 +17,11 @@ public class ResetVersionsAction extends XWikiAction
 
         String confirm = request.getParameter("confirm");
         if ((confirm != null) && (confirm.equals("1"))) {
+            // CSRF prevention
+            if (!csrfTokenCheck(context)) {
+                return false;
+            }
+
             XWikiDocument tdoc = getTranslatedDocument(doc, language, context);
             // Do it
             tdoc.resetArchive(context);

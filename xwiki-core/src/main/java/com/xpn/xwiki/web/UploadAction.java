@@ -80,6 +80,11 @@ public class UploadAction extends XWikiAction
             }
         }
 
+        // CSRF prevention
+        if (!csrfTokenCheck(context)) {
+            return false;
+        }
+
         XWikiDocument doc = (XWikiDocument) context.getDoc().clone();
 
         // The document is saved for each attachment in the group.

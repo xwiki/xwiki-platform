@@ -55,6 +55,10 @@ public abstract class AbstractPropChangeAction extends XWikiAction
         BaseClass xclass = doc.getXClass();
 
         if (propertyName != null && xclass.get(propertyName) != null) {
+            // CSRF prevention
+            if (!csrfTokenCheck(context)) {
+                return false;
+            }
             changePropertyDefinition(xclass, propertyName, context);
         } else {
             return true;

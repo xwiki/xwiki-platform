@@ -176,6 +176,11 @@ public class SaveAction extends PreviewAction
     @Override
     public boolean action(XWikiContext context) throws XWikiException
     {
+        // CSRF prevention
+        if (!csrfTokenCheck(context)) {
+            return false;
+        }
+
         if (save(context)) {
             return true;
         }

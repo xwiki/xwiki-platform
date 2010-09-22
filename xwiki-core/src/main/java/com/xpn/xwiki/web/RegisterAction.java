@@ -50,6 +50,11 @@ public class RegisterAction extends XWikiAction
 
         String register = request.getParameter(REGISTER);
         if (register != null && register.equals("1")) {
+            // CSRF prevention
+            if (!csrfTokenCheck(context)) {
+                return false;
+            }
+
             int useemail = xwiki.getXWikiPreferenceAsInt("use_email_verification", 0, context);
             int result;
             if (useemail == 1) {

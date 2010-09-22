@@ -105,6 +105,11 @@ public class PropUpdateAction extends XWikiAction
     @Override
     public boolean action(XWikiContext context) throws XWikiException
     {
+        // CSRF prevention
+        if (!csrfTokenCheck(context)) {
+            return false;
+        }
+
         try {
             if (propUpdate(context)) {
                 return true;

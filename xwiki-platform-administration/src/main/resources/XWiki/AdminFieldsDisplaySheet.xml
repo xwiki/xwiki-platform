@@ -63,7 +63,6 @@
    &lt;/fieldset&gt;
   #end
   &lt;div class="hidden"&gt;
-    &lt;input type="hidden" name="form_token" value="$!{services.csrf.getToken()}" /&gt;
     &lt;input type="hidden" name="xcontinue" value="$xwiki.getURL($currentDoc, 'admin', "editor=${escapetool.url(${editor})}&amp;amp;section=${escapetool.url(${section})}&amp;amp;space=${escapetool.url(${currentSpace})}")" /&gt;
     &lt;input type="hidden" name="xredirect" value="$xwiki.getURL($currentDoc, 'admin', "editor=${escapetool.url(${editor})}&amp;amp;section=${escapetool.url(${section})}&amp;amp;space=${escapetool.url(${currentSpace})}")" /&gt;
     &lt;input type="hidden" name="classname" value="XWiki.XWikiPreferences" /&gt;

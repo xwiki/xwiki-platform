@@ -146,6 +146,12 @@
       <artifactId>xwiki-core-csrftoken</artifactId>
       <version>${platform.core.version}</version>
     </dependency>
+    <!-- Extension Manager -->
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-core-extension</artifactId>
+      <version>${platform.core.version}</version>
+    </dependency>
 
     <!-- Needed for GWT/WYSIWYG -->
     <dependency>

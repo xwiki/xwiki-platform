@@ -36,9 +36,7 @@
   #set ($wiki = $WikiManager.getWikiFromDocumentName($doc.fullName))
   ##
   #if ($action &amp;&amp; ($action == "create") &amp;&amp; $domain &amp;&amp; ($domain.trim().length() &gt; 0))
-    #if (!${services.csrf.isTokenValid("$!{request.getParameter('form_token')}")})
-      #error($msg.get("notallowed"))
-    #elseif (!$wiki.containsWikiAlias($domain))
+    #if (!$wiki.containsWikiAlias($domain))
       #set ($alias = $wiki.newObject("XWiki.XWikiServerClass"))
       $alias.set("server", $domain)
       $alias.set("homepage", "Main.WebHome")
@@ -49,9 +47,7 @@
   #end
   ##
   #if ($action &amp;&amp; ($action == "delete") &amp;&amp; $domain &amp;&amp; ($domain.trim().length() &gt; 0))
-    #if (!${services.csrf.isTokenValid("$!{request.getParameter('form_token')}")})
-      #error($msg.get("notallowed"))
-    #elseif ($wiki.containsWikiAlias($domain))
+    #if ($wiki.containsWikiAlias($domain))
       #set ($alias = $wiki.getWikiAlias($domain))
       #set ($removed = $wiki.removeObject($alias.objectApi))
       $wiki.save()
@@ -136,7 +132,6 @@
       &lt;form method="get" action=""&gt;
         &lt;fieldset&gt;
           &lt;legend&gt;Create new alias&lt;/legend&gt;
-          &lt;input type="hidden" name="form_token" value="$!{services.csrf.getToken()}" /&gt;
           &lt;input type="hidden" name="action" value="create"/&gt;
           &lt;label for="inputdomain"&gt;$msg.get("wikimanager.prop.alias.server")&lt;/label&gt;: &lt;input id="inputdomain" type="text" name="domain" class="wikialiasinput"/&gt;
           &lt;input type="submit" class="button" value="$msg.get("create")"/&gt;
@@ -175,7 +170,6 @@
               &lt;/dl&gt;
         #if ($xcontext.action == "view")
   	          &lt;br /&gt;
-              &lt;input type="hidden" name="form_token" value="$!{services.csrf.getToken()}" /&gt;
               &lt;input type="hidden" name="action" value="delete"/&gt;
               &lt;input type="hidden" name="domain" value="$wikiAlias.server"/&gt;
               &lt;input type="submit" class="button" value="$msg.get("delete")"/&gt;

@@ -50,7 +50,7 @@ public class DefaultExtensionManagerTest extends AbstractComponentTestCase
     private ConfigurableDefaultCoreExtensionRepository coreExtensionRepository;
 
     private LocalExtensionRepository localExtensionRepository;
-    
+
     @Before
     public void setUp() throws Exception
     {
@@ -95,6 +95,10 @@ public class DefaultExtensionManagerTest extends AbstractComponentTestCase
     {
         // way too big for a unit test so lets skip it
         this.coreExtensionRepository.addExtensions("org.jruby:jruby", "1.5");
+        // the following extension should be found in the classpath but maven seems to have some bug around it (it's
+        // working well inside Eclipse)
+        this.coreExtensionRepository.addExtensions("org.xwiki.platform:xwiki-core-classloader", this.rubyArtifactId.getVersion());
+        this.coreExtensionRepository.addExtensions("org.xwiki.platform:xwiki-core-rendering-api", this.rubyArtifactId.getVersion());
 
         // emulate environment
         registerMockComponent(DocumentAccessBridge.class);
@@ -121,7 +125,7 @@ public class DefaultExtensionManagerTest extends AbstractComponentTestCase
         this.extensionManager.uninstallExtension(this.rubyArtifactId.getId());
 
         Assert.assertNull(this.localExtensionRepository.getLocalExtension(this.rubyArtifactId.getId()));
-        
+
         try {
             getComponentManager().lookup(Macro.class, "ruby");
             Assert.fail("the extension has not been uninstalled");

@@ -281,7 +281,7 @@ v7oibV0+qncSAAAAAElFTkSuQmCC</content></attachment>
 #set($msgRestart=$msg.get("xe.officeimporter.openoffice.actions.restart"))
 #set($msgUpdate=$msg.get("xe.officeimporter.openoffice.update"))
 #set($msgLimitedControl=$msg.get("xe.officeimporter.openoffice.limitedcontrol"))
-#if($hasAdmin &amp;&amp; ${services.csrf.isTokenValid("$!{request.getParameter('form_token')}")})
+#if($hasAdmin)
   #set($currentAction = "$!{request.action}")
   #if($currentAction == "stop")
     #if(!$oomanager.stopServer())
@@ -332,7 +332,6 @@ v7oibV0+qncSAAAAAElFTkSuQmCC</content></attachment>
 #if($hasAdmin &amp;&amp; $xcontext.isMainWiki())
 &lt;form action="$escapetool.xml($xwiki.requestURL)" enctype="multipart/form-data" method="post"&gt;
 &lt;div&gt;
-  &lt;input type="hidden" name="form_token" value="$!{services.csrf.getToken()}" /&gt;
   &lt;strong&gt;$msgActions&lt;/strong&gt;&lt;br/&gt;
   &lt;label for="action1" class="hidden"&gt;$actionStart&lt;/label&gt;
   &lt;input id="action1" name="action" type="radio" value="start" checked="checked"/&gt;$actionStart&lt;br/&gt;

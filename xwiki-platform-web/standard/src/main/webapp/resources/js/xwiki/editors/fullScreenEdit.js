@@ -381,6 +381,7 @@ XWiki.editors.FullScreenEditing = Class.create({
     if (targetElement._toolbar) {
       targetElement._toolbar.viewportOffset();
     }
+    document.fire("xwiki:fullscreen:entered", { "target" : targetElement });
   },
   /** Restore the layout. */
   closeFullScreen : function() {
@@ -449,6 +450,7 @@ XWiki.editors.FullScreenEditing = Class.create({
     if (this.maximizedReference) {
       this.maximizedReference.value = '';
     }
+    document.fire("xwiki:fullscreen:exited", { "target" : targetElement });
   },
   /** In full screen, when the containers's dimensions change, the maximized element must be resized accordingly. */
   resizeTextArea : function(targetElement) {
@@ -475,6 +477,7 @@ XWiki.editors.FullScreenEditing = Class.create({
       targetElement.down(".mceEditorIframe").setStyle({'width' :  newWidth + 'px', 'height' : newHeight - targetElement._toolbar.getHeight() + 'px'});
       targetElement.down(".mceEditorSource").setStyle({'width' :  newWidth + 'px', 'height' : newHeight - targetElement._toolbar.getHeight() + 'px'});
     }
+    document.fire("xwiki:fullscreen:resized", { "target" : targetElement });
   },
   /** onMouseDown handler that prevents dragging the button. */
   preventDrag : function(event) {

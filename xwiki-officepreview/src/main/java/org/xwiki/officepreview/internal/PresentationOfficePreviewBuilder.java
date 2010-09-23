@@ -59,7 +59,7 @@ public class PresentationOfficePreviewBuilder extends AbstractOfficePreviewBuild
     private OpenOfficeManager officeManager;
 
     /**
-     * Used to build the presentation xdom.
+     * Used to build the presentation XDOM.
      */
     @Requirement("xwiki/2.0")
     private Parser xwiki20Parser;
@@ -74,7 +74,7 @@ public class PresentationOfficePreviewBuilder extends AbstractOfficePreviewBuild
      * {@inheritDoc}
      */
     protected OfficeDocumentPreview build(AttachmentReference attachmentReference, String version, InputStream data,
-        boolean filterStyles) throws Exception
+        Map<String, String> parameters) throws Exception
     {
         Map<String, InputStream> inputs = Collections.singletonMap(attachmentReference.getName(), data);
         Map<String, byte[]> artifacts =
@@ -94,11 +94,12 @@ public class PresentationOfficePreviewBuilder extends AbstractOfficePreviewBuild
     }
 
     /**
-     * Builds a presentation XDOM which simply contains an html macro (iframe) pointing to the specified slide.
+     * Builds a presentation XDOM which simply contains an {@code html} macro that outputs an in-line frame that points
+     * to the specified slide.
      * 
-     * @param firstSlideURL URL of the first slide to which this presentation should link to.
-     * @return XDOM containing a html macro which holds the presentation iframe code.
-     * @throws Exception if an error occurs while transforming the XDOM.
+     * @param firstSlideURL URL of the first slide to which this presentation should link to
+     * @return XDOM containing a {@code html} macro block which outputs an in-line frame displaying the presentation
+     * @throws Exception if an error occurs while transforming the XDOM
      */
     private XDOM buildPresentationXDOM(String firstSlideURL) throws Exception
     {

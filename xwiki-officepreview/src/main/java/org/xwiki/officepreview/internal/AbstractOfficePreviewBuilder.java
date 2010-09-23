@@ -23,6 +23,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.InputStream;
 import java.net.URLEncoder;
+import java.util.Map;
 
 import org.apache.commons.io.IOUtils;
 import org.xwiki.bridge.DocumentAccessBridge;
@@ -65,7 +66,7 @@ public abstract class AbstractOfficePreviewBuilder extends AbstractLogEnabled im
      * Used to access attachment content.
      */
     @Requirement
-    private DocumentAccessBridge docBridge;
+    private DocumentAccessBridge documentAccessBridge;
 
     /**
      * Used for serializing {@link AttachmentReference}s.
@@ -86,6 +87,8 @@ public abstract class AbstractOfficePreviewBuilder extends AbstractLogEnabled im
 
     /**
      * {@inheritDoc}
+     * 
+     * @see Initializable#initialize()
      */
     public void initialize() throws InitializationException
     {
@@ -100,43 +103,43 @@ public abstract class AbstractOfficePreviewBuilder extends AbstractLogEnabled im
 
     /**
      * {@inheritDoc}
+     * 
+     * @see OfficePreviewBuilder#build(AttachmentReference, Map)
      */
-    public XDOM build(AttachmentReference attachmentReference, boolean filterStyles) throws Exception
+    public XDOM build(AttachmentReference attachmentReference, Map<String, String> parameters) throws Exception
     {
-        String strAttachRef = serializer.serialize(attachmentReference);
-        DocumentReference documentReference = attachmentReference.getDocumentReference();
-
         // Search the cache.
-        OfficeDocumentPreview preview = previewsCache.get(strAttachRef);
+        String cacheKey = getPreviewsCacheKey(attachmentReference, parameters);
+        OfficeDocumentPreview preview = previewsCache.get(cacheKey);
 
         // It's possible that the attachment has been deleted. We need to catch such events and cleanup the cache.
-        if (!docBridge.getAttachmentReferences(documentReference).contains(attachmentReference)) {
+        DocumentReference documentReference = attachmentReference.getDocumentReference();
+        if (!documentAccessBridge.getAttachmentReferences(documentReference).contains(attachmentReference)) {
             // If a cached preview exists, flush it.
             if (null != preview) {
-                previewsCache.remove(strAttachRef);
+                previewsCache.remove(cacheKey);
             }
-            throw new Exception(String.format("Attachment [%s] does not exist.", strAttachRef));
+            throw new Exception(String.format("Attachment [%s] does not exist.", attachmentReference));
         }
 
         // Query the current version of the attachment.
-        String currentVersion = docBridge.getAttachmentVersion(attachmentReference);
+        String currentVersion = documentAccessBridge.getAttachmentVersion(attachmentReference);
 
         // Check if the preview has been expired.
         if (null != preview && !currentVersion.equals(preview.getVersion())) {
             // Flush the cached preview.
-            previewsCache.remove(strAttachRef);
+            previewsCache.remove(cacheKey);
             preview = null;
         }
 
         // If a preview in not available, build one.
         if (null == preview) {
             // Build preview.
-            preview =
-                build(attachmentReference, currentVersion, docBridge.getAttachmentContent(attachmentReference),
-                    filterStyles);
+            InputStream content = documentAccessBridge.getAttachmentContent(attachmentReference);
+            preview = build(attachmentReference, currentVersion, content, parameters);
 
             // Cache the preview.
-            previewsCache.set(strAttachRef, preview);
+            previewsCache.set(cacheKey, preview);
         }
 
         // Done.
@@ -144,26 +147,36 @@ public abstract class AbstractOfficePreviewBuilder extends AbstractLogEnabled im
     }
 
     /**
+     * @param attachmentReference reference to the attachment to be previewed
+     * @param previewParameters implementation specific preview parameters
+     * @return a key to cache the preview of the specified attachment
+     */
+    private String getPreviewsCacheKey(AttachmentReference attachmentReference, Map<String, String> previewParameters)
+    {
+        return serializer.serialize(attachmentReference) + '/' + previewParameters.hashCode();
+    }
+
+    /**
      * Builds a preview of the specified attachment.
      * 
-     * @param attachmentReference reference to the attachment to be previewed.
-     * @param version version of the attachment for which the preview should be generated for.
-     * @param data content of the attachment.
-     * @param filterStyles whether office document styles should be filtered.
-     * @return {@link OfficeDocumentPreview} corresponding to the preview of the specified attachment.
-     * @throws Exception if an error occurs while building the preview.
+     * @param attachmentReference reference to the attachment to be previewed
+     * @param version version of the attachment for which the preview should be generated for
+     * @param data content of the attachment
+     * @param parameters implementation specific preview parameters
+     * @return {@link OfficeDocumentPreview} corresponding to the preview of the specified attachment
+     * @throws Exception if an error occurs while building the preview
      */
     protected abstract OfficeDocumentPreview build(AttachmentReference attachmentReference, String version,
-        InputStream data, boolean filterStyles) throws Exception;
+        InputStream data, Map<String, String> parameters) throws Exception;
 
     /**
      * Saves a temporary file associated with the given attachment.
      * 
-     * @param attachmentReference reference to the attachment to which this temporary file belongs.
-     * @param fileName name of the temporary file.
-     * @param fileData file data.
-     * @return file that was just written.
-     * @throws Exception if an error occurs while writing the temporary file.
+     * @param attachmentReference reference to the attachment to which this temporary file belongs
+     * @param fileName name of the temporary file
+     * @param fileData file data
+     * @return file that was just written
+     * @throws Exception if an error occurs while writing the temporary file
      */
     protected File saveTemporaryFile(AttachmentReference attachmentReference, String fileName, byte[] fileData)
         throws Exception
@@ -183,8 +196,8 @@ public abstract class AbstractOfficePreviewBuilder extends AbstractLogEnabled im
     /**
      * Utility method for obtaining a temporary storage directory for an attachment.
      * 
-     * @param attachmentReference reference to the attachment.
-     * @return temporary directory for the specified attachment.
+     * @param attachmentReference reference to the attachment
+     * @return temporary directory for the specified attachment
      * @throws Exception if creating or accessing the temporary directory fails
      */
     protected File getTemporaryDirectory(AttachmentReference attachmentReference) throws Exception
@@ -205,9 +218,7 @@ public abstract class AbstractOfficePreviewBuilder extends AbstractLogEnabled im
         String path = String.format("temp/officepreview/%s/%s/%s/%s/", wiki, space, page, attachmentName);
         File rootDir = container.getApplicationContext().getTemporaryDirectory();
         File tempDir = new File(rootDir, path);
-        boolean success = tempDir.exists() ? true : tempDir.mkdirs();
-        success = success && tempDir.isDirectory();
-        success = success && tempDir.canWrite();
+        boolean success = (tempDir.exists() || tempDir.mkdirs()) && tempDir.isDirectory() && tempDir.canWrite();
         if (!success) {
             String message = "Error while creating temporary directory for attachment [%s].";
             throw new Exception(String.format(message, attachmentName));
@@ -218,13 +229,14 @@ public abstract class AbstractOfficePreviewBuilder extends AbstractLogEnabled im
     /**
      * Utility method for building a URL to the specified temporary file.
      * 
-     * @param attachmentReference attachment to which the temporary file is associated.
-     * @param fileName name of the temporary file.
-     * @return URL string that refers the specified temporary file.
+     * @param attachmentReference attachment to which the temporary file is associated
+     * @param fileName name of the temporary file
+     * @return URL string that refers the specified temporary file
      */
     protected String buildURL(AttachmentReference attachmentReference, String fileName)
     {
-        String prefix = docBridge.getDocumentURL(attachmentReference.getDocumentReference(), "temp", null, null);
+        String prefix =
+            documentAccessBridge.getDocumentURL(attachmentReference.getDocumentReference(), "temp", null, null);
         String attachmentName = attachmentReference.getName();
         return String.format("%s/officepreview/%s/%s", prefix, attachmentName, fileName);
     }

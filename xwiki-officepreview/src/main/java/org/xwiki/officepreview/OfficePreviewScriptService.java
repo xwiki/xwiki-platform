@@ -19,9 +19,10 @@
  */
 package org.xwiki.officepreview;
 
+import java.util.Map;
+
 import org.xwiki.component.annotation.ComponentRole;
 import org.xwiki.model.reference.AttachmentReference;
-import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.script.service.ScriptService;
 
 /**
@@ -36,44 +37,31 @@ public interface OfficePreviewScriptService extends ScriptService
     /**
      * Builds a preview of the specified office attachment in xhtml/1.0 syntax.
      * 
-     * @param attachmentStringReference string identifying the office attachment
-     * @param filterStyles whether office document styles should be filtered
+     * @param attachmentReference reference to the attachment to be previewed
      * @return preview of the specified office attachment or {@code null} if an error occurs
      */
-    String preview(String attachmentStringReference, boolean filterStyles);
-
-    /**
-     * Builds a preview of the specified office attachment in xhtml/1.0 syntax.
-     * 
-     * @param documentStringReference string identifying the document holding office attachment
-     * @param fileName the office file name
-     * @param filterStyles whether office document styles should be filtered
-     * @return preview of the specified office attachment or {@code null} if an error occurs
-     */
-    String preview(String documentStringReference, String fileName, boolean filterStyles);
-
-    /**
-     * Builds a preview of the specified office attachment in xhtml/1.0 syntax.
-     * 
-     * @param documentReference reference to the document holding the attachment to be previewed
-     * @param fileName the office file name
-     * @param filterStyles whether office document styles should be filtered
-     * @return preview of the specified office attachment or {@code null} if an error occurs
-     */
-    String preview(DocumentReference documentReference, String fileName, boolean filterStyles);
+    String preview(AttachmentReference attachmentReference);
 
     /**
      * Builds a preview of the specified office attachment in xhtml/1.0 syntax.
      * 
      * @param attachmentReference reference to the attachment to be previewed
-     * @param filterStyles whether office document styles should be filtered
+     * @param parameters preview parameters specific to the underlying {@link OfficePreviewBuilder} implementation
      * @return preview of the specified office attachment or {@code null} if an error occurs
      */
-    String preview(AttachmentReference attachmentReference, boolean filterStyles);
+    String preview(AttachmentReference attachmentReference, Map<String, String> parameters);
 
     /**
      * @return the exception caught during the last preview on the current execution, or {@code null} if no exception
      *         has been thrown
      */
     Exception getCaughtException();
+
+    /**
+     * Checks if a given mime type is supported.
+     * 
+     * @param mimeType a mime type
+     * @return {@code true} if the specified mime type can be previewed, {@code false} otherwise
+     */
+    boolean isMimeTypeSupported(String mimeType);
 }

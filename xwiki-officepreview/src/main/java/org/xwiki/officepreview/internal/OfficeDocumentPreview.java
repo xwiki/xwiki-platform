@@ -57,10 +57,10 @@ public class OfficeDocumentPreview implements DisposableCacheValue
     /**
      * Creates a new {@link OfficeDocumentPreview} instance.
      * 
-     * @param attachmentReference reference to the attachment to which this preview belongs.
-     * @param version version of the attachment to which this preview corresponds.
-     * @param xdom {@link XDOM} holding the preview document syntax.
-     * @param temporaryFiles temporary files that belongs to this preview.
+     * @param attachmentReference reference to the attachment to which this preview belongs
+     * @param version version of the attachment to which this preview corresponds
+     * @param xdom {@link XDOM} holding the preview document syntax
+     * @param temporaryFiles temporary files that belongs to this preview
      */
     public OfficeDocumentPreview(AttachmentReference attachmentReference, String version, XDOM xdom,
         Set<File> temporaryFiles)
@@ -73,6 +73,8 @@ public class OfficeDocumentPreview implements DisposableCacheValue
 
     /**
      * {@inheritDoc}
+     * 
+     * @see DisposableCacheValue#dispose()
      */
     public void dispose() throws Exception
     {
@@ -83,7 +85,7 @@ public class OfficeDocumentPreview implements DisposableCacheValue
     }
 
     /**
-     * @return reference to the attachment to which this preview belongs to.
+     * @return reference to the attachment to which this preview belongs to
      */
     public AttachmentReference getAttachmentReference()
     {
@@ -91,7 +93,7 @@ public class OfficeDocumentPreview implements DisposableCacheValue
     }
 
     /**
-     * @return version of the attachment to which this preview corresponds.
+     * @return version of the attachment to which this preview corresponds
      */
     public String getVersion()
     {
@@ -99,7 +101,7 @@ public class OfficeDocumentPreview implements DisposableCacheValue
     }
 
     /**
-     * @return {@link XDOM} holding the preview document syntax.
+     * @return {@link XDOM} holding the preview document syntax
      */
     public XDOM getXDOM()
     {

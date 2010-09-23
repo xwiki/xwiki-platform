@@ -26,6 +26,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 
 import junit.framework.Assert;
 
@@ -67,9 +68,19 @@ public class DefaultOfficePreviewBuilderTest extends AbstractMockingComponentTes
     private static final String STRING_ATTACHMENT_REFERENCE = "xwiki:Main.Test@Test.doc";
 
     /**
+     * The cache key corresponding to {@link #STRING_ATTACHMENT_REFERENCE} and {@link #DEFAULT_PREVIEW_PARAMETERS}.
+     */
+    private static final String PREVIEW_CACHE_KEY = STRING_ATTACHMENT_REFERENCE + "/0";
+
+    /**
      * Attachment version to be used in tests.
      */
     private static final String ATTACHMENT_VERSION = "1.1";
+
+    /**
+     * Default preview parameters.
+     */
+    private static final Map<String, String> DEFAULT_PREVIEW_PARAMETERS = Collections.emptyMap();
 
     /**
      * The {@link DefaultOfficePreviewBuilder} instance being tested.
@@ -149,7 +160,7 @@ public class DefaultOfficePreviewBuilderTest extends AbstractMockingComponentTes
                 oneOf(entityReferenceSerializer).serialize(ATTACHMENT_REFERENCE);
                 will(returnValue(STRING_ATTACHMENT_REFERENCE));
 
-                oneOf(previewCache).get(STRING_ATTACHMENT_REFERENCE);
+                oneOf(previewCache).get(PREVIEW_CACHE_KEY);
                 will(returnValue(null));
 
                 oneOf(documentAccessBridge).getAttachmentReferences(ATTACHMENT_REFERENCE.getDocumentReference());
@@ -158,11 +169,10 @@ public class DefaultOfficePreviewBuilderTest extends AbstractMockingComponentTes
         });
 
         try {
-            defaultOfficePreviewBuilder.build(ATTACHMENT_REFERENCE, true);
+            defaultOfficePreviewBuilder.build(ATTACHMENT_REFERENCE, DEFAULT_PREVIEW_PARAMETERS);
             Assert.fail("Expected exception.");
-        } catch (Exception ex) {
-            Assert.assertEquals(String.format("Attachment [%s] does not exist.", STRING_ATTACHMENT_REFERENCE), ex
-                .getMessage());
+        } catch (Exception e) {
+            Assert.assertEquals(String.format("Attachment [%s] does not exist.", ATTACHMENT_REFERENCE), e.getMessage());
         }
     }
 
@@ -185,7 +195,7 @@ public class DefaultOfficePreviewBuilderTest extends AbstractMockingComponentTes
                 oneOf(entityReferenceSerializer).serialize(ATTACHMENT_REFERENCE);
                 will(returnValue(STRING_ATTACHMENT_REFERENCE));
 
-                oneOf(previewCache).get(STRING_ATTACHMENT_REFERENCE);
+                oneOf(previewCache).get(PREVIEW_CACHE_KEY);
                 will(returnValue(null));
 
                 oneOf(documentAccessBridge).getAttachmentReferences(ATTACHMENT_REFERENCE.getDocumentReference());
@@ -203,14 +213,14 @@ public class DefaultOfficePreviewBuilderTest extends AbstractMockingComponentTes
                 will(returnValue(attachmentContent));
 
                 oneOf(officeDocumentBuilder).build(attachmentContent, ATTACHMENT_REFERENCE.getName(),
-                    ATTACHMENT_REFERENCE.getDocumentReference(), true);
+                    ATTACHMENT_REFERENCE.getDocumentReference(), false);
                 will(returnValue(xdomOfficeDocument));
 
-                oneOf(previewCache).set(with(STRING_ATTACHMENT_REFERENCE), with(aNonNull(OfficeDocumentPreview.class)));
+                oneOf(previewCache).set(with(PREVIEW_CACHE_KEY), with(aNonNull(OfficeDocumentPreview.class)));
             }
         });
 
-        defaultOfficePreviewBuilder.build(ATTACHMENT_REFERENCE, true);
+        defaultOfficePreviewBuilder.build(ATTACHMENT_REFERENCE, DEFAULT_PREVIEW_PARAMETERS);
     }
 
     /**
@@ -231,7 +241,7 @@ public class DefaultOfficePreviewBuilderTest extends AbstractMockingComponentTes
                 oneOf(entityReferenceSerializer).serialize(ATTACHMENT_REFERENCE);
                 will(returnValue(STRING_ATTACHMENT_REFERENCE));
 
-                oneOf(previewCache).get(STRING_ATTACHMENT_REFERENCE);
+                oneOf(previewCache).get(PREVIEW_CACHE_KEY);
                 will(returnValue(officeDocumentPreview));
 
                 oneOf(documentAccessBridge).getAttachmentReferences(ATTACHMENT_REFERENCE.getDocumentReference());
@@ -242,7 +252,7 @@ public class DefaultOfficePreviewBuilderTest extends AbstractMockingComponentTes
             }
         });
 
-        Assert.assertNotNull(defaultOfficePreviewBuilder.build(ATTACHMENT_REFERENCE, true));
+        Assert.assertNotNull(defaultOfficePreviewBuilder.build(ATTACHMENT_REFERENCE, DEFAULT_PREVIEW_PARAMETERS));
     }
 
     /**
@@ -267,7 +277,7 @@ public class DefaultOfficePreviewBuilderTest extends AbstractMockingComponentTes
                 oneOf(entityReferenceSerializer).serialize(ATTACHMENT_REFERENCE);
                 will(returnValue(STRING_ATTACHMENT_REFERENCE));
 
-                oneOf(previewCache).get(STRING_ATTACHMENT_REFERENCE);
+                oneOf(previewCache).get(PREVIEW_CACHE_KEY);
                 will(returnValue(officeDocumentPreview));
 
                 oneOf(documentAccessBridge).getAttachmentReferences(ATTACHMENT_REFERENCE.getDocumentReference());
@@ -281,20 +291,20 @@ public class DefaultOfficePreviewBuilderTest extends AbstractMockingComponentTes
         getMockery().checking(new Expectations()
         {
             {
-                oneOf(previewCache).remove(STRING_ATTACHMENT_REFERENCE);
+                oneOf(previewCache).remove(PREVIEW_CACHE_KEY);
 
                 oneOf(documentAccessBridge).getAttachmentContent(ATTACHMENT_REFERENCE);
                 will(returnValue(attachmentContent));
 
                 oneOf(officeDocumentBuilder).build(attachmentContent, ATTACHMENT_REFERENCE.getName(),
-                    ATTACHMENT_REFERENCE.getDocumentReference(), true);
+                    ATTACHMENT_REFERENCE.getDocumentReference(), false);
                 will(returnValue(xdomOfficeDocument));
 
-                oneOf(previewCache).set(with(STRING_ATTACHMENT_REFERENCE), with(aNonNull(OfficeDocumentPreview.class)));
+                oneOf(previewCache).set(with(PREVIEW_CACHE_KEY), with(aNonNull(OfficeDocumentPreview.class)));
             }
         });
 
-        Assert.assertNotNull(defaultOfficePreviewBuilder.build(ATTACHMENT_REFERENCE, true));
+        Assert.assertNotNull(defaultOfficePreviewBuilder.build(ATTACHMENT_REFERENCE, DEFAULT_PREVIEW_PARAMETERS));
     }
 
     /**

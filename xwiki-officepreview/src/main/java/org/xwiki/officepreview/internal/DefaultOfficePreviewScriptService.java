@@ -20,7 +20,9 @@
 package org.xwiki.officepreview.internal;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 
 import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.component.annotation.Component;
@@ -28,11 +30,7 @@ import org.xwiki.component.annotation.Requirement;
 import org.xwiki.component.logging.AbstractLogEnabled;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.context.Execution;
-import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.AttachmentReference;
-import org.xwiki.model.reference.DocumentReference;
-import org.xwiki.model.reference.EntityReference;
-import org.xwiki.model.reference.EntityReferenceResolver;
 import org.xwiki.officepreview.OfficePreviewBuilder;
 import org.xwiki.officepreview.OfficePreviewScriptService;
 import org.xwiki.rendering.block.Block;
@@ -55,6 +53,16 @@ public class DefaultOfficePreviewScriptService extends AbstractLogEnabled implem
     private static final List<String> PRESENTATION_FORMATS = Arrays.asList("ppt", "pptx", "odp");
 
     /**
+     * The list of supported mime types, i.e. the mime types that can be previewed.
+     */
+    private static final List<String> SUPPORTED_MIME_TYPES =
+        Arrays.asList("application/msword", "application/powerpoint", "application/vnd.ms-powerpoint",
+            "application/vnd.ms-excel", "application/vnd.oasis.opendocument",
+            "application/vnd.oasis.opendocument.text", "application/vnd.oasis.opendocument.graphics",
+            "application/vnd.oasis.opendocument.presentation", "application/vnd.oasis.opendocument.spreadsheet",
+            "application/vnd.oasis.opendocument.chart", "application/vnd.oasis.opendocument.formula");
+
+    /**
      * The key used to save on the execution context the exception caught during office document preview.
      */
     private static final String OFFICE_PREVIEW_EXCEPTION = "officePreview.caughtException";
@@ -70,12 +78,6 @@ public class DefaultOfficePreviewScriptService extends AbstractLogEnabled implem
      */
     @Requirement
     private Execution execution;
-
-    /**
-     * The component used to parse string entity references.
-     */
-    @Requirement("explicit")
-    private EntityReferenceResolver<String> explicitStringEntityReferenceResolver;
 
     /**
      * The component used to check access rights on the document holding the office attachment to be previewed.
@@ -96,45 +98,20 @@ public class DefaultOfficePreviewScriptService extends AbstractLogEnabled implem
     /**
      * {@inheritDoc}
      * 
-     * @see OfficePreviewScriptService#preview(String, boolean)
+     * @see OfficePreviewScriptService#preview(AttachmentReference)
      */
-    public String preview(String attachmentStringReference, boolean filterStyles)
+    public String preview(AttachmentReference attachmentReference)
     {
-        EntityReference entityReference =
-            explicitStringEntityReferenceResolver.resolve(attachmentStringReference, EntityType.ATTACHMENT,
-                documentAccessBridge.getCurrentDocumentReference());
-        return preview(new AttachmentReference(entityReference), filterStyles);
+        Map<String, String> parameters = Collections.emptyMap();
+        return preview(attachmentReference, parameters);
     }
 
     /**
      * {@inheritDoc}
      * 
-     * @see OfficePreviewScriptService#preview(String, String, boolean)
+     * @see OfficePreviewScriptService#preview(AttachmentReference, java.util.Map)
      */
-    public String preview(String documentStringReference, String fileName, boolean filterStyles)
-    {
-        EntityReference entityReference =
-            explicitStringEntityReferenceResolver.resolve(documentStringReference, EntityType.DOCUMENT,
-                documentAccessBridge.getCurrentDocumentReference());
-        return preview(new DocumentReference(entityReference), fileName, filterStyles);
-    }
-
-    /**
-     * {@inheritDoc}
-     * 
-     * @see OfficePreviewScriptService#preview(DocumentReference, String, boolean)
-     */
-    public String preview(DocumentReference documentReference, String fileName, boolean filterStyles)
-    {
-        return preview(new AttachmentReference(fileName, documentReference), filterStyles);
-    }
-
-    /**
-     * {@inheritDoc}
-     * 
-     * @see OfficePreviewScriptService#preview(AttachmentReference, boolean)
-     */
-    public String preview(AttachmentReference attachmentReference, boolean filterStyles)
+    public String preview(AttachmentReference attachmentReference, Map<String, String> parameters)
     {
         // Clear previous caught exception.
         execution.getContext().removeProperty(OFFICE_PREVIEW_EXCEPTION);
@@ -149,13 +126,23 @@ public class DefaultOfficePreviewScriptService extends AbstractLogEnabled implem
             OfficePreviewBuilder officePreviewBuilder = componentManager.lookup(OfficePreviewBuilder.class, hint);
 
             // Build the preview and render the result.
-            return render(officePreviewBuilder.build(attachmentReference, filterStyles), "xhtml/1.0");
+            return render(officePreviewBuilder.build(attachmentReference, parameters), "xhtml/1.0");
         } catch (Exception e) {
             // Save caught exception.
             execution.getContext().setProperty(OFFICE_PREVIEW_EXCEPTION, e);
             getLogger().error("Failed to preview office document: " + attachmentReference, e);
             return null;
         }
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see OfficePreviewScriptService#isMimeTypeSupported(String)
+     */
+    public boolean isMimeTypeSupported(String mimeType)
+    {
+        return SUPPORTED_MIME_TYPES.contains(mimeType);
     }
 
     /**

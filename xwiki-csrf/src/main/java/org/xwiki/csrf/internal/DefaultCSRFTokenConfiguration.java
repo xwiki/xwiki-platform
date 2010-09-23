@@ -17,13 +17,13 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.csrftoken.internal;
+package org.xwiki.csrf.internal;
 
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.Requirement;
 import org.xwiki.component.logging.AbstractLogEnabled;
 import org.xwiki.configuration.ConfigurationSource;
-import org.xwiki.csrftoken.CSRFTokenConfiguration;
+import org.xwiki.csrf.CSRFTokenConfiguration;
 
 /**
  * Get configuration data from the XWiki properties file. Supported options:
@@ -37,7 +37,7 @@ import org.xwiki.csrftoken.CSRFTokenConfiguration;
 @Component
 public class DefaultCSRFTokenConfiguration extends AbstractLogEnabled implements CSRFTokenConfiguration
 {
-    /** Prefix for the configuration keys for the {@link org.xwiki.csrftoken.CSRFToken} component. */
+    /** Prefix for the configuration keys for the {@link org.xwiki.csrf.CSRFToken} component. */
     private static final String PREFIX = "core.csrftoken.";
 
     /** Main XWiki properties configuration source. */

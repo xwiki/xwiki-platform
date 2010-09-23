@@ -20,7 +20,7 @@
  */
 package com.xpn.xwiki.web;
 
-import org.xwiki.csrftoken.CSRFToken;
+import org.xwiki.csrf.CSRFToken;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;

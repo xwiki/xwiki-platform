@@ -17,7 +17,7 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.csrftoken.internal;
+package org.xwiki.csrf.internal;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
@@ -41,8 +41,8 @@ import org.xwiki.container.Container;
 import org.xwiki.container.Request;
 import org.xwiki.container.servlet.ServletRequest;
 import org.xwiki.container.servlet.filters.SavedRequestManager;
-import org.xwiki.csrftoken.CSRFToken;
-import org.xwiki.csrftoken.CSRFTokenConfiguration;
+import org.xwiki.csrf.CSRFToken;
+import org.xwiki.csrf.CSRFTokenConfiguration;
 import org.xwiki.model.reference.DocumentReference;
 
 /**

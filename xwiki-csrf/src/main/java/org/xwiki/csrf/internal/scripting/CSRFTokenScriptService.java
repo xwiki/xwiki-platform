@@ -17,12 +17,12 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.csrftoken.internal.scripting;
+package org.xwiki.csrf.internal.scripting;
 
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.Requirement;
 import org.xwiki.component.logging.AbstractLogEnabled;
-import org.xwiki.csrftoken.CSRFToken;
+import org.xwiki.csrf.CSRFToken;
 import org.xwiki.script.service.ScriptService;
 
 /**

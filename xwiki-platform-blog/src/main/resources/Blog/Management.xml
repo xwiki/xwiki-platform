@@ -65,14 +65,13 @@
     #end
     #set($title = $escapetool.url($title))
     #set($parent = 'Main.WebHome')
-    $response.sendRedirect($xwiki.getURL($blogDocName, 'save', "parent=${parent}&amp;title=${escapetool.url($title)}&amp;template=${blogTemplate}&amp;${blogClassname}_0_title=${escapetool.url($title)}&amp;form_token=$!{request.getParameter('form_token')}"))
+    $response.sendRedirect($xwiki.getURL($blogDocName, 'save', "parent=${parent}&amp;title=${escapetool.url($title)}&amp;template=${blogTemplate}&amp;${blogClassname}_0_title=${escapetool.url($title)}"))
   #end
 #end
 ##
 ## Show the form
 &lt;form action="${xwiki.getURL('Blog.Management')}" id="newBlog" method="post"&gt;
 &lt;div&gt;
-  &lt;input type="hidden" name="form_token" value="$!{services.csrf.getToken()}" /&gt;
 &lt;dl&gt;
   &lt;dt&gt;&lt;label for="blogSpace"&gt;$msg.get('xe.blog.manage.space')&lt;/label&gt;&lt;/dt&gt;
   &lt;dd&gt;&lt;input type="text" name="blogSpace" id="blogSpace" value=""/&gt;&lt;/dd&gt;

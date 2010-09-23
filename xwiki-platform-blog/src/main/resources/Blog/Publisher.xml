@@ -32,7 +32,7 @@
 #end
 #set($entryName = "$!{request.entryName}")
 #if($entryName != '')
-  #if($xwiki.hasAccessLevel('edit', $xcontext.user, $entryName) &amp;&amp; $!{services.csrf.isTokenValid("$!{request.getParameter('form_token')}")})
+  #if($xwiki.hasAccessLevel('edit', $xcontext.user, $entryName))
     #set($entryDoc = $xwiki.getDocument($entryName))
     #if ($entryDoc)
       #getEntryObject($entryDoc $entryObj)

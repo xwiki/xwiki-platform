@@ -103,7 +103,6 @@
 <content>#largepanelheader($msg.get("addobject"))
 &lt;form id="objectadd" method="post" action="$doc.getURL("objectadd")" onsubmit="cancelCancelEdit()"&gt;
 &lt;p&gt;
-&lt;input type="hidden" name="form_token" value="$!{services.csrf.getToken()}" /&gt;
 &lt;input type="hidden" name="xredirect" value="$doc.getURL("edit", "editor=object")" /&gt;
 &lt;select name="classname" size="1"&gt;
 &lt;option value="---"&gt;$msg.get("selectclass")&lt;/option&gt;

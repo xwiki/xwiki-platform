@@ -91,7 +91,6 @@
 {{html}}
 &lt;form action="$xwiki.requestURL" enctype="multipart/form-data" method="post"&gt;
 &lt;fieldset&gt;
-&lt;input type="hidden" name="form_token" value="$!{services.csrf.getToken()}" /&gt;
 
   ## Does not really make sense to reindex the whole farm from a subwiki
   #if ($xcontext.isMainWiki())

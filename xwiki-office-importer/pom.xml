@@ -145,4 +145,9 @@
       </plugin>
     </plugins>
   </build>
+  <properties>
+    <!-- Skip Clirr execution because we renamed this module and its previous version is not matched anymore.
+      Remove once XE 2.5M2 is released. -->
+    <xwiki.clirr.skip>true</xwiki.clirr.skip>
+  </properties>
 </project>

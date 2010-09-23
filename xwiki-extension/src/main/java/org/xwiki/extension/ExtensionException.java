@@ -22,7 +22,7 @@ package org.xwiki.extension;
 /**
  * Any exception raised in the XWiki Extension Manager must raise an exception of this type.
  * 
- * @version $Id: ExtensionException.java 29083 2010-06-01 09:17:13Z tmortagne $
+ * @version $Id$
  */
 public class ExtensionException extends Exception
 {

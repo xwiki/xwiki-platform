@@ -15,7 +15,7 @@ import org.xwiki.test.AbstractComponentTestCase;
 /**
  * Unit tests for {@link ObservationManager}.
  * 
- * @version $Id: ObservationManagerTest.java 24733 2009-10-27 16:56:41Z tmortagne $
+ * @version $Id$
  */
 public class ObservationManagerEventListenerTest extends AbstractComponentTestCase
 {

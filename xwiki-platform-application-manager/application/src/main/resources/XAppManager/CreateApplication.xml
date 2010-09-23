@@ -94,7 +94,6 @@
 ##
 &lt;form method="get" action=""&gt;
   &lt;div&gt;
-    &lt;input type="hidden" name="form_token" value="$!{services.csrf.getToken()}" /&gt;
     &lt;input type="hidden" name="action" value="create" /&gt;
     &lt;dl&gt;
       &lt;dt&gt;&lt;label for="XAppClasses.XWikiApplicationClass_0_appname"&gt;$msg.get("xapp.appname")&lt;/label&gt;&lt;/dt&gt;

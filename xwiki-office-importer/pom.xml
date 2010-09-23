@@ -27,7 +27,7 @@
     <artifactId>xwiki-core-parent</artifactId>
     <version>2.5-SNAPSHOT</version>
   </parent>
-  <artifactId>xwiki-core-officeimporter</artifactId>
+  <artifactId>xwiki-core-office-importer</artifactId>
   <name>XWiki Platform - Core - Office Importer</name>
   <packaging>jar</packaging>
   <description>XWiki Platform - Core - Office Importer</description>

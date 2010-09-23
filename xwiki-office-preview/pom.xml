@@ -29,7 +29,7 @@
   </parent>
   <modelVersion>4.0.0</modelVersion>
   <groupId>org.xwiki.platform</groupId>
-  <artifactId>xwiki-core-officepreview</artifactId>
+  <artifactId>xwiki-core-office-preview</artifactId>
   <name>XWiki Platform - Core - Office Preview</name>
   <description>A module providing support for previewing office documents attached to wiki pages.</description>
   <dependencies>
@@ -55,7 +55,7 @@
     </dependency>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-core-officeimporter</artifactId>
+      <artifactId>xwiki-core-office-importer</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>

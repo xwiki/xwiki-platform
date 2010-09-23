@@ -774,7 +774,7 @@
     </dependency>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-core-officeimporter</artifactId>
+      <artifactId>xwiki-core-office-importer</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>

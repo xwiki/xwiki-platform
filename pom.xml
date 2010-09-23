@@ -156,8 +156,8 @@
     <module>xwiki-configuration</module>
     <module>xwiki-query</module>
     <module>xwiki-webdav</module>
-    <module>xwiki-officeimporter</module>
-    <module>xwiki-officepreview</module>
+    <module>xwiki-office-importer</module>
+    <module>xwiki-office-preview</module>
     <module>xwiki-rest</module>
     <module>xwiki-rest-model</module>
     <module>xwiki-refactoring</module>

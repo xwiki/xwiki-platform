@@ -1,0 +1,366 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xwikidoc>
+<web>ExtensionManager</web>
+<name>WebHome</name>
+<language></language>
+<defaultLanguage>en</defaultLanguage>
+<translation>0</translation>
+<parent></parent>
+<creator>XWiki.Admin</creator>
+<author>XWiki.Admin</author>
+<customClass></customClass>
+<contentAuthor>XWiki.Admin</contentAuthor>
+<creationDate>1284043167000</creationDate>
+<date>1285234299000</date>
+<contentUpdateDate>1285234299000</contentUpdateDate>
+<version>1.1</version>
+<title>Extension Manager</title>
+<template></template>
+<defaultTemplate></defaultTemplate>
+<validationScript></validationScript>
+<comment></comment>
+<minorEdit>false</minorEdit>
+<syntaxId>xwiki/2.0</syntaxId>
+<hidden>false</hidden>
+<object>
+<class>
+<name>XWiki.ConfigurableClass</name>
+<customClass></customClass>
+<customMapping></customMapping>
+<defaultViewSheet></defaultViewSheet>
+<defaultEditSheet></defaultEditSheet>
+<defaultWeb></defaultWeb>
+<nameField></nameField>
+<validationScript></validationScript>
+<codeToExecute>
+<disabled>0</disabled>
+<editor>---</editor>
+<name>codeToExecute</name>
+<number>7</number>
+<picker>0</picker>
+<prettyName>codeToExecute</prettyName>
+<rows>5</rows>
+<size>40</size>
+<unmodifiable>0</unmodifiable>
+<validationMessage></validationMessage>
+<validationRegExp></validationRegExp>
+<classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+</codeToExecute>
+<configurationClass>
+<disabled>0</disabled>
+<name>configurationClass</name>
+<number>3</number>
+<picker>0</picker>
+<prettyName>configurationClass</prettyName>
+<size>30</size>
+<unmodifiable>0</unmodifiable>
+<validationMessage></validationMessage>
+<validationRegExp></validationRegExp>
+<classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+</configurationClass>
+<configureGlobally>
+<defaultValue></defaultValue>
+<disabled>0</disabled>
+<displayFormType>checkbox</displayFormType>
+<displayType></displayType>
+<name>configureGlobally</name>
+<number>4</number>
+<prettyName>configureGlobally</prettyName>
+<unmodifiable>0</unmodifiable>
+<validationMessage></validationMessage>
+<validationRegExp></validationRegExp>
+<classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+</configureGlobally>
+<displayInSection>
+<disabled>0</disabled>
+<name>displayInSection</name>
+<number>1</number>
+<picker>0</picker>
+<prettyName>displayInSection</prettyName>
+<size>30</size>
+<unmodifiable>0</unmodifiable>
+<validationMessage></validationMessage>
+<validationRegExp></validationRegExp>
+<classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+</displayInSection>
+<heading>
+<disabled>0</disabled>
+<name>heading</name>
+<number>2</number>
+<picker>0</picker>
+<prettyName>heading</prettyName>
+<size>30</size>
+<unmodifiable>0</unmodifiable>
+<validationMessage></validationMessage>
+<validationRegExp></validationRegExp>
+<classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+</heading>
+<iconAttachment>
+<disabled>0</disabled>
+<name>iconAttachment</name>
+<number>8</number>
+<picker>0</picker>
+<prettyName>iconAttachment</prettyName>
+<size>30</size>
+<unmodifiable>0</unmodifiable>
+<validationMessage></validationMessage>
+<validationRegExp></validationRegExp>
+<classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+</iconAttachment>
+<linkPrefix>
+<disabled>0</disabled>
+<name>linkPrefix</name>
+<number>5</number>
+<picker>0</picker>
+<prettyName>linkPrefix</prettyName>
+<size>30</size>
+<unmodifiable>0</unmodifiable>
+<validationMessage></validationMessage>
+<validationRegExp></validationRegExp>
+<classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+</linkPrefix>
+<propertiesToShow>
+<cache>0</cache>
+<disabled>0</disabled>
+<displayType>input</displayType>
+<multiSelect>1</multiSelect>
+<name>propertiesToShow</name>
+<number>6</number>
+<picker>0</picker>
+<prettyName>propertiesToShow</prettyName>
+<relationalStorage>1</relationalStorage>
+<separator> </separator>
+<separators> ,|</separators>
+<size>20</size>
+<sort>none</sort>
+<unmodifiable>0</unmodifiable>
+<validationMessage></validationMessage>
+<validationRegExp></validationRegExp>
+<values></values>
+<classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+</propertiesToShow>
+</class>
+<name>ExtensionManager.WebHome</name>
+<number>0</number>
+<className>XWiki.ConfigurableClass</className>
+<guid>cef8c7cf-fecf-42cc-9e95-8a3be6ce936b</guid>
+<property>
+<codeToExecute>{{include document="ExtensionManager.WebHome" /}}</codeToExecute>
+</property>
+<property>
+<configurationClass></configurationClass>
+</property>
+<property>
+<configureGlobally>1</configureGlobally>
+</property>
+<property>
+<displayInSection>Extensions</displayInSection>
+</property>
+<property>
+<heading></heading>
+</property>
+<property>
+<iconAttachment></iconAttachment>
+</property>
+<property>
+<linkPrefix></linkPrefix>
+</property>
+<property>
+<propertiesToShow/>
+</property>
+</object>
+<content>{{warning}}
+This application is experimental, use it at your own risk.
+{{/warning}}
+
+{{velocity}}
+#set($extensionManager = $services.extension)
+#set($versionManager = $extensionManager.versionManager)
+{{/velocity}}
+
+{{velocity}}
+{{html}}
+&lt;form action="$xwiki.requestURL" enctype="multipart/form-data" method="post"&gt;
+&lt;fieldset&gt;
+
+  &lt;p&gt;
+    &lt;label for="extensionid"&gt;Extension identifier&lt;/label&gt;
+    &lt;input id="extensionid" name="extensionid" type="text" title="Extension identifier (&amp;lt;groupid&amp;gt;:&amp;lt;artefactid&amp;gt; for a maven extension)" #if($request.extensionid)value="${escapetool.xml($request.extensionid)}"#end /&gt;
+  &lt;/p&gt;
+
+  &lt;p&gt;
+    &lt;label for="extensionversion"&gt;Extension version&lt;/label&gt;
+    &lt;input id="extensionversion" name="extensionversion" type="text" title="Extension version" #if($request.extensionversion)value="${escapetool.xml($request.extensionversion)}"#end /&gt;
+  &lt;/p&gt;
+
+  &lt;span class="buttonwrapper"&gt;&lt;input type="submit" value="Resolve" name="actionresolve" class="button"/&gt;&lt;/span&gt;
+  #if ($hasProgramming)
+  &lt;span class="buttonwrapper"&gt;&lt;input type="submit" value="Install" name="actioninstall" class="button"/&gt;&lt;/span&gt;
+  #end
+
+&lt;/fieldset&gt;
+&lt;/form&gt;
+{{/html}}
+{{/velocity}}
+
+{{velocity}}
+#if ($request.actionresolve)
+  = Resolve
+
+  #macro(resolveExtension $extensionid $extensionversion $extensionlevel)
+    #set($extension = $extensionManager.resolve($extensionid, $extensionversion))
+    #set($extensionclass = "${extension.class}")
+    #foreach($index in [1..$extensionlevel])*#end #if($extensionclass.endsWith('CoreExtension'))**C**#elseif($extensionclass.endsWith('LocalExtension'))**I**#else**R**#end $extension.id ($extension.version#if($extensionversion != $extension.version) was $extensionversion#end)
+    #resolveExtensionDependencies($extension)
+  #end
+  #macro(resolveExtensionDependencies $extension $extensionlevel)
+    #set($extensionlevel = $extensionlevel + 1)
+    #foreach ($dependency in $extension.dependencies)
+      #resolveExtension($dependency.id, $dependency.version, $extensionlevel)
+    #end
+    #set($extensionlevel = $extensionlevel - 1)
+  #end
+  #resolveExtension($request.extensionid, $request.extensionversion, 1)
+
+  **C**: core extension
+  **I**: installed extension
+  **R**: remote extension
+#elseif($request.actioninstall)
+  = Install
+
+  #if($request.confirm)
+    #set($extension = $extensionManager.install($request.extensionid, $request.extensionversion))
+  #else
+    #macro(prepareInstall $extensionid $extensionversion $extensionsToInstall $extensionsToUpgrade $extensionsSuggested, $coreExtensionsConflicts)
+      #set($extension = $extensionManager.resolve($extensionid, $extensionversion))
+      #set($extensionclass = "${extension.class}")
+      #if (!$extensionclass.endsWith('CoreExtension') &amp;&amp; !$extensionclass.endsWith('LocalExtension'))
+        #if ($extensionManager.getInstalledExtension($extensionid))
+          #set($void = $extensionsToUpgrade.add($extension))
+        #else
+          #set($void = $extensionsToInstall.add($extension))
+        #end
+      #elseif ($extensionclass.endsWith('CoreExtension') &amp;&amp; $versionManager.compareVersions($extensionversion, $extension.version) &gt; 0)
+        #set($void = $coreExtensionsConflicts.add([$extension,$extensionversion]))
+      #end
+      #prepareInstallDependencies($extension, $extensionsToInstall, $extensionsToUpgrade, $extensionsSuggested)
+    #end
+    #macro(prepareInstallDependencies $extension $extensionsToInstall $extensionsToUpgrade $extensionsSuggested, $coreExtensionsConflicts)
+      #foreach ($dependency in $extension.dependencies)
+        #prepareInstall($dependency.id, $dependency.version, $extensionsToInstall, $extensionsToUpgrade, $extensionsSuggested)
+      #end
+    #end
+    #set($extensionsToInstall = [])
+    #set($extensionsToUpgrade = [])
+    #set($extensionsSuggested = [])
+    #set($coreExtensionsConflicts = [])
+    #prepareInstall($request.extensionid $request.extensionversion $extensionsToInstall $extensionsToUpgrade $extensionsSuggested, $coreExtensionsConflicts)
+    #if ($extensionsToInstall.empty &amp;&amp; $extensionsToUpgrade.empty)
+      Already installed
+    #else
+      #if (!$extensionsToInstall.empty)
+        The following new extensions will be installed:
+        #foreach ($extension in $extensionsToInstall)
+          * $extension.id ($extension.version)
+        #end
+
+      #end
+      #if (!$extensionsToUpgrade.empty)
+        The following extensions will be upgraded:
+        #foreach ($extension in $extensionsToUpgrade)
+          * $extension.id ($extension.version)
+        #end
+
+      #end
+      #if (!$extensionsSuggested.empty)
+        Suggested:
+        #foreach ($extension in $extensionsSuggested)
+          * $extension.id ($extension.version)
+        #end
+
+      #end
+      #if (!$coreExtensionsConflicts.empty)
+        {{warning}}
+          Conflict with core extensions:
+          #foreach ($conflict in $coreExtensionsConflicts)
+            * extension **$conflict.get(0).id** is needed in version **$conflict.get(1)** but core extension has version **$conflict.get(0).version**
+          #end
+
+          Are you sure you want to install ?
+        {{/warning}}
+
+      #end
+      {{html}}
+      &lt;form action="$xwiki.requestURL" enctype="multipart/form-data" method="get"&gt;
+        &lt;fieldset&gt;
+          &lt;input name="extensionid" value="${escapetool.xml($request.extensionid)}" type="hidden" /&gt;
+          &lt;input name="extensionversion" value="${escapetool.xml($request.extensionversion)}" type="hidden" /&gt;
+          &lt;input name="actioninstall" type="hidden" /&gt;
+          &lt;span class="buttonwrapper"&gt;&lt;input type="submit" value="Apply" name="confirm" class="button"/&gt;&lt;/span&gt;
+        &lt;/fieldset&gt;
+      &lt;/form&gt;
+      {{/html}}
+    #end
+  #end
+#elseif($request.actionuninstall)
+  = Uninstall
+
+  #if($request.confirm)
+    #set($extension = $extensionManager.uninstall($request.extensionid))
+  #else
+    #macro(prepareUninstall $extensionid $extensionsToUninstall)
+      #set($void = $extensionsToUninstall.add($extensionid))
+      #set($backwardDependencies = $extensionManager.getBackwardDependencies($extensionid))
+      #prepareUninstallBackwardDependencies($backwardDependencies, $extensionsToUninstall)
+    #end
+    #macro(prepareUninstallBackwardDependencies $backwardDependencies $extensionsToUninstall)
+      #foreach ($backwardDependency in $backwardDependencies)
+        #prepareUninstall($backwardDependency.id, $extensionsToUninstall)
+      #end
+    #end
+    #set($extensionsToUninstall = [])
+    #prepareUninstall($request.extensionid $extensionsToUninstall)
+    #if ($extensionsToUninstall.empty)
+      Extension does not exists
+    #else
+      The following extensions will be removed:
+      #foreach ($extensionid in $extensionsToUninstall)
+        * $extensionid
+      #end
+
+      {{html}}
+      &lt;form action="$xwiki.requestURL" enctype="multipart/form-data" method="get"&gt;
+        &lt;fieldset&gt;
+          &lt;input name="extensionid" value="${escapetool.xml($request.extensionid)}" type="hidden" /&gt;
+          &lt;input name="extensionversion" value="${escapetool.xml($request.extensionversion)}" type="hidden" /&gt;
+          &lt;input name="actionuninstall" type="hidden" /&gt;
+          &lt;span class="buttonwrapper"&gt;&lt;input type="submit" value="Apply" name="confirm" class="button"/&gt;&lt;/span&gt;
+        &lt;/fieldset&gt;
+      &lt;/form&gt;
+      {{/html}}
+    #end
+  #end
+#end
+{{/velocity}}
+
+{{velocity}}
+= Installed extensions
+
+#set($extensions = $extensionManager.installedExtensions)
+|=Id|=Version|=Type#if ($hasProgramming)
+|=Actions
+#end
+#foreach($extension in $extensions)
+|$extension.id#if ($hasProgramming)
+|$extension.version|$extension.type|{{html clean="false"}}
+      &lt;form action="$xwiki.requestURL" enctype="multipart/form-data" method="post"&gt;
+        &lt;fieldset&gt;
+          &lt;input name="extensionid" value="${escapetool.xml($extension.id)}" type="hidden" /&gt;
+          &lt;input name="extensionversion" value="${escapetool.xml($extension.version)}" type="hidden" /&gt;
+          &lt;span class="buttonwrapper"&gt;&lt;input type="submit" value="Uninstall" name="actionuninstall" class="button"/&gt;&lt;/span&gt;
+        &lt;/fieldset&gt;
+      &lt;/form&gt;
+      {{/html}}
+#end
+#end
+{{/velocity}}</content></xwikidoc>

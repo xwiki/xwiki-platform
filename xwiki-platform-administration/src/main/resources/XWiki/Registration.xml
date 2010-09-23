@@ -534,7 +534,6 @@ $heading
   {{html clean=false wiki=false}}
     &lt;form id="register" action="" method="post"&gt;
     &lt;div&gt;
-    &lt;input type="hidden" name="form_token" value="$!{services.csrf.getToken()}" /&gt;
     #generateHtml($fields, $fieldMandatoryStar, $failureMessageParams)
     &lt;div class="wikimodel-emptyline"&gt;&lt;/div&gt;
     &lt;span class="buttonwrapper"&gt;
@@ -686,16 +685,11 @@ $heading
  * @param $doAfterRegistration code block to run after registration completes successfully.
  *###
 #macro(createUser, $fields, $request, $response, $doAfterRegistration)
-  ## CSRF check
-  #if(${services.csrf.isTokenValid("$!{request.getParameter('form_token')}")})
-    ## See if email verification is required and register the user.
-    #if($xwiki.getXWikiPreferenceAsInt('use_email_verification', 0) == 1)
-      #set($reg = $xwiki.createUser(true))
-    #else
-      #set($reg = $xwiki.createUser(false))
-    #end
+  ## See if email verification is required and register the user.
+  #if($xwiki.getXWikiPreferenceAsInt('use_email_verification', 0) == 1)
+    #set($reg = $xwiki.createUser(true))
   #else
-    $response.sendRedirect("$!{services.csrf.getResubmissionURL()}")
+    #set($reg = $xwiki.createUser(false))
   #end
   ##
   ## Handle output from the registration.
@@ -747,7 +741,6 @@ $heading
       {{html clean=false wiki=false}}
         &lt;form id="loginForm" action="$loginURL" method="post"&gt;
           &lt;div&gt;
-          &lt;input type="hidden" name="form_token" value="$!{services.csrf.getToken()}" /&gt;
           &lt;input id="j_username" name="j_username" type="hidden" value="$escapetool.xml($!userName)" /&gt;
           &lt;input id="j_password" name="j_password" type="hidden" value="$escapetool.xml($!password)" /&gt;
           &lt;input id="$redirectParam" name="$redirectParam" type="hidden" value="$escapetool.xml($redirect)" /&gt;

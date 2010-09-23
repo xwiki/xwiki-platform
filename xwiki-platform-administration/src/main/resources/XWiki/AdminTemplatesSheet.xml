@@ -28,7 +28,6 @@
 {{html}}
   &lt;form action="$doc.getURL('create')" method="post"&gt;
     &lt;div&gt;
-      &lt;input type="hidden" name="form_token" value="$!{services.csrf.getToken()}" /&gt;
       &lt;input type="hidden" name="parent" value="XWiki.TemplateProviderClass"/&gt;
       &lt;input type="hidden" name="template" value="XWiki.TemplateProviderTemplate"/&gt;
       &lt;label for="space"&gt;$msg.get('admin.templates.createprovider.space')&lt;/label&gt;

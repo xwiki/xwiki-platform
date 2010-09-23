@@ -86,7 +86,6 @@ window.addNewMember = function(uorg, name)
      if(name) 
      {
              var url = "$doc.getURL("view")" + "?xpage=adduorg" + "&amp;" + "uorg=" + uorg + "&amp;" + "name=" + name;
-             url += "&amp;form_token=$!{services.csrf.getToken()}";
              new Ajax.Request(url, 
              {
                method: 'get',

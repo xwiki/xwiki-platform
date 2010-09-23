@@ -216,7 +216,7 @@
  * control for choosing the parent category among existing categories.
  *###
 ## DO NOT CHANGE INDENTATION
-#macro(addCategoryForm) &lt;form action="$doc.getURL()" method="post" class="category-add-form"&gt;&lt;div class='create-category'&gt; &lt;input type="hidden" name="form_token" value="$!{services.csrf.getToken()}" /&gt; &lt;input type="hidden" name="xaction" value="create"/&gt; &lt;label&gt;$msg.get("xe.blog.categories.new")&lt;br/&gt; &lt;input type="text" name="newCategoryName" class="category-name-input"&gt;&lt;/input&gt;&lt;/label&gt;&lt;br/&gt;#if("$!{request.parentCategory}" == "")&lt;label&gt;#* $msg.get("xe.blog.categories.parent")*# Subcategory of:&lt;br/&gt; &lt;select name="newCategoryParent" id="blog_category_selectBox" class="category-add-input"&gt; &lt;option value="${defaultCategoryParent}" selected="selected"&gt;None&lt;/option&gt; $!processedCategories.clear() #displayCategoriesHierarchy($tree 'option') &lt;/select&gt; &lt;br/&gt;&lt;/label&gt;#else&lt;input type="hidden" name="newCategoryParent" value="${escapetool.xml($request.parentCategory)}"/&gt;#end&lt;span class="buttonwrapper"&gt;&lt;input class="button" type="submit" value="Add"&gt;&lt;/input&gt;&lt;/span&gt; &lt;a href="$doc.getURL()"&gt;Cancel&lt;/a&gt; &lt;/div&gt;&lt;/form&gt; #end
+#macro(addCategoryForm) &lt;form action="$doc.getURL()" method="post" class="category-add-form"&gt;&lt;div class='create-category'&gt; &lt;input type="hidden" name="xaction" value="create"/&gt; &lt;label&gt;$msg.get("xe.blog.categories.new")&lt;br/&gt; &lt;input type="text" name="newCategoryName" class="category-name-input"&gt;&lt;/input&gt;&lt;/label&gt;&lt;br/&gt;#if("$!{request.parentCategory}" == "")&lt;label&gt;#* $msg.get("xe.blog.categories.parent")*# Subcategory of:&lt;br/&gt; &lt;select name="newCategoryParent" id="blog_category_selectBox" class="category-add-input"&gt; &lt;option value="${defaultCategoryParent}" selected="selected"&gt;None&lt;/option&gt; $!processedCategories.clear() #displayCategoriesHierarchy($tree 'option') &lt;/select&gt; &lt;br/&gt;&lt;/label&gt;#else&lt;input type="hidden" name="newCategoryParent" value="${escapetool.xml($request.parentCategory)}"/&gt;#end&lt;span class="buttonwrapper"&gt;&lt;input class="button" type="submit" value="Add"&gt;&lt;/input&gt;&lt;/span&gt; &lt;a href="$doc.getURL()"&gt;Cancel&lt;/a&gt; &lt;/div&gt;&lt;/form&gt; #end
 ##
 ##
 ##
@@ -226,7 +226,6 @@
 ## DO NOT CHANGE INDENTATION
 #macro(renameCategoryForm)##
 &lt;form action="$doc.getURL()" method="post" class="category-rename-form"&gt;&lt;div class='rename-category'&gt;##
-&lt;input type="hidden" name="form_token" value="$!{services.csrf.getToken()}" /&gt;
 &lt;input type="hidden" name="xaction" value="rename"/&gt;##
 &lt;input type="hidden" name="category" value="${escapetool.xml($request.category)}"/&gt;##
 &lt;label&gt;$msg.get("xe.blog.categories.newName")&lt;br/&gt; &lt;input type="text" name="newCategoryName" class="category-name-input"&gt;&lt;/input&gt;&lt;/label&gt;&lt;br/&gt;##
@@ -255,7 +254,7 @@
 &lt;span class="blog-category-tools"&gt;##
 #if($xwiki.hasAccessLevel('delete', $xcontext.user, $name) &amp;&amp; ("$!{request.xaction}" != 'showRenameCategory' || "$!{request.category}" != $name))&lt;a href="$xwiki.getURL('Blog.ManageCategories', 'view', "xaction=showRenameCategory&amp;amp;category=$nameUrl")" class="tool rename"&gt;#toolImage('pencil' 'Rename ')&lt;/a&gt;#end ##
 #if($xwiki.hasAccessLevel('edit', $xcontext.user, $doc.fullName) &amp;&amp; ("$!{request.xaction}" != "showAddCategory" || "$!{request.parentCategory}" != $name))&lt;a href="$xwiki.getURL('Blog.ManageCategories', 'view', "xaction=showAddCategory&amp;amp;parentCategory=$nameUrl")" class="tool add-subcategory"&gt;#toolImage('chart_organisation_add' 'Add a subcategory ')&lt;/a&gt; #end ##
-#if($xwiki.hasAccessLevel('delete', $xcontext.user, $name)) &lt;a href="$xwiki.getURL('Blog.ManageCategories', 'view', "xaction=delete&amp;amp;category=$nameUrl&amp;amp;form_token=$!{services.csrf.getToken()}")" class="tool delete"&gt;#toolImage('cross' 'Delete ')&lt;/a&gt;#end ##
+#if($xwiki.hasAccessLevel('delete', $xcontext.user, $name)) &lt;a href="$xwiki.getURL('Blog.ManageCategories', 'view', "xaction=delete&amp;amp;category=$nameUrl")" class="tool delete"&gt;#toolImage('cross' 'Delete ')&lt;/a&gt;#end ##
 &lt;/span&gt;##
 #if($xwiki.hasAccessLevel('edit', $xcontext.user, $doc.fullName) &amp;&amp; "$!{request.xaction}" == "showRenameCategory" &amp;&amp; "$!{request.category}" == $name) #renameCategoryForm() #end##
 #if($xwiki.hasAccessLevel('edit', $xcontext.user, $doc.fullName) &amp;&amp; "$!{request.xaction}" == "showAddCategory" &amp;&amp; "$!{request.parentCategory}" == $name) #addCategoryForm() #end##
@@ -347,7 +346,6 @@ $escapetool.xml($!categoryDoc.getObject(${blogCategoryClassname}).getProperty('d
  *###
 #macro(showCreateCategoryBox $tree)
   &lt;div class='create-category'&gt;
-    &lt;input type="hidden" name="form_token" value="$!{services.csrf.getToken()}" /&gt;
     &lt;input type="hidden" name="xaction" value="create"/&gt;
     &lt;label&gt;$msg.get("xe.blog.categories.new") &lt;input type="text" name="newCategoryName"&gt;&lt;/input&gt;&lt;/label&gt;
     &lt;label&gt;$msg.get("xe.blog.categories.parent")
@@ -397,7 +395,7 @@ $escapetool.xml($!categoryDoc.getObject(${blogCategoryClassname}).getProperty('d
   #end
   #set($query = "${query}obj.name = doc.fullName and obj.className = '${blogCategoryClassname}' and doc.fullName &lt;&gt; 'Blog.CategoryTemplate' and doc.parent = ? order by doc.name")
   #foreach($item in $xwiki.searchDocuments($query, $parameterValues))
-    #if($xwiki.hasAccessLevel('edit', $xcontext.user, $item) &amp;&amp; $!{services.csrf.isTokenValid("$!{request.getParameter('form_token')}")})
+    #if($xwiki.hasAccessLevel('edit', $xcontext.user, $item))
       #set($subcategoryDoc = $xwiki.getDocument($item))
       $subcategoryDoc.setParent($categoryParent)
       $subcategoryDoc.save($msg.get('xe.blog.manageCategories.comment.updatedParent'), true)
@@ -409,7 +407,7 @@ $escapetool.xml($!categoryDoc.getObject(${blogCategoryClassname}).getProperty('d
   #end
   #set($query = "${query}obj.name = doc.fullName and obj.className = '${blogPostClassname}' and doc.fullName &lt;&gt; 'Blog.BlogPostTemplate' and categories.id.id = obj.id and categories.id.name = 'category' and category = ? order by doc.name")
   #foreach($item in $xwiki.searchDocuments($query, $parameterValues))
-    #if($xwiki.hasAccessLevel('edit', $xcontext.user, $item) &amp;&amp; $!{services.csrf.isTokenValid("$!{request.getParameter('form_token')}")})
+    #if($xwiki.hasAccessLevel('edit', $xcontext.user, $item))
       #set($blogEntryDoc = $xwiki.getDocument($item))
       #set($discard = $blogEntryDoc.getObject(${blogPostClassname}).getProperty('category').value.remove($category))
       $blogEntryDoc.save($msg.get('xe.blog.manageCategories.comment.removedDeletedCategory'), true)
@@ -433,7 +431,7 @@ $escapetool.xml($!categoryDoc.getObject(${blogCategoryClassname}).getProperty('d
   #set($query = ', BaseObject obj where ')
   #set($query = "${query}obj.name = doc.fullName and obj.className = '${blogCategoryClassname}' and doc.fullName &lt;&gt; 'Blog.CategoryTemplate' and doc.parent = ? order by doc.name")
   #foreach($item in $xwiki.searchDocuments($query, $parameterValues))
-    #if($xwiki.hasAccessLevel('edit', $xcontext.user, $item) &amp;&amp; $!{services.csrf.isTokenValid("$!{request.getParameter('form_token')}")})
+    #if($xwiki.hasAccessLevel('edit', $xcontext.user, $item))
       #set($subcategoryDoc = $xwiki.getDocument($item))
       $subcategoryDoc.setParent($newCategoryDoc.fullName)
       $subcategoryDoc.save($msg.get('xe.blog.manageCategories.comment.updatedParent'), true)
@@ -442,18 +440,16 @@ $escapetool.xml($!categoryDoc.getObject(${blogCategoryClassname}).getProperty('d
   #set($query = ', BaseObject obj, DBStringListProperty categories join categories.list as category where ')
   #set($query = "${query}obj.name = doc.fullName and obj.className = '${blogPostClassname}' and doc.fullName &lt;&gt; 'Blog.BlogPostTemplate' and categories.id.id = obj.id and categories.id.name = 'category' and category = ? order by doc.name")
   #foreach($item in $xwiki.searchDocuments($query, $parameterValues))
-    #if($xwiki.hasAccessLevel('edit', $xcontext.user, $item) &amp;&amp; $!{services.csrf.isTokenValid("$!{request.getParameter('form_token')}")})
+    #if($xwiki.hasAccessLevel('edit', $xcontext.user, $item))
       #set($blogEntryDoc = $xwiki.getDocument($item))
       #set($discard = $blogEntryDoc.getObject(${blogPostClassname}).getProperty('category').value.remove($category))
       #set($discard = $blogEntryDoc.getObject(${blogPostClassname}).getProperty('category').value.add($newCategoryDoc.fullName))
       $blogEntryDoc.save($msg.get('xe.blog.manageCategories.comment.updatedRenamedCategory'), true)
     #end
   #end
-  #if ($!{services.csrf.isTokenValid("$!{request.getParameter('form_token')}")})
-    $categoryDoc.getObject('Blog.CategoryClass').set('name', $newCategoryName)
-    $categoryDoc.save($msg.get('xe.blog.manageCategories.comment.updatedCategory'), true)
-    $categoryDoc.rename($newCategoryName)
-  #end
+  $categoryDoc.getObject('Blog.CategoryClass').set('name', $newCategoryName)
+  $categoryDoc.save($msg.get('xe.blog.manageCategories.comment.updatedCategory'), true)
+  $categoryDoc.rename($newCategoryName)
 #end
 {{/velocity}}</content>
 </xwikidoc>

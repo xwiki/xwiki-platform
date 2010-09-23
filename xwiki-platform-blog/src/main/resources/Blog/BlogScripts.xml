@@ -244,7 +244,7 @@ XWiki.Blog = {
     var parentCategory = this.newCategoryParent.value;
     var parentSpace = encodeURI(parentCategory.substring(0, parentCategory.indexOf(".")));
     var parent = encodeURI(parentCategory);
-    new Ajax.Request("${xwiki.getURL('__name__', 'save', "ajax=1&amp;template=${blogCategoryTemplate}&amp;form_token=$!{services.csrf.getToken()}")}".replace(/__name__/g, safeName) + "&amp;parent=" + parent + "&amp;title=" + title + "&amp;${blogCategoryClassname}_0_name=" + title, {
+    new Ajax.Request("${xwiki.getURL('__name__', 'save', "ajax=1&amp;template=${blogCategoryTemplate}")}".replace(/__name__/g, safeName) + "&amp;parent=" + parent + "&amp;title=" + title + "&amp;${blogCategoryClassname}_0_name=" + title, {
       method: "get",
       onSuccess: XWiki.Blog.updateCategoryTree.bindAsEventListener(this, name, parentCategory, parentSpace),
       on1223: function(response) {response.request.options.onSuccess(response)},

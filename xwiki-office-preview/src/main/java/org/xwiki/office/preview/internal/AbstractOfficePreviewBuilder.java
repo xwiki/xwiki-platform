@@ -17,7 +17,7 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.officepreview.internal;
+package org.xwiki.office.preview.internal;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -39,7 +39,7 @@ import org.xwiki.container.Container;
 import org.xwiki.model.reference.AttachmentReference;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReferenceSerializer;
-import org.xwiki.officepreview.OfficePreviewBuilder;
+import org.xwiki.office.preview.OfficePreviewBuilder;
 import org.xwiki.rendering.block.XDOM;
 
 /**

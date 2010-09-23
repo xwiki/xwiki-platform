@@ -17,7 +17,7 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.officepreview.internal;
+package org.xwiki.office.preview.internal;
 
 import java.io.File;
 import java.io.InputStream;
@@ -38,7 +38,7 @@ import org.xwiki.rendering.transformation.TransformationContext;
 import org.xwiki.rendering.transformation.TransformationManager;
 
 /**
- * Implementation of {@link org.xwiki.officepreview.OfficePreviewBuilder} which is responsible for building previews of
+ * Implementation of {@link org.xwiki.office.preview.OfficePreviewBuilder} which is responsible for building previews of
  * office presentations.
  * 
  * @since 2.5M2

@@ -310,7 +310,6 @@ $msg.get("xe.officeimporter.import.splitting.naming") : &lt;/span&gt;&lt;select 
 &lt;/label&gt;
 &lt;/p&gt;&lt;p class="help_message"&gt;$msg.get("xe.officeimporter.import.help.splitting")&lt;/p&gt;
 &lt;input type="hidden" name="groovyFilter" value="" /&gt;
-&lt;input type="hidden" name="form_token" value="$!{services.csrf.getToken()}" /&gt;
 &lt;/div&gt;
 &lt;div class="office_importer_buttons"&gt;&lt;span class="buttonwrapper"&gt;&lt;input type="submit" value="$msg.get('xe.officeimporter.import.import')" class="button"/&gt;&lt;/span&gt;&lt;/div&gt;
 &lt;/form&gt;

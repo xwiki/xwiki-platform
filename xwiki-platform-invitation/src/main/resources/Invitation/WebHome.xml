@@ -737,9 +737,7 @@ $xwiki.get('ssx').use($config.get('commonPage'))
     #set($messageBody = '')
   #end
   ##
-  #if("$!request.get('sendMail')" != ''
-      &amp;&amp; $request.getMethod().toLowerCase() == 'post'
-      &amp;&amp; ${services.csrf.isTokenValid("$!{request.getParameter('form_token')}")})
+  #if("$!request.get('sendMail')" != '' &amp;&amp; $request.getMethod().toLowerCase() == 'post')
     #generateAndSendMail($config,
                          $recipients,
                          $subjectLine,
@@ -991,7 +989,6 @@ $xwiki.get('ssx').use($config.get('commonPage'))
 
   {{html clean="false" wiki="false"}}
   &lt;form id="invitation-sender-form" action="$doc.getURL('view')" method="post" class="invitation"&gt;
-   &lt;div class="hidden"&gt;&lt;input type="hidden" name="form_token" value="$!{services.csrf.getToken()}" /&gt;&lt;/div&gt;
    &lt;dl&gt;
     ## Who you are inviting:
     &lt;dt&gt;&lt;label for="recipients"&gt;$msg.get('xe.invitation.toLabel')&lt;/label&gt;&lt;/dt&gt;

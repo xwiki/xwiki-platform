@@ -307,7 +307,6 @@ $xwiki.jsfx.use('js/xwiki/actionbuttons/actionButtons.js', true)
 {{html wiki="true"}}
 &lt;form id="search_XWiki.SearchConfig" method="post" action="${searchConfigDoc.getURL('save')}" onsubmit="cancelCancelEdit()"&gt;
 &lt;fieldset&gt;
-&lt;input type="hidden" name="form_token" value="$!{services.csrf.getToken()}" /&gt;
 
 &lt;p&gt;
 &lt;label for="XWiki.SearchConfigClass_0_engine"&gt;$searchEnginePropertyClass.prettyName&lt;/label&gt;

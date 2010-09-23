@@ -95,7 +95,6 @@ $xwiki.jsx.use("Workstream.Javascript") ## Inject JS using SX
 &lt;div align="right" class="chars-left-container"&gt;&lt;span id="workstream-chars-left" class="chars-left-regular"&gt;&lt;/span&gt;$msg.get('workstream.charsleft')&lt;/div&gt;
 &lt;textarea id="workstream-status-box" name="status" cols="80" onkeyup="countCharsLeft()"; maxlength="$maxChars"&gt;$msg.get('workstream.whatareyouworkingon')&lt;/textarea&gt;
 &lt;div&gt;
-&lt;input type="hidden" name="form_token" value="$!{services.csrf.getToken()}" /&gt;
 &lt;/div&gt;
 &lt;br /&gt;
 &lt;span class="buttonwrapper"&gt;

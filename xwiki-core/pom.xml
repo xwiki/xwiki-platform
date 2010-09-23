@@ -792,7 +792,7 @@
     </dependency>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-core-csrftoken</artifactId>
+      <artifactId>xwiki-core-csrf</artifactId>
       <version>${pom.version}</version>
     </dependency>
 

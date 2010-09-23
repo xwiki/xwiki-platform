@@ -29,10 +29,10 @@
     <artifactId>xwiki-core-parent</artifactId>
     <version>2.5-SNAPSHOT</version>
   </parent>
-  <artifactId>xwiki-core-csrftoken</artifactId>
-  <name>XWiki Platform - Core - CSRF Token</name>
+  <artifactId>xwiki-core-csrf</artifactId>
+  <name>XWiki Platform - Core - CSRF</name>
   <packaging>jar</packaging>
-  <description>XWiki Platform - Core - CSRF Token</description>
+  <description>XWiki CSRF Protection Module</description>
   <properties>
     <!-- Skip Clirr execution, since this is a new component -->
     <xwiki.clirr.skip>true</xwiki.clirr.skip>

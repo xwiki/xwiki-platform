@@ -169,7 +169,7 @@
     <module>xwiki-annotations</module>
     <module>xwiki-management</module>
     <module>xwiki-crypto</module>
-    <module>xwiki-csrftoken</module>
+    <module>xwiki-csrf</module>
     <module>xwiki-extension</module>
   </modules>
   <profiles>

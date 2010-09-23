@@ -345,7 +345,6 @@
      $('wikinamevalidation').innerHTML = "$MSG_ERROR_WIKINAMEEMPTY";
    
      var surl = "$ISWIKINAMEAVAILABLE" + "?xpage=plain&amp;ajax=1&amp;wikiname=" + escape(wikiname);
-     surl += "&amp;form_token=$!{services.csrf.getToken()}";
      new Ajax.Request(surl,
                {
                  method: 'get',
@@ -590,7 +589,6 @@
       &lt;br /&gt;
       #if ($request.stepbystep) &lt;input type="hidden" name="stepbystep" value="$request.stepbystep" /&gt; #end
       #if ($request.doc) &lt;input type="hidden" name="doc" value="$request.doc" /&gt; #end
-      &lt;input type="hidden" name="form_token" value="$!{services.csrf.getToken()}" /&gt;
       &lt;input class="button" type="submit" id="actioncreatebutton" name="actioncreate" value="${msg.get("create")}" onclick="return validate();" /&gt;
     &lt;/div&gt;
   &lt;/div&gt;

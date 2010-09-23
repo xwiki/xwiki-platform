@@ -159,6 +159,13 @@
       <version>${wagon.providers.version}</version>
     </dependency>
     
+    <!-- Scripting -->
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-core-bridge</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    
     <!-- Test dependencies -->
     <dependency>
       <groupId>org.xwiki.platform</groupId>

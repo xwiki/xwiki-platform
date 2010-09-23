@@ -1,0 +1,16 @@
+org.xwiki.extension.internal.DefaultExtensionManager
+org.xwiki.extension.internal.DefaultExtensionManagerConfiguration
+org.xwiki.extension.internal.DefaultVersionManager
+org.xwiki.extension.internal.script.ExtensionManagerScriptService
+org.xwiki.extension.install.internal.DefaultExtensionHandlerManager
+org.xwiki.extension.install.internal.jar.JarExtensionHandler
+org.xwiki.extension.install.internal.jar.DefaultJarExtensionClassLoader
+org.xwiki.extension.install.internal.jar.JarExtensionExecutionContextInitializer
+org.xwiki.extension.install.internal.jar.JarHandlerApplicationStartedListener
+org.xwiki.extension.repository.internal.DefaultExtensionRepositoryManager
+org.xwiki.extension.repository.internal.DefaultLocalExtensionRepository
+org.xwiki.extension.repository.internal.DefaultCoreExtensionRepository
+org.xwiki.extension.repository.internal.ConfigurationExtensionRepositorySource
+org.xwiki.extension.repository.internal.aether.AetherExtensionRepositoryFactory
+org.xwiki.extension.repository.internal.aether.configuration.DefaultAetherConfiguration
+org.xwiki.extension.repository.internal.plexus.DefaultPlexusComponentManager

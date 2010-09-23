@@ -30,7 +30,6 @@
     <version>34</version>
     <relativePath>../pom</relativePath>
   </parent>
-  <groupId>org.xwiki.platform</groupId>
   <artifactId>xwiki-core-parent</artifactId>
   <name>XWiki Platform - Core - Parent POM</name>
   <packaging>pom</packaging>
@@ -171,6 +170,7 @@
     <module>xwiki-management</module>
     <module>xwiki-crypto</module>
     <module>xwiki-csrftoken</module>
+    <module>xwiki-extension</module>
   </modules>
   <profiles>
     <profile>

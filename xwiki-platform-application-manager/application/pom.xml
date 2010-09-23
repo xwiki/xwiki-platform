@@ -35,7 +35,7 @@
   <packaging>xar</packaging>
   <description>Manages creation and installation of XWiki Applications</description>
   <properties>
-    <platform.plugin.applicationmanager.version>1.14-SNAPSHOT</platform.plugin.applicationmanager.version>
+    <platform.plugin.applicationmanager.version>1.14</platform.plugin.applicationmanager.version>
   </properties>
   <dependencies>
     <dependency>

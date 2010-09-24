@@ -28,7 +28,7 @@ import org.xwiki.csrf.CSRFTokenConfiguration;
 /**
  * Get configuration data from the XWiki properties file. Supported options:
  * <ul>
- *   <li>"core.csrftoken.enabled", default = false</li>
+ *   <li>"core.csrf.enabled", default = false</li>
  * </ul>
  * 
  * @version $Id$
@@ -38,7 +38,7 @@ import org.xwiki.csrf.CSRFTokenConfiguration;
 public class DefaultCSRFTokenConfiguration extends AbstractLogEnabled implements CSRFTokenConfiguration
 {
     /** Prefix for the configuration keys for the {@link org.xwiki.csrf.CSRFToken} component. */
-    private static final String PREFIX = "core.csrftoken.";
+    private static final String PREFIX = "core.csrf.";
 
     /** Main XWiki properties configuration source. */
     @Requirement("xwikiproperties")

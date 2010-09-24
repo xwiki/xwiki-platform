@@ -692,8 +692,9 @@ body.hideright #footerglobal {
   display: block;
   font-size: .85em;
   font-weight: 700;
-  margin: 10px 0;
+  margin: 10px 0 4px;
   text-transform: uppercase;
+  color: $theme.textSecondaryColor;
 }
 
 #xwikidoctitleinput, .metamodifs input[type="text"], .alleditcontent #parentinput input {

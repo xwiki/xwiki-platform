@@ -4,7 +4,7 @@
 #template("startpage.vm")
 <div class="main layoutsubsection">
 <div id="mainContentArea">
-#xwikimessageboxstart("$!msg.get('warning')" "$!msg.get('csrftoken.confirmation')")
+#xwikimessageboxstart("$!msg.get('warning')" "$!msg.get('csrf.confirmation')")
 #set($resubmit = "$!{escapetool.xml($request.getParameter('resubmit'))}")
 #set($xback = "$!{escapetool.xml($request.getParameter('xback'))}")
 <form action="$resubmit" method="post">

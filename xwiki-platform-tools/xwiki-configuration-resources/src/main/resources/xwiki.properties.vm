@@ -284,5 +284,5 @@
 #-#   1: Enabled
 #-#
 #-# Default value is 0
-# core.csrftoken.enabled = 0
+# core.csrf.enabled = 0
 

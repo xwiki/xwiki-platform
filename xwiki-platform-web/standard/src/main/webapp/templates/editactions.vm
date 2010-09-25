@@ -1,6 +1,7 @@
 ### Buttons displayed in the edit interface: cancel, preview (when enabled), save and continue, save and view.
 ###
 #if ("$!showactions" != '0')
+  $xwiki.jsfx.use('js/xwiki/actionbuttons/actionButtons.js', true)
   #set ($keyboardShortcutsEnabled = ($editor != 'wysiwyg'))
   ## This allows the preview form to redirect back to the correct editor when pressing "Back to edit":
   <div class="metamodifs">

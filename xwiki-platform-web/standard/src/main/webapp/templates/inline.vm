@@ -1,5 +1,4 @@
 $xwiki.jsfx.use('js/scriptaculous/scriptaculous.js')
-$xwiki.jsfx.use('js/xwiki/actionbuttons/actionButtons.js', true)
 #if((!$request.editor) || ($request.editor.trim() == ""))
   #set($editor = "inline")
 #else

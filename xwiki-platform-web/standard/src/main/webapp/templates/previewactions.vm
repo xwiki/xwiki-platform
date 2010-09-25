@@ -1,6 +1,7 @@
 ### Buttons displayed in the preview interface: cancel, back to edit, save and continue, save and view.
 ###
 #if("$!showactions" != '0')
+  $xwiki.jsfx.use('js/xwiki/actionbuttons/actionButtons.js', true)
   #set($backToEditAction = "$!{request.xeditaction}")
   #if($backToEditAction == '')
     #set($backToEditAction = 'edit')

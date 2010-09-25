@@ -23,6 +23,8 @@ XWiki.editors.AutoSave = Class.create({
   enabled: false,
   /** If enabled, how frequent are the savings */
   frequency: 5, // minutes
+  /** Disabled text opacity **/
+  disabledOpacity: 0.2,
   /** Initialization */
   initialize : function() {
     if(!(this.form = $("xwikieditcontent")) || !(this.form = this.form.up("form"))) {
@@ -64,14 +66,14 @@ XWiki.editors.AutoSave = Class.create({
    */
   createUIElements : function() {
     // Checkbox to enable/disable the autosave
-    this.autosaveCheckbox = new Element('input', {type: "checkbox", checked: this.enabled});
+    this.autosaveCheckbox = new Element('input', {type: "checkbox", checked: this.enabled, name: "doAutosave", id: "doAutosave"});
     // Input for setting the autosave frequency
     this.autosaveInput = new Element('input', {type: "text", value: this.frequency, size : "2", "class": "autosave-frequency"});
     // Labels
-    var autosaveLabel = new Element('label');
+    var autosaveLabel = new Element('label', {'class': 'autosave', 'for' : "doAutosave"});
     autosaveLabel.appendChild(this.autosaveCheckbox);
     autosaveLabel.appendChild(document.createTextNode(" Autosave"));
-    var frequencyLabel = new Element('label');
+    var frequencyLabel = new Element('label', {'class': 'frequency'});
     frequencyLabel.appendChild(document.createTextNode("every "));
     frequencyLabel.appendChild(this.autosaveInput);
     this.timeUnit = new Element('span');
@@ -79,15 +81,16 @@ XWiki.editors.AutoSave = Class.create({
     frequencyLabel.appendChild(document.createTextNode(" "));
     frequencyLabel.appendChild(this.timeUnit);
     if (!this.enabled) {
-      frequencyLabel.addClassName('hidden');
+      frequencyLabel.setOpacity(this.disabledOpacity);
     }
     // A paragraph containing the whole thing
-    var container = new Element('p', {"id": "autosaveControl"});
+    var container = new Element('div', {"id": "autosaveControl"});
     container.appendChild(autosaveLabel);
     container.appendChild(document.createTextNode(" "));
     container.appendChild(frequencyLabel);
+    container.appendChild(document.createTextNode(" "));
     // Insert in the editing UI
-    $(document.body).down(".alleditcontent").insert({bottom : container});
+    $(document.body).down(".bottombuttons .buttons").insert({bottom : container});
     // If we keep the autosave control in the form, the fast back-forward is broken in FF, so we lose the edited content
     // when pressing the browser Back button, instead of the form Back to Edit. Catch the form submission and remove the
     // controls.
@@ -122,10 +125,10 @@ XWiki.editors.AutoSave = Class.create({
       this.enabled = this.autosaveCheckbox.checked;
       if (this.enabled) {
         this.startTimer();
-        this.autosaveInput.up("label").removeClassName("hidden");
+        this.autosaveInput.up("label").setOpacity('1.0');
       } else {
         this.stopTimer();
-        this.autosaveInput.up("label").addClassName("hidden");
+        this.autosaveInput.up("label").setOpacity(this.disabledOpacity);
       }
     }.bindAsEventListener(this));
     // Set autosave frequency

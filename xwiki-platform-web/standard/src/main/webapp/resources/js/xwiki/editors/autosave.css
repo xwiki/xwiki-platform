@@ -1,20 +1,23 @@
 #template('colorThemeInit.vm')
 #autosaveControl {
-  font-size: 80%;
-  font-weight: bold;
-  margin: 2px 16px;
+  display: inline;
+}
+#autosaveControl * {
+  vertical-align: text-bottom;
 }
 #autosaveControl input.autosave-frequency {
-  /* "Invisible" border. */
-  border: 1px solid $theme.pageContentBackgroundColor;
-  overflow: visible;
   text-align: center;
+  vertical-align: baseline;
+  padding-bottom: 0;
+  width: 2em;
 }
-#autosaveControl input.focused {
-  border: 1px solid $theme.borderColor;
-}
-/** Override toucan styles */
+
+/** Override Toucan styles */
 #body #autosaveControl label {
   display: inline;
+  margin: 0;
+}
+#body #autosaveControl label.frequency, #body #autosaveControl label.frequency span {
   text-transform: none;
+  font-weight: normal;
 }

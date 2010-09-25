@@ -42,7 +42,6 @@ $xwiki.ssfx.use('js/xwiki/editors/fullScreenEdit.css', true)##
   <input type="hidden" name="title" value="$!{escapetool.xml($request.title)}" />
 #end
 $cdoc.getRenderedContent()
-</div>  ## clear
 #set($editactions = "bottom")
 <div class="bottombuttons">#template("editactions.vm")</div>
 </div> ## form

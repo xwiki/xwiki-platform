@@ -2,6 +2,7 @@
 ###
 #if("$!showactions" != '0')
   $xwiki.jsfx.use('js/xwiki/actionbuttons/actionButtons.js', true)
+  $xwiki.ssfx.use('js/xwiki/actionbuttons/actionButtons.css', true)
   #set($backToEditAction = "$!{request.xeditaction}")
   #if($backToEditAction == '')
     #set($backToEditAction = 'edit')

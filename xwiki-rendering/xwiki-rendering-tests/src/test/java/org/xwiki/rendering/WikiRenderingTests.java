@@ -69,6 +69,7 @@ public class WikiRenderingTests extends TestCase
         suite.addTestsFromResource("link/links23", false);
         suite.addTestsFromResource("link/links25", false);
         suite.addTestsFromResource("link/links26", false);
+        suite.addTestsFromResource("link/links27", false);
 
         // Images
         suite.addTestsFromResource("image/image1", false);

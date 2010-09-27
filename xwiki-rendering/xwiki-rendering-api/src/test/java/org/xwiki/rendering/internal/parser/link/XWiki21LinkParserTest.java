@@ -85,6 +85,13 @@ public class XWiki21LinkParserTest extends AbstractXWikiLinkParserTest
         Assert.assertFalse(link.isTyped());
         Assert.assertEquals("page@alias", link.getReference());
         Assert.assertEquals("Typed = [false] Type = [doc] Reference = [page@alias]", link.toString());
+
+        // Verify path link types
+        link = parser.parse("path:/some/path");
+        Assert.assertEquals(LinkType.PATH, link.getType());
+        Assert.assertTrue(link.isTyped());
+        Assert.assertEquals("/some/path", link.getReference());
+        Assert.assertEquals("Typed = [true] Type = [path] Reference = [/some/path]", link.toString());
     }
 
     @Test

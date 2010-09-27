@@ -9,6 +9,7 @@ org.xwiki.rendering.internal.parser.link.URLLinkTypeParser
 org.xwiki.rendering.internal.parser.link.MailtoLinkTypeParser
 org.xwiki.rendering.internal.parser.link.ImageLinkTypeParser
 org.xwiki.rendering.internal.parser.link.AttachmentLinkTypeParser
+org.xwiki.rendering.internal.parser.link.PathLinkTypeParser
 org.xwiki.rendering.internal.parser.GenericImageParser
 org.xwiki.rendering.internal.parser.XWikiImageParser
 org.xwiki.rendering.internal.parser.DefaultAttachmentParser
@@ -42,6 +43,7 @@ org.xwiki.rendering.internal.renderer.xhtml.link.InterWikiXHTMLLinkTypeRenderer
 org.xwiki.rendering.internal.renderer.xhtml.link.DocumentXHTMLLinkTypeRenderer
 org.xwiki.rendering.internal.renderer.xhtml.link.URLXHTMLLinkTypeRenderer
 org.xwiki.rendering.internal.renderer.xhtml.link.AttachmentXHTMLLinkTypeRenderer
+org.xwiki.rendering.internal.renderer.xhtml.link.PathXHTMLLinkTypeRenderer
 org.xwiki.rendering.internal.renderer.event.EventRendererFactory
 org.xwiki.rendering.internal.renderer.event.EventRenderer
 org.xwiki.rendering.internal.renderer.event.EventBlockRenderer

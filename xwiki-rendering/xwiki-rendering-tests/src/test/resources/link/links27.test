@@ -1,0 +1,29 @@
+.#-----------------------------------------------------
+.input|xwiki/2.1
+.#-----------------------------------------------------
+[[path:/some/path]]
+.#-----------------------------------------------------
+.expect|event/1.0
+.#-----------------------------------------------------
+beginDocument
+beginParagraph
+beginLink [Typed = [true] Type = [path] Reference = [/some/path]] [false]
+endLink [Typed = [true] Type = [path] Reference = [/some/path]] [false]
+endParagraph
+endDocument
+.#-----------------------------------------------------
+.expect|annotatedxhtml/1.0
+.#-----------------------------------------------------
+<p><!--startwikilink:path:/some/path--><span class="wikiexternallink"><a href="/some/path"><span class="wikigeneratedlinkcontent">/some/path</span></a></span><!--stopwikilink--></p>
+.#-----------------------------------------------------
+.expect|xwiki/2.0
+.#-----------------------------------------------------
+[[path:/some/path]]
+.#-----------------------------------------------------
+.input|xhtml/1.0
+.#-----------------------------------------------------
+<html><p><!--startwikilink:path:/some/path--><span class="wikiexternallink"><a href="/some/path"><span class="wikigeneratedlinkcontent">/some/path</span></a></span><!--stopwikilink--></p></html>
+.#-----------------------------------------------------
+.expect|plain/1.0
+.#-----------------------------------------------------
+/some/path

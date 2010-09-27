@@ -45,4 +45,13 @@
     <system>jira</system>
     <url>http://jira.xwiki.org/jira/browse/XAPHOTO</url>
   </issueManagement>
+  <dependencies>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-core-parent</artifactId>
+      <version>[2.5-SNAPSHOT,)</version>
+      <type>pom</type>
+      <scope>runtime</scope>
+    </dependency>
+  </dependencies>
 </project>

@@ -42,6 +42,13 @@
       <version>1.2-SNAPSHOT</version>
       <scope>runtime</scope>
     </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-core-parent</artifactId>
+      <version>[2.5-SNAPSHOT,)</version>
+      <type>pom</type>
+      <scope>runtime</scope>
+    </dependency>
   </dependencies>
   <!-- We must configure SCM in each module. For more information see:
        http://svn.xwiki.org/svnroot/xwiki/platform/pom/trunk/pom.xml -->

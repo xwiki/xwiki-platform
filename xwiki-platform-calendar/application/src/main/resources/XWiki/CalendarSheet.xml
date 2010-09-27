@@ -43,7 +43,7 @@ $cview.getHTMLCalendar($cparams, "")
 
 #foreach($event in $doc.getObjects("XWiki.CalendarEvent"))
 &lt;div class="vevent"&gt;
-1.1.1 &lt;span class="summary"&gt;$event.title.replaceAll('\n', "")&lt;/span&gt; #if($hasedit) (&lt;a href="$doc.getURL("edit", "editor=object&amp;amp;classname=XWiki.CalendarEvent&amp;amp;nb=$event.number")"&gt;$msg.get("edit")&lt;/a&gt;, &lt;a href="$doc.getURL("objectremove", "classname=XWiki.CalendarEvent&amp;amp;classid=${event.number}&amp;amp;xredirect=$doc.getURL('view')")"&gt;$msg.get("delete")&lt;/a&gt;)#end
+1.1.1 &lt;span class="summary"&gt;$event.title.replaceAll('\n', "")&lt;/span&gt; #if($hasedit) (&lt;a href="$doc.getURL("edit", "editor=object&amp;amp;classname=XWiki.CalendarEvent&amp;amp;nb=$event.number")"&gt;$msg.get("edit")&lt;/a&gt;, &lt;a href="$doc.getURL("objectremove", "classname=XWiki.CalendarEvent&amp;amp;classid=${event.number}&amp;amp;xredirect=$doc.getURL('view')&amp;amp;form_token=$!{services.csrf.getToken()}")"&gt;$msg.get("delete")&lt;/a&gt;)#end
 
 &lt;div class="eventinfo"&gt;
 #if($event.category != "" &amp;&amp; $event.getProperty('category').value != "Other")
@@ -68,6 +68,7 @@ $cview.getHTMLCalendar($cparams, "")
 &lt;form action="$doc.getURL('objectadd')" method="get"&gt;
 &lt;div&gt;
 &lt;div class="hidden"&gt;
+&lt;input type="hidden" name="form_token" value="$!{services.csrf.getToken()}" /&gt;
 &lt;input type="hidden" name="classname" value="XWiki.CalendarEvent" /&gt;
 &lt;input type="hidden" name="xredirect" value="${doc.getURL('view')}" /&gt;
 &lt;/div&gt;

@@ -332,6 +332,7 @@ v7oibV0+qncSAAAAAElFTkSuQmCC</content></attachment>
 #if($hasAdmin &amp;&amp; $xcontext.isMainWiki())
 &lt;form action="$escapetool.xml($xwiki.requestURL)" enctype="multipart/form-data" method="post"&gt;
 &lt;div&gt;
+  &lt;input type="hidden" name="form_token" value="$!{services.csrf.getToken()}" /&gt;
   &lt;strong&gt;$msgActions&lt;/strong&gt;&lt;br/&gt;
   &lt;label for="action1" class="hidden"&gt;$actionStart&lt;/label&gt;
   &lt;input id="action1" name="action" type="radio" value="start" checked="checked"/&gt;$actionStart&lt;br/&gt;

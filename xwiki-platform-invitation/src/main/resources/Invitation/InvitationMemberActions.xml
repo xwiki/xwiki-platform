@@ -382,7 +382,7 @@ $xwiki.get('ssx').use($config.get('commonPage'))
             $msg.get('xe.invitation.doUserActionOnMultipleMessages.cancel.someMessagesNotFound',
                      [$mathtool.sub($messageIDs.size(), $messages.size()), $messageIDs.size()]){{error}})))
       #end
-    #elseif($confirm)
+    #elseif($confirm &amp;&amp; ${services.csrf.isTokenValid("$!{request.getParameter('form_token')}")})
       ## If the user accidently selected messages to which this action cannot be done, just skip over them.
       #set($changed = false)
       #foreach($message in $messages)
@@ -435,7 +435,7 @@ $xwiki.get('ssx').use($config.get('commonPage'))
         $msg.get('xe.invitation.doUserActionOnMultipleMessages.noMessagesFound')
       #end
       {{/error}})))
-    #elseif($confirm)
+    #elseif($confirm &amp;&amp; ${services.csrf.isTokenValid("$!{request.getParameter('form_token')}")})
       ## If the user accidently selected messages to which this action cannot be done, just skip over them.
       #set($changed = false)
       #foreach($message in $messages)

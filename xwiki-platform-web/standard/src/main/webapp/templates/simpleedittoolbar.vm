@@ -41,7 +41,7 @@
 #set($discard = $syntax20Elements.add(['velocity', '\n{{velocity}}\n', '\n{{/velocity}}\n', 'cog']))
 #if($doc.syntax.toIdString() == 'xwiki/1.0')
   #set($syntaxElements = $syntax10Elements)
-#elseif($doc.syntax.toIdString() == "xwiki/2.0")
+#elseif($doc.syntax.toIdString() == "xwiki/2.0" || $doc.syntax.toIdString() == "xwiki/2.1")
   #set($syntaxElements = $syntax20Elements)
 #end
 // <![CDATA[

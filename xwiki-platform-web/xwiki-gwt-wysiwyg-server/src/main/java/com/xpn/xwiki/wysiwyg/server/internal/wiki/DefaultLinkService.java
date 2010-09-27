@@ -30,7 +30,7 @@ import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.rendering.listener.Link;
 import org.xwiki.rendering.listener.LinkType;
 import org.xwiki.rendering.parser.LinkParser;
-import org.xwiki.rendering.renderer.LinkReferenceSerializer;
+import org.xwiki.rendering.renderer.link.LinkReferenceSerializer;
 
 import com.xpn.xwiki.wysiwyg.server.wiki.EntityReferenceConverter;
 import com.xpn.xwiki.wysiwyg.server.wiki.LinkService;
@@ -79,7 +79,7 @@ public class DefaultLinkService implements LinkService
     /**
      * The component used to serialize link references.
      */
-    @Requirement
+    @Requirement("xwiki/2.0")
     private LinkReferenceSerializer linkReferenceSerializer;
 
     /**
@@ -142,13 +142,17 @@ public class DefaultLinkService implements LinkService
         String relativeStringEntityReference)
     {
         Link link = new Link();
-        link.setType(entityType == org.xwiki.gwt.wysiwyg.client.wiki.EntityReference.EntityType.DOCUMENT
-            ? LinkType.DOCUMENT : LinkType.URI);
+        // TODO: Improve this to make it generic and allow adding new link types dynamically
+        if (entityType == org.xwiki.gwt.wysiwyg.client.wiki.EntityReference.EntityType.DOCUMENT) {
+            link.setType(LinkType.DOCUMENT);
+        } else if (entityType == org.xwiki.gwt.wysiwyg.client.wiki.EntityReference.EntityType.IMAGE) {
+            link.setType(LinkType.IMAGE);
+        } else {
+            // Consider it's an attachment. TODO: Fix this since this assumption is plain wrong!
+            link.setType(LinkType.ATTACHMENT);
+        }
         link.setReference(relativeStringEntityReference);
         String linkReference = linkReferenceSerializer.serialize(link);
-        if (entityType == org.xwiki.gwt.wysiwyg.client.wiki.EntityReference.EntityType.ATTACHMENT) {
-            linkReference = ATTACHMENT_URI_PROTOCOL + linkReference;
-        }
         return linkReference;
     }
 
@@ -169,11 +173,6 @@ public class DefaultLinkService implements LinkService
         }
         Link link = linkReferenceParser.parse(fullLinkReference);
         String stringEntityReference = link.getReference();
-        // Remove the URI protocol because the link reference parser doesn't do it.
-        int uriSchemeDelimiter = stringEntityReference.indexOf(':');
-        if (link.getType() == LinkType.URI && uriSchemeDelimiter > -1) {
-            stringEntityReference = stringEntityReference.substring(uriSchemeDelimiter + 1);
-        }
         org.xwiki.gwt.wysiwyg.client.wiki.EntityReference entityReference =
             entityReferenceConverter.convert(explicitStringEntityReferenceResolver.resolve(stringEntityReference,
                 entityReferenceConverter.convert(entityType), entityReferenceConverter.convert(baseReference)));

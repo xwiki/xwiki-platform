@@ -33,6 +33,7 @@ public class Syntax
     public static final Syntax HTML_4_01 = new Syntax(SyntaxType.HTML, "4.01");
     public static final Syntax XWIKI_1_0 = new Syntax(SyntaxType.XWIKI, "1.0");
     public static final Syntax XWIKI_2_0 = new Syntax(SyntaxType.XWIKI, "2.0");
+    public static final Syntax XWIKI_2_1 = new Syntax(SyntaxType.XWIKI, "2.1", "experimental");
     public static final Syntax PLAIN_1_0 = new Syntax(SyntaxType.PLAIN, "1.0");
     public static final Syntax EVENT_1_0 = new Syntax(SyntaxType.EVENT, "1.0");
     public static final Syntax TEX_1_0 = new Syntax(SyntaxType.TEX, "1.0");
@@ -52,10 +53,21 @@ public class Syntax
 
     private String version;
 
+    /**
+     * Optional free form text that qualifies the version, eg "experimental". 
+     */
+    private String qualifier;
+
     public Syntax(SyntaxType type, String version)
     {
         this.type = type;
         this.version = version;
+    }
+
+    public Syntax(SyntaxType type, String version, String qualifier)
+    {
+        this(type, version);
+        this.qualifier = qualifier;
     }
 
     public SyntaxType getType()
@@ -66,6 +78,11 @@ public class Syntax
     public String getVersion()
     {
         return this.version;
+    }
+
+    public String getQualifier()
+    {
+        return this.qualifier;
     }
 
     public String toIdString()
@@ -81,7 +98,7 @@ public class Syntax
     @Override
     public String toString()
     {
-        return getType().toString() + " " + getVersion();
+        return getType().toString() + " " + getVersion() + (getQualifier() != null ? "(" + getQualifier() + ")" : "");
     }
 
     /**
@@ -97,6 +114,7 @@ public class Syntax
         int hash = 7;
         hash = 31 * hash + (null == getType() ? 0 : getType().hashCode());
         hash = 31 * hash + (null == getVersion() ? 0 : getVersion().hashCode());
+        hash = 31 * hash + (null == getQualifier() ? 0 : getQualifier().hashCode());
         return hash;
     }
 
@@ -122,7 +140,9 @@ public class Syntax
                 result =
                     (getType() == syntax.getType() || (getType() != null && getType().equals(syntax.getType())))
                         && (getVersion() == syntax.getVersion() || (getVersion() != null && getVersion().equals(
-                            syntax.getVersion())));
+                            syntax.getVersion())))
+                        && (getQualifier() == syntax.getQualifier() || (getQualifier() != null && getQualifier().equals(
+                            syntax.getQualifier())));
             }
         }
         return result;

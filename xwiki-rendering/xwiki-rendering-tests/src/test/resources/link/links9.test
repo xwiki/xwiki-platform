@@ -13,8 +13,8 @@ onWord [is]
 onSpace
 onWord [a]
 onSpace
-beginLink [Reference = [mailto:content]] [true]
-endLink [Reference = [mailto:content]] [true]
+beginLink [Typed = [true] Type = [mailto] Reference = [content]] [true]
+endLink [Typed = [true] Type = [mailto] Reference = [content]] [true]
 onSpace
 onWord [element]
 endParagraph

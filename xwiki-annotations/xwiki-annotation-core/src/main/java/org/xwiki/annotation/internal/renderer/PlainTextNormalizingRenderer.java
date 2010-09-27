@@ -31,7 +31,7 @@ import org.xwiki.component.phase.InitializationException;
 import org.xwiki.rendering.listener.chaining.ListenerChain;
 import org.xwiki.rendering.parser.StreamParser;
 import org.xwiki.rendering.renderer.AbstractChainingPrintRenderer;
-import org.xwiki.rendering.renderer.LinkLabelGenerator;
+import org.xwiki.rendering.renderer.link.LinkLabelGenerator;
 
 /**
  * Plain text renderer that renders the current document with normalized spaces.

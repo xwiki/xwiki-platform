@@ -7,8 +7,8 @@
 .#-----------------------------------------------------
 beginDocument
 beginParagraph
-beginLink [Reference = [mailto:john@doe.com?subject=This is a test]] [false]
-endLink [Reference = [mailto:john@doe.com?subject=This is a test]] [false]
+beginLink [Typed = [true] Type = [mailto] Reference = [john@doe.com?subject=This is a test]] [false]
+endLink [Typed = [true] Type = [mailto] Reference = [john@doe.com?subject=This is a test]] [false]
 endParagraph
 endDocument
 .#-----------------------------------------------------

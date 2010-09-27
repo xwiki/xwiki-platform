@@ -13,8 +13,8 @@ onSpecialSymbol [-]
 onWord [verbose]
 onSpace
 onSpecialSymbol [']
-beginLink [Reference = [ftp://afp']] [true]
-endLink [Reference = [ftp://afp']] [true]
+beginLink [Typed = [false] Type = [url] Reference = [ftp://afp']] [true]
+endLink [Typed = [false] Type = [url] Reference = [ftp://afp']] [true]
 endParagraph
 endDocument
 .#-----------------------------------------------------

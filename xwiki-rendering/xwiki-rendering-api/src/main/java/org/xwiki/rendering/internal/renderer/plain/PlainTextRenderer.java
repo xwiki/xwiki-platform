@@ -28,7 +28,7 @@ import org.xwiki.component.phase.InitializationException;
 import org.xwiki.rendering.listener.chaining.BlockStateChainingListener;
 import org.xwiki.rendering.listener.chaining.EmptyBlockChainingListener;
 import org.xwiki.rendering.listener.chaining.ListenerChain;
-import org.xwiki.rendering.renderer.LinkLabelGenerator;
+import org.xwiki.rendering.renderer.link.LinkLabelGenerator;
 import org.xwiki.rendering.renderer.AbstractChainingPrintRenderer;
 
 /**
@@ -45,7 +45,7 @@ public class PlainTextRenderer extends AbstractChainingPrintRenderer implements 
 {
     @Requirement
     private LinkLabelGenerator linkLabelGenerator;
-
+    
     /**
      * {@inheritDoc}
      * 

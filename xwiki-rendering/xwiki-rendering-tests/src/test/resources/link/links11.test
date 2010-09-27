@@ -11,8 +11,8 @@
 .#-----------------------------------------------------
 beginDocument
 beginParagraph
-beginLink [Reference = [http://www.xwiki.org]] [false]
+beginLink [Typed = [false] Type = [url] Reference = [http://www.xwiki.org]] [false]
 onWord [label]
-endLink [Reference = [http://www.xwiki.org]] [false]
+endLink [Typed = [false] Type = [url] Reference = [http://www.xwiki.org]] [false]
 endParagraph
 endDocument

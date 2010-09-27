@@ -8,11 +8,11 @@
 .#-----------------------------------------------------
 beginDocument
 beginParagraph
-beginLink [Reference = [attach:my.png]] [false] [[param1]=[value1][param2]=[value2]]
-endLink [Reference = [attach:my.png]] [false] [[param1]=[value1][param2]=[value2]]
+beginLink [Typed = [true] Type = [attach] Reference = [my.png]] [false] [[param1]=[value1][param2]=[value2]]
+endLink [Typed = [true] Type = [attach] Reference = [my.png]] [false] [[param1]=[value1][param2]=[value2]]
 onNewLine
-beginLink [Reference = [attach:Space.ExistingPage@my.png]] [false]
-endLink [Reference = [attach:Space.ExistingPage@my.png]] [false]
+beginLink [Typed = [true] Type = [attach] Reference = [Space.ExistingPage@my.png]] [false]
+endLink [Typed = [true] Type = [attach] Reference = [Space.ExistingPage@my.png]] [false]
 endParagraph
 endDocument
 .#-----------------------------------------------------

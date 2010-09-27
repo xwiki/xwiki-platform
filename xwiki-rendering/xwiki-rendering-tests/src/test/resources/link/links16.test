@@ -11,11 +11,11 @@ onWord [Inline]
 onSpace
 onWord [attachment]
 onSpace
-beginLink [Reference = [attach:existing.attachment]] [true]
-endLink [Reference = [attach:existing.attachment]] [true]
+beginLink [Typed = [true] Type = [attach] Reference = [existing.attachment]] [true]
+endLink [Typed = [true] Type = [attach] Reference = [existing.attachment]] [true]
 onSpace
-beginLink [Reference = [attach:Space.ExistingPage@existing.attachment]] [true]
-endLink [Reference = [attach:Space.ExistingPage@existing.attachment]] [true]
+beginLink [Typed = [true] Type = [attach] Reference = [Space.ExistingPage@existing.attachment]] [true]
+endLink [Typed = [true] Type = [attach] Reference = [Space.ExistingPage@existing.attachment]] [true]
 endParagraph
 endDocument
 .#-----------------------------------------------------

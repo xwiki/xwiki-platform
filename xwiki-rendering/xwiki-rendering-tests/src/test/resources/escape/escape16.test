@@ -12,10 +12,10 @@ image:--
 beginDocument
 onMacroStandalone [macro] [] [--]
 beginParagraph
-beginLink [Reference = [reference]] [false]
+beginLink [Typed = [false] Type = [url] Reference = [reference]] [false]
 onSpecialSymbol [-]
 onSpecialSymbol [-]
-endLink [Reference = [reference]] [false]
+endLink [Typed = [false] Type = [url] Reference = [reference]] [false]
 onNewLine
 onImage: [--] [true]
 endParagraph

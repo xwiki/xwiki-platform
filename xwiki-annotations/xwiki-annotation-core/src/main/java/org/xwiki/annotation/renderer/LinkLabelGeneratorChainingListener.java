@@ -32,7 +32,7 @@ import org.xwiki.rendering.listener.chaining.EmptyBlockChainingListener;
 import org.xwiki.rendering.listener.chaining.ListenerChain;
 import org.xwiki.rendering.parser.ParseException;
 import org.xwiki.rendering.parser.StreamParser;
-import org.xwiki.rendering.renderer.LinkLabelGenerator;
+import org.xwiki.rendering.renderer.link.LinkLabelGenerator;
 
 /**
  * Chaining listener to generate labels for the links without labels and send these labels as events in the chain.

@@ -36,9 +36,9 @@ import org.xwiki.rendering.listener.Link;
 public interface LinkParser
 {
     /**
-     * Interwiki link separator.
+     * Link Reference Type separator (eg "mailto:mail@address").
      */
-    String SEPARATOR_INTERWIKI = "@";
+    String TYPE_SEPARATOR = ":";
 
     /**
      * Query String separator.

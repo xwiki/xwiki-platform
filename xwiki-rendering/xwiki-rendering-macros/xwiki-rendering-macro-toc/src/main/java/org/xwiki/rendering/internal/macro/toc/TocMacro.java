@@ -34,13 +34,14 @@ import org.xwiki.rendering.block.ListBLock;
 import org.xwiki.rendering.block.ListItemBlock;
 import org.xwiki.rendering.block.NumberedListBlock;
 import org.xwiki.rendering.block.SectionBlock;
-import org.xwiki.rendering.listener.Link;
+import org.xwiki.rendering.listener.DocumentLink;
+import org.xwiki.rendering.listener.LinkType;
 import org.xwiki.rendering.macro.AbstractMacro;
 import org.xwiki.rendering.macro.MacroExecutionException;
 import org.xwiki.rendering.macro.toc.TocMacroParameters;
 import org.xwiki.rendering.macro.toc.TocMacroParameters.Scope;
 import org.xwiki.rendering.parser.Parser;
-import org.xwiki.rendering.renderer.LinkLabelGenerator;
+import org.xwiki.rendering.renderer.link.LinkLabelGenerator;
 import org.xwiki.rendering.transformation.MacroTransformationContext;
 
 /**
@@ -265,8 +266,9 @@ public class TocMacro extends AbstractMacro<TocMacroParameters>
     private ListItemBlock createTocEntry(HeaderBlock headerBlock)
     {
         // Create the link to target the header anchor
-        Link link = new Link();
+        DocumentLink link = new DocumentLink();
         link.setAnchor(headerBlock.getId());
+        link.setType(LinkType.DOCUMENT);
         LinkBlock linkBlock = new LinkBlock(this.tocBlockFilter.generateLabel(headerBlock), link, false);
 
         return new ListItemBlock(Collections.<Block> singletonList(linkBlock));

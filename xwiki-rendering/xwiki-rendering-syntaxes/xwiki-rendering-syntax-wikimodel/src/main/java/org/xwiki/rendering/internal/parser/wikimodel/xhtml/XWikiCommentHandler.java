@@ -111,7 +111,7 @@ public class XWikiCommentHandler extends CommentHandler
         // Since we cannot get this label as it originally appeared in the HTML source ( we are doing a SAX-like
         // parsing), we should render the XDOM as HTML to get an HTML label.
         // Since any syntax would do it, as long as this renderer matches the corresponding XDOMGeneratorListener
-        // parser, we use an xwiki 2.0 renderer for it is less complex (no context needed to render xwiki 2.0, no url
+        // parser, we use an xwiki 2.1 renderer for it is less complex (no context needed to render xwiki 2.1, no url
         // resolution needed, no reference validity tests).
         // see XDOMGeneratorListener#XDOMGeneratorListener(Parser, LinkParser, ImageParser)
         // see WikiModelXHTMLParser#getLinkLabelParser()

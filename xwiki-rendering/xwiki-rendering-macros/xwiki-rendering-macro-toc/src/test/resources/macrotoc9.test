@@ -28,52 +28,52 @@ endHeader [1, HLevel1]
 beginMacroMarkerStandalone [toc] [start=1|depth=3|numbered=false|scope=page]
 beginList [BULLETED]
 beginListItem
-beginLink [Anchor = [HLevel1]] [false]
+beginLink [Typed = [false] Type = [doc] Anchor = [HLevel1]] [false]
 onWord [Level]
 onSpace
 onWord [1]
-endLink [Anchor = [HLevel1]] [false]
+endLink [Typed = [false] Type = [doc] Anchor = [HLevel1]] [false]
 beginList [BULLETED]
 beginListItem
-beginLink [Anchor = [HLevel2a]] [false]
+beginLink [Typed = [false] Type = [doc] Anchor = [HLevel2a]] [false]
 onWord [Level]
 onSpace
 onWord [2a]
-endLink [Anchor = [HLevel2a]] [false]
+endLink [Typed = [false] Type = [doc] Anchor = [HLevel2a]] [false]
 beginList [BULLETED]
 beginListItem
-beginLink [Anchor = [HLevel3a]] [false]
+beginLink [Typed = [false] Type = [doc] Anchor = [HLevel3a]] [false]
 onWord [Level]
 onSpace
 onWord [3a]
-endLink [Anchor = [HLevel3a]] [false]
+endLink [Typed = [false] Type = [doc] Anchor = [HLevel3a]] [false]
 endListItem
 beginListItem
-beginLink [Anchor = [HLevel3b]] [false]
+beginLink [Typed = [false] Type = [doc] Anchor = [HLevel3b]] [false]
 onWord [Level]
 onSpace
 onWord [3b]
-endLink [Anchor = [HLevel3b]] [false]
+endLink [Typed = [false] Type = [doc] Anchor = [HLevel3b]] [false]
 endListItem
 endList [BULLETED]
 endListItem
 endList [BULLETED]
 endListItem
 beginListItem
-beginLink [Anchor = [HLevel2b]] [false]
+beginLink [Typed = [false] Type = [doc] Anchor = [HLevel2b]] [false]
 onWord [Level]
 onSpace
 onWord [2b]
-endLink [Anchor = [HLevel2b]] [false]
+endLink [Typed = [false] Type = [doc] Anchor = [HLevel2b]] [false]
 beginList [BULLETED]
 beginListItem
 beginList [BULLETED]
 beginListItem
-beginLink [Anchor = [HLevel3c]] [false]
+beginLink [Typed = [false] Type = [doc] Anchor = [HLevel3c]] [false]
 onWord [Level]
 onSpace
 onWord [3c]
-endLink [Anchor = [HLevel3c]] [false]
+endLink [Typed = [false] Type = [doc] Anchor = [HLevel3c]] [false]
 endListItem
 endList [BULLETED]
 endListItem

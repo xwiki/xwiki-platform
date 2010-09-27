@@ -15,12 +15,12 @@ onWord [Some]
 onSpace
 onWord [URL]
 onSpace
-beginLink [Reference = [http://server/path/~user]] [true]
-endLink [Reference = [http://server/path/~user]] [true]
+beginLink [Typed = [false] Type = [url] Reference = [http://server/path/~user]] [true]
+endLink [Typed = [false] Type = [url] Reference = [http://server/path/~user]] [true]
 endParagraph
 beginParagraph
-beginLink [Reference = [something://whatever]] [true]
-endLink [Reference = [something://whatever]] [true]
+beginLink [Typed = [false] Type = [url] Reference = [something://whatever]] [true]
+endLink [Typed = [false] Type = [url] Reference = [something://whatever]] [true]
 endParagraph
 endDocument
 .#-----------------------------------------------------

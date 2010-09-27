@@ -4,6 +4,12 @@
 image:http://thor.info.uaic.ro/~evalica/img/x_logo_xwiki.png
 [[image:http://thor.info.uaic.ro/~~evalica/img/x_logo_xwiki.png]]
 [[http://thor.info.uaic.ro/~~evalica/img/x_logo_xwiki.png]]
+.#---------------------------------------------------------------------------------------------------------
+.input|xwiki/2.1
+.#---------------------------------------------------------------------------------------------------------
+image:http://thor.info.uaic.ro/~evalica/img/x_logo_xwiki.png
+[[image:http://thor.info.uaic.ro/~~evalica/img/x_logo_xwiki.png]]
+[[http://thor.info.uaic.ro/~~evalica/img/x_logo_xwiki.png]]
 .#-----------------------------------------------------
 .expect|event/1.0
 .#-----------------------------------------------------
@@ -13,8 +19,8 @@ onImage: [http://thor.info.uaic.ro/~evalica/img/x_logo_xwiki.png] [true]
 onNewLine
 onImage: [http://thor.info.uaic.ro/~evalica/img/x_logo_xwiki.png] [false]
 onNewLine
-beginLink [Reference = [http://thor.info.uaic.ro/~evalica/img/x_logo_xwiki.png]] [false]
-endLink [Reference = [http://thor.info.uaic.ro/~evalica/img/x_logo_xwiki.png]] [false]
+beginLink [Typed = [false] Type = [url] Reference = [http://thor.info.uaic.ro/~evalica/img/x_logo_xwiki.png]] [false]
+endLink [Typed = [false] Type = [url] Reference = [http://thor.info.uaic.ro/~evalica/img/x_logo_xwiki.png]] [false]
 endParagraph
 endDocument
 .#-----------------------------------------------------

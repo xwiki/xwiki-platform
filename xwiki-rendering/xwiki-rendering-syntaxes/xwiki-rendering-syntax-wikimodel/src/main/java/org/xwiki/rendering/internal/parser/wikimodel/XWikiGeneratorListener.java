@@ -35,14 +35,7 @@ import org.wikimodel.wem.WikiParameter;
 import org.wikimodel.wem.WikiParameters;
 import org.wikimodel.wem.WikiReference;
 import org.wikimodel.wem.WikiStyle;
-import org.xwiki.rendering.listener.CompositeListener;
-import org.xwiki.rendering.listener.Format;
-import org.xwiki.rendering.listener.HeaderLevel;
-import org.xwiki.rendering.listener.Link;
-import org.xwiki.rendering.listener.LinkType;
-import org.xwiki.rendering.listener.ListType;
-import org.xwiki.rendering.listener.Listener;
-import org.xwiki.rendering.listener.QueueListener;
+import org.xwiki.rendering.listener.*;
 import org.xwiki.rendering.parser.ImageParser;
 import org.xwiki.rendering.parser.LinkParser;
 import org.xwiki.rendering.parser.ParseException;
@@ -109,7 +102,6 @@ public class XWikiGeneratorListener implements IWemListener
     private WikiFormat lastEndFormat = null;
 
     /**
-     * @see XWikiGeneratorListener
      * @see <a href="http://code.google.com/p/wikimodel/issues/detail?id=87">wikimodel issue 87</a>
      * @since 2.0M3
      */
@@ -933,11 +925,24 @@ public class XWikiGeneratorListener implements IWemListener
         if (this.linkParser != null) {
             Link link = this.linkParser.parse(reference);
 
-            if (link.getType() == LinkType.URI && link.getReference().startsWith("image:")) {
-                String imageLocation = link.getReference().substring("image:".length());
-
-                getListener().onImage(this.imageParser.parse(imageLocation), isFreeStandingURI, parameters);
+            if (link.getType() == LinkType.IMAGE) {
+                getListener().onImage(this.imageParser.parse(link.getReference()), isFreeStandingURI, parameters);
             } else {
+                // Since 2.5M2, handle the special case when the link syntax used for a link to a document has the
+                // query string and/or the anchor specified as parameters. This is how the XWiki Syntax 2.1 specifies
+                // query string and anchor (ex: [[label>>doc:docReference||queryString="a=b" anchor="anchor"]]).
+                if (link.getType() == LinkType.DOCUMENT) {
+                    DocumentLink documentLink = (DocumentLink) link;
+                    String queryString = parameters.remove("queryString");
+                    if (queryString != null) {
+                        documentLink.setQueryString(queryString);
+                    }
+                    String anchor = parameters.remove("anchor");
+                    if (anchor != null) {
+                        documentLink.setAnchor(anchor);
+                    }
+                }
+
                 getListener().beginLink(link, isFreeStandingURI, parameters);
                 if (label != null) {
                     try {

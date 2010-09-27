@@ -24,7 +24,7 @@ import java.util.List;
 import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.block.HeaderBlock;
 import org.xwiki.rendering.block.PlainTextBlockFilter;
-import org.xwiki.rendering.renderer.LinkLabelGenerator;
+import org.xwiki.rendering.renderer.link.LinkLabelGenerator;
 import org.xwiki.rendering.parser.Parser;
 
 /**

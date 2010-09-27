@@ -169,8 +169,8 @@ public class IncludeMacroTest extends AbstractComponentTestCase
     {
         String expected = "beginDocument\n"
             + "beginParagraph\n"
-            + "beginLink [Reference = [wiki:space.page]] [false]\n"
-            + "endLink [Reference = [wiki:space.page]] [false]\n"
+            + "beginLink [Typed = [false] Type = [doc] Reference = [wiki:space.page]] [false]\n"
+            + "endLink [Typed = [false] Type = [doc] Reference = [wiki:space.page]] [false]\n"
             + "endParagraph\n"
             + "endDocument";
 

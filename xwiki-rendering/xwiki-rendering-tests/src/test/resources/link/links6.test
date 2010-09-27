@@ -18,17 +18,17 @@ not:link
 .#-----------------------------------------------------
 beginDocument
 beginParagraph
-beginLink [Reference = [{{macro}}]] [false]
-endLink [Reference = [{{macro}}]] [false]
+beginLink [Typed = [false] Type = [doc] Reference = [{{macro}}]] [false]
+endLink [Typed = [false] Type = [doc] Reference = [{{macro}}]] [false]
 onNewLine
-beginLink [Reference = [Label>Reference]] [false]
-endLink [Reference = [Label>Reference]] [false]
+beginLink [Typed = [false] Type = [doc] Reference = [Label>Reference]] [false]
+endLink [Typed = [false] Type = [doc] Reference = [Label>Reference]] [false]
 onNewLine
-beginLink [Reference = [Reference|Param=Value]] [false]
-endLink [Reference = [Reference|Param=Value]] [false]
+beginLink [Typed = [false] Type = [doc] Reference = [Reference|Param=Value]] [false]
+endLink [Typed = [false] Type = [doc] Reference = [Reference|Param=Value]] [false]
 onNewLine
-beginLink [Reference = [[[no link]] [false]
-endLink [Reference = [[[no link]] [false]
+beginLink [Typed = [false] Type = [doc] Reference = [[[no link]] [false]
+endLink [Typed = [false] Type = [doc] Reference = [[[no link]] [false]
 onSpecialSymbol [>]
 onSpecialSymbol [>]
 onWord [Not]
@@ -37,11 +37,11 @@ onWord [Reference]
 onSpecialSymbol []]
 onSpecialSymbol []]
 onNewLine
-beginLink [Reference = [Reference]] [false]
+beginLink [Typed = [false] Type = [doc] Reference = [Reference]] [false]
 onSpecialSymbol [[]
 onSpecialSymbol [[]
 onImage: [whatever] [true]
-endLink [Reference = [Reference]] [false]
+endLink [Typed = [false] Type = [doc] Reference = [Reference]] [false]
 onNewLine
 onWord [not]
 onSpecialSymbol [:]

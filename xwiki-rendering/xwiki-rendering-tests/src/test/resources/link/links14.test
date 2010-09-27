@@ -8,9 +8,9 @@
 .#-----------------------------------------------------
 beginDocument
 beginParagraph
-beginLink [Reference = [http://xwiki.org]] [false] [[param]=[value]]
+beginLink [Typed = [false] Type = [url] Reference = [http://xwiki.org]] [false] [[param]=[value]]
 onImage: [attach.png] [false] [[height]=[100][width]=[100]]
-endLink [Reference = [http://xwiki.org]] [false] [[param]=[value]]
+endLink [Typed = [false] Type = [url] Reference = [http://xwiki.org]] [false] [[param]=[value]]
 endParagraph
 endDocument
 .#-----------------------------------------------------

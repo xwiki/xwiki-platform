@@ -6,6 +6,20 @@ attach:attach.ext
 image:image.png
 [[NotWikiPage]]
 .#-----------------------------------------------------
+.expect|event/1.0
+.#-----------------------------------------------------
+beginDocument
+beginParagraph
+beginLink [Typed = [false] Type = [url] Reference = [attach:attach.ext]] [true]
+endLink [Typed = [false] Type = [url] Reference = [attach:attach.ext]] [true]
+onNewLine
+onImage: [image.png] [true]
+onNewLine
+beginLink [Typed = [false] Type = [url] Reference = [NotWikiPage]] [false]
+endLink [Typed = [false] Type = [url] Reference = [NotWikiPage]] [false]
+endParagraph
+endDocument
+.#-----------------------------------------------------
 .expect|xhtml/1.0
 .#-----------------------------------------------------
-<p><span class="wikiexternallink"><a class="wikimodel-freestanding" href="attach:attach.ext"><span class="wikigeneratedlinkcontent">attach.ext</span></a></span><br/><img src="image.png" class="wikimodel-freestanding" alt="image.png"/><br/><span class="wikiexternallink"><a href="NotWikiPage"><span class="wikigeneratedlinkcontent">NotWikiPage</span></a></span></p>
+<p><span class="wikiexternallink"><a class="wikimodel-freestanding" href="attach:attach.ext"><span class="wikigeneratedlinkcontent">attach:attach.ext</span></a></span><br/><img src="image.png" class="wikimodel-freestanding" alt="image.png"/><br/><span class="wikiexternallink"><a href="NotWikiPage"><span class="wikigeneratedlinkcontent">NotWikiPage</span></a></span></p>

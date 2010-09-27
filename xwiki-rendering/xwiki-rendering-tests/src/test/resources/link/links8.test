@@ -8,12 +8,12 @@
 .#-----------------------------------------------------
 beginDocument
 beginParagraph
-beginLink [Reference = [Space.ExistingPage]] [false] [[param1]=[value1][param2]=[value2]]
-endLink [Reference = [Space.ExistingPage]] [false] [[param1]=[value1][param2]=[value2]]
+beginLink [Typed = [false] Type = [doc] Reference = [Space.ExistingPage]] [false] [[param1]=[value1][param2]=[value2]]
+endLink [Typed = [false] Type = [doc] Reference = [Space.ExistingPage]] [false] [[param1]=[value1][param2]=[value2]]
 onNewLine
-beginLink [Reference = [Space.UnknownPage]] [false] [[param]=[value]]
+beginLink [Typed = [false] Type = [doc] Reference = [Space.UnknownPage]] [false] [[param]=[value]]
 onWord [label]
-endLink [Reference = [Space.UnknownPage]] [false] [[param]=[value]]
+endLink [Typed = [false] Type = [doc] Reference = [Space.UnknownPage]] [false] [[param]=[value]]
 endParagraph
 endDocument
 .#-----------------------------------------------------

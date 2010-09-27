@@ -20,9 +20,10 @@
 package org.xwiki.rendering.internal.renderer.xhtml;
 
 import java.util.Map;
+
+import org.xwiki.rendering.internal.renderer.xhtml.image.XHTMLImageRenderer;
+import org.xwiki.rendering.internal.renderer.xhtml.link.XHTMLLinkRenderer;
 import org.xwiki.rendering.listener.chaining.ListenerChain;
-import org.xwiki.rendering.renderer.xhtml.XHTMLImageRenderer;
-import org.xwiki.rendering.renderer.xhtml.XHTMLLinkRenderer;
 
 /**
  * Convert listener events to annotated XHTML. See {@link AnnotatedXHTMLChainingRenderer} for more details on

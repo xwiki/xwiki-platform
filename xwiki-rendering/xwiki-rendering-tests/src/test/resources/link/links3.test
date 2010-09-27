@@ -7,9 +7,9 @@
 .#-----------------------------------------------------
 beginDocument
 beginParagraph
-beginLink [Reference = [Space.UnknownPage]] [false]
+beginLink [Typed = [false] Type = [doc] Reference = [Space.UnknownPage]] [false]
 onWord [label]
-endLink [Reference = [Space.UnknownPage]] [false]
+endLink [Typed = [false] Type = [doc] Reference = [Space.UnknownPage]] [false]
 endParagraph
 endDocument
 .#-----------------------------------------------------

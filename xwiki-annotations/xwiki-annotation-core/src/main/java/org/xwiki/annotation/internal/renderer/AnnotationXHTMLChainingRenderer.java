@@ -28,6 +28,8 @@ import org.xwiki.annotation.renderer.AnnotationEvent;
 import org.xwiki.annotation.renderer.ChainingPrintRenderer;
 import org.xwiki.annotation.renderer.AnnotationEvent.AnnotationEventType;
 import org.xwiki.rendering.internal.renderer.xhtml.XHTMLChainingRenderer;
+import org.xwiki.rendering.internal.renderer.xhtml.image.XHTMLImageRenderer;
+import org.xwiki.rendering.internal.renderer.xhtml.link.XHTMLLinkRenderer;
 import org.xwiki.rendering.listener.Format;
 import org.xwiki.rendering.listener.HeaderLevel;
 import org.xwiki.rendering.listener.Link;
@@ -35,8 +37,6 @@ import org.xwiki.rendering.listener.ListType;
 import org.xwiki.rendering.listener.chaining.EventType;
 import org.xwiki.rendering.listener.chaining.ListenerChain;
 import org.xwiki.rendering.renderer.printer.XHTMLWikiPrinter;
-import org.xwiki.rendering.renderer.xhtml.XHTMLImageRenderer;
-import org.xwiki.rendering.renderer.xhtml.XHTMLLinkRenderer;
 import org.xwiki.rendering.syntax.Syntax;
 
 /**

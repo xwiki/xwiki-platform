@@ -25,10 +25,10 @@ import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.InstantiationStrategy;
 import org.xwiki.component.annotation.Requirement;
 import org.xwiki.component.descriptor.ComponentInstantiationStrategy;
+import org.xwiki.rendering.internal.renderer.xhtml.image.XHTMLImageRenderer;
+import org.xwiki.rendering.internal.renderer.xhtml.link.XHTMLLinkRenderer;
 import org.xwiki.rendering.listener.chaining.ListenerChain;
-import org.xwiki.rendering.renderer.LinkLabelGenerator;
-import org.xwiki.rendering.renderer.xhtml.XHTMLImageRenderer;
-import org.xwiki.rendering.renderer.xhtml.XHTMLLinkRenderer;
+import org.xwiki.rendering.renderer.link.LinkLabelGenerator;
 
 /**
  * Renders annotations in the XHTML format.

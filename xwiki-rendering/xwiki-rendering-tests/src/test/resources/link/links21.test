@@ -1,8 +1,12 @@
 .#-----------------------------------------------------
 .input|xwiki/2.0
-.# Test anchor links targetting current document.
+.# Test anchor links targeting the current document.
 .#-----------------------------------------------------
 [[label>>#name]]
+.#-----------------------------------------------------
+.input|xwiki/2.1
+.#-----------------------------------------------------
+[[label>>||anchor="name"]]
 .#-----------------------------------------------------
 .expect|xhtml/1.0
 .#-----------------------------------------------------
@@ -10,4 +14,8 @@
 .#-----------------------------------------------------
 .expect|annotatedxhtml/1.0
 .#-----------------------------------------------------
-<p><!--startwikilink:#name--><span class="wikilink"><a href="#name">label</a></span><!--stopwikilink--></p>
+<p><!--startwikilink:--><span class="wikilink"><a href="#name">label</a></span><!--stopwikilink--></p>
+.#-----------------------------------------------------
+.input|xhtml/1.0
+.#-----------------------------------------------------
+<html><p><!--startwikilink:--><span class="wikilink"><a href="#name">label</a></span><!--stopwikilink--></p></html>

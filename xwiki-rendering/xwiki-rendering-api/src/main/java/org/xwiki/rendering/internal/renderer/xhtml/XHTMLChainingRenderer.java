@@ -22,6 +22,8 @@ package org.xwiki.rendering.internal.renderer.xhtml;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
+import org.xwiki.rendering.internal.renderer.xhtml.image.XHTMLImageRenderer;
+import org.xwiki.rendering.internal.renderer.xhtml.link.XHTMLLinkRenderer;
 import org.xwiki.rendering.listener.Format;
 import org.xwiki.rendering.listener.HeaderLevel;
 import org.xwiki.rendering.listener.Image;
@@ -34,8 +36,6 @@ import org.xwiki.rendering.listener.chaining.BlockStateChainingListener.Event;
 import org.xwiki.rendering.renderer.AbstractChainingPrintRenderer;
 import org.xwiki.rendering.renderer.printer.WikiPrinter;
 import org.xwiki.rendering.renderer.printer.XHTMLWikiPrinter;
-import org.xwiki.rendering.renderer.xhtml.XHTMLImageRenderer;
-import org.xwiki.rendering.renderer.xhtml.XHTMLLinkRenderer;
 import org.xwiki.rendering.syntax.Syntax;
 import org.xwiki.rendering.syntax.SyntaxType;
 

@@ -44,7 +44,7 @@ import org.xwiki.rendering.util.IdGenerator;
 public abstract class AbstractWikiModelParser extends AbstractLogEnabled implements Parser, StreamParser
 {
     /**
-     * Used by the XWikiGeneratorListener to generate unique header ids.
+     * Used by the XWiki Generator Listener to generate unique header ids.
      */
     @Requirement("plain/1.0")
     protected PrintRendererFactory plainRendererFactory;

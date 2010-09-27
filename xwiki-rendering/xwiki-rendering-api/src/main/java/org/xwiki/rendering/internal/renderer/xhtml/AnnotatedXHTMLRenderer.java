@@ -19,11 +19,11 @@
  */
 package org.xwiki.rendering.internal.renderer.xhtml;
 
+import org.xwiki.rendering.internal.renderer.xhtml.image.XHTMLImageRenderer;
+import org.xwiki.rendering.internal.renderer.xhtml.link.XHTMLLinkRenderer;
 import org.xwiki.rendering.listener.chaining.BlockStateChainingListener;
 import org.xwiki.rendering.listener.chaining.ListenerChain;
 import org.xwiki.rendering.listener.chaining.EmptyBlockChainingListener;
-import org.xwiki.rendering.renderer.xhtml.XHTMLLinkRenderer;
-import org.xwiki.rendering.renderer.xhtml.XHTMLImageRenderer;
 import org.xwiki.rendering.renderer.AbstractChainingPrintRenderer;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.InstantiationStrategy;

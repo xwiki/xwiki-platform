@@ -19,8 +19,11 @@
  */
 package org.xwiki.rendering.internal.parser.wikimodel.xhtml;
 
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.Collections;
 
+import org.apache.commons.lang.StringUtils;
 import org.wikimodel.wem.IWemListener;
 import org.wikimodel.wem.WikiParameter;
 import org.wikimodel.wem.WikiParameters;
@@ -105,8 +108,15 @@ public class XWikiReferenceTagHandler extends ReferenceTagHandler
             if (isFreeStandingReference(context)) {
                 context.getTagStack().setStackParameter("isFreeStandingLink", true);
             } else {
-                context.getTagStack().setStackParameter("linkParameters",
-                    removeMeaningfulParameters(context.getParams()));
+                WikiParameters params = removeMeaningfulParameters(context.getParams());
+
+                // Add the Query String and Anchor information to the parameter list. we extract them from the HREF
+                // attribute.
+                if (context.getParams().getParameter("href") != null) {
+                    params = addQueryStringAndAnchor(context.getParams().getParameter("href").getValue(), params);
+                }
+
+                context.getTagStack().setStackParameter("linkParameters", params);
             }
 
             setAccumulateContent(false);
@@ -186,5 +196,24 @@ public class XWikiReferenceTagHandler extends ReferenceTagHandler
         } else {
             super.end(context);
         }
+    }
+
+    private WikiParameters addQueryStringAndAnchor(String href, WikiParameters params)
+    {
+        WikiParameters newParams = params;
+
+        try {
+            URI uri = new URI(href);
+            if (!StringUtils.isEmpty(uri.getFragment())) {
+                newParams = newParams.addParameter("anchor", uri.getFragment());
+            }
+            if (!StringUtils.isEmpty(uri.getQuery())) {
+                newParams = newParams.addParameter("queryString", uri.getQuery());
+            }
+        } catch (URISyntaxException e) {
+            // Invalid URI, ignore anchor/query string
+        }
+
+        return newParams;
     }
 }

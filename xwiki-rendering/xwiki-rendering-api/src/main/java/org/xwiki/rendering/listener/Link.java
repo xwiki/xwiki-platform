@@ -20,23 +20,23 @@
 package org.xwiki.rendering.listener;
 
 /**
- * Represents a link. Note that this representation is independent of any wiki syntax.
- * 
+ * Represents a reference to a link. Note that this representation is independent of any wiki syntax.
+ *
  * @version $Id$
  * @since 1.5M2
  */
 public class Link implements Cloneable
 {
     /**
-     * @see #getInterWikiAlias()
+     * @see #isTyped()
      */
-    private String interWikiAlias;
+    private boolean isTyped;
 
     /**
      * @see #getReference()
      *
-     * Note that the reason we store the reference as a String and not as an Entity Reference is because we want the
-     * Rendering module indpendent of the XWiki Model so that it can be used independently of XWiki.
+     * Note that the reason we store the reference as a String and not as an Entity Reference is because we want
+     * the Rendering module independent of the XWiki Model so that it can be used independently of XWiki.
      */
     private String reference;
 
@@ -46,14 +46,20 @@ public class Link implements Cloneable
     private LinkType type;
 
     /**
-     * @see #getQueryString()
+     * @param isTyped see {@link #isTyped()}
      */
-    private String queryString;
+    public void setTyped(boolean isTyped)
+    {
+        this.isTyped = isTyped;
+    }
 
     /**
-     * @see #getAnchor()
+     * @return true if the link reference is prefixed with the link type (eg "doc" for links to documents, etc)
      */
-    private String anchor;
+    public boolean isTyped()
+    {
+        return this.isTyped;
+    }
 
     /**
      * @param reference see {@link #getReference()}
@@ -66,8 +72,7 @@ public class Link implements Cloneable
     /**
      * @return the reference pointed to by this link. For example a reference can be a document's name (which depends on
      *         the wiki, for example for XWiki the format is "wiki:space.page"), a URI (for example: mailto:john@doe.com
-     *         or a URL) or an <a href="http://en.wikipedia.org/wiki/InterWiki">Inter Wiki</a> reference (which is
-     *         appended to the interwiki alias when it's resolved).
+     *         or a URL),n <a href="http://en.wikipedia.org/wiki/InterWiki">Inter Wiki</a> reference, etc
      * @see #getType()
      */
     public String getReference()
@@ -94,72 +99,9 @@ public class Link implements Cloneable
     }
 
     /**
-     * @return the <a href="http://en.wikipedia.org/wiki/InterWiki">Inter Wiki</a> alias to which the link is pointing
-     *         to or null if not defined. Mappings between Inter Wiki aliases and actual locations are defined in the
-     *         Inter Wiki Map. Example: "wikipedia"
-     */
-    public String getInterWikiAlias()
-    {
-        return this.interWikiAlias;
-    }
-
-    /**
-     * @param interWikiAlias see {@link #getInterWikiAlias()}
-     */
-    public void setInterWikiAlias(String interWikiAlias)
-    {
-        this.interWikiAlias = interWikiAlias;
-    }
-
-    /**
-     * @return the query string for specifying parameters that will be used in the rendered URL or null if no query
-     *         string has been specified. Example: "mydata1=5&mydata2=Hello"
-     */
-    public String getQueryString()
-    {
-        return this.queryString;
-    }
-
-    /**
-     * @param queryString see {@link #getQueryString()}
-     */
-    public void setQueryString(String queryString)
-    {
-        this.queryString = queryString;
-    }
-
-    /**
-     * @return the anchor name pointing to an anchor defined in the referenced link or null if no anchor has been
-     *         specified (in which case the link points to the top of the page). Note that in XWiki anchors are
-     *         automatically created for titles. Example: "TableOfContentAnchor"
-     */
-    public String getAnchor()
-    {
-        return this.anchor;
-    }
-
-    /**
-     * @param anchor see {@link #getAnchor()}
-     */
-    public void setAnchor(String anchor)
-    {
-        this.anchor = anchor;
-    }
-
-    /**
-     * @return true if the link points to an external link (ie if it's a URI or an Interwiki link) or false otherwise
-     */
-    public boolean isExternalLink()
-    {
-        return (getType() == LinkType.INTERWIKI) || (getType() == LinkType.URI);
-    }
-
-    /**
-     * {@inheritDoc}
-     * <p>
-     * The output is syntax independent since this class is used for all syntaxes. Specific syntaxes should extend this
-     * class and override this method to perform syntax-dependent formatting.
-     * 
+     * {@inheritDoc} <p> The output is syntax independent since this class is used for all syntaxes. Specific syntaxes
+     * should extend this class and override this method to perform syntax-dependent formatting.
+     *
      * @see java.lang.Object#toString()
      */
     @Override
@@ -167,23 +109,14 @@ public class Link implements Cloneable
     {
         boolean shouldAddSpace = false;
         StringBuffer sb = new StringBuffer();
+        sb.append("Typed = [").append(isTyped()).append("]");
+        sb.append(" ");
+        sb.append("Type = [").append(getType().getScheme()).append("]");
+        shouldAddSpace = true;
         if (getReference() != null) {
+            sb.append(shouldAddSpace ? " " : "");
             sb.append("Reference = [").append(getReference()).append("]");
             shouldAddSpace = true;
-        }
-        if (getQueryString() != null) {
-            sb.append(shouldAddSpace ? " " : "");
-            sb.append("QueryString = [").append(getQueryString()).append("]");
-            shouldAddSpace = true;
-        }
-        if (getAnchor() != null) {
-            sb.append(shouldAddSpace ? " " : "");
-            sb.append("Anchor = [").append(getAnchor()).append("]");
-            shouldAddSpace = true;
-        }
-        if (getInterWikiAlias() != null) {
-            sb.append(shouldAddSpace ? " " : "");
-            sb.append("InterWikiAlias = [").append(getInterWikiAlias()).append("]");
         }
 
         return sb.toString();
@@ -191,7 +124,7 @@ public class Link implements Cloneable
 
     /**
      * {@inheritDoc}
-     * 
+     *
      * @see Object#clone()
      */
     @Override

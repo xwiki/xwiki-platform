@@ -21,7 +21,7 @@ package org.xwiki.rendering.internal.renderer;
 
 import org.xwiki.component.annotation.Component;
 import org.xwiki.rendering.listener.Link;
-import org.xwiki.rendering.renderer.LinkLabelGenerator;
+import org.xwiki.rendering.renderer.link.LinkLabelGenerator;
 
 /**
  * Basic default implementation to be used when the XWiki Rendering is used standalone, outside of XWiki.
@@ -34,7 +34,7 @@ public class DefaultLinkLabelGenerator implements LinkLabelGenerator
 {
     /**
      * {@inheritDoc}
-     * @see org.xwiki.rendering.renderer.LinkLabelGenerator#generate(org.xwiki.rendering.listener.Link)
+     * @see org.xwiki.rendering.renderer.link.LinkLabelGenerator#generate(org.xwiki.rendering.listener.Link)
      */
     public String generate(Link link)
     {

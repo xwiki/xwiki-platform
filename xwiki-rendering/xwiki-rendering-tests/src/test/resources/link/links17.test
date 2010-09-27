@@ -8,10 +8,10 @@
 .#-----------------------------------------------------
 beginDocument
 beginParagraph
-beginLink [Reference = [http://xwiki.org]] [false]
-beginLink [Reference = [http://xwiki2.org]] [true]
-endLink [Reference = [http://xwiki2.org]] [true]
-endLink [Reference = [http://xwiki.org]] [false]
+beginLink [Typed = [false] Type = [url] Reference = [http://xwiki.org]] [false]
+beginLink [Typed = [false] Type = [url] Reference = [http://xwiki2.org]] [true]
+endLink [Typed = [false] Type = [url] Reference = [http://xwiki2.org]] [true]
+endLink [Typed = [false] Type = [url] Reference = [http://xwiki.org]] [false]
 endParagraph
 endDocument
 .#-----------------------------------------------------

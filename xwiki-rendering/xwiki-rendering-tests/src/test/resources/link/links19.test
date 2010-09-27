@@ -13,13 +13,13 @@
 .#-----------------------------------------------------
 beginDocument
 beginParagraph
-beginLink [Reference = [http://reference]] [false] [[param1]=[value1]]
+beginLink [Typed = [false] Type = [url] Reference = [http://reference]] [false] [[param1]=[value1]]
 onWord [http]
 onSpecialSymbol [:]
 onSpecialSymbol [/]
 onSpecialSymbol [/]
 onWord [reference]
-endLink [Reference = [http://reference]] [false] [[param1]=[value1]]
+endLink [Typed = [false] Type = [url] Reference = [http://reference]] [false] [[param1]=[value1]]
 endParagraph
 endDocument
 .#-----------------------------------------------------

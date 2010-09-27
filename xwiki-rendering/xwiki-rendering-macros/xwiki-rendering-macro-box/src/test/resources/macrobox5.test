@@ -10,9 +10,9 @@ beginMacroMarkerStandalone [box] [title=[[XWiki>>http://www.xwiki.org]]|cssClass
 beginGroup [[class]=[box myCLASS]]
 onImage: [http://l.yimg.com/i/i/fr/tr/usa4.jpg] [true]
 onNewLine
-beginLink [Reference = [http://www.xwiki.org]] [false]
+beginLink [Typed = [false] Type = [url] Reference = [http://www.xwiki.org]] [false]
 onWord [XWiki]
-endLink [Reference = [http://www.xwiki.org]] [false]
+endLink [Typed = [false] Type = [url] Reference = [http://www.xwiki.org]] [false]
 beginParagraph
 onWord [alabala]
 endParagraph

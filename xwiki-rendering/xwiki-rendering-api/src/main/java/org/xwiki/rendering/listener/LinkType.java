@@ -20,25 +20,115 @@
 package org.xwiki.rendering.listener;
 
 /**
- * The link type (a link to a document, a link to a URI, a link to an external interwiki).
+ * The link type (a link to a document, a link to a mail, a link to an external interwiki, etc).
  * 
  * @version $Id$
- * @since 1.5M2
+ * @since 2.5M2
  */
-public enum LinkType
+public class LinkType
 {
     /**
-     * The link target a local document.
+     * The link targets a document.
      */
-    DOCUMENT,
+    public static final LinkType DOCUMENT = new LinkType("doc");
 
     /**
-     * The link is an URL.
+     * The link targets an URL.
      */
-    URI,
+    public static final LinkType URL = new LinkType("url");
 
     /**
-     * The link target a document in another wiki.
+     * The link targets a document in another wiki.
      */
-    INTERWIKI
+    public static final LinkType INTERWIKI = new LinkType("interwiki");
+    
+    /**
+     * The link targets a relative URL in the current wiki.
+     */
+    public static final LinkType PATH = new LinkType("path");
+
+    /**
+     * The link targets a mail.
+     */
+    public static final LinkType MAILTO = new LinkType("mailto");
+
+    /**
+     * The link targets an attachment.
+     */
+    public static final LinkType ATTACHMENT = new LinkType("attach");
+
+    /**
+     * The link targets an image.
+     */
+    public static final LinkType IMAGE = new LinkType("image");
+
+    /**
+     * @see #getScheme()
+     */
+    private String scheme;
+
+    /**
+     * @param scheme see {@link #getScheme()}
+     */
+    public LinkType(String scheme)
+    {
+        setScheme(scheme);
+    }
+
+    /**
+     * @return the type of the link (eg "doc" for links to documents, etc)
+     */
+    public String getScheme()
+    {
+        return this.scheme;
+    }
+
+    /**
+     * @param scheme see {@link #getScheme()}
+     */
+    public void setScheme(String scheme)
+    {
+        this.scheme = scheme;
+    }
+
+    /**
+     * {@inheritDoc}
+     *
+     * @see Object#hashCode()
+     */
+    @Override
+    public int hashCode()
+    {
+        // Random number. See http://www.technofundo.com/tech/java/equalhash.html for the detail of this
+        // algorithm.
+        int hash = 8;
+        hash = 31 * hash + (null == getScheme() ? 0 : getScheme().hashCode());
+        return hash;
+    }
+
+    /**
+     * {@inheritDoc}
+     *
+     * @see Object#equals(Object)
+     */
+    @Override
+    public boolean equals(Object object)
+    {
+        boolean result;
+
+        // See http://www.technofundo.com/tech/java/equalhash.html for the detail of this algorithm.
+        if (this == object) {
+            result = true;
+        } else {
+            if ((object == null) || (object.getClass() != this.getClass())) {
+                result = false;
+            } else {
+                // object must be LinkType at this point
+                LinkType linkType = (LinkType) object;
+                result = (getScheme() == linkType.getScheme() || (getScheme() != null
+                    && getScheme().equals(linkType.getScheme())));
+            }
+        }
+        return result;
+    }
 }

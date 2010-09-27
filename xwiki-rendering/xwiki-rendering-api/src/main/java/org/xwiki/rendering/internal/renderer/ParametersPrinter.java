@@ -30,11 +30,16 @@ import java.util.Map;
 public class ParametersPrinter
 {
     /**
-     * Print parameters in a String.
+     * Quote character.
+     */
+    private static final String QUOTE = "\"";
+
+    /**
+     * Print the parameters as a String.
      * 
-     * @param parameters the parameters to print.
+     * @param parameters the parameters to print
      * @param escapeChar the character used in front of a special character when need to escape it
-     * @return the printed parameters.
+     * @return the printed parameters
      */
     public String print(Map<String, String> parameters, char escapeChar)
     {
@@ -47,16 +52,28 @@ public class ParametersPrinter
                 if (buffer.length() > 0) {
                     buffer.append(' ');
                 }
-
-                // escape the escaping character
-                value = value.replace(String.valueOf(escapeChar), String.valueOf(escapeChar) + escapeChar);
-                // escape quote
-                value = value.replace("\"", String.valueOf(escapeChar) + '"');
-
-                buffer.append(entry.getKey()).append('=').append('"').append(value).append('"');
+                buffer.append(print(key, value, escapeChar));
             }
         }
 
         return buffer.toString();
+    }
+
+    /**
+     *  Print a parameter as a String.
+     *
+     * @param parameterName the name of the parameter to print
+     * @param parameterValue the value of the parameter to print
+     * @param escapeChar the character used in front of a special character when need to escape it
+     * @return the printed parameter
+     */
+    public String print(String parameterName, String parameterValue, char escapeChar)
+    {
+        // escape the escaping character
+        String value = parameterValue.replace(String.valueOf(escapeChar), String.valueOf(escapeChar) + escapeChar);
+        // escape quote
+        value = value.replace(QUOTE, String.valueOf(escapeChar) + QUOTE);
+
+        return parameterName + "=" + QUOTE + value + QUOTE;
     }
 }

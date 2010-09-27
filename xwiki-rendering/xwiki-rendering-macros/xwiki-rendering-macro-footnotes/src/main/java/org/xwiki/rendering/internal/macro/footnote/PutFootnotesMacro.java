@@ -38,8 +38,9 @@ import org.xwiki.rendering.block.NumberedListBlock;
 import org.xwiki.rendering.block.ParagraphBlock;
 import org.xwiki.rendering.block.SpaceBlock;
 import org.xwiki.rendering.block.WordBlock;
+import org.xwiki.rendering.listener.DocumentLink;
 import org.xwiki.rendering.listener.Format;
-import org.xwiki.rendering.listener.Link;
+import org.xwiki.rendering.listener.LinkType;
 import org.xwiki.rendering.macro.AbstractMacro;
 import org.xwiki.rendering.macro.MacroExecutionException;
 import org.xwiki.rendering.macro.footnote.FootnoteMacroParameters;
@@ -196,8 +197,9 @@ public class PutFootnotesMacro extends AbstractMacro<FootnoteMacroParameters>
     private Block createFootnoteReferenceBlock(int counter)
     {
         Block result = new WordBlock(counter + "");
-        Link link = new Link();
+        DocumentLink link = new DocumentLink();
         link.setAnchor(FOOTNOTE_ID_PREFIX + counter);
+        link.setType(LinkType.DOCUMENT);
         result = new LinkBlock(Collections.singletonList(result), link, false);
         result = new FormatBlock(Collections.singletonList(result), Format.SUPERSCRIPT);
         ((FormatBlock) result).setParameter(ID_ATTRIBUTE_NAME, FOOTNOTE_REFERENCE_ID_PREFIX + counter);
@@ -230,8 +232,9 @@ public class PutFootnotesMacro extends AbstractMacro<FootnoteMacroParameters>
             parsedContent = Collections.<Block> singletonList(new WordBlock(content));
         }
         Block result = new WordBlock("^");
-        Link link = new Link();
+        DocumentLink link = new DocumentLink();
         link.setAnchor(FOOTNOTE_REFERENCE_ID_PREFIX + counter);
+        link.setType(LinkType.DOCUMENT);
         result = new LinkBlock(Collections.singletonList(result), link, false);
         ((LinkBlock) result).setParameter(ID_ATTRIBUTE_NAME, FOOTNOTE_ID_PREFIX + counter);
         ((LinkBlock) result).setParameter(CLASS_ATTRIBUTE_NAME, "footnoteBackRef");

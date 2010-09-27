@@ -66,7 +66,7 @@ public class WikiModelXHTMLParser extends AbstractWikiModelParser
     /**
      * @see #getLinkParser()
      */
-    @Requirement("xwiki/2.0")
+    @Requirement("xwiki/2.1")
     private LinkParser linkParser;
 
     /**

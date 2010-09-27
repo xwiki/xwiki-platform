@@ -53,6 +53,11 @@
       <artifactId>xwiki-core-velocity</artifactId>
       <version>${project.version}</version>
     </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-core-model</artifactId>
+      <version>${project.version}</version>
+    </dependency>
     <!-- Testing dependencies -->
     <dependency>
       <groupId>org.xwiki.platform</groupId>

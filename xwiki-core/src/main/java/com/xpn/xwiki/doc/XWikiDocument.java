@@ -90,6 +90,7 @@ import org.xwiki.rendering.block.LinkBlock;
 import org.xwiki.rendering.block.MacroBlock;
 import org.xwiki.rendering.block.SectionBlock;
 import org.xwiki.rendering.block.XDOM;
+import org.xwiki.rendering.listener.DocumentLink;
 import org.xwiki.rendering.listener.HeaderLevel;
 import org.xwiki.rendering.listener.LinkType;
 import org.xwiki.rendering.parser.ParseException;
@@ -4481,13 +4482,15 @@ public class XWikiDocument implements DocumentModelBridge
                     org.xwiki.rendering.listener.Link link = linkBlock.getLink();
                     if (link.getType() == LinkType.DOCUMENT) {
                         // If the reference is empty, the link is an autolink
-                        if (!StringUtils.isEmpty(link.getReference())
-                            || (StringUtils.isEmpty(link.getAnchor()) && StringUtils.isEmpty(link.getQueryString()))) {
+                        DocumentLink documentLink = (DocumentLink) link;
+                        if (!StringUtils.isEmpty(documentLink.getReference())
+                            || (StringUtils.isEmpty(documentLink.getAnchor())
+                            && StringUtils.isEmpty(documentLink.getQueryString()))) {
                             // The reference may not have the space or even document specified (in case of an empty
                             // string)
                             // Thus we need to find the fully qualified document name
                             DocumentReference documentReference =
-                                this.currentDocumentReferenceResolver.resolve(link.getReference());
+                                this.currentDocumentReferenceResolver.resolve(documentLink.getReference());
 
                             // Verify that the link is not an autolink (i.e. a link to the current document)
                             if (!documentReference.equals(currentDocumentReference)) {

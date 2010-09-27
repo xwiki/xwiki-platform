@@ -8,8 +8,8 @@
 .#-----------------------------------------------------
 beginDocument
 beginParagraph
-beginLink [Reference = [\]] [false]
-endLink [Reference = [\]] [false]
+beginLink [Typed = [false] Type = [doc] Reference = [\]] [false]
+endLink [Typed = [false] Type = [doc] Reference = [\]] [false]
 endParagraph
 endDocument
 .#-----------------------------------------------------

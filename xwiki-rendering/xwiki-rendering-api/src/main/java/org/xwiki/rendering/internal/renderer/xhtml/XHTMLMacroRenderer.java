@@ -32,7 +32,7 @@ import org.xwiki.rendering.renderer.printer.XHTMLWikiPrinter;
  */
 public class XHTMLMacroRenderer
 {
-    private static final String SEPARATOR = "|-|";
+    private static final String COMMENT_SEPARATOR = "|-|";
 
     private ParametersPrinter parametersPrinter = new ParametersPrinter();
 
@@ -50,14 +50,14 @@ public class XHTMLMacroRenderer
         buffer.append(name);
 
         // Print parameters
-        buffer.append(SEPARATOR);
+        buffer.append(COMMENT_SEPARATOR);
         if (!parameters.isEmpty()) {
             buffer.append(this.parametersPrinter.print(parameters, '\\'));
         }
 
         // Print content
         if (content != null) {
-            buffer.append(SEPARATOR);
+            buffer.append(COMMENT_SEPARATOR);
             buffer.append(content);
         }
 

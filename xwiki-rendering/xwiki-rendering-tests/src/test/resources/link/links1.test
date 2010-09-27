@@ -7,8 +7,8 @@
 .#-----------------------------------------------------
 beginDocument
 beginParagraph
-beginLink [Reference = [Space.ExistingPage]] [false]
-endLink [Reference = [Space.ExistingPage]] [false]
+beginLink [Typed = [false] Type = [doc] Reference = [Space.ExistingPage]] [false]
+endLink [Typed = [false] Type = [doc] Reference = [Space.ExistingPage]] [false]
 endParagraph
 endDocument
 .#-----------------------------------------------------

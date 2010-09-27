@@ -85,7 +85,7 @@ public class MockWikiModel implements WikiModel
      */
     public String getDocumentViewURL(String documentName, String anchor, String queryString)
     {
-        return "viewurl";
+        return "viewurl" + (queryString != null ? "?" + queryString : "") + (anchor != null ? "#" + anchor : "");
     }
 
     /**

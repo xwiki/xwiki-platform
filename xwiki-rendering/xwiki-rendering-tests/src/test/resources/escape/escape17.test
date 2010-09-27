@@ -8,9 +8,9 @@
 .#-----------------------------------------------------
 beginDocument
 beginParagraph
-beginLink [Reference = [Space.ExistingPage]] [false] [[title]=[xwiki "rox"]]
+beginLink [Typed = [false] Type = [url] Reference = [Space.ExistingPage]] [false] [[title]=[xwiki "rox"]]
 onWord [go]
-endLink [Reference = [Space.ExistingPage]] [false] [[title]=[xwiki "rox"]]
+endLink [Typed = [false] Type = [url] Reference = [Space.ExistingPage]] [false] [[title]=[xwiki "rox"]]
 endParagraph
 endDocument
 .#-----------------------------------------------------

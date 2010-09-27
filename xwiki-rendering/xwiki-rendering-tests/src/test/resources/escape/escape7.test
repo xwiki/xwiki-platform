@@ -18,22 +18,22 @@ onWord [nolink]
 onSpecialSymbol []]
 onSpecialSymbol []]
 onNewLine
-beginLink [Reference = [reference]] [false]
+beginLink [Typed = [false] Type = [url] Reference = [reference]] [false]
 onSpecialSymbol [[]
 onSpecialSymbol [[]
-endLink [Reference = [reference]] [false]
+endLink [Typed = [false] Type = [url] Reference = [reference]] [false]
 onNewLine
 onSpecialSymbol [[]
 onSpecialSymbol [[]
 onWord [whatever]
 onNewLine
 onSpecialSymbol [[]
-beginLink [Reference = [link]] [false]
-endLink [Reference = [link]] [false]
+beginLink [Typed = [false] Type = [url] Reference = [link]] [false]
+endLink [Typed = [false] Type = [url] Reference = [link]] [false]
 onNewLine
 onSpecialSymbol [[]
-beginLink [Reference = [http://reference]] [true]
-endLink [Reference = [http://reference]] [true]
+beginLink [Typed = [false] Type = [url] Reference = [http://reference]] [true]
+endLink [Typed = [false] Type = [url] Reference = [http://reference]] [true]
 onSpecialSymbol []]
 endParagraph
 endDocument

@@ -164,7 +164,7 @@ public class RssMacro extends AbstractMacro<RssMacroParameters>
             // Title link.
             Link titleLink = new Link();
             titleLink.setReference(feed.getLink());
-            titleLink.setType(LinkType.URI);
+            titleLink.setType(LinkType.URL);
 
             // Title text link.
             Block titleTextLinkBlock = new LinkBlock(parsePlainText(feed.getTitle()), titleLink, true);
@@ -207,7 +207,7 @@ public class RssMacro extends AbstractMacro<RssMacroParameters>
             SyndEntry entry = (SyndEntry) item;
 
             Link titleLink = new Link();
-            titleLink.setType(LinkType.URI);
+            titleLink.setType(LinkType.URL);
             titleLink.setReference(entry.getLink());
             Block titleBlock = new LinkBlock(parsePlainText(entry.getTitle()), titleLink, true);
             ParagraphBlock paragraphTitleBlock = new ParagraphBlock(Collections.singletonList(titleBlock));

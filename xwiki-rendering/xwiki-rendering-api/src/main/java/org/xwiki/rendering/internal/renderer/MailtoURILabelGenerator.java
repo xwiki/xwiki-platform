@@ -22,7 +22,7 @@ package org.xwiki.rendering.internal.renderer;
 import org.apache.commons.lang.StringUtils;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.rendering.listener.Link;
-import org.xwiki.rendering.renderer.URILabelGenerator;
+import org.xwiki.rendering.renderer.link.URILabelGenerator;
 
 /**
  * Generate link labels for MAILTO URIs.
@@ -40,7 +40,7 @@ public class MailtoURILabelGenerator implements URILabelGenerator
     
     /**
      * {@inheritDoc}
-     * @see org.xwiki.rendering.renderer.URILabelGenerator#generateLabel(org.xwiki.rendering.listener.Link)
+     * @see org.xwiki.rendering.renderer.link.URILabelGenerator#generateLabel(org.xwiki.rendering.listener.Link)
      */
     public String generateLabel(Link link)
     {

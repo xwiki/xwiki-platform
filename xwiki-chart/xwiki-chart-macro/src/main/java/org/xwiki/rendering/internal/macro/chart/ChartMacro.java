@@ -118,7 +118,7 @@ public class ChartMacro extends AbstractMacro<ChartMacroParameters>
         String title = macroParams.getTitle();
         Link link = new Link();
         link.setReference(imageLocation);
-        link.setType(LinkType.URI);
+        link.setType(LinkType.URL);
         ImageBlock imageBlock = new ImageBlock(new URLImage(imageLocation), true);
         imageBlock.setParameter("alt", title);
         LinkBlock linkBlock = new LinkBlock(Collections.singletonList((Block) imageBlock), link, true);

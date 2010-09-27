@@ -7,9 +7,9 @@
 .#-----------------------------------------------------
 beginDocument
 beginParagraph
-beginLink [Reference = [http://xwiki.org]] [false]
+beginLink [Typed = [false] Type = [url] Reference = [http://xwiki.org]] [false]
 onWord [label]
-endLink [Reference = [http://xwiki.org]] [false]
+endLink [Typed = [false] Type = [url] Reference = [http://xwiki.org]] [false]
 endParagraph
 endDocument
 .#-----------------------------------------------------

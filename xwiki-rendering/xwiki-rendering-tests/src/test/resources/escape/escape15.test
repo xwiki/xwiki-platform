@@ -8,13 +8,13 @@
 .#-----------------------------------------------------
 beginDocument
 beginParagraph
-beginLink [Reference = [refe||rence]] [false] [[param]=[value]]
+beginLink [Typed = [false] Type = [url] Reference = [refe||rence]] [false] [[param]=[value]]
 onWord [lab]
 onSpecialSymbol [>]
 onSpecialSymbol [>]
 onWord [el]
 onSpecialSymbol [~]
-endLink [Reference = [refe||rence]] [false] [[param]=[value]]
+endLink [Typed = [false] Type = [url] Reference = [refe||rence]] [false] [[param]=[value]]
 endParagraph
 endDocument
 .#-----------------------------------------------------

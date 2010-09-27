@@ -13,14 +13,14 @@ beginDocument
 beginMacroMarkerStandalone [toc] []
 beginList [BULLETED]
 beginListItem
-beginLink [Anchor = [Hh1]] [false]
+beginLink [Typed = [false] Type = [doc] Anchor = [Hh1]] [false]
 onWord [h1]
-endLink [Anchor = [Hh1]] [false]
+endLink [Typed = [false] Type = [doc] Anchor = [Hh1]] [false]
 beginList [BULLETED]
 beginListItem
-beginLink [Anchor = [Hh2]] [false]
+beginLink [Typed = [false] Type = [doc] Anchor = [Hh2]] [false]
 onWord [h2]
-endLink [Anchor = [Hh2]] [false]
+endLink [Typed = [false] Type = [doc] Anchor = [Hh2]] [false]
 endListItem
 endList [BULLETED]
 endListItem

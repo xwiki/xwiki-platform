@@ -201,6 +201,18 @@
                 <exclude>org/xwiki/rendering/macro/script/AbstractScriptMacro</exclude>
                 <exclude>org/xwiki/rendering/macro/script/AbstractJSR223ScriptMacro</exclude>
                 <exclude>org/xwiki/rendering/wiki/WikiModel</exclude>
+                <exclude>org/xwiki/rendering/block/PlainTextBlockFilter</exclude>
+                <exclude>org/xwiki/rendering/listener/Link</exclude>
+                <exclude>org/xwiki/rendering/listener/LinkType</exclude>
+                <exclude>org/xwiki/rendering/parser/LinkParser</exclude>
+                <exclude>org/xwiki/rendering/renderer/LinkLabelGenerator</exclude>
+                <exclude>org/xwiki/rendering/renderer/LinkReferenceSerializer</exclude>
+                <exclude>org/xwiki/rendering/renderer/URILabelGenerator</exclude>
+                <exclude>org/xwiki/rendering/renderer/XWikiSyntaxListenerChain</exclude>
+                <exclude>org/xwiki/rendering/renderer/xhtml/XHTMLImageRenderer</exclude>
+                <exclude>org/xwiki/rendering/renderer/xhtml/XHTMLLinkRenderer</exclude>
+                <exclude>org/xwiki/annotation/renderer/AbstractAnnotationRenderer</exclude>
+                <exclude>org/xwiki/annotation/renderer/LinkLabelGeneratorChainingListener</exclude>
                 <!-- Not really API changes, just moved to another project -->
                 <exclude>org/xwiki/component/manager/AbstractComponentDescriptorEvent</exclude>
                 <exclude>org/xwiki/component/manager/ComponentDescriptorAddedEvent</exclude>

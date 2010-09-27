@@ -20,17 +20,11 @@
 package org.xwiki.extension.repository.internal;
 
 import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import org.apache.maven.model.Model;
-import org.apache.maven.model.Parent;
-import org.apache.maven.model.io.xpp3.MavenXpp3Reader;
-import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 import org.xwiki.extension.CoreExtension;
 import org.xwiki.extension.ExtensionDependency;
 import org.xwiki.extension.ExtensionException;
@@ -56,45 +50,19 @@ public class DefaultCoreExtension implements CoreExtension
 
     private DefaultCoreExtensionRepository repository;
 
-    private Model mavenModel;
-
     public DefaultCoreExtension(String id, String version)
     {
         this.id = id;
         this.version = version;
     }
 
-    public DefaultCoreExtension(DefaultCoreExtensionRepository repository, URL url, InputStream descriptorStream)
-        throws IOException, XmlPullParserException
+    public DefaultCoreExtension(DefaultCoreExtensionRepository repository, URL url, String id, String version)
     {
         this.repository = repository;
 
         this.url = url;
 
-        parseDescriptor(descriptorStream);
-    }
-
-    private void parseDescriptor(InputStream descriptorStream) throws IOException, XmlPullParserException
-    {
-        MavenXpp3Reader reader = new MavenXpp3Reader();
-        this.mavenModel = reader.read(descriptorStream);
-
-        String version = this.mavenModel.getVersion();
-        String groupId = this.mavenModel.getGroupId();
-
-        if (version == null || groupId == null) {
-            Parent parent = this.mavenModel.getParent();
-
-            if (groupId == null) {
-                groupId = parent.getGroupId();
-            }
-
-            if (version == null) {
-                version = parent.getVersion();
-            }
-        }
-
-        this.id = groupId + ":" + this.mavenModel.getArtifactId();
+        this.id = id;
         this.version = version;
     }
 

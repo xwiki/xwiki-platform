@@ -28,6 +28,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.apache.maven.model.Dependency;
+import org.apache.maven.model.Model;
+import org.apache.maven.model.Parent;
+import org.apache.maven.model.io.xpp3.MavenXpp3Reader;
 import org.reflections.Reflections;
 import org.reflections.scanners.ResourcesScanner;
 import org.reflections.util.ClasspathHelper;
@@ -81,6 +85,8 @@ public class DefaultCoreExtensionRepository extends AbstractLogEnabled implement
 
         this.extensions = new LinkedHashMap<String, CoreExtension>(descriptors.size());
 
+        List<Dependency> dependencies = new ArrayList<Dependency>();
+
         for (String descriptor : descriptors) {
             URL descriptorUrl = getClass().getClassLoader().getResource(descriptor);
 
@@ -88,9 +94,32 @@ public class DefaultCoreExtensionRepository extends AbstractLogEnabled implement
 
             InputStream descriptorStream = getClass().getClassLoader().getResourceAsStream(descriptor);
             try {
-                CoreExtension coreExtension = new DefaultCoreExtension(this, descriptorUrl, descriptorStream);
+                MavenXpp3Reader reader = new MavenXpp3Reader();
+                Model mavenModel = reader.read(descriptorStream);
+
+                String version = mavenModel.getVersion();
+                String groupId = mavenModel.getGroupId();
+
+                if (version == null || groupId == null) {
+                    Parent parent = mavenModel.getParent();
+
+                    if (groupId == null) {
+                        groupId = parent.getGroupId();
+                    }
+
+                    if (version == null) {
+                        version = parent.getVersion();
+                    }
+                }
+
+                CoreExtension coreExtension =
+                    new DefaultCoreExtension(this, descriptorUrl, groupId + ":" + mavenModel.getArtifactId(), version);
 
                 this.extensions.put(coreExtension.getId(), coreExtension);
+
+                for (Dependency dependency : mavenModel.getDependencies()) {
+                    dependencies.add(dependency);
+                }
             } catch (Exception e) {
                 getLogger().error("Failed to parse descriptor [" + descriptorUrl + "]", e);
             } finally {
@@ -99,6 +128,17 @@ public class DefaultCoreExtensionRepository extends AbstractLogEnabled implement
                 } catch (IOException e) {
                     // Should not happen
                     getLogger().error("Failed to close descriptor stream [" + descriptorUrl + "]", e);
+                }
+            }
+
+            // Add dependencies that does not provide proper pom.xml resource and can't be found in the classpath
+            for (Dependency dependency : dependencies) {
+                String dependencyId = dependency.getGroupId() + ":" + dependency.getArtifactId();
+                if (!this.extensions.containsKey(dependencyId)) {
+                    CoreExtension coreExtension =
+                        new DefaultCoreExtension(this, descriptorUrl, dependencyId, dependency.getVersion());
+
+                    this.extensions.put(dependencyId, coreExtension);
                 }
             }
         }

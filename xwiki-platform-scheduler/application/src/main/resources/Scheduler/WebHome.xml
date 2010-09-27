@@ -267,6 +267,7 @@ $msg.get('xe.scheduler.welcome')
 {{html}}
 &lt;form action="" id="newdoc"&gt;
 &lt;div&gt;
+&lt;input type="hidden" name="form_token" value="$!{services.csrf.getToken()}" /&gt;
 &lt;input type="hidden" name="parent" value="Scheduler.WebHome" /&gt;
 &lt;input type="hidden" name="template" value="XWiki.SchedulerJobTemplate" /&gt;
 &lt;input type="hidden" name="sheet" value="1" /&gt;

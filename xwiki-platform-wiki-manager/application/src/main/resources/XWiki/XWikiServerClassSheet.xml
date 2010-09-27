@@ -36,7 +36,9 @@
   #set ($wiki = $WikiManager.getWikiFromDocumentName($doc.fullName))
   ##
   #if ($action &amp;&amp; ($action == "create") &amp;&amp; $domain &amp;&amp; ($domain.trim().length() &gt; 0))
-    #if (!$wiki.containsWikiAlias($domain))
+    #if (!${services.csrf.isTokenValid("$!{request.getParameter('form_token')}")})
+      #error($msg.get("notallowed"))
+    #elseif (!$wiki.containsWikiAlias($domain))
       #set ($alias = $wiki.newObject("XWiki.XWikiServerClass"))
       $alias.set("server", $domain)
       $alias.set("homepage", "Main.WebHome")
@@ -47,7 +49,9 @@
   #end
   ##
   #if ($action &amp;&amp; ($action == "delete") &amp;&amp; $domain &amp;&amp; ($domain.trim().length() &gt; 0))
-    #if ($wiki.containsWikiAlias($domain))
+    #if (!${services.csrf.isTokenValid("$!{request.getParameter('form_token')}")})
+      #error($msg.get("notallowed"))
+    #elseif ($wiki.containsWikiAlias($domain))
       #set ($alias = $wiki.getWikiAlias($domain))
       #set ($removed = $wiki.removeObject($alias.objectApi))
       $wiki.save()

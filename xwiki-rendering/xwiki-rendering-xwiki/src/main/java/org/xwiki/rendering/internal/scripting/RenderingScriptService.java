@@ -24,6 +24,7 @@ import org.xwiki.component.annotation.Requirement;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.rendering.parser.Parser;
+import org.xwiki.rendering.renderer.PrintRendererFactory;
 import org.xwiki.rendering.syntax.Syntax;
 import org.xwiki.script.service.ScriptService;
 
@@ -39,6 +40,9 @@ import java.util.List;
 @Component("rendering")
 public class RenderingScriptService implements ScriptService
 {
+    /**
+     * Used to lookup parsers and renderers to discover available syntaxes.
+     */
     @Requirement
     private ComponentManager componentManager;
 
@@ -54,6 +58,23 @@ public class RenderingScriptService implements ScriptService
             }
         } catch (ComponentLookupException e) {
             // Failed to lookup parsers, consider there are no syntaxes available
+        }
+
+        return syntaxes;
+    }
+
+    /**
+     * @return the list of syntaxes for which a Renderer is available
+     */
+    public List<Syntax> getAvailableRendererSyntaxes()
+    {
+        List<Syntax> syntaxes = new ArrayList<Syntax>();
+        try {
+            for (PrintRendererFactory factory : this.componentManager.lookupList(PrintRendererFactory.class)) {
+                syntaxes.add(factory.getSyntax());
+            }
+        } catch (ComponentLookupException e) {
+            // Failed to lookup renderers, consider there are no syntaxes available
         }
 
         return syntaxes;

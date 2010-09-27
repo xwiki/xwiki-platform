@@ -105,7 +105,7 @@ public class DefaultCSRFToken extends AbstractLogEnabled implements CSRFToken, I
         }
         byte[] seed = this.random.generateSeed(TOKEN_LENGTH);
         this.random.setSeed(seed);
-        getLogger().info("CSRFToken: Anti-CSRF secret token component has been initialized");
+        getLogger().debug("CSRFToken: Anti-CSRF secret token component has been initialized");
     }
 
     /**

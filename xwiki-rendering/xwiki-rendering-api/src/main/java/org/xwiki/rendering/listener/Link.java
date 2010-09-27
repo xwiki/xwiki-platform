@@ -54,7 +54,8 @@ public class Link implements Cloneable
     }
 
     /**
-     * @return true if the link reference is prefixed with the link type (eg "doc" for links to documents, etc)
+     * @return true if the link type has been explicitly provided (eg in XWiki Syntax 2.1 if the reference is prefixed
+     *         with the link type followed by ":" and then the rest of the reference)
      */
     public boolean isTyped()
     {

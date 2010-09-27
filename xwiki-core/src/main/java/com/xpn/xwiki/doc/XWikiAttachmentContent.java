@@ -27,9 +27,9 @@ import java.io.IOException;
 import java.io.InputStream;
 
 /**
- * The content of an attachment.
- * Objects of this class hold the actual content which will be downloaded when a user downloads an attachment.
- *
+ * The content of an attachment. Objects of this class hold the actual content which will be downloaded when a user
+ * downloads an attachment.
+ * 
  * @version $Id$
  */
 public class XWikiAttachmentContent implements Cloneable
@@ -45,7 +45,7 @@ public class XWikiAttachmentContent implements Cloneable
 
     /**
      * Constructor with associated attachment specified.
-     *
+     * 
      * @param attachment the attachment which this is the content for.
      */
     public XWikiAttachmentContent(XWikiAttachment attachment)
@@ -55,8 +55,7 @@ public class XWikiAttachmentContent implements Cloneable
     }
 
     /**
-     * The default Constructor.
-     * For creating content which will be associated with an attachment later.
+     * The default Constructor. For creating content which will be associated with an attachment later.
      */
     public XWikiAttachmentContent()
     {
@@ -65,7 +64,7 @@ public class XWikiAttachmentContent implements Cloneable
 
     /**
      * This is used so that Hibernate will associate this content with the right attachment (metadata).
-     *
+     * 
      * @return the id of the attachment (metadata) which this content is associated with.
      */
     public long getId()
@@ -75,7 +74,7 @@ public class XWikiAttachmentContent implements Cloneable
 
     /**
      * This function does nothing and exists only for Hibernate to be able to load a value which is not used.
-     *
+     * 
      * @param id is ignored.
      */
     public void setId(long id)
@@ -104,7 +103,6 @@ public class XWikiAttachmentContent implements Cloneable
 
     /**
      * @return a byte array containing the binary content of the attachment.
-     * 
      * @deprecated use {@link #getContentInputStream()} instead
      */
     @Deprecated
@@ -119,9 +117,8 @@ public class XWikiAttachmentContent implements Cloneable
 
     /**
      * Set the content from a byte array.
-     *
+     * 
      * @param content a byte array containing the binary data of the attachment
-     *
      * @deprecated use {@link #setContent(java.io.InputStream, int)} instead
      */
     @Deprecated
@@ -156,7 +153,7 @@ public class XWikiAttachmentContent implements Cloneable
 
     /**
      * Is the content "dirty" meaning out of sync with the database.
-     *
+     * 
      * @return true if the content is out of sync with the database and in need of saving.
      */
     public boolean isContentDirty()
@@ -166,9 +163,9 @@ public class XWikiAttachmentContent implements Cloneable
 
     /**
      * Set the content as "dirty" meaning out of sync with the database.
-     *
-     * @param contentDirty if true then the content is regarded as out of sync with the database and in need of
-     *                     saving, otherwise it's considered saved.
+     * 
+     * @param contentDirty if true then the content is regarded as out of sync with the database and in need of saving,
+     *            otherwise it's considered saved.
      */
     public void setContentDirty(boolean contentDirty)
     {
@@ -177,7 +174,6 @@ public class XWikiAttachmentContent implements Cloneable
 
     /**
      * @return an InputStream to read the binary content of this attachment.
-     *
      * @since 2.3M2
      */
     public InputStream getContentInputStream()
@@ -187,7 +183,7 @@ public class XWikiAttachmentContent implements Cloneable
 
     /**
      * Set the content of the attachment from an InputStream.
-     *
+     * 
      * @param is the input stream that will be read
      * @param len the length in byte to read
      * @throws IOException when an error occurs during streaming operation
@@ -200,17 +196,16 @@ public class XWikiAttachmentContent implements Cloneable
 
     /**
      * @return the true size of the content of the attachment.
-     *
      * @since 2.3M2
      */
     public int getSize()
     {
-        return content.length;
+        return this.content.length;
     }
 
     /**
      * Read an input stream into a byte array.
-     *
+     * 
      * @param is the input stream to read
      * @param length the number of bytes of the stream to read.
      * @return a byte array of size len containing the read data

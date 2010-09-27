@@ -1,29 +1,68 @@
 #template('colorThemeInit.vm')
 /* Thread */
-.commentthread {
-  margin: 0 0 0 32px;
-}
 .commentthread fieldset {
   border: none;
   margin: 0 !important;
   padding: 0 0 8px 0;
 }
-ul.commentreplies, li.reply {
+ul.commentreplies, .reply {
   margin: 0;
   padding: 0;
   text-indent: 0;
 }
-li.reply {
+.reply {
   list-style-type: none;
+  padding-left: 55px;
+}
+.reply form.reply {
+  padding-left: 0;
+}
+.commentthread .reply {
+  padding-left: 35px;
 }
 * html .reply {
   /* Strange things happen in IE if this is missing: the width of a comment is larger and the layout is broken. */
   border-top: 1px solid $theme.pageContentBackgroundColor;
 }
+*+html .xwikicomment {
+  border-top: 1px solid $theme.pageContentBackgroundColor;
+}
 /* Comment */
 .xwikicomment {
-  border: none;     /* Overriding toucan */
+  border: 0 none;   /* Overriding toucan */
   padding: 0 0 8px; /* Overriding toucan */
+}
+* html .xwikicomment {
+  /* Pick-a-boo IE6 bugfix */
+  position: relative;
+}
+.commentavatar {
+  display: inline; /* IE6 bugfix */
+  float: left;
+  margin-left: -55px;
+  padding-top: 5px;
+  position: relative; /* IE6 bugfix */
+  text-align: center;
+  width: 50px;
+}
+.commentthread .commentavatar {
+  margin-left: -35px;
+  width: 30px;
+}
+.commentavatar img {
+  max-width: 50px;
+  max-height: 50px;
+}
+.commentthread .commentavatar img {
+  max-width: 30px;
+  max-height: 30px;
+}
+/* max-width is not supported in IE6 */
+* html .commentavatar img {
+  width: 50px;
+}
+* html .commentthread .commentavatar img {
+  width: 30px;
 }
 .commentheader {
   border-bottom: 1px dotted $theme.borderColor;
@@ -43,7 +82,7 @@ li.reply {
 .commentcontent {
   border: none;       /* Overriding toucan */
   margin: 0;
-  padding: 0 36px 0 32px;
+  padding: 0 36px 0 0;
   text-align: justify;
 }
 /* Comment "toolbox": delete, reply */
@@ -76,9 +115,18 @@ li.reply {
 #AddComment {
   border-top: 1px solid $theme.borderColor;
 }
+#AddComment fieldset {
+  padding-left: 55px;
+}
+.commentthread #AddComment fieldset {
+  padding-left: 35px;
+}
 #AddComment label {
   color: $theme.textSecondaryColor;
   font-weight: 400;
+}
+#AddComment legend {
+  margin-left: -55px;
 }
 .commentthread #AddComment legend {
   display: none;     /* For replies, don't display the legend, because it is unnecessary and does not integrate well. */
@@ -99,7 +147,11 @@ li.reply {
   width: 100%;
 }
 * html #AddComment .commentcontainer textarea {
-  /* fix for IE */
+  /* fix for IE6 */
+  width: 98%;
+}
+*+html #AddComment .commentcontainer textarea {
+  /* fix for IE7 */
   width: 98%;
 }
 #AddComment label {
@@ -130,4 +182,12 @@ form.edit-xcomment .commentPreview {
 }
 form.edit-xcomment .commentcontent textarea {
   width: 100%;
+}
+* html form.edit-xcomment .commentcontent textarea {
+  /* fix for IE6 */
+  width: 98%;
+}
+*+html form.edit-xcomment .commentcontent textarea {
+  /* fix for IE7 */
+  width: 98%;
 }

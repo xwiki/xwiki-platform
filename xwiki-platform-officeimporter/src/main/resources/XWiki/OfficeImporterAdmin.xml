@@ -281,7 +281,7 @@ v7oibV0+qncSAAAAAElFTkSuQmCC</content></attachment>
 #set($msgRestart=$msg.get("xe.officeimporter.openoffice.actions.restart"))
 #set($msgUpdate=$msg.get("xe.officeimporter.openoffice.update"))
 #set($msgLimitedControl=$msg.get("xe.officeimporter.openoffice.limitedcontrol"))
-#if($hasAdmin)
+#if($hasAdmin &amp;&amp; ${services.csrf.isTokenValid("$!{request.getParameter('form_token')}")})
   #set($currentAction = "$!{request.action}")
   #if($currentAction == "stop")
     #if(!$oomanager.stopServer())

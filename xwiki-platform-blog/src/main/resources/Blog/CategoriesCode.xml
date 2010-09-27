@@ -397,7 +397,7 @@ $escapetool.xml($!categoryDoc.getObject(${blogCategoryClassname}).getProperty('d
   #end
   #set($query = "${query}obj.name = doc.fullName and obj.className = '${blogCategoryClassname}' and doc.fullName &lt;&gt; 'Blog.CategoryTemplate' and doc.parent = ? order by doc.name")
   #foreach($item in $xwiki.searchDocuments($query, $parameterValues))
-    #if($xwiki.hasAccessLevel('edit', $xcontext.user, $item))
+    #if($xwiki.hasAccessLevel('edit', $xcontext.user, $item) &amp;&amp; $!{services.csrf.isTokenValid("$!{request.getParameter('form_token')}")})
       #set($subcategoryDoc = $xwiki.getDocument($item))
       $subcategoryDoc.setParent($categoryParent)
       $subcategoryDoc.save($msg.get('xe.blog.manageCategories.comment.updatedParent'), true)
@@ -409,7 +409,7 @@ $escapetool.xml($!categoryDoc.getObject(${blogCategoryClassname}).getProperty('d
   #end
   #set($query = "${query}obj.name = doc.fullName and obj.className = '${blogPostClassname}' and doc.fullName &lt;&gt; 'Blog.BlogPostTemplate' and categories.id.id = obj.id and categories.id.name = 'category' and category = ? order by doc.name")
   #foreach($item in $xwiki.searchDocuments($query, $parameterValues))
-    #if($xwiki.hasAccessLevel('edit', $xcontext.user, $item))
+    #if($xwiki.hasAccessLevel('edit', $xcontext.user, $item) &amp;&amp; $!{services.csrf.isTokenValid("$!{request.getParameter('form_token')}")})
       #set($blogEntryDoc = $xwiki.getDocument($item))
       #set($discard = $blogEntryDoc.getObject(${blogPostClassname}).getProperty('category').value.remove($category))
       $blogEntryDoc.save($msg.get('xe.blog.manageCategories.comment.removedDeletedCategory'), true)
@@ -433,7 +433,7 @@ $escapetool.xml($!categoryDoc.getObject(${blogCategoryClassname}).getProperty('d
   #set($query = ', BaseObject obj where ')
   #set($query = "${query}obj.name = doc.fullName and obj.className = '${blogCategoryClassname}' and doc.fullName &lt;&gt; 'Blog.CategoryTemplate' and doc.parent = ? order by doc.name")
   #foreach($item in $xwiki.searchDocuments($query, $parameterValues))
-    #if($xwiki.hasAccessLevel('edit', $xcontext.user, $item))
+    #if($xwiki.hasAccessLevel('edit', $xcontext.user, $item) &amp;&amp; $!{services.csrf.isTokenValid("$!{request.getParameter('form_token')}")})
       #set($subcategoryDoc = $xwiki.getDocument($item))
       $subcategoryDoc.setParent($newCategoryDoc.fullName)
       $subcategoryDoc.save($msg.get('xe.blog.manageCategories.comment.updatedParent'), true)
@@ -442,16 +442,18 @@ $escapetool.xml($!categoryDoc.getObject(${blogCategoryClassname}).getProperty('d
   #set($query = ', BaseObject obj, DBStringListProperty categories join categories.list as category where ')
   #set($query = "${query}obj.name = doc.fullName and obj.className = '${blogPostClassname}' and doc.fullName &lt;&gt; 'Blog.BlogPostTemplate' and categories.id.id = obj.id and categories.id.name = 'category' and category = ? order by doc.name")
   #foreach($item in $xwiki.searchDocuments($query, $parameterValues))
-    #if($xwiki.hasAccessLevel('edit', $xcontext.user, $item))
+    #if($xwiki.hasAccessLevel('edit', $xcontext.user, $item) &amp;&amp; $!{services.csrf.isTokenValid("$!{request.getParameter('form_token')}")})
       #set($blogEntryDoc = $xwiki.getDocument($item))
       #set($discard = $blogEntryDoc.getObject(${blogPostClassname}).getProperty('category').value.remove($category))
       #set($discard = $blogEntryDoc.getObject(${blogPostClassname}).getProperty('category').value.add($newCategoryDoc.fullName))
       $blogEntryDoc.save($msg.get('xe.blog.manageCategories.comment.updatedRenamedCategory'), true)
     #end
   #end
-  $categoryDoc.getObject('Blog.CategoryClass').set('name', $newCategoryName)
-  $categoryDoc.save($msg.get('xe.blog.manageCategories.comment.updatedCategory'), true)
-  $categoryDoc.rename($newCategoryName)
+  #if ($!{services.csrf.isTokenValid("$!{request.getParameter('form_token')}")})
+    $categoryDoc.getObject('Blog.CategoryClass').set('name', $newCategoryName)
+    $categoryDoc.save($msg.get('xe.blog.manageCategories.comment.updatedCategory'), true)
+    $categoryDoc.rename($newCategoryName)
+  #end
 #end
 {{/velocity}}</content>
 </xwikidoc>

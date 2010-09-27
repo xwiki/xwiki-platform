@@ -20,11 +20,12 @@
 package com.xpn.xwiki.content.parsers;
 
 import junit.framework.TestCase;
+
 import com.xpn.xwiki.content.Link;
 
 /**
  * Unit tests for {@link com.xpn.xwiki.content.parsers.RenamePageReplaceLinkHandler}.
- *
+ * 
  * @version $Id$
  */
 public class RenamePageReplaceLinkHandlerTest extends TestCase

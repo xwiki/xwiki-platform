@@ -85,13 +85,14 @@ public interface AttachmentRecycleBinStore
 
     /**
      * Get all the deleted attachments from the database matching an attachment template (document name and filename).
+     * The results are ordered by the deletion date, descending (most recently deleted first).
      * 
-     * @return Infos about all mathing deleted attachments, sorted by date.
      * @param attachment Optional attachment template. If <code>null</code>, return information about all deleted
      *            attachments from the database. Otherwise, filter by the document and filename provided in the passed
      *            attachment.
      * @param context The current context.
      * @param bTransaction Should use old transaction (false) or create new (true).
+     * @return Infos about all matching deleted attachments, sorted by date.
      * @throws XWikiException If an error occurs while loading or restoring the attachments.
      */
     List<DeletedAttachment> getAllDeletedAttachments(XWikiAttachment attachment, XWikiContext context,

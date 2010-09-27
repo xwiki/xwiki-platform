@@ -104,6 +104,7 @@
 #set($panelId = $util.generateRandomString(4))
 &lt;form method="post" action="$doc.getURL('view', 'xpage=create')" onsubmit="cancelCancelEdit()"&gt;
   &lt;div class="padded centered"&gt;
+    &lt;input type="hidden" name="form_token" value="$!{services.csrf.getToken()}" /&gt;
     &lt;input type="hidden" name="tocreate" value="page"/&gt;
     &lt;dl&gt;
       &lt;dt&gt;

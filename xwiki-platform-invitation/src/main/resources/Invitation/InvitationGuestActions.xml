@@ -223,7 +223,7 @@
       {{error}}(%id="invitation-action-message"%)$msg.get('xe.invitation.doAction.accept.alreadyReportedAsSpam'){{/error}}
     #elseif($status != 'pending')
       {{error}}(%id="invitation-action-message"%)$msg.get('xe.invitation.doAction.invalidStatus', ["#messageStatusForCode($status)"]){{/error}}
-    #else
+    #elseif($confirm &amp;&amp; ${services.csrf.isTokenValid("$!{request.getParameter('form_token')}")})
       #if("#canGuestAcceptInvitation($doc)" != 'true')
       ##
         {{error}}(%id="invitation-action-message"%)$msg.get('xe.invitation.doAction.accept.improperConfiguration'){{/error}}
@@ -235,6 +235,9 @@
         #set($invited = true)
         {{include document="XWiki.Registration"/}}
       #end
+    #else
+      ## CSRF protection
+      $response.sendRedirect("$!{services.csrf.getResubmissionURL()}")
     #end
   #elseif($action == 'decline')
     ## Decline Invitation &lt;------------------------------------------------------------------------
@@ -261,7 +264,7 @@
       {{error}}(%id="invitation-action-message"%)$msg.get('xe.invitation.doAction.decline.alreadyReportedAsSpam'){{/error}}
     #elseif($status != 'pending')
       {{error}}(%id="invitation-action-message"%)$msg.get('xe.invitation.doAction.invalidStatus', ["#messageStatusForCode($status)"]){{/error}}
-    #elseif($confirm)
+    #elseif($confirm &amp;&amp; ${services.csrf.isTokenValid("$!{request.getParameter('form_token')}")})
       #setMessageStatus($message, 'declined', $memo)##
       $emailContainer.saveAsAuthor($msg.get('xe.invitation.doAction.decline.saveComment'))
       {{info}}(%id="invitation-action-message"%)$msg.get('xe.invitation.doAction.decline.success'){{/info}}
@@ -280,7 +283,7 @@
     #if("$!message" == '')
       ## No message found by that id.
       {{error}}(%id="invitation-action-message"%)$msg.get('xe.invitation.doAction.reportSpam.noMessageFound'){{/error}}
-    #elseif($confirm)
+    #elseif($confirm &amp;&amp; ${services.csrf.isTokenValid("$!{request.getParameter('form_token')}")})
       #setMessageStatus($message, 'reported', $memo)##
       $emailContainer.saveAsAuthor($msg.get('xe.invitation.doAction.reportSpam.reportSaveComment'))
       ## Your report has been logged, sorry for the inconvienence.

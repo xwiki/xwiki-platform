@@ -50,15 +50,11 @@ public class DefaultCoreExtensionRepositoryTest extends AbstractComponentTestCas
         ConfigurableDefaultCoreExtensionRepository.register(getComponentManager());
     }
 
-    // FIXME: can't make it work in maven yet because the classpath is wrong during surefire tests it seems (can't find
-    // anything in it)
-    /*
     @Test
     public void testInit()
     {
         Assert.assertTrue(this.coreExtensionRepository.countExtensions() > 0);
-    }
-    */
+    }    
 
     @Test
     public void testGetCoreExtension()

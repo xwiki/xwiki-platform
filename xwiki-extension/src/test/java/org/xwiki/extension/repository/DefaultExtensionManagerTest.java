@@ -97,8 +97,8 @@ public class DefaultExtensionManagerTest extends AbstractComponentTestCase
         this.coreExtensionRepository.addExtensions("org.jruby:jruby", "1.5");
         // the following extension should be found in the classpath but maven seems to have some bug around it (it's
         // working well inside Eclipse)
-        this.coreExtensionRepository.addExtensions("org.xwiki.platform:xwiki-core-classloader", this.rubyArtifactId.getVersion());
-        this.coreExtensionRepository.addExtensions("org.xwiki.platform:xwiki-core-rendering-api", this.rubyArtifactId.getVersion());
+        //this.coreExtensionRepository.addExtensions("org.xwiki.platform:xwiki-core-classloader", this.rubyArtifactId.getVersion());
+        //this.coreExtensionRepository.addExtensions("org.xwiki.platform:xwiki-core-rendering-api", this.rubyArtifactId.getVersion());
 
         // emulate environment
         registerMockComponent(DocumentAccessBridge.class);

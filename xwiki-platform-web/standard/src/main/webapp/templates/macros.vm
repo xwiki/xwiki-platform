@@ -530,6 +530,7 @@ $xwiki.getUserName("xwiki:${username}")
 <span class="separator"> | </span>
 #end
 
+
 ###
 ###    useravatar
 ###
@@ -537,14 +538,14 @@ $xwiki.getUserName("xwiki:${username}")
 ###
 ### @param username The name of the user whose avatar will be displayed
 ###
-#macro(useravatar $username)
+#macro(resizedUserAvatar $username $size)
   #if(!$picturelist)
     #set($picturelist = $util.hashMap)
   #end
-  #if(!$picturelist.containsKey($username))
+  #if(!$picturelist.containsKey("$username--$size"))
     #set($picture = "<img src='")
-    #set($picture = $picture.concat($xwiki.getSkinFile('noavatar.png')))
-    #set($picture = $picture.concat("' alt='${escapetool.xml($username)}' title='${escapetool.xml($username)}'/>"))
+    #set($picture = $picture.concat($xwiki.getSkinFile('noavatar.png', true)))
+    #set($picture = $picture.concat("' alt='${xwiki.getUserName($username, false)}' title='${xwiki.getUserName($username, false)}'/>"))
     #set($profiledoc = $xwiki.getDocument($username))
     #if(!$profiledoc.isNew())
       #if($profiledoc.attachmentList.size() != 0)
@@ -555,10 +556,13 @@ $xwiki.getUserName("xwiki:${username}")
               #set($pictureurl = $profiledoc.getAttachmentURL($profileobj.avatar))
               #set($picture = "<img src='")
               #set($picture = $picture.concat($pictureurl))
+              #if ($size > 0)
+                #set($picture = $picture.concat("?width=${size}&amp;height=${size}&amp;keepAspectRatio=true"))
+              #end
               #set($picture = $picture.concat("' alt='"))
-              #set($picture = $picture.concat(${escapetool.xml($username)}))
+              #set($picture = $picture.concat(${xwiki.getUserName($username, false)}))
               #set($picture = $picture.concat("' title='"))
-              #set($picture = $picture.concat(${escapetool.xml($username)}))
+              #set($picture = $picture.concat(${xwiki.getUserName($username, false)}))
               #set($picture = $picture.concat("'/>"))
               #break
             #end
@@ -566,9 +570,28 @@ $xwiki.getUserName("xwiki:${username}")
         #end
       #end
     #end
-    $!picturelist.put($username, $picture)
+    $!picturelist.put("$username--$size", $picture)
   #end
-  $picturelist.get($username)
+  $picturelist.get("$username--$size")
+#end
+#macro(largeUserAvatar $username)
+  #resizedUserAvatar($username 120)
+#end
+#macro(mediumUserAvatar $username)
+  #resizedUserAvatar($username 50)
+#end
+#macro(smallUserAvatar $username)
+  #resizedUserAvatar($username 30)
+#end
+###
+###    useravatar
+###
+### Display the avatar of a user, or a standard image if the user has no avatar
+###
+### @param username The name of the user whose avatar will be displayed
+###
+#macro(useravatar $username)
+  #resizedUserAvatar($username 0)
 #end
 
 ###

@@ -98,7 +98,7 @@ public class Syntax
     @Override
     public String toString()
     {
-        return getType().toString() + " " + getVersion() + (getQualifier() != null ? "(" + getQualifier() + ")" : "");
+        return getType().toString() + " " + getVersion() + (getQualifier() != null ? " (" + getQualifier() + ")" : "");
     }
 
     /**

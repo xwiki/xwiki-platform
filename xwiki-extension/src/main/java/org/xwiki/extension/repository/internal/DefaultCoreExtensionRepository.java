@@ -32,6 +32,7 @@ import org.reflections.Reflections;
 import org.reflections.scanners.ResourcesScanner;
 import org.reflections.util.ClasspathHelper;
 import org.reflections.util.ConfigurationBuilder;
+import org.reflections.util.FilterBuilder;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.logging.AbstractLogEnabled;
 import org.xwiki.component.phase.Initializable;
@@ -71,7 +72,8 @@ public class DefaultCoreExtensionRepository extends AbstractLogEnabled implement
     {
         ConfigurationBuilder configurationBuilder = new ConfigurationBuilder();
         configurationBuilder.setScanners(new ResourcesScanner());
-        configurationBuilder.setUrls(ClasspathHelper.getUrlsForCurrentClasspath());
+        configurationBuilder.setUrls(ClasspathHelper.getUrlsForPackagePrefix("META-INF.maven"));
+        configurationBuilder.filterInputsBy(new FilterBuilder.Include(FilterBuilder.prefix("META-INF.maven")));
 
         Reflections reflections = new Reflections(configurationBuilder);
 

@@ -20,6 +20,7 @@
  */
 package com.xpn.xwiki.web;
 
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
@@ -85,7 +86,7 @@ public class UploadAction extends XWikiAction
             return false;
         }
 
-        XWikiDocument doc = (XWikiDocument) context.getDoc().clone();
+        XWikiDocument doc = context.getDoc().clone();
 
         // The document is saved for each attachment in the group.
         FileUploadPlugin fileupload = (FileUploadPlugin) context.get("fileuploadplugin");
@@ -166,7 +167,7 @@ public class UploadAction extends XWikiAction
                 InputStream fiis = fileupload.getFileItemInputStream(fieldName, context);
                 attachment.setContent(fiis, fisize);
             } else {
-                attachment.setContent(new byte[0]);
+                attachment.setContent(new ByteArrayInputStream(new byte[0]), 0);
             }
         } catch (IOException e) {
             throw new XWikiException(XWikiException.MODULE_XWIKI_APP,

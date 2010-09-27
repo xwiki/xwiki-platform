@@ -542,7 +542,7 @@ $xwiki.getUserName("xwiki:${username}")
   #if(!$picturelist)
     #set($picturelist = $util.hashMap)
   #end
-  #if(!$picturelist.containsKey("$username--$size"))
+  #if(!$picturelist.containsKey("${username}--${size}"))
     #set($picture = "<img src='")
     #set($picture = $picture.concat($xwiki.getSkinFile('noavatar.png', true)))
     #set($picture = $picture.concat("' alt='${xwiki.getUserName($username, false)}' title='${xwiki.getUserName($username, false)}'/>"))
@@ -570,9 +570,9 @@ $xwiki.getUserName("xwiki:${username}")
         #end
       #end
     #end
-    $!picturelist.put("$username--$size", $picture)
+    $!picturelist.put("${username}--${size}", $picture)
   #end
-  $picturelist.get("$username--$size")
+  $picturelist.get("${username}--${size}")
 #end
 #macro(largeUserAvatar $username)
   #resizedUserAvatar($username 120)

@@ -37,22 +37,22 @@ public class OfficeDocumentPreview implements DisposableCacheValue
     /**
      * Reference to the attachment to which this preview belongs.
      */
-    private AttachmentReference attachmentReference;
+    private final AttachmentReference attachmentReference;
 
     /**
      * Specific version of the attachment to which this preview corresponds.
      */
-    private String version;
+    private final String version;
 
     /**
      * {@link XDOM} holding the preview document syntax.
      */
-    private XDOM xdom;
+    private final XDOM xdom;
 
     /**
      * Temporary files used by this preview.
      */
-    private Set<File> temporaryFiles;
+    private final Set<File> temporaryFiles;
 
     /**
      * Creates a new {@link OfficeDocumentPreview} instance.

@@ -31,6 +31,7 @@ import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.Requirement;
 import org.xwiki.model.reference.AttachmentReference;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.officeimporter.builder.PresentationBuilder;
 import org.xwiki.officeimporter.builder.XDOMOfficeDocumentBuilder;
 import org.xwiki.officeimporter.document.XDOMOfficeDocument;
 import org.xwiki.rendering.block.Block;
@@ -48,27 +49,51 @@ import org.xwiki.rendering.listener.URLImage;
 public class DefaultOfficePreviewBuilder extends AbstractOfficePreviewBuilder
 {
     /**
-     * Used to build xdom documents from office documents.
+     * File extensions corresponding to presentation office documents.
+     */
+    private static final List<String> PRESENTATION_FORMATS = Arrays.asList("ppt", "pptx", "odp");
+
+    /**
+     * Used to build XDOM documents from office documents.
      */
     @Requirement
-    private XDOMOfficeDocumentBuilder builder;
+    private XDOMOfficeDocumentBuilder documentBuilder;
+
+    /**
+     * Used to build XDOM document from office presentations.
+     */
+    @Requirement
+    private PresentationBuilder presentationBuilder;
 
     /**
      * {@inheritDoc}
      * 
-     * @see AbstractOfficePreviewBuilder#build(AttachmentReference, String, InputStream, Map)
+     * @see AbstractOfficePreviewBuilder#buildPreview(AttachmentReference, Map)
      */
-    protected OfficeDocumentPreview build(AttachmentReference attachmentReference, String version, InputStream data,
+    protected OfficeDocumentPreview buildPreview(AttachmentReference attachmentReference,
         Map<String, String> parameters) throws Exception
     {
-        DocumentReference documentReference = attachmentReference.getDocumentReference();
+        XDOMOfficeDocument xdomOfficeDocument = buildXDOM(attachmentReference, parameters);
+        Set<File> temporaryFiles = processImages(attachmentReference, xdomOfficeDocument);
 
-        boolean filterStyles = Boolean.valueOf(parameters.get("filterStyles"));
-        XDOMOfficeDocument xdomOfficeDoc =
-            builder.build(data, attachmentReference.getName(), documentReference, filterStyles);
+        XDOM xdom = xdomOfficeDocument.getContentDocument();
+        String attachmentVersion = documentAccessBridge.getAttachmentVersion(attachmentReference);
+        return new OfficeDocumentPreview(attachmentReference, attachmentVersion, xdom, temporaryFiles);
+    }
 
-        XDOM xdom = xdomOfficeDoc.getContentDocument();
-        Map<String, byte[]> artifacts = xdomOfficeDoc.getArtifacts();
+    /**
+     * Processes all the image blocks in the given XDOM and changes image URL to point to a temporary file for those
+     * images that are preview artifacts.
+     * 
+     * @param attachmentReference a reference to the office file that is being previewed; this reference is used to
+     *            compute the path to the temporary directory holding the image artifacts
+     * @param xdomOfficeDocument the XDOM whose image blocks have to be processed
+     * @return the set of temporary files corresponding to image artifacts
+     */
+    private Set<File> processImages(AttachmentReference attachmentReference, XDOMOfficeDocument xdomOfficeDocument)
+    {
+        XDOM xdom = xdomOfficeDocument.getContentDocument();
+        Map<String, byte[]> artifacts = xdomOfficeDocument.getArtifacts();
         Set<File> temporaryFiles = new HashSet<File>();
 
         // Process all image blocks.
@@ -98,6 +123,40 @@ public class DefaultOfficePreviewBuilder extends AbstractOfficePreviewBuilder
             }
         }
 
-        return new OfficeDocumentPreview(attachmentReference, version, xdom, temporaryFiles);
+        return temporaryFiles;
+    }
+
+    /**
+     * Builds an XDOM from the content of the specified office file.
+     * 
+     * @param attachmentReference a reference to the office file to be parsed into XDOM
+     * @param parameters build parameters
+     * @return the {@link XDOMOfficeDocument} corresponding to the specified office file
+     * @throws Exception if building the XDOM fails
+     */
+    private XDOMOfficeDocument buildXDOM(AttachmentReference attachmentReference, Map<String, String> parameters)
+        throws Exception
+    {
+        DocumentReference documentReference = attachmentReference.getDocumentReference();
+        InputStream officeFileStream = documentAccessBridge.getAttachmentContent(attachmentReference);
+        String officeFileName = attachmentReference.getName();
+        if (isPresentation(officeFileName)) {
+            return presentationBuilder.build(officeFileStream, officeFileName, documentReference);
+        } else {
+            boolean filterStyles = Boolean.valueOf(parameters.get("filterStyles"));
+            return documentBuilder.build(officeFileStream, officeFileName, documentReference, filterStyles);
+        }
+    }
+
+    /**
+     * Utility method for checking if a file name corresponds to an office presentation.
+     * 
+     * @param fileName attachment file name
+     * @return {@code true} if the file extension represents an office presentation format, {@code false} otherwise
+     */
+    private boolean isPresentation(String fileName)
+    {
+        String extension = fileName.substring(fileName.lastIndexOf('.') + 1);
+        return PRESENTATION_FORMATS.contains(extension);
     }
 }

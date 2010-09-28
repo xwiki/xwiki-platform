@@ -216,6 +216,9 @@ public class DefaultOfficePreviewBuilderTest extends AbstractMockingComponentTes
                     ATTACHMENT_REFERENCE.getDocumentReference(), false);
                 will(returnValue(xdomOfficeDocument));
 
+                oneOf(documentAccessBridge).getAttachmentVersion(ATTACHMENT_REFERENCE);
+                will(returnValue(ATTACHMENT_VERSION));
+
                 oneOf(previewCache).set(with(PREVIEW_CACHE_KEY), with(aNonNull(OfficeDocumentPreview.class)));
             }
         });
@@ -270,6 +273,7 @@ public class DefaultOfficePreviewBuilderTest extends AbstractMockingComponentTes
         final XDOMOfficeDocument xdomOfficeDocument =
             new XDOMOfficeDocument(new XDOM(new ArrayList<Block>()), new HashMap<String, byte[]>(),
                 getComponentManager());
+        final String attachmentVersion = "2.1";
 
         getMockery().checking(new Expectations()
         {
@@ -284,7 +288,7 @@ public class DefaultOfficePreviewBuilderTest extends AbstractMockingComponentTes
                 will(returnValue(Arrays.asList(ATTACHMENT_REFERENCE)));
 
                 oneOf(documentAccessBridge).getAttachmentVersion(ATTACHMENT_REFERENCE);
-                will(returnValue("2.1"));
+                will(returnValue(attachmentVersion));
             }
         });
         // Note: We're using two expectation groups to limit the length of the anonymous inner class (max allowed 20)
@@ -299,6 +303,9 @@ public class DefaultOfficePreviewBuilderTest extends AbstractMockingComponentTes
                 oneOf(officeDocumentBuilder).build(attachmentContent, ATTACHMENT_REFERENCE.getName(),
                     ATTACHMENT_REFERENCE.getDocumentReference(), false);
                 will(returnValue(xdomOfficeDocument));
+
+                oneOf(documentAccessBridge).getAttachmentVersion(ATTACHMENT_REFERENCE);
+                will(returnValue(attachmentVersion));
 
                 oneOf(previewCache).set(with(PREVIEW_CACHE_KEY), with(aNonNull(OfficeDocumentPreview.class)));
             }

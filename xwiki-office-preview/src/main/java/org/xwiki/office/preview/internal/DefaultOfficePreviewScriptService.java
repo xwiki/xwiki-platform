@@ -48,11 +48,6 @@ import org.xwiki.rendering.renderer.printer.WikiPrinter;
 public class DefaultOfficePreviewScriptService extends AbstractLogEnabled implements OfficePreviewScriptService
 {
     /**
-     * File extensions corresponding to presentation office documents.
-     */
-    private static final List<String> PRESENTATION_FORMATS = Arrays.asList("ppt", "pptx", "odp");
-
-    /**
      * The list of supported mime types, i.e. the mime types that can be previewed.
      */
     private static final List<String> SUPPORTED_MIME_TYPES =
@@ -66,6 +61,12 @@ public class DefaultOfficePreviewScriptService extends AbstractLogEnabled implem
      * The key used to save on the execution context the exception caught during office document preview.
      */
     private static final String OFFICE_PREVIEW_EXCEPTION = "officePreview.caughtException";
+
+    /**
+     * The component used to preview office documents.
+     */
+    @Requirement
+    private OfficePreviewBuilder officePreviewBuilder;
 
     /**
      * Used to lookup various {@link OfficePreviewBuilder} implementations based on the office file format.
@@ -121,10 +122,6 @@ public class DefaultOfficePreviewScriptService extends AbstractLogEnabled implem
                 throw new RuntimeException("Inadequate privileges.");
             }
 
-            // Get the right office preview builder for the specified office file.
-            String hint = isPresentation(attachmentReference.getName()) ? "presentation" : "default";
-            OfficePreviewBuilder officePreviewBuilder = componentManager.lookup(OfficePreviewBuilder.class, hint);
-
             // Build the preview and render the result.
             return render(officePreviewBuilder.build(attachmentReference, parameters), "xhtml/1.0");
         } catch (Exception e) {
@@ -143,18 +140,6 @@ public class DefaultOfficePreviewScriptService extends AbstractLogEnabled implem
     public boolean isMimeTypeSupported(String mimeType)
     {
         return SUPPORTED_MIME_TYPES.contains(mimeType);
-    }
-
-    /**
-     * Utility method for checking if a file name corresponds to an office presentation.
-     * 
-     * @param fileName attachment file name
-     * @return {@code true} if the file extension represents an office presentation format, {@code false} otherwise
-     */
-    private boolean isPresentation(String fileName)
-    {
-        String extension = fileName.substring(fileName.lastIndexOf('.') + 1);
-        return PRESENTATION_FORMATS.contains(extension);
     }
 
     /**

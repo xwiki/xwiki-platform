@@ -21,7 +21,7 @@ package org.xwiki.office.preview.internal;
 
 import java.io.File;
 import java.io.FileOutputStream;
-import java.io.InputStream;
+import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.util.Map;
 
@@ -57,16 +57,16 @@ public abstract class AbstractOfficePreviewBuilder extends AbstractLogEnabled im
     private static final String DEFAULT_ENCODING = "UTF-8";
 
     /**
+     * Used to access attachment content.
+     */
+    @Requirement
+    protected DocumentAccessBridge documentAccessBridge;
+
+    /**
      * Used to access the temporary directory.
      */
     @Requirement
     private Container container;
-
-    /**
-     * Used to access attachment content.
-     */
-    @Requirement
-    private DocumentAccessBridge documentAccessBridge;
 
     /**
      * Used for serializing {@link AttachmentReference}s.
@@ -122,10 +122,8 @@ public abstract class AbstractOfficePreviewBuilder extends AbstractLogEnabled im
             throw new Exception(String.format("Attachment [%s] does not exist.", attachmentReference));
         }
 
-        // Query the current version of the attachment.
-        String currentVersion = documentAccessBridge.getAttachmentVersion(attachmentReference);
-
         // Check if the preview has been expired.
+        String currentVersion = documentAccessBridge.getAttachmentVersion(attachmentReference);
         if (null != preview && !currentVersion.equals(preview.getVersion())) {
             // Flush the cached preview.
             previewsCache.remove(cacheKey);
@@ -135,8 +133,7 @@ public abstract class AbstractOfficePreviewBuilder extends AbstractLogEnabled im
         // If a preview in not available, build one.
         if (null == preview) {
             // Build preview.
-            InputStream content = documentAccessBridge.getAttachmentContent(attachmentReference);
-            preview = build(attachmentReference, currentVersion, content, parameters);
+            preview = buildPreview(attachmentReference, parameters);
 
             // Cache the preview.
             previewsCache.set(cacheKey, preview);
@@ -160,14 +157,12 @@ public abstract class AbstractOfficePreviewBuilder extends AbstractLogEnabled im
      * Builds a preview of the specified attachment.
      * 
      * @param attachmentReference reference to the attachment to be previewed
-     * @param version version of the attachment for which the preview should be generated for
-     * @param data content of the attachment
      * @param parameters implementation specific preview parameters
      * @return {@link OfficeDocumentPreview} corresponding to the preview of the specified attachment
      * @throws Exception if an error occurs while building the preview
      */
-    protected abstract OfficeDocumentPreview build(AttachmentReference attachmentReference, String version,
-        InputStream data, Map<String, String> parameters) throws Exception;
+    protected abstract OfficeDocumentPreview buildPreview(AttachmentReference attachmentReference,
+        Map<String, String> parameters) throws Exception;
 
     /**
      * Saves a temporary file associated with the given attachment.
@@ -237,7 +232,14 @@ public abstract class AbstractOfficePreviewBuilder extends AbstractLogEnabled im
     {
         String prefix =
             documentAccessBridge.getDocumentURL(attachmentReference.getDocumentReference(), "temp", null, null);
-        String attachmentName = attachmentReference.getName();
-        return String.format("%s/officepreview/%s/%s", prefix, attachmentName, fileName);
+        try {
+            String encodedAttachmentName = URLEncoder.encode(attachmentReference.getName(), DEFAULT_ENCODING);
+            String encodedFileName = URLEncoder.encode(fileName, DEFAULT_ENCODING);
+            return String.format("%s/officepreview/%s/%s", prefix, encodedAttachmentName, encodedFileName);
+        } catch (UnsupportedEncodingException e) {
+            // This should never happen.
+            getLogger().error("Failed to encode URL using " + DEFAULT_ENCODING, e);
+            return null;
+        }
     }
 }

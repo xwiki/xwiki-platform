@@ -99,4 +99,14 @@ public class DefaultXWikiRenderingConfiguration implements XWikiRenderingConfigu
     {
         return this.configuration.getProperty(PREFIX + "imageDimensionsIncludedInImageURL", true);
     }
+
+    /**
+     * {@inheritDoc}
+     *
+     * @see org.xwiki.rendering.internal.configuration.XWikiRenderingConfiguration#getInterWikiDefinitions()
+     */
+    public Properties getInterWikiDefinitions()
+    {
+        return this.configuration.getProperty(PREFIX + "interWikiDefinitions", Properties.class);
+    }
 }

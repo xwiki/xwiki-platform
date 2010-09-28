@@ -45,6 +45,11 @@ public class DefaultRenderingConfiguration implements RenderingConfiguration
     private Properties macroCategories = new Properties();
 
     /**
+     * @see #getInterWikiDefinitions()
+     */
+    private Properties interWikiDefinitions = new Properties();
+
+    /**
      * {@inheritDoc}
      * 
      * @see org.xwiki.rendering.configuration.RenderingConfiguration#getLinkLabelFormat()
@@ -83,5 +88,26 @@ public class DefaultRenderingConfiguration implements RenderingConfiguration
         // This method is useful for those using the XWiki Rendering in standalone mode since it allows the rendering
         // to work even without a configuration store.
         this.macroCategories.setProperty(macroId.toString(), category);
+    }
+
+    /**
+     * {@inheritDoc}
+     *
+     * @see org.xwiki.rendering.configuration.RenderingConfiguration#getInterWikiDefinitions()
+     */
+    public Properties getInterWikiDefinitions()
+    {
+        return this.interWikiDefinitions;
+    }
+
+    /**
+     * @param interWikiAlias see {@link org.xwiki.rendering.listener.InterWikiLink}
+     * @param interWikiURL see {@link org.xwiki.rendering.listener.InterWikiLink}
+     */
+    public void addInterWikiDefinition(String interWikiAlias, String interWikiURL)
+    {
+        // This method is useful for those using the XWiki Rendering in standalone mode since it allows the rendering
+        // to work even without a configuration store.
+        this.interWikiDefinitions.setProperty(interWikiAlias, interWikiURL);
     }
 }

@@ -1,0 +1,41 @@
+.#-----------------------------------------------------
+.input|xwiki/2.1
+.# InterWiki link tests
+.#-----------------------------------------------------
+[[interwiki:knownalias:path]]
+[[interwiki:unknownalias:path]]
+.#-----------------------------------------------------
+.input|xwiki/2.0
+.#-----------------------------------------------------
+[[path@knownalias]]
+[[path@unknownalias]]
+.#-----------------------------------------------------
+.expect|event/1.0
+.#-----------------------------------------------------
+beginDocument
+beginParagraph
+beginLink [Typed = [true] Type = [interwiki] Reference = [path] InterWikiAlias = [knownalias]] [false]
+endLink [Typed = [true] Type = [interwiki] Reference = [path] InterWikiAlias = [knownalias]] [false]
+onNewLine
+beginLink [Typed = [true] Type = [interwiki] Reference = [path] InterWikiAlias = [unknownalias]] [false]
+endLink [Typed = [true] Type = [interwiki] Reference = [path] InterWikiAlias = [unknownalias]] [false]
+endParagraph
+endDocument
+.#-----------------------------------------------------
+.expect|annotatedxhtml/1.0
+.#-----------------------------------------------------
+<p><!--startwikilink:interwiki:knownalias:path--><span class="wikiexternallink"><a href="http://server/common/url/path"><span class="wikigeneratedlinkcontent">path</span></a></span><!--stopwikilink--><br/><!--startwikilink:interwiki:unknownalias:path--><span class="wikiexternallink"><a href="path"><span class="wikigeneratedlinkcontent">path</span></a></span><!--stopwikilink--></p>
+.#-----------------------------------------------------
+.expect|xwiki/2.1
+.#-----------------------------------------------------
+[[interwiki:knownalias:path]]
+[[interwiki:unknownalias:path]]
+.#-----------------------------------------------------
+.input|xhtml/1.0
+.#-----------------------------------------------------
+<html><p><!--startwikilink:interwiki:knownalias:path--><span class="wikiexternallink"><a href="http://server/common/url/path"><span class="wikigeneratedlinkcontent">path</span></a></span><!--stopwikilink--><br/><!--startwikilink:interwiki:unknownalias:path--><span class="wikiexternallink"><a href="path"><span class="wikigeneratedlinkcontent">path</span></a></span><!--stopwikilink--></p></html>
+.#-----------------------------------------------------
+.expect|plain/1.0
+.#-----------------------------------------------------
+path
+path

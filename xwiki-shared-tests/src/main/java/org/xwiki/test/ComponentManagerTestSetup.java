@@ -58,6 +58,11 @@ public class ComponentManagerTestSetup extends TestSetup
         this.componentDescriptors.addAll(componentDescriptors);
     }
 
+    public void addComponentDescriptor(ComponentDescriptor< ? > componentDescriptor)
+    {
+        this.componentDescriptors.add(componentDescriptor);    
+    }
+
     /**
      * {@inheritDoc}
      * 

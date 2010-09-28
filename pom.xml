@@ -198,6 +198,7 @@
                 <exclude>org/xwiki/officeimporter/openoffice/OpenOfficeManager$ManagerState</exclude>
                 <!-- TODO: Excludes below to be removed when we release XWiki 2.5 -->
                 <exclude>org/xwiki/bridge/DocumentAccessBridge</exclude>
+                <exclude>org/xwiki/rendering/configuration/RenderingConfiguration</exclude>
                 <exclude>org/xwiki/rendering/macro/script/AbstractScriptMacro</exclude>
                 <exclude>org/xwiki/rendering/macro/script/AbstractJSR223ScriptMacro</exclude>
                 <exclude>org/xwiki/rendering/wiki/WikiModel</exclude>

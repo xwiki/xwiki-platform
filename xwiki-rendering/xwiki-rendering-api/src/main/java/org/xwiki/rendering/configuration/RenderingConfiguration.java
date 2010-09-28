@@ -63,4 +63,10 @@ public interface RenderingConfiguration
      *         descriptor (ie defined by the macro author) will be used
      */
     Properties getMacroCategories();
+
+    /**
+     * @return the list of InterWiki definitions. Each InterWiki definition is made of an alias and a base URL.
+     * @see org.xwiki.rendering.listener.InterWikiLink
+     */
+    Properties getInterWikiDefinitions();
 }

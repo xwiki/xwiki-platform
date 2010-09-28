@@ -20,7 +20,11 @@
 package org.xwiki.rendering.listener;
 
 /**
- * Represents a link reference to an interwiki link.
+ * Represents a link reference to an <a href="http://en.wikipedia.org/wiki/InterWiki">Inter Wiki</a> link. An InterWiki
+ * link is a shorthand notation to link to a set of external URL, all having a common prefix (eg
+ * http://server/some/common/prefix/a1, http://server/some/common/prefix/a2). An InterWiki link is made of an InterWiki
+ * Alias which is a name corresponding to the common URL and an InterWiki Path which is the suffix to append to the
+ * common URL part to make the full URL.
  *
  * @version $Id$
  * @since 2.5M2

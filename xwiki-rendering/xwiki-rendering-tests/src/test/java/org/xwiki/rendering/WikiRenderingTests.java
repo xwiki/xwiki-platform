@@ -25,6 +25,8 @@ import java.util.List;
 import junit.framework.TestCase;
 
 import org.xwiki.component.descriptor.ComponentDescriptor;
+import org.xwiki.rendering.configuration.RenderingConfiguration;
+import org.xwiki.rendering.internal.configuration.DefaultRenderingConfiguration;
 import org.xwiki.rendering.scaffolding.MockWikiModel;
 import org.xwiki.rendering.scaffolding.RenderingTestSuite;
 import org.xwiki.rendering.wiki.WikiModel;
@@ -70,6 +72,7 @@ public class WikiRenderingTests extends TestCase
         suite.addTestsFromResource("link/links25", false);
         suite.addTestsFromResource("link/links26", false);
         suite.addTestsFromResource("link/links27", false);
+        suite.addTestsFromResource("link/links28", false);
 
         // Images
         suite.addTestsFromResource("image/image1", false);
@@ -79,9 +82,14 @@ public class WikiRenderingTests extends TestCase
         suite.addTestsFromResource("image/image5", false);
         suite.addTestsFromResource("image/image6", false);
 
-        List<ComponentDescriptor< ? >> mocks = new ArrayList<ComponentDescriptor< ? >>();
-        mocks.add(MockWikiModel.getComponentDescriptor());
+        ComponentManagerTestSetup testSetup = new ComponentManagerTestSetup(suite);
+        testSetup.addComponentDescriptor(MockWikiModel.getComponentDescriptor());
 
-        return new ComponentManagerTestSetup(suite, mocks);
+        // Add InterWiki Definition for links28 test
+        DefaultRenderingConfiguration renderingConfiguration = 
+            (DefaultRenderingConfiguration) testSetup.getComponentManager().lookup(RenderingConfiguration.class);
+        renderingConfiguration.addInterWikiDefinition("knownalias", "http://server/common/url/");
+
+        return testSetup;
     }
 }

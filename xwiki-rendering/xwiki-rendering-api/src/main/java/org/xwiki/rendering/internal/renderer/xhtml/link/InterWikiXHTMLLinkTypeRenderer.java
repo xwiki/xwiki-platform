@@ -21,10 +21,14 @@ package org.xwiki.rendering.internal.renderer.xhtml.link;
 
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.InstantiationStrategy;
+import org.xwiki.component.annotation.Requirement;
 import org.xwiki.component.descriptor.ComponentInstantiationStrategy;
+import org.xwiki.rendering.configuration.RenderingConfiguration;
+import org.xwiki.rendering.listener.InterWikiLink;
 import org.xwiki.rendering.listener.Link;
 
 import java.util.Map;
+import java.util.Properties;
 
 /**
  * Handle XHTML rendering for interwiki links.
@@ -37,6 +41,12 @@ import java.util.Map;
 public class InterWikiXHTMLLinkTypeRenderer extends AbstractXHTMLLinkTypeRenderer
 {
     /**
+     * Used to get access to the InterWiki definitions.
+     */
+    @Requirement
+    private RenderingConfiguration renderingConfiguration;
+
+    /**
      * {@inheritDoc}
      *
      * @see AbstractXHTMLLinkTypeRenderer#beginLinkExtraAttributes(Link, java.util.Map, java.util.Map)
@@ -45,6 +55,14 @@ public class InterWikiXHTMLLinkTypeRenderer extends AbstractXHTMLLinkTypeRendere
     protected void beginLinkExtraAttributes(Link link, Map<String, String> spanAttributes,
         Map<String, String> anchorAttributes)
     {
-        // TODO
+        // Look for an InterWiki definition for the passed Link. If not found then simply use the InterWiki Path.
+        InterWikiLink interWikiLink = (InterWikiLink) link;
+        Properties definitions = this.renderingConfiguration.getInterWikiDefinitions();
+        if (definitions.containsKey(interWikiLink.getInterWikiAlias())) {
+            anchorAttributes.put(XHTMLLinkRenderer.HREF, definitions.getProperty(interWikiLink.getInterWikiAlias())
+                + interWikiLink.getReference());
+        } else {
+            anchorAttributes.put(XHTMLLinkRenderer.HREF, interWikiLink.getReference());
+        }
     }
 }

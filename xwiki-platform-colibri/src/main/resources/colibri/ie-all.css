@@ -20,8 +20,11 @@ body {
   margin-left: -230px;
 }
 
-fieldset.xwikimessage, div.xwikimessage {
-  border-top-width: 0;
+fieldset.xwikimessage legend span {
+  float: left;
+}
+fieldset.xwikimessage legend span span {
+  float: none;
 }
 
 .xwikiintracontent legend {

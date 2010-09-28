@@ -1442,24 +1442,24 @@ div.floatinginfobox {
 
 fieldset.xwikimessage {
   background-color: $theme.backgroundSecondaryColor;
-  border-top: 4em solid $theme.backgroundSecondaryColor;
   display: inline-block;
   margin: 5em auto;
-  padding: 0 2em 1.5em;
+  padding: 1.5em 2em;
   text-align: left;
   width: auto;
 }
 
-fieldset.xwikimessage legend{
+fieldset.xwikimessage legend {
   background-color: $theme.backgroundSecondaryColor; /* Opera */
   color: $theme.titleColor;
   display: inline;
+  float: left;
   font: 700 1.4em sans-serif;
-  height: 1.8em; /* Opera */
   letter-spacing: .4em;
   margin: 0;
-  padding: 1em 0 0;
+  padding: 0;
   text-align: left;
+  white-space: normal;
   width: 100%;
 }
 
@@ -1480,6 +1480,7 @@ table.xwikilogintable td, table.xwikilogintable th {
 }
 
 fieldset.xwikimessage .xwikimessage {
+  clear: both;
   font-size: 110%;
   font-weight: 700;
   text-align: left;

@@ -78,6 +78,7 @@ public class DownloadAction extends XWikiAction
         // Choose the right content type
         String mimetype = attachment.getMimeType(context);
         response.setContentType(mimetype);
+        response.setCharacterEncoding("");
 
         long lastModifiedOnClient = request.getDateHeader("If-Modified-Since");
         long lastModifiedOnServer = attachment.getDate().getTime();

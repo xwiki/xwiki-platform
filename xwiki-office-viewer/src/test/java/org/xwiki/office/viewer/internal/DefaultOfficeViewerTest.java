@@ -17,7 +17,7 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.office.preview.internal;
+package org.xwiki.office.viewer.internal;
 
 import java.io.ByteArrayInputStream;
 import java.io.File;
@@ -50,11 +50,11 @@ import org.xwiki.test.AbstractMockingComponentTestCase;
 import org.xwiki.test.annotation.MockingRequirement;
 
 /**
- * Test case for {@link DefaultOfficePreviewBuilder}.
+ * Test case for {@link DefaultOfficeViewer}.
  * 
  * @version $Id$
  */
-public class DefaultOfficePreviewBuilderTest extends AbstractMockingComponentTestCase
+public class DefaultOfficeViewerTest extends AbstractMockingComponentTestCase
 {
     /**
      * An attachment reference to be used in tests.
@@ -68,9 +68,9 @@ public class DefaultOfficePreviewBuilderTest extends AbstractMockingComponentTes
     private static final String STRING_ATTACHMENT_REFERENCE = "xwiki:Main.Test@Test.doc";
 
     /**
-     * The cache key corresponding to {@link #STRING_ATTACHMENT_REFERENCE} and {@link #DEFAULT_PREVIEW_PARAMETERS}.
+     * The cache key corresponding to {@link #STRING_ATTACHMENT_REFERENCE} and {@link #DEFAULT_VIEW_PARAMETERS}.
      */
-    private static final String PREVIEW_CACHE_KEY = STRING_ATTACHMENT_REFERENCE + "/0";
+    private static final String CACHE_KEY = STRING_ATTACHMENT_REFERENCE + "/0";
 
     /**
      * Attachment version to be used in tests.
@@ -78,15 +78,15 @@ public class DefaultOfficePreviewBuilderTest extends AbstractMockingComponentTes
     private static final String ATTACHMENT_VERSION = "1.1";
 
     /**
-     * Default preview parameters.
+     * Default view parameters.
      */
-    private static final Map<String, String> DEFAULT_PREVIEW_PARAMETERS = Collections.emptyMap();
+    private static final Map<String, String> DEFAULT_VIEW_PARAMETERS = Collections.emptyMap();
 
     /**
-     * The {@link DefaultOfficePreviewBuilder} instance being tested.
+     * The {@link DefaultOfficeViewer} instance being tested.
      */
     @MockingRequirement
-    private DefaultOfficePreviewBuilder defaultOfficePreviewBuilder;
+    private DefaultOfficeViewer defaultOfficeViewer;
 
     /**
      * The mock {@link DocumentAccessBridge} instance used in tests.
@@ -106,7 +106,7 @@ public class DefaultOfficePreviewBuilderTest extends AbstractMockingComponentTes
     /**
      * The mock {@link Cache} instance used in tests.
      */
-    private Cache<OfficeDocumentPreview> previewCache;
+    private Cache<OfficeDocumentView> cache;
 
     /**
      * {@inheritDoc}
@@ -136,23 +136,23 @@ public class DefaultOfficePreviewBuilderTest extends AbstractMockingComponentTes
         super.configure();
 
         final CacheManager cacheManager = getComponentManager().lookup(CacheManager.class);
-        previewCache = getMockery().mock(Cache.class);
+        cache = getMockery().mock(Cache.class);
         getMockery().checking(new Expectations()
         {
             {
                 oneOf(cacheManager).createNewCache(with(aNonNull(CacheConfiguration.class)));
-                will(returnValue(previewCache));
+                will(returnValue(cache));
             }
         });
     }
 
     /**
-     * Test the previewing of a non-existing attachment.
+     * Test creating a view for a non-existing attachment.
      * 
-     * @throws Exception if an error occurs.
+     * @throws Exception if an error occurs
      */
     @Test
-    public void testOfficePreviewWithNonExistingAttachment() throws Exception
+    public void testViewNonExistingOfficeAttachment() throws Exception
     {
         getMockery().checking(new Expectations()
         {
@@ -160,7 +160,7 @@ public class DefaultOfficePreviewBuilderTest extends AbstractMockingComponentTes
                 oneOf(entityReferenceSerializer).serialize(ATTACHMENT_REFERENCE);
                 will(returnValue(STRING_ATTACHMENT_REFERENCE));
 
-                oneOf(previewCache).get(PREVIEW_CACHE_KEY);
+                oneOf(cache).get(CACHE_KEY);
                 will(returnValue(null));
 
                 oneOf(documentAccessBridge).getAttachmentReferences(ATTACHMENT_REFERENCE.getDocumentReference());
@@ -169,7 +169,7 @@ public class DefaultOfficePreviewBuilderTest extends AbstractMockingComponentTes
         });
 
         try {
-            defaultOfficePreviewBuilder.build(ATTACHMENT_REFERENCE, DEFAULT_PREVIEW_PARAMETERS);
+            defaultOfficeViewer.createView(ATTACHMENT_REFERENCE, DEFAULT_VIEW_PARAMETERS);
             Assert.fail("Expected exception.");
         } catch (Exception e) {
             Assert.assertEquals(String.format("Attachment [%s] does not exist.", ATTACHMENT_REFERENCE), e.getMessage());
@@ -177,12 +177,12 @@ public class DefaultOfficePreviewBuilderTest extends AbstractMockingComponentTes
     }
 
     /**
-     * Tests the normal office preview function.
+     * Tests creating a view for an existing office attachment.
      * 
-     * @throws Exception if an error occurs.
+     * @throws Exception if an error occurs
      */
     @Test
-    public void testOfficePreviewWithCacheMiss() throws Exception
+    public void testViewExistingOfficeAttachmentWithCacheMiss() throws Exception
     {
         final ByteArrayInputStream attachmentContent = new ByteArrayInputStream(new byte[256]);
         final XDOMOfficeDocument xdomOfficeDocument =
@@ -195,7 +195,7 @@ public class DefaultOfficePreviewBuilderTest extends AbstractMockingComponentTes
                 oneOf(entityReferenceSerializer).serialize(ATTACHMENT_REFERENCE);
                 will(returnValue(STRING_ATTACHMENT_REFERENCE));
 
-                oneOf(previewCache).get(PREVIEW_CACHE_KEY);
+                oneOf(cache).get(CACHE_KEY);
                 will(returnValue(null));
 
                 oneOf(documentAccessBridge).getAttachmentReferences(ATTACHMENT_REFERENCE.getDocumentReference());
@@ -219,23 +219,23 @@ public class DefaultOfficePreviewBuilderTest extends AbstractMockingComponentTes
                 oneOf(documentAccessBridge).getAttachmentVersion(ATTACHMENT_REFERENCE);
                 will(returnValue(ATTACHMENT_VERSION));
 
-                oneOf(previewCache).set(with(PREVIEW_CACHE_KEY), with(aNonNull(OfficeDocumentPreview.class)));
+                oneOf(cache).set(with(CACHE_KEY), with(aNonNull(OfficeDocumentView.class)));
             }
         });
 
-        defaultOfficePreviewBuilder.build(ATTACHMENT_REFERENCE, DEFAULT_PREVIEW_PARAMETERS);
+        defaultOfficeViewer.createView(ATTACHMENT_REFERENCE, DEFAULT_VIEW_PARAMETERS);
     }
 
     /**
-     * Tests the previewing of an office document which has already been previewed and cached.
+     * Tests creating a view for an office attachment which has already been viewed and cached.
      * 
      * @throws Exception if an error occurs.
      */
     @Test
-    public void testOfficePreviewWithCacheHit() throws Exception
+    public void testViewExistingOfficeAttachmentWithCacheHit() throws Exception
     {
-        final OfficeDocumentPreview officeDocumentPreview =
-            new OfficeDocumentPreview(ATTACHMENT_REFERENCE, ATTACHMENT_VERSION, new XDOM(new ArrayList<Block>()),
+        final OfficeDocumentView officeDocumentPreview =
+            new OfficeDocumentView(ATTACHMENT_REFERENCE, ATTACHMENT_VERSION, new XDOM(new ArrayList<Block>()),
                 new HashSet<File>());
 
         getMockery().checking(new Expectations()
@@ -244,7 +244,7 @@ public class DefaultOfficePreviewBuilderTest extends AbstractMockingComponentTes
                 oneOf(entityReferenceSerializer).serialize(ATTACHMENT_REFERENCE);
                 will(returnValue(STRING_ATTACHMENT_REFERENCE));
 
-                oneOf(previewCache).get(PREVIEW_CACHE_KEY);
+                oneOf(cache).get(CACHE_KEY);
                 will(returnValue(officeDocumentPreview));
 
                 oneOf(documentAccessBridge).getAttachmentReferences(ATTACHMENT_REFERENCE.getDocumentReference());
@@ -255,19 +255,20 @@ public class DefaultOfficePreviewBuilderTest extends AbstractMockingComponentTes
             }
         });
 
-        Assert.assertNotNull(defaultOfficePreviewBuilder.build(ATTACHMENT_REFERENCE, DEFAULT_PREVIEW_PARAMETERS));
+        Assert.assertNotNull(defaultOfficeViewer.createView(ATTACHMENT_REFERENCE, DEFAULT_VIEW_PARAMETERS));
     }
 
     /**
-     * Tests office attachment previewing where a cached preview exists for an older version of the attachment.
+     * Tests creating a view for an office attachment that has been viewed in past and whose version has been
+     * incremented.
      * 
      * @throws Exception if an error occurs.
      */
     @Test
-    public void testOfficePreviewWithExpiredCachedAttachmentPreview() throws Exception
+    public void testViewANewVersionOfAnExistingOfficeAttachment() throws Exception
     {
-        final OfficeDocumentPreview officeDocumentPreview =
-            new OfficeDocumentPreview(ATTACHMENT_REFERENCE, ATTACHMENT_VERSION, new XDOM(new ArrayList<Block>()),
+        final OfficeDocumentView officeDocumentPreview =
+            new OfficeDocumentView(ATTACHMENT_REFERENCE, ATTACHMENT_VERSION, new XDOM(new ArrayList<Block>()),
                 new HashSet<File>());
         final ByteArrayInputStream attachmentContent = new ByteArrayInputStream(new byte[256]);
         final XDOMOfficeDocument xdomOfficeDocument =
@@ -281,7 +282,7 @@ public class DefaultOfficePreviewBuilderTest extends AbstractMockingComponentTes
                 oneOf(entityReferenceSerializer).serialize(ATTACHMENT_REFERENCE);
                 will(returnValue(STRING_ATTACHMENT_REFERENCE));
 
-                oneOf(previewCache).get(PREVIEW_CACHE_KEY);
+                oneOf(cache).get(CACHE_KEY);
                 will(returnValue(officeDocumentPreview));
 
                 oneOf(documentAccessBridge).getAttachmentReferences(ATTACHMENT_REFERENCE.getDocumentReference());
@@ -295,7 +296,7 @@ public class DefaultOfficePreviewBuilderTest extends AbstractMockingComponentTes
         getMockery().checking(new Expectations()
         {
             {
-                oneOf(previewCache).remove(PREVIEW_CACHE_KEY);
+                oneOf(cache).remove(CACHE_KEY);
 
                 oneOf(documentAccessBridge).getAttachmentContent(ATTACHMENT_REFERENCE);
                 will(returnValue(attachmentContent));
@@ -307,16 +308,15 @@ public class DefaultOfficePreviewBuilderTest extends AbstractMockingComponentTes
                 oneOf(documentAccessBridge).getAttachmentVersion(ATTACHMENT_REFERENCE);
                 will(returnValue(attachmentVersion));
 
-                oneOf(previewCache).set(with(PREVIEW_CACHE_KEY), with(aNonNull(OfficeDocumentPreview.class)));
+                oneOf(cache).set(with(CACHE_KEY), with(aNonNull(OfficeDocumentView.class)));
             }
         });
 
-        Assert.assertNotNull(defaultOfficePreviewBuilder.build(ATTACHMENT_REFERENCE, DEFAULT_PREVIEW_PARAMETERS));
+        Assert.assertNotNull(defaultOfficeViewer.createView(ATTACHMENT_REFERENCE, DEFAULT_VIEW_PARAMETERS));
     }
 
     /**
-     * A test case for testing the {@link AbstractOfficePreviewBuilder#getTemporaryDirectory(AttachmentReference)}
-     * method.
+     * A test case for testing the {@link AbstractOfficeViewer#getTemporaryDirectory(AttachmentReference)} method.
      * 
      * @throws Exception if an error occurs.
      */
@@ -337,12 +337,12 @@ public class DefaultOfficePreviewBuilderTest extends AbstractMockingComponentTes
             }
         });
 
-        File tempFile = defaultOfficePreviewBuilder.getTemporaryDirectory(ATTACHMENT_REFERENCE);
+        File tempFile = defaultOfficeViewer.getTemporaryDirectory(ATTACHMENT_REFERENCE);
         Assert.assertTrue(tempFile.getAbsolutePath().endsWith("/temp/officepreview/xwiki/Main/Test/Test.doc"));
     }
 
     /**
-     * A test case for testing the {@link AbstractOfficePreviewBuilder#buildURL(AttachmentReference, String)} method.
+     * A test case for testing the {@link AbstractOfficeViewer#buildURL(AttachmentReference, String)} method.
      * 
      * @throws Exception if an error occurs.
      */
@@ -358,7 +358,7 @@ public class DefaultOfficePreviewBuilderTest extends AbstractMockingComponentTes
             }
         });
 
-        String url = defaultOfficePreviewBuilder.buildURL(ATTACHMENT_REFERENCE, "some_temporary_artifact.gif");
+        String url = defaultOfficeViewer.buildURL(ATTACHMENT_REFERENCE, "some_temporary_artifact.gif");
         Assert.assertEquals("/xwiki/bin/temp/Main/Test/officepreview/Test.doc/some_temporary_artifact.gif", url);
     }
 }

@@ -17,7 +17,7 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.office.preview.internal;
+package org.xwiki.office.viewer.internal;
 
 import java.io.File;
 import java.util.Set;
@@ -27,42 +27,43 @@ import org.xwiki.model.reference.AttachmentReference;
 import org.xwiki.rendering.block.XDOM;
 
 /**
- * Used for holding all the information belonging to an office attachment preview.
+ * Holds all the information belonging to an office attachment view. Instances of this class are mainly used for caching
+ * office attachment views.
  * 
  * @since 2.5M2
  * @version $Id$
  */
-public class OfficeDocumentPreview implements DisposableCacheValue
+public class OfficeDocumentView implements DisposableCacheValue
 {
     /**
-     * Reference to the attachment to which this preview belongs.
+     * Reference to the office attachment to which this view belongs.
      */
     private final AttachmentReference attachmentReference;
 
     /**
-     * Specific version of the attachment to which this preview corresponds.
+     * Specific version of the attachment to which this view corresponds.
      */
     private final String version;
 
     /**
-     * {@link XDOM} holding the preview document syntax.
+     * {@link XDOM} representation of the office document.
      */
     private final XDOM xdom;
 
     /**
-     * Temporary files used by this preview.
+     * Temporary files used by this view.
      */
     private final Set<File> temporaryFiles;
 
     /**
-     * Creates a new {@link OfficeDocumentPreview} instance.
+     * Creates a new {@link OfficeDocumentView} instance.
      * 
-     * @param attachmentReference reference to the attachment to which this preview belongs
-     * @param version version of the attachment to which this preview corresponds
-     * @param xdom {@link XDOM} holding the preview document syntax
-     * @param temporaryFiles temporary files that belongs to this preview
+     * @param attachmentReference reference to the office attachment to which this view belongs
+     * @param version version of the attachment to which this view corresponds
+     * @param xdom {@link XDOM} representation of the office document
+     * @param temporaryFiles temporary files used by this view
      */
-    public OfficeDocumentPreview(AttachmentReference attachmentReference, String version, XDOM xdom,
+    public OfficeDocumentView(AttachmentReference attachmentReference, String version, XDOM xdom,
         Set<File> temporaryFiles)
     {
         this.attachmentReference = attachmentReference;
@@ -85,15 +86,15 @@ public class OfficeDocumentPreview implements DisposableCacheValue
     }
 
     /**
-     * @return reference to the attachment to which this preview belongs to
+     * @return a reference to the office attachment that is the source of this view
      */
     public AttachmentReference getAttachmentReference()
     {
-        return this.attachmentReference;
+        return attachmentReference;
     }
 
     /**
-     * @return version of the attachment to which this preview corresponds
+     * @return the version of the attachment that is the source of this view
      */
     public String getVersion()
     {
@@ -101,7 +102,7 @@ public class OfficeDocumentPreview implements DisposableCacheValue
     }
 
     /**
-     * @return {@link XDOM} holding the preview document syntax
+     * @return {@link XDOM} representation of the office document
      */
     public XDOM getXDOM()
     {

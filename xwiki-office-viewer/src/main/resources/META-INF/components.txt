@@ -1,2 +1,2 @@
-org.xwiki.office.preview.internal.DefaultOfficePreviewScriptService
-org.xwiki.office.preview.internal.DefaultOfficePreviewBuilder
+org.xwiki.office.viewer.internal.DefaultOfficeViewer
+org.xwiki.office.viewer.internal.DefaultOfficeViewerScriptService

@@ -17,7 +17,7 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.office.preview.internal;
+package org.xwiki.office.viewer.internal;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -31,24 +31,24 @@ import org.xwiki.component.logging.AbstractLogEnabled;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.context.Execution;
 import org.xwiki.model.reference.AttachmentReference;
-import org.xwiki.office.preview.OfficePreviewBuilder;
-import org.xwiki.office.preview.OfficePreviewScriptService;
+import org.xwiki.office.viewer.OfficeViewer;
+import org.xwiki.office.viewer.OfficeViewerScriptService;
 import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.renderer.BlockRenderer;
 import org.xwiki.rendering.renderer.printer.DefaultWikiPrinter;
 import org.xwiki.rendering.renderer.printer.WikiPrinter;
 
 /**
- * Default implementation of {@link OfficePreviewScriptService}.
+ * Default implementation of {@link OfficeViewerScriptService}.
  * 
  * @since 2.5M2
  * @version $Id$
  */
-@Component("officepreview")
-public class DefaultOfficePreviewScriptService extends AbstractLogEnabled implements OfficePreviewScriptService
+@Component("officeviewer")
+public class DefaultOfficeViewerScriptService extends AbstractLogEnabled implements OfficeViewerScriptService
 {
     /**
-     * The list of supported mime types, i.e. the mime types that can be previewed.
+     * The list of supported mime types, i.e. the mime types that can be viewed.
      */
     private static final List<String> SUPPORTED_MIME_TYPES =
         Arrays.asList("application/msword", "application/powerpoint", "application/vnd.ms-powerpoint",
@@ -58,30 +58,30 @@ public class DefaultOfficePreviewScriptService extends AbstractLogEnabled implem
             "application/vnd.oasis.opendocument.chart", "application/vnd.oasis.opendocument.formula");
 
     /**
-     * The key used to save on the execution context the exception caught during office document preview.
+     * The key used to save on the execution context the exception caught during office document view.
      */
-    private static final String OFFICE_PREVIEW_EXCEPTION = "officePreview.caughtException";
+    private static final String OFFICE_VIEW_EXCEPTION = "officeView.caughtException";
 
     /**
-     * The component used to preview office documents.
+     * The component used to view office documents.
      */
     @Requirement
-    private OfficePreviewBuilder officePreviewBuilder;
+    private OfficeViewer officeViewer;
 
     /**
-     * Used to lookup various {@link OfficePreviewBuilder} implementations based on the office file format.
+     * Used to lookup various {@link BlockRenderer} implementations based on the output syntax.
      */
     @Requirement
     private ComponentManager componentManager;
 
     /**
-     * Reference to the current execution context, used to save the exception caught during office document preview.
+     * Reference to the current execution context, used to save the exception caught during office document view.
      */
     @Requirement
     private Execution execution;
 
     /**
-     * The component used to check access rights on the document holding the office attachment to be previewed.
+     * The component used to check access rights on the document holding the office attachment to be viewed.
      */
     @Requirement
     private DocumentAccessBridge documentAccessBridge;
@@ -89,45 +89,45 @@ public class DefaultOfficePreviewScriptService extends AbstractLogEnabled implem
     /**
      * {@inheritDoc}
      * 
-     * @see OfficePreviewScriptService#getCaughtException()
+     * @see OfficeViewerScriptService#getCaughtException()
      */
     public Exception getCaughtException()
     {
-        return (Exception) execution.getContext().getProperty(OFFICE_PREVIEW_EXCEPTION);
+        return (Exception) execution.getContext().getProperty(OFFICE_VIEW_EXCEPTION);
     }
 
     /**
      * {@inheritDoc}
      * 
-     * @see OfficePreviewScriptService#preview(AttachmentReference)
+     * @see OfficeViewerScriptService#view(AttachmentReference)
      */
-    public String preview(AttachmentReference attachmentReference)
+    public String view(AttachmentReference attachmentReference)
     {
         Map<String, String> parameters = Collections.emptyMap();
-        return preview(attachmentReference, parameters);
+        return view(attachmentReference, parameters);
     }
 
     /**
      * {@inheritDoc}
      * 
-     * @see OfficePreviewScriptService#preview(AttachmentReference, java.util.Map)
+     * @see OfficeViewerScriptService#view(AttachmentReference, Map)
      */
-    public String preview(AttachmentReference attachmentReference, Map<String, String> parameters)
+    public String view(AttachmentReference attachmentReference, Map<String, String> parameters)
     {
         // Clear previous caught exception.
-        execution.getContext().removeProperty(OFFICE_PREVIEW_EXCEPTION);
+        execution.getContext().removeProperty(OFFICE_VIEW_EXCEPTION);
         try {
             // Check whether current user has view rights on the document containing the attachment.
             if (!documentAccessBridge.isDocumentViewable(attachmentReference.getDocumentReference())) {
                 throw new RuntimeException("Inadequate privileges.");
             }
 
-            // Build the preview and render the result.
-            return render(officePreviewBuilder.build(attachmentReference, parameters), "xhtml/1.0");
+            // Create the view and render the result.
+            return render(officeViewer.createView(attachmentReference, parameters), "xhtml/1.0");
         } catch (Exception e) {
             // Save caught exception.
-            execution.getContext().setProperty(OFFICE_PREVIEW_EXCEPTION, e);
-            getLogger().error("Failed to preview office document: " + attachmentReference, e);
+            execution.getContext().setProperty(OFFICE_VIEW_EXCEPTION, e);
+            getLogger().error("Failed to view office document: " + attachmentReference, e);
             return null;
         }
     }
@@ -135,7 +135,7 @@ public class DefaultOfficePreviewScriptService extends AbstractLogEnabled implem
     /**
      * {@inheritDoc}
      * 
-     * @see OfficePreviewScriptService#isMimeTypeSupported(String)
+     * @see OfficeViewerScriptService#isMimeTypeSupported(String)
      */
     public boolean isMimeTypeSupported(String mimeType)
     {

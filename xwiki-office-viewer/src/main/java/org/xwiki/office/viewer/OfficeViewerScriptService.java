@@ -17,7 +17,7 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.office.preview;
+package org.xwiki.office.viewer;
 
 import java.util.Map;
 
@@ -26,42 +26,42 @@ import org.xwiki.model.reference.AttachmentReference;
 import org.xwiki.script.service.ScriptService;
 
 /**
- * Exposes office preview utility methods to velocity scripts.
+ * Exposes utility methods for viewing office attachments in server-side scripts.
  * 
  * @since 2.5M2
  * @version $Id$
  */
 @ComponentRole
-public interface OfficePreviewScriptService extends ScriptService
+public interface OfficeViewerScriptService extends ScriptService
 {
     /**
-     * Builds a preview of the specified office attachment in xhtml/1.0 syntax.
+     * Builds a XHTML representation of the specified office attachment.
      * 
-     * @param attachmentReference reference to the attachment to be previewed
-     * @return preview of the specified office attachment or {@code null} if an error occurs
+     * @param attachmentReference reference to the office attachment to be viewed
+     * @return a XHTML representation of the specified office attachment or {@code null} if an error occurs
      */
-    String preview(AttachmentReference attachmentReference);
+    String view(AttachmentReference attachmentReference);
 
     /**
-     * Builds a preview of the specified office attachment in xhtml/1.0 syntax.
+     * Builds a XHTML representation of the specified office attachment.
      * 
-     * @param attachmentReference reference to the attachment to be previewed
-     * @param parameters preview parameters specific to the underlying {@link OfficePreviewBuilder} implementation
-     * @return preview of the specified office attachment or {@code null} if an error occurs
+     * @param attachmentReference reference to the office attachment to be viewed
+     * @param parameters view parameters specific to the underlying {@link OfficeViewer} implementation
+     * @return a XHTML representation of the specified office attachment or {@code null} if an error occurs
      */
-    String preview(AttachmentReference attachmentReference, Map<String, String> parameters);
+    String view(AttachmentReference attachmentReference, Map<String, String> parameters);
 
     /**
-     * @return the exception caught during the last preview on the current execution, or {@code null} if no exception
-     *         has been thrown
+     * @return the exception caught during the last office attachment view on the current execution, or {@code null} if
+     *         no exception has been thrown
      */
     Exception getCaughtException();
 
     /**
-     * Checks if a given mime type is supported.
+     * Checks if a given mime type is supported for viewing.
      * 
      * @param mimeType a mime type
-     * @return {@code true} if the specified mime type can be previewed, {@code false} otherwise
+     * @return {@code true} if the specified mime type can be viewed, {@code false} otherwise
      */
     boolean isMimeTypeSupported(String mimeType);
 }

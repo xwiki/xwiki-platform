@@ -17,7 +17,7 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.office.preview.internal;
+package org.xwiki.office.viewer.internal;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -39,17 +39,16 @@ import org.xwiki.container.Container;
 import org.xwiki.model.reference.AttachmentReference;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReferenceSerializer;
-import org.xwiki.office.preview.OfficePreviewBuilder;
+import org.xwiki.office.viewer.OfficeViewer;
 import org.xwiki.rendering.block.XDOM;
 
 /**
- * An abstract implementation of {@link OfficePreviewBuilder} which provides caching and other utility functions.
+ * An abstract implementation of {@link OfficeViewer} which provides caching and other utility functions.
  * 
  * @since 2.5M2
  * @version $Id$
  */
-public abstract class AbstractOfficePreviewBuilder extends AbstractLogEnabled implements OfficePreviewBuilder,
-    Initializable
+public abstract class AbstractOfficeViewer extends AbstractLogEnabled implements OfficeViewer, Initializable
 {
     /**
      * Default encoding used for encoding wiki, space, page and attachment names.
@@ -75,15 +74,15 @@ public abstract class AbstractOfficePreviewBuilder extends AbstractLogEnabled im
     private EntityReferenceSerializer<String> serializer;
 
     /**
-     * Used to initialize the previews cache.
+     * Used to initialize the view cache.
      */
     @Requirement
     private CacheManager cacheManager;
 
     /**
-     * Office document previews cache.
+     * Office document view cache.
      */
-    private Cache<OfficeDocumentPreview> previewsCache;
+    private Cache<OfficeDocumentView> cache;
 
     /**
      * {@inheritDoc}
@@ -93,9 +92,9 @@ public abstract class AbstractOfficePreviewBuilder extends AbstractLogEnabled im
     public void initialize() throws InitializationException
     {
         CacheConfiguration config = new CacheConfiguration();
-        config.setConfigurationId("officepreview");
+        config.setConfigurationId("officeviewer");
         try {
-            previewsCache = cacheManager.createNewCache(config);
+            cache = cacheManager.createNewCache(config);
         } catch (CacheException e) {
             throw new InitializationException("Failed to create cache.", e);
         }
@@ -104,64 +103,61 @@ public abstract class AbstractOfficePreviewBuilder extends AbstractLogEnabled im
     /**
      * {@inheritDoc}
      * 
-     * @see OfficePreviewBuilder#build(AttachmentReference, Map)
+     * @see OfficeViewer#createView(AttachmentReference, Map)
      */
-    public XDOM build(AttachmentReference attachmentReference, Map<String, String> parameters) throws Exception
+    public XDOM createView(AttachmentReference attachmentReference, Map<String, String> parameters) throws Exception
     {
         // Search the cache.
-        String cacheKey = getPreviewsCacheKey(attachmentReference, parameters);
-        OfficeDocumentPreview preview = previewsCache.get(cacheKey);
+        String cacheKey = getCacheKey(attachmentReference, parameters);
+        OfficeDocumentView view = cache.get(cacheKey);
 
         // It's possible that the attachment has been deleted. We need to catch such events and cleanup the cache.
         DocumentReference documentReference = attachmentReference.getDocumentReference();
         if (!documentAccessBridge.getAttachmentReferences(documentReference).contains(attachmentReference)) {
-            // If a cached preview exists, flush it.
-            if (null != preview) {
-                previewsCache.remove(cacheKey);
+            // If a cached view exists, flush it.
+            if (view != null) {
+                cache.remove(cacheKey);
             }
             throw new Exception(String.format("Attachment [%s] does not exist.", attachmentReference));
         }
 
-        // Check if the preview has been expired.
+        // Check if the view has expired.
         String currentVersion = documentAccessBridge.getAttachmentVersion(attachmentReference);
-        if (null != preview && !currentVersion.equals(preview.getVersion())) {
-            // Flush the cached preview.
-            previewsCache.remove(cacheKey);
-            preview = null;
+        if (view != null && !currentVersion.equals(view.getVersion())) {
+            // Flush the cached view.
+            cache.remove(cacheKey);
+            view = null;
         }
 
-        // If a preview in not available, build one.
-        if (null == preview) {
-            // Build preview.
-            preview = buildPreview(attachmentReference, parameters);
-
-            // Cache the preview.
-            previewsCache.set(cacheKey, preview);
+        // If a view in not available, build one and cache it.
+        if (view == null) {
+            view = createOfficeDocumentView(attachmentReference, parameters);
+            cache.set(cacheKey, view);
         }
 
         // Done.
-        return preview.getXDOM();
+        return view.getXDOM();
     }
 
     /**
-     * @param attachmentReference reference to the attachment to be previewed
-     * @param previewParameters implementation specific preview parameters
-     * @return a key to cache the preview of the specified attachment
+     * @param attachmentReference reference to the attachment to be viewed
+     * @param viewParameters implementation specific view parameters
+     * @return a key to cache the view of the specified attachment
      */
-    private String getPreviewsCacheKey(AttachmentReference attachmentReference, Map<String, String> previewParameters)
+    private String getCacheKey(AttachmentReference attachmentReference, Map<String, String> viewParameters)
     {
-        return serializer.serialize(attachmentReference) + '/' + previewParameters.hashCode();
+        return serializer.serialize(attachmentReference) + '/' + viewParameters.hashCode();
     }
 
     /**
-     * Builds a preview of the specified attachment.
+     * Creates an {@link OfficeDocumentView} of the specified attachment.
      * 
-     * @param attachmentReference reference to the attachment to be previewed
-     * @param parameters implementation specific preview parameters
-     * @return {@link OfficeDocumentPreview} corresponding to the preview of the specified attachment
-     * @throws Exception if an error occurs while building the preview
+     * @param attachmentReference reference to the attachment to be viewed
+     * @param parameters implementation specific view parameters
+     * @return {@link OfficeDocumentView} that can be used to cache the XDOM representation of the specified attachment
+     * @throws Exception if an error occurs while creating the view
      */
-    protected abstract OfficeDocumentPreview buildPreview(AttachmentReference attachmentReference,
+    protected abstract OfficeDocumentView createOfficeDocumentView(AttachmentReference attachmentReference,
         Map<String, String> parameters) throws Exception;
 
     /**

@@ -17,7 +17,7 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.office.preview;
+package org.xwiki.office.viewer;
 
 import java.util.Map;
 
@@ -26,21 +26,21 @@ import org.xwiki.model.reference.AttachmentReference;
 import org.xwiki.rendering.block.XDOM;
 
 /**
- * Interface for the component responsible for building previews of office attachments.
+ * The component responsible for creating XDOM views from office attachments.
  * 
  * @since 2.5M2
  * @version $Id$
  */
 @ComponentRole
-public interface OfficePreviewBuilder
+public interface OfficeViewer
 {
     /**
-     * Builds a preview {@link XDOM} of the specified office attachment.
+     * Creates a {@link XDOM} view of the specified office attachment.
      * 
-     * @param attachmentReference office attachment reference
-     * @param parameters implementation specific preview parameters
-     * @return {@link XDOM} containing a preview of the specified attachment
-     * @throws Exception if an error occurs while accessing the attachment or building the preview
+     * @param attachmentReference reference to the office attachment to be viewed
+     * @param parameters implementation specific view parameters
+     * @return {@link XDOM} representation of the specified office document
+     * @throws Exception if an error occurs while accessing the office attachment or while creating the view
      */
-    XDOM build(AttachmentReference attachmentReference, Map<String, String> parameters) throws Exception;
+    XDOM createView(AttachmentReference attachmentReference, Map<String, String> parameters) throws Exception;
 }

@@ -17,7 +17,7 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.office.preview.internal;
+package org.xwiki.office.viewer.internal;
 
 import java.io.File;
 import java.io.InputStream;
@@ -40,13 +40,13 @@ import org.xwiki.rendering.block.XDOM;
 import org.xwiki.rendering.listener.URLImage;
 
 /**
- * Default implementation of {@link org.xwiki.office.preview.OfficePreviewBuilder}.
+ * Default implementation of {@link org.xwiki.office.viewer.OfficeViewer}.
  * 
  * @since 2.5M2
  * @version $Id$
  */
 @Component
-public class DefaultOfficePreviewBuilder extends AbstractOfficePreviewBuilder
+public class DefaultOfficeViewer extends AbstractOfficeViewer
 {
     /**
      * File extensions corresponding to presentation office documents.
@@ -60,7 +60,7 @@ public class DefaultOfficePreviewBuilder extends AbstractOfficePreviewBuilder
     private XDOMOfficeDocumentBuilder documentBuilder;
 
     /**
-     * Used to build XDOM document from office presentations.
+     * Used to build XDOM documents from office presentations.
      */
     @Requirement
     private PresentationBuilder presentationBuilder;
@@ -68,25 +68,25 @@ public class DefaultOfficePreviewBuilder extends AbstractOfficePreviewBuilder
     /**
      * {@inheritDoc}
      * 
-     * @see AbstractOfficePreviewBuilder#buildPreview(AttachmentReference, Map)
+     * @see AbstractOfficeViewer#createOfficeDocumentView(AttachmentReference, Map)
      */
-    protected OfficeDocumentPreview buildPreview(AttachmentReference attachmentReference,
+    protected OfficeDocumentView createOfficeDocumentView(AttachmentReference attachmentReference,
         Map<String, String> parameters) throws Exception
     {
-        XDOMOfficeDocument xdomOfficeDocument = buildXDOM(attachmentReference, parameters);
+        XDOMOfficeDocument xdomOfficeDocument = createXDOM(attachmentReference, parameters);
         Set<File> temporaryFiles = processImages(attachmentReference, xdomOfficeDocument);
 
         XDOM xdom = xdomOfficeDocument.getContentDocument();
         String attachmentVersion = documentAccessBridge.getAttachmentVersion(attachmentReference);
-        return new OfficeDocumentPreview(attachmentReference, attachmentVersion, xdom, temporaryFiles);
+        return new OfficeDocumentView(attachmentReference, attachmentVersion, xdom, temporaryFiles);
     }
 
     /**
      * Processes all the image blocks in the given XDOM and changes image URL to point to a temporary file for those
-     * images that are preview artifacts.
+     * images that are view artifacts.
      * 
-     * @param attachmentReference a reference to the office file that is being previewed; this reference is used to
-     *            compute the path to the temporary directory holding the image artifacts
+     * @param attachmentReference a reference to the office file that is being viewed; this reference is used to compute
+     *            the path to the temporary directory holding the image artifacts
      * @param xdomOfficeDocument the XDOM whose image blocks have to be processed
      * @return the set of temporary files corresponding to image artifacts
      */
@@ -114,7 +114,7 @@ public class DefaultOfficePreviewBuilder extends AbstractOfficePreviewBuilder
                     Block newImgBlock = new ImageBlock(urlImage, false, imgBlock.getParameters());
                     imgBlock.getParent().replaceChild(Arrays.asList(newImgBlock), imgBlock);
 
-                    // Collect the temporary file so that it can be cleaned up when the preview is disposed.
+                    // Collect the temporary file so that it can be cleaned up when the view is disposed from cache.
                     temporaryFiles.add(tempFile);
                 } catch (Exception ex) {
                     String message = "Error while processing artifact image [%s].";
@@ -127,14 +127,14 @@ public class DefaultOfficePreviewBuilder extends AbstractOfficePreviewBuilder
     }
 
     /**
-     * Builds an XDOM from the content of the specified office file.
+     * Creates a {@link XDOM} representation of the specified office attachment.
      * 
      * @param attachmentReference a reference to the office file to be parsed into XDOM
      * @param parameters build parameters
      * @return the {@link XDOMOfficeDocument} corresponding to the specified office file
      * @throws Exception if building the XDOM fails
      */
-    private XDOMOfficeDocument buildXDOM(AttachmentReference attachmentReference, Map<String, String> parameters)
+    private XDOMOfficeDocument createXDOM(AttachmentReference attachmentReference, Map<String, String> parameters)
         throws Exception
     {
         DocumentReference documentReference = attachmentReference.getDocumentReference();

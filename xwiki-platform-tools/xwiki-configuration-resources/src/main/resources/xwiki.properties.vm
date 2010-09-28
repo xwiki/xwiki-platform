@@ -87,6 +87,13 @@
 # rendering.imageHeightLimit = 768
 # rendering.imageHeightLimit = -1
 
+#-# [Since 2.5M2]
+#-# InterWiki definitions in the format alias=URL
+#-# See http://en.wikipedia.org/wiki/Interwiki_links for a definition of an InterWiki link
+# Some examples:
+# rendering.interWikiDefinitions = wikipedia = http://en.wikipedia.org/wiki/
+# rendering.interWikiDefinitions = definition = http://www.yourdictionary.com/
+
 #-------------------------------------------------------------------------------------
 # Cache
 #-------------------------------------------------------------------------------------

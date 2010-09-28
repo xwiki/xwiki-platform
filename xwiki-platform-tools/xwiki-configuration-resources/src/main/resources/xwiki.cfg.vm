@@ -14,7 +14,7 @@
 
 #-# [Since 1.6RC1] Defines the list of supported syntaxes
 #-# Available syntaxes are: 
-#-#    xwiki/1.0, xwiki/2.0, confluence/1.0, jspwiki/1.0, creole/1.0,  mediawiki/1.0, twiki/1.0, xhtml/1.0, html/4.01, plain/1.0
+#-#    xwiki/1.0, xwiki/2.0, xwiki/2.1, confluence/1.0, jspwiki/1.0, creole/1.0,  mediawiki/1.0, twiki/1.0, xhtml/1.0, html/4.01, plain/1.0
 xwiki.rendering.syntaxes = xwiki/1.0, xwiki/2.0
 
 #-# List of groups that a new user should be added to by default after registering. Comma-separated list of group document

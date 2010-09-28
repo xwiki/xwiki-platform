@@ -29,7 +29,7 @@
 
 .attachment .xwikibuttonlinks {
   float: right;
-  width: 40px;
+  width: 60px;
 }
 
 /* Attachment form style */
@@ -73,6 +73,9 @@
 }
 .attachment .xwikibuttonlinks a.editlink {
   background-image: url("$xwiki.getSkinFile('icons/silk/pencil.gif')");
+}
+.attachment .xwikibuttonlinks a.viewlink {
+  background-image: url("$xwiki.getSkinFile('icons/silk/eye.gif')");
 }
 #AddAttachment {
   border-top: 1px solid $theme.borderColor;

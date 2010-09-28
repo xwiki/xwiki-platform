@@ -20,15 +20,16 @@
 package org.xwiki.officeimporter.internal.builder;
 
 import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
 import java.io.InputStream;
 import java.io.StringReader;
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipOutputStream;
 
+import org.apache.commons.lang.StringUtils;
+import org.w3c.dom.Document;
 import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.Requirement;
@@ -40,12 +41,11 @@ import org.xwiki.officeimporter.builder.PresentationBuilder;
 import org.xwiki.officeimporter.document.XDOMOfficeDocument;
 import org.xwiki.officeimporter.openoffice.OpenOfficeConverterException;
 import org.xwiki.officeimporter.openoffice.OpenOfficeManager;
-import org.xwiki.rendering.block.XDOM;
 import org.xwiki.rendering.parser.ParseException;
 import org.xwiki.rendering.parser.Parser;
-import org.xwiki.rendering.syntax.Syntax;
-import org.xwiki.rendering.transformation.TransformationException;
-import org.xwiki.rendering.transformation.TransformationManager;
+import org.xwiki.xml.html.HTMLCleaner;
+import org.xwiki.xml.html.HTMLCleanerConfiguration;
+import org.xwiki.xml.html.HTMLUtils;
 
 /**
  * Default implementation of {@link PresentationBuilder}.
@@ -57,18 +57,6 @@ import org.xwiki.rendering.transformation.TransformationManager;
 public class DefaultPresentationBuilder implements PresentationBuilder
 {
     /**
-     * XWiki/2.0 syntax parser used for building the presentation XDOM.
-     */
-    @Requirement("xwiki/2.0")
-    private Parser xwikiParser;
-
-    /**
-     * Used to transform the XDOM.
-     */
-    @Requirement
-    private TransformationManager transformationManager;
-
-    /**
      * Component manager used by {@link XDOMOfficeDocument}.
      */
     @Requirement
@@ -79,44 +67,70 @@ public class DefaultPresentationBuilder implements PresentationBuilder
      */
     @Requirement
     private OpenOfficeManager officeManager;
-    
-    /**
-     * Used to serialize {@link DocumentReference} instances into strings.
-     */
-    @Requirement
-    private EntityReferenceSerializer<String> serializer;
-    
+
     /**
      * Used to access current context document.
      */
     @Requirement
-    private DocumentAccessBridge docBridge;
+    private DocumentAccessBridge documentAccessBridge;
 
     /**
-     * {@inheritDoc}    
+     * Used to serialize the reference document name.
      */
-    public XDOMOfficeDocument build(InputStream officeFileStream, String officeFileName, DocumentReference reference)
-        throws OfficeImporterException
+    @Requirement
+    private EntityReferenceSerializer<String> entityReferenceSerializer;
+
+    /**
+     * OpenOffice HTML cleaner.
+     */
+    @Requirement("openoffice")
+    private HTMLCleaner ooHTMLCleaner;
+
+    /**
+     * XHTML/1.0 syntax parser used to build an XDOM from an XHTML input.
+     */
+    @Requirement("xhtml/1.0")
+    private Parser xhtmlParser;
+
+    /**
+     * {@inheritDoc}
+     */
+    public XDOMOfficeDocument build(InputStream officeFileStream, String officeFileName,
+        DocumentReference documentReference) throws OfficeImporterException
     {
-        // Invoke openoffice document converter.
+        // Invoke OpenOffice document converter.
         Map<String, InputStream> inputStreams = new HashMap<String, InputStream>();
         inputStreams.put(officeFileName, officeFileStream);
         Map<String, byte[]> artifacts;
         try {
-            artifacts = this.officeManager.getConverter().convert(inputStreams, officeFileName, "output.html");
-        } catch (OpenOfficeConverterException ex) {
+            // The OpenOffice converter uses the output file name extension to determine the output format/syntax.
+            // The returned artifacts are of three types: imgX.jpg (slide screen shot), imgX.html (HTML page that
+            // display the corresponding slide screen shot) and textX.html (HTML page that display the text extracted
+            // from the corresponding slide). We use "img0.html" as the output file name because the corresponding
+            // artifact displays a screen shot of the first presentation slide.
+            artifacts = officeManager.getConverter().convert(inputStreams, officeFileName, "img0.html");
+        } catch (OpenOfficeConverterException e) {
             String message = "Error while converting document [%s] into html.";
-            throw new OfficeImporterException(String.format(message, officeFileName), ex);
+            throw new OfficeImporterException(String.format(message, officeFileName), e);
         }
 
-        // Create presentation archive.
-        byte[] presentationArchive = buildPresentationArchive(artifacts);
-        artifacts.clear();
-        artifacts.put("presentation.zip", presentationArchive);
+        // Create presentation HTML.
+        String html = buildPresentationHTML(artifacts, StringUtils.substringBeforeLast(officeFileName, "."));
 
-        // Build presentation XDOM.
-        String stringReference = serializer.serialize(reference);
-        return new XDOMOfficeDocument(buildPresentationXDOM(stringReference), artifacts, this.componentManager);
+        // Clear and adjust presentation HTML (slide image URLs are updated to point to the corresponding attachments).
+        HTMLCleanerConfiguration configuration = ooHTMLCleaner.getDefaultConfiguration();
+        configuration.setParameters(Collections.singletonMap("targetDocument", entityReferenceSerializer
+            .serialize(documentReference)));
+        Document xhtmlDocument = ooHTMLCleaner.clean(new StringReader(html), configuration);
+        HTMLUtils.stripHTMLEnvelope(xhtmlDocument);
+        html = HTMLUtils.toString(xhtmlDocument);
+
+        // Parse presentation HTML.
+        try {
+            return new XDOMOfficeDocument(xhtmlParser.parse(new StringReader(html)), artifacts, this.componentManager);
+        } catch (ParseException e) {
+            throw new OfficeImporterException("Failed to parse presentation HTML.", e);
+        }
     }
 
     /**
@@ -127,7 +141,7 @@ public class DefaultPresentationBuilder implements PresentationBuilder
     @Deprecated
     public XDOMOfficeDocument build(InputStream officeFileStream, String officeFileName) throws OfficeImporterException
     {
-        return build(officeFileStream, officeFileName, docBridge.getCurrentDocumentReference());
+        return build(officeFileStream, officeFileName, documentAccessBridge.getCurrentDocumentReference());
     }
 
     /**
@@ -142,64 +156,49 @@ public class DefaultPresentationBuilder implements PresentationBuilder
     }
 
     /**
-     * Utility method for building a zip archive from artifacts.
+     * Builds the presentation HTML from the presentation artifacts. There are two types of presentation artifacts:
+     * slide image and slide text. The returned HTML will display all the slide images. Slide text is currently ignored.
+     * All artifacts except slide images are removed from {@code presentationArtifacts}. Slide images names are prefixed
+     * with the given {@code nameSpace} to avoid name conflicts.
      * 
-     * @param artifacts artifacts collected during document import operation.
-     * @return the byte[] containing the zip archive off all the artifacts.
-     * @throws OfficeImporterException if an I/O exception is encountered.
+     * @param presentationArtifacts the map of presentation artifacts; this method removes some of the presentation
+     *            artifacts and renames others so be aware of the side effects
+     * @param nameSpace the prefix to add in front of all slide image names to prevent name conflicts
+     * @return the presentation HTML
      */
-    private byte[] buildPresentationArchive(Map<String, byte[]> artifacts) throws OfficeImporterException
+    private String buildPresentationHTML(Map<String, byte[]> presentationArtifacts, String nameSpace)
     {
-        try {
-            ByteArrayOutputStream bos = new ByteArrayOutputStream();
-            ZipOutputStream zos = new ZipOutputStream(bos);
-            for (String artifactName : artifacts.keySet()) {
-                ZipEntry entry = new ZipEntry(artifactName);
-                zos.putNextEntry(entry);
-                zos.write(artifacts.get(artifactName));
-                zos.closeEntry();
+        StringBuilder presentationHTML = new StringBuilder();
+
+        // Iterate all the slides.
+        int i = 0;
+        String slideImageKeyFormat = "img%s.jpg";
+        byte[] slideImage = presentationArtifacts.remove(String.format(slideImageKeyFormat, i));
+        while (slideImage != null) {
+            // Remove unused artifacts.
+            // imgX.html is an HTML page that displays the corresponding slide image.
+            presentationArtifacts.remove(String.format("img%s.html", i));
+            // textX.html is an HTML page that displays the text extracted from the corresponding slide.
+            presentationArtifacts.remove(String.format("text%s.html", i));
+
+            // Rename slide image to prevent name conflicts when it will be attached to the target document.
+            String slideImageName = String.format("%s-slide%s.jpg", nameSpace, i);
+            presentationArtifacts.put(slideImageName, slideImage);
+
+            // Append slide image to the presentation HTML.
+            String slideImageURL = null;
+            try {
+                // We need to encode the slide image name in case it contains special URL characters.
+                slideImageURL = URLEncoder.encode(slideImageName, "UTF-8");
+            } catch (UnsupportedEncodingException e) {
+                // This should never happen.
             }
-            zos.close();
-            return bos.toByteArray();
-        } catch (IOException ex) {
-            throw new OfficeImporterException("Error while creating presentation archive.", ex);
+            presentationHTML.append(String.format("<p><img src=\"%s\"/></p>", slideImageURL));
+
+            // Move to the next slide.
+            slideImage = presentationArtifacts.remove(String.format(slideImageKeyFormat, ++i));
         }
-    }
 
-    /**
-     * Utility method for building the presentation XDOM.
-     * 
-     * @param stringDocumentReference name of the target wiki page.
-     * @return presentation XDOM.
-     * @throws OfficeImporterException if an error occurs while building the presentation xdom.
-     */
-    private XDOM buildPresentationXDOM(String stringDocumentReference) throws OfficeImporterException
-    {
-        // TODO: the XDOM should be generated in pure java and not depends on velocity, html macros and xwiki/2.0
-        // parser. This is slow and wrong. Before we need to convert the zip plugin into component to be able to use it
-        // directly.
-        StringBuffer buffer = new StringBuffer();
-        buffer.append("{{velocity}}");
-        buffer.append(String.format("#set($mdoc = $xwiki.getDocument(\"%s\"))", stringDocumentReference));
-        buffer.append("#set($url = $xwiki.zipexplorer.getFileLink($mdoc, 'presentation.zip', 'output.html'))");
-        buffer.append("{{html wiki=\"false\" clean=\"false\"}}");
-        buffer.append("<iframe src=\"$url\" frameborder=0 width=800px height=600px></iframe>");
-        buffer.append("{{/html}}");
-        buffer.append("{{/velocity}}");
-
-        XDOM xdom;
-        try {
-            xdom = this.xwikiParser.parse(new StringReader(buffer.toString()));
-
-            // Transform XDOM
-            this.transformationManager.performTransformations(xdom, Syntax.XWIKI_2_0);
-
-            return xdom;
-        } catch (ParseException e) {
-            throw new OfficeImporterException(
-                "Error while building presentation: failed to parse presentation content", e);
-        } catch (TransformationException e) {
-            throw new OfficeImporterException("Error while building presentation: failed to transform XDOM", e);
-        }
+        return presentationHTML.toString();
     }
 }

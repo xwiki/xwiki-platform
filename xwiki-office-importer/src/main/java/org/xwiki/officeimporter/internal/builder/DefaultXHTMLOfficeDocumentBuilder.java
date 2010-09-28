@@ -27,6 +27,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang.StringUtils;
 import org.w3c.dom.Document;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.Requirement;
@@ -51,11 +52,6 @@ import org.xwiki.xml.html.HTMLCleanerConfiguration;
 public class DefaultXHTMLOfficeDocumentBuilder extends AbstractLogEnabled implements XHTMLOfficeDocumentBuilder
 {
     /**
-     * Name of the output file as seen by {@link org.xwiki.officeimporter.openoffice.OpenOfficeConverterException}.
-     */
-    private static final String OUTPUT_FILE_NAME = "output.html";
-
-    /**
      * Used to serialize the reference document name.
      */
     @Requirement
@@ -68,7 +64,7 @@ public class DefaultXHTMLOfficeDocumentBuilder extends AbstractLogEnabled implem
     private OpenOfficeManager officeManager;
 
     /**
-     * OpenOffice html cleaner.
+     * OpenOffice HTML cleaner.
      */
     @Requirement("openoffice")
     private HTMLCleaner ooHtmlCleaner;
@@ -79,26 +75,28 @@ public class DefaultXHTMLOfficeDocumentBuilder extends AbstractLogEnabled implem
     public XHTMLOfficeDocument build(InputStream officeFileStream, String officeFileName, DocumentReference reference,
         boolean filterStyles) throws OfficeImporterException
     {
-        // Invoke openoffice document converter.
+        // Invoke OpenOffice document converter.
         Map<String, InputStream> inputStreams = new HashMap<String, InputStream>();
         inputStreams.put(officeFileName, officeFileStream);
         Map<String, byte[]> artifacts;
+        // The OpenOffice converter uses the output file name extension to determine the output format/syntax.
+        String outputFileName = StringUtils.substringBeforeLast(officeFileName, ".") + ".html";
         try {
-            artifacts = officeManager.getConverter().convert(inputStreams, officeFileName, OUTPUT_FILE_NAME);
+            artifacts = officeManager.getConverter().convert(inputStreams, officeFileName, outputFileName);
         } catch (OpenOfficeConverterException ex) {
             String message = "Error while converting document [%s] into html.";
             throw new OfficeImporterException(String.format(message, officeFileName), ex);
         }
 
-        // Prepare the parameters for html cleaning.
+        // Prepare the parameters for HTML cleaning.
         Map<String, String> params = new HashMap<String, String>();
         params.put("targetDocument", entityReferenceSerializer.serialize(reference));
         if (filterStyles) {
             params.put("filterStyles", "strict");
         }
 
-        // Parse and clean the html output.
-        InputStream htmlStream = new ByteArrayInputStream(artifacts.remove(OUTPUT_FILE_NAME));
+        // Parse and clean the HTML output.
+        InputStream htmlStream = new ByteArrayInputStream(artifacts.remove(outputFileName));
         InputStreamReader htmlReader = null;
         Document xhtmlDoc = null;
         try {
@@ -119,7 +117,8 @@ public class DefaultXHTMLOfficeDocumentBuilder extends AbstractLogEnabled implem
 
     /**
      * {@inheritDoc}
-     * @deprecated use {@link #build(InputStream, String, DocumentReference, boolean)}  since 2.2M1
+     * 
+     * @deprecated use {@link #build(InputStream, String, DocumentReference, boolean)} since 2.2M1
      */
     @Deprecated
     public XHTMLOfficeDocument build(byte[] officeFileData, org.xwiki.bridge.DocumentName reference,

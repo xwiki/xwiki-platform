@@ -24,16 +24,16 @@ import java.util.Collections;
 
 import org.jmock.Expectations;
 import org.junit.Assert;
-import org.junit.Before;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
-import org.xwiki.bridge.DocumentAccessBridge;
+import org.xwiki.model.reference.AttachmentReference;
+import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.xml.html.HTMLCleanerConfiguration;
 
 /**
- * Test case for cleaning html images in {@link OpenOfficeHTMLCleaner}.
+ * Test case for cleaning HTML images in {@link OpenOfficeHTMLCleaner}.
  * 
  * @version $Id$
  * @since 1.8
@@ -41,37 +41,53 @@ import org.xwiki.xml.html.HTMLCleanerConfiguration;
 public class ImageOpenOfficeCleaningTest extends AbstractHTMLCleaningTest
 {
     /**
-     * Mock document access bridge.
+     * The key used to store the target document string reference in the cleaning parameters map.
      */
-    private DocumentAccessBridge mockDAB;
-    
-    /**
-     * {@inheritDoc}
-     */
-    @Before
-    public void setUp() throws Exception
-    {
-        super.setUp();
+    private static final String TARGET_DOCUMENT_KEY = "targetDocument";
 
-        mockDAB = getComponentManager().lookup(DocumentAccessBridge.class);        
-    }
+    /**
+     * The default target document string reference.
+     */
+    private static final String TARGET_DOCUMENT_VALUE = "Import.Test";
+
+    /**
+     * Default target document reference.
+     */
+    private static final DocumentReference TARGET_DOCUMENT_REFERENCE = new DocumentReference("xwiki", "Import", "Test");
+
+    /**
+     * Default attachment reference to be used in tests.
+     */
+    private static final AttachmentReference DEFAULT_ATTACHMENT_REFERENCE =
+        new AttachmentReference("foo.png", TARGET_DOCUMENT_REFERENCE);
+
+    /**
+     * Default attachment URL to be used in tests.
+     */
+    private static final String DEFAULT_ATTACHMENT_URL = "/bridge/foo.png";
 
     /**
      * {@code <img/>} links should be wrapped in xwiki specific html elements so that they are recognized by the XHTML
      * parser.
      */
     @org.junit.Test
-    public void testImageWrapping() throws Exception
+    public void testImageWrapping()
     {
         String html = header + "<img src=\"foo.png\"/>" + footer;
         HTMLCleanerConfiguration configuration = this.openOfficeHTMLCleaner.getDefaultConfiguration();
-        configuration.setParameters(Collections.singletonMap("targetDocument", "Import.Test"));
+        configuration.setParameters(Collections.singletonMap(TARGET_DOCUMENT_KEY, TARGET_DOCUMENT_VALUE));
 
-        getMockery().checking(new Expectations() {{
-            allowing(mockDAB).getAttachmentURL("Import.Test", "foo.png");
-            will(returnValue("/bridge/foo.png"));
-        }});
-        
+        getMockery().checking(new Expectations()
+        {
+            {
+                oneOf(mockDocumentReferenceResolver).resolve(TARGET_DOCUMENT_VALUE);
+                will(returnValue(TARGET_DOCUMENT_REFERENCE));
+
+                oneOf(mockDocumentAccessBridge).getAttachmentURL(DEFAULT_ATTACHMENT_REFERENCE, false);
+                will(returnValue(DEFAULT_ATTACHMENT_URL));
+            }
+        });
+
         Document doc = openOfficeHTMLCleaner.clean(new StringReader(html), configuration);
 
         NodeList nodes = doc.getElementsByTagName("img");
@@ -81,7 +97,7 @@ public class ImageOpenOfficeCleaningTest extends AbstractHTMLCleaningTest
         Node stopComment = image.getNextSibling();
         Assert.assertEquals(Node.COMMENT_NODE, startComment.getNodeType());
         Assert.assertTrue(startComment.getNodeValue().equals("startimage:foo.png"));
-        Assert.assertEquals("/bridge/foo.png", image.getAttribute("src"));
+        Assert.assertEquals(DEFAULT_ATTACHMENT_URL, image.getAttribute("src"));
         Assert.assertEquals(Node.COMMENT_NODE, stopComment.getNodeType());
         Assert.assertTrue(stopComment.getNodeValue().equals("stopimage"));
     }
@@ -95,13 +111,19 @@ public class ImageOpenOfficeCleaningTest extends AbstractHTMLCleaningTest
     {
         String html = header + "<a href=\"http://www.xwiki.org\"><img src=\"foo.png\"/></a>" + footer;
         HTMLCleanerConfiguration configuration = this.openOfficeHTMLCleaner.getDefaultConfiguration();
-        configuration.setParameters(Collections.singletonMap("targetDocument", "Import.Test"));
+        configuration.setParameters(Collections.singletonMap(TARGET_DOCUMENT_KEY, TARGET_DOCUMENT_VALUE));
 
-        getMockery().checking(new Expectations() {{
-            allowing(mockDAB).getAttachmentURL("Import.Test", "foo.png");
-            will(returnValue("/bridge/foo.png"));
-        }});
-        
+        getMockery().checking(new Expectations()
+        {
+            {
+                oneOf(mockDocumentReferenceResolver).resolve(TARGET_DOCUMENT_VALUE);
+                will(returnValue(TARGET_DOCUMENT_REFERENCE));
+
+                oneOf(mockDocumentAccessBridge).getAttachmentURL(DEFAULT_ATTACHMENT_REFERENCE, false);
+                will(returnValue(DEFAULT_ATTACHMENT_URL));
+            }
+        });
+
         Document doc = openOfficeHTMLCleaner.clean(new StringReader(html), configuration);
 
         NodeList nodes = doc.getElementsByTagName("img");
@@ -111,7 +133,7 @@ public class ImageOpenOfficeCleaningTest extends AbstractHTMLCleaningTest
         Node stopImageComment = image.getNextSibling();
         Assert.assertEquals(Node.COMMENT_NODE, startImageComment.getNodeType());
         Assert.assertTrue(startImageComment.getNodeValue().equals("startimage:foo.png"));
-        Assert.assertEquals("/bridge/foo.png", image.getAttribute("src"));
+        Assert.assertEquals(DEFAULT_ATTACHMENT_URL, image.getAttribute("src"));
         Assert.assertEquals(Node.COMMENT_NODE, stopImageComment.getNodeType());
         Assert.assertTrue(stopImageComment.getNodeValue().equals("stopimage"));
         Element link = (Element) image.getParentNode();
@@ -137,18 +159,24 @@ public class ImageOpenOfficeCleaningTest extends AbstractHTMLCleaningTest
     {
         String html = header + "<img src=\"../../some/path/foo.png\"/>" + footer;
         HTMLCleanerConfiguration configuration = this.openOfficeHTMLCleaner.getDefaultConfiguration();
-        configuration.setParameters(Collections.singletonMap("targetDocument", "Import.Test"));
+        configuration.setParameters(Collections.singletonMap(TARGET_DOCUMENT_KEY, TARGET_DOCUMENT_VALUE));
 
-        getMockery().checking(new Expectations() {{
-            allowing(mockDAB).getAttachmentURL("Import.Test", "foo.png");
-            will(returnValue("/bridge/foo.png"));
-        }});
-        
+        getMockery().checking(new Expectations()
+        {
+            {
+                oneOf(mockDocumentReferenceResolver).resolve(TARGET_DOCUMENT_VALUE);
+                will(returnValue(TARGET_DOCUMENT_REFERENCE));
+
+                oneOf(mockDocumentAccessBridge).getAttachmentURL(DEFAULT_ATTACHMENT_REFERENCE, false);
+                will(returnValue(DEFAULT_ATTACHMENT_URL));
+            }
+        });
+
         Document doc = openOfficeHTMLCleaner.clean(new StringReader(html), configuration);
-        
+
         NodeList nodes = doc.getElementsByTagName("img");
         Assert.assertEquals(1, nodes.getLength());
         Element image = (Element) nodes.item(0);
-        Assert.assertEquals("/bridge/foo.png", image.getAttribute("src"));
+        Assert.assertEquals(DEFAULT_ATTACHMENT_URL, image.getAttribute("src"));
     }
 }

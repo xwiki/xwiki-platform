@@ -19,6 +19,8 @@
  */
 package org.xwiki.officeimporter.internal.filter;
 
+import java.io.UnsupportedEncodingException;
+import java.net.URLDecoder;
 import java.util.List;
 import java.util.Map;
 
@@ -29,6 +31,9 @@ import org.w3c.dom.Element;
 import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.Requirement;
+import org.xwiki.model.reference.AttachmentReference;
+import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.xml.html.filter.AbstractHTMLFilter;
 
 /**
@@ -45,7 +50,13 @@ public class ImageFilter extends AbstractHTMLFilter
      * The {@link DocumentAccessBridge} component.
      */
     @Requirement
-    private DocumentAccessBridge docBridge;
+    private DocumentAccessBridge documentAccessBridge;
+
+    /**
+     * The component used to parse string document references.
+     */
+    @Requirement("currentmixed")
+    private DocumentReferenceResolver<String> documentStringReferenceResolver;
 
     /**
      * {@inheritDoc}
@@ -53,22 +64,30 @@ public class ImageFilter extends AbstractHTMLFilter
     public void filter(Document htmlDocument, Map<String, String> cleaningParams)
     {
         String targetDocument = cleaningParams.get("targetDocument");
+        DocumentReference targetDocumentReference = null;
+
         List<Element> images = filterDescendants(htmlDocument.getDocumentElement(), new String[] {TAG_IMG});
         for (Element image : images) {
+            if (targetDocumentReference == null && !StringUtils.isBlank(targetDocument)) {
+                targetDocumentReference = documentStringReferenceResolver.resolve(targetDocument);
+            }
             String src = image.getAttribute(ATTRIBUTE_SRC);
-            if (!StringUtils.isBlank(src) && !StringUtils.isBlank(targetDocument)) {
+            if (!StringUtils.isBlank(src) && targetDocumentReference != null) {
                 // OpenOffice 3.2 server generates relative image paths, extract image name.
                 int separator = src.lastIndexOf("/");
                 if (-1 != separator) {
                     src = src.substring(separator + 1);
                 }
-                
-                // Set image source attribute relative to the reference document.  
                 try {
-                    image.setAttribute(ATTRIBUTE_SRC, docBridge.getAttachmentURL(targetDocument, src));
-                } catch (Exception ex) {
-                    // Do nothing.
+                    // We have to decode the image file name in case it contains URL special characters.
+                    src = URLDecoder.decode(src, "UTF-8");
+                } catch (UnsupportedEncodingException e) {
+                    // This should never happen.
                 }
+
+                // Set image source attribute relative to the reference document.
+                AttachmentReference attachmentReference = new AttachmentReference(src, targetDocumentReference);
+                image.setAttribute(ATTRIBUTE_SRC, documentAccessBridge.getAttachmentURL(attachmentReference, false));
 
                 // The 'align' attribute of images creates a lot of problems. First, OO server has a problem with
                 // center aligning images (it aligns them to left). Next, OO server uses <br clear"xxx"> for

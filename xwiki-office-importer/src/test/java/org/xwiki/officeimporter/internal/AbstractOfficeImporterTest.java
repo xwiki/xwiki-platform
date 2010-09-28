@@ -42,18 +42,18 @@ public abstract class AbstractOfficeImporterTest extends AbstractComponentTestCa
     /**
      * Mock (default) string document reference serializer.
      */
-    protected EntityReferenceSerializer mockDefaultStringEntityReferenceSerializer;
+    protected EntityReferenceSerializer<String> mockDefaultStringEntityReferenceSerializer;
 
     /**
      * Mock (compactwiki) string document reference serializer.
      */
-    protected EntityReferenceSerializer mockCompactWikiStringEntityReferenceSerializer;
+    protected EntityReferenceSerializer<String> mockCompactWikiStringEntityReferenceSerializer;
 
     /**
      * Mock document name factory.
      */
-    protected DocumentReferenceResolver mockDocumentReferenceResolver;
-    
+    protected DocumentReferenceResolver<String> mockDocumentReferenceResolver;
+
     /**
      * Mock {@link OpenOfficeManager} component.
      */
@@ -62,6 +62,7 @@ public abstract class AbstractOfficeImporterTest extends AbstractComponentTestCa
     /**
      * {@inheritDoc}
      */
+    @SuppressWarnings("unchecked")
     protected void registerComponents() throws Exception
     {
         super.registerComponents();
@@ -75,7 +76,7 @@ public abstract class AbstractOfficeImporterTest extends AbstractComponentTestCa
             new DefaultComponentDescriptor<EntityReferenceSerializer>();
         descriptorDSRS.setRole(EntityReferenceSerializer.class);
         getComponentManager().registerComponent(descriptorDSRS, mockDefaultStringEntityReferenceSerializer);
-        
+
         // Mock (compactwiki) string document name serializer.
         mockCompactWikiStringEntityReferenceSerializer = getMockery().mock(EntityReferenceSerializer.class, "s2");
         DefaultComponentDescriptor<EntityReferenceSerializer> descriptorCWSRS =

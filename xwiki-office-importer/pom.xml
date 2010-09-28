@@ -89,20 +89,6 @@
       <version>${project.version}</version>
       <scope>runtime</scope>
     </dependency>
-    <!-- This dependency is dues to a bad design in DefaultPresentationBuilder#buildPresentationXDOM and should be fixed. -->
-    <dependency>
-      <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-core-rendering-macro-velocity</artifactId>
-      <version>${project.version}</version>
-      <scope>runtime</scope>
-    </dependency>
-    <!-- This dependency is dues to a bad design in DefaultPresentationBuilder#buildPresentationXDOM and should be fixed. -->
-    <dependency>
-      <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-core-rendering-macro-html</artifactId>
-      <version>${project.version}</version>
-      <scope>runtime</scope>
-    </dependency>
 
     <!-- Testing dependencies -->
     <dependency>
@@ -134,12 +120,10 @@
           	- DefaultXDOMOfficeDocumentSplitter class has a fan-out of 21 (max 20). Needs refactoring. There are TODOs
           	  in the code from Asiri that say: "This code needs to be refactored along with the xwiki-refactoring
           	  module code."
-          	- DefaultPresentationBuilder Class Fan-Out Complexity is 22 (max allowed is 20). Needs to be refactored.
            -->
           <excludes>
               org/xwiki/officeimporter/internal/DefaultOfficeImporter.java,
-              org/xwiki/officeimporter/internal/splitter/DefaultXDOMOfficeDocumentSplitter.java,
-              org/xwiki/officeimporter/internal/builder/DefaultPresentationBuilder.java
+              org/xwiki/officeimporter/internal/splitter/DefaultXDOMOfficeDocumentSplitter.java
           </excludes>
         </configuration>
       </plugin>

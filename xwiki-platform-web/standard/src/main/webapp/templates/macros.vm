@@ -1726,7 +1726,12 @@ ${Msz}Mb##
                 <select id="xwiki-livetable-${divid}-filter-${velocityCount}" name='${colname}'><option value=''>$msg.get('xe.livetable.select.all')</option>
                 #set($map = $class.get($colname).getMapValues())
                 #foreach($listitem in $list)
-                  <option value="$listitem">$map.get($listitem).getValue()</option>
+                  #set ($l10n_key = "${propClassName}_${colname}_${listitem}")
+                  #set ($l10n_value = $msg.get($l10n_key))
+                  #if ($l10n_value == $l10n_key)
+                    #set ($l10n_value = $map.get($listitem).getValue())
+                  #end
+                  <option value="$listitem">$l10n_value</option>
                 #end
                 </select>
                 </td>

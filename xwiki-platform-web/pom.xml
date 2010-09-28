@@ -53,7 +53,7 @@
     <!-- Lock down configuration resources to 1.42 version because it's not compatible with 2.4 branch anymore -->
     <platform.tool.configuration.version>1.42</platform.tool.configuration.version>
 
-    <platform.core.version>2.4.3</platform.core.version>
+    <platform.core.version>${project.version}</platform.core.version>
 
     <!-- Lock down albatross skins to 1.28 version because it's not compatible with 2.4 branch anymore -->
     <platform.skin.albatross.version>1.28</platform.skin.albatross.version>

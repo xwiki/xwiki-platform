@@ -929,6 +929,7 @@ div#xwikiobjects input[type="checkbox"], div#xwikiclassproperties input[type="ch
   cursor: default;
   display: block;
   float: left;
+  height: 1.6em;
   margin-right: 5px;
   min-height: 22px;
 }
@@ -962,8 +963,8 @@ div#xwikiobjects input[type="checkbox"], div#xwikiclassproperties input[type="ch
 
 .menuarrow {
   color: $theme.menuLinkColor;
-  font-size: 8px;
-  line-height: 22px;
+  font-size: .8em;
+  line-height: 1.9em;
   margin-right: 10px;
 }
 

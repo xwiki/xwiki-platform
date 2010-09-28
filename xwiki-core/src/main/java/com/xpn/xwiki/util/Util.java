@@ -29,6 +29,8 @@ import java.io.InputStream;
 import java.io.Reader;
 import java.io.StreamTokenizer;
 import java.io.StringReader;
+import java.net.URLDecoder;
+import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -44,7 +46,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
-import org.apache.commons.httpclient.util.URIUtil;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.ArrayUtils;
@@ -75,6 +76,12 @@ import com.xpn.xwiki.web.XWikiRequest;
 
 public class Util
 {
+    /**
+     * Encoding used for URL encoding/decoding. UTF-8 is the default encoding in RFC 3986, and is recommended by the W3
+     * consortium.
+     */
+    private static final String URL_ENCODING = "UTF-8";
+
     private static final Log LOG = LogFactory.getLog(Util.class);
 
     private static PatternCache patterns = new PatternCacheLRU(200);
@@ -760,9 +767,10 @@ public class Util
     public static String encodeURI(String text, XWikiContext context)
     {
         try {
-            return URIUtil.encodeWithinQuery(text);
+            return URLEncoder.encode(text, URL_ENCODING);
         } catch (Exception e) {
-            return text;
+            // Should not happen (UTF-8 is always available), but if so, fail securely
+            return null;
         }
     }
 
@@ -779,8 +787,9 @@ public class Util
     public static String decodeURI(String text, XWikiContext context)
     {
         try {
-            return URIUtil.decode(text);
+            return URLDecoder.decode(text, URL_ENCODING);
         } catch (Exception e) {
+            // Should not happen (UTF-8 is always available)
             return text;
         }
     }

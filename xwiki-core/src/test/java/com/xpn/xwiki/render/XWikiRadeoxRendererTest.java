@@ -113,7 +113,7 @@ public class XWikiRadeoxRendererTest extends AbstractBridgedXWikiComponentTestCa
         Mock mockUrlFactory = mock(XWikiURLFactory.class);
         mockUrlFactory.expects(once()).method("createURL").with(
             new Constraint[] {eq("A+ B"), eq("new link"), eq("edit"),
-            eq("parent=A%2B%20B.C%23%20Examples%20%26%20Libs%3F%20No%2C%20I%20prefer%20C%2B%2B"), ANYTHING, ANYTHING})
+            eq("parent=A%2B+B.C%23+Examples+%26+Libs%3F+No%2C+I+prefer+C%2B%2B"), ANYTHING, ANYTHING})
             .will(returnValue(new URL("http://server.com/A%2B%20B/new link")));
         mockUrlFactory.expects(atLeastOnce()).method("getURL").will(returnValue("/A%2B+B/new link"));
         getContext().setURLFactory((XWikiURLFactory) mockUrlFactory.proxy());

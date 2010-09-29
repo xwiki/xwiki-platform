@@ -10,30 +10,6 @@
   <name>XWiki Platform - Core - Rendering - Macro - RSS</name>
   <version>2.5-SNAPSHOT</version>
   <description>XWiki Platform - Core - Rendering - Macro - RSS</description>
-  <build>
-    <plugins>
-      <!-- Apply the Checkstyle configurations defined in the top level pom.xml file -->        
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-checkstyle-plugin</artifactId>
-          <configuration>
-            <excludes>
-              **/RssMacro.java
-            </excludes>
-          </configuration>
-      </plugin>
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-surefire-plugin</artifactId>
-        <configuration>
-          <includes>
-            <include>**/RenderingTests.java</include>
-            <include>**/*Test.java</include>
-          </includes>
-        </configuration>
-      </plugin>
-    </plugins>
-  </build>
   <dependencies>
     <dependency>
       <groupId>rome</groupId>
@@ -63,6 +39,20 @@
       <version>${project.version}</version>
     </dependency>
   </dependencies>
+  <build>
+    <plugins>
+      <!-- Apply the Checkstyle configurations defined in the top level pom.xml file -->        
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-checkstyle-plugin</artifactId>
+          <configuration>
+            <excludes>
+              **/RssMacro.java
+            </excludes>
+          </configuration>
+      </plugin>
+    </plugins>
+  </build>
   <repositories>
     <!--  Used to get Rome 1.0 which is not yet on the Central Maven repo. Remove this when it is -->
     <repository>

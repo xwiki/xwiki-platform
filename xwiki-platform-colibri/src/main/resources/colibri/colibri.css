@@ -511,7 +511,6 @@ ul.xwikitabbar {
   height: 20px;
   line-height: 20px !important;
   padding: 0 10px;
-  text-decoration: none;
   text-transform: uppercase;
 }
 
@@ -990,7 +989,6 @@ div#xwikiobjects input[type="checkbox"], div#xwikiclassproperties input[type="ch
 
 .actionmenu a:link, .actionmenu a:visited  {
   cursor: pointer;
-  text-decoration: none;
 }
 
 .actionmenu .hasIcon a.tme {
@@ -1196,7 +1194,6 @@ input.button, .buttonwrapper a:visited, .buttonwrapper a:link, .buttonwrapper a:
   font: normal normal 700 .8em/140% "Helvetica",sans-serif;
   margin: 0;
   padding: 2px 3px;
-  text-decoration: none;
   text-transform: uppercase;
 }
 

@@ -31,6 +31,19 @@
 <defaultWeb></defaultWeb>
 <nameField></nameField>
 <validationScript></validationScript>
+<accessibility>
+<defaultValue>0</defaultValue>
+<disabled>0</disabled>
+<displayFormType>select</displayFormType>
+<displayType></displayType>
+<name>accessibility</name>
+<number>79</number>
+<prettyName>Enable extra accessibility features</prettyName>
+<unmodifiable>0</unmodifiable>
+<validationMessage></validationMessage>
+<validationRegExp></validationRegExp>
+<classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+</accessibility>
 <ad_clientid>
 <customDisplay></customDisplay>
 <disabled>0</disabled>
@@ -1452,6 +1465,19 @@
 <defaultWeb></defaultWeb>
 <nameField></nameField>
 <validationScript></validationScript>
+<accessibility>
+<defaultValue>0</defaultValue>
+<disabled>0</disabled>
+<displayFormType>select</displayFormType>
+<displayType></displayType>
+<name>accessibility</name>
+<number>79</number>
+<prettyName>Enable extra accessibility features</prettyName>
+<unmodifiable>0</unmodifiable>
+<validationMessage></validationMessage>
+<validationRegExp></validationRegExp>
+<classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+</accessibility>
 <ad_clientid>
 <customDisplay></customDisplay>
 <disabled>0</disabled>
@@ -2618,6 +2644,9 @@
 <number>0</number>
 <className>XWiki.XWikiPreferences</className>
 <guid>a2464e0e-d798-467c-8f3e-8ae4443cd4fe</guid>
+<property>
+<accessibility>0</accessibility>
+</property>
 <property>
 <ad_clientid></ad_clientid>
 </property>

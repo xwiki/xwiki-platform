@@ -39,8 +39,30 @@ import java.util.Set;
  * Unit tests for Components should extend this class instead of the older
  * {@link org.xwiki.test.AbstractComponentTestCase} test class.
  *
- * To use this class, define one or several fields annotated with {@link org.xwiki.test.annotation.MockingRequirement}.
- * These fields will have all their dependencies mocked.
+ * To use this class, add a private field of the type of the component class being tested and annotate it with
+ * {@link org.xwiki.test.annotation.MockingRequirement}. This test case will then find all Requirements of the
+ * component class being tested and inject mocks for each of them. To set expectations simply look them up in
+ * setUp() (for exzample) and define their expectations in your test methods or setUp().
+ *
+ * For example:
+ * <code><pre>
+ * public class MyComponentTest
+ * {
+ *     &#64;MockingRequirement
+ *     private MyComponent myComponent;
+ *
+ *     private SomeRequirementComponentRoleClass requirement;
+ *
+ *     &#64;Override
+ *     &#64;Before
+ *     public void setUp() throws Exception
+ *     {
+ *         super.setUp();
+ *         requirement = getComponentManager().lookup(SomeRequirementComponentRoleClass.class);
+ *     }
+ *     ...
+ * }
+ * </code></pre>
  *
  * @version $Id$
  * @since 2.2M1

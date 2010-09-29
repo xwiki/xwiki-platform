@@ -1,0 +1,23 @@
+.# Test that adding a container with no layout generates a group for the macro but no other structure inside 
+.#-----------------------------------------------------
+.input|xwiki/2.0
+.#-----------------------------------------------------
+{{container}}
+foobar
+{{/container}}
+.#-----------------------------------------------------
+.expect|event/1.0
+.#-----------------------------------------------------
+beginDocument
+beginMacroMarkerStandalone [container] [] [foobar]
+beginGroup
+beginParagraph
+onWord [foobar]
+endParagraph
+endGroup
+endMacroMarkerStandalone [container] [] [foobar]
+endDocument
+.#-----------------------------------------------------
+.expect|xhtml/1.0
+.#-----------------------------------------------------
+<div><p>foobar</p></div>

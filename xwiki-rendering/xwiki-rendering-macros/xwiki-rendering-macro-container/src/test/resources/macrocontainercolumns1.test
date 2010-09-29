@@ -1,0 +1,25 @@
+.# Test that an empty container with columns layout just a macro event and a group, and renders a div 
+.#-----------------------------------------------------
+.input|xwiki/2.0
+.#-----------------------------------------------------
+{{container layoutStyle="columns"/}}
+
+{{container layoutStyle="columns"}}
+{{/container}}
+.#-----------------------------------------------------
+.expect|event/1.0
+.#-----------------------------------------------------
+beginDocument
+beginMacroMarkerStandalone [container] [layoutStyle=columns]
+beginGroup
+endGroup
+endMacroMarkerStandalone [container] [layoutStyle=columns]
+beginMacroMarkerStandalone [container] [layoutStyle=columns] []
+beginGroup
+endGroup
+endMacroMarkerStandalone [container] [layoutStyle=columns] []
+endDocument
+.#-----------------------------------------------------
+.expect|xhtml/1.0
+.#-----------------------------------------------------
+<div></div><div></div>

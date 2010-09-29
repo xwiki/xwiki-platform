@@ -1,0 +1,23 @@
+.# Test that adding a container with non-existing layout doesn't throw exception, but only displays the contents as if there was no layout set 
+.#-----------------------------------------------------
+.input|xwiki/2.0
+.#-----------------------------------------------------
+{{container layoutStyle="barfoo"}}
+foobar
+{{/container}}
+.#-----------------------------------------------------
+.expect|event/1.0
+.#-----------------------------------------------------
+beginDocument
+beginMacroMarkerStandalone [container] [layoutStyle=barfoo] [foobar]
+beginGroup
+beginParagraph
+onWord [foobar]
+endParagraph
+endGroup
+endMacroMarkerStandalone [container] [layoutStyle=barfoo] [foobar]
+endDocument
+.#-----------------------------------------------------
+.expect|xhtml/1.0
+.#-----------------------------------------------------
+<div><p>foobar</p></div>

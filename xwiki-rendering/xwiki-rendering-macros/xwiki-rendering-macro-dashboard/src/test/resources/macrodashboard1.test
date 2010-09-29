@@ -1,0 +1,60 @@
+.# Test that dashboard macro with columns layout produces the same result as a container macro with columns layout and justify parameter.
+.# Also test that dashboard without layout parameter does columns layouting. 
+.# Put macro instances in the dashboard macro in these tests so that they would work fine even when implementing the dashboard content restrictions 
+.#-----------------------------------------------------
+.input|xwiki/2.0
+.#-----------------------------------------------------
+{{dashboard layout="columns"}}
+((({{gadget/}})))
+((({{gadget/}})))
+{{/dashboard}}
+
+{{dashboard}}
+((({{gadget/}})))
+((({{gadget/}})))
+{{/dashboard}}
+.#-----------------------------------------------------
+.expect|event/1.0
+.#-----------------------------------------------------
+beginDocument
+beginMacroMarkerStandalone [dashboard] [layout=columns] [((({{gadget/}})))
+((({{gadget/}})))]
+beginGroup [[style]=[text-align: justify;]]
+beginGroup [[style]=[float: left;width:49.2%;padding-right:1.5%;]]
+beginMacroMarkerStandalone [gadget] []
+onWord [gadget]
+endMacroMarkerStandalone [gadget] []
+endGroup [[style]=[float: left;width:49.2%;padding-right:1.5%;]]
+beginGroup [[style]=[float: left;width:49.2%;]]
+beginMacroMarkerStandalone [gadget] []
+onWord [gadget]
+endMacroMarkerStandalone [gadget] []
+endGroup [[style]=[float: left;width:49.2%;]]
+beginGroup [[style]=[clear: both;]]
+endGroup [[style]=[clear: both;]]
+endGroup [[style]=[text-align: justify;]]
+endMacroMarkerStandalone [dashboard] [layout=columns] [((({{gadget/}})))
+((({{gadget/}})))]
+beginMacroMarkerStandalone [dashboard] [] [((({{gadget/}})))
+((({{gadget/}})))]
+beginGroup [[style]=[text-align: justify;]]
+beginGroup [[style]=[float: left;width:49.2%;padding-right:1.5%;]]
+beginMacroMarkerStandalone [gadget] []
+onWord [gadget]
+endMacroMarkerStandalone [gadget] []
+endGroup [[style]=[float: left;width:49.2%;padding-right:1.5%;]]
+beginGroup [[style]=[float: left;width:49.2%;]]
+beginMacroMarkerStandalone [gadget] []
+onWord [gadget]
+endMacroMarkerStandalone [gadget] []
+endGroup [[style]=[float: left;width:49.2%;]]
+beginGroup [[style]=[clear: both;]]
+endGroup [[style]=[clear: both;]]
+endGroup [[style]=[text-align: justify;]]
+endMacroMarkerStandalone [dashboard] [] [((({{gadget/}})))
+((({{gadget/}})))]
+endDocument
+.#-----------------------------------------------------
+.expect|xhtml/1.0
+.#-----------------------------------------------------
+<div style="text-align: justify;"><div style="float: left;width:49.2%;padding-right:1.5%;">gadget</div><div style="float: left;width:49.2%;">gadget</div><div style="clear: both;"></div></div><div style="text-align: justify;"><div style="float: left;width:49.2%;padding-right:1.5%;">gadget</div><div style="float: left;width:49.2%;">gadget</div><div style="clear: both;"></div></div>

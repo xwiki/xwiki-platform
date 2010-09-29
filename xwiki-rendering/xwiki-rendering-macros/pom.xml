@@ -116,5 +116,7 @@
     <module>xwiki-rendering-macro-ruby</module>
     <module>xwiki-rendering-macro-python</module>
     <module>xwiki-rendering-macro-php</module>
+    <module>xwiki-rendering-macro-container</module>
+    <module>xwiki-rendering-macro-dashboard</module>
   </modules>
 </project>

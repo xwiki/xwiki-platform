@@ -1,0 +1,34 @@
+.# Test that dashboard macro with unknown layout parameter renders the groups inside as they are  
+.# Put macro instances in the dashboard macro in these tests so that they would work fine even when implementing the dashboard content restrictions 
+.#-----------------------------------------------------
+.input|xwiki/2.0
+.#-----------------------------------------------------
+{{dashboard layout="foo"}}
+((({{gadget/}})))
+((({{gadget/}})))
+{{/dashboard}}
+.#-----------------------------------------------------
+.expect|event/1.0
+.#-----------------------------------------------------
+beginDocument
+beginMacroMarkerStandalone [dashboard] [layout=foo] [((({{gadget/}})))
+((({{gadget/}})))]
+beginGroup [[style]=[text-align: justify;]]
+beginGroup
+beginMacroMarkerStandalone [gadget] []
+onWord [gadget]
+endMacroMarkerStandalone [gadget] []
+endGroup
+beginGroup
+beginMacroMarkerStandalone [gadget] []
+onWord [gadget]
+endMacroMarkerStandalone [gadget] []
+endGroup
+endGroup [[style]=[text-align: justify;]]
+endMacroMarkerStandalone [dashboard] [layout=foo] [((({{gadget/}})))
+((({{gadget/}})))]
+endDocument
+.#-----------------------------------------------------
+.expect|xhtml/1.0
+.#-----------------------------------------------------
+<div style="text-align: justify;"><div>gadget</div><div>gadget</div></div>

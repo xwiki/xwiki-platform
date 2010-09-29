@@ -1,0 +1,25 @@
+.# Test that adding a container with no content inside generates just a macro event and a group, and renders a div 
+.#-----------------------------------------------------
+.input|xwiki/2.0
+.#-----------------------------------------------------
+{{container /}}
+
+{{container}}
+{{/container}}
+.#-----------------------------------------------------
+.expect|event/1.0
+.#-----------------------------------------------------
+beginDocument
+beginMacroMarkerStandalone [container] []
+beginGroup
+endGroup
+endMacroMarkerStandalone [container] []
+beginMacroMarkerStandalone [container] [] []
+beginGroup
+endGroup
+endMacroMarkerStandalone [container] [] []
+endDocument
+.#-----------------------------------------------------
+.expect|xhtml/1.0
+.#-----------------------------------------------------
+<div></div><div></div>

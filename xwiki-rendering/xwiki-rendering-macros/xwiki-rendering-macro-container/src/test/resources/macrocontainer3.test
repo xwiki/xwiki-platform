@@ -1,0 +1,29 @@
+.# Test macro with justify parameter, with content and without 
+.#-----------------------------------------------------
+.input|xwiki/2.0
+.#-----------------------------------------------------
+{{container justify=true}}
+foobar
+{{/container}}
+
+{{container justify=true /}}
+.#-----------------------------------------------------
+.expect|event/1.0
+.#-----------------------------------------------------
+beginDocument
+beginMacroMarkerStandalone [container] [justify=true] [foobar]
+beginGroup [[style]=[text-align: justify;]]
+beginParagraph
+onWord [foobar]
+endParagraph
+endGroup [[style]=[text-align: justify;]]
+endMacroMarkerStandalone [container] [justify=true] [foobar]
+beginMacroMarkerStandalone [container] [justify=true]
+beginGroup [[style]=[text-align: justify;]]
+endGroup [[style]=[text-align: justify;]]
+endMacroMarkerStandalone [container] [justify=true]
+endDocument
+.#-----------------------------------------------------
+.expect|xhtml/1.0
+.#-----------------------------------------------------
+<div style="text-align: justify;"><p>foobar</p></div><div style="text-align: justify;"></div>

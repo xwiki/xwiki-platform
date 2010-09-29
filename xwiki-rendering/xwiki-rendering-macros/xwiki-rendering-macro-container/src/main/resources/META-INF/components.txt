@@ -1,0 +1,2 @@
+org.xwiki.rendering.internal.macro.container.ContainerMacro
+org.xwiki.rendering.internal.macro.container.ColumnsLayoutManager

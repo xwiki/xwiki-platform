@@ -1,0 +1,33 @@
+.# Test that a container macro with groups inside and no layout renders the 2 groups consecutively inside. 
+.#-----------------------------------------------------
+.input|xwiki/2.0
+.#-----------------------------------------------------
+{{container}}
+(((foo)))
+(((bar)))
+{{/container}}
+.#-----------------------------------------------------
+.expect|event/1.0
+.#-----------------------------------------------------
+beginDocument
+beginMacroMarkerStandalone [container] [] [(((foo)))
+(((bar)))]
+beginGroup
+beginGroup
+beginParagraph
+onWord [foo]
+endParagraph
+endGroup
+beginGroup
+beginParagraph
+onWord [bar]
+endParagraph
+endGroup
+endGroup
+endMacroMarkerStandalone [container] [] [(((foo)))
+(((bar)))]
+endDocument
+.#-----------------------------------------------------
+.expect|xhtml/1.0
+.#-----------------------------------------------------
+<div><div><p>foo</p></div><div><p>bar</p></div></div>

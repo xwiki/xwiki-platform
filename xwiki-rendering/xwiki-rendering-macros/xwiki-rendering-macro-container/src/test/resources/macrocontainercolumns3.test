@@ -1,0 +1,35 @@
+.# Test that columns container with one 2 groups styles the columns properly 
+.#-----------------------------------------------------
+.input|xwiki/2.0
+.#-----------------------------------------------------
+{{container layoutStyle="columns"}}
+(((foo)))
+(((bar)))
+{{/container}}
+.#-----------------------------------------------------
+.expect|event/1.0
+.#-----------------------------------------------------
+beginDocument
+beginMacroMarkerStandalone [container] [layoutStyle=columns] [(((foo)))
+(((bar)))]
+beginGroup
+beginGroup [[style]=[float: left;width:49.2%;padding-right:1.5%;]]
+beginParagraph
+onWord [foo]
+endParagraph
+endGroup [[style]=[float: left;width:49.2%;padding-right:1.5%;]]
+beginGroup [[style]=[float: left;width:49.2%;]]
+beginParagraph
+onWord [bar]
+endParagraph
+endGroup [[style]=[float: left;width:49.2%;]]
+beginGroup [[style]=[clear: both;]]
+endGroup [[style]=[clear: both;]]
+endGroup
+endMacroMarkerStandalone [container] [layoutStyle=columns] [(((foo)))
+(((bar)))]
+endDocument
+.#-----------------------------------------------------
+.expect|xhtml/1.0
+.#-----------------------------------------------------
+<div><div style="float: left;width:49.2%;padding-right:1.5%;"><p>foo</p></div><div style="float: left;width:49.2%;"><p>bar</p></div><div style="clear: both;"></div></div>

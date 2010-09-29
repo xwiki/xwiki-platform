@@ -1,0 +1,42 @@
+.# Test that columns container with one group puts content in a group 
+.#-----------------------------------------------------
+.input|xwiki/2.0
+.#-----------------------------------------------------
+{{container layoutStyle="columns"}}
+(((foobar)))
+{{/container}}
+
+{{container layoutStyle="columns" justify="true"}}
+(((foobar)))
+{{/container}}
+.#-----------------------------------------------------
+.expect|event/1.0
+.#-----------------------------------------------------
+beginDocument
+beginMacroMarkerStandalone [container] [layoutStyle=columns] [(((foobar)))]
+beginGroup
+beginGroup [[style]=[float: left;width:99.9%;]]
+beginParagraph
+onWord [foobar]
+endParagraph
+endGroup [[style]=[float: left;width:99.9%;]]
+beginGroup [[style]=[clear: both;]]
+endGroup [[style]=[clear: both;]]
+endGroup
+endMacroMarkerStandalone [container] [layoutStyle=columns] [(((foobar)))]
+beginMacroMarkerStandalone [container] [layoutStyle=columns|justify=true] [(((foobar)))]
+beginGroup [[style]=[text-align: justify;]]
+beginGroup [[style]=[float: left;width:99.9%;]]
+beginParagraph
+onWord [foobar]
+endParagraph
+endGroup [[style]=[float: left;width:99.9%;]]
+beginGroup [[style]=[clear: both;]]
+endGroup [[style]=[clear: both;]]
+endGroup [[style]=[text-align: justify;]]
+endMacroMarkerStandalone [container] [layoutStyle=columns|justify=true] [(((foobar)))]
+endDocument
+.#-----------------------------------------------------
+.expect|xhtml/1.0
+.#-----------------------------------------------------
+<div><div style="float: left;width:99.9%;"><p>foobar</p></div><div style="clear: both;"></div></div><div style="text-align: justify;"><div style="float: left;width:99.9%;"><p>foobar</p></div><div style="clear: both;"></div></div>

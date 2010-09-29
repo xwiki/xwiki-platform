@@ -214,7 +214,7 @@
     <!-- The REST module -->
     <dependency>
       <groupId>com.xpn.xwiki.platform</groupId>
-      <artifactId>xwiki-rest</artifactId>
+      <artifactId>xwiki-rest-server</artifactId>
       <version>${platform.core.version}</version>
     </dependency>
 

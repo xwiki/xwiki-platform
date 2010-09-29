@@ -76,7 +76,6 @@
       <groupId>org.codehaus.groovy</groupId>
       <artifactId>groovy-all</artifactId>
     </dependency>
-
     <!-- Runtime dependencies -->
     <dependency>
       <groupId>org.xwiki.platform</groupId>
@@ -87,20 +86,12 @@
   </dependencies>
   <build>
     <plugins>
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-surefire-plugin</artifactId>
-        <configuration>
-          <excludes>
-            <exclude>**/Abstract*.java</exclude>
-          </excludes>
-        </configuration>
-      </plugin>
       <!-- Apply the Checkstyle configurations defined in the top level pom.xml file -->
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-checkstyle-plugin</artifactId>
         <configuration>
+          <includeTestSourceDirectory>false</includeTestSourceDirectory>
           <!--
             Notes:
               - DefaultOfficeImporter class has a fan-out of 22 (max 20) which is little hard to fix with the current API.
@@ -116,9 +107,4 @@
       </plugin>
     </plugins>
   </build>
-  <properties>
-    <!-- Skip Clirr execution because we renamed this module and its previous version is not matched anymore.
-      Remove once XE 2.5M2 is released. -->
-    <xwiki.clirr.skip>true</xwiki.clirr.skip>
-  </properties>
 </project>

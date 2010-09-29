@@ -52,4 +52,21 @@
       <scope>test</scope>
     </dependency>
   </dependencies>
+  <build>
+    <plugins>
+      <plugin>
+        <!-- Apply the Checkstyle configurations defined in the top level pom.xml file -->
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-checkstyle-plugin</artifactId>
+        <configuration>
+          <includeTestSourceDirectory>true</includeTestSourceDirectory>
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
+  <properties>
+    <!-- Skip Clirr execution because xwiki-office-viewer and xwiki-office-macro have not been released yet, and
+      xwiki-office-importer has been renamed. Remove once XE 2.5M2 is released. -->
+    <xwiki.clirr.skip>true</xwiki.clirr.skip>
+  </properties>
 </project>

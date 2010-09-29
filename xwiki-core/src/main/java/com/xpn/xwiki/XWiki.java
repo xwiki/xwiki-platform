@@ -3073,6 +3073,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface
         needsUpdate |= bclass.addTextField("imaccount", "imaccount", 30);
         needsUpdate |= bclass.addStaticListField("editor", "Default Editor", "---|Text|Wysiwyg");
         needsUpdate |= bclass.addStaticListField("usertype", "User type", "Simple|Advanced");
+        needsUpdate |= bclass.addBooleanField("accessibility", "Enable extra accessibility features", "yesno");
 
         // New fields for the XWiki 1.0 skin
         needsUpdate |= bclass.addTextField("skin", "skin", 30);
@@ -3166,6 +3167,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface
         }
         needsUpdate |= bclass.addTextField("stylesheet", "Default Stylesheet", 30);
         needsUpdate |= bclass.addTextField("stylesheets", "Alternative Stylesheet", 60);
+        needsUpdate |= bclass.addBooleanField("accessibility", "Enable extra accessibility features", "yesno");
 
         needsUpdate |= bclass.addStaticListField("editor", "Default Editor", "---|Text|Wysiwyg");
         needsUpdate |= bclass.addTextField("editbox_width", "Editbox Width", 5);

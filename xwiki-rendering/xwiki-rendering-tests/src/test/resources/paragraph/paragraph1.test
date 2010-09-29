@@ -75,18 +75,3 @@ third paragraph
 
 
 fourth paragraph
-.#-----------------------------------------------------
-.input|mediawiki/1.0|skip
-.#-----------------------------------------------------
-.# TODO: See http://code.google.com/p/wikimodel/issues/detail?id=59
-first
-paragraph
-
-second paragraph
-
-
-third paragraph
-
-
-
-fourth paragraph

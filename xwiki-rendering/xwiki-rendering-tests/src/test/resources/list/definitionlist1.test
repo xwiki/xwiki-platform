@@ -60,12 +60,3 @@ title2
 definition2
 title3
 definition3
-.#-----------------------------------------------------
-.input|mediawiki/1.0
-.#-----------------------------------------------------
-; title1
-: definition1
-:; title2
-:: definition2
-; title3
-: definition3

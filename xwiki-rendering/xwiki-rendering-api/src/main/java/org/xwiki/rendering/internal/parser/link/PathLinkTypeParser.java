@@ -25,7 +25,7 @@ import org.xwiki.rendering.listener.LinkType;
 /**
  * Parses a link reference to a URL.
  *
- * @version $Id: URLLinkTypeParser.java 31386 2010-09-27 09:42:32Z vmassol $
+ * @version $Id$
  * @since 2.5M2
  */
 @Component("path")

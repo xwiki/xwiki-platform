@@ -5527,8 +5527,6 @@ public class XWiki implements XWikiDocChangeNotificationInterface
                     LOG.warn("Failed to initialize RightService " + rightsClass
                         + " using Reflection, trying default implementation using 'new'.", e);
 
-                    // e.printStackTrace(); - not needed? -LBlaze
-
                     this.rightService = new XWikiRightServiceImpl();
 
                     if (LOG.isDebugEnabled()) {

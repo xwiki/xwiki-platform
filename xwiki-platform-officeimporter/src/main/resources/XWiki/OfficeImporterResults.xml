@@ -131,8 +131,8 @@
         #if($docsMap)
           #foreach($targetDescriptor in $docsMap.keySet())
             #set($splitXdomOfficeDoc=$docsMap.get($targetDescriptor))
-            #set($target=$targetDescriptor.pageNameAsString)
-            #set($parent=$targetDescriptor.parentNameAsString)
+            #set($target=$targetDescriptor.documentReferenceAsString)
+            #set($parent=$targetDescriptor.parentReferenceAsString)
             #set($result=$officeimporter.save($splitXdomOfficeDoc, $target, "xwiki/2.0", $parent, null, $appendContent))
             #if(! $result)
               {{warning}}$officeimporter.errorMessage{{/warning}}

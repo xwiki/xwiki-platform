@@ -32,13 +32,4 @@
   <artifactId>xwiki-core-rendering-macro-box</artifactId>
   <name>XWiki Platform - Core - Rendering - Macro - Box</name>
   <description>XWiki Platform - Core - Rendering - Macro - Box</description>
-  <build>
-    <plugins>
-      <plugin>
-        <!-- Apply the Checkstyle configurations defined in the top level pom.xml file -->
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-checkstyle-plugin</artifactId>
-      </plugin>
-    </plugins>
-  </build>
 </project>

@@ -33,15 +33,6 @@
   <name>XWiki Platform - Core - Rendering - Macro - User Avatar</name>
   <version>2.5-SNAPSHOT</version>
   <description>XWiki Platform - Core - Rendering - Macro - User Avatar</description>
-  <build>
-    <plugins>
-      <plugin>
-        <!-- Apply the Checkstyle configurations defined in the top level pom.xml file -->
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-checkstyle-plugin</artifactId>
-      </plugin>
-    </plugins>
-  </build>
   <dependencies>
     <dependency>
       <groupId>org.xwiki.platform</groupId>

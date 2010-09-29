@@ -24,13 +24,13 @@
   <modelVersion>4.0.0</modelVersion>
   <parent>
     <groupId>org.xwiki.platform</groupId>
-    <artifactId>xwiki-core-parent</artifactId>
+    <artifactId>xwiki-core-office-parent</artifactId>
     <version>2.5-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-core-office-importer</artifactId>
-  <name>XWiki Platform - Core - Office Importer</name>
+  <name>XWiki Platform - Core - Office - Importer</name>
   <packaging>jar</packaging>
-  <description>XWiki Platform - Core - Office Importer</description>
+  <description>XWiki Platform - Core - Office - Importer</description>
   <dependencies>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
@@ -40,11 +40,6 @@
     <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-core-rendering-api</artifactId>
-      <version>${project.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-core-component-api</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>
@@ -89,14 +84,6 @@
       <version>${project.version}</version>
       <scope>runtime</scope>
     </dependency>
-
-    <!-- Testing dependencies -->
-    <dependency>
-      <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-core-shared-tests</artifactId>
-      <version>${project.version}</version>
-      <scope>test</scope>
-    </dependency>
   </dependencies>
   <build>
     <plugins>
@@ -110,16 +97,16 @@
         </configuration>
       </plugin>
       <!-- Apply the Checkstyle configurations defined in the top level pom.xml file -->
-      <plugin>        
+      <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-checkstyle-plugin</artifactId>
         <configuration>
           <!--
             Notes:
-          	- DefaultOfficeImporter class has a fan-out of 22 (max 20) which is little hard to fix with the current API.
-          	- DefaultXDOMOfficeDocumentSplitter class has a fan-out of 21 (max 20). Needs refactoring. There are TODOs
-          	  in the code from Asiri that say: "This code needs to be refactored along with the xwiki-refactoring
-          	  module code."
+              - DefaultOfficeImporter class has a fan-out of 22 (max 20) which is little hard to fix with the current API.
+              - DefaultXDOMOfficeDocumentSplitter class has a fan-out of 21 (max 20). Needs refactoring. There are TODOs
+                in the code from Asiri that say: "This code needs to be refactored along with the xwiki-refactoring
+                module code."
            -->
           <excludes>
               org/xwiki/officeimporter/internal/DefaultOfficeImporter.java,

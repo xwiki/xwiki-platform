@@ -23,24 +23,18 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
   xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <parent>
-    <artifactId>xwiki-core-parent</artifactId>
+    <artifactId>xwiki-core-office-parent</artifactId>
     <groupId>org.xwiki.platform</groupId>
     <version>2.5-SNAPSHOT</version>
   </parent>
   <modelVersion>4.0.0</modelVersion>
-  <groupId>org.xwiki.platform</groupId>
   <artifactId>xwiki-core-office-viewer</artifactId>
-  <name>XWiki Platform - Core - Office Viewer</name>
+  <name>XWiki Platform - Core - Office - Viewer</name>
   <description>A module providing support for viewing office documents attached to wiki pages.</description>
   <dependencies>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-core-rendering-api</artifactId>
-      <version>${project.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-core-component-api</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>
@@ -62,13 +56,6 @@
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-core-cache-api</artifactId>
       <version>${project.version}</version>
-    </dependency>
-    <!-- Testing dependencies -->
-    <dependency>
-      <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-core-shared-tests</artifactId>
-      <version>${project.version}</version>
-      <scope>test</scope>
     </dependency>
   </dependencies>
   <build>

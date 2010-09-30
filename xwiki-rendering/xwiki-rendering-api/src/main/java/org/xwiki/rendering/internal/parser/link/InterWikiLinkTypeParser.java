@@ -62,7 +62,6 @@ public class InterWikiLinkTypeParser extends AbstractURILinkTypeParser
         int pos = reference.indexOf(INTERWIKI_ALIAS_SEPARATOR);
         if (pos > -1) {
             InterWikiLink link = new InterWikiLink();
-            link.setTyped(true);
             link.setType(getType());
             link.setInterWikiAlias(reference.substring(0, pos + INTERWIKI_ALIAS_SEPARATOR.length() - 1));
             link.setReference(reference.substring(pos + INTERWIKI_ALIAS_SEPARATOR.length()));

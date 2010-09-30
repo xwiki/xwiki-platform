@@ -39,7 +39,6 @@ public abstract class AbstractURILinkTypeParser implements LinkTypeParser
     public Link parse(String reference)
     {
         Link resultLink = new Link();
-        resultLink.setTyped(true);
         resultLink.setType(getType());
         resultLink.setReference(reference);
         return resultLink;

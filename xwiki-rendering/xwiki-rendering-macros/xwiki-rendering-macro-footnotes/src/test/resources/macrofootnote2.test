@@ -17,9 +17,9 @@ onSpace
 onWord [footnote]
 beginMacroMarkerInline [footnote] [] [This is the **footnote** content]
 beginFormat [SUPERSCRIPT] [[id]=[x_footnote_ref_1][class]=[footnoteRef]]
-beginLink [Typed = [false] Type = [doc] Parameters = [[anchor] = [x_footnote_1]]] [false]
+beginLink [Typed = [true] Type = [doc] Parameters = [[anchor] = [x_footnote_1]]] [false]
 onWord [1]
-endLink [Typed = [false] Type = [doc] Parameters = [[anchor] = [x_footnote_1]]] [false]
+endLink [Typed = [true] Type = [doc] Parameters = [[anchor] = [x_footnote_1]]] [false]
 endFormat [SUPERSCRIPT] [[id]=[x_footnote_ref_1][class]=[footnoteRef]]
 endMacroMarkerInline [footnote] [] [This is the **footnote** content]
 onSpace
@@ -41,9 +41,9 @@ endParagraph
 beginMacroMarkerStandalone [putFootnotes] []
 beginList [NUMBERED] [[class]=[footnotes]]
 beginListItem
-beginLink [Typed = [false] Type = [doc] Parameters = [[anchor] = [x_footnote_ref_1]]] [false] [[id]=[x_footnote_1][class]=[footnoteBackRef]]
+beginLink [Typed = [true] Type = [doc] Parameters = [[anchor] = [x_footnote_ref_1]]] [false] [[id]=[x_footnote_1][class]=[footnoteBackRef]]
 onWord [^]
-endLink [Typed = [false] Type = [doc] Parameters = [[anchor] = [x_footnote_ref_1]]] [false] [[id]=[x_footnote_1][class]=[footnoteBackRef]]
+endLink [Typed = [true] Type = [doc] Parameters = [[anchor] = [x_footnote_ref_1]]] [false] [[id]=[x_footnote_1][class]=[footnoteBackRef]]
 onSpace
 onWord [This]
 onSpace

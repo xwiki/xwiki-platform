@@ -64,7 +64,6 @@ public class URLLinkTypeParser extends AbstractURILinkTypeParser
             // We don't parse the URL since it can contain unknown protocol for the JVM but protocols known by the
             // browser (such as skype:// for example).
             resultLink = new Link();
-            resultLink.setTyped(true);
             resultLink.setType(getType());
             resultLink.setReference(reference);
         }

@@ -839,7 +839,7 @@ public class XWikiSyntaxChainingRenderer extends AbstractChainingPrintRenderer i
     public void onImage(Image image, boolean isFreeStandingURI, Map<String, String> parameters)
     {
         Link link = new Link();
-        link.setReference("image:" + getImageRenderer().renderImage(image));
+        link.setReference(getImageRenderer().renderImage(image));
         link.setType(LinkType.IMAGE);
 
         getLinkRenderer().beginRenderLink(getXWikiPrinter(), link, isFreeStandingURI, parameters);

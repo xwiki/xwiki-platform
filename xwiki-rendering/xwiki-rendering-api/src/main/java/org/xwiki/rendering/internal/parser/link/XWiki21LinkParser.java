@@ -78,6 +78,7 @@ public class XWiki21LinkParser implements LinkParser
         if (!isInWikiMode() && !rawLink.startsWith("image:")) {
             Link link = new Link();
             link.setType(LinkType.URL);
+            link.setTyped(false);
             link.setReference(rawLink);
             return link;
         }

@@ -169,6 +169,7 @@ public class XWiki20LinkParser implements LinkParser
         if (!isInWikiMode() && !rawLink.startsWith("image:")) {
             Link link = new Link();
             link.setType(LinkType.URL);
+            link.setTyped(false);
             link.setReference(rawLink);
             return link;
         }
@@ -211,6 +212,8 @@ public class XWiki20LinkParser implements LinkParser
         }
 
         documentLink.setReference(removeEscapesFromReferencePart(content.toString()));
+        documentLink.setTyped(false);
+        
         return documentLink;
     }
 

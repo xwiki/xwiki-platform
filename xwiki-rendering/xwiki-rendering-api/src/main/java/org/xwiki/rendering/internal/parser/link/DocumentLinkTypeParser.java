@@ -51,8 +51,6 @@ public class DocumentLinkTypeParser extends AbstractURILinkTypeParser
     public Link parse(String reference)
     {
         DocumentLink resultLink = new DocumentLink();
-        resultLink.setTyped(true);
-        resultLink.setType(getType());
         resultLink.setReference(reference);
         return resultLink;
     }

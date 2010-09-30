@@ -35,7 +35,7 @@ public class Link implements Cloneable
     /**
      * @see #isTyped()
      */
-    private boolean isTyped;
+    private boolean isTyped = true;
 
     /**
      * @see #getReference()

@@ -31,6 +31,19 @@ $response.setContentType('application/x-json')
     #set($mdoc = $xwiki.getDocument($m))
     #set($wikiname = $mdoc.getWiki())
     #if($wikiname != 'xwiki' || $wikiname == $xcontext.database) #set($wikiname = 'local') #end
+    #set($mDoc = $xwiki.getDocument($m))
+    #set($userObj = $mDoc.getObject("XWiki.XWikiUsers"))
+    #set($groupObj = $mDoc.getObject("XWiki.XWikiGroups"))
+    #set($emptyValue = $msg.get('xe.admin.groups.emptyvalue'))
+    #set($noAvatarImg = $xwiki.getSkinFile('noavatar.png'))
+    #set($mAvatarImg = $!userObj.getProperty('avatar').value)
+    #set($mGroupImg = $xwiki.getSkinFile('noavatargroup.png'))
+    #set($mAvatarSrc = $noAvatarImg)
+    #if($!userObj && "$!mAvatarImg" != "")
+      #set($mAvatarSrc = $mDoc.getAttachmentURL($mAvatarImg))
+    #elseif($!groupObj)
+      #set($mAvatarSrc = $mGroupImg)
+    #end
     #if( $velocityCount > 1 ) , #end
    {
     "fullname"     : "$m",
@@ -44,7 +57,8 @@ $response.setContentType('application/x-json')
     "doc_hasadmin" : "${xwiki.hasAccessLevel('admin', $xcontext.user, $doc)}",
     "member"   : "$xwiki.getUserName($m, false)#if($hasAdmin || $isAdvancedUser) (#if($wikiname != 'local')$wikiname:#end$m)#end",
     "member_url" : "$xwiki.getURL($m)",
-    "doc_delete_url" : "$doc.getURL('view', "xpage=deletegroupmember&fullname=${m}&ajax=true&form_token=$!{services.csrf.getToken()}")"
+    "doc_delete_url" : "$doc.getURL('view', "xpage=deletegroupmember&fullname=${m}&ajax=true")",
+    "_avatar" : "<img src='$!mAvatarSrc' width='50' alt='$m' title='$m' />"
    }
 #end
 ]}

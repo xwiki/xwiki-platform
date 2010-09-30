@@ -56,13 +56,13 @@ public class InterWikiXHTMLLinkTypeRenderer extends AbstractXHTMLLinkTypeRendere
         Map<String, String> anchorAttributes)
     {
         // Look for an InterWiki definition for the passed Link. If not found then simply use the InterWiki Path.
-        InterWikiLink interWikiLink = (InterWikiLink) link;
+        String interWikiAlias = (String) link.getParameter(InterWikiLink.INTERWIKI_ALIAS);
         Properties definitions = this.renderingConfiguration.getInterWikiDefinitions();
-        if (definitions.containsKey(interWikiLink.getInterWikiAlias())) {
-            anchorAttributes.put(XHTMLLinkRenderer.HREF, definitions.getProperty(interWikiLink.getInterWikiAlias())
-                + interWikiLink.getReference());
+        if (definitions.containsKey(interWikiAlias)) {
+            anchorAttributes.put(XHTMLLinkRenderer.HREF, definitions.getProperty(interWikiAlias)
+                + link.getReference());
         } else {
-            anchorAttributes.put(XHTMLLinkRenderer.HREF, interWikiLink.getReference());
+            anchorAttributes.put(XHTMLLinkRenderer.HREF, link.getReference());
         }
     }
 }

@@ -932,14 +932,13 @@ public class XWikiGeneratorListener implements IWemListener
                 // query string and/or the anchor specified as parameters. This is how the XWiki Syntax 2.1 specifies
                 // query string and anchor (ex: [[label>>doc:docReference||queryString="a=b" anchor="anchor"]]).
                 if (link.getType() == LinkType.DOCUMENT) {
-                    DocumentLink documentLink = (DocumentLink) link;
                     String queryString = parameters.remove("queryString");
                     if (queryString != null) {
-                        documentLink.setQueryString(queryString);
+                        link.setParameter(DocumentLink.QUERY_STRING, queryString);
                     }
                     String anchor = parameters.remove("anchor");
                     if (anchor != null) {
-                        documentLink.setAnchor(anchor);
+                        link.setParameter(DocumentLink.ANCHOR, anchor);
                     }
                 }
 

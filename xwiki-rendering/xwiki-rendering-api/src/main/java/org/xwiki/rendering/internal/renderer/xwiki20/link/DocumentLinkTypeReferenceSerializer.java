@@ -78,23 +78,24 @@ public class DocumentLinkTypeReferenceSerializer implements LinkTypeReferenceSer
      */
     public String serialize(Link link)
     {
-        DocumentLink documentLink = (DocumentLink) link;
         StringBuilder buffer = new StringBuilder();
 
-        if (documentLink.getReference() != null) {
+        if (link.getReference() != null) {
             // Make sure we escape special chars: # and ? as they have special meaning in links, but only for
             // links to documents. Also escape \ since it's the escape char.
-            String normalizedReference = addEscapesToReferencePart(documentLink.getReference());
+            String normalizedReference = addEscapesToReferencePart(link.getReference());
             buffer.append(normalizedReference);
         }
 
-        if (documentLink.getAnchor() != null) {
+        String anchor = (String) link.getParameter(DocumentLink.ANCHOR);
+        if (anchor != null) {
             buffer.append('#');
-            buffer.append(addEscapesToExtraParts(documentLink.getAnchor()));
+            buffer.append(addEscapesToExtraParts(anchor));
         }
-        if (documentLink.getQueryString() != null) {
+        String queryString = (String) link.getParameter(DocumentLink.QUERY_STRING);
+        if (queryString != null) {
             buffer.append('?');
-            buffer.append(addEscapesToExtraParts(documentLink.getQueryString()));
+            buffer.append(addEscapesToExtraParts(queryString));
         }
 
         return buffer.toString();

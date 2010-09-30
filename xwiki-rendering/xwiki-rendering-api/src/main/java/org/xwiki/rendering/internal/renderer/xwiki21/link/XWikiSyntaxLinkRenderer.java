@@ -58,21 +58,22 @@ public class XWikiSyntaxLinkRenderer extends org.xwiki.rendering.internal.render
         // Print the Query String and Anchor as parameters if they're defined and if the link is a link to a document.
         boolean shouldPrintSeparator = true;
         if (link.getType() == LinkType.DOCUMENT) {
-            DocumentLink documentLink = (DocumentLink) link;
             // Print first the query string
-            if (!StringUtils.isEmpty(documentLink.getQueryString())) {
+            String queryString = (String) link.getParameter(DocumentLink.QUERY_STRING);
+            if (!StringUtils.isEmpty(queryString)) {
                 printer.print(PARAMETER_SEPARATOR);
-                printer.print(this.parametersPrinter.print("queryString", documentLink.getQueryString(), '~'));
+                printer.print(this.parametersPrinter.print("queryString", queryString, '~'));
                 shouldPrintSeparator = false;
             }
             // Then print the anchor
-            if (!StringUtils.isEmpty(documentLink.getAnchor())) {
+            String anchor = (String) link.getParameter(DocumentLink.ANCHOR);
+            if (!StringUtils.isEmpty(anchor)) {
                 if (shouldPrintSeparator) {
                     printer.print(PARAMETER_SEPARATOR);
                 } else {
                     printer.print(" ");
                 }
-                printer.print(this.parametersPrinter.print("anchor", documentLink.getAnchor(), '~'));
+                printer.print(this.parametersPrinter.print("anchor", anchor, '~'));
                 shouldPrintSeparator = false;
             }
         }

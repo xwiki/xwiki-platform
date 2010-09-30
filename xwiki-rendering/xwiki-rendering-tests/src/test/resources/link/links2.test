@@ -14,8 +14,8 @@
 .#-----------------------------------------------------
 beginDocument
 beginParagraph
-beginLink [Typed = [false] Type = [doc] Reference = [Space.ExistingPage] QueryString = [param1=value1] Anchor = [anchor]] [false] [[param2]=[value2]]
-endLink [Typed = [false] Type = [doc] Reference = [Space.ExistingPage] QueryString = [param1=value1] Anchor = [anchor]] [false] [[param2]=[value2]]
+beginLink [Typed = [false] Type = [doc] Reference = [Space.ExistingPage] Parameters = [[queryString] = [param1=value1], [anchor] = [anchor]]] [false] [[param2]=[value2]]
+endLink [Typed = [false] Type = [doc] Reference = [Space.ExistingPage] Parameters = [[queryString] = [param1=value1], [anchor] = [anchor]]] [false] [[param2]=[value2]]
 endParagraph
 endDocument
 .#-----------------------------------------------------

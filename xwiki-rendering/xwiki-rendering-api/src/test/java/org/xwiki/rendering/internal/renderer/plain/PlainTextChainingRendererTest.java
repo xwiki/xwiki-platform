@@ -64,7 +64,6 @@ public class PlainTextChainingRendererTest extends AbstractComponentTestCase
         link.setAnchor("anchor");
         link.setQueryString("param=value");
         link.setReference("reference");
-        link.setType(LinkType.DOCUMENT);
 
         this.renderer.beginLink(link, false, Collections.<String, String> emptyMap());
         this.renderer.endLink(link, false, Collections.<String, String> emptyMap());

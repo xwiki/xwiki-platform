@@ -32,16 +32,25 @@ package org.xwiki.rendering.listener;
 public class InterWikiLink extends Link
 {
     /**
-     * @see #getInterWikiAlias()
+     * The name of the parameter representing the InterWiki Alias.
      */
-    private String interWikiAlias;
+    public static final String INTERWIKI_ALIAS = "interWikiAlias";
+
+    /**
+     * Sets the link type automatically.
+     */
+    public InterWikiLink()
+    {
+        setType(LinkType.INTERWIKI);
+        setTyped(true);
+    }
 
     /**
      * @param interWikiAlias see {@link #getInterWikiAlias()}
      */
     public void setInterWikiAlias(String interWikiAlias)
     {
-        this.interWikiAlias = interWikiAlias;
+        setParameter(INTERWIKI_ALIAS, interWikiAlias);
     }
 
     /**
@@ -51,21 +60,6 @@ public class InterWikiLink extends Link
      */
     public String getInterWikiAlias()
     {
-        return this.interWikiAlias;
-    }
-
-    /**
-     * {@inheritDoc}
-     * @see Object#toString()
-     */
-    @Override
-    public String toString()
-    {
-        StringBuffer sb = new StringBuffer(super.toString());
-        if (getInterWikiAlias() != null) {
-            sb.append(" ");
-            sb.append("InterWikiAlias = [").append(getInterWikiAlias()).append("]");
-        }
-        return sb.toString();        
+        return (String) getParameter(INTERWIKI_ALIAS);
     }
 }

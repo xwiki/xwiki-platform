@@ -28,22 +28,30 @@ package org.xwiki.rendering.listener;
 public class DocumentLink extends Link
 {
     /**
-     * @see #getQueryString()
+     * The name of the parameter representing the Query String.
      */
-    private String queryString;
+    public static final String QUERY_STRING = "queryString";
 
     /**
-     * @see #getAnchor()
+     * The name of the parameter representing the Anchor.
      */
-    private String anchor;
-
+    public static final String ANCHOR = "anchor";
+    
+    /**
+     * Sets the link type automatically.
+     */
+    public DocumentLink()
+    {
+        setType(LinkType.DOCUMENT);
+    }
+    
     /**
      * @return the query string for specifying parameters that will be used in the rendered URL or null if no query
      *         string has been specified. Example: "mydata1=5&mydata2=Hello"
      */
     public String getQueryString()
     {
-        return this.queryString;
+        return (String) getParameter(QUERY_STRING);
     }
 
     /**
@@ -51,7 +59,7 @@ public class DocumentLink extends Link
      */
     public void setQueryString(String queryString)
     {
-        this.queryString = queryString;
+        setParameter(QUERY_STRING, queryString);
     }
 
     /**
@@ -61,7 +69,7 @@ public class DocumentLink extends Link
      */
     public String getAnchor()
     {
-        return this.anchor;
+        return (String) getParameter(ANCHOR);
     }
 
     /**
@@ -69,25 +77,6 @@ public class DocumentLink extends Link
      */
     public void setAnchor(String anchor)
     {
-        this.anchor = anchor;
-    }
-
-    /**
-     * {@inheritDoc}
-     * @see Object#toString()
-     */
-    @Override
-    public String toString()
-    {
-        StringBuffer sb = new StringBuffer(super.toString());
-        if (getQueryString() != null) {
-            sb.append(" ");
-            sb.append("QueryString = [").append(getQueryString()).append("]");
-        }
-        if (getAnchor() != null) {
-            sb.append(" ");
-            sb.append("Anchor = [").append(getAnchor()).append("]");
-        }
-        return sb.toString();        
+        setParameter(ANCHOR, anchor);
     }
 }

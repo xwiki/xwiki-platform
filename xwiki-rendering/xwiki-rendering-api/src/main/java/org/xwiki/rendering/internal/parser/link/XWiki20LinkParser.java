@@ -199,11 +199,17 @@ public class XWiki20LinkParser implements LinkParser
     private Link parseDocumentLink(StringBuffer content)
     {
         DocumentLink documentLink = new DocumentLink();
-        documentLink.setType(LinkType.DOCUMENT);
-        documentLink.setQueryString(removeEscapesFromExtraParts(
-            parseElementAfterString(content, LinkParser.SEPARATOR_QUERYSTRING)));
-        documentLink.setAnchor(removeEscapesFromExtraParts(parseElementAfterString(content,
-            LinkParser.SEPARATOR_ANCHOR)));
+
+        String text = parseElementAfterString(content, LinkParser.SEPARATOR_QUERYSTRING);
+        if (text != null) {
+            documentLink.setQueryString(removeEscapesFromExtraParts(text));
+        }
+
+        text = parseElementAfterString(content, LinkParser.SEPARATOR_ANCHOR);
+        if (text != null) {
+            documentLink.setAnchor(removeEscapesFromExtraParts(text));
+        }
+
         documentLink.setReference(removeEscapesFromReferencePart(content.toString()));
         return documentLink;
     }
@@ -255,8 +261,6 @@ public class XWiki20LinkParser implements LinkParser
         String interWikiAlias = parseElementAfterString(content, SEPARATOR_INTERWIKI);
         if (interWikiAlias != null) {
             InterWikiLink link = new InterWikiLink();
-            link.setType(LinkType.INTERWIKI);
-            link.setTyped(true);
             link.setInterWikiAlias(removeEscapes(interWikiAlias));
             link.setReference(removeEscapes(content.toString()));
             result = link;

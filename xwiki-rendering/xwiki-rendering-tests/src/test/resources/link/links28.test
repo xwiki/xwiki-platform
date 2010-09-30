@@ -14,11 +14,11 @@
 .#-----------------------------------------------------
 beginDocument
 beginParagraph
-beginLink [Typed = [true] Type = [interwiki] Reference = [path] InterWikiAlias = [knownalias]] [false]
-endLink [Typed = [true] Type = [interwiki] Reference = [path] InterWikiAlias = [knownalias]] [false]
+beginLink [Typed = [true] Type = [interwiki] Reference = [path] Parameters = [[interWikiAlias] = [knownalias]]] [false]
+endLink [Typed = [true] Type = [interwiki] Reference = [path] Parameters = [[interWikiAlias] = [knownalias]]] [false]
 onNewLine
-beginLink [Typed = [true] Type = [interwiki] Reference = [path] InterWikiAlias = [unknownalias]] [false]
-endLink [Typed = [true] Type = [interwiki] Reference = [path] InterWikiAlias = [unknownalias]] [false]
+beginLink [Typed = [true] Type = [interwiki] Reference = [path] Parameters = [[interWikiAlias] = [unknownalias]]] [false]
+endLink [Typed = [true] Type = [interwiki] Reference = [path] Parameters = [[interWikiAlias] = [unknownalias]]] [false]
 endParagraph
 endDocument
 .#-----------------------------------------------------

@@ -19,6 +19,11 @@
  */
 package org.xwiki.rendering.listener;
 
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
+
 /**
  * Represents a reference to a link. Note that this representation is independent of any wiki syntax.
  *
@@ -44,6 +49,11 @@ public class Link implements Cloneable
      * @see #getType()
      */
     private LinkType type;
+
+    /**
+     * @see #getParameter(String) 
+     */
+    private Map<String, Object> parameters = new HashMap<String, Object>();
 
     /**
      * @param isTyped see {@link #isTyped()}
@@ -100,6 +110,43 @@ public class Link implements Cloneable
     }
 
     /**
+     * @param name see {@link #getParameter(String)}
+     * @param value see {@link #getParameter(String)}
+     */
+    public void setParameter(String name, Object value)
+    {
+        this.parameters.put(name, value);
+    }
+
+    /**
+     * @param name see {@link #getParameter(String)}
+     */
+    public void removeParameter(String name)
+    {
+        this.parameters.remove(name);
+    }
+    /**
+     * In order for Link references to be extensible we allow for extra parameters in addition to the link reference.
+     * For example this is used in Document Links for storing the query string and anchor information, and in InterWiki
+     * Links to store the InterWiki Alias.
+     *
+     * @param name the name of the parameter to get
+     * @return the parameter value or null if no such parameter exist
+     */
+    public Object getParameter(String name)
+    {
+        return this.parameters.get(name);
+    }
+
+    /**
+     * @return the collections of parameters, see {@link #getParameter(String)}
+     */
+    public Map<String, Object> getParameters()
+    {
+        return Collections.unmodifiableMap(this.parameters);
+    }
+
+    /**
      * {@inheritDoc} <p> The output is syntax independent since this class is used for all syntaxes. Specific syntaxes
      * should extend this class and override this method to perform syntax-dependent formatting.
      *
@@ -108,16 +155,27 @@ public class Link implements Cloneable
     @Override
     public String toString()
     {
-        boolean shouldAddSpace = false;
         StringBuffer sb = new StringBuffer();
         sb.append("Typed = [").append(isTyped()).append("]");
         sb.append(" ");
         sb.append("Type = [").append(getType().getScheme()).append("]");
-        shouldAddSpace = true;
         if (getReference() != null) {
-            sb.append(shouldAddSpace ? " " : "");
+            sb.append(" ");
             sb.append("Reference = [").append(getReference()).append("]");
-            shouldAddSpace = true;
+        }
+        Map<String, Object> params = getParameters();
+        if (!params.isEmpty()) {
+            sb.append(" ");
+            sb.append("Parameters = [");
+            Iterator<Map.Entry<String, Object>> it = params.entrySet().iterator();
+            while (it.hasNext()) {
+                Map.Entry<String, Object> entry = it.next();
+                sb.append("[").append(entry.getKey()).append("] = [").append(entry.getValue()).append("]");
+                if (it.hasNext()) {
+                    sb.append(", ");
+                }
+            }
+            sb.append("]");
         }
 
         return sb.toString();

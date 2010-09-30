@@ -35,7 +35,6 @@ import org.xwiki.rendering.block.ListItemBlock;
 import org.xwiki.rendering.block.NumberedListBlock;
 import org.xwiki.rendering.block.SectionBlock;
 import org.xwiki.rendering.listener.DocumentLink;
-import org.xwiki.rendering.listener.LinkType;
 import org.xwiki.rendering.macro.AbstractMacro;
 import org.xwiki.rendering.macro.MacroExecutionException;
 import org.xwiki.rendering.macro.toc.TocMacroParameters;
@@ -268,7 +267,6 @@ public class TocMacro extends AbstractMacro<TocMacroParameters>
         // Create the link to target the header anchor
         DocumentLink link = new DocumentLink();
         link.setAnchor(headerBlock.getId());
-        link.setType(LinkType.DOCUMENT);
         LinkBlock linkBlock = new LinkBlock(this.tocBlockFilter.generateLabel(headerBlock), link, false);
 
         return new ListItemBlock(Collections.<Block> singletonList(linkBlock));

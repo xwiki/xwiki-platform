@@ -59,8 +59,8 @@ public class XWiki21LinkParserTest extends AbstractXWikiLinkParserTest
         Assert.assertEquals("content", link.getReference());
         Assert.assertTrue(link.isTyped());
         Assert.assertEquals("alias", ((InterWikiLink) link).getInterWikiAlias());
-        Assert.assertEquals("Typed = [true] Type = [interwiki] Reference = [content] InterWikiAlias = [alias]",
-            link.toString());
+        Assert.assertEquals("Typed = [true] Type = [interwiki] Reference = [content] "
+            + "Parameters = [[interWikiAlias] = [alias]]", link.toString());
 
         // Verify that an invalid InterWiki link is considered as Document link
         link = parser.parse("interwiki:invalid_since_doesnt_have_colon");

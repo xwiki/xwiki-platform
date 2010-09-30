@@ -11,11 +11,11 @@
 .#-----------------------------------------------------
 beginDocument
 beginParagraph
-beginLink [Typed = [true] Type = [interwiki] Reference = [pa.g?a@b#c\#anchor\?querystring\] InterWikiAlias = [inter@wikilink\]] [false]
-endLink [Typed = [true] Type = [interwiki] Reference = [pa.g?a@b#c\#anchor\?querystring\] InterWikiAlias = [inter@wikilink\]] [false]
+beginLink [Typed = [true] Type = [interwiki] Reference = [pa.g?a@b#c\#anchor\?querystring\] Parameters = [[interWikiAlias] = [inter@wikilink\]]] [false]
+endLink [Typed = [true] Type = [interwiki] Reference = [pa.g?a@b#c\#anchor\?querystring\] Parameters = [[interWikiAlias] = [inter@wikilink\]]] [false]
 onNewLine
-beginLink [Typed = [true] Type = [interwiki] Reference = [pa.g?a@b#c\#anchor\?querystring\] InterWikiAlias = [inter@wikilink\]] [false]
-endLink [Typed = [true] Type = [interwiki] Reference = [pa.g?a@b#c\#anchor\?querystring\] InterWikiAlias = [inter@wikilink\]] [false]
+beginLink [Typed = [true] Type = [interwiki] Reference = [pa.g?a@b#c\#anchor\?querystring\] Parameters = [[interWikiAlias] = [inter@wikilink\]]] [false]
+endLink [Typed = [true] Type = [interwiki] Reference = [pa.g?a@b#c\#anchor\?querystring\] Parameters = [[interWikiAlias] = [inter@wikilink\]]] [false]
 onNewLine
 beginLink [Typed = [true] Type = [attach] Reference = [My\@Page@filename]] [false]
 endLink [Typed = [true] Type = [attach] Reference = [My\@Page@filename]] [false]

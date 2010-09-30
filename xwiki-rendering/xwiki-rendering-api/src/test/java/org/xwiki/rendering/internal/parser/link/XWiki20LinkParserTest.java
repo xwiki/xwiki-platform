@@ -53,28 +53,32 @@ public class XWiki20LinkParserTest extends AbstractXWikiLinkParserTest
         Assert.assertEquals("xredirect=../whatever", ((DocumentLink) link).getQueryString());
         Assert.assertFalse(link.isTyped());
         Assert.assertEquals(LinkType.DOCUMENT, link.getType());
-        Assert.assertEquals("Typed = [false] Type = [doc] Reference = [Hello World] QueryString = [xredirect=../whatever]", link.toString());
+        Assert.assertEquals("Typed = [false] Type = [doc] Reference = [Hello World] "
+            + "Parameters = [[queryString] = [xredirect=../whatever]]", link.toString());
 
         link = parser.parse("HelloWorld?xredirect=http://xwiki.org");
         Assert.assertEquals("HelloWorld", link.getReference());
         Assert.assertEquals("xredirect=http://xwiki.org", ((DocumentLink) link).getQueryString());
         Assert.assertFalse(link.isTyped());
         Assert.assertEquals(LinkType.DOCUMENT, link.getType());
-        Assert.assertEquals("Typed = [false] Type = [doc] Reference = [HelloWorld] QueryString = [xredirect=http://xwiki.org]", link.toString());
+        Assert.assertEquals("Typed = [false] Type = [doc] Reference = [HelloWorld] "
+            + "Parameters = [[queryString] = [xredirect=http://xwiki.org]]", link.toString());
 
         // Test Anchors in links to documents
         link = parser.parse("#anchor");
         Assert.assertEquals("anchor", ((DocumentLink) link).getAnchor());
         Assert.assertFalse(link.isTyped());
         Assert.assertEquals(LinkType.DOCUMENT, link.getType());
-        Assert.assertEquals("Typed = [false] Type = [doc] Reference = [] Anchor = [anchor]", link.toString());
+        Assert.assertEquals("Typed = [false] Type = [doc] Reference = [] Parameters = [[anchor] = [anchor]]",
+            link.toString());
 
         link = parser.parse("Hello#anchor");
         Assert.assertEquals("Hello", link.getReference());
         Assert.assertEquals("anchor", ((DocumentLink) link).getAnchor());
         Assert.assertFalse(link.isTyped());
         Assert.assertEquals(LinkType.DOCUMENT, link.getType());
-        Assert.assertEquals("Typed = [false] Type = [doc] Reference = [Hello] Anchor = [anchor]", link.toString());
+        Assert.assertEquals("Typed = [false] Type = [doc] Reference = [Hello] Parameters = [[anchor] = [anchor]]",
+            link.toString());
 
         // Test InterWiki links
         link = parser.parse("HelloWorld#anchor?param1=1&param2=2@wikipedia");
@@ -83,7 +87,7 @@ public class XWiki20LinkParserTest extends AbstractXWikiLinkParserTest
         Assert.assertTrue(link.isTyped());
         Assert.assertEquals(LinkType.INTERWIKI, link.getType());
         Assert.assertEquals("Typed = [true] Type = [interwiki] Reference = [HelloWorld#anchor?param1=1&param2=2] "
-            + "InterWikiAlias = [wikipedia]", link.toString());
+            + "Parameters = [[interWikiAlias] = [wikipedia]]", link.toString());
 
         // Verify in XWiki Syntax 2.0 the "doc" prefix is not meaningful
         link = parser.parse("doc:whatever");

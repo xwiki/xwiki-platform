@@ -7,7 +7,6 @@
 <form action="?xpage=rename&amp;step=2" method="post"
     onsubmit="if(this.newPageName.value=='${escapetool.xml($newname)}') this.newPageName.value=''">
   <h2><span>$msg.get('core.rename.title.newName')</span></h2>
-  <h2><span>$msg.get("core.rename.title.newName")</span></h2>
   ## CSRF prevention
   <div class="hidden"><input type="hidden" name="form_token" value="$!{services.csrf.getToken()}" /></div>
   #set($pweb = $doc.space)

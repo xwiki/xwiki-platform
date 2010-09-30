@@ -19,6 +19,7 @@
  */
 package com.xpn.xwiki.wysiwyg.server.internal.wiki;
 
+import org.apache.commons.lang.StringUtils;
 import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.component.annotation.Requirement;
 import org.xwiki.gwt.wysiwyg.client.wiki.EntityConfig;
@@ -42,11 +43,6 @@ import com.xpn.xwiki.wysiwyg.server.wiki.LinkService;
  */
 public class DefaultLinkService implements LinkService
 {
-    /**
-     * The attachment URI protocol.
-     */
-    private static final String ATTACHMENT_URI_PROTOCOL = "attach:";
-
     /**
      * The image URI protocol.
      */
@@ -78,14 +74,20 @@ public class DefaultLinkService implements LinkService
 
     /**
      * The component used to serialize link references.
+     * <p>
+     * Note: The link reference syntax is independent of the syntax of the edited document. The current hint should be
+     * replaced with a generic one to avoid confusion.
      */
-    @Requirement("xwiki/2.0")
+    @Requirement("xwiki/2.1")
     private LinkReferenceSerializer linkReferenceSerializer;
 
     /**
      * The component used to parser link references.
+     * <p>
+     * Note: The link reference syntax is independent of the syntax of the edited document. The current hint should be
+     * replaced with a generic one to avoid confusion.
      */
-    @Requirement("xwiki/2.0")
+    @Requirement("xwiki/2.1")
     private LinkParser linkReferenceParser;
 
     /**
@@ -142,17 +144,28 @@ public class DefaultLinkService implements LinkService
         String relativeStringEntityReference)
     {
         Link link = new Link();
-        // TODO: Improve this to make it generic and allow adding new link types dynamically
-        if (entityType == org.xwiki.gwt.wysiwyg.client.wiki.EntityReference.EntityType.DOCUMENT) {
-            link.setType(LinkType.DOCUMENT);
-        } else if (entityType == org.xwiki.gwt.wysiwyg.client.wiki.EntityReference.EntityType.IMAGE) {
-            link.setType(LinkType.IMAGE);
-        } else {
-            // Consider it's an attachment. TODO: Fix this since this assumption is plain wrong!
-            link.setType(LinkType.ATTACHMENT);
+        // TODO: Improve this to make it generic and allow adding new link types dynamically.
+        switch (entityType) {
+            case DOCUMENT:
+                link.setType(LinkType.DOCUMENT);
+                break;
+            case IMAGE:
+                link.setType(LinkType.IMAGE);
+                break;
+            case ATTACHMENT:
+                link.setType(LinkType.ATTACHMENT);
+                break;
+            default:
+                // We shoudn't get here.
+                break;
         }
         link.setReference(relativeStringEntityReference);
         String linkReference = linkReferenceSerializer.serialize(link);
+        // Remove the image protocol because the client doesn't need it: image protocol is implied by the image specific
+        // meta data (which is different than link meta data).
+        if (entityType == org.xwiki.gwt.wysiwyg.client.wiki.EntityReference.EntityType.IMAGE) {
+            linkReference = StringUtils.removeStart(linkReference, IMAGE_URI_PROTOCOL);
+        }
         return linkReference;
     }
 

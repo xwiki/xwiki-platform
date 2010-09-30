@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <xwikidoc>
-<web>ExtensionManager</web>
-<name>WebHome</name>
+<web>XWiki</web>
+<name>ExtensionManager</name>
 <language></language>
 <defaultLanguage>en</defaultLanguage>
 <translation>0</translation>
@@ -140,12 +140,12 @@
 <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
 </propertiesToShow>
 </class>
-<name>ExtensionManager.WebHome</name>
+<name>XWiki.ExtensionManager</name>
 <number>0</number>
 <className>XWiki.ConfigurableClass</className>
 <guid>cef8c7cf-fecf-42cc-9e95-8a3be6ce936b</guid>
 <property>
-<codeToExecute>{{include document="ExtensionManager.WebHome" /}}</codeToExecute>
+<codeToExecute>{{include document="XWiki.ExtensionManager" /}}</codeToExecute>
 </property>
 <property>
 <configurationClass></configurationClass>

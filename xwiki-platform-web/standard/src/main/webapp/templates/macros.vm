@@ -1199,7 +1199,7 @@ $doc.display("content", $obj)
 #macro(xwikimessageboxstart $title $message)
     <div class="centered">
     <fieldset class="xwikimessage">
-      <legend></span>$title</span></legend>
+      <legend><span>$title</span></legend>
       <p class="xwikimessage">$message</p>
 #end
 #macro(xwikimessageboxend)

@@ -429,7 +429,7 @@ This application is experimental, use it at your own risk.
 
       #end
       {{html}}
-      &lt;form action="$xwiki.requestURL" enctype="multipart/form-data" method="get"&gt;
+      &lt;form action="$xwiki.requestURL" enctype="multipart/form-data" method="post"&gt;
         &lt;fieldset&gt;
           &lt;input name="extensionid" value="${escapetool.xml($request.extensionid)}" type="hidden" /&gt;
           &lt;input name="extensionversion" value="${escapetool.xml($request.extensionversion)}" type="hidden" /&gt;
@@ -467,7 +467,7 @@ This application is experimental, use it at your own risk.
       #end
 
       {{html}}
-      &lt;form action="$xwiki.requestURL" enctype="multipart/form-data" method="get"&gt;
+      &lt;form action="$xwiki.requestURL" enctype="multipart/form-data" method="post"&gt;
         &lt;fieldset&gt;
           &lt;input name="extensionid" value="${escapetool.xml($request.extensionid)}" type="hidden" /&gt;
           &lt;input name="extensionversion" value="${escapetool.xml($request.extensionversion)}" type="hidden" /&gt;

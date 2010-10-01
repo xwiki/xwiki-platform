@@ -37,7 +37,6 @@ import org.xwiki.rendering.block.MacroBlock;
 import org.xwiki.rendering.block.MacroMarkerBlock;
 import org.xwiki.rendering.block.VerbatimBlock;
 import org.xwiki.rendering.block.WordBlock;
-import org.xwiki.rendering.block.XDOM;
 import org.xwiki.rendering.listener.Format;
 import org.xwiki.rendering.macro.Macro;
 import org.xwiki.rendering.macro.MacroId;
@@ -97,17 +96,6 @@ public class MacroTransformation extends AbstractTransformation
         {
             return this.macro.compareTo(holder.macro);
         }
-    }
-
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.rendering.transformation.Transformation#transform(org.xwiki.rendering.block.XDOM ,
-     *      org.xwiki.rendering.syntax.Syntax)
-     */
-    public void transform(XDOM dom, Syntax syntax) throws TransformationException
-    {
-        transform(dom, new TransformationContext(dom, syntax));
     }
 
     /**

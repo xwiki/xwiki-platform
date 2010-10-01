@@ -20,6 +20,8 @@
 package org.xwiki.rendering.transformation;
 
 import org.xwiki.component.logging.AbstractLogEnabled;
+import org.xwiki.rendering.block.XDOM;
+import org.xwiki.rendering.syntax.Syntax;
 
 /**
  * Code common to all Transformation and base implementation of priorities (see {@link Transformation#getPriority()}).
@@ -53,5 +55,16 @@ public abstract class AbstractTransformation extends AbstractLogEnabled implemen
     public int compareTo(Transformation transformation)
     {
         return getPriority() - transformation.getPriority();
+    }
+
+    /**
+     * {@inheritDoc}
+     *
+     * @see org.xwiki.rendering.transformation.Transformation#transform(org.xwiki.rendering.block.XDOM ,
+     *      org.xwiki.rendering.syntax.Syntax)
+     */
+    public void transform(XDOM dom, Syntax syntax) throws TransformationException
+    {
+        transform(dom, new TransformationContext(dom, syntax));
     }
 }

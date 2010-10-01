@@ -31,7 +31,6 @@
   </parent>
   <artifactId>xwiki-core-refactoring</artifactId>
   <name>XWiki Platform - Core - Refactoring</name>
-  <version>2.5-SNAPSHOT</version>
   <description>XWiki Platform - Core - Refactoring</description>
   <dependencies>
     <dependency>

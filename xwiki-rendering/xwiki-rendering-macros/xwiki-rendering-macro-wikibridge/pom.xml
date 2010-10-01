@@ -32,7 +32,6 @@
   <groupId>org.xwiki.platform</groupId>
   <artifactId>xwiki-core-rendering-macro-wikibridge</artifactId>
   <name>XWiki Platform - Core - Rendering - Macro - Wiki Bridge</name>
-  <version>2.5-SNAPSHOT</version>
   <description>XWiki Platform - Core - Rendering - Macro - Wiki Bridge</description>
   <dependencies>
     <dependency>

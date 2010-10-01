@@ -31,7 +31,6 @@
   </parent>
   <artifactId>xwiki-core-rendering-macro-message</artifactId>
   <name>XWiki Platform - Core - Rendering - Macro - Message</name>
-  <version>2.5-SNAPSHOT</version>
   <description>XWiki Platform - Core - Rendering - Macro - Message</description>
   <dependencies>
     <dependency>

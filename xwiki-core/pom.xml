@@ -786,6 +786,14 @@
       <scope>runtime</scope>
     </dependency>
     <dependency>
+      <!-- xwiki-core doesn't really depend on xwiki-core-office-macro. We added this dependency just to have the
+        xwiki-core-office-macro jar in the XE distribution. -->
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-core-office-macro</artifactId>
+      <version>${project.version}</version>
+      <scope>runtime</scope>
+    </dependency>
+    <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-core-component-multi</artifactId>
       <version>${project.version}</version>

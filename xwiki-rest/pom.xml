@@ -35,7 +35,7 @@
   <name>XWiki Platform - Core - REST - Parent POM</name>
   <description>Service for accessing XWiki through a RESTful API</description>
   <modules>
-    <module>xwiki-rest-server</module>
     <module>xwiki-rest-model</module>
+    <module>xwiki-rest-server</module>
   </modules>
 </project>

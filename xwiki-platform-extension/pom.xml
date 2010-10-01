@@ -27,7 +27,7 @@
   <parent>
     <groupId>org.xwiki.platform.applications</groupId>
     <artifactId>xwiki-applications</artifactId>
-    <version>32-SNAPSHOT</version>
+    <version>33-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-application-extension</artifactId>
   <version>1.0-SNAPSHOT</version>

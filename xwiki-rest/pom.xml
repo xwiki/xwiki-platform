@@ -29,7 +29,6 @@
     <artifactId>xwiki-core-parent</artifactId>
     <version>2.5-SNAPSHOT</version>
   </parent>
-  <groupId>com.xpn.xwiki.platform</groupId>
   <artifactId>xwiki-rest</artifactId>
   <packaging>pom</packaging>
   <name>XWiki Platform - Core - REST - Parent POM</name>

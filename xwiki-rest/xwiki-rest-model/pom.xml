@@ -24,11 +24,11 @@
 
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
-  <parent>    
-    <groupId>com.xpn.xwiki.platform</groupId>
+  <parent>
+    <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-rest</artifactId>
     <version>2.5-SNAPSHOT</version>
-  </parent>  
+  </parent>
   <artifactId>xwiki-rest-model</artifactId>
   <name>XWiki Platform - Core - REST - Model</name>
   <description>The (JAXB) model for XML resource representations served by the REST module.</description>

@@ -92,7 +92,9 @@ public class XWikiAuthentication extends Guard
             try {
                 XWikiUser xwikiUser = xwiki.getAuthService().checkAuth(xwikiContext);
                 if (xwikiUser != null) {
-                    xwikiContext.setUser(xwikiUser.getUser());
+                    // Make sure the user is absolute
+                    xwikiContext.setUser(xwikiUser.getUser().contains(":") ? xwikiUser.getUser() : xwikiContext
+                        .getDatabase() + ':' + xwikiUser.getUser());
                     getLogger().log(Level.FINE, String.format("Authenticated as '%s'.", xwikiUser.getUser()));
                 }
             } catch (XWikiException e) {

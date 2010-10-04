@@ -263,7 +263,7 @@
 .annotation-box .links {
   float: right;
   font-size: 80%;
-  text-transform: lowercase:
+  text-transform: lowercase;
 /*  margin: -6px -8px 0 0;
 }
 

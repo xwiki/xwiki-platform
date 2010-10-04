@@ -241,7 +241,7 @@ exe4HTmbnGvM+gk9nVqKm3NKMQAAAABJRU5ErkJggg==
 }
 
 .annotation-box {
-  padding: 2px 12px 4px 6px;
+  padding: 6px 12px;
 }
 
 .annotation-bubble .loading {
@@ -252,6 +252,29 @@ exe4HTmbnGvM+gk9nVqKm3NKMQAAAABJRU5ErkJggg==
   width: 99%;
 }
 
+.annotationAvatar {
+  float: left;
+  width: 55px;
+  text-align: left;
+}
+.annotationAvatar img {
+  max-width: 50px;
+  max-height: 50px;
+}
+* html .annotationAvatar img {
+  width: 50px;
+}
+
+#allAnnotations .annotationAvatar  {
+  padding-top: 5px;
+}
+
+#allAnnotations .annotationHeader, #allAnnotations .annotationContent {
+  margin-left: 55px;
+}
+#allAnnotations .annotationTitle * {
+  line-height: 1.4em;
+}
 .annotation-box .annotationAuthor {
   border-bottom: 1px dotted $theme.borderColor;
   display: block;
@@ -264,28 +287,8 @@ exe4HTmbnGvM+gk9nVqKm3NKMQAAAABJRU5ErkJggg==
   margin-right: 51px;
   display: block;
 }
-.annotationContent {
+.annotation-bubble .annotationContent {
   clear: both;
-}
-
-## In velocity comment: settings for using the larger images from silk
-.annotation-box .annotation {
-  ##padding: 0 0 0 18px;
-  ##background: transparent #imgURL('note') left top no-repeat;
-  padding: 0 0 0 14px;
-  background: transparent #attImgURL('notesmall') left 4px no-repeat;
-}
-.annotation-box .buttons {
-  ##padding: 0 0 0 18px;
-  padding: 0 0 0 14px;
-}
-
-/* Make room for the large note_add icon */
-.annotation-box-create .annotation, .annotation-box-create .buttons {
-  padding-left: 18px !important;
-}
-.annotation-box-create .annotation {
-  background: transparent #imgURL('note_add') left top no-repeat !important;
 }
 
 .annotation-box .links {
@@ -298,20 +301,20 @@ exe4HTmbnGvM+gk9nVqKm3NKMQAAAABJRU5ErkJggg==
   background-image: #imgURL('note_add');
 }
 
-/* Annotations list (extra-tab)*/
-## In velocity comment: settings for using the larger images from silk
+/* Annotations list (extra-tab) */
 #allAnnotations .annotation {
-  margin: 8px 0;
-  ##padding: 0 0 0 18px;
-  ##background: transparent #imgURL('note') left top no-repeat;
-  padding: 0 0 0 14px;
-  background: transparent #attImgURL('notesmall') left 4px no-repeat;
+  margin: 0 0 8px;
 }
-#allAnnotations .UPDATED, #xwikicontent .UPDATED, .annotation-bubble .UPDATED {
+#allAnnotations .annotation .annotationText {
+  padding: 0 36px 0 14px;
+  background: transparent #attImgURL('notesmall') left 4px no-repeat;
+  text-align: justify;
+}
+#allAnnotations .UPDATED .annotationText, #xwikicontent .UPDATED {
   ##background-image: #imgURL('note_error');
   background-image: #attImgURL('notesmallorange');
 }
-#allAnnotations .ALTERED, #xwikicontent .ALTERED, .annotation-bubble .ALTERED {
+#allAnnotations .ALTERED annotationText, #xwikicontent .ALTERED {
   ##background-image: #imgURL('note_delete');
   background-image: #attImgURL('notesmallred');
 }
@@ -331,7 +334,6 @@ exe4HTmbnGvM+gk9nVqKm3NKMQAAAABJRU5ErkJggg==
   display: block;
   float: right;
   margin-top: -1.2em;
-  margin-right: -2px;
 }
 .annotationTools a {
   background: transparent none no-repeat left top;
@@ -372,6 +374,9 @@ dt.annotationLabel label {
 }
 .annotationContent dd, .annotationContent blockquote {
   margin-bottom: 10px;
+}
+.annotationContent blockquote {
+  padding-left: 12px;
 }</code>
 </property>
 <property>

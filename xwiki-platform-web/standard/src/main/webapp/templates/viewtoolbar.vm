@@ -17,7 +17,7 @@ $msg.get("welcome") !
 #set($recentlyviewed = $xwiki.getRecentActions("view", 5))
 #foreach($docname in $recentlyviewed)
 #set($rdoc = $xwiki.getDocument($docname))
-<a href="$rdoc.getURL("view")">$rdoc.name</a>
+<a href="$rdoc.getURL("view")">${escapetool.xml($rdoc.name)}</a>
 <span class="xwikisep"> | </span>
 #end
 </div>

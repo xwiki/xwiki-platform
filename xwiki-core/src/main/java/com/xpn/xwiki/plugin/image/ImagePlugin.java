@@ -73,7 +73,7 @@ public class ImagePlugin extends XWikiDefaultPlugin
     /**
      * Default JPEG image quality.
      */
-    private float defaultQuality = 0.3f;
+    private float defaultQuality = 0.5f;
 
     /**
      * The object used to process images.

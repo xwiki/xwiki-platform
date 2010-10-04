@@ -19,7 +19,7 @@
   #end
 #end
 #if ($request.rev)
-  #set($revparams="rev=${request.rev}")
+  #set($revparams="rev=${escapetool.url($request.rev)}")
 #end
 #set($hasedit = $xwiki.hasAccessLevel("edit"))
 #set($hasadmin = $xwiki.hasAdminRights())

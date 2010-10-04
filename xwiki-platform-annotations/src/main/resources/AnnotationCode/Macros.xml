@@ -134,6 +134,7 @@
     #set($mode = 'view')
   #end
   &lt;div class="annotation $!{ann.state}" id="annotation_${mode}_$!{ann.id}"&gt;
+    &lt;div class="annotationAvatar"&gt;#mediumUserAvatar($ann.author)&lt;/div&gt;
     &lt;div class="annotationHeader"&gt;
       #displayAnnotationTitle($ann)
       #displayAnnotationToolbox($ann $mode $docWiki $docSpace $docPage)
@@ -213,6 +214,18 @@
   ## Fake object that allows to use the API to generate the display
   #set($fakeObj = $doc.newObject($annotationClassDocName))
   #set($properties = $annotationClass.properties)
+  #if ($properties.size() == $hiddenProperties.size() + 1)
+    ## Do not show property labels if there's only one property to display
+    #set($prop = $annotationClass.get('annotation'))
+    #set($discard = $fakeObj.set($prop.name, "$!{ann.get($prop.name)}"))
+    &lt;div class="annotationText"&gt;
+      #if($mode == 'edit' || $mode == 'create')
+        $doc.displayEdit($prop, '', $fakeObj)
+      #else
+        $doc.displayView($prop, '', $fakeObj)
+      #end
+    &lt;/div&gt;
+  #else
   &lt;dl&gt;
   #foreach($prop in $properties)
     #if (!$listtool.contains($hiddenProperties, $prop.name))
@@ -226,6 +239,7 @@
     #end
   #end
   &lt;/dl&gt;
+  #end
 #end
 {{/velocity}}</content>
 </xwikidoc>

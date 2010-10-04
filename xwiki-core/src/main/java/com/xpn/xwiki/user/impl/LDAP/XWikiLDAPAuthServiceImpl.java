@@ -332,8 +332,6 @@ public class XWikiLDAPAuthServiceImpl extends XWikiAuthServiceImpl
         // 3. find XWiki user profile page
         // ////////////////////////////////////////////////////////////////////
 
-        LDAPProfileXClass ldapProfileClass = new LDAPProfileXClass(context);
-
         XWikiDocument userProfile = getUserProfileByUid(validXWikiUserName, ldapUid, context);
 
         // ////////////////////////////////////////////////////////////////////
@@ -378,32 +376,6 @@ public class XWikiLDAPAuthServiceImpl extends XWikiAuthServiceImpl
         // ////////////////////////////////////////////////////////////////////
 
         List<XWikiLDAPSearchAttribute> searchAttributes = null;
-
-        // Try to find LDAP DN from already created user profile
-        if (ldapDn == null) {
-            // FIXME: to speed up authentication try to find the ldapDn in the LDAP server.
-            // Currently jldap seems to have a bug that makes it
-            // * either impossible to find a dn by querying it as any attribute
-            // * or put in in a state where it keep using the same bad base DN for every following queries
-
-            // get DN from existing XWiki user
-            // ldapDn = ldapProfileClass.getDn(userProfile);
-            //
-            // if (LOG.isDebugEnabled() && ldapDn != null) {
-            // LOG.debug("Found user dn with the user object: " + ldapDn);
-            // }
-            //
-            // if (ldapDn != null) { // didn't get attributes before, so do it now searchAttributes =
-            // ldapUtils.searchUserAttributesByDN(ldapDn, getAttributeNameTable(context));
-            // if (searchAttributes == null) {
-            // if (LOG.isDebugEnabled()) {
-            // LOG.debug("Can't find any attributes for user [" + ldapDn + "]."
-            // + " That generally means that the user DN changed.");
-            // ldapDn = null;
-            // }
-            // }
-            // }
-        }
 
         // if we still don't have a dn, search for it. Also get the attributes, we might need
         // them

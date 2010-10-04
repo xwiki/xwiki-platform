@@ -33,7 +33,7 @@
 ##
 ##
 ## Do not display these 'internal' properties in the form:
-#set($hiddenProperties = ['selection', 'selectionLeftContext', 'selectionRightContext', 'originalSelection', 'target', 'date', 'author', 'state', 'color'])
+#set($hiddenProperties = ['selection', 'selectionLeftContext', 'selectionRightContext', 'originalSelection', 'target', 'date', 'author', 'state'])## TODO: 'color'
 ##
 ##
 #*
@@ -219,9 +219,9 @@
       #set($discard = $fakeObj.set($prop.name, "$!{ann.get($prop.name)}"))
       &lt;dt class="annotationLabel"&gt;&lt;label for="$prop.name"&gt;$prop.prettyName&lt;/label&gt;&lt;/dt&gt;
       #if($mode == 'edit' || $mode == 'create')
-        &lt;dd&gt;$doc.displayEdit($prop, "" , $fakeObj)&lt;/dd&gt;
+        &lt;dd&gt;$doc.displayEdit($prop, '', $fakeObj)&lt;/dd&gt;
       #else
-        &lt;dd&gt;$doc.displayView($prop, "" , $fakeObj)&lt;/dd&gt;
+        &lt;dd&gt;$doc.displayView($prop, '', $fakeObj)&lt;/dd&gt;
       #end
     #end
   #end

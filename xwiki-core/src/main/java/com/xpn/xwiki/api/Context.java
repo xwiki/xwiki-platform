@@ -571,6 +571,8 @@ public class Context extends Api
      * Drop all author permissions by switching author to guest.
      * Call this when all code requiring permission has been executed and the code following may be untrusted.
      * Once dropped, permissions cannot be regained for the duration of the request.
+     * 
+     * @since 2.5M2
      */
     public void dropPermissions()
     {

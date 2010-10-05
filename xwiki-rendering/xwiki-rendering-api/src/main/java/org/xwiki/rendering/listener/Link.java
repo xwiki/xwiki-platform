@@ -26,7 +26,7 @@ import java.util.Map;
 
 /**
  * Represents a reference to a link. Note that this representation is independent of any wiki syntax.
- *
+ * 
  * @version $Id$
  * @since 1.5M2
  */
@@ -51,7 +51,7 @@ public class Link implements Cloneable
     private LinkType type;
 
     /**
-     * @see #getParameter(String) 
+     * @see #getParameter(String)
      */
     private Map<String, String> parameters = new HashMap<String, String>();
 
@@ -119,19 +119,27 @@ public class Link implements Cloneable
     }
 
     /**
+     * @param parameters see {@link #getParameters()}
+     */
+    public void setParameters(Map<String, String> parameters)
+    {
+        this.parameters.putAll(parameters);
+    }
+
+    /**
      * @param name see {@link #getParameter(String)}
      */
     public void removeParameter(String name)
     {
         this.parameters.remove(name);
     }
+
     /**
      * In order for Link references to be extensible we allow for extra parameters in addition to the link reference.
      * For example this is used in Document Links for storing the query string and anchor information, and in InterWiki
-     * Links to store the InterWiki Alias. Note that supported parameters depend on the Renderer that will be used
-     * (i.e. it depends on the target Syntax). For example the XWiki Syntax 2.1 only supports "queryString" and
-     * "anchor".
-     *
+     * Links to store the InterWiki Alias. Note that supported parameters depend on the Renderer that will be used (i.e.
+     * it depends on the target Syntax). For example the XWiki Syntax 2.1 only supports "queryString" and "anchor".
+     * 
      * @param name the name of the parameter to get
      * @return the parameter value or null if no such parameter exist
      */
@@ -149,9 +157,11 @@ public class Link implements Cloneable
     }
 
     /**
-     * {@inheritDoc} <p> The output is syntax independent since this class is used for all syntaxes. Specific syntaxes
-     * should extend this class and override this method to perform syntax-dependent formatting.
-     *
+     * {@inheritDoc}
+     * <p>
+     * The output is syntax independent since this class is used for all syntaxes. Specific syntaxes should extend this
+     * class and override this method to perform syntax-dependent formatting.
+     * 
      * @see java.lang.Object#toString()
      */
     @Override
@@ -185,7 +195,7 @@ public class Link implements Cloneable
 
     /**
      * {@inheritDoc}
-     *
+     * 
      * @see Object#clone()
      */
     @Override

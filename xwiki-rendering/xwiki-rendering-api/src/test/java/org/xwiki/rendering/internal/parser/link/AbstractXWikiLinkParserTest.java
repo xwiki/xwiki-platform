@@ -25,13 +25,16 @@ import org.xwiki.rendering.listener.LinkType;
 import org.xwiki.rendering.parser.LinkParser;
 import org.xwiki.test.AbstractComponentTestCase;
 
+/**
+ * Common tests for {@link org.xwiki.rendering.parser.LinkParser} implementations for XWiki Syntax 2.0 and 2.1.
+ * 
+ * @version $Id$
+ * @since 2.5M2
+ */
 public abstract class AbstractXWikiLinkParserTest extends AbstractComponentTestCase
 {
     protected LinkParser parser;
 
-    /**
-     * Tests common to XWiki Syntax 2.0 and 2.1
-     */
     @Test
     public void testParseLinksWhenInWikiModeCommon() throws Exception
     {

@@ -17,22 +17,30 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.rendering.internal.parser;
+package org.xwiki.rendering.internal.parser.image;
 
 import org.xwiki.component.annotation.Component;
+import org.xwiki.component.annotation.Requirement;
 import org.xwiki.rendering.listener.Attachment;
-import org.xwiki.rendering.listener.DefaultAttachment;
+import org.xwiki.rendering.parser.AttachmentParser;
 
 /**
- * Since we need to have wiki syntax-specific image parsers, this generic parser supports external images and
- * images located in the attachment of the current page, while waiting for specialized image parsers to be written.
+ * Parses XWiki image definitions, using either a URL (pointing to an image or the following format:
+ * <code>wiki:Space.Page@attachmentName</code> where <code>imageName</code> is the name of the image attachment (for
+ * example "my.png").
  * 
  * @version $Id$
  * @since 1.7M3
  */
-@Component
-public class GenericImageParser extends AbstractImageParser
+@Component("xwiki/2.0")
+public class XWikiImageParser extends AbstractImageParser
 {
+    /**
+     * Used to parse the attachment syntax to extract document name and attachment name.
+     */
+    @Requirement
+    private AttachmentParser attachmentParser;
+
     /**
      * {@inheritDoc}
      * 
@@ -41,6 +49,6 @@ public class GenericImageParser extends AbstractImageParser
     @Override
     protected Attachment parseAttachment(String attachment)
     {
-        return new DefaultAttachment(null, attachment);
+        return this.attachmentParser.parse(attachment);
     }
 }

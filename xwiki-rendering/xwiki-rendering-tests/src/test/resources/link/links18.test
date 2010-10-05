@@ -23,7 +23,7 @@ endDocument
 .#-----------------------------------------------------
 .expect|annotatedxhtml/1.0
 .#-----------------------------------------------------
-<p><!--startwikilink:--><span class="wikilink"><a href="#"><span class="wikigeneratedlinkcontent"></span></a></span><!--stopwikilink--></p>
+<p><!--startwikilink:false|-|doc|-|--><span class="wikilink"><a href="#"><span class="wikigeneratedlinkcontent"></span></a></span><!--stopwikilink--></p>
 .#-----------------------------------------------------
 .expect|xwiki/2.0
 .#-----------------------------------------------------
@@ -31,4 +31,4 @@ endDocument
 .#-----------------------------------------------------
 .input|xhtml/1.0
 .#-----------------------------------------------------
-<html><p><!--startwikilink:--><span class="wikilink"><a href="#"><span class="wikigeneratedlinkcontent"></span></a></span><!--stopwikilink--></p></html>
+<p><!--startwikilink:false|-|doc|-|--><span class="wikilink"><a href="#"><span class="wikigeneratedlinkcontent"></span></a></span><!--stopwikilink--></p>

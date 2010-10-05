@@ -136,14 +136,14 @@ public class DocumentXHTMLLinkTypeRenderer extends AbstractXHTMLLinkTypeRenderer
         } else if (this.wikiModel.isDocumentAvailable(link.getReference())) {
             spanAttributes.put(CLASS, WIKILINK);
             anchorAttributes.put(XHTMLLinkRenderer.HREF, this.wikiModel.getDocumentViewURL(link.getReference(),
-                (String) link.getParameter(DocumentLink.ANCHOR),
-                (String) link.getParameter(DocumentLink.QUERY_STRING)));
+                link.getParameter(DocumentLink.ANCHOR),
+                link.getParameter(DocumentLink.QUERY_STRING)));
         } else {
             // The wiki document doesn't exist
             spanAttributes.put(CLASS, "wikicreatelink");
             anchorAttributes.put(XHTMLLinkRenderer.HREF, this.wikiModel.getDocumentEditURL(link.getReference(),
-                (String) link.getParameter(DocumentLink.ANCHOR),
-                (String) link.getParameter(DocumentLink.QUERY_STRING)));
+                link.getParameter(DocumentLink.ANCHOR),
+                link.getParameter(DocumentLink.QUERY_STRING)));
         }
 
         getXHTMLWikiPrinter().printXMLStartElement(SPAN, spanAttributes);
@@ -160,13 +160,13 @@ public class DocumentXHTMLLinkTypeRenderer extends AbstractXHTMLLinkTypeRenderer
         spanAttributes.put(CLASS, WIKILINK);
 
         StringBuilder buffer = new StringBuilder();
-        String queryString = (String) link.getParameter(DocumentLink.QUERY_STRING);
+        String queryString = link.getParameter(DocumentLink.QUERY_STRING);
         if (queryString != null) {
             buffer.append('?');
             buffer.append(queryString);
         }
         buffer.append('#');
-        String anchor = (String) link.getParameter(DocumentLink.ANCHOR);
+        String anchor = link.getParameter(DocumentLink.ANCHOR);
         if (anchor != null) {
             buffer.append(anchor);
         }

@@ -24,9 +24,13 @@ import org.wikimodel.wem.xwiki.xwiki21.XWikiParser;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.Requirement;
 import org.xwiki.rendering.internal.parser.wikimodel.AbstractWikiModelParser;
+import org.xwiki.rendering.internal.parser.wikimodel.XWikiGeneratorListener;
+import org.xwiki.rendering.internal.parser.wikimodel.xwiki.XWiki21XWikiGeneratorListener;
+import org.xwiki.rendering.listener.Listener;
 import org.xwiki.rendering.parser.ImageParser;
 import org.xwiki.rendering.parser.LinkParser;
 import org.xwiki.rendering.syntax.Syntax;
+import org.xwiki.rendering.util.IdGenerator;
 
 /**
  * Parses XWiki Syntax 2.1.
@@ -91,5 +95,17 @@ public class WikiModelXWiki21Parser extends AbstractWikiModelParser
     public LinkParser getLinkParser()
     {
         return this.linkParser;
+    }
+
+    /**
+     * {@inheritDoc}
+     *
+     * @see AbstractWikiModelParser#createXWikiGeneratorListener(Listener, IdGenerator)
+     */
+    @Override
+    public XWikiGeneratorListener createXWikiGeneratorListener(Listener listener, IdGenerator idGenerator)
+    {
+        return new XWiki21XWikiGeneratorListener(getLinkLabelParser(), listener, getLinkParser(), getImageParser(),
+            this.plainRendererFactory, idGenerator);
     }
 }

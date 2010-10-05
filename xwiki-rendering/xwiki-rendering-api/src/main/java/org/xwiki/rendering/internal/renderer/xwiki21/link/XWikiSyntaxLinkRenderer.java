@@ -57,16 +57,18 @@ public class XWikiSyntaxLinkRenderer extends org.xwiki.rendering.internal.render
     {
         // Print the Query String and Anchor as parameters if they're defined and if the link is a link to a document.
         boolean shouldPrintSeparator = true;
-        if (link.getType() == LinkType.DOCUMENT) {
+
+        // The XWiki Syntax 2.1 supports two special Link reference parameters: queryString and anchor.
+        if (link.getType().equals(LinkType.DOCUMENT)) {
             // Print first the query string
-            String queryString = (String) link.getParameter(DocumentLink.QUERY_STRING);
+            String queryString = link.getParameter(DocumentLink.QUERY_STRING);
             if (!StringUtils.isEmpty(queryString)) {
                 printer.print(PARAMETER_SEPARATOR);
                 printer.print(this.parametersPrinter.print("queryString", queryString, '~'));
                 shouldPrintSeparator = false;
             }
             // Then print the anchor
-            String anchor = (String) link.getParameter(DocumentLink.ANCHOR);
+            String anchor = link.getParameter(DocumentLink.ANCHOR);
             if (!StringUtils.isEmpty(anchor)) {
                 if (shouldPrintSeparator) {
                     printer.print(PARAMETER_SEPARATOR);
@@ -78,6 +80,7 @@ public class XWikiSyntaxLinkRenderer extends org.xwiki.rendering.internal.render
             }
         }
 
+        // Add all Link parameters but only if there isn't a Link Reference parameter of the same name...
         if (!parameters.isEmpty()) {
             if (shouldPrintSeparator) {
                 printer.print(PARAMETER_SEPARATOR);

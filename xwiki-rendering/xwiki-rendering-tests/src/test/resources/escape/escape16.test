@@ -21,6 +21,10 @@ onImage: [--] [true]
 endParagraph
 endDocument
 .#-----------------------------------------------------
+.expect|annotatedxhtml/1.0
+.#-----------------------------------------------------
+<!--startmacro:macro|-||-|-\-\--><!--stopmacro--><p><!--startwikilink:false|-|url|-|reference--><span class="wikiexternallink"><a href="reference">--</a></span><!--stopwikilink--><br/><!--startimage:-\-\--><img src="--" class="wikimodel-freestanding" alt="--"/><!--stopimage--></p>
+.#-----------------------------------------------------
 .expect|xhtml/1.0
 .#-----------------------------------------------------
 <p><span class="wikiexternallink"><a href="reference">--</a></span><br/><img src="--" class="wikimodel-freestanding" alt="--"/></p>
@@ -36,4 +40,4 @@ image:--
 .#-----------------------------------------------------
 .input|xhtml/1.0
 .#-----------------------------------------------------
-<!--startmacro:macro|-||-|-\-\--><!--stopmacro--><p><!--startwikilink:reference--><span class="wikiexternallink"><a href="reference">--</a></span><!--stopwikilink--><br/><!--startimage:-\-\--><img src="--" class="wikimodel-freestanding" alt="--"/><!--stopimage--></p>
+<!--startmacro:macro|-||-|-\-\--><!--stopmacro--><p><!--startwikilink:false|-|url|-|reference--><span class="wikiexternallink"><a href="reference">--</a></span><!--stopwikilink--><br/><!--startimage:-\-\--><img src="--" class="wikimodel-freestanding" alt="--"/><!--stopimage--></p>

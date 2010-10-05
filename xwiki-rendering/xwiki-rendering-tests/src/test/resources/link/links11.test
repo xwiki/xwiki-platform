@@ -5,7 +5,7 @@
 .#-------------------------------------------------------------------------------------------
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
-<html><head /><body><!--startwikilink:http://www.xwiki.org--><span class="wikiexternallink"><a href="http://www.xwiki.org">label</a></span><!--stopwikilink--></body></html>
+<html><head /><body><!--startwikilink:false|-|url|-|http://www.xwiki.org--><span class="wikiexternallink"><a href="http://www.xwiki.org">label</a></span><!--stopwikilink--></body></html>
 .#-----------------------------------------------------
 .expect|event/1.0
 .#-----------------------------------------------------

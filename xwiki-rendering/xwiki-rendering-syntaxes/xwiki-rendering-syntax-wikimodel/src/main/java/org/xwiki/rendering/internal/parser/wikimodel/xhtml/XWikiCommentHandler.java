@@ -21,17 +21,18 @@ package org.xwiki.rendering.internal.parser.wikimodel.xhtml;
 
 import java.util.Stack;
 
+import org.apache.commons.lang.StringUtils;
 import org.wikimodel.wem.WikiParameter;
 import org.wikimodel.wem.WikiParameters;
 import org.wikimodel.wem.WikiReference;
 import org.wikimodel.wem.xhtml.handler.CommentHandler;
 import org.wikimodel.wem.xhtml.impl.XhtmlHandler.TagStack;
+import org.xwiki.rendering.internal.parser.WikiModelXHTMLParser;
 import org.xwiki.rendering.internal.parser.wikimodel.XWikiGeneratorListener;
 import org.xwiki.rendering.listener.Image;
+import org.xwiki.rendering.listener.LinkType;
 import org.xwiki.rendering.listener.Listener;
 import org.xwiki.rendering.parser.ImageParser;
-import org.xwiki.rendering.parser.LinkParser;
-import org.xwiki.rendering.parser.StreamParser;
 import org.xwiki.rendering.renderer.PrintRenderer;
 import org.xwiki.rendering.renderer.PrintRendererFactory;
 import org.xwiki.rendering.renderer.printer.DefaultWikiPrinter;
@@ -47,15 +48,16 @@ import org.xwiki.xml.XMLUtils;
  */
 public class XWikiCommentHandler extends CommentHandler
 {
-    private StreamParser parser;
+    /**
+     * Character to separate data in XHTML comments.
+     */
+    private static final String COMMENT_SEPARATOR = "|-|";
 
-    private LinkParser linkParser;
+    private WikiModelXHTMLParser parser;
 
     private ImageParser imageParser;
 
     private PrintRendererFactory xwikiSyntaxPrintRendererFactory;
-
-    private PrintRendererFactory plainRendererFactory;
 
     /**
      * We're using a stack so that we can have nested comment handling. For example when we have a link to an image we
@@ -68,14 +70,12 @@ public class XWikiCommentHandler extends CommentHandler
      * @todo Remove the need to pass a Parser when WikiModel implements support for wiki syntax in links. See
      *       http://code.google.com/p/wikimodel/issues/detail?id=87
      */
-    public XWikiCommentHandler(StreamParser parser, LinkParser linkParser, ImageParser imageParser,
-        PrintRendererFactory xwikiSyntaxPrintRendererFactory, PrintRendererFactory plainRendererFactory)
+    public XWikiCommentHandler(WikiModelXHTMLParser parser, ImageParser imageParser,
+        PrintRendererFactory xwikiSyntaxPrintRendererFactory)
     {
         this.parser = parser;
-        this.linkParser = linkParser;
         this.xwikiSyntaxPrintRendererFactory = xwikiSyntaxPrintRendererFactory;
         this.imageParser = imageParser;
-        this.plainRendererFactory = plainRendererFactory;
     }
 
     @Override
@@ -105,15 +105,14 @@ public class XWikiCommentHandler extends CommentHandler
     private void handleLinkCommentStart(String content, TagStack stack)
     {
         // Since wikimodel does not support wiki syntax in link labels we need to pass the link label "as is" (as it
-        // originally appears in the parsed source) and handle it specially in the
-        // XDOMGeneratorListener.createLinkBlock(), with the parser passed as the first parameter in the
-        // XDOMGeneratorListener constructor.
+        // originally appears in the parsed source) and handle it specially in DefaultXWikiGeneratorListener, with the
+        // parser passed as the first parameter in the DefaultXWikiGeneratorListener constructor.
         // Since we cannot get this label as it originally appeared in the HTML source ( we are doing a SAX-like
         // parsing), we should render the XDOM as HTML to get an HTML label.
-        // Since any syntax would do it, as long as this renderer matches the corresponding XDOMGeneratorListener
+        // Since any syntax would do it, as long as this renderer matches the corresponding DefaultXWikiGeneratorListener
         // parser, we use an xwiki 2.1 renderer for it is less complex (no context needed to render xwiki 2.1, no url
         // resolution needed, no reference validity tests).
-        // see XDOMGeneratorListener#XDOMGeneratorListener(Parser, LinkParser, ImageParser)
+        // see DefaultXWikiGeneratorListener#DefaultXWikiGeneratorListener(Parser, LinkParser, ImageParser)
         // see WikiModelXHTMLParser#getLinkLabelParser()
         // see http://code.google.com/p/wikimodel/issues/detail?id=87
         // TODO: remove this workaround when wiki syntax in link labels will be supported by wikimodel
@@ -123,9 +122,7 @@ public class XWikiCommentHandler extends CommentHandler
         // Make sure to flush whatever the renderer implementation
         linkLabelRenderer.beginDocument(Listener.EMPTY_PARAMETERS);
 
-        XWikiGeneratorListener xwikiListener =
-                new XWikiGeneratorListener(this.parser, linkLabelRenderer, this.linkParser, this.imageParser,
-                    this.plainRendererFactory, null);
+        XWikiGeneratorListener xwikiListener = this.parser.createXWikiGeneratorListener(linkLabelRenderer, null);
 
         stack.pushStackParameter("linkListener", xwikiListener);
 
@@ -145,18 +142,32 @@ public class XWikiCommentHandler extends CommentHandler
         linkLabelRenderer.endDocument(Listener.EMPTY_PARAMETERS);
 
         boolean isFreeStandingLink = (Boolean) stack.getStackParameter("isFreeStandingLink");
+
+        // Format of a link definition in comment:
+        // <!--startwikilink:(isTyped)|-|(type)|-|(reference)|-|(parameters: key="value")-->
         String linkComment = this.commentContentStack.pop();
-        if (isFreeStandingLink) {
-            stack.getScannerContext().onReference(linkComment);
-        } else {
-            String label = linkLabelRenderer.getPrinter().toString();
-            String reference = linkComment;
-            WikiParameters params = (WikiParameters) stack.getStackParameter("linkParameters");
 
-            WikiReference wikiReference = new WikiReference(reference, label, params);
-
-            stack.getScannerContext().onReference(wikiReference);
+        String[] tokens = StringUtils.splitByWholeSeparatorPreserveAllTokens(linkComment, COMMENT_SEPARATOR);
+        boolean isTyped = tokens[0].equalsIgnoreCase("true") ? true : false;
+        LinkType type = new LinkType(tokens[1]);
+        String reference = tokens[2];
+        WikiParameters linkParams = WikiParameters.EMPTY;
+        WikiParameters referenceParams = WikiParameters.EMPTY;
+        if (tokens.length == 4) {
+            referenceParams = WikiParameters.newWikiParameters(tokens[3]);
         }
+
+        String label = null;
+        if (!isFreeStandingLink) {
+            label = linkLabelRenderer.getPrinter().toString();
+
+            // Add the Link reference parameters to the link parameters.
+            linkParams = (WikiParameters) stack.getStackParameter("linkParameters");
+        }
+
+        WikiReference wikiReference =
+            new XWikiWikiReference(isTyped, type, reference, label, referenceParams, linkParams, isFreeStandingLink);
+        stack.getScannerContext().onReference(wikiReference);
 
         stack.popStackParameter("isInLink");
         stack.popStackParameter("isFreeStandingLink");

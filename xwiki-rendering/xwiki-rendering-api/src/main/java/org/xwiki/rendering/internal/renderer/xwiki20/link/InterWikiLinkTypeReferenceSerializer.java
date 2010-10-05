@@ -70,7 +70,7 @@ public class InterWikiLinkTypeReferenceSerializer implements LinkTypeReferenceSe
      */
     public String serialize(Link link)
     {
-        String interWikiAlias = (String) link.getParameter(InterWikiLink.INTERWIKI_ALIAS);
+        String interWikiAlias = link.getParameter(InterWikiLink.INTERWIKI_ALIAS);
         String result = addEscapesToReferencePart(link.getReference());
         if (interWikiAlias != null) {
             result = addEscapesToReferencePart(link.getReference()) + XWiki20LinkParser.SEPARATOR_INTERWIKI

@@ -45,7 +45,7 @@ public class InterWikiLinkTypeReferenceSerializer implements LinkTypeReferenceSe
         StringBuffer result = new StringBuffer();
         result.append(link.getType().getScheme());
         result.append(LinkParser.TYPE_SEPARATOR);
-        String interWikiAlias = (String) link.getParameter(InterWikiLink.INTERWIKI_ALIAS);
+        String interWikiAlias = link.getParameter(InterWikiLink.INTERWIKI_ALIAS);
         if (interWikiAlias != null) {
             result.append(interWikiAlias);
             result.append(InterWikiLinkTypeParser.INTERWIKI_ALIAS_SEPARATOR);

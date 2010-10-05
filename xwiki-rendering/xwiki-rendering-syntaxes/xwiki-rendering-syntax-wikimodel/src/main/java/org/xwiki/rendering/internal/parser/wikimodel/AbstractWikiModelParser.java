@@ -41,7 +41,7 @@ import org.xwiki.rendering.util.IdGenerator;
  * @version $Id$
  * @since 1.5M2
  */
-public abstract class AbstractWikiModelParser extends AbstractLogEnabled implements Parser, StreamParser
+public abstract class AbstractWikiModelParser extends AbstractLogEnabled implements Parser, WikiModelStreamParser
 {
     /**
      * Used by the XWiki Generator Listener to generate unique header ids.
@@ -115,6 +115,17 @@ public abstract class AbstractWikiModelParser extends AbstractLogEnabled impleme
     }
 
     /**
+     * {@inheritDoc}
+     *
+     * @see WikiModelStreamParser#createXWikiGeneratorListener(Listener, IdGenerator)
+     */
+    public XWikiGeneratorListener createXWikiGeneratorListener(Listener listener, IdGenerator idGenerator)
+    {
+        return new DefaultXWikiGeneratorListener(getLinkLabelParser(), listener, getLinkParser(), getImageParser(),
+            this.plainRendererFactory, idGenerator);
+    }
+
+    /**
      * @param source the content to parse
      * @param listener receive event for each element
      * @param idGenerator unique id tool generator
@@ -124,14 +135,9 @@ public abstract class AbstractWikiModelParser extends AbstractLogEnabled impleme
      */
     private void parse(Reader source, Listener listener, IdGenerator idGenerator) throws ParseException
     {
-        // We pass the LinkParser corresponding to the syntax.
-        XWikiGeneratorListener wikimodelListener =
-                new XWikiGeneratorListener(getLinkLabelParser(), listener, getLinkParser(), getImageParser(),
-                    this.plainRendererFactory, idGenerator);
-
         IWikiParser parser = createWikiModelParser();
         try {
-            parser.parse(source, wikimodelListener);
+            parser.parse(source, createXWikiGeneratorListener(listener, idGenerator));
         } catch (Exception e) {
             throw new ParseException("Failed to parse input source", e);
         }

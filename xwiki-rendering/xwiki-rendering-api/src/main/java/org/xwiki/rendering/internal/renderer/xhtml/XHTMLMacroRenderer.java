@@ -32,6 +32,9 @@ import org.xwiki.rendering.renderer.printer.XHTMLWikiPrinter;
  */
 public class XHTMLMacroRenderer
 {
+    /**
+     * Character to separate Macro name, content and parameters in XHTML comments.
+     */
     private static final String COMMENT_SEPARATOR = "|-|";
 
     private ParametersPrinter parametersPrinter = new ParametersPrinter();

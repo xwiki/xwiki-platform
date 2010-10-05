@@ -33,7 +33,7 @@ endDocument
 .#-----------------------------------------------------
 .expect|annotatedxhtml/1.0
 .#-----------------------------------------------------
-<p><!--startwikilink:Page--><span class="wikicreatelink"><a href="editurl"><strong>hello</strong></a></span><!--stopwikilink--><br/><!--startwikilink:Page--><span class="wikicreatelink"><a href="editurl">= notheader</a></span><!--stopwikilink--><br/><!--startwikilink:Page--><span class="wikicreatelink"><a href="editurl"><!--startmacro:testsimplemacro|-||-|label--><!--stopmacro--></a></span><!--stopwikilink--></p>
+<p><!--startwikilink:false|-|doc|-|Page--><span class="wikicreatelink"><a href="editurl"><strong>hello</strong></a></span><!--stopwikilink--><br/><!--startwikilink:false|-|doc|-|Page--><span class="wikicreatelink"><a href="editurl">= notheader</a></span><!--stopwikilink--><br/><!--startwikilink:false|-|doc|-|Page--><span class="wikicreatelink"><a href="editurl"><!--startmacro:testsimplemacro|-||-|label--><!--stopmacro--></a></span><!--stopwikilink--></p>
 .#-----------------------------------------------------
 .expect|xwiki/2.0
 .#-----------------------------------------------------
@@ -43,4 +43,4 @@ endDocument
 .#-----------------------------------------------------
 .input|xhtml/1.0
 .#-----------------------------------------------------
-<p><!--startwikilink:Page--><span class="wikicreatelink"><a href="editurl"><strong>hello</strong></a></span><!--stopwikilink--><br/><!--startwikilink:Page--><span class="wikicreatelink"><a href="editurl">= notheader</a></span><!--stopwikilink--><br/><!--startwikilink:Page--><span class="wikicreatelink"><a href="editurl"><!--startmacro:testsimplemacro|-||-|label--><!--stopmacro--></a></span><!--stopwikilink--></p>
+<p><!--startwikilink:false|-|doc|-|Page--><span class="wikicreatelink"><a href="editurl"><strong>hello</strong></a></span><!--stopwikilink--><br/><!--startwikilink:false|-|doc|-|Page--><span class="wikicreatelink"><a href="editurl">= notheader</a></span><!--stopwikilink--><br/><!--startwikilink:false|-|doc|-|Page--><span class="wikicreatelink"><a href="editurl"><!--startmacro:testsimplemacro|-||-|label--><!--stopmacro--></a></span><!--stopwikilink--></p>

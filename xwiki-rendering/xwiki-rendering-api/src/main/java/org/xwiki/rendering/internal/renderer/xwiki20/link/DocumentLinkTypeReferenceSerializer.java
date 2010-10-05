@@ -87,12 +87,12 @@ public class DocumentLinkTypeReferenceSerializer implements LinkTypeReferenceSer
             buffer.append(normalizedReference);
         }
 
-        String anchor = (String) link.getParameter(DocumentLink.ANCHOR);
+        String anchor = link.getParameter(DocumentLink.ANCHOR);
         if (anchor != null) {
             buffer.append('#');
             buffer.append(addEscapesToExtraParts(anchor));
         }
-        String queryString = (String) link.getParameter(DocumentLink.QUERY_STRING);
+        String queryString = link.getParameter(DocumentLink.QUERY_STRING);
         if (queryString != null) {
             buffer.append('?');
             buffer.append(addEscapesToExtraParts(queryString));

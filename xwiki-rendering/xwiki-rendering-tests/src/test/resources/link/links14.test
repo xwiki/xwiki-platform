@@ -20,7 +20,7 @@ endDocument
 .#-----------------------------------------------------
 .expect|annotatedxhtml/1.0
 .#-----------------------------------------------------
-<p><!--startwikilink:http://xwiki.org--><span class="wikiexternallink"><a param="value" href="http://xwiki.org"><!--startimage:attach.png--><img src="attachmenturl" height="100" width="100" alt="attach.png"/><!--stopimage--></a></span><!--stopwikilink--></p>
+<p><!--startwikilink:false|-|url|-|http://xwiki.org--><span class="wikiexternallink"><a param="value" href="http://xwiki.org"><!--startimage:attach.png--><img src="attachmenturl" height="100" width="100" alt="attach.png"/><!--stopimage--></a></span><!--stopwikilink--></p>
 .#-----------------------------------------------------
 .expect|xwiki/2.0
 .#-----------------------------------------------------
@@ -28,4 +28,4 @@ endDocument
 .#-----------------------------------------------------
 .input|xhtml/1.0
 .#-----------------------------------------------------
-<html><p><!--startwikilink:http://xwiki.org--><span class="wikiexternallink"><a param="value" href="http://xwiki.org"><!--startimage:attach.png--><img src="attachmenturl" height="100" width="100" alt="attach.png"/><!--stopimage--></a></span><!--stopwikilink--></p></html>
+<p><!--startwikilink:false|-|url|-|http://xwiki.org--><span class="wikiexternallink"><a param="value" href="http://xwiki.org"><!--startimage:attach.png--><img src="attachmenturl" height="100" width="100" alt="attach.png"/><!--stopimage--></a></span><!--stopwikilink--></p>

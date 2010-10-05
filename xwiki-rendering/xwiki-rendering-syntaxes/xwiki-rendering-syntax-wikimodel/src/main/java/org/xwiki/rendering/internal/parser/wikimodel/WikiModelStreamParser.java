@@ -19,19 +19,22 @@
  */
 package org.xwiki.rendering.internal.parser.wikimodel;
 
-import org.wikimodel.wem.IWemListener;
 import org.xwiki.rendering.listener.Listener;
+import org.xwiki.rendering.parser.StreamParser;
+import org.xwiki.rendering.util.IdGenerator;
 
 /**
- * Bridge between WikiModel and XWiki: translates WikiModel events into XWiki events.
- *
+ * Adds the ability to create a corresponding XWiki Generator Listener over {@link StreamParser}.
+ *  
  * @version $Id$
  * @since 2.5RC1
  */
-public interface XWikiGeneratorListener extends IWemListener
+public interface WikiModelStreamParser extends StreamParser
 {
     /**
-     * @return the XWiki listener to which to forward the events to
+     * @param listener the XWiki listener to which to forward WikiModel events
+     * @param idGenerator unique id tool generator
+     * @return the XWiki Generator Listener instance corresponding to the parser (they need to be in sync)
      */
-    Listener getListener();
+    XWikiGeneratorListener createXWikiGeneratorListener(Listener listener, IdGenerator idGenerator);
 }

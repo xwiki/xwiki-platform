@@ -53,7 +53,7 @@ public class Link implements Cloneable
     /**
      * @see #getParameter(String) 
      */
-    private Map<String, Object> parameters = new HashMap<String, Object>();
+    private Map<String, String> parameters = new HashMap<String, String>();
 
     /**
      * @param isTyped see {@link #isTyped()}
@@ -113,7 +113,7 @@ public class Link implements Cloneable
      * @param name see {@link #getParameter(String)}
      * @param value see {@link #getParameter(String)}
      */
-    public void setParameter(String name, Object value)
+    public void setParameter(String name, String value)
     {
         this.parameters.put(name, value);
     }
@@ -128,12 +128,14 @@ public class Link implements Cloneable
     /**
      * In order for Link references to be extensible we allow for extra parameters in addition to the link reference.
      * For example this is used in Document Links for storing the query string and anchor information, and in InterWiki
-     * Links to store the InterWiki Alias.
+     * Links to store the InterWiki Alias. Note that supported parameters depend on the Renderer that will be used
+     * (i.e. it depends on the target Syntax). For example the XWiki Syntax 2.1 only supports "queryString" and
+     * "anchor".
      *
      * @param name the name of the parameter to get
      * @return the parameter value or null if no such parameter exist
      */
-    public Object getParameter(String name)
+    public String getParameter(String name)
     {
         return this.parameters.get(name);
     }
@@ -141,7 +143,7 @@ public class Link implements Cloneable
     /**
      * @return the collections of parameters, see {@link #getParameter(String)}
      */
-    public Map<String, Object> getParameters()
+    public Map<String, String> getParameters()
     {
         return Collections.unmodifiableMap(this.parameters);
     }
@@ -163,13 +165,13 @@ public class Link implements Cloneable
             sb.append(" ");
             sb.append("Reference = [").append(getReference()).append("]");
         }
-        Map<String, Object> params = getParameters();
+        Map<String, String> params = getParameters();
         if (!params.isEmpty()) {
             sb.append(" ");
             sb.append("Parameters = [");
-            Iterator<Map.Entry<String, Object>> it = params.entrySet().iterator();
+            Iterator<Map.Entry<String, String>> it = params.entrySet().iterator();
             while (it.hasNext()) {
-                Map.Entry<String, Object> entry = it.next();
+                Map.Entry<String, String> entry = it.next();
                 sb.append("[").append(entry.getKey()).append("] = [").append(entry.getValue()).append("]");
                 if (it.hasNext()) {
                     sb.append(", ");

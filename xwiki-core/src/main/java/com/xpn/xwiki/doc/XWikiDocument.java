@@ -4480,11 +4480,11 @@ public class XWikiDocument implements DocumentModelBridge
 
                 for (LinkBlock linkBlock : linkBlocks) {
                     org.xwiki.rendering.listener.Link link = linkBlock.getLink();
-                    if (link.getType() == LinkType.DOCUMENT) {
+                    if (link.getType().equals(LinkType.DOCUMENT)) {
                         // If the reference is empty, the link is an autolink
                         if (!StringUtils.isEmpty(link.getReference())
-                            || (StringUtils.isEmpty((String) link.getParameter(DocumentLink.ANCHOR))
-                            && StringUtils.isEmpty((String) link.getParameter(DocumentLink.QUERY_STRING)))) {
+                            || (StringUtils.isEmpty(link.getParameter(DocumentLink.ANCHOR))
+                            && StringUtils.isEmpty(link.getParameter(DocumentLink.QUERY_STRING)))) {
                             // The reference may not have the space or even document specified (in case of an empty
                             // string)
                             // Thus we need to find the fully qualified document name
@@ -5714,7 +5714,7 @@ public class XWikiDocument implements DocumentModelBridge
 
             for (LinkBlock linkBlock : linkBlockList) {
                 org.xwiki.rendering.listener.Link link = linkBlock.getLink();
-                if (link.getType() == LinkType.DOCUMENT) {
+                if (link.getType().equals(LinkType.DOCUMENT)) {
                     DocumentReference documentReference =
                         this.currentDocumentReferenceResolver.resolve(link.getReference());
 

@@ -51,7 +51,7 @@ public class DocumentLink extends Link
      */
     public String getQueryString()
     {
-        return (String) getParameter(QUERY_STRING);
+        return getParameter(QUERY_STRING);
     }
 
     /**
@@ -69,7 +69,7 @@ public class DocumentLink extends Link
      */
     public String getAnchor()
     {
-        return (String) getParameter(ANCHOR);
+        return getParameter(ANCHOR);
     }
 
     /**

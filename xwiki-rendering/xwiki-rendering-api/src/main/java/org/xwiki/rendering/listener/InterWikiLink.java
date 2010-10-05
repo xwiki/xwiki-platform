@@ -60,6 +60,6 @@ public class InterWikiLink extends Link
      */
     public String getInterWikiAlias()
     {
-        return (String) getParameter(INTERWIKI_ALIAS);
+        return getParameter(INTERWIKI_ALIAS);
     }
 }

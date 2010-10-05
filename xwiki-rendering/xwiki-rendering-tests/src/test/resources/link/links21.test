@@ -8,14 +8,24 @@
 .#-----------------------------------------------------
 [[label>>||anchor="name"]]
 .#-----------------------------------------------------
+.expect|event/1.0
+.#-----------------------------------------------------
+beginDocument
+beginParagraph
+beginLink [Typed = [false] Type = [doc] Reference = [] Parameters = [[anchor] = [name]]] [false]
+onWord [label]
+endLink [Typed = [false] Type = [doc] Reference = [] Parameters = [[anchor] = [name]]] [false]
+endParagraph
+endDocument
+.#-----------------------------------------------------
 .expect|xhtml/1.0
 .#-----------------------------------------------------
 <p><span class="wikilink"><a href="#name">label</a></span></p>
 .#-----------------------------------------------------
 .expect|annotatedxhtml/1.0
 .#-----------------------------------------------------
-<p><!--startwikilink:--><span class="wikilink"><a href="#name">label</a></span><!--stopwikilink--></p>
+<p><!--startwikilink:false|-|doc|-||-|anchor="name"--><span class="wikilink"><a href="#name">label</a></span><!--stopwikilink--></p>
 .#-----------------------------------------------------
 .input|xhtml/1.0
 .#-----------------------------------------------------
-<html><p><!--startwikilink:--><span class="wikilink"><a href="#name">label</a></span><!--stopwikilink--></p></html>
+<p><!--startwikilink:false|-|doc|-||-|anchor="name"--><span class="wikilink"><a href="#name">label</a></span><!--stopwikilink--></p>

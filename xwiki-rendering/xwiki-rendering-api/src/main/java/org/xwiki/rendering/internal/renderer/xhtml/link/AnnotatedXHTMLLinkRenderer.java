@@ -25,6 +25,7 @@ import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.InstantiationStrategy;
 import org.xwiki.component.annotation.Requirement;
 import org.xwiki.component.descriptor.ComponentInstantiationStrategy;
+import org.xwiki.rendering.internal.renderer.ParametersPrinter;
 import org.xwiki.rendering.listener.Link;
 import org.xwiki.rendering.renderer.link.LinkReferenceSerializer;
 import org.xwiki.rendering.renderer.printer.XHTMLWikiPrinter;
@@ -40,6 +41,16 @@ import org.xwiki.rendering.renderer.printer.XHTMLWikiPrinter;
 @InstantiationStrategy(ComponentInstantiationStrategy.PER_LOOKUP)
 public class AnnotatedXHTMLLinkRenderer implements XHTMLLinkRenderer
 {
+    /**
+     * Character to separate Link reference and parameters in XHTML comments.
+     */
+    private static final String COMMENT_SEPARATOR = "|-|";
+
+    /**
+     * Used to print Link Parameters in XHTML comments. 
+     */
+    private ParametersPrinter parametersPrinter = new ParametersPrinter();
+
     /**
      * The default XHTML Link Renderer that we're wrapping.
      */
@@ -83,7 +94,30 @@ public class AnnotatedXHTMLLinkRenderer implements XHTMLLinkRenderer
         // Add an XML comment as a placeholder so that the XHTML parser can find the document name.
         // Otherwise it would be too difficult to transform a URL into a document name especially since
         // a link can refer to an external URL.
-        getXHTMLWikiPrinter().printXMLComment("startwikilink:" + this.linkReferenceSerializer.serialize(link), true);
+        StringBuffer buffer = new StringBuffer("startwikilink:");
+
+        // Print if the Link Reference is typed, the Link Reference Type and the Link Reference itself
+        buffer.append(link.isTyped());
+        buffer.append(COMMENT_SEPARATOR);
+        buffer.append(link.getType().getScheme());
+        buffer.append(COMMENT_SEPARATOR);
+        buffer.append(link.getReference());
+
+        // Print Link Reference parameters. We need to do this so that the XHTML parser doesn't have
+        // to parse the query string to extract the parameters. Doing so could lezd to false result since
+        // for example the XHTML renderer can add a parent parameter in the query string for links to non
+        // existing documents.
+        //
+        // Also note that we don't need to print Link parameters since they are added as XHTML class
+        // attributes by the XHTML Renderer and thus the XHTML parser will be able to get them
+        // agian as attributes.
+        Map<String, String> linkReferenceParameters = link.getParameters();
+        if (!linkReferenceParameters.isEmpty()) {
+            buffer.append(COMMENT_SEPARATOR);
+            buffer.append(this.parametersPrinter.print(linkReferenceParameters, '\\'));
+        }
+
+        getXHTMLWikiPrinter().printXMLComment(buffer.toString(), true);
 
         this.defaultLinkRenderer.beginLink(link, isFreeStandingURI, parameters);
     }

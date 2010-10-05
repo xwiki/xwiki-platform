@@ -116,7 +116,7 @@ public class PlainTextChainingRenderer extends AbstractChainingPrintRenderer
     public void endLink(Link link, boolean isFreeStandingURI, Map<String, String> parameters)
     {
         if (getEmptyBlockState().isCurrentContainerBlockEmpty()) {
-            if (link.getType() == LinkType.DOCUMENT && this.linkLabelGenerator != null) {
+            if (link.getType().equals(LinkType.DOCUMENT) && this.linkLabelGenerator != null) {
                 getPrinter().print(this.linkLabelGenerator.generate(link));
             } else {
                 getPrinter().print(link.getReference());

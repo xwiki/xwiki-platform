@@ -56,7 +56,7 @@
             org/xwiki/rendering/internal/renderer/wikimodel/WikiModelGeneratorListener.java,
             org/xwiki/rendering/internal/renderer/wikimodel/WikiModelPrinterAdapter.java,
             org/xwiki/rendering/internal/parser/WikiModelXHTMLParser.java,
-            org/xwiki/rendering/internal/parser/wikimodel/XWikiGeneratorListener.java,
+            org/xwiki/rendering/internal/parser/wikimodel/DefaultXWikiGeneratorListener.java,
             org/xwiki/rendering/internal/parser/wikimodel/xhtml/XWikiXHTMLWhitespaceXMLFilter.java,
             org/xwiki/rendering/internal/parser/wikimodel/xhtml/XWikiImageTagHandler.java,
             org/xwiki/rendering/internal/parser/wikimodel/xhtml/XWikiReferenceTagHandler.java,
@@ -65,7 +65,8 @@
             org/xwiki/rendering/internal/parser/wikimodel/xhtml/XWikiSpanTagHandler.java,
             org/xwiki/rendering/internal/parser/wikimodel/xhtml/XWikiXMLReaderFactory.java,
             org/xwiki/rendering/internal/parser/wikimodel/WikiModelParserUtils.java,
-            org/xwiki/rendering/internal/parser/WikiModelConfluenceParser.java
+            org/xwiki/rendering/internal/parser/WikiModelConfluenceParser.java,
+            org/xwiki/rendering/internal/parser/wikimodel/xhtml/XWikiWikiReference.java
           </excludes>
         </configuration>
       </plugin>

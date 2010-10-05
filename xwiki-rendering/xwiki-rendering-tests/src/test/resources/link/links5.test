@@ -18,7 +18,7 @@ endDocument
 .#-----------------------------------------------------
 .expect|annotatedxhtml/1.0
 .#-----------------------------------------------------
-<p><!--startwikilink:mailto:john@doe.com?subject=This is a test--><span class="wikiexternallink"><a href="mailto:john@doe.com?subject=This is a test"><span class="wikigeneratedlinkcontent">john@doe.com</span></a></span><!--stopwikilink--></p>
+<p><!--startwikilink:true|-|mailto|-|john@doe.com?subject=This is a test--><span class="wikiexternallink"><a href="mailto:john@doe.com?subject=This is a test"><span class="wikigeneratedlinkcontent">john@doe.com</span></a></span><!--stopwikilink--></p>
 .#-----------------------------------------------------
 .expect|xwiki/2.0
 .#-----------------------------------------------------
@@ -26,4 +26,4 @@ endDocument
 .#-----------------------------------------------------
 .input|xhtml/1.0
 .#-----------------------------------------------------
-<html><p><!--startwikilink:mailto:john@doe.com?subject=This is a test--><span class="wikiexternallink"><a href="mailto:john@doe.com?subject=This is a test"><span class="wikigeneratedlinkcontent">john@doe.com</span></a></span><!--stopwikilink--></p></html>
+<p><!--startwikilink:true|-|mailto|-|john@doe.com?subject=This is a test--><span class="wikiexternallink"><a href="mailto:john@doe.com?subject=This is a test"><span class="wikigeneratedlinkcontent">john@doe.com</span></a></span><!--stopwikilink--></p>

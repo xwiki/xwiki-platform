@@ -198,7 +198,7 @@ public class IncludeMacro extends AbstractMacro<IncludeMacroParameters>
         XDOM xdom = new XDOM(result);
         for (LinkBlock block : xdom.getChildrenByType(LinkBlock.class, true)) {
             Link link = block.getLink();
-            if (link.getType() == LinkType.DOCUMENT) {
+            if (link.getType().equals(LinkType.DOCUMENT)) {
                 // It's a link to a document, make the reference absolute
                 String resolvedReference =
                     this.defaultEntityReferenceSerializer.serialize(this.currentDocumentReferenceResolver.resolve(link

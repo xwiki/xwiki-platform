@@ -19,7 +19,7 @@ endDocument
 .#-----------------------------------------------------
 .expect|annotatedxhtml/1.0
 .#-----------------------------------------------------
-<p><!--startwikilink:Space.UnknownPage--><span class="wikicreatelink"><a href="editurl">label</a></span><!--stopwikilink--></p>
+<p><!--startwikilink:false|-|doc|-|Space.UnknownPage--><span class="wikicreatelink"><a href="editurl">label</a></span><!--stopwikilink--></p>
 .#-----------------------------------------------------
 .expect|xwiki/2.0
 .#-----------------------------------------------------
@@ -27,7 +27,7 @@ endDocument
 .#-----------------------------------------------------
 .input|xhtml/1.0
 .#-----------------------------------------------------
-<p><!--startwikilink:Space.UnknownPage--><span class="wikicreatelink"><a href="editurl">label</a></span><!--stopwikilink--></p>
+<p><!--startwikilink:false|-|doc|-|Space.UnknownPage--><span class="wikicreatelink"><a href="editurl">label</a></span><!--stopwikilink--></p>
 .#-----------------------------------------------------
 .expect|plain/1.0
 .#-----------------------------------------------------

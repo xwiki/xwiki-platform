@@ -29,7 +29,6 @@ import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.rendering.listener.Link;
 import org.xwiki.rendering.renderer.printer.XHTMLWikiPrinter;
-import org.xwiki.rendering.wiki.WikiModel;
 
 /**
  * Default implementation for rendering links as XHTML. The implementation is pluggable in the sense that the

@@ -19,12 +19,8 @@
  */
 package org.xwiki.rendering.internal.parser.wikimodel.xhtml;
 
-import java.net.URI;
-import java.net.URISyntaxException;
 import java.util.Collections;
 
-import org.apache.commons.lang.StringUtils;
-import org.wikimodel.wem.IWemListener;
 import org.wikimodel.wem.WikiParameter;
 import org.wikimodel.wem.WikiParameters;
 import org.wikimodel.wem.WikiReference;
@@ -32,11 +28,10 @@ import org.wikimodel.wem.impl.WikiScannerContext;
 import org.wikimodel.wem.xhtml.handler.ReferenceTagHandler;
 import org.wikimodel.wem.xhtml.impl.XhtmlHandler.TagStack;
 import org.wikimodel.wem.xhtml.impl.XhtmlHandler.TagStack.TagContext;
+import org.xwiki.rendering.internal.parser.WikiModelXHTMLParser;
+import org.xwiki.rendering.internal.parser.wikimodel.DefaultXWikiGeneratorListener;
 import org.xwiki.rendering.internal.parser.wikimodel.XWikiGeneratorListener;
 import org.xwiki.rendering.listener.Listener;
-import org.xwiki.rendering.parser.ImageParser;
-import org.xwiki.rendering.parser.LinkParser;
-import org.xwiki.rendering.parser.StreamParser;
 import org.xwiki.rendering.renderer.PrintRenderer;
 import org.xwiki.rendering.renderer.PrintRendererFactory;
 import org.xwiki.rendering.renderer.printer.DefaultWikiPrinter;
@@ -50,28 +45,19 @@ import org.xwiki.rendering.renderer.printer.DefaultWikiPrinter;
  */
 public class XWikiReferenceTagHandler extends ReferenceTagHandler
 {
-    private StreamParser parser;
-
-    private LinkParser linkParser;
-
-    private ImageParser imageParser;
+    private WikiModelXHTMLParser parser;
 
     private PrintRendererFactory xwikiSyntaxPrintRendererFactory;
-
-    private PrintRendererFactory plainRendererFactory;
 
     /**
      * @since 2.2.5
      * @todo Remove the need to pass a Parser when WikiModel implements support for wiki syntax in links. See
      *       http://code.google.com/p/wikimodel/issues/detail?id=87
      */
-    public XWikiReferenceTagHandler(StreamParser parser, LinkParser linkParser, ImageParser imageParser,
-        PrintRendererFactory xwikiSyntaxPrintRendererFactory, PrintRendererFactory plainRendererFactory)
+    public XWikiReferenceTagHandler(WikiModelXHTMLParser parser, PrintRendererFactory xwikiSyntaxPrintRendererFactory)
     {
-        this.linkParser = linkParser;
+        this.parser = parser;
         this.xwikiSyntaxPrintRendererFactory = xwikiSyntaxPrintRendererFactory;
-        this.imageParser = imageParser;
-        this.plainRendererFactory = plainRendererFactory;
     }
 
     /**
@@ -97,7 +83,8 @@ public class XWikiReferenceTagHandler extends ReferenceTagHandler
     {
         boolean isInLink = (Boolean) context.getTagStack().getStackParameter("isInLink");
         if (isInLink) {
-            IWemListener listener = (IWemListener) context.getTagStack().getStackParameter("linkListener");
+            XWikiGeneratorListener listener =
+                (XWikiGeneratorListener) context.getTagStack().getStackParameter("linkListener");
             context.getTagStack().pushScannerContext(new WikiScannerContext(listener));
 
             // Ensure we simulate a new document being parsed
@@ -108,15 +95,8 @@ public class XWikiReferenceTagHandler extends ReferenceTagHandler
             if (isFreeStandingReference(context)) {
                 context.getTagStack().setStackParameter("isFreeStandingLink", true);
             } else {
-                WikiParameters params = removeMeaningfulParameters(context.getParams());
-
-                // Add the Query String and Anchor information to the parameter list. we extract them from the HREF
-                // attribute.
-                if (context.getParams().getParameter("href") != null) {
-                    params = addQueryStringAndAnchor(context.getParams().getParameter("href").getValue(), params);
-                }
-
-                context.getTagStack().setStackParameter("linkParameters", params);
+                context.getTagStack().setStackParameter("linkParameters",
+                    removeMeaningfulParameters(context.getParams()));
             }
 
             setAccumulateContent(false);
@@ -131,9 +111,7 @@ public class XWikiReferenceTagHandler extends ReferenceTagHandler
                 linkLabelRenderer.beginDocument(Listener.EMPTY_PARAMETERS);
 
                 XWikiGeneratorListener xwikiListener =
-                    new XWikiGeneratorListener(this.parser, linkLabelRenderer, this.linkParser, this.imageParser,
-                        this.plainRendererFactory, null);
-
+                    this.parser.createXWikiGeneratorListener(linkLabelRenderer, null);
                 context.getTagStack().pushScannerContext(new WikiScannerContext(xwikiListener));
 
                 // Ensure we simulate a new document being parsed
@@ -148,7 +126,7 @@ public class XWikiReferenceTagHandler extends ReferenceTagHandler
                 if (idName != null) {
                     WikiParameter parameter = new WikiParameter("name", idName.getValue());
                     WikiParameters parameters = new WikiParameters(Collections.singletonList(parameter));
-                    context.getScannerContext().onExtensionBlock(XWikiGeneratorListener.EXT_ID, parameters);
+                    context.getScannerContext().onExtensionBlock(DefaultXWikiGeneratorListener.EXT_ID, parameters);
                 }
             }
         } else {
@@ -196,24 +174,5 @@ public class XWikiReferenceTagHandler extends ReferenceTagHandler
         } else {
             super.end(context);
         }
-    }
-
-    private WikiParameters addQueryStringAndAnchor(String href, WikiParameters params)
-    {
-        WikiParameters newParams = params;
-
-        try {
-            URI uri = new URI(href);
-            if (!StringUtils.isEmpty(uri.getFragment())) {
-                newParams = newParams.addParameter("anchor", uri.getFragment());
-            }
-            if (!StringUtils.isEmpty(uri.getQuery())) {
-                newParams = newParams.addParameter("queryString", uri.getQuery());
-            }
-        } catch (URISyntaxException e) {
-            // Invalid URI, ignore anchor/query string
-        }
-
-        return newParams;
     }
 }

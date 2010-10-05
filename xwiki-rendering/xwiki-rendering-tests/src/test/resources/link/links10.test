@@ -30,7 +30,7 @@ endDocument
 .#-----------------------------------------------------
 .expect|annotatedxhtml/1.0
 .#-----------------------------------------------------
-<p>Some URL <!--startwikilink:http://server/path/~user--><span class="wikiexternallink"><a class="wikimodel-freestanding" href="http://server/path/~user"><span class="wikigeneratedlinkcontent">http://server/path/~user</span></a></span><!--stopwikilink--></p><p><!--startwikilink:something://whatever--><span class="wikiexternallink"><a class="wikimodel-freestanding" href="something://whatever"><span class="wikigeneratedlinkcontent">something://whatever</span></a></span><!--stopwikilink--></p>
+<p>Some URL <!--startwikilink:false|-|url|-|http://server/path/~user--><span class="wikiexternallink"><a class="wikimodel-freestanding" href="http://server/path/~user"><span class="wikigeneratedlinkcontent">http://server/path/~user</span></a></span><!--stopwikilink--></p><p><!--startwikilink:false|-|url|-|something://whatever--><span class="wikiexternallink"><a class="wikimodel-freestanding" href="something://whatever"><span class="wikigeneratedlinkcontent">something://whatever</span></a></span><!--stopwikilink--></p>
 .#-----------------------------------------------------
 .expect|xwiki/2.0
 .#-----------------------------------------------------
@@ -40,4 +40,4 @@ something://whatever
 .#-----------------------------------------------------
 .input|xhtml/1.0
 .#-----------------------------------------------------
-<html><p>Some URL <!--startwikilink:http://server/path/~user--><span class="wikiexternallink"><a class="wikimodel-freestanding" href="http://server/path/~user"><span class="wikigeneratedlinkcontent">http://server/path/~user</span></a></span><!--stopwikilink--></p><p><!--startwikilink:something://whatever--><span class="wikiexternallink"><a class="wikimodel-freestanding" href="something://whatever"><span class="wikigeneratedlinkcontent">something://whatever</span></a></span><!--stopwikilink--></p></html>
+<p>Some URL <!--startwikilink:false|-|url|-|http://server/path/~user--><span class="wikiexternallink"><a class="wikimodel-freestanding" href="http://server/path/~user"><span class="wikigeneratedlinkcontent">http://server/path/~user</span></a></span><!--stopwikilink--></p><p><!--startwikilink:false|-|url|-|something://whatever--><span class="wikiexternallink"><a class="wikimodel-freestanding" href="something://whatever"><span class="wikigeneratedlinkcontent">something://whatever</span></a></span><!--stopwikilink--></p>

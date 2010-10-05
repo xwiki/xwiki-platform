@@ -30,7 +30,7 @@ import org.wikimodel.wem.IWemListener;
 import org.wikimodel.wem.WikiFormat;
 import org.wikimodel.wem.WikiParameter;
 import org.wikimodel.wem.WikiParameters;
-import org.xwiki.rendering.internal.parser.wikimodel.XWikiGeneratorListener;
+import org.xwiki.rendering.internal.parser.wikimodel.DefaultXWikiGeneratorListener;
 import org.xwiki.rendering.listener.Image;
 import org.xwiki.rendering.listener.Link;
 import org.xwiki.rendering.listener.ListType;
@@ -293,7 +293,7 @@ public class WikiModelGeneratorListener implements Listener
 
     public void onId(String name)
     {
-        this.wikimodelListener.onExtensionBlock(XWikiGeneratorListener.EXT_ID, createWikiParameters(Collections
+        this.wikimodelListener.onExtensionBlock(DefaultXWikiGeneratorListener.EXT_ID, createWikiParameters(Collections
             .singletonMap("name", name)));
     }
 

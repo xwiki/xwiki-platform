@@ -20,14 +20,18 @@
 package org.xwiki.extension.install.internal.jar;
 
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.Requirement;
 import org.xwiki.component.logging.AbstractLogEnabled;
-import org.xwiki.extension.ExtensionManager;
+import org.xwiki.extension.ExtensionDependency;
+import org.xwiki.extension.InstallException;
 import org.xwiki.extension.LocalExtension;
 import org.xwiki.extension.install.ExtensionHandlerManager;
+import org.xwiki.extension.repository.CoreExtensionRepository;
 import org.xwiki.extension.repository.LocalExtensionRepository;
 import org.xwiki.observation.EventListener;
 import org.xwiki.observation.event.ApplicationStartedEvent;
@@ -39,7 +43,7 @@ public class JarHandlerApplicationStartedListener extends AbstractLogEnabled imp
     private static final List<Event> EVENTS = Collections.<Event> singletonList(new ApplicationStartedEvent());
 
     @Requirement
-    private ExtensionManager extensionManager;
+    private CoreExtensionRepository coreExtensionRepository;
 
     @Requirement
     private LocalExtensionRepository localExtensionRepository;
@@ -59,16 +63,57 @@ public class JarHandlerApplicationStartedListener extends AbstractLogEnabled imp
 
     public void onEvent(Event arg0, Object arg1, Object arg2)
     {
+        Map<String, Boolean> loadedExtension = new HashMap<String, Boolean>();
+
         // Load extensions from local repository
         List<LocalExtension> localExtensions = this.localExtensionRepository.getLocalExtensions();
         for (LocalExtension localExtension : localExtensions) {
             if (localExtension.getType().equals("jar")) {
                 try {
-                    // TODO: validate dependencies
-                    this.extensionHandlerManager.install(localExtension);
+                    loadExtension(localExtension, loadedExtension);
                 } catch (Exception e) {
                     getLogger().error("Failed to install local extension [" + localExtension + "]", e);
                 }
+            }
+        }
+    }
+
+    private void loadExtension(LocalExtension localExtension, Map<String, Boolean> loadedExtension)
+        throws InstallException
+    {
+        Boolean loaded = loadedExtension.get(localExtension.getId());
+
+        if (loaded == null) {
+            for (ExtensionDependency dependency : localExtension.getDependencies()) {
+                try {
+                    loadExtension(dependency.getId(), loadedExtension);
+                } catch (InstallException e) {
+                    loadedExtension.put(localExtension.getId(), false);
+                    throw new InstallException("Failed to load extension [" + localExtension
+                        + "]: impossible to load dependency [" + dependency.getId() + "]", e);
+                }
+            }
+        } else if (!loaded) {
+            throw new InstallException("Extension [" + localExtension + "] has not been loaded");
+        }
+
+        if (loadedExtension.containsKey(localExtension)) {
+            this.extensionHandlerManager.install(localExtension);
+        }
+
+        loadedExtension.put(localExtension.getId(), true);
+    }
+
+    private void loadExtension(String localExtensionId, Map<String, Boolean> loadedExtension) throws InstallException
+    {
+        LocalExtension localExtension = this.localExtensionRepository.getLocalExtension(localExtensionId);
+
+        if (localExtension == null) {
+            if (this.coreExtensionRepository.exists(localExtensionId)) {
+                loadedExtension.put(localExtensionId, true);
+            } else {
+                loadedExtension.put(localExtensionId, false);
+                throw new InstallException("Failed to load extension [" + localExtensionId + "]: does not exists");
             }
         }
     }

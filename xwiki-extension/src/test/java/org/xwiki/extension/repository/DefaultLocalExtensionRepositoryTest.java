@@ -84,7 +84,7 @@ public class DefaultLocalExtensionRepositoryTest extends AbstractComponentTestCa
     @Test
     public void testInit()
     {
-        Assert.assertTrue(this.localExtensionRepository.countExtensions() > 0);
+        Assert.assertEquals(2, this.localExtensionRepository.countExtensions());
     }
 
     @Test

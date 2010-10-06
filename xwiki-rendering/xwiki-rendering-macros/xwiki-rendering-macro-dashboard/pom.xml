@@ -56,8 +56,4 @@
       <version>${project.version}</version>
     </dependency>
   </dependencies>
-  <properties>
-    <!-- Skip Clirr execution since this is the first release of this module. Remove once XE 2.5M2 is released. -->
-    <xwiki.clirr.skip>true</xwiki.clirr.skip>
-  </properties>
 </project>

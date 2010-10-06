@@ -26,6 +26,7 @@ import java.util.List;
 import javax.ws.rs.core.UriBuilder;
 import javax.ws.rs.core.UriBuilderException;
 
+import org.apache.commons.lang.StringUtils;
 import org.xwiki.query.Query;
 import org.xwiki.query.QueryException;
 import org.xwiki.rest.Relations;
@@ -123,10 +124,9 @@ public class BaseSearchResult extends XWikiResource
             Formatter f = new Formatter();
 
             if (space != null) {
-                f
-                    .format("select distinct doc.space, doc.name, doc.language from XWikiDocument as doc where doc.space = :space and ( ");
+                f.format("select distinct doc.fullName, doc.space, doc.name, doc.language from XWikiDocument as doc where doc.space = :space and ( ");
             } else {
-                f.format("select distinct doc.space, doc.name, doc.language from XWikiDocument as doc where ( ");
+                f.format("select distinct doc.fullName, doc.space, doc.name, doc.language from XWikiDocument as doc where ( ");
             }
 
             int acceptedScopes = 0;
@@ -158,10 +158,9 @@ public class BaseSearchResult extends XWikiResource
             }
 
             if (hasProgrammingRights) {
-                f.format(") order by doc.space, doc.name asc");
+                f.format(") order by doc.fullName asc");
             } else {
-                f
-                    .format(") and doc.space<>'XWiki' and doc.space<>'Admin' and doc.space<>'Panels' and doc.name<>'WebPreferences' order by doc.space, doc.name asc");
+                f.format(") and doc.space<>'XWiki' and doc.space<>'Admin' and doc.space<>'Panels' and doc.name<>'WebPreferences' order by doc.fullName asc");
             }
 
             String query = f.toString();
@@ -171,21 +170,22 @@ public class BaseSearchResult extends XWikiResource
             /* This is needed because if the :space placeholder is not in the query, setting it would cause an exception */
             if (space != null) {
                 queryResult =
-                    queryManager.createQuery(query, Query.XWQL).bindValue("keywords",
-                        String.format("%%%s%%", keywords.toUpperCase())).bindValue("space", space).setLimit(number)
-                        .execute();
+                    queryManager.createQuery(query, Query.XWQL)
+                        .bindValue("keywords", String.format("%%%s%%", keywords.toUpperCase()))
+                        .bindValue("space", space).setLimit(number).execute();
             } else {
                 queryResult =
-                    queryManager.createQuery(query, Query.XWQL).bindValue("keywords",
-                        String.format("%%%s%%", keywords.toUpperCase())).setLimit(number).execute();
+                    queryManager.createQuery(query, Query.XWQL)
+                        .bindValue("keywords", String.format("%%%s%%", keywords.toUpperCase())).setLimit(number)
+                        .execute();
             }
 
             for (Object object : queryResult) {
                 Object[] fields = (Object[]) object;
 
-                String spaceName = (String) fields[0];
-                String pageName = (String) fields[1];
-                String language = (String) fields[2];
+                String spaceName = (String) fields[1];
+                String pageName = (String) fields[2];
+                String language = (String) fields[3];
 
                 String pageId = Utils.getPageId(wikiName, spaceName, pageName);
 
@@ -199,15 +199,15 @@ public class BaseSearchResult extends XWikiResource
                     searchResult.setPageName(pageName);
 
                     String pageUri;
-                    if ("".equals(language)) {
+                    if (StringUtils.isBlank(language)) {
                         pageUri =
-                            UriBuilder.fromUri(uriInfo.getBaseUri()).path(PageResource.class).build(wikiName,
-                                spaceName, pageName).toString();
+                            UriBuilder.fromUri(uriInfo.getBaseUri()).path(PageResource.class)
+                                .build(wikiName, spaceName, pageName).toString();
                     } else {
                         searchResult.setLanguage(language);
                         pageUri =
-                            UriBuilder.fromUri(uriInfo.getBaseUri()).path(PageTranslationResource.class).build(
-                                wikiName, spaceName, pageName, language).toString();
+                            UriBuilder.fromUri(uriInfo.getBaseUri()).path(PageTranslationResource.class)
+                                .build(wikiName, spaceName, pageName, language).toString();
                     }
 
                     Link pageLink = new Link();
@@ -256,18 +256,15 @@ public class BaseSearchResult extends XWikiResource
             Formatter f = new Formatter();
 
             if (space != null) {
-                f
-                    .format("select distinct doc.space, doc.name, obj.className, obj.number from XWikiDocument as doc, BaseObject as obj, StringProperty as sp, LargeStringProperty as lsp where doc.space = :space and obj.name=doc.fullName and sp.id.id = obj.id and lsp.id.id = obj.id and (upper(sp.value) like :keywords or upper(lsp.value) like :keywords) ");
+                f.format("select distinct doc.fullName, doc.space, doc.name, obj.className, obj.number from XWikiDocument as doc, BaseObject as obj, StringProperty as sp, LargeStringProperty as lsp where doc.space = :space and obj.name=doc.fullName and sp.id.id = obj.id and lsp.id.id = obj.id and (upper(sp.value) like :keywords or upper(lsp.value) like :keywords) ");
             } else {
-                f
-                    .format("select distinct doc.space, doc.name, obj.className, obj.number from XWikiDocument as doc, BaseObject as obj, StringProperty as sp, LargeStringProperty as lsp where obj.name=doc.fullName and sp.id.id = obj.id and lsp.id.id = obj.id and (upper(sp.value) like :keywords or upper(lsp.value) like :keywords) ");
+                f.format("select distinct doc.fullName, doc.space, doc.name, obj.className, obj.number from XWikiDocument as doc, BaseObject as obj, StringProperty as sp, LargeStringProperty as lsp where obj.name=doc.fullName and sp.id.id = obj.id and lsp.id.id = obj.id and (upper(sp.value) like :keywords or upper(lsp.value) like :keywords) ");
             }
 
             if (hasProgrammingRights) {
-                f.format(" order by doc.space, doc.name asc");
+                f.format(" order by doc.fullName asc");
             } else {
-                f
-                    .format(" and doc.space<>'XWiki' and doc.space<>'Admin' and doc.space<>'Panels' and doc.name<>'WebPreferences' order by doc.space, doc.name asc");
+                f.format(" and doc.space<>'XWiki' and doc.space<>'Admin' and doc.space<>'Panels' and doc.name<>'WebPreferences' order by doc.fullName asc");
             }
 
             String query = f.toString();
@@ -277,22 +274,23 @@ public class BaseSearchResult extends XWikiResource
             /* This is needed because if the :space placeholder is not in the query, setting it would cause an exception */
             if (space != null) {
                 queryResult =
-                    queryManager.createQuery(query, Query.XWQL).bindValue("keywords",
-                        String.format("%%%s%%", keywords.toUpperCase())).bindValue("space", space).setLimit(number)
-                        .execute();
+                    queryManager.createQuery(query, Query.XWQL)
+                        .bindValue("keywords", String.format("%%%s%%", keywords.toUpperCase()))
+                        .bindValue("space", space).setLimit(number).execute();
             } else {
                 queryResult =
-                    queryManager.createQuery(query, Query.XWQL).bindValue("keywords",
-                        String.format("%%%s%%", keywords.toUpperCase())).setLimit(number).execute();
+                    queryManager.createQuery(query, Query.XWQL)
+                        .bindValue("keywords", String.format("%%%s%%", keywords.toUpperCase())).setLimit(number)
+                        .execute();
             }
 
             for (Object object : queryResult) {
                 Object[] fields = (Object[]) object;
 
-                String spaceName = (String) fields[0];
-                String pageName = (String) fields[1];
-                String className = (String) fields[2];
-                int objectNumber = (Integer) fields[3];
+                String spaceName = (String) fields[1];
+                String pageName = (String) fields[2];
+                String className = (String) fields[3];
+                int objectNumber = (Integer) fields[4];
 
                 String id = Utils.getObjectId(wikiName, spaceName, pageName, className, objectNumber);
 
@@ -309,16 +307,16 @@ public class BaseSearchResult extends XWikiResource
                     searchResult.setObjectNumber(objectNumber);
 
                     String pageUri =
-                        UriBuilder.fromUri(uriInfo.getBaseUri()).path(PageResource.class).build(wikiName, spaceName,
-                            pageName).toString();
+                        UriBuilder.fromUri(uriInfo.getBaseUri()).path(PageResource.class)
+                            .build(wikiName, spaceName, pageName).toString();
                     Link pageLink = new Link();
                     pageLink.setHref(pageUri);
                     pageLink.setRel(Relations.PAGE);
                     searchResult.getLinks().add(pageLink);
 
                     String objectUri =
-                        UriBuilder.fromUri(uriInfo.getBaseUri()).path(ObjectResource.class).build(wikiName, spaceName,
-                            pageName, className, objectNumber).toString();
+                        UriBuilder.fromUri(uriInfo.getBaseUri()).path(ObjectResource.class)
+                            .build(wikiName, spaceName, pageName, className, objectNumber).toString();
                     Link objectLink = new Link();
                     objectLink.setHref(objectUri);
                     objectLink.setRel(Relations.OBJECT);

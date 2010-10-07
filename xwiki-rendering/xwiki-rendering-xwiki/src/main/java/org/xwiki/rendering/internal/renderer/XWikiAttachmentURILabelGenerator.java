@@ -45,6 +45,7 @@ public class XWikiAttachmentURILabelGenerator implements URILabelGenerator
      * {@inheritDoc}
      * @see org.xwiki.rendering.renderer.link.URILabelGenerator#generateLabel(
      *      org.xwiki.rendering.listener.ResourceReference)
+     * @since 2.5RC1
      */
     public String generateLabel(ResourceReference reference)
     {

@@ -144,6 +144,7 @@ public class TextOnNewLineStateChainingListener extends AbstractChainingListener
      * 
      * @see org.xwiki.rendering.listener.chaining.AbstractChainingListener#beginLink(
      *      org.xwiki.rendering.listener.ResourceReference, boolean, java.util.Map)
+     * @since 2.5RC1
      */
     @Override
     public void beginLink(ResourceReference reference, boolean isFreeStandingURI, Map<String, String> parameters)
@@ -304,6 +305,7 @@ public class TextOnNewLineStateChainingListener extends AbstractChainingListener
      * 
      * @see org.xwiki.rendering.listener.chaining.AbstractChainingListener#endLink(
      *      org.xwiki.rendering.listener.ResourceReference, boolean, java.util.Map)
+     * @since 2.5RC1
      */
     @Override
     public void endLink(ResourceReference reference, boolean isFreeStandingURI, Map<String, String> parameters)

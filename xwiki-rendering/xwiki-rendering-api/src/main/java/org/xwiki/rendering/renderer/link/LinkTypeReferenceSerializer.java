@@ -34,6 +34,7 @@ public interface LinkTypeReferenceSerializer
     /**
      * @param reference the link reference to serialize
      * @return the string representation of the passed {@link org.xwiki.rendering.listener.ResourceReference} object
+     * @since 2.5RC1
      */
     String serialize(ResourceReference reference);
 }

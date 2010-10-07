@@ -474,7 +474,7 @@ public class DoxiaGeneratorListener implements Listener
      * 
      * @see org.xwiki.rendering.listener.Listener#beginLink(org.xwiki.rendering.listener.ResourceReference , boolean,
      *      Map)
-     * @since 1.7M1
+     * @since 2.5RC1
      */
     public void beginLink(ResourceReference reference, boolean isFreeStandingURI, Map<String, String> parameters)
     {
@@ -485,7 +485,7 @@ public class DoxiaGeneratorListener implements Listener
      * {@inheritDoc}
      * 
      * @see org.xwiki.rendering.listener.Listener#endLink(org.xwiki.rendering.listener.ResourceReference , boolean, Map)
-     * @since 1.7M1
+     * @since 2.5RC1
      */
     public void endLink(ResourceReference reference, boolean isFreeStandingURI, Map<String, String> parameters)
     {

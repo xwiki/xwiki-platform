@@ -128,8 +128,9 @@ public class LinkLabelGeneratorChainingListener extends AbstractChainingListener
     /**
      * {@inheritDoc}
      * 
-     * @see org.xwiki.rendering.listener.chaining.AbstractChainingListener#endLink(org.xwiki.rendering.listener.ResourceReference ,
-     *      boolean, java.util.Map)
+     * @see org.xwiki.rendering.listener.chaining.AbstractChainingListener#endLink(
+     *      org.xwiki.rendering.listener.ResourceReference, boolean, java.util.Map)
+     * @since 2.5RC1
      */
     @Override
     public void endLink(ResourceReference reference, boolean isFreeStandingURI, Map<String, String> parameters)

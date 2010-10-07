@@ -35,6 +35,7 @@ public interface URILabelGenerator
     /**
      * @param reference the reference pointing to a URI for which we want to generate a label
      * @return the URI label to display when rendering resource references
+     * @since 2.5RC1
      */
     String generateLabel(ResourceReference reference);
 }

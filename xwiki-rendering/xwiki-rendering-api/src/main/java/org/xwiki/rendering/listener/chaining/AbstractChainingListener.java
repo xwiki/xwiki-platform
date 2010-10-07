@@ -155,6 +155,7 @@ public abstract class AbstractChainingListener implements ChainingListener
      * {@inheritDoc}
      * 
      * @see ChainingListener#beginLink(org.xwiki.rendering.listener.ResourceReference , boolean, Map)
+     * @since 2.5RC1
      */
     public void beginLink(ResourceReference reference, boolean isFreeStandingURI, Map<String, String> parameters)
     {
@@ -403,6 +404,7 @@ public abstract class AbstractChainingListener implements ChainingListener
      * {@inheritDoc}
      * 
      * @see ChainingListener#endLink(org.xwiki.rendering.listener.ResourceReference , boolean, Map)
+     * @since 2.5RC1
      */
     public void endLink(ResourceReference reference, boolean isFreeStandingURI, Map<String, String> parameters)
     {

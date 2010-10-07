@@ -49,6 +49,11 @@ public class XWikiLinkLabelGenerator implements LinkLabelGenerator
     @Requirement("current")
     private DocumentReferenceResolver currentDocumentReferenceResolver;
 
+    /**
+     * {@inheritDoc}
+     * @see LinkLabelGenerator#generate(org.xwiki.rendering.listener.ResourceReference)
+     * @since 2.5RC1 
+     */
     public String generate(ResourceReference reference)
     {
         String result;

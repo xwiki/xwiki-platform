@@ -36,6 +36,7 @@ public interface LinkLabelGenerator
      * 
      * @param reference the link reference
      * @return the generated label
+     * @since 2.5RC1
      */
     String generate(ResourceReference reference);
 }

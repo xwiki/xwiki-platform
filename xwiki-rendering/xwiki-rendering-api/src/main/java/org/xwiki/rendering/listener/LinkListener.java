@@ -38,7 +38,7 @@ public interface LinkListener
      * @param isFreeStandingURI if true then the link is a free standing URI directly in the text
      * @param parameters a generic list of parameters. Example: style="background-color: blue"
      * @see ResourceReference
-     * @since 1.7M1
+     * @since 2.5RC1
      */
     void beginLink(ResourceReference reference, boolean isFreeStandingURI, Map<String, String> parameters);
 
@@ -49,7 +49,7 @@ public interface LinkListener
      * @param isFreeStandingURI if true then the link is a free standing URI directly in the text
      * @param parameters a generic list of parameters. Example: style="background-color: blue"
      * @see ResourceReference
-     * @since 1.7M1
+     * @since 2.5RC1
      */
     void endLink(ResourceReference reference, boolean isFreeStandingURI, Map<String, String> parameters);
 }

@@ -240,6 +240,7 @@ public class WrappingListener implements Listener
      * 
      * @see org.xwiki.rendering.listener.LinkListener#beginLink(ResourceReference , boolean,
      *      java.util.Map)
+     * @since 2.5RC1
      */
     public void beginLink(ResourceReference reference, boolean isFreeStandingURI, Map<String, String> parameters)
     {
@@ -250,6 +251,7 @@ public class WrappingListener implements Listener
      * {@inheritDoc}
      * 
      * @see org.xwiki.rendering.listener.LinkListener#endLink(ResourceReference , boolean, java.util.Map)
+     * @since 2.5RC1
      */
     public void endLink(ResourceReference reference, boolean isFreeStandingURI, Map<String, String> parameters)
     {

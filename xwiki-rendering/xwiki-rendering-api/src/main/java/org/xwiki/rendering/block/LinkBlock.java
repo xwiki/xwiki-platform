@@ -48,6 +48,7 @@ public class LinkBlock extends AbstractFatherBlock
      * @param childrenBlocks the nested children blocks
      * @param reference the reference to the target resource to link to
      * @param isFreeStandingURI if true then the link is a free standing URI directly in the text
+     * @since 2.5RC1
      */
     public LinkBlock(List<Block> childrenBlocks, ResourceReference reference, boolean isFreeStandingURI)
     {
@@ -59,6 +60,7 @@ public class LinkBlock extends AbstractFatherBlock
      * @param reference the reference to the target resource to link to
      * @param isFreeStandingURI if true then the link is a free standing URI directly in the text
      * @param parameters the parameters to set
+     * @since 2.5RC1
      */
     public LinkBlock(List<Block> childrenBlocks, ResourceReference reference, boolean isFreeStandingURI,
         Map<String, String> parameters)
@@ -71,6 +73,7 @@ public class LinkBlock extends AbstractFatherBlock
     /**
      * @return the reference to the target to link to
      * @see org.xwiki.rendering.listener.ResourceReference
+     * @since 2.5RC1
      */
     public ResourceReference getReference()
     {

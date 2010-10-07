@@ -50,4 +50,8 @@
       </plugin>
     </plugins>
   </build>
+  <properties>
+    <!-- Skip Clirr execution since this is the first release of this module. Remove once XE 2.5 is released. -->
+    <xwiki.clirr.skip>true</xwiki.clirr.skip>
+  </properties>
 </project>

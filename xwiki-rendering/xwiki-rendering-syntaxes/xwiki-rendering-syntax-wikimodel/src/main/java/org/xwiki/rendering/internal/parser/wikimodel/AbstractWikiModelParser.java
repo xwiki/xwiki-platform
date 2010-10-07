@@ -59,6 +59,7 @@ public abstract class AbstractWikiModelParser extends AbstractLogEnabled impleme
      * @return the parser to use when parsing resource references (links, images, attachments, etc). We need to parse
      *         references to transform them from a string representation coming from WikiModel into a
      *         {@link org.xwiki.rendering.listener.ResourceReference} object.
+     * @since 2.5RC1
      */
     public abstract ResourceReferenceParser getResourceReferenceParser();
 

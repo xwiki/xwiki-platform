@@ -34,9 +34,9 @@ public interface ImageListener
     /**
      * An image.
      * 
-     * @param image the image definition (location, attachment name)
+     * @param reference the image reference
      * @param isFreeStandingURI if true then the image is defined directly as a URI in the text
      * @param parameters a generic list of parameters. Example: style="background-color: blue"
      */
-    void onImage(Image image, boolean isFreeStandingURI, Map<String, String> parameters);
+    void onImage(ResourceReference reference, boolean isFreeStandingURI, Map<String, String> parameters);
 }

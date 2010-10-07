@@ -90,6 +90,7 @@ public class WikiModelXWiki21Parser extends AbstractWikiModelParser
      * {@inheritDoc}
      *
      * @see org.xwiki.rendering.internal.parser.wikimodel.AbstractWikiModelParser#getResourceReferenceParser()
+     * @since 2.5RC1
      */
     @Override
     public ResourceReferenceParser getResourceReferenceParser()

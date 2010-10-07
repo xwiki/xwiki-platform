@@ -84,6 +84,7 @@ public class WikiModelXWiki20Parser extends AbstractWikiModelParser
      * {@inheritDoc}
      * 
      * @see AbstractWikiModelParser#getResourceReferenceParser()
+     * @since 2.5RC1
      */
     @Override
     public ResourceReferenceParser getResourceReferenceParser()

@@ -11,8 +11,8 @@
 <customClass></customClass>
 <contentAuthor>XWiki.Admin</contentAuthor>
 <creationDate>1284043167000</creationDate>
-<date>1285847305000</date>
-<contentUpdateDate>1285847305000</contentUpdateDate>
+<date>1286455983000</date>
+<contentUpdateDate>1286455983000</contentUpdateDate>
 <version>1.1</version>
 <title>Extension Manager</title>
 <template></template>
@@ -485,12 +485,10 @@ This application is experimental, use it at your own risk.
 = Installed extensions
 
 #set($extensions = $extensionManager.installedExtensions)
-|=Id|=Version|=Type#if ($hasProgramming)
-|=Actions
-#end
+|=Id|=Version|=Type#if ($hasProgramming)|=Actions#end
+
 #foreach($extension in $extensions)
-|$extension.id#if ($hasProgramming)
-|$extension.version|$extension.type|{{html clean="false"}}
+|$extension.id|$extension.version|$extension.type#if ($hasProgramming)|{{html clean="false"}}
       &lt;form action="$xwiki.requestURL" enctype="multipart/form-data" method="post"&gt;
         &lt;fieldset&gt;
           &lt;input name="extensionid" value="${escapetool.xml($extension.id)}" type="hidden" /&gt;
@@ -498,7 +496,17 @@ This application is experimental, use it at your own risk.
           &lt;span class="buttonwrapper"&gt;&lt;input type="submit" value="Uninstall" name="actionuninstall" class="button"/&gt;&lt;/span&gt;
         &lt;/fieldset&gt;
       &lt;/form&gt;
-      {{/html}}
+      {{/html}}#end
+
 #end
+{{/velocity}}
+
+{{velocity}}
+= Core extensions
+
+#set($extensions = $extensionManager.coreExtensions)
+|=Id|=Version|=Type
+#foreach($extension in $extensions)
+|$extension.id|$extension.version|$extension.type
 #end
 {{/velocity}}</content></xwikidoc>

@@ -32,7 +32,7 @@ package org.xwiki.rendering.listener;
  * </ul>
  * 
  * @version $Id$
- * @since 2.5M2
+ * @since 2.5RC1
  */
 public class ResourceType
 {

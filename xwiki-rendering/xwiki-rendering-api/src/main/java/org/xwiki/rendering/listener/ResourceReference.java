@@ -29,7 +29,7 @@ import java.util.Map;
  * Note that this representation is independent of any wiki syntax.
  *
  * @version $Id$
- * @since 1.5M2
+ * @since 2.5RC1
  */
 public class ResourceReference implements Cloneable
 {

@@ -25,7 +25,7 @@ import org.apache.commons.lang.StringUtils;
  * Represents a reference to a Document.
  *
  * @version $Id$
- * @since 2.5M2
+ * @since 2.5RC1
  */
 public class DocumentResourceReference extends ResourceReference
 {

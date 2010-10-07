@@ -27,7 +27,7 @@ package org.xwiki.rendering.listener;
  * to the common URL part to make the full URL.
  *
  * @version $Id$
- * @since 2.5M2
+ * @since 2.5RC1
  */
 public class InterWikiResourceReference extends ResourceReference
 {

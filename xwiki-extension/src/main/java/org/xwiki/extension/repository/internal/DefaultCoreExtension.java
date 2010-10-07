@@ -50,13 +50,14 @@ public class DefaultCoreExtension implements CoreExtension
 
     private DefaultCoreExtensionRepository repository;
 
-    public DefaultCoreExtension(String id, String version)
+    public DefaultCoreExtension(String id, String version, String type)
     {
         this.id = id;
         this.version = version;
+        this.type = type;
     }
 
-    public DefaultCoreExtension(DefaultCoreExtensionRepository repository, URL url, String id, String version)
+    public DefaultCoreExtension(DefaultCoreExtensionRepository repository, URL url, String id, String version, String type)
     {
         this.repository = repository;
 
@@ -64,6 +65,7 @@ public class DefaultCoreExtension implements CoreExtension
 
         this.id = id;
         this.version = version;
+        this.type = type;
     }
 
     // Extension

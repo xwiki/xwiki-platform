@@ -100,6 +100,8 @@ public class DefaultCoreExtensionRepository extends AbstractLogEnabled implement
                 String version = mavenModel.getVersion();
                 String groupId = mavenModel.getGroupId();
 
+                // TODO: add support for properties
+                // TODO: add support for parents
                 if (version == null || groupId == null) {
                     Parent parent = mavenModel.getParent();
 
@@ -110,14 +112,31 @@ public class DefaultCoreExtensionRepository extends AbstractLogEnabled implement
                     if (version == null) {
                         version = parent.getVersion();
                     }
+
+                    if (version == null) {
+                        version = "unknown";
+                    }
+                    if (groupId == null) {
+                        groupId = "unknown";
+                    }
                 }
 
-                CoreExtension coreExtension =
-                    new DefaultCoreExtension(this, descriptorUrl, groupId + ":" + mavenModel.getArtifactId(), version);
+                DefaultCoreExtension coreExtension =
+                    new DefaultCoreExtension(this, descriptorUrl, groupId + ":" + mavenModel.getArtifactId(), version,
+                        packagingToType(mavenModel.getPackaging()));
 
                 this.extensions.put(coreExtension.getId(), coreExtension);
 
                 for (Dependency dependency : mavenModel.getDependencies()) {
+                    if (dependency.getGroupId().equals("${project.groupId}")) {
+                        dependency.setGroupId(groupId);
+                    }
+                    if (dependency.getVersion() == null) {
+                        dependency.setVersion("unknown");
+                    } else if (dependency.getVersion().equals("${project.version}")
+                        || dependency.getVersion().equals("${pom.version}")) {
+                        dependency.setVersion(version);
+                    }
                     dependencies.add(dependency);
                 }
             } catch (Exception e) {
@@ -136,12 +155,23 @@ public class DefaultCoreExtensionRepository extends AbstractLogEnabled implement
                 String dependencyId = dependency.getGroupId() + ":" + dependency.getArtifactId();
                 if (!this.extensions.containsKey(dependencyId)) {
                     CoreExtension coreExtension =
-                        new DefaultCoreExtension(this, descriptorUrl, dependencyId, dependency.getVersion());
+                        new DefaultCoreExtension(this, descriptorUrl, dependencyId, dependency.getVersion(),
+                            packagingToType(dependency.getType()));
 
                     this.extensions.put(dependencyId, coreExtension);
                 }
             }
         }
+    }
+
+    private String packagingToType(String packaging)
+    {
+        // support bundle packaging
+        if (packaging.equals("bundle")) {
+            return "jar";
+        }
+
+        return packaging;
     }
 
     // Repository

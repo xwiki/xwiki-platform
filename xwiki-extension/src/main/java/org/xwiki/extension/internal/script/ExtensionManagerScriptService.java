@@ -19,12 +19,12 @@
  */
 package org.xwiki.extension.internal.script;
 
-
 import java.util.List;
 
 import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.Requirement;
+import org.xwiki.extension.CoreExtension;
 import org.xwiki.extension.Extension;
 import org.xwiki.extension.ExtensionId;
 import org.xwiki.extension.ExtensionManager;
@@ -33,6 +33,7 @@ import org.xwiki.extension.LocalExtension;
 import org.xwiki.extension.ResolveException;
 import org.xwiki.extension.UninstallException;
 import org.xwiki.extension.internal.VersionManager;
+import org.xwiki.extension.repository.CoreExtensionRepository;
 import org.xwiki.extension.repository.LocalExtensionRepository;
 import org.xwiki.script.service.ScriptService;
 
@@ -50,6 +51,9 @@ public class ExtensionManagerScriptService implements ScriptService
 
     @Requirement
     private LocalExtensionRepository localExtensionRepository;
+
+    @Requirement
+    private CoreExtensionRepository coreExtensionRepository;
 
     public LocalExtension install(String id, String version) throws InstallException
     {
@@ -83,10 +87,20 @@ public class ExtensionManagerScriptService implements ScriptService
     {
         return this.localExtensionRepository.getLocalExtensions();
     }
-    
+
     public LocalExtension getInstalledExtension(String id)
     {
         return this.localExtensionRepository.getLocalExtension(id);
+    }
+
+    public List<CoreExtension> getCoreExtensions()
+    {
+        return this.coreExtensionRepository.getCoreExtensions();
+    }
+
+    public CoreExtension getCoreExtension(String id)
+    {
+        return this.coreExtensionRepository.getCoreExtension(id);
     }
 
     public VersionManager getVersionManager()

@@ -19,6 +19,8 @@
  */
 package org.xwiki.rendering.listener;
 
+import org.apache.commons.lang.StringUtils;
+
 /**
  * Represents a reference to a Document.
  *
@@ -38,11 +40,11 @@ public class DocumentResourceReference extends ResourceReference
     public static final String ANCHOR = "anchor";
     
     /**
-     * Sets the resource type automatically.
+     * @param reference see {@link #getReference()}
      */
-    public DocumentResourceReference()
+    public DocumentResourceReference(String reference)
     {
-        setType(ResourceType.DOCUMENT);
+        super(reference, ResourceType.DOCUMENT);
     }
     
     /**
@@ -59,7 +61,9 @@ public class DocumentResourceReference extends ResourceReference
      */
     public void setQueryString(String queryString)
     {
-        setParameter(QUERY_STRING, queryString);
+        if (!StringUtils.isEmpty(queryString)) {
+            setParameter(QUERY_STRING, queryString);
+        }
     }
 
     /**
@@ -77,6 +81,8 @@ public class DocumentResourceReference extends ResourceReference
      */
     public void setAnchor(String anchor)
     {
-        setParameter(ANCHOR, anchor);
+        if (!StringUtils.isEmpty(anchor)) {
+            setParameter(ANCHOR, anchor);
+        }
     }
 }

@@ -38,9 +38,6 @@ public abstract class AbstractURILinkTypeParser implements LinkTypeParser
      */
     public ResourceReference parse(String reference)
     {
-        ResourceReference resultReference = new ResourceReference();
-        resultReference.setType(getType());
-        resultReference.setReference(reference);
-        return resultReference;
+        return new ResourceReference(reference, getType());
     }
 }

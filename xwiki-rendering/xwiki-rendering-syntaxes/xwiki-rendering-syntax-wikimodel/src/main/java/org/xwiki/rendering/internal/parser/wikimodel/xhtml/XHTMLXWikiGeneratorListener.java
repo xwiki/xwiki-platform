@@ -69,7 +69,7 @@ public class XHTMLXWikiGeneratorListener extends DefaultXWikiGeneratorListener
             super.onReference(reference);
         } else {
             XWikiWikiReference xwikiReference = (XWikiWikiReference) reference;
-            ResourceReference resourceReference = xwikiReference.getXWikiLink();
+            ResourceReference resourceReference = xwikiReference.getLinkReference();
 
             flushFormat();
 

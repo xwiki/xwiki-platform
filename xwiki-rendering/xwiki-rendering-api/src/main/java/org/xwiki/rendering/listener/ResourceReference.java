@@ -55,6 +55,16 @@ public class ResourceReference implements Cloneable
      * @see #getParameter(String)
      */
     private Map<String, String> parameters = new HashMap<String, String>();
+    
+    /**
+     * @param reference see {@link #getReference()}
+     * @param type see {@link #getType()}
+     */
+    public ResourceReference(String reference, ResourceType type)
+    {
+        setReference(reference);
+        setType(type);
+    }
 
     /**
      * @param isTyped see {@link #isTyped()}

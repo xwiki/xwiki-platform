@@ -116,9 +116,7 @@ public class ChartMacro extends AbstractMacro<ChartMacroParameters>
         String imageLocation =
             documentAccessBridge.getURL(null, "charting", null, null) + "/" + generateChart(macroParams, content);
         String title = macroParams.getTitle();
-        ResourceReference reference = new ResourceReference();
-        reference.setReference(imageLocation);
-        reference.setType(ResourceType.URL);
+        ResourceReference reference = new ResourceReference(imageLocation, ResourceType.URL);
         ImageBlock imageBlock = new ImageBlock(new URLImage(imageLocation), true);
         imageBlock.setParameter("alt", title);
         LinkBlock linkBlock = new LinkBlock(Collections.singletonList((Block) imageBlock), reference, true);

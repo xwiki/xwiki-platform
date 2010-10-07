@@ -167,10 +167,8 @@ public class XWiki20LinkParser implements LinkParser
         // Step 1: If we're not in wiki mode then all links are URL links, except for link to images (since an image
         // link can point to an image defined as a URL.
         if (!isInWikiMode() && !rawLink.startsWith("image:")) {
-            ResourceReference resourceReference = new ResourceReference();
-            resourceReference.setType(ResourceType.URL);
+            ResourceReference resourceReference = new ResourceReference(rawLink, ResourceType.URL);
             resourceReference.setTyped(false);
-            resourceReference.setReference(rawLink);
             return resourceReference;
         }
 
@@ -199,21 +197,24 @@ public class XWiki20LinkParser implements LinkParser
      */
     private ResourceReference parseDocumentLink(StringBuffer content)
     {
-        DocumentResourceReference reference = new DocumentResourceReference();
-
+        String queryString = null;
         String text = parseElementAfterString(content, LinkParser.SEPARATOR_QUERYSTRING);
         if (text != null) {
-            reference.setQueryString(removeEscapesFromExtraParts(text));
+            queryString = removeEscapesFromExtraParts(text);
         }
 
+        String anchor = null;
         text = parseElementAfterString(content, LinkParser.SEPARATOR_ANCHOR);
         if (text != null) {
-            reference.setAnchor(removeEscapesFromExtraParts(text));
+            anchor = removeEscapesFromExtraParts(text);
         }
 
-        reference.setReference(removeEscapesFromReferencePart(content.toString()));
+        DocumentResourceReference reference =
+            new DocumentResourceReference(removeEscapesFromReferencePart(content.toString()));
         reference.setTyped(false);
-        
+        reference.setQueryString(queryString);
+        reference.setAnchor(anchor);
+
         return reference;
     }
 
@@ -264,9 +265,8 @@ public class XWiki20LinkParser implements LinkParser
         ResourceReference result = null;
         String interWikiAlias = parseElementAfterString(content, SEPARATOR_INTERWIKI);
         if (interWikiAlias != null) {
-            InterWikiResourceReference link = new InterWikiResourceReference();
+            InterWikiResourceReference link = new InterWikiResourceReference(removeEscapes(content.toString()));
             link.setInterWikiAlias(removeEscapes(interWikiAlias));
-            link.setReference(removeEscapes(content.toString()));
             result = link;
         }
         return result;

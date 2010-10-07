@@ -193,16 +193,14 @@ public class XWikiCommentHandler extends CommentHandler
         Image image = this.imageParser.parse(imageComment);
 
         if (isFreeStandingImage) {
-
             stack.getScannerContext().onImage(imageComment);
         } else {
             // Remove the ALT attribute if the content has the same value as the original image location
             // This is because the XHTML renderer automatically adds an ALT attribute since it is mandatory
             // in the XHTML specifications.
             WikiParameter alt = parameters.getParameter("alt");
-            // HACK: Fix this when we have a common Reference object replacing Link and Image
-            ResourceReference dummyReference = new ResourceReference();
-            dummyReference.setReference(image.getReference());
+            // TODO: Fix this when we have a common Reference object replacing Link and Image
+            ResourceReference dummyReference = new ResourceReference(image.getReference(), ResourceType.DOCUMENT);
             if (alt != null && alt.getValue().equals(this.attachLinkLabelGenerator.generateLabel(dummyReference))) {
                 parameters = parameters.remove("alt");
             }

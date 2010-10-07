@@ -60,10 +60,9 @@ public class PlainTextChainingRendererTest extends AbstractComponentTestCase
         DefaultWikiPrinter printer = new DefaultWikiPrinter();
         this.renderer.setPrinter(printer);
 
-        DocumentResourceReference reference = new DocumentResourceReference();
+        DocumentResourceReference reference = new DocumentResourceReference("reference");
         reference.setAnchor("anchor");
         reference.setQueryString("param=value");
-        reference.setReference("reference");
 
         this.renderer.beginLink(reference, false, Collections.<String, String> emptyMap());
         this.renderer.endLink(reference, false, Collections.<String, String> emptyMap());
@@ -77,10 +76,7 @@ public class PlainTextChainingRendererTest extends AbstractComponentTestCase
         DefaultWikiPrinter printer = new DefaultWikiPrinter();
         this.renderer.setPrinter(printer);
 
-        ResourceReference reference = new ResourceReference();
-        reference.setReference("http://some/url");
-        reference.setType(ResourceType.URL);
-
+        ResourceReference reference = new ResourceReference("http://some/url", ResourceType.URL);
         this.renderer.beginLink(reference, false, Collections.<String, String> emptyMap());
         this.renderer.endLink(reference, false, Collections.<String, String> emptyMap());
 

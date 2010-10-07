@@ -63,9 +63,7 @@ public class URLLinkTypeParser extends AbstractURILinkTypeParser
         if (matcher.lookingAt()) {
             // We don't parse the URL since it can contain unknown protocol for the JVM but protocols known by the
             // browser (such as skype:// for example).
-            resultReference = new ResourceReference();
-            resultReference.setType(getType());
-            resultReference.setReference(reference);
+            resultReference = new ResourceReference(reference, getType());
         }
         return resultReference;
     }

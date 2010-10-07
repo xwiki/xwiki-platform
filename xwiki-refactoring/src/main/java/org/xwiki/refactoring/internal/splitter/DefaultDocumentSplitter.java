@@ -112,8 +112,7 @@ public class DefaultDocumentSplitter implements DocumentSplitter
     {
         Block firstBlock = block.getChildren().get(0);
         if (firstBlock instanceof HeaderBlock) {
-            DocumentResourceReference reference = new DocumentResourceReference();
-            reference.setReference(target);
+            DocumentResourceReference reference = new DocumentResourceReference(target);
             // Clone the header block and remove any unwanted stuff
             Block clonedHeaderBlock = firstBlock.clone(new BlockFilter()
             {

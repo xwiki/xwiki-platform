@@ -28,8 +28,8 @@ import java.util.List;
 import junit.framework.TestCase;
 
 import org.xwiki.rendering.listener.DocumentImage;
+import org.xwiki.rendering.listener.DocumentResourceReference;
 import org.xwiki.rendering.listener.HeaderLevel;
-import org.xwiki.rendering.listener.ResourceReference;
 
 /**
  * Unit tests for Block manipulation, testing {@link AbstractBlock}.
@@ -139,9 +139,8 @@ public class BlockTest extends TestCase
     {
         WordBlock wb = new WordBlock("block");
         ImageBlock ib = new ImageBlock(new DocumentImage("document@attachment"), true);
-        ResourceReference resourceReference = new ResourceReference();
-        resourceReference.setReference("reference");
-        LinkBlock lb = new LinkBlock(Arrays.asList((Block) new WordBlock("label")), resourceReference, false);
+        DocumentResourceReference linkReference = new DocumentResourceReference("reference");
+        LinkBlock lb = new LinkBlock(Arrays.asList((Block) new WordBlock("label")), linkReference, false);
         Block rootBlock = new ParagraphBlock(Arrays.<Block> asList(wb, ib, lb));
 
         Block newRootBlock = rootBlock.clone();
@@ -161,9 +160,8 @@ public class BlockTest extends TestCase
         WordBlock lw = new WordBlock("linkword");
         SpecialSymbolBlock ls = new SpecialSymbolBlock('$');
         
-        ResourceReference resourceReference = new ResourceReference();
-        resourceReference.setReference("reference");
-        LinkBlock pl = new LinkBlock(Arrays.<Block>asList(lw, ls), resourceReference, false);
+        DocumentResourceReference linkReference = new DocumentResourceReference("reference");
+        LinkBlock pl = new LinkBlock(Arrays.<Block>asList(lw, ls), linkReference, false);
         
         ImageBlock pi = new ImageBlock(new DocumentImage("document@attachment"), true);
         

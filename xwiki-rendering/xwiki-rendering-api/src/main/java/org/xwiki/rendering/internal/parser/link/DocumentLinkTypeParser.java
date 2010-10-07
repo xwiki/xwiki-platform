@@ -50,8 +50,6 @@ public class DocumentLinkTypeParser extends AbstractURILinkTypeParser
     @Override
     public ResourceReference parse(String reference)
     {
-        DocumentResourceReference resultReference = new DocumentResourceReference();
-        resultReference.setReference(reference);
-        return resultReference;
+        return new DocumentResourceReference(reference);
     }
 }

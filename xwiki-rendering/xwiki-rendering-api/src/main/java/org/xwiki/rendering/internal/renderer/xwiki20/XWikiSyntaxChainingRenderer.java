@@ -838,10 +838,7 @@ public class XWikiSyntaxChainingRenderer extends AbstractChainingPrintRenderer i
     @Override
     public void onImage(Image image, boolean isFreeStandingURI, Map<String, String> parameters)
     {
-        ResourceReference reference = new ResourceReference();
-        reference.setReference(getImageRenderer().renderImage(image));
-        reference.setType(ResourceType.IMAGE);
-
+        ResourceReference reference = new ResourceReference(getImageRenderer().renderImage(image), ResourceType.IMAGE);
         getLinkRenderer().beginRenderLink(getXWikiPrinter(), reference, isFreeStandingURI, parameters);
         getLinkRenderer().endRenderLink(getXWikiPrinter(), reference, isFreeStandingURI, parameters);
     }

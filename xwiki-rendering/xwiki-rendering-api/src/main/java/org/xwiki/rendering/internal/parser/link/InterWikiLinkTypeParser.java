@@ -61,10 +61,9 @@ public class InterWikiLinkTypeParser extends AbstractURILinkTypeParser
         // reference is not an interwiki link.
         int pos = reference.indexOf(INTERWIKI_ALIAS_SEPARATOR);
         if (pos > -1) {
-            InterWikiResourceReference interWikiReference = new InterWikiResourceReference();
-            interWikiReference.setType(getType());
+            InterWikiResourceReference interWikiReference =
+                new InterWikiResourceReference(reference.substring(pos + INTERWIKI_ALIAS_SEPARATOR.length()));
             interWikiReference.setInterWikiAlias(reference.substring(0, pos + INTERWIKI_ALIAS_SEPARATOR.length() - 1));
-            interWikiReference.setReference(reference.substring(pos + INTERWIKI_ALIAS_SEPARATOR.length()));
             resultReference = interWikiReference;
         }
         return resultReference;

@@ -196,7 +196,7 @@ public class PutFootnotesMacro extends AbstractMacro<FootnoteMacroParameters>
     private Block createFootnoteReferenceBlock(int counter)
     {
         Block result = new WordBlock(counter + "");
-        DocumentResourceReference reference = new DocumentResourceReference();
+        DocumentResourceReference reference = new DocumentResourceReference(null);
         reference.setAnchor(FOOTNOTE_ID_PREFIX + counter);
         result = new LinkBlock(Collections.singletonList(result), reference, false);
         result = new FormatBlock(Collections.singletonList(result), Format.SUPERSCRIPT);
@@ -230,7 +230,7 @@ public class PutFootnotesMacro extends AbstractMacro<FootnoteMacroParameters>
             parsedContent = Collections.<Block> singletonList(new WordBlock(content));
         }
         Block result = new WordBlock("^");
-        DocumentResourceReference reference = new DocumentResourceReference();
+        DocumentResourceReference reference = new DocumentResourceReference(null);
         reference.setAnchor(FOOTNOTE_REFERENCE_ID_PREFIX + counter);
         result = new LinkBlock(Collections.singletonList(result), reference, false);
         ((LinkBlock) result).setParameter(ID_ATTRIBUTE_NAME, FOOTNOTE_ID_PREFIX + counter);

@@ -5714,13 +5714,14 @@ public class XWikiDocument implements DocumentModelBridge
             List<LinkBlock> linkBlockList = xdom.getChildrenByType(LinkBlock.class, true);
 
             for (LinkBlock linkBlock : linkBlockList) {
-                ResourceReference reference = linkBlock.getReference();
-                if (reference.getType().equals(ResourceType.DOCUMENT)) {
+                ResourceReference linkReference = linkBlock.getReference();
+                if (linkReference.getType().equals(ResourceType.DOCUMENT)) {
                     DocumentReference documentReference =
-                        this.currentDocumentReferenceResolver.resolve(reference.getReference());
+                        this.currentDocumentReferenceResolver.resolve(linkReference.getReference());
 
                     if (documentReference.equals(oldDocumentReference)) {
-                        reference.setReference(this.compactEntityReferenceSerializer.serialize(newDocumentReference));
+                        linkReference.setReference(
+                            this.compactEntityReferenceSerializer.serialize(newDocumentReference));
                     }
                 }
             }

@@ -162,9 +162,7 @@ public class RssMacro extends AbstractMacro<RssMacroParameters>
             titleBlocks = parsePlainText(feed.getTitle());
         } else {
             // Title link.
-            ResourceReference titleResourceReference = new ResourceReference();
-            titleResourceReference.setReference(feed.getLink());
-            titleResourceReference.setType(ResourceType.URL);
+            ResourceReference titleResourceReference = new ResourceReference(feed.getLink(), ResourceType.URL);
 
             // Title text link.
             Block titleTextLinkBlock = new LinkBlock(parsePlainText(feed.getTitle()), titleResourceReference, true);
@@ -206,9 +204,7 @@ public class RssMacro extends AbstractMacro<RssMacroParameters>
             }
             SyndEntry entry = (SyndEntry) item;
 
-            ResourceReference titleResourceReference = new ResourceReference();
-            titleResourceReference.setType(ResourceType.URL);
-            titleResourceReference.setReference(entry.getLink());
+            ResourceReference titleResourceReference = new ResourceReference(entry.getLink(), ResourceType.URL);
             Block titleBlock = new LinkBlock(parsePlainText(entry.getTitle()), titleResourceReference, true);
             ParagraphBlock paragraphTitleBlock = new ParagraphBlock(Collections.singletonList(titleBlock));
             paragraphTitleBlock.setParameter(CLASS_ATTRIBUTE, "rssitemtitle");

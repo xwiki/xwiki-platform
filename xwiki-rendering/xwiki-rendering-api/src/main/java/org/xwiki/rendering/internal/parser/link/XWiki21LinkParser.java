@@ -76,10 +76,8 @@ public class XWiki21LinkParser implements LinkParser
         // Step 1: If we're not in wiki mode then all links are URL links, except for link to images (since an image
         // link can point to an image defined as a URL.
         if (!isInWikiMode() && !rawLink.startsWith("image:")) {
-            ResourceReference resourceReference = new ResourceReference();
-            resourceReference.setType(ResourceType.URL);
+            ResourceReference resourceReference = new ResourceReference(rawLink, ResourceType.URL);
             resourceReference.setTyped(false);
-            resourceReference.setReference(rawLink);
             return resourceReference;
         }
 

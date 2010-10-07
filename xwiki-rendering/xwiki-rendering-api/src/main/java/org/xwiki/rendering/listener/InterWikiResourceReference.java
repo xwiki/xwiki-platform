@@ -37,11 +37,11 @@ public class InterWikiResourceReference extends ResourceReference
     public static final String INTERWIKI_ALIAS = "interWikiAlias";
 
     /**
-     * Sets the resource type automatically.
+     * @param reference see {@link #getReference()}
      */
-    public InterWikiResourceReference()
+    public InterWikiResourceReference(String reference)
     {
-        setType(ResourceType.INTERWIKI);
+        super(reference, ResourceType.INTERWIKI);
         setTyped(true);
     }
 

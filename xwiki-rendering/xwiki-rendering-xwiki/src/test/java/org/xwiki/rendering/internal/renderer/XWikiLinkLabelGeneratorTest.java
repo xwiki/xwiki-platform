@@ -21,14 +21,14 @@ package org.xwiki.rendering.internal.renderer;
 
 import org.jmock.Expectations;
 import org.jmock.Mockery;
-import org.junit.Assert;
-import org.junit.Before;
+import org.junit.*;
 import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.bridge.DocumentModelBridge;
 import org.xwiki.component.util.ReflectionUtils;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.rendering.configuration.RenderingConfiguration;
+import org.xwiki.rendering.listener.DocumentResourceReference;
 import org.xwiki.rendering.listener.ResourceReference;
 
 /**
@@ -72,11 +72,10 @@ public class XWikiLinkLabelGeneratorTest
         }});
     }
 
-    @org.junit.Test
+    @Test
     public void testGenerate() throws Exception
     {
-        ResourceReference resourceReference = new ResourceReference();
-        resourceReference.setReference("HelloWorld");
+        ResourceReference resourceReference = new DocumentResourceReference("HelloWorld");
 
         mockery.checking(new Expectations() {{
             allowing(mockDocumentReferenceResolver).resolve(with(any(String.class)), with(any(Object[].class)));
@@ -90,9 +89,11 @@ public class XWikiLinkLabelGeneratorTest
             + "(My title)", this.generator.generate(resourceReference));
     }
 
-    @org.junit.Test
+    @Test
     public void testGenerateWhenDocumentFailsToLoad() throws Exception
     {
+        ResourceReference resourceReference = new DocumentResourceReference("HelloWorld");
+
         mockery.checking(new Expectations() {{
             allowing(mockDocumentReferenceResolver).resolve(with(any(String.class)), with(any(Object[].class)));
                 will(returnValue(new DocumentReference("xwiki", "Main", "HelloWorld")));
@@ -100,14 +101,13 @@ public class XWikiLinkLabelGeneratorTest
                 will(throwException(new Exception("error")));
         }});
 
-        Assert.assertEquals("HelloWorld", this.generator.generate(new ResourceReference()));
+        Assert.assertEquals("HelloWorld", this.generator.generate(resourceReference));
     }
 
-    @org.junit.Test
+    @Test
     public void testGenerateWhenDocumentTitleIsNull() throws Exception
     {
-        ResourceReference resourceReference = new ResourceReference();
-        resourceReference.setReference("HelloWorld");
+        ResourceReference resourceReference = new DocumentResourceReference("HelloWorld");
 
         mockery.checking(new Expectations() {{
             allowing(mockDocumentReferenceResolver).resolve(with(any(String.class)), with(any(Object[].class)));
@@ -117,12 +117,14 @@ public class XWikiLinkLabelGeneratorTest
                 will(returnValue(mockDocumentModelBridge));
         }});
 
-        Assert.assertEquals("HelloWorld", this.generator.generate(new ResourceReference()));
+        Assert.assertEquals("HelloWorld", this.generator.generate(resourceReference));
     }
 
-    @org.junit.Test
+    @Test
     public void testGenerateWhithRegexpSyntax() throws Exception
     {
+        ResourceReference resourceReference = new DocumentResourceReference("HelloWorld");
+
         mockery.checking(new Expectations() {{
             allowing(mockDocumentModelBridge).getTitle(); will(returnValue("$0"));
             allowing(mockDocumentAccessBridge).getDocument(with(any(DocumentReference.class)));
@@ -132,6 +134,6 @@ public class XWikiLinkLabelGeneratorTest
 
         }});
 
-        Assert.assertEquals("[$0:\\.$0] $0 ($0) [$0:\\.$0] $0 ($0)", this.generator.generate(new ResourceReference()));
+        Assert.assertEquals("[$0:\\.$0] $0 ($0) [$0:\\.$0] $0 ($0)", this.generator.generate(resourceReference));
     }
 }

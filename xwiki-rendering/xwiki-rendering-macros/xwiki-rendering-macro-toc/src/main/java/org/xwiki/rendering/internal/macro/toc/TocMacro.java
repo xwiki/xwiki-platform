@@ -265,7 +265,7 @@ public class TocMacro extends AbstractMacro<TocMacroParameters>
     private ListItemBlock createTocEntry(HeaderBlock headerBlock)
     {
         // Create the link to target the header anchor
-        DocumentResourceReference reference = new DocumentResourceReference();
+        DocumentResourceReference reference = new DocumentResourceReference(null);
         reference.setAnchor(headerBlock.getId());
         LinkBlock linkBlock = new LinkBlock(this.tocBlockFilter.generateLabel(headerBlock), reference, false);
 

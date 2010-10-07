@@ -934,7 +934,7 @@ public class DefaultXWikiGeneratorListener implements XWikiGeneratorListener
     {
         flushFormat();
 
-        // If there's no link parser defined, don't handle links and images...
+        // If there's no link parser defined, don't handle links...
         if (this.referenceParser != null) {
             onReference(this.referenceParser.parse(reference), label, isFreeStandingURI, parameters);
         }
@@ -943,6 +943,8 @@ public class DefaultXWikiGeneratorListener implements XWikiGeneratorListener
     protected void onReference(ResourceReference reference, String label, boolean isFreeStandingURI,
         Map<String, String> parameters)
     {
+        // Since WikiModel doesn't handle syntax in link labels and thus doesn't have begin/end events for links, we
+        // need to call the XWiki events and use an inline parser to parse the syntax in the label.
         getListener().beginLink(reference, isFreeStandingURI, parameters);
         if (label != null) {
             try {

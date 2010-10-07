@@ -37,8 +37,7 @@ fieldset.xwikimessage legend span span {
 }
 
 input.button {
-  *padding: 1px 0;
-  font-weight: bold;
+  *padding: 0 0 1px;
 }
 
 fieldset.xwikimessage {

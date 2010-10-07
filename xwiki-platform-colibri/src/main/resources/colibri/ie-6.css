@@ -30,11 +30,6 @@ h1 span, h2 span, h3 span, h4 span  {
   position: relative;
 }
 
-.buttonwrapper a {
-  line-height: 26px !important;
-  padding: 3px 5px;
-}
-
 fieldset.xwikimessage {
   display: block;
   width: 27em;

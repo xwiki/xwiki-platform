@@ -8,13 +8,13 @@ image:wiki:Space.Page@file.ext
 .#-----------------------------------------------------
 beginDocument
 beginParagraph
-onImage: [wiki:Space.Page] [file.ext] [true]
+onImage: [wiki:Space.Page@file.ext] [true]
 endParagraph
 endDocument
 .#-----------------------------------------------------
 .expect|xhtml/1.0
 .#-----------------------------------------------------
-<p><img src="attachmenturl" class="wikimodel-freestanding" alt="file.ext"/></p>
+<p><img src="attachmenturl" class="wikimodel-freestanding" alt="wiki:Space.Page@file.ext"/></p>
 .#-----------------------------------------------------
 .expect|xwiki/2.0
 .#-----------------------------------------------------

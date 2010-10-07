@@ -33,7 +33,9 @@ import org.xwiki.component.descriptor.ComponentInstantiationStrategy;
 import org.xwiki.rendering.listener.DocumentImage;
 import org.xwiki.rendering.listener.Image;
 import org.xwiki.rendering.listener.ImageType;
+import org.xwiki.rendering.listener.Link;
 import org.xwiki.rendering.listener.URLImage;
+import org.xwiki.rendering.renderer.link.URILabelGenerator;
 import org.xwiki.rendering.renderer.printer.XHTMLWikiPrinter;
 import org.xwiki.rendering.wiki.WikiModel;
 
@@ -64,6 +66,9 @@ public class DefaultXHTMLImageRenderer implements XHTMLImageRenderer, Initializa
     @Requirement
     private ComponentManager componentManager;
 
+    @Requirement("attach")
+    private URILabelGenerator attachURILabelGenerator;
+    
     /**
      * {@inheritDoc}
      *
@@ -117,9 +122,7 @@ public class DefaultXHTMLImageRenderer implements XHTMLImageRenderer, Initializa
             // that would not honor this contract.
             if (this.wikiModel != null) {
                 DocumentImage documentImage = DocumentImage.class.cast(image);
-                imageURL =
-                    this.wikiModel.getImageURL(documentImage.getDocumentName(), documentImage.getAttachmentName(),
-                        parameters);
+                imageURL = this.wikiModel.getImageURL(documentImage.getAttachmentReference(), parameters);
             } else {
                 throw new RuntimeException("Invalid Image type. In non wiki mode, all image types must be URL images.");
             }
@@ -139,9 +142,12 @@ public class DefaultXHTMLImageRenderer implements XHTMLImageRenderer, Initializa
         // Add the other parameters as attributes
         attributes.putAll(parameters);
 
-        // If not ALT attribute has been specified, add it since the XHTML specifications makes it mandatory.
+        // If no ALT attribute has been specified, add it since the XHTML specifications makes it mandatory.
         if (!parameters.containsKey(ALTERNATE)) {
-            attributes.put(ALTERNATE, image.getName());
+            // HACK: Fix this when we have a common Reference object replacing Link and Image
+            Link dummyLink = new Link();
+            dummyLink.setReference(image.getReference());
+            attributes.put(ALTERNATE, this.attachURILabelGenerator.generateLabel(dummyLink));
         }
 
         // And generate the XHTML IMG element.

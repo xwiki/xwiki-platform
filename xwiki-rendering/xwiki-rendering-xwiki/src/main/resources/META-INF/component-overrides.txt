@@ -1,3 +1,4 @@
 org.xwiki.rendering.internal.configuration.DefaultXWikiRenderingConfiguration
 org.xwiki.rendering.internal.renderer.XWikiLinkLabelGenerator
 org.xwiki.rendering.internal.wiki.XWikiWikiModel
+org.xwiki.rendering.internal.renderer.XWikiAttachmentURILabelGenerator

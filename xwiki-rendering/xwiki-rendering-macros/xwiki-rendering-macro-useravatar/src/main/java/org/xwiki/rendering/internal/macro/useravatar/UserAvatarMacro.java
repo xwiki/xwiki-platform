@@ -28,9 +28,14 @@ import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.bridge.SkinAccessBridge;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.Requirement;
+import org.xwiki.model.EntityType;
+import org.xwiki.model.reference.AttachmentReference;
+import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.DocumentReferenceResolver;
+import org.xwiki.model.reference.EntityReferenceSerializer;
+import org.xwiki.model.reference.EntityReferenceValueProvider;
 import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.block.ImageBlock;
-import org.xwiki.rendering.listener.DefaultAttachment;
 import org.xwiki.rendering.listener.DocumentImage;
 import org.xwiki.rendering.listener.Image;
 import org.xwiki.rendering.listener.URLImage;
@@ -66,6 +71,26 @@ public class UserAvatarMacro extends AbstractMacro<UserAvatarMacroParameters>
     private SkinAccessBridge skinAccessBridge;
 
     /**
+     * Used to convert a user reference represented as a String (passed as a macro parameter by the user) to a
+     * Document Reference.
+     */
+    @Requirement("current")
+    private DocumentReferenceResolver<String> currentDocumentReferenceResolver; 
+
+    /**
+     * Used to convert a Document Reference to string (compact form without the wiki part if it matches the current
+     * wiki).
+     */
+    @Requirement("compactwiki")
+    private EntityReferenceSerializer<String> compactWikiEntityReferenceSerializer;
+
+    /**
+     * Used to find out the current Wiki name.
+     */
+    @Requirement("current")
+    private EntityReferenceValueProvider currentEntityReferenceValueProvider;
+
+    /**
      * Create and initialize the descriptor of the macro.
      */
     public UserAvatarMacro()
@@ -83,29 +108,34 @@ public class UserAvatarMacro extends AbstractMacro<UserAvatarMacroParameters>
     public List<Block> execute(UserAvatarMacroParameters parameters, String content, MacroTransformationContext context)
         throws MacroExecutionException
     {
-        String userName = parameters.getUsername();
-        Block resultedBlock = null;
+        DocumentReference userReference = this.currentDocumentReferenceResolver.resolve(parameters.getUsername());
 
         // Find the avatar attachment name or null if not defined or an error happened when locating it
         String fileName = null;
-        if (documentAccessBridge.exists(userName)) {
-            Object avatarProperty = documentAccessBridge.getProperty(userName, "XWiki.XWikiUsers", "avatar");
+        if (documentAccessBridge.exists(userReference)) {
+            Object avatarProperty = documentAccessBridge.getProperty(userReference,
+                new DocumentReference(this.currentEntityReferenceValueProvider.getDefaultValue(EntityType.WIKI),
+                    "XWiki", "XWikiUsers"), "avatar");
             if (avatarProperty != null) {
                 fileName = avatarProperty.toString(); 
             }
         } else {
-            throw new MacroExecutionException("User " + userName + " is not registered in this wiki");
+            throw new MacroExecutionException("User ["
+                + this.compactWikiEntityReferenceSerializer.serialize(userReference)
+                + "] is not registered in this wiki");
         }
-        Image image = null;
 
-        image =
-            StringUtils.isBlank(fileName) ? new URLImage(skinAccessBridge.getSkinFile("noavatar.png"))
-                : new DocumentImage(new DefaultAttachment(userName, fileName));
-
+        Image image;
+        if (StringUtils.isBlank(fileName)) {
+            image = new URLImage(skinAccessBridge.getSkinFile("noavatar.png"));
+        } else {
+            AttachmentReference attachmentReference = new AttachmentReference(fileName, userReference);
+            image = new DocumentImage(this.compactWikiEntityReferenceSerializer.serialize(attachmentReference));
+        }
         ImageBlock imageBlock = new ImageBlock(image, false);
-        String shortName = userName.split("[.]")[1];
-        imageBlock.setParameter("alt", "Picture of " + shortName);
-        imageBlock.setParameter("title", shortName);
+
+        imageBlock.setParameter("alt", "Picture of " + userReference.getName());
+        imageBlock.setParameter("title", userReference.getName());
 
         if (parameters.getWidth() != null) {
             imageBlock.setParameter("width", String.valueOf(parameters.getWidth()));
@@ -115,9 +145,7 @@ public class UserAvatarMacro extends AbstractMacro<UserAvatarMacroParameters>
             imageBlock.setParameter("height", String.valueOf(parameters.getHeight()));
         }
 
-        resultedBlock = imageBlock;
-
-        return Collections.singletonList(resultedBlock);
+        return Collections.singletonList((Block) imageBlock);
     }
 
     /**

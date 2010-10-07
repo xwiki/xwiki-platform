@@ -27,7 +27,6 @@ package org.xwiki.rendering.macro;
  */
 public class MacroLookupException extends Exception
 {
-
     /**
      * For serialization.
      */

@@ -61,9 +61,9 @@ public class URLImage extends AbstractImage
     /**
      * {@inheritDoc}
      * 
-     * @see org.xwiki.rendering.listener.Image#getName()
+     * @see org.xwiki.rendering.listener.Image#getReference()
      */
-    public String getName()
+    public String getReference()
     {
         return getURL();
     }
@@ -76,6 +76,6 @@ public class URLImage extends AbstractImage
     @Override
     public String toString()
     {
-        return "document = [" + getURL() + "]";
+        return "url = [" + getURL() + "]";
     }
 }

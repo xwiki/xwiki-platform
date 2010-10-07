@@ -1,0 +1,10 @@
+.#-----------------------------------------------------
+.input|xwiki/2.0
+.# Verify that the generated ALT attribute contains
+.# only the file name and not the full reference
+.#-----------------------------------------------------
+[[image:Space.ExistingPage@my.png]]
+.#-----------------------------------------------------
+.expect|annotatedxhtml/1.0
+.#-----------------------------------------------------
+<p><!--startimage:Space.ExistingPage@my.png--><img src="attachmenturl" alt="my.png"/><!--stopimage--></p>

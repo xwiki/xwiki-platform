@@ -203,7 +203,13 @@
                 <exclude>org/xwiki/rendering/block/PlainTextBlockFilter</exclude>
                 <exclude>org/xwiki/rendering/listener/Link</exclude>
                 <exclude>org/xwiki/rendering/listener/LinkType</exclude>
+                <exclude>org/xwiki/rendering/listener/Attachment</exclude>
+                <exclude>org/xwiki/rendering/listener/DefaultAttachment</exclude>
+                <exclude>org/xwiki/rendering/listener/Image</exclude>
+                <exclude>org/xwiki/rendering/listener/DocumentImage</exclude>
+                <exclude>org/xwiki/rendering/listener/URLImage</exclude>
                 <exclude>org/xwiki/rendering/parser/LinkParser</exclude>
+                <exclude>org/xwiki/rendering/parser/AttachmentParser</exclude>
                 <exclude>org/xwiki/rendering/renderer/LinkLabelGenerator</exclude>
                 <exclude>org/xwiki/rendering/renderer/LinkReferenceSerializer</exclude>
                 <exclude>org/xwiki/rendering/renderer/URILabelGenerator</exclude>

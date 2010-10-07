@@ -27,7 +27,6 @@ import java.util.List;
 
 import junit.framework.TestCase;
 
-import org.xwiki.rendering.listener.DefaultAttachment;
 import org.xwiki.rendering.listener.DocumentImage;
 import org.xwiki.rendering.listener.HeaderLevel;
 import org.xwiki.rendering.listener.Link;
@@ -139,7 +138,7 @@ public class BlockTest extends TestCase
     public void testClone()
     {
         WordBlock wb = new WordBlock("block");
-        ImageBlock ib = new ImageBlock(new DocumentImage(new DefaultAttachment("document", "attachment")), true);
+        ImageBlock ib = new ImageBlock(new DocumentImage("document@attachment"), true);
         Link link = new Link();
         link.setReference("reference");
         LinkBlock lb = new LinkBlock(Arrays.asList((Block) new WordBlock("label")), link, false);
@@ -166,7 +165,7 @@ public class BlockTest extends TestCase
         link.setReference("reference");
         LinkBlock pl = new LinkBlock(Arrays.<Block>asList(lw, ls), link, false);
         
-        ImageBlock pi = new ImageBlock(new DocumentImage(new DefaultAttachment("document", "attachment")), true);
+        ImageBlock pi = new ImageBlock(new DocumentImage("document@attachment"), true);
         
         ParagraphBlock rootBlock = new ParagraphBlock(Arrays.<Block> asList(pi, pl));
         

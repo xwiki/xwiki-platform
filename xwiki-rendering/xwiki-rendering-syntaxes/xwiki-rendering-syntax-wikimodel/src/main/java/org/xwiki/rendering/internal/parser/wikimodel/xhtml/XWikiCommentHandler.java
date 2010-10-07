@@ -30,11 +30,13 @@ import org.wikimodel.wem.xhtml.impl.XhtmlHandler.TagStack;
 import org.xwiki.rendering.internal.parser.WikiModelXHTMLParser;
 import org.xwiki.rendering.internal.parser.wikimodel.XWikiGeneratorListener;
 import org.xwiki.rendering.listener.Image;
+import org.xwiki.rendering.listener.Link;
 import org.xwiki.rendering.listener.LinkType;
 import org.xwiki.rendering.listener.Listener;
 import org.xwiki.rendering.parser.ImageParser;
 import org.xwiki.rendering.renderer.PrintRenderer;
 import org.xwiki.rendering.renderer.PrintRendererFactory;
+import org.xwiki.rendering.renderer.link.URILabelGenerator;
 import org.xwiki.rendering.renderer.printer.DefaultWikiPrinter;
 import org.xwiki.xml.XMLUtils;
 
@@ -59,6 +61,8 @@ public class XWikiCommentHandler extends CommentHandler
 
     private PrintRendererFactory xwikiSyntaxPrintRendererFactory;
 
+    private URILabelGenerator attachLinkLabelGenerator;
+
     /**
      * We're using a stack so that we can have nested comment handling. For example when we have a link to an image we
      * need nested comment support.
@@ -71,11 +75,12 @@ public class XWikiCommentHandler extends CommentHandler
      *       http://code.google.com/p/wikimodel/issues/detail?id=87
      */
     public XWikiCommentHandler(WikiModelXHTMLParser parser, ImageParser imageParser,
-        PrintRendererFactory xwikiSyntaxPrintRendererFactory)
+        PrintRendererFactory xwikiSyntaxPrintRendererFactory, URILabelGenerator attachLinkLabelGenerator)
     {
         this.parser = parser;
         this.xwikiSyntaxPrintRendererFactory = xwikiSyntaxPrintRendererFactory;
         this.imageParser = imageParser;
+        this.attachLinkLabelGenerator = attachLinkLabelGenerator;
     }
 
     @Override
@@ -195,7 +200,10 @@ public class XWikiCommentHandler extends CommentHandler
             // This is because the XHTML renderer automatically adds an ALT attribute since it is mandatory
             // in the XHTML specifications.
             WikiParameter alt = parameters.getParameter("alt");
-            if (alt != null && alt.getValue().equals(image.getName())) {
+            // HACK: Fix this when we have a common Reference object replacing Link and Image
+            Link dummyLink = new Link();
+            dummyLink.setReference(image.getReference());
+            if (alt != null && alt.getValue().equals(this.attachLinkLabelGenerator.generateLabel(dummyLink))) {
                 parameters = parameters.remove("alt");
             }
 

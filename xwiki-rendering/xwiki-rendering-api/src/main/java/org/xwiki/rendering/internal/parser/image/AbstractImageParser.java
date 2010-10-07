@@ -22,7 +22,6 @@ package org.xwiki.rendering.internal.parser.image;
 import org.xwiki.component.annotation.Requirement;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
-import org.xwiki.rendering.listener.Attachment;
 import org.xwiki.rendering.listener.DocumentImage;
 import org.xwiki.rendering.listener.Image;
 import org.xwiki.rendering.listener.URLImage;
@@ -46,12 +45,6 @@ public abstract class AbstractImageParser implements ImageParser
     private ComponentManager componentManager;
 
     /**
-     * @param attachment the attachment to parse as a string
-     * @return the parsed attachment string as an {@link Attachment}Êobject
-     */
-    protected abstract Attachment parseAttachment(String attachment);
-
-    /**
      * {@inheritDoc}
      * 
      * @see ImageParser#parse(String)
@@ -65,7 +58,7 @@ public abstract class AbstractImageParser implements ImageParser
         if (imageLocation.startsWith("http://") || !isInWikiMode()) {
             result = new URLImage(imageLocation);
         } else {
-            result = new DocumentImage(parseAttachment(imageLocation));
+            result = new DocumentImage(imageLocation);
         }
 
         return result;

@@ -26,9 +26,7 @@ import org.xwiki.component.descriptor.ComponentInstantiationStrategy;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.phase.Initializable;
 import org.xwiki.component.phase.InitializationException;
-import org.xwiki.rendering.listener.Attachment;
 import org.xwiki.rendering.listener.Link;
-import org.xwiki.rendering.parser.AttachmentParser;
 import org.xwiki.rendering.renderer.link.LinkTypeReferenceSerializer;
 import org.xwiki.rendering.wiki.WikiModel;
 
@@ -44,12 +42,6 @@ import java.util.Map;
 @InstantiationStrategy(ComponentInstantiationStrategy.PER_LOOKUP)
 public class AttachmentXHTMLLinkTypeRenderer extends AbstractXHTMLLinkTypeRenderer implements Initializable
 {
-    /**
-     * Used to extract the attachment information form the reference if the link is targeting an attachment.
-     */
-    @Requirement
-    private AttachmentParser attachmentParser;
-
     /**
      * Used to serialize the attachment link to XWiki Syntax 2.0 when we're not inside a wiki.
      * We choose the XWiki Syntax 2.0 arbitrarily. Normally the user should never use a link to an attachment when
@@ -89,10 +81,7 @@ public class AttachmentXHTMLLinkTypeRenderer extends AbstractXHTMLLinkTypeRender
         Map<String, String> anchorAttributes)
     {
         if (this.wikiModel != null) {
-            // Use the default attachment syntax parser to extract document name and attachment name
-            Attachment attachment = this.attachmentParser.parse(link.getReference());
-            anchorAttributes.put(XHTMLLinkRenderer.HREF, this.wikiModel.getAttachmentURL(attachment.getDocumentName(),
-                attachment.getAttachmentName()));
+            anchorAttributes.put(XHTMLLinkRenderer.HREF, this.wikiModel.getAttachmentURL(link.getReference()));
         } else {
             anchorAttributes.put(XHTMLLinkRenderer.HREF, this.defaultLinkTypeReferenceSerializer.serialize(link));
         }

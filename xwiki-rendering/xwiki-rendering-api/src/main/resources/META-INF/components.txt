@@ -12,9 +12,8 @@ org.xwiki.rendering.internal.parser.link.AttachmentLinkTypeParser
 org.xwiki.rendering.internal.parser.link.PathLinkTypeParser
 org.xwiki.rendering.internal.parser.image.GenericImageParser
 org.xwiki.rendering.internal.parser.image.XWikiImageParser
-org.xwiki.rendering.internal.parser.DefaultAttachmentParser
 org.xwiki.rendering.internal.renderer.DefaultLinkLabelGenerator
-org.xwiki.rendering.internal.renderer.AttachmentURILabelGenerator
+org.xwiki.rendering.internal.renderer.DefaultAttachmentURILabelGenerator
 org.xwiki.rendering.internal.renderer.MailtoURILabelGenerator
 org.xwiki.rendering.internal.renderer.xwiki20.XWikiSyntaxRenderer
 org.xwiki.rendering.internal.renderer.xwiki20.XWikiSyntaxBlockRenderer

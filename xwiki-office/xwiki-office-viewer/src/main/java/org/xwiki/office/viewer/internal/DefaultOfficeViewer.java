@@ -99,7 +99,7 @@ public class DefaultOfficeViewer extends AbstractOfficeViewer
         // Process all image blocks.
         List<ImageBlock> imgBlocks = xdom.getChildrenByType(ImageBlock.class, true);
         for (ImageBlock imgBlock : imgBlocks) {
-            String imageName = imgBlock.getImage().getName();
+            String imageName = imgBlock.getImage().getReference();
 
             // Check whether there is a corresponding artifact.
             if (artifacts.containsKey(imageName)) {

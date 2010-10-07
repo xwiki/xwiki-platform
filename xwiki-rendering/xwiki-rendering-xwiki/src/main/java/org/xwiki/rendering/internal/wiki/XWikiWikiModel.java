@@ -31,6 +31,7 @@ import org.w3c.dom.css.CSSStyleDeclaration;
 import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.Requirement;
+import org.xwiki.model.reference.AttachmentReferenceResolver;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.rendering.internal.configuration.XWikiRenderingConfiguration;
@@ -81,6 +82,12 @@ public class XWikiWikiModel implements WikiModel
     private EntityReferenceSerializer<String> entityReferenceSerializer;
 
     /**
+     * Convert an Attachment Reference from a String into an Attachment object.
+     */
+    @Requirement("current")
+    private AttachmentReferenceResolver<String> currentAttachmentReferenceResolver;
+
+    /**
      * The object used to parse the CSS from the image style parameter.
      */
     private final CSSOMParser cssParser = new CSSOMParser();
@@ -89,15 +96,113 @@ public class XWikiWikiModel implements WikiModel
      * {@inheritDoc}
      * 
      * @see WikiModel#getAttachmentURL(String, String)
+     * @deprecated since 2.5RC1 use {@link #getAttachmentURL(String)} instead
      */
-    public String getAttachmentURL(String documentName, String attachmentName)
+    @Deprecated
+    public String getAttachmentURL(String documentReference, String attachmentName)
     {
-        return this.documentAccessBridge.getAttachmentURL(documentName, attachmentName);
+        return this.documentAccessBridge.getAttachmentURL(documentReference, attachmentName);
+    }
+
+    /**
+     * {@inheritDoc}
+     *
+     * @see WikiModel#getAttachmentURL(String)
+     * @since 2.5RC1 
+     */
+    public String getAttachmentURL(String attachmentReference)
+    {
+        return this.documentAccessBridge.getAttachmentURL(
+            this.currentAttachmentReferenceResolver.resolve(attachmentReference), true);
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see org.xwiki.rendering.wiki.WikiModel#getImageURL(String, java.util.Map)
+     */
+    public String getImageURL(String attachmentReference, Map<String, String> parameters)
+    {
+        String url = getAttachmentURL(attachmentReference);
+        if (!xwikiRenderingConfiguration.isImageDimensionsIncludedInImageURL()) {
+            return url;
+        }
+
+        StringBuilder queryString = getImageURLQueryString(parameters);
+        if (queryString.length() == 0) {
+            return url;
+        }
+
+        // Determine the insertion point.
+        int insertionPoint = url.lastIndexOf('#');
+        if (insertionPoint < 0) {
+            // No fragment identifier.
+            insertionPoint = url.length();
+        }
+        if (url.lastIndexOf('?', insertionPoint) < 0) {
+            // No query string.
+            queryString.setCharAt(0, '?');
+        }
+
+        // Insert the query string.
+        return new StringBuilder(url).insert(insertionPoint, queryString).toString();
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see WikiModel#isDocumentAvailable(String)
+     */
+    public boolean isDocumentAvailable(String documentReference)
+    {
+        return this.documentAccessBridge.exists(documentReference);
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see WikiModel#getDocumentViewURL(String, String, String)
+     */
+    public String getDocumentViewURL(String documentReference, String anchor, String queryString)
+    {
+        return this.documentAccessBridge.getURL(documentReference, "view", queryString, anchor);
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see WikiModel#getDocumentEditURL(String, String, String)
+     */
+    public String getDocumentEditURL(String documentReference, String anchor, String queryString)
+    {
+        // Add the parent=<current document name> parameter to the query string of the edit URL so that
+        // the new document is created with the current page as its parent.
+        String modifiedQueryString = queryString;
+        if (StringUtils.isBlank(queryString)) {
+            DocumentReference reference = this.documentAccessBridge.getCurrentDocumentReference();
+            if (reference != null) {
+                try {
+                    // Note: we encode using UTF8 since it's the W3C recommendation.
+                    // See http://www.w3.org/TR/html40/appendix/notes.html#non-ascii-chars
+                    // TODO: Once the xwiki-url module is usable, refactor this code to use it and remove the need to
+                    // perform explicit encoding here.
+                    modifiedQueryString =
+                        "parent=" + URLEncoder.encode(this.entityReferenceSerializer.serialize(reference), "UTF-8");
+                } catch (UnsupportedEncodingException e) {
+                    // Not supporting UTF-8 as a valid encoding for some reasons. We consider XWiki cannot work
+                    // without that encoding.
+                    throw new RuntimeException("Failed to URL encode ["
+                        + this.entityReferenceSerializer.serialize(reference) + "] using UTF-8.", e);
+                }
+            }
+        }
+
+        return this.documentAccessBridge.getURL(documentReference, "create", modifiedQueryString, anchor);
     }
 
     /**
      * Extracts the specified image dimension from the image parameters.
-     * 
+     *
      * @param dimension either {@code width} or {@code height}
      * @param imageParameters the image parameters; may include the {@code width}, {@code height} and {@code style}
      *            parameters
@@ -126,7 +231,7 @@ public class XWikiWikiModel implements WikiModel
 
     /**
      * Creates the query string that can be added to an image URL to resize the image on the server side.
-     * 
+     *
      * @param imageParameters image parameters, including width and height then they are specified
      * @return the query string to be added to an image URL in order to resize the image on the server side
      */
@@ -165,89 +270,5 @@ public class XWikiWikiModel implements WikiModel
             }
         }
         return queryString;
-    }
-
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.rendering.wiki.WikiModel#getImageURL(java.lang.String, java.lang.String, java.util.Map)
-     */
-    public String getImageURL(String documentName, String attachmentName, Map<String, String> parameters)
-    {
-        String url = getAttachmentURL(documentName, attachmentName);
-        if (!xwikiRenderingConfiguration.isImageDimensionsIncludedInImageURL()) {
-            return url;
-        }
-
-        StringBuilder queryString = getImageURLQueryString(parameters);
-        if (queryString.length() == 0) {
-            return url;
-        }
-
-        // Determine the insertion point.
-        int insertionPoint = url.lastIndexOf('#');
-        if (insertionPoint < 0) {
-            // No fragment identifier.
-            insertionPoint = url.length();
-        }
-        if (url.lastIndexOf('?', insertionPoint) < 0) {
-            // No query string.
-            queryString.setCharAt(0, '?');
-        }
-
-        // Insert the query string.
-        return new StringBuilder(url).insert(insertionPoint, queryString).toString();
-    }
-
-    /**
-     * {@inheritDoc}
-     * 
-     * @see WikiModel#isDocumentAvailable(String)
-     */
-    public boolean isDocumentAvailable(String documentName)
-    {
-        return this.documentAccessBridge.exists(documentName);
-    }
-
-    /**
-     * {@inheritDoc}
-     * 
-     * @see WikiModel#getDocumentViewURL(String, String, String)
-     */
-    public String getDocumentViewURL(String documentName, String anchor, String queryString)
-    {
-        return this.documentAccessBridge.getURL(documentName, "view", queryString, anchor);
-    }
-
-    /**
-     * {@inheritDoc}
-     * 
-     * @see WikiModel#getDocumentEditURL(String, String, String)
-     */
-    public String getDocumentEditURL(String documentName, String anchor, String queryString)
-    {
-        // Add the parent=<current document name> parameter to the query string of the edit URL so that
-        // the new document is created with the current page as its parent.
-        String modifiedQueryString = queryString;
-        if (StringUtils.isBlank(queryString)) {
-            DocumentReference reference = this.documentAccessBridge.getCurrentDocumentReference();
-            if (reference != null) {
-                try {
-                    // Note: we encode using UTF8 since it's the W3C recommendation.
-                    // See http://www.w3.org/TR/html40/appendix/notes.html#non-ascii-chars
-                    // TODO: Once the xwiki-url module is usable, refactor this code to use it and remove the need to
-                    // perform explicit encoding here.
-                    modifiedQueryString =
-                        "parent=" + URLEncoder.encode(this.entityReferenceSerializer.serialize(reference), "UTF-8");
-                } catch (UnsupportedEncodingException e) {
-                    // Not supporting UTF-8 as a valid encoding for some reasons. We consider XWiki cannot work
-                    // without that encoding.
-                    throw new RuntimeException("Failed to URL encode ["
-                        + this.entityReferenceSerializer.serialize(reference) + "] using UTF-8.", e);
-                }
-            }
-        }
-
-        return this.documentAccessBridge.getURL(documentName, "create", modifiedQueryString, anchor);
-    }
+    }    
 }

@@ -23,14 +23,11 @@ import java.util.Iterator;
 import java.util.Map;
 
 import org.apache.commons.lang.StringUtils;
-import org.xwiki.rendering.listener.DocumentImage;
 import org.xwiki.rendering.listener.Format;
 import org.xwiki.rendering.listener.HeaderLevel;
 import org.xwiki.rendering.listener.Image;
-import org.xwiki.rendering.listener.ImageType;
 import org.xwiki.rendering.listener.Link;
 import org.xwiki.rendering.listener.ListType;
-import org.xwiki.rendering.listener.URLImage;
 import org.xwiki.rendering.listener.chaining.ListenerChain;
 import org.xwiki.rendering.syntax.Syntax;
 import org.xwiki.rendering.renderer.AbstractChainingPrintRenderer;
@@ -601,18 +598,8 @@ public class EventsChainingRenderer extends AbstractChainingPrintRenderer
     @Override
     public void onImage(Image image, boolean isFreeStandingURI, Map<String, String> parameters)
     {
-        if (image.getType() == ImageType.DOCUMENT) {
-            DocumentImage documentImage = DocumentImage.class.cast(image);
-            getPrinter().println(
-                "onImage: "
-                    + (documentImage.getDocumentName() != null ? "[" + documentImage.getDocumentName() + "] " : "")
-                    + "[" + documentImage.getAttachmentName() + "] [" + isFreeStandingURI + "]"
-                    + serializeParameters(parameters));
-        } else {
-            URLImage urlImage = URLImage.class.cast(image);
-            getPrinter().println(
-                "onImage: [" + urlImage.getURL() + "] [" + isFreeStandingURI + "]" + serializeParameters(parameters));
-        }
+        getPrinter().println("onImage: " + "[" + image.getReference() + "] [" + isFreeStandingURI + "]"
+            + serializeParameters(parameters));
     }
 
     public String getEscaped(String str)

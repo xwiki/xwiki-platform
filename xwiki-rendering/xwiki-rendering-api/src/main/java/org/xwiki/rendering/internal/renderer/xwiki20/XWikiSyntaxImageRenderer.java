@@ -19,15 +19,11 @@
  */
 package org.xwiki.rendering.internal.renderer.xwiki20;
 
-import org.xwiki.rendering.listener.DocumentImage;
 import org.xwiki.rendering.listener.Image;
-import org.xwiki.rendering.listener.ImageType;
-import org.xwiki.rendering.listener.URLImage;
 
 /**
- * Generate a XWiki syntax string representation of an {@link Image}, using the format:
- * <code>(optional document name)@(attachment name)</code>.
- * 
+ * Generate a XWiki syntax string representation of an {@link Image}.
+ *
  * @version $Id$
  * @since 2.0M3
  */
@@ -35,19 +31,6 @@ public class XWikiSyntaxImageRenderer
 {
     public String renderImage(Image image)
     {
-        String result;
-        if (image.getType() == ImageType.DOCUMENT) {
-            DocumentImage documentImage = DocumentImage.class.cast(image);
-            if (documentImage.getDocumentName() != null) {
-                result = documentImage.getDocumentName() + "@" + documentImage.getAttachmentName();
-            } else {
-                result = documentImage.getAttachmentName();
-            }
-        } else {
-            URLImage urlImage = URLImage.class.cast(image);
-            result = urlImage.getURL();
-        }
-
-        return result;
+        return image.getReference();
     }
 }

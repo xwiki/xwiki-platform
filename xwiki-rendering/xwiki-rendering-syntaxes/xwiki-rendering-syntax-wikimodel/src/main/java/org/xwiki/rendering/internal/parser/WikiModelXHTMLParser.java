@@ -45,6 +45,7 @@ import org.xwiki.rendering.parser.LinkParser;
 import org.xwiki.rendering.parser.ParseException;
 import org.xwiki.rendering.parser.StreamParser;
 import org.xwiki.rendering.renderer.PrintRendererFactory;
+import org.xwiki.rendering.renderer.link.URILabelGenerator;
 import org.xwiki.rendering.syntax.Syntax;
 import org.xwiki.rendering.util.IdGenerator;
 import org.xwiki.xml.XMLReaderFactory;
@@ -82,6 +83,9 @@ public class WikiModelXHTMLParser extends AbstractWikiModelParser
     @Requirement("xwiki/2.1")
     private PrintRendererFactory xwikiSyntaxPrintRendererFactory;
 
+    @Requirement("attach")
+    private URILabelGenerator attachURILabelGenerator;
+    
     /**
      * A special factory that create foolproof XML reader that have the following characteristics:
      * <ul>
@@ -141,7 +145,8 @@ public class WikiModelXHTMLParser extends AbstractWikiModelParser
 
         XhtmlParser parser = new XhtmlParser();
         parser.setExtraHandlers(handlers);
-        parser.setCommentHandler(new XWikiCommentHandler(this, this.imageParser, this.xwikiSyntaxPrintRendererFactory));
+        parser.setCommentHandler(new XWikiCommentHandler(this, this.imageParser, this.xwikiSyntaxPrintRendererFactory,
+            this.attachURILabelGenerator));
 
         // Construct our own XML filter chain since we want to use our own Comment filter.
         try {

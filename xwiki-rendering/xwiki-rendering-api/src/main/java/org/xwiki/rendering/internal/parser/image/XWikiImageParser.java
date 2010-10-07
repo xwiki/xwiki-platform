@@ -20,9 +20,6 @@
 package org.xwiki.rendering.internal.parser.image;
 
 import org.xwiki.component.annotation.Component;
-import org.xwiki.component.annotation.Requirement;
-import org.xwiki.rendering.listener.Attachment;
-import org.xwiki.rendering.parser.AttachmentParser;
 
 /**
  * Parses XWiki image definitions, using either a URL (pointing to an image or the following format:
@@ -35,20 +32,4 @@ import org.xwiki.rendering.parser.AttachmentParser;
 @Component("xwiki/2.0")
 public class XWikiImageParser extends AbstractImageParser
 {
-    /**
-     * Used to parse the attachment syntax to extract document name and attachment name.
-     */
-    @Requirement
-    private AttachmentParser attachmentParser;
-
-    /**
-     * {@inheritDoc}
-     * 
-     * @see AbstractImageParser#parseAttachment(String)
-     */
-    @Override
-    protected Attachment parseAttachment(String attachment)
-    {
-        return this.attachmentParser.parse(attachment);
-    }
 }

@@ -20,7 +20,7 @@
 package org.xwiki.rendering.listener;
 
 /**
- * Represents an image in a Document.
+ * Represents a reference to an image. Note that this representation is independent of any wiki syntax.
  * 
  * @version $Id$
  * @since 1.7M3
@@ -33,9 +33,13 @@ public interface Image extends Cloneable
     ImageType getType();
 
     /**
-     * @return a name representing the image (it's used for example as the ALT text in the XHTML renderer)
+     * @return the reference to where the image is located. The format used is independent of the Rendering module.
+     *         For XWiki the syntax is of the type {@code wiki:page.space@filename}.
+     *
+     * Note that the reason we store the reference as a String and not as an Entity Reference is because we want
+     * the Rendering module independent of the XWiki Model so that it can be used independently of XWiki.
      */
-    String getName();
+    String getReference();
 
     /**
      * @return a copy of the image

@@ -52,8 +52,10 @@ public class MockWikiModel implements WikiModel
      * {@inheritDoc}
      * 
      * @see WikiModel#getAttachmentURL(String, String)
+     * @deprecated since 2.5RC1 use {@link #getAttachmentURL(String)} instead
      */
-    public String getAttachmentURL(String documentName, String attachmentName)
+    @Deprecated
+    public String getAttachmentURL(String documentReference, String attachmentName)
     {
         return "attachmenturl";
     }
@@ -61,11 +63,22 @@ public class MockWikiModel implements WikiModel
     /**
      * {@inheritDoc}
      *
-     * @see WikiModel#getImageURL(String, String, Map)
+     * @see WikiModel#getAttachmentURL(String)
+     * @since 2.5RC1
      */
-    public String getImageURL(String documentName, String attachmentName, Map<String, String> parameters)
+    public String getAttachmentURL(String attachmentReference)
     {
-        return getAttachmentURL(documentName, attachmentName);
+        return "attachmenturl";
+    }
+
+    /**
+     * {@inheritDoc}
+     *
+     * @see WikiModel#getImageURL(String, java.util.Map)
+     */
+    public String getImageURL(String attachmentReference, Map<String, String> parameters)
+    {
+        return getAttachmentURL(attachmentReference);
     }
 
     /**
@@ -73,7 +86,7 @@ public class MockWikiModel implements WikiModel
      * 
      * @see WikiModel#getDocumentEditURL(String, String, String)
      */
-    public String getDocumentEditURL(String documentName, String anchor, String queryString)
+    public String getDocumentEditURL(String documentReference, String anchor, String queryString)
     {
         return "editurl";
     }
@@ -83,7 +96,7 @@ public class MockWikiModel implements WikiModel
      * 
      * @see WikiModel#getDocumentViewURL(String, String, String)
      */
-    public String getDocumentViewURL(String documentName, String anchor, String queryString)
+    public String getDocumentViewURL(String documentReference, String anchor, String queryString)
     {
         return "viewurl" + (queryString != null ? "?" + queryString : "") + (anchor != null ? "#" + anchor : "");
     }
@@ -93,8 +106,8 @@ public class MockWikiModel implements WikiModel
      * 
      * @see WikiModel#isDocumentAvailable(String)
      */
-    public boolean isDocumentAvailable(String documentName)
+    public boolean isDocumentAvailable(String documentReference)
     {
-        return "Space.ExistingPage".equals(documentName);
+        return "Space.ExistingPage".equals(documentReference);
     }
 }

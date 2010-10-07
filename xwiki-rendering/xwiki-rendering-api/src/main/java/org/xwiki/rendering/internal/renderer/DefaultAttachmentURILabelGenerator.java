@@ -17,25 +17,27 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.rendering.parser;
+package org.xwiki.rendering.internal.renderer;
 
-import org.xwiki.component.annotation.ComponentRole;
-import org.xwiki.rendering.listener.Attachment;
+import org.xwiki.component.annotation.Component;
+import org.xwiki.rendering.listener.Link;
+import org.xwiki.rendering.renderer.link.URILabelGenerator;
 
 /**
- * Interface for parsing attachment location represented as Strings.
- * 
- * @version $Id $
- * @since 1.7.1
+ * Generate link labels for ATTACH URIs.
+ *
+ * @version $Id: DefaultAttachmentURILabelGenerator.java 31386 2010-09-27 09:42:32Z vmassol $
+ * @since 2.5RC1
  */
-@ComponentRole
-public interface AttachmentParser
+@Component("attach")
+public class DefaultAttachmentURILabelGenerator implements URILabelGenerator
 {
     /**
-     * Extract informations from attachment location string an return an {@link Attachment}.
-     * 
-     * @param attachmentLocation the location of the attachment in string.
-     * @return the {@link Attachment} object.
+     * {@inheritDoc}
+     * @see org.xwiki.rendering.renderer.link.URILabelGenerator#generateLabel(org.xwiki.rendering.listener.Link)
      */
-    Attachment parse(String attachmentLocation);
+    public String generateLabel(Link link)
+    {
+        return link.getReference();
+    }
 }

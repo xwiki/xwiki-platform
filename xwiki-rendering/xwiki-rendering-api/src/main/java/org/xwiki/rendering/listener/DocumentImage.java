@@ -25,40 +25,29 @@ package org.xwiki.rendering.listener;
  * @version $Id$
  * @since 1.7RC1
  */
-public class DocumentImage extends AbstractImage implements Attachment
+public class DocumentImage extends AbstractImage
 {
     /**
-     * The attachment containing the image.
+     * @see #getAttachmentReference() 
      */
-    private Attachment attachment;
+    private String attachmentReference;
 
     /**
-     * @param attachment the attachment containing the image
-     * @since 1.7.1
+     * @param attachmentReference see {@link #getAttachmentReference()}
+     * @since 2.5RC1
      */
-    public DocumentImage(Attachment attachment)
+    public DocumentImage(String attachmentReference)
     {
-        this.attachment = attachment;
+        this.attachmentReference = attachmentReference;
     }
 
     /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.rendering.listener.Attachment#getDocumentName()
+     * @return the reference to the attachment containing the image
+     * @since 2.5RC1
      */
-    public String getDocumentName()
+    public String getAttachmentReference()
     {
-        return this.attachment.getDocumentName();
-    }
-
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.rendering.listener.Attachment#getAttachmentName()
-     */
-    public String getAttachmentName()
-    {
-        return this.attachment.getAttachmentName();
+        return this.attachmentReference;
     }
 
     /**
@@ -73,12 +62,12 @@ public class DocumentImage extends AbstractImage implements Attachment
 
     /**
      * {@inheritDoc}
-     * 
-     * @see org.xwiki.rendering.listener.Image#getName()
+     *
+     * @see Image#getReference()
      */
-    public String getName()
+    public String getReference()
     {
-        return getAttachmentName();
+        return getAttachmentReference();
     }
 
     /**
@@ -89,6 +78,6 @@ public class DocumentImage extends AbstractImage implements Attachment
     @Override
     public String toString()
     {
-        return "document = [" + getDocumentName() + "], attachment = [" + getAttachmentName() + "]";
+        return "reference = [" + getAttachmentReference() + "]";
     }
 }

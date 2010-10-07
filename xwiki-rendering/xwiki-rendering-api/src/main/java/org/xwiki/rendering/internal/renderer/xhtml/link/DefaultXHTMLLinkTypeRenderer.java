@@ -40,7 +40,7 @@ import java.util.Map;
 public class DefaultXHTMLLinkTypeRenderer extends AbstractXHTMLLinkTypeRenderer
 {
     /**
-     * Used to seralize the link into XWiki Syntax 2.0. This syntax was chosen arbitrarily. Normally we should always
+     * Used to serialize the link into XWiki Syntax 2.0. This syntax was chosen arbitrarily. Normally we should always
      * have a specific link type renderer found so this is only a fallback solution.
      */
     @Requirement("xwiki/2.0")

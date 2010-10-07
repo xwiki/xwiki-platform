@@ -35,7 +35,7 @@ import org.xwiki.rendering.listener.ResourceReference;
 public class LinkBlock extends AbstractFatherBlock
 {
     /**
-     * A link. See {@link org.xwiki.rendering.listener.ResourceReference} for more details.
+     * A reference to the link target. See {@link org.xwiki.rendering.listener.ResourceReference} for more details.
      */
     private ResourceReference reference;
 
@@ -69,7 +69,7 @@ public class LinkBlock extends AbstractFatherBlock
     }
 
     /**
-     * @return the link
+     * @return the reference to the target to link to
      * @see org.xwiki.rendering.listener.ResourceReference
      */
     public ResourceReference getReference()

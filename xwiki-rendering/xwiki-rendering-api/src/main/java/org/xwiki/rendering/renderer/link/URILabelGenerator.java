@@ -20,11 +20,11 @@
 package org.xwiki.rendering.renderer.link;
 
 import org.xwiki.component.annotation.ComponentRole;
-import org.xwiki.rendering.listener.Link;
+import org.xwiki.rendering.listener.ResourceReference;
 
 /**
- * Generate link labels for URIs. For example an implementation for MAILTO URIs would remove the scheme part and the
- * query string part.
+ * Generate Resource Reference labels for URIs. For example an implementation for MAILTO URIs would remove the scheme
+ * part and the query string part.
  *
  * @version $Id$
  * @since 2.2RC1
@@ -33,8 +33,8 @@ import org.xwiki.rendering.listener.Link;
 public interface URILabelGenerator
 {
     /**
-     * @param link the link pointing to a URI for which we want to generate a label
-     * @return the URI label to display when rendering links
+     * @param reference the reference pointing to a URI for which we want to generate a label
+     * @return the URI label to display when rendering resource references
      */
-    String generateLabel(Link link);
+    String generateLabel(ResourceReference reference);
 }

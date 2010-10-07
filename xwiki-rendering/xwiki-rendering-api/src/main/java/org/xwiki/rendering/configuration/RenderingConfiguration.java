@@ -66,7 +66,7 @@ public interface RenderingConfiguration
 
     /**
      * @return the list of InterWiki definitions. Each InterWiki definition is made of an alias and a base URL.
-     * @see org.xwiki.rendering.listener.InterWikiLink
+     * @see org.xwiki.rendering.listener.InterWikiResourceReference
      */
     Properties getInterWikiDefinitions();
 }

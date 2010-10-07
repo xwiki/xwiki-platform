@@ -26,7 +26,7 @@ import org.xwiki.component.annotation.InstantiationStrategy;
 import org.xwiki.component.annotation.Requirement;
 import org.xwiki.component.descriptor.ComponentInstantiationStrategy;
 import org.xwiki.rendering.internal.renderer.ParametersPrinter;
-import org.xwiki.rendering.listener.Link;
+import org.xwiki.rendering.listener.ResourceReference;
 import org.xwiki.rendering.renderer.link.LinkReferenceSerializer;
 import org.xwiki.rendering.renderer.printer.XHTMLWikiPrinter;
 
@@ -86,10 +86,10 @@ public class AnnotatedXHTMLLinkRenderer implements XHTMLLinkRenderer
     /**
      * {@inheritDoc}
      * 
-     * @see org.xwiki.rendering.listener.LinkListener#beginLink(org.xwiki.rendering.listener.Link, boolean,
-     *      java.util.Map)
+     * @see org.xwiki.rendering.listener.LinkListener#beginLink(org.xwiki.rendering.listener.ResourceReference ,
+     *      boolean, java.util.Map)
      */
-    public void beginLink(Link link, boolean isFreeStandingURI, Map<String, String> parameters)
+    public void beginLink(ResourceReference reference, boolean isFreeStandingURI, Map<String, String> parameters)
     {
         // Add an XML comment as a placeholder so that the XHTML parser can find the document name.
         // Otherwise it would be too difficult to transform a URL into a document name especially since
@@ -97,11 +97,11 @@ public class AnnotatedXHTMLLinkRenderer implements XHTMLLinkRenderer
         StringBuffer buffer = new StringBuffer("startwikilink:");
 
         // Print if the Link Reference is typed, the Link Reference Type and the Link Reference itself
-        buffer.append(link.isTyped());
+        buffer.append(reference.isTyped());
         buffer.append(COMMENT_SEPARATOR);
-        buffer.append(link.getType().getScheme());
+        buffer.append(reference.getType().getScheme());
         buffer.append(COMMENT_SEPARATOR);
-        buffer.append(link.getReference());
+        buffer.append(reference.getReference());
 
         // Print Link Reference parameters. We need to do this so that the XHTML parser doesn't have
         // to parse the query string to extract the parameters. Doing so could lezd to false result since
@@ -111,7 +111,7 @@ public class AnnotatedXHTMLLinkRenderer implements XHTMLLinkRenderer
         // Also note that we don't need to print Link parameters since they are added as XHTML class
         // attributes by the XHTML Renderer and thus the XHTML parser will be able to get them
         // agian as attributes.
-        Map<String, String> linkReferenceParameters = link.getParameters();
+        Map<String, String> linkReferenceParameters = reference.getParameters();
         if (!linkReferenceParameters.isEmpty()) {
             buffer.append(COMMENT_SEPARATOR);
             buffer.append(this.parametersPrinter.print(linkReferenceParameters, '\\'));
@@ -119,17 +119,18 @@ public class AnnotatedXHTMLLinkRenderer implements XHTMLLinkRenderer
 
         getXHTMLWikiPrinter().printXMLComment(buffer.toString(), true);
 
-        this.defaultLinkRenderer.beginLink(link, isFreeStandingURI, parameters);
+        this.defaultLinkRenderer.beginLink(reference, isFreeStandingURI, parameters);
     }
 
     /**
      * {@inheritDoc}
      * 
-     * @see org.xwiki.rendering.listener.LinkListener#endLink(org.xwiki.rendering.listener.Link, boolean, java.util.Map)
+     * @see org.xwiki.rendering.listener.LinkListener#endLink(org.xwiki.rendering.listener.ResourceReference ,
+     *      boolean, java.util.Map)
      */
-    public void endLink(Link link, boolean isFreeStandingURI, Map<String, String> parameters)
+    public void endLink(ResourceReference reference, boolean isFreeStandingURI, Map<String, String> parameters)
     {
-        this.defaultLinkRenderer.endLink(link, isFreeStandingURI, parameters);
+        this.defaultLinkRenderer.endLink(reference, isFreeStandingURI, parameters);
 
         // Add a XML comment to signify the end of the link.
         getXHTMLWikiPrinter().printXMLComment("stopwikilink");

@@ -20,12 +20,12 @@
 package org.xwiki.rendering.parser;
 
 import org.xwiki.component.annotation.ComponentRole;
-import org.xwiki.rendering.listener.Link;
-import org.xwiki.rendering.listener.LinkType;
+import org.xwiki.rendering.listener.ResourceReference;
+import org.xwiki.rendering.listener.ResourceType;
 
 /**
  * Parses a raw link by determining if it has the right type and return a non-null
- * {@link org.xwiki.rendering.listener.Link} object if it has.
+ * {@link org.xwiki.rendering.listener.ResourceReference} object if it has.
  *
  * @version $Id$
  * @since 2.5M2
@@ -36,12 +36,12 @@ public interface LinkTypeParser
     /**
      * @return the link type (document, url, attachment, etc).
      */
-    LinkType getType();
+    ResourceType getType();
 
     /**
      * @param reference the raw link reference to parse
      * @return the parsed link information if the passed reference can be parsed by this link type parser or null if
      *         the passed reference isn't valid
      */
-    Link parse(String reference);
+    ResourceReference parse(String reference);
 }

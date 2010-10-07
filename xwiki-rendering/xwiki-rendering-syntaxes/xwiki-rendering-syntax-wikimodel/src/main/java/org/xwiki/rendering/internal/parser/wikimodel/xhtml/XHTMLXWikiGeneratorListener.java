@@ -21,8 +21,8 @@ package org.xwiki.rendering.internal.parser.wikimodel.xhtml;
 
 import org.wikimodel.wem.WikiReference;
 import org.xwiki.rendering.internal.parser.wikimodel.DefaultXWikiGeneratorListener;
-import org.xwiki.rendering.listener.Link;
-import org.xwiki.rendering.listener.LinkType;
+import org.xwiki.rendering.listener.ResourceReference;
+import org.xwiki.rendering.listener.ResourceType;
 import org.xwiki.rendering.listener.Listener;
 import org.xwiki.rendering.parser.ImageParser;
 import org.xwiki.rendering.parser.LinkParser;
@@ -69,15 +69,15 @@ public class XHTMLXWikiGeneratorListener extends DefaultXWikiGeneratorListener
             super.onReference(reference);
         } else {
             XWikiWikiReference xwikiReference = (XWikiWikiReference) reference;
-            Link link = xwikiReference.getXWikiLink();
+            ResourceReference resourceReference = xwikiReference.getXWikiLink();
 
             flushFormat();
 
-            if (link.getType().equals(LinkType.IMAGE)) {
-                getListener().onImage(getImageParser().parse(link.getReference()), xwikiReference.isFreeStanding(),
-                    convertParameters(xwikiReference.getParameters()));
+            if (resourceReference.getType().equals(ResourceType.IMAGE)) {
+                getListener().onImage(getImageParser().parse(resourceReference.getReference()),
+                    xwikiReference.isFreeStanding(), convertParameters(xwikiReference.getParameters()));
             } else {
-                onReference(link, xwikiReference.getLabel(), xwikiReference.isFreeStanding(),
+                onReference(resourceReference, xwikiReference.getLabel(), xwikiReference.isFreeStanding(),
                     convertParameters(xwikiReference.getParameters()));
             }
         }

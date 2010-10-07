@@ -22,7 +22,7 @@ package org.xwiki.rendering.listener;
 import java.util.Map;
 
 /**
- * Contains callback events for Links,called when a document has been parsed and when it needs to be modified 
+ * Contains callback events for Links, called when a document has been parsed and when it needs to be modified 
  * or rendered.
  * 
  * @version $Id$
@@ -34,22 +34,22 @@ public interface LinkListener
     /**
      * Start of a link.
      * 
-     * @param link the link definition (the reference)
+     * @param reference the link reference
      * @param isFreeStandingURI if true then the link is a free standing URI directly in the text
      * @param parameters a generic list of parameters. Example: style="background-color: blue"
-     * @see Link
+     * @see ResourceReference
      * @since 1.7M1
      */
-    void beginLink(Link link, boolean isFreeStandingURI, Map<String, String> parameters);
+    void beginLink(ResourceReference reference, boolean isFreeStandingURI, Map<String, String> parameters);
 
     /**
      * End of a link.
      * 
-     * @param link the link definition (the reference)
+     * @param reference the link reference
      * @param isFreeStandingURI if true then the link is a free standing URI directly in the text
      * @param parameters a generic list of parameters. Example: style="background-color: blue"
-     * @see Link
+     * @see ResourceReference
      * @since 1.7M1
      */
-    void endLink(Link link, boolean isFreeStandingURI, Map<String, String> parameters);
+    void endLink(ResourceReference reference, boolean isFreeStandingURI, Map<String, String> parameters);
 }

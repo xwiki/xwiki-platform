@@ -32,7 +32,7 @@ import org.xwiki.rendering.internal.renderer.xhtml.image.XHTMLImageRenderer;
 import org.xwiki.rendering.internal.renderer.xhtml.link.XHTMLLinkRenderer;
 import org.xwiki.rendering.listener.Format;
 import org.xwiki.rendering.listener.HeaderLevel;
-import org.xwiki.rendering.listener.Link;
+import org.xwiki.rendering.listener.ResourceReference;
 import org.xwiki.rendering.listener.ListType;
 import org.xwiki.rendering.listener.chaining.EventType;
 import org.xwiki.rendering.listener.chaining.ListenerChain;
@@ -231,14 +231,14 @@ public class AnnotationXHTMLChainingRenderer extends XHTMLChainingRenderer imple
     /**
      * {@inheritDoc}
      * 
-     * @see org.xwiki.rendering.listener.chaining.AbstractChainingListener#endLink(org.xwiki.rendering.listener.Link,
-     *      boolean, java.util.Map)
+     * @see org.xwiki.rendering.listener.chaining.AbstractChainingListener#endLink(
+     *      org.xwiki.rendering.listener.ResourceReference, boolean, java.util.Map)
      */
     @Override
-    public void endLink(Link link, boolean isFreeStandingURI, Map<String, String> parameters)
+    public void endLink(ResourceReference reference, boolean isFreeStandingURI, Map<String, String> parameters)
     {
         getAnnotationsMarkerPrinter().closeAllAnnotationMarkers();
-        super.endLink(link, isFreeStandingURI, parameters);
+        super.endLink(reference, isFreeStandingURI, parameters);
     }
 
     /**
@@ -529,10 +529,10 @@ public class AnnotationXHTMLChainingRenderer extends XHTMLChainingRenderer imple
      *      #beginLink(org.xwiki.rendering.listener.Link, boolean, java.util.Map)
      */
     @Override
-    public void beginLink(Link link, boolean isFreeStandingURI, Map<String, String> parameters)
+    public void beginLink(ResourceReference reference, boolean isFreeStandingURI, Map<String, String> parameters)
     {
         getAnnotationsMarkerPrinter().closeAllAnnotationMarkers();
-        super.beginLink(link, isFreeStandingURI, parameters);
+        super.beginLink(reference, isFreeStandingURI, parameters);
     }
 
     /**

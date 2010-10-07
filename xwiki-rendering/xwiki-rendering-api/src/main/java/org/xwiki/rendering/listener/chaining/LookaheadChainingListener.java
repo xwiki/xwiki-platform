@@ -24,7 +24,7 @@ import java.util.Map;
 import org.xwiki.rendering.listener.Format;
 import org.xwiki.rendering.listener.HeaderLevel;
 import org.xwiki.rendering.listener.Image;
-import org.xwiki.rendering.listener.Link;
+import org.xwiki.rendering.listener.ResourceReference;
 import org.xwiki.rendering.listener.ListType;
 import org.xwiki.rendering.listener.QueueListener;
 import org.xwiki.rendering.listener.QueueListener.Event;
@@ -149,13 +149,13 @@ public class LookaheadChainingListener extends AbstractChainingListener
     /**
      * {@inheritDoc}
      * 
-     * @see org.xwiki.rendering.listener.chaining.AbstractChainingListener#beginLink(org.xwiki.rendering.listener.Link,
-     *      boolean, java.util.Map)
+     * @see org.xwiki.rendering.listener.chaining.AbstractChainingListener#beginLink(
+     *      org.xwiki.rendering.listener.ResourceReference, boolean, java.util.Map)
      */
     @Override
-    public void beginLink(Link link, boolean isFreeStandingURI, Map<String, String> parameters)
+    public void beginLink(ResourceReference reference, boolean isFreeStandingURI, Map<String, String> parameters)
     {
-        this.previousEvents.beginLink(link, isFreeStandingURI, parameters);
+        this.previousEvents.beginLink(reference, isFreeStandingURI, parameters);
         firePreviousEvent();
     }
 
@@ -382,13 +382,13 @@ public class LookaheadChainingListener extends AbstractChainingListener
     /**
      * {@inheritDoc}
      * 
-     * @see org.xwiki.rendering.listener.chaining.AbstractChainingListener#endLink(org.xwiki.rendering.listener.Link,
-     *      boolean, java.util.Map)
+     * @see org.xwiki.rendering.listener.chaining.AbstractChainingListener#endLink(
+     *      org.xwiki.rendering.listener.ResourceReference, boolean, java.util.Map)
      */
     @Override
-    public void endLink(Link link, boolean isFreeStandingURI, Map<String, String> parameters)
+    public void endLink(ResourceReference reference, boolean isFreeStandingURI, Map<String, String> parameters)
     {
-        this.previousEvents.endLink(link, isFreeStandingURI, parameters);
+        this.previousEvents.endLink(reference, isFreeStandingURI, parameters);
         firePreviousEvent();
     }
 

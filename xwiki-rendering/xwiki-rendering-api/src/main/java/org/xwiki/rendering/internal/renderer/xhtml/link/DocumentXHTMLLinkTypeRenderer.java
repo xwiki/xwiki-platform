@@ -30,8 +30,8 @@ import org.xwiki.component.descriptor.ComponentInstantiationStrategy;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.phase.Initializable;
 import org.xwiki.component.phase.InitializationException;
-import org.xwiki.rendering.listener.DocumentLink;
-import org.xwiki.rendering.listener.Link;
+import org.xwiki.rendering.listener.DocumentResourceReference;
+import org.xwiki.rendering.listener.ResourceReference;
 import org.xwiki.rendering.renderer.link.LinkLabelGenerator;
 import org.xwiki.rendering.wiki.WikiModel;
 
@@ -80,50 +80,51 @@ public class DocumentXHTMLLinkTypeRenderer extends AbstractXHTMLLinkTypeRenderer
     /**
      * {@inheritDoc}
      * 
-     * @see XHTMLLinkTypeRenderer#beginLink(Link, boolean, Map)
+     * @see XHTMLLinkTypeRenderer#beginLink(org.xwiki.rendering.listener.ResourceReference , boolean, Map)
      */
-    public void beginLink(Link link, boolean isFreeStandingURI, Map<String, String> parameters)
+    public void beginLink(ResourceReference reference, boolean isFreeStandingURI, Map<String, String> parameters)
     {
         if (this.wikiModel == null) {
-            super.beginLink(link, isFreeStandingURI, parameters);
+            super.beginLink(reference, isFreeStandingURI, parameters);
         } else {
-            beginInternalLink(link, isFreeStandingURI, parameters);
+            beginInternalLink(reference, isFreeStandingURI, parameters);
         }
     }
 
     /**
      * {@inheritDoc}
-     * @see AbstractXHTMLLinkTypeRenderer#computeLabel(org.xwiki.rendering.listener.Link)   
+     * @see AbstractXHTMLLinkTypeRenderer#computeLabel(org.xwiki.rendering.listener.ResourceReference)
      */
     @Override
-    protected String computeLabel(Link link)
+    protected String computeLabel(ResourceReference reference)
     {
-        return this.linkLabelGenerator.generate(link);
+        return this.linkLabelGenerator.generate(reference);
     }
 
     /**
      * {@inheritDoc}
-     * @see AbstractXHTMLLinkTypeRenderer#beginLinkExtraAttributes(Link, java.util.Map, java.util.Map)
+     * @see AbstractXHTMLLinkTypeRenderer#beginLinkExtraAttributes(org.xwiki.rendering.listener.ResourceReference , java.util.Map, java.util.Map)
      */
     @Override
-    protected void beginLinkExtraAttributes(Link link, Map<String, String> spanAttributes,
+    protected void beginLinkExtraAttributes(ResourceReference reference, Map<String, String> spanAttributes,
         Map<String, String> anchorAttributes)
     {
-        if (StringUtils.isEmpty(link.getReference())) {
-            renderAutoLink(link, spanAttributes, anchorAttributes);
+        if (StringUtils.isEmpty(reference.getReference())) {
+            renderAutoLink(reference, spanAttributes, anchorAttributes);
         } else {
-            anchorAttributes.put(XHTMLLinkRenderer.HREF, link.getReference());
+            anchorAttributes.put(XHTMLLinkRenderer.HREF, reference.getReference());
         }
     }
 
     /**
      * Start of an internal link.
      *
-     * @param link the link definition (the reference)
+     * @param reference the reference to the link
      * @param isFreeStandingURI if true then the link is a free standing URI directly in the text
      * @param parameters a generic list of parameters. Example: style="background-color: blue"
      */
-    private void beginInternalLink(Link link, boolean isFreeStandingURI, Map<String, String> parameters)
+    private void beginInternalLink(ResourceReference reference, boolean isFreeStandingURI,
+        Map<String, String> parameters)
     {
         Map<String, String> spanAttributes = new LinkedHashMap<String, String>();
         Map<String, String> anchorAttributes = new LinkedHashMap<String, String>();
@@ -131,19 +132,19 @@ public class DocumentXHTMLLinkTypeRenderer extends AbstractXHTMLLinkTypeRenderer
         // Add all parameters to the A attributes
         anchorAttributes.putAll(parameters);
 
-        if (StringUtils.isEmpty(link.getReference())) {
-            renderAutoLink(link, spanAttributes, anchorAttributes);
-        } else if (this.wikiModel.isDocumentAvailable(link.getReference())) {
+        if (StringUtils.isEmpty(reference.getReference())) {
+            renderAutoLink(reference, spanAttributes, anchorAttributes);
+        } else if (this.wikiModel.isDocumentAvailable(reference.getReference())) {
             spanAttributes.put(CLASS, WIKILINK);
-            anchorAttributes.put(XHTMLLinkRenderer.HREF, this.wikiModel.getDocumentViewURL(link.getReference(),
-                link.getParameter(DocumentLink.ANCHOR),
-                link.getParameter(DocumentLink.QUERY_STRING)));
+            anchorAttributes.put(XHTMLLinkRenderer.HREF, this.wikiModel.getDocumentViewURL(reference.getReference(),
+                reference.getParameter(DocumentResourceReference.ANCHOR),
+                reference.getParameter(DocumentResourceReference.QUERY_STRING)));
         } else {
             // The wiki document doesn't exist
             spanAttributes.put(CLASS, "wikicreatelink");
-            anchorAttributes.put(XHTMLLinkRenderer.HREF, this.wikiModel.getDocumentEditURL(link.getReference(),
-                link.getParameter(DocumentLink.ANCHOR),
-                link.getParameter(DocumentLink.QUERY_STRING)));
+            anchorAttributes.put(XHTMLLinkRenderer.HREF, this.wikiModel.getDocumentEditURL(reference.getReference(),
+                reference.getParameter(DocumentResourceReference.ANCHOR),
+                reference.getParameter(DocumentResourceReference.QUERY_STRING)));
         }
 
         getXHTMLWikiPrinter().printXMLStartElement(SPAN, spanAttributes);
@@ -151,22 +152,23 @@ public class DocumentXHTMLLinkTypeRenderer extends AbstractXHTMLLinkTypeRenderer
     }
 
     /**
-     * @param link the link definition (the reference)
+     * @param reference the reference to the link
      * @param spanAttributes the span element where to put the class
      * @param aAttributes the anchor element where to put the reference
      */
-    private void renderAutoLink(Link link, Map<String, String> spanAttributes, Map<String, String> aAttributes)
+    private void renderAutoLink(ResourceReference reference, Map<String, String> spanAttributes,
+        Map<String, String> aAttributes)
     {
         spanAttributes.put(CLASS, WIKILINK);
 
         StringBuilder buffer = new StringBuilder();
-        String queryString = link.getParameter(DocumentLink.QUERY_STRING);
+        String queryString = reference.getParameter(DocumentResourceReference.QUERY_STRING);
         if (queryString != null) {
             buffer.append('?');
             buffer.append(queryString);
         }
         buffer.append('#');
-        String anchor = link.getParameter(DocumentLink.ANCHOR);
+        String anchor = reference.getParameter(DocumentResourceReference.ANCHOR);
         if (anchor != null) {
             buffer.append(anchor);
         }

@@ -27,7 +27,7 @@ import org.xwiki.rendering.internal.renderer.xhtml.link.XHTMLLinkRenderer;
 import org.xwiki.rendering.listener.Format;
 import org.xwiki.rendering.listener.HeaderLevel;
 import org.xwiki.rendering.listener.Image;
-import org.xwiki.rendering.listener.Link;
+import org.xwiki.rendering.listener.ResourceReference;
 import org.xwiki.rendering.listener.ListType;
 import org.xwiki.rendering.listener.chaining.BlockStateChainingListener;
 import org.xwiki.rendering.listener.chaining.EmptyBlockChainingListener;
@@ -251,28 +251,28 @@ public class XHTMLChainingRenderer extends AbstractChainingPrintRenderer
     /**
      * {@inheritDoc}
      * 
-     * @see AbstractChainingPrintRenderer#beginLink(Link, boolean, Map)
+     * @see AbstractChainingPrintRenderer#beginLink(org.xwiki.rendering.listener.ResourceReference , boolean, Map)
      */
     @Override
-    public void beginLink(Link link, boolean isFreeStandingURI, Map<String, String> parameters)
+    public void beginLink(ResourceReference reference, boolean isFreeStandingURI, Map<String, String> parameters)
     {
         // Ensure the link renderer is using the latest printer since the original printer used could have been
         // superseded by another one in the printer stack.
         this.linkRenderer.setXHTMLWikiPrinter(getXHTMLWikiPrinter());
 
-        this.linkRenderer.beginLink(link, isFreeStandingURI, parameters);
+        this.linkRenderer.beginLink(reference, isFreeStandingURI, parameters);
     }
 
     /**
      * {@inheritDoc}
      * 
-     * @see AbstractChainingPrintRenderer#endLink(Link, boolean, Map)
+     * @see AbstractChainingPrintRenderer#endLink(org.xwiki.rendering.listener.ResourceReference , boolean, Map)
      */
     @Override
-    public void endLink(Link link, boolean isFreeStandingURI, Map<String, String> parameters)
+    public void endLink(ResourceReference reference, boolean isFreeStandingURI, Map<String, String> parameters)
     {
         this.linkRenderer.setHasLabel(!getEmptyBlockState().isCurrentContainerBlockEmpty());
-        this.linkRenderer.endLink(link, isFreeStandingURI, parameters);
+        this.linkRenderer.endLink(reference, isFreeStandingURI, parameters);
     }
 
     /**

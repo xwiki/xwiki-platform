@@ -20,7 +20,7 @@
 package org.xwiki.rendering.internal.parser.link;
 
 import org.xwiki.component.annotation.Component;
-import org.xwiki.rendering.listener.LinkType;
+import org.xwiki.rendering.listener.ResourceType;
 
 /**
  * Parses a link reference to a URL.
@@ -36,8 +36,8 @@ public class PathLinkTypeParser extends AbstractURILinkTypeParser
      *
      * @see org.xwiki.rendering.internal.parser.link.AbstractURILinkTypeParser#getType()
      */
-    public LinkType getType()
+    public ResourceType getType()
     {
-        return LinkType.PATH;
+        return ResourceType.PATH;
     }
 }

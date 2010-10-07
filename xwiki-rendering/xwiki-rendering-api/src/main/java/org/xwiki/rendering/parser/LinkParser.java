@@ -20,7 +20,7 @@
 package org.xwiki.rendering.parser;
 
 import org.xwiki.component.annotation.ComponentRole;
-import org.xwiki.rendering.listener.Link;
+import org.xwiki.rendering.listener.ResourceReference;
 
 /**
  * Interface for parsing wiki links for various wiki syntaxes.
@@ -56,11 +56,11 @@ public interface LinkParser
     char ESCAPE_CHAR = '\\';
 
     /**
-     * Parses a link represented as a String into a {@link Link} object.
+     * Parses a link represented as a String into a {@link org.xwiki.rendering.listener.ResourceReference} object.
      * 
      * @param rawLink the string representation of the link to parse (the supported syntax depends on the parser
      *            implementation used)
      * @return the parsed link
      */
-    Link parse(String rawLink);
+    ResourceReference parse(String rawLink);
 }

@@ -20,7 +20,7 @@
 package org.xwiki.rendering.internal.renderer;
 
 import org.xwiki.component.annotation.Component;
-import org.xwiki.rendering.listener.Link;
+import org.xwiki.rendering.listener.ResourceReference;
 import org.xwiki.rendering.renderer.link.LinkLabelGenerator;
 
 /**
@@ -34,10 +34,11 @@ public class DefaultLinkLabelGenerator implements LinkLabelGenerator
 {
     /**
      * {@inheritDoc}
-     * @see org.xwiki.rendering.renderer.link.LinkLabelGenerator#generate(org.xwiki.rendering.listener.Link)
+     * @see org.xwiki.rendering.renderer.link.LinkLabelGenerator#generate(
+     *      org.xwiki.rendering.listener.ResourceReference)
      */
-    public String generate(Link link)
+    public String generate(ResourceReference reference)
     {
-        return link.getReference();
+        return reference.getReference();
     }
 }

@@ -20,9 +20,9 @@
 package org.xwiki.rendering.internal.parser.link;
 
 import org.xwiki.component.annotation.Component;
-import org.xwiki.rendering.listener.DocumentLink;
-import org.xwiki.rendering.listener.Link;
-import org.xwiki.rendering.listener.LinkType;
+import org.xwiki.rendering.listener.DocumentResourceReference;
+import org.xwiki.rendering.listener.ResourceReference;
+import org.xwiki.rendering.listener.ResourceType;
 
 /**
  * Parses a link reference to a document.
@@ -37,9 +37,9 @@ public class DocumentLinkTypeParser extends AbstractURILinkTypeParser
      * {@inheritDoc}
      * @see org.xwiki.rendering.internal.parser.link.AbstractURILinkTypeParser#getType() 
      */
-    public LinkType getType()
+    public ResourceType getType()
     {
-        return LinkType.DOCUMENT;
+        return ResourceType.DOCUMENT;
     }
 
     /**
@@ -48,10 +48,10 @@ public class DocumentLinkTypeParser extends AbstractURILinkTypeParser
      * @see AbstractURILinkTypeParser#parse(String) 
      */
     @Override
-    public Link parse(String reference)
+    public ResourceReference parse(String reference)
     {
-        DocumentLink resultLink = new DocumentLink();
-        resultLink.setReference(reference);
-        return resultLink;
+        DocumentResourceReference resultReference = new DocumentResourceReference();
+        resultReference.setReference(reference);
+        return resultReference;
     }
 }

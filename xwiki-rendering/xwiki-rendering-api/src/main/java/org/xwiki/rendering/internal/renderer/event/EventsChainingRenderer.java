@@ -26,7 +26,7 @@ import org.apache.commons.lang.StringUtils;
 import org.xwiki.rendering.listener.Format;
 import org.xwiki.rendering.listener.HeaderLevel;
 import org.xwiki.rendering.listener.Image;
-import org.xwiki.rendering.listener.Link;
+import org.xwiki.rendering.listener.ResourceReference;
 import org.xwiki.rendering.listener.ListType;
 import org.xwiki.rendering.listener.chaining.ListenerChain;
 import org.xwiki.rendering.syntax.Syntax;
@@ -151,25 +151,25 @@ public class EventsChainingRenderer extends AbstractChainingPrintRenderer
     /**
      * {@inheritDoc}
      * 
-     * @see org.xwiki.rendering.renderer.AbstractChainingPrintRenderer#beginLink(org.xwiki.rendering.listener.Link,
-     *      boolean, java.util.Map)
+     * @see org.xwiki.rendering.renderer.AbstractChainingPrintRenderer#beginLink(
+     *      org.xwiki.rendering.listener.ResourceReference, boolean, java.util.Map)
      */
     @Override
-    public void beginLink(Link link, boolean isFreeStandingURI, Map<String, String> parameters)
+    public void beginLink(ResourceReference reference, boolean isFreeStandingURI, Map<String, String> parameters)
     {
-        getPrinter().println("beginLink [" + link + "] [" + isFreeStandingURI + "]" + serializeParameters(parameters));
+        getPrinter().println("beginLink [" + reference + "] [" + isFreeStandingURI + "]" + serializeParameters(parameters));
     }
 
     /**
      * {@inheritDoc}
      * 
-     * @see org.xwiki.rendering.renderer.AbstractChainingPrintRenderer#endLink(org.xwiki.rendering.listener.Link,
-     *      boolean, java.util.Map)
+     * @see org.xwiki.rendering.renderer.AbstractChainingPrintRenderer#endLink(
+     *      org.xwiki.rendering.listener.ResourceReference, boolean, java.util.Map)
      */
     @Override
-    public void endLink(Link link, boolean isFreeStandingURI, Map<String, String> parameters)
+    public void endLink(ResourceReference reference, boolean isFreeStandingURI, Map<String, String> parameters)
     {
-        getPrinter().println("endLink [" + link + "] [" + isFreeStandingURI + "]" + serializeParameters(parameters));
+        getPrinter().println("endLink [" + reference + "] [" + isFreeStandingURI + "]" + serializeParameters(parameters));
     }
 
     /**

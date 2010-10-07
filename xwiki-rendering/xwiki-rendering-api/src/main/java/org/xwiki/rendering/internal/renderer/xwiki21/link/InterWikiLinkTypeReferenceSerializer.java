@@ -21,8 +21,8 @@ package org.xwiki.rendering.internal.renderer.xwiki21.link;
 
 import org.xwiki.component.annotation.Component;
 import org.xwiki.rendering.internal.parser.link.InterWikiLinkTypeParser;
-import org.xwiki.rendering.listener.InterWikiLink;
-import org.xwiki.rendering.listener.Link;
+import org.xwiki.rendering.listener.InterWikiResourceReference;
+import org.xwiki.rendering.listener.ResourceReference;
 import org.xwiki.rendering.parser.LinkParser;
 import org.xwiki.rendering.renderer.link.LinkTypeReferenceSerializer;
 
@@ -38,19 +38,19 @@ public class InterWikiLinkTypeReferenceSerializer implements LinkTypeReferenceSe
     /**
      * {@inheritDoc}
      *
-     * @see LinkTypeReferenceSerializer#serialize(Link)
+     * @see LinkTypeReferenceSerializer#serialize(org.xwiki.rendering.listener.ResourceReference)
      */
-    public String serialize(Link link)
+    public String serialize(ResourceReference reference)
     {
         StringBuffer result = new StringBuffer();
-        result.append(link.getType().getScheme());
+        result.append(reference.getType().getScheme());
         result.append(LinkParser.TYPE_SEPARATOR);
-        String interWikiAlias = link.getParameter(InterWikiLink.INTERWIKI_ALIAS);
+        String interWikiAlias = reference.getParameter(InterWikiResourceReference.INTERWIKI_ALIAS);
         if (interWikiAlias != null) {
             result.append(interWikiAlias);
             result.append(InterWikiLinkTypeParser.INTERWIKI_ALIAS_SEPARATOR);
         }
-        result.append(link.getReference());
+        result.append(reference.getReference());
         return result.toString();
     }
 }

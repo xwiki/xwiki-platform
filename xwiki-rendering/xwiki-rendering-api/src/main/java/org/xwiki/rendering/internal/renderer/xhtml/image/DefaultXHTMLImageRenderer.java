@@ -33,7 +33,7 @@ import org.xwiki.component.descriptor.ComponentInstantiationStrategy;
 import org.xwiki.rendering.listener.DocumentImage;
 import org.xwiki.rendering.listener.Image;
 import org.xwiki.rendering.listener.ImageType;
-import org.xwiki.rendering.listener.Link;
+import org.xwiki.rendering.listener.ResourceReference;
 import org.xwiki.rendering.listener.URLImage;
 import org.xwiki.rendering.renderer.link.URILabelGenerator;
 import org.xwiki.rendering.renderer.printer.XHTMLWikiPrinter;
@@ -145,9 +145,9 @@ public class DefaultXHTMLImageRenderer implements XHTMLImageRenderer, Initializa
         // If no ALT attribute has been specified, add it since the XHTML specifications makes it mandatory.
         if (!parameters.containsKey(ALTERNATE)) {
             // HACK: Fix this when we have a common Reference object replacing Link and Image
-            Link dummyLink = new Link();
-            dummyLink.setReference(image.getReference());
-            attributes.put(ALTERNATE, this.attachURILabelGenerator.generateLabel(dummyLink));
+            ResourceReference dummyResourceReference = new ResourceReference();
+            dummyResourceReference.setReference(image.getReference());
+            attributes.put(ALTERNATE, this.attachURILabelGenerator.generateLabel(dummyResourceReference));
         }
 
         // And generate the XHTML IMG element.

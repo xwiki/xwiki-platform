@@ -20,12 +20,12 @@
 package org.xwiki.rendering.listener;
 
 /**
- * Represents a link reference to a Document.
+ * Represents a reference to a Document.
  *
  * @version $Id$
  * @since 2.5M2
  */
-public class DocumentLink extends Link
+public class DocumentResourceReference extends ResourceReference
 {
     /**
      * The name of the parameter representing the Query String.
@@ -38,11 +38,11 @@ public class DocumentLink extends Link
     public static final String ANCHOR = "anchor";
     
     /**
-     * Sets the link type automatically.
+     * Sets the resource type automatically.
      */
-    public DocumentLink()
+    public DocumentResourceReference()
     {
-        setType(LinkType.DOCUMENT);
+        setType(ResourceType.DOCUMENT);
     }
     
     /**
@@ -63,8 +63,8 @@ public class DocumentLink extends Link
     }
 
     /**
-     * @return the anchor name pointing to an anchor defined in the referenced link or null if no anchor has been
-     *         specified (in which case the link points to the top of the page). Note that in XWiki anchors are
+     * @return the anchor name pointing to an anchor defined in the referenced document or null if no anchor has been
+     *         specified (in which case the reference points to the top of the document). Note that in XWiki anchors are
      *         automatically created for titles. Example: "TableOfContentAnchor"
      */
     public String getAnchor()

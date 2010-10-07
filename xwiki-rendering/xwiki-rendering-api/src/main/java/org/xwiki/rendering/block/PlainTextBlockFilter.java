@@ -25,8 +25,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import org.xwiki.rendering.listener.Link;
-import org.xwiki.rendering.listener.LinkType;
+import org.xwiki.rendering.listener.ResourceReference;
+import org.xwiki.rendering.listener.ResourceType;
 import org.xwiki.rendering.parser.ParseException;
 import org.xwiki.rendering.parser.Parser;
 import org.xwiki.rendering.renderer.link.LinkLabelGenerator;
@@ -83,15 +83,15 @@ public class PlainTextBlockFilter implements BlockFilter
         if (VALID_PLAINTEXT_BLOCKS.contains(block.getClass())) {
             return Collections.singletonList(block);
         } else if (block.getClass() == LinkBlock.class && block.getChildren().size() == 0) {
-            Link link = ((LinkBlock) block).getLink();
+            ResourceReference reference = ((LinkBlock) block).getReference();
 
             try {
                 String label;
 
-                if (link.getType().equals(LinkType.DOCUMENT)) {
-                    label = this.linkLabelGenerator.generate(link);
+                if (reference.getType().equals(ResourceType.DOCUMENT)) {
+                    label = this.linkLabelGenerator.generate(reference);
                 } else {
-                    label = link.getReference();
+                    label = reference.getReference();
                 }
 
                 return this.plainTextParser.parse(new StringReader(label)).getChildren().get(0).getChildren();

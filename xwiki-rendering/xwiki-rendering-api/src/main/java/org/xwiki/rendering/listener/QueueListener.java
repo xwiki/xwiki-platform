@@ -182,11 +182,11 @@ public class QueueListener extends LinkedList<QueueListener.Event> implements Li
     /**
      * {@inheritDoc}
      * 
-     * @see org.xwiki.rendering.listener.Listener#beginLink(org.xwiki.rendering.listener.Link, boolean, java.util.Map)
+     * @see org.xwiki.rendering.listener.Listener#beginLink(ResourceReference , boolean, java.util.Map)
      */
-    public void beginLink(Link link, boolean isFreeStandingURI, Map<String, String> parameters)
+    public void beginLink(ResourceReference reference, boolean isFreeStandingURI, Map<String, String> parameters)
     {
-        saveEvent(EventType.BEGIN_LINK, link, isFreeStandingURI, parameters);
+        saveEvent(EventType.BEGIN_LINK, reference, isFreeStandingURI, parameters);
     }
 
     /**
@@ -375,11 +375,11 @@ public class QueueListener extends LinkedList<QueueListener.Event> implements Li
     /**
      * {@inheritDoc}
      * 
-     * @see org.xwiki.rendering.listener.Listener#endLink(org.xwiki.rendering.listener.Link, boolean, java.util.Map)
+     * @see org.xwiki.rendering.listener.Listener#endLink(ResourceReference , boolean, java.util.Map)
      */
-    public void endLink(Link link, boolean isFreeStandingURI, Map<String, String> parameters)
+    public void endLink(ResourceReference reference, boolean isFreeStandingURI, Map<String, String> parameters)
     {
-        saveEvent(EventType.END_LINK, link, isFreeStandingURI, parameters);
+        saveEvent(EventType.END_LINK, reference, isFreeStandingURI, parameters);
     }
 
     /**

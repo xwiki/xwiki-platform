@@ -27,13 +27,13 @@ import org.xwiki.component.annotation.Requirement;
 import org.xwiki.component.descriptor.ComponentInstantiationStrategy;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
-import org.xwiki.rendering.listener.Link;
+import org.xwiki.rendering.listener.ResourceReference;
 import org.xwiki.rendering.renderer.printer.XHTMLWikiPrinter;
 
 /**
  * Default implementation for rendering links as XHTML. The implementation is pluggable in the sense that the
  * implementation is done by {@link org.xwiki.rendering.internal.renderer.xhtml.link.XHTMLLinkTypeRenderer}
- * implementation, each in charge of handling a given {@link org.xwiki.rendering.listener.LinkType}.
+ * implementation, each in charge of handling a given {@link org.xwiki.rendering.listener.ResourceType}.
  *
  * @version $Id$
  * @since 2.0M3
@@ -91,31 +91,30 @@ public class DefaultXHTMLLinkRenderer implements XHTMLLinkRenderer
     /**
      * {@inheritDoc}
      * 
-     * @see XHTMLLinkRenderer#beginLink(Link, boolean, Map)
+     * @see XHTMLLinkRenderer#beginLink(org.xwiki.rendering.listener.ResourceReference , boolean, Map)
      */
-    public void beginLink(Link link, boolean isFreeStandingURI, Map<String, String> parameters)
+    public void beginLink(ResourceReference reference, boolean isFreeStandingURI, Map<String, String> parameters)
     {
-        getXHTMLLinkTypeRenderer(link).beginLink(link, isFreeStandingURI, parameters);
+        getXHTMLLinkTypeRenderer(reference).beginLink(reference, isFreeStandingURI, parameters);
     }
 
     /**
      * {@inheritDoc}
      * 
-     * @see XHTMLLinkRenderer#endLink(Link, boolean, Map)
+     * @see XHTMLLinkRenderer#endLink(org.xwiki.rendering.listener.ResourceReference , boolean, Map)
      */
-    public void endLink(Link link, boolean isFreeStandingURI, Map<String, String> parameters)
+    public void endLink(ResourceReference reference, boolean isFreeStandingURI, Map<String, String> parameters)
     {
-        getXHTMLLinkTypeRenderer(link).endLink(link, isFreeStandingURI, parameters);
+        getXHTMLLinkTypeRenderer(reference).endLink(reference, isFreeStandingURI, parameters);
     }
 
-    private XHTMLLinkTypeRenderer getXHTMLLinkTypeRenderer(Link link)
+    private XHTMLLinkTypeRenderer getXHTMLLinkTypeRenderer(ResourceReference reference)
     {
         XHTMLLinkTypeRenderer renderer;
 
         // TODO: This is probably not very performant since it's called at each begin/endLink.
         try {
-            renderer = this.componentManager.lookup(XHTMLLinkTypeRenderer.class,
-                link.getType().getScheme());
+            renderer = this.componentManager.lookup(XHTMLLinkTypeRenderer.class, reference.getType().getScheme());
         } catch (ComponentLookupException e) {
             // There's no specific XHTML Link Type Renderer for the passed link type, use the default renderer.
             renderer = this.defaultLinkTypeRenderer;

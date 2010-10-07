@@ -20,10 +20,10 @@
 package org.xwiki.rendering.renderer.link;
 
 import org.xwiki.component.annotation.ComponentRole;
-import org.xwiki.rendering.listener.Link;
+import org.xwiki.rendering.listener.ResourceReference;
 
 /**
- * Generate a string representation of a {@link Link}.
+ * Generate a string representation of a {@link org.xwiki.rendering.listener.ResourceReference}.
  *
  * @version $Id$ 
  * @since 2.3M2
@@ -32,8 +32,8 @@ import org.xwiki.rendering.listener.Link;
 public interface LinkReferenceSerializer
 {
     /**
-     * @param link the link to serialize
-     * @return the string representation of the passed {@link Link} object
+     * @param reference the link reference to serialize
+     * @return the string representation of the passed {@link org.xwiki.rendering.listener.ResourceReference} object
      */
-    String serialize(Link link);
+    String serialize(ResourceReference reference);
 }

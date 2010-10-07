@@ -25,9 +25,9 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.xwiki.component.util.ReflectionUtils;
-import org.xwiki.rendering.listener.DocumentLink;
-import org.xwiki.rendering.listener.Link;
-import org.xwiki.rendering.listener.LinkType;
+import org.xwiki.rendering.listener.DocumentResourceReference;
+import org.xwiki.rendering.listener.ResourceReference;
+import org.xwiki.rendering.listener.ResourceType;
 import org.xwiki.rendering.renderer.link.LinkReferenceSerializer;
 import org.xwiki.rendering.renderer.printer.DefaultWikiPrinter;
 import org.xwiki.test.AbstractComponentTestCase;
@@ -60,13 +60,13 @@ public class PlainTextChainingRendererTest extends AbstractComponentTestCase
         DefaultWikiPrinter printer = new DefaultWikiPrinter();
         this.renderer.setPrinter(printer);
 
-        DocumentLink link = new DocumentLink();
-        link.setAnchor("anchor");
-        link.setQueryString("param=value");
-        link.setReference("reference");
+        DocumentResourceReference reference = new DocumentResourceReference();
+        reference.setAnchor("anchor");
+        reference.setQueryString("param=value");
+        reference.setReference("reference");
 
-        this.renderer.beginLink(link, false, Collections.<String, String> emptyMap());
-        this.renderer.endLink(link, false, Collections.<String, String> emptyMap());
+        this.renderer.beginLink(reference, false, Collections.<String, String> emptyMap());
+        this.renderer.endLink(reference, false, Collections.<String, String> emptyMap());
 
         Assert.assertEquals("reference", printer.toString());
     }
@@ -77,12 +77,12 @@ public class PlainTextChainingRendererTest extends AbstractComponentTestCase
         DefaultWikiPrinter printer = new DefaultWikiPrinter();
         this.renderer.setPrinter(printer);
 
-        Link link = new Link();
-        link.setReference("http://some/url");
-        link.setType(LinkType.URL);
+        ResourceReference reference = new ResourceReference();
+        reference.setReference("http://some/url");
+        reference.setType(ResourceType.URL);
 
-        this.renderer.beginLink(link, false, Collections.<String, String> emptyMap());
-        this.renderer.endLink(link, false, Collections.<String, String> emptyMap());
+        this.renderer.beginLink(reference, false, Collections.<String, String> emptyMap());
+        this.renderer.endLink(reference, false, Collections.<String, String> emptyMap());
 
         Assert.assertEquals("http://some/url", printer.toString());
     }

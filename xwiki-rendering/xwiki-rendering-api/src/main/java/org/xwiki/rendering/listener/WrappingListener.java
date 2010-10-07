@@ -238,22 +238,22 @@ public class WrappingListener implements Listener
     /**
      * {@inheritDoc}
      * 
-     * @see org.xwiki.rendering.listener.LinkListener#beginLink(org.xwiki.rendering.listener.Link, boolean,
+     * @see org.xwiki.rendering.listener.LinkListener#beginLink(ResourceReference , boolean,
      *      java.util.Map)
      */
-    public void beginLink(Link link, boolean isFreeStandingURI, Map<String, String> parameters)
+    public void beginLink(ResourceReference reference, boolean isFreeStandingURI, Map<String, String> parameters)
     {
-        this.listener.beginLink(link, isFreeStandingURI, parameters);
+        this.listener.beginLink(reference, isFreeStandingURI, parameters);
     }
 
     /**
      * {@inheritDoc}
      * 
-     * @see org.xwiki.rendering.listener.LinkListener#endLink(org.xwiki.rendering.listener.Link, boolean, java.util.Map)
+     * @see org.xwiki.rendering.listener.LinkListener#endLink(ResourceReference , boolean, java.util.Map)
      */
-    public void endLink(Link link, boolean isFreeStandingURI, Map<String, String> parameters)
+    public void endLink(ResourceReference reference, boolean isFreeStandingURI, Map<String, String> parameters)
     {
-        this.listener.endLink(link, isFreeStandingURI, parameters);
+        this.listener.endLink(reference, isFreeStandingURI, parameters);
     }
 
     /**

@@ -20,9 +20,9 @@
 package org.xwiki.rendering.internal.parser.link;
 
 import org.xwiki.component.annotation.Component;
-import org.xwiki.rendering.listener.InterWikiLink;
-import org.xwiki.rendering.listener.Link;
-import org.xwiki.rendering.listener.LinkType;
+import org.xwiki.rendering.listener.InterWikiResourceReference;
+import org.xwiki.rendering.listener.ResourceReference;
+import org.xwiki.rendering.listener.ResourceType;
 
 /**
  * Parses a link reference to an interwiki refernce.
@@ -42,9 +42,9 @@ public class InterWikiLinkTypeParser extends AbstractURILinkTypeParser
      * {@inheritDoc}
      * @see org.xwiki.rendering.internal.parser.link.AbstractURILinkTypeParser#getType()
      */
-    public LinkType getType()
+    public ResourceType getType()
     {
-        return LinkType.INTERWIKI;
+        return ResourceType.INTERWIKI;
     }
 
     /**
@@ -53,20 +53,20 @@ public class InterWikiLinkTypeParser extends AbstractURILinkTypeParser
      * @see AbstractURILinkTypeParser#parse(String)
      */
     @Override
-    public Link parse(String reference)
+    public ResourceReference parse(String reference)
     {
-        Link resultLink = null;
+        ResourceReference resultReference = null;
         // Try to find an interwiki separator to extract the interwiki alias from the interwiki suffix.
         // If no separator is found it means the interwiki link syntax is invalid. In this case consider that the
         // reference is not an interwiki link.
         int pos = reference.indexOf(INTERWIKI_ALIAS_SEPARATOR);
         if (pos > -1) {
-            InterWikiLink link = new InterWikiLink();
-            link.setType(getType());
-            link.setInterWikiAlias(reference.substring(0, pos + INTERWIKI_ALIAS_SEPARATOR.length() - 1));
-            link.setReference(reference.substring(pos + INTERWIKI_ALIAS_SEPARATOR.length()));
-            resultLink = link;
+            InterWikiResourceReference interWikiReference = new InterWikiResourceReference();
+            interWikiReference.setType(getType());
+            interWikiReference.setInterWikiAlias(reference.substring(0, pos + INTERWIKI_ALIAS_SEPARATOR.length() - 1));
+            interWikiReference.setReference(reference.substring(pos + INTERWIKI_ALIAS_SEPARATOR.length()));
+            resultReference = interWikiReference;
         }
-        return resultLink;
+        return resultReference;
     }
 }

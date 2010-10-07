@@ -22,8 +22,8 @@ package org.xwiki.rendering.internal.parser.wikimodel.xhtml;
 import org.wikimodel.wem.WikiParameter;
 import org.wikimodel.wem.WikiParameters;
 import org.wikimodel.wem.WikiReference;
-import org.xwiki.rendering.listener.Link;
-import org.xwiki.rendering.listener.LinkType;
+import org.xwiki.rendering.listener.ResourceReference;
+import org.xwiki.rendering.listener.ResourceType;
 
 /**
  * WikiModel extension in order to add additional XWiki Link information so that the XWiki Generator Listener for the
@@ -36,13 +36,13 @@ public class XWikiWikiReference extends WikiReference
 {
     private boolean isTyped;
 
-    private LinkType type;
+    private ResourceType type;
 
     private boolean isFreeStanding;
 
     WikiParameters referenceParameters = WikiParameters.EMPTY;
 
-    public XWikiWikiReference(boolean isTyped, LinkType type, String reference, String label,
+    public XWikiWikiReference(boolean isTyped, ResourceType type, String reference, String label,
         WikiParameters referenceParameters, WikiParameters linkParameters, boolean isFreeStanding)
     {
         super(reference, label, linkParameters);
@@ -62,7 +62,7 @@ public class XWikiWikiReference extends WikiReference
         return this.isFreeStanding;
     }
 
-    public LinkType getType()
+    public ResourceType getType()
     {
         return this.type;
     }
@@ -72,16 +72,16 @@ public class XWikiWikiReference extends WikiReference
         return this.referenceParameters;
     }
 
-    public Link getXWikiLink()
+    public ResourceReference getXWikiLink()
     {
-        Link link = new Link();
-        link.setTyped(isTyped());
-        link.setType(getType());
-        link.setReference(getLink());
+        ResourceReference resourceReference = new ResourceReference();
+        resourceReference.setTyped(isTyped());
+        resourceReference.setType(getType());
+        resourceReference.setReference(getLink());
         for (WikiParameter param : getReferenceParameters()) {
-            link.setParameter(param.getKey(), param.getValue());
+            resourceReference.setParameter(param.getKey(), param.getValue());
         }
-        return link;
+        return resourceReference;
     }
 
     // TODO: implement hashcode, equals, totring

@@ -23,7 +23,7 @@ import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.Requirement;
 import org.xwiki.model.reference.AttachmentReference;
 import org.xwiki.model.reference.AttachmentReferenceResolver;
-import org.xwiki.rendering.listener.Link;
+import org.xwiki.rendering.listener.ResourceReference;
 import org.xwiki.rendering.renderer.link.URILabelGenerator;
 
 /**
@@ -43,11 +43,13 @@ public class XWikiAttachmentURILabelGenerator implements URILabelGenerator
 
     /**
      * {@inheritDoc}
-     * @see org.xwiki.rendering.renderer.link.URILabelGenerator#generateLabel(org.xwiki.rendering.listener.Link)
+     * @see org.xwiki.rendering.renderer.link.URILabelGenerator#generateLabel(
+     *      org.xwiki.rendering.listener.ResourceReference)
      */
-    public String generateLabel(Link link)
+    public String generateLabel(ResourceReference reference)
     {
-        AttachmentReference attachmentReference = this.currentAttachmentReferenceResolver.resolve(link.getReference());
+        AttachmentReference attachmentReference =
+            this.currentAttachmentReferenceResolver.resolve(reference.getReference());
         return attachmentReference.getName();
     }
 }

@@ -29,7 +29,7 @@ import org.xwiki.component.util.ReflectionUtils;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.rendering.configuration.RenderingConfiguration;
-import org.xwiki.rendering.listener.Link;
+import org.xwiki.rendering.listener.ResourceReference;
 
 /**
  * Unit tests for {@link XWikiLinkLabelGenerator}.
@@ -75,8 +75,8 @@ public class XWikiLinkLabelGeneratorTest
     @org.junit.Test
     public void testGenerate() throws Exception
     {
-        Link link = new Link();
-        link.setReference("HelloWorld");
+        ResourceReference resourceReference = new ResourceReference();
+        resourceReference.setReference("HelloWorld");
 
         mockery.checking(new Expectations() {{
             allowing(mockDocumentReferenceResolver).resolve(with(any(String.class)), with(any(Object[].class)));
@@ -87,7 +87,7 @@ public class XWikiLinkLabelGeneratorTest
         }});
 
         Assert.assertEquals("[xwiki:Main.HelloWorld] Hello World (My title) [xwiki:Main.HelloWorld] Hello World "
-            + "(My title)", this.generator.generate(link));
+            + "(My title)", this.generator.generate(resourceReference));
     }
 
     @org.junit.Test
@@ -100,14 +100,14 @@ public class XWikiLinkLabelGeneratorTest
                 will(throwException(new Exception("error")));
         }});
 
-        Assert.assertEquals("HelloWorld", this.generator.generate(new Link()));
+        Assert.assertEquals("HelloWorld", this.generator.generate(new ResourceReference()));
     }
 
     @org.junit.Test
     public void testGenerateWhenDocumentTitleIsNull() throws Exception
     {
-        Link link = new Link();
-        link.setReference("HelloWorld");
+        ResourceReference resourceReference = new ResourceReference();
+        resourceReference.setReference("HelloWorld");
 
         mockery.checking(new Expectations() {{
             allowing(mockDocumentReferenceResolver).resolve(with(any(String.class)), with(any(Object[].class)));
@@ -117,7 +117,7 @@ public class XWikiLinkLabelGeneratorTest
                 will(returnValue(mockDocumentModelBridge));
         }});
 
-        Assert.assertEquals("HelloWorld", this.generator.generate(new Link()));
+        Assert.assertEquals("HelloWorld", this.generator.generate(new ResourceReference()));
     }
 
     @org.junit.Test
@@ -132,6 +132,6 @@ public class XWikiLinkLabelGeneratorTest
 
         }});
 
-        Assert.assertEquals("[$0:\\.$0] $0 ($0) [$0:\\.$0] $0 ($0)", this.generator.generate(new Link()));
+        Assert.assertEquals("[$0:\\.$0] $0 ($0) [$0:\\.$0] $0 ($0)", this.generator.generate(new ResourceReference()));
     }
 }

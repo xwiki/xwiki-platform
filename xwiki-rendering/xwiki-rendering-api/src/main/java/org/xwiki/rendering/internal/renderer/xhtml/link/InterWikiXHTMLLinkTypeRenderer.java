@@ -24,8 +24,8 @@ import org.xwiki.component.annotation.InstantiationStrategy;
 import org.xwiki.component.annotation.Requirement;
 import org.xwiki.component.descriptor.ComponentInstantiationStrategy;
 import org.xwiki.rendering.configuration.RenderingConfiguration;
-import org.xwiki.rendering.listener.InterWikiLink;
-import org.xwiki.rendering.listener.Link;
+import org.xwiki.rendering.listener.InterWikiResourceReference;
+import org.xwiki.rendering.listener.ResourceReference;
 
 import java.util.Map;
 import java.util.Properties;
@@ -49,20 +49,21 @@ public class InterWikiXHTMLLinkTypeRenderer extends AbstractXHTMLLinkTypeRendere
     /**
      * {@inheritDoc}
      *
-     * @see AbstractXHTMLLinkTypeRenderer#beginLinkExtraAttributes(Link, java.util.Map, java.util.Map)
+     * @see AbstractXHTMLLinkTypeRenderer#beginLinkExtraAttributes(org.xwiki.rendering.listener.ResourceReference ,
+     *      java.util.Map, java.util.Map)
      */
     @Override
-    protected void beginLinkExtraAttributes(Link link, Map<String, String> spanAttributes,
+    protected void beginLinkExtraAttributes(ResourceReference reference, Map<String, String> spanAttributes,
         Map<String, String> anchorAttributes)
     {
         // Look for an InterWiki definition for the passed Link. If not found then simply use the InterWiki Path.
-        String interWikiAlias = link.getParameter(InterWikiLink.INTERWIKI_ALIAS);
+        String interWikiAlias = reference.getParameter(InterWikiResourceReference.INTERWIKI_ALIAS);
         Properties definitions = this.renderingConfiguration.getInterWikiDefinitions();
         if (definitions.containsKey(interWikiAlias)) {
             anchorAttributes.put(XHTMLLinkRenderer.HREF, definitions.getProperty(interWikiAlias)
-                + link.getReference());
+                + reference.getReference());
         } else {
-            anchorAttributes.put(XHTMLLinkRenderer.HREF, link.getReference());
+            anchorAttributes.put(XHTMLLinkRenderer.HREF, reference.getReference());
         }
     }
 }

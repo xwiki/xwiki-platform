@@ -26,7 +26,7 @@ import org.xwiki.rendering.renderer.printer.XHTMLWikiPrinter;
 /**
  * Renders a type of link (mailto link, document link, URL, etc) in XHTML. Components implementing this
  * interface implement the rendering logic only for a single link type and must have a role hint value
- * equal to the {@link org.xwiki.rendering.listener.LinkType} name (eg "doc" for document link, "attach"
+ * equal to the {@link org.xwiki.rendering.listener.ResourceType} name (eg "doc" for document link, "attach"
  * for attachment link, etc).
  *
  * Implementations must handle both cases when rendering a link:

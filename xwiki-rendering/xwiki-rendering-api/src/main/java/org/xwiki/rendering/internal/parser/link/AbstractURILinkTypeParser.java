@@ -19,7 +19,7 @@
  */
 package org.xwiki.rendering.internal.parser.link;
 
-import org.xwiki.rendering.listener.Link;
+import org.xwiki.rendering.listener.ResourceReference;
 import org.xwiki.rendering.parser.LinkTypeParser;
 
 /**
@@ -36,11 +36,11 @@ public abstract class AbstractURILinkTypeParser implements LinkTypeParser
      *
      * @see LinkTypeParser#parse(String)
      */
-    public Link parse(String reference)
+    public ResourceReference parse(String reference)
     {
-        Link resultLink = new Link();
-        resultLink.setType(getType());
-        resultLink.setReference(reference);
-        return resultLink;
+        ResourceReference resultReference = new ResourceReference();
+        resultReference.setType(getType());
+        resultReference.setReference(reference);
+        return resultReference;
     }
 }

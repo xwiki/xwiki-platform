@@ -23,7 +23,7 @@ import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.InstantiationStrategy;
 import org.xwiki.component.annotation.Requirement;
 import org.xwiki.component.descriptor.ComponentInstantiationStrategy;
-import org.xwiki.rendering.listener.Link;
+import org.xwiki.rendering.listener.ResourceReference;
 import org.xwiki.rendering.renderer.link.LinkTypeReferenceSerializer;
 
 import java.util.Map;
@@ -49,12 +49,14 @@ public class DefaultXHTMLLinkTypeRenderer extends AbstractXHTMLLinkTypeRenderer
     /**
      * {@inheritDoc}
      *
-     * @see AbstractXHTMLLinkTypeRenderer#beginLinkExtraAttributes(Link, java.util.Map, java.util.Map)
+     * @see AbstractXHTMLLinkTypeRenderer#beginLinkExtraAttributes(org.xwiki.rendering.listener.ResourceReference ,
+     *      java.util.Map, java.util.Map)
      */
     @Override
-    protected void beginLinkExtraAttributes(Link link, Map<String, String> spanAttributes,
+    protected void beginLinkExtraAttributes(ResourceReference reference, Map<String, String> spanAttributes,
         Map<String, String> anchorAttributes)
     {
-        anchorAttributes.put(XHTMLLinkRenderer.HREF, this.defaultLinkTypeReferenceSerializer.serialize(link));
+        anchorAttributes.put(XHTMLLinkRenderer.HREF, this.defaultLinkTypeReferenceSerializer.serialize(
+            reference));
     }
 }

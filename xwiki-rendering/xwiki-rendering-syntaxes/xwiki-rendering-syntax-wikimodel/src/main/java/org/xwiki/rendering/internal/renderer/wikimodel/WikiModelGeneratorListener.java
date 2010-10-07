@@ -32,7 +32,7 @@ import org.wikimodel.wem.WikiParameter;
 import org.wikimodel.wem.WikiParameters;
 import org.xwiki.rendering.internal.parser.wikimodel.DefaultXWikiGeneratorListener;
 import org.xwiki.rendering.listener.Image;
-import org.xwiki.rendering.listener.Link;
+import org.xwiki.rendering.listener.ResourceReference;
 import org.xwiki.rendering.listener.ListType;
 import org.xwiki.rendering.listener.Listener;
 import org.xwiki.rendering.listener.HeaderLevel;
@@ -249,13 +249,13 @@ public class WikiModelGeneratorListener implements Listener
         this.wikimodelListener.endHeader(level.getAsInt(), createWikiParameters(parameters));
     }
 
-    public void beginLink(Link link, boolean isFreeStandingURI, Map<String, String> parameters)
+    public void beginLink(ResourceReference reference, boolean isFreeStandingURI, Map<String, String> parameters)
     {
         // TODO wait for WikiModel to support wiki syntax in links
         // See http://code.google.com/p/wikimodel/issues/detail?id=87
     }
 
-    public void endLink(Link link, boolean isFreeStandingURI, Map<String, String> parameters)
+    public void endLink(ResourceReference reference, boolean isFreeStandingURI, Map<String, String> parameters)
     {
         // TODO wait for WikiModel to support wiki syntax in links
         // See http://code.google.com/p/wikimodel/issues/detail?id=87

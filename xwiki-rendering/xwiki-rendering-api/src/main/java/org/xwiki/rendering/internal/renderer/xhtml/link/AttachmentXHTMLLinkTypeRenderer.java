@@ -26,7 +26,7 @@ import org.xwiki.component.descriptor.ComponentInstantiationStrategy;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.phase.Initializable;
 import org.xwiki.component.phase.InitializationException;
-import org.xwiki.rendering.listener.Link;
+import org.xwiki.rendering.listener.ResourceReference;
 import org.xwiki.rendering.renderer.link.LinkTypeReferenceSerializer;
 import org.xwiki.rendering.wiki.WikiModel;
 
@@ -74,16 +74,18 @@ public class AttachmentXHTMLLinkTypeRenderer extends AbstractXHTMLLinkTypeRender
     /**
      * {@inheritDoc}
      *
-     * @see AbstractXHTMLLinkTypeRenderer#beginLinkExtraAttributes(Link, java.util.Map, java.util.Map)
+     * @see AbstractXHTMLLinkTypeRenderer#beginLinkExtraAttributes(org.xwiki.rendering.listener.ResourceReference ,
+     *      java.util.Map, java.util.Map)
      */
     @Override
-    protected void beginLinkExtraAttributes(Link link, Map<String, String> spanAttributes,
+    protected void beginLinkExtraAttributes(ResourceReference reference, Map<String, String> spanAttributes,
         Map<String, String> anchorAttributes)
     {
         if (this.wikiModel != null) {
-            anchorAttributes.put(XHTMLLinkRenderer.HREF, this.wikiModel.getAttachmentURL(link.getReference()));
+            anchorAttributes.put(XHTMLLinkRenderer.HREF, this.wikiModel.getAttachmentURL(reference.getReference()));
         } else {
-            anchorAttributes.put(XHTMLLinkRenderer.HREF, this.defaultLinkTypeReferenceSerializer.serialize(link));
+            anchorAttributes.put(XHTMLLinkRenderer.HREF, this.defaultLinkTypeReferenceSerializer.serialize(
+                reference));
         }
     }
 }

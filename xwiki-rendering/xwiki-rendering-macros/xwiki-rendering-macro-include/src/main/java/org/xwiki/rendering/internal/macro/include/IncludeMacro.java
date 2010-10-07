@@ -38,8 +38,8 @@ import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.block.LinkBlock;
 import org.xwiki.rendering.block.MacroMarkerBlock;
 import org.xwiki.rendering.block.XDOM;
-import org.xwiki.rendering.listener.Link;
-import org.xwiki.rendering.listener.LinkType;
+import org.xwiki.rendering.listener.ResourceReference;
+import org.xwiki.rendering.listener.ResourceType;
 import org.xwiki.rendering.macro.AbstractMacro;
 import org.xwiki.rendering.macro.MacroExecutionException;
 import org.xwiki.rendering.macro.include.IncludeMacroParameters;
@@ -197,13 +197,13 @@ public class IncludeMacro extends AbstractMacro<IncludeMacroParameters>
         // code portion and instead perform the resolution at render time, using context information.
         XDOM xdom = new XDOM(result);
         for (LinkBlock block : xdom.getChildrenByType(LinkBlock.class, true)) {
-            Link link = block.getLink();
-            if (link.getType().equals(LinkType.DOCUMENT)) {
+            ResourceReference reference = block.getReference();
+            if (reference.getType().equals(ResourceType.DOCUMENT)) {
                 // It's a link to a document, make the reference absolute
                 String resolvedReference =
-                    this.defaultEntityReferenceSerializer.serialize(this.currentDocumentReferenceResolver.resolve(link
-                        .getReference()));
-                link.setReference(resolvedReference);
+                    this.defaultEntityReferenceSerializer.serialize(this.currentDocumentReferenceResolver.resolve(
+                        reference.getReference()));
+                reference.setReference(resolvedReference);
             }
         }
 

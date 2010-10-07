@@ -20,7 +20,7 @@
 package org.xwiki.rendering.renderer.link;
 
 import org.xwiki.component.annotation.ComponentRole;
-import org.xwiki.rendering.listener.Link;
+import org.xwiki.rendering.listener.ResourceReference;
 
 /**
  * Generate Link label. Used when no label has been specified by the user for links.
@@ -32,10 +32,10 @@ import org.xwiki.rendering.listener.Link;
 public interface LinkLabelGenerator
 {
     /**
-     * Generate a clean String label for the provided {@link Link}.
+     * Generate a clean String label for the provided {@link org.xwiki.rendering.listener.ResourceReference}.
      * 
-     * @param link the link
+     * @param reference the link reference
      * @return the generated label
      */
-    String generate(Link link);
+    String generate(ResourceReference reference);
 }

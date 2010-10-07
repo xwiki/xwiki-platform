@@ -38,7 +38,7 @@ import org.xwiki.rendering.block.SpaceBlock;
 import org.xwiki.rendering.block.SpecialSymbolBlock;
 import org.xwiki.rendering.block.WordBlock;
 import org.xwiki.rendering.block.XDOM;
-import org.xwiki.rendering.listener.DocumentLink;
+import org.xwiki.rendering.listener.DocumentResourceReference;
 
 /**
  * Default implementation of {@link DocumentSplitter}.
@@ -112,8 +112,8 @@ public class DefaultDocumentSplitter implements DocumentSplitter
     {
         Block firstBlock = block.getChildren().get(0);
         if (firstBlock instanceof HeaderBlock) {
-            DocumentLink link = new DocumentLink();
-            link.setReference(target);
+            DocumentResourceReference reference = new DocumentResourceReference();
+            reference.setReference(target);
             // Clone the header block and remove any unwanted stuff
             Block clonedHeaderBlock = firstBlock.clone(new BlockFilter()
             {
@@ -127,7 +127,7 @@ public class DefaultDocumentSplitter implements DocumentSplitter
                     return blocks;
                 }
             });
-            return new LinkBlock(clonedHeaderBlock.getChildren(), link, false);
+            return new LinkBlock(clonedHeaderBlock.getChildren(), reference, false);
         } else if (firstBlock instanceof SectionBlock) {
             return createLink(firstBlock, target);
         } else {

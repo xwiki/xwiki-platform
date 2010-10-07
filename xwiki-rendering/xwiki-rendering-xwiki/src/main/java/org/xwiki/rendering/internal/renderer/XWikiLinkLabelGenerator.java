@@ -27,7 +27,7 @@ import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.Requirement;
 import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.rendering.configuration.RenderingConfiguration;
-import org.xwiki.rendering.listener.Link;
+import org.xwiki.rendering.listener.ResourceReference;
 import org.xwiki.rendering.renderer.link.LinkLabelGenerator;
 
 /**
@@ -49,12 +49,12 @@ public class XWikiLinkLabelGenerator implements LinkLabelGenerator
     @Requirement("current")
     private DocumentReferenceResolver currentDocumentReferenceResolver;
 
-    public String generate(Link link)
+    public String generate(ResourceReference reference)
     {
         String result;
 
         String format = this.renderingConfiguration.getLinkLabelFormat();
-        DocumentReference documentReference = this.currentDocumentReferenceResolver.resolve(link.getReference());
+        DocumentReference documentReference = this.currentDocumentReferenceResolver.resolve(reference.getReference());
 
         // Replace %w with the wiki name
         result = format.replace("%w", documentReference.getWikiReference().getName());

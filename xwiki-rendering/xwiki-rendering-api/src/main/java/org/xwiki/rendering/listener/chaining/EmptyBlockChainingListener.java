@@ -21,7 +21,7 @@ package org.xwiki.rendering.listener.chaining;
 
 import org.xwiki.rendering.syntax.Syntax;
 import org.xwiki.rendering.listener.Format;
-import org.xwiki.rendering.listener.Link;
+import org.xwiki.rendering.listener.ResourceReference;
 import org.xwiki.rendering.listener.ListType;
 import org.xwiki.rendering.listener.HeaderLevel;
 import org.xwiki.rendering.listener.Image;
@@ -132,15 +132,15 @@ public class EmptyBlockChainingListener extends AbstractChainingListener
     /**
      * {@inheritDoc}
      *
-     * @see org.xwiki.rendering.listener.chaining.AbstractChainingListener#beginLink(org.xwiki.rendering.listener.Link,
-     *      boolean, java.util.Map)
+     * @see org.xwiki.rendering.listener.chaining.AbstractChainingListener#beginLink(
+     *      org.xwiki.rendering.listener.ResourceReference, boolean, java.util.Map)
      */
     @Override
-    public void beginLink(Link link, boolean isFreeStandingURI, Map<String, String> parameters)
+    public void beginLink(ResourceReference reference, boolean isFreeStandingURI, Map<String, String> parameters)
     {
         markNotEmpty();
         startContainerBlock();
-        super.beginLink(link, isFreeStandingURI, parameters);
+        super.beginLink(reference, isFreeStandingURI, parameters);
     }
 
     /**
@@ -378,13 +378,13 @@ public class EmptyBlockChainingListener extends AbstractChainingListener
     /**
      * {@inheritDoc}
      *
-     * @see org.xwiki.rendering.listener.chaining.AbstractChainingListener#endLink(org.xwiki.rendering.listener.Link,
-     *      boolean, java.util.Map)
+     * @see org.xwiki.rendering.listener.chaining.AbstractChainingListener#endLink(
+     *      org.xwiki.rendering.listener.ResourceReference, boolean, java.util.Map)
      */
     @Override
-    public void endLink(Link link, boolean isFreeStandingURI, Map<String, String> parameters)
+    public void endLink(ResourceReference reference, boolean isFreeStandingURI, Map<String, String> parameters)
     {
-        super.endLink(link, isFreeStandingURI, parameters);
+        super.endLink(reference, isFreeStandingURI, parameters);
         stopContainerBlock();
     }
 

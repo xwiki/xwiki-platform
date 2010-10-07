@@ -57,7 +57,7 @@ public abstract class AbstractWikiModelParser extends AbstractLogEnabled impleme
 
     /**
      * @return the parser to use when parsing links. We need to parse links to transform a link reference passed as a
-     *         raw string by WikiModel into a {@link org.xwiki.rendering.listener.Link} object.
+     *         raw string by WikiModel into a {@link org.xwiki.rendering.listener.ResourceReference} object.
      */
     public abstract LinkParser getLinkParser();
 

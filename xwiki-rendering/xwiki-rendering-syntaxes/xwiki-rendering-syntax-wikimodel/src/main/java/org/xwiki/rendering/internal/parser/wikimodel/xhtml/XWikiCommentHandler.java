@@ -30,8 +30,8 @@ import org.wikimodel.wem.xhtml.impl.XhtmlHandler.TagStack;
 import org.xwiki.rendering.internal.parser.WikiModelXHTMLParser;
 import org.xwiki.rendering.internal.parser.wikimodel.XWikiGeneratorListener;
 import org.xwiki.rendering.listener.Image;
-import org.xwiki.rendering.listener.Link;
-import org.xwiki.rendering.listener.LinkType;
+import org.xwiki.rendering.listener.ResourceReference;
+import org.xwiki.rendering.listener.ResourceType;
 import org.xwiki.rendering.listener.Listener;
 import org.xwiki.rendering.parser.ImageParser;
 import org.xwiki.rendering.renderer.PrintRenderer;
@@ -154,7 +154,7 @@ public class XWikiCommentHandler extends CommentHandler
 
         String[] tokens = StringUtils.splitByWholeSeparatorPreserveAllTokens(linkComment, COMMENT_SEPARATOR);
         boolean isTyped = tokens[0].equalsIgnoreCase("true") ? true : false;
-        LinkType type = new LinkType(tokens[1]);
+        ResourceType type = new ResourceType(tokens[1]);
         String reference = tokens[2];
         WikiParameters linkParams = WikiParameters.EMPTY;
         WikiParameters referenceParams = WikiParameters.EMPTY;
@@ -201,9 +201,9 @@ public class XWikiCommentHandler extends CommentHandler
             // in the XHTML specifications.
             WikiParameter alt = parameters.getParameter("alt");
             // HACK: Fix this when we have a common Reference object replacing Link and Image
-            Link dummyLink = new Link();
-            dummyLink.setReference(image.getReference());
-            if (alt != null && alt.getValue().equals(this.attachLinkLabelGenerator.generateLabel(dummyLink))) {
+            ResourceReference dummyReference = new ResourceReference();
+            dummyReference.setReference(image.getReference());
+            if (alt != null && alt.getValue().equals(this.attachLinkLabelGenerator.generateLabel(dummyReference))) {
                 parameters = parameters.remove("alt");
             }
 

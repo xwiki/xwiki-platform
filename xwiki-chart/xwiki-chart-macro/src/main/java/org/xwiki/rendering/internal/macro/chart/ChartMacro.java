@@ -37,8 +37,8 @@ import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.block.ImageBlock;
 import org.xwiki.rendering.block.LinkBlock;
 import org.xwiki.rendering.block.ParagraphBlock;
-import org.xwiki.rendering.listener.Link;
-import org.xwiki.rendering.listener.LinkType;
+import org.xwiki.rendering.listener.ResourceReference;
+import org.xwiki.rendering.listener.ResourceType;
 import org.xwiki.rendering.listener.URLImage;
 import org.xwiki.rendering.macro.AbstractMacro;
 import org.xwiki.rendering.macro.MacroExecutionException;
@@ -116,12 +116,12 @@ public class ChartMacro extends AbstractMacro<ChartMacroParameters>
         String imageLocation =
             documentAccessBridge.getURL(null, "charting", null, null) + "/" + generateChart(macroParams, content);
         String title = macroParams.getTitle();
-        Link link = new Link();
-        link.setReference(imageLocation);
-        link.setType(LinkType.URL);
+        ResourceReference reference = new ResourceReference();
+        reference.setReference(imageLocation);
+        reference.setType(ResourceType.URL);
         ImageBlock imageBlock = new ImageBlock(new URLImage(imageLocation), true);
         imageBlock.setParameter("alt", title);
-        LinkBlock linkBlock = new LinkBlock(Collections.singletonList((Block) imageBlock), link, true);
+        LinkBlock linkBlock = new LinkBlock(Collections.singletonList((Block) imageBlock), reference, true);
         linkBlock.setParameter("title", title);
 
         // If the macro is used standalone then we need to wrap it in a paragraph block.

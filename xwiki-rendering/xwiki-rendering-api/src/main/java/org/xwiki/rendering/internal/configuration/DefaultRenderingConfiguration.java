@@ -101,8 +101,8 @@ public class DefaultRenderingConfiguration implements RenderingConfiguration
     }
 
     /**
-     * @param interWikiAlias see {@link org.xwiki.rendering.listener.InterWikiLink}
-     * @param interWikiURL see {@link org.xwiki.rendering.listener.InterWikiLink}
+     * @param interWikiAlias see {@link org.xwiki.rendering.listener.InterWikiResourceReference}
+     * @param interWikiURL see {@link org.xwiki.rendering.listener.InterWikiResourceReference}
      */
     public void addInterWikiDefinition(String interWikiAlias, String interWikiURL)
     {

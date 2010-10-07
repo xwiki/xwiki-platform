@@ -23,8 +23,8 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.xwiki.component.annotation.Component;
-import org.xwiki.rendering.listener.Link;
-import org.xwiki.rendering.listener.LinkType;
+import org.xwiki.rendering.listener.ResourceReference;
+import org.xwiki.rendering.listener.ResourceType;
 
 /**
  * Parses a link reference to a URL.
@@ -45,9 +45,9 @@ public class URLLinkTypeParser extends AbstractURILinkTypeParser
      *
      * @see org.xwiki.rendering.internal.parser.link.AbstractURILinkTypeParser#getType()
      */
-    public LinkType getType()
+    public ResourceType getType()
     {
-        return LinkType.URL;
+        return ResourceType.URL;
     }
 
     /**
@@ -56,17 +56,17 @@ public class URLLinkTypeParser extends AbstractURILinkTypeParser
      * @see AbstractURILinkTypeParser#parse(String)
      */
     @Override
-    public Link parse(String reference)
+    public ResourceReference parse(String reference)
     {
-        Link resultLink = null;
+        ResourceReference resultReference = null;
         Matcher matcher = URL_SCHEME_PATTERN.matcher(reference);
         if (matcher.lookingAt()) {
             // We don't parse the URL since it can contain unknown protocol for the JVM but protocols known by the
             // browser (such as skype:// for example).
-            resultLink = new Link();
-            resultLink.setType(getType());
-            resultLink.setReference(reference);
+            resultReference = new ResourceReference();
+            resultReference.setType(getType());
+            resultReference.setReference(reference);
         }
-        return resultLink;
+        return resultReference;
     }
 }

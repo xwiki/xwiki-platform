@@ -24,10 +24,10 @@ import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.Requirement;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
-import org.xwiki.rendering.listener.DocumentLink;
-import org.xwiki.rendering.listener.InterWikiLink;
-import org.xwiki.rendering.listener.Link;
-import org.xwiki.rendering.listener.LinkType;
+import org.xwiki.rendering.listener.DocumentResourceReference;
+import org.xwiki.rendering.listener.InterWikiResourceReference;
+import org.xwiki.rendering.listener.ResourceReference;
+import org.xwiki.rendering.listener.ResourceType;
 import org.xwiki.rendering.parser.LinkParser;
 import org.xwiki.rendering.parser.LinkTypeParser;
 import org.xwiki.rendering.wiki.WikiModel;
@@ -162,29 +162,29 @@ public class XWiki20LinkParser implements LinkParser
      *
      * @see org.xwiki.rendering.parser.LinkParser#parse(java.lang.String)
      */
-    public Link parse(String rawLink)
+    public ResourceReference parse(String rawLink)
     {
         // Step 1: If we're not in wiki mode then all links are URL links, except for link to images (since an image
         // link can point to an image defined as a URL.
         if (!isInWikiMode() && !rawLink.startsWith("image:")) {
-            Link link = new Link();
-            link.setType(LinkType.URL);
-            link.setTyped(false);
-            link.setReference(rawLink);
-            return link;
+            ResourceReference resourceReference = new ResourceReference();
+            resourceReference.setType(ResourceType.URL);
+            resourceReference.setTyped(false);
+            resourceReference.setReference(rawLink);
+            return resourceReference;
         }
 
         // Step 2: Check if it's a known URI by looking for one of the known URI schemes. If not, check if it's a URL.
-        Link link = parseURILinks(rawLink);
-        if (link != null) {
-            return link;
+        ResourceReference resourceReference = parseURILinks(rawLink);
+        if (resourceReference != null) {
+            return resourceReference;
         }
 
         // Step 3: Look for an InterWiki link
         StringBuffer content = new StringBuffer(rawLink);
-        link = parseInterWikiLinks(content);
-        if (link != null) {
-            return link;
+        resourceReference = parseInterWikiLinks(content);
+        if (resourceReference != null) {
+            return resourceReference;
         }
 
         // Step 4: Consider that we have a reference to a document.
@@ -197,24 +197,24 @@ public class XWiki20LinkParser implements LinkParser
      * @param content the string containing the Document link reference
      * @return the parsed Link Object corresponding to the Document link reference
      */
-    private Link parseDocumentLink(StringBuffer content)
+    private ResourceReference parseDocumentLink(StringBuffer content)
     {
-        DocumentLink documentLink = new DocumentLink();
+        DocumentResourceReference reference = new DocumentResourceReference();
 
         String text = parseElementAfterString(content, LinkParser.SEPARATOR_QUERYSTRING);
         if (text != null) {
-            documentLink.setQueryString(removeEscapesFromExtraParts(text));
+            reference.setQueryString(removeEscapesFromExtraParts(text));
         }
 
         text = parseElementAfterString(content, LinkParser.SEPARATOR_ANCHOR);
         if (text != null) {
-            documentLink.setAnchor(removeEscapesFromExtraParts(text));
+            reference.setAnchor(removeEscapesFromExtraParts(text));
         }
 
-        documentLink.setReference(removeEscapesFromReferencePart(content.toString()));
-        documentLink.setTyped(false);
+        reference.setReference(removeEscapesFromReferencePart(content.toString()));
+        reference.setTyped(false);
         
-        return documentLink;
+        return reference;
     }
 
     /**
@@ -224,28 +224,29 @@ public class XWiki20LinkParser implements LinkParser
      * @return the parsed Link object or null if the passed reference is not an URI link reference or if no URI type
      *         parser was found for the passed URI scheme
      */
-    private Link parseURILinks(String rawLink)
+    private ResourceReference parseURILinks(String rawLink)
     {
-        Link result = null;
+        ResourceReference result = null;
         int uriSchemeDelimiterPos = rawLink.indexOf(":");
         if (uriSchemeDelimiterPos > -1) {
             String scheme = rawLink.substring(0, uriSchemeDelimiterPos);
             String reference = rawLink.substring(uriSchemeDelimiterPos + 1);
             if (getAllowedURIPrefixes().contains(scheme)) {
                 try {
-                    Link link = this.componentManager.lookup(LinkTypeParser.class, scheme).parse(reference);
-                    if (link != null) {
-                        result = link;
+                    ResourceReference resourceReference =
+                        this.componentManager.lookup(LinkTypeParser.class, scheme).parse(reference);
+                    if (resourceReference != null) {
+                        result = resourceReference;
                     }
                 } catch (ComponentLookupException e) {
                     // Failed to lookup component, this shouldn't happen but ignore it.
                 }
             } else {
                 // Check if it's a URL
-                Link link = this.urlLinkTypeParser.parse(rawLink);
-                if (link != null) {
-                    link.setTyped(false);
-                    result = link;
+                ResourceReference resourceReference = this.urlLinkTypeParser.parse(rawLink);
+                if (resourceReference != null) {
+                    resourceReference.setTyped(false);
+                    result = resourceReference;
                 }
             }
         }
@@ -258,12 +259,12 @@ public class XWiki20LinkParser implements LinkParser
      * @param content the original content to parse
      * @return the parsed Link object or null if the passed reference is not an interwiki link reference
      */
-    private Link parseInterWikiLinks(StringBuffer content)
+    private ResourceReference parseInterWikiLinks(StringBuffer content)
     {
-        Link result = null;
+        ResourceReference result = null;
         String interWikiAlias = parseElementAfterString(content, SEPARATOR_INTERWIKI);
         if (interWikiAlias != null) {
-            InterWikiLink link = new InterWikiLink();
+            InterWikiResourceReference link = new InterWikiResourceReference();
             link.setInterWikiAlias(removeEscapes(interWikiAlias));
             link.setReference(removeEscapes(content.toString()));
             result = link;

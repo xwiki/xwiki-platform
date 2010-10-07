@@ -22,8 +22,8 @@ package org.xwiki.rendering.internal.renderer.xwiki20.link;
 import org.apache.commons.lang.StringUtils;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.rendering.internal.parser.link.XWiki20LinkParser;
-import org.xwiki.rendering.listener.DocumentLink;
-import org.xwiki.rendering.listener.Link;
+import org.xwiki.rendering.listener.DocumentResourceReference;
+import org.xwiki.rendering.listener.ResourceReference;
 import org.xwiki.rendering.parser.LinkParser;
 import org.xwiki.rendering.renderer.link.LinkTypeReferenceSerializer;
 
@@ -74,25 +74,25 @@ public class DocumentLinkTypeReferenceSerializer implements LinkTypeReferenceSer
     /**
      * {@inheritDoc}
      *
-     * @see LinkTypeReferenceSerializer#serialize(Link)
+     * @see LinkTypeReferenceSerializer#serialize(org.xwiki.rendering.listener.ResourceReference)
      */
-    public String serialize(Link link)
+    public String serialize(ResourceReference reference)
     {
         StringBuilder buffer = new StringBuilder();
 
-        if (link.getReference() != null) {
+        if (reference.getReference() != null) {
             // Make sure we escape special chars: # and ? as they have special meaning in links, but only for
             // links to documents. Also escape \ since it's the escape char.
-            String normalizedReference = addEscapesToReferencePart(link.getReference());
+            String normalizedReference = addEscapesToReferencePart(reference.getReference());
             buffer.append(normalizedReference);
         }
 
-        String anchor = link.getParameter(DocumentLink.ANCHOR);
+        String anchor = reference.getParameter(DocumentResourceReference.ANCHOR);
         if (anchor != null) {
             buffer.append('#');
             buffer.append(addEscapesToExtraParts(anchor));
         }
-        String queryString = link.getParameter(DocumentLink.QUERY_STRING);
+        String queryString = reference.getParameter(DocumentResourceReference.QUERY_STRING);
         if (queryString != null) {
             buffer.append('?');
             buffer.append(addEscapesToExtraParts(queryString));

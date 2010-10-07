@@ -24,9 +24,9 @@ import java.util.Map;
 import org.apache.commons.lang.StringUtils;
 import org.xwiki.rendering.internal.renderer.printer.XWikiSyntaxEscapeWikiPrinter;
 import org.xwiki.rendering.internal.renderer.xwiki20.XWikiSyntaxListenerChain;
-import org.xwiki.rendering.listener.DocumentLink;
-import org.xwiki.rendering.listener.Link;
-import org.xwiki.rendering.listener.LinkType;
+import org.xwiki.rendering.listener.DocumentResourceReference;
+import org.xwiki.rendering.listener.ResourceReference;
+import org.xwiki.rendering.listener.ResourceType;
 import org.xwiki.rendering.renderer.link.LinkReferenceSerializer;
 
 /**
@@ -49,26 +49,26 @@ public class XWikiSyntaxLinkRenderer extends org.xwiki.rendering.internal.render
 
     /**
      * {@inheritDoc}
-     * @see org.xwiki.rendering.internal.renderer.xwiki20.link.XWikiSyntaxLinkRenderer#printParameters(XWikiSyntaxEscapeWikiPrinter, Link, java.util.Map)
+     * @see org.xwiki.rendering.internal.renderer.xwiki20.link.XWikiSyntaxLinkRenderer#printParameters(XWikiSyntaxEscapeWikiPrinter, org.xwiki.rendering.listener.ResourceReference , java.util.Map)
      */
     @Override
-    protected void printParameters(XWikiSyntaxEscapeWikiPrinter printer, Link link,
+    protected void printParameters(XWikiSyntaxEscapeWikiPrinter printer, ResourceReference reference,
         Map<String, String> parameters)
     {
         // Print the Query String and Anchor as parameters if they're defined and if the link is a link to a document.
         boolean shouldPrintSeparator = true;
 
         // The XWiki Syntax 2.1 supports two special Link reference parameters: queryString and anchor.
-        if (link.getType().equals(LinkType.DOCUMENT)) {
+        if (reference.getType().equals(ResourceType.DOCUMENT)) {
             // Print first the query string
-            String queryString = link.getParameter(DocumentLink.QUERY_STRING);
+            String queryString = reference.getParameter(DocumentResourceReference.QUERY_STRING);
             if (!StringUtils.isEmpty(queryString)) {
                 printer.print(PARAMETER_SEPARATOR);
                 printer.print(this.parametersPrinter.print("queryString", queryString, '~'));
                 shouldPrintSeparator = false;
             }
             // Then print the anchor
-            String anchor = link.getParameter(DocumentLink.ANCHOR);
+            String anchor = reference.getParameter(DocumentResourceReference.ANCHOR);
             if (!StringUtils.isEmpty(anchor)) {
                 if (shouldPrintSeparator) {
                     printer.print(PARAMETER_SEPARATOR);

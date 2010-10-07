@@ -201,6 +201,7 @@
                 <exclude>org/xwiki/rendering/macro/script/AbstractJSR223ScriptMacro</exclude>
                 <exclude>org/xwiki/rendering/wiki/WikiModel</exclude>
                 <exclude>org/xwiki/rendering/block/PlainTextBlockFilter</exclude>
+                <exclude>org/xwiki/rendering/block/LinkBlock</exclude>
                 <exclude>org/xwiki/rendering/listener/Link</exclude>
                 <exclude>org/xwiki/rendering/listener/LinkType</exclude>
                 <exclude>org/xwiki/rendering/listener/Attachment</exclude>
@@ -208,6 +209,16 @@
                 <exclude>org/xwiki/rendering/listener/Image</exclude>
                 <exclude>org/xwiki/rendering/listener/DocumentImage</exclude>
                 <exclude>org/xwiki/rendering/listener/URLImage</exclude>
+                <exclude>org/xwiki/rendering/listener/CompositeListener</exclude>
+                <exclude>org/xwiki/rendering/listener/LinkListener</exclude>
+                <exclude>org/xwiki/rendering/listener/WrappingListener</exclude>
+                <exclude>org/xwiki/rendering/listener/QueueListener</exclude>
+                <exclude>org/xwiki/rendering/listener/chaining/AbstractChainingListener</exclude>
+                <exclude>org/xwiki/rendering/listener/chaining/BlockStateChainingListener</exclude>
+                <exclude>org/xwiki/rendering/listener/chaining/ConsecutiveNewLineStateChainingListener</exclude>
+                <exclude>org/xwiki/rendering/listener/chaining/EmptyBlockChainingListener</exclude>
+                <exclude>org/xwiki/rendering/listener/chaining/LookaheadChainingListener</exclude>
+                <exclude>org/xwiki/rendering/listener/chaining/TextOnNewLineStateChainingListener</exclude>
                 <exclude>org/xwiki/rendering/parser/LinkParser</exclude>
                 <exclude>org/xwiki/rendering/parser/AttachmentParser</exclude>
                 <exclude>org/xwiki/rendering/renderer/LinkLabelGenerator</exclude>

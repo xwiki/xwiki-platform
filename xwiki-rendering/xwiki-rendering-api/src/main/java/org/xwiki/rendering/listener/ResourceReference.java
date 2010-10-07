@@ -25,12 +25,13 @@ import java.util.Iterator;
 import java.util.Map;
 
 /**
- * Represents a reference to a link. Note that this representation is independent of any wiki syntax.
- * 
+ * Represents a reference to a Resource (document, image, attachment, mail, etc).
+ * Note that this representation is independent of any wiki syntax.
+ *
  * @version $Id$
  * @since 1.5M2
  */
-public class Link implements Cloneable
+public class ResourceReference implements Cloneable
 {
     /**
      * @see #isTyped()
@@ -48,7 +49,7 @@ public class Link implements Cloneable
     /**
      * @see #getType()
      */
-    private LinkType type;
+    private ResourceType type;
 
     /**
      * @see #getParameter(String)
@@ -64,8 +65,8 @@ public class Link implements Cloneable
     }
 
     /**
-     * @return true if the link type has been explicitly provided (eg in XWiki Syntax 2.1 if the reference is prefixed
-     *         with the link type followed by ":" and then the rest of the reference)
+     * @return true if the resource type has been explicitly provided (eg in XWiki Syntax 2.1 if the reference is
+     *         prefixed with the resource type followed by ":" and then the rest of the reference)
      */
     public boolean isTyped()
     {
@@ -81,9 +82,10 @@ public class Link implements Cloneable
     }
 
     /**
-     * @return the reference pointed to by this link. For example a reference can be a document's name (which depends on
-     *         the wiki, for example for XWiki the format is "wiki:space.page"), a URI (for example: mailto:john@doe.com
-     *         or a URL),n <a href="http://en.wikipedia.org/wiki/InterWiki">Inter Wiki</a> reference, etc
+     * @return the reference pointed to by this resource. For example a reference can be a document's name (which
+     *         depends on the wiki, for example for XWiki the format is "wiki:space.page"), a URI
+     *         (for example: mailto:john@doe.com), a URL, an
+     *         <a href="http://en.wikipedia.org/wiki/InterWiki">Inter Wiki</a> reference, etc
      * @see #getType()
      */
     public String getReference()
@@ -92,19 +94,19 @@ public class Link implements Cloneable
     }
 
     /**
-     * @return the type of link
-     * @see LinkType
+     * @return the type of the resource
+     * @see ResourceType
      */
-    public LinkType getType()
+    public ResourceType getType()
     {
         return this.type;
     }
 
     /**
-     * @param type the type of link
-     * @see LinkType
+     * @param type the type of the resource
+     * @see ResourceType
      */
-    public void setType(LinkType type)
+    public void setType(ResourceType type)
     {
         this.type = type;
     }
@@ -135,10 +137,11 @@ public class Link implements Cloneable
     }
 
     /**
-     * In order for Link references to be extensible we allow for extra parameters in addition to the link reference.
-     * For example this is used in Document Links for storing the query string and anchor information, and in InterWiki
-     * Links to store the InterWiki Alias. Note that supported parameters depend on the Renderer that will be used (i.e.
-     * it depends on the target Syntax). For example the XWiki Syntax 2.1 only supports "queryString" and "anchor".
+     * In order for Resource references to be extensible we allow for extra parameters in addition to the Resource
+     * reference. For example this is used in Document Resource References for storing the query string and anchor
+     * information, and in InterWiki Resource References to store the InterWiki Alias. Note that supported parameters
+     * depend on the Renderer that will be used (i.e. it depends on the target Syntax). For example the XWiki Syntax
+     * 2.1 only supports "queryString" and "anchor".
      * 
      * @param name the name of the parameter to get
      * @return the parameter value or null if no such parameter exist
@@ -199,11 +202,11 @@ public class Link implements Cloneable
      * @see Object#clone()
      */
     @Override
-    public Link clone()
+    public ResourceReference clone()
     {
-        Link clone;
+        ResourceReference clone;
         try {
-            clone = (Link) super.clone();
+            clone = (ResourceReference) super.clone();
         } catch (CloneNotSupportedException e) {
             // Should never happen
             throw new RuntimeException("Failed to clone object", e);

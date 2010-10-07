@@ -23,14 +23,14 @@ import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.Requirement;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
-import org.xwiki.rendering.listener.Link;
+import org.xwiki.rendering.listener.ResourceReference;
 import org.xwiki.rendering.renderer.link.LinkReferenceSerializer;
 import org.xwiki.rendering.renderer.link.LinkTypeReferenceSerializer;
 
 /**
  * Generate a string representation of a {@link}'s reference, in XWiki Syntax 2.0. This implementation is pluggable by
  * using internally implementations of {@link org.xwiki.rendering.renderer.link.LinkTypeReferenceSerializer}, each in
- * charge of serializing a given {@link org.xwiki.rendering.listener.LinkType}.
+ * charge of serializing a given {@link org.xwiki.rendering.listener.ResourceType}.
  * <p>
  * Note that {@link org.xwiki.rendering.renderer.link.LinkTypeReferenceSerializer} component implementations must use
  * a role hint equal to the XWiki Syntax id followed by "/" and then Link Type name (eg "doc" for document links,
@@ -63,18 +63,19 @@ public class XWikiSyntaxLinkReferenceSerializer implements LinkReferenceSerializ
     /**
      * {@inheritDoc}
      *
-     * @see org.xwiki.rendering.renderer.link.LinkReferenceSerializer#serialize(org.xwiki.rendering.listener.Link)
+     * @see org.xwiki.rendering.renderer.link.LinkReferenceSerializer#serialize(
+     *      org.xwiki.rendering.listener.ResourceReference)
      */
-    public String serialize(Link link)
+    public String serialize(ResourceReference reference)
     {
         String result;
 
         try {
             result = this.componentManager.lookup(LinkTypeReferenceSerializer.class,
-                getLinkTypeSerializerComponentPrefix() + "/" + link.getType().getScheme()).serialize(link);
+                getLinkTypeSerializerComponentPrefix() + "/" + reference.getType().getScheme()).serialize(reference);
         } catch (ComponentLookupException e) {
             // Failed to find serializer for the passed link type. Use the default serializer.
-            result = this.defaultLinkTypeReferenceSerializer.serialize(link);
+            result = this.defaultLinkTypeReferenceSerializer.serialize(reference);
         }
         return result;
     }

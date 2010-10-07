@@ -29,7 +29,7 @@ import org.apache.maven.doxia.sink.SinkEventAttributes;
 import org.xwiki.rendering.listener.CompositeListener;
 import org.xwiki.rendering.listener.Format;
 import org.xwiki.rendering.listener.HeaderLevel;
-import org.xwiki.rendering.listener.Link;
+import org.xwiki.rendering.listener.ResourceReference;
 import org.xwiki.rendering.listener.ListType;
 import org.xwiki.rendering.listener.Listener;
 import org.xwiki.rendering.listener.QueueListener;
@@ -631,11 +631,11 @@ public class XWikiGeneratorSink implements Sink
     {
         flushEmptyLines();
 
-        Link link = this.linkParser.parse(name);
+        ResourceReference resourceReference = this.linkParser.parse(name);
 
-        getListener().beginLink(link, false, Listener.EMPTY_PARAMETERS);
+        getListener().beginLink(resourceReference, false, Listener.EMPTY_PARAMETERS);
 
-        this.parameters.push(link);
+        this.parameters.push(resourceReference);
     }
 
     /**
@@ -657,7 +657,7 @@ public class XWikiGeneratorSink implements Sink
     {
         flushEmptyLines();
 
-        getListener().endLink((Link) this.parameters.pop(), false, Listener.EMPTY_PARAMETERS);
+        getListener().endLink((ResourceReference) this.parameters.pop(), false, Listener.EMPTY_PARAMETERS);
     }
 
     /**

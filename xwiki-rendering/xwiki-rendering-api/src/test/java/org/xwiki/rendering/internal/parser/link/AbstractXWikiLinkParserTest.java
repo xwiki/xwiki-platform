@@ -20,8 +20,8 @@
 package org.xwiki.rendering.internal.parser.link;
 
 import org.junit.*;
-import org.xwiki.rendering.listener.Link;
-import org.xwiki.rendering.listener.LinkType;
+import org.xwiki.rendering.listener.ResourceReference;
+import org.xwiki.rendering.listener.ResourceType;
 import org.xwiki.rendering.parser.LinkParser;
 import org.xwiki.test.AbstractComponentTestCase;
 
@@ -38,53 +38,53 @@ public abstract class AbstractXWikiLinkParserTest extends AbstractComponentTestC
     @Test
     public void testParseLinksWhenInWikiModeCommon() throws Exception
     {
-        Link link = parser.parse("");
-        Assert.assertEquals("", link.getReference());
-        Assert.assertFalse(link.isTyped());
-        Assert.assertEquals(LinkType.DOCUMENT, link.getType());
-        Assert.assertEquals("Typed = [false] Type = [doc] Reference = []", link.toString());
+        ResourceReference reference = parser.parse("");
+        Assert.assertEquals("", reference.getReference());
+        Assert.assertFalse(reference.isTyped());
+        Assert.assertEquals(ResourceType.DOCUMENT, reference.getType());
+        Assert.assertEquals("Typed = [false] Type = [doc] Reference = []", reference.toString());
 
-        link = parser.parse("Hello World");
-        Assert.assertEquals("Hello World", link.getReference());
-        Assert.assertFalse(link.isTyped());
-        Assert.assertEquals(LinkType.DOCUMENT, link.getType());
-        Assert.assertEquals("Typed = [false] Type = [doc] Reference = [Hello World]", link.toString());
+        reference = parser.parse("Hello World");
+        Assert.assertEquals("Hello World", reference.getReference());
+        Assert.assertFalse(reference.isTyped());
+        Assert.assertEquals(ResourceType.DOCUMENT, reference.getType());
+        Assert.assertEquals("Typed = [false] Type = [doc] Reference = [Hello World]", reference.toString());
 
-        link = parser.parse("http://xwiki.org");
-        Assert.assertEquals("http://xwiki.org", link.getReference());
-        Assert.assertFalse(link.isTyped());
-        Assert.assertEquals(LinkType.URL, link.getType());
-        Assert.assertEquals("Typed = [false] Type = [url] Reference = [http://xwiki.org]", link.toString());
+        reference = parser.parse("http://xwiki.org");
+        Assert.assertEquals("http://xwiki.org", reference.getReference());
+        Assert.assertFalse(reference.isTyped());
+        Assert.assertEquals(ResourceType.URL, reference.getType());
+        Assert.assertEquals("Typed = [false] Type = [url] Reference = [http://xwiki.org]", reference.toString());
 
         // Verify mailto: URI is recognized
-        link = parser.parse("mailto:john@smith.com?subject=test");
-        Assert.assertEquals("john@smith.com?subject=test", link.getReference());
-        Assert.assertTrue(link.isTyped());
-        Assert.assertEquals(LinkType.MAILTO, link.getType());
+        reference = parser.parse("mailto:john@smith.com?subject=test");
+        Assert.assertEquals("john@smith.com?subject=test", reference.getReference());
+        Assert.assertTrue(reference.isTyped());
+        Assert.assertEquals(ResourceType.MAILTO, reference.getType());
         Assert.assertEquals("Typed = [true] Type = [mailto] Reference = [john@smith.com?subject=test]",
-            link.toString());
+            reference.toString());
 
         // Verify image: URI is recognized
-        link = parser.parse("image:some:content");
-        Assert.assertEquals("some:content", link.getReference());
-        Assert.assertTrue(link.isTyped());
-        Assert.assertEquals(LinkType.IMAGE, link.getType());
-        Assert.assertEquals("Typed = [true] Type = [image] Reference = [some:content]", link.toString());
+        reference = parser.parse("image:some:content");
+        Assert.assertEquals("some:content", reference.getReference());
+        Assert.assertTrue(reference.isTyped());
+        Assert.assertEquals(ResourceType.IMAGE, reference.getType());
+        Assert.assertEquals("Typed = [true] Type = [image] Reference = [some:content]", reference.toString());
 
         // Verify attach: URI is recognized
-        link = parser.parse("attach:some:content");
-        Assert.assertEquals("some:content", link.getReference());
-        Assert.assertTrue(link.isTyped());
-        Assert.assertEquals(LinkType.ATTACHMENT, link.getType());
-        Assert.assertEquals("Typed = [true] Type = [attach] Reference = [some:content]", link.toString());
+        reference = parser.parse("attach:some:content");
+        Assert.assertEquals("some:content", reference.getReference());
+        Assert.assertTrue(reference.isTyped());
+        Assert.assertEquals(ResourceType.ATTACHMENT, reference.getType());
+        Assert.assertEquals("Typed = [true] Type = [attach] Reference = [some:content]", reference.toString());
 
         // Verify that unknown URIs are ignored
         // Note: In this example we point to a document and we consider that myxwiki is the wiki name and
         // http://xwiki.org is the page name
-        link = parser.parse("mywiki:http://xwiki.org");
-        Assert.assertEquals("mywiki:http://xwiki.org", link.getReference());
-        Assert.assertFalse(link.isTyped());
-        Assert.assertEquals(LinkType.DOCUMENT, link.getType());
-        Assert.assertEquals("Typed = [false] Type = [doc] Reference = [mywiki:http://xwiki.org]", link.toString());
+        reference = parser.parse("mywiki:http://xwiki.org");
+        Assert.assertEquals("mywiki:http://xwiki.org", reference.getReference());
+        Assert.assertFalse(reference.isTyped());
+        Assert.assertEquals(ResourceType.DOCUMENT, reference.getType());
+        Assert.assertEquals("Typed = [false] Type = [doc] Reference = [mywiki:http://xwiki.org]", reference.toString());
     }
 }

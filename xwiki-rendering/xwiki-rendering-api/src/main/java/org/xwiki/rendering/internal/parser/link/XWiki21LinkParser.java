@@ -23,8 +23,8 @@ import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.Requirement;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
-import org.xwiki.rendering.listener.Link;
-import org.xwiki.rendering.listener.LinkType;
+import org.xwiki.rendering.listener.ResourceReference;
+import org.xwiki.rendering.listener.ResourceType;
 import org.xwiki.rendering.parser.LinkParser;
 import org.xwiki.rendering.parser.LinkTypeParser;
 import org.xwiki.rendering.wiki.WikiModel;
@@ -71,16 +71,16 @@ public class XWiki21LinkParser implements LinkParser
      *
      * @see org.xwiki.rendering.parser.LinkParser#parse(String)
      */
-    public Link parse(String rawLink)
+    public ResourceReference parse(String rawLink)
     {
         // Step 1: If we're not in wiki mode then all links are URL links, except for link to images (since an image
         // link can point to an image defined as a URL.
         if (!isInWikiMode() && !rawLink.startsWith("image:")) {
-            Link link = new Link();
-            link.setType(LinkType.URL);
-            link.setTyped(false);
-            link.setReference(rawLink);
-            return link;
+            ResourceReference resourceReference = new ResourceReference();
+            resourceReference.setType(ResourceType.URL);
+            resourceReference.setTyped(false);
+            resourceReference.setReference(rawLink);
+            return resourceReference;
         }
 
         // Step 2: Find the type parser matching the specified prefix type (if any).
@@ -90,9 +90,9 @@ public class XWiki21LinkParser implements LinkParser
             String reference = rawLink.substring(pos + 1);
             try {
                 LinkTypeParser parser = this.componentManager.lookup(LinkTypeParser.class, typePrefix);
-                Link parsedLink = parser.parse(reference);
-                if (parsedLink != null) {
-                    return parsedLink;
+                ResourceReference parsedResourceReference = parser.parse(reference);
+                if (parsedResourceReference != null) {
+                    return parsedResourceReference;
                 }
             } catch (ComponentLookupException e) {
                 // Couldn't find a link type parser for the specified type. Will try to autodiscover the type.
@@ -103,14 +103,14 @@ public class XWiki21LinkParser implements LinkParser
         // either:
         // - a URL (specified without the "url" type)
         // - a reference to a document (specified without the "doc" type)
-        Link parsedLink = this.urlLinkTypeParser.parse(rawLink);
-        if (parsedLink == null) {
+        ResourceReference parsedResourceReference = this.urlLinkTypeParser.parse(rawLink);
+        if (parsedResourceReference == null) {
             // What remains is considered to be a link to a document, use the document link type parser to parse it.
-            parsedLink = this.documentLinkTypeParser.parse(rawLink);
+            parsedResourceReference = this.documentLinkTypeParser.parse(rawLink);
         }
-        parsedLink.setTyped(false);
+        parsedResourceReference.setTyped(false);
 
-        return parsedLink;
+        return parsedResourceReference;
     }
 
     /**

@@ -38,8 +38,7 @@ import org.wikimodel.wem.WikiStyle;
 import org.xwiki.rendering.listener.CompositeListener;
 import org.xwiki.rendering.listener.Format;
 import org.xwiki.rendering.listener.HeaderLevel;
-import org.xwiki.rendering.listener.Link;
-import org.xwiki.rendering.listener.LinkType;
+import org.xwiki.rendering.listener.ResourceReference;
 import org.xwiki.rendering.listener.ListType;
 import org.xwiki.rendering.listener.Listener;
 import org.xwiki.rendering.listener.QueueListener;
@@ -940,9 +939,10 @@ public class DefaultXWikiGeneratorListener implements XWikiGeneratorListener
         }
     }
 
-    protected void onReference(Link link, String label, boolean isFreeStandingURI, Map<String, String> parameters)
+    protected void onReference(ResourceReference reference, String label, boolean isFreeStandingURI,
+        Map<String, String> parameters)
     {
-        getListener().beginLink(link, isFreeStandingURI, parameters);
+        getListener().beginLink(reference, isFreeStandingURI, parameters);
         if (label != null) {
             try {
                 // TODO: Use an inline parser. See http://jira.xwiki.org/jira/browse/XWIKI-2748
@@ -952,7 +952,7 @@ public class DefaultXWikiGeneratorListener implements XWikiGeneratorListener
                 // TODO what should we do here ?
             }
         }
-        getListener().endLink(link, isFreeStandingURI, parameters);
+        getListener().endLink(reference, isFreeStandingURI, parameters);
     }
 
     /**

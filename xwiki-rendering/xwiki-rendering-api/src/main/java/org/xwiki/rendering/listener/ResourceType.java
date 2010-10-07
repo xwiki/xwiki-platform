@@ -20,47 +20,47 @@
 package org.xwiki.rendering.listener;
 
 /**
- * The link type (a link to a document, a link to a mail, a link to an external interwiki, etc).
+ * The Resource type (a document, a mail, a document in external wiki, an attachment, etc).
  * 
  * @version $Id$
  * @since 2.5M2
  */
-public class LinkType
+public class ResourceType
 {
     /**
-     * The link targets a document.
+     * Represents a Document.
      */
-    public static final LinkType DOCUMENT = new LinkType("doc");
+    public static final ResourceType DOCUMENT = new ResourceType("doc");
 
     /**
-     * The link targets an URL.
+     * Represents an URL.
      */
-    public static final LinkType URL = new LinkType("url");
+    public static final ResourceType URL = new ResourceType("url");
 
     /**
-     * The link targets a document in another wiki.
+     * Represents a document in another wiki.
      */
-    public static final LinkType INTERWIKI = new LinkType("interwiki");
+    public static final ResourceType INTERWIKI = new ResourceType("interwiki");
     
     /**
-     * The link targets a relative URL in the current wiki.
+     * Represents a relative URL in the current wiki.
      */
-    public static final LinkType PATH = new LinkType("path");
+    public static final ResourceType PATH = new ResourceType("path");
 
     /**
-     * The link targets a mail.
+     * Represents a mail.
      */
-    public static final LinkType MAILTO = new LinkType("mailto");
+    public static final ResourceType MAILTO = new ResourceType("mailto");
 
     /**
-     * The link targets an attachment.
+     * Represents an attachment.
      */
-    public static final LinkType ATTACHMENT = new LinkType("attach");
+    public static final ResourceType ATTACHMENT = new ResourceType("attach");
 
     /**
-     * The link targets an image.
+     * Represents an image.
      */
-    public static final LinkType IMAGE = new LinkType("image");
+    public static final ResourceType IMAGE = new ResourceType("image");
 
     /**
      * @see #getScheme()
@@ -70,7 +70,7 @@ public class LinkType
     /**
      * @param scheme see {@link #getScheme()}
      */
-    public LinkType(String scheme)
+    public ResourceType(String scheme)
     {
         setScheme(scheme);
     }
@@ -123,10 +123,10 @@ public class LinkType
             if ((object == null) || (object.getClass() != this.getClass())) {
                 result = false;
             } else {
-                // object must be LinkType at this point
-                LinkType linkType = (LinkType) object;
-                result = (getScheme() == linkType.getScheme() || (getScheme() != null
-                    && getScheme().equals(linkType.getScheme())));
+                // object must be ResourceType at this point
+                ResourceType type = (ResourceType) object;
+                result = (getScheme() == type.getScheme() || (getScheme() != null
+                    && getScheme().equals(type.getScheme())));
             }
         }
         return result;

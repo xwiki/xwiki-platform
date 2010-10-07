@@ -26,7 +26,7 @@ import org.apache.commons.lang.StringUtils;
 import org.xwiki.rendering.internal.parser.PlainTextStreamParser;
 import org.xwiki.rendering.internal.renderer.ParametersPrinter;
 import org.xwiki.rendering.internal.renderer.printer.XWikiSyntaxEscapeWikiPrinter;
-import org.xwiki.rendering.listener.Link;
+import org.xwiki.rendering.listener.ResourceReference;
 import org.xwiki.rendering.listener.QueueListener.Event;
 import org.xwiki.rendering.listener.chaining.EventType;
 import org.xwiki.rendering.renderer.link.LinkReferenceSerializer;
@@ -61,9 +61,9 @@ public class XWikiSyntaxLinkRenderer
         this.forceFullSyntax.push(false);
     }
 
-    public String serialize(Link link, boolean isFreeStanding)
+    public String serialize(ResourceReference reference, boolean isFreeStanding)
     {
-        String result = this.linkReferenceSerializer.serialize(link);
+        String result = this.linkReferenceSerializer.serialize(reference);
 
         if (!isFreeStanding) {
             result = result.replace("~", "~~").replace(">>", "~>~>").replace(PARAMETER_SEPARATOR, "~|~|");
@@ -72,8 +72,8 @@ public class XWikiSyntaxLinkRenderer
         return result;
     }
 
-    public void beginRenderLink(XWikiSyntaxEscapeWikiPrinter printer, Link link, boolean isFreeStandingURI,
-        Map<String, String> parameters)
+    public void beginRenderLink(XWikiSyntaxEscapeWikiPrinter printer, ResourceReference reference,
+        boolean isFreeStandingURI, Map<String, String> parameters)
     {
         // find if the last printed char is part of a syntax (i.e. consumed by the parser before starting to parse the
         // link)
@@ -129,13 +129,13 @@ public class XWikiSyntaxLinkRenderer
         }
     }
 
-    public void endRenderLink(XWikiSyntaxEscapeWikiPrinter printer, Link link, boolean isFreeStandingURI,
-        Map<String, String> parameters)
+    public void endRenderLink(XWikiSyntaxEscapeWikiPrinter printer, ResourceReference reference,
+        boolean isFreeStandingURI, Map<String, String> parameters)
     {
-        printer.print(serialize(link, isFreeStandingURI));
+        printer.print(serialize(reference, isFreeStandingURI));
 
         // If there were parameters specified, print them
-        printParameters(printer, link, parameters);
+        printParameters(printer, reference, parameters);
 
         if (this.forceFullSyntax.peek() || !isFreeStandingURI) {
             printer.print("]]");
@@ -144,7 +144,8 @@ public class XWikiSyntaxLinkRenderer
         this.forceFullSyntax.pop();
     }
 
-    protected void printParameters(XWikiSyntaxEscapeWikiPrinter printer, Link link, Map<String, String> parameters)
+    protected void printParameters(XWikiSyntaxEscapeWikiPrinter printer, ResourceReference resourceReference,
+        Map<String, String> parameters)
     {
         // If there were parameters specified, output them separated by the "||" characters
         if (!parameters.isEmpty()) {

@@ -24,7 +24,7 @@ import java.util.Map;
 import org.xwiki.rendering.listener.Format;
 import org.xwiki.rendering.listener.HeaderLevel;
 import org.xwiki.rendering.listener.Image;
-import org.xwiki.rendering.listener.Link;
+import org.xwiki.rendering.listener.ResourceReference;
 import org.xwiki.rendering.listener.ListType;
 import org.xwiki.rendering.listener.Listener;
 import org.xwiki.rendering.syntax.Syntax;
@@ -170,14 +170,14 @@ public enum EventType
     BEGIN_LINK {
         public void fireEvent(Listener listener, Object[] eventParameters)
         {
-            listener.beginLink((Link) eventParameters[0], (Boolean) eventParameters[1],
+            listener.beginLink((ResourceReference) eventParameters[0], (Boolean) eventParameters[1],
                 (Map<String, String>) eventParameters[2]);
         }
     },
     END_LINK {
         public void fireEvent(Listener listener, Object[] eventParameters)
         {
-            listener.endLink((Link) eventParameters[0], (Boolean) eventParameters[1],
+            listener.endLink((ResourceReference) eventParameters[0], (Boolean) eventParameters[1],
                 (Map<String, String>) eventParameters[2]);
         }
     },

@@ -34,8 +34,8 @@ import org.xwiki.rendering.block.ImageBlock;
 import org.xwiki.rendering.block.LinkBlock;
 import org.xwiki.rendering.block.ParagraphBlock;
 import org.xwiki.rendering.block.RawBlock;
-import org.xwiki.rendering.listener.Link;
-import org.xwiki.rendering.listener.LinkType;
+import org.xwiki.rendering.listener.ResourceReference;
+import org.xwiki.rendering.listener.ResourceType;
 import org.xwiki.rendering.listener.URLImage;
 import org.xwiki.rendering.macro.AbstractMacro;
 import org.xwiki.rendering.macro.Macro;
@@ -162,19 +162,19 @@ public class RssMacro extends AbstractMacro<RssMacroParameters>
             titleBlocks = parsePlainText(feed.getTitle());
         } else {
             // Title link.
-            Link titleLink = new Link();
-            titleLink.setReference(feed.getLink());
-            titleLink.setType(LinkType.URL);
+            ResourceReference titleResourceReference = new ResourceReference();
+            titleResourceReference.setReference(feed.getLink());
+            titleResourceReference.setType(ResourceType.URL);
 
             // Title text link.
-            Block titleTextLinkBlock = new LinkBlock(parsePlainText(feed.getTitle()), titleLink, true);
+            Block titleTextLinkBlock = new LinkBlock(parsePlainText(feed.getTitle()), titleResourceReference, true);
 
             // Rss icon.
             String imagePath = skinAccessBridge.getSkinFile(FEED_ICON_RESOURCE_PATH);
             ImageBlock imageBlock = new ImageBlock(new URLImage(imagePath), false);
 
             // Title rss icon link.
-            Block titleImageLinkBlock = new LinkBlock(Arrays.<Block> asList(imageBlock), titleLink, true);
+            Block titleImageLinkBlock = new LinkBlock(Arrays.<Block> asList(imageBlock), titleResourceReference, true);
 
             titleBlocks = Arrays.<Block> asList(titleTextLinkBlock, titleImageLinkBlock);
         }
@@ -206,10 +206,10 @@ public class RssMacro extends AbstractMacro<RssMacroParameters>
             }
             SyndEntry entry = (SyndEntry) item;
 
-            Link titleLink = new Link();
-            titleLink.setType(LinkType.URL);
-            titleLink.setReference(entry.getLink());
-            Block titleBlock = new LinkBlock(parsePlainText(entry.getTitle()), titleLink, true);
+            ResourceReference titleResourceReference = new ResourceReference();
+            titleResourceReference.setType(ResourceType.URL);
+            titleResourceReference.setReference(entry.getLink());
+            Block titleBlock = new LinkBlock(parsePlainText(entry.getTitle()), titleResourceReference, true);
             ParagraphBlock paragraphTitleBlock = new ParagraphBlock(Collections.singletonList(titleBlock));
             paragraphTitleBlock.setParameter(CLASS_ATTRIBUTE, "rssitemtitle");
             parentBlock.addChild(paragraphTitleBlock);

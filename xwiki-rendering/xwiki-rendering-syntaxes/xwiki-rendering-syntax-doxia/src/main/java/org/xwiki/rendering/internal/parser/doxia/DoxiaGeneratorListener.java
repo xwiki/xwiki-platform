@@ -25,7 +25,7 @@ import org.apache.maven.doxia.sink.Sink;
 import org.xwiki.rendering.listener.Format;
 import org.xwiki.rendering.listener.HeaderLevel;
 import org.xwiki.rendering.listener.Image;
-import org.xwiki.rendering.listener.Link;
+import org.xwiki.rendering.listener.ResourceReference;
 import org.xwiki.rendering.listener.ListType;
 import org.xwiki.rendering.listener.Listener;
 import org.xwiki.rendering.syntax.Syntax;
@@ -472,21 +472,22 @@ public class DoxiaGeneratorListener implements Listener
     /**
      * {@inheritDoc}
      * 
-     * @see org.xwiki.rendering.listener.Listener#beginLink(Link, boolean, Map)
+     * @see org.xwiki.rendering.listener.Listener#beginLink(org.xwiki.rendering.listener.ResourceReference , boolean,
+     *      Map)
      * @since 1.7M1
      */
-    public void beginLink(Link link, boolean isFreeStandingURI, Map<String, String> parameters)
+    public void beginLink(ResourceReference reference, boolean isFreeStandingURI, Map<String, String> parameters)
     {
-        this.sink.link(link.getReference());
+        this.sink.link(reference.getReference());
     }
 
     /**
      * {@inheritDoc}
      * 
-     * @see org.xwiki.rendering.listener.Listener#endLink(Link, boolean, Map)
+     * @see org.xwiki.rendering.listener.Listener#endLink(org.xwiki.rendering.listener.ResourceReference , boolean, Map)
      * @since 1.7M1
      */
-    public void endLink(Link link, boolean isFreeStandingURI, Map<String, String> parameters)
+    public void endLink(ResourceReference reference, boolean isFreeStandingURI, Map<String, String> parameters)
     {
         this.sink.link_();
     }

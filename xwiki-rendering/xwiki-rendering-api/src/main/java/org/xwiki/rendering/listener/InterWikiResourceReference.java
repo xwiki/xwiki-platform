@@ -20,16 +20,16 @@
 package org.xwiki.rendering.listener;
 
 /**
- * Represents a link reference to an <a href="http://en.wikipedia.org/wiki/InterWiki">Inter Wiki</a> link. An InterWiki
- * link is a shorthand notation to link to a set of external URL, all having a common prefix (eg
- * http://server/some/common/prefix/a1, http://server/some/common/prefix/a2). An InterWiki link is made of an InterWiki
- * Alias which is a name corresponding to the common URL and an InterWiki Path which is the suffix to append to the
- * common URL part to make the full URL.
+ * Represents a reference to an external wiki(<a href="http://en.wikipedia.org/wiki/InterWiki">Inter Wiki</a>).
+ * An InterWiki reference is a shorthand notation to reference a set of external URL, all having a common prefix (eg
+ * http://server/some/common/prefix/a1, http://server/some/common/prefix/a2). An InterWiki reference is made of an
+ * InterWiki Alias which is a name corresponding to the common URL and an InterWiki Path which is the suffix to append
+ * to the common URL part to make the full URL.
  *
  * @version $Id$
  * @since 2.5M2
  */
-public class InterWikiLink extends Link
+public class InterWikiResourceReference extends ResourceReference
 {
     /**
      * The name of the parameter representing the InterWiki Alias.
@@ -37,11 +37,11 @@ public class InterWikiLink extends Link
     public static final String INTERWIKI_ALIAS = "interWikiAlias";
 
     /**
-     * Sets the link type automatically.
+     * Sets the resource type automatically.
      */
-    public InterWikiLink()
+    public InterWikiResourceReference()
     {
-        setType(LinkType.INTERWIKI);
+        setType(ResourceType.INTERWIKI);
         setTyped(true);
     }
 
@@ -54,9 +54,9 @@ public class InterWikiLink extends Link
     }
 
     /**
-     * @return the <a href="http://en.wikipedia.org/wiki/InterWiki">Inter Wiki</a> alias to which the link is pointing
-     *         to or null if not defined. Mappings between Inter Wiki aliases and actual locations are defined in the
-     *         Inter Wiki Map. Example: "wikipedia"
+     * @return the <a href="http://en.wikipedia.org/wiki/InterWiki">Inter Wiki</a> alias to which the resource is
+     *         pointing to or null if not defined. Mappings between Inter Wiki aliases and actual locations are defined
+     *         in the Inter Wiki Map. Example: "wikipedia"
      */
     public String getInterWikiAlias()
     {

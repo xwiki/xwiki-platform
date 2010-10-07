@@ -24,7 +24,7 @@ import java.util.Map;
 import org.xwiki.rendering.listener.Format;
 import org.xwiki.rendering.listener.HeaderLevel;
 import org.xwiki.rendering.listener.Image;
-import org.xwiki.rendering.listener.Link;
+import org.xwiki.rendering.listener.ResourceReference;
 import org.xwiki.rendering.listener.ListType;
 import org.xwiki.rendering.syntax.Syntax;
 
@@ -154,13 +154,13 @@ public abstract class AbstractChainingListener implements ChainingListener
     /**
      * {@inheritDoc}
      * 
-     * @see ChainingListener#beginLink(Link, boolean, Map)
+     * @see ChainingListener#beginLink(org.xwiki.rendering.listener.ResourceReference , boolean, Map)
      */
-    public void beginLink(Link link, boolean isFreeStandingURI, Map<String, String> parameters)
+    public void beginLink(ResourceReference reference, boolean isFreeStandingURI, Map<String, String> parameters)
     {
         ChainingListener next = getListenerChain().getNextListener(getClass());
         if (next != null) {
-            next.beginLink(link, isFreeStandingURI, parameters);
+            next.beginLink(reference, isFreeStandingURI, parameters);
         }
     }
 
@@ -402,13 +402,13 @@ public abstract class AbstractChainingListener implements ChainingListener
     /**
      * {@inheritDoc}
      * 
-     * @see ChainingListener#endLink(Link, boolean, Map)
+     * @see ChainingListener#endLink(org.xwiki.rendering.listener.ResourceReference , boolean, Map)
      */
-    public void endLink(Link link, boolean isFreeStandingURI, Map<String, String> parameters)
+    public void endLink(ResourceReference reference, boolean isFreeStandingURI, Map<String, String> parameters)
     {
         ChainingListener next = getListenerChain().getNextListener(getClass());
         if (next != null) {
-            next.endLink(link, isFreeStandingURI, parameters);
+            next.endLink(reference, isFreeStandingURI, parameters);
         }
     }
 

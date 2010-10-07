@@ -22,9 +22,9 @@ package org.xwiki.rendering.internal.parser.wikimodel.xwiki;
 import java.util.Map;
 
 import org.xwiki.rendering.internal.parser.wikimodel.DefaultXWikiGeneratorListener;
-import org.xwiki.rendering.listener.DocumentLink;
-import org.xwiki.rendering.listener.Link;
-import org.xwiki.rendering.listener.LinkType;
+import org.xwiki.rendering.listener.DocumentResourceReference;
+import org.xwiki.rendering.listener.ResourceReference;
+import org.xwiki.rendering.listener.ResourceType;
 import org.xwiki.rendering.listener.Listener;
 import org.xwiki.rendering.parser.ImageParser;
 import org.xwiki.rendering.parser.LinkParser;
@@ -59,22 +59,23 @@ public class XWiki21XWikiGeneratorListener extends DefaultXWikiGeneratorListener
      *
      * @see DefaultXWikiGeneratorListener#onReference(String, String, boolean, java.util.Map) 
      */
-    protected void onReference(Link link, String label, boolean isFreeStandingURI, Map<String, String> parameters)
+    protected void onReference(ResourceReference reference, String label, boolean isFreeStandingURI,
+        Map<String, String> parameters)
     {
         // Since 2.5M2, handle the special case when the link syntax used for a link to a document has the
         // query string and/or the anchor specified as parameters. This is how the XWiki Syntax 2.1 specifies
         // query string and anchor (ex: [[label>>doc:docReference||queryString="a=b" anchor="anchor"]]).
-        if (link.getType().equals(LinkType.DOCUMENT)) {
+        if (reference.getType().equals(ResourceType.DOCUMENT)) {
             String queryString = parameters.remove("queryString");
             if (queryString != null) {
-                link.setParameter(DocumentLink.QUERY_STRING, queryString);
+                reference.setParameter(DocumentResourceReference.QUERY_STRING, queryString);
             }
             String anchor = parameters.remove("anchor");
             if (anchor != null) {
-                link.setParameter(DocumentLink.ANCHOR, anchor);
+                reference.setParameter(DocumentResourceReference.ANCHOR, anchor);
             }
         }
 
-        super.onReference(link, label, isFreeStandingURI, parameters);
+        super.onReference(reference, label, isFreeStandingURI, parameters);
     }
 }

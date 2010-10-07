@@ -24,7 +24,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.xwiki.rendering.listener.Listener;
-import org.xwiki.rendering.listener.Link;
+import org.xwiki.rendering.listener.ResourceReference;
 
 /**
  * Represents a Link element in a page.
@@ -35,9 +35,9 @@ import org.xwiki.rendering.listener.Link;
 public class LinkBlock extends AbstractFatherBlock
 {
     /**
-     * A link. See {@link Link} for more details.
+     * A link. See {@link org.xwiki.rendering.listener.ResourceReference} for more details.
      */
-    private Link link;
+    private ResourceReference reference;
 
     /**
      * If true then the link is a free standing URI directly in the text.
@@ -46,34 +46,35 @@ public class LinkBlock extends AbstractFatherBlock
 
     /**
      * @param childrenBlocks the nested children blocks
-     * @param link the link
+     * @param reference the reference to the target resource to link to
      * @param isFreeStandingURI if true then the link is a free standing URI directly in the text
      */
-    public LinkBlock(List<Block> childrenBlocks, Link link, boolean isFreeStandingURI)
+    public LinkBlock(List<Block> childrenBlocks, ResourceReference reference, boolean isFreeStandingURI)
     {
-        this(childrenBlocks, link, isFreeStandingURI, Collections.<String, String> emptyMap());
+        this(childrenBlocks, reference, isFreeStandingURI, Collections.<String, String> emptyMap());
     }
 
     /**
      * @param childrenBlocks the nested children blocks
-     * @param link the link
+     * @param reference the reference to the target resource to link to
      * @param isFreeStandingURI if true then the link is a free standing URI directly in the text
      * @param parameters the parameters to set
      */
-    public LinkBlock(List<Block> childrenBlocks, Link link, boolean isFreeStandingURI, Map<String, String> parameters)
+    public LinkBlock(List<Block> childrenBlocks, ResourceReference reference, boolean isFreeStandingURI,
+        Map<String, String> parameters)
     {
         super(childrenBlocks, parameters);
-        this.link = link;
+        this.reference = reference;
         this.isFreeStandingURI = isFreeStandingURI;
     }
 
     /**
      * @return the link
-     * @see Link
+     * @see org.xwiki.rendering.listener.ResourceReference
      */
-    public Link getLink()
+    public ResourceReference getReference()
     {
-        return this.link;
+        return this.reference;
     }
 
     /**
@@ -91,7 +92,7 @@ public class LinkBlock extends AbstractFatherBlock
      */
     public void before(Listener listener)
     {
-        listener.beginLink(getLink(), isFreeStandingURI(), getParameters());
+        listener.beginLink(getReference(), isFreeStandingURI(), getParameters());
     }
 
     /**
@@ -101,7 +102,7 @@ public class LinkBlock extends AbstractFatherBlock
      */
     public void after(Listener listener)
     {
-        listener.endLink(getLink(), isFreeStandingURI(), getParameters());
+        listener.endLink(getReference(), isFreeStandingURI(), getParameters());
     }
 
     /**
@@ -114,7 +115,7 @@ public class LinkBlock extends AbstractFatherBlock
     public LinkBlock clone(BlockFilter blockFilter)
     {
         LinkBlock clone = (LinkBlock) super.clone(blockFilter);
-        clone.link = getLink().clone();
+        clone.reference = getReference().clone();
         return clone;
     }
 }

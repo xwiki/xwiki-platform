@@ -143,23 +143,23 @@ public class DefaultLinkService implements LinkService
     private String getLinkReference(org.xwiki.gwt.wysiwyg.client.wiki.EntityReference.EntityType entityType,
         String relativeStringEntityReference)
     {
-        ResourceReference linkReference = new ResourceReference();
         // TODO: Improve this to make it generic and allow adding new link types dynamically.
+        ResourceType resourceType;
         switch (entityType) {
             case DOCUMENT:
-                linkReference.setType(ResourceType.DOCUMENT);
+                resourceType = ResourceType.DOCUMENT;
                 break;
             case IMAGE:
-                linkReference.setType(ResourceType.IMAGE);
+                resourceType = ResourceType.IMAGE;
                 break;
             case ATTACHMENT:
-                linkReference.setType(ResourceType.ATTACHMENT);
+                resourceType = ResourceType.ATTACHMENT;
                 break;
             default:
-                // We shoudn't get here.
-                break;
+                // We shouldn't get here.
+                throw new RuntimeException("Unknown link type [" + entityType.name() + "]");
         }
-        linkReference.setReference(relativeStringEntityReference);
+        ResourceReference linkReference = new ResourceReference(relativeStringEntityReference, resourceType);
         String linkReferenceAsString = linkReferenceSerializer.serialize(linkReference);
         // Remove the image protocol because the client doesn't need it: image protocol is implied by the image specific
         // meta data (which is different than link meta data).

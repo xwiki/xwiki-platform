@@ -936,13 +936,7 @@ public class DefaultXWikiGeneratorListener implements XWikiGeneratorListener
 
         // If there's no link parser defined, don't handle links and images...
         if (this.linkParser != null) {
-            Link link = this.linkParser.parse(reference);
-
-            if (link.getType().equals(LinkType.IMAGE)) {
-                getListener().onImage(getImageParser().parse(link.getReference()), isFreeStandingURI, parameters);
-            } else {
-                onReference(link, label, isFreeStandingURI, parameters);
-            }
+            onReference(this.linkParser.parse(reference), label, isFreeStandingURI, parameters);
         }
     }
 

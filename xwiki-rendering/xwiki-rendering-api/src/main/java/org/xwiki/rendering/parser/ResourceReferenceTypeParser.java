@@ -24,23 +24,23 @@ import org.xwiki.rendering.listener.ResourceReference;
 import org.xwiki.rendering.listener.ResourceType;
 
 /**
- * Parses a raw link by determining if it has the right type and return a non-null
+ * Parses a raw Resource Reference by determining if it has the right type and return a non-null
  * {@link org.xwiki.rendering.listener.ResourceReference} object if it has.
  *
  * @version $Id$
- * @since 2.5M2
+ * @since 2.5RC1
  */
 @ComponentRole
-public interface LinkTypeParser
+public interface ResourceReferenceTypeParser
 {
     /**
-     * @return the link type (document, url, attachment, etc).
+     * @return the resource type (document, url, attachment, etc).
      */
     ResourceType getType();
 
     /**
-     * @param reference the raw link reference to parse
-     * @return the parsed link information if the passed reference can be parsed by this link type parser or null if
+     * @param reference the raw resource reference to parse
+     * @return the parsed resource information if the passed reference can be parsed by this type parser or null if
      *         the passed reference isn't valid
      */
     ResourceReference parse(String reference);

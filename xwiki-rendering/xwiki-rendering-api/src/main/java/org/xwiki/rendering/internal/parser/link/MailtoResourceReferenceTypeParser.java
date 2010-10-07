@@ -20,36 +20,23 @@
 package org.xwiki.rendering.internal.parser.link;
 
 import org.xwiki.component.annotation.Component;
-import org.xwiki.rendering.listener.DocumentResourceReference;
-import org.xwiki.rendering.listener.ResourceReference;
 import org.xwiki.rendering.listener.ResourceType;
 
 /**
- * Parses a link reference to a document.
+ * Parses a resource reference to a mail.
  *
  * @version $Id$
- * @since 2.5M2
+ * @since 2.5RC1
  */
-@Component("doc")
-public class DocumentLinkTypeParser extends AbstractURILinkTypeParser
+@Component("mailto")
+public class MailtoResourceReferenceTypeParser extends AbstractURIResourceReferenceTypeParser
 {
     /**
      * {@inheritDoc}
-     * @see org.xwiki.rendering.internal.parser.link.AbstractURILinkTypeParser#getType() 
+     * @see AbstractURIResourceReferenceTypeParser#getType()
      */
     public ResourceType getType()
     {
-        return ResourceType.DOCUMENT;
-    }
-
-    /**
-     * {@inheritDoc}
-     *
-     * @see AbstractURILinkTypeParser#parse(String) 
-     */
-    @Override
-    public ResourceReference parse(String reference)
-    {
-        return new DocumentResourceReference(reference);
+        return ResourceType.MAILTO;
     }
 }

@@ -20,7 +20,7 @@
 package org.xwiki.rendering.internal.renderer.xwiki21.link;
 
 import org.xwiki.component.annotation.Component;
-import org.xwiki.rendering.internal.parser.link.InterWikiLinkTypeParser;
+import org.xwiki.rendering.internal.parser.link.InterWikiResourceReferenceTypeParser;
 import org.xwiki.rendering.internal.parser.link.XWiki21ResourceReferenceParser;
 import org.xwiki.rendering.listener.InterWikiResourceReference;
 import org.xwiki.rendering.listener.ResourceReference;
@@ -48,7 +48,7 @@ public class InterWikiLinkTypeReferenceSerializer implements LinkTypeReferenceSe
         String interWikiAlias = reference.getParameter(InterWikiResourceReference.INTERWIKI_ALIAS);
         if (interWikiAlias != null) {
             result.append(interWikiAlias);
-            result.append(InterWikiLinkTypeParser.INTERWIKI_ALIAS_SEPARATOR);
+            result.append(InterWikiResourceReferenceTypeParser.INTERWIKI_ALIAS_SEPARATOR);
         }
         result.append(reference.getReference());
         return result.toString();

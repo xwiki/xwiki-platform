@@ -29,7 +29,7 @@ import org.xwiki.rendering.listener.InterWikiResourceReference;
 import org.xwiki.rendering.listener.ResourceReference;
 import org.xwiki.rendering.listener.ResourceType;
 import org.xwiki.rendering.parser.ResourceReferenceParser;
-import org.xwiki.rendering.parser.LinkTypeParser;
+import org.xwiki.rendering.parser.ResourceReferenceTypeParser;
 import org.xwiki.rendering.wiki.WikiModel;
 
 import java.util.Arrays;
@@ -155,7 +155,7 @@ public class XWiki20ResourceReferenceParser implements ResourceReferenceParser
      * Parser to parse link references pointing to URLs.
      */
     @Requirement("url")
-    private LinkTypeParser urlLinkTypeParser;
+    private ResourceReferenceTypeParser urlResourceReferenceTypeParser;
 
     /**
      * Used to verify if we're in wiki mode or not by looking up an implementation of {@link
@@ -250,7 +250,7 @@ public class XWiki20ResourceReferenceParser implements ResourceReferenceParser
             if (getAllowedURIPrefixes().contains(scheme)) {
                 try {
                     ResourceReference resourceReference =
-                        this.componentManager.lookup(LinkTypeParser.class, scheme).parse(reference);
+                        this.componentManager.lookup(ResourceReferenceTypeParser.class, scheme).parse(reference);
                     if (resourceReference != null) {
                         result = resourceReference;
                     }
@@ -259,7 +259,7 @@ public class XWiki20ResourceReferenceParser implements ResourceReferenceParser
                 }
             } else {
                 // Check if it's a URL
-                ResourceReference resourceReference = this.urlLinkTypeParser.parse(rawLink);
+                ResourceReference resourceReference = this.urlResourceReferenceTypeParser.parse(rawLink);
                 if (resourceReference != null) {
                     resourceReference.setTyped(false);
                     result = resourceReference;

@@ -19,25 +19,24 @@
  */
 package org.xwiki.rendering.internal.parser.link;
 
-import org.xwiki.rendering.listener.ResourceReference;
-import org.xwiki.rendering.parser.LinkTypeParser;
+import org.xwiki.component.annotation.Component;
+import org.xwiki.rendering.listener.ResourceType;
 
 /**
- * Default link type parser for URIs: just take the full reference as the Link reference. Note that this parser doesn't
- * extract the scheme from the URI for the link reference.
+ * Parses a resource reference to an image.
  *
  * @version $Id$
- * @since 2.5M2
+ * @since 2.5RC1
  */
-public abstract class AbstractURILinkTypeParser implements LinkTypeParser
+@Component("image")
+public class ImageResourceReferenceTypeParser extends AbstractURIResourceReferenceTypeParser
 {
     /**
      * {@inheritDoc}
-     *
-     * @see LinkTypeParser#parse(String)
+     * @see AbstractURIResourceReferenceTypeParser#getType()
      */
-    public ResourceReference parse(String reference)
+    public ResourceType getType()
     {
-        return new ResourceReference(reference, getType());
+        return ResourceType.IMAGE;
     }
 }

@@ -25,13 +25,13 @@ import org.xwiki.rendering.listener.ResourceReference;
 import org.xwiki.rendering.listener.ResourceType;
 
 /**
- * Parses a link reference to an interwiki refernce.
+ * Parses a resource reference to a document in another wiki (interwiki).
  *
  * @version $Id$
- * @since 2.5M2
+ * @since 2.5RC1
  */
 @Component("interwiki")
-public class InterWikiLinkTypeParser extends AbstractURILinkTypeParser
+public class InterWikiResourceReferenceTypeParser extends AbstractURIResourceReferenceTypeParser
 {
     /**
      * Separator between the interwiki alias and the interwiki path (eg "alias" in interwiki:alias:path).  
@@ -40,7 +40,7 @@ public class InterWikiLinkTypeParser extends AbstractURILinkTypeParser
 
     /**
      * {@inheritDoc}
-     * @see org.xwiki.rendering.internal.parser.link.AbstractURILinkTypeParser#getType()
+     * @see AbstractURIResourceReferenceTypeParser#getType()
      */
     public ResourceType getType()
     {
@@ -50,7 +50,7 @@ public class InterWikiLinkTypeParser extends AbstractURILinkTypeParser
     /**
      * {@inheritDoc}
      *
-     * @see AbstractURILinkTypeParser#parse(String)
+     * @see AbstractURIResourceReferenceTypeParser#parse(String)
      */
     @Override
     public ResourceReference parse(String reference)

@@ -19,24 +19,52 @@
  */
 package org.xwiki.rendering.internal.parser.link;
 
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 import org.xwiki.component.annotation.Component;
+import org.xwiki.rendering.listener.ResourceReference;
 import org.xwiki.rendering.listener.ResourceType;
 
 /**
- * Parses a link reference to a mail.
+ * Parses a resource reference to a URL.
  *
  * @version $Id$
- * @since 2.5M2
+ * @since 2.5RC1
  */
-@Component("mailto")
-public class MailtoLinkTypeParser extends AbstractURILinkTypeParser
+@Component("url")
+public class URLResourceReferenceTypeParser extends AbstractURIResourceReferenceTypeParser
 {
     /**
+     * URL matching pattern.
+     */
+    private static final Pattern URL_SCHEME_PATTERN = Pattern.compile("[a-zA-Z0-9+.-]*://");
+
+    /**
      * {@inheritDoc}
-     * @see org.xwiki.rendering.internal.parser.link.AbstractURILinkTypeParser#getType()
+     *
+     * @see AbstractURIResourceReferenceTypeParser#getType()
      */
     public ResourceType getType()
     {
-        return ResourceType.MAILTO;
+        return ResourceType.URL;
+    }
+
+    /**
+     * {@inheritDoc}
+     *
+     * @see AbstractURIResourceReferenceTypeParser#parse(String)
+     */
+    @Override
+    public ResourceReference parse(String reference)
+    {
+        ResourceReference resultReference = null;
+        Matcher matcher = URL_SCHEME_PATTERN.matcher(reference);
+        if (matcher.lookingAt()) {
+            // We don't parse the URL since it can contain unknown protocol for the JVM but protocols known by the
+            // browser (such as skype:// for example).
+            resultReference = new ResourceReference(reference, getType());
+        }
+        return resultReference;
     }
 }

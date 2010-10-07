@@ -23,20 +23,21 @@ import org.xwiki.component.annotation.Component;
 import org.xwiki.rendering.listener.ResourceType;
 
 /**
- * Parses a link reference to an attachment.
- * 
+ * Parses a resource reference to a relative URL.
+ *
  * @version $Id$
- * @since 2.5M2
+ * @since 2.5RC1
  */
-@Component("attach")
-public class AttachmentLinkTypeParser extends AbstractURILinkTypeParser
+@Component("path")
+public class PathResourceReferenceTypeParser extends AbstractURIResourceReferenceTypeParser
 {
     /**
      * {@inheritDoc}
-     * @see org.xwiki.rendering.internal.parser.link.AbstractURILinkTypeParser#getType()
+     *
+     * @see AbstractURIResourceReferenceTypeParser#getType()
      */
     public ResourceType getType()
     {
-        return ResourceType.ATTACHMENT;
+        return ResourceType.PATH;
     }
 }

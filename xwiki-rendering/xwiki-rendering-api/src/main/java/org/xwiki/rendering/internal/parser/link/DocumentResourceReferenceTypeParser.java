@@ -20,24 +20,36 @@
 package org.xwiki.rendering.internal.parser.link;
 
 import org.xwiki.component.annotation.Component;
+import org.xwiki.rendering.listener.DocumentResourceReference;
+import org.xwiki.rendering.listener.ResourceReference;
 import org.xwiki.rendering.listener.ResourceType;
 
 /**
- * Parses a link reference to a URL.
+ * Parses a resource reference to a document.
  *
  * @version $Id$
- * @since 2.5M2
+ * @since 2.5RC1
  */
-@Component("path")
-public class PathLinkTypeParser extends AbstractURILinkTypeParser
+@Component("doc")
+public class DocumentResourceReferenceTypeParser extends AbstractURIResourceReferenceTypeParser
 {
     /**
      * {@inheritDoc}
-     *
-     * @see org.xwiki.rendering.internal.parser.link.AbstractURILinkTypeParser#getType()
+     * @see AbstractURIResourceReferenceTypeParser#getType()
      */
     public ResourceType getType()
     {
-        return ResourceType.PATH;
+        return ResourceType.DOCUMENT;
+    }
+
+    /**
+     * {@inheritDoc}
+     *
+     * @see AbstractURIResourceReferenceTypeParser#parse(String)
+     */
+    @Override
+    public ResourceReference parse(String reference)
+    {
+        return new DocumentResourceReference(reference);
     }
 }

@@ -26,7 +26,7 @@ import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.rendering.listener.ResourceReference;
 import org.xwiki.rendering.listener.ResourceType;
 import org.xwiki.rendering.parser.ResourceReferenceParser;
-import org.xwiki.rendering.parser.LinkTypeParser;
+import org.xwiki.rendering.parser.ResourceReferenceTypeParser;
 import org.xwiki.rendering.wiki.WikiModel;
 
 /**
@@ -35,10 +35,10 @@ import org.xwiki.rendering.wiki.WikiModel;
  * {@link org.xwiki.rendering.listener.ResourceType} of the resource pointed to (e.g. document, mailto, attachment, 
  * image, document in another wiki, etc), and {@code reference} defines the target. The syntax of {@code reference}
  * depends on the Resource type and is documented in the javadoc of the various
- * {@link org.xwiki.rendering.parser.LinkTypeParser} implementations.
+ * {@link org.xwiki.rendering.parser.ResourceReferenceTypeParser} implementations.
  *
  * Note that the implementation is pluggable and it's allowed plug new resource reference types by implementing
- * {@link org.xwiki.rendering.parser.LinkTypeParser}s and registering the implementation as a component.
+ * {@link org.xwiki.rendering.parser.ResourceReferenceTypeParser}s and registering the implementation as a component.
  *
  * @version $Id$
  * @since 2.5RC1
@@ -55,13 +55,13 @@ public class XWiki21ResourceReferenceParser implements ResourceReferenceParser
      * Parser to parse link references pointing to URLs.
      */
     @Requirement("url")
-    private LinkTypeParser urlLinkTypeParser;
+    private ResourceReferenceTypeParser urlResourceReferenceTypeParser;
 
     /**
      * Parser to parse link references pointing to documents.
      */
     @Requirement("doc")
-    private LinkTypeParser documentLinkTypeParser;
+    private ResourceReferenceTypeParser documentResourceReferenceTypeParser;
 
     /**
      * Used to verify if we're in wiki mode or not by looking up an implementation of {@link
@@ -91,7 +91,8 @@ public class XWiki21ResourceReferenceParser implements ResourceReferenceParser
             String typePrefix = rawLink.substring(0, pos);
             String reference = rawLink.substring(pos + 1);
             try {
-                LinkTypeParser parser = this.componentManager.lookup(LinkTypeParser.class, typePrefix);
+                ResourceReferenceTypeParser
+                    parser = this.componentManager.lookup(ResourceReferenceTypeParser.class, typePrefix);
                 ResourceReference parsedResourceReference = parser.parse(reference);
                 if (parsedResourceReference != null) {
                     return parsedResourceReference;
@@ -105,10 +106,10 @@ public class XWiki21ResourceReferenceParser implements ResourceReferenceParser
         // either:
         // - a URL (specified without the "url" type)
         // - a reference to a document (specified without the "doc" type)
-        ResourceReference parsedResourceReference = this.urlLinkTypeParser.parse(rawLink);
+        ResourceReference parsedResourceReference = this.urlResourceReferenceTypeParser.parse(rawLink);
         if (parsedResourceReference == null) {
             // What remains is considered to be a link to a document, use the document link type parser to parse it.
-            parsedResourceReference = this.documentLinkTypeParser.parse(rawLink);
+            parsedResourceReference = this.documentResourceReferenceTypeParser.parse(rawLink);
         }
         parsedResourceReference.setTyped(false);
 

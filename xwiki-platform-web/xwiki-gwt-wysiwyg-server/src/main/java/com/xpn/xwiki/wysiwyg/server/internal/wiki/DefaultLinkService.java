@@ -28,8 +28,8 @@ import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.EntityReferenceResolver;
 import org.xwiki.model.reference.EntityReferenceSerializer;
-import org.xwiki.rendering.listener.Link;
-import org.xwiki.rendering.listener.LinkType;
+import org.xwiki.rendering.listener.ResourceReference;
+import org.xwiki.rendering.listener.ResourceType;
 import org.xwiki.rendering.parser.LinkParser;
 import org.xwiki.rendering.renderer.link.LinkReferenceSerializer;
 
@@ -143,30 +143,30 @@ public class DefaultLinkService implements LinkService
     private String getLinkReference(org.xwiki.gwt.wysiwyg.client.wiki.EntityReference.EntityType entityType,
         String relativeStringEntityReference)
     {
-        Link link = new Link();
+        ResourceReference linkReference = new ResourceReference();
         // TODO: Improve this to make it generic and allow adding new link types dynamically.
         switch (entityType) {
             case DOCUMENT:
-                link.setType(LinkType.DOCUMENT);
+                linkReference.setType(ResourceType.DOCUMENT);
                 break;
             case IMAGE:
-                link.setType(LinkType.IMAGE);
+                linkReference.setType(ResourceType.IMAGE);
                 break;
             case ATTACHMENT:
-                link.setType(LinkType.ATTACHMENT);
+                linkReference.setType(ResourceType.ATTACHMENT);
                 break;
             default:
                 // We shoudn't get here.
                 break;
         }
-        link.setReference(relativeStringEntityReference);
-        String linkReference = linkReferenceSerializer.serialize(link);
+        linkReference.setReference(relativeStringEntityReference);
+        String linkReferenceAsString = linkReferenceSerializer.serialize(linkReference);
         // Remove the image protocol because the client doesn't need it: image protocol is implied by the image specific
         // meta data (which is different than link meta data).
         if (entityType == org.xwiki.gwt.wysiwyg.client.wiki.EntityReference.EntityType.IMAGE) {
-            linkReference = StringUtils.removeStart(linkReference, IMAGE_URI_PROTOCOL);
+            linkReferenceAsString = StringUtils.removeStart(linkReferenceAsString, IMAGE_URI_PROTOCOL);
         }
-        return linkReference;
+        return linkReferenceAsString;
     }
 
     /**
@@ -175,17 +175,17 @@ public class DefaultLinkService implements LinkService
      * @see LinkService#parseLinkReference(String, org.xwiki.gwt.wysiwyg.client.wiki.EntityReference.EntityType,
      *      org.xwiki.gwt.wysiwyg.client.wiki.EntityReference)
      */
-    public org.xwiki.gwt.wysiwyg.client.wiki.EntityReference parseLinkReference(String linkReference,
+    public org.xwiki.gwt.wysiwyg.client.wiki.EntityReference parseLinkReference(String linkReferenceAsString,
         org.xwiki.gwt.wysiwyg.client.wiki.EntityReference.EntityType entityType,
         org.xwiki.gwt.wysiwyg.client.wiki.EntityReference baseReference)
     {
-        String fullLinkReference = linkReference;
+        String fullLinkReference = linkReferenceAsString;
         // Add the image protocol because the client doesn't provided it.
         if (entityType == org.xwiki.gwt.wysiwyg.client.wiki.EntityReference.EntityType.IMAGE) {
-            fullLinkReference = IMAGE_URI_PROTOCOL + linkReference;
+            fullLinkReference = IMAGE_URI_PROTOCOL + linkReferenceAsString;
         }
-        Link link = linkReferenceParser.parse(fullLinkReference);
-        String stringEntityReference = link.getReference();
+        ResourceReference linkReference = linkReferenceParser.parse(fullLinkReference);
+        String stringEntityReference = linkReference.getReference();
         org.xwiki.gwt.wysiwyg.client.wiki.EntityReference entityReference =
             entityReferenceConverter.convert(explicitStringEntityReferenceResolver.resolve(stringEntityReference,
                 entityReferenceConverter.convert(entityType), entityReferenceConverter.convert(baseReference)));

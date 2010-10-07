@@ -17,7 +17,7 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.rendering.internal.parser.link;
+package org.xwiki.rendering.internal.parser.reference;
 
 import org.junit.*;
 import org.xwiki.rendering.listener.DocumentResourceReference;
@@ -33,7 +33,7 @@ import org.xwiki.rendering.wiki.WikiModel;
  * @version $Id$
  * @since 2.5M2
  */
-public class XWiki20LinkParserTest extends AbstractXWikiLinkParserTest
+public class XWiki20ResourceReferenceParserTest extends AbstractResourceReferenceParserTest
 {
     @Override
     protected void registerComponents() throws Exception

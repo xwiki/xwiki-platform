@@ -17,34 +17,27 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.rendering.internal.parser.link;
-
-import java.util.Arrays;
-import java.util.List;
+package org.xwiki.rendering.internal.parser.reference;
 
 import org.xwiki.component.annotation.Component;
+import org.xwiki.rendering.listener.ResourceType;
 
 /**
- * Each syntax should have its own resource reference parser. However while we wait for syntax specific parser to be
- * implemented this generic parser should provide a good approximation.
- * 
+ * Parses a resource reference to a relative URL.
+ *
  * @version $Id$
  * @since 2.5RC1
  */
-@Component
-public class GenericResourceReferenceParser extends XWiki20ResourceReferenceParser
+@Component("path")
+public class PathResourceReferenceTypeParser extends AbstractURIResourceReferenceTypeParser
 {
     /**
-     * The list of recognized URL prefixes.
-     */
-    private static final List<String> URI_PREFIXES = Arrays.asList("mailto");
-
-    /**
      * {@inheritDoc}
-     * @see XWiki20ResourceReferenceParser#getAllowedURIPrefixes()
+     *
+     * @see AbstractURIResourceReferenceTypeParser#getType()
      */
-    protected List<String> getAllowedURIPrefixes()
+    public ResourceType getType()
     {
-        return URI_PREFIXES;
+        return ResourceType.PATH;
     }
 }

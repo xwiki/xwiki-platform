@@ -17,7 +17,7 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.rendering.internal.parser.link;
+package org.xwiki.rendering.internal.parser.reference;
 
 import org.junit.*;
 import org.xwiki.rendering.listener.ResourceReference;
@@ -26,12 +26,13 @@ import org.xwiki.rendering.parser.ResourceReferenceParser;
 import org.xwiki.test.AbstractComponentTestCase;
 
 /**
- * Common tests for {@link org.xwiki.rendering.parser.ResourceReferenceParser} implementations for XWiki Syntax 2.0 and 2.1.
+ * Common tests for {@link org.xwiki.rendering.parser.ResourceReferenceParser} implementations for XWiki Syntax 2.0
+ * and 2.1.
  * 
  * @version $Id$
- * @since 2.5M2
+ * @since 2.5RC1
  */
-public abstract class AbstractXWikiLinkParserTest extends AbstractComponentTestCase
+public abstract class AbstractResourceReferenceParserTest extends AbstractComponentTestCase
 {
     protected ResourceReferenceParser parser;
 

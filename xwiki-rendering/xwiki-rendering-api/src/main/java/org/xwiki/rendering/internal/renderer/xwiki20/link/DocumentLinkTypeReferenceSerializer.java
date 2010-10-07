@@ -21,7 +21,7 @@ package org.xwiki.rendering.internal.renderer.xwiki20.link;
 
 import org.apache.commons.lang.StringUtils;
 import org.xwiki.component.annotation.Component;
-import org.xwiki.rendering.internal.parser.link.XWiki20ResourceReferenceParser;
+import org.xwiki.rendering.internal.parser.reference.XWiki20ResourceReferenceParser;
 import org.xwiki.rendering.listener.DocumentResourceReference;
 import org.xwiki.rendering.listener.ResourceReference;
 import org.xwiki.rendering.renderer.link.LinkTypeReferenceSerializer;

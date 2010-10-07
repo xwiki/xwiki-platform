@@ -17,27 +17,26 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.rendering.internal.parser.link;
+package org.xwiki.rendering.internal.parser.reference;
 
 import org.xwiki.component.annotation.Component;
 import org.xwiki.rendering.listener.ResourceType;
 
 /**
- * Parses a resource reference to a relative URL.
+ * Parses a resource reference to a mail.
  *
  * @version $Id$
  * @since 2.5RC1
  */
-@Component("path")
-public class PathResourceReferenceTypeParser extends AbstractURIResourceReferenceTypeParser
+@Component("mailto")
+public class MailtoResourceReferenceTypeParser extends AbstractURIResourceReferenceTypeParser
 {
     /**
      * {@inheritDoc}
-     *
      * @see AbstractURIResourceReferenceTypeParser#getType()
      */
     public ResourceType getType()
     {
-        return ResourceType.PATH;
+        return ResourceType.MAILTO;
     }
 }

@@ -20,8 +20,8 @@
 package org.xwiki.rendering.internal.renderer.xwiki21.link;
 
 import org.xwiki.component.annotation.Component;
-import org.xwiki.rendering.internal.parser.link.InterWikiResourceReferenceTypeParser;
-import org.xwiki.rendering.internal.parser.link.XWiki21ResourceReferenceParser;
+import org.xwiki.rendering.internal.parser.reference.InterWikiResourceReferenceTypeParser;
+import org.xwiki.rendering.internal.parser.reference.XWiki21ResourceReferenceParser;
 import org.xwiki.rendering.listener.InterWikiResourceReference;
 import org.xwiki.rendering.listener.ResourceReference;
 import org.xwiki.rendering.renderer.link.LinkTypeReferenceSerializer;

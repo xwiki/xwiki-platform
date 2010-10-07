@@ -17,26 +17,27 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.rendering.internal.parser.link;
+package org.xwiki.rendering.internal.parser.reference;
 
-import org.xwiki.component.annotation.Component;
-import org.xwiki.rendering.listener.ResourceType;
+import org.xwiki.rendering.listener.ResourceReference;
+import org.xwiki.rendering.parser.ResourceReferenceTypeParser;
 
 /**
- * Parses a resource reference to an image.
+ * Default resource reference type parser for URIs: just take the full reference as the Resource reference.
+ * Note that this parser doesn't extract the scheme from the URI for the resource reference.
  *
  * @version $Id$
  * @since 2.5RC1
  */
-@Component("image")
-public class ImageResourceReferenceTypeParser extends AbstractURIResourceReferenceTypeParser
+public abstract class AbstractURIResourceReferenceTypeParser implements ResourceReferenceTypeParser
 {
     /**
      * {@inheritDoc}
-     * @see AbstractURIResourceReferenceTypeParser#getType()
+     *
+     * @see org.xwiki.rendering.parser.ResourceReferenceTypeParser#parse(String)
      */
-    public ResourceType getType()
+    public ResourceReference parse(String reference)
     {
-        return ResourceType.IMAGE;
+        return new ResourceReference(reference, getType());
     }
 }

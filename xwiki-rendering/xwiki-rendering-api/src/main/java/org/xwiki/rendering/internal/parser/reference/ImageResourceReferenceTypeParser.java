@@ -17,21 +17,19 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.rendering.internal.parser.link;
+package org.xwiki.rendering.internal.parser.reference;
 
 import org.xwiki.component.annotation.Component;
-import org.xwiki.rendering.listener.DocumentResourceReference;
-import org.xwiki.rendering.listener.ResourceReference;
 import org.xwiki.rendering.listener.ResourceType;
 
 /**
- * Parses a resource reference to a document.
+ * Parses a resource reference to an image.
  *
  * @version $Id$
  * @since 2.5RC1
  */
-@Component("doc")
-public class DocumentResourceReferenceTypeParser extends AbstractURIResourceReferenceTypeParser
+@Component("image")
+public class ImageResourceReferenceTypeParser extends AbstractURIResourceReferenceTypeParser
 {
     /**
      * {@inheritDoc}
@@ -39,17 +37,6 @@ public class DocumentResourceReferenceTypeParser extends AbstractURIResourceRefe
      */
     public ResourceType getType()
     {
-        return ResourceType.DOCUMENT;
-    }
-
-    /**
-     * {@inheritDoc}
-     *
-     * @see AbstractURIResourceReferenceTypeParser#parse(String)
-     */
-    @Override
-    public ResourceReference parse(String reference)
-    {
-        return new DocumentResourceReference(reference);
+        return ResourceType.IMAGE;
     }
 }

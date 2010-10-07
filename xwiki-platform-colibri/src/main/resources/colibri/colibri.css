@@ -1192,6 +1192,7 @@ input.button, .buttonwrapper a:visited, .buttonwrapper a:link, .buttonwrapper a:
   border: 1px solid $theme.buttonPrimaryBackgroundColor;
   color: $theme.buttonPrimaryTextColor;
   cursor: pointer;
+  display: inline-block;
   font: normal normal 700 .8em/140% "Helvetica",sans-serif;
   margin: 0;
   padding: 2px 3px;

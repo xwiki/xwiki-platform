@@ -20,8 +20,8 @@
 package org.xwiki.rendering.internal.renderer.xwiki20.link;
 
 import org.xwiki.component.annotation.Component;
+import org.xwiki.rendering.internal.parser.link.XWiki21ResourceReferenceParser;
 import org.xwiki.rendering.listener.ResourceReference;
-import org.xwiki.rendering.parser.LinkParser;
 import org.xwiki.rendering.renderer.link.LinkTypeReferenceSerializer;
 
 /**
@@ -44,7 +44,7 @@ public class DefaultLinkTypeReferenceSerializer implements LinkTypeReferenceSeri
         StringBuffer result = new StringBuffer();
         if (reference.isTyped()) {
             result.append(reference.getType().getScheme());
-            result.append(LinkParser.TYPE_SEPARATOR);
+            result.append(XWiki21ResourceReferenceParser.TYPE_SEPARATOR);
         }
         result.append(reference.getReference());
         return result.toString();

@@ -25,14 +25,14 @@ import java.util.List;
 import org.xwiki.component.annotation.Component;
 
 /**
- * Each syntax should have its own link parser. However while we wait for syntax specific parser to be implemented
- * this generic parser should provide a good approximation.
+ * Each syntax should have its own resource reference parser. However while we wait for syntax specific parser to be
+ * implemented this generic parser should provide a good approximation.
  * 
  * @version $Id$
- * @since 1.6RC1
+ * @since 2.5RC1
  */
 @Component
-public class GenericLinkParser extends XWiki20LinkParser
+public class GenericResourceReferenceParser extends XWiki20ResourceReferenceParser
 {
     /**
      * The list of recognized URL prefixes.
@@ -41,7 +41,7 @@ public class GenericLinkParser extends XWiki20LinkParser
 
     /**
      * {@inheritDoc}
-     * @see XWiki20LinkParser#getAllowedURIPrefixes()
+     * @see XWiki20ResourceReferenceParser#getAllowedURIPrefixes()
      */
     protected List<String> getAllowedURIPrefixes()
     {

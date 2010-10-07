@@ -25,7 +25,7 @@ import org.xwiki.rendering.listener.ResourceReference;
 import org.xwiki.rendering.listener.ResourceType;
 import org.xwiki.rendering.listener.Listener;
 import org.xwiki.rendering.parser.ImageParser;
-import org.xwiki.rendering.parser.LinkParser;
+import org.xwiki.rendering.parser.ResourceReferenceParser;
 import org.xwiki.rendering.parser.StreamParser;
 import org.xwiki.rendering.renderer.PrintRendererFactory;
 import org.xwiki.rendering.util.IdGenerator;
@@ -41,15 +41,15 @@ public class XHTMLXWikiGeneratorListener extends DefaultXWikiGeneratorListener
     /**
      * @param parser the parser to use to parse link labels
      * @param listener the XWiki listener to which to forward WikiModel events
-     * @param linkParser the parser to parse link references
+     * @param referenceParser the parser to parse resource references
      * @param imageParser the parser to parse image references
      * @param plainRendererFactory used to generate header ids
      * @param idGenerator used to generate header ids
      */
-    public XHTMLXWikiGeneratorListener(StreamParser parser, Listener listener, LinkParser linkParser,
+    public XHTMLXWikiGeneratorListener(StreamParser parser, Listener listener, ResourceReferenceParser referenceParser,
         ImageParser imageParser, PrintRendererFactory plainRendererFactory, IdGenerator idGenerator)
     {
-        super(parser, listener, linkParser, imageParser, plainRendererFactory, idGenerator);
+        super(parser, listener, referenceParser, imageParser, plainRendererFactory, idGenerator);
     }
 
     /**

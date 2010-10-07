@@ -117,7 +117,7 @@ public class XWikiCommentHandler extends CommentHandler
         // Since any syntax would do it, as long as this renderer matches the corresponding DefaultXWikiGeneratorListener
         // parser, we use an xwiki 2.1 renderer for it is less complex (no context needed to render xwiki 2.1, no url
         // resolution needed, no reference validity tests).
-        // see DefaultXWikiGeneratorListener#DefaultXWikiGeneratorListener(Parser, LinkParser, ImageParser)
+        // see DefaultXWikiGeneratorListener#DefaultXWikiGeneratorListener(Parser, ResourceReferenceParser, ImageParser)
         // see WikiModelXHTMLParser#getLinkLabelParser()
         // see http://code.google.com/p/wikimodel/issues/detail?id=87
         // TODO: remove this workaround when wiki syntax in link labels will be supported by wikimodel

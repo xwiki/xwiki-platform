@@ -25,7 +25,7 @@ import org.xwiki.rendering.block.XDOM;
 import org.xwiki.rendering.internal.parser.XDOMGeneratorListener;
 import org.xwiki.rendering.listener.Listener;
 import org.xwiki.rendering.parser.ImageParser;
-import org.xwiki.rendering.parser.LinkParser;
+import org.xwiki.rendering.parser.ResourceReferenceParser;
 import org.xwiki.rendering.parser.Parser;
 import org.xwiki.rendering.parser.ParseException;
 import org.xwiki.rendering.parser.StreamParser;
@@ -50,7 +50,7 @@ public abstract class AbstractDoxiaParser extends AbstractLogEnabled implements 
     private StreamParser plainParser;
 
     @Requirement
-    private LinkParser linkParser;
+    private ResourceReferenceParser referenceParser;
 
     @Requirement
     protected ImageParser imageParser;
@@ -65,10 +65,7 @@ public abstract class AbstractDoxiaParser extends AbstractLogEnabled implements 
     public XDOM parse(Reader source) throws ParseException
     {
         IdGenerator idGenerator = new IdGenerator();
-
-        // We pass the LinkParser corresponding to the syntax.
         XDOMGeneratorListener listener = new XDOMGeneratorListener();
-
         parse(source, listener, idGenerator);
 
         XDOM xdom = listener.getXDOM();
@@ -98,10 +95,8 @@ public abstract class AbstractDoxiaParser extends AbstractLogEnabled implements 
      */
     private void parse(Reader source, Listener listener, IdGenerator idGenerator) throws ParseException
     {
-        // We pass the LinkParser corresponding to the syntax.
-        XWikiGeneratorSink doxiaSink =
-                new XWikiGeneratorSink(listener, this.linkParser, this.plainRendererFactory, idGenerator,
-                    this.plainParser);
+        XWikiGeneratorSink doxiaSink = new XWikiGeneratorSink(listener, this.referenceParser,
+            this.plainRendererFactory, idGenerator, this.plainParser);
 
         org.apache.maven.doxia.parser.Parser parser = createDoxiaParser();
         try {

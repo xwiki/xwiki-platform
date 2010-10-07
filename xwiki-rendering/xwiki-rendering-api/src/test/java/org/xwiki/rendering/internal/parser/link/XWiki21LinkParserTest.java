@@ -24,11 +24,11 @@ import org.xwiki.rendering.listener.DocumentResourceReference;
 import org.xwiki.rendering.listener.InterWikiResourceReference;
 import org.xwiki.rendering.listener.ResourceReference;
 import org.xwiki.rendering.listener.ResourceType;
-import org.xwiki.rendering.parser.LinkParser;
+import org.xwiki.rendering.parser.ResourceReferenceParser;
 import org.xwiki.rendering.wiki.WikiModel;
 
 /**
- * Unit tests for {@link org.xwiki.rendering.internal.parser.link.XWiki20LinkParser}.
+ * Unit tests for {@link XWiki20ResourceReferenceParser}.
  * 
  * @version $Id$
  * @since 2.5M2
@@ -41,7 +41,7 @@ public class XWiki21LinkParserTest extends AbstractXWikiLinkParserTest
         // Create a Mock WikiModel implementation so that the link parser works in wiki mode
         registerMockComponent(WikiModel.class);
 
-        this.parser = getComponentManager().lookup(LinkParser.class, "xwiki/2.1");
+        this.parser = getComponentManager().lookup(ResourceReferenceParser.class, "xwiki/2.1");
     }
 
     @Test

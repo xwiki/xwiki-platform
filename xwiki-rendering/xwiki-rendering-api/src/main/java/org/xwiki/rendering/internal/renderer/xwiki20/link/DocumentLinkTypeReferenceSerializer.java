@@ -21,10 +21,9 @@ package org.xwiki.rendering.internal.renderer.xwiki20.link;
 
 import org.apache.commons.lang.StringUtils;
 import org.xwiki.component.annotation.Component;
-import org.xwiki.rendering.internal.parser.link.XWiki20LinkParser;
+import org.xwiki.rendering.internal.parser.link.XWiki20ResourceReferenceParser;
 import org.xwiki.rendering.listener.DocumentResourceReference;
 import org.xwiki.rendering.listener.ResourceReference;
-import org.xwiki.rendering.parser.LinkParser;
 import org.xwiki.rendering.renderer.link.LinkTypeReferenceSerializer;
 
 /**
@@ -41,35 +40,35 @@ public class DocumentLinkTypeReferenceSerializer implements LinkTypeReferenceSer
      * Escapes to add when rendering a link reference part.
      */
     private static final String[] ESCAPE_REPLACEMENTS_REFERENCE = new String[]{
-        LinkParser.ESCAPE_CHAR + LinkParser.SEPARATOR_QUERYSTRING,
-        LinkParser.ESCAPE_CHAR + XWiki20LinkParser.SEPARATOR_INTERWIKI,
-        LinkParser.ESCAPE_CHAR + LinkParser.SEPARATOR_ANCHOR };
+        XWiki20ResourceReferenceParser.ESCAPE_CHAR + XWiki20ResourceReferenceParser.SEPARATOR_QUERYSTRING,
+        XWiki20ResourceReferenceParser.ESCAPE_CHAR + XWiki20ResourceReferenceParser.SEPARATOR_INTERWIKI,
+        XWiki20ResourceReferenceParser.ESCAPE_CHAR + XWiki20ResourceReferenceParser.SEPARATOR_ANCHOR };
 
     /**
      * Replacement chars for the escapes to add to the reference part.
      */
     private static final String[] ESCAPES_REFERENCE = new String[]{
-        LinkParser.SEPARATOR_QUERYSTRING,
-        XWiki20LinkParser.SEPARATOR_INTERWIKI,
-        LinkParser.SEPARATOR_ANCHOR };
+        XWiki20ResourceReferenceParser.SEPARATOR_QUERYSTRING,
+        XWiki20ResourceReferenceParser.SEPARATOR_INTERWIKI,
+        XWiki20ResourceReferenceParser.SEPARATOR_ANCHOR };
 
     /**
      * Escapes to add when rendering a link query string, anchor or interwiki part.
      */
     private static final String[] ESCAPE_REPLACEMENTS_EXTRA = new String[]{
-        LinkParser.ESCAPE_CHAR + LinkParser.SEPARATOR_QUERYSTRING,
-        LinkParser.ESCAPE_CHAR + XWiki20LinkParser.SEPARATOR_INTERWIKI,
-        LinkParser.ESCAPE_CHAR + LinkParser.SEPARATOR_ANCHOR,
-        "" + LinkParser.ESCAPE_CHAR + LinkParser.ESCAPE_CHAR };
+        XWiki20ResourceReferenceParser.ESCAPE_CHAR + XWiki20ResourceReferenceParser.SEPARATOR_QUERYSTRING,
+        XWiki20ResourceReferenceParser.ESCAPE_CHAR + XWiki20ResourceReferenceParser.SEPARATOR_INTERWIKI,
+        XWiki20ResourceReferenceParser.ESCAPE_CHAR + XWiki20ResourceReferenceParser.SEPARATOR_ANCHOR,
+        "" + XWiki20ResourceReferenceParser.ESCAPE_CHAR + XWiki20ResourceReferenceParser.ESCAPE_CHAR };
 
     /**
      * Replacement chars for the escapes to add to the query string, anchor or interwiki part.
      */
     private static final String[] ESCAPES_EXTRA = new String[]{
-        LinkParser.SEPARATOR_QUERYSTRING,
-        XWiki20LinkParser.SEPARATOR_INTERWIKI,
-        LinkParser.SEPARATOR_ANCHOR,
-        "" + LinkParser.ESCAPE_CHAR };
+        XWiki20ResourceReferenceParser.SEPARATOR_QUERYSTRING,
+        XWiki20ResourceReferenceParser.SEPARATOR_INTERWIKI,
+        XWiki20ResourceReferenceParser.SEPARATOR_ANCHOR,
+        "" + XWiki20ResourceReferenceParser.ESCAPE_CHAR };
 
     /**
      * {@inheritDoc}

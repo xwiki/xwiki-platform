@@ -25,7 +25,7 @@ import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.Requirement;
 import org.xwiki.rendering.internal.parser.wikimodel.AbstractWikiModelParser;
 import org.xwiki.rendering.parser.ImageParser;
-import org.xwiki.rendering.parser.LinkParser;
+import org.xwiki.rendering.parser.ResourceReferenceParser;
 import org.xwiki.rendering.syntax.Syntax;
 
 /**
@@ -36,10 +36,10 @@ import org.xwiki.rendering.syntax.Syntax;
 public class WikiModelXWiki20Parser extends AbstractWikiModelParser
 {
     /**
-     * @see #getLinkParser()
+     * @see #getResourceReferenceParser()
      */
     @Requirement("xwiki/2.0")
-    private LinkParser linkParser;
+    private ResourceReferenceParser referenceParser;
 
     /**
      * @see #getImageParser()
@@ -83,11 +83,11 @@ public class WikiModelXWiki20Parser extends AbstractWikiModelParser
     /**
      * {@inheritDoc}
      * 
-     * @see AbstractWikiModelParser#getLinkParser()
+     * @see AbstractWikiModelParser#getResourceReferenceParser()
      */
     @Override
-    public LinkParser getLinkParser()
+    public ResourceReferenceParser getResourceReferenceParser()
     {
-        return this.linkParser;
+        return this.referenceParser;
     }
 }

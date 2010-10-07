@@ -28,7 +28,7 @@ import org.xwiki.rendering.listener.DocumentResourceReference;
 import org.xwiki.rendering.listener.InterWikiResourceReference;
 import org.xwiki.rendering.listener.ResourceReference;
 import org.xwiki.rendering.listener.ResourceType;
-import org.xwiki.rendering.parser.LinkParser;
+import org.xwiki.rendering.parser.ResourceReferenceParser;
 import org.xwiki.rendering.parser.LinkTypeParser;
 import org.xwiki.rendering.wiki.WikiModel;
 
@@ -36,7 +36,7 @@ import java.util.Arrays;
 import java.util.List;
 
 /**
- * Parses the content of XWiki 2.0 links.
+ * Parses the content of XWiki 2.0 resource references.
  *
  * The supported generic format is as follows: <code>(link)(@interWikiAlias)?</code>, where:
  * <ul>
@@ -70,15 +70,30 @@ import java.util.List;
  * {@code image:} and {@code attach:}.
  *
  * @version $Id$
- * @since 2.5M2
+ * @since 2.5RC1
  */
 @Component("xwiki/2.0")
-public class XWiki20LinkParser implements LinkParser
+public class XWiki20ResourceReferenceParser implements ResourceReferenceParser
 {
     /**
-     * Interwiki link separator.
+     * Interwiki separator.
      */
     public static final String SEPARATOR_INTERWIKI = "@";
+
+    /**
+     * Query String separator.
+     */
+    public static final String SEPARATOR_QUERYSTRING = "?";
+
+    /**
+     * Anchor separator.
+     */
+    public static final String SEPARATOR_ANCHOR = "#";
+
+    /**
+     * Escape character to allow "#", "@" and "?" characters in a reference's name.
+     */
+    public static final char ESCAPE_CHAR = '\\';
 
     /**
      * Escapes to remove from the document reference part when parsing the raw reference (i.e. excluding query string,
@@ -160,7 +175,7 @@ public class XWiki20LinkParser implements LinkParser
     /**
      * {@inheritDoc}
      *
-     * @see org.xwiki.rendering.parser.LinkParser#parse(java.lang.String)
+     * @see org.xwiki.rendering.parser.ResourceReferenceParser#parse(java.lang.String)
      */
     public ResourceReference parse(String rawLink)
     {
@@ -198,13 +213,13 @@ public class XWiki20LinkParser implements LinkParser
     private ResourceReference parseDocumentLink(StringBuffer content)
     {
         String queryString = null;
-        String text = parseElementAfterString(content, LinkParser.SEPARATOR_QUERYSTRING);
+        String text = parseElementAfterString(content, SEPARATOR_QUERYSTRING);
         if (text != null) {
             queryString = removeEscapesFromExtraParts(text);
         }
 
         String anchor = null;
-        text = parseElementAfterString(content, LinkParser.SEPARATOR_ANCHOR);
+        text = parseElementAfterString(content, SEPARATOR_ANCHOR);
         if (text != null) {
             anchor = removeEscapesFromExtraParts(text);
         }

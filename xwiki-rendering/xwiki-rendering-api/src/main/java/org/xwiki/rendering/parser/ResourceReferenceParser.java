@@ -23,44 +23,21 @@ import org.xwiki.component.annotation.ComponentRole;
 import org.xwiki.rendering.listener.ResourceReference;
 
 /**
- * Interface for parsing wiki links for various wiki syntaxes.
- * <p>
- * Note: Since WikiModel doesn't parse link content we need to do it. See
- * http://code.google.com/p/wikimodel/issues/detail?id=20
- * </p>
+ * Interface for parsing resource references (references to links, images, attachments, etc) for various wiki syntaxes.
  * 
  * @version $Id$
- * @since 1.5M2
+ * @since 2.5RC1
  */
 @ComponentRole
-public interface LinkParser
+public interface ResourceReferenceParser
 {
     /**
-     * Link Reference Type separator (eg "mailto:mail@address").
-     */
-    String TYPE_SEPARATOR = ":";
-
-    /**
-     * Query String separator.
-     */
-    String SEPARATOR_QUERYSTRING = "?";
-
-    /**
-     * Anchor separator.
-     */
-    String SEPARATOR_ANCHOR = "#";
-
-    /**
-     * Escape character to allow "#", "@" and "?" characters in a reference's name.
-     */
-    char ESCAPE_CHAR = '\\';
-
-    /**
-     * Parses a link represented as a String into a {@link org.xwiki.rendering.listener.ResourceReference} object.
+     * Parses a resource reference represented (reference to a link, image, attachment, etc)  as a String into a
+     * {@link org.xwiki.rendering.listener.ResourceReference} object.
      * 
-     * @param rawLink the string representation of the link to parse (the supported syntax depends on the parser
-     *            implementation used)
-     * @return the parsed link
+     * @param rawLink the string representation of the resource reference to parse (the supported syntax depends on the
+     *        parser implementation used)
+     * @return the parsed resource reference
      */
     ResourceReference parse(String rawLink);
 }

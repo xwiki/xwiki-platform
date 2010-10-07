@@ -22,18 +22,18 @@ package org.xwiki.rendering.internal.parser.link;
 import org.junit.*;
 import org.xwiki.rendering.listener.ResourceReference;
 import org.xwiki.rendering.listener.ResourceType;
-import org.xwiki.rendering.parser.LinkParser;
+import org.xwiki.rendering.parser.ResourceReferenceParser;
 import org.xwiki.test.AbstractComponentTestCase;
 
 /**
- * Common tests for {@link org.xwiki.rendering.parser.LinkParser} implementations for XWiki Syntax 2.0 and 2.1.
+ * Common tests for {@link org.xwiki.rendering.parser.ResourceReferenceParser} implementations for XWiki Syntax 2.0 and 2.1.
  * 
  * @version $Id$
  * @since 2.5M2
  */
 public abstract class AbstractXWikiLinkParserTest extends AbstractComponentTestCase
 {
-    protected LinkParser parser;
+    protected ResourceReferenceParser parser;
 
     @Test
     public void testParseLinksWhenInWikiModeCommon() throws Exception

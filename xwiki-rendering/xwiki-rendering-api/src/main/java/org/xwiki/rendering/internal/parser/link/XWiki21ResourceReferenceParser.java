@@ -25,28 +25,32 @@ import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.rendering.listener.ResourceReference;
 import org.xwiki.rendering.listener.ResourceType;
-import org.xwiki.rendering.parser.LinkParser;
+import org.xwiki.rendering.parser.ResourceReferenceParser;
 import org.xwiki.rendering.parser.LinkTypeParser;
 import org.xwiki.rendering.wiki.WikiModel;
 
 /**
- * Parses the content of XWiki Syntax 2.1 links. The syntax for links is the same as for XWiki Syntax 2.0 (see
- * {@link XWiki20LinkParser} for syntax details) but with the following
- * differences:
- * <ul>
- * <li>Ability to plug new reference types by implementing {@link org.xwiki.rendering.parser.LinkTypeParser}s.</li>
- * <li>All references have a canonical syntax with a type prefix. For documents the type is "doc" and for URLs the
- *     type is "url". However for easiness of usage we also support implicit URLs and implicit references to
- *     documents without the prefix specified.</li>
- * <li>Interwiki links now have the following syntax: {@code interwiki:<interwiki alias>:<interwiki suffix>}.</li> 
- * </ul>
- * 
+ * Parses the content of XWiki Syntax 2.1 resource references. The format of a resource reference is the following:
+ * {@code (type):(reference)} where {@code type} represents the type (see
+ * {@link org.xwiki.rendering.listener.ResourceType} of the resource pointed to (e.g. document, mailto, attachment, 
+ * image, document in another wiki, etc), and {@code reference} defines the target. The syntax of {@code reference}
+ * depends on the Resource type and is documented in the javadoc of the various
+ * {@link org.xwiki.rendering.parser.LinkTypeParser} implementations.
+ *
+ * Note that the implementation is pluggable and it's allowed plug new resource reference types by implementing
+ * {@link org.xwiki.rendering.parser.LinkTypeParser}s and registering the implementation as a component.
+ *
  * @version $Id$
- * @since 2.5M2
+ * @since 2.5RC1
  */
 @Component("xwiki/2.1")
-public class XWiki21LinkParser implements LinkParser
+public class XWiki21ResourceReferenceParser implements ResourceReferenceParser
 {
+    /**
+     * Link Reference Type separator (eg "mailto:mail@address").
+     */
+    public static final String TYPE_SEPARATOR = ":";
+
     /**
      * Parser to parse link references pointing to URLs.
      */
@@ -69,7 +73,7 @@ public class XWiki21LinkParser implements LinkParser
     /**
      * {@inheritDoc}
      *
-     * @see org.xwiki.rendering.parser.LinkParser#parse(String)
+     * @see org.xwiki.rendering.parser.ResourceReferenceParser#parse(String)
      */
     public ResourceReference parse(String rawLink)
     {

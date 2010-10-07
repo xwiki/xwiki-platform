@@ -43,7 +43,7 @@ import org.xwiki.rendering.listener.ListType;
 import org.xwiki.rendering.listener.Listener;
 import org.xwiki.rendering.listener.QueueListener;
 import org.xwiki.rendering.parser.ImageParser;
-import org.xwiki.rendering.parser.LinkParser;
+import org.xwiki.rendering.parser.ResourceReferenceParser;
 import org.xwiki.rendering.parser.ParseException;
 import org.xwiki.rendering.parser.StreamParser;
 import org.xwiki.rendering.renderer.PrintRenderer;
@@ -93,7 +93,7 @@ public class DefaultXWikiGeneratorListener implements XWikiGeneratorListener
 
     private StreamParser parser;
 
-    private LinkParser linkParser;
+    private ResourceReferenceParser referenceParser;
 
     private ImageParser imageParser;
 
@@ -111,13 +111,14 @@ public class DefaultXWikiGeneratorListener implements XWikiGeneratorListener
      * @see <a href="http://code.google.com/p/wikimodel/issues/detail?id=87">wikimodel issue 87</a>
      * @since 2.0M3
      */
-    public DefaultXWikiGeneratorListener(StreamParser parser, Listener listener, LinkParser linkParser,
-        ImageParser imageParser, PrintRendererFactory plainRendererFactory, IdGenerator idGenerator)
+    public DefaultXWikiGeneratorListener(StreamParser parser, Listener listener,
+        ResourceReferenceParser referenceParser, ImageParser imageParser, PrintRendererFactory plainRendererFactory,
+        IdGenerator idGenerator)
     {
         pushListener(listener);
 
         this.parser = parser;
-        this.linkParser = linkParser;
+        this.referenceParser = referenceParser;
         this.imageParser = imageParser;
         this.idGenerator = idGenerator != null ? idGenerator : new IdGenerator();
         this.plainRendererFactory = plainRendererFactory;
@@ -934,8 +935,8 @@ public class DefaultXWikiGeneratorListener implements XWikiGeneratorListener
         flushFormat();
 
         // If there's no link parser defined, don't handle links and images...
-        if (this.linkParser != null) {
-            onReference(this.linkParser.parse(reference), label, isFreeStandingURI, parameters);
+        if (this.referenceParser != null) {
+            onReference(this.referenceParser.parse(reference), label, isFreeStandingURI, parameters);
         }
     }
 

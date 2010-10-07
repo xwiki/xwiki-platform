@@ -1,8 +1,8 @@
 org.xwiki.rendering.internal.parser.PlainTextBlockParser
 org.xwiki.rendering.internal.parser.PlainTextStreamParser
-org.xwiki.rendering.internal.parser.link.GenericLinkParser
-org.xwiki.rendering.internal.parser.link.XWiki20LinkParser
-org.xwiki.rendering.internal.parser.link.XWiki21LinkParser
+org.xwiki.rendering.internal.parser.link.GenericResourceReferenceParser
+org.xwiki.rendering.internal.parser.link.XWiki20ResourceReferenceParser
+org.xwiki.rendering.internal.parser.link.XWiki21ResourceReferenceParser
 org.xwiki.rendering.internal.parser.link.DocumentLinkTypeParser
 org.xwiki.rendering.internal.parser.link.InterWikiLinkTypeParser
 org.xwiki.rendering.internal.parser.link.URLLinkTypeParser

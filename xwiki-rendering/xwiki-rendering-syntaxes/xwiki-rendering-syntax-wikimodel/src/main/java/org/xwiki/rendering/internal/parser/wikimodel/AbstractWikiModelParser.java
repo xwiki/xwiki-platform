@@ -28,7 +28,7 @@ import org.xwiki.rendering.block.XDOM;
 import org.xwiki.rendering.internal.parser.XDOMGeneratorListener;
 import org.xwiki.rendering.listener.Listener;
 import org.xwiki.rendering.parser.ImageParser;
-import org.xwiki.rendering.parser.LinkParser;
+import org.xwiki.rendering.parser.ResourceReferenceParser;
 import org.xwiki.rendering.parser.ParseException;
 import org.xwiki.rendering.parser.Parser;
 import org.xwiki.rendering.parser.StreamParser;
@@ -56,10 +56,11 @@ public abstract class AbstractWikiModelParser extends AbstractLogEnabled impleme
     public abstract IWikiParser createWikiModelParser() throws ParseException;
 
     /**
-     * @return the parser to use when parsing links. We need to parse links to transform a link reference passed as a
-     *         raw string by WikiModel into a {@link org.xwiki.rendering.listener.ResourceReference} object.
+     * @return the parser to use when parsing resource references (links, images, attachments, etc). We need to parse
+     *         references to transform them from a string representation coming from WikiModel into a
+     *         {@link org.xwiki.rendering.listener.ResourceReference} object.
      */
-    public abstract LinkParser getLinkParser();
+    public abstract ResourceReferenceParser getResourceReferenceParser();
 
     /**
      * @return the parser to use when parsing image references (eg "Space.Doc@image.png" in XWiki Syntax 2.0). We
@@ -90,10 +91,7 @@ public abstract class AbstractWikiModelParser extends AbstractLogEnabled impleme
     public XDOM parse(Reader source) throws ParseException
     {
         IdGenerator idGenerator = new IdGenerator();
-
-        // We pass the LinkParser corresponding to the syntax.
         XDOMGeneratorListener listener = new XDOMGeneratorListener();
-
         parse(source, listener, idGenerator);
 
         XDOM xdom = listener.getXDOM();
@@ -121,8 +119,8 @@ public abstract class AbstractWikiModelParser extends AbstractLogEnabled impleme
      */
     public XWikiGeneratorListener createXWikiGeneratorListener(Listener listener, IdGenerator idGenerator)
     {
-        return new DefaultXWikiGeneratorListener(getLinkLabelParser(), listener, getLinkParser(), getImageParser(),
-            this.plainRendererFactory, idGenerator);
+        return new DefaultXWikiGeneratorListener(getLinkLabelParser(), listener, getResourceReferenceParser(),
+            getImageParser(), this.plainRendererFactory, idGenerator);
     }
 
     /**

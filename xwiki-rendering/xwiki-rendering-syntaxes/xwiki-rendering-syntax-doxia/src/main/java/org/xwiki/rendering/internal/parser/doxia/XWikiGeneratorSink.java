@@ -35,7 +35,7 @@ import org.xwiki.rendering.listener.Listener;
 import org.xwiki.rendering.listener.QueueListener;
 import org.xwiki.rendering.listener.URLImage;
 import org.xwiki.rendering.listener.WrappingListener;
-import org.xwiki.rendering.parser.LinkParser;
+import org.xwiki.rendering.parser.ResourceReferenceParser;
 import org.xwiki.rendering.parser.ParseException;
 import org.xwiki.rendering.parser.StreamParser;
 import org.xwiki.rendering.renderer.PrintRenderer;
@@ -55,7 +55,7 @@ public class XWikiGeneratorSink implements Sink
 
     private Stack<Object> parameters = new Stack<Object>();
 
-    private LinkParser linkParser;
+    private ResourceReferenceParser referenceParser;
 
     private IdGenerator idGenerator;
 
@@ -70,12 +70,12 @@ public class XWikiGeneratorSink implements Sink
     /**
      * @since 2.0M3
      */
-    public XWikiGeneratorSink(Listener listener, LinkParser linkParser, PrintRendererFactory plainRendererFactory,
-        IdGenerator idGenerator, StreamParser plainParser)
+    public XWikiGeneratorSink(Listener listener, ResourceReferenceParser referenceParser,
+        PrintRendererFactory plainRendererFactory, IdGenerator idGenerator, StreamParser plainParser)
     {
         pushListener(listener);
 
-        this.linkParser = linkParser;
+        this.referenceParser = referenceParser;
         this.idGenerator = idGenerator != null ? idGenerator : new IdGenerator();
         this.plainRendererFactory = plainRendererFactory;
         this.plainParser = plainParser;
@@ -631,7 +631,7 @@ public class XWikiGeneratorSink implements Sink
     {
         flushEmptyLines();
 
-        ResourceReference resourceReference = this.linkParser.parse(name);
+        ResourceReference resourceReference = this.referenceParser.parse(name);
 
         getListener().beginLink(resourceReference, false, Listener.EMPTY_PARAMETERS);
 

@@ -24,7 +24,7 @@ import org.wikimodel.wem.jspwiki.JspWikiParser;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.Requirement;
 import org.xwiki.rendering.parser.ImageParser;
-import org.xwiki.rendering.parser.LinkParser;
+import org.xwiki.rendering.parser.ResourceReferenceParser;
 import org.xwiki.rendering.syntax.Syntax;
 import org.xwiki.rendering.internal.parser.wikimodel.AbstractWikiModelParser;
 
@@ -36,10 +36,10 @@ import org.xwiki.rendering.internal.parser.wikimodel.AbstractWikiModelParser;
 public class WikiModelJspWikiParser extends AbstractWikiModelParser
 {
     /**
-     * @see #getLinkParser()
+     * @see #getResourceReferenceParser()
      */
     @Requirement
-    private LinkParser linkParser;
+    private ResourceReferenceParser referenceParser;
 
     /**
      * @see #getImageParser()
@@ -80,11 +80,11 @@ public class WikiModelJspWikiParser extends AbstractWikiModelParser
 
     /**
      * {@inheritDoc}
-     * @see AbstractWikiModelParser#getLinkParser()
+     * @see AbstractWikiModelParser#getResourceReferenceParser()
      */
     @Override
-    public LinkParser getLinkParser()
+    public ResourceReferenceParser getResourceReferenceParser()
     {
-        return this.linkParser;
+        return this.referenceParser;
     }
 }

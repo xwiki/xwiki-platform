@@ -41,7 +41,7 @@ import org.xwiki.rendering.internal.parser.wikimodel.xhtml.XWikiSpanTagHandler;
 import org.xwiki.rendering.internal.parser.wikimodel.xhtml.XWikiTableDataTagHandler;
 import org.xwiki.rendering.listener.Listener;
 import org.xwiki.rendering.parser.ImageParser;
-import org.xwiki.rendering.parser.LinkParser;
+import org.xwiki.rendering.parser.ResourceReferenceParser;
 import org.xwiki.rendering.parser.ParseException;
 import org.xwiki.rendering.parser.StreamParser;
 import org.xwiki.rendering.renderer.PrintRendererFactory;
@@ -69,10 +69,10 @@ public class WikiModelXHTMLParser extends AbstractWikiModelParser
     private StreamParser xwikiParser;
 
     /**
-     * @see #getLinkParser()
+     * @see #getResourceReferenceParser()
      */
     @Requirement("xwiki/2.1")
-    private LinkParser linkParser;
+    private ResourceReferenceParser referenceParser;
 
     /**
      * @see #getImageParser()
@@ -172,12 +172,12 @@ public class WikiModelXHTMLParser extends AbstractWikiModelParser
     /**
      * {@inheritDoc}
      * 
-     * @see AbstractWikiModelParser#getLinkParser()
+     * @see AbstractWikiModelParser#getResourceReferenceParser()
      */
     @Override
-    public LinkParser getLinkParser()
+    public ResourceReferenceParser getResourceReferenceParser()
     {
-        return this.linkParser;
+        return this.referenceParser;
     }
 
     /**
@@ -188,7 +188,7 @@ public class WikiModelXHTMLParser extends AbstractWikiModelParser
     @Override
     public XWikiGeneratorListener createXWikiGeneratorListener(Listener listener, IdGenerator idGenerator)
     {
-        return new XHTMLXWikiGeneratorListener(getLinkLabelParser(), listener, getLinkParser(), getImageParser(),
+        return new XHTMLXWikiGeneratorListener(getLinkLabelParser(), listener, getResourceReferenceParser(), getImageParser(),
             this.plainRendererFactory, idGenerator);
     }
 }

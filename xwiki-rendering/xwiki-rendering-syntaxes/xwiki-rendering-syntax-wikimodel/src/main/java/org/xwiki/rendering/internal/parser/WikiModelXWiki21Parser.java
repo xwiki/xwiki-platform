@@ -28,7 +28,7 @@ import org.xwiki.rendering.internal.parser.wikimodel.XWikiGeneratorListener;
 import org.xwiki.rendering.internal.parser.wikimodel.xwiki.XWiki21XWikiGeneratorListener;
 import org.xwiki.rendering.listener.Listener;
 import org.xwiki.rendering.parser.ImageParser;
-import org.xwiki.rendering.parser.LinkParser;
+import org.xwiki.rendering.parser.ResourceReferenceParser;
 import org.xwiki.rendering.syntax.Syntax;
 import org.xwiki.rendering.util.IdGenerator;
 
@@ -42,10 +42,10 @@ import org.xwiki.rendering.util.IdGenerator;
 public class WikiModelXWiki21Parser extends AbstractWikiModelParser
 {
     /**
-     * @see #getLinkParser()
+     * @see #getResourceReferenceParser()
      */
     @Requirement("xwiki/2.1")
-    private LinkParser linkParser;
+    private ResourceReferenceParser referenceParser;
 
     /**
      * @see #getImageParser()
@@ -89,12 +89,12 @@ public class WikiModelXWiki21Parser extends AbstractWikiModelParser
     /**
      * {@inheritDoc}
      *
-     * @see org.xwiki.rendering.internal.parser.wikimodel.AbstractWikiModelParser#getLinkParser()
+     * @see org.xwiki.rendering.internal.parser.wikimodel.AbstractWikiModelParser#getResourceReferenceParser()
      */
     @Override
-    public LinkParser getLinkParser()
+    public ResourceReferenceParser getResourceReferenceParser()
     {
-        return this.linkParser;
+        return this.referenceParser;
     }
 
     /**
@@ -105,7 +105,7 @@ public class WikiModelXWiki21Parser extends AbstractWikiModelParser
     @Override
     public XWikiGeneratorListener createXWikiGeneratorListener(Listener listener, IdGenerator idGenerator)
     {
-        return new XWiki21XWikiGeneratorListener(getLinkLabelParser(), listener, getLinkParser(), getImageParser(),
-            this.plainRendererFactory, idGenerator);
+        return new XWiki21XWikiGeneratorListener(getLinkLabelParser(), listener, getResourceReferenceParser(),
+            getImageParser(), this.plainRendererFactory, idGenerator);
     }
 }

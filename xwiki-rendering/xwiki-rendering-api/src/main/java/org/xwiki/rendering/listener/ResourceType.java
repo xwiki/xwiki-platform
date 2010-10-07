@@ -20,7 +20,16 @@
 package org.xwiki.rendering.listener;
 
 /**
- * The Resource type (a document, a mail, a document in external wiki, an attachment, etc).
+ * The Resource type. It can be one of:
+ * <ul>
+ * <li>document ("doc")</li>
+ * <li>URL ("url")</li>
+ * <li>document in another wiki (interwiki) ("interwiki")</li>
+ * <li>relative URL ("path")</li>
+ * <li>mail ("mailto")</li>
+ * <li>attachment ("attach")</li>
+ * <li>image ("image")</li>
+ * </ul>
  * 
  * @version $Id$
  * @since 2.5M2

@@ -52,8 +52,16 @@ public class XWiki21ImageReferenceParserTest extends AbstractImageReferenceParse
         ResourceReference reference = parser.parse("attach:wiki:space.page@filename");
         Assert.assertEquals(ResourceType.ATTACHMENT, reference.getType());
         Assert.assertEquals("wiki:space.page@filename", reference.getReference());
+        Assert.assertTrue(reference.isTyped());
         Assert.assertEquals("Typed = [true] Type = [attach] Reference = [wiki:space.page@filename]",
             reference.toString());
+
+        // Verify path: support
+        reference = parser.parse("path:/some/image");
+        Assert.assertEquals(ResourceType.PATH, reference.getType());
+        Assert.assertEquals("/some/image", reference.getReference());
         Assert.assertTrue(reference.isTyped());
+        Assert.assertEquals("Typed = [true] Type = [path] Reference = [/some/image]",
+            reference.toString());
     }
 }

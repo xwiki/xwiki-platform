@@ -31,7 +31,7 @@ import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.rendering.listener.ResourceReference;
 import org.xwiki.rendering.listener.ResourceType;
 import org.xwiki.rendering.parser.ResourceReferenceParser;
-import org.xwiki.rendering.renderer.link.LinkReferenceSerializer;
+import org.xwiki.rendering.renderer.reference.ResourceReferenceSerializer;
 
 import com.xpn.xwiki.wysiwyg.server.wiki.EntityReferenceConverter;
 import com.xpn.xwiki.wysiwyg.server.wiki.LinkService;
@@ -78,8 +78,8 @@ public class DefaultLinkService implements LinkService
      * Note: The link reference syntax is independent of the syntax of the edited document. The current hint should be
      * replaced with a generic one to avoid confusion.
      */
-    @Requirement("xwiki/2.1")
-    private LinkReferenceSerializer linkReferenceSerializer;
+    @Requirement("xwiki/2.1/link")
+    private ResourceReferenceSerializer linkReferenceSerializer;
 
     /**
      * The component used to parser link references.

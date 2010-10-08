@@ -23,18 +23,16 @@ import java.util.Map;
 
 import org.apache.commons.lang.StringUtils;
 import org.xwiki.rendering.internal.renderer.printer.XWikiSyntaxEscapeWikiPrinter;
-import org.xwiki.rendering.internal.renderer.xwiki20.link.XWikiSyntaxLinkRenderer;
+import org.xwiki.rendering.internal.renderer.xwiki20.reference.XWikiSyntaxResourceRenderer;
 import org.xwiki.rendering.listener.Format;
 import org.xwiki.rendering.listener.HeaderLevel;
-import org.xwiki.rendering.listener.Image;
 import org.xwiki.rendering.listener.ResourceReference;
-import org.xwiki.rendering.listener.ResourceType;
 import org.xwiki.rendering.listener.ListType;
 import org.xwiki.rendering.listener.chaining.BlockStateChainingListener;
 import org.xwiki.rendering.listener.chaining.ListenerChain;
 import org.xwiki.rendering.listener.chaining.StackableChainingListener;
 import org.xwiki.rendering.renderer.AbstractChainingPrintRenderer;
-import org.xwiki.rendering.renderer.link.LinkReferenceSerializer;
+import org.xwiki.rendering.renderer.reference.ResourceReferenceSerializer;
 import org.xwiki.rendering.renderer.printer.DefaultWikiPrinter;
 import org.xwiki.rendering.renderer.printer.VoidWikiPrinter;
 import org.xwiki.rendering.renderer.printer.WikiPrinter;
@@ -47,13 +45,15 @@ import org.xwiki.rendering.renderer.printer.WikiPrinter;
  */
 public class XWikiSyntaxChainingRenderer extends AbstractChainingPrintRenderer implements StackableChainingListener
 {
-    private XWikiSyntaxLinkRenderer linkRenderer;
+    private XWikiSyntaxResourceRenderer linkResourceRenderer;
 
-    private XWikiSyntaxImageRenderer imageRenderer;
+    private XWikiSyntaxResourceRenderer imageResourceRenderer;
 
     private XWikiSyntaxMacroRenderer macroPrinter;
 
-    private LinkReferenceSerializer linkReferenceSerializer;
+    private ResourceReferenceSerializer linkReferenceSerializer;
+
+    private ResourceReferenceSerializer imageReferenceSerializer;
 
     // Custom States
 
@@ -63,20 +63,37 @@ public class XWikiSyntaxChainingRenderer extends AbstractChainingPrintRenderer i
 
     private Map<String, String> previousFormatParameters;
 
-    public XWikiSyntaxChainingRenderer(ListenerChain listenerChain, LinkReferenceSerializer linkReferenceSerializer)
+    /**
+     * @since 2.5RC1
+     */
+    public XWikiSyntaxChainingRenderer(ListenerChain listenerChain,
+        ResourceReferenceSerializer linkReferenceSerializer, ResourceReferenceSerializer imageReferenceSerializer)
     {
         setListenerChain(listenerChain);
 
         this.linkReferenceSerializer = linkReferenceSerializer;
-        this.linkRenderer = createXWikiSyntaxLinkRenderer(getListenerChain(), linkReferenceSerializer);
-        this.imageRenderer = new XWikiSyntaxImageRenderer();
+        this.imageReferenceSerializer = imageReferenceSerializer;
+        this.linkResourceRenderer = createXWikiSyntaxLinkRenderer(getListenerChain(), linkReferenceSerializer);
+        this.imageResourceRenderer = createXWikiSyntaxImageRenderer(getListenerChain(), imageReferenceSerializer);
         this.macroPrinter = new XWikiSyntaxMacroRenderer();
     }
 
-    protected XWikiSyntaxLinkRenderer createXWikiSyntaxLinkRenderer(ListenerChain listenerChain,
-        LinkReferenceSerializer linkReferenceSerializer)
+    /**
+     * @since 2.5RC1
+     */
+    protected XWikiSyntaxResourceRenderer createXWikiSyntaxLinkRenderer(ListenerChain listenerChain,
+        ResourceReferenceSerializer linkReferenceSerializer)
     {
-        return new XWikiSyntaxLinkRenderer((XWikiSyntaxListenerChain) listenerChain, linkReferenceSerializer);     
+        return new XWikiSyntaxResourceRenderer((XWikiSyntaxListenerChain) listenerChain, linkReferenceSerializer);
+    }
+
+    /**
+     * @since 2.5RC1
+     */
+    protected XWikiSyntaxResourceRenderer createXWikiSyntaxImageRenderer(ListenerChain listenerChain,
+        ResourceReferenceSerializer imageReferenceSerializer)
+    {
+        return new XWikiSyntaxResourceRenderer((XWikiSyntaxListenerChain) listenerChain, imageReferenceSerializer);
     }
 
     // State
@@ -93,8 +110,8 @@ public class XWikiSyntaxChainingRenderer extends AbstractChainingPrintRenderer i
      */
     public StackableChainingListener createChainingListenerInstance()
     {
-        XWikiSyntaxChainingRenderer renderer =
-            new XWikiSyntaxChainingRenderer(getListenerChain(), this.linkReferenceSerializer);
+        XWikiSyntaxChainingRenderer renderer = new XWikiSyntaxChainingRenderer(getListenerChain(),
+            this.linkReferenceSerializer, this.imageReferenceSerializer);
         renderer.setPrinter(getPrinter());
         return renderer;
     }
@@ -104,14 +121,14 @@ public class XWikiSyntaxChainingRenderer extends AbstractChainingPrintRenderer i
         return (XWikiSyntaxListenerChain) getListenerChain();
     }
 
-    private XWikiSyntaxLinkRenderer getLinkRenderer()
+    private XWikiSyntaxResourceRenderer getLinkRenderer()
     {
-        return this.linkRenderer;
+        return this.linkResourceRenderer;
     }
 
-    private XWikiSyntaxImageRenderer getImageRenderer()
+    private XWikiSyntaxResourceRenderer getImageRenderer()
     {
-        return this.imageRenderer;
+        return this.imageResourceRenderer;
     }
 
     private XWikiSyntaxMacroRenderer getMacroPrinter()
@@ -833,14 +850,15 @@ public class XWikiSyntaxChainingRenderer extends AbstractChainingPrintRenderer i
     /**
      * {@inheritDoc}
      * 
-     * @see org.xwiki.rendering.listener.Listener#onImage(org.xwiki.rendering.listener.Image, boolean, Map)
+     * @see org.xwiki.rendering.listener.Listener#onImage(org.xwiki.rendering.listener.ResourceReference, boolean,
+     *      java.util.Map)
+     * @since 2.5RC1
      */
     @Override
-    public void onImage(Image image, boolean isFreeStandingURI, Map<String, String> parameters)
+    public void onImage(ResourceReference reference, boolean isFreeStandingURI, Map<String, String> parameters)
     {
-        ResourceReference reference = new ResourceReference(getImageRenderer().renderImage(image), ResourceType.IMAGE);
-        getLinkRenderer().beginRenderLink(getXWikiPrinter(), reference, isFreeStandingURI, parameters);
-        getLinkRenderer().endRenderLink(getXWikiPrinter(), reference, isFreeStandingURI, parameters);
+        getImageRenderer().beginRenderLink(getXWikiPrinter(), reference, isFreeStandingURI, parameters);
+        getImageRenderer().endRenderLink(getXWikiPrinter(), reference, isFreeStandingURI, parameters);
     }
 
     protected void printParameters(Map<String, String> parameters)
@@ -946,5 +964,4 @@ public class XWikiSyntaxChainingRenderer extends AbstractChainingPrintRenderer i
 
         super.popPrinter();
     }
-
 }

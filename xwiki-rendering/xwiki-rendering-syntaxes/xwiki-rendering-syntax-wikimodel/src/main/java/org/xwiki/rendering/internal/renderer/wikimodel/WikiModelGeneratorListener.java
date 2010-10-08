@@ -31,7 +31,6 @@ import org.wikimodel.wem.WikiFormat;
 import org.wikimodel.wem.WikiParameter;
 import org.wikimodel.wem.WikiParameters;
 import org.xwiki.rendering.internal.parser.wikimodel.DefaultXWikiGeneratorListener;
-import org.xwiki.rendering.listener.Image;
 import org.xwiki.rendering.listener.ResourceReference;
 import org.xwiki.rendering.listener.ListType;
 import org.xwiki.rendering.listener.Listener;
@@ -493,7 +492,12 @@ public class WikiModelGeneratorListener implements Listener
         this.wikimodelListener.endTableRow(createWikiParameters(parameters));
     }
 
-    public void onImage(Image image, boolean isFreeStandingURI, Map<String, String> parameters)
+    /**
+     * {@inheritDoc}
+     * @see Listener#onImage(org.xwiki.rendering.listener.ResourceReference, boolean, java.util.Map)
+     * @since 2.5RC1
+     */
+    public void onImage(ResourceReference reference, boolean isFreeStandingURI, Map<String, String> parameters)
     {
         // Note: This means that any WikiModel listener needs to be overridden with a XWiki specific
         // version that knows how to handle XWiki image location format.

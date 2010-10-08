@@ -39,7 +39,6 @@ import org.xwiki.rendering.block.LinkBlock;
 import org.xwiki.rendering.block.ParagraphBlock;
 import org.xwiki.rendering.listener.ResourceReference;
 import org.xwiki.rendering.listener.ResourceType;
-import org.xwiki.rendering.listener.URLImage;
 import org.xwiki.rendering.macro.AbstractMacro;
 import org.xwiki.rendering.macro.MacroExecutionException;
 import org.xwiki.rendering.macro.chart.ChartDataSource;
@@ -117,7 +116,7 @@ public class ChartMacro extends AbstractMacro<ChartMacroParameters>
             documentAccessBridge.getURL(null, "charting", null, null) + "/" + generateChart(macroParams, content);
         String title = macroParams.getTitle();
         ResourceReference reference = new ResourceReference(imageLocation, ResourceType.URL);
-        ImageBlock imageBlock = new ImageBlock(new URLImage(imageLocation), true);
+        ImageBlock imageBlock = new ImageBlock(new ResourceReference(imageLocation, ResourceType.URL), true);
         imageBlock.setParameter("alt", title);
         LinkBlock linkBlock = new LinkBlock(Collections.singletonList((Block) imageBlock), reference, true);
         linkBlock.setParameter("title", title);

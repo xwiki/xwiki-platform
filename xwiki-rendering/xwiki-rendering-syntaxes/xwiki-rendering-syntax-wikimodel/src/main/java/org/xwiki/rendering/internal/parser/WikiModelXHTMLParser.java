@@ -40,12 +40,11 @@ import org.xwiki.rendering.internal.parser.wikimodel.xhtml.XWikiReferenceTagHand
 import org.xwiki.rendering.internal.parser.wikimodel.xhtml.XWikiSpanTagHandler;
 import org.xwiki.rendering.internal.parser.wikimodel.xhtml.XWikiTableDataTagHandler;
 import org.xwiki.rendering.listener.Listener;
-import org.xwiki.rendering.parser.ImageParser;
 import org.xwiki.rendering.parser.ResourceReferenceParser;
 import org.xwiki.rendering.parser.ParseException;
 import org.xwiki.rendering.parser.StreamParser;
 import org.xwiki.rendering.renderer.PrintRendererFactory;
-import org.xwiki.rendering.renderer.link.URILabelGenerator;
+import org.xwiki.rendering.renderer.reference.link.URILabelGenerator;
 import org.xwiki.rendering.syntax.Syntax;
 import org.xwiki.rendering.util.IdGenerator;
 import org.xwiki.xml.XMLReaderFactory;
@@ -69,16 +68,16 @@ public class WikiModelXHTMLParser extends AbstractWikiModelParser
     private StreamParser xwikiParser;
 
     /**
-     * @see #getResourceReferenceParser()
+     * @see #getLinkReferenceParser()
      */
-    @Requirement("xwiki/2.1")
-    private ResourceReferenceParser referenceParser;
+    @Requirement("xwiki/2.1/link")
+    private ResourceReferenceParser linkReferenceParser;
 
     /**
-     * @see #getImageParser()
+     * @see #getImageReferenceParser()
      */
-    @Requirement("xwiki/2.0")
-    private ImageParser imageParser;
+    @Requirement("xwiki/2.1/image")
+    private ResourceReferenceParser imageReferenceParser;
 
     @Requirement("xwiki/2.1")
     private PrintRendererFactory xwikiSyntaxPrintRendererFactory;
@@ -145,8 +144,8 @@ public class WikiModelXHTMLParser extends AbstractWikiModelParser
 
         XhtmlParser parser = new XhtmlParser();
         parser.setExtraHandlers(handlers);
-        parser.setCommentHandler(new XWikiCommentHandler(this, this.imageParser, this.xwikiSyntaxPrintRendererFactory,
-            this.attachURILabelGenerator));
+        parser.setCommentHandler(new XWikiCommentHandler(this, getImageReferenceParser(), 
+            this.xwikiSyntaxPrintRendererFactory, this.attachURILabelGenerator));
 
         // Construct our own XML filter chain since we want to use our own Comment filter.
         try {
@@ -161,24 +160,25 @@ public class WikiModelXHTMLParser extends AbstractWikiModelParser
     /**
      * {@inheritDoc}
      * 
-     * @see AbstractWikiModelParser#getImageParser()
+     * @see AbstractWikiModelParser#getLinkReferenceParser()
+     * @since 2.5RC1
      */
     @Override
-    public ImageParser getImageParser()
+    public ResourceReferenceParser getLinkReferenceParser()
     {
-        return this.imageParser;
+        return this.linkReferenceParser;
     }
 
     /**
      * {@inheritDoc}
-     * 
-     * @see AbstractWikiModelParser#getResourceReferenceParser()
+     *
+     * @see org.xwiki.rendering.internal.parser.wikimodel.AbstractWikiModelParser#getImageReferenceParser()
      * @since 2.5RC1
      */
     @Override
-    public ResourceReferenceParser getResourceReferenceParser()
+    public ResourceReferenceParser getImageReferenceParser()
     {
-        return this.referenceParser;
+        return this.imageReferenceParser;
     }
 
     /**
@@ -189,7 +189,7 @@ public class WikiModelXHTMLParser extends AbstractWikiModelParser
     @Override
     public XWikiGeneratorListener createXWikiGeneratorListener(Listener listener, IdGenerator idGenerator)
     {
-        return new XHTMLXWikiGeneratorListener(getLinkLabelParser(), listener, getResourceReferenceParser(), getImageParser(),
-            this.plainRendererFactory, idGenerator);
+        return new XHTMLXWikiGeneratorListener(getLinkLabelParser(), listener, getLinkReferenceParser(),
+            getImageReferenceParser(), this.plainRendererFactory, idGenerator);
     }
 }

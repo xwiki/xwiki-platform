@@ -17,19 +17,33 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.rendering.internal.parser.image;
+package org.xwiki.rendering.internal.renderer.xwiki21.reference;
 
 import org.xwiki.component.annotation.Component;
 
 /**
- * Parses XWiki image definitions, using either a URL (pointing to an image or the following format:
- * <code>wiki:Space.Page@attachmentName</code> where <code>imageName</code> is the name of the image attachment (for
- * example "my.png").
- * 
+ * Generate a string representation of a {@link}'s reference, in XWiki Syntax 2.1.
+ *
  * @version $Id$
- * @since 1.7M3
+ * @since 2.3M2
  */
-@Component("xwiki/2.0")
-public class XWikiImageParser extends AbstractImageParser
+@Component("xwiki/2.1/link")
+public class XWikiSyntaxLinkReferenceSerializer
+    extends org.xwiki.rendering.internal.renderer.xwiki20.reference.XWikiSyntaxLinkReferenceSerializer
 {
+    /**
+     * Prefix to use for {@link org.xwiki.rendering.renderer.reference.ResourceReferenceTypeSerializer} role hints.
+     */
+    private static final String COMPONENT_PREFIX = "xwiki/2.1";
+
+    /**
+     * {@inheritDoc}
+     *
+     * @see org.xwiki.rendering.internal.renderer.xwiki20.reference.XWikiSyntaxLinkReferenceSerializer#getLinkTypeSerializerComponentPrefix()
+     */
+    @Override
+    protected String getLinkTypeSerializerComponentPrefix()
+    {
+        return COMPONENT_PREFIX;
+    }
 }

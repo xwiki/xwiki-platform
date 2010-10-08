@@ -38,8 +38,8 @@ import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.block.ImageBlock;
 import org.xwiki.rendering.block.ParagraphBlock;
 import org.xwiki.rendering.block.WordBlock;
-import org.xwiki.rendering.listener.Image;
-import org.xwiki.rendering.listener.URLImage;
+import org.xwiki.rendering.listener.ResourceReference;
+import org.xwiki.rendering.listener.ResourceType;
 import org.xwiki.rendering.macro.AbstractMacro;
 import org.xwiki.rendering.macro.MacroExecutionException;
 import org.xwiki.rendering.macro.descriptor.DefaultContentDescriptor;
@@ -153,8 +153,8 @@ public class FormulaMacro extends AbstractMacro<FormulaMacroParameters>
             FormulaRenderer renderer = this.manager.lookup(FormulaRenderer.class, rendererHint);
             String imageName = renderer.process(formula, inline, fontSize, imageType);
             String url = this.dab.getURL(null, "tex", null, null) + "/" + imageName;
-            Image image = new URLImage(url);
-            ImageBlock result = new ImageBlock(image, false);
+            ResourceReference imageReference = new ResourceReference(url, ResourceType.URL);
+            ImageBlock result = new ImageBlock(imageReference, false);
             // Set the alternative text for the image to be the original formula
             result.setParameter("alt", formula);
             return result;

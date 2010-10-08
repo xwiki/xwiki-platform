@@ -27,7 +27,6 @@ import org.xwiki.component.annotation.Requirement;
 import org.xwiki.component.descriptor.ComponentInstantiationStrategy;
 import org.xwiki.rendering.internal.renderer.ParametersPrinter;
 import org.xwiki.rendering.listener.ResourceReference;
-import org.xwiki.rendering.renderer.link.LinkReferenceSerializer;
 import org.xwiki.rendering.renderer.printer.XHTMLWikiPrinter;
 
 /**
@@ -57,12 +56,6 @@ public class AnnotatedXHTMLLinkRenderer implements XHTMLLinkRenderer
     @Requirement
     private XHTMLLinkRenderer defaultLinkRenderer;
 
-    /**
-     * To generate a string representation of a link that we save as an XHTML annotation.
-     */
-    @Requirement("xwiki/2.1")
-    private LinkReferenceSerializer linkReferenceSerializer;
-    
     /**
      * {@inheritDoc}
      * 
@@ -104,7 +97,7 @@ public class AnnotatedXHTMLLinkRenderer implements XHTMLLinkRenderer
         buffer.append(reference.getReference());
 
         // Print Link Reference parameters. We need to do this so that the XHTML parser doesn't have
-        // to parse the query string to extract the parameters. Doing so could lezd to false result since
+        // to parse the query string to extract the parameters. Doing so could lead to false result since
         // for example the XHTML renderer can add a parent parameter in the query string for links to non
         // existing documents.
         //

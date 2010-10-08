@@ -22,8 +22,8 @@ package org.xwiki.rendering.block;
 import java.util.Collections;
 import java.util.Map;
 
-import org.xwiki.rendering.listener.Image;
 import org.xwiki.rendering.listener.Listener;
+import org.xwiki.rendering.listener.ResourceReference;
 
 /**
  * Represents an image.
@@ -34,9 +34,9 @@ import org.xwiki.rendering.listener.Listener;
 public class ImageBlock extends AbstractBlock
 {
     /**
-     * The image.
+     * A reference to the image target. See {@link org.xwiki.rendering.listener.ResourceReference} for more details.
      */
-    private Image image;
+    private ResourceReference reference;
 
     /**
      * If true then the image is defined as a free standing URI directly in the text.
@@ -44,35 +44,39 @@ public class ImageBlock extends AbstractBlock
     private boolean isFreeStandingURI;
 
     /**
-     * @param image the image
+     * @param reference the image reference
      * @param isFreeStandingURI indicate if the image syntax is simple a full descriptive syntax (detail depending of
      *            the syntax)
+     * @since 2.5RC1
      */
-    public ImageBlock(Image image, boolean isFreeStandingURI)
+    public ImageBlock(ResourceReference reference, boolean isFreeStandingURI)
     {
-        this(image, isFreeStandingURI, Collections.<String, String> emptyMap());
+        this(reference, isFreeStandingURI, Collections.<String, String> emptyMap());
     }
 
     /**
-     * @param image the image
+     * @param reference the image reference
      * @param isFreeStandingURI indicate if the image syntax is simple a full descriptive syntax (detail depending of
      *            the syntax)
      * @param parameters the custom parameters
+     * @since 2.5RC1
      */
-    public ImageBlock(Image image, boolean isFreeStandingURI, Map<String, String> parameters)
+    public ImageBlock(ResourceReference reference, boolean isFreeStandingURI, Map<String, String> parameters)
     {
         super(parameters);
 
-        this.image = image;
+        this.reference = reference;
         this.isFreeStandingURI = isFreeStandingURI;
     }
 
     /**
-     * @return the image.
+     * @return the reference to the image
+     * @see org.xwiki.rendering.listener.ResourceReference
+     * @since 2.5RC1
      */
-    public Image getImage()
+    public ResourceReference getReference()
     {
-        return this.image;
+        return this.reference;
     }
 
     /**
@@ -90,7 +94,7 @@ public class ImageBlock extends AbstractBlock
      */
     public void traverse(Listener listener)
     {
-        listener.onImage(getImage(), isFreeStandingURI(), getParameters());
+        listener.onImage(getReference(), isFreeStandingURI(), getParameters());
     }
 
     /**
@@ -103,9 +107,7 @@ public class ImageBlock extends AbstractBlock
     public ImageBlock clone(BlockFilter blockFilter)
     {
         ImageBlock clone = (ImageBlock) super.clone(blockFilter);
-
-        clone.image = getImage().clone();
-
+        clone.reference = getReference().clone();
         return clone;
     }
 }

@@ -202,6 +202,7 @@
                 <exclude>org/xwiki/rendering/wiki/WikiModel</exclude>
                 <exclude>org/xwiki/rendering/block/PlainTextBlockFilter</exclude>
                 <exclude>org/xwiki/rendering/block/LinkBlock</exclude>
+                <exclude>org/xwiki/rendering/block/ImageBlock</exclude>
                 <exclude>org/xwiki/rendering/listener/Link</exclude>
                 <exclude>org/xwiki/rendering/listener/LinkType</exclude>
                 <exclude>org/xwiki/rendering/listener/Attachment</exclude>
@@ -213,6 +214,8 @@
                 <exclude>org/xwiki/rendering/listener/LinkListener</exclude>
                 <exclude>org/xwiki/rendering/listener/WrappingListener</exclude>
                 <exclude>org/xwiki/rendering/listener/QueueListener</exclude>
+                <exclude>org/xwiki/rendering/listener/AbstractImage</exclude>
+                <exclude>org/xwiki/rendering/listener/ImageListener</exclude>
                 <exclude>org/xwiki/rendering/listener/chaining/AbstractChainingListener</exclude>
                 <exclude>org/xwiki/rendering/listener/chaining/BlockStateChainingListener</exclude>
                 <exclude>org/xwiki/rendering/listener/chaining/ConsecutiveNewLineStateChainingListener</exclude>
@@ -220,6 +223,7 @@
                 <exclude>org/xwiki/rendering/listener/chaining/LookaheadChainingListener</exclude>
                 <exclude>org/xwiki/rendering/listener/chaining/TextOnNewLineStateChainingListener</exclude>
                 <exclude>org/xwiki/rendering/parser/LinkParser</exclude>
+                <exclude>org/xwiki/rendering/parser/ImageParser</exclude>
                 <exclude>org/xwiki/rendering/parser/AttachmentParser</exclude>
                 <exclude>org/xwiki/rendering/renderer/LinkLabelGenerator</exclude>
                 <exclude>org/xwiki/rendering/renderer/LinkReferenceSerializer</exclude>

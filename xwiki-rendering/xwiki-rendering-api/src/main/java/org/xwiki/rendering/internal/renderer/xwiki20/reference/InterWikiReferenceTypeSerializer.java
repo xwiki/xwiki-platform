@@ -17,55 +17,55 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.rendering.internal.renderer.xwiki20.link;
+package org.xwiki.rendering.internal.renderer.xwiki20.reference;
 
 import org.apache.commons.lang.StringUtils;
 import org.xwiki.component.annotation.Component;
-import org.xwiki.rendering.internal.parser.reference.XWiki20ResourceReferenceParser;
+import org.xwiki.rendering.internal.parser.reference.XWiki20LinkReferenceParser;
 import org.xwiki.rendering.listener.InterWikiResourceReference;
 import org.xwiki.rendering.listener.ResourceReference;
-import org.xwiki.rendering.renderer.link.LinkTypeReferenceSerializer;
+import org.xwiki.rendering.renderer.reference.ResourceReferenceTypeSerializer;
 
 /**
  * Serialize a link reference pointing to an interwiki link using the format
  * {@code (interwiki path)@(interwiki alias)}.
  *
  * @version $Id$
- * @since 2.5M2
+ * @since 2.5RC1
  */
 @Component("xwiki/2.0/interwiki")
-public class InterWikiLinkTypeReferenceSerializer implements LinkTypeReferenceSerializer
+public class InterWikiReferenceTypeSerializer implements ResourceReferenceTypeSerializer
 {
     /**
      * Escapes to add when rendering a link reference part.
      */
     private static final String[] ESCAPE_REPLACEMENTS_REFERENCE = new String[]{
-        "" + XWiki20ResourceReferenceParser.ESCAPE_CHAR + XWiki20ResourceReferenceParser.ESCAPE_CHAR };
+        "" + XWiki20LinkReferenceParser.ESCAPE_CHAR + XWiki20LinkReferenceParser.ESCAPE_CHAR };
 
     /**
      * Replacement chars for the escapes to add to the reference part.
      */
     private static final String[] ESCAPES_REFERENCE = new String[]{
-        "" + XWiki20ResourceReferenceParser.ESCAPE_CHAR };
+        "" + XWiki20LinkReferenceParser.ESCAPE_CHAR };
 
     /**
      * Escapes to add when rendering a link query string, anchor or interwiki part.
      */
     private static final String[] ESCAPE_REPLACEMENTS_EXTRA = new String[]{
-        "" + XWiki20ResourceReferenceParser.ESCAPE_CHAR + XWiki20ResourceReferenceParser.SEPARATOR_INTERWIKI,
-        "" + XWiki20ResourceReferenceParser.ESCAPE_CHAR + XWiki20ResourceReferenceParser.ESCAPE_CHAR };
+        "" + XWiki20LinkReferenceParser.ESCAPE_CHAR + XWiki20LinkReferenceParser.SEPARATOR_INTERWIKI,
+        "" + XWiki20LinkReferenceParser.ESCAPE_CHAR + XWiki20LinkReferenceParser.ESCAPE_CHAR };
 
     /**
      * Replacement chars for the escapes to add to the query string, anchor or interwiki part.
      */
     private static final String[] ESCAPES_EXTRA = new String[]{
-        XWiki20ResourceReferenceParser.SEPARATOR_INTERWIKI,
-        "" + XWiki20ResourceReferenceParser.ESCAPE_CHAR };
+        XWiki20LinkReferenceParser.SEPARATOR_INTERWIKI,
+        "" + XWiki20LinkReferenceParser.ESCAPE_CHAR };
 
     /**
      * {@inheritDoc}
      *
-     * @see LinkTypeReferenceSerializer#serialize(org.xwiki.rendering.listener.ResourceReference)
+     * @see org.xwiki.rendering.renderer.reference.ResourceReferenceTypeSerializer#serialize(org.xwiki.rendering.listener.ResourceReference)
      */
     public String serialize(ResourceReference reference)
     {
@@ -73,7 +73,7 @@ public class InterWikiLinkTypeReferenceSerializer implements LinkTypeReferenceSe
         String result = addEscapesToReferencePart(reference.getReference());
         if (interWikiAlias != null) {
             result = addEscapesToReferencePart(reference.getReference())
-                + XWiki20ResourceReferenceParser.SEPARATOR_INTERWIKI + addEscapesToExtraParts(interWikiAlias);
+                + XWiki20LinkReferenceParser.SEPARATOR_INTERWIKI + addEscapesToExtraParts(interWikiAlias);
         }
         return result;
     }

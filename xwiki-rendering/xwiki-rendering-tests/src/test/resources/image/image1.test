@@ -20,7 +20,7 @@ endDocument
 .#-----------------------------------------------------
 .expect|annotatedxhtml/1.0
 .#-----------------------------------------------------
-<p><!--startimage:my.png--><img src="attachmenturl" param1="value1" param2="value2" alt="my.png"/><!--stopimage--><br/><!--startimage:Space.ExistingPage@my.png--><img src="attachmenturl" alt="Space.ExistingPage@my.png"/><!--stopimage--></p>
+<p><!--startimage:false|-|attach|-|my.png--><img src="attachmenturl" param1="value1" param2="value2" alt="my.png"/><!--stopimage--><br/><!--startimage:false|-|attach|-|Space.ExistingPage@my.png--><img src="attachmenturl" alt="Space.ExistingPage@my.png"/><!--stopimage--></p>
 .#-----------------------------------------------------
 .expect|xwiki/2.0
 .#-----------------------------------------------------
@@ -29,4 +29,4 @@ endDocument
 .#-----------------------------------------------------
 .input|xhtml/1.0
 .#-----------------------------------------------------
-<p><!--startimage:my.png--><img src="attachmenturl" param1="value1" param2="value2" alt="my.png"/><!--stopimage--><br/><!--startimage:Space.ExistingPage@my.png--><img src="attachmenturl" alt="Space.ExistingPage@my.png"/><!--stopimage--></p>
+<p><!--startimage:false|-|attach|-|my.png--><img src="attachmenturl" param1="value1" param2="value2" alt="my.png"/><!--stopimage--><br/><!--startimage:false|-|attach|-|Space.ExistingPage@my.png--><img src="attachmenturl" alt="Space.ExistingPage@my.png"/><!--stopimage--></p>

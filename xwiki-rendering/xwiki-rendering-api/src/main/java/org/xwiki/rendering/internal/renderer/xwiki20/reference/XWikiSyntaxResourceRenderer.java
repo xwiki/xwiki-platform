@@ -17,7 +17,7 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.rendering.internal.renderer.xwiki20.link;
+package org.xwiki.rendering.internal.renderer.xwiki20.reference;
 
 import java.util.Map;
 import java.util.Stack;
@@ -29,16 +29,16 @@ import org.xwiki.rendering.internal.renderer.printer.XWikiSyntaxEscapeWikiPrinte
 import org.xwiki.rendering.listener.ResourceReference;
 import org.xwiki.rendering.listener.QueueListener.Event;
 import org.xwiki.rendering.listener.chaining.EventType;
-import org.xwiki.rendering.renderer.link.LinkReferenceSerializer;
+import org.xwiki.rendering.renderer.reference.ResourceReferenceSerializer;
 import org.xwiki.rendering.internal.renderer.xwiki20.XWikiSyntaxListenerChain;
 
 /**
- * Logic to render a XWiki Link into XWiki Syntax 2.0.
+ * Logic to render a Resource Reference into XWiki Syntax 2.0.
  * 
  * @version $Id$
  * @since 2.0M3
  */
-public class XWikiSyntaxLinkRenderer
+public class XWikiSyntaxResourceRenderer
 {
     /**
      * Separator to use between the link reference and link parameters.
@@ -51,19 +51,22 @@ public class XWikiSyntaxLinkRenderer
 
     private XWikiSyntaxListenerChain listenerChain;
 
-    private LinkReferenceSerializer linkReferenceSerializer;
+    private ResourceReferenceSerializer referenceSerializer;
 
-    public XWikiSyntaxLinkRenderer(XWikiSyntaxListenerChain listenerChain,
-        LinkReferenceSerializer linkReferenceSerializer)
+    /**
+     * @since 2.5RC1
+     */
+    public XWikiSyntaxResourceRenderer(XWikiSyntaxListenerChain listenerChain,
+        ResourceReferenceSerializer referenceSerializer)
     {
         this.listenerChain = listenerChain;
-        this.linkReferenceSerializer = linkReferenceSerializer;
+        this.referenceSerializer = referenceSerializer;
         this.forceFullSyntax.push(false);
     }
 
     public String serialize(ResourceReference reference, boolean isFreeStanding)
     {
-        String result = this.linkReferenceSerializer.serialize(reference);
+        String result = this.referenceSerializer.serialize(reference);
 
         if (!isFreeStanding) {
             result = result.replace("~", "~~").replace(">>", "~>~>").replace(PARAMETER_SEPARATOR, "~|~|");
@@ -107,7 +110,7 @@ public class XWikiSyntaxLinkRenderer
         // 3: it follows a character which is not a white space (newline/space) and is not consumed by the parser (like
         // a another link)
         // 4: it's followed by a character which is not a white space (TODO: find a better way than this endless list of
-        // EventType test but it probably need some big refactoring of the printer and XWikiSyntaxLinkRenderer)
+        // EventType test but it probably need some big refactoring of the printer and XWikiSyntaxResourceRenderer)
         return !isFreeStandingURI
             || !parameters.isEmpty()
             || (!isLastSyntax && !printer.isAfterWhiteSpace() && (!PlainTextStreamParser.SPECIALSYMBOL_PATTERN.matcher(

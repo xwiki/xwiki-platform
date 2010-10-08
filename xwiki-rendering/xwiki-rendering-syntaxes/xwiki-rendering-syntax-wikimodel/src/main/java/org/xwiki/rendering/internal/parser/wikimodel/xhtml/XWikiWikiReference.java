@@ -72,7 +72,7 @@ public class XWikiWikiReference extends WikiReference
         return this.referenceParameters;
     }
 
-    public ResourceReference getLinkReference()
+    public ResourceReference getReference()
     {
         ResourceReference resourceReference = new ResourceReference(getLink(), getType());
         resourceReference.setTyped(isTyped());

@@ -17,63 +17,63 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.rendering.internal.renderer.xwiki20.link;
+package org.xwiki.rendering.internal.renderer.xwiki20.reference;
 
 import org.apache.commons.lang.StringUtils;
 import org.xwiki.component.annotation.Component;
-import org.xwiki.rendering.internal.parser.reference.XWiki20ResourceReferenceParser;
+import org.xwiki.rendering.internal.parser.reference.XWiki20LinkReferenceParser;
 import org.xwiki.rendering.listener.DocumentResourceReference;
 import org.xwiki.rendering.listener.ResourceReference;
-import org.xwiki.rendering.renderer.link.LinkTypeReferenceSerializer;
+import org.xwiki.rendering.renderer.reference.ResourceReferenceTypeSerializer;
 
 /**
  * Serialize a link reference pointing to a document using the format
  * {@code (document reference)(#anchor)(?query string)}.
  *  
  * @version $Id$
- * @since 2.5M2
+ * @since 2.5RC1
  */
 @Component("xwiki/2.0/doc")
-public class DocumentLinkTypeReferenceSerializer implements LinkTypeReferenceSerializer
+public class DocumentReferenceTypeSerializer implements ResourceReferenceTypeSerializer
 {
     /**
      * Escapes to add when rendering a link reference part.
      */
     private static final String[] ESCAPE_REPLACEMENTS_REFERENCE = new String[]{
-        XWiki20ResourceReferenceParser.ESCAPE_CHAR + XWiki20ResourceReferenceParser.SEPARATOR_QUERYSTRING,
-        XWiki20ResourceReferenceParser.ESCAPE_CHAR + XWiki20ResourceReferenceParser.SEPARATOR_INTERWIKI,
-        XWiki20ResourceReferenceParser.ESCAPE_CHAR + XWiki20ResourceReferenceParser.SEPARATOR_ANCHOR };
+        XWiki20LinkReferenceParser.ESCAPE_CHAR + XWiki20LinkReferenceParser.SEPARATOR_QUERYSTRING,
+        XWiki20LinkReferenceParser.ESCAPE_CHAR + XWiki20LinkReferenceParser.SEPARATOR_INTERWIKI,
+        XWiki20LinkReferenceParser.ESCAPE_CHAR + XWiki20LinkReferenceParser.SEPARATOR_ANCHOR };
 
     /**
      * Replacement chars for the escapes to add to the reference part.
      */
     private static final String[] ESCAPES_REFERENCE = new String[]{
-        XWiki20ResourceReferenceParser.SEPARATOR_QUERYSTRING,
-        XWiki20ResourceReferenceParser.SEPARATOR_INTERWIKI,
-        XWiki20ResourceReferenceParser.SEPARATOR_ANCHOR };
+        XWiki20LinkReferenceParser.SEPARATOR_QUERYSTRING,
+        XWiki20LinkReferenceParser.SEPARATOR_INTERWIKI,
+        XWiki20LinkReferenceParser.SEPARATOR_ANCHOR };
 
     /**
      * Escapes to add when rendering a link query string, anchor or interwiki part.
      */
     private static final String[] ESCAPE_REPLACEMENTS_EXTRA = new String[]{
-        XWiki20ResourceReferenceParser.ESCAPE_CHAR + XWiki20ResourceReferenceParser.SEPARATOR_QUERYSTRING,
-        XWiki20ResourceReferenceParser.ESCAPE_CHAR + XWiki20ResourceReferenceParser.SEPARATOR_INTERWIKI,
-        XWiki20ResourceReferenceParser.ESCAPE_CHAR + XWiki20ResourceReferenceParser.SEPARATOR_ANCHOR,
-        "" + XWiki20ResourceReferenceParser.ESCAPE_CHAR + XWiki20ResourceReferenceParser.ESCAPE_CHAR };
+        XWiki20LinkReferenceParser.ESCAPE_CHAR + XWiki20LinkReferenceParser.SEPARATOR_QUERYSTRING,
+        XWiki20LinkReferenceParser.ESCAPE_CHAR + XWiki20LinkReferenceParser.SEPARATOR_INTERWIKI,
+        XWiki20LinkReferenceParser.ESCAPE_CHAR + XWiki20LinkReferenceParser.SEPARATOR_ANCHOR,
+        "" + XWiki20LinkReferenceParser.ESCAPE_CHAR + XWiki20LinkReferenceParser.ESCAPE_CHAR };
 
     /**
      * Replacement chars for the escapes to add to the query string, anchor or interwiki part.
      */
     private static final String[] ESCAPES_EXTRA = new String[]{
-        XWiki20ResourceReferenceParser.SEPARATOR_QUERYSTRING,
-        XWiki20ResourceReferenceParser.SEPARATOR_INTERWIKI,
-        XWiki20ResourceReferenceParser.SEPARATOR_ANCHOR,
-        "" + XWiki20ResourceReferenceParser.ESCAPE_CHAR };
+        XWiki20LinkReferenceParser.SEPARATOR_QUERYSTRING,
+        XWiki20LinkReferenceParser.SEPARATOR_INTERWIKI,
+        XWiki20LinkReferenceParser.SEPARATOR_ANCHOR,
+        "" + XWiki20LinkReferenceParser.ESCAPE_CHAR };
 
     /**
      * {@inheritDoc}
      *
-     * @see LinkTypeReferenceSerializer#serialize(org.xwiki.rendering.listener.ResourceReference)
+     * @see org.xwiki.rendering.renderer.reference.ResourceReferenceTypeSerializer#serialize(org.xwiki.rendering.listener.ResourceReference)
      */
     public String serialize(ResourceReference reference)
     {

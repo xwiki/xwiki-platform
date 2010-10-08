@@ -28,7 +28,7 @@ import org.xwiki.component.util.ReflectionUtils;
 import org.xwiki.rendering.listener.DocumentResourceReference;
 import org.xwiki.rendering.listener.ResourceReference;
 import org.xwiki.rendering.listener.ResourceType;
-import org.xwiki.rendering.renderer.link.LinkReferenceSerializer;
+import org.xwiki.rendering.renderer.reference.ResourceReferenceSerializer;
 import org.xwiki.rendering.renderer.printer.DefaultWikiPrinter;
 import org.xwiki.test.AbstractComponentTestCase;
 
@@ -50,7 +50,7 @@ public class PlainTextChainingRendererTest extends AbstractComponentTestCase
 		// Force the link label generator to be null
 		this.renderer = new PlainTextRenderer();
 		ReflectionUtils.setFieldValue(this.renderer, "defaultLinkReferenceSerializer", 
-		    getComponentManager().lookup(LinkReferenceSerializer.class, "xwiki/2.1"));
+		    getComponentManager().lookup(ResourceReferenceSerializer.class, "xwiki/2.1/link"));
 		this.renderer.initialize();
 	}
 	

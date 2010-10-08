@@ -17,53 +17,49 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.rendering.internal.parser.image;
+package org.xwiki.rendering.internal.parser.reference;
 
+import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.Requirement;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
-import org.xwiki.rendering.listener.DocumentImage;
-import org.xwiki.rendering.listener.Image;
-import org.xwiki.rendering.listener.URLImage;
-import org.xwiki.rendering.parser.ImageParser;
+import org.xwiki.rendering.listener.ResourceReference;
+import org.xwiki.rendering.listener.ResourceType;
+import org.xwiki.rendering.parser.ResourceReferenceParser;
 import org.xwiki.rendering.wiki.WikiModel;
 
 /**
- * Common implementation for Image parsers. The implementation handles both cases when we're in wiki mode
- * and when we're not.
- *  
  * @version $Id$
- * @since 2.0M1
+ * @since 2.5RC1
  */
-public abstract class AbstractImageParser implements ImageParser
+@Component("xwiki/2.0/image")
+public class XWiki20ImageReferenceParser implements ResourceReferenceParser
 {
     /**
-     * Used to verify if we're in wiki mode or not by looking up an implementation of {@link WikiModel}. In non wiki
-     * mode all image references are considered as URLs.
+     * Used to verify if we're in wiki mode or not by looking up an implementation of
+     * {@link org.xwiki.rendering.wiki.WikiModel}. In non wiki mode all image references are considered as URLs.
      */
     @Requirement
     private ComponentManager componentManager;
 
     /**
      * {@inheritDoc}
-     * 
-     * @see ImageParser#parse(String)
+     *
+     * @see org.xwiki.rendering.parser.ResourceReferenceParser#parse(String)
      */
-    public Image parse(String imageLocation)
+    public ResourceReference parse(String rawReference)
     {
-        Image result;
-
-        // TODO: Shouldn't we store a DocumentIdentity object instead in Image and make sure that it's never null
-        // by using the current document when not specified?
-        if (imageLocation.startsWith("http://") || !isInWikiMode()) {
-            result = new URLImage(imageLocation);
+        ResourceType type;
+        if (rawReference.startsWith("http://") || !isInWikiMode()) {
+            type = ResourceType.URL;
         } else {
-            result = new DocumentImage(imageLocation);
+            type = ResourceType.ATTACHMENT;
         }
-
-        return result;
+        ResourceReference result = new ResourceReference(rawReference, type);
+        result.setTyped(false);
+        return result; 
     }
-    
+
     /**
      * @return true if we're in wiki mode (ie there's no implementing class for {@link WikiModel})
      */

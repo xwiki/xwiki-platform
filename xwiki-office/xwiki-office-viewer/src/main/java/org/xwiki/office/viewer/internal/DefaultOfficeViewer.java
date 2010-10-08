@@ -37,7 +37,8 @@ import org.xwiki.officeimporter.document.XDOMOfficeDocument;
 import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.block.ImageBlock;
 import org.xwiki.rendering.block.XDOM;
-import org.xwiki.rendering.listener.URLImage;
+import org.xwiki.rendering.listener.ResourceReference;
+import org.xwiki.rendering.listener.ResourceType;
 
 /**
  * Default implementation of {@link org.xwiki.office.viewer.OfficeViewer}.
@@ -99,26 +100,28 @@ public class DefaultOfficeViewer extends AbstractOfficeViewer
         // Process all image blocks.
         List<ImageBlock> imgBlocks = xdom.getChildrenByType(ImageBlock.class, true);
         for (ImageBlock imgBlock : imgBlocks) {
-            String imageName = imgBlock.getImage().getReference();
+            String imageReference = imgBlock.getReference().getReference();
 
             // Check whether there is a corresponding artifact.
-            if (artifacts.containsKey(imageName)) {
+            if (artifacts.containsKey(imageReference)) {
                 try {
                     // Write the image into a temporary file.
-                    File tempFile = saveTemporaryFile(attachmentReference, imageName, artifacts.get(imageName));
+                    File tempFile =
+                        saveTemporaryFile(attachmentReference, imageReference, artifacts.get(imageReference));
 
-                    // Build a URLImage which links to above temporary image file.
-                    URLImage urlImage = new URLImage(buildURL(attachmentReference, tempFile.getName()));
+                    // Build a URL Image Reference which links to above temporary image file.
+                    ResourceReference urlImageReference =
+                        new ResourceReference(buildURL(attachmentReference, tempFile.getName()), ResourceType.URL);
 
                     // Replace the old image block with new one backed by the URLImage.
-                    Block newImgBlock = new ImageBlock(urlImage, false, imgBlock.getParameters());
+                    Block newImgBlock = new ImageBlock(urlImageReference, false, imgBlock.getParameters());
                     imgBlock.getParent().replaceChild(Arrays.asList(newImgBlock), imgBlock);
 
                     // Collect the temporary file so that it can be cleaned up when the view is disposed from cache.
                     temporaryFiles.add(tempFile);
                 } catch (Exception ex) {
                     String message = "Error while processing artifact image [%s].";
-                    getLogger().error(String.format(message, imageName), ex);
+                    getLogger().error(String.format(message, imageReference), ex);
                 }
             }
         }

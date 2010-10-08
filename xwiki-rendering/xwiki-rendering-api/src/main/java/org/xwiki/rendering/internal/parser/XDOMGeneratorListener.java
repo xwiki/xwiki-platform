@@ -60,7 +60,6 @@ import org.xwiki.rendering.block.WordBlock;
 import org.xwiki.rendering.block.XDOM;
 import org.xwiki.rendering.listener.Format;
 import org.xwiki.rendering.listener.HeaderLevel;
-import org.xwiki.rendering.listener.Image;
 import org.xwiki.rendering.listener.ResourceReference;
 import org.xwiki.rendering.listener.ListType;
 import org.xwiki.rendering.listener.Listener;
@@ -604,11 +603,11 @@ public class XDOMGeneratorListener implements Listener
     /**
      * {@inheritDoc}
      * 
-     * @see org.xwiki.rendering.listener.ImageListener#onImage(org.xwiki.rendering.listener.Image, boolean,
-     *      java.util.Map)
+     * @see org.xwiki.rendering.listener.ImageListener#onImage(org.xwiki.rendering.listener.ResourceReference,
+     *      boolean, java.util.Map)
      */
-    public void onImage(Image image, boolean isFreeStandingURI, Map<String, String> parameters)
+    public void onImage(ResourceReference reference, boolean isFreeStandingURI, Map<String, String> parameters)
     {
-        this.stack.push(new ImageBlock(image, isFreeStandingURI, parameters));
+        this.stack.push(new ImageBlock(reference, isFreeStandingURI, parameters));
     }
 }

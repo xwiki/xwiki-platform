@@ -27,7 +27,6 @@ import org.xwiki.component.logging.AbstractLogEnabled;
 import org.xwiki.rendering.block.XDOM;
 import org.xwiki.rendering.internal.parser.XDOMGeneratorListener;
 import org.xwiki.rendering.listener.Listener;
-import org.xwiki.rendering.parser.ImageParser;
 import org.xwiki.rendering.parser.ResourceReferenceParser;
 import org.xwiki.rendering.parser.ParseException;
 import org.xwiki.rendering.parser.Parser;
@@ -56,18 +55,20 @@ public abstract class AbstractWikiModelParser extends AbstractLogEnabled impleme
     public abstract IWikiParser createWikiModelParser() throws ParseException;
 
     /**
-     * @return the parser to use when parsing resource references (links, images, attachments, etc). We need to parse
-     *         references to transform them from a string representation coming from WikiModel into a
+     * @return the parser to use when parsing link references. We need to parse link references to transform them from
+     *         a string representation coming from WikiModel into a
      *         {@link org.xwiki.rendering.listener.ResourceReference} object.
      * @since 2.5RC1
      */
-    public abstract ResourceReferenceParser getResourceReferenceParser();
+    public abstract ResourceReferenceParser getLinkReferenceParser();
 
     /**
-     * @return the parser to use when parsing image references (eg "Space.Doc@image.png" in XWiki Syntax 2.0). We
-     *         transform a raw image reference into a {@link org.xwiki.rendering.listener.Image} object.
+     * @return the parser to use when parsing image references. We need to parse image references to transform them from
+     *         a string representation coming from WikiModel into a
+     *         {@link org.xwiki.rendering.listener.ResourceReference} object.
+     * @since 2.5RC1
      */
-    public abstract ImageParser getImageParser();
+    public abstract ResourceReferenceParser getImageReferenceParser();
 
     /**
      * @return the syntax parser to use for parsing link labels, since wikimodel does not support wiki syntax in links
@@ -120,8 +121,8 @@ public abstract class AbstractWikiModelParser extends AbstractLogEnabled impleme
      */
     public XWikiGeneratorListener createXWikiGeneratorListener(Listener listener, IdGenerator idGenerator)
     {
-        return new DefaultXWikiGeneratorListener(getLinkLabelParser(), listener, getResourceReferenceParser(),
-            getImageParser(), this.plainRendererFactory, idGenerator);
+        return new DefaultXWikiGeneratorListener(getLinkLabelParser(), listener, getLinkReferenceParser(),
+            getImageReferenceParser(), this.plainRendererFactory, idGenerator);
     }
 
     /**

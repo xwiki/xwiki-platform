@@ -17,25 +17,18 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.rendering.renderer.link;
+package org.xwiki.rendering.internal.parser.reference;
 
-import org.xwiki.component.annotation.ComponentRole;
-import org.xwiki.rendering.listener.ResourceReference;
+import org.xwiki.component.annotation.Component;
 
 /**
- * Generate Resource Reference labels for URIs. For example an implementation for MAILTO URIs would remove the scheme
- * part and the query string part.
- *
- * @version $Id$
- * @since 2.2RC1
+ * Each syntax should have its own resource reference parser. However while we wait for syntax specific parser to be
+ * implemented this generic parser should provide a good approximation.
+ * 
+ * @version $Id: GenericLinkReferenceParser.java 31663 2010-10-07 14:59:36Z vmassol $
+ * @since 2.5RC1
  */
-@ComponentRole
-public interface URILabelGenerator
+@Component("default/image")
+public class GenericImageReferenceParser extends XWiki20ImageReferenceParser
 {
-    /**
-     * @param reference the reference pointing to a URI for which we want to generate a label
-     * @return the URI label to display when rendering resource references
-     * @since 2.5RC1
-     */
-    String generateLabel(ResourceReference reference);
 }

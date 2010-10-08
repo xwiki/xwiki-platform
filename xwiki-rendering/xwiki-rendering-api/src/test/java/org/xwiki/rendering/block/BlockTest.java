@@ -27,9 +27,10 @@ import java.util.List;
 
 import junit.framework.TestCase;
 
-import org.xwiki.rendering.listener.DocumentImage;
 import org.xwiki.rendering.listener.DocumentResourceReference;
 import org.xwiki.rendering.listener.HeaderLevel;
+import org.xwiki.rendering.listener.ResourceReference;
+import org.xwiki.rendering.listener.ResourceType;
 
 /**
  * Unit tests for Block manipulation, testing {@link AbstractBlock}.
@@ -138,7 +139,7 @@ public class BlockTest extends TestCase
     public void testClone()
     {
         WordBlock wb = new WordBlock("block");
-        ImageBlock ib = new ImageBlock(new DocumentImage("document@attachment"), true);
+        ImageBlock ib = new ImageBlock(new ResourceReference("document@attachment", ResourceType.ATTACHMENT), true);
         DocumentResourceReference linkReference = new DocumentResourceReference("reference");
         LinkBlock lb = new LinkBlock(Arrays.asList((Block) new WordBlock("label")), linkReference, false);
         Block rootBlock = new ParagraphBlock(Arrays.<Block> asList(wb, ib, lb));
@@ -151,7 +152,7 @@ public class BlockTest extends TestCase
         assertNotSame(lb, newRootBlock.getChildren().get(2));
 
         assertEquals(wb.getWord(), ((WordBlock) newRootBlock.getChildren().get(0)).getWord());
-        assertNotSame(ib.getImage(), ((ImageBlock) newRootBlock.getChildren().get(1)).getImage());
+        assertNotSame(ib.getReference(), ((ImageBlock) newRootBlock.getChildren().get(1)).getReference());
         assertNotSame(lb.getReference(), ((LinkBlock) newRootBlock.getChildren().get(2)).getReference());
     }
     
@@ -163,7 +164,7 @@ public class BlockTest extends TestCase
         DocumentResourceReference linkReference = new DocumentResourceReference("reference");
         LinkBlock pl = new LinkBlock(Arrays.<Block>asList(lw, ls), linkReference, false);
         
-        ImageBlock pi = new ImageBlock(new DocumentImage("document@attachment"), true);
+        ImageBlock pi = new ImageBlock(new ResourceReference("document@attachment", ResourceType.ATTACHMENT), true);
         
         ParagraphBlock rootBlock = new ParagraphBlock(Arrays.<Block> asList(pi, pl));
         

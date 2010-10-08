@@ -26,13 +26,13 @@ import org.xwiki.rendering.parser.ResourceReferenceParser;
 import org.xwiki.test.AbstractComponentTestCase;
 
 /**
- * Common tests for {@link org.xwiki.rendering.parser.ResourceReferenceParser} implementations for XWiki Syntax 2.0
- * and 2.1.
+ * Common tests for Link implementations of {@link org.xwiki.rendering.parser.ResourceReferenceParser} for
+ * XWiki Syntax 2.0 and 2.1.
  * 
  * @version $Id$
  * @since 2.5RC1
  */
-public abstract class AbstractResourceReferenceParserTest extends AbstractComponentTestCase
+public abstract class AbstractLinkReferenceParserTest extends AbstractComponentTestCase
 {
     protected ResourceReferenceParser parser;
 

@@ -28,7 +28,7 @@ import org.xwiki.component.descriptor.ComponentInstantiationStrategy;
 import org.xwiki.rendering.internal.renderer.xhtml.image.XHTMLImageRenderer;
 import org.xwiki.rendering.internal.renderer.xhtml.link.XHTMLLinkRenderer;
 import org.xwiki.rendering.listener.chaining.ListenerChain;
-import org.xwiki.rendering.renderer.link.LinkLabelGenerator;
+import org.xwiki.rendering.renderer.reference.link.LinkLabelGenerator;
 
 /**
  * Renders annotations in the XHTML format.

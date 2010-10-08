@@ -40,7 +40,7 @@ import org.xwiki.rendering.macro.MacroExecutionException;
 import org.xwiki.rendering.macro.toc.TocMacroParameters;
 import org.xwiki.rendering.macro.toc.TocMacroParameters.Scope;
 import org.xwiki.rendering.parser.Parser;
-import org.xwiki.rendering.renderer.link.LinkLabelGenerator;
+import org.xwiki.rendering.renderer.reference.link.LinkLabelGenerator;
 import org.xwiki.rendering.transformation.MacroTransformationContext;
 
 /**

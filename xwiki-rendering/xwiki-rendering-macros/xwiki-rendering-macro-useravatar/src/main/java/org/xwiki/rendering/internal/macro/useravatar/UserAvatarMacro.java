@@ -36,9 +36,8 @@ import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.model.reference.EntityReferenceValueProvider;
 import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.block.ImageBlock;
-import org.xwiki.rendering.listener.DocumentImage;
-import org.xwiki.rendering.listener.Image;
-import org.xwiki.rendering.listener.URLImage;
+import org.xwiki.rendering.listener.ResourceReference;
+import org.xwiki.rendering.listener.ResourceType;
 import org.xwiki.rendering.macro.AbstractMacro;
 import org.xwiki.rendering.macro.MacroExecutionException;
 import org.xwiki.rendering.macro.useravatar.UserAvatarMacroParameters;
@@ -125,14 +124,15 @@ public class UserAvatarMacro extends AbstractMacro<UserAvatarMacroParameters>
                 + "] is not registered in this wiki");
         }
 
-        Image image;
+        ResourceReference imageReference;
         if (StringUtils.isBlank(fileName)) {
-            image = new URLImage(skinAccessBridge.getSkinFile("noavatar.png"));
+            imageReference = new ResourceReference(skinAccessBridge.getSkinFile("noavatar.png"), ResourceType.URL);
         } else {
             AttachmentReference attachmentReference = new AttachmentReference(fileName, userReference);
-            image = new DocumentImage(this.compactWikiEntityReferenceSerializer.serialize(attachmentReference));
+            imageReference = new ResourceReference(
+                this.compactWikiEntityReferenceSerializer.serialize(attachmentReference), ResourceType.ATTACHMENT);
         }
-        ImageBlock imageBlock = new ImageBlock(image, false);
+        ImageBlock imageBlock = new ImageBlock(imageReference, false);
 
         imageBlock.setParameter("alt", "Picture of " + userReference.getName());
         imageBlock.setParameter("title", userReference.getName());

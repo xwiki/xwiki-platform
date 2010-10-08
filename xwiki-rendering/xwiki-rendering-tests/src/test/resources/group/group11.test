@@ -5,7 +5,7 @@
 .# Note: We're using an external image so that this tests works in non wiki mode (ie without 
 .# requiring a WikiModel implementation available).
 .#--------------------------------------------------------------------------------------------------
-<div><!--startimage:http://host.com/image.jpg--><img src="http://host.com/image.jpg"></img><!--stopimage--></div>
+<div><!--startimage:false|-|url|-|http://host.com/image.jpg--><img src="http://host.com/image.jpg"></img><!--stopimage--></div>
 .#-----------------------------------------------------
 .expect|event/1.0
 .#-----------------------------------------------------

@@ -22,9 +22,7 @@ package org.xwiki.rendering.internal.parser.wikimodel.xhtml;
 import org.wikimodel.wem.WikiReference;
 import org.xwiki.rendering.internal.parser.wikimodel.DefaultXWikiGeneratorListener;
 import org.xwiki.rendering.listener.ResourceReference;
-import org.xwiki.rendering.listener.ResourceType;
 import org.xwiki.rendering.listener.Listener;
-import org.xwiki.rendering.parser.ImageParser;
 import org.xwiki.rendering.parser.ResourceReferenceParser;
 import org.xwiki.rendering.parser.StreamParser;
 import org.xwiki.rendering.renderer.PrintRendererFactory;
@@ -41,15 +39,17 @@ public class XHTMLXWikiGeneratorListener extends DefaultXWikiGeneratorListener
     /**
      * @param parser the parser to use to parse link labels
      * @param listener the XWiki listener to which to forward WikiModel events
-     * @param referenceParser the parser to parse resource references
-     * @param imageParser the parser to parse image references
+     * @param linkReferenceParser the parser to parse link references
+     * @param imageReferenceParser the parser to parse image references
      * @param plainRendererFactory used to generate header ids
      * @param idGenerator used to generate header ids
+     * @since 2.5RC1
      */
-    public XHTMLXWikiGeneratorListener(StreamParser parser, Listener listener, ResourceReferenceParser referenceParser,
-        ImageParser imageParser, PrintRendererFactory plainRendererFactory, IdGenerator idGenerator)
+    public XHTMLXWikiGeneratorListener(StreamParser parser, Listener listener,
+        ResourceReferenceParser linkReferenceParser, ResourceReferenceParser imageReferenceParser,
+        PrintRendererFactory plainRendererFactory, IdGenerator idGenerator)
     {
-        super(parser, listener, referenceParser, imageParser, plainRendererFactory, idGenerator);
+        super(parser, listener, linkReferenceParser, imageReferenceParser, plainRendererFactory, idGenerator);
     }
 
     /**
@@ -69,17 +69,38 @@ public class XHTMLXWikiGeneratorListener extends DefaultXWikiGeneratorListener
             super.onReference(reference);
         } else {
             XWikiWikiReference xwikiReference = (XWikiWikiReference) reference;
-            ResourceReference resourceReference = xwikiReference.getLinkReference();
+            ResourceReference resourceReference = xwikiReference.getReference();
 
             flushFormat();
 
-            if (resourceReference.getType().equals(ResourceType.IMAGE)) {
-                getListener().onImage(getImageParser().parse(resourceReference.getReference()),
-                    xwikiReference.isFreeStanding(), convertParameters(xwikiReference.getParameters()));
-            } else {
-                onReference(resourceReference, xwikiReference.getLabel(), xwikiReference.isFreeStanding(),
-                    convertParameters(xwikiReference.getParameters()));
-            }
+            onReference(resourceReference, xwikiReference.getLabel(), xwikiReference.isFreeStanding(),
+                convertParameters(xwikiReference.getParameters()));
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     *
+     * @see DefaultXWikiGeneratorListener#onImage(org.wikimodel.wem.WikiReference)
+     */
+    @Override
+    public void onImage(WikiReference reference)
+    {
+        // We need to handle 2 cases:
+        // - when the passed reference is an instance of XWikiWikiReference, i.e. when a XHTML comment defining a XWiki
+        //   image has been specified
+        // - when the passed reference is not an instance of XWikiWikiReference which will happen if there's no special
+        //   XHTML comment defining a XWiki image
+        if (!(reference instanceof XWikiWikiReference)) {
+            super.onImage(reference);
+        } else {
+            XWikiWikiReference xwikiReference = (XWikiWikiReference) reference;
+            ResourceReference resourceReference = xwikiReference.getReference();
+
+            flushFormat();
+
+            onImage(resourceReference, xwikiReference.isFreeStanding(),
+                convertParameters(xwikiReference.getParameters()));
         }
     }
 }

@@ -29,14 +29,12 @@ import org.wikimodel.wem.xhtml.handler.CommentHandler;
 import org.wikimodel.wem.xhtml.impl.XhtmlHandler.TagStack;
 import org.xwiki.rendering.internal.parser.WikiModelXHTMLParser;
 import org.xwiki.rendering.internal.parser.wikimodel.XWikiGeneratorListener;
-import org.xwiki.rendering.listener.Image;
-import org.xwiki.rendering.listener.ResourceReference;
 import org.xwiki.rendering.listener.ResourceType;
 import org.xwiki.rendering.listener.Listener;
-import org.xwiki.rendering.parser.ImageParser;
+import org.xwiki.rendering.parser.ResourceReferenceParser;
 import org.xwiki.rendering.renderer.PrintRenderer;
 import org.xwiki.rendering.renderer.PrintRendererFactory;
-import org.xwiki.rendering.renderer.link.URILabelGenerator;
+import org.xwiki.rendering.renderer.reference.link.URILabelGenerator;
 import org.xwiki.rendering.renderer.printer.DefaultWikiPrinter;
 import org.xwiki.xml.XMLUtils;
 
@@ -57,7 +55,7 @@ public class XWikiCommentHandler extends CommentHandler
 
     private WikiModelXHTMLParser parser;
 
-    private ImageParser imageParser;
+    private ResourceReferenceParser imageReferenceParser;
 
     private PrintRendererFactory xwikiSyntaxPrintRendererFactory;
 
@@ -70,16 +68,16 @@ public class XWikiCommentHandler extends CommentHandler
     private Stack<String> commentContentStack = new Stack<String>();
 
     /**
-     * @since 2.1RC1
+     * @since 2.5RC1
      * @todo Remove the need to pass a Parser when WikiModel implements support for wiki syntax in links. See
      *       http://code.google.com/p/wikimodel/issues/detail?id=87
      */
-    public XWikiCommentHandler(WikiModelXHTMLParser parser, ImageParser imageParser,
+    public XWikiCommentHandler(WikiModelXHTMLParser parser, ResourceReferenceParser imageReferenceParser,
         PrintRendererFactory xwikiSyntaxPrintRendererFactory, URILabelGenerator attachLinkLabelGenerator)
     {
         this.parser = parser;
         this.xwikiSyntaxPrintRendererFactory = xwikiSyntaxPrintRendererFactory;
-        this.imageParser = imageParser;
+        this.imageReferenceParser = imageReferenceParser;
         this.attachLinkLabelGenerator = attachLinkLabelGenerator;
     }
 
@@ -148,20 +146,8 @@ public class XWikiCommentHandler extends CommentHandler
 
         boolean isFreeStandingLink = (Boolean) stack.getStackParameter("isFreeStandingLink");
 
-        // Format of a link definition in comment:
-        // <!--startwikilink:(isTyped)|-|(type)|-|(reference)|-|(parameters: key="value")-->
-        String linkComment = this.commentContentStack.pop();
-
-        String[] tokens = StringUtils.splitByWholeSeparatorPreserveAllTokens(linkComment, COMMENT_SEPARATOR);
-        boolean isTyped = tokens[0].equalsIgnoreCase("true") ? true : false;
-        ResourceType type = new ResourceType(tokens[1]);
-        String reference = tokens[2];
+        XWikiWikiReference linkReference = parseResourceReference(this.commentContentStack.pop());
         WikiParameters linkParams = WikiParameters.EMPTY;
-        WikiParameters referenceParams = WikiParameters.EMPTY;
-        if (tokens.length == 4) {
-            referenceParams = WikiParameters.newWikiParameters(tokens[3]);
-        }
-
         String label = null;
         if (!isFreeStandingLink) {
             label = linkLabelRenderer.getPrinter().toString();
@@ -170,8 +156,8 @@ public class XWikiCommentHandler extends CommentHandler
             linkParams = (WikiParameters) stack.getStackParameter("linkParameters");
         }
 
-        WikiReference wikiReference =
-            new XWikiWikiReference(isTyped, type, reference, label, referenceParams, linkParams, isFreeStandingLink);
+        WikiReference wikiReference = new XWikiWikiReference(linkReference.isTyped(), linkReference.getType(),
+            linkReference.getLink(), label, linkReference.getReferenceParameters(), linkParams, isFreeStandingLink);
         stack.getScannerContext().onReference(wikiReference);
 
         stack.popStackParameter("isInLink");
@@ -188,30 +174,44 @@ public class XWikiCommentHandler extends CommentHandler
     private void handleImageCommentStop(String content, TagStack stack)
     {
         boolean isFreeStandingImage = (Boolean) stack.getStackParameter("isFreeStandingImage");
-        WikiParameters parameters = (WikiParameters) stack.getStackParameter("imageParameters");
-        String imageComment = this.commentContentStack.pop();
-        Image image = this.imageParser.parse(imageComment);
 
-        if (isFreeStandingImage) {
-            stack.getScannerContext().onImage(imageComment);
-        } else {
+        XWikiWikiReference imageReference = parseResourceReference(this.commentContentStack.pop());
+
+        WikiParameters imageParams = WikiParameters.EMPTY;
+        if (!isFreeStandingImage) {
             // Remove the ALT attribute if the content has the same value as the original image location
             // This is because the XHTML renderer automatically adds an ALT attribute since it is mandatory
             // in the XHTML specifications.
-            WikiParameter alt = parameters.getParameter("alt");
-            // TODO: Fix this when we have a common Reference object replacing Link and Image
-            ResourceReference dummyReference = new ResourceReference(image.getReference(), ResourceType.DOCUMENT);
-            if (alt != null && alt.getValue().equals(this.attachLinkLabelGenerator.generateLabel(dummyReference))) {
-                parameters = parameters.remove("alt");
+            imageParams = (WikiParameters) stack.getStackParameter("imageParameters");
+            WikiParameter alt = imageParams.getParameter("alt");
+            if (alt != null && alt.getValue().equals(
+                this.attachLinkLabelGenerator.generateLabel(imageReference.getReference())))
+            {
+                imageParams = imageParams.remove("alt");
             }
-
-            WikiReference reference = new WikiReference(imageComment, null, parameters);
-
-            stack.getScannerContext().onImage(reference);
         }
+
+        WikiReference reference = new XWikiWikiReference(imageReference.isTyped(), imageReference.getType(),
+            imageReference.getLink(), null, imageReference.getReferenceParameters(), imageParams, isFreeStandingImage);
+        stack.getScannerContext().onImage(reference);
 
         stack.setStackParameter("isInImage", false);
         stack.setStackParameter("isFreeStandingImage", false);
         stack.setStackParameter("imageParameters", WikiParameters.EMPTY);
+    }
+
+    private XWikiWikiReference parseResourceReference(String rawReference)
+    {
+        // Format of a resource definition in comment:
+        // (isTyped)|-|(type)|-|(reference)|-|(parameters: key="value")
+        String[] tokens = StringUtils.splitByWholeSeparatorPreserveAllTokens(rawReference, COMMENT_SEPARATOR);
+        boolean isTyped = tokens[0].equalsIgnoreCase("true") ? true : false;
+        ResourceType type = new ResourceType(tokens[1]);
+        String reference = tokens[2];
+        WikiParameters referenceParams = WikiParameters.EMPTY;
+        if (tokens.length == 4) {
+            referenceParams = WikiParameters.newWikiParameters(tokens[3]);
+        }
+        return new XWikiWikiReference(isTyped, type, reference, null, referenceParams, WikiParameters.EMPTY, false);
     }
 }

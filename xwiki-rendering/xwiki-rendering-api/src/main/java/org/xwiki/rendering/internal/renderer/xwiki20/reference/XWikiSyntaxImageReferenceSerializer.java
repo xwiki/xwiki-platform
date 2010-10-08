@@ -17,40 +17,35 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.rendering.internal.renderer;
+package org.xwiki.rendering.internal.renderer.xwiki20.reference;
 
 import org.xwiki.component.annotation.Component;
-import org.xwiki.component.annotation.Requirement;
-import org.xwiki.model.reference.AttachmentReference;
-import org.xwiki.model.reference.AttachmentReferenceResolver;
 import org.xwiki.rendering.listener.ResourceReference;
-import org.xwiki.rendering.renderer.reference.link.URILabelGenerator;
 
 /**
- * Generate link labels for ATTACH URIs.
+ * Generate a string representation of an Image reference, in XWiki Syntax 2.0. This implementation is pluggable by
+ * using internally implementations of {@link org.xwiki.rendering.renderer.reference.ResourceReferenceTypeSerializer},
+ * each in charge of serializing a given {@link org.xwiki.rendering.listener.ResourceType}.
+ * <p>
+ * Note that {@link org.xwiki.rendering.renderer.reference.ResourceReferenceTypeSerializer} component implementations
+ * must use a role hint equal to the XWiki Syntax id followed by "/" and then Link Type name (eg "doc" for document
+ * links, "attach" for attachment links, etc).
+ * </p>
  *
- * @version $Id$
+ * @version $Id: XWikiSyntaxLinkReferenceSerializer.java 31655 2010-10-07 12:34:15Z vmassol $
  * @since 2.5RC1
  */
-@Component("attach")
-public class XWikiAttachmentURILabelGenerator implements URILabelGenerator
+@Component("xwiki/2.0/image")
+public class XWikiSyntaxImageReferenceSerializer extends XWikiSyntaxLinkReferenceSerializer
 {
     /**
-     * Used to extract the attachment name part in an Attachment reference.
-     */
-    @Requirement("current")
-    private AttachmentReferenceResolver<String> currentAttachmentReferenceResolver;
-
-    /**
      * {@inheritDoc}
-     * @see org.xwiki.rendering.renderer.reference.link.URILabelGenerator#generateLabel(
+     *
+     * @see org.xwiki.rendering.renderer.reference.ResourceReferenceSerializer#serialize(
      *      org.xwiki.rendering.listener.ResourceReference)
-     * @since 2.5RC1
      */
-    public String generateLabel(ResourceReference reference)
+    public String serialize(ResourceReference reference)
     {
-        AttachmentReference attachmentReference =
-            this.currentAttachmentReferenceResolver.resolve(reference.getReference());
-        return attachmentReference.getName();
+        return "image:" + super.serialize(reference);
     }
 }

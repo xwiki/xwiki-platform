@@ -23,14 +23,13 @@ import java.util.Map;
 
 import org.apache.commons.lang.StringUtils;
 import org.xwiki.rendering.listener.HeaderLevel;
-import org.xwiki.rendering.listener.Image;
 import org.xwiki.rendering.listener.ResourceReference;
 import org.xwiki.rendering.listener.ResourceType;
 import org.xwiki.rendering.listener.ListType;
 import org.xwiki.rendering.listener.chaining.BlockStateChainingListener;
 import org.xwiki.rendering.listener.chaining.EmptyBlockChainingListener;
 import org.xwiki.rendering.listener.chaining.ListenerChain;
-import org.xwiki.rendering.renderer.link.LinkLabelGenerator;
+import org.xwiki.rendering.renderer.reference.link.LinkLabelGenerator;
 import org.xwiki.rendering.renderer.AbstractChainingPrintRenderer;
 
 /**
@@ -336,11 +335,12 @@ public class PlainTextChainingRenderer extends AbstractChainingPrintRenderer
     /**
      * {@inheritDoc}
      * 
-     * @see org.xwiki.rendering.renderer.AbstractChainingPrintRenderer#onImage(org.xwiki.rendering.listener.Image,
-     *      boolean, java.util.Map)
+     * @see org.xwiki.rendering.renderer.AbstractChainingPrintRenderer#onImage(
+     *      org.xwiki.rendering.listener.ResourceReference, boolean, java.util.Map)
+     * @since 2.5RC1 
      */
     @Override
-    public void onImage(Image image, boolean isFreeStandingURI, Map<String, String> parameters)
+    public void onImage(ResourceReference reference, boolean isFreeStandingURI, Map<String, String> parameters)
     {
         // TODO: maybe something could be done here
     }

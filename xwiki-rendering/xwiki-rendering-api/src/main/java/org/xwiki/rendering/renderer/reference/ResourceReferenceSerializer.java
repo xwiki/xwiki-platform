@@ -17,18 +17,23 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.rendering.internal.parser.image;
+package org.xwiki.rendering.renderer.reference;
 
-import org.xwiki.component.annotation.Component;
+import org.xwiki.component.annotation.ComponentRole;
+import org.xwiki.rendering.listener.ResourceReference;
 
 /**
- * Since we need to have wiki syntax-specific image parsers, this generic parser supports external images and
- * images located in the attachment of the current page, while waiting for specialized image parsers to be written.
- * 
+ * Generate a string representation of a {@link org.xwiki.rendering.listener.ResourceReference}.
+ *
  * @version $Id$
- * @since 1.7M3
+ * @since 2.5RC1
  */
-@Component
-public class GenericImageParser extends AbstractImageParser
+@ComponentRole
+public interface ResourceReferenceSerializer
 {
+    /**
+     * @param reference the link reference to serialize
+     * @return the string representation of the passed {@link org.xwiki.rendering.listener.ResourceReference} object
+     */
+    String serialize(ResourceReference reference);
 }

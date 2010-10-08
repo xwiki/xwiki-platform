@@ -30,13 +30,9 @@ import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.component.phase.Initializable;
 import org.xwiki.component.phase.InitializationException;
 import org.xwiki.component.descriptor.ComponentInstantiationStrategy;
-import org.xwiki.rendering.listener.DocumentImage;
-import org.xwiki.rendering.listener.Image;
-import org.xwiki.rendering.listener.ImageType;
 import org.xwiki.rendering.listener.ResourceReference;
 import org.xwiki.rendering.listener.ResourceType;
-import org.xwiki.rendering.listener.URLImage;
-import org.xwiki.rendering.renderer.link.URILabelGenerator;
+import org.xwiki.rendering.renderer.reference.link.URILabelGenerator;
 import org.xwiki.rendering.renderer.printer.XHTMLWikiPrinter;
 import org.xwiki.rendering.wiki.WikiModel;
 
@@ -109,27 +105,26 @@ public class DefaultXHTMLImageRenderer implements XHTMLImageRenderer, Initializa
     /**
      * {@inheritDoc}
      *
-     * @see XHTMLImageRenderer#onImage(Image, boolean, Map)
+     * @see XHTMLImageRenderer#onImage(org.xwiki.rendering.listener.ResourceReference, boolean, java.util.Map)
+     * @since 2.5RC1
      */
-    public void onImage(Image image, boolean isFreeStandingURI, Map<String, String> parameters)
+    public void onImage(ResourceReference reference, boolean isFreeStandingURI, Map<String, String> parameters)
     {
         Map<String, String> attributes = new LinkedHashMap<String, String>();
 
         // First we need to compute the image URL.
         String imageURL;
-        if (image.getType() == ImageType.DOCUMENT) {
-            // Note if wikiModel is null then all Image objects will be of type URLImage. This must be ensured by the
-            // Image parser used beforehand. However we're adding a protection here against Image parsers
-            // that would not honor this contract.
+        if (reference.getType().equals(ResourceType.ATTACHMENT)) {
+            // Note if wikiModel is null then all Image reference objects will be of type URL. This must be ensured by
+            // the Image Reference parser used beforehand. However we're adding a protection here against Image
+            // Reference parsers that would not honor this contract...
             if (this.wikiModel != null) {
-                DocumentImage documentImage = DocumentImage.class.cast(image);
-                imageURL = this.wikiModel.getImageURL(documentImage.getAttachmentReference(), parameters);
+                imageURL = this.wikiModel.getImageURL(reference.getReference(), parameters);
             } else {
                 throw new RuntimeException("Invalid Image type. In non wiki mode, all image types must be URL images.");
             }
         } else {
-            URLImage urlImage = URLImage.class.cast(image);
-            imageURL = urlImage.getURL();
+            imageURL = reference.getReference();
         }
 
         // Then add it as an attribute of the IMG element.
@@ -145,10 +140,7 @@ public class DefaultXHTMLImageRenderer implements XHTMLImageRenderer, Initializa
 
         // If no ALT attribute has been specified, add it since the XHTML specifications makes it mandatory.
         if (!parameters.containsKey(ALTERNATE)) {
-            // TODO: Fix this when we have a common Reference object replacing Link and Image
-            ResourceReference dummyResourceReference =
-                new ResourceReference(image.getReference(), ResourceType.DOCUMENT);
-            attributes.put(ALTERNATE, this.attachURILabelGenerator.generateLabel(dummyResourceReference));
+            attributes.put(ALTERNATE, this.attachURILabelGenerator.generateLabel(reference));
         }
 
         // And generate the XHTML IMG element.

@@ -17,7 +17,7 @@ endDocument
 .#-----------------------------------------------------
 .expect|annotatedxhtml/1.0
 .#-----------------------------------------------------
-<p><!--startimage:http://www.google.ro/intl/en_com/images/logo_plain.png--><img src="http://www.google.ro/intl/en_com/images/logo_plain.png" alt="bar" title="foo"/><!--stopimage--></p>
+<p><!--startimage:false|-|url|-|http://www.google.ro/intl/en_com/images/logo_plain.png--><img src="http://www.google.ro/intl/en_com/images/logo_plain.png" alt="bar" title="foo"/><!--stopimage--></p>
 .#-----------------------------------------------------
 .expect|xwiki/2.0
 .#-----------------------------------------------------

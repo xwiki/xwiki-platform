@@ -36,8 +36,8 @@ import org.xwiki.rendering.block.ImageBlock;
 import org.xwiki.rendering.block.NewLineBlock;
 import org.xwiki.rendering.block.ParagraphBlock;
 import org.xwiki.rendering.listener.Format;
-import org.xwiki.rendering.listener.Image;
-import org.xwiki.rendering.listener.URLImage;
+import org.xwiki.rendering.listener.ResourceReference;
+import org.xwiki.rendering.listener.ResourceType;
 import org.xwiki.rendering.macro.AbstractMacro;
 import org.xwiki.rendering.macro.MacroExecutionException;
 import org.xwiki.rendering.macro.descriptor.ContentDescriptor;
@@ -130,8 +130,8 @@ public abstract class AbstractBoxMacro<P extends BoxMacroParameters> extends Abs
 
                 // we add the image, if there is one
                 if (!StringUtils.isEmpty(imageParameter)) {
-                    Image image = new URLImage(imageParameter);
-                    Block imageBlock = new ImageBlock(image, true);
+                    ResourceReference imageReference = new ResourceReference(imageParameter, ResourceType.URL);
+                    Block imageBlock = new ImageBlock(imageReference, true);
                     boxBlock.addChild(imageBlock);
                     boxBlock.addChild(NewLineBlock.NEW_LINE_BLOCK);
                 }

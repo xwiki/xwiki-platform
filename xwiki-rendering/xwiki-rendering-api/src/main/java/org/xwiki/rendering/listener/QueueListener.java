@@ -538,11 +538,12 @@ public class QueueListener extends LinkedList<QueueListener.Event> implements Li
     /**
      * {@inheritDoc}
      * 
-     * @see org.xwiki.rendering.listener.Listener#onImage(org.xwiki.rendering.listener.Image, boolean, java.util.Map)
+     * @see org.xwiki.rendering.listener.Listener#onImage(ResourceReference, boolean, java.util.Map)
+     * @since 2.5RC1
      */
-    public void onImage(Image image, boolean isFreeStandingURI, Map<String, String> parameters)
+    public void onImage(ResourceReference reference, boolean isFreeStandingURI, Map<String, String> parameters)
     {
-        saveEvent(EventType.ON_IMAGE, image, isFreeStandingURI, parameters);
+        saveEvent(EventType.ON_IMAGE, reference, isFreeStandingURI, parameters);
     }
 
     /**

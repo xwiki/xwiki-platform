@@ -17,26 +17,29 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.rendering.parser;
+package org.xwiki.rendering.internal.renderer.xwiki21.reference;
 
-import org.xwiki.component.annotation.ComponentRole;
-import org.xwiki.rendering.listener.Image;
+import org.xwiki.component.annotation.Component;
+import org.xwiki.rendering.internal.renderer.xwiki20.reference.XWikiSyntaxLinkReferenceSerializer;
+import org.xwiki.rendering.listener.ResourceReference;
 
 /**
- * Interface for parsing image definitions represented as Strings.
- * 
- * @version $Id $
- * @since 1.7M3
+ * Generate a string representation of an Image's reference, in XWiki Syntax 2.1.
+ *
+ * @version $Id: XWikiSyntaxLinkReferenceSerializer.java 31655 2010-10-07 12:34:15Z vmassol $
+ * @since 2.5RC1
  */
-@ComponentRole
-public interface ImageParser
+@Component("xwiki/2.1/image")
+public class XWikiSyntaxImageReferenceSerializer extends XWikiSyntaxLinkReferenceSerializer
 {
     /**
-     * Parses an image represented as a String into an {@link Image} object.
-     * 
-     * @param imageLocation the string representation of the image to parse (the supported syntax depends on the parser
-     *            implementation used)
-     * @return the parsed image
+     * {@inheritDoc}
+     *
+     * @see org.xwiki.rendering.renderer.reference.ResourceReferenceSerializer#serialize(
+     *      org.xwiki.rendering.listener.ResourceReference)
      */
-    Image parse(String imageLocation);
+    public String serialize(ResourceReference reference)
+    {
+        return "image:" + super.serialize(reference);
+    }
 }

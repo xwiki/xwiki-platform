@@ -17,20 +17,23 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.rendering.internal.renderer.xwiki20;
+package org.xwiki.rendering.renderer.reference;
 
-import org.xwiki.rendering.listener.Image;
+import org.xwiki.component.annotation.ComponentRole;
+import org.xwiki.rendering.listener.ResourceReference;
 
 /**
- * Generate a XWiki syntax string representation of an {@link Image}.
+ * Serialize a given Resource Reference to a String based on its Resource Type.
  *
  * @version $Id$
- * @since 2.0M3
+ * @since 2.5RC1
  */
-public class XWikiSyntaxImageRenderer
+@ComponentRole
+public interface ResourceReferenceTypeSerializer
 {
-    public String renderImage(Image image)
-    {
-        return image.getReference();
-    }
+    /**
+     * @param reference the link reference to serialize
+     * @return the string representation of the passed {@link org.xwiki.rendering.listener.ResourceReference} object
+     */
+    String serialize(ResourceReference reference);
 }

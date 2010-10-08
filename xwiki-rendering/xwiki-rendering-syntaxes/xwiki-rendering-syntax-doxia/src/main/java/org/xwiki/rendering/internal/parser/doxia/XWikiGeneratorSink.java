@@ -33,7 +33,7 @@ import org.xwiki.rendering.listener.ResourceReference;
 import org.xwiki.rendering.listener.ListType;
 import org.xwiki.rendering.listener.Listener;
 import org.xwiki.rendering.listener.QueueListener;
-import org.xwiki.rendering.listener.URLImage;
+import org.xwiki.rendering.listener.ResourceType;
 import org.xwiki.rendering.listener.WrappingListener;
 import org.xwiki.rendering.parser.ResourceReferenceParser;
 import org.xwiki.rendering.parser.ParseException;
@@ -55,7 +55,7 @@ public class XWikiGeneratorSink implements Sink
 
     private Stack<Object> parameters = new Stack<Object>();
 
-    private ResourceReferenceParser referenceParser;
+    private ResourceReferenceParser linkReferenceParser;
 
     private IdGenerator idGenerator;
 
@@ -70,12 +70,12 @@ public class XWikiGeneratorSink implements Sink
     /**
      * @since 2.0M3
      */
-    public XWikiGeneratorSink(Listener listener, ResourceReferenceParser referenceParser,
+    public XWikiGeneratorSink(Listener listener, ResourceReferenceParser linkReferenceParser,
         PrintRendererFactory plainRendererFactory, IdGenerator idGenerator, StreamParser plainParser)
     {
         pushListener(listener);
 
-        this.referenceParser = referenceParser;
+        this.linkReferenceParser = linkReferenceParser;
         this.idGenerator = idGenerator != null ? idGenerator : new IdGenerator();
         this.plainRendererFactory = plainRendererFactory;
         this.plainParser = plainParser;
@@ -512,7 +512,7 @@ public class XWikiGeneratorSink implements Sink
         flushEmptyLines();
 
         // TODO: Handle image to attachments. For now we only handle URLs.
-        getListener().onImage(new URLImage(source), false, Listener.EMPTY_PARAMETERS);
+        getListener().onImage(new ResourceReference(source, ResourceType.URL), false, Listener.EMPTY_PARAMETERS);
     }
 
     /**
@@ -631,7 +631,7 @@ public class XWikiGeneratorSink implements Sink
     {
         flushEmptyLines();
 
-        ResourceReference resourceReference = this.referenceParser.parse(name);
+        ResourceReference resourceReference = this.linkReferenceParser.parse(name);
 
         getListener().beginLink(resourceReference, false, Listener.EMPTY_PARAMETERS);
 

@@ -21,7 +21,7 @@ package org.xwiki.rendering.internal.renderer;
 
 import org.xwiki.component.annotation.Component;
 import org.xwiki.rendering.listener.ResourceReference;
-import org.xwiki.rendering.renderer.link.URILabelGenerator;
+import org.xwiki.rendering.renderer.reference.link.URILabelGenerator;
 
 /**
  * Generate link labels for ATTACH URIs.
@@ -34,7 +34,7 @@ public class DefaultAttachmentURILabelGenerator implements URILabelGenerator
 {
     /**
      * {@inheritDoc}
-     * @see org.xwiki.rendering.renderer.link.URILabelGenerator#generateLabel(
+     * @see org.xwiki.rendering.renderer.reference.link.URILabelGenerator#generateLabel(
      *      org.xwiki.rendering.listener.ResourceReference)
      */
     public String generateLabel(ResourceReference reference)

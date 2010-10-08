@@ -42,7 +42,6 @@ import org.xwiki.rendering.listener.ResourceReference;
 import org.xwiki.rendering.listener.ListType;
 import org.xwiki.rendering.listener.Listener;
 import org.xwiki.rendering.listener.QueueListener;
-import org.xwiki.rendering.parser.ImageParser;
 import org.xwiki.rendering.parser.ResourceReferenceParser;
 import org.xwiki.rendering.parser.ParseException;
 import org.xwiki.rendering.parser.StreamParser;
@@ -93,9 +92,9 @@ public class DefaultXWikiGeneratorListener implements XWikiGeneratorListener
 
     private StreamParser parser;
 
-    private ResourceReferenceParser referenceParser;
+    private ResourceReferenceParser linkReferenceParser;
 
-    private ImageParser imageParser;
+    private ResourceReferenceParser imageReferenceParser;
 
     private IdGenerator idGenerator;
 
@@ -109,17 +108,17 @@ public class DefaultXWikiGeneratorListener implements XWikiGeneratorListener
 
     /**
      * @see <a href="http://code.google.com/p/wikimodel/issues/detail?id=87">wikimodel issue 87</a>
-     * @since 2.0M3
+     * @since 2.5RC1
      */
     public DefaultXWikiGeneratorListener(StreamParser parser, Listener listener,
-        ResourceReferenceParser referenceParser, ImageParser imageParser, PrintRendererFactory plainRendererFactory,
-        IdGenerator idGenerator)
+        ResourceReferenceParser linkReferenceParser, ResourceReferenceParser imageReferenceParser,
+        PrintRendererFactory plainRendererFactory, IdGenerator idGenerator)
     {
         pushListener(listener);
 
         this.parser = parser;
-        this.referenceParser = referenceParser;
-        this.imageParser = imageParser;
+        this.linkReferenceParser = linkReferenceParser;
+        this.imageReferenceParser = imageReferenceParser;
         this.idGenerator = idGenerator != null ? idGenerator : new IdGenerator();
         this.plainRendererFactory = plainRendererFactory;
     }
@@ -134,9 +133,20 @@ public class DefaultXWikiGeneratorListener implements XWikiGeneratorListener
         return this.listener.peek();
     }
 
-    protected ImageParser getImageParser()
+    /**
+     * @since 2.5RC1
+     */
+    protected ResourceReferenceParser getLinkReferenceParser()
     {
-        return this.imageParser;
+        return this.linkReferenceParser;
+    }
+
+    /**
+     * @since 2.5RC1
+     */
+    protected ResourceReferenceParser getImageReferenceParser()
+    {
+        return this.imageReferenceParser;
     }
 
     /**
@@ -934,9 +944,9 @@ public class DefaultXWikiGeneratorListener implements XWikiGeneratorListener
     {
         flushFormat();
 
-        // If there's no link parser defined, don't handle links...
-        if (this.referenceParser != null) {
-            onReference(this.referenceParser.parse(reference), label, isFreeStandingURI, parameters);
+        // If there's no resource reference parser defined, don't handle links...
+        if (getLinkReferenceParser() != null) {
+            onReference(getLinkReferenceParser().parse(reference), label, isFreeStandingURI, parameters);
         }
     }
 
@@ -963,11 +973,9 @@ public class DefaultXWikiGeneratorListener implements XWikiGeneratorListener
      * 
      * @see org.wikimodel.wem.IWemListenerInline#onImage(java.lang.String)
      */
-    public void onImage(String ref)
+    public void onImage(String reference)
     {
-        flushFormat();
-
-        getListener().onImage(getImageParser().parse(ref), true, Listener.EMPTY_PARAMETERS);
+        onImage(reference, true, Listener.EMPTY_PARAMETERS);
     }
 
     /**
@@ -975,11 +983,30 @@ public class DefaultXWikiGeneratorListener implements XWikiGeneratorListener
      * 
      * @see org.wikimodel.wem.IWemListenerInline#onImage(org.wikimodel.wem.WikiReference)
      */
-    public void onImage(WikiReference ref)
+    public void onImage(WikiReference reference)
+    {
+        onImage(reference.getLink(), false, convertParameters(reference.getParameters()));
+    }
+
+    /**
+     * @since 2.5RC1
+     */
+    protected void onImage(String reference, boolean isFreeStandingURI, Map<String, String> parameters)
     {
         flushFormat();
 
-        getListener().onImage(getImageParser().parse(ref.getLink()), false, convertParameters(ref.getParameters()));
+        // If there's no resource reference parser defined, don't handle images...
+        if (getImageReferenceParser() != null) {
+            onImage(getImageReferenceParser().parse(reference), isFreeStandingURI, parameters);
+        }
+    }
+
+    /**
+     * @since 2.5RC1
+     */
+    protected void onImage(ResourceReference reference, boolean isFreeStandingURI, Map<String, String> parameters)
+    {
+        getListener().onImage(reference, isFreeStandingURI, parameters);
     }
 
     /**

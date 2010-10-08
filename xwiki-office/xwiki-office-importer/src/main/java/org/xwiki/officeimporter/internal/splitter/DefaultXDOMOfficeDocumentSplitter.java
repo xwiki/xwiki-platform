@@ -125,8 +125,8 @@ public class DefaultXDOMOfficeDocumentSplitter implements XDOMOfficeDocumentSpli
             Map<String, byte[]> artifacts = new HashMap<String, byte[]>();
             List<ImageBlock> imageBlocks = doc.getXdom().getChildrenByType(ImageBlock.class, true);
             for (ImageBlock imageBlock : imageBlocks) {
-                String imageName = imageBlock.getImage().getReference();
-                artifacts.put(imageName, officeDocument.getArtifacts().remove(imageName));
+                String imageReference = imageBlock.getReference().getReference();
+                artifacts.put(imageReference, officeDocument.getArtifacts().remove(imageReference));
             }
 
             // Create the resulting XDOMOfficeDocument.

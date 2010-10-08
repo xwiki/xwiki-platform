@@ -28,12 +28,12 @@ import org.xwiki.rendering.parser.ResourceReferenceParser;
 import org.xwiki.rendering.wiki.WikiModel;
 
 /**
- * Unit tests for {@link XWiki20ResourceReferenceParser}.
+ * Unit tests for {@link XWiki21LinkReferenceParser}.
  * 
  * @version $Id$
- * @since 2.5M2
+ * @since 2.5RC1
  */
-public class XWiki21ResourceReferenceParserTest extends AbstractResourceReferenceParserTest
+public class XWiki21LinkReferenceParserTest extends AbstractLinkReferenceParserTest
 {
     @Override
     protected void registerComponents() throws Exception
@@ -41,7 +41,7 @@ public class XWiki21ResourceReferenceParserTest extends AbstractResourceReferenc
         // Create a Mock WikiModel implementation so that the link parser works in wiki mode
         registerMockComponent(WikiModel.class);
 
-        this.parser = getComponentManager().lookup(ResourceReferenceParser.class, "xwiki/2.1");
+        this.parser = getComponentManager().lookup(ResourceReferenceParser.class, "xwiki/2.1/link");
     }
 
     @Test

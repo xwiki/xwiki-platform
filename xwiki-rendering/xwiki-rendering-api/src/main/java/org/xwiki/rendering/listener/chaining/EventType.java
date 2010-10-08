@@ -23,7 +23,6 @@ import java.util.Map;
 
 import org.xwiki.rendering.listener.Format;
 import org.xwiki.rendering.listener.HeaderLevel;
-import org.xwiki.rendering.listener.Image;
 import org.xwiki.rendering.listener.ResourceReference;
 import org.xwiki.rendering.listener.ListType;
 import org.xwiki.rendering.listener.Listener;
@@ -368,7 +367,7 @@ public enum EventType
     ON_IMAGE {
         public void fireEvent(Listener listener, Object[] eventParameters)
         {
-            listener.onImage((Image) eventParameters[0], (Boolean) eventParameters[1],
+            listener.onImage((ResourceReference) eventParameters[0], (Boolean) eventParameters[1],
                 (Map<String, String>) eventParameters[2]);
         }
     },

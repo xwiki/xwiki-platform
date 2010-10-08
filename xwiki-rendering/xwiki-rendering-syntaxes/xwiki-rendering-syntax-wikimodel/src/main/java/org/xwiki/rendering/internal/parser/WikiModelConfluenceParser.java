@@ -24,7 +24,6 @@ import org.wikimodel.wem.confluence.ConfluenceWikiParser;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.Requirement;
 import org.xwiki.rendering.internal.parser.wikimodel.AbstractWikiModelParser;
-import org.xwiki.rendering.parser.ImageParser;
 import org.xwiki.rendering.parser.ResourceReferenceParser;
 import org.xwiki.rendering.parser.Parser;
 import org.xwiki.rendering.syntax.Syntax;
@@ -39,16 +38,16 @@ import org.xwiki.rendering.syntax.Syntax;
 public class WikiModelConfluenceParser extends AbstractWikiModelParser
 {
     /**
-     * @see #getResourceReferenceParser()
+     * @see #getLinkReferenceParser()
      */
-    @Requirement
+    @Requirement("default/link")
     private ResourceReferenceParser referenceParser;
 
     /**
-     * @see #getImageParser()
+     * @see #getImageReferenceParser()
      */
-    @Requirement
-    private ImageParser imageParser;
+    @Requirement("default/image")
+    private ResourceReferenceParser imageReferenceParser;
 
     /**
      * {@inheritDoc}
@@ -73,22 +72,24 @@ public class WikiModelConfluenceParser extends AbstractWikiModelParser
     
     /**
      * {@inheritDoc}
-     * @see AbstractWikiModelParser#getImageParser()
+     * @see AbstractWikiModelParser#getLinkReferenceParser()
+     * @since 2.5RC1
      */
     @Override
-    public ImageParser getImageParser()
+    public ResourceReferenceParser getLinkReferenceParser()
     {
-        return this.imageParser;
+        return this.referenceParser;
     }
 
     /**
      * {@inheritDoc}
-     * @see AbstractWikiModelParser#getResourceReferenceParser()
+     *
+     * @see org.xwiki.rendering.internal.parser.wikimodel.AbstractWikiModelParser#getImageReferenceParser()
      * @since 2.5RC1
      */
     @Override
-    public ResourceReferenceParser getResourceReferenceParser()
+    public ResourceReferenceParser getImageReferenceParser()
     {
-        return this.referenceParser;
+        return this.imageReferenceParser;
     }
 }

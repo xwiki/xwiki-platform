@@ -17,65 +17,34 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.rendering.listener;
+package org.xwiki.rendering.internal.parser.reference;
+
+import java.util.Arrays;
+import java.util.List;
+
+import org.xwiki.component.annotation.Component;
 
 /**
- * Image located at a URL.
+ * Each syntax should have its own resource reference parser. However while we wait for syntax specific parser to be
+ * implemented this generic parser should provide a good approximation.
  * 
  * @version $Id$
- * @since 1.7RC1
+ * @since 2.5RC1
  */
-public class URLImage extends AbstractImage
+@Component("default/link")
+public class GenericLinkReferenceParser extends XWiki20LinkReferenceParser
 {
     /**
-     * The URL where the image is located.
+     * The list of recognized URL prefixes.
      */
-    private String url;
-
-    /**
-     * @param url the URL where the image is located.
-     */
-    public URLImage(String url)
-    {
-        this.url = url;
-    }
-
-    /**
-     * @return the URL where the image is located.
-     */
-    public String getURL()
-    {
-        return this.url;
-    }
+    private static final List<String> URI_PREFIXES = Arrays.asList("mailto");
 
     /**
      * {@inheritDoc}
-     * 
-     * @see org.xwiki.rendering.listener.Image#getType()
+     * @see XWiki20LinkReferenceParser#getAllowedURIPrefixes()
      */
-    public ImageType getType()
+    protected List<String> getAllowedURIPrefixes()
     {
-        return ImageType.URL;
-    }
-
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.rendering.listener.Image#getReference()
-     */
-    public String getReference()
-    {
-        return getURL();
-    }
-
-    /**
-     * {@inheritDoc}
-     * 
-     * @see java.lang.Object#toString()
-     */
-    @Override
-    public String toString()
-    {
-        return "url = [" + getURL() + "]";
+        return URI_PREFIXES;
     }
 }

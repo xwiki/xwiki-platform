@@ -24,7 +24,6 @@ import java.util.Map;
 import org.apache.maven.doxia.sink.Sink;
 import org.xwiki.rendering.listener.Format;
 import org.xwiki.rendering.listener.HeaderLevel;
-import org.xwiki.rendering.listener.Image;
 import org.xwiki.rendering.listener.ResourceReference;
 import org.xwiki.rendering.listener.ListType;
 import org.xwiki.rendering.listener.Listener;
@@ -495,16 +494,17 @@ public class DoxiaGeneratorListener implements Listener
     /**
      * {@inheritDoc}
      * 
-     * @see org.xwiki.rendering.listener.Listener#onImage(Image, boolean, Map)
-     * @since 1.7M2
+     * @see org.xwiki.rendering.listener.Listener#onImage(org.xwiki.rendering.listener.ResourceReference, boolean,
+     *      java.util.Map)
+     * @since 2.5RC1
      */
-    public void onImage(Image image, boolean isFreeStandingURI, Map<String, String> parameters)
+    public void onImage(ResourceReference reference, boolean isFreeStandingURI, Map<String, String> parameters)
     {
         this.sink.figure();
         // TODO: handle special XWiki format for image locations. How do we pass image bits to Doxia?
         // TODO: Handle parameters
         // TODO: Handle free standing URI (if supported by Doxia)
-        this.sink.figureGraphics(image.getReference());
+        this.sink.figureGraphics(reference.getReference());
         this.sink.figure_();
     }
 }

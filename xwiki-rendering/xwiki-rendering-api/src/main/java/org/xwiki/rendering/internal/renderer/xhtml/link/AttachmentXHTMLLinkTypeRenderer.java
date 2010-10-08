@@ -27,7 +27,7 @@ import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.phase.Initializable;
 import org.xwiki.component.phase.InitializationException;
 import org.xwiki.rendering.listener.ResourceReference;
-import org.xwiki.rendering.renderer.link.LinkTypeReferenceSerializer;
+import org.xwiki.rendering.renderer.reference.ResourceReferenceTypeSerializer;
 import org.xwiki.rendering.wiki.WikiModel;
 
 import java.util.Map;
@@ -48,7 +48,7 @@ public class AttachmentXHTMLLinkTypeRenderer extends AbstractXHTMLLinkTypeRender
      * not inside a wiki. 
      */
     @Requirement("xwiki/2.0")
-    private LinkTypeReferenceSerializer defaultLinkTypeReferenceSerializer;
+    private ResourceReferenceTypeSerializer defaultResourceReferenceTypeSerializer;
 
     /**
      * Used to generate the link targeting a local document.
@@ -84,7 +84,7 @@ public class AttachmentXHTMLLinkTypeRenderer extends AbstractXHTMLLinkTypeRender
         if (this.wikiModel != null) {
             anchorAttributes.put(XHTMLLinkRenderer.HREF, this.wikiModel.getAttachmentURL(reference.getReference()));
         } else {
-            anchorAttributes.put(XHTMLLinkRenderer.HREF, this.defaultLinkTypeReferenceSerializer.serialize(
+            anchorAttributes.put(XHTMLLinkRenderer.HREF, this.defaultResourceReferenceTypeSerializer.serialize(
                 reference));
         }
     }

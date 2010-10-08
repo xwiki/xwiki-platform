@@ -17,7 +17,7 @@ endDocument
 .#-----------------------------------------------------
 .expect|annotatedxhtml/1.0
 .#-----------------------------------------------------
-<p><!--startimage:http://some/image.png--><img src="http://some/image.png" class="wikimodel-freestanding" alt="http://some/image.png"/><!--stopimage--></p>
+<p><!--startimage:false|-|url|-|http://some/image.png--><img src="http://some/image.png" class="wikimodel-freestanding" alt="http://some/image.png"/><!--stopimage--></p>
 .#-----------------------------------------------------
 .expect|xwiki/2.0
 .#-----------------------------------------------------
@@ -25,4 +25,4 @@ image:http://some/image.png
 .#-----------------------------------------------------
 .input|xhtml/1.0
 .#-----------------------------------------------------
-<html><p><!--startimage:http://some/image.png--><img src="http://some/image.png" class="wikimodel-freestanding" alt="http://some/image.png"/><!--stopimage--></p></html>
+<p><!--startimage:false|-|url|-|http://some/image.png--><img src="http://some/image.png" class="wikimodel-freestanding" alt="http://some/image.png"/><!--stopimage--></p>

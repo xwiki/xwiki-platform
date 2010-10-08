@@ -36,7 +36,6 @@ import org.xwiki.rendering.block.ParagraphBlock;
 import org.xwiki.rendering.block.RawBlock;
 import org.xwiki.rendering.listener.ResourceReference;
 import org.xwiki.rendering.listener.ResourceType;
-import org.xwiki.rendering.listener.URLImage;
 import org.xwiki.rendering.macro.AbstractMacro;
 import org.xwiki.rendering.macro.Macro;
 import org.xwiki.rendering.macro.MacroExecutionException;
@@ -169,7 +168,7 @@ public class RssMacro extends AbstractMacro<RssMacroParameters>
 
             // Rss icon.
             String imagePath = skinAccessBridge.getSkinFile(FEED_ICON_RESOURCE_PATH);
-            ImageBlock imageBlock = new ImageBlock(new URLImage(imagePath), false);
+            ImageBlock imageBlock = new ImageBlock(new ResourceReference(imagePath, ResourceType.URL), false);
 
             // Title rss icon link.
             Block titleImageLinkBlock = new LinkBlock(Arrays.<Block> asList(imageBlock), titleResourceReference, true);

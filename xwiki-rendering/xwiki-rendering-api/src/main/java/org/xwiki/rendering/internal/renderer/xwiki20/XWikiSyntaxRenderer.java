@@ -25,7 +25,7 @@ import org.xwiki.component.annotation.Requirement;
 import org.xwiki.component.descriptor.ComponentInstantiationStrategy;
 import org.xwiki.rendering.listener.chaining.ChainingListener;
 import org.xwiki.rendering.listener.chaining.ListenerChain;
-import org.xwiki.rendering.renderer.link.LinkReferenceSerializer;
+import org.xwiki.rendering.renderer.reference.ResourceReferenceSerializer;
 
 /**
  * Generates XWiki Syntax 2.0 from {@link org.xwiki.rendering.block.XDOM}. This is useful for example to convert other wiki
@@ -42,8 +42,14 @@ public class XWikiSyntaxRenderer extends AbstractXWikiSyntaxRenderer
     /**
      * Needed by XWikiSyntaxChainingRenderer to serialize wiki link references.
      */
-    @Requirement("xwiki/2.0")
-    private LinkReferenceSerializer linkReferenceSerializer;
+    @Requirement("xwiki/2.0/link")
+    private ResourceReferenceSerializer linkReferenceSerializer;
+
+    /**
+     * Needed by XWikiSyntaxChainingRenderer to serialize wiki image references.
+     */
+    @Requirement("xwiki/2.0/image")
+    private ResourceReferenceSerializer imageReferenceSerializer;
 
     /**
      * {@inheritDoc}
@@ -52,6 +58,6 @@ public class XWikiSyntaxRenderer extends AbstractXWikiSyntaxRenderer
     @Override
     protected ChainingListener createXWikiSyntaxChainingRenderer(ListenerChain chain)
     {
-        return new XWikiSyntaxChainingRenderer(chain, this.linkReferenceSerializer);
+        return new XWikiSyntaxChainingRenderer(chain, this.linkReferenceSerializer, this.imageReferenceSerializer);
     }
 }

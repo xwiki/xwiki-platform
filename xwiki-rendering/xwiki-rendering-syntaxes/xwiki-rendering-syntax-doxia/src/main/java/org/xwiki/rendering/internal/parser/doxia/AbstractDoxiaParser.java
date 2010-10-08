@@ -24,7 +24,6 @@ import org.xwiki.component.logging.AbstractLogEnabled;
 import org.xwiki.rendering.block.XDOM;
 import org.xwiki.rendering.internal.parser.XDOMGeneratorListener;
 import org.xwiki.rendering.listener.Listener;
-import org.xwiki.rendering.parser.ImageParser;
 import org.xwiki.rendering.parser.ResourceReferenceParser;
 import org.xwiki.rendering.parser.Parser;
 import org.xwiki.rendering.parser.ParseException;
@@ -49,11 +48,11 @@ public abstract class AbstractDoxiaParser extends AbstractLogEnabled implements 
     @Requirement("plain/1.0")
     private StreamParser plainParser;
 
-    @Requirement
-    private ResourceReferenceParser referenceParser;
+    @Requirement("default/link")
+    private ResourceReferenceParser linkReferenceParser;
 
-    @Requirement
-    protected ImageParser imageParser;
+    @Requirement("default/image")
+    private ResourceReferenceParser imageReferenceParser;
 
     public abstract org.apache.maven.doxia.parser.Parser createDoxiaParser();
 
@@ -95,7 +94,7 @@ public abstract class AbstractDoxiaParser extends AbstractLogEnabled implements 
      */
     private void parse(Reader source, Listener listener, IdGenerator idGenerator) throws ParseException
     {
-        XWikiGeneratorSink doxiaSink = new XWikiGeneratorSink(listener, this.referenceParser,
+        XWikiGeneratorSink doxiaSink = new XWikiGeneratorSink(listener, this.linkReferenceParser,
             this.plainRendererFactory, idGenerator, this.plainParser);
 
         org.apache.maven.doxia.parser.Parser parser = createDoxiaParser();

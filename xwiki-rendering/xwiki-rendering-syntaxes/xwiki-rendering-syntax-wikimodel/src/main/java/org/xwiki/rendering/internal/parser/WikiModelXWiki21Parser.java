@@ -27,7 +27,6 @@ import org.xwiki.rendering.internal.parser.wikimodel.AbstractWikiModelParser;
 import org.xwiki.rendering.internal.parser.wikimodel.XWikiGeneratorListener;
 import org.xwiki.rendering.internal.parser.wikimodel.xwiki.XWiki21XWikiGeneratorListener;
 import org.xwiki.rendering.listener.Listener;
-import org.xwiki.rendering.parser.ImageParser;
 import org.xwiki.rendering.parser.ResourceReferenceParser;
 import org.xwiki.rendering.syntax.Syntax;
 import org.xwiki.rendering.util.IdGenerator;
@@ -42,16 +41,16 @@ import org.xwiki.rendering.util.IdGenerator;
 public class WikiModelXWiki21Parser extends AbstractWikiModelParser
 {
     /**
-     * @see #getResourceReferenceParser()
+     * @see #getLinkReferenceParser()
      */
-    @Requirement("xwiki/2.1")
-    private ResourceReferenceParser referenceParser;
+    @Requirement("xwiki/2.1/link")
+    private ResourceReferenceParser linkReferenceParser;
 
     /**
-     * @see #getImageParser()
+     * @see #getImageReferenceParser()
      */
-    @Requirement("xwiki/2.0")
-    private ImageParser imageParser;
+    @Requirement("xwiki/2.1/image")
+    private ResourceReferenceParser imageReferenceParser;
 
     /**
      * {@inheritDoc}
@@ -78,24 +77,25 @@ public class WikiModelXWiki21Parser extends AbstractWikiModelParser
     /**
      * {@inheritDoc}
      *
-     * @see org.xwiki.rendering.internal.parser.wikimodel.AbstractWikiModelParser#getImageParser()
+     * @see org.xwiki.rendering.internal.parser.wikimodel.AbstractWikiModelParser#getLinkReferenceParser()
+     * @since 2.5RC1
      */
     @Override
-    public ImageParser getImageParser()
+    public ResourceReferenceParser getLinkReferenceParser()
     {
-        return this.imageParser;
+        return this.linkReferenceParser;
     }
 
     /**
      * {@inheritDoc}
      *
-     * @see org.xwiki.rendering.internal.parser.wikimodel.AbstractWikiModelParser#getResourceReferenceParser()
+     * @see org.xwiki.rendering.internal.parser.wikimodel.AbstractWikiModelParser#getImageReferenceParser()
      * @since 2.5RC1
      */
     @Override
-    public ResourceReferenceParser getResourceReferenceParser()
+    public ResourceReferenceParser getImageReferenceParser()
     {
-        return this.referenceParser;
+        return this.imageReferenceParser;
     }
 
     /**
@@ -106,7 +106,7 @@ public class WikiModelXWiki21Parser extends AbstractWikiModelParser
     @Override
     public XWikiGeneratorListener createXWikiGeneratorListener(Listener listener, IdGenerator idGenerator)
     {
-        return new XWiki21XWikiGeneratorListener(getLinkLabelParser(), listener, getResourceReferenceParser(),
-            getImageParser(), this.plainRendererFactory, idGenerator);
+        return new XWiki21XWikiGeneratorListener(getLinkLabelParser(), listener, getLinkReferenceParser(),
+            getImageReferenceParser(), this.plainRendererFactory, idGenerator);
     }
 }

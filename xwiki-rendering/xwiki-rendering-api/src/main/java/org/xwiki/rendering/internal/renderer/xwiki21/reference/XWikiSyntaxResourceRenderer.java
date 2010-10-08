@@ -17,7 +17,7 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.rendering.internal.renderer.xwiki21.link;
+package org.xwiki.rendering.internal.renderer.xwiki21.reference;
 
 import java.util.Map;
 
@@ -27,7 +27,7 @@ import org.xwiki.rendering.internal.renderer.xwiki20.XWikiSyntaxListenerChain;
 import org.xwiki.rendering.listener.DocumentResourceReference;
 import org.xwiki.rendering.listener.ResourceReference;
 import org.xwiki.rendering.listener.ResourceType;
-import org.xwiki.rendering.renderer.link.LinkReferenceSerializer;
+import org.xwiki.rendering.renderer.reference.ResourceReferenceSerializer;
 
 /**
  * Logic to render a XWiki Link into XWiki Syntax 2.1.
@@ -35,21 +35,24 @@ import org.xwiki.rendering.renderer.link.LinkReferenceSerializer;
  * @version $Id$
  * @since 2.5M2
  */
-public class XWikiSyntaxLinkRenderer extends org.xwiki.rendering.internal.renderer.xwiki20.link.XWikiSyntaxLinkRenderer
+public class XWikiSyntaxResourceRenderer
+    extends org.xwiki.rendering.internal.renderer.xwiki20.reference.XWikiSyntaxResourceRenderer
 {
     /**
      * @param listenerChain the rendering chain
-     * @param linkReferenceSerializer the serializer implementation to use to serialize link references
+     * @param referenceSerializer the serializer implementation to use to serialize link references
+     * @since 2.5RC1
      */
-    public XWikiSyntaxLinkRenderer(XWikiSyntaxListenerChain listenerChain,
-        LinkReferenceSerializer linkReferenceSerializer)
+    public XWikiSyntaxResourceRenderer(XWikiSyntaxListenerChain listenerChain,
+        ResourceReferenceSerializer referenceSerializer)
     {
-        super(listenerChain, linkReferenceSerializer);
+        super(listenerChain, referenceSerializer);
     }
 
     /**
      * {@inheritDoc}
-     * @see org.xwiki.rendering.internal.renderer.xwiki20.link.XWikiSyntaxLinkRenderer#printParameters(XWikiSyntaxEscapeWikiPrinter, org.xwiki.rendering.listener.ResourceReference , java.util.Map)
+     * @see org.xwiki.rendering.internal.renderer.xwiki20.reference.XWikiSyntaxResourceRenderer#printParameters(
+     *      XWikiSyntaxEscapeWikiPrinter, org.xwiki.rendering.listener.ResourceReference , java.util.Map)
      */
     @Override
     protected void printParameters(XWikiSyntaxEscapeWikiPrinter printer, ResourceReference reference,

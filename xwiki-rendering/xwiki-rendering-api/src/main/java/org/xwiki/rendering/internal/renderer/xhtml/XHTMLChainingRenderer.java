@@ -26,7 +26,6 @@ import org.xwiki.rendering.internal.renderer.xhtml.image.XHTMLImageRenderer;
 import org.xwiki.rendering.internal.renderer.xhtml.link.XHTMLLinkRenderer;
 import org.xwiki.rendering.listener.Format;
 import org.xwiki.rendering.listener.HeaderLevel;
-import org.xwiki.rendering.listener.Image;
 import org.xwiki.rendering.listener.ResourceReference;
 import org.xwiki.rendering.listener.ListType;
 import org.xwiki.rendering.listener.chaining.BlockStateChainingListener;
@@ -708,15 +707,17 @@ public class XHTMLChainingRenderer extends AbstractChainingPrintRenderer
     /**
      * {@inheritDoc}
      * 
-     * @see AbstractChainingPrintRenderer#onImage(org.xwiki.rendering.listener.Image, boolean, Map)
+     * @see AbstractChainingPrintRenderer#onImage(org.xwiki.rendering.listener.ResourceReference, boolean,
+     *      java.util.Map)
+     * @since 2.5RC1
      */
     @Override
-    public void onImage(Image image, boolean isFreeStandingURI, Map<String, String> parameters)
+    public void onImage(ResourceReference reference, boolean isFreeStandingURI, Map<String, String> parameters)
     {
         // Ensure the image renderer is using the latest printer since the original printer used could have been
         // superseded by another one in the printer stack.
         this.imageRenderer.setXHTMLWikiPrinter(getXHTMLWikiPrinter());
-        this.imageRenderer.onImage(image, isFreeStandingURI, parameters);
+        this.imageRenderer.onImage(reference, isFreeStandingURI, parameters);
     }
 
     /**

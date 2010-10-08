@@ -29,7 +29,7 @@ import org.xwiki.rendering.listener.ResourceReference;
 import org.xwiki.rendering.listener.ResourceType;
 import org.xwiki.rendering.parser.ParseException;
 import org.xwiki.rendering.parser.Parser;
-import org.xwiki.rendering.renderer.link.LinkLabelGenerator;
+import org.xwiki.rendering.renderer.reference.link.LinkLabelGenerator;
 
 /**
  * Used to filter plain text blocks.

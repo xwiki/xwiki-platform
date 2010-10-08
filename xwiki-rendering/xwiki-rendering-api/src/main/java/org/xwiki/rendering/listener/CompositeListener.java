@@ -645,13 +645,13 @@ public class CompositeListener implements Listener
     /**
      * {@inheritDoc}
      * 
-     * @see org.xwiki.rendering.listener.ImageListener#onImage(org.xwiki.rendering.listener.Image, boolean,
-     *      java.util.Map)
+     * @see org.xwiki.rendering.listener.ImageListener#onImage(ResourceReference, boolean, java.util.Map)
+     * @since 2.5RC1 
      */
-    public void onImage(Image image, boolean isFreeStandingURI, Map<String, String> parameters)
+    public void onImage(ResourceReference reference, boolean isFreeStandingURI, Map<String, String> parameters)
     {
         for (Listener listener : listeners) {
-            listener.onImage(image, isFreeStandingURI, parameters);
+            listener.onImage(reference, isFreeStandingURI, parameters);
         }
     }
 }

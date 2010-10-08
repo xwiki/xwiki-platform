@@ -72,8 +72,8 @@ import java.util.List;
  * @version $Id$
  * @since 2.5RC1
  */
-@Component("xwiki/2.0")
-public class XWiki20ResourceReferenceParser implements ResourceReferenceParser
+@Component("xwiki/2.0/link")
+public class XWiki20LinkReferenceParser implements ResourceReferenceParser
 {
     /**
      * Interwiki separator.
@@ -177,23 +177,23 @@ public class XWiki20ResourceReferenceParser implements ResourceReferenceParser
      *
      * @see org.xwiki.rendering.parser.ResourceReferenceParser#parse(java.lang.String)
      */
-    public ResourceReference parse(String rawLink)
+    public ResourceReference parse(String rawReference)
     {
         // Step 1: If we're not in wiki mode then all links are URL links.
         if (!isInWikiMode()) {
-            ResourceReference resourceReference = new ResourceReference(rawLink, ResourceType.URL);
+            ResourceReference resourceReference = new ResourceReference(rawReference, ResourceType.URL);
             resourceReference.setTyped(false);
             return resourceReference;
         }
 
         // Step 2: Check if it's a known URI by looking for one of the known URI schemes. If not, check if it's a URL.
-        ResourceReference resourceReference = parseURILinks(rawLink);
+        ResourceReference resourceReference = parseURILinks(rawReference);
         if (resourceReference != null) {
             return resourceReference;
         }
 
         // Step 3: Look for an InterWiki link
-        StringBuffer content = new StringBuffer(rawLink);
+        StringBuffer content = new StringBuffer(rawReference);
         resourceReference = parseInterWikiLinks(content);
         if (resourceReference != null) {
             return resourceReference;

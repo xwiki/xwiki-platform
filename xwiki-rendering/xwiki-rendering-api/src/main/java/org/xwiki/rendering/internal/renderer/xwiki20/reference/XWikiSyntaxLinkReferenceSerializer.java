@@ -17,39 +17,39 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.rendering.internal.renderer.xwiki20.link;
+package org.xwiki.rendering.internal.renderer.xwiki20.reference;
 
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.Requirement;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.rendering.listener.ResourceReference;
-import org.xwiki.rendering.renderer.link.LinkReferenceSerializer;
-import org.xwiki.rendering.renderer.link.LinkTypeReferenceSerializer;
+import org.xwiki.rendering.renderer.reference.ResourceReferenceSerializer;
+import org.xwiki.rendering.renderer.reference.ResourceReferenceTypeSerializer;
 
 /**
- * Generate a string representation of a {@link}'s reference, in XWiki Syntax 2.0. This implementation is pluggable by
- * using internally implementations of {@link org.xwiki.rendering.renderer.link.LinkTypeReferenceSerializer}, each in
- * charge of serializing a given {@link org.xwiki.rendering.listener.ResourceType}.
+ * Generate a string representation of a Link reference, in XWiki Syntax 2.0. This implementation is pluggable by
+ * using internally implementations of {@link org.xwiki.rendering.renderer.reference.ResourceReferenceTypeSerializer},
+ * each in charge of serializing a given {@link org.xwiki.rendering.listener.ResourceType}.
  * <p>
- * Note that {@link org.xwiki.rendering.renderer.link.LinkTypeReferenceSerializer} component implementations must use
- * a role hint equal to the XWiki Syntax id followed by "/" and then Link Type name (eg "doc" for document links,
- * "attach" for attachment links, etc).
+ * Note that {@link org.xwiki.rendering.renderer.reference.ResourceReferenceTypeSerializer} component implementations
+ * must use a role hint equal to the XWiki Syntax id followed by "/" and then Link Type name (eg "doc" for document
+ * links, "attach" for attachment links, etc).
  * </p>
  *
  * @version $Id$
- * @since 2.3M2
+ * @since 2.5RC1
  */
-@Component("xwiki/2.0")
-public class XWikiSyntaxLinkReferenceSerializer implements LinkReferenceSerializer
+@Component("xwiki/2.0/link")
+public class XWikiSyntaxLinkReferenceSerializer implements ResourceReferenceSerializer
 {
     /**
-     * Prefix to use for {@link org.xwiki.rendering.renderer.link.LinkTypeReferenceSerializer} role hints. 
+     * Prefix to use for {@link org.xwiki.rendering.renderer.reference.ResourceReferenceTypeSerializer} role hints.
      */
     private static final String COMPONENT_PREFIX = "xwiki/2.0";
 
     /**
-     * Used to lookup {@link org.xwiki.rendering.renderer.link.LinkTypeReferenceSerializer} implementations.
+     * Used to lookup {@link org.xwiki.rendering.renderer.reference.ResourceReferenceTypeSerializer} implementations.
      */
     @Requirement
     private ComponentManager componentManager;
@@ -58,12 +58,12 @@ public class XWikiSyntaxLinkReferenceSerializer implements LinkReferenceSerializ
      * Default serializer to use when no serializer is found for the link type.
      */
     @Requirement("xwiki/2.0")
-    private LinkTypeReferenceSerializer defaultLinkTypeReferenceSerializer;
+    private ResourceReferenceTypeSerializer defaultResourceReferenceTypeSerializer;
 
     /**
      * {@inheritDoc}
      *
-     * @see org.xwiki.rendering.renderer.link.LinkReferenceSerializer#serialize(
+     * @see org.xwiki.rendering.renderer.reference.ResourceReferenceSerializer#serialize(
      *      org.xwiki.rendering.listener.ResourceReference)
      */
     public String serialize(ResourceReference reference)
@@ -71,18 +71,18 @@ public class XWikiSyntaxLinkReferenceSerializer implements LinkReferenceSerializ
         String result;
 
         try {
-            result = this.componentManager.lookup(LinkTypeReferenceSerializer.class,
+            result = this.componentManager.lookup(ResourceReferenceTypeSerializer.class,
                 getLinkTypeSerializerComponentPrefix() + "/" + reference.getType().getScheme()).serialize(reference);
         } catch (ComponentLookupException e) {
             // Failed to find serializer for the passed link type. Use the default serializer.
-            result = this.defaultLinkTypeReferenceSerializer.serialize(reference);
+            result = this.defaultResourceReferenceTypeSerializer.serialize(reference);
         }
         return result;
     }
 
     /**
      * @return the role hint prefix to use when looking up
-     *         {@link org.xwiki.rendering.renderer.link.LinkTypeReferenceSerializer} implementations.
+     *         {@link org.xwiki.rendering.renderer.reference.ResourceReferenceTypeSerializer} implementations.
      */
     protected String getLinkTypeSerializerComponentPrefix()
     {

@@ -24,7 +24,7 @@ import org.xwiki.component.annotation.InstantiationStrategy;
 import org.xwiki.component.annotation.Requirement;
 import org.xwiki.component.descriptor.ComponentInstantiationStrategy;
 import org.xwiki.rendering.listener.ResourceReference;
-import org.xwiki.rendering.renderer.link.LinkTypeReferenceSerializer;
+import org.xwiki.rendering.renderer.reference.ResourceReferenceTypeSerializer;
 
 import java.util.Map;
 
@@ -44,7 +44,7 @@ public class DefaultXHTMLLinkTypeRenderer extends AbstractXHTMLLinkTypeRenderer
      * have a specific link type renderer found so this is only a fallback solution.
      */
     @Requirement("xwiki/2.0")
-    private LinkTypeReferenceSerializer defaultLinkTypeReferenceSerializer;
+    private ResourceReferenceTypeSerializer defaultResourceReferenceTypeSerializer;
 
     /**
      * {@inheritDoc}
@@ -56,7 +56,7 @@ public class DefaultXHTMLLinkTypeRenderer extends AbstractXHTMLLinkTypeRenderer
     protected void beginLinkExtraAttributes(ResourceReference reference, Map<String, String> spanAttributes,
         Map<String, String> anchorAttributes)
     {
-        anchorAttributes.put(XHTMLLinkRenderer.HREF, this.defaultLinkTypeReferenceSerializer.serialize(
+        anchorAttributes.put(XHTMLLinkRenderer.HREF, this.defaultResourceReferenceTypeSerializer.serialize(
             reference));
     }
 }

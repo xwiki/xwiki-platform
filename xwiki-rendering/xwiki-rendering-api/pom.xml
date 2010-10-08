@@ -140,7 +140,7 @@
             org/xwiki/rendering/internal/renderer/xwiki20/XWikiSyntaxChainingRenderer.java,
             org/xwiki/rendering/internal/renderer/xwiki20/XWikiSyntaxEscapeHandler.java,
             org/xwiki/rendering/internal/renderer/xwiki20/XWikiSyntaxImageRenderer.java,
-            org/xwiki/rendering/internal/renderer/xwiki20/link/XWikiSyntaxLinkRenderer.java,
+            org/xwiki/rendering/internal/renderer/xwiki20/reference/XWikiSyntaxResourceRenderer.java,
             org/xwiki/rendering/internal/renderer/plain/PlainTextRenderer.java,
             org/xwiki/rendering/internal/renderer/plain/PlainTextChainingRenderer.java,
             org/xwiki/rendering/internal/renderer/printer/XHTMLWriter.java,

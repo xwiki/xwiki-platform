@@ -23,7 +23,7 @@ import org.xwiki.component.annotation.Requirement;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.rendering.listener.ResourceReference;
-import org.xwiki.rendering.renderer.link.URILabelGenerator;
+import org.xwiki.rendering.renderer.reference.link.URILabelGenerator;
 import org.xwiki.rendering.renderer.printer.XHTMLWikiPrinter;
 
 import java.util.LinkedHashMap;
@@ -48,8 +48,8 @@ public abstract class AbstractXHTMLLinkTypeRenderer implements XHTMLLinkTypeRend
     protected static final String SPAN = "span";
 
     /**
-     * Used to look for {@link org.xwiki.rendering.renderer.link.URILabelGenerator} component implementations when
-     * computing labels.
+     * Used to look for {@link org.xwiki.rendering.renderer.reference.link.URILabelGenerator} component implementations
+     * when computing labels.
      */
     @Requirement
     protected ComponentManager componentManager;

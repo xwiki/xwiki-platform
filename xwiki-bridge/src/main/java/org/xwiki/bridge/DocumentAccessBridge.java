@@ -260,7 +260,7 @@ public interface DocumentAccessBridge
      * @param language The desired translation of the document.
      * @return The document's content.
      * @throws Exception If the document cannot be accessed.
-     * @deprecated replaced by {@link #getDocumentContent(DocumentReference)} since 2.2.1
+     * @deprecated replaced by {@link #getDocumentContent(DocumentReference, String)} since 2.2.1
      */
     @Deprecated
     String getDocumentContent(String documentReference, String language) throws Exception;
@@ -515,6 +515,19 @@ public interface DocumentAccessBridge
      * @since 2.2M1
      */
     String getAttachmentURL(AttachmentReference attachmentReference, boolean isFullURL);
+
+    /**
+     * Retrieves the URL (either relative ie the path without the hostname and port, or the full URL) that can be used
+     * to access an attachment.
+     *
+     * @param attachmentReference the attachment name for which to find the URL
+     * @param queryString An optional query string to append to the URL, use <code>null</code> or an empty string to
+     *        skip.
+     * @param isFullURL whether the returned URL will a relative URL or the full URL
+     * @return the attachment URL
+     * @since 2.5RC1
+     */
+    String getAttachmentURL(AttachmentReference attachmentReference, String queryString, boolean isFullURL);
 
     /**
      * Retrieves the URL (either relative ie the path without the hostname and port, or the full URL) that can be used

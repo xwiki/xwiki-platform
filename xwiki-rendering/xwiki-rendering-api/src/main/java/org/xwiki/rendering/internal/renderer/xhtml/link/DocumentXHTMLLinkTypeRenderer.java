@@ -134,17 +134,13 @@ public class DocumentXHTMLLinkTypeRenderer extends AbstractXHTMLLinkTypeRenderer
 
         if (StringUtils.isEmpty(reference.getReference())) {
             renderAutoLink(reference, spanAttributes, anchorAttributes);
-        } else if (this.wikiModel.isDocumentAvailable(reference.getReference())) {
+        } else if (this.wikiModel.isDocumentAvailable(reference)) {
             spanAttributes.put(CLASS, WIKILINK);
-            anchorAttributes.put(XHTMLLinkRenderer.HREF, this.wikiModel.getDocumentViewURL(reference.getReference(),
-                reference.getParameter(DocumentResourceReference.ANCHOR),
-                reference.getParameter(DocumentResourceReference.QUERY_STRING)));
+            anchorAttributes.put(XHTMLLinkRenderer.HREF, this.wikiModel.getDocumentViewURL(reference));
         } else {
             // The wiki document doesn't exist
             spanAttributes.put(CLASS, "wikicreatelink");
-            anchorAttributes.put(XHTMLLinkRenderer.HREF, this.wikiModel.getDocumentEditURL(reference.getReference(),
-                reference.getParameter(DocumentResourceReference.ANCHOR),
-                reference.getParameter(DocumentResourceReference.QUERY_STRING)));
+            anchorAttributes.put(XHTMLLinkRenderer.HREF, this.wikiModel.getDocumentEditURL(reference));
         }
 
         getXHTMLWikiPrinter().printXMLStartElement(SPAN, spanAttributes);

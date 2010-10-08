@@ -119,7 +119,7 @@ public class DefaultXHTMLImageRenderer implements XHTMLImageRenderer, Initializa
             // the Image Reference parser used beforehand. However we're adding a protection here against Image
             // Reference parsers that would not honor this contract...
             if (this.wikiModel != null) {
-                imageURL = this.wikiModel.getImageURL(reference.getReference(), parameters);
+                imageURL = this.wikiModel.getImageURL(reference, parameters);
             } else {
                 throw new RuntimeException("Invalid Image type. In non wiki mode, all image types must be URL images.");
             }

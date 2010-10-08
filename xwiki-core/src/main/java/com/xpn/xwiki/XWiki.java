@@ -5095,8 +5095,17 @@ public class XWiki implements XWikiDocChangeNotificationInterface
 
     public String getAttachmentURL(String fullname, String filename, XWikiContext context) throws XWikiException
     {
+        return getAttachmentURL(fullname, filename, null, context); 
+    }
+
+    /**
+     * @since 2.5RC1
+     */
+    public String getAttachmentURL(String fullname, String filename, String queryString, XWikiContext context)
+        throws XWikiException
+    {
         XWikiDocument doc = new XWikiDocument(this.currentMixedDocumentReferenceResolver.resolve(fullname));
-        return doc.getAttachmentURL(filename, "download", context);
+        return doc.getAttachmentURL(filename, "download", queryString, context);
     }
 
     // Usefull date functions

@@ -23,6 +23,9 @@ import java.util.Map;
 
 import org.xwiki.component.descriptor.ComponentDescriptor;
 import org.xwiki.component.descriptor.DefaultComponentDescriptor;
+import org.xwiki.rendering.listener.AttachmentResourceReference;
+import org.xwiki.rendering.listener.DocumentResourceReference;
+import org.xwiki.rendering.listener.ResourceReference;
 import org.xwiki.rendering.wiki.WikiModel;
 
 /**
@@ -50,33 +53,22 @@ public class MockWikiModel implements WikiModel
 
     /**
      * {@inheritDoc}
-     * 
-     * @see WikiModel#getAttachmentURL(String, String)
-     * @deprecated since 2.5RC1 use {@link #getAttachmentURL(String)} instead
-     */
-    @Deprecated
-    public String getAttachmentURL(String documentReference, String attachmentName)
-    {
-        return "attachmenturl";
-    }
-
-    /**
-     * {@inheritDoc}
      *
-     * @see WikiModel#getAttachmentURL(String)
+     * @see WikiModel#getAttachmentURL(org.xwiki.rendering.listener.ResourceReference)
      * @since 2.5RC1
      */
-    public String getAttachmentURL(String attachmentReference)
+    public String getAttachmentURL(ResourceReference attachmentReference)
     {
-        return "attachmenturl";
+        String queryString = attachmentReference.getParameter(AttachmentResourceReference.QUERY_STRING);
+        return "attachmenturl" + (queryString != null ? "?" + queryString : "");
     }
 
     /**
      * {@inheritDoc}
      *
-     * @see WikiModel#getImageURL(String, java.util.Map)
+     * @see WikiModel#getImageURL(org.xwiki.rendering.listener.ResourceReference, java.util.Map)
      */
-    public String getImageURL(String attachmentReference, Map<String, String> parameters)
+    public String getImageURL(ResourceReference attachmentReference, Map<String, String> parameters)
     {
         return getAttachmentURL(attachmentReference);
     }
@@ -84,9 +76,9 @@ public class MockWikiModel implements WikiModel
     /**
      * {@inheritDoc}
      * 
-     * @see WikiModel#getDocumentEditURL(String, String, String)
+     * @see WikiModel#getDocumentEditURL(org.xwiki.rendering.listener.ResourceReference)
      */
-    public String getDocumentEditURL(String documentReference, String anchor, String queryString)
+    public String getDocumentEditURL(ResourceReference documentReference)
     {
         return "editurl";
     }
@@ -94,20 +86,22 @@ public class MockWikiModel implements WikiModel
     /**
      * {@inheritDoc}
      * 
-     * @see WikiModel#getDocumentViewURL(String, String, String)
+     * @see WikiModel#getDocumentViewURL(org.xwiki.rendering.listener.ResourceReference)
      */
-    public String getDocumentViewURL(String documentReference, String anchor, String queryString)
+    public String getDocumentViewURL(ResourceReference documentReference)
     {
+        String queryString = documentReference.getParameter(DocumentResourceReference.QUERY_STRING);
+        String anchor = documentReference.getParameter(DocumentResourceReference.ANCHOR);
         return "viewurl" + (queryString != null ? "?" + queryString : "") + (anchor != null ? "#" + anchor : "");
     }
 
     /**
      * {@inheritDoc}
      * 
-     * @see WikiModel#isDocumentAvailable(String)
+     * @see WikiModel#isDocumentAvailable(org.xwiki.rendering.listener.ResourceReference)
      */
-    public boolean isDocumentAvailable(String documentReference)
+    public boolean isDocumentAvailable(ResourceReference documentReference)
     {
-        return "Space.ExistingPage".equals(documentReference);
+        return "Space.ExistingPage".equals(documentReference.getReference());
     }
 }

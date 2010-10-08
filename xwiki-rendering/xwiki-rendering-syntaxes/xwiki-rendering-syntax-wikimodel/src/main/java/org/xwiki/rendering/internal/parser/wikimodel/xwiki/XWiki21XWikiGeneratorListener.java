@@ -40,13 +40,22 @@ import org.xwiki.rendering.util.IdGenerator;
 public class XWiki21XWikiGeneratorListener extends DefaultXWikiGeneratorListener
 {
     /**
+     * Parameter name for Query String.
+     */
+    private static final String QUERY_STRING = "queryString";
+
+    /**
+     * Parameter name for Anchor.
+     */
+    private static final String ANCHOR = "anchor";
+
+    /**
      * @param parser the parser to use to parse link labels
      * @param listener the XWiki listener to which to forward WikiModel events
      * @param linkReferenceParser the parser to parse link references
      * @param imageReferenceParser the parser to parse image references
      * @param plainRendererFactory used to generate header ids
      * @param idGenerator used to generate header ids
-     * @since 2.5RC1
      */
     public XWiki21XWikiGeneratorListener(StreamParser parser, Listener listener,
         ResourceReferenceParser linkReferenceParser, ResourceReferenceParser imageReferenceParser,
@@ -67,16 +76,35 @@ public class XWiki21XWikiGeneratorListener extends DefaultXWikiGeneratorListener
         // query string and/or the anchor specified as parameters. This is how the XWiki Syntax 2.1 specifies
         // query string and anchor (ex: [[label>>doc:docReference||queryString="a=b" anchor="anchor"]]).
         if (reference.getType().equals(ResourceType.DOCUMENT)) {
-            String queryString = parameters.remove("queryString");
+            String queryString = parameters.remove(QUERY_STRING);
             if (queryString != null) {
                 reference.setParameter(DocumentResourceReference.QUERY_STRING, queryString);
             }
-            String anchor = parameters.remove("anchor");
+            String anchor = parameters.remove(ANCHOR);
             if (anchor != null) {
                 reference.setParameter(DocumentResourceReference.ANCHOR, anchor);
             }
         }
 
         super.onReference(reference, label, isFreeStandingURI, parameters);
+    }
+
+    /**
+     * {@inheritDoc}
+     *
+     * @see DefaultXWikiGeneratorListener#onImage(org.xwiki.rendering.listener.ResourceReference, boolean,
+     *      java.util.Map)
+     */
+    protected void onImage(ResourceReference reference, boolean isFreeStandingURI, Map<String, String> parameters)
+    {
+        // Since 2.5M2, handle the special case when the image syntax used for an image has a query string specified.
+        if (reference.getType().equals(ResourceType.ATTACHMENT)) {
+            String queryString = parameters.remove(QUERY_STRING);
+            if (queryString != null) {
+                reference.setParameter(DocumentResourceReference.QUERY_STRING, queryString);
+            }
+        }
+
+        super.onImage(reference, isFreeStandingURI, parameters);
     }
 }

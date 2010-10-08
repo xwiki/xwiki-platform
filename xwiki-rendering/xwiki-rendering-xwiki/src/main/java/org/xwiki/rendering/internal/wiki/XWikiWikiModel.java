@@ -35,6 +35,9 @@ import org.xwiki.model.reference.AttachmentReferenceResolver;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.rendering.internal.configuration.XWikiRenderingConfiguration;
+import org.xwiki.rendering.listener.AttachmentResourceReference;
+import org.xwiki.rendering.listener.DocumentResourceReference;
+import org.xwiki.rendering.listener.ResourceReference;
 import org.xwiki.rendering.wiki.WikiModel;
 
 import com.steadystate.css.parser.CSSOMParser;
@@ -94,37 +97,28 @@ public class XWikiWikiModel implements WikiModel
 
     /**
      * {@inheritDoc}
-     * 
-     * @see WikiModel#getAttachmentURL(String, String)
-     * @deprecated since 2.5RC1 use {@link #getAttachmentURL(String)} instead
-     */
-    @Deprecated
-    public String getAttachmentURL(String documentReference, String attachmentName)
-    {
-        return this.documentAccessBridge.getAttachmentURL(documentReference, attachmentName);
-    }
-
-    /**
-     * {@inheritDoc}
      *
-     * @see WikiModel#getAttachmentURL(String)
+     * @see WikiModel#getAttachmentURL(org.xwiki.rendering.listener.ResourceReference)
      * @since 2.5RC1 
      */
-    public String getAttachmentURL(String attachmentReference)
+    public String getAttachmentURL(ResourceReference attachmentReference)
     {
         return this.documentAccessBridge.getAttachmentURL(
-            this.currentAttachmentReferenceResolver.resolve(attachmentReference), true);
+            this.currentAttachmentReferenceResolver.resolve(attachmentReference.getReference()),
+            attachmentReference.getParameter(AttachmentResourceReference.QUERY_STRING), true);
     }
 
     /**
      * {@inheritDoc}
      * 
-     * @see org.xwiki.rendering.wiki.WikiModel#getImageURL(String, java.util.Map)
+     * @see org.xwiki.rendering.wiki.WikiModel#getImageURL(org.xwiki.rendering.listener.ResourceReference,
+     *      java.util.Map)
+     * @since 2.5RC1
      */
-    public String getImageURL(String attachmentReference, Map<String, String> parameters)
+    public String getImageURL(ResourceReference attachmentReference, Map<String, String> parameters)
     {
         String url = getAttachmentURL(attachmentReference);
-        if (!xwikiRenderingConfiguration.isImageDimensionsIncludedInImageURL()) {
+        if (!this.xwikiRenderingConfiguration.isImageDimensionsIncludedInImageURL()) {
             return url;
         }
 
@@ -151,34 +145,36 @@ public class XWikiWikiModel implements WikiModel
     /**
      * {@inheritDoc}
      * 
-     * @see WikiModel#isDocumentAvailable(String)
+     * @see WikiModel#isDocumentAvailable(org.xwiki.rendering.listener.ResourceReference)
      */
-    public boolean isDocumentAvailable(String documentReference)
+    public boolean isDocumentAvailable(ResourceReference documentReference)
     {
-        return this.documentAccessBridge.exists(documentReference);
+        return this.documentAccessBridge.exists(documentReference.getReference());
     }
 
     /**
      * {@inheritDoc}
      * 
-     * @see WikiModel#getDocumentViewURL(String, String, String)
+     * @see WikiModel#getDocumentViewURL(org.xwiki.rendering.listener.ResourceReference)
      */
-    public String getDocumentViewURL(String documentReference, String anchor, String queryString)
+    public String getDocumentViewURL(ResourceReference documentReference)
     {
-        return this.documentAccessBridge.getURL(documentReference, "view", queryString, anchor);
+        return this.documentAccessBridge.getURL(documentReference.getReference(), "view",
+            documentReference.getParameter(DocumentResourceReference.QUERY_STRING),
+            documentReference.getParameter(DocumentResourceReference.ANCHOR));
     }
 
     /**
      * {@inheritDoc}
      * 
-     * @see WikiModel#getDocumentEditURL(String, String, String)
+     * @see WikiModel#getDocumentEditURL(org.xwiki.rendering.listener.ResourceReference)
      */
-    public String getDocumentEditURL(String documentReference, String anchor, String queryString)
+    public String getDocumentEditURL(ResourceReference documentReference)
     {
         // Add the parent=<current document name> parameter to the query string of the edit URL so that
         // the new document is created with the current page as its parent.
-        String modifiedQueryString = queryString;
-        if (StringUtils.isBlank(queryString)) {
+        String modifiedQueryString = documentReference.getParameter(DocumentResourceReference.QUERY_STRING);
+        if (StringUtils.isBlank(modifiedQueryString)) {
             DocumentReference reference = this.documentAccessBridge.getCurrentDocumentReference();
             if (reference != null) {
                 try {
@@ -197,7 +193,8 @@ public class XWikiWikiModel implements WikiModel
             }
         }
 
-        return this.documentAccessBridge.getURL(documentReference, "create", modifiedQueryString, anchor);
+        return this.documentAccessBridge.getURL(documentReference.getReference(), "create", modifiedQueryString,
+            documentReference.getParameter(DocumentResourceReference.ANCHOR));
     }
 
     /**

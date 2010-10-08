@@ -24,6 +24,7 @@ import java.util.Map;
 import org.apache.commons.lang.StringUtils;
 import org.xwiki.rendering.internal.renderer.printer.XWikiSyntaxEscapeWikiPrinter;
 import org.xwiki.rendering.internal.renderer.xwiki20.XWikiSyntaxListenerChain;
+import org.xwiki.rendering.listener.AttachmentResourceReference;
 import org.xwiki.rendering.listener.DocumentResourceReference;
 import org.xwiki.rendering.listener.ResourceReference;
 import org.xwiki.rendering.listener.ResourceType;
@@ -38,6 +39,16 @@ import org.xwiki.rendering.renderer.reference.ResourceReferenceSerializer;
 public class XWikiSyntaxResourceRenderer
     extends org.xwiki.rendering.internal.renderer.xwiki20.reference.XWikiSyntaxResourceRenderer
 {
+    /**
+     * Parameter name under which to serialize the query string in XWiki Syntax 2.1.
+     */
+    private static final String QUERY_STRING = "queryString";
+
+    /**
+     * Parameter name under which to serialize the query string in XWiki Syntax 2.1.
+     */
+    private static final String ANCHOR = "anchor";
+
     /**
      * @param listenerChain the rendering chain
      * @param referenceSerializer the serializer implementation to use to serialize link references
@@ -61,13 +72,16 @@ public class XWikiSyntaxResourceRenderer
         // Print the Query String and Anchor as parameters if they're defined and if the link is a link to a document.
         boolean shouldPrintSeparator = true;
 
-        // The XWiki Syntax 2.1 supports two special Link reference parameters: queryString and anchor.
+        // The XWiki Syntax 2.1 supports two special reference parameters for document references:
+        // - queryString and anchor.
+        // The XWiki Syntax 2.1 supports one special reference parameters for attachment references:
+        // - queryString.
         if (reference.getType().equals(ResourceType.DOCUMENT)) {
             // Print first the query string
             String queryString = reference.getParameter(DocumentResourceReference.QUERY_STRING);
             if (!StringUtils.isEmpty(queryString)) {
                 printer.print(PARAMETER_SEPARATOR);
-                printer.print(this.parametersPrinter.print("queryString", queryString, '~'));
+                printer.print(this.parametersPrinter.print(QUERY_STRING, queryString, '~'));
                 shouldPrintSeparator = false;
             }
             // Then print the anchor
@@ -78,7 +92,14 @@ public class XWikiSyntaxResourceRenderer
                 } else {
                     printer.print(" ");
                 }
-                printer.print(this.parametersPrinter.print("anchor", anchor, '~'));
+                printer.print(this.parametersPrinter.print(ANCHOR, anchor, '~'));
+                shouldPrintSeparator = false;
+            }
+        } else if (reference.getType().equals(ResourceType.ATTACHMENT)) {
+            String queryString = reference.getParameter(AttachmentResourceReference.QUERY_STRING);
+            if (!StringUtils.isEmpty(queryString)) {
+                printer.print(PARAMETER_SEPARATOR);
+                printer.print(this.parametersPrinter.print(QUERY_STRING, queryString, '~'));
                 shouldPrintSeparator = false;
             }
         }

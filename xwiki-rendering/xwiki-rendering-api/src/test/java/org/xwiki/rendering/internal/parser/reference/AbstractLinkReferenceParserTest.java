@@ -65,13 +65,6 @@ public abstract class AbstractLinkReferenceParserTest extends AbstractComponentT
         Assert.assertEquals("Typed = [true] Type = [mailto] Reference = [john@smith.com?subject=test]",
             reference.toString());
 
-        // Verify image: URI is recognized
-        reference = parser.parse("image:some:content");
-        Assert.assertEquals("some:content", reference.getReference());
-        Assert.assertTrue(reference.isTyped());
-        Assert.assertEquals(ResourceType.IMAGE, reference.getType());
-        Assert.assertEquals("Typed = [true] Type = [image] Reference = [some:content]", reference.toString());
-
         // Verify attach: URI is recognized
         reference = parser.parse("attach:some:content");
         Assert.assertEquals("some:content", reference.getReference());

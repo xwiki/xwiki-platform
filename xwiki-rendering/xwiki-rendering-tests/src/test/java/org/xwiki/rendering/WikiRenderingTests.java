@@ -83,6 +83,8 @@ public class WikiRenderingTests extends TestCase
         suite.addTestsFromResource("image/image5", false);
         suite.addTestsFromResource("image/image6", false);
         suite.addTestsFromResource("image/image7", false);
+        suite.addTestsFromResource("image/image8", false);
+        suite.addTestsFromResource("image/image9", false);
 
         ComponentManagerTestSetup testSetup = new ComponentManagerTestSetup(suite);
         testSetup.addComponentDescriptor(MockWikiModel.getComponentDescriptor());

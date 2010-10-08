@@ -10,7 +10,6 @@ org.xwiki.rendering.internal.parser.reference.DocumentResourceReferenceTypeParse
 org.xwiki.rendering.internal.parser.reference.InterWikiResourceReferenceTypeParser
 org.xwiki.rendering.internal.parser.reference.URLResourceReferenceTypeParser
 org.xwiki.rendering.internal.parser.reference.MailtoResourceReferenceTypeParser
-org.xwiki.rendering.internal.parser.reference.ImageResourceReferenceTypeParser
 org.xwiki.rendering.internal.parser.reference.AttachmentResourceReferenceTypeParser
 org.xwiki.rendering.internal.parser.reference.PathResourceReferenceTypeParser
 org.xwiki.rendering.internal.renderer.DefaultLinkLabelGenerator

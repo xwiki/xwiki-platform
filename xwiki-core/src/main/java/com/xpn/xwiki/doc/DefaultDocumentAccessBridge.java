@@ -737,19 +737,38 @@ public class DefaultDocumentAccessBridge implements DocumentAccessBridge
      */
     public String getAttachmentURL(AttachmentReference attachmentReference, boolean isFullURL)
     {
+        return getAttachmentURL(attachmentReference, null, isFullURL);
+    }
+
+    /**
+     * {@inheritDoc}
+     *
+     * @see DocumentAccessBridge#getAttachmentURL(org.xwiki.model.reference.AttachmentReference, String, boolean)
+     * @since 2.5RC1
+     */
+    public String getAttachmentURL(AttachmentReference attachmentReference, String queryString, boolean isFullURL)
+    {
         String url;
         if (isFullURL) {
             XWikiContext xcontext = getContext();
             url =
                     xcontext.getURLFactory().createAttachmentURL(attachmentReference.getName(),
                         attachmentReference.getDocumentReference().getLastSpaceReference().getName(),
-                        attachmentReference.getDocumentReference().getName(), "download", null,
+                        attachmentReference.getDocumentReference().getName(), "download", queryString,
                         attachmentReference.getDocumentReference().getWikiReference().getName(), xcontext).toString();
         } else {
-            url =
-                    getAttachmentURL(
-                        this.entityReferenceSerializer.serialize(attachmentReference.getDocumentReference()),
-                        attachmentReference.getName());
+            XWikiContext xcontext = getContext();
+            String documentReference =
+                this.entityReferenceSerializer.serialize(attachmentReference.getDocumentReference());
+            try {
+                url = xcontext.getWiki().getAttachmentURL(
+                    documentReference == null ? xcontext.getDoc().getFullName() : documentReference, queryString,
+                    attachmentReference.getName(), xcontext);
+            } catch (XWikiException e) {
+                // This cannot happen. There's a bug in the definition of XWiki.getAttachmentURL: it says it can generate
+                // an exception but in fact no exception is raised in the current implementation.
+                throw new RuntimeException("Failed to get attachment URL", e);
+            }
         }
         return url;
     }

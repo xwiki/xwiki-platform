@@ -75,9 +75,9 @@ public class XWikiServletURLFactory extends XWikiDefaultURLFactory
      */
     public void init(XWikiContext context)
     {
-        contextPath = context.getWiki().getWebAppPath(context);
+        this.contextPath = context.getWiki().getWebAppPath(context);
         try {
-            serverURL = new URL(getProtocol(context) + "://" + getHost(context));
+            this.serverURL = new URL(getProtocol(context) + "://" + getHost(context));
         } catch (MalformedURLException e) {
             // This can't happen.
         }
@@ -90,7 +90,7 @@ public class XWikiServletURLFactory extends XWikiDefaultURLFactory
      */
     public String getContextPath()
     {
-        return contextPath;
+        return this.contextPath;
     }
 
     /**
@@ -146,7 +146,7 @@ public class XWikiServletURLFactory extends XWikiDefaultURLFactory
     public URL getServerURL(String xwikidb, XWikiContext context) throws MalformedURLException
     {
         if (xwikidb == null || xwikidb.equals(context.getOriginalDatabase())) {
-            return serverURL;
+            return this.serverURL;
         }
 
         if (context.isMainWiki(xwikidb)) {
@@ -157,7 +157,7 @@ public class XWikiServletURLFactory extends XWikiDefaultURLFactory
         }
 
         URL url = context.getWiki().getServerURL(xwikidb, context);
-        return url == null ? serverURL : url;
+        return url == null ? this.serverURL : url;
     }
 
     /**

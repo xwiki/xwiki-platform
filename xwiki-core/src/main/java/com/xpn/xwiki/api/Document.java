@@ -73,6 +73,14 @@ import com.xpn.xwiki.util.TOCGenerator;
 import com.xpn.xwiki.util.Util;
 import com.xpn.xwiki.web.Utils;
 
+/**
+ * This class represents a document or page in the wiki.
+ * This is a security and usability wrapper which wraps {@link com.xpn.xwiki.doc.XWikiDocument}
+ * In scripting, an object representing the document in which the script resides will be bound to a variable called
+ * doc.
+ *
+ * @version $Id$ 
+ */
 public class Document extends Api
 {
     /** Logging helper object. */
@@ -316,9 +324,7 @@ public class Document extends Api
         }
     }
 
-    /**
-     * TODO: document this.
-     */
+    // TODO: document this.
     public String getFormat()
     {
         return this.doc.getFormat();
@@ -464,20 +470,23 @@ public class Document extends Api
     }
 
     /**
-     * return the comment of the latest update of the document
+     * @return the comment of the latest update of the document.
      */
     public String getComment()
     {
         return this.doc.getComment();
     }
 
+    /**
+     * @return true if the last change to this document was a minor edit.
+     */
     public boolean isMinorEdit()
     {
         return this.doc.isMinorEdit();
     }
 
     /**
-     * Return the list of existing translations for this document.
+     * @return the list of existing translations for this document.
      */
     public List<String> getTranslationList() throws XWikiException
     {
@@ -485,9 +494,9 @@ public class Document extends Api
     }
 
     /**
-     * return the translated document's content if the wiki is multilingual, the language is first checked in the URL,
-     * the cookie, the user profile and finally the wiki configuration if not, the language is the one on the wiki
-     * configuration
+     * @return the translated document's content if the wiki is multilingual, the language is first checked in the 
+     *         URL, the cookie, the user profile and finally the wiki configuration if not, the language is the one
+     *         on the wiki configuration.
      */
     public String getTranslatedContent() throws XWikiException
     {
@@ -495,7 +504,7 @@ public class Document extends Api
     }
 
     /**
-     * return the translated content in the given language
+     * @return the translated content in the given language
      */
     public String getTranslatedContent(String language) throws XWikiException
     {
@@ -503,7 +512,7 @@ public class Document extends Api
     }
 
     /**
-     * return the translated document in the given document
+     * @return the translated document in the given document
      */
     public Document getTranslatedDocument(String language) throws XWikiException
     {
@@ -511,8 +520,9 @@ public class Document extends Api
     }
 
     /**
-     * return the tranlated Document if the wiki is multilingual, the language is first checked in the URL, the cookie,
-     * the user profile and finally the wiki configuration if not, the language is the one on the wiki configuration
+     * @return the tranlated Document if the wiki is multilingual, the language is first checked in the URL, the 
+     *         cookie, the user profile and finally the wiki configuration if not, the language is the one on the 
+     *         wiki configuration.
      */
     public Document getTranslatedDocument() throws XWikiException
     {
@@ -520,7 +530,7 @@ public class Document extends Api
     }
 
     /**
-     * return the content of the document rendererd
+     * @return the content of the document rendered.
      */
     public String getRenderedContent() throws XWikiException
     {
@@ -572,7 +582,19 @@ public class Document extends Api
     }
 
     /**
-     * return a escaped version of the content of this document
+     * Get the document's content escaped.
+     * Gets the user's translation of this document and passes it through
+     * {@link org.apache.ecs.filter.CharacterFilter} which replaces:
+     * <ul>
+     * <li>" with &amp;#34;</li>
+     * <li>' with &amp;#8217;</li>
+     * <li>& with &amp;#160;</li>
+     * </ul>
+     * CAUTION: &amp;#8217; is not the same as ' and &amp;#160; is non breaking space, NOT &.
+     * If you wish to XML escape the content of the document, it is recommended that you use 
+     * {@link org.apache.velocity.tools.generic.EscapeTool}
+     * 
+     * @return a escaped version of the content of this document.
      */
     public String getEscapedContent() throws XWikiException
     {
@@ -580,7 +602,7 @@ public class Document extends Api
     }
 
     /**
-     * return the archive of the document in a string format
+     * @return the archive of the document in a string format.
      */
     public String getArchive() throws XWikiException
     {
@@ -588,7 +610,10 @@ public class Document extends Api
     }
 
     /**
-     * this function is accessible only if you have the programming rights return the archive of the document
+     * Get the archive of this document's history.
+     * This function is accessible only if you have the programming rights.
+     *
+     * @return the archive of this document's history as an {@link XWikiDocumentArchive}.
      */
     public XWikiDocumentArchive getDocumentArchive() throws XWikiException
     {
@@ -607,7 +632,7 @@ public class Document extends Api
     }
 
     /**
-     * return the URL of download for the the given attachment name
+     * Return the URL of download for the the given attachment name.
      * 
      * @param filename the name of the attachment
      * @return A String with the URL
@@ -618,9 +643,11 @@ public class Document extends Api
     }
 
     /**
-     * return the URL of the given action for the the given attachment name
+     * Get the URL of the given action for the the given attachment name.
      * 
-     * @return A string with the URL
+     * @param filename the name of the attachment.
+     * @param action what to do to the file for example "delattachment", "download" or "downloadrev".
+     * @return a string representation of a URL to do the given opperation.
      */
     public String getAttachmentURL(String filename, String action)
     {
@@ -628,9 +655,14 @@ public class Document extends Api
     }
 
     /**
-     * return the URL of the given action for the the given attachment name with "queryString" parameters
+     * Get the URL of an action on an attachment.
+     * the given action for the the given attachment name with "queryString" parameters
      * 
-     * @param queryString parameters added to the URL
+     * @param filename the name of the attachment.
+     * @param action what to do to the file for example "delattachment", "download" or "downloadrev" 
+     * @param queryString parameters added to the URL, the "rev" parameter is used to specify a revision if using
+     *                    the "downloadrev" action. The query string must not begin with an ? character.
+     * @return a string representation of a URL to do the given opperation.
      */
     public String getAttachmentURL(String filename, String action, String queryString)
     {
@@ -638,7 +670,11 @@ public class Document extends Api
     }
 
     /**
-     * return the URL for accessing to the archive of the attachment "filename" at the version "version"
+     * Get an old revision of an attachment.
+     *
+     * @param filename the name of the attachment.
+     * @param version a revision number such as "1.1" or "1.2".
+     * @return the URL for accessing to the archive of the attachment "filename" at the version "version"
      */
     public String getAttachmentRevisionURL(String filename, String version)
     {
@@ -646,16 +682,24 @@ public class Document extends Api
     }
 
     /**
-     * return the URL for accessing to the archive of the attachment "filename" at the version "version" and with the
-     * given queryString parameters
+     * Get an old revision of an attachment.
+     *
+     * @param filename the name of the attachment.
+     * @param version a revision number such as "1.1" or "1.2".
+     * @param queryString additional query parameters to pass in the request.
+     * @return the URL for accessing to the archive of the attachment "filename" at the version "version" 
+     *         with the given queryString parameters.
      */
-    public String getAttachmentRevisionURL(String filename, String version, String querystring)
+    public String getAttachmentRevisionURL(String filename, String version, String queryString)
     {
-        return this.doc.getAttachmentRevisionURL(filename, version, querystring, getXWikiContext());
+        return this.doc.getAttachmentRevisionURL(filename, version, queryString, getXWikiContext());
     }
 
     /**
-     * return the URL of this document in view mode
+     * Get the URL of this document.
+     *
+     * @return the URL to view this document, this will be a relitive URL for example: /xwiki/bin/view/Main/WebHome
+     * @see #getExternalURL() for an absolute URL which can used outside of the site.
      */
     public String getURL()
     {
@@ -663,7 +707,11 @@ public class Document extends Api
     }
 
     /**
-     * return the URL of this document with the given action
+     * Get the URL to do a given action on this document.
+     *
+     * @param action what to do to the document for example "view", "edit" or "inline".
+     * @return the URL of this document with the given action.
+     * @see #getExternalURL(String) for an absolute URL which can used outside of the site.
      */
     public String getURL(String action)
     {
@@ -671,15 +719,24 @@ public class Document extends Api
     }
 
     /**
-     * return the URL of this document with the given action and queryString as parameters
+     * Get the URL to do a given action on this document.
+     *
+     * @param action what to do to the document for example "view", "edit" or "inline".
+     * @param queryString parameters to pass in the request eg: "paramA=value1&paramB=value2"
+     * @return the URL of this document with the given action and queryString as parameters.
+     * @see #getExternalURL(String, String) for an absolute URL which can used outside of the site.
      */
-    public String getURL(String action, String querystring)
+    public String getURL(String action, String queryString)
     {
         return this.doc.getURL(action, querystring, getXWikiContext());
     }
 
     /**
-     * return the full URL of the document
+     * Get the external URL to do a given action on this document.
+     *
+     * @return the full URL of the document, sutable for use at external websites
+     *         for example: http://www.xwiki.org/xwiki/bin/view/Main/WebHome
+     * @see #getURL() for a reletive URL which can only be used inside of the site.
      */
     public String getExternalURL()
     {
@@ -687,13 +744,26 @@ public class Document extends Api
     }
 
     /**
-     * return the full URL of the document for the given action
+     * Get the external URL to do a given action on this document.
+     *
+     * @param action what to do to the document for example "view", "edit" or "inline".
+     * @return the URL of this document with the given action.
+     * @see #getURL() for a relative URL which can only be used inside of the site.
      */
     public String getExternalURL(String action)
     {
         return this.doc.getExternalURL(action, getXWikiContext());
     }
 
+    /**
+     * Get the URL to do a given action on this document.
+     *
+     * @param action what to do to the document for example "view", "edit" or "inline".
+     * @param queryString parameters to pass in the request eg: "paramA=value1&paramB=value2"
+     * @return the URL of this document with the given action and queryString as parameters.
+
+     * @see #getURL() for a relative URL which can only be used inside of the site.
+     */
     public String getExternalURL(String action, String querystring)
     {
         return this.doc.getExternalURL(action, querystring, getXWikiContext());

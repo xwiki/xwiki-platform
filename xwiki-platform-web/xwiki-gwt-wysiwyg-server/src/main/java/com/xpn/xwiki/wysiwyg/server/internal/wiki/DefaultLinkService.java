@@ -30,7 +30,7 @@ import org.xwiki.model.reference.EntityReferenceResolver;
 import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.rendering.listener.ResourceReference;
 import org.xwiki.rendering.listener.ResourceType;
-import org.xwiki.rendering.parser.LinkParser;
+import org.xwiki.rendering.parser.ResourceReferenceParser;
 import org.xwiki.rendering.renderer.link.LinkReferenceSerializer;
 
 import com.xpn.xwiki.wysiwyg.server.wiki.EntityReferenceConverter;
@@ -88,7 +88,7 @@ public class DefaultLinkService implements LinkService
      * replaced with a generic one to avoid confusion.
      */
     @Requirement("xwiki/2.1")
-    private LinkParser linkReferenceParser;
+    private ResourceReferenceParser linkReferenceParser;
 
     /**
      * The object used to convert between client-side entity references and server-side entity references.

@@ -271,13 +271,13 @@ XVq9K2VEJiSMaOtaeISGyPbWWy9oz4jXRgORpHPiOcFunz+jeccQEWSHsYHmAsS/vXPiV5eQDfpi
 #if($accessLevel)
   &lt;div class="floatcontainer"&gt;
     &lt;ul class="xwikitabbar" id="panelEditorSteps"&gt;
-      &lt;li id="firstwtab" class="active"&gt;&lt;a href="#PanelListSection"&gt;$msg.get("panelwizard.panellist")&lt;/a&gt;&lt;/li&gt;
-      &lt;li id="secondwtab"&gt;&lt;a href="#PageLayoutSection"&gt;$msg.get("panelwizard.pagelayout")&lt;/a&gt;&lt;/li&gt;
+      &lt;li id="firstwtab" class="active"&gt;&lt;a href="#PanelListSection"&gt;$escapetool.xml($msg.get('panelwizard.panellist'))&lt;/a&gt;&lt;/li&gt;
+      &lt;li id="secondwtab"&gt;&lt;a href="#PageLayoutSection"&gt;$escapetool.xml($msg.get('panelwizard.pagelayout'))&lt;/a&gt;&lt;/li&gt;
     &lt;/ul&gt;
   &lt;/div&gt;
   &lt;div id="xwikieditcontent" class="clear"&gt;
     &lt;div id="PanelListSection"&gt;
-      &lt;span id="draganddroptooltip" class="hastooltip"&gt;$msg.get("panelwizard.draganddrop")
+      &lt;span id="draganddroptooltip" class="hastooltip"&gt;$escapetool.xml($msg.get('panelwizard.draganddrop'))
       #set($panelClass = $xwiki.getDocument("Panels.PanelClass").xWikiClass)
       #set($categoryList = $panelClass.category.getProperty("values").value.split("[|]"))
       #set($sql = ", BaseObject as obj where obj.name=doc.fullName and obj.className='Panels.PanelClass' and doc.fullName!='Panels.PanelTemplate'")
@@ -316,8 +316,8 @@ XVq9K2VEJiSMaOtaeISGyPbWWy9oz4jXRgORpHPiOcFunz+jeccQEWSHsYHmAsS/vXPiV5eQDfpi
       //&lt;![CDATA[
       window.ajaxurl = "$ajaxurl";
       window.allPanelsPlace = new Object();
-      window.panelsavesuccess = "$msg.get("panelsavesuccess")";
-      window.panelsaveerror = "$msg.get("panelsaveerror")";
+      window.panelsavesuccess = "$escapetool.javascript($msg.get('panelsavesuccess'))";
+      window.panelsaveerror = "$escapetool.javascript($msg.get('panelsaveerror'))";
       #set($counter = 0)
       #set($panelsStatus = $util.hashMap)
       #foreach($category in $categoryList)
@@ -375,7 +375,7 @@ XVq9K2VEJiSMaOtaeISGyPbWWy9oz4jXRgORpHPiOcFunz+jeccQEWSHsYHmAsS/vXPiV5eQDfpi
               &lt;div class="accordionTabContentBox"&gt;
                 #set($categPanels = $categoryMap.get($category))
                 #if($categPanels.size() == 0)
-                  $msg.get("panelwizard.nopanels")
+                  $escapetool.xml($msg.get('panelwizard.nopanels'))
                 #else
                   #foreach ($item in $categPanels)
                     #set($panelDoc = $xwiki.getDocument($item))
@@ -383,7 +383,7 @@ XVq9K2VEJiSMaOtaeISGyPbWWy9oz4jXRgORpHPiOcFunz+jeccQEWSHsYHmAsS/vXPiV5eQDfpi
                           &lt;div class="panelitemc"&gt;
                             &lt;div class="label"&gt;$doc.display("name", $obj)&lt;/div&gt;
                             &lt;div id="panelContainer${panelCount}" class="panelcontainer"&gt;#if($panelsStatus.get($item) == "false")#displaypanel("$item")#else&lt;div class="panel"&gt;&lt;/div&gt;#end&lt;/div&gt;
-                            &lt;div class="xwikibuttonlink"&gt;&lt;a href="$xwiki.getURL("$item", "inline")"&gt;$msg.get("edit")&lt;/a&gt; &lt;a href="$xwiki.getURL("$item", "delete")"&gt;$msg.get("delete")&lt;/a&gt;&lt;/div&gt;
+                            &lt;div class="xwikibuttonlink"&gt;&lt;a href="$xwiki.getURL($item, 'inline')"&gt;$escapetool.xml($msg.get('edit'))&lt;/a&gt; &lt;a href="$xwiki.getURL("$item", "delete")"&gt;$escapetool.xml($msg.get('delete'))&lt;/a&gt;&lt;/div&gt;
                           &lt;/div&gt;
                           &lt;script type="text/javascript"&gt;
                           //&lt;![CDATA[
@@ -403,7 +403,7 @@ XVq9K2VEJiSMaOtaeISGyPbWWy9oz4jXRgORpHPiOcFunz+jeccQEWSHsYHmAsS/vXPiV5eQDfpi
        &lt;/div&gt;   ## end of allpanels div
      &lt;/div&gt;      ## end of PanelsListSection
      &lt;div id="PageLayoutSection"&gt;
-    $msg.get("panelwizard.choosepagelayout")
+    $escapetool.xml($msg.get('panelwizard.choosepagelayout'))
 
     #set($crtlayout = 0)
     #if($showLeftPanels and $showLeftPanels == "1")
@@ -420,7 +420,7 @@ XVq9K2VEJiSMaOtaeISGyPbWWy9oz4jXRgORpHPiOcFunz+jeccQEWSHsYHmAsS/vXPiV5eQDfpi
             #if($crtlayout == 0)id="selectedoption" #end 
             class="pagelayoutoption pagelayoutoption0"&gt;
               ##&lt;input type="radio" name="pagelayout" value="nosidecol" checked="cheched" /&gt;
-              &lt;label&gt;$msg.get("panelwizard.nosidecolumn")&lt;/label&gt;
+              &lt;label&gt;$escapetool.xml($msg.get('panelwizard.nosidecolumn'))&lt;/label&gt;
               &lt;div id="nosidecolumn" class="layoutmaquette"&gt;
                 &lt;div class="lmcontentcolumn"&gt;&lt;/div&gt;
               &lt;/div&gt;
@@ -431,7 +431,7 @@ XVq9K2VEJiSMaOtaeISGyPbWWy9oz4jXRgORpHPiOcFunz+jeccQEWSHsYHmAsS/vXPiV5eQDfpi
             #if($crtlayout == 1)id="selectedoption" #end
             class="pagelayoutoption pagelayoutoption1"&gt;
               ##&lt;input type="radio" name="pagelayout" value="leftcol" "/&gt;
-              &lt;label&gt;$msg.get("panelwizard.leftcolumn")&lt;/label&gt;
+              &lt;label&gt;$escapetool.xml($msg.get('panelwizard.leftcolumn'))&lt;/label&gt;
               &lt;div id="leftcolumn" class="layoutmaquette"&gt;
                 &lt;div class="lmleftcolumn"&gt;&lt;/div&gt;
                 &lt;div class="lmcontentcolumn"&gt;&lt;/div&gt;
@@ -443,7 +443,7 @@ XVq9K2VEJiSMaOtaeISGyPbWWy9oz4jXRgORpHPiOcFunz+jeccQEWSHsYHmAsS/vXPiV5eQDfpi
             #if($crtlayout == 2)id="selectedoption" #end
             class="pagelayoutoption pagelayoutoption2"&gt;
               ##&lt;input type="radio" name="pagelayout" value="rightcol" /&gt;
-              &lt;label&gt;$msg.get("panelwizard.rightcolumn")&lt;/label&gt;
+              &lt;label&gt;$escapetool.xml($msg.get('panelwizard.rightcolumn'))&lt;/label&gt;
               &lt;div id="rightcolumn" class="layoutmaquette"&gt;
                 &lt;div class="lmrightcolumn"&gt;&lt;/div&gt;
                 &lt;div class="lmcontentcolumn"&gt;&lt;/div&gt;
@@ -454,7 +454,7 @@ XVq9K2VEJiSMaOtaeISGyPbWWy9oz4jXRgORpHPiOcFunz+jeccQEWSHsYHmAsS/vXPiV5eQDfpi
             &lt;div 
             #if($crtlayout == 3)id="selectedoption" #end
             class="pagelayoutoption pagelayoutoption3"&gt;
-              &lt;label&gt;$msg.get("panelwizard.bothcolumns")&lt;/label&gt;
+              &lt;label&gt;$escapetool.xml($msg.get('panelwizard.bothcolumns'))&lt;/label&gt;
               &lt;div  id="bothcolumns" class="layoutmaquette"&gt;
                 &lt;div class="lmleftcolumn"&gt;&lt;/div&gt;
                 &lt;div class="lmrightcolumn"&gt;&lt;/div&gt;
@@ -469,9 +469,9 @@ XVq9K2VEJiSMaOtaeISGyPbWWy9oz4jXRgORpHPiOcFunz+jeccQEWSHsYHmAsS/vXPiV5eQDfpi
   &lt;/div&gt; ## xwikieditcontent
   &lt;div id="panelwizardbuttons" class="floatcontainer"&gt;
     &lt;span class="xwikibuttonlink"&gt;
-      &lt;span class="buttonwrapper"&gt;&lt;a id="saveLayout" href="#"&gt;$msg.get("xe.panels.wizard.savenew")&lt;/a&gt;&lt;/span&gt;
-      &lt;span class="buttonwrapper"&gt;&lt;a id="revertLayout" href="$doc.getURL("view")"&gt;$msg.get("xe.panels.wizard.revert")&lt;/a&gt;&lt;/span&gt;
-      &lt;span class="buttonwrapper"&gt;&lt;a href="$xwiki.getURL("Panels.WebHome")"&gt;$msg.get("xe.panels.wizard.homepage")&lt;/a&gt;&lt;/span&gt;
+      &lt;span class="buttonwrapper"&gt;&lt;a id="saveLayout" href="#"&gt;$escapetool.xml($msg.get('xe.panels.wizard.savenew'))&lt;/a&gt;&lt;/span&gt;
+      &lt;span class="buttonwrapper"&gt;&lt;a id="revertLayout" href="$doc.getURL("view")"&gt;$escapetool.xml($msg.get('xe.panels.wizard.revert'))&lt;/a&gt;&lt;/span&gt;
+      &lt;span class="buttonwrapper"&gt;&lt;a href="$xwiki.getURL("Panels.WebHome")"&gt;$escapetool.xml($msg.get('xe.panels.wizard.homepage'))&lt;/a&gt;&lt;/span&gt;
     &lt;/span&gt;
   &lt;/div&gt;
   &lt;script type="text/javascript"&gt;
@@ -480,7 +480,7 @@ XVq9K2VEJiSMaOtaeISGyPbWWy9oz4jXRgORpHPiOcFunz+jeccQEWSHsYHmAsS/vXPiV5eQDfpi
       if(window.isDraggingPanel) {
         return; 
       } 
-      showtip($('draganddroptooltip'), '$msg.get("panelwizard.tip")', 300);
+      showtip($('draganddroptooltip'), "$escapetool.javascript($msg.get('panelwizard.tip'))", 300);
     });
 
     Event.observe($('firstwtab'), "click", function(event) {
@@ -510,8 +510,8 @@ XVq9K2VEJiSMaOtaeISGyPbWWy9oz4jXRgORpHPiOcFunz+jeccQEWSHsYHmAsS/vXPiV5eQDfpi
   //]]&gt;
   &lt;/script&gt;
 #else
-  #xwikimessageboxstart("$msg.get('panelwizard.paneleditor')" "")
-  $msg.get("panelwizard.needadminright")
+  #xwikimessageboxstart($escapetool.xml($msg.get('panelwizard.paneleditor')) '')
+  $escapetool.xml($msg.get('panelwizard.needadminright'))
   #xwikimessageboxend()
 #end
 #end ## redirect

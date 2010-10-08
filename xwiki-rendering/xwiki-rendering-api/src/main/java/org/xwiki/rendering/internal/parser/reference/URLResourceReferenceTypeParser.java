@@ -23,8 +23,8 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.xwiki.component.annotation.Component;
-import org.xwiki.rendering.listener.ResourceReference;
-import org.xwiki.rendering.listener.ResourceType;
+import org.xwiki.rendering.listener.reference.ResourceReference;
+import org.xwiki.rendering.listener.reference.ResourceType;
 
 /**
  * Parses a resource reference to a URL.

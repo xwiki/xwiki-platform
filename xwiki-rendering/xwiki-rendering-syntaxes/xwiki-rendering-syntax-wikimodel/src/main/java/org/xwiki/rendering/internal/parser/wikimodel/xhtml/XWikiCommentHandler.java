@@ -29,7 +29,7 @@ import org.wikimodel.wem.xhtml.handler.CommentHandler;
 import org.wikimodel.wem.xhtml.impl.XhtmlHandler.TagStack;
 import org.xwiki.rendering.internal.parser.WikiModelXHTMLParser;
 import org.xwiki.rendering.internal.parser.wikimodel.XWikiGeneratorListener;
-import org.xwiki.rendering.listener.ResourceType;
+import org.xwiki.rendering.listener.reference.ResourceType;
 import org.xwiki.rendering.listener.Listener;
 import org.xwiki.rendering.parser.ResourceReferenceParser;
 import org.xwiki.rendering.renderer.PrintRenderer;

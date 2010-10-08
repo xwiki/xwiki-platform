@@ -38,7 +38,7 @@ import org.xwiki.rendering.block.NumberedListBlock;
 import org.xwiki.rendering.block.ParagraphBlock;
 import org.xwiki.rendering.block.SpaceBlock;
 import org.xwiki.rendering.block.WordBlock;
-import org.xwiki.rendering.listener.DocumentResourceReference;
+import org.xwiki.rendering.listener.reference.DocumentResourceReference;
 import org.xwiki.rendering.listener.Format;
 import org.xwiki.rendering.macro.AbstractMacro;
 import org.xwiki.rendering.macro.MacroExecutionException;

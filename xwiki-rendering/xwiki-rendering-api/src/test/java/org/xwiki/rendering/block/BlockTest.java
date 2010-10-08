@@ -27,10 +27,10 @@ import java.util.List;
 
 import junit.framework.TestCase;
 
-import org.xwiki.rendering.listener.DocumentResourceReference;
+import org.xwiki.rendering.listener.reference.DocumentResourceReference;
 import org.xwiki.rendering.listener.HeaderLevel;
-import org.xwiki.rendering.listener.ResourceReference;
-import org.xwiki.rendering.listener.ResourceType;
+import org.xwiki.rendering.listener.reference.ResourceReference;
+import org.xwiki.rendering.listener.reference.ResourceType;
 
 /**
  * Unit tests for Block manipulation, testing {@link AbstractBlock}.

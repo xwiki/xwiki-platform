@@ -27,13 +27,13 @@ import org.xwiki.component.annotation.Requirement;
 import org.xwiki.component.descriptor.ComponentInstantiationStrategy;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
-import org.xwiki.rendering.listener.ResourceReference;
+import org.xwiki.rendering.listener.reference.ResourceReference;
 import org.xwiki.rendering.renderer.printer.XHTMLWikiPrinter;
 
 /**
  * Default implementation for rendering links as XHTML. The implementation is pluggable in the sense that the
  * implementation is done by {@link org.xwiki.rendering.internal.renderer.xhtml.link.XHTMLLinkTypeRenderer}
- * implementation, each in charge of handling a given {@link org.xwiki.rendering.listener.ResourceType}.
+ * implementation, each in charge of handling a given {@link org.xwiki.rendering.listener.reference.ResourceType}.
  *
  * @version $Id$
  * @since 2.0M3
@@ -91,7 +91,7 @@ public class DefaultXHTMLLinkRenderer implements XHTMLLinkRenderer
     /**
      * {@inheritDoc}
      * 
-     * @see XHTMLLinkRenderer#beginLink(org.xwiki.rendering.listener.ResourceReference , boolean, Map)
+     * @see XHTMLLinkRenderer#beginLink(org.xwiki.rendering.listener.reference.ResourceReference , boolean, Map)
      */
     public void beginLink(ResourceReference reference, boolean isFreeStandingURI, Map<String, String> parameters)
     {
@@ -101,7 +101,7 @@ public class DefaultXHTMLLinkRenderer implements XHTMLLinkRenderer
     /**
      * {@inheritDoc}
      * 
-     * @see XHTMLLinkRenderer#endLink(org.xwiki.rendering.listener.ResourceReference , boolean, Map)
+     * @see XHTMLLinkRenderer#endLink(org.xwiki.rendering.listener.reference.ResourceReference , boolean, Map)
      */
     public void endLink(ResourceReference reference, boolean isFreeStandingURI, Map<String, String> parameters)
     {

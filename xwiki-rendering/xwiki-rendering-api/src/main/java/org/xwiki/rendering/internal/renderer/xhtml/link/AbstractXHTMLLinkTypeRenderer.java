@@ -22,7 +22,7 @@ package org.xwiki.rendering.internal.renderer.xhtml.link;
 import org.xwiki.component.annotation.Requirement;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
-import org.xwiki.rendering.listener.ResourceReference;
+import org.xwiki.rendering.listener.reference.ResourceReference;
 import org.xwiki.rendering.renderer.reference.link.URILabelGenerator;
 import org.xwiki.rendering.renderer.printer.XHTMLWikiPrinter;
 
@@ -164,7 +164,7 @@ public abstract class AbstractXHTMLLinkTypeRenderer implements XHTMLLinkTypeRend
     /**
      * {@inheritDoc}
      *
-     * @see XHTMLLinkRenderer#endLink(org.xwiki.rendering.listener.ResourceReference , boolean, Map)
+     * @see XHTMLLinkRenderer#endLink(org.xwiki.rendering.listener.reference.ResourceReference , boolean, Map)
      */
     public void endLink(ResourceReference reference, boolean isFreeStandingURI, Map<String, String> parameters)
     {

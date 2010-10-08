@@ -24,7 +24,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.xwiki.rendering.listener.Listener;
-import org.xwiki.rendering.listener.ResourceReference;
+import org.xwiki.rendering.listener.reference.ResourceReference;
 
 /**
  * Represents a Link element in a page.
@@ -35,7 +35,7 @@ import org.xwiki.rendering.listener.ResourceReference;
 public class LinkBlock extends AbstractFatherBlock
 {
     /**
-     * A reference to the link target. See {@link org.xwiki.rendering.listener.ResourceReference} for more details.
+     * A reference to the link target. See {@link org.xwiki.rendering.listener.reference.ResourceReference} for more details.
      */
     private ResourceReference reference;
 
@@ -72,7 +72,7 @@ public class LinkBlock extends AbstractFatherBlock
 
     /**
      * @return the reference to the target to link to
-     * @see org.xwiki.rendering.listener.ResourceReference
+     * @see org.xwiki.rendering.listener.reference.ResourceReference
      * @since 2.5RC1
      */
     public ResourceReference getReference()

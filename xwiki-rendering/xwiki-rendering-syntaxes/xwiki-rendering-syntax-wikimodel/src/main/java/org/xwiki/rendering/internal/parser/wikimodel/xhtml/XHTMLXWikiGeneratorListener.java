@@ -21,7 +21,7 @@ package org.xwiki.rendering.internal.parser.wikimodel.xhtml;
 
 import org.wikimodel.wem.WikiReference;
 import org.xwiki.rendering.internal.parser.wikimodel.DefaultXWikiGeneratorListener;
-import org.xwiki.rendering.listener.ResourceReference;
+import org.xwiki.rendering.listener.reference.ResourceReference;
 import org.xwiki.rendering.listener.Listener;
 import org.xwiki.rendering.parser.ResourceReferenceParser;
 import org.xwiki.rendering.parser.StreamParser;

@@ -20,10 +20,10 @@
 package org.xwiki.rendering.internal.parser.reference;
 
 import org.junit.*;
-import org.xwiki.rendering.listener.DocumentResourceReference;
-import org.xwiki.rendering.listener.InterWikiResourceReference;
-import org.xwiki.rendering.listener.ResourceReference;
-import org.xwiki.rendering.listener.ResourceType;
+import org.xwiki.rendering.listener.reference.DocumentResourceReference;
+import org.xwiki.rendering.listener.reference.InterWikiResourceReference;
+import org.xwiki.rendering.listener.reference.ResourceReference;
+import org.xwiki.rendering.listener.reference.ResourceType;
 import org.xwiki.rendering.parser.ResourceReferenceParser;
 import org.xwiki.rendering.wiki.WikiModel;
 

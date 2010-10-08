@@ -23,6 +23,7 @@ import java.util.LinkedList;
 import java.util.Map;
 
 import org.xwiki.rendering.listener.chaining.EventType;
+import org.xwiki.rendering.listener.reference.ResourceReference;
 import org.xwiki.rendering.syntax.Syntax;
 
 /**

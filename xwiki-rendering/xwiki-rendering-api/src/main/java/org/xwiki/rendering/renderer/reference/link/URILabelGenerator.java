@@ -20,7 +20,7 @@
 package org.xwiki.rendering.renderer.reference.link;
 
 import org.xwiki.component.annotation.ComponentRole;
-import org.xwiki.rendering.listener.ResourceReference;
+import org.xwiki.rendering.listener.reference.ResourceReference;
 
 /**
  * Generate Resource Reference labels for URIs. For example an implementation for MAILTO URIs would remove the scheme

@@ -31,7 +31,7 @@ import org.wikimodel.wem.WikiFormat;
 import org.wikimodel.wem.WikiParameter;
 import org.wikimodel.wem.WikiParameters;
 import org.xwiki.rendering.internal.parser.wikimodel.DefaultXWikiGeneratorListener;
-import org.xwiki.rendering.listener.ResourceReference;
+import org.xwiki.rendering.listener.reference.ResourceReference;
 import org.xwiki.rendering.listener.ListType;
 import org.xwiki.rendering.listener.Listener;
 import org.xwiki.rendering.listener.HeaderLevel;
@@ -494,7 +494,7 @@ public class WikiModelGeneratorListener implements Listener
 
     /**
      * {@inheritDoc}
-     * @see Listener#onImage(org.xwiki.rendering.listener.ResourceReference, boolean, java.util.Map)
+     * @see Listener#onImage(org.xwiki.rendering.listener.reference.ResourceReference , boolean, java.util.Map)
      * @since 2.5RC1
      */
     public void onImage(ResourceReference reference, boolean isFreeStandingURI, Map<String, String> parameters)

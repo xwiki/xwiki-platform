@@ -37,8 +37,8 @@ import org.xwiki.officeimporter.document.XDOMOfficeDocument;
 import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.block.ImageBlock;
 import org.xwiki.rendering.block.XDOM;
-import org.xwiki.rendering.listener.ResourceReference;
-import org.xwiki.rendering.listener.ResourceType;
+import org.xwiki.rendering.listener.reference.ResourceReference;
+import org.xwiki.rendering.listener.reference.ResourceType;
 
 /**
  * Default implementation of {@link org.xwiki.office.viewer.OfficeViewer}.

@@ -38,7 +38,7 @@ import org.xwiki.rendering.block.SpaceBlock;
 import org.xwiki.rendering.block.SpecialSymbolBlock;
 import org.xwiki.rendering.block.WordBlock;
 import org.xwiki.rendering.block.XDOM;
-import org.xwiki.rendering.listener.DocumentResourceReference;
+import org.xwiki.rendering.listener.reference.DocumentResourceReference;
 
 /**
  * Default implementation of {@link DocumentSplitter}.

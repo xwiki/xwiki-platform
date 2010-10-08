@@ -21,7 +21,7 @@ package org.xwiki.rendering.internal.parser.reference;
 
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.Requirement;
-import org.xwiki.rendering.listener.ResourceReference;
+import org.xwiki.rendering.listener.reference.ResourceReference;
 import org.xwiki.rendering.parser.ResourceReferenceTypeParser;
 
 /**

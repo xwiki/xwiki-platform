@@ -21,8 +21,8 @@ package org.xwiki.rendering.internal.parser.reference;
 
 import org.junit.Assert;
 import org.junit.Test;
-import org.xwiki.rendering.listener.ResourceReference;
-import org.xwiki.rendering.listener.ResourceType;
+import org.xwiki.rendering.listener.reference.ResourceReference;
+import org.xwiki.rendering.listener.reference.ResourceType;
 import org.xwiki.rendering.parser.ResourceReferenceParser;
 import org.xwiki.test.AbstractComponentTestCase;
 

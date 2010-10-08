@@ -30,8 +30,8 @@ import org.xwiki.component.descriptor.ComponentInstantiationStrategy;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.phase.Initializable;
 import org.xwiki.component.phase.InitializationException;
-import org.xwiki.rendering.listener.DocumentResourceReference;
-import org.xwiki.rendering.listener.ResourceReference;
+import org.xwiki.rendering.listener.reference.DocumentResourceReference;
+import org.xwiki.rendering.listener.reference.ResourceReference;
 import org.xwiki.rendering.renderer.reference.link.LinkLabelGenerator;
 import org.xwiki.rendering.wiki.WikiModel;
 
@@ -80,7 +80,7 @@ public class DocumentXHTMLLinkTypeRenderer extends AbstractXHTMLLinkTypeRenderer
     /**
      * {@inheritDoc}
      * 
-     * @see XHTMLLinkTypeRenderer#beginLink(org.xwiki.rendering.listener.ResourceReference , boolean, Map)
+     * @see XHTMLLinkTypeRenderer#beginLink(org.xwiki.rendering.listener.reference.ResourceReference , boolean, Map)
      */
     public void beginLink(ResourceReference reference, boolean isFreeStandingURI, Map<String, String> parameters)
     {
@@ -93,7 +93,7 @@ public class DocumentXHTMLLinkTypeRenderer extends AbstractXHTMLLinkTypeRenderer
 
     /**
      * {@inheritDoc}
-     * @see AbstractXHTMLLinkTypeRenderer#computeLabel(org.xwiki.rendering.listener.ResourceReference)
+     * @see AbstractXHTMLLinkTypeRenderer#computeLabel(org.xwiki.rendering.listener.reference.ResourceReference)
      */
     @Override
     protected String computeLabel(ResourceReference reference)
@@ -103,7 +103,7 @@ public class DocumentXHTMLLinkTypeRenderer extends AbstractXHTMLLinkTypeRenderer
 
     /**
      * {@inheritDoc}
-     * @see AbstractXHTMLLinkTypeRenderer#beginLinkExtraAttributes(org.xwiki.rendering.listener.ResourceReference , java.util.Map, java.util.Map)
+     * @see AbstractXHTMLLinkTypeRenderer#beginLinkExtraAttributes(org.xwiki.rendering.listener.reference.ResourceReference , java.util.Map, java.util.Map)
      */
     @Override
     protected void beginLinkExtraAttributes(ResourceReference reference, Map<String, String> spanAttributes,

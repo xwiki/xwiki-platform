@@ -21,7 +21,7 @@ package org.xwiki.rendering.internal.renderer.xwiki20.reference;
 
 import org.xwiki.component.annotation.Component;
 import org.xwiki.rendering.internal.parser.reference.AbstractXWiki21ResourceReferenceParser;
-import org.xwiki.rendering.listener.ResourceReference;
+import org.xwiki.rendering.listener.reference.ResourceReference;
 import org.xwiki.rendering.renderer.reference.ResourceReferenceTypeSerializer;
 
 /**
@@ -37,7 +37,7 @@ public class DefaultResourceReferenceTypeSerializer implements ResourceReference
     /**
      * {@inheritDoc}
      *
-     * @see org.xwiki.rendering.renderer.reference.ResourceReferenceTypeSerializer#serialize(org.xwiki.rendering.listener.ResourceReference)
+     * @see org.xwiki.rendering.renderer.reference.ResourceReferenceTypeSerializer#serialize(org.xwiki.rendering.listener.reference.ResourceReference)
      */
     public String serialize(ResourceReference reference)
     {

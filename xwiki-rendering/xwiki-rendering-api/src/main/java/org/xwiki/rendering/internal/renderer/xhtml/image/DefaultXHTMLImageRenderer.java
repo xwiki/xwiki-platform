@@ -30,8 +30,8 @@ import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.component.phase.Initializable;
 import org.xwiki.component.phase.InitializationException;
 import org.xwiki.component.descriptor.ComponentInstantiationStrategy;
-import org.xwiki.rendering.listener.ResourceReference;
-import org.xwiki.rendering.listener.ResourceType;
+import org.xwiki.rendering.listener.reference.ResourceReference;
+import org.xwiki.rendering.listener.reference.ResourceType;
 import org.xwiki.rendering.renderer.reference.link.URILabelGenerator;
 import org.xwiki.rendering.renderer.printer.XHTMLWikiPrinter;
 import org.xwiki.rendering.wiki.WikiModel;
@@ -105,7 +105,7 @@ public class DefaultXHTMLImageRenderer implements XHTMLImageRenderer, Initializa
     /**
      * {@inheritDoc}
      *
-     * @see XHTMLImageRenderer#onImage(org.xwiki.rendering.listener.ResourceReference, boolean, java.util.Map)
+     * @see XHTMLImageRenderer#onImage(org.xwiki.rendering.listener.reference.ResourceReference , boolean, java.util.Map)
      * @since 2.5RC1
      */
     public void onImage(ResourceReference reference, boolean isFreeStandingURI, Map<String, String> parameters)

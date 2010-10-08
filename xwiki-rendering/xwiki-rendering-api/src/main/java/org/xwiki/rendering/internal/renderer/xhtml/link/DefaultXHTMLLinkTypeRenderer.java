@@ -23,7 +23,7 @@ import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.InstantiationStrategy;
 import org.xwiki.component.annotation.Requirement;
 import org.xwiki.component.descriptor.ComponentInstantiationStrategy;
-import org.xwiki.rendering.listener.ResourceReference;
+import org.xwiki.rendering.listener.reference.ResourceReference;
 import org.xwiki.rendering.renderer.reference.ResourceReferenceTypeSerializer;
 
 import java.util.Map;
@@ -49,7 +49,7 @@ public class DefaultXHTMLLinkTypeRenderer extends AbstractXHTMLLinkTypeRenderer
     /**
      * {@inheritDoc}
      *
-     * @see AbstractXHTMLLinkTypeRenderer#beginLinkExtraAttributes(org.xwiki.rendering.listener.ResourceReference ,
+     * @see AbstractXHTMLLinkTypeRenderer#beginLinkExtraAttributes(org.xwiki.rendering.listener.reference.ResourceReference ,
      *      java.util.Map, java.util.Map)
      */
     @Override

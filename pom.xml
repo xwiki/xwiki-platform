@@ -216,6 +216,7 @@
                 <exclude>org/xwiki/rendering/listener/QueueListener</exclude>
                 <exclude>org/xwiki/rendering/listener/AbstractImage</exclude>
                 <exclude>org/xwiki/rendering/listener/ImageListener</exclude>
+                <exclude>org/xwiki/rendering/listener/ImageType</exclude>
                 <exclude>org/xwiki/rendering/listener/chaining/AbstractChainingListener</exclude>
                 <exclude>org/xwiki/rendering/listener/chaining/BlockStateChainingListener</exclude>
                 <exclude>org/xwiki/rendering/listener/chaining/ConsecutiveNewLineStateChainingListener</exclude>

@@ -26,7 +26,7 @@ import org.xwiki.component.descriptor.ComponentInstantiationStrategy;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.phase.Initializable;
 import org.xwiki.component.phase.InitializationException;
-import org.xwiki.rendering.listener.ResourceReference;
+import org.xwiki.rendering.listener.reference.ResourceReference;
 import org.xwiki.rendering.renderer.reference.ResourceReferenceTypeSerializer;
 import org.xwiki.rendering.wiki.WikiModel;
 
@@ -74,7 +74,7 @@ public class AttachmentXHTMLLinkTypeRenderer extends AbstractXHTMLLinkTypeRender
     /**
      * {@inheritDoc}
      *
-     * @see AbstractXHTMLLinkTypeRenderer#beginLinkExtraAttributes(org.xwiki.rendering.listener.ResourceReference ,
+     * @see AbstractXHTMLLinkTypeRenderer#beginLinkExtraAttributes(org.xwiki.rendering.listener.reference.ResourceReference ,
      *      java.util.Map, java.util.Map)
      */
     @Override

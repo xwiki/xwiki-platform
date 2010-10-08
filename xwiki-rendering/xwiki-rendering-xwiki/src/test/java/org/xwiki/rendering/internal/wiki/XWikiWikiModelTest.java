@@ -33,8 +33,8 @@ import org.xwiki.model.reference.AttachmentReferenceResolver;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.rendering.internal.configuration.XWikiRenderingConfiguration;
-import org.xwiki.rendering.listener.AttachmentResourceReference;
-import org.xwiki.rendering.listener.DocumentResourceReference;
+import org.xwiki.rendering.listener.reference.AttachmentResourceReference;
+import org.xwiki.rendering.listener.reference.DocumentResourceReference;
 import org.xwiki.test.AbstractMockingComponentTestCase;
 import org.xwiki.test.annotation.MockingRequirement;
 

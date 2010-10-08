@@ -21,7 +21,7 @@ package org.xwiki.rendering.listener.chaining;
 
 import org.xwiki.rendering.syntax.Syntax;
 import org.xwiki.rendering.listener.Format;
-import org.xwiki.rendering.listener.ResourceReference;
+import org.xwiki.rendering.listener.reference.ResourceReference;
 import org.xwiki.rendering.listener.ListType;
 import org.xwiki.rendering.listener.HeaderLevel;
 
@@ -132,7 +132,7 @@ public class EmptyBlockChainingListener extends AbstractChainingListener
      * {@inheritDoc}
      *
      * @see org.xwiki.rendering.listener.chaining.AbstractChainingListener#beginLink(
-     *      org.xwiki.rendering.listener.ResourceReference, boolean, java.util.Map)
+     *      org.xwiki.rendering.listener.reference.ResourceReference , boolean, java.util.Map)
      * @since 2.5RC1
      */
     @Override
@@ -379,7 +379,7 @@ public class EmptyBlockChainingListener extends AbstractChainingListener
      * {@inheritDoc}
      *
      * @see org.xwiki.rendering.listener.chaining.AbstractChainingListener#endLink(
-     *      org.xwiki.rendering.listener.ResourceReference, boolean, java.util.Map)
+     *      org.xwiki.rendering.listener.reference.ResourceReference , boolean, java.util.Map)
      * @since 2.5RC1
      */
     @Override
@@ -588,7 +588,7 @@ public class EmptyBlockChainingListener extends AbstractChainingListener
      * {@inheritDoc}
      *
      * @see org.xwiki.rendering.listener.chaining.AbstractChainingListener#onImage(
-     *      org.xwiki.rendering.listener.ResourceReference, boolean, java.util.Map)
+     *      org.xwiki.rendering.listener.reference.ResourceReference , boolean, java.util.Map)
      * @since 2.5RC1
      */
     @Override

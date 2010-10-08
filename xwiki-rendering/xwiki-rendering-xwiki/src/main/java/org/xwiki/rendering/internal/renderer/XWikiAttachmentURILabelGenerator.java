@@ -23,7 +23,7 @@ import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.Requirement;
 import org.xwiki.model.reference.AttachmentReference;
 import org.xwiki.model.reference.AttachmentReferenceResolver;
-import org.xwiki.rendering.listener.ResourceReference;
+import org.xwiki.rendering.listener.reference.ResourceReference;
 import org.xwiki.rendering.renderer.reference.link.URILabelGenerator;
 
 /**
@@ -44,7 +44,7 @@ public class XWikiAttachmentURILabelGenerator implements URILabelGenerator
     /**
      * {@inheritDoc}
      * @see org.xwiki.rendering.renderer.reference.link.URILabelGenerator#generateLabel(
-     *      org.xwiki.rendering.listener.ResourceReference)
+     *org.xwiki.rendering.listener.reference.ResourceReference)
      * @since 2.5RC1
      */
     public String generateLabel(ResourceReference reference)

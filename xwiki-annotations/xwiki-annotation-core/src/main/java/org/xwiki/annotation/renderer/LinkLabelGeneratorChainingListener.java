@@ -24,8 +24,8 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.xwiki.rendering.listener.Format;
-import org.xwiki.rendering.listener.ResourceReference;
-import org.xwiki.rendering.listener.ResourceType;
+import org.xwiki.rendering.listener.reference.ResourceReference;
+import org.xwiki.rendering.listener.reference.ResourceType;
 import org.xwiki.rendering.listener.WrappingListener;
 import org.xwiki.rendering.listener.chaining.AbstractChainingListener;
 import org.xwiki.rendering.listener.chaining.EmptyBlockChainingListener;
@@ -129,7 +129,7 @@ public class LinkLabelGeneratorChainingListener extends AbstractChainingListener
      * {@inheritDoc}
      * 
      * @see org.xwiki.rendering.listener.chaining.AbstractChainingListener#endLink(
-     *      org.xwiki.rendering.listener.ResourceReference, boolean, java.util.Map)
+     *      org.xwiki.rendering.listener.reference.ResourceReference , boolean, java.util.Map)
      * @since 2.5RC1
      */
     @Override

@@ -21,7 +21,7 @@ package org.xwiki.rendering.internal.renderer;
 
 import org.apache.commons.lang.StringUtils;
 import org.xwiki.component.annotation.Component;
-import org.xwiki.rendering.listener.ResourceReference;
+import org.xwiki.rendering.listener.reference.ResourceReference;
 import org.xwiki.rendering.renderer.reference.link.URILabelGenerator;
 
 /**
@@ -41,7 +41,7 @@ public class MailtoURILabelGenerator implements URILabelGenerator
     /**
      * {@inheritDoc}
      * @see org.xwiki.rendering.renderer.reference.link.URILabelGenerator#generateLabel(
-     *      org.xwiki.rendering.listener.ResourceReference)
+     *org.xwiki.rendering.listener.reference.ResourceReference)
      */
     public String generateLabel(ResourceReference reference)
     {

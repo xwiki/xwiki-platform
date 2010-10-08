@@ -22,8 +22,8 @@ package org.xwiki.rendering.internal.parser.wikimodel.xhtml;
 import org.wikimodel.wem.WikiParameter;
 import org.wikimodel.wem.WikiParameters;
 import org.wikimodel.wem.WikiReference;
-import org.xwiki.rendering.listener.ResourceReference;
-import org.xwiki.rendering.listener.ResourceType;
+import org.xwiki.rendering.listener.reference.ResourceReference;
+import org.xwiki.rendering.listener.reference.ResourceType;
 
 /**
  * WikiModel extension in order to add additional XWiki Link information so that the XWiki Generator Listener for the

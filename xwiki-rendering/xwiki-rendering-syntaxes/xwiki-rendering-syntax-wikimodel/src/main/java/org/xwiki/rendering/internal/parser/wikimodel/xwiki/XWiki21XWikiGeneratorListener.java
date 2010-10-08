@@ -22,9 +22,9 @@ package org.xwiki.rendering.internal.parser.wikimodel.xwiki;
 import java.util.Map;
 
 import org.xwiki.rendering.internal.parser.wikimodel.DefaultXWikiGeneratorListener;
-import org.xwiki.rendering.listener.DocumentResourceReference;
-import org.xwiki.rendering.listener.ResourceReference;
-import org.xwiki.rendering.listener.ResourceType;
+import org.xwiki.rendering.listener.reference.DocumentResourceReference;
+import org.xwiki.rendering.listener.reference.ResourceReference;
+import org.xwiki.rendering.listener.reference.ResourceType;
 import org.xwiki.rendering.listener.Listener;
 import org.xwiki.rendering.parser.ResourceReferenceParser;
 import org.xwiki.rendering.parser.StreamParser;
@@ -92,7 +92,7 @@ public class XWiki21XWikiGeneratorListener extends DefaultXWikiGeneratorListener
     /**
      * {@inheritDoc}
      *
-     * @see DefaultXWikiGeneratorListener#onImage(org.xwiki.rendering.listener.ResourceReference, boolean,
+     * @see DefaultXWikiGeneratorListener#onImage(org.xwiki.rendering.listener.reference.ResourceReference , boolean,
      *      java.util.Map)
      */
     protected void onImage(ResourceReference reference, boolean isFreeStandingURI, Map<String, String> parameters)

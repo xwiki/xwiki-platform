@@ -26,7 +26,7 @@ import org.apache.commons.lang.StringUtils;
 import org.xwiki.rendering.internal.parser.PlainTextStreamParser;
 import org.xwiki.rendering.internal.renderer.ParametersPrinter;
 import org.xwiki.rendering.internal.renderer.printer.XWikiSyntaxEscapeWikiPrinter;
-import org.xwiki.rendering.listener.ResourceReference;
+import org.xwiki.rendering.listener.reference.ResourceReference;
 import org.xwiki.rendering.listener.QueueListener.Event;
 import org.xwiki.rendering.listener.chaining.EventType;
 import org.xwiki.rendering.renderer.reference.ResourceReferenceSerializer;

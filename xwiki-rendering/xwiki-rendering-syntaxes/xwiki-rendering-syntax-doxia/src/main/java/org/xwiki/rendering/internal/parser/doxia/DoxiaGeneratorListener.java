@@ -24,7 +24,7 @@ import java.util.Map;
 import org.apache.maven.doxia.sink.Sink;
 import org.xwiki.rendering.listener.Format;
 import org.xwiki.rendering.listener.HeaderLevel;
-import org.xwiki.rendering.listener.ResourceReference;
+import org.xwiki.rendering.listener.reference.ResourceReference;
 import org.xwiki.rendering.listener.ListType;
 import org.xwiki.rendering.listener.Listener;
 import org.xwiki.rendering.syntax.Syntax;
@@ -471,7 +471,7 @@ public class DoxiaGeneratorListener implements Listener
     /**
      * {@inheritDoc}
      * 
-     * @see org.xwiki.rendering.listener.Listener#beginLink(org.xwiki.rendering.listener.ResourceReference , boolean,
+     * @see org.xwiki.rendering.listener.Listener#beginLink(org.xwiki.rendering.listener.reference.ResourceReference , boolean,
      *      Map)
      * @since 2.5RC1
      */
@@ -483,7 +483,7 @@ public class DoxiaGeneratorListener implements Listener
     /**
      * {@inheritDoc}
      * 
-     * @see org.xwiki.rendering.listener.Listener#endLink(org.xwiki.rendering.listener.ResourceReference , boolean, Map)
+     * @see org.xwiki.rendering.listener.Listener#endLink(org.xwiki.rendering.listener.reference.ResourceReference , boolean, Map)
      * @since 2.5RC1
      */
     public void endLink(ResourceReference reference, boolean isFreeStandingURI, Map<String, String> parameters)
@@ -494,7 +494,7 @@ public class DoxiaGeneratorListener implements Listener
     /**
      * {@inheritDoc}
      * 
-     * @see org.xwiki.rendering.listener.Listener#onImage(org.xwiki.rendering.listener.ResourceReference, boolean,
+     * @see org.xwiki.rendering.listener.Listener#onImage(org.xwiki.rendering.listener.reference.ResourceReference , boolean,
      *      java.util.Map)
      * @since 2.5RC1
      */

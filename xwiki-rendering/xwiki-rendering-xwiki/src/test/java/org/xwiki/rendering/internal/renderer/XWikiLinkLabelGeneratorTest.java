@@ -28,8 +28,8 @@ import org.xwiki.component.util.ReflectionUtils;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.rendering.configuration.RenderingConfiguration;
-import org.xwiki.rendering.listener.DocumentResourceReference;
-import org.xwiki.rendering.listener.ResourceReference;
+import org.xwiki.rendering.listener.reference.DocumentResourceReference;
+import org.xwiki.rendering.listener.reference.ResourceReference;
 
 /**
  * Unit tests for {@link XWikiLinkLabelGenerator}.

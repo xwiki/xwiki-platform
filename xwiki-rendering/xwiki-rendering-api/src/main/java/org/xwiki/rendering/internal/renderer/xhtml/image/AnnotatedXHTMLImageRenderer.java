@@ -22,7 +22,7 @@ package org.xwiki.rendering.internal.renderer.xhtml.image;
 import java.util.Map;
 
 import org.xwiki.rendering.internal.renderer.ParametersPrinter;
-import org.xwiki.rendering.listener.ResourceReference;
+import org.xwiki.rendering.listener.reference.ResourceReference;
 import org.xwiki.rendering.renderer.printer.XHTMLWikiPrinter;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.Requirement;
@@ -68,7 +68,7 @@ public class AnnotatedXHTMLImageRenderer implements XHTMLImageRenderer
 
     /**
      * {@inheritDoc}
-     * @see XHTMLImageRenderer#onImage(org.xwiki.rendering.listener.ResourceReference, boolean, java.util.Map)
+     * @see XHTMLImageRenderer#onImage(org.xwiki.rendering.listener.reference.ResourceReference , boolean, java.util.Map)
      * @since 2.5RC1
      */
     public void onImage(ResourceReference reference, boolean isFreeStandingURI, Map<String, String> parameters)

@@ -26,7 +26,7 @@ import org.xwiki.rendering.internal.renderer.printer.XWikiSyntaxEscapeWikiPrinte
 import org.xwiki.rendering.internal.renderer.xwiki20.reference.XWikiSyntaxResourceRenderer;
 import org.xwiki.rendering.listener.Format;
 import org.xwiki.rendering.listener.HeaderLevel;
-import org.xwiki.rendering.listener.ResourceReference;
+import org.xwiki.rendering.listener.reference.ResourceReference;
 import org.xwiki.rendering.listener.ListType;
 import org.xwiki.rendering.listener.chaining.BlockStateChainingListener;
 import org.xwiki.rendering.listener.chaining.ListenerChain;
@@ -190,7 +190,7 @@ public class XWikiSyntaxChainingRenderer extends AbstractChainingPrintRenderer i
      * {@inheritDoc}
      * 
      * @see org.xwiki.rendering.renderer.AbstractChainingPrintRenderer#beginLink(
-     *      org.xwiki.rendering.listener.ResourceReference , boolean, java.util.Map)
+     *      org.xwiki.rendering.listener.reference.ResourceReference , boolean, java.util.Map)
      */
     @Override
     public void beginLink(ResourceReference reference, boolean isFreeStandingURI, Map<String, String> parameters)
@@ -232,7 +232,7 @@ public class XWikiSyntaxChainingRenderer extends AbstractChainingPrintRenderer i
      * {@inheritDoc}
      * 
      * @see org.xwiki.rendering.renderer.AbstractChainingPrintRenderer#endLink(
-     *      org.xwiki.rendering.listener.ResourceReference, boolean, java.util.Map)
+     *      org.xwiki.rendering.listener.reference.ResourceReference , boolean, java.util.Map)
      */
     @Override
     public void endLink(ResourceReference reference, boolean isFreeStandingURI, Map<String, String> parameters)
@@ -850,7 +850,7 @@ public class XWikiSyntaxChainingRenderer extends AbstractChainingPrintRenderer i
     /**
      * {@inheritDoc}
      * 
-     * @see org.xwiki.rendering.listener.Listener#onImage(org.xwiki.rendering.listener.ResourceReference, boolean,
+     * @see org.xwiki.rendering.listener.Listener#onImage(org.xwiki.rendering.listener.reference.ResourceReference , boolean,
      *      java.util.Map)
      * @since 2.5RC1
      */

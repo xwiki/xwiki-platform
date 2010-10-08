@@ -23,7 +23,7 @@ import java.util.Collections;
 import java.util.Map;
 
 import org.xwiki.rendering.listener.Listener;
-import org.xwiki.rendering.listener.ResourceReference;
+import org.xwiki.rendering.listener.reference.ResourceReference;
 
 /**
  * Represents an image.
@@ -34,7 +34,7 @@ import org.xwiki.rendering.listener.ResourceReference;
 public class ImageBlock extends AbstractBlock
 {
     /**
-     * A reference to the image target. See {@link org.xwiki.rendering.listener.ResourceReference} for more details.
+     * A reference to the image target. See {@link org.xwiki.rendering.listener.reference.ResourceReference} for more details.
      */
     private ResourceReference reference;
 
@@ -71,7 +71,7 @@ public class ImageBlock extends AbstractBlock
 
     /**
      * @return the reference to the image
-     * @see org.xwiki.rendering.listener.ResourceReference
+     * @see org.xwiki.rendering.listener.reference.ResourceReference
      * @since 2.5RC1
      */
     public ResourceReference getReference()

@@ -23,9 +23,9 @@ import java.util.Map;
 
 import org.xwiki.component.descriptor.ComponentDescriptor;
 import org.xwiki.component.descriptor.DefaultComponentDescriptor;
-import org.xwiki.rendering.listener.AttachmentResourceReference;
-import org.xwiki.rendering.listener.DocumentResourceReference;
-import org.xwiki.rendering.listener.ResourceReference;
+import org.xwiki.rendering.listener.reference.AttachmentResourceReference;
+import org.xwiki.rendering.listener.reference.DocumentResourceReference;
+import org.xwiki.rendering.listener.reference.ResourceReference;
 import org.xwiki.rendering.wiki.WikiModel;
 
 /**
@@ -54,7 +54,7 @@ public class MockWikiModel implements WikiModel
     /**
      * {@inheritDoc}
      *
-     * @see WikiModel#getAttachmentURL(org.xwiki.rendering.listener.ResourceReference)
+     * @see WikiModel#getAttachmentURL(org.xwiki.rendering.listener.reference.ResourceReference)
      * @since 2.5RC1
      */
     public String getAttachmentURL(ResourceReference attachmentReference)
@@ -66,7 +66,7 @@ public class MockWikiModel implements WikiModel
     /**
      * {@inheritDoc}
      *
-     * @see WikiModel#getImageURL(org.xwiki.rendering.listener.ResourceReference, java.util.Map)
+     * @see WikiModel#getImageURL(org.xwiki.rendering.listener.reference.ResourceReference , java.util.Map)
      */
     public String getImageURL(ResourceReference attachmentReference, Map<String, String> parameters)
     {
@@ -76,7 +76,7 @@ public class MockWikiModel implements WikiModel
     /**
      * {@inheritDoc}
      * 
-     * @see WikiModel#getDocumentEditURL(org.xwiki.rendering.listener.ResourceReference)
+     * @see WikiModel#getDocumentEditURL(org.xwiki.rendering.listener.reference.ResourceReference)
      */
     public String getDocumentEditURL(ResourceReference documentReference)
     {
@@ -86,7 +86,7 @@ public class MockWikiModel implements WikiModel
     /**
      * {@inheritDoc}
      * 
-     * @see WikiModel#getDocumentViewURL(org.xwiki.rendering.listener.ResourceReference)
+     * @see WikiModel#getDocumentViewURL(org.xwiki.rendering.listener.reference.ResourceReference)
      */
     public String getDocumentViewURL(ResourceReference documentReference)
     {
@@ -98,7 +98,7 @@ public class MockWikiModel implements WikiModel
     /**
      * {@inheritDoc}
      * 
-     * @see WikiModel#isDocumentAvailable(org.xwiki.rendering.listener.ResourceReference)
+     * @see WikiModel#isDocumentAvailable(org.xwiki.rendering.listener.reference.ResourceReference)
      */
     public boolean isDocumentAvailable(ResourceReference documentReference)
     {

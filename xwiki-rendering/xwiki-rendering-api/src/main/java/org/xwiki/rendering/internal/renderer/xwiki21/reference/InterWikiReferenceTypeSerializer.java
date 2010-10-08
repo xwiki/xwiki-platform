@@ -22,8 +22,8 @@ package org.xwiki.rendering.internal.renderer.xwiki21.reference;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.rendering.internal.parser.reference.AbstractXWiki21ResourceReferenceParser;
 import org.xwiki.rendering.internal.parser.reference.InterWikiResourceReferenceTypeParser;
-import org.xwiki.rendering.listener.InterWikiResourceReference;
-import org.xwiki.rendering.listener.ResourceReference;
+import org.xwiki.rendering.listener.reference.InterWikiResourceReference;
+import org.xwiki.rendering.listener.reference.ResourceReference;
 import org.xwiki.rendering.renderer.reference.ResourceReferenceTypeSerializer;
 
 /**
@@ -38,7 +38,7 @@ public class InterWikiReferenceTypeSerializer implements ResourceReferenceTypeSe
     /**
      * {@inheritDoc}
      *
-     * @see org.xwiki.rendering.renderer.reference.ResourceReferenceTypeSerializer#serialize(org.xwiki.rendering.listener.ResourceReference)
+     * @see org.xwiki.rendering.renderer.reference.ResourceReferenceTypeSerializer#serialize(org.xwiki.rendering.listener.reference.ResourceReference)
      */
     public String serialize(ResourceReference reference)
     {

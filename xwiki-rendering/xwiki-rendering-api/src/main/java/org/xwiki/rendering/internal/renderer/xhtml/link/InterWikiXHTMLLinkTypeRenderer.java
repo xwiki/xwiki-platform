@@ -24,8 +24,8 @@ import org.xwiki.component.annotation.InstantiationStrategy;
 import org.xwiki.component.annotation.Requirement;
 import org.xwiki.component.descriptor.ComponentInstantiationStrategy;
 import org.xwiki.rendering.configuration.RenderingConfiguration;
-import org.xwiki.rendering.listener.InterWikiResourceReference;
-import org.xwiki.rendering.listener.ResourceReference;
+import org.xwiki.rendering.listener.reference.InterWikiResourceReference;
+import org.xwiki.rendering.listener.reference.ResourceReference;
 
 import java.util.Map;
 import java.util.Properties;
@@ -49,7 +49,7 @@ public class InterWikiXHTMLLinkTypeRenderer extends AbstractXHTMLLinkTypeRendere
     /**
      * {@inheritDoc}
      *
-     * @see AbstractXHTMLLinkTypeRenderer#beginLinkExtraAttributes(org.xwiki.rendering.listener.ResourceReference ,
+     * @see AbstractXHTMLLinkTypeRenderer#beginLinkExtraAttributes(org.xwiki.rendering.listener.reference.ResourceReference ,
      *      java.util.Map, java.util.Map)
      */
     @Override

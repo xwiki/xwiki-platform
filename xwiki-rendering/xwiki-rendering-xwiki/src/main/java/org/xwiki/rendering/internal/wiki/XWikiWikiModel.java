@@ -35,9 +35,9 @@ import org.xwiki.model.reference.AttachmentReferenceResolver;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.rendering.internal.configuration.XWikiRenderingConfiguration;
-import org.xwiki.rendering.listener.AttachmentResourceReference;
-import org.xwiki.rendering.listener.DocumentResourceReference;
-import org.xwiki.rendering.listener.ResourceReference;
+import org.xwiki.rendering.listener.reference.AttachmentResourceReference;
+import org.xwiki.rendering.listener.reference.DocumentResourceReference;
+import org.xwiki.rendering.listener.reference.ResourceReference;
 import org.xwiki.rendering.wiki.WikiModel;
 
 import com.steadystate.css.parser.CSSOMParser;
@@ -98,7 +98,7 @@ public class XWikiWikiModel implements WikiModel
     /**
      * {@inheritDoc}
      *
-     * @see WikiModel#getAttachmentURL(org.xwiki.rendering.listener.ResourceReference)
+     * @see WikiModel#getAttachmentURL(org.xwiki.rendering.listener.reference.ResourceReference)
      * @since 2.5RC1 
      */
     public String getAttachmentURL(ResourceReference attachmentReference)
@@ -111,7 +111,7 @@ public class XWikiWikiModel implements WikiModel
     /**
      * {@inheritDoc}
      * 
-     * @see org.xwiki.rendering.wiki.WikiModel#getImageURL(org.xwiki.rendering.listener.ResourceReference,
+     * @see org.xwiki.rendering.wiki.WikiModel#getImageURL(org.xwiki.rendering.listener.reference.ResourceReference ,
      *      java.util.Map)
      * @since 2.5RC1
      */
@@ -145,7 +145,7 @@ public class XWikiWikiModel implements WikiModel
     /**
      * {@inheritDoc}
      * 
-     * @see WikiModel#isDocumentAvailable(org.xwiki.rendering.listener.ResourceReference)
+     * @see WikiModel#isDocumentAvailable(org.xwiki.rendering.listener.reference.ResourceReference)
      */
     public boolean isDocumentAvailable(ResourceReference documentReference)
     {
@@ -155,7 +155,7 @@ public class XWikiWikiModel implements WikiModel
     /**
      * {@inheritDoc}
      * 
-     * @see WikiModel#getDocumentViewURL(org.xwiki.rendering.listener.ResourceReference)
+     * @see WikiModel#getDocumentViewURL(org.xwiki.rendering.listener.reference.ResourceReference)
      */
     public String getDocumentViewURL(ResourceReference documentReference)
     {
@@ -167,7 +167,7 @@ public class XWikiWikiModel implements WikiModel
     /**
      * {@inheritDoc}
      * 
-     * @see WikiModel#getDocumentEditURL(org.xwiki.rendering.listener.ResourceReference)
+     * @see WikiModel#getDocumentEditURL(org.xwiki.rendering.listener.reference.ResourceReference)
      */
     public String getDocumentEditURL(ResourceReference documentReference)
     {

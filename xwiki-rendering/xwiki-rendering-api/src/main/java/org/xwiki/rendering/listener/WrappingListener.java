@@ -21,6 +21,7 @@ package org.xwiki.rendering.listener;
 
 import java.util.Map;
 
+import org.xwiki.rendering.listener.reference.ResourceReference;
 import org.xwiki.rendering.syntax.Syntax;
 
 /**

@@ -21,13 +21,13 @@ package org.xwiki.rendering.internal.parser.reference;
 
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.Requirement;
-import org.xwiki.rendering.listener.ResourceReference;
+import org.xwiki.rendering.listener.reference.ResourceReference;
 import org.xwiki.rendering.parser.ResourceReferenceTypeParser;
 
 /**
  * Parses the content of XWiki Syntax 2.1 resource references. The format of a resource reference is the following:
  * {@code (type):(reference)} where {@code type} represents the type (see
- * {@link org.xwiki.rendering.listener.ResourceType} of the resource pointed to (e.g. document, mailto, attachment, 
+ * {@link org.xwiki.rendering.listener.reference.ResourceType} of the resource pointed to (e.g. document, mailto, attachment,
  * image, document in another wiki, etc), and {@code reference} defines the target. The syntax of {@code reference}
  * depends on the Resource type and is documented in the javadoc of the various
  * {@link org.xwiki.rendering.parser.ResourceReferenceTypeParser} implementations.

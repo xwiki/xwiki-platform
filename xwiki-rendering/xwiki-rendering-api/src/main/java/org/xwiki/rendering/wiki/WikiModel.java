@@ -22,7 +22,7 @@ package org.xwiki.rendering.wiki;
 import java.util.Map;
 
 import org.xwiki.component.annotation.ComponentRole;
-import org.xwiki.rendering.listener.ResourceReference;
+import org.xwiki.rendering.listener.reference.ResourceReference;
 
 /**
  * Bridge between the Rendering module and a Wiki Model. Contains wiki APIs required by Rendering classes such as
@@ -44,7 +44,7 @@ public interface WikiModel
     String getAttachmentURL(ResourceReference attachmentReference);
 
     /**
-     * Generate image specific URL. The difference with {@link #getAttachmentURL(ResourceReference)} is that in some
+     * Generate image specific URL. The difference with {@link #getAttachmentURL(org.xwiki.rendering.listener.reference.ResourceReference)} is that in some
      * implementation we want to make a distinction between displayed image and a simple link targeting an attachment
      * file.
      *

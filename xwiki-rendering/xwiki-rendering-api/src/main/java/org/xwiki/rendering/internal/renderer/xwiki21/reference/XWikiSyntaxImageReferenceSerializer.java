@@ -21,7 +21,7 @@ package org.xwiki.rendering.internal.renderer.xwiki21.reference;
 
 import org.xwiki.component.annotation.Component;
 import org.xwiki.rendering.internal.renderer.xwiki20.reference.XWikiSyntaxLinkReferenceSerializer;
-import org.xwiki.rendering.listener.ResourceReference;
+import org.xwiki.rendering.listener.reference.ResourceReference;
 
 /**
  * Generate a string representation of an Image's reference, in XWiki Syntax 2.1.
@@ -36,7 +36,7 @@ public class XWikiSyntaxImageReferenceSerializer extends XWikiSyntaxLinkReferenc
      * {@inheritDoc}
      *
      * @see org.xwiki.rendering.renderer.reference.ResourceReferenceSerializer#serialize(
-     *      org.xwiki.rendering.listener.ResourceReference)
+     *org.xwiki.rendering.listener.reference.ResourceReference)
      */
     public String serialize(ResourceReference reference)
     {

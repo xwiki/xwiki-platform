@@ -20,12 +20,12 @@
 package org.xwiki.rendering.parser;
 
 import org.xwiki.component.annotation.ComponentRole;
-import org.xwiki.rendering.listener.ResourceReference;
-import org.xwiki.rendering.listener.ResourceType;
+import org.xwiki.rendering.listener.reference.ResourceReference;
+import org.xwiki.rendering.listener.reference.ResourceType;
 
 /**
  * Parses a raw Resource Reference by determining if it has the right type and return a non-null
- * {@link org.xwiki.rendering.listener.ResourceReference} object if it has.
+ * {@link org.xwiki.rendering.listener.reference.ResourceReference} object if it has.
  *
  * @version $Id$
  * @since 2.5RC1

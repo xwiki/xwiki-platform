@@ -23,7 +23,7 @@ import java.util.Map;
 
 import org.xwiki.rendering.listener.Format;
 import org.xwiki.rendering.listener.HeaderLevel;
-import org.xwiki.rendering.listener.ResourceReference;
+import org.xwiki.rendering.listener.reference.ResourceReference;
 import org.xwiki.rendering.listener.ListType;
 import org.xwiki.rendering.syntax.Syntax;
 
@@ -145,7 +145,7 @@ public class ConsecutiveNewLineStateChainingListener extends AbstractChainingLis
      * {@inheritDoc}
      * 
      * @see org.xwiki.rendering.listener.chaining.AbstractChainingListener#endLink(
-     *      org.xwiki.rendering.listener.ResourceReference, boolean, java.util.Map)
+     *      org.xwiki.rendering.listener.reference.ResourceReference , boolean, java.util.Map)
      * @since 2.5RC1
      */
     @Override
@@ -342,7 +342,7 @@ public class ConsecutiveNewLineStateChainingListener extends AbstractChainingLis
      * {@inheritDoc}
      * 
      * @see org.xwiki.rendering.listener.chaining.AbstractChainingListener#onImage(
-     *      org.xwiki.rendering.listener.ResourceReference, boolean, java.util.Map)
+     *      org.xwiki.rendering.listener.reference.ResourceReference , boolean, java.util.Map)
      * @since 2.5RC1
      */
     @Override

@@ -60,7 +60,7 @@ import org.xwiki.rendering.block.WordBlock;
 import org.xwiki.rendering.block.XDOM;
 import org.xwiki.rendering.listener.Format;
 import org.xwiki.rendering.listener.HeaderLevel;
-import org.xwiki.rendering.listener.ResourceReference;
+import org.xwiki.rendering.listener.reference.ResourceReference;
 import org.xwiki.rendering.listener.ListType;
 import org.xwiki.rendering.listener.Listener;
 import org.xwiki.rendering.syntax.Syntax;
@@ -295,7 +295,7 @@ public class XDOMGeneratorListener implements Listener
     /**
      * {@inheritDoc}
      * 
-     * @see org.xwiki.rendering.listener.LinkListener#beginLink(org.xwiki.rendering.listener.ResourceReference ,
+     * @see org.xwiki.rendering.listener.LinkListener#beginLink(org.xwiki.rendering.listener.reference.ResourceReference ,
      *      boolean, java.util.Map)
      */
     public void beginLink(ResourceReference reference, boolean isFreeStandingURI, Map<String, String> parameters)
@@ -492,7 +492,7 @@ public class XDOMGeneratorListener implements Listener
     /**
      * {@inheritDoc}
      * 
-     * @see org.xwiki.rendering.listener.LinkListener#endLink(org.xwiki.rendering.listener.ResourceReference ,
+     * @see org.xwiki.rendering.listener.LinkListener#endLink(org.xwiki.rendering.listener.reference.ResourceReference ,
      *      boolean, java.util.Map)
      */
     public void endLink(ResourceReference reference, boolean isFreeStandingURI, Map<String, String> parameters)
@@ -603,7 +603,7 @@ public class XDOMGeneratorListener implements Listener
     /**
      * {@inheritDoc}
      * 
-     * @see org.xwiki.rendering.listener.ImageListener#onImage(org.xwiki.rendering.listener.ResourceReference,
+     * @see org.xwiki.rendering.listener.ImageListener#onImage(org.xwiki.rendering.listener.reference.ResourceReference ,
      *      boolean, java.util.Map)
      */
     public void onImage(ResourceReference reference, boolean isFreeStandingURI, Map<String, String> parameters)

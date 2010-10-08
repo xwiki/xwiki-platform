@@ -20,7 +20,7 @@
 package org.xwiki.rendering.parser;
 
 import org.xwiki.component.annotation.ComponentRole;
-import org.xwiki.rendering.listener.ResourceReference;
+import org.xwiki.rendering.listener.reference.ResourceReference;
 
 /**
  * Interface for parsing resource references (references to links, images, attachments, etc) for various wiki syntaxes.
@@ -33,7 +33,7 @@ public interface ResourceReferenceParser
 {
     /**
      * Parses a resource reference represented (reference to a link, image, attachment, etc)  as a String into a
-     * {@link org.xwiki.rendering.listener.ResourceReference} object.
+     * {@link org.xwiki.rendering.listener.reference.ResourceReference} object.
      * 
      * @param rawLink the string representation of the resource reference to parse (the supported syntax depends on the
      *        parser implementation used)

@@ -20,9 +20,9 @@
 package org.xwiki.rendering.internal.parser.reference;
 
 import org.xwiki.component.annotation.Component;
-import org.xwiki.rendering.listener.InterWikiResourceReference;
-import org.xwiki.rendering.listener.ResourceReference;
-import org.xwiki.rendering.listener.ResourceType;
+import org.xwiki.rendering.listener.reference.InterWikiResourceReference;
+import org.xwiki.rendering.listener.reference.ResourceReference;
+import org.xwiki.rendering.listener.reference.ResourceType;
 
 /**
  * Parses a resource reference to a document in another wiki (interwiki).

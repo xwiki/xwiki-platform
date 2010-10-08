@@ -24,10 +24,10 @@ import java.util.Map;
 import org.apache.commons.lang.StringUtils;
 import org.xwiki.rendering.internal.renderer.printer.XWikiSyntaxEscapeWikiPrinter;
 import org.xwiki.rendering.internal.renderer.xwiki20.XWikiSyntaxListenerChain;
-import org.xwiki.rendering.listener.AttachmentResourceReference;
-import org.xwiki.rendering.listener.DocumentResourceReference;
-import org.xwiki.rendering.listener.ResourceReference;
-import org.xwiki.rendering.listener.ResourceType;
+import org.xwiki.rendering.listener.reference.AttachmentResourceReference;
+import org.xwiki.rendering.listener.reference.DocumentResourceReference;
+import org.xwiki.rendering.listener.reference.ResourceReference;
+import org.xwiki.rendering.listener.reference.ResourceType;
 import org.xwiki.rendering.renderer.reference.ResourceReferenceSerializer;
 
 /**
@@ -63,7 +63,7 @@ public class XWikiSyntaxResourceRenderer
     /**
      * {@inheritDoc}
      * @see org.xwiki.rendering.internal.renderer.xwiki20.reference.XWikiSyntaxResourceRenderer#printParameters(
-     *      XWikiSyntaxEscapeWikiPrinter, org.xwiki.rendering.listener.ResourceReference , java.util.Map)
+     *      XWikiSyntaxEscapeWikiPrinter, org.xwiki.rendering.listener.reference.ResourceReference , java.util.Map)
      */
     @Override
     protected void printParameters(XWikiSyntaxEscapeWikiPrinter printer, ResourceReference reference,

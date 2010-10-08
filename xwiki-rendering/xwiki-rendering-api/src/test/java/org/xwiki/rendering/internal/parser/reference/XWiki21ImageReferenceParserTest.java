@@ -21,13 +21,10 @@ package org.xwiki.rendering.internal.parser.reference;
 
 import org.junit.Assert;
 import org.junit.Test;
-import org.xwiki.rendering.listener.DocumentResourceReference;
-import org.xwiki.rendering.listener.InterWikiResourceReference;
-import org.xwiki.rendering.listener.ResourceReference;
-import org.xwiki.rendering.listener.ResourceType;
+import org.xwiki.rendering.listener.reference.ResourceReference;
+import org.xwiki.rendering.listener.reference.ResourceType;
 import org.xwiki.rendering.parser.ResourceReferenceParser;
 import org.xwiki.rendering.wiki.WikiModel;
-import org.xwiki.test.AbstractComponentTestCase;
 
 /**
  * Unit tests for {@link org.xwiki.rendering.internal.parser.reference.XWiki21ImageReferenceParser}.

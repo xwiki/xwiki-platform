@@ -21,6 +21,8 @@ package org.xwiki.rendering.listener;
 
 import java.util.Map;
 
+import org.xwiki.rendering.listener.reference.ResourceReference;
+
 /**
  * Contains callback events for Links, called when a document has been parsed and when it needs to be modified 
  * or rendered.

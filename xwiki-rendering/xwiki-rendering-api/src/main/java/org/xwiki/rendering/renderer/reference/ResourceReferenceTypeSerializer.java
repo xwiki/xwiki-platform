@@ -20,7 +20,7 @@
 package org.xwiki.rendering.renderer.reference;
 
 import org.xwiki.component.annotation.ComponentRole;
-import org.xwiki.rendering.listener.ResourceReference;
+import org.xwiki.rendering.listener.reference.ResourceReference;
 
 /**
  * Serialize a given Resource Reference to a String based on its Resource Type.
@@ -33,7 +33,7 @@ public interface ResourceReferenceTypeSerializer
 {
     /**
      * @param reference the link reference to serialize
-     * @return the string representation of the passed {@link org.xwiki.rendering.listener.ResourceReference} object
+     * @return the string representation of the passed {@link org.xwiki.rendering.listener.reference.ResourceReference} object
      */
     String serialize(ResourceReference reference);
 }

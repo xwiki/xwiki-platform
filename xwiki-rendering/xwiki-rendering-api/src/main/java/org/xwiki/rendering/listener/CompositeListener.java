@@ -23,6 +23,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import org.xwiki.rendering.listener.reference.ResourceReference;
 import org.xwiki.rendering.syntax.Syntax;
 
 /**
@@ -618,7 +619,7 @@ public class CompositeListener implements Listener
     /**
      * {@inheritDoc}
      * 
-     * @see org.xwiki.rendering.listener.LinkListener#beginLink(ResourceReference , boolean,
+     * @see org.xwiki.rendering.listener.LinkListener#beginLink(org.xwiki.rendering.listener.reference.ResourceReference , boolean,
      *      java.util.Map)
      * @since 2.5RC1
      */

@@ -728,7 +728,7 @@ public class Document extends Api
      */
     public String getURL(String action, String queryString)
     {
-        return this.doc.getURL(action, querystring, getXWikiContext());
+        return this.doc.getURL(action, queryString, getXWikiContext());
     }
 
     /**

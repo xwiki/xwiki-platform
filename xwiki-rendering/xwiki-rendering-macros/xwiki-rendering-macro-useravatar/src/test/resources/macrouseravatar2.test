@@ -7,6 +7,6 @@
 .#-----------------------------------------------------
 beginDocument
 beginMacroMarkerStandalone [useravatar] [username=XWiki.ExistingUserWithoutAvatar]
-onImage: [/xwiki/noavatar.png] [false] [[alt]=[Picture of ExistingUserWithoutAvatar][title]=[ExistingUserWithoutAvatar]]
+onImage [Typed = [true] Type = [url] Reference = [/xwiki/noavatar.png]] [false] [[alt]=[Picture of ExistingUserWithoutAvatar][title]=[ExistingUserWithoutAvatar]]
 endMacroMarkerStandalone [useravatar] [username=XWiki.ExistingUserWithoutAvatar]
 endDocument

@@ -7,7 +7,7 @@
 .#-----------------------------------------------------
 beginDocument
 beginParagraph
-onImage: [/some/path] [false]
+onImage [Typed = [true] Type = [path] Reference = [/some/path]] [false]
 endParagraph
 endDocument
 .#-----------------------------------------------------

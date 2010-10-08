@@ -18,7 +18,7 @@ onSpace
 onWord [2]
 endLink [Typed = [true] Type = [url] Reference = [http://localhost/feed.xml]] [true]
 beginLink [Typed = [true] Type = [url] Reference = [http://localhost/feed.xml]] [true]
-onImage: [/xwiki/skins/albatross/icons/black-rss.png] [false]
+onImage [Typed = [true] Type = [url] Reference = [/xwiki/skins/albatross/icons/black-rss.png]] [false]
 endLink [Typed = [true] Type = [url] Reference = [http://localhost/feed.xml]] [true]
 endParagraph [[class]=[rsschanneltitle]]
 beginParagraph [[class]=[rssitemtitle]]

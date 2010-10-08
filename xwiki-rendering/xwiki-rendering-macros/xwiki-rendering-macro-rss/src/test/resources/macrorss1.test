@@ -8,7 +8,7 @@
 beginDocument
 beginMacroMarkerStandalone [testrss] [feed=file://feed1.xml|content=true|count=2|image=true]
 beginGroup [[class]=[box rssfeed]]
-onImage: [http://www.w3schools.com/images/logo.gif] [true]
+onImage [Typed = [true] Type = [url] Reference = [http://www.w3schools.com/images/logo.gif]] [true]
 onNewLine
 beginParagraph [[class]=[rsschanneltitle]]
 beginLink [Typed = [true] Type = [url] Reference = [http://liftoff.msfc.nasa.gov/]] [true]
@@ -19,7 +19,7 @@ onSpace
 onWord [News]
 endLink [Typed = [true] Type = [url] Reference = [http://liftoff.msfc.nasa.gov/]] [true]
 beginLink [Typed = [true] Type = [url] Reference = [http://liftoff.msfc.nasa.gov/]] [true]
-onImage: [/xwiki/skins/albatross/icons/black-rss.png] [false]
+onImage [Typed = [true] Type = [url] Reference = [/xwiki/skins/albatross/icons/black-rss.png]] [false]
 endLink [Typed = [true] Type = [url] Reference = [http://liftoff.msfc.nasa.gov/]] [true]
 endParagraph [[class]=[rsschanneltitle]]
 beginParagraph [[class]=[rssitemtitle]]

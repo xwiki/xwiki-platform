@@ -15,9 +15,9 @@ image:http://thor.info.uaic.ro/~evalica/img/x_logo_xwiki.png
 .#-----------------------------------------------------
 beginDocument
 beginParagraph
-onImage: [http://thor.info.uaic.ro/~evalica/img/x_logo_xwiki.png] [true]
+onImage [Typed = [false] Type = [url] Reference = [http://thor.info.uaic.ro/~evalica/img/x_logo_xwiki.png]] [true]
 onNewLine
-onImage: [http://thor.info.uaic.ro/~evalica/img/x_logo_xwiki.png] [false]
+onImage [Typed = [false] Type = [url] Reference = [http://thor.info.uaic.ro/~evalica/img/x_logo_xwiki.png]] [false]
 onNewLine
 beginLink [Typed = [false] Type = [url] Reference = [http://thor.info.uaic.ro/~evalica/img/x_logo_xwiki.png]] [false]
 endLink [Typed = [false] Type = [url] Reference = [http://thor.info.uaic.ro/~evalica/img/x_logo_xwiki.png]] [false]

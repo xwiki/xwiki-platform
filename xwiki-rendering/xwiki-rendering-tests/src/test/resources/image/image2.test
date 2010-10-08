@@ -11,9 +11,9 @@ onWord [Inline]
 onSpace
 onWord [images]
 onSpace
-onImage: [existing.attachment] [true]
+onImage [Typed = [false] Type = [attach] Reference = [existing.attachment]] [true]
 onSpace
-onImage: [Space.ExistingPage@existing.attachment] [true]
+onImage [Typed = [false] Type = [attach] Reference = [Space.ExistingPage@existing.attachment]] [true]
 endParagraph
 endDocument
 .#-----------------------------------------------------

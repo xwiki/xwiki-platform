@@ -8,7 +8,7 @@
 beginDocument
 beginMacroMarkerStandalone [box] [title=[[XWiki>>http://www.xwiki.org]]|cssClass=myCLASS|image=http://l.yimg.com/i/i/fr/tr/usa4.jpg] [alabala]
 beginGroup [[class]=[box myCLASS]]
-onImage: [http://l.yimg.com/i/i/fr/tr/usa4.jpg] [true]
+onImage [Typed = [true] Type = [url] Reference = [http://l.yimg.com/i/i/fr/tr/usa4.jpg]] [true]
 onNewLine
 beginLink [Typed = [false] Type = [url] Reference = [http://www.xwiki.org]] [false]
 onWord [XWiki]

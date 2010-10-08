@@ -156,7 +156,8 @@ public class EventsChainingRenderer extends AbstractChainingPrintRenderer
     @Override
     public void beginLink(ResourceReference reference, boolean isFreeStandingURI, Map<String, String> parameters)
     {
-        getPrinter().println("beginLink [" + reference + "] [" + isFreeStandingURI + "]" + serializeParameters(parameters));
+        getPrinter().println("beginLink [" + reference + "] [" + isFreeStandingURI + "]"
+            + serializeParameters(parameters));
     }
 
     /**
@@ -168,7 +169,8 @@ public class EventsChainingRenderer extends AbstractChainingPrintRenderer
     @Override
     public void endLink(ResourceReference reference, boolean isFreeStandingURI, Map<String, String> parameters)
     {
-        getPrinter().println("endLink [" + reference + "] [" + isFreeStandingURI + "]" + serializeParameters(parameters));
+        getPrinter().println("endLink [" + reference + "] [" + isFreeStandingURI + "]"
+            + serializeParameters(parameters));
     }
 
     /**
@@ -220,8 +222,8 @@ public class EventsChainingRenderer extends AbstractChainingPrintRenderer
     /**
      * {@inheritDoc}
      * 
-     * @see org.xwiki.rendering.renderer.AbstractChainingPrintRenderer#endHeader(org.xwiki.rendering.listener.HeaderLevel,
-     *      String, java.util.Map)
+     * @see org.xwiki.rendering.renderer.AbstractChainingPrintRenderer#endHeader(
+     *      org.xwiki.rendering.listener.HeaderLevel, String, java.util.Map)
      */
     @Override
     public void endHeader(HeaderLevel level, String id, Map<String, String> parameters)
@@ -598,7 +600,7 @@ public class EventsChainingRenderer extends AbstractChainingPrintRenderer
     @Override
     public void onImage(ResourceReference reference, boolean isFreeStandingURI, Map<String, String> parameters)
     {
-        getPrinter().println("onImage: " + "[" + reference.getReference() + "] [" + isFreeStandingURI + "]"
+        getPrinter().println("onImage [" + reference + "] [" + isFreeStandingURI + "]" 
             + serializeParameters(parameters));
     }
 

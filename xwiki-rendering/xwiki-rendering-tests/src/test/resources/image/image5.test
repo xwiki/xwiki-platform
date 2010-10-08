@@ -8,7 +8,7 @@ image:wiki:Space.Page@file.ext
 .#-----------------------------------------------------
 beginDocument
 beginParagraph
-onImage: [wiki:Space.Page@file.ext] [true]
+onImage [Typed = [false] Type = [attach] Reference = [wiki:Space.Page@file.ext]] [true]
 endParagraph
 endDocument
 .#-----------------------------------------------------

@@ -7,7 +7,7 @@
 .#-----------------------------------------------------
 beginDocument
 beginParagraph
-onImage: [http://www.google.ro/intl/en_com/images/logo_plain.png] [false] [[alt]=[bar][title]=[foo]]
+onImage [Typed = [false] Type = [url] Reference = [http://www.google.ro/intl/en_com/images/logo_plain.png]] [false] [[alt]=[bar][title]=[foo]]
 endParagraph
 endDocument
 .#-----------------------------------------------------

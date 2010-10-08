@@ -17,7 +17,7 @@ onSpecialSymbol [-]
 onSpecialSymbol [-]
 endLink [Typed = [false] Type = [url] Reference = [reference]] [false]
 onNewLine
-onImage: [--] [true]
+onImage [Typed = [false] Type = [url] Reference = [--]] [true]
 endParagraph
 endDocument
 .#-----------------------------------------------------

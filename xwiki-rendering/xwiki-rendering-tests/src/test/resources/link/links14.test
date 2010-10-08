@@ -9,7 +9,7 @@
 beginDocument
 beginParagraph
 beginLink [Typed = [false] Type = [url] Reference = [http://xwiki.org]] [false] [[param]=[value]]
-onImage: [attach.png] [false] [[height]=[100][width]=[100]]
+onImage [Typed = [false] Type = [attach] Reference = [attach.png]] [false] [[height]=[100][width]=[100]]
 endLink [Typed = [false] Type = [url] Reference = [http://xwiki.org]] [false] [[param]=[value]]
 endParagraph
 endDocument

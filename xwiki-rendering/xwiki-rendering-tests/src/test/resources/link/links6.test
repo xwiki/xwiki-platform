@@ -40,7 +40,7 @@ onNewLine
 beginLink [Typed = [false] Type = [doc] Reference = [Reference]] [false]
 onSpecialSymbol [[]
 onSpecialSymbol [[]
-onImage: [whatever] [true]
+onImage [Typed = [false] Type = [attach] Reference = [whatever]] [true]
 endLink [Typed = [false] Type = [doc] Reference = [Reference]] [false]
 onNewLine
 onWord [not]

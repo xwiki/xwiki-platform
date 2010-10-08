@@ -12,24 +12,24 @@
 .#-----------------------------------------------------
 beginDocument
 beginParagraph
-onImage: [file.ext] [true]
+onImage [Typed = [false] Type = [attach] Reference = [file.ext]] [true]
 onWord [text]
-onImage: [file.ext] [true]
+onImage [Typed = [false] Type = [attach] Reference = [file.ext]] [true]
 onWord [text]
-onImage: [file.ext] [true]
-onImage: [file.ext] [true]
+onImage [Typed = [false] Type = [attach] Reference = [file.ext]] [true]
+onImage [Typed = [false] Type = [attach] Reference = [file.ext]] [true]
 endParagraph
 beginParagraph
 onWord [text]
 onNewLine
-onImage: [file.ext] [true]
+onImage [Typed = [false] Type = [attach] Reference = [file.ext]] [true]
 onNewLine
 onWord [text]
 endParagraph
 beginParagraph
 onWord [text]
 onSpace
-onImage: [file.ext] [true]
+onImage [Typed = [false] Type = [attach] Reference = [file.ext]] [true]
 onSpace
 onWord [text]
 endParagraph

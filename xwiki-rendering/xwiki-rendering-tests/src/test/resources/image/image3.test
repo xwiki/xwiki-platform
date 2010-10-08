@@ -7,7 +7,7 @@ image:http://some/image.png
 .#-----------------------------------------------------
 beginDocument
 beginParagraph
-onImage: [http://some/image.png] [true]
+onImage [Typed = [false] Type = [url] Reference = [http://some/image.png]] [true]
 endParagraph
 endDocument
 .#-----------------------------------------------------

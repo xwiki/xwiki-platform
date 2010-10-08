@@ -20,16 +20,15 @@
 package org.xwiki.gwt.wysiwyg.client;
 
 import org.xwiki.gwt.dom.client.Element;
-import org.xwiki.gwt.user.client.BackForwardCache;
 import org.xwiki.gwt.user.client.Config;
+import org.xwiki.gwt.user.client.StringUtils;
 import org.xwiki.gwt.wysiwyg.client.plugin.PluginFactoryManager;
 import org.xwiki.gwt.wysiwyg.client.syntax.SyntaxValidatorManager;
 
-import com.google.gwt.dom.client.IFrameElement;
 import com.google.gwt.dom.client.Style.Display;
+import com.google.gwt.event.dom.client.LoadEvent;
 import com.google.gwt.event.logical.shared.SelectionEvent;
 import com.google.gwt.event.logical.shared.SelectionHandler;
-import com.google.gwt.user.client.DOM;
 import com.google.gwt.user.client.ui.TabPanel;
 import com.google.gwt.user.client.ui.Widget;
 
@@ -41,69 +40,121 @@ import com.google.gwt.user.client.ui.Widget;
 public class WysiwygEditor extends RichTextEditorController
 {
     /**
-     * The default storage syntax.
-     */
-    public static final String DEFAULT_SYNTAX = "xhtml/1.0";
-
-    /**
-     * WYWISYWG tab index in the TabPanel.
-     */
-    protected static final int WYSIWYG_TAB_INDEX = 0;
-
-    /**
-     * Source tab index in the TabPanel.
-     */
-    protected static final int SOURCE_TAB_INDEX = 1;
-
-    /**
      * The interface of the WYSIWYG editor. It can be either a {@link RichTextEditor} or a {@link TabPanel} containing
      * the {@link RichTextEditor} and the {@link PlainTextEditor}.
      */
-    private Widget ui;
+    private final Widget ui;
+
+    /**
+     * The configuration object.
+     */
+    private final WysiwygEditorConfig config;
+
+    /**
+     * The object that will handle the switch between the source editor and the rich text editor.
+     */
+    private final WysiwygEditorTabSwitchHandler switcher;
+
+    /**
+     * Flag indicating if the rich text area was loaded.
+     */
+    private boolean richTextAreaLoaded;
+
+    /**
+     * Flag indicating if the rich text editor was initialized. The rich text editor must be initialized after the rich
+     * text area is loaded (after it is attached to the document).
+     */
+    private boolean richTextEditorInitialized;
 
     /**
      * Creates a new WYSIWYG editor.
      * 
-     * @param config The configuration object.
-     * @param svm The syntax validation manager used for enabling or disabling plugin features.
-     * @param pfm The plugin factory manager used to instantiate plugins.
+     * @param config the configuration source
+     * @param svm the syntax validation manager used for enabling or disabling plugin features
+     * @param pfm the plugin factory manager used to instantiate plugins
      */
     public WysiwygEditor(Config config, SyntaxValidatorManager svm, PluginFactoryManager pfm)
     {
-        super(new RichTextEditor(), config, pfm, svm.getSyntaxValidator(config.getParameter("syntax", DEFAULT_SYNTAX)));
+        this(new WysiwygEditorConfig(config), svm, pfm);
+    }
 
-        // Initialize the rich text area.
-        IFrameElement.as(getRichTextEditor().getTextArea().getElement()).setSrc(
-            config.getParameter("inputURL", "about:blank"));
-        getRichTextEditor().getTextArea().setHeight(Math.max(getHook().getOffsetHeight(), 100) + "px");
+    /**
+     * Creates a new WYSIWYG editor.
+     * 
+     * @param config the configuration object
+     * @param svm the syntax validation manager used for enabling or disabling plugin features
+     * @param pfm the plugin factory manager used to instantiate plugins
+     */
+    public WysiwygEditor(WysiwygEditorConfig config, SyntaxValidatorManager svm, PluginFactoryManager pfm)
+    {
+        super(new RichTextEditor(), config.getConfigurationSource(), pfm, svm.getSyntaxValidator(config.getSyntax()));
 
-        if (isTabbed()) {
-            createTabPanel();
+        this.config = config;
+
+        // Initialize the WYSIWYG/Source tab switcher. Even if the editor tabs are disabled, this object is still useful
+        // to convert the source text to HTML (when initializing the rich text area).
+        switcher = new WysiwygEditorTabSwitchHandler(this);
+
+        // Initialize the user interface.
+        if (config.isTabbed()) {
+            ui = createTabPanel();
+            initializePlainTextArea();
         } else {
             ui = getRichTextEditor();
         }
 
-        getHook().getStyle().setDisplay(Display.NONE);
+        // Resize the rich text area and hide the hook.
+        Element hook = config.getHook();
+        getRichTextEditor().getTextArea().setHeight(Math.max(hook.getOffsetHeight(), 100) + "px");
+        hook.getStyle().setDisplay(Display.NONE);
     }
 
     /**
      * {@inheritDoc}
      * 
-     * @see RichTextEditorController#initTextArea()
+     * @see RichTextEditorController#onLoad(LoadEvent)
      */
-    protected void initTextArea()
+    @Override
+    public void onLoad(LoadEvent event)
     {
-        // Enable the rich text area if needed.
-        int selectedTab = getSelectedTab();
-        // If the source tab is not selected then either we don't have tabs or the WYSIWYG tab is selected.
-        if (selectedTab != SOURCE_TAB_INDEX) {
-            if (selectedTab == WYSIWYG_TAB_INDEX) {
-                // Disable the plain text area to prevent submitting its content. The plain text area was enabled
-                // while the the rich text area was loading because the rich text area couldn't have been submitted
-                // during that time.
-                getPlainTextEditor().getTextArea().setEnabled(false);
+        if (event.getSource() == getRichTextEditor().getTextArea() && !richTextAreaLoaded) {
+            richTextAreaLoaded = true;
+            boolean inputConverted = config.isInputConverted();
+            if (inputConverted && StringUtils.isEmpty(config.getTemplateURL())) {
+                // We don't have to convert the input value nor to load a rich text area template.
+                getRichTextEditor().getTextArea().setHTML(config.getInputValue());
+                super.onLoad(event);
+            } else {
+                // If input value is already converted then we just load the rich text area template.
+                switcher.convertToHTML(inputConverted ? "" : config.getInputValue());
             }
-            super.initTextArea();
+        }
+    }
+
+    /**
+     * Initializes the rich text editor if it wasn't already initialized.
+     */
+    protected void maybeInitializeRichTextEditor()
+    {
+        if (!richTextEditorInitialized) {
+            richTextEditorInitialized = true;
+            if (config.isInputConverted()) {
+                // The rich text area template was loaded. We can now set the inner HTML.
+                getRichTextEditor().getTextArea().setHTML(config.getInputValue());
+            }
+            maybeInitialize();
+        }
+    }
+
+    /**
+     * Initializes the plain text area.
+     */
+    private void initializePlainTextArea()
+    {
+        if (config.isInputConverted()) {
+            switcher.convertFromHTML(config.getInputValue());
+        } else {
+            getPlainTextEditor().getTextArea().setText(config.getInputValue());
         }
     }
 
@@ -115,42 +166,30 @@ public class WysiwygEditor extends RichTextEditorController
      */
     private TabPanel createTabPanel()
     {
-        Element cacheableElement = (Element) DOM.getElementById(getConfig().getParameter("cacheId", "")).cast();
-        final BackForwardCache cache = new BackForwardCache(cacheableElement);
-        PlainTextEditor plainTextEditor = new PlainTextEditor(getHook(), cache);
+        PlainTextEditor plainTextEditor = new PlainTextEditor(config.getHook());
 
         TabPanel tabs = new TabPanel();
-        ui = tabs;
         tabs.add(getRichTextEditor(), Strings.INSTANCE.wysiwyg());
         tabs.add(plainTextEditor, Strings.INSTANCE.source());
         tabs.setStyleName("xRichTextEditorTabPanel");
         tabs.setAnimationEnabled(false);
+        tabs.selectTab(config.getSelectedTabIndex());
 
-        final String wysiwygTabName = "wysiwyg";
-        final String cacheKeyActiveTextArea = "editor.activeTextArea";
-        String defaultEditor = cache.get(cacheKeyActiveTextArea, getConfig().getParameter("defaultEditor"));
-        tabs.selectTab(wysiwygTabName.equals(defaultEditor) ? WYSIWYG_TAB_INDEX : SOURCE_TAB_INDEX);
+        // Enable the appropriate text area based on the type of input (source or HTML).
+        boolean richTextAreaEnabled = config.isInputConverted();
+        plainTextEditor.getTextArea().setEnabled(!richTextAreaEnabled);
+        getRichTextEditor().getTextArea().setEnabled(richTextAreaEnabled);
 
-        // We initially disable the rich text area because it is loaded asynchronously and during this time we can't
-        // submit its value. We enable it as soon as it finishes loading, if the WYSIWYG tab is selected. By enabling
-        // the plain text area we can switch to the source tab editor before the WYSIWYG tab is fully loaded.
-        plainTextEditor.getTextArea().setEnabled(true);
-        getRichTextEditor().getTextArea().setEnabled(false);
-
-        // Create the object that will handle the switch between the source editor and the rich text editor.
-        WysiwygEditorTabSwitchHandler editorSwitcher = new WysiwygEditorTabSwitchHandler(this);
-
-        saveRegistration(tabs.addBeforeSelectionHandler(editorSwitcher));
+        saveRegistration(tabs.addBeforeSelectionHandler(switcher));
         saveRegistration(tabs.addSelectionHandler(new SelectionHandler<Integer>()
         {
             public void onSelection(SelectionEvent<Integer> event)
             {
                 // Cache the active text area.
-                cache.put(cacheKeyActiveTextArea, event.getSelectedItem() == WYSIWYG_TAB_INDEX ? wysiwygTabName
-                    : "source");
+                config.setSelectedTabIndex(event.getSelectedItem());
             }
         }));
-        saveRegistration(tabs.addSelectionHandler(editorSwitcher));
+        saveRegistration(tabs.addSelectionHandler(switcher));
 
         return tabs;
     }
@@ -159,7 +198,7 @@ public class WysiwygEditor extends RichTextEditorController
      * In a Model-View-Controller architecture the UI represents the View component, while this class represents the
      * Controller. The model could be considered the DOM document edited.
      * 
-     * @return The editor User Interface main panel.
+     * @return the user interface of the editor, i.e. the rich text editor if tabs are disabled, the tab panel otherwise
      */
     public Widget getUI()
     {
@@ -169,27 +208,12 @@ public class WysiwygEditor extends RichTextEditorController
     /**
      * Get the plain text editor.
      * 
-     * @return The plain text editor, null if it does not exist.
+     * @return the plain text editor, {@code null} if it does not exist
      */
     public PlainTextEditor getPlainTextEditor()
     {
-        return isTabbed() ? (PlainTextEditor) ((TabPanel) ui).getWidget(SOURCE_TAB_INDEX) : null;
-    }
-
-    /**
-     * @return the element replaced by the WYSIWYG editor
-     */
-    private Element getHook()
-    {
-        return DOM.getElementById(getConfig().getParameter("hookId")).cast();
-    }
-
-    /**
-     * @return {@code true} if the WYSIWYG/Source tabs are displayed, {@code false} otherwise
-     */
-    private boolean isTabbed()
-    {
-        return Boolean.valueOf(getConfig().getParameter("displayTabs", "false"));
+        return config.isTabbed() ? (PlainTextEditor) ((TabPanel) ui).getWidget(WysiwygEditorConfig.SOURCE_TAB_INDEX)
+            : null;
     }
 
     /**
@@ -197,7 +221,8 @@ public class WysiwygEditor extends RichTextEditorController
      */
     public int getSelectedTab()
     {
-        return ui instanceof TabPanel ? ((TabPanel) ui).getTabBar().getSelectedTab() : -1;
+        return ui instanceof TabPanel ? ((TabPanel) ui).getTabBar().getSelectedTab()
+            : WysiwygEditorConfig.WYSIWYG_TAB_INDEX;
     }
 
     /**
@@ -210,6 +235,14 @@ public class WysiwygEditor extends RichTextEditorController
         if (ui instanceof TabPanel) {
             ((TabPanel) ui).selectTab(index);
         }
+    }
+
+    /**
+     * @return the configuration object
+     */
+    public WysiwygEditorConfig getConfig()
+    {
+        return config;
     }
 
     /**

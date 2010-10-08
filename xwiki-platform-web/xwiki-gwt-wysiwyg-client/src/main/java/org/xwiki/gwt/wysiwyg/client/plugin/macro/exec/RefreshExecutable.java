@@ -55,13 +55,22 @@ public class RefreshExecutable extends AbstractSelectionExecutable
     private final LoadingPanel waiting = new LoadingPanel();
 
     /**
-     * Creates a new executable that can be used to refresh the specified rich text area.
+     * The object used to reload the rich text area.
+     */
+    private final Reloader reloader;
+
+    /**
+     * Creates a new executable that can be used to refresh the specified rich text area. We use a {@link Reloader} to
+     * submit the content of the rich text area to the given URL and then use the response to reset the content of the
+     * rich text area.
      * 
      * @param rta the execution target
+     * @param url the URL to take the content from
      */
-    public RefreshExecutable(RichTextArea rta)
+    public RefreshExecutable(RichTextArea rta, String url)
     {
         super(rta);
+        reloader = new Reloader(rta, url);
     }
 
     /**
@@ -97,7 +106,6 @@ public class RefreshExecutable extends AbstractSelectionExecutable
         Map<String, String> params = new HashMap<String, String>();
         params.put("html", html);
 
-        Reloader reloader = new Reloader(rta);
         reloader.reload(params, new AsyncCallback<Object>()
         {
             public void onFailure(Throwable caught)

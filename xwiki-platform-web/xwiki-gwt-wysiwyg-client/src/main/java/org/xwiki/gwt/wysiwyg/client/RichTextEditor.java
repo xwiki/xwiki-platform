@@ -24,10 +24,6 @@ import org.xwiki.gwt.user.client.ui.MenuBar;
 import org.xwiki.gwt.user.client.ui.ToolBar;
 import org.xwiki.gwt.user.client.ui.rta.RichTextArea;
 
-import com.google.gwt.event.dom.client.LoadEvent;
-import com.google.gwt.event.dom.client.LoadHandler;
-import com.google.gwt.user.client.Command;
-import com.google.gwt.user.client.DeferredCommand;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FlowPanel;
 
@@ -36,7 +32,7 @@ import com.google.gwt.user.client.ui.FlowPanel;
  * 
  * @version $Id$
  */
-public class RichTextEditor extends Composite implements LoadHandler
+public class RichTextEditor extends Composite
 {
     /**
      * The menu bar.
@@ -64,14 +60,20 @@ public class RichTextEditor extends Composite implements LoadHandler
     protected final FlowPanel container;
 
     /**
+     * Flag indicating if the rich text editor is in loading state. We need this flag to keep the loading state while
+     * the rich text editor is detached from the document.
+     */
+    private boolean loading;
+
+    /**
      * Creates a new rich text editor.
      */
     public RichTextEditor()
     {
         textArea = new RichTextArea();
-        textArea.addLoadHandler(this);
 
         loadingPanel = new LoadingPanel();
+        // NOTE: Setting and then removing visibility:hidden on the rich text area prevents it from being focused.
         loadingPanel.getElement().getStyle().setBackgroundColor("white");
 
         container = new FlowPanel();
@@ -127,11 +129,15 @@ public class RichTextEditor extends Composite implements LoadHandler
      */
     public void setLoading(boolean loading)
     {
-        if (loading) {
-            // NOTE: Setting and then removing visibility:hidden on the rich text area prevents it from being focused.
-            loadingPanel.startLoading(textArea);
-        } else {
-            loadingPanel.stopLoading();
+        if (this.loading != loading) {
+            this.loading = loading;
+            if (isAttached()) {
+                if (loading) {
+                    loadingPanel.startLoading(textArea);
+                } else {
+                    loadingPanel.stopLoading();
+                }
+            }
         }
     }
 
@@ -140,7 +146,7 @@ public class RichTextEditor extends Composite implements LoadHandler
      */
     public boolean isLoading()
     {
-        return loadingPanel.isLoading();
+        return loading;
     }
 
     /**
@@ -148,28 +154,13 @@ public class RichTextEditor extends Composite implements LoadHandler
      * 
      * @see Composite#onLoad()
      */
+    @Override
     protected void onLoad()
     {
-        // This rich text editor has been attached to the document but its rich text area might not be ready yet.
-        setLoading(true);
-    }
-
-    /**
-     * {@inheritDoc}
-     * 
-     * @see LoadHandler#onLoad(LoadEvent)
-     */
-    public void onLoad(LoadEvent event)
-    {
-        if (event.getSource() == textArea) {
-            // Move out of the loading state after the rest of the listeners execute their code.
-            DeferredCommand.addCommand(new Command()
-            {
-                public void execute()
-                {
-                    setLoading(false);
-                }
-            });
+        // Synchronize the loading panel with the loading state.
+        if (loading != loadingPanel.isLoading()) {
+            loading = loadingPanel.isLoading();
+            setLoading(!loading);
         }
     }
 }

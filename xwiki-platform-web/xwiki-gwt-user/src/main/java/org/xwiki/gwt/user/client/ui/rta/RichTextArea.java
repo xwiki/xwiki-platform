@@ -45,6 +45,7 @@ import com.google.gwt.event.dom.client.HasLoadHandlers;
 import com.google.gwt.event.dom.client.LoadEvent;
 import com.google.gwt.event.dom.client.LoadHandler;
 import com.google.gwt.event.shared.HandlerRegistration;
+import com.google.gwt.user.client.DOM;
 import com.google.gwt.user.client.ui.impl.RichTextAreaImpl;
 
 /**
@@ -151,8 +152,11 @@ public class RichTextArea extends com.google.gwt.user.client.ui.RichTextArea imp
      */
     private native JavaScriptObject createDocumentGetter()
     /*-{
-        var element = this.@com.google.gwt.user.client.ui.UIObject::getElement()();
+        var outer = this;
         var contentDocumentGetter = function() {
+            // The in-line frame element can be replaced during the life time of a rich text area so we must get it
+            // whenever the edited document is requested.
+            var element = outer.@com.google.gwt.user.client.ui.UIObject::getElement()();
             // We access the content document in a static way because only static references to overlay types are
             // allowed from JSNI.
             return @org.xwiki.gwt.dom.client.IFrameElement::getContentDocument(Lorg/xwiki/gwt/dom/client/IFrameElement;)(element);
@@ -160,7 +164,8 @@ public class RichTextArea extends com.google.gwt.user.client.ui.RichTextArea imp
         var nullDocumentGetter = function() {
             return null;
         }
-        return 'iframe' == element.nodeName.toLowerCase() ? contentDocumentGetter : nullDocumentGetter;
+        var tagName = this.@com.google.gwt.user.client.ui.UIObject::getElement()().nodeName.toLowerCase();
+        return tagName == 'iframe' ? contentDocumentGetter : nullDocumentGetter;
     }-*/;
 
     /**
@@ -249,6 +254,19 @@ public class RichTextArea extends com.google.gwt.user.client.ui.RichTextArea imp
     /**
      * {@inheritDoc}
      * 
+     * @see com.google.gwt.user.client.ui.RichTextArea#onLoad()
+     */
+    @Override
+    protected void onLoad()
+    {
+        // Initialize the element only after the document to be edited is loaded. #onLoad(LoadEvent)
+        getElement().setPropertyBoolean(LOADED, false);
+        super.onLoad();
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
      * @see LoadHandler#onLoad(LoadEvent)
      * @see #onAttach()
      */
@@ -308,5 +326,27 @@ public class RichTextArea extends com.google.gwt.user.client.ui.RichTextArea imp
     public HandlerRegistration addActionHandler(String actionName, ActionHandler handler)
     {
         return addHandler(handler, ActionEvent.getType(actionName));
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see com.google.gwt.user.client.ui.RichTextArea#sinkEvents(int)
+     */
+    @Override
+    public void sinkEvents(int eventBitsToAdd)
+    {
+        // Events listeners are not registered right away but after the widget is attached to the browser's document for
+        // the first time. This deferred sink behavior is not suited for the load event because the load event could be
+        // fired before the load listener is registered. This can happen if the underlying element is loaded
+        // synchronously (e.g. in-line frame with the source attribute unspecified).
+        if (!isOrWasAttached() && (eventBitsToAdd & Event.ONLOAD) != 0) {
+            // Sink the load event immediately.
+            DOM.sinkEvents(getElement(), eventBitsToAdd | DOM.getEventsSunk(getElement()));
+            DOM.setEventListener(getElement(), this);
+        } else {
+            // Preserve deferred sink behavior.
+            super.sinkEvents(eventBitsToAdd);
+        }
     }
 }

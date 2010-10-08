@@ -108,16 +108,16 @@ public class RichTextEditorController implements Updatable, MouseUpHandler, KeyU
     private final HandlerRegistrationCollection registrations = new HandlerRegistrationCollection();
 
     /**
-     * Flag indicating if the editor has been loaded. It is needed in order to prevent reloading the UI when the edited
-     * document is reloaded.
+     * Flag indicating if the editor has been initialized. It is needed in order to prevent reinitializing the UI when
+     * the edited document is reloaded, i.e. when the rich text area is reloaded.
      */
-    private boolean loaded;
+    private boolean initialized;
 
     /**
      * Creates a new editor.
      * 
      * @param richTextEditor the rich text editor to manage
-     * @param config the configuration object
+     * @param config the configuration source
      * @param pfm the plugin factory manager used to instantiate plugins
      * @param syntaxValidator the object used to assert if a feature must be enabled or disabled in some context
      */
@@ -131,6 +131,9 @@ public class RichTextEditorController implements Updatable, MouseUpHandler, KeyU
         registrations.add(richTextEditor.getTextArea().addMouseUpHandler(this));
         registrations.add(richTextEditor.getTextArea().addKeyUpHandler(this));
         richTextEditor.getTextArea().getCommandManager().addCommandListener(this);
+
+        // Put the rich text editor in loading state until we finish loading it. See #onLoad(LoadEvent event)
+        richTextEditor.setLoading(true);
 
         toolBarController = new ToolBarController(richTextEditor.getToolbar());
 
@@ -196,8 +199,18 @@ public class RichTextEditorController implements Updatable, MouseUpHandler, KeyU
      */
     public void onLoad(LoadEvent event)
     {
-        if (event.getSource() == richTextEditor.getTextArea() && !loaded) {
-            loaded = true;
+        if (event.getSource() == richTextEditor.getTextArea()) {
+            maybeInitialize();
+        }
+    }
+
+    /**
+     * Initialize the rich text editor if it wasn't already initialized.
+     */
+    protected void maybeInitialize()
+    {
+        if (!initialized) {
+            initialized = true;
 
             loadPlugins();
             extendRootUI();
@@ -205,6 +218,7 @@ public class RichTextEditorController implements Updatable, MouseUpHandler, KeyU
             toolBarController.fill(config, pluginManager);
             initTextArea();
 
+            richTextEditor.setLoading(false);
             ActionEvent.fire(getRichTextEditor().getTextArea(), "loaded");
         }
     }
@@ -295,9 +309,9 @@ public class RichTextEditorController implements Updatable, MouseUpHandler, KeyU
     }
 
     /**
-     * @return this editor's configuration object
+     * @return this editor's configuration source
      */
-    public Config getConfig()
+    public Config getConfigurationSource()
     {
         return config;
     }

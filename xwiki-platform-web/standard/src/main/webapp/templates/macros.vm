@@ -2230,9 +2230,11 @@ $xwiki.jsfx.use("js/xwiki/wysiwyg/xwe/XWikiWysiwyg.js", {"forceSkinAction": true
   * ConversionFilter catches any exception during the convesion then it redirects the request back preventing the user
   * from loosing unsaved changes and allowing us to display the exception.
   *
-  * @param $fieldId identifies the form field for which to display the conversion error
+  * @param $parameters WYSIWYG editor configuration parameter map including the id of the field for which to display the
+  *                    conversion errors
   *#
-#macro(wysiwyg_displayConversionError $fieldId)
+#macro(wysiwyg_displayConversionError $parameters)
+#set($fieldId = $parameters.hookId)
 #if("$!{request.key}" != "")
 #set($sessionErrors = $request.getSession().getAttribute("com.xpn.xwiki.wysiwyg.server.converter.errors"))
 #if($sessionErrors && $sessionErrors.containsKey($request.key))
@@ -2240,6 +2242,7 @@ $xwiki.jsfx.use("js/xwiki/wysiwyg/xwe/XWikiWysiwyg.js", {"forceSkinAction": true
 #if($requestErrors && $requestErrors.containsKey($fieldId))
 #set($fieldError = $requestErrors.get($fieldId))
 #if($fieldError)
+#set($ok = $parameters.put('convertInput', false))
 #error("${fieldId}: ${fieldError.message}")
 #set($ok = $requestErrors.remove($fieldId))
 #if($requestErrors.isEmpty())
@@ -2249,109 +2252,6 @@ $xwiki.jsfx.use("js/xwiki/wysiwyg/xwe/XWikiWysiwyg.js", {"forceSkinAction": true
 #end
 #end
 #end
-#end
-
-#**
-  * Sets the input of the WYSIWYG editor.
-  *
-  * @param $fieldId identifies the rich form field for which to set the WYSIWYG input
-  * @param $fieldValue the rich form field value to be set as the input for the WYSIWYG editor; if there is a conversion
-  *            error on the current session for the specified field then this value is discarded and the value provided
-  *            by the ConversionFilter is used instead
-  * @param $parameters WYSIWYG editor configuration parameter map to put the input URL query string in
-  *#
-#macro(wysiwyg_input $fieldId $fieldValue $parameters)
-##
-## In real-time mode the input value must be the empty string (this is a temporary limitation).
-##
-#if($request.sync)
-#set($fieldValue = "")
-#end
-##
-## Use the ConversionFilter output if present to prevent loosing changes after a conversion error.
-##
-#if("$!{request.key}" != "")
-#set($sessionOutput = $request.getSession().getAttribute("com.xpn.xwiki.wysiwyg.server.converter.output"))
-#if($sessionOutput && $sessionOutput.containsKey($request.key))
-#set($requestOutput = $sessionOutput.get($request.key))
-#if($requestOutput && $requestOutput.containsKey($fieldId))
-#set($fieldConversionOutput = $requestOutput.get($fieldId))
-#if($fieldConversionOutput)
-#set($fieldValue = $fieldConversionOutput)
-#set($ok = $requestOutput.remove($fieldId))
-#if($requestOutput.isEmpty())
-#set($ok = $sessionOutput.remove($request.key))
-#end
-#end
-#end
-#end
-#end
-#set($renderFieldValue = true)
-##
-## If there is a conversion error for the specified field then its value is HTML and thus shouldn't be rendered.
-##
-#if("$!{request.key}" != "")
-#set($sessionErrors = $request.getSession().getAttribute("com.xpn.xwiki.wysiwyg.server.converter.errors"))
-#if($sessionErrors && $sessionErrors.containsKey($request.key))
-#set($requestErrors = $sessionErrors.get($request.key))
-#if($requestErrors && $requestErrors.containsKey($fieldId))
-#set($renderFieldValue = false)
-#end
-#end
-#end
-##
-## Put the field value in the WYSIWYG input map.
-##
-#set($wysiwygInput = $request.getSession().getAttribute("com.xpn.xwiki.wysiwyg.input"))
-#if(!$wysiwygInput)
-#set($wysiwygInput = $util.getHashMap())
-$request.getSession().setAttribute("com.xpn.xwiki.wysiwyg.input", $wysiwygInput)
-#end
-#set($wysiwygInputKey = $util.generateRandomString(4))
-#set($ok = $wysiwygInput.put($wysiwygInputKey, $fieldValue))
-##
-## Build the query string for the input URL.
-##
-#set($ok = $parameters.put('inputURLQueryString', "xpage=wysiwyginput&key=${wysiwygInputKey}&render=${renderFieldValue}"))
-#end
-
-#**
-  * Sets the input of the WYSIWYG editor based on a object property identifier. An example of a property identifier is
-  * "XWiki.ArticleClass_0_content". The special "content" property is also supported, which represents the content of
-  * the edited document.
-  *
-  * @param $editedDocument the document whose objects are being edited
-  * @param $propertyId identifies the rich text object property for which to set the WYSIWYG input
-  * @param $parameters WYSIWYG editor configuration parameter map to put the input URL in
-  *#
-#macro(wysiwyg_inputProperty $editedDocument $propertyId $parameters)
-#set($propertyValue = '')
-#if("$!propertyId" == "content")
-#set($propertyValue = $editedDocument.content)
-#else
-#set($found = false)
-#foreach($entry in $editedDocument.xWikiObjects.entrySet())
-## If class name matches..
-#if($propertyId.startsWith("${entry.key}_"))
-#foreach($object in $entry.value)
-#set($classNameAndObjectNumber = $entry.key + '_' + $object.number + '_')
-## If object number matches..
-#if($propertyId.startsWith($classNameAndObjectNumber))
-#set($propertyName = $propertyId.substring($classNameAndObjectNumber.length()))
-## Make sure the property value is always a string. Use the empty string for unset properties.
-#set($propertyValue = "$!{object.getProperty($propertyName).getValue()}")
-#set($found = true)
-#break
-#end ## If object number matches..
-#end ## foreach object
-#if($found)
-#break
-#end
-#end ## If class name matches..
-#end ## foreach class name
-#end
-#wysiwyg_input($propertyId $propertyValue $parameters)
-#set($ok = $parameters.put('inputURL', $editedDocument.getExternalURL('edit', $parameters.remove('inputURLQueryString'))))
 #end
 
 #**
@@ -2398,6 +2298,8 @@ var $jsVarName = {
 #set($ok = $parameters.put('hookId', $fieldId))
 #end
 #set($ok = $parameters.put('syntax', $editedDocument.syntax.toIdString()))
+#set($ok = $parameters.put('convertInput', true))
+#set($ok = $parameters.put('inputURL', $editedDocument.getExternalURL('edit', 'xpage=wysiwyginput')))
 #if($full)
 #set($ok = $parameters.put('displayTabs', 'true'))
 #set($ok = $parameters.put('defaultEditor', 'wysiwyg'))
@@ -2451,7 +2353,7 @@ Wysiwyg.onModuleLoad(function() {
 #macro(wysiwyg_editProperty $editedDocument $propertyId $full)
 #set($parameters = $util.hashMap)
 #wysiwyg_storeConfig($parameters $editedDocument $propertyId $full)
-#wysiwyg_editPropertyCustom($editedDocument $propertyId $parameters)
+#wysiwyg_editPropertyCustom($editedDocument $parameters)
 #end
 
 #**
@@ -2459,18 +2361,15 @@ Wysiwyg.onModuleLoad(function() {
   * special "content" document property is also supported.
   *
   * @param $editedDocument the document whose objects are being edited
-  * @param $propertyIds A comma separated list of property identifiers. An example of a property identifier is "XWiki.ArticleClass_0_content".
   * @param $parameters WYSIWYG editor configuration parameters
   *#
-#macro(wysiwyg_editPropertyCustom $editedDocument $propertyId $parameters)
+#macro(wysiwyg_editPropertyCustom $editedDocument $parameters)
 ## Hide the plain text area.
 #wysiwyg_hide($parameters.hookId)
 ## Import required JavaScript files (lazy=false).
 #wysiwyg_import(false)
-## Set the input value for the editor.
-#wysiwyg_inputProperty($editedDocument $propertyId $parameters)
 ## Display conversion errors, if present.
-#wysiwyg_displayConversionError($propertyId)
+#wysiwyg_displayConversionError($parameters)
 ## Create the cache.
 #wysiwyg_createCache($parameters)
 ## Create the editor UI.
@@ -2503,6 +2402,6 @@ Wysiwyg.onModuleLoad(function() {
 #set($propertyIds = "$!propertyIds")
 #foreach($propertyId in $propertyIds.split(","))
 #set($ok = $instanceParameters.put('hookId', $propertyId))
-#wysiwyg_editPropertyCustom($editedDocument $propertyId $instanceParameters)
+#wysiwyg_editPropertyCustom($editedDocument $instanceParameters)
 #end
 #end

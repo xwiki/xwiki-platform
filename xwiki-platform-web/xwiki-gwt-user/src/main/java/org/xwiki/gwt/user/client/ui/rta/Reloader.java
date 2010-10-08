@@ -83,9 +83,21 @@ public class Reloader implements RequestCallback, LoadHandler
      */
     public Reloader(RichTextArea rta)
     {
+        this(rta, IFrameElement.as(rta.getElement()).getSrc());
+    }
+
+    /**
+     * Creates a new reloader that makes requests to the specified URL and uses the response to reset the content of the
+     * given rich text area.
+     * 
+     * @param rta the rich text area that needs to be reloaded
+     * @param url the URL to get the content from; note that this URL must obey the same-origin policy
+     */
+    public Reloader(RichTextArea rta, String url)
+    {
         this.rta = rta;
 
-        requestBuilder = new RequestBuilder(RequestBuilder.POST, IFrameElement.as(rta.getElement()).getSrc());
+        requestBuilder = new RequestBuilder(RequestBuilder.POST, url);
         // NOTE: We must specify the character set because otherwise the server side will use the configured encoding.
         requestBuilder.setHeader("Content-type", "application/x-www-form-urlencoded; charset=UTF-8");
     }
@@ -142,9 +154,11 @@ public class Reloader implements RequestCallback, LoadHandler
             } else {
                 // Save the inner HTML listeners.
                 swapInnerHTMLListeners();
+                // Renew the in-line frame used by the rich text area in order to prevent the browser from recording a
+                // new entry in its navigation history. This is a hack but we had no choice.
+                renewRichTextAreaElement();
+                // Listen to the load event to restore the inner HTML listeners.
                 loadRegistration = rta.addLoadHandler(this);
-                // We can't reload the document while it is in design mode.
-                rta.getDocument().setDesignMode(false);
             }
             updateContent(response.getText());
         } else {
@@ -152,6 +166,38 @@ public class Reloader implements RequestCallback, LoadHandler
                 .httpStatusTextRequestAborted() : response.getStatusText()));
         }
     }
+
+    /**
+     * Renew the in-line frame used by the rich text area in order to prevent the browser from recording a new entry in
+     * its navigation history. This is a hack but we had no choice.
+     */
+    private native void renewRichTextAreaElement()
+    /*-{
+        var rta = this.@org.xwiki.gwt.user.client.ui.rta.Reloader::rta;
+        var rtaImpl = rta.@com.google.gwt.user.client.ui.RichTextArea::impl;
+        var iframe = rta.@com.google.gwt.user.client.ui.UIObject::element;
+        
+        // Fake detach to release event listeners.
+        rta.@com.google.gwt.user.client.ui.Widget::onDetach()(); 
+
+        // Clone the current in-line frame.
+        var newIframe = iframe.cloneNode(true);
+
+        // Update the reference to the in-line frame in the widgets.
+        rta.@com.google.gwt.user.client.ui.UIObject::element = newIframe;
+        rtaImpl.@com.google.gwt.user.client.ui.impl.RichTextAreaImpl::elem = newIframe;
+
+        // Update the DOM.
+        iframe.parentNode.replaceChild(newIframe, iframe);
+
+        // Don't let the in-line frame load to prevent the browser from recording a new history entry. We use DOMUtils
+        // because only static references to overlay types are allowed from JSNI.
+        var domUtils = @org.xwiki.gwt.dom.client.DOMUtils::getInstance()();
+        domUtils.@org.xwiki.gwt.dom.client.DOMUtils::stop(Lorg/xwiki/gwt/dom/client/Window;)(newIframe.contentWindow);
+        
+        // Fake attach to initialize the event listeners.
+        rta.@com.google.gwt.user.client.ui.Widget::onAttach()();
+    }-*/;
 
     /**
      * Updates the content of the rich text area.

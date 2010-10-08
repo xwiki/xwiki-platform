@@ -48,32 +48,14 @@ function fireContentLoad(contentLoadTriggerId) {
 // ]]>
 </script>
 </head>
-## We don't use directly $tdoc.content because we could loose changes made by the 
-## user before switching from wiki editor to wysiwyg or before saving when a 
-## conversion exception is thrown.
-#set($content = $tdoc.content)
-#set($render = ("$!request.render" == "true"))
-#if("$!request.key" != "")
-  #set($wysiwygInput = $request.getSession().getAttribute("com.xpn.xwiki.wysiwyg.input"))
-  #if($wysiwygInput && $wysiwygInput.containsKey($request.key))
-    #set($content = $wysiwygInput.get($request.key))
-    #set($ok = $wysiwygInput.remove($request.key))
-  #elseif($request.getParameterMap().containsKey("source"))
-    #set($content = $request.source)
-  #elseif($request.getParameterMap().containsKey("html"))
-    #set($render = false)
-    #set($content = $services.wysiwyg.parseAndRender($request.html, $tdoc.getSyntax().toIdString()))
-  #end
+#if($request.method.equalsIgnoreCase('post'))
+#if($request.getParameterMap().containsKey('source'))
+#set($content = $tdoc.getRenderedContent($request.source, $tdoc.getSyntax().toIdString(), 'annotatedxhtml/1.0'))
+#elseif($request.getParameterMap().containsKey('html'))
+#set($content = $services.wysiwyg.parseAndRender($request.html, $tdoc.getSyntax().toIdString()))
 #end
-## We don't always have to render the content:
-## * If this template is called after a conversion exception then the content is HTML.
-## * If the WYSIWYG is in real time mode then the content must be empty.
-#if($render)
-  ## We render using the Annotated XHTML Renderer since we need the extra metadata in order to be able to do full
-  ## Round tripping between HTML and Wiki syntax.
-  #set($content = $tdoc.getRenderedContent($content, $tdoc.getSyntax().toIdString(), "annotatedxhtml/1.0"))
 #end
-<body id="body" class="main">$content<script id="__contentLoadTrigger" type="text/javascript"><!--
+<body id="body" class="main">$!content<script id="__contentLoadTrigger" type="text/javascript"><!--
 fireContentLoad('__contentLoadTrigger')
 --></script></body>
 </html>

@@ -33,13 +33,10 @@ import org.xwiki.gwt.wysiwyg.client.converter.HTMLConverter;
 import org.xwiki.gwt.wysiwyg.client.converter.HTMLConverterAsync;
 
 import com.google.gwt.core.client.GWT;
-import com.google.gwt.event.dom.client.LoadEvent;
-import com.google.gwt.event.dom.client.LoadHandler;
 import com.google.gwt.event.logical.shared.BeforeSelectionEvent;
 import com.google.gwt.event.logical.shared.BeforeSelectionHandler;
 import com.google.gwt.event.logical.shared.SelectionEvent;
 import com.google.gwt.event.logical.shared.SelectionHandler;
-import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.user.client.DeferredCommand;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.TabPanel;
@@ -92,6 +89,12 @@ public class WysiwygEditorTabSwitchHandler implements SelectionHandler<Integer>,
     private CancelableAsyncCallback<String> sourceCallback;
 
     /**
+     * The object notified when the response for the conversion from source to HTML is received. This object is used
+     * only if the {@code templateURL} is not provided, i.e. if {@link #reloader} is {@code null}.
+     */
+    private CancelableAsyncCallback<String> wysiwygCallback;
+
+    /**
      * The last HTML converted to source. This helps us prevent converting the same rich text to source multiple times,
      * like when the user switches tabs without changing the content.
      */
@@ -121,30 +124,13 @@ public class WysiwygEditorTabSwitchHandler implements SelectionHandler<Integer>,
      * 
      * @param editor the {@link WysiwygEditor} instance
      */
-    WysiwygEditorTabSwitchHandler(final WysiwygEditor editor)
+    WysiwygEditorTabSwitchHandler(WysiwygEditor editor)
     {
         this.editor = editor;
-        reloader = new Reloader(editor.getRichTextEditor().getTextArea());
-        sourceSyntax = editor.getConfig().getParameter("syntax", WysiwygEditor.DEFAULT_SYNTAX);
+        String templateURL = editor.getConfig().getTemplateURL();
+        reloader = templateURL == null ? null : new Reloader(editor.getRichTextEditor().getTextArea(), templateURL);
+        sourceSyntax = editor.getConfig().getSyntax();
         domSelectionPreserver = new SelectionPreserver(editor.getRichTextEditor().getTextArea());
-
-        // Prevent a useless conversion the first time the user switches from source to rich text if the source text
-        // didn't change and the user switched to source tab before the rich text area finished loading.
-        lastConvertedSourceText = editor.getPlainTextEditor().getTextArea().getText();
-
-        // Prevent a useless conversion the first time the user switches from rich text to source.
-        final HandlerRegistration[] registrations = new HandlerRegistration[1];
-        registrations[0] = editor.getRichTextEditor().getTextArea().addLoadHandler(new LoadHandler()
-        {
-            public void onLoad(LoadEvent event)
-            {
-                registrations[0].removeHandler();
-                if (editor.getSelectedTab() == WysiwygEditor.WYSIWYG_TAB_INDEX) {
-                    lastConvertedHTML =
-                        editor.getRichTextEditor().getTextArea().getCommandManager().getStringValue(SUBMIT);
-                }
-            }
-        });
     }
 
     /**
@@ -162,7 +148,7 @@ public class WysiwygEditorTabSwitchHandler implements SelectionHandler<Integer>,
         }
 
         switch (currentlySelectedTab) {
-            case WysiwygEditor.WYSIWYG_TAB_INDEX:
+            case WysiwygEditorConfig.WYSIWYG_TAB_INDEX:
                 if (!editor.getRichTextEditor().isLoading()) {
                     // Notify the plug-ins that the content of the rich text area is about to be submitted.
                     // We have to do this before the tabs are actually switched because plug-ins can't access the
@@ -172,7 +158,7 @@ public class WysiwygEditorTabSwitchHandler implements SelectionHandler<Integer>,
                     domSelectionPreserver.saveSelection();
                 }
                 break;
-            case WysiwygEditor.SOURCE_TAB_INDEX:
+            case WysiwygEditorConfig.SOURCE_TAB_INDEX:
                 if (!editor.getPlainTextEditor().isLoading()) {
                     // Save the source selection before the plain text area is hidden.
                     sourceRange[0] = editor.getPlainTextEditor().getTextArea().getCursorPos();
@@ -194,7 +180,7 @@ public class WysiwygEditorTabSwitchHandler implements SelectionHandler<Integer>,
      */
     public void onSelection(SelectionEvent<Integer> event)
     {
-        if (event.getSelectedItem() == WysiwygEditor.WYSIWYG_TAB_INDEX) {
+        if (event.getSelectedItem() == WysiwygEditorConfig.WYSIWYG_TAB_INDEX) {
             switchToWysiwyg();
         } else {
             switchToSource();
@@ -216,38 +202,48 @@ public class WysiwygEditorTabSwitchHandler implements SelectionHandler<Integer>,
             String currentHTML = editor.getRichTextEditor().getTextArea().getCommandManager().getStringValue(SUBMIT);
             // If the HTML didn't change then there's no point in doing the conversion again.
             if (!currentHTML.equals(lastConvertedHTML)) {
-                // Update the HTML to prevent duplicated requests while the conversion is in progress.
-                lastConvertedHTML = currentHTML;
-                // Clear the saved source selection range because a new source text will be loaded. Place the caret at
-                // start.
-                sourceRange[0] = 0;
-                sourceRange[1] = 0;
-                // If there is a conversion is progress, cancel it.
-                if (sourceCallback != null) {
-                    sourceCallback.setCanceled(true);
-                } else {
-                    editor.getPlainTextEditor().setLoading(true);
-                }
-                sourceCallback = new CancelableAsyncCallback<String>(new AsyncCallback<String>()
-                {
-                    public void onFailure(Throwable caught)
-                    {
-                        sourceCallback = null;
-                        onSwitchToSourceFailure(caught);
-                    }
-
-                    public void onSuccess(String result)
-                    {
-                        sourceCallback = null;
-                        onSwitchToSourceSuccess(result);
-                    }
-                });
-                // Make the request to convert the HTML to source syntax.
-                converter.fromHTML(currentHTML, sourceSyntax, sourceCallback);
+                convertFromHTML(currentHTML);
             } else if (!editor.getPlainTextEditor().isLoading()) {
                 enableSourceTab();
             }
         }
+    }
+
+    /**
+     * Converts the given HTML fragment to source and updates the plain text area.
+     * 
+     * @param html the HTML fragment to be converted to source
+     */
+    public void convertFromHTML(String html)
+    {
+        // Update the HTML to prevent duplicated requests while the conversion is in progress.
+        lastConvertedHTML = html;
+        // Clear the saved source selection range because a new source text will be loaded. Place the caret at
+        // start.
+        sourceRange[0] = 0;
+        sourceRange[1] = 0;
+        // If there is a conversion is progress, cancel it.
+        if (sourceCallback != null) {
+            sourceCallback.setCanceled(true);
+        } else {
+            editor.getPlainTextEditor().setLoading(true);
+        }
+        sourceCallback = new CancelableAsyncCallback<String>(new AsyncCallback<String>()
+        {
+            public void onFailure(Throwable caught)
+            {
+                sourceCallback = null;
+                onSwitchToSourceFailure(caught);
+            }
+
+            public void onSuccess(String result)
+            {
+                sourceCallback = null;
+                onSwitchToSourceSuccess(result);
+            }
+        });
+        // Make the request to convert the HTML to source syntax.
+        converter.fromHTML(html, sourceSyntax, sourceCallback);
     }
 
     /**
@@ -261,7 +257,7 @@ public class WysiwygEditorTabSwitchHandler implements SelectionHandler<Integer>,
         // Reset the last converted HTML to retry the conversion.
         lastConvertedHTML = null;
         // Move back to the WYSIWYG tab to prevent losing data.
-        editor.setSelectedTab(WysiwygEditor.WYSIWYG_TAB_INDEX);
+        editor.setSelectedTab(WysiwygEditorConfig.WYSIWYG_TAB_INDEX);
     }
 
     /**
@@ -277,7 +273,7 @@ public class WysiwygEditorTabSwitchHandler implements SelectionHandler<Integer>,
         editor.getPlainTextEditor().getTextArea().setText(source);
         editor.getPlainTextEditor().setLoading(false);
         // If we are still on the source tab..
-        if (editor.getSelectedTab() == WysiwygEditor.SOURCE_TAB_INDEX) {
+        if (editor.getSelectedTab() == WysiwygEditorConfig.SOURCE_TAB_INDEX) {
             enableSourceTab();
         }
     }
@@ -294,6 +290,8 @@ public class WysiwygEditorTabSwitchHandler implements SelectionHandler<Integer>,
         editor.getPlainTextEditor().getTextArea().setEnabled(true);
         // Store the initial value of the plain text area in case it is submitted without gaining focus.
         editor.getPlainTextEditor().submit();
+        // Remember the fact that the submitted value is not HTML for the case when the editor is loaded from cache.
+        editor.getConfig().setInputConverted(false);
         // Restore the selected text or just place the caret at start.
         restoreSourceSelection();
     }
@@ -333,26 +331,7 @@ public class WysiwygEditorTabSwitchHandler implements SelectionHandler<Integer>,
             String currentSourceText = editor.getPlainTextEditor().getTextArea().getText();
             // If the source text didn't change then there's no point in doing the conversion again.
             if (!currentSourceText.equals(lastConvertedSourceText)) {
-                // Update the source text to prevent duplicated conversion requests while the conversion is in progress.
-                lastConvertedSourceText = currentSourceText;
-                // Clear the saved selection because the document is reloaded.
-                domSelectionPreserver.clearPlaceHolders();
-                editor.getRichTextEditor().setLoading(true);
-                // Reload the rich text area.
-                Map<String, String> params = new HashMap<String, String>();
-                params.put("source", currentSourceText);
-                reloader.reload(params, new AsyncCallback<String>()
-                {
-                    public void onFailure(Throwable caught)
-                    {
-                        onSwitchToWysiwygFailure(caught);
-                    }
-
-                    public void onSuccess(String result)
-                    {
-                        onSwitchToWysiwygSuccess();
-                    }
-                });
+                convertToHTML(currentSourceText);
             } else if (!editor.getRichTextEditor().isLoading()) {
                 // NOTE: We have to use a deferred command in order to let the rich text area re-initialize its internal
                 // selection object after it was hidden. The internal selection object is null at this point.
@@ -361,7 +340,7 @@ public class WysiwygEditorTabSwitchHandler implements SelectionHandler<Integer>,
                     public void execute()
                     {
                         // Double check the selected tab.
-                        if (editor.getSelectedTab() == WysiwygEditor.WYSIWYG_TAB_INDEX
+                        if (editor.getSelectedTab() == WysiwygEditorConfig.WYSIWYG_TAB_INDEX
                             && !editor.getRichTextEditor().isLoading()) {
                             enableWysiwygTab();
                         }
@@ -369,6 +348,79 @@ public class WysiwygEditorTabSwitchHandler implements SelectionHandler<Integer>,
                 });
             }
         }
+    }
+
+    /**
+     * Converts the given source text to HTML and updates the rich text area.
+     * 
+     * @param source the source text to be converted to HTML
+     */
+    public void convertToHTML(String source)
+    {
+        // Update the source text to prevent duplicated conversion requests while the conversion is in progress.
+        lastConvertedSourceText = source;
+        // Clear the saved selection because the document is reloaded.
+        domSelectionPreserver.clearPlaceHolders();
+        editor.getRichTextEditor().setLoading(true);
+        if (reloader != null) {
+            convertToHTMLWithTemplate(source);
+        } else {
+            convertToHTMLWithoutTemplate(source);
+        }
+    }
+
+    /**
+     * Converts the given source text to HTML using the provided rich text area template and updates the rich text area.
+     * 
+     * @param source the source text to be converted to HTML
+     */
+    private void convertToHTMLWithTemplate(String source)
+    {
+        // Reload the rich text area.
+        Map<String, String> params = new HashMap<String, String>();
+        params.put("source", source);
+        reloader.reload(params, new AsyncCallback<Void>()
+        {
+            public void onFailure(Throwable caught)
+            {
+                onSwitchToWysiwygFailure(caught);
+            }
+
+            public void onSuccess(Void result)
+            {
+                onSwitchToWysiwygSuccess();
+            }
+        });
+    }
+
+    /**
+     * Converts the given source text to HTML using the HTML converter.
+     * 
+     * @param source the source text to be converted to HTML
+     */
+    private void convertToHTMLWithoutTemplate(String source)
+    {
+        // If there is a conversion is progress, cancel it.
+        if (wysiwygCallback != null) {
+            wysiwygCallback.setCanceled(true);
+        }
+        wysiwygCallback = new CancelableAsyncCallback<String>(new AsyncCallback<String>()
+        {
+            public void onFailure(Throwable caught)
+            {
+                wysiwygCallback = null;
+                onSwitchToWysiwygFailure(caught);
+            }
+
+            public void onSuccess(String result)
+            {
+                wysiwygCallback = null;
+                editor.getRichTextEditor().getTextArea().setHTML(result);
+                onSwitchToWysiwygSuccess();
+            }
+        });
+        // Make the request to convert the source text to HTML.
+        converter.toHTML(source, sourceSyntax, wysiwygCallback);
     }
 
     /**
@@ -382,7 +434,7 @@ public class WysiwygEditorTabSwitchHandler implements SelectionHandler<Integer>,
         // Reset the last converted source text to retry the conversion.
         lastConvertedSourceText = null;
         // Move back to the source tab to prevent losing data.
-        editor.setSelectedTab(WysiwygEditor.SOURCE_TAB_INDEX);
+        editor.setSelectedTab(WysiwygEditorConfig.SOURCE_TAB_INDEX);
     }
 
     /**
@@ -393,9 +445,10 @@ public class WysiwygEditorTabSwitchHandler implements SelectionHandler<Integer>,
         // Reset the content of the rich text area.
         editor.getRichTextEditor().getTextArea().getCommandManager().execute(RESET);
         // If we are still on the WYSIWYG tab..
-        if (editor.getSelectedTab() == WysiwygEditor.WYSIWYG_TAB_INDEX) {
+        if (editor.getSelectedTab() == WysiwygEditorConfig.WYSIWYG_TAB_INDEX) {
             enableWysiwygTab();
         }
+        editor.getRichTextEditor().setLoading(false);
     }
 
     /**
@@ -403,9 +456,14 @@ public class WysiwygEditorTabSwitchHandler implements SelectionHandler<Integer>,
      */
     private void enableWysiwygTab()
     {
-        // Disable the plain text area to prevent submitting its content.
-        editor.getPlainTextEditor().getTextArea().setEnabled(false);
+        // Disable the plain text area (if present) to prevent submitting its content.
+        PlainTextEditor plainTextEditor = editor.getPlainTextEditor();
+        if (plainTextEditor != null) {
+            plainTextEditor.getTextArea().setEnabled(false);
+        }
 
+        // Initialize the rich text editor if this is the first time we switch to WYSIWYG tab.
+        editor.maybeInitializeRichTextEditor();
         // Restore the DOM selection before executing the commands.
         restoreDOMSelection();
         // Store the initial value of the rich text area in case it is submitted without gaining focus.
@@ -414,6 +472,8 @@ public class WysiwygEditorTabSwitchHandler implements SelectionHandler<Integer>,
         lastConvertedHTML = editor.getRichTextEditor().getTextArea().getCommandManager().getStringValue(SUBMIT);
         // Enable the rich text area in order to be able to submit its content.
         editor.getRichTextEditor().getTextArea().getCommandManager().execute(ENABLE, true);
+        // Remember the fact that the submitted value is HTML for the case when the editor is loaded from cache.
+        editor.getConfig().setInputConverted(true);
     }
 
     /**

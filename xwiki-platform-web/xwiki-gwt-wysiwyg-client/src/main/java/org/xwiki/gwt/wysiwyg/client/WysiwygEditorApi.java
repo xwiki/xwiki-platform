@@ -96,7 +96,7 @@ public class WysiwygEditorApi
         editor = WysiwygEditorFactory.getInstance().newEditor(config);
 
         // Attach the editor to the browser's document.
-        if (Boolean.TRUE.toString().equals(editor.getConfig().getParameter("debug", "false"))) {
+        if (editor.getConfig().isDebugMode()) {
             RootPanel.get(containerId).add(new WysiwygEditorDebugger(editor));
         } else {
             RootPanel.get(containerId).add(editor.getUI());
@@ -176,7 +176,7 @@ public class WysiwygEditorApi
             editor.getRichTextEditor().getTextArea().getCommandManager().execute(SUBMIT);
             // Make the request to convert the submitted HTML to source text.
             converter.fromHTML(editor.getRichTextEditor().getTextArea().getCommandManager().getStringValue(SUBMIT),
-                editor.getConfig().getParameter("syntax", WysiwygEditor.DEFAULT_SYNTAX), callback);
+                editor.getConfig().getSyntax(), callback);
         } else {
             // We take the source text from the plain text editor.
             callback.onSuccess(editor.getPlainTextEditor().getTextArea().getText());
@@ -217,7 +217,7 @@ public class WysiwygEditorApi
      */
     public String getParameter(String name)
     {
-        return editor.getConfig().getParameter(name);
+        return editor.getConfigurationSource().getParameter(name);
     }
 
     /**
@@ -226,7 +226,7 @@ public class WysiwygEditorApi
     public JsArrayString getParameterNames()
     {
         JsArrayString parameterNames = JavaScriptObject.createArray().cast();
-        for (String parameterName : editor.getConfig().getParameterNames()) {
+        for (String parameterName : editor.getConfigurationSource().getParameterNames()) {
             parameterNames.push(parameterName);
         }
         return parameterNames;

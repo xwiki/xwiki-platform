@@ -87,7 +87,7 @@ public class DefaultLinkService implements LinkService
      * Note: The link reference syntax is independent of the syntax of the edited document. The current hint should be
      * replaced with a generic one to avoid confusion.
      */
-    @Requirement("xwiki/2.1")
+    @Requirement("xwiki/2.1/link")
     private ResourceReferenceParser linkReferenceParser;
 
     /**

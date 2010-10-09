@@ -206,8 +206,13 @@
           <tr><th colspan="3">$msg.get('core.viewers.diff.object.updated', [$object.get(0).number, $object.get(0).className])</th></tr>
         #end
         #foreach($propertyChange in $object)
-          #if($propertyChange.action != 'object-added' && $propertyChange.action != 'object-removed')
-            #displayPropertyChange($propertyChange ${propertyChange.propName} ${propertyChange.propName})
+          #if ($propertyChange.action != 'object-added' && $propertyChange.action != 'object-removed')
+            #set ($class = $xwiki.getDocument($object.get(0).className).getxWikiClass())
+            #set ($propertyPrettyName = "$!{class.get(${propertyChange.propName}).getPrettyName()}")
+            #if ($propertyPrettyName == '')
+              #set ($propertyPrettyName = ${propertyChange.propName})
+            #end
+            #displayPropertyChange ($propertyChange ${propertyChange.propName} ${propertyPrettyName})
           #end
         #end
       #end

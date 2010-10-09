@@ -371,7 +371,8 @@ public class XWikiServletURLFactory extends XWikiDefaultURLFactory
     public URL createAttachmentURL(String filename, String web, String name, String action, String querystring,
         String xwikidb, XWikiContext context)
     {
-        if ((context != null) && "viewrev".equals(context.getAction()) && context.get("rev") != null) {
+        if ((context != null) && "viewrev".equals(context.getAction()) && context.get("rev") != null
+            && isContextDoc(xwikidb, web, name, context)) {
             try {
                 String docRevision = context.get("rev").toString();
                 XWikiAttachment attachment =
@@ -407,6 +408,28 @@ public class XWikiServletURLFactory extends XWikiDefaultURLFactory
         } catch (Exception e) {
             return null;
         }
+    }
+
+    /**
+     * Check if a document is the original context document. This is needed when generating attachment revision URLs,
+     * since only attachments of the context document should also be versioned.
+     * 
+     * @param wiki the wiki name of the document to check
+     * @param space the space name of the document to check
+     * @param name the document name of the document to check
+     * @param context the current request context
+     * @return {@code true} if the provided document is the same as the current context document, {@code false}
+     *         otherwise
+     */
+    protected boolean isContextDoc(String wiki, String space, String name, XWikiContext context)
+    {
+        if (context == null || context.getDoc() == null) {
+            return false;
+        }
+        XWikiDocument doc = context.getDoc();
+        return doc.getDocumentReference().getLastSpaceReference().getName().equals(space)
+            && doc.getDocumentReference().getName().equals(name)
+            && (wiki == null || doc.getDocumentReference().getWikiReference().getName().equals(wiki));
     }
 
     /**

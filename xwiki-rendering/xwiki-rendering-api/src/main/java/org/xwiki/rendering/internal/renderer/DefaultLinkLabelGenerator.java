@@ -35,7 +35,7 @@ public class DefaultLinkLabelGenerator implements LinkLabelGenerator
     /**
      * {@inheritDoc}
      * @see org.xwiki.rendering.renderer.reference.link.LinkLabelGenerator#generate(
-     *org.xwiki.rendering.listener.reference.ResourceReference)
+     *      org.xwiki.rendering.listener.reference.ResourceReference)
      * @since 2.5RC1
      */
     public String generate(ResourceReference reference)

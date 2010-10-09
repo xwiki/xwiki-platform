@@ -34,18 +34,13 @@ import org.xwiki.rendering.renderer.reference.link.URILabelGenerator;
 public class MailtoURILabelGenerator implements URILabelGenerator
 {
     /**
-     * The MAILTO URI prefix (the scheme followed by ":").
-     */
-    private static final String MAILTO = "mailto:";
-    
-    /**
      * {@inheritDoc}
      * @see org.xwiki.rendering.renderer.reference.link.URILabelGenerator#generateLabel(
      *org.xwiki.rendering.listener.reference.ResourceReference)
      */
     public String generateLabel(ResourceReference reference)
     {
-        // Remove the scheme prefix and the query string (if any).
-        return StringUtils.substringBefore(StringUtils.removeStart(reference.getReference(), MAILTO), "?");
+        // Remove the query string (if any).
+        return StringUtils.substringBefore(reference.getReference(), "?");
     }
 }

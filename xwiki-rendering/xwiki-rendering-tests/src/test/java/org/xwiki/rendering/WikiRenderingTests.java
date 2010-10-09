@@ -19,12 +19,8 @@
  */
 package org.xwiki.rendering;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import junit.framework.TestCase;
 
-import org.xwiki.component.descriptor.ComponentDescriptor;
 import org.xwiki.rendering.configuration.RenderingConfiguration;
 import org.xwiki.rendering.internal.configuration.DefaultRenderingConfiguration;
 import org.xwiki.rendering.scaffolding.MockWikiModel;

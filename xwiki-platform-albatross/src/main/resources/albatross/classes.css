@@ -47,3 +47,25 @@
   /* Rounding errors with 33.3%, might end up with one more pixel which pushes the column down. */
   width: 33.2%;
 }
+
+.avatar_30 {
+  max-widht: 30px;
+  max-height: 30px;
+}
+* html .avatar_30 {
+  width: 30px;
+}
+.avatar_50 {
+  max-widht: 50px;
+  max-height: 50px;
+}
+* html .avatar_50 {
+  width: 50px;
+}
+.avatar_120 {
+  max-widht: 120px;
+  max-height: 120px;
+}
+* html .avatar_120 {
+  width: 120px;
+}

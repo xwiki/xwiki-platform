@@ -141,6 +141,28 @@ a img {
     border: none;
 }
 
+.avatar_30 {
+  max-widht: 30px;
+  max-height: 30px;
+}
+* html .avatar_30 {
+  width: 30px;
+}
+.avatar_50 {
+  max-widht: 50px;
+  max-height: 50px;
+}
+* html .avatar_50 {
+  width: 50px;
+}
+.avatar_120 {
+  max-widht: 120px;
+  max-height: 120px;
+}
+* html .avatar_120 {
+  width: 120px;
+}
+
 /* Used to signify a rendering error in the rendered page. Valid only with new rendering */
 .xwikirenderingerror {
   background-color: #eee; 

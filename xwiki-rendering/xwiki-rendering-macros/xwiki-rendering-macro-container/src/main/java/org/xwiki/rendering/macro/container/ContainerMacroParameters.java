@@ -12,11 +12,6 @@ import org.xwiki.properties.annotation.PropertyDescription;
 public class ContainerMacroParameters
 {
     /**
-     * String identifier of the columns layout style.
-     */
-    public static final String COLUMNS_LAYOUT_STYLE = "columns";
-
-    /**
      * Flag specifying whether the groups inside this macro are displayed as justified or not.
      */
     private boolean justify;

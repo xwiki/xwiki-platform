@@ -3,6 +3,7 @@
   border: 1px dotted #003366;
   width: 30%;
   white-space:normal;
+  background-color: #FFF;
 }
 
 .rsschanneltitle {
@@ -11,12 +12,11 @@
   margin-bottom: 10px;
   padding: 5px;
   text-align: center;
-  background-color: #BDDE7B;
 }
 
 .rssitemtitle {
   margin-bottom: 5px;
-  background-color: white;
+  background-color: #FFF;
 }
 
 .rssitem {

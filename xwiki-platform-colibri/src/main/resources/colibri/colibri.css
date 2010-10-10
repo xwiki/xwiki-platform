@@ -297,6 +297,28 @@ span.wikicreatelink a:after {
   width: 33.2%;
 }
 
+.avatar_30 {
+  max-widht: 30px;
+  max-height: 30px;
+}
+* html .avatar_30 {
+  width: 30px;
+}
+.avatar_50 {
+  max-widht: 50px;
+  max-height: 50px;
+}
+* html .avatar_50 {
+  width: 50px;
+}
+.avatar_120 {
+  max-widht: 120px;
+  max-height: 120px;
+}
+* html .avatar_120 {
+  width: 120px;
+}
+
 /* @group VIEW LAYOUT */
 /* --------------------------------------------------------------
   * Layout elements for Colibri skin in view mode

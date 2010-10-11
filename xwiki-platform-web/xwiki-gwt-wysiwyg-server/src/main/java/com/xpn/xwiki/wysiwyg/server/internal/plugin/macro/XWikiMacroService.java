@@ -26,6 +26,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.xwiki.component.annotation.Requirement;
@@ -145,7 +146,9 @@ public class XWikiMacroService implements MacroService
     {
         ParameterDescriptor result = new ParameterDescriptor();
         result.setId(descriptor.getId());
-        result.setName(descriptor.getName());
+        // Fall-back on parameter id if parameter name if not specified.
+        // See XWIKI-4558 (Add macro parameter display name support to wiki macros).
+        result.setName(StringUtils.isBlank(descriptor.getName()) ? descriptor.getId() : descriptor.getName());
         result.setDescription(descriptor.getDescription());
         result.setType(createMacroParameterType(descriptor.getType()));
         Object defaultValue = descriptor.getDefaultValue();

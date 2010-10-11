@@ -38,15 +38,6 @@ public class RenderingTests extends TestCase
     {
         RenderingTestSuite suite = new RenderingTestSuite("Test Velocity Macro");
 
-        suite.addTestsFromResource("macrovelocity1", true);
-        suite.addTestsFromResource("macrovelocity2", true);
-        suite.addTestsFromResource("macrovelocity3", true);
-        suite.addTestsFromResource("macrovelocity4", true);
-        suite.addTestsFromResource("macrovelocity5", true);
-        suite.addTestsFromResource("macrovelocity6", true);
-        suite.addTestsFromResource("macrovelocity7", true);
-        suite.addTestsFromResource("macrovelocity8", true);
-
         ComponentManagerTestSetup testSetup = new ComponentManagerTestSetup(suite);
         new ScriptMockSetup(testSetup.getComponentManager());
 

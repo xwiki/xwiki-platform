@@ -1,3 +1,5 @@
+.runTransformations
+.#-----------------------------------------------------
 .# Test that columns container with one 2 groups styles the columns properly 
 .#-----------------------------------------------------
 .input|xwiki/2.0

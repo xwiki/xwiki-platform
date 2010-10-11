@@ -1,45 +1,31 @@
+.runTransformations
 .#-----------------------------------------------------
 .input|xwiki/2.0
-.# Same a macro1.test but this time the macro is executed.
 .#-----------------------------------------------------
-First paragraph.
-
-{{testsimplemacro}}
-Some **content**
-{{/testsimplemacro}}
+{{testsimplemacro param="v\al~"u~~e"/}}
 .#-----------------------------------------------------
 .expect|event/1.0
 .#-----------------------------------------------------
 beginDocument
+beginMacroMarkerStandalone [testsimplemacro] [param=v\al"u~e]
 beginParagraph
-onWord [First]
-onSpace
-onWord [paragraph]
-onSpecialSymbol [.]
+onWord [simplemacro0]
 endParagraph
-beginMacroMarkerStandalone [testsimplemacro] [] [Some **content**]
-beginParagraph
-onWord [simplemacro2]
-endParagraph
-endMacroMarkerStandalone [testsimplemacro] [] [Some **content**]
+endMacroMarkerStandalone [testsimplemacro] [param=v\al"u~e]
 endDocument
 .#-----------------------------------------------------
 .expect|xhtml/1.0
 .#-----------------------------------------------------
-<p>First paragraph.</p><p>simplemacro2</p>
+<p>simplemacro0</p>
 .#-----------------------------------------------------
 .expect|annotatedxhtml/1.0
 .#-----------------------------------------------------
-<p>First paragraph.</p><!--startmacro:testsimplemacro|-||-|Some **content**--><p>simplemacro2</p><!--stopmacro-->
+<!--startmacro:testsimplemacro|-|param="v\\\\al\\"u~e"--><p>simplemacro0</p><!--stopmacro-->
 .#-----------------------------------------------------
 .expect|xwiki/2.0
 .#-----------------------------------------------------
-First paragraph.
-
-{{testsimplemacro}}
-Some **content**
-{{/testsimplemacro}}
+{{testsimplemacro param="v\al~"u~~e"/}}
 .#-----------------------------------------------------
 .input|xhtml/1.0
 .#-----------------------------------------------------
-<p>First paragraph.</p><!--startmacro:testsimplemacro|-||-|Some **content**--><p>simplemacro2</p><!--stopmacro-->
+<!--startmacro:testsimplemacro|-|param="v\\\\al\\"u~e"--><p>simplemacro0</p><!--stopmacro-->

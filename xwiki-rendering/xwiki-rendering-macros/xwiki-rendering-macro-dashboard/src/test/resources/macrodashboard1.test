@@ -1,3 +1,5 @@
+.runTransformations
+.#-----------------------------------------------------
 .# Test that dashboard macro with columns layout produces the same result as a container macro with columns layout and justify parameter.
 .# Also test that dashboard without layout parameter does columns layouting. 
 .# Put macro instances in the dashboard macro in these tests so that they would work fine even when implementing the dashboard content restrictions 

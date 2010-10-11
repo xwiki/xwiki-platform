@@ -36,18 +36,6 @@ public class RenderingTests extends TestCase
     public static Test suite() throws Exception
     {
         RenderingTestSuite suite = new RenderingTestSuite("Test Toc Macro");
-
-        suite.addTestsFromResource("macrotoc1", true);
-        suite.addTestsFromResource("macrotoc2", true);
-        suite.addTestsFromResource("macrotoc3", true);
-        suite.addTestsFromResource("macrotoc4", true);
-        suite.addTestsFromResource("macrotoc5", true);
-        suite.addTestsFromResource("macrotoc6", true);
-        suite.addTestsFromResource("macrotoc7", true);
-        suite.addTestsFromResource("macrotoc8", true);
-        suite.addTestsFromResource("macrotoc9", true);
-        suite.addTestsFromResource("macrotoc10", true);
-
         return new ComponentManagerTestSetup(suite);
     }
 }

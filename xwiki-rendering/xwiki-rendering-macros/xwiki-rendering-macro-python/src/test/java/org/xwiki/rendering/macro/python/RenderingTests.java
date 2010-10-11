@@ -51,11 +51,6 @@ public class RenderingTests extends TestCase
     public static Test suite() throws Exception
     {
         RenderingTestSuite suite = new RenderingTestSuite("Test Python Macro");
-
-        suite.addTestsFromResource("macropython1", true);
-        suite.addTestsFromResource("macropython2", true);
-        suite.addTestsFromResource("macropython3", true);
-
         ComponentManagerTestSetup testSetup = new ComponentManagerTestSetup(suite);
         setUpMocks(testSetup.getComponentManager());
 

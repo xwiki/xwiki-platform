@@ -36,10 +36,6 @@ public class RenderingTests extends TestCase
     public static Test suite() throws Exception
     {
         RenderingTestSuite suite = new RenderingTestSuite("Test Footnote Macro");
-
-        suite.addTestsFromResource("macrofootnote1", true);
-        suite.addTestsFromResource("macrofootnote2", true);
-
         return new ComponentManagerTestSetup(suite);
     }
 }

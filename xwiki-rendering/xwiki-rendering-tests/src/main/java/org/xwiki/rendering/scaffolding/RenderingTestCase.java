@@ -20,6 +20,7 @@
 package org.xwiki.rendering.scaffolding;
 
 import java.io.StringReader;
+import java.util.HashMap;
 import java.util.Map;
 
 import org.jmock.cglib.MockObjectTestCase;
@@ -79,6 +80,7 @@ public class RenderingTestCase extends MockObjectTestCase
     @Override
     protected void runTest() throws Throwable
     {
+        Map<String, String> originalConfiguration = new HashMap<String, String>();
         if (this.configuration != null) {
             ConfigurationSource configurationSource = getComponentManager().lookup(ConfigurationSource.class);
 
@@ -86,11 +88,33 @@ public class RenderingTestCase extends MockObjectTestCase
                 MockConfigurationSource mockConfigurationSource = (MockConfigurationSource) configurationSource;
 
                 for (Map.Entry<String, ? > entry : this.configuration.entrySet()) {
+                    originalConfiguration.put(entry.getKey(),
+                        mockConfigurationSource.<String>getProperty(entry.getKey()));
                     mockConfigurationSource.setProperty(entry.getKey(), entry.getValue());
                 }
             }
         }
 
+        try {
+            runTestInternal();
+        } finally {
+            // Revert Configuration that have been set
+            if (this.configuration != null) {
+                ConfigurationSource configurationSource = getComponentManager().lookup(ConfigurationSource.class);
+
+                if (configurationSource instanceof MockConfigurationSource) {
+                    MockConfigurationSource mockConfigurationSource = (MockConfigurationSource) configurationSource;
+
+                    for (Map.Entry<String, String> entry : originalConfiguration.entrySet()) {
+                        mockConfigurationSource.setProperty(entry.getKey(), entry.getValue());
+                    }
+                }
+            }
+        }
+    }
+
+    private void runTestInternal() throws Throwable
+    {
         Parser parser = getComponentManager().lookup(Parser.class, this.parserId);
         XDOM xdom = parser.parse(new StringReader(this.input));
 

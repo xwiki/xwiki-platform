@@ -43,11 +43,6 @@ public class RenderingTests extends TestCase
     public static Test suite() throws Exception
     {
         RenderingTestSuite suite = new RenderingTestSuite("Test Ruby Macro");
-
-        suite.addTestsFromResource("macroruby1", true);
-        suite.addTestsFromResource("macroruby2", true);
-        suite.addTestsFromResource("macroruby3", true);
-
         ComponentManagerTestSetup testSetup = new ComponentManagerTestSetup(suite);
         new ScriptMockSetup(testSetup.getComponentManager());
 

@@ -44,9 +44,6 @@ public class RenderingTests extends TestCase
     public static Test suite() throws Exception
     {
         RenderingTestSuite suite = new RenderingTestSuite("Test Equation Macro");
-
-        suite.addTestsFromResource("macroequation1", true);
-
         ComponentManagerTestSetup testSetup = new ComponentManagerTestSetup(suite);
         setUpMocks(testSetup.getComponentManager());
 

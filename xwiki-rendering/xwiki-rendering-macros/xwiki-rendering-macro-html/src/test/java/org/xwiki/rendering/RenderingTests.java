@@ -36,25 +36,6 @@ public class RenderingTests extends TestCase
     public static Test suite() throws Exception
     {
         RenderingTestSuite suite = new RenderingTestSuite("Test the HTML Macro");
-
-        suite.addTestsFromResource("macrohtml1", true);
-        suite.addTestsFromResource("macrohtml2", true);
-        suite.addTestsFromResource("macrohtml3", true);
-        suite.addTestsFromResource("macrohtml4", true);
-        suite.addTestsFromResource("macrohtml5", true);
-        suite.addTestsFromResource("macrohtml6", true);
-        suite.addTestsFromResource("macrohtml7", true);
-        suite.addTestsFromResource("macrohtml8", true);
-        suite.addTestsFromResource("macrohtml9", true);
-        suite.addTestsFromResource("macrohtml10", true);
-        suite.addTestsFromResource("macrohtml11", true);
-        suite.addTestsFromResource("macrohtml12", true);
-        suite.addTestsFromResource("macrohtml13", true);
-        suite.addTestsFromResource("macrohtml14", true);
-        suite.addTestsFromResource("macrohtml15", true);
-        suite.addTestsFromResource("macrohtml16", true);
-        suite.addTestsFromResource("macrohtml17", true);
-
         return new ComponentManagerTestSetup(suite);
     }
 }

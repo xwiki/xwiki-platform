@@ -1,3 +1,4 @@
+.runTransformations
 .#---------------------------------------------------------------------------------------------------------------
 .input|xwiki/2.0
 .# Verify non trimming of whitespaces/new lines when in non-wiki mode (wiki syntax not parsed in element content)

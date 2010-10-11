@@ -233,6 +233,7 @@
                 <exclude>org/xwiki/rendering/renderer/xhtml/XHTMLImageRenderer</exclude>
                 <exclude>org/xwiki/rendering/renderer/xhtml/XHTMLLinkRenderer</exclude>
                 <exclude>org/xwiki/rendering/scaffolding/MockWikiModel</exclude>
+                <exclude>org/xwiki/rendering/scaffolding/RenderingTestSuite</exclude>
                 <exclude>org/xwiki/annotation/renderer/AbstractAnnotationRenderer</exclude>
                 <exclude>org/xwiki/annotation/renderer/LinkLabelGeneratorChainingListener</exclude>
                 <!-- Not really API changes, just moved to another project -->

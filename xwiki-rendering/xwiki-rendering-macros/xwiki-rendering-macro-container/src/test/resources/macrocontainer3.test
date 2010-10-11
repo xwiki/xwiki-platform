@@ -1,3 +1,5 @@
+.runTransformations
+.#-----------------------------------------------------
 .# Test macro with justify parameter, with content and without 
 .#-----------------------------------------------------
 .input|xwiki/2.0

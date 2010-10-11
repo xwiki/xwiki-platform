@@ -39,48 +39,7 @@ public class WikiRenderingTests extends TestCase
 {
     public static junit.framework.Test suite() throws Exception
     {
-        RenderingTestSuite suite = new RenderingTestSuite("Rendering tests requiring the wiki notion");
-
-        // Links
-        suite.addTestsFromResource("link/links1", false);
-        suite.addTestsFromResource("link/links2", false);
-        suite.addTestsFromResource("link/links3", false);
-        suite.addTestsFromResource("link/links4", false);
-        suite.addTestsFromResource("link/links5", false);
-        suite.addTestsFromResource("link/links6", false);
-        suite.addTestsFromResource("link/links7", false);
-        suite.addTestsFromResource("link/links8", false);
-        suite.addTestsFromResource("link/links9", false);
-        suite.addTestsFromResource("link/links10", false);
-        suite.addTestsFromResource("link/links11", false);
-        suite.addTestsFromResource("link/links12", false);
-        suite.addTestsFromResource("link/links13", false);
-        suite.addTestsFromResource("link/links14", false);
-        suite.addTestsFromResource("link/links15", false);
-        suite.addTestsFromResource("link/links16", false);
-        suite.addTestsFromResource("link/links17", false);
-        suite.addTestsFromResource("link/links18", false);
-        suite.addTestsFromResource("link/links19", false);
-        suite.addTestsFromResource("link/links20", false);
-        suite.addTestsFromResource("link/links21", false);
-        suite.addTestsFromResource("link/links22", false);
-        suite.addTestsFromResource("link/links23", false);
-        suite.addTestsFromResource("link/links25", false);
-        suite.addTestsFromResource("link/links26", false);
-        suite.addTestsFromResource("link/links27", false);
-        suite.addTestsFromResource("link/links28", false);
-        suite.addTestsFromResource("link/links29", false);
-
-        // Images
-        suite.addTestsFromResource("image/image1", false);
-        suite.addTestsFromResource("image/image2", false);
-        suite.addTestsFromResource("image/image3", false);
-        suite.addTestsFromResource("image/image4", false);
-        suite.addTestsFromResource("image/image5", false);
-        suite.addTestsFromResource("image/image6", false);
-        suite.addTestsFromResource("image/image7", false);
-        suite.addTestsFromResource("image/image8", false);
-        suite.addTestsFromResource("image/image9", false);
+        RenderingTestSuite suite = new RenderingTestSuite("Rendering tests requiring the wiki notion", "wiki");
 
         ComponentManagerTestSetup testSetup = new ComponentManagerTestSetup(suite);
         testSetup.addComponentDescriptor(MockWikiModel.getComponentDescriptor());

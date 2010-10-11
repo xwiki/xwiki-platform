@@ -1,3 +1,5 @@
+.runTransformations
+.#-----------------------------------------------------
 .# Test that a container macro with groups inside and no layout renders the 2 groups consecutively inside. 
 .#-----------------------------------------------------
 .input|xwiki/2.0

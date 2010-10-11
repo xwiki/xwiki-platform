@@ -46,8 +46,6 @@ public class RenderingTests extends TestCase
         RenderingTestSuite suite =
             new RenderingTestSuite("Rendering tests requiring the wiki notion and that run inside XWiki");
 
-        suite.addTestsFromResource("image1", true);
-
         ComponentManagerTestSetup testSetup = new ComponentManagerTestSetup(suite);
         testSetup.addComponentDescriptor(MockWikiModel.getComponentDescriptor());
         setUpMocks(testSetup.getComponentManager());

@@ -49,10 +49,6 @@ public class RenderingTests extends TestCase
     public static Test suite() throws Exception
     {
         RenderingTestSuite suite = new RenderingTestSuite("Test user avatar macro");
-        
-        suite.addTestsFromResource("macrouseravatar1", true);
-        suite.addTestsFromResource("macrouseravatar2", true);
-        suite.addTestsFromResource("macrouseravatar3", true);
 
         ComponentManagerTestSetup testSetup = new ComponentManagerTestSetup(suite);
         setUpMocks(testSetup.getComponentManager());

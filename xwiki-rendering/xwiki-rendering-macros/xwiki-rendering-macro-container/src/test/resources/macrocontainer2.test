@@ -1,3 +1,5 @@
+.runTransformations
+.#-----------------------------------------------------
 .# Test that adding a container with no content inside generates just a macro event and a group, and renders a div 
 .#-----------------------------------------------------
 .input|xwiki/2.0

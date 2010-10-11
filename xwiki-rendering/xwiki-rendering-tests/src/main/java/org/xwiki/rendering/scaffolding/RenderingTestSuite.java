@@ -26,6 +26,10 @@ import java.io.InputStreamReader;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.StringTokenizer;
+import java.util.regex.Pattern;
+
+import org.reflections.Reflections;
+import org.reflections.scanners.ResourcesScanner;
 
 import junit.framework.TestSuite;
 
@@ -40,29 +44,57 @@ public class RenderingTestSuite extends TestSuite
         public Map<String, String> inputs = new HashMap<String, String>();
 
         public Map<String, String> expectations = new HashMap<String, String>();
+
+        /**
+         * @since 2.5RC1
+         */
+        public boolean runTransformations;
+
+        /**
+         * @since 2.5RC1
+         */
+        public Map<String, String> configuration = new HashMap<String, String>();
     }
 
     public RenderingTestSuite(String name)
     {
-        super(name);
-    }
-
-    public void addTestsFromResource(String testResourceName, boolean runTransformations)
-    {
-        addTestsFromResource(testResourceName, runTransformations, null);
+        this(name, "");
     }
 
     /**
-     * @since 2.4M1
+     * @since 2.5RC1
      */
-    public void addTestsFromResource(String testResourceName, boolean runTransformations, Map<String, ? > configuration)
+    public RenderingTestSuite(String name, String testPackage)
     {
-        String resourceName = "/" + testResourceName + ".test";
+        this(name, testPackage, ".*\\.test");
+    }
+
+    /**
+     * @since 2.5RC1
+     */
+    public RenderingTestSuite(String name, String testPackage, String pattern)
+    {
+        super(name);
+
+        Reflections reflections = new Reflections(testPackage, new ResourcesScanner());
+        for (String testFile : reflections.getResources(Pattern.compile(pattern))) {
+            addTestsFromResource(testFile);
+        }
+
+    }
+
+    public void addTestsFromResource(String testResourceName)
+    {
+        String resourceName = "/" + testResourceName;
         Data data;
         try {
-            data = readTestData(getClass().getResourceAsStream(resourceName), resourceName);
+            InputStream source = getClass().getResourceAsStream(resourceName);
+            if (source == null) {
+                throw new RuntimeException("Failed to find test file [" + resourceName + "]");
+            }
+            data = readTestData(source, resourceName);
         } catch (Exception e) {
-            throw new RuntimeException("Failed to find load test data [" + testResourceName + "]");
+            throw new RuntimeException("Failed to read test data from [" + resourceName + "]", e);
         }
 
         // Create a test case for each input and for each expectation so that each test is executed separately
@@ -73,15 +105,15 @@ public class RenderingTestSuite extends TestSuite
                 String input = entry.getValue();
 
                 if ("xhtml/1.0".equals(parserId) && !input.startsWith("<?xml") && !input.startsWith("<!DOCTYPE")) {
-                    input =
-                        "<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Strict//EN\" \"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd\">"
-                            + "<html>" + input + "</html>";
+                    input = "<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Strict//EN\" "
+                        + "\"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd\">"
+                        + "<html>" + input + "</html>";
                 }
 
-                RenderingTestCase testCase =
-                    new RenderingTestCase(computeTestName(testResourceName, parserId, targetSyntaxId), input,
-                        data.expectations.get(targetSyntaxId), parserId, targetSyntaxId, runTransformations,
-                        configuration);
+                RenderingTestCase testCase = new RenderingTestCase(
+                    computeTestName(testResourceName, parserId, targetSyntaxId), input,
+                    data.expectations.get(targetSyntaxId), parserId, targetSyntaxId, data.runTransformations,
+                    data.configuration);
                 addTest(testCase);
             }
         }
@@ -120,6 +152,11 @@ public class RenderingTestSuite extends TestSuite
                         if (line.toLowerCase().contains("todo")) {
                             System.out.println(line);
                         }
+                    } else if (line.startsWith(".runTransformations")) {
+                        data.runTransformations = true;
+                    } else if (line.startsWith(".configuration")) {
+                        StringTokenizer st = new StringTokenizer(line.substring(".configuration".length() + 1), "=");
+                        data.configuration.put(st.nextToken(), st.nextToken());
                     } else {
                         // If there's already some data, write it to the maps now.
                         if (map != null) {

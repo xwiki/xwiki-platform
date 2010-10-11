@@ -1,3 +1,4 @@
+.runTransformations
 .#---------------------------------------------------------------
 .input|xwiki/2.0
 .# Verify that we can insert invalid HTML when clean is false

@@ -1,3 +1,4 @@
+.runTransformations
 .#-----------------------------------------------------
 .input|xwiki/2.0
 .# Validate that id event is properly handled by XHTML renderer inside a header

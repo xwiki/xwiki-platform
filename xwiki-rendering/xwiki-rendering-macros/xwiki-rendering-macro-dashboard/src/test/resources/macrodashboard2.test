@@ -1,3 +1,5 @@
+.runTransformations
+.#-----------------------------------------------------
 .# Test that dashboard macro with unknown layout parameter renders the groups inside as they are  
 .# Put macro instances in the dashboard macro in these tests so that they would work fine even when implementing the dashboard content restrictions 
 .#-----------------------------------------------------

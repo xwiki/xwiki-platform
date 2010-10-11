@@ -42,16 +42,6 @@ public class RenderingTests extends TestCase
     public static Test suite() throws Exception
     {
         RenderingTestSuite suite = new RenderingTestSuite("Test Container Macro");
-
-        suite.addTestsFromResource("macrocontainer1", true);
-        suite.addTestsFromResource("macrocontainer2", true);
-        suite.addTestsFromResource("macrocontainer3", true);
-        suite.addTestsFromResource("macrocontainer4", true);
-        suite.addTestsFromResource("macrocontainercolumns1", true);
-        suite.addTestsFromResource("macrocontainercolumns2", true);
-        suite.addTestsFromResource("macrocontainercolumns3", true);
-        suite.addTestsFromResource("macrocontainercolumns4", true);
-
         return new ComponentManagerTestSetup(suite);
     }
 }

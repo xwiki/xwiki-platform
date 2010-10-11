@@ -1,3 +1,5 @@
+.runTransformations
+.#-----------------------------------------------------
 .# Test that adding a container with no layout generates a group for the macro but no other structure inside 
 .#-----------------------------------------------------
 .input|xwiki/2.0

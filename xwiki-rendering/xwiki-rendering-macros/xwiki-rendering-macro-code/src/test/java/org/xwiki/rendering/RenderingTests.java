@@ -19,8 +19,6 @@
  */
 package org.xwiki.rendering;
 
-import java.util.Collections;
-
 import junit.framework.Test;
 import junit.framework.TestCase;
 
@@ -38,21 +36,6 @@ public class RenderingTests extends TestCase
     public static Test suite() throws Exception
     {
         RenderingTestSuite suite = new RenderingTestSuite("Test Code Macro");
-
-        suite.addTestsFromResource("macrocode1", true);
-        suite.addTestsFromResource("macrocode2", true);
-        suite.addTestsFromResource("macrocode3", true);
-        suite.addTestsFromResource("macrocode4", true);
-        suite.addTestsFromResource("macrocode5", true);
-        suite.addTestsFromResource("macrocode6", true);
-        suite.addTestsFromResource("macrocode7", true);
-        suite.addTestsFromResource("macrocode8", true);
-        suite.addTestsFromResource("macrocode9", true);
-        suite.addTestsFromResource("macrocode10", true);
-
-        suite.addTestsFromResource("macrocode11", true, Collections.singletonMap("rendering.macro.code.pygments.style",
-            "colorful"));
-
         return new ComponentManagerTestSetup(suite);
     }
 }

@@ -41,10 +41,6 @@ public class RenderingTests extends TestCase
     public static Test suite() throws Exception
     {
         RenderingTestSuite suite = new RenderingTestSuite("Test Dashboard Macro");
-
-        suite.addTestsFromResource("macrodashboard1", true);
-        suite.addTestsFromResource("macrodashboard2", true);
-
         return new ComponentManagerTestSetup(suite);
     }
 }

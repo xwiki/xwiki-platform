@@ -1,3 +1,5 @@
+.runTransformations
+.#-----------------------------------------------------
 .# Test that adding a container with non-existing layout doesn't throw exception, but only displays the contents as if there was no layout set 
 .#-----------------------------------------------------
 .input|xwiki/2.0

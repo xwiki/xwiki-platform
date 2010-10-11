@@ -1,3 +1,5 @@
+.runTransformations
+.#-----------------------------------------------------
 .# Test that columns container with one group puts content in a group 
 .#-----------------------------------------------------
 .input|xwiki/2.0

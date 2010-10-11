@@ -36,11 +36,6 @@ public class RenderingTests extends TestCase
     public static Test suite() throws Exception
     {
         RenderingTestSuite suite = new RenderingTestSuite("Test Id Macro");
-
-        suite.addTestsFromResource("macroid1", true);
-        suite.addTestsFromResource("macroid2", true);
-        suite.addTestsFromResource("macroid3", true);
-
         return new ComponentManagerTestSetup(suite);
     }
 }

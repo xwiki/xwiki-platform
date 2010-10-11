@@ -1,3 +1,5 @@
+.runTransformations
+.configuration|rendering.macro.code.pygments.style=colorful
 .#-----------------------------------------------------
 .input|xwiki/2.0
 .# Testing another style (colorful)

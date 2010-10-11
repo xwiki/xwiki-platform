@@ -43,15 +43,6 @@ public class RenderingTests extends TestCase
     public static Test suite() throws Exception
     {
         RenderingTestSuite suite = new RenderingTestSuite("Test PHP Macro");
-
-        suite.addTestsFromResource("macrophp1", true);
-        suite.addTestsFromResource("macrophp2", true);
-        suite.addTestsFromResource("macrophp3", true);
-        // Disabled for the moment, since the variables defined in a macro instance don't live past the macro block.
-        // suite.addTestsFromResource("macrophp4", true);
-        // Disabled for the moment, since the classes defined in a macro instance don't live past the macro block.
-        // suite.addTestsFromResource("macrophp5", true);
-
         ComponentManagerTestSetup testSetup = new ComponentManagerTestSetup(suite);
         new ScriptMockSetup(testSetup.getComponentManager());
 

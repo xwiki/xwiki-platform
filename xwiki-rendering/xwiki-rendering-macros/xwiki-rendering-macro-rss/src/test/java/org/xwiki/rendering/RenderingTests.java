@@ -41,10 +41,6 @@ public class RenderingTests extends TestCase
     public static Test suite() throws Exception
     {
         RenderingTestSuite suite = new RenderingTestSuite("Test RSS Macro");
-
-        suite.addTestsFromResource("macrorss1", true);
-        suite.addTestsFromResource("macrorss2", true);
-
         ComponentManagerTestSetup testSetup = new ComponentManagerTestSetup(suite);
         setUpMocks(testSetup.getComponentManager());
 

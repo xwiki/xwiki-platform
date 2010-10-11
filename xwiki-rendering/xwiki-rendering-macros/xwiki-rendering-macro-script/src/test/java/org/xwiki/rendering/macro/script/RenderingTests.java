@@ -46,12 +46,6 @@ public class RenderingTests extends TestCase
     {
         RenderingTestSuite suite = new RenderingTestSuite("Test all Parsers/Renderers");
 
-        suite.addTestsFromResource("macroscript1", true);
-        suite.addTestsFromResource("macroscript2", true);
-        suite.addTestsFromResource("macroscript3", true);
-        suite.addTestsFromResource("macroscript4", true);
-        suite.addTestsFromResource("macroscript5", true);
-
         ComponentManagerTestSetup testSetup = new ComponentManagerTestSetup(suite);
         Mockery mockery = new Mockery();
         new ScriptMockSetup(mockery, testSetup.getComponentManager());

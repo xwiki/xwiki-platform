@@ -1,16 +1,17 @@
+.runTransformations
 .#-----------------------------------------------------
 .input|xwiki/2.0
 .#-----------------------------------------------------
-{{testsimplemacro foo="x|-|y"}}abc{{/testsimplemacro}}
+{{testsimplemacro}}a|-|b{{/testsimplemacro}}
 .#-----------------------------------------------------
 .expect|event/1.0
 .#-----------------------------------------------------
 beginDocument
-beginMacroMarkerStandalone [testsimplemacro] [foo=x|-|y] [abc]
+beginMacroMarkerStandalone [testsimplemacro] [] [a|-|b]
 beginParagraph
 onWord [simplemacro0]
 endParagraph
-endMacroMarkerStandalone [testsimplemacro] [foo=x|-|y] [abc]
+endMacroMarkerStandalone [testsimplemacro] [] [a|-|b]
 endDocument
 .#-----------------------------------------------------
 .expect|xhtml/1.0
@@ -19,14 +20,14 @@ endDocument
 .#-----------------------------------------------------
 .expect|annotatedxhtml/1.0
 .#-----------------------------------------------------
-<!--startmacro:testsimplemacro|-|foo="x|-|y"|-|abc--><p>simplemacro0</p><!--stopmacro-->
+<!--startmacro:testsimplemacro|-||-|a|-|b--><p>simplemacro0</p><!--stopmacro-->
 .#-----------------------------------------------------
 .expect|xwiki/2.0
 .#-----------------------------------------------------
-{{testsimplemacro foo="x|-|y"}}
-abc
+{{testsimplemacro}}
+a|-|b
 {{/testsimplemacro}}
 .#-----------------------------------------------------
 .input|xhtml/1.0
 .#-----------------------------------------------------
-<!--startmacro:testsimplemacro|-|foo="x|-|y"|-|abc--><p>simplemacro0</p><!--stopmacro-->
+<!--startmacro:testsimplemacro|-||-|a|-|b--><p>simplemacro0</p><!--stopmacro-->

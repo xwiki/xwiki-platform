@@ -2587,8 +2587,11 @@ td.label {
     vertical-align: top;
 }
 
+* html .xwikidatatable {
+  width: 99%;
+}
 html > body .xwikidatatable {
-    width: 100%;
+  width: 100%;
 }
 
 /* @group Page Layout */

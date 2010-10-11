@@ -19,11 +19,9 @@
  */
 package org.xwiki.rendering.internal.parser.wikimodel.xhtml;
 
-import org.wikimodel.wem.WikiParameter;
 import org.wikimodel.wem.WikiParameters;
 import org.wikimodel.wem.WikiReference;
 import org.xwiki.rendering.listener.reference.ResourceReference;
-import org.xwiki.rendering.listener.reference.ResourceType;
 
 /**
  * WikiModel extension in order to add additional XWiki Link information so that the XWiki Generator Listener for the
@@ -34,53 +32,28 @@ import org.xwiki.rendering.listener.reference.ResourceType;
  */
 public class XWikiWikiReference extends WikiReference
 {
-    private boolean isTyped;
-
-    private ResourceType type;
+    private ResourceReference reference;
 
     private boolean isFreeStanding;
 
-    WikiParameters referenceParameters = WikiParameters.EMPTY;
-
-    public XWikiWikiReference(boolean isTyped, ResourceType type, String reference, String label,
-        WikiParameters referenceParameters, WikiParameters linkParameters, boolean isFreeStanding)
+    public XWikiWikiReference(ResourceReference reference, String label, WikiParameters linkParameters,
+        boolean isFreeStanding)
     {
-        super(reference, label, linkParameters);
-        this.isTyped = isTyped;
-        this.type = type;
+        super(reference.getReference(), label, linkParameters);
+        this.reference = reference;
         this.isFreeStanding = isFreeStanding;
-        this.referenceParameters = referenceParameters;
     }
 
-    public boolean isTyped()
-    {
-        return this.isTyped;
-    }
-    
     public boolean isFreeStanding()
     {
         return this.isFreeStanding;
     }
 
-    public ResourceType getType()
-    {
-        return this.type;
-    }
-
-    public WikiParameters getReferenceParameters()
-    {
-        return this.referenceParameters;
-    }
-
     public ResourceReference getReference()
     {
-        ResourceReference resourceReference = new ResourceReference(getLink(), getType());
-        resourceReference.setTyped(isTyped());
-        for (WikiParameter param : getReferenceParameters()) {
-            resourceReference.setParameter(param.getKey(), param.getValue());
-        }
-        return resourceReference;
+        return this.reference;
     }
 
+    // TODO: Ensure there's no sync issue between reference object and getLink() from WikiReference
     // TODO: implement hashcode, equals, totring
 }

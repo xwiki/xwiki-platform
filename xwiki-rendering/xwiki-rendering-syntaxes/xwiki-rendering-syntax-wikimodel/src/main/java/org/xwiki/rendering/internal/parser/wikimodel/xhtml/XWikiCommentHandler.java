@@ -29,6 +29,7 @@ import org.wikimodel.wem.xhtml.handler.CommentHandler;
 import org.wikimodel.wem.xhtml.impl.XhtmlHandler.TagStack;
 import org.xwiki.rendering.internal.parser.WikiModelXHTMLParser;
 import org.xwiki.rendering.internal.parser.wikimodel.XWikiGeneratorListener;
+import org.xwiki.rendering.listener.reference.ResourceReference;
 import org.xwiki.rendering.listener.reference.ResourceType;
 import org.xwiki.rendering.listener.Listener;
 import org.xwiki.rendering.parser.ResourceReferenceParser;
@@ -146,7 +147,7 @@ public class XWikiCommentHandler extends CommentHandler
 
         boolean isFreeStandingLink = (Boolean) stack.getStackParameter("isFreeStandingLink");
 
-        XWikiWikiReference linkReference = parseResourceReference(this.commentContentStack.pop());
+        ResourceReference linkReference = parseResourceReference(this.commentContentStack.pop());
         WikiParameters linkParams = WikiParameters.EMPTY;
         String label = null;
         if (!isFreeStandingLink) {
@@ -156,8 +157,7 @@ public class XWikiCommentHandler extends CommentHandler
             linkParams = (WikiParameters) stack.getStackParameter("linkParameters");
         }
 
-        WikiReference wikiReference = new XWikiWikiReference(linkReference.isTyped(), linkReference.getType(),
-            linkReference.getLink(), label, linkReference.getReferenceParameters(), linkParams, isFreeStandingLink);
+        WikiReference wikiReference = new XWikiWikiReference(linkReference, label, linkParams, isFreeStandingLink);
         stack.getScannerContext().onReference(wikiReference);
 
         stack.popStackParameter("isInLink");
@@ -175,7 +175,7 @@ public class XWikiCommentHandler extends CommentHandler
     {
         boolean isFreeStandingImage = (Boolean) stack.getStackParameter("isFreeStandingImage");
 
-        XWikiWikiReference imageReference = parseResourceReference(this.commentContentStack.pop());
+        ResourceReference imageReference = parseResourceReference(this.commentContentStack.pop());
 
         WikiParameters imageParams = WikiParameters.EMPTY;
         if (!isFreeStandingImage) {
@@ -185,14 +185,13 @@ public class XWikiCommentHandler extends CommentHandler
             imageParams = (WikiParameters) stack.getStackParameter("imageParameters");
             WikiParameter alt = imageParams.getParameter("alt");
             if (alt != null && alt.getValue().equals(
-                this.attachLinkLabelGenerator.generateLabel(imageReference.getReference())))
+                this.attachLinkLabelGenerator.generateLabel(imageReference)))
             {
                 imageParams = imageParams.remove("alt");
             }
         }
 
-        WikiReference reference = new XWikiWikiReference(imageReference.isTyped(), imageReference.getType(),
-            imageReference.getLink(), null, imageReference.getReferenceParameters(), imageParams, isFreeStandingImage);
+        WikiReference reference = new XWikiWikiReference(imageReference, null, imageParams, isFreeStandingImage);
         stack.getScannerContext().onImage(reference);
 
         stack.setStackParameter("isInImage", false);
@@ -200,7 +199,7 @@ public class XWikiCommentHandler extends CommentHandler
         stack.setStackParameter("imageParameters", WikiParameters.EMPTY);
     }
 
-    private XWikiWikiReference parseResourceReference(String rawReference)
+    private ResourceReference parseResourceReference(String rawReference)
     {
         // Format of a resource definition in comment:
         // (isTyped)|-|(type)|-|(reference)|-|(parameters: key="value")
@@ -208,10 +207,16 @@ public class XWikiCommentHandler extends CommentHandler
         boolean isTyped = tokens[0].equalsIgnoreCase("true") ? true : false;
         ResourceType type = new ResourceType(tokens[1]);
         String reference = tokens[2];
-        WikiParameters referenceParams = WikiParameters.EMPTY;
+
+        ResourceReference resourceReference = new ResourceReference(reference, type);
+        resourceReference.setTyped(isTyped);
+
         if (tokens.length == 4) {
-            referenceParams = WikiParameters.newWikiParameters(tokens[3]);
+            for (WikiParameter parameter : WikiParameters.newWikiParameters(tokens[3])) {
+                resourceReference.setParameter(parameter.getKey(), parameter.getValue());
+            }
         }
-        return new XWikiWikiReference(isTyped, type, reference, null, referenceParams, WikiParameters.EMPTY, false);
+
+        return resourceReference;
     }
 }

@@ -28,8 +28,8 @@ import org.xwiki.rendering.listener.reference.ResourceType;
 import org.xwiki.rendering.parser.ResourceReferenceParser;
 
 /**
- * Parse a resource reference specified using the syntax used by the XHTML Renderer to represent resources as XHTML
- * comments, using the syntax {@code (isTyped)|-|(type)|-|(reference)|-|(parameters: key="value")}.
+ * Parse a resource reference specified using the syntax used by the XHTML Annotated Renderer to represent resources
+ * as XHTML comments, using the syntax {@code (isTyped)|-|(type)|-|(reference)|-|(parameters: key="value")}.
  *
  * @version $Id$
  * @since 2.5RC1

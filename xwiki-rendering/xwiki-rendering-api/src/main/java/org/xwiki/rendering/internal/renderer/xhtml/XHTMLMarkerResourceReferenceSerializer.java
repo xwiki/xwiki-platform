@@ -62,14 +62,13 @@ public class XHTMLMarkerResourceReferenceSerializer implements ResourceReference
         buffer.append(COMMENT_SEPARATOR);
         buffer.append(reference.getReference());
 
-        // Print Link Reference parameters. We need to do this so that the XHTML parser doesn't have
+        // Print Resource Reference parameters. We need to do this so that the XHTML parser doesn't have
         // to parse the query string to extract the parameters. Doing so could lead to false result since
         // for example the XHTML renderer can add a parent parameter in the query string for links to non
         // existing documents.
         //
-        // Also note that we don't need to print Link parameters since they are added as XHTML class
-        // attributes by the XHTML Renderer and thus the XHTML parser will be able to get them
-        // agian as attributes.
+        // Also note that we don't need to print Resource Reference parameters since they are added as XHTML class
+        // attributes by the XHTML Renderer and thus the XHTML parser will be able to get them again as attributes.
         Map<String, String> linkReferenceParameters = reference.getParameters();
         if (!linkReferenceParameters.isEmpty()) {
             buffer.append(COMMENT_SEPARATOR);

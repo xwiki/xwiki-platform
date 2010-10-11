@@ -30,6 +30,9 @@ import java.util.regex.Pattern;
 
 import org.reflections.Reflections;
 import org.reflections.scanners.ResourcesScanner;
+import org.reflections.util.ClasspathHelper;
+import org.reflections.util.ConfigurationBuilder;
+import org.reflections.util.FilterBuilder;
 
 import junit.framework.TestSuite;
 
@@ -76,11 +79,13 @@ public class RenderingTestSuite extends TestSuite
     {
         super(name);
 
-        Reflections reflections = new Reflections(testPackage, new ResourcesScanner());
+        Reflections reflections = new Reflections(new ConfigurationBuilder()
+            .setScanners(new ResourcesScanner())
+            .setUrls(ClasspathHelper.getUrlsForPackagePrefix(""))
+            .filterInputsBy(new FilterBuilder.Include(FilterBuilder.prefix(testPackage))));
         for (String testFile : reflections.getResources(Pattern.compile(pattern))) {
             addTestsFromResource(testFile);
         }
-
     }
 
     public void addTestsFromResource(String testResourceName)

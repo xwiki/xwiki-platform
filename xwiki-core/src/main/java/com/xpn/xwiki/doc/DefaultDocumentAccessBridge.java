@@ -760,13 +760,15 @@ public class DefaultDocumentAccessBridge implements DocumentAccessBridge
             XWikiContext xcontext = getContext();
             String documentReference =
                 this.entityReferenceSerializer.serialize(attachmentReference.getDocumentReference());
+            if (documentReference == null) {
+                documentReference = xcontext.getDoc().getFullName();
+            }
+            String fileName = attachmentReference.getName();
             try {
-                url = xcontext.getWiki().getAttachmentURL(
-                    documentReference == null ? xcontext.getDoc().getFullName() : documentReference, queryString,
-                    attachmentReference.getName(), xcontext);
+                url = xcontext.getWiki().getAttachmentURL(documentReference, fileName, queryString, xcontext);
             } catch (XWikiException e) {
-                // This cannot happen. There's a bug in the definition of XWiki.getAttachmentURL: it says it can generate
-                // an exception but in fact no exception is raised in the current implementation.
+                // This cannot happen. There's a bug in the definition of XWiki.getAttachmentURL: it says it can
+                // generate an exception but in fact no exception is raised in the current implementation.
                 throw new RuntimeException("Failed to get attachment URL", e);
             }
         }

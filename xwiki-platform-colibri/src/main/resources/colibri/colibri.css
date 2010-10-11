@@ -423,6 +423,7 @@ body.content #contentcolumn .main {
 }
 
 #xwikicontent {
+  clear: both;
   overflow: auto;
   width: 100%;
 }

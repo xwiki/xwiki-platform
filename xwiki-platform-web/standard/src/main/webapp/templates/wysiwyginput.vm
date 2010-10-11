@@ -48,7 +48,7 @@ function fireContentLoad(contentLoadTriggerId) {
 // ]]>
 </script>
 </head>
-#if($request.method.equalsIgnoreCase('post'))
+#if($request.method.equalsIgnoreCase('post') && $services.csrf.isTokenValid($request.token))
 #if($request.getParameterMap().containsKey('source'))
 #set($content = $tdoc.getRenderedContent($request.source, $tdoc.getSyntax().toIdString(), 'annotatedxhtml/1.0'))
 #elseif($request.getParameterMap().containsKey('html'))

@@ -2299,7 +2299,7 @@ var $jsVarName = {
 #end
 #set($ok = $parameters.put('syntax', $editedDocument.syntax.toIdString()))
 #set($ok = $parameters.put('convertInput', true))
-#set($ok = $parameters.put('inputURL', $editedDocument.getExternalURL('edit', 'xpage=wysiwyginput')))
+#set($ok = $parameters.put('inputURL', $editedDocument.getExternalURL('edit', "xpage=wysiwyginput&token=${services.csrf.getToken()}")))
 #if($full)
 #set($ok = $parameters.put('displayTabs', 'true'))
 #set($ok = $parameters.put('defaultEditor', 'wysiwyg'))

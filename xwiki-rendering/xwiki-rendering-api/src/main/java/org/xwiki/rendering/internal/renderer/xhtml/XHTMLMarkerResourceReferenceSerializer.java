@@ -55,7 +55,7 @@ public class XHTMLMarkerResourceReferenceSerializer implements ResourceReference
     {
         StringBuilder buffer = new StringBuilder();
 
-        // Print if the Link Reference is typed, the Link Reference Type and the Link Reference itself
+        // Print if the Resource Reference is typed, the Resource Reference Type and the Reference itself
         buffer.append(reference.isTyped());
         buffer.append(COMMENT_SEPARATOR);
         buffer.append(reference.getType().getScheme());

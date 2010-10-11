@@ -24,6 +24,9 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
+import org.apache.commons.lang.builder.EqualsBuilder;
+import org.apache.commons.lang.builder.HashCodeBuilder;
+
 /**
  * Represents a reference to a Resource (document, image, attachment, mail, etc).
  * Note that this representation is independent of any wiki syntax.
@@ -222,5 +225,45 @@ public class ResourceReference implements Cloneable
             throw new RuntimeException("Failed to clone object", e);
         }
         return clone;
+    }
+
+    /**
+     * {@inheritDoc}
+     * @see Object#hashCode()
+     */
+    @Override
+    public int hashCode()
+    {
+        return new HashCodeBuilder(1, 9)
+            .append(getType())
+            .append(isTyped())
+            .append(getReference())
+            .append(getParameters())
+            .toHashCode();
+    }
+
+    /**
+     * {@inheritDoc}
+     * @see Object#equals(Object)
+     */
+    @Override
+    public boolean equals(Object object)
+    {
+        if (object == null) {
+            return false;
+        }
+        if (object == this) {
+            return true;
+        }
+        if (object.getClass() != getClass()) {
+            return false;
+        }
+        ResourceReference rhs = (ResourceReference) object;
+        return new EqualsBuilder()
+            .append(getType(), rhs.getType())
+            .append(isTyped(), rhs.isTyped())
+            .append(getReference(), rhs.getReference())
+            .append(getParameters(), rhs.getParameters())
+            .isEquals();
     }
 }

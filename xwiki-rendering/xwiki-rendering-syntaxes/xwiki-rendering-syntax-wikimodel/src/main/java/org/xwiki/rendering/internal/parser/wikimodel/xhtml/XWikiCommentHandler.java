@@ -21,7 +21,6 @@ package org.xwiki.rendering.internal.parser.wikimodel.xhtml;
 
 import java.util.Stack;
 
-import org.apache.commons.lang.StringUtils;
 import org.wikimodel.wem.WikiParameter;
 import org.wikimodel.wem.WikiParameters;
 import org.wikimodel.wem.WikiReference;
@@ -30,7 +29,6 @@ import org.wikimodel.wem.xhtml.impl.XhtmlHandler.TagStack;
 import org.xwiki.rendering.internal.parser.WikiModelXHTMLParser;
 import org.xwiki.rendering.internal.parser.wikimodel.XWikiGeneratorListener;
 import org.xwiki.rendering.listener.reference.ResourceReference;
-import org.xwiki.rendering.listener.reference.ResourceType;
 import org.xwiki.rendering.listener.Listener;
 import org.xwiki.rendering.parser.ResourceReferenceParser;
 import org.xwiki.rendering.renderer.PrintRenderer;
@@ -62,6 +60,8 @@ public class XWikiCommentHandler extends CommentHandler
 
     private URILabelGenerator attachLinkLabelGenerator;
 
+    private ResourceReferenceParser xhtmlMarkerResourceReferenceParser;
+
     /**
      * We're using a stack so that we can have nested comment handling. For example when we have a link to an image we
      * need nested comment support.
@@ -74,12 +74,14 @@ public class XWikiCommentHandler extends CommentHandler
      *       http://code.google.com/p/wikimodel/issues/detail?id=87
      */
     public XWikiCommentHandler(WikiModelXHTMLParser parser, ResourceReferenceParser imageReferenceParser,
-        PrintRendererFactory xwikiSyntaxPrintRendererFactory, URILabelGenerator attachLinkLabelGenerator)
+        PrintRendererFactory xwikiSyntaxPrintRendererFactory, URILabelGenerator attachLinkLabelGenerator,
+        ResourceReferenceParser xhtmlMarkerResourceReferenceParser)
     {
         this.parser = parser;
         this.xwikiSyntaxPrintRendererFactory = xwikiSyntaxPrintRendererFactory;
         this.imageReferenceParser = imageReferenceParser;
         this.attachLinkLabelGenerator = attachLinkLabelGenerator;
+        this.xhtmlMarkerResourceReferenceParser = xhtmlMarkerResourceReferenceParser;
     }
 
     @Override
@@ -147,7 +149,7 @@ public class XWikiCommentHandler extends CommentHandler
 
         boolean isFreeStandingLink = (Boolean) stack.getStackParameter("isFreeStandingLink");
 
-        ResourceReference linkReference = parseResourceReference(this.commentContentStack.pop());
+        ResourceReference linkReference = this.xhtmlMarkerResourceReferenceParser.parse(this.commentContentStack.pop());
         WikiParameters linkParams = WikiParameters.EMPTY;
         String label = null;
         if (!isFreeStandingLink) {
@@ -175,7 +177,8 @@ public class XWikiCommentHandler extends CommentHandler
     {
         boolean isFreeStandingImage = (Boolean) stack.getStackParameter("isFreeStandingImage");
 
-        ResourceReference imageReference = parseResourceReference(this.commentContentStack.pop());
+        ResourceReference imageReference =
+            this.xhtmlMarkerResourceReferenceParser.parse(this.commentContentStack.pop());
 
         WikiParameters imageParams = WikiParameters.EMPTY;
         if (!isFreeStandingImage) {
@@ -197,26 +200,5 @@ public class XWikiCommentHandler extends CommentHandler
         stack.setStackParameter("isInImage", false);
         stack.setStackParameter("isFreeStandingImage", false);
         stack.setStackParameter("imageParameters", WikiParameters.EMPTY);
-    }
-
-    private ResourceReference parseResourceReference(String rawReference)
-    {
-        // Format of a resource definition in comment:
-        // (isTyped)|-|(type)|-|(reference)|-|(parameters: key="value")
-        String[] tokens = StringUtils.splitByWholeSeparatorPreserveAllTokens(rawReference, COMMENT_SEPARATOR);
-        boolean isTyped = tokens[0].equalsIgnoreCase("true") ? true : false;
-        ResourceType type = new ResourceType(tokens[1]);
-        String reference = tokens[2];
-
-        ResourceReference resourceReference = new ResourceReference(reference, type);
-        resourceReference.setTyped(isTyped);
-
-        if (tokens.length == 4) {
-            for (WikiParameter parameter : WikiParameters.newWikiParameters(tokens[3])) {
-                resourceReference.setParameter(parameter.getKey(), parameter.getValue());
-            }
-        }
-
-        return resourceReference;
     }
 }

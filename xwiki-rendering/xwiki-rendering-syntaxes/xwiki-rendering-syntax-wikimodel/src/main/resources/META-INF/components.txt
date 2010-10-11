@@ -7,6 +7,7 @@ org.xwiki.rendering.internal.parser.WikiModelXHTMLParser
 org.xwiki.rendering.internal.parser.WikiModelHTMLParser
 org.xwiki.rendering.internal.parser.WikiModelConfluenceParser
 org.xwiki.rendering.internal.parser.wikimodel.xhtml.XWikiXMLReaderFactory
+org.xwiki.rendering.internal.parser.wikimodel.xhtml.XHTMLMarkerResourceReferenceParser
 org.xwiki.rendering.internal.renderer.tex.TexRendererFactory
 org.xwiki.rendering.internal.renderer.tex.TexRenderer
 org.xwiki.rendering.internal.renderer.tex.TexBlockRenderer

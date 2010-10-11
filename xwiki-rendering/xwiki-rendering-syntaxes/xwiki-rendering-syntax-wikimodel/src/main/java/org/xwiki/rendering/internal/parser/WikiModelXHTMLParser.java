@@ -84,7 +84,10 @@ public class WikiModelXHTMLParser extends AbstractWikiModelParser
 
     @Requirement("attach")
     private URILabelGenerator attachURILabelGenerator;
-    
+
+    @Requirement("xhtmlmarker")
+    private ResourceReferenceParser xhtmlMarkerResourceReferenceParser;
+
     /**
      * A special factory that create foolproof XML reader that have the following characteristics:
      * <ul>
@@ -145,7 +148,8 @@ public class WikiModelXHTMLParser extends AbstractWikiModelParser
         XhtmlParser parser = new XhtmlParser();
         parser.setExtraHandlers(handlers);
         parser.setCommentHandler(new XWikiCommentHandler(this, getImageReferenceParser(), 
-            this.xwikiSyntaxPrintRendererFactory, this.attachURILabelGenerator));
+            this.xwikiSyntaxPrintRendererFactory, this.attachURILabelGenerator,
+            this.xhtmlMarkerResourceReferenceParser));
 
         // Construct our own XML filter chain since we want to use our own Comment filter.
         try {

@@ -21,13 +21,13 @@ package org.xwiki.rendering.internal.renderer.xhtml.image;
 
 import java.util.Map;
 
-import org.xwiki.rendering.internal.renderer.xhtml.XHTMLMarkerResourceReferenceRenderer;
 import org.xwiki.rendering.listener.reference.ResourceReference;
 import org.xwiki.rendering.renderer.printer.XHTMLWikiPrinter;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.Requirement;
 import org.xwiki.component.annotation.InstantiationStrategy;
 import org.xwiki.component.descriptor.ComponentInstantiationStrategy;
+import org.xwiki.rendering.renderer.reference.ResourceReferenceSerializer;
 
 /**
  * Render images as XHTML, using annotations (see
@@ -43,7 +43,8 @@ public class AnnotatedXHTMLImageRenderer implements XHTMLImageRenderer
     /**
      * Used to print Image reference as XHTML comments.
      */
-    private XHTMLMarkerResourceReferenceRenderer xhtmlMarkerRenderer = new XHTMLMarkerResourceReferenceRenderer();
+    @Requirement("xhtmlmarker")
+    private ResourceReferenceSerializer xhtmlMarkerSerializer;
 
     /**
      * The default XHTML Link Renderer that we're wrapping.
@@ -71,7 +72,7 @@ public class AnnotatedXHTMLImageRenderer implements XHTMLImageRenderer
         // We need to save the image location in XML comment so that it can be reconstructed later on when moving
         // from XHTML to wiki syntax.
         StringBuffer buffer = new StringBuffer("startimage:");
-        buffer.append(this.xhtmlMarkerRenderer.render(reference));
+        buffer.append(this.xhtmlMarkerSerializer.serialize(reference));
 
         getXHTMLWikiPrinter().printXMLComment(buffer.toString(), true);
         this.defaultImageRenderer.onImage(reference, isFreeStandingURI, parameters);

@@ -25,9 +25,9 @@ import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.InstantiationStrategy;
 import org.xwiki.component.annotation.Requirement;
 import org.xwiki.component.descriptor.ComponentInstantiationStrategy;
-import org.xwiki.rendering.internal.renderer.xhtml.XHTMLMarkerResourceReferenceRenderer;
 import org.xwiki.rendering.listener.reference.ResourceReference;
 import org.xwiki.rendering.renderer.printer.XHTMLWikiPrinter;
+import org.xwiki.rendering.renderer.reference.ResourceReferenceSerializer;
 
 /**
  * Render links as XHTML, using annotations (see
@@ -43,7 +43,8 @@ public class AnnotatedXHTMLLinkRenderer implements XHTMLLinkRenderer
     /**
      * Used to print Image reference as XHTML comments.
      */
-    private XHTMLMarkerResourceReferenceRenderer xhtmlMarkerRenderer = new XHTMLMarkerResourceReferenceRenderer();
+    @Requirement("xhtmlmarker")
+    private ResourceReferenceSerializer xhtmlMarkerSerializer;
 
     /**
      * The default XHTML Link Renderer that we're wrapping.
@@ -83,7 +84,7 @@ public class AnnotatedXHTMLLinkRenderer implements XHTMLLinkRenderer
         // Otherwise it would be too difficult to transform a URL into a document name especially since
         // a link can refer to an external URL.
         StringBuffer buffer = new StringBuffer("startwikilink:");
-        buffer.append(this.xhtmlMarkerRenderer.render(reference));
+        buffer.append(this.xhtmlMarkerSerializer.serialize(reference));
 
         getXHTMLWikiPrinter().printXMLComment(buffer.toString(), true);
         this.defaultLinkRenderer.beginLink(reference, isFreeStandingURI, parameters);

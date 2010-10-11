@@ -45,6 +45,7 @@ org.xwiki.rendering.internal.renderer.xhtml.link.DocumentXHTMLLinkTypeRenderer
 org.xwiki.rendering.internal.renderer.xhtml.link.URLXHTMLLinkTypeRenderer
 org.xwiki.rendering.internal.renderer.xhtml.link.AttachmentXHTMLLinkTypeRenderer
 org.xwiki.rendering.internal.renderer.xhtml.link.PathXHTMLLinkTypeRenderer
+org.xwiki.rendering.internal.renderer.xhtml.XHTMLMarkerResourceReferenceSerializer
 org.xwiki.rendering.internal.renderer.event.EventRendererFactory
 org.xwiki.rendering.internal.renderer.event.EventRenderer
 org.xwiki.rendering.internal.renderer.event.EventBlockRenderer

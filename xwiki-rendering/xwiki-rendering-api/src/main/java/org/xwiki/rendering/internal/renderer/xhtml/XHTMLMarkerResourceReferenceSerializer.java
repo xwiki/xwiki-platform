@@ -21,17 +21,21 @@ package org.xwiki.rendering.internal.renderer.xhtml;
 
 import java.util.Map;
 
+import org.xwiki.component.annotation.Component;
 import org.xwiki.rendering.internal.renderer.ParametersPrinter;
 import org.xwiki.rendering.listener.reference.ResourceReference;
+import org.xwiki.rendering.renderer.reference.ResourceReferenceSerializer;
 
 /**
  * Serialize a Resource Reference into XHTML comments using the syntax
- * {@code (isTyped)|-|(type)|-|(reference)|-|(parameters: key="value")}.
+ * {@code (isTyped)|-|(type)|-|(reference)|-|(parameters: key="value")}. This is used for example to save a Link or
+ * Image Reference in XHTML Comment in the Annotated XHTML Renderer.
  *
  * @version $Id$
  * @since 2.5RC1
  */
-public class XHTMLMarkerResourceReferenceRenderer
+@Component("xhtmlmarker")
+public class XHTMLMarkerResourceReferenceSerializer implements ResourceReferenceSerializer
 {
     /**
      * Character to separate Link reference and parameters in XHTML comments.
@@ -44,11 +48,10 @@ public class XHTMLMarkerResourceReferenceRenderer
     private ParametersPrinter parametersPrinter = new ParametersPrinter();
 
     /**
-     * @param reference the resource reference to serialize as XHTML comment
-     * @return the serialized resource reference using the format
-     *         {@code (isTyped)|-|(type)|-|(reference)|-|(parameters: key="value")}
+     * {@inheritDoc}
+     * @see org.xwiki.rendering.renderer.reference.ResourceReferenceSerializer#serialize(ResourceReference)
      */
-    public String render(ResourceReference reference)
+    public String serialize(ResourceReference reference)
     {
         StringBuilder buffer = new StringBuilder();
 

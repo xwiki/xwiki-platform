@@ -21,7 +21,7 @@ package org.xwiki.rendering.internal.renderer.xhtml.image;
 
 import java.util.Map;
 
-import org.xwiki.rendering.internal.renderer.ParametersPrinter;
+import org.xwiki.rendering.internal.renderer.xhtml.XHTMLMarkerResourceReferenceRenderer;
 import org.xwiki.rendering.listener.reference.ResourceReference;
 import org.xwiki.rendering.renderer.printer.XHTMLWikiPrinter;
 import org.xwiki.component.annotation.Component;
@@ -41,14 +41,9 @@ import org.xwiki.component.descriptor.ComponentInstantiationStrategy;
 public class AnnotatedXHTMLImageRenderer implements XHTMLImageRenderer
 {
     /**
-     * Character to separate Link reference and parameters in XHTML comments.
+     * Used to print Image reference as XHTML comments.
      */
-    private static final String COMMENT_SEPARATOR = "|-|";
-
-    /**
-     * Used to print Link Parameters in XHTML comments.
-     */
-    private ParametersPrinter parametersPrinter = new ParametersPrinter();
+    private XHTMLMarkerResourceReferenceRenderer xhtmlMarkerRenderer = new XHTMLMarkerResourceReferenceRenderer();
 
     /**
      * The default XHTML Link Renderer that we're wrapping.
@@ -76,27 +71,7 @@ public class AnnotatedXHTMLImageRenderer implements XHTMLImageRenderer
         // We need to save the image location in XML comment so that it can be reconstructed later on when moving
         // from XHTML to wiki syntax.
         StringBuffer buffer = new StringBuffer("startimage:");
-
-        // Print if the Image Reference is typed, the Link Reference Type and the Image Reference itself
-        buffer.append(reference.isTyped());
-        buffer.append(COMMENT_SEPARATOR);
-        buffer.append(reference.getType().getScheme());
-        buffer.append(COMMENT_SEPARATOR);
-        buffer.append(reference.getReference());
-
-        // Print Image Reference parameters. We need to do this so that the XHTML parser doesn't have
-        // to parse the query string to extract the parameters. Doing so could lead to false result since
-        // for example the XHTML renderer can add a parent parameter in the query string for images to non
-        // existing attachments.
-        //
-        // Also note that we don't need to print Image parameters since they are added as XHTML class
-        // attributes by the XHTML Renderer and thus the XHTML parser will be able to get them
-        // agian as attributes.
-        Map<String, String> imageReferenceParameters = reference.getParameters();
-        if (!imageReferenceParameters.isEmpty()) {
-            buffer.append(COMMENT_SEPARATOR);
-            buffer.append(this.parametersPrinter.print(imageReferenceParameters, '\\'));
-        }
+        buffer.append(this.xhtmlMarkerRenderer.render(reference));
 
         getXHTMLWikiPrinter().printXMLComment(buffer.toString(), true);
         this.defaultImageRenderer.onImage(reference, isFreeStandingURI, parameters);

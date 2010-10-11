@@ -19,7 +19,6 @@
  */
 package com.xpn.xwiki.wysiwyg.server.internal.wiki;
 
-import org.apache.commons.lang.StringUtils;
 import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.component.annotation.Requirement;
 import org.xwiki.gwt.wysiwyg.client.wiki.EntityConfig;
@@ -43,11 +42,6 @@ import com.xpn.xwiki.wysiwyg.server.wiki.LinkService;
  */
 public class DefaultLinkService implements LinkService
 {
-    /**
-     * The image URI protocol.
-     */
-    private static final String IMAGE_URI_PROTOCOL = "image:";
-
     /**
      * The component used to access documents. This is temporary till XWiki model is moved into components.
      */
@@ -78,7 +72,7 @@ public class DefaultLinkService implements LinkService
      * Note: The link reference syntax is independent of the syntax of the edited document. The current hint should be
      * replaced with a generic one to avoid confusion.
      */
-    @Requirement("xwiki/2.1/link")
+    @Requirement("xhtmlmarker")
     private ResourceReferenceSerializer linkReferenceSerializer;
 
     /**
@@ -87,7 +81,7 @@ public class DefaultLinkService implements LinkService
      * Note: The link reference syntax is independent of the syntax of the edited document. The current hint should be
      * replaced with a generic one to avoid confusion.
      */
-    @Requirement("xwiki/2.1/link")
+    @Requirement("xhtmlmarker")
     private ResourceReferenceParser linkReferenceParser;
 
     /**
@@ -145,12 +139,14 @@ public class DefaultLinkService implements LinkService
     {
         // TODO: Improve this to make it generic and allow adding new link types dynamically.
         ResourceType resourceType;
+        boolean resourceTyped = true;
         switch (entityType) {
             case DOCUMENT:
                 resourceType = ResourceType.DOCUMENT;
                 break;
             case IMAGE:
                 resourceType = ResourceType.IMAGE;
+                resourceTyped = false;
                 break;
             case ATTACHMENT:
                 resourceType = ResourceType.ATTACHMENT;
@@ -160,13 +156,8 @@ public class DefaultLinkService implements LinkService
                 throw new RuntimeException("Unknown link type [" + entityType.name() + "]");
         }
         ResourceReference linkReference = new ResourceReference(relativeStringEntityReference, resourceType);
-        String linkReferenceAsString = linkReferenceSerializer.serialize(linkReference);
-        // Remove the image protocol because the client doesn't need it: image protocol is implied by the image specific
-        // meta data (which is different than link meta data).
-        if (entityType == org.xwiki.gwt.wysiwyg.client.wiki.EntityReference.EntityType.IMAGE) {
-            linkReferenceAsString = StringUtils.removeStart(linkReferenceAsString, IMAGE_URI_PROTOCOL);
-        }
-        return linkReferenceAsString;
+        linkReference.setTyped(resourceTyped);
+        return linkReferenceSerializer.serialize(linkReference);
     }
 
     /**
@@ -179,12 +170,7 @@ public class DefaultLinkService implements LinkService
         org.xwiki.gwt.wysiwyg.client.wiki.EntityReference.EntityType entityType,
         org.xwiki.gwt.wysiwyg.client.wiki.EntityReference baseReference)
     {
-        String fullLinkReference = linkReferenceAsString;
-        // Add the image protocol because the client doesn't provided it.
-        if (entityType == org.xwiki.gwt.wysiwyg.client.wiki.EntityReference.EntityType.IMAGE) {
-            fullLinkReference = IMAGE_URI_PROTOCOL + linkReferenceAsString;
-        }
-        ResourceReference linkReference = linkReferenceParser.parse(fullLinkReference);
+        ResourceReference linkReference = linkReferenceParser.parse(linkReferenceAsString);
         String stringEntityReference = linkReference.getReference();
         org.xwiki.gwt.wysiwyg.client.wiki.EntityReference entityReference =
             entityReferenceConverter.convert(explicitStringEntityReferenceResolver.resolve(stringEntityReference,

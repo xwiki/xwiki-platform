@@ -27,10 +27,9 @@ import org.xwiki.component.descriptor.ComponentInstantiationStrategy;
 import org.xwiki.rendering.listener.reference.ResourceReference;
 
 /**
- * Handle XHTML rendering for links for which we haven't found a specific
- * {@link org.xwiki.rendering.internal.renderer.xhtml.link.XHTMLLinkTypeRenderer} implementation.
+ * Handle XHTML rendering for mailto links.
  * 
- * @version $Id: DefaultXHTMLLinkTypeRenderer.java 31687 2010-10-08 19:37:36Z vmassol $
+ * @version $Id$
  * @since 2.5RC1
  */
 @Component("mailto")

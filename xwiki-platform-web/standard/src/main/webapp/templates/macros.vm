@@ -544,7 +544,11 @@ $xwiki.getUserName("xwiki:${username}")
   #end
   #if(!$picturelist.containsKey("${username}--${size}"))
     #set($picture = "<img class='avatar avatar_${escapetool.xml(${size})}' src='")
-    #set($picture = $picture.concat($xwiki.getSkinFile('noavatar.png', true)))
+    #if ($xwiki.getDocument($username).getObject('XWiki.XWikiGroups'))
+      #set ($picture = $picture.concat($xwiki.getSkinFile('icons/xwiki/noavatargroup.png', true)))
+    #else
+      #set ($picture = $picture.concat($xwiki.getSkinFile('icons/xwiki/noavatar.png', true)))
+    #end
     #set($picture = $picture.concat("' alt='${xwiki.getUserName($username, false)}' title='${xwiki.getUserName($username, false)}'/>"))
     #set($profiledoc = $xwiki.getDocument($username))
     #if (!$profiledoc.isNew())

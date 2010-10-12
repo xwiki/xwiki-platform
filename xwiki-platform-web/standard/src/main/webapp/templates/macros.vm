@@ -547,9 +547,9 @@ $xwiki.getUserName("xwiki:${username}")
     #set($picture = $picture.concat($xwiki.getSkinFile('noavatar.png', true)))
     #set($picture = $picture.concat("' alt='${xwiki.getUserName($username, false)}' title='${xwiki.getUserName($username, false)}'/>"))
     #set($profiledoc = $xwiki.getDocument($username))
-    #if(!$profiledoc.isNew())
+    #if (!$profiledoc.isNew())
       #if($profiledoc.attachmentList.size() != 0)
-        #set($profileobj = $profiledoc.getObject("XWiki.XWikiUsers", 0))
+        #set($profileobj = $profiledoc.getObject('XWiki.XWikiUsers', 0))
         #if($profileobj.avatar && $profileobj.avatar != "")
           #foreach ($attach in $profiledoc.attachmentList)
             #if($attach.filename == $profileobj.avatar)
@@ -570,9 +570,9 @@ $xwiki.getUserName("xwiki:${username}")
         #end
       #end
     #end
-    $!picturelist.put("${username}--${size}", $picture)
+    #set ($discard = $!picturelist.put("${username}--${size}", $picture))
   #end
-  $picturelist.get("${username}--${size}")
+  $picturelist.get("${username}--${size}")##
 #end
 #macro(largeUserAvatar $username)
   #resizedUserAvatar($username 120)

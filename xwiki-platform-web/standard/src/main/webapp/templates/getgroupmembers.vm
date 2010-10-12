@@ -38,9 +38,9 @@ $response.setContentType('application/x-json')
     "wikiname"     : "$wikiname",
     "memberurl"    : "$xwiki.getURL($m)",
     "docurl"       : "$doc.getURL()",
-    "grayed"       : "$grayed",
+    "grayed"       : $grayed,
 ## livetable data
-    "doc_viewable" : "${xwiki.hasAccessLevel('view', $xcontext.user, $m)}",
+    "doc_viewable" : ${xwiki.hasAccessLevel('view', $xcontext.user, $m)},
     "doc_hasadmin" : ${xwiki.hasAccessLevel('admin', $xcontext.user, $doc.fullName)},
     "member"   : "$xwiki.getUserName($m, false)#if($hasAdmin || $isAdvancedUser) (#if($wikiname != 'local')$wikiname:#end$m)#end",
     "member_url" : "$xwiki.getURL($m)",

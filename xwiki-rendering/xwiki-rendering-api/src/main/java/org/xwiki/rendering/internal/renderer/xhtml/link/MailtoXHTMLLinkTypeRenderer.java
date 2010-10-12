@@ -19,32 +19,34 @@
  */
 package org.xwiki.rendering.internal.renderer.xhtml.link;
 
+import java.util.Map;
+
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.InstantiationStrategy;
 import org.xwiki.component.descriptor.ComponentInstantiationStrategy;
 import org.xwiki.rendering.listener.reference.ResourceReference;
 
-import java.util.Map;
-
 /**
- * Handle XHTML rendering for links to URLs.
- *
- * @version $Id$
- * @since 2.5M2
+ * Handle XHTML rendering for links for which we haven't found a specific
+ * {@link org.xwiki.rendering.internal.renderer.xhtml.link.XHTMLLinkTypeRenderer} implementation.
+ * 
+ * @version $Id: DefaultXHTMLLinkTypeRenderer.java 31687 2010-10-08 19:37:36Z vmassol $
+ * @since 2.5RC1
  */
-@Component("url")
+@Component("mailto")
 @InstantiationStrategy(ComponentInstantiationStrategy.PER_LOOKUP)
-public class URLXHTMLLinkTypeRenderer extends AbstractXHTMLLinkTypeRenderer
+public class MailtoXHTMLLinkTypeRenderer extends AbstractXHTMLLinkTypeRenderer
 {
     /**
      * {@inheritDoc}
-     * @see AbstractXHTMLLinkTypeRenderer#beginLinkExtraAttributes(org.xwiki.rendering.listener.reference.ResourceReference ,
-     *      java.util.Map, java.util.Map)
+     * 
+     * @see AbstractXHTMLLinkTypeRenderer#beginLinkExtraAttributes(org.xwiki.rendering.listener.reference.ResourceReference
+     *      , java.util.Map, java.util.Map)
      */
     @Override
     protected void beginLinkExtraAttributes(ResourceReference reference, Map<String, String> spanAttributes,
         Map<String, String> anchorAttributes)
     {
-        anchorAttributes.put(XHTMLLinkRenderer.HREF, reference.getReference());
+        anchorAttributes.put(XHTMLLinkRenderer.HREF, reference.getType().getScheme() + ':' + reference.getReference());
     }
 }

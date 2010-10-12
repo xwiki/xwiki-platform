@@ -19,19 +19,17 @@
  */
 package org.xwiki.rendering.internal.renderer.xhtml.link;
 
-import org.xwiki.component.annotation.Component;
-import org.xwiki.component.annotation.InstantiationStrategy;
-import org.xwiki.component.annotation.Requirement;
-import org.xwiki.component.descriptor.ComponentInstantiationStrategy;
-import org.xwiki.rendering.listener.reference.ResourceReference;
-import org.xwiki.rendering.renderer.reference.ResourceReferenceTypeSerializer;
-
 import java.util.Map;
 
+import org.xwiki.component.annotation.Component;
+import org.xwiki.component.annotation.InstantiationStrategy;
+import org.xwiki.component.descriptor.ComponentInstantiationStrategy;
+import org.xwiki.rendering.listener.reference.ResourceReference;
+
 /**
- * Handle XHTML rendering for links for which we haven't found a specific {@link org.xwiki.rendering.internal.renderer.xhtml.link.XHTMLLinkTypeRenderer}
- * implementation.
- *
+ * Handle XHTML rendering for links for which we haven't found a specific
+ * {@link org.xwiki.rendering.internal.renderer.xhtml.link.XHTMLLinkTypeRenderer} implementation.
+ * 
  * @version $Id$
  * @since 2.5M2
  */
@@ -40,23 +38,15 @@ import java.util.Map;
 public class DefaultXHTMLLinkTypeRenderer extends AbstractXHTMLLinkTypeRenderer
 {
     /**
-     * Used to serialize the link into XWiki Syntax 2.0. This syntax was chosen arbitrarily. Normally we should always
-     * have a specific link type renderer found so this is only a fallback solution.
-     */
-    @Requirement("xwiki/2.0")
-    private ResourceReferenceTypeSerializer defaultResourceReferenceTypeSerializer;
-
-    /**
      * {@inheritDoc}
-     *
-     * @see AbstractXHTMLLinkTypeRenderer#beginLinkExtraAttributes(org.xwiki.rendering.listener.reference.ResourceReference ,
-     *      java.util.Map, java.util.Map)
+     * 
+     * @see AbstractXHTMLLinkTypeRenderer#beginLinkExtraAttributes(org.xwiki.rendering.listener.reference.ResourceReference
+     *      , java.util.Map, java.util.Map)
      */
     @Override
     protected void beginLinkExtraAttributes(ResourceReference reference, Map<String, String> spanAttributes,
         Map<String, String> anchorAttributes)
     {
-        anchorAttributes.put(XHTMLLinkRenderer.HREF, this.defaultResourceReferenceTypeSerializer.serialize(
-            reference));
+        anchorAttributes.put(XHTMLLinkRenderer.HREF, reference.getReference());
     }
 }

@@ -32,4 +32,12 @@
   <artifactId>xwiki-core-rendering-macro-toc</artifactId>
   <name>XWiki Platform - Core - Rendering - Macro - Toc</name>
   <description>XWiki Platform - Core - Rendering - Macro - Toc</description>
+  <dependencies>
+    <dependency>
+      <groupId>org.hibernate</groupId>
+      <artifactId>hibernate-validator</artifactId>
+      <version>4.0.2.GA</version>
+      <scope>test</scope>
+    </dependency>
+  </dependencies>
 </project>

@@ -19,8 +19,9 @@
  */
 package org.xwiki.rendering.macro.toc;
 
+import javax.validation.constraints.Min;
+
 import org.xwiki.properties.annotation.PropertyDescription;
-import org.xwiki.rendering.macro.parameter.ParameterValueTooLowException;
 
 /**
  * Parameters for the {@link org.xwiki.rendering.internal.macro.toc.TocMacro} Macro.
@@ -49,6 +50,7 @@ public class TocMacroParameters
     /**
      * The minimum section level. For example if 2 then level 1 sections will not be listed.
      */
+    @Min(1)
     private int start = 1;
 
     /**
@@ -59,6 +61,7 @@ public class TocMacroParameters
     /**
      * The maximum section level. For example if 3 then all section levels from 4 will not be listed.
      */
+    @Min(1)
     private int depth = 6;
 
     /**
@@ -74,15 +77,10 @@ public class TocMacroParameters
 
     /**
      * @param start the minimum section level. For example if 2 then level 1 sections will not be listed.
-     * @throws ParameterValueTooLowException the provided value is too low, it needs to be >= 1.
      */
     @PropertyDescription("the minimum section level. For example if 2 then level 1 sections will not be listed")
-    public void setStart(int start) throws ParameterValueTooLowException
+    public void setStart(int start)
     {
-        if (start < 1) {
-            throw new ParameterValueTooLowException(1);
-        }
-
         this.start = start;
         this.customStart = true;
     }
@@ -105,16 +103,11 @@ public class TocMacroParameters
 
     /**
      * @param depth the maximum section level. For example if 3 then all section levels from 4 will not be listed.
-     * @throws ParameterValueTooLowException the provided value is too low, it needs to be >= 1.
      */
     @PropertyDescription("the maximum section level. "
         + "For example if 3 then all section levels from 4 will not be listed")
-    public void setDepth(int depth) throws ParameterValueTooLowException
+    public void setDepth(int depth)
     {
-        if (depth < 1) {
-            throw new ParameterValueTooLowException(1);
-        }
-
         this.depth = depth;
     }
 

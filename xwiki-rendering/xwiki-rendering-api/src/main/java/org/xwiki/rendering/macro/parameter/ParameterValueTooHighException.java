@@ -23,7 +23,9 @@ package org.xwiki.rendering.macro.parameter;
  * Exception used when the macro parameter is two high.
  * 
  * @version $Id$
+ * @deprecated use {@link javax.validation.constraints.Max} instead
  */
+@Deprecated
 public class ParameterValueTooHighException extends MacroParameterException
 {
     /**

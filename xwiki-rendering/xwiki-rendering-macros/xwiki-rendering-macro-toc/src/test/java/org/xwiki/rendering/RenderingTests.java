@@ -35,7 +35,7 @@ public class RenderingTests extends TestCase
 {
     public static Test suite() throws Exception
     {
-        RenderingTestSuite suite = new RenderingTestSuite("Test Toc Macro");
+        RenderingTestSuite suite = new RenderingTestSuite("Test Toc Macro", "", "macrotoc11.test");
         return new ComponentManagerTestSetup(suite);
     }
 }

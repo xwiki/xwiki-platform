@@ -23,7 +23,9 @@ package org.xwiki.rendering.macro.parameter;
  * Exception used when the macro parameter is two low.
  * 
  * @version $Id$
+ * @deprecated use {@link javax.validation.constraints.Min} instead
  */
+@Deprecated
 public class ParameterValueTooLowException extends MacroParameterException
 {
     /**

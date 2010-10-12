@@ -1,0 +1,81 @@
+.runTransformations
+.#-----------------------------------------------------
+.input|xwiki/2.0
+.# Verify the TOC produce error when "start" or "depth" parameters are too low
+.#-----------------------------------------------------
+{{toc start="0"/}}
+
+{{toc depth="0"/}}
+.#-----------------------------------------------------
+.expect|event/1.0
+.#-----------------------------------------------------
+beginDocument
+beginMacroMarkerStandalone [toc] [start=0]
+beginGroup [[class]=[xwikirenderingerror]]
+onWord [Invalid macro parameters used for the "toc" macro]
+endGroup [[class]=[xwikirenderingerror]]
+beginGroup [[class]=[xwikirenderingerrordescription hidden]]
+onVerbatim [org.xwiki.properties.PropertyException: Failed to validate bean: [must be greater than or equal to 1]
+	at org.xwiki.properties.internal.DefaultBeanManager.validateBean(DefaultBeanManager.java:178)
+	at org.xwiki.properties.internal.DefaultBeanManager.populate(DefaultBeanManager.java:113)
+	at org.xwiki.rendering.internal.transformation.MacroTransformation.transformOnce(MacroTransformation.java:158)
+	at org.xwiki.rendering.internal.transformation.MacroTransformation.transform(MacroTransformation.java:117)
+	at org.xwiki.rendering.internal.transformation.DefaultTransformationManager.performTransformations(DefaultTransformationManager.java:85)
+	at org.xwiki.rendering.scaffolding.RenderingTestCase.runTestInternal(RenderingTestCase.java:126)
+	at org.xwiki.rendering.scaffolding.RenderingTestCase.runTest(RenderingTestCase.java:99)
+	at org.jmock.core.VerifyingTestCase.runBare(VerifyingTestCase.java:39)
+	at junit.framework.TestResult$1.protect(TestResult.java:110)
+	at junit.framework.TestResult.runProtected(TestResult.java:128)
+	at junit.framework.TestResult.run(TestResult.java:113)
+	at junit.framework.TestCase.run(TestCase.java:124)
+	at junit.framework.TestSuite.runTest(TestSuite.java:232)
+	at junit.framework.TestSuite.run(TestSuite.java:227)
+	at junit.extensions.TestDecorator.basicRun(TestDecorator.java:24)
+	at junit.extensions.TestSetup$1.protect(TestSetup.java:23)
+	at junit.framework.TestResult.runProtected(TestResult.java:128)
+	at junit.extensions.TestSetup.run(TestSetup.java:27)
+	at org.junit.internal.runners.JUnit38ClassRunner.run(JUnit38ClassRunner.java:79)
+	at org.eclipse.jdt.internal.junit4.runner.JUnit4TestReference.run(JUnit4TestReference.java:49)
+	at org.eclipse.jdt.internal.junit.runner.TestExecution.run(TestExecution.java:38)
+	at org.eclipse.jdt.internal.junit.runner.RemoteTestRunner.runTests(RemoteTestRunner.java:467)
+	at org.eclipse.jdt.internal.junit.runner.RemoteTestRunner.runTests(RemoteTestRunner.java:683)
+	at org.eclipse.jdt.internal.junit.runner.RemoteTestRunner.run(RemoteTestRunner.java:390)
+	at org.eclipse.jdt.internal.junit.runner.RemoteTestRunner.main(RemoteTestRunner.java:197)
+] [false]
+endGroup [[class]=[xwikirenderingerrordescription hidden]]
+endMacroMarkerStandalone [toc] [start=0]
+beginMacroMarkerStandalone [toc] [depth=0]
+beginGroup [[class]=[xwikirenderingerror]]
+onWord [Invalid macro parameters used for the "toc" macro]
+endGroup [[class]=[xwikirenderingerror]]
+beginGroup [[class]=[xwikirenderingerrordescription hidden]]
+onVerbatim [org.xwiki.properties.PropertyException: Failed to validate bean: [must be greater than or equal to 1]
+	at org.xwiki.properties.internal.DefaultBeanManager.validateBean(DefaultBeanManager.java:178)
+	at org.xwiki.properties.internal.DefaultBeanManager.populate(DefaultBeanManager.java:113)
+	at org.xwiki.rendering.internal.transformation.MacroTransformation.transformOnce(MacroTransformation.java:158)
+	at org.xwiki.rendering.internal.transformation.MacroTransformation.transform(MacroTransformation.java:117)
+	at org.xwiki.rendering.internal.transformation.DefaultTransformationManager.performTransformations(DefaultTransformationManager.java:85)
+	at org.xwiki.rendering.scaffolding.RenderingTestCase.runTestInternal(RenderingTestCase.java:126)
+	at org.xwiki.rendering.scaffolding.RenderingTestCase.runTest(RenderingTestCase.java:99)
+	at org.jmock.core.VerifyingTestCase.runBare(VerifyingTestCase.java:39)
+	at junit.framework.TestResult$1.protect(TestResult.java:110)
+	at junit.framework.TestResult.runProtected(TestResult.java:128)
+	at junit.framework.TestResult.run(TestResult.java:113)
+	at junit.framework.TestCase.run(TestCase.java:124)
+	at junit.framework.TestSuite.runTest(TestSuite.java:232)
+	at junit.framework.TestSuite.run(TestSuite.java:227)
+	at junit.extensions.TestDecorator.basicRun(TestDecorator.java:24)
+	at junit.extensions.TestSetup$1.protect(TestSetup.java:23)
+	at junit.framework.TestResult.runProtected(TestResult.java:128)
+	at junit.extensions.TestSetup.run(TestSetup.java:27)
+	at org.junit.internal.runners.JUnit38ClassRunner.run(JUnit38ClassRunner.java:79)
+	at org.eclipse.jdt.internal.junit4.runner.JUnit4TestReference.run(JUnit4TestReference.java:49)
+	at org.eclipse.jdt.internal.junit.runner.TestExecution.run(TestExecution.java:38)
+	at org.eclipse.jdt.internal.junit.runner.RemoteTestRunner.runTests(RemoteTestRunner.java:467)
+	at org.eclipse.jdt.internal.junit.runner.RemoteTestRunner.runTests(RemoteTestRunner.java:683)
+	at org.eclipse.jdt.internal.junit.runner.RemoteTestRunner.run(RemoteTestRunner.java:390)
+	at org.eclipse.jdt.internal.junit.runner.RemoteTestRunner.main(RemoteTestRunner.java:197)
+] [false]
+endGroup [[class]=[xwikirenderingerrordescription hidden]]
+endMacroMarkerStandalone [toc] [depth=0]
+endDocument

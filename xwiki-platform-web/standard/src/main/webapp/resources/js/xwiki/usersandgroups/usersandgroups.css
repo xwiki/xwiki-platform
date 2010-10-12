@@ -79,3 +79,8 @@
 tr.userorgroups-header {
   background-color:#DDDDDD;
 }
+
+/* Make the avatar column smaller */
+table#groupusers th.xwiki-livetable-display-header-text:first-child {
+  width: 50px;
+}

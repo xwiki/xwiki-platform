@@ -159,10 +159,6 @@ table pre {
   white-space: pre-wrap;
 }
 
-th.avatar {
-  width: 50px;
-}
-
 /* @group XWIKI */
 /* --------------------------------------------------------------
   * XWiki Specific classes
@@ -321,6 +317,9 @@ span.wikicreatelink a:after {
 }
 * html .avatar_120 {
   width: 120px;
+}
+th.avatar {
+  width: 50px;
 }
 
 /* @group VIEW LAYOUT */

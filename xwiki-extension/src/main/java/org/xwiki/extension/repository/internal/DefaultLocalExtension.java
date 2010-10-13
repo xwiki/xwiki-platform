@@ -29,7 +29,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import org.apache.log4j.lf5.util.StreamUtils;
+import org.apache.commons.io.IOUtils;
 import org.xwiki.extension.Extension;
 import org.xwiki.extension.ExtensionDependency;
 import org.xwiki.extension.ExtensionException;
@@ -74,7 +74,7 @@ public class DefaultLocalExtension implements LocalExtension
         this(repository, extension.getId(), extension.getVersion(), extension.getType());
 
         this.dependencies.addAll(extension.getDependencies());
-        
+
         setDescription(extension.getDescription());
         setAuthor(extension.getAuthor());
         setWebsite(extension.getWebSite());
@@ -121,7 +121,7 @@ public class DefaultLocalExtension implements LocalExtension
             sourceStream = new FileInputStream(getFile());
             targetStream = new FileOutputStream(file);
 
-            StreamUtils.copy(sourceStream, targetStream);
+            IOUtils.copy(sourceStream, targetStream);
         } catch (Exception e) {
             throw new ExtensionException("Failed to copy file", e);
         } finally {

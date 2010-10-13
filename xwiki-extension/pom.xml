@@ -121,6 +121,11 @@
       <artifactId>aether-connector-wagon</artifactId>
       <version>${aether.version}</version>
       <exclusions>
+        <!-- Plexus Container (drawn by Aether Wagon) incorrectly draws JUnit -->
+        <exclusion>
+          <groupId>junit</groupId>
+          <artifactId>junit</artifactId>
+        </exclusion>
         <exclusion>
           <groupId>log4j</groupId>
           <artifactId>log4j</artifactId>

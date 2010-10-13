@@ -69,3 +69,6 @@
 * html .avatar_120 {
   width: 120px;
 }
+th.avatar {
+  width: 50px;
+}

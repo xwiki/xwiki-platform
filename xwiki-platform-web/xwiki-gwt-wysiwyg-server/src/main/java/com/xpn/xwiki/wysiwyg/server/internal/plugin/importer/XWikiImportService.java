@@ -30,12 +30,13 @@ import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.gwt.wysiwyg.client.plugin.importer.ImportService;
 import org.xwiki.gwt.wysiwyg.client.wiki.Attachment;
 import org.xwiki.model.reference.AttachmentReference;
-import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.officeimporter.OfficeImporter;
 import org.xwiki.xml.html.HTMLCleaner;
 import org.xwiki.xml.html.HTMLCleanerConfiguration;
 import org.xwiki.xml.html.HTMLUtils;
+
+import com.xpn.xwiki.wysiwyg.server.wiki.EntityReferenceConverter;
 
 /**
  * XWiki specific implementation of {@link ImportService}.
@@ -70,6 +71,11 @@ public class XWikiImportService implements ImportService
     private ComponentManager componentManager;
 
     /**
+     * The object used to convert between client and server entity reference.
+     */
+    private final EntityReferenceConverter entityReferenceConverter = new EntityReferenceConverter();
+
+    /**
      * {@inheritDoc}
      * 
      * @see ImportService#cleanOfficeHTML(String, String, Map)
@@ -97,11 +103,9 @@ public class XWikiImportService implements ImportService
     public String officeToXHTML(Attachment attachment, Map<String, String> cleaningParams)
     {
         try {
-            DocumentReference parent =
-                new DocumentReference(attachment.getReference().getWikiName(),
-                    attachment.getReference().getSpaceName(), attachment.getReference().getPageName());
-            AttachmentReference attachmentReference =
-                new AttachmentReference(attachment.getReference().getFileName(), parent);
+            org.xwiki.gwt.wysiwyg.client.wiki.AttachmentReference clientAttachmentReference =
+                new org.xwiki.gwt.wysiwyg.client.wiki.AttachmentReference(attachment.getReference());
+            AttachmentReference attachmentReference = entityReferenceConverter.convert(clientAttachmentReference);
             // Omit the XML declaration and the document type because the returned XHTML is inserted at the caret
             // position or replaces the current selection in the rich text area.
             cleaningParams.put("omitXMLDeclaration", Boolean.TRUE.toString());

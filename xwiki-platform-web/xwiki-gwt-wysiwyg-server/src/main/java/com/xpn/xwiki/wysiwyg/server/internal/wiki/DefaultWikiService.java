@@ -32,7 +32,9 @@ import org.xwiki.component.annotation.Requirement;
 import org.xwiki.context.Execution;
 import org.xwiki.gwt.wysiwyg.client.wiki.Attachment;
 import org.xwiki.gwt.wysiwyg.client.wiki.EntityConfig;
+import org.xwiki.gwt.wysiwyg.client.wiki.ResourceReference;
 import org.xwiki.gwt.wysiwyg.client.wiki.WikiPage;
+import org.xwiki.gwt.wysiwyg.client.wiki.WikiPageReference;
 import org.xwiki.gwt.wysiwyg.client.wiki.WikiService;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.rendering.syntax.Syntax;
@@ -73,7 +75,7 @@ public class DefaultWikiService implements WikiService
     private LinkService linkService;
 
     /**
-     * The object used to convert between client-side entity references and server-side entity references.
+     * The object used to convert between client and server entity reference.
      */
     private final EntityReferenceConverter entityReferenceConverter = new EntityReferenceConverter();
 
@@ -263,7 +265,7 @@ public class DefaultWikiService implements WikiService
             WikiPage wikiPage = new WikiPage();
             XWikiContext context = getXWikiContext();
             XWikiDocument document = context.getWiki().getDocument(documentReference, context);
-            wikiPage.setReference(entityReferenceConverter.convert(documentReference));
+            wikiPage.setReference(entityReferenceConverter.convert(documentReference).getEntityReference());
             wikiPage.setTitle(document.getRenderedTitle(Syntax.XHTML_1_0, context));
             wikiPage.setUrl(document.getURL("view", context));
             wikiPages.add(wikiPage);
@@ -274,11 +276,10 @@ public class DefaultWikiService implements WikiService
     /**
      * {@inheritDoc}
      * 
-     * @see WikiService#getEntityConfig(org.xwiki.gwt.wysiwyg.client.wiki.EntityReference,
-     *      org.xwiki.gwt.wysiwyg.client.wiki.EntityReference)
+     * @see WikiService#getEntityConfig(org.xwiki.gwt.wysiwyg.client.wiki.EntityReference, ResourceReference)
      */
     public EntityConfig getEntityConfig(org.xwiki.gwt.wysiwyg.client.wiki.EntityReference origin,
-        org.xwiki.gwt.wysiwyg.client.wiki.EntityReference destination)
+        ResourceReference destination)
     {
         return linkService.getEntityConfig(origin, destination);
     }
@@ -286,16 +287,15 @@ public class DefaultWikiService implements WikiService
     /**
      * {@inheritDoc}
      * 
-     * @see WikiService#getAttachment(org.xwiki.gwt.wysiwyg.client.wiki.EntityReference)
+     * @see WikiService#getAttachment(org.xwiki.gwt.wysiwyg.client.wiki.AttachmentReference)
      */
-    public Attachment getAttachment(org.xwiki.gwt.wysiwyg.client.wiki.EntityReference attachmentReference)
+    public Attachment getAttachment(org.xwiki.gwt.wysiwyg.client.wiki.AttachmentReference attachmentReference)
     {
         XWikiContext context = getXWikiContext();
         // Clean attachment filename to be synchronized with all attachment operations.
         String cleanedFileName = context.getWiki().clearName(attachmentReference.getFileName(), false, true, context);
         DocumentReference documentReference =
-            new DocumentReference(attachmentReference.getWikiName(), attachmentReference.getSpaceName(),
-                attachmentReference.getPageName());
+            entityReferenceConverter.convert(attachmentReference.getWikiPageReference());
         XWikiDocument doc;
         try {
             doc = context.getWiki().getDocument(documentReference, context);
@@ -312,13 +312,11 @@ public class DefaultWikiService implements WikiService
             return null;
         }
 
-        org.xwiki.gwt.wysiwyg.client.wiki.EntityReference foundAttachmentReference =
-            entityReferenceConverter.convert(documentReference);
-        foundAttachmentReference.setType(attachmentReference.getType());
+        org.xwiki.gwt.wysiwyg.client.wiki.AttachmentReference foundAttachmentReference = attachmentReference.clone();
         foundAttachmentReference.setFileName(cleanedFileName);
 
         Attachment attach = new Attachment();
-        attach.setReference(foundAttachmentReference);
+        attach.setReference(foundAttachmentReference.getEntityReference());
         attach.setUrl(doc.getAttachmentURL(cleanedFileName, context));
         return attach;
     }
@@ -326,15 +324,14 @@ public class DefaultWikiService implements WikiService
     /**
      * {@inheritDoc}
      * 
-     * @see WikiService#getImageAttachments(org.xwiki.gwt.wysiwyg.client.wiki.EntityReference)
+     * @see WikiService#getImageAttachments(WikiPageReference)
      */
-    public List<Attachment> getImageAttachments(org.xwiki.gwt.wysiwyg.client.wiki.EntityReference reference)
+    public List<Attachment> getImageAttachments(WikiPageReference reference)
     {
         List<Attachment> imageAttachments = new ArrayList<Attachment>();
         List<Attachment> allAttachments = getAttachments(reference);
         for (Attachment attachment : allAttachments) {
             if (attachment.getMimeType().startsWith("image/")) {
-                attachment.getReference().setType(org.xwiki.gwt.wysiwyg.client.wiki.EntityReference.EntityType.IMAGE);
                 imageAttachments.add(attachment);
             }
         }
@@ -344,25 +341,21 @@ public class DefaultWikiService implements WikiService
     /**
      * {@inheritDoc}
      * 
-     * @see WikiService#getAttachments(org.xwiki.gwt.wysiwyg.client.wiki.EntityReference)
+     * @see WikiService#getAttachments(WikiPageReference)
      */
-    public List<Attachment> getAttachments(org.xwiki.gwt.wysiwyg.client.wiki.EntityReference reference)
+    public List<Attachment> getAttachments(WikiPageReference reference)
     {
         try {
             XWikiContext context = getXWikiContext();
             List<Attachment> attachments = new ArrayList<Attachment>();
-            DocumentReference documentReference =
-                new DocumentReference(reference.getWikiName(), reference.getSpaceName(), reference.getPageName());
+            DocumentReference documentReference = entityReferenceConverter.convert(reference);
             XWikiDocument doc = context.getWiki().getDocument(documentReference, context);
             for (XWikiAttachment attach : doc.getAttachmentList()) {
-                org.xwiki.gwt.wysiwyg.client.wiki.EntityReference attachmentReference =
-                    entityReferenceConverter.convert(documentReference);
-                attachmentReference.setType(org.xwiki.gwt.wysiwyg.client.wiki.EntityReference.EntityType.ATTACHMENT);
-                attachmentReference.setFileName(attach.getFilename());
-
+                org.xwiki.gwt.wysiwyg.client.wiki.AttachmentReference attachmentReference =
+                    new org.xwiki.gwt.wysiwyg.client.wiki.AttachmentReference(attach.getFilename(), reference);
                 Attachment currentAttach = new Attachment();
                 currentAttach.setUrl(doc.getAttachmentURL(attach.getFilename(), context));
-                currentAttach.setReference(attachmentReference);
+                currentAttach.setReference(attachmentReference.getEntityReference());
                 currentAttach.setMimeType(attach.getMimeType(context));
                 attachments.add(currentAttach);
             }
@@ -376,24 +369,21 @@ public class DefaultWikiService implements WikiService
     /**
      * {@inheritDoc}
      * 
-     * @see WikiService#getUploadURL(org.xwiki.gwt.wysiwyg.client.wiki.EntityReference)
+     * @see WikiService#getUploadURL(WikiPageReference)
      */
-    public String getUploadURL(org.xwiki.gwt.wysiwyg.client.wiki.EntityReference documentReference)
+    public String getUploadURL(WikiPageReference reference)
     {
-        return documentAccessBridge.getDocumentURL(new DocumentReference(documentReference.getWikiName(),
-            documentReference.getSpaceName(), documentReference.getPageName()), "upload", null, null);
+        return documentAccessBridge.getDocumentURL(entityReferenceConverter.convert(reference), "upload", null, null);
     }
 
     /**
      * {@inheritDoc}
      * 
-     * @see WikiService#parseLinkReference(String, org.xwiki.gwt.wysiwyg.client.wiki.EntityReference.EntityType,
-     *      org.xwiki.gwt.wysiwyg.client.wiki.EntityReference)
+     * @see WikiService#parseLinkReference(String, org.xwiki.gwt.wysiwyg.client.wiki.EntityReference)
      */
-    public org.xwiki.gwt.wysiwyg.client.wiki.EntityReference parseLinkReference(String linkReference,
-        org.xwiki.gwt.wysiwyg.client.wiki.EntityReference.EntityType entityType,
+    public ResourceReference parseLinkReference(String linkReference,
         org.xwiki.gwt.wysiwyg.client.wiki.EntityReference baseReference)
     {
-        return linkService.parseLinkReference(linkReference, entityType, baseReference);
+        return linkService.parseLinkReference(linkReference, baseReference);
     }
 }

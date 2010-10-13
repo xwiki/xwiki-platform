@@ -19,8 +19,14 @@
  */
 package com.xpn.xwiki.wysiwyg.server.wiki;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import org.apache.commons.lang.StringUtils;
+import org.xwiki.gwt.wysiwyg.client.wiki.WikiPageReference;
 import org.xwiki.model.EntityType;
+import org.xwiki.model.reference.AttachmentReference;
+import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
 
 /**
@@ -30,6 +36,20 @@ import org.xwiki.model.reference.EntityReference;
  */
 public class EntityReferenceConverter
 {
+    /**
+     * Maps entity types to client reference component names.
+     */
+    private static final Map<EntityType, String> REFERENCE_COMPONENT_NAME;
+
+    static {
+        REFERENCE_COMPONENT_NAME = new HashMap<EntityType, String>();
+        REFERENCE_COMPONENT_NAME.put(EntityType.WIKI, WikiPageReference.WIKI_NAME);
+        REFERENCE_COMPONENT_NAME.put(EntityType.SPACE, WikiPageReference.SPACE_NAME);
+        REFERENCE_COMPONENT_NAME.put(EntityType.DOCUMENT, WikiPageReference.PAGE_NAME);
+        REFERENCE_COMPONENT_NAME.put(EntityType.ATTACHMENT,
+            org.xwiki.gwt.wysiwyg.client.wiki.AttachmentReference.FILE_NAME);
+    }
+
     /**
      * Converts an entity reference received from the client to an entity reference to be used on the server.
      * 
@@ -42,20 +62,21 @@ public class EntityReferenceConverter
             return null;
         }
         EntityReference serverEntityReference = null;
-        if (!StringUtils.isEmpty(clientEntityReference.getWikiName())) {
-            serverEntityReference = new EntityReference(clientEntityReference.getWikiName(), EntityType.WIKI);
+        String wikiName = clientEntityReference.getComponent(REFERENCE_COMPONENT_NAME.get(EntityType.WIKI));
+        if (!StringUtils.isEmpty(wikiName)) {
+            serverEntityReference = new EntityReference(wikiName, EntityType.WIKI);
         }
-        if (!StringUtils.isEmpty(clientEntityReference.getSpaceName())) {
-            serverEntityReference =
-                new EntityReference(clientEntityReference.getSpaceName(), EntityType.SPACE, serverEntityReference);
+        String spaceName = clientEntityReference.getComponent(REFERENCE_COMPONENT_NAME.get(EntityType.SPACE));
+        if (!StringUtils.isEmpty(spaceName)) {
+            serverEntityReference = new EntityReference(spaceName, EntityType.SPACE, serverEntityReference);
         }
-        if (!StringUtils.isEmpty(clientEntityReference.getPageName())) {
-            serverEntityReference =
-                new EntityReference(clientEntityReference.getPageName(), EntityType.DOCUMENT, serverEntityReference);
+        String pageName = clientEntityReference.getComponent(REFERENCE_COMPONENT_NAME.get(EntityType.DOCUMENT));
+        if (!StringUtils.isEmpty(pageName)) {
+            serverEntityReference = new EntityReference(pageName, EntityType.DOCUMENT, serverEntityReference);
         }
-        if (!StringUtils.isEmpty(clientEntityReference.getFileName())) {
-            serverEntityReference =
-                new EntityReference(clientEntityReference.getFileName(), EntityType.ATTACHMENT, serverEntityReference);
+        String fileName = clientEntityReference.getComponent(REFERENCE_COMPONENT_NAME.get(EntityType.ATTACHMENT));
+        if (!StringUtils.isEmpty(fileName)) {
+            serverEntityReference = new EntityReference(fileName, EntityType.ATTACHMENT, serverEntityReference);
         }
         return serverEntityReference;
     }
@@ -70,33 +91,17 @@ public class EntityReferenceConverter
     {
         org.xwiki.gwt.wysiwyg.client.wiki.EntityReference clientEntityReference =
             new org.xwiki.gwt.wysiwyg.client.wiki.EntityReference();
-        switch (serverEntityReference.getType()) {
-            case DOCUMENT:
-                clientEntityReference.setType(org.xwiki.gwt.wysiwyg.client.wiki.EntityReference.EntityType.DOCUMENT);
-                break;
-            case ATTACHMENT:
-                clientEntityReference.setType(org.xwiki.gwt.wysiwyg.client.wiki.EntityReference.EntityType.ATTACHMENT);
-                break;
-            default:
-                break;
+        try {
+            clientEntityReference.setType(org.xwiki.gwt.wysiwyg.client.wiki.EntityReference.EntityType
+                .valueOf(serverEntityReference.getType().toString()));
+        } catch (Exception e) {
+            return null;
         }
         EntityReference child = serverEntityReference;
         while (child != null) {
-            switch (child.getType()) {
-                case WIKI:
-                    clientEntityReference.setWikiName(child.getName());
-                    break;
-                case SPACE:
-                    clientEntityReference.setSpaceName(child.getName());
-                    break;
-                case DOCUMENT:
-                    clientEntityReference.setPageName(child.getName());
-                    break;
-                case ATTACHMENT:
-                    clientEntityReference.setFileName(child.getName());
-                    break;
-                default:
-                    break;
+            String componentName = REFERENCE_COMPONENT_NAME.get(child.getType());
+            if (componentName != null) {
+                clientEntityReference.setComponent(componentName, child.getName());
             }
             child = child.getParent();
         }
@@ -104,19 +109,43 @@ public class EntityReferenceConverter
     }
 
     /**
-     * @param clientEntityType an entity type received from the client
-     * @return the corresponding server-side entity type
+     * @param documentReference a document reference
+     * @return the corresponding wiki page reference
      */
-    public EntityType convert(org.xwiki.gwt.wysiwyg.client.wiki.EntityReference.EntityType clientEntityType)
+    public WikiPageReference convert(DocumentReference documentReference)
     {
-        switch (clientEntityType) {
-            case DOCUMENT:
-                return EntityType.DOCUMENT;
-            case ATTACHMENT:
-            case IMAGE:
-                return EntityType.ATTACHMENT;
-            default:
-                return null;
-        }
+        String wikiName = documentReference.getWikiReference().getName();
+        String spaceName = documentReference.getLastSpaceReference().getName();
+        String pageName = documentReference.getName();
+        return new WikiPageReference(wikiName, spaceName, pageName);
+    }
+
+    /**
+     * @param reference a wiki page reference
+     * @return the corresponding document reference
+     */
+    public DocumentReference convert(WikiPageReference reference)
+    {
+        return new DocumentReference(reference.getWikiName(), reference.getSpaceName(), reference.getPageName());
+    }
+
+    /**
+     * @param attachmentReference an attachment reference
+     * @return the corresponding client attachment reference
+     */
+    public org.xwiki.gwt.wysiwyg.client.wiki.AttachmentReference convert(AttachmentReference attachmentReference)
+    {
+        return new org.xwiki.gwt.wysiwyg.client.wiki.AttachmentReference(attachmentReference.getName(),
+            convert(attachmentReference.getDocumentReference()));
+    }
+
+    /**
+     * @param clientAttachmentReference a client attachment reference
+     * @return the corresponding server-side attachment reference
+     */
+    public AttachmentReference convert(org.xwiki.gwt.wysiwyg.client.wiki.AttachmentReference clientAttachmentReference)
+    {
+        return new AttachmentReference(clientAttachmentReference.getFileName(), convert(clientAttachmentReference
+            .getWikiPageReference()));
     }
 }

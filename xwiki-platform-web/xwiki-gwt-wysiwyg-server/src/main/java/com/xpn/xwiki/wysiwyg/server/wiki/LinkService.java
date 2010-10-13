@@ -22,7 +22,7 @@ package com.xpn.xwiki.wysiwyg.server.wiki;
 import org.xwiki.component.annotation.ComponentRole;
 import org.xwiki.gwt.wysiwyg.client.wiki.EntityConfig;
 import org.xwiki.gwt.wysiwyg.client.wiki.EntityReference;
-import org.xwiki.gwt.wysiwyg.client.wiki.EntityReference.EntityType;
+import org.xwiki.gwt.wysiwyg.client.wiki.ResourceReference;
 
 /**
  * The service used to create links.
@@ -40,16 +40,15 @@ public interface LinkService
      * @param destination the destination of the link
      * @return the link configuration object that can be used to insert the link in the origin page
      */
-    EntityConfig getEntityConfig(EntityReference origin, EntityReference destination);
+    EntityConfig getEntityConfig(EntityReference origin, ResourceReference destination);
 
     /**
-     * Parses the given link reference and extracts a reference to the linked entity. The returned entity reference is
-     * resolved relative to the given base entity reference.
+     * Parses the given link reference and extracts a reference to the linked resource. The returned resource reference
+     * is resolved relative to the given base entity reference.
      * 
-     * @param linkReference a link reference pointing to an entity of the specified type
-     * @param entityType the type of entity being linked
-     * @param baseReference the entity reference used to resolve the linked entity reference
-     * @return a reference to the linked entity
+     * @param linkReference a serialized link reference
+     * @param baseReference the entity reference used to resolve the linked resource reference
+     * @return a reference to the linked resource
      */
-    EntityReference parseLinkReference(String linkReference, EntityType entityType, EntityReference baseReference);
+    ResourceReference parseLinkReference(String linkReference, EntityReference baseReference);
 }

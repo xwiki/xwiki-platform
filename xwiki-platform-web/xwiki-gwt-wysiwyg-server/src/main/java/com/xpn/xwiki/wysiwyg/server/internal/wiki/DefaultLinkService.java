@@ -22,6 +22,8 @@ package com.xpn.xwiki.wysiwyg.server.internal.wiki;
 import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.component.annotation.Requirement;
 import org.xwiki.gwt.wysiwyg.client.wiki.EntityConfig;
+import org.xwiki.gwt.wysiwyg.client.wiki.URIReference;
+import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.AttachmentReference;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
@@ -85,7 +87,7 @@ public class DefaultLinkService implements LinkService
     private ResourceReferenceParser linkReferenceParser;
 
     /**
-     * The object used to convert between client-side entity references and server-side entity references.
+     * The object used to convert between client and server entity reference.
      */
     private final EntityReferenceConverter entityReferenceConverter = new EntityReferenceConverter();
 
@@ -93,21 +95,29 @@ public class DefaultLinkService implements LinkService
      * {@inheritDoc}
      * 
      * @see LinkService#getEntityConfig(org.xwiki.gwt.wysiwyg.client.wiki.EntityReference,
-     *      org.xwiki.gwt.wysiwyg.client.wiki.EntityReference)
+     *      org.xwiki.gwt.wysiwyg.client.wiki.ResourceReference)
      */
     public EntityConfig getEntityConfig(org.xwiki.gwt.wysiwyg.client.wiki.EntityReference origin,
-        org.xwiki.gwt.wysiwyg.client.wiki.EntityReference destination)
+        org.xwiki.gwt.wysiwyg.client.wiki.ResourceReference destination)
     {
-        EntityReference originReference = entityReferenceConverter.convert(origin);
-        EntityReference destinationReference = entityReferenceConverter.convert(destination);
-        destinationReference =
-            explicitReferenceEntityReferenceResolver.resolve(destinationReference, destinationReference.getType(),
-                originReference);
-        String destRelativeStrRef = this.entityReferenceSerializer.serialize(destinationReference, originReference);
+        String url;
+        String destRelativeStrRef;
+
+        if (org.xwiki.gwt.wysiwyg.client.wiki.EntityReference.EntityType.EXTERNAL == destination.getEntityReference()
+            .getType()) {
+            url = new URIReference(destination.getEntityReference()).getURI();
+            destRelativeStrRef = url;
+        } else {
+            EntityReference originRef = entityReferenceConverter.convert(origin);
+            EntityReference destRef = entityReferenceConverter.convert(destination.getEntityReference());
+            destRef = explicitReferenceEntityReferenceResolver.resolve(destRef, destRef.getType(), originRef);
+            destRelativeStrRef = entityReferenceSerializer.serialize(destRef, originRef);
+            url = getEntityURL(destRef);
+        }
 
         EntityConfig entityConfig = new EntityConfig();
-        entityConfig.setUrl(getEntityURL(destinationReference));
-        entityConfig.setReference(getLinkReference(destination.getType(), destRelativeStrRef));
+        entityConfig.setUrl(url);
+        entityConfig.setReference(getLinkReference(destination.getType(), destination.isTyped(), destRelativeStrRef));
         return entityConfig;
     }
 
@@ -130,52 +140,73 @@ public class DefaultLinkService implements LinkService
     }
 
     /**
-     * @param entityType the type of linked entity
+     * @param clientResourceType the type of linked resource
+     * @param typed {@code true} to include the resource scheme in the link reference serialization, {@code false}
+     *            otherwise
      * @param relativeStringEntityReference a relative string entity reference
      * @return a link reference that can be used to insert a link to the specified entity
      */
-    private String getLinkReference(org.xwiki.gwt.wysiwyg.client.wiki.EntityReference.EntityType entityType,
+    private String getLinkReference(
+        org.xwiki.gwt.wysiwyg.client.wiki.ResourceReference.ResourceType clientResourceType, boolean typed,
         String relativeStringEntityReference)
     {
-        // TODO: Improve this to make it generic and allow adding new link types dynamically.
-        ResourceType resourceType;
-        boolean resourceTyped = true;
-        switch (entityType) {
-            case DOCUMENT:
-                resourceType = ResourceType.DOCUMENT;
-                break;
-            case IMAGE:
-                resourceType = ResourceType.IMAGE;
-                resourceTyped = false;
-                break;
-            case ATTACHMENT:
-                resourceType = ResourceType.ATTACHMENT;
-                break;
-            default:
-                // We shouldn't get here.
-                throw new RuntimeException("Unknown link type [" + entityType.name() + "]");
-        }
+        ResourceType resourceType = new ResourceType(clientResourceType.getScheme());
         ResourceReference linkReference = new ResourceReference(relativeStringEntityReference, resourceType);
-        linkReference.setTyped(resourceTyped);
+        linkReference.setTyped(typed);
         return linkReferenceSerializer.serialize(linkReference);
     }
 
     /**
      * {@inheritDoc}
      * 
-     * @see LinkService#parseLinkReference(String, org.xwiki.gwt.wysiwyg.client.wiki.EntityReference.EntityType,
-     *      org.xwiki.gwt.wysiwyg.client.wiki.EntityReference)
+     * @see LinkService#parseLinkReference(String, org.xwiki.gwt.wysiwyg.client.wiki.EntityReference)
      */
-    public org.xwiki.gwt.wysiwyg.client.wiki.EntityReference parseLinkReference(String linkReferenceAsString,
-        org.xwiki.gwt.wysiwyg.client.wiki.EntityReference.EntityType entityType,
+    public org.xwiki.gwt.wysiwyg.client.wiki.ResourceReference parseLinkReference(String linkReferenceAsString,
         org.xwiki.gwt.wysiwyg.client.wiki.EntityReference baseReference)
     {
         ResourceReference linkReference = linkReferenceParser.parse(linkReferenceAsString);
-        String stringEntityReference = linkReference.getReference();
-        org.xwiki.gwt.wysiwyg.client.wiki.EntityReference entityReference =
-            entityReferenceConverter.convert(explicitStringEntityReferenceResolver.resolve(stringEntityReference,
-                entityReferenceConverter.convert(entityType), entityReferenceConverter.convert(baseReference)));
-        entityReference.setType(entityType);
-        return entityReference;
+        org.xwiki.gwt.wysiwyg.client.wiki.ResourceReference clientLinkReference =
+            new org.xwiki.gwt.wysiwyg.client.wiki.ResourceReference();
+        clientLinkReference.setType(org.xwiki.gwt.wysiwyg.client.wiki.ResourceReference.ResourceType
+            .forScheme(linkReference.getType().getScheme()));
+        clientLinkReference.setTyped(linkReference.isTyped());
+        clientLinkReference.getParameters().putAll(linkReference.getParameters());
+        clientLinkReference.setEntityReference(parseEntityReferenceFromResourceReference(linkReference.getReference(),
+            clientLinkReference.getType(), baseReference));
+        return clientLinkReference;
+    }
+
+    /**
+     * Parses a client entity reference from a link/resource reference.
+     * 
+     * @param stringEntityReference a string entity reference extracted from a link/resource reference
+     * @param resourceType the type of resource the string entity reference was extracted from
+     * @param baseReference the client entity reference that is used to resolve the parsed entity reference relative to
+     * @return an untyped client entity reference
+     */
+    private org.xwiki.gwt.wysiwyg.client.wiki.EntityReference parseEntityReferenceFromResourceReference(
+        String stringEntityReference, org.xwiki.gwt.wysiwyg.client.wiki.ResourceReference.ResourceType resourceType,
+        org.xwiki.gwt.wysiwyg.client.wiki.EntityReference baseReference)
+    {
+        org.xwiki.gwt.wysiwyg.client.wiki.EntityReference.EntityType entityType;
+        switch (resourceType) {
+            case DOCUMENT:
+                entityType = org.xwiki.gwt.wysiwyg.client.wiki.EntityReference.EntityType.DOCUMENT;
+                break;
+            case ATTACHMENT:
+            case IMAGE:
+                entityType = org.xwiki.gwt.wysiwyg.client.wiki.EntityReference.EntityType.ATTACHMENT;
+                break;
+            default:
+                entityType = org.xwiki.gwt.wysiwyg.client.wiki.EntityReference.EntityType.EXTERNAL;
+                break;
+        }
+        if (entityType == org.xwiki.gwt.wysiwyg.client.wiki.EntityReference.EntityType.EXTERNAL) {
+            return new URIReference(stringEntityReference).getEntityReference();
+        } else {
+            return entityReferenceConverter.convert(explicitStringEntityReferenceResolver.resolve(
+                stringEntityReference, EntityType.valueOf(entityType.toString()), entityReferenceConverter
+                    .convert(baseReference)));
+        }
     }
 }

@@ -159,6 +159,10 @@ table pre {
   white-space: pre-wrap;
 }
 
+th.avatar {
+  width: 50px;
+}
+
 /* @group XWIKI */
 /* --------------------------------------------------------------
   * XWiki Specific classes

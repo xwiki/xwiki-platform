@@ -11,8 +11,8 @@
 <customClass></customClass>
 <contentAuthor>XWiki.Admin</contentAuthor>
 <creationDate>1284043167000</creationDate>
-<date>1286966254000</date>
-<contentUpdateDate>1286966254000</contentUpdateDate>
+<date>1286967310000</date>
+<contentUpdateDate>1286967310000</contentUpdateDate>
 <version>1.1</version>
 <title>Extension Manager</title>
 <template></template>
@@ -504,8 +504,22 @@ This application is experimental, use it at your own risk.
 = Core extensions
 
 #set($extensions = $extensionManager.coreExtensions)
+
+== XWiki core extensions
+
 |=Id|=Version|=Type
 #foreach($extension in $extensions)
+  #if ($extension.id.startsWith("org.xwiki") || $extension.id.startsWith("com.xpn"))
 |(%title="$extension.getURL()"%)$extension.id|$extension.version|$extension.type
+  #end
+#end
+
+== Third party core extensions
+
+|=Id|=Version|=Type
+#foreach($extension in $extensions)
+  #if (!$extension.id.startsWith("org.xwiki") &amp;&amp; !$extension.id.startsWith("com.xpn"))
+|(%title="$extension.getURL()"%)$extension.id|$extension.version|$extension.type
+  #end
 #end
 {{/velocity}}</content></xwikidoc>

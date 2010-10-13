@@ -11,8 +11,8 @@
 <customClass></customClass>
 <contentAuthor>XWiki.Admin</contentAuthor>
 <creationDate>1284043167000</creationDate>
-<date>1286455983000</date>
-<contentUpdateDate>1286455983000</contentUpdateDate>
+<date>1286966254000</date>
+<contentUpdateDate>1286966254000</contentUpdateDate>
 <version>1.1</version>
 <title>Extension Manager</title>
 <template></template>
@@ -27,8 +27,7 @@
 <author>XWiki.Admin</author>
 <date>1285847285000</date>
 <version>1.1</version>
-<comment></comment>
-<content>iVBORw0KGgoAAAANSUhEUgAAAH0AAABVCAYAAABkf+t+AAAABmJLR0QA/wD/AP+gvaeTAAAcx0lE
+<comment></comment><content>iVBORw0KGgoAAAANSUhEUgAAAH0AAABVCAYAAABkf+t+AAAABmJLR0QA/wD/AP+gvaeTAAAcx0lE
 QVR4Xu2deZAcV53nPy9fZlZWdV3drT5ltQ4LS5aNZKNhfGA52AGbYz2YjQFid1jOXWIXFrx/rHcD
 zHANgz3sLEfAMDHjCYLFnmEIjsVcYzCLF48R9mCwLB+SZUmWrMtqqY/qOrqOPN5mZ9SLUGVUqaQu
 1N0M+kb84mW+fNkVqk9+f+/ITJWplOJ3Sxdl8hvURV2EflEXoV+UECIP2DRl2wyj1YArrr46c9ll
@@ -311,7 +310,7 @@ H7r8uiiT3zld1P8HeoqDVNse6k8AAAAASUVORK5CYII=
 This application is experimental, use it at your own risk.
 {{/warning}}
 
-{{velocity}}
+{{velocity output="false"}}
 #set($extensionManager = $services.extension)
 #set($versionManager = $extensionManager.versionManager)
 {{/velocity}}
@@ -507,6 +506,6 @@ This application is experimental, use it at your own risk.
 #set($extensions = $extensionManager.coreExtensions)
 |=Id|=Version|=Type
 #foreach($extension in $extensions)
-|$extension.id|$extension.version|$extension.type
+|(%title="$extension.getURL()"%)$extension.id|$extension.version|$extension.type
 #end
 {{/velocity}}</content></xwikidoc>

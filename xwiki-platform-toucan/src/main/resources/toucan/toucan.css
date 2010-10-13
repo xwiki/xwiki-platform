@@ -162,6 +162,9 @@ a img {
 * html .avatar_120 {
   width: 120px;
 }
+th.avatar {
+  width: 50px;
+}
 
 /* Used to signify a rendering error in the rendered page. Valid only with new rendering */
 .xwikirenderingerror {

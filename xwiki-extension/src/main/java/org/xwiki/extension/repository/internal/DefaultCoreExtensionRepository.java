@@ -74,9 +74,11 @@ public class DefaultCoreExtensionRepository extends AbstractLogEnabled implement
 
     private void loadExtensions()
     {
+        Set<URL> basURLs = ClasspathHelper.getUrlsForPackagePrefix("META-INF.maven");
+
         ConfigurationBuilder configurationBuilder = new ConfigurationBuilder();
         configurationBuilder.setScanners(new ResourcesScanner());
-        configurationBuilder.setUrls(ClasspathHelper.getUrlsForPackagePrefix("META-INF.maven"));
+        configurationBuilder.setUrls(basURLs);
         configurationBuilder.filterInputsBy(new FilterBuilder.Include(FilterBuilder.prefix("META-INF.maven")));
 
         Reflections reflections = new Reflections(configurationBuilder);
@@ -122,8 +124,8 @@ public class DefaultCoreExtensionRepository extends AbstractLogEnabled implement
                 }
 
                 DefaultCoreExtension coreExtension =
-                    new DefaultCoreExtension(this, descriptorUrl, groupId + ":" + mavenModel.getArtifactId(), version,
-                        packagingToType(mavenModel.getPackaging()));
+                    new DefaultCoreExtension(this, ClasspathHelper.getBaseUrl(descriptorUrl, basURLs), groupId + ":"
+                        + mavenModel.getArtifactId(), version, packagingToType(mavenModel.getPackaging()));
 
                 this.extensions.put(coreExtension.getId(), coreExtension);
 
@@ -155,7 +157,7 @@ public class DefaultCoreExtensionRepository extends AbstractLogEnabled implement
                 String dependencyId = dependency.getGroupId() + ":" + dependency.getArtifactId();
                 if (!this.extensions.containsKey(dependencyId)) {
                     CoreExtension coreExtension =
-                        new DefaultCoreExtension(this, descriptorUrl, dependencyId, dependency.getVersion(),
+                        new DefaultCoreExtension(this, ClasspathHelper.getBaseUrl(descriptorUrl, basURLs), dependencyId, dependency.getVersion(),
                             packagingToType(dependency.getType()));
 
                     this.extensions.put(dependencyId, coreExtension);

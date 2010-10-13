@@ -31,9 +31,10 @@ import org.xwiki.gwt.wysiwyg.client.Strings;
 import org.xwiki.gwt.wysiwyg.client.plugin.image.ImageConfig;
 import org.xwiki.gwt.wysiwyg.client.widget.wizard.util.LinkUploadWizardStep;
 import org.xwiki.gwt.wysiwyg.client.wiki.EntityLink;
-import org.xwiki.gwt.wysiwyg.client.wiki.EntityReference;
+import org.xwiki.gwt.wysiwyg.client.wiki.ResourceReference;
+import org.xwiki.gwt.wysiwyg.client.wiki.WikiPageReference;
 import org.xwiki.gwt.wysiwyg.client.wiki.WikiServiceAsync;
-import org.xwiki.gwt.wysiwyg.client.wiki.EntityReference.EntityType;
+import org.xwiki.gwt.wysiwyg.client.wiki.ResourceReference.ResourceType;
 
 import com.google.gwt.user.client.ui.Image;
 
@@ -136,16 +137,17 @@ public class ImageWizard extends Wizard implements WizardStepProvider
     @Override
     public void start(String startStep, Object data)
     {
-        EntityReference origin = new EntityReference();
-        origin.setType(EntityType.DOCUMENT);
+        WikiPageReference origin = new WikiPageReference();
         origin.setWikiName(config.getParameter("wiki"));
         origin.setSpaceName(config.getParameter("space"));
         origin.setPageName(config.getParameter("page"));
-        EntityReference destination = new EntityReference();
-        destination.setType(EntityType.IMAGE);
-        EntityLink<ImageConfig> entityLink = new EntityLink<ImageConfig>(origin, destination, (ImageConfig) data);
 
-        super.start(startStep, entityLink);
+        ResourceReference destination = new ResourceReference();
+        destination.setType(ResourceType.ATTACHMENT);
+        destination.setTyped(false);
+
+        super.start(startStep,
+            new EntityLink<ImageConfig>(origin.getEntityReference(), destination, (ImageConfig) data));
     }
 
     /**

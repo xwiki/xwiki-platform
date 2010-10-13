@@ -21,8 +21,6 @@ package org.xwiki.gwt.wysiwyg.client.wiki;
 
 import java.util.List;
 
-import org.xwiki.gwt.wysiwyg.client.wiki.EntityReference.EntityType;
-
 import com.google.gwt.user.client.rpc.AsyncCallback;
 
 /**
@@ -91,7 +89,7 @@ public interface WikiServiceAsync
      * @param destination the destination of the link
      * @param async object used for asynchronous communication between server and client.
      */
-    void getEntityConfig(EntityReference origin, EntityReference destination, AsyncCallback<EntityConfig> async);
+    void getEntityConfig(EntityReference origin, ResourceReference destination, AsyncCallback<EntityConfig> async);
 
     /**
      * Returns information about the referenced attachment. Note that the {@code EntityReference#getFileName()} name
@@ -103,7 +101,7 @@ public interface WikiServiceAsync
      *            {@link Attachment} containing the serialized reference and the access URL of the specified attachment,
      *            or {@code null} in case the attachment was not found
      */
-    void getAttachment(EntityReference attachmentReference, AsyncCallback<Attachment> async);
+    void getAttachment(AttachmentReference attachmentReference, AsyncCallback<Attachment> async);
 
     /**
      * Returns all the image attachments from the referred page.
@@ -111,7 +109,7 @@ public interface WikiServiceAsync
      * @param documentReference a reference to the document to get the images from
      * @param async object used for asynchronous communication between server and client
      */
-    void getImageAttachments(EntityReference documentReference, AsyncCallback<List<Attachment>> async);
+    void getImageAttachments(WikiPageReference documentReference, AsyncCallback<List<Attachment>> async);
 
     /**
      * Returns all the attachments from the referred page.
@@ -119,7 +117,7 @@ public interface WikiServiceAsync
      * @param documentReference a reference to the document to get the attachments from
      * @param async object used for asynchronous communication between server and client
      */
-    void getAttachments(EntityReference documentReference, AsyncCallback<List<Attachment>> async);
+    void getAttachments(WikiPageReference documentReference, AsyncCallback<List<Attachment>> async);
 
     /**
      * Returns the URL to be used to upload an attachment to the specified document.
@@ -127,17 +125,16 @@ public interface WikiServiceAsync
      * @param documentReference the document for which to retrieve the upload URL
      * @param async object used for asynchronous communication between server and client
      */
-    void getUploadURL(EntityReference documentReference, AsyncCallback<String> async);
+    void getUploadURL(WikiPageReference documentReference, AsyncCallback<String> async);
 
     /**
-     * Parses the given link reference and extracts a reference to the linked entity. The returned entity reference is
-     * resolved relative to the given base entity reference.
+     * Parses the given link reference and extracts a reference to the linked resource. The returned resource reference
+     * is resolved relative to the given base entity reference.
      * 
-     * @param linkReference a link reference pointing to an entity of the specified type
-     * @param entityType the type of entity being linked
-     * @param baseReference the entity reference used to resolve the linked entity reference
+     * @param linkReferenceAsString a serialized link reference
+     * @param baseReference the entity reference used to resolve the linked resource reference
      * @param async object used for asynchronous communication between server and client
      */
-    void parseLinkReference(String linkReference, EntityType entityType, EntityReference baseReference,
-        AsyncCallback<EntityReference> async);
+    void parseLinkReference(String linkReferenceAsString, EntityReference baseReference,
+        AsyncCallback<ResourceReference> async);
 }

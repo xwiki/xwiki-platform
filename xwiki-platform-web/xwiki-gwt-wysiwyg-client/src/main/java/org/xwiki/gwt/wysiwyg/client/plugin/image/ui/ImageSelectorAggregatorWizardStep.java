@@ -22,13 +22,13 @@ package org.xwiki.gwt.wysiwyg.client.plugin.image.ui;
 import java.util.EnumSet;
 import java.util.List;
 
-import org.xwiki.gwt.user.client.StringUtils;
 import org.xwiki.gwt.user.client.ui.wizard.WizardStep;
 import org.xwiki.gwt.wysiwyg.client.Strings;
 import org.xwiki.gwt.wysiwyg.client.plugin.image.ImageConfig;
 import org.xwiki.gwt.wysiwyg.client.plugin.image.ui.ImageWizard.ImageWizardStep;
 import org.xwiki.gwt.wysiwyg.client.widget.wizard.util.AttachmentSelectorAggregatorWizardStep;
 import org.xwiki.gwt.wysiwyg.client.wiki.WikiServiceAsync;
+import org.xwiki.gwt.wysiwyg.client.wiki.ResourceReference.ResourceType;
 
 /**
  * Allows the user to select an image from different locations: edited page attachments, all attachments or external
@@ -63,7 +63,7 @@ public class ImageSelectorAggregatorWizardStep extends AttachmentSelectorAggrega
             setAllPagesSelector(new ImagesExplorerWizardStep(false, wikiService));
         }
         if (allowExternalImage) {
-            externalImageSelector = new ExternalImageSelectorWizardStep();
+            externalImageSelector = new ExternalImageSelectorWizardStep(wikiService);
             externalImageSelector.setNextStep(ImageWizardStep.IMAGE_CONFIG.toString());
             externalImageSelector.setValidDirections(EnumSet.of(NavigationDirection.NEXT));
             externalImageSelector.setDirectionName(NavigationDirection.NEXT, Strings.INSTANCE.select());
@@ -78,8 +78,7 @@ public class ImageSelectorAggregatorWizardStep extends AttachmentSelectorAggrega
     @Override
     protected String getRequiredStep()
     {
-        String reference = getData().getData().getReference();
-        if (externalImageSelector != null && !StringUtils.isEmpty(reference) && reference.contains("://")) {
+        if (externalImageSelector != null && getData().getDestination().getType() != ResourceType.ATTACHMENT) {
             return Strings.INSTANCE.imageExternal();
         } else {
             return super.getRequiredStep();

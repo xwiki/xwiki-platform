@@ -27,6 +27,8 @@ import org.xwiki.gwt.wysiwyg.client.plugin.link.LinkConfig;
 import org.xwiki.gwt.wysiwyg.client.plugin.link.ui.LinkWizard.LinkWizardStep;
 import org.xwiki.gwt.wysiwyg.client.widget.wizard.util.AbstractEntityListSelectorWizardStep;
 import org.xwiki.gwt.wysiwyg.client.wiki.Attachment;
+import org.xwiki.gwt.wysiwyg.client.wiki.AttachmentReference;
+import org.xwiki.gwt.wysiwyg.client.wiki.WikiPageReference;
 import org.xwiki.gwt.wysiwyg.client.wiki.WikiServiceAsync;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
@@ -75,7 +77,7 @@ public class CurrentPageAttachmentSelectorWizardStep extends
     @Override
     protected void fetchData(AsyncCallback<List<Attachment>> callback)
     {
-        getWikiService().getAttachments(getData().getOrigin(), callback);
+        getWikiService().getAttachments(new WikiPageReference(getData().getOrigin()), callback);
     }
 
     /**
@@ -86,7 +88,7 @@ public class CurrentPageAttachmentSelectorWizardStep extends
     {
         ListItem<Attachment> item = new ListItem<Attachment>();
         item.setData(data);
-        Label attachmentLabel = new Label(data.getReference().getFileName());
+        Label attachmentLabel = new Label(new AttachmentReference(data.getReference()).getFileName());
         attachmentLabel.addStyleName("xAttachPreview");
         item.add(attachmentLabel);
         return item;

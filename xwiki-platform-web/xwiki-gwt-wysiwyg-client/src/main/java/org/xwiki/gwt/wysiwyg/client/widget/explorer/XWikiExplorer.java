@@ -362,10 +362,10 @@ public class XWikiExplorer extends TreeGrid
     /*-{
         var self = this.@com.smartgwt.client.widgets.BaseWidget::getOrCreateJsObj()();
         self.selectResource({
-            wiki: entityReference.@org.xwiki.gwt.wysiwyg.client.wiki.EntityReference::getWikiName()(),
-            space: entityReference.@org.xwiki.gwt.wysiwyg.client.wiki.EntityReference::getSpaceName()(),
-            name: entityReference.@org.xwiki.gwt.wysiwyg.client.wiki.EntityReference::getPageName()(),
-            attachment: entityReference.@org.xwiki.gwt.wysiwyg.client.wiki.EntityReference::getFileName()(),
+            wiki: entityReference.@org.xwiki.gwt.wysiwyg.client.wiki.EntityReference::getComponent(Ljava/lang/String;)('wikiName'),
+            space: entityReference.@org.xwiki.gwt.wysiwyg.client.wiki.EntityReference::getComponent(Ljava/lang/String;)('spaceName'),
+            name: entityReference.@org.xwiki.gwt.wysiwyg.client.wiki.EntityReference::getComponent(Ljava/lang/String;)('pageName'),
+            attachment: entityReference.@org.xwiki.gwt.wysiwyg.client.wiki.EntityReference::getComponent(Ljava/lang/String;)('fileName'),
             anchor: anchor
         });
     }-*/;

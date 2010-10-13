@@ -26,9 +26,9 @@ import org.xwiki.gwt.user.client.ui.wizard.WizardStep;
 import org.xwiki.gwt.user.client.ui.wizard.NavigationListener.NavigationDirection;
 import org.xwiki.gwt.wysiwyg.client.Strings;
 import org.xwiki.gwt.wysiwyg.client.wiki.Attachment;
-import org.xwiki.gwt.wysiwyg.client.wiki.EntityReference;
+import org.xwiki.gwt.wysiwyg.client.wiki.AttachmentReference;
+import org.xwiki.gwt.wysiwyg.client.wiki.WikiPageReference;
 import org.xwiki.gwt.wysiwyg.client.wiki.WikiServiceAsync;
-import org.xwiki.gwt.wysiwyg.client.wiki.EntityReference.EntityType;
 
 import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.user.client.rpc.AsyncCallback;
@@ -324,22 +324,16 @@ public abstract class AbstractFileUploadWizardStep implements WizardStep
     /**
      * @return a reference to the page where the attachment will be uploaded
      */
-    protected abstract EntityReference getTargetPageReference();
+    protected abstract WikiPageReference getTargetPageReference();
 
     /**
      * @param fileName the name of the file used to upload the attachment
      * @return a reference to the specified attachment
      */
-    private EntityReference getAttachmentReference(String fileName)
+    private AttachmentReference getAttachmentReference(String fileName)
     {
-        EntityReference targetPageReference = getTargetPageReference();
-        EntityReference attachmentReference = new EntityReference();
-        attachmentReference.setType(EntityType.ATTACHMENT);
-        attachmentReference.setWikiName(targetPageReference.getWikiName());
-        attachmentReference.setSpaceName(targetPageReference.getSpaceName());
-        attachmentReference.setPageName(targetPageReference.getPageName());
-        attachmentReference.setFileName(fileName);
-        return attachmentReference;
+        WikiPageReference targetPageReference = getTargetPageReference();
+        return new AttachmentReference(fileName, targetPageReference);
     }
 
     /**

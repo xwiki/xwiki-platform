@@ -23,7 +23,7 @@ import org.xwiki.gwt.user.client.StringUtils;
 import org.xwiki.gwt.wysiwyg.client.Strings;
 import org.xwiki.gwt.wysiwyg.client.plugin.link.LinkConfig.LinkType;
 import org.xwiki.gwt.wysiwyg.client.plugin.link.ui.LinkWizard.LinkWizardStep;
-import org.xwiki.gwt.wysiwyg.client.wiki.EntityReference;
+import org.xwiki.gwt.wysiwyg.client.wiki.WikiPageReference;
 import org.xwiki.gwt.wysiwyg.client.wiki.WikiServiceAsync;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
@@ -55,8 +55,9 @@ public class WikiPageExplorerWizardStep extends AbstractExplorerWizardStep
      */
     public String getNextStep()
     {
-        return StringUtils.isEmpty(getData().getDestination().getPageName()) ? LinkWizardStep.WIKI_PAGE_CREATOR
-            .toString() : LinkWizardStep.WIKI_PAGE_CONFIG.toString();
+        WikiPageReference wikiPageReference = new WikiPageReference(getData().getDestination().getEntityReference());
+        return StringUtils.isEmpty(wikiPageReference.getPageName()) ? LinkWizardStep.WIKI_PAGE_CREATOR.toString()
+            : LinkWizardStep.WIKI_PAGE_CONFIG.toString();
     }
 
     /**
@@ -66,40 +67,37 @@ public class WikiPageExplorerWizardStep extends AbstractExplorerWizardStep
     {
         hideError();
 
-        EntityReference pageReference = new EntityReference();
-        pageReference.setType(getData().getDestination().getType());
+        WikiPageReference pageReference = new WikiPageReference();
         pageReference.setWikiName(getExplorer().getSelectedWiki());
         pageReference.setSpaceName(getExplorer().getSelectedSpace());
         pageReference.setPageName(getExplorer().getSelectedPage());
 
         if (getExplorer().isNewPageSelectedFromTreeNode()) {
             getData().getData().setType(LinkType.NEW_WIKIPAGE);
-            getData().setDestination(pageReference);
+            getData().getDestination().setEntityReference(pageReference.getEntityReference());
             async.onSuccess(true);
-        } else if (!StringUtils.isEmpty(pageReference.getPageName())) {
-            if (getData().getDestination().equals(pageReference)) {
-                async.onSuccess(true);
-            } else {
-                updateLinkConfig(pageReference, new AsyncCallback<Boolean>()
-                {
-                    public void onFailure(Throwable caught)
-                    {
-                        async.onFailure(caught);
-                    }
-
-                    public void onSuccess(Boolean result)
-                    {
-                        if (result) {
-                            LinkType linkType = getExplorer().isNewPage() ? LinkType.NEW_WIKIPAGE : LinkType.WIKIPAGE;
-                            getData().getData().setType(linkType);
-                        }
-                        async.onSuccess(result);
-                    }
-                });
-            }
-        } else {
+        } else if (StringUtils.isEmpty(pageReference.getPageName())) {
             displayError(Strings.INSTANCE.linkNoPageSelectedError());
             async.onSuccess(false);
+        } else if (getData().getDestination().getEntityReference().equals(pageReference.getEntityReference())) {
+            async.onSuccess(true);
+        } else {
+            updateLinkConfig(pageReference.getEntityReference(), new AsyncCallback<Boolean>()
+            {
+                public void onFailure(Throwable caught)
+                {
+                    async.onFailure(caught);
+                }
+
+                public void onSuccess(Boolean result)
+                {
+                    if (result) {
+                        LinkType linkType = getExplorer().isNewPage() ? LinkType.NEW_WIKIPAGE : LinkType.WIKIPAGE;
+                        getData().getData().setType(linkType);
+                    }
+                    async.onSuccess(result);
+                }
+            });
         }
     }
 }

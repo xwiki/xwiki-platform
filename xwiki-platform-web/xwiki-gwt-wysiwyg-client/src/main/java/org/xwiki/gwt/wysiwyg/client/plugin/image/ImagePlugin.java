@@ -186,7 +186,7 @@ public class ImagePlugin extends AbstractPlugin implements ClickHandler, WizardL
     }
 
     /**
-     * Function to handle the image event, when the toolbar button is clicked or the menu command is issued: either
+     * Function to handle the image event, when the tool bar button is clicked or the menu command is issued: either
      * create a new image, or edit an existing image.
      */
     public void onImage()

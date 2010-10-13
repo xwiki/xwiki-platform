@@ -25,8 +25,8 @@ import org.xwiki.gwt.wysiwyg.client.Strings;
 import org.xwiki.gwt.wysiwyg.client.plugin.link.LinkConfig;
 import org.xwiki.gwt.wysiwyg.client.plugin.link.ui.LinkWizard.LinkWizardStep;
 import org.xwiki.gwt.wysiwyg.client.widget.wizard.util.AbstractEntityListSelectorWizardStep;
-import org.xwiki.gwt.wysiwyg.client.wiki.EntityReference;
 import org.xwiki.gwt.wysiwyg.client.wiki.WikiPage;
+import org.xwiki.gwt.wysiwyg.client.wiki.WikiPageReference;
 import org.xwiki.gwt.wysiwyg.client.wiki.WikiServiceAsync;
 
 import com.google.gwt.user.client.ui.FlowPanel;
@@ -77,8 +77,8 @@ public abstract class AbstractPageListSelectorWizardStep extends
     {
         ListItem<WikiPage> item = new ListItem<WikiPage>();
         item.setData(data);
-        Label pageName =
-            new Label(Strings.INSTANCE.entityLocatedIn() + " " + serializeDocumentReference(data.getReference()));
+        String documentReferenceAsString = serializeDocumentReference(new WikiPageReference(data.getReference()));
+        Label pageName = new Label(Strings.INSTANCE.entityLocatedIn() + " " + documentReferenceAsString);
         pageName.addStyleName("xPagePreviewFullname");
         Label title = new Label(data.getTitle());
         title.addStyleName("xPagePreviewTitle");
@@ -100,7 +100,7 @@ public abstract class AbstractPageListSelectorWizardStep extends
      * @param reference a document reference
      * @return a user friendly string serialization of a document reference
      */
-    protected String serializeDocumentReference(EntityReference reference)
+    protected String serializeDocumentReference(WikiPageReference reference)
     {
         String separator = " \u00BB ";
         return reference.getWikiName() + separator + reference.getSpaceName() + separator + reference.getPageName();

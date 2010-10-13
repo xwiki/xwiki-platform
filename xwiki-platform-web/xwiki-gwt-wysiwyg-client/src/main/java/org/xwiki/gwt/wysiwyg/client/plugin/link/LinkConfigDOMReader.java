@@ -37,6 +37,11 @@ import com.google.gwt.dom.client.ImageElement;
 public class LinkConfigDOMReader implements ConfigDOMReader<LinkConfig, AnchorElement>
 {
     /**
+     * The string that separates link reference components.
+     */
+    private static final String LINK_REFERENCE_COMPONENT_SEPARATOR = "|-|";
+
+    /**
      * The object used to extract the image file name when the anchor wraps an image.
      */
     private final ImageConfigDOMReader imageConfigHTMLParser = new ImageConfigDOMReader();
@@ -98,12 +103,40 @@ public class LinkConfigDOMReader implements ConfigDOMReader<LinkConfig, AnchorEl
             return LinkType.NEW_WIKIPAGE;
         }
         if ("wikiexternallink".equals(wrappingSpanClass)) {
-            if (reference.startsWith("mailto")) {
+            String linkProtocol = getLinkProtocol(reference);
+            if ("mailto".equalsIgnoreCase(linkProtocol)) {
                 return LinkType.EMAIL;
-            } else if (reference.startsWith("attach")) {
+            } else if ("attach".equalsIgnoreCase(linkProtocol)) {
                 return LinkType.ATTACHMENT;
             }
         }
         return LinkType.EXTERNAL;
+    }
+
+    /**
+     * Extracts the link protocol from a link reference.
+     * <p>
+     * NOTE: Ideally the client shouldn't know the syntax/format of the link reference. The link reference should be
+     * parsed on the server side. We need to extract the link protocol to be able to determine the link type which is
+     * then used to determine what link wizard to open when editing a link. Making an asynchronous request to parse the
+     * link reference to get only the link type/protocol before any link wizard is opened is a bit difficult with the
+     * current design. This needs to be fixed nevertheless. Until then we make the assumption that the link protocol is
+     * between the first and second occurrence of the {@link #LINK_REFERENCE_COMPONENT_SEPARATOR}.
+     * 
+     * @param linkReference a link reference, taken from a link XHTML marker / annotation / meta data.
+     * @return the link protocol extracted from the given link reference
+     */
+    private String getLinkProtocol(String linkReference)
+    {
+        int beginIndex = linkReference.indexOf(LINK_REFERENCE_COMPONENT_SEPARATOR);
+        if (beginIndex < 0) {
+            return null;
+        }
+        beginIndex += LINK_REFERENCE_COMPONENT_SEPARATOR.length();
+        int endIndex = linkReference.indexOf(LINK_REFERENCE_COMPONENT_SEPARATOR, beginIndex);
+        if (endIndex < 0) {
+            return null;
+        }
+        return linkReference.substring(beginIndex, endIndex);
     }
 }

@@ -23,8 +23,8 @@ import org.xwiki.gwt.user.client.StringUtils;
 import org.xwiki.gwt.wysiwyg.client.wiki.Entity;
 import org.xwiki.gwt.wysiwyg.client.wiki.EntityConfig;
 import org.xwiki.gwt.wysiwyg.client.wiki.EntityLink;
+import org.xwiki.gwt.wysiwyg.client.wiki.ResourceReference;
 import org.xwiki.gwt.wysiwyg.client.wiki.WikiServiceAsync;
-import org.xwiki.gwt.wysiwyg.client.wiki.EntityReference.EntityType;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
 
@@ -61,7 +61,7 @@ public abstract class AbstractEntityListSelectorWizardStep<C extends EntityConfi
     @Override
     protected boolean isSelectedByDefault(E listItemData)
     {
-        return listItemData.getReference().equals(getData().getDestination());
+        return listItemData.getReference().equals(getData().getDestination().getEntityReference());
     };
 
     /**
@@ -74,30 +74,29 @@ public abstract class AbstractEntityListSelectorWizardStep<C extends EntityConfi
     {
         final E selectedEntity = getSelectedItem().getData();
         if (selectedEntity == null) {
-            EntityType type = getData().getDestination().getType();
-            getData().setDestination(getData().getOrigin().clone());
-            getData().getDestination().setType(type);
+            getData().getDestination().setEntityReference(getData().getOrigin().clone());
             async.onSuccess(true);
         } else if (!StringUtils.isEmpty(getData().getData().getReference())
-            && getData().getDestination().equals(selectedEntity.getReference())) {
+            && getData().getDestination().getEntityReference().equals(selectedEntity.getReference())) {
             async.onSuccess(true);
         } else {
-            wikiService.getEntityConfig(getData().getOrigin(), selectedEntity.getReference(),
-                new AsyncCallback<EntityConfig>()
+            final ResourceReference destination = getData().getDestination().clone();
+            destination.setEntityReference(selectedEntity.getReference().clone());
+            wikiService.getEntityConfig(getData().getOrigin(), destination, new AsyncCallback<EntityConfig>()
+            {
+                public void onFailure(Throwable caught)
                 {
-                    public void onFailure(Throwable caught)
-                    {
-                        async.onFailure(caught);
-                    }
+                    async.onFailure(caught);
+                }
 
-                    public void onSuccess(EntityConfig result)
-                    {
-                        getData().setDestination(selectedEntity.getReference().clone());
-                        getData().getData().setReference(result.getReference());
-                        getData().getData().setUrl(result.getUrl());
-                        async.onSuccess(true);
-                    }
-                });
+                public void onSuccess(EntityConfig result)
+                {
+                    getData().setDestination(destination);
+                    getData().getData().setReference(result.getReference());
+                    getData().getData().setUrl(result.getUrl());
+                    async.onSuccess(true);
+                }
+            });
         }
     }
 

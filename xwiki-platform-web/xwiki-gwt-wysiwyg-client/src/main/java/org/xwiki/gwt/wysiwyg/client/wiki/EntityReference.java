@@ -19,7 +19,8 @@
  */
 package org.xwiki.gwt.wysiwyg.client.wiki;
 
-import org.xwiki.gwt.user.client.StringUtils;
+import java.util.HashMap;
+import java.util.Map;
 
 import com.google.gwt.user.client.rpc.IsSerializable;
 
@@ -46,9 +47,9 @@ public class EntityReference implements IsSerializable
         ATTACHMENT,
 
         /**
-         * Represents an Image entity.
+         * Represents an external entity, usually identified by an URI.
          */
-        IMAGE;
+        EXTERNAL;
 
         /**
          * @param expected the expected type
@@ -62,29 +63,14 @@ public class EntityReference implements IsSerializable
     }
 
     /**
+     * The entity reference components.
+     */
+    protected Map<String, String> components = new HashMap<String, String>();
+
+    /**
      * The type of entity being referenced.
      */
     private EntityType type;
-
-    /**
-     * The name of the wiki that hosts the referenced entity.
-     */
-    private String wikiName;
-
-    /**
-     * The name of the space that hosts the referenced entity.
-     */
-    private String spaceName;
-
-    /**
-     * The name of the page that hosts the referenced entity.
-     */
-    private String pageName;
-
-    /**
-     * The name of the file that hosts the referenced entity.
-     */
-    private String fileName;
 
     /**
      * @return the type of entity being referenced
@@ -105,75 +91,23 @@ public class EntityReference implements IsSerializable
     }
 
     /**
-     * @return the name of the wiki that hosts the referenced entity
+     * @param componentName the name of a reference component
+     * @return the value of the specified reference component
      */
-    public String getWikiName()
+    public String getComponent(String componentName)
     {
-        return wikiName;
+        return components.get(componentName);
     }
 
     /**
-     * Sets the name of the wiki that hosts the referenced entity.
+     * Sets the value of a reference component.
      * 
-     * @param wikiName the name of the wiki that hosts the referenced entity
+     * @param componentName the name of the reference component
+     * @param componentValue the value of the reference component
      */
-    public void setWikiName(String wikiName)
+    public void setComponent(String componentName, String componentValue)
     {
-        this.wikiName = wikiName;
-    }
-
-    /**
-     * @return the name of the space that hosts the referenced entity
-     */
-    public String getSpaceName()
-    {
-        return spaceName;
-    }
-
-    /**
-     * Sets the name of the space that hosts the referenced entity.
-     * 
-     * @param spaceName the name of the space that hosts the referenced entity
-     */
-    public void setSpaceName(String spaceName)
-    {
-        this.spaceName = spaceName;
-    }
-
-    /**
-     * @return the name of the page that hosts the referenced entity
-     */
-    public String getPageName()
-    {
-        return pageName;
-    }
-
-    /**
-     * Sets the name of the page that hosts the referenced entity.
-     * 
-     * @param pageName the name of the page that hosts the referenced entity
-     */
-    public void setPageName(String pageName)
-    {
-        this.pageName = pageName;
-    }
-
-    /**
-     * @return the name of the file that hosts the referenced entity
-     */
-    public String getFileName()
-    {
-        return fileName;
-    }
-
-    /**
-     * Sets the name of the file that hosts the referenced entity.
-     * 
-     * @param fileName the name of the file that hosts the referenced entity
-     */
-    public void setFileName(String fileName)
-    {
-        this.fileName = fileName;
+        components.put(componentName, componentValue);
     }
 
     /**
@@ -186,19 +120,11 @@ public class EntityReference implements IsSerializable
     {
         final int prime = 31;
         int result = 1;
-        result = prime * result + ((fileName == null) ? 0 : fileName.hashCode());
-        result = prime * result + ((pageName == null) ? 0 : pageName.hashCode());
-        result = prime * result + ((spaceName == null) ? 0 : spaceName.hashCode());
+        result = prime * result + components.hashCode();
         result = prime * result + ((type == null) ? 0 : type.hashCode());
-        result = prime * result + ((wikiName == null) ? 0 : wikiName.hashCode());
         return result;
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see Object#equals(Object)
-     */
     @Override
     public boolean equals(Object obj)
     {
@@ -212,9 +138,7 @@ public class EntityReference implements IsSerializable
             return false;
         }
         EntityReference other = (EntityReference) obj;
-        return EntityType.areEqual(type, other.type) && StringUtils.areEqual(fileName, other.fileName)
-            && StringUtils.areEqual(wikiName, other.wikiName) && StringUtils.areEqual(spaceName, other.spaceName)
-            && StringUtils.areEqual(pageName, other.pageName) && StringUtils.areEqual(fileName, other.fileName);
+        return components.equals(other.components) && EntityType.areEqual(type, other.type);
     }
 
     /**
@@ -226,10 +150,7 @@ public class EntityReference implements IsSerializable
     {
         EntityReference clone = new EntityReference();
         clone.setType(type);
-        clone.setWikiName(wikiName);
-        clone.setSpaceName(spaceName);
-        clone.setPageName(pageName);
-        clone.setFileName(fileName);
+        clone.components.putAll(components);
         return clone;
     }
 }

@@ -22,9 +22,8 @@ package org.xwiki.gwt.wysiwyg.client.widget.wizard.util;
 import org.xwiki.gwt.user.client.StringUtils;
 import org.xwiki.gwt.wysiwyg.client.wiki.EntityConfig;
 import org.xwiki.gwt.wysiwyg.client.wiki.EntityLink;
-import org.xwiki.gwt.wysiwyg.client.wiki.EntityReference;
+import org.xwiki.gwt.wysiwyg.client.wiki.ResourceReference;
 import org.xwiki.gwt.wysiwyg.client.wiki.WikiServiceAsync;
-import org.xwiki.gwt.wysiwyg.client.wiki.EntityReference.EntityType;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
 
@@ -63,20 +62,18 @@ public abstract class AbstractEntitySelectorAggregatorWizardStep<C extends Entit
     {
         final EntityLink<C> entityLink = (EntityLink<C>) data;
         if (StringUtils.isEmpty(entityLink.getData().getReference())) {
-            EntityType type = entityLink.getDestination().getType();
-            entityLink.setDestination(entityLink.getOrigin().clone());
-            entityLink.getDestination().setType(type);
+            entityLink.getDestination().setEntityReference(entityLink.getOrigin().clone());
             super.init(entityLink, cb);
         } else {
-            wikiService.parseLinkReference(entityLink.getData().getReference(),
-                entityLink.getDestination().getType(), entityLink.getOrigin(), new AsyncCallback<EntityReference>()
+            wikiService.parseLinkReference(entityLink.getData().getReference(), entityLink.getOrigin(),
+                new AsyncCallback<ResourceReference>()
                 {
                     public void onFailure(Throwable caught)
                     {
                         cb.onFailure(caught);
                     }
 
-                    public void onSuccess(EntityReference result)
+                    public void onSuccess(ResourceReference result)
                     {
                         entityLink.setDestination(result);
                         AbstractEntitySelectorAggregatorWizardStep.super.init(entityLink, cb);

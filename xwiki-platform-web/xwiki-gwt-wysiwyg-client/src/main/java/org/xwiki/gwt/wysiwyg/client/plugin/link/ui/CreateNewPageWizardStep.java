@@ -33,7 +33,8 @@ import org.xwiki.gwt.wysiwyg.client.plugin.link.LinkConfig;
 import org.xwiki.gwt.wysiwyg.client.plugin.link.ui.LinkWizard.LinkWizardStep;
 import org.xwiki.gwt.wysiwyg.client.wiki.EntityConfig;
 import org.xwiki.gwt.wysiwyg.client.wiki.EntityLink;
-import org.xwiki.gwt.wysiwyg.client.wiki.EntityReference;
+import org.xwiki.gwt.wysiwyg.client.wiki.ResourceReference;
+import org.xwiki.gwt.wysiwyg.client.wiki.WikiPageReference;
 import org.xwiki.gwt.wysiwyg.client.wiki.WikiServiceAsync;
 
 import com.google.gwt.event.dom.client.KeyCodes;
@@ -205,8 +206,8 @@ public class CreateNewPageWizardStep implements WizardStep, KeyPressHandler, Sou
             callback.onSuccess(false);
             DeferredCommand.addCommand(new FocusCommand(pageNameTextBox));
         } else {
-            final EntityReference destination = entityLink.getDestination().clone();
-            destination.setPageName(newPageName);
+            final ResourceReference destination = entityLink.getDestination().clone();
+            (new WikiPageReference(destination.getEntityReference())).setPageName(newPageName);
             wikiService.getEntityConfig(entityLink.getOrigin(), destination, new AsyncCallback<EntityConfig>()
             {
                 public void onFailure(Throwable caught)

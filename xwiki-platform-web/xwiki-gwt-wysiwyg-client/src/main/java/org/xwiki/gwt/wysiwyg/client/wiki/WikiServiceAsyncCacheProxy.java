@@ -23,8 +23,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.xwiki.gwt.wysiwyg.client.wiki.EntityReference.EntityType;
-
 import com.google.gwt.user.client.rpc.AsyncCallback;
 
 /**
@@ -157,19 +155,19 @@ public class WikiServiceAsyncCacheProxy implements WikiServiceAsync
     /**
      * {@inheritDoc}
      * 
-     * @see WikiServiceAsync#getPageLink(EntityReference, EntityReference, AsyncCallback)
+     * @see WikiServiceAsync#getEntityConfig(EntityReference, ResourceReference, AsyncCallback)
      */
-    public void getEntityConfig(EntityReference origin, EntityReference destination, AsyncCallback<EntityConfig> async)
+    public void getEntityConfig(EntityReference base, ResourceReference target, AsyncCallback<EntityConfig> async)
     {
-        service.getEntityConfig(origin, destination, async);
+        service.getEntityConfig(base, target, async);
     }
 
     /**
      * {@inheritDoc}
      * 
-     * @see WikiServiceAsync#getAttachment(EntityReference, AsyncCallback)
+     * @see WikiServiceAsync#getAttachment(AttachmentReference, AsyncCallback)
      */
-    public void getAttachment(EntityReference attachmentReference, AsyncCallback<Attachment> async)
+    public void getAttachment(AttachmentReference attachmentReference, AsyncCallback<Attachment> async)
     {
         service.getAttachment(attachmentReference, async);
     }
@@ -177,9 +175,9 @@ public class WikiServiceAsyncCacheProxy implements WikiServiceAsync
     /**
      * {@inheritDoc}
      * 
-     * @see WikiServiceAsync#getImageAttachments(EntityReference, AsyncCallback)
+     * @see WikiServiceAsync#getImageAttachments(WikiPageReference, AsyncCallback)
      */
-    public void getImageAttachments(EntityReference documentReference, AsyncCallback<List<Attachment>> async)
+    public void getImageAttachments(WikiPageReference documentReference, AsyncCallback<List<Attachment>> async)
     {
         service.getImageAttachments(documentReference, async);
     }
@@ -187,9 +185,9 @@ public class WikiServiceAsyncCacheProxy implements WikiServiceAsync
     /**
      * {@inheritDoc}
      * 
-     * @see WikiServiceAsync#getAttachments(EntityReference, AsyncCallback)
+     * @see WikiServiceAsync#getAttachments(WikiPageReference, AsyncCallback)
      */
-    public void getAttachments(EntityReference documentReference, AsyncCallback<List<Attachment>> async)
+    public void getAttachments(WikiPageReference documentReference, AsyncCallback<List<Attachment>> async)
     {
         service.getAttachments(documentReference, async);
     }
@@ -197,12 +195,12 @@ public class WikiServiceAsyncCacheProxy implements WikiServiceAsync
     /**
      * {@inheritDoc}
      * 
-     * @see WikiServiceAsync#getUploadURL(EntityReference, AsyncCallback)
+     * @see WikiServiceAsync#getUploadURL(WikiPageReference, AsyncCallback)
      */
-    public void getUploadURL(final EntityReference documentReference, final AsyncCallback<String> async)
+    public void getUploadURL(final WikiPageReference documentReference, final AsyncCallback<String> async)
     {
-        if (uploadURLCache.containsKey(documentReference)) {
-            async.onSuccess(uploadURLCache.get(documentReference));
+        if (uploadURLCache.containsKey(documentReference.getEntityReference())) {
+            async.onSuccess(uploadURLCache.get(documentReference.getEntityReference()));
         } else {
             service.getUploadURL(documentReference, new AsyncCallback<String>()
             {
@@ -213,7 +211,7 @@ public class WikiServiceAsyncCacheProxy implements WikiServiceAsync
 
                 public void onSuccess(String result)
                 {
-                    uploadURLCache.put(documentReference.clone(), result);
+                    uploadURLCache.put(documentReference.getEntityReference().clone(), result);
                     async.onSuccess(result);
                 }
             });
@@ -223,11 +221,11 @@ public class WikiServiceAsyncCacheProxy implements WikiServiceAsync
     /**
      * {@inheritDoc}
      * 
-     * @see WikiServiceAsync#parseLinkReference(String, EntityType, EntityReference, AsyncCallback)
+     * @see WikiServiceAsync#parseLinkReference(String, EntityReference, AsyncCallback)
      */
-    public void parseLinkReference(String linkReference, EntityType entityType, EntityReference baseReference,
-        AsyncCallback<EntityReference> async)
+    public void parseLinkReference(String linkReference, EntityReference baseReference,
+        AsyncCallback<ResourceReference> async)
     {
-        service.parseLinkReference(linkReference, entityType, baseReference, async);
+        service.parseLinkReference(linkReference, baseReference, async);
     }
 }

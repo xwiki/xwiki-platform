@@ -26,7 +26,7 @@ import org.xwiki.gwt.user.client.StringUtils;
 import org.xwiki.gwt.user.client.ui.wizard.WizardStep;
 import org.xwiki.gwt.wysiwyg.client.Strings;
 import org.xwiki.gwt.wysiwyg.client.wiki.EntityConfig;
-import org.xwiki.gwt.wysiwyg.client.wiki.EntityReference;
+import org.xwiki.gwt.wysiwyg.client.wiki.WikiPageReference;
 import org.xwiki.gwt.wysiwyg.client.wiki.WikiServiceAsync;
 
 /**
@@ -78,30 +78,16 @@ public class AttachmentSelectorAggregatorWizardStep<T extends EntityConfig> exte
     @Override
     protected String getRequiredStep()
     {
-        EntityReference origin = getData().getOrigin();
-        EntityReference destination = getData().getDestination();
+        WikiPageReference originPage = new WikiPageReference(getData().getOrigin());
+        WikiPageReference destinationPage = new WikiPageReference(getData().getDestination().getEntityReference());
         if (selectionLimitedToCurrentPage || StringUtils.isEmpty(getData().getData().getReference())
-            || samePage(origin, destination)) {
+            || originPage.equals(destinationPage)) {
             // Selection limited to current page, or no reference specified or the targeted attachment is attached to
             // the origin page.
             return Strings.INSTANCE.selectorSelectFromCurrentPage();
         } else {
             return Strings.INSTANCE.selectorSelectFromAllPages();
         }
-    }
-
-    /**
-     * Utility method for checking if two entity references point to the same page.
-     * 
-     * @param origin the origin entity reference
-     * @param destination the destination entity reference
-     * @return {@code true} if the given entity references point to the same page, {@code false} otherwise
-     */
-    private boolean samePage(EntityReference origin, EntityReference destination)
-    {
-        return StringUtils.areEqual(origin.getPageName(), destination.getPageName())
-            && StringUtils.areEqual(origin.getSpaceName(), destination.getSpaceName())
-            && StringUtils.areEqual(origin.getWikiName(), destination.getWikiName());
     }
 
     /**

@@ -32,16 +32,16 @@ import org.xwiki.gwt.wysiwyg.client.plugin.link.LinkConfig;
 import org.xwiki.gwt.wysiwyg.client.widget.wizard.util.AttachmentSelectorAggregatorWizardStep;
 import org.xwiki.gwt.wysiwyg.client.widget.wizard.util.LinkUploadWizardStep;
 import org.xwiki.gwt.wysiwyg.client.wiki.EntityLink;
-import org.xwiki.gwt.wysiwyg.client.wiki.EntityReference;
+import org.xwiki.gwt.wysiwyg.client.wiki.ResourceReference;
+import org.xwiki.gwt.wysiwyg.client.wiki.WikiPageReference;
 import org.xwiki.gwt.wysiwyg.client.wiki.WikiServiceAsync;
-import org.xwiki.gwt.wysiwyg.client.wiki.EntityReference.EntityType;
+import org.xwiki.gwt.wysiwyg.client.wiki.ResourceReference.ResourceType;
 
 import com.google.gwt.user.client.ui.Image;
 
 /**
- * The link wizard, used to configure link parameters in a {@link org.xwiki.gwt.wysiwyg.client.plugin.link.LinkConfig}
- * object, in successive steps. This class extends the {@link Wizard} class by encapsulating {@link WizardStepProvider}
- * behavior specific to links.
+ * The link wizard, used to configure link parameters in a {@link LinkConfig} object, in successive steps. This class
+ * extends the {@link Wizard} class by encapsulating {@link WizardStepProvider} behavior specific to links.
  * 
  * @version $Id$
  */
@@ -59,9 +59,9 @@ public class LinkWizard extends Wizard implements WizardStepProvider
     };
 
     /**
-     * Maps a link wizard step to the type of entity that step creates links to.
+     * Maps a link wizard step to the type of resource that step creates links to.
      */
-    private static final Map<LinkWizardStep, EntityType> WIZARD_STEP_TO_ENTITY_TYPE_MAP;
+    private static final Map<LinkWizardStep, ResourceType> WIZARD_STEP_TO_RESOURCE_TYPE_MAP;
 
     /**
      * Map with the instantiated steps to return. Will be lazily initialized upon request.
@@ -79,9 +79,11 @@ public class LinkWizard extends Wizard implements WizardStepProvider
     private final WikiServiceAsync wikiService;
 
     static {
-        WIZARD_STEP_TO_ENTITY_TYPE_MAP = new HashMap<LinkWizardStep, EntityType>();
-        WIZARD_STEP_TO_ENTITY_TYPE_MAP.put(LinkWizardStep.WIKI_PAGE, EntityType.DOCUMENT);
-        WIZARD_STEP_TO_ENTITY_TYPE_MAP.put(LinkWizardStep.ATTACHMENT, EntityType.ATTACHMENT);
+        WIZARD_STEP_TO_RESOURCE_TYPE_MAP = new HashMap<LinkWizardStep, ResourceType>();
+        WIZARD_STEP_TO_RESOURCE_TYPE_MAP.put(LinkWizardStep.WIKI_PAGE, ResourceType.DOCUMENT);
+        WIZARD_STEP_TO_RESOURCE_TYPE_MAP.put(LinkWizardStep.ATTACHMENT, ResourceType.ATTACHMENT);
+        WIZARD_STEP_TO_RESOURCE_TYPE_MAP.put(LinkWizardStep.WEB_PAGE, ResourceType.URL);
+        WIZARD_STEP_TO_RESOURCE_TYPE_MAP.put(LinkWizardStep.EMAIL, ResourceType.MAILTO);
     }
 
     /**
@@ -172,16 +174,16 @@ public class LinkWizard extends Wizard implements WizardStepProvider
     @Override
     public void start(String startStep, Object data)
     {
-        EntityReference origin = new EntityReference();
-        origin.setType(EntityType.DOCUMENT);
+        WikiPageReference origin = new WikiPageReference();
         origin.setWikiName(config.getParameter("wiki"));
         origin.setSpaceName(config.getParameter("space"));
         origin.setPageName(config.getParameter("page"));
-        EntityReference destination = new EntityReference();
-        destination.setType(WIZARD_STEP_TO_ENTITY_TYPE_MAP.get(parseStepName(startStep)));
-        EntityLink<LinkConfig> entityLink = new EntityLink<LinkConfig>(origin, destination, (LinkConfig) data);
 
-        super.start(startStep, entityLink);
+        ResourceReference destination = new ResourceReference();
+        destination.setType(WIZARD_STEP_TO_RESOURCE_TYPE_MAP.get(parseStepName(startStep)));
+        destination.setTyped(destination.getType() != ResourceType.URL);
+
+        super.start(startStep, new EntityLink<LinkConfig>(origin.getEntityReference(), destination, (LinkConfig) data));
     }
 
     /**

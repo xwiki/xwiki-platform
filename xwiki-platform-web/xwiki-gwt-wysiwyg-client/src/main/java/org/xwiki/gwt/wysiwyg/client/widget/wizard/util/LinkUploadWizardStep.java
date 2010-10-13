@@ -22,7 +22,7 @@ package org.xwiki.gwt.wysiwyg.client.widget.wizard.util;
 import org.xwiki.gwt.wysiwyg.client.wiki.Attachment;
 import org.xwiki.gwt.wysiwyg.client.wiki.EntityConfig;
 import org.xwiki.gwt.wysiwyg.client.wiki.EntityLink;
-import org.xwiki.gwt.wysiwyg.client.wiki.EntityReference;
+import org.xwiki.gwt.wysiwyg.client.wiki.WikiPageReference;
 import org.xwiki.gwt.wysiwyg.client.wiki.WikiServiceAsync;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
@@ -74,9 +74,9 @@ public class LinkUploadWizardStep<C extends EntityConfig> extends AbstractFileUp
      * @see AbstractFileUploadWizardStep#getTargetPageReference()
      */
     @Override
-    protected EntityReference getTargetPageReference()
+    protected WikiPageReference getTargetPageReference()
     {
-        return entityLink.getDestination();
+        return new WikiPageReference(entityLink.getDestination().getEntityReference());
     }
 
     /**
@@ -87,10 +87,8 @@ public class LinkUploadWizardStep<C extends EntityConfig> extends AbstractFileUp
     @Override
     protected void onAttachmentUploaded(Attachment attachment, final AsyncCallback<Boolean> async)
     {
-        // The link type is given by the link destination type (e.g. image or attachment link).
-        attachment.getReference().setType(entityLink.getDestination().getType());
-        entityLink.setDestination(attachment.getReference().clone());
-        getWikiService().getEntityConfig(entityLink.getOrigin(), attachment.getReference(),
+        entityLink.getDestination().setEntityReference(attachment.getReference().clone());
+        getWikiService().getEntityConfig(entityLink.getOrigin(), entityLink.getDestination(),
             new AsyncCallback<EntityConfig>()
             {
                 public void onFailure(Throwable caught)

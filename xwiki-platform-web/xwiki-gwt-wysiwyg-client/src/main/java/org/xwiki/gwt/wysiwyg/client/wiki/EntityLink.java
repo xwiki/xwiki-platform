@@ -20,7 +20,7 @@
 package org.xwiki.gwt.wysiwyg.client.wiki;
 
 /**
- * Defines a link between two entities.
+ * Defines a link from an entity to a resource.
  * 
  * @version $Id$
  * @param <T> the type of data associated with the link
@@ -33,9 +33,9 @@ public class EntityLink<T>
     private EntityReference origin;
 
     /**
-     * The entity that is targeted by the link.
+     * The resource that is targeted by the link.
      */
-    private EntityReference destination;
+    private ResourceReference destination;
 
     /**
      * Link data.
@@ -56,7 +56,7 @@ public class EntityLink<T>
      * @param destination the link destination
      * @param data the link data
      */
-    public EntityLink(EntityReference origin, EntityReference destination, T data)
+    public EntityLink(EntityReference origin, ResourceReference destination, T data)
     {
         this.origin = origin;
         this.destination = destination;
@@ -84,7 +84,7 @@ public class EntityLink<T>
     /**
      * @return the link destination
      */
-    public EntityReference getDestination()
+    public ResourceReference getDestination()
     {
         return destination;
     }
@@ -94,7 +94,7 @@ public class EntityLink<T>
      * 
      * @param destination the new link destination
      */
-    public void setDestination(EntityReference destination)
+    public void setDestination(ResourceReference destination)
     {
         this.destination = destination;
     }

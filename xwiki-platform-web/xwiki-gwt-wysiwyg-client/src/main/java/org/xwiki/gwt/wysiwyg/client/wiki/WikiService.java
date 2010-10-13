@@ -22,7 +22,6 @@ package org.xwiki.gwt.wysiwyg.client.wiki;
 import java.util.List;
 
 import org.xwiki.component.annotation.ComponentRole;
-import org.xwiki.gwt.wysiwyg.client.wiki.EntityReference.EntityType;
 
 import com.google.gwt.user.client.rpc.RemoteService;
 import com.google.gwt.user.client.rpc.RemoteServiceRelativePath;
@@ -87,7 +86,7 @@ public interface WikiService extends RemoteService
      * @param destination the destination of the link
      * @return the link configuration object that can be used to insert the link in the origin page
      */
-    EntityConfig getEntityConfig(EntityReference origin, EntityReference destination);
+    EntityConfig getEntityConfig(EntityReference origin, ResourceReference destination);
 
     /**
      * Returns information about the referenced attachment. Note that the {@code EntityReference#getFileName()} name
@@ -98,7 +97,7 @@ public interface WikiService extends RemoteService
      * @return an {@link Attachment} containing the serialized reference and the access URL of the specified attachment,
      *         or {@code null} in case the attachment was not found
      */
-    Attachment getAttachment(EntityReference attachmentReference);
+    Attachment getAttachment(AttachmentReference attachmentReference);
 
     /**
      * Returns all the image attachments from the referred page.
@@ -106,7 +105,7 @@ public interface WikiService extends RemoteService
      * @param documentReference a reference to the document to get the images from
      * @return list of the image attachments
      */
-    List<Attachment> getImageAttachments(EntityReference documentReference);
+    List<Attachment> getImageAttachments(WikiPageReference documentReference);
 
     /**
      * Returns all the attachments from the referred page.
@@ -114,22 +113,21 @@ public interface WikiService extends RemoteService
      * @param documentReference a reference to the document to get the attachments from
      * @return list of the attachments
      */
-    List<Attachment> getAttachments(EntityReference documentReference);
+    List<Attachment> getAttachments(WikiPageReference documentReference);
 
     /**
      * @param documentReference a document reference
      * @return the URL that can be used to upload an attachment to the specified document
      */
-    String getUploadURL(EntityReference documentReference);
+    String getUploadURL(WikiPageReference documentReference);
 
     /**
-     * Parses the given link reference and extracts a reference to the linked entity. The returned entity reference is
-     * resolved relative to the given base entity reference.
+     * Parses the given link reference and extracts a reference to the linked resource. The returned resource reference
+     * is resolved relative to the given base entity reference.
      * 
-     * @param linkReference a link reference pointing to an entity of the specified type
-     * @param entityType the type of entity being linked
-     * @param baseReference the entity reference used to resolve the linked entity reference
-     * @return a reference to the linked entity
+     * @param linkReference a serialized link reference
+     * @param baseReference the entity reference used to resolve the linked resource reference
+     * @return a reference to the linked resource
      */
-    EntityReference parseLinkReference(String linkReference, EntityType entityType, EntityReference baseReference);
+    ResourceReference parseLinkReference(String linkReference, EntityReference baseReference);
 }

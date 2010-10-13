@@ -27,8 +27,11 @@ import org.xwiki.gwt.wysiwyg.client.plugin.image.ImageConfig;
 import org.xwiki.gwt.wysiwyg.client.plugin.image.ui.ImageWizard.ImageWizardStep;
 import org.xwiki.gwt.wysiwyg.client.widget.wizard.util.AbstractEntityListSelectorWizardStep;
 import org.xwiki.gwt.wysiwyg.client.wiki.Attachment;
+import org.xwiki.gwt.wysiwyg.client.wiki.AttachmentReference;
 import org.xwiki.gwt.wysiwyg.client.wiki.EntityReference;
+import org.xwiki.gwt.wysiwyg.client.wiki.WikiPageReference;
 import org.xwiki.gwt.wysiwyg.client.wiki.WikiServiceAsync;
+import org.xwiki.gwt.wysiwyg.client.wiki.ResourceReference.ResourceType;
 
 import com.google.gwt.event.logical.shared.SelectionEvent;
 import com.google.gwt.event.logical.shared.SelectionHandler;
@@ -101,8 +104,9 @@ public class CurrentPageImageSelectorWizardStep extends AbstractEntityListSelect
     @Override
     protected void fetchData(AsyncCallback<List<Attachment>> callback)
     {
-        EntityReference currentPage = useLinkDestination ? getData().getDestination() : getData().getOrigin();
-        getWikiService().getImageAttachments(currentPage, callback);
+        EntityReference currentPage =
+            useLinkDestination ? getData().getDestination().getEntityReference() : getData().getOrigin();
+        getWikiService().getImageAttachments(new WikiPageReference(currentPage), callback);
     }
 
     /**
@@ -143,7 +147,7 @@ public class CurrentPageImageSelectorWizardStep extends AbstractEntityListSelect
         ListItem<Attachment> imageItem = new ListItem<Attachment>();
         imageItem.setData(image);
         Image htmlImage = new Image(image.getUrl() + "?width=135");
-        htmlImage.setTitle(image.getReference().getFileName());
+        htmlImage.setTitle(new AttachmentReference(image.getReference()).getFileName());
         FlowPanel previewPanel = new FlowPanel();
         previewPanel.addStyleName("xImagePreview");
         previewPanel.add(htmlImage);
@@ -177,5 +181,34 @@ public class CurrentPageImageSelectorWizardStep extends AbstractEntityListSelect
             // it's the fake item, select the last item in the list
             getList().setSelectedItem(getList().getItem(getList().getItemCount() - 2));
         }
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see AbstractEntityListSelectorWizardStep#saveSelectedValue(AsyncCallback)
+     */
+    @Override
+    protected void saveSelectedValue(final AsyncCallback<Boolean> async)
+    {
+        // Backup the current resource type.
+        final ResourceType previousResourceType = getData().getDestination().getType();
+        // Make sure the resource type is ATTACHMENT since this wizard step selects an attachment.
+        getData().getDestination().setType(ResourceType.ATTACHMENT);
+        super.saveSelectedValue(new AsyncCallback<Boolean>()
+        {
+
+            public void onFailure(Throwable caught)
+            {
+                // Restore previous resource type.
+                getData().getDestination().setType(previousResourceType);
+                async.onFailure(caught);
+            }
+
+            public void onSuccess(Boolean result)
+            {
+                async.onSuccess(result);
+            }
+        });
     }
 }

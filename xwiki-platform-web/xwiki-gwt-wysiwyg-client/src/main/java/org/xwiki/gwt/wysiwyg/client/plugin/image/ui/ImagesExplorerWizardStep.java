@@ -31,8 +31,10 @@ import org.xwiki.gwt.wysiwyg.client.widget.PageSelector;
 import org.xwiki.gwt.wysiwyg.client.widget.SpaceSelector;
 import org.xwiki.gwt.wysiwyg.client.widget.WikiSelector;
 import org.xwiki.gwt.wysiwyg.client.widget.wizard.util.AbstractSelectorWizardStep;
+import org.xwiki.gwt.wysiwyg.client.wiki.AttachmentReference;
 import org.xwiki.gwt.wysiwyg.client.wiki.EntityLink;
 import org.xwiki.gwt.wysiwyg.client.wiki.EntityReference;
+import org.xwiki.gwt.wysiwyg.client.wiki.WikiPageReference;
 import org.xwiki.gwt.wysiwyg.client.wiki.WikiServiceAsync;
 import org.xwiki.gwt.wysiwyg.client.wiki.EntityReference.EntityType;
 
@@ -146,12 +148,12 @@ public class ImagesExplorerWizardStep extends AbstractSelectorWizardStep<EntityL
         {
             public void onClick(ClickEvent event)
             {
-                EntityReference imageReferenceTemplate = new EntityReference();
-                imageReferenceTemplate.setType(EntityType.IMAGE);
-                imageReferenceTemplate.setWikiName(displayWikiSelector ? wikiSelector.getSelectedWiki() : getData()
-                    .getOrigin().getWikiName());
-                imageReferenceTemplate.setSpaceName(spaceSelector.getSelectedSpace());
-                imageReferenceTemplate.setPageName(pageSelector.getSelectedPage());
+                WikiPageReference originPage = new WikiPageReference(getData().getOrigin());
+                AttachmentReference imageReferenceTemplate = new AttachmentReference();
+                imageReferenceTemplate.getWikiPageReference().setWikiName(
+                    displayWikiSelector ? wikiSelector.getSelectedWiki() : originPage.getWikiName());
+                imageReferenceTemplate.getWikiPageReference().setSpaceName(spaceSelector.getSelectedSpace());
+                imageReferenceTemplate.getWikiPageReference().setPageName(pageSelector.getSelectedPage());
                 initCurrentPage(imageReferenceTemplate, null);
             }
         });
@@ -169,7 +171,7 @@ public class ImagesExplorerWizardStep extends AbstractSelectorWizardStep<EntityL
      * @param imageReference a reference to the image to be selected
      * @param cb the object to be notified after the specified image is selected
      */
-    public void setSelection(final EntityReference imageReference, final AsyncCallback< ? > cb)
+    public void setSelection(final AttachmentReference imageReference, final AsyncCallback< ? > cb)
     {
         if (displayWikiSelector) {
             wikiService.isMultiWiki(new AsyncCallback<Boolean>()
@@ -201,9 +203,9 @@ public class ImagesExplorerWizardStep extends AbstractSelectorWizardStep<EntityL
      * @param imageReference the image to be selected
      * @param cb the object to be notified after the specified image is selected
      */
-    private void setWikiSelection(final EntityReference imageReference, final AsyncCallback< ? > cb)
+    private void setWikiSelection(final AttachmentReference imageReference, final AsyncCallback< ? > cb)
     {
-        wikiSelector.refreshList(imageReference.getWikiName(), new AsyncCallback<List<String>>()
+        wikiSelector.refreshList(imageReference.getWikiPageReference().getWikiName(), new AsyncCallback<List<String>>()
         {
             public void onSuccess(List<String> result)
             {
@@ -225,23 +227,25 @@ public class ImagesExplorerWizardStep extends AbstractSelectorWizardStep<EntityL
      * @param imageReference the image to be selected
      * @param cb the object to be notified after the specified image is selected
      */
-    private void setSpaceSelection(final EntityReference imageReference, final AsyncCallback< ? > cb)
+    private void setSpaceSelection(final AttachmentReference imageReference, final AsyncCallback< ? > cb)
     {
-        spaceSelector.setWiki(displayWikiSelector ? imageReference.getWikiName() : getData().getOrigin().getWikiName());
-        spaceSelector.refreshList(imageReference.getSpaceName(), new AsyncCallback<List<String>>()
-        {
-            public void onSuccess(List<String> result)
+        String originWiki = new WikiPageReference(getData().getOrigin()).getWikiName();
+        spaceSelector.setWiki(displayWikiSelector ? imageReference.getWikiPageReference().getWikiName() : originWiki);
+        spaceSelector.refreshList(imageReference.getWikiPageReference().getSpaceName(),
+            new AsyncCallback<List<String>>()
             {
-                setPageSelection(imageReference, cb);
-            }
-
-            public void onFailure(Throwable caught)
-            {
-                if (cb != null) {
-                    cb.onFailure(caught);
+                public void onSuccess(List<String> result)
+                {
+                    setPageSelection(imageReference, cb);
                 }
-            }
-        });
+
+                public void onFailure(Throwable caught)
+                {
+                    if (cb != null) {
+                        cb.onFailure(caught);
+                    }
+                }
+            });
     }
 
     /**
@@ -250,11 +254,12 @@ public class ImagesExplorerWizardStep extends AbstractSelectorWizardStep<EntityL
      * @param imageReference the image to be selected
      * @param cb the object to be notified after the specified image is selected
      */
-    private void setPageSelection(final EntityReference imageReference, final AsyncCallback< ? > cb)
+    private void setPageSelection(final AttachmentReference imageReference, final AsyncCallback< ? > cb)
     {
-        pageSelector.setWiki(displayWikiSelector ? imageReference.getWikiName() : getData().getOrigin().getWikiName());
-        pageSelector.setSpace(imageReference.getSpaceName());
-        pageSelector.refreshList(imageReference.getPageName(), new AsyncCallback<List<String>>()
+        String originWiki = new WikiPageReference(getData().getOrigin()).getWikiName();
+        pageSelector.setWiki(displayWikiSelector ? imageReference.getWikiPageReference().getWikiName() : originWiki);
+        pageSelector.setSpace(imageReference.getWikiPageReference().getSpaceName());
+        pageSelector.refreshList(imageReference.getWikiPageReference().getPageName(), new AsyncCallback<List<String>>()
         {
             public void onSuccess(List<String> result)
             {
@@ -293,8 +298,8 @@ public class ImagesExplorerWizardStep extends AbstractSelectorWizardStep<EntityL
                 }
             });
         } else if (event.getSource() == spaceSelector) {
-            pageSelector.setWiki(displayWikiSelector ? wikiSelector.getSelectedWiki() : getData().getOrigin()
-                .getWikiName());
+            WikiPageReference originPage = new WikiPageReference(getData().getOrigin());
+            pageSelector.setWiki(displayWikiSelector ? wikiSelector.getSelectedWiki() : originPage.getWikiName());
             pageSelector.setSpace(spaceSelector.getSelectedSpace());
             pageSelector.refreshList(pageSelector.getSelectedPage());
         }
@@ -307,10 +312,10 @@ public class ImagesExplorerWizardStep extends AbstractSelectorWizardStep<EntityL
      * @param imageReference a reference to the image to be selected after the list of images is updated
      * @param cb the object to be notified after the list of images is updated
      */
-    protected void initCurrentPage(EntityReference imageReference, final AsyncCallback< ? > cb)
+    protected void initCurrentPage(AttachmentReference imageReference, final AsyncCallback< ? > cb)
     {
         mainPanel.addStyleName(STYLE_LOADING);
-        getData().setDestination(imageReference);
+        getData().getDestination().setEntityReference(imageReference.getEntityReference());
         pageWizardStep.init(getData(), new AsyncCallback<Object>()
         {
             public void onSuccess(Object result)
@@ -389,15 +394,17 @@ public class ImagesExplorerWizardStep extends AbstractSelectorWizardStep<EntityL
      */
     protected void initializeSelection(AsyncCallback< ? > cb)
     {
-        if (!StringUtils.isEmpty(getData().getData().getReference())) {
-            // Edit image.
-            setSelection(getData().getDestination(), cb);
+        if (!StringUtils.isEmpty(getData().getData().getReference())
+            && getData().getDestination().getEntityReference().getType() == EntityType.ATTACHMENT) {
+            // Edit internal image.
+            setSelection(new AttachmentReference(getData().getDestination().getEntityReference()), cb);
         } else if (pageSelector.getSelectedPage() == null) {
             // Insert image. No page selected so initialize the list of images.
-            setSelection(getData().getOrigin(), cb);
+            setSelection(new AttachmentReference(getData().getOrigin()), cb);
         } else {
             // Insert image. There is a previous selection, preserve it and re-initialize the list of images.
-            initCurrentPage(pageWizardStep.getData().getDestination(), cb);
+            EntityReference destinationReference = pageWizardStep.getData().getDestination().getEntityReference();
+            initCurrentPage(new AttachmentReference(destinationReference), cb);
         }
     }
 

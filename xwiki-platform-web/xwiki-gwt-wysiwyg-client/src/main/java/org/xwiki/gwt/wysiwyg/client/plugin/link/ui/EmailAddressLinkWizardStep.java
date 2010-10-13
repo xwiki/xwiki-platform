@@ -30,11 +30,6 @@ import org.xwiki.gwt.wysiwyg.client.wiki.WikiServiceAsync;
 public class EmailAddressLinkWizardStep extends AbstractExternalLinkWizardStep
 {
     /**
-     * URL protocol constant.
-     */
-    private static final String MAILTO = "mailto:";
-
-    /**
      * Creates a new wizard step for configuring a link to an email address.
      * 
      * @param wikiService the service to be used for parsing the image reference when the link label is an image
@@ -42,21 +37,6 @@ public class EmailAddressLinkWizardStep extends AbstractExternalLinkWizardStep
     EmailAddressLinkWizardStep(WikiServiceAsync wikiService)
     {
         super(wikiService);
-    }
-
-    /**
-     * {@inheritDoc}
-     * 
-     * @see AbstractExternalLinkWizardStep#buildURL()
-     */
-    protected String buildURL()
-    {
-        String emailAddress = getUrlTextBox().getText().trim();
-        // If url does not start with the desired protocol, add it
-        if (!emailAddress.startsWith(MAILTO)) {
-            emailAddress = MAILTO + emailAddress;
-        }
-        return emailAddress;
     }
 
     /**

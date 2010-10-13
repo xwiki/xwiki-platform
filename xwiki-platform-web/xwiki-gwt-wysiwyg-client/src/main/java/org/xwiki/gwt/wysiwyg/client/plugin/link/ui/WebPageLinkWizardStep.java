@@ -86,7 +86,7 @@ public class WebPageLinkWizardStep extends AbstractExternalLinkWizardStep
     protected String buildURL()
     {
         String webPageAddress = getUrlTextBox().getText().trim();
-        // If no protocol is specified add http by default
+        // If no protocol is specified add HTTP by default.
         if (!webPageAddress.contains("://")) {
             webPageAddress = "http://" + webPageAddress;
         }

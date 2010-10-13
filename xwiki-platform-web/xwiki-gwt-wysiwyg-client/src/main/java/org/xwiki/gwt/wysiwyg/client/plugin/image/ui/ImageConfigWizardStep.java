@@ -32,7 +32,9 @@ import org.xwiki.gwt.user.client.ui.wizard.WizardStep;
 import org.xwiki.gwt.user.client.ui.wizard.NavigationListener.NavigationDirection;
 import org.xwiki.gwt.wysiwyg.client.Strings;
 import org.xwiki.gwt.wysiwyg.client.plugin.image.ImageConfig;
+import org.xwiki.gwt.wysiwyg.client.wiki.AttachmentReference;
 import org.xwiki.gwt.wysiwyg.client.wiki.EntityLink;
+import org.xwiki.gwt.wysiwyg.client.wiki.URIReference;
 
 import com.google.gwt.event.dom.client.KeyCodes;
 import com.google.gwt.event.dom.client.KeyPressEvent;
@@ -281,8 +283,23 @@ public class ImageConfigWizardStep implements WizardStep, KeyPressHandler, Sourc
         widthBox.setText(entityLink.getData().getWidth());
         heightBox.setText(entityLink.getData().getHeight());
         setImageAlignment(entityLink.getData().getAlignment());
+
         String altText = entityLink.getData().getAltText();
-        altTextBox.setText(StringUtils.isEmpty(altText) ? entityLink.getDestination().getFileName() : altText);
+        if (StringUtils.isEmpty(altText)) {
+            switch (entityLink.getDestination().getEntityReference().getType()) {
+                case ATTACHMENT:
+                    altText = new AttachmentReference(entityLink.getDestination().getEntityReference()).getFileName();
+                    break;
+                case EXTERNAL:
+                    altText = new URIReference(entityLink.getDestination().getEntityReference()).getURI();
+                    break;
+                default:
+                    altText = "";
+                    break;
+            }
+        }
+        altTextBox.setText(altText);
+
         cb.onSuccess(null);
         DeferredCommand.addCommand(new FocusCommand(widthBox));
     }
@@ -301,7 +318,8 @@ public class ImageConfigWizardStep implements WizardStep, KeyPressHandler, Sourc
     public void onSubmit(AsyncCallback<Boolean> async)
     {
         String altText = altTextBox.getText().trim();
-        entityLink.getData().setAltText(altText.length() > 0 ? altText : entityLink.getDestination().getFileName());
+        AttachmentReference imageReference = new AttachmentReference(entityLink.getDestination().getEntityReference());
+        entityLink.getData().setAltText(altText.length() > 0 ? altText : imageReference.getFileName());
         entityLink.getData().setWidth(widthBox.getText().trim());
         entityLink.getData().setHeight(heightBox.getText().trim());
         ImageConfig.ImageAlignment alignment = getSelectedAlignment();

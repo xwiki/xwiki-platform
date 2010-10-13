@@ -21,6 +21,9 @@ package org.xwiki.gwt.wysiwyg.client.plugin.link.ui;
 
 import org.xwiki.gwt.user.client.FocusCommand;
 import org.xwiki.gwt.wysiwyg.client.Strings;
+import org.xwiki.gwt.wysiwyg.client.wiki.EntityConfig;
+import org.xwiki.gwt.wysiwyg.client.wiki.ResourceReference;
+import org.xwiki.gwt.wysiwyg.client.wiki.URIReference;
 import org.xwiki.gwt.wysiwyg.client.wiki.WikiServiceAsync;
 
 import com.google.gwt.user.client.DeferredCommand;
@@ -105,7 +108,8 @@ public abstract class AbstractExternalLinkWizardStep extends LinkConfigWizardSte
         {
             public void onSuccess(Boolean result)
             {
-                urlTextBox.setText(getLinkConfig().getUrl() == null ? "" : getLinkConfig().getUrl());
+                String url = getData().getData().getUrl();
+                urlTextBox.setText(url == null ? "" : url);
                 cb.onSuccess(null);
             }
 
@@ -156,14 +160,29 @@ public abstract class AbstractExternalLinkWizardStep extends LinkConfigWizardSte
 
     /**
      * {@inheritDoc}
+     * 
+     * @see LinkConfigWizardStep#saveForm(AsyncCallback)
      */
     @Override
-    protected void saveForm()
+    protected void saveForm(final AsyncCallback<Boolean> callback)
     {
-        super.saveForm();
-        String linkUri = buildURL();
-        getLinkConfig().setUrl(linkUri);
-        getLinkConfig().setReference(linkUri);
+        final ResourceReference destination = getData().getDestination().clone();
+        destination.setEntityReference(new URIReference(buildURL()).getEntityReference());
+        getWikiService().getEntityConfig(getData().getOrigin(), destination, new AsyncCallback<EntityConfig>()
+        {
+            public void onFailure(Throwable caught)
+            {
+                callback.onFailure(caught);
+            }
+
+            public void onSuccess(EntityConfig result)
+            {
+                getData().setDestination(destination);
+                getData().getData().setReference(result.getReference());
+                getData().getData().setUrl(result.getUrl());
+                AbstractExternalLinkWizardStep.super.saveForm(callback);
+            }
+        });
     }
 
     /**
@@ -195,7 +214,10 @@ public abstract class AbstractExternalLinkWizardStep extends LinkConfigWizardSte
      * 
      * @return the URL to the external resource from the user input.
      */
-    protected abstract String buildURL();
+    protected String buildURL()
+    {
+        return urlTextBox.getText().trim();
+    }
 
     /**
      * @return the tooltip for URL text box.

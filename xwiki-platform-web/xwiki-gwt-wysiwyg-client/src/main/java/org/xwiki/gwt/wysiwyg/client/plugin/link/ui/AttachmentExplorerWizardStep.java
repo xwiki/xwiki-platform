@@ -22,7 +22,7 @@ package org.xwiki.gwt.wysiwyg.client.plugin.link.ui;
 import org.xwiki.gwt.user.client.StringUtils;
 import org.xwiki.gwt.wysiwyg.client.Strings;
 import org.xwiki.gwt.wysiwyg.client.plugin.link.ui.LinkWizard.LinkWizardStep;
-import org.xwiki.gwt.wysiwyg.client.wiki.EntityReference;
+import org.xwiki.gwt.wysiwyg.client.wiki.AttachmentReference;
 import org.xwiki.gwt.wysiwyg.client.wiki.WikiServiceAsync;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
@@ -66,27 +66,24 @@ public class AttachmentExplorerWizardStep extends AbstractExplorerWizardStep
     {
         hideError();
 
-        EntityReference attachmentReference = new EntityReference();
-        attachmentReference.setType(getData().getDestination().getType());
-        attachmentReference.setWikiName(getExplorer().getSelectedWiki());
-        attachmentReference.setSpaceName(getExplorer().getSelectedSpace());
-        attachmentReference.setPageName(getExplorer().getSelectedPage());
+        AttachmentReference attachmentReference = new AttachmentReference();
+        attachmentReference.getWikiPageReference().setWikiName(getExplorer().getSelectedWiki());
+        attachmentReference.getWikiPageReference().setSpaceName(getExplorer().getSelectedSpace());
+        attachmentReference.getWikiPageReference().setPageName(getExplorer().getSelectedPage());
         attachmentReference.setFileName(getExplorer().getSelectedAttachment());
 
         if (getExplorer().isNewAttachment()) {
-            getData().setDestination(attachmentReference);
+            getData().getDestination().setEntityReference(attachmentReference.getEntityReference());
             // Invalidate the explorer cache so that the new attachment shows up in the tree when the tree is reloaded.
             invalidateExplorerData();
             async.onSuccess(true);
-        } else if (!StringUtils.isEmpty(attachmentReference.getFileName())) {
-            if (getData().getDestination().equals(attachmentReference)) {
-                async.onSuccess(true);
-            } else {
-                updateLinkConfig(attachmentReference, async);
-            }
-        } else {
+        } else if (StringUtils.isEmpty(attachmentReference.getFileName())) {
             displayError(Strings.INSTANCE.linkNoAttachmentSelectedError());
             async.onSuccess(false);
+        } else if (getData().getDestination().getEntityReference().equals(attachmentReference.getEntityReference())) {
+            async.onSuccess(true);
+        } else {
+            updateLinkConfig(attachmentReference.getEntityReference(), async);
         }
     }
 }

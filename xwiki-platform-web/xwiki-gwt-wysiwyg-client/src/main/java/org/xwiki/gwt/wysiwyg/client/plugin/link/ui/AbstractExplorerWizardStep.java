@@ -32,8 +32,9 @@ import org.xwiki.gwt.wysiwyg.client.widget.wizard.util.AbstractSelectorWizardSte
 import org.xwiki.gwt.wysiwyg.client.wiki.EntityConfig;
 import org.xwiki.gwt.wysiwyg.client.wiki.EntityLink;
 import org.xwiki.gwt.wysiwyg.client.wiki.EntityReference;
+import org.xwiki.gwt.wysiwyg.client.wiki.ResourceReference;
 import org.xwiki.gwt.wysiwyg.client.wiki.WikiServiceAsync;
-import org.xwiki.gwt.wysiwyg.client.wiki.EntityReference.EntityType;
+import org.xwiki.gwt.wysiwyg.client.wiki.ResourceReference.ResourceType;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Label;
@@ -222,7 +223,7 @@ public abstract class AbstractExplorerWizardStep extends AbstractSelectorWizardS
         String reference = getData().getData().getReference();
         if (!StringUtils.isEmpty(reference)) {
             // Edit link (link reference is not empty).
-            getExplorer().selectEntity(getData().getDestination(), null);
+            getExplorer().selectEntity(getData().getDestination().getEntityReference(), null);
         } else if (StringUtils.isEmpty(getExplorer().getValue())) {
             // New link (no entity has been previously selected).
             getExplorer().selectEntity(getData().getOrigin(), getGroupAnchor(getData().getDestination().getType()));
@@ -231,12 +232,12 @@ public abstract class AbstractExplorerWizardStep extends AbstractSelectorWizardS
     }
 
     /**
-     * @param entityType an entity type
-     * @return the anchor that groups the entities with the specified type under their parent entity
+     * @param resourceType a resource type
+     * @return the anchor that groups the resources with the specified type under their parent entity
      */
-    private String getGroupAnchor(EntityType entityType)
+    private String getGroupAnchor(ResourceType resourceType)
     {
-        return entityType == EntityType.ATTACHMENT || entityType == EntityType.IMAGE ? "Attachments" : null;
+        return resourceType == ResourceType.ATTACHMENT || resourceType == ResourceType.IMAGE ? "Attachments" : null;
     }
 
     /**
@@ -309,10 +310,11 @@ public abstract class AbstractExplorerWizardStep extends AbstractSelectorWizardS
      * @param selectedEntityReference a reference to the selected entity
      * @param callback the object to be notified after the link configuration object has been updated
      */
-    protected void updateLinkConfig(final EntityReference selectedEntityReference,
-        final AsyncCallback<Boolean> callback)
+    protected void updateLinkConfig(EntityReference selectedEntityReference, final AsyncCallback<Boolean> callback)
     {
-        wikiService.getEntityConfig(getData().getOrigin(), selectedEntityReference, new AsyncCallback<EntityConfig>()
+        final ResourceReference destination = getData().getDestination().clone();
+        destination.setEntityReference(selectedEntityReference.clone());
+        wikiService.getEntityConfig(getData().getOrigin(), destination, new AsyncCallback<EntityConfig>()
         {
             public void onFailure(Throwable caught)
             {
@@ -321,7 +323,7 @@ public abstract class AbstractExplorerWizardStep extends AbstractSelectorWizardS
 
             public void onSuccess(EntityConfig result)
             {
-                getData().setDestination(selectedEntityReference.clone());
+                getData().setDestination(destination);
                 getData().getData().setReference(result.getReference());
                 getData().getData().setUrl(result.getUrl());
                 callback.onSuccess(true);

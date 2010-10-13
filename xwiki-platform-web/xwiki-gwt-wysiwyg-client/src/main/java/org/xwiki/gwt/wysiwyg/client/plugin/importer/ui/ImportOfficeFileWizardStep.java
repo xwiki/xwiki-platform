@@ -29,9 +29,8 @@ import org.xwiki.gwt.wysiwyg.client.Strings;
 import org.xwiki.gwt.wysiwyg.client.plugin.importer.ImportServiceAsync;
 import org.xwiki.gwt.wysiwyg.client.widget.wizard.util.AbstractFileUploadWizardStep;
 import org.xwiki.gwt.wysiwyg.client.wiki.Attachment;
-import org.xwiki.gwt.wysiwyg.client.wiki.EntityReference;
+import org.xwiki.gwt.wysiwyg.client.wiki.WikiPageReference;
 import org.xwiki.gwt.wysiwyg.client.wiki.WikiServiceAsync;
-import org.xwiki.gwt.wysiwyg.client.wiki.EntityReference.EntityType;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.CheckBox;
@@ -240,10 +239,9 @@ public class ImportOfficeFileWizardStep extends AbstractFileUploadWizardStep
      * @see AbstractFileUploadWizardStep#getTargetPageReference()
      */
     @Override
-    protected EntityReference getTargetPageReference()
+    protected WikiPageReference getTargetPageReference()
     {
-        EntityReference targetPageReference = new EntityReference();
-        targetPageReference.setType(EntityType.DOCUMENT);
+        WikiPageReference targetPageReference = new WikiPageReference();
         targetPageReference.setWikiName(config.getParameter("wiki", "xwiki"));
         targetPageReference.setSpaceName(config.getParameter("space", "Main"));
         targetPageReference.setPageName(config.getParameter("page", "WebHome"));

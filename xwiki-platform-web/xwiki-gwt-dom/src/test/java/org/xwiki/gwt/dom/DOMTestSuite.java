@@ -46,7 +46,7 @@ import com.google.gwt.junit.tools.GWTTestSuite;
  * errors we moved our test suite class out of module's source path.
  * 
  * @version $Id$
- * @see http://code.google.com/p/google-web-toolkit/issues/detail?id=2486
+ * @see <a href="http://code.google.com/p/google-web-toolkit/issues/detail?id=2486">Issue 2486</a>
  */
 public class DOMTestSuite extends GWTTestSuite
 {

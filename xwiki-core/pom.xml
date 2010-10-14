@@ -845,9 +845,9 @@
     <!-- Build tools -->
     <!-- Needed for backward compatibility Aspects -->
     <dependency>
-      <groupId>aspectj</groupId>
+      <groupId>org.aspectj</groupId>
       <artifactId>aspectjrt</artifactId>
-      <version>1.5.2a</version>
+      <version>1.6.7</version>
     </dependency>
     <dependency>
       <groupId>org.xwiki.platform</groupId>

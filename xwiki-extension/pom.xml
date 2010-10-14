@@ -27,7 +27,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-core-parent</artifactId>
-    <version>2.5-SNAPSHOT</version>
+    <version>2.6-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-core-extension</artifactId>
   <name>XWiki Platform - Core - Extension</name>

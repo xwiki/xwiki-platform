@@ -157,7 +157,7 @@ public class DialogBox extends PopupPanel implements DragListener, ClickHandler
         box.add(content);
         box.add(contentPlaceHolder);
 
-        int zIndex = 100;
+        int zIndex = 1000;
         if (modal) {
             glassPanel = new GlassPanel(false);
             glassPanel.getElement().getStyle().setZIndex(zIndex++);

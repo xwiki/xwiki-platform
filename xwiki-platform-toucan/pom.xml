@@ -31,7 +31,7 @@
   </parent>
   <artifactId>xwiki-skin-toucan</artifactId>
   <name>XWiki Platform - Skins - Toucan</name>
-  <version>1.37</version>
+  <version>1.38-SNAPSHOT</version>
   <packaging>pom</packaging>
   <description>
     Toucan Skin. It is based on Albatross and requires that Albatross be set as the base skin
@@ -50,9 +50,9 @@
   <!-- We must configure SCM in each module. For more information see:
        http://svn.xwiki.org/svnroot/xwiki/platform/pom/trunk/pom.xml -->
   <scm>
-    <connection>scm:svn:http://svn.xwiki.org/svnroot/xwiki/platform/skins/tags/xwiki-skin-toucan-1.37</connection>
-    <developerConnection>scm:svn:https://svn.xwiki.org/svnroot/xwiki/platform/skins/tags/xwiki-skin-toucan-1.37</developerConnection>
-    <url>http://svn.xwiki.org/svnroot/xwiki/platform/skins/tags/xwiki-skin-toucan-1.37</url>
+    <connection>scm:svn:http://svn.xwiki.org/svnroot/xwiki/platform/skins/trunk/toucan</connection>
+    <developerConnection>scm:svn:https://svn.xwiki.org/svnroot/xwiki/platform/skins/trunk/toucan</developerConnection>
+    <url>http://svn.xwiki.org/svnroot/xwiki/platform/skins/trunk/toucan</url>
   </scm>
   <build>
     <plugins>

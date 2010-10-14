@@ -55,4 +55,19 @@
     <module>xwiki-standards-validator</module>
     <module>foxwiki</module>
   </modules>
+  <build>
+    <pluginManagement>
+      <plugins>
+        <plugin>
+          <!-- Exclude Tools code from being Clovered since it doesn't bring interesting information and causes
+               headaches in making them run at runtime -->
+          <groupId>com.atlassian.maven.plugins</groupId>
+          <artifactId>maven-clover2-plugin</artifactId>
+          <configuration>
+            <skip>true</skip>
+          </configuration>
+        </plugin>
+      </plugins>
+    </pluginManagement>
+  </build>
 </project>

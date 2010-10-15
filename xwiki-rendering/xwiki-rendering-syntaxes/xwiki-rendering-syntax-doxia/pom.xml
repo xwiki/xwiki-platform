@@ -37,6 +37,13 @@
       <groupId>org.apache.maven.doxia</groupId>
       <artifactId>doxia-module-twiki</artifactId>
       <version>1.1.3</version>
+      <exclusions>
+        <!-- Plexus draws JUnit that we don't need/want to have at runtime -->
+        <exclusion>
+          <groupId>junit</groupId>
+          <artifactId>junit</artifactId>
+        </exclusion>
+      </exclusions>
     </dependency>
   </dependencies>
   <build>

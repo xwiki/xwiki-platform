@@ -39,6 +39,7 @@
   </properties>
   <modules>
     <module>xwiki-extension-api</module>
+    <module>xwiki-extension-handlers</module>
   </modules>
 </project>
        

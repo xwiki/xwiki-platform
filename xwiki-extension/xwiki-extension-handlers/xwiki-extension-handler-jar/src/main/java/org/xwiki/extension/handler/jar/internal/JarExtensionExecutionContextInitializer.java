@@ -17,24 +17,27 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.extension.install.internal;
+package org.xwiki.extension.handler.jar.internal;
 
-import org.xwiki.component.logging.AbstractLogEnabled;
-import org.xwiki.extension.InstallException;
-import org.xwiki.extension.LocalExtension;
-import org.xwiki.extension.UninstallException;
-import org.xwiki.extension.install.ExtensionHandler;
+import org.xwiki.component.annotation.Component;
+import org.xwiki.component.annotation.Requirement;
+import org.xwiki.context.ExecutionContext;
+import org.xwiki.context.ExecutionContextException;
+import org.xwiki.context.ExecutionContextInitializer;
 
-public abstract class AbstractExtensionHandler extends AbstractLogEnabled implements ExtensionHandler
+@Component("jarextension")
+public class JarExtensionExecutionContextInitializer implements ExecutionContextInitializer
 {
-    public void upgrade(LocalExtension previousLocalExtension, LocalExtension newLocalExtension)
-        throws InstallException
+    @Requirement
+    private JarExtensionClassLoader jarExtensionClassLoader;
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see org.xwiki.context.ExecutionContextInitializer#initialize(org.xwiki.context.ExecutionContext)
+     */
+    public void initialize(ExecutionContext context) throws ExecutionContextException
     {
-        try {
-            uninstall(previousLocalExtension);
-        } catch (UninstallException e) {
-            throw new InstallException("Failed to uninstall previous extension [" + previousLocalExtension + "]");
-        }
-        install(newLocalExtension);
+        Thread.currentThread().setContextClassLoader(this.jarExtensionClassLoader.getURLClassLoader());
     }
 }

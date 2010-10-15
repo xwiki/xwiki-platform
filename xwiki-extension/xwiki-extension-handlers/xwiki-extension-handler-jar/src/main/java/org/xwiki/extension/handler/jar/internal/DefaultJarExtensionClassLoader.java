@@ -17,27 +17,25 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.extension.install.internal.jar;
+package org.xwiki.extension.handler.jar.internal;
 
+import java.net.URI;
+
+import org.xwiki.classloader.ExtendedURLClassLoader;
+import org.xwiki.classloader.URIClassLoader;
 import org.xwiki.component.annotation.Component;
-import org.xwiki.component.annotation.Requirement;
-import org.xwiki.context.ExecutionContext;
-import org.xwiki.context.ExecutionContextException;
-import org.xwiki.context.ExecutionContextInitializer;
 
-@Component("jarextension")
-public class JarExtensionExecutionContextInitializer implements ExecutionContextInitializer
+@Component
+public class DefaultJarExtensionClassLoader implements JarExtensionClassLoader
 {
-    @Requirement
-    private JarExtensionClassLoader jarExtensionClassLoader;
+    private ExtendedURLClassLoader classLoader;
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.context.ExecutionContextInitializer#initialize(org.xwiki.context.ExecutionContext)
-     */
-    public void initialize(ExecutionContext context) throws ExecutionContextException
+    public ExtendedURLClassLoader getURLClassLoader()
     {
-        Thread.currentThread().setContextClassLoader(this.jarExtensionClassLoader.getURLClassLoader());
+        if (this.classLoader == null) {
+            this.classLoader = new URIClassLoader(new URI[] {}, getClass().getClassLoader());
+        }
+
+        return this.classLoader;
     }
 }

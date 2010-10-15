@@ -17,25 +17,24 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.extension.install.internal.jar;
+package org.xwiki.extension.handler.internal;
 
-import java.net.URI;
+import org.xwiki.component.logging.AbstractLogEnabled;
+import org.xwiki.extension.InstallException;
+import org.xwiki.extension.LocalExtension;
+import org.xwiki.extension.UninstallException;
+import org.xwiki.extension.handler.ExtensionHandler;
 
-import org.xwiki.classloader.ExtendedURLClassLoader;
-import org.xwiki.classloader.URIClassLoader;
-import org.xwiki.component.annotation.Component;
-
-@Component
-public class DefaultJarExtensionClassLoader implements JarExtensionClassLoader
+public abstract class AbstractExtensionHandler extends AbstractLogEnabled implements ExtensionHandler
 {
-    private ExtendedURLClassLoader classLoader;
-
-    public ExtendedURLClassLoader getURLClassLoader()
+    public void upgrade(LocalExtension previousLocalExtension, LocalExtension newLocalExtension)
+        throws InstallException
     {
-        if (this.classLoader == null) {
-            this.classLoader = new URIClassLoader(new URI[] {}, getClass().getClassLoader());
+        try {
+            uninstall(previousLocalExtension);
+        } catch (UninstallException e) {
+            throw new InstallException("Failed to uninstall previous extension [" + previousLocalExtension + "]");
         }
-
-        return this.classLoader;
+        install(newLocalExtension);
     }
 }

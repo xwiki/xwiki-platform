@@ -17,7 +17,7 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.extension.install.internal.jar;
+package org.xwiki.extension.handler.jar.internal;
 
 import java.util.Collections;
 import java.util.HashMap;
@@ -30,7 +30,7 @@ import org.xwiki.component.logging.AbstractLogEnabled;
 import org.xwiki.extension.ExtensionDependency;
 import org.xwiki.extension.InstallException;
 import org.xwiki.extension.LocalExtension;
-import org.xwiki.extension.install.ExtensionHandlerManager;
+import org.xwiki.extension.handler.ExtensionHandlerManager;
 import org.xwiki.extension.repository.CoreExtensionRepository;
 import org.xwiki.extension.repository.LocalExtensionRepository;
 import org.xwiki.observation.EventListener;

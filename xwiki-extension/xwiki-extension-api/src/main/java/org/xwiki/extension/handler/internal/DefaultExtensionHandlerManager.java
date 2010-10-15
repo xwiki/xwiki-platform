@@ -17,7 +17,7 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.extension.install.internal;
+package org.xwiki.extension.handler.internal;
 
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.Requirement;
@@ -26,8 +26,8 @@ import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.extension.InstallException;
 import org.xwiki.extension.LocalExtension;
 import org.xwiki.extension.UninstallException;
-import org.xwiki.extension.install.ExtensionHandler;
-import org.xwiki.extension.install.ExtensionHandlerManager;
+import org.xwiki.extension.handler.ExtensionHandler;
+import org.xwiki.extension.handler.ExtensionHandlerManager;
 
 @Component
 public class DefaultExtensionHandlerManager implements ExtensionHandlerManager

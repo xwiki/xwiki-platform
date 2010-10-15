@@ -17,7 +17,7 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.extension.install.internal.jar;
+package org.xwiki.extension.handler.jar.internal;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -39,7 +39,7 @@ import org.xwiki.component.phase.InitializationException;
 import org.xwiki.extension.InstallException;
 import org.xwiki.extension.LocalExtension;
 import org.xwiki.extension.UninstallException;
-import org.xwiki.extension.install.internal.AbstractExtensionHandler;
+import org.xwiki.extension.handler.internal.AbstractExtensionHandler;
 
 @Component("jar")
 public class JarExtensionHandler extends AbstractExtensionHandler implements Initializable
@@ -65,7 +65,7 @@ public class JarExtensionHandler extends AbstractExtensionHandler implements Ini
     /**
      * {@inheritDoc}
      * 
-     * @see org.xwiki.extension.install.ExtensionHandler#install(org.xwiki.extension.LocalExtension)
+     * @see org.xwiki.extension.handler.ExtensionHandler#install(org.xwiki.extension.LocalExtension)
      */
     public void install(LocalExtension localExtension) throws InstallException
     {

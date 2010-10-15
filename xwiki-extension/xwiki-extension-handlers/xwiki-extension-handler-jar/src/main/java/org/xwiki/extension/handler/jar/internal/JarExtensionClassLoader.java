@@ -17,19 +17,13 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.extension.install;
+package org.xwiki.extension.handler.jar.internal;
 
+import org.xwiki.classloader.ExtendedURLClassLoader;
 import org.xwiki.component.annotation.ComponentRole;
-import org.xwiki.extension.InstallException;
-import org.xwiki.extension.LocalExtension;
-import org.xwiki.extension.UninstallException;
 
 @ComponentRole
-public interface ExtensionHandlerManager
+public interface JarExtensionClassLoader
 {
-    void install(LocalExtension localExtension) throws InstallException;
-
-    void uninstall(LocalExtension localExtension) throws UninstallException;
-
-    void upgrade(LocalExtension previousLocalExtension, LocalExtension newLocalExtension) throws InstallException;
+    ExtendedURLClassLoader getURLClassLoader();
 }

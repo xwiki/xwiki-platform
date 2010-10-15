@@ -31,6 +31,7 @@ import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.zip.ZipEntry;
@@ -391,19 +392,21 @@ public class Package
         Document description = null;
 
         try {
-            description = ReadZipInfoFile(zis);
-            if (description == null) {
-                throw new PackageException(XWikiException.ERROR_XWIKI_UNKNOWN, "Could not find the package definition");
-            }
-            file.reset();
             zis = new ZipInputStream(file);
+
+            List<XWikiDocument> docsToLoad = new LinkedList<XWikiDocument>();
+            /*
+             * Loop 1: Cycle through the zip input stream and load out all of the documents, when we find the
+             * package.xml file we put it aside to so that we only include documents which are in the file.
+             */
             while ((entry = zis.getNextEntry()) != null) {
-                // Don't read the package.xml file (since we've already read it above),
-                // directories or any file in the META-INF directory (we use that directory
-                // to put meta data such as LICENSE/NOTICE files.
-                if (entry.getName().compareTo(DefaultPackageFileName) == 0 || entry.isDirectory()
-                    || (entry.getName().indexOf("META-INF") != -1)) {
+                if (entry.isDirectory() || (entry.getName().indexOf("META-INF") != -1)) {
+                    // The entry is either a directory or is something inside of the META-INF dir.
+                    // (we use that directory to put meta data such as LICENSE/NOTICE files.)
                     continue;
+                } else if (entry.getName().compareTo(DefaultPackageFileName) == 0) {
+                    // The entry is the manifest (package.xml). Read this differently.
+                    description = fromXml(new UnclosableInputStream(zis));
                 } else {
                     XWikiDocument doc = null;
                     try {
@@ -418,22 +421,37 @@ public class Package
                         continue;
                     }
 
+                    // Run all of the registered DocumentFilters on this document and
+                    // if no filters throw exceptions, add it to the list to import.
                     try {
-                        filter(doc, context);
-                        if (documentExistInPackageFile(doc.getFullName(), doc.getLanguage(), description)) {
-                            this.add(doc, context);
-                        } else {
-                            LOG.warn("document " + doc.getFullName() + " does not exist in package definition."
-                                + " It will not be installed.");
-                            // It will be listed in the "skipped documents" section after the
-                            // import.
-                            addToSkipped(doc.getFullName(), context);
-                        }
+                        this.filter(doc, context);
+                        docsToLoad.add(doc);
                     } catch (ExcludeDocumentException e) {
                         LOG.info("Skip the document '" + doc.getFullName() + "'");
                     }
                 }
             }
+            // Make sure a manifest was included in the package...
+            if (description == null) {
+                throw new PackageException(XWikiException.ERROR_XWIKI_UNKNOWN,
+                                           "Could not find the package definition");
+            }
+            /*
+             * Loop 2: Cycle through the list of documents and if they are in the manifest then add them, otherwise
+             * log a warning and add them to the skipped list.
+             */
+            for (XWikiDocument doc : docsToLoad) {
+                if (documentExistInPackageFile(doc.getFullName(), doc.getLanguage(), description)) {
+                    this.add(doc, context);
+                } else {
+                    LOG.warn("document " + doc.getFullName() + " does not exist in package definition."
+                        + " It will not be installed.");
+                    // It will be listed in the "skipped documents" section after the
+                    // import.
+                    addToSkipped(doc.getFullName(), context);
+                }
+            }
+
             updateFileInfos(description);
         } catch (DocumentException e) {
             throw new PackageException(XWikiException.ERROR_XWIKI_UNKNOWN, "Error when reading the XML");
@@ -842,21 +860,6 @@ public class Package
         doc.fromXML(domDoc, this.withVersions);
 
         return doc;
-    }
-
-    private Document ReadZipInfoFile(ZipInputStream zis) throws IOException, DocumentException
-    {
-        ZipEntry entry;
-        Document description;
-
-        while ((entry = zis.getNextEntry()) != null) {
-            if (entry.getName().compareTo(DefaultPackageFileName) == 0) {
-                description = fromXml(zis);
-                return description;
-            }
-        }
-
-        return null;
     }
 
     /**

@@ -174,7 +174,7 @@ $xwiki.ssfx.use("js/xwiki/table/livetable.css", true)
 #end
 #set($columnOptions = {
   "member" : {'link': 'auto', 'type': 'text'},
-  '_avatar' : { 'type' : 'none', 'link' : 'none', 'html' : 'true', 'sortable' : false },
+  '_avatar' : { 'type' : 'none', 'link' : 'field', 'html' : 'true', 'sortable' : false },
   "_actions" : {
     'actions': ['delete'],
     'actionCallbacks': {'delete': 'table.deleteRow(i);'},

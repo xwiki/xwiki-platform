@@ -642,6 +642,15 @@ public class XWikiAttachment implements Cloneable
         this.attachment_content.setContent(is, length);
     }
 
+    public void setContent(InputStream is) throws IOException
+    {
+        if (this.attachment_content == null) {
+            this.attachment_content = new XWikiAttachmentContent(this);
+        }
+
+        this.attachment_content.setContent(is);
+    }
+
     public void loadContent(XWikiContext context) throws XWikiException
     {
         if (this.attachment_content == null) {

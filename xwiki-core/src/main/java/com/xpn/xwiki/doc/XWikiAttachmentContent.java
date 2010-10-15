@@ -22,9 +22,13 @@
 package com.xpn.xwiki.doc;
 
 import java.io.ByteArrayInputStream;
-import java.io.EOFException;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+
+import org.apache.commons.io.IOUtils;
+import org.apache.commons.fileupload.FileItem;
+import org.apache.commons.fileupload.disk.DiskFileItem;
 
 /**
  * The content of an attachment. Objects of this class hold the actual content which will be downloaded when a user
@@ -37,11 +41,24 @@ public class XWikiAttachmentContent implements Cloneable
     /** The XWikiAttachment (attachment metadata) which this attachment content is associated with. */
     private XWikiAttachment attachment;
 
-    /** The content of the attachment. */
-    private byte[] content;
-
     /** True if the content is out of sync with the content stored in the database and thus needs to be saved. */
     private boolean isContentDirty;
+
+    /** Storage which holds the actual content. */
+    private FileItem file;
+
+    /**
+     * Constructor which clones an existing XWikiAttachmentContent.
+     * used by {@link #clone()}.
+     *
+     * @param original the XWikiAttachmentContent to clone.
+     * @since 2.6M1
+     */
+    public XWikiAttachmentContent(XWikiAttachmentContent original)
+    {
+        this.file = original.file;
+        this.attachment = original.attachment;
+    }
 
     /**
      * Constructor with associated attachment specified.
@@ -59,7 +76,29 @@ public class XWikiAttachmentContent implements Cloneable
      */
     public XWikiAttachmentContent()
     {
-        this.content = new byte[0];
+        this.newFileItem();
+    }
+
+    /**
+     * Set a new FileItem for storage.
+     * @since 2.6M1
+     */
+    private void newFileItem()
+    {
+        String tempFileLocation = System.getProperty("java.io.tmpdir");
+        // TODO try to get a different temp file location.
+        try {
+            final DiskFileItem dfi = new DiskFileItem(null, null, false, null, 10000, new File(tempFileLocation));
+            // This causes the temp file to be created.
+            dfi.getOutputStream();
+            // Make sure this file is marked for deletion on VM exit because DiskFileItem does not.
+            dfi.getStoreLocation().deleteOnExit();
+            this.file = dfi;
+        } catch (IOException e) {
+            throw new RuntimeException("Failed to create new attachment temporary file."
+                                       + " Are you sure you have permission to write to "
+                                       + tempFileLocation + "?", e);
+        }
     }
 
     /**
@@ -91,14 +130,7 @@ public class XWikiAttachmentContent implements Cloneable
     @Override
     public Object clone()
     {
-        final XWikiAttachmentContent newContent = new XWikiAttachmentContent(this.getAttachment());
-
-        // This points the new attachment to the same array, behavior is not guarenteed if the byte array is mutated.
-        newContent.setContent(this.getContent());
-
-        newContent.setContentDirty(this.isContentDirty());
-
-        return newContent;
+        return new XWikiAttachmentContent(this);
     }
 
     /**
@@ -108,11 +140,7 @@ public class XWikiAttachmentContent implements Cloneable
     @Deprecated
     public byte[] getContent()
     {
-        if (this.content == null) {
-            return new byte[0];
-        } else {
-            return this.content;
-        }
+        return this.file.get();
     }
 
     /**
@@ -124,14 +152,15 @@ public class XWikiAttachmentContent implements Cloneable
     @Deprecated
     public void setContent(byte[] content)
     {
-        if (content == null) {
-            this.content = null;
-        } else {
-            if (!content.equals(this.content)) {
-                setContentDirty(true);
+        try {
+            byte[] internalContent = new byte[0];
+            if (content != null) {
+                internalContent = content;
             }
-            this.content = content;
-            this.attachment.setFilesize(content.length);
+
+            this.setContent(new ByteArrayInputStream(internalContent));
+        } catch (IOException e) {
+            throw new RuntimeException("Failed to copy data to storage.", e);
         }
     }
 
@@ -178,20 +207,42 @@ public class XWikiAttachmentContent implements Cloneable
      */
     public InputStream getContentInputStream()
     {
-        return new ByteArrayInputStream(getContent());
+        try {
+            return this.file.getInputStream();
+        } catch (IOException e) {
+            throw new RuntimeException("Failed to get InputStream", e);
+        }
+    }
+
+    /**
+     * Set the content of the attachment from a portion of an InputStream.
+     * 
+     * @param is the input stream that will be read
+     * @param len the number of bytes to read from the beginning of the stream
+     * @throws IOException when an error occurs during streaming operation
+     * @since 2.3M2
+     */
+    public void setContent(InputStream is, int len) throws IOException
+    {
+        // TODO Fix so this sends a EOS when the limit is reached.
+        //this.setContent(new LimitedInputStream(is, ((long) len)));
+        this.setContent(is);
     }
 
     /**
      * Set the content of the attachment from an InputStream.
      * 
      * @param is the input stream that will be read
-     * @param len the length in byte to read
      * @throws IOException when an error occurs during streaming operation
-     * @since 2.3M2
+     * @since 2.6M1
      */
-    public void setContent(InputStream is, int len) throws IOException
+    public void setContent(InputStream is) throws IOException
     {
-        setContent(readData(is, len));
+        this.newFileItem();
+        IOUtils.copy(is, this.file.getOutputStream());
+        this.setContentDirty(true);
+
+        this.attachment.setFilesize(this.getSize());
     }
 
     /**
@@ -200,37 +251,6 @@ public class XWikiAttachmentContent implements Cloneable
      */
     public int getSize()
     {
-        return this.content.length;
-    }
-
-    /**
-     * Read an input stream into a byte array.
-     * 
-     * @param is the input stream to read
-     * @param length the number of bytes of the stream to read.
-     * @return a byte array of size len containing the read data
-     * @throws IOException when an error occurs during streaming operation
-     * @since 2.3M2
-     */
-    private byte[] readData(InputStream is, int length) throws IOException
-    {
-        // We don't want to modify the input so we must copy it.
-        int len = length;
-
-        if (is == null) {
-            return null;
-        }
-
-        int off = 0;
-        byte[] buf = new byte[len];
-        while (len > 0) {
-            int n = is.read(buf, off, len);
-            if (n == -1) {
-                throw new EOFException();
-            }
-            off += n;
-            len -= n;
-        }
-        return buf;
+        return (int) this.file.getSize();
     }
 }

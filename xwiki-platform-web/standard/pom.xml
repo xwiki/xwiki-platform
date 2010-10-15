@@ -153,7 +153,7 @@
     <!-- Extension Manager -->
     <dependency>
       <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-core-extension</artifactId>
+      <artifactId>xwiki-core-extension-handler-jar</artifactId>
       <version>${platform.core.version}</version>
     </dependency>
   </dependencies>

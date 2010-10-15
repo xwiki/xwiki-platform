@@ -19,9 +19,6 @@
  */
 package org.xwiki.extension.repository.internal.aether;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import org.apache.maven.repository.internal.MavenRepositorySystemSession;
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 import org.sonatype.aether.RepositorySystem;

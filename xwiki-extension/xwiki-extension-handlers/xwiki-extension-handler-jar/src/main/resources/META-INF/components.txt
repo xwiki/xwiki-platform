@@ -1,4 +1,4 @@
-org.xwiki.extension.install.internal.jar.JarExtensionHandler
-org.xwiki.extension.install.internal.jar.DefaultJarExtensionClassLoader
-org.xwiki.extension.install.internal.jar.JarExtensionExecutionContextInitializer
-org.xwiki.extension.install.internal.jar.JarHandlerApplicationStartedListener
+org.xwiki.extension.handler.jar.internal.JarExtensionHandler
+org.xwiki.extension.handler.jar.internal.DefaultJarExtensionClassLoader
+org.xwiki.extension.handler.jar.internal.JarExtensionExecutionContextInitializer
+org.xwiki.extension.handler.jar.internal.JarHandlerApplicationStartedListener

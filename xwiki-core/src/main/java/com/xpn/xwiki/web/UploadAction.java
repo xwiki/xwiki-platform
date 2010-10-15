@@ -160,15 +160,8 @@ public class UploadAction extends XWikiAction
             doc.getAttachmentList().add(attachment);
         }
 
-        int fisize = fileupload.getFileItemSize(fieldName, context);
-
         try {
-            if (fisize > 0) {
-                InputStream fiis = fileupload.getFileItemInputStream(fieldName, context);
-                attachment.setContent(fiis, fisize);
-            } else {
-                attachment.setContent(new ByteArrayInputStream(new byte[0]), 0);
-            }
+            attachment.setContent(fileupload.getFileItemInputStream(fieldName, context));
         } catch (IOException e) {
             throw new XWikiException(XWikiException.MODULE_XWIKI_APP,
                 XWikiException.ERROR_XWIKI_APP_UPLOAD_FILE_EXCEPTION, "Exception while reading uploaded parsed file", e);

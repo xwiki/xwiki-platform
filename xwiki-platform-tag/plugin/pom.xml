@@ -69,6 +69,18 @@
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-checkstyle-plugin</artifactId>
       </plugin>
+      <!-- To remove when 1.15 will be released -->
+      <plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>clirr-maven-plugin</artifactId>
+        <configuration>
+          <skip>${xwiki.clirr.skip}</skip>
+          <comparisonVersion>${clirr.previous.version}</comparisonVersion>
+          <excludes>
+            <exclude>com/xpn/xwiki/plugin/tag/TagOperationResult</exclude>
+          </excludes>
+        </configuration>
+      </plugin>
     </plugins>
   </build>
 </project>

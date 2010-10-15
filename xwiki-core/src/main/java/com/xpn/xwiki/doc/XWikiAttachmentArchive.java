@@ -121,6 +121,12 @@ public class XWikiAttachmentArchive implements Cloneable
         }
     }
 
+    /**
+     * Update the archive.
+     *
+     * @param data not used for anything, the data is loaded from the attachment included with this archive.
+     * @param context the XWikiContext for the request used to load the correct attachment content from the database.
+     */
     public void updateArchive(byte[] data, XWikiContext context) throws XWikiException
     {
         try {

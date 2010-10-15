@@ -677,7 +677,8 @@ public class XWikiAttachment implements Cloneable
             return;
         }
 
-        loadArchive(context).updateArchive(getContent(context), context);
+        // XWikiAttachmentArchive no longer uses the byte array passed as it's first parameter making it redundant.
+        loadArchive(context).updateArchive(null, context);
     }
 
     public String getMimeType(XWikiContext context)

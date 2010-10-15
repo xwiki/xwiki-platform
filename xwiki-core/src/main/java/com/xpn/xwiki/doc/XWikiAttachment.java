@@ -324,6 +324,9 @@ public class XWikiAttachment implements Cloneable
     public String toStringXML(boolean bWithAttachmentContent, boolean bWithVersions, XWikiContext context)
         throws XWikiException
     {
+        // This is very bad. baos holds the entire attachment on the heap, then it makes a copy when toByteArray
+        // is called, then String forces us to make a copy when we construct a new String.
+        // Unfortunately this can't be fixed because jrcs demands the content as a String.
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         try {
             XMLWriter wr = new XMLWriter(baos, new OutputFormat("", true, context.getWiki().getEncoding()));
@@ -331,7 +334,9 @@ public class XWikiAttachment implements Cloneable
             wr.writeDocumentStart(doc);
             toXML(wr, bWithAttachmentContent, bWithVersions, context);
             wr.writeDocumentEnd(doc);
-            return baos.toString(context.getWiki().getEncoding());
+            byte[] array = baos.toByteArray();
+            baos = null;
+            return new String(array, context.getWiki().getEncoding());
         } catch (IOException e) {
             e.printStackTrace();
             return "";

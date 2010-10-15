@@ -29,8 +29,8 @@ import java.util.List;
 import org.apache.commons.fileupload.FileItem;
 import org.apache.commons.fileupload.FileUpload;
 import org.apache.commons.fileupload.FileUploadBase;
-import org.apache.commons.fileupload.FileUploadException;
 import org.apache.commons.fileupload.RequestContext;
+import org.apache.commons.fileupload.disk.DiskFileItem;
 import org.apache.commons.fileupload.disk.DiskFileItemFactory;
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
 import org.apache.commons.fileupload.servlet.ServletRequestContext;
@@ -48,7 +48,7 @@ import com.xpn.xwiki.plugin.XWikiPluginInterface;
  * Plugin that offers access to uploaded files. The uploaded files are automatically parsed and preserved as a list of
  * {@link FileItem}s.
  * 
- * @version $Id$
+ * @version $Id: 12b3e2df32507aab8981bdb10ca4e07d74d01bcc $
  */
 public class FileUploadPlugin extends XWikiDefaultPlugin implements XWikiPluginInterface
 {
@@ -225,7 +225,28 @@ public class FileUploadPlugin extends XWikiDefaultPlugin implements XWikiPluginI
         }
 
         // Get the FileUpload Data
-        DiskFileItemFactory factory = new DiskFileItemFactory();
+        // Make sure the factory only ever creates file items which will be deleted when the jvm is stopped.
+        DiskFileItemFactory factory = new DiskFileItemFactory() {
+            public FileItem createItem(String fieldName, String contentType, boolean isFormField, String fileName)
+            {
+                try {
+                    final DiskFileItem item =
+                        (DiskFileItem) super.createItem(fieldName, contentType, isFormField, fileName);
+                    // Needed to make sure the File object is created.
+                    item.getOutputStream();
+                    item.getStoreLocation().deleteOnExit();
+                    return item;
+                } catch (IOException e) {
+                    String path = System.getProperty("java.io.tmpdir");
+                    if (super.getRepository() != null) {
+                        path = super.getRepository().getPath();
+                    }
+                    throw new RuntimeException("Unable to create a temporary file for saving the attachment. "
+                                               + "Do you have write access on " + path + "?");
+                }
+            }
+        };
+
         factory.setSizeThreshold(uploadSizeThreashold);
 
         if (tempdir != null) {
@@ -251,7 +272,7 @@ public class FileUploadPlugin extends XWikiDefaultPlugin implements XWikiPluginI
         } catch (FileUploadBase.SizeLimitExceededException e) {
             throw new XWikiException(XWikiException.MODULE_XWIKI_APP,
                 XWikiException.ERROR_XWIKI_APP_FILE_EXCEPTION_MAXSIZE, "Exception uploaded file");
-        } catch (FileUploadException e) {
+        } catch (Exception e) {
             throw new XWikiException(XWikiException.MODULE_XWIKI_APP,
                 XWikiException.ERROR_XWIKI_APP_UPLOAD_PARSE_EXCEPTION, "Exception while parsing uploaded file", e);
         }

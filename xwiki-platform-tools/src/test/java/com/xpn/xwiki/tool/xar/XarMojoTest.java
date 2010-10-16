@@ -32,6 +32,7 @@ import org.apache.maven.model.Build;
 import org.apache.maven.model.Resource;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.testing.AbstractMojoTestCase;
+import org.apache.maven.plugin.testing.SilentLog;
 import org.apache.maven.project.MavenProject;
 import org.codehaus.plexus.archiver.zip.ZipFile;
 import org.codehaus.plexus.archiver.zip.ZipUnArchiver;
@@ -44,11 +45,6 @@ import org.codehaus.plexus.archiver.zip.ZipUnArchiver;
  */
 public class XarMojoTest extends AbstractMojoTestCase
 {
-    /**
-     * The name of the XarMojo class.
-     */
-    protected static final String XARMOJO = "XarMojo";
-
     protected static final String TESTRESSOURCES_PATH = "target/test-classes";
 
     /**
@@ -75,6 +71,8 @@ public class XarMojoTest extends AbstractMojoTestCase
      */
     private File tempDir;
 
+    private XarMojo mojo;
+
     /**
      * Preparing the environment for a test.
      * 
@@ -89,31 +87,27 @@ public class XarMojoTest extends AbstractMojoTestCase
         }
         assertTrue("Cannot create a temporary directory at " + this.tempDir.getAbsolutePath(), this.tempDir.mkdirs());
         super.setUp();
+
+        this.mojo = new XarMojo();
+        this.mojo.setLog(new SilentLog());
     }
 
     /**
      * Test method for {@link com.xpn.xwiki.tool.xar.XarMojo#execute()}. It provides an invalid package.xml and the
      * class must throw an exception in order to pass the test.
-     * 
+     *
      * @throws Exception if the XarMojo class fails to instantiate
      */
-    public void testInvalidXml() throws Exception
+    public void testInvalidPackageXmlThrowsException() throws Exception
     {
-        boolean exceptionOccured = false;
-        XarMojo mojo = new XarMojo();
-        assertNotNull(mojo);
-
         MavenProject project = getMavenProjectInvalidXml();
-        setVariableValueToObject(mojo, MAVENPROJECT_FIELD, project);
+        setVariableValueToObject(this.mojo, MAVENPROJECT_FIELD, project);
 
         try {
-            mojo.execute();
-        } catch (MojoExecutionException e) {
-            // the execution has failed, like it should have
-            exceptionOccured = true;
-        }
-        if (!exceptionOccured) {
-            fail("In case of an invalid package.xml, it should end up with an error.");
+            this.mojo.execute();
+            fail("Should have raised an exception since the provided package.xml is invalid.");
+        } catch (MojoExecutionException expected) {
+            // Expected
         }
     }
 
@@ -123,17 +117,14 @@ public class XarMojoTest extends AbstractMojoTestCase
      * 
      * @throws Exception if the XarMojo class fails to instantiate
      */
-    public void testValidXml() throws Exception
+    public void testValidPackageXml() throws Exception
     {
-        XarMojo mojo = new XarMojo();
-        assertNotNull("Failed to initalize the  XarMojo class", mojo);
-
         MavenProject project = getMavenProjectValidXml();
-        setVariableValueToObject(mojo, MAVENPROJECT_FIELD, project);
+        setVariableValueToObject(this.mojo, MAVENPROJECT_FIELD, project);
 
         // Testing the plugin's execution
         try {
-            mojo.execute();
+            this.mojo.execute();
         } catch (MojoExecutionException e) {
             fail("The execution failed with the following error : " + e.getMessage());
         }
@@ -158,10 +149,10 @@ public class XarMojoTest extends AbstractMojoTestCase
             File currentFile = new File(this.tempDir, entryName);
             String documentName = XWikiDocument.getFullName(currentFile);
             if (!documentNames.contains(documentName)) {
-                fail("Document  " + documentName + " can't be found in the newly created xar archive.");
+                fail("Document [" + documentName + "] cannot be found in the newly created xar archive.");
             }
         }
-        assertEquals("The newly  created xar archive doesn't contain the required documents", documentNames.size(),
+        assertEquals("The newly created xar archive doesn't contain the required documents", documentNames.size(),
             countEntries);
 
     }
@@ -172,49 +163,43 @@ public class XarMojoTest extends AbstractMojoTestCase
      * 
      * @throws Exception if the XarMojo class fails to instantiate
      */
-    public void testNoXml() throws Exception
+    public void testNoPackageXml() throws Exception
     {
-        XarMojo mojo = new XarMojo();
-        assertNotNull("Failed to initalize the XarMojo class", mojo);
-
         MavenProject project = getMavenProjectNoXml();
-        setVariableValueToObject(mojo, MAVENPROJECT_FIELD, project);
+        setVariableValueToObject(this.mojo, MAVENPROJECT_FIELD, project);
 
         // Testing the plugin's execution
-        try {
-            mojo.execute();
-        } catch (MojoExecutionException e) {
-            fail("The execution failed with the following error: " + e.getMessage());
-        }
+        this.mojo.execute();
 
         // Checking whether the generated xar archive contains the right data.
-        ZipUnArchiver unarchiver = new ZipUnArchiver(new File(XAR_PATH_NOXML));
 
+        // Verify that the zip file contains the generated package.xml file
         ZipFile zip = new ZipFile(XAR_PATH_NOXML);
-        Enumeration entries = zip.getEntries();
-        assertTrue(entries.hasMoreElements());
-        assertEquals(entries.nextElement().toString(), XarMojo.PACKAGE_XML);
+        assertNotNull("Package.xml file not found in zip!", zip.getEntry(XarMojo.PACKAGE_XML));
 
+        // Extract package.xml and extract all the entries one by one and read them as a XWiki Document to verify
+        // they're valid.
+        ZipUnArchiver unarchiver = new ZipUnArchiver(new File(XAR_PATH_NOXML));
         unarchiver.extract(XarMojo.PACKAGE_XML, this.tempDir);
-
         Collection<String> documentNames = XarMojo.getDocumentNamesFromXML(new File(this.tempDir, XarMojo.PACKAGE_XML));
         int countEntries = 0;
-
+        Enumeration entries = zip.getEntries();
         while (entries.hasMoreElements()) {
             String entryName = entries.nextElement().toString();
-            ++countEntries;
-            unarchiver.extract(entryName, this.tempDir);
+            if (!entryName.equals(XarMojo.PACKAGE_XML)) {
+                ++countEntries;
+                unarchiver.extract(entryName, this.tempDir);
 
-            File currentFile = new File(this.tempDir, entryName);
-            String documentName = XWikiDocument.getFullName(currentFile);
-            if (!documentNames.contains(documentName)) {
-                fail("Document " + documentName + " cannot be found in the newly created xar archive.");
+                File currentFile = new File(this.tempDir, entryName);
+                String documentName = XWikiDocument.getFullName(currentFile);
+                if (!documentNames.contains(documentName)) {
+                    fail("Document [" + documentName + "] cannot be found in the newly created XAR archive.");
+                }
             }
         }
 
         assertEquals("The newly created xar archive doesn't contain the required documents", documentNames.size(),
             countEntries);
-
     }
 
     /**
@@ -305,7 +290,6 @@ public class XarMojoTest extends AbstractMojoTestCase
      */
     private MavenProject getMavenProjectNoXml() throws Exception
     {
-
         MavenProject project = new MavenProject();
 
         Build build = new Build();

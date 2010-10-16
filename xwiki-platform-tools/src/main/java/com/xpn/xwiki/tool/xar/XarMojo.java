@@ -55,7 +55,7 @@ public class XarMojo extends AbstractXarMojo
     /**
      * To look up Archiver/UnArchiver implementations.
      * 
-     * @parameter expression="${component.org.codehaus.plexus.archiver.manager.ArchiverManager}"
+     * @parameter role="org.codehaus.plexus.archiver.manager.ArchiverManager"
      * @required
      */
     protected ArchiverManager archiverManager;
@@ -75,7 +75,6 @@ public class XarMojo extends AbstractXarMojo
         try {
             performArchive();
         } catch (Exception e) {
-            e.printStackTrace();
             throw new MojoExecutionException("Error while creating XAR file", e);
         }
     }
@@ -320,12 +319,12 @@ public class XarMojo extends AbstractXarMojo
      */
     private void addFilesToArchive(ZipArchiver archiver, File sourceDir, File packageXml) throws Exception
     {
-        Collection<String> documentNames = null;
+        Collection<String> documentNames;
         getLog().info("Using the existing package.xml descriptor at [" + packageXml.getPath() + "]");
         try {
             documentNames = getDocumentNamesFromXML(packageXml);
         } catch (Exception e) {
-            getLog().error("The existing " + PACKAGE_XML + " is invalid.");
+            getLog().error("The existing [" + PACKAGE_XML + "] is invalid.");
             throw e;
         }
 

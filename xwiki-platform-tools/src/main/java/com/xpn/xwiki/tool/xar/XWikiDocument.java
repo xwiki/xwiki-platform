@@ -165,7 +165,7 @@ public class XWikiDocument
      */
     public static String getFullName(File file)
     {
-        XWikiDocument doc = null;
+        XWikiDocument doc;
         try {
             doc = new XWikiDocument();
             doc.fromXML(file);

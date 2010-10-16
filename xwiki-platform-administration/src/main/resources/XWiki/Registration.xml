@@ -730,7 +730,7 @@ $heading
     #set($userName = $!request.get('xwikiname'))
     #set($password = $!request.get('register_password'))
     #set($loginURL = $xwiki.getURL($loginPage, $loginAction))
-    #if($request.getParameter($redirectParam) != '')
+    #if("$!request.getParameter($redirectParam)" != '')
       #set($redirect = $request.getParameter($redirectParam))
     #else
       #set($redirect = $defaultRedirect)

@@ -49,19 +49,7 @@
     <dependency>
       <groupId>org.codehaus.plexus</groupId>
       <artifactId>plexus-archiver</artifactId>
-      <version>1.0-alpha-10</version>
-      <!-- We need to exclude some unnneeded transitive deps otherwise it fails under Maven 2.0.x.
-           See http://jira.codehaus.org/browse/MNG-3438 for full details. -->
-      <exclusions>
-        <exclusion>
-          <groupId>org.codehaus.plexus</groupId>
-          <artifactId>plexus-container-default</artifactId>
-        </exclusion>
-        <exclusion>
-          <groupId>org.codehaus.plexus</groupId>
-          <artifactId>plexus-component-api</artifactId>
-        </exclusion>
-      </exclusions>
+      <version>1.2</version>
     </dependency>
     <dependency>
       <groupId>org.codehaus.plexus</groupId>

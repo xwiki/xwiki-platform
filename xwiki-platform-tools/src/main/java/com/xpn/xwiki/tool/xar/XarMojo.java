@@ -55,7 +55,7 @@ public class XarMojo extends AbstractXarMojo
     /**
      * To look up Archiver/UnArchiver implementations.
      * 
-     * @parameter role="org.codehaus.plexus.archiver.manager.ArchiverManager"
+     * @parameter expression="${component.org.codehaus.plexus.archiver.manager.ArchiverManager}"
      * @required
      */
     protected ArchiverManager archiverManager;

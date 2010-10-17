@@ -1811,7 +1811,7 @@ ${Msz}Mb##
 </div> ## xwiki-livetable-container
   #if($xwiki.getCurrentContentSyntaxId() == "xwiki/2.0"){{/html}}
 
-  #else {/pre} #end
+#else {/pre} #end
 #end
 
 #**

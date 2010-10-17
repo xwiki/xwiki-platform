@@ -20,9 +20,11 @@
 <validationScript></validationScript>
 <comment></comment>
 <minorEdit>false</minorEdit>
-<syntaxId>xwiki/1.0</syntaxId>
-<content>## Administrate the wiki import.
-{pre}
+<syntaxId>xwiki/2.0</syntaxId>
+<hidden>false</hidden>
+<content>{{velocity}}
+## Administrate the wiki import.
+{{html}}
 #template('importinline.vm')
-{/pre}</content>
-</xwikidoc>
+{{/html}}
+{{/velocity}}</content></xwikidoc>

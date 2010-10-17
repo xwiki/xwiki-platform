@@ -20,11 +20,13 @@
 <validationScript></validationScript>
 <comment></comment>
 <minorEdit>false</minorEdit>
-<syntaxId>xwiki/1.0</syntaxId>
-<content>### Globally administrate the registration of new users in a wiki.
+<syntaxId>xwiki/2.0</syntaxId>
+<hidden>false</hidden>
+<content>{{velocity output="false"}}
+### Globally administrate the registration of new users in a wiki.
 #set($legend = ['registration'])
 #set($params = $util.hashMap)
 #set($params.registration = ['use_email_verification', 'auth_active_check', 'validation_email_content', 'confirmation_email_content', 'invitation_email_content'])
-#includeForm('XWiki.AdminFieldsDisplaySheet')
-</content>
-</xwikidoc>
+{{/velocity}}
+{{include document="XWiki.AdminFieldsDisplaySheet" /}}
+</content></xwikidoc>

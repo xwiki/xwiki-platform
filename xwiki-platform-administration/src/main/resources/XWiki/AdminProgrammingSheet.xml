@@ -20,11 +20,13 @@
 <validationScript></validationScript>
 <comment></comment>
 <minorEdit>false</minorEdit>
-<syntaxId>xwiki/1.0</syntaxId>
-<content>### Globally administrate the programming preferences.
+<syntaxId>xwiki/2.0</syntaxId>
+<hidden>false</hidden>
+<content>{{velocity output="false"}}
+### Globally administrate the programming preferences.
 #set($legend = ['programming'])
 #set($params = $util.hashMap)
 #set($params.programming = ['macros_languages', 'macros_velocity', 'macros_groovy', 'macros_mapping', 'notification_pages', 'documentBundles'])
-#includeForm('XWiki.AdminFieldsDisplaySheet')
-</content>
-</xwikidoc>
+{{/velocity}}
+{{include document="XWiki.AdminFieldsDisplaySheet" /}}
+</content></xwikidoc>

@@ -20,9 +20,10 @@
 <validationScript></validationScript>
 <comment></comment>
 <minorEdit>false</minorEdit>
-<syntaxId>xwiki/1.0</syntaxId>
-<content>### Administrate the wiki export
-{pre}
+<syntaxId>xwiki/2.0</syntaxId>
+<hidden>false</hidden>
+<content>{{velocity}}
+{{html}}
 #template('exportinline.vm')
-{/pre}</content>
-</xwikidoc>
+{{/html}}
+{{/velocity}}</content></xwikidoc>

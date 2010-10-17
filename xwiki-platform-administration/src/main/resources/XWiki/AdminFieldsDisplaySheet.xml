@@ -25,7 +25,7 @@
 <content>{{velocity}}
 ### Sheet used to generically display the XWikiPreferences object fields in the administration sheets.
 #if ("$!section" != '')
-  ## clean="false" due to bug #XWIKI-4122 - the <legend> element is dropped.
+  ## clean="false" due to bug #XWIKI-4122 - the &lt;legend&gt; element is dropped.
   {{html clean="false"}}
   &lt;form id="$section.toLowerCase()" method="post" action="$xwiki.getURL($currentDoc, 'saveandcontinue')" onsubmit="cancelCancelEdit()"&gt;
     #foreach ($item in $legend)

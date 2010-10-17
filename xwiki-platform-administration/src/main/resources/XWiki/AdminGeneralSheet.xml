@@ -20,14 +20,15 @@
 <validationScript></validationScript>
 <comment></comment>
 <minorEdit>false</minorEdit>
-<syntaxId>xwiki/1.0</syntaxId>
+<syntaxId>xwiki/2.0</syntaxId>
 <hidden>false</hidden>
-<content>### Administrate general wiki preferences, at global level
+<content>{{velocity output="false"}}
+### Administrate general wiki preferences, at global level
 #set($legend = ['language', 'editor', 'admin', 'smtp'])
 #set($params = $util.hashMap)
 #set($params.language = ['multilingual', 'languages' , 'default_language', 'dateformat'])
 #set($params.editor = ['editor', 'core.defaultDocumentSyntax', 'xwiki.title.mandatory'])
 #set($params.admin = ['admin_email'])
 #set($params.smtp = ['smtp_server', 'smtp_port', 'smtp_server_username', 'smtp_server_password', 'javamail_extra_props'])
-#includeForm('XWiki.AdminFieldsDisplaySheet')</content>
-</xwikidoc>
+{{/velocity}}
+{{include document="XWiki.AdminFieldsDisplaySheet" /}}</content></xwikidoc>

@@ -20,8 +20,10 @@
 <validationScript></validationScript>
 <comment></comment>
 <minorEdit>false</minorEdit>
-<syntaxId>xwiki/1.0</syntaxId>
-<content>### Administrate the presentation preferences globally and at space level.
+<syntaxId>xwiki/2.0</syntaxId>
+<hidden>false</hidden>
+<content>{{velocity output="false"}}
+### Administrate the presentation preferences globally and at space level.
 #if("$!editor" == 'globaladmin')
   #set($legend = ['header', 'panels', 'footer', 'skin'])
 #else
@@ -36,5 +38,5 @@
 #else
   #set($params.skin = ['skin', 'stylesheet', 'stylesheets'])
 #end
-#includeForm('XWiki.AdminFieldsDisplaySheet')</content>
-</xwikidoc>
+{{/velocity}}
+{{include document="XWiki.AdminFieldsDisplaySheet" /}}</content></xwikidoc>

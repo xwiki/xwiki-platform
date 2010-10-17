@@ -14,13 +14,13 @@
 <date>1106311617000</date>
 <contentUpdateDate>1106311617000</contentUpdateDate>
 <version>1.1</version>
-<title></title>
+<title>XWiki Preferences</title>
 <template></template>
 <defaultTemplate></defaultTemplate>
 <validationScript></validationScript>
 <comment></comment>
 <minorEdit>false</minorEdit>
-<syntaxId>xwiki/1.0</syntaxId>
+<syntaxId>xwiki/2.0</syntaxId>
 <hidden>false</hidden>
 <class>
 <name>XWiki.XWikiPreferences</name>
@@ -2835,5 +2835,4 @@ $xwiki.getDocument("XWiki.AccountValidation").getExternalURL("view", "validkey=$
 <webcopyright>This wiki is licensed under a &lt;a rel="license" href="http://creativecommons.org/licenses/by/2.0/"&gt;Creative Commons 2.0&lt;/a&gt; license</webcopyright>
 </property>
 </object>
-<content>#includeForm("XWiki.AdminSheet")</content>
-</xwikidoc>
+<content>{{include document="XWiki.AdminSheet" /}}</content></xwikidoc>

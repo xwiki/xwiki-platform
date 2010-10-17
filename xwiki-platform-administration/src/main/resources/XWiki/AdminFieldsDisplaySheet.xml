@@ -20,39 +20,39 @@
 <validationScript></validationScript>
 <comment></comment>
 <minorEdit>false</minorEdit>
-<syntaxId>xwiki/1.0</syntaxId>
+<syntaxId>xwiki/2.0</syntaxId>
 <hidden>false</hidden>
-<content>### Sheet used to generically display the XWikiPreferences object fields in the administration sheets.
+<content>{{velocity}}
+### Sheet used to generically display the XWikiPreferences object fields in the administration sheets.
 #if ("$!section" != '')
-{pre}
-&lt;form id="$section.toLowerCase()" method="post" action="$xwiki.getURL($currentDoc, 'saveandcontinue')" onsubmit="cancelCancelEdit()"&gt;
- #foreach($item in $legend)
-   #set($fields = $params.get($item))
-   &lt;fieldset class="$item"&gt;
+  ## clean="false" due to bug #XWIKI-4122 - the <legend> element is dropped.
+  {{html clean="false"}}
+  &lt;form id="$section.toLowerCase()" method="post" action="$xwiki.getURL($currentDoc, 'saveandcontinue')" onsubmit="cancelCancelEdit()"&gt;
+    #foreach ($item in $legend)
+      #set ($fields = $params.get($item))
+      &lt;fieldset class="$item"&gt;
       #if($legend.size() &gt; 1)
-      &lt;legend&gt;$msg.get("admin.${item}")&lt;/legend&gt;
+        &lt;legend&gt;$msg.get("admin.${item}")&lt;/legend&gt;
       #end
       #foreach($field in $fields)
         #set($prop = $obj.xWikiClass.get($field))
         #set($title = $msg.get($field))
-        #if($title == $field)
-         #if($prop)
-           #set($title = $!prop.prettyName)
-         #end
+        #if ($title == $field &amp;&amp; $prop)
+          #set ($title = $!prop.prettyName)
         #end
         &lt;p&gt;
           &lt;label #if($prop)for="${prefsclassname}_${obj.number}_${prop.name}"#end class="$field"&gt;$title
           #if($field == 'skin')
-           #set($skin = $xwiki.skin)
-           #if($skin.indexOf('.') != -1)
-             &amp;nbsp;&lt;span class="buttonwrapper"&gt;&lt;a href="$xwiki.getURL($skin)"&gt;$msg.get('admin.customize')&lt;/a&gt;&lt;/span&gt;
-           #end
+            #set ($skin = $xwiki.skin)
+            #if ($skin.indexOf('.') != -1)
+              &amp;nbsp;&lt;span class="buttonwrapper"&gt;&lt;a href="$xwiki.getURL($skin)"&gt;$msg.get('admin.customize')&lt;/a&gt;&lt;/span&gt;
+            #end
           #end
           #if($field == 'colorTheme')
-           #set($colorThemeName = $xwiki.getXWikiPreference('colorTheme'))
-           #if($colorThemeName.indexOf('.') != -1)
-             &amp;nbsp;&lt;span class="buttonwrapper"&gt;&lt;a href="$xwiki.getURL($colorThemeName, 'inline')"&gt;$msg.get('admin.customize')&lt;/a&gt;&lt;/span&gt;
-           #end
+            #set ($colorThemeName = $xwiki.getXWikiPreference('colorTheme'))
+            #if ($colorThemeName.indexOf('.') != -1)
+              &amp;nbsp;&lt;span class="buttonwrapper"&gt;&lt;a href="$xwiki.getURL($colorThemeName, 'inline')"&gt;$msg.get('admin.customize')&lt;/a&gt;&lt;/span&gt;
+            #end
           #end
           &lt;/label&gt;
           #if ($prop)
@@ -60,20 +60,20 @@
           #end
         &lt;/p&gt;
       #end
-   &lt;/fieldset&gt;
-  #end
-  &lt;div class="hidden"&gt;
-    &lt;input type="hidden" name="form_token" value="$!{services.csrf.getToken()}" /&gt;
-    &lt;input type="hidden" name="xcontinue" value="$xwiki.getURL($currentDoc, 'admin', "editor=${escapetool.url(${editor})}&amp;amp;section=${escapetool.url(${section})}&amp;amp;space=${escapetool.url(${currentSpace})}")" /&gt;
-    &lt;input type="hidden" name="xredirect" value="$xwiki.getURL($currentDoc, 'admin', "editor=${escapetool.url(${editor})}&amp;amp;section=${escapetool.url(${section})}&amp;amp;space=${escapetool.url(${currentSpace})}")" /&gt;
-    &lt;input type="hidden" name="classname" value="XWiki.XWikiPreferences" /&gt;
-  &lt;/div&gt;
-  &lt;div class="bottombuttons"&gt;
-     &lt;p class="admin-buttons"&gt;
+      &lt;/fieldset&gt;
+    #end
+    &lt;div class="hidden"&gt;
+      &lt;input type="hidden" name="form_token" value="$!{services.csrf.getToken()}" /&gt;
+      &lt;input type="hidden" name="xcontinue" value="$xwiki.getURL($currentDoc, 'admin', "editor=${escapetool.url(${editor})}&amp;amp;section=${escapetool.url(${section})}&amp;amp;space=${escapetool.url(${currentSpace})}")" /&gt;
+      &lt;input type="hidden" name="xredirect" value="$xwiki.getURL($currentDoc, 'admin', "editor=${escapetool.url(${editor})}&amp;amp;section=${escapetool.url(${section})}&amp;amp;space=${escapetool.url(${currentSpace})}")" /&gt;
+      &lt;input type="hidden" name="classname" value="XWiki.XWikiPreferences" /&gt;
+    &lt;/div&gt;
+    &lt;div class="bottombuttons"&gt;
+      &lt;p class="admin-buttons"&gt;
         &lt;span class="buttonwrapper"&gt;&lt;input class="button" type="submit" name="formactionsac" value="$msg.get('admin.save')" /&gt;&lt;/span&gt;
-     &lt;/p&gt;
-   &lt;/div&gt; ## bottombuttons
- &lt;/form&gt;
-{/pre}
-#end</content>
-</xwikidoc>
+      &lt;/p&gt;
+    &lt;/div&gt; ## bottombuttons
+  &lt;/form&gt;
+  {{/html}}
+#end
+{{/velocity}}</content></xwikidoc>

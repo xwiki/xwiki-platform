@@ -18,6 +18,10 @@
 <template></template>
 <defaultTemplate></defaultTemplate>
 <validationScript></validationScript>
+<comment></comment>
+<minorEdit>false</minorEdit>
+<syntaxId>xwiki/2.0</syntaxId>
+<hidden>false</hidden>
 <object>
 <class>
 <name>XWiki.XWikiGroups</name>
@@ -29,20 +33,21 @@
 <nameField></nameField>
 <validationScript></validationScript>
 <member>
+<disabled>0</disabled>
 <name>member</name>
-<prettyName>Member</prettyName>
-<unmodifiable>0</unmodifiable>
-<size>30</size>
 <number>1</number>
+<prettyName>Member</prettyName>
+<size>30</size>
+<unmodifiable>0</unmodifiable>
 <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
 </member>
 </class>
 <name>XWiki.XWikiAllGroup</name>
 <number>0</number>
 <className>XWiki.XWikiGroups</className>
+<guid>2ab32578-80c7-484a-bc49-fab0b3570609</guid>
 <property>
 <member>XWiki.Admin</member>
 </property>
 </object>
-<content>#includeForm("XWiki.XWikiGroupSheet")</content>
-</xwikidoc>
+<content>{{include document="XWiki.XWikiGroupSheet"/}}</content></xwikidoc>

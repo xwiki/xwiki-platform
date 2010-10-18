@@ -34,6 +34,8 @@
   <description>The client side of XWiki's WYSIWYG editor. This is a reusable rich text editor all written in GWT.</description>
   <properties>
     <gwt.args />
+    <!-- Skip Clirr execution because public API has been changed. Remove this after 2.5 release. -->
+    <xwiki.clirr.skip>true</xwiki.clirr.skip>
   </properties>
   <dependencies>
     <!-- GWT core dependencies -->

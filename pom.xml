@@ -37,7 +37,7 @@
   <description>XWiki Platform - Core - Parent POM</description>
   <properties>
     <!-- Versions of XWiki dependencies used in Core modules -->
-    <clirr.previous.version>2.5</clirr.previous.version>
+    <clirr.previous.version>2.4</clirr.previous.version>
   </properties>
   <scm>
     <connection>scm:svn:http://svn.xwiki.org/svnroot/xwiki/platform/core/trunk</connection>
@@ -194,6 +194,69 @@
                      exclude it for the moment. See http://bit.ly/c5Jnho Remove this exclude when the problem is fixed
                      in CLIRR. -->
                 <exclude>org/xwiki/officeimporter/openoffice/OpenOfficeManager$ManagerState</exclude>
+                <!-- TODO: Excludes below to be removed when we release XWiki 2.5 -->
+                <exclude>org/xwiki/bridge/DocumentAccessBridge</exclude>
+                <exclude>org/xwiki/rendering/configuration/RenderingConfiguration</exclude>
+                <exclude>org/xwiki/rendering/macro/script/AbstractScriptMacro</exclude>
+                <exclude>org/xwiki/rendering/macro/script/AbstractJSR223ScriptMacro</exclude>
+                <exclude>org/xwiki/rendering/wiki/WikiModel</exclude>
+                <exclude>org/xwiki/rendering/block/PlainTextBlockFilter</exclude>
+                <exclude>org/xwiki/rendering/block/LinkBlock</exclude>
+                <exclude>org/xwiki/rendering/block/ImageBlock</exclude>
+                <exclude>org/xwiki/rendering/listener/Link</exclude>
+                <exclude>org/xwiki/rendering/listener/LinkType</exclude>
+                <exclude>org/xwiki/rendering/listener/Attachment</exclude>
+                <exclude>org/xwiki/rendering/listener/DefaultAttachment</exclude>
+                <exclude>org/xwiki/rendering/listener/Image</exclude>
+                <exclude>org/xwiki/rendering/listener/DocumentImage</exclude>
+                <exclude>org/xwiki/rendering/listener/URLImage</exclude>
+                <exclude>org/xwiki/rendering/listener/CompositeListener</exclude>
+                <exclude>org/xwiki/rendering/listener/LinkListener</exclude>
+                <exclude>org/xwiki/rendering/listener/WrappingListener</exclude>
+                <exclude>org/xwiki/rendering/listener/QueueListener</exclude>
+                <exclude>org/xwiki/rendering/listener/AbstractImage</exclude>
+                <exclude>org/xwiki/rendering/listener/ImageListener</exclude>
+                <exclude>org/xwiki/rendering/listener/ImageType</exclude>
+                <exclude>org/xwiki/rendering/listener/chaining/AbstractChainingListener</exclude>
+                <exclude>org/xwiki/rendering/listener/chaining/BlockStateChainingListener</exclude>
+                <exclude>org/xwiki/rendering/listener/chaining/ConsecutiveNewLineStateChainingListener</exclude>
+                <exclude>org/xwiki/rendering/listener/chaining/EmptyBlockChainingListener</exclude>
+                <exclude>org/xwiki/rendering/listener/chaining/LookaheadChainingListener</exclude>
+                <exclude>org/xwiki/rendering/listener/chaining/TextOnNewLineStateChainingListener</exclude>
+                <exclude>org/xwiki/rendering/parser/LinkParser</exclude>
+                <exclude>org/xwiki/rendering/parser/ImageParser</exclude>
+                <exclude>org/xwiki/rendering/parser/AttachmentParser</exclude>
+                <exclude>org/xwiki/rendering/renderer/LinkLabelGenerator</exclude>
+                <exclude>org/xwiki/rendering/renderer/LinkReferenceSerializer</exclude>
+                <exclude>org/xwiki/rendering/renderer/URILabelGenerator</exclude>
+                <exclude>org/xwiki/rendering/renderer/XWikiSyntaxListenerChain</exclude>
+                <exclude>org/xwiki/rendering/renderer/xhtml/XHTMLImageRenderer</exclude>
+                <exclude>org/xwiki/rendering/renderer/xhtml/XHTMLLinkRenderer</exclude>
+                <exclude>org/xwiki/rendering/scaffolding/MockWikiModel</exclude>
+                <exclude>org/xwiki/rendering/scaffolding/RenderingTestSuite</exclude>
+                <exclude>org/xwiki/annotation/renderer/AbstractAnnotationRenderer</exclude>
+                <exclude>org/xwiki/annotation/renderer/LinkLabelGeneratorChainingListener</exclude>
+                <!-- Not really API changes, just moved to another project -->
+                <exclude>org/xwiki/component/manager/AbstractComponentDescriptorEvent</exclude>
+                <exclude>org/xwiki/component/manager/ComponentDescriptorAddedEvent</exclude>
+                <exclude>org/xwiki/component/manager/ComponentDescriptorRemovedEvent</exclude>
+                <exclude>org/xwiki/observation/EventListener</exclude>
+                <exclude>org/xwiki/observation/ObservationManager</exclude>
+                <exclude>org/xwiki/observation/event/AbstractDocumentEvent</exclude>
+                <exclude>org/xwiki/observation/event/AbstractFilterableEvent</exclude>
+                <exclude>org/xwiki/observation/event/ActionExecutionEvent</exclude>
+                <exclude>org/xwiki/observation/event/AllEvent</exclude>
+                <exclude>org/xwiki/observation/event/ApplicationStartedEvent</exclude>
+                <exclude>org/xwiki/observation/event/ApplicationStoppedEvent</exclude>
+                <exclude>org/xwiki/observation/event/DocumentDeleteEvent</exclude>
+                <exclude>org/xwiki/observation/event/DocumentSaveEvent</exclude>
+                <exclude>org/xwiki/observation/event/DocumentUpdateEvent</exclude>
+                <exclude>org/xwiki/observation/event/Event</exclude>
+                <exclude>org/xwiki/observation/event/FilterableEvent</exclude>
+                <exclude>org/xwiki/observation/event/filter/AlwaysMatchingEventFilter</exclude>
+                <exclude>org/xwiki/observation/event/filter/EventFilter</exclude>
+                <exclude>org/xwiki/observation/event/filter/FixedNameEventFilter</exclude>
+                <exclude>org/xwiki/observation/event/filter/RegexEventFilter</exclude>
               </excludes>
             </configuration>
           </plugin>

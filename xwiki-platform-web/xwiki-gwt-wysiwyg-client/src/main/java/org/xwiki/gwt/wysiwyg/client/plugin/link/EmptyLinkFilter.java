@@ -20,8 +20,10 @@
 package org.xwiki.gwt.wysiwyg.client.plugin.link;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
+import org.xwiki.gwt.dom.client.Document;
 import org.xwiki.gwt.user.client.StringUtils;
 import org.xwiki.gwt.user.client.ui.rta.RichTextArea;
 import org.xwiki.gwt.user.client.ui.rta.cmd.Command;
@@ -30,6 +32,7 @@ import org.xwiki.gwt.user.client.ui.rta.cmd.CommandManager;
 
 import com.google.gwt.dom.client.AnchorElement;
 import com.google.gwt.dom.client.Element;
+import com.google.gwt.dom.client.Node;
 import com.google.gwt.dom.client.NodeList;
 import com.google.gwt.dom.client.Style.Display;
 
@@ -100,8 +103,28 @@ public class EmptyLinkFilter implements CommandListener
      */
     private boolean isEmpty(AnchorElement anchor)
     {
-        // NOTE: Don't test the offsetHeight against 0 because it can be the same as the line height.
-        return !StringUtils.isEmpty(anchor.getHref()) && anchor.getOffsetWidth() == 0 && isDisplayed(anchor);
+        return !StringUtils.isEmpty(anchor.getHref()) && isDisplayed(anchor) && !isVisible(anchor);
+    }
+
+    /**
+     * Checks if an element or its contents are visible on the page.
+     * <p>
+     * NOTE: Checking the {@code offsetWidth} only on the given element is not enough because its child nodes could be
+     * floated. Also, we don't test the offsetHeight against 0 because it can be the same as the line height.
+     * 
+     * @param element a DOM element
+     * @return {@code true} if the given element is visible on the page, {@code false} otherwise
+     */
+    private boolean isVisible(Element element)
+    {
+        Iterator<Node> iterator = ((Document) element.getOwnerDocument()).getIterator(element);
+        while (iterator.hasNext()) {
+            Node node = iterator.next();
+            if (Element.is(node) && Element.as(node).getOffsetWidth() > 0) {
+                return true;
+            }
+        }
+        return false;
     }
 
     /**

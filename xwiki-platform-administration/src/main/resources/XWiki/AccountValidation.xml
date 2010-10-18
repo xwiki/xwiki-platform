@@ -20,15 +20,17 @@
 <validationScript></validationScript>
 <comment></comment>
 <minorEdit>false</minorEdit>
-<syntaxId>xwiki/1.0</syntaxId>
-<content>#if("$!{request.validkey}" != '' &amp;&amp; "$!{request.xwikiname}" != '')
+<syntaxId>xwiki/2.0</syntaxId>
+<hidden>false</hidden>
+<content>{{velocity}}
+#if("$!{request.validkey}" != '' &amp;&amp; "$!{request.xwikiname}" != '')
   #if($xwiki.validateUser(true) == 0)
     #set($loginURL = $xwiki.getURL('XWiki.XWikiLogin', 'login'))
-    #info($msg.get('xe.admin.accountvalidation.success', [${loginURL}]))
+    {{info}}{{html clean="false"}}$msg.get('xe.admin.accountvalidation.success', [${loginURL}]){{/html}}{{/info}}
   #else
-    #warning($msg.get('xe.admin.accountvalidation.failure'))
+    {{warning}}$msg.get('xe.admin.accountvalidation.failure'){{/warning}}
   #end
 #else
   $response.sendRedirect($xwiki.getURL('Main.WebHome'))
-#end</content>
-</xwikidoc>
+#end
+{{/velocity}}</content></xwikidoc>

@@ -64,9 +64,4 @@
       </plugin>
     </plugins>
   </build>
-  <properties>
-    <!-- Skip Clirr execution because xwiki-office-viewer and xwiki-office-macro have not been released yet, and
-      xwiki-office-importer has been renamed. Remove once XE 2.5M2 is released. -->
-    <xwiki.clirr.skip>true</xwiki.clirr.skip>
-  </properties>
 </project>

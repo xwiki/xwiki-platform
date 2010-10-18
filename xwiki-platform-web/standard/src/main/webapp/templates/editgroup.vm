@@ -137,5 +137,5 @@ $xwiki.ssfx.use('js/xwiki/table/livetable.css')
 //]]>
 </script>
 #else
-$xwiki.renderText($xwiki.getDocument("XWiki.XWikiGroupSheet").getContent(), $doc)
+ $doc.getRenderedContent()
 #end

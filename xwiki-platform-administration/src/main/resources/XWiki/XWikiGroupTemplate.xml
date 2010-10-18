@@ -19,6 +19,9 @@
 <defaultTemplate></defaultTemplate>
 <validationScript></validationScript>
 <comment></comment>
+<minorEdit>false</minorEdit>
+<syntaxId>xwiki/2.0</syntaxId>
+<hidden>false</hidden>
 <object>
 <class>
 <name>XWiki.XWikiGroups</name>
@@ -30,6 +33,7 @@
 <nameField></nameField>
 <validationScript></validationScript>
 <member>
+<disabled>0</disabled>
 <name>member</name>
 <number>1</number>
 <prettyName>Member</prettyName>
@@ -41,9 +45,9 @@
 <name>XWiki.XWikiGroupTemplate</name>
 <number>0</number>
 <className>XWiki.XWikiGroups</className>
+<guid>78a72679-f5f8-4113-b1a8-dc6591ce2afb</guid>
 <property>
 <member></member>
 </property>
 </object>
-<content>#includeForm("XWiki.XWikiGroupSheet")</content>
-</xwikidoc>
+<content>{{include document="XWiki.XWikiGroupSheet"/}}</content></xwikidoc>

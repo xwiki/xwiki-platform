@@ -4,6 +4,14 @@
 	"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
 <hibernate-mapping auto-import="true">
 
+<!--
+ All new table names should be all lower case versions of the name of the class which they represent
+ for example:
+ XWikiDocument should map to a table called xwikidocument
+ All new column names should be all lower case versions of the property which they represent for example:
+ fullName should map to a column called fullname
+-->
+
     <!-- com.xpn.xwiki.doc.XWikiDocument root -->
     <class name="com.xpn.xwiki.doc.XWikiDocument" table="xwikidoc">
         <id name="id" type="long" unsaved-value="undefined">

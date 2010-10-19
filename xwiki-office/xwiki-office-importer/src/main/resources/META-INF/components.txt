@@ -7,7 +7,6 @@ org.xwiki.officeimporter.internal.splitter.DefaultXDOMOfficeDocumentSplitter
 org.xwiki.officeimporter.internal.filter.AnchorFilter
 org.xwiki.officeimporter.internal.filter.ImageFilter
 org.xwiki.officeimporter.internal.filter.LineBreakFilter
-org.xwiki.officeimporter.internal.filter.LinkFilter
 org.xwiki.officeimporter.internal.filter.ListFilter
 org.xwiki.officeimporter.internal.filter.ParagraphFilter
 org.xwiki.officeimporter.internal.filter.RedundancyFilter

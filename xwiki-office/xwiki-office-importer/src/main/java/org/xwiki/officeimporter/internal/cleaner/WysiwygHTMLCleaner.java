@@ -76,13 +76,7 @@ public class WysiwygHTMLCleaner extends AbstractLogEnabled implements HTMLCleane
      */
     @Requirement("officeimporter/image")
     private HTMLFilter imageFilter;
-    
-    /**
-     * {@link HTMLFilter} for filtering html links.
-     */
-    @Requirement("officeimporter/link")
-    private HTMLFilter linkFilter;
-    
+
     /**
      * {@link HTMLFilter} for filtering lists.
      */
@@ -132,7 +126,6 @@ public class WysiwygHTMLCleaner extends AbstractLogEnabled implements HTMLCleane
             this.redundancyFilter,
             this.paragraphFilter,
             this.imageFilter,
-            this.linkFilter,
             this.listFilter,
             this.tableFilter));
         configuration.setFilters(filters);

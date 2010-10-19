@@ -79,12 +79,6 @@ public class OpenOfficeHTMLCleaner extends AbstractLogEnabled implements HTMLCle
     private HTMLFilter imageFilter;
     
     /**
-     * {@link HTMLFilter} for filtering HTML links.
-     */
-    @Requirement("officeimporter/link")
-    private HTMLFilter linkFilter;
-    
-    /**
      * {@link HTMLFilter} for filtering HTML anchors.
      */
     @Requirement("officeimporter/anchor")
@@ -149,7 +143,6 @@ public class OpenOfficeHTMLCleaner extends AbstractLogEnabled implements HTMLCle
             this.redundancyFilter,
             this.paragraphFilter,
             this.imageFilter,
-            this.linkFilter,
             this.anchorFilter,
             this.listFilter,
             this.tableFilter,

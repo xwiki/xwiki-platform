@@ -538,7 +538,9 @@ public class Context extends Api
      * 
      * @return an instance of the {@link com.xpn.xwiki.util.Util} class
      * @see Util
+     * @deprecated since 2.5RC1 the functions provided by Util are internal, please do not use them.
      */
+    @Deprecated
     public Util getUtil()
     {
         return this.context.getUtil();

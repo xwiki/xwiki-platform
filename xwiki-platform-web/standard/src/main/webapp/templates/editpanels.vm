@@ -1,3 +1,4 @@
+#if($isInServletMode)
 ## This template is necessary so that different skins can use different edit Panels.
 ## Thus each skin is allowed to override the editpanelsvars.vm file.
 #template("editpanelsvars.vm")
@@ -24,7 +25,7 @@
 <script type="text/javascript">
 //<![CDATA[
   if (browser.isIE || browser.isMozilla || browser.isGecko  || browser.isSafari) {
-    var panels = document.getElementById("editPanels");   
+    var panels = document.getElementById("editPanels");
     if(document.getElementById("xwikisyntaxhelppanel"))
         panels.removeChild(document.getElementById("xwikisyntaxhelppanel"));
     if (document.getElementById("simpleedittoolbar"))
@@ -32,4 +33,5 @@
   }
 //]]>
 </script>
+#end
 #end

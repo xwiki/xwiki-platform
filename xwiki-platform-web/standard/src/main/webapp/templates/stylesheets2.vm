@@ -38,3 +38,7 @@
   $style
 </style>
 #end
+
+## Hook for inserting CSS skin extensions
+<!-- com.xpn.xwiki.plugin.skinx.CssSkinExtensionPlugin -->
+<!-- com.xpn.xwiki.plugin.skinx.CssSkinFileExtensionPlugin -->

@@ -3,6 +3,6 @@
 #if($isInServletMode)
 </body>
 </html>
-#else
-##</div>## UIApplication (hack for eXo portal integration)
+#else ## Portlet Mode
+</div>
 #end

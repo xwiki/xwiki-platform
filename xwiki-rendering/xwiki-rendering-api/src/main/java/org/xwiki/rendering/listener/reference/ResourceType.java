@@ -28,7 +28,6 @@ package org.xwiki.rendering.listener.reference;
  * <li>relative URL ("path")</li>
  * <li>mail ("mailto")</li>
  * <li>attachment ("attach")</li>
- * <li>image ("image")</li>
  * </ul>
  * 
  * @version $Id$
@@ -65,11 +64,6 @@ public class ResourceType
      * Represents an attachment.
      */
     public static final ResourceType ATTACHMENT = new ResourceType("attach");
-
-    /**
-     * Represents an image.
-     */
-    public static final ResourceType IMAGE = new ResourceType("image");
 
     /**
      * @see #getScheme()

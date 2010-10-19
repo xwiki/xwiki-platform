@@ -34,6 +34,7 @@ import org.apache.commons.fileupload.RequestContext;
 import org.apache.commons.fileupload.disk.DiskFileItemFactory;
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
 import org.apache.commons.fileupload.servlet.ServletRequestContext;
+import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -417,7 +418,8 @@ public class FileUploadPlugin extends XWikiDefaultPlugin implements XWikiPluginI
     {
         FileItem fileitem = getFile(formfieldName, context);
 
-        return (fileitem == null) ? null : fileitem.getName();
+        // We need to strip the file path. See http://commons.apache.org/fileupload/faq.html#whole-path-from-IE
+        return (fileitem == null) ? null : FilenameUtils.getName(fileitem.getName());
     }
 
     /**

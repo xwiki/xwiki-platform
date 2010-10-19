@@ -651,6 +651,13 @@ public class XWikiAttachment implements Cloneable
         this.attachment_content.setContent(is, length);
     }
 
+    /**
+     * Set the content of the attachment from an InputStream.
+     *
+     * @param is the input stream that will be read
+     * @throws IOException when an error occurs during streaming operation
+     * @since 2.6M1
+     */
     public void setContent(InputStream is) throws IOException
     {
         if (this.attachment_content == null) {

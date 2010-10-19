@@ -34,6 +34,7 @@ import org.apache.commons.fileupload.disk.DiskFileItem;
 import org.apache.commons.fileupload.disk.DiskFileItemFactory;
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
 import org.apache.commons.fileupload.servlet.ServletRequestContext;
+import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -48,7 +49,7 @@ import com.xpn.xwiki.plugin.XWikiPluginInterface;
  * Plugin that offers access to uploaded files. The uploaded files are automatically parsed and preserved as a list of
  * {@link FileItem}s.
  * 
- * @version $Id: 12b3e2df32507aab8981bdb10ca4e07d74d01bcc $
+ * @version $Id$
  */
 public class FileUploadPlugin extends XWikiDefaultPlugin implements XWikiPluginInterface
 {
@@ -438,7 +439,8 @@ public class FileUploadPlugin extends XWikiDefaultPlugin implements XWikiPluginI
     {
         FileItem fileitem = getFile(formfieldName, context);
 
-        return (fileitem == null) ? null : fileitem.getName();
+        // We need to strip the file path. See http://commons.apache.org/fileupload/faq.html#whole-path-from-IE
+        return (fileitem == null) ? null : FilenameUtils.getName(fileitem.getName());
     }
 
     /**

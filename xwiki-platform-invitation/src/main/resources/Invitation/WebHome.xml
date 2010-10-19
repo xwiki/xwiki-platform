@@ -970,7 +970,7 @@ $xwiki.get('ssx').use($config.get('commonPage'))
   #if($emailRegex.length() > 1)
     #set($emailRegexInternal = $emailRegex.substring(1, $mathtool.add($emailRegex.length(), -1)))
   #else
-    ## I don't expect this but want to maintain compatability.
+    ## I don't expect this but want to maintain compatibility.
     #set($emailRegexInternal = $emailRegex)
   #end
   #foreach($address in $allAddresses)

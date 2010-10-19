@@ -19,6 +19,14 @@
 # 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 # ---------------------------------------------------------------------------
 
+# ---------------------------------------------------------------------------
+# Optional ENV vars
+# -----------------
+#   XWIKI_OPTS - parameters passed to the Java VM when running XWiki
+#     e.g. to increase the memory allocated to the JVM to 1GB, use
+#       set XWIKI_OPTS=-Xmx1024m
+# ---------------------------------------------------------------------------
+
 # Ensure that the commands below are always started in the directory where this script is
 # located. To do this we compute the location of the current script.
 PRG="$0"
@@ -35,7 +43,11 @@ PRGDIR=`dirname "$PRG"`
 cd "$PRGDIR"
 
 JETTY_HOME=jetty
-JAVA_OPTS=-Xmx300m
+
+# If no XWIKI_OPTS env variable has been defined use default values.
+if [ -z "$XWIKI_OPTS" ] ; then
+  XWIKI_OPTS=-Xmx300m
+fi
 
 # The port on which to start Jetty can be passed to this script as the first argument
 if [ -n "$1" ]; then
@@ -60,7 +72,16 @@ mkdir -p $JETTY_HOME/logs 2>/dev/null
 # Ensure the work directory exists so that Jetty uses it for its temporary files.
 mkdir -p $JETTY_HOME/work 2>/dev/null
 
-# Specify port and key to stop a running Jetty instance
-JAVA_OPTS="$JAVA_OPTS -DSTOP.KEY=xwiki -DSTOP.PORT=$JETTY_STOPPORT"
+# Specify port on which HTTP requests will be handled
+XWIKI_OPTS="$XWIKI_OPTS -Djetty.port=$JETTY_PORT"
 
-java $JAVA_OPTS -Dfile.encoding=UTF8 -Djetty.port=$JETTY_PORT -Djetty.home=$JETTY_HOME -jar $JETTY_HOME/start.jar
+# Specify Jetty's home directory
+XWIKI_OPTS="$XWIKI_OPTS -Djetty.home=$JETTY_HOME"
+
+# Specify port and key to stop a running Jetty instance
+XWIKI_OPTS="$XWIKI_OPTS -DSTOP.KEY=xwiki -DSTOP.PORT=$JETTY_STOPPORT"
+
+# Specify the encoding to use
+XWIKI_OPTS="$XWIKI_OPTS -Dfile.encoding=UTF8"
+
+java $XWIKI_OPTS $3 $4 $5 $6 $7 $8 $9 -jar $JETTY_HOME/start.jar

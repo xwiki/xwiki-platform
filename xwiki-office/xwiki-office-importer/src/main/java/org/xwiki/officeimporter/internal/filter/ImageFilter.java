@@ -34,6 +34,9 @@ import org.xwiki.component.annotation.Requirement;
 import org.xwiki.model.reference.AttachmentReference;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
+import org.xwiki.rendering.listener.reference.ResourceReference;
+import org.xwiki.rendering.listener.reference.ResourceType;
+import org.xwiki.rendering.renderer.reference.ResourceReferenceSerializer;
 import org.xwiki.xml.html.filter.AbstractHTMLFilter;
 
 /**
@@ -51,6 +54,12 @@ public class ImageFilter extends AbstractHTMLFilter
      */
     @Requirement
     private DocumentAccessBridge documentAccessBridge;
+
+    /**
+     * Used to serialize the image reference as XHTML comment.
+     */
+    @Requirement("xhtmlmarker")
+    private ResourceReferenceSerializer xhtmlMarkerSerializer;
 
     /**
      * The component used to parse string document references.
@@ -99,7 +108,9 @@ public class ImageFilter extends AbstractHTMLFilter
                 image.setAttribute(ATTRIBUTE_SRC, src);
                 image.setAttribute(ATTRIBUTE_ALT, src);
             }
-            Comment beforeComment = htmlDocument.createComment("startimage:" + src);
+            Comment beforeComment =
+                htmlDocument.createComment("startimage:"
+                    + this.xhtmlMarkerSerializer.serialize(new ResourceReference(src, ResourceType.ATTACHMENT)));
             Comment afterComment = htmlDocument.createComment("stopimage");
             image.getParentNode().insertBefore(beforeComment, image);
             image.getParentNode().insertBefore(afterComment, image.getNextSibling());

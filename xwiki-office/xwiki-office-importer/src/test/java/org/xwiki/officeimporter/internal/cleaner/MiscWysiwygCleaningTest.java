@@ -67,7 +67,7 @@ public class MiscWysiwygCleaningTest extends AbstractHTMLCleaningTest
         Node startComment = image.getPreviousSibling();
         Node stopComment = image.getNextSibling();
         Assert.assertEquals(Node.COMMENT_NODE, startComment.getNodeType());
-        Assert.assertTrue(startComment.getNodeValue().equals("startimage:Missing.png"));
+        Assert.assertEquals("startimage:true|-|attach|-|Missing.png", startComment.getNodeValue());
         Assert.assertEquals("Missing.png", image.getAttribute("src"));
         Assert.assertEquals(Node.COMMENT_NODE, stopComment.getNodeType());
         Assert.assertTrue(stopComment.getNodeValue().equals("stopimage"));

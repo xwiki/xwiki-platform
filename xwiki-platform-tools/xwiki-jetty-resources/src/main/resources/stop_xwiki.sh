@@ -19,6 +19,14 @@
 # 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 # ---------------------------------------------------------------------------
 
+# ---------------------------------------------------------------------------
+# Optional ENV vars
+# -----------------
+#   XWIKI_OPTS - parameters passed to the Java VM when running XWiki
+#     e.g. to increase the memory allocated to the JVM to 1GB, use
+#       set XWIKI_OPTS=-Xmx1024m
+# ---------------------------------------------------------------------------
+
 # Ensure that the commands below are always started in the directory where this script is
 # located. To do this we compute the location of the current script.
 PRG="$0"
@@ -44,6 +52,9 @@ else
 fi
 
 # Specify port and key to stop a running Jetty instance
-JAVA_OPTS="-DSTOP.KEY=xwiki -DSTOP.PORT=$JETTY_STOPPORT"
+XWIKI_OPTS="$XWIKI_OPTS -DSTOP.KEY=xwiki -DSTOP.PORT=$JETTY_STOPPORT"
 
-java $JAVA_OPTS -Djetty.home=$JETTY_HOME -jar $JETTY_HOME/start.jar --stop
+# Specify Jetty's home directory
+XWIKI_OPTS="$XWIKI_OPTS -Djetty.home=$JETTY_HOME"
+
+java $XWIKI_OPTS -jar $JETTY_HOME/start.jar --stop

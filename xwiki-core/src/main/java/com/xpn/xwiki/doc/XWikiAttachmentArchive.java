@@ -74,11 +74,19 @@ public class XWikiAttachmentArchive implements Cloneable
     // Document Archive
     private Archive archive;
 
+    /**
+     * @deprecated since 2.6M1 please do not use this, it is bound to a jrcs based implementation.
+     */
+    @Deprecated
     public Archive getRCSArchive()
     {
         return this.archive;
     }
 
+    /**
+     * @deprecated since 2.6M1 please do not use this, it is bound to a jrcs based implementation.
+     */
+    @Deprecated
     public void setRCSArchive(Archive archive)
     {
         this.archive = archive;

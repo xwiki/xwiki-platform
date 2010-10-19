@@ -549,6 +549,10 @@ public class XWikiAttachment implements Cloneable
         return this.attachment_content.getContentInputStream();
     }
 
+    /**
+     * @deprecated since 2.6M1 please do not use this, it is bound to a jrcs based implementation.
+     */
+    @Deprecated
     public Archive getArchive()
     {
         if (this.attachment_archive == null) {
@@ -558,6 +562,10 @@ public class XWikiAttachment implements Cloneable
         }
     }
 
+    /**
+     * @deprecated since 2.6M1 please do not use this, it is bound to a jrcs based implementation.
+     */
+    @Deprecated
     public void setArchive(Archive archive)
     {
         if (this.attachment_archive == null) {

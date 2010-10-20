@@ -29,7 +29,7 @@ import org.xwiki.rendering.listener.reference.ResourceReference;
  * Renderers. For example the XHTML Link Renderer needs to know if a wiki document exists in order to know how to
  * generate the HTML (in order to display a question mark for non existing documents) and it also needs to get the URL
  * pointing the wiki document.
- * 
+ *
  * @version $Id$
  * @since 2.0M1
  */
@@ -37,23 +37,19 @@ import org.xwiki.rendering.listener.reference.ResourceReference;
 public interface WikiModel
 {
     /**
-     * @param attachmentReference the reference to the attachment
-     * @return the URL to the attachment
+     * @param linkReference the reference to the link resource
+     * @return the URL to the link resource (the resource could be a document, a URL, a path, etc)
      * @since 2.5RC1
      */
-    String getAttachmentURL(ResourceReference attachmentReference);
+    String getLinkURL(ResourceReference linkReference);
 
     /**
-     * Generate image specific URL. The difference with {@link #getAttachmentURL(org.xwiki.rendering.listener.reference.ResourceReference)} is that in some
-     * implementation we want to make a distinction between displayed image and a simple link targeting an attachment
-     * file.
-     *
-     * @param attachmentReference the reference to the attachment
-     * @param parameters the custom parameters
-     * @return the URL to the image
+     * @param imageReference the reference to the image resource
+     * @param parameters the optional parameters passed to the image reference (width, height, etc)
+     * @return the URL to the image resource (the resource could be an attacment in a document, an icon, etc)
      * @since 2.5RC1
      */
-    String getImageURL(ResourceReference attachmentReference, Map<String, String> parameters);
+    String getImageURL(ResourceReference imageReference, Map<String, String> parameters);
 
     /**
      * @param documentReference the reference to the document

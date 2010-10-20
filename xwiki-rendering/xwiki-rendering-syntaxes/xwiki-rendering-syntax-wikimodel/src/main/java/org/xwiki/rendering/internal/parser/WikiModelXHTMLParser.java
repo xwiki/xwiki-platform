@@ -28,6 +28,7 @@ import org.wikimodel.wem.xhtml.handler.TagHandler;
 import org.wikimodel.wem.xhtml.impl.XhtmlHandler.TagStack;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.Requirement;
+import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.rendering.block.XDOM;
 import org.xwiki.rendering.internal.parser.wikimodel.AbstractWikiModelParser;
 import org.xwiki.rendering.internal.parser.wikimodel.XWikiGeneratorListener;
@@ -44,7 +45,6 @@ import org.xwiki.rendering.parser.ResourceReferenceParser;
 import org.xwiki.rendering.parser.ParseException;
 import org.xwiki.rendering.parser.StreamParser;
 import org.xwiki.rendering.renderer.PrintRendererFactory;
-import org.xwiki.rendering.renderer.reference.link.URILabelGenerator;
 import org.xwiki.rendering.syntax.Syntax;
 import org.xwiki.rendering.util.IdGenerator;
 import org.xwiki.xml.XMLReaderFactory;
@@ -82,8 +82,8 @@ public class WikiModelXHTMLParser extends AbstractWikiModelParser
     @Requirement("xwiki/2.1")
     private PrintRendererFactory xwikiSyntaxPrintRendererFactory;
 
-    @Requirement("attach")
-    private URILabelGenerator attachURILabelGenerator;
+    @Requirement
+    private ComponentManager componentManager;
 
     @Requirement("xhtmlmarker")
     private ResourceReferenceParser xhtmlMarkerResourceReferenceParser;
@@ -147,9 +147,8 @@ public class WikiModelXHTMLParser extends AbstractWikiModelParser
 
         XhtmlParser parser = new XhtmlParser();
         parser.setExtraHandlers(handlers);
-        parser.setCommentHandler(new XWikiCommentHandler(this, getImageReferenceParser(), 
-            this.xwikiSyntaxPrintRendererFactory, this.attachURILabelGenerator,
-            this.xhtmlMarkerResourceReferenceParser));
+        parser.setCommentHandler(new XWikiCommentHandler(this.componentManager, this, getImageReferenceParser(),
+            this.xwikiSyntaxPrintRendererFactory, this.xhtmlMarkerResourceReferenceParser));
 
         // Construct our own XML filter chain since we want to use our own Comment filter.
         try {

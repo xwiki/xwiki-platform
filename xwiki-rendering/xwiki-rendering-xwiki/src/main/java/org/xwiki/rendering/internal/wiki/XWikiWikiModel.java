@@ -29,6 +29,7 @@ import org.apache.commons.lang.StringUtils;
 import org.w3c.css.sac.InputSource;
 import org.w3c.dom.css.CSSStyleDeclaration;
 import org.xwiki.bridge.DocumentAccessBridge;
+import org.xwiki.bridge.SkinAccessBridge;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.Requirement;
 import org.xwiki.model.reference.AttachmentReferenceResolver;
@@ -38,6 +39,7 @@ import org.xwiki.rendering.internal.configuration.XWikiRenderingConfiguration;
 import org.xwiki.rendering.listener.reference.AttachmentResourceReference;
 import org.xwiki.rendering.listener.reference.DocumentResourceReference;
 import org.xwiki.rendering.listener.reference.ResourceReference;
+import org.xwiki.rendering.listener.reference.ResourceType;
 import org.xwiki.rendering.wiki.WikiModel;
 
 import com.steadystate.css.parser.CSSOMParser;
@@ -79,6 +81,12 @@ public class XWikiWikiModel implements WikiModel
     private DocumentAccessBridge documentAccessBridge;
 
     /**
+     * Used to find the URL for an icon.
+     */
+    @Requirement
+    private SkinAccessBridge skinAccessBridge;
+
+    /**
      * The component used to serialize entity references to strings.
      */
     @Requirement
@@ -98,14 +106,14 @@ public class XWikiWikiModel implements WikiModel
     /**
      * {@inheritDoc}
      *
-     * @see WikiModel#getAttachmentURL(org.xwiki.rendering.listener.reference.ResourceReference)
+     * @see WikiModel#getLinkURL(org.xwiki.rendering.listener.reference.ResourceReference)
      * @since 2.5RC1 
      */
-    public String getAttachmentURL(ResourceReference attachmentReference)
+    public String getLinkURL(ResourceReference linkReference)
     {
         return this.documentAccessBridge.getAttachmentURL(
-            this.currentAttachmentReferenceResolver.resolve(attachmentReference.getReference()),
-            attachmentReference.getParameter(AttachmentResourceReference.QUERY_STRING), true);
+            this.currentAttachmentReferenceResolver.resolve(linkReference.getReference()),
+            linkReference.getParameter(AttachmentResourceReference.QUERY_STRING), true);
     }
 
     /**
@@ -115,9 +123,15 @@ public class XWikiWikiModel implements WikiModel
      *      java.util.Map)
      * @since 2.5RC1
      */
-    public String getImageURL(ResourceReference attachmentReference, Map<String, String> parameters)
+    public String getImageURL(ResourceReference imageReference, Map<String, String> parameters)
     {
-        String url = getAttachmentURL(attachmentReference);
+        // Handle icon references
+        if (imageReference.getType().equals(ResourceType.ICON)) {
+            return this.skinAccessBridge.getIconURL(imageReference.getReference());
+        }
+
+        // Handle attachment references
+        String url = getLinkURL(imageReference);
         if (!this.xwikiRenderingConfiguration.isImageDimensionsIncludedInImageURL()) {
             return url;
         }

@@ -82,7 +82,7 @@ public class AttachmentXHTMLLinkTypeRenderer extends AbstractXHTMLLinkTypeRender
         Map<String, String> anchorAttributes)
     {
         if (this.wikiModel != null) {
-            anchorAttributes.put(XHTMLLinkRenderer.HREF, this.wikiModel.getAttachmentURL(reference));
+            anchorAttributes.put(XHTMLLinkRenderer.HREF, this.wikiModel.getLinkURL(reference));
         } else {
             anchorAttributes.put(XHTMLLinkRenderer.HREF, this.defaultResourceReferenceTypeSerializer.serialize(
                 reference));

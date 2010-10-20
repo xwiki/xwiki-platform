@@ -54,4 +54,16 @@ public class DefaultSkinAccessBridge implements SkinAccessBridge
         XWiki xwiki = xcontext.getWiki();
         return xwiki.getSkinFile(fileName, xcontext);
     }
+
+    /**
+     * {@inheritDoc}
+     * @see org.xwiki.bridge.SkinAccessBridge#getIconURL(String)
+     * @since 2.6M1
+     */
+    public String getIconURL(String iconName)
+    {
+        XWikiContext xcontext = getContext();
+        XWiki xwiki = xcontext.getWiki();
+        return xwiki.getIconURL(iconName, xcontext);
+    }
 }

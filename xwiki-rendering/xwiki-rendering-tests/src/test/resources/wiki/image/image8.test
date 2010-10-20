@@ -15,11 +15,11 @@ endDocument
 .#-----------------------------------------------------
 .expect|xhtml/1.0
 .#-----------------------------------------------------
-<p><img src="attachmenturl" param2="value2" alt="Space.ExistingPage@my.png?param1=value1"/></p>
+<p><img src="imageurl" param2="value2" alt="Space.ExistingPage@my.png?param1=value1"/></p>
 .#-----------------------------------------------------
 .expect|annotatedxhtml/1.0
 .#-----------------------------------------------------
-<p><!--startimage:false|-|attach|-|Space.ExistingPage@my.png?param1=value1--><img src="attachmenturl" param2="value2" alt="Space.ExistingPage@my.png?param1=value1"/><!--stopimage--></p>
+<p><!--startimage:false|-|attach|-|Space.ExistingPage@my.png?param1=value1--><img src="imageurl" param2="value2" alt="Space.ExistingPage@my.png?param1=value1"/><!--stopimage--></p>
 .#-----------------------------------------------------
 .expect|xwiki/2.0
 .#-----------------------------------------------------
@@ -27,4 +27,4 @@ endDocument
 .#-----------------------------------------------------
 .input|xhtml/1.0
 .#-----------------------------------------------------
-<p><!--startimage:false|-|attach|-|Space.ExistingPage@my.png?param1=value1--><img src="attachmenturl" param2="value2" alt="Space.ExistingPage@my.png?param1=value1"/><!--stopimage--></p>
+<p><!--startimage:false|-|attach|-|Space.ExistingPage@my.png?param1=value1--><img src="imageurl" param2="value2" alt="Space.ExistingPage@my.png?param1=value1"/><!--stopimage--></p>

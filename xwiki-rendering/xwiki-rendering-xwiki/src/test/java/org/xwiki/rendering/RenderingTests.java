@@ -60,7 +60,7 @@ public class RenderingTests extends TestCase
         // Attachment Reference Resolver Mock
         final AttachmentReferenceResolver<String> mockResolver = mockery.mock(AttachmentReferenceResolver.class);
         mockery.checking(new Expectations() {{
-            oneOf(mockResolver).resolve("Space.ExistingPage@my.png");
+            allowing(mockResolver).resolve("Space.ExistingPage@my.png");
             will(returnValue(
                 new AttachmentReference("my.png", new DocumentReference("wiki", "Space", "ExistingPage"))));
         }});

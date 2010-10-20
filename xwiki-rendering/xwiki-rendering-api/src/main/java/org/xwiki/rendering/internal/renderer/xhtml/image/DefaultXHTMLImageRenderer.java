@@ -63,9 +63,6 @@ public class DefaultXHTMLImageRenderer implements XHTMLImageRenderer, Initializa
     @Requirement
     private ComponentManager componentManager;
 
-    @Requirement("attach")
-    private URILabelGenerator attachURILabelGenerator;
-    
     /**
      * {@inheritDoc}
      *
@@ -114,7 +111,7 @@ public class DefaultXHTMLImageRenderer implements XHTMLImageRenderer, Initializa
 
         // First we need to compute the image URL.
         String imageURL;
-        if (reference.getType().equals(ResourceType.ATTACHMENT)) {
+        if (reference.getType().equals(ResourceType.ATTACHMENT) || reference.getType().equals(ResourceType.ICON)) {
             // Note if wikiModel is null then all Image reference objects will be of type URL. This must be ensured by
             // the Image Reference parser used beforehand. However we're adding a protection here against Image
             // Reference parsers that would not honor this contract...
@@ -140,10 +137,23 @@ public class DefaultXHTMLImageRenderer implements XHTMLImageRenderer, Initializa
 
         // If no ALT attribute has been specified, add it since the XHTML specifications makes it mandatory.
         if (!parameters.containsKey(ALTERNATE)) {
-            attributes.put(ALTERNATE, this.attachURILabelGenerator.generateLabel(reference));
+            attributes.put(ALTERNATE, computeAltAttributeValue(reference));
         }
 
         // And generate the XHTML IMG element.
         getXHTMLWikiPrinter().printXMLElement(IMG, attributes);
+    }
+
+    private String computeAltAttributeValue(ResourceReference reference)
+    {
+        String label;
+        try {
+            URILabelGenerator uriLabelGenerator = this.componentManager.lookup(URILabelGenerator.class,
+                reference.getType().getScheme());
+            label = uriLabelGenerator.generateLabel(reference);
+        } catch (ComponentLookupException e) {
+            label = reference.getReference();
+        }
+        return label;
     }
 }

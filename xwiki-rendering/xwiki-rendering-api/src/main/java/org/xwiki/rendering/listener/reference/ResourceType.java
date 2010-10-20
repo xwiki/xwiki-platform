@@ -66,6 +66,11 @@ public class ResourceType
     public static final ResourceType ATTACHMENT = new ResourceType("attach");
 
     /**
+     * Represents an icon.
+     */
+    public static final ResourceType ICON = new ResourceType("icon");
+
+    /**
      * @see #getScheme()
      */
     private String scheme;

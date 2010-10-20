@@ -54,12 +54,12 @@ public class MockWikiModel implements WikiModel
     /**
      * {@inheritDoc}
      *
-     * @see WikiModel#getAttachmentURL(org.xwiki.rendering.listener.reference.ResourceReference)
+     * @see WikiModel#getLinkURL(org.xwiki.rendering.listener.reference.ResourceReference)
      * @since 2.5RC1
      */
-    public String getAttachmentURL(ResourceReference attachmentReference)
+    public String getLinkURL(ResourceReference linkReference)
     {
-        String queryString = attachmentReference.getParameter(AttachmentResourceReference.QUERY_STRING);
+        String queryString = linkReference.getParameter(AttachmentResourceReference.QUERY_STRING);
         return "attachmenturl" + (queryString != null ? "?" + queryString : "");
     }
 
@@ -68,9 +68,10 @@ public class MockWikiModel implements WikiModel
      *
      * @see WikiModel#getImageURL(org.xwiki.rendering.listener.reference.ResourceReference , java.util.Map)
      */
-    public String getImageURL(ResourceReference attachmentReference, Map<String, String> parameters)
+    public String getImageURL(ResourceReference imageReference, Map<String, String> parameters)
     {
-        return getAttachmentURL(attachmentReference);
+        String queryString = imageReference.getParameter(AttachmentResourceReference.QUERY_STRING);
+        return "imageurl" + (queryString != null ? "?" + queryString : "");
     }
 
     /**

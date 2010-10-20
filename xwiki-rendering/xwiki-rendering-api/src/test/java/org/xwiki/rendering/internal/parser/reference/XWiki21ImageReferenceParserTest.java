@@ -60,5 +60,12 @@ public class XWiki21ImageReferenceParserTest extends AbstractImageReferenceParse
         Assert.assertTrue(reference.isTyped());
         Assert.assertEquals("Typed = [true] Type = [path] Reference = [/some/image]",
             reference.toString());
+
+        // Verify icon: support
+        reference = parser.parse("icon:name");
+        Assert.assertEquals(ResourceType.ICON, reference.getType());
+        Assert.assertEquals("name", reference.getReference());
+        Assert.assertTrue(reference.isTyped());
+        Assert.assertEquals("Typed = [true] Type = [icon] Reference = [name]", reference.toString());
     }
 }

@@ -17,31 +17,27 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.bridge;
+package org.xwiki.rendering.internal.parser.reference;
 
-import org.xwiki.component.annotation.ComponentRole;
+import org.xwiki.component.annotation.Component;
+import org.xwiki.rendering.listener.reference.ResourceType;
 
 /**
- * Exposes methods for accessing Skin data.
- * 
- * @version $Id$ 
- * @since 1.7
+ * Parses a resource reference to an icon.
+ *
+ * @version $Id$
+ * @since 2.6M1
  */
-@ComponentRole
-public interface SkinAccessBridge
+@Component("icon")
+public class IconResourceReferenceTypeParser extends AbstractURIResourceReferenceTypeParser
 {
     /**
-     * Gets a specific file from the current skin.
-     * @param fileName the required file
-     * @return the file's URL
+     * {@inheritDoc}
+     *
+     * @see org.xwiki.rendering.internal.parser.reference.AbstractURIResourceReferenceTypeParser#getType()
      */
-    String getSkinFile(String fileName);
-
-    /**
-     * @param iconName the standard name of an icon (it's not the name of the file on the filesystem, it's a generic
-     *        name, for example "success" for a success icon
-     * @return the URL to the icon resource
-     * @since 2.6M1
-     */
-    String getIconURL(String iconName);
+    public ResourceType getType()
+    {
+        return ResourceType.ICON;
+    }
 }

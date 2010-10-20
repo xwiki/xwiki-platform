@@ -1961,6 +1961,19 @@ public class XWiki implements XWikiDocChangeNotificationInterface
 
     }
 
+    /**
+     * @param iconName the standard name of an icon (it's not the name of the file on the filesystem, it's a generic
+     *        name, for example "success" for a success icon
+     * @return the URL to the icon resource
+     * @since 2.6M1
+     */
+    public String getIconURL(String iconName, XWikiContext context)
+    {
+        // TODO: Do a better mapping between generic icon name and physical resource name, especially to be independent
+        // of the underlying icon library. Right now we assume it's the Silk icon library.
+        return getSkinFile("icons/silk/" + iconName + ".gif", context);
+    }
+
     public String getSkinFile(String filename, XWikiContext context)
     {
         return getSkinFile(filename, false, context);

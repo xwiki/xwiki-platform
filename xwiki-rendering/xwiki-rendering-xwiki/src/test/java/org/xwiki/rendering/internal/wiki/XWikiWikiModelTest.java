@@ -28,6 +28,7 @@ import junit.framework.Assert;
 import org.jmock.Expectations;
 import org.junit.Test;
 import org.xwiki.bridge.DocumentAccessBridge;
+import org.xwiki.bridge.SkinAccessBridge;
 import org.xwiki.model.reference.AttachmentReference;
 import org.xwiki.model.reference.AttachmentReferenceResolver;
 import org.xwiki.model.reference.DocumentReference;
@@ -35,6 +36,8 @@ import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.rendering.internal.configuration.XWikiRenderingConfiguration;
 import org.xwiki.rendering.listener.reference.AttachmentResourceReference;
 import org.xwiki.rendering.listener.reference.DocumentResourceReference;
+import org.xwiki.rendering.listener.reference.ResourceReference;
+import org.xwiki.rendering.listener.reference.ResourceType;
 import org.xwiki.test.AbstractMockingComponentTestCase;
 import org.xwiki.test.annotation.MockingRequirement;
 
@@ -296,6 +299,23 @@ public class XWikiWikiModelTest extends AbstractMockingComponentTestCase
         // we can't use it for resizing the image on the server side so it's omitted from the query string.
         AttachmentResourceReference reference = new AttachmentResourceReference("attachmentReference");
         Assert.assertEquals("attachmentURL?height=75", wikiModel.getImageURL(reference, parameters));
+    }
+
+    @Test
+    public void testGetImageURLWhenIcon() throws Exception
+    {
+        ResourceReference reference = new ResourceReference("iconname", ResourceType.ICON);
+        final SkinAccessBridge skinAccessBridge = getComponentManager().lookup(SkinAccessBridge.class);
+        getMockery().checking(new Expectations()
+        {
+            {
+                oneOf(skinAccessBridge).getIconURL("iconname");
+                will(returnValue("/path/to/icon"));
+            }
+        });
+
+        Assert.assertEquals("/path/to/icon",
+            this.wikiModel.getImageURL(reference, Collections.<String, String>emptyMap()));
     }
 
     private void setUpCommonExpectations(final String expectedAttachmentURL, 

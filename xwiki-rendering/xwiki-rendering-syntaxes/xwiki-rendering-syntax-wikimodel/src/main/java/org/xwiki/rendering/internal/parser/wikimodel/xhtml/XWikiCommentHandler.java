@@ -26,6 +26,8 @@ import org.wikimodel.wem.WikiParameters;
 import org.wikimodel.wem.WikiReference;
 import org.wikimodel.wem.xhtml.handler.CommentHandler;
 import org.wikimodel.wem.xhtml.impl.XhtmlHandler.TagStack;
+import org.xwiki.component.manager.ComponentLookupException;
+import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.rendering.internal.parser.WikiModelXHTMLParser;
 import org.xwiki.rendering.internal.parser.wikimodel.XWikiGeneratorListener;
 import org.xwiki.rendering.listener.reference.ResourceReference;
@@ -58,7 +60,7 @@ public class XWikiCommentHandler extends CommentHandler
 
     private PrintRendererFactory xwikiSyntaxPrintRendererFactory;
 
-    private URILabelGenerator attachLinkLabelGenerator;
+    private ComponentManager componentManager;
 
     private ResourceReferenceParser xhtmlMarkerResourceReferenceParser;
 
@@ -73,14 +75,14 @@ public class XWikiCommentHandler extends CommentHandler
      * @todo Remove the need to pass a Parser when WikiModel implements support for wiki syntax in links. See
      *       http://code.google.com/p/wikimodel/issues/detail?id=87
      */
-    public XWikiCommentHandler(WikiModelXHTMLParser parser, ResourceReferenceParser imageReferenceParser,
-        PrintRendererFactory xwikiSyntaxPrintRendererFactory, URILabelGenerator attachLinkLabelGenerator,
+    public XWikiCommentHandler(ComponentManager componentManager, WikiModelXHTMLParser parser,
+        ResourceReferenceParser imageReferenceParser, PrintRendererFactory xwikiSyntaxPrintRendererFactory,
         ResourceReferenceParser xhtmlMarkerResourceReferenceParser)
     {
+        this.componentManager = componentManager;
         this.parser = parser;
         this.xwikiSyntaxPrintRendererFactory = xwikiSyntaxPrintRendererFactory;
         this.imageReferenceParser = imageReferenceParser;
-        this.attachLinkLabelGenerator = attachLinkLabelGenerator;
         this.xhtmlMarkerResourceReferenceParser = xhtmlMarkerResourceReferenceParser;
     }
 
@@ -187,9 +189,7 @@ public class XWikiCommentHandler extends CommentHandler
             // in the XHTML specifications.
             imageParams = (WikiParameters) stack.getStackParameter("imageParameters");
             WikiParameter alt = imageParams.getParameter("alt");
-            if (alt != null && alt.getValue().equals(
-                this.attachLinkLabelGenerator.generateLabel(imageReference)))
-            {
+            if (alt != null && alt.getValue().equals(computeAltAttributeValue(imageReference))) {
                 imageParams = imageParams.remove("alt");
             }
         }
@@ -200,5 +200,18 @@ public class XWikiCommentHandler extends CommentHandler
         stack.setStackParameter("isInImage", false);
         stack.setStackParameter("isFreeStandingImage", false);
         stack.setStackParameter("imageParameters", WikiParameters.EMPTY);
+    }
+
+    private String computeAltAttributeValue(ResourceReference reference)
+    {
+        String label;
+        try {
+            URILabelGenerator uriLabelGenerator = this.componentManager.lookup(URILabelGenerator.class,
+                reference.getType().getScheme());
+            label = uriLabelGenerator.generateLabel(reference);
+        } catch (ComponentLookupException e) {
+            label = reference.getReference();
+        }
+        return label;
     }
 }

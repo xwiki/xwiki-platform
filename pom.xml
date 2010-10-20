@@ -196,6 +196,9 @@
                 <exclude>org/xwiki/officeimporter/openoffice/OpenOfficeManager$ManagerState</exclude>
                 <!-- To be removed when we release 2.6 -->
                 <exclude>org/xwiki/rendering/listener/reference/ResourceType</exclude><!-- Removed field IMAGE -->
+                <exclude>org/xwiki/bridge/SkinAccessBridge</exclude><!-- New method getIconURL -->
+                <exclude>org/xwiki/rendering/wiki/WikiModel</exclude><!-- Renamed getAttachmentURL in getLinkURL -->
+                <exclude>org/xwiki/rendering/scaffolding/MockWikiModel</exclude><!-- Renamed getAttachmentURL in getLinkURL -->
               </excludes>
             </configuration>
           </plugin>

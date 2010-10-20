@@ -636,7 +636,14 @@ $heading
         #if($error == '' &amp;&amp; $validate.get('regex') &amp;&amp; $value &amp;&amp; $value != '')
           #set($regex = $validate.get('regex'))
           #if($regex.get('pattern') &amp;&amp; $regex.get('failureMessage'))
-            #if(!$xcontext.getUtil().match($regex.get('pattern'), $value))
+            ## Make Java regexes more compatible with Perl/js style regexes by removing leading and trailing /
+            #if($emailRegex.length() > 1)
+              #set($emailRegexNoSlashes = $emailRegex.substring(1, $mathtool.add($emailRegex.length(), -1)))
+            #else
+              ## I don't expect this but want to maintain compatibility.
+              #set($emailRegexNoSlashes = $emailRegex)
+            #end
+            #if($regextool.find($value, $emailRegexNoSlashes).isEmpty())
               #set($error = $regex.get('failureMessage'))
             #end
           #elseif($regex.get('pattern'))

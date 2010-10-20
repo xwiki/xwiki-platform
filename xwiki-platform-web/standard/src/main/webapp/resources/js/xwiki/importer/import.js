@@ -1,4 +1,6 @@
-(function(){
+var XWiki = (function(XWiki){
+
+    var importer = XWiki.importer = XWiki.importer || {};
 
     var translations = {
                 "availableDocuments" : "$msg.get('core.importer.availableDocuments')",
@@ -45,7 +47,7 @@
 
             // Create a package explorer widget to let the user browse
             // and select/unselect the documents he wants.          
-            new PackageExplorer( "packagecontainer", decodeURIComponent(file) );        
+            new importer.PackageExplorer( "packagecontainer", decodeURIComponent(file) );        
         });
       });
     }
@@ -70,7 +72,7 @@
     /**
      * Helper class to request the server informations about a package via AJAX.
      */
-    PackageInformationRequest = Class.create({
+    importer.PackageInformationRequest = Class.create({
         
         /**
          * Constructor of this class
@@ -119,7 +121,7 @@
     /**
      * A widget that allows to browse the contents of a package (a XAR).
      */
-    PackageExplorer = Class.create({
+    importer.PackageExplorer = Class.create({
 
         /**
          * Constructor of our widget.
@@ -142,7 +144,7 @@
             // Request the server for information about the desired package,
             // and bind the response to the proper callbacks (success or failure).
             this.node.addClassName("loading");
-            var ajx = new PackageInformationRequest(name,{
+            var ajx = new importer.PackageInformationRequest(name,{
               onSuccess: this.onPackageInfosAvailable.bind(this),
               onFailure: this.onPackageInfosRequestFailed.bind(this)
             });
@@ -387,7 +389,7 @@
          */
         addSpaceToPackage: function(space) 
         {   
-            var docNb = Object.keys(this.packageDocuments[space]).length;
+            var docNb = this.countDocumentsInSpace(space);
             var selection =  docNb + " / " + docNb + " " + translations["documentSelected"];
             
             var spaceItem = new Element("li", {'class':'xitem xunderline'});
@@ -455,9 +457,7 @@
         addDocumentToSpace: function(list, space, page) 
         {
             var trList = this.packageDocuments[space][page], self = this;
-            trList.sortBy(function(s){return s.language}).each(function(infos) {
-                var displayName = page + (infos.language == "" ? "" :  (" - " + infos.language));
-                
+            trList.sortBy(function(s){return s.language}).each(function(infos) {                
                 var pageItem = new Element("li", {'class':'xitem xhighlight'});
                 var pageItemContainer = new Element("div", {'class': 'xitemcontainer xpagecontainer'});
             
@@ -465,7 +465,10 @@
                 docBox.observe("click", self.documentCheckboxClicked.bind(self));
                 pageItemContainer.insert( new Element("span", {'class':'checkbox'}).update(docBox) );
                 
-                pageItemContainer.insert(new Element("span", {'class':'documentName'}).update(displayName));
+                pageItemContainer.insert(new Element("span", {'class':'documentName'}).update(page));
+                if (infos.language != "") {
+                   pageItemContainer.insert(new Element("span", {'class':'documentLanguage'}).update(" - " + infos.language));
+			    }
                 pageItemContainer.insert(new Element("div", {'class':'clearfloats'}));
                 
                 // Insert some hidden div to store exact fullName and language of the node.
@@ -650,5 +653,7 @@
         }
 
     });
+
+    return XWiki;
     
-})();
+})(XWiki || {});

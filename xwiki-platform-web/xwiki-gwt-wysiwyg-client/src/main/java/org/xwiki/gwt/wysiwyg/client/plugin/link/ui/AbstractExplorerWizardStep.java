@@ -237,7 +237,7 @@ public abstract class AbstractExplorerWizardStep extends AbstractSelectorWizardS
      */
     private String getGroupAnchor(ResourceType resourceType)
     {
-        return resourceType == ResourceType.ATTACHMENT || resourceType == ResourceType.IMAGE ? "Attachments" : null;
+        return resourceType == ResourceType.ATTACHMENT ? "Attachments" : null;
     }
 
     /**

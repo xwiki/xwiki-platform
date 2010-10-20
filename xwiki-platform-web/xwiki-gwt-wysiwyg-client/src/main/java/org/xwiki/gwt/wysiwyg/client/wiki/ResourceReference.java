@@ -65,12 +65,7 @@ public class ResourceReference implements IsSerializable
         /**
          * Represents an attachment.
          */
-        ATTACHMENT("attach"),
-
-        /**
-         * Represents an image.
-         */
-        IMAGE("image");
+        ATTACHMENT("attach");
 
         /**
          * The mapping between scheme and resource types.

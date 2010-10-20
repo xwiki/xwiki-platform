@@ -194,7 +194,6 @@ public class DefaultLinkService implements LinkService
                 entityType = org.xwiki.gwt.wysiwyg.client.wiki.EntityReference.EntityType.DOCUMENT;
                 break;
             case ATTACHMENT:
-            case IMAGE:
                 entityType = org.xwiki.gwt.wysiwyg.client.wiki.EntityReference.EntityType.ATTACHMENT;
                 break;
             default:

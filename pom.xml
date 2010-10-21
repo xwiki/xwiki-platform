@@ -198,6 +198,7 @@
                 <!-- 2.5RC1 was wrongly released using Java 1.6 (instead of 1.5) and we need to add those exclusions
                      as otherwise CLIRR complains -->
                 <exclude>org/xwiki/component/descriptor/ComponentInstantiationStrategy</exclude>
+                <exclude>org/xwiki/model/EntityType</exclude>
                 <!-- To be removed when we release 2.6 -->
                 <exclude>org/xwiki/rendering/listener/reference/ResourceType</exclude><!-- Removed field IMAGE -->
                 <exclude>org/xwiki/bridge/SkinAccessBridge</exclude><!-- New method getIconURL -->

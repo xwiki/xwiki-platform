@@ -25,7 +25,7 @@ import org.w3c.dom.Document;
 import org.xwiki.component.annotation.ComponentRole;
 
 /**
- * Transforms any HTML content into valid XHTML that can be feed to the XHTML Parser for example.
+ * Transforms any HTML content into valid XHTML that can be fed to the XHTML Parser for example.
  * 
  * @version $Id$
  * @since 1.6M1

@@ -32,20 +32,20 @@ import org.xwiki.xml.html.filter.AbstractHTMLFilter;
  * nodes that are not allowed) nested inside a &lt;ul&gt; or &lt;ol&gt; element inside the previous &lt;li&gt; element.
  * <p>
  * For example: <code><pre>
- *   <ul>
- *     <li>item1</li>
- *     <ul>
- *       <li>item2</li>
- *     </ul>
- *   </ul>
+ *   &lt;ul&gt;
+ *     &lt;li&gt;item1&lt;/li&gt;
+ *     &lt;ul&gt;
+ *       &lt;li&gt;item2</li&gt;
+ *     &lt;/ul&gt;
+ *   &lt;/ul&gt;
  * </pre></code> becomes <code><pre>
- *   <ul>
- *     <li>item1
- *       <ul>
- *         <li>item2</li>
- *       </ul>
- *     </li>
- *   </ul>
+ *   &lt;ul&gt;
+ *     &lt;li&gt;item1
+ *       &lt;ul&gt;
+ *         &lt;li&gt;item2&lt;/li&gt;
+ *       &lt;/ul&gt;
+ *     &lt;/li&gt;
+ *   &lt;/ul&gt;
  * </pre></code>
  * 
  * @version $Id$

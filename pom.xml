@@ -200,6 +200,7 @@
                 <exclude>org/xwiki/component/descriptor/ComponentInstantiationStrategy</exclude>
                 <exclude>org/xwiki/model/EntityType</exclude>
                 <exclude>org/xwiki/cache/eviction/EntryEvictionConfiguration$Algorithm</exclude>
+                <exclude>org/xwiki/url/XWikiURLType</exclude>
                 <!-- To be removed when we release 2.6 -->
                 <exclude>org/xwiki/rendering/listener/reference/ResourceType</exclude><!-- Removed field IMAGE, Added UNKNOWN -->
                 <exclude>org/xwiki/bridge/SkinAccessBridge</exclude><!-- New method getIconURL -->

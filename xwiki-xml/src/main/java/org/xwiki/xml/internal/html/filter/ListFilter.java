@@ -35,7 +35,7 @@ import org.xwiki.xml.html.filter.AbstractHTMLFilter;
  *   &lt;ul&gt;
  *     &lt;li&gt;item1&lt;/li&gt;
  *     &lt;ul&gt;
- *       &lt;li&gt;item2</li&gt;
+ *       &lt;li&gt;item2&lt;/li&gt;
  *     &lt;/ul&gt;
  *   &lt;/ul&gt;
  * </pre></code> becomes <code><pre>

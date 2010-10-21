@@ -106,7 +106,7 @@ public class DefaultBeanDescriptor extends AbstractLogEnabled implements BeanDes
     }
 
     /**
-     * Extract provided properties informations and insert it in {@link #parameterDescriptorMap}.
+     * Extract provided properties information and insert it in {@link #parameterDescriptorMap}.
      * 
      * @param propertyDescriptor the JAVA bean property descriptor.
      * @param defaultInstance the default instance of bean class.

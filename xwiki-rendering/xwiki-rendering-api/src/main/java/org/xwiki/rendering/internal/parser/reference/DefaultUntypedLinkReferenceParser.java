@@ -22,24 +22,18 @@ package org.xwiki.rendering.internal.parser.reference;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.Requirement;
 import org.xwiki.rendering.listener.reference.ResourceReference;
+import org.xwiki.rendering.parser.ResourceReferenceParser;
 import org.xwiki.rendering.parser.ResourceReferenceTypeParser;
 
 /**
- * Parses the content of XWiki Syntax 2.1 resource references. The format of a resource reference is the following:
- * {@code (type):(reference)} where {@code type} represents the type (see
- * {@link org.xwiki.rendering.listener.reference.ResourceType} of the resource pointed to (e.g. document, mailto, attachment,
- * image, document in another wiki, etc), and {@code reference} defines the target. The syntax of {@code reference}
- * depends on the Resource type and is documented in the javadoc of the various
- * {@link org.xwiki.rendering.parser.ResourceReferenceTypeParser} implementations.
+ * Considers all passed link references to be untyped and tries to guess the type by first looking for a URL
+ * and then considering it's a reference to a document.
  *
- * Note that the implementation is pluggable and it's allowed plug new resource reference types by implementing
- * {@link org.xwiki.rendering.parser.ResourceReferenceTypeParser}s and registering the implementation as a component.
- *
- * @version $Id$
- * @since 2.5RC1
+ * @version $Id: DefaultLinkReferenceParser.java 31687 2010-10-08 19:37:36Z vmassol $
+ * @since 2.6M1
  */
-@Component("xwiki/2.1/link")
-public class XWiki21LinkReferenceParser extends AbstractXWiki21ResourceReferenceParser
+@Component("link/untyped")
+public class DefaultUntypedLinkReferenceParser implements ResourceReferenceParser
 {
     /**
      * Parser to parse link references pointing to URLs.
@@ -55,21 +49,20 @@ public class XWiki21LinkReferenceParser extends AbstractXWiki21ResourceReference
 
     /**
      * {@inheritDoc}
-     * @see AbstractXWiki21ResourceReferenceParser#parseDefault(String)
+     * @see ResourceReferenceParser#parse(String)
      */
-    @Override
-    protected ResourceReference parseDefault(String rawReference)
+    public ResourceReference parse(String rawReference)
     {
         // Try to guess the link type. It can be either:
         // - a URL (specified without the "url" type)
         // - a reference to a document (specified without the "doc" type)
-        ResourceReference parsedResourceReference = this.urlResourceReferenceTypeParser.parse(rawReference);
-        if (parsedResourceReference == null) {
+        ResourceReference reference = this.urlResourceReferenceTypeParser.parse(rawReference);
+        if (reference == null) {
             // What remains is considered to be a link to a document, use the document link type parser to parse it.
-            parsedResourceReference = this.documentResourceReferenceTypeParser.parse(rawReference);
+            reference = this.documentResourceReferenceTypeParser.parse(rawReference);
         }
-        parsedResourceReference.setTyped(false);
+        reference.setTyped(false);
 
-        return parsedResourceReference;
+        return reference;
     }
 }

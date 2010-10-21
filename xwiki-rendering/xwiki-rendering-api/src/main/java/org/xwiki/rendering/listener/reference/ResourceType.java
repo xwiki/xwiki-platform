@@ -36,6 +36,11 @@ package org.xwiki.rendering.listener.reference;
 public class ResourceType
 {
     /**
+     * Special type to be used when the type of the resource is not known.
+     */
+    public static final ResourceType UNKNOWN = new ResourceType("unknown");
+
+    /**
      * Represents a Document.
      */
     public static final ResourceType DOCUMENT = new ResourceType("doc");

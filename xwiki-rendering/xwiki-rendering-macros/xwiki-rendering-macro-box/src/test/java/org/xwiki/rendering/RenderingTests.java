@@ -22,7 +22,11 @@ package org.xwiki.rendering;
 import junit.framework.Test;
 import junit.framework.TestCase;
 
+import org.jmock.Mockery;
+import org.xwiki.component.descriptor.DefaultComponentDescriptor;
+import org.xwiki.component.embed.EmbeddableComponentManager;
 import org.xwiki.rendering.scaffolding.RenderingTestSuite;
+import org.xwiki.rendering.wiki.WikiModel;
 import org.xwiki.test.ComponentManagerTestSetup;
 
 /**
@@ -35,7 +39,24 @@ public class RenderingTests extends TestCase
 {
     public static Test suite() throws Exception
     {
-        RenderingTestSuite suite = new RenderingTestSuite("Test Box Macro");
-        return new ComponentManagerTestSetup(suite);
+        RenderingTestSuite suite = new RenderingTestSuite("Test Box Macro", "", "macrobox5.test");
+
+        ComponentManagerTestSetup testSetup = new ComponentManagerTestSetup(suite);
+        setUpMocks(testSetup.getComponentManager());
+
+        return testSetup;
+    }
+
+    private static void setUpMocks(EmbeddableComponentManager componentManager) throws Exception
+    {
+        Mockery mockery = new Mockery();
+
+        // Register a WikiModel mock so that we're in wiki mode (otherwise we wouldn't be able to test proper image
+        // references).
+        WikiModel wikiModel = mockery.mock(WikiModel.class);
+        DefaultComponentDescriptor<WikiModel> descriptorWM =
+            new DefaultComponentDescriptor<WikiModel>();
+        descriptorWM.setRole(WikiModel.class);
+        componentManager.registerComponent(descriptorWM, wikiModel);
     }
 }

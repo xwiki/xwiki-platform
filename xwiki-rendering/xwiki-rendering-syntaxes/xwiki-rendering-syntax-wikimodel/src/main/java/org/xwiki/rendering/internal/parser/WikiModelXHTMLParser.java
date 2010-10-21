@@ -70,13 +70,13 @@ public class WikiModelXHTMLParser extends AbstractWikiModelParser
     /**
      * @see #getLinkReferenceParser()
      */
-    @Requirement("xwiki/2.1/link")
+    @Requirement("link")
     private ResourceReferenceParser linkReferenceParser;
 
     /**
      * @see #getImageReferenceParser()
      */
-    @Requirement("xwiki/2.1/image")
+    @Requirement("image")
     private ResourceReferenceParser imageReferenceParser;
 
     @Requirement("xwiki/2.1")

@@ -22,14 +22,18 @@ package org.xwiki.rendering.internal.parser.reference;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.Requirement;
 import org.xwiki.rendering.listener.reference.ResourceReference;
+import org.xwiki.rendering.parser.ResourceReferenceParser;
 import org.xwiki.rendering.parser.ResourceReferenceTypeParser;
 
 /**
+ * Considers all passed images references to be untyped and tries to guess the type by first looking for a URL
+ * and then considering it's a reference to an attachment.
+ *
  * @version $Id$
- * @since 2.5RC1
+ * @since 2.6M1
  */
-@Component("xwiki/2.1/image")
-public class XWiki21ImageReferenceParser extends AbstractXWiki21ResourceReferenceParser
+@Component("image/untyped")
+public class DefaultUntypedImageReferenceParser implements ResourceReferenceParser
 {
     /**
      * Parser to parse link references pointing to URLs.
@@ -45,21 +49,20 @@ public class XWiki21ImageReferenceParser extends AbstractXWiki21ResourceReferenc
 
     /**
      * {@inheritDoc}
-     * @see AbstractXWiki21ResourceReferenceParser#parseDefault(String)
+     * @see ResourceReferenceParser#parse(String)
      */
-    @Override
-    protected ResourceReference parseDefault(String rawReference)
+    public ResourceReference parse(String rawReference)
     {
         // Try to guess the link type. It can be either:
         // - a URL (specified without the "url" type)
         // - a reference to an attachment (specified without the "attach" type)
-        ResourceReference parsedResourceReference = this.urlResourceReferenceTypeParser.parse(rawReference);
-        if (parsedResourceReference == null) {
-            // What remains is considered to be a link to an attachment, use the attachment link type parser to parse.
-            parsedResourceReference = this.attachmentResourceReferenceTypeParser.parse(rawReference);
+        ResourceReference reference = this.urlResourceReferenceTypeParser.parse(rawReference);
+        if (reference == null) {
+            // What remains is considered to be a link to an attachment, use the attachment link type parser to
+            // parse.
+            reference = this.attachmentResourceReferenceTypeParser.parse(rawReference);
         }
-        parsedResourceReference.setTyped(false);
-
-        return parsedResourceReference;
+        reference.setTyped(false);
+        return reference;
     }
 }

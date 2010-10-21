@@ -200,10 +200,11 @@
                 <exclude>org/xwiki/component/descriptor/ComponentInstantiationStrategy</exclude>
                 <exclude>org/xwiki/model/EntityType</exclude>
                 <!-- To be removed when we release 2.6 -->
-                <exclude>org/xwiki/rendering/listener/reference/ResourceType</exclude><!-- Removed field IMAGE -->
+                <exclude>org/xwiki/rendering/listener/reference/ResourceType</exclude><!-- Removed field IMAGE, Added UNKNOWN -->
                 <exclude>org/xwiki/bridge/SkinAccessBridge</exclude><!-- New method getIconURL -->
                 <exclude>org/xwiki/rendering/wiki/WikiModel</exclude><!-- Renamed getAttachmentURL in getLinkURL -->
                 <exclude>org/xwiki/rendering/scaffolding/MockWikiModel</exclude><!-- Renamed getAttachmentURL in getLinkURL -->
+                <exclude>org/xwiki/rendering/macro/box/BoxMacroParameters</exclude><!-- Changed get/setImage param type -->
               </excludes>
             </configuration>
           </plugin>

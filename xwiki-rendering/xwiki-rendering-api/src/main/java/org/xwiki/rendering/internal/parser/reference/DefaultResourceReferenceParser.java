@@ -19,6 +19,7 @@
  */
 package org.xwiki.rendering.internal.parser.reference;
 
+import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.Requirement;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
@@ -29,12 +30,21 @@ import org.xwiki.rendering.parser.ResourceReferenceTypeParser;
 import org.xwiki.rendering.wiki.WikiModel;
 
 /**
- * Common code for link and image reference parser implementations for XWiki Syntax 2.1. 
+ * Parses the content of resource references. The format of a resource reference is the following:
+ * {@code (type):(reference)} where {@code type} represents the type (see
+ * {@link org.xwiki.rendering.listener.reference.ResourceType} of the resource pointed to (e.g. document, mailto,
+ * attachment, image, document in another wiki, etc), and {@code reference} defines the target.
+ * The syntax of {@code reference} depends on the Resource type and is documented in the javadoc of the various
+ * {@link org.xwiki.rendering.parser.ResourceReferenceTypeParser} implementations.
+ *
+ * Note that the implementation is pluggable and it's allowed plug new resource reference types by implementing
+ * {@link org.xwiki.rendering.parser.ResourceReferenceTypeParser}s and registering the implementation as a component.
  *
  * @version $Id$
- * @since 2.5RC1
+ * @since 2.6M1
  */
-public abstract class AbstractXWiki21ResourceReferenceParser implements ResourceReferenceParser
+@Component
+public class DefaultResourceReferenceParser implements ResourceReferenceParser
 {
     /**
      * Link Reference Type separator (eg "mailto:mail@address").
@@ -49,15 +59,10 @@ public abstract class AbstractXWiki21ResourceReferenceParser implements Resource
     private ComponentManager componentManager;
 
     /**
-     * Tries to guess the Resource type. Called when there has been no Resource type specified in the raw reference.
-     * 
-     * @param rawReference the reference to parse
-     * @return the parsed Resource Reference object
-     */
-    protected abstract ResourceReference parseDefault(String rawReference);
-
-    /**
      * {@inheritDoc}
+     *
+     * @return the parsed resource reference or a Resource Reference with {@link ResourceType#UNKNOWN} if no reference
+     *         type was specified
      *
      * @see org.xwiki.rendering.parser.ResourceReferenceParser#parse(String)
      */
@@ -87,10 +92,8 @@ public abstract class AbstractXWiki21ResourceReferenceParser implements Resource
             }
         }
 
-        // Step 3: There's no specific type parser found. As a convenience try to guess the link type.
-        ResourceReference parsedResourceReference = parseDefault(rawReference);
-
-        return parsedResourceReference;
+        // Step 3: There's no specific type parser found.
+        return new ResourceReference(rawReference, ResourceType.UNKNOWN);
     }
 
     /**

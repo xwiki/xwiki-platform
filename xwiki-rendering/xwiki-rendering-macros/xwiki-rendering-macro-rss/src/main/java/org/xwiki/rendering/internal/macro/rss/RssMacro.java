@@ -137,7 +137,7 @@ public class RssMacro extends AbstractMacro<RssMacroParameters>
         boxParameters.setBlockTitle(generateBoxTitle("rsschanneltitle", feed));
 
         if (hasImage) {
-            boxParameters.setImage(feed.getImage().getUrl());
+            boxParameters.setImage(new ResourceReference(feed.getImage().getUrl(), ResourceType.URL));
         }
 
         List<Block> result = boxMacro.execute(boxParameters, content == null ? StringUtils.EMPTY : content, context);

@@ -20,7 +20,7 @@
 package org.xwiki.rendering.internal.renderer.xwiki20.reference;
 
 import org.xwiki.component.annotation.Component;
-import org.xwiki.rendering.internal.parser.reference.AbstractXWiki21ResourceReferenceParser;
+import org.xwiki.rendering.internal.parser.reference.DefaultResourceReferenceParser;
 import org.xwiki.rendering.listener.reference.ResourceReference;
 import org.xwiki.rendering.renderer.reference.ResourceReferenceTypeSerializer;
 
@@ -44,7 +44,7 @@ public class DefaultResourceReferenceTypeSerializer implements ResourceReference
         StringBuffer result = new StringBuffer();
         if (reference.isTyped()) {
             result.append(reference.getType().getScheme());
-            result.append(AbstractXWiki21ResourceReferenceParser.TYPE_SEPARATOR);
+            result.append(DefaultResourceReferenceParser.TYPE_SEPARATOR);
         }
         result.append(reference.getReference());
         return result.toString();

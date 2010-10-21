@@ -43,6 +43,7 @@ import org.xwiki.rendering.macro.MacroExecutionException;
 import org.xwiki.rendering.macro.descriptor.ContentDescriptor;
 import org.xwiki.rendering.parser.ParseException;
 import org.xwiki.rendering.parser.Parser;
+import org.xwiki.rendering.parser.ResourceReferenceParser;
 import org.xwiki.rendering.transformation.MacroTransformationContext;
 
 /**
@@ -59,6 +60,12 @@ public abstract class AbstractBoxMacro<P extends BoxMacroParameters> extends Abs
      */
     @Requirement
     private ComponentManager componentManager;
+
+    /**
+     * Parses untyped image references.
+     */
+    @Requirement("image/untyped")
+    private ResourceReferenceParser untypedImageReferenceParser;
 
     /**
      * Creates a new box macro.
@@ -100,7 +107,14 @@ public abstract class AbstractBoxMacro<P extends BoxMacroParameters> extends Abs
     public List<Block> execute(P parameters, String content, MacroTransformationContext context)
         throws MacroExecutionException
     {
-        String imageParameter = parameters.getImage();
+        // TODO: Refactor this when it'll possible to have a specific converter associated to a macro parameter.
+        ResourceReference imageReference = parameters.getImage();
+        // If the image reference is unknown then resolve it with the untyped resource reference parser
+        // (this happens when the user doesn't specify a type for the image reference).
+        if (imageReference != null && imageReference.getType().equals(ResourceType.UNKNOWN)) {
+            imageReference = this.untypedImageReferenceParser.parse(imageReference.getReference());
+        }
+
         String titleParameter = parameters.getTitle();
         List< ? extends Block> titleBlockList = parameters.getBlockTitle();
 
@@ -129,8 +143,7 @@ public abstract class AbstractBoxMacro<P extends BoxMacroParameters> extends Abs
                 boxBlock = new GroupBlock(boxParameters);
 
                 // we add the image, if there is one
-                if (!StringUtils.isEmpty(imageParameter)) {
-                    ResourceReference imageReference = new ResourceReference(imageParameter, ResourceType.URL);
+                if (imageReference != null) {
                     Block imageBlock = new ImageBlock(imageReference, true);
                     boxBlock.addChild(imageBlock);
                     boxBlock.addChild(NewLineBlock.NEW_LINE_BLOCK);

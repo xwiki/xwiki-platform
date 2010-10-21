@@ -2,10 +2,13 @@ org.xwiki.rendering.internal.parser.PlainTextBlockParser
 org.xwiki.rendering.internal.parser.PlainTextStreamParser
 org.xwiki.rendering.internal.parser.reference.GenericLinkReferenceParser
 org.xwiki.rendering.internal.parser.reference.GenericImageReferenceParser
+org.xwiki.rendering.internal.parser.reference.DefaultResourceReferenceParser
+org.xwiki.rendering.internal.parser.reference.DefaultLinkReferenceParser
+org.xwiki.rendering.internal.parser.reference.DefaultImageReferenceParser
+org.xwiki.rendering.internal.parser.reference.DefaultUntypedLinkReferenceParser
+org.xwiki.rendering.internal.parser.reference.DefaultUntypedImageReferenceParser
 org.xwiki.rendering.internal.parser.reference.XWiki20LinkReferenceParser
 org.xwiki.rendering.internal.parser.reference.XWiki20ImageReferenceParser
-org.xwiki.rendering.internal.parser.reference.XWiki21LinkReferenceParser
-org.xwiki.rendering.internal.parser.reference.XWiki21ImageReferenceParser
 org.xwiki.rendering.internal.parser.reference.DocumentResourceReferenceTypeParser
 org.xwiki.rendering.internal.parser.reference.InterWikiResourceReferenceTypeParser
 org.xwiki.rendering.internal.parser.reference.URLResourceReferenceTypeParser
@@ -55,6 +58,7 @@ org.xwiki.rendering.internal.renderer.plain.PlainTextBlockRenderer
 org.xwiki.rendering.internal.macro.DefaultMacroManager
 org.xwiki.rendering.internal.macro.DefaultMacroCategoryManager
 org.xwiki.rendering.internal.macro.DefaultMacroIdFactory
+org.xwiki.rendering.internal.macro.ResourceReferenceConverter
 org.xwiki.rendering.internal.converter.DefaultConverter
 org.xwiki.rendering.internal.transformation.DefaultTransformationManager
 org.xwiki.rendering.internal.transformation.MacroTransformation

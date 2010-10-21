@@ -27,12 +27,12 @@ import org.xwiki.rendering.parser.ResourceReferenceParser;
 import org.xwiki.rendering.wiki.WikiModel;
 
 /**
- * Unit tests for {@link org.xwiki.rendering.internal.parser.reference.XWiki21ImageReferenceParser}.
+ * Unit tests for {@link DefaultImageReferenceParser}.
  *
  * @version $Id$
- * @since 2.5RC1
+ * @since 2.6M1
  */
-public class XWiki21ImageReferenceParserTest extends AbstractImageReferenceParserTest
+public class DefaultImageReferenceParserTest extends AbstractImageReferenceParserTest
 {
     @Override
     protected void registerComponents() throws Exception
@@ -40,7 +40,7 @@ public class XWiki21ImageReferenceParserTest extends AbstractImageReferenceParse
         // Create a Mock WikiModel implementation so that the link parser works in wiki mode
         registerMockComponent(WikiModel.class);
 
-        this.parser = getComponentManager().lookup(ResourceReferenceParser.class, "xwiki/2.1/image");
+        this.parser = getComponentManager().lookup(ResourceReferenceParser.class, "image");
     }
 
     @Test

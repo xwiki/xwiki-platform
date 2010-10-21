@@ -25,16 +25,17 @@ import org.apache.commons.lang.StringUtils;
 import org.xwiki.properties.annotation.PropertyDescription;
 import org.xwiki.properties.annotation.PropertyHidden;
 import org.xwiki.rendering.block.Block;
+import org.xwiki.rendering.listener.reference.ResourceReference;
 
 /**
  * Parameters for the Box macro.
- * 
+ *
  * @version $Id$
  */
 public class BoxMacroParameters
 {
     /**
-     * @see @getClassProperty 
+     * @see @getClassProperty
      */
     private String cssClass = StringUtils.EMPTY;
 
@@ -46,7 +47,7 @@ public class BoxMacroParameters
     /**
      * @see #getImage()
      */
-    private String image = StringUtils.EMPTY;
+    private ResourceReference imageReference;
 
     /**
      * @see #getWidth()
@@ -54,13 +55,13 @@ public class BoxMacroParameters
     private String width = StringUtils.EMPTY;
 
     /**
-     * @see #getTitle() 
+     * @see #getTitle()
      */
     private List< ? extends Block> blockTitle;
 
     /**
      * Optionally, the title can contain a list of Blocks, for more flexibility, instead of storing only ordinary text.
-     * 
+     *
      * @return the title represented as a list of Blocks
      */
     public List< ? extends Block> getBlockTitle()
@@ -96,21 +97,20 @@ public class BoxMacroParameters
     }
 
     /**
-     * @return the image to be displayed in the message box. It can be specified as attachment name or as an absolute
-     *         URL.
+     * @return the reference to the image to display in the message box.
      */
-    public String getImage()
+    public ResourceReference getImage()
     {
-        return image;
+        return this.imageReference;
     }
 
     /**
-     * @param image refer to {@link #getImage()}
+     * @param imageReference see {@link #getImage()}
      */
-    @PropertyDescription("the image which is to be displayed in the message box")
-    public void setImage(String image)
+    @PropertyDescription("the reference to the image to display in the message box")
+    public void setImage(ResourceReference imageReference)
     {
-        this.image = image;
+        this.imageReference = imageReference;
     }
 
     /**

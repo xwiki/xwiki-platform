@@ -831,7 +831,7 @@ $xwiki.jsfx.use('js/xwiki/actionbuttons/actionButtons.js', true)
  *###
 #macro(sandboxDocument)
   #if($xcontext.hasProgrammingRights())
-    $xcontext.getContext().getDoc().setContentAuthor('XWiki.XWikiGuest')##
+    $xcontext.dropPermissions()##
   #end
 #end
 ##

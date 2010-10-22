@@ -27,7 +27,7 @@
   <parent>
     <groupId>org.xwiki.platform.applications</groupId>
     <artifactId>xwiki-applications</artifactId>
-    <version>33</version>
+    <version>34-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-application-application-manager</artifactId>
   <name>XWiki Platform - Applications - Application Manager</name>
@@ -35,7 +35,7 @@
   <packaging>xar</packaging>
   <description>Manages creation and installation of XWiki Applications</description>
   <properties>
-    <platform.plugin.applicationmanager.version>1.15</platform.plugin.applicationmanager.version>
+    <platform.plugin.applicationmanager.version>${project.version}</platform.plugin.applicationmanager.version>
   </properties>
   <dependencies>
     <dependency>
@@ -47,7 +47,7 @@
     <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-core-parent</artifactId>
-      <version>2.5-milestone-2</version>
+      <version>[2.5-milestone-2,)</version>
       <type>pom</type>
       <scope>runtime</scope>
     </dependency>

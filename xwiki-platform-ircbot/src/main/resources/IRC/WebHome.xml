@@ -36,7 +36,7 @@ Here are the IRC logs archived by the XWiki IRC Bot:
 #set($columnsProperties = {
     "channel" : { "type" : "text" , "size" : 20, "link" : "view"}
 })
-#set($options = { 
+#set($options = {
    "className":"IRC.IRCArchiveClass",
    "rowCount": 10
 })

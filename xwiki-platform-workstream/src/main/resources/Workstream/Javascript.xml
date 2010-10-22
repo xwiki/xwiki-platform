@@ -104,7 +104,7 @@ function countCharsLeft()
 {
      var charsLeft = (140 - $('workstream-status-box').value.length);
      $('workstream-chars-left').innerHTML = charsLeft;
-     if(charsLeft &gt; 20) $('workstream-chars-left').setAttribute("class","chars-left-regular"); 
+     if(charsLeft &gt; 20) $('workstream-chars-left').setAttribute("class","chars-left-regular");
      if(charsLeft &lt; 20) $('workstream-chars-left').setAttribute("class","chars-left-low");
      if(charsLeft &lt; 5) $('workstream-chars-left').setAttribute("class","chars-left-very-low");
      if(charsLeft &lt; 0) $('workstream-chars-left').setAttribute("class","chars-left-negative");
@@ -116,7 +116,7 @@ function countCharsLeftInPanel()
 {
    var charsLeft = (140 - $('workstream-status-box-panel').value.length);
    $('workstream-chars-left-panel').innerHTML = charsLeft;
-   if(charsLeft &gt; 20) $('workstream-chars-left-panel').setAttribute("class","chars-left-regular"); 
+   if(charsLeft &gt; 20) $('workstream-chars-left-panel').setAttribute("class","chars-left-regular");
    if(charsLeft &lt; 20) $('workstream-chars-left-panel').setAttribute("class","chars-left-low");
    if(charsLeft &lt; 5) $('workstream-chars-left-panel').setAttribute("class","chars-left-very-low");
    if(charsLeft &lt; 0) $('workstream-chars-left-panel').setAttribute("class","chars-left-negative");
@@ -151,7 +151,7 @@ function getUpdates(offset, howMany)
         method: 'get',
         onLoading: function() {$('updates').className = "loading";},
         onSuccess: function(transport) {
-          var res = eval( '(' + transport.responseText + ')' ); 
+          var res = eval( '(' + transport.responseText + ')' );
           for (i=0;i&lt;res.updates.length;i++)
           {
            if(!$('update_' + res.updates[i].id)) {
@@ -171,7 +171,7 @@ function getUpdates(offset, howMany)
           }
           if(res.hasnext=="1") {
             rmClass($('olderupdates'), "hidden");
-            $('olderupdates').innerHTML = 
+            $('olderupdates').innerHTML =
               "&lt;a href=\"\#\" onclick=\"getUpdates(" + (res.offset +  res.returnedrows) +","+ res.returnedrows +")\"&gt;$msg.get('workstream.older')&lt;/a&gt;"; // TODO remove this / use global vars + event.observe.
           }
           else {
@@ -179,7 +179,7 @@ function getUpdates(offset, howMany)
           }
           if(res.hasprevious=="1") {
             rmClass($('newerupdates'), "hidden");
-            $('newerupdates').innerHTML = 
+            $('newerupdates').innerHTML =
               "&lt;a href=\"\#\" onclick=\"getUpdates(" + (res.offset -  res.returnedrows) +","+ res.returnedrows +")\"&gt;$msg.get('workstream.newer')&lt;/a&gt;"; // TODO remove this / use global vars + event.observe.
           }
           else {
@@ -187,7 +187,7 @@ function getUpdates(offset, howMany)
           }
           $('updates').className = "";
           // remove left updates in the DOM when returned less rows than asked (can happen on latest page)
-          var updates = $('updates').getElementsBySelector("div.update"); 
+          var updates = $('updates').getElementsBySelector("div.update");
           for(i = res.returnedrows; i&lt;5; i++) {updates[i].remove();}
       }
      }

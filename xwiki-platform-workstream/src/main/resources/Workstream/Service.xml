@@ -55,7 +55,7 @@
 <tags/>
 </property>
 </object>
-<content>#* Groovy service for the workstream 
+<content>#* Groovy service for the workstream
  * @programming
  *#
 {pre}
@@ -78,9 +78,9 @@ offset : &lt;%=offset%&gt;,
 hasprevious : "&lt;%=hasprevious%&gt;",
 hasnext : "&lt;%=hasnext%&gt;",
 updates : [ &lt;%
-updates.reverse().eachWithIndex() { update, i -&gt; 
+updates.reverse().eachWithIndex() { update, i -&gt;
 if (i&gt;0) { %&gt;,&lt;% } %&gt;
-{  
+{
 "id" : "&lt;%=update.eventId%&gt;",
 "title" : "&lt;%=update.displayBody%&gt;",
 "username" : "&lt;%=xwiki.getLocalUserName(update.stream, false)%&gt;",
@@ -118,7 +118,6 @@ def getProfilePictureURL( username, height )
                           hasavatar = 1;
              if ( hasavatar == 1 ) {
                  avatarurl = profiledoc.getAttachmentURL(profileobj.avatar, "download", "height="+height);
-         
              }
          }
      }

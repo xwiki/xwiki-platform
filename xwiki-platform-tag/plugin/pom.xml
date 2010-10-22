@@ -27,7 +27,7 @@
   <parent>
     <groupId>com.xpn.xwiki.platform.plugins</groupId>
     <artifactId>xwiki-plugins</artifactId>
-    <version>27</version>
+    <version>28-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-plugin-tag</artifactId>
   <name>XWiki Platform - Plugins - Tag</name>
@@ -68,18 +68,6 @@
         <!-- Apply the Checkstyle configurations defined in the top level pom.xml file -->
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-checkstyle-plugin</artifactId>
-      </plugin>
-      <!-- To remove when 1.15 will be released -->
-      <plugin>
-        <groupId>org.codehaus.mojo</groupId>
-        <artifactId>clirr-maven-plugin</artifactId>
-        <configuration>
-          <skip>${xwiki.clirr.skip}</skip>
-          <comparisonVersion>${clirr.previous.version}</comparisonVersion>
-          <excludes>
-            <exclude>com/xpn/xwiki/plugin/tag/TagOperationResult</exclude>
-          </excludes>
-        </configuration>
       </plugin>
     </plugins>
   </build>

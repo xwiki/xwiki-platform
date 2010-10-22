@@ -206,7 +206,15 @@
                 <exclude>org/xwiki/rendering/listener/HeaderLevel</exclude>
                 <exclude>org/xwiki/rendering/listener/ListType</exclude>
                 <exclude>org/xwiki/rendering/listener/chaining/BlockStateChainingListener$Event</exclude>
-                <exclude>**[]</exclude>
+                <exclude>org/xwiki/rendering/listener/chaining/EventType</exclude>
+                <exclude>org/xwiki/rendering/listener/chaining/EventType$*</exclude>
+                <exclude>org/xwiki/formula/FormulaRenderer$FontSize</exclude>
+                <exclude>org/xwiki/formula/FormulaRenderer$Type</exclude>
+                <exclude>org/xwiki/rendering/macro/toc/TocMacroParameters$Scope</exclude>
+                <exclude>org/xwiki/rendering/macro/include/IncludeMacroParameters$Context</exclude>
+                <exclude>org/xwiki/rendering/macro/wikibridge/WikiMacroVisibility</exclude>
+                <exclude>org/xwiki/annotation/maintainer/AnnotationState</exclude>
+                <exclude>org/xwiki/annotation/renderer/AnnotationEvent$AnnotationEventType</exclude>
                 <!-- To be removed when we release 2.6 -->
                 <exclude>org/xwiki/rendering/listener/reference/ResourceType</exclude><!-- Removed field IMAGE, Added UNKNOWN -->
                 <exclude>org/xwiki/bridge/SkinAccessBridge</exclude><!-- New method getIconURL -->

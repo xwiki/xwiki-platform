@@ -1,5 +1,4 @@
 <?xml version="1.0" encoding="UTF-8"?>
-
 <xwikidoc>
 <web>Blog</web>
 <name>CategoriesCode</name>
@@ -76,22 +75,30 @@
  *        all its subcategories. To obtain the full hierarchy, start with the key 'Blog.Categories'.
  *###
 #macro(getCategoriesHierarchy $space $tree)
-  #set($tree = $util.hashMap)
-  #set($query = ', BaseObject obj where ')
-  #if("$!space" != '')
-    #set($query = "${query}doc.space = '${space}' and ")
-  #end
-  #set($query = "${query}obj.name = doc.fullName and obj.className = '${blogCategoryClassname}' order by doc.name")
-  #foreach($category in $xwiki.searchDocuments($query))
-    #set($categoryDoc = $xwiki.getDocument($category))
-    #set($categoryParent = "$!categoryDoc.parent")
-    #if($categoryParent == '')
-      #set($categoryParent = $defaultCategoryParent)
+  #if ("$!{blogCategoriesHierarchyCache.containsKey($!{space})}" == 'true')
+    #set ($tree = $blogCategoriesHierarchyCache.get($!{space}))
+  #else
+    #set($tree = $util.hashMap)
+    #set($query = ', BaseObject obj where ')
+    #if("$!space" != '')
+      #set($query = "${query}doc.space = '${space}' and ")
     #end
-    #if(!$tree.containsKey($categoryParent))
-      #set($discard = $tree.put($categoryParent, $util.arrayList))
+    #set($query = "${query}obj.name = doc.fullName and obj.className = '${blogCategoryClassname}' order by doc.name")
+    #foreach($category in $xwiki.searchDocuments($query))
+      #set($categoryDoc = $xwiki.getDocument($category))
+      #set($categoryParent = "$!categoryDoc.parent")
+      #if($categoryParent == '')
+        #set($categoryParent = $defaultCategoryParent)
+      #end
+      #if(!$tree.containsKey($categoryParent))
+        #set($discard = $tree.put($categoryParent, $util.arrayList))
+      #end
+      #set($discard = $tree.get($categoryParent).add($category))
     #end
-    #set($discard = $tree.get($categoryParent).add($category))
+    #if ("$!{blogCategoriesHierarchyCache.containsKey($!{space})}" == '')
+      #set ($blogCategoriesHierarchyCache = {})
+    #end
+    #set ($discard = $blogCategoriesHierarchyCache.put("$!{space}", $tree))
   #end
 #end
 ##

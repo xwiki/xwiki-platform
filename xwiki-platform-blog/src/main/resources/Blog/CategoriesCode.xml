@@ -38,20 +38,29 @@
  *        placed. Useful for a paginated view.
  *###
 #macro(getEntriesForCategory $category $entries $totalEntries)
-  #getCategoriesHierarchy('' $tree)
-  #set($subcategories = $util.arrayList)
-  #getSubcategories($tree $category $subcategories)
-  #set($categories = [${category}])
-  #set($discard = $categories.addAll(${subcategories}))
-  #set($parameters = '?')
-  #foreach($subcategory in $subcategories)
-    #set($parameters = $parameters.concat(', ?'))
+  #if ("$!{blogCategoryEntriesCache.containsKey($!{category})}" == 'true')
+    #set ($entries = $blogCategoryEntriesCache.get($!{category}).get(0))
+    #set ($totalEntries = $blogCategoryEntriesCache.get($!{category}).get(1))
+  #else
+    #getCategoriesHierarchy('' $tree)
+    #set($subcategories = $util.arrayList)
+    #getSubcategories($tree $category $subcategories)
+    #set($categories = [${category}])
+    #set($discard = $categories.addAll(${subcategories}))
+    #set($parameters = '?')
+    #foreach($subcategory in $subcategories)
+      #set($parameters = $parameters.concat(', ?'))
+    #end
+    #getBlogEntriesBaseQuery($query)
+    #set($query = ", DBStringListProperty as categories join categories.list as category${query} and obj.id = categories.id.id and categories.id.name='category' and category in (${parameters})")
+    #set($totalEntries = $xwiki.countDocuments(${query}, ${categories}))
+    #preparePagedViewParams($totalEntries 10)
+    #set($entries = $xwiki.searchDocuments("${query} order by publishDate.value desc", $itemsPerPage, $startAt, ${categories}))
+    #if ("$!{blogCategoryEntriesCache.containsKey($!{category})}" == '')
+      #set ($blogCategoryEntriesCache = {})
+    #end
+    #set ($discard = $blogCategoryEntriesCache.put("$!{category}", [$entries, $totalEntries]))
   #end
-  #getBlogEntriesBaseQuery($query)
-  #set($query = ", DBStringListProperty as categories join categories.list as category${query} and obj.id = categories.id.id and categories.id.name='category' and category in (${parameters})")
-  #set($totalEntries = $xwiki.countDocuments(${query}, ${categories}))
-  #preparePagedViewParams($totalEntries 10)
-  #set($entries = $xwiki.searchDocuments("${query} order by publishDate.value desc", $itemsPerPage, $startAt, ${categories}))
 #end
 #macro(getSubcategories $tree $category $subcategories)
   #if(!$subcategories.contains($category))

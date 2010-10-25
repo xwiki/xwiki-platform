@@ -39,6 +39,7 @@
     <module>xwiki-rendering-syntaxes</module>
     <module>xwiki-rendering-tests</module>
     <module>xwiki-rendering-macros</module>
+    <module>xwiki-rendering-transformations</module>
   </modules>
   <dependencies>
     <dependency>

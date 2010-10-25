@@ -66,8 +66,8 @@ public class TestGeneratedContentMacro extends AbstractNoParameterMacro
     public List<Block> execute(Object parameters, String content, MacroTransformationContext context)
         throws MacroExecutionException
     {
-        return Arrays.<Block> asList(new WordBlock("some"), SpaceBlock.SPACE_BLOCK, new WordBlock("content"),
-            SpaceBlock.SPACE_BLOCK, new WordBlock("which"), SpaceBlock.SPACE_BLOCK, new WordBlock("is"),
-            SpaceBlock.SPACE_BLOCK, new WordBlock("generated"));
+        return Arrays.<Block> asList(new WordBlock("some"), new SpaceBlock(), new WordBlock("content"),
+            new SpaceBlock(), new WordBlock("which"), new SpaceBlock(), new WordBlock("is"),
+            new SpaceBlock(), new WordBlock("generated"));
     }
 }

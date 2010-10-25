@@ -567,7 +567,7 @@ public class XDOMGeneratorListener implements Listener
      */
     public void onSpace()
     {
-        this.stack.push(SpaceBlock.SPACE_BLOCK);
+        this.stack.push(new SpaceBlock());
     }
 
     /**

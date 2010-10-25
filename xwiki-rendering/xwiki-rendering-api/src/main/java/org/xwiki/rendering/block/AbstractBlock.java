@@ -33,7 +33,7 @@ import org.apache.commons.lang.builder.HashCodeBuilder;
  * Implementation for Block operations. All blocks should extend this class.
  * Supports the notion of generic parameters which can be added to a block (see {@link #getParameter(String)} for more
  * details.
- * 
+ *
  * @version $Id$
  * @since 1.5M2
  */
@@ -55,6 +55,16 @@ public abstract class AbstractBlock implements Block
     private Block parentBlock;
 
     /**
+     * The next Sibling Block or null if no next sibling exists.
+     */
+    private Block nextSiblingBlock;
+
+    /**
+     * The previous Sibling Block or null if no previous sibling exists.
+     */
+    private Block previousSiblingBlock;
+
+    /**
      * Empty constructor to construct an empty block.
      */
     public AbstractBlock()
@@ -64,7 +74,7 @@ public abstract class AbstractBlock implements Block
 
     /**
      * Construct a block with parameters.
-     * 
+     *
      * @param parameters the parameters to set
      */
     public AbstractBlock(Map<String, String> parameters)
@@ -74,7 +84,7 @@ public abstract class AbstractBlock implements Block
 
     /**
      * {@inheritDoc}
-     * 
+     *
      * @see org.xwiki.rendering.block.Block#addChild(org.xwiki.rendering.block.Block)
      */
     public void addChild(Block blockToAdd)
@@ -84,7 +94,7 @@ public abstract class AbstractBlock implements Block
 
     /**
      * {@inheritDoc}
-     * 
+     *
      * @see org.xwiki.rendering.block.Block#addChildren(java.util.List)
      */
     public void addChildren(List< ? extends Block> blocksToAdd)
@@ -96,7 +106,29 @@ public abstract class AbstractBlock implements Block
 
     /**
      * {@inheritDoc}
-     * 
+     *
+     * @see Block#setNextSiblingBlock(Block)
+     * @since 2.6RC1
+     */
+    public void setNextSiblingBlock(Block nextSiblingBlock)
+    {
+        this.nextSiblingBlock = nextSiblingBlock;
+    }
+
+    /**
+     * {@inheritDoc}
+     *
+     * @see Block#setPreviousSiblingBlock(Block)
+     * @since 2.6RC1
+     */
+    public void setPreviousSiblingBlock(Block previousSiblingBlock)
+    {
+        this.previousSiblingBlock = previousSiblingBlock;
+    }
+
+    /**
+     * {@inheritDoc}
+     *
      * @see org.xwiki.rendering.block.Block#insertChildBefore(org.xwiki.rendering.block.Block,
      *      org.xwiki.rendering.block.Block)
      */
@@ -105,32 +137,59 @@ public abstract class AbstractBlock implements Block
         blockToInsert.setParent(this);
 
         if (nextBlock == null) {
+            // Last block becomes last but one
+            if (!this.childrenBlocks.isEmpty()) {
+                Block lastBlock = this.childrenBlocks.get(this.childrenBlocks.size() - 1);
+                blockToInsert.setPreviousSiblingBlock(lastBlock);
+                lastBlock.setNextSiblingBlock(blockToInsert);
+            } else {
+                blockToInsert.setPreviousSiblingBlock(null);
+            }
+            blockToInsert.setNextSiblingBlock(null);
             this.childrenBlocks.add(blockToInsert);
         } else {
+            // If there's a previous block to nextBlock then get it to set its next sibling
+            Block previousBlock = nextBlock.getPreviousSibling();
+            if (previousBlock != null) {
+                previousBlock.setNextSiblingBlock(blockToInsert);
+                blockToInsert.setPreviousSiblingBlock(previousBlock);
+            } else {
+                blockToInsert.setPreviousSiblingBlock(null);
+            }
+            blockToInsert.setNextSiblingBlock(nextBlock);
+            nextBlock.setPreviousSiblingBlock(blockToInsert);
             this.childrenBlocks.add(indexOfChild(nextBlock), blockToInsert);
         }
     }
 
     /**
      * {@inheritDoc}
-     * 
+     *
      * @see org.xwiki.rendering.block.Block#insertChildAfter(org.xwiki.rendering.block.Block,
      *      org.xwiki.rendering.block.Block)
      */
     public void insertChildAfter(Block blockToInsert, Block previousBlock)
     {
-        blockToInsert.setParent(this);
-
         if (previousBlock == null) {
-            this.childrenBlocks.add(blockToInsert);
+            insertChildBefore(blockToInsert, null);
         } else {
+            // If there's a next block to previousBlock then get it to set its previous sibling
+            Block nextBlock = previousBlock.getNextSibling();
+            if (nextBlock != null) {
+                nextBlock.setPreviousSiblingBlock(blockToInsert);
+                blockToInsert.setNextSiblingBlock(nextBlock);
+            } else {
+                blockToInsert.setNextSiblingBlock(null);
+            }
+            blockToInsert.setPreviousSiblingBlock(previousBlock);
+            previousBlock.setNextSiblingBlock(blockToInsert);
             this.childrenBlocks.add(indexOfChild(previousBlock) + 1, blockToInsert);
         }
     }
 
     /**
      * {@inheritDoc}
-     * 
+     *
      * @see org.xwiki.rendering.block.Block#replaceChild(Block, Block)
      */
     public void replaceChild(Block newBlock, Block oldBlock)
@@ -140,7 +199,7 @@ public abstract class AbstractBlock implements Block
 
     /**
      * {@inheritDoc}
-     * 
+     *
      * @see org.xwiki.rendering.block.Block#replaceChild(List, Block)
      */
     public void replaceChild(List<Block> newBlocks, Block oldBlock)
@@ -153,16 +212,37 @@ public abstract class AbstractBlock implements Block
 
         List<Block> blocks = getChildren();
 
-        // remove old child
+        // Remove old child
         blocks.remove(position);
         oldBlock.setParent(null);
 
-        // insert new children
+        // Insert new children
+        Block previousBlock = oldBlock.getPreviousSibling();
+        if (newBlocks.isEmpty()) {
+            previousBlock.setNextSiblingBlock(oldBlock.getNextSibling());
+        }
+        Block lastBlock = null;
         for (Block block : newBlocks) {
             block.setParent(this);
+            block.setPreviousSiblingBlock(previousBlock);
+            if (previousBlock != null) {
+                previousBlock.setNextSiblingBlock(block);
+            }
+            previousBlock = block;
+            lastBlock = block;
         }
+        Block nextBlock = oldBlock.getNextSibling();
+        if (nextBlock != null) {
+            nextBlock.setPreviousSiblingBlock(lastBlock);
+        }
+        if (lastBlock != null) {
+            lastBlock.setNextSiblingBlock(nextBlock);
+        }
+
         blocks.addAll(position, newBlocks);
 
+        oldBlock.setNextSiblingBlock(null);
+        oldBlock.setPreviousSiblingBlock(null);
     }
 
     /**
@@ -171,7 +251,7 @@ public abstract class AbstractBlock implements Block
      * Can't use {@link List#indexOf(Object)} since it's using {@link Object#equals(Object)} internally which is not
      * what we want since two WordBlock with the same text or two spaces are equals for example but we want to be able
      * to target one specific Block.
-     * 
+     *
      * @param block the block
      * @return the position of the block, -1 if the block can't be found
      */
@@ -186,9 +266,9 @@ public abstract class AbstractBlock implements Block
      * Can't use {@link List#indexOf(Object)} since it's using {@link Object#equals(Object)} internally which is not
      * what we want since two WordBlock with the same text or two spaces are equals for example but we want to be able
      * to target one specific Block.
-     * 
-     * @param block the block
-     * @param blocks the list of blocks
+     *
+     * @param block the block for which to find the position
+     * @param blocks the list of blocks in which to look for the passed block
      * @return the position of the block, -1 if the block can't be found
      */
     private int indexOfBlock(Block block, List<Block> blocks)
@@ -207,7 +287,7 @@ public abstract class AbstractBlock implements Block
 
     /**
      * {@inheritDoc}
-     * 
+     *
      * @see org.xwiki.rendering.block.Block#getChildren()
      */
     public List<Block> getChildren()
@@ -217,7 +297,7 @@ public abstract class AbstractBlock implements Block
 
     /**
      * {@inheritDoc}
-     * 
+     *
      * @see org.xwiki.rendering.block.Block#getParent()
      */
     public Block getParent()
@@ -236,7 +316,7 @@ public abstract class AbstractBlock implements Block
     /**
      * A Parameter is a generic key/value which can be used to add metadata to a block. What is done with the metadata
      * depends on the Renderer's implementations. For example the XHTML Renderer adds them as Element attributes.
-     * 
+     *
      * @param name the name of the parameter to return
      * @return the parameter or null if the parameter doesn't exist
      */
@@ -247,7 +327,7 @@ public abstract class AbstractBlock implements Block
 
     /**
      * Set a parameter on the current block. See {@link #getParameter(String)} for more details.
-     * 
+     *
      * @param name the parameter's name
      * @param value the parameter's value
      */
@@ -258,9 +338,9 @@ public abstract class AbstractBlock implements Block
 
     /**
      * Set several parameters at once.
-     * 
+     *
      * @param parameters the parameters to set
-     * @see #getParameter(String) 
+     * @see #getParameter(String)
      * @since 1.7M2
      */
     public void setParameters(Map<String, String> parameters)
@@ -270,7 +350,7 @@ public abstract class AbstractBlock implements Block
 
     /**
      * {@inheritDoc}
-     * 
+     *
      * @see org.xwiki.rendering.block.Block#setParent(org.xwiki.rendering.block.Block)
      */
     public void setParent(Block parentBlock)
@@ -280,7 +360,7 @@ public abstract class AbstractBlock implements Block
 
     /**
      * {@inheritDoc}
-     * 
+     *
      * @see org.xwiki.rendering.block.Block#getRoot()
      */
     public Block getRoot()
@@ -296,7 +376,7 @@ public abstract class AbstractBlock implements Block
 
     /**
      * {@inheritDoc}
-     * 
+     *
      * @see org.xwiki.rendering.block.Block#getChildrenByType(java.lang.Class, boolean)
      */
     public <T extends Block> List<T> getChildrenByType(Class<T> blockClass, boolean recurse)
@@ -316,7 +396,7 @@ public abstract class AbstractBlock implements Block
 
     /**
      * {@inheritDoc}
-     * 
+     *
      * @see org.xwiki.rendering.block.Block#getPreviousBlockByType(java.lang.Class, boolean)
      */
     public <T extends Block> T getPreviousBlockByType(Class<T> blockClass, boolean recurse)
@@ -347,7 +427,7 @@ public abstract class AbstractBlock implements Block
 
     /**
      * {@inheritDoc}
-     * 
+     *
      * @see org.xwiki.rendering.block.Block#getParentBlockByType(java.lang.Class)
      */
     public <T extends Block> T getParentBlockByType(Class<T> blockClass)
@@ -363,7 +443,52 @@ public abstract class AbstractBlock implements Block
 
     /**
      * {@inheritDoc}
-     * 
+     *
+     * @see Block#getNextSibling()
+     * @since 2.6RC1
+     */
+    public Block getNextSibling()
+    {
+        return this.nextSiblingBlock;
+    }
+
+    /**
+     * {@inheritDoc}
+     *
+     * @see Block#getPreviousSibling()
+     * @since 2.6RC1
+     */
+    public Block getPreviousSibling()
+    {
+        return this.previousSiblingBlock;
+    }
+
+    /**
+     * {@inheritDoc}
+     *
+     * @see org.xwiki.rendering.block.Block#removeBlock(Block)
+     * @since 2.6RC1
+     */
+    public void removeBlock(Block childBlockToRemove)
+    {
+        getChildren().remove(childBlockToRemove);
+        if (childBlockToRemove != null) {
+            Block previousBlock = childBlockToRemove.getPreviousSibling();
+            if (previousBlock != null) {
+                previousBlock.setNextSiblingBlock(childBlockToRemove.getNextSibling());
+            }
+            Block nextBlock = childBlockToRemove.getNextSibling();
+            if (nextBlock != null) {
+                nextBlock.setPreviousSiblingBlock(previousBlock);
+            }
+            childBlockToRemove.setNextSiblingBlock(null);
+            childBlockToRemove.setPreviousSiblingBlock(null);
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     *
      * @see EqualsBuilder#reflectionEquals(Object, Object)
      */
     @Override
@@ -374,7 +499,7 @@ public abstract class AbstractBlock implements Block
 
     /**
      * {@inheritDoc}
-     * 
+     *
      * @see HashCodeBuilder#reflectionHashCode(Object)
      */
     @Override
@@ -385,7 +510,7 @@ public abstract class AbstractBlock implements Block
 
     /**
      * {@inheritDoc}
-     * 
+     *
      * @see org.xwiki.rendering.block.Block#clone()
      */
     @Override
@@ -396,7 +521,7 @@ public abstract class AbstractBlock implements Block
 
     /**
      * {@inheritDoc}
-     * 
+     *
      * @see org.xwiki.rendering.block.Block#clone(org.xwiki.rendering.block.BlockFilter)
      * @since 1.8RC2
      */

@@ -221,6 +221,8 @@
                 <exclude>org/xwiki/rendering/wiki/WikiModel</exclude><!-- Renamed getAttachmentURL in getLinkURL -->
                 <exclude>org/xwiki/rendering/scaffolding/MockWikiModel</exclude><!-- Renamed getAttachmentURL in getLinkURL -->
                 <exclude>org/xwiki/rendering/macro/box/BoxMacroParameters</exclude><!-- Changed get/setImage param type -->
+                <exclude>org/xwiki/rendering/block/Block</exclude><!-- Added get/setNext/PreviousSibling + removeBlock -->
+                <exclude>org/xwiki/rendering/block/SpaceBlock</exclude><!-- Removed field SPACE_BLOCK-->
               </excludes>
             </configuration>
           </plugin>

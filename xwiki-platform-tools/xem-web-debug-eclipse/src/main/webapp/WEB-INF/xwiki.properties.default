@@ -232,8 +232,9 @@
 #-# in the request.
 #-# 
 #-# Valid values:
-#-#   0: Disabled
-#-#   1: Enabled
+#-#   true : Enabled
+#-#   false: Disabled
 #-#
-#-# Default value is 0
-# core.csrf.enabled = 0
+#-# Default value is false
+# csrf.enabled = false
+

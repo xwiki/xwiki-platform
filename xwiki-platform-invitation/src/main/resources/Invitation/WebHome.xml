@@ -965,10 +965,18 @@ $xwiki.get('ssx').use($config.get('commonPage'))
  * $invalidAddresses (List&lt;String&gt;) this List will be populated with addresses from $allAddresses which are invalid.
  *###
 #macro(validateAddressFormat, $allAddresses, $emailRegex, $invalidAddresses)
+  ## Perl/javascript regexes look like /^.*/
+  ## java does not like the / at beginning and end.
+  #if($emailRegex.length() > 1)
+    #set($emailRegexInternal = $emailRegex.substring(1, $mathtool.add($emailRegex.length(), -1)))
+  #else
+    ## I don't expect this but want to maintain compatibility.
+    #set($emailRegexInternal = $emailRegex)
+  #end
   #foreach($address in $allAddresses)
     #if("$!address" == '')
       ## Empty address, do nothing.
-    #elseif(!$xcontext.getUtil().match($emailRegex, $address))
+    #elseif($regextool.find($address, $emailRegexInternal).size() == 0)
       #set($discard = $invalidAddresses.add($address))
     #end
   #end

@@ -21,7 +21,7 @@ package org.xwiki.velocity.internal;
 
 import java.util.Properties;
 
-import org.apache.velocity.tools.generic.DateTool;
+import org.apache.velocity.tools.generic.ComparisonDateTool;
 import org.apache.velocity.tools.generic.EscapeTool;
 import org.apache.velocity.tools.generic.ListTool;
 import org.apache.velocity.tools.generic.MathTool;
@@ -79,7 +79,7 @@ public class DefaultVelocityConfiguration implements Initializable, VelocityConf
         // Default Velocity tools.
         this.defaultTools.setProperty("listtool", ListTool.class.getName());
         this.defaultTools.setProperty("numbertool", NumberTool.class.getName());
-        this.defaultTools.setProperty("datetool", DateTool.class.getName());
+        this.defaultTools.setProperty("datetool", ComparisonDateTool.class.getName());
         this.defaultTools.setProperty("mathtool", MathTool.class.getName());
         this.defaultTools.setProperty("sorttool", SortTool.class.getName());
         this.defaultTools.setProperty("escapetool", EscapeTool.class.getName());

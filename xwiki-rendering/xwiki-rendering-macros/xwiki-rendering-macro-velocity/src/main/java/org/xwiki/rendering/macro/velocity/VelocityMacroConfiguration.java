@@ -25,8 +25,8 @@ import org.xwiki.component.annotation.ComponentRole;
  * Configuration properties for the Velocity macro.
  * <p>
  * You can override the default values for each of the configuration properties below by defining them in XWiki's global
- * configuration file using a prefix of "macro.velocity" followed by the property name. For example:
- * <code>macro.velocity.cleaner = none</code>
+ * configuration file using a prefix of "rendering.macro.velocity" followed by the property name. For example:
+ * <code>rendering.macro.velocity.cleaner = none</code>
  * 
  * @version $Id$
  * @since 2.0M1

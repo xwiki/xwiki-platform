@@ -521,22 +521,7 @@ ux1Ane6uyL1jBt51dsf+F6sNFKNoUUSaAAAAAElFTkSuQmCC</content></attachment>
 <className>XWiki.ConfigurableClass</className>
 <guid>1c92a63a-fb97-41e7-8fb5-adb134b4b4f0</guid>
 <property>
-<codeToExecute>## If there is no Invitation.InvitationConfig then create one.
-## TODO Find a nicer way to handle this.
-#if($xwiki.getDocument('Invitation.InvitationConfig').isNew())
-  {{include document="Invitation.WebHome" context="new"/}}
-  #if($request.getParameter('redirected') == 3)
-    {{error}}$msg.get('xe.invitation.failedToCreateDocuments'){{/error}}
-  #else
-    #set($redirected = 1)
-    #if($request.getParameter('redirected'))
-      #set($redirected = $mathtool.add(1, $request.getParameter('redirected')))
-    #end
-    $response.sendRedirect(
-      $request.getRequestURL().append("?").append(
-        $request.getQueryString().replaceAll('&amp;redirected=.*', '')).append("&amp;redirected=$redirected").toString())
-  #end
-#end</codeToExecute>
+<codeToExecute></codeToExecute>
 </property>
 <property>
 <configurationClass></configurationClass>

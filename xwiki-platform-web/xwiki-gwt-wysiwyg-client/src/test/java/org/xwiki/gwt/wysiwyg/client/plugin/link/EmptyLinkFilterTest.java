@@ -210,4 +210,21 @@ public class EmptyLinkFilterTest extends RichTextAreaTestCase
             }
         });
     }
+
+    /**
+     * @see XWIKI-5588: Wysiwyg removes image when image is left align and has a link around it
+     */
+    public void testAnchorWithFloatedContentIsNotFiltered()
+    {
+        deferTest(new com.google.gwt.user.client.Command()
+        {
+            public void execute()
+            {
+                rta.setHTML("<a href=\"http://www.xwiki.org\"><img src=\"missing.gif\""
+                    + " alt=\"test\" style=\"float:left\"/></a>");
+                linkFilter.onBeforeCommand(rta.getCommandManager(), SUBMIT_COMMAND, null);
+                assertEquals(1, getBody().getElementsByTagName(ANCHOR_TAG).getLength());
+            }
+        });
+    }
 }

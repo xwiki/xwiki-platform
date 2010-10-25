@@ -34,6 +34,7 @@
   <name>XWiki Platform - Core - Rendering - Transformation - Icon</name>
   <description>XWiki Platform - Core - Rendering - Transformation - Icon</description>
   <properties>
+    <!-- New module introduced in 2.6, remove this skip once 2.6 is released. -->
     <xwiki.clirr.skip>true</xwiki.clirr.skip>
   </properties>
 </project>

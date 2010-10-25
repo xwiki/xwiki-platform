@@ -34,10 +34,6 @@
   <packaging>jar</packaging>
   <name>XWiki Platform - Core - REST - Server</name>
   <description>Service for accessing XWiki through a RESTful API</description>
-  <!-- Since in 2.4 we moved all model classes in a separate module, skip clirr otherwise we will get plenty of "removed" errors. Re-enable it in next development cycles! -->
-  <properties>
-    <xwiki.clirr.skip>true</xwiki.clirr.skip>
-  </properties>
   <dependencies>
     <dependency>
       <groupId>javax.servlet</groupId>

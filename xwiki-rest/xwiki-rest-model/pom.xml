@@ -32,10 +32,6 @@
   <artifactId>xwiki-rest-model</artifactId>
   <name>XWiki Platform - Core - REST - Model</name>
   <description>The (JAXB) model for XML resource representations served by the REST module.</description>
-  <!-- We are disabling clirr in order to avoid errors because since we are introducing this module in 2.4, previous versions don't exist. REMOVE this line in next development cycles! -->
-  <properties>
-    <xwiki.clirr.skip>true</xwiki.clirr.skip>
-  </properties>
   <dependencies>
     <dependency>
       <groupId>javax.xml.bind</groupId>

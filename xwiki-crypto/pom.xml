@@ -32,10 +32,6 @@
   <artifactId>xwiki-core-crypto</artifactId>
   <name>XWiki Platform - Core - Cryptographic Services</name>
   <description>XWiki Platform - Core - Cryptographic Services</description>
-  <properties>
-    <!-- Skip Clirr execution, since this is a new component -->
-    <xwiki.clirr.skip>true</xwiki.clirr.skip>
-  </properties>
   <dependencies>
     <!-- Used by CryptoScriptService which provides a service to Velocity scripts -->
     <dependency>

@@ -34,10 +34,6 @@
   <name>XWiki Platform - Core - Observation - API</name>
   <packaging>jar</packaging>
   <description>XWiki Platform - Core - Observation - API</description>
-  <properties>
-    <!-- Remove when 2.5 will be released -->
-    <xwiki.clirr.skip>true</xwiki.clirr.skip>
-  </properties>
   <dependencies>
     <dependency>
       <groupId>org.xwiki.platform</groupId>

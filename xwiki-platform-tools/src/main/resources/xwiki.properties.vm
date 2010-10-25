@@ -158,7 +158,7 @@
 #-# Default values (no need to add them)
 #-#   velocity.tools = listtool = org.apache.velocity.tools.generic.ListTool
 #-#   velocity.tools = numbertool = org.apache.velocity.tools.generic.NumberTool
-#-#   velocity.tools = datetool = org.apache.velocity.tools.generic.DateTool
+#-#   velocity.tools = datetool = org.apache.velocity.tools.generic.ComparisonDateTool
 #-#   velocity.tools = mathtool = org.apache.velocity.tools.generic.MathTool
 #-#   velocity.tools = sorttool = org.apache.velocity.tools.generic.SortTool     
 #-#   velocity.tools = escapetool = org.apache.velocity.tools.generic.EscapeTool

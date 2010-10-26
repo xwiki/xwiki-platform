@@ -108,9 +108,10 @@ public class ImageFilter extends AbstractHTMLFilter
                 image.setAttribute(ATTRIBUTE_SRC, src);
                 image.setAttribute(ATTRIBUTE_ALT, src);
             }
+            ResourceReference imageReference = new ResourceReference(src, ResourceType.ATTACHMENT);
+            imageReference.setTyped(false);
             Comment beforeComment =
-                htmlDocument.createComment("startimage:"
-                    + this.xhtmlMarkerSerializer.serialize(new ResourceReference(src, ResourceType.ATTACHMENT)));
+                htmlDocument.createComment("startimage:" + this.xhtmlMarkerSerializer.serialize(imageReference));
             Comment afterComment = htmlDocument.createComment("stopimage");
             image.getParentNode().insertBefore(beforeComment, image);
             image.getParentNode().insertBefore(afterComment, image.getNextSibling());

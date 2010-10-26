@@ -103,10 +103,21 @@ import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.model.reference.EntityReferenceValueProvider;
 import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.model.reference.WikiReference;
+import org.xwiki.observation.EventListener;
 import org.xwiki.observation.ObservationManager;
+import org.xwiki.observation.event.AnnotationAddEvent;
+import org.xwiki.observation.event.AnnotationDeleteEvent;
+import org.xwiki.observation.event.AnnotationUpdateEvent;
+import org.xwiki.observation.event.AttachmentAddEvent;
+import org.xwiki.observation.event.AttachmentDeleteEvent;
+import org.xwiki.observation.event.AttachmentUpdateEvent;
+import org.xwiki.observation.event.CommentAddEvent;
+import org.xwiki.observation.event.CommentDeleteEvent;
+import org.xwiki.observation.event.CommentUpdateEvent;
 import org.xwiki.observation.event.DocumentDeleteEvent;
 import org.xwiki.observation.event.DocumentSaveEvent;
 import org.xwiki.observation.event.DocumentUpdateEvent;
+import org.xwiki.observation.event.Event;
 import org.xwiki.query.QueryException;
 import org.xwiki.rendering.macro.wikibridge.WikiMacroInitializer;
 import org.xwiki.rendering.parser.ParseException;
@@ -119,6 +130,7 @@ import com.xpn.xwiki.api.Api;
 import com.xpn.xwiki.api.Document;
 import com.xpn.xwiki.api.User;
 import com.xpn.xwiki.criteria.api.XWikiCriteriaService;
+import com.xpn.xwiki.doc.AttachmentDiff;
 import com.xpn.xwiki.doc.DeletedAttachment;
 import com.xpn.xwiki.doc.XWikiAttachment;
 import com.xpn.xwiki.doc.XWikiDeletedDocument;
@@ -132,6 +144,7 @@ import com.xpn.xwiki.notify.XWikiNotificationManager;
 import com.xpn.xwiki.notify.XWikiNotificationRule;
 import com.xpn.xwiki.notify.XWikiPageNotification;
 import com.xpn.xwiki.objects.BaseObject;
+import com.xpn.xwiki.objects.ObjectDiff;
 import com.xpn.xwiki.objects.PropertyInterface;
 import com.xpn.xwiki.objects.classes.BaseClass;
 import com.xpn.xwiki.objects.classes.BooleanClass;
@@ -187,7 +200,7 @@ import com.xpn.xwiki.web.XWikiURLFactoryService;
 import com.xpn.xwiki.web.XWikiURLFactoryServiceImpl;
 import com.xpn.xwiki.web.includeservletasstring.IncludeServletAsString;
 
-public class XWiki implements XWikiDocChangeNotificationInterface
+public class XWiki implements XWikiDocChangeNotificationInterface, EventListener
 {
     /** Logging helper object. */
     protected static final Log LOG = LogFactory.getLog(XWiki.class);
@@ -853,6 +866,8 @@ public class XWiki implements XWikiDocChangeNotificationInterface
         // TODO: This is only a temporary work around, we need to use a component-based init mechanism instead. Note
         // that we need DB access to be available (at component initialization) to make this possible.
         registerWikiMacros();
+
+        Utils.getComponent(ObservationManager.class).addListener(this);
     }
 
     /**
@@ -7518,5 +7533,71 @@ public class XWiki implements XWikiDocChangeNotificationInterface
     public boolean isTitleInCompatibilityMode()
     {
         return "1".equals(Param("xwiki.title.compatibility", "0"));
+    }
+
+    public void onEvent(Event event, Object source, Object data)
+    {
+        XWikiDocument doc = (XWikiDocument) source;
+        XWikiDocument originalDoc = doc.getOriginalDocument();
+        XWikiContext context = (XWikiContext) data;
+
+        ObservationManager om = Utils.getComponent(ObservationManager.class);
+        String reference = this.defaultEntityReferenceSerializer.serialize(doc.getDocumentReference());
+
+        try {
+            for (List<ObjectDiff> objectChanges : doc.getObjectDiff(originalDoc, doc, context)) {
+                for (ObjectDiff diff : objectChanges) {
+                    if (StringUtils.equals(diff.getClassName(), "XWiki.XWikiComments")) {
+                        if (StringUtils.equals(diff.getAction(), "object-removed")) {
+                            om.notify(new CommentDeleteEvent(reference, diff.getNumber() + ""), source, data);
+                        } else if (StringUtils.equals(diff.getAction(), "object-added")) {
+                            om.notify(new CommentAddEvent(reference, diff.getNumber() + ""), source, data);
+                        } else {
+                            om.notify(new CommentUpdateEvent(reference, diff.getNumber() + ""), source, data);
+                        }
+                    } else if (StringUtils.equals(diff.getClassName(), "AnnotationCode.AnnotationClass")) {
+                        if (StringUtils.equals(diff.getAction(), "object-removed")) {
+                            om.notify(new AnnotationDeleteEvent(reference, diff.getNumber() + ""), source, data);
+                        } else if (StringUtils.equals(diff.getAction(), "object-added")) {
+                            om.notify(new AnnotationAddEvent(reference, diff.getNumber() + ""), source, data);
+                        } else {
+                            om.notify(new AnnotationUpdateEvent(reference, diff.getNumber() + ""), source, data);
+                        }
+                    }
+                    break;
+                }
+            }
+            for (AttachmentDiff diff : doc.getAttachmentDiff(originalDoc, doc, context)) {
+                if (StringUtils.isEmpty(diff.getOrigVersion())) {
+                    om.notify(new AttachmentAddEvent(reference, diff.getFileName()), source, data);
+                } else if (StringUtils.isEmpty(diff.getNewVersion())) {
+                    om.notify(new AttachmentDeleteEvent(reference, diff.getFileName()), source, data);
+                } else {
+                    om.notify(new AttachmentUpdateEvent(reference, diff.getFileName()), source, data);
+                }
+            }
+        } catch (XWikiException ex) {
+            // TODO Auto-generated catch block
+            ex.printStackTrace();
+        }
+    }
+
+    private static final List<Event> LISTENER_EVENTS = new ArrayList<Event>()
+    {
+        {
+            add(new DocumentSaveEvent());
+            add(new DocumentUpdateEvent());
+            add(new DocumentDeleteEvent());
+        }
+    };
+
+    public List<Event> getEvents()
+    {
+        return LISTENER_EVENTS;
+    }
+
+    public String getName()
+    {
+        return "xwiki-core";
     }
 }

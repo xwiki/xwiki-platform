@@ -80,7 +80,7 @@ public class DefaultCoreConfiguration extends AbstractLogEnabled implements Core
             syntaxId = this.xwikiPropertiesConfiguration.getProperty(key, Syntax.XWIKI_2_0.toIdString());
         }
 
-        // Try to parse the syntax and if it failes defaults to the XWiki Syntax 2.0
+        // Try to parse the syntax and if it fails defaults to the XWiki Syntax 2.0
         Syntax syntax;
         try {
             syntax = this.syntaxFactory.createSyntaxFromIdString(syntaxId);

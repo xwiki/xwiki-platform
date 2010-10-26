@@ -94,6 +94,29 @@
 # rendering.interWikiDefinitions = wikipedia = http://en.wikipedia.org/wiki/
 # rendering.interWikiDefinitions = definition = http://www.yourdictionary.com/
 
+#-# [Since 2.6RC1]
+#-# Icon Transformation Configuration
+#-# Defines mappings between suite of characters and the icon to display when those characters are found.
+#-# The format is: rendering.transformation.icon.mappings = <suite of characters> = <icon name>
+#-# The following mappings are already predefined and you don't need to redefine them unless you wish to override them
+#-# rendering.transformation.icon.mappings = :) = emoticon_smile
+#-# rendering.transformation.icon.mappings = :( = emoticon_unhappy
+#-# rendering.transformation.icon.mappings = :P = emoticon_tongue
+#-# rendering.transformation.icon.mappings = :D = emoticon_grin
+#-# rendering.transformation.icon.mappings = ;) = emoticon_wink
+#-# rendering.transformation.icon.mappings = (y) = thumb_up
+#-# rendering.transformation.icon.mappings = (n) = thumb_down
+#-# rendering.transformation.icon.mappings = (i) = information
+#-# rendering.transformation.icon.mappings = (/) = accept
+#-# rendering.transformation.icon.mappings = (x) = cancel
+#-# rendering.transformation.icon.mappings = (!) = error
+#-# rendering.transformation.icon.mappings = (+) = add
+#-# rendering.transformation.icon.mappings = (-) = delete
+#-# rendering.transformation.icon.mappings = (?) = help
+#-# rendering.transformation.icon.mappings = (on) = lightbulb
+#-# rendering.transformation.icon.mappings = (off) = lightbulb_off
+#-# rendering.transformation.icon.mappings = (*) = star
+
 #-------------------------------------------------------------------------------------
 # Cache
 #-------------------------------------------------------------------------------------
@@ -154,7 +177,7 @@
 
 #-# [Since 2.0M1]
 #-# Velocity Tools that will be available from your scripts. The format is
-#-# velocity.tools.<name under which it'll be available in the context> = <class name>
+#-# velocity.tools = <name under which it'll be available in the context> = <class name>
 #-# Default values (no need to add them)
 #-#   velocity.tools = listtool = org.apache.velocity.tools.generic.ListTool
 #-#   velocity.tools = numbertool = org.apache.velocity.tools.generic.NumberTool

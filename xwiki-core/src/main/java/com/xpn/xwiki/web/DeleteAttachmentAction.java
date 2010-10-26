@@ -116,6 +116,9 @@ public class DeleteAttachmentAction extends XWikiAction
 
         newdoc.deleteAttachment(attachment, context);
 
+        // Needed to counter a side effect of XWIKI-1982: the attachment is deleted from the newdoc.originalDoc as well
+        newdoc.setOriginalDocument(doc);
+
         // Also save the document and attachment metadata
         context.getWiki().saveDocument(newdoc, context);
 

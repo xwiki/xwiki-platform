@@ -40,4 +40,49 @@ public interface ActivityEventType
      * Document deletion.
      */
     String DELETE = "delete";
+
+    /**
+     * Comment add.
+     */
+    String ADD_COMMENT = "addComment";
+
+    /**
+     * Comment modification.
+     */
+    String UPDATE_COMMENT = "updateComment";
+
+    /**
+     * Comment deletion.
+     */
+    String DELETE_COMMENT = "deleteComment";
+
+    /**
+     * Attachment add.
+     */
+    String ADD_ATTACHMENT = "addAttachment";
+
+    /**
+     * Attachment modification.
+     */
+    String UPDATE_ATTACHMENT = "updateAttachment";
+
+    /**
+     * Attachment deletion.
+     */
+    String DELETE_ATTACHMENT = "deleteAttachment";
+
+    /**
+     * Annotation add.
+     */
+    String ADD_ANNOTATION = "addAnnotation";
+
+    /**
+     * Annotation modification.
+     */
+    String UPDATE_ANNOTATION = "updateAnnotation";
+
+    /**
+     * Annotation deletion.
+     */
+    String DELETE_ANNOTATION = "deleteAnnotation";
 }

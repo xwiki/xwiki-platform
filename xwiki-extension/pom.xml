@@ -33,9 +33,13 @@
   <name>XWiki Platform - Core - Extension</name>
   <packaging>pom</packaging>
   <description>XWiki Platform - Core - Extension</description>
+  <properties>
+    <!-- Remove when 2.6 will be released -->
+    <xwiki.clirr.skip>true</xwiki.clirr.skip>
+  </properties>
   <modules>
     <module>xwiki-extension-api</module>
     <module>xwiki-extension-handlers</module>
   </modules>
 </project>
-       
+

@@ -72,12 +72,12 @@ public class ActivityStreamImpl implements ActivityStream, EventListener
      * Character used as a separator in event IDs.
      */
     private static final String EVENT_ID_ELEMENTS_SEPARATOR = "-";
-    
+
     /**
      * The name of the listener.
      */
     private static final String LISTENER_NAME = "activitystream";
-    
+
     /**
      * The events to match.
      */
@@ -113,7 +113,7 @@ public class ActivityStreamImpl implements ActivityStream, EventListener
             }
 
             if (event.getUrl() == null) {
-                // Protection against NPEs, events can happen before the URL factory gets created. 
+                // Protection against NPEs, events can happen before the URL factory gets created.
                 if (context.getURLFactory() != null) {
                     event.setUrl(doc.getURL("view", context));
                 }
@@ -267,7 +267,7 @@ public class ActivityStreamImpl implements ActivityStream, EventListener
             // If we aren't in virtual mode, local store is forced.
             return false;
         }
-        
+
         if (context.getWiki().isVirtualMode() && context.getDatabase().equals(context.getMainXWiki())) {
             // We're in the main database, we don't have to store the data twice.
             return false;
@@ -830,7 +830,7 @@ public class ActivityStreamImpl implements ActivityStream, EventListener
             return "";
         }
     }
-    
+
     /**
      * {@inheritDoc}
      * 
@@ -850,7 +850,7 @@ public class ActivityStreamImpl implements ActivityStream, EventListener
     {
         return LISTENER_NAME;
     }
-    
+
     /**
      * {@inheritDoc}
      * 
@@ -865,13 +865,13 @@ public class ActivityStreamImpl implements ActivityStream, EventListener
         String wiki = context.getDatabase();
         String msgPrefix = "activitystream.event.";
         String streamName = getStreamName(currentDoc.getSpace(), context);
-        
+
         // If we haven't found a stream to store the event or if both currentDoc and originalDoc are null: exit
         if (streamName == null) {
             return;
         }
-        
-        // Take events into account only once in a cluster  
+
+        // Take events into account only once in a cluster
         if (!Utils.getComponent(RemoteObservationManagerContext.class).isRemoteState()) {
             String eventType;
             String displayTitle;
@@ -886,15 +886,15 @@ public class ActivityStreamImpl implements ActivityStream, EventListener
                 eventType = ActivityEventType.DELETE;
                 displayTitle = originalDoc.getDisplayTitle(context);
             }
-            
+
             List<String> params = new ArrayList<String>();
             params.add(displayTitle);
             
             try {
                 addDocumentActivityEvent(streamName, currentDoc, eventType, msgPrefix + eventType, params, context);
             } catch (ActivityStreamException e) {
-                Log.error("Exception while trying to add a document activity event, updated document: [" 
-                    + wiki + ":" + currentDoc.getFullName() + "]");                
+                Log.error("Exception while trying to add a document activity event, updated document: [" + wiki + ":"
+                    + currentDoc.getFullName() + "]");
             }
         }
     }

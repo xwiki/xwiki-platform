@@ -260,7 +260,7 @@ public interface ActivityStream
         int start, List<Object> parameterValues, XWikiContext context) throws ActivityStreamException;
 
     /**
-     * Get events from the activiy stream.
+     * Get events from the activity stream.
      * 
      * @param filter true if the events should be filtered by priority 
      * @param nb number of events to retrieve

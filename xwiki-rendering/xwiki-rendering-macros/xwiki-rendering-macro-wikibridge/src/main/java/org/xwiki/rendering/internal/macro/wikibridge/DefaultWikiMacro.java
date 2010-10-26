@@ -224,12 +224,13 @@ public class DefaultWikiMacro implements WikiMacro, NestedScriptMacroEnabled
     /**
      * Extract result of the wiki macro execution.
      * 
-     * @param xdom the wiki macro content
+     * @param blocks the wiki macro content
      * @param macroContext the wiki macro context
      * @param context the macro execution context
      * @return the result
      */
-    private List<Block> extractResult(List<Block> blocks, Map<String, Object> macroContext, MacroTransformationContext context)
+    private List<Block> extractResult(List<Block> blocks, Map<String, Object> macroContext,
+        MacroTransformationContext context)
     {
         Object resultObject = macroContext.get(MACRO_RESULT_KEY);
 

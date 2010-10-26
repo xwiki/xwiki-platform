@@ -31,6 +31,15 @@ import org.hibernate.Session;
 import org.jfree.util.Log;
 import org.xwiki.observation.EventListener;
 import org.xwiki.observation.ObservationManager;
+import org.xwiki.observation.event.AnnotationAddEvent;
+import org.xwiki.observation.event.AnnotationDeleteEvent;
+import org.xwiki.observation.event.AnnotationUpdateEvent;
+import org.xwiki.observation.event.AttachmentAddEvent;
+import org.xwiki.observation.event.AttachmentDeleteEvent;
+import org.xwiki.observation.event.AttachmentUpdateEvent;
+import org.xwiki.observation.event.CommentAddEvent;
+import org.xwiki.observation.event.CommentDeleteEvent;
+import org.xwiki.observation.event.CommentUpdateEvent;
 import org.xwiki.observation.event.DocumentDeleteEvent;
 import org.xwiki.observation.event.DocumentSaveEvent;
 import org.xwiki.observation.event.DocumentUpdateEvent;
@@ -87,6 +96,15 @@ public class ActivityStreamImpl implements ActivityStream, EventListener
             add(new DocumentSaveEvent());
             add(new DocumentUpdateEvent());
             add(new DocumentDeleteEvent());
+            add(new CommentAddEvent());
+            add(new CommentDeleteEvent());
+            add(new CommentUpdateEvent());
+            add(new AttachmentAddEvent());
+            add(new AttachmentDeleteEvent());
+            add(new AttachmentUpdateEvent());
+            add(new AnnotationAddEvent());
+            add(new AnnotationDeleteEvent());
+            add(new AnnotationUpdateEvent());
         }
     };
 
@@ -875,21 +893,61 @@ public class ActivityStreamImpl implements ActivityStream, EventListener
         if (!Utils.getComponent(RemoteObservationManagerContext.class).isRemoteState()) {
             String eventType;
             String displayTitle;
-            
+            String additionalIdentifier = null;
+
             if (event instanceof DocumentSaveEvent) {
                 eventType = ActivityEventType.CREATE;
                 displayTitle = currentDoc.getDisplayTitle(context);
             } else if (event instanceof DocumentUpdateEvent) {
                 eventType = ActivityEventType.UPDATE;
                 displayTitle = originalDoc.getDisplayTitle(context);
-            } else { // event instanceof DocumentDeleteEvent
+            } else if (event instanceof DocumentDeleteEvent) {
                 eventType = ActivityEventType.DELETE;
                 displayTitle = originalDoc.getDisplayTitle(context);
+            } else if (event instanceof CommentAddEvent) {
+                eventType = ActivityEventType.ADD_COMMENT;
+                displayTitle = currentDoc.getDisplayTitle(context);
+                additionalIdentifier = ((CommentAddEvent) event).getComment();
+            } else if (event instanceof CommentDeleteEvent) {
+                eventType = ActivityEventType.DELETE_COMMENT;
+                displayTitle = currentDoc.getDisplayTitle(context);
+                additionalIdentifier = ((CommentDeleteEvent) event).getComment();
+            } else if (event instanceof CommentUpdateEvent){
+                eventType = ActivityEventType.UPDATE_COMMENT;
+                displayTitle = currentDoc.getDisplayTitle(context);
+                additionalIdentifier = ((CommentUpdateEvent) event).getComment();
+            } else if (event instanceof AttachmentAddEvent){
+                eventType = ActivityEventType.ADD_ATTACHMENT;
+                displayTitle = currentDoc.getDisplayTitle(context);
+                additionalIdentifier = ((AttachmentAddEvent) event).getName();
+            } else if (event instanceof AttachmentDeleteEvent){
+                eventType = ActivityEventType.DELETE_ATTACHMENT;
+                displayTitle = currentDoc.getDisplayTitle(context);
+                additionalIdentifier = ((AttachmentDeleteEvent) event).getName();
+            } else if (event instanceof AttachmentUpdateEvent){
+                eventType = ActivityEventType.UPDATE_ATTACHMENT;
+                displayTitle = currentDoc.getDisplayTitle(context);
+                additionalIdentifier = ((AttachmentUpdateEvent) event).getName();
+            } else if (event instanceof AnnotationAddEvent){
+                eventType = ActivityEventType.ADD_ANNOTATION;
+                displayTitle = currentDoc.getDisplayTitle(context);
+                additionalIdentifier = ((AnnotationAddEvent) event).getIdentifier();
+            } else if (event instanceof AnnotationDeleteEvent){
+                eventType = ActivityEventType.DELETE_ANNOTATION;
+                displayTitle = currentDoc.getDisplayTitle(context);
+                additionalIdentifier = ((AnnotationDeleteEvent) event).getIdentifier();
+            } else { // update annotation
+                eventType = ActivityEventType.UPDATE_ANNOTATION;
+                displayTitle = currentDoc.getDisplayTitle(context);
+                additionalIdentifier = ((AnnotationUpdateEvent) event).getIdentifier();
             }
 
             List<String> params = new ArrayList<String>();
             params.add(displayTitle);
-            
+            if (additionalIdentifier != null) {
+                params.add(additionalIdentifier);
+            }
+
             try {
                 addDocumentActivityEvent(streamName, currentDoc, eventType, msgPrefix + eventType, params, context);
             } catch (ActivityStreamException e) {

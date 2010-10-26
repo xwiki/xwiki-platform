@@ -47,8 +47,18 @@ public interface WysiwygEditorScriptService extends ScriptService
      * editor. This method is called for instance when a macro is inserted or edited.
      * 
      * @param html the HTML fragment to be rendered
-     * @param syntax the storage syntax
+     * @param syntaxId the storage syntax identifier
      * @return the XHTML result of rendering the given HTML fragment
      */
-    String parseAndRender(String html, String syntax);
+    String parseAndRender(String html, String syntaxId);
+
+    /**
+     * Converts the given source text from the specified syntax to annotated XHTML, which can be used as input for the
+     * WYSIWYG editor.
+     * 
+     * @param source the text to be converted
+     * @param syntaxId the syntax identifier
+     * @return the annotated XHTML result of the conversion
+     */
+    String toAnnotatedXHTML(String source, String syntaxId);
 }

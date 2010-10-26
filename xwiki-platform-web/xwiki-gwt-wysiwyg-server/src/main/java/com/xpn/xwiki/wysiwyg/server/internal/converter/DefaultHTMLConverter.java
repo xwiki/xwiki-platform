@@ -33,9 +33,8 @@ import org.xwiki.rendering.renderer.BlockRenderer;
 import org.xwiki.rendering.renderer.printer.DefaultWikiPrinter;
 import org.xwiki.rendering.renderer.printer.WikiPrinter;
 import org.xwiki.rendering.syntax.SyntaxFactory;
+import org.xwiki.rendering.transformation.Transformation;
 import org.xwiki.rendering.transformation.TransformationContext;
-import org.xwiki.rendering.transformation.TransformationManager;
-
 
 /**
  * Converts HTML into/from xwiki/2.0 syntax.
@@ -68,10 +67,16 @@ public class DefaultHTMLConverter implements HTMLConverter
     private SyntaxFactory syntaxFactory;
 
     /**
-     * The component used to execute the XDOM transformations before rendering to XHTML.
+     * The component used to execute the XDOM macro transformations before rendering to XHTML.
+     * <p>
+     * NOTE: We execute only macro transformations because they are the only transformations protected by the WYSIWYG
+     * editor. We should use the transformation manager once generic transformation markers are implemented in the
+     * rendering module and the WYSIWYG editor supports them.
+     * 
+     * @see XWIKI-3260: Add markers to modified XDOM by Transformations/Macros
      */
-    @Requirement
-    private TransformationManager transformationManager;
+    @Requirement("macro")
+    private Transformation macroTransformation;
 
     /**
      * The component used to render a XDOM to XHTML.
@@ -124,11 +129,11 @@ public class DefaultHTMLConverter implements HTMLConverter
             Parser parser = componentManager.lookup(Parser.class, syntaxId);
             XDOM xdom = parser.parse(new StringReader(source));
 
-            // Execute transformations
+            // Execute macro transformations
             TransformationContext txContext = new TransformationContext();
             txContext.setXDOM(xdom);
             txContext.setSyntax(syntaxFactory.createSyntaxFromIdString(syntaxId));
-            transformationManager.performTransformations(xdom, txContext);
+            macroTransformation.transform(xdom, txContext);
 
             // Render
             WikiPrinter printer = new DefaultWikiPrinter();
@@ -155,11 +160,11 @@ public class DefaultHTMLConverter implements HTMLConverter
             // Parse
             XDOM xdom = xhtmlParser.parse(new StringReader(html));
 
-            // Execute transformations
+            // Execute macro transformations
             TransformationContext txContext = new TransformationContext();
             txContext.setXDOM(xdom);
             txContext.setSyntax(syntaxFactory.createSyntaxFromIdString(syntax));
-            transformationManager.performTransformations(xdom, txContext);
+            macroTransformation.transform(xdom, txContext);
 
             // Render
             WikiPrinter printer = new DefaultWikiPrinter();

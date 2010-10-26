@@ -50,7 +50,7 @@ function fireContentLoad(contentLoadTriggerId) {
 </head>
 #if($request.method.equalsIgnoreCase('post') && $services.csrf.isTokenValid($request.token))
 #if($request.getParameterMap().containsKey('source'))
-#set($content = $tdoc.getRenderedContent($request.source, $tdoc.getSyntax().toIdString(), 'annotatedxhtml/1.0'))
+#set($content = $services.wysiwyg.toAnnotatedXHTML($request.source, $tdoc.getSyntax().toIdString()))
 #elseif($request.getParameterMap().containsKey('html'))
 #set($content = $services.wysiwyg.parseAndRender($request.html, $tdoc.getSyntax().toIdString()))
 #end

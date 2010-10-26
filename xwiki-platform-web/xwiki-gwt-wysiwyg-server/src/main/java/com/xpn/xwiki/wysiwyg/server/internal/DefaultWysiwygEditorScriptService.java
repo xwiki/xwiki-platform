@@ -116,4 +116,34 @@ public class DefaultWysiwygEditorScriptService implements WysiwygEditorScriptSer
             }
         }
     }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see WysiwygEditorScriptService#toAnnotatedXHTML(String, String)
+     */
+    public String toAnnotatedXHTML(String source, String syntaxId)
+    {
+        // Save the value of the "is in rendering engine" context property.
+        Object isInRenderingEngine = getXWikiContext().get(IS_IN_RENDERING_ENGINE);
+
+        try {
+            // This tells display() methods that we are inside the rendering engine and thus that they can return wiki
+            // syntax and not HTML syntax (which is needed when outside the rendering engine, i.e. when we're inside
+            // templates using only Velocity for example).
+            getXWikiContext().put(IS_IN_RENDERING_ENGINE, true);
+
+            return htmlConverter.toHTML(source, syntaxId);
+        } catch (Exception e) {
+            // Return the source text in case of an exception.
+            return source;
+        } finally {
+            // Restore the value of the value of the "is in rendering engine" context property.
+            if (isInRenderingEngine != null) {
+                getXWikiContext().put(IS_IN_RENDERING_ENGINE, isInRenderingEngine);
+            } else {
+                getXWikiContext().remove(IS_IN_RENDERING_ENGINE);
+            }
+        }
+    }
 }

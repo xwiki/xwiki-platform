@@ -907,15 +907,15 @@ public class ActivityStreamImpl implements ActivityStream, EventListener
             } else if (event instanceof CommentAddEvent) {
                 eventType = ActivityEventType.ADD_COMMENT;
                 displayTitle = currentDoc.getDisplayTitle(context);
-                additionalIdentifier = ((CommentAddEvent) event).getComment();
+                additionalIdentifier = ((CommentAddEvent) event).getIdentifier();
             } else if (event instanceof CommentDeleteEvent) {
                 eventType = ActivityEventType.DELETE_COMMENT;
                 displayTitle = currentDoc.getDisplayTitle(context);
-                additionalIdentifier = ((CommentDeleteEvent) event).getComment();
+                additionalIdentifier = ((CommentDeleteEvent) event).getIdentifier();
             } else if (event instanceof CommentUpdateEvent){
                 eventType = ActivityEventType.UPDATE_COMMENT;
                 displayTitle = currentDoc.getDisplayTitle(context);
-                additionalIdentifier = ((CommentUpdateEvent) event).getComment();
+                additionalIdentifier = ((CommentUpdateEvent) event).getIdentifier();
             } else if (event instanceof AttachmentAddEvent){
                 eventType = ActivityEventType.ADD_ATTACHMENT;
                 displayTitle = currentDoc.getDisplayTitle(context);

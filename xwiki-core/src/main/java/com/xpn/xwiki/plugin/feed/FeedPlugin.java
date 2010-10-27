@@ -513,16 +513,10 @@ public class FeedPlugin extends XWikiDefaultPlugin implements XWikiPluginInterfa
                     // Set the document date to the current date
                     doc.setDate(new Date());
                     Date adate;
-                    if (StringUtils.isBlank(context.getWiki().Param("xwiki.plugins.feed.publishedDateIsCreationDate"))) {
+                    if (!StringUtils.isBlank(context.getWiki().Param("xwiki.plugins.feed.creationDateIsPublicationDate"))) {
                         // Set the creation date to the feed date if it exists, otherwise the current date
-                        adate = (entry.getPublishedDate() == null) ? new Date() : entry.getPublishedDate();
-                    } else {
-                        // By default use now (fetching date) as document creation date, since the publish date
-                        // information is made available from
-                        // the XWiki.FeedEntryClass object.
-                        adate = new Date();
+                    	doc.setCreationDate((entry.getPublishedDate() == null) ? new Date() : entry.getPublishedDate());
                     }
-                    doc.setCreationDate(adate);
                     if (StringUtils.isBlank(doc.getContent())) {
                         this.prepareFeedEntryDocument(doc, context);
                     }

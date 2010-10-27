@@ -1215,16 +1215,18 @@ public class XWikiDocument implements DocumentModelBridge
                 if (header.getLevel().getAsInt() <= titleHeaderDepth) {
                     XDOM headerXDOM = new XDOM(Collections.<Block> singletonList(header));
 
-                    // transform
+                    // Transform
                     try {
                         TransformationContext txContext = new TransformationContext(headerXDOM, getSyntax());
                         Utils.getComponent(TransformationManager.class).performTransformations(headerXDOM, txContext);
                     } catch (TransformationException e) {
-                        throw new XWikiException(XWikiException.MODULE_XWIKI_RENDERING,
-                            XWikiException.ERROR_XWIKI_UNKNOWN, "Failed to transform document", e);
+                        // An error happened during one of the transformations. Since the error has been logged
+                        // continue
+                        // TODO: We should have a visual clue for the user in the future to let him know something
+                        // didn't work as expected.
                     }
 
-                    // render
+                    // Render
                     Block headerBlock = headerXDOM.getChildren().get(0);
                     if (headerBlock instanceof HeaderBlock) {
                         title = renderXDOM(new XDOM(headerBlock.getChildren()), outputSyntax);
@@ -1322,6 +1324,7 @@ public class XWikiDocument implements DocumentModelBridge
                 }
             }
         } catch (Exception e) {
+            // Don't stop when there's a problem rendering the title.
         }
 
         return title;
@@ -7402,7 +7405,14 @@ public class XWikiDocument implements DocumentModelBridge
                 if (txContext.getXDOM() == null) {
                     txContext.setXDOM(content);
                 }
-                transformations.performTransformations(content, txContext);
+                try {
+                    transformations.performTransformations(content, txContext);
+                } catch (TransformationException te) {
+                    // An error happened during one of the transformations. Since the error has been logged
+                    // continue
+                    // TODO: We should have a visual clue for the user in the future to let him know something
+                    // didn't work as expected.
+                }
             }
 
             // Render XDOM

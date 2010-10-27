@@ -21,6 +21,7 @@ package org.xwiki.rendering.internal.transformation;
 
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.Requirement;
+import org.xwiki.component.logging.AbstractLogEnabled;
 import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.block.XDOM;
 import org.xwiki.rendering.configuration.RenderingConfiguration;
@@ -38,7 +39,7 @@ import org.xwiki.rendering.transformation.TransformationManager;
  * @since 1.5M2
  */
 @Component
-public class DefaultTransformationManager implements TransformationManager
+public class DefaultTransformationManager extends AbstractLogEnabled implements TransformationManager
 {
     /**
      * Used to get the ordered list of transformations to execute.
@@ -65,8 +66,19 @@ public class DefaultTransformationManager implements TransformationManager
      */
     public void performTransformations(Block block, TransformationContext context) throws TransformationException
     {
+        boolean error = false;
         for (Transformation transformation : this.configuration.getTransformations()) {
-            transformation.transform(block, context);
+            try {
+                transformation.transform(block, context);
+            } catch (Exception e) {
+                // Continue running the other transformations
+                getLogger().error("Failed to execute transformation", e);
+                error = true;
+            }
+        }
+        if (error) {
+            throw new TransformationException("One or several transformations failed to execute properly. "
+                + "See the logs for details.");
         }
     }
 }

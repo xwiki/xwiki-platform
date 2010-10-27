@@ -25,6 +25,8 @@ import org.xwiki.rendering.block.XDOM;
 import org.xwiki.rendering.syntax.Syntax;
 
 /**
+ * Executes a set of transformations, in the correct order.
+ *
  * @version $Id$
  * @since 1.5M2
  */

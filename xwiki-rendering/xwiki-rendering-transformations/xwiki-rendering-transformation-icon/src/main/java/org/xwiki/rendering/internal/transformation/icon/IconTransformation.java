@@ -103,7 +103,7 @@ public class IconTransformation extends AbstractTransformation implements Initia
      */
     public void transform(Block source, TransformationContext context) throws TransformationException
     {
-        if (!this.mappingTree.getChildren().isEmpty()) {
+        if (!this.mappingTree.getChildren().isEmpty() && !source.getChildren().isEmpty()) {
             parseTree(source.getChildren());
         }
     }

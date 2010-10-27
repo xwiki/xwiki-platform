@@ -38,7 +38,7 @@ public class ActivityStreamPlugin extends XWikiDefaultPlugin
      * Name of the plugin.
      */
     public static final String PLUGIN_NAME = "activitystream";
-    
+
     /**
      * We should user inversion of control instead.
      */
@@ -63,6 +63,7 @@ public class ActivityStreamPlugin extends XWikiDefaultPlugin
      * 
      * @see XWikiDefaultPlugin#getName()
      */
+    @Override
     public String getName()
     {
         return PLUGIN_NAME;
@@ -73,6 +74,7 @@ public class ActivityStreamPlugin extends XWikiDefaultPlugin
      * 
      * @see XWikiDefaultPlugin#getPluginApi
      */
+    @Override
     public Api getPluginApi(XWikiPluginInterface plugin, XWikiContext context)
     {
         return new ActivityStreamPluginApi((ActivityStreamPlugin) plugin, context);
@@ -83,7 +85,7 @@ public class ActivityStreamPlugin extends XWikiDefaultPlugin
      */
     public ActivityStream getActivityStream()
     {
-        return activityStream;
+        return this.activityStream;
     }
 
     /**
@@ -108,17 +110,18 @@ public class ActivityStreamPlugin extends XWikiDefaultPlugin
         String prefName = preferencePrefix + preference;
         return context.getWiki().getXWikiPreference(prefName, prefName, defaultValue, context);
     }
-    
+
     /**
      * {@inheritDoc}
      * 
      * @see XWikiDefaultPlugin#init(XWikiContext)
      */
+    @Override
     public void init(XWikiContext context)
     {
         super.init(context);
         try {
-            activityStream.init(context);
+            this.activityStream.init(context);
         } catch (Exception e) {
             // Do nothing.
         }
@@ -129,6 +132,7 @@ public class ActivityStreamPlugin extends XWikiDefaultPlugin
      * 
      * @see XWikiDefaultPlugin#virtualInit(XWikiContext)
      */
+    @Override
     public void virtualInit(XWikiContext context)
     {
         super.virtualInit(context);

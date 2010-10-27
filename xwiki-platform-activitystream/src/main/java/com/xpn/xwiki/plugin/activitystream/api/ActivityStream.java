@@ -207,7 +207,7 @@ public interface ActivityStream
      * @return matching events
      * @throws ActivityStreamException if the search query fails
      */
-    List<ActivityEvent> searchEvents(String fromHql, String hql, boolean filter, int nb, int start, 
+    List<ActivityEvent> searchEvents(String fromHql, String hql, boolean filter, int nb, int start,
         XWikiContext context) throws ActivityStreamException;
 
     /**
@@ -262,7 +262,7 @@ public interface ActivityStream
     /**
      * Get events from the activity stream.
      * 
-     * @param filter true if the events should be filtered by priority 
+     * @param filter true if the events should be filtered by priority
      * @param nb number of events to retrieve
      * @param start query offset
      * @param context the XWiki context
@@ -276,7 +276,7 @@ public interface ActivityStream
      * Get events from the activity stream of a space.
      * 
      * @param space space to retrieve the events from
-     * @param filter true if the events should be filtered by priority 
+     * @param filter true if the events should be filtered by priority
      * @param nb number of events to retrieve
      * @param start query offset
      * @param context the XWiki context
@@ -290,7 +290,7 @@ public interface ActivityStream
      * Get events from the activity stream of a user.
      * 
      * @param user user to retrieve the events from
-     * @param filter true if the events should be filtered by priority 
+     * @param filter true if the events should be filtered by priority
      * @param nb number of events to retrieve
      * @param start query offset
      * @param context the XWiki context
@@ -304,7 +304,7 @@ public interface ActivityStream
      * Get events from a particular activity stream.
      * 
      * @param streamName name of the activity stream to retrieve the events from
-     * @param filter true if the events should be filtered by priority 
+     * @param filter true if the events should be filtered by priority
      * @param nb number of events to retrieve
      * @param start query offset
      * @param context the XWiki context
@@ -319,7 +319,7 @@ public interface ActivityStream
      * 
      * @param streamName name of the activity stream to retrieve the events from
      * @param space space to retrieve the events from
-     * @param filter true if the events should be filtered by priority 
+     * @param filter true if the events should be filtered by priority
      * @param nb number of events to retrieve
      * @param start query offset
      * @param context the XWiki context
@@ -334,7 +334,7 @@ public interface ActivityStream
      * 
      * @param streamName name of the activity stream to retrieve the events from
      * @param user user to retrieve the events from
-     * @param filter true if the events should be filtered by priority 
+     * @param filter true if the events should be filtered by priority
      * @param nb number of events to retrieve
      * @param start query offset
      * @param context the XWiki context
@@ -425,8 +425,8 @@ public interface ActivityStream
      * @param copyright copyright to set in the feed metadata
      * @param encoding encoding to set in the feed metadata
      * @param url URL to set in the feed metadata
-     * @param type the feed type (syntax) to use, <b>null</b> if none. It can be any version of RSS or Atom. Some 
-     *        possible values are "rss_1.0", "rss_2.0" and "atom_1.0"
+     * @param type the feed type (syntax) to use, <b>null</b> if none. It can be any version of RSS or Atom. Some
+     *            possible values are "rss_1.0", "rss_2.0" and "atom_1.0"
      * @param context the XWiki context
      * @return the feed entry corresponding to the given events
      */
@@ -443,19 +443,19 @@ public interface ActivityStream
      * @param copyright copyright to set in the feed metadata
      * @param encoding encoding to set in the feed metadata
      * @param url URL to set in the feed metadata
-     * @param type the feed type (syntax) to use, <b>null</b> if none. It can be any version of RSS or Atom. Some 
-     *        possible values are "rss_1.0", "rss_2.0" and "atom_1.0"
+     * @param type the feed type (syntax) to use, <b>null</b> if none. It can be any version of RSS or Atom. Some
+     *            possible values are "rss_1.0", "rss_2.0" and "atom_1.0"
      * @param suffix suffix to add to entries title and body strings
      * @param context the XWiki context
      * @return the feed entry corresponding to the given events
      */
     String getFeedOutput(List<ActivityEvent> events, String author, String title, String description, String copyright,
         String encoding, String url, String type, String suffix, XWikiContext context);
-    
+
     /**
      * @param feed the feed to get the string representation for
-     * @param type the feed type (syntax) to use, <b>null</b> if none. It can be any version of RSS or Atom. Some 
-     *        possible values are "rss_1.0", "rss_2.0" and "atom_1.0" 
+     * @param type the feed type (syntax) to use, <b>null</b> if none. It can be any version of RSS or Atom. Some
+     *            possible values are "rss_1.0", "rss_2.0" and "atom_1.0"
      * @return the string representation of the given feed.
      */
     String getFeedOutput(SyndFeed feed, String type);

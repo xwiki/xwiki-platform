@@ -912,27 +912,27 @@ public class ActivityStreamImpl implements ActivityStream, EventListener
                 eventType = ActivityEventType.DELETE_COMMENT;
                 displayTitle = currentDoc.getDisplayTitle(context);
                 additionalIdentifier = ((CommentDeleteEvent) event).getIdentifier();
-            } else if (event instanceof CommentUpdateEvent){
+            } else if (event instanceof CommentUpdateEvent) {
                 eventType = ActivityEventType.UPDATE_COMMENT;
                 displayTitle = currentDoc.getDisplayTitle(context);
                 additionalIdentifier = ((CommentUpdateEvent) event).getIdentifier();
-            } else if (event instanceof AttachmentAddEvent){
+            } else if (event instanceof AttachmentAddEvent) {
                 eventType = ActivityEventType.ADD_ATTACHMENT;
                 displayTitle = currentDoc.getDisplayTitle(context);
                 additionalIdentifier = ((AttachmentAddEvent) event).getName();
-            } else if (event instanceof AttachmentDeleteEvent){
+            } else if (event instanceof AttachmentDeleteEvent) {
                 eventType = ActivityEventType.DELETE_ATTACHMENT;
                 displayTitle = currentDoc.getDisplayTitle(context);
                 additionalIdentifier = ((AttachmentDeleteEvent) event).getName();
-            } else if (event instanceof AttachmentUpdateEvent){
+            } else if (event instanceof AttachmentUpdateEvent) {
                 eventType = ActivityEventType.UPDATE_ATTACHMENT;
                 displayTitle = currentDoc.getDisplayTitle(context);
                 additionalIdentifier = ((AttachmentUpdateEvent) event).getName();
-            } else if (event instanceof AnnotationAddEvent){
+            } else if (event instanceof AnnotationAddEvent) {
                 eventType = ActivityEventType.ADD_ANNOTATION;
                 displayTitle = currentDoc.getDisplayTitle(context);
                 additionalIdentifier = ((AnnotationAddEvent) event).getIdentifier();
-            } else if (event instanceof AnnotationDeleteEvent){
+            } else if (event instanceof AnnotationDeleteEvent) {
                 eventType = ActivityEventType.DELETE_ANNOTATION;
                 displayTitle = currentDoc.getDisplayTitle(context);
                 additionalIdentifier = ((AnnotationDeleteEvent) event).getIdentifier();

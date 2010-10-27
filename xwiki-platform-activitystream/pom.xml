@@ -83,6 +83,16 @@
           </excludes>
         </configuration>
       </plugin>
+      <plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>clirr-maven-plugin</artifactId>
+        <configuration>
+          <excludes>
+            <!-- To be removed when we release 1.7 -->
+            <exclude>com/xpn/xwiki/plugin/activitystream/api/ActivityStream</exclude><!-- Added getRelatedEvents -->
+          </excludes>
+        </configuration>
+      </plugin>
     </plugins>
   </build>
   <!-- We must configure SCM in each module. For more information see:

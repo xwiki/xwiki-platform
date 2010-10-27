@@ -95,6 +95,14 @@
 # rendering.interWikiDefinitions = definition = http://www.yourdictionary.com/
 
 #-# [Since 2.6RC1]
+#-# Controls what transformations will be executed when rendering content.
+#-# A transformation modifies the parsed content. For example the Icon transformation replaces some characters with
+#-# icons, a WikiWord transformation will automatically create links when it finds wiki words, etc.
+#-# Note that the Macro transformation is a special transformation that replaces macro markers by the result of the
+#-# macro execution. If you don't list it, macros won't get executed.
+#-# The default value is: rendering.transformations = macro, icon
+
+#-# [Since 2.6RC1]
 #-# Icon Transformation Configuration
 #-# Defines mappings between suite of characters and the icon to display when those characters are found.
 #-# The format is: rendering.transformation.icon.mappings = <suite of characters> = <icon name>

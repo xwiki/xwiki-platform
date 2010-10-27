@@ -49,7 +49,7 @@ public interface XWikiRenderingConfiguration extends RenderingConfiguration
      * image are limited.
      * 
      * @return the maximum image width when there's no user supplied width
-     * @see #isIncludeImageDimensionsInImageURL()
+     * @see #isImageDimensionsIncludedInImageURL()
      * @since 2.5M2
      */
     int getImageWidthLimit();
@@ -64,7 +64,7 @@ public interface XWikiRenderingConfiguration extends RenderingConfiguration
      * the image are limited.
      * 
      * @return the maximum image height when there's no user supplied height
-     * @see #isIncludeImageDimensionsInImageURL()
+     * @see #isImageDimensionsIncludedInImageURL()
      * @since 2.5M2
      */
     int getImageHeightLimit();

@@ -398,6 +398,7 @@ public class XWikiTest extends AbstractBridgedXWikiComponentTestCase
     public void testValidationKeyStorage() throws Exception
     {
         XWikiContext context = getContext();
+        context.setLanguage("en");
 
         // Prepare the request
         Mock request = mock(XWikiRequest.class);

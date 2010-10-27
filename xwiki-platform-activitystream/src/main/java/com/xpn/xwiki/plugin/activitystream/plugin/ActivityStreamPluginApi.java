@@ -55,7 +55,7 @@ public class ActivityStreamPluginApi extends PluginApi<ActivityStreamPlugin>
      */
     protected ActivityStream getActivityStream()
     {
-        return ((ActivityStreamPlugin) getProtectedPlugin()).getActivityStream();
+        return getProtectedPlugin().getActivityStream();
     }
 
     /**
@@ -68,7 +68,7 @@ public class ActivityStreamPluginApi extends PluginApi<ActivityStreamPlugin>
         throws ActivityStreamException
     {
         if (hasProgrammingRights()) {
-            getActivityStream().addActivityEvent(event, context);
+            getActivityStream().addActivityEvent(event, this.context);
         }
     }
 
@@ -84,7 +84,7 @@ public class ActivityStreamPluginApi extends PluginApi<ActivityStreamPlugin>
     public void addActivityEvent(String streamName, String type, String title) throws ActivityStreamException
     {
         if (hasProgrammingRights()) {
-            getActivityStream().addActivityEvent(streamName, type, title, context);
+            getActivityStream().addActivityEvent(streamName, type, title, this.context);
         }
     }
 
@@ -102,7 +102,7 @@ public class ActivityStreamPluginApi extends PluginApi<ActivityStreamPlugin>
         throws ActivityStreamException
     {
         if (hasProgrammingRights()) {
-            getActivityStream().addActivityEvent(streamName, type, title, params, context);
+            getActivityStream().addActivityEvent(streamName, type, title, params, this.context);
         }
     }
 
@@ -120,7 +120,7 @@ public class ActivityStreamPluginApi extends PluginApi<ActivityStreamPlugin>
         throws ActivityStreamException
     {
         if (hasProgrammingRights()) {
-            getActivityStream().addDocumentActivityEvent(streamName, doc.getDocument(), type, title, context);
+            getActivityStream().addDocumentActivityEvent(streamName, doc.getDocument(), type, title, this.context);
         }
     }
 
@@ -139,7 +139,8 @@ public class ActivityStreamPluginApi extends PluginApi<ActivityStreamPlugin>
         throws ActivityStreamException
     {
         if (hasProgrammingRights()) {
-            getActivityStream().addDocumentActivityEvent(streamName, doc.getDocument(), type, priority, title, context);
+            getActivityStream().addDocumentActivityEvent(streamName, doc.getDocument(), type, priority, title,
+                this.context);
         }
     }
 
@@ -154,7 +155,7 @@ public class ActivityStreamPluginApi extends PluginApi<ActivityStreamPlugin>
         if (hasProgrammingRights()) {
             List<com.xpn.xwiki.plugin.activitystream.api.ActivityEvent> events = unwrapEvents(evs);
             for (com.xpn.xwiki.plugin.activitystream.api.ActivityEvent ev : events) {
-                getActivityStream().deleteActivityEvent(ev, context);
+                getActivityStream().deleteActivityEvent(ev, this.context);
             }
         }
     }
@@ -168,7 +169,7 @@ public class ActivityStreamPluginApi extends PluginApi<ActivityStreamPlugin>
     public void deleteActivityEvent(ActivityEvent event) throws ActivityStreamException
     {
         if (hasProgrammingRights()) {
-            getActivityStream().deleteActivityEvent(event.getEvent(), context);
+            getActivityStream().deleteActivityEvent(event.getEvent(), this.context);
         }
     }
 
@@ -183,11 +184,12 @@ public class ActivityStreamPluginApi extends PluginApi<ActivityStreamPlugin>
      * @param params parameters of the event
      * @throws ActivityStreamException if the addition to the stream fails
      */
-    public void addDocumentActivityEvent(String streamName, Document doc, String type, String title, 
+    public void addDocumentActivityEvent(String streamName, Document doc, String type, String title,
         List<String> params) throws ActivityStreamException
     {
         if (hasProgrammingRights()) {
-            getActivityStream().addDocumentActivityEvent(streamName, doc.getDocument(), type, title, params, context);
+            getActivityStream().addDocumentActivityEvent(streamName, doc.getDocument(), type, title, params,
+                this.context);
         }
     }
 
@@ -208,7 +210,7 @@ public class ActivityStreamPluginApi extends PluginApi<ActivityStreamPlugin>
     {
         if (hasProgrammingRights()) {
             getActivityStream().addDocumentActivityEvent(streamName, doc.getDocument(), type, priority, title, params,
-                context);
+                this.context);
         }
     }
 
@@ -227,7 +229,7 @@ public class ActivityStreamPluginApi extends PluginApi<ActivityStreamPlugin>
         throws ActivityStreamException
     {
         if (hasProgrammingRights()) {
-            return wrapEvents(getActivityStream().searchEvents(hql, filter, nb, start, context));
+            return wrapEvents(getActivityStream().searchEvents(hql, filter, nb, start, this.context));
         } else {
             return null;
         }
@@ -249,7 +251,7 @@ public class ActivityStreamPluginApi extends PluginApi<ActivityStreamPlugin>
         throws ActivityStreamException
     {
         if (hasProgrammingRights()) {
-            return wrapEvents(getActivityStream().searchEvents(hql, filter, globalSearch, nb, start, context));
+            return wrapEvents(getActivityStream().searchEvents(hql, filter, globalSearch, nb, start, this.context));
         } else {
             return null;
         }
@@ -271,7 +273,8 @@ public class ActivityStreamPluginApi extends PluginApi<ActivityStreamPlugin>
         throws ActivityStreamException
     {
         if (hasProgrammingRights()) {
-            return wrapEvents(getActivityStream().searchEvents("", hql, filter, nb, start, parameterValues, context));
+            return wrapEvents(getActivityStream().searchEvents("", hql, filter, nb, start, parameterValues,
+                this.context));
         } else {
             return null;
         }
@@ -295,7 +298,7 @@ public class ActivityStreamPluginApi extends PluginApi<ActivityStreamPlugin>
     {
         if (hasProgrammingRights()) {
             return wrapEvents(getActivityStream().searchEvents("", hql, filter, globalSearch, nb, start,
-                parameterValues, context));
+                parameterValues, this.context));
         } else {
             return null;
         }
@@ -317,7 +320,7 @@ public class ActivityStreamPluginApi extends PluginApi<ActivityStreamPlugin>
         throws ActivityStreamException
     {
         if (hasProgrammingRights()) {
-            return wrapEvents(getActivityStream().searchEvents(fromHql, hql, filter, nb, start, context));
+            return wrapEvents(getActivityStream().searchEvents(fromHql, hql, filter, nb, start, this.context));
         } else {
             return null;
         }
@@ -340,7 +343,8 @@ public class ActivityStreamPluginApi extends PluginApi<ActivityStreamPlugin>
         int start) throws ActivityStreamException
     {
         if (hasProgrammingRights()) {
-            return wrapEvents(getActivityStream().searchEvents(fromHql, hql, filter, globalSearch, nb, start, context));
+            return wrapEvents(getActivityStream().searchEvents(fromHql, hql, filter, globalSearch, nb, start,
+                this.context));
         } else {
             return null;
         }
@@ -363,7 +367,7 @@ public class ActivityStreamPluginApi extends PluginApi<ActivityStreamPlugin>
         List<Object> parameterValues) throws ActivityStreamException
     {
         if (hasProgrammingRights()) {
-            return wrapEvents(getActivityStream().searchEvents(fromHql, hql, filter, nb, start, context));
+            return wrapEvents(getActivityStream().searchEvents(fromHql, hql, filter, nb, start, this.context));
         } else {
             return null;
         }
@@ -387,7 +391,8 @@ public class ActivityStreamPluginApi extends PluginApi<ActivityStreamPlugin>
         int start, List<Object> parameterValues) throws ActivityStreamException
     {
         if (hasProgrammingRights()) {
-            return wrapEvents(getActivityStream().searchEvents(fromHql, hql, filter, globalSearch, nb, start, context));
+            return wrapEvents(getActivityStream().searchEvents(fromHql, hql, filter, globalSearch, nb, start,
+                this.context));
         } else {
             return null;
         }
@@ -405,7 +410,7 @@ public class ActivityStreamPluginApi extends PluginApi<ActivityStreamPlugin>
     public List<ActivityEvent> getEvents(boolean filter, int nb, int start) throws ActivityStreamException
     {
         if (hasProgrammingRights()) {
-            return wrapEvents(getActivityStream().getEvents(filter, nb, start, context));
+            return wrapEvents(getActivityStream().getEvents(filter, nb, start, this.context));
         } else {
             return null;
         }
@@ -426,7 +431,7 @@ public class ActivityStreamPluginApi extends PluginApi<ActivityStreamPlugin>
         throws ActivityStreamException
     {
         if (hasProgrammingRights()) {
-            return wrapEvents(getActivityStream().getEventsForSpace(space, filter, nb, start, context));
+            return wrapEvents(getActivityStream().getEventsForSpace(space, filter, nb, start, this.context));
         } else {
             return null;
         }
@@ -447,7 +452,7 @@ public class ActivityStreamPluginApi extends PluginApi<ActivityStreamPlugin>
         throws ActivityStreamException
     {
         if (hasProgrammingRights()) {
-            return wrapEvents(getActivityStream().getEventsForUser(user, filter, nb, start, context));
+            return wrapEvents(getActivityStream().getEventsForUser(user, filter, nb, start, this.context));
         } else {
             return null;
         }
@@ -468,7 +473,7 @@ public class ActivityStreamPluginApi extends PluginApi<ActivityStreamPlugin>
         throws ActivityStreamException
     {
         if (hasProgrammingRights()) {
-            return wrapEvents(getActivityStream().getEvents(streamName, filter, nb, start, context));
+            return wrapEvents(getActivityStream().getEvents(streamName, filter, nb, start, this.context));
         } else {
             return null;
         }
@@ -489,7 +494,7 @@ public class ActivityStreamPluginApi extends PluginApi<ActivityStreamPlugin>
         throws ActivityStreamException
     {
         if (hasProgrammingRights()) {
-            return wrapEvents(getActivityStream().getEventsForSpace(streamName, space, filter, nb, start, context));
+            return wrapEvents(getActivityStream().getEventsForSpace(streamName, space, filter, nb, start, this.context));
         } else {
             return null;
         }
@@ -510,7 +515,7 @@ public class ActivityStreamPluginApi extends PluginApi<ActivityStreamPlugin>
         throws ActivityStreamException
     {
         if (hasProgrammingRights()) {
-            return wrapEvents(getActivityStream().getEventsForUser(streamName, user, filter, nb, start, context));
+            return wrapEvents(getActivityStream().getEventsForUser(streamName, user, filter, nb, start, this.context));
         } else {
             return null;
         }
@@ -562,7 +567,7 @@ public class ActivityStreamPluginApi extends PluginApi<ActivityStreamPlugin>
      */
     public SyndEntry getFeedEntry(com.xpn.xwiki.plugin.activitystream.plugin.ActivityEvent event)
     {
-        return getActivityStream().getFeedEntry(event.getEvent(), context);
+        return getActivityStream().getFeedEntry(event.getEvent(), this.context);
     }
 
     /**
@@ -574,7 +579,7 @@ public class ActivityStreamPluginApi extends PluginApi<ActivityStreamPlugin>
      */
     public SyndEntry getFeedEntry(com.xpn.xwiki.plugin.activitystream.plugin.ActivityEvent event, String suffix)
     {
-        return getActivityStream().getFeedEntry(event.getEvent(), suffix, context);
+        return getActivityStream().getFeedEntry(event.getEvent(), suffix, this.context);
     }
 
     /**
@@ -585,7 +590,7 @@ public class ActivityStreamPluginApi extends PluginApi<ActivityStreamPlugin>
      */
     public SyndFeed getFeed(List<ActivityEvent> events)
     {
-        return getActivityStream().getFeed(unwrapEvents(events), context);
+        return getActivityStream().getFeed(unwrapEvents(events), this.context);
     }
 
     /**
@@ -597,7 +602,7 @@ public class ActivityStreamPluginApi extends PluginApi<ActivityStreamPlugin>
      */
     public SyndFeed getFeed(List<ActivityEvent> events, String suffix)
     {
-        return getActivityStream().getFeed(unwrapEvents(events), suffix, context);
+        return getActivityStream().getFeed(unwrapEvents(events), suffix, this.context);
     }
 
     /**
@@ -616,7 +621,7 @@ public class ActivityStreamPluginApi extends PluginApi<ActivityStreamPlugin>
         String copyright, String encoding, String url)
     {
         return getActivityStream().getFeed(unwrapEvents(events), author, title, description, copyright, encoding, url,
-            context);
+            this.context);
     }
 
     /**
@@ -636,7 +641,7 @@ public class ActivityStreamPluginApi extends PluginApi<ActivityStreamPlugin>
         String copyright, String encoding, String url, String suffix)
     {
         return getActivityStream().getFeed(unwrapEvents(events), author, title, description, copyright, encoding, url,
-            suffix, context);
+            suffix, this.context);
     }
 
     /**
@@ -649,15 +654,15 @@ public class ActivityStreamPluginApi extends PluginApi<ActivityStreamPlugin>
      * @param copyright copyright to set in the feed metadata
      * @param encoding encoding to set in the feed metadata
      * @param url URL to set in the feed metadata
-     * @param type the feed type (syntax) to use, <b>null</b> if none. It can be any version of RSS or Atom. Some 
-     *        possible values are "rss_1.0", "rss_2.0" and "atom_1.0"
+     * @param type the feed type (syntax) to use, <b>null</b> if none. It can be any version of RSS or Atom. Some
+     *            possible values are "rss_1.0", "rss_2.0" and "atom_1.0"
      * @return the feed entry corresponding to the given events
      */
     public String getFeedOutput(List<ActivityEvent> events, String author, String title, String description,
         String copyright, String encoding, String url, String type)
     {
         return getActivityStream().getFeedOutput(unwrapEvents(events), author, title, description, copyright, encoding,
-            url, type, context);
+            url, type, this.context);
     }
 
     /**
@@ -670,8 +675,8 @@ public class ActivityStreamPluginApi extends PluginApi<ActivityStreamPlugin>
      * @param copyright copyright to set in the feed metadata
      * @param encoding encoding to set in the feed metadata
      * @param url URL to set in the feed metadata
-     * @param type the feed type (syntax) to use, <b>null</b> if none. It can be any version of RSS or Atom. Some 
-     *        possible values are "rss_1.0", "rss_2.0" and "atom_1.0"
+     * @param type the feed type (syntax) to use, <b>null</b> if none. It can be any version of RSS or Atom. Some
+     *            possible values are "rss_1.0", "rss_2.0" and "atom_1.0"
      * @param suffix suffix to add to entries title and body strings
      * @return the feed entry corresponding to the given events
      */
@@ -679,15 +684,15 @@ public class ActivityStreamPluginApi extends PluginApi<ActivityStreamPlugin>
         String copyright, String encoding, String url, String type, String suffix)
     {
         return getActivityStream().getFeedOutput(unwrapEvents(events), author, title, description, copyright, encoding,
-            url, type, suffix, context);
+            url, type, suffix, this.context);
     }
 
     /**
      * Get the string representation of a feed from the given feed.
      * 
-     * @param feed the feed to get the string representation from  
-     * @param type the feed type (syntax) to use, <b>null</b> if none. It can be any version of RSS or Atom. Some 
-     *        possible values are "rss_1.0", "rss_2.0" and "atom_1.0"
+     * @param feed the feed to get the string representation from
+     * @param type the feed type (syntax) to use, <b>null</b> if none. It can be any version of RSS or Atom. Some
+     *            possible values are "rss_1.0", "rss_2.0" and "atom_1.0"
      * @return the feed entry corresponding to the given events
      */
     public String getFeedOutput(SyndFeed feed, String type)
@@ -701,6 +706,6 @@ public class ActivityStreamPluginApi extends PluginApi<ActivityStreamPlugin>
      */
     public String getStreamName(String spaceName)
     {
-        return getActivityStream().getStreamName(spaceName, context);
+        return getActivityStream().getStreamName(spaceName, this.context);
     }
 }

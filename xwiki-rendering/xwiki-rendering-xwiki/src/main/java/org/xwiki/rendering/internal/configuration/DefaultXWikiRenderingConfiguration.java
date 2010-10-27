@@ -19,11 +19,19 @@
  */
 package org.xwiki.rendering.internal.configuration;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
 import java.util.Properties;
 
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.Requirement;
+import org.xwiki.component.logging.AbstractLogEnabled;
+import org.xwiki.component.manager.ComponentLookupException;
+import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.configuration.ConfigurationSource;
+import org.xwiki.rendering.transformation.Transformation;
 
 /**
  * All configuration options for the rendering subsystem.
@@ -32,7 +40,7 @@ import org.xwiki.configuration.ConfigurationSource;
  * @since 2.5M2
  */
 @Component
-public class DefaultXWikiRenderingConfiguration implements XWikiRenderingConfiguration
+public class DefaultXWikiRenderingConfiguration extends AbstractLogEnabled implements XWikiRenderingConfiguration
 {
     /**
      * Prefix for configuration keys for the Rendering module.
@@ -49,6 +57,13 @@ public class DefaultXWikiRenderingConfiguration implements XWikiRenderingConfigu
      */
     @Requirement
     private ConfigurationSource configuration;
+
+    /**
+     * Used to convert transformation component hints into {@link org.xwiki.rendering.transformation.Transformation}
+     * objects.
+     */
+    @Requirement
+    private ComponentManager componentManager;
 
     /**
      * {@inheritDoc}
@@ -108,5 +123,26 @@ public class DefaultXWikiRenderingConfiguration implements XWikiRenderingConfigu
     public Properties getInterWikiDefinitions()
     {
         return this.configuration.getProperty(PREFIX + "interWikiDefinitions", Properties.class);
+    }
+
+    /**
+     * {@inheritDoc}
+     * @see org.xwiki.rendering.configuration.RenderingConfiguration#getTransformations()
+     * @since 2.6RC1
+     */
+    public List<Transformation> getTransformations()
+    {
+        List<Transformation> transformations = new ArrayList<Transformation>();
+        for (String hint : this.configuration.getProperty(PREFIX + "transformations",
+            Arrays.asList("macro", "icon")))
+        {
+            try {
+                transformations.add(this.componentManager.lookup(Transformation.class, hint));
+            } catch (ComponentLookupException e) {
+                getLogger().warn("Failed to locate transformation with hint [" + hint + "], ignoring it.");
+            }
+        }
+        Collections.sort(transformations);
+        return transformations;
     }
 }

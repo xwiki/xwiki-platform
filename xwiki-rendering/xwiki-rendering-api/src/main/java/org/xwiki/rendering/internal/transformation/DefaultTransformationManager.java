@@ -19,16 +19,11 @@
  */
 package org.xwiki.rendering.internal.transformation;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.Requirement;
-import org.xwiki.component.phase.Initializable;
-import org.xwiki.component.phase.InitializationException;
 import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.block.XDOM;
+import org.xwiki.rendering.configuration.RenderingConfiguration;
 import org.xwiki.rendering.syntax.Syntax;
 import org.xwiki.rendering.transformation.Transformation;
 import org.xwiki.rendering.transformation.TransformationContext;
@@ -43,24 +38,13 @@ import org.xwiki.rendering.transformation.TransformationManager;
  * @since 1.5M2
  */
 @Component
-public class DefaultTransformationManager implements TransformationManager, Initializable
+public class DefaultTransformationManager implements TransformationManager
 {
     /**
-     * Holds the list of transformations to apply, sorted by priority in {@link #initialize()}.
+     * Used to get the ordered list of transformations to execute.
      */
-    @Requirement(role = Transformation.class)
-    private List<Transformation> transformations = new ArrayList<Transformation>();
-
-    /**
-     * {@inheritDoc}
-     * 
-     * @see Initializable#initialize()
-     */
-    public void initialize() throws InitializationException
-    {
-        // Sort transformations by priority.
-        Collections.sort(this.transformations);
-    }
+    @Requirement
+    private RenderingConfiguration configuration;
 
     /**
      * {@inheritDoc}
@@ -81,7 +65,7 @@ public class DefaultTransformationManager implements TransformationManager, Init
      */
     public void performTransformations(Block block, TransformationContext context) throws TransformationException
     {
-        for (Transformation transformation : this.transformations) {
+        for (Transformation transformation : this.configuration.getTransformations()) {
             transformation.transform(block, context);
         }
     }

@@ -125,6 +125,15 @@ public class CommonsConfigurationSourceTest extends AbstractComponentTestCase
     }
 
     @Test
+    public void testListPropertyWhenArrayList()
+    {
+        configuration.setProperty("list", "value");
+        List<String> expected = Arrays.asList("value");
+
+        Assert.assertEquals(expected, source.getProperty("list", Arrays.asList("default")));
+    }
+
+    @Test
     public void testPropertiesProperty()
     {
         configuration.setProperty("properties", "key1=value1");

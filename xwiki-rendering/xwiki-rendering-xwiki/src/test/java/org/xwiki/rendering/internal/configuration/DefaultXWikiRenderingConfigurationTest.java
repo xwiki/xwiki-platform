@@ -19,12 +19,21 @@
  */
 package org.xwiki.rendering.internal.configuration;
 
+import java.util.Arrays;
+import java.util.List;
 import java.util.Properties;
 
 import org.jmock.Expectations;
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.Test;
+import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.configuration.ConfigurationSource;
+import org.xwiki.rendering.block.Block;
+import org.xwiki.rendering.transformation.AbstractTransformation;
+import org.xwiki.rendering.transformation.Transformation;
+import org.xwiki.rendering.transformation.TransformationContext;
+import org.xwiki.rendering.transformation.TransformationException;
 import org.xwiki.test.AbstractMockingComponentTestCase;
 import org.xwiki.test.annotation.MockingRequirement;
 
@@ -39,14 +48,22 @@ public class DefaultXWikiRenderingConfigurationTest extends AbstractMockingCompo
     @MockingRequirement(XWikiRenderingConfiguration.class)
     private DefaultXWikiRenderingConfiguration configuration;
 
+    private ConfigurationSource source;
+
+    @Override
+    public void setUp() throws Exception
+    {
+        super.setUp();
+        this.source = getComponentManager().lookup(ConfigurationSource.class);
+    }
+
     @Test
     public void testGetLinkLabelFormat() throws Exception
     {
-        final ConfigurationSource source = getComponentManager().lookup(ConfigurationSource.class);
         getMockery().checking(new Expectations()
         {
             {
-                allowing(source).getProperty("rendering.linkLabelFormat", "%p");
+                oneOf(source).getProperty("rendering.linkLabelFormat", "%p");
                 will(returnValue("%p"));
             }
         });
@@ -57,27 +74,26 @@ public class DefaultXWikiRenderingConfigurationTest extends AbstractMockingCompo
     @Test
     public void testGetMacroCategories() throws Exception
     {
-        final ConfigurationSource source = getComponentManager().lookup(ConfigurationSource.class);
         getMockery().checking(new Expectations()
         {
             {
-                allowing(source).getProperty("rendering.macroCategories", Properties.class);
+                oneOf(source).getProperty("rendering.macroCategories", Properties.class);
                 will(returnValue(new Properties()));
             }
         });
 
-        Assert.assertNotNull(this.configuration.getMacroCategories());
-        Assert.assertEquals(0, this.configuration.getMacroCategories().size());
+        Properties categories = this.configuration.getMacroCategories();
+        Assert.assertNotNull(categories);
+        Assert.assertEquals(0, categories.size());
     }
 
     @Test
     public void testGetImageWidthLimit() throws Exception
     {
-        final ConfigurationSource source = getComponentManager().lookup(ConfigurationSource.class);
         getMockery().checking(new Expectations()
         {
             {
-                allowing(source).getProperty("rendering.imageWidthLimit", -1);
+                oneOf(source).getProperty("rendering.imageWidthLimit", -1);
                 will(returnValue(100));
             }
         });
@@ -88,11 +104,10 @@ public class DefaultXWikiRenderingConfigurationTest extends AbstractMockingCompo
     @Test
     public void testGetImageHeightLimit() throws Exception
     {
-        final ConfigurationSource source = getComponentManager().lookup(ConfigurationSource.class);
         getMockery().checking(new Expectations()
         {
             {
-                allowing(source).getProperty("rendering.imageHeightLimit", -1);
+                oneOf(source).getProperty("rendering.imageHeightLimit", -1);
                 will(returnValue(150));
             }
         });
@@ -103,15 +118,39 @@ public class DefaultXWikiRenderingConfigurationTest extends AbstractMockingCompo
     @Test
     public void testIsImageDimensionsIncludedInImageURL() throws Exception
     {
-        final ConfigurationSource source = getComponentManager().lookup(ConfigurationSource.class);
         getMockery().checking(new Expectations()
         {
             {
-                allowing(source).getProperty("rendering.imageDimensionsIncludedInImageURL", true);
+                oneOf(source).getProperty("rendering.imageDimensionsIncludedInImageURL", true);
                 will(returnValue(false));
             }
         });
 
         Assert.assertFalse(this.configuration.isImageDimensionsIncludedInImageURL());
+    }
+
+    @Test
+    public void testGetTransformations() throws Exception
+    {
+        final Transformation expectedTransformation = new AbstractTransformation() {
+            public void transform(Block block, TransformationContext context) throws TransformationException
+            {
+                // Do nothing
+            }
+        };
+        final ComponentManager cm = getComponentManager().lookup(ComponentManager.class);
+        getMockery().checking(new Expectations()
+        {
+            {
+                oneOf(source).getProperty("rendering.transformations", Arrays.asList("macro", "icon"));
+                will(returnValue(Arrays.asList("mytransformation")));
+                oneOf(cm).lookup(Transformation.class, "mytransformation");
+                will(returnValue(expectedTransformation));
+            }
+        });
+
+        List<Transformation> txs = this.configuration.getTransformations();
+        Assert.assertEquals(1, txs.size());
+        Assert.assertSame(expectedTransformation, txs.get(0));
     }
 }

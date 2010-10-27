@@ -19,10 +19,7 @@
  */
 package org.xwiki.configuration.internal;
 
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Properties;
+import java.util.*;
 
 import org.apache.commons.configuration.Configuration;
 import org.xwiki.component.annotation.Requirement;
@@ -88,9 +85,9 @@ public class CommonsConfigurationSource extends AbstractLogEnabled implements Co
         try {
             if (String.class.getName().equals(valueClass.getName())) {
                 result = (T) this.configuration.getString(key);
-            } else if (List.class.getName().equals(valueClass.getName())) {
+            } else if (List.class.isAssignableFrom(valueClass)) {
                 result = (T) this.configuration.getList(key);
-            } else if (Properties.class.getName().equals(valueClass.getName())) {
+            } else if (Properties.class.isAssignableFrom(valueClass)) {
                 result = (T) this.configuration.getProperties(key);
             } else if (null != getProperty(key)) {
                 result = this.converterManager.convert(valueClass, getProperty(key));

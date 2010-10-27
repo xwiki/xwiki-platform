@@ -63,6 +63,7 @@ import org.apache.fop.apps.FopFactory;
 import org.apache.fop.apps.FormattingResults;
 import org.apache.fop.apps.MimeConstants;
 import org.apache.fop.apps.PageSequenceResults;
+import org.apache.velocity.VelocityContext;
 import org.dom4j.Element;
 import org.dom4j.io.OutputFormat;
 import org.dom4j.io.SAXReader;
@@ -71,9 +72,14 @@ import org.w3c.dom.Document;
 import org.w3c.tidy.Tidy;
 import org.xml.sax.InputSource;
 import org.xwiki.container.Container;
+import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.officeimporter.openoffice.OpenOfficeConverter;
 import org.xwiki.officeimporter.openoffice.OpenOfficeManager;
 import org.xwiki.officeimporter.openoffice.OpenOfficeManager.ManagerState;
+import org.xwiki.velocity.VelocityEngine;
+import org.xwiki.velocity.VelocityManager;
+import org.xwiki.velocity.XWikiVelocityException;
 import org.xwiki.xml.EntityResolver;
 
 import com.xpn.xwiki.XWikiContext;
@@ -390,9 +396,30 @@ public class PdfExportImpl implements PdfExport
         String fieldcontent = null;
         XWikiDocument doc = getPDFTemplateDocument(context);
         if (doc != null) {
-            BaseObject bobj = doc.getObject("XWiki.PDFClass");
+            BaseObject bobj = doc.getXObject(new DocumentReference(context.getDatabase(), "XWiki", "PDFClass"));
             if (bobj != null) {
-                fieldcontent = doc.display(fieldname, "view", bobj, context);
+                fieldcontent = bobj.getLargeStringValue(fieldname);
+                EntityReferenceSerializer<String> entityReferenceSerializer =
+                    Utils.getComponent(EntityReferenceSerializer.class);
+                try {
+                    StringWriter writer = new StringWriter();
+                    VelocityManager velocityManager = Utils.getComponent(VelocityManager.class);
+                    VelocityEngine engine = velocityManager.getVelocityEngine();
+                    try {
+                        VelocityContext vcontext = velocityManager.getVelocityContext();
+                        engine.startedUsingMacroNamespace(entityReferenceSerializer.serialize(doc
+                            .getDocumentReference()));
+                        velocityManager.getVelocityEngine().evaluate(vcontext, writer,
+                            entityReferenceSerializer.serialize(doc.getDocumentReference()), fieldcontent);
+                        fieldcontent = writer.toString();
+                    } finally {
+                        engine.stoppedUsingMacroNamespace(entityReferenceSerializer.serialize(
+                            doc.getDocumentReference()));
+                    }
+                } catch (XWikiVelocityException ex) {
+                    log.warn("Velocity errors while parsing pdf export extension [" +
+                        entityReferenceSerializer.serialize(doc.getDocumentReference()) + "]: " + ex.getMessage());
+                }
             }
         }
         return fieldcontent;

@@ -21,9 +21,9 @@
 package com.xpn.xwiki.pdf.impl;
 
 import info.informatica.doc.dom4j.CSSStylableElement;
+import info.informatica.doc.dom4j.DOM4JCSSStyleSheet;
 import info.informatica.doc.dom4j.XHTMLDocument;
 import info.informatica.doc.dom4j.XHTMLDocumentFactory;
-import info.informatica.doc.style.css.dom.DOMCSSStyleSheet;
 import info.informatica.doc.xml.dtd.DefaultEntityResolver;
 
 import java.io.ByteArrayInputStream;
@@ -69,6 +69,7 @@ import org.dom4j.io.OutputFormat;
 import org.dom4j.io.SAXReader;
 import org.dom4j.io.XMLWriter;
 import org.w3c.dom.Document;
+import org.w3c.dom.css.CSSStyleDeclaration;
 import org.w3c.tidy.Tidy;
 import org.xml.sax.InputSource;
 import org.xwiki.container.Container;
@@ -452,8 +453,7 @@ public class PdfExportImpl implements PdfExport
             XHTMLDocument document = (XHTMLDocument) reader.read(source);
 
             // Apply the style sheet
-            document.setDefaultStyleSheet(new DOMCSSStyleSheet(null, null));
-            document.getStyleSheet();
+            document.setDefaultStyleSheet(new DOM4JCSSStyleSheet(null, null, null));
             document.addStyleSheet(new org.w3c.css.sac.InputSource(new StringReader(css)));
             applyInlineStyle(document.getRootElement());
             OutputFormat outputFormat = new OutputFormat("", true);
@@ -483,7 +483,8 @@ public class PdfExportImpl implements PdfExport
             org.dom4j.Node node = element.node(i);
             if (node instanceof CSSStylableElement) {
                 CSSStylableElement styleElement = (CSSStylableElement) node;
-                if (styleElement.getComputedStyle() != null) {
+                CSSStyleDeclaration style = styleElement.getComputedStyle();
+                if (style != null && StringUtils.isNotEmpty(style.getCssText())) {
                     styleElement.addAttribute("style", styleElement.getComputedStyle().getCssText());
                 }
             }

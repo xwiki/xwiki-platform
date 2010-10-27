@@ -11,10 +11,10 @@
 <customClass></customClass>
 <contentAuthor>XWiki.Admin</contentAuthor>
 <creationDate>1251716762000</creationDate>
-<date>1274966492000</date>
-<contentUpdateDate>1274966492000</contentUpdateDate>
+<date>1288198373000</date>
+<contentUpdateDate>1288198373000</contentUpdateDate>
 <version>1.1</version>
-<title></title>
+<title>$msg.get('xe.wikimacrobridge.wikiMacros')</title>
 <template></template>
 <defaultTemplate></defaultTemplate>
 <validationScript></validationScript>
@@ -22,16 +22,16 @@
 <minorEdit>false</minorEdit>
 <syntaxId>xwiki/2.0</syntaxId>
 <hidden>false</hidden>
-<content>= Existing wiki macro definitions =
-
-{{velocity}}
-#set($mxwiki = $xwiki.getXWiki())
-#set($mcontext = $xcontext.getContext())
-#set($sql = "select doc.fullName from XWikiDocument doc, BaseObject obj where doc.fullName=obj.name and obj.className='XWiki.WikiMacroClass'")
-#set($mdocs = $mxwiki.getStore().search($sql, 0, 0, $mcontext))
-{{info}}[$listtool.size($mdocs)] wiki macro definition(s) found:{{/info}}
-
-#foreach($mdoc in $mdocs)
-  [[$mdoc&gt;&gt;$mdoc]]
+<content>{{velocity}}
+#set($wikiMacroDocuments = $services.query.xwql("from doc.object(XWiki.WikiMacroClass) as macros").execute())
+#if($wikiMacroDocuments.size() &gt; 0)
+|=$msg.get('xe.wikimacrobridge.macroName') {{html}}&lt;tt&gt;($msg.get('xe.wikimacrobridge.macroId'))&lt;/tt&gt;{{/html}}|=$msg.get('xe.wikimacrobridge.macroDescription')|=$msg.get('xe.wikimacrobridge.macroVisibility')|=$msg.get('xe.wikimacrobridge.macroPage')
+  #foreach($macroDocumentName in $wikiMacroDocuments)
+    #set($macroDocument = $xwiki.getDocument($macroDocumentName))
+    #set($macroObject = $macroDocument.getObject("XWiki.WikiMacroClass"))
+|$macroObject.get('name') {{html}}&lt;tt&gt;($macroObject.id)&lt;/tt&gt;{{/html}}|$macroObject.description|$macroObject.visibility|[[$macroDocument.getDisplayTitle()&gt;&gt;$macroDocument.fullName]]
+  #end
+#else
+{{warning}}$msg.get('xe.wikimacrobridge.noWikiMacro'){{/warning}}
 #end
 {{/velocity}}</content></xwikidoc>

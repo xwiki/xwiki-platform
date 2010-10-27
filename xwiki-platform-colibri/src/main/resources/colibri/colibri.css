@@ -24,7 +24,7 @@ html, body, div, span, applet, object, iframe,
   margin: 0;
   outline: 0;
   padding: 0;
-  vertical-align: baseline;
+  vertical-align: inherit;
   line-height: normal;
 }
 
@@ -38,6 +38,7 @@ body {
   font-family: sans-serif;
   font-size: 87.5%; /* 10px */
   min-width: 970px;
+  vertical-align: baseline;
 }
 
 a:link, a:active, a:visited {
@@ -142,12 +143,12 @@ input[type="text"], input[type="password"], textarea, select {
 /* -----------------------Tables-------------------------*/
 table {
   border-collapse: collapse;
+  vertical-align: middle;
 }
 
 caption, th, td {
   font-size: 1em;
   text-align: left;
-  vertical-align: middle;
 }
 
 th {

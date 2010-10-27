@@ -59,12 +59,15 @@ public class WikiWordTransformationTest extends AbstractComponentTestCase
         // - that several wiki words in a row are recognized
         // - that wiki words with non ASCII chars are recognized (accented chars)
         // - that two uppercase letters following each other (as in "XWiki") are not considered a wiki word
-        String testInput = "This is a WikiWord, Another\u00D9ne, not one: XWiki";
+        // - that several uppercases chars followed by lowercases and then one uppercase and lowercase chars is
+        //   recognized as a wiki word (eg "XWikiEnterprise")
+        String testInput = "This is a WikiWord, Another\u00D9ne, XWikiEnterprise, not one: XWiki";
 
         XDOM xdom = getComponentManager().lookup(Parser.class, "xwiki/2.1").parse(new StringReader(testInput));
         this.wikiWordTransformation.transform(xdom, new TransformationContext());
         WikiPrinter printer = new DefaultWikiPrinter();
         getComponentManager().lookup(BlockRenderer.class, "xwiki/2.1").render(xdom, printer);
-        Assert.assertEquals("This is a [[doc:WikiWord]], [[doc:Another\u00D9ne]], not one: XWiki", printer.toString());
+        Assert.assertEquals("This is a [[doc:WikiWord]], [[doc:Another\u00D9ne]], [[doc:XWikiEnterprise]], "
+            + "not one: XWiki", printer.toString());
     }
 }

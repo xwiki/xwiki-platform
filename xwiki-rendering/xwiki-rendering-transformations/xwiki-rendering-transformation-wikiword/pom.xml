@@ -29,9 +29,9 @@
     <groupId>org.xwiki.platform</groupId>
     <version>2.6-SNAPSHOT</version>
   </parent>
-  <artifactId>xwiki-core-rendering-transformation-icon</artifactId>
-  <name>XWiki Platform - Core - Rendering - Transformation - Icon</name>
-  <description>XWiki Platform - Core - Rendering - Transformation - Icon</description>
+  <artifactId>xwiki-core-rendering-transformation-wikiword</artifactId>
+  <name>XWiki Platform - Core - Rendering - Transformation - WikiWord</name>
+  <description>XWiki Platform - Core - Rendering - Transformation - WikiWord</description>
   <properties>
     <!-- New module introduced in 2.6, remove this skip once 2.6 is released. -->
     <xwiki.clirr.skip>true</xwiki.clirr.skip>

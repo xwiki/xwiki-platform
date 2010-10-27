@@ -49,5 +49,6 @@
   </dependencies>
   <modules>
     <module>xwiki-rendering-transformation-icon</module>
+    <module>xwiki-rendering-transformation-wikiword</module>
   </modules>
 </project>

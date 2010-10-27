@@ -708,4 +708,18 @@ public class ActivityStreamPluginApi extends PluginApi<ActivityStreamPlugin>
     {
         return getActivityStream().getStreamName(spaceName, this.context);
     }
+
+    /**
+     * Get events that have the same requestId as the event passed as parameter. The provided event is also included in
+     * the returned list.
+     * 
+     * @param event the event for which to look for related events
+     * @return a list of events
+     * @throws ActivityStreamException if the retrieval fails
+     * @see ActivityStream#getRelatedEvents(com.xpn.xwiki.plugin.activitystream.api.ActivityEvent, XWikiContext)
+     */
+    public List<ActivityEvent> getRelatedEvents(ActivityEvent event) throws ActivityStreamException
+    {
+        return wrapEvents(getActivityStream().getRelatedEvents(event.getEvent(), this.context));
+    }
 }

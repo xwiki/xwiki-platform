@@ -55,10 +55,10 @@ public class WikiWordTransformationTest extends AbstractComponentTestCase
     public void testWikiWordTransformation() throws Exception
     {
         XDOM xdom = getComponentManager().lookup(Parser.class, "xwiki/2.1").parse(new StringReader(
-            "This is a WikiWord, AnotherOne"));
+            "This is a WikiWord, AnotherOne, not one: XWiki"));
         this.wikiWordTransformation.transform(xdom, new TransformationContext());
         WikiPrinter printer = new DefaultWikiPrinter();
         getComponentManager().lookup(BlockRenderer.class, "xwiki/2.1").render(xdom, printer);
-        Assert.assertEquals("This is a [[doc:WikiWord]], [[doc:AnotherOne]]", printer.toString());
+        Assert.assertEquals("This is a [[doc:WikiWord]], [[doc:AnotherOne]], not one: XWiki", printer.toString());
     }
 }

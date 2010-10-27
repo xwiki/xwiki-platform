@@ -44,7 +44,7 @@ public class WikiWordTransformation extends AbstractTransformation
     /**
      * Regex Patternt to recognize a WikiWord.
      */
-    private static final Pattern WIKIWORD_PATTERN = Pattern.compile("[A-Z][a-z]*([A-Z][a-z]*)+");
+    private static final Pattern WIKIWORD_PATTERN = Pattern.compile("[A-Z][a-z]+([A-Z][a-z]*)+");
 
     /**
      * {@inheritDoc}

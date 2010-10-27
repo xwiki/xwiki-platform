@@ -100,6 +100,18 @@ public class MacroTransformation extends AbstractTransformation
 
     /**
      * {@inheritDoc}
+     * @see org.xwiki.rendering.transformation.AbstractTransformation#getPriority()
+     */
+    @Override
+    public int getPriority()
+    {
+        // Make it one of the transformations that's executed first so that other transformations run on the executed
+        // macros.
+        return 100;
+    }
+
+    /**
+     * {@inheritDoc}
      * 
      * @see org.xwiki.rendering.transformation.Transformation#transform(org.xwiki.rendering.block.Block,
      *      org.xwiki.rendering.transformation.TransformationContext)

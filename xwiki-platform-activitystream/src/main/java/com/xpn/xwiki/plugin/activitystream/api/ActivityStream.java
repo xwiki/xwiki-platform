@@ -460,4 +460,14 @@ public interface ActivityStream
      */
     String getFeedOutput(SyndFeed feed, String type);
 
+    /**
+     * Get events that have the same requestId as the event passed as parameter. The provided event is also included in
+     * the returned list.
+     * 
+     * @param event the event for which to look for related events
+     * @param context the XWiki context
+     * @return a list of events
+     * @throws ActivityStreamException if the retrieval fails
+     */
+    List<ActivityEvent> getRelatedEvents(ActivityEvent event, XWikiContext context) throws ActivityStreamException;
 }

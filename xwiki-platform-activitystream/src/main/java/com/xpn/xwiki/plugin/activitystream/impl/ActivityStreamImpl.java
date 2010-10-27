@@ -956,4 +956,18 @@ public class ActivityStreamImpl implements ActivityStream, EventListener
             }
         }
     }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see ActivityStream#getRelatedEvents(ActivityEvent, XWikiContext)
+     */
+    public List<ActivityEvent> getRelatedEvents(ActivityEvent event, XWikiContext context)
+        throws ActivityStreamException
+    {
+        List<Object> params = new ArrayList<Object>();
+        params.add(event.getRequestId());
+
+        return this.searchEvents("", "act.requestId= ? ", false, false, 0, 0, params, context);
+    }
 }

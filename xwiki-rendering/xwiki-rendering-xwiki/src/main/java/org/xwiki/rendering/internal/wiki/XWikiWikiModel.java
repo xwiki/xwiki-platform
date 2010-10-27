@@ -43,6 +43,7 @@ import org.xwiki.rendering.listener.reference.ResourceType;
 import org.xwiki.rendering.wiki.WikiModel;
 
 import com.steadystate.css.parser.CSSOMParser;
+import com.steadystate.css.parser.SACParserCSS21;
 
 /**
  * Implementation using the Document Access Bridge ({@link DocumentAccessBridge}).
@@ -100,8 +101,15 @@ public class XWikiWikiModel implements WikiModel
 
     /**
      * The object used to parse the CSS from the image style parameter.
+     * <p>
+     * NOTE: We explicitly pass the CSS SAC parser because otherwise (e.g. using the default constructor)
+     * {@link CSSOMParser} sets the {@code org.w3c.css.sac.parser} system property to its own implementation, i.e.
+     * {@link com.steadystate.css.parser.SACParserCSS2}, affecting other components that require a CSS SAC parser (e.g.
+     * PDF export).
+     * 
+     * @see XWIKI-5625: PDF styling doesn't work anymore
      */
-    private final CSSOMParser cssParser = new CSSOMParser();
+    private final CSSOMParser cssParser = new CSSOMParser(new SACParserCSS21());
 
     /**
      * {@inheritDoc}

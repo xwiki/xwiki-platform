@@ -541,9 +541,6 @@ xwiki.exo=0
 # xwiki.plugin.graphviz.dotpath=c:/Program Files/ATT/GraphViz/bin/dot.exe
 # xwiki.plugin.graphviz.neatopath=c:/Program Files/ATT/GraphViz/bin/neato.exe
 
-xwiki.plugin.laszlo.baseurl=/openlaszlo/xwiki/
-xwiki.plugin.laszlo.path=c:/Program Files/Apache Software Foundation/Tomcat 5.0/webapps/openlaszlo/xwiki/
-
 xwiki.plugin.image.cache.capacity=30
 
 #-# Calendar Prev/Next Month bounds.

@@ -26,13 +26,17 @@
   #if($keyboardShortcutsEnabled)
     <script type="text/javascript">
     //<![CDATA[
-      shortcut.add("$msg.get('core.shortcuts.view.edit')",function() { location.href="$doc.getURL($editaction, $!languageparams)"; }, { 'type':'keypress', 'propagate':false, 'disable_in_input':true });
-      shortcut.add("$msg.get('core.shortcuts.view.wiki')",function() { location.href="$doc.getURL('edit', "$!{languageparams}&editor=wiki")"; }, { 'type':'keypress', 'propagate':false, 'disable_in_input':true });
-      shortcut.add("$msg.get('core.shortcuts.view.wysiwyg')",function() { location.href="$doc.getURL('edit', "$!{languageparams}&editor=wysiwyg")"; }, { 'type':'keypress', 'propagate':false, 'disable_in_input':true });
-      shortcut.add("$msg.get('core.shortcuts.view.inline')",function() { location.href="$doc.getURL('inline', $!languageparams)"; }, { 'type':'keypress', 'propagate':false, 'disable_in_input':true });
-      shortcut.add("$msg.get('core.shortcuts.view.rights')",function() { location.href="$doc.getURL('edit', 'editor=rights')"; }, { 'type':'keypress', 'propagate':false, 'disable_in_input':true });
-      shortcut.add("$msg.get('core.shortcuts.view.objects')",function() { location.href="$doc.getURL('edit', 'editor=object')"; }, { 'type':'keypress', 'propagate':false, 'disable_in_input':true });
-      shortcut.add("$msg.get('core.shortcuts.view.class')",function() { location.href="$doc.getURL('edit', 'editor=class')"; }, { 'type':'keypress', 'propagate':false, 'disable_in_input':true });
+      shortcut.add("$msg.get('core.shortcuts.view.edit')",function() { location.href=$('tmEdit').down('a').href; }, { 'type':'keypress', 'propagate':false, 'disable_in_input':true });
+      #if($isAdvancedUser)
+        shortcut.add("$msg.get('core.shortcuts.view.wiki')",function() { location.href=$('tmEditWiki').href; }, { 'type':'keypress', 'propagate':false, 'disable_in_input':true });
+        shortcut.add("$msg.get('core.shortcuts.view.wysiwyg')",function() { location.href=$('tmEditWysiwyg').href; }, { 'type':'keypress', 'propagate':false, 'disable_in_input':true });
+        shortcut.add("$msg.get('core.shortcuts.view.inline')",function() { location.href=$('tmEditInline').href; }, { 'type':'keypress', 'propagate':false, 'disable_in_input':true });
+        shortcut.add("$msg.get('core.shortcuts.view.rights')",function() { location.href=$('tmEditRights').href; }, { 'type':'keypress', 'propagate':false, 'disable_in_input':true });
+        shortcut.add("$msg.get('core.shortcuts.view.objects')",function() { location.href=$('tmEditObject').href; }, { 'type':'keypress', 'propagate':false, 'disable_in_input':true });
+        #if($hasAdmin)
+          shortcut.add("$msg.get('core.shortcuts.view.class')",function() { location.href=$('tmEditClass').href; }, { 'type':'keypress', 'propagate':false, 'disable_in_input':true });
+        #end
+      #end
     //]]>
     </script>
   #end

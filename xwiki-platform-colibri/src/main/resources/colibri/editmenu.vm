@@ -1,8 +1,6 @@
 <strong id="xwikicontentmenutitle" class="hidden">$msg.get('core.menu.content.title')</strong>
 <div id="contenteditmenu" class="leftmenu">
 #if($hasEdit && !$isReadOnly)
-  ## Compute the default edit mode
-  #set($editaction = $doc.getDefaultEditMode())
   ##
   ## Edit menu
   ##
@@ -25,16 +23,18 @@
   #else ## !isAdvanced
     #xwikitopmenuentry('' $currentEditorTitle 'tmCurrentEditor' "$currentEditorId hasIcon")
   #end
-  #if($keyboardShortcutsEnabled)
+  #if($keyboardShortcutsEnabled && $isAdvancedUser)
     <script type="text/javascript">
     //<![CDATA[
-      shortcut.add("$msg.get('core.shortcuts.view.edit')",function() { location.href="$doc.getURL($editaction, $!languageparams)"; }, { 'type':'keypress', 'propagate':false, 'disable_in_input':true });
-      shortcut.add("$msg.get('core.shortcuts.view.wiki')",function() { location.href="$doc.getURL('edit', "$!{languageparams}&editor=wiki")"; }, { 'type':'keypress', 'propagate':false, 'disable_in_input':true });
-      shortcut.add("$msg.get('core.shortcuts.view.wysiwyg')",function() { location.href="$doc.getURL('edit', "$!{languageparams}&editor=wysiwyg")"; }, { 'type':'keypress', 'propagate':false, 'disable_in_input':true });
-      shortcut.add("$msg.get('core.shortcuts.view.inline')",function() { location.href="$doc.getURL('inline', $!languageparams)"; }, { 'type':'keypress', 'propagate':false, 'disable_in_input':true });
-      shortcut.add("$msg.get('core.shortcuts.view.rights')",function() { location.href="$doc.getURL('edit', 'editor=rights')"; }, { 'type':'keypress', 'propagate':false, 'disable_in_input':true });
-      shortcut.add("$msg.get('core.shortcuts.view.objects')",function() { location.href="$doc.getURL('edit', 'editor=object')"; }, { 'type':'keypress', 'propagate':false, 'disable_in_input':true });
-      shortcut.add("$msg.get('core.shortcuts.view.class')",function() { location.href="$doc.getURL('edit', 'editor=class')"; }, { 'type':'keypress', 'propagate':false, 'disable_in_input':true });
+      shortcut.add("$msg.get('core.shortcuts.view.wiki')",function() { location.href=$('tmEditWiki').href; }, { 'type':'keypress', 'propagate':false, 'disable_in_input':true });
+      shortcut.add("$msg.get('core.shortcuts.view.wysiwyg')",function() { location.href=$('tmEditWysiwyg').href; }, { 'type':'keypress', 'propagate':false, 'disable_in_input':true });
+      ## See above the comment for the tmEditInline menu item.
+      ##shortcut.add("$msg.get('core.shortcuts.view.inline')",function() { location.href=$('tmEditInline').href; }, { 'type':'keypress', 'propagate':false, 'disable_in_input':true });
+      shortcut.add("$msg.get('core.shortcuts.view.rights')",function() { location.href=$('tmEditRights').href; }, { 'type':'keypress', 'propagate':false, 'disable_in_input':true });
+      shortcut.add("$msg.get('core.shortcuts.view.objects')",function() { location.href=$('tmEditObject').href; }, { 'type':'keypress', 'propagate':false, 'disable_in_input':true });
+      #if($hasAdmin)
+        shortcut.add("$msg.get('core.shortcuts.view.class')",function() { location.href=$('tmEditClass').href; }, { 'type':'keypress', 'propagate':false, 'disable_in_input':true });
+      #end
     //]]>
     </script>
   #end

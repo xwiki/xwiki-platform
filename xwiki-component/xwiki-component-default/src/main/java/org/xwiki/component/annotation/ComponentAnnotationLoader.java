@@ -169,8 +169,6 @@ public class ComponentAnnotationLoader extends AbstractLogEnabled
     {
         List<ComponentDescriptor> descriptors = new ArrayList<ComponentDescriptor>();
 
-        Map<RoleHint, ComponentDescriptor> descriptorMap = new HashMap<RoleHint, ComponentDescriptor>();
-
         // Look for ComponentRole annotations and register one component per ComponentRole found
         for (Class< ? > componentRoleClass : findComponentRoleClasses(componentClass)) {
             descriptors.addAll(this.factory.createComponentDescriptors(componentClass, componentRoleClass));

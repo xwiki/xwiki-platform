@@ -81,7 +81,7 @@ public class ReflectionUtils
                         throw new RuntimeException("Failed to set field [" + fieldName + "] in instance of ["
                             + instanceContainingField.getClass().getName() + "]. The Java Security Manager has "
                             + "probably been configured to prevent settting private field values. XWiki requires "
-                            + "this ability to work.");
+                            + "this ability to work.", e);
                     }
                     return;
                 }

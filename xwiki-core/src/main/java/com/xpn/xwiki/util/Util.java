@@ -637,28 +637,6 @@ public class Util
             + "\" style=\"display: none;\"><pre class=\"xwikierror\">\n" + text + "</pre></div>";
     }
 
-    public static String secureLaszloCode(String laszlocode) throws XWikiException
-    {
-        SAXReader reader = new SAXReader();
-        Document domdoc;
-
-        try {
-            StringReader in = new StringReader(laszlocode);
-            domdoc = reader.read(in);
-        } catch (DocumentException e) {
-            throw new XWikiException(XWikiException.MODULE_PLUGIN_LASZLO, XWikiException.ERROR_LASZLO_INVALID_XML,
-                "Invalid Laszlo XML", e);
-        }
-
-        String code = domdoc.asXML();
-        if (code.indexOf("..") != -1) {
-            throw new XWikiException(XWikiException.MODULE_PLUGIN_LASZLO, XWikiException.ERROR_LASZLO_INVALID_DOTDOT,
-                "Invalid content in Laszlo XML");
-        }
-
-        return laszlocode;
-    }
-
     public static MonitorPlugin getMonitorPlugin(XWikiContext context)
     {
         try {

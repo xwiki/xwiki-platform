@@ -32,7 +32,7 @@ html, body, div, span, applet, object, iframe,
 /* --------------------------------------------------------------
   * Sets the styles for standard HTML elements
 -------------------------------------------------------------- */
-body {
+#body {
   background-color: $theme.pageBackgroundColor;
   color: $theme.textColor;
   font-family: sans-serif;
@@ -405,19 +405,19 @@ th.avatar {
   padding: 0 25px 25px;
 }
 
-body.hideleft #contentcolumn .main {
+#body.hideleft #contentcolumn .main {
   margin: 0 200px 0 0;
 }
 
-body.hideright #contentcolumn .main {
+#body.hideright #contentcolumn .main {
   margin: 0 0 0 200px;
 }
 
-body.hidelefthideright #contentcolumn .main {
+#body.hidelefthideright #contentcolumn .main {
   margin: 0;
 }
 
-body.content #contentcolumn .main {
+#body.content #contentcolumn .main {
   margin: 0 200px;
 }
 
@@ -696,11 +696,11 @@ div.buttonwrapper {
   text-transform: uppercase;
 }
 
-body.hideleft #footerglobal{
+#body.hideleft #footerglobal{
   margin: 0 225px 0 0;
 }
 
-body.hideright #footerglobal {
+#body.hideright #footerglobal {
   margin: 0 0 0 225px;
 }
 
@@ -825,7 +825,7 @@ iframe.mceEditorIframe, .mceEditor {
   width: 100%;
 }
 
-body.mceContentBody {
+#body.mceContentBody {
   background: $theme.pageContentBackgroundColor;
   min-width: 100px;
 }
@@ -837,7 +837,7 @@ table.xRichTextEditorTabPanel td {
 }
 
 /* Should be in RichTextArea.css - for table resizing */
-body.main table {
+#body.main table {
   margin: 0;
 }
 
@@ -1903,7 +1903,7 @@ input#tags {
 -------------------------------------------------------------- */
 
 /* -------------SmartClient tree overrides---------------*/
-body .listGrid {
+#body .listGrid {
   border: none;
 }
 #XWEWrapper {

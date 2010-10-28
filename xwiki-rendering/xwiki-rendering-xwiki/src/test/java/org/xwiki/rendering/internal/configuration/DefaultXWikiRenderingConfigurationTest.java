@@ -72,22 +72,6 @@ public class DefaultXWikiRenderingConfigurationTest extends AbstractMockingCompo
     }
 
     @Test
-    public void testGetMacroCategories() throws Exception
-    {
-        getMockery().checking(new Expectations()
-        {
-            {
-                oneOf(source).getProperty("rendering.macroCategories", Properties.class);
-                will(returnValue(new Properties()));
-            }
-        });
-
-        Properties categories = this.configuration.getMacroCategories();
-        Assert.assertNotNull(categories);
-        Assert.assertEquals(0, categories.size());
-    }
-
-    @Test
     public void testGetImageWidthLimit() throws Exception
     {
         getMockery().checking(new Expectations()

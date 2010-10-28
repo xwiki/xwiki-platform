@@ -27,13 +27,13 @@ import org.jmock.Expectations;
 import org.junit.Before;
 import org.junit.Test;
 import org.xwiki.component.descriptor.DefaultComponentDescriptor;
-import org.xwiki.rendering.configuration.RenderingConfiguration;
-import org.xwiki.rendering.internal.configuration.DefaultRenderingConfiguration;
+import org.xwiki.rendering.internal.transformation.macro.DefaultMacroTransformationConfiguration;
 import org.xwiki.rendering.macro.Macro;
 import org.xwiki.rendering.macro.MacroCategoryManager;
 import org.xwiki.rendering.macro.MacroId;
 import org.xwiki.rendering.macro.descriptor.DefaultMacroDescriptor;
 import org.xwiki.rendering.syntax.Syntax;
+import org.xwiki.rendering.transformation.macro.MacroTransformationConfiguration;
 import org.xwiki.test.AbstractComponentTestCase;
 
 /**
@@ -58,10 +58,11 @@ public class DefaultMacroCategoryManagerTest extends AbstractComponentTestCase
     {
         // TODO: This test needs to be improved. Right now it's based on the Test Macro located in the transformation
         // package and for 4 of them a "Test" category has been set...
-        DefaultRenderingConfiguration configuration =
-            (DefaultRenderingConfiguration) getComponentManager().lookup(RenderingConfiguration.class);
-        configuration.addMacroCategory(new MacroId("testcontentmacro"), "Content");
-        configuration.addMacroCategory(new MacroId("testsimplemacro"), "Simple");
+        DefaultMacroTransformationConfiguration configuration =
+            (DefaultMacroTransformationConfiguration) getComponentManager().lookup(
+                MacroTransformationConfiguration.class);
+        configuration.addCategory(new MacroId("testcontentmacro"), "Content");
+        configuration.addCategory(new MacroId("testsimplemacro"), "Simple");
 
         Set<String> macroCategories = this.macroCategoryManager.getMacroCategories();
 
@@ -102,10 +103,11 @@ public class DefaultMacroCategoryManagerTest extends AbstractComponentTestCase
         getComponentManager().registerComponent(descriptor, testMacro1);
         
         // Override default macro categories. 
-        DefaultRenderingConfiguration configuration =
-            (DefaultRenderingConfiguration) getComponentManager().lookup(RenderingConfiguration.class);
-        configuration.addMacroCategory(new MacroId("mytestmacro1"), "Cat1");
-        configuration.addMacroCategory(new MacroId("mytestmacro2"), "Cat2");
+        DefaultMacroTransformationConfiguration configuration =
+            (DefaultMacroTransformationConfiguration) getComponentManager().lookup(
+                MacroTransformationConfiguration.class);
+        configuration.addCategory(new MacroId("mytestmacro1"), "Cat1");
+        configuration.addCategory(new MacroId("mytestmacro2"), "Cat2");
         
         // Check whether our macros are registered under correct categories.
         Set<MacroId> macroIds = this.macroCategoryManager.getMacroIds("Cat1");
@@ -132,9 +134,10 @@ public class DefaultMacroCategoryManagerTest extends AbstractComponentTestCase
         }});
         
         // Override the macro category for this macro. 
-        DefaultRenderingConfiguration configuration =
-            (DefaultRenderingConfiguration) getComponentManager().lookup(RenderingConfiguration.class);
-        configuration.addMacroCategory(new MacroId("mytestmacro", Syntax.XWIKI_2_0), "Test");
+        DefaultMacroTransformationConfiguration configuration =
+            (DefaultMacroTransformationConfiguration) getComponentManager().lookup(
+                MacroTransformationConfiguration.class);
+        configuration.addCategory(new MacroId("mytestmacro", Syntax.XWIKI_2_0), "Test");
                 
         // Make sure our macro is put into the correct category & registered under correct syntax.
         Set<MacroId> macroIds = this.macroCategoryManager.getMacroIds("Test");

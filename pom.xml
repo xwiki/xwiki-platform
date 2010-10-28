@@ -203,6 +203,9 @@
                 <exclude>org/xwiki/rendering/block/Block</exclude><!-- Added get/setNext/PreviousSibling + removeBlock -->
                 <exclude>org/xwiki/rendering/block/SpaceBlock</exclude><!-- Removed field SPACE_BLOCK-->
                 <exclude>org/xwiki/rendering/configuration/RenderingConfiguration</exclude><!-- Added getTransformations -->
+                <!-- Following classes moved to the new Macro Transformation Module -->
+                <exclude>org/xwiki/rendering/macro/**</exclude>
+                <exclude>org/xwiki/rendering/transformation/MacroTransformationContext</exclude>
               </excludes>
             </configuration>
           </plugin>

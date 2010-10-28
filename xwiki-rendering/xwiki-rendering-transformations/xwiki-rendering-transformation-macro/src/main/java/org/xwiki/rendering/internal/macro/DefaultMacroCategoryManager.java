@@ -29,12 +29,12 @@ import java.util.Set;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.Requirement;
 import org.xwiki.component.logging.AbstractLogEnabled;
-import org.xwiki.rendering.configuration.RenderingConfiguration;
 import org.xwiki.rendering.macro.MacroCategoryManager;
 import org.xwiki.rendering.macro.MacroLookupException;
 import org.xwiki.rendering.macro.MacroManager;
 import org.xwiki.rendering.macro.MacroId;
 import org.xwiki.rendering.syntax.Syntax;
+import org.xwiki.rendering.transformation.macro.MacroTransformationConfiguration;
 
 /**
  * Default implementation of {@link org.xwiki.rendering.macro.MacroCategoryManager}.
@@ -49,7 +49,7 @@ public class DefaultMacroCategoryManager extends AbstractLogEnabled implements M
      * Used to get macro categories defined by the user (if any).
      */
     @Requirement
-    private RenderingConfiguration configuration;
+    private MacroTransformationConfiguration configuration;
 
     /**
      * Macro manager component used to check the existence of macros.
@@ -136,7 +136,7 @@ public class DefaultMacroCategoryManager extends AbstractLogEnabled implements M
         Set<MacroId> macroIds = this.macroManager.getMacroIds();
         
         // Loop through all the macro ids and categorize them.
-        Properties categories = this.configuration.getMacroCategories();
+        Properties categories = this.configuration.getCategories();
         for (MacroId macroId : macroIds) {
             if (matcher.match(macroId)) {
                 // Check if this macro's category has been overwritten.

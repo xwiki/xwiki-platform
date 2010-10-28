@@ -1,0 +1,6 @@
+org.xwiki.rendering.internal.macro.DefaultMacroManager
+org.xwiki.rendering.internal.macro.DefaultMacroCategoryManager
+org.xwiki.rendering.internal.macro.DefaultMacroIdFactory
+org.xwiki.rendering.internal.macro.ResourceReferenceConverter
+org.xwiki.rendering.internal.transformation.macro.MacroTransformation
+org.xwiki.rendering.internal.transformation.macro.DefaultMacroTransformationConfiguration

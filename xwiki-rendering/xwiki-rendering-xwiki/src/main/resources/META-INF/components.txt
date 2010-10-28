@@ -3,3 +3,4 @@ org.xwiki.rendering.internal.renderer.XWikiLinkLabelGenerator
 org.xwiki.rendering.internal.wiki.XWikiWikiModel
 org.xwiki.rendering.internal.scripting.RenderingScriptService
 org.xwiki.rendering.internal.renderer.XWikiAttachmentURILabelGenerator
+org.xwiki.rendering.internal.transformation.macro.XWikiMacroTransformationConfiguration

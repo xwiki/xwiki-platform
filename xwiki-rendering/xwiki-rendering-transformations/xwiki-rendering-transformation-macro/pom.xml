@@ -25,54 +25,22 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <parent>
+    <artifactId>xwiki-core-rendering-transformations-parent</artifactId>
     <groupId>org.xwiki.platform</groupId>
-    <artifactId>xwiki-core-rendering-macros-parent</artifactId>
     <version>2.6-SNAPSHOT</version>
   </parent>
-  <artifactId>xwiki-core-rendering-macro-script</artifactId>
-  <name>XWiki Platform - Core - Rendering - Macro - Script</name>
-  <description>XWiki Platform - Core - Rendering - Macro - Script</description>
+  <artifactId>xwiki-core-rendering-transformation-macro</artifactId>
+  <name>XWiki Platform - Core - Rendering - Transformation - Macro</name>
+  <description>XWiki Platform - Core - Rendering - Transformation - Macro</description>
+  <properties>
+    <!-- New module introduced in 2.6, remove this skip once 2.6 is released. -->
+    <xwiki.clirr.skip>true</xwiki.clirr.skip>
+  </properties>
   <dependencies>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-core-script</artifactId>
+      <artifactId>xwiki-core-properties</artifactId>
       <version>${project.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-core-bridge</artifactId>
-      <version>${project.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-core-classloader</artifactId>
-      <version>${project.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-core-observation-api</artifactId>
-      <version>${project.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-core-component-observation</artifactId>
-      <version>${project.version}</version>
-      <scope>runtime</scope>
-    </dependency>
-
-    <!-- Test dependencies -->
-    <dependency>
-      <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-core-observation-local</artifactId>
-      <version>${project.version}</version>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-core-rendering-transformation-macro</artifactId>
-      <version>${project.version}</version>
-      <type>test-jar</type>
-      <scope>test</scope>
     </dependency>
   </dependencies>
   <build>
@@ -82,16 +50,29 @@
         <artifactId>maven-jar-plugin</artifactId>
         <executions>
           <execution>
+            <id>test-jar</id>
             <goals>
               <goal>test-jar</goal>
             </goals>
             <configuration>
               <includes>
-                <include>**/ScriptMockSetup*.class</include>
+                <!-- Required since we're using test components in the integration test module  -->
+                <include>**/Test*Macro.class</include>
+                <include>**/Test*Macro$*.class</include>
+                <include>**/components.txt</include>
               </includes>
             </configuration>
           </execution>
         </executions>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-checkstyle-plugin</artifactId>
+        <configuration>
+          <excludes>
+            org/xwiki/rendering/internal/transformation/macro/MacroTransformation.java
+          </excludes>
+        </configuration>
       </plugin>
     </plugins>
   </build>

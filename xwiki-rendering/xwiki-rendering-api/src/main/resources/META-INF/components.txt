@@ -55,12 +55,7 @@ org.xwiki.rendering.internal.renderer.event.EventBlockRenderer
 org.xwiki.rendering.internal.renderer.plain.PlainTextRendererFactory
 org.xwiki.rendering.internal.renderer.plain.PlainTextRenderer
 org.xwiki.rendering.internal.renderer.plain.PlainTextBlockRenderer
-org.xwiki.rendering.internal.macro.DefaultMacroManager
-org.xwiki.rendering.internal.macro.DefaultMacroCategoryManager
-org.xwiki.rendering.internal.macro.DefaultMacroIdFactory
-org.xwiki.rendering.internal.macro.ResourceReferenceConverter
 org.xwiki.rendering.internal.converter.DefaultConverter
 org.xwiki.rendering.internal.transformation.DefaultTransformationManager
-org.xwiki.rendering.internal.transformation.MacroTransformation
 org.xwiki.rendering.internal.configuration.DefaultRenderingConfiguration
 org.xwiki.rendering.internal.syntax.DefaultSyntaxFactory

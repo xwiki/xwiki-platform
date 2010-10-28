@@ -45,16 +45,6 @@
     </dependency>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-core-properties</artifactId>
-      <version>${project.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-core-observation-api</artifactId>
-      <version>${project.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-core-configuration-api</artifactId>
       <version>${project.version}</version>
     </dependency>
@@ -109,10 +99,6 @@
             <configuration>
               <includes>
                 <include>**/scaffolding/**.class</include>
-                <!-- Required since we're using test components in the integration test module  -->
-                <include>**/Test*Macro.class</include>
-                <include>**/Test*Macro$*.class</include>
-                <include>**/components.txt</include>
               </includes>
             </configuration>
           </execution>
@@ -157,8 +143,7 @@
             org/xwiki/rendering/internal/renderer/event/EventsChainingRenderer.java,
             org/xwiki/rendering/internal/renderer/event/EventRendererFactory.java,
             org/xwiki/rendering/internal/renderer/event/EventBlockRenderer.java,
-            org/xwiki/rendering/internal/parser/XDOMGeneratorListener.java,
-            org/xwiki/rendering/internal/transformation/MacroTransformation.java
+            org/xwiki/rendering/internal/parser/XDOMGeneratorListener.java
           </excludes>
         </configuration>
       </plugin>

@@ -39,5 +39,10 @@
       <artifactId>xwiki-core-office-viewer</artifactId>
       <version>${project.version}</version>
     </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-core-rendering-transformation-macro</artifactId>
+      <version>${project.version}</version>
+    </dependency>
   </dependencies>
 </project>

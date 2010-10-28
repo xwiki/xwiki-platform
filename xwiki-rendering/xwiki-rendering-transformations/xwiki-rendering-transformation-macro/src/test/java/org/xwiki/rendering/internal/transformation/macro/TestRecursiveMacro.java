@@ -17,25 +17,25 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.rendering.internal.transformation;
+package org.xwiki.rendering.internal.transformation.macro;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 import org.xwiki.component.annotation.Component;
 import org.xwiki.rendering.block.Block;
-import org.xwiki.rendering.block.ParagraphBlock;
-import org.xwiki.rendering.block.WordBlock;
+import org.xwiki.rendering.block.MacroBlock;
 import org.xwiki.rendering.macro.AbstractNoParameterMacro;
 import org.xwiki.rendering.macro.MacroExecutionException;
 import org.xwiki.rendering.transformation.MacroTransformationContext;
 
-@Component("testsimpleinlinemacro")
-public class TestSimpleInlineMacro extends AbstractNoParameterMacro
+@Component("testrecursivemacro")
+public class TestRecursiveMacro extends AbstractNoParameterMacro
 {
-    public TestSimpleInlineMacro()
+    public TestRecursiveMacro()
     {
-        super("Simple Inline Macro");
+        super("Recursive Macro");
     }
 
     /**
@@ -45,21 +45,18 @@ public class TestSimpleInlineMacro extends AbstractNoParameterMacro
      */
     public boolean supportsInlineMode()
     {
-        return true;
+        return false;
     }
 
     /**
      * {@inheritDoc}
      * 
-     * @see org.xwiki.rendering.macro.Macro#execute(Object, String,
-     *      org.xwiki.rendering.transformation.MacroTransformationContext)
+     * @see org.xwiki.rendering.macro.Macro#execute
      */
     public List<Block> execute(Object parameters, String content, MacroTransformationContext context)
         throws MacroExecutionException
     {
-        int wordCount = context.getXDOM().getChildrenByType(WordBlock.class, true).size();
-
-        List<Block> result = Arrays.<Block> asList(new WordBlock("simpleinlinemacro" + wordCount));
-        return context.isInline() ? result : Arrays.<Block> asList(new ParagraphBlock(result));
+        return Arrays.asList((Block) new MacroBlock("testrecursivemacro", Collections
+            .<String, String> emptyMap(), false));
     }
 }

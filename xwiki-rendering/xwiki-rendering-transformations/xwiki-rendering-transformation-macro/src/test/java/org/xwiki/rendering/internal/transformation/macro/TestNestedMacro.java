@@ -17,7 +17,7 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.rendering.internal.transformation;
+package org.xwiki.rendering.internal.transformation.macro;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -49,6 +49,11 @@ public class TestNestedMacro extends AbstractNoParameterMacro
         return false;
     }
 
+    /**
+     * {@inheritDoc}
+     *
+     * @see org.xwiki.rendering.macro.Macro#execute
+     */
     public List<Block> execute(Object parameters, String content, MacroTransformationContext context)
         throws MacroExecutionException
     {

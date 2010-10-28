@@ -17,28 +17,28 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.rendering.internal.transformation;
+package org.xwiki.rendering.internal.transformation.macro;
 
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 
 import org.xwiki.component.annotation.Component;
 import org.xwiki.rendering.block.Block;
-import org.xwiki.rendering.block.FormatBlock;
+import org.xwiki.rendering.block.ParagraphBlock;
 import org.xwiki.rendering.block.WordBlock;
-import org.xwiki.rendering.listener.Format;
 import org.xwiki.rendering.macro.AbstractNoParameterMacro;
 import org.xwiki.rendering.macro.MacroExecutionException;
 import org.xwiki.rendering.transformation.MacroTransformationContext;
 
-@Component("testformatmacro")
-public class TestFormatMacro extends AbstractNoParameterMacro
+@Component("testprioritymacro")
+public class TestPriorityMacro extends AbstractNoParameterMacro
 {
-    public TestFormatMacro()
+    public TestPriorityMacro()
     {
-        super("Format Macro");
-        setDefaultCategory("Test");
+        super("Priority Macro");
+
+        // Ensure that this macro gets executed before the other macros for testing priorities
+        setPriority(500);
     }
 
     /**
@@ -48,19 +48,17 @@ public class TestFormatMacro extends AbstractNoParameterMacro
      */
     public boolean supportsInlineMode()
     {
-        return true;
+        return false;
     }
 
     /**
      * {@inheritDoc}
-     * 
-     * @see org.xwiki.rendering.macro.Macro#execute(Object, String, org.xwiki.rendering.transformation.MacroTransformationContext)
+     *
+     * @see org.xwiki.rendering.macro.Macro#execute
      */
     public List<Block> execute(Object parameters, String content, MacroTransformationContext context)
         throws MacroExecutionException
     {
-        int wordCount = context.getXDOM().getChildrenByType(WordBlock.class, true).size();
-        return Arrays.<Block>asList(new FormatBlock(Arrays.<Block>asList(
-            new WordBlock("formatmacro" + wordCount)), Format.NONE, Collections.singletonMap("param", "value")));
+        return Arrays.<Block>asList(new ParagraphBlock(Arrays.<Block>asList(new WordBlock("word"))));
     }
 }

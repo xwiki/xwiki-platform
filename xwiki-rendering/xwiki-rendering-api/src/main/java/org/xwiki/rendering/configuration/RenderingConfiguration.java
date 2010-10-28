@@ -60,13 +60,6 @@ public interface RenderingConfiguration
     String getLinkLabelFormat();
 
     /**
-     * @return the category names to use for the macros. These are the categories under which they'll be listed
-     *         in UIs for example. If a category for a macro is null then the category defined in the macro
-     *         descriptor (ie defined by the macro author) will be used
-     */
-    Properties getMacroCategories();
-
-    /**
      * @return the list of InterWiki definitions. Each InterWiki definition is made of an alias and a base URL.
      * @see org.xwiki.rendering.listener.reference.InterWikiResourceReference
      */

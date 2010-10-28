@@ -17,28 +17,44 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.rendering.internal.transformation;
+package org.xwiki.rendering.internal.transformation.macro;
 
-import java.util.Arrays;
+import java.io.PrintWriter;
 import java.util.List;
 
 import org.xwiki.component.annotation.Component;
 import org.xwiki.rendering.block.Block;
-import org.xwiki.rendering.block.ParagraphBlock;
-import org.xwiki.rendering.block.WordBlock;
 import org.xwiki.rendering.macro.AbstractNoParameterMacro;
 import org.xwiki.rendering.macro.MacroExecutionException;
 import org.xwiki.rendering.transformation.MacroTransformationContext;
 
-@Component("testprioritymacro")
-public class TestPriorityMacro extends AbstractNoParameterMacro
+/**
+ * Macro stub for testing a macro that throws an exception when executed.
+ * 
+ * @version $Id$
+ * @since 1.7M3
+ */
+@Component("testfailingmacro")
+public class TestFailingMacro extends AbstractNoParameterMacro
 {
-    public TestPriorityMacro()
+    public class MockMacroExecutionException extends MacroExecutionException
     {
-        super("Priority Macro");
+        public MockMacroExecutionException(String message)
+        {
+            super(message);
+        }
 
-        // Ensure that this macro gets executed before the other macros for testing priorities
-        setPriority(500);
+        @Override
+        public void printStackTrace(PrintWriter writer)
+        {
+            writer.print("stack trace here");
+        }
+    }
+
+    public TestFailingMacro()
+    {
+        super("Failing Macro");
+        setDefaultCategory("Test");
     }
 
     /**
@@ -48,12 +64,17 @@ public class TestPriorityMacro extends AbstractNoParameterMacro
      */
     public boolean supportsInlineMode()
     {
-        return false;
+        return true;
     }
 
+    /**
+     * {@inheritDoc}
+     * 
+     * @see org.xwiki.rendering.macro.Macro#execute
+     */
     public List<Block> execute(Object parameters, String content, MacroTransformationContext context)
         throws MacroExecutionException
     {
-        return Arrays.<Block>asList(new ParagraphBlock(Arrays.<Block>asList(new WordBlock("word"))));
+        throw new MockMacroExecutionException("Macro execution error");
     }
 }

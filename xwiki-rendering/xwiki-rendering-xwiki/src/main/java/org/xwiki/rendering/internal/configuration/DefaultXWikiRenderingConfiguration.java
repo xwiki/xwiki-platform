@@ -34,7 +34,7 @@ import org.xwiki.configuration.ConfigurationSource;
 import org.xwiki.rendering.transformation.Transformation;
 
 /**
- * All configuration options for the rendering subsystem.
+ * All configuration options for the Rendering subsystem.
  * 
  * @version $Id$
  * @since 2.5M2
@@ -73,16 +73,6 @@ public class DefaultXWikiRenderingConfiguration extends AbstractLogEnabled imple
     public String getLinkLabelFormat()
     {
         return this.configuration.getProperty(PREFIX + "linkLabelFormat", DEFAULT_LINK_LABEL_FORMAT);
-    }
-
-    /**
-     * {@inheritDoc}
-     * 
-     * @see XWikiRenderingConfiguration#getMacroCategories()
-     */
-    public Properties getMacroCategories()
-    {
-        return this.configuration.getProperty(PREFIX + "macroCategories", Properties.class);
     }
 
     /**

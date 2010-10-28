@@ -26,7 +26,6 @@ import org.xwiki.component.annotation.Component;
 import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.internal.macro.rss.RssMacro;
 import org.xwiki.rendering.macro.MacroExecutionException;
-import org.xwiki.rendering.macro.rss.RssMacroParameters;
 import org.xwiki.rendering.transformation.MacroTransformationContext;
 
 /**

@@ -17,49 +17,30 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.rendering.internal.transformation;
+package org.xwiki.rendering.internal.transformation.macro;
 
-import java.io.PrintWriter;
+import java.util.Arrays;
 import java.util.List;
 
 import org.xwiki.component.annotation.Component;
 import org.xwiki.rendering.block.Block;
+import org.xwiki.rendering.block.ParagraphBlock;
+import org.xwiki.rendering.block.WordBlock;
 import org.xwiki.rendering.macro.AbstractNoParameterMacro;
 import org.xwiki.rendering.macro.MacroExecutionException;
 import org.xwiki.rendering.transformation.MacroTransformationContext;
 
-/**
- * Macro stub for testing a macro that throws an exception when executed.
- * 
- * @version $Id$
- * @since 1.7M3
- */
-@Component("testfailingmacro")
-public class TestFailingMacro extends AbstractNoParameterMacro
+@Component("testsimpleinlinemacro")
+public class TestSimpleInlineMacro extends AbstractNoParameterMacro
 {
-    public class MockMacroExecutionException extends MacroExecutionException
+    public TestSimpleInlineMacro()
     {
-        public MockMacroExecutionException(String message)
-        {
-            super(message);
-        }
-
-        @Override
-        public void printStackTrace(PrintWriter writer)
-        {
-            writer.print("stack trace here");
-        }
-    }
-
-    public TestFailingMacro()
-    {
-        super("Failing Macro");
-        setDefaultCategory("Test");
+        super("Simple Inline Macro");
     }
 
     /**
      * {@inheritDoc}
-     *
+     * 
      * @see org.xwiki.rendering.macro.Macro#supportsInlineMode()
      */
     public boolean supportsInlineMode()
@@ -70,11 +51,14 @@ public class TestFailingMacro extends AbstractNoParameterMacro
     /**
      * {@inheritDoc}
      * 
-     * @see org.xwiki.rendering.macro.Macro#execute(Object, String, MacroTransformationContext)
+     * @see org.xwiki.rendering.macro.Macro#execute
      */
     public List<Block> execute(Object parameters, String content, MacroTransformationContext context)
         throws MacroExecutionException
     {
-        throw new MockMacroExecutionException("Macro execution error");
+        int wordCount = context.getXDOM().getChildrenByType(WordBlock.class, true).size();
+
+        List<Block> result = Arrays.<Block> asList(new WordBlock("simpleinlinemacro" + wordCount));
+        return context.isInline() ? result : Arrays.<Block> asList(new ParagraphBlock(result));
     }
 }

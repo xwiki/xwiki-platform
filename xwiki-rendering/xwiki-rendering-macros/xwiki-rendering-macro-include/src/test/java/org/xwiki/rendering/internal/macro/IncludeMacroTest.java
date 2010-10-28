@@ -33,7 +33,7 @@ import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.block.MacroBlock;
 import org.xwiki.rendering.block.MacroMarkerBlock;
 import org.xwiki.rendering.internal.macro.include.IncludeMacro;
-import org.xwiki.rendering.internal.transformation.MacroTransformation;
+import org.xwiki.rendering.internal.transformation.macro.MacroTransformation;
 import org.xwiki.rendering.macro.Macro;
 import org.xwiki.rendering.macro.MacroExecutionException;
 import org.xwiki.rendering.macro.include.IncludeMacroParameters;

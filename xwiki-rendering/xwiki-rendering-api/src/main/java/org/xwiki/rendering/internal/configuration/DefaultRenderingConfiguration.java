@@ -24,7 +24,6 @@ import org.xwiki.component.annotation.Requirement;
 import org.xwiki.component.phase.Initializable;
 import org.xwiki.component.phase.InitializationException;
 import org.xwiki.rendering.configuration.RenderingConfiguration;
-import org.xwiki.rendering.macro.MacroId;
 import org.xwiki.rendering.transformation.Transformation;
 
 import java.util.ArrayList;
@@ -51,11 +50,6 @@ public class DefaultRenderingConfiguration implements RenderingConfiguration, In
      * @see #getLinkLabelFormat()
      */
     private String linkLabelFormat = "%p";
-
-    /**
-     * @see #getMacroCategories()
-     */
-    private Properties macroCategories = new Properties();
 
     /**
      * @see #getInterWikiDefinitions()
@@ -91,27 +85,6 @@ public class DefaultRenderingConfiguration implements RenderingConfiguration, In
         // This method is useful for those using the XWiki Rendering in standalone mode since it allows the rendering
         // to work even without a configuration store.
         this.linkLabelFormat = linkLabelFormat;
-    }
-
-    /**
-     * {@inheritDoc}
-     *
-     * @see org.xwiki.rendering.configuration.RenderingConfiguration#getMacroCategories()
-     */
-    public Properties getMacroCategories()
-    {
-        return this.macroCategories;
-    }
-
-    /**
-     * @param macroId the id of the macro for which to set a category
-     * @param category the category name to set
-     */
-    public void addMacroCategory(MacroId macroId, String category)
-    {
-        // This method is useful for those using the XWiki Rendering in standalone mode since it allows the rendering
-        // to work even without a configuration store.
-        this.macroCategories.setProperty(macroId.toString(), category);
     }
 
     /**

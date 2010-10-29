@@ -128,15 +128,17 @@
     ## The list is already sorted alphabetically
 #set($prevSpace = '')
 #foreach ($classname in $xwiki.classList)
-  #set($classdoc = $xwiki.getDocument($classname))
-  #if($classdoc.space != $prevSpace)
-    #if($prevSpace != '')
-      </optgroup>
+  #if ($!xwiki.hasAccessLevel('view', $classname))
+    #set ($classdoc = $xwiki.getDocument($classname))
+    #if ($classdoc.space != $prevSpace)
+      #if ($prevSpace != '')
+        </optgroup>
+      #end
+      <optgroup label="${escapetool.xml($classdoc.space)}">
+      #set ($prevSpace = $classdoc.space)
     #end
-    <optgroup label="${escapetool.xml($classdoc.space)}">
-    #set($prevSpace = $classdoc.space)
+    <option value="${escapetool.xml($classdoc.fullName)}">${escapetool.xml($classdoc.name)}</option>
   #end
-  <option value="${escapetool.xml($classdoc.fullName)}">${escapetool.xml($classdoc.name)}</option>
 #end
 #if($prevSpace != '')
   </optgroup>

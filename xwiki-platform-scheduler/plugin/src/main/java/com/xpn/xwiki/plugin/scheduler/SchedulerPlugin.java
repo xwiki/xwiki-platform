@@ -580,7 +580,7 @@ public class SchedulerPlugin extends XWikiDefaultPlugin
         // BaseObject passed as argument will not be saved (XWikiDocument#getObject clones the document
         // and returns the BaseObject from the clone)
         // TODO refactor the plugin in order to stop passing BaseObject around, passing document references instead.
-        BaseObject job = jobHolder.getObject("XWiki.SchedulerJobClass");
+        BaseObject job = jobHolder.getObject(XWIKI_JOB_CLASS);
         job.setStringValue("status", status);
         jobHolder.setMinorEdit(true);
         context.getWiki().saveDocument(jobHolder, context);

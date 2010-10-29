@@ -82,6 +82,10 @@ XWiki.widgets.LiveTable = Class.create({
         }
       },this);
 
+    // Initialize the throttling delay, that is the delay a user can type a second filter key after a first one without
+    // sending an AJAX request to the server.
+    this.throttlingDelay = options.throttlingDelay || 0.5;
+
     // If permalinks is enable, load initial hash, using the URL hash if available or the default above
     this.permalinks = new LiveTableHash(this,(typeof options.permalinks == "undefined" || options.permalinks));
 
@@ -101,7 +105,9 @@ XWiki.widgets.LiveTable = Class.create({
 
     // Initialize filters
     if (this.filtersNodes.length > 0) {
-      this.filter = new LiveTableFilter(this, this.filtersNodes, this.permalinks.getFilters());
+      this.filter = new LiveTableFilter(this, this.filtersNodes, this.permalinks.getFilters(), {
+        throttlingDelay: this.throttlingDelay
+      });
     } 
 
     if ($(domNodeName + "-tagcloud"))
@@ -146,85 +152,102 @@ XWiki.widgets.LiveTable = Class.create({
     * @param reqLimit Maximum number of rows to retrieve.
     * @param displayOffset Starting display offset; the index of the first row that should be displayed.
     * @param displayLimit Maximum number of rows to display.
+    * @param delay An possible delay before firing the request to allow that request to be cancelled (used
+    *          for submission throttling on filters)
     */
-  getRows: function(reqOffset, reqLimit, displayOffset, displayLimit)
+  getRows: function(reqOffset, reqLimit, displayOffset, displayLimit, delay)
   {
-    var url =  this.getUrl + '&offset='+reqOffset+'&limit='+reqLimit+'&reqNo='+ (++this.sendReqNo);
-
-    if (this.filter) {
-      this.filters = this.filter.serializeFilters();
-      if (this.filters != undefined && this.filters != "") {
-        url += this.filters;
-      }
-    }
-
-    if (typeof this.tags != "undefined" && this.tags.length > 0) {
-       this.tags.each(function(tag) {
-          url += ("&tag=" + encodeURIComponent(tag.unescapeHTML()));
-       });
-    }
-
-    url += this.getSortURLFragment();
-
     var self = this;
 
-    this.loadingStatus.removeClassName("hidden");
+    if (this.nextRequestTimeoutId) {
+      // If a request was queued previously, cancel it
+      window.clearTimeout(this.nextRequestTimeoutId);
+      delete this.nextRequestTimeoutId;
+    }
 
-    // Let code know the table is about to load new entries.
-    // 1. Named event (for code interested by that table only)
-    document.fire("xwiki:livetable:" + this.domNodeName + ":loadingEntries");
-    // 2. Generic event (for code potentially interested in any livetable)
-    document.fire("xwiki:livetable:loadingEntries", {
-      "tableId" : this.domNodeName
-    });
+    var doRequest = function(){
 
-    var ajx = new Ajax.Request(url,
-    {
-      method: 'get',
-      onComplete: function( transport ) {
-        // Let code know loading is finished
-        // 1. Named event (for code interested by that table only)
-        document.fire("xwiki:livetable:" + self.domNodeName + ":loadingComplete", {
-          "status" : transport.status
-        });
-        // 2. Generic event (for code potentially interested in any livetable)
-        document.fire("xwiki:livetable:loadingComplete", {
-          "status" : transport.status,
-          "tableId" : self.domNodeName
-        });
-
-        self.loadingStatus.addClassName("hidden");
-      },
-
-      onSuccess: function( transport ) {
-        var res = eval( '(' + transport.responseText + ')');
-
-        if (res.reqNo < self.sendReqNo) {
-          return;
+      var url =  self.getUrl + '&offset='+reqOffset+'&limit='+reqLimit+'&reqNo='+ (++self.sendReqNo);
+      if (self.filter) {
+        self.filters = self.filter.serializeFilters();
+        if (self.filters != undefined && self.filters != "") {
+          url += self.filters;
         }
-
-        self.recvReqNo = res.reqNo;
-        self.loadingStatus.addClassName("hidden");
-
-        if(self.tagCloud && res.matchingtags) {
-           self.tagCloud.updateTagCloud(res.tags, res.matchingtags);
-        }
-
-        // Let code know new entries arrived
-        // 1. Named event (for code interested by that table only)
-        document.fire("xwiki:livetable:" + this.domNodeName + ":receivedEntries", {
-          "data" : res
-        });
-        // 2. Generic event (for code potentially interested in any livetable)
-        document.fire("xwiki:livetable:receivedEntries", {
-          "data" : res,
-          "tableId" : self.domNodeName
-        });
-
-        self.updateFetchedRows(res);
-        self.displayRows(displayOffset, displayLimit);
       }
-    });
+      if (typeof self.tags != "undefined" && self.tags.length > 0) {
+         self.tags.each(function(tag) {
+            url += ("&tag=" + encodeURIComponent(tag.unescapeHTML()));
+         });
+      }
+      url += self.getSortURLFragment();
+
+      self.loadingStatus.removeClassName("hidden");
+
+      // Let code know the table is about to load new entries.
+      // 1. Named event (for code interested by that table only)
+      document.fire("xwiki:livetable:" + this.domNodeName + ":loadingEntries");
+      // 2. Generic event (for code potentially interested in any livetable)
+      document.fire("xwiki:livetable:loadingEntries", {
+        "tableId" : this.domNodeName
+      });
+
+      var ajx = new Ajax.Request(url,
+      {
+        method: 'get',
+        onComplete: function( transport ) {
+          // Let code know loading is finished
+          // 1. Named event (for code interested by that table only)
+          document.fire("xwiki:livetable:" + self.domNodeName + ":loadingComplete", {
+            "status" : transport.status
+          });
+          // 2. Generic event (for code potentially interested in any livetable)
+          document.fire("xwiki:livetable:loadingComplete", {
+            "status" : transport.status,
+            "tableId" : self.domNodeName
+          });
+
+          self.loadingStatus.addClassName("hidden");
+        },
+        onSuccess: function( transport ) {
+          var res = eval( '(' + transport.responseText + ')');
+
+          if (res.reqNo < self.sendReqNo) {
+            return;
+          }
+
+          self.recvReqNo = res.reqNo;
+          self.loadingStatus.addClassName("hidden");
+
+          if (self.tagCloud && res.matchingtags) {
+            self.tagCloud.updateTagCloud(res.tags, res.matchingtags);
+          }
+
+          // Let code know new entries arrived
+          // 1. Named event (for code interested by that table only)
+          document.fire("xwiki:livetable:" + this.domNodeName + ":receivedEntries", {
+            "data" : res
+          });
+          // 2. Generic event (for code potentially interested in any livetable)
+          document.fire("xwiki:livetable:receivedEntries", {
+            "data" : res,
+            "tableId" : self.domNodeName
+          });
+
+          self.updateFetchedRows(res);
+          self.displayRows(displayOffset, displayLimit);
+        }
+      });
+
+    }
+
+    if (typeof delay != 'undefined' && delay > 0) {
+      // fire the request after a withdrawal period in which it can be cancelled
+      this.nextRequestTimeoutId = Function.delay.call(doRequest, delay);
+    }
+    else {
+      // no withdrawal period
+      doRequest();
+    }
   },
 
   /**
@@ -300,8 +323,10 @@ XWiki.widgets.LiveTable = Class.create({
     * any) rows should be fetched from the server, then forwards the call to {@link #displayRows}.
     * @param offset Starting offset; the index of the first row that should be displayed.
     * @param limit Maximum number of rows to display.
+    * @param in case we need to fetch rows, an optional delay before the rows are actually fetched 
+    *         against the server (allows submission throttling)
     */
-  showRows: function(offset, limit)
+  showRows: function(offset, limit, delay)
   {
     this.lastOffset = offset;
 
@@ -313,7 +338,7 @@ XWiki.widgets.LiveTable = Class.create({
 
     // If no rows fetched yet, get all we need
     if (this.totalRows == -1) {
-      this.getRows(offset, limit, offset, limit);
+      this.getRows(offset, limit, offset, limit, delay);
       buff += 'table is empty so we get all rows';
       return buff;
     }
@@ -812,11 +837,12 @@ var LiveTablePagination = Class.create({
  * The class that deals with the filtering in a table
  */
 var LiveTableFilter = Class.create({
-  initialize: function(table, filterNodes, filters)
+  initialize: function(table, filterNodes, filters, options)
   {
     this.table = table;
     this.filterNodes = filterNodes;
     this.filters = filters || new Object();
+    this.throttlingDelay = options.throttlingDelay || 0;
 
     this.inputs = this.filterNodes.invoke('select','input').flatten();
     this.selects = this.filterNodes.invoke('select','select').flatten();
@@ -926,8 +952,7 @@ var LiveTableFilter = Class.create({
     this.table.totalRows = -1;
     this.table.fetchedRows = new Array();
     this.table.filters = newFilters;
-    this.table.showRows(1, this.table.limit);
-  // 0 was 1
+    this.table.showRows(1, this.table.limit, this.throttlingDelay);
   },
 
   /**

@@ -536,6 +536,75 @@ Object.extend(XWiki, {
     }
   },
 
+  cookies: {
+	/**
+	 * Create a cookie, with or without expiration date.
+	 *
+	 * @param name Name of the cookie.
+	 * @param value Value of the cookie.
+	 * @param days Days to keep the cookie (can be null).
+	 * @return
+	 */
+	create: function(name,value,days) {
+	    if (days) {
+	        var date = new Date();
+	        date.setTime(date.getTime()+(days*24*60*60*1000));
+	        var expires = "; expires="+date.toGMTString();
+	    }
+	    else var expires = "";
+	    document.cookie = name+"="+value+expires+"; path=/";
+	},
+
+	/**
+	 * Read a cookie.
+	 *
+	 * @param name Name of the cookie.
+	 * @return Value for the given cookie.
+	 */
+	read:function(name) {
+	    var nameEQ = name + "=";
+	    var ca = document.cookie.split(';');
+	    for(var i=0;i < ca.length;i++) {
+	        var c = ca[i];
+	        while (c.charAt(0)==' ') {
+	            c = c.substring(1,c.length);
+	        }
+	        if (c.indexOf(nameEQ) == 0) {
+	            return c.substring(nameEQ.length,c.length);
+	        }
+	    }
+	    return null;
+	},
+
+	/**
+	 * Erase a cookie.
+	 *
+	 * @param name Name of the cookie to erase.
+	 * @return
+	 */
+	erase:function(name) {
+	    XWiki.cookies.create(name,"",-1);
+	}
+	
+  },
+
+  /**
+   * Expand the given panel if collapsed, collapse if visible.
+   *
+   * @param form  {element} The panel element.
+   */
+  togglePanelVisibility: function(element, cookieName){
+    element = $(element);
+    element.toggleClassName("collapsed");
+    if (cookieName) {
+      if (element.hasClassName("collapsed")) {
+        XWiki.cookies.create(cookieName, "collapsed", '');
+      } else {
+        XWiki.cookies.erase(cookieName);
+      }
+    }
+  },
+
   /**
    * Initialize method for the XWiki object. This is to be called only once upon dom loading.
    * It makes rendering errors expandable and fixes external links on the body content.
@@ -573,50 +642,6 @@ document.observe("dom:loaded", XWiki.initialize.bind(XWiki));
 // Passed this point, the methods are not XWiki-namespaced.
 // They should be progressively cleaned, and we should not add any other of such.
 // See http://jira.xwiki.org/jira/browse/XWIKI-3175
-
-/**
- * Hide the fieldset inside the given form.
- *
- * @param form  {element} The form element.
- * @return
- */
-function hideForm(form){
-    form.getElementsByTagName("fieldset").item(0).className = "collapsed";
-}
-
-/**
- * Hide the fieldset inside the given form if visible, show it if it's not.
- *
- * @param form  {element} The form element.
- * @return
- */
-function toggleForm(form){
-    var fieldset = form.getElementsByTagName("fieldset").item(0);
-    if(fieldset.className == "collapsed"){
-        fieldset.className = "expanded";
-    }
-    else{
-        fieldset.className = "collapsed";
-    }
-}
-
-/**
- * Expand the given panel if collapsed, collapse if visible.
- *
- * @param form  {element} The panel element.
- * @return
- */
-function togglePanelVisibility(element, cookieName){
-  element = $(element);
-  element.toggleClassName("collapsed");
-  if (cookieName) {
-    if (element.hasClassName("collapsed")) {
-      createCookie(cookieName, "collapsed", '');
-    } else {
-      eraseCookie(cookieName);
-    }
-  }
-}
 
 /**
  * Show items under the given entry in the top menu (menuview.vm).
@@ -849,55 +874,6 @@ function prepareName(form) {
     if (cxwikiname.value == "") {
         cxwikiname.value = noaccent(fname + lname);
     }
-}
-
-/**
- * Create a cookie, with or without expiration date.
- *
- * @param name Name of the cookie.
- * @param value Value of the cookie.
- * @param days Days to keep the cookie (can be null).
- * @return
- */
-function createCookie(name,value,days) {
-    if (days) {
-        var date = new Date();
-        date.setTime(date.getTime()+(days*24*60*60*1000));
-        var expires = "; expires="+date.toGMTString();
-    }
-    else var expires = "";
-    document.cookie = name+"="+value+expires+"; path=/";
-}
-
-/**
- * Read a cookie.
- *
- * @param name Name of the cookie.
- * @return Value for the given cookie.
- */
-function readCookie(name) {
-    var nameEQ = name + "=";
-    var ca = document.cookie.split(';');
-    for(var i=0;i < ca.length;i++) {
-        var c = ca[i];
-        while (c.charAt(0)==' ') {
-            c = c.substring(1,c.length);
-        }
-        if (c.indexOf(nameEQ) == 0) {
-            return c.substring(nameEQ.length,c.length);
-        }
-    }
-    return null;
-}
-
-/**
- * Erase a cookie.
- *
- * @param name Name of the cookie to erase.
- * @return
- */
-function eraseCookie(name) {
-    createCookie(name,"",-1);
 }
 
 /**

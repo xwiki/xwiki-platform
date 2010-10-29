@@ -41,7 +41,7 @@ if (typeof XWiki.widgets == "object" && typeof XWiki.widgets.LiveTable == "funct
         // inject an element for pagination since the scroller has been removed.
         if($("showLimits").up("tr")) {
           $("showLimits").up("tr").insert({'after':
-	    new Element("tr").update(
+        new Element("tr").update(
               new Element("td").update(
                 new Element("div", {
                   'id': domNode + "-pagination",
@@ -49,7 +49,7 @@ if (typeof XWiki.widgets == "object" && typeof XWiki.widgets.LiveTable == "funct
                 })
               )
             )
-          });	
+          });   
         }
         // replace the id of the limits element by the one expected by convention by the new LiveTable widget
         $("showLimits").id = domNode + "-limits";
@@ -74,5 +74,79 @@ if (typeof XWiki.widgets == "object" && typeof XWiki.widgets.LiveTable == "funct
     } 
   });
 }
+
+/**
+ * Hide the fieldset inside the given form.
+ *
+ * @param form  {element} The form element.
+ *
+ * Deprecated since 2.6 RC1
+ */
+window.hideForm = function(form){
+    warn("window.hideForm is deprecated since XWiki 2.6RC1. Use a CSS selector + Element#toggleClassName instead.");    
+    form.getElementsByTagName("fieldset").item(0).className = "collapsed";
+}
+
+/**
+ * Hide the fieldset inside the given form if visible, show it if it's not.
+ *
+ * @param form  {element} The form element.
+ *
+ * Deprecated since 2.6 RC1
+ */
+window.toggleForm= function(form){
+    warn("window.toggleForm is deprecated since XWiki 2.6RC1. Use a CSS selector + Element#toggleClassName instead.");
+    var fieldset = form.getElementsByTagName("fieldset").item(0);
+    if(fieldset.className == "collapsed"){
+        fieldset.className = "expanded";
+    }
+    else{
+        fieldset.className = "collapsed";
+    }
+}
+
+/**
+ * Deprecated since 2.6RC1
+ */
+window.createCookie = XWiki.cookies.create.wrap(
+  function(){
+    warn("window.createCookie is deprecated since XWiki 2.6RC1. Use XWiki.cookies.create instead.");
+    var args = $A(arguments), proceed = args.shift();
+    return proceed.apply(window, args);
+  }
+);
+
+/**
+ * Deprecated since 2.6RC1
+ */
+window.readCookie = XWiki.cookies.read.wrap(
+  function(){
+    warn("window.readCookie is deprecated since XWiki 2.6RC1. Use XWiki.cookies.read instead.");
+    var args = $A(arguments), proceed = args.shift();
+    return proceed.apply(window, args);
+  }
+);
+
+/**
+ * Deprecated since 2.6RC1
+ */
+window.eraseCookie = XWiki.cookies.erase.wrap(
+  function(){
+    warn("window.eraseCookie is deprecated since XWiki 2.6RC1. Use XWiki.cookies.erase instead.");
+    var args = $A(arguments), proceed = args.shift();
+    return proceed.apply(window, args);
+  }
+);
+
+/**
+ * Deprecated since 2.6RC1
+ */
+window.togglePanelVisibility = XWiki.togglePanelVisibility.wrap(
+  function(){
+    warn("window.togglePanelVisibility is deprecated since XWiki 2.6RC1. Use XWiki.togglePanelVisibility instead.");
+    var args = $A(arguments), proceed = args.shift();
+    return proceed.apply(window, args);
+  }
+);
 
 })();

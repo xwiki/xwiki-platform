@@ -28,5 +28,6 @@
 #set($params = $util.hashMap)
 #set($params.programming = ['macros_languages', 'macros_velocity', 'macros_groovy', 'macros_mapping', 'notification_pages', 'documentBundles'])
 {{/velocity}}
+
 {{include document="XWiki.AdminFieldsDisplaySheet" /}}
 </content></xwikidoc>

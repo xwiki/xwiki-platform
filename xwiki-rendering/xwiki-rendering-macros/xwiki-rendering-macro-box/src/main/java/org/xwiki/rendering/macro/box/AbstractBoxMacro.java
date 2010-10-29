@@ -19,7 +19,6 @@
  */
 package org.xwiki.rendering.macro.box;
 
-import java.io.StringReader;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -27,22 +26,18 @@ import java.util.LinkedHashMap;
 
 import org.apache.commons.lang.StringUtils;
 import org.xwiki.component.annotation.Requirement;
-import org.xwiki.component.manager.ComponentLookupException;
-import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.block.FormatBlock;
 import org.xwiki.rendering.block.GroupBlock;
 import org.xwiki.rendering.block.ImageBlock;
 import org.xwiki.rendering.block.NewLineBlock;
-import org.xwiki.rendering.block.ParagraphBlock;
+import org.xwiki.rendering.internal.macro.box.MacroContentParser;
 import org.xwiki.rendering.listener.Format;
 import org.xwiki.rendering.listener.reference.ResourceReference;
 import org.xwiki.rendering.listener.reference.ResourceType;
 import org.xwiki.rendering.macro.AbstractMacro;
 import org.xwiki.rendering.macro.MacroExecutionException;
 import org.xwiki.rendering.macro.descriptor.ContentDescriptor;
-import org.xwiki.rendering.parser.ParseException;
-import org.xwiki.rendering.parser.Parser;
 import org.xwiki.rendering.parser.ResourceReferenceParser;
 import org.xwiki.rendering.transformation.MacroTransformationContext;
 
@@ -56,16 +51,16 @@ import org.xwiki.rendering.transformation.MacroTransformationContext;
 public abstract class AbstractBoxMacro<P extends BoxMacroParameters> extends AbstractMacro<P>
 {
     /**
-     * Used to get the current syntax parser.
-     */
-    @Requirement
-    private ComponentManager componentManager;
-
-    /**
      * Parses untyped image references.
      */
     @Requirement("image/untyped")
     private ResourceReferenceParser untypedImageReferenceParser;
+
+    /**
+     * The parser used to parse box content and box title parameter.
+     */
+    @Requirement
+    private MacroContentParser contentParser;
 
     /**
      * Creates a new box macro.
@@ -79,14 +74,6 @@ public abstract class AbstractBoxMacro<P extends BoxMacroParameters> extends Abs
         Class< ? > parametersBeanClass)
     {
         super(name, description, contentDescriptor, parametersBeanClass);
-    }
-
-    /**
-     * @return the component manager.
-     */
-    public ComponentManager getComponentManager()
-    {
-        return this.componentManager;
     }
 
     /**
@@ -146,13 +133,11 @@ public abstract class AbstractBoxMacro<P extends BoxMacroParameters> extends Abs
                 if (imageReference != null) {
                     Block imageBlock = new ImageBlock(imageReference, true);
                     boxBlock.addChild(imageBlock);
-                    boxBlock.addChild(NewLineBlock.NEW_LINE_BLOCK);
+                    boxBlock.addChild(new NewLineBlock());
                 }
                 // we add the title, if there is one
                 if (!StringUtils.isEmpty(titleParameter)) {
-                    Parser parser = getSyntaxParser(context);
-                    List<Block> titleBlocks = parseTitle(parser, titleParameter);
-                    boxBlock.addChildren(titleBlocks);
+                    boxBlock.addChildren(this.contentParser.parse(titleParameter, context.getSyntax(), true));
                 }
                 if (titleBlockList != null) {
                     boxBlock.addChildren(titleBlockList);
@@ -164,33 +149,6 @@ public abstract class AbstractBoxMacro<P extends BoxMacroParameters> extends Abs
             return Collections.singletonList(boxBlock);
         } else {
             return Collections.emptyList();
-        }
-    }
-
-    /**
-     * Renders the box's title (which can contain content in the current syntax).
-     * 
-     * @param parser the appropriate syntax parser
-     * @param titleParameter the title which is going to be parsed
-     * @return the parsing result
-     * @throws MacroExecutionException if the parsing fails
-     */
-    private List<Block> parseTitle(Parser parser, String titleParameter) throws MacroExecutionException
-    {
-        try {
-            List<Block> titleBlocks = parser.parse(new StringReader(titleParameter)).getChildren();
-
-            // we try to simplify a bit the generated XDOM tree
-            if (titleBlocks.size() == 1 && titleBlocks.get(0) instanceof ParagraphBlock) {
-                List<Block> children = titleBlocks.get(0).getChildren();
-                if (children.size() > 0) {
-                    titleBlocks = children;
-                }
-            }
-
-            return titleBlocks;
-        } catch (ParseException e) {
-            throw new MacroExecutionException("Failed to parse the box's title [" + titleParameter + "]", e);
         }
     }
 
@@ -209,27 +167,18 @@ public abstract class AbstractBoxMacro<P extends BoxMacroParameters> extends Abs
         throws MacroExecutionException;
 
     /**
-     * Get the parser for the current syntax.
-     * 
-     * @param context the context of the macro transformation (from which to get the current syntax)
-     * @return the parser for the current syntax
-     * @throws MacroExecutionException Failed to find source parser.
-     */
-    protected Parser getSyntaxParser(MacroTransformationContext context) throws MacroExecutionException
-    {
-        try {
-            return getComponentManager().lookup(Parser.class, context.getSyntax().toIdString());
-        } catch (ComponentLookupException e) {
-            throw new MacroExecutionException("Failed to find source parser for syntax [" + context.getSyntax() + "]",
-                e);
-        }
-    }
-
-    /**
      * @return the name of the CSS class to use when rendering, in case no cssClass parameter is specified.
      */
     protected String getClassProperty()
     {
         return "box";
+    }
+
+    /**
+     * @return the macro content parser to use to parse content in wiki syntax
+     */
+    protected MacroContentParser getMacroContentParser()
+    {
+        return this.contentParser;
     }
 }

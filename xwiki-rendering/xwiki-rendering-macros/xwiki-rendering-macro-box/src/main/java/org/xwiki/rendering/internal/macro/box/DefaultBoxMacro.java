@@ -19,7 +19,6 @@
  */
 package org.xwiki.rendering.internal.macro.box;
 
-import java.io.StringReader;
 import java.util.List;
 
 import org.xwiki.component.annotation.Component;
@@ -28,10 +27,7 @@ import org.xwiki.rendering.macro.MacroExecutionException;
 import org.xwiki.rendering.macro.box.AbstractBoxMacro;
 import org.xwiki.rendering.macro.box.BoxMacroParameters;
 import org.xwiki.rendering.macro.descriptor.DefaultContentDescriptor;
-import org.xwiki.rendering.parser.ParseException;
-import org.xwiki.rendering.parser.Parser;
 import org.xwiki.rendering.transformation.MacroTransformationContext;
-import org.xwiki.rendering.util.ParserUtils;
 
 /**
  * Draw a box around provided content.
@@ -71,33 +67,6 @@ public class DefaultBoxMacro<P extends BoxMacroParameters> extends AbstractBoxMa
     protected List<Block> parseContent(P parameters, String content, MacroTransformationContext context)
         throws MacroExecutionException
     {
-        return parseSourceSyntax(content, context);
-    }
-
-    /**
-     * Parse provided content with the parser of the current wiki syntax.
-     * 
-     * @param content the content to parse.
-     * @param context the context of the macro transformation.
-     * @return an XDOM containing the parser content.
-     * @throws MacroExecutionException failed to parse content
-     */
-    protected List<Block> parseSourceSyntax(String content, MacroTransformationContext context)
-        throws MacroExecutionException
-    {
-        Parser parser = getSyntaxParser(context);
-
-        try {
-            List<Block> blocks = parser.parse(new StringReader(content)).getChildren();
-            if (context.isInline()) {
-                ParserUtils parseUtils = new ParserUtils();
-                parseUtils.removeTopLevelParagraph(blocks);
-            }
-
-            return blocks;
-        } catch (ParseException e) {
-            throw new MacroExecutionException("Failed to parse content [" + content + "] with Syntax parser ["
-                + parser.getSyntax() + "]", e);
-        }
+        return getMacroContentParser().parse(content, context.getSyntax(), context.isInline());
     }
 }

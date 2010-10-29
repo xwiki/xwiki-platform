@@ -31,17 +31,14 @@ import org.xwiki.rendering.listener.Listener;
 public final class NewLineBlock extends AbstractBlock
 {
     /**
-     * The single instance for a new line block. There's no need for more than one instance since there's
-     * no state in the new line block.
+     * A new line block. Note that we don't make NewLineBlock a singleton since that would cause problems when using
+     * Block APIs to manipulate a tree of blocks (for example to find the position of a new line block in a list using
+     * {@link java.util.List#indexOf(Object)} wich would always return the first new line block).
+     * @since 2.6RC1
      */
-    public static final NewLineBlock NEW_LINE_BLOCK = new NewLineBlock();
-
-    /**
-     * Private constructor to prevent instantiation. Instead use {@link #NEW_LINE_BLOCK}.
-     */
-    private NewLineBlock()
+    public NewLineBlock()
     {
-        // Voluntarily empty
+        // We need to keep this constructor to override the ones in AbstractBlock
     }
 
     /**

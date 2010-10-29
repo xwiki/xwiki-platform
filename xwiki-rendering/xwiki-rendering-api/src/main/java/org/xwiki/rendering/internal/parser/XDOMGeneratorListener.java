@@ -547,7 +547,7 @@ public class XDOMGeneratorListener implements Listener
      */
     public void onNewLine()
     {
-        this.stack.push(NewLineBlock.NEW_LINE_BLOCK);
+        this.stack.push(new NewLineBlock());
     }
 
     /**

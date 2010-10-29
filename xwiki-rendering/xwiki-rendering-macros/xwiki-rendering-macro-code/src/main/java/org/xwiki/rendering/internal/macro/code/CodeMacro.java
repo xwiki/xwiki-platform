@@ -27,6 +27,7 @@ import org.apache.commons.lang.StringUtils;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.Requirement;
 import org.xwiki.component.manager.ComponentLookupException;
+import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.macro.MacroExecutionException;
 import org.xwiki.rendering.macro.box.AbstractBoxMacro;
@@ -66,6 +67,12 @@ public class CodeMacro extends AbstractBoxMacro<CodeMacroParameters>
      */
     @Requirement("plain/1.0")
     private Parser plainTextParser;
+
+    /**
+     * Used to lookup highlight parsers.
+     */
+    @Requirement
+    private ComponentManager componentManager;
 
     /**
      * Create and initialize the descriptor of the macro.
@@ -116,11 +123,11 @@ public class CodeMacro extends AbstractBoxMacro<CodeMacroParameters>
     protected List<Block> highlight(CodeMacroParameters parameters, String content) throws ParseException,
         ComponentLookupException
     {
-        HighlightParser parser = null;
+        HighlightParser parser;
 
         if (parameters.getLanguage() != null) {
             try {
-                parser = getComponentManager().lookup(HighlightParser.class, parameters.getLanguage());
+                parser = this.componentManager.lookup(HighlightParser.class, parameters.getLanguage());
                 return parser.highlight(parameters.getLanguage(), new StringReader(content));
             } catch (ComponentLookupException e) {
                 if (getLogger().isDebugEnabled()) {
@@ -134,7 +141,7 @@ public class CodeMacro extends AbstractBoxMacro<CodeMacroParameters>
             getLogger().debug("Trying the default highlighting parser");
         }
 
-        parser = getComponentManager().lookup(HighlightParser.class, "default");
+        parser = this.componentManager.lookup(HighlightParser.class, "default");
 
         return parser.highlight(parameters.getLanguage(), new StringReader(content));
     }

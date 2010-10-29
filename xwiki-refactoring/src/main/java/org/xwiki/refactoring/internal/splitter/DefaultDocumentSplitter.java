@@ -88,7 +88,7 @@ public class DefaultDocumentSplitter implements DocumentSplitter
                 // Remove the original block from the parent document.
                 it.remove();
                 // Place a link from the parent to child.
-                it.add(NewLineBlock.NEW_LINE_BLOCK);
+                it.add(new NewLineBlock());
                 it.add(createLink(block, newDocumentName));
                 // Check whether this node should be further traversed.
                 if (splittingCriterion.shouldIterate(block, depth)) {

@@ -576,7 +576,12 @@ public class SchedulerPlugin extends XWikiDefaultPlugin
     private void saveStatus(String status, BaseObject object, XWikiContext context) throws XWikiException
     {
         XWikiDocument jobHolder = context.getWiki().getDocument(object.getName(), context);
-        object.setStringValue("status", status);
+        // We need to retrieve the object BaseObject the document again. Otherwise, modifications made to the
+        // BaseObject passed as argument will not be saved (XWikiDocument#getObject clones the document
+        // and returns the BaseObject from the clone)
+        // TODO refactor the plugin in order to stop passing BaseObject around, passing document references instead.
+        BaseObject job = jobHolder.getObject("XWiki.SchedulerJobClass");
+        job.setStringValue("status", status);
         jobHolder.setMinorEdit(true);
         context.getWiki().saveDocument(jobHolder, context);
     }

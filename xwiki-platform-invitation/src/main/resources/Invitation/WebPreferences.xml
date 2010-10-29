@@ -19,8 +19,8 @@
 <defaultTemplate></defaultTemplate>
 <validationScript></validationScript>
 <comment></comment>
-<minorEdit>true</minorEdit>
-<syntaxId>xwiki/1.0</syntaxId>
+<minorEdit>false</minorEdit>
+<syntaxId>xwiki/2.0</syntaxId>
 <hidden>false</hidden>
 <object>
 <class>
@@ -1302,5 +1302,4 @@
 <webcopyright></webcopyright>
 </property>
 </object>
-<content>#includeForm("XWiki.AdminSheet")</content>
-</xwikidoc>
+<content>{{include document="XWiki.AdminSheet"/}}</content></xwikidoc>

@@ -31,4 +31,5 @@
 #set($params.admin = ['admin_email'])
 #set($params.smtp = ['smtp_server', 'smtp_port', 'smtp_server_username', 'smtp_server_password', 'javamail_extra_props'])
 {{/velocity}}
+
 {{include document="XWiki.AdminFieldsDisplaySheet" /}}</content></xwikidoc>

@@ -39,4 +39,5 @@
   #set($params.skin = ['skin', 'stylesheet', 'stylesheets'])
 #end
 {{/velocity}}
+
 {{include document="XWiki.AdminFieldsDisplaySheet" /}}</content></xwikidoc>

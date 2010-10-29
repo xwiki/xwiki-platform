@@ -25,6 +25,7 @@ html, body, div, span, applet, object, iframe,
   outline: 0;
   padding: 0;
   vertical-align: inherit;
+  text-align: inherit;
   line-height: normal;
 }
 
@@ -148,7 +149,6 @@ table {
 
 caption, th, td {
   font-size: 1em;
-  text-align: left;
 }
 
 th {

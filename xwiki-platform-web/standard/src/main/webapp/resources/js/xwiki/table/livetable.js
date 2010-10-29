@@ -621,7 +621,6 @@ var LiveTableHash = Class.create({
   /**
    * Returns filters from permalink hash
    * Note: Currently filters are not kept/updated after initialization
-   *
    */
   getFilters: function(name)
   {
@@ -637,8 +636,7 @@ var LiveTableHash = Class.create({
   serializeParams: function(newParams)
   {
     var params = $H((newParams) ? newParams : this.params);
-    params = params.inject({}, function(params, pair)
-    {
+    params = params.inject({}, function(params, pair) {
       params[pair.key] = encodeURIComponent(pair.value);
       return params;
     });
@@ -900,8 +898,8 @@ var LiveTableFilter = Class.create({
     var result = "";
     var filters = [this.inputs, this.selects].flatten();
     for (var i=0;i<filters.length;i++) {
-      // Ignore filters with blank value
-      if (!filters[i].value.blank()) {
+      // Ignore filters with blank value if are not used as filters yet
+      if (!filters[i].value.blank() || (this.filters[filters[i].name] && !this.filters[filters[i].name].blank())){
         if ((filters[i].type != "radio" && filters[i].type != "checkbox") || filters[i].checked) {
           result += ("&" + filters[i].serialize());
         }

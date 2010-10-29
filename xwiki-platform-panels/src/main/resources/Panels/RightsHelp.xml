@@ -132,7 +132,7 @@ $xwiki.jsfx.use("js/xwiki/accordion/accordion.js")
 &lt;script type="text/javascript"&gt;
 var obj = {div:'xwikirightshelp',no:0,height:512};
 var acc = createAccordion(obj);
-togglePanelVisibility((document.getElementById('xwikirightshelppanel')).getElementsByTagName('div').item(0));&lt;/script&gt;</content>
+XWiki.togglePanelVisibility((document.getElementById('xwikirightshelppanel')).getElementsByTagName('div').item(0));&lt;/script&gt;</content>
 </property>
 <property>
 <description>Help on Rights Editor usage.</description>

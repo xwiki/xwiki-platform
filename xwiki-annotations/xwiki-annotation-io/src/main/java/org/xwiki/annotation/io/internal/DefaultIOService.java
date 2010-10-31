@@ -100,12 +100,12 @@ public class DefaultIOService extends AbstractLogEnabled implements IOService
      */
     @Requirement
     private DocumentAccessBridge dab;
-    
+
     /**
-     * Observation manager to send annotations events.
+     * Component manager to get the observation manager and send notifications.
      */
     @Requirement
-    private ObservationManager observationManager;
+    private ComponentManager componentManager;
 
     /**
      * {@inheritDoc} <br />
@@ -158,11 +158,14 @@ public class DefaultIOService extends AbstractLogEnabled implements IOService
                 "Added annotation on \"" + annotation.getSelection() + "\"", deprecatedContext);
 
             // notify listeners that an annotation was added
+            ObservationManager observationManager = componentManager.lookup(ObservationManager.class);
             observationManager.notify(new AnnotationAddEvent(documentFullName, object.getNumber() + ""), document,
                 deprecatedContext);
 
         } catch (XWikiException e) {
             throw new IOServiceException("An exception message has occurred while saving the annotation", e);
+        } catch (ComponentLookupException exc) {
+            getLogger().warn("Could not get the observation manager to send notifications about the annotation add");
         }
     }
 
@@ -293,6 +296,7 @@ public class DefaultIOService extends AbstractLogEnabled implements IOService
                 deprecatedContext.getWiki().saveDocument(document, "Deleted annotation " + annotationID,
                     deprecatedContext);
                 // notify listeners that an annotation was deleted
+                ObservationManager observationManager = componentManager.lookup(ObservationManager.class);
                 observationManager
                     .notify(new AnnotationDeleteEvent(docName, annotationID), document, deprecatedContext);
             }
@@ -300,6 +304,8 @@ public class DefaultIOService extends AbstractLogEnabled implements IOService
             throw new IOServiceException("An exception has occurred while parsing the annotation id", e);
         } catch (XWikiException e) {
             throw new IOServiceException("An exception has occurred while removing the annotation", e);
+        } catch (ComponentLookupException exc) {
+            getLogger().warn("Could not get the observation manager to send notifications about the annotation delete");
         }
     }
 
@@ -346,6 +352,7 @@ public class DefaultIOService extends AbstractLogEnabled implements IOService
                 document.setAuthor(deprecatedContext.getUser());
                 deprecatedContext.getWiki().saveDocument(document, "Updated annotations", deprecatedContext);
                 // send annotation update notifications for all annotations set to notify for
+                ObservationManager observationManager = componentManager.lookup(ObservationManager.class);
                 for (String updateNotif : updateNotifs) {
                     observationManager.notify(new AnnotationUpdateEvent(docName, updateNotif), document,
                         deprecatedContext);
@@ -353,6 +360,8 @@ public class DefaultIOService extends AbstractLogEnabled implements IOService
             }
         } catch (XWikiException e) {
             throw new IOServiceException("An exception has occurred while updating the annotation", e);
+        } catch (ComponentLookupException exc) {
+            getLogger().warn("Could not get the observation manager to send notifications about the annotation update");
         }
     }
 

@@ -7555,14 +7555,6 @@ public class XWiki implements XWikiDocChangeNotificationInterface, EventListener
                         } else {
                             om.notify(new CommentUpdateEvent(reference, diff.getNumber() + ""), source, data);
                         }
-                    } else if (StringUtils.equals(diff.getClassName(), "AnnotationCode.AnnotationClass")) {
-                        if (StringUtils.equals(diff.getAction(), "object-removed")) {
-                            om.notify(new AnnotationDeleteEvent(reference, diff.getNumber() + ""), source, data);
-                        } else if (StringUtils.equals(diff.getAction(), "object-added")) {
-                            om.notify(new AnnotationAddEvent(reference, diff.getNumber() + ""), source, data);
-                        } else {
-                            om.notify(new AnnotationUpdateEvent(reference, diff.getNumber() + ""), source, data);
-                        }
                     }
                     break;
                 }

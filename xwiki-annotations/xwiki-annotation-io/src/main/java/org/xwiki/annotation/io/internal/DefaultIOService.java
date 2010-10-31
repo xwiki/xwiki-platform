@@ -36,10 +36,16 @@ import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.Requirement;
 import org.xwiki.component.logging.AbstractLogEnabled;
+import org.xwiki.component.manager.ComponentLookupException;
+import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.context.Execution;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.EntityReferenceSerializer;
+import org.xwiki.observation.ObservationManager;
+import org.xwiki.observation.event.AnnotationAddEvent;
+import org.xwiki.observation.event.AnnotationDeleteEvent;
+import org.xwiki.observation.event.AnnotationUpdateEvent;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
@@ -94,6 +100,12 @@ public class DefaultIOService extends AbstractLogEnabled implements IOService
      */
     @Requirement
     private DocumentAccessBridge dab;
+    
+    /**
+     * Observation manager to send annotations events.
+     */
+    @Requirement
+    private ObservationManager observationManager;
 
     /**
      * {@inheritDoc} <br />
@@ -144,6 +156,11 @@ public class DefaultIOService extends AbstractLogEnabled implements IOService
             document.setAuthor(deprecatedContext.getUser());
             deprecatedContext.getWiki().saveDocument(document,
                 "Added annotation on \"" + annotation.getSelection() + "\"", deprecatedContext);
+
+            // notify listeners that an annotation was added
+            observationManager.notify(new AnnotationAddEvent(documentFullName, object.getNumber() + ""), document,
+                deprecatedContext);
+
         } catch (XWikiException e) {
             throw new IOServiceException("An exception message has occurred while saving the annotation", e);
         }
@@ -275,6 +292,9 @@ public class DefaultIOService extends AbstractLogEnabled implements IOService
                 document.setAuthor(deprecatedContext.getUser());
                 deprecatedContext.getWiki().saveDocument(document, "Deleted annotation " + annotationID,
                     deprecatedContext);
+                // notify listeners that an annotation was deleted
+                observationManager
+                    .notify(new AnnotationDeleteEvent(docName, annotationID), document, deprecatedContext);
             }
         } catch (NumberFormatException e) {
             throw new IOServiceException("An exception has occurred while parsing the annotation id", e);
@@ -304,6 +324,7 @@ public class DefaultIOService extends AbstractLogEnabled implements IOService
             // get the document pointed to by the target
             XWikiContext deprecatedContext = getXWikiContext();
             XWikiDocument document = deprecatedContext.getWiki().getDocument(docName, deprecatedContext);
+            List<String> updateNotifs = new ArrayList<String>();
             boolean updated = false;
             for (Annotation annotation : annotations) {
                 // parse annotation id as string. If cannot parse, then ignore annotation, is not valid
@@ -318,11 +339,17 @@ public class DefaultIOService extends AbstractLogEnabled implements IOService
                     continue;
                 }
                 updated = updateObject(object, annotation, deprecatedContext) || updated;
+                updateNotifs.add(annotation.getId());
             }
             if (updated) {
                 // set the author of the document to the current user
                 document.setAuthor(deprecatedContext.getUser());
                 deprecatedContext.getWiki().saveDocument(document, "Updated annotations", deprecatedContext);
+                // send annotation update notifications for all annotations set to notify for
+                for (String updateNotif : updateNotifs) {
+                    observationManager.notify(new AnnotationUpdateEvent(docName, updateNotif), document,
+                        deprecatedContext);
+                }
             }
         } catch (XWikiException e) {
             throw new IOServiceException("An exception has occurred while updating the annotation", e);
@@ -394,10 +421,6 @@ public class DefaultIOService extends AbstractLogEnabled implements IOService
             if (!skippedFields.contains(propName)) {
                 updated = setIfNotNull(object, propName, annotation.get(propName), deprecatedContext) || updated;
             }
-        }
-        // if it was updated, set the new date of the annotation to now
-        if (updated) {
-            object.set(Annotation.DATE_FIELD, new Date(), deprecatedContext);
         }
 
         return updated;

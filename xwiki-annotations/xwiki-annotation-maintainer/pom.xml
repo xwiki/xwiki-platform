@@ -124,6 +124,16 @@
           </excludes>
         </configuration>
       </plugin>
+      <plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>clirr-maven-plugin</artifactId>
+        <configuration>
+          <excludes>
+            <!-- Remove me when releasing the 2.6 -->
+          	<exclude>org/xwiki/annotation/maintainer/AbstractAnnotationMaintainer</exclude>
+          </excludes>
+        </configuration>
+      </plugin>      
     </plugins>
   </build>
 </project>

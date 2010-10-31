@@ -93,6 +93,9 @@ public abstract class AbstractAnnotationMaintainer extends AbstractLogEnabled im
                 return;
             }
 
+            // store the annotations to save after update
+            List<Annotation> toUpdate = new ArrayList<Annotation>();            
+
             // produce the ptr of the previous and current, wrt to syntax
             String syntaxId = ioContentService.getSourceSyntax(target);
             String renderedPreviousContent = renderPlainText(previousContent, syntaxId);
@@ -109,15 +112,18 @@ public abstract class AbstractAnnotationMaintainer extends AbstractLogEnabled im
                 // version
                 AlteredContent spacelessRenderedPreviousContent =
                     spaceStripperContentAlterer.alter(renderedPreviousContent);
-                // recompute properties for all annotations
+                // recompute properties for all annotations and store the ones to update
                 for (Annotation annotation : annotations) {
-                    recomputeProperties(annotation, differences, renderedPreviousContent,
+                    boolean wasUpdated = recomputeProperties(annotation, differences, renderedPreviousContent,
                         spacelessRenderedPreviousContent, renderedCurrentContent);
+                    if (wasUpdated) {
+                        toUpdate.add(annotation);
+                    }
                 }
             }
 
             // finally store the updates
-            ioService.updateAnnotations(target, annotations);
+            ioService.updateAnnotations(target, toUpdate);
         } catch (Exception e) {
             throw new MaintainerServiceException("An exception occurred while updating annotations for content at "
                 + target, e);
@@ -168,13 +174,17 @@ public abstract class AbstractAnnotationMaintainer extends AbstractLogEnabled im
      * @param spacelessPreviousContent the spaceless version of the rendered previous content, to be used to map
      *            annotations on the content in the same way they are done on rendering, that is, spaceless.
      * @param renderedCurrentContent the plain text space normalized rendered current content
+     * @return the updated state of this annotation, {@code true} if the annotation was updated during property
+     *         recompute, {@code false} otherwise
      */
-    protected void recomputeProperties(Annotation annotation, Collection<XDelta> differences,
+    protected boolean recomputeProperties(Annotation annotation, Collection<XDelta> differences,
         String renderedPreviousContent, AlteredContent spacelessPreviousContent, String renderedCurrentContent)
     {
+        boolean updated = false;
+
         // TODO: do we still want this here? Do we want to try to recover altered annotations?
         if (annotation.getState().equals(AnnotationState.ALTERED)) {
-            return;
+            return updated;
         }
 
         String spacelessLeftContext =
@@ -199,7 +209,7 @@ public abstract class AbstractAnnotationMaintainer extends AbstractLogEnabled im
         if (spacelessContext.length() == 0 || cStart < 0) {
             // annotation context does not exist or could not be found in the previous rendered content, it must be
             // somewhere in the generated content or something like that, skip it
-            return;
+            return updated;
         }
 
         int cEnd = cStart + spacelessContext.length();
@@ -235,12 +245,14 @@ public abstract class AbstractAnnotationMaintainer extends AbstractLogEnabled im
                 // update the selection length
                 alteredSLength += diff.getSignedDelta();
                 annotation.setState(AnnotationState.UPDATED);
+                updated = true;
             }
 
             // 3/ the edit overlaps the annotation selection completely
             if (dStart <= sStart && dEnd >= sEnd) {
                 // mark annotation as altered and drop it
                 annotation.setState(AnnotationState.ALTERED);
+                updated = true;
                 break;
             }
 
@@ -251,12 +263,14 @@ public abstract class AbstractAnnotationMaintainer extends AbstractLogEnabled im
                 // before it and will contain the new content at the start of the annotation
                 alteredCStart += diff.getSignedDelta();
                 annotation.setState(AnnotationState.UPDATED);
+                updated = true;
             }
 
             // 5/ the edit overlaps the end of the annotation
             if (dStart < sEnd && dEnd > sEnd) {
                 // nothing, behave as if the edit would have taken place after the annotation
                 annotation.setState(AnnotationState.UPDATED);
+                updated = true;
             }
         }
 
@@ -269,7 +283,13 @@ public abstract class AbstractAnnotationMaintainer extends AbstractLogEnabled im
             // if this annotation was updated first time during this update, set its original selection
             if (annotation.getState() == AnnotationState.UPDATED && initialState == AnnotationState.SAFE) {
                 annotation.setOriginalSelection(annotation.getSelection());
+                // FIXME: redundant, but anyway
+                updated = true;
             }
+
+            String originalLeftContext = annotation.getSelectionLeftContext();
+            String originalSelection = annotation.getSelection();
+            String originalRightContext = annotation.getSelectionRightContext();
 
             String contextLeft = renderedCurrentContent.substring(alteredCStart, alteredCStart + cLeftSize);
             String selection =
@@ -282,7 +302,15 @@ public abstract class AbstractAnnotationMaintainer extends AbstractLogEnabled im
 
             // make sure annotation stays unique
             ensureUnique(annotation, renderedCurrentContent, alteredCStart, cLeftSize, alteredSLength, cRightSize);
+
+            // if the annotations selection and/or context have changed during the recompute, set the update flag
+            updated =
+                updated
+                    || !(selection.equals(originalSelection) && contextLeft.equals(originalLeftContext) && contextRight
+                        .equals(originalRightContext));
         }
+
+        return updated;
     }
 
     /**

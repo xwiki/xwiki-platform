@@ -37,6 +37,7 @@ import java.io.StringReader;
 import java.io.StringWriter;
 import java.io.UnsupportedEncodingException;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
 
@@ -53,6 +54,7 @@ import javax.xml.transform.stream.StreamSource;
 
 import org.apache.avalon.framework.configuration.Configuration;
 import org.apache.avalon.framework.configuration.DefaultConfigurationBuilder;
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang.RandomStringUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
@@ -314,6 +316,7 @@ public class PdfExportImpl implements PdfExport
         try {
             tempdir.mkdirs();
             context.put("pdfexportdir", tempdir);
+            context.put("pdfexport-file-mapping", new HashMap<String, File>());
             boolean useLocalPlaceholders = !Utils.arePlaceholdersEnabled(context);
             if (useLocalPlaceholders) {
                 Utils.enablePlaceholders(context);
@@ -325,11 +328,12 @@ public class PdfExportImpl implements PdfExport
             }
             exportHtml(content, out, type, context);
         } finally {
-            File[] filelist = tempdir.listFiles();
-            for (int i = 0; i < filelist.length; i++) {
-                filelist[i].delete();
+            try {
+                FileUtils.deleteDirectory(tempdir);
+            } catch (IOException ex) {
+                // Should not happen, but it's nothing serious, just that temporary files are left on the disk.
+                log.warn("Failed to cleanup temporary files after a PDF export", ex);
             }
-            tempdir.delete();
         }
     }
 

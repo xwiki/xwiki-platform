@@ -20,33 +20,31 @@
  */
 package com.xpn.xwiki.pdf.impl;
 
+import java.io.File;
+import java.io.FileOutputStream;
+import java.net.URL;
+
+import org.apache.commons.io.IOUtils;
+import org.xwiki.model.reference.DocumentReference;
+
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.doc.XWikiAttachment;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.util.Util;
 import com.xpn.xwiki.web.XWikiServletURLFactory;
 
-import java.io.File;
-import java.io.FileOutputStream;
-import java.net.URL;
-
-import org.apache.commons.io.IOUtils;
-
 public class PdfURLFactory extends XWikiServletURLFactory
 {
-    public PdfURLFactory()
-    {
-    }
-
-    public URL createAttachmentURL(String filename, String web, String name, String action, String querystring,
+    @Override
+    public URL createAttachmentURL(String filename, String space, String name, String action, String querystring,
         String xwikidb, XWikiContext context)
     {
         try {
             File tempdir = (File) context.get("pdfexportdir");
-            File file = new File(tempdir, web + "." + name + "." + filename);
+            File file = new File(tempdir, space + "." + name + "." + filename);
             if (!file.exists()) {
                 XWikiDocument doc = null;
-                doc = context.getWiki().getDocument(web + "." + name, context);
+                doc = context.getWiki().getDocument(new DocumentReference(context.getDatabase(), space, name), context);
                 XWikiAttachment attachment = doc.getAttachment(filename);
                 FileOutputStream fos = new FileOutputStream(file);
                 IOUtils.copy(attachment.getContentInputStream(context), fos);
@@ -55,19 +53,20 @@ public class PdfURLFactory extends XWikiServletURLFactory
             return file.toURL();
         } catch (Exception e) {
             e.printStackTrace();
-            return super.createAttachmentURL(filename, web, name, action, null, xwikidb, context);
+            return super.createAttachmentURL(filename, space, name, action, null, xwikidb, context);
         }
     }
 
-    public URL createAttachmentRevisionURL(String filename, String web, String name, String revision, String xwikidb,
+    @Override
+    public URL createAttachmentRevisionURL(String filename, String space, String name, String revision, String xwikidb,
         XWikiContext context)
     {
         try {
             File tempdir = (File) context.get("pdfexportdir");
-            File file = new File(tempdir, web + "." + name + "." + filename);
+            File file = new File(tempdir, space + "." + name + "." + filename);
             if (!file.exists()) {
                 XWikiDocument doc = null;
-                doc = context.getWiki().getDocument(web + "." + name, context);
+                doc = context.getWiki().getDocument(new DocumentReference(context.getDatabase(), space, name), context);
                 XWikiAttachment attachment = doc.getAttachment(filename).getAttachmentRevision(revision, context);
                 FileOutputStream fos = new FileOutputStream(file);
                 IOUtils.copy(attachment.getContentInputStream(context), fos);
@@ -76,10 +75,11 @@ public class PdfURLFactory extends XWikiServletURLFactory
             return file.toURL();
         } catch (Exception e) {
             e.printStackTrace();
-            return super.createAttachmentRevisionURL(filename, web, name, revision, xwikidb, context);
+            return super.createAttachmentRevisionURL(filename, space, name, revision, xwikidb, context);
         }
     }
 
+    @Override
     public String getURL(URL url, XWikiContext context)
     {
         if (url == null) {

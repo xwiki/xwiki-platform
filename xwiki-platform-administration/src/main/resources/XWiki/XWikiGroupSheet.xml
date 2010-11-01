@@ -162,7 +162,7 @@ $xwiki.ssfx.use('js/xwiki/table/livetable.css', true)
             } else {
               suggesturl += "&amp;uorg=group&amp;";
             }
-            return new ajaxSuggest(input, { script: suggesturl, varname:'input' });
+            return new XWiki.widgets.Suggest(input, { script: suggesturl, varname:'input' });
           },
           addNewMember: function(uorg, input) {
             if (input) {

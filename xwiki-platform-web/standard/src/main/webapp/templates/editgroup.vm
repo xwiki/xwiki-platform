@@ -88,7 +88,7 @@ $xwiki.ssfx.use('js/xwiki/table/livetable.css')
         
      //clear the errors
         $('errMsg').innerHTML = "";
-     return new ajaxSuggest(input, { script: suggesturl, varname:'input' } );
+     return new XWiki.widgets.Suggest(input, { script: suggesturl, varname:'input' } );
   }
   
   addNewMember = function(uorg, name)

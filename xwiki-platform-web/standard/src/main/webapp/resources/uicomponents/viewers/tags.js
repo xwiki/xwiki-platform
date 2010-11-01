@@ -153,7 +153,7 @@ XWiki.viewers.Tags = Class.create({
     var cancel = new Element("input", {type: "reset", value : form.down('.button-add-tag-cancel').innerHTML, "class" : "button"});
     form.down('.button-add-tag-cancel').replace(cancel);
 
-    new ajaxSuggest(form.down('input[type=text]'), {
+    new XWiki.widgets.Suggest(form.down('input[type=text]'), {
       script: "${xwiki.getURL('Main.WebHome', 'view', 'xpage=suggest&classname=XWiki.TagClass&fieldname=tags&firCol=-&secCol=-')}&",
       varname: 'input',
       seps: "${xwiki.getDocument('XWiki.TagClass').xWikiClass.tags.getProperty('separators').value}",

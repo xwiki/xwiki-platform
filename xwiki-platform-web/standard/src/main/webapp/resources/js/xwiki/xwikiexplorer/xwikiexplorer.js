@@ -954,7 +954,7 @@ isc.XWETreeGrid.addMethods({
         // Prepare suggest feature.
         if (this.displaySuggest) {
             var inputFocus = function() {
-                var suggest = new ajaxSuggest(this, {
+                var suggest = new XWiki.widgets.Suggest(this, {
                     script: '/xwiki/rest/wikis/' + XWiki.currentWiki + '/search?scope=name&',
                     varname:'q'
                 });

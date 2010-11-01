@@ -17,6 +17,31 @@ function warn(message){
 }
 
 /**
+ * _xwk is an old namespace for XWiki code that was optional
+ * Deprecated since 2.6RC1
+ */
+if (window.useXWKns) {
+  warn("_xwk namespace is deprecated since XWiki 2.6RC1. Use the XWiki namespace instead.");
+  if (typeof _xwk == "undefined") {
+    _xwk = new Object();
+  }
+} else {
+  _xwk = window;
+}
+
+/**
+ * Deprecated since 2.6RC1
+ */
+_xwk.ajaxSuggest = Class.create(XWiki.widgets.Suggest, {
+  initialize: function($super){
+    warn("ajaxSuggest is deprecated since XWiki 2.6RC1. Use XWiki.widgets.Suggest instead.");
+    var args = $A(arguments)
+    args.shift();
+    $super.apply( _xwk, args );
+  }
+});
+
+/**
  * Deprecated since 1.9M2
  */
 window.displayDocExtra = XWiki.displayDocExtra.wrap(

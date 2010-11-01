@@ -1,33 +1,12 @@
-// Make sure the XWiki 'namespace' exists.
-if(typeof XWiki == "undefined") {
-  XWiki = new Object();
-}
-// Make sure the widgets 'namespace' exists.
-if(typeof(XWiki.widgets) == 'undefined') {
-  XWiki.widgets = new Object();
-}
+var XWiki = (function(XWiki){
 
-var useXWKns;
-
-if (useXWKns) {
-  if (typeof _xwk == "undefined") {
-    // This is temporary, until we move all backward compatibility into a compability.js file
-    // For this, all calls referencing this old _xwk namespace have first to be cleaned from XE default webapp/XAR.
-    _xwk = new Object();
-  }
-} else {
-  _xwk = this;
-}
-
-// Same, this is temporary until the clean is finished.
-// see http://jira.xwiki.org/jira/browse/XWIKI-3655
-_xwk.ajaxSuggest =
+ var widgets = XWiki.widgets = XWiki.widgets || {};
 
 /**
  * Suggest class.
  * Provide value suggestions to users when starting to type in a text input.
  */
-XWiki.widgets.Suggest = Class.create({
+ widgets.Suggest = Class.create({
   options : {
     // The minimum number of characters after which to trigger the suggest
     minchars : 1,
@@ -569,4 +548,8 @@ XWiki.widgets.Suggest = Class.create({
     }
   }
 
-});
+ });
+
+ return XWiki;
+
+})(XWiki || {});

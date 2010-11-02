@@ -97,7 +97,7 @@ $xwiki.ssx.use('Main.Dashboard')##
 #set ($rcAuthor = [$doc.fullName])
 #set ($rcChangesNb = 10)
 
-{{recentchanges changesNb="$!rcChangesNb" rcAuthor="$!rcAuthor" /}}
+{{recentactivity changesNb="$!rcChangesNb" rcAuthor="$!rcAuthor" /}}
 
 {{html clean="false"}}
       &lt;/div&gt;

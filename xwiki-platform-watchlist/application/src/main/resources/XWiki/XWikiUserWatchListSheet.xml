@@ -42,7 +42,7 @@ $xwiki.ssx.use('Main.Dashboard')##
       &lt;dl&gt;
         &lt;dt class="label"&gt;&lt;label&gt;$msg.get('platform.core.profile.watchlist.notifier')&lt;/label&gt;&lt;/dt&gt;
         #set($notifiers = $xwiki.searchDocuments(", BaseObject obj where doc.fullName=obj.name and obj.className='XWiki.WatchListJobClass'"))
-        #set($currentNotifier = $doc.display('interval', 'view'))
+        #set($currentNotifier = $doc.getObject('XWiki.WatchListClass').getProperty('interval').getValue())
         &lt;dd&gt;
           #if($xcontext.action=='view')
             #if("$!currentNotifier" != "")

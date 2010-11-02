@@ -205,7 +205,7 @@ $xwiki.ssx.use('Main.Dashboard')##
 ## Switch between all possible actions:
 ## viewTag, prepareRename, rename, prepareDelete, delete, default (Tag cloud)
 ##
-{{html}}
+{{html wiki=true}}
 #if($do == 'viewTag')
   ##
   ## View tag
@@ -225,9 +225,11 @@ $xwiki.ssx.use('Main.Dashboard')##
     &lt;/div&gt;
     &lt;div id="dashboardright"&gt;
       &lt;div id="dashboardrightcontent"&gt;
-        &lt;h3 class="xapp"&gt;&lt;span&gt;$msg.get("xe.tag.recentchanges", [$htmlEscapedTag])&lt;/span&gt;&lt;/h3&gt;
+        &lt;h3 class="xapp"&gt;&lt;span&gt;$msg.get("xe.tag.recentactivity", [$htmlEscapedTag])&lt;/span&gt;&lt;/h3&gt;
         #set($rcTag = [$tag])
-        #includeInContext('Main.RecentChanges')
+        
+        {{recentchanges tag="$htmlEscapedTag" /}}
+        
     &lt;/div&gt;
   &lt;/div&gt;
   &lt;div style="clear:both; margin-bottom: 40px;"&gt;&lt;!-- --&gt;&lt;/div&gt;

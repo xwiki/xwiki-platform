@@ -228,7 +228,7 @@ $xwiki.ssx.use('Main.Dashboard')##
         &lt;h3 class="xapp"&gt;&lt;span&gt;$msg.get("xe.tag.recentactivity", [$htmlEscapedTag])&lt;/span&gt;&lt;/h3&gt;
         #set($rcTag = [$tag])
         
-        {{recentchanges tag="$htmlEscapedTag" /}}
+        {{recentactivity tag="$htmlEscapedTag" /}}
         
     &lt;/div&gt;
   &lt;/div&gt;

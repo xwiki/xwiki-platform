@@ -292,6 +292,10 @@ div.dashboard h1 {
   margin:10px 0;
 }
 
+div.dashboard h2 {
+  font-size: 110%;
+}
+
 div.userInfo, div.userRecentChanges, div.userPreferences, div.passwordManagement, div.watchlistManagement, div.watchlistRss, div.watchlistElements {
   margin: 5px 10px 10px;
   padding: 5px 10px 10px;

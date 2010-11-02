@@ -40,6 +40,7 @@ import com.google.gwt.event.dom.client.LoadHandler;
 import com.google.gwt.event.dom.client.MouseUpEvent;
 import com.google.gwt.event.dom.client.MouseUpHandler;
 import com.google.gwt.event.shared.HandlerRegistration;
+import com.google.gwt.user.client.DeferredCommand;
 import com.google.gwt.user.client.ui.MenuItem;
 import com.google.gwt.user.client.ui.Widget;
 
@@ -200,7 +201,22 @@ public class RichTextEditorController implements Updatable, MouseUpHandler, KeyU
     public void onLoad(LoadEvent event)
     {
         if (event.getSource() == richTextEditor.getTextArea()) {
-            maybeInitialize();
+            if (richTextEditor.isAttached()) {
+                maybeInitialize();
+            } else {
+                // If the load event was fired synchronously (i.e. the in-line frame used by the rich text area was
+                // loaded instantly, immediately after being attached to the DOM document) then the logical widget
+                // attach process did not finish (i.e. the rich text editor widget appears to detached although its
+                // underlying element is attached to the DOM tree). Let the logical attach process finish and then
+                // initialize the rich text editor.
+                DeferredCommand.addCommand(new com.google.gwt.user.client.Command()
+                {
+                    public void execute()
+                    {
+                        maybeInitialize();
+                    }
+                });
+            }
         }
     }
 
@@ -209,7 +225,7 @@ public class RichTextEditorController implements Updatable, MouseUpHandler, KeyU
      */
     protected void maybeInitialize()
     {
-        if (!initialized) {
+        if (!initialized && richTextEditor.isAttached()) {
             initialized = true;
 
             loadPlugins();

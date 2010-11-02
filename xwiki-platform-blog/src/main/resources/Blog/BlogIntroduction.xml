@@ -162,7 +162,7 @@
 * You can **create new blog posts** through the input field located on [[your Blog's homepage&gt;&gt;Blog.WebHome]]. The status of a blog post may be any one of the following:
 ** //Unpublished//: your post is still a draft. It can be seen by its creator and by administrators. Once you have clicked publish, you cannot unpublish a post. However, you can choose to hide it.
 ** //Published//: your post can be read by every user that has access to your blog.
-** //Published &amp;amp; hidden//: your post is published but only its creator and admins can see it. This is useful if you need to make modifications on a post that has already been published by mistake.
+** //Published &amp; hidden//: your post is published but only its creator and admins can see it. This is useful if you need to make modifications on a post that has already been published by mistake.
 
 * Every blog article can be **tagged** and/or **categorized**:
 ** You will be able to browse posts by category using the panel located on the left of the page

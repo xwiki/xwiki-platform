@@ -665,7 +665,7 @@ XWiki.Selection = Class.create({
       var shortcutsContainer = $('commentsshortcut').up();
       var annShortcut = new Element('span', {'id' : 'annotationsshortcut'}).update('&lt;a href="#' + this.annTabname + '"&gt;$msg.get("annotations.title")&lt;/a&gt; ');
       shortcutsContainer.insert({top: annShortcut});
-      var separator = new Element('span', {'class' : 'separator'}).update('|');
+      var separator = new Element('span', {'class' : 'separator'}).update('&#183;');
       annShortcut.insert({after : separator});
   
       annShortcut.observe('click', XWiki.displayDocExtra.bind(XWiki, this.annTabname, 'annotationsinline.vm', true));

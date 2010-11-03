@@ -262,7 +262,7 @@ public class DefaultWikiMacroInitializer extends AbstractLogEnabled implements W
         needsUpdate |= bclass.addStaticListField(MACRO_VISIBILITY_PROPERTY, "Macro visibility", 1, false,
             "Current User|Current Wiki|Global", "select", "|");
         needsUpdate |= bclass.addStaticListField(MACRO_CONTENT_TYPE_PROPERTY, "Macro content type", 1, false,
-            "Mandatory|Optional|No content", "select", "|");
+            "Optional|Mandatory|No content", "select", "|");
         needsUpdate |= bclass.addTextAreaField(MACRO_CONTENT_DESCRIPTION_PROPERTY,
             "Content description (Not applicable for \"No content\" type)", 40, 5);
         needsUpdate |= bclass.addTextAreaField(MACRO_CODE_PROPERTY, "Macro code", 40, 20);

@@ -658,8 +658,8 @@ $!xwiki.jsx.use($blogScriptsDocumentName)##
   #listCategories($entryObj) ##
   ## Since the publish date and update date are not set at the exact same time, there could be a small difference that
   ## we assume cannot be more than 3 seconds.
-  | &lt;a href="$entryDoc.getURL('view')" rel="bookmark"&gt;$msg.get('xe.blog.code.permalink')&lt;/a&gt; ##
-  | &lt;a href="$entryDoc.getURL('view', '#Comments')"&gt;$entryDoc.comments.size() $msg.get('xe.blog.code.comments')&lt;/a&gt; ##
+  &lt;span class="separator"&gt;&amp;#183;&lt;/span&gt; &lt;a href="$entryDoc.getURL('view')" rel="bookmark"&gt;$msg.get('xe.blog.code.permalink')&lt;/a&gt; ##
+  &lt;span class="separator"&gt;&amp;#183;&lt;/span&gt; &lt;a href="$entryDoc.getURL('view', '#Comments')"&gt;$entryDoc.comments.size() $msg.get('xe.blog.code.comments')&lt;/a&gt; ##
   &lt;/div&gt; ## entry-footer
   {{/html}}
 #end
@@ -681,7 +681,7 @@ $!xwiki.jsx.use($blogScriptsDocumentName)##
 #set($categoryDoc = $!xwiki.getDocument($category))
 #if(!$categoryDoc.isNew() &amp;&amp; $categoryDoc.getObject(${blogCategoryClassname}))
 #if($first)
- | $msg.get('xe.blog.code.categories')
+ &lt;span class="separator"&gt;&amp;#183;&lt;/span&gt; $msg.get('xe.blog.code.categories')
 #set($first = false)
 #else, #end## if first
 &lt;a rel="tag" href="$xwiki.getURL(${category})"&gt;$!{escapetool.xml($!xwiki.getDocument($category).getObject($blogCategoryClassname).getProperty('name').value)}&lt;/a&gt;##

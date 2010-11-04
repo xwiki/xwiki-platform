@@ -338,7 +338,8 @@ $msg.get("xe.officeimporter.import.splitting.naming") : &lt;/span&gt;&lt;select 
     if (typeof(XWiki.widgets.Suggest) != "undefined") {
       new XWiki.widgets.Suggest(field, {
         script: "$suggestDoc.URL?xpage=plain&amp;type=" + type + "&amp;number=" + number + "&amp;",
-      });  
+        icon: "$xwiki.getSkinFile('icons/silk/folder.gif')"
+      });
     }
   }
   XWiki.officeImporter.addAutoSuggest(document.getElementById("targetSpaceInputId"), "spaces", 5);

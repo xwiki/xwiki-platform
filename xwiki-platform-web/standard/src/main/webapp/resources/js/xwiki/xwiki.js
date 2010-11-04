@@ -537,55 +537,55 @@ Object.extend(XWiki, {
   },
 
   cookies: {
-	/**
-	 * Create a cookie, with or without expiration date.
-	 *
-	 * @param name Name of the cookie.
-	 * @param value Value of the cookie.
-	 * @param days Days to keep the cookie (can be null).
-	 * @return
-	 */
-	create: function(name,value,days) {
-	    if (days) {
-	        var date = new Date();
-	        date.setTime(date.getTime()+(days*24*60*60*1000));
-	        var expires = "; expires="+date.toGMTString();
-	    }
-	    else var expires = "";
-	    document.cookie = name+"="+value+expires+"; path=/";
-	},
+    /**
+     * Create a cookie, with or without expiration date.
+     *
+     * @param name Name of the cookie.
+     * @param value Value of the cookie.
+     * @param days Days to keep the cookie (can be null).
+     * @return
+     */
+    create: function(name,value,days) {
+        if (days) {
+            var date = new Date();
+            date.setTime(date.getTime()+(days*24*60*60*1000));
+            var expires = "; expires="+date.toGMTString();
+        }
+        else var expires = "";
+        document.cookie = name+"="+value+expires+"; path=/";
+    },
 
-	/**
-	 * Read a cookie.
-	 *
-	 * @param name Name of the cookie.
-	 * @return Value for the given cookie.
-	 */
-	read:function(name) {
-	    var nameEQ = name + "=";
-	    var ca = document.cookie.split(';');
-	    for(var i=0;i < ca.length;i++) {
-	        var c = ca[i];
-	        while (c.charAt(0)==' ') {
-	            c = c.substring(1,c.length);
-	        }
-	        if (c.indexOf(nameEQ) == 0) {
-	            return c.substring(nameEQ.length,c.length);
-	        }
-	    }
-	    return null;
-	},
+    /**
+     * Read a cookie.
+     *
+     * @param name Name of the cookie.
+     * @return Value for the given cookie.
+     */
+    read:function(name) {
+        var nameEQ = name + "=";
+        var ca = document.cookie.split(';');
+        for(var i=0;i < ca.length;i++) {
+            var c = ca[i];
+            while (c.charAt(0)==' ') {
+                c = c.substring(1,c.length);
+            }
+            if (c.indexOf(nameEQ) == 0) {
+                return c.substring(nameEQ.length,c.length);
+            }
+        }
+        return null;
+    },
 
-	/**
-	 * Erase a cookie.
-	 *
-	 * @param name Name of the cookie to erase.
-	 * @return
-	 */
-	erase:function(name) {
-	    XWiki.cookies.create(name,"",-1);
-	}
-	
+    /**
+     * Erase a cookie.
+     *
+     * @param name Name of the cookie to erase.
+     * @return
+     */
+    erase:function(name) {
+        XWiki.cookies.create(name,"",-1);
+    }
+    
   },
 
   /**
@@ -1337,27 +1337,57 @@ document.observe('xwiki:dom:loaded', function() {
 /**
  * Small JS improvement, which suggests document names (doc.fullName) when typing in an input.
  *
- * To activate this behavior on an input elements, add the "suggestDocuments" classname to it.
+ * To activate this behavior on an input elements, add one of the following classname to it :
+ * <ul>
+ * <li><tt>suggestDocuments</tt> to suggest from any available document</li>
+ * <li><tt>suggestUsers</tt> to suggest from documents that contains user objects</li>
+ * <li><tt>suggestGroups</tt> to suggest from documents that contains group objects</li>
+ * </ul>
  */
 document.observe('xwiki:dom:loaded', function() {
-  if (typeof(XWiki.widgets.Suggest) != "undefined") {
-    $$("input.suggestDocuments").each(function(item) {
-      // Create the Suggest.
-      new XWiki.widgets.Suggest(item, {
-        // This document also provides the suggestions.
-        script: XWiki.Document.getRestSearchURL("scope=name&number=10&media=json&"),
-        varname: "q",
-        noresults: "Document not found",
-        json: true,
-        resultsParameter : "searchResults",
-        resultId : "id",
-        resultValue : "pageFullName",
-        resultInfo : "pageFullName",
-        timeout : 30000,
-        parentContainer : item.up()
-      });
-    });
-  }
+    var suggestionsMapping = {
+        "documents" : {
+            script: XWiki.Document.getRestSearchURL("scope=name&number=10&media=json&"),
+            varname: "q",
+            icon: "$xwiki.getSkinFile('icons/silk/page_white_text.gif')",
+            noresults: "Document not found",
+            json: true,
+            resultsParameter : "searchResults",
+            resultId : "id",
+            resultValue : "pageFullName",
+            resultInfo : "pageFullName"     
+        },
+        "users" : {
+            script: XWiki.currentDocument.getURL('get', 'xpage=uorgsuggest&classname=XWiki.XWikiUsers&wiki=local&uorg=user&'),
+            varname: "input",
+            icon: "$xwiki.getSkinFile('icons/silk/user.gif')",
+            noresults: "User not found",
+        },
+        "groups" : {
+            script: XWiki.currentDocument.getURL('get', 'xpage=uorgsuggest&classname=XWiki.XWikiGroups&wiki=local&uorg=group&'),
+            varname: "input",
+            icon: "$xwiki.getSkinFile('icons/silk/group.gif')",
+            noresults: "Group not found",
+        }
+    };
+    if (typeof(XWiki.widgets.Suggest) != "undefined") {
+      var keys = Object.keys(suggestionsMapping);
+      for (var i=0;i<keys.length;i++) {
+        var selector = 'input.suggest' + keys[i].capitalize();
+        $$(selector).each(function(item) {
+          if (!item.hasClassName('initialized')) {
+            var options = {
+              timeout : 30000,
+              parentContainer : item.up()
+            };
+            Object.extend(options, suggestionsMapping[keys[i]]);
+            // Create the Suggest.
+            var suggest = new XWiki.widgets.Suggest(item, options);
+            item.addClassName('initialized');
+          }
+        });
+      }
+    }
 });
 
 /**

@@ -204,6 +204,7 @@
                 <exclude>org/xwiki/rendering/block/SpaceBlock</exclude><!-- Removed field SPACE_BLOCK-->
                 <exclude>org/xwiki/rendering/block/NewLineBlock</exclude><!-- Removed field NEW_LINE_BLOCK-->
                 <exclude>org/xwiki/rendering/configuration/RenderingConfiguration</exclude><!-- Added getTransformations -->
+                <exclude>org/xwiki/annotation/maintainer/AbstractAnnotationMaintainer</exclude>
                 <!-- Following classes moved to the new Macro Transformation Module -->
                 <exclude>org/xwiki/rendering/macro/**</exclude>
                 <exclude>org/xwiki/rendering/transformation/MacroTransformationContext</exclude>

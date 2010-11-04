@@ -157,7 +157,8 @@ XWiki.viewers.Tags = Class.create({
       script: "${xwiki.getURL('Main.WebHome', 'view', 'xpage=suggest&classname=XWiki.TagClass&fieldname=tags&firCol=-&secCol=-')}&",
       varname: 'input',
       seps: "${xwiki.getDocument('XWiki.TagClass').xWikiClass.tags.getProperty('separators').value}",
-      shownoresults : false
+      shownoresults : false,
+      icon: "${xwiki.getSkinFile('icons/silk/tag_yellow.gif')}"
     });
   }
 });

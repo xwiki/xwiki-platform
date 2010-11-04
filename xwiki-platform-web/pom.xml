@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki</artifactId>
-    <version>37-SNAPSHOT</version>
+    <version>37</version>
     <relativePath>../pom</relativePath>
   </parent>
   <groupId>com.xpn.xwiki.platform</groupId>
@@ -49,7 +49,7 @@
     <smartgwt.version>2.0</smartgwt.version>
     <junit.version>3.8.2</junit.version>
     <!-- Versions of XWiki dependencies used in Platform/Web modules -->
-    <platform.tool.configuration.version>1.45-SNAPSHOT</platform.tool.configuration.version>
+    <platform.tool.configuration.version>1.45</platform.tool.configuration.version>
     <platform.core.version>${project.version}</platform.core.version>
     <platform.skin.albatross.version>1.31-SNAPSHOT</platform.skin.albatross.version>
     <platform.skin.toucan.version>1.38-SNAPSHOT</platform.skin.toucan.version>

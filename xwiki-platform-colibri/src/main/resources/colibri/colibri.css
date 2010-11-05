@@ -24,7 +24,6 @@ html, body, div, span, applet, object, iframe,
   margin: 0;
   outline: 0;
   padding: 0;
-  vertical-align: inherit;
   text-align: inherit;
   line-height: normal;
 }
@@ -145,6 +144,10 @@ input[type="text"], input[type="password"], textarea, select {
 table {
   border-collapse: collapse;
   vertical-align: middle;
+}
+thead, tbody, tfoot {
+  /* Override default browser styles. */
+  vertical-align: inherit;
 }
 
 caption, th, td {

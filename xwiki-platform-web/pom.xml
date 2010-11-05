@@ -53,7 +53,7 @@
     <platform.core.version>${project.version}</platform.core.version>
     <platform.skin.albatross.version>1.30</platform.skin.albatross.version>
     <platform.skin.toucan.version>1.37</platform.skin.toucan.version>
-    <platform.skin.colibri.version>1.23</platform.skin.colibri.version>
+    <platform.skin.colibri.version>1.24</platform.skin.colibri.version>
   </properties>
   <profiles>
     <profile>

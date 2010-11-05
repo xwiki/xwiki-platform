@@ -830,7 +830,7 @@
     <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-core-csrf</artifactId>
-      <version>${pom.version}</version>
+      <version>${project.version}</version>
     </dependency>
 
     <!-- Used to mock XWiki class -->

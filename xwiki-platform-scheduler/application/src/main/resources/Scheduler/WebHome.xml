@@ -226,8 +226,7 @@ $msg.get('xe.scheduler.welcome')
   #set($actions = $util.hashMap)## get a hash to store action urls
   #set($jobHolder = $xwiki.getDocument($docName))
   #set($job = $jobHolder.getObject('XWiki.SchedulerJobClass'))
-  #set($status = "")
-  #set($status = $job.get('status'))
+  #set($status = $scheduler.getJobStatus($job).value)
   #if($status == "")
     #set($status="None")
   #end

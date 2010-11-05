@@ -1357,6 +1357,17 @@ document.observe('xwiki:dom:loaded', function() {
             resultValue : "pageFullName",
             resultInfo : "pageFullName"     
         },
+        "spaces" : {
+            script: XWiki.Document.getRestSearchURL("scope=spaces&number=10&media=json&"),
+            varname: "q",
+            icon: "$xwiki.getSkinFile('icons/silk/folder.gif')",
+            noresults: "Space not found",
+            json: true,
+            resultsParameter : "searchResults",
+            resultId : "id",
+            resultValue : "space",
+            resultInfo : "space"     
+        },
         "users" : {
             script: XWiki.currentDocument.getURL('get', 'xpage=uorgsuggest&classname=XWiki.XWikiUsers&wiki=local&uorg=user&'),
             varname: "input",

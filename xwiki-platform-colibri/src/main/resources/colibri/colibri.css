@@ -95,6 +95,12 @@ p {
   line-height: 1.4em;
   margin: .5em 0;
 }
+table p:first-child {
+  margin-top: 0;
+}
+table p:last-child {
+  margin-bottom: 0;
+}
 p * {
   line-height: 1.4em;
 }

@@ -1,5 +1,4 @@
 <?xml version="1.0" encoding="UTF-8"?>
-
 <xwikidoc>
 <web>XWiki</web>
 <name>OfficeImporter</name>
@@ -12,8 +11,8 @@
 <customClass></customClass>
 <contentAuthor>XWiki.Admin</contentAuthor>
 <creationDate>1217261143000</creationDate>
-<date>1253186002000</date>
-<contentUpdateDate>1253186002000</contentUpdateDate>
+<date>1288979323000</date>
+<contentUpdateDate>1288979323000</contentUpdateDate>
 <version>1.1</version>
 <title>$msg.get("xe.officeimporter.import.title")</title>
 <template></template>
@@ -35,6 +34,7 @@
 <validationScript></validationScript>
 <cache>
 <cache>0</cache>
+<disabled>0</disabled>
 <displayType>select</displayType>
 <multiSelect>0</multiSelect>
 <name>cache</name>
@@ -49,6 +49,7 @@
 <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
 </cache>
 <code>
+<disabled>0</disabled>
 <name>code</name>
 <number>2</number>
 <prettyName>Code</prettyName>
@@ -58,6 +59,7 @@
 <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
 </code>
 <name>
+<disabled>0</disabled>
 <name>name</name>
 <number>1</number>
 <prettyName>Name</prettyName>
@@ -66,6 +68,7 @@
 <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
 </name>
 <parse>
+<disabled>0</disabled>
 <displayFormType>select</displayFormType>
 <displayType>yesno</displayType>
 <name>parse</name>
@@ -76,6 +79,7 @@
 </parse>
 <use>
 <cache>0</cache>
+<disabled>0</disabled>
 <displayType>select</displayType>
 <multiSelect>0</multiSelect>
 <name>use</name>
@@ -86,7 +90,7 @@
 <separators> ,|</separators>
 <size>1</size>
 <unmodifiable>0</unmodifiable>
-<values>onDemand=On demand|always=Always</values>
+<values>currentPage=Always on this page|onDemand=On demand|always=Always on this wiki</values>
 <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
 </use>
 </class>
@@ -259,8 +263,7 @@ select#childPagesNamingMethod {
 <use>onDemand</use>
 </property>
 </object>
-<content>
-#set($ok = $xwiki.ssx.use("XWiki.OfficeImporter"))
+<content>#set($ok = $xwiki.ssx.use("XWiki.OfficeImporter"))
 #if($isguest)
   #error($msg.get("xe.officeimporter.notallowed"))
 #elseif("$!{oomanager.serverState}" != "Connected")
@@ -282,7 +285,7 @@ select#childPagesNamingMethod {
 &lt;p class="office_importer_target"&gt;
 &lt;label for="targetSpaceInputId"  class="inputtext"&gt;
 &lt;span&gt;$msg.get("xe.officeimporter.import.targetspace") : &lt;/span&gt;
-&lt;input id="targetSpaceInputId" type="text" name="targetSpace" value="$!{targetdoc.space}"/&gt;
+&lt;input id="targetSpaceInputId" type="text" name="targetSpace" class="suggestSpaces suggested" value="$!{targetdoc.space}"/&gt;
 &lt;/label&gt;
 &lt;label for="targetPageInputId" class="inputtext"&gt;
 &lt;span&gt;$msg.get("xe.officeimporter.import.targetpage") : &lt;/span&gt;
@@ -333,16 +336,6 @@ $msg.get("xe.officeimporter.import.splitting.naming") : &lt;/span&gt;&lt;select 
     fileName = fileName.replace(/[\.:]/g, "-");
     document.getElementById("targetPageInputId").value = fileName;
   }
-  XWiki.officeImporter.addAutoSuggest = function(field, type, number) {
-    #set($suggestDoc = $xwiki.getDocument("XWiki.OfficeImporterSuggest"))
-    if (typeof(XWiki.widgets.Suggest) != "undefined") {
-      new XWiki.widgets.Suggest(field, {
-        script: "$suggestDoc.URL?xpage=plain&amp;type=" + type + "&amp;number=" + number + "&amp;",
-        icon: "$xwiki.getSkinFile('icons/silk/folder.gif')"
-      });
-    }
-  }
-  XWiki.officeImporter.addAutoSuggest(document.getElementById("targetSpaceInputId"), "spaces", 5);
 /* ]]&gt; */
 &lt;/script&gt;
 {/pre}

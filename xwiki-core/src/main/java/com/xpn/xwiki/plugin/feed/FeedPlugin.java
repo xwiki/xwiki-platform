@@ -37,7 +37,8 @@ import java.util.Map;
 import java.util.Vector;
 
 import org.apache.commons.lang.StringUtils;
-import org.jfree.util.Log;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.xwiki.cache.Cache;
 import org.xwiki.cache.CacheException;
 import org.xwiki.cache.config.CacheConfiguration;
@@ -78,6 +79,11 @@ public class FeedPlugin extends XWikiDefaultPlugin implements XWikiPluginInterfa
     private Map<String, UpdateThread> updateThreads = new HashMap<String, UpdateThread>();
 
     private Converter syntaxConverter;
+   
+    /**
+     * Log object to log messages in this class.
+     */
+    private static final Log LOG = LogFactory.getLog(FeedPlugin.class);
     
     public static class SyndEntryComparator implements Comparator<SyndEntry>
     {
@@ -739,7 +745,7 @@ public class FeedPlugin extends XWikiDefaultPlugin implements XWikiPluginInterfa
             // If some day wiki syntax is supported in document titles, we might want to convert to wiki syntax instead.
             title = this.stripHtmlTags(entry.getTitle());
         } catch (ConversionException e) {
-            Log.warn("Failed to strip HTML tags from entry title : " + e.getMessage());
+            LOG.warn("Failed to strip HTML tags from entry title : " + e.getMessage());
             // Nevermind, we will use the original title
             title = entry.getTitle();
         }

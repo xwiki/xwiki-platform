@@ -46,8 +46,9 @@ public class SpaceSearchResource extends BaseSearchResult
         @QueryParam("number") @DefaultValue("-1") Integer number) throws QueryException, XWikiException
     {
         SearchResults searchResults = objectFactory.createSearchResults();
-        searchResults.setTemplate(String.format("%s?q={keywords}(&scope={content|name|title|objects})*", UriBuilder
-            .fromUri(uriInfo.getBaseUri()).path(SpaceSearchResource.class).build(wikiName, spaceName).toString()));
+        searchResults.setTemplate(String.format("%s?%s",
+            UriBuilder.fromUri(uriInfo.getBaseUri()).path(SpaceSearchResource.class).build(wikiName, spaceName)
+                .toString(), SEARCH_TEMPLATE_INFO));
 
         List<SearchScope> searchScopes = parseSearchScopeStrings(searchScopeStrings);
 

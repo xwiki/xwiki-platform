@@ -46,8 +46,9 @@ public class WikiSearchResource extends BaseSearchResult
         throws QueryException, XWikiException
     {
         SearchResults searchResults = objectFactory.createSearchResults();
-        searchResults.setTemplate(String.format("%s?q={keywords}(&scope={content|name|title|objects})*", UriBuilder
-            .fromUri(uriInfo.getBaseUri()).path(WikiSearchResource.class).build(wikiName).toString()));
+        searchResults.setTemplate(String.format("%s?%s",
+            UriBuilder.fromUri(uriInfo.getBaseUri()).path(WikiSearchResource.class).build(wikiName).toString(),
+            SEARCH_TEMPLATE_INFO));
 
         Utils.getXWikiContext(componentManager).setDatabase(wikiName);
 

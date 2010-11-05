@@ -17,34 +17,27 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.rendering.internal.renderer.xhtml.link;
-
-import java.util.Map;
+package org.xwiki.rendering.internal.parser.reference;
 
 import org.xwiki.component.annotation.Component;
-import org.xwiki.component.annotation.InstantiationStrategy;
-import org.xwiki.component.descriptor.ComponentInstantiationStrategy;
-import org.xwiki.rendering.listener.reference.ResourceReference;
+import org.xwiki.rendering.listener.reference.ResourceType;
 
 /**
- * Handle XHTML rendering for mailto links.
- * 
+ * Parses a resource reference to a UNC (Universal Naming Convention).
+ *
  * @version $Id$
- * @since 2.5RC1
+ * @since 2.7M1
  */
-@Component("mailto")
-@InstantiationStrategy(ComponentInstantiationStrategy.PER_LOOKUP)
-public class MailtoXHTMLLinkTypeRenderer extends AbstractXHTMLLinkTypeRenderer
+@Component("unc")
+public class UNCResourceReferenceTypeParser extends AbstractURIResourceReferenceTypeParser
 {
     /**
      * {@inheritDoc}
-     * 
-     * @see AbstractXHTMLLinkTypeRenderer#beginLinkExtraAttributes(ResourceReference, java.util.Map, java.util.Map)
+     *
+     * @see AbstractURIResourceReferenceTypeParser#getType()
      */
-    @Override
-    protected void beginLinkExtraAttributes(ResourceReference reference, Map<String, String> spanAttributes,
-        Map<String, String> anchorAttributes)
+    public ResourceType getType()
     {
-        anchorAttributes.put(XHTMLLinkRenderer.HREF, reference.getType().getScheme() + ':' + reference.getReference());
+        return ResourceType.UNC;
     }
 }

@@ -100,6 +100,14 @@ public class DefaultLinkReferenceParserTest extends AbstractLinkReferenceParserT
         Assert.assertTrue(reference.isTyped());
         Assert.assertEquals("/some/path", reference.getReference());
         Assert.assertEquals("Typed = [true] Type = [path] Reference = [/some/path]", reference.toString());
+
+        // Verify UNC link types
+        reference = parser.parse("unc:\\\\myserver\\myshare\\mydoc.txt");
+        Assert.assertEquals(ResourceType.UNC, reference.getType());
+        Assert.assertTrue(reference.isTyped());
+        Assert.assertEquals("\\\\myserver\\myshare\\mydoc.txt", reference.getReference());
+        Assert.assertEquals("Typed = [true] Type = [unc] Reference = [\\\\myserver\\myshare\\mydoc.txt]",
+            reference.toString());
     }
 
     @Test

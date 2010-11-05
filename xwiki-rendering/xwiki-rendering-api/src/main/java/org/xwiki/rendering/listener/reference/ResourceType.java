@@ -28,6 +28,7 @@ package org.xwiki.rendering.listener.reference;
  * <li>relative URL ("path")</li>
  * <li>mail ("mailto")</li>
  * <li>attachment ("attach")</li>
+ * <li>UNC path ("unc")</li>
  * </ul>
  * 
  * @version $Id$
@@ -74,6 +75,12 @@ public class ResourceType
      * Represents an icon.
      */
     public static final ResourceType ICON = new ResourceType("icon");
+
+    /**
+     * Represents a UNC (Universal Naming Convention) (eg "\\myserver\myshare\mydoc.txt").
+     * @since 2.7M1
+     */
+    public static final ResourceType UNC = new ResourceType("unc");
 
     /**
      * @see #getScheme()

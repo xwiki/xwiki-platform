@@ -27,24 +27,28 @@ import org.xwiki.component.descriptor.ComponentInstantiationStrategy;
 import org.xwiki.rendering.listener.reference.ResourceReference;
 
 /**
- * Handle XHTML rendering for mailto links.
- * 
+ * Handle XHTML rendering for UNC links (Universal Naming Convention).
+ *
  * @version $Id$
- * @since 2.5RC1
+ * @since 2.7M1
  */
-@Component("mailto")
+@Component("unc")
 @InstantiationStrategy(ComponentInstantiationStrategy.PER_LOOKUP)
-public class MailtoXHTMLLinkTypeRenderer extends AbstractXHTMLLinkTypeRenderer
+public class UNCXHTMLLinkTypeRenderer extends AbstractXHTMLLinkTypeRenderer
 {
     /**
      * {@inheritDoc}
-     * 
+     *
      * @see AbstractXHTMLLinkTypeRenderer#beginLinkExtraAttributes(ResourceReference, java.util.Map, java.util.Map)
      */
     @Override
     protected void beginLinkExtraAttributes(ResourceReference reference, Map<String, String> spanAttributes,
         Map<String, String> anchorAttributes)
     {
-        anchorAttributes.put(XHTMLLinkRenderer.HREF, reference.getType().getScheme() + ':' + reference.getReference());
+        // Transform the UNC reference into a file URL of the format: file://///myserver/myshare/mydoc.txt
+        // i.e. replace all "\" chars by "/" and prefix with "file:///".
+        String fileURL = "file:///" + reference.getReference().replaceAll("\\\\", "/");
+
+        anchorAttributes.put(XHTMLLinkRenderer.HREF, fileURL);
     }
 }

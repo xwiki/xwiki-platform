@@ -16,6 +16,7 @@ org.xwiki.rendering.internal.parser.reference.MailtoResourceReferenceTypeParser
 org.xwiki.rendering.internal.parser.reference.AttachmentResourceReferenceTypeParser
 org.xwiki.rendering.internal.parser.reference.PathResourceReferenceTypeParser
 org.xwiki.rendering.internal.parser.reference.IconResourceReferenceTypeParser
+org.xwiki.rendering.internal.parser.reference.UNCResourceReferenceTypeParser
 org.xwiki.rendering.internal.renderer.DefaultLinkLabelGenerator
 org.xwiki.rendering.internal.renderer.DefaultAttachmentURILabelGenerator
 org.xwiki.rendering.internal.renderer.MailtoURILabelGenerator
@@ -48,6 +49,7 @@ org.xwiki.rendering.internal.renderer.xhtml.link.MailtoXHTMLLinkTypeRenderer
 org.xwiki.rendering.internal.renderer.xhtml.link.InterWikiXHTMLLinkTypeRenderer
 org.xwiki.rendering.internal.renderer.xhtml.link.DocumentXHTMLLinkTypeRenderer
 org.xwiki.rendering.internal.renderer.xhtml.link.AttachmentXHTMLLinkTypeRenderer
+org.xwiki.rendering.internal.renderer.xhtml.link.UNCXHTMLLinkTypeRenderer
 org.xwiki.rendering.internal.renderer.xhtml.XHTMLMarkerResourceReferenceSerializer
 org.xwiki.rendering.internal.renderer.event.EventRendererFactory
 org.xwiki.rendering.internal.renderer.event.EventRenderer

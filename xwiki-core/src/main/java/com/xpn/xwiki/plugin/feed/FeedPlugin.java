@@ -22,6 +22,7 @@
 package com.xpn.xwiki.plugin.feed;
 
 import java.io.IOException;
+import java.io.StringReader;
 import java.io.StringWriter;
 import java.lang.reflect.Constructor;
 import java.net.URL;
@@ -36,10 +37,15 @@ import java.util.Map;
 import java.util.Vector;
 
 import org.apache.commons.lang.StringUtils;
+import org.jfree.util.Log;
 import org.xwiki.cache.Cache;
 import org.xwiki.cache.CacheException;
 import org.xwiki.cache.config.CacheConfiguration;
 import org.xwiki.cache.eviction.LRUEvictionConfiguration;
+import org.xwiki.rendering.converter.ConversionException;
+import org.xwiki.rendering.converter.Converter;
+import org.xwiki.rendering.renderer.printer.DefaultWikiPrinter;
+import org.xwiki.rendering.renderer.printer.WikiPrinter;
 import org.xwiki.rendering.syntax.Syntax;
 
 import com.sun.syndication.feed.synd.SyndCategory;
@@ -61,6 +67,7 @@ import com.xpn.xwiki.objects.classes.BaseClass;
 import com.xpn.xwiki.plugin.XWikiDefaultPlugin;
 import com.xpn.xwiki.plugin.XWikiPluginInterface;
 import com.xpn.xwiki.user.api.XWikiRightService;
+import com.xpn.xwiki.web.Utils;
 
 public class FeedPlugin extends XWikiDefaultPlugin implements XWikiPluginInterface
 {
@@ -70,6 +77,8 @@ public class FeedPlugin extends XWikiDefaultPlugin implements XWikiPluginInterfa
 
     private Map<String, UpdateThread> updateThreads = new HashMap<String, UpdateThread>();
 
+    private Converter syntaxConverter;
+    
     public static class SyndEntryComparator implements Comparator<SyndEntry>
     {
         public int compare(SyndEntry entry1, SyndEntry entry2)
@@ -723,7 +732,18 @@ public class FeedPlugin extends XWikiDefaultPlugin implements XWikiPluginInterfa
         obj.setStringValue("feedname", feedname);
         obj.setStringValue("title", entry.getTitle());
         // set document title to the feed title
-        doc.setTitle(entry.getTitle());
+        String title;
+        try {
+            // Strips HTML tags that the feed can output, since they are not supported in document titles.
+            // (For example Google Blog search adds a <b> tag around matched keyword in title)
+            // If some day wiki syntax is supported in document titles, we might want to convert to wiki syntax instead.
+            title = this.stripHtmlTags(entry.getTitle());
+        } catch (ConversionException e) {
+            Log.warn("Failed to strip HTML tags from entry title : " + e.getMessage());
+            // Nevermind, we will use the original title
+            title = entry.getTitle();
+        }
+        doc.setTitle(title);
         obj.setIntValue("flag", 0);
         @SuppressWarnings("unchecked")
         List<SyndCategory> categList = entry.getCategories();
@@ -1058,5 +1078,20 @@ public class FeedPlugin extends XWikiDefaultPlugin implements XWikiPluginInterfa
     {
         SyndFeed feed = getFeed(query, count, start, source, sourceParams, metadata, context);
         return getFeedOutput(feed, type, context);
+    }
+
+    /**
+     * @param originalString the string to strip the HTML tags from
+     * @return the passed string, stripped from HTML markup
+     * @throws ConversionException when the conversion fails
+     */
+    private String stripHtmlTags(String originalString) throws ConversionException
+    {
+        if (this.syntaxConverter == null) {
+            this.syntaxConverter = Utils.getComponent(Converter.class);
+        }
+        WikiPrinter printer = new DefaultWikiPrinter();
+        this.syntaxConverter.convert(new StringReader(originalString), Syntax.HTML_4_01, Syntax.PLAIN_1_0, printer);
+        return printer.toString();
     }
 }

@@ -308,21 +308,21 @@ span.wikicreatelink a:after {
 }
 
 .avatar_30 {
-  max-widht: 30px;
+  max-width: 30px;
   max-height: 30px;
 }
 * html .avatar_30 {
   width: 30px;
 }
 .avatar_50 {
-  max-widht: 50px;
+  max-width: 50px;
   max-height: 50px;
 }
 * html .avatar_50 {
   width: 50px;
 }
 .avatar_120 {
-  max-widht: 120px;
+  max-width: 120px;
   max-height: 120px;
 }
 * html .avatar_120 {

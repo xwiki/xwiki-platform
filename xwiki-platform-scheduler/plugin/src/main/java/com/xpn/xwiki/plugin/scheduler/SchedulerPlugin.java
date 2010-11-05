@@ -36,6 +36,7 @@ import org.quartz.Scheduler;
 import org.quartz.SchedulerException;
 import org.quartz.Trigger;
 import org.quartz.impl.StdSchedulerFactory;
+import org.xwiki.script.service.ScriptServiceManager;
 
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
@@ -47,6 +48,7 @@ import com.xpn.xwiki.objects.classes.BaseClass;
 import com.xpn.xwiki.objects.classes.TextAreaClass;
 import com.xpn.xwiki.plugin.XWikiDefaultPlugin;
 import com.xpn.xwiki.plugin.XWikiPluginInterface;
+import com.xpn.xwiki.web.Utils;
 import com.xpn.xwiki.web.XWikiResponse;
 import com.xpn.xwiki.web.XWikiServletRequest;
 
@@ -329,9 +331,11 @@ public class SchedulerPlugin extends XWikiDefaultPlugin
             XWikiContext stubContext = prepareJobStubContext(object, context);
 
             data.put("context", stubContext);
+            data.put("xcontext", stubContext);
             data.put("xwiki", new com.xpn.xwiki.api.XWiki(context.getWiki(), stubContext));
             data.put("xjob", object);
-
+            data.put("services", Utils.getComponent(ScriptServiceManager.class));
+            
             job.setJobDataMap(data);
 
             getScheduler().addJob(job, true);

@@ -2,7 +2,11 @@
 /* Attachment list style */
 .attachment {
   font-size: 85%;
-  padding: 10px 0;
+  padding: 10px;
+  margin: 0 -10px;
+}
+.attachment:hover {
+  background: $theme.highlightColor;
 }
 
 .attachment .information {

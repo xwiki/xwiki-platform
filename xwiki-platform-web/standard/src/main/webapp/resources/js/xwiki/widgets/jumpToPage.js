@@ -17,11 +17,11 @@ XWiki.widgets.JumpToPage = Class.create(XWiki.widgets.ModalPopup, {
     this.input = new Element("input", {
       "type" : "text",
       "id" : "jmp_target",
-      "title" : "Space.Document"
+      "title" : "$msg.get('core.viewers.jump.dialog.input.tooltip')"
     });
     content.appendChild(this.input);
-    this.viewButton = this.createButton("button", "View", "View page (Enter, Meta+V)", "jmp_view");
-    this.editButton = this.createButton("button", "Edit", "Edit page in the default editor (Meta+E)", "jmp_edit");
+    this.viewButton = this.createButton("button", "$msg.get('core.viewers.jump.dialog.actions.view')", "$msg.get('core.viewers.jump.dialog.actions.view.tooltip')", "jmp_view");
+    this.editButton = this.createButton("button", "$msg.get('core.viewers.jump.dialog.actions.edit')", "$msg.get('core.viewers.jump.dialog.actions.edit.tooltip')", "jmp_edit");
     var buttonContainer = new Element("div", {"class" : "buttons"});
     buttonContainer.appendChild(this.viewButton);
     buttonContainer.appendChild(this.editButton);
@@ -29,12 +29,12 @@ XWiki.widgets.JumpToPage = Class.create(XWiki.widgets.ModalPopup, {
     $super(
       content,
       {
-        "show" : { method : this.showDialog, keys : ['Meta+G','Ctrl+G', 'Ctrl+/', 'Meta+/'] },
-        "view" : { method : this.openDocument, keys : ['Enter', 'Meta+V','Ctrl+V'] },
-        "edit" : { method : this.openDocument, keys : ['Meta+E','Ctrl+E'] }
+        "show" : { method : this.showDialog, keys : [$msg.get('core.viewers.jump.shortcuts')] },
+        "view" : { method : this.openDocument, keys : [$msg.get('core.viewers.jump.dialog.actions.view.shortcuts')] },
+        "edit" : { method : this.openDocument, keys : [$msg.get('core.viewers.jump.dialog.actions.edit.shortcuts')] }
       },
       {
-        title : "Go to:",
+        title : "$msg.get('core.viewers.jump.dialog.content')",
         verticalPosition : "top"
       }
     );
@@ -56,7 +56,7 @@ XWiki.widgets.JumpToPage = Class.create(XWiki.widgets.ModalPopup, {
         script: "${request.contextPath}/rest/wikis/${context.database}/search?scope=name&number=10&media=json&",
         // Prefixed with & since the current (as of 1.7) Suggest code does not automatically append it.
         varname: "q",
-        noresults: "Document not found",
+        noresults: "$msg.get('core.viewers.jump.suggest.noResults')",
         icon: "${xwiki.getSkinFile('icons/silk/page_white_text.gif')}",
         json: true,
         resultsParameter : "searchResults",
@@ -93,7 +93,7 @@ XWiki.widgets.JumpToPage = Class.create(XWiki.widgets.ModalPopup, {
   addQuickLinksEntry : function() {
     $$(".panel.QuickLinks .xwikipanelcontents").each(function(item) {
       var jumpToPageActivator = new Element('span', {'class': "jmp-activator"});
-      jumpToPageActivator.update("Jump to any page in the wiki (Meta+G)"); // TODO: i18n!
+      jumpToPageActivator.update("$msg.get('core.viewers.jump.quickLinksText')");
       Event.observe(jumpToPageActivator, "click", function(event) {
         this.showDialog(event);
       }.bindAsEventListener(this));

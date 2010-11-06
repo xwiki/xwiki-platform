@@ -30,7 +30,8 @@ import java.util.Map;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
-import org.apache.log4j.Logger;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.xwiki.model.reference.DocumentReference;
 
 import com.xpn.xwiki.XWikiContext;
@@ -48,7 +49,7 @@ import com.xpn.xwiki.web.XWikiServletURLFactory;
 public class PdfURLFactory extends XWikiServletURLFactory
 {
     /** Logging helper object. */
-    private static final Logger LOG = Logger.getLogger(PdfURLFactory.class);
+    private static final Log LOG = LogFactory.getLog(PdfURLFactory.class);
 
     private static final String SEPARATOR = "/";
 

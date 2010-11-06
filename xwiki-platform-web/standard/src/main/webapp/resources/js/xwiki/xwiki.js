@@ -405,7 +405,7 @@ Object.extend(XWiki, {
           }
       }
   },
-  
+
   /**
    * Display a modal box allowing to create the new document from a template when clicking on broken links.
    */
@@ -433,9 +433,9 @@ Object.extend(XWiki, {
               }
           });
 
-          var spans = document.body.select("span.wikicreatelink"); 
+          var spans = document.body.select("span.wikicreatelink");
           for (var i = 0; i < spans.length; i++) {
-              spans[i].down('a').observe('click', function(event) {               
+              spans[i].down('a').observe('click', function(event) {
                   new Ajax.Request(event.currentTarget.href + '&xpage=createinline&ajax=1', {
                       method:'get',
                       onSuccess: function(transport) {
@@ -449,21 +449,21 @@ Object.extend(XWiki, {
                       onFailure: function() {
                         new XWiki.widgets.Notification("$msg.get('core.create.ajax.error')", 'error', {inactive: true}).show();
                       }
-                  });                 
+                  });
                   event.stop();
               });
           }
       }
   },
-  
+
   /**
    * Watchlist methods.
    */
   watchlist : {
- 
+
     /**
      * Mapping between link IDs and associated actions.
-     */    
+     */
     actionsMap : {
         'tmWatchDocument' : 'adddocument',
         'tmUnwatchDocument' : 'removedocument',
@@ -484,24 +484,24 @@ Object.extend(XWiki, {
         'tmWatchWiki' : 'tmUnwatchWiki',
         'tmUnwatchWiki' : 'tmWatchWiki'
     },
-    
+
     /**
      * Execute a watchlist action (add or remove the given document/space/wiki from watchlist).
      *
      * @param element the element that fired the action.
      */
     executeAction : function(element) {
-        var surl = window.docgeturl + "?xpage=watch&do=" + this.actionsMap[element.id];        
+        var surl = window.docgeturl + "?xpage=watch&do=" + this.actionsMap[element.id];
         var myAjax = new Ajax.Request(
           surl,
           {
             method: 'get',
             onComplete: function() {
               if (element.nodeName == 'A') {
-                element.parentNode.toggleClassName('hidden');               
+                element.parentNode.toggleClassName('hidden');
                 $(XWiki.watchlist.flowMap[element.id]).parentNode.toggleClassName('hidden');
               } else {
-                element.toggleClassName('hidden');              
+                element.toggleClassName('hidden');
                 $(XWiki.watchlist.flowMap[element.id]).toggleClassName('hidden');
               }
             }
@@ -529,7 +529,7 @@ Object.extend(XWiki, {
                 while (element.id == '') {
                     element = element.parentNode;
                 }
-                XWiki.watchlist.executeAction(element);                 
+                XWiki.watchlist.executeAction(element);
               });
           }
         }
@@ -585,7 +585,7 @@ Object.extend(XWiki, {
     erase:function(name) {
         XWiki.cookies.create(name,"",-1);
     }
-    
+
   },
 
   /**
@@ -1355,7 +1355,7 @@ document.observe('xwiki:dom:loaded', function() {
             resultsParameter : "searchResults",
             resultId : "id",
             resultValue : "pageFullName",
-            resultInfo : "pageFullName"     
+            resultInfo : "pageFullName"
         },
         "spaces" : {
             script: XWiki.Document.getRestSearchURL("scope=spaces&number=10&media=json&"),
@@ -1366,7 +1366,7 @@ document.observe('xwiki:dom:loaded', function() {
             resultsParameter : "searchResults",
             resultId : "id",
             resultValue : "space",
-            resultInfo : "space"     
+            resultInfo : "space"
         },
         "users" : {
             script: XWiki.currentDocument.getURL('get', 'xpage=uorgsuggest&classname=XWiki.XWikiUsers&wiki=local&uorg=user&'),

@@ -26,9 +26,10 @@ import java.net.URL;
 import java.net.MalformedURLException;
 
 import org.apache.commons.lang.RandomStringUtils;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.hibernate.Query;
 import org.hibernate.Session;
-import org.jfree.util.Log;
 import org.xwiki.observation.EventListener;
 import org.xwiki.observation.ObservationManager;
 import org.xwiki.observation.event.AnnotationAddEvent;
@@ -72,6 +73,9 @@ import com.sun.syndication.io.SyndFeedOutput;
 @SuppressWarnings("serial")
 public class ActivityStreamImpl implements ActivityStream, EventListener
 {
+    /** Logging helper object. */
+    private static final Log LOG = LogFactory.getLog(ActivityStreamImpl.class);
+
     /**
      * Key used to store the request ID in the context.
      */
@@ -951,7 +955,7 @@ public class ActivityStreamImpl implements ActivityStream, EventListener
             try {
                 addDocumentActivityEvent(streamName, currentDoc, eventType, msgPrefix + eventType, params, context);
             } catch (ActivityStreamException e) {
-                Log.error("Exception while trying to add a document activity event, updated document: [" + wiki + ":"
+                LOG.error("Exception while trying to add a document activity event, updated document: [" + wiki + ":"
                     + currentDoc.getFullName() + "]");
             }
         }

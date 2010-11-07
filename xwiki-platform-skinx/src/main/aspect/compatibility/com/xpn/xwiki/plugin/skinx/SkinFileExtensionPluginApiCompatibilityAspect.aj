@@ -38,7 +38,7 @@ public aspect SkinFileExtensionPluginApiCompatibilityAspect
     private static Map<String, String> compatibilityMap = new HashMap<String, String>();
 
     static {
-        // fullScreen script has been moved and renamed in XWiki 2.6RC2 / 2.7M1 See   
+        // fullScreen script has been moved and renamed in XWiki 2.6RC2 / 2.7M1 See XWIKI-5659
         compatibilityMap.put("js/xwiki/editors/fullScreenEdit.js", "uicomponents/widgets/fullScreen.js");
         compatibilityMap.put("js/xwiki/editors/fullScreenEdit.css", "uicomponents/widgets/fullScreen.css");
     }

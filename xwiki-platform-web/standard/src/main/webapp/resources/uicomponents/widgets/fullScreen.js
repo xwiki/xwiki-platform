@@ -49,7 +49,7 @@ XWiki.widgets.FullScreen = Class.create({
     // The controls that will close the fullscreen
     this.createCloseButtons();
     // Prepare textareas / maximizable elements for full screen editing
-    $$('textarea', 'div.maximizable').each(function(element) {
+    $$('textarea', '.maximizable').each(function(element) {
       this.addBehavior(element);
     }.bind(this));
     // The GWT editor removes the textarea from the document, thus should be treated separately
@@ -83,9 +83,9 @@ XWiki.widgets.FullScreen = Class.create({
     } else if (this.isWysiwyg10Field(item)) {
       this.addWysiwyg10FieldButton(item);
     } else {
-	  // a div element with class maximazable
-	  this.addElementButton(item);
-	}
+      // a div element with class maximazable
+      this.addElementButton(item);
+    }
   },
   addWysiwyg20Listener : function () {
     document.observe('xwiki:wysiwyg:created', this.wysiwyg20Created.bindAsEventListener(this));
@@ -192,7 +192,7 @@ XWiki.widgets.FullScreen = Class.create({
     return true;
   },
   addElementButton: function(element) {
-	Element.insert(element, {before: this.createOpenLink(element)});
+    Element.insert(element, {before: this.createOpenLink(element)});
   },
   addWikiFieldButton : function (textarea) {
     Element.insert(textarea, {before: this.createOpenLink(textarea)});

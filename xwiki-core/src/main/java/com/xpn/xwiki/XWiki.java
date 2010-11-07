@@ -7569,8 +7569,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface, EventListener
                 }
             }
         } catch (XWikiException ex) {
-            // TODO Auto-generated catch block
-            ex.printStackTrace();
+            LOG.warn("Failed to refine events: " + ex.getMessage());
         }
     }
 

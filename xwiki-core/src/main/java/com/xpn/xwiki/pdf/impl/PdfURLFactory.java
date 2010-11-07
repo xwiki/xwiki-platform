@@ -78,7 +78,7 @@ public class PdfURLFactory extends XWikiServletURLFactory
         try {
             return getURL(wiki, space, name, filename, revision, context);
         } catch (Exception ex) {
-            LOG.warn("Failed to save image for PDF export", ex);
+            LOG.warn("Failed to save image for PDF export: " + ex.getMessage());
             return super.createAttachmentRevisionURL(filename, space, name, revision, wiki, context);
         }
     }

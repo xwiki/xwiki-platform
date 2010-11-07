@@ -6,16 +6,16 @@ if (typeof(XWiki) == 'undefined') {
   XWiki = new Object();
 }
 // Make sure the editors 'namespace' exists.
-if (typeof(XWiki.editors) == 'undefined') {
-  XWiki.editors = new Object();
+if (typeof(XWiki.widgets) == 'undefined') {
+  XWiki.widgets = new Object();
 }
 
 /**
- * Full screen editing for textarea.
+ * Full screen editing for textareas or maximizable elements.
  *
  * TODO Revisit once the new WYSIWYG supports inline editing.
  */
-XWiki.editors.FullScreenEditing = Class.create({
+XWiki.widgets.FullScreen = Class.create({
   // Some layout settings, to be customized for other skins
   /** Maximized element margins */
   margin : 0,
@@ -48,9 +48,9 @@ XWiki.editors.FullScreenEditing = Class.create({
     this.toolbarPlaceholder = new Element("span");
     // The controls that will close the fullscreen
     this.createCloseButtons();
-    // Prepare textareas in the form for full screen editing
-    $$('textarea').each(function(textarea) {
-      this.addBehavior(textarea);
+    // Prepare textareas / maximizable elements for full screen editing
+    $$('textarea', 'div.maximizable').each(function(element) {
+      this.addBehavior(element);
     }.bind(this));
     // The GWT editor removes the textarea from the document, thus should be treated separately
     $$('.xRichTextEditor').each(function(item) {
@@ -82,7 +82,10 @@ XWiki.editors.FullScreenEditing = Class.create({
       this.addWikiFieldButton(item);
     } else if (this.isWysiwyg10Field(item)) {
       this.addWysiwyg10FieldButton(item);
-    }
+    } else {
+	  // a div element with class maximazable
+	  this.addElementButton(item);
+	}
   },
   addWysiwyg20Listener : function () {
     document.observe('xwiki:wysiwyg:created', this.wysiwyg20Created.bindAsEventListener(this));
@@ -187,6 +190,9 @@ XWiki.editors.FullScreenEditing = Class.create({
       item._x_fullScreenLoader = false;
     }
     return true;
+  },
+  addElementButton: function(element) {
+	Element.insert(element, {before: this.createOpenLink(element)});
   },
   addWikiFieldButton : function (textarea) {
     Element.insert(textarea, {before: this.createOpenLink(textarea)});
@@ -487,5 +493,5 @@ XWiki.editors.FullScreenEditing = Class.create({
 
 // Create the fullscreen behavior on startup.
 document.observe('xwiki:dom:loaded', function() {
-  new XWiki.editors.FullScreenEditing();
+  new XWiki.widgets.FullScreen();
 });

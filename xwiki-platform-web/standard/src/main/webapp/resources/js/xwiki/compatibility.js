@@ -17,6 +17,19 @@ function warn(message){
 }
 
 /**
+ * Deprecated since 2.6RC2
+ */
+if (typeof XWiki.widgets == 'object' && typeof XWiki.widgets.FullScreen == 'function') {
+  XWiki.editors.FullScreenEditing = Class.create(XWiki.widgets.FullScreen, {
+    initialize: function($super){
+      warn("XWiki.editors.FullScreenEditing is deprecated since XWiki 2.6RC2. Use XWiki.widgets.FullScreen instead.");
+      $super();
+    }
+  });
+}
+
+
+/**
  * _xwk is an old namespace for XWiki code that was optional
  * Deprecated since 2.6RC1
  */

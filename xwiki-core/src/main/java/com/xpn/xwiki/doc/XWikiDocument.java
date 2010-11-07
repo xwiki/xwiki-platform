@@ -5670,12 +5670,48 @@ public class XWikiDocument implements DocumentModelBridge
             xwiki.saveDocument(backlinkDocument, saveMessage, true, context);
         }
 
-        // Step 4: Delete the old document
+        // Step 4: Refactor the links contained in the document
+        XWikiDocument newDocument = xwiki.getDocument(newDocumentReference, context);
+        XDOM newDocumentXDOM = newDocument.getXDOM();
+        List<LinkBlock> linkBlockList = newDocumentXDOM.getChildrenByType(LinkBlock.class, true);
+        XWikiDocument currentContextDoc = context.getDoc();
+
+        try {
+            boolean modified = false;
+            for (LinkBlock linkBlock : linkBlockList) {
+                ResourceReference linkReference = linkBlock.getReference();
+                if (linkReference.getType().equals(ResourceType.DOCUMENT)) {
+                    context.setDoc(this);
+                    DocumentReference currentLinkReference =
+                        this.currentDocumentReferenceResolver.resolve(linkReference.getReference());
+
+                    context.setDoc(newDocument);
+                    DocumentReference newLinkReference =
+                        this.currentDocumentReferenceResolver.resolve(linkReference.getReference());
+
+                    if (!newLinkReference.equals(currentLinkReference)) {
+                        modified = true;
+                        linkReference.setReference(this.compactWikiEntityReferenceSerializer
+                            .serialize(currentLinkReference));
+                    }
+                }
+            }
+            // Set new content and save document if needed
+            if (modified) {
+                newDocument.setContent(newDocumentXDOM);
+                xwiki.saveDocument(newDocument, context);
+            }
+        } finally {
+            // Restore original context
+            context.setDoc(currentContextDoc);
+        }
+
+        // Step 5: Delete the old document
         xwiki.deleteDocument(this, context);
 
-        // Step 5: The current document needs to point to the renamed document as otherwise it's pointing to an
+        // Step 6: The current document needs to point to the renamed document as otherwise it's pointing to an
         // invalid XWikiDocument object as it's been deleted...
-        clone(xwiki.getDocument(newDocumentReference, context));
+        clone(newDocument);
     }
 
     /**

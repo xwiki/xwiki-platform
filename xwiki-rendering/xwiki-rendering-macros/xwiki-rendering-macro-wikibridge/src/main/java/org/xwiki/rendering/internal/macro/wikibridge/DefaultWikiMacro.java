@@ -23,11 +23,11 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.context.Execution;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.observation.ObservationManager;
 import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.block.MacroBlock;
 import org.xwiki.rendering.block.MacroMarkerBlock;
@@ -40,6 +40,8 @@ import org.xwiki.rendering.macro.descriptor.MacroDescriptor;
 import org.xwiki.rendering.macro.descriptor.ParameterDescriptor;
 import org.xwiki.rendering.macro.parameter.MacroParameterException;
 import org.xwiki.rendering.macro.wikibridge.WikiMacro;
+import org.xwiki.rendering.macro.wikibridge.WikiMacroExecutionFinishedEvent;
+import org.xwiki.rendering.macro.wikibridge.WikiMacroExecutionStartsEvent;
 import org.xwiki.rendering.macro.wikibridge.WikiMacroParameters;
 import org.xwiki.rendering.syntax.Syntax;
 import org.xwiki.rendering.transformation.MacroTransformationContext;
@@ -54,11 +56,6 @@ import org.xwiki.rendering.transformation.TransformationContext;
  */
 public class DefaultWikiMacro implements WikiMacro, NestedScriptMacroEnabled
 {
-    /**
-     * They key used to access the current context document stored in XWikiContext.
-     */
-    private static final String CONTEXT_DOCUMENT_KEY = "doc";
-
     /**
      * The key under which macro context will be available in the XWikiContext for scripts.
      */
@@ -88,6 +85,16 @@ public class DefaultWikiMacro implements WikiMacro, NestedScriptMacroEnabled
      * The key under which macro can directly return the resulting {@link List} of {@link Block}.
      */
     private static final String MACRO_RESULT_KEY = "result";
+
+    /**
+     * Event sent before wiki macro execution.
+     */
+    private static final WikiMacroExecutionStartsEvent STARTEXECUTION_EVENT = new WikiMacroExecutionStartsEvent();
+
+    /**
+     * Event sent after wiki macro execution.
+     */
+    private static final WikiMacroExecutionFinishedEvent ENDEXECUTION_EVENT = new WikiMacroExecutionFinishedEvent();
 
     /**
      * The {@link MacroDescriptor} for this macro.
@@ -175,48 +182,42 @@ public class DefaultWikiMacro implements WikiMacro, NestedScriptMacroEnabled
         }
 
         // Execute the macro
-        Map<String, Object> xwikiContext = null;
-        Object contextDoc = null;
+        ObservationManager observation = null;
         try {
-            Execution execution = this.componentManager.lookup(Execution.class);
-            DocumentAccessBridge docBridge = this.componentManager.lookup(DocumentAccessBridge.class);
+            observation = this.componentManager.lookup(ObservationManager.class);
+        } catch (ComponentLookupException e) {
+            // TODO: maybe log something
+        }
+
+        try {
             Transformation macroTransformation = this.componentManager.lookup(Transformation.class, MACRO_HINT);
 
             // Place macro context inside xwiki context ($context.macro).
-            xwikiContext = (Map<String, Object>) execution.getContext().getProperty("xwikicontext");
+            Execution execution = this.componentManager.lookup(Execution.class);
+            Map<String, Object> xwikiContext = (Map<String, Object>) execution.getContext().getProperty("xwikicontext");
             xwikiContext.put(MACRO_KEY, macroBinding);
-
-            // Save current context document.
-            contextDoc = xwikiContext.get(CONTEXT_DOCUMENT_KEY);
-
-            // Set the macro definition document as the context document, this is required to give the macro access to
-            // it's context ($context.macro) which holds macro parameters, macro content and other important structures.
-            // This workaround ensures that macro code is evaluated with programming rights, which in turn ensures that
-            // $context.macro is accessible within the macro code.
-            xwikiContext.put(CONTEXT_DOCUMENT_KEY, docBridge.getDocument(getDocumentReference()));
 
             MacroBlock wikiMacroBlock = context.getCurrentMacroBlock();
             MacroMarkerBlock wikiMacroMarker =
-                new MacroMarkerBlock(wikiMacroBlock.getId(), wikiMacroBlock.getParameters(), wikiMacroBlock
-                    .getContent(), xdom.getChildren(), wikiMacroBlock.isInline());
+                new MacroMarkerBlock(wikiMacroBlock.getId(), wikiMacroBlock.getParameters(),
+                    wikiMacroBlock.getContent(), xdom.getChildren(), wikiMacroBlock.isInline());
             // otherwise the inner macros will not be able to access the parent DOM
             wikiMacroMarker.setParent(wikiMacroBlock.getParent());
+
+            if (observation != null) {
+                observation.notify(STARTEXECUTION_EVENT, this, macroBinding);
+            }
 
             // Perform internal macro transformations.
             TransformationContext txContext = new TransformationContext(context.getXDOM(), this.syntax);
             macroTransformation.transform(wikiMacroMarker, txContext);
-            
+
             return extractResult(wikiMacroMarker.getChildren(), macroBinding, context);
         } catch (Exception ex) {
             throw new MacroExecutionException("Error while performing internal macro transformations", ex);
         } finally {
-            if (null != xwikiContext) {
-                // Remove macro context from XWiki context.
-                xwikiContext.remove(MACRO_KEY);
-                if (null != contextDoc) {
-                    // Reset the context document.
-                    xwikiContext.put(CONTEXT_DOCUMENT_KEY, contextDoc);
-                }
+            if (observation != null) {
+                observation.notify(ENDEXECUTION_EVENT, this);
             }
         }
     }

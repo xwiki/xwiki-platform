@@ -37,6 +37,12 @@ import org.xwiki.rendering.macro.wikibridge.WikiMacroExecutionStartsEvent;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.doc.XWikiDocument;
 
+/**
+ * Make sure to execute wiki macro with a properly configured context and especially which user programming right is
+ * tested on.
+ * 
+ * @version $Id$
+ */
 @Component("WikiMacroExecutionEventListener")
 public class WikiMacroExecutionEventListener extends AbstractLogEnabled implements EventListener
 {
@@ -98,7 +104,7 @@ public class WikiMacroExecutionEventListener extends AbstractLogEnabled implemen
     {
         XWikiContext xwikiContext = (XWikiContext) this.execution.getContext().getProperty("xwikicontext");
         XWikiDocument contextDoc = xwikiContext.getDoc();
-        
+
         if (event instanceof WikiMacroExecutionStartsEvent) {
             // Set context document content author as macro author so that programming right is tested on the right
             // user
@@ -107,7 +113,7 @@ public class WikiMacroExecutionEventListener extends AbstractLogEnabled implemen
             try {
                 wikiMacroDocument =
                     (XWikiDocument) this.documentAccessBridge.getDocument(wikiMacro.getDocumentReference());
-                
+
                 // Set context document content author as macro author so that programming right is tested on the right
                 // user. It's cloned to make sure it not really modifying the real document but only do that for the
                 // current context.
@@ -122,7 +128,7 @@ public class WikiMacroExecutionEventListener extends AbstractLogEnabled implemen
             // Restore context document
             try {
                 contextDoc = (XWikiDocument) this.documentAccessBridge.getDocument(contextDoc.getDocumentReference());
-                
+
                 xwikiContext.setDoc(contextDoc);
             } catch (Exception e) {
                 Log.error("Failed to setup context after wiki macro execution");

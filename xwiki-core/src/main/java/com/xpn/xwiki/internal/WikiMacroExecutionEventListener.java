@@ -52,6 +52,17 @@ public class WikiMacroExecutionEventListener extends AbstractLogEnabled implemen
     private static final String NAME = "WikiMacroExecutionEventListener";
 
     /**
+     * The events to match.
+     */
+    private static final List<Event> EVENTS = new ArrayList<Event>()
+    {
+        {
+            add(new WikiMacroExecutionStartsEvent());
+            add(new WikiMacroExecutionFinishedEvent());
+        }
+    };
+
+    /**
      * Used to extract the {@link XWikiContext}.
      */
     @Requirement
@@ -62,17 +73,6 @@ public class WikiMacroExecutionEventListener extends AbstractLogEnabled implemen
      */
     @Requirement
     private DocumentAccessBridge documentAccessBridge;
-
-    /**
-     * The events to match.
-     */
-    private static final List<Event> EVENTS = new ArrayList<Event>()
-    {
-        {
-            add(new WikiMacroExecutionStartsEvent());
-            add(new WikiMacroExecutionFinishedEvent());
-        }
-    };
 
     /**
      * {@inheritDoc}

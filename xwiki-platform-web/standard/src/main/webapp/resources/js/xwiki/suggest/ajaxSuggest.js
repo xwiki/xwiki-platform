@@ -392,13 +392,13 @@ var XWiki = (function(XWiki){
     if (!list)
       return false;
 
-    var n;
+    var n, elem;
 
     if (this.iHighlighted) {
       if (key == 40)
-        elem = this.iHighlighted.next();
+        elem = this.iHighlighted.next() || list.down('li');
       else if (key == 38)
-        elem = this.iHighlighted.previous();
+        elem = this.iHighlighted.previous() || list.down('li:last-child');
     }
     else {
       if (key == 40)
@@ -409,7 +409,7 @@ var XWiki = (function(XWiki){
         }
     }
 
-    if (typeof elem != 'undefined') {
+    if (elem) {
       this.setHighlight(elem);
     }
   },

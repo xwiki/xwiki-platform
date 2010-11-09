@@ -48,6 +48,7 @@
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-assembly-plugin</artifactId>
         <configuration>
+          <appendAssemblyId>false</appendAssemblyId>
           <!-- Don't attach the zip to the project since we don't want to install/deploy it. It's only temporary and
                it's renamed to an XPI file by the AntRun plugin below. -->
           <attach>false</attach>

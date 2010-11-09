@@ -90,6 +90,7 @@
           <execution>
             <phase>package</phase>
             <configuration>
+              <appendAssemblyId>false</appendAssemblyId>
               <descriptors>
                 <descriptor>${basedir}/src/main/assembly/distribution.xml</descriptor>
               </descriptors>

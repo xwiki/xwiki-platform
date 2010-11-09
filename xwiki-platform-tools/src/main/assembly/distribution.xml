@@ -21,6 +21,7 @@
 -->
 
 <assembly>
+  <id>distribution</id>
   <formats>
     <format>zip</format>
   </formats>
@@ -30,16 +31,12 @@
       <!-- Remove versions so that the shell script used to start Jetty can always refer to start.jar -->
       <outputFileNameMapping>start.jar</outputFileNameMapping>
       <outputDirectory>/jetty</outputDirectory>
-      <!-- Uncomment when we move to version 2.2 beta 3 of the Assembly plugin since it's not supported in 2.2 beta 1 (and not needed) -->
-      <!--useProjectArtifact>false</useProjectArtifact-->
       <includes>
         <include>org.mortbay.jetty:start</include>
       </includes>
     </dependencySet>
     <dependencySet>
       <outputDirectory>/jetty/lib</outputDirectory>
-      <!-- Uncomment when we move to version 2.2 beta 3 of the Assembly plugin since it's not supported in 2.2 beta 1 (and not needed) -->
-      <!--useProjectArtifact>false</useProjectArtifact-->
       <excludes>
         <exclude>org.mortbay.jetty:start</exclude>
       </excludes>

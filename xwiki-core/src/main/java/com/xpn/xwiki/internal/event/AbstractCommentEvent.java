@@ -16,56 +16,73 @@
  * License along with this software; if not, write to the Free
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+ *
  */
-package org.xwiki.observation.event;
+package com.xpn.xwiki.internal.event;
 
+import org.xwiki.observation.event.AbstractDocumentEvent;
 import org.xwiki.observation.event.filter.EventFilter;
 
-
 /**
- * An event triggered just before evaluation of a script macro (Groovy, Velocity, etc.) is started. The script will not
- * be executed if this event is canceled.
- * <p>
- * This event is supposed to be sent with {@link org.xwiki.rendering.transformation.MacroTransformationContext} as the
- * source and {@link org.xwiki.rendering.macro.script.ScriptMacroParameters} as data.</p>
+ * Base class for all comment {@link org.xwiki.observation.event.Event events}.
  * 
  * @version $Id$
- * @since 2.5M1
- * @see ScriptEvaluationFinishedEvent
+ * @since 2.6RC2
  */
-public class ScriptEvaluationStartsEvent extends AbstractCancelableEvent
+public abstract class AbstractCommentEvent extends AbstractDocumentEvent
 {
-    /** Serial version ID. Increment only if the <i>serialized</i> version of this class changes. */
+    /**
+     * The version identifier for this Serializable class. Increment only if the <i>serialized</i> form of the class
+     * changes.
+     */
     private static final long serialVersionUID = 1L;
+
+    /**
+     * The comment that is used in events.
+     */
+    private String identifier;
 
     /**
      * Constructor initializing the event filter with an
      * {@link org.xwiki.observation.event.filter.AlwaysMatchingEventFilter}, meaning that this event will match any
-     * other event of the same type.
+     * other comment event (add, update, delete).
      */
-    public ScriptEvaluationStartsEvent()
+    public AbstractCommentEvent()
     {
+        super();
     }
 
     /**
      * Constructor initializing the event filter with a {@link org.xwiki.observation.event.filter.FixedNameEventFilter},
-     * meaning that this event will match only events of the same type affecting the same passed name.
-     *
-     * @param scriptMacroName name of the macro to match, e.g. "velocity"
+     * meaning that this event will match only comment events affecting the document matching the passed document name.
+     * 
+     * @param documentName the name of the updated document to match
+     * @param identifier the identifier of the comment added/updated/deleted
      */
-    public ScriptEvaluationStartsEvent(String scriptMacroName)
+    public AbstractCommentEvent(String documentName, String identifier)
     {
-        super(scriptMacroName);
+        super(documentName);
+        this.identifier = identifier;
     }
 
     /**
      * Constructor using a custom {@link EventFilter}.
-     *
+     * 
      * @param eventFilter the filter to use for matching events
      */
-    public ScriptEvaluationStartsEvent(EventFilter eventFilter)
+    public AbstractCommentEvent(EventFilter eventFilter)
     {
         super(eventFilter);
     }
-}
 
+    /**
+     * Retrieves the content of the comment added/updated/deleted in the event.
+     * 
+     * @return comment identifier
+     */
+    public String getIdentifier()
+    {
+        return identifier;
+    }
+
+}

@@ -195,6 +195,20 @@
                      in CLIRR. -->
                 <exclude>org/xwiki/officeimporter/openoffice/OpenOfficeManager$ManagerState</exclude>
                 <!-- To be removed when we release 2.6 -->
+                <exclude>org/xwiki/observation/event/AbstractAnnotationEvent</exclude>
+                <exclude>org/xwiki/observation/event/AnnotationAddEvent</exclude>
+                <exclude>org/xwiki/observation/event/AnnotationDeleteEvent</exclude>
+                <exclude>org/xwiki/observation/event/AnnotationUpdateEvent</exclude>
+                <exclude>org/xwiki/observation/event/AbstractAttachmentEvent</exclude>
+                <exclude>org/xwiki/observation/event/AttachmentAddEvent</exclude>
+                <exclude>org/xwiki/observation/event/AttachmentDeleteEvent</exclude>
+                <exclude>org/xwiki/observation/event/AttachmentUpdateEvent</exclude>
+                <exclude>org/xwiki/observation/event/AbstractCommentEvent</exclude>
+                <exclude>org/xwiki/observation/event/CommentAddEvent</exclude>
+                <exclude>org/xwiki/observation/event/CommentDeleteEvent</exclude>
+                <exclude>org/xwiki/observation/event/CommentUpdateEvent</exclude>
+                <exclude>org/xwiki/observation/event/ScriptEvaluationFinishedEvent</exclude>
+                <exclude>org/xwiki/observation/event/ScriptEvaluationStartsEvent</exclude>
               </excludes>
             </configuration>
           </plugin>

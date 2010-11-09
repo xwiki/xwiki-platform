@@ -32,7 +32,7 @@ import org.xwiki.rendering.macro.script.ScriptMacroParameters;
 import org.xwiki.rendering.transformation.MacroTransformationContext;
 
 /**
- * Listens to {@link org.xwiki.observation.event.ScriptEvaluationStartsEvent} and cancels the evaluation if the script
+ * Listens to {@link org.xwiki.script.event.ScriptEvaluatingEvent} and cancels the evaluation if the script
  * is nested.
  * 
  * @version $Id$

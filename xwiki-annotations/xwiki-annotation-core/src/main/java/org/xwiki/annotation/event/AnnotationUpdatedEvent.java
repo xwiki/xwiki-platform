@@ -18,16 +18,17 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  *
  */
-package org.xwiki.observation.event;
+package org.xwiki.annotation.event;
 
 import org.xwiki.observation.event.filter.EventFilter;
 
 /**
- * An event triggered when an attachment is updated.
+ * An event triggered when an annotation is updated.
  * 
  * @version $Id$
+ * @since 2.6RC2
  */
-public class AttachmentUpdateEvent extends AbstractAttachmentEvent
+public class AnnotationUpdatedEvent extends AbstractAnnotationEvent
 {
     /**
      * The version identifier for this Serializable class. Increment only if the <i>serialized</i> form of the class
@@ -38,24 +39,24 @@ public class AttachmentUpdateEvent extends AbstractAttachmentEvent
     /**
      * Constructor initializing the event filter with an
      * {@link org.xwiki.observation.event.filter.AlwaysMatchingEventFilter}, meaning that this event will match any
-     * other attachment update event.
+     * other annotation update event.
      */
-    public AttachmentUpdateEvent()
+    public AnnotationUpdatedEvent()
     {
         super();
     }
 
     /**
      * Constructor initializing the event filter with a {@link org.xwiki.observation.event.filter.FixedNameEventFilter},
-     * meaning that this event will match only attachment update events affecting the document matching the passed
+     * meaning that this event will match only annotation update events affecting the document matching the passed
      * document name.
      * 
      * @param documentName the name of the document to match
-     * @param name the name of the updated attachment
+     * @param identifier the identifier of the updated annotation
      */
-    public AttachmentUpdateEvent(String documentName, String name)
+    public AnnotationUpdatedEvent(String documentName, String identifier)
     {
-        super(documentName, name);
+        super(documentName, identifier);
     }
 
     /**
@@ -63,7 +64,7 @@ public class AttachmentUpdateEvent extends AbstractAttachmentEvent
      * 
      * @param eventFilter the filter to use for matching events
      */
-    public AttachmentUpdateEvent(EventFilter eventFilter)
+    public AnnotationUpdatedEvent(EventFilter eventFilter)
     {
         super(eventFilter);
     }

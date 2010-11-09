@@ -18,17 +18,17 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  *
  */
-package org.xwiki.observation.event;
+package com.xpn.xwiki.internal.event;
 
 import org.xwiki.observation.event.filter.EventFilter;
 
 /**
- * An event triggered when an annotation is deleted.
+ * An event triggered when a comment is updated.
  * 
  * @version $Id$
+ * @since 2.6RC2
  */
-
-public class AnnotationDeleteEvent extends AbstractAnnotationEvent
+public class CommentUpdatedEvent extends AbstractCommentEvent
 {
     /**
      * The version identifier for this Serializable class. Increment only if the <i>serialized</i> form of the class
@@ -39,22 +39,22 @@ public class AnnotationDeleteEvent extends AbstractAnnotationEvent
     /**
      * Constructor initializing the event filter with an
      * {@link org.xwiki.observation.event.filter.AlwaysMatchingEventFilter}, meaning that this event will match any
-     * other annotation delete event.
+     * other comment update event.
      */
-    public AnnotationDeleteEvent()
+    public CommentUpdatedEvent()
     {
         super();
     }
 
     /**
      * Constructor initializing the event filter with a {@link org.xwiki.observation.event.filter.FixedNameEventFilter},
-     * meaning that this event will match only annotation delete events affecting the document matching the passed
-     * document name.
+     * meaning that this event will match only comment update events affecting the document matching the passed document
+     * name.
      * 
      * @param documentName the name of the document to match
-     * @param identifier the identifier of the deleted annotation
+     * @param identifier the identifier of the updated comment
      */
-    public AnnotationDeleteEvent(String documentName, String identifier)
+    public CommentUpdatedEvent(String documentName, String identifier)
     {
         super(documentName, identifier);
     }
@@ -64,7 +64,7 @@ public class AnnotationDeleteEvent extends AbstractAnnotationEvent
      * 
      * @param eventFilter the filter to use for matching events
      */
-    public AnnotationDeleteEvent(EventFilter eventFilter)
+    public CommentUpdatedEvent(EventFilter eventFilter)
     {
         super(eventFilter);
     }

@@ -18,7 +18,7 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  *
  */
-package org.xwiki.observation.event;
+package com.xpn.xwiki.internal.event;
 
 import org.xwiki.observation.event.filter.EventFilter;
 
@@ -26,8 +26,9 @@ import org.xwiki.observation.event.filter.EventFilter;
  * An event triggered when a comment is deleted.
  * 
  * @version $Id$
+ * @since 2.6RC2
  */
-public class CommentDeleteEvent extends AbstractCommentEvent
+public class CommentDeletedEvent extends AbstractCommentEvent
 {
     /**
      * The version identifier for this Serializable class. Increment only if the <i>serialized</i> form of the class
@@ -40,7 +41,7 @@ public class CommentDeleteEvent extends AbstractCommentEvent
      * {@link org.xwiki.observation.event.filter.AlwaysMatchingEventFilter}, meaning that this event will match any
      * other comment delete event.
      */
-    public CommentDeleteEvent()
+    public CommentDeletedEvent()
     {
         super();
     }
@@ -53,7 +54,7 @@ public class CommentDeleteEvent extends AbstractCommentEvent
      * @param documentName the name of the document to match
      * @param identifier the identifier of the deleted comment
      */
-    public CommentDeleteEvent(String documentName, String identifier)
+    public CommentDeletedEvent(String documentName, String identifier)
     {
         super(documentName, identifier);
     }
@@ -63,7 +64,7 @@ public class CommentDeleteEvent extends AbstractCommentEvent
      * 
      * @param eventFilter the filter to use for matching events
      */
-    public CommentDeleteEvent(EventFilter eventFilter)
+    public CommentDeletedEvent(EventFilter eventFilter)
     {
         super(eventFilter);
     }

@@ -18,17 +18,17 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  *
  */
-package org.xwiki.observation.event;
+package com.xpn.xwiki.internal.event;
 
 import org.xwiki.observation.event.filter.EventFilter;
 
 /**
- * An event triggered when an annotation is added.
+ * An event triggered when a comment is added.
  * 
  * @version $Id$
+ * @since 2.6RC2
  */
-
-public class AnnotationAddEvent extends AbstractAnnotationEvent
+public class CommentAddedEvent extends AbstractCommentEvent
 {
     /**
      * The version identifier for this Serializable class. Increment only if the <i>serialized</i> form of the class
@@ -39,22 +39,22 @@ public class AnnotationAddEvent extends AbstractAnnotationEvent
     /**
      * Constructor initializing the event filter with an
      * {@link org.xwiki.observation.event.filter.AlwaysMatchingEventFilter}, meaning that this event will match any
-     * other annotation add event.
+     * other comment add event.
      */
-    public AnnotationAddEvent()
+    public CommentAddedEvent()
     {
         super();
     }
 
     /**
      * Constructor initializing the event filter with a {@link org.xwiki.observation.event.filter.FixedNameEventFilter},
-     * meaning that this event will match only annotation add events affecting the document matching the passed document
+     * meaning that this event will match only comment add events affecting the document matching the passed document
      * name.
      * 
      * @param documentName the name of the document to match
-     * @param identifier the identifier of the added annotation
+     * @param identifier the identifier of the added comment
      */
-    public AnnotationAddEvent(String documentName, String identifier)
+    public CommentAddedEvent(String documentName, String identifier)
     {
         super(documentName, identifier);
     }
@@ -64,8 +64,9 @@ public class AnnotationAddEvent extends AbstractAnnotationEvent
      * 
      * @param eventFilter the filter to use for matching events
      */
-    public AnnotationAddEvent(EventFilter eventFilter)
+    public CommentAddedEvent(EventFilter eventFilter)
     {
         super(eventFilter);
     }
+
 }

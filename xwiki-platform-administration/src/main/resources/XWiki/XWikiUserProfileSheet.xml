@@ -94,10 +94,8 @@ $xwiki.ssx.use('Main.Dashboard')##
       &lt;div class="userRecentChanges"&gt;
         &lt;h1&gt;$msg.get('platform.core.profile.section.recentactivity')&lt;/h1&gt;
 {{/html}}
-#set ($rcAuthor = [$doc.fullName])
-#set ($rcChangesNb = 10)
 
-{{recentactivity changesNb="$!rcChangesNb" rcAuthor="$!rcAuthor" /}}
+{{activity authors="${doc.fullName}" /}}
 
 {{html clean="false"}}
       &lt;/div&gt;

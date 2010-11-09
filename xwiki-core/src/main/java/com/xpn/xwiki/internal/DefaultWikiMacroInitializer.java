@@ -93,6 +93,31 @@ public class DefaultWikiMacroInitializer extends AbstractLogEnabled implements W
      */
     public void registerExistingWikiMacros() throws Exception
     {
+        registerExistingWikiMacros(true, null);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public void registerExistingWikiMacros(String wiki) throws Exception
+    {
+        registerExistingWikiMacros(false, wiki);
+    }
+
+    /**
+     * Registers the wiki macros for all the wikis or a specific wiki, according to the passed parameter. <br />
+     * FIXME: I don't like this way of passing params, but it's kinda the best I can do for the moment without
+     * duplicating at least the logic inside this function, if not some code as well.
+     * 
+     * @param local false if only macros in a specified wiki are to be registered, in which case, the name of the wiki
+     *            should be specified in the second parameter, false if the macros in all the wikis should be
+     *            registered, in which case the value of the second parameter is ignored
+     * @param wiki the name of the wiki to register macros for, if local is true
+     * @throws Exception if xwiki classes required for defining wiki macros are missing or if an error occurs while
+     *             searching for existing wiki macros.
+     */
+    private void registerExistingWikiMacros(boolean local, String wiki) throws Exception
+    {
         XWikiContext xcontext = getContext();
 
         // Check whether xwiki classes required for defining wiki macros are present.
@@ -103,19 +128,23 @@ public class DefaultWikiMacroInitializer extends AbstractLogEnabled implements W
             throw new Exception(String.format(message, WIKI_MACRO_CLASS, WIKI_MACRO_PARAMETER_CLASS));
         }
 
-        // Register the wiki macros that exist in each wiki
+        // Register the wiki macros that exist
         String originalWiki = xcontext.getDatabase();
         try {
-            Set<String> wikiNames = new HashSet<String>();
-            // Always add the main wiki to the list of wikis for which to load defined wiki macros.
-            wikiNames.add(xcontext.getMainXWiki());
-            // If we're in multi wiki mode add the list of all subwikis
-            if (xcontext.getWiki().isVirtualMode()) {
-                wikiNames.addAll(xcontext.getWiki().getVirtualWikisDatabaseNames(xcontext));
-            }
+            if (!local) {
+                Set<String> wikiNames = new HashSet<String>();
+                // Always add the main wiki to the list of wikis for which to load defined wiki macros.
+                wikiNames.add(xcontext.getMainXWiki());
+                // If we're in multi wiki mode add the list of all subwikis
+                if (xcontext.getWiki().isVirtualMode()) {
+                    wikiNames.addAll(xcontext.getWiki().getVirtualWikisDatabaseNames(xcontext));
+                }
 
-            for (String wikiName : wikiNames) {
-                registerMacrosForWiki(wikiName, xcontext);
+                for (String wikiName : wikiNames) {
+                    registerMacrosForWiki(wikiName, xcontext);
+                }
+            } else {
+                registerMacrosForWiki(wiki, xcontext);
             }
         } finally {
             xcontext.setDatabase(originalWiki);

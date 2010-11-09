@@ -126,7 +126,8 @@ public enum Right
             .put("objectadd", EDIT)
             .put("objectremove", EDIT)
             .put("rollback", EDIT)
-            .put("upload", EDIT);
+            .put("upload", EDIT)
+            .put("create", EDIT);
 
         for (Right level : values()) {
             if (!level.equals(ILLEGAL)) {

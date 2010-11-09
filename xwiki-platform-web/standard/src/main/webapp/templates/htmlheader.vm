@@ -80,7 +80,7 @@
   </head>
   #set($bodyTagName = 'body')
 #else ## Portlet Mode
-  #template("stylesheets2.vm")
+  #template("stylesheets.vm")
   #template("javascript.vm")
   #set($bodyTagName = 'div')
 #end

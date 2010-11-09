@@ -38,3 +38,4 @@ com.xpn.xwiki.internal.cache.DefaultDocumentCache
 com.xpn.xwiki.internal.cache.rendering.DefaultRenderingCache
 com.xpn.xwiki.internal.cache.rendering.DefaultRenderingCacheConfiguration
 com.xpn.xwiki.internal.plugin.image.DefaultImageProcessor
+com.xpn.xwiki.internal.RegisterMacrosOnImportListener

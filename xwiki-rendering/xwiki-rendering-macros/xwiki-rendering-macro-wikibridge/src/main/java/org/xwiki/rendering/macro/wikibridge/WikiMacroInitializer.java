@@ -44,4 +44,13 @@ public interface WikiMacroInitializer
      *             searching for existing wiki macros.
      */
     void registerExistingWikiMacros() throws Exception;
+
+    /**
+     * Searches for all the wiki macro definitions in the specified wiki and registers them against the macro manager.
+     * 
+     * @param wiki the name of the wiki to register wiki macros for
+     * @throws Exception if xwiki classes required for defining wiki macros are missing or if an error occurs while
+     *             searching for existing wiki macros.
+     */
+    void registerExistingWikiMacros(String wiki) throws Exception;
 }

@@ -205,6 +205,7 @@
                 <exclude>org/xwiki/rendering/block/NewLineBlock</exclude><!-- Removed field NEW_LINE_BLOCK-->
                 <exclude>org/xwiki/rendering/configuration/RenderingConfiguration</exclude><!-- Added getTransformations -->
                 <exclude>org/xwiki/annotation/maintainer/AbstractAnnotationMaintainer</exclude>
+                <exclude>org/xwiki/rendering/macro/wikibridge/WikiMacroInitializer</exclude>
                 <exclude>org/xwiki/observation/event/AbstractAnnotationEvent</exclude>
                 <exclude>org/xwiki/observation/event/AnnotationAddEvent</exclude>
                 <exclude>org/xwiki/observation/event/AnnotationDeleteEvent</exclude>

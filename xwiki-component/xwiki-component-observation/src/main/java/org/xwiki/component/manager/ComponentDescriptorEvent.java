@@ -23,7 +23,7 @@ package org.xwiki.component.manager;
 import org.xwiki.observation.event.Event;
 
 /**
- * Base interface for all componets descriptor events.
+ * Base interface for all components descriptor events.
  * 
  * @version $Id$
  */

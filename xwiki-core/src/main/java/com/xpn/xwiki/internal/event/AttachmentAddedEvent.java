@@ -18,17 +18,19 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  *
  */
-package org.xwiki.observation.event;
+package com.xpn.xwiki.internal.event;
 
 import org.xwiki.observation.event.filter.EventFilter;
 
 /**
- * Base class for all attachment {@link Event events}.
+ * An event triggered when an attachment is added.
  * 
  * @version $Id$
+ * @since 2.6RC2
  */
-public class AbstractAttachmentEvent extends AbstractDocumentEvent
+public class AttachmentAddedEvent extends AbstractAttachmentEvent
 {
+
     /**
      * The version identifier for this Serializable class. Increment only if the <i>serialized</i> form of the class
      * changes.
@@ -36,32 +38,26 @@ public class AbstractAttachmentEvent extends AbstractDocumentEvent
     private static final long serialVersionUID = 1L;
 
     /**
-     * The name of the attachment that is used in events.
-     */
-    private String name;
-
-    /**
      * Constructor initializing the event filter with an
      * {@link org.xwiki.observation.event.filter.AlwaysMatchingEventFilter}, meaning that this event will match any
-     * other attachment event (add, update, delete).
+     * other attachment add event.
      */
-    public AbstractAttachmentEvent()
+    public AttachmentAddedEvent()
     {
         super();
     }
 
     /**
      * Constructor initializing the event filter with a {@link org.xwiki.observation.event.filter.FixedNameEventFilter},
-     * meaning that this event will match only attachment events affecting the document matching the passed document
+     * meaning that this event will match only attachment add events affecting the document matching the passed document
      * name.
      * 
-     * @param documentName the name of the updated document to match
-     * @param name the name of the attachment added/updated/deleted
+     * @param documentName the name of the document to match
+     * @param name the name of the added attachment
      */
-    public AbstractAttachmentEvent(String documentName, String name)
+    public AttachmentAddedEvent(String documentName, String name)
     {
-        super(documentName);
-        this.name = name;
+        super(documentName, name);
     }
 
     /**
@@ -69,18 +65,8 @@ public class AbstractAttachmentEvent extends AbstractDocumentEvent
      * 
      * @param eventFilter the filter to use for matching events
      */
-    public AbstractAttachmentEvent(EventFilter eventFilter)
+    public AttachmentAddedEvent(EventFilter eventFilter)
     {
         super(eventFilter);
-    }
-
-    /**
-     * Retrieves the name of the attachment added/updated/deleted in the event.
-     * 
-     * @return name name of the attachment
-     */
-    public String getName()
-    {
-        return name;
     }
 }

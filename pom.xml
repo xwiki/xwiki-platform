@@ -205,6 +205,20 @@
                 <exclude>org/xwiki/rendering/block/NewLineBlock</exclude><!-- Removed field NEW_LINE_BLOCK-->
                 <exclude>org/xwiki/rendering/configuration/RenderingConfiguration</exclude><!-- Added getTransformations -->
                 <exclude>org/xwiki/annotation/maintainer/AbstractAnnotationMaintainer</exclude>
+                <exclude>org/xwiki/observation/event/AbstractAnnotationEvent</exclude>
+                <exclude>org/xwiki/observation/event/AnnotationAddEvent</exclude>
+                <exclude>org/xwiki/observation/event/AnnotationDeleteEvent</exclude>
+                <exclude>org/xwiki/observation/event/AnnotationUpdateEvent</exclude>
+                <exclude>org/xwiki/observation/event/AbstractAttachmentEvent</exclude>
+                <exclude>org/xwiki/observation/event/AttachmentAddEvent</exclude>
+                <exclude>org/xwiki/observation/event/AttachmentDeleteEvent</exclude>
+                <exclude>org/xwiki/observation/event/AttachmentUpdateEvent</exclude>
+                <exclude>org/xwiki/observation/event/AbstractCommentEvent</exclude>
+                <exclude>org/xwiki/observation/event/CommentAddEvent</exclude>
+                <exclude>org/xwiki/observation/event/CommentDeleteEvent</exclude>
+                <exclude>org/xwiki/observation/event/CommentUpdateEvent</exclude>
+                <exclude>org/xwiki/observation/event/ScriptEvaluationFinishedEvent</exclude>
+                <exclude>org/xwiki/observation/event/ScriptEvaluationStartsEvent</exclude>
                 <!-- Following classes moved to the new Macro Transformation Module -->
                 <exclude>org/xwiki/rendering/macro/**</exclude>
                 <exclude>org/xwiki/rendering/transformation/MacroTransformationContext</exclude>

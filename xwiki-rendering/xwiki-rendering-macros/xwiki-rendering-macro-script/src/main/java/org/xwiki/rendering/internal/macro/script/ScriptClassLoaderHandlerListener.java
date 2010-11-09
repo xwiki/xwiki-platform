@@ -31,14 +31,13 @@ import org.xwiki.context.Execution;
 import org.xwiki.observation.EventListener;
 import org.xwiki.observation.event.CancelableEvent;
 import org.xwiki.observation.event.Event;
-import org.xwiki.observation.event.ScriptEvaluationFinishedEvent;
-import org.xwiki.observation.event.ScriptEvaluationStartsEvent;
+import org.xwiki.script.event.ScriptEvaluatedEvent;
+import org.xwiki.script.event.ScriptEvaluatingEvent;
 import org.xwiki.rendering.macro.MacroExecutionException;
 import org.xwiki.rendering.macro.script.ScriptMacroParameters;
 
-
 /**
- * Listens to script evaluation events ({@link ScriptEvaluationStartsEvent} and {@link ScriptEvaluationFinishedEvent}).
+ * Listens to script evaluation events ({@link org.xwiki.script.event.ScriptEvaluatingEvent} and {@link org.xwiki.script.event.ScriptEvaluatedEvent}).
  * Sets the context class loader for the evaluation and restores the original class loader afterwards.
  * 
  * @version $Id$
@@ -91,8 +90,8 @@ public class ScriptClassLoaderHandlerListener implements EventListener
     public List<Event> getEvents()
     {
         List<Event> events = new LinkedList<Event>();
-        events.add(new ScriptEvaluationStartsEvent());
-        events.add(new ScriptEvaluationFinishedEvent());
+        events.add(new ScriptEvaluatingEvent());
+        events.add(new ScriptEvaluatedEvent());
         return events;
     }
 
@@ -106,7 +105,7 @@ public class ScriptClassLoaderHandlerListener implements EventListener
         if (!(data instanceof ScriptMacroParameters)) {
             return;
         }
-        if (event instanceof ScriptEvaluationStartsEvent) {
+        if (event instanceof ScriptEvaluatingEvent) {
             // Set the context class loader to the script CL to ensure that any script engine using the context
             // classloader will work just fine.
             // Note: We must absolutely ensure that we always use the same context CL during the whole execution
@@ -122,7 +121,7 @@ public class ScriptClassLoaderHandlerListener implements EventListener
                 // abort execution
                 ((CancelableEvent) event).cancel(exception.getMessage());
             }
-        } else if (event instanceof ScriptEvaluationFinishedEvent) {
+        } else if (event instanceof ScriptEvaluatedEvent) {
             // Restore original class loader.
             ClassLoader originalClassLoader =
                 (ClassLoader) this.execution.getContext().getProperty(EXECUTION_CONTEXT_ORIG_CLASSLOADER_KEY);

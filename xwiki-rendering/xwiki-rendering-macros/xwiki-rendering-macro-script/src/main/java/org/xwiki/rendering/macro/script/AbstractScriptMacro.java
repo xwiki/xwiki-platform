@@ -29,8 +29,8 @@ import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.context.Execution;
 import org.xwiki.observation.ObservationManager;
-import org.xwiki.observation.event.ScriptEvaluationFinishedEvent;
-import org.xwiki.observation.event.ScriptEvaluationStartsEvent;
+import org.xwiki.script.event.ScriptEvaluatedEvent;
+import org.xwiki.script.event.ScriptEvaluatingEvent;
 import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.block.MacroBlock;
 import org.xwiki.rendering.block.XDOM;
@@ -42,13 +42,12 @@ import org.xwiki.rendering.parser.Parser;
 import org.xwiki.rendering.transformation.MacroTransformationContext;
 import org.xwiki.rendering.util.ParserUtils;
 
-
 /**
  * Base Class for script evaluation macros.
  * <p>
  * It is not obvious to see how macro execution works just from looking at the code. A lot of checking and
- * initialization is done in listeners to the {@link ScriptEvaluationStartsEvent} and
- * {@link ScriptEvaluationFinishedEvent}. E.g. the check for programming rights for JSR223 scripts, check for nested
+ * initialization is done in listeners to the {@link org.xwiki.script.event.ScriptEvaluatingEvent} and
+ * {@link org.xwiki.script.event.ScriptEvaluatedEvent}. E.g. the check for programming rights for JSR223 scripts, check for nested
  * script macros and selecting the right class loader is done there.</p>
  * 
  * @param <P> the type of macro parameters bean.
@@ -181,7 +180,7 @@ public abstract class AbstractScriptMacro<P extends ScriptMacroParameters> exten
         if (!StringUtils.isEmpty(content)) {
             try {
                 // send evaluation starts event
-                ScriptEvaluationStartsEvent event = new ScriptEvaluationStartsEvent(getDescriptor().getId().getId());
+                ScriptEvaluatingEvent event = new ScriptEvaluatingEvent(getDescriptor().getId().getId());
                 observation.notify(event, context, parameters);
                 if (event.isCanceled()) {
                     throw new MacroExecutionException(event.getReason());
@@ -195,7 +194,7 @@ public abstract class AbstractScriptMacro<P extends ScriptMacroParameters> exten
                 }
             } finally {
                 // send evaluation finished event
-                observation.notify(new ScriptEvaluationFinishedEvent(getDescriptor().getId().getId()), context,
+                observation.notify(new ScriptEvaluatedEvent(getDescriptor().getId().getId()), context,
                         parameters);
             }
         }

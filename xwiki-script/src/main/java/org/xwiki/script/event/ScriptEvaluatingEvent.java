@@ -17,23 +17,24 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.observation.event;
+package org.xwiki.script.event;
 
+import org.xwiki.observation.event.AbstractCancelableEvent;
 import org.xwiki.observation.event.filter.EventFilter;
 
-
 /**
- * An event triggered right after evaluation of a script macro (Groovy, Velocity, etc.) was finished (no matter
- * successfully or not).
+ * An event triggered just before evaluation of a script macro (Groovy, Velocity, etc.) is started. The script will not
+ * be executed if this event is canceled.
  * <p>
- * This event is supposed to be sent with {@link org.xwiki.rendering.transformation.MacroTransformationContext} as the
- * source and {@link org.xwiki.rendering.macro.script.ScriptMacroParameters} as data.</p>
+ * This event is supposed to be sent with {@code org.xwiki.rendering.transformation.MacroTransformationContext} as the
+ * source and {@code org.xwiki.rendering.macro.script.ScriptMacroParameters} as data.
+ * </p>
  * 
  * @version $Id$
- * @since 2.5M1
- * @see ScriptEvaluationStartsEvent
+ * @see ScriptEvaluatedEvent
+ * @since 2.6RC2
  */
-public class ScriptEvaluationFinishedEvent extends AbstractFilterableEvent
+public class ScriptEvaluatingEvent extends AbstractCancelableEvent
 {
     /** Serial version ID. Increment only if the <i>serialized</i> version of this class changes. */
     private static final long serialVersionUID = 1L;
@@ -43,8 +44,9 @@ public class ScriptEvaluationFinishedEvent extends AbstractFilterableEvent
      * {@link org.xwiki.observation.event.filter.AlwaysMatchingEventFilter}, meaning that this event will match any
      * other event of the same type.
      */
-    public ScriptEvaluationFinishedEvent()
+    public ScriptEvaluatingEvent()
     {
+        super();
     }
 
     /**
@@ -53,7 +55,7 @@ public class ScriptEvaluationFinishedEvent extends AbstractFilterableEvent
      *
      * @param scriptMacroName name of the macro to match, e.g. "velocity"
      */
-    public ScriptEvaluationFinishedEvent(String scriptMacroName)
+    public ScriptEvaluatingEvent(String scriptMacroName)
     {
         super(scriptMacroName);
     }
@@ -63,7 +65,7 @@ public class ScriptEvaluationFinishedEvent extends AbstractFilterableEvent
      *
      * @param eventFilter the filter to use for matching events
      */
-    public ScriptEvaluationFinishedEvent(EventFilter eventFilter)
+    public ScriptEvaluatingEvent(EventFilter eventFilter)
     {
         super(eventFilter);
     }

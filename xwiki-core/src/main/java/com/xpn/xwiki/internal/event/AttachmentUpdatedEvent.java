@@ -18,16 +18,17 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  *
  */
-package org.xwiki.observation.event;
+package com.xpn.xwiki.internal.event;
 
 import org.xwiki.observation.event.filter.EventFilter;
 
 /**
- * An event triggered when a comment is updated.
+ * An event triggered when an attachment is updated.
  * 
  * @version $Id$
+ * @since 2.6RC2
  */
-public class CommentUpdateEvent extends AbstractCommentEvent
+public class AttachmentUpdatedEvent extends AbstractAttachmentEvent
 {
     /**
      * The version identifier for this Serializable class. Increment only if the <i>serialized</i> form of the class
@@ -38,24 +39,24 @@ public class CommentUpdateEvent extends AbstractCommentEvent
     /**
      * Constructor initializing the event filter with an
      * {@link org.xwiki.observation.event.filter.AlwaysMatchingEventFilter}, meaning that this event will match any
-     * other comment update event.
+     * other attachment update event.
      */
-    public CommentUpdateEvent()
+    public AttachmentUpdatedEvent()
     {
         super();
     }
 
     /**
      * Constructor initializing the event filter with a {@link org.xwiki.observation.event.filter.FixedNameEventFilter},
-     * meaning that this event will match only comment update events affecting the document matching the passed document
-     * name.
+     * meaning that this event will match only attachment update events affecting the document matching the passed
+     * document name.
      * 
      * @param documentName the name of the document to match
-     * @param identifier the identifier of the updated comment
+     * @param name the name of the updated attachment
      */
-    public CommentUpdateEvent(String documentName, String identifier)
+    public AttachmentUpdatedEvent(String documentName, String name)
     {
-        super(documentName, identifier);
+        super(documentName, name);
     }
 
     /**
@@ -63,7 +64,7 @@ public class CommentUpdateEvent extends AbstractCommentEvent
      * 
      * @param eventFilter the filter to use for matching events
      */
-    public CommentUpdateEvent(EventFilter eventFilter)
+    public AttachmentUpdatedEvent(EventFilter eventFilter)
     {
         super(eventFilter);
     }

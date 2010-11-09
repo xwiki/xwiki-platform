@@ -105,15 +105,12 @@ import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.model.reference.WikiReference;
 import org.xwiki.observation.EventListener;
 import org.xwiki.observation.ObservationManager;
-import org.xwiki.observation.event.AnnotationAddEvent;
-import org.xwiki.observation.event.AnnotationDeleteEvent;
-import org.xwiki.observation.event.AnnotationUpdateEvent;
-import org.xwiki.observation.event.AttachmentAddEvent;
-import org.xwiki.observation.event.AttachmentDeleteEvent;
-import org.xwiki.observation.event.AttachmentUpdateEvent;
-import org.xwiki.observation.event.CommentAddEvent;
-import org.xwiki.observation.event.CommentDeleteEvent;
-import org.xwiki.observation.event.CommentUpdateEvent;
+import com.xpn.xwiki.internal.event.AttachmentAddedEvent;
+import com.xpn.xwiki.internal.event.AttachmentDeletedEvent;
+import com.xpn.xwiki.internal.event.AttachmentUpdatedEvent;
+import com.xpn.xwiki.internal.event.CommentAddedEvent;
+import com.xpn.xwiki.internal.event.CommentDeletedEvent;
+import com.xpn.xwiki.internal.event.CommentUpdatedEvent;
 import org.xwiki.observation.event.DocumentDeleteEvent;
 import org.xwiki.observation.event.DocumentSaveEvent;
 import org.xwiki.observation.event.DocumentUpdateEvent;
@@ -7549,11 +7546,11 @@ public class XWiki implements XWikiDocChangeNotificationInterface, EventListener
                 for (ObjectDiff diff : objectChanges) {
                     if (StringUtils.equals(diff.getClassName(), "XWiki.XWikiComments")) {
                         if (StringUtils.equals(diff.getAction(), "object-removed")) {
-                            om.notify(new CommentDeleteEvent(reference, diff.getNumber() + ""), source, data);
+                            om.notify(new CommentDeletedEvent(reference, diff.getNumber() + ""), source, data);
                         } else if (StringUtils.equals(diff.getAction(), "object-added")) {
-                            om.notify(new CommentAddEvent(reference, diff.getNumber() + ""), source, data);
+                            om.notify(new CommentAddedEvent(reference, diff.getNumber() + ""), source, data);
                         } else {
-                            om.notify(new CommentUpdateEvent(reference, diff.getNumber() + ""), source, data);
+                            om.notify(new CommentUpdatedEvent(reference, diff.getNumber() + ""), source, data);
                         }
                     }
                     break;
@@ -7561,11 +7558,11 @@ public class XWiki implements XWikiDocChangeNotificationInterface, EventListener
             }
             for (AttachmentDiff diff : doc.getAttachmentDiff(originalDoc, doc, context)) {
                 if (StringUtils.isEmpty(diff.getOrigVersion())) {
-                    om.notify(new AttachmentAddEvent(reference, diff.getFileName()), source, data);
+                    om.notify(new AttachmentAddedEvent(reference, diff.getFileName()), source, data);
                 } else if (StringUtils.isEmpty(diff.getNewVersion())) {
-                    om.notify(new AttachmentDeleteEvent(reference, diff.getFileName()), source, data);
+                    om.notify(new AttachmentDeletedEvent(reference, diff.getFileName()), source, data);
                 } else {
-                    om.notify(new AttachmentUpdateEvent(reference, diff.getFileName()), source, data);
+                    om.notify(new AttachmentUpdatedEvent(reference, diff.getFileName()), source, data);
                 }
             }
         } catch (XWikiException ex) {

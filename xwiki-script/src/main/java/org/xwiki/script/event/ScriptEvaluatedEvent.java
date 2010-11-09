@@ -16,57 +16,58 @@
  * License along with this software; if not, write to the Free
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
- *
  */
-package org.xwiki.observation.event;
+package org.xwiki.script.event;
 
+import org.xwiki.observation.event.AbstractFilterableEvent;
 import org.xwiki.observation.event.filter.EventFilter;
 
 /**
- * An event triggered when a comment is added.
- * 
+ * An event triggered right after evaluation of a script macro (Groovy, Velocity, etc.) was finished (no matter
+ * successfully or not).
+ * <p>
+ * This event is supposed to be sent with {@code org.xwiki.rendering.transformation.MacroTransformationContext} as the
+ * source and {@code org.xwiki.rendering.macro.script.ScriptMacroParameters} as data.
+ * </p>
+ *
  * @version $Id$
+ * @see ScriptEvaluatingEvent
+ * @since 2.6RC2
  */
-
-public class CommentAddEvent extends AbstractCommentEvent
+public class ScriptEvaluatedEvent extends AbstractFilterableEvent
 {
-    /**
-     * The version identifier for this Serializable class. Increment only if the <i>serialized</i> form of the class
-     * changes.
-     */
+    /** Serial version ID. Increment only if the <i>serialized</i> version of this class changes. */
     private static final long serialVersionUID = 1L;
 
     /**
      * Constructor initializing the event filter with an
      * {@link org.xwiki.observation.event.filter.AlwaysMatchingEventFilter}, meaning that this event will match any
-     * other comment add event.
+     * other event of the same type.
      */
-    public CommentAddEvent()
+    public ScriptEvaluatedEvent()
     {
         super();
     }
 
     /**
      * Constructor initializing the event filter with a {@link org.xwiki.observation.event.filter.FixedNameEventFilter},
-     * meaning that this event will match only comment add events affecting the document matching the passed document
-     * name.
-     * 
-     * @param documentName the name of the document to match
-     * @param identifier the identifier of the added comment
+     * meaning that this event will match only events of the same type affecting the same passed name.
+     *
+     * @param scriptMacroName name of the macro to match, e.g. "velocity"
      */
-    public CommentAddEvent(String documentName, String identifier)
+    public ScriptEvaluatedEvent(String scriptMacroName)
     {
-        super(documentName, identifier);
+        super(scriptMacroName);
     }
 
     /**
      * Constructor using a custom {@link EventFilter}.
-     * 
+     *
      * @param eventFilter the filter to use for matching events
      */
-    public CommentAddEvent(EventFilter eventFilter)
+    public ScriptEvaluatedEvent(EventFilter eventFilter)
     {
         super(eventFilter);
     }
-
 }
+

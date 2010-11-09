@@ -18,16 +18,17 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  *
  */
-package org.xwiki.observation.event;
+package org.xwiki.annotation.event;
 
 import org.xwiki.observation.event.filter.EventFilter;
 
 /**
- * An event triggered when an annotation is updated.
+ * An event triggered when an annotation is deleted.
  * 
  * @version $Id$
+ * @since 2.6RC2
  */
-public class AnnotationUpdateEvent extends AbstractAnnotationEvent
+public class AnnotationDeletedEvent extends AbstractAnnotationEvent
 {
     /**
      * The version identifier for this Serializable class. Increment only if the <i>serialized</i> form of the class
@@ -38,22 +39,22 @@ public class AnnotationUpdateEvent extends AbstractAnnotationEvent
     /**
      * Constructor initializing the event filter with an
      * {@link org.xwiki.observation.event.filter.AlwaysMatchingEventFilter}, meaning that this event will match any
-     * other annotation update event.
+     * other annotation delete event.
      */
-    public AnnotationUpdateEvent()
+    public AnnotationDeletedEvent()
     {
         super();
     }
 
     /**
      * Constructor initializing the event filter with a {@link org.xwiki.observation.event.filter.FixedNameEventFilter},
-     * meaning that this event will match only annotation update events affecting the document matching the passed
+     * meaning that this event will match only annotation delete events affecting the document matching the passed
      * document name.
      * 
      * @param documentName the name of the document to match
-     * @param identifier the identifier of the updated annotation
+     * @param identifier the identifier of the deleted annotation
      */
-    public AnnotationUpdateEvent(String documentName, String identifier)
+    public AnnotationDeletedEvent(String documentName, String identifier)
     {
         super(documentName, identifier);
     }
@@ -63,7 +64,7 @@ public class AnnotationUpdateEvent extends AbstractAnnotationEvent
      * 
      * @param eventFilter the filter to use for matching events
      */
-    public AnnotationUpdateEvent(EventFilter eventFilter)
+    public AnnotationDeletedEvent(EventFilter eventFilter)
     {
         super(eventFilter);
     }

@@ -18,16 +18,18 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  *
  */
-package org.xwiki.observation.event;
+package com.xpn.xwiki.internal.event;
 
+import org.xwiki.observation.event.AbstractDocumentEvent;
 import org.xwiki.observation.event.filter.EventFilter;
 
 /**
- * Base class for all comment {@link Event events}.
+ * Base class for all attachment {@link org.xwiki.observation.event.Event events}.
  * 
  * @version $Id$
+ * @since 2.6RC2
  */
-public abstract class AbstractCommentEvent extends AbstractDocumentEvent
+public class AbstractAttachmentEvent extends AbstractDocumentEvent
 {
     /**
      * The version identifier for this Serializable class. Increment only if the <i>serialized</i> form of the class
@@ -36,31 +38,32 @@ public abstract class AbstractCommentEvent extends AbstractDocumentEvent
     private static final long serialVersionUID = 1L;
 
     /**
-     * The comment that is used in events.
+     * The name of the attachment that is used in events.
      */
-    private String identifier;
+    private String name;
 
     /**
      * Constructor initializing the event filter with an
      * {@link org.xwiki.observation.event.filter.AlwaysMatchingEventFilter}, meaning that this event will match any
-     * other comment event (add, update, delete).
+     * other attachment event (add, update, delete).
      */
-    public AbstractCommentEvent()
+    public AbstractAttachmentEvent()
     {
         super();
     }
 
     /**
      * Constructor initializing the event filter with a {@link org.xwiki.observation.event.filter.FixedNameEventFilter},
-     * meaning that this event will match only comment events affecting the document matching the passed document name.
+     * meaning that this event will match only attachment events affecting the document matching the passed document
+     * name.
      * 
      * @param documentName the name of the updated document to match
-     * @param identifier the identifier of the comment added/updated/deleted
+     * @param name the name of the attachment added/updated/deleted
      */
-    public AbstractCommentEvent(String documentName, String identifier)
+    public AbstractAttachmentEvent(String documentName, String name)
     {
         super(documentName);
-        this.identifier = identifier;
+        this.name = name;
     }
 
     /**
@@ -68,19 +71,18 @@ public abstract class AbstractCommentEvent extends AbstractDocumentEvent
      * 
      * @param eventFilter the filter to use for matching events
      */
-    public AbstractCommentEvent(EventFilter eventFilter)
+    public AbstractAttachmentEvent(EventFilter eventFilter)
     {
         super(eventFilter);
     }
 
     /**
-     * Retrieves the content of the comment added/updated/deleted in the event.
+     * Retrieves the name of the attachment added/updated/deleted in the event.
      * 
-     * @return comment identifier
+     * @return name name of the attachment
      */
-    public String getIdentifier()
+    public String getName()
     {
-        return identifier;
+        return name;
     }
-
 }

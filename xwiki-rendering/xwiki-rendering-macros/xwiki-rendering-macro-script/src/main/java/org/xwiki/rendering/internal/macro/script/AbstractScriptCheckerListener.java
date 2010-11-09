@@ -25,10 +25,9 @@ import java.util.List;
 import org.xwiki.observation.EventListener;
 import org.xwiki.observation.event.CancelableEvent;
 import org.xwiki.observation.event.Event;
-import org.xwiki.observation.event.ScriptEvaluationStartsEvent;
+import org.xwiki.script.event.ScriptEvaluatingEvent;
 import org.xwiki.rendering.macro.script.ScriptMacroParameters;
 import org.xwiki.rendering.transformation.MacroTransformationContext;
-
 
 /**
  * Abstract base class for listeners that need to perform some checks just before a script macro is executed. Subclasses
@@ -42,13 +41,13 @@ public abstract class AbstractScriptCheckerListener implements EventListener
 {
     /**
      * {@inheritDoc}
-     * This implementation returns a singleton list with a {@link ScriptEvaluationStartsEvent}.
+     * This implementation returns a singleton list with a {@link org.xwiki.script.event.ScriptEvaluatingEvent}.
      * 
      * @see org.xwiki.observation.EventListener#getEvents()
      */
     public List<Event> getEvents()
     {
-        return Collections.singletonList((Event) new ScriptEvaluationStartsEvent());
+        return Collections.singletonList((Event) new ScriptEvaluatingEvent());
     }
 
     /**
@@ -60,7 +59,7 @@ public abstract class AbstractScriptCheckerListener implements EventListener
      */
     public void onEvent(Event event, Object source, Object data)
     {
-        if (!(event instanceof ScriptEvaluationStartsEvent)) {
+        if (!(event instanceof ScriptEvaluatingEvent)) {
             return;
         }
         if ((source == null || source instanceof MacroTransformationContext)
@@ -70,7 +69,7 @@ public abstract class AbstractScriptCheckerListener implements EventListener
     }
 
     /**
-     * This method is called when an {@link ScriptEvaluationStartsEvent} is received.
+     * This method is called when an {@link org.xwiki.script.event.ScriptEvaluatingEvent} is received.
      * 
      * @param event the received event
      * @param context current transformation context

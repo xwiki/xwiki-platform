@@ -29,7 +29,7 @@ import org.jmock.Mockery;
 import org.xwiki.component.descriptor.DefaultComponentDescriptor;
 import org.xwiki.observation.EventListener;
 import org.xwiki.observation.event.Event;
-import org.xwiki.observation.event.ScriptEvaluationStartsEvent;
+import org.xwiki.script.event.ScriptEvaluatingEvent;
 import org.xwiki.rendering.scaffolding.RenderingTestSuite;
 import org.xwiki.rendering.transformation.MacroTransformationContext;
 import org.xwiki.test.ComponentManagerTestSetup;
@@ -59,7 +59,7 @@ public class RenderingTests extends TestCase
             allowing(nestedValidator).getName();
                 will(returnValue("nestedscriptmacrovalidator"));
             allowing(nestedValidator).getEvents();
-                will(returnValue(Collections.singletonList((Event) new ScriptEvaluationStartsEvent())));
+                will(returnValue(Collections.singletonList((Event) new ScriptEvaluatingEvent())));
         }});
         DefaultComponentDescriptor<EventListener> validatorDescriptor
             = new DefaultComponentDescriptor<EventListener>();

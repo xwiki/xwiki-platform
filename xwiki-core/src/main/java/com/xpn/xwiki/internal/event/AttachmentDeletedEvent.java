@@ -18,19 +18,18 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  *
  */
-package org.xwiki.observation.event;
+package com.xpn.xwiki.internal.event;
 
 import org.xwiki.observation.event.filter.EventFilter;
 
 /**
- * An event triggered when an attachment is added.
+ * An event triggered when an attachment is deleted.
  * 
  * @version $Id$
+ * @since 2.6RC2
  */
-
-public class AttachmentAddEvent extends AbstractAttachmentEvent
+public class AttachmentDeletedEvent extends AbstractAttachmentEvent
 {
-
     /**
      * The version identifier for this Serializable class. Increment only if the <i>serialized</i> form of the class
      * changes.
@@ -40,22 +39,22 @@ public class AttachmentAddEvent extends AbstractAttachmentEvent
     /**
      * Constructor initializing the event filter with an
      * {@link org.xwiki.observation.event.filter.AlwaysMatchingEventFilter}, meaning that this event will match any
-     * other attachment add event.
+     * other attachment delete event.
      */
-    public AttachmentAddEvent()
+    public AttachmentDeletedEvent()
     {
         super();
     }
 
     /**
      * Constructor initializing the event filter with a {@link org.xwiki.observation.event.filter.FixedNameEventFilter},
-     * meaning that this event will match only attachment add events affecting the document matching the passed document
-     * name.
+     * meaning that this event will match only attachment delete events affecting the document matching the passed
+     * document name.
      * 
      * @param documentName the name of the document to match
-     * @param name the name of the added attachment
+     * @param name the name of the deleted attachment
      */
-    public AttachmentAddEvent(String documentName, String name)
+    public AttachmentDeletedEvent(String documentName, String name)
     {
         super(documentName, name);
     }
@@ -65,7 +64,7 @@ public class AttachmentAddEvent extends AbstractAttachmentEvent
      * 
      * @param eventFilter the filter to use for matching events
      */
-    public AttachmentAddEvent(EventFilter eventFilter)
+    public AttachmentDeletedEvent(EventFilter eventFilter)
     {
         super(eventFilter);
     }

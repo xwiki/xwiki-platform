@@ -18,14 +18,16 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  *
  */
-package org.xwiki.observation.event;
+package org.xwiki.annotation.event;
 
+import org.xwiki.observation.event.AbstractDocumentEvent;
 import org.xwiki.observation.event.filter.EventFilter;
 
 /**
- * Base class for all annotation {@link Event events}.
+ * Base class for all annotation {@link org.xwiki.observation.event.Event}.
  * 
  * @version $Id$
+ * @since 2.6RC2
  */
 public class AbstractAnnotationEvent extends AbstractDocumentEvent
 {

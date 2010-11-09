@@ -28,6 +28,9 @@ import java.util.Date;
 import java.util.List;
 
 import org.xwiki.annotation.Annotation;
+import org.xwiki.annotation.event.AnnotationAddedEvent;
+import org.xwiki.annotation.event.AnnotationDeletedEvent;
+import org.xwiki.annotation.event.AnnotationUpdatedEvent;
 import org.xwiki.annotation.io.IOService;
 import org.xwiki.annotation.io.IOServiceException;
 import org.xwiki.annotation.maintainer.AnnotationState;
@@ -43,9 +46,6 @@ import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.observation.ObservationManager;
-import org.xwiki.observation.event.AnnotationAddEvent;
-import org.xwiki.observation.event.AnnotationDeleteEvent;
-import org.xwiki.observation.event.AnnotationUpdateEvent;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
@@ -159,7 +159,7 @@ public class DefaultIOService extends AbstractLogEnabled implements IOService
 
             // notify listeners that an annotation was added
             ObservationManager observationManager = componentManager.lookup(ObservationManager.class);
-            observationManager.notify(new AnnotationAddEvent(documentFullName, object.getNumber() + ""), document,
+            observationManager.notify(new AnnotationAddedEvent(documentFullName, object.getNumber() + ""), document,
                 deprecatedContext);
 
         } catch (XWikiException e) {
@@ -298,7 +298,7 @@ public class DefaultIOService extends AbstractLogEnabled implements IOService
                 // notify listeners that an annotation was deleted
                 ObservationManager observationManager = componentManager.lookup(ObservationManager.class);
                 observationManager
-                    .notify(new AnnotationDeleteEvent(docName, annotationID), document, deprecatedContext);
+                    .notify(new AnnotationDeletedEvent(docName, annotationID), document, deprecatedContext);
             }
         } catch (NumberFormatException e) {
             throw new IOServiceException("An exception has occurred while parsing the annotation id", e);
@@ -354,7 +354,7 @@ public class DefaultIOService extends AbstractLogEnabled implements IOService
                 // send annotation update notifications for all annotations set to notify for
                 ObservationManager observationManager = componentManager.lookup(ObservationManager.class);
                 for (String updateNotif : updateNotifs) {
-                    observationManager.notify(new AnnotationUpdateEvent(docName, updateNotif), document,
+                    observationManager.notify(new AnnotationUpdatedEvent(docName, updateNotif), document,
                         deprecatedContext);
                 }
             }

@@ -33,7 +33,7 @@ import org.xwiki.rendering.transformation.MacroTransformationContext;
 
 
 /**
- * Listens to {@link org.xwiki.observation.event.ScriptEvaluationStartsEvent} and aborts execution if the user is
+ * Listens to {@link org.xwiki.script.event.ScriptEvaluatingEvent} and aborts execution if the user is
  * permitted to execute the script.
  * 
  * @version $Id$

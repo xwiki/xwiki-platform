@@ -1,2 +1,2 @@
-@import "microformats.css";
-@import "colibri.css";
+@import "$xwiki.getSkinFile('microformats.css')";
+@import "$xwiki.getSkinFile('colibri.css', true)";

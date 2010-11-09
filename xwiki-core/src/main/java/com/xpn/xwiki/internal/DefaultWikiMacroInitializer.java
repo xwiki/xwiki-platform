@@ -93,7 +93,7 @@ public class DefaultWikiMacroInitializer extends AbstractLogEnabled implements W
      */
     public void registerExistingWikiMacros() throws Exception
     {
-        registerExistingWikiMacros(true, null);
+        registerExistingWikiMacros(false, null);
     }
 
     /**
@@ -101,7 +101,7 @@ public class DefaultWikiMacroInitializer extends AbstractLogEnabled implements W
      */
     public void registerExistingWikiMacros(String wiki) throws Exception
     {
-        registerExistingWikiMacros(false, wiki);
+        registerExistingWikiMacros(true, wiki);
     }
 
     /**

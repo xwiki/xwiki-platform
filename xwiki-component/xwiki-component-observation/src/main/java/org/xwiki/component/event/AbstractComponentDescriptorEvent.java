@@ -17,13 +17,13 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.component.manager;
+package org.xwiki.component.event;
 
 /**
  * Base class for events about components descriptors.
  * 
  * @version $Id$
- * @since 2.0M2
+ * @since 2.6RC2
  */
 public abstract class AbstractComponentDescriptorEvent implements ComponentDescriptorEvent
 {

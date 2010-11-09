@@ -22,8 +22,8 @@ package org.xwiki.component.internal;
 import java.util.Stack;
 
 import org.xwiki.component.descriptor.ComponentDescriptor;
-import org.xwiki.component.manager.ComponentDescriptorAddedEvent;
-import org.xwiki.component.manager.ComponentDescriptorRemovedEvent;
+import org.xwiki.component.event.ComponentDescriptorAddedEvent;
+import org.xwiki.component.event.ComponentDescriptorRemovedEvent;
 import org.xwiki.component.manager.ComponentEventManager;
 import org.xwiki.observation.ObservationManager;
 import org.xwiki.observation.event.Event;
@@ -47,7 +47,7 @@ public class StackingComponentEventManager implements ComponentEventManager
     /**
      * {@inheritDoc}
      * 
-     * @see org.xwiki.component.manager.ComponentEventManager#notifyComponentRegistered(org.xwiki.component.descriptor.ComponentDescriptor)
+     * @see org.xwiki.component.manager.ComponentEventManager#notifyComponentRegistered(ComponentDescriptor)
      */
     public void notifyComponentRegistered(ComponentDescriptor< ? > descriptor)
     {
@@ -58,7 +58,7 @@ public class StackingComponentEventManager implements ComponentEventManager
     /**
      * {@inheritDoc}
      * 
-     * @see org.xwiki.component.manager.ComponentEventManager#notifyComponentUnregistered(org.xwiki.component.descriptor.ComponentDescriptor)
+     * @see org.xwiki.component.manager.ComponentEventManager#notifyComponentUnregistered(ComponentDescriptor)
      */
     public void notifyComponentUnregistered(ComponentDescriptor< ? > descriptor)
     {

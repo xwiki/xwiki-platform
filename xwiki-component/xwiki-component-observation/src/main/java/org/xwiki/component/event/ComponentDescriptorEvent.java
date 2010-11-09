@@ -18,14 +18,15 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  *
  */
-package org.xwiki.component.manager;
+package org.xwiki.component.event;
 
 import org.xwiki.observation.event.Event;
 
 /**
- * Base interface for all componets descriptor events.
+ * Base interface for all components descriptor events.
  * 
  * @version $Id$
+ * @since 2.6RC2
  */
 public interface ComponentDescriptorEvent extends Event
 {

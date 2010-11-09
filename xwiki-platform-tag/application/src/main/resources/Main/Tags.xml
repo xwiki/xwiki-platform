@@ -226,13 +226,12 @@ $xwiki.ssx.use('Main.Dashboard')##
     &lt;div id="dashboardright"&gt;
       &lt;div id="dashboardrightcontent"&gt;
         &lt;h3 class="xapp"&gt;&lt;span&gt;$msg.get("xe.tag.recentactivity", [$htmlEscapedTag])&lt;/span&gt;&lt;/h3&gt;
-        #set($rcTag = [$tag])
         
-        {{recentactivity tag="$htmlEscapedTag" /}}
+        {{activity tags="$htmlEscapedTag" /}}
         
     &lt;/div&gt;
   &lt;/div&gt;
-  &lt;div style="clear:both; margin-bottom: 40px;"&gt;&lt;!-- --&gt;&lt;/div&gt;
+  &lt;div style="clear:both; margin-bottom: 40px;"&gt;&lt;/div&gt;
 &lt;/div&gt;
 #elseif($do == 'prepareRename')
   ##

@@ -30,17 +30,11 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.hibernate.Query;
 import org.hibernate.Session;
+import org.xwiki.annotation.event.AnnotationAddedEvent;
+import org.xwiki.annotation.event.AnnotationDeletedEvent;
+import org.xwiki.annotation.event.AnnotationUpdatedEvent;
 import org.xwiki.observation.EventListener;
 import org.xwiki.observation.ObservationManager;
-import org.xwiki.observation.event.AnnotationAddEvent;
-import org.xwiki.observation.event.AnnotationDeleteEvent;
-import org.xwiki.observation.event.AnnotationUpdateEvent;
-import org.xwiki.observation.event.AttachmentAddEvent;
-import org.xwiki.observation.event.AttachmentDeleteEvent;
-import org.xwiki.observation.event.AttachmentUpdateEvent;
-import org.xwiki.observation.event.CommentAddEvent;
-import org.xwiki.observation.event.CommentDeleteEvent;
-import org.xwiki.observation.event.CommentUpdateEvent;
 import org.xwiki.observation.event.DocumentDeleteEvent;
 import org.xwiki.observation.event.DocumentSaveEvent;
 import org.xwiki.observation.event.DocumentUpdateEvent;
@@ -56,6 +50,12 @@ import com.sun.syndication.io.SyndFeedOutput;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
+import com.xpn.xwiki.internal.event.AttachmentAddedEvent;
+import com.xpn.xwiki.internal.event.AttachmentDeletedEvent;
+import com.xpn.xwiki.internal.event.AttachmentUpdatedEvent;
+import com.xpn.xwiki.internal.event.CommentAddedEvent;
+import com.xpn.xwiki.internal.event.CommentDeletedEvent;
+import com.xpn.xwiki.internal.event.CommentUpdatedEvent;
 import com.xpn.xwiki.plugin.activitystream.api.ActivityEvent;
 import com.xpn.xwiki.plugin.activitystream.api.ActivityEventPriority;
 import com.xpn.xwiki.plugin.activitystream.api.ActivityEventType;
@@ -100,15 +100,15 @@ public class ActivityStreamImpl implements ActivityStream, EventListener
             add(new DocumentSaveEvent());
             add(new DocumentUpdateEvent());
             add(new DocumentDeleteEvent());
-            add(new CommentAddEvent());
-            add(new CommentDeleteEvent());
-            add(new CommentUpdateEvent());
-            add(new AttachmentAddEvent());
-            add(new AttachmentDeleteEvent());
-            add(new AttachmentUpdateEvent());
-            add(new AnnotationAddEvent());
-            add(new AnnotationDeleteEvent());
-            add(new AnnotationUpdateEvent());
+            add(new CommentAddedEvent());
+            add(new CommentDeletedEvent());
+            add(new CommentUpdatedEvent());
+            add(new AttachmentAddedEvent());
+            add(new AttachmentDeletedEvent());
+            add(new AttachmentUpdatedEvent());
+            add(new AnnotationAddedEvent());
+            add(new AnnotationDeletedEvent());
+            add(new AnnotationUpdatedEvent());
         }
     };
 
@@ -908,42 +908,42 @@ public class ActivityStreamImpl implements ActivityStream, EventListener
             } else if (event instanceof DocumentDeleteEvent) {
                 eventType = ActivityEventType.DELETE;
                 displayTitle = originalDoc.getDisplayTitle(context);
-            } else if (event instanceof CommentAddEvent) {
+            } else if (event instanceof CommentAddedEvent) {
                 eventType = ActivityEventType.ADD_COMMENT;
                 displayTitle = currentDoc.getDisplayTitle(context);
-                additionalIdentifier = ((CommentAddEvent) event).getIdentifier();
-            } else if (event instanceof CommentDeleteEvent) {
+                additionalIdentifier = ((CommentAddedEvent) event).getIdentifier();
+            } else if (event instanceof CommentDeletedEvent) {
                 eventType = ActivityEventType.DELETE_COMMENT;
                 displayTitle = currentDoc.getDisplayTitle(context);
-                additionalIdentifier = ((CommentDeleteEvent) event).getIdentifier();
-            } else if (event instanceof CommentUpdateEvent) {
+                additionalIdentifier = ((CommentDeletedEvent) event).getIdentifier();
+            } else if (event instanceof CommentUpdatedEvent) {
                 eventType = ActivityEventType.UPDATE_COMMENT;
                 displayTitle = currentDoc.getDisplayTitle(context);
-                additionalIdentifier = ((CommentUpdateEvent) event).getIdentifier();
-            } else if (event instanceof AttachmentAddEvent) {
+                additionalIdentifier = ((CommentUpdatedEvent) event).getIdentifier();
+            } else if (event instanceof AttachmentAddedEvent) {
                 eventType = ActivityEventType.ADD_ATTACHMENT;
                 displayTitle = currentDoc.getDisplayTitle(context);
-                additionalIdentifier = ((AttachmentAddEvent) event).getName();
-            } else if (event instanceof AttachmentDeleteEvent) {
+                additionalIdentifier = ((AttachmentAddedEvent) event).getName();
+            } else if (event instanceof AttachmentDeletedEvent) {
                 eventType = ActivityEventType.DELETE_ATTACHMENT;
                 displayTitle = currentDoc.getDisplayTitle(context);
-                additionalIdentifier = ((AttachmentDeleteEvent) event).getName();
-            } else if (event instanceof AttachmentUpdateEvent) {
+                additionalIdentifier = ((AttachmentDeletedEvent) event).getName();
+            } else if (event instanceof AttachmentUpdatedEvent) {
                 eventType = ActivityEventType.UPDATE_ATTACHMENT;
                 displayTitle = currentDoc.getDisplayTitle(context);
-                additionalIdentifier = ((AttachmentUpdateEvent) event).getName();
-            } else if (event instanceof AnnotationAddEvent) {
+                additionalIdentifier = ((AttachmentUpdatedEvent) event).getName();
+            } else if (event instanceof AnnotationAddedEvent) {
                 eventType = ActivityEventType.ADD_ANNOTATION;
                 displayTitle = currentDoc.getDisplayTitle(context);
-                additionalIdentifier = ((AnnotationAddEvent) event).getIdentifier();
-            } else if (event instanceof AnnotationDeleteEvent) {
+                additionalIdentifier = ((AnnotationAddedEvent) event).getIdentifier();
+            } else if (event instanceof AnnotationDeletedEvent) {
                 eventType = ActivityEventType.DELETE_ANNOTATION;
                 displayTitle = currentDoc.getDisplayTitle(context);
-                additionalIdentifier = ((AnnotationDeleteEvent) event).getIdentifier();
+                additionalIdentifier = ((AnnotationDeletedEvent) event).getIdentifier();
             } else { // update annotation
                 eventType = ActivityEventType.UPDATE_ANNOTATION;
                 displayTitle = currentDoc.getDisplayTitle(context);
-                additionalIdentifier = ((AnnotationUpdateEvent) event).getIdentifier();
+                additionalIdentifier = ((AnnotationUpdatedEvent) event).getIdentifier();
             }
 
             List<String> params = new ArrayList<String>();

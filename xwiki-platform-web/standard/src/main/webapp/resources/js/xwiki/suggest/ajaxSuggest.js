@@ -480,7 +480,11 @@ var XWiki = (function(XWiki){
           this.sInput = this.fld.value = this.iHighlighted.down(".suggestValue").innerHTML;
       }
 
-      Event.fire(this.fld, "xwiki:suggest:selected");
+      Event.fire(this.fld, "xwiki:suggest:selected", {
+        'id': this.iHighlighted.down(".suggestId").innerHTML,
+        'value': this.iHighlighted.down(".suggestValue").innerHTML,
+        'info': this.iHighlighted.down(".suggestInfo").innerHTML
+      });
       this.fld.focus();
 
       /*

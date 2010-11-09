@@ -337,10 +337,14 @@ var XWiki = (function(XWiki){
       var val = arr[i].value, st = val.toLowerCase().indexOf( this.sInput.toLowerCase() );
       var output = val.substring(0,st) + "<span class='highlight'>" + val.substring(st, st+this.sInput.length) + "</span>" + val.substring(st+this.sInput.length);
       var span = new Element("span").update(output);
+      var valueNode = new Element('div')
+            .insert(new Element('span', {'class':'suggestId'}).update(arr[i].id))
+            .insert(new Element('span', {'class':'suggestValue'}).update(arr[i].value))
+            .insert(new Element('span', {'class':'suggestInfo'}).update(arr[i].info));
 
       var item = new XWiki.widgets.XListItem( span , {
         containerClasses: 'suggestItem',
-        value: arr[i].value,
+        value: valueNode,
         noHighlight: true // we do the highlighting ourselves
       });
 
@@ -454,10 +458,10 @@ var XWiki = (function(XWiki){
 
   setHighlightedValue: function ()
   {
-    if (this.iHighlighted)
+    if (this.iHighlighted && !this.iHighlighted.hasClassName('noSuggestion'))
     {
       if(this.sInput == "" && this.fld.value == "")
-        this.sInput = this.fld.value = this.iHighlighted.down(".value").innerHTML;
+        this.sInput = this.fld.value = this.iHighlighted.down(".suggestValue").innerHTML;
       else {
         if(this.seps) {
            var lastIndx = -1;
@@ -465,15 +469,15 @@ var XWiki = (function(XWiki){
              if(this.fld.value.lastIndexOf(this.seps.charAt(i)) > lastIndx)
                lastIndx = this.fld.value.lastIndexOf(this.seps.charAt(i));
             if(lastIndx == -1)
-              this.sInput = this.fld.value = this.iHighlighted.down(".value").innerHTML;
+              this.sInput = this.fld.value = this.iHighlighted.down(".suggestValue").innerHTML;
             else
             {
-              this.fld.value = this.fld.value.substring(0, lastIndx+1) + this.iHighlighted.down(".value").innerHTML;
+              this.fld.value = this.fld.value.substring(0, lastIndx+1) + this.iHighlighted.down(".suggestValue").innerHTML;
                this.sInput = this.fld.value.substring(lastIndx+1);
            }
         }
         else
-          this.sInput = this.fld.value = this.iHighlighted.down(".value").innerHTML;
+          this.sInput = this.fld.value = this.iHighlighted.down(".suggestValue").innerHTML;
       }
 
       Event.fire(this.fld, "xwiki:suggest:selected");
@@ -490,7 +494,11 @@ var XWiki = (function(XWiki){
       // pass selected object to callback function, if exists
 
       if (typeof(this.options.callback) == "function") {
-        this.options.callback( this.aSuggestions[this.iHighlighted-1] );
+        this.options.callback( {
+          'id': this.iHighlighted.down(".suggestId").innerHTML,
+          'value': this.iHighlighted.down(".suggestValue").innerHTML,
+          'info': this.iHighlighted.down(".suggestInfo").innerHTML
+        } );
       }
 
       //there is a hidden input
@@ -499,7 +507,7 @@ var XWiki = (function(XWiki){
         var hidden_inp = $(hidden_id);
 
         if(hidden_inp)
-           hidden_inp.value = this.aSuggestions[ this.iHighlighted-1 ].info;
+           hidden_inp.value =  this.iHighlighted.down(".suggestInfo").innerHTML;
       }
 
     }

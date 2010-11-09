@@ -77,7 +77,7 @@ var XWiki = function(XWiki){
     widgets.XListItem = Class.create({
         initialize: function(content, options) {
           this.options = options || {};
-          var classes = 'xitem' + (this.options.noHighlight ? '' : ' xhighlight');
+          var classes = 'xitem ' + (this.options.noHighlight ? '' : 'xhighlight ');
           classes += this.options.classes ? this.options.classes: '';
           this.containerElement = new Element("div", {'class': 'xitemcontainer'}).insert(content || '');
           this.containerElement.addClassName(this.options.containerClasses || '');

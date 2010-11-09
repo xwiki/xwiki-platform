@@ -29,7 +29,7 @@ import org.xwiki.observation.event.Event;
  * Unit tests for {@link ComponentDescriptorAddedEvent}.
  * 
  * @version $Id$
- * @since 2.0M1
+ * @since 2.6RC2
  */
 public class ComponentDescriptorAddedEventTest
 {

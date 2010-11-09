@@ -23,7 +23,7 @@ package org.xwiki.component.event;
  * Event sent to tell that a new Component Descriptor has been registered.
  * 
  * @version $Id$
- * @since 2.0M1
+ * @since 2.6RC2
  */
 public class ComponentDescriptorAddedEvent extends AbstractComponentDescriptorEvent
 {

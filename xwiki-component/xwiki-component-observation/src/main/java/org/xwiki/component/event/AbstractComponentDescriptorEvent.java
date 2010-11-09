@@ -23,7 +23,7 @@ package org.xwiki.component.event;
  * Base class for events about components descriptors.
  * 
  * @version $Id$
- * @since 2.0M2
+ * @since 2.6RC2
  */
 public abstract class AbstractComponentDescriptorEvent implements ComponentDescriptorEvent
 {

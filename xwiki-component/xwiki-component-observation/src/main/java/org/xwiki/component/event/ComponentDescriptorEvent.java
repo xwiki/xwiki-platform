@@ -26,6 +26,7 @@ import org.xwiki.observation.event.Event;
  * Base interface for all components descriptor events.
  * 
  * @version $Id$
+ * @since 2.6RC2
  */
 public interface ComponentDescriptorEvent extends Event
 {

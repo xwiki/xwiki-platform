@@ -210,6 +210,11 @@
                 <exclude>org/xwiki/observation/event/CommentUpdateEvent</exclude>
                 <exclude>org/xwiki/observation/event/ScriptEvaluationFinishedEvent</exclude>
                 <exclude>org/xwiki/observation/event/ScriptEvaluationStartsEvent</exclude>
+                <exclude>org/xwiki/component/manager/AbstractComponentDescriptorEvent</exclude>
+                <exclude>org/xwiki/component/manager/ComponentDescriptorAddedEvent</exclude>
+                <exclude>org/xwiki/component/manager/ComponentDescriptorEvent</exclude>
+                <exclude>org/xwiki/component/manager/ComponentDescriptorRemovedEvent</exclude>
+                <exclude>org/xwiki/component/manager/ComponentEventManager</exclude>
               </excludes>
             </configuration>
           </plugin>

@@ -18,10 +18,11 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  *
  */
-package org.xwiki.component.manager;
+package org.xwiki.component.event;
 
 import org.junit.Assert;
 import org.junit.Test;
+import org.xwiki.component.event.ComponentDescriptorAddedEvent;
 import org.xwiki.observation.event.Event;
 
 /**

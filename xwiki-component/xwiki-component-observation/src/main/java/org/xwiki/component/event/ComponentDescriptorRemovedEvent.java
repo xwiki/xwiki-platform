@@ -17,20 +17,20 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.component.manager;
+package org.xwiki.component.event;
 
 /**
- * Event sent to tell that a new Component Descriptor has been registered.
+ * Event sent to tell that a new Component Descriptor has been unregistered.
  * 
  * @version $Id$
- * @since 2.0M1
+ * @since 2.0M2
  */
-public class ComponentDescriptorAddedEvent extends AbstractComponentDescriptorEvent
+public class ComponentDescriptorRemovedEvent extends AbstractComponentDescriptorEvent
 {
     /**
      * Watches all roles (whenever a component is added it'll trigger this event).
      */
-    public ComponentDescriptorAddedEvent()
+    public ComponentDescriptorRemovedEvent()
     {
 
     }
@@ -38,7 +38,7 @@ public class ComponentDescriptorAddedEvent extends AbstractComponentDescriptorEv
     /**
      * @param role the component role to watch (all components matching this role will trigger this event)
      */
-    public ComponentDescriptorAddedEvent(Class< ? > role)
+    public ComponentDescriptorRemovedEvent(Class< ? > role)
     {
         super(role);
     }
@@ -47,7 +47,7 @@ public class ComponentDescriptorAddedEvent extends AbstractComponentDescriptorEv
      * @param role the component role to watch
      * @param roleHint the component role hint to watch
      */
-    public ComponentDescriptorAddedEvent(Class< ? > role, String roleHint)
+    public ComponentDescriptorRemovedEvent(Class< ? > role, String roleHint)
     {
         super(role, roleHint);
     }
@@ -55,13 +55,13 @@ public class ComponentDescriptorAddedEvent extends AbstractComponentDescriptorEv
     /**
      * {@inheritDoc}
      * 
-     * @see org.xwiki.component.manager.AbstractComponentDescriptorEvent#matches(java.lang.Object)
+     * @see AbstractComponentDescriptorEvent#matches(java.lang.Object)
      */
     public boolean matches(Object otherEvent)
     {
         boolean result = false;
 
-        if (ComponentDescriptorAddedEvent.class.isAssignableFrom(otherEvent.getClass())) {
+        if (ComponentDescriptorRemovedEvent.class.isAssignableFrom(otherEvent.getClass())) {
             result = super.matches(otherEvent);
         }
 

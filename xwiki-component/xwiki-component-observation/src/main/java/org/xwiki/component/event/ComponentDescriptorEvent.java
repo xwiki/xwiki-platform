@@ -18,7 +18,7 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  *
  */
-package org.xwiki.component.manager;
+package org.xwiki.component.event;
 
 import org.xwiki.observation.event.Event;
 

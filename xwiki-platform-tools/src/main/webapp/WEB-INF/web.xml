@@ -36,6 +36,16 @@
     </init-param>
     -->
   </servlet>
+  <!-- Make sure we don't redirect when the container is asking for the favicon -->
+  <servlet-mapping>
+    <servlet-name>default</servlet-name>
+    <url-pattern>/favicon.ico</url-pattern>
+  </servlet-mapping>
+  <!-- Make sure we don't redirect when the container is asking for the robots.txt file -->
+  <servlet-mapping>
+    <servlet-name>default</servlet-name>
+    <url-pattern>/robots.txt</url-pattern>
+  </servlet-mapping>
   <servlet-mapping>
     <servlet-name>XWikiDispatcherServlet</servlet-name>
     <url-pattern>/</url-pattern>

@@ -225,7 +225,7 @@ $xwiki.ssx.use('Main.Dashboard')##
     &lt;/div&gt;
     &lt;div id="dashboardright"&gt;
       &lt;div id="dashboardrightcontent"&gt;
-        &lt;h3 class="xapp"&gt;&lt;span&gt;$msg.get("xe.tag.recentactivity", [$htmlEscapedTag])&lt;/span&gt;&lt;/h3&gt;
+        &lt;h3 class="xapp"&gt;&lt;span&gt;$msg.get("xe.tag.activity", [$htmlEscapedTag])&lt;/span&gt;&lt;/h3&gt;
         
         {{activity tags="$htmlEscapedTag" /}}
         

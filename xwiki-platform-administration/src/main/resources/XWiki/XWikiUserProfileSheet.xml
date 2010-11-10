@@ -92,7 +92,7 @@ $xwiki.ssx.use('Main.Dashboard')##
   &lt;div class="dashboardright"&gt;
     #if ($xcontext.action == 'view')
       &lt;div class="userRecentChanges"&gt;
-        &lt;h1&gt;$msg.get('platform.core.profile.section.recentactivity')&lt;/h1&gt;
+        &lt;h1&gt;$msg.get('platform.core.profile.section.activity')&lt;/h1&gt;
 {{/html}}
 
 {{activity authors="${doc.fullName}" /}}

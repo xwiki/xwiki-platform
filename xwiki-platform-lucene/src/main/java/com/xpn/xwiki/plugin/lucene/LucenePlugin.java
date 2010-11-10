@@ -420,7 +420,7 @@ public class LucenePlugin extends XWikiDefaultPlugin
             bQuery.add(buildOredTermQuery(virtualWikiNames, IndexFields.DOCUMENT_WIKI), BooleanClause.Occur.MUST);
         }
         if (languages != null && languages.length() > 0) {
-            bQuery.add(buildOredTermQuery(languages, IndexFields.DOCUMENT_LANGUAGE), BooleanClause.Occur.SHOULD);
+            bQuery.add(buildOredTermQuery(languages, IndexFields.DOCUMENT_LANGUAGE), BooleanClause.Occur.MUST);
         }
 
         return bQuery;

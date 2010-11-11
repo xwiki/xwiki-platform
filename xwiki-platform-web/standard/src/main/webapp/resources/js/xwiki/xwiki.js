@@ -597,11 +597,8 @@ Object.extend(XWiki, {
     element = $(element);
     element.toggleClassName("collapsed");
     if (cookieName) {
-      if (element.hasClassName("collapsed")) {
-        XWiki.cookies.create(cookieName, "collapsed", '');
-      } else {
-        XWiki.cookies.erase(cookieName);
-      }
+      var cookieValue = element.hasClassName('collapsed') ? 'collapsed' : 'expanded';
+      XWiki.cookies.create(cookieName, cookieValue, '');
     }
   },
 

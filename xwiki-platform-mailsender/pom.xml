@@ -34,7 +34,7 @@
   <version>1.15-SNAPSHOT</version>
   <description>XWiki Platform - Plugins - Mail Sender</description>
   <properties>
-    <platform.core.version>1.9.3</platform.core.version>
+    <platform.core.version>2.6-SNAPSHOT</platform.core.version>
   </properties>
   <dependencies>
     <dependency>

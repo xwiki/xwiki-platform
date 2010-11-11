@@ -19,7 +19,8 @@ XWiki.widgets.ModalPopup = Class.create({
     backgroundColor : "",
     screenOpacity : "0.5",
     verticalPosition : "center",
-    horizontalPosition : "center"
+    horizontalPosition : "center",
+    removeOnClose : false
   },
   /** Constructor. Registers the key listener that pops up the dialog. */
   initialize : function(content, shortcuts, options) {
@@ -156,6 +157,9 @@ XWiki.widgets.ModalPopup = Class.create({
     }
     // Hide the dialog, without removing it from the DOM.
     this.dialog.hide();
+    if (this.options.removeOnClose) {
+      this.dialog.remove();
+    }
     // Stop the UI shortcuts (except the initial Show Dialog one).
     this.detachKeyListeners();
     // Re-enable the 'show' behavior.

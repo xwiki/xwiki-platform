@@ -84,11 +84,11 @@ public class MailSenderPlugin extends XWikiDefaultPlugin
 {
     /** Logging helper object. */
     private static final Log LOG = LogFactory.getLog(MailSenderPlugin.class);
-    
+
     /**
-     * Since Java uses full Unicode Strings and email clients manage it we force email encoding to UTF-8. 
-     * XWiki encoding must be used when working with storage or the container since they can be configured to use
-     * another encoding, this constraint does not apply here.   
+     * Since Java uses full Unicode Strings and email clients manage it we force email encoding to UTF-8. XWiki encoding
+     * must be used when working with storage or the container since they can be configured to use another encoding,
+     * this constraint does not apply here.
      */
     private static final String EMAIL_ENCODING = "UTF-8";
 
@@ -266,7 +266,7 @@ public class MailSenderPlugin extends XWikiDefaultPlugin
             doc.setTitle("XWiki Mail Class");
         }
         if (StringUtils.isBlank(doc.getContent()) || !XWikiDocument.XWIKI20_SYNTAXID.equals(doc.getSyntaxId())) {
-            needsUpdate = true;      
+            needsUpdate = true;
             doc.setContent("{{include document=\"XWiki.ClassSheet\" /}}");
             doc.setSyntaxId(XWikiDocument.XWIKI20_SYNTAXID);
         }
@@ -349,14 +349,14 @@ public class MailSenderPlugin extends XWikiDefaultPlugin
         message.saveChanges();
         return message;
     }
-    
+
     /**
      * Add attachments to a multipart message
      * 
      * @param multipart Multipart message
      * @param attachments List of attachments
      */
-    public MimeBodyPart createAttachmentBodyPart(Attachment attachment, XWikiContext context) throws XWikiException, 
+    public MimeBodyPart createAttachmentBodyPart(Attachment attachment, XWikiContext context) throws XWikiException,
         IOException, MessagingException
     {
         String name = attachment.getFilename();
@@ -364,19 +364,19 @@ public class MailSenderPlugin extends XWikiDefaultPlugin
         File temp = File.createTempFile("tmpfile", ".tmp");
         FileOutputStream fos = new FileOutputStream(temp);
         fos.write(stream);
-        fos.close();                
-        DataSource source = new FileDataSource(temp);                
+        fos.close();
+        DataSource source = new FileDataSource(temp);
         MimeBodyPart part = new MimeBodyPart();
         String mimeType = MimeTypesUtil.getMimeTypeFromFilename(name);
 
         part.setDataHandler(new DataHandler(source));
         part.setHeader("Content-Type", mimeType);
         part.setFileName(name);
-        part.setContentID("<" + name + ">");    
+        part.setContentID("<" + name + ">");
         part.setDisposition("inline");
-        
+
         temp.deleteOnExit();
-        
+
         return part;
     }
 
@@ -390,22 +390,22 @@ public class MailSenderPlugin extends XWikiDefaultPlugin
         IOException
     {
         Multipart multipart;
-        List<Attachment> rawAttachments = 
+        List<Attachment> rawAttachments =
             mail.getAttachments() != null ? mail.getAttachments() : new ArrayList<Attachment>();
-        
-        if (mail.getHtmlPart() == null && mail.getAttachments() != null) { 
+
+        if (mail.getHtmlPart() == null && mail.getAttachments() != null) {
             multipart = new MimeMultipart("mixed");
-            
+
             // Create the text part of the email
-            BodyPart textPart = new MimeBodyPart();            
+            BodyPart textPart = new MimeBodyPart();
             textPart.setContent(mail.getTextPart(), "text/plain; charset=" + EMAIL_ENCODING);
             multipart.addBodyPart(textPart);
-            
+
             // Add attachments to the main multipart
             for (Attachment attachment : rawAttachments) {
                 multipart.addBodyPart(createAttachmentBodyPart(attachment, context));
             }
-        } else {            
+        } else {
             multipart = new MimeMultipart("mixed");
             List<Attachment> attachments = new ArrayList<Attachment>();
             List<Attachment> embeddedImages = new ArrayList<Attachment>();
@@ -414,24 +414,24 @@ public class MailSenderPlugin extends XWikiDefaultPlugin
             BodyPart textPart;
             textPart = new MimeBodyPart();
             textPart.setText(mail.getTextPart());
-            
+
             // Create the HTML part of the email, define the html as a multipart/related in case there are images
-            Multipart htmlMultipart = new MimeMultipart("related");            
+            Multipart htmlMultipart = new MimeMultipart("related");
             BodyPart htmlPart = new MimeBodyPart();
             htmlPart.setContent(mail.getHtmlPart(), "text/html; charset=" + EMAIL_ENCODING);
             htmlPart.setHeader("Content-Disposition", "inline");
             htmlPart.setHeader("Content-Transfer-Encoding", "quoted-printable");
             htmlMultipart.addBodyPart(htmlPart);
-            
+
             // Find images used with src="cid:" in the email HTML part
             Pattern cidPattern =
                 Pattern.compile("src=('|\")cid:([^'\"]*)('|\")", Pattern.CASE_INSENSITIVE | Pattern.MULTILINE);
             Matcher matcher = cidPattern.matcher(mail.getHtmlPart());
-            List<String> foundEmbeddedImages = new ArrayList<String>();            
+            List<String> foundEmbeddedImages = new ArrayList<String>();
             while (matcher.find()) {
-                foundEmbeddedImages.add(matcher.group(2));             
+                foundEmbeddedImages.add(matcher.group(2));
             }
-            
+
             // Loop over the attachments of the email, add images used from the HTML to the list of attachments to be
             // embedded with the HTML part, add the other attachements to the list of attachments to be attached to the
             // email.
@@ -442,28 +442,28 @@ public class MailSenderPlugin extends XWikiDefaultPlugin
                     attachments.add(attachment);
                 }
             }
-            
+
             // Add the images to the HTML multipart (they should be hidden from the mail reader attachment list)
             for (Attachment image : embeddedImages) {
                 htmlMultipart.addBodyPart(createAttachmentBodyPart(image, context));
             }
-            
+
             // Wrap the HTML and text parts in an alternative body part and add it to the main multipart
             Multipart alternativePart = new MimeMultipart("alternative");
-            BodyPart alternativeMultipartWrapper = new MimeBodyPart();            
+            BodyPart alternativeMultipartWrapper = new MimeBodyPart();
             BodyPart htmlMultipartWrapper = new MimeBodyPart();
             alternativePart.addBodyPart(textPart);
             htmlMultipartWrapper.setContent(htmlMultipart);
             alternativePart.addBodyPart(htmlMultipartWrapper);
             alternativeMultipartWrapper.setContent(alternativePart);
             multipart.addBodyPart(alternativeMultipartWrapper);
-            
-            // Add attachments to the main multipart   
+
+            // Add attachments to the main multipart
             for (Attachment attachment : attachments) {
                 multipart.addBodyPart(createAttachmentBodyPart(attachment, context));
             }
         }
-        
+
         return multipart;
     }
 

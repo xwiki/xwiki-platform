@@ -71,6 +71,8 @@ import com.xpn.xwiki.objects.classes.BaseClass;
 import com.xpn.xwiki.plugin.XWikiDefaultPlugin;
 import com.xpn.xwiki.plugin.XWikiPluginInterface;
 import com.xpn.xwiki.render.XWikiVelocityRenderer;
+import com.xpn.xwiki.web.ExternalServletURLFactory;
+import com.xpn.xwiki.web.XWikiURLFactory;
 
 /**
  * Plugin that brings powerful mailing capabilities.
@@ -782,45 +784,52 @@ public class MailSenderPlugin extends XWikiDefaultPlugin
     public int sendMailFromTemplate(String templateDocFullName, String from, String to, String cc, String bcc,
         String language, VelocityContext vcontext, XWikiContext context) throws XWikiException
     {
-
-        VelocityContext updatedVelocityContext = prepareVelocityContext(from, to, cc, bcc, vcontext, context);
-        XWiki xwiki = context.getWiki();
-        XWikiDocument doc = xwiki.getDocument(templateDocFullName, context);
-        Document docApi = new Document(doc, context);
-        
-        BaseObject obj = doc.getObject(EMAIL_XWIKI_CLASS_NAME, "language", language);
-        if (obj == null) {
-            obj = doc.getObject(EMAIL_XWIKI_CLASS_NAME, "language", "en");
-        }
-        if (obj == null) {
-            LOG.error("No mail object found in the document " + templateDocFullName);
-            return ERROR_TEMPLATE_EMAIL_OBJECT_NOT_FOUND;
-        }
-        String subjectContent = obj.getStringValue("subject");
-        String txtContent = obj.getStringValue("text");
-        String htmlContent = obj.getStringValue("html");
-
-        String subject =
-            XWikiVelocityRenderer.evaluate(subjectContent, templateDocFullName, updatedVelocityContext, context);
-        String msg = XWikiVelocityRenderer.evaluate(txtContent, templateDocFullName, updatedVelocityContext, context);
-        String html = XWikiVelocityRenderer.evaluate(htmlContent, templateDocFullName, updatedVelocityContext, context);
-
-        Mail mail = new Mail();
-        mail.setFrom((String) updatedVelocityContext.get("from.address"));
-        mail.setTo((String) updatedVelocityContext.get("to.address"));
-        mail.setCc((String) updatedVelocityContext.get("to.cc"));
-        mail.setBcc((String) updatedVelocityContext.get("to.bcc"));
-        mail.setSubject(subject);
-        mail.setTextPart(msg);
-        mail.setHtmlPart(html);
-        mail.setAttachments(docApi.getAttachmentList());
-        
+        XWikiURLFactory originalURLFactory = context.getURLFactory();
         try {
-            sendMail(mail, context);
-            return 0;
-        } catch (Exception e) {
-            LOG.error("sendEmailFromTemplate: " + templateDocFullName + " vcontext: " + updatedVelocityContext, e);
-            return ERROR;
+            context.setURLFactory(new ExternalServletURLFactory(context));
+            VelocityContext updatedVelocityContext = prepareVelocityContext(from, to, cc, bcc, vcontext, context);
+            XWiki xwiki = context.getWiki();
+            XWikiDocument doc = xwiki.getDocument(templateDocFullName, context);
+            Document docApi = new Document(doc, context);
+
+            BaseObject obj = doc.getObject(EMAIL_XWIKI_CLASS_NAME, "language", language);
+            if (obj == null) {
+                obj = doc.getObject(EMAIL_XWIKI_CLASS_NAME, "language", "en");
+            }
+            if (obj == null) {
+                LOG.error("No mail object found in the document " + templateDocFullName);
+                return ERROR_TEMPLATE_EMAIL_OBJECT_NOT_FOUND;
+            }
+            String subjectContent = obj.getStringValue("subject");
+            String txtContent = obj.getStringValue("text");
+            String htmlContent = obj.getStringValue("html");
+
+            String subject =
+                XWikiVelocityRenderer.evaluate(subjectContent, templateDocFullName, updatedVelocityContext, context);
+            String msg =
+                XWikiVelocityRenderer.evaluate(txtContent, templateDocFullName, updatedVelocityContext, context);
+            String html =
+                XWikiVelocityRenderer.evaluate(htmlContent, templateDocFullName, updatedVelocityContext, context);
+
+            Mail mail = new Mail();
+            mail.setFrom((String) updatedVelocityContext.get("from.address"));
+            mail.setTo((String) updatedVelocityContext.get("to.address"));
+            mail.setCc((String) updatedVelocityContext.get("to.cc"));
+            mail.setBcc((String) updatedVelocityContext.get("to.bcc"));
+            mail.setSubject(subject);
+            mail.setTextPart(msg);
+            mail.setHtmlPart(html);
+            mail.setAttachments(docApi.getAttachmentList());
+
+            try {
+                sendMail(mail, context);
+                return 0;
+            } catch (Exception e) {
+                LOG.error("sendEmailFromTemplate: " + templateDocFullName + " vcontext: " + updatedVelocityContext, e);
+                return ERROR;
+            }
+        } finally {
+            context.setURLFactory(originalURLFactory);
         }
     }
 }

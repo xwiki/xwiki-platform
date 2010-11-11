@@ -243,7 +243,7 @@ public class TagPlugin extends XWikiDefaultPlugin implements XWikiPluginInterfac
 
         // We have to manually build a cardinality map since we have to ignore tags case.
         for (String result : results) {
-            // This key allows to keep track of the case variants we've encountered .        
+            // This key allows to keep track of the case variants we've encountered.
             String lowerTag = result.toLowerCase();
 
             // We store the first case variant to reuse it in the final result set.
@@ -251,13 +251,13 @@ public class TagPlugin extends XWikiDefaultPlugin implements XWikiPluginInterfac
                 processedTags.put(lowerTag, result);
             }
 
-            String tagCountKey = processedTags.get(lowerTag); 
+            String tagCountKey = processedTags.get(lowerTag);
             int tagCountForTag = 0;
             if (tagCount.get(tagCountKey) != null) {
                 tagCountForTag = tagCount.get(tagCountKey);
             }
             tagCount.put(tagCountKey, tagCountForTag + 1);
-        }        
+        }
 
         return tagCount;
     }
@@ -272,9 +272,9 @@ public class TagPlugin extends XWikiDefaultPlugin implements XWikiPluginInterfac
      */
     public List<String> getDocumentsWithTag(String tag, XWikiContext context) throws XWikiException
     {
-        String hql = ", BaseObject as obj, DBStringListProperty as prop join prop.list item " 
-            + "where obj.className=? and obj.name=doc.fullName and obj.id=prop.id.id " 
-            + "and prop.id.name='tags' and lower(item)=lower(?) order by doc.fullName"; 
+        String hql = ", BaseObject as obj, DBStringListProperty as prop join prop.list item "
+            + "where obj.className=? and obj.name=doc.fullName and obj.id=prop.id.id "
+            + "and prop.id.name='tags' and lower(item)=lower(?) order by doc.fullName";
         List<Object> parameters = new ArrayList<Object>();
         parameters.add(TAG_CLASS);
         parameters.add(tag);

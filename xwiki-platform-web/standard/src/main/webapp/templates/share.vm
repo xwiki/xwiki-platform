@@ -1,0 +1,6 @@
+###
+### Share page by email
+###
+###
+<div id="document-title"><h1>$msg.get('core.viewers.share.title', [$escapetool.xml($doc.displayTitle), $doc.getURL()])</h1></div>
+#template("shareinline.vm")

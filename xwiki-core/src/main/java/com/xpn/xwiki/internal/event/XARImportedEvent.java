@@ -35,13 +35,4 @@ public class XARImportedEvent extends AbstractFilterableEvent
      * changes.
      */
     private static final long serialVersionUID = 1L;
-
-    /**
-     * Builds a default (and ftm only type of) XARImportedEvent, triggered whenever a .xar is imported.
-     */
-    public XARImportedEvent()
-    {
-        // use the fixed name comparer, with an empty name (this way, only the type will be compared)
-        super("");
-    }
 }

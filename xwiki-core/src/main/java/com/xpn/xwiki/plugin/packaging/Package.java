@@ -591,15 +591,11 @@ public class Package
         }
         setStatus(status, context);
 
-        // notify all the listeners about the just done import
-        try {
-            ObservationManager om = Utils.getComponent(ObservationManager.class);
-            // FIXME: should be able to pass some sort of source here, the name of the attachment or the list of
-            // imported documents. But for the moment it's fine
-            om.notify(new XARImportedEvent(), null, context);
-        } catch (Throwable ex) {
-            LOG.error("Cannot send action notifications for import", ex);
-        }
+        // Notify all the listeners about the just done import
+        ObservationManager om = Utils.getComponent(ObservationManager.class);
+        // FIXME: should be able to pass some sort of source here, the name of the attachment or the list of
+        // imported documents. But for the moment it's fine
+        om.notify(new XARImportedEvent(), null, context);
 
         return status;
     }

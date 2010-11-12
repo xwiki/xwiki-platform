@@ -802,8 +802,8 @@ isc.XWETreeGrid.addMethods({
                 // it calls the openParent method again, this time with the parent of the resource.
                 var fetchCallback = function(xmlDoc, xmlText, rpcResponse, rpcRequest) {
                     if (xmlDoc.httpResponseCode == 200) {
-                        var parentRes = XWiki.resource.get(xmlDoc.data[0].parent);
-                        var parentNode = rt.findById(parentRes.fullName);
+                        // XWiki.resource.get(reference) resolves the passed reference relative to the current document reference.
+                        var parentRes = xmlDoc.data[0].parent ? XWiki.resource.get(xmlDoc.data[0].parent) : { prefixedFullName: '', name: '' };
                         // Store the parent / child relationship in the cache to avoid the need of another request if this
                         // relationship is searched again.
                         rt.parentMap[resource.prefixedFullName] = parentRes;

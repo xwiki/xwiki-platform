@@ -28,11 +28,11 @@ import org.xwiki.component.annotation.Requirement;
 import org.xwiki.component.logging.AbstractLogEnabled;
 import org.xwiki.context.Execution;
 import org.xwiki.observation.EventListener;
-import org.xwiki.observation.event.ActionExecutionEvent;
 import org.xwiki.observation.event.Event;
 import org.xwiki.rendering.macro.wikibridge.WikiMacroInitializer;
 
 import com.xpn.xwiki.XWikiContext;
+import com.xpn.xwiki.internal.event.XARImportedEvent;
 
 /**
  * Import action event listener to handle registering of the wiki macros after import. The problem is with the wiki
@@ -60,7 +60,7 @@ public class RegisterMacrosOnImportListener extends AbstractLogEnabled implement
     /**
      * The events observed by this event listener.
      */
-    private final List<Event> eventsList = new ArrayList<Event>(Arrays.asList(new ActionExecutionEvent("import")));
+    private final List<Event> eventsList = new ArrayList<Event>(Arrays.asList(new XARImportedEvent()));
 
     /**
      * {@inheritDoc}

@@ -1180,6 +1180,10 @@ div#xwikiobjects input[type="checkbox"], div#xwikiclassproperties input[type="ch
   background-image: url("$xwiki.getSkinFile('icons/silk/textfield_rename.gif')");
 }
 
+.actionmenu #tmActionShare {
+  background-image: url("$xwiki.getSkinFile('icons/silk/email_go.gif')");
+}
+
 .actionmenu .tmActionCopy {
   background-image: url("$xwiki.getSkinFile('icons/silk/page_white_copy.gif')");
 }

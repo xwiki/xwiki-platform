@@ -49,6 +49,7 @@ import org.dom4j.dom.DOMDocument;
 import org.dom4j.dom.DOMElement;
 import org.dom4j.io.OutputFormat;
 import org.dom4j.io.SAXReader;
+import org.xwiki.observation.ObservationManager;
 import org.xwiki.query.QueryException;
 
 import com.xpn.xwiki.XWiki;
@@ -56,9 +57,11 @@ import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiAttachment;
 import com.xpn.xwiki.doc.XWikiDocument;
+import com.xpn.xwiki.internal.event.XARImportedEvent;
 import com.xpn.xwiki.internal.xml.UnclosableInputStream;
 import com.xpn.xwiki.internal.xml.XMLWriter;
 import com.xpn.xwiki.objects.classes.BaseClass;
+import com.xpn.xwiki.web.Utils;
 
 public class Package
 {
@@ -587,6 +590,12 @@ public class Package
             }
         }
         setStatus(status, context);
+
+        // Notify all the listeners about the just done import
+        ObservationManager om = Utils.getComponent(ObservationManager.class);
+        // FIXME: should be able to pass some sort of source here, the name of the attachment or the list of
+        // imported documents. But for the moment it's fine
+        om.notify(new XARImportedEvent(), null, context);
 
         return status;
     }

@@ -44,7 +44,7 @@ var XWiki = function(XWiki){
           this.items = items || [];
           this.options = options || {}
           this.listElement = new Element(this.options.ordered ? "ol" : "ul", {
-            'class' : 'xlist' + (this.options.classes ? (' ' + this.options.classes) : ''),
+            'class' : 'xlist' + (this.options.classes ? (' ' + this.options.classes) : '')
           });
           if (this.items && this.items.length > 0) {
             for (var i=0;i<this.items.length;i++) {
@@ -103,7 +103,7 @@ var XWiki = function(XWiki){
             this.iconImage.onload = function(){
                 this.listItemElement.setStyle({
                   backgroundImage: "url(" + this.iconImage.src + ")",
-                  backgroundRepeat: 'no-repeat',
+                  backgroundRepeat: 'no-repeat'
                 });
                 this.listItemElement.down(".xitemcontainer").setStyle({
                   textIndent:(this.iconImage.width + 5) + 'px',
@@ -118,7 +118,7 @@ var XWiki = function(XWiki){
           for (var i=0;i<events.length;i++) {
             this.listItemElement.observe(events[i], eventListeners[events[i]].bind(this));
           }
-        },
+        }
     });
     
     return XWiki;

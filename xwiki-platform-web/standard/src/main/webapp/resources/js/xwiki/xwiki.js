@@ -1369,13 +1369,13 @@ document.observe('xwiki:dom:loaded', function() {
             script: XWiki.currentDocument.getURL('get', 'xpage=uorgsuggest&classname=XWiki.XWikiUsers&wiki=local&uorg=user&'),
             varname: "input",
             icon: "$xwiki.getSkinFile('icons/silk/user.gif')",
-            noresults: "User not found",
+            noresults: "User not found"
         },
         "groups" : {
             script: XWiki.currentDocument.getURL('get', 'xpage=uorgsuggest&classname=XWiki.XWikiGroups&wiki=local&uorg=group&'),
             varname: "input",
             icon: "$xwiki.getSkinFile('icons/silk/group.gif')",
-            noresults: "Group not found",
+            noresults: "Group not found"
         }
     };
     if (typeof(XWiki.widgets.Suggest) != "undefined") {

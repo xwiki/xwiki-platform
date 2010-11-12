@@ -1,6 +1,6 @@
 ## Insert JS and CSS needed for the fullscreen edit feature
-$xwiki.jsfx.use('js/xwiki/editors/fullScreenEdit.js', {'forceSkinAction': true, 'language': ${xcontext.language}})##
-$xwiki.ssfx.use('js/xwiki/editors/fullScreenEdit.css', true)##
+$xwiki.jsfx.use('uicomponents/widgets/fullScreen.js', {'forceSkinAction': true, 'language': ${xcontext.language}})##
+$xwiki.ssfx.use('uicomponents/widgets/fullScreen.css', true)##
 #set($formname = "inline")
 #set($saveaction = "save")
 #set($previewenabled = true)

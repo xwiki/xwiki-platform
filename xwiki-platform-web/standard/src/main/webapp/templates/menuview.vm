@@ -136,6 +136,10 @@
   #if($canImport)
     #submenuitem($xwiki.getURL('XWiki.OfficeImporter', 'view') $msg.get('core.menu.create.pageFromOffice') 'tmActionImport')
   #end
+  #if (!$isGuest)
+    #submenuitem($doc.getURL('view', 'viewer=share') $msg.get('core.menu.share') 'tmActionShare', '')
+    $xwiki.jsx.use('XWiki.SharePage')
+  #end
   #xwikitopmenuentryend()
   #if($canDelete && $keyboardShortcutsEnabled)
     <script type="text/javascript">

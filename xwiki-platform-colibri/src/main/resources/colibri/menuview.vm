@@ -52,7 +52,7 @@
     #if("$!{officeImporterMainDocument.isNew()}" == 'false')
       #submenuitem($officeImporterMainDocument.getURL('view', "&amp;parent=$!{escapetool.url($doc.fullName)}") $msg.get('core.menu.create.pageFromOffice') 'tmCreatePageFromOffice', '')
     #end
-    #submenuseparator()    
+    #submenuseparator()
   #end
   #if($hasComment)
     #submenuitem("$doc.getURL('view', 'viewer=comments')" $msg.get('core.menu.create.comment') 'tmCreateComment', '')
@@ -64,7 +64,7 @@
             XWiki.displayDocExtra('Comments', 'commentsinline.vm', true);
             return false;
           });
-        });      
+        });
       //]]>
     </script>
   #end
@@ -78,7 +78,7 @@
             XWiki.displayDocExtra('Attachments', 'attachmentsinline.vm', true);
             return false;
           });
-        });      
+        });
       //]]>
     </script>
   #end
@@ -109,7 +109,7 @@
       #set($unwatchClasses = '')
     #end
     #submenuitem("$doc.getURL('view', 'xpage=watch&amp;do=addwiki')&amp;xredirect=$escapetool.url($doc.getURL())" $msg.get('core.menu.watchlist.add.wiki', [$escapetool.xml($doc.wiki)]) 'tmWatchWiki', $watchClasses)
-    #submenuitem("$doc.getURL('view', 'xpage=watch&amp;do=removewiki')&amp;xredirect=$escapetool.url($doc.getURL())" $msg.get('core.menu.watchlist.remove.wiki') 'tmUnwatchWiki', $unwatchClasses)    
+    #submenuitem("$doc.getURL('view', 'xpage=watch&amp;do=removewiki')&amp;xredirect=$escapetool.url($doc.getURL())" $msg.get('core.menu.watchlist.remove.wiki') 'tmUnwatchWiki', $unwatchClasses)
   #end
   #if($hasGlobalAdmin)
     #set ($adminwikiaction = $!xwiki.getURL('XWiki.XWikiPreferences', 'admin'))
@@ -169,7 +169,7 @@
       #set($unwatchClasses = 'hasIcon')
     #end
     #submenuitem("$doc.getURL('view', 'xpage=watch&amp;do=adddocument')&amp;xredirect=$escapetool.url($doc.getURL())" $msg.get('core.menu.watchlist.add.page') 'tmWatchDocument' $watchClasses)
-    #submenuitem("$doc.getURL('view', 'xpage=watch&amp;do=removedocument')&amp;xredirect=$escapetool.url($doc.getURL())" $msg.get('core.menu.watchlist.remove.page') 'tmUnwatchDocument' $unwatchClasses)  
+    #submenuitem("$doc.getURL('view', 'xpage=watch&amp;do=removedocument')&amp;xredirect=$escapetool.url($doc.getURL())" $msg.get('core.menu.watchlist.remove.page') 'tmUnwatchDocument' $unwatchClasses)
   #end
   #set ($canDelete = !$doc.isNew() && $xwiki.checkAccess($doc.fullName, 'delete'))
   #if($canDelete || $xwiki.hasProgrammingRights())

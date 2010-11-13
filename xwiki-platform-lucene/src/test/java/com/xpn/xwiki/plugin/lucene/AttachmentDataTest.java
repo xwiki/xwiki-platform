@@ -93,7 +93,7 @@ public class AttachmentDataTest extends AbstractBridgedXWikiComponentTestCase
 
     public void testGetFullTextFromMSOffice97() throws XWikiException, IOException
     {
-        assertGetFullText("msoffice97.doc MS Office 97 content\r\n\n", "msoffice97.doc");
+        assertGetFullText("msoffice97.doc MS Office 97 content\n\n", "msoffice97.doc");
     }
 
     public void testGetFullTextFromOpenXML() throws XWikiException, IOException

@@ -30,7 +30,7 @@
   <name>XWiki Macro - Example</name>
   <description>XWiki Macro - Example</description>
   <properties>
-    <platform.core.version>2.3-SNAPSHOT</platform.core.version>
+    <platform.core.version>2.5</platform.core.version>
   </properties>
   <build>
     <plugins>

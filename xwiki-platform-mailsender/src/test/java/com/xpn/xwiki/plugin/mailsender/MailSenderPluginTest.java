@@ -20,21 +20,17 @@
  */
 package com.xpn.xwiki.plugin.mailsender;
 
-import junit.framework.TestCase;
-
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.junit.runners.JUnit4;
 
 /**
  * Unit tests for the {@link MailSenderPlugin mailsender plugin}.
  * 
  * @version $Id$
  */
-@RunWith(JUnit4.class)
-public class MailSenderPluginTest extends TestCase
+public class MailSenderPluginTest
 {
     /** The empty {@link Mail} object used for testing. */
     private Mail mail;
@@ -49,7 +45,6 @@ public class MailSenderPluginTest extends TestCase
     }
 
     /** Setup: create a new {@code Mail} object and a plugin instance. */
-    @Override
     @Before
     public void setUp()
     {
@@ -66,7 +61,7 @@ public class MailSenderPluginTest extends TestCase
         } catch (IllegalArgumentException ex) {
             thrown = true;
         }
-        assertTrue(thrown);
+        Assert.assertTrue(thrown);
     }
 
     /** Test that a {@code null} message throws an exception. */
@@ -79,7 +74,7 @@ public class MailSenderPluginTest extends TestCase
         } catch (IllegalArgumentException ex) {
             thrown = true;
         }
-        assertTrue(thrown);
+        Assert.assertTrue(thrown);
     }
 
     /** Test that a simple mail with no headers becomes the Mail's textPart. */
@@ -87,8 +82,8 @@ public class MailSenderPluginTest extends TestCase
     public void testParseRawMessageWithSimpleMessage()
     {
         plugin.parseRawMessage("Dear John,\nHello and Goodbye!", this.mail);
-        assertEquals("Dear John,\r\nHello and Goodbye!\r\n", this.mail.getTextPart());
-        assertEquals(0, this.mail.getHeaders().size());
+        Assert.assertEquals("Dear John,\r\nHello and Goodbye!\r\n", this.mail.getTextPart());
+        Assert.assertEquals(0, this.mail.getHeaders().size());
 
     }
 
@@ -97,9 +92,9 @@ public class MailSenderPluginTest extends TestCase
     public void testParseRawMessageWithSubject()
     {
         plugin.parseRawMessage("Subject:Greetings!\n\nDear John,\nHello and Goodbye!", this.mail);
-        assertEquals("Dear John,\r\nHello and Goodbye!\r\n", this.mail.getTextPart());
-        assertEquals("Greetings!", this.mail.getSubject());
-        assertEquals(0, this.mail.getHeaders().size());
+        Assert.assertEquals("Dear John,\r\nHello and Goodbye!\r\n", this.mail.getTextPart());
+        Assert.assertEquals("Greetings!", this.mail.getSubject());
+        Assert.assertEquals(0, this.mail.getHeaders().size());
     }
 
     /** Test that both Subject and From are detected as special headers. */
@@ -108,10 +103,10 @@ public class MailSenderPluginTest extends TestCase
     {
         plugin
             .parseRawMessage("Subject:Greetings!\nFrom:user@example.org\n\nDear John,\nHello and Goodbye!", this.mail);
-        assertEquals("Dear John,\r\nHello and Goodbye!\r\n", this.mail.getTextPart());
-        assertEquals("Greetings!", this.mail.getSubject());
-        assertEquals("user@example.org", this.mail.getFrom());
-        assertEquals(0, this.mail.getHeaders().size());
+        Assert.assertEquals("Dear John,\r\nHello and Goodbye!\r\n", this.mail.getTextPart());
+        Assert.assertEquals("Greetings!", this.mail.getSubject());
+        Assert.assertEquals("user@example.org", this.mail.getFrom());
+        Assert.assertEquals(0, this.mail.getHeaders().size());
     }
 
     /** Test that the first empty line marks the start of the body. */
@@ -120,10 +115,10 @@ public class MailSenderPluginTest extends TestCase
     {
         plugin.parseRawMessage("Subject:Greetings!\n\nFrom:user@example.org\n\nDear John,\nHello and Goodbye!",
             this.mail);
-        assertEquals("From:user@example.org\r\n\r\nDear John,\r\nHello and Goodbye!\r\n", this.mail.getTextPart());
-        assertEquals("Greetings!", this.mail.getSubject());
-        assertNull(this.mail.getFrom());
-        assertEquals(0, this.mail.getHeaders().size());
+        Assert.assertEquals("From:user@example.org\r\n\r\nDear John,\r\nHello and Goodbye!\r\n", this.mail.getTextPart());
+        Assert.assertEquals("Greetings!", this.mail.getSubject());
+        Assert.assertNull(this.mail.getFrom());
+        Assert.assertEquals(0, this.mail.getHeaders().size());
     }
 
     /** Test that the header name stops at the first colon. */
@@ -131,10 +126,10 @@ public class MailSenderPluginTest extends TestCase
     public void testParseRawMessageWithColonInHeader()
     {
         plugin.parseRawMessage("Subject:Greetings:Human!\n\nDear John,\nHello and Goodbye!", this.mail);
-        assertEquals("Dear John,\r\nHello and Goodbye!\r\n", this.mail.getTextPart());
-        assertEquals("Greetings:Human!", this.mail.getSubject());
-        assertNull(this.mail.getFrom());
-        assertEquals(0, this.mail.getHeaders().size());
+        Assert.assertEquals("Dear John,\r\nHello and Goodbye!\r\n", this.mail.getTextPart());
+        Assert.assertEquals("Greetings:Human!", this.mail.getSubject());
+        Assert.assertNull(this.mail.getFrom());
+        Assert.assertEquals(0, this.mail.getHeaders().size());
     }
 
     /** Test that custom header are simply passed to the mail as-is. */
@@ -142,9 +137,9 @@ public class MailSenderPluginTest extends TestCase
     public void testParseRawMessageWithExtraHeaders()
     {
         plugin.parseRawMessage("X-Header:Something extra!\n\nDear John,\nHello and Goodbye!", this.mail);
-        assertEquals("Dear John,\r\nHello and Goodbye!\r\n", this.mail.getTextPart());
-        assertNull(this.mail.getSubject());
-        assertEquals(1, this.mail.getHeaders().size());
+        Assert.assertEquals("Dear John,\r\nHello and Goodbye!\r\n", this.mail.getTextPart());
+        Assert.assertNull(this.mail.getSubject());
+        Assert.assertEquals(1, this.mail.getHeaders().size());
     }
 
     /** RFC 2822 allows headers to be split on multiple lines using "folding white spaces". */
@@ -153,10 +148,10 @@ public class MailSenderPluginTest extends TestCase
     {
         plugin.parseRawMessage("Subject:Greetings\n from\n\thome\nFrom:user@example.org\n\nHello and Goodbye!",
             this.mail);
-        assertEquals("Hello and Goodbye!\r\n", this.mail.getTextPart());
-        assertEquals("Greetings from\thome", this.mail.getSubject());
-        assertEquals("user@example.org", this.mail.getFrom());
-        assertEquals(0, this.mail.getHeaders().size());
+        Assert.assertEquals("Hello and Goodbye!\r\n", this.mail.getTextPart());
+        Assert.assertEquals("Greetings from\thome", this.mail.getSubject());
+        Assert.assertEquals("user@example.org", this.mail.getFrom());
+        Assert.assertEquals(0, this.mail.getHeaders().size());
     }
 
     /** Headers can't contain spaces. Test that such lines are correctly used as the body. */
@@ -164,8 +159,8 @@ public class MailSenderPluginTest extends TestCase
     public void testParseRawMessageWithFakeHeaders()
     {
         plugin.parseRawMessage("To Susan:Greetings!\n\nHello and Goodbye!", this.mail);
-        assertEquals("To Susan:Greetings!\r\n\r\nHello and Goodbye!\r\n", this.mail.getTextPart());
-        assertNull(this.mail.getSubject());
-        assertEquals(0, this.mail.getHeaders().size());
+        Assert.assertEquals("To Susan:Greetings!\r\n\r\nHello and Goodbye!\r\n", this.mail.getTextPart());
+        Assert.assertNull(this.mail.getSubject());
+        Assert.assertEquals(0, this.mail.getHeaders().size());
     }
 }

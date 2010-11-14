@@ -4,7 +4,7 @@
     <archetype>
       <groupId>org.xwiki.platform.tools</groupId>
       <artifactId>xwiki-archetype-macro</artifactId>
-      <version>1.1</version>
+      <version>1.2-SNAPSHOT</version>
       <description>Make it easy to create a maven project for creating XWiki Rendering Macros.</description>
       <repository>http://maven.xwiki.org/snapshots/</repository>
     </archetype>

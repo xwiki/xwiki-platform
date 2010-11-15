@@ -362,7 +362,7 @@ public class FeedPlugin extends XWikiDefaultPlugin implements XWikiPluginInterfa
                 String feedurl = obj.getStringValue("url");
                 String feedname = obj.getStringValue("name");
                 nbfeeds++;
-                int nb = updateFeed(feedname, feedurl, fullContent, oneDocPerEntry, force, space, context);
+                int nb = updateFeed(feedDoc, feedname, feedurl, fullContent, oneDocPerEntry, force, space, context);
                 if (nb != -1) {
                     total += nb;
                 } else {
@@ -470,6 +470,12 @@ public class FeedPlugin extends XWikiDefaultPlugin implements XWikiPluginInterfa
     public int updateFeed(String feedname, String feedurl, boolean fullContent, boolean oneDocPerEntry, boolean force,
         String space, XWikiContext context)
     {
+        return this.updateFeed("", feedname, feedurl, fullContent, oneDocPerEntry, force, space, context);
+    }
+    
+    public int updateFeed(String feedDocumentName, String feedname, String feedurl, boolean fullContent, boolean oneDocPerEntry, boolean force,
+        String space, XWikiContext context)
+    {
         try {
             // Make sure we have this class
             getFeedEntryClass(context);
@@ -479,7 +485,7 @@ public class FeedPlugin extends XWikiDefaultPlugin implements XWikiPluginInterfa
                 if (feed.getImage() != null) {
                     context.put("feedimgurl", feed.getImage().getUrl());
                 }
-                return saveFeed(feedname, feedurl, feed, fullContent, oneDocPerEntry, force, space, context);
+                return saveFeed(feedDocumentName, feedname, feedurl, feed, fullContent, oneDocPerEntry, force, space, context);
             } else {
                 return 0;
             }
@@ -495,7 +501,7 @@ public class FeedPlugin extends XWikiDefaultPlugin implements XWikiPluginInterfa
         return -1;
     }
 
-    private int saveFeed(String feedname, String feedurl, SyndFeed feed, boolean fullContent, boolean oneDocPerEntry,
+    private int saveFeed(String feedDocumentName, String feedname, String feedurl, SyndFeed feed, boolean fullContent, boolean oneDocPerEntry,
         boolean force, String space, XWikiContext context) throws XWikiException
     {
         XWikiDocument doc = null;
@@ -527,7 +533,10 @@ public class FeedPlugin extends XWikiDefaultPlugin implements XWikiPluginInterfa
                 if (doc.isNew() || force) {
                     // Set the document date to the current date
                     doc.setDate(new Date());
-                    Date adate;
+                    if (!StringUtils.isBlank(feedDocumentName)) {
+                        // Set the feed document as parent of this feed entry
+                        doc.setParent(feedDocumentName);
+                    }
                     if (!StringUtils.isBlank(context.getWiki().Param("xwiki.plugins.feed.creationDateIsPublicationDate"))) {
                         // Set the creation date to the feed date if it exists, otherwise the current date
                     	doc.setCreationDate((entry.getPublishedDate() == null) ? new Date() : entry.getPublishedDate());

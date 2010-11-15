@@ -98,66 +98,59 @@
 <cache>default</cache>
 </property>
 <property>
-<code>(function(){
-
-if (typeof window.XWiki == "undefined") {
-   window.XWiki = {};
+<code>var XWiki = (function (XWiki) {
+// Start XWiki augmentation.
+function displayDavLink(node) {
+  node.down("a[class*='editlink']").removeClassName("hidden");
 }
-
-XWiki = window.XWiki;
-XWiki.WebDAV = {};
-
-XWiki.WebDAV.displayDavLinks = function(domNode) {
+XWiki.WebDAV = {
+  displayDavLinks: function(domNode) {
     // un-hide Dav links only if the browser is going to support it
     if(window.ActiveXObject || window.InstallTrigger) {
-       domNode.select(".attachment").each(displayDavLink);
+      domNode.select(".attachment").each(displayDavLink);
     }
-}
-
-function displayDavLink(node) {
-     node.down("a[class*='editlink']").removeClassName("hidden");
-}
-
-
-XWiki.WebDAV.davEdit = function(davURL) {
-  if (window.ActiveXObject) {
-    var editor;
-    try {
-      editor = new ActiveXObject("SharePoint.OpenDocuments");
-    } catch (err) {
-      window.alert("$msg.get('xe.webdav.initialize.activex')");
-      return;
-    }
-    if (editor) {
-      editor.EditDocument(davURL);
-    } else {
-      window.alert("$msg.get('xe.webdav.initialize.error')");
-      return;
-    }
-  } else if (window.InstallTrigger) {		
-    if ("createEvent" in document) {
-      var element = document.createElement("FoXWikiDomEventData");
-      element.setAttribute("davURL", davURL);
-      element.setAttribute("foxwiki", "false");
-      document.documentElement.appendChild(element);
-      var evt = document.createEvent("Events");
-      evt.initEvent("FoXWikiDomEvent", true, false);
-      element.dispatchEvent(evt);
-      if (element.getAttribute("foxwiki") == "false") {
-        if (window.confirm("$msg.get('xe.webdav.install.foxwiki')")) {
-	  InstallTrigger.install( {"FoXWiki" :"https://addons.mozilla.org/en-US/firefox/downloads/file/39674/foxwiki-1.0b-fx.xpi"});
-	}
+  },
+  davEdit: function(davURL) {
+    if (window.ActiveXObject) {
+      var editor;
+      try {
+        editor = new window.ActiveXObject("SharePoint.OpenDocuments");
+      } catch (err) {
+        window.alert("$msg.get('xe.webdav.initialize.activex')");
+        return;
+      }
+      if (editor) {
+        editor.EditDocument(davURL);
+      } else {
+        window.alert("$msg.get('xe.webdav.initialize.error')");
+        return;
+      }
+    } else if (window.InstallTrigger) {
+      if ("createEvent" in document) {
+        var element = document.createElement("FoXWikiDomEventData");
+        element.setAttribute("davURL", davURL);
+        element.setAttribute("foxwiki", "false");
+        document.documentElement.appendChild(element);
+        var evt = document.createEvent("Events");
+        evt.initEvent("FoXWikiDomEvent", true, false);
+        element.dispatchEvent(evt);
+        if (element.getAttribute("foxwiki") == "false") {
+          if (window.confirm("$msg.get('xe.webdav.install.foxwiki')")) {
+            window.InstallTrigger.install( {"FoXWiki" :"https://addons.mozilla.org/en-US/firefox/downloads/file/39674/foxwiki-1.0b-fx.xpi"});
+          }
+        }
+      } else {
+        window.alert("$msg.get('xe.webdav.error')");
       }
     } else {
-      alert("$msg.get('xe.webdav.error')");
-    }			
-  } else {
-    window.alert("$msg.get('xe.webdav.sorry')");
+      window.alert("$msg.get('xe.webdav.sorry')");
+    }
   }
-}
-
-})();
-</code></property><property><name>WebDAVJSX</name>
+};
+// End XWiki augmentation.
+return XWiki;
+}(XWiki || {}));</code>
+</property><property><name>WebDAVJSX</name>
 </property>
 <property>
 <parse>1</parse>

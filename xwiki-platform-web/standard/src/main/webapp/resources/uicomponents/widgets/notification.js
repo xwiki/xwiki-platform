@@ -1,13 +1,6 @@
-// Make sure the XWiki 'namespace' exists.
-if(typeof(XWiki) == 'undefined') {
-  XWiki = new Object();
-}
-
-// Make sure the widgets 'namespace' exists.
-if(typeof(XWiki.widgets) == 'undefined') {
-  XWiki.widgets = new Object();
-}
-
+var XWiki = (function (XWiki) {
+// Start XWiki augmentation.
+var widgets = XWiki.widgets = XWiki.widgets || {};
 /**
  * A general purpose notification class, displaying a simple message for the user, at the bottom of the screen.
  * Features:
@@ -71,7 +64,7 @@ if(typeof(XWiki.widgets) == 'undefined') {
  *   <dd>background: #EFD</dd>
  * </dl>
  */
-XWiki.widgets.Notification = Class.create({
+widgets.Notification = Class.create({
   text : "Hello world!",
   defaultOptions : {
     /** supported types: plain, info, warning, error, inprogress, done */
@@ -110,8 +103,8 @@ XWiki.widgets.Notification = Class.create({
   },
   /** Display the notification and schedule an automatic hide after the configured period of time, if any. */
   show : function() {
-    if (!this.element.descendantOf(XWiki.widgets.Notification.getContainer())) {
-      XWiki.widgets.Notification.getContainer().insert({top: this.element});
+    if (!this.element.descendantOf(widgets.Notification.getContainer())) {
+      widgets.Notification.getContainer().insert({top: this.element});
     }
     this.element.show();
     if (this.options.timeout) {
@@ -143,23 +136,27 @@ XWiki.widgets.Notification = Class.create({
 });
 
 /** The container for all the notifications. */
-XWiki.widgets.Notification.container = null;
+widgets.Notification.container = null;
 
 /** Returns the container for all the notifications. The container is created the first time this function is called. */
-XWiki.widgets.Notification.getContainer = function() {
-  if (!XWiki.widgets.Notification.container) {
-    XWiki.widgets.Notification.container = new Element('div', {"class" : "xnotification-container"});
+widgets.Notification.getContainer = function() {
+  if (!widgets.Notification.container) {
+    widgets.Notification.container = new Element('div', {"class" : "xnotification-container"});
     // Insert the container in the document body.
-    $(document.body).insert(XWiki.widgets.Notification.container);
+    $(document.body).insert(widgets.Notification.container);
     // Register a scroll listener to reposition the notifications at the bottom of the screen in IE.
     if (Prototype.Browser.IE) {
-      XWiki.widgets.Notification.container.setStyle({position : 'absolute', 'bottom': '0px'});
+      widgets.Notification.container.setStyle({position : 'absolute', 'bottom': '0px'});
       Event.observe(window, "scroll", function() {
         var span = new Element("div");
-        XWiki.widgets.Notification.container.insert({top: span});
+        widgets.Notification.container.insert({top: span});
         setTimeout(span.remove.bind(span), 1);
       });
     }
   }
-  return XWiki.widgets.Notification.container;
+  return widgets.Notification.container;
 };
+
+// End XWiki augmentation.
+return XWiki;
+}(XWiki || {}));

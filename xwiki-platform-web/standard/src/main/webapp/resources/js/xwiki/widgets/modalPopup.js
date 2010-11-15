@@ -1,14 +1,7 @@
-// Make sure the XWiki 'namespace' exists.
-if(typeof(XWiki) == 'undefined') {
-  XWiki = new Object();
-}
-
-// Make sure the widgets 'namespace' exists.
-if(typeof(XWiki.widgets) == 'undefined') {
-  XWiki.widgets = new Object();
-}
-
-XWiki.widgets.ModalPopup = Class.create({
+var XWiki = (function (XWiki) {
+// Start XWiki augmentation.
+var widgets = XWiki.widgets = XWiki.widgets || {};
+widgets.ModalPopup = Class.create({
   /** Configuration. Empty values will fall back to the CSS. */
   options : {
     title : "",
@@ -119,8 +112,8 @@ XWiki.widgets.ModalPopup = Class.create({
       Event.stop(event);
     }
     // Only do this if the dialog is not already active.
-    if (!XWiki.widgets.ModalPopup.active) {
-      XWiki.widgets.ModalPopup.active = true;
+    if (!widgets.ModalPopup.active) {
+      widgets.ModalPopup.active = true;
       if (!this.dialog) {
         // The dialog wasn't loaded, create it.
         this.createDialog();
@@ -163,7 +156,7 @@ XWiki.widgets.ModalPopup = Class.create({
     // Stop the UI shortcuts (except the initial Show Dialog one).
     this.detachKeyListeners();
     // Re-enable the 'show' behavior.
-    XWiki.widgets.ModalPopup.active = false;
+    widgets.ModalPopup.active = false;
   },
   /** Enables all the keyboard shortcuts, except the one that opens the dialog, which is already enabled. */
   attachKeyListeners : function() {
@@ -222,7 +215,10 @@ XWiki.widgets.ModalPopup = Class.create({
   }
 });
 /** Whether or not the dialog is already active (or activating). */
-XWiki.widgets.ModalPopup.active = false;
+widgets.ModalPopup.active = false;
+// End XWiki augmentation.
+return XWiki;
+}(XWiki || {}));
 
 // When the document is loaded, enable the keyboard listener that triggers the dialog.
 // document.observe("xwiki:dom:loaded", function() {

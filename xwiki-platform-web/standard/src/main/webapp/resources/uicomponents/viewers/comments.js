@@ -1,16 +1,10 @@
-// Make sure the XWiki 'namespace' exists.
-if (typeof(XWiki) == 'undefined') {
-  XWiki = new Object();
-}
-// Make sure the viewers 'namespace' exists.
-if (typeof(XWiki.viewers) == 'undefined') {
-  XWiki.viewers = new Object();
-}
-
+var XWiki = (function (XWiki) {
+// Start XWiki augmentation.
+var viewers = XWiki.viewers = XWiki.viewers || {};
 /**
  * Javascript enhancements for the comments viewer.
  */
-XWiki.viewers.Comments = Class.create({
+viewers.Comments = Class.create({
   xcommentSelector : ".xwikicomment",
   /** Constructor. Adds all the JS improvements of the Comments area. */
   initialize : function() {
@@ -419,6 +413,9 @@ XWiki.viewers.Comments = Class.create({
     return msg;
   }
 });
+// End XWiki augmentation.
+return XWiki;
+}(XWiki || {}));
 // ======================================
 // Comment actions enhancements
 document.observe('xwiki:dom:loaded', function() {

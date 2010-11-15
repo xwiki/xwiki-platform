@@ -1,19 +1,14 @@
 // ======================================
 // Ajax tag editing
 // 
-// Make sure the XWiki 'namespace' exists.
-if (typeof(XWiki) == 'undefined') {
-  XWiki = new Object();
-}
-// Make sure the viewers 'namespace' exists.
-if (typeof(XWiki.viewers) == 'undefined') {
-  XWiki.viewers = new Object();
-}
+var XWiki = (function (XWiki) {
+// Start XWiki augmentation.
+var viewers = XWiki.viewers = XWiki.viewers || {};
 
 /**
  * Tag editing.
  */
-XWiki.viewers.Tags = Class.create({
+viewers.Tags = Class.create({
   /**
    * Initialization: add listeners for all tag actions, to perform them via AJAX
    */
@@ -162,6 +157,9 @@ XWiki.viewers.Tags = Class.create({
     });
   }
 });
+// End XWiki augmentation.
+return XWiki;
+}(XWiki || {}));
 
 // Create the tags editing behavior on startup.
 document.observe('xwiki:dom:loaded', function() {

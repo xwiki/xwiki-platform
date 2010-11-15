@@ -1,16 +1,11 @@
-// Make sure the XWiki 'namespace' exists.
-if(typeof(XWiki) == 'undefined') {
-  XWiki = new Object();
-}
-// Make sure the viewers 'namespace' exists.
-if(typeof(XWiki.viewers) == 'undefined') {
-  XWiki.viewers = new Object();
-}
+var XWiki = (function (XWiki) {
+// Start XWiki augmentation.
+var viewers = XWiki.viewers = XWiki.viewers || {};
 /**
  * Enhancements for the Attachment upload area: adding and removing file fields, resetting with the Cancel button,
  * preventing submit if no files are selected.
  */
-XWiki.viewers.Attachments = Class.create({
+viewers.Attachments = Class.create({
   /** Counter for creating distinct upload field names. */
   counter : 1,
   /** Constructor. Adds all the JS improvements of the Attachment area. */
@@ -185,6 +180,9 @@ XWiki.viewers.Attachments = Class.create({
     document.observe("xwiki:docextra:loaded", listener);
   }
 });
+// End XWiki augmentation.
+return XWiki;
+}(XWiki || {}));
 
 // When the document is loaded, trigger the attachment form enhancements.
 document.observe("xwiki:dom:loaded", function() { new XWiki.viewers.Attachments(); });

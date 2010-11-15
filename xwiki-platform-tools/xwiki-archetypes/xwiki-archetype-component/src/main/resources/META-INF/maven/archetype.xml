@@ -1,8 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?><archetype>
   <id>xwiki-archetype-component</id>
   <sources>
-    <source>src/main/java/internal/DefaultHelloWorld.java</source>
     <source>src/main/java/HelloWorld.java</source>
+    <source>src/main/java/internal/DefaultHelloWorld.java</source>
+    <source>src/main/java/internal/HelloWorldScriptService.java</source>
   </sources>
   <testSources>
     <source>src/test/java/HelloWorldTest.java</source>

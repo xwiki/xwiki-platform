@@ -98,7 +98,9 @@
 <cache></cache>
 </property>
 <property>
-<code>XWiki.AnnotationSettings = Class.create({  
+<code>var XWiki = (function (XWiki) {
+// Start XWiki augmentation.
+XWiki.AnnotationSettings = Class.create({
   initialize : function() {
     this.addCheckboxListeners();
     this.addClearListeners();
@@ -188,6 +190,9 @@
     });
   }
 });
+// End XWiki augmentation.
+return XWiki;
+}(XWiki || {}));
 
 document.observe('xwiki:annotations:settings:loaded', function() {
   new XWiki.AnnotationSettings();

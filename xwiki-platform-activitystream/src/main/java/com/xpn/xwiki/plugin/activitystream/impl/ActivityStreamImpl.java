@@ -409,6 +409,8 @@ public class ActivityStreamImpl implements ActivityStream, EventListener
         event.setBody(title);
         event.setVersion(doc.getVersion());
         event.setParams(params);
+        // This might be wrong once non-altering events will be logged.
+        event.setUser(doc.getAuthor());
         addActivityEvent(event, doc, context);
     }
 

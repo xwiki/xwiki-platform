@@ -98,10 +98,8 @@
 <cache></cache>
 </property>
 <property>
-<code>if (typeof (XWiki) == 'undefined') {
-    XWiki = new Object();
-}
-
+<code>var XWiki = (function (XWiki) {
+// Start XWiki augmentation.
 XWiki.Selection = Class.create({
   container : false,
   selectionText : false,
@@ -475,7 +473,10 @@ XWiki.Selection = Class.create({
     // assume (ass of u and me) that no encounter means unique
     return true;
   }
-});</code>
+});
+// End XWiki augmentation.
+return XWiki;
+}(XWiki || {}));</code>
 </property>
 <property>
 <name>Annotation Javascript -- Selection handling code</name>
@@ -562,7 +563,9 @@ XWiki.Selection = Class.create({
 <cache></cache>
 </property>
 <property>
-<code>XWiki.Annotation = Class.create({
+<code>var XWiki = (function (XWiki) {
+// Start XWiki augmentation.
+XWiki.Annotation = Class.create({
   // the html element corresponding to the annotated content (where annotations are to be added, displayed, etc)
   annotatedElement : false,
   // tab name of the annotations tab
@@ -1519,6 +1522,9 @@ XWiki.Selection = Class.create({
     });
   }
 });
+// End XWiki augmentation.
+return XWiki;
+}(XWiki || {}));
 
 ## Retrieve the annotation settings from the configuration object
 #set($config = 'AnnotationCode.AnnotationConfig')

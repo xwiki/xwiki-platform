@@ -21,7 +21,7 @@ package ${package};
 
 import org.junit.Assert;
 import org.junit.Test;
-import org.vma.internal.DefaultHelloWorld;
+import ${package}.internal.DefaultHelloWorld;
 import org.xwiki.test.AbstractMockingComponentTestCase;
 import org.xwiki.test.annotation.MockingRequirement;
 

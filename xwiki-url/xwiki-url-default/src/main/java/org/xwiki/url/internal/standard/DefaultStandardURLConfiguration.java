@@ -37,7 +37,7 @@ public class DefaultStandardURLConfiguration implements StandardURLConfiguration
     private static final String PREFIX = "url.standard.";
 
     /**
-     * Defines from where to read the rendering configuration data.
+     * Defines from where to read the URL configuration data.
      */
     @Requirement("xwikiproperties")
     private ConfigurationSource configuration;

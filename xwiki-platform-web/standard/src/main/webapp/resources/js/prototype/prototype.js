@@ -2817,10 +2817,13 @@ Element._returnOffset = function(l, t) {
 
 Element._getContentFromAnonymousElement = function(tagName, html) {
   var div = new Element('div'), t = Element._insertionTranslations.tags[tagName];
+  div.setStyle({'display' : 'none'});
+  document.body.appendChild(div);
   if (t) {
     div.innerHTML = t[0] + html + t[1];
     t[2].times(function() { div = div.firstChild });
   } else div.innerHTML = html;
+  div.remove();
   return $A(div.childNodes);
 };
 

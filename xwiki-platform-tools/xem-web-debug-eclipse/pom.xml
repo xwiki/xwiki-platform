@@ -27,7 +27,7 @@
   <parent>
     <groupId>org.xwiki.enterprise</groupId>
     <artifactId>xwiki-enterprise-parent</artifactId>
-    <version>2.6-SNAPSHOT</version>
+    <version>2.7-SNAPSHOT</version>
   </parent>
   <artifactId>xem-web-debug</artifactId>
   <name>xem-web-debug</name>
@@ -40,7 +40,7 @@
   </scm>
   <properties>
     <!-- Used by gwt and wysiwyg modules -->
-    <gwt.version>2.0.3</gwt.version>
+    <gwt.version>2.0.4</gwt.version>
     <smartgwt.version>2.0</smartgwt.version>
 
     <!-- XEM dependencies -->

@@ -317,10 +317,11 @@ public class XWikiContext extends Hashtable<Object, Object>
 
     public void setUser(String user, boolean main)
     {
-        this.user = new XWikiUser(user, main);
         if (user == null) {
+            this.user = null;
             remove(USER_KEY);
         } else {
+            this.user = new XWikiUser(user, main);
             put(USER_KEY, user);
         }
     }

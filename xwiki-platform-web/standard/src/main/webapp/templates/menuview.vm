@@ -139,6 +139,7 @@
   #if ($xwiki.exists('XWiki.SharePage') && !$isGuest)
     #submenuitem($doc.getURL('view', 'viewer=share') $msg.get('core.menu.share') 'tmActionShare', '')
     $xwiki.jsx.use('XWiki.SharePage')
+    $xwiki.ssx.use('XWiki.SharePage')
   #end
   #xwikitopmenuentryend()
   #if($canDelete && $keyboardShortcutsEnabled)

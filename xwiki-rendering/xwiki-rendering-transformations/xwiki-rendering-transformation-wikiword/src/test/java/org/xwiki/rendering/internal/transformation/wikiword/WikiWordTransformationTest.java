@@ -20,10 +20,15 @@
 package org.xwiki.rendering.internal.transformation.wikiword;
 
 import java.io.StringReader;
+import java.util.Arrays;
+import java.util.Collections;
 
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+import org.xwiki.rendering.block.Block;
+import org.xwiki.rendering.block.MacroMarkerBlock;
+import org.xwiki.rendering.block.WordBlock;
 import org.xwiki.rendering.block.XDOM;
 import org.xwiki.rendering.parser.Parser;
 import org.xwiki.rendering.renderer.BlockRenderer;
@@ -70,4 +75,23 @@ public class WikiWordTransformationTest extends AbstractComponentTestCase
         Assert.assertEquals("This is a [[doc:WikiWord]], [[doc:Another\u00D9ne]], [[doc:XWikiEnterprise]], "
             + "not one: XWiki", printer.toString());
     }
+
+    @Test
+    public void testWikiWordTransformationIgnoresProtectedContent() throws Exception
+    {
+        String expected = "beginDocument\n"
+            + "beginMacroMarkerStandalone [code] []\n"
+            + "onWord [WikiWord]\n"
+            + "endMacroMarkerStandalone [code] []\n"
+            + "endDocument";
+
+        XDOM xdom = new XDOM(Arrays.asList((Block) new MacroMarkerBlock("code", Collections.<String, String>emptyMap(),
+            Arrays.asList((Block) new WordBlock("WikiWord")), false)));
+        this.wikiWordTransformation.transform(xdom, new TransformationContext());
+
+        WikiPrinter printer = new DefaultWikiPrinter();
+        getComponentManager().lookup(BlockRenderer.class, "event/1.0").render(xdom, printer);
+        Assert.assertEquals(expected, printer.toString());
+    }
+
 }

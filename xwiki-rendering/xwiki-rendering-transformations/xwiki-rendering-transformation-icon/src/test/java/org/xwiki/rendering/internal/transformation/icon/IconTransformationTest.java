@@ -22,11 +22,12 @@ package org.xwiki.rendering.internal.transformation.icon;
 import org.jmock.Expectations;
 import org.junit.Assert;
 import org.junit.Test;
-import org.xwiki.component.descriptor.ComponentDescriptor;
 import org.xwiki.component.descriptor.DefaultComponentDescriptor;
 import org.xwiki.configuration.ConfigurationSource;
+import org.xwiki.rendering.block.Block;
+import org.xwiki.rendering.block.MacroMarkerBlock;
+import org.xwiki.rendering.block.SpecialSymbolBlock;
 import org.xwiki.rendering.block.XDOM;
-import org.xwiki.rendering.internal.parser.PlainTextBlockParser;
 import org.xwiki.rendering.parser.Parser;
 import org.xwiki.rendering.renderer.BlockRenderer;
 import org.xwiki.rendering.renderer.printer.DefaultWikiPrinter;
@@ -37,6 +38,8 @@ import org.xwiki.test.AbstractMockingComponentTestCase;
 import org.xwiki.test.annotation.MockingRequirement;
 
 import java.io.StringReader;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.Properties;
 
 /**
@@ -96,6 +99,25 @@ public class IconTransformationTest extends AbstractMockingComponentTestCase
 
         XDOM xdom = getComponentManager().lookup(Parser.class, "xwiki/2.1").parse(new StringReader(
            "Some :) smileys:(:P:D;)(y)(n)(i)(/)(x)(!)(+)(-)(?)(on)(off)(*)"));
+        this.transformation.transform(xdom, new TransformationContext());
+
+        WikiPrinter printer = new DefaultWikiPrinter();
+        getComponentManager().lookup(BlockRenderer.class, "event/1.0").render(xdom, printer);
+        Assert.assertEquals(expected, printer.toString());
+    }
+
+    @Test
+    public void testTransformIgnoresProtectedContent() throws Exception
+    {
+        String expected = "beginDocument\n"
+            + "beginMacroMarkerStandalone [code] []\n"
+            + "onSpecialSymbol [:]\n"
+            + "onSpecialSymbol [)]\n"
+            + "endMacroMarkerStandalone [code] []\n"
+            + "endDocument";
+
+        XDOM xdom = new XDOM(Arrays.asList((Block) new MacroMarkerBlock("code", Collections.<String, String>emptyMap(),
+            Arrays.asList((Block) new SpecialSymbolBlock(':'), new SpecialSymbolBlock(')')), false)));
         this.transformation.transform(xdom, new TransformationContext());
 
         WikiPrinter printer = new DefaultWikiPrinter();

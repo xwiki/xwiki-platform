@@ -26,6 +26,7 @@ import org.xwiki.component.annotation.Component;
 import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.block.LinkBlock;
 import org.xwiki.rendering.block.WordBlock;
+import org.xwiki.rendering.internal.block.ProtectedBlockFilter;
 import org.xwiki.rendering.listener.reference.DocumentResourceReference;
 import org.xwiki.rendering.listener.reference.ResourceReference;
 import org.xwiki.rendering.transformation.AbstractTransformation;
@@ -48,13 +49,18 @@ public class WikiWordTransformation extends AbstractTransformation
         "\\p{javaUpperCase}+\\p{javaLowerCase}+(\\p{javaUpperCase}\\p{javaLowerCase}*)+");
 
     /**
+     * Used to filter protected blocks (code macro marker block, etc).
+     */
+    private ProtectedBlockFilter filter = new ProtectedBlockFilter();
+
+    /**
      * {@inheritDoc}
      * @see AbstractTransformation#transform(Block, TransformationContext)
      */
     public void transform(Block block, TransformationContext transformationContext) throws TransformationException
     {
         // Find all Word blocks and for each of them check if they're a wiki word or not
-        for (WordBlock wordBlock : block.getChildrenByType(WordBlock.class, true)) {
+        for (WordBlock wordBlock : this.filter.getChildrenByType(block, WordBlock.class, true)) {
             Matcher matcher = WIKIWORD_PATTERN.matcher(wordBlock.getWord());
             if (matcher.matches()) {
                 ResourceReference linkReference = new DocumentResourceReference(wordBlock.getWord());

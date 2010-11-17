@@ -620,7 +620,8 @@ public class MailSenderPlugin extends XWikiDefaultPlugin
         VelocityContext vcontext, XWikiContext context)
     {
         if (vcontext == null) {
-            vcontext = new VelocityContext();
+            // Use the original velocity context as a starting point
+            vcontext = new VelocityContext((VelocityContext) context.get("vcontext"));
         }
 
         vcontext.put("from.name", fromAddr);

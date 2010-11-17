@@ -1,3 +1,4 @@
+#template('colorThemeInit.vm')
 body {
   behavior: url("$xwiki.getSkinFile('/htc/csshover3.htc')");
 }
@@ -7,7 +8,7 @@ body {
 }
 
 #docextrapanes {
-  *display: inline-block;
+  display: inline-block;
 }
 
 .minwidth, .minwidthb, .minwidthc, .minwidthd {
@@ -29,7 +30,7 @@ fieldset.xwikimessage legend span span {
 
 .xwikiintracontent legend {
   margin: -5px 0 5px 0;
-  *margin: 5px 0 10px -7px;
+  margin: 5px 0 10px -7px;
 }
 
 #commentscontent #AddComment .commentcontainer label {
@@ -37,7 +38,7 @@ fieldset.xwikimessage legend span span {
 }
 
 input.button {
-  *padding: 0 0 1px;
+  padding: 0 0 1px;
 }
 
 fieldset.xwikimessage {

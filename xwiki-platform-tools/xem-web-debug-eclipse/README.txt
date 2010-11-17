@@ -2,7 +2,7 @@ This is a Eclipse project used to easily debug a complete XWiki Enterprise (it c
 
 = PREREQUISITES =
 
-* You need M2EClipse 0.9.9 or superior, if Eclipse does not propose it automatically in updates it probably mean it's still the dev version. In that case you should try http://m2eclipse.sonatype.org/update-dev/ as update site.
+* You need M2EClipse 0.9.9 or superior.
 
 = INSTALL =
 
@@ -19,4 +19,4 @@ This project comes with some example configuration you need to copy/past and set
 
 = TODO =
 
-* add support for GWT WYSIWYG
+* add support for GWT WYSIWYG (any any other GWT based module)

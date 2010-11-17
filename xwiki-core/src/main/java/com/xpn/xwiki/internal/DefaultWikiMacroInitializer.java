@@ -47,6 +47,7 @@ import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.classes.BaseClass;
 import com.xpn.xwiki.user.api.XWikiRightService;
+import com.xpn.xwiki.user.api.XWikiUser;
 
 /**
  * A {@link DefaultWikiMacroInitializer} providing wiki macros.
@@ -218,7 +219,7 @@ public class DefaultWikiMacroInitializer extends AbstractLogEnabled implements W
     {
         LOG.debug("Found macro: " + wikiMacroDocumentReference);
 
-        String originalAuthor = xcontext.getUser();
+        XWikiUser originalAuthor = xcontext.getXWikiUser();
         try {
             WikiMacro macro = this.wikiMacroFactory.createWikiMacro(wikiMacroDocumentReference);
 
@@ -236,7 +237,11 @@ public class DefaultWikiMacroInitializer extends AbstractLogEnabled implements W
             // Just log the exception and skip to the next.
             getLogger().error(ex.getMessage(), ex);
         } finally {
-            xcontext.setUser(originalAuthor);
+            if (originalAuthor != null) {
+                xcontext.setUser(originalAuthor.getUser(), originalAuthor.isMain());
+            } else {
+                xcontext.setUser(null);
+            }
         }
     }
 

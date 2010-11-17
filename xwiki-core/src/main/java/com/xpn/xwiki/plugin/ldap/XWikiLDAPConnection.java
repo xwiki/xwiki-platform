@@ -113,7 +113,7 @@ public class XWikiLDAPConnection
      * @param ldapPort the port of the server to connect to.
      * @param loginDN the user DN to connect to LDAP server.
      * @param password the password to connect to LDAP server.
-     * @param pathToKeys the patch to SSL keystore to use.
+     * @param pathToKeys the path to SSL keystore to use.
      * @param ssl if true connect using SSL.
      * @param context the XWiki context.
      * @return true if the connection succeed, false otherwise.

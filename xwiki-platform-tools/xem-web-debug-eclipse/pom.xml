@@ -39,10 +39,6 @@
     <url>http://svn.xwiki.org/svnroot/xwiki/platform/xwiki-tools/trunk/xem-web-debug-eclipse</url>
   </scm>
   <properties>
-    <!-- Used by gwt and wysiwyg modules -->
-    <gwt.version>2.0.4</gwt.version>
-    <smartgwt.version>2.0</smartgwt.version>
-
     <!-- XEM dependencies -->
     <platform.plugin.applicationmanager.version>1.15-SNAPSHOT</platform.plugin.applicationmanager.version>
     <platform.plugin.wikimanager.version>1.21-SNAPSHOT</platform.plugin.wikimanager.version>
@@ -91,16 +87,6 @@
     </dependency>
 
      <!-- The annotations modules -->
-    <dependency>
-      <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-core-annotations-core</artifactId>
-      <version>${platform.core.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-core-annotations-reference</artifactId>
-      <version>${platform.core.version}</version>
-    </dependency>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-core-annotations-io</artifactId>
@@ -161,47 +147,7 @@
     </dependency>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-web-gwt-user</artifactId>
-      <version>${project.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-web-gwt-wysiwyg-client</artifactId>
-      <version>${project.version}</version>
-    </dependency>
-    <dependency>
-      <!-- For merging styles in NestedStyleFilter -->
-      <groupId>net.sourceforge.cssparser</groupId>
-      <artifactId>cssparser</artifactId>
-      <version>0.9.5</version>
-    </dependency>
-
-    <!-- GWT core dependencies -->
-    <dependency>
-      <groupId>com.google.gwt</groupId>
-      <artifactId>gwt-servlet</artifactId>
-      <version>${gwt.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>com.google.gwt</groupId>
-      <artifactId>gwt-user</artifactId>
-      <version>${gwt.version}</version>
-    </dependency>
-    <!-- GWT libraries -->
-    <dependency>
-      <groupId>com.google.gwt</groupId>
-      <artifactId>incubator-glasspanel</artifactId>
-      <version>r729</version>
-      <scope>provided</scope>
-    </dependency>
-    <dependency>
-      <groupId>com.smartgwt</groupId>
-      <artifactId>smartgwt</artifactId>
-      <version>${smartgwt.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-web-gwt-dom</artifactId>
       <version>${project.version}</version>
     </dependency>
 

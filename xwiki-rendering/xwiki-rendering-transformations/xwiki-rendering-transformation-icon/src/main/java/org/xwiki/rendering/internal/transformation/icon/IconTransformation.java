@@ -28,6 +28,7 @@ import org.xwiki.rendering.block.ImageBlock;
 import org.xwiki.rendering.block.WordBlock;
 import org.xwiki.rendering.block.SpecialSymbolBlock;
 import org.xwiki.rendering.block.XDOM;
+import org.xwiki.rendering.internal.block.ProtectedBlockFilter;
 import org.xwiki.rendering.listener.reference.ResourceReference;
 import org.xwiki.rendering.listener.reference.ResourceType;
 import org.xwiki.rendering.parser.ParseException;
@@ -76,6 +77,11 @@ public class IconTransformation extends AbstractTransformation implements Initia
     private XDOM mappingTree;
 
     /**
+     * Used to filter protected blocks (code macro marker block, etc).
+     */
+    private ProtectedBlockFilter filter = new ProtectedBlockFilter();
+
+    /**
      * {@inheritDoc}
      * @see org.xwiki.component.phase.Initializable#initialize()
      */
@@ -103,8 +109,9 @@ public class IconTransformation extends AbstractTransformation implements Initia
      */
     public void transform(Block source, TransformationContext context) throws TransformationException
     {
-        if (!this.mappingTree.getChildren().isEmpty() && !source.getChildren().isEmpty()) {
-            parseTree(source.getChildren());
+        List<Block> filteredBlocks = this.filter.filter(source.getChildren());
+        if (!this.mappingTree.getChildren().isEmpty() && !filteredBlocks.isEmpty()) {
+            parseTree(filteredBlocks);
         }
     }
 
@@ -232,12 +239,13 @@ public class IconTransformation extends AbstractTransformation implements Initia
                 }
             }
             // Look for a match in children of the source block
-            if (sourceBlock.getChildren().size() > 0) {
-                parseTree(sourceBlock.getChildren());
+            List<Block> filteredSourceBlocks = this.filter.filter(sourceBlock.getChildren());
+            if (filteredSourceBlocks.size() > 0) {
+                parseTree(filteredSourceBlocks);
             } else if (mappingCursor == null) {
                 mappingCursor = this.mappingTree.getChildren().get(0);
             }
-            sourceBlock = sourceBlock.getNextSibling();
+            sourceBlock = this.filter.getNextSibling(sourceBlock);
         }
     }
 }

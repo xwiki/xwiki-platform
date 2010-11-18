@@ -957,7 +957,8 @@ var LiveTableFilter = Class.create({
    * Apply style to livetable filters that are applied
    */
   applyActiveFilterStyle: function(element) {
-    if(element && ((element.tagName.toLowerCase() == "input" && element.type == "text") || element.tagName.toLowerCase() == "select")) {
+    if(element && element.tagName && 
+	    ((element.tagName.toLowerCase() == "input" && element.type == "text") || element.tagName.toLowerCase() == "select")) {
       if ($F(element) != '') {
         element.addClassName('xwiki-livetable-filter-active');
       } else {

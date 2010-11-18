@@ -1002,7 +1002,7 @@ public class ActivityStreamImpl implements ActivityStream, EventListener
 
         searchHql.append("select act.page, max(act.date) from ActivityEventImpl as act");
         if (StringUtils.isNotBlank(optionalWhereClause)) {
-            searchHql.append("where ");
+            searchHql.append(" where ");
             searchHql.append(optionalWhereClause);
         }
         searchHql.append(" group by act.page order by 2 desc");

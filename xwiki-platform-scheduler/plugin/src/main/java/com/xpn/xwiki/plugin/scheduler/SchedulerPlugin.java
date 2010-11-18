@@ -54,7 +54,7 @@ import com.xpn.xwiki.web.XWikiServletRequest;
 
 /**
  * See {@link com.xpn.xwiki.plugin.scheduler.SchedulerPluginApi} for documentation.
- *
+ * 
  * @version $Id$
  */
 public class SchedulerPlugin extends XWikiDefaultPlugin
@@ -76,7 +76,7 @@ public class SchedulerPlugin extends XWikiDefaultPlugin
 
     /**
      * Default plugin constructor.
-     *
+     * 
      * @see XWikiDefaultPlugin#XWikiDefaultPlugin(String,String,com.xpn.xwiki.XWikiContext)
      */
     public SchedulerPlugin(String name, String className, XWikiContext context)
@@ -86,7 +86,7 @@ public class SchedulerPlugin extends XWikiDefaultPlugin
 
     /**
      * {@inheritDoc}
-     *
+     * 
      * @see com.xpn.xwiki.plugin.XWikiPluginInterface#init(com.xpn.xwiki.XWikiContext)
      */
     @Override
@@ -147,7 +147,7 @@ public class SchedulerPlugin extends XWikiDefaultPlugin
 
     /**
      * {@inheritDoc}
-     *
+     * 
      * @see com.xpn.xwiki.plugin.XWikiPluginInterface#virtualInit(com.xpn.xwiki.XWikiContext)
      */
     @Override
@@ -161,7 +161,7 @@ public class SchedulerPlugin extends XWikiDefaultPlugin
      * fields "contextUser", "contextLang", "contextDatabase". If one of this field is empty (this would typically
      * happen on the first schedule operation), it is instead retrieved from the passed context, and the job object is
      * updated with this value. This mean that this method may modify the passed object.
-     *
+     * 
      * @param job the job for which the context will be prepared
      * @param context the XWikiContext at preparation time. This is a real context associated with a servlet request
      * @return the stub context prepared with job datas.
@@ -226,7 +226,7 @@ public class SchedulerPlugin extends XWikiDefaultPlugin
         // errors.
         XWikiResponse stub = new XWikiServletResponseStub();
         scontext.setResponse(stub);
-        
+
         // feed the dummy context
         scontext.setUser(cUser);
         scontext.setLanguage(cLang);
@@ -263,7 +263,7 @@ public class SchedulerPlugin extends XWikiDefaultPlugin
      * stored status. If a Job is stored with the status "Normal", it is just scheduled If a Job is stored with the
      * status "Paused", then it is both scheduled and paused Jobs with other status (None, Complete) are not
      * rescheduled.
-     *
+     * 
      * @param context The XWikiContext when initializing the plugin
      */
     private void restoreExistingJobs(XWikiContext context) throws SchedulerPluginException
@@ -300,7 +300,7 @@ public class SchedulerPlugin extends XWikiDefaultPlugin
      * Retrieve the job's status of a given {@link com.xpn.xwiki.plugin.scheduler.SchedulerPlugin#XWIKI_JOB_CLASS} job
      * XObject, by asking the actual job status to the quartz scheduler instance. It's the actual status, as the one
      * stored in the XObject may be changed manually by users.
-     *
+     * 
      * @param object the XObject to give the status of
      * @return the status of the Job inside the quartz scheduler, as {@link com.xpn.xwiki.plugin.scheduler.JobState}
      *         instance
@@ -324,8 +324,8 @@ public class SchedulerPlugin extends XWikiDefaultPlugin
                 new JobDetail(xjob, Scheduler.DEFAULT_GROUP, Class.forName(object.getStringValue("jobClass")));
 
             Trigger trigger =
-                new CronTrigger(xjob, Scheduler.DEFAULT_GROUP, xjob, Scheduler.DEFAULT_GROUP, object
-                    .getStringValue("cron"));
+                new CronTrigger(xjob, Scheduler.DEFAULT_GROUP, xjob, Scheduler.DEFAULT_GROUP,
+                    object.getStringValue("cron"));
 
             // Let's prepare an execution context...
             XWikiContext stubContext = prepareJobStubContext(object, context);
@@ -335,7 +335,7 @@ public class SchedulerPlugin extends XWikiDefaultPlugin
             data.put("xwiki", new com.xpn.xwiki.api.XWiki(context.getWiki(), stubContext));
             data.put("xjob", object);
             data.put("services", Utils.getComponent(ScriptServiceManager.class));
-            
+
             job.setJobDataMap(data);
 
             getScheduler().addJob(job, true);
@@ -387,7 +387,7 @@ public class SchedulerPlugin extends XWikiDefaultPlugin
 
     /**
      * Pause the job with the given name by pausing all of its current triggers.
-     *
+     * 
      * @param object the non-wrapped XObject Job to be paused
      */
     public void pauseJob(BaseObject object, XWikiContext context) throws SchedulerPluginException
@@ -406,7 +406,7 @@ public class SchedulerPlugin extends XWikiDefaultPlugin
 
     /**
      * Resume the job with the given name (un-pause)
-     *
+     * 
      * @param object the non-wrapped XObject Job to be resumed
      */
     public void resumeJob(BaseObject object, XWikiContext context) throws SchedulerPluginException
@@ -441,7 +441,7 @@ public class SchedulerPlugin extends XWikiDefaultPlugin
 
     /**
      * Unschedule the given job
-     *
+     * 
      * @param object the unwrapped XObject job to be unscheduled
      */
     public void unscheduleJob(BaseObject object, XWikiContext context) throws SchedulerPluginException
@@ -460,7 +460,7 @@ public class SchedulerPlugin extends XWikiDefaultPlugin
 
     /**
      * Get Trigger object of the given job
-     *
+     * 
      * @param object the unwrapped XObject to be retrieve the trigger for
      * @param context the XWiki context
      * @return the trigger object of the given job
@@ -485,13 +485,13 @@ public class SchedulerPlugin extends XWikiDefaultPlugin
 
     /**
      * Give, for a BaseObject job in a {@link JobState#STATE_NORMAL} state, the previous date at which the job has been
-     * executed. Note that this method does not compute a date from the CRON expression, it only returns a date value 
+     * executed. Note that this method does not compute a date from the CRON expression, it only returns a date value
      * which is set each time the job is executed. If the job has never been fired this method will return null.
      * 
      * @param object unwrapped XObject job for which the next fire time will be given
      * @param context the XWiki context
      * @return the next Date the job will be fired at, null if the job has never been fired
-     */    
+     */
     public Date getPreviousFireTime(BaseObject object, XWikiContext context) throws SchedulerPluginException
     {
         return getTrigger(object, context).getPreviousFireTime();
@@ -499,7 +499,7 @@ public class SchedulerPlugin extends XWikiDefaultPlugin
 
     /**
      * Get the next fire time for the given job name SchedulerJob
-     *
+     * 
      * @param object unwrapped XObject job for which the next fire time will be given
      * @return the next Date the job will be fired at
      */
@@ -561,7 +561,7 @@ public class SchedulerPlugin extends XWikiDefaultPlugin
 
     /**
      * Associates the scheduler with a StatusListener
-     *
+     * 
      * @throws SchedulerPluginException if the status listener failed to be set properly
      */
     private void setStatusListener() throws SchedulerPluginException
@@ -606,7 +606,7 @@ public class SchedulerPlugin extends XWikiDefaultPlugin
     /**
      * Creates the XWiki SchedulerJob XClass if it does not exist in the wiki. Update it if it exists but is missing
      * some properties.
-     *
+     * 
      * @param context the XWiki context
      * @throws SchedulerPluginException if the updated SchedulerJob XClass failed to be saved
      */
@@ -642,7 +642,7 @@ public class SchedulerPlugin extends XWikiDefaultPlugin
         needsUpdate |= bclass.addTextField("contextUser", "Job execution context user", 30);
         needsUpdate |= bclass.addTextField("contextLang", "Job execution context lang", 30);
         needsUpdate |= bclass.addTextField("contextDatabase", "Job execution context database", 30);
-        
+
         if (StringUtils.isBlank(doc.getCreator())) {
             needsUpdate = true;
             doc.setCreator("superadmin");
@@ -660,7 +660,7 @@ public class SchedulerPlugin extends XWikiDefaultPlugin
             doc.setTitle("XWiki Scheduler Job Class");
         }
         if (StringUtils.isBlank(doc.getContent()) || !XWikiDocument.XWIKI20_SYNTAXID.equals(doc.getSyntaxId())) {
-            needsUpdate = true;      
+            needsUpdate = true;
             doc.setContent("{{include document=\"XWiki.ClassSheet\" /}}");
             doc.setSyntaxId(XWikiDocument.XWIKI20_SYNTAXID);
         }

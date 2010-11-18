@@ -470,4 +470,31 @@ public interface ActivityStream
      * @throws ActivityStreamException if the retrieval fails
      */
     List<ActivityEvent> getRelatedEvents(ActivityEvent event, XWikiContext context) throws ActivityStreamException;
+
+    /**
+     * Get unique pages with events sorted by date.
+     * 
+     * @param optionalWhereClause optional HQL where query statement
+     * @param maxItems maximum number of documents to retrieve
+     * @param startAt query offset
+     * @param context the XWiki context
+     * @return pairs of [document name, last event date], in descending order of the last event date
+     * @throws ActivityStreamException if the search fails
+     */
+    List<Object[]> searchUniquePages(String optionalWhereClause, int maxItems, int startAt, XWikiContext context)
+        throws ActivityStreamException;
+
+    /**
+     * Get unique pages with events sorted by date.
+     * 
+     * @param optionalWhereClause optional HQL where query statement
+     * @param parametersValues values for the query parameters
+     * @param maxItems maximum number of documents to retrieve
+     * @param startAt query offset
+     * @param context the XWiki context
+     * @return pairs of [document name, last event date], in descending order of the last event date
+     * @throws ActivityStreamException if the search fails
+     */
+    List<Object[]> searchUniquePages(String optionalWhereClause, List<Object> parametersValues, int maxItems,
+        int startAt, XWikiContext context) throws ActivityStreamException;
 }

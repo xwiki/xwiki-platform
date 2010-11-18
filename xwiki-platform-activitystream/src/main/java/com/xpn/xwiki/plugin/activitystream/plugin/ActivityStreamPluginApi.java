@@ -20,7 +20,11 @@
 package com.xpn.xwiki.plugin.activitystream.plugin;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 import com.sun.syndication.feed.synd.SyndEntry;
 import com.sun.syndication.feed.synd.SyndFeed;
@@ -38,6 +42,9 @@ import com.xpn.xwiki.plugin.activitystream.api.ActivityStreamException;
  */
 public class ActivityStreamPluginApi extends PluginApi<ActivityStreamPlugin>
 {
+    /** Logging helper object. */
+    private static final Log LOG = LogFactory.getLog(ActivityStreamPlugin.class);
+
     /**
      * Constructor.
      * 
@@ -721,5 +728,45 @@ public class ActivityStreamPluginApi extends PluginApi<ActivityStreamPlugin>
     public List<ActivityEvent> getRelatedEvents(ActivityEvent event) throws ActivityStreamException
     {
         return wrapEvents(getActivityStream().getRelatedEvents(event.getEvent(), this.context));
+    }
+
+    /**
+     * Get unique page events sorted by date
+     * 
+     * @param hql HQL where query statement
+     * @param nb number of events to retrieve
+     * @param start query offset
+     * @return matching pages with events
+     * @throws ActivityStreamException if the search query fails
+     */
+    public List<Object[]> searchUniquePages(String optionalWhereClause, int maxItems, int startAt)
+    {
+        try {
+            return getActivityStream().searchUniquePages(optionalWhereClause, maxItems, startAt, this.context);
+        } catch (ActivityStreamException ex) {
+            LOG.error("Failed to query events: " + ex.getMessage(), ex);
+            return Collections.emptyList();
+        }
+    }
+
+    /**
+     * Get unique page events sorted by date
+     * 
+     * @param hql HQL where query statement
+     * @param nb number of events to retrieve
+     * @param start query offset
+     * @return matching pages with events
+     * @throws ActivityStreamException if the search query fails
+     */
+    public List<Object[]> searchUniquePages(String optionalWhereClause, List<Object> parametersValues, int maxItems,
+        int startAt)
+    {
+        try {
+            return getActivityStream().searchUniquePages(optionalWhereClause, parametersValues, maxItems, startAt,
+                this.context);
+        } catch (ActivityStreamException ex) {
+            LOG.error("Failed to query events: " + ex.getMessage(), ex);
+            return Collections.emptyList();
+        }
     }
 }

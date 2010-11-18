@@ -26,6 +26,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.commons.lang.RandomStringUtils;
+import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.hibernate.Query;
@@ -975,5 +976,48 @@ public class ActivityStreamImpl implements ActivityStream, EventListener
         params.add(event.getRequestId());
 
         return this.searchEvents("", "act.requestId= ? ", false, false, 0, 0, params, context);
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see ActivityStream#searchUniquePages(String, int, int, XWikiContext))
+     */
+    public List<Object[]> searchUniquePages(String optionalWhereClause, int maxItems, int startAt,
+        XWikiContext context) throws ActivityStreamException
+    {
+        return searchUniquePages(optionalWhereClause, null, maxItems, startAt, context);
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see ActivityStream#searchUniquePages(String, List, int, int, XWikiContext))
+     */
+    public List<Object[]> searchUniquePages(String optionalWhereClause, List<Object> parametersValues,
+        int maxItems, int startAt, XWikiContext context) throws ActivityStreamException
+    {
+        StringBuffer searchHql = new StringBuffer();
+        List<Object[]> results;
+
+        searchHql.append("select act.page, max(act.date) from ActivityEventImpl as act");
+        if (StringUtils.isNotBlank(optionalWhereClause)) {
+            searchHql.append("where ");
+            searchHql.append(optionalWhereClause);
+        }
+        searchHql.append(" group by act.page order by 2 desc");
+
+        String oriDatabase = context.getDatabase();
+        try {
+            context.setDatabase(context.getMainXWiki());
+            results =
+                context.getWiki().getStore().search(searchHql.toString(), maxItems, startAt, parametersValues, context);
+        } catch (XWikiException e) {
+            throw new ActivityStreamException(e);
+        } finally {
+            context.setDatabase(oriDatabase);
+        }
+
+        return results;
     }
 }

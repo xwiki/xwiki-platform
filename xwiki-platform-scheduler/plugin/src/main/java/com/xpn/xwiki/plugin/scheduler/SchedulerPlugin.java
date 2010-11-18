@@ -22,7 +22,6 @@ package com.xpn.xwiki.plugin.scheduler;
 import java.net.URL;
 import java.text.ParseException;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 
@@ -94,26 +93,36 @@ public class SchedulerPlugin extends XWikiDefaultPlugin
     {
         try {
             String initialDb = !context.getDatabase().equals("") ? context.getDatabase() : context.getMainXWiki();
-            List<String> wikiServers = Collections.emptyList();
 
+            List<String> wikiServers;
             if (context.getWiki().isVirtualMode()) {
                 try {
                     wikiServers = context.getWiki().getVirtualWikisDatabaseNames(context);
-                    if (!wikiServers.contains(context.getMainXWiki())) {
-                        wikiServers.add(context.getMainXWiki());
-                    }
                 } catch (Exception e) {
                     LOG.error("error getting list of wiki servers!", e);
+                    wikiServers = new ArrayList<String>();
                 }
             } else {
                 wikiServers = new ArrayList<String>();
+            }
+
+            if (!wikiServers.contains(context.getMainXWiki())) {
                 wikiServers.add(context.getMainXWiki());
             }
 
+            // Init class
+            
             try {
-                for (String wikiName : wikiServers) {
+                for (String wikiName : new ArrayList<String>(wikiServers)) {
                     context.setDatabase(wikiName);
-                    updateSchedulerJobClass(context);
+                    try {
+                        updateSchedulerJobClass(context);
+                    } catch (Exception e) {
+                        LOG.error("Failed to update scheduler job class for in wiki [" + wikiName + "]", e);
+
+                        // Removing the wiki from the list since it will be impossible start jobs for it
+                        wikiServers.remove(wikiName);
+                    }
                 }
             } finally {
                 context.setDatabase(initialDb);
@@ -128,6 +137,8 @@ public class SchedulerPlugin extends XWikiDefaultPlugin
             setStatusListener();
             getScheduler().start();
 
+            // Restore jobs
+            
             try {
                 // Iterate on all virtual wikis
                 for (String wikiName : wikiServers) {
@@ -142,6 +153,7 @@ public class SchedulerPlugin extends XWikiDefaultPlugin
         } catch (SchedulerPluginException e) {
             LOG.error("Failed to initialize the scheduler", e);
         }
+
         super.init(context);
     }
 

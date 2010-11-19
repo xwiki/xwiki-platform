@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<xwikidoc>
+<web>XAppResources</web>
+<name>Translations</name>
+<language>de</language>
+<defaultLanguage>en</defaultLanguage>
+<translation>1</translation>
+<parent>XAppResources.WebHome</parent>
+<creator></creator>
+<author>XWiki.Admin</author>
+<customClass></customClass>
+<contentAuthor>XWiki.Admin</contentAuthor>
+<creationDate>1192218584000</creationDate>
+<date>1278346254000</date>
+<contentUpdateDate>1278346254000</contentUpdateDate>
+<version>1.1</version>
+<title></title>
+<template></template>
+<defaultTemplate></defaultTemplate>
+<validationScript></validationScript>
+<comment></comment>
+<minorEdit>false</minorEdit>
+<syntaxId>xwiki/2.0</syntaxId>
+<hidden>false</hidden>
+<content>## XWiki Translation for language de generated from http://www.l10n.xwiki.org
+xapp.action.exportnonrecurse=Export (nicht rekursiv)
+xapp.action.exportrecurse=Export
+xapp.action.reloadapp=Neu laden
+xapp.answer.deleteapp.msg=Sind Sie sicher, dass Sie Applikation "{0}" l\u00F6schen wollen.
+xapp.answer.deleteapp.title=Applikation "{0}" l\u00F6schen
+xapp.answer.exportapp.recursive=Rekursiv
+xapp.answer.exportapp.title=Applikation "{0}" exportieren
+xapp.answer.exportapp.withdetails=Mit Historie
+xapp.appmanager=Applikationmanager
+xapp.appname=Applikationname
+xapp.availablefilestoimport=F\u00FCr den Import verf\u00FCgbare Dateien.
+xapp.createapplication=Neue Applikation erstellen
+xapp.description=Beschreibung
+xapp.docname=Dokumentname
+xapp.errorcreateapp=Beim Erstellen von Applikation "{0}" trat ein Fehler auf (Code "{1}"}.
+xapp.errorcreateapp.ERROR_AM_APPDOCALREADYEXISTS=Applikation "{0}" existiert bereits. W\u00E4hlen Sie einen anderen Namen.
+xapp.errordeleteapp=Beim L\u00F6schen von Applikation "{0}" trat ein Fehler auf (Code "{1}"}.
+xapp.errorexportapp=Beim Exportieren von Applikation "{0}" trat ein Fehler auf (Code "{1}"}.
+xapp.errorimportapp=Beim Importieren von Applikation "{0}" trat ein Fehler auf (Code "{1}"}.
+xapp.errorreloadapp=Beim Neu laden von Applikation "{0}" trat ein Fehler auf (Code "{1}"}.
+xapp.legend.application=Applikation
+xapp.legend.validate=Pr\u00FCfen
+xapp.pluginnotenabled=Das Applikationmanager-Plugin ist nicht aktiv. Diese Seite wird nicht korrekt funktionieren. Stellen Sie sicher, dass "com.xpn.xwiki.plugin.applicationmanager.ApplicationManagerPlugin" im xwiki.plugins-Parameter in der xwiki.cfg-Datei aufscheint.
+xapp.successcreateapp=Applikation \u201C{0}" wurde erstellt. Sie k\u00F6nnen Sie unter [{1}] erreichen.
+xapp.successdeleteapp=Applikation \u201C{0}" erfolgreich gel\u00F6scht.
+xapp.successexportapp=Applikation \u201C{0}" erfolgreich exportiert.
+xapp.successimportapp=Applikationpaket \u201C{0}" erfolgreich importiert.
+xapp.successreloadapp=Applikation \u201C{0}" erfolgreich neu geladen.
+xapp.totalnumberofapp=Gesamtzahl der Applikationen
+</content></xwikidoc>

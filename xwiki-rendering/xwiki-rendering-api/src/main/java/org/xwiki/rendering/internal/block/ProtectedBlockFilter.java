@@ -74,7 +74,7 @@ public class ProtectedBlockFilter implements BlockFilter
     {
         Block sibling = block.getNextSibling();
         while (sibling != null && isProtectedBlock(sibling)) {
-            sibling = block.getNextSibling();
+            sibling = sibling.getNextSibling();
         }
         return sibling;
     }

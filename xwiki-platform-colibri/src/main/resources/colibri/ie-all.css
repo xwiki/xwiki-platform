@@ -7,7 +7,7 @@ body {
   display: inline-block;
 }
 
-#docextrapanes {
+*+html #docextrapanes {
   display: inline-block;
 }
 
@@ -30,6 +30,9 @@ fieldset.xwikimessage legend span span {
 
 .xwikiintracontent legend {
   margin: -5px 0 5px 0;
+}
+
+*+html .xwikiintracontent legend {
   margin: 5px 0 10px -7px;
 }
 
@@ -37,7 +40,7 @@ fieldset.xwikimessage legend span span {
   display: none;
 }
 
-input.button {
+*+html input.button {
   padding: 0 0 1px;
 }
 

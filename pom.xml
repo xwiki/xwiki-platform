@@ -37,7 +37,7 @@
   <description>XWiki Platform - Core - Parent POM</description>
   <properties>
     <!-- Versions of XWiki dependencies used in Core modules -->
-    <clirr.previous.version>2.6-rc-2</clirr.previous.version>
+    <clirr.previous.version>2.6</clirr.previous.version>
   </properties>
   <scm>
     <connection>scm:svn:http://svn.xwiki.org/svnroot/xwiki/platform/core/trunk</connection>

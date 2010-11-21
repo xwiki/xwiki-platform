@@ -99,9 +99,8 @@ public class StandardXWikiURLFactoryTest extends AbstractComponentTestCase
     public void testCreateXWikiURLWhenInvalidURL() throws Exception
     {
         try {
-            // Invalid URL since the space isn't encoded.
-            XWikiURL xwikiURL = createURL("http://host/xwiki/bin/view/Space/Page Name", true, "host");
-            assertXWikiURL(xwikiURL, "view", new DocumentReference("Wiki", "Space", "Page Name"));
+            // Invalid URL since the space in the page name isn't encoded.
+            createURL("http://host/xwiki/bin/view/Space/Page Name", true, "host");
             Assert.fail("Should have thrown an exception here");
         } catch (InvalidURLException expected) {
             Assert.assertEquals("Invalid URL [http://host/xwiki/bin/view/Space/Page Name]", expected.getMessage());
@@ -161,7 +160,7 @@ public class StandardXWikiURLFactoryTest extends AbstractComponentTestCase
         getMockery().checking(new Expectations() {{
             allowing(mockHostResolver).resolve(expectedHost);
                 will(returnValue(new WikiReference("Wiki")));
-            allowing(mockConfiguration).isPathBasedMultiWikiFormat();
+            allowing(mockConfiguration).isPathBasedMultiWiki();
                 will(returnValue(!isDomainBasedWikiFormat));
             allowing(mockConfiguration).getWikiPathPrefix();
                 will(returnValue("wiki"));

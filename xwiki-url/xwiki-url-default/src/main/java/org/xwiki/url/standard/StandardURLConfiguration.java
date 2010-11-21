@@ -28,7 +28,7 @@ import org.xwiki.component.annotation.ComponentRole;
 @ComponentRole
 public interface StandardURLConfiguration
 {
-    boolean isPathBasedMultiWikiFormat();
+    boolean isPathBasedMultiWiki();
 
     String getWikiPathPrefix();
 }

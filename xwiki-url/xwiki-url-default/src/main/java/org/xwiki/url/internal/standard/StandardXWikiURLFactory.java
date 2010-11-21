@@ -209,7 +209,7 @@ public class StandardXWikiURLFactory implements XWikiURLFactory<URL>
     protected WikiReference extractWikiReference(URI uri, URLParsingState state)
     {
         String host = null;
-        if (this.configuration.isPathBasedMultiWikiFormat()) {
+        if (this.configuration.isPathBasedMultiWiki()) {
             // If the first path element isn't the value of the wikiPathPrefix configuration value then we fall back
             // to the host name. This also allows the main wiki URL to be domain-based even for a path-based multiwiki.
             if (state.urlSegments.get(0).equalsIgnoreCase(this.configuration.getWikiPathPrefix())) {

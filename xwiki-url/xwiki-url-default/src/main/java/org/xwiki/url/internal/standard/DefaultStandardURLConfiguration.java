@@ -44,11 +44,11 @@ public class DefaultStandardURLConfiguration implements StandardURLConfiguration
 
     /**
      * {@inheritDoc}
-     * @see org.xwiki.url.standard.StandardURLConfiguration#isPathBasedMultiWikiFormat()
+     * @see org.xwiki.url.standard.StandardURLConfiguration#isPathBasedMultiWiki()
      */
-    public boolean isPathBasedMultiWikiFormat()
+    public boolean isPathBasedMultiWiki()
     {
-        return this.configuration.getProperty(PREFIX + "pathBasedMultiWiki", Boolean.FALSE);
+        return this.configuration.getProperty(PREFIX + "multiwiki.isPathBased", Boolean.FALSE);
     }
 
     /**
@@ -57,6 +57,6 @@ public class DefaultStandardURLConfiguration implements StandardURLConfiguration
      */
     public String getWikiPathPrefix()
     {
-        return this.configuration.getProperty(PREFIX + "wikiPathPrefix", "wiki");
+        return this.configuration.getProperty(PREFIX + "multiwiki.wikiPathPrefix", "wiki");
     }
 }

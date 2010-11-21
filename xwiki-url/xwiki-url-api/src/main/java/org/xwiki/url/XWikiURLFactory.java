@@ -25,7 +25,7 @@ import org.xwiki.component.annotation.ComponentRole;
 import java.util.Map;
 
 /**
- * Transforms some representation of a XWiki URL into a {@link XWikiURL} instance.
+ * Transforms some representation of an XWiki URL into a {@link XWikiURL} instance.
  * 
  * @version $Id$
  * @param <T> the object to transform into a XWiki URL

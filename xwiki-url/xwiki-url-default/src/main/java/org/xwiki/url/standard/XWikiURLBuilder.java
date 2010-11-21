@@ -38,7 +38,7 @@ public interface XWikiURLBuilder
      *
      * @param wikiReference the wiki reference part of the
      * @param pathSegments the URL path segments (ie the parts separated by forward slashes in the URL) but starting
-     *        at the action segment part (e.g. "/view/Space/Page")
+     *        at the action segment part (e.g. List of ("view", "Space", "Page") for "/view/Space/Page")
      * @return the {@link XWikiURL} object
      */
     XWikiURL build(WikiReference wikiReference, List<String> pathSegments);

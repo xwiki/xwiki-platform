@@ -48,6 +48,7 @@ public class DefaultURLConfiguration implements URLConfiguration
      */
     public String getURLFormatId()
     {
-        return this.configuration.getProperty(PREFIX + "formatId", "standard");        
+        // Note: the format corresponds to the component hint for the XWikiURLFactory implementation to use.
+        return this.configuration.getProperty(PREFIX + "format", "standard");
     }
 }

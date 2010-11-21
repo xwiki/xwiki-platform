@@ -19,7 +19,6 @@
  */
 package org.xwiki.url.internal.standard;
 
-import org.jmock.Mockery;
 import org.junit.Assert;
 import org.junit.Test;
 import org.xwiki.model.reference.AttachmentReference;
@@ -46,8 +45,6 @@ public class EntityXWikiURLBuilderTest extends AbstractComponentTestCase
     private static final WikiReference WIKI_REFERENCE = new WikiReference("Wiki");
 
     private XWikiURLBuilder builder;
-
-    private Mockery mockery = new Mockery();
 
     @Override protected void registerComponents() throws Exception
     {

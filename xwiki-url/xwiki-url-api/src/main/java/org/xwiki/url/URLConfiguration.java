@@ -20,6 +20,8 @@
 package org.xwiki.url;
 
 /**
+ * Configuration options for the URL module.
+ *
  * @version $Id$
  * @since 2.3M1
  */

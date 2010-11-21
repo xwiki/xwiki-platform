@@ -49,9 +49,11 @@ public class AbstractXWikiURL implements XWikiURL
     {
         setType(type);
     }
-    
+
     /**
-     * @return the type of URL (Entity URL, Attachment URL, Template URL, etc) 
+     * {@inheritDoc}
+     *
+     * @see org.xwiki.url.XWikiURL#getType()
      */
     public XWikiURLType getType()
     {
@@ -76,26 +78,29 @@ public class AbstractXWikiURL implements XWikiURL
     }
 
     /**
-     * A XWiki URL parameter provides optional additional information about the URL. 
-     * For example these will find their way into the Query String when the XWiki URL serialized to a standard URL.
-     * Note that there can be several values for the same name (since this is allowed in URLs and we want to map a 
-     * URL to a XWiki URL). Also note that the order in the map is the same as the order in the URL.
-     * 
-     * @return the XWiki URL parameters
+     * {@inheritDoc}
+     *
+     * @see org.xwiki.url.XWikiURL#getParameters()
      */
     public Map<String, List<String>> getParameters()
     {
         return Collections.unmodifiableMap(this.parameters);
     }
 
+    /**
+     * {@inheritDoc}
+     *
+     * @see XWikiURL#getParameterValues(String)
+     */
     public List<String> getParameterValues(String name)
     {
         return this.parameters.get(name);
     }
-    
+
     /**
-     * @param name the parameter name for which to return the value
-     * @return the first parameter value matching the passed parameter name
+     * {@inheritDoc}
+     *
+     * @see XWikiURL#getParameterValue(String)
      */
     public String getParameterValue(String name)
     {

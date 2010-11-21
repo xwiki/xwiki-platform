@@ -48,7 +48,6 @@ public class DefaultStandardURLConfiguration implements StandardURLConfiguration
      */
     public boolean isPathBasedMultiWikiFormat()
     {
-        // Note: the id corresponds to the component hint for the WikiReferenceResolver component role.
         return this.configuration.getProperty(PREFIX + "pathBasedMultiWiki", Boolean.FALSE);
     }
 

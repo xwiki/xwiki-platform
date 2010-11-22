@@ -97,12 +97,12 @@ $xwiki.ssx.use('Main.Dashboard')##
                                   var deleteLink = new Element('a', {
                                     href : row.deleteUrl
                                   });
-                                  deleteLink.insert(new Element('img', {  
-                                    'src' : '/xwiki/resources/icons/silk/cross.gif'
+                                  deleteLink.insert(new Element('img', {
+                                    'src' : '${xwiki.getSkinFile('icons/silk/cross.gif')}'
                                   }));
                                   deleteLink.observe('click', function(event) {
                                     Event.stop(event);
-                                    var surl = row.deleteUrl;        
+                                    var surl = row.deleteUrl;
                                     var myAjax = new Ajax.Request(
                                       surl,
                                       {

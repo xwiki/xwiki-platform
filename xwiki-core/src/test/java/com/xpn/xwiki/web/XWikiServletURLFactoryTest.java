@@ -142,14 +142,28 @@ public class XWikiServletURLFactoryTest extends AbstractBridgedXWikiComponentTes
         getContext().setWiki(xwiki);
         getContext().setRequest((XWikiRequest) mockXWikiRequest.proxy());
 
-        XWikiDocument wiki1Doc = getDocument(new DocumentReference(MAIN_WIKI_NAME, "XWiki", "XWikiServerWiki1"));
-        BaseObject wiki1Obj = wiki1Doc.newObject("XWiki.XWikiServerClass", getContext());
-        wiki1Obj.setStringValue("server", "wiki1server");
-        saveDocument(wiki1Doc);
+        // Create sub-wikis.
+        createWiki("wiki1");
+        createWiki("wiki2");
 
         getContext().setURL(new URL("http://127.0.0.1/xwiki/view/InitialSpace/InitialPage"));
 
         this.urlFactory.init(getContext());
+    }
+
+    /**
+     * Creates a new sub-wiki with the given name.
+     * 
+     * @param wikiName the wiki name
+     * @throws Exception if creating the wiki fails
+     */
+    private void createWiki(String wikiName) throws Exception
+    {
+        String wikiDocName = "XWikiServer" + wikiName.substring(0, 1).toUpperCase() + wikiName.substring(1);
+        XWikiDocument wikiDoc = getDocument(new DocumentReference(MAIN_WIKI_NAME, "XWiki", wikiDocName));
+        BaseObject wikiObj = wikiDoc.newObject("XWiki.XWikiServerClass", getContext());
+        wikiObj.setStringValue("server", wikiName + "server");
+        saveDocument(wikiDoc);
     }
 
     public void testCreateURLOnMainWiki() throws MalformedURLException
@@ -289,5 +303,24 @@ public class XWikiServletURLFactoryTest extends AbstractBridgedXWikiComponentTes
         URL url = urlFactory.createURL("Space", "Page", "view", "param1=1", "anchor", "wiki1", getContext());
         assertEquals(new URL("http://www.xwiki.org:8080/xwiki/wiki/wiki1server/view/Space/Page?param1=1#anchor"), url);
         assertEquals("/xwiki/wiki/wiki1server/view/Space/Page?param1=1#anchor", urlFactory.getURL(url, getContext()));
+    }
+
+    /**
+     * Tests how URLs are serialized when the request wiki (taken from the request URL) and the context wiki (explicitly
+     * set from code on the XWiki context) are different.
+     */
+    public void testGetURLWhenRequestWikiAndContextWikiAreDifferent() throws MalformedURLException
+    {
+        getContext().setURL(new URL("http://wiki1server/xwiki/view/InitialSpace/InitialPage"));
+        // Reinitialize the URL factory to take into account the new request URL.
+        urlFactory.init(getContext());
+
+        getContext().setDatabase("wiki2");
+
+        String url = urlFactory.getURL(new URL("http://wiki1server/xwiki/bin/view/Space/Page"), getContext());
+        assertEquals("/xwiki/bin/view/Space/Page", url);
+
+        url = urlFactory.getURL(new URL("http://wiki2server/xwiki/bin/view/Space/Page"), getContext());
+        assertEquals("http://wiki2server/xwiki/bin/view/Space/Page", url);
     }
 }

@@ -303,7 +303,7 @@ XVq9K2VEJiSMaOtaeISGyPbWWy9oz4jXRgORpHPiOcFunz+jeccQEWSHsYHmAsS/vXPiV5eQDfpi
       &lt;div id="dhtmltooltip" style="visibility: hidden;"&gt;&lt;/div&gt;
       #set($ajaxdoc = $xwiki.getDocument("Panels.AjaxEditor"))
       #if($request.place)
-        #set($ajaxurl = $xwiki.getDocument("Panels.PanelLayoutUpdate").getURL("view", "xpage=plain&amp;place=${request.place}&amp;prefsdoc=${currentDoc}"))
+        #set($ajaxurl = $xwiki.getDocument("Panels.PanelLayoutUpdate").getURL("view", "xpage=plain&amp;place=$!{escapetool.url($request.place)}&amp;prefsdoc=${currentDoc}"))
       #else
         #set($ajaxurl = $xwiki.getDocument("Panels.PanelLayoutUpdate").getURL("view", "xpage=plain&amp;prefsdoc=${currentDoc}"))
       #end
@@ -389,7 +389,7 @@ XVq9K2VEJiSMaOtaeISGyPbWWy9oz4jXRgORpHPiOcFunz+jeccQEWSHsYHmAsS/vXPiV5eQDfpi
                           //&lt;![CDATA[
                             Event.observe($("panelContainer${panelCount}"), "mouseover", function(event) {
                               if(!window.isDraggingPanel) {
-                                showtip(Event.element(event), unescape('$util.encodeURI($doc.display("description", $obj)).replaceAll("[+]", "%20").replaceAll("'", "&amp;#39;")'), 300); 
+                                showtip(Event.element(event), unescape('$escapetool.url($doc.display("description", $obj)).replaceAll("[+]", "%20").replaceAll("'", "&amp;#39;")'), 300);
                               }
                             });
                           //]]&gt;

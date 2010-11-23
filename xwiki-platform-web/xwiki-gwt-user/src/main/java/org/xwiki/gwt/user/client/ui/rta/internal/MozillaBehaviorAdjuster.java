@@ -65,8 +65,21 @@ public class MozillaBehaviorAdjuster extends BehaviorAdjuster
         }
 
         Document document = getTextArea().getDocument();
-        Node paragraph = document.getSelection().getRangeAt(0).getStartContainer().getParentNode();
-        paragraph.appendChild(document.createBRElement());
+        Selection selection = document.getSelection();
+        Range caret = selection.getRangeAt(0);
+        Node emptyTextNode = caret.getStartContainer();
+
+        // (1) We need to add a BR to make the new empty line visible.
+        // (2) The caret is rendered at the start of the document when we place it inside an empty text node. To fix
+        // this, we move the caret before the BR and remove the empty text node.
+        emptyTextNode.getParentNode().insertBefore(document.createBRElement(), emptyTextNode);
+        caret.setStartBefore(emptyTextNode.getPreviousSibling());
+        caret.collapse(true);
+        emptyTextNode.getParentNode().removeChild(emptyTextNode);
+
+        // Update the selection.
+        selection.removeAllRanges();
+        selection.addRange(caret);
     }
 
     /**

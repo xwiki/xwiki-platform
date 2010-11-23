@@ -476,6 +476,23 @@ public class XWikiServletURLFactory extends XWikiDefaultURLFactory
     /**
      * Converts a URL to a relative URL if it's a XWiki URL (keeping only the path + query string + anchor) and leave
      * the URL unchanged if it's an external URL.
+     * <p>
+     * An URL is considered to be external if its server component doesn't match the server of the current request URL.
+     * This means that URLs are made relative with respect to the current request URL rather than the current wiki set
+     * on the XWiki context. Let's take an example:
+     * 
+     * <pre>
+     * {@code
+     * request URL: http://playground.xwiki.org/xwiki/bin/view/Sandbox/TestURL
+     * current wiki: code (code.xwiki.org)
+     * URL (1): http://code.xwiki.org/xwiki/bin/view/Main/WebHome
+     * URL (2): http://playground.xwiki.org/xwiki/bin/view/Spage/Page
+     * 
+     * The result will be:
+     * (1) http://code.xwiki.org/xwiki/bin/view/Main/WebHome
+     * (2) /xwiki/bin/view/Spage/Page
+     * }
+     * </pre>
      * 
      * @param url the URL to convert
      * @return the converted URL as a string
@@ -490,7 +507,7 @@ public class XWikiServletURLFactory extends XWikiDefaultURLFactory
             }
 
             String surl = url.toString();
-            if (!surl.startsWith(getServerURL(context).toString())) {
+            if (!surl.startsWith(serverURL.toString())) {
                 // External URL: leave it as is.
                 return surl;
             } else {

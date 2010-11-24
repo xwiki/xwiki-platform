@@ -128,7 +128,7 @@
     #if($isAdminAppInstalled)
       #submenuitem($adminwikiaction $msg.get('core.menu.admin.wiki') 'tmAdminWiki', '')
     #else
-      #xwikitopmenuentry($importaction $msg.get('core.menu.admin') 'tmAdmin')
+      #submenuitem($importaction $msg.get('core.menu.admin') 'tmAdminWiki' '')
     #end
     #set ($hasPreviousMenuSection = true)
   #end

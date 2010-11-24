@@ -4,32 +4,20 @@
 ## List format : ["ExtraAnchor",  "ExtraTabText", numberOfItems]
 ##
 #if (!$docextralinks && !$docextras)
-  #if("$!{showcomments}" == "")
-    #set($showcomments = $xwiki.getSpacePreference('showcomments'))
-  #end
-  #if("$!{showattachments}" == "")
-    #set($showattachments = $xwiki.getSpacePreference('showattachments'))
-  #end
-  #if("$!{showhistory}" == "")
-    #set($showhistory = $xwiki.getSpacePreference('showhistory'))
-  #end
-  #if("$!{showinformation}" == "")
-    #set($showinformation = $xwiki.getSpacePreference('showinformation'))
-  #end
   #set($docextralinks = $util.arrayList)
   #if($xcontext.action == 'view' && $viewer != 'content')
     #set ($discard = $docextralinks.add(['content', $msg.get('core.links.content'), -1]))
   #end
-  #if($viewer != 'comments' && $showcomments != false && $showcomments != "no" && $showcomments != "0" && $showcomments != "false")
+  #if($viewer != 'comments' && $showcomments)
     #set ($discard = $docextralinks.add(["comments", $msg.get("docextra.comments"), $doc.getObjects("XWiki.XWikiComments").size()]))
   #end
-  #if($viewer != 'attachments' && $showattachments != false && $showattachments != "no" && $showattachments != "0" && $showattachments != "false")
+  #if($viewer != 'attachments' && $showattachments)
     #set ($discard = $docextralinks.add(["attachments", $msg.get("docextra.attachments"), $doc.getAttachmentList().size()]))
   #end
-  #if($viewer != 'history' && $showhistory != false && $showhistory != "no" && $showhistory != "0" && $showhistory != "false")
+  #if($viewer != 'history' && $showhistory)
     #set ($discard = $docextralinks.add(["history", $msg.get("docextra.history"), -1]))
   #end
-  #if($viewer != 'information' && $showinformation != false && $showinformation != "no" && $showinformation != "0" && $showinformation != "false")
+  #if($viewer != 'information' && $showinformation)
     #set ($discard = $docextralinks.add(["information", $msg.get("docextra.information"), -1]))
   #end
 #end

@@ -1,5 +1,7 @@
 ## The module name must match the value of the rename-to attribute from Wysiwyg.gwt.xml
 #set($moduleName = "xwe")
+// Declare the module name to avoid checking for undefined while the module is loading.
+var $moduleName;
 /**
  * XWiki's custom WYSIWYG controller.
  * Usage: \$xwiki.jsfx.use("path/to/XWikiWysiwyg.js", {'forceSkinAction': true, 'lazy': true})

@@ -41,20 +41,27 @@
 #set ($displayCreateSubmenu = $hasCreateSpace || $hasCreatePage || $hasComment)
 #if($displayCreateSubmenu)
   #xwikitopmenuentrystart('' $msg.get('core.menu.create') 'tmCreate' 'hasIcon')
+  #set ($hasPreviousMenuSection = false)
   #if ($hasCreateSpace)
     #submenuitem("$doc.getURL('create', 'tocreate=space')" $msg.get('core.menu.create.space') 'tmCreateSpace', '')
-    #submenuseparator()
+    #set ($hasPreviousMenuSection = true)
   #end
   #if ($hasCreatePage)
+    #if ($hasPreviousMenuSection)
+      #submenuseparator()
+    #end
     #submenuitem("$doc.getURL('create')" $msg.get('core.menu.create.page') 'tmCreatePage', '')
     ## Only display the Office Importer menu action if the Office Importer application is installed
     #set($officeImporterMainDocument = $xwiki.getDocument('XWiki.OfficeImporter'))
     #if("$!{officeImporterMainDocument.isNew()}" == 'false')
       #submenuitem($officeImporterMainDocument.getURL('view', "&amp;parent=$!{escapetool.url($doc.fullName)}") $msg.get('core.menu.create.pageFromOffice') 'tmCreatePageFromOffice', '')
     #end
+    #set ($hasPreviousMenuSection = true)
+  #end
+  #if (($hasComment || $hasEdit) && $hasPreviousMenuSection)
     #submenuseparator()
   #end
-  #if($hasComment)
+  #if ($hasComment)
     #submenuitem("$doc.getURL('view', 'viewer=comments')" $msg.get('core.menu.create.comment') 'tmCreateComment', '')
     <script type="text/javascript">
       //<![CDATA[
@@ -67,8 +74,9 @@
         });
       //]]>
     </script>
+    #set ($hasPreviousMenuSection = true)
   #end
-  #if($hasEdit)
+  #if ($hasEdit)
     #submenuitem("$doc.getURL('view', 'viewer=attachments')" $msg.get('core.menu.create.attachment') 'tmCreateAttachment', '')
     <script type="text/javascript">
       //<![CDATA[
@@ -81,6 +89,7 @@
         });
       //]]>
     </script>
+    #set ($hasPreviousMenuSection = true)
   #end
   #xwikitopmenuentryend()
 #end
@@ -88,7 +97,7 @@
 ## Wiki
 ##
 #set($isAdminAppInstalled = $xwiki.exists('XWiki.AdminSheet'))
-#set($displayWikiSubmenu = $hasWatch || $hasGlobalAdmin)
+#set ($displayWikiSubmenu = $hasWatch || $hasGlobalAdmin)
 #set($wikiEntryText = $msg.get('core.menu.type.wiki'))
 #if($xwiki.isVirtualMode() && $xwiki.wikimanager)
   #set($wikiName = $xwiki.wikimanager.getWikiDocument($xcontext.getDatabase()).getWikiPrettyName())
@@ -101,6 +110,7 @@
   #xwikitopmenuentry($xwiki.getURL('Main.WebHome', 'view') $wikiEntryText 'tmWiki' 'hasIcon')
 #else
   #xwikitopmenuentrystart($xwiki.getURL('Main.WebHome', 'view') $wikiEntryText 'tmWiki' 'hasIcon')
+  #set ($hasPreviousMenuSection = false)
   #if ($hasWatch)
     #set($watchClasses = '')
     #set($unwatchClasses = 'hidden')
@@ -110,6 +120,7 @@
     #end
     #submenuitem("$doc.getURL('view', 'xpage=watch&amp;do=addwiki')&amp;xredirect=$escapetool.url($doc.getURL())" $msg.get('core.menu.watchlist.add.wiki', [$escapetool.xml($doc.wiki)]) 'tmWatchWiki', $watchClasses)
     #submenuitem("$doc.getURL('view', 'xpage=watch&amp;do=removewiki')&amp;xredirect=$escapetool.url($doc.getURL())" $msg.get('core.menu.watchlist.remove.wiki') 'tmUnwatchWiki', $unwatchClasses)
+    #set ($hasPreviousMenuSection = true)
   #end
   #if($hasGlobalAdmin)
     #set ($adminwikiaction = $!xwiki.getURL('XWiki.XWikiPreferences', 'admin'))
@@ -119,8 +130,11 @@
     #else
       #xwikitopmenuentry($importaction $msg.get('core.menu.admin') 'tmAdmin')
     #end
+    #set ($hasPreviousMenuSection = true)
   #end
-  #submenuseparator()
+  #if ($hasPreviousMenuSection)
+    #submenuseparator()
+  #end
   #submenuitem("$xwiki.getURL('Main.AllDocs')" $msg.get('core.menu.wiki.documentindex') 'tmWikiDocumentIndex' '')
   #xwikitopmenuentryend()
 #end
@@ -133,6 +147,7 @@
   #xwikitopmenuentry($xwiki.getURL("${doc.space}.WebHome", 'view') "$msg.get('core.menu.type.space')__SEPARATOR__$!{escapetool.xml($doc.space)}" 'tmSpace' 'hasIcon')
 #else
   #xwikitopmenuentrystart($xwiki.getURL("${doc.space}.WebHome", 'view') "$msg.get('core.menu.type.space')__SEPARATOR__$!{escapetool.xml($doc.space)}" 'tmSpace' 'hasIcon')
+  #set ($hasPreviousMenuSection = false)
   #if ($hasWatch)
     #set($watchClasses = '')
     #set($unwatchClasses = 'hidden')
@@ -142,14 +157,19 @@
     #end
     #submenuitem("$doc.getURL('view', 'xpage=watch&amp;do=addspace')&amp;xredirect=$escapetool.url($doc.getURL())" $msg.get('core.menu.watchlist.add.space', [$escapetool.xml($doc.space)]) 'tmWatchSpace', $watchClasses)
     #submenuitem("$doc.getURL('view', 'xpage=watch&amp;do=removespace')&amp;xredirect=$escapetool.url($doc.getURL())" $msg.get('core.menu.watchlist.remove.space') 'tmUnwatchSpace', $unwatchClasses)
+    #set ($hasPreviousMenuSection = true)
   #end
   #if($hasSpaceAdmin)
     #set ($adminspaceaction = $!xwiki.getURL("${doc.space}.WebPreferences", 'admin'))
     #submenuitem($adminspaceaction $msg.get('core.menu.admin.space', [$escapetool.xml($doc.space)]) 'tmAdminSpace')
+    #set ($hasPreviousMenuSection = true)
   #end
-  #submenuseparator()
-  #set($spaceIndexUrl = $xwiki.getURL('Main.SpaceIndex', 'view',"space=${escapetool.url($doc.space)}"))
-  #submenuitem($spaceIndexUrl $msg.get('core.menu.space.documentindex') 'tmSpaceDocumentIndex' '')
+  #if ($hasPreviousMenuSection)
+    #submenuseparator()
+  #end
+  #set ($spaceIndexUrl = $xwiki.getURL('Main.SpaceIndex', 'view',"space=${escapetool.url($doc.space)}"))
+  #submenuitem ($spaceIndexUrl $msg.get('core.menu.space.documentindex') 'tmSpaceDocumentIndex' '')
+  #set ($hasPreviousMenuSection = true)
   #xwikitopmenuentryend()
 #end
 ##

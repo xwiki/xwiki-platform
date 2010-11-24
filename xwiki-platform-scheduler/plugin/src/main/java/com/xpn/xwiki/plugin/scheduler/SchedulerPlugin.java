@@ -280,9 +280,7 @@ public class SchedulerPlugin extends XWikiDefaultPlugin
      */
     private void restoreExistingJobs(XWikiContext context) throws SchedulerPluginException
     {
-        String hql =
-            ", BaseObject as obj where doc.web='Scheduler' and obj.name=doc.fullName and "
-                + "obj.className='XWiki.SchedulerJobClass'";
+        String hql = ", BaseObject as obj where obj.name=doc.fullName and obj.className='XWiki.SchedulerJobClass'";
         try {
             List<String> jobsDocsNames = context.getWiki().getStore().searchDocumentsNames(hql, context);
             for (String docName : jobsDocsNames) {

@@ -161,7 +161,7 @@ $xwiki.ssfx.use("uicomponents/search/search.css", true)##
     &lt;label for="text" class="hidden"&gt;$msg.get('search.page.query.label')&lt;/label&gt;
     &lt;input type="text" id="text" name="text" class="searchQuery #if($text == '') defaultText#end" #if($text == '') value="$msg.get('search.page.bar.query.tip')" #else value="${escapetool.xml($text)}" #end title="$msg.get('search.page.bar.query.title')"/&gt;
     #if ($xwiki.isVirtualMode() &amp;&amp; $xcontext.isMainWiki())
-      #wikisselect($wikinamelist $allwikinamelist)
+      #wikisselect($request.wikinames $allwikinamelist)
     #end
     #spaceselect($selectedSpace $spaces)
     &lt;input type="submit" class="searchButton" value="$msg.get('search.page.bar.submit')" title="$msg.get('search.page.bar.submit.title')"/&gt;

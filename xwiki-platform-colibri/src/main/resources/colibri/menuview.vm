@@ -58,10 +58,10 @@
     #end
     #set ($hasPreviousMenuSection = true)
   #end
-  #if (($hasComment || $hasEdit) && $hasPreviousMenuSection)
+  #if ((($hasComment && $showcomments) || ($hasEdit && $showattachments)) && $hasPreviousMenuSection)
     #submenuseparator()
   #end
-  #if ($hasComment)
+  #if ($hasComment && $showcomments)
     #submenuitem("$doc.getURL('view', 'viewer=comments')" $msg.get('core.menu.create.comment') 'tmCreateComment', '')
     <script type="text/javascript">
       //<![CDATA[
@@ -76,7 +76,7 @@
     </script>
     #set ($hasPreviousMenuSection = true)
   #end
-  #if ($hasEdit)
+  #if ($hasEdit && $showattachments)
     #submenuitem("$doc.getURL('view', 'viewer=attachments')" $msg.get('core.menu.create.attachment') 'tmCreateAttachment', '')
     <script type="text/javascript">
       //<![CDATA[

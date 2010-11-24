@@ -13,6 +13,27 @@
 #set ($hasProgramming = $xwiki.hasAccessLevel('programming', $xcontext.user, 'XWiki.XWikiPreferences'))
 #set ($hasSpaceAdmin = $xwiki.hasAccessLevel('admin', $xcontext.user, "${doc.space}.WebPreferences"))
 #set ($hasWatch = $xwiki.watchlist && !$isGuest && !$isSuperAdmin && $xwiki.exists($services.model.serialize($services.model.createDocumentReference($xcontext.wiki, 'XWiki', 'XWikiUserWatchListSheet'), 'local')))
+##
+## Are comments, attachments, history etc. enabled?
+##
+#macro (retrieveSetting $settingName $settingValue)
+  #set ($settingValue = $xwiki.getSpacePreference($settingName))
+  #if ("$!{settingValue}" != "false" && "$!{settingValue}" != "no" && "$!{settingValue}" != "0")
+    #set ($settingValue = true)
+  #else
+    #set ($settingValue = false)
+  #end
+#end
+#retrieveSetting('showcomments' $settingValue)
+#set ($showcomments = $settingValue)
+#retrieveSetting('showattachments' $settingValue)
+#set ($showattachments = $settingValue)
+#retrieveSetting('showhistory' $settingValue)
+#set ($showhistory = $settingValue)
+#retrieveSetting('showinformation' $settingValue)
+#set ($showinformation = $settingValue)
+##
+##
 #set ($isReadOnly = $xwiki.isReadOnly())
 #set ($spaceViewUrl = $spaceDoc.getURL('view'))
 #set ($viewUrl = $doc.getURL('view'))

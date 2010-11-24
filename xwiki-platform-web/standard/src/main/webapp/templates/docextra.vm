@@ -28,33 +28,21 @@ $xcontext.dropPermissions()
 ## List format : ["ExtraAnchor", "ExtraName", "ExtraTabText", ExtraNumberOfItems, "extratemplate.vm", "keyboardShortcut"]
 ##
 #if (!$docextras)
-  #if("$!{showcomments}" == "")
-    #set($showcomments = $xwiki.getSpacePreference('showcomments'))
-  #end
-  #if("$!{showattachments}" == "")
-    #set($showattachments = $xwiki.getSpacePreference('showattachments'))
-  #end
-  #if("$!{showhistory}" == "")
-    #set($showhistory = $xwiki.getSpacePreference('showhistory'))
-  #end
-  #if("$!{showinformation}" == "")
-    #set($showinformation = $xwiki.getSpacePreference('showinformation'))
-  #end
   #set($docextras = $util.arrayList)
-  #if($showcomments != false && $showcomments != "no" && $showcomments != "0" && $showcomments != "false")
+  #if ($showcomments)
     $xwiki.jsfx.use('uicomponents/viewers/comments.js', {'forceSkinAction': true, 'language': ${xcontext.language}})
     $xwiki.ssfx.use('uicomponents/viewers/comments.css', true)
     #set ($discard = $docextras.add(["Comments", "comments", $msg.get("docextra.comments"), $doc.getObjects("XWiki.XWikiComments").size(), "commentsinline.vm", $msg.get("core.shortcuts.view.comments")]))
   #end
-  #if($showattachments != false && $showattachments != "no" && $showattachments != "0" && $showattachments != "false")
+  #if ($showattachments)
     $xwiki.jsfx.use('js/xwiki/viewers/attachments.js', {'forceSkinAction': true, 'language': ${xcontext.language}})
     $xwiki.ssfx.use('js/xwiki/viewers/attachments.css', true)
     #set ($discard = $docextras.add(["Attachments", "attachments", $msg.get("docextra.attachments"), $doc.getAttachmentList().size(), "attachmentsinline.vm",$msg.get("core.shortcuts.view.attachments")]))
   #end
-  #if($showhistory != false && $showhistory != "no" && $showhistory != "0" && $showhistory != "false")
+  #if ($showhistory)
     #set ($discard = $docextras.add(["History", "history", $msg.get("docextra.history"), -1, "historyinline.vm", $msg.get("core.shortcuts.view.history")]))
   #end
-  #if($showinformation != false && $showinformation != "no" && $showinformation != "0" && $showinformation != "false")
+  #if ($showinformation)
     #set ($discard = $docextras.add(["Information", "information", $msg.get("docextra.information"), -1, "informationinline.vm", $msg.get("core.shortcuts.view.information")]))
   #end
 #end

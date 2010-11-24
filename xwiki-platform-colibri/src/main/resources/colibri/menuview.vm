@@ -97,7 +97,7 @@
 ## Wiki
 ##
 #set($isAdminAppInstalled = $xwiki.exists('XWiki.AdminSheet'))
-#set ($displayWikiSubmenu = $hasWatch || $hasGlobalAdmin)
+#set ($displayWikiSubmenu = $hasWatch || $hasGlobalAdmin || $xwiki.exists('Main.AllDocs'))
 #set($wikiEntryText = $msg.get('core.menu.type.wiki'))
 #if($xwiki.isVirtualMode() && $xwiki.wikimanager)
   #set($wikiName = $xwiki.wikimanager.getWikiDocument($xcontext.getDatabase()).getWikiPrettyName())
@@ -132,16 +132,18 @@
     #end
     #set ($hasPreviousMenuSection = true)
   #end
-  #if ($hasPreviousMenuSection)
-    #submenuseparator()
+  #if ($xwiki.exists('Main.AllDocs'))
+    #if ($hasPreviousMenuSection)
+      #submenuseparator()
+    #end
+    #submenuitem("$xwiki.getURL('Main.AllDocs')" $msg.get('core.menu.wiki.documentindex') 'tmWikiDocumentIndex' '')
   #end
-  #submenuitem("$xwiki.getURL('Main.AllDocs')" $msg.get('core.menu.wiki.documentindex') 'tmWikiDocumentIndex' '')
   #xwikitopmenuentryend()
 #end
 ##
 ## Space
 ##
-#set ($displaySpaceSubmenu = $hasWatch || $hasSpaceAdmin)
+#set ($displaySpaceSubmenu = $hasWatch || $hasSpaceAdmin || $xwiki.exists('Main.SpaceIndex'))
 #xwikitopmenuseparator()
 #if(!$displaySpaceSubmenu)
   #xwikitopmenuentry($xwiki.getURL("${doc.space}.WebHome", 'view') "$msg.get('core.menu.type.space')__SEPARATOR__$!{escapetool.xml($doc.space)}" 'tmSpace' 'hasIcon')
@@ -164,12 +166,14 @@
     #submenuitem($adminspaceaction $msg.get('core.menu.admin.space', [$escapetool.xml($doc.space)]) 'tmAdminSpace')
     #set ($hasPreviousMenuSection = true)
   #end
-  #if ($hasPreviousMenuSection)
-    #submenuseparator()
+  #if ($xwiki.exists('Main.SpaceIndex'))
+    #if ($hasPreviousMenuSection)
+      #submenuseparator()
+    #end
+    #set ($spaceIndexUrl = $xwiki.getURL('Main.SpaceIndex', 'view',"space=${escapetool.url($doc.space)}"))
+    #submenuitem($spaceIndexUrl $msg.get('core.menu.space.documentindex') 'tmSpaceDocumentIndex' '')
+    #set ($hasPreviousMenuSection = true)
   #end
-  #set ($spaceIndexUrl = $xwiki.getURL('Main.SpaceIndex', 'view',"space=${escapetool.url($doc.space)}"))
-  #submenuitem ($spaceIndexUrl $msg.get('core.menu.space.documentindex') 'tmSpaceDocumentIndex' '')
-  #set ($hasPreviousMenuSection = true)
   #xwikitopmenuentryend()
 #end
 ##

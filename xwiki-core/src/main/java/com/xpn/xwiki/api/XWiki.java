@@ -77,8 +77,8 @@ public class XWiki extends Api
      * @see org.xwiki.model.internal.reference.DefaultStringDocumentReferenceResolver
      */
     @SuppressWarnings("unchecked")
-    private DocumentReferenceResolver<String> defaultDocumentReferenceResolver = Utils.getComponent(
-        DocumentReferenceResolver.class);
+    private DocumentReferenceResolver<String> defaultDocumentReferenceResolver = Utils
+        .getComponent(DocumentReferenceResolver.class);
 
     /**
      * XWiki API Constructor
@@ -179,8 +179,8 @@ public class XWiki extends Api
     }
 
     /**
-     * Loads an Document from the database. Rights are checked on the author (contentAuthor) of the document
-     * containing the currently executing script before sending back the loaded document.
+     * Loads an Document from the database. Rights are checked on the author (contentAuthor) of the document containing
+     * the currently executing script before sending back the loaded document.
      * 
      * @param fullName the full name of the XWiki document to be loaded
      * @return a Document object or null if it is not accessible
@@ -204,9 +204,9 @@ public class XWiki extends Api
     }
 
     /**
-     * Loads an Document from the database. Rights are checked on the author (contentAuthor) of the document
-     * containing the currently executing script before sending back the loaded document.
-     *
+     * Loads an Document from the database. Rights are checked on the author (contentAuthor) of the document containing
+     * the currently executing script before sending back the loaded document.
+     * 
      * @param reference the reference of the XWiki document to be loaded
      * @return a Document object or null if it is not accessible
      * @throws XWikiException
@@ -216,8 +216,7 @@ public class XWiki extends Api
     {
         String author = this.getEffectiveScriptAuthorName();
         XWikiDocument doc = this.xwiki.getDocument(reference, getXWikiContext());
-        if (this.xwiki.getRightService().hasAccessLevel("view", author, doc.getFullName(),
-            getXWikiContext()) == false) {
+        if (this.xwiki.getRightService().hasAccessLevel("view", author, doc.getFullName(), getXWikiContext()) == false) {
             return null;
         }
 
@@ -443,9 +442,8 @@ public class XWiki extends Api
     }
 
     /**
-     * Transform a text in a XML compatible text
-     * This method uses Apache CharacterFilter which swaps single quote (&#39;)
-     * for left single quotation mark (&#8217;)
+     * Transform a text in a XML compatible text This method uses Apache CharacterFilter which swaps single quote
+     * (&#39;) for left single quotation mark (&#8217;)
      * 
      * @param content text to transform
      * @return encoded result
@@ -585,25 +583,25 @@ public class XWiki extends Api
     /**
      * API allowing to search for document names matching a query. Examples:
      * <ul>
-     * <li>Query: <code>where doc.space='Main' order by doc.creationDate desc</code>. Result: All the documents in space 'Main' ordered by the creation date from
-     * the most recent</li>
-     * <li>Query: <code>where doc.name like '%sport%' order by doc.name asc</code>. Result: All the documents containing 'sport' in their name ordered by
-     * document name</li>
-     * <li>Query: <code>where doc.content like '%sport%' order by doc.author</code> Result: All the documents containing 'sport' in their content ordered by
-     * the author</li>
+     * <li>Query: <code>where doc.space='Main' order by doc.creationDate desc</code>. Result: All the documents in space
+     * 'Main' ordered by the creation date from the most recent</li>
+     * <li>Query: <code>where doc.name like '%sport%' order by doc.name asc</code>. Result: All the documents containing
+     * 'sport' in their name ordered by document name</li>
+     * <li>Query: <code>where doc.content like '%sport%' order by doc.author</code> Result: All the documents containing
+     * 'sport' in their content ordered by the author</li>
      * <li>Query: <code>where doc.creator = 'XWiki.LudovicDubost' order by doc.creationDate
-     *       desc</code>. Result: All the documents with creator LudovicDubost ordered by the creation date
-     * from the most recent</li>
-     * <li>Query: <code>where doc.author = 'XWiki.LudovicDubost' order by doc.date desc</code>. Result: All the documents with last author LudovicDubost ordered by the
-     * last modification date from the most recent.</li>
+     *       desc</code>. Result: All the documents with creator LudovicDubost ordered by the creation date from the
+     * most recent</li>
+     * <li>Query: <code>where doc.author = 'XWiki.LudovicDubost' order by doc.date desc</code>. Result: All the
+     * documents with last author LudovicDubost ordered by the last modification date from the most recent.</li>
      * <li>Query: <code>,BaseObject as obj where doc.fullName=obj.name and
-     *       obj.className='XWiki.XWikiComments' order by doc.date desc</code>. Result: All the documents with at least one comment ordered by the last modification date
-     * from the most recent</li>
+     *       obj.className='XWiki.XWikiComments' order by doc.date desc</code>. Result: All the documents with at least
+     * one comment ordered by the last modification date from the most recent</li>
      * <li>Query: <code>,BaseObject as obj, StringProperty as prop where
      *       doc.fullName=obj.name and obj.className='XWiki.XWikiComments' and obj.id=prop.id.id
      *       and prop.id.name='author' and prop.value='XWiki.LudovicDubost' order by doc.date
-     *       desc</code>. Result: All the documents with at least one comment from
-     * LudovicDubost ordered by the last modification date from the most recent</li>
+     *       desc</code>. Result: All the documents with at least one comment from LudovicDubost ordered by the last
+     * modification date from the most recent</li>
      * </ul>
      * 
      * @param wheresql Query to be run (either starting with ", BaseObject as obj where.." or by "where ..."
@@ -722,8 +720,7 @@ public class XWiki extends Api
      * @throws XWikiException in case of error while performing the query
      */
     public List<String> searchDocuments(String parameterizedWhereClause, int maxResults, int startOffset,
-        List< ? > parameterValues)
-        throws XWikiException
+        List< ? > parameterValues) throws XWikiException
     {
         return this.xwiki.getStore().searchDocumentsNames(parameterizedWhereClause, maxResults, startOffset,
             parameterValues, getXWikiContext());
@@ -1332,7 +1329,7 @@ public class XWiki extends Api
             } else {
                 registerRight =
                     this.xwiki.getRightService().hasAccessLevel("register", getXWikiContext().getUser(),
-                    "XWiki.XWikiPreferences", getXWikiContext());
+                        "XWiki.XWikiPreferences", getXWikiContext());
             }
 
             if (registerRight) {
@@ -1573,8 +1570,7 @@ public class XWiki extends Api
         throws XWikiException
     {
         if (hasProgrammingRights()) {
-            return this.xwiki.copySpaceBetweenWikis(space, sourceWiki, targetWiki, language, clean,
-                getXWikiContext());
+            return this.xwiki.copySpaceBetweenWikis(space, sourceWiki, targetWiki, language, clean, getXWikiContext());
         }
 
         return -1;
@@ -1915,8 +1911,8 @@ public class XWiki extends Api
     @Deprecated
     public DocumentStats getCurrentMonthXWikiStats(String action)
     {
-        return getXWikiContext().getWiki().getStatsService(getXWikiContext()).getDocMonthStats("", action, new Date(),
-            getXWikiContext());
+        return getXWikiContext().getWiki().getStatsService(getXWikiContext())
+            .getDocMonthStats("", action, new Date(), getXWikiContext());
     }
 
     /**
@@ -2239,8 +2235,8 @@ public class XWiki extends Api
     public String getURLContent(String surl, String username, String password, int timeout) throws IOException
     {
         try {
-            return this.xwiki.getURLContent(surl, username, password, timeout, this.xwiki
-                .getHttpUserAgent(this.context));
+            return this.xwiki.getURLContent(surl, username, password, timeout,
+                this.xwiki.getHttpUserAgent(this.context));
         } catch (Exception e) {
             return "";
         }
@@ -2443,7 +2439,7 @@ public class XWiki extends Api
         try {
             if (this.xwiki.exists(newFullName, getXWikiContext())
                 && !this.xwiki.getRightService().hasAccessLevel("delete", getXWikiContext().getUser(), newFullName,
-                getXWikiContext())) {
+                    getXWikiContext())) {
                 return false;
             }
             if (this.xwiki.getRightService().hasAccessLevel("edit", getXWikiContext().getUser(), doc.getFullName(),
@@ -2982,8 +2978,8 @@ public class XWiki extends Api
     }
 
     /**
-     * @return the section depth for which section editing is available (can be configured through {@code
-     *         xwiki.section.depth} configuration property. Defaults to 2 when not defined
+     * @return the section depth for which section editing is available (can be configured through
+     *         {@code xwiki.section.depth} configuration property. Defaults to 2 when not defined
      */
     public long getSectionEditingDepth()
     {

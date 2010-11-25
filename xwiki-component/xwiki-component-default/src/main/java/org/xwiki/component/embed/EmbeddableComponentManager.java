@@ -23,6 +23,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 import org.xwiki.component.annotation.ComponentAnnotationLoader;
 import org.xwiki.component.descriptor.ComponentDependency;
@@ -57,8 +58,8 @@ public class EmbeddableComponentManager implements ComponentManager
     private Map<RoleHint< ? >, ComponentDescriptor< ? >> descriptors =
         new HashMap<RoleHint< ? >, ComponentDescriptor< ? >>();
 
-    private Map<RoleHint< ? >, Object> components = new HashMap<RoleHint< ? >, Object>();
-    
+    private Map<RoleHint< ? >, Object> components = new ConcurrentHashMap<RoleHint< ? >, Object>();
+
     private Logger logger = new CommonsLoggingLogger(EmbeddableComponentManager.class);
 
     /**
@@ -345,31 +346,36 @@ public class EmbeddableComponentManager implements ComponentManager
     @SuppressWarnings("unchecked")
     private <T> T initialize(RoleHint<T> roleHint) throws ComponentLookupException
     {
-        T instance;
-        synchronized (this) {
-            // If the instance exists return it
-            instance = (T) this.components.get(roleHint);
-            if (instance == null) {
-                // If there's a component descriptor, create the instance
-                ComponentDescriptor<T> descriptor = (ComponentDescriptor<T>) this.descriptors.get(roleHint);
-                if (descriptor != null) {
-                    try {
-                        instance = createInstance(descriptor);
-                        if (instance == null) {
-                            throw new ComponentLookupException("Failed to lookup component [" + roleHint + "]");
-                        } else if (this.descriptors.get(roleHint).getInstantiationStrategy() == ComponentInstantiationStrategy.SINGLETON) {
-                            this.components.put(roleHint, instance);
+        // If the instance exists return it
+        T instance = (T) this.components.get(roleHint);
+
+        if (instance == null) {
+            synchronized (this) {
+                // If the instance exists return it
+                instance = (T) this.components.get(roleHint);
+                if (instance == null) {
+                    // If there's a component descriptor, create the instance
+                    ComponentDescriptor<T> descriptor = (ComponentDescriptor<T>) this.descriptors.get(roleHint);
+                    if (descriptor != null) {
+                        try {
+                            instance = createInstance(descriptor);
+                            if (instance == null) {
+                                throw new ComponentLookupException("Failed to lookup component [" + roleHint + "]");
+                            } else if (this.descriptors.get(roleHint).getInstantiationStrategy() == ComponentInstantiationStrategy.SINGLETON) {
+                                this.components.put(roleHint, instance);
+                            }
+                        } catch (Exception e) {
+                            throw new ComponentLookupException("Failed to lookup component [" + roleHint + "]", e);
                         }
-                    } catch (Exception e) {
-                        throw new ComponentLookupException("Failed to lookup component [" + roleHint + "]", e);
-                    }
-                } else {
-                    // Look for the component in the parent Component Manager (if there's a parent)
-                    ComponentManager parent = getParent();
-                    if (parent != null) {
-                        instance = getParent().lookup(roleHint.getRole(), roleHint.getHint());
                     } else {
-                        throw new ComponentLookupException("Can't find descriptor for the component [" + roleHint + "]");
+                        // Look for the component in the parent Component Manager (if there's a parent)
+                        ComponentManager parent = getParent();
+                        if (parent != null) {
+                            instance = getParent().lookup(roleHint.getRole(), roleHint.getHint());
+                        } else {
+                            throw new ComponentLookupException("Can't find descriptor for the component [" + roleHint
+                                + "]");
+                        }
                     }
                 }
             }

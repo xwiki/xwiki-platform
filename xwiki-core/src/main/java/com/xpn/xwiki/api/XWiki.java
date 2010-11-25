@@ -844,37 +844,46 @@ public class XWiki extends Api
     }
 
     /**
-     * API to parse the message being stored in the Context A message can be an error message or an information message
-     * either as text or as a message ID pointing to ApplicationResources The message is also parse for velocity scripts
+     * API to parse the message being stored in the Context. A message can be an error message or an information message
+     * either as text or as a message ID pointing to ApplicationResources. The message is also parse for velocity scripts
      * 
      * @return Final message
+     * @deprecated use {@link XWikiMessageTool#get(String, List)} instead. From velocity you can access XWikiMessageTool
+     *             with $msg binding.
      */
+    @Deprecated
     public String parseMessage()
     {
         return this.xwiki.parseMessage(getXWikiContext());
     }
 
     /**
-     * API to parse a message A message can be an error message or an information message either as text or as a message
-     * ID pointing to ApplicationResources The message is also parse for velocity scripts
+     * API to parse a message. A message can be an error message or an information message either as text or as a message
+     * ID pointing to ApplicationResources. The message is also parse for velocity scripts
      * 
      * @return Final message
      * @param id
      * @return the result of the parsed message
+     * @deprecated use {@link XWikiMessageTool#get(String, List)} instead. From velocity you can access XWikiMessageTool
+     *             with $msg binding.
      */
+    @Deprecated
     public String parseMessage(String id)
     {
         return this.xwiki.parseMessage(id, getXWikiContext());
     }
 
     /**
-     * API to get a message A message can be an error message or an information message either as text or as a message
-     * ID pointing to ApplicationResources The message is also parsed for velocity scripts
+     * API to get a message. A message can be an error message or an information message either as text or as a message
+     * ID pointing to ApplicationResources. The message is also parsed for velocity scripts
      * 
      * @return Final message
      * @param id
      * @return the result of the parsed message
+     * @deprecated use {@link XWikiMessageTool#get(String, List)} instead. From velocity you can access XWikiMessageTool
+     *             with $msg binding.
      */
+    @Deprecated
     public String getMessage(String id)
     {
         return this.xwiki.getMessage(id, getXWikiContext());

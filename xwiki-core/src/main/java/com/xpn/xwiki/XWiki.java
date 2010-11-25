@@ -7001,6 +7001,11 @@ public class XWiki implements XWikiDocChangeNotificationInterface, EventListener
         return doc.validate(context);
     }
 
+    /**
+     * @deprecated use {@link XWikiMessageTool#get(String, List)} instead. You can access message tool using
+     *             {@link XWikiContext#getMessageTool()}.
+     */
+    @Deprecated
     public String getMessage(String item, XWikiContext context)
     {
         XWikiMessageTool msg = context.getMessageTool();
@@ -7011,6 +7016,11 @@ public class XWiki implements XWikiDocChangeNotificationInterface, EventListener
         }
     }
 
+    /**
+     * @deprecated use {@link XWikiMessageTool#get(String, List)} instead. You can access message tool using
+     *             {@link XWikiContext#getMessageTool()}.
+     */
+    @Deprecated
     public String parseMessage(String id, XWikiContext context)
     {
         XWikiMessageTool msg = context.getMessageTool();
@@ -7018,6 +7028,11 @@ public class XWiki implements XWikiDocChangeNotificationInterface, EventListener
         return parseContent(msg.get(id), context);
     }
 
+    /**
+     * @deprecated use {@link XWikiMessageTool#get(String, List)} instead. You can access message tool using
+     *             {@link XWikiContext#getMessageTool()}.
+     */
+    @Deprecated
     public String parseMessage(XWikiContext context)
     {
         String message = (String) context.get("message");

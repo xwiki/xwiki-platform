@@ -257,7 +257,7 @@ public final class WikiManager
             context.setDatabase(context.getMainXWiki());
 
             List<XWikiDocument> documents =
-                    context.getWiki().getStore().searchDocuments(wheresql, parameterValues, context);
+                context.getWiki().getStore().searchDocuments(wheresql, parameterValues, context);
 
             for (XWikiDocument document : documents) {
                 wikiList.add(new Wiki(document, context));
@@ -284,8 +284,8 @@ public final class WikiManager
 
         // Get applications manger
         ApplicationManagerPluginApi appmanager =
-                (ApplicationManagerPluginApi) context.getWiki().getPluginApi(ApplicationManagerPlugin.PLUGIN_NAME,
-                    context);
+            (ApplicationManagerPluginApi) context.getWiki().getPluginApi(ApplicationManagerPlugin.PLUGIN_NAME,
+                context);
 
         if (appmanager == null) {
             return null;
@@ -349,26 +349,28 @@ public final class WikiManager
 
             Collection<String>[] docsNames = getDocsNames(sourceWiki, context);
 
-            Object[] includeFormatParams = new Object[] {sourceWiki, XObjectDocument.WIKI_SPACE_SEPARATOR, null};
+            if (docsNames != null) {
+                Object[] includeFormatParams = new Object[] {sourceWiki, XObjectDocument.WIKI_SPACE_SEPARATOR, null};
 
-            // Replace documents contents to include
-            for (Object item : docsNames[0]) {
-                String docFullName = (String) item;
-                XWikiDocument targetDoc = xwiki.getDocument(docFullName, context);
+                // Replace documents contents to include
+                for (Object item : docsNames[0]) {
+                    String docFullName = (String) item;
+                    XWikiDocument targetDoc = xwiki.getDocument(docFullName, context);
 
-                includeFormatParams[2] = docFullName;
-                targetDoc.setContent(MessageFormat.format("#includeInContext(\"{0}{1}{2}\")", includeFormatParams));
-                targetDoc.setSyntaxId(XWikiDocument.XWIKI10_SYNTAXID);
-            }
+                    includeFormatParams[2] = docFullName;
+                    targetDoc.setContent(MessageFormat.format("#includeInContext(\"{0}{1}{2}\")", includeFormatParams));
+                    targetDoc.setSyntaxId(XWikiDocument.XWIKI10_SYNTAXID);
+                }
 
-            // Replace documents contents to link
-            for (Object item : docsNames[1]) {
-                String docFullName = (String) item;
-                XWikiDocument targetDoc = xwiki.getDocument(docFullName, context);
+                // Replace documents contents to link
+                for (Object item : docsNames[1]) {
+                    String docFullName = (String) item;
+                    XWikiDocument targetDoc = xwiki.getDocument(docFullName, context);
 
-                includeFormatParams[2] = docFullName;
-                targetDoc.setContent(MessageFormat.format("#includeTopic(\"{0}{1}{2}\")", includeFormatParams));
-                targetDoc.setSyntaxId(XWikiDocument.XWIKI10_SYNTAXID);
+                    includeFormatParams[2] = docFullName;
+                    targetDoc.setContent(MessageFormat.format("#includeTopic(\"{0}{1}{2}\")", includeFormatParams));
+                    targetDoc.setSyntaxId(XWikiDocument.XWIKI10_SYNTAXID);
+                }
             }
         } finally {
             context.setDatabase(database);

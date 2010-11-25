@@ -218,4 +218,46 @@ public privileged aspect XWikiCompatibilityAspect
     {
         return this.skipDefaultSpaceInURLs(context);
     }
+
+    /**
+     * @deprecated use {@link XWikiMessageTool#get(String, List)} instead. You can access message tool using
+     *             {@link XWikiContext#getMessageTool()}.
+     */
+    @Deprecated
+    public String getMessage(String item, XWikiContext context)
+    {
+        XWikiMessageTool msg = context.getMessageTool();
+        if (msg == null) {
+            return item;
+        } else {
+            return msg.get(item);
+        }
+    }
+
+    /**
+     * @deprecated use {@link XWikiMessageTool#get(String, List)} instead. You can access message tool using
+     *             {@link XWikiContext#getMessageTool()}.
+     */
+    @Deprecated
+    public String parseMessage(String id, XWikiContext context)
+    {
+        XWikiMessageTool msg = context.getMessageTool();
+
+        return parseContent(msg.get(id), context);
+    }
+
+    /**
+     * @deprecated use {@link XWikiMessageTool#get(String, List)} instead. You can access message tool using
+     *             {@link XWikiContext#getMessageTool()}.
+     */
+    @Deprecated
+    public String parseMessage(XWikiContext context)
+    {
+        String message = (String) context.get("message");
+        if (message == null) {
+            return null;
+        }
+
+        return parseMessage(message, context);
+    }
 }

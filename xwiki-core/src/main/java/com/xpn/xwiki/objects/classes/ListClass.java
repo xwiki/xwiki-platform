@@ -340,13 +340,13 @@ public abstract class ListClass extends PropertyClass
             return displayValue;
         }
         String msgname = getFieldFullName() + "_" + value;
-        String newresult = context.getWiki().getMessage(msgname, context);
+        String newresult = context.getMessageTool().get(msgname);
         if (msgname.equals(newresult)) {
             msgname = "option_" + name + "_" + value;
-            newresult = context.getWiki().getMessage(msgname, context);
+            newresult = context.getMessageTool().get(msgname);
             if (msgname.equals(newresult)) {
                 msgname = "option_" + value;
-                newresult = context.getWiki().getMessage(msgname, context);
+                newresult = context.getMessageTool().get(msgname);
                 if (msgname.equals(newresult)) {
                     return displayValue;
                 }

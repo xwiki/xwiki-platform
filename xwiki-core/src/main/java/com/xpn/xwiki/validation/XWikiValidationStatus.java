@@ -22,6 +22,7 @@ package com.xpn.xwiki.validation;
 
 import com.xpn.xwiki.XWikiContext;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.ArrayList;
 
@@ -71,7 +72,7 @@ public class XWikiValidationStatus {
             else {
                 vcontext.put("className", className);
                 vcontext.put("propName", propPrettyName);
-                String message = context.getWiki().parseMessage("validation_error", context);
+                String message = context.getMessageTool().get("validationerror", Collections.singletonList(propName));
                 getErrors().add(message);
             }
         }

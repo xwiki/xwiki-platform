@@ -325,7 +325,7 @@ public class PropertyClass extends BaseCollection implements PropertyClassInterf
             return getPrettyName();
         }
 
-        String prettyName = context.getWiki().getMessage(msgName, context);
+        String prettyName = context.getMessageTool().get(msgName);
         if (prettyName.equals(msgName)) {
             return getPrettyName();
         }
@@ -352,11 +352,11 @@ public class PropertyClass extends BaseCollection implements PropertyClassInterf
     public String getTooltip(XWikiContext context)
     {
         String tooltipName = getFieldFullName() + "_tooltip";
-        String tooltip = context.getWiki().getMessage(tooltipName, context);
+        String tooltip = context.getMessageTool().get(tooltipName);
         if (tooltipName.equals(tooltip)) {
             tooltipName = getLargeStringValue("tooltip");
             if ((tooltipName != null) && (!tooltipName.trim().equals(""))) {
-                tooltip = context.getWiki().getMessage(tooltipName, context);
+                tooltip = context.getMessageTool().get(tooltipName);
             }
         }
         return tooltip;

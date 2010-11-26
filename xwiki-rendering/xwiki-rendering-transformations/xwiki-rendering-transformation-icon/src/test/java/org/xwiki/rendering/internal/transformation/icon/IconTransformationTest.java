@@ -124,4 +124,27 @@ public class IconTransformationTest extends AbstractMockingComponentTestCase
         getComponentManager().lookup(BlockRenderer.class, "event/1.0").render(xdom, printer);
         Assert.assertEquals(expected, printer.toString());
     }
+
+    /**
+     * Fixes XWIKI-5729.
+     */
+    @Test
+    public void testTransformWhenIncompleteMatchExistsFollowedByMatch() throws Exception
+    {
+        String expected = "beginDocument\n"
+            + "beginParagraph\n"
+            + "onSpecialSymbol [(]\n"
+            + "onSpace\n"
+            + "onImage [Typed = [true] Type = [icon] Reference = [information]] [true]\n"
+            + "endParagraph\n"
+            + "endDocument";
+
+        XDOM xdom = getComponentManager().lookup(Parser.class, "xwiki/2.1").parse(new StringReader(
+           "( (i)"));
+        this.transformation.transform(xdom, new TransformationContext());
+
+        WikiPrinter printer = new DefaultWikiPrinter();
+        getComponentManager().lookup(BlockRenderer.class, "event/1.0").render(xdom, printer);
+        Assert.assertEquals(expected, printer.toString());
+    }
 }

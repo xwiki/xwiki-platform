@@ -82,20 +82,37 @@ public class SerializableEventConverter extends AbstractEventConverter
      */
     public boolean toRemote(LocalEventData localEvent, RemoteEventData remoteEvent)
     {
-        if (localEvent.getEvent() instanceof Serializable) {
+        if (isSerializable(localEvent)) {
             remoteEvent.setEvent((Serializable) localEvent.getEvent());
-
-            if (localEvent.getSource() instanceof Serializable) {
-                remoteEvent.setSource((Serializable) localEvent.getSource());
-            }
-
-            if (localEvent.getData() instanceof Serializable) {
-                remoteEvent.setData((Serializable) localEvent.getData());
-            }
+            remoteEvent.setSource((Serializable) localEvent.getSource());
+            remoteEvent.setData((Serializable) localEvent.getData());
 
             return true;
         }
 
         return false;
+    }
+
+    /**
+     * Indicate if a local event is fully serializable.
+     * 
+     * @param localEvent the local event
+     * @return true is the local event is fully serializable, false otherwise.
+     */
+    private boolean isSerializable(LocalEventData localEvent)
+    {
+        return localEvent.getEvent() instanceof Serializable && isSerializable(localEvent.getData())
+            && isSerializable(localEvent.getSource());
+    }
+
+    /**
+     * Indicate if an object is serializable.
+     * 
+     * @param obj the object to test
+     * @return true is the object is serializable, false otherwise.
+     */
+    private boolean isSerializable(Object obj)
+    {
+        return obj instanceof Serializable || obj == null;
     }
 }

@@ -26,6 +26,7 @@ import com.xpn.xwiki.cache.api.XWikiCache;
 import com.xpn.xwiki.cache.api.XWikiCacheService;
 import com.xpn.xwiki.cache.api.internal.XWikiCacheServiceStub;
 import com.xpn.xwiki.cache.api.internal.XWikiCacheStub;
+import com.xpn.xwiki.web.XWikiMessageTool;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;

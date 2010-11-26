@@ -224,7 +224,7 @@ public privileged aspect XWikiCompatibilityAspect
      *             {@link XWikiContext#getMessageTool()}.
      */
     @Deprecated
-    public String getMessage(String item, XWikiContext context)
+    public String XWiki.getMessage(String item, XWikiContext context)
     {
         XWikiMessageTool msg = context.getMessageTool();
         if (msg == null) {
@@ -239,7 +239,7 @@ public privileged aspect XWikiCompatibilityAspect
      *             {@link XWikiContext#getMessageTool()}.
      */
     @Deprecated
-    public String parseMessage(String id, XWikiContext context)
+    public String XWiki.parseMessage(String id, XWikiContext context)
     {
         XWikiMessageTool msg = context.getMessageTool();
 
@@ -251,7 +251,7 @@ public privileged aspect XWikiCompatibilityAspect
      *             {@link XWikiContext#getMessageTool()}.
      */
     @Deprecated
-    public String parseMessage(XWikiContext context)
+    public String XWiki.parseMessage(XWikiContext context)
     {
         String message = (String) context.get("message");
         if (message == null) {

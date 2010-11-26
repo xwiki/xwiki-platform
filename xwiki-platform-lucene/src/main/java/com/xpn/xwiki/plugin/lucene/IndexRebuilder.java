@@ -149,9 +149,7 @@ public class IndexRebuilder extends AbstractXWikiRunnable
                 }
             }
 
-            if (wikis != null) {
-                this.wikis = new ArrayList<String>(wikis);
-            }
+            this.wikis = wikis != null ? new ArrayList<String>(wikis) : null;
             this.hqlFilter = hqlFilter;
             this.onlyNew = onlyNew;
             this.rebuildInProgress = true;

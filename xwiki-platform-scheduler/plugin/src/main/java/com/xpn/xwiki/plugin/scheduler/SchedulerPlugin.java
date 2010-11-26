@@ -111,7 +111,7 @@ public class SchedulerPlugin extends XWikiDefaultPlugin
             }
 
             // Init class
-            
+
             try {
                 for (String wikiName : new ArrayList<String>(wikiServers)) {
                     context.setDatabase(wikiName);
@@ -138,7 +138,7 @@ public class SchedulerPlugin extends XWikiDefaultPlugin
             getScheduler().start();
 
             // Restore jobs
-            
+
             try {
                 // Iterate on all virtual wikis
                 for (String wikiName : wikiServers) {
@@ -284,10 +284,10 @@ public class SchedulerPlugin extends XWikiDefaultPlugin
         try {
             List<String> jobsDocsNames = context.getWiki().getStore().searchDocumentsNames(hql, context);
             for (String docName : jobsDocsNames) {
-                XWikiDocument jobDoc = context.getWiki().getDocument(docName, context);
-                BaseObject jobObj = jobDoc.getObject(XWIKI_JOB_CLASS);
-                String jobName = jobObj.getStringValue("jobName");
                 try {
+                    XWikiDocument jobDoc = context.getWiki().getDocument(docName, context);
+                    BaseObject jobObj = jobDoc.getObject(XWIKI_JOB_CLASS);
+
                     String status = jobObj.getStringValue("status");
                     if (status.equals(JobState.STATE_NORMAL) || status.equals(JobState.STATE_PAUSED)) {
                         this.scheduleJob(jobObj, context);
@@ -295,12 +295,12 @@ public class SchedulerPlugin extends XWikiDefaultPlugin
                     if (status.equals(JobState.STATE_PAUSED)) {
                         this.pauseJob(jobObj, context);
                     }
-                } catch (XWikiException e) {
-                    throw new SchedulerPluginException(SchedulerPluginException.ERROR_SCHEDULERPLUGIN_RESTORE_JOB,
-                        "Failed to restore job with job name " + jobName, e);
+                } catch (Exception e) {
+                    LOG.error("Failed to restore job with in document [" + docName + "] and wiki ["
+                        + context.getDatabase() + "]");
                 }
             }
-        } catch (XWikiException e) {
+        } catch (Exception e) {
             throw new SchedulerPluginException(SchedulerPluginException.ERROR_SCHEDULERPLUGIN_RESTORE_EXISTING_JOBS,
                 "Failed to restore existing scheduler jobs", e);
         }

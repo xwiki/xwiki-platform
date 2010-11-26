@@ -1554,7 +1554,7 @@ ${Msz}Mb##
  *#
 #macro(livetable $divid $collist $colprops $options)
 ## Do not indent:
-#if($xwiki.getCurrentContentSyntaxId() == "xwiki/2.0")
+#if($xwiki.getCurrentContentSyntaxId() != "xwiki/1.0")
 
 
 {{html}}
@@ -1809,7 +1809,7 @@ ${Msz}Mb##
    //]]>
   </script>
 </div> ## xwiki-livetable-container
-  #if($xwiki.getCurrentContentSyntaxId() == "xwiki/2.0"){{/html}}
+  #if($xwiki.getCurrentContentSyntaxId() != "xwiki/1.0"){{/html}}
 
 #else {/pre} #end
 #end

@@ -243,7 +243,10 @@ public class IconTransformation extends AbstractTransformation implements Initia
             if (filteredSourceBlocks.size() > 0) {
                 parseTree(filteredSourceBlocks);
             } else if (mappingCursor == null) {
+                // No match has been found, reset state variables
                 mappingCursor = this.mappingTree.getChildren().get(0);
+                count = 0;
+                matchStartBlock = null;
             }
             sourceBlock = this.filter.getNextSibling(sourceBlock);
         }

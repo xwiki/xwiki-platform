@@ -278,7 +278,7 @@ public class SchedulerPlugin extends XWikiDefaultPlugin
      * 
      * @param context The XWikiContext when initializing the plugin
      */
-    private void restoreExistingJobs(XWikiContext context) throws SchedulerPluginException
+    private void restoreExistingJobs(XWikiContext context)
     {
         String hql = ", BaseObject as obj where obj.name=doc.fullName and obj.className='XWiki.SchedulerJobClass'";
         try {
@@ -296,13 +296,13 @@ public class SchedulerPlugin extends XWikiDefaultPlugin
                         this.pauseJob(jobObj, context);
                     }
                 } catch (Exception e) {
-                    LOG.error("Failed to restore job with in document [" + docName + "] and wiki ["
-                        + context.getDatabase() + "]");
+                    LOG.error(
+                        "Failed to restore job with in document [" + docName + "] and wiki [" + context.getDatabase()
+                            + "]", e);
                 }
             }
         } catch (Exception e) {
-            throw new SchedulerPluginException(SchedulerPluginException.ERROR_SCHEDULERPLUGIN_RESTORE_EXISTING_JOBS,
-                "Failed to restore existing scheduler jobs", e);
+            LOG.error("Failed to restore existing scheduler jobs in wiki [" + context.getDatabase() + "]", e);
         }
     }
 

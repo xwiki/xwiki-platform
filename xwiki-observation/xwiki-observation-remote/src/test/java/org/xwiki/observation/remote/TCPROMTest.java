@@ -33,6 +33,8 @@ import org.xwiki.observation.remote.test.TestEvent;
 
 public class TCPROMTest extends AbstractROMTestCase
 {
+    static class Unserializable { }
+    
     private Mockery context = new Mockery();
 
     @Before
@@ -56,24 +58,28 @@ public class TCPROMTest extends AbstractROMTestCase
     @Test
     public void testSerializableEvent() throws InterruptedException
     {
-        final EventListener listener1 = this.context.mock(EventListener.class, "listener1");
-        final EventListener listener2 = this.context.mock(EventListener.class, "listener2");
+        final EventListener localListener = this.context.mock(EventListener.class, "listener1");
+        final EventListener remoteListener = this.context.mock(EventListener.class, "listener2");
 
         final TestEvent event = new TestEvent();
 
+        final Unserializable unserializable = new Unserializable();
+
         this.context.checking(new Expectations() {{
-                allowing(listener1).getName(); will(returnValue("mylistener"));
-                allowing(listener2).getName(); will(returnValue("mylistener"));
-                allowing(listener1).getEvents(); will(returnValue(Arrays.asList(event)));
-                allowing(listener2).getEvents(); will(returnValue(Arrays.asList(event)));
-                oneOf(listener1).onEvent(with(equal(event)), with(equal("some source")), with(equal("some data")));
-                oneOf(listener2).onEvent(with(equal(event)), with(equal("some source")), with(equal("some data")));
+                allowing(localListener).getName(); will(returnValue("mylistener"));
+                allowing(remoteListener).getName(); will(returnValue("mylistener"));
+                allowing(localListener).getEvents(); will(returnValue(Arrays.asList(event)));
+                allowing(remoteListener).getEvents(); will(returnValue(Arrays.asList(event)));
+                oneOf(localListener).onEvent(with(same(event)), with(equal("some source")), with(equal("some data")));
+                oneOf(localListener).onEvent(with(same(event)), with(same(unserializable)), with(same(unserializable)));
+                oneOf(remoteListener).onEvent(with(equal(event)), with(equal("some source")), with(equal("some data")));
             }});
 
-        getObservationManager1().addListener(listener1);
-        getObservationManager2().addListener(listener2);
+        getObservationManager1().addListener(localListener);
+        getObservationManager2().addListener(remoteListener);
 
         getObservationManager1().notify(event, "some source", "some data");
+        getObservationManager1().notify(event, unserializable, unserializable);
 
         // Make sure JGroups has enough time to send the message
         Thread.sleep(1000);

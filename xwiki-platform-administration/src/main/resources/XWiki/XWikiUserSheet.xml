@@ -286,13 +286,13 @@ td.recentChangesRight {
   padding: 0 !important;
 }
 
-div.dashboard h1 {
+#profilePane .column h1 {
   font-weight:bold;
   font-size:115%;
   margin:10px 0;
 }
 
-div.dashboard h2 {
+#profilePane .column h2 {
   font-size: 110%;
 }
 
@@ -335,7 +335,7 @@ div.editProfileCategory a {
 span.wikiWatchlistType, span.spaceWatchlistType, span.pageWatchlistType {
   width: 16px;
   height: 16px;
-  display: block;  
+  display: block;
 }
 
 span.wikiWatchlistType {
@@ -426,12 +426,8 @@ span#avatarUpload {
   padding-top: 0;
 }
 
-.vertical-pane .dashboardleft, .vertical-pane .dashboardright {
+.vertical-pane .column {
   overflow: hidden;
-}
-
-.dashboardinline .dashboardleft {
-  width: 100% !important;
 }</code>
 </property>
 <property>

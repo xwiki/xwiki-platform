@@ -40,9 +40,7 @@ $doc.use($obj)
   &lt;span class="fn hidden"&gt;$username&lt;/span&gt;
 #end
 $xwiki.ssx.use("XWiki.XWikiUserSheet")##
-$xwiki.ssx.use('Main.Dashboard')##
-&lt;div class="dashboard dashboard${xcontext.action}"&gt;
-  &lt;div class="dashboardleft"&gt;
+  &lt;div class="#if($context.action == 'view')half #{else}full #{end}column"&gt;
     &lt;div class="userInfo"&gt;
       #if($xcontext.action == 'view' &amp;&amp; $hasEdit)
         &lt;div class="editProfileCategory"&gt;&lt;a href="$doc.getURL('inline', 'category=profile')"&gt;&lt;span class="hidden"&gt;$msg.get('platform.core.profile.category.profile.edit')&lt;/span&gt;&lt;/a&gt;&lt;/div&gt;
@@ -89,8 +87,8 @@ $xwiki.ssx.use('Main.Dashboard')##
       #end
     &lt;/div&gt;
   &lt;/div&gt;
-  &lt;div class="dashboardright"&gt;
-    #if ($xcontext.action == 'view')
+  #if ($xcontext.action == 'view')
+    &lt;div class="half column"&gt;
       &lt;div class="userRecentChanges"&gt;
         &lt;h1&gt;$msg.get('platform.core.profile.section.activity')&lt;/h1&gt;
 {{/html}}
@@ -99,10 +97,9 @@ $xwiki.ssx.use('Main.Dashboard')##
 
 {{html clean="false"}}
       &lt;/div&gt;
-    #end
-  &lt;/div&gt;
-  &lt;div class="dashboardspacer"&gt;&amp;nbsp;&lt;/div&gt;
-&lt;/div&gt;
+    &lt;/div&gt;
+  #end
+  &lt;div class="clearfloats"&gt;&amp;nbsp;&lt;/div&gt;
 #if($xcontext.action == 'view')
   ## Close the vcard
   &lt;/div&gt;

@@ -298,6 +298,10 @@ span.wikicreatelink a:after {
 .column {
   float: left;
 }
+.full {
+  /* Leave a bit of space for borders. */
+  width: 99.8%;
+}
 .half {
   /* Rounding errors with 50%, might end up with one more pixel which pushes the column down. */
   width: 49.9%;

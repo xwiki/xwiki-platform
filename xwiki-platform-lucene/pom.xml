@@ -81,6 +81,11 @@
           <groupId>asm</groupId>
           <artifactId>asm</artifactId>
         </exclusion>
+        <!-- Tika parsers 0.8 drags ROME 0.9, while xwiki-core provides ROME 1.0 -->
+        <exclusion>
+          <groupId>rome</groupId>
+          <artifactId>rome</artifactId>
+        </exclusion>
       </exclusions>
     </dependency>
 

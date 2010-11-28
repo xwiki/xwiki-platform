@@ -126,10 +126,10 @@
   #end
 
 &lt;p&gt;
-  &lt;label for="indexcustom_clearIndex"&gt;$msg.get('search.admin.lucene.indexing.action.indexcustom.clearindex')&lt;/label&gt; &lt;input id="indexcustom_clearIndex" name="clearIndex" type="checkbox" title="$escapetool.xml($msg.get('search.admin.lucene.indexing.action.indexcustom.clearindex.title'))" #if($clearIndex)checked="checked"#end /&gt;
+  &lt;label for="indexcustom_clearIndex"&gt;&lt;input id="indexcustom_clearIndex" name="clearIndex" type="checkbox" title="$escapetool.xml($msg.get('search.admin.lucene.indexing.action.indexcustom.clearindex.title'))" #if($clearIndex)checked="checked" #end/&gt; $msg.get('search.admin.lucene.indexing.action.indexcustom.clearindex')&lt;/label&gt;
 &lt;/p&gt;
 &lt;p&gt;
-  &lt;label for="indexcustom_onlyNew"&gt;$msg.get('search.admin.lucene.indexing.action.indexcustom.onlynew')&lt;/label&gt; &lt;input id="indexcustom_onlyNew" name="onlyNew" type="checkbox" title="$escapetool.xml($msg.get('search.admin.lucene.indexing.action.indexcustom.onlynew.title'))" #if($onlyNew)checked="checked"#end /&gt;
+  &lt;label for="indexcustom_onlyNew"&gt;&lt;input id="indexcustom_onlyNew" name="onlyNew" type="checkbox" title="$escapetool.xml($msg.get('search.admin.lucene.indexing.action.indexcustom.onlynew.title'))" #if($onlyNew)checked="checked" #end/&gt; $msg.get('search.admin.lucene.indexing.action.indexcustom.onlynew')&lt;/label&gt;
 &lt;/p&gt;
 
 &lt;span class="buttonwrapper"&gt;&lt;input type="submit" value="$msg.get('search.admin.lucene.indexing.button')" class="button"/&gt;&lt;/span&gt;

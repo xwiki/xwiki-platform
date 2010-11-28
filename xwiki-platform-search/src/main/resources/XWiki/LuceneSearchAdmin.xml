@@ -23,44 +23,44 @@
 <syntaxId>xwiki/2.0</syntaxId>
 <hidden>false</hidden>
 <content>{{velocity output="false"}}
-#set($lucene = $xwiki.lucene)
+#set ($lucene = $xwiki.lucene)
 {{/velocity}}
 
 {{velocity}}
 #if ($hasAdmin)
   #if ($request.action == 'indexfarm')
     #if ($xcontext.isMainWiki())
-      #set($clearIndex = true)
-      #set($onlyNew = false)
-      #set($startindex = true)
+      #set ($clearIndex = true)
+      #set ($onlyNew = false)
+      #set ($startindex = true)
     #else## !$xcontext.isMainWiki()
       {{error}}$msg.get('needadminrights').{{/error}}
     #end
   #elseif ($request.action == 'indexcurrentwiki')
-    #set($wikis = [$xcontext.database])
-    #set($wikisString = "${xcontext.database}")
-    #set($clearIndex = true)
-    #set($onlyNew = false)
-    #set($startindex = true)
+    #set ($wikis = [$xcontext.database])
+    #set ($wikisString = "${xcontext.database}")
+    #set ($clearIndex = true)
+    #set ($onlyNew = false)
+    #set ($startindex = true)
   #elseif ($request.action == 'indexcustom')
     #if ($xcontext.isMainWiki())
-      #if ($request.wikis &amp;&amp; $request.wikis.trim() != '')
-        #set($wikisArray = $request.wikis.split(','))
-        #set($wikis = $wikisArray.subList(0, $wikisArray.size()))
-        #set($wikisString = $request.wikis)
+      #if ("$!{request.wikis.trim()}" != '')
+        #set ($wikisArray = $request.wikis.split(','))
+        #set ($wikis = $wikisArray.subList(0, $wikisArray.size()))
+        #set ($wikisString = $request.wikis)
       #end
     #else## !$xcontext.isMainWiki()
-      #set($wikis = [$xcontext.database])
-      #set($wikisString = "${xcontext.database}")
+      #set ($wikis = [$xcontext.database])
+      #set ($wikisString = "${xcontext.database}")
     #end
-    #set($hqlFilter = $request.hqlFilter)
-    #set($clearIndex = $request.clearIndex == 'on')
-    #set($onlyNew = $request.onlyNew == 'on')
-    #set($startindex = true)
+    #set ($hqlFilter = $request.hqlFilter)
+    #set ($clearIndex = $request.clearIndex == 'on')
+    #set ($onlyNew = $request.onlyNew == 'on')
+    #set ($startindex = true)
   #end
   ##
   #if ($startindex)
-    #set($errorcode = $lucene.startIndex($wikis, $hqlFilter, $clearIndex, $onlyNew))
+    #set ($errorcode = $lucene.startIndex($wikis, $hqlFilter, $clearIndex, $onlyNew))
     #if ($errorcode &gt; 0)
       {{info}}$msg.get('search.admin.lucene.indexing.message.started'){{/info}}
     #elseif ($errorcode == -1)
@@ -77,9 +77,11 @@
 (% id="Hsearch.admin.lucene.status.title" %)
 == {{velocity}}$msg.get('search.admin.lucene.status.title'){{/velocity}} ==
 
-|={{velocity}}$msg.get('search.admin.lucene.status.infotitle'){{/velocity}}|={{velocity}}$msg.get('search.admin.lucene.status.valuetitle'){{/velocity}}
-|{{velocity}}$msg.get('search.admin.lucene.status.indexed'){{/velocity}}|{{velocity}}$lucene.luceneDocCount{{/velocity}}
-|{{velocity}}$msg.get('search.admin.lucene.status.indexing'){{/velocity}}|{{velocity}}$lucene.queueSize{{/velocity}}
+{{velocity}}
+|=$msg.get('search.admin.lucene.status.infotitle')|=$msg.get('search.admin.lucene.status.valuetitle')
+|$msg.get('search.admin.lucene.status.indexed')|$lucene.luceneDocCount
+|$msg.get('search.admin.lucene.status.indexing')|$lucene.queueSize
+{{/velocity}}
 
 (% id="Hsearch.admin.lucene.indexing.title" %)
 == {{velocity}}$msg.get('search.admin.lucene.indexing.title'){{/velocity}} ==

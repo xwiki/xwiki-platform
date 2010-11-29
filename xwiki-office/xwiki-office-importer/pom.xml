@@ -73,6 +73,15 @@
       <version>3.0-beta-3</version>
     </dependency>
     <dependency>
+      <!--
+        Required by org.artofsolving.jodconverter.document.JsonDocumentFormatRegistry which is used to configure the
+        office document conversion.
+      -->
+      <groupId>org.json</groupId>
+      <artifactId>json</artifactId>
+      <version>20080701</version>
+    </dependency>
+    <dependency>
       <groupId>org.codehaus.groovy</groupId>
       <artifactId>groovy-all</artifactId>
     </dependency>

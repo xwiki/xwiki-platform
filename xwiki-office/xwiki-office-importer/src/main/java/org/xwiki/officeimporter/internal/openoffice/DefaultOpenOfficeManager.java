@@ -20,8 +20,10 @@
 package org.xwiki.officeimporter.internal.openoffice;
 
 import java.io.File;
+import java.io.InputStream;
 
 import org.artofsolving.jodconverter.OfficeDocumentConverter;
+import org.artofsolving.jodconverter.document.JsonDocumentFormatRegistry;
 import org.artofsolving.jodconverter.office.DefaultOfficeManagerConfiguration;
 import org.artofsolving.jodconverter.office.ExternalOfficeManagerConfiguration;
 import org.artofsolving.jodconverter.office.OfficeManager;
@@ -43,6 +45,11 @@ import org.xwiki.officeimporter.openoffice.OpenOfficeManagerException;
 @Component
 public class DefaultOpenOfficeManager extends AbstractLogEnabled implements OpenOfficeManager
 {
+    /**
+     * The path to the file that can be used to configure the office document conversion.
+     */
+    private static final String DOCUMENT_FORMATS_PATH = "/document-formats.js";
+
     /**
      * The {@link OpenOfficeConfiguration} component.
      */
@@ -109,7 +116,28 @@ public class DefaultOpenOfficeManager extends AbstractLogEnabled implements Open
             setState(ManagerState.CONF_ERROR);
             throw new OpenOfficeManagerException("Invalid openoffice server configuration.");
         }
-        this.jodConverter = new OfficeDocumentConverter(this.jodOOManager);
+
+        jodConverter = null;
+        // Try to use the JSON document format registry to configure the office document conversion.
+        InputStream input = getClass().getResourceAsStream(DOCUMENT_FORMATS_PATH);
+        if (input != null) {
+            try {
+                jodConverter = new OfficeDocumentConverter(jodOOManager, new JsonDocumentFormatRegistry(input));
+            } catch (Exception e) {
+                getLogger().warn(
+                    String.format("Failed to parse %s . The default document format registry will be used instead.",
+                        DOCUMENT_FORMATS_PATH), e);
+            }
+        } else {
+            getLogger().debug(
+                String.format("%s is missing. The default document format registry will be used instead.",
+                    DOCUMENT_FORMATS_PATH));
+        }
+        if (jodConverter == null) {
+            // Use the default document format registry.
+            jodConverter = new OfficeDocumentConverter(jodOOManager);
+        }
+
         File workDir = container.getApplicationContext().getTemporaryDirectory();
         this.converter = new DefaultOpenOfficeConverter(this.jodConverter, workDir, getLogger());
     }

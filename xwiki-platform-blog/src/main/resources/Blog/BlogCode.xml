@@ -599,7 +599,7 @@ $!xwiki.jsx.use($blogScriptsDocumentName)##
 #macro(displayEntryContent $entryDoc $entryObj $onlyExtract)
   &lt;div class="#if($onlyExtract)entry-summary#{else}entry-content#end"&gt;
   #getEntryContent($entryDoc $entryObj $onlyExtract $entryContent)
-  {{html wiki="false"}}$entryDoc.getRenderedContent($entryContent, $entryDoc.getSyntax().toIdString()){{/html}}
+  {{html wiki="false"}}$entryDoc.getRenderedContent($entryContent, $entryDoc.syntax.toIdString()){{/html}}
   &lt;/div&gt; ## entry-content
 #end
 ##
@@ -628,7 +628,7 @@ $!xwiki.jsx.use($blogScriptsDocumentName)##
 *    #end
 ## *###
   #else
-    #if($entryDoc.syntax == 'xwiki/1.0')
+    #if($entryDoc.syntax.toIdString() == 'xwiki/1.0')
       #set($entryContent = "${entryContent} &lt;a href='${entryDoc.getURL()}' title='$msg.get('xe.blog.code.readpost')'&gt;...&lt;/a&gt;")
     #else
       #set($entryContent = "${entryContent} [[...&gt;&gt;${entryDoc}||title='$msg.get('xe.blog.code.readpost')']]")

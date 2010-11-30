@@ -21,6 +21,8 @@
 package org.xwiki.component.annotation;
 
 import java.lang.reflect.Field;
+import java.lang.reflect.ParameterizedType;
+import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -43,18 +45,18 @@ import org.xwiki.component.util.ReflectionUtils;
 public class ComponentDescriptorFactory
 {
     /**
-     * Create component descriptors for the passed component implementation class and component role class.
-     * There can be more than one descriptor if the component class has specified several hints.
+     * Create component descriptors for the passed component implementation class and component role class. There can be
+     * more than one descriptor if the component class has specified several hints.
      * 
      * @param componentClass the component implementation class
      * @param componentRoleClass the component role class
      * @return the component descriptors with resolved component dependencies
      */
-    public List<ComponentDescriptor> createComponentDescriptors(Class< ? > componentClass, 
+    public List<ComponentDescriptor> createComponentDescriptors(Class< ? > componentClass,
         Class< ? > componentRoleClass)
     {
         List<ComponentDescriptor> descriptors = new ArrayList<ComponentDescriptor>();
-        
+
         // If the Component annotation has several hints specified ignore the default hint value and for each specified
         // hint create a Component Descriptor
         String[] hints;
@@ -73,7 +75,7 @@ public class ComponentDescriptorFactory
         for (String hint : hints) {
             descriptors.add(createComponentDescriptor(componentClass, hint, componentRoleClass));
         }
-        
+
         return descriptors;
     }
 
@@ -85,7 +87,7 @@ public class ComponentDescriptorFactory
      * @param componentRoleClass the component role class
      * @return the component descriptor with resolved component dependencies
      */
-    private ComponentDescriptor createComponentDescriptor(Class< ? > componentClass, String hint, 
+    private ComponentDescriptor createComponentDescriptor(Class< ? > componentClass, String hint,
         Class< ? > componentRoleClass)
     {
         DefaultComponentDescriptor descriptor = new DefaultComponentDescriptor();
@@ -100,9 +102,9 @@ public class ComponentDescriptorFactory
         } else {
             descriptor.setInstantiationStrategy(ComponentInstantiationStrategy.SINGLETON);
         }
-        
+
         // Set the requirements.
-        // Note: that we need to find all fields since we can have some inherited fields which are annotated in a 
+        // Note: that we need to find all fields since we can have some inherited fields which are annotated in a
         // superclass. Since Java doesn't offer a method to return all fields we have to traverse all parent classes
         // looking for declared fields.
         for (Field field : ReflectionUtils.getAllFields(componentClass)) {
@@ -111,10 +113,10 @@ public class ComponentDescriptorFactory
                 descriptor.addComponentDependency(dependency);
             }
         }
-        
-        return descriptor;        
+
+        return descriptor;
     }
-   
+
     /**
      * @param field the field for which to extract a Component Dependency
      * @return the Component Dependency instance created from the passed field
@@ -129,17 +131,13 @@ public class ComponentDescriptorFactory
             dependency.setName(field.getName());
 
             // Handle case of list or map
-            if (isRequirementListType(field.getType())) {
-                // Only add the field to the descriptor if the user has specified a role class different than an
-                // Object since we use Object as the default value when no role is specified.
-                if (!requirement.role().getName().equals(Object.class.getName())) {
-                    dependency.setRole(requirement.role());
-                } else {
-                    return null;
-                }
-            } else {
-                dependency.setRole(field.getType());
+            Class< ? > role = getFieldRole(field, requirement);
+
+            if (role == null) {
+                return null;
             }
+
+            dependency.setRole(role);
 
             if (requirement.value().trim().length() > 0) {
                 dependency.setRoleHint(requirement.value());
@@ -153,7 +151,55 @@ public class ComponentDescriptorFactory
 
         return dependency;
     }
-    
+
+    /**
+     * Extract component role frol the field to inject.
+     * 
+     * @param field the field to inject
+     * @param requirement the Requirement attribute
+     * @return the role of the field to inject
+     */
+    private Class< ? > getFieldRole(Field field, Requirement requirement)
+    {
+        Class< ? > role = null;
+
+        // Handle case of list or map
+        if (isRequirementListType(field.getType())) {
+            // Only add the field to the descriptor if the user has specified a role class different than an
+            // Object since we use Object as the default value when no role is specified.
+            if (!requirement.role().getName().equals(Object.class.getName())) {
+                role = requirement.role();
+            } else {
+                role = getGenericRole(field);
+            }
+        } else {
+            role = field.getType();
+        }
+
+        return role;
+    }
+
+    /**
+     * Extract generic type from the list field.
+     * 
+     * @param field the list field to inject
+     * @return the role of the components in the list
+     */
+    private Class< ? > getGenericRole(Field field)
+    {
+        Type type = field.getGenericType();
+
+        if (type instanceof ParameterizedType) {
+            ParameterizedType pType = (ParameterizedType) type;
+            Type[] types = pType.getActualTypeArguments();
+            if (types.length > 0 && types[0] instanceof Class) {
+                return (Class) types[0];
+            }
+        }
+
+        return null;
+    }
+
     /**
      * @param type the type for which to verify if it's a list or not
      * @return true if the type is a list (Collection or Map), false otherwise

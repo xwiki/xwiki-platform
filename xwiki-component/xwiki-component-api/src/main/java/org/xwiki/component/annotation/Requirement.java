@@ -50,7 +50,9 @@ public @interface Requirement
      * The role for the component to inject. Note that the role can usually be guessed from the field
      * type or method parameter type. However, for Lists or Maps we need to pass it since Java doesn't
      * allow getting it using reflection.
+     * @deprecated since 2.7RC1 generic types are guessed too
      */
+    @Deprecated
     Class< ? > role() default Object.class;
 
     /**

@@ -21,7 +21,10 @@ package com.xpn.xwiki.web;
 
 import java.util.ArrayList;
 
+import javax.servlet.http.HttpServletResponse;
+
 import org.apache.commons.lang.math.NumberUtils;
+import org.apache.velocity.VelocityContext;
 
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
@@ -98,9 +101,16 @@ public class DeleteAttachmentAction extends XWikiAction
         // An attachment can be indicated either using an id, or using the filename.
         if (request.getParameter("id") != null) {
             int id = NumberUtils.toInt(request.getParameter("id"));
-            attachment = newdoc.getAttachmentList().get(id);
+            if (newdoc.getAttachmentList().size() > id) {
+                attachment = newdoc.getAttachmentList().get(id);
+            }
         } else {
             attachment = newdoc.getAttachment(filename);
+        }
+
+        // No such attachment
+        if (attachment == null) {
+            return true;
         }
 
         newdoc.setAuthor(context.getUser());
@@ -127,5 +137,21 @@ public class DeleteAttachmentAction extends XWikiAction
         sendRedirect(response, redirect);
 
         return false;
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see com.xpn.xwiki.web.XWikiAction#render(XWikiContext)
+     */
+    @Override
+    public String render(XWikiContext context)
+    {
+        context.getResponse().setStatus(HttpServletResponse.SC_NOT_FOUND);
+        VelocityContext vcontext = (VelocityContext) context.get("vcontext");
+        if (vcontext != null) {
+            vcontext.put("details", context.getMessageTool().get("platform.core.action.deleteAttachment.noAttachment"));
+        }
+        return "error";
     }
 }

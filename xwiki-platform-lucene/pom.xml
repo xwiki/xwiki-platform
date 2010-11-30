@@ -86,7 +86,18 @@
           <groupId>rome</groupId>
           <artifactId>rome</artifactId>
         </exclusion>
+        <!-- TODO: Remove when upgrade to tika 0.9 -->
+        <exclusion>
+          <groupId>edu.ucar</groupId>
+          <artifactId>netcdf</artifactId>
+        </exclusion>
       </exclusions>
+    </dependency>
+    <!-- TODO: Remove when upgrade to tika 0.9 -->
+    <dependency>
+      <groupId>edu.ucar</groupId>
+      <artifactId>netcdf</artifactId>
+      <version>4.2-min</version>
     </dependency>
 
     <!-- We only need this for setting the thread name... -->

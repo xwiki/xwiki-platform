@@ -43,6 +43,7 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.Stack;
 import java.util.TreeMap;
 import java.util.Vector;
 import java.util.regex.Matcher;
@@ -1203,6 +1204,19 @@ public class XWikiDocument implements DocumentModelBridge
     private String getRenderedContentTitle(Syntax outputSyntax, XWikiContext context) throws XWikiException
     {
         String title = null;
+        
+        Stack<DocumentReference> stackTrace =
+            (Stack<DocumentReference>) context.get("internal.getRenderedContentTitleStackTrace");
+
+        if (stackTrace == null) {
+            stackTrace = new Stack<DocumentReference>();
+            context.put("internal.getRenderedContentTitleStackTrace", stackTrace);
+        } else if (stackTrace.contains(getDocumentReference())) {
+            // TODO: generate an error message instead ?
+            return null;
+        }
+
+        stackTrace.push(getDocumentReference());
 
         if (is10Syntax()) {
             title = getRenderedContentTitle10(context);
@@ -1234,6 +1248,8 @@ public class XWikiDocument implements DocumentModelBridge
                 }
             }
         }
+
+        stackTrace.pop();
 
         return title;
     }

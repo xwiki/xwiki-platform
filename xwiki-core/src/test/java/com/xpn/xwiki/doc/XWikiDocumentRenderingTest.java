@@ -250,6 +250,17 @@ public class XWikiDocumentRenderingTest extends AbstractBridgedXWikiComponentTes
 
         assertEquals("Page", this.document.getRenderedTitle(Syntax.XHTML_1_0, getContext()));
     }
+    
+    /**
+     * Make sure title extracted from content is protected from cycles
+     */
+    public void testGetRenderedTitleRecursive() throws XWikiException
+    {
+        this.document.setSyntax(Syntax.XWIKI_2_0);
+        this.document.setContent("= {{groovy}}print doc.getDisplayTitle(){{/groovy}}");
+
+        assertEquals("Page", this.document.getRenderedTitle(Syntax.XHTML_1_0, getContext()));
+    }
 
     public void testExtractTitle()
     {

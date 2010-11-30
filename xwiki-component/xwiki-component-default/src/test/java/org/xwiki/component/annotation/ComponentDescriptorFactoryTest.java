@@ -76,12 +76,23 @@ public class ComponentDescriptorFactoryTest
          * Inject all implementation of the FieldRole role. 
          */
         @Requirement(role = FieldRole.class)
+        private List<FieldRole> deprecatedRoles;
+        
+        /**
+         * Inject all implementation of the FieldRole role. 
+         */
+        @Requirement()
         private List<FieldRole> roles;
 
         /**
          * Only inject FieldRole implementation with a "special" hint.
          */
         @Requirement(role = FieldRole.class, hints = {"special"})
+        private List<FieldRole> deprecatedSpecialRoles;
+        /**
+         * Only inject FieldRole implementation with a "special" hint.
+         */
+        @Requirement(hints = {"special"})
         private List<FieldRole> specialRoles;
     }
 
@@ -142,7 +153,7 @@ public class ComponentDescriptorFactoryTest
         Assert.assertEquals(ComponentInstantiationStrategy.SINGLETON, descriptor.getInstantiationStrategy());
 
         Collection<ComponentDependency> deps = descriptor.getComponentDependencies(); 
-        Assert.assertEquals(4, deps.size());
+        Assert.assertEquals(6, deps.size());
         Iterator<ComponentDependency> it = deps.iterator();
 
         ComponentDependency dep = it.next(); 
@@ -161,8 +172,20 @@ public class ComponentDescriptorFactoryTest
         Assert.assertEquals(FieldRole.class.getName(), dep.getRole().getName());
         Assert.assertEquals("default", dep.getRoleHint());
         Assert.assertEquals(List.class.getName(), dep.getMappingType().getName());
+        Assert.assertEquals("deprecatedRoles", dep.getName());
+        
+        dep = it.next();
+        Assert.assertEquals(FieldRole.class.getName(), dep.getRole().getName());
+        Assert.assertEquals("default", dep.getRoleHint());
+        Assert.assertEquals(List.class.getName(), dep.getMappingType().getName());
         Assert.assertEquals("roles", dep.getName());
 
+        dep = it.next();
+        Assert.assertEquals(FieldRole.class.getName(), dep.getRole().getName());
+        Assert.assertEquals("default", dep.getRoleHint());
+        Assert.assertEquals(List.class.getName(), dep.getMappingType().getName());
+        Assert.assertEquals("deprecatedSpecialRoles", dep.getName());
+        
         dep = it.next();
         Assert.assertEquals(FieldRole.class.getName(), dep.getRole().getName());
         Assert.assertEquals("default", dep.getRoleHint());

@@ -133,6 +133,8 @@ public class ImportAction extends XWikiAction
                     // Set the backup pack option
                     if (StringUtils.equals(request.getParameter("importAsBackup"), "true")) {
                         importer.setBackupPack(true);
+                    } else {
+                        importer.setBackupPack(false);
                     }
                     // Import files
                     importer.install();

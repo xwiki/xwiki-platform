@@ -429,6 +429,7 @@ public class HTMLFilter extends AbstractFilter implements Initializable
                     }
                 } catch (InvalidHtmlException e) {
                     getLogger().debug("Invalid HTML block at char [" + i + "]", e);
+                    ++i;
                 }
             } else {
                 elementContent.append(c);

@@ -86,14 +86,16 @@
           <groupId>rome</groupId>
           <artifactId>rome</artifactId>
         </exclusion>
-        <!-- TODO: Remove when upgrade to tika 0.9 -->
+        <!-- TODO: Remove when upgrade to tika 0.9.
+        netcdf jar embeds some standard libraries in conflict with the versions we are using. -->
         <exclusion>
           <groupId>edu.ucar</groupId>
           <artifactId>netcdf</artifactId>
         </exclusion>
       </exclusions>
     </dependency>
-    <!-- TODO: Remove when upgrade to tika 0.9 -->
+    <!-- TODO: Remove when upgrade to tika 0.9.
+    netcdf jar embeds some standard libraries in conflict with the versions we are using. -->
     <dependency>
       <groupId>edu.ucar</groupId>
       <artifactId>netcdf</artifactId>

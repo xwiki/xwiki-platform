@@ -36,6 +36,7 @@ import org.xwiki.gwt.wysiwyg.client.plugin.link.LinkPluginFactory;
 import org.xwiki.gwt.wysiwyg.client.plugin.list.ListPluginFactory;
 import org.xwiki.gwt.wysiwyg.client.plugin.macro.MacroPluginFactory;
 import org.xwiki.gwt.wysiwyg.client.plugin.separator.SeparatorPluginFactory;
+import org.xwiki.gwt.wysiwyg.client.plugin.style.StylePluginFactory;
 import org.xwiki.gwt.wysiwyg.client.plugin.submit.SubmitPluginFactory;
 import org.xwiki.gwt.wysiwyg.client.plugin.symbol.SymbolPluginFactory;
 import org.xwiki.gwt.wysiwyg.client.plugin.table.TablePluginFactory;
@@ -45,7 +46,6 @@ import org.xwiki.gwt.wysiwyg.client.syntax.SyntaxValidatorManager;
 import org.xwiki.gwt.wysiwyg.client.syntax.internal.DefaultSyntaxValidator;
 import org.xwiki.gwt.wysiwyg.client.syntax.internal.DefaultSyntaxValidatorManager;
 import org.xwiki.gwt.wysiwyg.client.syntax.internal.XWikiSyntaxValidator;
-
 
 /**
  * Factory for {@link WysiwygEditor}. Holds the responsibility of injecting the {@link PluginFactoryManager} and
@@ -104,6 +104,7 @@ public final class WysiwygEditorFactory
         pfm.addPluginFactory(ImportPluginFactory.getInstance());
         pfm.addPluginFactory(MacroPluginFactory.getInstance());
         pfm.addPluginFactory(EmbedPluginFactory.getInstance());
+        pfm.addPluginFactory(StylePluginFactory.getInstance());
         // add additional PluginFactory for other plug-ins
     }
 

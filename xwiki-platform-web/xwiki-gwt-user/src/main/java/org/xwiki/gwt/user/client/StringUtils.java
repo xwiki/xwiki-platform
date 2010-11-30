@@ -19,6 +19,8 @@
  */
 package org.xwiki.gwt.user.client;
 
+import java.util.Collection;
+
 /**
  * Operations on Strings.
  * 
@@ -63,5 +65,28 @@ public class StringUtils
     public static boolean areEqual(String expected, String actual)
     {
         return expected == actual || (expected != null && expected.equals(actual));
+    }
+
+    /**
+     * Joins the elements of the provided collection into a single string containing the provided elements. No delimiter
+     * is added before or after the list. A {@code null} separator is the same as an empty string ("").
+     * 
+     * @param collection the collection of values to join together, may be {@code null}
+     * @param inputSeparator the separator string to use, {@code null} treated as ""
+     * @return the joined string
+     */
+    public static String join(Collection< ? > collection, String inputSeparator)
+    {
+        if (collection == null) {
+            return null;
+        }
+        String actualSeparator = inputSeparator == null ? "" : inputSeparator;
+        String separator = "";
+        StringBuilder result = new StringBuilder();
+        for (Object item : collection) {
+            result.append(separator).append(item);
+            separator = actualSeparator;
+        }
+        return result.toString();
     }
 }

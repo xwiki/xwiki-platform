@@ -99,3 +99,12 @@ html>body .xToolbar .gwt-ToggleButton-down-disabled {
   margin:2px 2px 2px 4px;
   width:0px;
 }
+
+.xToolbar .xStyleNamePicker option {
+  padding-left: 20px;
+  text-transform: capitalize;
+}
+
+.xToolbar .xStyleNamePicker .selected {
+  background:url(../images/checked.png) no-repeat scroll 2px center #E0E0E0;
+}

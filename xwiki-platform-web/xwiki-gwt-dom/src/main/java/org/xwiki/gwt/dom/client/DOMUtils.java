@@ -53,6 +53,11 @@ public abstract class DOMUtils
     public static final String HR = "hr";
 
     /**
+     * The id attribute.
+     */
+    public static final String ID = "id";
+
+    /**
      * Constant for the comment node type.
      */
     public static final short COMMENT_NODE = 8;
@@ -815,7 +820,7 @@ public abstract class DOMUtils
                 node.setNodeValue(node.getNodeValue().substring(0, offset));
                 break;
             case Node.ELEMENT_NODE:
-                Element.as(clone).removeAttribute("id");
+                Element.as(clone).removeAttribute(ID);
                 for (int i = node.getChildNodes().getLength(); i > offset; i--) {
                     clone.appendChild(node.getChildNodes().getItem(offset));
                 }
@@ -1389,5 +1394,56 @@ public abstract class DOMUtils
     public void removeAttribute(Element element, String attributeName)
     {
         element.removeAttribute(attributeName);
+    }
+
+    /**
+     * Isolates a node from its siblings. Previous siblings are moved in a clone of their parent placed before their
+     * parent. Next siblings are moved in a clone of their parent placed after their parent. As an example, isolating
+     * the {@code em} from<br/>{@code <ins>a<em>b</em>c</ins>}<br/>
+     * results in<br/>{@code <ins>a</ins><ins><em>b</em></ins><ins>c</ins>}.
+     * 
+     * @param node the node to isolate
+     */
+    public void isolate(Node node)
+    {
+        Node parent = node.getParentNode();
+        if (parent == null) {
+            return;
+        }
+
+        Node grandParent = parent.getParentNode();
+        if (grandParent == null) {
+            return;
+        }
+
+        // Isolate from previous siblings.
+        if (node.getPreviousSibling() != null) {
+            Node leftClone = parent.cloneNode(false);
+            ((Element) leftClone).removeAttribute(ID);
+            Node leftSibling = node.getPreviousSibling();
+            leftClone.appendChild(leftSibling);
+            leftSibling = node.getPreviousSibling();
+            while (leftSibling != null) {
+                leftClone.insertBefore(leftSibling, leftClone.getFirstChild());
+                leftSibling = node.getPreviousSibling();
+            }
+            grandParent.insertBefore(leftClone, parent);
+        }
+
+        // Isolate from next siblings.
+        if (node.getNextSibling() != null) {
+            Node rightClone = parent.cloneNode(false);
+            ((Element) rightClone).removeAttribute(ID);
+            Node rightSibling = node.getNextSibling();
+            while (rightSibling != null) {
+                rightClone.appendChild(rightSibling);
+                rightSibling = node.getNextSibling();
+            }
+            if (parent.getNextSibling() != null) {
+                grandParent.insertBefore(rightClone, parent.getNextSibling());
+            } else {
+                grandParent.appendChild(rightClone);
+            }
+        }
     }
 }

@@ -209,9 +209,20 @@ public class InlineStyleExecutable extends AbstractSelectionExecutable
         }
 
         // Apply the style.
-        ancestor.getStyle().setProperty(property.getJSName(), parameter);
+        addStyle(ancestor, parameter);
 
         return new TextFragment(text, 0, text.getLength());
+    }
+
+    /**
+     * Styles the given element.
+     * 
+     * @param element the element to be styled
+     * @param parameter the value of the style property that is added
+     */
+    protected void addStyle(Element element, String parameter)
+    {
+        element.getStyle().setProperty(property.getJSName(), parameter);
     }
 
     /**

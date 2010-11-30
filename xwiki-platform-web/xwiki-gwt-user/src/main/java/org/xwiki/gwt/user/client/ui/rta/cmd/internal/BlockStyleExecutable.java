@@ -75,7 +75,18 @@ public class BlockStyleExecutable extends AbstractBlockExecutable
             // Let's wrap the in-line contents around the current selection in a paragraph.
             ancestor = wrap((Element) ancestor, offset, "p");
         }
-        ((Element) ancestor).getStyle().setProperty(property.getJSName(), value);
+        addStyle(Element.as(ancestor), value);
+    }
+
+    /**
+     * Styles the given element.
+     * 
+     * @param element the element to be styled
+     * @param value the value of the style property that is set
+     */
+    protected void addStyle(Element element, String value)
+    {
+        element.getStyle().setProperty(property.getJSName(), value);
     }
 
     /**

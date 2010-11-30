@@ -87,7 +87,7 @@ public class RemoveFormatExecutable extends ToggleInlineStyleExecutable
                     reorder(top, stack.peek());
                 }
             } else if (top == null) {
-                isolate(stack.peek());
+                domUtils.isolate(stack.peek());
                 top = parent;
             } else {
                 isolateUpTo(stack.peek(), top);
@@ -223,7 +223,7 @@ public class RemoveFormatExecutable extends ToggleInlineStyleExecutable
     {
         Node ancestor = child;
         do {
-            isolate(ancestor);
+            domUtils.isolate(ancestor);
             ancestor = ancestor.getParentNode();
         } while (ancestor != null && ancestor != top);
     }

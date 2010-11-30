@@ -40,11 +40,6 @@ import com.google.gwt.dom.client.Node;
 public class ToggleInlineStyleExecutable extends InlineStyleExecutable
 {
     /**
-     * The id attribute.
-     */
-    private static final String ID = "id";
-
-    /**
      * The value of the style property when the style is applied.
      */
     private final String value;
@@ -116,7 +111,7 @@ public class ToggleInlineStyleExecutable extends InlineStyleExecutable
         Node child = text;
         Node parent = child.getParentNode();
         while (parent != null && matchesStyle(parent) && domUtils.isInline(parent)) {
-            isolate(child);
+            domUtils.isolate(child);
             child = child.getParentNode();
             parent = child.getParentNode();
         }
@@ -151,57 +146,6 @@ public class ToggleInlineStyleExecutable extends InlineStyleExecutable
         }
 
         return new TextFragment(text, 0, text.getLength());
-    }
-
-    /**
-     * Isolates a node from its siblings. Previous siblings are moved in a clone of their parent placed before their
-     * parent. Next siblings are moved in a clone of their parent placed after their parent. As an example, isolating
-     * the {@code em} from<br/>{@code <ins>a<em>b</em>c</ins>}<br/>
-     * results in<br/>{@code <ins>a</ins><ins><em>b</em></ins><ins>c</ins>}.
-     * 
-     * @param node the node to isolate
-     */
-    protected void isolate(Node node)
-    {
-        Node parent = node.getParentNode();
-        if (parent == null) {
-            return;
-        }
-
-        Node grandParent = parent.getParentNode();
-        if (grandParent == null) {
-            return;
-        }
-
-        // Isolate from previous siblings.
-        if (node.getPreviousSibling() != null) {
-            Node leftClone = parent.cloneNode(false);
-            ((Element) leftClone).removeAttribute(ID);
-            Node leftSibling = node.getPreviousSibling();
-            leftClone.appendChild(leftSibling);
-            leftSibling = node.getPreviousSibling();
-            while (leftSibling != null) {
-                leftClone.insertBefore(leftSibling, leftClone.getFirstChild());
-                leftSibling = node.getPreviousSibling();
-            }
-            grandParent.insertBefore(leftClone, parent);
-        }
-
-        // Isolate from next siblings.
-        if (node.getNextSibling() != null) {
-            Node rightClone = parent.cloneNode(false);
-            ((Element) rightClone).removeAttribute(ID);
-            Node rightSibling = node.getNextSibling();
-            while (rightSibling != null) {
-                rightClone.appendChild(rightSibling);
-                rightSibling = node.getNextSibling();
-            }
-            if (parent.getNextSibling() != null) {
-                grandParent.insertBefore(rightClone, parent.getNextSibling());
-            } else {
-                grandParent.appendChild(rightClone);
-            }
-        }
     }
 
     /**

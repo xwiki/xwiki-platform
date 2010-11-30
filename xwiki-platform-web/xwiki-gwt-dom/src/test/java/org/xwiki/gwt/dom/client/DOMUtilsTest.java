@@ -890,4 +890,19 @@ public class DOMUtilsTest extends DOMTestCase
         domUtils.ensureBlockIsEditable(Element.as(getDocument().createHRElement()));
         // We should get here without any exception thrown and without any effect.
     }
+
+    /**
+     * Unit test for {@link DOMUtils#isolate(Node)}.
+     */
+    public void testIsolate()
+    {
+        getContainer().setInnerHTML("<span id=\"foo\" class=\"bar\"><em>one</em><strong>two</strong>three</span>");
+        Node parent = getContainer().getFirstChild();
+        domUtils.isolate(parent.getChild(1));
+        // The isolated node must keep the original parent.
+        assertEquals(parent, getContainer().getChild(1));
+        assertEquals("<span class=\"bar\"><em>one</em></span>"
+            + "<span id=\"foo\" class=\"bar\"><strong>two</strong></span>" + "<span class=\"bar\">three</span>",
+            getContainer().getInnerHTML());
+    }
 }

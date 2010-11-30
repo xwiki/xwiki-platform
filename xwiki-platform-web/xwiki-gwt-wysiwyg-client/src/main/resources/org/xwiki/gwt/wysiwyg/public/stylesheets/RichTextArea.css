@@ -12,15 +12,15 @@
   bar then the BODY element should increase its height/width to be able to wrap the content.
 */
 html {
-  height: 100%;
-  width: 100%;
+  height: 100% !important;
+  width: 100% !important;
 }
 
 * html {
-  overflow-y: scroll;
+  overflow-y: scroll !important;
 }
 
-body.main {
+body {
   background-color: $theme.pageContentBackgroundColor !important;
   background-image: none !important;
   color: $theme.textColor !important;
@@ -29,27 +29,27 @@ body.main {
     body and its first in-flow block-level child. Otherwise the vertical scroll bar would be visible because of the
     min-height:100% rule. See http://www.w3.org/TR/CSS21/box.html#collapsing-margins
   */
-  float: left;
-  height: auto;
-  margin: 0;
+  float: left !important;
+  height: auto !important;
+  margin: 0 !important;
   min-height: 100% !important;
   min-width: 100% !important;
-  overflow: visible;
-  padding: 0;
-  position: static;
-  width: auto;
+  overflow: visible !important;
+  padding: 0 !important;
+  position: static !important;
+  width: auto !important;
 }
 
-* html body.main {
-  height: 100%;
-  width: 100%;
+* html body {
+  height: 100% !important;
+  width: 100% !important;
 }
 
 /*
   Overwrite no matter what list-style-position to outside position to avoid the Firefox issues with editing lists
   with inside list style. 
 */
-.main ul, .main ol {
+ul, ol {
   list-style-position: outside !important;
 }
 
@@ -59,35 +59,35 @@ body.main {
   span when applying header style to the selection. In order to view headers as in view mode we have to block some of
   the CSS rules applied to the span and add then to the header. 
 */
-.main h1 span, .main h2 span, .main h3 span, .main h4 span {
-  border-bottom: 0 none;
-  margin: 0;
+h1 span, h2 span, h3 span, h4 span {
+  border-bottom: 0 none !important;
+  margin: 0 !important;
   /* IE behaves strangely when the span is displayed as block. */
-  display: inline;
+  display: inline !important;
   /*
     IE behaves strangely when the span doesn't have static position.
     See XWIKI-3339: New TOC overlaps with titles in WYSIWYG edition in IE6
   */
-  position: static;
+  position: static !important;
 }
 
-.main h1, .main h2, .main h3, .main h4 {
-  border-bottom: 1px solid #CCCCCC;
-  margin: 20px 0;
+h1, h2, h3, h4 {
+  border-bottom: 1px solid #CCCCCC !important;
+  margin: 20px 0 !important;
   /*
     Headings with overflow:hidden are painful to edit in IE because they are treated as fixed size boxes (resize
     handlers are present).
   */
-  overflow: visible;
+  overflow: visible !important;
 }
 
-.main h1 {
-  margin: 25px 0 20px 0;
+h1 {
+  margin: 25px 0 20px 0 !important;
   /* Letter spacing affects the behavior of the Delete and Backspace keys in IE */
-  letter-spacing: normal;
+  letter-spacing: normal !important;
 }
 
-.main .macro {
+.macro {
   background-color: transparent;
   border: 1px dashed #CCCCCC;
   font-size: 100%;
@@ -101,14 +101,14 @@ body.main {
   white-space: nowrap;
 }
 
-.main .macro-inline {
+.macro-inline {
   display: inline;
   margin: 0px;
   /* Prevent horizontal resizing in IE */
   width: auto !important;
 }
 
-.main .macro-block {
+.macro-block {
   display: block;
   margin-right: auto;
   /*
@@ -119,11 +119,11 @@ body.main {
   width: 99% !important;
 }
 
-.main .macro-selected {
+.macro-selected {
   background-color: #E8F2FE;
 }
 
-.main .macro .macro-placeholder {
+.macro .macro-placeholder {
   background-image: url(../images/macro.gif);
   background-position: left center;
   background-repeat: no-repeat;
@@ -133,7 +133,7 @@ body.main {
   padding-left: 20px;
 }
 
-.main .xEmbeddedObject {
+.xEmbeddedObject {
   background-image: url(../images/embed.gif);
   background-position: center center;
   background-repeat: no-repeat;

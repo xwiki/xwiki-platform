@@ -42,6 +42,9 @@ import org.xwiki.gwt.wysiwyg.client.plugin.link.LinkMetaDataExtractorTest;
 import org.xwiki.gwt.wysiwyg.client.plugin.list.ListBehaviorAdjusterTest;
 import org.xwiki.gwt.wysiwyg.client.plugin.macro.MacroCallTest;
 import org.xwiki.gwt.wysiwyg.client.plugin.separator.exec.InsertHRExecutableTest;
+import org.xwiki.gwt.wysiwyg.client.plugin.style.StyleDescriptorJSONParserTest;
+import org.xwiki.gwt.wysiwyg.client.plugin.style.exec.BlockStyleNameExecutableTest;
+import org.xwiki.gwt.wysiwyg.client.plugin.style.exec.InlineStyleNameExecutableTest;
 import org.xwiki.gwt.wysiwyg.client.plugin.submit.exec.EnableExecutableTest;
 import org.xwiki.gwt.wysiwyg.client.syntax.internal.DefaultSyntaxValidatorManagerTest;
 import org.xwiki.gwt.wysiwyg.client.syntax.internal.DefaultValidationRuleTest;
@@ -111,5 +114,8 @@ public class WysiwygTestSuite extends GWTTestSuite
         suite.addTestSuite(ColorPickerTest.class);
         suite.addTestSuite(EnableExecutableTest.class);
         suite.addTestSuite(LinePluginTest.class);
+        suite.addTestSuite(StyleDescriptorJSONParserTest.class);
+        suite.addTestSuite(BlockStyleNameExecutableTest.class);
+        suite.addTestSuite(InlineStyleNameExecutableTest.class);
     }
 }

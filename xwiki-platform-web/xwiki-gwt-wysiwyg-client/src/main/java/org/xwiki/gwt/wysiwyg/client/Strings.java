@@ -415,4 +415,12 @@ public interface Strings extends Constants
     String embeddedObject();
 
     String entityLocatedIn();
+
+    String stylePickerLabel();
+
+    String stylePickerTitle();
+
+    String styleInlineGroupLabel();
+
+    String styleBlockGroupLabel();
 }

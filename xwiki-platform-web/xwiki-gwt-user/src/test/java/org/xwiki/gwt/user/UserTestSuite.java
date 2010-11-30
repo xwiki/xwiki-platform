@@ -22,6 +22,7 @@ package org.xwiki.gwt.user;
 import junit.framework.Test;
 import junit.framework.TestSuite;
 
+import org.xwiki.gwt.user.client.StringUtilsTest;
 import org.xwiki.gwt.user.client.TimerTest;
 import org.xwiki.gwt.user.client.ui.rta.RichTextAreaTest;
 import org.xwiki.gwt.user.client.ui.rta.SelectionPreserverTest;
@@ -58,6 +59,7 @@ public class UserTestSuite extends GWTTestSuite
         suite.addTestSuite(InsertHTMLExecutableTest.class);
         suite.addTestSuite(StyleExecutableTest.class);
         suite.addTestSuite(SelectionPreserverTest.class);
+        suite.addTestSuite(StringUtilsTest.class);
 
         return suite;
     }

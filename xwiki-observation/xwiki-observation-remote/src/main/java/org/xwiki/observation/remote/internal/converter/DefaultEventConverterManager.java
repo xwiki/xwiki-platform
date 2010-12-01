@@ -46,13 +46,13 @@ public class DefaultEventConverterManager implements EventConverterManager, Init
     /**
      * The local events converters.
      */
-    @Requirement(role = LocalEventConverter.class)
+    @Requirement
     private List<LocalEventConverter> localEventConverters;
 
     /**
      * The remote events converters.
      */
-    @Requirement(role = RemoteEventConverter.class)
+    @Requirement
     private List<RemoteEventConverter> remoteEventConverters;
 
     /**

@@ -47,7 +47,7 @@ public class DefaultScriptContextManager extends AbstractLogEnabled implements S
     /**
      * The {@link ScriptContextInitializer} list used to initialize {@link ScriptContext}.
      */
-    @Requirement(role = ScriptContextInitializer.class)
+    @Requirement
     private List<ScriptContextInitializer> scriptContextInitializerList;
 
     /**

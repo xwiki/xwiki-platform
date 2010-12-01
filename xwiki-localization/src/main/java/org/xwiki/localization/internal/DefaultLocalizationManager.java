@@ -57,7 +57,7 @@ public class DefaultLocalizationManager extends AbstractLogEnabled implements Lo
     /** 
      * The list of {@link Bundle}s to use.
      */
-    @Requirement(role = Bundle.class)
+    @Requirement
     private List<Bundle> bundles;
 
     /**

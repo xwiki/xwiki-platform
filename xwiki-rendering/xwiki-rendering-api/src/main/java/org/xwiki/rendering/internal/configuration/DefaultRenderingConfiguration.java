@@ -43,7 +43,7 @@ public class DefaultRenderingConfiguration implements RenderingConfiguration, In
     /**
      * Holds the list of transformations to apply, sorted by priority in {@link #initialize()}.
      */
-    @Requirement(role = Transformation.class)
+    @Requirement
     private List<Transformation> transformations = new ArrayList<Transformation>();
 
     /**

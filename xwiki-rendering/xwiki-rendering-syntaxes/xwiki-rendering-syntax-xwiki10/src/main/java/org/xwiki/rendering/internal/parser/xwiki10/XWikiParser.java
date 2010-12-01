@@ -64,7 +64,7 @@ public class XWikiParser extends AbstractLogEnabled implements Parser, Initializ
     /**
      * The filters use to convert 1.0 content to 2.0.
      */
-    @Requirement(role = Filter.class)
+    @Requirement
     private List<Filter> filters;
 
     /**

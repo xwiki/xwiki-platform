@@ -45,7 +45,7 @@ public class DefaultQueryExecutorManager implements QueryExecutorManager
     /**
      * Map from language to its executor.
      */
-    @Requirement(role = QueryExecutor.class)
+    @Requirement
     private Map<String, QueryExecutor> executors;
 
     /**

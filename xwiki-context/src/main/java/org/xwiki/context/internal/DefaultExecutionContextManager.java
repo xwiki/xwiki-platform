@@ -33,7 +33,7 @@ import org.xwiki.context.ExecutionContextManager;
 @Component
 public class DefaultExecutionContextManager implements ExecutionContextManager
 {
-    @Requirement(role = ExecutionContextInitializer.class)
+    @Requirement
     private List<ExecutionContextInitializer> initializers = new ArrayList<ExecutionContextInitializer>();
     
     public ExecutionContext clone(ExecutionContext context) throws ExecutionContextException

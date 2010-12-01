@@ -94,7 +94,7 @@
 <className>XWiki.StyleSheetExtension</className>
 <guid>f10f7209-a83d-4793-9367-56e11a2600e1</guid>
 <property>
-<cache>default</cache>
+<cache>long</cache>
 </property>
 <property>
 <code>ul &gt; li &gt; ul &gt; li {

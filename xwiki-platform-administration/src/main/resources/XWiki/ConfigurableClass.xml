@@ -352,7 +352,7 @@ iKAtTBe0AQfYWgXdAG9qCi1fA5wQWwLgSdydYgcsNRLABafWgzPNB4DsfrNE6VJz6VvXltr/A+kB
 <className>XWiki.JavaScriptExtension</className>
 <guid>71fc6ffa-92cb-48f1-9d80-a845d1807b10</guid>
 <property>
-<cache>default</cache>
+<cache>long</cache>
 </property>
 <property>
 <code>document.observe('dom:loaded', function() {

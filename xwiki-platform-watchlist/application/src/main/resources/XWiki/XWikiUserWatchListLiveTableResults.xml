@@ -89,7 +89,14 @@
       {
         "id"        : "$!listtool.get($element, 0)",
         "type"      : "$!listtool.get($element, 1)",
-        "wikiName"  : "$!listtool.get($element, 2)",
+        #set($wikiName = $!listtool.get($element, 2))
+        #if($xwiki.isVirtualMode() &amp;&amp; $xwiki.wikimanager)
+          #set($wikiPrettyName = $xwiki.wikimanager.getWikiDocument($wikiName).getWikiPrettyName())
+          #if("$!wikiPrettyName.trim()" != '')
+            #set($wikiName = $wikiPrettyName)
+          #end
+        #end
+        "wikiName"  : "$wikiName",
         "wikiUrl"   : "$!listtool.get($element, 3)",
         "spaceName" : "$!listtool.get($element, 4)",
         "spaceUrl"  : "$!listtool.get($element, 5)",

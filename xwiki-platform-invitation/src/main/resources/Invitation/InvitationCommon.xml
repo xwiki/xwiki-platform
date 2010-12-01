@@ -94,7 +94,7 @@
 <className>XWiki.StyleSheetExtension</className>
 <guid>57002efd-3fd9-45a9-bedf-d9741dcc1ac9</guid>
 <property>
-<cache>forbid</cache>
+<cache>long</cache>
 </property>
 <property>
 <code>#template("colorThemeInit.vm")

@@ -100,46 +100,46 @@
 <className>XWiki.StyleSheetExtension</className>
 <guid>a8888c10-036f-4a37-9964-ac7691874ef6</guid>
 <property>
-<cache>default</cache>
+<cache>long</cache>
 </property>
 <property>
-<code>ol.tagCloud { 
-  text-align: justify; 
-  /* Overriding of toucan value */ 
+<code>ol.tagCloud {
+  text-align: justify;
+  /* Overriding of toucan value */
   margin: 0;
 }
 
-div#dashboardleft ol.tagCloud { 
+div#dashboardleft ol.tagCloud {
   /* We re-set this value here on purpose so that uses of the cloud outside of the dashboard are not affected */
   margin: 0.5em;
 }
 
-ol.tagCloud li { 
-  display:inline; padding: 0 3px; 
+ol.tagCloud li {
+  display:inline; padding: 0 3px;
 }
 
-ol.tagCloud .notPopular { 
-  font-size:1.0em; 
+ol.tagCloud .notPopular {
+  font-size:1.0em;
 }
 
-ol.tagCloud .notVeryPopular { 
-  font-size:1.1em; 
+ol.tagCloud .notVeryPopular {
+  font-size:1.1em;
 }
 
-ol.tagCloud .somewhatPopular { 
-  font-size:1.2em; 
+ol.tagCloud .somewhatPopular {
+  font-size:1.2em;
 }
 
-ol.tagCloud .popular { 
-  font-size:1.3em; 
+ol.tagCloud .popular {
+  font-size:1.3em;
 }
 
 ol.tagCloud .veryPopular {
-  font-size:1.4em; 
+  font-size:1.4em;
 }
 
 ol.tagCloud .ultraPopular {
-  font-size:1.5em; 
+  font-size:1.5em;
 }</code>
 </property>
 <property>

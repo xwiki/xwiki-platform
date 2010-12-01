@@ -460,7 +460,11 @@ $msg.get("watchlist.notification.email.multipleUpdates.intro")
 #if (!$firstEntry)
 
 #end
-+ $event.getWiki()
+#set($wikiName = "$!xwiki.wikimanager.getWikiDocument($event.getWiki()).getWikiPrettyName()")
+#if($wikiName == '')
+  #set($wikiName = $event.getWiki())
+#end
++ $wikiName
 |
 #end
 #if ($newSpace)

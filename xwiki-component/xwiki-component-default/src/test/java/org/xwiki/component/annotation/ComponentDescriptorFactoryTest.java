@@ -23,6 +23,7 @@ package org.xwiki.component.annotation;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 
 import org.junit.Assert;
 import org.junit.Test;
@@ -81,7 +82,7 @@ public class ComponentDescriptorFactoryTest
         /**
          * Inject all implementation of the FieldRole role. 
          */
-        @Requirement()
+        @Requirement
         private List<FieldRole> roles;
 
         /**
@@ -94,6 +95,12 @@ public class ComponentDescriptorFactoryTest
          */
         @Requirement(hints = {"special"})
         private List<FieldRole> specialRoles;
+        
+        /**
+         * Inject all implementation of the FieldRole role. 
+         */
+        @Requirement
+        private Map<String, FieldRole> mapRoles;
     }
 
     @Component
@@ -153,7 +160,7 @@ public class ComponentDescriptorFactoryTest
         Assert.assertEquals(ComponentInstantiationStrategy.SINGLETON, descriptor.getInstantiationStrategy());
 
         Collection<ComponentDependency> deps = descriptor.getComponentDependencies(); 
-        Assert.assertEquals(6, deps.size());
+        Assert.assertEquals(7, deps.size());
         Iterator<ComponentDependency> it = deps.iterator();
 
         ComponentDependency dep = it.next(); 
@@ -191,5 +198,11 @@ public class ComponentDescriptorFactoryTest
         Assert.assertEquals("default", dep.getRoleHint());
         Assert.assertEquals(List.class.getName(), dep.getMappingType().getName());
         Assert.assertEquals("specialRoles", dep.getName());
+        
+        dep = it.next();
+        Assert.assertEquals(FieldRole.class.getName(), dep.getRole().getName());
+        Assert.assertEquals("default", dep.getRoleHint());
+        Assert.assertEquals(Map.class.getName(), dep.getMappingType().getName());
+        Assert.assertEquals("mapRoles", dep.getName());
     }
 }

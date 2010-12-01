@@ -192,8 +192,8 @@ public class ComponentDescriptorFactory
         if (type instanceof ParameterizedType) {
             ParameterizedType pType = (ParameterizedType) type;
             Type[] types = pType.getActualTypeArguments();
-            if (types.length > 0 && types[0] instanceof Class) {
-                return (Class) types[0];
+            if (types.length > 0 && types[types.length - 1] instanceof Class) {
+                return (Class) types[types.length - 1];
             }
         }
 

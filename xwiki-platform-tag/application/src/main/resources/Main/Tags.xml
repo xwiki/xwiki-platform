@@ -95,7 +95,7 @@
 <className>XWiki.StyleSheetExtension</className>
 <guid>842b2aaf-cc25-4c1d-b0de-c23318aa9cbe</guid>
 <property>
-<cache>default</cache>
+<cache>long</cache>
 </property>
 <property>
 <code>h1.xapp {

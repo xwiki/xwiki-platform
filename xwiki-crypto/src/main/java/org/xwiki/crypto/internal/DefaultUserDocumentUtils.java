@@ -41,11 +41,11 @@ public class DefaultUserDocumentUtils implements UserDocumentUtils
     private DocumentAccessBridge bridge;
 
     /** Resolver which can make a DocumentReference out of a String. */
-    @Requirement(role = String.class)
+    @Requirement
     private DocumentReferenceResolver<String> resolver;
 
     /** Serializer to turn a document reference into a String which can be put in a certificate. */
-    @Requirement(role = String.class)
+    @Requirement
     private EntityReferenceSerializer<String> serializer;
 
     /**

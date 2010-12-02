@@ -1546,12 +1546,8 @@ fieldset.xwikimessage .xwikimessage {
 
 .accordionTabContentBox {
   background: $theme.backgroundSecondaryColor;
-  overflow: hidden;
+  overflow: auto;
   padding: 5px;
-}
-
-#allviewpanels .accordionTabContentBox, #editPanels .accordionTabContentBox {
-  overflow: auto !important;
 }
 
 /* -----------------Content Panels-----------------------*/

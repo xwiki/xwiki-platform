@@ -32,11 +32,9 @@
 #set($params = $util.hashMap)
 #set($params.header = ['title', 'meta'])
 #set($params.panels = ['showLeftPanels', 'leftPanels', 'showRightPanels', 'rightPanels'])
+#set($params.skin = ['skin', 'colorTheme', 'stylesheet', 'stylesheets'])
 #if("$!editor" == 'globaladmin')
   #set($params.footer = ['webcopyright', 'version'])
-  #set($params.skin = ['skin', 'colorTheme', 'stylesheet', 'stylesheets'])
-#else
-  #set($params.skin = ['skin', 'stylesheet', 'stylesheets'])
 #end
 {{/velocity}}
 

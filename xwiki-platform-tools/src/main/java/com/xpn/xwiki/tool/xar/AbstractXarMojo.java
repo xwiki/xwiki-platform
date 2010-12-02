@@ -46,6 +46,9 @@ abstract class AbstractXarMojo extends AbstractMojo
      */
     protected static final String FILE_TAG = "file";
 
+    /** Default encoding to use. */
+    private static final String DEFAULT_ENCODING = "UTF-8";
+
     /**
      * Default excludes.
      * 
@@ -84,6 +87,13 @@ abstract class AbstractXarMojo extends AbstractMojo
     protected MavenProject project;
 
     /**
+     * The encoding to use when generating the package summary file and when storing file names.
+     * 
+     * @parameter expression="${project.build.sourceEncoding}"
+     */
+    protected String encoding = DEFAULT_ENCODING;
+
+    /**
      * @return the includes
      */
     protected String[] getIncludes()
@@ -120,6 +130,7 @@ abstract class AbstractXarMojo extends AbstractMojo
     {
         try {
             ZipUnArchiver unArchiver = new ZipUnArchiver();
+            unArchiver.setEncoding(this.encoding);
             unArchiver.enableLogging(new ConsoleLogger(Logger.LEVEL_ERROR, logName));
             unArchiver.setSourceFile(file);
             unArchiver.setDestDirectory(location);

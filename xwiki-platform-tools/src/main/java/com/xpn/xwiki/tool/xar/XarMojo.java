@@ -97,6 +97,7 @@ public class XarMojo extends AbstractXarMojo
         File sourceDir = new File(this.project.getBuild().getOutputDirectory());
 
         ZipArchiver archiver = new ZipArchiver();
+        archiver.setEncoding(this.encoding);
         archiver.setDestFile(xarFile);
         archiver.setIncludeEmptyDirs(false);
         archiver.setCompress(true);
@@ -139,7 +140,7 @@ public class XarMojo extends AbstractXarMojo
         getLog().info("Generating package.xml descriptor at [" + packageFile.getPath() + "]");
 
         OutputFormat outputFormat = new OutputFormat("", true);
-        outputFormat.setEncoding("ISO-8859-1");
+        outputFormat.setEncoding(this.encoding);
         FileWriter fw = new FileWriter(packageFile);
         XMLWriter writer = new XMLWriter(fw, outputFormat);
         writer.write(toXML(files));

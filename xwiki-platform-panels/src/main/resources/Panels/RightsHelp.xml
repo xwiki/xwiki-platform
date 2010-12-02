@@ -127,12 +127,14 @@ $msg.get("xe.panels.rights.allowdenyexplanation")
 &lt;/div&gt;
 #panelfooter()
 &lt;/div&gt;
-$xwiki.jsfx.use("js/scriptaculous/scriptaculous.js")
-$xwiki.jsfx.use("js/xwiki/accordion/accordion.js")
+$xwiki.jsfx.use('js/scriptaculous/scriptaculous.js')
+$xwiki.jsfx.use('js/xwiki/accordion/accordion.js')
 &lt;script type="text/javascript"&gt;
-var obj = {div:'xwikirightshelp',no:0,height:512};
-var acc = createAccordion(obj);
-XWiki.togglePanelVisibility((document.getElementById('xwikirightshelppanel')).getElementsByTagName('div').item(0));&lt;/script&gt;</content>
+document.observe('xwiki:dom:loaded', function() {
+  var obj = {div:'xwikirightshelp', no:0, height:512};
+  var acc = createAccordion(obj);
+  XWiki.togglePanelVisibility($('xwikirightshelppanel').down('div'));
+});&lt;/script&gt;</content>
 </property>
 <property>
 <description>Help on Rights Editor usage.</description>

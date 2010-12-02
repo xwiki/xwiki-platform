@@ -358,9 +358,9 @@ XVq9K2VEJiSMaOtaeISGyPbWWy9oz4jXRgORpHPiOcFunz+jeccQEWSHsYHmAsS/vXPiV5eQDfpi
       #end
       window.showLeftColumn = $showLeftPanels;
       window.showRightColumn = $showRightPanels;
-      var obj = {div:'panellistaccordion', no:0, height:512};  
+      var obj = {div:'panellistaccordion', no:0, height:512};
       document.observe('xwiki:dom:loaded', function () {
-        createAccordion.bind(this, obj);
+        createAccordion(obj);
       });
       //]]&gt;
       &lt;/script&gt;

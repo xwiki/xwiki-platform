@@ -22,41 +22,6 @@
 <minorEdit>false</minorEdit>
 <syntaxId>xwiki/1.0</syntaxId>
 <hidden>false</hidden>
-<object>
-<class>
-<name>XWiki.TagClass</name>
-<customClass></customClass>
-<customMapping></customMapping>
-<defaultViewSheet></defaultViewSheet>
-<defaultEditSheet></defaultEditSheet>
-<defaultWeb></defaultWeb>
-<nameField></nameField>
-<validationScript></validationScript>
-<tags>
-<cache>0</cache>
-<disabled>0</disabled>
-<displayType>input</displayType>
-<multiSelect>1</multiSelect>
-<name>tags</name>
-<number>1</number>
-<prettyName>Tags</prettyName>
-<relationalStorage>1</relationalStorage>
-<separator>|</separator>
-<separators>|,</separators>
-<size>30</size>
-<unmodifiable>0</unmodifiable>
-<values></values>
-<classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
-</tags>
-</class>
-<name>XAppCode.ExportAppCode</name>
-<number>0</number>
-<className>XWiki.TagClass</className>
-<guid>db138765-efc6-488b-9ae7-50a123b9aa69</guid>
-<property>
-<tags/>
-</property>
-</object>
 <content>#if($action &amp;&amp; $action == "export")
   #if($confirm &amp;&amp; $confirm == 1)
     #if($recurse &amp;&amp; $recurse == 1)

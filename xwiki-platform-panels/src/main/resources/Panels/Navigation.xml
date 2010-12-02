@@ -143,8 +143,10 @@
 $xwiki.jsfx.use('js/scriptaculous/scriptaculous.js')
 $xwiki.jsfx.use('js/xwiki/accordion/accordion.js')
 &lt;script type="text/javascript"&gt;
-var obj = {div:'xwikinav',no:$spacecount,height:250};
-var acc = createAccordion(obj);
+document.observe('xwiki:dom:loaded', function() {
+  var obj = {div:'xwikinav', no:$spacecount, height:250};
+  var acc = createAccordion(obj);
+});
 &lt;/script&gt;
 #panelfooter()</content>
 </property>

@@ -26,6 +26,7 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 
+import org.apache.commons.lang.math.NumberUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.suigeneris.jrcs.diff.delta.Chunk;
@@ -251,6 +252,9 @@ public class XWiki extends Api
      */
     public DeletedDocument getDeletedDocument(String fullname, String lang, String index) throws XWikiException
     {
+        if (!NumberUtils.isDigits(index)) {
+            return null;
+        }
         XWikiDeletedDocument dd = this.xwiki.getDeletedDocument(fullname, lang, Integer.parseInt(index), this.context);
         if (dd == null) {
             return null;

@@ -1,10 +1,11 @@
+#template('colorThemeInit.vm')
 ## The default stylesheet configuration option allows to override the default style.css CSS
 #set($defaultstyle = $xwiki.getSpacePreference('stylesheet'))
 #if($defaultstyle == '')
   #set ( $defaultstyle = "style.css" )
 #end
-#set( $defaultStyleURL = $xwiki.getSkinFile($defaultstyle, true) )
-<link href="$defaultStyleURL" rel="stylesheet" type="text/css" media="all" />
+#set ($defaultStyleURL = $xwiki.getSkinFile($defaultstyle, true))
+<link href="${defaultStyleURL}?colorTheme=$!{themeDocFullName}" rel="stylesheet" type="text/css" media="all" />
 <link href="$xwiki.getSkinFile("print.css", true)" rel="stylesheet" type="text/css" media="print" />
 #set ($a11y = "$!{request.getCookie('a11y').getValue()}")
 #if ($a11y == '')

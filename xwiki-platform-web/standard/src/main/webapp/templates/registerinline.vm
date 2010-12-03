@@ -26,7 +26,8 @@
         ## CSRF prevention
         <input type="hidden" name="form_token" value="$!{services.csrf.getToken()}" />
         <input type="hidden" name="template" value="XWiki.XWikiUserTemplate" />
-        <input type="hidden" name="register" value="1"/>
+        <input type="hidden" name="register" value="1" />
+        <input type="hidden" name="xredirect" value="$!request.xredirect" />
         #set($class = $xwiki.getClass('XWiki.XWikiUsers'))
         #set($obj = $class.newObject())
         #set($serverobj = $class.newObject())

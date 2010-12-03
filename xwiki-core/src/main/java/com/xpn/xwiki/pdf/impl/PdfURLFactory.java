@@ -100,12 +100,11 @@ public class PdfURLFactory extends XWikiServletURLFactory
     {
         @SuppressWarnings("unchecked")
         Map<String, File> usedFiles = (Map<String, File>) context.get("pdfexport-file-mapping");
-        String key = getAttackmentKey(space, name, filename, revision);
+        String key = getAttachmentKey(space, name, filename, revision);
         if (!usedFiles.containsKey(key)) {
             File tempdir = (File) context.get("pdfexportdir");
             File file = File.createTempFile("pdf", "." + FilenameUtils.getExtension(filename), tempdir);
-            XWikiDocument doc = null;
-            doc = context.getWiki().getDocument(
+            XWikiDocument doc = context.getWiki().getDocument(
                 new DocumentReference(StringUtils.defaultString(wiki, context.getDatabase()), space, name), context);
             XWikiAttachment attachment = doc.getAttachment(filename);
             if (StringUtils.isNotEmpty(revision)) {
@@ -134,14 +133,13 @@ public class PdfURLFactory extends XWikiServletURLFactory
     /**
      * Computes a safe identifier for an attachment, guaranteed to be collision-free.
      * 
-     * @param wiki the name of the owner document's wiki
      * @param space the name of the owner document's space
      * @param name the name of the owner document
      * @param filename the name of the attachment
      * @param revision an optional attachment version
      * @return an identifier for this attachment
      */
-    private String getAttackmentKey(String space, String name, String filename, String revision)
+    private String getAttachmentKey(String space, String name, String filename, String revision)
     {
         try {
             return URLEncoder.encode(space, "UTF-8") + SEPARATOR

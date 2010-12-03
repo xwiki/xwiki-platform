@@ -371,7 +371,7 @@ public class PdfExportImpl implements PdfExport
             docFactory.setNamespaceAware(true);
             docFactory.setValidating(false);
             DocumentBuilder docBuilder = docFactory.newDocumentBuilder();
-            docBuilder.setEntityResolver((org.xml.sax.EntityResolver) Utils.getComponent(EntityResolver.class));
+            docBuilder.setEntityResolver(Utils.getComponent(EntityResolver.class));
             Document xslt = docBuilder.parse(new InputSource(xsltinputstream));
             Document xmldoc = docBuilder.parse(new InputSource(xmlinputstream));
             Transformer transformer = TransformerFactory.newInstance().newTransformer(new DOMSource(xslt));

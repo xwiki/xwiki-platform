@@ -21,7 +21,6 @@
 
 package com.xpn.xwiki.objects;
 
-import com.novell.ldap.extensions.SetReplicationFilterRequest;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.objects.classes.BaseClass;

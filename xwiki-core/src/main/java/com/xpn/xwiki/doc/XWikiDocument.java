@@ -4388,7 +4388,7 @@ public class XWikiDocument implements DocumentModelBridge
                 XWikiLink wikiLink = new XWikiLink();
 
                 wikiLink.setDocId(getId());
-                wikiLink.setFullName(getFullName());
+                wikiLink.setFullName(this.localEntityReferenceSerializer.serialize(getDocumentReference()));
                 wikiLink.setLink(linkedPage);
 
                 links.add(wikiLink);

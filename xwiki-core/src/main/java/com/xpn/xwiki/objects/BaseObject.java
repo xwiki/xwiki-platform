@@ -88,6 +88,8 @@ public class BaseObject extends BaseCollection implements ObjectInterface, Seria
         DocumentReference reference = getDocumentReference();
 
         if (reference != null) {
+            // Make sure to not modify a reference that could comes from somewhere else
+            reference = new DocumentReference(reference);
             EntityReference relativeReference = this.relativeEntityReferenceResolver.resolve(name, EntityType.DOCUMENT);
             reference.getLastSpaceReference().setName(relativeReference.extractReference(EntityType.SPACE).getName());
             reference.setName(relativeReference.extractReference(EntityType.DOCUMENT).getName());

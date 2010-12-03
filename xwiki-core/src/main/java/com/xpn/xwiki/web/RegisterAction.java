@@ -64,15 +64,18 @@ public class RegisterAction extends XWikiAction
             }
             VelocityContext vcontext = (VelocityContext) context.get("vcontext");
             vcontext.put("reg", new Integer(result));
+
+            // Redirect if a redirection parameter is passed.
+            String redirect = Utils.getRedirect(request, null);
+            if (redirect == null) {
+                return true;
+            } else {
+                sendRedirect(response, redirect);
+                return false;
+            }
         }
 
-        String redirect = Utils.getRedirect(request, null);
-        if (redirect == null) {
-            return true;
-        } else {
-            sendRedirect(response, redirect);
-            return false;
-        }
+        return true;
     }
 
     /**

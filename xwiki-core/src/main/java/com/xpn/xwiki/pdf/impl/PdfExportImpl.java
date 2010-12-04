@@ -113,7 +113,7 @@ public class PdfExportImpl implements PdfExport
     static {
         fopFactory = FopFactory.newInstance();
         try {
-            fopFactory.setFontBaseURL(((Container) Utils.getComponent(Container.class)).getApplicationContext()
+            fopFactory.setFontBaseURL((Utils.getComponent(Container.class)).getApplicationContext()
                 .getResource("/WEB-INF/fonts/").getPath());
         } catch (Throwable ex) {
             log.warn("Starting with 1.5, XWiki uses the WEB-INF/fonts/ directory as the font directory, "

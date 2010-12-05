@@ -1440,7 +1440,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface, EventListener
                 // The first call is for the old notification mechanism. It is kept here because it
                 // is in a deprecation stage. It will be removed later.
                 //
-                // The second is the new notification mechanism, implemented as a Plexus Component.
+                // The second is the new notification mechanism (xwiki-observation module).
                 // For the moment we're sending the XWiki context as the data, but this will be
                 // changed in the future, when the whole platform will be written using components
                 // and there won't be a need for the context. The old version is available using

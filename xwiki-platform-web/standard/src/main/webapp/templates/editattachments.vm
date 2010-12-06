@@ -1,6 +1,2 @@
-###
-### Attachments page in the "view" mode
-###
-###
-<h1><span>$xwiki.parseMessage("viewattachmentstitle")</span></h1>
-#template("attachmentsinline.vm")
+## Deprecated, attachments should be used in view mode only.
+#template('attachments.vm')

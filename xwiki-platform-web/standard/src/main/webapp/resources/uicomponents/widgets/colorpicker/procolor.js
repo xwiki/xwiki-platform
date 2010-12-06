@@ -338,7 +338,7 @@ var ProColor = Class.create({
 			showInField: false,
 			parent: null,
 			closeButton: (options.mode == 'popup'),
-			imgPath: "",
+			imgPath: "#set($imgPath = $xwiki.getSkinFile('uicomponents/widgets/colorpicker/img/procolor_win_bg.png'))#set($imgPath = $imgPath.substring(0, $imgPath.lastIndexOf('bg.png')))${imgPath}",
 			color: (!this.input ? '#FFFFFF'
 				: this.input.tagName == 'INPUT' ? this.input.value
 				: this.input.innerHTML),

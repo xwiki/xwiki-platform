@@ -472,7 +472,8 @@ public interface ActivityStream
     List<ActivityEvent> getRelatedEvents(ActivityEvent event, XWikiContext context) throws ActivityStreamException;
 
     /**
-     * Get unique pages with events sorted by date.
+     * Get unique pages with events sorted by date. A document is returned at most once, regardless of the number of
+     * events.
      * 
      * @param optionalWhereClause optional HQL where query statement
      * @param maxItems maximum number of documents to retrieve
@@ -485,7 +486,8 @@ public interface ActivityStream
         throws ActivityStreamException;
 
     /**
-     * Get unique pages with events sorted by date.
+     * Get unique pages with events sorted by date. A document is returned at most once, regardless of the number of
+     * events.
      * 
      * @param optionalWhereClause optional HQL where query statement
      * @param parametersValues values for the query parameters
@@ -496,5 +498,34 @@ public interface ActivityStream
      * @throws ActivityStreamException if the search fails
      */
     List<Object[]> searchUniquePages(String optionalWhereClause, List<Object> parametersValues, int maxItems,
+        int startAt, XWikiContext context) throws ActivityStreamException;
+
+    /**
+     * Get unique pages with events sorted by date, grouped by days. A document is returned at most once per day, but
+     * might appear more than once if it has associated events in different days.
+     * 
+     * @param optionalWhereClause optional HQL where query statement
+     * @param maxItems maximum number of documents to retrieve
+     * @param startAt query offset
+     * @param context the XWiki context
+     * @return pairs of [document name, event date], in descending order of the last event date
+     * @throws ActivityStreamException if the search fails
+     */
+    List<Object[]> searchDailyPages(String optionalWhereClause, int maxItems, int startAt, XWikiContext context)
+        throws ActivityStreamException;
+
+    /**
+     * Get unique pages with events sorted by date, grouped by days. A document is returned at most once per day, but
+     * might appear more than once if it has associated events in different days.
+     * 
+     * @param optionalWhereClause optional HQL where query statement
+     * @param parametersValues values for the query parameters
+     * @param maxItems maximum number of documents to retrieve
+     * @param startAt query offset
+     * @param context the XWiki context
+     * @return pairs of [document name, event date], in descending order of the last event date
+     * @throws ActivityStreamException if the search fails
+     */
+    List<Object[]> searchDailyPages(String optionalWhereClause, List<Object> parametersValues, int maxItems,
         int startAt, XWikiContext context) throws ActivityStreamException;
 }

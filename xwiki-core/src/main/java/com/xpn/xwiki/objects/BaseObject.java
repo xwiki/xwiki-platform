@@ -21,11 +21,13 @@
 
 package com.xpn.xwiki.objects;
 
-import com.xpn.xwiki.XWikiContext;
-import com.xpn.xwiki.XWikiException;
-import com.xpn.xwiki.objects.classes.BaseClass;
-import com.xpn.xwiki.objects.classes.PropertyClass;
-import com.xpn.xwiki.web.Utils;
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Iterator;
+import java.util.List;
+import java.util.UUID;
+
 import org.apache.commons.lang.StringUtils;
 import org.dom4j.Element;
 import org.dom4j.dom.DOMElement;
@@ -35,12 +37,11 @@ import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.EntityReferenceResolver;
 
-import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Iterator;
-import java.util.List;
-import java.util.UUID;
+import com.xpn.xwiki.XWikiContext;
+import com.xpn.xwiki.XWikiException;
+import com.xpn.xwiki.objects.classes.BaseClass;
+import com.xpn.xwiki.objects.classes.PropertyClass;
+import com.xpn.xwiki.web.Utils;
 
 public class BaseObject extends BaseCollection implements ObjectInterface, Serializable, Cloneable
 {
@@ -64,7 +65,7 @@ public class BaseObject extends BaseCollection implements ObjectInterface, Seria
      * Note: This method is overridden to add the deprecation warning so that code using it can see it's deprecated.
      *
      * {@inheritDoc}
-     *
+     * 
      * @deprecated since 2.2M2 use {@link #getDocumentReference()}
      */
     @Deprecated
@@ -76,9 +77,9 @@ public class BaseObject extends BaseCollection implements ObjectInterface, Seria
 
     /**
      * Note: BaseElement.setName() does not support setting reference anymore since 2.4M2.
-     *
+     * 
      * {@inheritDoc}
-     *
+     * 
      * @deprecated since 2.2M2 use {@link #setDocumentReference(org.xwiki.model.reference.DocumentReference)}
      */
     @Deprecated
@@ -307,10 +308,8 @@ public class BaseObject extends BaseCollection implements ObjectInterface, Seria
 
         // If no GUID exists in the XML, then use the one randomly generated at initialization
         Element guidElement = oel.element("guid");
-        if (guidElement != null) {
-            if (guidElement.getText() != null) {
-                this.guid = guidElement.getText();
-            }
+        if (guidElement != null && guidElement.getText() != null) {
+            this.guid = guidElement.getText();
         }
 
         List list = oel.elements("property");

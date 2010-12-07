@@ -244,7 +244,7 @@ public class Package
             }
         }
 
-        doc = (XWikiDocument) doc.clone();
+        doc = doc.clone();
 
         try {
             filter(doc, context);

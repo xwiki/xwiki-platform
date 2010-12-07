@@ -167,6 +167,11 @@ public class Package
     {
         this.backupPack = backupPack;
     }
+    
+    public boolean hasBackupPackImportRights(XWikiContext context)
+    {
+        return isFarmAdmin(context);
+    }
 
     /**
      * If true, the package will preserve the current document version during import, regardless of whether or not the

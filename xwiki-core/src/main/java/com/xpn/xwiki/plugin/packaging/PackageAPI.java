@@ -132,13 +132,7 @@ public class PackageAPI extends Api
      */
     public boolean hasBackupPackImportRights()
     {
-        try {
-            return context.getWiki().getRightService()
-                .hasAccessLevel("admin", context.getUser(), "xwiki:XWiki.XWikiPreferences", context);
-        } catch (XWikiException e) {
-            e.printStackTrace();
-            return false;
-        }
+        return plugin.hasBackupPackImportRights(context);
     }
 
     public boolean isVersionPreserved()

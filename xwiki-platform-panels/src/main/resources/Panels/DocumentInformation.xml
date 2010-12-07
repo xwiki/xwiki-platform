@@ -415,11 +415,7 @@ $xwiki.jsx.use($paneldoc.fullName)##
 #end
 ##--------------------------------------------------------------------------
 #if($pages.size() != 0)
-  #if($pages.size() == 1)
-    &lt;dt&gt;$msg.get("panels.documentInformation.includesOne", [$pages.size()])&lt;/dt&gt;
-  #else
-    &lt;dt&gt;$msg.get("panels.documentInformation.includesMore", [$pages.size()])&lt;/dt&gt;
-  #end
+  &lt;dt&gt;$msg.get('panels.documentInformation.includesCount', [$pages.size()])&lt;/dt&gt;
   &lt;dd&gt;
   &lt;ul&gt;
   #foreach ($page in $pages)

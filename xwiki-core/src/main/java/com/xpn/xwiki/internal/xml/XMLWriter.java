@@ -29,6 +29,7 @@ import java.util.Stack;
 
 import org.apache.commons.codec.binary.Base64OutputStream;
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.io.output.CloseShieldOutputStream;
 import org.dom4j.Document;
 import org.dom4j.Element;
 import org.dom4j.io.OutputFormat;
@@ -181,7 +182,7 @@ public class XMLWriter extends org.dom4j.io.XMLWriter
     {
         writeOpen(element);
         flush();
-        Base64OutputStream base64 = new Base64OutputStream(new UnclosableOutputStream(this.out));
+        Base64OutputStream base64 = new Base64OutputStream(new CloseShieldOutputStream(this.out));
         IOUtils.copy(is, base64);
         base64.close();
         writeClose(element);

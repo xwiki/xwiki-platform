@@ -40,6 +40,7 @@ import java.util.zip.ZipOutputStream;
 
 import net.sf.json.JSONObject;
 
+import org.apache.commons.io.input.CloseShieldInputStream;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.dom4j.Document;
@@ -58,7 +59,6 @@ import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiAttachment;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.internal.event.XARImportedEvent;
-import com.xpn.xwiki.internal.xml.UnclosableInputStream;
 import com.xpn.xwiki.internal.xml.XMLWriter;
 import com.xpn.xwiki.objects.classes.BaseClass;
 import com.xpn.xwiki.web.Utils;
@@ -409,11 +409,11 @@ public class Package
                     continue;
                 } else if (entry.getName().compareTo(DefaultPackageFileName) == 0) {
                     // The entry is the manifest (package.xml). Read this differently.
-                    description = fromXml(new UnclosableInputStream(zis));
+                    description = fromXml(new CloseShieldInputStream(zis));
                 } else {
                     XWikiDocument doc = null;
                     try {
-                        doc = readFromXML(new UnclosableInputStream(zis));
+                        doc = readFromXML(new CloseShieldInputStream(zis));
                     } catch (Throwable ex) {
                         LOG.warn("Failed to parse document [" + entry.getName()
                             + "] from XML during import, thus it will not be installed. " + "The error was: "

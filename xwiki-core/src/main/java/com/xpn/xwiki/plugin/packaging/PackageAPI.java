@@ -121,6 +121,25 @@ public class PackageAPI extends Api
     {
         this.plugin.setBackupPack(backupPack);
     }
+    
+    /**
+     * Indicate if the current user has the right to import a package as a backup pack. In this implementation, to be 
+     * able to import has backup pack the user must have the admin right on the XWiki.XWikiPreferences document from
+     * the main wiki (xwiki:XWiki.XWikiPreferences). The goal is to prevent local wiki administrators from importing
+     * documents saved with a global administrator as the author (rights escalation). 
+     * 
+     * @return true if the current user has the rights to import a package as a backup pack, false otherwise
+     */
+    public boolean hasBackupPackImportRights()
+    {
+        try {
+            return context.getWiki().getRightService()
+                .hasAccessLevel("admin", context.getUser(), "xwiki:XWiki.XWikiPreferences", context);
+        } catch (XWikiException e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
 
     public boolean isVersionPreserved()
     {

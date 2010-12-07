@@ -252,7 +252,7 @@ var XWiki = (function(XWiki){
                                        .insert( new Element("input", { 'type':'radio','name':'historyStrategy', 'value': 'reset' }) )
                                        .insert(translations["resetHistory"] )  );
             
-            if (XWiki.hasProgramming) {
+            if (XWiki.hasBackupPackImportRights) {
 	            var importAsBackupCheckbox = new Element("input", { 'type':'checkbox', 'name':'importAsBackup', 'value':'true' });            
 	            if (infos.backup) {
 	              importAsBackupCheckbox.checked = true;

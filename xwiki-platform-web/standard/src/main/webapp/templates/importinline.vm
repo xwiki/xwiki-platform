@@ -194,7 +194,7 @@
                      $msg.get('core.importer.resetHistory')
                   </div>
                 </div>
-                #if($xwiki.hasProgrammingRights())
+                #if($packager.hasBackupPackImportRights())
                 <div class="importOption">
                   <input type="checkbox" name="importAsBackup" value="true" #if($packager.isBackupPack())checked="checked"#end/>
                   $msg.get('core.importer.importAsBackup')

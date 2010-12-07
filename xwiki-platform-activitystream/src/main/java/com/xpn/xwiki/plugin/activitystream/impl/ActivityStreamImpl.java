@@ -1007,7 +1007,7 @@ public class ActivityStreamImpl implements ActivityStream, EventListener
         }
         searchHql.append(" group by act.page order by 2 desc");
 
-        String oriDatabase = context.getDatabase();
+        String originalDatabase = context.getDatabase();
         try {
             context.setDatabase(context.getMainXWiki());
             results =
@@ -1015,7 +1015,54 @@ public class ActivityStreamImpl implements ActivityStream, EventListener
         } catch (XWikiException e) {
             throw new ActivityStreamException(e);
         } finally {
-            context.setDatabase(oriDatabase);
+            context.setDatabase(originalDatabase);
+        }
+
+        return results;
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see ActivityStream#searchDailyPages(String, int, int, XWikiContext))
+     */
+    public List<Object[]> searchDailyPages(String optionalWhereClause, int maxItems, int startAt,
+        XWikiContext context) throws ActivityStreamException
+    {
+        return searchDailyPages(optionalWhereClause, null, maxItems, startAt, context);
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see ActivityStream#searchDailyPages(String, List, int, int, XWikiContext))
+     */
+    public List<Object[]> searchDailyPages(String optionalWhereClause, List<Object> parametersValues,
+        int maxItems, int startAt, XWikiContext context) throws ActivityStreamException
+    {
+        StringBuffer searchHql = new StringBuffer();
+        List<Object[]> results = new ArrayList<Object[]>();
+
+        searchHql.append("select year(act.date), month(act.date), day(act.date), act.page, max(act.date)"
+           + "from ActivityEventImpl as act");
+        if (StringUtils.isNotBlank(optionalWhereClause)) {
+            searchHql.append(" where ");
+            searchHql.append(optionalWhereClause);
+        }
+        searchHql.append(" group by year(act.date), month(act.date), day(act.date), act.page order by 5 desc");
+
+        String originalDatabase = context.getDatabase();
+        try {
+            context.setDatabase(context.getMainXWiki());
+            List<Object[]> rawResults =
+                context.getWiki().getStore().search(searchHql.toString(), maxItems, startAt, parametersValues, context);
+            for (Object[] rawResult : rawResults) {
+                results.add(new Object[] { rawResult[3], rawResult[4] });
+            }
+        } catch (XWikiException e) {
+            throw new ActivityStreamException(e);
+        } finally {
+            context.setDatabase(originalDatabase);
         }
 
         return results;

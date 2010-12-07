@@ -731,7 +731,8 @@ public class ActivityStreamPluginApi extends PluginApi<ActivityStreamPlugin>
     }
 
     /**
-     * Get unique page events sorted by date
+     * Get unique pages with events sorted by date. A document is returned at most once, regardless of the number of
+     * events.
      * 
      * @param hql HQL where query statement
      * @param nb number of events to retrieve
@@ -750,7 +751,8 @@ public class ActivityStreamPluginApi extends PluginApi<ActivityStreamPlugin>
     }
 
     /**
-     * Get unique page events sorted by date
+     * Get unique pages with events sorted by date. A document is returned at most once, regardless of the number of
+     * events.
      * 
      * @param hql HQL where query statement
      * @param nb number of events to retrieve
@@ -763,6 +765,48 @@ public class ActivityStreamPluginApi extends PluginApi<ActivityStreamPlugin>
     {
         try {
             return getActivityStream().searchUniquePages(optionalWhereClause, parametersValues, maxItems, startAt,
+                this.context);
+        } catch (ActivityStreamException ex) {
+            LOG.error("Failed to query events: " + ex.getMessage(), ex);
+            return Collections.emptyList();
+        }
+    }
+
+    /**
+     * Get unique pages with events sorted by date, grouped by days. A document is returned at most once per day, but
+     * might appear more than once if it has associated events in different days.
+     * 
+     * @param hql HQL where query statement
+     * @param nb number of events to retrieve
+     * @param start query offset
+     * @return matching pages with events
+     * @throws ActivityStreamException if the search query fails
+     */
+    public List<Object[]> searchDailyPages(String optionalWhereClause, int maxItems, int startAt)
+    {
+        try {
+            return getActivityStream().searchDailyPages(optionalWhereClause, maxItems, startAt, this.context);
+        } catch (ActivityStreamException ex) {
+            LOG.error("Failed to query events: " + ex.getMessage(), ex);
+            return Collections.emptyList();
+        }
+    }
+
+    /**
+     * Get unique pages with events sorted by date, grouped by days. A document is returned at most once per day, but
+     * might appear more than once if it has associated events in different days.
+     * 
+     * @param hql HQL where query statement
+     * @param nb number of events to retrieve
+     * @param start query offset
+     * @return matching pages with events
+     * @throws ActivityStreamException if the search query fails
+     */
+    public List<Object[]> searchDailyPages(String optionalWhereClause, List<Object> parametersValues, int maxItems,
+        int startAt)
+    {
+        try {
+            return getActivityStream().searchDailyPages(optionalWhereClause, parametersValues, maxItems, startAt,
                 this.context);
         } catch (ActivityStreamException ex) {
             LOG.error("Failed to query events: " + ex.getMessage(), ex);

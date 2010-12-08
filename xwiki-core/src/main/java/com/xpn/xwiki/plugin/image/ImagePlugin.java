@@ -277,6 +277,12 @@ public class ImagePlugin extends XWikiDefaultPlugin
             thumbnail = shrinkImage(image, width, height, keepAspectRatio, quality, context);
             this.imageCache.set(key, thumbnail.getContent(context));
         }
+        if (!StringUtils.endsWithIgnoreCase(thumbnail.getFilename(), "jpeg")
+            && !StringUtils.endsWithIgnoreCase(thumbnail.getFilename(), "jpg")
+            && !StringUtils.endsWithIgnoreCase(thumbnail.getFilename(), "png")) {
+            // The scaled image is PNG, so correct the extension in order to output the correct MIME type.
+            thumbnail.setFilename(StringUtils.substringBeforeLast(thumbnail.getFilename(), ".") + ".png");
+        }
         return thumbnail;
     }
 

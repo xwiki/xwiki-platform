@@ -32,7 +32,7 @@ public class EscapeTool extends org.apache.velocity.tools.generic.EscapeTool
     /**
      * Escapes the XML special characters in a <code>String</code> using numerical XML entities.
      * 
-     * @param value the text to escape, may be {@code null}
+     * @param source the text to escape, may be {@code null}
      * @return a new escaped {@code String}, {@code null} if {@code null} input
      */
     @Override

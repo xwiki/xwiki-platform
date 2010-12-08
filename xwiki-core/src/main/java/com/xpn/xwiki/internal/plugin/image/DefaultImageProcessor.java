@@ -73,7 +73,7 @@ public class DefaultImageProcessor implements ImageProcessor
             ImageWriter writer = null;
             Iterator<ImageWriter> iter = ImageIO.getImageWritersByMIMEType(mimeType);
             if (iter.hasNext()) {
-                writer = (ImageWriter) iter.next();
+                writer = iter.next();
             }
             JPEGImageWriteParam iwp = new JPEGImageWriteParam(null);
             iwp.setCompressionMode(ImageWriteParam.MODE_EXPLICIT);
@@ -103,7 +103,17 @@ public class DefaultImageProcessor implements ImageProcessor
     public RenderedImage scaleImage(Image image, int width, int height)
     {
         // Draw the given image to a buffered image object and scale it to the new size on-the-fly.
-        BufferedImage bufferedImage = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
+        int imageType = BufferedImage.TYPE_4BYTE_ABGR;
+        if (image instanceof BufferedImage) {
+            imageType = ((BufferedImage) image).getType();
+            if (imageType == BufferedImage.TYPE_BYTE_INDEXED || imageType == BufferedImage.TYPE_BYTE_BINARY
+                || imageType == BufferedImage.TYPE_CUSTOM) {
+                // INDEXED and BINARY: GIFs or indexed PNGs may lose their transparent bits, for safety revert to ABGR.
+                // CUSTOM: Unknown image type, fall back on ABGR.
+                imageType = BufferedImage.TYPE_4BYTE_ABGR;
+            }
+        }
+        BufferedImage bufferedImage = new BufferedImage(width, height, imageType);
         Graphics2D graphics2D = bufferedImage.createGraphics();
         graphics2D.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BICUBIC);
         // We should test the return code here because an exception can be throw but caught.

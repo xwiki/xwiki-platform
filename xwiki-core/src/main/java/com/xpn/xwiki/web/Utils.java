@@ -40,8 +40,6 @@ import org.apache.commons.lang.RandomStringUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.ecs.Filter;
-import org.apache.ecs.filter.CharacterFilter;
 import org.apache.log4j.MDC;
 import org.apache.struts.upload.MultipartRequestWrapper;
 import org.xwiki.component.manager.ComponentLookupException;
@@ -512,12 +510,56 @@ public class Utils
         map.put(name, newValues);
     }
 
+    /**
+     * Escapes the XML special characters in a <code>String</code> using numerical XML entities.
+     * 
+     * @param value the text to escape, may be null
+     * @return a new escaped <code>String</code>, <code>null</code> if null input
+     * @deprecated starting with 2.7 use {@link #escapeXml(String)}
+     */
+    @Deprecated
     public static String formEncode(String value)
     {
-        Filter filter = new CharacterFilter();
-        filter.removeAttribute("'");
-        String svalue = filter.process(value);
-        return svalue;
+        return escapeXml(value);
+    }
+
+    /**
+     * Escapes the XML special characters in a <code>String</code> using numerical XML entities.
+     * 
+     * @param value the text to escape, may be {@code null}
+     * @return a new escaped {@code String}, {@code null} if {@code null} input
+     */
+    public static String escapeXml(String value)
+    {
+        if (value == null) {
+            return null;
+        }
+        StringBuilder result = new StringBuilder((int) (value.length() * 1.1));
+        int length = value.length();
+        char c;
+        for (int i = 0; i < length; ++i) {
+            c = value.charAt(i);
+            switch (c) {
+                case '&':
+                    result.append("&#38;");
+                    break;
+                case '<':
+                    result.append("&#60;");
+                    break;
+                case '>':
+                    result.append("&#62;");
+                    break;
+                case '"':
+                    result.append("&#34;");
+                    break;
+                case '\'':
+                    result.append("&#39;");
+                    break;
+                default:
+                    result.append(c);
+            }
+        }
+        return result.toString();
     }
 
     public static String SQLFilter(String text)

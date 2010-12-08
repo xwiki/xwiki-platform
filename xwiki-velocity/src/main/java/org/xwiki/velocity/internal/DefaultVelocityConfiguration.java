@@ -22,7 +22,6 @@ package org.xwiki.velocity.internal;
 import java.util.Properties;
 
 import org.apache.velocity.tools.generic.ComparisonDateTool;
-import org.apache.velocity.tools.generic.EscapeTool;
 import org.apache.velocity.tools.generic.ListTool;
 import org.apache.velocity.tools.generic.MathTool;
 import org.apache.velocity.tools.generic.NumberTool;
@@ -37,6 +36,7 @@ import org.xwiki.configuration.ConfigurationSource;
 import org.xwiki.velocity.VelocityConfiguration;
 import org.xwiki.velocity.introspection.ChainingUberspector;
 import org.xwiki.velocity.introspection.DeprecatedCheckUberspector;
+import org.xwiki.velocity.tools.EscapeTool;
 import org.xwiki.velocity.tools.RegexTool;
 
 /**

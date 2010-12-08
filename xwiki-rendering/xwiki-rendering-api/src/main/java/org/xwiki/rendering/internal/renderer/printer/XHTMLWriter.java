@@ -44,6 +44,19 @@ public class XHTMLWriter extends XMLWriter
         super(writer, DEFAULT_XHTML_FORMAT);
 
         // escape all non US-ASCII to have as less encoding problems as possible
-        setMaximumAllowedCharacter(127);
+        setMaximumAllowedCharacter(-1);
+    }
+
+    /**
+     * Escapes a string to be used as an attribute value. Unlike the original method in {@link XMLWriter}, apostrophes
+     * are replaced by a numerical entity &amp;#38;, since &amp;apos; is not valid in HTML documents.
+     * 
+     * @param text the attribute value to escape
+     * @return the text with all occurrences of special XML characters replaced by entity references.
+     */
+    @Override
+    protected String escapeAttributeEntities(String text)
+    {
+        return super.escapeAttributeEntities(text).replace("&apos;", "&#38;");
     }
 }

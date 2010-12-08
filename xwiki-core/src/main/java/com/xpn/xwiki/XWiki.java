@@ -5806,12 +5806,12 @@ public class XWiki implements XWikiDocChangeNotificationInterface, EventListener
         try {
             userdoc = getDocument(user, context);
             if (userdoc == null) {
-                return StringEscapeUtils.escapeXml(user);
+                return Utils.escapeXml(user);
             }
 
             BaseObject userobj = userdoc.getObject("XWiki.XWikiUsers");
             if (userobj == null) {
-                return StringEscapeUtils.escapeXml(userdoc.getName());
+                return Utils.escapeXml(userdoc.getName());
             }
 
             Set<String> proplist = userobj.getPropertyList();
@@ -5832,7 +5832,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface, EventListener
                         + context.getDoc().getPrefixedFullName() + ">", vcontext, context);
             }
 
-            text = StringEscapeUtils.escapeXml(text.trim());
+            text = Utils.escapeXml(text.trim());
 
             if (link) {
                 text =

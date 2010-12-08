@@ -1025,10 +1025,10 @@ var LiveTableTagCloud = Class.create({
    displayTagCloud: function(){
       this.domNode.down('.xwiki-livetable-tagcloud').innerHTML = "";
       var cloud = new Element("ol", {'class':'tagCloud'});
+      var levels = this.map.keys().sortBy(function(k){return parseInt(k)}).reverse();
       var liClass;
       for (var i=0;i<this.tags.length;i++) {
          liClass = "";
-         var levels = this.map.keys().reverse();
          for (var j=0;j<levels.length;j++) {
             if (this.tags[i].count >= levels[j] || (j == (levels.length - 1))) {
                liClass = this.map.get(levels[j]);

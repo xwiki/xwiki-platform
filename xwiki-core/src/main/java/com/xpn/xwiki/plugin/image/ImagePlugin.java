@@ -267,7 +267,7 @@ public class ImagePlugin extends XWikiDefaultPlugin
         }
         String key =
             String.format("%s;%s;%s;%s;%s;%s", image.getId(), image.getVersion(), width, height, keepAspectRatio,
-            quality);
+                quality);
         byte[] data = this.imageCache.get(key);
         XWikiAttachment thumbnail;
         if (data != null) {

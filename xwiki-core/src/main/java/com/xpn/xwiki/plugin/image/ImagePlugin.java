@@ -125,10 +125,10 @@ public class ImagePlugin extends XWikiDefaultPlugin
         String defaultQualityParam = context.getWiki().Param("xwiki.plugin.image.defaultQuality");
         if (!StringUtils.isBlank(defaultQualityParam) && StringUtils.isNumeric(defaultQualityParam.trim())) {
             try {
-                defaultQuality = Math.max(0, Math.min(1, Float.parseFloat(defaultQualityParam.trim())));
+                this.defaultQuality = Math.max(0, Math.min(1, Float.parseFloat(defaultQualityParam.trim())));
             } catch (NumberFormatException e) {
                 LOG.warn(String.format("Failed to parse xwiki.plugin.image.defaultQuality configuration parameter. "
-                    + "Using %s as the default image quality.", defaultQuality), e);
+                    + "Using %s as the default image quality.", this.defaultQuality), e);
             }
         }
     }
@@ -160,16 +160,16 @@ public class ImagePlugin extends XWikiDefaultPlugin
         String capacityParam = context.getWiki().Param("xwiki.plugin.image.cache.capacity");
         if (!StringUtils.isBlank(capacityParam) && StringUtils.isNumeric(capacityParam.trim())) {
             try {
-                capacity = Integer.parseInt(capacityParam.trim());
+                this.capacity = Integer.parseInt(capacityParam.trim());
             } catch (NumberFormatException e) {
                 LOG.warn(String.format("Failed to parse xwiki.plugin.image.cache.capacity configuration parameter. "
-                    + "Using %s as the cache capacity.", capacity), e);
+                    + "Using %s as the cache capacity.", this.capacity), e);
             }
         }
-        lru.setMaxEntries(capacity);
+        lru.setMaxEntries(this.capacity);
 
         try {
-            imageCache = context.getWiki().getLocalCacheFactory().newCache(configuration);
+            this.imageCache = context.getWiki().getLocalCacheFactory().newCache(configuration);
         } catch (CacheException e) {
             LOG.error("Error initializing the image cache.", e);
         }
@@ -201,7 +201,7 @@ public class ImagePlugin extends XWikiDefaultPlugin
     @Override
     public XWikiAttachment downloadAttachment(XWikiAttachment attachment, XWikiContext context)
     {
-        if (!imageProcessor.isMimeTypeSupported(attachment.getMimeType(context))) {
+        if (!this.imageProcessor.isMimeTypeSupported(attachment.getMimeType(context))) {
             return attachment;
         }
 
@@ -259,23 +259,23 @@ public class ImagePlugin extends XWikiDefaultPlugin
         XWikiContext context) throws Exception
     {
         boolean keepAspectRatio = Boolean.valueOf(context.getRequest().getParameter("keepAspectRatio"));
-        if (imageCache == null) {
+        if (this.imageCache == null) {
             initCache(context);
-            if (imageCache == null) {
+            if (this.imageCache == null) {
                 return shrinkImage(image, width, height, keepAspectRatio, quality, context);
             }
         }
         String key =
             String.format("%s;%s;%s;%s;%s;%s", image.getId(), image.getVersion(), width, height, keepAspectRatio,
-                quality);
-        byte[] data = imageCache.get(key);
+            quality);
+        byte[] data = this.imageCache.get(key);
         XWikiAttachment thumbnail;
         if (data != null) {
             thumbnail = (XWikiAttachment) image.clone();
             thumbnail.setContent(new ByteArrayInputStream(data), data.length);
         } else {
             thumbnail = shrinkImage(image, width, height, keepAspectRatio, quality, context);
-            imageCache.set(key, thumbnail.getContent(context));
+            this.imageCache.set(key, thumbnail.getContent(context));
         }
         return thumbnail;
     }
@@ -300,7 +300,7 @@ public class ImagePlugin extends XWikiDefaultPlugin
     private XWikiAttachment shrinkImage(XWikiAttachment attachment, int requestedWidth, int requestedHeight,
         boolean keepAspectRatio, float requestedQuality, XWikiContext context) throws Exception
     {
-        Image image = imageProcessor.readImage(attachment.getContentInputStream(context));
+        Image image = this.imageProcessor.readImage(attachment.getContentInputStream(context));
 
         // Compute the new image dimension.
         int currentWidth = image.getWidth(null);
@@ -314,15 +314,15 @@ public class ImagePlugin extends XWikiDefaultPlugin
             if (dimensions[0] == currentWidth && dimensions[1] == currentHeight) {
                 return attachment;
             }
-            quality = defaultQuality;
+            quality = this.defaultQuality;
         }
 
         // Scale the image to the new dimensions.
-        RenderedImage shrunkImage = imageProcessor.scaleImage(image, dimensions[0], dimensions[1]);
+        RenderedImage shrunkImage = this.imageProcessor.scaleImage(image, dimensions[0], dimensions[1]);
 
         // Write the shrunk image to a byte array output stream.
         ByteArrayOutputStream bout = new ByteArrayOutputStream();
-        imageProcessor.writeImage(shrunkImage, attachment.getMimeType(context), quality, bout);
+        this.imageProcessor.writeImage(shrunkImage, attachment.getMimeType(context), quality, bout);
 
         // Create an image attachment for the shrunk image.
         XWikiAttachment thumbnail = (XWikiAttachment) attachment.clone();
@@ -395,7 +395,7 @@ public class ImagePlugin extends XWikiDefaultPlugin
      */
     public int getWidth(XWikiAttachment attachment, XWikiContext context) throws IOException, XWikiException
     {
-        return imageProcessor.readImage(attachment.getContentInputStream(context)).getWidth(null);
+        return this.imageProcessor.readImage(attachment.getContentInputStream(context)).getWidth(null);
     }
 
     /**
@@ -407,6 +407,6 @@ public class ImagePlugin extends XWikiDefaultPlugin
      */
     public int getHeight(XWikiAttachment attachment, XWikiContext context) throws IOException, XWikiException
     {
-        return imageProcessor.readImage(attachment.getContentInputStream(context)).getHeight(null);
+        return this.imageProcessor.readImage(attachment.getContentInputStream(context)).getHeight(null);
     }
 }

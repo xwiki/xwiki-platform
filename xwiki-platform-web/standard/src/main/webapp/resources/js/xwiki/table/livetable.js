@@ -1025,7 +1025,7 @@ var LiveTableTagCloud = Class.create({
    displayTagCloud: function(){
       this.domNode.down('.xwiki-livetable-tagcloud').innerHTML = "";
       var cloud = new Element("ol", {'class':'tagCloud'});
-      var levels = this.map.keys().sortBy(function(k){return parseInt(k)}).reverse();
+      var levels = this.map ? this.map.keys().sortBy(function(k){return parseInt(k)}).reverse() : [];
       var liClass;
       for (var i=0;i<this.tags.length;i++) {
          liClass = "";

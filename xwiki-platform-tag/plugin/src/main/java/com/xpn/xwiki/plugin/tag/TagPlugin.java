@@ -203,7 +203,7 @@ public class TagPlugin extends XWikiDefaultPlugin implements XWikiPluginInterfac
     public Map<String, Integer> getTagCount(String space, XWikiContext context) throws XWikiException
     {
         if (!StringUtils.isBlank(space)) {
-            return getTagCountForQuery("", "doc.space='" + space + "'", context);
+            return getTagCountForQuery("", "doc.space = ?", Collections.singletonList(space), context);
         }
         return getTagCount(context);
     }
@@ -222,10 +222,28 @@ public class TagPlugin extends XWikiDefaultPlugin implements XWikiPluginInterfac
     public Map<String, Integer> getTagCountForQuery(String fromHql, String whereHql, XWikiContext context)
         throws XWikiException
     {
+        return getTagCountForQuery(fromHql, whereHql, null, context);
+    }
+
+    /**
+     * Get cardinality map of tags matching a parametrized hql query.
+     * 
+     * @param fromHql the <code>from</code> fragment of the hql query
+     * @param whereHql the <code>where</code> fragment of the hql query
+     * @param parameterValues list of parameter values for the query
+     * @param context XWiki context.
+     * @return map of tags (alphabetical order) with their occurences counts.
+     * @throws XWikiException if search query fails (possible failures: DB access problems, etc).
+     * @since 2.7
+     * @see TagPluginApi#getTagCountForQuery(String, String, java.util.List)
+     */
+    public Map<String, Integer> getTagCountForQuery(String fromHql, String whereHql, List< ? > parameterValues,
+            XWikiContext context) throws XWikiException
+    {
         List<String> results = null;
         Map<String, Integer> tagCount = new TreeMap<String, Integer>(String.CASE_INSENSITIVE_ORDER);
 
-        String from = "select elements(prop.list) from BaseObject as tagobject, DBStringListProperty " + "as prop";
+        String from = "select elements(prop.list) from BaseObject as tagobject, DBStringListProperty as prop";
         String where =
             " where tagobject.className='XWiki.TagClass' and tagobject.id=prop.id.id and prop.id.name='tags'";
 
@@ -237,7 +255,11 @@ public class TagPlugin extends XWikiDefaultPlugin implements XWikiPluginInterfac
             where += " and doc.fullName=tagobject.name and " + whereHql;
         }
 
-        results = context.getWiki().search(from + where, context);
+        List<?> params = parameterValues;
+        if (params == null) {
+            params = new ArrayList<String>();
+        }
+        results = context.getWiki().getStore().search(from + where, 0, 0, params, context);
         Collections.sort(results, String.CASE_INSENSITIVE_ORDER);
         Map<String, String> processedTags = new HashMap<String, String>();
 

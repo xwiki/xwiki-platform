@@ -196,7 +196,7 @@ public class TagPlugin extends XWikiDefaultPlugin implements XWikiPluginInterfac
      * 
      * @param space the wiki space to get tags from. If blank, return tags for the whole wiki.
      * @param context XWiki context.
-     * @return map of tags (alphabetical order) with their occurences counts.
+     * @return map of tags (alphabetical order) with their occurrences counts.
      * @throws XWikiException if search query fails (possible failures: DB access problems, etc).
      * @since 1.2
      */
@@ -214,7 +214,7 @@ public class TagPlugin extends XWikiDefaultPlugin implements XWikiPluginInterfac
      * @param fromHql the <code>from</code> fragment of the hql query
      * @param whereHql the <code>where</code> fragment of the hql query
      * @param context XWiki context.
-     * @return map of tags (alphabetical order) with their occurences counts.
+     * @return map of tags (alphabetical order) with their occurrences counts.
      * @throws XWikiException if search query fails (possible failures: DB access problems, etc).
      * @since 1.2
      * @see TagPluginApi#getTagCountForQuery(String, String)
@@ -226,15 +226,15 @@ public class TagPlugin extends XWikiDefaultPlugin implements XWikiPluginInterfac
     }
 
     /**
-     * Get cardinality map of tags matching a parametrized hql query.
+     * Get cardinality map of tags matching a parameterized hql query.
      * 
      * @param fromHql the <code>from</code> fragment of the hql query
      * @param whereHql the <code>where</code> fragment of the hql query
      * @param parameterValues list of parameter values for the query
      * @param context XWiki context.
-     * @return map of tags (alphabetical order) with their occurences counts.
+     * @return map of tags (alphabetical order) with their occurrences counts.
      * @throws XWikiException if search query fails (possible failures: DB access problems, etc).
-     * @since 2.7
+     * @since 1.18
      * @see TagPluginApi#getTagCountForQuery(String, String, java.util.List)
      */
     public Map<String, Integer> getTagCountForQuery(String fromHql, String whereHql, List< ? > parameterValues,

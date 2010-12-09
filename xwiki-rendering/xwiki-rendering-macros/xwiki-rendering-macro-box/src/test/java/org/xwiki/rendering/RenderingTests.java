@@ -39,7 +39,7 @@ public class RenderingTests extends TestCase
 {
     public static Test suite() throws Exception
     {
-        RenderingTestSuite suite = new RenderingTestSuite("Test Box Macro", "", "macrobox5.test");
+        RenderingTestSuite suite = new RenderingTestSuite("Test Box Macro");
 
         ComponentManagerTestSetup testSetup = new ComponentManagerTestSetup(suite);
         setUpMocks(testSetup.getComponentManager());

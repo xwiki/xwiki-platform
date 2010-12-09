@@ -113,7 +113,7 @@ public class TagPluginApi extends PluginApi<TagPlugin>
      * 
      * @param from the from fragment of the query
      * @param where the where fragment from the query
-     * @return map of tags with their occurences counts
+     * @return map of tags with their occurrences counts
      * @throws XWikiException if search query fails (possible failures: DB access problems, incorrect query fragments).
      * @since 1.2
      * @see TagPluginApi#getTagCountForQuery(String, String, java.util.List)
@@ -133,11 +133,11 @@ public class TagPluginApi extends PluginApi<TagPlugin>
      * </ul>
      * 
      * @param from the from fragment of the query
-     * @param where the parametrized where fragment from the query
+     * @param where the parameterized where fragment from the query
      * @param parameterValues list of parameter values for the query
-     * @return map of tags with their occurences counts
+     * @return map of tags with their occurrences counts
      * @throws XWikiException if search query fails (possible failures: DB access problems, incorrect query fragments).
-     * @since 2.7
+     * @since 1.18
      */
     public Map<String, Integer> getTagCountForQuery(String from, String where, List< ? > parameterValues)
         throws XWikiException

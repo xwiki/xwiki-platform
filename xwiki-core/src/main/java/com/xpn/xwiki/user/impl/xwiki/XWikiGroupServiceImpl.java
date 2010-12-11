@@ -30,6 +30,9 @@ import java.util.Vector;
 
 import org.apache.commons.lang.NotImplementedException;
 import org.apache.commons.lang.StringUtils;
+import org.xwiki.bridge.event.DocumentCreatedEvent;
+import org.xwiki.bridge.event.DocumentDeletedEvent;
+import org.xwiki.bridge.event.DocumentUpdatedEvent;
 import org.xwiki.cache.Cache;
 import org.xwiki.cache.CacheException;
 import org.xwiki.cache.CacheManager;
@@ -41,9 +44,6 @@ import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.model.reference.WikiReference;
 import org.xwiki.observation.EventListener;
 import org.xwiki.observation.ObservationManager;
-import org.xwiki.observation.event.DocumentDeleteEvent;
-import org.xwiki.observation.event.DocumentSaveEvent;
-import org.xwiki.observation.event.DocumentUpdateEvent;
 import org.xwiki.observation.event.Event;
 import org.xwiki.query.Query;
 import org.xwiki.query.QueryException;
@@ -122,9 +122,9 @@ public class XWikiGroupServiceImpl implements XWikiGroupService, EventListener
     private static final List<Event> EVENTS = new ArrayList<Event>()
     {
         {
-            add(new DocumentSaveEvent());
-            add(new DocumentUpdateEvent());
-            add(new DocumentDeleteEvent());
+            add(new DocumentCreatedEvent());
+            add(new DocumentUpdatedEvent());
+            add(new DocumentDeletedEvent());
         }
     };
 

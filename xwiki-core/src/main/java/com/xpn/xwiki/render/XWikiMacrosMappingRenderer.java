@@ -31,10 +31,10 @@ import java.util.regex.Pattern;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.xwiki.bridge.event.DocumentCreatedEvent;
+import org.xwiki.bridge.event.DocumentUpdatedEvent;
 import org.xwiki.observation.EventListener;
 import org.xwiki.observation.ObservationManager;
-import org.xwiki.observation.event.DocumentSaveEvent;
-import org.xwiki.observation.event.DocumentUpdateEvent;
 import org.xwiki.observation.event.Event;
 import org.xwiki.observation.event.filter.FixedNameEventFilter;
 
@@ -71,8 +71,8 @@ public class XWikiMacrosMappingRenderer implements XWikiRenderer, EventListener
     private static final List<Event> EVENTS = new ArrayList<Event>()
     {
         {
-            add(new DocumentUpdateEvent(new FixedNameEventFilter("xwiki:XWiki.XWikiPreferences")));
-            add(new DocumentSaveEvent(new FixedNameEventFilter("xwiki:XWiki.XWikiPreferences")));
+            add(new DocumentUpdatedEvent(new FixedNameEventFilter("xwiki:XWiki.WikiPreferences")));
+            add(new DocumentCreatedEvent(new FixedNameEventFilter("xwiki:XWiki.XWikiPreferences")));
         }
     };
 

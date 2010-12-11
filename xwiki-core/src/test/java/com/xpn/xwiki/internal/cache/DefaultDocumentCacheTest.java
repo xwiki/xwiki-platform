@@ -24,11 +24,11 @@ import junit.framework.Assert;
 import org.jmock.Mock;
 import org.junit.Before;
 import org.junit.Test;
+import org.xwiki.bridge.event.DocumentUpdatedEvent;
 import org.xwiki.cache.config.CacheConfiguration;
 import org.xwiki.cache.eviction.LRUEvictionConfiguration;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.observation.ObservationManager;
-import org.xwiki.observation.event.DocumentUpdateEvent;
 
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.doc.XWikiDocument;
@@ -95,7 +95,7 @@ public class DefaultDocumentCacheTest extends AbstractBridgedXWikiComponentTestC
         this.cache.set("data", this.document.getDocumentReference(), "ext1", "ext2");
 
         getComponentManager().lookup(ObservationManager.class).notify(
-            new DocumentUpdateEvent(this.document.getPrefixedFullName()), this.document, getContext());
+            new DocumentUpdatedEvent(this.document.getDocumentReference()), this.document, getContext());
 
         Assert.assertNull(this.cache.get(this.document.getDocumentReference()));
         Assert.assertNull(this.cache.get(this.document.getDocumentReference(), "ext1", "ext2"));

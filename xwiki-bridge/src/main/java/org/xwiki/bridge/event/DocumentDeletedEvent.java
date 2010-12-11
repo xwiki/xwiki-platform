@@ -16,53 +16,55 @@
  * License along with this software; if not, write to the Free
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
- *
  */
-package org.xwiki.observation.event;
+package org.xwiki.bridge.event;
 
+import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.observation.event.AbstractDocumentEvent;
 import org.xwiki.observation.event.filter.EventFilter;
 
 /**
- * An event triggered when a document is saved for the first time (a new document is created).
+ * An event triggered after a document is deleted.
  * 
  * @version $Id$
  */
-public class DocumentSaveEvent extends AbstractDocumentEvent
+public class DocumentDeletedEvent extends AbstractDocumentEvent
 {
     /**
      * The version identifier for this Serializable class. Increment only if the <i>serialized</i> form of the class
      * changes.
      */
     private static final long serialVersionUID = 1L;
-
+    
     /**
      * Constructor initializing the event filter with an
      * {@link org.xwiki.observation.event.filter.AlwaysMatchingEventFilter}, meaning that this event will match any
-     * other document save event.
+     * other document delete event.
      */
-    public DocumentSaveEvent()
+    public DocumentDeletedEvent()
     {
         super();
     }
-
+    
     /**
      * Constructor initializing the event filter with a {@link org.xwiki.observation.event.filter.FixedNameEventFilter},
-     * meaning that this event will match only save events affecting the same document.
+     * meaning that this event will match only delete events affecting the same document.
      * 
-     * @param documentName the name of the saved document to match
+     * @param documentReference the reference of the document to match
      */
-    public DocumentSaveEvent(String documentName)
+    public DocumentDeletedEvent(DocumentReference documentReference)    
     {
-        super(documentName);
+        super(documentReference);
     }
-
+    
     /**
      * Constructor using a custom {@link EventFilter}.
      * 
      * @param eventFilter the filter to use for matching events
      */
-    public DocumentSaveEvent(EventFilter eventFilter)
+    public DocumentDeletedEvent(EventFilter eventFilter)
     {
         super(eventFilter);
     }
+
 }

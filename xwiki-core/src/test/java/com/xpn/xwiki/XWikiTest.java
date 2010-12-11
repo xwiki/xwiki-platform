@@ -34,10 +34,14 @@ import org.apache.commons.collections.IteratorUtils;
 import org.jmock.Mock;
 import org.jmock.core.Invocation;
 import org.jmock.core.stub.CustomStub;
+import org.xwiki.bridge.event.DocumentCreatedEvent;
+import org.xwiki.bridge.event.DocumentCreatingEvent;
+import org.xwiki.bridge.event.DocumentDeletedEvent;
+import org.xwiki.bridge.event.DocumentDeletingEvent;
+import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.observation.EventListener;
 import org.xwiki.observation.ObservationManager;
-import org.xwiki.observation.event.DocumentDeleteEvent;
-import org.xwiki.observation.event.DocumentSaveEvent;
+import org.xwiki.rendering.syntax.Syntax;
 
 import com.xpn.xwiki.doc.XWikiAttachment;
 import com.xpn.xwiki.doc.XWikiDocument;
@@ -52,7 +56,6 @@ import com.xpn.xwiki.store.XWikiVersioningStoreInterface;
 import com.xpn.xwiki.test.AbstractBridgedXWikiComponentTestCase;
 import com.xpn.xwiki.web.XWikiRequest;
 import com.xpn.xwiki.web.XWikiServletRequest;
-import org.xwiki.rendering.syntax.Syntax;
 
 /**
  * Unit tests for {@link com.xpn.xwiki.XWiki}.
@@ -293,8 +296,9 @@ public class XWikiTest extends AbstractBridgedXWikiComponentTestCase
     {
         Mock mockListener = mock(EventListener.class);
         mockListener.stubs().method("getName").will(returnValue("testlistener"));
-        mockListener.expects(once()).method("getEvents").will(
-            returnValue(Arrays.asList(new DocumentSaveEvent("xwikitest:Some.Document"))));
+        DocumentReference ref = new DocumentReference("xwikitest", "Some", "Document");
+        mockListener.expects(once()).method("getEvents")
+            .will(returnValue(Arrays.asList(new DocumentCreatedEvent(ref), new DocumentCreatingEvent(ref))));
 
         ObservationManager om = getComponentManager().lookup(ObservationManager.class);
         om.addListener((EventListener) mockListener.proxy());
@@ -302,8 +306,10 @@ public class XWikiTest extends AbstractBridgedXWikiComponentTestCase
         XWikiDocument document = new XWikiDocument("xwikitest", "Some", "Document");
         document.setContent("the content");
 
-        // Ensure that the onEvent method has been called
-        mockListener.expects(once()).method("onEvent").with(isA(DocumentSaveEvent.class), same(document),
+        // Ensure that the onEvent method has been called before and after the save
+        mockListener.expects(once()).method("onEvent").with(isA(DocumentCreatingEvent.class), same(document),
+            isA(XWikiContext.class));
+        mockListener.expects(once()).method("onEvent").with(isA(DocumentCreatedEvent.class), same(document),
             isA(XWikiContext.class));
 
         this.xwiki.saveDocument(document, getContext());
@@ -316,8 +322,9 @@ public class XWikiTest extends AbstractBridgedXWikiComponentTestCase
     {
         Mock mockListener = mock(EventListener.class);
         mockListener.stubs().method("getName").will(returnValue("testlistener"));
-        mockListener.expects(once()).method("getEvents").will(
-            returnValue(Arrays.asList(new DocumentDeleteEvent("xwikitest:Another.Document"))));
+        DocumentReference ref = new DocumentReference("xwikitest", "Another", "Document");
+        mockListener.expects(once()).method("getEvents")
+            .will(returnValue(Arrays.asList(new DocumentDeletedEvent(ref), new DocumentDeletingEvent(ref))));
 
         ObservationManager om = getComponentManager().lookup(ObservationManager.class);
         om.addListener((EventListener) mockListener.proxy());
@@ -329,9 +336,11 @@ public class XWikiTest extends AbstractBridgedXWikiComponentTestCase
 
         this.xwiki.saveDocument(document, getContext());
 
-        // Ensure that the onEvent method has been called
-        mockListener.expects(once()).method("onEvent").with(isA(DocumentDeleteEvent.class), isA(XWikiDocument.class),
-            isA(XWikiContext.class));
+        // Ensure that the onEvent method has been called before and after the deletion
+        mockListener.expects(once()).method("onEvent")
+        .with(isA(DocumentDeletingEvent.class), isA(XWikiDocument.class), isA(XWikiContext.class));
+        mockListener.expects(once()).method("onEvent")
+            .with(isA(DocumentDeletedEvent.class), isA(XWikiDocument.class), isA(XWikiContext.class));
 
         this.xwiki.deleteDocument(document, false, getContext());
     }

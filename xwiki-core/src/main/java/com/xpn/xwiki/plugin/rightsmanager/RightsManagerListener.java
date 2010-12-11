@@ -25,8 +25,8 @@ import java.util.List;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.xwiki.bridge.event.DocumentDeletedEvent;
 import org.xwiki.observation.EventListener;
-import org.xwiki.observation.event.DocumentDeleteEvent;
 import org.xwiki.observation.event.Event;
 import org.xwiki.observation.remote.RemoteObservationManagerContext;
 
@@ -59,7 +59,7 @@ public final class RightsManagerListener implements EventListener
     private static final List<Event> EVENTS = new ArrayList<Event>()
     {
         {
-            add(new DocumentDeleteEvent());
+            add(new DocumentDeletedEvent());
         }
     };
 

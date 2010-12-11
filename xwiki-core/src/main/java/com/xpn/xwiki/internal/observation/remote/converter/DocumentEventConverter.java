@@ -24,10 +24,10 @@ import java.io.Serializable;
 import java.util.HashSet;
 import java.util.Set;
 
+import org.xwiki.bridge.event.DocumentCreatedEvent;
+import org.xwiki.bridge.event.DocumentDeletedEvent;
+import org.xwiki.bridge.event.DocumentUpdatedEvent;
 import org.xwiki.component.annotation.Component;
-import org.xwiki.observation.event.DocumentDeleteEvent;
-import org.xwiki.observation.event.DocumentSaveEvent;
-import org.xwiki.observation.event.DocumentUpdateEvent;
 import org.xwiki.observation.event.Event;
 import org.xwiki.observation.remote.LocalEventData;
 import org.xwiki.observation.remote.RemoteEventData;
@@ -52,9 +52,9 @@ public class DocumentEventConverter extends AbstractXWikiEventConverter
     private Set<Class< ? extends Event>> events = new HashSet<Class< ? extends Event>>()
     {
         {
-            add(DocumentDeleteEvent.class);
-            add(DocumentSaveEvent.class);
-            add(DocumentUpdateEvent.class);
+            add(DocumentDeletedEvent.class);
+            add(DocumentCreatedEvent.class);
+            add(DocumentUpdatedEvent.class);
         }
     };
 

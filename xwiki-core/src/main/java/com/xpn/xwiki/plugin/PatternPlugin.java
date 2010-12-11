@@ -27,10 +27,11 @@ import java.util.Vector;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.ecs.filter.CharacterFilter;
+import org.xwiki.bridge.event.DocumentCreatedEvent;
+import org.xwiki.bridge.event.DocumentUpdatedEvent;
+import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.observation.EventListener;
 import org.xwiki.observation.ObservationManager;
-import org.xwiki.observation.event.DocumentSaveEvent;
-import org.xwiki.observation.event.DocumentUpdateEvent;
 import org.xwiki.observation.event.Event;
 
 import com.xpn.xwiki.XWiki;
@@ -55,8 +56,8 @@ public class PatternPlugin extends XWikiDefaultPlugin implements EventListener
     private static final List<Event> EVENTS = new ArrayList<Event>()
     {
         {
-            add(new DocumentSaveEvent("xwiki:Plugins.PatternPlugin"));
-            add(new DocumentUpdateEvent("xwiki:Plugins.PatternPlugin"));
+            add(new DocumentCreatedEvent(new DocumentReference("xwiki", "Plugins", "PatternPlugin")));
+            add(new DocumentUpdatedEvent(new DocumentReference("xwiki", "Plugins", "PatternPlugin")));
         }
     };
 

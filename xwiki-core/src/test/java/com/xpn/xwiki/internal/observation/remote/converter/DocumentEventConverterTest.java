@@ -24,7 +24,8 @@ import java.io.ByteArrayOutputStream;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 
-import org.xwiki.observation.event.DocumentUpdateEvent;
+import org.xwiki.bridge.event.DocumentUpdatedEvent;
+import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.observation.remote.LocalEventData;
 import org.xwiki.observation.remote.RemoteEventData;
 import org.xwiki.observation.remote.converter.EventConverterManager;
@@ -47,7 +48,7 @@ public class DocumentEventConverterTest extends AbstractBridgedXWikiComponentTes
         // local -> remote
 
         LocalEventData localEvent = new LocalEventData();
-        localEvent.setEvent(new DocumentUpdateEvent("wiki:space.page"));
+        localEvent.setEvent(new DocumentUpdatedEvent(new DocumentReference("wiki","space","page")));
         localEvent.setSource(new XWikiDocument("wiki", "space", "page"));
         localEvent.setData(new XWikiContext());
 

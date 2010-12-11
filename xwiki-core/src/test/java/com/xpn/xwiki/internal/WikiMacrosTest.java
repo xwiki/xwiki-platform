@@ -23,11 +23,11 @@ import org.jmock.Expectations;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+import org.xwiki.bridge.event.DocumentCreatedEvent;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.observation.EventListener;
-import org.xwiki.observation.event.DocumentSaveEvent;
 import org.xwiki.rendering.macro.Macro;
 import org.xwiki.rendering.macro.wikibridge.WikiMacroManager;
 import org.xwiki.rendering.syntax.Syntax;
@@ -102,7 +102,8 @@ public class WikiMacrosTest extends AbstractBridgedComponentTestCase
     @Test
     public void testSaveWikiMacro() throws Exception
     {
-        final DocumentSaveEvent documentSaveEvent = new DocumentSaveEvent("wiki.Space.Name");
+        final DocumentCreatedEvent documentCreatedEvent =
+            new DocumentCreatedEvent(new DocumentReference("wiki", "Space", "Name"));
 
         getMockery().checking(new Expectations()
         {
@@ -118,7 +119,7 @@ public class WikiMacrosTest extends AbstractBridgedComponentTestCase
 
         this.macroObject.setStringValue("visibility", "Current Wiki");
 
-        this.wikiMacroEventListener.onEvent(documentSaveEvent, this.macroDocument, getContext());
+        this.wikiMacroEventListener.onEvent(documentCreatedEvent, this.macroDocument, getContext());
 
         Macro testMacro = getWikiComponentManager().lookup(Macro.class, "macroid");
 
@@ -135,7 +136,8 @@ public class WikiMacrosTest extends AbstractBridgedComponentTestCase
     @Test
     public void testUnRegisterWikiMacroWithDifferentVisibilityKeys() throws Exception
     {
-        final DocumentSaveEvent documentSaveEvent = new DocumentSaveEvent("wiki.Space.Name");
+        final DocumentCreatedEvent documentCreatedEvent =
+            new DocumentCreatedEvent(new DocumentReference("wiki", "Space", "Name"));
 
         getMockery().checking(new Expectations()
         {
@@ -153,7 +155,7 @@ public class WikiMacrosTest extends AbstractBridgedComponentTestCase
 
         getContext().setUser("XWiki.user");
 
-        this.wikiMacroEventListener.onEvent(documentSaveEvent, this.macroDocument, getContext());
+        this.wikiMacroEventListener.onEvent(documentCreatedEvent, this.macroDocument, getContext());
 
         Macro testMacro = getUserComponentManager().lookup(Macro.class, "macroid");
 
@@ -163,7 +165,7 @@ public class WikiMacrosTest extends AbstractBridgedComponentTestCase
 
         getContext().setUser("XWiki.user2");
 
-        this.wikiMacroEventListener.onEvent(documentSaveEvent, this.macroDocument, getContext());
+        this.wikiMacroEventListener.onEvent(documentCreatedEvent, this.macroDocument, getContext());
 
         testMacro = getUserComponentManager().lookup(Macro.class, "macroid");
 

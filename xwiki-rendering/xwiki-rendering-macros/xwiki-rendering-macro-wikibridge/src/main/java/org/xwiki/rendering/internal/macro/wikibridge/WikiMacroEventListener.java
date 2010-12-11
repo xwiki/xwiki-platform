@@ -23,20 +23,20 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.xwiki.bridge.DocumentModelBridge;
-import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.bridge.event.DocumentCreatedEvent;
+import org.xwiki.bridge.event.DocumentDeletedEvent;
+import org.xwiki.bridge.event.DocumentUpdatedEvent;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.Requirement;
 import org.xwiki.component.logging.AbstractLogEnabled;
+import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.observation.EventListener;
 import org.xwiki.observation.event.AbstractDocumentEvent;
-import org.xwiki.observation.event.DocumentDeleteEvent;
-import org.xwiki.observation.event.DocumentSaveEvent;
-import org.xwiki.observation.event.DocumentUpdateEvent;
 import org.xwiki.observation.event.Event;
 import org.xwiki.rendering.macro.wikibridge.InsufficientPrivilegesException;
 import org.xwiki.rendering.macro.wikibridge.WikiMacro;
-import org.xwiki.rendering.macro.wikibridge.WikiMacroFactory;
 import org.xwiki.rendering.macro.wikibridge.WikiMacroException;
+import org.xwiki.rendering.macro.wikibridge.WikiMacroFactory;
 import org.xwiki.rendering.macro.wikibridge.WikiMacroManager;
 
 /**
@@ -74,7 +74,8 @@ public class WikiMacroEventListener extends AbstractLogEnabled implements EventL
      */
     public List<Event> getEvents()
     {
-        return Arrays.<Event> asList(new DocumentSaveEvent(), new DocumentUpdateEvent(), new DocumentDeleteEvent());
+        return Arrays
+            .<Event> asList(new DocumentCreatedEvent(), new DocumentUpdatedEvent(), new DocumentDeletedEvent());
     }
 
     /**
@@ -95,9 +96,9 @@ public class WikiMacroEventListener extends AbstractLogEnabled implements EventL
             // - don't use a listener to register macros and instead have a page listing all macros with a
             // register/unregister button (and thus provide visual feedback when the action fails).
 
-            if (event instanceof DocumentSaveEvent || event instanceof DocumentUpdateEvent) {
+            if (event instanceof DocumentCreatedEvent || event instanceof DocumentUpdatedEvent) {
                 registerMacro(documentReference);
-            } else if (event instanceof DocumentDeleteEvent) {
+            } else if (event instanceof DocumentDeletedEvent) {
                 unregisterMacro(documentReference);
             }
         }

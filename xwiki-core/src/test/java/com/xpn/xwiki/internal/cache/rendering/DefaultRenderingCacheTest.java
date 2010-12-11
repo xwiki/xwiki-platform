@@ -24,9 +24,9 @@ import java.util.Collections;
 import org.jmock.Mock;
 import org.junit.Before;
 import org.junit.Test;
+import org.xwiki.bridge.event.DocumentUpdatedEvent;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.observation.ObservationManager;
-import org.xwiki.observation.event.DocumentUpdateEvent;
 import org.xwiki.test.MockConfigurationSource;
 
 import com.xpn.xwiki.XWiki;
@@ -86,7 +86,7 @@ public class DefaultRenderingCacheTest extends AbstractBridgedXWikiComponentTest
             "source", getContext()));
 
         getComponentManager().lookup(ObservationManager.class).notify(
-            new DocumentUpdateEvent(this.document.getPrefixedFullName()), this.document, getContext());
+            new DocumentUpdatedEvent(this.document.getDocumentReference()), this.document, getContext());
 
         assertNull("renderedContent", this.renderingCache.getRenderedContent(this.document.getDocumentReference(),
             "source", getContext()));

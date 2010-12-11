@@ -16,19 +16,20 @@
  * License along with this software; if not, write to the Free
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+ *
  */
 package org.xwiki.observation.event;
 
-import org.xwiki.model.internal.reference.DefaultStringEntityReferenceSerializer;
-import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.observation.event.filter.EventFilter;
 
 /**
- * Base class for all document {@link Event events}.
+ * An event triggered when a document is deleted.
  * 
  * @version $Id$
+ * @deprecated use {@link org.xwiki.bridge.event.DocumentDeletedEvent} instead
  */
-public abstract class AbstractDocumentEvent extends AbstractFilterableEvent
+@Deprecated
+public class DocumentDeleteEvent extends AbstractDocumentEvent
 {
     /**
      * The version identifier for this Serializable class. Increment only if the <i>serialized</i> form of the class
@@ -37,30 +38,22 @@ public abstract class AbstractDocumentEvent extends AbstractFilterableEvent
     private static final long serialVersionUID = 1L;
 
     /**
-     * This event will match any other document event of the same type.
+     * Constructor initializing the event filter with an
+     * {@link org.xwiki.observation.event.filter.AlwaysMatchingEventFilter}, meaning that this event will match any
+     * other document delete event.
      */
-    public AbstractDocumentEvent()
+    public DocumentDeleteEvent()
     {
-        super(); 
+        super();
     }
 
     /**
-     * This event will match only events of the same type affecting the same document.
+     * Constructor initializing the event filter with a {@link org.xwiki.observation.event.filter.FixedNameEventFilter},
+     * meaning that this event will match only delete events affecting the same document.
      * 
-     * @param documentReference the reference of the document relater to this event
+     * @param documentName the name of the deleted document to match
      */
-    public AbstractDocumentEvent(DocumentReference documentReference)
-    {
-        super(new DefaultStringEntityReferenceSerializer().serialize(documentReference));
-    }
-    
-    /**
-     * This event will match only events of the same type affecting the same document.
-     * 
-     * @param documentName the name of the document related to this event
-     * @deprecated use {@link #AbstractDocumentEvent(DocumentReference)} instead
-     */
-    public AbstractDocumentEvent(String documentName)
+    public DocumentDeleteEvent(String documentName)
     {
         super(documentName);
     }
@@ -70,7 +63,7 @@ public abstract class AbstractDocumentEvent extends AbstractFilterableEvent
      * 
      * @param eventFilter the filter to use for matching events
      */
-    public AbstractDocumentEvent(EventFilter eventFilter)
+    public DocumentDeleteEvent(EventFilter eventFilter)
     {
         super(eventFilter);
     }

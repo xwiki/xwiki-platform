@@ -26,6 +26,7 @@ import java.util.List;
 import org.xwiki.annotation.maintainer.AnnotationMaintainer;
 import org.xwiki.annotation.maintainer.MaintainerServiceException;
 import org.xwiki.bridge.DocumentModelBridge;
+import org.xwiki.bridge.event.DocumentUpdatedEvent;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.Requirement;
 import org.xwiki.component.logging.AbstractLogEnabled;
@@ -33,7 +34,6 @@ import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.observation.EventListener;
-import org.xwiki.observation.event.DocumentUpdateEvent;
 import org.xwiki.observation.event.Event;
 
 /**
@@ -68,7 +68,7 @@ public class DocumentContentAnnotationUpdateListener extends AbstractLogEnabled 
     /**
      * The events observed by this observation manager.
      */
-    private final List<Event> eventsList = new ArrayList<Event>(Arrays.asList(new DocumentUpdateEvent()));
+    private final List<Event> eventsList = new ArrayList<Event>(Arrays.asList(new DocumentUpdatedEvent()));
 
     /**
      * {@inheritDoc}

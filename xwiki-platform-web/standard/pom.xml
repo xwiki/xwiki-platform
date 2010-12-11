@@ -156,6 +156,12 @@
       <artifactId>xwiki-core-extension-handler-jar</artifactId>
       <version>${platform.core.version}</version>
     </dependency>
+    <!-- Legacy / Backward compatibility -->
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-core-legacy</artifactId>
+      <version>${platform.core.version}</version>
+    </dependency>
   </dependencies>
   <build>
     <plugins>

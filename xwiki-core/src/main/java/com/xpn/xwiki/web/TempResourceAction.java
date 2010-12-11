@@ -113,7 +113,7 @@ public class TempResourceAction extends XWikiAction
         Matcher matcher = URI_PATTERN.matcher(uri);
         File result = null;
         if (matcher.find()) {
-            String wiki = context.getWiki().getDatabase();
+            String wiki = context.getDatabase();
             String space = matcher.group(1);
             String page = matcher.group(2);
             String module = matcher.group(3);

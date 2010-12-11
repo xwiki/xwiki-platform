@@ -471,6 +471,7 @@ public class DefaultDocumentAccessBridge implements DocumentAccessBridge
      * @see org.xwiki.bridge.DocumentAccessBridge#setProperty(java.lang.String, java.lang.String, java.lang.String,
      *      java.lang.Object)
      */
+    @Deprecated
     public void setProperty(String documentReference, String className, String propertyName, Object propertyValue)
         throws Exception
     {
@@ -483,6 +484,23 @@ public class DefaultDocumentAccessBridge implements DocumentAccessBridge
         }
     }
 
+    /**
+     * {@inheritDoc}
+     * 
+     * @see org.xwiki.bridge.DocumentAccessBridge#setProperty(DocumentReference, DocumentReference, java.lang.String, java.lang.Object)
+     */
+    public void setProperty(DocumentReference documentReference, DocumentReference classReference, String propertyName, Object propertyValue)
+        throws Exception
+    {
+        XWikiContext xcontext = getContext();
+        XWikiDocument doc = xcontext.getWiki().getDocument(documentReference, xcontext);
+        BaseObject obj = doc.getXObject(classReference, true, xcontext);
+        if (obj != null) {
+            obj.set(propertyName, propertyValue, xcontext);
+            saveDocument(doc, String.format("Property [%s] set.", propertyName), true);
+        }
+    }
+    
     /**
      * {@inheritDoc}
      * 

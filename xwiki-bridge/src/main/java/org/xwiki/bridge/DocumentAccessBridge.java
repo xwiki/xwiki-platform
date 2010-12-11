@@ -346,10 +346,24 @@ public interface DocumentAccessBridge
      * @param propertyName name of the property to set.
      * @param propertyValue value of the property to set.
      * @throws Exception if the document cannot be accessed.
+     * @deprecated use {@link DocumentAccessBridge#setProperty(DocumentReference, DocumentReference, String, Object)
      */
     void setProperty(String documentReference, String className, String propertyName, Object propertyValue)
         throws Exception;
 
+    /**
+     * Sets the given property of the first object (of the given class) attached to the document. If no such object
+     * exists, this method will create a new object of the given class, attach it to the document and set the property.
+     * 
+     * @param documentReference the reference of the document to access
+     * @param classReference the reference of the class.
+     * @param propertyName name of the property to set.
+     * @param propertyValue value of the property to set.
+     * @throws Exception if the document cannot be accessed.
+     */
+    void setProperty(DocumentReference documentReference, DocumentReference classReference, String propertyName,
+        Object propertyValue) throws Exception;
+    
     /**
      * Returns the content of a document attachment.
      * 

@@ -108,7 +108,7 @@ public class TempResourceAction extends XWikiAction
      * @param context xwiki context.
      * @return temporary file corresponding to the specified URI or null if no such file can be located.
      */
-    private File getTemporaryFile(String uri, XWikiContext context)
+    protected File getTemporaryFile(String uri, XWikiContext context)
     {
         Matcher matcher = URI_PATTERN.matcher(uri);
         File result = null;

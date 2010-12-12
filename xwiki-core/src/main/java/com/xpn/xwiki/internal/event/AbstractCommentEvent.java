@@ -20,8 +20,9 @@
  */
 package com.xpn.xwiki.internal.event;
 
-import org.xwiki.observation.event.AbstractDocumentEvent;
+import org.xwiki.model.event.AbstractDocumentEvent;
 import org.xwiki.observation.event.filter.EventFilter;
+import org.xwiki.observation.event.filter.FixedNameEventFilter;
 
 /**
  * Base class for all comment {@link org.xwiki.observation.event.Event events}.
@@ -61,7 +62,8 @@ public abstract class AbstractCommentEvent extends AbstractDocumentEvent
      */
     public AbstractCommentEvent(String documentName, String identifier)
     {
-        super(documentName);
+        // TODO: depreciate this constructor and add a constructor taking a document reference instead
+        super(new FixedNameEventFilter(documentName));
         this.identifier = identifier;
     }
 

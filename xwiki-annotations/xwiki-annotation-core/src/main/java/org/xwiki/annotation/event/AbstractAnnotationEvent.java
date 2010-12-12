@@ -20,8 +20,9 @@
  */
 package org.xwiki.annotation.event;
 
-import org.xwiki.observation.event.AbstractDocumentEvent;
+import org.xwiki.model.event.AbstractDocumentEvent;
 import org.xwiki.observation.event.filter.EventFilter;
+import org.xwiki.observation.event.filter.FixedNameEventFilter;
 
 /**
  * Base class for all annotation {@link org.xwiki.observation.event.Event}.
@@ -61,7 +62,8 @@ public class AbstractAnnotationEvent extends AbstractDocumentEvent
      */
     public AbstractAnnotationEvent(String documentName, String identifier)
     {
-        super(documentName);
+        // TODO refactor annotation event to take a document reference as constructor and depreciate this constructor
+        super(new FixedNameEventFilter(documentName));
         this.identifier = identifier;
     }
 

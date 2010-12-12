@@ -20,7 +20,7 @@
 package org.xwiki.bridge.event;
 
 import org.xwiki.model.reference.DocumentReference;
-import org.xwiki.observation.event.AbstractDocumentEvent;
+import org.xwiki.model.event.AbstractDocumentEvent;
 import org.xwiki.observation.event.filter.EventFilter;
 
 /**

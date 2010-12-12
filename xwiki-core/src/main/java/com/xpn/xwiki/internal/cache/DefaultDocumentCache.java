@@ -39,7 +39,7 @@ import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.observation.EventListener;
 import org.xwiki.observation.ObservationManager;
-import org.xwiki.observation.event.AbstractDocumentEvent;
+import org.xwiki.model.event.AbstractDocumentEvent;
 import org.xwiki.observation.event.Event;
 
 /**

@@ -31,7 +31,7 @@ import org.xwiki.component.annotation.Requirement;
 import org.xwiki.component.logging.AbstractLogEnabled;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.observation.EventListener;
-import org.xwiki.observation.event.AbstractDocumentEvent;
+import org.xwiki.model.event.AbstractDocumentEvent;
 import org.xwiki.observation.event.Event;
 import org.xwiki.rendering.macro.wikibridge.InsufficientPrivilegesException;
 import org.xwiki.rendering.macro.wikibridge.WikiMacro;

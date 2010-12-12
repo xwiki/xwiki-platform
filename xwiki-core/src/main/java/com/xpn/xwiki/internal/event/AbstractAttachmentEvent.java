@@ -20,8 +20,9 @@
  */
 package com.xpn.xwiki.internal.event;
 
-import org.xwiki.observation.event.AbstractDocumentEvent;
+import org.xwiki.model.event.AbstractDocumentEvent;
 import org.xwiki.observation.event.filter.EventFilter;
+import org.xwiki.observation.event.filter.FixedNameEventFilter;
 
 /**
  * Base class for all attachment {@link org.xwiki.observation.event.Event events}.
@@ -62,7 +63,8 @@ public class AbstractAttachmentEvent extends AbstractDocumentEvent
      */
     public AbstractAttachmentEvent(String documentName, String name)
     {
-        super(documentName);
+        // TODO: depreciate this constructor and add a constructor taking a document reference instead
+        super(new FixedNameEventFilter(documentName));
         this.name = name;
     }
 

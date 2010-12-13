@@ -68,6 +68,7 @@ import org.dom4j.io.SAXReader;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 import org.xwiki.container.Container;
+import org.xwiki.xml.internal.XMLScriptService;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
@@ -622,8 +623,8 @@ public class Util
 
     public static String getHTMLExceptionMessage(XWikiException xe, XWikiContext context)
     {
-        String title = Utils.escapeXml(xe.getMessage());
-        String text = Utils.escapeXml(xe.getFullMessage());
+        String title = XMLScriptService.escape(xe.getMessage());
+        String text = XMLScriptService.escape(xe.getFullMessage());
         String id = (String) context.get("xwikierrorid");
         if (id == null) {
             id = "1";

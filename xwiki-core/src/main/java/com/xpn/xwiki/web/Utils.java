@@ -44,6 +44,7 @@ import org.apache.log4j.MDC;
 import org.apache.struts.upload.MultipartRequestWrapper;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
+import org.xwiki.xml.internal.XMLScriptService;
 
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
@@ -515,51 +516,12 @@ public class Utils
      * 
      * @param value the text to escape, may be null
      * @return a new escaped <code>String</code>, <code>null</code> if null input
-     * @deprecated starting with 2.7 use {@link #escapeXml(String)}
+     * @deprecated starting with 2.7 use {@link XMLScriptService#escape(Object) $services.xml.escape(content)}
      */
     @Deprecated
     public static String formEncode(String value)
     {
-        return escapeXml(value);
-    }
-
-    /**
-     * Escapes the XML special characters in a <code>String</code> using numerical XML entities.
-     * 
-     * @param value the text to escape, may be {@code null}
-     * @return a new escaped {@code String}, {@code null} if {@code null} input
-     */
-    public static String escapeXml(String value)
-    {
-        if (value == null) {
-            return null;
-        }
-        StringBuilder result = new StringBuilder((int) (value.length() * 1.1));
-        int length = value.length();
-        char c;
-        for (int i = 0; i < length; ++i) {
-            c = value.charAt(i);
-            switch (c) {
-                case '&':
-                    result.append("&#38;");
-                    break;
-                case '<':
-                    result.append("&#60;");
-                    break;
-                case '>':
-                    result.append("&#62;");
-                    break;
-                case '"':
-                    result.append("&#34;");
-                    break;
-                case '\'':
-                    result.append("&#39;");
-                    break;
-                default:
-                    result.append(c);
-            }
-        }
-        return result.toString();
+        return XMLScriptService.escape(value);
     }
 
     public static String SQLFilter(String text)

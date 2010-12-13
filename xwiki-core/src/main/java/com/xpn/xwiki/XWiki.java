@@ -111,6 +111,7 @@ import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.model.reference.WikiReference;
 import org.xwiki.observation.EventListener;
 import org.xwiki.observation.ObservationManager;
+import org.xwiki.xml.internal.XMLScriptService;
 import com.xpn.xwiki.internal.event.AttachmentAddedEvent;
 import com.xpn.xwiki.internal.event.AttachmentDeletedEvent;
 import com.xpn.xwiki.internal.event.AttachmentUpdatedEvent;
@@ -5837,12 +5838,12 @@ public class XWiki implements XWikiDocChangeNotificationInterface, EventListener
         try {
             userdoc = getDocument(user, context);
             if (userdoc == null) {
-                return Utils.escapeXml(user);
+                return XMLScriptService.escape(user);
             }
 
             BaseObject userobj = userdoc.getObject("XWiki.XWikiUsers");
             if (userobj == null) {
-                return Utils.escapeXml(userdoc.getName());
+                return XMLScriptService.escape(userdoc.getName());
             }
 
             Set<String> proplist = userobj.getPropertyList();
@@ -5863,7 +5864,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface, EventListener
                         + context.getDoc().getPrefixedFullName() + ">", vcontext, context);
             }
 
-            text = Utils.escapeXml(text.trim());
+            text = XMLScriptService.escape(text.trim());
 
             if (link) {
                 text =

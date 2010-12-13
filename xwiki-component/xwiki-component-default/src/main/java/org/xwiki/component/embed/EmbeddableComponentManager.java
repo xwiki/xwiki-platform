@@ -92,7 +92,7 @@ public class EmbeddableComponentManager implements ComponentManager
      */
     public <T> boolean hasComponent(Class<T> role, String roleHint)
     {
-        return this.components.containsKey(new RoleHint<T>(role, roleHint));
+        return this.descriptors.containsKey(new RoleHint<T>(role, roleHint));
     }
 
     /**
@@ -102,7 +102,7 @@ public class EmbeddableComponentManager implements ComponentManager
      */
     public <T> boolean hasComponent(Class<T> role)
     {
-        return this.components.containsKey(new RoleHint<T>(role));
+        return this.descriptors.containsKey(new RoleHint<T>(role));
     }
 
     /**

@@ -180,4 +180,18 @@ public class EmbeddableComponentManagerTest
         parent.registerComponent(cd);
         return parent;
     }
+    
+    @Test
+    public void testHasComponent() throws Exception
+    {
+        EmbeddableComponentManager ecm = new EmbeddableComponentManager();
+
+        DefaultComponentDescriptor<Role> d1 = new DefaultComponentDescriptor<Role>();
+        d1.setRole(Role.class);
+        d1.setRoleHint("default");
+        ecm.registerComponent(d1);
+
+        Assert.assertTrue(ecm.hasComponent(Role.class));
+        Assert.assertTrue(ecm.hasComponent(Role.class, "default"));
+    }
 }

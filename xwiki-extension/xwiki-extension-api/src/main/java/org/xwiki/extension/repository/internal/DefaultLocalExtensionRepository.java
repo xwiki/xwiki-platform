@@ -301,14 +301,14 @@ public class DefaultLocalExtensionRepository extends AbstractLogEnabled implemen
 
     private String getFileName(String id, String version, String extension)
     {
-    	String fileName = id + "-" + version + "." + extension;
-    	try {
-			return URLEncoder.encode(fileName, "UTF-8");
-		} catch (UnsupportedEncodingException e) {
-			// Should never happen
+        String fileName = id + "-" + version + "." + extension;
+        try {
+            return URLEncoder.encode(fileName, "UTF-8");
+        } catch (UnsupportedEncodingException e) {
+            // Should never happen
 
-			return fileName;
-		}
+            return fileName;
+        }
     }
 
     private void addElement(Document document, Element parentElement, String elementName, String elementValue)

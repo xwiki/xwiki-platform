@@ -352,8 +352,7 @@ public class XWikiDocument implements DocumentModelBridge
         DocumentReferenceResolver.class, "current");
 
     /**
-     * Used to resolve a string into a proper Document Reference using the current document's reference to fill the
-     * blanks.
+     * Used to resolve a string into a proper Document Reference.
      */
     private DocumentReferenceResolver<String> explicitDocumentReferenceResolver = Utils.getComponent(
         DocumentReferenceResolver.class, "explicit");
@@ -5692,7 +5691,8 @@ public class XWikiDocument implements DocumentModelBridge
                         getDocumentReference().getLastSpaceReference().getName());
 
                 backlinkDocument.setContent((String) result.getModifiedContent());
-            } else {
+            } else if (Utils.getComponentManager().hasComponent(BlockRenderer.class,
+                backlinkDocument.getSyntax().toIdString())) {
                 backlinkDocument.refactorDocumentLinks(getDocumentReference(), newDocumentReference, context);
             }
 
@@ -5702,29 +5702,31 @@ public class XWikiDocument implements DocumentModelBridge
             xwiki.saveDocument(backlinkDocument, saveMessage, true, context);
         }
 
-        // Step 4: Refactor the links contained in the document
+        // Get new document
         XWikiDocument newDocument = xwiki.getDocument(newDocumentReference, context);
-        XDOM newDocumentXDOM = newDocument.getXDOM();
-        List<LinkBlock> linkBlockList = newDocumentXDOM.getChildrenByType(LinkBlock.class, true);
-        XWikiDocument currentContextDoc = context.getDoc();
+        
+        // Step 4: Refactor the links contained in the document
+        if (Utils.getComponentManager().hasComponent(BlockRenderer.class, getSyntax().toIdString())) {
+            // Only support syntax for which a renderer is provided
+            XDOM newDocumentXDOM = newDocument.getXDOM();
+            List<LinkBlock> linkBlockList = newDocumentXDOM.getChildrenByType(LinkBlock.class, true);
 
-        try {
             boolean modified = false;
             for (LinkBlock linkBlock : linkBlockList) {
                 ResourceReference linkReference = linkBlock.getReference();
                 if (linkReference.getType().equals(ResourceType.DOCUMENT)) {
-                    context.setDoc(this);
                     DocumentReference currentLinkReference =
-                        this.currentDocumentReferenceResolver.resolve(linkReference.getReference());
+                        this.explicitDocumentReferenceResolver.resolve(linkReference.getReference(),
+                            getDocumentReference());
 
-                    context.setDoc(newDocument);
                     DocumentReference newLinkReference =
-                        this.currentDocumentReferenceResolver.resolve(linkReference.getReference());
+                        this.explicitDocumentReferenceResolver.resolve(linkReference.getReference(),
+                            newDocument.getDocumentReference());
 
                     if (!newLinkReference.equals(currentLinkReference)) {
                         modified = true;
-                        linkReference.setReference(this.compactWikiEntityReferenceSerializer
-                            .serialize(currentLinkReference));
+                        linkReference.setReference(this.compactWikiEntityReferenceSerializer.serialize(
+                            currentLinkReference, newDocument.getDocumentReference()));
                     }
                 }
             }
@@ -5733,9 +5735,6 @@ public class XWikiDocument implements DocumentModelBridge
                 newDocument.setContent(newDocumentXDOM);
                 xwiki.saveDocument(newDocument, context);
             }
-        } finally {
-            // Restore original context
-            context.setDoc(currentContextDoc);
         }
 
         // Step 5: Delete the old document
@@ -5773,35 +5772,25 @@ public class XWikiDocument implements DocumentModelBridge
     private void refactorDocumentLinks(DocumentReference oldDocumentReference, DocumentReference newDocumentReference,
         XWikiContext context) throws XWikiException
     {
-        String contextWiki = context.getDatabase();
-        XWikiDocument contextDoc = context.getDoc();
+        XDOM xdom = getXDOM();
 
-        try {
-            context.setDatabase(getDocumentReference().getWikiReference().getName());
-            context.setDoc(this);
+        List<LinkBlock> linkBlockList = xdom.getChildrenByType(LinkBlock.class, true);
 
-            XDOM xdom = getXDOM();
+        for (LinkBlock linkBlock : linkBlockList) {
+            ResourceReference linkReference = linkBlock.getReference();
+            if (linkReference.getType().equals(ResourceType.DOCUMENT)) {
+                DocumentReference documentReference =
+                    this.explicitDocumentReferenceResolver
+                        .resolve(linkReference.getReference(), getDocumentReference());
 
-            List<LinkBlock> linkBlockList = xdom.getChildrenByType(LinkBlock.class, true);
-
-            for (LinkBlock linkBlock : linkBlockList) {
-                ResourceReference linkReference = linkBlock.getReference();
-                if (linkReference.getType().equals(ResourceType.DOCUMENT)) {
-                    DocumentReference documentReference =
-                        this.currentDocumentReferenceResolver.resolve(linkReference.getReference());
-
-                    if (documentReference.equals(oldDocumentReference)) {
-                        linkReference.setReference(this.compactEntityReferenceSerializer
-                            .serialize(newDocumentReference));
-                    }
+                if (documentReference.equals(oldDocumentReference)) {
+                    linkReference.setReference(this.compactEntityReferenceSerializer.serialize(newDocumentReference,
+                        getDocumentReference()));
                 }
             }
-
-            setContent(xdom);
-        } finally {
-            context.setDatabase(contextWiki);
-            context.setDoc(contextDoc);
         }
+
+        setContent(xdom);
     }
 
     /**

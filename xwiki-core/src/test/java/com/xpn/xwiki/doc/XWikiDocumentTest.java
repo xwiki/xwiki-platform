@@ -21,6 +21,7 @@ package com.xpn.xwiki.doc;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
@@ -949,6 +950,12 @@ public class XWikiDocumentTest extends AbstractBridgedXWikiComponentTestCase
         // "space.name" -means----> DOCWIKI+":"+input
         // "database:space.name" (no change)
 
+        DocumentReference sourceReference = new DocumentReference(this.document.getDocumentReference());
+    	this.document.setContent("[[pageinsamespace]]");
+    	this.document.setSyntax(Syntax.XWIKI_2_0);
+        DocumentReference targetReference = new DocumentReference("newwikiname", "newspace", "newpage");
+    	XWikiDocument targetDocument = this.document.duplicate(targetReference);
+
         DocumentReference reference1 = new DocumentReference(DOCWIKI, DOCSPACE, "Page1");
         XWikiDocument doc1 = new XWikiDocument(reference1);
         doc1.setContent("[[" + DOCWIKI + ":" + DOCSPACE + "." + DOCNAME + "]] [[someName>>" + DOCSPACE + "." + DOCNAME
@@ -975,6 +982,7 @@ public class XWikiDocumentTest extends AbstractBridgedXWikiComponentTestCase
         doc5.setParent(DOCWIKI + ":" + DOCSPACE + "." + DOCNAME);
 
         this.mockXWiki.stubs().method("copyDocument").will(returnValue(true));
+        this.mockXWiki.stubs().method("getDocument").with(eq(targetReference), ANYTHING).will(returnValue(targetDocument));
         this.mockXWiki.stubs().method("getDocument").with(eq(reference1), ANYTHING).will(returnValue(doc1));
         this.mockXWiki.stubs().method("getDocument").with(eq(reference2), ANYTHING).will(returnValue(doc2));
         this.mockXWiki.stubs().method("getDocument").with(eq(reference3), ANYTHING).will(returnValue(doc3));
@@ -983,11 +991,11 @@ public class XWikiDocumentTest extends AbstractBridgedXWikiComponentTestCase
         this.mockXWiki.stubs().method("saveDocument").isVoid();
         this.mockXWiki.stubs().method("deleteDocument").isVoid();
 
-        this.document.rename("newwikiname:newspace.newpage", Arrays.asList(DOCWIKI + ":" + DOCSPACE + ".Page1",
-            "newwikiname:" + DOCSPACE + ".Page2", "newwikiname:newspace.Page3"), Arrays.asList(DOCWIKI + ":" + DOCSPACE
-            + ".Page4", "newwikiname:newspace.Page5"), getContext());
+        this.document.rename(new DocumentReference("newwikiname", "newspace", "newpage"),
+            Arrays.asList(reference1, reference2, reference3), Arrays.asList(reference4, reference5), getContext());
 
         // Test links
+		assertEquals("[[Wiki:Space.pageinsamespace]]", this.document.getContent());
         assertEquals("[[newwikiname:newspace.newpage]] " + "[[someName>>newwikiname:newspace.newpage]] "
             + "[[newwikiname:newspace.newpage]]", doc1.getContent());
         assertEquals("[[newspace.newpage]]", doc2.getContent());
@@ -996,6 +1004,29 @@ public class XWikiDocumentTest extends AbstractBridgedXWikiComponentTestCase
         // Test parents
         assertEquals("newwikiname:newspace.newpage", doc4.getParent());
         assertEquals(new DocumentReference("newwikiname", "newspace", "newpage"), doc5.getParentReference());
+    }
+
+    /**
+     * Validate rename does not crash when the document has 1.0 syntax (it does not support everything but it does not crash).
+     */
+    public void testRename10() throws XWikiException
+    {
+        DocumentReference sourceReference = new DocumentReference(this.document.getDocumentReference());
+        this.document.setContent("[pageinsamespace]");
+        this.document.setSyntax(Syntax.XWIKI_1_0);
+        DocumentReference targetReference = new DocumentReference("newwikiname", "newspace", "newpage");
+        XWikiDocument targetDocument = this.document.duplicate(targetReference);
+
+        this.mockXWiki.stubs().method("copyDocument").will(returnValue(true));
+        this.mockXWiki.stubs().method("getDocument").with(eq(targetReference), ANYTHING).will(returnValue(targetDocument));
+        this.mockXWiki.stubs().method("saveDocument").isVoid();
+        this.mockXWiki.stubs().method("deleteDocument").isVoid();
+
+        this.document.rename(new DocumentReference("newwikiname", "newspace", "newpage"), Collections.<DocumentReference>emptyList(),
+            Collections.<DocumentReference>emptyList(), getContext());
+
+        // Test links
+        assertEquals("[pageinsamespace]", this.document.getContent());
     }
 
     /**

@@ -222,7 +222,7 @@ public class XMLScriptService implements ScriptService
      * 
      * @return an empty DOM Document
      */
-    public Document getDomDocument()
+    public Document createDOMDocument()
     {
         try {
             return DocumentBuilderFactory.newInstance().newDocumentBuilder().newDocument();

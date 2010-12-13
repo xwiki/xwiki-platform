@@ -196,7 +196,7 @@ public class XMLScriptServiceTest extends AbstractComponentTestCase
     public void testGetDomDocument()
     {
         // Nothing much that we can test here...
-        Assert.assertNotNull(this.xml.getDomDocument());
+        Assert.assertNotNull(this.xml.createDOMDocument());
     }
 
     @Test
@@ -496,7 +496,7 @@ public class XMLScriptServiceTest extends AbstractComponentTestCase
 
     private Document createSimpleDocument()
     {
-        Document d = this.xml.getDomDocument();
+        Document d = this.xml.createDOMDocument();
         Element a = d.createElement("a");
         a.setTextContent("\u00E9");
         d.appendChild(a);

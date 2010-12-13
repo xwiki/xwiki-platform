@@ -90,7 +90,7 @@ public class TempResourceActionTest extends AbstractBridgedComponentTestCase
     @Test
     public void testGetTemporaryFileForBadURI()
     {
-        Assert.assertNull(action.getTemporaryFile("/xwiki/bin/temp/Space/Page/image.png", getContext()));
+        Assert.assertNull(action.getTemporaryFile("/xwiki/bin/temp/secret.txt", getContext()));
     }
 
     /**
@@ -100,7 +100,7 @@ public class TempResourceActionTest extends AbstractBridgedComponentTestCase
     @Test
     public void testGetTemporaryFileForRelativeURI()
     {
-        Assert.assertNull(action.getTemporaryFile("/xwiki/bin/temp/../../secret/file.xml", getContext()));
+        Assert.assertNull(action.getTemporaryFile("/xwiki/bin/temp/../../module/secret.txt", getContext()));
     }
 
     /**

@@ -70,7 +70,7 @@ public final class XMLUtils
     }
 
     /**
-     * XML content does not support some characters inside its content but there is no official escaping/unescaping for
+     * XML comment does not support some characters inside its content but there is no official escaping/unescaping for
      * it so we made our own.
      * <p>
      * <ul>
@@ -108,7 +108,7 @@ public final class XMLUtils
     }
 
     /**
-     * XML content does not support some characters inside its content but there is no official escaping/unescaping for
+     * XML comment does not support some characters inside its content but there is no official escaping/unescaping for
      * it so we made our own.
      * 
      * @param content the XML comment content to unescape

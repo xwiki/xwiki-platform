@@ -19,6 +19,9 @@
  */
 package org.xwiki.rendering.internal.scripting;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.Requirement;
 import org.xwiki.component.manager.ComponentLookupException;
@@ -27,9 +30,6 @@ import org.xwiki.rendering.parser.Parser;
 import org.xwiki.rendering.renderer.PrintRendererFactory;
 import org.xwiki.rendering.syntax.Syntax;
 import org.xwiki.script.service.ScriptService;
-
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * Provides Rendering-specific Scripting APIs.

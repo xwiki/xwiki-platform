@@ -23,6 +23,8 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.FilenameFilter;
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
@@ -289,12 +291,24 @@ public class DefaultLocalExtensionRepository extends AbstractLogEnabled implemen
 
     private File getFile(String id, String version, String type)
     {
-        return new File(getRootFolder(), id + "-" + version + "." + type);
+        return new File(getRootFolder(), getFileName(id, version, type));
     }
 
     private File getDescriptorFile(String id, String version)
     {
-        return new File(getRootFolder(), id + "-" + version + ".xed");
+        return new File(getRootFolder(), getFileName(id, version, "xed"));
+    }
+
+    private String getFileName(String id, String version, String extension)
+    {
+    	String fileName = id + "-" + version + "." + extension;
+    	try {
+			return URLEncoder.encode(fileName, "UTF-8");
+		} catch (UnsupportedEncodingException e) {
+			// Should never happen
+
+			return fileName;
+		}
     }
 
     private void addElement(Document document, Element parentElement, String elementName, String elementValue)

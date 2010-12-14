@@ -75,6 +75,9 @@ viewers.Attachments = Class.create({
   },
   /** Enhance the upload form with JS behaviors. */
   prepareForm : function() {
+    if (!$("attachform")) {
+      return;
+    }
     this.form = $("attachform").up("form");
     this.defaultFileDiv = this.form.down("input[type='file']").up("div");
     this.inputSize = this.form.down("input[type='file']").size;

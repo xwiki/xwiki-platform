@@ -60,7 +60,14 @@
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-core-model</artifactId>
       <version>${project.version}</version>
-    </dependency>   
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-core-bridge</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    
+    <!-- Test dependencies -->
     <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-core-rendering-transformation-macro</artifactId>

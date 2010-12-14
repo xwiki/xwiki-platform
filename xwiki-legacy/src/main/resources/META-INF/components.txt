@@ -1,1 +1,1 @@
-org.xwiki.observation.LegacyEventDispatcher
+org.xwiki.legacy.internal.LegacyEventDispatcher

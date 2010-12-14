@@ -26,7 +26,7 @@ import org.xwiki.observation.event.filter.EventFilter;
  * An event triggered when a document is deleted.
  * 
  * @version $Id$
- * @deprecated use {@link org.xwiki.bridge.event.DocumentDeletedEvent} instead
+ * @deprecated since 2.7RC1 use {@link org.xwiki.bridge.event.DocumentDeletedEvent} instead
  */
 @Deprecated
 public class DocumentDeleteEvent extends AbstractDocumentEvent

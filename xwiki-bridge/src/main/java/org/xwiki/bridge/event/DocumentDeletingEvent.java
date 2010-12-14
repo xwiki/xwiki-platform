@@ -20,13 +20,13 @@
 package org.xwiki.bridge.event;
 
 import org.xwiki.model.reference.DocumentReference;
-import org.xwiki.model.event.AbstractDocumentEvent;
 import org.xwiki.observation.event.filter.EventFilter;
 
 /**
  * An event triggered before a document is deleted.
  * 
  * @version $Id$
+ * @since 2.7RC1
  */
 public class DocumentDeletingEvent extends AbstractDocumentEvent
 {

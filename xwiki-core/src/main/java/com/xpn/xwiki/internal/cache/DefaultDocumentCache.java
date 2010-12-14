@@ -24,6 +24,7 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 
+import org.xwiki.bridge.event.AbstractDocumentEvent;
 import org.xwiki.bridge.event.DocumentCreatedEvent;
 import org.xwiki.bridge.event.DocumentDeletedEvent;
 import org.xwiki.bridge.event.DocumentUpdatedEvent;
@@ -39,7 +40,6 @@ import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.observation.EventListener;
 import org.xwiki.observation.ObservationManager;
-import org.xwiki.model.event.AbstractDocumentEvent;
 import org.xwiki.observation.event.Event;
 
 /**

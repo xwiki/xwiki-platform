@@ -18,7 +18,7 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  *
  */
-package org.xwiki.observation;
+package org.xwiki.legacy.internal;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -31,6 +31,8 @@ import org.xwiki.component.annotation.Requirement;
 import org.xwiki.component.logging.AbstractLogEnabled;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
+import org.xwiki.observation.EventListener;
+import org.xwiki.observation.ObservationManager;
 import org.xwiki.observation.event.DocumentDeleteEvent;
 import org.xwiki.observation.event.DocumentSaveEvent;
 import org.xwiki.observation.event.DocumentUpdateEvent;
@@ -86,11 +88,14 @@ public class LegacyEventDispatcher extends AbstractLogEnabled implements EventLi
     public void onEvent(Event event, Object source, Object data)
     {
         if (event instanceof DocumentDeletedEvent) {
-            this.getObservationManager().notify(new DocumentDeleteEvent(), source, data);
+            this.getObservationManager().notify(
+                new DocumentDeleteEvent(((DocumentDeletedEvent) event).getEventFilter()), source, data);
         } else if (event instanceof DocumentCreatedEvent) {
-            this.getObservationManager().notify(new DocumentSaveEvent(), source, data);
+            this.getObservationManager().notify(new DocumentSaveEvent(((DocumentCreatedEvent) event).getEventFilter()),
+                source, data);
         } else if (event instanceof DocumentUpdatedEvent) {
-            this.getObservationManager().notify(new DocumentUpdateEvent(), source, data);
+            this.getObservationManager().notify(
+                new DocumentUpdateEvent(((DocumentUpdatedEvent) event).getEventFilter()), source, data);
         }
     }
 

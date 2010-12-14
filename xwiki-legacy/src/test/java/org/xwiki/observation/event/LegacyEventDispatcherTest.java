@@ -17,7 +17,7 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.observation;
+package org.xwiki.observation.event;
 
 import java.util.Collections;
 import java.util.List;
@@ -29,54 +29,63 @@ import org.junit.Test;
 import org.xwiki.bridge.event.DocumentCreatedEvent;
 import org.xwiki.bridge.event.DocumentDeletedEvent;
 import org.xwiki.bridge.event.DocumentUpdatedEvent;
+import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.observation.EventListener;
+import org.xwiki.observation.ObservationManager;
 import org.xwiki.observation.event.DocumentDeleteEvent;
 import org.xwiki.observation.event.DocumentSaveEvent;
 import org.xwiki.observation.event.DocumentUpdateEvent;
 import org.xwiki.observation.event.Event;
+import org.xwiki.observation.event.filter.EventFilter;
+import org.xwiki.observation.event.filter.FixedNameEventFilter;
 import org.xwiki.test.AbstractComponentTestCase;
 
 public class LegacyEventDispatcherTest extends AbstractComponentTestCase
 {
-
-    private boolean hasBeenNotified;
+    private Event receivedEvent;
 
     private ObservationManager om;
 
     @Before
     public void setUp() throws Exception
     {
-        this.hasBeenNotified = false;
-        this.om = this.getComponentManager().lookup(ObservationManager.class);
+        this.om = getComponentManager().lookup(ObservationManager.class);
     }
 
     @Test
     public void testLegacyDocumentDeleteEventGetsDispatched() throws Exception
     {
         this.registerListenerWithLegacyEvent(new DocumentDeleteEvent());
-        om.notify(new DocumentDeletedEvent(), new Object());
+        this.om.notify(new DocumentDeletedEvent(new DocumentReference("wiki", "space", "name")), new Object());
+        
         // The notification is synchronous, so the following assertion will only be tested
         // once all matching event listeners have been notified.
-        Assert.assertTrue("Should have been notified by legacy event dispatcher", this.hasBeenNotified);
+        Assert.assertNotNull("Should have been notified by legacy event dispatcher", this.receivedEvent);
+        Assert.assertEquals("Wrong event filter", "wiki:space.name", ((EventFilter)((FilterableEvent)this.receivedEvent).getEventFilter()).getFilter());
     }
 
     @Test
     public void testLegacyDocumentSaveEventGetsDispatched() throws Exception
     {
         this.registerListenerWithLegacyEvent(new DocumentSaveEvent());
-        om.notify(new DocumentCreatedEvent(), new Object());
+        this.om.notify(new DocumentCreatedEvent(new DocumentReference("wiki", "space", "name")), new Object());
+        
         // The notification is synchronous, so the following assertion will only be tested
         // once all matching event listeners have been notified.
-        Assert.assertTrue("Should have been notified by legacy event dispatcher", this.hasBeenNotified);
+        Assert.assertNotNull("Should have been notified by legacy event dispatcher", this.receivedEvent);
+        Assert.assertEquals("Wrong event filter", "wiki:space.name", ((EventFilter)((FilterableEvent)this.receivedEvent).getEventFilter()).getFilter());
     }
 
     @Test
     public void testLegacyDocumentUpdateEventGetsDispatched() throws Exception
     {
         this.registerListenerWithLegacyEvent(new DocumentUpdateEvent());
-        om.notify(new DocumentUpdatedEvent(), new Object());
+        this.om.notify(new DocumentUpdatedEvent(new DocumentReference("wiki", "space", "name")), new Object());
+
         // The notification is synchronous, so the following assertion will only be tested
         // once all matching event listeners have been notified.
-        Assert.assertTrue("Should have been notified by legacy event dispatcher", this.hasBeenNotified);
+        Assert.assertNotNull("Should have been notified by legacy event dispatcher", this.receivedEvent);
+        Assert.assertEquals("Wrong event filter", "wiki:space.name", ((EventFilter)((FilterableEvent)this.receivedEvent).getEventFilter()).getFilter());
     }
 
     private void registerListenerWithLegacyEvent(final Event event)
@@ -95,14 +104,8 @@ public class LegacyEventDispatcherTest extends AbstractComponentTestCase
 
             public void onEvent(Event event, Object source, Object data)
             {
-                setNotified();
+                receivedEvent = event;
             }
-
         });
-    }
-
-    private void setNotified()
-    {
-        this.hasBeenNotified = true;
     }
 }

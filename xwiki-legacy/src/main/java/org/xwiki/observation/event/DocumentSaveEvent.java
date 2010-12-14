@@ -26,7 +26,7 @@ import org.xwiki.observation.event.filter.EventFilter;
  * An event triggered when a document is saved for the first time (a new document is created).
  * 
  * @version $Id$
- * @deprecated use {@link org.xwiki.bridge.event.DocumentCreatedEvent} instead
+ * @deprecated since 2.7RC1 use {@link org.xwiki.bridge.event.DocumentCreatedEvent} instead
  */
 @Deprecated
 public class DocumentSaveEvent extends AbstractDocumentEvent

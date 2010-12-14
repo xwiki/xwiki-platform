@@ -17,18 +17,18 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.model.event;
+package org.xwiki.bridge.event;
 
 import org.xwiki.model.internal.reference.DefaultStringEntityReferenceSerializer;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.observation.event.AbstractFilterableEvent;
-import org.xwiki.observation.event.Event;
 import org.xwiki.observation.event.filter.EventFilter;
 
 /**
- * Base class for all document {@link Event events}.
+ * Base class for all document related {@link org.xwiki.observation.event.Event}.
  * 
  * @version $Id$
+ * @since 2.7RC1
  */
 public abstract class AbstractDocumentEvent extends AbstractFilterableEvent
 {
@@ -39,11 +39,17 @@ public abstract class AbstractDocumentEvent extends AbstractFilterableEvent
     private static final long serialVersionUID = 1L;
 
     /**
+     * Used to serialize document name.
+     */
+    private static final DefaultStringEntityReferenceSerializer SERIALIZER =
+        new DefaultStringEntityReferenceSerializer();
+
+    /**
      * This event will match any other document event of the same type.
      */
     public AbstractDocumentEvent()
     {
-        super(); 
+        super();
     }
 
     /**
@@ -53,9 +59,9 @@ public abstract class AbstractDocumentEvent extends AbstractFilterableEvent
      */
     public AbstractDocumentEvent(DocumentReference documentReference)
     {
-        super(new DefaultStringEntityReferenceSerializer().serialize(documentReference));
+        super(SERIALIZER.serialize(documentReference));
     }
-    
+
     /**
      * Constructor using a custom {@link EventFilter}.
      * 

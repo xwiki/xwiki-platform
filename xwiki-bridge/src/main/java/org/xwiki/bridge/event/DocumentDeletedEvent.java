@@ -20,13 +20,13 @@
 package org.xwiki.bridge.event;
 
 import org.xwiki.model.reference.DocumentReference;
-import org.xwiki.model.event.AbstractDocumentEvent;
 import org.xwiki.observation.event.filter.EventFilter;
 
 /**
  * An event triggered after a document is deleted.
  * 
  * @version $Id$
+ * @since 2.7RC1
  */
 public class DocumentDeletedEvent extends AbstractDocumentEvent
 {
@@ -43,7 +43,7 @@ public class DocumentDeletedEvent extends AbstractDocumentEvent
      */
     public DocumentDeletedEvent()
     {
-        super();
+        
     }
     
     /**

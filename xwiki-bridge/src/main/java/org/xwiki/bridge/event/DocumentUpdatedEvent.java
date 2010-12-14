@@ -20,13 +20,13 @@
 package org.xwiki.bridge.event;
 
 import org.xwiki.model.reference.DocumentReference;
-import org.xwiki.model.event.AbstractDocumentEvent;
 import org.xwiki.observation.event.filter.EventFilter;
 
 /**
  * An event triggered after a document is updated.
  * 
  * @version $Id$
+ * @since 2.7RC1
  */
 public class DocumentUpdatedEvent extends AbstractDocumentEvent
 {

@@ -20,13 +20,13 @@
 package org.xwiki.bridge.event;
 
 import org.xwiki.model.reference.DocumentReference;
-import org.xwiki.model.event.AbstractDocumentEvent;
 import org.xwiki.observation.event.filter.EventFilter;
 
 /**
  * An event triggered before a document is updated.
  * 
  * @version $Id$
+ * @since 2.7RC1
  */
 public class DocumentUpdatingEvent extends AbstractDocumentEvent
 {
@@ -35,7 +35,7 @@ public class DocumentUpdatingEvent extends AbstractDocumentEvent
      * changes.
      */
     private static final long serialVersionUID = 1L;
-    
+
     /**
      * Constructor initializing the event filter with an
      * {@link org.xwiki.observation.event.filter.AlwaysMatchingEventFilter}, meaning that this event will match any

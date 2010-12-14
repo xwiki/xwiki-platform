@@ -18,6 +18,7 @@ onWord [(((732)))(((8364)))]
 endParagraph [[param1]=[val(((252)))e]]
 endDocument
 .#-----------------------------------------------------
-.expect|xhtml/1.0
+.expect|xhtml/1.0|skip
+.# TODO: Re-enable this test once we reach a decision about non-ASCII characters
 .#-----------------------------------------------------
 <p>&nbsp;&#732;&#8364;</p><p param1="val&#252;e">&nbsp;&#732;&#8364;</p>

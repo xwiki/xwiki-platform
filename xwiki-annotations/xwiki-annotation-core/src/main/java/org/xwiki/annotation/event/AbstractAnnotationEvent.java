@@ -20,7 +20,7 @@
  */
 package org.xwiki.annotation.event;
 
-import org.xwiki.model.event.AbstractDocumentEvent;
+import org.xwiki.bridge.event.AbstractDocumentEvent;
 import org.xwiki.observation.event.filter.EventFilter;
 import org.xwiki.observation.event.filter.FixedNameEventFilter;
 

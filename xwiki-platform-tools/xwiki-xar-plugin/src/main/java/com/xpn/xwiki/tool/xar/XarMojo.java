@@ -20,8 +20,9 @@
 package com.xpn.xwiki.tool.xar;
 
 import java.io.File;
-import java.io.FileWriter;
+import java.io.FileOutputStream;
 import java.io.FilenameFilter;
+import java.io.OutputStream;
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.Queue;
@@ -141,11 +142,11 @@ public class XarMojo extends AbstractXarMojo
 
         OutputFormat outputFormat = new OutputFormat("", true);
         outputFormat.setEncoding(this.encoding);
-        FileWriter fw = new FileWriter(packageFile);
-        XMLWriter writer = new XMLWriter(fw, outputFormat);
+        OutputStream out = new FileOutputStream(packageFile);
+        XMLWriter writer = new XMLWriter(out, outputFormat);
         writer.write(toXML(files));
         writer.close();
-        fw.close();
+        out.close();
     }
 
     /**

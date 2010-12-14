@@ -28,6 +28,7 @@ import java.util.List;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
+import org.apache.commons.io.FileUtils;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.ComponentAnnotationLoader;
 import org.xwiki.component.annotation.ComponentDescriptorFactory;
@@ -71,7 +72,7 @@ public class JarExtensionHandler extends AbstractExtensionHandler implements Ini
     {
         // 1) load jar into classloader
         try {
-            this.jarExtensionClassLoader.getURLClassLoader().addURL(localExtension.getFile().toURL());
+            this.jarExtensionClassLoader.getURLClassLoader().addURL(localExtension.getFile().toURI().toURL());
         } catch (MalformedURLException e) {
             throw new InstallException("Failed to load jar file", e);
         }

@@ -73,7 +73,7 @@ public class DefaultExtensionManagerTest extends AbstractComponentTestCase
         this.repositoryManager.addRepository(new ExtensionRepositoryId("central", "maven", new URI(
             "http://repo1.maven.org/maven2/")));
 
-        this.rubyArtifactId = new ExtensionId("org.xwiki.platform:xwiki-core-rendering-macro-ruby", "2.4");
+        this.rubyArtifactId = new ExtensionId("org.xwiki.platform:xwiki-core-rendering-macro-ruby", "2.6");
 
         this.extensionManager = getComponentManager().lookup(ExtensionManager.class);
         this.coreExtensionRepository =

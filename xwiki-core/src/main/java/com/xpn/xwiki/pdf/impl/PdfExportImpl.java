@@ -460,7 +460,7 @@ public class PdfExportImpl implements PdfExport
             document.setDefaultStyleSheet(new DOM4JCSSStyleSheet(null, null, null));
             document.addStyleSheet(new org.w3c.css.sac.InputSource(new StringReader(css)));
             applyInlineStyle(document.getRootElement());
-            OutputFormat outputFormat = new OutputFormat("", true);
+            OutputFormat outputFormat = new OutputFormat("", false);
             if ((context == null) || (context.getWiki() == null)) {
                 outputFormat.setEncoding("UTF-8");
             } else {

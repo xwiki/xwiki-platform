@@ -32,7 +32,7 @@ import org.xwiki.gwt.wysiwyg.client.plugin.internal.FocusWidgetUIExtension;
 import org.xwiki.gwt.wysiwyg.client.plugin.style.exec.BlockStyleNameExecutable;
 import org.xwiki.gwt.wysiwyg.client.plugin.style.exec.InlineStyleNameExecutable;
 
-import com.google.gwt.dom.client.NodeList;
+import com.google.gwt.dom.client.Node;
 import com.google.gwt.dom.client.OptGroupElement;
 import com.google.gwt.dom.client.OptionElement;
 import com.google.gwt.dom.client.SelectElement;
@@ -69,9 +69,14 @@ public class StylePlugin extends AbstractStatefulPlugin implements ChangeHandler
     private ListBox styleNamePicker;
 
     /**
-     * We keep a reference to the in-line style group to be able to distinguish between in-line and block styles.
+     * The group of in-line style names.
      */
     private OptGroupElement inlineStyleGroup;
+
+    /**
+     * The group of block style names.
+     */
+    private OptGroupElement blockStyleGroup;
 
     /**
      * User interface extension for the editor tool bar.
@@ -110,7 +115,7 @@ public class StylePlugin extends AbstractStatefulPlugin implements ChangeHandler
         styleNamePicker.addItem(Strings.INSTANCE.stylePickerLabel(), "");
         saveRegistration(styleNamePicker.addChangeHandler(this));
 
-        OptGroupElement blockStyleGroup = styleNamePicker.getElement().getOwnerDocument().createOptGroupElement();
+        blockStyleGroup = styleNamePicker.getElement().getOwnerDocument().createOptGroupElement();
         blockStyleGroup.setLabel(Strings.INSTANCE.styleBlockGroupLabel());
         styleNamePicker.getElement().appendChild(blockStyleGroup);
 
@@ -185,20 +190,30 @@ public class StylePlugin extends AbstractStatefulPlugin implements ChangeHandler
     public void update()
     {
         if (styleNamePicker.isEnabled()) {
-            String inlineStyleNames = getTextArea().getCommandManager().getStringValue(INLINE_STYLE_NAME);
-            String blockStyleNames = getTextArea().getCommandManager().getStringValue(BLOCK_STYLE_NAME);
-            String mixedStyleNames = (inlineStyleNames + " " + blockStyleNames).trim();
-            Set<String> appliedStyleNames = new HashSet<String>(Arrays.asList(mixedStyleNames.split("\\s+")));
-            NodeList<OptionElement> options = SelectElement.as(styleNamePicker.getElement()).getOptions();
-            // Skip the first option because it is used as the label of the style name picker.
-            for (int i = 1; i < options.getLength(); i++) {
-                OptionElement option = options.getItem(i);
-                if (appliedStyleNames.contains(option.getValue())) {
-                    option.addClassName(SELECTED);
-                } else {
-                    option.removeClassName(SELECTED);
-                }
+            update(blockStyleGroup, BLOCK_STYLE_NAME);
+            update(inlineStyleGroup, INLINE_STYLE_NAME);
+        }
+    }
+
+    /**
+     * Updates the selected state of all the options in the specified group.
+     * 
+     * @param group a group of style name options
+     * @param styleNameCommand the command used to retrieve the list of applied style names
+     */
+    private void update(OptGroupElement group, Command styleNameCommand)
+    {
+        String appliedStyleNames = getTextArea().getCommandManager().getStringValue(styleNameCommand);
+        Set<String> styleNames = new HashSet<String>(Arrays.asList(appliedStyleNames.split("\\s+")));
+        Node child = group.getFirstChild();
+        while (child != null) {
+            OptionElement option = (OptionElement) child;
+            if (styleNames.contains(option.getValue())) {
+                option.addClassName(SELECTED);
+            } else {
+                option.removeClassName(SELECTED);
             }
+            child = child.getNextSibling();
         }
     }
 }

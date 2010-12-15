@@ -287,10 +287,10 @@
 </property>
 </object>
 <content>{{velocity}}
-$doc.use("IRC.IRCBotlet")
-$doc.getValue("description")
+$doc.use('IRC.IRCBotlet')
+$doc.getValue('description')
 
-Usage: $doc.getValue("usage")
+Usage: $doc.getValue('usage')
 {{/velocity}}
 
 = Status =
@@ -420,11 +420,11 @@ println "&lt;/form&gt;{{/html}}"
 = Botlet parameters =
 
 {{velocity}}
-#set ($ircconfigdoc = $xwiki.getDocument("IRC.IRCConfig"))
+#set ($ircconfigdoc = $xwiki.getDocument('IRC.IRCConfig'))
 $ircconfigdoc.use($doc.fullName)
-* JIRA URL: $ircconfigdoc.getValue("jiraURL")
-* JIRA Username: $ircconfigdoc.getValue("jiraUsername")
-* JIRA Pattern: $ircconfigdoc.getValue("jiraPattern")
+* JIRA URL: $ircconfigdoc.getValue('jiraURL')
+* JIRA Username: $ircconfigdoc.getValue('jiraUsername')
+* JIRA Pattern: $ircconfigdoc.getValue('jiraPattern')
 {{/velocity}}
 
 To modify the configuration, go to the [[IRC Configuration page&gt;&gt;IRC.IRCConfig]].

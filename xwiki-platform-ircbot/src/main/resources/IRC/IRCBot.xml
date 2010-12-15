@@ -184,11 +184,10 @@
 {{velocity}}
 #foreach($item in $xwiki.searchDocuments(", BaseObject as obj where obj.name=doc.fullName and obj.className='IRC.IRCBotlet' order by doc.name"))
   #set ($itemDoc = $xwiki.getDocument($item))
-  $itemDoc.use("IRC.IRCBotlet")
-  * [[$item]]: $itemDoc.getValue("description")
+  $itemDoc.use('IRC.IRCBotlet')##
+  * [[$item]]: $itemDoc.getValue('description')
 #end
 {{/velocity}}
-
 
 = Status =
 
@@ -542,11 +541,11 @@ println "&lt;/form&gt;{{/html}}"
 {{velocity}}
 #set ($ircconfigdoc = $xwiki.getDocument("IRC.IRCConfig"))
 $ircconfigdoc.use($doc.fullName)
-* Server: $ircconfigdoc.getValue("server")
-* Channel: $ircconfigdoc.getValue("channel")
-* Bot name: $ircconfigdoc.getValue("botname")
+* Server: $ircconfigdoc.getValue('server')
+* Channel: $ircconfigdoc.getValue('channel')
+* Bot name: $ircconfigdoc.getValue('botname')
 * Validation script for events: (((
-{{code language="groovy"}}$ircconfigdoc.getValue("validation"){{/code}}
+{{code language="groovy"}}$ircconfigdoc.getValue('validation'){{/code}}
 )))
 {{/velocity}}
 

@@ -63,13 +63,10 @@
 <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
 </content>
 </class>
-−
-<content>
-{{velocity filter="none"}}
-#set($defaultparent = "IRC.WebHome")
-#set($defaultweb = "IRC")
+<content>{{velocity output="false"}}
+#set ($defaultparent = 'IRC.WebHome')
+#set ($defaultweb = 'IRC')
 {{/velocity}}
 
-{{include document="XWiki.ClassSheet"/}}
-</content>
+{{include document="XWiki.ClassSheet"/}}</content>
 </xwikidoc>

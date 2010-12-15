@@ -31,15 +31,15 @@
 Here are the IRC logs archived by the XWiki IRC Bot:
 
 {{velocity}}
-#set($columns = ["doc.date", "channel", "doc.name"])
-#set($columnsProperties = {
-    "channel" : { "type" : "text" , "size" : 20, "link" : "view"}
+#set ($columns = ['doc.date', 'channel', 'doc.name'])
+#set ($columnsProperties = {
+  'channel' : { 'type' : 'text', 'size' : 20, 'link' : 'view'}
 })
-#set($options = {
-   "className":"IRC.IRCArchiveClass",
-   "translationPrefix" : "irc.",
-   "rowCount": 10
+#set ($options = {
+  'className': 'IRC.IRCArchiveClass',
+  'translationPrefix': 'irc.',
+  'rowCount': 10
 })
-#livetable("ircarchives" $columns $columnsProperties $options)
+#livetable('ircarchives' $columns $columnsProperties $options)
 {{/velocity}}
 </content></xwikidoc>

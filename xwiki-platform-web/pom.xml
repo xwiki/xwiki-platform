@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki</artifactId>
-    <version>38-SNAPSHOT</version>
+    <version>39-SNAPSHOT</version>
     <relativePath>../pom</relativePath>
   </parent>
   <groupId>com.xpn.xwiki.platform</groupId>
@@ -53,7 +53,7 @@
     <platform.core.version>${project.version}</platform.core.version>
     <platform.skin.albatross.version>1.31-SNAPSHOT</platform.skin.albatross.version>
     <platform.skin.toucan.version>1.38-SNAPSHOT</platform.skin.toucan.version>
-    <platform.skin.colibri.version>1.27-SNAPSHOT</platform.skin.colibri.version>
+    <platform.skin.colibri.version>1.28-SNAPSHOT</platform.skin.colibri.version>
   </properties>
   <profiles>
     <profile>

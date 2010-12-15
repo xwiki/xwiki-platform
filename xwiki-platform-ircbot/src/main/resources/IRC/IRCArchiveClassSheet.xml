@@ -20,12 +20,10 @@
 <validationScript></validationScript>
 <comment></comment>
 <minorEdit>false</minorEdit>
-<syntaxId>xwiki/1.0</syntaxId>
+<syntaxId>xwiki/2.0</syntaxId>
 <hidden>false</hidden>
-<content>$doc.use("IRC.IRCArchiveClass")
-{pre}
-&lt;pre&gt;
-$xwiki.getXMLEncoded($doc.display("content"))
-&lt;/pre&gt;
-{/pre}</content>
-</xwikidoc>
+<content>{{velocity filter="none"}}
+{{code language="irc"}}
+$doc.getObject('IRC.IRCArchiveClass').getProperty('content').getValue()
+{{/code}}
+{{/velocity}}</content></xwikidoc>

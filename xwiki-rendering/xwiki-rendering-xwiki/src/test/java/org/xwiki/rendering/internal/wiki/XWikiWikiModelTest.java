@@ -55,8 +55,8 @@ public class XWikiWikiModelTest extends AbstractMockingComponentTestCase
     @Test
     public void testGetDocumentEditURLWhenNoQueryStringSpecified() throws Exception
     {
-        final EntityReferenceSerializer< ? > entityReferenceSerializer =
-            getComponentManager().lookup(EntityReferenceSerializer.class);
+        final EntityReferenceSerializer< ? > compactEntityReferenceSerializer =
+            getComponentManager().lookup(EntityReferenceSerializer.class, "compactwiki");
         final DocumentAccessBridge documentAccessBridge = getComponentManager().lookup(DocumentAccessBridge.class);
         final DocumentReference documentReference = new DocumentReference("wiki", "Space", "Page");
         getMockery().checking(new Expectations()
@@ -64,7 +64,7 @@ public class XWikiWikiModelTest extends AbstractMockingComponentTestCase
             {
                 oneOf(documentAccessBridge).getCurrentDocumentReference();
                 will(returnValue(documentReference));
-                oneOf(entityReferenceSerializer).serialize(documentReference);
+                oneOf(compactEntityReferenceSerializer).serialize(documentReference);
                 will(returnValue("wiki:Space.Page\u20AC"));
 
                 // The test is here: we verify that getURL is called with the query string already encoded since

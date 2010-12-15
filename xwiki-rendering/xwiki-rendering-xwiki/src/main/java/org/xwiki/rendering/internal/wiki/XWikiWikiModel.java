@@ -90,8 +90,8 @@ public class XWikiWikiModel implements WikiModel
     /**
      * The component used to serialize entity references to strings.
      */
-    @Requirement
-    private EntityReferenceSerializer<String> entityReferenceSerializer;
+    @Requirement("compactwiki")
+    private EntityReferenceSerializer<String> compactEntityReferenceSerializer;
 
     /**
      * Convert an Attachment Reference from a String into an Attachment object.
@@ -200,17 +200,24 @@ public class XWikiWikiModel implements WikiModel
             DocumentReference reference = this.documentAccessBridge.getCurrentDocumentReference();
             if (reference != null) {
                 try {
-                    // Note: we encode using UTF8 since it's the W3C recommendation.
+                    // Note 1: we encode using UTF8 since it's the W3C recommendation.
                     // See http://www.w3.org/TR/html40/appendix/notes.html#non-ascii-chars
+
+                    // Note 2: We need to be careful to use a compact serializer so that the wiki part is not
+                    // part of the generated String so that when the user clicks on the link, the new page is created
+                    // with a relative parent (and thus the new page can be moved from one wiki to another easily
+                    // without having to change the parent reference).
+
                     // TODO: Once the xwiki-url module is usable, refactor this code to use it and remove the need to
                     // perform explicit encoding here.
-                    modifiedQueryString =
-                        "parent=" + URLEncoder.encode(this.entityReferenceSerializer.serialize(reference), "UTF-8");
+
+                    modifiedQueryString = "parent=" + URLEncoder.encode(
+                        this.compactEntityReferenceSerializer.serialize(reference), "UTF-8");
                 } catch (UnsupportedEncodingException e) {
                     // Not supporting UTF-8 as a valid encoding for some reasons. We consider XWiki cannot work
                     // without that encoding.
                     throw new RuntimeException("Failed to URL encode ["
-                        + this.entityReferenceSerializer.serialize(reference) + "] using UTF-8.", e);
+                        + this.compactEntityReferenceSerializer.serialize(reference) + "] using UTF-8.", e);
                 }
             }
         }

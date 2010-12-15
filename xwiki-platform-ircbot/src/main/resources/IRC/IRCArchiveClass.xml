@@ -20,7 +20,7 @@
 <validationScript></validationScript>
 <comment></comment>
 <minorEdit>false</minorEdit>
-<syntaxId>xwiki/1.0</syntaxId>
+<syntaxId>xwiki/2.0</syntaxId>
 <hidden>false</hidden>
 <class>
 <name>IRC.IRCArchiveClass</name>
@@ -63,7 +63,13 @@
 <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
 </content>
 </class>
-<content>#set($defaultparent = "IRC.WebHome")
+−
+<content>
+{{velocity filter="none"}}
+#set($defaultparent = "IRC.WebHome")
 #set($defaultweb = "IRC")
-#includeForm("XWiki.ClassSheet")</content>
+{{/velocity}}
+
+{{include document="XWiki.ClassSheet"/}}
+</content>
 </xwikidoc>

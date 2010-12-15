@@ -37,6 +37,7 @@ Here are the IRC logs archived by the XWiki IRC Bot:
 })
 #set($options = {
    "className":"IRC.IRCArchiveClass",
+   "translationPrefix" : "irc.",
    "rowCount": 10
 })
 #livetable("ircarchives" $columns $columnsProperties $options)

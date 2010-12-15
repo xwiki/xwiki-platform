@@ -188,7 +188,7 @@
   * [[$item]]: $itemDoc.getValue("description")
 #end
 {{/velocity}}
-)))
+
 
 = Status =
 
@@ -258,8 +258,14 @@ class IRCBot extends PircBot
     {
         initExecutionContext()
         def date = xwiki.formatDate(new Date(), "HH:mm", context)
-        log(channel, "${sender} - (${date}): ${message}\n")
-
+        def User[] pircUsers = this.getUsers(channel)
+        def userPrefix = "";
+        for (User singleUser in pircUsers) {
+              if (singleUser.equals(sender)) {
+                     userPrefix = singleUser.getPrefix();
+              }
+        }
+        log(channel, "${date} &lt;${userPrefix}${sender}&gt; ${message}\n")
         for (IRCBotlet botlet : Utils.getComponentManager().lookupList(IRCBotlet.class)) {
             try {
                 def result = botlet.handleMessage(channel, sender, login, hostname, message, xwiki, context)
@@ -291,21 +297,21 @@ class IRCBot extends PircBot
     {
         initExecutionContext()
         def date = xwiki.formatDate(new Date(), "HH:mm", context)
-        log(channel, "${sender} joined ${channel} at ${date}\n")
+        log(channel, "${date} &lt;${sender}&gt; has joined ${channel}\n")
     }
 
     void onPart(String channel, String sender, String login, String hostname)
     {
         initExecutionContext()
         def date = xwiki.formatDate(new Date(), "HH:mm", context)
-        log(channel, "${sender} left ${channel} at ${date}\n")
+        log(channel, "${date} &lt;${sender}&gt; has left ${channel}\n")
     }
 
     void onQuit(String sourceNick, String sourceLogin, String sourceHostname, String reason)
     {
         initExecutionContext()
         def date = xwiki.formatDate(new Date(), "HH:mm", context)
-        log(getChannels()[0], "${sourceNick} left at ${date} (${reason}\n")
+        log(getChannels()[0], "${date} &lt;${sourceNick}&gt; has quit\n")
     }
 
     public void onPrivateMessage(String sender, String login, String hostname, String message)
@@ -317,7 +323,8 @@ class IRCBot extends PircBot
     void onNickChange(String oldNick, String login, String hostname, String newNick)
     {
         initExecutionContext()
-        log(getChannels()[0], "${oldNick} is now known as ${newNick} (${login}@${hostname}\n")
+        def date = xwiki.formatDate(new Date(), "HH:mm", context)
+        log(getChannels()[0], "${date} &lt;${oldNick}&gt; is now known as &lt;${newNick}&gt;\n")
     }
     
     XWikiDocument getLoggingDocument(String channelName)

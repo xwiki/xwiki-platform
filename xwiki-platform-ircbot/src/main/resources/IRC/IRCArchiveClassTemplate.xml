@@ -20,7 +20,7 @@
 <validationScript></validationScript>
 <comment></comment>
 <minorEdit>false</minorEdit>
-<syntaxId>xwiki/1.0</syntaxId>
+<syntaxId>xwiki/2.0</syntaxId>
 <hidden>false</hidden>
-<content>#includeForm("IRC.IRCArchiveClassSheet")
-</content></xwikidoc>
+<content>{{include document="IRC.IRCArchiveClassSheet"/}}</content>
+</xwikidoc>

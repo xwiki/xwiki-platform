@@ -31,7 +31,7 @@
   </parent>
   <artifactId>xwiki-xar-plugin</artifactId>
   <name>XWiki Platform - Tools - XAR Plugin</name>
-  <version>1.14</version>
+  <version>1.15-SNAPSHOT</version>
   <packaging>maven-plugin</packaging>
   <description>XWiki Platform - Tools - XAR Plugin</description>
   <dependencies>
@@ -85,9 +85,9 @@
   <!-- We must configure SCM in each module. For more information see:
        http://svn.xwiki.org/svnroot/xwiki/platform/pom/trunk/pom.xml -->
   <scm>
-    <connection>scm:svn:http://svn.xwiki.org/svnroot/xwiki/platform/xwiki-tools/tags/xwiki-xar-plugin-1.14</connection>
-    <developerConnection>scm:svn:https://svn.xwiki.org/svnroot/xwiki/platform/xwiki-tools/tags/xwiki-xar-plugin-1.14</developerConnection>
-    <url>http://svn.xwiki.org/svnroot/xwiki/platform/xwiki-tools/tags/xwiki-xar-plugin-1.14</url>
+    <connection>scm:svn:http://svn.xwiki.org/svnroot/xwiki/platform/xwiki-tools/trunk/xwiki-xar-plugin</connection>
+    <developerConnection>scm:svn:https://svn.xwiki.org/svnroot/xwiki/platform/xwiki-tools/trunk/xwiki-xar-plugin</developerConnection>
+    <url>http://svn.xwiki.org/svnroot/xwiki/platform/xwiki-tools/trunk/xwiki-xar-plugin</url>
   </scm>
   <build>
     <plugins>

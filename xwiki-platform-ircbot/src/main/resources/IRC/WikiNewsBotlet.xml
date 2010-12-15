@@ -179,10 +179,10 @@
 </property>
 </object>
 <content>{{velocity}}
-$doc.use("IRC.IRCBotlet")
-$doc.getValue("description")
+$doc.use('IRC.IRCBotlet')
+$doc.getValue('description')
 
-Usage: $doc.getValue("usage")
+Usage: $doc.getValue('usage')
 {{/velocity}}
 
 = Status =
@@ -330,9 +330,9 @@ println "&lt;/form&gt;{{/html}}"
 = Botlet parameters =
 
 {{velocity}}
-#set ($ircconfigdoc = $xwiki.getDocument("IRC.IRCConfig"))
+#set ($ircconfigdoc = $xwiki.getDocument('IRC.IRCConfig'))
 $ircconfigdoc.use($doc.fullName)
-* List of Wikis to watch (empty means all wikis): $ircconfigdoc.getValue("wikis")
+* List of Wikis to watch (empty means all wikis): $ircconfigdoc.getValue('wikis')
 {{/velocity}}
 
 To modify the configuration, go to the [[IRC Configuration page&gt;&gt;IRC.IRCConfig]].

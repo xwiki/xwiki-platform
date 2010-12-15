@@ -150,9 +150,9 @@
 </object>
 <content>{{velocity}}
 $doc.use($doc.fullName)
-$doc.getValue("description")
+$doc.getValue('description')
 
-Usage: $doc.getValue("usage")
+Usage: $doc.getValue('usage')
 {{/velocity}}
 
 = Status =

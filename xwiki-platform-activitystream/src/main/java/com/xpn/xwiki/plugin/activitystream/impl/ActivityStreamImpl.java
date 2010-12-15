@@ -1044,7 +1044,7 @@ public class ActivityStreamImpl implements ActivityStream, EventListener
         List<Object[]> results = new ArrayList<Object[]>();
 
         searchHql.append("select year(act.date), month(act.date), day(act.date), act.page, max(act.date)"
-           + "from ActivityEventImpl as act");
+            + "from ActivityEventImpl as act");
         if (StringUtils.isNotBlank(optionalWhereClause)) {
             searchHql.append(" where ");
             searchHql.append(optionalWhereClause);

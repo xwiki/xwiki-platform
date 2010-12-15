@@ -1,5 +1,4 @@
 <?xml version="1.0" encoding="UTF-8"?>
-
 <xwikidoc>
 <web>IRC</web>
 <name>IRCBotlet</name>
@@ -19,8 +18,8 @@
 <template></template>
 <defaultTemplate></defaultTemplate>
 <validationScript></validationScript>
-<comment>allow delete right for XWiki.XWikiAdminGroup</comment>
-<minorEdit>true</minorEdit>
+<comment></comment>
+<minorEdit>false</minorEdit>
 <syntaxId>xwiki/2.0</syntaxId>
 <hidden>false</hidden>
 <class>
@@ -33,6 +32,7 @@
 <nameField></nameField>
 <validationScript></validationScript>
 <description>
+<disabled>0</disabled>
 <name>description</name>
 <number>1</number>
 <picker>0</picker>
@@ -44,6 +44,7 @@
 <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
 </description>
 <usage>
+<disabled>0</disabled>
 <name>usage</name>
 <number>2</number>
 <picker>0</picker>
@@ -67,6 +68,7 @@
 <validationScript></validationScript>
 <allow>
 <defaultValue>1</defaultValue>
+<disabled>0</disabled>
 <displayFormType>select</displayFormType>
 <displayType>allow</displayType>
 <name>allow</name>
@@ -77,6 +79,7 @@
 </allow>
 <groups>
 <cache>0</cache>
+<disabled>0</disabled>
 <displayType>select</displayType>
 <multiSelect>1</multiSelect>
 <name>groups</name>
@@ -91,6 +94,7 @@
 </groups>
 <levels>
 <cache>0</cache>
+<disabled>0</disabled>
 <displayType>select</displayType>
 <multiSelect>1</multiSelect>
 <name>levels</name>
@@ -104,6 +108,7 @@
 </levels>
 <users>
 <cache>0</cache>
+<disabled>0</disabled>
 <displayType>select</displayType>
 <multiSelect>1</multiSelect>
 <name>users</name>

@@ -1,5 +1,4 @@
 <?xml version="1.0" encoding="UTF-8"?>
-
 <xwikidoc>
 <web>IRC</web>
 <name>JiraBotlet</name>
@@ -34,6 +33,7 @@
 <validationScript></validationScript>
 <jiraPassword>
 <algorithm></algorithm>
+<disabled>0</disabled>
 <name>jiraPassword</name>
 <number>3</number>
 <picker>0</picker>
@@ -46,6 +46,7 @@
 <classType>com.xpn.xwiki.objects.classes.PasswordClass</classType>
 </jiraPassword>
 <jiraPattern>
+<disabled>0</disabled>
 <name>jiraPattern</name>
 <number>4</number>
 <picker>0</picker>
@@ -57,6 +58,7 @@
 <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
 </jiraPattern>
 <jiraURL>
+<disabled>0</disabled>
 <name>jiraURL</name>
 <number>1</number>
 <picker>0</picker>
@@ -68,6 +70,7 @@
 <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
 </jiraURL>
 <jiraUsername>
+<disabled>0</disabled>
 <name>jiraUsername</name>
 <number>2</number>
 <picker>0</picker>
@@ -90,6 +93,7 @@
 <nameField></nameField>
 <validationScript></validationScript>
 <description>
+<disabled>0</disabled>
 <name>description</name>
 <number>1</number>
 <picker>0</picker>
@@ -101,6 +105,7 @@
 <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
 </description>
 <usage>
+<disabled>0</disabled>
 <name>usage</name>
 <number>2</number>
 <picker>0</picker>
@@ -135,6 +140,7 @@
 <validationScript></validationScript>
 <jiraPassword>
 <algorithm></algorithm>
+<disabled>0</disabled>
 <name>jiraPassword</name>
 <number>3</number>
 <picker>0</picker>
@@ -147,6 +153,7 @@
 <classType>com.xpn.xwiki.objects.classes.PasswordClass</classType>
 </jiraPassword>
 <jiraPattern>
+<disabled>0</disabled>
 <name>jiraPattern</name>
 <number>4</number>
 <picker>0</picker>
@@ -158,6 +165,7 @@
 <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
 </jiraPattern>
 <jiraURL>
+<disabled>0</disabled>
 <name>jiraURL</name>
 <number>1</number>
 <picker>0</picker>
@@ -169,6 +177,7 @@
 <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
 </jiraURL>
 <jiraUsername>
+<disabled>0</disabled>
 <name>jiraUsername</name>
 <number>2</number>
 <picker>0</picker>
@@ -209,6 +218,7 @@
 <validationScript></validationScript>
 <allow>
 <defaultValue>1</defaultValue>
+<disabled>0</disabled>
 <displayFormType>select</displayFormType>
 <displayType>allow</displayType>
 <name>allow</name>
@@ -219,6 +229,7 @@
 </allow>
 <groups>
 <cache>0</cache>
+<disabled>0</disabled>
 <displayType>select</displayType>
 <multiSelect>1</multiSelect>
 <name>groups</name>
@@ -233,6 +244,7 @@
 </groups>
 <levels>
 <cache>0</cache>
+<disabled>0</disabled>
 <displayType>select</displayType>
 <multiSelect>1</multiSelect>
 <name>levels</name>
@@ -246,6 +258,7 @@
 </levels>
 <users>
 <cache>0</cache>
+<disabled>0</disabled>
 <displayType>select</displayType>
 <multiSelect>1</multiSelect>
 <name>users</name>

@@ -1,5 +1,4 @@
 <?xml version="1.0" encoding="UTF-8"?>
-
 <xwikidoc>
 <web>IRC</web>
 <name>IRCConfig</name>
@@ -34,6 +33,7 @@
 <nameField></nameField>
 <validationScript></validationScript>
 <botname>
+<disabled>0</disabled>
 <name>botname</name>
 <number>1</number>
 <picker>0</picker>
@@ -45,6 +45,7 @@
 <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
 </botname>
 <channel>
+<disabled>0</disabled>
 <name>channel</name>
 <number>3</number>
 <picker>0</picker>
@@ -57,6 +58,7 @@
 </channel>
 <password>
 <algorithm></algorithm>
+<disabled>0</disabled>
 <name>password</name>
 <number>4</number>
 <picker>0</picker>
@@ -69,6 +71,7 @@
 <classType>com.xpn.xwiki.objects.classes.PasswordClass</classType>
 </password>
 <server>
+<disabled>0</disabled>
 <name>server</name>
 <number>2</number>
 <picker>0</picker>
@@ -80,6 +83,7 @@
 <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
 </server>
 <validation>
+<disabled>0</disabled>
 <editor>PureText</editor>
 <name>validation</name>
 <number>5</number>
@@ -122,6 +126,7 @@
 <validationScript></validationScript>
 <jiraPassword>
 <algorithm></algorithm>
+<disabled>0</disabled>
 <name>jiraPassword</name>
 <number>3</number>
 <picker>0</picker>
@@ -134,6 +139,7 @@
 <classType>com.xpn.xwiki.objects.classes.PasswordClass</classType>
 </jiraPassword>
 <jiraPattern>
+<disabled>0</disabled>
 <name>jiraPattern</name>
 <number>4</number>
 <picker>0</picker>
@@ -145,6 +151,7 @@
 <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
 </jiraPattern>
 <jiraURL>
+<disabled>0</disabled>
 <name>jiraURL</name>
 <number>1</number>
 <picker>0</picker>
@@ -156,6 +163,7 @@
 <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
 </jiraURL>
 <jiraUsername>
+<disabled>0</disabled>
 <name>jiraUsername</name>
 <number>2</number>
 <picker>0</picker>
@@ -196,6 +204,7 @@
 <validationScript></validationScript>
 <wikis>
 <cache>0</cache>
+<disabled>0</disabled>
 <displayType>input</displayType>
 <multiSelect>0</multiSelect>
 <name>wikis</name>
@@ -224,5 +233,4 @@
 </object>
 <content>This page contains the IRC Bot configuration + all Botlet configurations too, stored as XWiki Objects. To modify the IRC Application configuration just edit this page's objects.
 
-{{warning}}When you uprgade the IRC Application, don't overwrite this page since it'll have your specific configuration.{{/warning}}</content>
-</xwikidoc>
+{{warning}}When you upgrade the IRC Application, don't overwrite this page since it will have your specific configuration.{{/warning}}</content></xwikidoc>

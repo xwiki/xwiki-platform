@@ -55,13 +55,13 @@
       <dependency>
         <groupId>org.codehaus.groovy</groupId>
         <artifactId>groovy-all</artifactId>
-        <version>1.7.5</version>
+        <version>1.7.6</version>
       </dependency>
       <!-- Jython engine -->
       <dependency>
         <groupId>org.python</groupId>
         <artifactId>jython-standalone</artifactId>
-        <version>2.5.2b2-xwiki</version>
+        <version>2.5.2rc2-xwiki</version>
       </dependency>
       <!-- JFreeChart -->
       <dependency>

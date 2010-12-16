@@ -35,8 +35,9 @@ public interface Cache<T>
     /**
      * Add a new value or overwrite the existing one associated with the provided key. *
      * <p>
-     * You can catch this events using {@link CacheEntryListener#cacheEntryAdded(CacheEntryEvent)} or
-     * {@link CacheEntryListener#cacheEntryModified(CacheEntryEvent)}.
+     * You can catch this events using
+     * {@link CacheEntryListener#cacheEntryAdded(org.xwiki.cache.event.CacheEntryEvent)} or
+     * {@link CacheEntryListener#cacheEntryModified(org.xwiki.cache.event.CacheEntryEvent)}
      * </p>
      * 
      * @param key the associated key used to access the value in the cache.
@@ -53,7 +54,8 @@ public interface Cache<T>
     /**
      * Remove the entry associated with the provided key from the cache.
      * <p>
-     * You can catch this events using {@link CacheEntryListener#cacheEntryRemoved(CacheEntryEvent)}.
+     * You can catch this events using
+     * {@link CacheEntryListener#cacheEntryRemoved(org.xwiki.cache.event.CacheEntryEvent)}
      * </p>
      * 
      * @param key the key used to access the value in the cache.

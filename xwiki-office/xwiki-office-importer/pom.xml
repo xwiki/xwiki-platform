@@ -70,7 +70,8 @@
     <dependency>
       <groupId>org.artofsolving.jodconverter</groupId>
       <artifactId>jodconverter-core</artifactId>
-      <version>3.0-beta-3</version>
+      <!-- We use a custom build that includes a fix for http://code.google.com/p/jodconverter/issues/detail?id=75 -->
+      <version>3.0-beta-3.20101216</version>
     </dependency>
     <dependency>
       <!--
@@ -79,7 +80,9 @@
       -->
       <groupId>org.json</groupId>
       <artifactId>json</artifactId>
-      <version>20080701</version>
+      <version>20090211</version>
+      <!-- This this provided as a transitive dependency of xwiki-rest-server -->
+      <scope>provided</scope>
     </dependency>
     <dependency>
       <groupId>org.codehaus.groovy</groupId>

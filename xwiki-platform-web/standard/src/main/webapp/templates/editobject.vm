@@ -17,31 +17,31 @@
   <div id="xobject_${escapetool.xml($class.name)}_${obj.number}" class="xobject">
   <div id="xobject_${escapetool.xml($class.name)}_${obj.number}_title" class="xobject-title"><h3>#cleanClassname(${class.name}) ${obj.number}: $!{escapetool.xml($doc.display($firstfield, $obj))}
     <a href="$doc.getURL('objectremove', "form_token=$!{services.csrf.getToken()}&amp;classname=${escapetool.url($class.name)}&amp;classid=${obj.number}&amp;xredirect=${escapetool.url($doc.getURL('edit', 'editor=object'))}")" class="xobject-action delete" title="$msg.get('core.editors.object.removeObject.tooltip')">$msg.get('core.editors.object.removeObject')</a>
-    #if(!$hasCustomObject) <a href="$doc.getURL("edit", "editor=object&amp;classname=${escapetool.url($class.name)}&amp;object=${obj.number}")" class="xobject-action edit" title="$msg.get('core.editors.object.editSingleObject.tooltip')">$msg.get('core.editors.object.editSingleObject')</a> #end
+    #if (!$hasCustomObject) <a href="$doc.getURL('edit', "editor=object&amp;classname=${escapetool.url($class.name)}&amp;object=${obj.number}")" class="xobject-action edit" title="$msg.get('core.editors.object.editSingleObject.tooltip')">$msg.get('core.editors.object.editSingleObject')</a> #end
   </h3></div>
   <div id="xobject_${escapetool.xml($class.name)}_${obj.number}_content" class="xobject-content"><div>
     <dl>
-    #if($hasCustomField)
-      #set($properties = $util.arrayList)
-      #foreach($propName in $customField.split(','))
-        #set($discard = $properties.add($class.get($propName)))
+    #if ($hasCustomField)
+      #set ($properties = $util.arrayList)
+      #foreach ($propName in $customField.split(','))
+        #set ($discard = $properties.add($class.get($propName)))
       #end
     #else
-      #set($properties = $class.properties)
+      #set ($properties = $class.properties)
     #end
-    #foreach($prop in $properties)
+    #foreach ($prop in $properties)
       <dt class="label#if($prop.isDisabled()) disabled#end"><label for="${escapetool.xml($class.name)}_${obj.number}_${escapetool.xml($prop.name)}">${escapetool.xml($prop.prettyName)}</label></dt>
-      <dd#if($prop.isDisabled()) class="disabled"#end>$doc.displayEdit($prop, "${escapetool.xml($class.name)}_${obj.number}_" , $obj)</dd>
+      <dd#if ($prop.isDisabled()) class="disabled"#end>$doc.displayEdit($prop, "${escapetool.xml($class.name)}_${obj.number}_" , $obj)</dd>
     #end
     </dl>
-    #set($deprecatedProperties = $class.getDeprecatedObjectProperties($obj))
-    #if($deprecatedProperties.size() > 0)
+    #set ($deprecatedProperties = $class.getDeprecatedObjectProperties($obj))
+    #if ($deprecatedProperties.size() > 0)
     <div class="box warningmessage deprecatedProperties">
       <strong>$msg.get('core.editors.object.removeDeprecatedProperties.info', [${escapetool.xml($class.name)}])</strong>
       <dl>
-      #foreach($prop in $deprecatedProperties)
-      <dt class="label disabled"><label>${escapetool.xml($prop.name)}:</label></dt>
-      <dd class="disabled">${escapetool.xml($prop.value)}</dd>
+      #foreach ($prop in $deprecatedProperties)
+        <dt class="label disabled"><label>${escapetool.xml($prop.name)}:</label></dt>
+        <dd class="disabled">${escapetool.xml($prop.value)}</dd>
       #end
       </dl>
       <div><a class="syncProperties" href='$doc.getURL("objectsync", "classname=${escapetool.url($class.name)}&amp;object=${obj.number}")' title="$msg.get('core.editors.object.removeDeprecatedProperties.link.tooltip')">$msg.get('core.editors.object.removeDeprecatedProperties.link')</a></div>
@@ -57,18 +57,18 @@
 #macro(getTitleField $props)
   #set($foundStringProperty = false)
   ## As a backup, use the first field of the class; will be overwritten later by better values
-  #if($props.size() > 0)
-    #set($titleField = $props.get(0).name)
+  #if ($props.size() > 0)
+    #set ($titleField = $props.get(0).name)
   #end
-  #foreach($prop in $props)
+  #foreach ($prop in $props)
     ## A property containing 'title' or 'name' has precedence
-    #if($prop.name.toLowerCase().indexOf('title') >= 0 || $prop.name.toLowerCase().indexOf('name') >= 0)
-      #set($titleField = $prop.name)
+    #if ($prop.name.toLowerCase().indexOf('title') >= 0 || $prop.name.toLowerCase().indexOf('name') >= 0)
+      #set ($titleField = $prop.name)
       #break
     ## String properties have precedence over other types
     #elseif ($prop.type == 'StringClass' && !$foundStringProperty)
-      #set($titleField = $prop.name)
-      #set($foundStringProperty = true)
+      #set ($titleField = $prop.name)
+      #set ($foundStringProperty = true)
     #end
   #end
 #end
@@ -77,12 +77,12 @@
  * Display a class
  *#
 #macro(displayClass $class)
-  #set($props = $class.getProperties())
+  #set ($props = $class.getProperties())
   #getTitleField($props)
   <div id="xclass_${escapetool.xml($class.name)}" class="xclass">
-    #if($hasCustomObject)
-      #set($object = $doc.getObject($class.name, $customObject))
-      #if($object)
+    #if ($hasCustomObject)
+      #set ($object = $doc.getObject($class.name, $customObject))
+      #if ($object)
         <div id="xclass_${escapetool.xml($class.name)}_title" class="xclass-title"><h2>${escapetool.xml($class.name)}</h2></div>
         <div id="xclass_${escapetool.xml($class.name)}_content" class="xclass-content"><div>
         #displayObject($object $class $props $titleField)
@@ -91,11 +91,11 @@
         #warning($msg.get('core.editors.object.noObject'))
       #end
     #else
-      #set($objects = $doc.getObjects($class.name))
-      #set($objectCount = $listtool.size($objects))
+      #set ($objects = $doc.getObjects($class.name))
+      #set ($objectCount = $listtool.size($objects))
       <div id="xclass_${escapetool.xml($class.name)}_title" class="xclass-title"><h2>$msg.get('core.editors.object.objectsForClass', [${escapetool.xml($class.name)}]) <span id="xclass_${escapetool.xml($class.name)}_xobject_nb" class="xclass_xobject_nb">($objectCount)</span></h2></div>
       <div id="xclass_${escapetool.xml($class.name)}_content" class="xclass-content"><div>
-      #foreach($object in $objects)
+      #foreach ($object in $objects)
         #displayObject($object $class $props $titleField)
       #end
       #displayAddObject($class)
@@ -110,9 +110,9 @@
  *#
 #macro(displayAddObject $class)
   <div id="add_xobject_${escapetool.xml($class.name)}" class="add_xobject">
-   <div id="add_xobject_${escapetool.xml($class.name)}_title" class="add_xobject-title">
-   <a href="$doc.getURL('edit', "xpage=editobject&amp;xaction=addObject&amp;className=$escapetool.url(${class.name})&amp;xredirect=$escapetool.url(${doc.getURL('edit', 'editor=object')})")" class="xobject-add-control" title="$msg.get('core.editors.object.newObjectForClass.tooltip', ["#cleanClassname(${class.name})"])">$msg.get('core.editors.object.newObjectForClass', ["#cleanClassname(${class.name})"])</a>
-   </div>
+    <div id="add_xobject_${escapetool.xml($class.name)}_title" class="add_xobject-title">
+      <a href="$doc.getURL('edit', "xpage=editobject&amp;xaction=addObject&amp;className=$escapetool.url(${class.name})&amp;xredirect=$escapetool.url(${doc.getURL('edit', 'editor=object')})")" class="xobject-add-control" title="$msg.get('core.editors.object.newObjectForClass.tooltip', ["#cleanClassname(${class.name})"])">$msg.get('core.editors.object.newObjectForClass', ["#cleanClassname(${class.name})"])</a>
+    </div>
   </div>
 #end
 ##
@@ -154,17 +154,17 @@
  * If so, provide a control to synchronize property sets of these objects.
  *#
 #macro (checkPropertyDeprecation)
-  #set($allClasses = $doc.getxWikiClasses())
-  #set($mustSync = false)
-  #foreach($class in $allClasses)
-    #set($objects = $doc.getObjects($class.name))
+  #set ($allClasses = $doc.getxWikiClasses())
+  #set ($mustSync = false)
+  #foreach ($class in $allClasses)
+    #set ($objects = $doc.getObjects($class.name))
     #foreach ($object in $objects)
-      #if($class.getDeprecatedObjectProperties($object).size() > 0)
-        #set($mustSync = true)
+      #if ($class.getDeprecatedObjectProperties($object).size() > 0)
+        #set ($mustSync = true)
         #break
       #end
     #end
-    #if($mustSync) #break #end
+    #if ($mustSync) #break #end
   #end
   #if ($mustSync)
     <div class="box warningmessage deprecatedProperties">
@@ -179,26 +179,26 @@
 ##
 ##
 ## Ajax object add:
-#if("$!{request.xaction}" == 'addObject')
-  #set($class = $xwiki.getClass(${request.className}))
-  #set($props = $class.getProperties())
+#if ("$!{request.xaction}" == 'addObject')
+  #set ($class = $xwiki.getClass(${request.className}))
+  #set ($props = $class.getProperties())
   #if ($listtool.isEmpty($props))
     $response.setStatus(404)
     #error($msg.get('core.editors.object.add.invalidClassName', [$request.className]))
   #else
-    #set($isNewClass = $listtool.isEmpty($doc.getObjects(${request.className})))
-    #set($newobj = $doc.newObject(${request.className}))
-    #set($discard = $doc.save())
-    #if("$!{request.xredirect}" != '')
+    #set ($isNewClass = $listtool.isEmpty($doc.getObjects(${request.className})))
+    #set ($newobj = $doc.newObject(${request.className}))
+    #set ($discard = $doc.save())
+    #if ("$!{request.xredirect}" != '')
       $response.sendRedirect($request.xredirect)
     #else
       ## Display
-      #if($isNewClass)
+      #if ($isNewClass)
         #displayClass($class)
       #else
-        #foreach($prop in $props)
+        #foreach ($prop in $props)
           #if ($velocityCount==1)
-            #set($firstfield = $prop.name)
+            #set ($firstfield = $prop.name)
             #break
           #end
         #end ## foreach prop
@@ -210,7 +210,7 @@
 ##
 ##
 ##
-#elseif("$!request.xpage" == 'editobject')
+#elseif ("$!request.xpage" == 'editobject')
   ## Old (pre 1.0) way of using this template
   $response.sendRedirect($doc.getURL('edit', 'editor=object'))
 #else
@@ -221,47 +221,47 @@
   $xwiki.jsfx.use('uicomponents/widgets/fullScreen.js', {'forceSkinAction': true, 'language': ${xcontext.language}})##
   $xwiki.ssfx.use('uicomponents/widgets/fullScreen.css')##
   ## Some parameters
-  #set($formname = 'update')
-  #set($saveaction = 'save')
-  #set($hasCustomClass = ("$!{request.classname.trim()}" != ''))
-  #set($hasCustomObject = ($hasCustomClass && ("$!{request.nb.trim()}$!{request.classid.trim()}$!{request.object.trim()}" != '')))
-  #set($hasCustomField = ($hasCustomClass && ("$!{request.property.trim()}" != '')))
-  #if($hasCustomClass)
-    #set($classes = [$xwiki.getDocument($request.classname).getxWikiClass()])
+  #set ($formname = 'update')
+  #set ($saveaction = 'save')
+  #set ($hasCustomClass = ("$!{request.classname.trim()}" != ''))
+  #set ($hasCustomObject = ($hasCustomClass && ("$!{request.nb.trim()}$!{request.classid.trim()}$!{request.object.trim()}" != '')))
+  #set ($hasCustomField = ($hasCustomClass && ("$!{request.property.trim()}" != '')))
+  #if ($hasCustomClass)
+    #set ($classes = [$xwiki.getDocument($request.classname).getxWikiClass()])
   #else
-    #set($classes = $doc.getxWikiClasses())
+    #set ($classes = $doc.getxWikiClasses())
   #end
-  #if($hasCustomClass || $hasCustomObject || $hasCustomField)
-    #set($fullEditorURL = "$doc.getURL('edit', 'editor=object')")
+  #if ($hasCustomClass || $hasCustomObject || $hasCustomField)
+    #set ($fullEditorURL = "$doc.getURL('edit', 'editor=object')")
     <div class="more-actions">
       <a href='$fullEditorURL' class='edit-all' title="$msg.get('core.editors.object.editAllObjects')">$msg.get('core.editors.object.editAllObjects')</a>
     </div>
   #end
-  #set($redirect = $xwiki.getRequestURL())
+  #set ($redirect = $xwiki.getRequestURL())
   <form id="update" method="post" action="$doc.getURL("save")" onsubmit="cancelCancelEdit()">
   <div id="xwikieditcontent" class="clear">
   <div id="document-title"><h1>$msg.get('core.editors.object.title', [$escapetool.xml($doc.displayTitle), $doc.getURL()])</h1></div>
 
   #checkPropertyDeprecation()
 
-  #set($q = 'editor=object')
-  #if($hasCustomClass)
-    #set($customClass = "${request.classname}")
-    #set($q = "${q}&amp;classname=$!{escapetool.url(${customClass})}")
-    #if($hasCustomObject)
-      #set($customObject = "${request.object}")
-      #if($customObject == '')
-        #set($customObject = "${request.classid}")
-        #if($customObject == '')
-          #set($customObject = "${request.nb}")
+  #set ($q = 'editor=object')
+  #if ($hasCustomClass)
+    #set ($customClass = "${request.classname}")
+    #set ($q = "${q}&amp;classname=$!{escapetool.url(${customClass})}")
+    #if ($hasCustomObject)
+      #set ($customObject = "${request.object}")
+      #if ($customObject == '')
+        #set ($customObject = "${request.classid}")
+        #if ($customObject == '')
+          #set ($customObject = "${request.nb}")
         #end
       #end
-      #set($customObject = $util.parseInt($customObject))
-      #set($q = "${q}&amp;object=${customObject}")
+      #set ($customObject = $util.parseInt($customObject))
+      #set ($q = "${q}&amp;object=${customObject}")
     #end
-    #if($hasCustomField)
-      #set($customField = "$request.property")
-      #set($q = "${q}&amp;property=$!{escapetool.url(${customField})}")
+    #if ($hasCustomField)
+      #set ($customField = "$request.property")
+      #set ($q = "${q}&amp;property=$!{escapetool.url(${customField})}")
     #end
   #end
     <div class="hidden">
@@ -273,10 +273,10 @@
       #editActionButton('preview', 'preview')
     </div>
     <div id="xwikiobjects">
-  #if(!$hasCustomClass)
+  #if (!$hasCustomClass)
     #displayAddObjectChooseClass()
   #end
-  #foreach($class in $classes)
+  #foreach ($class in $classes)
     #displayClass($class)
   #end
     </div>## xwikiobjects

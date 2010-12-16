@@ -155,7 +155,7 @@ public class JBossCacheCacheConfiguration extends AbstractCacheConfigurationLoad
      */
     private void setLRUConfiguration(EvictionRegionConfig erc, EntryEvictionConfiguration eec)
     {
-        LRUAlgorithmConfig lruc = null;
+        LRUAlgorithmConfig lruc;
 
         if (erc.getEvictionAlgorithmConfig() instanceof LRUAlgorithmConfig) {
             lruc = (LRUAlgorithmConfig) erc.getEvictionAlgorithmConfig();

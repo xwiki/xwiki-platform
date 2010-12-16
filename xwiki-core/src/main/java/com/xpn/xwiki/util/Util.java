@@ -887,7 +887,8 @@ public class Util
         }
         // handle language_COUNTRY case
         final String separator = "_";
-        String[] parts = languageCode.toLowerCase().split(separator);
+
+        String[] parts = StringUtils.split(languageCode.toLowerCase(), "_-.");
         String result = parts[0];
         if (parts.length > 1) {
             parts[1] = parts[1].toUpperCase();

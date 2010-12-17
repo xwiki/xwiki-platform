@@ -57,19 +57,6 @@
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-checkstyle-plugin</artifactId>
       </plugin>
-      <plugin>
-        <groupId>org.codehaus.mojo</groupId>
-        <artifactId>clirr-maven-plugin</artifactId>
-        <configuration>
-          <skip>${xwiki.clirr.skip}</skip>
-          <comparisonVersion>${clirr.previous.version}</comparisonVersion>
-          <excludes>
-            <!-- Exclude DAB for 2.7RC1 because we've added an API. See XWIKI-5789.
-               TODO remove this exclude once 2.7RC1 is released -->
-            <exclude>org/xwiki/bridge/DocumentAccessBridge</exclude>
-          </excludes>
-        </configuration>
-      </plugin>
     </plugins>
   </build>
 </project>

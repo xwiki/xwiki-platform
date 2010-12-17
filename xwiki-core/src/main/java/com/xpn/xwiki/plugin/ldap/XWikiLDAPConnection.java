@@ -366,15 +366,21 @@ public class XWikiLDAPConnection
         }
     }
 
-    public static final String escapeLDAPSearchFilter(String filter)
+    /**
+     * Escape part of a LDAP query filter.
+     * 
+     * @param value the value to escape
+     * @return the escaped version
+     */
+    public static final String escapeLDAPSearchFilter(String value)
     {
-        if (filter == null) {
+        if (value == null) {
             return null;
         }
 
         StringBuilder sb = new StringBuilder();
-        for (int i = 0; i < filter.length(); i++) {
-            char curChar = filter.charAt(i);
+        for (int i = 0; i < value.length(); i++) {
+            char curChar = value.charAt(i);
             switch (curChar) {
                 case '\\':
                     sb.append("\\5c");

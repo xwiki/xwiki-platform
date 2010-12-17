@@ -58,6 +58,12 @@
     <!-- Test dependencies -->
     <dependency>
       <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-core-observation-local</artifactId>
+      <version>${project.version}</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-core-rendering-transformation-macro</artifactId>
       <version>${project.version}</version>
       <scope>test</scope>

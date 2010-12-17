@@ -132,9 +132,9 @@ public class WikiManagerPluginApi extends PluginApi<WikiManagerPlugin>
      * @param errorMessage error message.
      * @param e the catched exception.
      */
-    public void logError(String errorMessage, XWikiException e)
+    private void error(String errorMessage, XWikiException e)
     {
-        LOG.error(errorMessage, e);
+        LOG.debug(errorMessage, e);
 
         this.context.put(CONTEXT_LASTERRORCODE, Integer.valueOf(e.getCode()));
         this.context.put(CONTEXT_LASTEXCEPTION, new XWikiExceptionApi(e, this.context));
@@ -222,7 +222,7 @@ public class WikiManagerPluginApi extends PluginApi<WikiManagerPlugin>
             this.wikiManager.createNewWiki(wikiXObjectDocument, failOnExist, realTemplateWikiName, realPkgName,
                 comment, this.context);
         } catch (WikiManagerException e) {
-            logError(this.messageTool.get(WikiManagerMessageTool.LOG_WIKICREATION, wikiXObjectDocument.toString()), e);
+            error(this.messageTool.get(WikiManagerMessageTool.LOG_WIKICREATION, wikiXObjectDocument.toString()), e);
 
             returncode = e.getCode();
         }
@@ -259,7 +259,7 @@ public class WikiManagerPluginApi extends PluginApi<WikiManagerPlugin>
 
             this.wikiManager.deleteWiki(wikiName, deleteDatabase, this.context);
         } catch (WikiManagerException e) {
-            logError(this.messageTool.get(WikiManagerMessageTool.LOG_WIKIDELETION, wikiName), e);
+            error(this.messageTool.get(WikiManagerMessageTool.LOG_WIKIDELETION, wikiName), e);
 
             returncode = e.getCode();
         }
@@ -339,7 +339,7 @@ public class WikiManagerPluginApi extends PluginApi<WikiManagerPlugin>
 
             this.wikiManager.deleteWikiAlias(wikiName, objectId, this.context);
         } catch (WikiManagerException e) {
-            logError(this.messageTool.get(WikiManagerMessageTool.LOG_WIKIDELETION, wikiName), e);
+            error(this.messageTool.get(WikiManagerMessageTool.LOG_WIKIDELETION, wikiName), e);
 
             returncode = e.getCode();
         }
@@ -361,7 +361,7 @@ public class WikiManagerPluginApi extends PluginApi<WikiManagerPlugin>
         try {
             doc = this.wikiManager.getWikiFromName(wikiName, context);
         } catch (WikiManagerException e) {
-            logError(this.messageTool.get(WikiManagerMessageTool.LOG_WIKIGET, wikiName), e);
+            error(this.messageTool.get(WikiManagerMessageTool.LOG_WIKIGET, wikiName), e);
         }
 
         return doc;
@@ -378,7 +378,7 @@ public class WikiManagerPluginApi extends PluginApi<WikiManagerPlugin>
         try {
             wikiList = this.wikiManager.getAllWikis(context);
         } catch (WikiManagerException e) {
-            logError(this.messageTool.get(WikiManagerMessageTool.LOG_WIKIGETALL), e);
+            error(this.messageTool.get(WikiManagerMessageTool.LOG_WIKIGETALL), e);
         }
 
         return wikiList;
@@ -398,7 +398,7 @@ public class WikiManagerPluginApi extends PluginApi<WikiManagerPlugin>
         try {
             doc = this.wikiManager.getWikiFromDocumentName(documentFullName, this.context);
         } catch (WikiManagerException e) {
-            logError(this.messageTool.get(WikiManagerMessageTool.LOG_WIKIGET, documentFullName), e);
+            error(this.messageTool.get(WikiManagerMessageTool.LOG_WIKIGET, documentFullName), e);
         }
 
         return doc;
@@ -445,7 +445,7 @@ public class WikiManagerPluginApi extends PluginApi<WikiManagerPlugin>
         try {
             doc = this.wikiManager.getWikiAlias(wikiName, objectId, true, this.context);
         } catch (WikiManagerException e) {
-            logError(this.messageTool.get(WikiManagerMessageTool.LOG_WIKIALIASGET, wikiName), e);
+            error(this.messageTool.get(WikiManagerMessageTool.LOG_WIKIALIASGET, wikiName), e);
         }
 
         return doc;
@@ -464,7 +464,7 @@ public class WikiManagerPluginApi extends PluginApi<WikiManagerPlugin>
         try {
             listDocument = this.wikiManager.getWikiAliasList(this.context);
         } catch (WikiManagerException e) {
-            logError(this.messageTool.get(WikiManagerMessageTool.LOG_WIKIALIASGETALL), e);
+            error(this.messageTool.get(WikiManagerMessageTool.LOG_WIKIALIASGETALL), e);
         }
 
         return listDocument;
@@ -563,7 +563,7 @@ public class WikiManagerPluginApi extends PluginApi<WikiManagerPlugin>
             wikiAlias.setVisibility(visibility);
             wikiAlias.save();
         } catch (WikiManagerException e) {
-            logError(this.messageTool.get(WikiManagerMessageTool.LOG_WIKISETVISIBILITY, wikiName), e);
+            error(this.messageTool.get(WikiManagerMessageTool.LOG_WIKISETVISIBILITY, wikiName), e);
 
             returncode = e.getCode();
         }
@@ -599,7 +599,7 @@ public class WikiManagerPluginApi extends PluginApi<WikiManagerPlugin>
             wikiAlias.setIsWikiTemplate(isWikiTemplate);
             wikiAlias.save();
         } catch (WikiManagerException e) {
-            logError(this.messageTool.get(WikiManagerMessageTool.LOG_WIKISETVISIBILITY, wikiName), e);
+            error(this.messageTool.get(WikiManagerMessageTool.LOG_WIKISETVISIBILITY, wikiName), e);
 
             returncode = e.getCode();
         }
@@ -654,7 +654,7 @@ public class WikiManagerPluginApi extends PluginApi<WikiManagerPlugin>
             String message = this.messageTool.get(WikiManagerMessageTool.COMMENT_CREATEWIKITEMPLATE, params);
             this.wikiManager.createWikiTemplate(wikiXObjectDocument, packageName, message, this.context);
         } catch (WikiManagerException e) {
-            logError(this.messageTool.get(WikiManagerMessageTool.LOG_WIKICREATION, wikiXObjectDocument.toString()), e);
+            error(this.messageTool.get(WikiManagerMessageTool.LOG_WIKICREATION, wikiXObjectDocument.toString()), e);
 
             returncode = e.getCode();
         }
@@ -705,7 +705,7 @@ public class WikiManagerPluginApi extends PluginApi<WikiManagerPlugin>
         try {
             doc = this.wikiManager.getWikiTemplateAlias(wikiName, objectId, this.context, true);
         } catch (WikiManagerException e) {
-            logError(this.messageTool.get(WikiManagerMessageTool.LOG_WIKITEMPLATEGET, wikiName), e);
+            error(this.messageTool.get(WikiManagerMessageTool.LOG_WIKITEMPLATEGET, wikiName), e);
         }
 
         return doc;
@@ -722,7 +722,7 @@ public class WikiManagerPluginApi extends PluginApi<WikiManagerPlugin>
         try {
             listDocument = this.wikiManager.getWikiTemplateAliasList(this.context);
         } catch (WikiManagerException e) {
-            logError(this.messageTool.get(WikiManagerMessageTool.LOG_WIKITEMPLATEGETALL), e);
+            error(this.messageTool.get(WikiManagerMessageTool.LOG_WIKITEMPLATEGETALL), e);
         }
 
         return listDocument;

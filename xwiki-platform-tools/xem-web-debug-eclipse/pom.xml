@@ -86,7 +86,7 @@
       <version>8.2-504.jdbc3</version>
     </dependency>
 
-     <!-- The annotations modules -->
+    <!-- The annotations modules -->
     <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-core-annotations-io</artifactId>
@@ -161,6 +161,13 @@
     <dependency>
       <groupId>com.xpn.xwiki.platform</groupId>
       <artifactId>xwiki-rest-server</artifactId>
+      <version>${platform.core.version}</version>
+    </dependency>
+
+    <!-- Deprecated APIs -->
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-core-legacy</artifactId>
       <version>${platform.core.version}</version>
     </dependency>
 

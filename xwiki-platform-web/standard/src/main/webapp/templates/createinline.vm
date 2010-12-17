@@ -139,7 +139,7 @@ $xwiki.get('ssfx').use('uicomponents/widgets/validation/livevalidation.css')##
      * Create Page Field Validator.
      */
     initPageValidator : function() {
-      this.pageValidator = new LiveValidation('page', { validMessage: "$msg.get('core.create.validation.valid')" });
+      this.pageValidator = new LiveValidation($$('.main [name=page]')[0], { validMessage: "$msg.get('core.create.validation.valid')" });
       this.pageValidator.add(Validate.Presence, {
         failureMessage: "$msg.get('core.create.validation.mandatoryfield')"
       });
@@ -148,7 +148,7 @@ $xwiki.get('ssfx').use('uicomponents/widgets/validation/livevalidation.css')##
      * Create Space Field Validator.
      */
     initSpaceValidator : function() {
-      this.spaceValidator = new LiveValidation('space', { validMessage: "$msg.get('core.create.validation.valid')" });
+      this.spaceValidator = new LiveValidation($$('.main [name=space]')[0], { validMessage: "$msg.get('core.create.validation.valid')" });
       this.spaceValidator.add(Validate.Presence, {
          failureMessage: "$msg.get('core.create.validation.mandatoryfield')"
       });

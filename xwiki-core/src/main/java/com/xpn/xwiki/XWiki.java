@@ -111,14 +111,6 @@ import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.model.reference.WikiReference;
 import org.xwiki.observation.EventListener;
 import org.xwiki.observation.ObservationManager;
-import org.xwiki.xml.internal.XMLScriptService;
-import com.xpn.xwiki.internal.event.AttachmentAddedEvent;
-import com.xpn.xwiki.internal.event.AttachmentDeletedEvent;
-import com.xpn.xwiki.internal.event.AttachmentUpdatedEvent;
-import com.xpn.xwiki.internal.event.CommentAddedEvent;
-import com.xpn.xwiki.internal.event.CommentDeletedEvent;
-import com.xpn.xwiki.internal.event.CommentUpdatedEvent;
-
 import org.xwiki.observation.event.Event;
 import org.xwiki.query.QueryException;
 import org.xwiki.rendering.macro.wikibridge.WikiMacroInitializer;
@@ -127,6 +119,7 @@ import org.xwiki.rendering.syntax.Syntax;
 import org.xwiki.rendering.syntax.SyntaxFactory;
 import org.xwiki.url.XWikiEntityURL;
 import org.xwiki.url.standard.XWikiURLBuilder;
+import org.xwiki.xml.internal.XMLScriptService;
 
 import com.xpn.xwiki.api.Api;
 import com.xpn.xwiki.api.Document;
@@ -138,6 +131,12 @@ import com.xpn.xwiki.doc.XWikiAttachment;
 import com.xpn.xwiki.doc.XWikiDeletedDocument;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.doc.XWikiDocumentArchive;
+import com.xpn.xwiki.internal.event.AttachmentAddedEvent;
+import com.xpn.xwiki.internal.event.AttachmentDeletedEvent;
+import com.xpn.xwiki.internal.event.AttachmentUpdatedEvent;
+import com.xpn.xwiki.internal.event.CommentAddedEvent;
+import com.xpn.xwiki.internal.event.CommentDeletedEvent;
+import com.xpn.xwiki.internal.event.CommentUpdatedEvent;
 import com.xpn.xwiki.notify.DocObjectChangedRule;
 import com.xpn.xwiki.notify.PropertyChangedRule;
 import com.xpn.xwiki.notify.XWikiActionRule;
@@ -1425,15 +1424,15 @@ public class XWiki implements XWikiDocChangeNotificationInterface, EventListener
             }
 
             ObservationManager om = Utils.getComponent(ObservationManager.class);
-            
+
             // Notify listeners about the document about to be created or updated
-            
+
             // First the legacy notification mechanism
-            
+
             // Then the new observation module
-            // Note that for the moment the event being send is a bridge event, as we are still passing around 
+            // Note that for the moment the event being send is a bridge event, as we are still passing around
             // an XWikiDocument as source and an XWikiContext as data.
-            
+
             if (originalDocument.isNew()) {
                 getNotificationManager().preverify(doc, originalDocument,
                     XWikiDocChangeNotificationInterface.EVENT_NEW, context);
@@ -1453,19 +1452,19 @@ public class XWiki implements XWikiDocChangeNotificationInterface, EventListener
             // Since the store#saveXWikiDoc resets originalDocument, we need to temporarily put it
             // back to send notifications.
             XWikiDocument newOriginal = doc.getOriginalDocument();
-            
+
             try {
                 doc.setOriginalDocument(originalDocument);
-                
+
                 // Notify listeners about the document having been created or updated
-                
+
                 // First the legacy notification mechanism
-                
+
                 // Then the new observation module
-                // Note that for the moment the event being send is a bridge event, as we are still passing around 
+                // Note that for the moment the event being send is a bridge event, as we are still passing around
                 // an XWikiDocument as source and an XWikiContext as data.
                 // The old version is made available using doc.getOriginalDocument()
-                
+
                 if (originalDocument.isNew()) {
                     getNotificationManager().verify(doc, originalDocument,
                         XWikiDocChangeNotificationInterface.EVENT_NEW, context);
@@ -4349,18 +4348,19 @@ public class XWiki implements XWikiDocChangeNotificationInterface, EventListener
     public void deleteDocument(XWikiDocument doc, boolean totrash, XWikiContext context) throws XWikiException
     {
         ObservationManager om = Utils.getComponent(ObservationManager.class);
-        
+
         // Inform notification mechanisms that a document is about to be deleted
-        
+
         // First the legacy notification mechanism
         getNotificationManager().preverify(doc, new XWikiDocument(doc.getDocumentReference()),
             XWikiDocChangeNotificationInterface.EVENT_DELETE, context);
-        
+
         // Then the new observation module
-        // Note that for the moment the event being send is a bridge event, as we are still passing around 
+        // Note that for the moment the event being send is a bridge event, as we are still passing around
         // an XWikiDocument as source and an XWikiContext as data.
-        om.notify(new DocumentDeletingEvent(doc.getDocumentReference()), new XWikiDocument(doc.getDocumentReference()), context);
-        
+        om.notify(new DocumentDeletingEvent(doc.getDocumentReference()), new XWikiDocument(doc.getDocumentReference()),
+            context);
+
         if (hasRecycleBin(context) && totrash) {
             getRecycleBinStore().saveToRecycleBin(doc, context.getUser(), new Date(), context, true);
         }
@@ -4369,13 +4369,13 @@ public class XWiki implements XWikiDocChangeNotificationInterface, EventListener
 
         try {
             // Inform notification mecanisms that a document has been deleted
-            
+
             // First the legacy notification mechanism
             getNotificationManager().verify(new XWikiDocument(doc.getDocumentReference()), doc,
                 XWikiDocChangeNotificationInterface.EVENT_DELETE, context);
 
             // Then the new observation module
-            // Note that for the moment the event being send is a bridge event, as we are still passing around 
+            // Note that for the moment the event being send is a bridge event, as we are still passing around
             // an XWikiDocument as source and an XWikiContext as data.
             // The source document is a new empty XWikiDocument to follow
             // DocumentUpdatedEvent policy: source document in new document and the old version is available using
@@ -5152,7 +5152,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface, EventListener
 
     public String getAttachmentURL(String fullname, String filename, XWikiContext context) throws XWikiException
     {
-        return getAttachmentURL(fullname, filename, null, context); 
+        return getAttachmentURL(fullname, filename, null, context);
     }
 
     /**

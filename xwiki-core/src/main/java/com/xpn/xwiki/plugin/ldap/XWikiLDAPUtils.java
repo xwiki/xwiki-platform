@@ -569,14 +569,18 @@ public class XWikiLDAPUtils
     public List<XWikiLDAPSearchAttribute> searchUserAttributesByUid(String uid, String[] attributeNameTable)
     {
         // search for the user in LDAP
-        String query = MessageFormat.format(this.userSearchFormatString, new Object[] {this.uidAttributeName, uid});
+        String filter =
+            MessageFormat.format(
+                this.userSearchFormatString,
+                new Object[] {XWikiLDAPConnection.escapeLDAPSearchFilter(this.uidAttributeName),
+                XWikiLDAPConnection.escapeLDAPSearchFilter(uid)});
 
         if (LOG.isDebugEnabled()) {
-            LOG.debug("Searching for the user in LDAP: user:" + uid + " base:" + this.baseDN + " query:" + query
+            LOG.debug("Searching for the user in LDAP: user:" + uid + " base:" + this.baseDN + " query:" + filter
                 + " uid:" + uidAttributeName);
         }
 
-        return this.connection.searchLDAP(this.baseDN, query, attributeNameTable, LDAPConnection.SCOPE_SUB);
+        return this.connection.searchLDAP(this.baseDN, filter, attributeNameTable, LDAPConnection.SCOPE_SUB);
     }
 
     /**

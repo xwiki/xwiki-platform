@@ -51,7 +51,7 @@
     </dependency>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-core-observation-local</artifactId>
+      <artifactId>xwiki-core-observation-api</artifactId>
       <version>${pom.version}</version>
     </dependency>
   </dependencies>

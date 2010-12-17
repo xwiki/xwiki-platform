@@ -1261,7 +1261,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface, EventListener
     {
         if (getEngineContext() != null) {
             try {
-                if (getResourceAsStream(name) != null) {
+                if (getResource(name) != null) {
                     return true;
                 }
             } catch (IOException e) {

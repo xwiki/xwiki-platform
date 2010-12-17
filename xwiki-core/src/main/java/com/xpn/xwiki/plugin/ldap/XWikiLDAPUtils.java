@@ -573,7 +573,7 @@ public class XWikiLDAPUtils
             MessageFormat.format(
                 this.userSearchFormatString,
                 new Object[] {XWikiLDAPConnection.escapeLDAPSearchFilter(this.uidAttributeName),
-                XWikiLDAPConnection.escapeLDAPSearchFilter(uid)});
+                    XWikiLDAPConnection.escapeLDAPSearchFilter(uid)});
 
         if (LOG.isDebugEnabled()) {
             LOG.debug("Searching for the user in LDAP: user:" + uid + " base:" + this.baseDN + " query:" + filter

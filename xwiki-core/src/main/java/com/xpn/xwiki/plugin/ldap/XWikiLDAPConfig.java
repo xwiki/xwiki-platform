@@ -12,6 +12,7 @@ import java.util.Set;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import com.novell.ldap.LDAPDN;
 import com.xpn.xwiki.XWikiContext;
 
 /**
@@ -397,7 +398,7 @@ public final class XWikiLDAPConfig
      */
     public String getLDAPBindDN(String login, String password, XWikiContext context)
     {
-        return MessageFormat.format(getLDAPBindDN(context), login, password);
+        return MessageFormat.format(getLDAPBindDN(context), LDAPDN.escapeRDN(login), LDAPDN.escapeRDN(password));
     }
 
     /**

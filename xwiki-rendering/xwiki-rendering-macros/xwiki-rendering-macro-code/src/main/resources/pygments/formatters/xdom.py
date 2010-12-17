@@ -35,12 +35,15 @@ class XDOMFormatter(Formatter):
     def __init__(self, listener, **options):
         Formatter.__init__(self, **options)
         self.listener = listener
+        self.styles = dict(self.style)
 
     def format(self, tokensource, outfile):
         lastval = ''
         lasttype = None
         
         for ttype, value in tokensource:
+            while ttype not in self.styles:
+                ttype = ttype.parent
             if ttype == lasttype:
                 lastval += value
             else:

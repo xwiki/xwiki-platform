@@ -978,7 +978,6 @@
               **/doc/MetaDataDiff.java,
               **/doc/rcs/XWikiPatchUtils.java,
               **/doc/rcs/XWikiRCSArchive.java,
-              **/doc/XWikiAttachmentArchive.java,
               **/doc/XWikiAttachment.java,
               **/doc/XWikiDocument.java,
               **/doc/XWikiLink.java,

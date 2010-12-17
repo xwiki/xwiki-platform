@@ -20,6 +20,7 @@
 package org.xwiki.bridge;
 
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.rendering.syntax.Syntax;
 
 /**
  * Exposes methods for accessing Documents. This is temporary until we remodel the Model classes and the Document
@@ -78,19 +79,28 @@ public interface DocumentModelBridge
     /**
      * @return the Syntax id representing the syntax used for the current document. For example "xwiki/1.0" represents
      *         the first version XWiki syntax while "xwiki/2.0" represents version 2.0 of the XWiki Syntax.
+     * @deprecated since 3.0M1 use {@link #getSyntax()} instead
      */
+    @Deprecated
     String getSyntaxId();
-    
+
+    /**
+     * @return the Syntax id representing the syntax used for the current document. For example "xwiki/1.0" represents
+     *         the first version XWiki syntax while "xwiki/2.0" represents version 2.0 of the XWiki Syntax.
+     * @since 3.0M1
+     */
+    Syntax getSyntax();
+
     /**
      * @return the page to which the document belongs to (eg "WebHome")
-     * @deprecated since 2.2M1 use {@link #getDocumentReference()}  instead
+     * @deprecated since 2.2M1 use {@link #getDocumentReference()} instead
      */
     @Deprecated
     String getPageName();
     
     /**
      * @return the space to which the document belongs to (eg "Main")
-     * @deprecated since 2.2M1 use {@link #getDocumentReference()}  instead
+     * @deprecated since 2.2M1 use {@link #getDocumentReference()} instead
      */
     @Deprecated
     String getSpaceName();

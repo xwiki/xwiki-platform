@@ -28,7 +28,7 @@ import org.xwiki.rendering.syntax.Syntax;
  * @version $Id$
  * @since 2.4M1
  */
-public class TransformationContext
+public class TransformationContext implements Cloneable
 {
     /**
      * The complete {@link XDOM} of the content currently being transformed.
@@ -116,5 +116,23 @@ public class TransformationContext
     public Syntax getSyntax()
     {
         return syntax;
+    }
+
+    /**
+     * {@inheritDoc}
+     * @see Object#clone()
+     */
+    @Override
+    public TransformationContext clone()
+    {
+        TransformationContext newContext;
+        try {
+            newContext = (TransformationContext) super.clone();
+        } catch (CloneNotSupportedException e) {
+            // Should never happen
+            throw new RuntimeException("Failed to clone object", e);
+        }
+
+        return newContext;
     }
 }

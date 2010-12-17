@@ -17,33 +17,38 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.rendering.internal.macro.box;
+package org.xwiki.rendering.transformation;
 
-import java.util.List;
+import java.util.Arrays;
 
-import org.xwiki.component.annotation.ComponentRole;
+import org.junit.Test;
+import org.junit.Assert;
 import org.xwiki.rendering.block.Block;
-import org.xwiki.rendering.macro.MacroExecutionException;
+import org.xwiki.rendering.block.WordBlock;
+import org.xwiki.rendering.block.XDOM;
 import org.xwiki.rendering.syntax.Syntax;
 
 /**
- * Parses content of a macro field (parameter, macro content) in a given syntax.
+ * Unit tests for {@link TransformationContext}.
  *
  * @version $Id$
- * @since 2.6RC1
+ * @since 3.0M1
  */
-@ComponentRole
-public interface MacroContentParser
+public class TransformationContextTest
 {
-    /**
-     * Parses content of a macro field (parameter, macro content) in a given syntax and optionally remove the top level
-     * paragraph.
-     *
-     * @param content the content to parse
-     * @param syntax the syntax in which the content is written in
-     * @param removeTopLevelParagraph whether the top level paragraph should be removed after parsing
-     * @return the result as a {@link org.xwiki.rendering.block.Block}s
-     * @throws MacroExecutionException in case of a parsing error
-     */
-    List<Block> parse(String content, Syntax syntax, boolean removeTopLevelParagraph) throws MacroExecutionException;
+    @Test
+    public void testClone()
+    {
+        TransformationContext context = new TransformationContext();
+        context.setId("id");
+        context.setSyntax(Syntax.XWIKI_2_0);
+        XDOM xdom = new XDOM(Arrays.<Block>asList(new WordBlock("test")));
+        context.setXDOM(xdom);
+
+        TransformationContext newContext = context.clone();
+        Assert.assertNotSame(context, newContext);
+        Assert.assertEquals("id", newContext.getId());
+        Assert.assertEquals(Syntax.XWIKI_2_0, newContext.getSyntax());
+        Assert.assertEquals(xdom, newContext.getXDOM());
+    }
 }

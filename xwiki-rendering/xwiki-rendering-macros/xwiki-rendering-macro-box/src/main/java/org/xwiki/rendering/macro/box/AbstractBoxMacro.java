@@ -31,7 +31,7 @@ import org.xwiki.rendering.block.FormatBlock;
 import org.xwiki.rendering.block.GroupBlock;
 import org.xwiki.rendering.block.ImageBlock;
 import org.xwiki.rendering.block.NewLineBlock;
-import org.xwiki.rendering.internal.macro.box.MacroContentParser;
+import org.xwiki.rendering.internal.macro.MacroContentParser;
 import org.xwiki.rendering.listener.Format;
 import org.xwiki.rendering.listener.reference.ResourceReference;
 import org.xwiki.rendering.listener.reference.ResourceType;
@@ -137,7 +137,8 @@ public abstract class AbstractBoxMacro<P extends BoxMacroParameters> extends Abs
                 }
                 // we add the title, if there is one
                 if (!StringUtils.isEmpty(titleParameter)) {
-                    boxBlock.addChildren(this.contentParser.parse(titleParameter, context.getSyntax(), true));
+                    // Don't execute transformations explicitly. They'll be executed on the generated content later on.
+                    boxBlock.addChildren(this.contentParser.parse(titleParameter, context, false, true));
                 }
                 if (titleBlockList != null) {
                     boxBlock.addChildren(titleBlockList);

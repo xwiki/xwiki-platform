@@ -29,7 +29,7 @@ import org.xwiki.rendering.syntax.Syntax;
  * 
  * @version $Id$
  */
-public class MacroTransformationContext
+public class MacroTransformationContext implements Cloneable
 {
     /**
      * The context of the transformation process.
@@ -180,5 +180,25 @@ public class MacroTransformationContext
     public void setId(String id)
     {
         this.transformationContext.setId(id);
+    }
+
+    /**
+     * {@inheritDoc}
+     * @see Object#clone()
+     */
+    @Override
+    public MacroTransformationContext clone()
+    {
+        MacroTransformationContext newContext;
+        try {
+            newContext = (MacroTransformationContext) super.clone();
+        } catch (CloneNotSupportedException e) {
+            // Should never happen
+            throw new RuntimeException("Failed to clone object", e);
+        }
+
+        newContext.transformationContext = getTransformationContext().clone();
+
+        return newContext;
     }
 }

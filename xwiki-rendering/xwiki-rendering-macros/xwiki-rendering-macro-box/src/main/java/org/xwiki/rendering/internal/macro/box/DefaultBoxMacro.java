@@ -67,6 +67,7 @@ public class DefaultBoxMacro<P extends BoxMacroParameters> extends AbstractBoxMa
     protected List<Block> parseContent(P parameters, String content, MacroTransformationContext context)
         throws MacroExecutionException
     {
-        return getMacroContentParser().parse(content, context.getSyntax(), context.isInline());
+        // Don't execute transformations explicitly. They'll be executed on the generated content later on.
+        return getMacroContentParser().parse(content, context, false, context.isInline());
     }
 }

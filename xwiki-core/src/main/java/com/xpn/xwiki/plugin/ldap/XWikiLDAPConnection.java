@@ -274,12 +274,12 @@ public class XWikiLDAPConnection
      * Execute a LDAP search query.
      * 
      * @param baseDN the root DN where to search.
-     * @param query the LDAP query.
+     * @param filter the LDAP filter.
      * @param attr the attributes names of values to return.
      * @param ldapScope {@link LDAPConnection#SCOPE_SUB} oder {@link LDAPConnection#SCOPE_BASE}.
      * @return the found LDAP attributes.
      */
-    public List<XWikiLDAPSearchAttribute> searchLDAP(String baseDN, String query, String[] attr, int ldapScope)
+    public List<XWikiLDAPSearchAttribute> searchLDAP(String baseDN, String filter, String[] attr, int ldapScope)
     {
         List<XWikiLDAPSearchAttribute> searchAttributeList = null;
 
@@ -288,13 +288,13 @@ public class XWikiLDAPConnection
         cons.setTimeLimit(1000);
 
         if (LOG.isDebugEnabled()) {
-            LOG.debug(MessageFormat.format("LDAP search: baseDN=[{0}] query=[{1}] attr=[{2}] ldapScope=[{3}]",
-                baseDN, query, attr != null ? Arrays.asList(attr) : null, ldapScope));
+            LOG.debug(MessageFormat.format("LDAP search: baseDN=[{0}] query=[{1}] attr=[{2}] ldapScope=[{3}]", baseDN,
+                filter, attr != null ? Arrays.asList(attr) : null, ldapScope));
         }
 
         try {
             // filter return all attributes return attrs and values time out value
-            searchResults = this.connection.search(baseDN, ldapScope, query, attr, false, cons);
+            searchResults = this.connection.search(baseDN, ldapScope, filter, attr, false, cons);
 
             if (!searchResults.hasMore()) {
                 return null;
@@ -364,5 +364,37 @@ public class XWikiLDAPConnection
                 }
             }
         }
+    }
+
+    public static final String escapeLDAPSearchFilter(String filter)
+    {
+        if (filter == null) {
+            return null;
+        }
+
+        StringBuilder sb = new StringBuilder();
+        for (int i = 0; i < filter.length(); i++) {
+            char curChar = filter.charAt(i);
+            switch (curChar) {
+                case '\\':
+                    sb.append("\\5c");
+                    break;
+                case '*':
+                    sb.append("\\2a");
+                    break;
+                case '(':
+                    sb.append("\\28");
+                    break;
+                case ')':
+                    sb.append("\\29");
+                    break;
+                case '\u0000':
+                    sb.append("\\00");
+                    break;
+                default:
+                    sb.append(curChar);
+            }
+        }
+        return sb.toString();
     }
 }

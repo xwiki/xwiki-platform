@@ -17,40 +17,26 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.test.annotation;
+package org.xwiki.rendering.internal.macro.context;
 
-import java.lang.annotation.Documented;
-import java.lang.annotation.Inherited;
-import java.lang.annotation.Retention;
-import java.lang.annotation.Target;
+import java.util.List;
 
-import static java.lang.annotation.ElementType.FIELD;
-import static java.lang.annotation.RetentionPolicy.RUNTIME;
+import org.xwiki.component.annotation.ComponentRole;
+import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.rendering.block.Block;
 
 /**
- * Defines a field that needs to be injected with a mocked component.
+ * Finds all relative Resource References in an XDOM and make them absolute.
  *
  * @version $Id$
- * @since 2.4RC1
+ * @since 3.0M1
  */
-@Documented
-@Retention(RUNTIME)
-@Target(FIELD)
-@Inherited
-public @interface MockingRequirement
+@ComponentRole
+public interface XDOMResourceReferenceResolver
 {
     /**
-     * @return the role if the component implementation implements several roles
+     * @param blocks the blocks to look into for transforming relative references into absolute ones
+     * @param docReference the entity reference used to resolve relative references against
      */
-    Class< ? > value() default Object.class;
-
-    /**
-     * @return the hint if the component implementation has several roles
-     */
-    String hint() default "";
-
-    /**
-     * @return a list of component roles for classes that shouldn't be mocked
-     */
-    Class< ? >[] exceptions() default { };
+    void resolve(List<Block> blocks, DocumentReference docReference);
 }

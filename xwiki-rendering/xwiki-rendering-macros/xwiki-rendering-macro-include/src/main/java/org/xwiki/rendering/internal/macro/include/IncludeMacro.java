@@ -31,19 +31,13 @@ import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.context.Execution;
 import org.xwiki.context.ExecutionContext;
 import org.xwiki.context.ExecutionContextManager;
-import org.xwiki.model.reference.AttachmentReferenceResolver;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
-import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.rendering.block.Block;
-import org.xwiki.rendering.block.ImageBlock;
-import org.xwiki.rendering.block.LinkBlock;
 import org.xwiki.rendering.block.MacroMarkerBlock;
-import org.xwiki.rendering.block.XDOM;
 import org.xwiki.rendering.internal.macro.MacroContentParser;
-import org.xwiki.rendering.listener.reference.ResourceReference;
-import org.xwiki.rendering.listener.reference.ResourceType;
+import org.xwiki.rendering.internal.macro.context.XDOMResourceReferenceResolver;
 import org.xwiki.rendering.macro.AbstractMacro;
 import org.xwiki.rendering.macro.MacroExecutionException;
 import org.xwiki.rendering.macro.include.IncludeMacroParameters;
@@ -94,16 +88,10 @@ public class IncludeMacro extends AbstractMacro<IncludeMacroParameters>
     private DocumentReferenceResolver<String> currentDocumentReferenceResolver;
 
     /**
-     * Used to transform relative document links into absolute references relative to the included document.
+     * Used to transform relative resource references in XDOM with absolute references.
      */
-    @Requirement("explicit")
-    private DocumentReferenceResolver<String> explicitDocumentReferenceResolver;
-
-    /**
-     * Used to transform relative attachment links into absolute references relative to the included document.
-     */
-    @Requirement("explicit")
-    private AttachmentReferenceResolver<String> explicitAttachmentReferenceResolver;
+    @Requirement
+    private XDOMResourceReferenceResolver xdomResourceReferenceResolver;
 
     /**
      * Used to serialize resolved document links into a string again since the Rendering API only manipulates Strings
@@ -217,54 +205,15 @@ public class IncludeMacro extends AbstractMacro<IncludeMacroParameters>
         }
 
         // Step 4: Modify relative references.
-        resolveRelativeReferences(result, includedReference);
+        // We need to handle the case when there are relative links specified in the content of the included document.
+        // These link references need to be resolved against the document being included and not the including document.
+        // TODO: When http://jira.xwiki.org/jira/browse/XWIKI-4802 is implemented it should be possible remove this
+        // code portion and instead perform the resolution at render time, using context information.
+        if (result.size() > 0) {
+            this.xdomResourceReferenceResolver.resolve(result, includedReference);
+        }
 
         return result;
-    }
-
-    /**
-     * We need to handle the case when there are relative links specified in the content of the included document.
-     * These link references need to be resolved against the document being included and not the including document.
-     * TODO: When http://jira.xwiki.org/jira/browse/XWIKI-4802 is implemented it should be possible remove this
-     * code portion and instead perform the resolution at render time, using context information.
-     *
-     * @param includedReference reference to the included document
-     */
-    private void resolveRelativeReferences(List<Block> blocks, DocumentReference includedReference)
-    {
-        XDOM xdom = new XDOM(blocks);
-
-        // Resolve links
-        for (LinkBlock block : xdom.getChildrenByType(LinkBlock.class, true)) {
-            ResourceReference resourceReference = block.getReference();
-            // Make reference absolute for links to document and attachments.
-            if (resourceReference.getType().equals(ResourceType.DOCUMENT)
-                || resourceReference.getType().equals(ResourceType.ATTACHMENT))
-            {
-                EntityReference entityReference;
-                if (resourceReference.getType().equals(ResourceType.DOCUMENT)) {
-                    entityReference = this.explicitDocumentReferenceResolver.resolve(resourceReference.getReference(),
-                        includedReference);
-                } else {
-                    entityReference = this.explicitAttachmentReferenceResolver.resolve(resourceReference.getReference(),
-                        includedReference);
-                }
-                String resolvedReference = this.defaultEntityReferenceSerializer.serialize(entityReference);
-                resourceReference.setReference(resolvedReference);
-            }
-        }
-
-        // Resolve images
-        for (ImageBlock block : xdom.getChildrenByType(ImageBlock.class, true)) {
-            ResourceReference resourceReference = block.getReference();
-            // Make reference absolute for images in documents
-            if (resourceReference.getType().equals(ResourceType.ATTACHMENT)) {
-                String resolvedReference = this.defaultEntityReferenceSerializer.serialize(
-                    this.explicitAttachmentReferenceResolver.resolve(resourceReference.getReference(),
-                        includedReference));
-                resourceReference.setReference(resolvedReference);
-            }
-        }
     }
 
     /**

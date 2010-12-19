@@ -123,5 +123,6 @@
     <module>xwiki-rendering-macro-php</module>
     <module>xwiki-rendering-macro-container</module>
     <module>xwiki-rendering-macro-dashboard</module>
+    <module>xwiki-rendering-macro-context</module>
   </modules>
 </project>

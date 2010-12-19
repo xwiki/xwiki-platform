@@ -62,6 +62,11 @@ public class DefaultMacroContentParser implements MacroContentParser
     public List<Block> parse(String content, MacroTransformationContext macroContext, boolean transform,
         boolean removeTopLevelParagraph) throws MacroExecutionException
     {
+        // If there's no syntax specified in the Transformation throw an error
+        if (macroContext.getSyntax() == null) {
+            throw new MacroExecutionException("Invalid Transformation: missing Syntax");
+        }
+
         try {
             List<Block> blocks = getSyntaxParser(macroContext.getSyntax()).parse(
                 new StringReader(content)).getChildren();

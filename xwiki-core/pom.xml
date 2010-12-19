@@ -730,6 +730,11 @@
       <artifactId>xwiki-core-rendering-macro-wikibridge</artifactId>
       <version>${project.version}</version>
     </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-core-rendering-macro-context</artifactId>
+      <version>${project.version}</version>
+    </dependency>
     <!-- XWiki syntax parsers -->
     <dependency>
       <groupId>org.xwiki.platform</groupId>

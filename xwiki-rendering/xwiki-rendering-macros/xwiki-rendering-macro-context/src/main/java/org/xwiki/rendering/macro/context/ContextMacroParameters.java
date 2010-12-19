@@ -17,40 +17,38 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.test.annotation;
+package org.xwiki.rendering.macro.context;
 
-import java.lang.annotation.Documented;
-import java.lang.annotation.Inherited;
-import java.lang.annotation.Retention;
-import java.lang.annotation.Target;
-
-import static java.lang.annotation.ElementType.FIELD;
-import static java.lang.annotation.RetentionPolicy.RUNTIME;
+import org.xwiki.properties.annotation.PropertyDescription;
 
 /**
- * Defines a field that needs to be injected with a mocked component.
+ * Parameters for the Context macro.
  *
  * @version $Id$
- * @since 2.4RC1
+ * @since 3.0M1
  */
-@Documented
-@Retention(RUNTIME)
-@Target(FIELD)
-@Inherited
-public @interface MockingRequirement
+public class ContextMacroParameters
 {
     /**
-     * @return the role if the component implementation implements several roles
+     * @see #getDocument()
      */
-    Class< ? > value() default Object.class;
+    private String documentReference;
 
     /**
-     * @return the hint if the component implementation has several roles
+     * @return the reference to the document that will be set as the current document to evaluate the macro's content
      */
-    String hint() default "";
+    public String getDocument()
+    {
+        return this.documentReference;
+    }
 
     /**
-     * @return a list of component roles for classes that shouldn't be mocked
+     * @param documentReference refer to {@link #getDocument()}
      */
-    Class< ? >[] exceptions() default { };
+    @PropertyDescription("the reference to the document serving as the current document")
+    public void setDocument(String documentReference)
+    {
+        this.documentReference = documentReference;
+    }
+
 }

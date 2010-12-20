@@ -48,12 +48,12 @@ public class ContextMacro extends AbstractMacro<ContextMacroParameters>
     /**
      * The description of the macro.
      */
-    private static final String DESCRIPTION = "Executes content in the context of the passed document.";
+    private static final String DESCRIPTION = "Executes content in the context of the passed document";
 
     /**
      * The description of the macro content.
      */
-    private static final String CONTENT_DESCRIPTION = "the content to execute.";
+    private static final String CONTENT_DESCRIPTION = "The content to execute";
 
     /**
      * Used to set the current document in the context (old way) and check rights.

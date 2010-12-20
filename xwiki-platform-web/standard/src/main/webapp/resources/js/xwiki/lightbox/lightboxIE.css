@@ -45,12 +45,28 @@
   top: 0;
   width: 100%;
   z-index: 100000;
-  /* Keep filter before -ms-filter because their values are wrapped in quotes. */
-  filter: "progid:DXImageTransform.Microsoft.alpha(opacity=70)";
-  -ms-filter: "progid:DXImageTransform.Microsoft.alpha(opacity=70)";
   opacity: 0.7;
   overflow: auto;
 }
+
+/* start IE opacity setting */
+#lb-bg {
+  /* This is for IE8. We need to quote the property value because the equal sign is not valid inside a CSS property value. */
+  -ms-filter: "progid:DXImageTransform.Microsoft.Alpha(Opacity=70)";
+}
+
+*+html #lb-bg {
+  /* This is for IE7, which doesn't accept the quoted value but fortunately understands the escape syntax. */
+  filter: alpha(opacity\=70);
+  /* Unicode escape works too. */
+  /*filter: alpha(opacity\003d 70);*/
+}
+
+* html #lb-bg {
+  /* This is for IE6, which doesn't understand the escaped equal sign (not even the unicode escape) but fortunately accepts the quoted value. */
+  filter: "progid:DXImageTransform.Microsoft.Alpha(Opacity=70)";
+}
+/* end IE opacity setting */
 
 #lb input[type=text], #lb textarea {
     cursor: text;

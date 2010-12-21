@@ -205,7 +205,7 @@ $xwiki.ssfx.use('uicomponents/viewers/comments.css', true)
     $('commentCaptcha').style.display = "none";
     var handler = function() {
       var captchaDiv = $('commentCaptcha');
-      var image = new Element('img', {'src' : '$doc.getURL("imagecaptcha")?nounce=$datetool.getSystemTime()', 'alt' : '$msg.get("core.captcha.image.alternateText")'});
+      var image = new Element('img', {'src' : '$doc.getURL("imagecaptcha")?nounce=$datetool.getSystemTime()', 'alt' : '$escapetool.javascript($msg.get("core.captcha.image.alternateText"))'});
       captchaDiv.insertBefore(image, captchaDiv.firstChild);
       Event.observe(image, 'load', function() {
         Effect.SlideDown('commentCaptcha', { duration: 0.7 });

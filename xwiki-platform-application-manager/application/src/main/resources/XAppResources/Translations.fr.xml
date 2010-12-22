@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<xwikidoc>
+<web>XAppResources</web>
+<name>Translations</name>
+<language>fr</language>
+<defaultLanguage>en</defaultLanguage>
+<translation>1</translation>
+<parent>XAppResources.WebHome</parent>
+<creator></creator>
+<author>XWiki.Admin</author>
+<customClass></customClass>
+<contentAuthor>XWiki.Admin</contentAuthor>
+<creationDate>1192218584000</creationDate>
+<date>1278346254000</date>
+<contentUpdateDate>1278346254000</contentUpdateDate>
+<version>1.1</version>
+<title></title>
+<template></template>
+<defaultTemplate></defaultTemplate>
+<validationScript></validationScript>
+<comment></comment>
+<minorEdit>false</minorEdit>
+<syntaxId>xwiki/2.0</syntaxId>
+<hidden>false</hidden>
+<content>## XWiki Translation for language fr generated from http://www.l10n.xwiki.org
+xapp.action.exportnonrecurse=Export (non r\u00E9cursif)
+xapp.action.exportrecurse=Export
+xapp.action.reloadapp=Recharger
+xapp.answer.deleteapp.msg=Souhaitez-vous vraiment supprimer l''application "{0}"?
+xapp.answer.deleteapp.title=Supprimer l''application "{0}"
+xapp.answer.exportapp.recursive=R\u00E9cursif
+xapp.answer.exportapp.title=Exporter l''application "{0}"
+xapp.answer.exportapp.withdetails=Avec l'historique
+xapp.appmanager=Gestionnaire d'applications
+xapp.appname=Nom de l'application
+xapp.availablefilestoimport=Fichier disponibles pour import
+xapp.createapplication=Cr\u00E9er une nouvelle application
+xapp.description=Description
+xapp.docname=Nom du document
+xapp.errorcreateapp=Une erreur s''est produite lors la cr\u00E9ation de l''application "{0}" (code "{1}").
+xapp.errorcreateapp.ERROR_AM_APPDOCALREADYEXISTS=L''application "{0}" existe d\u00E9j\u00E0. Veuillez choisir un autre nom.
+xapp.errordeleteapp=Une erreur s''est produite lors de la suppression de l''application "{0}" (code "{1}").
+xapp.errorexportapp=Une erreur s''est produite lors de l''export de l''application "{0}" (code "{1}").
+xapp.errorimportapp=Une erreur s''est produite lors de l''import de l''application "{0}" (code "{1}").
+xapp.errorreloadapp=Une erreur s''est produite en rechargeant l''application "{0}" (code "{1}"). 
+xapp.legend.application=Application
+xapp.legend.validate=Valider
+xapp.pluginnotenabled=Le plugin de gestion d'applications n'est pas activ\u00E9. Veuillez vous assurer que "com.xpn.xwiki.plugin.applicationmanager.ApplicationManagerPlugin" est bien list\u00E9 dans la section xwiki.plugins du fichier xwiki.cfg.
+xapp.successcreateapp=L''application "{0}" a \u00E9t\u00E9 cr\u00E9\u00E9e. Vous pouvez y acc\u00E9der sur la page [{0}]
+xapp.successdeleteapp=L''application "{0}" a bien \u00E9t\u00E9 supprim\u00E9e.
+xapp.successexportapp=L''application "{0}" a bien \u00E9t\u00E9 export\u00E9e.
+xapp.successimportapp=L''import de l''application "{0}" a bien \u00E9t\u00E9 r\u00E9alis\u00E9.
+xapp.successreloadapp=L''application "{0}" a bien \u00E9t\u00E9 recharg\u00E9e.
+xapp.totalnumberofapp=Nombre total d'applications
+</content></xwikidoc>

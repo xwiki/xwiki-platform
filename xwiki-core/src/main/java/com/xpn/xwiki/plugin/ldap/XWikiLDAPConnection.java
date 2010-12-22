@@ -35,6 +35,7 @@ import org.apache.commons.logging.LogFactory;
 import com.novell.ldap.LDAPAttribute;
 import com.novell.ldap.LDAPAttributeSet;
 import com.novell.ldap.LDAPConnection;
+import com.novell.ldap.LDAPDN;
 import com.novell.ldap.LDAPEntry;
 import com.novell.ldap.LDAPException;
 import com.novell.ldap.LDAPJSSESecureSocketFactory;
@@ -364,6 +365,20 @@ public class XWikiLDAPConnection
                 }
             }
         }
+    }
+
+    /**
+     * Fully escape DN value (the part after the =).
+     * 
+     * <p>For example, for the dn value "Acme, Inc", the escapeLDAPDNValue method
+    * returns "Acme\, Inc".</p>
+    * 
+     * @param value the DN value to escape
+     * @return the escaped version o the DN value
+     */
+    public static final String escapeLDAPDNValue(String value)
+    {
+        return LDAPDN.escapeRDN("key=" + value).substring("key=".length());
     }
 
     /**

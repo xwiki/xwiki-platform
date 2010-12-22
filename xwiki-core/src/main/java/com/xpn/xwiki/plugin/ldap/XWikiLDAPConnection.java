@@ -378,7 +378,7 @@ public class XWikiLDAPConnection
      */
     public static final String escapeLDAPDNValue(String value)
     {
-        return LDAPDN.escapeRDN("key=" + value).substring("key=".length());
+        return LDAPDN.escapeRDN("key=" + value).substring(4);
     }
 
     /**

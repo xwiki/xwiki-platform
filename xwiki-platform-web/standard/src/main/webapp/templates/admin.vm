@@ -84,7 +84,7 @@
       ## Less than 40 pages in the wiki, probably a fresh install (16/07/08 : XWiki creates 21 pages at startup)
       #set ($rawVersion = $xwiki.getVersion())
       #set ($URLhost = "http://maven.xwiki.org")
-      #set ($URLgroup = "org/xwiki/products")
+      #set ($URLgroup = "org/xwiki/enterprise")
       #set ($URLartifact = "xwiki-enterprise-wiki")
       #set ($URLversion = $rawVersion.substring(0, $rawVersion.lastIndexOf(".")))
       #if ($URLversion.endsWith("-SNAPSHOT"))
@@ -95,7 +95,7 @@
       #warning($msg.get("admin.defaultwikinotinstalled", ["<a href='$URL'>$URL</a>"]))
     #else
       ## More than 40 pages and Admin app not installed, probably an upgrade.
-      #warning($msg.get("admin.adminappnotinstalled", ["<a href='http://code.xwiki.org/xwiki/bin/view/Applications/AdministrationApplication'>http://code.xwiki.org/xwiki/bin/view/Applications/AdministrationApplication</a>"]))
+      #warning($msg.get("admin.adminappnotinstalled", ["<a href='http://extensions.xwiki.org/xwiki/bin/view/Extension/Administration+Application'>http://extensions.xwiki.org/xwiki/bin/view/Extension/Administration+Application</a>"]))
     #end
     <div id="admin-page">
       <div id="admin-page-header">

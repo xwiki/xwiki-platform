@@ -50,6 +50,7 @@ import org.dom4j.dom.DOMDocument;
 import org.dom4j.dom.DOMElement;
 import org.dom4j.io.OutputFormat;
 import org.dom4j.io.SAXReader;
+import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.observation.ObservationManager;
 import org.xwiki.query.QueryException;
 
@@ -167,7 +168,7 @@ public class Package
     {
         this.backupPack = backupPack;
     }
-    
+
     public boolean hasBackupPackImportRights(XWikiContext context)
     {
         return isFarmAdmin(context);
@@ -257,7 +258,7 @@ public class Package
             DocumentInfo docinfo = new DocumentInfo(doc);
             docinfo.setAction(defaultAction);
             this.files.add(docinfo);
-            BaseClass bclass = doc.getxWikiClass();
+            BaseClass bclass = doc.getXClass();
             if (bclass.getFieldList().size() > 0) {
                 this.classFiles.add(docinfo);
             }
@@ -266,7 +267,7 @@ public class Package
             }
             return true;
         } catch (ExcludeDocumentException e) {
-            LOG.info("Skip the document " + doc.getFullName());
+            LOG.info("Skip the document " + doc.getDocumentReference());
 
             return false;
         }
@@ -435,24 +436,24 @@ public class Package
                         this.filter(doc, context);
                         docsToLoad.add(doc);
                     } catch (ExcludeDocumentException e) {
-                        LOG.info("Skip the document '" + doc.getFullName() + "'");
+                        LOG.info("Skip the document '" + doc.getDocumentReference() + "'");
                     }
                 }
             }
             // Make sure a manifest was included in the package...
             if (description == null) {
                 throw new PackageException(XWikiException.ERROR_XWIKI_UNKNOWN,
-                                           "Could not find the package definition");
+                    "Could not find the package definition");
             }
             /*
-             * Loop 2: Cycle through the list of documents and if they are in the manifest then add them, otherwise
-             * log a warning and add them to the skipped list.
+             * Loop 2: Cycle through the list of documents and if they are in the manifest then add them, otherwise log
+             * a warning and add them to the skipped list.
              */
             for (XWikiDocument doc : docsToLoad) {
                 if (documentExistInPackageFile(doc.getFullName(), doc.getLanguage(), description)) {
                     this.add(doc, context);
                 } else {
-                    LOG.warn("document " + doc.getFullName() + " does not exist in package definition."
+                    LOG.warn("document " + doc.getDocumentReference() + " does not exist in package definition."
                         + " It will not be installed.");
                     // It will be listed in the "skipped documents" section after the
                     // import.
@@ -473,6 +474,7 @@ public class Package
         Element docFiles = xml.getRootElement();
         Element infosFiles = docFiles.element("files");
 
+        @SuppressWarnings("unchecked")
         List<Element> fileList = infosFiles.elements("file");
 
         for (Element el : fileList) {
@@ -497,6 +499,7 @@ public class Package
         Element docFiles = xml.getRootElement();
         Element infosFiles = docFiles.element("files");
 
+        @SuppressWarnings("unchecked")
         List<Element> fileList = infosFiles.elements("file");
         for (Element el : fileList) {
             String defaultAction = el.attributeValue("defaultAction");
@@ -562,7 +565,7 @@ public class Package
 
         boolean hasCustomMappings = false;
         for (DocumentInfo docinfo : this.customMappingFiles) {
-            BaseClass bclass = docinfo.getDoc().getxWikiClass();
+            BaseClass bclass = docinfo.getDoc().getXClass();
             hasCustomMappings |= context.getWiki().getStore().injectCustomMapping(bclass, context);
         }
 
@@ -672,10 +675,10 @@ public class Package
                         result = DocumentInfo.INSTALL_ERROR;
                         addToErrors(doc.getFullName() + ":" + doc.getLanguage(), context);
                         if (LOG.isErrorEnabled()) {
-                            LOG.error("Failed to delete document " + previousdoc.getFullName());
+                            LOG.error("Failed to delete document " + previousdoc.getDocumentReference());
                         }
                         if (LOG.isDebugEnabled()) {
-                            LOG.debug("Failed to delete document " + previousdoc.getFullName(), e);
+                            LOG.debug("Failed to delete document " + previousdoc.getDocumentReference(), e);
                         }
                     }
                 }
@@ -777,6 +780,7 @@ public class Package
 
     private List<String> getStringList(String name, XWikiContext context)
     {
+        @SuppressWarnings("unchecked")
         List<String> list = (List<String>) context.get(name);
 
         if (list == null) {
@@ -853,7 +857,7 @@ public class Package
      */
     private XWikiDocument readFromXML(InputStream is) throws XWikiException
     {
-        XWikiDocument doc = new com.xpn.xwiki.doc.XWikiDocument();
+        XWikiDocument doc = new XWikiDocument();
 
         doc.fromXML(is, this.withVersions);
 
@@ -869,7 +873,7 @@ public class Package
      */
     private XWikiDocument readFromXML(Document domDoc) throws XWikiException
     {
-        XWikiDocument doc = new com.xpn.xwiki.doc.XWikiDocument();
+        XWikiDocument doc = new XWikiDocument();
 
         doc.fromXML(domDoc, this.withVersions);
 
@@ -995,7 +999,7 @@ public class Package
      */
     public String getPathFromDocument(XWikiDocument doc, XWikiContext context)
     {
-        return doc.getSpace() + "/" + getFileNameFromDocument(doc, context);
+        return getDirectoryForDocument(doc) + getFileNameFromDocument(doc, context);
     }
 
     /**
@@ -1006,7 +1010,7 @@ public class Package
      */
     public String getFileNameFromDocument(XWikiDocument doc, XWikiContext context)
     {
-        StringBuffer fileName = new StringBuffer(doc.getName());
+        StringBuffer fileName = new StringBuffer(doc.getDocumentReference().getName());
 
         // Add language
         String language = doc.getLanguage();
@@ -1019,6 +1023,21 @@ public class Package
         fileName.append('.').append(DEFAULT_FILEEXT);
 
         return fileName.toString();
+    }
+
+    /**
+     * Generate a relative path based on provided document for the directory where the document should be stored.
+     * 
+     * @param doc the document to export
+     * @return the corresponding path
+     */
+    public String getDirectoryForDocument(XWikiDocument doc)
+    {
+        StringBuilder path = new StringBuilder();
+        for (SpaceReference space : doc.getDocumentReference().getSpaceReferences()) {
+            path.append(space.getName()).append('/');
+        }
+        return path.toString();
     }
 
     /**
@@ -1042,7 +1061,7 @@ public class Package
     {
         try {
             filter(doc, context);
-            File spacedir = new File(dir, doc.getSpace());
+            File spacedir = new File(dir, getDirectoryForDocument(doc));
             if (!spacedir.exists()) {
                 if (!spacedir.mkdirs()) {
                     Object[] args = new Object[1];
@@ -1058,10 +1077,10 @@ public class Package
             fos.flush();
             fos.close();
         } catch (ExcludeDocumentException e) {
-            LOG.info("Skip the document " + doc.getFullName());
+            LOG.info("Skip the document " + doc.getDocumentReference());
         } catch (Exception e) {
             Object[] args = new Object[1];
-            args[0] = doc.getFullName();
+            args[0] = doc.getDocumentReference();
 
             throw new XWikiException(XWikiException.MODULE_XWIKI_DOC, XWikiException.ERROR_XWIKI_DOC_EXPORT,
                 "Error creating file {0}", e, args);
@@ -1183,10 +1202,10 @@ public class Package
                             ++count;
                         } else {
                             throw new PackageException(XWikiException.ERROR_XWIKI_UNKNOWN, "document "
-                                + doc.getFullName() + " does not exist in package definition");
+                                + doc.getDocumentReference() + " does not exist in package definition");
                         }
                     } catch (ExcludeDocumentException e) {
-                        LOG.info("Skip the document '" + doc.getFullName() + "'");
+                        LOG.info("Skip the document '" + doc.getDocumentReference() + "'");
                     }
                 } else if (!file.getName().equals(DefaultPackageFileName)) {
                     LOG.info(file.getAbsolutePath() + " is not a valid wiki document");

@@ -122,4 +122,14 @@ public class DefaultOpenOfficeConverter implements OpenOfficeConverter
             }
         }
     }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see OpenOfficeConverter#isMediaTypeSupported(String)
+     */
+    public boolean isMediaTypeSupported(String mediaType)
+    {
+        return converter.getFormatRegistry().getFormatByMediaType(mediaType) != null;
+    }
 }

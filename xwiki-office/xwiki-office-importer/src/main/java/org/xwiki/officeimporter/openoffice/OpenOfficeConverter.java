@@ -23,8 +23,8 @@ import java.io.InputStream;
 import java.util.Map;
 
 /**
- * Converter interface to be used for performing document conversion tasks. 
- *
+ * Converter interface to be used for performing document conversion tasks.
+ * 
  * @version $Id$
  * @since 2.2M1
  */
@@ -50,4 +50,13 @@ public interface OpenOfficeConverter
      */
     Map<String, byte[]> convert(Map<String, InputStream> inputStreams, String inputFileName, String outputFileName)
         throws OpenOfficeConverterException;
+
+    /**
+     * Checks if the office documents with the specified media type can be converted by this converter.
+     * 
+     * @param mediaType a media type
+     * @return {@code true} if the specified media type is supported, {@code false} otherwise
+     * @since 3.0M1
+     */
+    boolean isMediaTypeSupported(String mediaType);
 }

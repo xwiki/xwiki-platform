@@ -19,9 +19,7 @@
  */
 package org.xwiki.office.viewer.internal;
 
-import java.util.Arrays;
 import java.util.Collections;
-import java.util.List;
 import java.util.Map;
 
 import org.xwiki.bridge.DocumentAccessBridge;
@@ -33,6 +31,8 @@ import org.xwiki.context.Execution;
 import org.xwiki.model.reference.AttachmentReference;
 import org.xwiki.office.viewer.OfficeViewer;
 import org.xwiki.office.viewer.OfficeViewerScriptService;
+import org.xwiki.officeimporter.openoffice.OpenOfficeConverter;
+import org.xwiki.officeimporter.openoffice.OpenOfficeManager;
 import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.renderer.BlockRenderer;
 import org.xwiki.rendering.renderer.printer.DefaultWikiPrinter;
@@ -48,16 +48,6 @@ import org.xwiki.rendering.renderer.printer.WikiPrinter;
 public class DefaultOfficeViewerScriptService extends AbstractLogEnabled implements OfficeViewerScriptService
 {
     /**
-     * The list of supported mime types, i.e. the mime types that can be viewed.
-     */
-    private static final List<String> SUPPORTED_MIME_TYPES =
-        Arrays.asList("application/msword", "application/powerpoint", "application/vnd.ms-powerpoint",
-            "application/vnd.ms-excel", "application/vnd.oasis.opendocument",
-            "application/vnd.oasis.opendocument.text", "application/vnd.oasis.opendocument.graphics",
-            "application/vnd.oasis.opendocument.presentation", "application/vnd.oasis.opendocument.spreadsheet",
-            "application/vnd.oasis.opendocument.chart", "application/vnd.oasis.opendocument.formula");
-
-    /**
      * The key used to save on the execution context the exception caught during office document view.
      */
     private static final String OFFICE_VIEW_EXCEPTION = "officeView.caughtException";
@@ -67,6 +57,14 @@ public class DefaultOfficeViewerScriptService extends AbstractLogEnabled impleme
      */
     @Requirement
     private OfficeViewer officeViewer;
+
+    /**
+     * The component used to retrieve the office document converter, which knows the supported media types.
+     * 
+     * @see #isMimeTypeSupported(String)
+     */
+    @Requirement
+    private OpenOfficeManager officeManager;
 
     /**
      * Used to lookup various {@link BlockRenderer} implementations based on the output syntax.
@@ -139,7 +137,8 @@ public class DefaultOfficeViewerScriptService extends AbstractLogEnabled impleme
      */
     public boolean isMimeTypeSupported(String mimeType)
     {
-        return SUPPORTED_MIME_TYPES.contains(mimeType);
+        OpenOfficeConverter converter = officeManager.getConverter();
+        return converter != null && converter.isMediaTypeSupported(mimeType);
     }
 
     /**

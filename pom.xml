@@ -194,6 +194,7 @@
                 <!-- To be removed when we release 3.0 -->
                 <exclude>org/xwiki/bridge/DocumentModelBridge</exclude>
                 <exclude>org/xwiki/rendering/macro/box/AbstractBoxMacro</exclude>
+                <exclude>org/xwiki/officeimporter/openoffice/OpenOfficeConverter</exclude>
               </excludes>
             </configuration>
           </plugin>

@@ -1220,6 +1220,64 @@ div#xwikiobjects input[type="checkbox"], div#xwikiclassproperties input[type="ch
   background-image: url("$xwiki.getSkinFile('icons/silk/book_open.gif')");
 }
 
+/* @group FORMS */
+/* --------------------------------------------------------------
+  * forms components
+-------------------------------------------------------------- */
+.xform h2 {
+  font-size: 1.2em;
+  font-weight: bold;
+  margin: 2em 0 0;
+}
+
+.xform input[type="text"], .xform input[type="password"],
+.xform select, .xform textarea{
+  width: 99%;
+}
+
+.xform dt {
+  margin-top: 1.2em;
+}
+
+.xform dt label {
+  color: $theme.textColor;
+  display: block;
+  font-size: .85em;
+  font-weight: 700;
+  margin-bottom: .3em;
+  text-transform: uppercase;
+}
+
+.xform .xRequired {
+  color: $theme.textSecondaryColor;
+  font-size: .9em;
+  font-style: italic;
+  font-weight: normal;
+  margin-left: 1ex;
+  text-transform: none;
+}
+
+.xform .xHint {
+  color: $theme.textSecondaryColor;
+  display: block;
+  font-size: .8em;
+  font-style: normal;
+  font-weight: 400;
+  margin-bottom: .3em;
+}
+
+.xform .xErrorMsg {
+  color: #CC3333;
+  display: block;
+  font-size: .8em;
+  font-weight: normal;
+  margin-bottom: .3em;
+}
+
+.xform .xErrorField {
+  border: 1px solid #CC3333;
+}
+
 /* @group BUTTONS */
 /* --------------------------------------------------------------
   * Button elements different containers
@@ -1247,6 +1305,13 @@ input.button:hover , .buttonwrapper  a:hover{
   background-color: $theme.buttonSecondaryBackgroundColor;
   color: $theme.buttonSecondaryTextColor;
   text-decoration: none;
+}
+
+.buttonwrapper input.secondary, .buttonwrapper a.secondary, 
+.buttonwrapper a.secondary:link, .buttonwrapper a.secondary:visited,
+.buttonwrapper a.secondary:active /* Needed for IE6 */ {
+  background-color: $theme.buttonSecondaryBackgroundColor;
+  color: $theme.buttonSecondaryTextColor;
 }
 
 /* @group PANELS */

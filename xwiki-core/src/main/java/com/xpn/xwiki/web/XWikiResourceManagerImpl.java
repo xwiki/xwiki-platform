@@ -32,11 +32,11 @@ public class XWikiResourceManagerImpl extends ResourceManagerImpl
     /**
      * {@inheritDoc}
      * 
-     * @see org.apache.velocity.runtime.resource.ResourceManagerImpl#getResource(java.lang.String, int, java.lang.String)
+     * @see org.apache.velocity.runtime.resource.ResourceManagerImpl#getResource(String, int, String)
      */
     @Override
     public Resource getResource(String string, int i, String string1) throws ResourceNotFoundException,
-        ParseErrorException, Exception
+        ParseErrorException
     {
         Resource result = super.getResource(string, i, string1);
         return result;

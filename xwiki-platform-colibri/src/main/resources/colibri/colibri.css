@@ -676,11 +676,11 @@ div.buttonwrapper {
 }
 
 .diffaddword {
-  color: #287f00;
+  color: $theme.notificationSuccessColor;
 }
 
 .diffremoveword {
-  color: #ca9a9b;
+  color: $theme.notificationErrorColor;
   text-decoration: line-through;
 }
 
@@ -861,7 +861,7 @@ table.xRichTextEditorTabPanel td {
 .xwikirenderingerror {
   background: $theme.backgroundSecondaryColor url("$xwiki.getSkinFile('icons/silk/exclamation.gif')") no-repeat 8px 50%;
   border: 1px dotted $theme.borderColor;
-  color: #e14726;
+  color: $theme.notificationErrorColor;
   display: block;
   padding: 2px 28px;
 }
@@ -1271,7 +1271,7 @@ div#xwikiobjects input[type="checkbox"], div#xwikiclassproperties input[type="ch
 }
 
 .xform .xErrorMsg {
-  color: #CC3333;
+  color: $theme.notificationErrorColor;
   display: block;
   font-size: .8em;
   font-weight: normal;
@@ -1279,7 +1279,7 @@ div#xwikiobjects input[type="checkbox"], div#xwikiclassproperties input[type="ch
 }
 
 .xform .xErrorField {
-  border: 1px solid #CC3333;
+  border: 1px solid $theme.notificationErrorColor;
 }
 
 /* @group BUTTONS */
@@ -1523,17 +1523,17 @@ ul.xlist li.xitem div.xitemcontainer ul.xlist {
 
 .infomessage {
   background-image: url("$xwiki.getSkinFile('icons/silk/information.gif')");
-  color: #369;
+  color: $theme.notificationInfoColor;
 }
 
 .warningmessage {
   background-image: url("$xwiki.getSkinFile('icons/silk/error.gif')");
-  color: #D5A13D;
+  color: $theme.notificationWarningColor;
 }
 
 .errormessage {
   background-image: url("$xwiki.getSkinFile('icons/silk/exclamation.gif')");
-  color: #e14726;
+  color: $theme.notificationErrorColor;
 }
 
 .messagetype {
@@ -1739,7 +1739,7 @@ ol.footnotes {
 
 /* --------------------RSS Macro-------------------------*/
 .rssfeed {
-  background-color: #fff;
+  background-color: $theme.pageContentBackgroundColor;
   border: 1px dotted $theme.borderColor;
   padding: 8px;
   width: 300px;

@@ -108,7 +108,7 @@
 #if($text1 != $text2)
   #set($hasChanges = true)
   <div id="changes-content">
-    <table class="changes-table">
+    <table class="changes-table" summary="$msg.get('core.viewers.diff.summary')">
       <tr class="changes-table-title">
         <th>$msg.get('core.viewers.diff.contentChanges')</th>
       </tr>
@@ -125,7 +125,7 @@
 #if($attachmentsChanges.size() > 0)
   #set($hasChanges = true)
   <div id="changes-attachments">
-    <table class="changes-table">
+    <table class="changes-table" summary="$msg.get('core.viewers.diff.summary')">
       <tr class="changes-table-title">
         <th colspan="2">$msg.get('core.viewers.diff.attachmentChanges')</th>
       </tr>
@@ -156,7 +156,7 @@
 #if($commentsChanges.size() > 0)
   #set($hasChanges = true)
   <div id="changes-comments">
-    <table class="changes-table">
+    <table class="changes-table" summary="$msg.get('core.viewers.diff.summary')">
       <tr class="changes-table-title">
         <th colspan="3">$msg.get('core.viewers.diff.commentChanges')</th>
       </tr>
@@ -191,7 +191,7 @@
 #if($objectsChanges.size() > 0)
   #set($hasChanges = true)
   <div id="changes-objects">
-    <table class="changes-table">
+    <table class="changes-table" summary="$msg.get('core.viewers.diff.summary')">
       <tr class="changes-table-title">
         <th colspan="3">$msg.get('core.viewers.diff.objectChanges')</th>
       </tr>
@@ -226,7 +226,7 @@
 #if(($classChanges.size() > 0) && ($classChanges.get(0).size() > 0))
   #set($hasChanges = true)
   <div id="changes-classes">
-    <table class="changes-table">
+    <table class="changes-table" summary="$msg.get('core.viewers.diff.summary')">
       <tr class="changes-table-title">
         <th>$msg.get('core.viewers.diff.classChanges')</th>
       </tr>

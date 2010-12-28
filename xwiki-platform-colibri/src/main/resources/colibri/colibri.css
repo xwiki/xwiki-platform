@@ -1076,10 +1076,14 @@ div#xwikiobjects input[type="checkbox"], div#xwikiclassproperties input[type="ch
 }
 
 .actionmenu .tmCreate {
-  background-color: #4D9244; /* $theme.buttonPrimaryBackgroundColor */
+  background-color: $theme.menuAddEntryBackgroundColor;
   margin-right: 2em;
   padding-left: 10px;
   position: relative;
+}
+
+.actionmenu .tmCreate a.tme, .tmCreate .menuarrow  {
+  color: $theme.menuAddEntryLinkColor;
 }
 
 .tmCreate .submenu {

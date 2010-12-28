@@ -36,6 +36,10 @@
 #set($discard = $theme.put('buttonSecondaryBackgroundColor', '#FFFFFF'))
 #set($discard = $theme.put('buttonSecondaryTextColor', '#0089DC'))
 #set($discard = $theme.put('backgroundSecondaryColor', '#EFEFEF'))
+#set($discard = $theme.put('notificationInfoColor', '#336699'))
+#set($discard = $theme.put('notificationSuccessColor', '#008000'))
+#set($discard = $theme.put('notificationWarningColor', '#D6AE00'))
+#set($discard = $theme.put('notificationErrorColor', '#CC3333'))
 ##
 ## Overwrite with the values set in the custom theme
 #if(!$themeObj)

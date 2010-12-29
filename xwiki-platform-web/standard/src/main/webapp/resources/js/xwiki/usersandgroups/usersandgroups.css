@@ -1,3 +1,4 @@
+#template('colorThemeInit.vm')
 #memberstable {
   width: 500px;
   margin-bottom: 5px;
@@ -5,12 +6,12 @@
 
 #specialusersandgroups {
   border-collapse: collapse;
-  border: 1px solid #d4dee8;
+  border: 1px solid $theme.borderColor;
   width: 99.5%;
 }
 
 #specialusersandgroups td {
-  border: 1px solid #d4dee8;
+  border: 1px solid $theme.borderColor;
 }
 
 .manage {
@@ -49,14 +50,14 @@
 }
 
 #errMsg {
-  color: #DD7700;
+  color: $theme.notificationErrorColor;
   font-size: 12px;
   font-weight: bold;
 }
 
 #XWikiGuestSpecial {
-  background-color: #fff;
-  color: #000;
+  background-color: $theme.pageContentBackgroundColor;
+  color: $theme.textColor;
 }
 
 .suorg {
@@ -77,5 +78,5 @@
 }
 
 tr.userorgroups-header {
-  background-color:#DDDDDD;
+  background-color: $theme.backgroundSecondaryColor;
 }

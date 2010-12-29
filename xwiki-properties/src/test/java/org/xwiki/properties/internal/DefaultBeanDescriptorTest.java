@@ -19,6 +19,9 @@
  */
 package org.xwiki.properties.internal;
 
+import java.lang.reflect.ParameterizedType;
+import java.util.List;
+
 import junit.framework.TestCase;
 
 import org.xwiki.properties.PropertyDescriptor;
@@ -47,10 +50,14 @@ public class DefaultBeanDescriptorTest extends TestCase
         private boolean prop3;
 
         private String hiddenProperty;
-
+        
+        private List<Integer> genericProp;
+        
         @PropertyName("Public Field")
         @PropertyDescription("a public field")
         public String publicField;
+        
+        public List<Integer> genericField;
 
         public void setLowerprop(String lowerprop)
         {
@@ -116,6 +123,16 @@ public class DefaultBeanDescriptorTest extends TestCase
         public String getHiddenProperty()
         {
             return hiddenProperty;
+        }
+        
+        public List<Integer> getGenericProp()
+        {
+            return genericProp;
+        }
+        
+        public void setGenericProp(List<Integer> genericProp)
+        {
+            this.genericProp = genericProp;
         }
     }
 
@@ -221,5 +238,42 @@ public class DefaultBeanDescriptorTest extends TestCase
         assertNotNull(prop3Descriptor.getWriteMethod());
         assertNotNull(prop3Descriptor.getReadMethod());
         assertNull(prop3Descriptor.getFied());
+    }
+    
+    public void testPropertyDescriptorGeneric()
+    {
+        PropertyDescriptor genericPropertyDescriptor = this.beanDescriptor.getProperty("genericProp");
+
+        assertNotNull(genericPropertyDescriptor);
+        assertEquals("genericProp", genericPropertyDescriptor.getId());
+        assertEquals("genericProp", genericPropertyDescriptor.getName());
+        assertEquals("genericProp", genericPropertyDescriptor.getDescription());
+        assertSame(List.class, ((ParameterizedType)genericPropertyDescriptor.getPropertyType()).getRawType());
+        assertSame(Integer.class, ((ParameterizedType)genericPropertyDescriptor.getPropertyType()).getActualTypeArguments()[0]);
+        assertEquals(null, genericPropertyDescriptor.getDefaultValue());
+        assertEquals(false, genericPropertyDescriptor.isMandatory());
+        assertNotNull(genericPropertyDescriptor.getWriteMethod());
+        assertNotNull(genericPropertyDescriptor.getReadMethod());
+        assertNull(genericPropertyDescriptor.getFied());
+
+        PropertyDescriptor prop1Descriptor = this.beanDescriptor.getProperty("prop1");
+
+        assertEquals("defaultprop1", prop1Descriptor.getDefaultValue());
+    }
+    
+    public void testPropertyDescriptorGenericField()
+    {
+        PropertyDescriptor genericFieldPropertyDescriptor = this.beanDescriptor.getProperty("genericField");
+
+        assertNotNull(genericFieldPropertyDescriptor);
+        assertEquals("genericField", genericFieldPropertyDescriptor.getId());
+        assertEquals("genericField", genericFieldPropertyDescriptor.getName());
+        assertEquals("genericField", genericFieldPropertyDescriptor.getDescription());
+        assertSame(List.class, ((ParameterizedType)genericFieldPropertyDescriptor.getPropertyType()).getRawType());
+        assertSame(Integer.class, ((ParameterizedType)genericFieldPropertyDescriptor.getPropertyType()).getActualTypeArguments()[0]);
+        assertEquals(false, genericFieldPropertyDescriptor.isMandatory());
+        assertNull(genericFieldPropertyDescriptor.getWriteMethod());
+        assertNull(genericFieldPropertyDescriptor.getReadMethod());
+        assertNotNull(genericFieldPropertyDescriptor.getFied());
     }
 }

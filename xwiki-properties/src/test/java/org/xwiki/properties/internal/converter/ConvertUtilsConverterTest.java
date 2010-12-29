@@ -19,33 +19,48 @@
  */
 package org.xwiki.properties.internal.converter;
 
+import org.junit.Assert;
+import org.junit.Before;
+import org.junit.Test;
 import org.xwiki.properties.converter.Converter;
-import org.xwiki.test.AbstractXWikiComponentTestCase;
+import org.xwiki.test.AbstractComponentTestCase;
 
 /**
  * Validate {@link ConvertConverter} component.
  * 
  * @version $Id$
  */
-public class ConvertUtilsConverterTest extends AbstractXWikiComponentTestCase
+public class ConvertUtilsConverterTest extends AbstractComponentTestCase
 {
     private Converter convertUtilsConverter;
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see junit.framework.TestCase#setUp()
-     */
+    public Integer[] field;
+
+    @Before
     @Override
-    protected void setUp() throws Exception
+    public void setUp() throws Exception
     {
         super.setUp();
 
         this.convertUtilsConverter = getComponentManager().lookup(Converter.class);
     }
 
-    public void testConvert()
+    @Test
+    public void testConvert() throws SecurityException, NoSuchFieldException
     {
-        assertEquals(Integer.valueOf(42), this.convertUtilsConverter.convert(Integer.class, "42"));
+        Assert.assertEquals(Integer.valueOf(42), this.convertUtilsConverter.convert(Integer.class, "42"));
+    }
+
+    @Test
+    public void testConvertArrays() throws SecurityException, NoSuchFieldException
+    {
+        Assert.assertArrayEquals(new int[] {1, 2, 3},
+            this.convertUtilsConverter.<int[]> convert(int[].class, "1, 2, 3"));
+
+        Assert.assertArrayEquals(new Integer[] {1, 2, 3},
+            this.convertUtilsConverter.<Integer[]> convert(Integer[].class, "1, 2, 3"));
+
+        Assert.assertArrayEquals(new Integer[] {1, 2, 3}, this.convertUtilsConverter.<Integer[]> convert(
+            ConvertUtilsConverterTest.class.getField("field").getGenericType(), "1, 2, 3"));
     }
 }

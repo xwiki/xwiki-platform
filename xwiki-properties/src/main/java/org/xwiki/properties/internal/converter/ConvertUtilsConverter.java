@@ -19,6 +19,9 @@
  */
 package org.xwiki.properties.internal.converter;
 
+import java.lang.reflect.ParameterizedType;
+import java.lang.reflect.Type;
+
 import org.apache.commons.beanutils.BeanUtilsBean;
 import org.apache.commons.beanutils.ConversionException;
 import org.apache.commons.beanutils.ConvertUtils;
@@ -49,12 +52,12 @@ public class ConvertUtilsConverter implements Converter, Initializable
     }
 
     /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.properties.converter.Converter#convert(java.lang.Class, java.lang.Object)
+     * @param <T> the type in which the provided value has to be converted
+     * @param targetType the type in which the provided value has to be converted
+     * @param sourceValue the value to convert
+     * @return the converted value
      */
-    @SuppressWarnings("unchecked")
-    public <T> T convert(Class<T> targetType, Object sourceValue)
+    private <T> T convert(Class<T> targetType, Object sourceValue)
     {
         // We can't use Class#cast(Object) because ConvertUtils#convert always return Object form of the targetType even
         // if targetType is a primitive. When using casting syntax Object form is implicitly converter to proper
@@ -64,5 +67,24 @@ public class ConvertUtilsConverter implements Converter, Initializable
         } catch (ConversionException ex) {
             throw new org.xwiki.properties.converter.ConversionException("Error while performing type conversion", ex);
         }
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see org.xwiki.properties.converter.Converter#convert(java.lang.reflect.Type, java.lang.Object)
+     */
+    public <T> T convert(Type targetType, Object sourceValue)
+    {
+        Class<T> clazz;
+        if (targetType instanceof Class) {
+            clazz = (Class<T>) targetType;
+        } else if (targetType instanceof ParameterizedType) {
+            clazz = (Class<T>) ((ParameterizedType) targetType).getRawType();
+        } else {
+            throw new org.xwiki.properties.converter.ConversionException("Unknown type [" + targetType + "]");
+        }
+
+        return convert(clazz, sourceValue);
     }
 }

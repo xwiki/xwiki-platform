@@ -17,31 +17,28 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.properties;
+package org.xwiki.properties.internal.converter;
 
-import java.lang.reflect.Type;
+import java.util.Collection;
+import java.util.LinkedHashSet;
 
-import org.xwiki.component.annotation.ComponentRole;
+import org.xwiki.component.annotation.Component;
+import org.xwiki.properties.converter.AbstractCollectionConverter;
 
 /**
- * Simple API to do universal conversion between two types.
- * <p>
- * To add support for another target type, implements a new {@link org.xwiki.properties.converter.Converter} component
- * 
  * @version $Id$
- * @since 2.0M2
  */
-@ComponentRole
-public interface ConverterManager
+@Component(hints = {"java.util.Set", "java.util.LinkedHashSet", "java.util.HashSet" })
+public class SetConverter extends AbstractCollectionConverter
 {
     /**
-     * Convert provided value into the provided target type.
+     * {@inheritDoc}
      * 
-     * @param <T> the type in which the provided value has to be converted
-     * @param targetType the type in which the provided value has to be converted
-     * @param sourceValue the value to convert
-     * @return the converted value
-     * @since 3.0M1
+     * @see org.xwiki.properties.converter.AbstractCollectionConverter#newCollection()
      */
-    <T> T convert(Type targetType, Object sourceValue);
+    @Override
+    protected Collection newCollection()
+    {
+        return new LinkedHashSet();
+    }
 }

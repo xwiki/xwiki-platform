@@ -20,6 +20,7 @@
 package org.xwiki.properties.internal.converter;
 
 import java.awt.Color;
+import java.lang.reflect.Type;
 import java.text.MessageFormat;
 import java.util.StringTokenizer;
 
@@ -44,14 +45,15 @@ public class ColorConverter extends AbstractConverter
     /**
      * {@inheritDoc}
      * 
-     * @see org.apache.commons.beanutils.converters.AbstractConverter#convertToType(java.lang.Class, java.lang.Object)
+     * @see org.xwiki.properties.converter.AbstractConverter#convertToType(org.xwiki.properties.PropertyType,
+     *      java.lang.Object)
      */
     @Override
-    protected <T> T convertToType(Class<T> type, Object value)
+    protected Color convertToType(Type type, Object value)
     {
-        T color = null;
+        Color color = null;
         if (value != null) {
-            color = type.cast(parse(value.toString()));
+            color = parse(value.toString());
         }
 
         return color;

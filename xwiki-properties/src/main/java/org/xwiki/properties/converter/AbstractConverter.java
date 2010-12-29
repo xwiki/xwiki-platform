@@ -19,10 +19,12 @@
  */
 package org.xwiki.properties.converter;
 
+import java.lang.reflect.Type;
+
 /**
  * Helper base class for a {@link Converter} component.
  * <p>
- * Commonly a new componenet is supposed to implements {@link AbstractConverter#convertToString(Object)} and
+ * Commonly a new component is supposed to implements {@link AbstractConverter#convertToString(Object)} and
  * {@link AbstractConverter#convertToType(Class, Object)}.
  * 
  * @version $Id$
@@ -33,18 +35,18 @@ public abstract class AbstractConverter implements Converter
     /**
      * {@inheritDoc}
      * 
-     * @see org.xwiki.properties.converter.Converter#convert(java.lang.Class, java.lang.Object)
+     * @see org.xwiki.properties.converter.Converter#convert(java.lang.reflect.Type, java.lang.Object)
      */
-    public <T> T convert(Class<T> targetType, Object sourceValue)
+    public <T> T convert(Type targetType, Object sourceValue)
     {
         Class< ? > sourceType = sourceValue == null ? null : sourceValue.getClass();
 
         if (targetType.equals(String.class)) {
             // Convert --> String
-            return targetType.cast(convertToString(sourceValue));
+            return (T) ((Class) targetType).cast(convertToString(sourceValue));
         } else if (targetType.equals(sourceType)) {
             // No conversion necessary
-            return targetType.cast(sourceValue);
+            return (T) sourceValue;
         } else {
             // Convert --> Type
             return convertToType(targetType, sourceValue);
@@ -71,9 +73,31 @@ public abstract class AbstractConverter implements Converter
      * Typical implementations will provide a minimum of <code>String --> type</code> conversion.
      * 
      * @param <T> the type in which the provided value has o be converted
+     * @param targetType Data type to which this value should be converted.
+     * @param value The input value to be converted.
+     * @return The converted value.
+     * @since 3.0M1
+     */
+    protected <T> T convertToType(Type targetType, Object value)
+    {
+        // Call #convertToType(Class<T> type, Object value) for retro compatibility
+        return convertToType(targetType, value);
+    }
+
+    /**
+     * Convert the input object into an output object of the specified type.
+     * <p>
+     * Typical implementations will provide a minimum of <code>String --> type</code> conversion.
+     * 
+     * @param <T> the type in which the provided value has o be converted
      * @param type Data type to which this value should be converted.
      * @param value The input value to be converted.
      * @return The converted value.
+     * @deprecated since 3.0M1 overwrite {@link #convertToType(Type, Object)} instead
      */
-    protected abstract <T> T convertToType(Class<T> type, Object value);
+    @Deprecated
+    protected <T> T convertToType(Class<T> type, Object value)
+    {
+        throw new ConversionException("Not implemented.");
+    }
 }

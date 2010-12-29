@@ -17,31 +17,15 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.properties;
+package org.xwiki.properties.internal.converter;
 
-import java.lang.reflect.Type;
-
-import org.xwiki.component.annotation.ComponentRole;
+import org.xwiki.component.annotation.Component;
+import org.xwiki.properties.converter.AbstractCollectionConverter;
 
 /**
- * Simple API to do universal conversion between two types.
- * <p>
- * To add support for another target type, implements a new {@link org.xwiki.properties.converter.Converter} component
- * 
  * @version $Id$
- * @since 2.0M2
  */
-@ComponentRole
-public interface ConverterManager
+@Component(hints = {"java.util.List", "java.util.Collection", "java.util.ArrayList" })
+public class ListConverter extends AbstractCollectionConverter
 {
-    /**
-     * Convert provided value into the provided target type.
-     * 
-     * @param <T> the type in which the provided value has to be converted
-     * @param targetType the type in which the provided value has to be converted
-     * @param sourceValue the value to convert
-     * @return the converted value
-     * @since 3.0M1
-     */
-    <T> T convert(Type targetType, Object sourceValue);
 }

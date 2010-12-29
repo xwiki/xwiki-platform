@@ -21,6 +21,7 @@ package org.xwiki.properties;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
+import java.lang.reflect.Type;
 
 /**
  * Describe a property in a bean.
@@ -49,8 +50,16 @@ public interface PropertyDescriptor
 
     /**
      * @return the type of the property.
+     * @deprecated since 3.0M1 use {@link #getPropertyType()} instead
      */
+    @Deprecated
     Class< ? > getPropertyClass();
+
+    /**
+     * @return the type of the property.
+     * @since 3.0M1
+     */
+    Type getPropertyType();
 
     /**
      * @return the default value of the property.

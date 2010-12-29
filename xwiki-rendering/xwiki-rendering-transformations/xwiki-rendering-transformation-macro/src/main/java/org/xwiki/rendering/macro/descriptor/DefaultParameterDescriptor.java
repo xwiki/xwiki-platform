@@ -19,6 +19,8 @@
  */
 package org.xwiki.rendering.macro.descriptor;
 
+import java.lang.reflect.Type;
+
 import org.xwiki.properties.PropertyDescriptor;
 
 /**
@@ -71,7 +73,7 @@ public class DefaultParameterDescriptor implements ParameterDescriptor
      */
     public String getDescription()
     {
-        return propertyDescriptor.getDescription();
+        return this.propertyDescriptor.getDescription();
     }
 
     /**
@@ -81,7 +83,17 @@ public class DefaultParameterDescriptor implements ParameterDescriptor
      */
     public Class< ? > getType()
     {
-        return propertyDescriptor.getPropertyClass();
+        return this.propertyDescriptor.getPropertyClass();
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see org.xwiki.rendering.macro.descriptor.ParameterDescriptor#getParameterType()
+     */
+    public Type getParameterType()
+    {
+        return this.propertyDescriptor.getPropertyType();
     }
 
     /**
@@ -91,7 +103,7 @@ public class DefaultParameterDescriptor implements ParameterDescriptor
      */
     public Object getDefaultValue()
     {
-        return propertyDescriptor.getDefaultValue();
+        return this.propertyDescriptor.getDefaultValue();
     }
 
     /**
@@ -102,6 +114,6 @@ public class DefaultParameterDescriptor implements ParameterDescriptor
      */
     public boolean isMandatory()
     {
-        return propertyDescriptor.isMandatory();
+        return this.propertyDescriptor.isMandatory();
     }
 }

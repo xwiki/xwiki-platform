@@ -115,7 +115,6 @@ public class DefaultBeanDescriptor extends AbstractLogEnabled implements BeanDes
     {
         DefaultPropertyDescriptor desc = new DefaultPropertyDescriptor();
         desc.setId(propertyDescriptor.getName());
-        desc.setPropertyClass(propertyDescriptor.getPropertyType());
 
         Method writeMethod = propertyDescriptor.getWriteMethod();
 
@@ -126,6 +125,8 @@ public class DefaultBeanDescriptor extends AbstractLogEnabled implements BeanDes
             PropertyHidden parameterHidden = extractPropertyAnnotation(writeMethod, readMethod, PropertyHidden.class);
 
             if (parameterHidden == null) {
+                desc.setPropertyType(readMethod.getGenericReturnType());
+
                 // get parameter description
                 PropertyName parameterName = extractPropertyAnnotation(writeMethod, readMethod, PropertyName.class);
 
@@ -133,14 +134,14 @@ public class DefaultBeanDescriptor extends AbstractLogEnabled implements BeanDes
 
                 // get parameter description
                 PropertyDescription parameterDescription =
-                        extractPropertyAnnotation(writeMethod, readMethod, PropertyDescription.class);
+                    extractPropertyAnnotation(writeMethod, readMethod, PropertyDescription.class);
 
-                desc.setDescription(parameterDescription != null ? parameterDescription.value()
-                    : propertyDescriptor.getShortDescription());
+                desc.setDescription(parameterDescription != null ? parameterDescription.value() : propertyDescriptor
+                    .getShortDescription());
 
                 // is parameter mandatory
                 PropertyMandatory parameterMandatory =
-                        extractPropertyAnnotation(writeMethod, readMethod, PropertyMandatory.class);
+                    extractPropertyAnnotation(writeMethod, readMethod, PropertyMandatory.class);
 
                 desc.setMandatory(parameterMandatory != null);
 
@@ -174,12 +175,13 @@ public class DefaultBeanDescriptor extends AbstractLogEnabled implements BeanDes
     {
         DefaultPropertyDescriptor desc = new DefaultPropertyDescriptor();
         desc.setId(field.getName());
-        desc.setPropertyClass(field.getType());
 
         // is parameter hidden
         PropertyHidden parameterHidden = field.getAnnotation(PropertyHidden.class);
 
         if (parameterHidden == null) {
+            desc.setPropertyType(field.getGenericType());
+
             // get parameter name
             PropertyName parameterName = field.getAnnotation(PropertyName.class);
 

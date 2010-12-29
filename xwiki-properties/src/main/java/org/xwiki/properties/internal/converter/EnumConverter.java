@@ -19,6 +19,8 @@
  */
 package org.xwiki.properties.internal.converter;
 
+import java.lang.reflect.Type;
+
 import org.xwiki.component.annotation.Component;
 import org.xwiki.properties.converter.AbstractConverter;
 import org.xwiki.properties.converter.ConversionException;
@@ -38,15 +40,15 @@ public class EnumConverter extends AbstractConverter
      * @see org.apache.commons.beanutils.converters.AbstractConverter#convertToType(java.lang.Class, java.lang.Object)
      */
     @Override
-    protected <T> T convertToType(Class<T> type, Object value)
+    protected <T> T convertToType(Type type, Object value)
     {
         if (value != null) {
-            Object[] enumValues = type.getEnumConstants();
+            Object[] enumValues = ((Class<T>) type).getEnumConstants();
 
             String testValue = value.toString();
             for (Object enumValue : enumValues) {
                 if (enumValue.toString().equalsIgnoreCase(testValue)) {
-                    return type.cast(enumValue);
+                    return (T) enumValue;
                 }
             }
 

@@ -1,5 +1,8 @@
 package org.xwiki.properties.internal;
 
+import java.lang.reflect.ParameterizedType;
+import java.lang.reflect.Type;
+
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.Requirement;
 import org.xwiki.component.logging.AbstractLogEnabled;
@@ -47,46 +50,106 @@ public class DefaultConverterManager extends AbstractLogEnabled implements Conve
     /**
      * {@inheritDoc}
      * 
-     * @see org.xwiki.properties.ConverterManager#convert(java.lang.Class, java.lang.Object)
+     * @see org.xwiki.properties.ConverterManager#convert(java.lang.reflect.Type, java.lang.Object)
      */
-    public <T> T convert(Class<T> targetClass, Object value)
+    public <T> T convert(Type targetType, Object value)
     {
         // Convert
-        Converter converter = lookupConverter(targetClass);
+        Converter converter = lookupConverter(targetType);
 
         if (converter != null) {
-            return converter.convert(targetClass, value);
+            return converter.convert(targetType, value);
         } else {
             throw new ConversionException("Can't find converter to convert value [" + value + "] to type ["
-                + targetClass + "] ");
+                + targetType + "] ");
         }
     }
 
     /**
      * Find the right {@link Converter} for the provided {@link Class}.
      * 
-     * @param targetType the class
+     * @param targetType the type to convert to
      * @return the {@link Converter} corresponding to the class
      */
-    private Converter lookupConverter(Class< ? > targetType)
+    private Converter lookupConverter(Type targetType)
     {
         Converter converter = null;
+
+        String typeGenericName = getTypeGenericName(targetType);
         try {
-            converter = this.componentManager.lookup(Converter.class, targetType.getName());
+            converter = this.componentManager.lookup(Converter.class, getTypeGenericName(targetType));
         } catch (ComponentLookupException e) {
-            getLogger().debug("Failed to find a proper Converter for type [" + targetType.getName() + "]", e);
+            getLogger().debug("Failed to find a proper Converter for type [" + typeGenericName + "]", e);
+
+            if (targetType instanceof ParameterizedType) {
+                String typeName = getTypeName(targetType);
+                try {
+                    converter = this.componentManager.lookup(Converter.class, typeName);
+                } catch (ComponentLookupException e2) {
+                    getLogger().debug("Failed to find a proper Converter for class [" + typeName + "]", e);
+                }
+            }
         }
 
         if (converter == null) {
-            if (Enum.class.isAssignableFrom(targetType)) {
+            if (Enum.class.isAssignableFrom(targetType.getClass())) {
                 converter = this.enumConverter;
             } else {
-                getLogger().debug("Trying default Converter for target type [" + targetType.getName() + "]");
+                getLogger().debug("Trying default Converter for target type [" + typeGenericName + "]");
 
                 converter = this.defaultConverter;
             }
         }
 
         return converter;
+    }
+
+    /**
+     * Get class name without generics.
+     * 
+     * @param type the type
+     * @return type name without generics
+     */
+    private String getTypeName(Type type)
+    {
+        String name;
+        if (type instanceof Class) {
+            name = ((Class) type).getName();
+        } else if (type instanceof ParameterizedType) {
+            name = ((Class) ((ParameterizedType) type).getRawType()).getName();
+        } else {
+            name = type.toString();
+        }
+
+        return name;
+    }
+
+    /**
+     * Get type name.
+     * 
+     * @param type the type
+     * @return type name
+     */
+    private String getTypeGenericName(Type type)
+    {
+        StringBuilder sb = new StringBuilder(getTypeName(type));
+
+        if (type instanceof ParameterizedType) {
+            ParameterizedType parameterizedType = (ParameterizedType) type;
+
+            Type[] generics = parameterizedType.getActualTypeArguments();
+            if (generics.length > 0) {
+                sb.append('<');
+                for (int i = 0; i < generics.length; ++i) {
+                    if (i > 0) {
+                        sb.append(',');
+                    }
+                    sb.append(getTypeGenericName(generics[i]));
+                }
+                sb.append('>');
+            }
+        }
+
+        return sb.toString();
     }
 }

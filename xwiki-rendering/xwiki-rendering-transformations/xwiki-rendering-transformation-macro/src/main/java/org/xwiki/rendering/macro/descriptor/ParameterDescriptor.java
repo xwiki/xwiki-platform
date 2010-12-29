@@ -19,6 +19,8 @@
  */
 package org.xwiki.rendering.macro.descriptor;
 
+import java.lang.reflect.Type;
+
 /**
  * Define a macro parameter.
  * 
@@ -46,8 +48,16 @@ public interface ParameterDescriptor
 
     /**
      * @return the type of the parameter.
+     * @deprecated since 3.0M1 use {@link #getParameterType()} instead
      */
+    @Deprecated
     Class< ? > getType();
+
+    /**
+     * @return the type of the property.
+     * @since 3.0M1
+     */
+    Type getParameterType();
 
     /**
      * @return the default value of the parameter.

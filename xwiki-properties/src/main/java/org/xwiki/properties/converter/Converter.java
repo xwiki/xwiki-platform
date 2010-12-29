@@ -19,6 +19,8 @@
  */
 package org.xwiki.properties.converter;
 
+import java.lang.reflect.Type;
+
 import org.xwiki.component.annotation.ComponentRole;
 
 /**
@@ -48,6 +50,7 @@ public interface Converter
      * @param targetType the type in which the provided value has to be converted
      * @param sourceValue the value to convert
      * @return the converted value
+     * @since 3.0M1
      */
-    <T> T convert(Class<T> targetType, Object sourceValue);
+    <T> T convert(Type targetType, Object sourceValue);
 }

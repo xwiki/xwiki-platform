@@ -21,6 +21,8 @@ package org.xwiki.properties.internal;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
+import java.lang.reflect.ParameterizedType;
+import java.lang.reflect.Type;
 
 import org.xwiki.properties.PropertyDescriptor;
 
@@ -50,9 +52,9 @@ public class DefaultPropertyDescriptor implements PropertyDescriptor
     private String description;
 
     /**
-     * @see #getPropertyClass()
+     * @see #getPropertyType()
      */
-    private Class< ? > propertyClass;
+    private Type propertyType;
 
     /**
      * @see #getDefaultValue()
@@ -143,18 +145,38 @@ public class DefaultPropertyDescriptor implements PropertyDescriptor
      * 
      * @see org.xwiki.properties.PropertyDescriptor#getPropertyClass()
      */
+    @Deprecated
     public Class< ? > getPropertyClass()
     {
-        return this.propertyClass;
+        Class< ? > clazz;
+        if (this.propertyType instanceof Class) {
+            clazz = (Class) this.propertyType;
+        } else if (this.propertyType instanceof ParameterizedType) {
+            clazz = (Class) ((ParameterizedType) this.propertyType).getRawType();
+        } else {
+            clazz = null;
+        }
+
+        return clazz;
     }
 
     /**
-     * @param propertyClass the type of the property.
+     * {@inheritDoc}
+     * 
+     * @see org.xwiki.properties.PropertyDescriptor#getPropertyType()
+     */
+    public Type getPropertyType()
+    {
+        return this.propertyType;
+    }
+
+    /**
+     * @param propertyType the class of the property.
      * @see #getPropertyClass()
      */
-    public void setPropertyClass(Class< ? > propertyClass)
+    public void setPropertyType(Type propertyType)
     {
-        this.propertyClass = propertyClass;
+        this.propertyType = propertyType;
     }
 
     /**

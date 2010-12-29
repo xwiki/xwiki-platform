@@ -58,7 +58,7 @@ public class DefaultConverterManager extends AbstractLogEnabled implements Conve
         Converter converter = lookupConverter(targetType);
 
         if (converter != null) {
-            return converter.convert(targetType, value);
+            return (T) converter.convert(targetType, value);
         } else {
             throw new ConversionException("Can't find converter to convert value [" + value + "] to type ["
                 + targetType + "] ");
@@ -92,7 +92,7 @@ public class DefaultConverterManager extends AbstractLogEnabled implements Conve
         }
 
         if (converter == null) {
-            if (Enum.class.isAssignableFrom(targetType.getClass())) {
+            if (targetType instanceof Class && Enum.class.isAssignableFrom((Class< ? >) targetType)) {
                 converter = this.enumConverter;
             } else {
                 getLogger().debug("Trying default Converter for target type [" + typeGenericName + "]");

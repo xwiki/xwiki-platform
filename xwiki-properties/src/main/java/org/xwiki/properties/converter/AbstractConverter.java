@@ -19,6 +19,7 @@
  */
 package org.xwiki.properties.converter;
 
+import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 
 /**
@@ -41,16 +42,19 @@ public abstract class AbstractConverter implements Converter
     {
         Class< ? > sourceType = sourceValue == null ? null : sourceValue.getClass();
 
+        T result;
         if (targetType.equals(String.class)) {
             // Convert --> String
-            return (T) ((Class) targetType).cast(convertToString(sourceValue));
+            result = (T) ((Class) targetType).cast(convertToString(sourceValue));
         } else if (targetType.equals(sourceType)) {
             // No conversion necessary
-            return (T) sourceValue;
+            result = (T) sourceValue;
         } else {
             // Convert --> Type
-            return convertToType(targetType, sourceValue);
+            result = (T) convertToType(targetType, sourceValue);
         }
+        
+        return result;
     }
 
     /**
@@ -80,8 +84,17 @@ public abstract class AbstractConverter implements Converter
      */
     protected <T> T convertToType(Type targetType, Object value)
     {
-        // Call #convertToType(Class<T> type, Object value) for retro compatibility
-        return convertToType(targetType, value);
+        Class<T> clazz;
+        if (targetType instanceof Class) {
+            clazz = (Class) targetType;
+        } else if (targetType instanceof ParameterizedType) {
+            clazz = (Class) ((ParameterizedType) targetType).getRawType();
+        } else {
+            throw new ConversionException("Unknown type [" + targetType + "]");
+        }
+
+        // Call #convertToType(Class<T> type, Object value) for retro-compatibility
+        return convertToType(clazz, value);
     }
 
     /**

@@ -19,6 +19,8 @@
  */
 package org.xwiki.rendering.macro.wikibridge;
 
+import java.lang.reflect.Type;
+
 import org.xwiki.rendering.macro.descriptor.ParameterDescriptor;
 
 /**
@@ -121,6 +123,16 @@ public class WikiMacroParameterDescriptor implements ParameterDescriptor
     public Class< ? > getType()
     {
         return String.class;
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see org.xwiki.rendering.macro.descriptor.ParameterDescriptor#getParameterType()
+     */
+    public Type getParameterType()
+    {
+        return getType();
     }
 
     /**

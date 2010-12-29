@@ -34,17 +34,17 @@ import java.lang.ref.ReferenceQueue;
  * Represents access level.
  * 
  * The pattern for creating objects of this class should be as follows:
- *
- * 1. Clone or construct an instance:
+ * <ol>
+ * <li>Clone or construct an instance:<br/>
  * 
- *    AccessLevel newInstance = existingInstance.clone();
+ * {@code AccessLevel newInstance = existingInstance.clone();}
+ * </li>
+ * <li>Modify new instance via allow, deny, and clear.
+ * </li>
+ * <li>Try to reuse an existing instance if available:<br/>
  *
- * 2. Modify new instance via allow, deny, and clear.
- *
- * 3. Try to reuse an existing instance if available:
- *
- *    newInstance = newInstance.reuseInstance();
- *
+ * {@code newInstance = newInstance.reuseInstance();}
+ * </li></ol>
  * After step 3. the instance is read-only.
  * @version $Id$
  */

@@ -195,6 +195,11 @@
                 <exclude>org/xwiki/bridge/DocumentModelBridge</exclude>
                 <exclude>org/xwiki/rendering/macro/box/AbstractBoxMacro</exclude>
                 <exclude>org/xwiki/officeimporter/openoffice/OpenOfficeConverter</exclude>
+                <exclude>org/xwiki/properties/ConverterManager</exclude>
+                <exclude>org/xwiki/properties/PropertyDescriptor</exclude>
+                <exclude>org/xwiki/properties/converter/AbstractConverter</exclude>
+                <exclude>org/xwiki/properties/converter/Converter</exclude>
+                <exclude>org/xwiki/rendering/macro/descriptor/ParameterDescriptor</exclude>
               </excludes>
             </configuration>
           </plugin>

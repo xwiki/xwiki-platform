@@ -90,7 +90,7 @@ public class CommonsConfigurationSource extends AbstractLogEnabled implements Co
             } else if (Properties.class.isAssignableFrom(valueClass)) {
                 result = (T) this.configuration.getProperties(key);
             } else if (null != getProperty(key)) {
-                result = this.converterManager.convert(valueClass, getProperty(key));
+                result = (T) this.converterManager.convert(valueClass, getProperty(key));
             }
         } catch (org.apache.commons.configuration.ConversionException e) {
             throw new org.xwiki.configuration.ConversionException("Key [" + key + "] is not of type ["

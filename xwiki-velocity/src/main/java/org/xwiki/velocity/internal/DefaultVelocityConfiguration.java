@@ -90,6 +90,7 @@ public class DefaultVelocityConfiguration implements Initializable, VelocityConf
         this.defaultProperties.setProperty("directive.set.null.allowed", Boolean.TRUE.toString());
         this.defaultProperties.setProperty("webapp.resource.loader.class", WebappLoader.class.getName());
         this.defaultProperties.setProperty("velocimacro.messages.on", Boolean.FALSE.toString());
+        this.defaultProperties.setProperty("velocimacro.max.depth", "100");
         this.defaultProperties.setProperty("resource.manager.logwhenfound", Boolean.FALSE.toString());
         this.defaultProperties.setProperty("velocimacro.permissions.allow.inline.local.scope", Boolean.TRUE.toString());
         // Prevents users from writing dangerous Velocity code like using Class.forName or Java threading APIs.

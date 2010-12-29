@@ -1,3 +1,4 @@
+#template('colorThemeInit.vm')
 .xnotification-container {
   position : fixed;
   bottom: 0;
@@ -23,11 +24,11 @@
 
 #set($notificationCustommization = [])
 ## each element:                       [notification type, bg color, text color, icon]
-#set($discard = $notificationCustommization.add(["info", "#268", "#fff"]))
-#set($discard = $notificationCustommization.add(["warning", "#fd8", "#330"]))
-#set($discard = $notificationCustommization.add(["error", "#a00", "#fff"]))
+#set($discard = $notificationCustommization.add(["info", "$theme.notificationInfoColor", "#fff"]))
+#set($discard = $notificationCustommization.add(["warning", "$theme.notificationWarningColor ", "#330"]))
+#set($discard = $notificationCustommization.add(["error", "$theme.notificationErrorColor", "#fff"]))
 #set($discard = $notificationCustommization.add(["inprogress", "#333", "#fff", "icons/xwiki/spinner-white.gif"]))
-#set($discard = $notificationCustommization.add(["done", "#160", "#fff"]))
+#set($discard = $notificationCustommization.add(["done", "$theme.notificationSuccessColor", "#fff"]))
 ##
 #foreach($item in $notificationCustommization)
   #set($notificationType  = ${item.get(0)})

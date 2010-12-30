@@ -46,7 +46,7 @@
 
 #if($hasAdmin) 
 {{box}}
-{{html}}&lt;img src="$xwiki.getSkinFile("icons/wiz.png")" alt=""/&gt;{{/html}} $msg.get("xe.panels.customize") [[$msg.get("panelwizard.panelwizard")&gt;&gt;Panels.PanelWizard]].
+{{html}}&lt;img src="$xwiki.getSkinFile('icons/silk/wand.gif')" alt=""/&gt;{{/html}} $msg.get("xe.panels.customize") [[$msg.get("panelwizard.panelwizard")&gt;&gt;Panels.PanelWizard]].
 {{/box}}
 #end
 

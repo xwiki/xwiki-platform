@@ -155,7 +155,7 @@ XWiki.SyntaxConverter = Class.create({
         this.name = "Main.WebHome";
       }
     }
-    this.loading = new Element("div").setStyle({backgroundColor: '#000', backgroundImage: 'url($xwiki.getSkinFile('icons/ajax-loader.gif'))', backgroundPosition: 'center', backgroundRepeat: 'no-repeat', opacity: 0.6}).hide();
+    this.loading = new Element("div").setStyle({backgroundColor: '#000', backgroundImage: 'url($xwiki.getSkinFile('icons/xwiki/ajax-loader-large.gif'))', backgroundPosition: 'center', backgroundRepeat: 'no-repeat', opacity: 0.6}).hide();
     document.body.appendChild(this.loading);
     this.loading.absolutize().clonePosition(this.contentField);
   },

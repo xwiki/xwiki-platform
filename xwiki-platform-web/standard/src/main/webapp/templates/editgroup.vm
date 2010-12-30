@@ -3,7 +3,7 @@
 #if($xwiki.getDocument("XWiki.XWikiGroupSheet").isNew())
 <div id="groupwrap">
 <div id="ajax-loader">Loading...<br />
-  <img src="$xwiki.getSkinFile('icons/ajax-loader.gif')" alt="Loading..." title="Loading..." />
+  <img src="$xwiki.getSkinFile('icons/xwiki/ajax-loader-large.gif')" alt="Loading..." title="Loading..." />
 </div>
 <table id="memberstable">
 <tr><td colspan="3" id="showLimits"></td></tr>

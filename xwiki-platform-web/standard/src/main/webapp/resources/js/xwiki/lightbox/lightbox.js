@@ -225,7 +225,7 @@ Lightbox = Class.create({
   },
 
   getWaiting: function() {
-    var msg = "$xwiki.getSkinFile('icons/ajax-loader.gif')";
+    var msg = "$xwiki.getSkinFile('icons/xwiki/ajax-loader-large.gif')";
     return '<div style="padding: 30px;"><img src="' + msg + '"/></div>';
   },
 

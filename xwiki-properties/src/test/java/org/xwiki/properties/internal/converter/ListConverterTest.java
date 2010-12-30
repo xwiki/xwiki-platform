@@ -32,7 +32,7 @@ import org.xwiki.test.AbstractComponentTestCase;
 /**
  * Validate {@link ColorConverter} component.
  * 
- * @version $Id: ColorConverterTest.java 22052 2009-07-24 19:21:19Z sdumitriu $
+ * @version $Id$
  */
 public class ListConverterTest extends AbstractComponentTestCase
 {

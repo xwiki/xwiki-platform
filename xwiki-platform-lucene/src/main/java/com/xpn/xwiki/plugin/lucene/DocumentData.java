@@ -47,9 +47,9 @@ public class DocumentData extends IndexData
 {
     private static final Log LOG = LogFactory.getLog(DocumentData.class);
 
-    public DocumentData(final XWikiDocument doc, final XWikiContext context)
+    public DocumentData(final XWikiDocument doc, final XWikiContext context, final boolean deleted)
     {
-        super(doc, context);
+        super(doc, context, deleted);
 
         setAuthor(doc.getAuthor());
         setCreator(doc.getCreator());
@@ -90,6 +90,7 @@ public class DocumentData extends IndexData
     private void getObjectFullText(StringBuilder sb, XWikiDocument doc, XWikiContext context)
     {
         super.getFullText(sb, doc, context);
+
         getObjectContentAsText(sb, doc, context);
     }
 

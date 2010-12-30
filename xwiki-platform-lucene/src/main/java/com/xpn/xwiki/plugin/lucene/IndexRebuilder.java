@@ -38,6 +38,7 @@ import org.apache.lucene.search.TermQuery;
 import org.apache.lucene.search.TopDocs;
 import org.apache.lucene.store.Directory;
 import org.xwiki.context.Execution;
+import org.xwiki.model.reference.DocumentReference;
 
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
@@ -124,8 +125,8 @@ public class IndexRebuilder extends AbstractXWikiRunnable
 
     private XWikiContext getContext()
     {
-        return (XWikiContext) Utils.getComponent(Execution.class).getContext().getProperty(
-            XWikiContext.EXECUTIONCONTEXT_KEY);
+        return (XWikiContext) Utils.getComponent(Execution.class).getContext()
+            .getProperty(XWikiContext.EXECUTIONCONTEXT_KEY);
     }
 
     public int startRebuildIndex(XWikiContext context)
@@ -285,10 +286,10 @@ public class IndexRebuilder extends AbstractXWikiRunnable
             Searcher searcher = this.onlyNew ? createSearcher(this.indexUpdater.getDirectory(), context) : null;
 
             try {
-                List<String> documentNames =
-                    context.getWiki().getStore().searchDocumentsNames(this.hqlFilter != null ? this.hqlFilter : "",
-                        context);
-                retval = indexDocuments(wikiName, documentNames, searcher, context);
+                List<DocumentReference> documentReferences =
+                    context.getWiki().getStore()
+                        .searchDocumentReferences(this.hqlFilter != null ? this.hqlFilter : "", context);
+                retval = indexDocuments(documentReferences, searcher, context);
             } catch (XWikiException e) {
                 LOG.warn(MessageFormat.format("Error getting document names for wiki [{0}] and filter [{1}].",
                     wikiName, this.hqlFilter), e);
@@ -310,28 +311,28 @@ public class IndexRebuilder extends AbstractXWikiRunnable
         return retval;
     }
 
-    private int indexDocuments(String wikiName, List<String> documentNames, Searcher searcher, XWikiContext context)
+    private int indexDocuments(List<DocumentReference> documentReferences, Searcher searcher, XWikiContext context)
     {
         int retval = 0;
 
-        for (String documentName : documentNames) {
-            if (searcher == null || !isIndexed(wikiName, documentName, searcher)) {
-                retval += indexDocument(wikiName, documentName, context);
+        for (DocumentReference documentReference : documentReferences) {
+            if (searcher == null || !isIndexed(documentReference, searcher)) {
+                retval += indexDocument(documentReference, context);
             }
         }
 
         return retval;
     }
 
-    private int indexDocument(String wikiName, String documentName, XWikiContext context)
+    private int indexDocument(DocumentReference documentReference, XWikiContext context)
     {
         int retval = 0;
 
         XWikiDocument document;
         try {
-            document = context.getWiki().getDocument(documentName, context);
+            document = context.getWiki().getDocument(documentReference, context);
         } catch (XWikiException e) {
-            LOG.error("error fetching document " + wikiName + ":" + documentName, e);
+            LOG.error("error fetching document " + documentReference, e);
 
             return retval;
         }
@@ -353,13 +354,13 @@ public class IndexRebuilder extends AbstractXWikiRunnable
                     return -2;
                 }
             }
-            this.indexUpdater.add(document, context);
+            this.indexUpdater.queueDocument(document, context, false);
             retval++;
             retval += addTranslationsOfDocument(document, context);
-            retval += this.indexUpdater.addAttachmentsOfDocument(document, context);
+            retval += this.indexUpdater.queueAttachments(document, context);
         } else {
             if (LOG.isInfoEnabled()) {
-                LOG.info("XWiki delivered null for document name " + wikiName + ":" + documentName);
+                LOG.info("XWiki delivered null for document " + documentReference);
             }
         }
 
@@ -381,7 +382,7 @@ public class IndexRebuilder extends AbstractXWikiRunnable
 
         for (String lang : translations) {
             try {
-                this.indexUpdater.add(document.getTranslatedDocument(lang, wikiContext), wikiContext);
+                this.indexUpdater.queueDocument(document.getTranslatedDocument(lang, wikiContext), wikiContext, false);
                 retval++;
             } catch (XWikiException e) {
                 LOG.error("Error getting translated document for document " + document + " and language " + lang, e);
@@ -408,21 +409,25 @@ public class IndexRebuilder extends AbstractXWikiRunnable
         return retval;
     }
 
-    public boolean isIndexed(String wikiName, String documentName, Searcher searcher)
+    public boolean isIndexed(DocumentReference documentReference, Searcher searcher)
     {
         boolean exists = false;
 
         BooleanQuery query = new BooleanQuery();
-        query.add(new TermQuery(new Term(IndexFields.DOCUMENT_FULLNAME, documentName.toLowerCase())),
+
+        query.add(new TermQuery(new Term(IndexFields.DOCUMENT_NAME, documentReference.getName().toLowerCase())),
             BooleanClause.Occur.MUST);
-        query.add(new TermQuery(new Term(IndexFields.DOCUMENT_WIKI, wikiName.toLowerCase())), BooleanClause.Occur.MUST);
+        query.add(new TermQuery(new Term(IndexFields.DOCUMENT_SPACE, documentReference.getLastSpaceReference()
+            .getName().toLowerCase())), BooleanClause.Occur.MUST);
+        query.add(new TermQuery(new Term(IndexFields.DOCUMENT_WIKI, documentReference.getWikiReference().getName()
+            .toLowerCase())), BooleanClause.Occur.MUST);
 
         try {
             TopDocs topDocs = searcher.search(query, 1);
 
             exists = topDocs.totalHits > 1;
         } catch (IOException e) {
-            LOG.error("Faild to search for page [" + wikiName + ":" + documentName + "] in Lucene index", e);
+            LOG.error("Faild to search for page [" + documentReference + "] in Lucene index", e);
         }
 
         return exists;

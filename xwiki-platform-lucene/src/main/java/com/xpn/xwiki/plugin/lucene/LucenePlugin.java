@@ -691,17 +691,17 @@ public class LucenePlugin extends XWikiDefaultPlugin
 
     public void queueDocument(XWikiDocument doc, XWikiContext context)
     {
-        this.indexUpdater.add(doc, context);
+        this.indexUpdater.queueDocument(doc, context, false);
     }
 
     public void queueAttachment(XWikiDocument doc, XWikiAttachment attach, XWikiContext context)
     {
-        this.indexUpdater.add(doc, attach, context);
+        this.indexUpdater.queueAttachment(attach, context, false);
     }
 
     public void queueAttachment(XWikiDocument doc, XWikiContext context)
     {
-        this.indexUpdater.addAttachmentsOfDocument(doc, context);
+        this.indexUpdater.queueAttachments(doc, context);
     }
 
     /**

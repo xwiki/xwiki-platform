@@ -22,7 +22,6 @@ package com.xpn.xwiki.plugin.lucene;
 import java.io.IOException;
 
 import org.apache.commons.lang.StringUtils;
-import org.apache.log4j.lf5.util.StreamUtils;
 import org.xwiki.model.reference.DocumentReference;
 
 import com.xpn.xwiki.XWikiException;
@@ -57,14 +56,13 @@ public class AttachmentDataTest extends AbstractBridgedXWikiComponentTestCase
         this.attachment = new XWikiAttachment(this.document, "filename");
         this.document.getAttachmentList().add(this.attachment);
 
-        this.attachmentData = new AttachmentData(this.document, this.attachment, getContext());
+        this.attachmentData = new AttachmentData(this.attachment, getContext(), false);
     }
 
     private void assertGetFullText(String expect, String filename) throws XWikiException, IOException
     {
         this.attachment.setFilename(filename);
-        byte[] bytes = StreamUtils.getBytes(getClass().getResourceAsStream("/" + filename));
-        this.attachment.setContent(bytes);
+        this.attachment.setContent(getClass().getResourceAsStream("/" + filename));
 
         this.attachmentData.setFilename(filename);
 

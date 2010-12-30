@@ -1,2 +1,2 @@
-@import "microformats.css";
+@import "$xwiki.getSkinFile('css/microformats.css')";
 @import "toucan.css";

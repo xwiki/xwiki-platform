@@ -11,8 +11,8 @@
 <customClass></customClass>
 <contentAuthor>XWiki.Admin</contentAuthor>
 <creationDate>1186676964000</creationDate>
-<date>1278497425000</date>
-<contentUpdateDate>1278497425000</contentUpdateDate>
+<date>1293708458000</date>
+<contentUpdateDate>1293708458000</contentUpdateDate>
 <version>1.1</version>
 <title>$msg.get("wikimanager.createwiki")</title>
 <template></template>
@@ -121,12 +121,12 @@
 #set ($WSTEPNAME_SUMMARY = "wstep_summary")
 #set ($WSTEPLIST = [$WSTEPNAME_INTRO, $WSTEPNAME_WIKINAME, $WSTEPNAME_WIKIDESC, $WSTEPNAME_DATAFROM, $WSTEPNAME_USERS, $WSTEPNAME_SUMMARY])
 #set ($ISWIKINAMEAVAILABLE = $xwiki.getDocument("WikiCode.IsWikiOrDatabaseAvailableService").URL)
-#set ($MSG_ERROR_WIKIALREADYEXISTS = "&lt;span class=\"errormessage\"&gt;&lt;span class=\"messagetype\"&gt;$msg.get('error'): &lt;/span&gt;$msg.get('wikimanager.wikiname.error.wikialreadyexists')&lt;/span&gt;")
-#set ($MSG_WARNING_DATABASEALREADYEXISTS = "&lt;span class=\"warningmessage\"&gt;&lt;span class=\"messagetype\"&gt;$msg.get('warning'): &lt;/span&gt;$msg.get('wikimanager.wikiname.error.databasealreadyexists')&lt;/span&gt;")
-#set ($MSG_ERROR_DATABASEALREADYEXISTS = "&lt;span class=\"errormessage\"&gt;&lt;span class=\"messagetype\"&gt;$msg.get('error'): &lt;/span&gt;$msg.get('wikimanager.wikiname.error.databasealreadyexists')&lt;/span&gt;")
-#set ($MSG_ERROR_WIKINAMEALREADYUSED = "&lt;span class=\"errormessage\"&gt;&lt;span class=\"messagetype\"&gt;$msg.get('error'): &lt;/span&gt;$msg.get('wikimanager.wikiname.error.alreadyused')&lt;/span&gt;")
-#set ($MSG_ERROR_WIKINAMEEMPTY = "&lt;span class=\"errormessage\"&gt;&lt;span class=\"messagetype\"&gt;$msg.get('error'): &lt;/span&gt;$msg.get('wikimanager.wikiname.error.empty')&lt;/span&gt;")
-#set ($MSG_INFO_WIKINAMEVALID = "&lt;span class=\"infomessage\"&gt;&lt;span class=\"messagetype\"&gt;$msg.get('info'): &lt;/span&gt;$msg.get('wikimanager.wikiname.info.valid')&lt;/span&gt;")
+#set ($MSG_ERROR_WIKIALREADYEXISTS = "&lt;span class='errormessage'&gt;&lt;span class='messagetype'&gt;$msg.get('error'): &lt;/span&gt;$msg.get('wikimanager.wikiname.error.wikialreadyexists')&lt;/span&gt;")
+#set ($MSG_WARNING_DATABASEALREADYEXISTS = "&lt;span class='warningmessage'&gt;&lt;span class='messagetype'&gt;$msg.get('warning'): &lt;/span&gt;$msg.get('wikimanager.wikiname.error.databasealreadyexists')&lt;/span&gt;")
+#set ($MSG_ERROR_DATABASEALREADYEXISTS = "&lt;span class='errormessage'&gt;&lt;span class='messagetype'&gt;$msg.get('error'): &lt;/span&gt;$msg.get('wikimanager.wikiname.error.databasealreadyexists')&lt;/span&gt;")
+#set ($MSG_ERROR_WIKINAMEALREADYUSED = "&lt;span class='errormessage'&gt;&lt;span class='messagetype'&gt;$msg.get('error'): &lt;/span&gt;$msg.get('wikimanager.wikiname.error.alreadyused')&lt;/span&gt;")
+#set ($MSG_ERROR_WIKINAMEEMPTY = "&lt;span class='errormessage'&gt;&lt;span class='messagetype'&gt;$msg.get('error'): &lt;/span&gt;$msg.get('wikimanager.wikiname.error.empty')&lt;/span&gt;")
+#set ($MSG_INFO_WIKINAMEVALID = "&lt;span class='infomessage'&gt;&lt;span class='messagetype'&gt;$msg.get('info'): &lt;/span&gt;$msg.get('wikimanager.wikiname.info.valid')&lt;/span&gt;")
 ##
 ############################################################################################
 ## REQUEST PARAMETERS

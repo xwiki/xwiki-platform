@@ -40,12 +40,10 @@
   </scm>
   <properties>
     <!-- XEM dependencies -->
-    <platform.plugin.applicationmanager.version>1.17-SNAPSHOT</platform.plugin.applicationmanager.version>
-    <platform.plugin.wikimanager.version>1.23-SNAPSHOT</platform.plugin.wikimanager.version>
+    <platform.plugin.applicationmanager.version>1.18-SNAPSHOT</platform.plugin.applicationmanager.version>
+    <platform.plugin.wikimanager.version>1.25-SNAPSHOT</platform.plugin.wikimanager.version>
   </properties>
   <dependencies>
-    <!-- needed for slf4j clients such as QueryPlugin and JCRStore 
-         It is deployment time logging configuration, so it is here instead of xwiki-core. -->
     <dependency>
       <groupId>org.slf4j</groupId>
       <artifactId>slf4j-log4j12</artifactId>

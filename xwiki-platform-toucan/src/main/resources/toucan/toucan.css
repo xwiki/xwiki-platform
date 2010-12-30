@@ -120,7 +120,7 @@ body.editbody .clearfloats {
 }
 
 .loading {
-    background-image: url(icons/spinner.gif);
+    background-image: url("$xwiki.getSkinFile('icons/xwiki/spinner.gif')");
     background-position: center center;
     background-repeat: no-repeat;
 }

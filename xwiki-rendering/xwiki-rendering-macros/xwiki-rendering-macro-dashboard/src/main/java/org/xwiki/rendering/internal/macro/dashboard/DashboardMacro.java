@@ -19,11 +19,16 @@
  */
 package org.xwiki.rendering.internal.macro.dashboard;
 
+import java.util.Collections;
 import java.util.List;
 
+import org.apache.commons.lang.StringUtils;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.Requirement;
+import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.rendering.block.Block;
+import org.xwiki.rendering.block.GroupBlock;
+import org.xwiki.rendering.block.MacroBlock;
 import org.xwiki.rendering.macro.AbstractMacro;
 import org.xwiki.rendering.macro.Macro;
 import org.xwiki.rendering.macro.MacroExecutionException;
@@ -57,6 +62,12 @@ public class DashboardMacro extends AbstractMacro<DashboardMacroParameters>
     private Macro<ContainerMacroParameters> containerMacro;
 
     /**
+     * The component manager, to inject to the GadgetBoxMacro.
+     */
+    @Requirement
+    private ComponentManager componentManager;
+
+    /**
      * Instantiates the dashboard macro, setting the name, description and parameters type.
      */
     public DashboardMacro()
@@ -73,14 +84,36 @@ public class DashboardMacro extends AbstractMacro<DashboardMacroParameters>
     public List<Block> execute(DashboardMacroParameters parameters, String content, MacroTransformationContext context)
         throws MacroExecutionException
     {
-        //TODO: include the dashboard javascript
-
-        // just delegate to the container macro
+        // do the layouting with the container macro
         ContainerMacroParameters containerParameters = new ContainerMacroParameters();
         containerParameters.setJustify(true);
         containerParameters.setLayoutStyle(parameters.getLayout());
+        List<Block> layoutedResult = containerMacro.execute(containerParameters, content, context);
 
-        return containerMacro.execute(containerParameters, content, context);
+        // get all the macro blocks inside and wrap them in a gadget macro, which will generate a title for it and a box
+        // around it to be able to have decoration and drag it
+        // TODO: expand container macros and descend into them. Container macro is a special case, used for layouting
+        // dashboards and not as a gadget
+        for (Block layoutedTopLevelBlock : layoutedResult) {
+            for (MacroBlock macroBlock : layoutedTopLevelBlock.getChildrenByType(MacroBlock.class, true)) {
+                // clone the macro block here, because otherwise we will not have it in the parent anymore
+                GadgetMacro gadgetBoxMacro = new GadgetMacro((MacroBlock) macroBlock.clone(), this.componentManager);
+                // execute with null params and null content since they will be generated anyway, from the set macro
+                // block
+                List<Block> boxMacroBlocks = gadgetBoxMacro.execute(null, null, context);
+                // replace the macro block in its parent with the blocks returned by the box macro
+                macroBlock.getParent().replaceChild(boxMacroBlocks, macroBlock);
+            }
+        }
+
+        // put everything in a nice toplevel group for this dashboard, to be able to add classes to it
+        GroupBlock topLevel = new GroupBlock();
+        topLevel.addChildren(layoutedResult);
+        // add the style attribute of the dashboard macro as a class to the toplevel container
+        topLevel.setParameter("class", MACRO_NAME
+            + (StringUtils.isEmpty(parameters.getStyle()) ? "" : " " + parameters.getStyle()));
+
+        return Collections.<Block> singletonList(topLevel);
     }
 
     /**

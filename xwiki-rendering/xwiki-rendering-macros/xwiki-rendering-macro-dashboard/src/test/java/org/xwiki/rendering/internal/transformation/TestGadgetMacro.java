@@ -42,7 +42,8 @@ public class TestGadgetMacro extends AbstractNoParameterMacro
      */
     public TestGadgetMacro()
     {
-        super("Mock gadget macro that produces just a single word, 'gadget', to be used to test the dashboard macro.");
+        super("Gadget",
+            "Mock gadget macro that produces just a single word, 'gadget', to be used to test the dashboard macro.");
     }
 
     /**

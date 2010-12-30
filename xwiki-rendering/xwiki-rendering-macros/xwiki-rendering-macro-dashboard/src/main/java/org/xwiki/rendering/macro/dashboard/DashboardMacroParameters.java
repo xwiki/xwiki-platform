@@ -35,6 +35,14 @@ public class DashboardMacroParameters
     private String layout = "columns";
 
     /**
+     * The identifier of the style to be used for this dashboard. No style means that the gadgets will be rendered
+     * plain, as content of the page. "colortheme" style will render the gadgets the same as the panels. Note that this
+     * is used as the CSS class of the top level block of the dashboard, so you can pass any value to create your own
+     * dashboard style.
+     */
+    private String style = "";
+
+    /**
      * @return the layout style of this dashboard
      */
     public String getLayout()
@@ -50,5 +58,25 @@ public class DashboardMacroParameters
     public void setLayout(String layout)
     {
         this.layout = layout;
+    }
+
+    /**
+     * @return the style of the dasbboard
+     */
+    public String getStyle()
+    {
+        return style;
+    }
+
+    /**
+     * @param style the style to set
+     */
+    @PropertyDescription("The identifier of the style to be used for this dashboard. No style means that the gadgets "
+        + "will be rendered plain, as content of the page. \"colortheme\" style will render the gadgets the same as "
+        + "the panels. Note that this is used as the CSS class of the top level block of the dashboard, so you can "
+        + "pass any value to create your own dashboard style.")
+    public void setStyle(String style)
+    {
+        this.style = style;
     }
 }

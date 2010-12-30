@@ -15,22 +15,38 @@
 beginDocument
 beginMacroMarkerStandalone [dashboard] [layout=foo] [((({{gadget/}})))
 ((({{gadget/}})))]
+beginGroup [[class]=[dashboard]]
 beginGroup [[style]=[text-align: justify;]]
 beginGroup
+beginGroup [[class]=[gadget]]
+beginHeader [2, null] [[class]=[gadget-title]]
+onWord [Gadget]
+endHeader [2, null] [[class]=[gadget-title]]
+beginGroup [[class]=[gadget-content]]
 beginMacroMarkerStandalone [gadget] []
 onWord [gadget]
 endMacroMarkerStandalone [gadget] []
+endGroup [[class]=[gadget-content]]
+endGroup [[class]=[gadget]]
 endGroup
 beginGroup
+beginGroup [[class]=[gadget]]
+beginHeader [2, null] [[class]=[gadget-title]]
+onWord [Gadget]
+endHeader [2, null] [[class]=[gadget-title]]
+beginGroup [[class]=[gadget-content]]
 beginMacroMarkerStandalone [gadget] []
 onWord [gadget]
 endMacroMarkerStandalone [gadget] []
+endGroup [[class]=[gadget-content]]
+endGroup [[class]=[gadget]]
 endGroup
 endGroup [[style]=[text-align: justify;]]
+endGroup [[class]=[dashboard]]
 endMacroMarkerStandalone [dashboard] [layout=foo] [((({{gadget/}})))
 ((({{gadget/}})))]
 endDocument
 .#-----------------------------------------------------
 .expect|xhtml/1.0
 .#-----------------------------------------------------
-<div style="text-align: justify;"><div>gadget</div><div>gadget</div></div>
+<div class="dashboard"><div style="text-align: justify;"><div><div class="gadget"><h2 class="gadget-title wikigeneratedheader"><span>Gadget</span></h2><div class="gadget-content">gadget</div></div></div><div><div class="gadget"><h2 class="gadget-title wikigeneratedheader"><span>Gadget</span></h2><div class="gadget-content">gadget</div></div></div></div></div>

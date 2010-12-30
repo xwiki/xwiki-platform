@@ -20,6 +20,11 @@ public class ContainerMacroParameters
      * The style of the layout of this container.
      */
     private String layoutStyle;
+    
+    /**
+     * The css class of this container.
+     */
+    private String cssClass;
 
     /**
      * @return the string identifying the layout style for this container.
@@ -57,5 +62,22 @@ public class ContainerMacroParameters
     public void setJustify(boolean justify)
     {
         this.justify = justify;
+    }
+
+    /**
+     * @return the CSS class to add to this container
+     */
+    public String getCssClass()
+    {
+        return cssClass;
+    }
+
+    /**
+     * @param cssClass the value of the class attribute to set for CSS styling
+     */
+    @PropertyDescription("Value of the HTML class attribute to add to this container, used to style in CSS.")
+    public void setCssClass(String cssClass)
+    {
+        this.cssClass = cssClass;
     }
 }

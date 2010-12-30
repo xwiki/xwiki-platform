@@ -36,17 +36,20 @@ import org.apache.lucene.index.IndexWriter;
 import org.apache.lucene.index.Term;
 import org.apache.lucene.store.Directory;
 import org.apache.lucene.store.LockObtainFailedException;
+import org.xwiki.bridge.event.DocumentCreatedEvent;
+import org.xwiki.bridge.event.DocumentDeletedEvent;
+import org.xwiki.bridge.event.DocumentUpdatedEvent;
 import org.xwiki.context.Execution;
 import org.xwiki.observation.EventListener;
-import org.xwiki.observation.event.ActionExecutionEvent;
-import org.xwiki.observation.event.DocumentDeleteEvent;
-import org.xwiki.observation.event.DocumentSaveEvent;
-import org.xwiki.observation.event.DocumentUpdateEvent;
 import org.xwiki.observation.event.Event;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.doc.XWikiAttachment;
 import com.xpn.xwiki.doc.XWikiDocument;
+import com.xpn.xwiki.internal.event.AbstractAttachmentEvent;
+import com.xpn.xwiki.internal.event.AttachmentAddedEvent;
+import com.xpn.xwiki.internal.event.AttachmentDeletedEvent;
+import com.xpn.xwiki.internal.event.AttachmentUpdatedEvent;
 import com.xpn.xwiki.util.AbstractXWikiRunnable;
 import com.xpn.xwiki.web.Utils;
 
@@ -67,8 +70,9 @@ public class IndexUpdater extends AbstractXWikiRunnable implements EventListener
      */
     private static final int EXIT_INTERVAL = 3000;
 
-    private static final List<Event> EVENTS = Arrays.<Event> asList(new DocumentUpdateEvent(), new DocumentSaveEvent(),
-        new DocumentDeleteEvent(), new ActionExecutionEvent("upload"));
+    private static final List<Event> EVENTS = Arrays.<Event> asList(new DocumentUpdatedEvent(),
+        new DocumentCreatedEvent(), new DocumentDeletedEvent(), new AttachmentAddedEvent(),
+        new AttachmentDeletedEvent());
 
     /**
      * Collecting all the fields for using up in search
@@ -121,8 +125,8 @@ public class IndexUpdater extends AbstractXWikiRunnable implements EventListener
 
     private XWikiContext getContext()
     {
-        return (XWikiContext) Utils.getComponent(Execution.class).getContext().getProperty(
-            XWikiContext.EXECUTIONCONTEXT_KEY);
+        return (XWikiContext) Utils.getComponent(Execution.class).getContext()
+            .getProperty(XWikiContext.EXECUTIONCONTEXT_KEY);
     }
 
     public void doExit()
@@ -228,13 +232,18 @@ public class IndexUpdater extends AbstractXWikiRunnable implements EventListener
                         /*
                          * XXX Is it not possible to obtain the right translation directly?
                          */
-                        XWikiDocument doc = context.getWiki().getDocument(data.getFullName(), context);
+                        XWikiDocument doc = context.getWiki().getDocument(data.getDocumentReference(), context);
 
                         if (data.getLanguage() != null && !data.getLanguage().equals("")) {
                             doc = doc.getTranslatedDocument(data.getLanguage(), context);
                         }
 
-                        addToIndex(writer, data, doc, context);
+                        if (data.isDeleted()) {
+                            removeFromIndex(writer, data, doc, context);
+                        } else {
+                            addToIndex(writer, data, doc, context);
+                        }
+
                         ++nb;
                     } catch (Throwable e) {
                         LOG.error("error indexing document " + id, e);
@@ -305,6 +314,16 @@ public class IndexUpdater extends AbstractXWikiRunnable implements EventListener
         writer.updateDocument(new Term(IndexFields.DOCUMENT_ID, data.getId()), luceneDoc);
     }
 
+    private void removeFromIndex(IndexWriter writer, IndexData data, XWikiDocument doc, XWikiContext context)
+        throws CorruptIndexException, IOException
+    {
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("removeFromIndex: " + data);
+        }
+
+        writer.deleteDocuments(new Term(IndexFields.DOCUMENT_ID, data.getId()));
+    }
+
     /**
      * @param analyzer The analyzer to set.
      */
@@ -326,21 +345,32 @@ public class IndexUpdater extends AbstractXWikiRunnable implements EventListener
         }
     }
 
-    public void add(XWikiDocument document, XWikiContext context)
+    public void queueDocument(XWikiDocument document, XWikiContext context, boolean deleted)
     {
-        this.queue.add(new DocumentData(document, context));
+        this.queue.add(new DocumentData(document, context, deleted));
     }
 
-    public void add(XWikiDocument document, XWikiAttachment attachment, XWikiContext context)
+    public void queueAttachment(XWikiAttachment attachment, XWikiContext context, boolean deleted)
     {
-        if (document != null && attachment != null && context != null) {
-            this.queue.add(new AttachmentData(document, attachment, context));
+        if (attachment != null && context != null) {
+            this.queue.add(new AttachmentData(attachment, context, deleted));
         } else {
-            LOG.error("invalid parameters given to add: " + document + ", " + attachment + ", " + context);
+            LOG.error("Invalid parameters given to " + (deleted ? "deleted" : "add") + " attachment ["
+                + attachment.getFilename() + "] of document [" + attachment.getDoc().getDocumentReference() + "]");
         }
     }
 
-    public int addAttachmentsOfDocument(XWikiDocument document, XWikiContext context)
+    public void addAttachment(XWikiDocument document, String attachmentName, XWikiContext context, boolean deleted)
+    {
+        if (document != null && attachmentName != null && context != null) {
+            this.queue.add(new AttachmentData(document, attachmentName, context, deleted));
+        } else {
+            LOG.error("Invalid parameters given to " + (deleted ? "deleted" : "add") + " attachment [" + attachmentName
+                + "] of document [" + document.getDocumentReference() + "]");
+        }
+    }
+
+    public int queueAttachments(XWikiDocument document, XWikiContext context)
     {
         int retval = 0;
 
@@ -348,9 +378,10 @@ public class IndexUpdater extends AbstractXWikiRunnable implements EventListener
         retval += attachmentList.size();
         for (XWikiAttachment attachment : attachmentList) {
             try {
-                add(document, attachment, context);
+                queueAttachment(attachment, context, false);
             } catch (Exception e) {
-                LOG.error("error retrieving attachment of document " + document, e);
+                LOG.error("Failed to retrieve attachment [" + attachment.getFilename() + "] of document [" + document
+                    + "]", e);
             }
         }
 
@@ -389,34 +420,14 @@ public class IndexUpdater extends AbstractXWikiRunnable implements EventListener
         XWikiContext context = (XWikiContext) data;
 
         try {
-            if (event instanceof ActionExecutionEvent) {
-                // Modified attachement
-                if (LOG.isDebugEnabled()) {
-                    LOG.debug("upload action notification for doc " + document);
-                }
-
-                // Retrieve the latest version (with the file just attached)
-                XWikiDocument basedoc = context.getWiki().getDocument(document.getDocumentReference(), context);
-                List<XWikiAttachment> attachments = basedoc.getAttachmentList();
-                /*
-                 * XXX Race condition: if two or more attachments are added before we find the "newest attachment"
-                 * below, only the last one added will be indexed.
-                 */
-                XWikiAttachment newestAttachment = null;
-                for (XWikiAttachment attachment : attachments) {
-                    if ((newestAttachment == null) || attachment.getDate().after(newestAttachment.getDate())) {
-                        newestAttachment = attachment;
-                    }
-                }
-
-                add(basedoc, newestAttachment, context);
-            } else {
-                // Modified document
-                if (LOG.isDebugEnabled()) {
-                    LOG.debug("notify from XWikiDocChangeNotificationInterface, event=" + event + ", doc=" + document);
-                }
-
-                add(document, context);
+            if (event instanceof DocumentUpdatedEvent || event instanceof DocumentCreatedEvent) {
+                queueDocument(document, context, false);
+            } else if (event instanceof DocumentDeletedEvent) {
+                queueDocument(document, context, true);
+            } else if (event instanceof AttachmentUpdatedEvent || event instanceof AttachmentAddedEvent) {
+                queueAttachment(document.getAttachment(((AbstractAttachmentEvent) event).getName()), context, false);
+            } else if (event instanceof AttachmentDeletedEvent) {
+                addAttachment(document, ((AbstractAttachmentEvent) event).getName(), context, true);
             }
         } catch (Exception e) {
             LOG.error("error in notify", e);

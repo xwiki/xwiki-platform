@@ -28,8 +28,8 @@ import java.util.concurrent.Semaphore;
 import org.apache.lucene.analysis.standard.StandardAnalyzer;
 import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.index.IndexWriter;
-import org.apache.lucene.index.Term;
 import org.apache.lucene.index.IndexWriter.MaxFieldLength;
+import org.apache.lucene.index.Term;
 import org.apache.lucene.search.IndexSearcher;
 import org.apache.lucene.search.Query;
 import org.apache.lucene.search.TermQuery;
@@ -140,8 +140,8 @@ public class IndexUpdaterTest extends AbstractBridgedXWikiComponentTestCase
         this.mockXWikiStoreInterface.stubs().method("cleanUp");
 
         this.mockXWiki = mock(XWiki.class);
-        this.mockXWiki.stubs().method("getDocument").with(eq(this.loremIpsum.getPrefixedFullName()), ANYTHING).will(
-            returnValue(this.loremIpsum));
+        this.mockXWiki.stubs().method("getDocument").with(eq(this.loremIpsum.getPrefixedFullName()), ANYTHING)
+            .will(returnValue(this.loremIpsum));
         this.mockXWiki.stubs().method("Param").with(ANYTHING, ANYTHING).will(new CustomStub("Implements XWiki.Param")
         {
             public Object invoke(Invocation invocation) throws Throwable
@@ -149,8 +149,8 @@ public class IndexUpdaterTest extends AbstractBridgedXWikiComponentTestCase
                 return invocation.parameterValues.get(1);
             }
         });
-        this.mockXWiki.stubs().method("Param").with(eq(LucenePlugin.PROP_INDEX_DIR)).will(
-            returnValue(IndexUpdaterTest.INDEXDIR));
+        this.mockXWiki.stubs().method("Param").with(eq(LucenePlugin.PROP_INDEX_DIR))
+            .will(returnValue(IndexUpdaterTest.INDEXDIR));
         this.mockXWiki.stubs().method("checkAccess").will(returnValue(true));
         this.mockXWiki.stubs().method("isVirtualMode").will(returnValue(false));
         this.mockXWiki.stubs().method("getStore").will(returnValue(this.mockXWikiStoreInterface.proxy()));
@@ -206,8 +206,8 @@ public class IndexUpdaterTest extends AbstractBridgedXWikiComponentTestCase
         Thread indexUpdaterThread = new Thread(indexUpdater, "Lucene Index Updater");
         indexUpdaterThread.start();
 
-        indexUpdater.add(this.loremIpsum.clone(), getContext());
-        indexUpdater.add(this.loremIpsum.clone(), getContext());
+        indexUpdater.queueDocument(this.loremIpsum.clone(), getContext(), false);
+        indexUpdater.queueDocument(this.loremIpsum.clone(), getContext(), false);
 
         try {
             Thread.sleep(1000);

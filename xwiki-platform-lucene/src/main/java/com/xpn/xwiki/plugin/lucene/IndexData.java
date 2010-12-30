@@ -28,10 +28,13 @@ import org.apache.lucene.document.Field;
 import org.apache.lucene.index.Term;
 import org.apache.lucene.search.Query;
 import org.apache.lucene.search.TermQuery;
+import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.rendering.syntax.Syntax;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.doc.XWikiDocument;
+import com.xpn.xwiki.web.Utils;
 
 /**
  * @version $Id$
@@ -40,41 +43,28 @@ public abstract class IndexData
 {
     private static final Log LOG = LogFactory.getLog(IndexData.class);
 
+    private boolean deleted;
+
+    private DocumentReference documentReference;
+
     private String documentTitle;
 
-    private String documentName;
-
-    private String documentSpace;
-
-    private String documentFullName;
-
-    private String fullName;
-
     private String author;
-
-    private Date creationDate;
 
     private String creator;
 
     private String language;
 
+    private Date creationDate;
+
     private Date modificationDate;
 
-    /**
-     * name of the wiki this doc belongs to
-     */
-    private String wiki;
-
-    public IndexData(final XWikiDocument doc, final XWikiContext context)
+    public IndexData(final XWikiDocument doc, final XWikiContext context, final boolean deleted)
     {
-        setDocumentName(doc.getName());
+        setDocumentReference(doc.getDocumentReference());
         setDocumentTitle(doc.getRenderedTitle(Syntax.PLAIN_1_0, context));
-        setDocumentSpace(doc.getSpace());
-        setDocumentFullName(doc.getFullName());
-        setWiki(doc.getWikiName() == null ? context.getDatabase() : doc.getWikiName());
-        setFullName(new StringBuffer(this.wiki).append(":").append(this.documentSpace).append(".").append(
-            this.documentName).toString());
         setLanguage(doc.getLanguage());
+        setDeleted(deleted);
     }
 
     /**
@@ -107,10 +97,8 @@ public abstract class IndexData
         // Keyword fields: stored and indexed, but not tokenized
         // Note: ID field must be UN_TOKENIZED to enable case sensitive IDs
         luceneDoc.add(new Field(IndexFields.DOCUMENT_ID, getId(), Field.Store.YES, Field.Index.NOT_ANALYZED));
-        luceneDoc.add(new Field(IndexFields.DOCUMENT_LANGUAGE, this.language, Field.Store.YES, Field.Index.ANALYZED));
-        if (!StringUtils.isEmpty(this.wiki)) {
-            luceneDoc.add(new Field(IndexFields.DOCUMENT_WIKI, this.wiki, Field.Store.YES, Field.Index.ANALYZED));
-        }
+        luceneDoc.add(new Field(IndexFields.DOCUMENT_LANGUAGE, getLanguage(), Field.Store.YES, Field.Index.ANALYZED));
+        luceneDoc.add(new Field(IndexFields.DOCUMENT_WIKI, getWiki(), Field.Store.YES, Field.Index.ANALYZED));
         if (getType() != null) {
             luceneDoc.add(new Field(IndexFields.DOCUMENT_TYPE, getType(), Field.Store.YES, Field.Index.ANALYZED));
         }
@@ -128,10 +116,10 @@ public abstract class IndexData
             luceneDoc.add(new Field(IndexFields.DOCUMENT_TITLE, this.documentTitle, Field.Store.YES,
                 Field.Index.ANALYZED));
         }
-        luceneDoc.add(new Field(IndexFields.DOCUMENT_NAME, this.documentName, Field.Store.YES, Field.Index.ANALYZED));
-        luceneDoc.add(new Field(IndexFields.DOCUMENT_WEB, this.documentSpace, Field.Store.YES, Field.Index.ANALYZED));
-        luceneDoc.add(new Field(IndexFields.DOCUMENT_SPACE, this.documentSpace, Field.Store.YES, Field.Index.ANALYZED));
-        luceneDoc.add(new Field(IndexFields.DOCUMENT_FULLNAME, this.documentFullName, Field.Store.YES,
+        luceneDoc.add(new Field(IndexFields.DOCUMENT_NAME, getDocumentName(), Field.Store.YES, Field.Index.ANALYZED));
+        luceneDoc.add(new Field(IndexFields.DOCUMENT_WEB, getDocumentSpace(), Field.Store.YES, Field.Index.ANALYZED));
+        luceneDoc.add(new Field(IndexFields.DOCUMENT_SPACE, getDocumentSpace(), Field.Store.YES, Field.Index.ANALYZED));
+        luceneDoc.add(new Field(IndexFields.DOCUMENT_FULLNAME, getDocumentFullName(), Field.Store.YES,
             Field.Index.ANALYZED));
         if (this.author != null) {
             luceneDoc.add(new Field(IndexFields.DOCUMENT_AUTHOR, this.author, Field.Store.YES, Field.Index.ANALYZED));
@@ -168,14 +156,11 @@ public abstract class IndexData
      */
     public String getId()
     {
-        StringBuffer retval = new StringBuffer();
+        StringBuilder retval = new StringBuilder();
 
-        if (!StringUtils.isEmpty(this.wiki)) {
-            retval.append(this.wiki).append(":");
-        }
-        retval.append(this.documentSpace).append(".");
-        retval.append(this.documentName).append(".");
-        retval.append(this.language);
+        retval.append(getFullName());
+        retval.append(".");
+        retval.append(getLanguage());
 
         return retval.toString();
     }
@@ -194,7 +179,7 @@ public abstract class IndexData
 
     protected void getFullText(StringBuilder sb, XWikiDocument doc, XWikiContext context)
     {
-        sb.append(this.documentName).append(" ").append(this.documentSpace);
+        sb.append(getDocumentName()).append(" ").append(getDocumentSpace());
 
         if (!StringUtils.isEmpty(this.author)) {
             sb.append(" ").append(this.author);
@@ -207,9 +192,20 @@ public abstract class IndexData
 
     public abstract String getType();
 
-    public String toString()
+    /**
+     * @see #isDeleted()
+     */
+    public void setDeleted(boolean deleted)
     {
-        return getId();
+        this.deleted = deleted;
+    }
+
+    /**
+     * @return indicate of the element should be deleted from he index
+     */
+    public boolean isDeleted()
+    {
+        return this.deleted;
     }
 
     /**
@@ -229,37 +225,6 @@ public abstract class IndexData
     }
 
     /**
-     * @param documentName The documentName to set.
-     */
-    public void setDocumentName(String documentName)
-    {
-        this.documentName = documentName;
-    }
-
-    /**
-     * @param documentWeb The documentWeb to set.
-     * @deprecated use {@link #setDocumentSpace(String)} instead
-     */
-    @Deprecated
-    public void setDocumentWeb(String documentWeb)
-    {
-        setDocumentSpace(documentWeb);
-    }
-
-    public void setDocumentSpace(String documentSpace)
-    {
-        this.documentSpace = documentSpace;
-    }
-
-    /**
-     * @param documentFullName The documentFullName to set.
-     */
-    public void setDocumentFullName(String documentFullName)
-    {
-        this.documentFullName = documentFullName;
-    }
-
-    /**
      * @param modificationDate The modificationDate to set.
      */
     public void setModificationDate(Date modificationDate)
@@ -272,38 +237,34 @@ public abstract class IndexData
         return this.documentTitle;
     }
 
-    public String getDocumentName()
+    public DocumentReference getDocumentReference()
     {
-        return this.documentName;
+        return this.documentReference;
     }
 
-    /**
-     * @deprecated use {@link #getDocumentSpace()} instead
-     */
-    @Deprecated
-    public String getDocumentWeb()
+    public void setDocumentReference(DocumentReference documentReference)
     {
-        return getDocumentSpace();
+        this.documentReference = documentReference;
+    }
+
+    public String getDocumentName()
+    {
+        return getDocumentReference().getName();
     }
 
     public String getDocumentSpace()
     {
-        return this.documentSpace;
-    }
-
-    public String getDocumentFullName()
-    {
-        return this.documentFullName;
+        return getDocumentReference().getLastSpaceReference().getName();
     }
 
     public String getWiki()
     {
-        return this.wiki;
+        return getDocumentReference().getWikiReference().getName();
     }
 
-    public void setWiki(String wiki)
+    public String getDocumentFullName()
     {
-        this.wiki = wiki;
+        return (String) Utils.getComponent(EntityReferenceSerializer.class, "local").serialize(getDocumentReference());
     }
 
     public Date getCreationDate()
@@ -328,12 +289,7 @@ public abstract class IndexData
 
     public String getFullName()
     {
-        return this.fullName;
-    }
-
-    public void setFullName(String fullName)
-    {
-        this.fullName = fullName;
+        return (String) Utils.getComponent(EntityReferenceSerializer.class).serialize(getDocumentReference());
     }
 
     public String getLanguage()
@@ -348,5 +304,12 @@ public abstract class IndexData
         } else {
             this.language = "default";
         }
+    }
+
+    // Object
+
+    public String toString()
+    {
+        return getId();
     }
 }

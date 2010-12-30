@@ -44,14 +44,22 @@ public class AttachmentData extends IndexData
 
     private String filename;
 
-    public AttachmentData(final XWikiDocument document, final XWikiAttachment attachment, final XWikiContext context)
+    public AttachmentData(final XWikiAttachment attachment, final XWikiContext context, final boolean deleted)
     {
-        super(attachment.getDoc(), context);
+        super(attachment.getDoc(), context, deleted);
 
         setModificationDate(attachment.getDate());
         setAuthor(attachment.getAuthor());
         setSize(attachment.getFilesize());
         setFilename(attachment.getFilename());
+    }
+
+    public AttachmentData(final XWikiDocument document, final String filename, final XWikiContext context,
+        final boolean deleted)
+    {
+        super(document, context, deleted);
+
+        setFilename(filename);
     }
 
     /**
@@ -82,7 +90,7 @@ public class AttachmentData extends IndexData
      */
     public int getSize()
     {
-        return size;
+        return this.size;
     }
 
     /**
@@ -150,7 +158,7 @@ public class AttachmentData extends IndexData
         try {
             XWikiAttachment att = doc.getAttachment(this.filename);
 
-            LOG.debug("Start parsing attachement [" + this.filename + "] in document [" + doc.getPrefixedFullName()
+            LOG.debug("Start parsing attachement [" + this.filename + "] in document [" + doc.getDocumentReference()
                 + "]");
 
             Tika tika = new Tika();
@@ -160,8 +168,9 @@ public class AttachmentData extends IndexData
 
             contentText = this.filename + " " + tika.parseToString(att.getContentInputStream(context), metadata);
         } catch (Throwable e) {
-            LOG.warn("error getting content of attachment [" + this.filename + "] for document ["
-                + doc.getPrefixedFullName() + "]", e);
+            LOG.warn(
+                "error getting content of attachment [" + this.filename + "] for document ["
+                    + doc.getDocumentReference() + "]", e);
         }
 
         return contentText;

@@ -1010,6 +1010,10 @@ WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING O
                 <xsl:when test="$name = 'display'"/>
                 <xsl:when test="$name = 'float'"/>
                 <xsl:when test="$name = 'clear'"/>
+                <!-- Skip properties added when copy/pasting from MS Office -->
+                <xsl:when test="starts-with($name, 'mso')"/>
+                <!-- Skip browser specific properties -->
+                <xsl:when test="starts-with($name, '-')"/>
                 <xsl:otherwise>
                     <xsl:attribute name="{$name}">
                         <xsl:value-of select="$value"/>

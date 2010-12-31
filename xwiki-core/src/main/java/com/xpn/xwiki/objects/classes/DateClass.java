@@ -27,6 +27,7 @@ import java.util.Date;
 import java.util.Locale;
 import java.util.Map;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.ecs.xhtml.input;
@@ -143,8 +144,7 @@ public class DateClass extends PropertyClass
         String value = ppcel.getText();
         BaseProperty property = newProperty();
 
-        if ((value == null) || (value.equals(""))) {
-            property.setValue(new Date());
+        if (StringUtils.isEmpty(value)) {
             return property;
         }
 

@@ -26,7 +26,7 @@ import org.xwiki.rendering.listener.reference.ResourceReference;
 /**
  * Generate a string representation of an Image's reference, in XWiki Syntax 2.1.
  *
- * @version $Id: XWikiSyntaxLinkReferenceSerializer.java 31655 2010-10-07 12:34:15Z vmassol $
+ * @version $Id$
  * @since 2.5RC1
  */
 @Component("xwiki/2.1/image")

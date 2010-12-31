@@ -32,7 +32,7 @@ import org.xwiki.rendering.listener.reference.ResourceReference;
  * links, "attach" for attachment links, etc).
  * </p>
  *
- * @version $Id: XWikiSyntaxLinkReferenceSerializer.java 31655 2010-10-07 12:34:15Z vmassol $
+ * @version $Id$
  * @since 2.5RC1
  */
 @Component("xwiki/2.0/image")

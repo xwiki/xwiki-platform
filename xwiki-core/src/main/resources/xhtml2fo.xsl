@@ -255,34 +255,6 @@ WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING O
         <xsl:attribute name="start-indent">inherited-property-value(start-indent) + 24pt</xsl:attribute>
     </xsl:attribute-set>
 
-    <!-- list-item-label format for each nesting level -->
-
-    <xsl:param name="ul-label-1">&#x2022;</xsl:param>
-    <xsl:attribute-set name="ul-label-1">
-        <xsl:attribute name="font">1em serif</xsl:attribute>
-    </xsl:attribute-set>
-
-    <xsl:param name="ul-label-2">&#xB0;</xsl:param>
-    <xsl:attribute-set name="ul-label-2">
-        <xsl:attribute name="font">0.67em monospace</xsl:attribute>
-        <xsl:attribute name="baseline-shift">0.25em</xsl:attribute>
-    </xsl:attribute-set>
-
-    <xsl:param name="ul-label-3">&#xB7;</xsl:param>
-    <xsl:attribute-set name="ul-label-3">
-        <xsl:attribute name="font">bold 0.9em sans-serif</xsl:attribute>
-        <xsl:attribute name="baseline-shift">0.05em</xsl:attribute>
-    </xsl:attribute-set>
-
-    <xsl:param name="ol-label-1">1.</xsl:param>
-    <xsl:attribute-set name="ol-label-1"/>
-
-    <xsl:param name="ol-label-2">a.</xsl:param>
-    <xsl:attribute-set name="ol-label-2"/>
-
-    <xsl:param name="ol-label-3">i.</xsl:param>
-    <xsl:attribute-set name="ol-label-3"/>
-
     <!--=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
     Table
     =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-->
@@ -597,6 +569,62 @@ WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING O
             <!-- No furher special attributes, continue processing in 'transform' mode -->
             <xsl:otherwise>
                 <xsl:apply-templates select="." mode="transform"/>
+            </xsl:otherwise>
+        </xsl:choose>
+    </xsl:template>
+
+    <!-- Compute the list number format based on the list-style-type style value -->
+    <xsl:template name="process-list-marker">
+        <xsl:param name="list-type"/>
+        <xsl:variable name="style" select="concat(';', translate(normalize-space(@style), ' ', ''), ';', translate(normalize-space(../@style), ' ', ''))"/>
+        <xsl:variable name="list-style-type">
+            <xsl:call-template name="get-style-value">
+                <xsl:with-param name="style" select="$style"/>
+                <xsl:with-param name="property" select="'list-style-type'"/>
+            </xsl:call-template>
+        </xsl:variable>
+        <xsl:choose>
+            <xsl:when test="$list-style-type = 'none'" />
+            <xsl:when test="$list-style-type = 'disc'">&#x2022;</xsl:when>
+            <xsl:when test="$list-style-type = 'circle'">&#x25E6;</xsl:when>
+            <xsl:when test="$list-style-type = 'square'">&#x25FE;</xsl:when>
+            <xsl:when test="$list-style-type = 'decimal'">
+                <xsl:number format="1."/>
+            </xsl:when>
+            <xsl:when test="$list-style-type = 'decimal-leading-zero'">
+                <xsl:number format="01."/>
+            </xsl:when>
+            <xsl:when test="($list-style-type = 'lower-alpha') or ($list-style-type = 'lower-latin')">
+                <xsl:number format="a."/>
+            </xsl:when>
+            <xsl:when test="($list-style-type = 'upper-alpha') or ($list-style-type = 'upper-latin')">
+                <xsl:number format="A."/>
+            </xsl:when>
+            <xsl:when test="$list-style-type = 'lower-roman'">
+                <xsl:number format="i."/>
+            </xsl:when>
+            <xsl:when test="$list-style-type = 'upper-roman'">
+                <xsl:number format="I."/>
+            </xsl:when>
+            <!-- There's a bug with greek numbering, XSLT also uses lowercase final sigma before the normal sigma. -->
+            <xsl:when test="$list-style-type = 'lower-greek'">
+                <xsl:number format="&#x03B1;."/>
+            </xsl:when>
+            <!-- Disabled, XSLT doesn't support armenian numbering yet.
+            <xsl:when test="$list-style-type = 'armenian'">
+                <xsl:number format="&#x0531;."/>
+            </xsl:when>
+            -->
+            <xsl:when test="$list-style-type = 'georgian'">
+                <xsl:number format="&#x10D0;." letter-value="traditional"/>
+            </xsl:when>
+            <xsl:otherwise>
+                <xsl:choose>
+                    <xsl:when test="$list-type = 'ol'">
+                        <xsl:number format="1."/>
+                    </xsl:when>
+                    <xsl:when test="$list-type = 'ul'">&#x2022;</xsl:when>
+                </xsl:choose>
             </xsl:otherwise>
         </xsl:choose>
     </xsl:template>
@@ -1249,75 +1277,29 @@ WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING O
 
     <xsl:template match="html:ul/html:li" mode="transform">
         <fo:list-item xsl:use-attribute-sets="ul-li">
-            <xsl:call-template name="process-ul-li"/>
+            <xsl:call-template name="process-li">
+                <xsl:with-param name="list-type" select="'ul'"/>
+            </xsl:call-template>
         </fo:list-item>
-    </xsl:template>
-
-    <xsl:template name="process-ul-li">
-        <xsl:call-template name="process-common-attributes"/>
-        <fo:list-item-label end-indent="label-end()"
-                            text-align="end" wrap-option="no-wrap">
-            <fo:block>
-                <xsl:if test="not(@style='list-style: none; ')">
-                    <xsl:variable name="depth" select="count(ancestor::html:ul)" />
-                    <xsl:choose>
-                        <xsl:when test="$depth = 1">
-                            <fo:inline xsl:use-attribute-sets="ul-label-1">
-                                <xsl:value-of select="$ul-label-1"/>
-                            </fo:inline>
-                        </xsl:when>
-                        <xsl:when test="$depth = 2">
-                            <fo:inline xsl:use-attribute-sets="ul-label-2">
-                                <xsl:value-of select="$ul-label-2"/>
-                            </fo:inline>
-                        </xsl:when>
-                        <xsl:otherwise>
-                            <fo:inline xsl:use-attribute-sets="ul-label-3">
-                                <xsl:value-of select="$ul-label-3"/>
-                            </fo:inline>
-                        </xsl:otherwise>
-                    </xsl:choose>
-                </xsl:if>
-            </fo:block>
-        </fo:list-item-label>
-        <fo:list-item-body start-indent="body-start()">
-            <fo:block>
-                <xsl:apply-templates mode="preprocess"/>
-            </fo:block>
-        </fo:list-item-body>
     </xsl:template>
 
     <xsl:template match="html:ol/html:li" mode="transform">
         <fo:list-item xsl:use-attribute-sets="ol-li">
-            <xsl:call-template name="process-ol-li"/>
+            <xsl:call-template name="process-li">
+                <xsl:with-param name="list-type" select="'ol'"/>
+            </xsl:call-template>
         </fo:list-item>
     </xsl:template>
 
-    <xsl:template name="process-ol-li">
+    <xsl:template name="process-li">
+        <xsl:param name="list-type"/>
         <xsl:call-template name="process-common-attributes"/>
         <fo:list-item-label end-indent="label-end()"
                             text-align="end" wrap-option="no-wrap">
             <fo:block>
-                <xsl:if test="not(@style='list-style: none; ')">
-                    <xsl:variable name="depth" select="count(ancestor::html:ol)" />
-                    <xsl:choose>
-                        <xsl:when test="$depth = 1">
-                            <fo:inline xsl:use-attribute-sets="ol-label-1">
-                                <xsl:number format="{$ol-label-1}"/>
-                            </fo:inline>
-                        </xsl:when>
-                        <xsl:when test="$depth = 2">
-                            <fo:inline xsl:use-attribute-sets="ol-label-2">
-                                <xsl:number format="{$ol-label-2}"/>
-                            </fo:inline>
-                        </xsl:when>
-                        <xsl:otherwise>
-                            <fo:inline xsl:use-attribute-sets="ol-label-3">
-                                <xsl:number format="{$ol-label-3}"/>
-                            </fo:inline>
-                        </xsl:otherwise>
-                    </xsl:choose>
-                </xsl:if>
+                <xsl:call-template name="process-list-marker" >
+                    <xsl:with-param name="list-type" select="$list-type"/>
+                </xsl:call-template>
             </fo:block>
         </fo:list-item-label>
         <fo:list-item-body start-indent="body-start()">

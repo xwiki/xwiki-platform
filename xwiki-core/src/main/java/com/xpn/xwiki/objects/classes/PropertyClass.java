@@ -28,6 +28,7 @@ import org.apache.velocity.VelocityContext;
 import org.dom4j.Element;
 import org.dom4j.dom.DOMElement;
 import org.hibernate.mapping.Property;
+import org.xwiki.velocity.VelocityManager;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
@@ -40,6 +41,7 @@ import com.xpn.xwiki.objects.meta.PropertyMetaClass;
 import com.xpn.xwiki.plugin.query.XWikiCriteria;
 import com.xpn.xwiki.plugin.query.XWikiQuery;
 import com.xpn.xwiki.validation.XWikiValidationStatus;
+import com.xpn.xwiki.web.Utils;
 
 /**
  * Represents an XClass property and contains property definitions (eg "relational storage", "display type",
@@ -248,7 +250,7 @@ public class PropertyClass extends BaseCollection implements PropertyClassInterf
         String content = getCustomDisplay();
 
         try {
-            VelocityContext vcontext = (VelocityContext) context.get("vcontext");
+            VelocityContext vcontext = Utils.getComponent(VelocityManager.class).getVelocityContext();
             vcontext.put("name", fieldName);
             vcontext.put("prefix", prefix);
             vcontext.put("object", new com.xpn.xwiki.api.Object(object, context));
@@ -260,7 +262,9 @@ public class PropertyClass extends BaseCollection implements PropertyClassInterf
                 vcontext.put("value", prop.getValue());
             }
 
-            content = context.getWiki().parseContent(content, context);
+            String classSyntax =
+                context.getWiki().getDocument(getObject().getDocumentReference(), context).getSyntax().toIdString();
+            content = context.getDoc().getRenderedContent(content, classSyntax, context);
         } catch (Exception e) {
             throw new XWikiException(XWikiException.MODULE_XWIKI_CLASSES,
                 XWikiException.ERROR_XWIKI_CLASSES_CANNOT_PREPARE_CUSTOM_DISPLAY,

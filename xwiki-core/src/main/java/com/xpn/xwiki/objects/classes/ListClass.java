@@ -286,7 +286,7 @@ public abstract class ListClass extends PropertyClass
     @Override
     public BaseProperty newPropertyfromXML(Element ppcel)
     {
-        if ((!isRelationalStorage()) && (!isMultiSelect())) {
+        if (!isMultiSelect()) {
             return super.newPropertyfromXML(ppcel);
         }
 

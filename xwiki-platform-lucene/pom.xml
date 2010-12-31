@@ -129,6 +129,24 @@
       <scope>test</scope>
     </dependency>
   </dependencies>
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>clirr-maven-plugin</artifactId>
+        <configuration>
+          <excludes>
+            <!-- To be removed when we release 1.23 -->
+            <exclude>com/xpn/xwiki/plugin/lucene/AttachmentData</exclude>
+            <exclude>com/xpn/xwiki/plugin/lucene/DocumentData</exclude>
+            <exclude>com/xpn/xwiki/plugin/lucene/IndexData</exclude>
+            <exclude>com/xpn/xwiki/plugin/lucene/IndexRebuilder</exclude>
+            <exclude>com/xpn/xwiki/plugin/lucene/IndexUpdater</exclude>
+          </excludes>
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
   <!-- We must configure SCM in each module. For more information see:
        http://svn.xwiki.org/svnroot/xwiki/platform/pom/trunk/pom.xml -->
   <scm>

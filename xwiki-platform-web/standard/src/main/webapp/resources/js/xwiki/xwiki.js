@@ -9,50 +9,32 @@ var XWiki = (function(XWiki) {
 Object.extend(XWiki, {
 
   constants: {
-
-    /**
-     * Character that separates wiki from space in a page fullName (example: xwiki:Main.WebHome).
-     */
+    /** Character that separates wiki from space in a page fullName (example: the colon in xwiki:Main.WebHome). */
     wikiSpaceSeparator: ":",
 
-    /**
-     * Character that separates space from page in a page fullName (example: xwiki:Main.WebHome).
-     */
+    /** Character that separates space from page in a page fullName (example: the dot in xwiki:Main.WebHome). */
     spacePageSeparator: ".",
 
-    /**
-     * Character that separates page from attachment in an attachment fullName (example: xwiki:Main.WebHome@Archive.tgz).
-     */
+    /** Character that separates page from attachment in an attachment fullName (example: the @ in xwiki:Main.WebHome@Archive.tgz). */
     pageAttachmentSeparator: "@",
 
-    /**
-     * URL Anchor separator.
-     */
+    /** URL Anchor separator. */
     anchorSeparator: "#",
 
-    /**
-     * URL Anchor for page comments.
-     */
+    /** URL Anchor for page comments. */
     docextraCommentsAnchor: "Comments",
 
-    /**
-     * URL Anchor for page comments.
-     */
+    /** URL Anchor for page attachments. */
     docextraAttachmentsAnchor: "Attachments",
 
-    /**
-     * URL Anchor for page comments.
-     */
+    /** URL Anchor for page history. */
     docextraHistoryAnchor: "History",
 
-    /**
-     * URL Anchor for page comments.
-     */
+    /** URL Anchor for page information. */
     docextraInformationAnchor: "Information"
   },
 
   resource: {
-
     /**
      * Extract the name of the wiki from a resource name. Examples: returns "xwiki" with "xwiki:Main.WebHome",
      * returns null with "Main.WebHome".

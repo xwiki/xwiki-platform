@@ -24,28 +24,26 @@ import java.util.Date;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.lucene.document.Document;
 import org.apache.lucene.document.Field;
 import org.apache.lucene.index.Term;
-import org.apache.lucene.search.Query;
-import org.apache.lucene.search.TermQuery;
+import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.rendering.syntax.Syntax;
 
 import com.xpn.xwiki.XWikiContext;
+import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.web.Utils;
 
 /**
- * @version $Id$
+ * @version $Id: IndexData.java 33749 2010-12-30 14:21:04Z tmortagne $
+ * @since 1.23
  */
-public abstract class IndexData
+public abstract class AbstractDocumentData extends AbstractIndexData
 {
-    private static final Log LOG = LogFactory.getLog(IndexData.class);
-
-    private boolean deleted;
-
-    private DocumentReference documentReference;
+    private static final Log LOG = LogFactory.getLog(AbstractDocumentData.class);
 
     private String documentTitle;
 
@@ -59,12 +57,12 @@ public abstract class IndexData
 
     private Date modificationDate;
 
-    public IndexData(final XWikiDocument doc, final XWikiContext context, final boolean deleted)
+    public AbstractDocumentData(String type, XWikiDocument doc, XWikiContext context, boolean deleted)
     {
-        setDocumentReference(doc.getDocumentReference());
+        super(type, doc.getDocumentReference(), deleted);
+
         setDocumentTitle(doc.getRenderedTitle(Syntax.PLAIN_1_0, context));
         setLanguage(doc.getLanguage());
-        setDeleted(deleted);
     }
 
     /**
@@ -91,8 +89,21 @@ public abstract class IndexData
      * @param luceneDoc if not null, this controls which translated version of the content will be indexed. If null, the
      *            content in the default language will be used.
      */
-    public void addDataToLuceneDocument(org.apache.lucene.document.Document luceneDoc, XWikiDocument doc,
-        XWikiContext context)
+    public void addDataToLuceneDocument(Document luceneDoc, XWikiContext context) throws XWikiException
+    {
+        /*
+         * XXX Is it not possible to obtain the right translation directly?
+         */
+        XWikiDocument doc = context.getWiki().getDocument(getDocumentReference(), context);
+
+        if (getLanguage() != null && !getLanguage().equals("")) {
+            doc = doc.getTranslatedDocument(getLanguage(), context);
+        }
+
+        addDocumentDataToLuceneDocument(luceneDoc, doc, context);
+    }
+
+    public void addDocumentDataToLuceneDocument(Document luceneDoc, XWikiDocument doc, XWikiContext context)
     {
         // Keyword fields: stored and indexed, but not tokenized
         // Note: ID field must be UN_TOKENIZED to enable case sensitive IDs
@@ -141,17 +152,6 @@ public abstract class IndexData
     }
 
     /**
-     * Builds a Lucene query matching only the document this instance represents. This is used for removing old versions
-     * of a document from the index before adding a new one.
-     * 
-     * @return a query matching the field DOCUMENT_ID to the value of #getId()
-     */
-    public Query buildQuery()
-    {
-        return new TermQuery(new Term(IndexFields.DOCUMENT_ID, getId()));
-    }
-
-    /**
      * @return string unique to this document across all languages and virtual wikis
      */
     public String getId()
@@ -163,6 +163,11 @@ public abstract class IndexData
         retval.append(getLanguage());
 
         return retval.toString();
+    }
+
+    public Term getTerm()
+    {
+        return new Term(IndexFields.DOCUMENT_ID, getId());
     }
 
     /**
@@ -188,24 +193,6 @@ public abstract class IndexData
         if (!StringUtils.isEmpty(this.creator)) {
             sb.append(" ").append(this.creator);
         }
-    }
-
-    public abstract String getType();
-
-    /**
-     * @see #isDeleted()
-     */
-    public void setDeleted(boolean deleted)
-    {
-        this.deleted = deleted;
-    }
-
-    /**
-     * @return indicate of the element should be deleted from he index
-     */
-    public boolean isDeleted()
-    {
-        return this.deleted;
     }
 
     /**
@@ -239,32 +226,27 @@ public abstract class IndexData
 
     public DocumentReference getDocumentReference()
     {
-        return this.documentReference;
-    }
-
-    public void setDocumentReference(DocumentReference documentReference)
-    {
-        this.documentReference = documentReference;
+        return (DocumentReference) getEntityReference();
     }
 
     public String getDocumentName()
     {
-        return getDocumentReference().getName();
+        return getEntityName(EntityType.DOCUMENT);
     }
 
     public String getDocumentSpace()
     {
-        return getDocumentReference().getLastSpaceReference().getName();
+        return getEntityName(EntityType.SPACE);
     }
 
     public String getWiki()
     {
-        return getDocumentReference().getWikiReference().getName();
+        return getEntityName(EntityType.WIKI);
     }
 
     public String getDocumentFullName()
     {
-        return (String) Utils.getComponent(EntityReferenceSerializer.class, "local").serialize(getDocumentReference());
+        return (String) Utils.getComponent(EntityReferenceSerializer.class, "local").serialize(getEntityReference());
     }
 
     public Date getCreationDate()
@@ -289,7 +271,7 @@ public abstract class IndexData
 
     public String getFullName()
     {
-        return (String) Utils.getComponent(EntityReferenceSerializer.class).serialize(getDocumentReference());
+        return (String) Utils.getComponent(EntityReferenceSerializer.class).serialize(getEntityReference());
     }
 
     public String getLanguage()

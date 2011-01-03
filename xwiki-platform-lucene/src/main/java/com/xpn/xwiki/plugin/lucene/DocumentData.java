@@ -43,13 +43,13 @@ import com.xpn.xwiki.objects.classes.StaticListClass;
  * 
  * @version $Id$
  */
-public class DocumentData extends IndexData
+public class DocumentData extends AbstractDocumentData
 {
     private static final Log LOG = LogFactory.getLog(DocumentData.class);
 
     public DocumentData(final XWikiDocument doc, final XWikiContext context, final boolean deleted)
     {
-        super(doc, context, deleted);
+        super(LucenePlugin.DOCTYPE_WIKIPAGE, doc, context, deleted);
 
         setAuthor(doc.getAuthor());
         setCreator(doc.getCreator());
@@ -58,16 +58,8 @@ public class DocumentData extends IndexData
     }
 
     /**
-     * @see IndexData#getType()
-     */
-    public String getType()
-    {
-        return LucenePlugin.DOCTYPE_WIKIPAGE;
-    }
-
-    /**
-     * @return a string containing the result of {@link IndexData#getFullText} plus the full text content of this
-     *         document (in the given language)
+     * @return a string containing the result of {@link AbstractIndexData#getFullText} plus the full text content of
+     *         this document (in the given language)
      */
     protected void getFullText(StringBuilder sb, XWikiDocument doc, XWikiContext context)
     {
@@ -83,9 +75,9 @@ public class DocumentData extends IndexData
     }
 
     /**
-     * Add to the string builder, the result of {@link IndexData#getFullText(XWikiDocument,XWikiContext)}plus the full
-     * text content (values of title,category,content and extract ) XWiki.ArticleClass Object, as far as it could be
-     * extracted.
+     * Add to the string builder, the result of {@link AbstractIndexData#getFullText(XWikiDocument,XWikiContext)}plus
+     * the full text content (values of title,category,content and extract ) XWiki.ArticleClass Object, as far as it
+     * could be extracted.
      */
     private void getObjectFullText(StringBuilder sb, XWikiDocument doc, XWikiContext context)
     {
@@ -132,10 +124,10 @@ public class DocumentData extends IndexData
     }
 
     @Override
-    public void addDataToLuceneDocument(org.apache.lucene.document.Document luceneDoc, XWikiDocument doc,
-        XWikiContext context)
+    public void addDocumentDataToLuceneDocument(Document luceneDoc, XWikiDocument doc, XWikiContext context)
     {
-        super.addDataToLuceneDocument(luceneDoc, doc, context);
+        super.addDocumentDataToLuceneDocument(luceneDoc, doc, context);
+
         for (List<BaseObject> objects : doc.getXObjects().values()) {
             for (BaseObject obj : objects) {
                 if (obj != null) {

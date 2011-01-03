@@ -33,17 +33,19 @@ import org.apache.lucene.document.Document;
 import org.apache.lucene.document.Field;
 import org.apache.lucene.index.CorruptIndexException;
 import org.apache.lucene.index.IndexWriter;
-import org.apache.lucene.index.Term;
 import org.apache.lucene.store.Directory;
 import org.apache.lucene.store.LockObtainFailedException;
 import org.xwiki.bridge.event.DocumentCreatedEvent;
 import org.xwiki.bridge.event.DocumentDeletedEvent;
 import org.xwiki.bridge.event.DocumentUpdatedEvent;
+import org.xwiki.bridge.event.WikiDeletedEvent;
 import org.xwiki.context.Execution;
+import org.xwiki.model.reference.WikiReference;
 import org.xwiki.observation.EventListener;
 import org.xwiki.observation.event.Event;
 
 import com.xpn.xwiki.XWikiContext;
+import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiAttachment;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.internal.event.AbstractAttachmentEvent;
@@ -224,29 +226,18 @@ public class IndexUpdater extends AbstractXWikiRunnable implements EventListener
             try {
                 int nb = 0;
                 while (!this.queue.isEmpty()) {
-                    IndexData data = this.queue.remove();
-
-                    String id = data.getId();
+                    AbstractIndexData data = this.queue.remove();
 
                     try {
-                        /*
-                         * XXX Is it not possible to obtain the right translation directly?
-                         */
-                        XWikiDocument doc = context.getWiki().getDocument(data.getDocumentReference(), context);
-
-                        if (data.getLanguage() != null && !data.getLanguage().equals("")) {
-                            doc = doc.getTranslatedDocument(data.getLanguage(), context);
-                        }
-
                         if (data.isDeleted()) {
-                            removeFromIndex(writer, data, doc, context);
+                            removeFromIndex(writer, data, context);
                         } else {
-                            addToIndex(writer, data, doc, context);
+                            addToIndex(writer, data, context);
                         }
 
                         ++nb;
                     } catch (Throwable e) {
-                        LOG.error("error indexing document " + id, e);
+                        LOG.error("error indexing document " + data, e);
                     }
                 }
 
@@ -294,15 +285,15 @@ public class IndexUpdater extends AbstractXWikiRunnable implements EventListener
         }
     }
 
-    private void addToIndex(IndexWriter writer, IndexData data, XWikiDocument doc, XWikiContext context)
-        throws IOException
+    private void addToIndex(IndexWriter writer, AbstractIndexData data, XWikiContext context) throws IOException,
+        XWikiException
     {
         if (LOG.isDebugEnabled()) {
             LOG.debug("addToIndex: " + data);
         }
 
         Document luceneDoc = new Document();
-        data.addDataToLuceneDocument(luceneDoc, doc, context);
+        data.addDataToLuceneDocument(luceneDoc, context);
 
         // collecting all the fields for using up in search
         for (Field field : (List<Field>) luceneDoc.getFields()) {
@@ -311,17 +302,17 @@ public class IndexUpdater extends AbstractXWikiRunnable implements EventListener
             }
         }
 
-        writer.updateDocument(new Term(IndexFields.DOCUMENT_ID, data.getId()), luceneDoc);
+        writer.updateDocument(data.getTerm(), luceneDoc);
     }
 
-    private void removeFromIndex(IndexWriter writer, IndexData data, XWikiDocument doc, XWikiContext context)
+    private void removeFromIndex(IndexWriter writer, AbstractIndexData data, XWikiContext context)
         throws CorruptIndexException, IOException
     {
         if (LOG.isDebugEnabled()) {
             LOG.debug("removeFromIndex: " + data);
         }
 
-        writer.deleteDocuments(new Term(IndexFields.DOCUMENT_ID, data.getId()));
+        writer.deleteDocuments(data.getTerm());
     }
 
     /**
@@ -367,6 +358,15 @@ public class IndexUpdater extends AbstractXWikiRunnable implements EventListener
         } else {
             LOG.error("Invalid parameters given to " + (deleted ? "deleted" : "add") + " attachment [" + attachmentName
                 + "] of document [" + document.getDocumentReference() + "]");
+        }
+    }
+
+    public void addWiki(String wikiId, boolean deleted)
+    {
+        if (wikiId != null) {
+            this.queue.add(new WikiData(new WikiReference(wikiId), deleted));
+        } else {
+            LOG.error("Invalid parameters given to " + (deleted ? "deleted" : "add") + " wiki [" + wikiId + "]");
         }
     }
 
@@ -416,18 +416,20 @@ public class IndexUpdater extends AbstractXWikiRunnable implements EventListener
      */
     public void onEvent(Event event, Object source, Object data)
     {
-        XWikiDocument document = (XWikiDocument) source;
         XWikiContext context = (XWikiContext) data;
 
         try {
             if (event instanceof DocumentUpdatedEvent || event instanceof DocumentCreatedEvent) {
-                queueDocument(document, context, false);
+                queueDocument((XWikiDocument) source, context, false);
             } else if (event instanceof DocumentDeletedEvent) {
-                queueDocument(document, context, true);
+                queueDocument((XWikiDocument) source, context, true);
             } else if (event instanceof AttachmentUpdatedEvent || event instanceof AttachmentAddedEvent) {
-                queueAttachment(document.getAttachment(((AbstractAttachmentEvent) event).getName()), context, false);
+                queueAttachment(((XWikiDocument) source).getAttachment(((AbstractAttachmentEvent) event).getName()),
+                    context, false);
             } else if (event instanceof AttachmentDeletedEvent) {
-                addAttachment(document, ((AbstractAttachmentEvent) event).getName(), context, true);
+                addAttachment((XWikiDocument) source, ((AbstractAttachmentEvent) event).getName(), context, true);
+            } else if (event instanceof WikiDeletedEvent) {
+                addWiki((String) source, true);
             }
         } catch (Exception e) {
             LOG.error("error in notify", e);

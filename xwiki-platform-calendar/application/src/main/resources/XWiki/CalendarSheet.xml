@@ -135,7 +135,7 @@ $event.description
 &lt;dt class="label"&gt;&lt;label&gt;$msg.get('eventDescription'):&lt;/label&gt;&lt;/dt&gt;
 &lt;dd&gt;$doc.displayEdit($pclass, 'XWiki.CalendarEvent_', $event)&lt;/dd&gt;
 &lt;/dl&gt;
-&lt;input type="submit" value="$msg.get('eventAdd')" /&gt;
+&lt;span class="buttonwrapper"&gt;&lt;input type="submit" class="button" value="$msg.get('eventAdd')" /&gt;&lt;/span&gt;
 &lt;/div&gt;
 &lt;/form&gt;
 {{/html}}

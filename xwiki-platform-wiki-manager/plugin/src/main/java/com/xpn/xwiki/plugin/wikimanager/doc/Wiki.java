@@ -6,6 +6,8 @@ import java.util.List;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.xwiki.bridge.event.WikiDeletedEvent;
+import org.xwiki.observation.ObservationManager;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
@@ -15,6 +17,7 @@ import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.plugin.wikimanager.WikiManagerException;
 import com.xpn.xwiki.plugin.wikimanager.WikiManagerMessageTool;
+import com.xpn.xwiki.web.Utils;
 
 /**
  * This class manage wiki document descriptor.
@@ -69,6 +72,7 @@ public class Wiki extends Document
         if (hasAdminRights()) {
             try {
                 this.context.getWiki().getStore().deleteWiki(wikiName, this.context);
+                Utils.getComponent(ObservationManager.class).notify(new WikiDeletedEvent(wikiName), wikiName, this.context);
             } catch (XWikiException e) {
                 LOG.error("Failed to delete wiki from database", e);
             }

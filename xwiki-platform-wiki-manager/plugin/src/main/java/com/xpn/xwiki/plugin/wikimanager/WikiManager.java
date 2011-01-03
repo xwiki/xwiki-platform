@@ -28,6 +28,8 @@ import java.util.List;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.xwiki.bridge.event.WikiCreatedEvent;
+import org.xwiki.observation.ObservationManager;
 
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
@@ -46,6 +48,7 @@ import com.xpn.xwiki.plugin.wikimanager.doc.XWikiServer;
 import com.xpn.xwiki.plugin.wikimanager.doc.XWikiServerClass;
 import com.xpn.xwiki.user.api.XWikiRightService;
 import com.xpn.xwiki.util.Util;
+import com.xpn.xwiki.web.Utils;
 
 /**
  * Hidden toolkit use by the plugin API that make all the plugins actions.
@@ -89,35 +92,12 @@ public final class WikiManager
     // Utils
 
     /**
-     * Encapsulate {@link com.xpn.xwiki.XWiki#saveDocument(XWikiDocument, XWikiContext)} adding wiki switch.
-     * 
-     * @param wikiName the name of the wiki where to save the document.
-     * @param doc the document to save.
-     * @param comment the comment to use when saving document.
-     * @param context the XWiki Context.
-     * @throws XWikiException error when calling {@link XWiki#saveDocument(XWikiDocument, String, XWikiContext)}.
-     * @see com.xpn.xwiki.XWiki#saveDocument(XWikiDocument, XWikiContext)
-     */
-    public void saveDocument(String wikiName, XWikiDocument doc, String comment, XWikiContext context)
-        throws XWikiException
-    {
-        String database = context.getDatabase();
-
-        try {
-            context.setDatabase(wikiName);
-            context.getWiki().saveDocument(doc, comment, context);
-        } finally {
-            context.setDatabase(database);
-        }
-    }
-
-    /**
      * Encapsulate {@link com.xpn.xwiki.XWiki#getDocument(String, XWikiContext)} adding wiki switch.
      * 
      * @param wikiName the name of the wiki where to get the document.
      * @param fullname the full name of the document to get.
      * @param context the XWiki context.
-     * @return the document with full name equals to <code>fullname</code> and wiki <code>wikiName</code>. If it dos not
+     * @return the document with full name equals to <code>fullname</code> and wiki <code>wikiName</code>. If it does not
      *         exist return new XWikiDocument.
      * @throws XWikiException error when calling {@link XWiki#getDocument(String, XWikiContext)} .
      * @see com.xpn.xwiki.XWiki#getDocument(String, XWikiContext)
@@ -325,7 +305,6 @@ public final class WikiManager
      * @param sourceWiki the wiki from where to copy documents and get lists of "document to link" and "documents to
      *            copy".
      * @param targetWiki the wiki where to copy documents.
-     * @param language the documents language to copy.
      * @param comment the comment to use when saving documents.
      * @param context the XWiki context.
      * @throws XWikiException error when:
@@ -335,13 +314,13 @@ public final class WikiManager
      *             <li>or getting documents to link.</li>
      *             </ul>
      */
-    private void copyWiki(String sourceWiki, String targetWiki, String language, String comment, XWikiContext context)
+    private void copyWiki(String sourceWiki, String targetWiki, String comment, XWikiContext context)
         throws XWikiException
     {
         XWiki xwiki = context.getWiki();
 
         // Copy all the wiki
-        xwiki.copyWikiWeb(null, sourceWiki, targetWiki, language, true, context);
+        xwiki.copyWiki(sourceWiki, targetWiki, null, context);
 
         String database = context.getDatabase();
         try {
@@ -532,14 +511,9 @@ public final class WikiManager
             // Save new wiki descriptor document.
             wikiSuperDocToSave.save(comment);
 
-            String language = userWikiSuperDoc.getLanguage();
-            if (language.length() == 0) {
-                language = null;
-            }
-
             // Copy template wiki into new wiki
             if (templateWikiName != null) {
-                copyWiki(templateWikiName, newWikiName, language, comment, context);
+                copyWiki(templateWikiName, newWikiName, comment, context);
             }
 
             // Import XAR package into new wiki
@@ -644,6 +618,8 @@ public final class WikiManager
             throw new WikiManagerException(WikiManagerException.ERROR_WM_UPDATEDATABASE, msg.get(
                 WikiManagerMessageTool.ERROR_UPDATEDATABASE, targetWiki), e);
         }
+        
+        Utils.getComponent(ObservationManager.class).notify(new WikiCreatedEvent(targetWiki), targetWiki, context);
     }
 
     /**

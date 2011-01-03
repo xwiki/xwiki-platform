@@ -26,6 +26,7 @@ import java.util.Map;
 import org.jmock.Mock;
 import org.jmock.core.Invocation;
 import org.jmock.core.stub.CustomStub;
+import org.xwiki.model.reference.DocumentReference;
 
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
@@ -73,6 +74,19 @@ public class WikiManagerTest extends AbstractBridgedXWikiComponentTestCase
         return this.databases.get(database);
     }
 
+    private XWikiDocument getDocument(DocumentReference documentReference) throws XWikiException
+    {
+        XWikiDocument document = new XWikiDocument(documentReference);
+
+        Map<String, XWikiDocument> docs = getDocuments(document.getDatabase(), false);
+
+        if (docs.containsKey(document.getFullName())) {
+            return docs.get(document.getFullName());
+        } else {
+            return document;
+        }
+    }
+    
     private XWikiDocument getDocument(String documentFullName) throws XWikiException
     {
         XWikiDocument document = new XWikiDocument();
@@ -117,7 +131,14 @@ public class WikiManagerTest extends AbstractBridgedXWikiComponentTestCase
 
         Mock mockXWikiRightService = mock(XWikiRightServiceImpl.class, new Class[] {}, new Object[] {});
 
-        mockXWiki.stubs().method("getDocument").will(new CustomStub("Implements XWiki.getDocument")
+        mockXWiki.stubs().method("getDocument").with(isA(DocumentReference.class), ANYTHING).will(new CustomStub("Implements XWiki.getDocument")
+        {
+            public Object invoke(Invocation invocation) throws Throwable
+            {
+                return getDocument((DocumentReference) invocation.parameterValues.get(0));
+            }
+        });
+        mockXWiki.stubs().method("getDocument").with(isA(String.class), ANYTHING).will(new CustomStub("Implements XWiki.getDocument")
         {
             public Object invoke(Invocation invocation) throws Throwable
             {
@@ -133,16 +154,16 @@ public class WikiManagerTest extends AbstractBridgedXWikiComponentTestCase
                 return null;
             }
         });
-        mockXWiki.stubs().method("getClass").will(new CustomStub("Implements XWiki.getClass")
+        mockXWiki.stubs().method("getXClass").will(new CustomStub("Implements XWiki.getClass")
         {
             public Object invoke(Invocation invocation) throws Throwable
             {
-                String classFullName = (String) invocation.parameterValues.get(0);
+                DocumentReference classReference = (DocumentReference) invocation.parameterValues.get(0);
                 XWikiContext context = (XWikiContext) invocation.parameterValues.get(1);
 
-                XWikiDocument doc = context.getWiki().getDocument(classFullName, context);
+                XWikiDocument doc = context.getWiki().getDocument(classReference, context);
 
-                return doc.getxWikiClass();
+                return doc.getXClass();
             }
         });
         mockXWiki.stubs().method("clearName").will(new CustomStub("Implements XWiki.clearName")
@@ -188,27 +209,9 @@ public class WikiManagerTest extends AbstractBridgedXWikiComponentTestCase
 
     private static final String DOCFULLNAME = DOCSPACE + "." + DOCNAME;
 
-    public void testSaveDocument() throws XWikiException
-    {
-        getContext().setDatabase(MAIN_WIKI_NAME);
-
-        databases.clear();
-        databases.put(TARGET_WIKI_NAME, new HashMap<String, XWikiDocument>());
-
-        // ///
-
-        XWikiDocument doc = new XWikiDocument("DocumentSpace", "DocumentName");
-
-        this.wikiManager.saveDocument(TARGET_WIKI_NAME, doc, "", getContext());
-
-        assertEquals(MAIN_WIKI_NAME, getContext().getDatabase());
-        assertTrue(databases.containsKey(TARGET_WIKI_NAME)
-            && databases.get(TARGET_WIKI_NAME).containsKey(doc.getFullName()));
-    }
-
     public void testGetDocument() throws XWikiException
     {
-        testSaveDocument();
+        saveDocument(new XWikiDocument(new DocumentReference(TARGET_WIKI_NAME, DOCSPACE, DOCNAME)));
 
         // ///
 
@@ -221,7 +224,7 @@ public class WikiManagerTest extends AbstractBridgedXWikiComponentTestCase
     public void testGetWikiFromNameWhenInAnotherWiki() throws XWikiException
     {
         XWikiDocument doc = new XWikiDocument();
-        databases.get(MAIN_WIKI_NAME).put("XWiki.XWikiServerWikiname", doc);
+        this.databases.get(MAIN_WIKI_NAME).put("XWiki.XWikiServerWikiname", doc);
 
         getContext().setDatabase("anotherwiki");
 
@@ -245,7 +248,7 @@ public class WikiManagerTest extends AbstractBridgedXWikiComponentTestCase
     public void testGetWikiAliasWhenDocumentDoesNotContainsClass() throws XWikiException
     {
         XWikiDocument doc = new XWikiDocument();
-        databases.get(MAIN_WIKI_NAME).put("XWiki.XWikiServerWikiname", doc);
+        this.databases.get(MAIN_WIKI_NAME).put("XWiki.XWikiServerWikiname", doc);
 
         try {
             this.wikiManager.getWikiAlias("WikInamE", 0, true, getContext());
@@ -260,7 +263,7 @@ public class WikiManagerTest extends AbstractBridgedXWikiComponentTestCase
     public void testGetWikiAlias() throws XWikiException
     {
         XWikiDocument doc = new XWikiDocument();
-        databases.get(MAIN_WIKI_NAME).put("XWiki.XWikiServerWikiname", doc);
+        this.databases.get(MAIN_WIKI_NAME).put("XWiki.XWikiServerWikiname", doc);
 
         try {
             this.wikiManager.getWikiAlias("WikInamE", 0, true, getContext());

@@ -34,7 +34,7 @@
   <version>1.25-SNAPSHOT</version>
   <description>XWiki Platform - Plugins - Wiki Manager</description>
   <properties>
-    <platform.core.version>2.0.5</platform.core.version>
+    <platform.core.version>2.7-SNAPSHOT</platform.core.version>
     <platform.plugin.applicationmanager.version>1.18-SNAPSHOT</platform.plugin.applicationmanager.version>
   </properties>
   <dependencies>
@@ -56,6 +56,8 @@
       <version>1.1.0</version>
       <scope>test</scope>
     </dependency>
+
+    <!-- Test dependencies -->
     <!-- Needed at test time. Some versions of Maven don't inherit provided dependencies. -->
     <dependency>
       <groupId>javax.servlet</groupId>
@@ -93,16 +95,6 @@
         <!-- Apply the Checkstyle configurations defined in the top level pom.xml file -->
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-checkstyle-plugin</artifactId>
-      </plugin>
-      <plugin>
-        <groupId>org.codehaus.mojo</groupId>
-        <artifactId>clirr-maven-plugin</artifactId>
-        <configuration>
-          <excludes>
-            <!-- To be removed when we release 1.24 -->
-            <exclude>com/xpn/xwiki/plugin/wikimanager/WikiManagerPluginApi</exclude>
-          </excludes>
-        </configuration>
       </plugin>
     </plugins>
   </build>

@@ -38,7 +38,7 @@ public class XWikiDocumentQueue
     /**
      * Maps names of documents to the document instances.
      */
-    private Map<String, IndexData> documentsByName = new HashMap<String, IndexData>();
+    private Map<String, AbstractIndexData> documentsByName = new HashMap<String, AbstractIndexData>();
 
     /**
      * Maintains FIFO order.
@@ -52,7 +52,7 @@ public class XWikiDocumentQueue
      * @return The oldest element in the queue.
      * @throws BufferUnderflowException If the queue is empty.
      */
-    public synchronized IndexData remove() throws BufferUnderflowException
+    public synchronized AbstractIndexData remove() throws BufferUnderflowException
     {
         return this.documentsByName.remove(this.namesQueue.remove());
     }
@@ -66,9 +66,10 @@ public class XWikiDocumentQueue
      * @param data IndexData object to add to the queue.
      */
     @SuppressWarnings("unchecked")
-    public synchronized void add(IndexData data)
+    public synchronized void add(AbstractIndexData data)
     {
-        final String key = data.getId();
+        String key = data.getId();
+
         if (!this.documentsByName.containsKey(key)) {
             // Document with this name not yet in the Queue, so add it
             this.namesQueue.add(key);

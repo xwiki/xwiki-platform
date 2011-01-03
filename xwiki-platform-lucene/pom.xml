@@ -34,7 +34,7 @@
   <version>1.23-SNAPSHOT</version>
   <description>XWiki Platform - Plugins - Lucene search</description>
   <properties>
-    <platform.core.version>2.7</platform.core.version>
+    <platform.core.version>2.7-SNAPSHOT</platform.core.version>
   </properties>
   <dependencies>
     <dependency>
@@ -142,6 +142,7 @@
             <exclude>com/xpn/xwiki/plugin/lucene/IndexData</exclude>
             <exclude>com/xpn/xwiki/plugin/lucene/IndexRebuilder</exclude>
             <exclude>com/xpn/xwiki/plugin/lucene/IndexUpdater</exclude>
+            <exclude>com/xpn/xwiki/plugin/lucene/XWikiDocumentQueue</exclude>
           </excludes>
         </configuration>
       </plugin>

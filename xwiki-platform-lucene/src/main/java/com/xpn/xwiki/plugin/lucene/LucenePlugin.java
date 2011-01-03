@@ -576,8 +576,8 @@ public class LucenePlugin extends XWikiDefaultPlugin
         // take care of crappy code calling #flushCache with no context...
         if (context == null) {
             context =
-                (XWikiContext) Utils.getComponent(Execution.class).getContext().getProperty(
-                    XWikiContext.EXECUTIONCONTEXT_KEY);
+                (XWikiContext) Utils.getComponent(Execution.class).getContext()
+                    .getProperty(XWikiContext.EXECUTIONCONTEXT_KEY);
         }
 
         if (this.indexUpdater != null) {

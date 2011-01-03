@@ -27,6 +27,7 @@ import org.apache.tika.Tika;
 import org.apache.tika.metadata.Metadata;
 
 import com.xpn.xwiki.XWikiContext;
+import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiAttachment;
 import com.xpn.xwiki.doc.XWikiDocument;
 
@@ -36,7 +37,7 @@ import com.xpn.xwiki.doc.XWikiDocument;
  * 
  * @version $Id$
  */
-public class AttachmentData extends IndexData
+public class AttachmentData extends AbstractDocumentData
 {
     private static final Log LOG = LogFactory.getLog(AttachmentData.class);
 
@@ -44,9 +45,9 @@ public class AttachmentData extends IndexData
 
     private String filename;
 
-    public AttachmentData(final XWikiAttachment attachment, final XWikiContext context, final boolean deleted)
+    public AttachmentData(XWikiAttachment attachment, XWikiContext context, boolean deleted)
     {
-        super(attachment.getDoc(), context, deleted);
+        super(LucenePlugin.DOCTYPE_ATTACHMENT, attachment.getDoc(), context, deleted);
 
         setModificationDate(attachment.getDate());
         setAuthor(attachment.getAuthor());
@@ -54,23 +55,16 @@ public class AttachmentData extends IndexData
         setFilename(attachment.getFilename());
     }
 
-    public AttachmentData(final XWikiDocument document, final String filename, final XWikiContext context,
-        final boolean deleted)
+    public AttachmentData(XWikiDocument document, String filename, XWikiContext context, boolean deleted)
     {
-        super(document, context, deleted);
+        super(LucenePlugin.DOCTYPE_ATTACHMENT, document, context, deleted);
 
         setFilename(filename);
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see com.xpn.xwiki.plugin.lucene.IndexData#addDataToLuceneDocument(org.apache.lucene.document.Document,
-     *      com.xpn.xwiki.doc.XWikiDocument, com.xpn.xwiki.XWikiContext)
-     */
-    public void addDataToLuceneDocument(Document luceneDoc, XWikiDocument doc, XWikiContext context)
+    public void addDataToLuceneDocument(Document luceneDoc, XWikiContext context) throws XWikiException
     {
-        super.addDataToLuceneDocument(luceneDoc, doc, context);
+        super.addDataToLuceneDocument(luceneDoc, context);
 
         if (this.filename != null) {
             luceneDoc.add(new Field(IndexFields.FILENAME, filename, Field.Store.YES, Field.Index.ANALYZED));
@@ -94,14 +88,6 @@ public class AttachmentData extends IndexData
     }
 
     /**
-     * @see IndexData#getType()
-     */
-    public String getType()
-    {
-        return LucenePlugin.DOCTYPE_ATTACHMENT;
-    }
-
-    /**
      * @return Returns the filename.
      */
     public String getFilename()
@@ -120,7 +106,7 @@ public class AttachmentData extends IndexData
     /**
      * overridden to append the filename
      * 
-     * @see IndexData#getId()
+     * @see AbstractIndexData#getId()
      */
     public String getId()
     {
@@ -130,11 +116,11 @@ public class AttachmentData extends IndexData
     /**
      * {@inheritDoc}
      * <p>
-     * Return a string containing the result of {@link IndexData#getFullText} plus the full text content of this
+     * Return a string containing the result of {@link AbstractIndexData#getFullText} plus the full text content of this
      * attachment, as far as it could be extracted.
      * 
-     * @see com.xpn.xwiki.plugin.lucene.IndexData#getFullText(java.lang.StringBuilder, com.xpn.xwiki.doc.XWikiDocument,
-     *      com.xpn.xwiki.XWikiContext)
+     * @see com.xpn.xwiki.plugin.lucene.AbstractIndexData#getFullText(java.lang.StringBuilder,
+     *      com.xpn.xwiki.doc.XWikiDocument, com.xpn.xwiki.XWikiContext)
      */
     @Override
     protected void getFullText(StringBuilder sb, XWikiDocument doc, XWikiContext context)

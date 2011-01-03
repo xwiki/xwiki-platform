@@ -97,8 +97,8 @@ public final class WikiManager
      * @param wikiName the name of the wiki where to get the document.
      * @param fullname the full name of the document to get.
      * @param context the XWiki context.
-     * @return the document with full name equals to <code>fullname</code> and wiki <code>wikiName</code>. If it does not
-     *         exist return new XWikiDocument.
+     * @return the document with full name equals to <code>fullname</code> and wiki <code>wikiName</code>. If it does
+     *         not exist return new XWikiDocument.
      * @throws XWikiException error when calling {@link XWiki#getDocument(String, XWikiContext)} .
      * @see com.xpn.xwiki.XWiki#getDocument(String, XWikiContext)
      */
@@ -264,8 +264,7 @@ public final class WikiManager
 
         // Get applications manger
         ApplicationManagerPluginApi appmanager =
-            (ApplicationManagerPluginApi) context.getWiki().getPluginApi(ApplicationManagerPlugin.PLUGIN_NAME,
-                context);
+            (ApplicationManagerPluginApi) context.getWiki().getPluginApi(ApplicationManagerPlugin.PLUGIN_NAME, context);
 
         if (appmanager == null) {
             return null;
@@ -618,7 +617,7 @@ public final class WikiManager
             throw new WikiManagerException(WikiManagerException.ERROR_WM_UPDATEDATABASE, msg.get(
                 WikiManagerMessageTool.ERROR_UPDATEDATABASE, targetWiki), e);
         }
-        
+
         Utils.getComponent(ObservationManager.class).notify(new WikiCreatedEvent(targetWiki), targetWiki, context);
     }
 
@@ -702,8 +701,8 @@ public final class WikiManager
         Wiki wiki = getWikiFromName(wikiNameToDelete, context);
 
         if (!XWikiServerClass.getInstance(context).isInstance(wiki)) {
-            throw new WikiManagerException(WikiManagerException.ERROR_WM_WIKIDOESNOTEXISTS,
-                getMessageTool(context).get(WikiManagerMessageTool.ERROR_WIKIDOESNOTEXISTS, wikiNameToDelete));
+            throw new WikiManagerException(WikiManagerException.ERROR_WM_WIKIDOESNOTEXISTS, getMessageTool(context)
+                .get(WikiManagerMessageTool.ERROR_WIKIDOESNOTEXISTS, wikiNameToDelete));
         }
 
         wiki.delete(deleteDatabase);

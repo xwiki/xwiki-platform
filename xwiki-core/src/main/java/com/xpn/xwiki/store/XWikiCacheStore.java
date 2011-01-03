@@ -30,6 +30,7 @@ import org.apache.commons.logging.LogFactory;
 import org.xwiki.bridge.event.DocumentCreatedEvent;
 import org.xwiki.bridge.event.DocumentDeletedEvent;
 import org.xwiki.bridge.event.DocumentUpdatedEvent;
+import org.xwiki.bridge.event.WikiDeletedEvent;
 import org.xwiki.cache.Cache;
 import org.xwiki.cache.CacheException;
 import org.xwiki.cache.CacheFactory;
@@ -108,7 +109,8 @@ public class XWikiCacheStore implements XWikiCacheStoreInterface, EventListener
      */
     public List<Event> getEvents()
     {
-        return Arrays.<Event> asList(new DocumentCreatedEvent(), new DocumentUpdatedEvent(), new DocumentDeletedEvent());
+        return Arrays.<Event> asList(new DocumentCreatedEvent(), new DocumentUpdatedEvent(),
+            new DocumentDeletedEvent(), new WikiDeletedEvent());
     }
 
     public synchronized void initCache(XWikiContext context) throws XWikiException
@@ -189,11 +191,10 @@ public class XWikiCacheStore implements XWikiCacheStoreInterface, EventListener
         getPageExistCache().remove(key);
 
         /*
-         * We do not want to save the document in the cache at this time.
-         * If we did, this would introduce the possibility for cache incoherince if the document is not saved
-         * in the database properly.
-         * In addition, the attachments uploaded to the document stay with it so we want the document in it's
-         * current form to be garbage collected as soon as the request is complete.
+         * We do not want to save the document in the cache at this time. If we did, this would introduce the
+         * possibility for cache incoherince if the document is not saved in the database properly. In addition, the
+         * attachments uploaded to the document stay with it so we want the document in it's current form to be garbage
+         * collected as soon as the request is complete.
          */
     }
 
@@ -203,6 +204,7 @@ public class XWikiCacheStore implements XWikiCacheStoreInterface, EventListener
             this.cache.dispose();
             this.cache = null;
         }
+
         if (this.pageExistCache != null) {
             this.pageExistCache.dispose();
             this.pageExistCache = null;
@@ -219,16 +221,20 @@ public class XWikiCacheStore implements XWikiCacheStoreInterface, EventListener
     {
         // only react to remote events since local actions are already taken into account
         if (this.remoteObservationManagerContext.isRemoteState()) {
-            XWikiDocument doc = (XWikiDocument) source;
-            XWikiContext context = (XWikiContext) data;
+            if (event instanceof WikiDeletedEvent) {
+                flushCache();
+            } else {
+                XWikiDocument doc = (XWikiDocument) source;
+                XWikiContext context = (XWikiContext) data;
 
-            String key = getKey(doc, context);
+                String key = getKey(doc, context);
 
-            if (getCache() != null) {
-                getCache().remove(key);
-            }
-            if (getPageExistCache() != null) {
-                getPageExistCache().remove(key);
+                if (getCache() != null) {
+                    getCache().remove(key);
+                }
+                if (getPageExistCache() != null) {
+                    getPageExistCache().remove(key);
+                }
             }
         }
     }
@@ -363,7 +369,7 @@ public class XWikiCacheStore implements XWikiCacheStoreInterface, EventListener
     }
 
     /**
-     * @deprecated since 2.2M2 use {@link #searchDocumentReferences(String, int, int, com.xpn.xwiki.XWikiContext)} 
+     * @deprecated since 2.2M2 use {@link #searchDocumentReferences(String, int, int, com.xpn.xwiki.XWikiContext)}
      */
     @Deprecated
     public List<String> searchDocumentsNames(String wheresql, int nb, int start, XWikiContext context)
@@ -382,7 +388,7 @@ public class XWikiCacheStore implements XWikiCacheStoreInterface, EventListener
     }
 
     /**
-     * @deprecated since 2.2M2 use {@link #searchDocumentReferences(String, int, int, String, XWikiContext)}  
+     * @deprecated since 2.2M2 use {@link #searchDocumentReferences(String, int, int, String, XWikiContext)}
      */
     @Deprecated
     public List<String> searchDocumentsNames(String wheresql, int nb, int start, String selectColumns,

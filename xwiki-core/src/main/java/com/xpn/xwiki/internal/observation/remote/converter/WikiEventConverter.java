@@ -41,7 +41,7 @@ import com.xpn.xwiki.XWikiContext;
  * @version $Id: DocumentEventConverter.java 33349 2010-12-11 10:37:21Z jvelociter $
  * @since 2.0M3
  */
-@Component("document")
+@Component("wiki")
 public class WikiEventConverter extends AbstractXWikiEventConverter
 {
     /**

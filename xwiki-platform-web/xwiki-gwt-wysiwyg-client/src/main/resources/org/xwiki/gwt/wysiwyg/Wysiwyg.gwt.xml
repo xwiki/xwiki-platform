@@ -20,13 +20,13 @@
  *
 -->
 <module rename-to="xwe">
-  <inherits name='org.xwiki.gwt.user.User'/>
-  <inherits name="com.smartgwt.SmartGwtNoScript"/>
+  <inherits name='org.xwiki.gwt.user.User' />
+  <inherits name="com.smartgwt.SmartGwtNoScript" />
 
-  <stylesheet src="stylesheets/Wysiwyg.css"/>
-  <entry-point class="org.xwiki.gwt.wysiwyg.client.Wysiwyg"/>
+  <stylesheet src="stylesheets/Wysiwyg.css" />
+  <entry-point class="org.xwiki.gwt.wysiwyg.client.Wysiwyg" />
 
-  <extend-property name="locale" values="ca,de,es,fr,it,lv,ru,sk,sv,zh_TW"/>
+  <extend-property name="locale" values="ca,de,es,fr,it,lv,ru,sk,sv,zh_TW" />
 
   <!-- Custom linker that adds the document type declaration to the generated permutations. -->
   <define-linker name="StandardsMode" class="org.xwiki.gwt.core.linker.StandardsModeIFrameLinker" />
@@ -34,92 +34,97 @@
 
   <!-- ColorPlugin -->
   <replace-with class="org.xwiki.gwt.wysiwyg.client.plugin.color.ColorPlugin">
-    <when-type-is class="org.xwiki.gwt.wysiwyg.client.plugin.color.ColorPlugin"/>
+    <when-type-is class="org.xwiki.gwt.wysiwyg.client.plugin.color.ColorPlugin" />
   </replace-with>
 
   <replace-with class="org.xwiki.gwt.wysiwyg.client.plugin.color.MozillaColorPlugin">
-    <when-type-is class="org.xwiki.gwt.wysiwyg.client.plugin.color.ColorPlugin"/>
+    <when-type-is class="org.xwiki.gwt.wysiwyg.client.plugin.color.ColorPlugin" />
     <any>
-      <when-property-is name="user.agent" value="gecko1_8"/>
-      <when-property-is name="user.agent" value="gecko"/>
+      <when-property-is name="user.agent" value="gecko1_8" />
+      <when-property-is name="user.agent" value="gecko" />
+      <!--
+        Opera and Mozilla have the same behavior: "backcolor" command changes the background color of block level
+        elements while "hilitecolor" affects the in-line text selection.
+      -->
+      <when-property-is name="user.agent" value="opera" />
     </any>
   </replace-with>
 
   <!-- MacroDisplayer -->
   <replace-with class="org.xwiki.gwt.wysiwyg.client.plugin.macro.MacroDisplayer">
-    <when-type-is class="org.xwiki.gwt.wysiwyg.client.plugin.macro.MacroDisplayer"/>
+    <when-type-is class="org.xwiki.gwt.wysiwyg.client.plugin.macro.MacroDisplayer" />
   </replace-with>
 
   <replace-with class="org.xwiki.gwt.wysiwyg.client.plugin.macro.internal.MozillaMacroDisplayer">
-    <when-type-is class="org.xwiki.gwt.wysiwyg.client.plugin.macro.MacroDisplayer"/>
+    <when-type-is class="org.xwiki.gwt.wysiwyg.client.plugin.macro.MacroDisplayer" />
     <any>
-      <when-property-is name="user.agent" value="gecko1_8"/>
-      <when-property-is name="user.agent" value="gecko"/>
+      <when-property-is name="user.agent" value="gecko1_8" />
+      <when-property-is name="user.agent" value="gecko" />
     </any>
   </replace-with>
 
   <!-- LinePlugin -->
   <replace-with class="org.xwiki.gwt.wysiwyg.client.plugin.line.LinePlugin">
-    <when-type-is class="org.xwiki.gwt.wysiwyg.client.plugin.line.LinePlugin"/>
+    <when-type-is class="org.xwiki.gwt.wysiwyg.client.plugin.line.LinePlugin" />
   </replace-with>
 
   <replace-with class="org.xwiki.gwt.wysiwyg.client.plugin.line.MozillaLinePlugin">
-    <when-type-is class="org.xwiki.gwt.wysiwyg.client.plugin.line.LinePlugin"/>
+    <when-type-is class="org.xwiki.gwt.wysiwyg.client.plugin.line.LinePlugin" />
     <any>
-      <when-property-is name="user.agent" value="gecko1_8"/>
-      <when-property-is name="user.agent" value="gecko"/>
+      <when-property-is name="user.agent" value="gecko1_8" />
+      <when-property-is name="user.agent" value="gecko" />
     </any>
   </replace-with>
 
   <replace-with class="org.xwiki.gwt.wysiwyg.client.plugin.line.IELinePlugin">
-    <when-type-is class="org.xwiki.gwt.wysiwyg.client.plugin.line.LinePlugin"/>
+    <when-type-is class="org.xwiki.gwt.wysiwyg.client.plugin.line.LinePlugin" />
     <any>
-      <when-property-is name="user.agent" value="ie6"/>
-      <when-property-is name="user.agent" value="ie8"/>
+      <when-property-is name="user.agent" value="ie6" />
+      <when-property-is name="user.agent" value="ie8" />
     </any>
   </replace-with>
 
   <!-- SubmitPlugin -->
   <replace-with class="org.xwiki.gwt.wysiwyg.client.plugin.submit.SubmitPlugin">
-    <when-type-is class="org.xwiki.gwt.wysiwyg.client.plugin.submit.SubmitPlugin"/>
+    <when-type-is class="org.xwiki.gwt.wysiwyg.client.plugin.submit.SubmitPlugin" />
   </replace-with>
 
   <replace-with class="org.xwiki.gwt.wysiwyg.client.plugin.submit.IESubmitPlugin">
-    <when-type-is class="org.xwiki.gwt.wysiwyg.client.plugin.submit.SubmitPlugin"/>
+    <when-type-is class="org.xwiki.gwt.wysiwyg.client.plugin.submit.SubmitPlugin" />
     <any>
-      <when-property-is name="user.agent" value="ie6"/>
-      <when-property-is name="user.agent" value="ie8"/>
+      <when-property-is name="user.agent" value="ie6" />
+      <when-property-is name="user.agent" value="ie8" />
     </any>
   </replace-with>
 
   <!-- ImageConfigDOMWriter -->
   <replace-with class="org.xwiki.gwt.wysiwyg.client.plugin.image.ImageConfigDOMWriter">
-    <when-type-is class="org.xwiki.gwt.wysiwyg.client.plugin.image.ImageConfigDOMWriter"/>
+    <when-type-is class="org.xwiki.gwt.wysiwyg.client.plugin.image.ImageConfigDOMWriter" />
   </replace-with>
 
   <replace-with class="org.xwiki.gwt.wysiwyg.client.plugin.image.internal.IEImageConfigDOMWriter">
-    <when-type-is class="org.xwiki.gwt.wysiwyg.client.plugin.image.ImageConfigDOMWriter"/>
-    <when-property-is name="user.agent" value="ie6"/>
+    <when-type-is class="org.xwiki.gwt.wysiwyg.client.plugin.image.ImageConfigDOMWriter" />
+    <when-property-is name="user.agent" value="ie6" />
   </replace-with>
 
   <!-- List behavior adjuster -->
   <replace-with class="org.xwiki.gwt.wysiwyg.client.plugin.list.ListBehaviorAdjuster">
-    <when-type-is class="org.xwiki.gwt.wysiwyg.client.plugin.list.ListBehaviorAdjuster"/>
+    <when-type-is class="org.xwiki.gwt.wysiwyg.client.plugin.list.ListBehaviorAdjuster" />
   </replace-with>
 
   <replace-with class="org.xwiki.gwt.wysiwyg.client.plugin.list.internal.IEListBehaviorAdjuster">
-    <when-type-is class="org.xwiki.gwt.wysiwyg.client.plugin.list.ListBehaviorAdjuster"/>
+    <when-type-is class="org.xwiki.gwt.wysiwyg.client.plugin.list.ListBehaviorAdjuster" />
     <any>
-      <when-property-is name="user.agent" value="ie6"/>
-      <when-property-is name="user.agent" value="ie8"/>
+      <when-property-is name="user.agent" value="ie6" />
+      <when-property-is name="user.agent" value="ie8" />
     </any>
   </replace-with>
 
   <replace-with class="org.xwiki.gwt.wysiwyg.client.plugin.list.internal.MozillaListBehaviorAdjuster">
-    <when-type-is class="org.xwiki.gwt.wysiwyg.client.plugin.list.ListBehaviorAdjuster"/>
+    <when-type-is class="org.xwiki.gwt.wysiwyg.client.plugin.list.ListBehaviorAdjuster" />
     <any>
-      <when-property-is name="user.agent" value="gecko1_8"/>
-      <when-property-is name="user.agent" value="gecko"/>
+      <when-property-is name="user.agent" value="gecko1_8" />
+      <when-property-is name="user.agent" value="gecko" />
     </any>
   </replace-with>
 </module>

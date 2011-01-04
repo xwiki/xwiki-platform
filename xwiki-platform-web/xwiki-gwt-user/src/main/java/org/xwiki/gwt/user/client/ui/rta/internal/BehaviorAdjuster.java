@@ -31,6 +31,7 @@ import org.xwiki.gwt.dom.client.TableCellElement;
 import org.xwiki.gwt.user.client.ui.rta.RichTextArea;
 import org.xwiki.gwt.user.client.ui.rta.cmd.Command;
 
+import com.google.gwt.dom.client.Element;
 import com.google.gwt.dom.client.Node;
 import com.google.gwt.event.dom.client.KeyCodes;
 
@@ -104,6 +105,9 @@ public class BehaviorAdjuster
         switch (event.getTypeInt()) {
             case Event.ONMOUSEDOWN:
                 onBeforeMouseDown(event);
+                break;
+            case Event.ONMOUSEUP:
+                onBeforeMouseUp(event);
                 break;
             default:
                 break;
@@ -422,6 +426,22 @@ public class BehaviorAdjuster
     protected void onBeforeMouseDown(Event event)
     {
         // Nothing here by default. May be overridden by browser specific implementations.
+    }
+
+    /**
+     * Overwrites the default rich text area behavior when the user releases the mouse button.
+     * 
+     * @param event the native event that was fired
+     */
+    protected void onBeforeMouseUp(Event event)
+    {
+        // The height of the body element is given by its content. When the height of the body element is less than the
+        // rich text area height the user can click outside of the body element, on the HTML element. When this happens
+        // the selection can be lost. To prevent this we give the focus back to the body element.
+        if (Element.is(event.getEventTarget())
+            && "html".equalsIgnoreCase(Element.as(event.getEventTarget()).getTagName())) {
+            textArea.setFocus(true);
+        }
     }
 
     /**

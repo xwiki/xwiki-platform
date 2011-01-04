@@ -117,6 +117,15 @@ public class RichTextAreaImplIE6 extends com.google.gwt.user.client.ui.impl.Rich
         var body = elem.contentWindow.document.body;
         body.ondblclick =
         body.onpaste = body.onclick;
+        
+        if (body.parentNode.nodeName.toLowerCase() == 'html') {
+          // In standards mode the body element doesn't take all the available space so the user can click on the HTML
+          // element. When this happens the text selection is lost. To prevent this we listen to mouse up event and
+          // focus the body element.
+          body.parentNode.onmouseup = body.onclick;
+          // Listen to the mouse up event just once.
+          body.onmouseup = null;
+        }
     }-*/;
 
     /**
@@ -142,6 +151,7 @@ public class RichTextAreaImplIE6 extends com.google.gwt.user.client.ui.impl.Rich
         var elem = this.@com.google.gwt.user.client.ui.impl.RichTextAreaImpl::elem;
         var body = elem.contentWindow.document.body;
         body.ondblclick =
-        body.onpaste = null;
+        body.onpaste =
+        body.parentNode.onmouseup = null;
     }-*/;
 }

@@ -66,7 +66,7 @@ public final class NativeSelection extends JavaScriptObject
         // If there is a previously stored selection then restore it. We have to do this before the edited document
         // gets focused to allow users to have a different selection than the stored one (by clicking inside the edited
         // document when it doesn't have the focus).
-        document.body.attachEvent('onbeforeactivate', function(event) {
+        var restoreSelectionHandler = function(event) {
             // In standards mode, the HTML element can gain focus separately from the BODY element without clearing its
             // inner selection. For instance, by using the scroll bars we move the focus from the BODY element to the
             // HTML element but the BODY element keeps its inner selection. In consequence, we don't have to restore
@@ -94,7 +94,11 @@ public final class NativeSelection extends JavaScriptObject
                     }
                 }
             }
-        });
+        };
+        document.body.attachEvent('onbeforeactivate', restoreSelectionHandler);
+        // 'onbeforeactivate' event is not fired when the parent window is focused from code (which happens for instance
+        // when we click on the HTML element).
+        document.parentWindow.attachEvent('onfocus', restoreSelectionHandler);
 
         // Save the selection when the edited document is about to loose focus.
         document.body.attachEvent('onbeforedeactivate', function(event) {

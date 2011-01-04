@@ -11,8 +11,8 @@
 <customClass></customClass>
 <contentAuthor>XWiki.Admin</contentAuthor>
 <creationDate>1211801518000</creationDate>
-<date>1211801518000</date>
-<contentUpdateDate>1211801518000</contentUpdateDate>
+<date>1294164055000</date>
+<contentUpdateDate>1294164055000</contentUpdateDate>
 <version>1.1</version>
 <title>AdminSheet</title>
 <template></template>
@@ -3035,6 +3035,7 @@ p.legend {
             #end
           #else
             #set($adoc = $xwiki.getDocument("XWiki.AdminSheet"))
+            #set($atitle = $msg.get("admin.${asection.toLowerCase()}"))
             #set($aiconname = "${asection.toLowerCase()}.png")
             #if($adoc.getAttachment($aiconname))
               #set($aiconurl = $adoc.getAttachmentURL($aiconname))

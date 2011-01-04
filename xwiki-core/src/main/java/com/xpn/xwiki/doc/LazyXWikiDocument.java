@@ -41,6 +41,21 @@ import com.xpn.xwiki.web.Utils;
 
 /**
  * Read only lazy loading document.
+ * <p>
+ * The following informations are taken into account:
+ * <ul>
+ * <li>document reference: the absolute reference of the document</li>
+ * <li>document language: if provided the proper language version of the document is loaded. If not the default one is
+ * loaded.</li>
+ * <li>document version: if provided the proper version of the document is loaded. Also make extra sure to bypass cache
+ * storage for remote observation use case.</li>
+ * </ul>
+ * <p>
+ * originalDocument remain the property of {@link LazyXWikiDocument} object and is not taken from the lazy loaded
+ * document since it depends on how this {@link XWikiDocument} object is used (its technical meaning is its state in the
+ * database before any modification but in the case of observation it's used as the previous version of the document).
+ * TODO: we should probably think about a separation of theses two notions in something more clear, something for the
+ * new model.
  * 
  * @version $Id$
  * @since 2.0M4
@@ -79,22 +94,39 @@ public class LazyXWikiDocument extends XWikiDocument
                 (XWikiContext) Utils.getComponent(Execution.class).getContext().getProperty("xwikicontext");
 
             XWikiDocument doc = new XWikiDocument(getDocumentReference());
-            doc.setLanguage(getLanguage());
+            doc.setLanguage(this.language);
 
+            String currentWiki = context.getDatabase();
             try {
+                // Put context in document wiki
+                context.setDatabase(getDocumentReference().getWikiReference().getName());
+
                 if (this.version == null) {
                     this.document = context.getWiki().getDocument(doc, context);
                 } else {
-                    try {
-                        this.document = context.getWiki().getDocument(doc, getVersion(), context);
-                    } catch (XWikiException e) {
-                        // FIXME: looks like there is a bug in the getDocument in a specific version, fallback on
-                        // getting last version of the document until a proper fix is found
-                        this.document = context.getWiki().getDocument(doc, context);
+                    // Force bypassing the cache to make extra sure we get the last version of the document. This is
+                    // safer for example when LazyXWikiDocument is used in the context of remote events. This is for
+                    // properly emulate events, XWikiCacheStore is taking care itself of invalidating itself.
+                    doc = context.getWiki().getNotCacheStore().loadXWikiDoc(doc, context);
+                    if (doc.getRCSVersion().equals(this.version)) {
+                        // It's the last version of the document
+                        this.document = doc;
+                    } else {
+                        // It's not the last version of the document, ask versioning store.
+                        try {
+                            this.document =
+                                context.getWiki().getVersioningStore()
+                                    .loadXWikiDoc(doc, this.version.toString(), context);
+                        } catch (XWikiException e) {
+                            // If the proper can't be found, return the last version of the document
+                            this.document = doc;
+                        }
                     }
                 }
             } catch (XWikiException e) {
                 throw new RuntimeException("Failed to get document [" + this + "]", e);
+            } finally {
+                context.setDatabase(currentWiki);
             }
         }
 

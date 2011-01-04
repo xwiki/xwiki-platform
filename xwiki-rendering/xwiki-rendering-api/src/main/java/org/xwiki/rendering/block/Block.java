@@ -20,6 +20,7 @@
 package org.xwiki.rendering.block;
 
 import java.util.List;
+import java.util.Map;
 
 import org.xwiki.rendering.listener.Listener;
 
@@ -210,4 +211,38 @@ public interface Block extends Cloneable
      * @see Object#clone()
      */
     Block clone();
+
+    /**
+     * @return all parameters
+     * @since 3.0M1
+     */
+    Map<String, String> getParameters();
+
+    /**
+     * A Parameter is a generic key/value which can be used to add metadata to a block. What is done with the metadata
+     * depends on the Renderer's implementations. For example the XHTML Renderer adds them as Element attributes.
+     *
+     * @param name the name of the parameter to return
+     * @return the parameter or null if the parameter doesn't exist
+     * @since 3.0M1
+     */
+    String getParameter(String name);
+
+    /**
+     * Set a parameter on the current block. See {@link #getParameter(String)} for more details.
+     *
+     * @param name the parameter's name
+     * @param value the parameter's value
+     * @since 3.0M1
+     */
+    void setParameter(String name, String value);
+
+    /**
+     * Set several parameters at once.
+     *
+     * @param parameters the parameters to set
+     * @see #getParameter(String)
+     * @since 3.0M1
+     */
+    void setParameters(Map<String, String> parameters);
 }

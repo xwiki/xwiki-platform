@@ -200,6 +200,7 @@
                 <exclude>org/xwiki/properties/converter/AbstractConverter</exclude>
                 <exclude>org/xwiki/properties/converter/Converter</exclude>
                 <exclude>org/xwiki/rendering/macro/descriptor/ParameterDescriptor</exclude>
+                <exclude>org/xwiki/rendering/block/Block</exclude>
               </excludes>
             </configuration>
           </plugin>

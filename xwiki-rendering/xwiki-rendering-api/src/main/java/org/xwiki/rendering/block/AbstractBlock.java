@@ -306,7 +306,9 @@ public abstract class AbstractBlock implements Block
     }
 
     /**
-     * @return all parameters
+     * {@inheritDoc}
+     * 
+     * @see org.xwiki.rendering.block.Block#getParameters()
      */
     public Map<String, String> getParameters()
     {
@@ -314,11 +316,9 @@ public abstract class AbstractBlock implements Block
     }
 
     /**
-     * A Parameter is a generic key/value which can be used to add metadata to a block. What is done with the metadata
-     * depends on the Renderer's implementations. For example the XHTML Renderer adds them as Element attributes.
-     *
-     * @param name the name of the parameter to return
-     * @return the parameter or null if the parameter doesn't exist
+     * {@inheritDoc}
+     * 
+     * @see org.xwiki.rendering.block.Block#getParameter(java.lang.String)
      */
     public String getParameter(String name)
     {
@@ -326,10 +326,9 @@ public abstract class AbstractBlock implements Block
     }
 
     /**
-     * Set a parameter on the current block. See {@link #getParameter(String)} for more details.
-     *
-     * @param name the parameter's name
-     * @param value the parameter's value
+     * {@inheritDoc}
+     * 
+     * @see org.xwiki.rendering.block.Block#setParameter(java.lang.String, java.lang.String)
      */
     public void setParameter(String name, String value)
     {
@@ -337,10 +336,9 @@ public abstract class AbstractBlock implements Block
     }
 
     /**
-     * Set several parameters at once.
-     *
-     * @param parameters the parameters to set
-     * @see #getParameter(String)
+     * {@inheritDoc}
+     * 
+     * @see org.xwiki.rendering.block.Block#setParameters(java.util.Map)
      * @since 1.7M2
      */
     public void setParameters(Map<String, String> parameters)

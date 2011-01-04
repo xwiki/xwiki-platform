@@ -11,8 +11,8 @@
 <customClass></customClass>
 <contentAuthor>XWiki.Admin</contentAuthor>
 <creationDate>1265775370000</creationDate>
-<date>1272620694000</date>
-<contentUpdateDate>1272620694000</contentUpdateDate>
+<date>1294165911000</date>
+<contentUpdateDate>1294165911000</contentUpdateDate>
 <version>1.1</version>
 <title>XWiki.ConfigurableClass</title>
 <template></template>
@@ -849,7 +849,9 @@ $xwiki.jsfx.use('js/xwiki/actionbuttons/actionButtons.js', true)
       #end
       &lt;span&gt;
       &lt;img src="$icon" alt="$escapetool.xml($sectionToAdd) icon"/&gt;
-      $escapetool.xml($sectionToAdd)
+      ## Translate the names of the sections, build the key by adding an "admin." in front. 
+      ## Not the best way to translate, but very inline with the way the translations are done in XWiki.AdminSheet for individual administration page titles
+      $escapetool.xml($msg.get("admin.${sectionToAdd.toLowerCase()}"))
       &lt;/span&gt;
       #if(!$hasAccess)
         &lt;br/&gt;&lt;span class="errormessage"&gt;$msg.get('xe.admin.configurable.sectionIconNoAccess')&lt;/span&gt;

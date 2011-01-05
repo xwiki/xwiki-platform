@@ -256,6 +256,7 @@ public class DBTreeListClass extends DBListClass
         vcontext.put("fieldname", prefix + name);
         vcontext.put("tree", map);
         vcontext.put("treelist", getTreeList(treemap, map, context));
+        vcontext.put("treemap", treemap);
         vcontext.put("mode", mode);
         return context.getWiki().parseTemplate("treeview.vm", context);
     }

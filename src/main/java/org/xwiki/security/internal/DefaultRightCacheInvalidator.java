@@ -30,9 +30,8 @@ import org.xwiki.model.reference.DocumentReference;
 
 import org.xwiki.observation.EventListener;
 import org.xwiki.observation.event.Event;
-import org.xwiki.observation.event.DocumentDeleteEvent;
-import org.xwiki.observation.event.DocumentUpdateEvent;
-import org.xwiki.observation.event.DocumentSaveEvent;
+import org.xwiki.bridge.event.DocumentDeletedEvent;
+import org.xwiki.bridge.event.DocumentUpdatedEvent;
 
 import java.util.List;
 import java.util.Arrays;
@@ -90,9 +89,8 @@ public class DefaultRightCacheInvalidator extends AbstractLogEnabled implements 
     public List<Event> getEvents()
     {
         Event[] events = {
-            new DocumentUpdateEvent(),
-            new DocumentDeleteEvent(),
-            new DocumentSaveEvent()
+            new DocumentUpdatedEvent(),
+            new DocumentDeletedEvent(),
         };
         return Arrays.asList(events);
     }

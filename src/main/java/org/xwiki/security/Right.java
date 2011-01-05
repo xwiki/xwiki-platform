@@ -123,8 +123,10 @@ public enum Right
             .put("inline", EDIT)
             .put("propadd", EDIT)
             .put("propupdate", EDIT)
+            .put("propdelete", EDIT)
             .put("objectadd", EDIT)
             .put("objectremove", EDIT)
+            .put("objectsync", EDIT)
             .put("rollback", EDIT)
             .put("upload", EDIT)
             .put("create", EDIT);

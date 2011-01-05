@@ -1282,6 +1282,10 @@ div#xwikiobjects input[type="checkbox"], div#xwikiclassproperties input[type="ch
   border: 1px solid $theme.notificationErrorColor;
 }
 
+.xform .buttons {
+  margin: .8em 0;
+}
+
 /* @group BUTTONS */
 /* --------------------------------------------------------------
   * Button elements different containers

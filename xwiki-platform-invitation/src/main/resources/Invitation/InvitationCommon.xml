@@ -164,6 +164,7 @@
 
 /* Labels */
 .invitation strong, .invitation label {
+  font-size: .85em;
   text-transform: uppercase;
 }
 

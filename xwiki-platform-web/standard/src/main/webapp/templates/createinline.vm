@@ -174,8 +174,7 @@ $xwiki.get('ssfx').use('uicomponents/widgets/validation/livevalidation.css')##
 ## ---------------------------------------------------------------------------------------------------------
 ## Display the form.
 ## ---------------------------------------------------------------------------------------------------------
-<form action="$doc.getURL('create')" method="post">
-  <div>
+<form action="$doc.getURL('create')" method="post" class="xform third">
   <input type="hidden" name="tocreate" value="$tocreate"/>
   #if($tocreate == 'page')
     ## ---------------------------------------------------------------------------------------------------------
@@ -191,6 +190,7 @@ $xwiki.get('ssfx').use('uicomponents/widgets/validation/livevalidation.css')##
       <dl>
         <dt>
           <label for="page">$msg.get('core.create.template')</label>
+          <span class="xHint">$msg.get('core.create.page.template.hint')</span>
         </dt>
         <dd>
           <label for="xwiki-create-form-0" class="xwiki-form-listclass">
@@ -250,6 +250,7 @@ $xwiki.get('ssfx').use('uicomponents/widgets/validation/livevalidation.css')##
       <dl>
         <dt>
           <label for="space">$msg.get('core.create.space')</label>
+          <span class="xHint">$msg.get('core.create.page.space.hint')</span>
         </dt>
         <dd>
           <input type="text" id="space" name="space" value="$!{escapetool.xml($defaultSpace)}"/>
@@ -266,6 +267,7 @@ $xwiki.get('ssfx').use('uicomponents/widgets/validation/livevalidation.css')##
       <dl>
         <dt>
           <label for="page">$msg.get('core.create.page')</label>
+          <span class="xHint">$msg.get('core.create.page.hint')</span>
         </dt>
         <dd>
           #set ($pageText = $msg.get('core.create.pageText'))
@@ -295,6 +297,7 @@ $xwiki.get('ssfx').use('uicomponents/widgets/validation/livevalidation.css')##
     <dl>
       <dt>
         <label for="space">$msg.get('core.create.space')</label>
+        <span class="xHint">$msg.get('core.create.space.hint')</span>
       </dt>
       <dd>
         <input type="text" id="space" name="space"/>
@@ -302,6 +305,9 @@ $xwiki.get('ssfx').use('uicomponents/widgets/validation/livevalidation.css')##
     </dl>
     <input type="hidden" name="parent" value="$!{escapetool.xml($parent)}"/>
   #end
-  <input type="submit" class="button" value="$msg.get('create')"/>
+  <div class="buttons">
+    <span class="buttonwrapper">
+      <input type="submit" class="button" value="$msg.get('create')"/>
+    </span>
   </div>
 </form>

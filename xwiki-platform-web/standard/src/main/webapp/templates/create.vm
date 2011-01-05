@@ -16,10 +16,8 @@
     #else
       #set ($title = $msg.get('core.create.spaceTitle'))
     #end
-    <h1><span>$title</span></h1>
-    <div class="plainmessage">
-      #template("createinline.vm")
-    </div>
+    <div id="document-title"><h1>$title</h1></div>
+    #template("createinline.vm")
   </div>## mainContentArea
 </div>## main
 #template("endpage.vm")

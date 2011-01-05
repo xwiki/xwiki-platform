@@ -2072,7 +2072,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface, EventListener
                 String shortName = StringUtils.replaceChars(filename, '/', '.');
                 XWikiAttachment attachment = doc.getAttachment(shortName);
                 if (attachment != null) {
-                    return doc.getAttachmentURL(shortName, context);
+                    return doc.getAttachmentURL(shortName, "skin", context);
                 }
             }
 

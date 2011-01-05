@@ -28,7 +28,7 @@ import org.xwiki.rendering.listener.Listener;
  * @version $Id$
  * @since 1.5M2
  */
-public class SectionBlock extends AbstractFatherBlock
+public class SectionBlock extends AbstractBlock
 {
     /**
      * @param childBlocks the children of the section
@@ -50,7 +50,7 @@ public class SectionBlock extends AbstractFatherBlock
     /**
      * {@inheritDoc}
      * 
-     * @see org.xwiki.rendering.block.FatherBlock#before(org.xwiki.rendering.listener.Listener)
+     * @see org.xwiki.rendering.block.AbstractBlock#before(org.xwiki.rendering.listener.Listener)
      */
     public void before(Listener listener)
     {
@@ -60,7 +60,7 @@ public class SectionBlock extends AbstractFatherBlock
     /**
      * {@inheritDoc}
      * 
-     * @see org.xwiki.rendering.block.FatherBlock#after(org.xwiki.rendering.listener.Listener)
+     * @see org.xwiki.rendering.block.AbstractBlock#after(org.xwiki.rendering.listener.Listener)
      */
     public void after(Listener listener)
     {

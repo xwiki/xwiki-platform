@@ -30,7 +30,7 @@ import org.xwiki.rendering.listener.Listener;
  * @version $Id$
  * @since 1.6M2
  */
-public class TableRowBlock extends AbstractFatherBlock
+public class TableRowBlock extends AbstractBlock
 {
     /**
      * @param list the list of children blocks of the table row block (generally a list of {@link TableCellBlock}).
@@ -44,7 +44,7 @@ public class TableRowBlock extends AbstractFatherBlock
     /**
      * {@inheritDoc}
      * 
-     * @see org.xwiki.rendering.block.FatherBlock#before(org.xwiki.rendering.listener.Listener)
+     * @see org.xwiki.rendering.block.AbstractBlock#before(org.xwiki.rendering.listener.Listener)
      */
     public void before(Listener listener)
     {
@@ -54,7 +54,7 @@ public class TableRowBlock extends AbstractFatherBlock
     /**
      * {@inheritDoc}
      * 
-     * @see org.xwiki.rendering.block.FatherBlock#after(org.xwiki.rendering.listener.Listener)
+     * @see org.xwiki.rendering.block.AbstractBlock#after(org.xwiki.rendering.listener.Listener)
      */
     public void after(Listener listener)
     {

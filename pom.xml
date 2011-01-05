@@ -201,6 +201,29 @@
                 <exclude>org/xwiki/properties/converter/Converter</exclude>
                 <exclude>org/xwiki/rendering/macro/descriptor/ParameterDescriptor</exclude>
                 <exclude>org/xwiki/rendering/block/Block</exclude>
+                <!-- Changes below are caused by the removal of the FatherBlock interface -->
+                <exclude>org/xwiki/rendering/block/AbstractFatherBlock</exclude>
+                <exclude>org/xwiki/rendering/block/FatherBlock</exclude>
+                <exclude>org/xwiki/rendering/block/BulletedListBlock</exclude>
+                <exclude>org/xwiki/rendering/block/DefinitionDescriptionBlock</exclude>
+                <exclude>org/xwiki/rendering/block/DefinitionListBlock</exclude>
+                <exclude>org/xwiki/rendering/block/DefinitionTermBlock</exclude>
+                <exclude>org/xwiki/rendering/block/FormatBlock</exclude>
+                <exclude>org/xwiki/rendering/block/GroupBlock</exclude>
+                <exclude>org/xwiki/rendering/block/HeaderBlock</exclude>
+                <exclude>org/xwiki/rendering/block/LinkBlock</exclude>
+                <exclude>org/xwiki/rendering/block/ListItemBlock</exclude>
+                <exclude>org/xwiki/rendering/block/MacroMarkerBlock</exclude>
+                <exclude>org/xwiki/rendering/block/NumberedListBlock</exclude>
+                <exclude>org/xwiki/rendering/block/ParagraphBlock</exclude>
+                <exclude>org/xwiki/rendering/block/QuotationBlock</exclude>
+                <exclude>org/xwiki/rendering/block/SectionBlock</exclude>
+                <exclude>org/xwiki/rendering/block/TableBlock</exclude>
+                <exclude>org/xwiki/rendering/block/TableCellBlock</exclude>
+                <exclude>org/xwiki/rendering/block/TableHeadCellBlock</exclude>
+                <exclude>org/xwiki/rendering/block/TableRowBlock</exclude>
+                <exclude>org/xwiki/rendering/block/XDOM</exclude>
+                <exclude>org/xwiki/rendering/block/QuotationLineBlock</exclude>
               </excludes>
             </configuration>
           </plugin>

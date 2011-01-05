@@ -29,7 +29,7 @@ import java.util.List;
  * @version $Id$
  * @since 1.6M2
  */
-public class DefinitionTermBlock extends AbstractFatherBlock
+public class DefinitionTermBlock extends AbstractBlock
 {
     /**
      * Construct a Definition Term block.
@@ -43,7 +43,7 @@ public class DefinitionTermBlock extends AbstractFatherBlock
 
     /**
      * {@inheritDoc}
-     * @see org.xwiki.rendering.block.AbstractFatherBlock#before(org.xwiki.rendering.listener.Listener)
+     * @see org.xwiki.rendering.block.AbstractBlock#before(org.xwiki.rendering.listener.Listener)
      */
     public void before(Listener listener)
     {
@@ -52,7 +52,7 @@ public class DefinitionTermBlock extends AbstractFatherBlock
 
     /**
      * {@inheritDoc}
-     * @see org.xwiki.rendering.block.AbstractFatherBlock#after(org.xwiki.rendering.listener.Listener)
+     * @see org.xwiki.rendering.block.AbstractBlock#after(org.xwiki.rendering.listener.Listener)
      */
     public void after(Listener listener)
     {

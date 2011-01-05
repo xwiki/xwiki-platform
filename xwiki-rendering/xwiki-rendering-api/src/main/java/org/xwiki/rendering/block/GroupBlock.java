@@ -31,7 +31,7 @@ import org.xwiki.rendering.listener.Listener;
  * @version $Id$
  * @since 1.8.3
  */
-public class GroupBlock extends AbstractFatherBlock
+public class GroupBlock extends AbstractBlock
 {
     /**
      * Create an empty group block with no children. This is useful when the user wants to call
@@ -75,8 +75,9 @@ public class GroupBlock extends AbstractFatherBlock
     /**
      * {@inheritDoc}
      * 
-     * @see org.xwiki.rendering.block.FatherBlock#before(org.xwiki.rendering.listener.Listener)
+     * @see org.xwiki.rendering.block.AbstractBlock#before(org.xwiki.rendering.listener.Listener)
      */
+    @Override
     public void before(Listener listener)
     {
         listener.beginGroup(getParameters());
@@ -85,8 +86,9 @@ public class GroupBlock extends AbstractFatherBlock
     /**
      * {@inheritDoc}
      * 
-     * @see org.xwiki.rendering.block.FatherBlock#after(org.xwiki.rendering.listener.Listener)
+     * @see org.xwiki.rendering.block.AbstractBlock#after(org.xwiki.rendering.listener.Listener)
      */
+    @Override
     public void after(Listener listener)
     {
         listener.endGroup(getParameters());

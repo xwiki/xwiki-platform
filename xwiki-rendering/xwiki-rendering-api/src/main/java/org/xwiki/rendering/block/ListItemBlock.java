@@ -29,7 +29,7 @@ import org.xwiki.rendering.listener.Listener;
  * @version $Id$
  * @since 1.5M2
  */
-public class ListItemBlock extends AbstractFatherBlock
+public class ListItemBlock extends AbstractBlock
 {
     /**
      * Constructs a list item Block.
@@ -43,7 +43,7 @@ public class ListItemBlock extends AbstractFatherBlock
 
     /**
      * {@inheritDoc}
-     * @see AbstractFatherBlock#before(org.xwiki.rendering.listener.Listener)
+     * @see AbstractBlock#before(org.xwiki.rendering.listener.Listener)
      */
     public void before(Listener listener)
     {
@@ -52,7 +52,7 @@ public class ListItemBlock extends AbstractFatherBlock
 
     /**
      * {@inheritDoc}
-     * @see AbstractFatherBlock#after(org.xwiki.rendering.listener.Listener)   
+     * @see AbstractBlock#after(org.xwiki.rendering.listener.Listener)
      */
     public void after(Listener listener)
     {

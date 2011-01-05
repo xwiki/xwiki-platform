@@ -32,7 +32,7 @@ import java.util.Map;
  * @version $Id$
  * @since 1.5M2
  */
-public class XDOM extends AbstractFatherBlock
+public class XDOM extends AbstractBlock
 {
     /**
      * Constructs an empty XDOM. Useful for example when calling a macro that doesn't use the XDOM parameter passed to
@@ -50,7 +50,7 @@ public class XDOM extends AbstractFatherBlock
     /**
      * @param childBlocks the list of children blocks of the block to construct
      * @param parameters the parameters to set
-     * @see AbstractFatherBlock#AbstractFatherBlock(List)
+     * @see AbstractBlock#AbstractBlock(List)
      */
     public XDOM(List<Block> childBlocks, Map<String, String> parameters)
     {
@@ -61,7 +61,7 @@ public class XDOM extends AbstractFatherBlock
 
     /**
      * @param childBlocks the list of children blocks of the block to construct
-     * @see AbstractFatherBlock#AbstractFatherBlock(List)
+     * @see AbstractBlock#AbstractBlock(List)
      */
     public XDOM(List<Block> childBlocks)
     {
@@ -101,7 +101,7 @@ public class XDOM extends AbstractFatherBlock
     /**
      * {@inheritDoc}
      * 
-     * @see org.xwiki.rendering.block.AbstractFatherBlock#before(org.xwiki.rendering.listener.Listener)
+     * @see org.xwiki.rendering.block.AbstractBlock#before(org.xwiki.rendering.listener.Listener)
      */
     public void before(Listener listener)
     {
@@ -111,7 +111,7 @@ public class XDOM extends AbstractFatherBlock
     /**
      * {@inheritDoc}
      * 
-     * @see org.xwiki.rendering.block.AbstractFatherBlock#after(org.xwiki.rendering.listener.Listener)
+     * @see org.xwiki.rendering.block.AbstractBlock#after(org.xwiki.rendering.listener.Listener)
      */
     public void after(Listener listener)
     {

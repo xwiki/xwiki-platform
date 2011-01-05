@@ -19,55 +19,39 @@
  */
 package org.xwiki.rendering.block;
 
-import org.xwiki.rendering.listener.Listener;
-
 import java.util.List;
 import java.util.Map;
-import java.util.Collections;
 
 /**
- * Default implementation for {@link FatherBlock}.
- * 
+ * A special block that can be used to indifferently represent either a single block or a list of blocks. This makes
+ * it easy for all APIs to take a {@link Block} as parameter instead of a {@code List<Block>} which is a bit
+ * cumbersome since when you have a single block to need to write things like {@code Arrays.asList(myBlock)}.
+ *
+ * Note that this block doesn't represent any content, it's a "technical" block only.
+ *
  * @version $Id$
- * @since 1.5M2
+ * @since 3.0M1
  */
-public abstract class AbstractFatherBlock extends AbstractBlock implements FatherBlock
+public class CollectionBlock extends AbstractBlock
 {
     /**
      * Constructs a block with children blocks.
-     * 
+     *
      * @param childrenBlocks the list of children blocks of the block to construct
      */
-    public AbstractFatherBlock(List<Block> childrenBlocks)
+    public CollectionBlock(List<Block> childrenBlocks)
     {
-        this(childrenBlocks, Collections.<String, String> emptyMap());
+        super(childrenBlocks);
     }
 
     /**
      * Construct a block with children blocks and parameters.
-     * 
+     *
      * @param childrenBlocks the list of children blocks of the block to construct
      * @param parameters the parameters to set
      */
-    public AbstractFatherBlock(List<Block> childrenBlocks, Map<String, String> parameters)
+    public CollectionBlock(List<Block> childrenBlocks, Map<String, String> parameters)
     {
-        super(parameters);
-        addChildren(childrenBlocks);
-    }
-
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.rendering.block.AbstractBlock#traverse(org.xwiki.rendering.listener.Listener)
-     */
-    public void traverse(Listener listener)
-    {
-        before(listener);
-
-        for (Block block : getChildren()) {
-            block.traverse(listener);
-        }
-
-        after(listener);
+        super(childrenBlocks, parameters);
     }
 }

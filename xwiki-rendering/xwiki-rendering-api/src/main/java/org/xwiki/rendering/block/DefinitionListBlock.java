@@ -30,7 +30,7 @@ import java.util.Map;
  * @version $Id$
  * @since 1.6M2
  */
-public class DefinitionListBlock extends AbstractFatherBlock implements ListBLock
+public class DefinitionListBlock extends AbstractBlock implements ListBLock
 {
     /**
      * Construct a Definition List block with no parameters.
@@ -56,7 +56,7 @@ public class DefinitionListBlock extends AbstractFatherBlock implements ListBLoc
 
     /**
      * {@inheritDoc}
-     * @see org.xwiki.rendering.block.AbstractFatherBlock#before(org.xwiki.rendering.listener.Listener)
+     * @see org.xwiki.rendering.block.AbstractBlock#before(org.xwiki.rendering.listener.Listener)
      */
     public void before(Listener listener)
     {
@@ -65,7 +65,7 @@ public class DefinitionListBlock extends AbstractFatherBlock implements ListBLoc
 
     /**
      * {@inheritDoc}
-     * @see org.xwiki.rendering.block.AbstractFatherBlock#after(org.xwiki.rendering.listener.Listener)
+     * @see org.xwiki.rendering.block.AbstractBlock#after(org.xwiki.rendering.listener.Listener)
      */
     public void after(Listener listener)
     {

@@ -32,7 +32,7 @@ import org.xwiki.rendering.listener.reference.ResourceReference;
  * @version $Id$
  * @since 1.5M2
  */
-public class LinkBlock extends AbstractFatherBlock
+public class LinkBlock extends AbstractBlock
 {
     /**
      * A reference to the link target. See {@link org.xwiki.rendering.listener.reference.ResourceReference} for more details.
@@ -91,7 +91,7 @@ public class LinkBlock extends AbstractFatherBlock
     /**
      * {@inheritDoc}
      * 
-     * @see org.xwiki.rendering.block.AbstractFatherBlock#before(org.xwiki.rendering.listener.Listener)
+     * @see org.xwiki.rendering.block.AbstractBlock#before(org.xwiki.rendering.listener.Listener)
      */
     public void before(Listener listener)
     {
@@ -101,7 +101,7 @@ public class LinkBlock extends AbstractFatherBlock
     /**
      * {@inheritDoc}
      * 
-     * @see org.xwiki.rendering.block.AbstractFatherBlock#after(org.xwiki.rendering.listener.Listener)
+     * @see org.xwiki.rendering.block.AbstractBlock#after(org.xwiki.rendering.listener.Listener)
      */
     public void after(Listener listener)
     {

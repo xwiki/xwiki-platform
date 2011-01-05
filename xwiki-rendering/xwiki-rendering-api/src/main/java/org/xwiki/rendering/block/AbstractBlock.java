@@ -28,6 +28,7 @@ import java.util.Map;
 
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
+import org.xwiki.rendering.listener.Listener;
 
 /**
  * Implementation for Block operations. All blocks should extend this class.
@@ -80,6 +81,54 @@ public abstract class AbstractBlock implements Block
     public AbstractBlock(Map<String, String> parameters)
     {
         this.parameters.putAll(parameters);
+    }
+
+    /**
+     * Constructs a block with a child block.
+     *
+     * @param childBlock the child block of this block
+     * @since 3.0M1
+     */
+    public AbstractBlock(Block childBlock)
+    {
+        this(childBlock, Collections.<String, String> emptyMap());
+    }
+
+    /**
+     * Constructs a block with children blocks.
+     *
+     * @param childrenBlocks the list of children blocks of the block to construct
+     * @since 3.0M1
+     */
+    public AbstractBlock(List< ? extends Block> childrenBlocks)
+    {
+        this(childrenBlocks, Collections.<String, String> emptyMap());
+    }
+
+    /**
+     * Construct a block with a child block and parameters.
+     *
+     * @param childBlock the child block of this block
+     * @param parameters the parameters to set
+     * @since 3.0M1
+     */
+    public AbstractBlock(Block childBlock, Map<String, String> parameters)
+    {
+        this(parameters);
+        addChild(childBlock);
+    }
+
+    /**
+     * Construct a block with children blocks and parameters.
+     *
+     * @param childrenBlocks the list of children blocks of the block to construct
+     * @param parameters the parameters to set
+     * @since 3.0M1
+     */
+    public AbstractBlock(List< ? extends Block> childrenBlocks, Map<String, String> parameters)
+    {
+        this(parameters);
+        addChildren(childrenBlocks);
     }
 
     /**
@@ -553,5 +602,45 @@ public abstract class AbstractBlock implements Block
         }
 
         return block;
+    }
+
+    /**
+     * {@inheritDoc}
+     *
+     * @see org.xwiki.rendering.block.AbstractBlock#traverse(org.xwiki.rendering.listener.Listener)
+     */
+    public void traverse(Listener listener)
+    {
+        before(listener);
+
+        for (Block block : getChildren()) {
+            block.traverse(listener);
+        }
+
+        after(listener);
+    }
+
+    /**
+     * Send {@link org.xwiki.rendering.listener.Listener} events corresponding to the start of the block. For
+     * example for a Bold block, this allows an XHTML Listener (aka a Renderer) to output <code>&lt;b&gt;</code>.
+     *
+     * @param listener the listener that will receive the events sent by this block before its children blocks
+     *            have emitted their own events.
+     */
+    public void before(Listener listener)
+    {
+        // Do nothing by default, should be overridden by extending Blocks
+    }
+
+    /**
+     * Send {@link Listener} events corresponding to the end of the block. For example for a Bold block, this
+     * allows an XHTML Listener (aka a Renderer) to output <code>&lt;/b&gt;</code>.
+     *
+     * @param listener the listener that will receive the events sent by this block before its children blocks
+     *            have emitted their own events.
+     */
+    public void after(Listener listener)
+    {
+        // Do nothing by default, should be overridden by extending Blocks
     }
 }

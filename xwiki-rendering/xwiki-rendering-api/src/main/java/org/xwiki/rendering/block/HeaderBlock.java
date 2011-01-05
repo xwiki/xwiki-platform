@@ -29,7 +29,7 @@ import org.xwiki.rendering.listener.HeaderLevel;
  * @version $Id$
  * @since 1.5M2
  */
-public class HeaderBlock extends AbstractFatherBlock
+public class HeaderBlock extends AbstractBlock
 {
     /**
      * The level of the header.
@@ -116,7 +116,7 @@ public class HeaderBlock extends AbstractFatherBlock
     /**
      * {@inheritDoc}
      * 
-     * @see org.xwiki.rendering.block.FatherBlock#before(org.xwiki.rendering.listener.Listener)
+     * @see org.xwiki.rendering.block.AbstractBlock#before(org.xwiki.rendering.listener.Listener)
      */
     public void before(Listener listener)
     {
@@ -126,7 +126,7 @@ public class HeaderBlock extends AbstractFatherBlock
     /**
      * {@inheritDoc}
      * 
-     * @see org.xwiki.rendering.block.FatherBlock#after(org.xwiki.rendering.listener.Listener)
+     * @see org.xwiki.rendering.block.AbstractBlock#after(org.xwiki.rendering.listener.Listener)
      */
     public void after(Listener listener)
     {

@@ -32,7 +32,7 @@ import org.xwiki.rendering.listener.Listener;
  * @version $Id$
  * @since 1.6M1
  */
-public class FormatBlock extends AbstractFatherBlock
+public class FormatBlock extends AbstractBlock
 {
     /**
      * The formatting to apply to the children blocks.
@@ -70,8 +70,9 @@ public class FormatBlock extends AbstractFatherBlock
     /**
      * {@inheritDoc}
      * 
-     * @see org.xwiki.rendering.block.AbstractFatherBlock#before(org.xwiki.rendering.listener.Listener)
+     * @see org.xwiki.rendering.block.AbstractBlock#before(org.xwiki.rendering.listener.Listener)
      */
+    @Override
     public void before(Listener listener)
     {
         listener.beginFormat(getFormat(), getParameters());
@@ -80,8 +81,9 @@ public class FormatBlock extends AbstractFatherBlock
     /**
      * {@inheritDoc}
      * 
-     * @see org.xwiki.rendering.block.AbstractFatherBlock#after(org.xwiki.rendering.listener.Listener)
+     * @see org.xwiki.rendering.block.AbstractBlock#after(org.xwiki.rendering.listener.Listener)
      */
+    @Override
     public void after(Listener listener)
     {
         listener.endFormat(getFormat(), getParameters());

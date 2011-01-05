@@ -29,7 +29,7 @@ import java.util.List;
  * @version $Id$
  * @since 1.6M2
  */
-public class DefinitionDescriptionBlock extends AbstractFatherBlock
+public class DefinitionDescriptionBlock extends AbstractBlock
 {
     /**
      * Construct a Definition Description block.
@@ -43,7 +43,7 @@ public class DefinitionDescriptionBlock extends AbstractFatherBlock
 
     /**
      * {@inheritDoc}
-     * @see AbstractFatherBlock#before(org.xwiki.rendering.listener.Listener)
+     * @see AbstractBlock#before(org.xwiki.rendering.listener.Listener)
      */
     public void before(Listener listener)
     {
@@ -52,7 +52,7 @@ public class DefinitionDescriptionBlock extends AbstractFatherBlock
 
     /**
      * {@inheritDoc}
-     * @see AbstractFatherBlock#after(org.xwiki.rendering.listener.Listener)
+     * @see AbstractBlock#after(org.xwiki.rendering.listener.Listener)
      */
     public void after(Listener listener)
     {

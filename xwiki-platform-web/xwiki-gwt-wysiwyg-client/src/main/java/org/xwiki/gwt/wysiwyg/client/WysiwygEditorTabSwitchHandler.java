@@ -33,11 +33,11 @@ import org.xwiki.gwt.wysiwyg.client.converter.HTMLConverter;
 import org.xwiki.gwt.wysiwyg.client.converter.HTMLConverterAsync;
 
 import com.google.gwt.core.client.GWT;
+import com.google.gwt.core.client.Scheduler;
 import com.google.gwt.event.logical.shared.BeforeSelectionEvent;
 import com.google.gwt.event.logical.shared.BeforeSelectionHandler;
 import com.google.gwt.event.logical.shared.SelectionEvent;
 import com.google.gwt.event.logical.shared.SelectionHandler;
-import com.google.gwt.user.client.DeferredCommand;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.TabPanel;
 
@@ -320,7 +320,7 @@ public class WysiwygEditorTabSwitchHandler implements SelectionHandler<Integer>,
             // The rich text area lost the focus while it was hidden. We have to restore its selection.
             // NOTE: We have to use a deferred command in order to let the rich text area re-initialize its internal
             // selection object after it was hidden. The internal selection object is null at this point.
-            DeferredCommand.addCommand(new com.google.gwt.user.client.Command()
+            Scheduler.get().scheduleDeferred(new com.google.gwt.user.client.Command()
             {
                 public void execute()
                 {
@@ -335,7 +335,7 @@ public class WysiwygEditorTabSwitchHandler implements SelectionHandler<Integer>,
             } else if (!editor.getRichTextEditor().isLoading()) {
                 // NOTE: We have to use a deferred command in order to let the rich text area re-initialize its internal
                 // selection object after it was hidden. The internal selection object is null at this point.
-                DeferredCommand.addCommand(new com.google.gwt.user.client.Command()
+                Scheduler.get().scheduleDeferred(new com.google.gwt.user.client.Command()
                 {
                     public void execute()
                     {

@@ -27,6 +27,7 @@ import java.util.List;
 import org.xwiki.gwt.dom.client.Event;
 import org.xwiki.gwt.user.client.ShortcutKey.ModifierKey;
 
+import com.google.gwt.core.client.Scheduler;
 import com.google.gwt.event.dom.client.HasAllKeyHandlers;
 import com.google.gwt.event.dom.client.KeyDownEvent;
 import com.google.gwt.event.dom.client.KeyDownHandler;
@@ -36,7 +37,6 @@ import com.google.gwt.event.dom.client.KeyUpEvent;
 import com.google.gwt.event.dom.client.KeyUpHandler;
 import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.user.client.Command;
-import com.google.gwt.user.client.DeferredCommand;
 
 /**
  * Associates {@link Command}s to shortcut keys.<br/>
@@ -97,7 +97,7 @@ public class ShortcutKeyManager extends HashMap<ShortcutKey, Command> implements
             // Prevent default browser behavior.
             ((Event) event.getNativeEvent()).xPreventDefault();
             // Schedule command.
-            DeferredCommand.addCommand(command);
+            Scheduler.get().scheduleDeferred(command);
         }
     }
 
@@ -113,7 +113,7 @@ public class ShortcutKeyManager extends HashMap<ShortcutKey, Command> implements
             ((Event) event.getNativeEvent()).xPreventDefault();
             if (!ignoreNextKeyPress) {
                 // Schedule command.
-                DeferredCommand.addCommand(command);
+                Scheduler.get().scheduleDeferred(command);
             }
             ignoreNextKeyPress = false;
         }

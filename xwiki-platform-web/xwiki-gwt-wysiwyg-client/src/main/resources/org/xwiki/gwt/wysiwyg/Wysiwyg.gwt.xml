@@ -41,7 +41,6 @@
     <when-type-is class="org.xwiki.gwt.wysiwyg.client.plugin.color.ColorPlugin" />
     <any>
       <when-property-is name="user.agent" value="gecko1_8" />
-      <when-property-is name="user.agent" value="gecko" />
       <!--
         Opera and Mozilla have the same behavior: "backcolor" command changes the background color of block level
         elements while "hilitecolor" affects the in-line text selection.
@@ -57,10 +56,7 @@
 
   <replace-with class="org.xwiki.gwt.wysiwyg.client.plugin.macro.internal.MozillaMacroDisplayer">
     <when-type-is class="org.xwiki.gwt.wysiwyg.client.plugin.macro.MacroDisplayer" />
-    <any>
-      <when-property-is name="user.agent" value="gecko1_8" />
-      <when-property-is name="user.agent" value="gecko" />
-    </any>
+    <when-property-is name="user.agent" value="gecko1_8" />
   </replace-with>
 
   <!-- LinePlugin -->
@@ -70,10 +66,7 @@
 
   <replace-with class="org.xwiki.gwt.wysiwyg.client.plugin.line.MozillaLinePlugin">
     <when-type-is class="org.xwiki.gwt.wysiwyg.client.plugin.line.LinePlugin" />
-    <any>
-      <when-property-is name="user.agent" value="gecko1_8" />
-      <when-property-is name="user.agent" value="gecko" />
-    </any>
+    <when-property-is name="user.agent" value="gecko1_8" />
   </replace-with>
 
   <replace-with class="org.xwiki.gwt.wysiwyg.client.plugin.line.IELinePlugin">
@@ -122,9 +115,6 @@
 
   <replace-with class="org.xwiki.gwt.wysiwyg.client.plugin.list.internal.MozillaListBehaviorAdjuster">
     <when-type-is class="org.xwiki.gwt.wysiwyg.client.plugin.list.ListBehaviorAdjuster" />
-    <any>
-      <when-property-is name="user.agent" value="gecko1_8" />
-      <when-property-is name="user.agent" value="gecko" />
-    </any>
+    <when-property-is name="user.agent" value="gecko1_8" />
   </replace-with>
 </module>

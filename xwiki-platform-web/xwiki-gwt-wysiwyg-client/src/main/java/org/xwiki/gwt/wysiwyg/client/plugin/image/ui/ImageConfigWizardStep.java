@@ -36,10 +36,10 @@ import org.xwiki.gwt.wysiwyg.client.wiki.AttachmentReference;
 import org.xwiki.gwt.wysiwyg.client.wiki.EntityLink;
 import org.xwiki.gwt.wysiwyg.client.wiki.URIReference;
 
+import com.google.gwt.core.client.Scheduler;
 import com.google.gwt.event.dom.client.KeyCodes;
 import com.google.gwt.event.dom.client.KeyPressEvent;
 import com.google.gwt.event.dom.client.KeyPressHandler;
-import com.google.gwt.user.client.DeferredCommand;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.Label;
@@ -301,7 +301,7 @@ public class ImageConfigWizardStep implements WizardStep, KeyPressHandler, Sourc
         altTextBox.setText(altText);
 
         cb.onSuccess(null);
-        DeferredCommand.addCommand(new FocusCommand(widthBox));
+        Scheduler.get().scheduleDeferred(new FocusCommand(widthBox));
     }
 
     /**

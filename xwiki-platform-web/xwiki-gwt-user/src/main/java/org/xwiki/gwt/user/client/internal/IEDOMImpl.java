@@ -60,9 +60,10 @@ public class IEDOMImpl extends DOMImplTrident
     private native void initCustomEventSystem()
     /*-{
         @org.xwiki.gwt.user.client.internal.IEDOMImpl::dispatchEvent = function() {
-            // dispatchEvent from base class expects "this" to be the object that fired the event. It is like this when
-            // dispatchEvent is registered using the corresponding event property but we use attachEvent instead.
-            @com.google.gwt.user.client.impl.DOMImplTrident::dispatchEvent.call($wnd.event.srcElement);
+            // callDispatchEvent from base class expects "this" to be the object that fired the event. It is like this
+            // when callDispatchEvent is registered using the corresponding event property but we use attachEvent
+            // instead.
+            @com.google.gwt.user.client.impl.DOMImplTrident::callDispatchEvent.call($wnd.event.srcElement);
         }
     }-*/;
 

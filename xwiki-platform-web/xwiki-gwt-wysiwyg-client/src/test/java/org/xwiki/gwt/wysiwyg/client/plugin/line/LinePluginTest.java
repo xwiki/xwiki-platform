@@ -109,8 +109,9 @@ public class LinePluginTest extends RichTextAreaTestCase
         select(range);
 
         // Type Enter.
-        rta.onBrowserEvent((Event) rta.getDocument().createKeyDownEvent(false, false, false, false, KeyCodes.KEY_ENTER,
-            KeyCodes.KEY_ENTER));
+        rta
+            .onBrowserEvent((Event) rta.getDocument()
+                .createKeyDownEvent(false, false, false, false, KeyCodes.KEY_ENTER));
 
         // Check if the caret is inside a span which is inside paragraph.
         range = rta.getDocument().getSelection().getRangeAt(0);
@@ -138,7 +139,7 @@ public class LinePluginTest extends RichTextAreaTestCase
 
                 // Type Enter.
                 rta.onBrowserEvent((Event) rta.getDocument().createKeyDownEvent(false, false, false, false,
-                    KeyCodes.KEY_ENTER, KeyCodes.KEY_ENTER));
+                    KeyCodes.KEY_ENTER));
 
                 // Check if the caret is inside a paragraph.
                 range = rta.getDocument().getSelection().getRangeAt(0);
@@ -177,8 +178,9 @@ public class LinePluginTest extends RichTextAreaTestCase
         select(range);
 
         // Type Enter.
-        rta.onBrowserEvent((Event) rta.getDocument().createKeyDownEvent(false, false, false, false, KeyCodes.KEY_ENTER,
-            KeyCodes.KEY_ENTER));
+        rta
+            .onBrowserEvent((Event) rta.getDocument()
+                .createKeyDownEvent(false, false, false, false, KeyCodes.KEY_ENTER));
 
         // Check if the caret is inside a paragraph.
         range = rta.getDocument().getSelection().getRangeAt(0);
@@ -218,8 +220,9 @@ public class LinePluginTest extends RichTextAreaTestCase
         select(range);
 
         // Type Enter.
-        rta.onBrowserEvent((Event) rta.getDocument().createKeyDownEvent(false, false, false, false, KeyCodes.KEY_ENTER,
-            KeyCodes.KEY_ENTER));
+        rta
+            .onBrowserEvent((Event) rta.getDocument()
+                .createKeyDownEvent(false, false, false, false, KeyCodes.KEY_ENTER));
 
         // Check if the caret is inside a strong element which is inside a paragraph.
         range = rta.getDocument().getSelection().getRangeAt(0);
@@ -257,8 +260,9 @@ public class LinePluginTest extends RichTextAreaTestCase
         select(range);
 
         // Type Enter.
-        rta.onBrowserEvent((Event) rta.getDocument().createKeyDownEvent(false, false, false, false, KeyCodes.KEY_ENTER,
-            KeyCodes.KEY_ENTER));
+        rta
+            .onBrowserEvent((Event) rta.getDocument()
+                .createKeyDownEvent(false, false, false, false, KeyCodes.KEY_ENTER));
 
         // We should have two paragraphs and one link.
         assertEquals(2, getBody().getElementsByTagName(PARAGRAPH).getLength());
@@ -297,8 +301,9 @@ public class LinePluginTest extends RichTextAreaTestCase
         select(range);
 
         // Type Enter.
-        rta.onBrowserEvent((Event) rta.getDocument().createKeyDownEvent(false, false, false, false, KeyCodes.KEY_ENTER,
-            KeyCodes.KEY_ENTER));
+        rta
+            .onBrowserEvent((Event) rta.getDocument()
+                .createKeyDownEvent(false, false, false, false, KeyCodes.KEY_ENTER));
 
         // We should have two paragraphs and one link.
         assertEquals(2, getBody().getElementsByTagName(PARAGRAPH).getLength());
@@ -337,8 +342,9 @@ public class LinePluginTest extends RichTextAreaTestCase
         select(range);
 
         // Type Enter.
-        rta.onBrowserEvent((Event) rta.getDocument().createKeyDownEvent(false, false, false, false, KeyCodes.KEY_ENTER,
-            KeyCodes.KEY_ENTER));
+        rta
+            .onBrowserEvent((Event) rta.getDocument()
+                .createKeyDownEvent(false, false, false, false, KeyCodes.KEY_ENTER));
 
         // We should have two paragraphs and two links.
         assertEquals(2, getBody().getElementsByTagName(PARAGRAPH).getLength());
@@ -378,8 +384,7 @@ public class LinePluginTest extends RichTextAreaTestCase
         select(range);
 
         // Type Shift+Enter.
-        rta.onBrowserEvent((Event) rta.getDocument().createKeyDownEvent(false, false, true, false, KeyCodes.KEY_ENTER,
-            KeyCodes.KEY_ENTER));
+        rta.onBrowserEvent((Event) rta.getDocument().createKeyDownEvent(false, false, true, false, KeyCodes.KEY_ENTER));
 
         // We should have one paragraph, one link and one line break.
         assertEquals(1, getBody().getElementsByTagName(PARAGRAPH).getLength());
@@ -387,8 +392,9 @@ public class LinePluginTest extends RichTextAreaTestCase
         assertEquals(1, getBody().getElementsByTagName(BR).getLength());
 
         // Type Enter.
-        rta.onBrowserEvent((Event) rta.getDocument().createKeyDownEvent(false, false, false, false, KeyCodes.KEY_ENTER,
-            KeyCodes.KEY_ENTER));
+        rta
+            .onBrowserEvent((Event) rta.getDocument()
+                .createKeyDownEvent(false, false, false, false, KeyCodes.KEY_ENTER));
 
         // We should have two paragraphs and one link.
         assertEquals(2, getBody().getElementsByTagName(PARAGRAPH).getLength());
@@ -427,8 +433,7 @@ public class LinePluginTest extends RichTextAreaTestCase
         select(range);
 
         // Type Shift+Enter.
-        rta.onBrowserEvent((Event) rta.getDocument().createKeyDownEvent(false, false, true, false, KeyCodes.KEY_ENTER,
-            KeyCodes.KEY_ENTER));
+        rta.onBrowserEvent((Event) rta.getDocument().createKeyDownEvent(false, false, true, false, KeyCodes.KEY_ENTER));
 
         // We should have one paragraph and one link.
         assertEquals(1, getBody().getElementsByTagName(PARAGRAPH).getLength());
@@ -437,8 +442,9 @@ public class LinePluginTest extends RichTextAreaTestCase
         assertTrue(getBody().getElementsByTagName(BR).getLength() > 0);
 
         // Type Enter.
-        rta.onBrowserEvent((Event) rta.getDocument().createKeyDownEvent(false, false, false, false, KeyCodes.KEY_ENTER,
-            KeyCodes.KEY_ENTER));
+        rta
+            .onBrowserEvent((Event) rta.getDocument()
+                .createKeyDownEvent(false, false, false, false, KeyCodes.KEY_ENTER));
 
         // We should have two paragraphs and one link.
         assertEquals(2, getBody().getElementsByTagName(PARAGRAPH).getLength());

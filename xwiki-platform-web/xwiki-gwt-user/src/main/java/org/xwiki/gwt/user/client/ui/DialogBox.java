@@ -19,7 +19,6 @@
  */
 package org.xwiki.gwt.user.client.ui;
 
-import org.xwiki.gwt.dom.client.Style;
 import org.xwiki.gwt.user.client.DragAdaptor;
 import org.xwiki.gwt.user.client.DragListener;
 import org.xwiki.gwt.user.client.Images;
@@ -36,9 +35,7 @@ import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.Image;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.PopupPanel;
-import com.google.gwt.user.client.ui.RootPanel;
 import com.google.gwt.user.client.ui.Widget;
-import com.google.gwt.widgetideas.client.GlassPanel;
 
 /**
  * Generic dialog box with optimized dragging.
@@ -88,11 +85,6 @@ public class DialogBox extends PopupPanel implements DragListener, ClickHandler
     private final FlowPanel box;
 
     /**
-     * Used when the dialog is in modal state to prevent clicking outside of the dialog.
-     */
-    private final GlassPanel glassPanel;
-
-    /**
      * The horizontal coordinate of the point where the drag started.
      */
     private int dragStartX;
@@ -128,8 +120,8 @@ public class DialogBox extends PopupPanel implements DragListener, ClickHandler
      */
     public DialogBox(boolean autoHide, boolean modal)
     {
-        // We use our own modal mechanism, based on glass panel.
-        super(autoHide, false);
+        super(autoHide, modal);
+        setGlassEnabled(modal);
 
         caption = new Label();
         caption.addStyleName("xDialogCaption");
@@ -157,15 +149,6 @@ public class DialogBox extends PopupPanel implements DragListener, ClickHandler
         box.add(content);
         box.add(contentPlaceHolder);
 
-        int zIndex = 1000;
-        if (modal) {
-            glassPanel = new GlassPanel(false);
-            glassPanel.getElement().getStyle().setZIndex(zIndex++);
-        } else {
-            glassPanel = null;
-        }
-
-        getElement().getStyle().setProperty(Style.Z_INDEX, String.valueOf(zIndex));
         super.setWidget(box);
     }
 
@@ -307,32 +290,6 @@ public class DialogBox extends PopupPanel implements DragListener, ClickHandler
         contentPlaceHolder.setVisible(false);
         content.setVisible(true);
         box.removeStyleDependentName(DRAGGING_STYLE);
-    }
-
-    /**
-     * {@inheritDoc}
-     * 
-     * @see PopupPanel#show()
-     */
-    public void show()
-    {
-        if (glassPanel != null) {
-            RootPanel.get().add(glassPanel, 0, 0);
-        }
-        super.show();
-    }
-
-    /**
-     * {@inheritDoc}
-     * 
-     * @see PopupPanel#hide()
-     */
-    public void hide()
-    {
-        if (glassPanel != null) {
-            glassPanel.removeFromParent();
-        }
-        super.hide();
     }
 
     /**

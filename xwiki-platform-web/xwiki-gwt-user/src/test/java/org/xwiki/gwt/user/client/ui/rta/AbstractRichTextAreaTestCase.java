@@ -24,6 +24,7 @@ import org.xwiki.gwt.dom.client.Range;
 import org.xwiki.gwt.dom.client.Selection;
 import org.xwiki.gwt.user.client.FocusCommand;
 
+import com.google.gwt.core.client.Scheduler;
 import com.google.gwt.event.dom.client.LoadEvent;
 import com.google.gwt.event.dom.client.LoadHandler;
 import com.google.gwt.event.shared.HandlerRegistration;
@@ -31,18 +32,17 @@ import com.google.gwt.junit.DoNotRunWith;
 import com.google.gwt.junit.Platform;
 import com.google.gwt.junit.client.GWTTestCase;
 import com.google.gwt.user.client.Command;
-import com.google.gwt.user.client.DeferredCommand;
 import com.google.gwt.user.client.ui.RootPanel;
 
 /**
  * Base class for tests running on a rich text area.
  * <p>
- * NOTE: HtmlUnit 2.6 doesn't fully support the {@link Selection} API and also doesn't fire the load event on in-line
- * frames. For now all test cases derived from this class are skipped when running on HtmlUnit.
+ * NOTE: HtmlUnit doesn't fire the load event on in-line frames. For now all test cases derived from this class are
+ * skipped when running on HtmlUnit.
  * 
  * @version $Id$
  */
-@DoNotRunWith(Platform.HtmlUnit)
+@DoNotRunWith(Platform.HtmlUnitBug)
 public abstract class AbstractRichTextAreaTestCase extends GWTTestCase implements LoadHandler
 {
     /**
@@ -111,7 +111,7 @@ public abstract class AbstractRichTextAreaTestCase extends GWTTestCase implement
     {
         // http://wiki.codetalks.org/wiki/index.php/Docs/Keyboard_navigable_JS_widgets
         // #Use_setTimeout_with_element.focus.28.29_to_set_focus
-        DeferredCommand.addCommand(new FocusCommand(rta));
+        Scheduler.get().scheduleDeferred(new FocusCommand(rta));
     }
 
     /**
@@ -142,7 +142,7 @@ public abstract class AbstractRichTextAreaTestCase extends GWTTestCase implement
                 // Make sure this handler is called only once.
                 registrations[0].removeHandler();
                 // Run the test after the rich text area is focused.
-                DeferredCommand.addCommand(new Command()
+                Scheduler.get().scheduleDeferred(new Command()
                 {
                     public void execute()
                     {

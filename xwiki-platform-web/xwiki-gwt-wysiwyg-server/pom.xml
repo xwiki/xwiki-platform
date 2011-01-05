@@ -20,7 +20,8 @@
  *
 -->
 
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <parent>
     <groupId>com.xpn.xwiki.platform</groupId>
@@ -113,14 +114,13 @@
       <plugin>
         <groupId>org.codehaus.mojo</groupId>
         <artifactId>gwt-maven-plugin</artifactId>
-        <version>1.2</version>
+        <version>${gwt.maven.plugin.version}</version>
         <configuration>
           <module>${xwe.module}</module>
           <webappDirectory>${gwt.output.directory}</webappDirectory>
           <style>${gwt.style}</style>
           <disableCastChecking>true</disableCastChecking>
           <disableClassMetadata>true</disableClassMetadata>
-          <soyc>false</soyc>
           <!--
             In order to prevent the "java.lang.InternalError: Can't connect to X11 window server using ':1.0' as the
             value of the DISPLAY variable." error message we have to run the GWT compiler with the headless AWT option.

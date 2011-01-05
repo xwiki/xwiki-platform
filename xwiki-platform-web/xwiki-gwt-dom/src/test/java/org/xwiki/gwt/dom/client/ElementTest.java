@@ -347,7 +347,7 @@ public class ElementTest extends DOMTestCase
      * Note: We don't run this test with HtmlUnit because the font-family of the inner element is incorrectly computed
      * as {@code inherit}. We fixed this bug for IE.
      */
-    @DoNotRunWith(Platform.HtmlUnit)
+    @DoNotRunWith(Platform.HtmlUnitBug)
     public void testGetComputedStyleWhenPropertyIsExplicitlySetToInherit()
     {
         Element inner = Element.as(getDocument().createSpanElement());

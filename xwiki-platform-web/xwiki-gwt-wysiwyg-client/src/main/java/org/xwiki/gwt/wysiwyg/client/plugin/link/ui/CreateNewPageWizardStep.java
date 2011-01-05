@@ -37,10 +37,10 @@ import org.xwiki.gwt.wysiwyg.client.wiki.ResourceReference;
 import org.xwiki.gwt.wysiwyg.client.wiki.WikiPageReference;
 import org.xwiki.gwt.wysiwyg.client.wiki.WikiServiceAsync;
 
+import com.google.gwt.core.client.Scheduler;
 import com.google.gwt.event.dom.client.KeyCodes;
 import com.google.gwt.event.dom.client.KeyPressEvent;
 import com.google.gwt.event.dom.client.KeyPressHandler;
-import com.google.gwt.user.client.DeferredCommand;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.InlineLabel;
@@ -183,7 +183,7 @@ public class CreateNewPageWizardStep implements WizardStep, KeyPressHandler, Sou
         entityLink = (EntityLink<LinkConfig>) data;
         hideError();
         cb.onSuccess(null);
-        DeferredCommand.addCommand(new FocusCommand(pageNameTextBox));
+        Scheduler.get().scheduleDeferred(new FocusCommand(pageNameTextBox));
     }
 
     /**
@@ -204,7 +204,7 @@ public class CreateNewPageWizardStep implements WizardStep, KeyPressHandler, Sou
         if (StringUtils.isEmpty(newPageName)) {
             displayError(Strings.INSTANCE.linkNewPageError());
             callback.onSuccess(false);
-            DeferredCommand.addCommand(new FocusCommand(pageNameTextBox));
+            Scheduler.get().scheduleDeferred(new FocusCommand(pageNameTextBox));
         } else {
             final ResourceReference destination = entityLink.getDestination().clone();
             (new WikiPageReference(destination.getEntityReference())).setPageName(newPageName);
@@ -213,7 +213,7 @@ public class CreateNewPageWizardStep implements WizardStep, KeyPressHandler, Sou
                 public void onFailure(Throwable caught)
                 {
                     callback.onFailure(caught);
-                    DeferredCommand.addCommand(new FocusCommand(pageNameTextBox));
+                    Scheduler.get().scheduleDeferred(new FocusCommand(pageNameTextBox));
                 }
 
                 public void onSuccess(EntityConfig result)

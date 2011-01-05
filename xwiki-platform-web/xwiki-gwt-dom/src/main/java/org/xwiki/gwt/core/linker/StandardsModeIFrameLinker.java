@@ -21,6 +21,7 @@ package org.xwiki.gwt.core.linker;
 
 import com.google.gwt.core.ext.LinkerContext;
 import com.google.gwt.core.ext.TreeLogger;
+import com.google.gwt.core.ext.UnableToCompleteException;
 import com.google.gwt.core.ext.linker.LinkerOrder;
 import com.google.gwt.core.linker.IFrameLinker;
 
@@ -46,6 +47,7 @@ public class StandardsModeIFrameLinker extends IFrameLinker
      * @see IFrameLinker#getModulePrefix(TreeLogger, LinkerContext, String)
      */
     protected String getModulePrefix(TreeLogger logger, LinkerContext context, String strongName)
+        throws UnableToCompleteException
     {
         return DOCTYPE + super.getModulePrefix(logger, context, strongName);
     }
@@ -56,6 +58,7 @@ public class StandardsModeIFrameLinker extends IFrameLinker
      * @see IFrameLinker#getModulePrefix(TreeLogger, LinkerContext, String, int)
      */
     protected String getModulePrefix(TreeLogger logger, LinkerContext context, String strongName, int numFragments)
+        throws UnableToCompleteException
     {
         return DOCTYPE + super.getModulePrefix(logger, context, strongName, numFragments);
     }

@@ -30,10 +30,10 @@ import org.xwiki.gwt.user.client.ui.wizard.NavigationListener.NavigationDirectio
 import org.xwiki.gwt.wysiwyg.client.Strings;
 import org.xwiki.gwt.wysiwyg.client.plugin.table.TableDescriptor;
 
+import com.google.gwt.core.client.Scheduler;
 import com.google.gwt.event.dom.client.KeyCodes;
 import com.google.gwt.event.dom.client.KeyUpEvent;
 import com.google.gwt.event.dom.client.KeyUpHandler;
-import com.google.gwt.user.client.DeferredCommand;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.CheckBox;
 import com.google.gwt.user.client.ui.FlowPanel;
@@ -180,7 +180,7 @@ public class TableConfigWizardStep extends AbstractNavigationAwareWizardStep imp
     {
         cb.onSuccess(null);
         // Focus the first input field.
-        DeferredCommand.addCommand(new FocusCommand(rows));
+        Scheduler.get().scheduleDeferred(new FocusCommand(rows));
     }
 
     /**
@@ -368,7 +368,7 @@ public class TableConfigWizardStep extends AbstractNavigationAwareWizardStep imp
         }
 
         if (failed != null) {
-            DeferredCommand.addCommand(new FocusCommand(failed));
+            Scheduler.get().scheduleDeferred(new FocusCommand(failed));
             return false;
         }
         return true;

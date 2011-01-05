@@ -34,10 +34,10 @@ import org.xwiki.gwt.wysiwyg.client.wiki.EntityLink;
 import org.xwiki.gwt.wysiwyg.client.wiki.ResourceReference;
 import org.xwiki.gwt.wysiwyg.client.wiki.WikiServiceAsync;
 
+import com.google.gwt.core.client.Scheduler;
 import com.google.gwt.event.dom.client.KeyCodes;
 import com.google.gwt.event.dom.client.KeyPressEvent;
 import com.google.gwt.event.dom.client.KeyPressHandler;
-import com.google.gwt.user.client.DeferredCommand;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.CheckBox;
 import com.google.gwt.user.client.ui.FlowPanel;
@@ -231,7 +231,7 @@ public class LinkConfigWizardStep implements WizardStep, SourcesNavigationEvents
      */
     protected void setFocus()
     {
-        DeferredCommand.addCommand(new FocusCommand(labelTextBox.isEnabled() ? labelTextBox : tooltipTextBox));
+        Scheduler.get().scheduleDeferred(new FocusCommand(labelTextBox.isEnabled() ? labelTextBox : tooltipTextBox));
     }
 
     /**

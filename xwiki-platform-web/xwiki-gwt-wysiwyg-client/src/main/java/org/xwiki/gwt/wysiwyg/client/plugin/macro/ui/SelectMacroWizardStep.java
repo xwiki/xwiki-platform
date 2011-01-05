@@ -45,6 +45,8 @@ import org.xwiki.gwt.wysiwyg.client.plugin.macro.MacroCall;
 import org.xwiki.gwt.wysiwyg.client.plugin.macro.MacroDescriptor;
 import org.xwiki.gwt.wysiwyg.client.plugin.macro.MacroServiceAsync;
 
+import com.google.gwt.core.client.Scheduler;
+import com.google.gwt.core.client.Scheduler.RepeatingCommand;
 import com.google.gwt.dom.client.Node;
 import com.google.gwt.event.dom.client.ChangeEvent;
 import com.google.gwt.event.dom.client.ChangeHandler;
@@ -53,8 +55,6 @@ import com.google.gwt.event.dom.client.DoubleClickHandler;
 import com.google.gwt.event.dom.client.KeyCodes;
 import com.google.gwt.event.dom.client.KeyUpEvent;
 import com.google.gwt.event.dom.client.KeyUpHandler;
-import com.google.gwt.user.client.DeferredCommand;
-import com.google.gwt.user.client.IncrementalCommand;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FlowPanel;
@@ -72,7 +72,7 @@ public class SelectMacroWizardStep extends AbstractMacroWizardStep implements Do
      * Creates the macro list items that will fill the macro list. The user will be able to filter this list items by
      * category or by a search query.
      */
-    private class CreateMacroListItemsCommand implements IncrementalCommand
+    private class CreateMacroListItemsCommand implements RepeatingCommand
     {
         /**
          * The list of macro descriptors.
@@ -100,7 +100,7 @@ public class SelectMacroWizardStep extends AbstractMacroWizardStep implements Do
         /**
          * {@inheritDoc}
          * 
-         * @see IncrementalCommand#execute()
+         * @see RepeatingCommand#execute()
          */
         public boolean execute()
         {
@@ -264,7 +264,7 @@ public class SelectMacroWizardStep extends AbstractMacroWizardStep implements Do
          */
         public void focus()
         {
-            DeferredCommand.addCommand(new FocusCommand(categoryList));
+            Scheduler.get().scheduleDeferred(new FocusCommand(categoryList));
         }
     }
 
@@ -424,7 +424,7 @@ public class SelectMacroWizardStep extends AbstractMacroWizardStep implements Do
                 public void onSuccess(List<MacroDescriptor> result)
                 {
                     if (result != null) {
-                        DeferredCommand.addCommand(new CreateMacroListItemsCommand(result));
+                        Scheduler.get().scheduleIncremental(new CreateMacroListItemsCommand(result));
                     } else {
                         macroDescriptorsCallback = null;
                     }
@@ -455,7 +455,7 @@ public class SelectMacroWizardStep extends AbstractMacroWizardStep implements Do
         async.onSuccess(result);
         // if validation fails, set focus on the macros list
         if (!result) {
-            DeferredCommand.addCommand(new FocusCommand(macroList));
+            Scheduler.get().scheduleDeferred(new FocusCommand(macroList));
         }
     }
 

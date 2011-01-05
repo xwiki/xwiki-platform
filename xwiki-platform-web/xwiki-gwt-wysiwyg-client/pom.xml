@@ -20,7 +20,8 @@
  *
 -->
 
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <parent>
     <groupId>com.xpn.xwiki.platform</groupId>
@@ -32,11 +33,6 @@
   <name>XWiki Platform - Web - GWT - WYSIWYG Editor - Client Side</name>
   <packaging>jar</packaging>
   <description>The client side of XWiki's WYSIWYG editor. This is a reusable rich text editor all written in GWT.</description>
-  <properties>
-    <gwt.args />
-    <!-- Skip Clirr execution because public API has been changed. Remove this after 2.6 release. -->
-    <xwiki.clirr.skip>true</xwiki.clirr.skip>
-  </properties>
   <dependencies>
     <!-- GWT core dependencies -->
     <dependency>
@@ -100,10 +96,9 @@
       <plugin>
         <groupId>org.codehaus.mojo</groupId>
         <artifactId>gwt-maven-plugin</artifactId>
-        <version>1.2</version>
+        <version>${gwt.maven.plugin.version}</version>
         <configuration>
-          <!-- HACK: We inject the GWT arguments in the out parameter because we have no other option. -->
-          <out>target/www-test${gwt.args}</out>
+          <mode>htmlunit</mode>
           <testTimeOut>600</testTimeOut>
           <includes>org/xwiki/gwt/wysiwyg/WysiwygTestSuite.java</includes>
         </configuration>
@@ -173,8 +168,10 @@
           <groupId>com.atlassian.maven.plugins</groupId>
           <artifactId>maven-clover2-plugin</artifactId>
           <configuration>
-            <!-- Exclude Client code since otherwise it would mean they would get instrumented by Clover and GWT
-                 would complain that it doesn't find the sources for Clover at runtime -->
+            <!--
+              Exclude Client code since otherwise it would mean they would get instrumented by Clover and GWT would
+              complain that it doesn't find the sources for Clover at runtime.
+            -->
             <excludes>
               <exclude>**/client/**/*.java</exclude>
             </excludes>
@@ -186,10 +183,21 @@
   <profiles>
     <profile>
       <id>manual</id>
-      <properties>
-        <!-- Arguments required to run the tests manually in any browser. -->
-        <gwt.args>" -prod -userAgents gecko1_8 -port 54321 -codeServerPort 12345 -style DETAILED -runStyle "Manual:1</gwt.args>
-      </properties>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.codehaus.mojo</groupId>
+            <artifactId>gwt-maven-plugin</artifactId>
+            <configuration>
+              <mode>manual</mode>
+              <productionMode>true</productionMode>
+              <style>DETAILED</style>
+              <!-- HACK: We inject the GWT arguments in the out parameter because we have no other option. -->
+              <out>target/www-test -port 54321 -codeServerPort 12345 -userAgents gecko1_8</out>
+            </configuration>
+          </plugin>
+        </plugins>
+      </build>
     </profile>
   </profiles>
 </project>

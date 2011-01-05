@@ -116,8 +116,8 @@ public class URLUtils
             String[] pair = keyValuePairs[i].split("=", 2);
             String name = pair[0];
             String value = pair.length == 1 ? "" : pair[1];
-            name = URL.decodeComponent(name);
-            value = URL.decodeComponent(value);
+            name = URL.decodeQueryString(name);
+            value = URL.decodeQueryString(value);
             List<String> values = parameters.get(name);
             if (values == null) {
                 values = new ArrayList<String>();
@@ -141,13 +141,13 @@ public class URLUtils
         for (Map.Entry<String, ? > entry : parameters.entrySet()) {
             if (entry.getValue() instanceof Iterable< ? >) {
                 for (Object value : (Iterable< ? >) entry.getValue()) {
-                    queryString.append(separator).append(URL.encodeComponent(entry.getKey())).append('=').append(
-                        URL.encodeComponent(value.toString()));
+                    queryString.append(separator).append(URL.encodeQueryString(entry.getKey())).append('=').append(
+                        URL.encodeQueryString(value.toString()));
                     separator = QUERY_STRING_COMPONENT_SEPARATOR;
                 }
             } else {
-                queryString.append(separator).append(URL.encodeComponent(entry.getKey())).append('=').append(
-                    URL.encodeComponent(entry.getValue().toString()));
+                queryString.append(separator).append(URL.encodeQueryString(entry.getKey())).append('=').append(
+                    URL.encodeQueryString(entry.getValue().toString()));
                 separator = QUERY_STRING_COMPONENT_SEPARATOR;
             }
         }

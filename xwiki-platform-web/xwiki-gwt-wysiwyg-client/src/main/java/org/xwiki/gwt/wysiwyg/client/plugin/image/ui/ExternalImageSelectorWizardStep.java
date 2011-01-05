@@ -35,10 +35,10 @@ import org.xwiki.gwt.wysiwyg.client.wiki.URIReference;
 import org.xwiki.gwt.wysiwyg.client.wiki.WikiServiceAsync;
 import org.xwiki.gwt.wysiwyg.client.wiki.ResourceReference.ResourceType;
 
+import com.google.gwt.core.client.Scheduler;
 import com.google.gwt.event.dom.client.KeyCodes;
 import com.google.gwt.event.dom.client.KeyUpEvent;
 import com.google.gwt.event.dom.client.KeyUpHandler;
-import com.google.gwt.user.client.DeferredCommand;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.InlineLabel;
@@ -159,7 +159,7 @@ public class ExternalImageSelectorWizardStep extends AbstractNavigationAwareWiza
             // new image location.
             source.setText(imageURL);
         }
-        DeferredCommand.addCommand(new FocusCommand(source));
+        Scheduler.get().scheduleDeferred(new FocusCommand(source));
         cb.onSuccess(null);
     }
 
@@ -199,7 +199,7 @@ public class ExternalImageSelectorWizardStep extends AbstractNavigationAwareWiza
         if (source.getText().trim().length() == 0) {
             sourceValidationError.setVisible(true);
             source.addStyleName(FIELD_ERROR_STYLE);
-            DeferredCommand.addCommand(new FocusCommand(source));
+            Scheduler.get().scheduleDeferred(new FocusCommand(source));
             return false;
         }
         return true;

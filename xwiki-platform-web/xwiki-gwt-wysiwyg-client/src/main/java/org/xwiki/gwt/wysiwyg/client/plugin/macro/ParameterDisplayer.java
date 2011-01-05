@@ -26,7 +26,7 @@ import org.xwiki.gwt.wysiwyg.client.plugin.macro.input.HasFocus;
 import org.xwiki.gwt.wysiwyg.client.plugin.macro.input.HasValue;
 import org.xwiki.gwt.wysiwyg.client.plugin.macro.input.InputFactory;
 
-import com.google.gwt.user.client.DeferredCommand;
+import com.google.gwt.core.client.Scheduler;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.InlineLabel;
 import com.google.gwt.user.client.ui.Label;
@@ -127,7 +127,7 @@ public class ParameterDisplayer
         // to still use setFocused
         // also, extend FocusCommand anonymously instead of just Command so that we find this piece here in usages of
         // FocusCommand, for future maintenance
-        DeferredCommand.addCommand(new FocusCommand(null)
+        Scheduler.get().scheduleDeferred(new FocusCommand(null)
         {
             @Override
             public void execute()

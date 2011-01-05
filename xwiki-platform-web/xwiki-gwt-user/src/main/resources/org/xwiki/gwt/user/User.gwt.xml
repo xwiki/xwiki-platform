@@ -20,116 +20,109 @@
  *
 -->
 <module>
-  <inherits name='com.google.gwt.user.User'/>
-  <inherits name='com.google.gwt.json.JSON'/>
-  <inherits name="com.google.gwt.widgetideas.GlassPanel"/>
-  <inherits name="org.xwiki.gwt.dom.DOM"/>
+  <inherits name='com.google.gwt.user.User' />
+  <inherits name='com.google.gwt.json.JSON' />
+  <inherits name="org.xwiki.gwt.dom.DOM" />
 
-  <extend-property name="locale" values="ca,de,es,fr,it,ru,zh_TW"/>
+  <extend-property name="locale" values="ca,de,es,fr,it,ru,zh_TW" />
 
   <!-- RichTextArea -->
   <replace-with class="org.xwiki.gwt.user.client.ui.rta.internal.RichTextAreaImplIE6">
-    <when-type-is class="com.google.gwt.user.client.ui.impl.RichTextAreaImpl"/>
+    <when-type-is class="com.google.gwt.user.client.ui.impl.RichTextAreaImpl" />
     <any>
-      <when-property-is name="user.agent" value="ie6"/>
-      <when-property-is name="user.agent" value="ie8"/>
+      <when-property-is name="user.agent" value="ie6" />
+      <when-property-is name="user.agent" value="ie8" />
     </any>
   </replace-with>
+
   <replace-with class="org.xwiki.gwt.user.client.ui.rta.internal.RichTextAreaImplMozilla">
-    <when-type-is class="com.google.gwt.user.client.ui.impl.RichTextAreaImpl"/>
-    <any>
-      <when-property-is name="user.agent" value="gecko1_8"/>
-      <when-property-is name="user.agent" value="gecko"/>
-    </any>
+    <when-type-is class="com.google.gwt.user.client.ui.impl.RichTextAreaImpl" />
+    <when-property-is name="user.agent" value="gecko1_8" />
   </replace-with>
+
   <replace-with class="org.xwiki.gwt.user.client.ui.rta.internal.RichTextAreaImplSafari">
-    <when-type-is class="com.google.gwt.user.client.ui.impl.RichTextAreaImpl"/>
+    <when-type-is class="com.google.gwt.user.client.ui.impl.RichTextAreaImpl" />
     <any>
-      <when-property-is name="user.agent" value="safari"/>
+      <when-property-is name="user.agent" value="safari" />
     </any>
   </replace-with>
+
   <replace-with class="org.xwiki.gwt.user.client.ui.rta.internal.RichTextAreaImplOpera">
-    <when-type-is class="com.google.gwt.user.client.ui.impl.RichTextAreaImpl"/>
+    <when-type-is class="com.google.gwt.user.client.ui.impl.RichTextAreaImpl" />
     <any>
-      <when-property-is name="user.agent" value="opera"/>
+      <when-property-is name="user.agent" value="opera" />
     </any>
   </replace-with>
 
   <!-- BehaviorAdjuster -->
   <replace-with class="org.xwiki.gwt.user.client.ui.rta.internal.BehaviorAdjuster">
-    <when-type-is class="org.xwiki.gwt.user.client.ui.rta.internal.BehaviorAdjuster"/>
+    <when-type-is class="org.xwiki.gwt.user.client.ui.rta.internal.BehaviorAdjuster" />
   </replace-with>
 
   <replace-with class="org.xwiki.gwt.user.client.ui.rta.internal.MozillaBehaviorAdjuster">
-    <when-type-is class="org.xwiki.gwt.user.client.ui.rta.internal.BehaviorAdjuster"/>
-    <any>
-      <when-property-is name="user.agent" value="gecko1_8"/>
-      <when-property-is name="user.agent" value="gecko"/>
-    </any>
+    <when-type-is class="org.xwiki.gwt.user.client.ui.rta.internal.BehaviorAdjuster" />
+    <when-property-is name="user.agent" value="gecko1_8" />
   </replace-with>
 
   <replace-with class="org.xwiki.gwt.user.client.ui.rta.internal.IEBehaviorAdjuster">
-    <when-type-is class="org.xwiki.gwt.user.client.ui.rta.internal.BehaviorAdjuster"/>
+    <when-type-is class="org.xwiki.gwt.user.client.ui.rta.internal.BehaviorAdjuster" />
     <any>
-      <when-property-is name="user.agent" value="ie6"/>
-      <when-property-is name="user.agent" value="ie8"/>
+      <when-property-is name="user.agent" value="ie6" />
+      <when-property-is name="user.agent" value="ie8" />
     </any>
   </replace-with>
 
   <!-- Console -->
   <replace-with class="org.xwiki.gwt.user.client.Console">
-    <when-type-is class="org.xwiki.gwt.user.client.Console"/>
+    <when-type-is class="org.xwiki.gwt.user.client.Console" />
   </replace-with>
 
   <replace-with class="org.xwiki.gwt.user.client.internal.FirebugConsole">
-    <when-type-is class="org.xwiki.gwt.user.client.Console"/>
-    <any>
-      <when-property-is name="user.agent" value="gecko1_8"/>
-      <when-property-is name="user.agent" value="gecko"/>
-    </any>
+    <when-type-is class="org.xwiki.gwt.user.client.Console" />
+    <when-property-is name="user.agent" value="gecko1_8" />
   </replace-with>
 
   <!-- DOMImpl for widgets -->
   <replace-with class="org.xwiki.gwt.user.client.internal.IEDOMImpl">
-    <when-type-is class="com.google.gwt.user.client.impl.DOMImpl"/>
+    <when-type-is class="com.google.gwt.user.client.impl.DOMImpl" />
     <any>
-      <when-property-is name="user.agent" value="ie6"/>
-      <when-property-is name="user.agent" value="ie8"/>
+      <when-property-is name="user.agent" value="ie6" />
+      <when-property-is name="user.agent" value="ie8" />
     </any>
   </replace-with>
 
   <!-- TextBoxImpl -->
   <replace-with class="org.xwiki.gwt.user.client.ui.internal.TextBoxImplIE6">
-    <when-type-is class="com.google.gwt.user.client.ui.impl.TextBoxImpl"/>
+    <when-type-is class="com.google.gwt.user.client.ui.impl.TextBoxImpl" />
     <any>
-      <when-property-is name="user.agent" value="ie6"/>
-      <when-property-is name="user.agent" value="ie8"/>
+      <when-property-is name="user.agent" value="ie6" />
+      <when-property-is name="user.agent" value="ie8" />
     </any>
   </replace-with>
 
   <!-- DeleteExecutable -->
   <replace-with class="org.xwiki.gwt.user.client.ui.rta.cmd.internal.DeleteExecutableImpl">
-    <when-type-is class="org.xwiki.gwt.user.client.ui.rta.cmd.internal.DeleteExecutableImpl"/>
+    <when-type-is class="org.xwiki.gwt.user.client.ui.rta.cmd.internal.DeleteExecutableImpl" />
   </replace-with>
 
   <replace-with class="org.xwiki.gwt.user.client.ui.rta.cmd.internal.DeleteExecutableImplIE">
-    <when-type-is class="org.xwiki.gwt.user.client.ui.rta.cmd.internal.DeleteExecutableImpl"/>
+    <when-type-is class="org.xwiki.gwt.user.client.ui.rta.cmd.internal.DeleteExecutableImpl" />
     <any>
-      <when-property-is name="user.agent" value="ie6"/>
-      <when-property-is name="user.agent" value="ie8"/>
+      <when-property-is name="user.agent" value="ie6" />
+      <when-property-is name="user.agent" value="ie8" />
     </any>
   </replace-with>
 
   <!-- InsertHTMLExecutableImpl -->
   <replace-with class="org.xwiki.gwt.user.client.ui.rta.cmd.internal.InsertHTMLExecutableImpl">
-    <when-type-is class="org.xwiki.gwt.user.client.ui.rta.cmd.internal.InsertHTMLExecutableImpl"/>
+    <when-type-is class="org.xwiki.gwt.user.client.ui.rta.cmd.internal.InsertHTMLExecutableImpl" />
   </replace-with>
 
   <replace-with class="org.xwiki.gwt.user.client.ui.rta.cmd.internal.InsertHTMLExecutableImplIE">
-    <when-type-is class="org.xwiki.gwt.user.client.ui.rta.cmd.internal.InsertHTMLExecutableImpl"/>
+    <when-type-is class="org.xwiki.gwt.user.client.ui.rta.cmd.internal.InsertHTMLExecutableImpl" />
     <any>
-      <when-property-is name="user.agent" value="ie6"/>
-      <when-property-is name="user.agent" value="ie8"/>
+      <when-property-is name="user.agent" value="ie6" />
+      <when-property-is name="user.agent" value="ie8" />
     </any>
   </replace-with>
 </module>

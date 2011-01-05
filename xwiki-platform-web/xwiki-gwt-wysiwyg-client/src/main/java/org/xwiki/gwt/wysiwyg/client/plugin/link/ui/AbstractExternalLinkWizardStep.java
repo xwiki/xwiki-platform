@@ -26,9 +26,10 @@ import org.xwiki.gwt.wysiwyg.client.wiki.ResourceReference;
 import org.xwiki.gwt.wysiwyg.client.wiki.URIReference;
 import org.xwiki.gwt.wysiwyg.client.wiki.WikiServiceAsync;
 
-import com.google.gwt.user.client.DeferredCommand;
+import com.google.gwt.core.client.Scheduler;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.FlowPanel;
+import com.google.gwt.user.client.ui.Focusable;
 import com.google.gwt.user.client.ui.InlineLabel;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.Panel;
@@ -126,12 +127,10 @@ public abstract class AbstractExternalLinkWizardStep extends LinkConfigWizardSte
     @Override
     protected void setFocus()
     {
-        // on the label error label if it's an error on label and not on url, otherwise on the url text box
-        if (getLabelErrorLabel().isVisible() && !urlErrorLabel.isVisible()) {
-            DeferredCommand.addCommand(new FocusCommand(getLabelTextBox()));
-        } else {
-            DeferredCommand.addCommand(new FocusCommand(urlTextBox));
-        }
+        // Focus the link label input if it failed the validation, otherwise focus the URL input.
+        Focusable focusable =
+            getLabelErrorLabel().isVisible() && !urlErrorLabel.isVisible() ? getLabelTextBox() : urlTextBox;
+        Scheduler.get().scheduleDeferred(new FocusCommand(focusable));
     }
 
     /**

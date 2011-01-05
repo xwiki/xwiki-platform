@@ -41,8 +41,8 @@ public class StyleDescriptorJSONParserTest extends WysiwygTestCase
     public void testParse()
     {
         List<StyleDescriptor> descriptors =
-            parser.parse("[{}, {name: ''}, {name: 'note'}, {name: 'todo', label: 'TODO'}, "
-                + "{name: 'secret', label: 'Top Secret', inline: false}]");
+            parser.parse("[{}, {\"name\": \"\"}, {\"name\": \"note\"}, {\"name\": \"todo\", \"label\": \"TODO\"}, "
+                + "{\"name\": \"secret\", \"label\": \"Top Secret\", \"inline\": false}]");
 
         assertNotNull(descriptors);
         assertEquals(3, descriptors.size());

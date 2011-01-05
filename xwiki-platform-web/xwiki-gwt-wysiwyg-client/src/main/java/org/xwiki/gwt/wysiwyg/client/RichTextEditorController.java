@@ -33,6 +33,7 @@ import org.xwiki.gwt.wysiwyg.client.plugin.UIExtension;
 import org.xwiki.gwt.wysiwyg.client.plugin.internal.DefaultPluginManager;
 import org.xwiki.gwt.wysiwyg.client.syntax.SyntaxValidator;
 
+import com.google.gwt.core.client.Scheduler;
 import com.google.gwt.event.dom.client.KeyUpEvent;
 import com.google.gwt.event.dom.client.KeyUpHandler;
 import com.google.gwt.event.dom.client.LoadEvent;
@@ -40,7 +41,6 @@ import com.google.gwt.event.dom.client.LoadHandler;
 import com.google.gwt.event.dom.client.MouseUpEvent;
 import com.google.gwt.event.dom.client.MouseUpHandler;
 import com.google.gwt.event.shared.HandlerRegistration;
-import com.google.gwt.user.client.DeferredCommand;
 import com.google.gwt.user.client.ui.MenuItem;
 import com.google.gwt.user.client.ui.Widget;
 
@@ -209,7 +209,7 @@ public class RichTextEditorController implements Updatable, MouseUpHandler, KeyU
                 // attach process did not finish (i.e. the rich text editor widget appears to detached although its
                 // underlying element is attached to the DOM tree). Let the logical attach process finish and then
                 // initialize the rich text editor.
-                DeferredCommand.addCommand(new com.google.gwt.user.client.Command()
+                Scheduler.get().scheduleDeferred(new com.google.gwt.user.client.Command()
                 {
                     public void execute()
                     {

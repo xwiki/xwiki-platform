@@ -19,14 +19,8 @@
  */
 package org.xwiki.gwt.dom.client;
 
-import com.google.gwt.junit.DoNotRunWith;
-import com.google.gwt.junit.Platform;
-
 /**
  * Unit tests for {@link Selection}.
- * <p>
- * NOTE: HtmlUnit 2.6 doesn't support {@link Selection#addRange(Range)} and {@link Selection#removeAllRanges()} so most
- * of the tests from this class are skipped. HtmlUnit 2.7 should provide full support for {@link Selection} API.
  * 
  * @version $Id$
  */
@@ -35,7 +29,6 @@ public class SelectionTest extends DOMTestCase
     /**
      * This test is mainly for Opera browser which reports a wrong range when the selection ends before an image.
      */
-    @DoNotRunWith(Platform.HtmlUnit)
     public void testEndSelectionBeforeImage()
     {
         getContainer().setInnerHTML("ab<em>cd</em>ef<ins>gh<img/></ins>ij");
@@ -57,7 +50,6 @@ public class SelectionTest extends DOMTestCase
     /**
      * Tests if hidden text can be selected.
      */
-    @DoNotRunWith(Platform.HtmlUnit)
     public void testSelectHiddenText()
     {
         getContainer().setInnerHTML("1<span style=\"display:none\">2</span>3");
@@ -74,7 +66,6 @@ public class SelectionTest extends DOMTestCase
     /**
      * Tests if a hidden image can be selected.
      */
-    @DoNotRunWith(Platform.HtmlUnit)
     public void testSelectHiddenImage()
     {
         getContainer().setInnerHTML("<span style=\"display:none\">x<img/>y</span>");

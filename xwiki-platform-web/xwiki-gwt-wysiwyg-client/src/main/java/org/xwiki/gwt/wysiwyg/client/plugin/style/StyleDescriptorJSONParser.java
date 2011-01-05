@@ -43,7 +43,7 @@ public class StyleDescriptorJSONParser
      */
     public List<StyleDescriptor> parse(String json)
     {
-        JSONArray jsDescriptors = JSONParser.parse(json).isArray();
+        JSONArray jsDescriptors = JSONParser.parseStrict(json).isArray();
         if (jsDescriptors == null) {
             return Collections.emptyList();
         }

@@ -19,12 +19,14 @@
  */
 package org.xwiki.gwt.wysiwyg.client.plugin.table.feature;
 
+import org.xwiki.gwt.dom.client.Element;
+import org.xwiki.gwt.dom.client.Range;
+import org.xwiki.gwt.dom.client.Selection;
 import org.xwiki.gwt.user.client.ui.rta.cmd.Command;
 import org.xwiki.gwt.wysiwyg.client.Strings;
 import org.xwiki.gwt.wysiwyg.client.plugin.table.TablePlugin;
-import org.xwiki.gwt.wysiwyg.client.plugin.table.util.TableUtils;
 
-import com.google.gwt.dom.client.TableElement;
+import com.google.gwt.dom.client.Node;
 
 /**
  * Feature allowing to remove a table from the editor. It is disabled when the caret is positioned outside of a table
@@ -38,6 +40,11 @@ public class DeleteTable extends AbstractTableFeature
      * Feature name.
      */
     public static final String NAME = "deletetable";
+
+    /**
+     * The name of the table HTML element.
+     */
+    private static final String TABLE = "table";
 
     /**
      * Initialize the feature. Table features needs to be aware of the plug-in (here the ClickListener) since they hold
@@ -57,10 +64,27 @@ public class DeleteTable extends AbstractTableFeature
      */
     public boolean execute(String parameter)
     {
-        TableElement table =
-            TableUtils.getInstance().getTable(TableUtils.getInstance().getCaretNode(rta.getDocument()));
-        table.getParentNode().removeChild(table);
-        // FIXME : the table editor rulers are still visible, find a way to clean midas state after deletion.
+        Selection selection = rta.getDocument().getSelection();
+        Node table = domUtils.getFirstAncestor(selection.getRangeAt(0).getCommonAncestorContainer(), TABLE);
+        Node previousLeaf = domUtils.getPreviousLeaf(table);
+        Node parent = table.getParentNode();
+
+        selection.removeAllRanges();
+        parent.removeChild(table);
+
+        Range range = rta.getDocument().createRange();
+        if (previousLeaf != null) {
+            if (previousLeaf.getNodeType() == Node.ELEMENT_NODE && Element.as(previousLeaf).canHaveChildren()) {
+                range.setStart(previousLeaf, 0);
+            } else {
+                range.setStartAfter(previousLeaf);
+            }
+        } else {
+            range.setStart(parent, 0);
+        }
+        range.collapse(true);
+        selection.addRange(range);
+
         return true;
     }
 
@@ -72,6 +96,7 @@ public class DeleteTable extends AbstractTableFeature
     public boolean isEnabled()
     {
         return super.isEnabled()
-            && TableUtils.getInstance().getTable(TableUtils.getInstance().getCaretNode(rta.getDocument())) != null;
+            && domUtils.getFirstAncestor(rta.getDocument().getSelection().getRangeAt(0).getCommonAncestorContainer(),
+                TABLE) != null;
     }
 }

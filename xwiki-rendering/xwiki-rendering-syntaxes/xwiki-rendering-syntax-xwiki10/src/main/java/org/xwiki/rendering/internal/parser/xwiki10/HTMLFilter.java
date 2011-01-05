@@ -454,13 +454,13 @@ public class HTMLFilter extends AbstractFilter implements Initializable
         i = getElementName(array, i, elementName, context);
 
         // skip white spaces
-        i = getWhiteSpaces(array, i, null, context);
+        i = getWhiteSpaces(array, i, null);
 
         // get parameters
-        i = getElementParameters(array, i, null, parameterMap, context);
+        i = getElementParameters(array, i, null, parameterMap);
 
         // skip white spaces
-        i = getWhiteSpaces(array, i, null, context);
+        i = getWhiteSpaces(array, i, null);
 
         // 
         if (array[i] == '/' && i + 1 < array.length && array[i + 1] == '>') {
@@ -490,7 +490,7 @@ public class HTMLFilter extends AbstractFilter implements Initializable
         i = getElementName(array, i, elementName, context);
 
         // skip white spaces
-        i = getWhiteSpaces(array, i, null, context);
+        i = getWhiteSpaces(array, i, null);
 
         if (array[i] == '>') {
             ++i;
@@ -526,7 +526,7 @@ public class HTMLFilter extends AbstractFilter implements Initializable
         return i;
     }
 
-    private int getWhiteSpaces(char[] array, int currentIndex, StringBuffer htmlBlock, HTMLFilterContext context)
+    private int getWhiteSpaces(char[] array, int currentIndex, StringBuffer htmlBlock)
     {
         int i = currentIndex;
 
@@ -541,13 +541,13 @@ public class HTMLFilter extends AbstractFilter implements Initializable
     }
 
     private int getElementParameters(char[] array, int currentIndex, StringBuffer parametersBlock,
-        Map<String, String> parameterMap, HTMLFilterContext context)
+        Map<String, String> parameterMap)
     {
         int i = currentIndex;
 
         for (; i < array.length;) {
             // Skip white spaces
-            i = getWhiteSpaces(array, i, null, context);
+            i = getWhiteSpaces(array, i, null);
 
             if (i < array.length) {
                 // If '>' it's the end of parameters
@@ -558,7 +558,7 @@ public class HTMLFilter extends AbstractFilter implements Initializable
                 }
 
                 // Skip parameter
-                i = getElementParameter(array, i, null, parameterMap, context);
+                i = getElementParameter(array, i, null, parameterMap);
             }
         }
 
@@ -570,7 +570,7 @@ public class HTMLFilter extends AbstractFilter implements Initializable
     }
 
     private int getElementParameter(char[] array, int currentIndex, StringBuffer parameterBlock,
-        Map<String, String> parameterMap, HTMLFilterContext context)
+        Map<String, String> parameterMap)
     {
         int i = currentIndex;
 
@@ -581,18 +581,18 @@ public class HTMLFilter extends AbstractFilter implements Initializable
         }
 
         // Skip white spaces
-        i = getWhiteSpaces(array, i, null, context);
+        i = getWhiteSpaces(array, i, null);
 
         // Equal sign
         if (array[i] == '=') {
             ++i;
 
             // Skip white spaces
-            i = getWhiteSpaces(array, i, null, context);
+            i = getWhiteSpaces(array, i, null);
 
             // Get value
             StringBuffer valueBlock = new StringBuffer();
-            i = getElementParameterValue(array, i, valueBlock, context);
+            i = getElementParameterValue(array, i, valueBlock);
 
             // Add a new parameter to the list
             parameterMap.put(keyBlock.toString(), valueBlock.toString());
@@ -605,8 +605,7 @@ public class HTMLFilter extends AbstractFilter implements Initializable
         return i;
     }
 
-    private int getElementParameterValue(char[] array, int currentIndex, StringBuffer valueBlock,
-        HTMLFilterContext context)
+    private int getElementParameterValue(char[] array, int currentIndex, StringBuffer valueBlock)
     {
         int i = currentIndex;
 
@@ -744,11 +743,9 @@ public class HTMLFilter extends AbstractFilter implements Initializable
 
         public String cleanContent(String content)
         {
-            String cleanedContent = content;
-
             Matcher velocityOpenMatcher = VelocityFilter.VELOCITYOPEN_PATTERN.matcher(content);
             setVelocityOpen(isVelocityOpen() | velocityOpenMatcher.find());
-            cleanedContent = velocityOpenMatcher.replaceFirst("");
+            String cleanedContent = velocityOpenMatcher.replaceFirst("");
 
             Matcher velocityCloseMatcher = VelocityFilter.VELOCITYCLOSE_PATTERN.matcher(cleanedContent);
             setVelocityClose(isVelocityClose() | velocityCloseMatcher.find());

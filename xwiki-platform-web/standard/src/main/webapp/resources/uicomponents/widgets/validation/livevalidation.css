@@ -1,13 +1,15 @@
 .LV_validation_message{
-    font-weight:bold;
-    margin:0 0 0 5px;
+  font-size: 0.8em;
+  line-height: 1.8em;
+  margin: 0 0 0 0.5em;
+  position: absolute;
 }
 
 .LV_valid {
-    color:#00CC00;
+  color: #008000;
 }
 	
 .LV_invalid {
-    color:#CC0000;
+  color: #CC3333;
 }
 

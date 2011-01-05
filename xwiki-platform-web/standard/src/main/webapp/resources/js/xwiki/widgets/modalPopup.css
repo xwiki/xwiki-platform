@@ -59,3 +59,6 @@
   margin-bottom: 10px;
   color: $theme.textColor;
 }
+.xdialog-box .xform { 
+  width: 100%;
+}

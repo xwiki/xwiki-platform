@@ -38,7 +38,7 @@ import com.xpn.xwiki.XWikiContext;
  * <p>
  * It also make sure the context contains the proper information like the user or the wiki.
  * 
- * @version $Id: DocumentEventConverter.java 33349 2010-12-11 10:37:21Z jvelociter $
+ * @version $Id$
  * @since 2.0M3
  */
 @Component("wiki")

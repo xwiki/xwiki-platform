@@ -24,7 +24,7 @@ import org.xwiki.observation.event.filter.EventFilter;
 /**
  * An event triggered after a wiki is deleted.
  * 
- * @version $Id: DocumentCreatedEvent.java 33376 2010-12-14 14:01:28Z tmortagne $
+ * @version $Id$
  * @since 3.0M1
  */
 public class WikiDeletedEvent extends AbstractWikiEvent

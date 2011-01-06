@@ -162,7 +162,7 @@
 $xwiki.get('ssfx').use('uicomponents/widgets/validation/livevalidation.css')
 ##
 ## The * next to the fields to denote they are mandatory.
-#set($fieldMandatoryStar = $failureMessageParams)
+#set($fieldMandatoryStar = { 'class' : 'xRequired'})
 ##
 #*
  * You may include this document in other documents using {{include document="XWiki.Registration"/}}
@@ -268,7 +268,7 @@ $xwiki.get('ssfx').use('uicomponents/widgets/validation/livevalidation.css')
     'label' : $msg.get('core.register.firstName'),
     'params' : { 
       'type' : 'text', 
-      'size' : '30' 
+      'size' : '60' 
     }
   })
 #set($discard = $fields.add($field))
@@ -279,7 +279,7 @@ $xwiki.get('ssfx').use('uicomponents/widgets/validation/livevalidation.css')
     'label' : $msg.get('core.register.lastName'),
     'params' : { 
       'type' : 'text', 
-      'size' : '30' 
+      'size' : '60' 
     }
   })
 #set($discard = $fields.add($field))
@@ -291,11 +291,11 @@ $xwiki.get('ssfx').use('uicomponents/widgets/validation/livevalidation.css')
     'params' : {
       'type' : 'text',
       'onfocus' : 'prepareName(document.forms.register);',
-      'size' : '20'
+      'size' : '60'
     },
     'validate' : {
       'mandatory' : { 
-        'failureMessage' : $msg.get('xe.admin.registration.fieldMandatory') 
+        'failureMessage' : $msg.get('core.validation.required.message') 
       },
       'programmaticValidation' : {
         'code' : '#nameAvailable($request.get("xwikiname"))',
@@ -318,11 +318,11 @@ $xwiki.get('ssfx').use('uicomponents/widgets/validation/livevalidation.css')
     'label' : $msg.get('core.register.password'),
     'params' : {
       'type' : 'password',
-      'size' : '10'
+      'size' : '60'
     },
     'validate' : {
       'mandatory' : { 
-        'failureMessage' : $msg.get('xe.admin.registration.fieldMandatory') 
+        'failureMessage' : $msg.get('core.validation.required.message') 
       },
       'regex' : {
         'pattern' : '/.{6,}/',
@@ -338,11 +338,11 @@ $xwiki.get('ssfx').use('uicomponents/widgets/validation/livevalidation.css')
     'label' : $msg.get('core.register.passwordRepeat'),
     'params' : {
       'type' : 'password',
-      'size' : '10'
+      'size' : '60'
     },
     'validate' : {
       'mandatory' : { 
-        'failureMessage' : $msg.get('xe.admin.registration.fieldMandatory') 
+        'failureMessage' : $msg.get('core.validation.required.message') 
       },
       'mustMatch' : {
         'name' : 'register_password',
@@ -362,7 +362,7 @@ $xwiki.get('ssfx').use('uicomponents/widgets/validation/livevalidation.css')
     'label' : $msg.get('core.register.email'),
     'params' : { 
       'type' : 'text', 
-      'size' : '30' 
+      'size' : '60' 
     },
     'validate' : {
       'regex' : {
@@ -380,11 +380,11 @@ $xwiki.get('ssfx').use('uicomponents/widgets/validation/livevalidation.css')
     'label' : 'What is your favorite color',
     'params' : {
       'type' : 'text',
-      'size' : '25'
+      'size' : '60'
     },
     'validate' : {
       'mandatory' : {
-        'failureMessage' : $msg.get('xe.admin.registration.fieldMandatory')
+        'failureMessage' : $msg.get('core.validation.required.message')
       },
       'regex' : {
         'pattern' : '/^green$/i',
@@ -415,7 +415,7 @@ $xwiki.get('ssfx').use('uicomponents/widgets/validation/livevalidation.css')
   ## Empty 'name' field overriddes name="captcha_image" with "" so name is not specified at all.
   #set($field = 
     {'name' : 'captcha_image',
-      'label' : '',
+      'label' : "&lt;span class='hidden'&gt;$msg.get('core.captcha.image.label')&lt;/span&gt;",
       'tag' : 'img',
       'params' : {
         'src' : $doc.getURL('imagecaptcha'),
@@ -433,7 +433,7 @@ $xwiki.get('ssfx').use('uicomponents/widgets/validation/livevalidation.css')
       'label' : $msg.get('core.captcha.image.instruction'),
       'params' : { 
         'type' : 'text', 
-        'size' : '30' 
+        'size' : '60' 
       },
       'validate' : {
         'mandatory' : {
@@ -532,7 +532,7 @@ $heading
   $welcomeMessage
 
   {{html clean=false wiki=false}}
-    &lt;form id="register" action="" method="post"&gt;
+    &lt;form id="register" action="" method="post" class="xform half"&gt;
     &lt;div&gt;
     &lt;input type="hidden" name="form_token" value="$!{services.csrf.getToken()}" /&gt;
     #generateHtml($fields, $fieldMandatoryStar, $failureMessageParams)
@@ -637,7 +637,7 @@ $heading
           #set($regex = $validate.get('regex'))
           #if($regex.get('pattern') &amp;&amp; $regex.get('failureMessage'))
             ## Make Java regexes more compatible with Perl/js style regexes by removing leading and trailing /
-            #if($regex.get('pattern').length() > 1)
+            #if($regex.get('pattern').length() &gt; 1)
               #set($pattern = $regex.get('pattern').substring(1, $mathtool.add($regex.get('pattern').length(), -1)))
             #else
               ## I don't expect this but want to maintain compatibility.
@@ -794,14 +794,15 @@ $heading
       #set($fieldName = $field.get('name'))
       #if($field.get('label'))
         #set($label = $field.get('label'))
-        &lt;dt&gt;&lt;label for="$fieldName"&gt;$label&lt;/label&gt;
+        &lt;dt&gt;&lt;label for="$fieldName"&gt;$label
         #if($field.get('validate').get('mandatory'))
           &lt;span ##
           #foreach($entry in $fieldMandatoryStar.entrySet())
             $entry.getKey()="$entry.getValue()" ##
           #end
-          &gt;*&lt;/span&gt;
+          &gt;$msg.get('core.validation.required')&lt;/span&gt;
         #end
+          &lt;/label&gt;
         &lt;/dt&gt;
       #end
       ## If no tag then default tag is &lt;input&gt;
@@ -930,17 +931,17 @@ $heading
   #set($configDocument = $xwiki.getDocument($configDocumentName))
   #if(!$configDocument || !$configDocument.getObject($documentName))
     ## No config document, load defaults.
-    #set($heading = "= $msg.get('core.register.title') =")
+    #set($heading = "$msg.get('core.register.title')")
     #set($welcomeMessage = "$msg.get('core.register.welcome')")
     #set($useLiveValidation = true)
-    #set($defaultFieldOkayMessage = "$msg.get('xe.admin.registration.fieldOkay')")
+    #set($defaultFieldOkayMessage = "$msg.get('core.validation.valid.message')")
     #set($loginButton = true)
     #set($defaultRedirect = "$xwiki.getURL('Main.WebHome')")
     #set($userFullName = "$request.get('register_first_name') $request.get('register_last_name')")
     #set($registrationSuccessMessage = '{{info}}$msg.get("core.register.successful", ["[[$fullName&gt;&gt;$userSpace$userName]]", $userName]){{/info}}')
   #else
     #set($configObject = $configDocument.getObject($documentName))
-    #set($heading = "= #evaluate($configObject.getProperty('heading').getValue()) =")
+    #set($heading = "(% id='document-title'%)((( = #evaluate($configObject.getProperty('heading').getValue()) = )))(%%)")
     #set($welcomeMessage = "#evaluate($configObject.getProperty('welcomeMessage').getValue())")
     #if($configObject.getProperty('liveValidation_enabled').getValue() == 1)
       #set($useLiveValidation = true)

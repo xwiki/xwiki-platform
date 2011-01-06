@@ -1,27 +1,27 @@
 #if($isInServletMode)
 ## This template is necessary so that different skins can use different edit Panels.
 ## Thus each skin is allowed to override the editpanelsvars.vm file.
-#template("editpanelsvars.vm")
-#if($editor == "wiki")
-  #set($editorPanels = $editorPanelsWiki)
-#elseif($editor == "wysiwyg")
-  #set($editorPanels = $editorPanelsWysiwyg)
-#elseif($editor == "object")
-  #set($editorPanels = $editorPanelsObjects)
-#elseif($editor == "class")
-  #set($editorPanels = $editorPanelsClass)
-#elseif($editor == "rights")
-  #set($editorPanels = $editorPanelsRights)
-#elseif($editor == "history")
-  #set($editorPanels = $editorPanelsHistory)
+#template('editpanelsvars.vm')
+#if ($editor == 'wiki')
+  #set ($editorPanels = $editorPanelsWiki)
+#elseif ($editor == 'wysiwyg')
+  #set ($editorPanels = $editorPanelsWysiwyg)
+#elseif ($editor == 'object')
+  #set ($editorPanels = $editorPanelsObjects)
+#elseif ($editor == 'class')
+  #set ($editorPanels = $editorPanelsClass)
+#elseif ($editor == 'rights')
+  #set ($editorPanels = $editorPanelsRights)
+#elseif ($editor == 'history')
+  #set ($editorPanels = $editorPanelsHistory)
 #end
-#set($editorPanels = $editorPanels.split(","))
+#set ($editorPanels = $editorPanels.split(','))
 <div id="editPanels" class="panels editor">
-#foreach($panel in $editorPanels)
+#foreach ($panel in $editorPanels)
   #displaypanel($panel)
 #end
 </div>
-#if($editor == "wysiwyg")
+#if ($editor == 'wysiwyg')
 <script type="text/javascript">
 //<![CDATA[
   if (browser.isIE || browser.isMozilla || browser.isGecko  || browser.isSafari) {

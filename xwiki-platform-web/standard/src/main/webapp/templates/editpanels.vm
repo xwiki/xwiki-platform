@@ -2,7 +2,7 @@
 ## This template is necessary so that different skins can use different edit Panels.
 ## Thus each skin is allowed to override the editpanelsvars.vm file.
 #template("editpanelsvars.vm")
-#if($editor == "wiki" || $editor == "wysiwyg")
+#if($editor == "wiki")
   #set($editorPanels = $editorPanelsWiki)
 #elseif($editor == "wysiwyg")
   #set($editorPanels = $editorPanelsWysiwyg)

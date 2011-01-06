@@ -162,6 +162,10 @@ XWiki.actionButtons.AjaxSaveAndContinue = Class.create({
     document.observe("xwiki:actions:save", this.onSave.bindAsEventListener(this));
   },
   onSave : function(event) {
+    // Don't continue if the event has been stopped already
+    if (event.stopped) {
+      return;
+    }
     if (event.memo["continue"]) {
       if (typeof (event.memo.originalEvent) != 'undefined') {
         event.memo.originalEvent.stop();

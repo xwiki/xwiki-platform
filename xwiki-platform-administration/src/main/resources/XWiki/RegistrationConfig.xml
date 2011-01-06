@@ -290,7 +290,7 @@
 <heading>$msg.get('core.register.title')</heading>
 </property>
 <property>
-<liveValidation_defaultFieldOkMessage>$msg.get('xe.admin.registration.fieldOkay')</liveValidation_defaultFieldOkMessage>
+<liveValidation_defaultFieldOkMessage>$msg.get('core.validation.valid.message')</liveValidation_defaultFieldOkMessage>
 </property>
 <property>
 <liveValidation_enabled>1</liveValidation_enabled>

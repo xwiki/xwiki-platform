@@ -211,7 +211,7 @@ $xwiki.get('ssfx').use('uicomponents/widgets/validation/livevalidation.css')##
                 #if($velocityCount == 1)
                   #set($jsAllowedSpacesArray = "'${allowedSpace}'")
                 #else
-                  #set($jsAllowedSpacesArray = "$!{jsAllowedSpacesArray}'${allowedSpace}'")
+                  #set($jsAllowedSpacesArray = "$!{jsAllowedSpacesArray}, '${allowedSpace}'")
                 #end
               #end
             #end

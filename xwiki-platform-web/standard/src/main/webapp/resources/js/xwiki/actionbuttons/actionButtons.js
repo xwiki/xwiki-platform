@@ -59,7 +59,7 @@ XWiki.actionButtons.EditActions = Class.create({
       var input = inputs[i];
       var validator = new LiveValidation(input, { validMessage: "" });
       validator.add(Validate.Presence, {
-        failureMessage: "$msg.get('core.editors.validation.mandatoryField')"
+        failureMessage: "$msg.get('core.validation.required.message')"
       });
       validator.validate();
       this.validators.push(validator);

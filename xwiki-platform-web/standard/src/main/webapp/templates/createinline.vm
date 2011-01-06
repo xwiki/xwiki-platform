@@ -175,6 +175,7 @@ $xwiki.get('ssfx').use('uicomponents/widgets/validation/livevalidation.css')##
 ## Display the form.
 ## ---------------------------------------------------------------------------------------------------------
 <form action="$doc.getURL('create')" method="post" class="xform third">
+  <div>
   <input type="hidden" name="tocreate" value="$tocreate"/>
   #if($tocreate == 'page')
     ## ---------------------------------------------------------------------------------------------------------
@@ -309,5 +310,6 @@ $xwiki.get('ssfx').use('uicomponents/widgets/validation/livevalidation.css')##
     <span class="buttonwrapper">
       <input type="submit" class="button" value="$msg.get('create')"/>
     </span>
+  </div>
   </div>
 </form>

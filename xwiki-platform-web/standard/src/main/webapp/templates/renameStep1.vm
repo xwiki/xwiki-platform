@@ -2,17 +2,23 @@
 ### Rename document template, step 1: choose new name + updated backlinks + updated parents
 ###
 ## TODO: check if this information should be displayed?
-<h1><span>$msg.get('core.rename.title', [$escapetool.xml($doc.fullName)])</span></h1>
+<div id="document-title"><h1>$msg.get('core.rename.title', [$escapetool.xml($doc.fullName)])</h1></div>
 #set($newname = $msg.get('core.rename.inputPrompt'))
-<form action="?xpage=rename&amp;step=2" method="post"
+<form action="?xpage=rename&amp;step=2" method="post" class="xform third"
     onsubmit="if(this.newPageName.value=='${escapetool.xml($newname)}') this.newPageName.value=''">
-  <h2><span>$msg.get('core.rename.title.newName')</span></h2>
+  #set($backlinks = $doc.getBacklinks())
+  #if($backlinks.size() > 0)
+    <h2><span>$msg.get('core.rename.title.newName')</span></h2>
+  #end
   ## CSRF prevention
   <div class="hidden"><input type="hidden" name="form_token" value="$!{services.csrf.getToken()}" /></div>
   #set($pweb = $doc.space)
   <div class="padded">
     <dl>
-      <dt><label for="newSpaceName">$msg.get('core.rename.newspace')</label></dt>
+      <dt>
+        <label for="newSpaceName">$msg.get('core.rename.newspace')</label>
+        <span class="xHint">$msg.get('core.rename.newspace.hint')</span>
+      </dt>
       <dd>
         <select id="newSpaceName" name="newSpaceName">
           #set ($spaces = $xwiki.getSpaces())
@@ -21,13 +27,15 @@
           #end
         </select>
       </dd>
-      <dt><label for="newPageName">$msg.get('core.rename.newpage')</label></dt>
+      <dt>
+        <label for="newPageName">$msg.get('core.rename.newpage')</label>
+        <span class="xHint">$msg.get('core.rename.newpage.hint')</span>
+      </dt>
       <dd>
-        <input type="text" id="newPageName" name="newPageName" value="${escapetool.xml($newname)}" class="panelinput withTip"/>
+        <input type="text" id="newPageName" size="60" name="newPageName" value="${escapetool.xml($newname)}" class="panelinput withTip"/>
       </dd>
     </dl>
   </div>
-  #set($backlinks = $doc.getBacklinks())
   #if($backlinks.size() > 0)
     <h2><span>$msg.get('core.rename.title.updateDocs')</span></h2>
     #foreach($backlink in $backlinks)
@@ -53,7 +61,7 @@
       #end
     #end
   #end
-  <div class="padded">
+  <div class="padded buttons">
     <span class="buttonwrapper"><input class="button" type="submit" name="formactionrename" value="$msg.get('core.rename.submit')"/></span>
     <span class="buttonwrapper"><a class="cancel secondary button" href="$doc.getURL()">$msg.get('cancel')</a></span>
   </div>

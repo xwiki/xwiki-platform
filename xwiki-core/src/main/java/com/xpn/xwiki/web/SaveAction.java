@@ -205,6 +205,12 @@ public class SaveAction extends PreviewAction
         if ((e != null) && (e.getCode() == XWikiException.ERROR_XWIKI_APP_DOCUMENT_NOT_EMPTY)) {
             return "docalreadyexists";
         }
+
+        if ("edit".equals(context.get("display"))) {
+            // When form validation (xvalidate) fails the save action forwards to the inline action.
+            return "inline";
+        }
+
         return "exception";
     }
 }

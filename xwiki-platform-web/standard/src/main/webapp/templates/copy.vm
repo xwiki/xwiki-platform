@@ -40,18 +40,24 @@
     #set($targetlink = "<a href='${tourl}'>$!{escapetool.xml($prefixedTargetdoc)}</a>")
     #info("$msg.get('core.copy.copyingdoc', [$sourcelink, $targetlink])")
     #else
-    <form action="">
+    <form action="" class="xform third">
     <div class="hidden">
       ## CSRF prevention
       <input type="hidden" name="form_token" value="$!{services.csrf.getToken()}" />
       <input type="hidden" name="xpage" value="copy" />
     </div>
     <dl>
-      <dt>$msg.get("core.copy.sourcedoc"):</dt>
+      <dt>
+        <label>$msg.get("core.copy.sourcedoc")</label>
+        <span class="xHint">$msg.get('core.copy.sourcedoc.hint')</span>
+      </dt>
       <dd>$!{escapetool.xml($doc.fullName)} <input type="hidden" name="sourcedoc" value="$!{escapetool.xml($doc.fullName)}" size="60"/></dd>
       #set ($docTranslations = $doc.getTranslationList())
       #if ($docTranslations.size() > 0)
-      <dt><label for="language">$msg.get("language")</label>:</dt>
+      <dt>
+        <label for="language">$msg.get("language")</label>
+        <span class="xHint">$msg.get('core.copy.language.hint')</span>
+      </dt>
       <dd>
         <select id="language" name="language">
           ## Add a special "All Translations" combo box entry to copy all translations.
@@ -63,10 +69,13 @@
         </select>
       </dd>
       #end
-      <dt><label for="targetdoc">$msg.get("core.copy.targetdoc")</label>:</dt>
+      <dt>
+        <label for="targetdoc">$msg.get("core.copy.targetdoc")</label>
+        <span class="xHint">$msg.get('core.copy.targetdoc.hint')</span>
+      </dt>
       <dd><input type="text" id="targetdoc" name="targetdoc" value="$!{escapetool.xml($targetdoc)}" size="60" /></dd>
     </dl>
-    <div><span class="buttonwrapper"><input type="submit" value="Copy" class="button"/></span></div>
+    <div class="buttons"><span class="buttonwrapper"><input type="submit" value="Copy" class="button"/></span></div>
     </form>
     #end
     <div class="clearfloats"></div>

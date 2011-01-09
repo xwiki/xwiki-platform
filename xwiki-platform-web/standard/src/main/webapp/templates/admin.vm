@@ -41,7 +41,11 @@
 ##-------------------------------------------------
 ## Include AdminSheet and XWikiPreferences obj.
 ##-------------------------------------------------
-#set($include = '#includeForm("XWiki.AdminSheet")')
+#if ($doc.syntax.toIdString() == 'xwiki/1.0')
+  #set ($include = '#includeForm("XWiki.AdminSheet")')
+#else
+  #set ($include = '{{include document="XWiki.AdminSheet"/}}')
+#end
 #if ($doc.fullName == 'XWiki.XWikiPreferences' || $doc.name == 'WebPreferences')
   #if ($doc.getContent().indexOf('XWiki.AdminSheet') < 0)
     #set ($discard = $doc.setContent($include))

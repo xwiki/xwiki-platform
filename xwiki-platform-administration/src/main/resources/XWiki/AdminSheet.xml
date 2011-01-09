@@ -2970,29 +2970,29 @@ p.legend {
   &lt;div id="admin-page"&gt;
     &lt;div id="admin-page-header"&gt;
       &lt;div class="admin-page-header-spacer"&gt;&amp;nbsp;&lt;/div&gt;
-        &lt;h1 id="admin-header"&gt;#if($section == '')$escapetool.xml($msg.get("admin.${editor}"))#else $escapetool.xml($sectionname)#end&lt;/h1&gt;
-        &lt;div id="change-context"&gt;
-          &lt;label for="goto-select" class="hidden"&gt;$msg.get('admin.placetoadminister')&lt;/label&gt;
-          &lt;select id="goto-select"&gt;
-            #if ($xwiki.hasAccessLevel('admin', $xcontext.user, 'XWiki.XWikiPreferences'))
-              &lt;optgroup label="$msg.get('admin.gotoglobaladministration')"&gt;
-                &lt;option value="$xwiki.getURL('XWiki.XWikiPreferences', 'admin')" #if("$!{editor}"=="globaladmin")selected="selected"#end&gt;$msg.get('admin.globaladministration')&lt;/option&gt;
-              &lt;/optgroup&gt;
-            #end
-            &lt;optgroup label="$msg.get('admin.gotospaceadministration')"&gt;
-            #foreach($spaceitem in $xwiki.spaces)
-              #if ($xwiki.hasAccessLevel('admin', $xcontext.user, "${spaceitem}.WebPreferences"))
-                &lt;option value="$xwiki.getURL("${spaceitem}.WebPreferences", 'admin')" #if("$!{currentSpace}" == ${spaceitem} &amp;&amp; "$!{editor}" != 'globaladmin')selected="selected"#end&gt;$escapetool.xml($spaceitem)&lt;/option&gt;
-              #end
-            #end
+      &lt;h1 id="admin-header"&gt;#if($section == '')$escapetool.xml($msg.get("admin.${editor}"))#else $escapetool.xml($sectionname)#end&lt;/h1&gt;
+      &lt;div id="change-context"&gt;
+        &lt;label for="goto-select" class="hidden"&gt;$msg.get('admin.placetoadminister')&lt;/label&gt;
+        &lt;select id="goto-select"&gt;
+          #if ($xwiki.hasAccessLevel('admin', $xcontext.user, 'XWiki.XWikiPreferences'))
+            &lt;optgroup label="$msg.get('admin.gotoglobaladministration')"&gt;
+              &lt;option value="$xwiki.getURL('XWiki.XWikiPreferences', 'admin')" #if("$!{editor}"=="globaladmin")selected="selected"#end&gt;$msg.get('admin.globaladministration')&lt;/option&gt;
             &lt;/optgroup&gt;
-          &lt;/select&gt;
-          #if($section != '')&lt;br/&gt;&lt;span id="showsectionswrapper" class="buttonwrapper"&gt;&lt;a id="showsections" href="$xwiki.getURL($currentDoc, 'admin')"&gt;$msg.get('admin.showsections')&lt;/a&gt;&lt;/span&gt;
+          #end
+          &lt;optgroup label="$msg.get('admin.gotospaceadministration')"&gt;
+          #foreach($spaceitem in $xwiki.spaces)
+            #if ($xwiki.hasAccessLevel('admin', $xcontext.user, "${spaceitem}.WebPreferences"))
+              &lt;option value="$xwiki.getURL("${spaceitem}.WebPreferences", 'admin')" #if("$!{currentSpace}" == ${spaceitem} &amp;&amp; "$!{editor}" != 'globaladmin')selected="selected"#end&gt;$escapetool.xml($spaceitem)&lt;/option&gt;
+            #end
+          #end
+          &lt;/optgroup&gt;
+        &lt;/select&gt;
+        #if($section != '')&lt;br/&gt;&lt;span id="showsectionswrapper" class="buttonwrapper"&gt;&lt;a id="showsections" href="$xwiki.getURL($currentDoc, 'admin')"&gt;$msg.get('admin.showsections')&lt;/a&gt;&lt;/span&gt;
           &lt;span id="hidesectionswrapper" class="hidden buttonwrapper"&gt;&lt;a id="hidesections" href="$xwiki.getURL($currentDoc, 'admin')"&gt;$msg.get('admin.hidesections')&lt;/a&gt;&lt;/span&gt;#end
-        &lt;/div&gt; ## change-context
-        &lt;div class="admin-page-header-spacer"&gt;&amp;nbsp;&lt;/div&gt;
-      &lt;/div&gt; ## admin-page-header
-      #if($section != '')
+      &lt;/div&gt; ## change-context
+      &lt;div class="admin-page-header-spacer"&gt;&amp;nbsp;&lt;/div&gt;
+    &lt;/div&gt; ## admin-page-header
+    #if($section != '')
       &lt;div id="admin-page-content"&gt;
         &lt;div class="$escapetool.xml($sectionname)"&gt;&lt;/div&gt;        
         ##------------------------------------------------------------------------------------------------------------
@@ -3013,13 +3013,13 @@ p.legend {
           #elseif($xwiki.exists($section))
             ## Application section
             #if($hasAdminActionUrl.contains($section))
-            $xwiki.getDocument($section).getTranslatedDocument().getRenderedContent()
-          #else
-            #includeForm($section)
+              $xwiki.getDocument($section).getTranslatedDocument().getRenderedContent()
+            #else
+              #includeForm($section)
+            #end
           #end
         #end
-      #end
-      #includeForm("XWiki.ConfigurableClass")
+        #includeForm('XWiki.ConfigurableClass')
       &lt;/div&gt; ## admin-page-content
     #end
     &lt;div id="admin-page-menu" #if($section != '')class="hidden"#end&gt;

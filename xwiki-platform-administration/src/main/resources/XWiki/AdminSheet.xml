@@ -2932,16 +2932,9 @@ p.legend {
   ## hard-coded links to app. admin pages which appear at global/space level
   ## TODO: replace this when the new IX are ready
   ##----------------------------------------------------------------------------
-  #set($globalAppAdmin = ['Panels.PanelWizard', 'Photos.Links', 'XWiki.OfficeImporterAdmin'])
+  #set($globalAppAdmin = ['Panels.PanelWizard', 'XWiki.OfficeImporterAdmin'])
   #set($spaceAppAdmin = ['Panels.PanelWizard'])
-  ##-----------------------------------------------------------------------------
-  ## some applications at space level (like Panel Wizard) might require a different type of
-  ## integration to allow users with space admin rights to use them, so they will have a
-  ## "/xwiki/bin/Space/WebPreferences?section=application" type of url, while some at global level
-  ## need to use a "/xwiki/admin/App/Settings" type of url, to be edited inline
-  ## inside the administration application UI.
   ##------------------------------------------------------------------------------
-  #set($hasAdminActionUrl = ['Photos.Links'])
   #set($section = "$!{request.section}")
   ##-------------------------------------
   ## determine the displayed sections
@@ -3011,12 +3004,7 @@ p.legend {
             ## Custom XE administration section
             #includeForm("XWiki.Admin${section}Sheet")
           #elseif($xwiki.exists($section))
-            ## Application section
-            #if($hasAdminActionUrl.contains($section))
-              $xwiki.getDocument($section).getTranslatedDocument().getRenderedContent()
-            #else
-              #includeForm($section)
-            #end
+            #includeForm($section)
           #end
         #end
         #includeForm('XWiki.ConfigurableClass')
@@ -3054,11 +3042,7 @@ p.legend {
           #elseif($xwiki.exists("XWiki.Admin${asection}Sheet"))
             #set($url = $xwiki.getURL($currentDoc, 'admin', $query))
           #elseif($xwiki.exists($asection))
-            #if($hasAdminActionUrl.contains($asection))
-              #set($url = $xwiki.getURL($asection, 'admin', $query))
-            #else
-              #set($url = $xwiki.getURL($currentDoc, 'admin', $query))
-            #end
+            #set($url = $xwiki.getURL($currentDoc, 'admin', $query))
           #end
           &lt;li class="${name}"&gt;&lt;a href="$url"&gt;&lt;span&gt;#if("$!aiconurl" != '')&lt;img src="$aiconurl" alt="$name icon" /&gt;#end#if("$!atitle" != '')$atitle#else$name#end&lt;/span&gt;&lt;/a&gt;&lt;/li&gt;
         #end

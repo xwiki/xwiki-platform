@@ -34,12 +34,18 @@
   <version>1.20-SNAPSHOT</version>
   <description>XWiki Platform - Plugins - Skin Extensions</description>
   <properties>
-    <platform.core.version>2.4</platform.core.version>
+    <platform.core.version>3.0-SNAPSHOT</platform.core.version>
   </properties>
   <dependencies>
     <dependency>
       <groupId>com.xpn.xwiki.platform</groupId>
       <artifactId>xwiki-core</artifactId>
+      <version>${platform.core.version}</version>
+      <scope>provided</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-core-skin</artifactId>
       <version>${platform.core.version}</version>
       <scope>provided</scope>
     </dependency>

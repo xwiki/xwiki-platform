@@ -26,7 +26,7 @@ import org.xwiki.skinx.AbstractWrapperSkinExtension;
  * Skin extension that provides the wrapper on the file Javascript extensions.
  * 
  * @version $Id$
- * @since 3.0M1
+ * @since 1.20
  */
 @Component(JsFileSkinExtension.NAME)
 public class JsFileSkinExtension extends AbstractWrapperSkinExtension

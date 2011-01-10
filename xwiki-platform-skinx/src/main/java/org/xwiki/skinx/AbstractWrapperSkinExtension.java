@@ -33,7 +33,7 @@ import com.xpn.xwiki.plugin.skinx.SkinExtensionPluginApi;
  * extensions plugins and call the use methods on them, subclasses only need to provide the name of the skin extension.
  * 
  * @version $Id$
- * @since 3.0M1
+ * @since 1.20
  */
 public abstract class AbstractWrapperSkinExtension implements SkinExtension
 {

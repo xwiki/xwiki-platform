@@ -1,0 +1,62 @@
+.runTransformations
+.#-----------------------------------------------------
+.# Test that dashboard macro with style parameter adds the style as a class to the toplevel macro container. 
+.#-----------------------------------------------------
+.input|xwiki/2.0
+.#-----------------------------------------------------
+{{dashboard layout="columns" style="colortheme"}}
+((({{gadget/}})))
+{{/dashboard}}
+
+{{dashboard style="colortheme"}}
+((({{gadget/}})))
+{{/dashboard}}
+.#-----------------------------------------------------
+.expect|event/1.0
+.#-----------------------------------------------------
+beginDocument
+beginMacroMarkerStandalone [dashboard] [layout=columns|style=colortheme] [((({{gadget/}})))]
+beginGroup [[class]=[dashboard colortheme]]
+beginGroup [[class]=[container-justified container-columns]]
+beginGroup [[class]=[column first-column last-column]]
+beginGroup [[class]=[gadget]]
+beginHeader [2, null] [[class]=[gadget-title]]
+onWord [Gadget]
+endHeader [2, null] [[class]=[gadget-title]]
+beginGroup [[class]=[gadget-content]]
+beginMacroMarkerStandalone [gadget] []
+onWord [gadget]
+endMacroMarkerStandalone [gadget] []
+endGroup [[class]=[gadget-content]]
+endGroup [[class]=[gadget]]
+endGroup [[class]=[column first-column last-column]]
+beginGroup [[class]=[clearfloats]]
+endGroup [[class]=[clearfloats]]
+endGroup [[class]=[container-justified container-columns]]
+endGroup [[class]=[dashboard colortheme]]
+endMacroMarkerStandalone [dashboard] [layout=columns|style=colortheme] [((({{gadget/}})))]
+beginMacroMarkerStandalone [dashboard] [style=colortheme] [((({{gadget/}})))]
+beginGroup [[class]=[dashboard colortheme]]
+beginGroup [[class]=[container-justified container-columns]]
+beginGroup [[class]=[column first-column last-column]]
+beginGroup [[class]=[gadget]]
+beginHeader [2, null] [[class]=[gadget-title]]
+onWord [Gadget]
+endHeader [2, null] [[class]=[gadget-title]]
+beginGroup [[class]=[gadget-content]]
+beginMacroMarkerStandalone [gadget] []
+onWord [gadget]
+endMacroMarkerStandalone [gadget] []
+endGroup [[class]=[gadget-content]]
+endGroup [[class]=[gadget]]
+endGroup [[class]=[column first-column last-column]]
+beginGroup [[class]=[clearfloats]]
+endGroup [[class]=[clearfloats]]
+endGroup [[class]=[container-justified container-columns]]
+endGroup [[class]=[dashboard colortheme]]
+endMacroMarkerStandalone [dashboard] [style=colortheme] [((({{gadget/}})))]
+endDocument
+.#-----------------------------------------------------
+.expect|xhtml/1.0
+.#-----------------------------------------------------
+<div class="dashboard colortheme"><div class="container-justified container-columns"><div class="column first-column last-column"><div class="gadget"><h2 class="gadget-title wikigeneratedheader"><span>Gadget</span></h2><div class="gadget-content">gadget</div></div></div><div class="clearfloats"></div></div></div><div class="dashboard colortheme"><div class="container-justified container-columns"><div class="column first-column last-column"><div class="gadget"><h2 class="gadget-title wikigeneratedheader"><span>Gadget</span></h2><div class="gadget-content">gadget</div></div></div><div class="clearfloats"></div></div></div>

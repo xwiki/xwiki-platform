@@ -62,6 +62,7 @@ public class DashboardMacroParameters
 
     /**
      * @return the style of the dasbboard
+     * @since 3.0M1
      */
     public String getStyle()
     {
@@ -70,6 +71,7 @@ public class DashboardMacroParameters
 
     /**
      * @param style the style to set
+     * @since 3.0M1
      */
     @PropertyDescription("The identifier of the style to be used for this dashboard. No style means that the gadgets "
         + "will be rendered plain, as content of the page. \"colortheme\" style will render the gadgets the same as "

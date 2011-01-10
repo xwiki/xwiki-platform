@@ -55,5 +55,10 @@
       <artifactId>xwiki-core-rendering-macro-container</artifactId>
       <version>${project.version}</version>
     </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-core-skin</artifactId>
+      <version>${project.version}</version>
+    </dependency>
   </dependencies>
 </project>

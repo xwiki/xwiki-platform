@@ -66,6 +66,7 @@ public class ContainerMacroParameters
 
     /**
      * @return the CSS class to add to this container
+     * @since 3.0M1
      */
     public String getCssClass()
     {
@@ -74,6 +75,7 @@ public class ContainerMacroParameters
 
     /**
      * @param cssClass the value of the class attribute to set for CSS styling
+     * @since 3.0M1
      */
     @PropertyDescription("Value of the HTML class attribute to add to this container, used to style in CSS.")
     public void setCssClass(String cssClass)

@@ -20,7 +20,9 @@
 package org.xwiki.rendering.internal.macro.dashboard;
 
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.commons.lang.StringUtils;
 import org.xwiki.component.annotation.Component;
@@ -35,6 +37,7 @@ import org.xwiki.rendering.macro.MacroExecutionException;
 import org.xwiki.rendering.macro.container.ContainerMacroParameters;
 import org.xwiki.rendering.macro.dashboard.DashboardMacroParameters;
 import org.xwiki.rendering.transformation.MacroTransformationContext;
+import org.xwiki.skinx.SkinExtension;
 
 /**
  * The dashboard macro, to display other macros as gadgets in a dashboard, using a container to include its contents.
@@ -62,6 +65,12 @@ public class DashboardMacro extends AbstractMacro<DashboardMacroParameters>
     private Macro<ContainerMacroParameters> containerMacro;
 
     /**
+     * CSS file skin extension, to include the dashboard css.
+     */
+    @Requirement("ssfx")
+    private SkinExtension ssfx;
+
+    /**
      * The component manager, to inject to the GadgetBoxMacro.
      */
     @Requirement
@@ -84,6 +93,11 @@ public class DashboardMacro extends AbstractMacro<DashboardMacroParameters>
     public List<Block> execute(DashboardMacroParameters parameters, String content, MacroTransformationContext context)
         throws MacroExecutionException
     {
+        Map<String, Object> fxParams = new HashMap<String, Object>();
+        fxParams.put("forceSkinAction", true);
+
+        ssfx.use("uicomponents/dashboard/dashboard.css", fxParams);
+
         // do the layouting with the container macro
         ContainerMacroParameters containerParameters = new ContainerMacroParameters();
         containerParameters.setJustify(true);

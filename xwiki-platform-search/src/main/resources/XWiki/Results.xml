@@ -59,7 +59,7 @@
             #if($item.type == 'attachment')
               &lt;a href="$xwiki.getDocument($itemfullname).getAttachmentURL($item.filename)"&gt;$xwiki.getXMLEncoded($item.filename)&lt;/a&gt;
             #else
-              &lt;a href="$xwiki.getURL($itemfullname)"&gt;$xwiki.getXMLEncoded($xwiki.getDocument($itemfullname).getDisplayTitle())&lt;/a&gt;
+              &lt;a href="$xwiki.getURL($itemfullname)"&gt;$escapetool.xml($xwiki.getDocument($itemfullname).getRenderedTitle("plain/1.0"))&lt;/a&gt;
             #end
           #else
             &lt;a href="$xwiki.getURL($itemfullname)"&gt;$xwiki.getXMLEncoded($itemDoc.getDisplayTitle())&lt;/a&gt;

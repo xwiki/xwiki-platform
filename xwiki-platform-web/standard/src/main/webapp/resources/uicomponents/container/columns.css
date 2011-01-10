@@ -1,0 +1,28 @@
+## get the number of columns from the parameter
+#set($columns = "$request.columns")
+#set($columnsNumber = $util.parseInt("$!columns"))
+## don't fill 100% because IE doesn't fit things properly in
+#set($columnsTotalWidth = 99.9)
+## 1.5% padding right to all the columns except last one
+#set($columnRightPadding = 1.5)
+## compute the percent of the screen width of a column
+#set($computedColumnWidth = (($columnsTotalWidth - $columnRightPadding * ($columnsNumber - 1)) / $columnsNumber))
+
+## FIXME: this style should not be here, it's style for the container overall, not for the columns layout. 
+## For the moment it's here to minimize the number of requested csss, 
+## since there are no other container rules at the moment (like border, title, or other decoration).
+.container-justified {
+  text-align: justify;
+}
+
+## set all the styles computed above
+
+.container-columns .column {
+  float: left;
+  width: ${computedColumnWidth}%;
+  padding-right: ${columnRightPadding}%;
+}
+
+.container-columns .last-column {
+  padding-right: 0;
+}

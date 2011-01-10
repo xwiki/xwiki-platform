@@ -19,10 +19,17 @@
  */
 package org.xwiki.rendering;
 
+import java.util.Map;
+
 import junit.framework.Test;
 import junit.framework.TestCase;
 
+import org.jmock.Expectations;
+import org.jmock.Mockery;
+import org.jmock.integration.junit4.JUnit4Mockery;
+import org.xwiki.component.descriptor.DefaultComponentDescriptor;
 import org.xwiki.rendering.scaffolding.RenderingTestSuite;
+import org.xwiki.skinx.SkinExtension;
 import org.xwiki.test.ComponentManagerTestSetup;
 
 /**
@@ -34,6 +41,11 @@ import org.xwiki.test.ComponentManagerTestSetup;
 public class RenderingTests extends TestCase
 {
     /**
+     * The mockery to create the skinx mocks.
+     */
+    private static Mockery mockery = new JUnit4Mockery();
+
+    /**
      * Builds the test suite.
      * 
      * @return the test suite for the container tests.
@@ -42,6 +54,37 @@ public class RenderingTests extends TestCase
     public static Test suite() throws Exception
     {
         RenderingTestSuite suite = new RenderingTestSuite("Test Container Macro");
-        return new ComponentManagerTestSetup(suite);
+
+        ComponentManagerTestSetup testSetup = new ComponentManagerTestSetup(suite);
+        setUpSkinExtensionStubs(testSetup);
+
+        return testSetup;
+    }
+
+    /**
+     * Sets up the stubs for the skin extensions, allowing use methods to be called on them.
+     * 
+     * @param testSetup the test setup to register the skinx stubs in
+     * @throws Exception in case anything goes wrong
+     */
+    private static void setUpSkinExtensionStubs(ComponentManagerTestSetup testSetup) throws Exception
+    {
+        final SkinExtension ssfxMock = mockery.mock(SkinExtension.class, "ssfxMock");
+
+        mockery.checking(new Expectations()
+        {
+            {
+                String cssPath = "uicomponents/container/columns.css";
+                allowing(ssfxMock).use(with(cssPath));
+                allowing(ssfxMock).use(with(cssPath), with(any(Map.class)));
+            }
+        });
+
+        // and inject these in the test setup
+        DefaultComponentDescriptor<SkinExtension> ssfxDesc = new DefaultComponentDescriptor<SkinExtension>();
+        ssfxDesc.setRole(SkinExtension.class);
+        ssfxDesc.setRoleHint("ssfx");
+
+        testSetup.getComponentManager().registerComponent(ssfxDesc, ssfxMock);
     }
 }

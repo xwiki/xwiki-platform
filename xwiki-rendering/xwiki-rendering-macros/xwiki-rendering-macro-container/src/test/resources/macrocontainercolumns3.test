@@ -14,24 +14,24 @@
 beginDocument
 beginMacroMarkerStandalone [container] [layoutStyle=columns] [(((foo)))
 (((bar)))]
-beginGroup
-beginGroup [[style]=[float: left;width:49.2%;padding-right:1.5%;]]
+beginGroup [[class]=[container-columns]]
+beginGroup [[class]=[column first-column]]
 beginParagraph
 onWord [foo]
 endParagraph
-endGroup [[style]=[float: left;width:49.2%;padding-right:1.5%;]]
-beginGroup [[style]=[float: left;width:49.2%;]]
+endGroup [[class]=[column first-column]]
+beginGroup [[class]=[column last-column]]
 beginParagraph
 onWord [bar]
 endParagraph
-endGroup [[style]=[float: left;width:49.2%;]]
-beginGroup [[style]=[clear: both;]]
-endGroup [[style]=[clear: both;]]
-endGroup
+endGroup [[class]=[column last-column]]
+beginGroup [[class]=[clearfloats]]
+endGroup [[class]=[clearfloats]]
+endGroup [[class]=[container-columns]]
 endMacroMarkerStandalone [container] [layoutStyle=columns] [(((foo)))
 (((bar)))]
 endDocument
 .#-----------------------------------------------------
 .expect|xhtml/1.0
 .#-----------------------------------------------------
-<div><div style="float: left;width:49.2%;padding-right:1.5%;"><p>foo</p></div><div style="float: left;width:49.2%;"><p>bar</p></div><div style="clear: both;"></div></div>
+<div class="container-columns"><div class="column first-column"><p>foo</p></div><div class="column last-column"><p>bar</p></div><div class="clearfloats"></div></div>

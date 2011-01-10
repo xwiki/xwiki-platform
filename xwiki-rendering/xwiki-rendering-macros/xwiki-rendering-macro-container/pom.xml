@@ -50,4 +50,11 @@
       </plugin>
     </plugins>
   </build>
+  <dependencies>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-core-skin</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+  </dependencies>
 </project>

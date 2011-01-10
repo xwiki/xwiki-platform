@@ -42,14 +42,14 @@ import org.xwiki.rendering.transformation.MacroTransformationContext;
  * 
  * @param <P> the macro parameters bean
  * @version $Id$
- * @since 3.0
+ * @since 3.0M1
  */
 public abstract class AbstractContainerMacro<P extends ContainerMacroParameters> extends AbstractMacro<P>
 {
     /**
      * The name of the parameter to convey style information to the HTML (html style attribute).
      */
-    private static final String STYLE_ATTRIBUTE = "style";
+    private static final String CLASS_ATTRIBUTE = "class";
 
     /**
      * The component manager used to dynamically fetch components (syntax parsers, in this case).
@@ -75,10 +75,12 @@ public abstract class AbstractContainerMacro<P extends ContainerMacroParameters>
     public List<Block> execute(P parameters, String content, MacroTransformationContext context)
         throws MacroExecutionException
     {
+        // TODO: include here container CSS. FTM the only rule, the one about justified text, is in the columns.css, in
+        // which case the justification makes the most sense.
         // transform the container in a group, with appropriate parameters
         Map<String, String> containerParameters = new HashMap<String, String>();
         if (parameters.isJustify()) {
-            containerParameters.put(STYLE_ATTRIBUTE, "text-align: justify;");
+            containerParameters.put(CLASS_ATTRIBUTE, "container-justified");
         }
 
         // create the root block for the container macro, as a group block, and add all the blocks resulted from parsing
@@ -95,7 +97,7 @@ public abstract class AbstractContainerMacro<P extends ContainerMacroParameters>
 
         // add the css class, if any, to the container root
         if (!StringUtils.isEmpty(parameters.getCssClass())) {
-            containerRoot.setParameter("class", parameters.getCssClass());
+            containerRoot.setParameter(CLASS_ATTRIBUTE, parameters.getCssClass());
         }
 
         // and finally return the styled container root

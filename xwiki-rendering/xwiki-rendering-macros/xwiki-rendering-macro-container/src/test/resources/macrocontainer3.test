@@ -14,18 +14,18 @@ foobar
 .#-----------------------------------------------------
 beginDocument
 beginMacroMarkerStandalone [container] [justify=true] [foobar]
-beginGroup [[style]=[text-align: justify;]]
+beginGroup [[class]=[container-justified]]
 beginParagraph
 onWord [foobar]
 endParagraph
-endGroup [[style]=[text-align: justify;]]
+endGroup [[class]=[container-justified]]
 endMacroMarkerStandalone [container] [justify=true] [foobar]
 beginMacroMarkerStandalone [container] [justify=true]
-beginGroup [[style]=[text-align: justify;]]
-endGroup [[style]=[text-align: justify;]]
+beginGroup [[class]=[container-justified]]
+endGroup [[class]=[container-justified]]
 endMacroMarkerStandalone [container] [justify=true]
 endDocument
 .#-----------------------------------------------------
 .expect|xhtml/1.0
 .#-----------------------------------------------------
-<div style="text-align: justify;"><p>foobar</p></div><div style="text-align: justify;"></div>
+<div class="container-justified"><p>foobar</p></div><div class="container-justified"></div>

@@ -20,14 +20,16 @@
 package org.xwiki.rendering.internal.macro.container;
 
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.lang.StringUtils;
 import org.xwiki.component.annotation.Component;
+import org.xwiki.component.annotation.Requirement;
 import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.block.GroupBlock;
 import org.xwiki.rendering.macro.container.LayoutManager;
+import org.xwiki.skinx.SkinExtension;
 
 /**
  * Layout manager implementation to layout the group blocks inside a container as columns.
@@ -39,14 +41,15 @@ import org.xwiki.rendering.macro.container.LayoutManager;
 public class ColumnsLayoutManager implements LayoutManager
 {
     /**
-     * The total width of the container, in the page.
-     */
-    private static final double TOTAL_WIDTH = 99.9;
-
-    /**
      * The name of the parameter to convey style information to the HTML (html style attribute).
      */
-    private static final String PARAMETER_STYLE = "style";
+    private static final String CLASS_ATTRIBUTE = "class";
+
+    /**
+     * The javascript file skin extension, to fetch the columns layout css.
+     */
+    @Requirement("ssfx")
+    private SkinExtension ssfx;
 
     /**
      * {@inheritDoc}
@@ -66,27 +69,35 @@ public class ColumnsLayoutManager implements LayoutManager
             return;
         }
 
-        // default padding, maybe should be read as a parameter
-        double columnRightPadding = 1.5;
-        // width of each column
-        double computedColumnWidth = ((TOTAL_WIDTH - columnRightPadding * (count - 1)) / count);
+        Map<String, Object> skinxParams = new HashMap<String, Object>();
+        skinxParams.put("forceSkinAction", true);
+        skinxParams.put("columns", count);
+        ssfx.use("uicomponents/container/columns.css", skinxParams);
 
         // add styles to all columns inside
-        Iterator<GroupBlock> it = innerGroups.iterator();
-        while (it.hasNext()) {
-            GroupBlock column = it.next();
-            ColumnStyle style = new ColumnStyle();
-            style.setWidthPercent(computedColumnWidth);
-            if (it.hasNext()) {
-                style.setPaddingRightPercent(columnRightPadding);
+        for (int i = 0; i < count; i++) {
+            GroupBlock column = innerGroups.get(i);
+            String classValue = "column";
+            if (i == 0) {
+                // we're at the first element in the list, put a marker. Don't need it to do standard columns layout,
+                // but maybe somebody needs it for customization...
+                classValue = classValue + " first-column";
             }
-            // FIXME: merge the HTML style attribute?
-            column.setParameter(PARAMETER_STYLE, style.getStyleAsString());
+            if (i == count - 1) {
+                // we're at the last element in the list, put a marker
+                classValue = classValue + " last-column";
+            }
+            String oldClass = column.getParameter(CLASS_ATTRIBUTE);
+            column.setParameter(CLASS_ATTRIBUTE, (StringUtils.isEmpty(oldClass) ? classValue : oldClass + " "
+                + classValue));
         }
 
         // finally, clear the floats introduced by the columns
         Map<String, String> clearFloatsParams = new HashMap<String, String>();
-        clearFloatsParams.put(PARAMETER_STYLE, "clear: both;");
+        clearFloatsParams.put(CLASS_ATTRIBUTE, "clearfloats");
+        String oldClass = container.getParameter(CLASS_ATTRIBUTE);
+        String newClass = "container-columns";
+        container.setParameter(CLASS_ATTRIBUTE, StringUtils.isEmpty(oldClass) ? newClass : oldClass + " " + newClass);
         container.addChild(new GroupBlock(clearFloatsParams));
     }
 

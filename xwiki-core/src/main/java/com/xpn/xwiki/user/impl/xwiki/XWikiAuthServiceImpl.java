@@ -605,7 +605,7 @@ public class XWikiAuthServiceImpl extends AbstractXWikiAuthService
         return param;
     }
 
-    protected void createUser(String user, XWikiContext context) throws XWikiException
+    protected String createUser(String user, XWikiContext context) throws XWikiException
     {
         String createuser = getParam("auth_createuser", context);
 
@@ -648,7 +648,11 @@ public class XWikiAuthServiceImpl extends AbstractXWikiAuthService
                     LOG.debug("User page already exists for user " + user);
                 }
             }
+
+            return wikiname;
         }
+
+        return user;
     }
 
     /**

@@ -26,7 +26,7 @@ import org.xwiki.skinx.AbstractWrapperSkinExtension;
  * Skin extension that provides the wrapper on the file CSS extensions.
  * 
  * @version $Id$
- * @since 3.0M1
+ * @since 1.20
  */
 @Component(CssFileSkinExtension.NAME)
 public class CssFileSkinExtension extends AbstractWrapperSkinExtension

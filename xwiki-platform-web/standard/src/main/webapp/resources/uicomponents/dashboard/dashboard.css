@@ -1,0 +1,28 @@
+#template('colorThemeInit.vm')
+
+/* colortheme gadget settings */
+.colortheme .gadget .gadget-title {
+  background-color: $theme.panelHeaderBackgroundColor;
+  border-bottom: 1px dotted $theme.borderColor;
+  color: $theme.panelHeaderTextColor;
+  font-size: .8em;
+  font-weight: 700;
+  letter-spacing: 0;
+  margin: 0;
+  padding: 6px 20px 6px 15px;
+  text-align: left;
+  text-transform: uppercase;
+}
+
+.colortheme .gadget {
+  border: 1px dotted $theme.borderColor;
+  background-color: $theme.panelBackgroundColor;
+  margin: 1em 0;
+}
+
+.colortheme .gadget .gadget-content {
+  background-color: $theme.panelBackgroundColor;
+  color: $theme.panelTextColor;
+  padding: 10px 15px;
+}
+

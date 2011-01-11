@@ -33,6 +33,7 @@ import org.xwiki.gwt.wysiwyg.client.plugin.style.exec.BlockStyleNameExecutable;
 import org.xwiki.gwt.wysiwyg.client.plugin.style.exec.InlineStyleNameExecutable;
 
 import com.google.gwt.dom.client.Node;
+import com.google.gwt.dom.client.NodeList;
 import com.google.gwt.dom.client.OptGroupElement;
 import com.google.gwt.dom.client.OptionElement;
 import com.google.gwt.dom.client.SelectElement;
@@ -127,7 +128,8 @@ public class StylePlugin extends AbstractStatefulPlugin implements ChangeHandler
         for (StyleDescriptor descriptor : parser.parse(getConfig().getParameter("styleNames", "[]"))) {
             styleNamePicker.addItem(descriptor.getLabel(), descriptor.getName());
             OptGroupElement group = descriptor.isInline() ? inlineStyleGroup : blockStyleGroup;
-            group.appendChild(styleNamePicker.getElement().getLastChild());
+            NodeList<OptionElement> options = SelectElement.as(styleNamePicker.getElement()).getOptions();
+            group.appendChild(options.getItem(options.getLength() - 1));
         }
         styleNamePicker.setSelectedIndex(0);
 

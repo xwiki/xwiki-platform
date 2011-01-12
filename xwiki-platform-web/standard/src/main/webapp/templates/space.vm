@@ -6,7 +6,7 @@
 #set($discard = $parents.add($parent))
 #set($pdoc = $xwiki.getDocument($parent).getTranslatedDocument())
 #set($pdocurl = $pdoc.getURL("view"))
-#set($nstring = "<a href='$pdocurl'>$escapetool.xml(${pdoc.getRenderedTitle('plain/1.0')})</a> &#187; $string")
+#set($nstring = "<a href='$pdocurl'>$escapetool.xml(${pdoc.getPlainTitle()})</a> &#187; $string")
 #set($level = $level + 1)
 #breadcrumb($pdoc $nstring $level)
 #else
@@ -19,7 +19,7 @@ $string
 <hr/>
   <div id="breadcrumbs">
     <span class="breadcrumbspace"><a href="$spaceViewUrl">$escapetool.xml(${doc.space})</a>: </span>
-#breadcrumb($doc "<a href='${doc.getURL('view')}'>$escapetool.xml($tdoc.getRenderedTitle('plain/1.0'))</a>" 0)
+#breadcrumb($doc "<a href='${doc.getURL('view')}'>$escapetool.xml($tdoc.getPlainTitle())</a>" 0)
   </div>
   #if($xcontext.action == 'edit' && ($editor == 'wiki' || $editor == 'wysiwyg'))
     <div class='edit-meta-tools'><a id='editParentTrigger' class='tool edit-parent' href='#headerspace' title="$msg.get('core.editors.content.parentField.edit.title')">[$msg.get('core.editors.content.parentField.edit')]</a></div>

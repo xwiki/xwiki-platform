@@ -1,11 +1,19 @@
 ###
 ### Code page in the "view" mode
 ###
-###
 $xwiki.jsfx.use('uicomponents/viewers/code.js', true)##
 $xwiki.jsfx.use('uicomponents/widgets/fullScreen.js', true)##
 $xwiki.ssfx.use('uicomponents/widgets/fullScreen.css', true)##
-<div id="document-title"><h1>$msg.get('core.viewers.code.title', [$escapetool.xml($doc.displayTitle), $doc.getURL()])</h1></div>
+<div id="document-title"><h1>$msg.get('core.viewers.code.title', [$escapetool.xml($doc.getPlainTitle()), $doc.getURL()])</h1></div>
+## ----------------------------
+## Display the shortcuts
+## ----------------------------
+#if($displayShortcuts)
+  #template("shortcuts.vm")
+#end
+## ----------------------------
+## Display the code
+## ----------------------------
 #set($escapedcontent = $escapetool.html($tdoc.translatedContent))
 #set($ln = "$!request.getParameter('showlinenumbers')")
 <div>

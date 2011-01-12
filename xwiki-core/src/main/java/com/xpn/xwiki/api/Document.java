@@ -296,11 +296,19 @@ public class Document extends Api
      * document's content and if not found return the page name. The returned title is also interpreted which means it's
      * allowed to use Velocity, Groovy, etc syntax within a title.
      * 
-     * @return The document title.
+     * @return The document title as XHTML
      */
     public String getDisplayTitle()
     {
         return this.doc.getDisplayTitle(getXWikiContext());
+    }
+
+    /**
+     * @return the document title as plain text (all markup removed)
+     */
+    public String getPlainTitle()
+    {
+        return this.doc.getRenderedTitle(Syntax.PLAIN_1_0, getXWikiContext());
     }
 
     /**
@@ -764,9 +772,9 @@ public class Document extends Api
 
      * @see #getURL() for a relative URL which can only be used inside of the site.
      */
-    public String getExternalURL(String action, String querystring)
+    public String getExternalURL(String action, String queryString)
     {
-        return this.doc.getExternalURL(action, querystring, getXWikiContext());
+        return this.doc.getExternalURL(action, queryString, getXWikiContext());
     }
 
     public String getParentURL() throws XWikiException

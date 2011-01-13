@@ -1697,7 +1697,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface, EventListener
     public DeletedAttachment getDeletedAttachment(String id, XWikiContext context) throws XWikiException
     {
         if (hasAttachmentRecycleBin(context)) {
-            return getAttachmentRecycleBinStore().getDeletedAttachment(NumberUtils.toInt(id), context, true);
+            return getAttachmentRecycleBinStore().getDeletedAttachment(NumberUtils.toLong(id), context, true);
         }
         return null;
     }

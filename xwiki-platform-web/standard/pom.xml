@@ -353,9 +353,9 @@
       <plugins>
         <!-- Javascript and CSS files compression -->
         <plugin>
-          <groupId>net.sf.alchim</groupId>
+          <groupId>net.alchim31.maven</groupId>
           <artifactId>yuicompressor-maven-plugin</artifactId>
-          <version>0.7.1</version>
+          <version>1.1</version>
           <configuration>
             <!-- Don't output in the default webapp location, since the war plugin will overwrite the files in there
                  with the original, uncompressed ones. -->
@@ -399,7 +399,7 @@
         <plugins>
           <!-- Javascript and CSS files compression -->
           <plugin>
-            <groupId>net.sf.alchim</groupId>
+            <groupId>net.alchim31.maven</groupId>
             <artifactId>yuicompressor-maven-plugin</artifactId>
             <executions>
               <execution>
@@ -414,7 +414,7 @@
       </build>
     </profile>
     <profile>
-      <id>jettyrun</id>      
+      <id>jettyrun</id>
       <build>
         <plugins>
           <!-- Run 'mvn install -Pjettyrun' to execute xwiki in Jetty. Useful for testing.
@@ -507,7 +507,7 @@
           </plugin>
           <!-- Javascript and CSS files compression -->
           <plugin>
-            <groupId>net.sf.alchim</groupId>
+            <groupId>net.alchim31.maven</groupId>
             <artifactId>yuicompressor-maven-plugin</artifactId>
             <executions>
               <execution>
@@ -516,8 +516,8 @@
                   <goal>compress</goal>
                 </goals>
               </execution>
-            </executions>        
-          </plugin>          
+            </executions>
+          </plugin>
         </plugins>
       </build>
     </profile>

@@ -85,11 +85,9 @@ public class DefaultMacroCategoryManagerTest extends AbstractComponentTestCase
         final Macro testMacro2 = getMockery().mock(Macro.class, "mock2");
         getMockery().checking(new Expectations(){{
             allowing(testMacro1).getDescriptor();
-            will(returnValue(new DefaultMacroDescriptor("Test macro - 1")));
-        }});
-        getMockery().checking(new Expectations(){{
+            will(returnValue(new DefaultMacroDescriptor(new MacroId("macro1"), "Test macro - 1")));
             allowing(testMacro2).getDescriptor();
-            will(returnValue(new DefaultMacroDescriptor("Test macro - 2")));
+            will(returnValue(new DefaultMacroDescriptor(new MacroId("macro2"), "Test macro - 2")));
         }});
         
         // Register these macros against CM as macros registered for all syntaxes.
@@ -130,7 +128,7 @@ public class DefaultMacroCategoryManagerTest extends AbstractComponentTestCase
         final Macro mockMacro = registerMockComponent(Macro.class, "mytestmacro/xwiki/2.0");
         getMockery().checking(new Expectations(){{
             allowing(mockMacro).getDescriptor();
-            will(returnValue(new DefaultMacroDescriptor("Test macro")));
+            will(returnValue(new DefaultMacroDescriptor(new MacroId("test"), "Test macro")));
         }});
         
         // Override the macro category for this macro. 

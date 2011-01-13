@@ -26,6 +26,7 @@ import org.xwiki.properties.BeanManager;
 import org.xwiki.properties.annotation.PropertyDescription;
 import org.xwiki.properties.annotation.PropertyHidden;
 import org.xwiki.properties.annotation.PropertyMandatory;
+import org.xwiki.rendering.macro.MacroId;
 import org.xwiki.test.AbstractMockingComponentTestCase;
 
 /**
@@ -125,7 +126,7 @@ public class DefaultMacroDescriptorTest extends AbstractMockingComponentTestCase
         super.setUp();
         BeanManager propertiesManager = getComponentManager().lookup(BeanManager.class);
         macroDescriptor =
-            new DefaultMacroDescriptor("Name", "Description", new DefaultContentDescriptor(),
+            new DefaultMacroDescriptor(new MacroId("Id"), "Name", "Description", new DefaultContentDescriptor(),
                 propertiesManager.getBeanDescriptor(ParametersTests.class));
     }
 

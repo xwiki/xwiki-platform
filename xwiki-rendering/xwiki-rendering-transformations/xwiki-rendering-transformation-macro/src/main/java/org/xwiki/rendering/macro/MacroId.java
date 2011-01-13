@@ -48,7 +48,7 @@ public class MacroId
     private Syntax syntax;
 
     /**
-     * Constructor for macros registrered for all syntaxes.
+     * Constructor for macros registered for all syntaxes.
      *
      * @param id see {@link #getId()}
      */
@@ -58,7 +58,7 @@ public class MacroId
     }
 
     /**
-     * Constructor for macros registrered for a specific syntax only.
+     * Constructor for macros registered for a specific syntax only.
      *
      * @param id see {@link #getId()}
      * @param syntax see {@link #getSyntax()}

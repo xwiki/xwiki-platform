@@ -41,17 +41,6 @@ public class DefaultMacroDescriptor extends AbstractMacroDescriptor
     }
 
     /**
-     * @param name the name of the macro (eg "Table Of Contents" for the TOC macro)
-     * @since 2.0M3
-     * @deprecated since 2.3M1 use {@link #DefaultMacroDescriptor(MacroId, String)} instead
-     */
-    @Deprecated
-    public DefaultMacroDescriptor(String name)
-    {
-        this(name, null);
-    }
-
-    /**
      * @param id the id of the macro
      * @param name the name of the macro (eg "Table Of Contents" for the TOC macro)
      * @param description the description of the macro.
@@ -60,18 +49,6 @@ public class DefaultMacroDescriptor extends AbstractMacroDescriptor
     public DefaultMacroDescriptor(MacroId id, String name, String description)
     {
         super(id, name, description, new DefaultContentDescriptor(), null);
-    }
-
-    /**
-     * @param name the name of the macro (eg "Table Of Contents" for the TOC macro)
-     * @param description the description of the macro.
-     * @since 2.0M3
-     * @deprecated since 2.3M1 use {@link #DefaultMacroDescriptor(MacroId, String, String)} instead
-     */
-    @Deprecated
-    public DefaultMacroDescriptor(String name, String description)
-    {
-        super(name, description, new DefaultContentDescriptor(), null);
     }
 
     /**
@@ -84,37 +61,6 @@ public class DefaultMacroDescriptor extends AbstractMacroDescriptor
     public DefaultMacroDescriptor(MacroId id, String name, String description, ContentDescriptor contentDescriptor)
     {
         super(id, name, description, contentDescriptor, null);
-    }
-
-    /**
-     * @param name the name of the macro (eg "Table Of Contents" for the TOC macro)
-     * @param description the description of the macro.
-     * @param contentDescriptor description of the macro content.
-     * @since 2.0M3
-     * @deprecated since 2.3M1 use {@link #DefaultMacroDescriptor(MacroId, String, String, ContentDescriptor)} instead
-     */
-    @Deprecated
-    public DefaultMacroDescriptor(String name, String description, ContentDescriptor contentDescriptor)
-    {
-        super(name, description, contentDescriptor, null);
-    }
-
-    /**
-     * @param name the name of the macro (eg "Table Of Contents" for the TOC macro)
-     * @param description the description of the macro.
-     * @param contentDescriptor the description of the macro content. null indicate macro does not support content.
-     * @param parametersBeanDescriptor the description of the parameters bean.
-     * @since 2.0M3
-     * @deprecated since 2.3M1 use
-     *             {@link #DefaultMacroDescriptor(MacroId, String, String, ContentDescriptor, BeanDescriptor)} instead
-     */
-    @Deprecated
-    public DefaultMacroDescriptor(String name, String description, ContentDescriptor contentDescriptor,
-        BeanDescriptor parametersBeanDescriptor)
-    {
-        super(name, description, contentDescriptor, parametersBeanDescriptor);
-
-        extractParameterDescriptorMap();
     }
 
     /**

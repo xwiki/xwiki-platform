@@ -54,7 +54,7 @@ XWiki.actionButtons.EditActions = Class.create({
   validators : new Array(), 
   addValidators : function() {
     // Add live presence validation for inputs with classname 'required'.
-    var inputs = document.body.select("input.required");
+    var inputs = $(document.body).select("input.required");
     for (var i = 0; i < inputs.length; i++) {
       var input = inputs[i];
       var validator = new LiveValidation(input, { validMessage: "" });

@@ -29,7 +29,6 @@ import java.util.Set;
 import java.util.Stack;
 
 import org.wikimodel.wem.IWemConstants;
-import org.wikimodel.wem.IWemListener;
 import org.wikimodel.wem.WikiFormat;
 import org.wikimodel.wem.WikiParameter;
 import org.wikimodel.wem.WikiParameters;
@@ -429,7 +428,7 @@ public class DefaultXWikiGeneratorListener implements XWikiGeneratorListener
     /**
      * {@inheritDoc}
      * 
-     * @see IWemListener#beginInfoBlock(String, WikiParameters)
+     * @see XWikiGeneratorListener#beginInfoBlock(String, WikiParameters)
      */
     public void beginInfoBlock(String infoType, WikiParameters params)
     {
@@ -475,7 +474,7 @@ public class DefaultXWikiGeneratorListener implements XWikiGeneratorListener
     /**
      * {@inheritDoc}
      * 
-     * @see IWemListener#beginPropertyBlock(String, boolean)
+     * @see XWikiGeneratorListener#beginPropertyBlock(String, boolean)
      */
     public void beginPropertyBlock(String propertyUri, boolean doc)
     {
@@ -485,7 +484,7 @@ public class DefaultXWikiGeneratorListener implements XWikiGeneratorListener
     /**
      * {@inheritDoc}
      * 
-     * @see IWemListener#beginPropertyInline(String)
+     * @see XWikiGeneratorListener#beginPropertyInline(String)
      */
     public void beginPropertyInline(String str)
     {
@@ -604,7 +603,7 @@ public class DefaultXWikiGeneratorListener implements XWikiGeneratorListener
     /**
      * {@inheritDoc}
      * 
-     * @see IWemListener#endFormat(WikiFormat)
+     * @see XWikiGeneratorListener#endFormat(WikiFormat)
      */
     public void endFormat(WikiFormat format)
     {
@@ -673,7 +672,7 @@ public class DefaultXWikiGeneratorListener implements XWikiGeneratorListener
     /**
      * {@inheritDoc}
      * 
-     * @see IWemListener#endInfoBlock(String, WikiParameters)
+     * @see XWikiGeneratorListener#endInfoBlock(String, WikiParameters)
      */
     public void endInfoBlock(String infoType, WikiParameters params)
     {
@@ -722,7 +721,7 @@ public class DefaultXWikiGeneratorListener implements XWikiGeneratorListener
     /**
      * {@inheritDoc}
      * 
-     * @see IWemListener#endPropertyBlock(String, boolean)
+     * @see XWikiGeneratorListener#endPropertyBlock(String, boolean)
      */
     public void endPropertyBlock(String propertyUri, boolean doc)
     {
@@ -732,7 +731,7 @@ public class DefaultXWikiGeneratorListener implements XWikiGeneratorListener
     /**
      * {@inheritDoc}
      * 
-     * @see IWemListener#endPropertyInline(String)
+     * @see XWikiGeneratorListener#endPropertyInline(String)
      */
     public void endPropertyInline(String inlineProperty)
     {
@@ -830,7 +829,7 @@ public class DefaultXWikiGeneratorListener implements XWikiGeneratorListener
     /**
      * {@inheritDoc}
      * 
-     * @see IWemListener#onExtensionBlock(String, WikiParameters)
+     * @see XWikiGeneratorListener#onExtensionBlock(String, WikiParameters)
      */
     public void onExtensionBlock(String extensionName, WikiParameters params)
     {
@@ -842,7 +841,7 @@ public class DefaultXWikiGeneratorListener implements XWikiGeneratorListener
     /**
      * {@inheritDoc}
      * 
-     * @see IWemListener#onExtensionInline(String, WikiParameters)
+     * @see XWikiGeneratorListener#onExtensionInline(String, WikiParameters)
      */
     public void onExtensionInline(String extensionName, WikiParameters params)
     {
@@ -1041,7 +1040,7 @@ public class DefaultXWikiGeneratorListener implements XWikiGeneratorListener
     /**
      * {@inheritDoc}
      * 
-     * @see IWemListener#onTableCaption(String)
+     * @see XWikiGeneratorListener#onTableCaption(String)
      */
     public void onTableCaption(String str)
     {

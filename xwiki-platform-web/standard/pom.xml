@@ -163,6 +163,10 @@
       <version>${platform.core.version}</version>
     </dependency>
   </dependencies>
+  <properties>
+    <!-- Don't run CLIRR on the .war since there's no Java code here. -->
+    <xwiki.clirr.skip>true</xwiki.clirr.skip>
+  </properties>
   <build>
     <plugins>
       <!-- Inject XWiki's configuration -->

@@ -577,8 +577,8 @@ public class Context extends Api
      *    {@link com.xpn.xwiki.api.Document#saveAsAuthor()},
      *    {@link com.xpn.xwiki.api.Document#saveAsAuthor(String)},
      *    {@link com.xpn.xwiki.api.Document#saveAsAuthor(String, boolean)},
-     *    and {@link com.xpn.xwiki.api.Document#deleteAsAuthor()} will all to their actions as if the author
-     *    was the guest user (XWiki.XWikiGuest).
+     *    and {@link com.xpn.xwiki.api.Document#deleteAsAuthor()} will perform all of their actions as
+     *    if the document's content author was the guest user (XWiki.XWikiGuest).
      *
      * In effect, no code requiring "programming right" will run, and if the document content author
      * (see: {@link com.xpn.xwiki.api.Document#getContentAuthor()}) is a user who has "programming right",

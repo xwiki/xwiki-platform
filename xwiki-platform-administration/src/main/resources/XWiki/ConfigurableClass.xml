@@ -950,7 +950,7 @@ $xwiki.jsfx.use('js/xwiki/actionbuttons/actionButtons.js', true)
               + "order by doc.creationDate")
   ##
   ## Run the search
-  #set(discard = $outputList.addAll($xwiki.searchDocuments($sql, 0, 0, $params)))
+  #set($discard = $outputList.addAll($xwiki.searchDocuments($sql, 0, 0, $params)))
   ##
 #end
 ##

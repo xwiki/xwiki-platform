@@ -950,7 +950,7 @@ $xwiki.jsfx.use('js/xwiki/actionbuttons/actionButtons.js', true)
               + "order by doc.creationDate")
   ##
   ## Run the search
-  #set($outputList = $xwiki.searchDocuments($sql, 0, 0, $params))
+  #set(discard = $outputList.addAll($xwiki.searchDocuments($sql, 0, 0, $params)))
   ##
 #end
 ##
@@ -982,7 +982,8 @@ $xwiki.jsfx.use('js/xwiki/actionbuttons/actionButtons.js', true)
   #else
     #set($userToCheck = $docToCheck.getAuthor())
   #end
-  #set($hasAccess = $xwiki.hasAccessLevel('edit', $userToCheck, $currentDoc))
+  #set ($hasAccess = $util.null)
+  #setVariable ("$hasAccess" $xwiki.hasAccessLevel('edit', $userToCheck, $currentDoc))
 #end
 ##
 #*

@@ -44,8 +44,8 @@ public class TocMacroParameters
         /**
          * List the sections of the whole page.
          */
-        PAGE;
-    };
+        PAGE
+    }
 
     /**
      * The minimum section level. For example if 2 then level 1 sections will not be listed.

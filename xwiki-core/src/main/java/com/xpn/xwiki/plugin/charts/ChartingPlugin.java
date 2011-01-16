@@ -86,7 +86,6 @@ public class ChartingPlugin extends XWikiDefaultPlugin implements XWikiPluginInt
                 log.error("Could not create charts temporary directory: " + tempDir, e2);
             }
         }
-        ;
     }
 
     @Override

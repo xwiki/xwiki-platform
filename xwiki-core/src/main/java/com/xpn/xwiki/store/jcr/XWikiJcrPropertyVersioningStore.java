@@ -59,7 +59,7 @@ public class XWikiJcrPropertyVersioningStore extends XWikiJcrBaseStore implement
 						Property prop = docNode.getProperty("archive");
 						String s = prop.getString();
 						archivedoc.setArchive( s );
-					} catch (PathNotFoundException e) {};
+					} catch (PathNotFoundException e) {}
 					return null;
 				}
 			});

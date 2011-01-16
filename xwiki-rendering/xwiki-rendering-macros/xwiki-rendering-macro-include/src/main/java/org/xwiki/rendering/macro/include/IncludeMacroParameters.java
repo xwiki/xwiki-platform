@@ -43,8 +43,8 @@ public class IncludeMacroParameters
         /**
          * Macro executed in the context of the current page.
          */
-        CURRENT;
-    };
+        CURRENT
+    }
 
     /**
      * The name of the document to include.

@@ -143,7 +143,7 @@ public class JackRabbitJCRProvider implements IJcrProvider {
 			log.info("namespace '"+preffix+"' registered!");
 		} catch (NamespaceException e) {
 			return false;
-		};
+		}
 		return true;
 	}
 

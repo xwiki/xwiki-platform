@@ -48,7 +48,7 @@ public class CacheEntryListenerTest implements CacheEntryListener<Object>
          * Remove event.
          */
         REMOVE
-    };
+    }
 
     /**
      * Event object received with last insertion.

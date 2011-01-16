@@ -85,7 +85,7 @@ public class XWikiJcrAttachmentStore extends XWikiJcrBaseStore implements XWikiA
 					try {
 						Node n = session.getNode( getAttachmentContentPath( content ) );
 						content.setContent( getBytesFromProp( n.getProperty("jcr:data") ) );
-					} catch (PathNotFoundException e) {};
+					} catch (PathNotFoundException e) {}
 					return content;
 				}
         	});

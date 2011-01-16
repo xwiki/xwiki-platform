@@ -41,5 +41,5 @@ public enum AnnotationState
      * An annotation is updated if its selected text has suffered a modification and it could be detected and recovered
      * during the maintaining process.
      */
-    UPDATED;
+    UPDATED
 }

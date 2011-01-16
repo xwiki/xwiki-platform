@@ -28,5 +28,5 @@ package org.xwiki.url;
  */
 public enum XWikiURLType
 {
-    ENTITY, SKIN, TEMPLATE, RESOURCE;
+    ENTITY, SKIN, TEMPLATE, RESOURCE
 }

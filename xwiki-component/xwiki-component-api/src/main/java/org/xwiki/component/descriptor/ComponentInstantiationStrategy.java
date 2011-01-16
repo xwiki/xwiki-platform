@@ -36,5 +36,5 @@ public enum ComponentInstantiationStrategy
     /**
      * A new component implementation instance is created at a each lookup.
      */
-    PER_LOOKUP;
+    PER_LOOKUP
 }

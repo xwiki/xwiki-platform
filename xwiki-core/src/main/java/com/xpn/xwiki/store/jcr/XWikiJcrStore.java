@@ -220,7 +220,6 @@ public class XWikiJcrStore extends XWikiJcrBaseStore implements XWikiStoreInterf
                             baseDocNode.getNode("attach").remove();
                         } catch (PathNotFoundException e) {
                         }
-                        ;
                     }
 
                     doc.setObjectsToRemove(new ArrayList());
@@ -730,7 +729,6 @@ public class XWikiJcrStore extends XWikiJcrBaseStore implements XWikiStoreInterf
                         }
                     } catch (PathNotFoundException e) {
                     }
-                    ;
                     return null;
                 }
             });
@@ -847,7 +845,6 @@ public class XWikiJcrStore extends XWikiJcrBaseStore implements XWikiStoreInterf
                         ses.save();
                     } catch (PathNotFoundException e) {
                     }
-                    ;
                     return null;
                 }
             });

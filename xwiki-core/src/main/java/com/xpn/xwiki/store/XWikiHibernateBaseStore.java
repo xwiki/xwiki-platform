@@ -504,7 +504,6 @@ public class XWikiHibernateBaseStore implements Initializable
                 }
             } catch (Exception e) {
             }
-            ;
             try {
                 if (bTransaction) {
                     endTransaction(context, true);

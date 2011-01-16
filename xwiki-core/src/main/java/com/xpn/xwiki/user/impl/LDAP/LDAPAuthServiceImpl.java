@@ -527,7 +527,6 @@ public class LDAPAuthServiceImpl extends XWikiAuthServiceImpl
                 if (log.isErrorEnabled())
                     log.error("LDAP Bind failed with Exception " + e.getMessage());
             }
-            ;
         } else {
             if (log.isDebugEnabled())
                 log.debug("LDAP Bind does not have binding info");

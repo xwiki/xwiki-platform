@@ -32,7 +32,7 @@ public class XWikiServletResponseStub implements XWikiResponse
         {
             outputStream.write(b);
         }
-    };;;
+    };
     
     public void setOutpuStream(OutputStream outputStream)
     {

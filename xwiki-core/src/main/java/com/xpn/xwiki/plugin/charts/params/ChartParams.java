@@ -780,7 +780,6 @@ public class ChartParams
             String name = (String) it.next();
             sb.append(name + "=");
             sb.append(valueMap.get(name).toString());
-            ;
             sb.append("\n");
         }
         return sb.toString();

@@ -66,7 +66,7 @@ public class EntryEvictionConfiguration extends HashMap<String, Object>
          * Support <code>maxentries</code> property. See {@link LRUEvictionConfiguration}.
          */
         LRU
-    };
+    }
 
     /**
      * The ordering/storing algorithm used by the cache.

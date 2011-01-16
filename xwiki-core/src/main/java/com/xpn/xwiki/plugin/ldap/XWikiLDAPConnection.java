@@ -376,7 +376,7 @@ public class XWikiLDAPConnection
      * @param value the DN value to escape
      * @return the escaped version o the DN value
      */
-    public static final String escapeLDAPDNValue(String value)
+    public static String escapeLDAPDNValue(String value)
     {
         return LDAPDN.escapeRDN("key=" + value).substring(4);
     }
@@ -387,7 +387,7 @@ public class XWikiLDAPConnection
      * @param value the value to escape
      * @return the escaped version
      */
-    public static final String escapeLDAPSearchFilter(String value)
+    public static String escapeLDAPSearchFilter(String value)
     {
         if (value == null) {
             return null;

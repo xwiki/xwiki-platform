@@ -127,7 +127,7 @@ public class DocumentReference extends EntityReference
         return references;
     }
 
-    private static final EntityReference constructSpaceReference(String wikiName, List<String> spaceNames)
+    private static EntityReference constructSpaceReference(String wikiName, List<String> spaceNames)
     {
         EntityReference spaceReference = null;
         EntityReference parent = new EntityReference(wikiName, EntityType.WIKI);

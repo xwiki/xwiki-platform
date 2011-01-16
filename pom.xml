@@ -225,6 +225,7 @@
                 <exclude>org/xwiki/rendering/block/TableRowBlock</exclude>
                 <exclude>org/xwiki/rendering/block/XDOM</exclude>
                 <exclude>org/xwiki/rendering/block/QuotationLineBlock</exclude>
+                <exclude>org/xwiki/rendering/syntax/SyntaxType</exclude>
               </excludes>
             </configuration>
           </plugin>

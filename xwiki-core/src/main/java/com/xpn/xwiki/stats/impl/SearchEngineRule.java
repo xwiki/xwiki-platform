@@ -18,7 +18,6 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  *
  */
-
 package com.xpn.xwiki.stats.impl;
 
 /**
@@ -26,7 +25,7 @@ package com.xpn.xwiki.stats.impl;
  * 
  * @version $Id$
  */
-public class SearchEngineRule extends Object
+public class SearchEngineRule
 {
     /**
      * The search engine server address.

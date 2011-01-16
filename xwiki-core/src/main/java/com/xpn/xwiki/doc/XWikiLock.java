@@ -22,7 +22,8 @@ package com.xpn.xwiki.doc;
 
 import java.util.Date;
 
-public class XWikiLock extends Object {
+public class XWikiLock
+{
     protected String userName;
     protected long docId;
     protected Date date;

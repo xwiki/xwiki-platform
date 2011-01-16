@@ -18,10 +18,9 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  *
  */
-
 package com.xpn.xwiki.objects;
 
-public class ObjectDiff extends Object
+public class ObjectDiff
 {
     private String className;
 

@@ -34,6 +34,7 @@ import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.Requirement;
 import org.xwiki.model.reference.AttachmentReferenceResolver;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.rendering.internal.configuration.XWikiRenderingConfiguration;
 import org.xwiki.rendering.listener.reference.AttachmentResourceReference;
@@ -98,6 +99,12 @@ public class XWikiWikiModel implements WikiModel
      */
     @Requirement("current")
     private AttachmentReferenceResolver<String> currentAttachmentReferenceResolver;
+
+    /**
+     * Used to resolve a Resource Reference into a proper Document Reference.
+     */
+    @Requirement("current")
+    private DocumentReferenceResolver<String> currentDocumentReferenceResolver;
 
     /**
      * The object used to parse the CSS from the image style parameter.
@@ -169,9 +176,11 @@ public class XWikiWikiModel implements WikiModel
      * 
      * @see WikiModel#isDocumentAvailable(org.xwiki.rendering.listener.reference.ResourceReference)
      */
-    public boolean isDocumentAvailable(ResourceReference documentReference)
+    public boolean isDocumentAvailable(ResourceReference documentResourceReference)
     {
-        return this.documentAccessBridge.exists(documentReference.getReference());
+        DocumentReference documentReference =
+            this.currentDocumentReferenceResolver.resolve(documentResourceReference.getReference());
+        return this.documentAccessBridge.exists(documentReference);
     }
 
     /**
@@ -179,11 +188,13 @@ public class XWikiWikiModel implements WikiModel
      * 
      * @see WikiModel#getDocumentViewURL(org.xwiki.rendering.listener.reference.ResourceReference)
      */
-    public String getDocumentViewURL(ResourceReference documentReference)
+    public String getDocumentViewURL(ResourceReference documentResourceReference)
     {
-        return this.documentAccessBridge.getURL(documentReference.getReference(), "view",
-            documentReference.getParameter(DocumentResourceReference.QUERY_STRING),
-            documentReference.getParameter(DocumentResourceReference.ANCHOR));
+        DocumentReference documentReference =
+            this.currentDocumentReferenceResolver.resolve(documentResourceReference.getReference());
+        return this.documentAccessBridge.getDocumentURL(documentReference, "view",
+            documentResourceReference.getParameter(DocumentResourceReference.QUERY_STRING),
+            documentResourceReference.getParameter(DocumentResourceReference.ANCHOR));
     }
 
     /**
@@ -191,11 +202,11 @@ public class XWikiWikiModel implements WikiModel
      * 
      * @see WikiModel#getDocumentEditURL(org.xwiki.rendering.listener.reference.ResourceReference)
      */
-    public String getDocumentEditURL(ResourceReference documentReference)
+    public String getDocumentEditURL(ResourceReference documentResourceReference)
     {
         // Add the parent=<current document name> parameter to the query string of the edit URL so that
         // the new document is created with the current page as its parent.
-        String modifiedQueryString = documentReference.getParameter(DocumentResourceReference.QUERY_STRING);
+        String modifiedQueryString = documentResourceReference.getParameter(DocumentResourceReference.QUERY_STRING);
         if (StringUtils.isBlank(modifiedQueryString)) {
             DocumentReference reference = this.documentAccessBridge.getCurrentDocumentReference();
             if (reference != null) {
@@ -222,8 +233,10 @@ public class XWikiWikiModel implements WikiModel
             }
         }
 
-        return this.documentAccessBridge.getURL(documentReference.getReference(), "create", modifiedQueryString,
-            documentReference.getParameter(DocumentResourceReference.ANCHOR));
+        DocumentReference documentReference =
+            this.currentDocumentReferenceResolver.resolve(documentResourceReference.getReference());
+        return this.documentAccessBridge.getDocumentURL(documentReference, "create", modifiedQueryString,
+            documentResourceReference.getParameter(DocumentResourceReference.ANCHOR));
     }
 
     /**

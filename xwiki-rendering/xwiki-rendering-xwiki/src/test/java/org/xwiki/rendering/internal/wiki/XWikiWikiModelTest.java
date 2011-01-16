@@ -32,6 +32,7 @@ import org.xwiki.bridge.SkinAccessBridge;
 import org.xwiki.model.reference.AttachmentReference;
 import org.xwiki.model.reference.AttachmentReferenceResolver;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.rendering.internal.configuration.XWikiRenderingConfiguration;
 import org.xwiki.rendering.listener.reference.AttachmentResourceReference;
@@ -58,25 +59,35 @@ public class XWikiWikiModelTest extends AbstractMockingComponentTestCase
         final EntityReferenceSerializer< ? > compactEntityReferenceSerializer =
             getComponentManager().lookup(EntityReferenceSerializer.class, "compactwiki");
         final DocumentAccessBridge documentAccessBridge = getComponentManager().lookup(DocumentAccessBridge.class);
-        final DocumentReference documentReference = new DocumentReference("wiki", "Space", "Page");
+
+        // Note: we use a character that needs to be encoded in the current document's page name to make sure the
+        // generate query string is encoded.
+        final DocumentReference currentDocumentReference = new DocumentReference("Wiki", "Space", "Page\u20AC");
+
+        final DocumentReferenceResolver<String> documentResolver =
+            getComponentManager().lookup(DocumentReferenceResolver.class, "current");
+        final DocumentReference documentReference = new DocumentReference("TargetWiki", "TargetSpace", "TargetPage");
+
         getMockery().checking(new Expectations()
         {
             {
                 oneOf(documentAccessBridge).getCurrentDocumentReference();
+                will(returnValue(currentDocumentReference));
+                oneOf(compactEntityReferenceSerializer).serialize(currentDocumentReference);
+                will(returnValue("Wiki:Space.Page\u20AC"));
+                oneOf(documentResolver).resolve("TargetSpace.TargetPage");
                 will(returnValue(documentReference));
-                oneOf(compactEntityReferenceSerializer).serialize(documentReference);
-                will(returnValue("wiki:Space.Page\u20AC"));
 
-                // The test is here: we verify that getURL is called with the query string already encoded since
-                // getURL() doesn't encode it.
-                oneOf(documentAccessBridge).getURL("Space.Page\u20AC", "create", "parent=wiki%3ASpace.Page%E2%82%AC",
-                    "anchor");
+                // The test is here: we verify that getDocumentURL is called with the query string already encoded
+                // since getDocumentURL() doesn't encode it.
+                oneOf(documentAccessBridge).getDocumentURL(documentReference, "create",
+                    "parent=Wiki%3ASpace.Page%E2%82%AC", "anchor");
             }
         });
 
-        DocumentResourceReference reference = new DocumentResourceReference("Space.Page\u20AC");
-        reference.setAnchor("anchor");
-        wikiModel.getDocumentEditURL(reference);
+        DocumentResourceReference drf = new DocumentResourceReference("TargetSpace.TargetPage");
+        drf.setAnchor("anchor");
+        this.wikiModel.getDocumentEditURL(drf);
     }
 
     /**

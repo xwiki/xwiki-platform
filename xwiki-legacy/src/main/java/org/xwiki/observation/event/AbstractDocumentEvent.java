@@ -62,6 +62,7 @@ public abstract class AbstractDocumentEvent extends AbstractFilterableEvent
      * @param documentName the name of the document related to this event
      * @deprecated use {@link #AbstractDocumentEvent(DocumentReference)} instead
      */
+    @Deprecated
     public AbstractDocumentEvent(String documentName)
     {
         super(documentName);

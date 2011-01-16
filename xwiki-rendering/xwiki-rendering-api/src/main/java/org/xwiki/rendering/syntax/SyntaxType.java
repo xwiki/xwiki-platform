@@ -105,6 +105,7 @@ public class SyntaxType
      * @return the technical id fo the Syntax type
      * @deprecated starting with 2.0M3 use {@link #getId()} instead
      */
+    @Deprecated
     public String toIdString()
     {
         return this.id;

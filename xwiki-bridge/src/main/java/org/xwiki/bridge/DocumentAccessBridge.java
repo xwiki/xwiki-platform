@@ -348,6 +348,7 @@ public interface DocumentAccessBridge
      * @throws Exception if the document cannot be accessed.
      * @deprecated use {@link DocumentAccessBridge#setProperty(DocumentReference, DocumentReference, String, Object)
      */
+    @Deprecated
     void setProperty(String documentReference, String className, String propertyName, Object propertyValue)
         throws Exception;
 

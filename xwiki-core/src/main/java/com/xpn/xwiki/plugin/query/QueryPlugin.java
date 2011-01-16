@@ -307,7 +307,7 @@ public class QueryPlugin extends XWikiDefaultPlugin implements IQueryFactory {
         return sb.toString();
     }
 
-    private final String n2e(String s) {
+    private String n2e(String s) {
         return s==null?"":s;
     }
 

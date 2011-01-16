@@ -420,7 +420,7 @@ public class URIClassLoader extends ExtendedURLClassLoader
             }
         }
 
-        private synchronized final URL[] getUrls()
+        private synchronized URL[] getUrls()
         {
             return urls;
         }

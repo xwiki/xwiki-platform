@@ -574,14 +574,14 @@ public class HibernateQuery extends DefaultQuery {
 		}
 		
 		private int indent;
-		private final void traverse(QueryNode[] node, Object data) {
+		private void traverse(QueryNode[] node, Object data) {
 	        indent ++;
 	        for (int i = 0; i < node.length; i++) {
 	            node[i].accept(this, data);
 	        }
 	        indent --;
 	    }
-		private final Object traverse(QueryNode node, Object data) {			
+		private Object traverse(QueryNode node, Object data) {
 			indent ++;
 			final Object r = node.accept(this, data);
 			indent --;
@@ -601,10 +601,10 @@ public class HibernateQuery extends DefaultQuery {
 			return null;			
 		}
 		
-		private final String n2e(String s) {
+		private String n2e(String s) {
 			return s==null?"":s;
 		}
-		private final String tosqlstring(String s) {
+		private String tosqlstring(String s) {
 			return s;
 		}
 		

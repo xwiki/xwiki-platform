@@ -191,7 +191,7 @@ public class GraphVizPlugin extends XWikiDefaultPlugin implements XWikiPluginInt
         }
     }
 
-    public byte[] readDotImage(File ofile) throws FileNotFoundException, IOException
+    public byte[] readDotImage(File ofile) throws IOException
     {
         FileInputStream fis = new FileInputStream(ofile);
         byte[] result = new byte[(int) ofile.length()];

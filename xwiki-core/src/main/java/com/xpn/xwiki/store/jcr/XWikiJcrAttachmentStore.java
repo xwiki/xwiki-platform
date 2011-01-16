@@ -96,7 +96,7 @@ public class XWikiJcrAttachmentStore extends XWikiJcrBaseStore implements XWikiA
         }
 	}
 	
-	protected byte[] getBytesFromProp(Property p) throws IOException, ValueFormatException, RepositoryException {		
+	protected byte[] getBytesFromProp(Property p) throws IOException, RepositoryException {
 		byte[] res = new byte[(int) p.getLength()];
 		p.getStream().read(res);
 		return res;

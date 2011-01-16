@@ -58,7 +58,7 @@ public class XWikiJcrSession implements Session {
 			return getRootNode().addNode("store", "xwiki:store");						
 		}
 	}
-	public Node getNode(String path) throws PathNotFoundException, RepositoryException {
+	public Node getNode(String path) throws RepositoryException {
 		return (Node) s.getItem(path);
 	}
 	/** Insert persistent object using graffito jcr-mapping */
@@ -70,11 +70,11 @@ public class XWikiJcrSession implements Session {
 		return oc.insert(s, parentNode, ISO9075.encode(nodeName), object, objclass);
 	}
 	/** Update persistent object using graffito jcr-mapping */ 
-	public void updateObject(Node node, Object object) throws PersistenceException, ItemNotFoundException, AccessDeniedException, RepositoryException {
+	public void updateObject(Node node, Object object) throws PersistenceException, RepositoryException {
 		oc.update(s, node, object);
 	}
 	/** Update persistent object using graffito jcr-mapping. low-level function */
-	public void updateObject(Node node, Object object, Class objclass) throws PersistenceException, ItemNotFoundException, AccessDeniedException, RepositoryException {
+	public void updateObject(Node node, Object object, Class objclass) throws PersistenceException, RepositoryException {
 		oc.update(s, node, object, objclass);
 	}
 	public Object loadObject(String path) {
@@ -119,8 +119,7 @@ public class XWikiJcrSession implements Session {
 		return s.getWorkspace();
 	}
 	/** @inheritDoc */
-	public Session impersonate(Credentials arg0) throws LoginException,
-			RepositoryException {
+	public Session impersonate(Credentials arg0) throws RepositoryException {
 		return s.impersonate(arg0);
 	}
 	/** @inheritDoc */
@@ -128,13 +127,11 @@ public class XWikiJcrSession implements Session {
 		return s.getRootNode();
 	}
 	/** @inheritDoc */
-	public Node getNodeByUUID(String arg0) throws ItemNotFoundException,
-			RepositoryException {
+	public Node getNodeByUUID(String arg0) throws RepositoryException {
 		return s.getNodeByUUID(arg0);
 	}
 	/** @inheritDoc */
-	public Item getItem(String arg0) throws PathNotFoundException,
-			RepositoryException {
+	public Item getItem(String arg0) throws RepositoryException {
 		return s.getItem(arg0);
 	}
 	/** @inheritDoc */
@@ -142,16 +139,11 @@ public class XWikiJcrSession implements Session {
 		return s.itemExists(arg0);
 	}
 	/** @inheritDoc */
-	public void move(String arg0, String arg1) throws ItemExistsException,
-			PathNotFoundException, VersionException,
-			ConstraintViolationException, LockException, RepositoryException {
+	public void move(String arg0, String arg1) throws RepositoryException {
 		s.move(arg0, arg1);
 	}
 	/** @inheritDoc */
-	public void save() throws AccessDeniedException, ItemExistsException,
-			ConstraintViolationException, InvalidItemStateException,
-			VersionException, LockException, NoSuchNodeTypeException,
-			RepositoryException {
+	public void save() throws RepositoryException {
 		pm.save();
 		s.save();
 	}
@@ -164,8 +156,7 @@ public class XWikiJcrSession implements Session {
 		return s.hasPendingChanges();
 	}
 	/** @inheritDoc */
-	public ValueFactory getValueFactory()
-			throws UnsupportedRepositoryOperationException, RepositoryException {
+	public ValueFactory getValueFactory() throws RepositoryException {
 		return s.getValueFactory();
 	}
 	/** @inheritDoc */
@@ -180,28 +171,22 @@ public class XWikiJcrSession implements Session {
 		return s.getImportContentHandler(arg0, arg1);
 	}
 	/** @inheritDoc */
-	public void importXML(String arg0, InputStream arg1, int arg2)
-			throws IOException, PathNotFoundException, ItemExistsException,
-			ConstraintViolationException, VersionException,
-			InvalidSerializedDataException, LockException, RepositoryException {
+	public void importXML(String arg0, InputStream arg1, int arg2) throws IOException, RepositoryException {
 		s.importXML(arg0, arg1, arg2);
 	}
 	/** @inheritDoc */
 	public void exportSystemView(String arg0, ContentHandler arg1,
-			boolean arg2, boolean arg3) throws PathNotFoundException,
-			SAXException, RepositoryException {
+			boolean arg2, boolean arg3) throws SAXException, RepositoryException {
 		s.exportSystemView(arg0, arg1, arg2, arg3);
 	}
 	/** @inheritDoc */
 	public void exportSystemView(String arg0, OutputStream arg1, boolean arg2,
-			boolean arg3) throws IOException, PathNotFoundException,
-			RepositoryException {
+			boolean arg3) throws IOException, RepositoryException {
 		s.exportSystemView(arg0, arg1, arg2, arg3);
 	}
 	/** @inheritDoc */
 	public void exportDocumentView(String arg0, ContentHandler arg1,
-			boolean arg2, boolean arg3) throws PathNotFoundException,
-			SAXException, RepositoryException {
+			boolean arg2, boolean arg3) throws SAXException, RepositoryException {
 		s.exportDocumentView(arg0, arg1, arg2, arg3);
 	}
 	/** @inheritDoc */
@@ -211,8 +196,7 @@ public class XWikiJcrSession implements Session {
 		s.exportDocumentView(arg0, arg1, arg2, arg3);
 	}
 	/** @inheritDoc */
-	public void setNamespacePrefix(String arg0, String arg1)
-			throws NamespaceException, RepositoryException {
+	public void setNamespacePrefix(String arg0, String arg1) throws RepositoryException {
 		s.setNamespacePrefix(arg0, arg1);
 	}
 	/** @inheritDoc */
@@ -220,13 +204,11 @@ public class XWikiJcrSession implements Session {
 		return s.getNamespacePrefixes();
 	}
 	/** @inheritDoc */
-	public String getNamespaceURI(String arg0) throws NamespaceException,
-			RepositoryException {
+	public String getNamespaceURI(String arg0) throws RepositoryException {
 		return s.getNamespaceURI(arg0);
 	}
 	/** @inheritDoc */
-	public String getNamespacePrefix(String arg0) throws NamespaceException,
-			RepositoryException {
+	public String getNamespacePrefix(String arg0) throws RepositoryException {
 		return s.getNamespacePrefix(arg0);
 	}
 	/** @inheritDoc */

@@ -75,7 +75,7 @@ public class JcrQuery implements IQuery {
 		return result;
 	}
 	
-	Object fromValue(Value v) throws ValueFormatException, IllegalStateException, RepositoryException {
+	Object fromValue(Value v) throws IllegalStateException, RepositoryException {
 		if (v==null) return null;
 		switch (v.getType()) {
 		case PropertyType.DATE: return v.getDate();

@@ -62,7 +62,7 @@ public class JackRabbitJCRProvider implements IJcrProvider {
 	
 	XWikiEngineContext econtext;
 	
-	public JackRabbitJCRProvider(XWikiConfig config, XWikiContext context) throws IOException, LoginException, RepositoryException, InvalidNodeTypeDefException, ParseException {
+	public JackRabbitJCRProvider(XWikiConfig config, XWikiContext context) throws IOException, RepositoryException, InvalidNodeTypeDefException, ParseException {
 		this.config = config;
 		if (context!=null)
 			this.econtext = context.getEngineContext();
@@ -79,11 +79,11 @@ public class JackRabbitJCRProvider implements IJcrProvider {
 		return config;
 	}
 	
-	public XWikiJcrSession getSession(String workspace) throws LoginException, RepositoryException {
+	public XWikiJcrSession getSession(String workspace) throws RepositoryException {
 		return getSession(workspace, "xwiki", "xwiki");
 	}
 	
-	public XWikiJcrSession getSession(String workspace, String username, String password) throws LoginException, RepositoryException {
+	public XWikiJcrSession getSession(String workspace, String username, String password) throws RepositoryException {
 		Session s = repository.login( new SimpleCredentials(username, password.toCharArray()), workspace);
 		PersistenceManager pm = new PersistenceManagerImpl(mapper, objectConverter, queryManager, s);
 		return new XWikiJcrSession(s, pm, objectConverter);
@@ -137,7 +137,7 @@ public class JackRabbitJCRProvider implements IJcrProvider {
 		});
 		ntm.registerNodeTypes(fis, NodeTypeManagerImpl.TEXT_X_JCR_CND);
 	}
-	private boolean registerNamespace(Workspace w, String preffix, String uri) throws UnsupportedRepositoryOperationException, AccessDeniedException, RepositoryException {
+	private boolean registerNamespace(Workspace w, String preffix, String uri) throws RepositoryException {
 		try {
 			w.getNamespaceRegistry().registerNamespace(preffix, uri);
 			log.info("namespace '"+preffix+"' registered!");

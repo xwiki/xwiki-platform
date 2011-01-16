@@ -229,7 +229,7 @@ public class XWikiFeedFetcher extends AbstractFeedFetcher {
      * @throws FetcherException
      * @throws FeedException
      */
-    private static SyndFeed retrieveFeed(String urlStr, HttpMethod method) throws IOException, HttpException, FetcherException, FeedException {
+    private static SyndFeed retrieveFeed(String urlStr, HttpMethod method) throws IOException, FetcherException, FeedException {
 
         InputStream stream = null;
         if ((method.getResponseHeader("Content-Encoding") != null) && ("gzip".equalsIgnoreCase(method.getResponseHeader("Content-Encoding").getValue()))) {
@@ -252,7 +252,7 @@ public class XWikiFeedFetcher extends AbstractFeedFetcher {
         }
     }
 
-    private SyndFeed getFeed(SyndFeedInfo syndFeedInfo, String urlStr, HttpMethod method, int statusCode) throws IOException, HttpException, FetcherException, FeedException {
+    private SyndFeed getFeed(SyndFeedInfo syndFeedInfo, String urlStr, HttpMethod method, int statusCode) throws IOException, FetcherException, FeedException {
 
         if (statusCode == HttpURLConnection.HTTP_NOT_MODIFIED && syndFeedInfo != null) {
             fireEvent(FetcherEvent.EVENT_TYPE_FEED_UNCHANGED, urlStr);

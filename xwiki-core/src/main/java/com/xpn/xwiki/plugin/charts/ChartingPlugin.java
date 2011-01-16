@@ -198,7 +198,7 @@ public class ChartingPlugin extends XWikiDefaultPlugin implements XWikiPluginInt
         os.write(bytes);
     }
 
-    public byte[] readFile(File ofile) throws FileNotFoundException, IOException
+    public byte[] readFile(File ofile) throws IOException
     {
         FileInputStream fis = new FileInputStream(ofile);
         byte[] result = new byte[(int) ofile.length()];

@@ -54,7 +54,7 @@ public class XWikiJcrBaseStore {
 		}
 	}
 	
-	protected Node getDocNodeById(XWikiJcrSession session, long docId) throws InvalidQueryException, RepositoryException {
+	protected Node getDocNodeById(XWikiJcrSession session, long docId) throws RepositoryException {
 		Filter filter = session.getObjectQueryManager().createFilter(XWikiDocument.class);
 		filter = filter.addEqualTo("id", new Long(docId));
 		String s = session.getObjectQueryManager().buildJCRExpression(
@@ -159,7 +159,7 @@ public class XWikiJcrBaseStore {
 		}
 		return (XWikiJcrSession) context.get("jcrsession");
 	}
-	private XWikiJcrSession getWriteSession(XWikiContext context) throws LoginException, RepositoryException {
+	private XWikiJcrSession getWriteSession(XWikiContext context) throws RepositoryException {
 		return jcr.getSession(context.getDatabase());
 	}	
 	/** springmodules-jcr like execute method for read-only operations in jcr. Logout is not needed  

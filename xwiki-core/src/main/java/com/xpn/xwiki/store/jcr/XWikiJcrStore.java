@@ -374,8 +374,7 @@ public class XWikiJcrStore extends XWikiJcrBaseStore implements XWikiStoreInterf
         return object;
     }
 
-    private void saveXWikiProperty(XWikiJcrSession ses, Node objnode, BaseProperty prop) throws ItemExistsException,
-        PathNotFoundException, VersionException, ConstraintViolationException, LockException, RepositoryException
+    private void saveXWikiProperty(XWikiJcrSession ses, Node objnode, BaseProperty prop) throws RepositoryException
     {
         if (prop.getValue() == null) {
             return;
@@ -893,7 +892,7 @@ public class XWikiJcrStore extends XWikiJcrBaseStore implements XWikiStoreInterf
     }
 
     private List searchStringAttribute(XWikiJcrSession session, Filter filter, String returnatt)
-        throws InvalidQueryException, RepositoryException
+        throws RepositoryException
     {
         String sq =
             session.getObjectQueryManager().buildJCRExpression(session.getObjectQueryManager().createQuery(filter));
@@ -901,8 +900,7 @@ public class XWikiJcrStore extends XWikiJcrBaseStore implements XWikiStoreInterf
         return searchStringAttribute(session, sq);
     }
 
-    private List searchStringAttribute(XWikiJcrSession session, String xpath) throws InvalidQueryException,
-        RepositoryException
+    private List searchStringAttribute(XWikiJcrSession session, String xpath) throws RepositoryException
     {
         List result = new ArrayList();
         RowIterator ri = session.getQueryManager().createQuery(xpath, Query.XPATH).execute().getRows();
@@ -912,8 +910,7 @@ public class XWikiJcrStore extends XWikiJcrBaseStore implements XWikiStoreInterf
         return result;
     }
 
-    private List searchNodeNames(XWikiJcrSession session, String xpath) throws InvalidQueryException,
-        RepositoryException
+    private List searchNodeNames(XWikiJcrSession session, String xpath) throws RepositoryException
     {
         List result = new ArrayList();
         NodeIterator ri = session.getQueryManager().createQuery(xpath, Query.XPATH).execute().getNodes();

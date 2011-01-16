@@ -138,7 +138,7 @@ public class SVGPlugin extends XWikiDefaultPlugin implements XWikiPluginInterfac
     }
 
 
-    public byte[] readSVGImage(File ofile) throws FileNotFoundException, IOException {
+    public byte[] readSVGImage(File ofile) throws IOException {
         FileInputStream fis = new FileInputStream(ofile);
         byte[] result = new byte[(int)ofile.length()];
         fis.read(result);

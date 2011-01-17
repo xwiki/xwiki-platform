@@ -311,7 +311,7 @@ public class FrenchStemmer
                 char ch = R0.charAt(i);
                 if (isVowel(ch)) {
                     if (!seenVowel) {
-                        if (ch == '\u00E9' || ch == '\u00E9') {
+                        if (ch == '\u00E9') {
                             pos = i;
                             break;
                         }

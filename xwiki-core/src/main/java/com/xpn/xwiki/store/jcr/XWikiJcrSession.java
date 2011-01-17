@@ -165,9 +165,7 @@ public class XWikiJcrSession implements Session {
 		s.checkPermission(arg0, arg1);
 	}
 	/** @inheritDoc */
-	public ContentHandler getImportContentHandler(String arg0, int arg1)
-			throws PathNotFoundException, ConstraintViolationException,
-			VersionException, LockException, RepositoryException {
+	public ContentHandler getImportContentHandler(String arg0, int arg1) throws RepositoryException {
 		return s.getImportContentHandler(arg0, arg1);
 	}
 	/** @inheritDoc */
@@ -191,8 +189,7 @@ public class XWikiJcrSession implements Session {
 	}
 	/** @inheritDoc */
 	public void exportDocumentView(String arg0, OutputStream arg1,
-			boolean arg2, boolean arg3) throws IOException,
-			PathNotFoundException, RepositoryException {
+			boolean arg2, boolean arg3) throws IOException, RepositoryException {
 		s.exportDocumentView(arg0, arg1, arg2, arg3);
 	}
 	/** @inheritDoc */

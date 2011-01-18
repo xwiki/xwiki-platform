@@ -23,12 +23,14 @@ import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.xwiki.gwt.user.client.FocusCommand;
 import org.xwiki.gwt.user.client.ui.rta.RichTextArea;
 import org.xwiki.gwt.user.client.ui.wizard.WizardStep;
 import org.xwiki.gwt.user.client.ui.wizard.NavigationListener.NavigationDirection;
 import org.xwiki.gwt.wysiwyg.client.Strings;
 import org.xwiki.gwt.wysiwyg.client.plugin.importer.ImportServiceAsync;
 
+import com.google.gwt.core.client.Scheduler;
 import com.google.gwt.event.dom.client.LoadEvent;
 import com.google.gwt.event.dom.client.LoadHandler;
 import com.google.gwt.user.client.rpc.AsyncCallback;
@@ -242,7 +244,8 @@ public class ImportOfficePasteWizardStep implements WizardStep, LoadHandler
         if (event.getSource() == textArea) {
             // The rich text area where the content is pasted is reloaded each time this wizard step is displayed so we
             // use the load event to focus the text area. Note that we can't focus if the rich text area isn't loaded.
-            textArea.setFocus(true);
+            // We use a deferred command in case the rich text area is loaded synchronously.
+            Scheduler.get().scheduleDeferred(new FocusCommand(textArea));
         }
     }
 }

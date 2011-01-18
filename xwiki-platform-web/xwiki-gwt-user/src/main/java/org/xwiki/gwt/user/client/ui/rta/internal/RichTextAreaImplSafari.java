@@ -19,6 +19,7 @@
  */
 package org.xwiki.gwt.user.client.ui.rta.internal;
 
+import org.xwiki.gwt.dom.client.Document;
 import org.xwiki.gwt.dom.client.Element;
 import org.xwiki.gwt.user.client.ui.rta.RichTextArea;
 
@@ -57,20 +58,48 @@ public class RichTextAreaImplSafari extends com.google.gwt.user.client.ui.impl.R
     /*-{
         var iframe = this.@com.google.gwt.user.client.ui.impl.RichTextAreaImpl::elem;
         if (!iframe[@org.xwiki.gwt.user.client.ui.rta.RichTextArea::LOADED]
-            || iframe.contentWindow.document.designMode.toLowerCase() == 'on') return;
-
-        iframe.contentWindow.document.designMode = 'on';
+            || iframe[@org.xwiki.gwt.user.client.ui.rta.RichTextArea::INITIALIZING]) {
+            // We need to signal that the element is initializing even when the rich text area is not fully loaded for
+            // the case when the rich text area widget is quickly attached and detached.
+            this.@com.google.gwt.user.client.ui.impl.RichTextAreaImplStandard::onElementInitializing()();
+        }
+        if (!iframe[@org.xwiki.gwt.user.client.ui.rta.RichTextArea::INITIALIZING]) return;
+        this.@com.google.gwt.user.client.ui.impl.RichTextAreaImplStandard::onElementInitialized()();
 
         var outer = this;
-        iframe.contentWindow.onunload = function() {
-            iframe.contentWindow.onunload = null;
+        iframe.contentWindow.addEventListener('unload', function(event) {
+            event.target.defaultView.removeEventListener('unload', arguments.callee, false);
             iframe[@org.xwiki.gwt.user.client.ui.rta.RichTextArea::LOADED] = false;
-            outer.@com.google.gwt.user.client.ui.impl.RichTextAreaImplStandard::uninitElement()()
-        }
-
-        this.@com.google.gwt.user.client.ui.impl.RichTextAreaImplStandard::initializing = true;
-        this.@com.google.gwt.user.client.ui.impl.RichTextAreaImplStandard::onElementInitialized()();
+            // Uninitialize the iframe element only if the event listeners are still attached.
+            if (iframe.__gwt_handler) {
+                outer.@com.google.gwt.user.client.ui.impl.RichTextAreaImplStandard::uninitElement()();
+            }
+        }, false);
     }-*/;
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see com.google.gwt.user.client.ui.impl.RichTextAreaImplSafari#setEnabledImpl(boolean)
+     */
+    @Override
+    protected void setEnabledImpl(boolean enabled)
+    {
+        if (enabled != isEnabledImpl()) {
+            ((Document) IFrameElement.as(elem).getContentDocument()).setDesignMode(enabled);
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see com.google.gwt.user.client.ui.impl.RichTextAreaImplSafari#isEnabledImpl()
+     */
+    @Override
+    protected boolean isEnabledImpl()
+    {
+        return ((Document) IFrameElement.as(elem).getContentDocument()).isDesignMode();
+    }
 
     /**
      * {@inheritDoc}

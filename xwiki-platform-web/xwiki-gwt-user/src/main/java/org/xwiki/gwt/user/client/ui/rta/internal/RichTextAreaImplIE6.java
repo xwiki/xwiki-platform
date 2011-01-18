@@ -19,6 +19,7 @@
  */
 package org.xwiki.gwt.user.client.ui.rta.internal;
 
+import org.xwiki.gwt.dom.client.Document;
 import org.xwiki.gwt.dom.client.Element;
 import org.xwiki.gwt.user.client.ui.rta.RichTextArea;
 
@@ -31,6 +32,11 @@ import com.google.gwt.dom.client.IFrameElement;
  */
 public class RichTextAreaImplIE6 extends com.google.gwt.user.client.ui.impl.RichTextAreaImplIE6
 {
+    /**
+     * Flag indicating if the load event needs to be fired manually when the rich text area is attached to the document.
+     */
+    private static final String FIRE_LOAD_EVENT_MANUALLY = "__fireLoadEventManually";
+
     /**
      * {@inheritDoc}<br/>
      * NOTE: Remove this method as soon as Issue 3147 is fixed. <br />
@@ -57,20 +63,52 @@ public class RichTextAreaImplIE6 extends com.google.gwt.user.client.ui.impl.Rich
     /*-{
         var iframe = this.@com.google.gwt.user.client.ui.impl.RichTextAreaImpl::elem;
         if (!iframe[@org.xwiki.gwt.user.client.ui.rta.RichTextArea::LOADED]
-            || iframe.contentWindow.document.body.isContentEditable) return;
-
-        iframe.contentWindow.document.body.contentEditable = true;
+            || iframe[@org.xwiki.gwt.user.client.ui.rta.RichTextArea::INITIALIZING]) {
+            // We need to signal that the element is initializing even when the rich text area is not fully loaded for
+            // the case when the rich text area widget is quickly attached and detached.
+            this.@com.google.gwt.user.client.ui.impl.RichTextAreaImplStandard::onElementInitializing()();
+        }
+        if (!iframe[@org.xwiki.gwt.user.client.ui.rta.RichTextArea::INITIALIZING]) {
+            if (iframe[@org.xwiki.gwt.user.client.ui.rta.RichTextArea::LOADED]
+                && iframe[@org.xwiki.gwt.user.client.ui.rta.internal.RichTextAreaImplIE6::FIRE_LOAD_EVENT_MANUALLY]) {
+                // See #uninitElement() for the explanation.
+                iframe.fireEvent('onload');
+            }
+            return;
+        }
+        this.@com.google.gwt.user.client.ui.impl.RichTextAreaImplStandard::onElementInitialized()();
 
         var outer = this;
         iframe.contentWindow.attachEvent('onunload', function() {
             iframe.contentWindow.detachEvent('onunload', arguments.callee);
             iframe[@org.xwiki.gwt.user.client.ui.rta.RichTextArea::LOADED] = false;
-            outer.@com.google.gwt.user.client.ui.impl.RichTextAreaImplStandard::uninitElement()()
+            outer.@com.google.gwt.user.client.ui.impl.RichTextAreaImplStandard::uninitElement()();
         });
-
-        this.@com.google.gwt.user.client.ui.impl.RichTextAreaImplStandard::initializing = true;
-        this.@com.google.gwt.user.client.ui.impl.RichTextAreaImplStandard::onElementInitialized()();
     }-*/;
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see com.google.gwt.user.client.ui.impl.RichTextAreaImplIE6#setEnabledImpl(boolean)
+     */
+    @Override
+    protected void setEnabledImpl(boolean enabled)
+    {
+        if (enabled != isEnabledImpl()) {
+            ((Document) IFrameElement.as(elem).getContentDocument()).setDesignMode(enabled);
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see com.google.gwt.user.client.ui.impl.RichTextAreaImplIE6#isEnabledImpl()
+     */
+    @Override
+    protected boolean isEnabledImpl()
+    {
+        return ((Document) IFrameElement.as(elem).getContentDocument()).isDesignMode();
+    }
 
     /**
      * {@inheritDoc}
@@ -90,6 +128,10 @@ public class RichTextAreaImplIE6 extends com.google.gwt.user.client.ui.impl.Rich
     {
         if (!elem.getPropertyBoolean(RichTextArea.LOADED)) {
             super.uninitElement();
+        } else {
+            // Remember to manually fire a load event next time the rich text area is re-attached because IE doesn't do
+            // it and the load event listeners must to be notified (e.g. when the rich text area is on a dialog box).
+            elem.setPropertyBoolean(FIRE_LOAD_EVENT_MANUALLY, true);
         }
     }
 

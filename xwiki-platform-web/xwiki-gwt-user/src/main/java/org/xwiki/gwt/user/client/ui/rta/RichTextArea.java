@@ -46,6 +46,9 @@ import com.google.gwt.event.dom.client.LoadEvent;
 import com.google.gwt.event.dom.client.LoadHandler;
 import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.user.client.DOM;
+import com.google.gwt.user.client.Window;
+import com.google.gwt.user.client.Window.ClosingEvent;
+import com.google.gwt.user.client.Window.ClosingHandler;
 import com.google.gwt.user.client.ui.impl.RichTextAreaImpl;
 
 /**
@@ -54,7 +57,7 @@ import com.google.gwt.user.client.ui.impl.RichTextAreaImpl;
  * @version $Id$
  */
 public class RichTextArea extends com.google.gwt.user.client.ui.RichTextArea implements HasDoubleClickHandlers,
-    HasLoadHandlers, LoadHandler, HasPasteHandlers, HasActionHandlers
+    HasLoadHandlers, LoadHandler, HasPasteHandlers, HasActionHandlers, ClosingHandler
 {
     /**
      * @see #setHTML(String)
@@ -62,14 +65,19 @@ public class RichTextArea extends com.google.gwt.user.client.ui.RichTextArea imp
     public static final String DIRTY = "__dirty";
 
     /**
+     * Flag indicating that the load event was fired. Ensures the rich text area is initialized only once.
+     * 
      * @see #onLoad(LoadEvent)
      */
     public static final String LOADED = "__loaded";
 
     /**
-     * @see #setEnabled(boolean)
+     * Flag indicating that the load event is currently being handled. Ensures the rich text area is initialized only
+     * when the load event is fired.
+     * 
+     * @see #onLoad(LoadEvent)
      */
-    public static final String DISABLED = "__disabled";
+    public static final String INITIALIZING = "__initializing";
 
     /**
      * The command manager that executes commands on this rich text area.
@@ -200,6 +208,11 @@ public class RichTextArea extends com.google.gwt.user.client.ui.RichTextArea imp
     {
         // We need to preview the event due to a GWT bug.
         // @see http://code.google.com/p/google-web-toolkit/issues/detail?id=729
+        // Note that this makes the RichTextArea unusable on a modal dialog box because the test that checks if the
+        // event target is a child of the panel fails for all the events triggered inside the in-line frame due to the
+        // fact that they come from a different document than the one holding the panel. As a result all the
+        // RichTextArea events are canceled when the RichTextArea is on a modal dialog box (the one provided by GWT).
+        // Unfortunately changing the event target to point to the in-line frame is not possible.
         if (!previewEvent(event)) {
             return;
         }
@@ -254,29 +267,26 @@ public class RichTextArea extends com.google.gwt.user.client.ui.RichTextArea imp
     /**
      * {@inheritDoc}
      * 
-     * @see com.google.gwt.user.client.ui.RichTextArea#onLoad()
-     */
-    @Override
-    protected void onLoad()
-    {
-        // Initialize the element only after the document to be edited is loaded. #onLoad(LoadEvent)
-        getElement().setPropertyBoolean(LOADED, false);
-        super.onLoad();
-    }
-
-    /**
-     * {@inheritDoc}
-     * 
      * @see LoadHandler#onLoad(LoadEvent)
      * @see #onAttach()
      */
     public void onLoad(LoadEvent event)
     {
-        // Initialize the element only after the document to be edited is loaded.
-        getElement().setPropertyBoolean(LOADED, true);
-        // The loaded flag is needed to distinguish between the case when initElement is called after the element is
-        // attached to the page and the case when initElement is called after the document to be edited is loaded.
-        getImpl().initElement();
+        // The load event could be fired multiple times.
+        if (!getElement().getPropertyBoolean(LOADED)) {
+            // Make sure the rich text area is initialized only once.
+            getElement().setPropertyBoolean(LOADED, true);
+            // Make sure the rich text area is initialized only when the load event is fired.
+            getElement().setPropertyBoolean(INITIALIZING, true);
+            try {
+                // The initializing flag is needed to distinguish between the case when initElement is called after the
+                // element is attached to the page and the case when initElement is called after the document to be
+                // edited is loaded.
+                getImpl().initElement();
+            } finally {
+                getElement().setPropertyBoolean(INITIALIZING, false);
+            }
+        }
     }
 
     /**
@@ -288,35 +298,6 @@ public class RichTextArea extends com.google.gwt.user.client.ui.RichTextArea imp
     /*-{
         return this.@com.google.gwt.user.client.ui.RichTextArea::impl;
     }-*/;
-
-    /**
-     * {@inheritDoc}
-     * 
-     * @see com.google.gwt.user.client.ui.RichTextArea#isEnabled()
-     * @see #setEnabled(boolean)
-     */
-    public boolean isEnabled()
-    {
-        return !getElement().getPropertyBoolean(DISABLED);
-    }
-
-    /**
-     * {@inheritDoc}
-     * <p>
-     * NOTE: We overwrite this method to prevent the use of the {@code disabled} property which blocks rich text area
-     * events in Internet Explorer. For instance, the load event is not fired if the {@code disabled} property is set to
-     * {@code true} on the in-line frame element used by the rich text area. In order to be consistent with all the
-     * browsers we chose to use a different property to mark the enabled/disabled state. This way we can disable the
-     * rich text area while it is loading to prevent its content from being submitted and enable it when the load event
-     * fires.
-     * 
-     * @see com.google.gwt.user.client.ui.RichTextArea#setEnabled(boolean)
-     * @see #isEnabled()
-     */
-    public void setEnabled(boolean enabled)
-    {
-        getElement().setPropertyBoolean(DISABLED, !enabled);
-    }
 
     /**
      * {@inheritDoc}
@@ -344,9 +325,41 @@ public class RichTextArea extends com.google.gwt.user.client.ui.RichTextArea imp
             // Sink the load event immediately.
             DOM.sinkEvents(getElement(), eventBitsToAdd | DOM.getEventsSunk(getElement()));
             DOM.setEventListener(getElement(), this);
+            // We can't remove the listener on detach so we listen to window closing event to remove the listener.
+            Window.addWindowClosingHandler(this);
         } else {
             // Preserve deferred sink behavior.
             super.sinkEvents(eventBitsToAdd);
         }
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see com.google.gwt.user.client.ui.RichTextArea#onDetach()
+     * @see #sinkEvents(int)
+     */
+    @Override
+    protected void onDetach()
+    {
+        super.onDetach();
+
+        // We need to keep the listener because onAttach is called after the rich text area is physically attached to
+        // the document and in some browsers the in-line frame used by the rich text area is loaded synchronously. This
+        // means that the load even can be fired before onAttach thus before the listener is set.
+        // NOTE: We have to remove the listener when the host page unloads in order to break the circular reference.
+        DOM.setEventListener(getElement(), this);
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see ClosingHandler#onWindowClosing(ClosingEvent)
+     * @see #onDetach()
+     */
+    public void onWindowClosing(ClosingEvent event)
+    {
+        // We can't remove the listener on detach so we remove it here.
+        DOM.setEventListener(getElement(), null);
     }
 }

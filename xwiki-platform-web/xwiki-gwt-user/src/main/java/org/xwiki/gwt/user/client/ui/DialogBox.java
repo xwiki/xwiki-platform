@@ -120,7 +120,11 @@ public class DialogBox extends PopupPanel implements DragListener, ClickHandler
      */
     public DialogBox(boolean autoHide, boolean modal)
     {
-        super(autoHide, modal);
+        // We use only the glass panel to make the dialog box modal because otherwise the RichTextArea would not be
+        // usable on a modal dialog box. If we make the popup panel modal it will stop all the events whose target is
+        // not a child of the panel. Events triggered inside the rich text area are from a different document than the
+        // one holding the panel and thus their target is not a child of the panel.
+        super(autoHide, false);
         setGlassEnabled(modal);
 
         caption = new Label();

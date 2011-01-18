@@ -284,12 +284,12 @@ public class RichTextEditorController implements Updatable, MouseUpHandler, KeyU
      */
     protected void initTextArea()
     {
-        // Focus the rich text area before executing the commands to ensure it has a proper selection.
-        richTextEditor.getTextArea().setFocus(true);
         if (!richTextEditor.getTextArea().isEnabled()) {
-            // Enable the rich text area in order to be able to submit its content, and notify the plug-ins.
+            // Enable the rich text area in order to be able to edit and submit its content, and notify the plug-ins.
             richTextEditor.getTextArea().getCommandManager().execute(new Command("enable"), true);
         }
+        // Focus the rich text area before executing the commands to ensure it has a proper selection.
+        richTextEditor.getTextArea().setFocus(true);
         // Store the initial content of the rich text area.
         richTextEditor.getTextArea().getCommandManager().execute(SUBMIT);
     }

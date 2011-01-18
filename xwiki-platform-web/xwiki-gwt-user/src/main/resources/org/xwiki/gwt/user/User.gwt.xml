@@ -72,6 +72,24 @@
     </any>
   </replace-with>
 
+  <!-- ReloaderImpl -->
+  <replace-with class="org.xwiki.gwt.user.client.ui.rta.internal.ReloaderImpl">
+    <when-type-is class="org.xwiki.gwt.user.client.ui.rta.internal.ReloaderImpl" />
+  </replace-with>
+
+  <replace-with class="org.xwiki.gwt.user.client.ui.rta.internal.ReloaderImplIE">
+    <when-type-is class="org.xwiki.gwt.user.client.ui.rta.internal.ReloaderImpl" />
+    <any>
+      <when-property-is name="user.agent" value="ie6" />
+      <when-property-is name="user.agent" value="ie8" />
+    </any>
+  </replace-with>
+
+  <replace-with class="org.xwiki.gwt.user.client.ui.rta.internal.ReloaderImplOpera">
+    <when-type-is class="org.xwiki.gwt.user.client.ui.rta.internal.ReloaderImpl" />
+    <when-property-is name="user.agent" value="opera" />
+  </replace-with>
+
   <!-- Console -->
   <replace-with class="org.xwiki.gwt.user.client.Console">
     <when-type-is class="org.xwiki.gwt.user.client.Console" />

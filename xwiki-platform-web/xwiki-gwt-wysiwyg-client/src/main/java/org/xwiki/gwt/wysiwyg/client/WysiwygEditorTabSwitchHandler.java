@@ -464,14 +464,14 @@ public class WysiwygEditorTabSwitchHandler implements SelectionHandler<Integer>,
 
         // Initialize the rich text editor if this is the first time we switch to WYSIWYG tab.
         editor.maybeInitializeRichTextEditor();
+        // Enable the rich text area in order to be able to edit and submit its content.
+        editor.getRichTextEditor().getTextArea().getCommandManager().execute(ENABLE, true);
         // Restore the DOM selection before executing the commands.
         restoreDOMSelection();
         // Store the initial value of the rich text area in case it is submitted without gaining focus.
         editor.getRichTextEditor().getTextArea().getCommandManager().execute(SUBMIT, true);
         // Update the HTML to prevent a useless HTML to source conversion when we already know the source.
         lastConvertedHTML = editor.getRichTextEditor().getTextArea().getCommandManager().getStringValue(SUBMIT);
-        // Enable the rich text area in order to be able to submit its content.
-        editor.getRichTextEditor().getTextArea().getCommandManager().execute(ENABLE, true);
         // Remember the fact that the submitted value is HTML for the case when the editor is loaded from cache.
         editor.getConfig().setInputConverted(true);
     }

@@ -26,7 +26,10 @@ import org.xwiki.gwt.dom.client.IFrameElement;
 import org.xwiki.gwt.dom.client.JavaScriptObject;
 import org.xwiki.gwt.user.client.Strings;
 import org.xwiki.gwt.user.client.URLUtils;
+import org.xwiki.gwt.user.client.ui.rta.internal.ReloaderImpl;
 
+import com.google.gwt.core.client.GWT;
+import com.google.gwt.dom.client.Node;
 import com.google.gwt.event.dom.client.LoadEvent;
 import com.google.gwt.event.dom.client.LoadHandler;
 import com.google.gwt.event.shared.HandlerRegistration;
@@ -35,6 +38,7 @@ import com.google.gwt.http.client.RequestBuilder;
 import com.google.gwt.http.client.RequestCallback;
 import com.google.gwt.http.client.RequestException;
 import com.google.gwt.http.client.Response;
+import com.google.gwt.user.client.DOM;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 
 /**
@@ -48,6 +52,11 @@ public class Reloader implements RequestCallback, LoadHandler
      * The rich text area to be reloaded.
      */
     private final RichTextArea rta;
+
+    /**
+     * The object used to do browser-specific reload operations.
+     */
+    private final ReloaderImpl impl = GWT.create(ReloaderImpl.class);
 
     /**
      * This object is used to preserve the list of inner HTML listeners while the rich text area is reloading. Rich text
@@ -174,30 +183,59 @@ public class Reloader implements RequestCallback, LoadHandler
     private native void renewRichTextAreaElement()
     /*-{
         var rta = this.@org.xwiki.gwt.user.client.ui.rta.Reloader::rta;
+
+        // Fake detach to release the event listeners.
+        rta.@com.google.gwt.user.client.ui.Widget::onDetach()();
+
+        // Renew the in-line frame element.
+        var newIFrame = this.@org.xwiki.gwt.user.client.ui.rta.Reloader::renewIFrameElement()();
+
+        // Update the reference to the rich text area element.
+        rta.@com.google.gwt.user.client.ui.UIObject::element = newIFrame;
         var rtaImpl = rta.@com.google.gwt.user.client.ui.RichTextArea::impl;
-        var iframe = rta.@com.google.gwt.user.client.ui.UIObject::element;
-        
-        // Fake detach to release event listeners.
-        rta.@com.google.gwt.user.client.ui.Widget::onDetach()(); 
-
-        // Clone the current in-line frame.
-        var newIframe = iframe.cloneNode(true);
-
-        // Update the reference to the in-line frame in the widgets.
-        rta.@com.google.gwt.user.client.ui.UIObject::element = newIframe;
-        rtaImpl.@com.google.gwt.user.client.ui.impl.RichTextAreaImpl::elem = newIframe;
-
-        // Update the DOM.
-        iframe.parentNode.replaceChild(newIframe, iframe);
-
-        // Don't let the in-line frame load to prevent the browser from recording a new history entry. We use DOMUtils
-        // because only static references to overlay types are allowed from JSNI.
-        var domUtils = @org.xwiki.gwt.dom.client.DOMUtils::getInstance()();
-        domUtils.@org.xwiki.gwt.dom.client.DOMUtils::stop(Lorg/xwiki/gwt/dom/client/Window;)(newIframe.contentWindow);
+        rtaImpl.@com.google.gwt.user.client.ui.impl.RichTextAreaImpl::elem = newIFrame;
         
         // Fake attach to initialize the event listeners.
         rta.@com.google.gwt.user.client.ui.Widget::onAttach()();
     }-*/;
+
+    /**
+     * Renews the in-line frame element used by the rich text area.
+     * 
+     * @return the new in-line frame element
+     * @see #renewRichTextAreaElement()
+     */
+    @SuppressWarnings("unused")
+    private IFrameElement renewIFrameElement()
+    {
+        IFrameElement iFrame = IFrameElement.as(rta.getElement()).cast();
+        Node parent = iFrame.getParentNode();
+        Node nextSibling = iFrame.getNextSibling();
+
+        impl.unloadIFrameElement(iFrame);
+
+        // The listener is not removed when onDetach is called. See RichTextArea#onDetach() for details.
+        DOM.setEventListener((com.google.gwt.user.client.Element) iFrame.cast(), null);
+
+        // Clone the previous in-line frame.
+        IFrameElement newIFrame = (IFrameElement) iFrame.cloneNode(false);
+
+        // Attach the new in-line frame to the DOM.
+        if (nextSibling != null) {
+            parent.insertBefore(newIFrame, nextSibling);
+        } else {
+            parent.appendChild(newIFrame);
+        }
+
+        // Don't let the in-line frame load to prevent the browser from recording a new history entry. We use DOMUtils
+        // because only static references to overlay types are allowed from JSNI.
+        newIFrame.getContentWindow().stop();
+
+        // onAttach sets the listener only the first time it is called. See RichTextArea#onAttach() for details.
+        DOM.setEventListener((com.google.gwt.user.client.Element) iFrame.cast(), rta);
+
+        return newIFrame;
+    }
 
     /**
      * Updates the content of the rich text area.

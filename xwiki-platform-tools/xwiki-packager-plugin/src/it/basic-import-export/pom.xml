@@ -72,16 +72,11 @@
             <artifactId>hsqldb</artifactId>
             <version>1.8.0.7</version>
           </dependency>
-          <!--
-            We need the Servlet API dep since it's used by the Packager
-            and since it has a provided scope in XWiki core it's not
-            inherited as part of transitive deps
-          -->
           <dependency>
             <groupId>javax.servlet</groupId>
             <artifactId>servlet-api</artifactId>
             <version>2.4</version>
-            <scope>provided</scope>
+            <scope>runtime</scope>
           </dependency>
         </dependencies>
         <executions>

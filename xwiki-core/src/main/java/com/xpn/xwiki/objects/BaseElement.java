@@ -58,13 +58,6 @@ public abstract class BaseElement implements ElementInterface, Serializable
     private String prettyName;
 
     /**
-     * Used to convert a Document Reference to string (compact form without the wiki part if it matches the current
-     * wiki).
-     */
-    private EntityReferenceSerializer<String> compactWikiEntityReferenceSerializer =
-        Utils.getComponent(EntityReferenceSerializer.class, "compactwiki");
-
-    /**
      * Used to convert a proper Document Reference to a string but without the wiki name.
      */
     private EntityReferenceSerializer<String> localEntityReferenceSerializer =
@@ -285,8 +278,12 @@ public abstract class BaseElement implements ElementInterface, Serializable
         try {
             syntaxId = getDocument(context).getSyntaxId();
         } catch (Exception e) {
+            // Used to convert a Document Reference to string (compact form without the wiki part if it matches the
+            // current wiki).
+            EntityReferenceSerializer<String> compactWikiEntityReferenceSerializer =
+                Utils.getComponent(EntityReferenceSerializer.class, "compactwiki");
             LOG.warn("Error while getting the syntax corresponding to object ["
-                + this.compactWikiEntityReferenceSerializer.serialize(getDocumentReference())
+                + compactWikiEntityReferenceSerializer.serialize(getDocumentReference())
                 + "]. Defaulting to using XWiki 1.0 syntax. Internal error [" + e.getMessage() + "]");
             syntaxId = "xwiki/1.0";
         }

@@ -38,7 +38,7 @@
     as a Maven2 plugin or directly from the command line.
    </description>
   <properties>
-    <platform.core.version>2.3.1</platform.core.version>
+    <platform.core.version>2.6.1</platform.core.version>
   </properties>
   <dependencies>
     <dependency>

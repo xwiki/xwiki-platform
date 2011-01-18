@@ -102,7 +102,7 @@
 }
 
 /* *+html #lb-bottom .rounded, */
-* html #lb-bottom .rounded {
+* html #lb-bottom .rounded, *+html #lb-top .rounded .top  {
   margin-top: 0em; /* avant -1em*/
 }
 

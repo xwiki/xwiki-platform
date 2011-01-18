@@ -755,10 +755,7 @@ public class Package
             } catch (XWikiException e) {
                 addToErrors(doc.getFullName() + ":" + doc.getLanguage(), context);
                 if (LOG.isErrorEnabled()) {
-                    LOG.error("Failed to save document " + doc.getFullName());
-                }
-                if (LOG.isDebugEnabled()) {
-                    LOG.debug("Failed to save document " + doc.getFullName(), e);
+                    LOG.error("Failed to save document " + doc.getFullName(), e);
                 }
                 result = DocumentInfo.INSTALL_ERROR;
             }
@@ -899,8 +896,8 @@ public class Package
     }
 
     /**
-     * Write the package.xml file to an {@link com.xpn.xwiki.internal.xml.âxpn.âxwiki.âutil.XMLWriter}
-     * 
+     * Write the package.xml file to an {@link XMLWriter}.
+     *
      * @param wr the writer to write to
      * @throws IOException when an error occurs during streaming operation
      * @since 2.3M2

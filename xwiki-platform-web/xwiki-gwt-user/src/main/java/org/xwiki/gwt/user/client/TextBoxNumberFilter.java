@@ -19,6 +19,9 @@
  */
 package org.xwiki.gwt.user.client;
 
+import java.util.Arrays;
+import java.util.List;
+
 import com.google.gwt.event.dom.client.KeyCodes;
 import com.google.gwt.event.dom.client.KeyPressEvent;
 import com.google.gwt.event.dom.client.KeyPressHandler;
@@ -30,32 +33,9 @@ import com.google.gwt.user.client.ui.TextBox;
 public class TextBoxNumberFilter implements KeyPressHandler
 {
     /**
-     * List of forbidden keys in the TextBox.
+     * Opera handles these keys as character keys, i.e. charCode > 0.
      */
-    private static final char[] AUTHORIZED_KEYS = {
-        KeyCodes.KEY_BACKSPACE, KeyCodes.KEY_DELETE, KeyCodes.KEY_HOME, KeyCodes.KEY_END, KeyCodes.KEY_LEFT,
-        KeyCodes.KEY_UP, KeyCodes.KEY_RIGHT, KeyCodes.KEY_DOWN, KeyCodes.KEY_TAB, KeyCodes.KEY_ENTER,
-        KeyCodes.KEY_ESCAPE
-    };
-
-    /**
-     * Determine if a char must be filtered.
-     * 
-     * @param keyCode char to inspect.
-     * @return true if the char needs to be filtered.
-     */
-    private boolean isFilteredKey(int keyCode)
-    {
-        if (Character.isDigit((char) keyCode)) {
-            return false;
-        }
-        for (char c : AUTHORIZED_KEYS) {
-            if (keyCode == c) {
-                return false;
-            }
-        }
-        return true;
-    }
+    private static final List<Integer> SPECIAL_KEY_CODES = Arrays.asList(KeyCodes.KEY_BACKSPACE, KeyCodes.KEY_TAB);
 
     /**
      * {@inheritDoc}
@@ -64,7 +44,9 @@ public class TextBoxNumberFilter implements KeyPressHandler
      */
     public void onKeyPress(KeyPressEvent event)
     {
-        if (isFilteredKey(event.getNativeEvent().getKeyCode())) {
+        int keyCode = event.getNativeEvent().getKeyCode();
+        int codePoint = event.getUnicodeCharCode();
+        if (codePoint > 0 && !Character.isDigit((char) codePoint) && !SPECIAL_KEY_CODES.contains(keyCode)) {
             // Suppress the current keyboard event.
             ((TextBox) event.getSource()).cancelKey();
         }

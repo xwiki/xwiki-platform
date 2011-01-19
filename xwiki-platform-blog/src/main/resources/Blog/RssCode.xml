@@ -305,10 +305,12 @@
  *###
 #macro(getTargetBlog $blogDoc)
   #if("$!{request.blog}" != '')
-    #set($blogDoc = $xwiki.getDocument($request.blog))
+    #set($result = $xwiki.getDocument($request.blog))
   #else
-    #getBlogDocument('Blog' $blogDoc)
+    #getBlogDocument('Blog' $result)
   #end
+  #set ($blogDoc = $util.null)
+  #setVariable ("$blogDoc" $result)
   ## TODO: Check if the document has a Blog.BlogClass object.
 #end
 ##
@@ -320,14 +322,15 @@ $escapetool.xml($entryDoc.display($fieldName, 'view', $entryObj))#end
 ##
 ##
 #macro(getWikiLogo $logoUrl)
-  #set($logoUrl = $xwiki.getSkinFile($xwiki.getSkinPreference('logo', 'logo.png')))
-  #set($port = '')
-  #if(($request.scheme == 'http') &amp;&amp; ($request.serverPort != 80))
-    #set($port = ":${request.serverPort}")
-  #elseif(($request.scheme == 'https') &amp;&amp; ($request.serverPort != 443))
-    #set($port = ":${request.serverPort}")
+  #set ($path = $xwiki.getSkinFile($xwiki.getSkinPreference('logo', 'logo.png')))
+  #set ($port = '')
+  #if (($request.scheme == 'http') &amp;&amp; ($request.serverPort != 80))
+    #set ($port = ":${request.serverPort}")
+  #elseif (($request.scheme == 'https') &amp;&amp; ($request.serverPort != 443))
+    #set ($port = ":${request.serverPort}")
   #end
-  #set($logoUrl = "${request.scheme}://${request.serverName}${port}$logoUrl")
+  #set ($logoUrl = $util.null)
+  #setVariable ("$logoUrl" "${request.scheme}://${request.serverName}${port}${path}")
 #end
 {{/velocity}}</content>
 </xwikidoc>

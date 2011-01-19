@@ -37,7 +37,7 @@ import org.xwiki.rendering.macro.descriptor.DefaultContentDescriptor;
 import org.xwiki.rendering.transformation.MacroTransformationContext;
 
 /**
- * Provides Caching for the content of the macro.
+ * Execute the macro's content in the context of another document's reference.
  *
  * @version $Id$
  * @since 3.0M1

@@ -23,6 +23,7 @@ import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiConfig;
 import com.xpn.xwiki.XWiki;
+import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.web.Utils;
 import com.xpn.xwiki.web.XWikiServletURLFactory;
 
@@ -36,6 +37,7 @@ import org.xwiki.context.Execution;
 import org.xwiki.context.ExecutionContext;
 import org.xwiki.context.ExecutionContextException;
 import org.xwiki.context.ExecutionContextManager;
+import org.xwiki.model.reference.DocumentReference;
 
 /**
  * Common code for importing and exporting.
@@ -81,6 +83,15 @@ public class AbstractPackager
         context.setDatabase(databaseName);
         context.setMainXWiki(databaseName);
 
+        // Use a dummy URL so that XWiki's initialization can create a Servlet URL Factory. We could also have
+        // registered a custom XWikiURLFactory against XWikiURLFactoryService but it's more work.
+        context.setURL(new URL("http://localhost/xwiki/bin/DummyAction/DumySpace/DummyPage"));
+
+        // Set a dummy Document in the context to act as the current document since when a document containing
+        // objects is imported it'll generate Object diff events and the algorithm to compute an object diff
+        // currently requires rendering object properties, which requires a current document in the context.
+        context.setDoc(new XWikiDocument(new DocumentReference(databaseName, "dummySpace", "dummyPage")));
+
         XWikiConfig config = new XWikiConfig();
         config.put("xwiki.store.class", "com.xpn.xwiki.store.XWikiHibernateStore");
 
@@ -94,7 +105,7 @@ public class AbstractPackager
         // Enable backlinks so that when documents are imported their backlinks will be saved too
         config.put("xwiki.backlinks", "1");
 
-        new XWiki(config, context);
+        new XWiki(config, context, null, true);
 
         try {
             context.setURLFactory(new XWikiServletURLFactory(new URL("http://localhost:8080"), "xwiki/", "bin/"));

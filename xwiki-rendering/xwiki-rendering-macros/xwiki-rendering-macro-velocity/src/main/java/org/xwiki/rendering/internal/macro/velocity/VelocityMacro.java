@@ -37,6 +37,9 @@ import org.xwiki.velocity.VelocityManager;
 import org.xwiki.velocity.XWikiVelocityException;
 
 /**
+ * Executes <a href="http://velocity.apache.org/">Velocity</a> on the content of this macro and optionally parse the
+ * resulting content with a wiki syntax parser.
+ *
  * @version $Id$
  * @since 1.5M2
  */
@@ -76,8 +79,6 @@ public class VelocityMacro extends AbstractScriptMacro<VelocityMacroParameters>
 
     /**
      * {@inheritDoc}
-     * 
-     * @see org.xwiki.rendering.macro.Macro#supportsInlineMode()
      */
     public boolean supportsInlineMode()
     {
@@ -86,8 +87,6 @@ public class VelocityMacro extends AbstractScriptMacro<VelocityMacroParameters>
 
     /**
      * {@inheritDoc}
-     * 
-     * @see AbstractScriptMacro#evaluateString(ScriptMacroParameters, String, MacroTransformationContext)
      */
     @Override
     protected String evaluateString(VelocityMacroParameters parameters, String content,

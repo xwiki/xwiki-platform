@@ -292,6 +292,9 @@
   #set($result = $result.replaceAll("${prefix}propDiffNewValue", "$propDiffStyle background:#EDFFED;"))
   #set($result = $result.replaceAll("${prefix}propDiff", "$propDiffStyle"))
   #set($suffix = "_WATCHLIST_IMG_PLACEHOLDER")
+  ## We have to rely on a trick to escape nested quotes because "" (doubling the quotes) syntax is supported only since
+  ## velocity 1.7 and escapetool is not present in the velocity context when the notification message is parsed (a
+  ## custom velocity context is used).
   #set($q = '"')
   #foreach($totransform in ["attach", "object", "class", "metadata"])
     #set($result = $result.replaceAll("${totransform}${suffix}", "&lt;img src=${q}cid:${totransform}.gif${q} style=${q}${iconStyle}${q} ${iconAttrs}&gt;&lt;/img&gt;"))

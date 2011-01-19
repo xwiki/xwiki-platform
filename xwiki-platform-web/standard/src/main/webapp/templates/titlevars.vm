@@ -34,3 +34,8 @@
     #set ($titleToDisplay = $regexResult.get(2).group)
   #end
 #end
+## If the title comes from a heading in the content, special XML characters are already escaped.
+## If the title comes from the title field or from the document name it must be manually escaped for security.
+#if ("$!{tdoc.title}" != '' || $tdoc.name == $titleToDisplay)
+  #set ($titleToDisplay = $escapetool.xml($titleToDisplay))
+#end

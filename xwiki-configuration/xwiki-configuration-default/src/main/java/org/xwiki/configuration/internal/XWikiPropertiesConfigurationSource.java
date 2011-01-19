@@ -57,12 +57,22 @@ public class XWikiPropertiesConfigurationSource extends CommonsConfigurationSour
         URL xwikiPropertiesUrl;
         try {
             xwikiPropertiesUrl = this.container.getApplicationContext().getResource(XWIKI_PROPERTIES_FILE);
-            setConfiguration(new PropertiesConfiguration(xwikiPropertiesUrl));
+            if (xwikiPropertiesUrl != null) {
+                setConfiguration(new PropertiesConfiguration(xwikiPropertiesUrl));
+            } else if (getLogger().isDebugEnabled()) {
+                // We use a debug logging level here since we consider it's ok that there's no XWIKI_PROPERTIES_FILE
+                // available, in which case default values are used.
+                getLogger().debug("No configuration file [" + XWIKI_PROPERTIES_FILE + "] found. "
+                    + "Using default configuration values.");
+
+                // Use a default Commons Configuration implementation since we couldn't use a Properties configuration.
+                setConfiguration(new BaseConfiguration());
+            }
         } catch (Exception e) {
-            // Note: if we cannot read the configuration file we log a warning but continue since XWiki will use 
-            // default values for all configurable elements.
+            // Note: if we cannot read the configuration file for any reasonwe log a warning but continue since XWiki
+            // will use default values for all configurable elements.
             getLogger().warn("Failed to load configuration file [" + XWIKI_PROPERTIES_FILE 
-                + "]. Using default configuration. " + " Internal error [" + e.getMessage() + "]");
+                + "]. Using default configuration values. " + " Internal error [" + e.getMessage() + "]");
             
             // Use a default Commons Configuration implementation since we couldn't use a Properties configuration.
             setConfiguration(new BaseConfiguration());

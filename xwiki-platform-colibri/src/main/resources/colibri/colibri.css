@@ -1228,10 +1228,31 @@ div#xwikiobjects input[type="checkbox"], div#xwikiclassproperties input[type="ch
 /* --------------------------------------------------------------
   * forms components
 -------------------------------------------------------------- */
-.xform h2 {
+.xform h2, .xform legend {
+  border-bottom: 1px dotted $theme.borderColor;
+  color: $theme.titleColor;
+  display: block;
   font-size: 1.2em;
-  font-weight: bold;
+  font-weight: 900;
+  line-height: 1.2em;
+  overflow: hidden;
+  width: 100%;
+}
+.xform h2 {
   margin: 2em 0 0;
+}
+.xform fieldset h2 {
+  margin: 0;
+}
+
+.xform fieldset {
+  margin: 2em 0;
+}
+.xform fieldset:first-of-type {
+  margin-top: 1em;
+}
+.xform fieldset:last-of-type {
+  margin-bottom: 1em;
 }
 
 .xform input[type="text"], .xform input[type="password"],
@@ -1250,6 +1271,11 @@ div#xwikiobjects input[type="checkbox"], div#xwikiclassproperties input[type="ch
   font-weight: 700;
   margin-bottom: .3em;
   text-transform: uppercase;
+}
+/* Buttons next to the labels, for example the Customize buttons in Administration->Presentation */
+.xform dt label .buttonwrapper {
+  float: right;
+  margin: 0 1% .3em;
 }
 
 .xform .xRequired {
@@ -1884,10 +1910,6 @@ ol.footnotes {
 /* --------------------------------------------------------------
   * These classes should be moved in AdminSheet ssx
 -------------------------------------------------------------- */
-#admin-page-content .bottombuttons {
-  padding-left: 20px;
-}
-
 /* Overwrites AdminSheet ssx */
 #admin-page-content fieldset p label {
   text-align: left;

@@ -292,11 +292,12 @@
   #set($result = $result.replaceAll("${prefix}propDiffNewValue", "$propDiffStyle background:#EDFFED;"))
   #set($result = $result.replaceAll("${prefix}propDiff", "$propDiffStyle"))
   #set($suffix = "_WATCHLIST_IMG_PLACEHOLDER")
+  #set($q = '"')
   #foreach($totransform in ["attach", "object", "class", "metadata"])
-    #set($result = $result.replaceAll("${totransform}${suffix}", "&lt;img src=""cid:${totransform}.gif"" style=""${iconStyle}"" ${iconAttrs}&gt;&lt;/img&gt;"))
+    #set($result = $result.replaceAll("${totransform}${suffix}", "&lt;img src=${q}cid:${totransform}.gif${q} style=${q}${iconStyle}${q} ${iconAttrs}&gt;&lt;/img&gt;"))
   #end
   #foreach($totransform in ["boolean", "date", "dblist", "dbtreelist", "groups", "levels", "number", "password", "staticlist", "string", "textarea", "users"])
-    #set($result = $result.replaceAll("${totransform}${suffix}", "&lt;img src=""cid:${totransform}.png"" style=""${iconStyle}"" ${iconAttrs}&gt;&lt;/img&gt;"))
+    #set($result = $result.replaceAll("${totransform}${suffix}", "&lt;img src=${q}cid:${totransform}.png${q} style=${q}${iconStyle}${q} ${iconAttrs}&gt;&lt;/img&gt;"))
   #end
   $result
 #end

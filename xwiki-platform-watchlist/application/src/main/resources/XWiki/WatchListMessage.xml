@@ -267,7 +267,7 @@
 #set($spaceDivStyle = "$commonDivStyle margin-left:8px;padding:10px;border-left:solid 1px ${lightGray};")
 #set($documentDivStyle = "$commonDivStyle margin-left:8px;padding:10px;border-left:solid 1px ${lightGray};")
 #set($iconStyle = "width:16px;height:16px;margin-right:4px")
-#set($iconAttrs = "align=\"absmiddle\"")
+#set($iconAttrs = 'align="absmiddle"')
 #set($eventStyle = "padding-left:21px;")
 #set($diffStyle = "padding:5px;margin:5px;background-color:$veryLightGray;border-left:solid 4px $lightGray;")
 #set($propDiffStyle = "margin-right:2px;padding:2px;")
@@ -293,10 +293,10 @@
   #set($result = $result.replaceAll("${prefix}propDiff", "$propDiffStyle"))
   #set($suffix = "_WATCHLIST_IMG_PLACEHOLDER")
   #foreach($totransform in ["attach", "object", "class", "metadata"])
-    #set($result = $result.replaceAll("${totransform}${suffix}", "&lt;img src=\"cid:${totransform}.gif\" style=\"${iconStyle}\" ${iconAttrs}&gt;&lt;/img&gt;"))
+    #set($result = $result.replaceAll("${totransform}${suffix}", "&lt;img src=""cid:${totransform}.gif"" style=""${iconStyle}"" ${iconAttrs}&gt;&lt;/img&gt;"))
   #end
   #foreach($totransform in ["boolean", "date", "dblist", "dbtreelist", "groups", "levels", "number", "password", "staticlist", "string", "textarea", "users"])
-    #set($result = $result.replaceAll("${totransform}${suffix}", "&lt;img src=\"cid:${totransform}.png\" style=\"${iconStyle}\" ${iconAttrs}&gt;&lt;/img&gt;"))
+    #set($result = $result.replaceAll("${totransform}${suffix}", "&lt;img src=""cid:${totransform}.png"" style=""${iconStyle}"" ${iconAttrs}&gt;&lt;/img&gt;"))
   #end
   $result
 #end

@@ -1945,6 +1945,91 @@ ul.xwikitabbar {
     border: 1px solid;
 }
 
+/* @group VERTICAL MENU */
+/* General styling */
+.vertical-menu {
+  border: 1px solid #CCC;
+  border-top-width: 0;
+  float: left;
+  font-size: .857em;/* 14px -> 12px */
+  margin: 0 2em 2em 0;
+  width: 15em;
+}
+
+.vertical-menu ul {
+  list-style-type: none;
+  margin: 0;
+}
+.vertical-menu ul ul ul {
+  margin-left: 2em;
+}
+
+.vertical-menu li {
+  border-top: 1px solid #CCC;
+  position: relative;
+}
+
+.vertical-menu span {
+  background: none no-repeat scroll 7px transparent;
+  display: block;
+}
+
+.vertical-menu a {
+  display: block;
+  padding: .5em .5em .5em 30px;
+  text-decoration: none;
+}
+
+/* Section titles */
+.vertical-menu .group {
+  background-color: #CCC;
+  font-weight: 700;
+  font-variant: small-caps;
+}
+
+/* Highlight items when hovering */
+.vertical-menu span:hover {
+  background-color: #FFD;
+}
+.vertical-menu .group:hover {
+  background-color: #505263;
+}
+.vertical-menu .group:hover * {
+  color: #FFF;
+}
+
+/* Selected item */
+.vertical-menu .current {
+  background-color: #FFD;
+  font-weight: bold;
+}
+.vertical-menu .current-group {
+  background-color: #505263;
+  color: #FFF;
+}
+.vertical-menu .current-group * {
+  color: #FFF;
+}
+
+/* Draw an arrow pointing right for the selected item */
+.vertical-menu .current:after, .vertical-menu .current a:after {
+  border-left: 10px solid #FFD;
+  border-top: 1.2em solid transparent;
+  border-bottom: 1.2em solid transparent;
+  content: "";
+  display: block;
+  position: absolute;
+  right: -10px;
+  top: 0%;
+}
+.vertical-menu .current a:after {
+  border-left-color: #CCC;
+  right: -11px;
+}
+.vertical-menu .current-group:after {
+  border-left-color: #505263 !important;
+}
+
 /* --------------------------------------- */
 /* --------------------------------------- */
 /* @group Panels */

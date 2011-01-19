@@ -2448,3 +2448,82 @@ Wysiwyg.onModuleLoad(function() {
 #wysiwyg_editPropertyCustom($editedDocument $instanceParameters)
 #end
 #end
+
+#**
+ * Generates a vertical menu from an object describing the categories
+ *
+ * Expected format of the object:
+ * menu = vector of items
+ * item = map with the following fields:
+ *        'id'       : mandatory
+ *        'name'     : the text displayed for the corresponding menu item;
+ *                     optional, defaults to
+ *                     $msg.get("$!{translationPrefix}${item.id}")
+ *        'url'      : the "action" of the menu item; optional, defaults to #
+ *        'cssClass' : a specific css class for the menu item for custom
+ *                     styling; optional, defaults to ''
+ *        'children' : vector of items, allowing to recursively define submenus
+ *
+ * @param $menu the menu object, in the format described above
+ * @param $options a map of options, where the following entries are currently used:
+ *        'translationPrefix' :  the translation prefix added to the id of each
+ *                     item, in order to generate the name; ignored for items whose
+ *                     name is specified
+ *        'crtItemId': identifier of the current menu item (for differential styling)
+ *        'cssClass' : specific css class for this menu
+ *#
+#macro(verticalNavigation $menu $options)
+  (% class="vertical-menu $!{options.cssClass}" %)(((
+  #foreach ($item in $menu)
+    #verticalNavigationItem($item '*' $options)
+  #end
+  )))
+#end
+
+#**
+ * Generates a vertical menu item from an object (a map)
+ *
+ * Expected format:
+ * item = map with the following fields:
+ *        'id'       : mandatory
+ *        'name'     : the text displayed for the corresponding menu item;
+ *                     optional, defaults to
+ *                     $msg.get("$!{translationPrefix}${item.id}")
+ *        'url'      : the "action" of the menu item; optional
+ *        'cssClass' : a specific css class for the menu item for custom
+ *                     styling; optional, defaults to ''
+ *        'children' : vector of items, allowing to recursively define submenus
+ *
+ * @param $item the menu item object, in the format described above
+ * @param $level the current level of the item, of the form '\*+'; the number of
+ *        stars indicates the depth of the item in the menu
+ * @param $options a map of options, where the following entries are currently used:
+ *        'translationPrefix' :  the translation prefix added to the id of each
+ *                     item, in order to generate the name; ignored for items whose
+ *                     name is specified
+ *        'crtItemId': identifier of the current menu item (for differential styling)
+ *#
+#macro(verticalNavigationItem $item $level $options)
+  #set ($class = "$!{item.cssClass}")
+  #set ($hasChildren = ($item.children && $item.children.size() > 0))
+  #if ($hasChildren)
+    #set ($class = "$class group")
+  #end
+  #if ($options.crtItemId == $item.id)
+    #set ($class = "$class current")
+    #if ($hasChildren)
+      #set ($class = "$class current-group")
+    #end
+  #end
+  #set ($class = $class.trim())
+  #set ($name = "$!{item.name}")
+  #if ($name == '')
+    #set ($name = $msg.get("$!{options.translationPrefix}${item.id}"))
+  #end
+  $level (% class="${class}" %){{html}}<a #if ("$!{item.url}" != '')href="$item.url"#{end}>$name</a>{{/html}}
+  #if ($hasChildren)
+    #foreach ($child in $item.children)
+      #verticalNavigationItem($child $level.concat('*') $options)
+    #end
+  #end
+#end

@@ -1,4 +1,4 @@
-package com.xpn.xwiki.internal;
+package com.xpn.xwiki.internal.macro;
 
 import java.util.Map;
 

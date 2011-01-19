@@ -131,13 +131,13 @@
   #set($space = 'Blog')
 #end
 #getBlogDocument($space $blogDoc)
-#set($month = "$!{request.month}")
-#set($year = "$!{request.year}")
-#if($year == '')
+#set ($month = "$!{util.parseInt($request.month)}")
+#set ($year = "$!{util.parseInt($request.year)}")
+#if ($year == '0')
   ## Show a brief history of the blog, a tree with first level = years, second level = months, and the number of entries from that year/month in every node.
   #displayBlogFullArchive($blogDoc)
 #else
-  #if($month == '')
+  #if ($month == '0')
     ## Show an index of all posts in this year (titles only), with month names as subtitles
     #displayBlogYearArchive($blogDoc $year)
   #else

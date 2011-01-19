@@ -237,10 +237,8 @@ public class HTMLVelocityMacroFilter extends AbstractLogEnabled implements Veloc
      */
     private void flushWhiteSpaces(StringBuffer contentBuffer, FilterContext filterContext, boolean forceNoSpace)
     {
-        boolean space = false;
-
         if (filterContext.wsGroup.length() > 0) {
-            space = filterContext.wsGroup.charAt(0) == ' ';
+            boolean space = filterContext.wsGroup.charAt(0) == ' ';
 
             if (forceNoSpace && space) {
                 contentBuffer.append(filterContext.wsGroup, 1, filterContext.wsGroup.length());

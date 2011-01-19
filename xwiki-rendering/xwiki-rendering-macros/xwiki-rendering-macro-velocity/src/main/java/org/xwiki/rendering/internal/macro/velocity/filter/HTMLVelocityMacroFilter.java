@@ -264,10 +264,10 @@ public class HTMLVelocityMacroFilter extends AbstractLogEnabled implements Veloc
      * @see org.xwiki.rendering.macro.velocity.filter.VelocityMacroFilter#before(java.lang.String,
      *      org.apache.velocity.VelocityContext)
      */
-    public String after(String content, VelocityContext velocityContect)
+    public String after(String content, VelocityContext velocityContext)
     {
-        velocityContect.remove(BINDING_NEWLINE);
-        velocityContect.remove(BINDING_SPACE);
+        velocityContext.remove(BINDING_NEWLINE);
+        velocityContext.remove(BINDING_SPACE);
 
         return content;
     }

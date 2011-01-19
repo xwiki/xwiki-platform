@@ -25,10 +25,20 @@
 }
 
 .rights {
-  text-align: center;
   padding-left: 0px !important;
   padding-top: 4px;
   width: 9%;
+}
+.rights th, .rights td {
+  border: 1px solid $theme.borderColor;
+  padding: 3px 4px;
+}
+.rights label {
+  display: inline;
+  text-transform: none;
+  font-weight: 400;
+  font-size: 1em;
+  color: $theme.textColor;
 }
 
 #usersandgroupstable.spacerights .rights {

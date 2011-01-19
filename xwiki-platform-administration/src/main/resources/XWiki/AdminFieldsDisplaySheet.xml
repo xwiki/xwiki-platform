@@ -27,12 +27,16 @@
 #if ("$!section" != '')
   ## clean="false" due to bug #XWIKI-4122 - the &lt;legend&gt; element is dropped.
   {{html clean="false"}}
-  &lt;form id="$section.toLowerCase()" method="post" action="$xwiki.getURL($currentDoc, 'saveandcontinue')" onsubmit="cancelCancelEdit()"&gt;
+  &lt;form id="$section.toLowerCase()" method="post" action="$xwiki.getURL($currentDoc, 'saveandcontinue')" onsubmit="cancelCancelEdit()" class="xform half"&gt;
     #foreach ($item in $legend)
       #set ($fields = $params.get($item))
       &lt;fieldset class="$item"&gt;
-      #if($legend.size() &gt; 1)
+      ## If there is only one section, don't display the legend
+      #if ($legend.size() &gt; 1)
         &lt;legend&gt;$msg.get("admin.${item}")&lt;/legend&gt;
+      #end
+      #if ($fields.size() &gt; 0)
+        &lt;dl&gt;
       #end
       #foreach($field in $fields)
         #set($prop = $obj.xWikiClass.get($field))
@@ -40,25 +44,28 @@
         #if ($title == $field &amp;&amp; $prop)
           #set ($title = $!prop.prettyName)
         #end
-        &lt;p&gt;
-          &lt;label #if($prop)for="${prefsclassname}_${obj.number}_${prop.name}"#end class="$field"&gt;$title
-          #if($field == 'skin')
-            #set ($skin = $xwiki.skin)
-            #if ($skin.indexOf('.') != -1)
-              &amp;nbsp;&lt;span class="buttonwrapper"&gt;&lt;a href="$xwiki.getURL($skin)"&gt;$msg.get('admin.customize')&lt;/a&gt;&lt;/span&gt;
-            #end
+        &lt;dt&gt;
+        &lt;label #if($prop)for="${prefsclassname}_${obj.number}_${prop.name}"#end class="$field"&gt;$title
+        #if($field == 'skin')
+          #set ($skin = $xwiki.skin)
+          #if ($skin.indexOf('.') != -1)
+            &amp;nbsp;&lt;span class="buttonwrapper"&gt;&lt;a href="$xwiki.getURL($skin)"&gt;$msg.get('admin.customize')&lt;/a&gt;&lt;/span&gt;
           #end
-          #if($field == 'colorTheme')
-            #set ($colorThemeName = $xwiki.getXWikiPreference('colorTheme'))
-            #if ($colorThemeName.indexOf('.') != -1)
-              &amp;nbsp;&lt;span class="buttonwrapper"&gt;&lt;a href="$xwiki.getURL($colorThemeName, 'inline')"&gt;$msg.get('admin.customize')&lt;/a&gt;&lt;/span&gt;
-            #end
+        #end
+        #if($field == 'colorTheme')
+          #set ($colorThemeName = $xwiki.getXWikiPreference('colorTheme'))
+          #if ($colorThemeName.indexOf('.') != -1)
+            &amp;nbsp;&lt;span class="buttonwrapper"&gt;&lt;a href="$xwiki.getURL($colorThemeName, 'inline')"&gt;$msg.get('admin.customize')&lt;/a&gt;&lt;/span&gt;
           #end
-          &lt;/label&gt;
-          #if ($prop)
-            $doc.displayEdit($prop, "${prefsclassname}_${obj.number}_", $obj)
-          #end
-        &lt;/p&gt;
+        #end
+        &lt;/label&gt;
+        &lt;/dt&gt;
+        #if ($prop)
+          &lt;dd&gt;$doc.displayEdit($prop, "${prefsclassname}_${obj.number}_", $obj)&lt;/dd&gt;
+        #end
+      #end
+      #if ($fields.size() &gt; 0)
+        &lt;/dl&gt;
       #end
       &lt;/fieldset&gt;
     #end

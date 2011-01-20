@@ -27,7 +27,7 @@
   <parent>
     <groupId>org.xwiki.platform.skins</groupId>
     <artifactId>xwiki-skins</artifactId>
-    <version>29-SNAPSHOT</version>
+    <version>30-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-skin-albatross</artifactId>
   <name>XWiki Platform - Skins - Albatross</name>

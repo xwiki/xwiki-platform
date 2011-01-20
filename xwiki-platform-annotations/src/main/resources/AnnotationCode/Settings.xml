@@ -407,20 +407,22 @@ document.observe('xwiki:annotations:settings:loaded', function() {
  * @param $valuesMap the map to return the values in
  *#
 #macro(getValues $annotationsList $propertyName $valuesMap)
-  #set($valuesMap = {})
+  #set ($result = {})
   #foreach($ann in $annotationsList)
     #set($value = "")
     #set($value = $ann.get($propertyName))
     #if("$!{value}" != "")
-      #set($previousValue = $valuesMap.get($value))
+      #set($previousValue = $result.get($value))
       #if ($previousValue)
         #set($newValue = $previousValue + 1)
-        #set($dispose = $valuesMap.put($value, $newValue))
+        #set($dispose = $result.put($value, $newValue))
       #else
-        #set($dispose = $valuesMap.put($value, 1))
+        #set($dispose = $result.put($value, 1))
       #end
     #end
   #end
+  #set ($valuesMap = $util.null)
+  #setVariable ("$valuesMap" $result)
 #end
 
 #*

@@ -42,7 +42,8 @@
     <dependency>
       <groupId>org.xwiki.platform.skins</groupId>
       <artifactId>xwiki-skin-albatross</artifactId>
-      <version>1.31-SNAPSHOT</version>
+      <!-- Lock albatross version because it isn't developed anymore. -->
+      <version>1.30</version>
       <scope>runtime</scope>
       <type>zip</type>
     </dependency>

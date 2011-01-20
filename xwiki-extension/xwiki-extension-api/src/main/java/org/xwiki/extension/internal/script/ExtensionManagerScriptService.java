@@ -61,12 +61,22 @@ public class ExtensionManagerScriptService implements ScriptService
             return null;
         }
 
-        return this.extensionManager.installExtension(new ExtensionId(id, version));
+        try {
+            return this.extensionManager.installExtension(new ExtensionId(id, version));
+        } catch (Exception ex) {
+            // Public script services should not throw errors
+            return null;
+        }
     }
 
     public Extension resolve(String id, String version) throws ResolveException
     {
-        return this.extensionManager.resolveExtension(new ExtensionId(id, version));
+        try {
+            return this.extensionManager.resolveExtension(new ExtensionId(id, version));
+        } catch (Exception ex) {
+            // Public script services should not throw errors
+            return null;
+        }
     }
 
     public void uninstall(String id) throws UninstallException
@@ -75,12 +85,21 @@ public class ExtensionManagerScriptService implements ScriptService
             return;
         }
 
-        this.extensionManager.uninstallExtension(id);
+        try {
+            this.extensionManager.uninstallExtension(id);
+        } catch (Exception ex) {
+            // Public script services should not throw errors
+        }
     }
 
     public List<LocalExtension> getBackwardDependencies(String id) throws ResolveException
     {
-        return this.localExtensionRepository.getBackwardDependencies(id);
+        try {
+            return this.localExtensionRepository.getBackwardDependencies(id);
+        } catch (Exception ex) {
+            // Public script services should not throw errors
+            return null;
+        }
     }
 
     public List<LocalExtension> getInstalledExtensions()
@@ -90,7 +109,12 @@ public class ExtensionManagerScriptService implements ScriptService
 
     public LocalExtension getInstalledExtension(String id)
     {
-        return this.localExtensionRepository.getLocalExtension(id);
+        try {
+            return this.localExtensionRepository.getLocalExtension(id);
+        } catch (Exception ex) {
+            // Public script services should not throw errors
+            return null;
+        }
     }
 
     public List<CoreExtension> getCoreExtensions()
@@ -100,7 +124,12 @@ public class ExtensionManagerScriptService implements ScriptService
 
     public CoreExtension getCoreExtension(String id)
     {
-        return this.coreExtensionRepository.getCoreExtension(id);
+        try {
+            return this.coreExtensionRepository.getCoreExtension(id);
+        } catch (Exception ex) {
+            // Public script services should not throw errors
+            return null;
+        }
     }
 
     public VersionManager getVersionManager()

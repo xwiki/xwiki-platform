@@ -31,10 +31,10 @@
   </parent>
   <artifactId>xwiki-plugin-lucene</artifactId>
   <name>XWiki Platform - Plugins - Lucene search</name>
-  <version>1.23-SNAPSHOT</version>
+  <version>1.23</version>
   <description>XWiki Platform - Plugins - Lucene search</description>
   <properties>
-    <platform.core.version>2.7</platform.core.version>
+    <platform.core.version>3.0-milestone-1</platform.core.version>
   </properties>
   <dependencies>
     <dependency>

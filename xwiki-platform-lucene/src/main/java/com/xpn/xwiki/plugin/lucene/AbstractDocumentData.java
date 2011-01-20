@@ -38,7 +38,7 @@ import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.web.Utils;
 
 /**
- * @version $Id: IndexData.java 33749 2010-12-30 14:21:04Z tmortagne $
+ * @version $Id$
  * @since 1.23
  */
 public abstract class AbstractDocumentData extends AbstractIndexData

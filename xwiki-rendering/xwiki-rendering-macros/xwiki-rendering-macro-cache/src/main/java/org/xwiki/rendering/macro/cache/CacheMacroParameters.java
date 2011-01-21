@@ -37,7 +37,8 @@ public class CacheMacroParameters
     /**
      * @return the optional unique id to use to cache the content. If not defined then use the content itself as the id
      *         but this doesn't guarantee unicity since the same content could be located on several pages with
-     *         different results.
+     *         different results. Also note that the id is considered containing wiki syntax; this is done so that the
+     *         user can use script macros to generate the id
      */
     public String getId()
     {

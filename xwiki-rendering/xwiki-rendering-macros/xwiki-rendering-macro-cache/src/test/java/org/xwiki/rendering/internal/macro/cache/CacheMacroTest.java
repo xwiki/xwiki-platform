@@ -156,6 +156,28 @@ public class CacheMacroTest extends AbstractComponentTestCase
         result = this.cacheMacro.execute(params, "whatever here...", context);
         assertBlocks(expected, result, this.rendererFactory);
     }
+
+    @Test
+    public void testExecuteWithIdGeneratedByVelocityMacro() throws Exception
+    {
+        VelocityManager velocityManager = getComponentManager().lookup(VelocityManager.class);
+        StringWriter writer = new StringWriter();
+        velocityManager.getVelocityEngine().evaluate(velocityManager.getVelocityContext(), writer, "template",
+            "#set ($var = 'generatedid')");
+
+        CacheMacroParameters params = new CacheMacroParameters();
+        params.setId("{{velocity}}$var{{/velocity}}");
+        MacroTransformationContext context = createMacroTransformationContext();
+
+        List<Block> result1 = this.cacheMacro.execute(params, "whatever", context);
+
+        // Execute a second time with the same id (specified explicitly this time) and ensures that the returned result
+        // is the same even the cache macro content is different.
+        params.setId("generatedid");
+        List<Block> result2 = this.cacheMacro.execute(params, "something else", context);
+        Assert.assertEquals(result1, result2);
+    }
+
     private MacroTransformationContext createMacroTransformationContext() throws Exception
     {
         MacroTransformation macroTransformation =

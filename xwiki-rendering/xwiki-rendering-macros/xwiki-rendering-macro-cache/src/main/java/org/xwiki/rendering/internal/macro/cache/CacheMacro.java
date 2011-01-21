@@ -36,6 +36,9 @@ import org.xwiki.rendering.macro.AbstractMacro;
 import org.xwiki.rendering.macro.MacroExecutionException;
 import org.xwiki.rendering.macro.cache.CacheMacroParameters;
 import org.xwiki.rendering.macro.descriptor.DefaultContentDescriptor;
+import org.xwiki.rendering.renderer.BlockRenderer;
+import org.xwiki.rendering.renderer.printer.DefaultWikiPrinter;
+import org.xwiki.rendering.renderer.printer.WikiPrinter;
 import org.xwiki.rendering.transformation.MacroTransformationContext;
 
 /**
@@ -68,6 +71,12 @@ public class CacheMacro extends AbstractMacro<CacheMacroParameters> implements I
      */
     @Requirement
     private MacroContentParser contentParser;
+
+    /**
+     * Renders the optional id parameter as plain text to use the result as a cache key.
+     */
+    @Requirement("plain/1.0")
+    private BlockRenderer plainTextBlockRenderer;
 
     /**
      * The cache containing all cache macro contents.
@@ -134,7 +143,12 @@ public class CacheMacro extends AbstractMacro<CacheMacroParameters> implements I
         // make it even more unique (when the cache macro parameter id is not specified).
         String cacheKey;
         if (parameters.getId() != null) {
-            cacheKey = parameters.getId();
+            // Consider that the id contains wiki syntax and parse it with the same wiki parser than the current
+            // transformation is using and render the result as plain text.
+            WikiPrinter printer = new DefaultWikiPrinter();
+            this.plainTextBlockRenderer.render(
+                this.contentParser.parse(parameters.getId(), context, true, false), printer);
+            cacheKey = printer.toString();
         } else {
             cacheKey = content;
         }

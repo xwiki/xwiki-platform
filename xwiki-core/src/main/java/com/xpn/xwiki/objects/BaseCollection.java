@@ -814,23 +814,6 @@ public abstract class BaseCollection extends BaseElement implements ObjectInterf
     /**
      * {@inheritDoc}
      * 
-     * @see BaseElement#setWiki(String)
-     * @since 2.2.3
-     */
-    @Deprecated
-    @Override
-    public void setWiki(String wiki)
-    {
-        super.setWiki(wiki);
-
-        // We force to refresh the XClass reference so that next time it's retrieved again it'll be resolved against
-        // the new document reference.
-        this.xClassReferenceCache = null;
-    }
-
-    /**
-     * {@inheritDoc}
-     * 
      * @see BaseElement#setName(String)
      * @since 2.2.3
      */

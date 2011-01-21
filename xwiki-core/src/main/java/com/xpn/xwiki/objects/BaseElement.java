@@ -25,12 +25,10 @@ import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.web.Utils;
-import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReferenceSerializer;
-import org.xwiki.model.reference.WikiReference;
 
 import java.io.Serializable;
 
@@ -135,46 +133,6 @@ public abstract class BaseElement implements ElementInterface, Serializable
     public void setPrettyName(String name)
     {
         this.prettyName = name;
-    }
-
-    /**
-     * @return the name of the wiki where this element is stored. If null, the context's wiki is used.
-     * @deprecated since 2.2M2 use {@link #getDocumentReference()} and
-     *             {@link org.xwiki.model.reference.DocumentReference#getWikiReference()}
-     */
-    @Deprecated
-    public String getWiki()
-    {
-        return getDocumentReference().getWikiReference().getName();
-    }
-
-    /**
-     * @param wiki the name of the wiki where this element is stored. If null, the context's wiki is used.
-     * @deprecated since 2.2M2 use {@link #setDocumentReference(DocumentReference)}
-     */
-    @Deprecated
-    public void setWiki(String wiki)
-    {
-        // Object using name without setting a reference are not allowed to set a wiki reference
-        if (this.reference == null && this.name != null) {
-            throw new IllegalStateException(
-                "BaseElement#setWiki could not be called when a non-reference Name has been set.");
-        }
-
-        if (!StringUtils.isEmpty(wiki)) {
-            DocumentReference reference = getDocumentReference();
-
-            if (reference != null) {
-                reference.setWikiReference(new WikiReference(wiki));
-                setDocumentReference(reference);
-            } else {
-                this.reference = new DocumentReference(wiki, "Main", "WebHome");
-
-                if (this.name != null) {
-                    setName(this.name);
-                }
-            }
-        }
     }
 
     /**

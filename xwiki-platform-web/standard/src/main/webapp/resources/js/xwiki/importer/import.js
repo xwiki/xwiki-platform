@@ -298,7 +298,9 @@ var XWiki = (function(XWiki){
 
             parameters["historyStrategy"] = $('packageDescription').down("input[type=radio][value='add']").checked ? "add" : 
                                             ($('packageDescription').down("input[type=radio][value='replace']").checked ? "replace" : "reset");
-            parameters["importAsBackup"] = $('packageDescription').down("input[type=checkbox][name='importAsBackup']").checked ? "true" : "false";
+            if (XWiki.hasBackupPackImportRights) {
+                parameters["importAsBackup"] = $('packageDescription').down("input[type=checkbox][name='importAsBackup']").checked ? "true" : "false";
+            }
             parameters["ajax"] = "1";
             
             var pages = [];

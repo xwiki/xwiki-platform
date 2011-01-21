@@ -213,7 +213,7 @@
 <allow>1</allow>
 </property>
 <property>
-<groups></groups>
+<groups>XWiki.XWikiAllGroup,xwiki:XWiki.XWikiAllGroup</groups>
 </property>
 <property>
 <levels>view</levels>

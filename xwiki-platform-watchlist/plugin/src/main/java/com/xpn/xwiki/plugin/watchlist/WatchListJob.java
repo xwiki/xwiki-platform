@@ -169,6 +169,9 @@ public class WatchListJob extends AbstractJob implements Job
     {
         XWikiDocument doc = this.context.getWiki().getDocument(this.watchListJobObject.getName(), this.context);
         this.watchListJobObject.setDateValue(WatchListJobManager.WATCHLIST_JOB_LAST_FIRE_TIME_PROP, new Date());
+        // Prevent version changes
+        doc.setMetaDataDirty(false);
+        doc.setContentDirty(false);
         this.context.getWiki().saveDocument(doc, "Updated last fire time", true, this.context);
     }
 

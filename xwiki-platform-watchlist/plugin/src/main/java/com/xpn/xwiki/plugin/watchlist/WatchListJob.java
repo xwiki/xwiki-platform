@@ -21,6 +21,7 @@ package com.xpn.xwiki.plugin.watchlist;
 
 import java.util.Date;
 import java.util.List;
+
 import javax.servlet.ServletException;
 
 import org.apache.commons.lang.StringUtils;
@@ -34,6 +35,7 @@ import org.xwiki.container.Container;
 import org.xwiki.container.servlet.ServletContainerException;
 import org.xwiki.container.servlet.ServletContainerInitializer;
 import org.xwiki.context.Execution;
+
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
@@ -89,15 +91,15 @@ public class WatchListJob extends AbstractJob implements Job
     {
         JobDataMap data = jobContext.getJobDetail().getJobDataMap();
         // clone the context to make sure we have a new one per run
-        context = (XWikiContext) ((XWikiContext) data.get("context")).clone();
+        this.context = (XWikiContext) ((XWikiContext) data.get("context")).clone();
         // clean up the database connections
-        context.getWiki().getStore().cleanUp(context);
-        plugin = (WatchListPlugin) context.getWiki().getPlugin(WatchListPlugin.ID, context);
-        schedulerJobObject = (BaseObject) data.get("xjob");
-        watchListJobObject =
-            context.getWiki().getDocument(schedulerJobObject.getName(), context).getObject(
+        this.context.getWiki().getStore().cleanUp(this.context);
+        this.plugin = (WatchListPlugin) this.context.getWiki().getPlugin(WatchListPlugin.ID, this.context);
+        this.schedulerJobObject = (BaseObject) data.get("xjob");
+        this.watchListJobObject =
+            this.context.getWiki().getDocument(this.schedulerJobObject.getName(), this.context).getObject(
                 WatchListJobManager.WATCHLIST_JOB_CLASS);
-        initializeComponents(context);
+        initializeComponents(this.context);
     }
 
     /**
@@ -114,7 +116,7 @@ public class WatchListJob extends AbstractJob implements Job
         // response and session to components which require them.
         // In the future this Servlet will be replaced by the XWikiPlexusServlet Servlet.
         ServletContainerInitializer containerInitializer =
-            (ServletContainerInitializer) Utils.getComponent(ServletContainerInitializer.class);
+            Utils.getComponent(ServletContainerInitializer.class);
 
         try {
             containerInitializer.initializeRequest(context.getRequest().getHttpServletRequest(), context);
@@ -130,8 +132,8 @@ public class WatchListJob extends AbstractJob implements Job
      */
     protected void cleanupComponents()
     {
-        Container container = (Container) Utils.getComponent(Container.class);
-        Execution execution = (Execution) Utils.getComponent(Execution.class);
+        Container container = Utils.getComponent(Container.class);
+        Execution execution = Utils.getComponent(Execution.class);
 
         // We must ensure we clean the ThreadLocal variables located in the Container and Execution
         // components as otherwise we will have a potential memory leak.
@@ -155,7 +157,7 @@ public class WatchListJob extends AbstractJob implements Job
      */
     private Date getPreviousFireTime()
     {
-        return watchListJobObject.getDateValue(WatchListJobManager.WATCHLIST_JOB_LAST_FIRE_TIME_PROP);
+        return this.watchListJobObject.getDateValue(WatchListJobManager.WATCHLIST_JOB_LAST_FIRE_TIME_PROP);
     }
 
     /**
@@ -165,9 +167,9 @@ public class WatchListJob extends AbstractJob implements Job
      */
     private void setPreviousFireTime() throws XWikiException
     {
-        XWikiDocument doc = context.getWiki().getDocument(watchListJobObject.getName(), context);
-        watchListJobObject.setDateValue(WatchListJobManager.WATCHLIST_JOB_LAST_FIRE_TIME_PROP, new Date());
-        context.getWiki().saveDocument(doc, "Updated last fire time", true, context);
+        XWikiDocument doc = this.context.getWiki().getDocument(this.watchListJobObject.getName(), this.context);
+        this.watchListJobObject.setDateValue(WatchListJobManager.WATCHLIST_JOB_LAST_FIRE_TIME_PROP, new Date());
+        this.context.getWiki().saveDocument(doc, "Updated last fire time", true, this.context);
     }
 
     /**
@@ -176,20 +178,20 @@ public class WatchListJob extends AbstractJob implements Job
      */
     private String getEmailTemplate(String userWiki)
     {
-        String fullName = watchListJobObject.getStringValue(WatchListJobManager.WATCHLIST_JOB_EMAIL_PROP);
+        String fullName = this.watchListJobObject.getStringValue(WatchListJobManager.WATCHLIST_JOB_EMAIL_PROP);
         String prefixedFullName;
-        
+
         if (fullName.contains(WatchListStore.WIKI_SPACE_SEP)) {
             // If the configured template is already an absolute reference it's meant to force the template.
             prefixedFullName = fullName;
         } else {
             prefixedFullName = userWiki + WatchListStore.WIKI_SPACE_SEP + fullName;
-            if (context.getWiki().exists(prefixedFullName, context)) {
+            if (this.context.getWiki().exists(prefixedFullName, this.context)) {
                 // If the configured template exists in the user wiki, use it.
                 return prefixedFullName;
             }
         }
-                
+
         return fullName;
     }
 
@@ -201,7 +203,7 @@ public class WatchListJob extends AbstractJob implements Job
      */
     private List<String> getSubscribers()
     {
-        return plugin.getStore().getSubscribersForJob(schedulerJobObject.getName());
+        return this.plugin.getStore().getSubscribersForJob(this.schedulerJobObject.getName());
     }
 
     /**
@@ -230,15 +232,15 @@ public class WatchListJob extends AbstractJob implements Job
         try {
             init(jobContext);
 
-            if (watchListJobObject == null) {
+            if (this.watchListJobObject == null) {
                 return;
             }
 
             List<String> subscribers = getSubscribers();
-            Date previousFireTime = getPreviousFireTime();            
-            WatchListEventMatcher eventMatcher = new WatchListEventMatcher(previousFireTime, context);
+            Date previousFireTime = getPreviousFireTime();
+            WatchListEventMatcher eventMatcher = new WatchListEventMatcher(previousFireTime, this.context);
             setPreviousFireTime();
-            
+
             if (!hasSubscribers()) {
                 return;
             }
@@ -248,27 +250,30 @@ public class WatchListJob extends AbstractJob implements Job
             }
 
             for (String subscriber : subscribers) {
-                List<String> wikis = plugin.getStore().getWatchedElements(subscriber, ElementType.WIKI, this.context);
-                List<String> spaces = plugin.getStore().getWatchedElements(subscriber, ElementType.SPACE, this.context);
+                List<String> wikis =
+                    this.plugin.getStore().getWatchedElements(subscriber, ElementType.WIKI, this.context);
+                List<String> spaces =
+                    this.plugin.getStore().getWatchedElements(subscriber, ElementType.SPACE, this.context);
                 List<String> documents =
-                    plugin.getStore().getWatchedElements(subscriber, ElementType.DOCUMENT, this.context);
-                List<String> users = plugin.getStore().getWatchedElements(subscriber, ElementType.USER, this.context);
+                    this.plugin.getStore().getWatchedElements(subscriber, ElementType.DOCUMENT, this.context);
+                List<String> users =
+                    this.plugin.getStore().getWatchedElements(subscriber, ElementType.USER, this.context);
                 List<WatchListEvent> matchingEvents =
-                    eventMatcher.getMatchingEvents(wikis, spaces, documents, users, subscriber, context);
+                    eventMatcher.getMatchingEvents(wikis, spaces, documents, users, subscriber, this.context);
                 String userWiki = StringUtils.substringBefore(subscriber, WatchListStore.WIKI_SPACE_SEP);
 
                 // If events have occurred on at least one element watched by the user, send the email
                 if (matchingEvents.size() > 0) {
-                    plugin.getNotifier().sendEmailNotification(subscriber, matchingEvents, getEmailTemplate(userWiki),
-                        previousFireTime, context);
+                    this.plugin.getNotifier().sendEmailNotification(subscriber, matchingEvents,
+                        getEmailTemplate(userWiki), previousFireTime, this.context);
                 }
-            }            
+            }
         } catch (Exception e) {
             // We're in a job, we don't throw exceptions
             LOG.error("Exception while running job", e);
             e.printStackTrace();
         } finally {
-            context.getWiki().getStore().cleanUp(context);
+            this.context.getWiki().getStore().cleanUp(this.context);
             cleanupComponents();
         }
     }

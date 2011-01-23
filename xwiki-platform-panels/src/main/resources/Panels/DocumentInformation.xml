@@ -392,7 +392,7 @@ document.observe("dom:loaded", function() { new XWiki.SyntaxConverter(); });</co
 ##--------------------------------------------------------------------------
 $xwiki.jsx.use($paneldoc.fullName)##
 #if($xwiki.getConfiguredSyntaxes().size() &gt; 1)
-&lt;dt&gt;&lt;label for="xwikidocsyntaxinput2"&gt;Page Syntax&lt;/label&gt;&lt;/dt&gt;
+&lt;dt&gt;&lt;label for="xwikidocsyntaxinput2"&gt;$msg.get('panels.documentInformation.syntax')&lt;/label&gt;&lt;/dt&gt;
 &lt;dd&gt;
 &lt;select name="syntaxId" id="xwikidocsyntaxinput2"&gt;
 &lt;option value="xwiki/1.0"#if($tdoc.getSyntax().toIdString().equalsIgnoreCase('xwiki/1.0')) selected="selected"#end&gt;XWiki 1.0&lt;/option&gt;

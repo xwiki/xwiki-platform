@@ -5212,13 +5212,7 @@ public class XWikiDocument implements DocumentModelBridge
     public String getTranslatedContent(String language, XWikiContext context) throws XWikiException
     {
         XWikiDocument tdoc = getTranslatedDocument(language, context);
-        String rev = (String) context.get("rev");
-        if ((rev == null) || (rev.length() == 0)) {
-            return tdoc.getContent();
-        }
-
-        XWikiDocument cdoc = context.getWiki().getDocument(tdoc, rev, context);
-        return cdoc.getContent();
+        return tdoc.getContent();
     }
 
     public XWikiDocument getTranslatedDocument(XWikiContext context) throws XWikiException

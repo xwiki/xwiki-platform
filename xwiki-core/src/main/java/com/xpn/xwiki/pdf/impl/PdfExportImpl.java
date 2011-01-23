@@ -36,8 +36,10 @@ import java.io.Reader;
 import java.io.StringReader;
 import java.io.StringWriter;
 import java.io.UnsupportedEncodingException;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 
@@ -71,7 +73,12 @@ import org.dom4j.io.OutputFormat;
 import org.dom4j.io.SAXReader;
 import org.dom4j.io.XMLWriter;
 import org.w3c.dom.Document;
+import org.w3c.dom.NodeList;
+import org.w3c.dom.bootstrap.DOMImplementationRegistry;
 import org.w3c.dom.css.CSSStyleDeclaration;
+import org.w3c.dom.ls.DOMImplementationLS;
+import org.w3c.dom.ls.LSOutput;
+import org.w3c.dom.ls.LSSerializer;
 import org.w3c.tidy.Tidy;
 import org.xml.sax.InputSource;
 import org.xwiki.container.Container;
@@ -111,11 +118,20 @@ public class PdfExportImpl implements PdfExport
     /** DOM parser factory. */
     private static DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
 
+    /** DOM Serializer factory. */
+    private static DOMImplementationLS lsImpl;
+
     private static FopFactory fopFactory;
 
     static {
         dbFactory.setNamespaceAware(true);
         dbFactory.setValidating(false);
+
+        try {
+            lsImpl = (DOMImplementationLS) DOMImplementationRegistry.newInstance().getDOMImplementation("LS 3.0");
+        } catch (Exception ex) {
+            log.warn("Cannot initialize the DomLS implementation needed by the PDF export: " + ex.getMessage());
+        }
 
         fopFactory = FopFactory.newInstance();
         try {
@@ -350,12 +366,59 @@ public class PdfExportImpl implements PdfExport
         }
 
         try {
+            // First step, Tidy the document
             StringWriter out = new StringWriter(input.length());
             this.tidy.parse(new StringReader(input), out);
-            return out.toString();
+
+            // Tidy can't solve duplicate IDs, so it needs to be done manually
+            DocumentBuilder docBuilder = dbFactory.newDocumentBuilder();
+            docBuilder.setEntityResolver(Utils.getComponent(EntityResolver.class));
+            Document doc = docBuilder.parse(new InputSource(new StringReader(out.toString())));
+            List<String> seenIDs = new ArrayList<String>();
+            this.cleanIDs(doc.getDocumentElement(), seenIDs);
+
+            // Write back the fixed document to a String
+            LSOutput output = lsImpl.createLSOutput();
+            StringWriter result = new StringWriter();
+            output.setCharacterStream(result);
+            LSSerializer serializer = lsImpl.createLSSerializer();
+            serializer.setNewLine("\n");
+            output.setEncoding(doc.getXmlEncoding());
+            serializer.write(doc, output);
+            return result.toString();
         } catch (Exception ex) {
             log.warn("Failed to tidy document for export: " + ex.getMessage(), ex);
             return input;
+        }
+    }
+
+    /**
+     * Solve duplicate IDs found in a document. When an already seen ID is encountered, a new ID is created for the
+     * current element by suffixing its original ID with a counter.
+     * 
+     * @param e the current element to process
+     * @param seenIDs the list of already encountered IDs so far
+     */
+    private void cleanIDs(org.w3c.dom.Element e, List<String> seenIDs)
+    {
+        String id = e.getAttribute("id");
+        if (StringUtils.isNotEmpty(id)) {
+            if (seenIDs.contains(id)) {
+                int i = 0;
+                while (seenIDs.contains(id + i)) {
+                    ++i;
+                }
+                e.setAttribute("id", id + i);
+                seenIDs.add(id + i);
+            } else {
+                seenIDs.add(id);
+            }
+        }
+        NodeList children = e.getChildNodes();
+        for (int i = 0; i < children.getLength(); ++i) {
+            if (children.item(i) instanceof org.w3c.dom.Element) {
+                cleanIDs((org.w3c.dom.Element) children.item(i), seenIDs);
+            }
         }
     }
 

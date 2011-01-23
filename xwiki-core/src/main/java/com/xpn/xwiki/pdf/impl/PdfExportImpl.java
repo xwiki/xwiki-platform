@@ -108,13 +108,19 @@ public class PdfExportImpl implements PdfExport
 
     public static final int RTF = 1;
 
+    /** DOM parser factory. */
+    private static DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
+
     private static FopFactory fopFactory;
 
     static {
+        dbFactory.setNamespaceAware(true);
+        dbFactory.setValidating(false);
+
         fopFactory = FopFactory.newInstance();
         try {
-            fopFactory.setFontBaseURL((Utils.getComponent(Container.class)).getApplicationContext()
-                .getResource("/WEB-INF/fonts/").getPath());
+            fopFactory.getFontManager().setFontBaseURL(
+                (Utils.getComponent(Container.class)).getApplicationContext().getResource("/WEB-INF/fonts/").getPath());
         } catch (Throwable ex) {
             log.warn("Starting with 1.5, XWiki uses the WEB-INF/fonts/ directory as the font directory, "
                 + "and it should contain the FreeFont (http://savannah.gnu.org/projects/freefont/) fonts. "
@@ -223,7 +229,7 @@ public class PdfExportImpl implements PdfExport
 
         // id attribute on body element makes openoffice converter to fail
         html = html.replaceFirst("(<body[^>]+)id=\"body\"([^>]*>)", "$1$2");
-        
+
         OpenOfficeManager OpenOfficeManager = Utils.getComponent(OpenOfficeManager.class);
 
         OpenOfficeConverter documentConverter = OpenOfficeManager.getConverter();
@@ -367,10 +373,7 @@ public class PdfExportImpl implements PdfExport
         StringWriter transout = new StringWriter(xml.length());
 
         try {
-            DocumentBuilderFactory docFactory = DocumentBuilderFactory.newInstance();
-            docFactory.setNamespaceAware(true);
-            docFactory.setValidating(false);
-            DocumentBuilder docBuilder = docFactory.newDocumentBuilder();
+            DocumentBuilder docBuilder = dbFactory.newDocumentBuilder();
             docBuilder.setEntityResolver(Utils.getComponent(EntityResolver.class));
             Document xslt = docBuilder.parse(new InputSource(xsltinputstream));
             Document xmldoc = docBuilder.parse(new InputSource(xmlinputstream));

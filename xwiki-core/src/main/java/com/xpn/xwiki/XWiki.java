@@ -5356,6 +5356,14 @@ public class XWiki implements XWikiDocChangeNotificationInterface
         vcontext.put("doc", doc.newDocument(context));
         vcontext.put("cdoc", vcontext.get("doc"));
         XWikiDocument tdoc = doc.getTranslatedDocument(context);
+        try {
+            String rev = (String) context.get("rev");
+            if (StringUtils.isNotEmpty(rev)) {
+                tdoc = getDocument(tdoc, rev, context);
+            }
+        } catch (Exception ex) {
+            // Invalid version, just use the most recent one
+        }
         context.put("tdoc", tdoc);
         vcontext.put("tdoc", tdoc.newDocument(context));
 

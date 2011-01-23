@@ -14,7 +14,7 @@
 <date>1235987110000</date>
 <contentUpdateDate>1235987110000</contentUpdateDate>
 <version>1.1</version>
-<title>OpenOffice Server</title>
+<title>$msg.get("admin.ooserver")</title>
 <template></template>
 <defaultTemplate></defaultTemplate>
 <validationScript></validationScript>

@@ -45,6 +45,9 @@ public class DBTreeListClass extends DBListClass
 {
     private static final Log LOG = LogFactory.getLog(DBTreeListClass.class);
 
+    /** In-memory cache of the ordered tree values, to be used in case it is supposed to be cached. */
+    private List<ListItem> cachedDBTreeList;
+
     public DBTreeListClass(PropertyMetaClass wclass)
     {
         super("dbtreelist", "DB Tree List", wclass);
@@ -63,6 +66,44 @@ public class DBTreeListClass extends DBListClass
     public void setParentField(String parentField)
     {
         setStringValue("parentField", parentField);
+    }
+
+    /**
+     * Get the ordered list of tree nodes that is currently cached, if any.
+     * 
+     * @param context the current request context
+     * @return the cached list, or {@code null} if not already cached
+     */
+    protected List<ListItem> getCachedDBTreeList(XWikiContext context)
+    {
+        if (isCache()) {
+            // If the property is supposed to be cached long term ({@link #isCache()}), then the list is cached in
+            // memory in the current object
+            return this.cachedDBTreeList;
+        } else {
+            // Otherwise, to avoid re-computing the tree in case it is requested several times during the same request,
+            // it is cached in the request context.
+            return (List<ListItem>) context.get(context.getDatabase() + ":" + getFieldFullName() + "-tree");
+        }
+    }
+
+    /**
+     * Store the ordered list of tree nodes in a cache.
+     * 
+     * @param cachedDBTreeList the list to cache
+     * @param context the current request context
+     */
+    protected void setCachedDBTreeList(List<ListItem> cachedDBTreeList, XWikiContext context)
+    {
+        if (isCache()) {
+            // If the property is supposed to be cached long term ({@link #isCache()}), then the list is cached in
+            // memory in the current object
+            this.cachedDBTreeList = cachedDBTreeList;
+        } else {
+            // Otherwise, to avoid re-computing the tree in case it is requested several times during the same request,
+            // it is cached in the request context.
+            context.put(context.getDatabase() + ":" + getFieldFullName() + "-tree", cachedDBTreeList);
+        }
     }
 
     public Map<String, List<ListItem>> getTreeMap(XWikiContext context)
@@ -87,16 +128,23 @@ public class DBTreeListClass extends DBListClass
     }
 
     /**
-     * Gets an ordered list of items in the tree. This is necessary to make sure childs are coming after their parents
+     * Gets an ordered list of items in the tree. This is necessary to make sure children are coming right after their
+     * parents.
      * 
-     * @param treemap
-     * @return list of ListItems
+     * @param treemap the unordered list of tree nodes
+     * @param map the mapping between a node name and its corresponding tree node
+     * @param context the current request context
+     * @return ordered list of {@code ListItem} tree nodes
      */
     protected List<ListItem> getTreeList(Map<String, List<ListItem>> treemap, Map<String, ListItem> map,
         XWikiContext context)
     {
-        List<ListItem> list = new ArrayList<ListItem>();
-        addToTreeList(list, treemap, map, "", context);
+        List<ListItem> list = getCachedDBTreeList(context);
+        if (list == null) {
+            list = new ArrayList<ListItem>();
+            addToTreeList(list, treemap, map, "", context);
+            setCachedDBTreeList(list, context);
+        }
         return list;
     }
 

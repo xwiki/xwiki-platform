@@ -31,9 +31,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
-import com.sun.image.codec.jpeg.JPEGCodec;
-import com.sun.image.codec.jpeg.JPEGImageEncoder;
 import com.xpn.xwiki.XWikiContext;
+import com.xpn.xwiki.plugin.image.ImageProcessor;
 import com.xpn.xwiki.web.Utils;
 
 /**
@@ -277,10 +276,8 @@ public class Util extends Api
      */
     public void outputImage(BufferedImage image) throws IOException
     {
-        JPEGImageEncoder encoder;
         OutputStream ostream = getXWikiContext().getResponse().getOutputStream();
-        encoder = JPEGCodec.createJPEGEncoder(ostream);
-        encoder.encode(image);
+        Utils.getComponent(ImageProcessor.class).writeImage(image, "image/jpeg", (float) 0.8, ostream);
         ostream.flush();
     }
 

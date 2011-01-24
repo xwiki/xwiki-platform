@@ -418,7 +418,7 @@ Object.extend(XWiki, {
           var spans = document.body.select("span.wikicreatelink");
           for (var i = 0; i < spans.length; i++) {
               spans[i].down('a').observe('click', function(event) {
-                  new Ajax.Request(event.currentTarget.href + '&xpage=createinline&ajax=1', {
+                  new Ajax.Request(event.findElement('a').href + '&xpage=createinline&ajax=1', {
                       method:'get',
                       onSuccess: function(transport) {
                           var redirect = transport.getHeader('redirect');

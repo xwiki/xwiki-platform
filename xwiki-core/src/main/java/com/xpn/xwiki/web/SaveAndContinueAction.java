@@ -61,6 +61,9 @@ public class SaveAndContinueAction extends XWikiAction
             SaveAction sa = new SaveAction();
             if (sa.save(context)) {
                 sa.render(context);
+            } else {
+                // Lock back the document
+                context.getDoc().getTranslatedDocument(context).setLock(context.getUser(), context);
             }
         }
 

@@ -59,7 +59,7 @@ $xwiki.ssfx.use('js/xwiki/table/livetable.css', true)
 #end
 #macro(hasEditGroupRight)
   #set($hasEditGroupRight = false)
-  #if($hasAdmin &amp;&amp; $doc.getObject('XWiki.XWikiGroups', false))
+  #if(($hasAdmin || $hasEdit) &amp;&amp; $doc.getObject('XWiki.XWikiGroups', false))
     #set($hasEditGroupRight = true)
   #end
 #end
@@ -209,7 +209,7 @@ $xwiki.ssfx.use('js/xwiki/table/livetable.css', true)
     'ajaxActions': {'delete': true}
    }
 })
-#if($hasAdmin &amp;&amp; $xcontext.action == 'inline' &amp;&amp; $hasEditGroupRight)
+#if($xcontext.action == 'inline' &amp;&amp; $hasEditGroupRight)
   #set($columns = ['_avatar', 'member', '_actions'])
 #else
   #set($columns = ['_avatar', 'member'])

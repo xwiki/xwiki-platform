@@ -186,6 +186,9 @@ public abstract class AbstractDocumentSkinExtensionPlugin extends AbstractSkinEx
         Collection<BaseObject> objects = doc.getObjects(getExtensionClassName());
         if (objects != null) {
             for (BaseObject obj : objects) {
+                if (obj == null) {
+                    continue;
+                }
                 if (obj.getStringValue(USE_FIELDNAME).equals("currentPage")) {
                     return true;
                 }

@@ -1830,44 +1830,6 @@ public class XWiki extends Api
     }
 
     /**
-     * Privileged API to access an eXo Platform service from the Wiki Engine
-     * 
-     * @param className eXo classname to retrieve the service from
-     * @return A object representing the service or null if the user doesn't have programming rights
-     * @throws XWikiException if the service cannot be loaded
-     * @since 1.1 Beta 1
-     */
-    public java.lang.Object getExoService(String className) throws XWikiException
-    {
-        java.lang.Object service = null;
-
-        if (hasProgrammingRights()) {
-            service = this.xwiki.getExoService(className);
-        }
-
-        return service;
-    }
-
-    /**
-     * Privileged API to access an eXo Platform Portal service from the Wiki Engine
-     * 
-     * @param className eXo classname to retrieve the service from
-     * @return A object representing the service or null if the user doesn't have programming rights
-     * @throws XWikiException if the service cannot be loaded
-     * @since 1.1 Beta 1
-     */
-    public java.lang.Object getExoPortalService(String className) throws XWikiException
-    {
-        java.lang.Object portalService = null;
-
-        if (hasProgrammingRights()) {
-            portalService = this.xwiki.getExoPortalService(className);
-        }
-
-        return portalService;
-    }
-
-    /**
      * API to access the current starts for the Wiki for a specific action It retrieves the number of times the action
      * was performed for the whole wiki The statistics module need to be activated (xwiki.stats=1 in xwiki.cfg)
      * 

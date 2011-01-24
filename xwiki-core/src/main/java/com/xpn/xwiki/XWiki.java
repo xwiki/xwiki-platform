@@ -81,8 +81,6 @@ import org.apache.ecs.Filter;
 import org.apache.ecs.filter.CharacterFilter;
 import org.apache.ecs.xhtml.textarea;
 import org.apache.velocity.VelocityContext;
-import org.exoplatform.container.PortalContainer;
-import org.exoplatform.container.RootContainer;
 import org.hibernate.HibernateException;
 import org.securityfilter.filter.URLPatternMatcher;
 import org.xwiki.bridge.event.DocumentCreatedEvent;
@@ -185,7 +183,6 @@ import com.xpn.xwiki.user.api.XWikiGroupService;
 import com.xpn.xwiki.user.api.XWikiRightService;
 import com.xpn.xwiki.user.api.XWikiUser;
 import com.xpn.xwiki.user.impl.LDAP.XWikiLDAPAuthServiceImpl;
-import com.xpn.xwiki.user.impl.exo.ExoAuthServiceImpl;
 import com.xpn.xwiki.user.impl.xwiki.XWikiAuthServiceImpl;
 import com.xpn.xwiki.user.impl.xwiki.XWikiGroupServiceImpl;
 import com.xpn.xwiki.user.impl.xwiki.XWikiRightServiceImpl;
@@ -5193,17 +5190,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface, EventListener
      */
     public boolean isVirtualMode()
     {
-        // With exo we can't be using virtual mode
-        if (isExo()) {
-            return false;
-        }
-
         return "1".equals(Param("xwiki.virtual"));
-    }
-
-    public boolean isExo()
-    {
-        return "1".equals(Param("xwiki.exo"));
     }
 
     public boolean isLDAP()
@@ -5484,32 +5471,14 @@ public class XWiki implements XWikiDocChangeNotificationInterface, EventListener
     {
         synchronized (this.GROUP_SERVICE_LOCK) {
             if (this.groupService == null) {
-                String groupClass;
-                if (isExo()) {
-                    groupClass =
-                        Param("xwiki.authentication.groupclass", "com.xpn.xwiki.user.impl.exo.ExoGroupServiceImpl");
-                } else {
-                    groupClass =
-                        Param("xwiki.authentication.groupclass", "com.xpn.xwiki.user.impl.xwiki.XWikiGroupServiceImpl");
-                }
+                String groupClass =
+                    Param("xwiki.authentication.groupclass", "com.xpn.xwiki.user.impl.xwiki.XWikiGroupServiceImpl");
 
                 try {
                     this.groupService = (XWikiGroupService) Class.forName(groupClass).newInstance();
                 } catch (Exception e) {
-                    e.printStackTrace();
-                    // If eXo we still want to use instanciation to not have class dependency
-                    // for java 1.4 compatibility
-                    if (isExo()) {
-                        try {
-                            this.groupService =
-                                (XWikiGroupService) Class.forName("com.xpn.xwiki.user.impl.exo.ExoGroupServiceImpl")
-                                    .newInstance();
-                        } catch (Exception e2) {
-                            e2.printStackTrace();
-                        }
-                    } else {
-                        this.groupService = new XWikiGroupServiceImpl();
-                    }
+                    LOG.error("Failed to instantiate custom group service class: " + e.getMessage(), e);
+                    this.groupService = new XWikiGroupServiceImpl();
                 }
                 this.groupService.init(this, context);
             }
@@ -5537,9 +5506,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface, EventListener
                         LOG.debug("Using custom AuthClass " + authClass + ".");
                     }
                 } else {
-                    if (isExo()) {
-                        authClass = "com.xpn.xwiki.user.impl.exo.ExoAuthServiceImpl";
-                    } else if (isLDAP()) {
+                    if (isLDAP()) {
                         authClass = "com.xpn.xwiki.user.impl.LDAP.XWikiLDAPAuthServiceImpl";
                     } else {
                         authClass = "com.xpn.xwiki.user.impl.xwiki.XWikiAuthServiceImpl";
@@ -5557,9 +5524,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface, EventListener
                     LOG.warn("Failed to initialize AuthService " + authClass
                         + " using Reflection, trying default implementations using 'new'.", e);
 
-                    if (isExo()) {
-                        this.authService = new ExoAuthServiceImpl();
-                    } else if (isLDAP()) {
+                    if (isLDAP()) {
                         this.authService = new XWikiLDAPAuthServiceImpl();
                     } else {
                         this.authService = new XWikiAuthServiceImpl();
@@ -5679,66 +5644,6 @@ public class XWiki implements XWikiDocChangeNotificationInterface, EventListener
     public XWikiCriteriaService getCriteriaService(XWikiContext context)
     {
         return this.criteriaService;
-    }
-
-    /**
-     * @see #getExoService(String)
-     * @deprecated use {@link #getExoService(String)} instead
-     */
-    @Deprecated
-    public Object getService(String className) throws XWikiException
-    {
-        return getExoService(className);
-    }
-
-    /**
-     * Privileged API to access an eXo Platform service from the Wiki Engine
-     * 
-     * @param className eXo classname to retrieve the service from
-     * @return A object representing the service
-     * @throws XWikiException if the service cannot be loaded
-     * @since 1.1 Beta 1
-     */
-    public Object getExoService(String className) throws XWikiException
-    {
-        try {
-            RootContainer manager = RootContainer.getInstance();
-            return manager.getComponentInstanceOfType(Class.forName(className));
-        } catch (Exception e) {
-            Object[] args = {className};
-            throw new XWikiException(XWikiException.MODULE_XWIKI_APP, XWikiException.ERROR_XWIKI_APP_SERVICE_NOT_FOUND,
-                "Service {0} not found", e, args);
-        }
-    }
-
-    /**
-     * @see #getExoPortalService(String)
-     * @deprecated use {@link #getExoPortalService(String)} instead
-     */
-    @Deprecated
-    public Object getPortalService(String className) throws XWikiException
-    {
-        return getExoPortalService(className);
-    }
-
-    /**
-     * Privileged API to access an eXo Platform Portal service from the Wiki Engine
-     * 
-     * @param className eXo classname to retrieve the service from
-     * @return A object representing the service
-     * @throws XWikiException if the service cannot be loaded
-     * @since 1.1 Beta 1
-     */
-    public Object getExoPortalService(String className) throws XWikiException
-    {
-        try {
-            PortalContainer manager = PortalContainer.getInstance();
-            return manager.getComponentInstanceOfType(Class.forName(className));
-        } catch (Exception e) {
-            Object[] args = {className};
-            throw new XWikiException(XWikiException.MODULE_XWIKI_APP, XWikiException.ERROR_XWIKI_APP_SERVICE_NOT_FOUND,
-                "Service {0} not found", e, args);
-        }
     }
 
     public ZipOutputStream getZipOutputStream(XWikiContext context) throws IOException

@@ -224,26 +224,6 @@ public privileged aspect XWikiCompatibilityAspect
     }
 
     /**
-     * @see #getExoService(String)
-     * @deprecated use {@link #getExoService(String)} instead
-     */
-    @Deprecated
-    public java.lang.Object XWiki.getService(String className) throws XWikiException
-    {
-        return getExoService(className);
-    }
-
-    /**
-     * @see #getExoPortalService(String)
-     * @deprecated use {@link #getExoPortalService(String)} instead
-     */
-    @Deprecated
-    public java.lang.Object XWiki.getPortalService(String className) throws XWikiException
-    {
-        return getExoPortalService(className);
-    }
-
-    /**
      * Creates an Array List. This is useful from Velocity since you cannot
      * create Object from Velocity with our secure uberspector.
      *

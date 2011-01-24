@@ -38,35 +38,6 @@
 
     <!-- Dependencies that we need to fix so that we don't need to have them in our custom remote repository -->
 
-    <!-- Exo POMs seems to have a problem. See http://jira.exoplatform.org/browse/PLT-24. When this is resolved,
-         get the Exo JARS from the ObjectWeb remote repo (or from the central repository when ObjectWeb
-         is synced to there. -->
-    <dependency>
-      <groupId>exo-platform</groupId>
-      <artifactId>exo-platform.container</artifactId>
-      <version>2.0</version>
-    </dependency>
-    <dependency>
-      <groupId>exo-platform</groupId>
-      <artifactId>exo-platform.commons</artifactId>
-      <version>2.0</version>
-    </dependency>
-    <dependency>
-      <groupId>exo-platform</groupId>
-      <artifactId>exo-platform.service.organization.api</artifactId>
-      <version>2.0</version>
-    </dependency>
-    <dependency>
-      <groupId>exo-platform</groupId>
-      <artifactId>exo-platform.service.security.api</artifactId>
-      <version>2.0</version>
-    </dependency>
-    <dependency>
-      <groupId>exo-platform</groupId>
-      <artifactId>exo-platform.service.database.api</artifactId>
-      <version>2.0</version>
-    </dependency>
-
     <!-- The JRCS JARS are are in our repo till we get them published on the central repository.
          JRCS home page: http://www.suigeneris.org/kb/display/jrcs/JRCS+Home -->
     <dependency>
@@ -1321,9 +1292,6 @@
               **/user/api/XWikiRightNotFoundException.java,
               **/user/api/XWikiRightService.java,
               **/user/api/XWikiUser.java,
-              **/user/impl/exo/ExoAuthServiceImpl.java,
-              **/user/impl/exo/ExoFilter.java,
-              **/user/impl/exo/ExoGroupServiceImpl.java,
               **/user/impl/LDAP/LDAPAuthServiceImpl.java,
               **/user/impl/LDAP/LDAPProfileXClass.java,
               **/user/impl/LDAP/XWikiLDAPAuthServiceImpl.java,
@@ -1338,7 +1306,6 @@
               **/user/impl/xwiki/XWikiGroupServiceImpl.java,
               **/user/impl/xwiki/XWikiRightServiceImpl.java,
               **/util/AbstractXWikiRunnable.java,
-              **/util/ExoFilter.java,
               **/util/MenuSubstitution.java,
               **/util/Programming.java,
               **/util/TidyMessageLogger.java,

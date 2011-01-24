@@ -24,10 +24,10 @@ import java.io.IOException;
 
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.commons.lang.StringUtils;
+
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
-
-import org.apache.commons.lang.StringUtils;
 
 /**
  * Action used for saving and returning to the edit page rather than viewing changes.
@@ -42,7 +42,8 @@ public class SaveAndContinueAction extends XWikiAction
      * @see XWikiAction#action(XWikiContext)
      */
     @Override
-    public boolean action(XWikiContext context) throws XWikiException {
+    public boolean action(XWikiContext context) throws XWikiException
+    {
         // CSRF prevention
         if (!csrfTokenCheck(context)) {
             return false;
@@ -115,8 +116,8 @@ public class SaveAndContinueAction extends XWikiAction
 
     /**
      * @param url the URL to get a modified version of.
-     * @return A modified version of the input url where all parameters 
-     *         are stripped from the query string except "editor"
+     * @return A modified version of the input url where all parameters are stripped from the query string except
+     *         "editor"
      */
     private String removeAllParametersFromQueryStringExceptEditor(String url)
     {

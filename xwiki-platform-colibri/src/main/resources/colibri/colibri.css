@@ -177,7 +177,7 @@ tt.wikimodel-verbatim {
   font-family: sans-serif;
   white-space: pre;
 }
-/* Reset for verbatim inside tt ##{{{abc}}}## */
+/* Reset for verbatim inside monospace */
 tt .wikimodel-verbatim {
   font-family: monospace;
 }

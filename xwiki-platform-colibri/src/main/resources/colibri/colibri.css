@@ -177,6 +177,10 @@ tt.wikimodel-verbatim {
   font-family: sans-serif;
   white-space: pre;
 }
+/* Reset for verbatim inside tt ##{{{abc}}}## */
+tt .wikimodel-verbatim {
+  font-family: monospace;
+}
 
 /* -----------------------Tables-------------------------*/
 .xwikidatatable {

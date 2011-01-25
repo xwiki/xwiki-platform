@@ -56,6 +56,12 @@ public abstract class AbstractOfficeViewer extends AbstractLogEnabled implements
     private static final String DEFAULT_ENCODING = "UTF-8";
 
     /**
+     * The module name used when creating temporary files. This is the module used by the temporary resource action to
+     * retrieve the temporary file.
+     */
+    private static final String MODULE_NAME = "officeviewer";
+
+    /**
      * Used to access attachment content.
      */
     @Requirement
@@ -92,7 +98,7 @@ public abstract class AbstractOfficeViewer extends AbstractLogEnabled implements
     public void initialize() throws InitializationException
     {
         CacheConfiguration config = new CacheConfiguration();
-        config.setConfigurationId("officeviewer");
+        config.setConfigurationId(MODULE_NAME);
         try {
             cache = cacheManager.createNewCache(config);
         } catch (CacheException e) {
@@ -206,7 +212,7 @@ public abstract class AbstractOfficeViewer extends AbstractLogEnabled implements
         attachmentName = URLEncoder.encode(attachmentName, DEFAULT_ENCODING);
 
         // Create temporary directory.
-        String path = String.format("temp/officepreview/%s/%s/%s/%s/", wiki, space, page, attachmentName);
+        String path = String.format("temp/%s/%s/%s/%s/%s/", MODULE_NAME, wiki, space, page, attachmentName);
         File rootDir = container.getApplicationContext().getTemporaryDirectory();
         File tempDir = new File(rootDir, path);
         boolean success = (tempDir.exists() || tempDir.mkdirs()) && tempDir.isDirectory() && tempDir.canWrite();
@@ -231,7 +237,7 @@ public abstract class AbstractOfficeViewer extends AbstractLogEnabled implements
         try {
             String encodedAttachmentName = URLEncoder.encode(attachmentReference.getName(), DEFAULT_ENCODING);
             String encodedFileName = URLEncoder.encode(fileName, DEFAULT_ENCODING);
-            return String.format("%s/officepreview/%s/%s", prefix, encodedAttachmentName, encodedFileName);
+            return String.format("%s/%s/%s/%s", prefix, MODULE_NAME, encodedAttachmentName, encodedFileName);
         } catch (UnsupportedEncodingException e) {
             // This should never happen.
             getLogger().error("Failed to encode URL using " + DEFAULT_ENCODING, e);

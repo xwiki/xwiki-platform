@@ -21,12 +21,7 @@
 
 package com.xpn.xwiki.objects;
 
-import com.xpn.xwiki.XWikiContext;
-import com.xpn.xwiki.XWikiException;
-import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.web.Utils;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReferenceSerializer;
 
@@ -39,8 +34,6 @@ import java.io.Serializable;
  */
 public abstract class BaseElement implements ElementInterface, Serializable
 {
-    private static final Log LOG = LogFactory.getLog(BaseElement.class);
-
     /**
      * Reference to the document in which this element is defined (for elements where this make sense, for example
      * for an XClass or a XObject).
@@ -208,44 +201,5 @@ public abstract class BaseElement implements ElementInterface, Serializable
         }
 
         return element;
-    }
-
-    /**
-     * Return the document where this element is stored.
-     *
-     * @param context the XWiki context
-     * @return the document
-     * @deprecated since 2.2M2 use {@link #getDocumentReference()} instead
-     */
-    @Deprecated
-    public XWikiDocument getDocument(XWikiContext context) throws XWikiException
-    {
-        return context.getWiki().getDocument(getDocumentReference(), context);
-    }
-
-    /**
-     * @return the syntax id of the document containing this element. If an error occurs while retrieving the document a
-     *         syntax id of "xwiki/1.0" is assumed.
-     * @deprecated since 2.2M2 use <code>context.getWiki().getDocument(object.getDocumentReference())</code> and then
-     *             get the syntax on the document object
-     */
-    @Deprecated
-    public String getDocumentSyntaxId(XWikiContext context)
-    {
-        String syntaxId;
-        try {
-            syntaxId = getDocument(context).getSyntaxId();
-        } catch (Exception e) {
-            // Used to convert a Document Reference to string (compact form without the wiki part if it matches the
-            // current wiki).
-            EntityReferenceSerializer<String> compactWikiEntityReferenceSerializer =
-                Utils.getComponent(EntityReferenceSerializer.class, "compactwiki");
-            LOG.warn("Error while getting the syntax corresponding to object ["
-                + compactWikiEntityReferenceSerializer.serialize(getDocumentReference())
-                + "]. Defaulting to using XWiki 1.0 syntax. Internal error [" + e.getMessage() + "]");
-            syntaxId = "xwiki/1.0";
-        }
-
-        return syntaxId;
     }
 }

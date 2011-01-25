@@ -23,6 +23,8 @@ package com.xpn.xwiki.objects.classes;
 
 import org.apache.ecs.xhtml.textarea;
 import org.apache.velocity.VelocityContext;
+import org.xwiki.model.reference.EntityReferenceSerializer;
+import org.xwiki.rendering.syntax.Syntax;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.doc.XWikiDocument;
@@ -30,6 +32,7 @@ import com.xpn.xwiki.objects.BaseCollection;
 import com.xpn.xwiki.objects.BaseProperty;
 import com.xpn.xwiki.objects.LargeStringProperty;
 import com.xpn.xwiki.objects.meta.PropertyMetaClass;
+import com.xpn.xwiki.web.Utils;
 
 public class TextAreaClass extends StringClass
 {
@@ -207,7 +210,8 @@ public class TextAreaClass extends StringClass
      *      java.lang.String, com.xpn.xwiki.objects.BaseCollection, com.xpn.xwiki.XWikiContext)
      */
     @Override
-    public void displayView(StringBuffer buffer, String name, String prefix, BaseCollection object, XWikiContext context)
+    public void displayView(StringBuffer buffer, String name, String prefix, BaseCollection object,
+        XWikiContext context)
     {
         String contentType = getContentType();
         XWikiDocument doc = context.getDoc();
@@ -217,7 +221,7 @@ public class TextAreaClass extends StringClass
         } else if ((contentType != null) && (context.getWiki() != null) && (contentType.equals("velocitycode"))) {
             StringBuffer result = new StringBuffer();
             super.displayView(result, name, prefix, object, context);
-            if (object.getDocumentSyntaxId(context).equals("xwiki/1.0")) {
+            if (getObjectDocumentSyntax(object, context).equals(Syntax.XWIKI_1_0)) {
                 buffer.append(context.getWiki().parseContent(result.toString(), context));
             } else {
                 // Don't do anything since this mode is deprecated and not supported in the new rendering.
@@ -227,10 +231,36 @@ public class TextAreaClass extends StringClass
             StringBuffer result = new StringBuffer();
             super.displayView(result, name, prefix, object, context);
             if (doc != null) {
-                buffer.append(doc.getRenderedContent(result.toString(), object.getDocumentSyntaxId(context), context));
+                buffer.append(doc.getRenderedContent(result.toString(),
+                    getObjectDocumentSyntax(object, context).toIdString(), context));
             } else {
                 buffer.append(result);
             }
         }
+    }
+
+    /**
+     * @return the syntax for the document to which the passed objects belongs to or the XWiki Syntax 1.0 if the
+     *         object document cannot be retrieved
+     */
+    private Syntax getObjectDocumentSyntax(BaseCollection object, XWikiContext context)
+    {
+        Syntax syntax;
+
+        try {
+            XWikiDocument doc = context.getWiki().getDocument(object.getDocumentReference(), context);
+            syntax = doc.getSyntax();
+        } catch (Exception e) {
+            // Used to convert a Document Reference to string (compact form without the wiki part if it matches the
+            // current wiki).
+            EntityReferenceSerializer<String> compactWikiEntityReferenceSerializer =
+                Utils.getComponent(EntityReferenceSerializer.class, "compactwiki");
+            LOG.warn("Error while getting the syntax corresponding to object ["
+                + compactWikiEntityReferenceSerializer.serialize(object.getDocumentReference())
+                + "]. Defaulting to using XWiki 1.0 syntax. Internal error [" + e.getMessage() + "]");
+            syntax = Syntax.XWIKI_1_0;
+        }
+
+        return syntax;
     }
 }

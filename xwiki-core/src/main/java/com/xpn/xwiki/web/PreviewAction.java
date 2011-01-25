@@ -111,10 +111,9 @@ public class PreviewAction extends XWikiAction
         VelocityContext vcontext = (VelocityContext) context.get("vcontext");
 
         String language = ((EditForm) form).getLanguage();
-        XWikiDocument tdoc;
 
         // Make sure it is not considered as new
-        XWikiDocument doc2 = (XWikiDocument) doc.clone();
+        XWikiDocument doc2 = doc.clone();
         context.put("doc", doc2);
 
         int sectionNumber = 0;
@@ -125,7 +124,6 @@ public class PreviewAction extends XWikiAction
 
         if ((language == null) || (language.equals("")) || (language.equals("default"))
             || (language.equals(doc.getDefaultLanguage()))) {
-            tdoc = doc2;
             context.put("tdoc", doc2);
             vcontext.put("doc", doc2.newDocument(context));
             vcontext.put("tdoc", vcontext.get("doc"));
@@ -139,19 +137,18 @@ public class PreviewAction extends XWikiAction
             }
         } else {
             // Need to save parent and defaultLanguage if they have changed
-            tdoc = doc.getTranslatedDocument(language, context);
+            XWikiDocument tdoc = doc.getTranslatedDocument(language, context).clone();
             tdoc.setLanguage(language);
             tdoc.setTranslation(1);
-            XWikiDocument tdoc2 = (XWikiDocument) tdoc.clone();
-            context.put("tdoc", tdoc2);
-            vcontext.put("tdoc", tdoc2.newDocument(context));
+            context.put("tdoc", tdoc);
+            vcontext.put("tdoc", tdoc.newDocument(context));
             vcontext.put("cdoc", vcontext.get("tdoc"));
-            tdoc2.readFromTemplate(((EditForm) form).getTemplate(), context);
-            tdoc2.readFromForm((EditForm) form, context);
-            tdoc2.setAuthor(context.getUser());
-            tdoc2.setContentAuthor(context.getUser());
-            if (tdoc2.isNew()) {
-                tdoc2.setCreator(context.getUser());
+            tdoc.readFromTemplate(((EditForm) form).getTemplate(), context);
+            tdoc.readFromForm((EditForm) form, context);
+            tdoc.setAuthor(context.getUser());
+            tdoc.setContentAuthor(context.getUser());
+            if (tdoc.isNew()) {
+                tdoc.setCreator(context.getUser());
             }
         }
         // reconfirm edit (captcha) when jcaptcha is not correct

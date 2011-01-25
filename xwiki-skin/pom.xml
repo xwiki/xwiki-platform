@@ -7,8 +7,8 @@
     <version>3.0-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-core-skin</artifactId>
-  <name>XWiki Core - Skin Component</name>
-  <description>XWiki Core - Skin Component</description>
+  <name>XWiki Platform - Core - Skin</name>
+  <description>XWiki Platform - Core - Skin</description>
   <properties>
     <xwiki.clirr.skip>true</xwiki.clirr.skip>
   </properties>

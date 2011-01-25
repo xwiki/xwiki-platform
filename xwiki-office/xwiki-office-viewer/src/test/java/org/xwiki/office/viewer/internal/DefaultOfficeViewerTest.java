@@ -234,7 +234,7 @@ public class DefaultOfficeViewerTest extends AbstractMockingComponentTestCase
     @Test
     public void testViewExistingOfficeAttachmentWithCacheHit() throws Exception
     {
-        final OfficeDocumentView officeDocumentPreview =
+        final OfficeDocumentView officeDocumentView =
             new OfficeDocumentView(ATTACHMENT_REFERENCE, ATTACHMENT_VERSION, new XDOM(new ArrayList<Block>()),
                 new HashSet<File>());
 
@@ -245,7 +245,7 @@ public class DefaultOfficeViewerTest extends AbstractMockingComponentTestCase
                 will(returnValue(STRING_ATTACHMENT_REFERENCE));
 
                 oneOf(cache).get(CACHE_KEY);
-                will(returnValue(officeDocumentPreview));
+                will(returnValue(officeDocumentView));
 
                 oneOf(documentAccessBridge).getAttachmentReferences(ATTACHMENT_REFERENCE.getDocumentReference());
                 will(returnValue(Arrays.asList(ATTACHMENT_REFERENCE)));
@@ -267,7 +267,7 @@ public class DefaultOfficeViewerTest extends AbstractMockingComponentTestCase
     @Test
     public void testViewANewVersionOfAnExistingOfficeAttachment() throws Exception
     {
-        final OfficeDocumentView officeDocumentPreview =
+        final OfficeDocumentView officeDocumentView =
             new OfficeDocumentView(ATTACHMENT_REFERENCE, ATTACHMENT_VERSION, new XDOM(new ArrayList<Block>()),
                 new HashSet<File>());
         final ByteArrayInputStream attachmentContent = new ByteArrayInputStream(new byte[256]);
@@ -283,7 +283,7 @@ public class DefaultOfficeViewerTest extends AbstractMockingComponentTestCase
                 will(returnValue(STRING_ATTACHMENT_REFERENCE));
 
                 oneOf(cache).get(CACHE_KEY);
-                will(returnValue(officeDocumentPreview));
+                will(returnValue(officeDocumentView));
 
                 oneOf(documentAccessBridge).getAttachmentReferences(ATTACHMENT_REFERENCE.getDocumentReference());
                 will(returnValue(Arrays.asList(ATTACHMENT_REFERENCE)));
@@ -338,7 +338,7 @@ public class DefaultOfficeViewerTest extends AbstractMockingComponentTestCase
         });
 
         File tempFile = defaultOfficeViewer.getTemporaryDirectory(ATTACHMENT_REFERENCE);
-        Assert.assertTrue(tempFile.getAbsolutePath().endsWith("/temp/officepreview/xwiki/Main/Test/Test.doc"));
+        Assert.assertTrue(tempFile.getAbsolutePath().endsWith("/temp/officeviewer/xwiki/Main/Test/Test.doc"));
     }
 
     /**
@@ -359,6 +359,6 @@ public class DefaultOfficeViewerTest extends AbstractMockingComponentTestCase
         });
 
         String url = defaultOfficeViewer.buildURL(ATTACHMENT_REFERENCE, "some_temporary_artifact.gif");
-        Assert.assertEquals("/xwiki/bin/temp/Main/Test/officepreview/Test.doc/some_temporary_artifact.gif", url);
+        Assert.assertEquals("/xwiki/bin/temp/Main/Test/officeviewer/Test.doc/some_temporary_artifact.gif", url);
     }
 }

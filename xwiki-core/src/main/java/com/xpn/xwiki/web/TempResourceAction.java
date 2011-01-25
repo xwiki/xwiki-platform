@@ -21,7 +21,10 @@ package com.xpn.xwiki.web;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.net.URI;
+import java.net.URLDecoder;
+import java.net.URLEncoder;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -49,6 +52,11 @@ public class TempResourceAction extends XWikiAction
      * URI pattern for this action.
      */
     public static final Pattern URI_PATTERN = Pattern.compile(".*?/temp/([^/]*+)/([^/]*+)/([^/]*+)/(.*+)");
+
+    /**
+     * The URL encoding.
+     */
+    private static final String URL_ENCODING = "UTF-8";
 
     /**
      * Logging support.
@@ -107,6 +115,7 @@ public class TempResourceAction extends XWikiAction
      * @param uri request URI.
      * @param context xwiki context.
      * @return temporary file corresponding to the specified URI or null if no such file can be located.
+     * @throws UnsupportedEncodingException
      */
     protected File getTemporaryFile(String uri, XWikiContext context)
     {
@@ -114,9 +123,14 @@ public class TempResourceAction extends XWikiAction
         File result = null;
         if (matcher.find()) {
             String wiki = context.getDatabase();
-            String space = matcher.group(1);
-            String page = matcher.group(2);
-            String module = matcher.group(3);
+            try {
+                wiki = URLEncoder.encode(wiki, URL_ENCODING);
+            } catch (UnsupportedEncodingException e) {
+                // This should never happen;
+            }
+            String space = withMinimalURLEncoding(matcher.group(1));
+            String page = withMinimalURLEncoding(matcher.group(2));
+            String module = withMinimalURLEncoding(matcher.group(3));
             String filePath = matcher.group(4);
             String prefix = String.format("temp/%s/%s/%s/%s/", module, wiki, space, page);
             String path = URI.create(prefix + filePath).normalize().toString();
@@ -126,5 +140,22 @@ public class TempResourceAction extends XWikiAction
             }
         }
         return result;
+    }
+
+    /**
+     * Keeps only minimal URL encoding. Currently, XWiki's URL factory over encodes the URLs in order to protect them
+     * from XWiki 1.0 syntax parser.
+     * 
+     * @param component a URL component
+     * @return the given string with minimal URL encoding
+     */
+    private String withMinimalURLEncoding(String component)
+    {
+        try {
+            return URLEncoder.encode(URLDecoder.decode(component, URL_ENCODING), URL_ENCODING);
+        } catch (UnsupportedEncodingException e) {
+            // This should never happen.
+            return component;
+        }
     }
 }

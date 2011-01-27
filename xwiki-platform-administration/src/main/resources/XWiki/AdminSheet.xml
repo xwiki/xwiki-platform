@@ -2954,7 +2954,12 @@ p.legend {
   #if($section != '' &amp;&amp; $section.indexOf('.') &gt; 0)
     #set($sectionname = $xwiki.getDocument($section).getDisplayTitle())
   #elseif($section != '')
-    #set($sectionname = $msg.get("admin.${section.toLowerCase()}"))
+    ## If there is no translation (translated message is equals to key), don't display the message key, but the section name instead.
+    #if($msg.get("admin.${section.toLowerCase()}") != "admin.${section.toLowerCase()}") 
+      #set($sectionname = $msg.get("admin.${section.toLowerCase()}")) 
+    #else
+      #set($sectionname = $section)
+    #end
   #end
   ##-----------------------------------------
   ## admin-page display

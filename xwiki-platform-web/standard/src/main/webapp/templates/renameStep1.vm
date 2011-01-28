@@ -32,7 +32,7 @@
         <span class="xHint">$msg.get('core.rename.newpage.hint')</span>
       </dt>
       <dd>
-        <input type="text" id="newPageName" size="60" name="newPageName" value="${escapetool.xml($newname)}" class="panelinput withTip"/>
+        <input type="text" id="newPageName" size="60" name="newPageName" value="${escapetool.xml($doc.name)}" class="panelinput"/>
       </dd>
     </dl>
   </div>

@@ -26,7 +26,7 @@ import org.xwiki.rendering.renderer.reference.link.URILabelGenerator;
 /**
  * Generate link labels for ATTACH URIs.
  *
- * @version $Id: DefaultAttachmentURILabelGenerator.java 31386 2010-09-27 09:42:32Z vmassol $
+ * @version $Id$
  * @since 2.5RC1
  */
 @Component("attach")

@@ -53,7 +53,7 @@ import javax.servlet.ServletResponse;
  * </p>
  * 
  * @author Craig McClanahan
- * @version $Revision: 452 $ $Date: 2005-03-25 13:58:30 +0100 (Fri, 25 Mar 2005) $
+ * @version $Id$
  */
 
 public class SetCharacterEncodingFilter implements Filter

@@ -30,6 +30,7 @@ import org.apache.commons.logging.LogFactory;
 import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.component.annotation.Requirement;
 import org.xwiki.context.Execution;
+import org.xwiki.csrf.CSRFToken;
 import org.xwiki.gwt.wysiwyg.client.wiki.Attachment;
 import org.xwiki.gwt.wysiwyg.client.wiki.EntityConfig;
 import org.xwiki.gwt.wysiwyg.client.wiki.ResourceReference;
@@ -73,6 +74,14 @@ public class DefaultWikiService implements WikiService
      */
     @Requirement
     private LinkService linkService;
+
+    /**
+     * The component that protects us against cross site request forgery by using a secret token validation mechanism.
+     * The secret token is added to the query string of the upload URL and then checked in the upload action when files
+     * are uploaded.
+     */
+    @Requirement
+    private CSRFToken csrf;
 
     /**
      * The object used to convert between client and server entity reference.
@@ -373,7 +382,9 @@ public class DefaultWikiService implements WikiService
      */
     public String getUploadURL(WikiPageReference reference)
     {
-        return documentAccessBridge.getDocumentURL(entityReferenceConverter.convert(reference), "upload", null, null);
+        String queryString = "form_token=" + csrf.getToken();
+        return documentAccessBridge.getDocumentURL(entityReferenceConverter.convert(reference), "upload", queryString,
+            null);
     }
 
     /**

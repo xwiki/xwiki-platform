@@ -6,11 +6,10 @@
 
     <xsl:output method="xml"/>
 
-    <xsl:template match="*">
-        <xsl:element name="{name(.)}">
-            <xsl:copy-of select="@*"/>
-            <xsl:apply-templates/>
-        </xsl:element>
+    <xsl:template match="@*|node()">
+        <xsl:copy>
+            <xsl:apply-templates select="@*|node()"/>
+        </xsl:copy>
     </xsl:template>
 
     <!-- ignore fo:table-and-caption because Fop won't render tables otherwise -->

@@ -55,6 +55,7 @@ import javax.xml.transform.stream.StreamSource;
 
 import org.apache.avalon.framework.configuration.DefaultConfigurationBuilder;
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.RandomStringUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
@@ -79,9 +80,11 @@ import org.w3c.dom.ls.LSOutput;
 import org.w3c.dom.ls.LSSerializer;
 import org.w3c.tidy.Tidy;
 import org.xml.sax.InputSource;
+import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.container.ApplicationContext;
 import org.xwiki.container.Container;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.officeimporter.openoffice.OpenOfficeConverter;
 import org.xwiki.officeimporter.openoffice.OpenOfficeManager;
@@ -94,10 +97,8 @@ import org.xwiki.xml.EntityResolver;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
-import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.pdf.api.PdfExport;
 import com.xpn.xwiki.web.Utils;
-import com.xpn.xwiki.web.XWikiRequest;
 
 /**
  * Default implementation for the PDF Export process, which uses XSLT transformations and Apache FOP to convert a
@@ -127,6 +128,19 @@ public class PdfExportImpl implements PdfExport
 
     /** Tidy configuration. */
     private static final Properties TIDY_CONFIGURATION;
+
+    /** Document name resolver. */
+    @SuppressWarnings("unchecked")
+    private static DocumentReferenceResolver<String> referenceResolver =
+        Utils.getComponent(DocumentReferenceResolver.class, "currentmixed");
+
+    /** Document name serializer. */
+    @SuppressWarnings("unchecked")
+    private static EntityReferenceSerializer<String> referenceSerializer =
+        Utils.getComponent(EntityReferenceSerializer.class);
+
+    /** Provides access to document properties. */
+    private static DocumentAccessBridge dab = Utils.getComponent(DocumentAccessBridge.class);
 
     /** Velocity engine manager, used for interpreting velocity. */
     private static VelocityManager velocityManager = Utils.getComponent(VelocityManager.class);
@@ -219,26 +233,6 @@ public class PdfExportImpl implements PdfExport
     {
         this.tidy = new Tidy();
         this.tidy.setConfigurationFromProps(TIDY_CONFIGURATION);
-    }
-
-    /**
-     * Get the XSLT for converting (valid) XHTML to XSL-FO. The content is searched in:
-     * <ol>
-     * <li>the <tt>xhtmlxsl</tt> property of the current PDFTemplate</li>
-     * <li>the <tt>xhtml2fo.xsl</tt> resource (usually a file inside xwiki-core-*.jar)</li>
-     * </ol>
-     * 
-     * @param context the current request context
-     * @return the content of the XSLT as a byte stream
-     */
-    public String getXhtmlxsl(XWikiContext context) throws XWikiException
-    {
-        String xsl = getPDFTemplateField("xhtmlxsl", context);
-        if (StringUtils.isBlank(xsl)) {
-            return DEFAULT_XHTML2FOP_XSLT;
-        } else {
-            return xsl;
-        }
     }
 
     /**
@@ -534,29 +528,27 @@ public class PdfExportImpl implements PdfExport
      */
     public String convertXHtmlToXMLFO(String xhtml, XWikiContext context) throws XWikiException
     {
-        String xmlfo = applyXsl(xhtml, getXhtmlxsl(context));
-        return applyXsl(xmlfo, getFopxsl(context));
+        String xmlfo = applyXsl(xhtml, getXhtml2FopXslt(context));
+        return applyXsl(xmlfo, getFopCleanupXslt(context));
     }
 
     /**
      * Applies an XSLT transformation to an XML document.
      * 
      * @param xml the XML document to convert
-     * @param xslfile the name of the XSLT file to apply
+     * @param xsl the XSLT to apply
      * @return the converted document
      * @throws XWikiException if the transformation fails for any reason
      */
-    public String applyXsl(String xml, String xslfile) throws XWikiException
+    private String applyXsl(String xml, InputStream xsl) throws XWikiException
     {
-        InputStream xsltinputstream = getClass().getClassLoader().getResourceAsStream(xslfile);
-
         Reader xmlinputstream = new StringReader(xml);
         StringWriter transout = new StringWriter(xml.length());
 
         try {
             DocumentBuilder docBuilder = dbFactory.newDocumentBuilder();
             docBuilder.setEntityResolver(Utils.getComponent(EntityResolver.class));
-            Document xslt = docBuilder.parse(new InputSource(xsltinputstream));
+            Document xslt = docBuilder.parse(new InputSource(xsl));
             Document xmldoc = docBuilder.parse(new InputSource(xmlinputstream));
             Transformer transformer = TransformerFactory.newInstance().newTransformer(new DOMSource(xslt));
             transformer.transform(new DOMSource(xmldoc), new StreamResult(transout));
@@ -586,70 +578,12 @@ public class PdfExportImpl implements PdfExport
     public String applyCSS(String html, XWikiContext context) throws XWikiException
     {
         String css =
-            ((context == null) || (context.getWiki() == null)) ? "" : context.getWiki().parseTemplate("pdf.css",
-                context);
-        String style = getPDFTemplateField("style", context);
+            (context == null || context.getWiki() == null) ? "" : context.getWiki().parseTemplate("pdf.css", context);
+        String style = getPDFTemplateProperty("style", context);
         if (style != null) {
             css += style;
         }
         return applyCSS(html, css, context);
-    }
-
-    /**
-     * Read a property from the current PDFTemplate document, and pass it through the Velocity engine.
-     * 
-     * @param propertyName the property to read
-     * @param context the current request context
-     * @return the content of the property, velocity-parsed, or an empty string if there's no such property in the
-     *         current PDFTemplate
-     */
-    public String getPDFTemplateField(String fieldname, XWikiContext context) throws XWikiException
-    {
-        String fieldcontent = null;
-        XWikiDocument doc = getPDFTemplateDocument(context);
-        if (doc != null) {
-            BaseObject bobj = doc.getXObject(new DocumentReference(context.getDatabase(), "XWiki", "PDFClass"));
-            if (bobj != null) {
-                fieldcontent = bobj.getLargeStringValue(fieldname);
-                EntityReferenceSerializer<String> entityReferenceSerializer =
-                    Utils.getComponent(EntityReferenceSerializer.class);
-                try {
-                    StringWriter writer = new StringWriter();
-                    VelocityEngine engine = velocityManager.getVelocityEngine();
-                    try {
-                        VelocityContext vcontext = velocityManager.getVelocityContext();
-                        engine.startedUsingMacroNamespace(entityReferenceSerializer.serialize(doc
-                            .getDocumentReference()));
-                        velocityManager.getVelocityEngine().evaluate(vcontext, writer,
-                            entityReferenceSerializer.serialize(doc.getDocumentReference()), fieldcontent);
-                        fieldcontent = writer.toString();
-                    } finally {
-                        engine.stoppedUsingMacroNamespace(entityReferenceSerializer.serialize(
-                            doc.getDocumentReference()));
-                    }
-                } catch (XWikiVelocityException ex) {
-                    LOG.warn("Velocity errors while parsing pdf export extension [" +
-                        entityReferenceSerializer.serialize(doc.getDocumentReference()) + "]: " + ex.getMessage());
-                }
-            }
-        }
-        return fieldcontent;
-    }
-
-    public XWikiDocument getPDFTemplateDocument(XWikiContext context) throws XWikiException
-    {
-        XWikiDocument doc = null;
-        XWikiRequest request = context.getRequest();
-        if (request != null) {
-            String pdftemplate = request.get("pdftemplate");
-            if (pdftemplate != null) {
-                doc = context.getWiki().getDocument(pdftemplate, context);
-            }
-        }
-        if (doc == null) {
-            doc = context.getDoc();
-        }
-        return doc;
     }
 
     /**
@@ -720,6 +654,21 @@ public class PdfExportImpl implements PdfExport
     }
 
     /**
+     * Get the XSLT for converting (valid) XHTML to XSL-FO. The content is searched in:
+     * <ol>
+     * <li>the <tt>xhtmlxsl</tt> property of the current PDFTemplate</li>
+     * <li>the <tt>xhtml2fo.xsl</tt> resource (usually a file inside xwiki-core-*.jar)</li>
+     * </ol>
+     * 
+     * @param context the current request context
+     * @return the content of the XSLT as a byte stream
+     */
+    private InputStream getXhtml2FopXslt(XWikiContext context)
+    {
+        return getXslt("xhtmlxsl", DEFAULT_XHTML2FOP_XSLT, context);
+    }
+
+    /**
      * Get the XSLT for post-processing the XSL-FO file. The content is searched in:
      * <ol>
      * <li>the <tt>fopxsl</tt> property of the current PDFTemplate</li>
@@ -729,13 +678,76 @@ public class PdfExportImpl implements PdfExport
      * @param context the current request context
      * @return the content of the XSLT as a byte stream
      */
-    public String getFopxsl(XWikiContext context) throws XWikiException
+    private InputStream getFopCleanupXslt(XWikiContext context)
     {
-        String xsl = getPDFTemplateField("fopxsl", context);
-        if ((xsl == null) || ("".equals(xsl.trim()))) {
-            return DEFAULT_CLEANUP_XSLT;
-        } else {
-            return xsl;
+        return getXslt("fopxsl", DEFAULT_CLEANUP_XSLT, context);
+    }
+
+    /**
+     * Get an XSLT file. The content is searched in:
+     * <ol>
+     * <li>the <tt>fopxsl</tt> property of the current <tt>PDFTemplate</tt></li>
+     * <li>the <tt>fop.xsl</tt> resource (usually a file inside <tt>xwiki-core-*.jar</tt>)</li>
+     * </ol>
+     * 
+     * @param propertyName the name of the <tt>XWiki.PDFClass</tt> property to read from the current PDFTemplate
+     *            document
+     * @param fallbackFile the name of a resource file to use when the PDFTemplate does not contain an override
+     * @param context the current request context
+     * @return the content of the XSLT as a byte stream
+     */
+    private InputStream getXslt(String propertyName, String fallbackFile, XWikiContext context)
+    {
+        String xsl = getPDFTemplateProperty(propertyName, context);
+        if (!StringUtils.isBlank(xsl)) {
+            try {
+                return IOUtils.toInputStream(xsl, context.getWiki().getEncoding());
+            } catch (IOException ex) {
+                // This really shouldn't happen
+            }
         }
+        return getClass().getClassLoader().getResourceAsStream(fallbackFile);
+    }
+
+    /**
+     * Read a property from the current PDFTemplate document, and pass it through the Velocity engine.
+     * 
+     * @param propertyName the property to read
+     * @param context the current request context
+     * @return the content of the property, velocity-parsed, or an empty string if there's no such property in the
+     *         current PDFTemplate
+     */
+    private String getPDFTemplateProperty(String propertyName, XWikiContext context)
+    {
+        String pdftemplate = context.getRequest().getParameter("pdftemplate");
+        String currentWiki = dab.getCurrentDocumentReference().getRoot().getName();
+        DocumentReference templateReference = dab.getCurrentDocumentReference();
+        DocumentReference classReference = new DocumentReference(currentWiki, "XWiki", "PDFClass");
+
+        if (StringUtils.isNotEmpty(pdftemplate)) {
+            templateReference = referenceResolver.resolve(pdftemplate);
+        }
+
+        String result = (String) dab.getProperty(templateReference, classReference, propertyName);
+        if (StringUtils.isBlank(result)) {
+            return "";
+        }
+        String templateName = this.referenceSerializer.serialize(templateReference);
+        try {
+            StringWriter writer = new StringWriter();
+            VelocityEngine engine = velocityManager.getVelocityEngine();
+            try {
+                VelocityContext vcontext = velocityManager.getVelocityContext();
+                engine.startedUsingMacroNamespace(templateName);
+                velocityManager.getVelocityEngine().evaluate(vcontext, writer, templateName, result);
+                result = writer.toString();
+            } finally {
+                engine.stoppedUsingMacroNamespace(templateName);
+            }
+        } catch (XWikiVelocityException ex) {
+            LOG.warn("Velocity errors while parsing pdf export extension [" + templateName + "]: "
+                + ex.getMessage());
+        }
+        return result;
     }
 }

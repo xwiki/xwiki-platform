@@ -124,6 +124,9 @@ public class PdfExportImpl implements PdfExport
     /** Logging helper object. */
     private static final Log LOG = LogFactory.getLog(PdfExportImpl.class);
 
+    /** Tidy configuration. */
+    private static final Properties TIDY_CONFIGURATION;
+
     /** Velocity engine manager, used for interpreting velocity. */
     private static VelocityManager velocityManager = Utils.getComponent(VelocityManager.class);
 
@@ -179,13 +182,10 @@ public class PdfExportImpl implements PdfExport
                 LOG.warn("Wrong FOP configuration: " + ex.getMessage());
             }
         }
-    }
 
-    /** Default constructor. */
-    public PdfExportImpl()
-    {
-        this.tidy = new Tidy();
-
+        // ----------------------------------------------------------------------
+        // Tidy configuration
+        // ----------------------------------------------------------------------
         // Setup a default configuration for Tidy
         Properties baseConfiguration = new Properties();
         baseConfiguration.setProperty("quiet", Boolean.TRUE.toString());
@@ -201,16 +201,21 @@ public class PdfExportImpl implements PdfExport
         baseConfiguration.setProperty("wrap", "0");
 
         // Allow Tidy to be configured in the tidy.properties file
-        Properties configuration = new Properties(baseConfiguration);
+        TIDY_CONFIGURATION = new Properties(baseConfiguration);
         try {
-            configuration.load(this.getClass().getClassLoader().getResourceAsStream("/tidy.properties"));
+            TIDY_CONFIGURATION.load(PdfExportImpl.class.getClassLoader().getResourceAsStream("/tidy.properties"));
         } catch (IOException ex) {
             LOG.warn("Tidy configuration file could not be read. Using default configuration.");
         } catch (NullPointerException ex) {
             LOG.warn("Tidy configuration file doesn't exist. Using default configuration.");
         }
+    }
 
-        this.tidy.setConfigurationFromProps(configuration);
+    /** Default constructor. */
+    public PdfExportImpl()
+    {
+        this.tidy = new Tidy();
+        this.tidy.setConfigurationFromProps(TIDY_CONFIGURATION);
     }
 
     /**

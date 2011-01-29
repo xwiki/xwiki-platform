@@ -41,6 +41,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 
+import javax.servlet.ServletContext;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.transform.Result;
@@ -161,7 +162,8 @@ public class PdfExportImpl implements PdfExport
         fopFactory = FopFactory.newInstance();
         try {
             fopFactory.getFontManager().setFontBaseURL(
-                (Utils.getComponent(Container.class)).getApplicationContext().getResource("/WEB-INF/fonts/").getPath());
+                ((ServletContext) (Utils.getComponent(Container.class)).getApplicationContext())
+                .getRealPath("/WEB-INF/fonts/"));
         } catch (Throwable ex) {
             LOG.warn("Starting with 1.5, XWiki uses the WEB-INF/fonts/ directory as the font directory, "
                 + "and it should contain the FreeFont (http://savannah.gnu.org/projects/freefont/) fonts. "

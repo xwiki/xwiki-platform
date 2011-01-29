@@ -109,11 +109,11 @@ import com.xpn.xwiki.web.XWikiRequest;
  */
 public class PdfExportImpl implements PdfExport
 {
-    /** Logging helper object. */
-    private static final Log LOG = LogFactory.getLog(PdfExportImpl.class);
+    /** Export type: PDF. */
+    public static final int PDF = 0;
 
-    /** The JTidy instance used for cleaning up HTML documents. */
-    private Tidy tidy;
+    /** Export type: RTF. */
+    public static final int RTF = 1;
 
     /** The name of the default XHTML2FOP transformation file. */
     private static final String DEFAULT_XHTML2FOP_XSLT = "xhtml2fo.xsl";
@@ -121,11 +121,8 @@ public class PdfExportImpl implements PdfExport
     /** The name of the default FOP post-processing transformation file. */
     private static final String DEFAULT_CLEANUP_XSLT = "fop.xsl";
 
-    /** Export type: PDF. */
-    public static final int PDF = 0;
-
-    /** Export type: RTF. */
-    public static final int RTF = 1;
+    /** Logging helper object. */
+    private static final Log LOG = LogFactory.getLog(PdfExportImpl.class);
 
     /** DOM parser factory. */
     private static DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
@@ -135,6 +132,9 @@ public class PdfExportImpl implements PdfExport
 
     /** The Apache FOP instance used for XSL-FO processing. */
     private static FopFactory fopFactory;
+
+    /** The JTidy instance used for cleaning up HTML documents. */
+    private Tidy tidy;
 
     // Fields initialization
     static {

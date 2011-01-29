@@ -79,6 +79,7 @@ import org.w3c.dom.ls.LSOutput;
 import org.w3c.dom.ls.LSSerializer;
 import org.w3c.tidy.Tidy;
 import org.xml.sax.InputSource;
+import org.xwiki.container.ApplicationContext;
 import org.xwiki.container.Container;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReferenceSerializer;
@@ -111,6 +112,9 @@ public class PdfExportImpl implements PdfExport
 
     /** Export type: RTF. */
     public static final int RTF = 1;
+
+    /** The location where fonts to be used during PDF export should be placed. */
+    private static final String FONTS_PATH = "WEB-INF/fonts/";
 
     /** The name of the default XHTML2FOP transformation file. */
     private static final String DEFAULT_XHTML2FOP_XSLT = "xhtml2fo.xsl";
@@ -161,9 +165,12 @@ public class PdfExportImpl implements PdfExport
         // ----------------------------------------------------------------------
         fopFactory = FopFactory.newInstance();
         try {
-            fopFactory.getFontManager().setFontBaseURL(
-                ((ServletContext) (Utils.getComponent(Container.class)).getApplicationContext())
-                .getRealPath("/WEB-INF/fonts/"));
+            ApplicationContext context = Utils.getComponent(Container.class).getApplicationContext();
+            String fontsPath = context.getResource(FONTS_PATH).getPath();
+            if (context instanceof ServletContext) {
+                fontsPath = ((ServletContext) context).getRealPath(FONTS_PATH);
+            }
+            fopFactory.getFontManager().setFontBaseURL(fontsPath);
         } catch (Throwable ex) {
             LOG.warn("Starting with 1.5, XWiki uses the WEB-INF/fonts/ directory as the font directory, "
                 + "and it should contain the FreeFont (http://savannah.gnu.org/projects/freefont/) fonts. "

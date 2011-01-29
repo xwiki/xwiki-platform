@@ -310,9 +310,7 @@ public class PdfExportImpl implements PdfExport
 
             out.write(ouput.values().iterator().next());
         } catch (Exception e) {
-            throw new XWikiException(XWikiException.MODULE_XWIKI_EXPORT,
-                XWikiException.ERROR_XWIKI_APP_SEND_RESPONSE_EXCEPTION, "Exception while exporting "
-                    + (type == PdfExportImpl.RTF ? "RTF" : "PDF"), e);
+            throw createException(e, type, XWikiException.ERROR_XWIKI_APP_SEND_RESPONSE_EXCEPTION);
         }
     }
 
@@ -361,13 +359,9 @@ public class PdfExportImpl implements PdfExport
                 LOG.debug("Generated " + foResults.getPageCount() + " pages in total.");
             }
         } catch (IllegalStateException e) {
-            throw new XWikiException(XWikiException.MODULE_XWIKI_EXPORT,
-                XWikiException.ERROR_XWIKI_APP_SEND_RESPONSE_EXCEPTION, "Exception while exporting "
-                    + (type == PdfExportImpl.RTF ? "RTF" : "PDF"), e);
+            throw createException(e, type, XWikiException.ERROR_XWIKI_APP_SEND_RESPONSE_EXCEPTION);
         } catch (Exception e) {
-            throw new XWikiException(XWikiException.MODULE_XWIKI_EXPORT,
-                XWikiException.ERROR_XWIKI_EXPORT_PDF_FOP_FAILED, "Exception while exporting "
-                    + (type == PdfExportImpl.RTF ? "RTF" : "PDF"), e);
+            throw createException(e, type, XWikiException.ERROR_XWIKI_EXPORT_PDF_FOP_FAILED);
         }
     }
 
@@ -755,5 +749,19 @@ public class PdfExportImpl implements PdfExport
                 + ex.getMessage());
         }
         return result;
+    }
+
+    /**
+     * Create an XWikiException object with the given source, export type and error type.
+     * 
+     * @param source the source exception that is forwarded
+     * @param exportType the type of the export performed while the exception occurred, {@link #PDF} or {@link #RTF}
+     * @param errorType the type of error that occurred, one of the constants in {@link XWikiException}
+     * @return a new XWikiException object
+     */
+    private XWikiException createException(Throwable source, int exportType, int errorType)
+    {
+        return new XWikiException(XWikiException.MODULE_XWIKI_EXPORT, errorType, "Exception while exporting "
+            + (exportType == PdfExportImpl.RTF ? "RTF" : "PDF"), source);
     }
 }

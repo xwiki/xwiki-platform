@@ -41,7 +41,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 
-import javax.servlet.ServletContext;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.transform.Result;
@@ -83,6 +82,7 @@ import org.xml.sax.InputSource;
 import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.container.ApplicationContext;
 import org.xwiki.container.Container;
+import org.xwiki.context.Execution;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.model.reference.EntityReferenceSerializer;
@@ -99,6 +99,7 @@ import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.pdf.api.PdfExport;
 import com.xpn.xwiki.web.Utils;
+import com.xpn.xwiki.web.XWikiRequest;
 
 /**
  * Default implementation for the PDF Export process, which uses XSLT transformations and Apache FOP to convert a
@@ -115,7 +116,7 @@ public class PdfExportImpl implements PdfExport
     public static final int RTF = 1;
 
     /** The location where fonts to be used during PDF export should be placed. */
-    private static final String FONTS_PATH = "WEB-INF/fonts/";
+    private static final String FONTS_PATH = "/WEB-INF/fonts/";
 
     /** The name of the default XHTML2FOP transformation file. */
     private static final String DEFAULT_XHTML2FOP_XSLT = "xhtml2fo.xsl";
@@ -181,8 +182,13 @@ public class PdfExportImpl implements PdfExport
         try {
             ApplicationContext context = Utils.getComponent(Container.class).getApplicationContext();
             String fontsPath = context.getResource(FONTS_PATH).getPath();
-            if (context instanceof ServletContext) {
-                fontsPath = ((ServletContext) context).getRealPath(FONTS_PATH);
+            Execution execution = Utils.getComponent(Execution.class);
+            XWikiContext xcontext = (XWikiContext) execution.getContext().getProperty("xwikicontext");
+            if (xcontext != null) {
+                XWikiRequest request = xcontext.getRequest();
+                if (request != null && request.getSession() != null) {
+                    fontsPath = request.getSession().getServletContext().getRealPath(FONTS_PATH);
+                }
             }
             fopFactory.getFontManager().setFontBaseURL(fontsPath);
         } catch (Throwable ex) {

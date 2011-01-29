@@ -289,7 +289,8 @@ public class PdfExportImpl implements PdfExport
         // FIXME: put that in some XSL transformation instead (no time and knowledge to do that before 2.4)
         // html = applyXsl(xhtml, getXhtmlOfficexsl(context));
         html = html.replaceAll("(<div[^>]+class=\"pdftoc\"[^>]*>)", "<p style=\"page-break-before: always;\" />\n$1");
-        html = html.replaceAll("(<div[^>]+id=\"xwikimaincontainer\"[^>]*>)", "<p style=\"page-break-before: always;\" />\n$1");
+        html = html.replaceAll("(<div[^>]+id=\"xwikimaincontainer\"[^>]*>)",
+            "<p style=\"page-break-before: always;\" />\n$1");
 
         // OpenOffice does not support XHTML so we remove the XML marker and let it parse it as if it was HTML content
         html = html.substring(xhtml.indexOf("?>") + 2);
@@ -331,13 +332,13 @@ public class PdfExportImpl implements PdfExport
             // configure foUserAgent as desired
 
             // Construct fop with desired output format
-            Fop fop =
-                fopFactory.newFop(type == PdfExportImpl.RTF ? MimeConstants.MIME_RTF : MimeConstants.MIME_PDF,
-                    foUserAgent, out);
+            Fop fop = fopFactory.newFop(type == PdfExportImpl.RTF ? MimeConstants.MIME_RTF : MimeConstants.MIME_PDF,
+                foUserAgent, out);
 
             // Setup JAXP using identity transformer
             TransformerFactory factory = TransformerFactory.newInstance();
-            Transformer transformer = factory.newTransformer(); // identity transformer
+            // Identity transformer
+            Transformer transformer = factory.newTransformer();
 
             // Setup input stream
             Source source = new StreamSource(new StringReader(xmlfo));
@@ -351,6 +352,7 @@ public class PdfExportImpl implements PdfExport
             // Result processing
             FormattingResults foResults = fop.getResults();
             if (foResults != null && LOG.isDebugEnabled()) {
+                @SuppressWarnings("unchecked")
                 java.util.List<PageSequenceResults> pageSequences = foResults.getPageSequences();
                 for (PageSequenceResults pageSequenceResults : pageSequences) {
                     LOG.debug("PageSequence " + StringUtils.defaultIfEmpty(pageSequenceResults.getID(), "<no id>")
@@ -456,13 +458,13 @@ public class PdfExportImpl implements PdfExport
 
         try {
             // First step, Tidy the document
-            StringWriter out = new StringWriter(input.length());
-            this.tidy.parse(new StringReader(input), out);
+            StringWriter tidyOutput = new StringWriter(input.length());
+            this.tidy.parse(new StringReader(input), tidyOutput);
 
             // Tidy can't solve duplicate IDs, so it needs to be done manually
             DocumentBuilder docBuilder = dbFactory.newDocumentBuilder();
             docBuilder.setEntityResolver(Utils.getComponent(EntityResolver.class));
-            Document doc = docBuilder.parse(new InputSource(new StringReader(out.toString())));
+            Document doc = docBuilder.parse(new InputSource(new StringReader(tidyOutput.toString())));
             List<String> seenIDs = new ArrayList<String>();
             this.cleanIDs(doc.getDocumentElement(), seenIDs);
 
@@ -732,7 +734,7 @@ public class PdfExportImpl implements PdfExport
         if (StringUtils.isBlank(result)) {
             return "";
         }
-        String templateName = this.referenceSerializer.serialize(templateReference);
+        String templateName = referenceSerializer.serialize(templateReference);
         try {
             StringWriter writer = new StringWriter();
             VelocityEngine engine = velocityManager.getVelocityEngine();

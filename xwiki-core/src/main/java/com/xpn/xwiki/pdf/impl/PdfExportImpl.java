@@ -274,7 +274,7 @@ public class PdfExportImpl implements PdfExport
             if (useLocalPlaceholders) {
                 Utils.enablePlaceholders(context);
             }
-            String content = context.getWiki().parseTemplate("pdf.vm", context);
+            String content = context.getWiki().parseTemplate("pdf.vm", context).trim();
             if (useLocalPlaceholders) {
                 content = Utils.replacePlaceholders(content, context);
                 Utils.disablePlaceholders(context);

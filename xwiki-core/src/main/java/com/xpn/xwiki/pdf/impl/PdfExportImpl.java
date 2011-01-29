@@ -155,6 +155,9 @@ public class PdfExportImpl implements PdfExport
     /** DOM Serializer factory. */
     private static DOMImplementationLS lsImpl;
 
+    /** XSLT transformer factory. */
+    private static TransformerFactory transformerFactory = TransformerFactory.newInstance();
+
     /** The Apache FOP instance used for XSL-FO processing. */
     private static FopFactory fopFactory;
 
@@ -335,10 +338,8 @@ public class PdfExportImpl implements PdfExport
             Fop fop = fopFactory.newFop(type == PdfExportImpl.RTF ? MimeConstants.MIME_RTF : MimeConstants.MIME_PDF,
                 foUserAgent, out);
 
-            // Setup JAXP using identity transformer
-            TransformerFactory factory = TransformerFactory.newInstance();
             // Identity transformer
-            Transformer transformer = factory.newTransformer();
+            Transformer transformer = transformerFactory.newTransformer();
 
             // Setup input stream
             Source source = new StreamSource(new StringReader(xmlfo));
@@ -544,22 +545,21 @@ public class PdfExportImpl implements PdfExport
      */
     private String applyXsl(String xml, InputStream xsl) throws XWikiException
     {
-        Reader xmlinputstream = new StringReader(xml);
-        StringWriter transout = new StringWriter(xml.length());
+        StringWriter output = new StringWriter(xml.length());
 
         try {
             DocumentBuilder docBuilder = dbFactory.newDocumentBuilder();
             docBuilder.setEntityResolver(Utils.getComponent(EntityResolver.class));
-            Document xslt = docBuilder.parse(new InputSource(xsl));
-            Document xmldoc = docBuilder.parse(new InputSource(xmlinputstream));
-            Transformer transformer = TransformerFactory.newInstance().newTransformer(new DOMSource(xslt));
-            transformer.transform(new DOMSource(xmldoc), new StreamResult(transout));
+            Document xsltDocument = docBuilder.parse(new InputSource(xsl));
+            Document xmlDocument = docBuilder.parse(new InputSource(new StringReader(xml)));
+            Transformer transformer = transformerFactory.newTransformer(new DOMSource(xsltDocument));
+            transformer.transform(new DOMSource(xmlDocument), new StreamResult(output));
         } catch (Exception e) {
             throw new XWikiException(XWikiException.MODULE_XWIKI_EXPORT, XWikiException.ERROR_XWIKI_EXPORT_XSL_FAILED,
                 "XSL Transformation Failed", e);
         }
 
-        return transout.toString();
+        return output.toString();
     }
 
     /**

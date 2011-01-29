@@ -253,7 +253,7 @@ public class PdfExportImpl implements PdfExport
      * @param context the current request context
      * @throws XWikiException if the conversion fails for any reason
      */
-    public void exportXHtml(String xhtml, OutputStream out, int type, XWikiContext context) throws XWikiException
+    private void exportXHTML(String xhtml, OutputStream out, int type, XWikiContext context) throws XWikiException
     {
         if (LOG.isDebugEnabled()) {
             LOG.debug("Final XHTML for export: " + xhtml);
@@ -262,7 +262,7 @@ public class PdfExportImpl implements PdfExport
         // If OpenOffice server is connected use it instead of FOP which does not support RTF very well
         // Only switch to openoffice server for RTF because FOP is supposedly a lot more powerful for PDF
         if (type != PDF && oooManager.getState() == ManagerState.CONNECTED) {
-            exportOffice(xhtml, out, type, context);
+            exportViaOfficeManager(xhtml, out, type, context);
         } else {
             // XSL Transformation to XML-FO
             String xmlfo = convertXHtmlToXMLFO(xhtml, context);
@@ -272,7 +272,7 @@ public class PdfExportImpl implements PdfExport
                 LOG.debug("XSL-FO source: " + xmlfo);
             }
 
-            exportXMLFO(xmlfo, out, type);
+            renderXSLFO(xmlfo, out, type);
         }
     }
 
@@ -285,7 +285,8 @@ public class PdfExportImpl implements PdfExport
      * @param context the current request context
      * @throws XWikiException if the conversion fails for any reason
      */
-    public void exportOffice(String xhtml, OutputStream out, int type, XWikiContext context) throws XWikiException
+    private void exportViaOfficeManager(String xhtml, OutputStream out, int type, XWikiContext context)
+        throws XWikiException
     {
         String html = xhtml;
 
@@ -326,13 +327,10 @@ public class PdfExportImpl implements PdfExport
      * @param type the type of the output: PDF or RTF
      * @throws XWikiException if the conversion fails for any reason
      */
-    public void exportXMLFO(String xmlfo, OutputStream out, int type) throws XWikiException
+    private void renderXSLFO(String xmlfo, OutputStream out, int type) throws XWikiException
     {
-        // XSL Transformation to XML-FO
-
         try {
             FOUserAgent foUserAgent = fopFactory.newFOUserAgent();
-            // configure foUserAgent as desired
 
             // Construct fop with desired output format
             Fop fop = fopFactory.newFop(type == PdfExportImpl.RTF ? MimeConstants.MIME_RTF : MimeConstants.MIME_PDF,
@@ -379,7 +377,7 @@ public class PdfExportImpl implements PdfExport
      */
     public void exportHtml(String html, OutputStream out, int type, XWikiContext context) throws XWikiException
     {
-        exportXHtml(applyCSS(convertToStrictXHtml(html), context), out, type, context);
+        exportXHTML(applyCSS(convertToStrictXHtml(html), context), out, type, context);
     }
 
     /**
@@ -531,26 +529,26 @@ public class PdfExportImpl implements PdfExport
      */
     public String convertXHtmlToXMLFO(String xhtml, XWikiContext context) throws XWikiException
     {
-        String xmlfo = applyXsl(xhtml, getXhtml2FopXslt(context));
-        return applyXsl(xmlfo, getFopCleanupXslt(context));
+        String xmlfo = applyXSLT(xhtml, getXhtml2FopXslt(context));
+        return applyXSLT(xmlfo, getFopCleanupXslt(context));
     }
 
     /**
      * Applies an XSLT transformation to an XML document.
      * 
      * @param xml the XML document to convert
-     * @param xsl the XSLT to apply
+     * @param xslt the XSLT to apply
      * @return the converted document
      * @throws XWikiException if the transformation fails for any reason
      */
-    private String applyXsl(String xml, InputStream xsl) throws XWikiException
+    private String applyXSLT(String xml, InputStream xslt) throws XWikiException
     {
         StringWriter output = new StringWriter(xml.length());
 
         try {
             DocumentBuilder docBuilder = dbFactory.newDocumentBuilder();
             docBuilder.setEntityResolver(Utils.getComponent(EntityResolver.class));
-            Document xsltDocument = docBuilder.parse(new InputSource(xsl));
+            Document xsltDocument = docBuilder.parse(new InputSource(xslt));
             Document xmlDocument = docBuilder.parse(new InputSource(new StringReader(xml)));
             Transformer transformer = transformerFactory.newTransformer(new DOMSource(xsltDocument));
             transformer.transform(new DOMSource(xmlDocument), new StreamResult(output));
@@ -577,7 +575,7 @@ public class PdfExportImpl implements PdfExport
      * @return the document with inlined style
      * @throws XWikiException if any exception occurs
      */
-    public String applyCSS(String html, XWikiContext context) throws XWikiException
+    private String applyCSS(String html, XWikiContext context) throws XWikiException
     {
         String css =
             (context == null || context.getWiki() == null) ? "" : context.getWiki().parseTemplate("pdf.css", context);
@@ -597,7 +595,7 @@ public class PdfExportImpl implements PdfExport
      * @param context the current request context
      * @return the document with inlined style
      */
-    public String applyCSS(String html, String css, XWikiContext context)
+    private String applyCSS(String html, String css, XWikiContext context)
     {
         try {
             // Prepare the input

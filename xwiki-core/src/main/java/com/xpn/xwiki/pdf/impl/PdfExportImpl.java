@@ -101,18 +101,30 @@ import com.xpn.xwiki.util.Util;
 import com.xpn.xwiki.web.Utils;
 import com.xpn.xwiki.web.XWikiRequest;
 
+/**
+ * Default implementation for the PDF Export process, which uses XSLT transformations and Apache FOP to convert a
+ * Document into PDF, passing through HTML, valid XHTML, styled XHTML, and XSL-FO.
+ * 
+ * @version $Id$
+ */
 public class PdfExportImpl implements PdfExport
 {
+    /** Logging helper object. */
     private static final Log log = LogFactory.getLog(PdfExportImpl.class);
 
+    /** The JTidy instance used for cleaning up HTML documents. */
     private Tidy tidy;
 
-    private String xhtmlxsl = "xhtml2fo.xsl";
+    /** The name of the default XHTML2FOP transformation file. */
+    private static final String DEFAULT_XHTML2FOP_XSLT = "xhtml2fo.xsl";
 
-    private String fopxsl = "fop.xsl";
+    /** The name of the default FOP post-processing transformation file. */
+    private static final String DEFAULT_CLEANUP_XSLT = "fop.xsl";
 
+    /** Export type: PDF. */
     public static final int PDF = 0;
 
+    /** Export type: RTF. */
     public static final int RTF = 1;
 
     /** DOM parser factory. */
@@ -121,9 +133,14 @@ public class PdfExportImpl implements PdfExport
     /** DOM Serializer factory. */
     private static DOMImplementationLS lsImpl;
 
+    /** The Apache FOP instance used for XSL-FO processing. */
     private static FopFactory fopFactory;
 
+    // Fields initialization
     static {
+        // ----------------------------------------------------------------------
+        // XML parser/serializer initialization
+        // ----------------------------------------------------------------------
         dbFactory.setNamespaceAware(true);
         dbFactory.setValidating(false);
 
@@ -133,6 +150,9 @@ public class PdfExportImpl implements PdfExport
             log.warn("Cannot initialize the DomLS implementation needed by the PDF export: " + ex.getMessage());
         }
 
+        // ----------------------------------------------------------------------
+        // FOP configuration
+        // ----------------------------------------------------------------------
         fopFactory = FopFactory.newInstance();
         try {
             fopFactory.getFontManager().setFontBaseURL(
@@ -155,21 +175,22 @@ public class PdfExportImpl implements PdfExport
         }
     }
 
+    /** Default constructor. */
     public PdfExportImpl()
     {
         this.tidy = new Tidy();
 
         // Setup a default configuration for Tidy
         Properties baseConfiguration = new Properties();
-        baseConfiguration.setProperty("quiet", "true");
-        baseConfiguration.setProperty("clean", "true");
-        baseConfiguration.setProperty("tidy-mark", "false");
-        baseConfiguration.setProperty("output-xhtml", "true");
-        baseConfiguration.setProperty("show-warnings", "false");
-        baseConfiguration.setProperty("trim-empty-elements", "false");
-        baseConfiguration.setProperty("numeric-entities", "true");
+        baseConfiguration.setProperty("quiet", Boolean.TRUE.toString());
+        baseConfiguration.setProperty("clean", Boolean.TRUE.toString());
+        baseConfiguration.setProperty("tidy-mark", Boolean.FALSE.toString());
+        baseConfiguration.setProperty("output-xhtml", Boolean.TRUE.toString());
+        baseConfiguration.setProperty("show-warnings", Boolean.FALSE.toString());
+        baseConfiguration.setProperty("trim-empty-elements", Boolean.FALSE.toString());
+        baseConfiguration.setProperty("numeric-entities", Boolean.TRUE.toString());
         // Don't replace non-ASCII apostrophes/quotes/dashes with plain ASCII ones.
-        baseConfiguration.setProperty("ascii-chars", "false");
+        baseConfiguration.setProperty("ascii-chars", Boolean.FALSE.toString());
         // Don't wrap, as it is not needed, and it triggers JTidy bugs when combined with non-ASCII chars.
         baseConfiguration.setProperty("wrap", "0");
 
@@ -186,26 +207,35 @@ public class PdfExportImpl implements PdfExport
         this.tidy.setConfigurationFromProps(configuration);
     }
 
-    public String getXhtmlxsl()
-    {
-        return this.xhtmlxsl;
-    }
-
+    /**
+     * Get the XSLT for converting (valid) XHTML to XSL-FO. The content is searched in:
+     * <ol>
+     * <li>the <tt>xhtmlxsl</tt> property of the current PDFTemplate</li>
+     * <li>the <tt>xhtml2fo.xsl</tt> resource (usually a file inside xwiki-core-*.jar)</li>
+     * </ol>
+     * 
+     * @param context the current request context
+     * @return the content of the XSLT as a byte stream
+     */
     public String getXhtmlxsl(XWikiContext context) throws XWikiException
     {
         String xsl = getPDFTemplateField("xhtmlxsl", context);
         if (StringUtils.isBlank(xsl)) {
-            return this.xhtmlxsl;
+            return DEFAULT_XHTML2FOP_XSLT;
         } else {
             return xsl;
         }
     }
 
-    public void setXhtmlxsl(String xhtmlxsl)
-    {
-        this.xhtmlxsl = xhtmlxsl;
-    }
-
+    /**
+     * Convert a valid XHTML document into PDF. No further processing of the XHTML occurs.
+     * 
+     * @param xhtml the source document to transform
+     * @param out where to write the resulting document
+     * @param type the type of the output: PDF or RTF
+     * @param context the current request context
+     * @throws XWikiException if the conversion fails for any reason
+     */
     public void exportXHtml(String xhtml, OutputStream out, int type, XWikiContext context) throws XWikiException
     {
         if (log.isDebugEnabled()) {
@@ -231,11 +261,20 @@ public class PdfExportImpl implements PdfExport
         }
     }
 
+    /**
+     * Export a valid XHTML document into PDF using the OpenOffice converter.
+     * 
+     * @param xhtml the source document to transform
+     * @param out where to write the resulting document
+     * @param type the type of the output: PDF or RTF
+     * @param context the current request context
+     * @throws XWikiException if the conversion fails for any reason
+     */
     public void exportOffice(String xhtml, OutputStream out, int type, XWikiContext context) throws XWikiException
     {
         String html = xhtml;
 
-        // FIXME: put that in some XSL translformation instead (no time and knowledge to do that before 2.4)
+        // FIXME: put that in some XSL transformation instead (no time and knowledge to do that before 2.4)
         // html = applyXsl(xhtml, getXhtmlOfficexsl(context));
         html = html.replaceAll("(<div[^>]+class=\"pdftoc\"[^>]*>)", "<p style=\"page-break-before: always;\" />\n$1");
         html = html.replaceAll("(<div[^>]+id=\"xwikimaincontainer\"[^>]*>)", "<p style=\"page-break-before: always;\" />\n$1");
@@ -267,6 +306,14 @@ public class PdfExportImpl implements PdfExport
         }
     }
 
+    /**
+     * Convert an XSL-FO document into PDF.
+     * 
+     * @param xmlfo the source FO to render
+     * @param out where to write the resulting document
+     * @param type the type of the output: PDF or RTF
+     * @throws XWikiException if the conversion fails for any reason
+     */
     public void exportXMLFO(String xmlfo, OutputStream out, int type) throws XWikiException
     {
         // XSL Transformation to XML-FO
@@ -314,16 +361,48 @@ public class PdfExportImpl implements PdfExport
         }
     }
 
+    /**
+     * Convert an HTML document to PDF. The HTML is cleaned up, and CSS style is applied to it.
+     * 
+     * @param html the source document to transform
+     * @param out where to write the resulting document
+     * @param type the type of the output: PDF or RTF
+     * @param context the current request context
+     * @throws XWikiException if the conversion fails for any reason
+     */
     public void exportHtml(String html, OutputStream out, int type, XWikiContext context) throws XWikiException
     {
         exportXHtml(applyCSS(convertToStrictXHtml(html), context), out, type, context);
     }
 
+    /**
+     * Export a wiki Document into PDF. See {@link #export(XWikiDocument, OutputStream, int, XWikiContext)} for more
+     * details about the conversion process.
+     * 
+     * @param doc the document to export
+     * @param out where to write the resulting document
+     * @param context the current request context
+     * @throws XWikiException if the conversion fails for any reason
+     * @see #export(XWikiDocument, OutputStream, int, XWikiContext)
+     */
     public void exportToPDF(XWikiDocument doc, OutputStream out, XWikiContext context) throws XWikiException
     {
         export(doc, out, PdfExportImpl.PDF, context);
     }
 
+    /**
+     * Export a wiki Document into PDF or RTF. The content of the document is rendered into HTML using the {@code
+     * pdf.vm} template, the resulting HTML is cleaned up into valid XHTML using JTidy, and custom CSS is applied to it.
+     * If an OpenOffice service is configured and the output format is RTF, then the XHTML source is converted to RTF
+     * using it. Otherwise, the XHTML document is transformed into an XSL-FO document, which is finally processed using
+     * Apache FOP.
+     * 
+     * @param doc the document to export
+     * @param out where to write the resulting document
+     * @param type the type of the output: PDF or RTF
+     * @param context the current request context
+     * @throws XWikiException if the conversion fails for any reason
+     */
     public void export(XWikiDocument doc, OutputStream out, int type, XWikiContext context) throws XWikiException
     {
         // Note: The passed document is not used currently since we're calling pdf.vm and that
@@ -359,6 +438,12 @@ public class PdfExportImpl implements PdfExport
         }
     }
 
+    /**
+     * Cleans up an HTML document, turning it into valid XHTML.
+     * 
+     * @param input the source HTML to process
+     * @return the cleaned up source
+     */
     public String convertToStrictXHtml(String input)
     {
         if (log.isDebugEnabled()) {
@@ -422,12 +507,35 @@ public class PdfExportImpl implements PdfExport
         }
     }
 
+    /**
+     * Convert a valid XHTML document into an XSL-FO document through XSLT transformations. Two transformations are
+     * involved:
+     * <ol>
+     * <li>A base transformation which converts the XHTML into a temporary XSL-FO; it uses the <tt>xhtml2fo.xsl</tt>
+     * file, or the <tt>xhtmlxsl</tt> property of the applied PDFTemplate.</li>
+     * <li>An eventual post-processing transformation which cleans up the temporary XSL-FO in order to avoid FOP bugs;
+     * it uses the <tt>fop.xsl</tt> file, or the <tt>fopxsl</tt> property of the applied PDFTemplate.</li>
+     * </ol>
+     * 
+     * @param xhtml the XHTML document to convert
+     * @param context the current request context
+     * @return the resulting XML-FO document
+     * @throws XWikiException if the conversion fails for any reason
+     */
     public String convertXHtmlToXMLFO(String xhtml, XWikiContext context) throws XWikiException
     {
         String xmlfo = applyXsl(xhtml, getXhtmlxsl(context));
         return applyXsl(xmlfo, getFopxsl(context));
     }
 
+    /**
+     * Applies an XSLT transformation to an XML document.
+     * 
+     * @param xml the XML document to convert
+     * @param xslfile the name of the XSLT file to apply
+     * @return the converted document
+     * @throws XWikiException if the transformation fails for any reason
+     */
     public String applyXsl(String xml, String xslfile) throws XWikiException
     {
         InputStream xsltinputstream = getClass().getClassLoader().getResourceAsStream(xslfile);
@@ -450,6 +558,21 @@ public class PdfExportImpl implements PdfExport
         return transout.toString();
     }
 
+    /**
+     * Apply CSS styling to an XHTML document. The style to apply is taken from:
+     * <ol>
+     * <li>the <tt>pdf.css</tt> skin file</li>
+     * <li>and the <tt>style</tt> property of the applied PDFTemplate</li>
+     * </ol>
+     * The content found in these locations is concatenated. The CSS rules are applied on the document, and the
+     * resulting style properties are embedded in the document, inside <tt>style</tt> attributes. The resulting XHTML
+     * document with the inlined style is then serialized and returned.
+     * 
+     * @param html the valid XHTML document to style
+     * @param context the current request context
+     * @return the document with inlined style
+     * @throws XWikiException if any exception occurs
+     */
     public String applyCSS(String html, XWikiContext context) throws XWikiException
     {
         String css =
@@ -462,6 +585,14 @@ public class PdfExportImpl implements PdfExport
         return applyCSS(html, css, context);
     }
 
+    /**
+     * Read a property from the current PDFTemplate document, and pass it through the Velocity engine.
+     * 
+     * @param propertyName the property to read
+     * @param context the current request context
+     * @return the content of the property, velocity-parsed, or an empty string if there's no such property in the
+     *         current PDFTemplate
+     */
     public String getPDFTemplateField(String fieldname, XWikiContext context) throws XWikiException
     {
         String fieldcontent = null;
@@ -512,6 +643,15 @@ public class PdfExportImpl implements PdfExport
         return doc;
     }
 
+    /**
+     * Apply a CSS style sheet to an XHTML document and return the document with the resulting style properties inlined
+     * in <tt>style</tt> attributes.
+     * 
+     * @param html the valid XHTML document to style
+     * @param css the style sheet to apply
+     * @param context the current request context
+     * @return the document with inlined style
+     */
     public String applyCSS(String html, String css, XWikiContext context)
     {
         try {
@@ -547,6 +687,12 @@ public class PdfExportImpl implements PdfExport
         }
     }
 
+    /**
+     * Recursively inline the computed style that applies to a DOM Element into the {@code style} attribute of that
+     * Element.
+     * 
+     * @param element the Element whose style should be inlined
+     */
     private void applyInlineStyle(Element element)
     {
         for (int i = 0; i < element.nodeCount(); i++) {
@@ -564,23 +710,23 @@ public class PdfExportImpl implements PdfExport
         }
     }
 
-    public String getFopxsl()
-    {
-        return this.fopxsl;
-    }
-
+    /**
+     * Get the XSLT for post-processing the XSL-FO file. The content is searched in:
+     * <ol>
+     * <li>the <tt>fopxsl</tt> property of the current PDFTemplate</li>
+     * <li>the <tt>fop.xsl</tt> resource (usually a file inside xwiki-core-*.jar)</li>
+     * </ol>
+     * 
+     * @param context the current request context
+     * @return the content of the XSLT as a byte stream
+     */
     public String getFopxsl(XWikiContext context) throws XWikiException
     {
         String xsl = getPDFTemplateField("fopxsl", context);
         if ((xsl == null) || ("".equals(xsl.trim()))) {
-            return this.fopxsl;
+            return DEFAULT_CLEANUP_XSLT;
         } else {
             return xsl;
         }
-    }
-
-    public void setFopxsl(String fopxsl)
-    {
-        this.fopxsl = fopxsl;
     }
 }

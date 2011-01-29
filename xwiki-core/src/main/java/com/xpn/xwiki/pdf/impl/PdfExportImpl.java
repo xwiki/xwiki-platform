@@ -110,7 +110,7 @@ import com.xpn.xwiki.web.XWikiRequest;
 public class PdfExportImpl implements PdfExport
 {
     /** Logging helper object. */
-    private static final Log log = LogFactory.getLog(PdfExportImpl.class);
+    private static final Log LOG = LogFactory.getLog(PdfExportImpl.class);
 
     /** The JTidy instance used for cleaning up HTML documents. */
     private Tidy tidy;
@@ -147,7 +147,7 @@ public class PdfExportImpl implements PdfExport
         try {
             lsImpl = (DOMImplementationLS) DOMImplementationRegistry.newInstance().getDOMImplementation("LS 3.0");
         } catch (Exception ex) {
-            log.warn("Cannot initialize the DomLS implementation needed by the PDF export: " + ex.getMessage());
+            LOG.warn("Cannot initialize the DomLS implementation needed by the PDF export: " + ex.getMessage());
         }
 
         // ----------------------------------------------------------------------
@@ -158,7 +158,7 @@ public class PdfExportImpl implements PdfExport
             fopFactory.getFontManager().setFontBaseURL(
                 (Utils.getComponent(Container.class)).getApplicationContext().getResource("/WEB-INF/fonts/").getPath());
         } catch (Throwable ex) {
-            log.warn("Starting with 1.5, XWiki uses the WEB-INF/fonts/ directory as the font directory, "
+            LOG.warn("Starting with 1.5, XWiki uses the WEB-INF/fonts/ directory as the font directory, "
                 + "and it should contain the FreeFont (http://savannah.gnu.org/projects/freefont/) fonts. "
                 + "FOP cannot access this directory. If this is an upgrade from a previous version, "
                 + "make sure you also copy the WEB-INF/fonts directory from the new distribution package.");
@@ -170,7 +170,7 @@ public class PdfExportImpl implements PdfExport
                 cfg = cfgBuilder.build(PdfExportImpl.class.getResourceAsStream("/fop-config.xml"));
                 fopFactory.setUserConfig(cfg);
             } catch (Exception ex) {
-                log.warn("Wrong FOP configuration: " + ex.getMessage());
+                LOG.warn("Wrong FOP configuration: " + ex.getMessage());
             }
         }
     }
@@ -199,9 +199,9 @@ public class PdfExportImpl implements PdfExport
         try {
             configuration.load(this.getClass().getClassLoader().getResourceAsStream("/tidy.properties"));
         } catch (IOException ex) {
-            log.warn("Tidy configuration file could not be read. Using default configuration.");
+            LOG.warn("Tidy configuration file could not be read. Using default configuration.");
         } catch (NullPointerException ex) {
-            log.warn("Tidy configuration file doesn't exist. Using default configuration.");
+            LOG.warn("Tidy configuration file doesn't exist. Using default configuration.");
         }
 
         this.tidy.setConfigurationFromProps(configuration);
@@ -238,8 +238,8 @@ public class PdfExportImpl implements PdfExport
      */
     public void exportXHtml(String xhtml, OutputStream out, int type, XWikiContext context) throws XWikiException
     {
-        if (log.isDebugEnabled()) {
-            log.debug("Final XHTML for export: " + xhtml);
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Final XHTML for export: " + xhtml);
         }
 
         OpenOfficeManager OpenOfficeManager = Utils.getComponent(OpenOfficeManager.class);
@@ -253,8 +253,8 @@ public class PdfExportImpl implements PdfExport
             String xmlfo = convertXHtmlToXMLFO(xhtml, context);
 
             // Debug output
-            if (log.isDebugEnabled()) {
-                log.debug("XSL-FO source: " + xmlfo);
+            if (LOG.isDebugEnabled()) {
+                LOG.debug("XSL-FO source: " + xmlfo);
             }
 
             exportXMLFO(xmlfo, out, type);
@@ -342,13 +342,13 @@ public class PdfExportImpl implements PdfExport
 
             // Result processing
             FormattingResults foResults = fop.getResults();
-            if (foResults != null && log.isDebugEnabled()) {
+            if (foResults != null && LOG.isDebugEnabled()) {
                 java.util.List<PageSequenceResults> pageSequences = foResults.getPageSequences();
                 for (PageSequenceResults pageSequenceResults : pageSequences) {
-                    log.debug("PageSequence " + StringUtils.defaultIfEmpty(pageSequenceResults.getID(), "<no id>")
+                    LOG.debug("PageSequence " + StringUtils.defaultIfEmpty(pageSequenceResults.getID(), "<no id>")
                         + " generated " + pageSequenceResults.getPageCount() + " pages.");
                 }
-                log.debug("Generated " + foResults.getPageCount() + " pages in total.");
+                LOG.debug("Generated " + foResults.getPageCount() + " pages in total.");
             }
         } catch (IllegalStateException e) {
             throw new XWikiException(XWikiException.MODULE_XWIKI_EXPORT,
@@ -433,7 +433,7 @@ public class PdfExportImpl implements PdfExport
                 FileUtils.deleteDirectory(tempdir);
             } catch (IOException ex) {
                 // Should not happen, but it's nothing serious, just that temporary files are left on the disk.
-                log.warn("Failed to cleanup temporary files after a PDF export", ex);
+                LOG.warn("Failed to cleanup temporary files after a PDF export", ex);
             }
         }
     }
@@ -446,8 +446,8 @@ public class PdfExportImpl implements PdfExport
      */
     public String convertToStrictXHtml(String input)
     {
-        if (log.isDebugEnabled()) {
-            log.debug("Cleaning HTML: " + input);
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Cleaning HTML: " + input);
         }
 
         try {
@@ -472,7 +472,7 @@ public class PdfExportImpl implements PdfExport
             serializer.write(doc, output);
             return result.toString();
         } catch (Exception ex) {
-            log.warn("Failed to tidy document for export: " + ex.getMessage(), ex);
+            LOG.warn("Failed to tidy document for export: " + ex.getMessage(), ex);
             return input;
         }
     }
@@ -619,7 +619,7 @@ public class PdfExportImpl implements PdfExport
                             doc.getDocumentReference()));
                     }
                 } catch (XWikiVelocityException ex) {
-                    log.warn("Velocity errors while parsing pdf export extension [" +
+                    LOG.warn("Velocity errors while parsing pdf export extension [" +
                         entityReferenceSerializer.serialize(doc.getDocumentReference()) + "]: " + ex.getMessage());
                 }
             }
@@ -677,12 +677,12 @@ public class PdfExportImpl implements PdfExport
             writer.write(document);
             String result = out.toString();
             // Debug output
-            if (log.isDebugEnabled()) {
-                log.debug("HTML with CSS applied: " + result);
+            if (LOG.isDebugEnabled()) {
+                LOG.debug("HTML with CSS applied: " + result);
             }
             return result;
         } catch (Exception ex) {
-            log.warn("Failed to apply CSS: " + ex.getMessage(), ex);
+            LOG.warn("Failed to apply CSS: " + ex.getMessage(), ex);
             return html;
         }
     }

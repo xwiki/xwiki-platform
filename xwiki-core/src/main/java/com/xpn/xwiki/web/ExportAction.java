@@ -31,6 +31,7 @@ import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.export.html.HtmlPackager;
+import com.xpn.xwiki.pdf.api.PdfExport.ExportType;
 import com.xpn.xwiki.pdf.impl.PdfExportImpl;
 import com.xpn.xwiki.plugin.packaging.PackageAPI;
 import com.xpn.xwiki.util.Util;
@@ -181,18 +182,16 @@ public class ExportAction extends XWikiAction
         XWikiDocument doc = context.getDoc();
         handleRevision(context);
 
-        int type = PdfExportImpl.PDF;
+        ExportType type = ExportType.PDF;
         if (format.equals("rtf")) {
-            type = PdfExportImpl.RTF;
-        } else {
-            format = "pdf";
+            type = ExportType.RTF;
         }
 
-        context.getResponse().setContentType("application/" + format);
+        context.getResponse().setContentType(type.mimeType);
         context.getResponse().addHeader(
             "Content-disposition",
-            "inline; filename=" + Util.encodeURI(doc.getSpace(), context) + "_"
-                + Util.encodeURI(doc.getName(), context) + "." + format);
+            "inline; filename=" + Util.encodeURI(doc.getDocumentReference().getLastSpaceReference().getName(), context)
+            + "_" + Util.encodeURI(doc.getDocumentReference().getName(), context) + "." + type.extension);
         pdfexport.export(doc, context.getResponse().getOutputStream(), type, context);
 
         return null;

@@ -63,7 +63,6 @@ import org.apache.fop.apps.FOUserAgent;
 import org.apache.fop.apps.Fop;
 import org.apache.fop.apps.FopFactory;
 import org.apache.fop.apps.FormattingResults;
-import org.apache.fop.apps.MimeConstants;
 import org.apache.fop.apps.PageSequenceResults;
 import org.apache.velocity.VelocityContext;
 import org.dom4j.Element;
@@ -109,12 +108,6 @@ import com.xpn.xwiki.web.XWikiRequest;
  */
 public class PdfExportImpl implements PdfExport
 {
-    /** Export type: PDF. */
-    public static final int PDF = 0;
-
-    /** Export type: RTF. */
-    public static final int RTF = 1;
-
     /** The location where fonts to be used during PDF export should be placed. */
     private static final String FONTS_PATH = "/WEB-INF/fonts/";
 
@@ -245,34 +238,24 @@ public class PdfExportImpl implements PdfExport
     }
 
     /**
-     * Export a wiki Document into PDF. See {@link #export(XWikiDocument, OutputStream, int, XWikiContext)} for more
-     * details about the conversion process.
+     * {@inheritDoc}
      * 
-     * @param doc the document to export
-     * @param out where to write the resulting document
-     * @param context the current request context
-     * @throws XWikiException if the conversion fails for any reason
-     * @see #export(XWikiDocument, OutputStream, int, XWikiContext)
+     * @see PdfExport#exportToPDF(XWikiDocument, OutputStream, XWikiContext)
+     * @since 1.0
      */
     public void exportToPDF(XWikiDocument doc, OutputStream out, XWikiContext context) throws XWikiException
     {
-        export(doc, out, PdfExportImpl.PDF, context);
+        export(doc, out, ExportType.PDF, context);
     }
 
     /**
-     * Export a wiki Document into PDF or RTF. The content of the document is rendered into HTML using the {@code
-     * pdf.vm} template, the resulting HTML is cleaned up into valid XHTML using JTidy, and custom CSS is applied to it.
-     * If an OpenOffice service is configured and the output format is RTF, then the XHTML source is converted to RTF
-     * using it. Otherwise, the XHTML document is transformed into an XSL-FO document, which is finally processed using
-     * Apache FOP.
+     * {@inheritDoc}
      * 
-     * @param doc the document to export
-     * @param out where to write the resulting document
-     * @param type the type of the output: PDF or RTF
-     * @param context the current request context
-     * @throws XWikiException if the conversion fails for any reason
+     * @see PdfExport#export(XWikiDocument, OutputStream, com.xpn.xwiki.pdf.api.PdfExport.ExportType, XWikiContext)
+     * @since 3.0M2
      */
-    public void export(XWikiDocument doc, OutputStream out, int type, XWikiContext context) throws XWikiException
+    public void export(XWikiDocument doc, OutputStream out, ExportType type, XWikiContext context)
+        throws XWikiException
     {
         // Note: The passed document is not used currently since we're calling pdf.vm and that
         // velocity template uses the XWiki Context to get the current doc or its translations.
@@ -308,15 +291,12 @@ public class PdfExportImpl implements PdfExport
     }
 
     /**
-     * Convert an HTML document to PDF. The HTML is cleaned up, and CSS style is applied to it.
+     * {@inheritDoc}
      * 
-     * @param html the source document to transform
-     * @param out where to write the resulting document
-     * @param type the type of the output: PDF or RTF
-     * @param context the current request context
-     * @throws XWikiException if the conversion fails for any reason
+     * @see PdfExport#exportHtml(String, OutputStream, com.xpn.xwiki.pdf.api.PdfExport.ExportType, XWikiContext)
+     * @since 3.0M2
      */
-    public void exportHtml(String html, OutputStream out, int type, XWikiContext context) throws XWikiException
+    public void exportHtml(String html, OutputStream out, ExportType type, XWikiContext context) throws XWikiException
     {
         exportXHTML(applyCSS(convertToStrictXHtml(html), context), out, type, context);
     }
@@ -399,7 +379,8 @@ public class PdfExportImpl implements PdfExport
      * @param context the current request context
      * @throws XWikiException if the conversion fails for any reason
      */
-    private void exportXHTML(String xhtml, OutputStream out, int type, XWikiContext context) throws XWikiException
+    private void exportXHTML(String xhtml, OutputStream out, ExportType type, XWikiContext context)
+        throws XWikiException
     {
         if (LOG.isDebugEnabled()) {
             LOG.debug("Final XHTML for export: " + xhtml);
@@ -407,7 +388,7 @@ public class PdfExportImpl implements PdfExport
 
         // If OpenOffice server is connected use it instead of FOP which does not support RTF very well
         // Only switch to openoffice server for RTF because FOP is supposedly a lot more powerful for PDF
-        if (type != PDF && oooManager.getState() == ManagerState.CONNECTED) {
+        if (type != ExportType.PDF && oooManager.getState() == ManagerState.CONNECTED) {
             exportViaOfficeManager(xhtml, out, type, context);
         } else {
             // XSL Transformation to XML-FO
@@ -451,14 +432,13 @@ public class PdfExportImpl implements PdfExport
      * @param type the type of the output: PDF or RTF
      * @throws XWikiException if the conversion fails for any reason
      */
-    private void renderXSLFO(String xmlfo, OutputStream out, int type) throws XWikiException
+    private void renderXSLFO(String xmlfo, OutputStream out, ExportType type) throws XWikiException
     {
         try {
             FOUserAgent foUserAgent = fopFactory.newFOUserAgent();
 
             // Construct fop with desired output format
-            Fop fop = fopFactory.newFop(type == PdfExportImpl.RTF ? MimeConstants.MIME_RTF : MimeConstants.MIME_PDF,
-                foUserAgent, out);
+            Fop fop = fopFactory.newFop(type.mimeType, foUserAgent, out);
 
             // Identity transformer
             Transformer transformer = transformerFactory.newTransformer();
@@ -619,7 +599,7 @@ public class PdfExportImpl implements PdfExport
      * @param context the current request context
      * @throws XWikiException if the conversion fails for any reason
      */
-    private void exportViaOfficeManager(String xhtml, OutputStream out, int type, XWikiContext context)
+    private void exportViaOfficeManager(String xhtml, OutputStream out, ExportType type, XWikiContext context)
         throws XWikiException
     {
         String html = xhtml;
@@ -639,7 +619,7 @@ public class PdfExportImpl implements PdfExport
         OpenOfficeConverter documentConverter = oooManager.getConverter();
 
         String inputFileName = "export_input.html";
-        String outputFileName = "export_output" + (type == PdfExportImpl.RTF ? ".rtf" : ".pdf");
+        String outputFileName = "export_output." + type.extension;
 
         Map<String, InputStream> inputStreams =
             Collections.<String, InputStream> singletonMap(inputFileName, new ByteArrayInputStream(html.getBytes()));
@@ -759,9 +739,9 @@ public class PdfExportImpl implements PdfExport
      * @param errorType the type of error that occurred, one of the constants in {@link XWikiException}
      * @return a new XWikiException object
      */
-    private XWikiException createException(Throwable source, int exportType, int errorType)
+    private XWikiException createException(Throwable source, ExportType exportType, int errorType)
     {
         return new XWikiException(XWikiException.MODULE_XWIKI_EXPORT, errorType, "Exception while exporting "
-            + (exportType == PdfExportImpl.RTF ? "RTF" : "PDF"), source);
+            + exportType.extension, source);
     }
 }

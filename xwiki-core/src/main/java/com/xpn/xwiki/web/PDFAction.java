@@ -25,15 +25,22 @@ import java.io.IOException;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
+import com.xpn.xwiki.pdf.api.PdfExport.ExportType;
 import com.xpn.xwiki.pdf.impl.PdfExportImpl;
 import com.xpn.xwiki.util.Util;
 
 /**
+ * Exports a document as PDF.
+ * 
  * @deprecated Use {@link ExportAction}.
+ * @version $Id$
  */
 @Deprecated
 public class PDFAction extends XWikiAction
 {
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public String render(XWikiContext context) throws XWikiException
     {
@@ -45,13 +52,13 @@ public class PDFAction extends XWikiAction
         handleRevision(context);
 
         try {
-            context.getResponse().setContentType("application/pdf");
+            context.getResponse().setContentType(ExportType.PDF.mimeType);
             context.getResponse().addHeader(
-                "Content-disposition",
-                "inline; filename=" + Util.encodeURI(doc.getSpace(), context) + "_"
-                    + Util.encodeURI(doc.getName(), context) + ".pdf");
+                "Content-disposition", "inline; filename="
+                + Util.encodeURI(doc.getDocumentReference().getLastSpaceReference().getName(), context) + "_"
+                + Util.encodeURI(doc.getDocumentReference().getName(), context) + "." + ExportType.PDF.extension);
 
-            pdfexport.export(doc, context.getResponse().getOutputStream(), PdfExportImpl.PDF, context);
+            pdfexport.export(doc, context.getResponse().getOutputStream(), ExportType.PDF, context);
         } catch (IOException e) {
             throw new XWikiException(XWikiException.MODULE_XWIKI_APP,
                 XWikiException.ERROR_XWIKI_APP_SEND_RESPONSE_EXCEPTION, "Exception while sending response", e);

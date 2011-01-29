@@ -12,39 +12,11 @@
         </xsl:copy>
     </xsl:template>
 
-    <!-- ignore fo:table-and-caption because Fop won't render tables otherwise -->
+    <!-- Skip fo:table-and-caption because Fop won't render tables otherwise -->
     <xsl:template match="fo:table-and-caption">
         <xsl:apply-templates/>
     </xsl:template>
 
-    <!-- ignore fo:table-caption because surrounding fo:table-and-caption was skipped -->
-    <xsl:template match="fo:table-caption">
-        <xsl:apply-templates mode="fo:table-caption"/>
-    </xsl:template>
-
-    <!-- fetch @id of skipped surrounding fo:table-and-caption for linking -->
-    <xsl:template match="fo:block" mode="fo:table-caption">
-        <xsl:element name="{name(.)}">
-            <xsl:attribute name="id">
-                <xsl:value-of select="ancestor::fo:table-and-caption/@id"/>
-            </xsl:attribute>
-            <xsl:copy-of select="@*"/>
-            <xsl:apply-templates/>
-        </xsl:element>
-    </xsl:template>
-
-    <!-- a clever idea that doesn't quite work. fop 0.20.1 doesn't understand % -->
-    <!-- and fop 0.20.2 doesn't work for me at all... -->
-    <!-- mod. by smaier -->
-    <xsl:template match="fo:table-column">
-        <xsl:element name="{name(.)}">
-            <xsl:if test="not(@column-width)">
-                <xsl:attribute name="column-width">
-                    <xsl:text>proportional-column-width(1)</xsl:text>
-                </xsl:attribute>
-            </xsl:if>
-            <xsl:copy-of select="@*"/>
-            <xsl:apply-templates/>
-        </xsl:element>
-    </xsl:template>
+    <!-- Ignore fo:table-caption because it is not supported -->
+    <xsl:template match="fo:table-caption" />
 </xsl:stylesheet>

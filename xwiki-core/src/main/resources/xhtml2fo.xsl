@@ -2001,7 +2001,8 @@ WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING O
             </xsl:variable>
             <xsl:attribute name="inline-progression-dimension.optimum"><xsl:value-of select="$width-no-unit"/><xsl:value-of select="$unit"/></xsl:attribute>
         </xsl:if>
-        <xsl:if test="$has-height">
+        <!-- There's a bug in FOP 1.0, specifying a height as percentage makes the image invisible. -->
+        <xsl:if test="$has-height and translate($height, '01234567890. ', '') != '%'">
             <xsl:variable name="unit"><xsl:value-of select="translate($height, '01234567890. ', '')"/></xsl:variable>
             <xsl:variable name="height-no-unit">
                 <xsl:choose>

@@ -28,19 +28,13 @@ import com.xpn.xwiki.doc.XWikiDocument;
 
 public interface PdfExport
 {
-    public void exportXHtml(byte[] xhtml, OutputStream out, int type, XWikiContext context) throws XWikiException;
-
     public void exportHtml(String xhtml, OutputStream out, int type, XWikiContext context) throws XWikiException;
 
     public void export(XWikiDocument doc, OutputStream out, int type, XWikiContext context) throws XWikiException;
 
     public void exportToPDF(XWikiDocument doc, OutputStream out, XWikiContext context) throws XWikiException;
 
-    public byte[] convertToStrictXHtml(byte[] input, XWikiContext context);
-
     public String convertToStrictXHtml(String input);
-
-    public byte[] convertXHtmlToXMLFO(byte[] input, XWikiContext context) throws XWikiException;
 
     public String convertXHtmlToXMLFO(String input, XWikiContext context) throws XWikiException;
 }

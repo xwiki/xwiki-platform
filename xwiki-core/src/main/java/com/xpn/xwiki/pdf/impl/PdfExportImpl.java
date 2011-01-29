@@ -124,6 +124,12 @@ public class PdfExportImpl implements PdfExport
     /** Logging helper object. */
     private static final Log LOG = LogFactory.getLog(PdfExportImpl.class);
 
+    /** Velocity engine manager, used for interpreting velocity. */
+    private static VelocityManager velocityManager = Utils.getComponent(VelocityManager.class);
+
+    /** The OpenOffice manager used for generating RTF. */
+    private static OpenOfficeManager oooManager = Utils.getComponent(OpenOfficeManager.class);
+
     /** DOM parser factory. */
     private static DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
 
@@ -242,11 +248,9 @@ public class PdfExportImpl implements PdfExport
             LOG.debug("Final XHTML for export: " + xhtml);
         }
 
-        OpenOfficeManager OpenOfficeManager = Utils.getComponent(OpenOfficeManager.class);
-
         // If OpenOffice server is connected use it instead of FOP which does not support RTF very well
         // Only switch to openoffice server for RTF because FOP is supposedly a lot more powerful for PDF
-        if (type != PDF && OpenOfficeManager.getState() == ManagerState.CONNECTED) {
+        if (type != PDF && oooManager.getState() == ManagerState.CONNECTED) {
             exportOffice(xhtml, out, type, context);
         } else {
             // XSL Transformation to XML-FO
@@ -285,9 +289,7 @@ public class PdfExportImpl implements PdfExport
         // id attribute on body element makes openoffice converter to fail
         html = html.replaceFirst("(<body[^>]+)id=\"body\"([^>]*>)", "$1$2");
 
-        OpenOfficeManager OpenOfficeManager = Utils.getComponent(OpenOfficeManager.class);
-
-        OpenOfficeConverter documentConverter = OpenOfficeManager.getConverter();
+        OpenOfficeConverter documentConverter = oooManager.getConverter();
 
         String inputFileName = "export_input.html";
         String outputFileName = "export_output" + (type == PdfExportImpl.RTF ? ".rtf" : ".pdf");
@@ -605,7 +607,6 @@ public class PdfExportImpl implements PdfExport
                     Utils.getComponent(EntityReferenceSerializer.class);
                 try {
                     StringWriter writer = new StringWriter();
-                    VelocityManager velocityManager = Utils.getComponent(VelocityManager.class);
                     VelocityEngine engine = velocityManager.getVelocityEngine();
                     try {
                         VelocityContext vcontext = velocityManager.getVelocityContext();

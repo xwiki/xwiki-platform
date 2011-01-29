@@ -28,14 +28,12 @@ import info.informatica.doc.xml.dtd.DefaultEntityResolver;
 
 import java.io.ByteArrayInputStream;
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.Reader;
 import java.io.StringReader;
 import java.io.StringWriter;
-import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -54,7 +52,6 @@ import javax.xml.transform.sax.SAXResult;
 import javax.xml.transform.stream.StreamResult;
 import javax.xml.transform.stream.StreamSource;
 
-import org.apache.avalon.framework.configuration.Configuration;
 import org.apache.avalon.framework.configuration.DefaultConfigurationBuilder;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang.RandomStringUtils;
@@ -97,7 +94,6 @@ import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.pdf.api.PdfExport;
-import com.xpn.xwiki.util.Util;
 import com.xpn.xwiki.web.Utils;
 import com.xpn.xwiki.web.XWikiRequest;
 
@@ -172,12 +168,10 @@ public class PdfExportImpl implements PdfExport
                 + "FOP cannot access this directory. If this is an upgrade from a previous version, "
                 + "make sure you also copy the WEB-INF/fonts directory from the new distribution package.");
         }
-        if (PdfExportImpl.class.getResource("/fop-config.xml") != null) {
-            DefaultConfigurationBuilder cfgBuilder = new DefaultConfigurationBuilder();
-            Configuration cfg;
+        InputStream fopConfigurationFile = PdfExportImpl.class.getResourceAsStream("/fop-config.xml");
+        if (fopConfigurationFile != null) {
             try {
-                cfg = cfgBuilder.build(PdfExportImpl.class.getResourceAsStream("/fop-config.xml"));
-                fopFactory.setUserConfig(cfg);
+                fopFactory.setUserConfig(new DefaultConfigurationBuilder().build(fopConfigurationFile));
             } catch (Exception ex) {
                 LOG.warn("Wrong FOP configuration: " + ex.getMessage());
             }

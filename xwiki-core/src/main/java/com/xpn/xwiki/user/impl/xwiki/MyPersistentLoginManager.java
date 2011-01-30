@@ -279,8 +279,6 @@ public class MyPersistentLoginManager extends DefaultPersistentLoginManager
                 cookieValue.append(COOKIE_EXPIRE_FORMAT.format(new Date(System.currentTimeMillis() + cookie.getMaxAge()
                     * 1000L)));
             }
-        } else {
-            cookieValue.append("; Discard");
         }
         if (StringUtils.isNotEmpty(cookie.getDomain())) {
             // IE needs toLowerCase for the domain name
@@ -292,6 +290,11 @@ public class MyPersistentLoginManager extends DefaultPersistentLoginManager
         // Protect cookies from being used from JavaScript, see http://www.owasp.org/index.php/HttpOnly
         cookieValue.append("; HttpOnly");
 
+        // Session cookies should be discarded.
+        // Keep this the last one, since Safari 5 drops everything after the Discard part.
+        if (cookie.getMaxAge() < 0) {
+            cookieValue.append("; Discard");
+        }
         response.addHeader("Set-Cookie", cookieValue.toString());
     }
 

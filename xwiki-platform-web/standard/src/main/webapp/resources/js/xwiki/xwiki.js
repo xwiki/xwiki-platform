@@ -518,7 +518,7 @@ Object.extend(XWiki, {
             var self = this;
 
             if (element.nodeName != 'A') {
-              element = $(button).firstChild;
+              element = $(button).down('A');
             }
 
             // unregister previously registered handler if any

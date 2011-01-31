@@ -24,8 +24,10 @@ import java.util.List;
 
 import org.xwiki.gwt.user.client.Config;
 import org.xwiki.gwt.user.client.ui.rta.RichTextArea;
+import org.xwiki.gwt.user.client.ui.rta.cmd.Command;
+import org.xwiki.gwt.user.client.ui.rta.cmd.CommandListener;
+import org.xwiki.gwt.user.client.ui.rta.cmd.CommandManager;
 import org.xwiki.gwt.wysiwyg.client.plugin.internal.AbstractPlugin;
-import org.xwiki.gwt.wysiwyg.client.plugin.internal.FocusWidgetUIExtension;
 import org.xwiki.gwt.wysiwyg.client.plugin.table.feature.DeleteCol;
 import org.xwiki.gwt.wysiwyg.client.plugin.table.feature.DeleteRow;
 import org.xwiki.gwt.wysiwyg.client.plugin.table.feature.DeleteTable;
@@ -36,13 +38,12 @@ import org.xwiki.gwt.wysiwyg.client.plugin.table.feature.InsertRowBefore;
 import org.xwiki.gwt.wysiwyg.client.plugin.table.feature.InsertTable;
 import org.xwiki.gwt.wysiwyg.client.plugin.table.ui.TableMenuExtension;
 
-
 /**
  * Plug-in allowing to manipulate tables in the WYSIWYG editor.
  * 
  * @version $Id$
  */
-public class TablePlugin extends AbstractPlugin
+public class TablePlugin extends AbstractPlugin implements CommandListener
 {
     /**
      * List of table features (example : InsertTable, DeleteCol).
@@ -50,26 +51,9 @@ public class TablePlugin extends AbstractPlugin
     private final List<TableFeature> features = new ArrayList<TableFeature>();
 
     /**
-     * The plug-in toolbar.
-     */
-    private final FocusWidgetUIExtension toolBarExtension = new FocusWidgetUIExtension("toolbar");
-
-    /**
      * The menu extension of this plugin.
      */
     private TableMenuExtension menuExtension;
-
-    /**
-     * Make a feature available.
-     * 
-     * @param rta WYSIWYG RichTextArea.
-     * @param feature feature to enable.
-     */
-    private void addFeature(RichTextArea rta, TableFeature feature)
-    {
-        rta.getCommandManager().registerCommand(feature.getCommand(), feature);
-        features.add(feature);
-    }
 
     /**
      * {@inheritDoc}
@@ -92,19 +76,8 @@ public class TablePlugin extends AbstractPlugin
         menuExtension = new TableMenuExtension(this);
         getUIExtensionList().add(menuExtension);
 
-        // Disable the standard table editing features of Firefox since they don't take
-        // table headings (th) into account.
-        rta.getDocument().execCommand("enableInlineTableEditing", "false");
-
-        getUIExtensionList().add(toolBarExtension);
-    }
-
-    /**
-     * @return The list of the features exposed by the plugin.
-     */
-    public List<TableFeature> getFeatures()
-    {
-        return features;
+        // Listen to the reset command and disable the browser built-in table editing feature.
+        rta.getCommandManager().addCommandListener(this);
     }
 
     /**
@@ -118,7 +91,50 @@ public class TablePlugin extends AbstractPlugin
             feature.destroy();
         }
         features.clear();
-        toolBarExtension.clearFeatures();
+        getTextArea().getCommandManager().removeCommandListener(this);
         super.destroy();
+    }
+
+    /**
+     * Make a feature available.
+     * 
+     * @param rta WYSIWYG RichTextArea.
+     * @param feature feature to enable.
+     */
+    private void addFeature(RichTextArea rta, TableFeature feature)
+    {
+        rta.getCommandManager().registerCommand(feature.getCommand(), feature);
+        features.add(feature);
+    }
+
+    /**
+     * @return The list of the features exposed by the plugin.
+     */
+    public List<TableFeature> getFeatures()
+    {
+        return features;
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see CommandListener#onBeforeCommand(CommandManager, Command, String)
+     */
+    public boolean onBeforeCommand(CommandManager sender, Command command, String param)
+    {
+        return false;
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see CommandListener#onCommand(CommandManager, Command, String)
+     */
+    public void onCommand(CommandManager sender, Command command, String param)
+    {
+        if ("enable".equalsIgnoreCase(command.toString())) {
+            // Disable the standard table editing feature of because it doesn't handle the table header correctly.
+            getTextArea().getDocument().execCommand("enableInlineTableEditing", "false");
+        }
     }
 }

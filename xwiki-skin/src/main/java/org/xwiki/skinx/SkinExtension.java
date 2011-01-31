@@ -37,7 +37,6 @@ public interface SkinExtension
      * not result in additional links, even if it is pulled with different parameters.
      * 
      * @param resource The name of the resource to pull.
-     * @see AbstractSkinExtensionPlugin#use(String, XWikiContext)
      */
     void use(String resource);
 
@@ -52,7 +51,6 @@ public interface SkinExtension
      * 
      * @param resource The name of the resource to pull.
      * @param parameters The parameters for this resource.
-     * @see AbstractSkinExtensionPlugin#use(String, Map, XWikiContext)
      */
     void use(String resource, Map<String, Object> parameters);
 }

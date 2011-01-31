@@ -19,6 +19,8 @@
  */
 package org.xwiki.rest.resources;
 
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.Formatter;
 import java.util.List;
@@ -208,16 +210,24 @@ public class BaseSearchResult extends XWikiResource
                     searchResult.setSpace(spaceName);
                     searchResult.setPageName(pageName);
 
-                    String pageUri;
-                    if (StringUtils.isBlank(language)) {
-                        pageUri =
-                            UriBuilder.fromUri(uriInfo.getBaseUri()).path(PageResource.class)
-                                .build(wikiName, spaceName, pageName).toString();
-                    } else {
-                        searchResult.setLanguage(language);
-                        pageUri =
-                            UriBuilder.fromUri(uriInfo.getBaseUri()).path(PageTranslationResource.class)
-                                .build(wikiName, spaceName, pageName, language).toString();
+                    String pageUri = null;
+                    try {
+                        if (StringUtils.isBlank(language)) {
+                            pageUri =
+                                UriBuilder.fromUri(this.uriInfo.getBaseUri()).path(PageResource.class)
+                                .buildFromEncoded(URLEncoder.encode(wikiName, "UTF-8"),
+                                URLEncoder.encode(spaceName, "UTF-8"),
+                                URLEncoder.encode(pageName, "UTF-8")).toString();
+                        } else {
+                            searchResult.setLanguage(language);
+                            pageUri =
+                                UriBuilder.fromUri(this.uriInfo.getBaseUri()).path(PageTranslationResource.class)
+                                .buildFromEncoded(URLEncoder.encode(wikiName, "UTF-8"),
+                                URLEncoder.encode(spaceName, "UTF-8"),
+                                URLEncoder.encode(pageName, "UTF-8"), language).toString();
+                        }
+                    } catch (UnsupportedEncodingException ex) {
+                        // This should never happen, UTF-8 is always valid.
                     }
 
                     Link pageLink = new Link();

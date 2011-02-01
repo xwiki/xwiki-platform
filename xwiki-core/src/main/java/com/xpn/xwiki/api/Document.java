@@ -305,6 +305,7 @@ public class Document extends Api
 
     /**
      * @return the document title as plain text (all markup removed)
+     * @since 3.0M1
      */
     public String getPlainTitle()
     {

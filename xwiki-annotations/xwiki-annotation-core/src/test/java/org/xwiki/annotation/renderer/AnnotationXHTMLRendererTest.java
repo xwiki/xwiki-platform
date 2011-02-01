@@ -219,7 +219,6 @@ public class AnnotationXHTMLRendererTest extends AbstractComponentTestCase
      * 
      * @throws Exception in case something goes wrong looking up components and rendering
      */
-    @Ignore // Waiting for Anca's help to fix this test and remove this annotation
     @Test
     public void getAnnotatedHTML() throws Exception
     {

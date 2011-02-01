@@ -1968,16 +1968,9 @@ WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING O
         <!-- If both height and width are specified, allow the image to be transformed to a different aspect ration -->
         <!-- Disabled, since images overlowing only one of the dimensions (e.g. larger width, but good height) will be stretched.
         <xsl:if test="$has-height and $has-width"><xsl:attribute name="scaling">non-uniform</xsl:attribute></xsl:if>-->
-        <xsl:choose>
-            <xsl:when test="not($has-width) and not($has-height)">
-                <xsl:attribute name="content-width">75%</xsl:attribute>
-            </xsl:when>
-            <xsl:otherwise>
-                <!-- Allow images to be resized -->
-                <xsl:attribute name="content-height">scale-to-fit</xsl:attribute>
-                <xsl:attribute name="content-width">scale-to-fit</xsl:attribute>
-            </xsl:otherwise>
-        </xsl:choose>
+        <!-- Allow images to be resized -->
+        <xsl:attribute name="content-height">scale-to-fit</xsl:attribute>
+        <xsl:attribute name="content-width">scale-to-fit</xsl:attribute>
         <!-- Min and max width -->
         <xsl:attribute name="inline-progression-dimension.minimum">auto</xsl:attribute>
         <xsl:attribute name="inline-progression-dimension.maximum">100%</xsl:attribute>

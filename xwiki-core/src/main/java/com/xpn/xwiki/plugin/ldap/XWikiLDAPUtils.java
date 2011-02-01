@@ -235,9 +235,8 @@ public class XWikiLDAPUtils
     {
         Cache<Map<String, String>> cache;
 
-        String cacheKey =
-            getUidAttributeName() + "." + this.connection.getConnection().getHost() + ":"
-                + this.connection.getConnection().getPort();
+        String cacheKey = getUidAttributeName() + "." + this.connection.getConnection().getHost() + ":"
+            + this.connection.getConnection().getPort();
 
         Map<String, Cache<Map<String, String>>> cacheMap;
 
@@ -586,15 +585,13 @@ public class XWikiLDAPUtils
     public List<XWikiLDAPSearchAttribute> searchUserAttributesByUid(String uid, String[] attributeNameTable)
     {
         // search for the user in LDAP
-        String filter =
-            MessageFormat.format(
-                this.userSearchFormatString,
-                new Object[] {XWikiLDAPConnection.escapeLDAPSearchFilter(this.uidAttributeName),
-                    XWikiLDAPConnection.escapeLDAPSearchFilter(uid)});
+        String filter = MessageFormat.format(this.userSearchFormatString, new Object[] {
+            XWikiLDAPConnection.escapeLDAPSearchFilter(this.uidAttributeName),
+            XWikiLDAPConnection.escapeLDAPSearchFilter(uid)});
 
         if (LOG.isDebugEnabled()) {
             LOG.debug("Searching for the user in LDAP: user:" + uid + " base:" + this.baseDN + " query:" + filter
-                + " uid:" + uidAttributeName);
+                + " uid:" + this.uidAttributeName);
         }
 
         return this.connection.searchLDAP(this.baseDN, filter, attributeNameTable, LDAPConnection.SCOPE_SUB);
@@ -645,9 +642,8 @@ public class XWikiLDAPUtils
             // get attributes from LDAP if we don't already have them
             if (searchAttributeList == null) {
                 // didn't get attributes before, so do it now
-                searchAttributeList =
-                    this.getConnection().searchLDAP(ldapDn, null, getAttributeNameTable(context),
-                        LDAPConnection.SCOPE_BASE);
+                searchAttributeList = this.getConnection().searchLDAP(ldapDn, null, getAttributeNameTable(context),
+                    LDAPConnection.SCOPE_BASE);
             }
 
             if (searchAttributeList == null) {
@@ -781,7 +777,7 @@ public class XWikiLDAPUtils
         // Mark user active
         map.put("active", "1");
 
-        context.getWiki().createUser(userProfile.getName(), map, context);
+        context.getWiki().createUser(userProfile.getDocumentReference().getName(), map, context);
 
         // Update ldap profile object
         XWikiDocument createdUserProfile = context.getWiki().getDocument(userProfile.getDocumentReference(), context);
@@ -938,9 +934,8 @@ public class XWikiLDAPUtils
         LDAPProfileXClass ldapXClass = new LDAPProfileXClass(context);
 
         // Try default profile name (generally in the cache)
-        XWikiDocument userProfile =
-            context.getWiki().getDocument(
-                new DocumentReference(context.getDatabase(), XWIKI_USER_SPACE, validXWikiUserName), context);
+        XWikiDocument userProfile = context.getWiki().getDocument(
+            new DocumentReference(context.getDatabase(), XWIKI_USER_SPACE, validXWikiUserName), context);
 
         if (!ldapUid.equalsIgnoreCase(ldapXClass.getUid(userProfile))) {
             // Search for existing profile with provided uid

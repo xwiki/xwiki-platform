@@ -1268,14 +1268,18 @@ div#xwikiobjects input[type="checkbox"], div#xwikiclassproperties input[type="ch
   margin-top: 1.2em;
 }
 
-.xform dt label {
+.xform dt label, .xformInline label {
   color: $theme.textColor;
-  display: block;
   font-size: .85em;
   font-weight: 700;
   margin-bottom: .3em;
   text-transform: uppercase;
 }
+
+.xform dt label {
+  display: block;
+}
+
 /* Buttons next to the labels, for example the Customize buttons in Administration->Presentation */
 .xform dt label .buttonwrapper {
   float: right;

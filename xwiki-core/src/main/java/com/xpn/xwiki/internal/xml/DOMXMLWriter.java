@@ -217,7 +217,7 @@ public class DOMXMLWriter extends XMLWriter
         if (parent.isEmpty()) {
             doc.setRootElement(element);
         } else {
-            parent.add(element);
+            this.parent.peek().add(element);
         }
     }
 
@@ -255,7 +255,7 @@ public class DOMXMLWriter extends XMLWriter
         if (parent.isEmpty()) {
             doc.setRootElement(element);
         } else {
-            parent.peek().add(element);
+            this.parent.add(element);
         }
 
         parent.push(element);

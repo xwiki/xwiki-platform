@@ -142,11 +142,12 @@ public class QueueListener extends LinkedList<QueueListener.Event> implements Li
     /**
      * {@inheritDoc}
      * 
-     * @see org.xwiki.rendering.listener.Listener#beginDocument(java.util.Map)
+     * @see Listener#beginDocument()
+     * @since 3.0M2
      */
-    public void beginDocument(Map<String, String> parameters)
+    public void beginDocument()
     {
-        saveEvent(EventType.BEGIN_DOCUMENT, parameters);
+        saveEvent(EventType.BEGIN_DOCUMENT);
     }
 
     /**
@@ -336,11 +337,12 @@ public class QueueListener extends LinkedList<QueueListener.Event> implements Li
     /**
      * {@inheritDoc}
      * 
-     * @see org.xwiki.rendering.listener.Listener#endDocument(java.util.Map)
+     * @see Listener#endDocument()
+     * @since 3.0M2
      */
-    public void endDocument(Map<String, String> parameters)
+    public void endDocument()
     {
-        saveEvent(EventType.END_DOCUMENT, parameters);
+        saveEvent(EventType.END_DOCUMENT);
     }
 
     /**

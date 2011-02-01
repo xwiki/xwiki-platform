@@ -507,14 +507,15 @@ public class BlockStateChainingListener extends AbstractChainingListener impleme
     /**
      * {@inheritDoc}
      * 
-     * @see org.xwiki.rendering.listener.chaining.AbstractChainingListener#endDocument(java.util.Map)
+     * @see AbstractChainingListener#endDocument()
+     * @since 3.0M2
      */
     @Override
-    public void endDocument(Map<String, String> parameters)
+    public void endDocument()
     {
         this.previousEvent = Event.DOCUMENT;
 
-        super.endDocument(parameters);
+        super.endDocument();
     }
 
     /**

@@ -229,6 +229,16 @@
                 <exclude>org/xwiki/rendering/block/XDOM</exclude>
                 <exclude>org/xwiki/rendering/block/QuotationLineBlock</exclude>
                 <exclude>org/xwiki/rendering/syntax/SyntaxType</exclude>
+                <exclude>org/xwiki/rendering/listener/CompositeListener</exclude>
+                <exclude>org/xwiki/rendering/listener/Listener</exclude>
+                <exclude>org/xwiki/rendering/listener/QueueListener</exclude>
+                <exclude>org/xwiki/rendering/listener/WrappingListener</exclude>
+                <exclude>org/xwiki/rendering/listener/chaining/AbstractChainingListener</exclude>
+                <exclude>org/xwiki/rendering/listener/chaining/BlockStateChainingListener</exclude>
+                <exclude>org/xwiki/rendering/listener/chaining/ConsecutiveNewLineStateChainingListener</exclude>
+                <exclude>org/xwiki/rendering/listener/chaining/EmptyBlockChainingListener</exclude>
+                <exclude>org/xwiki/rendering/listener/chaining/LookaheadChainingListener</exclude>
+                <exclude>org/xwiki/rendering/listener/chaining/TextOnNewLineStateChainingListener</exclude>
               </excludes>
             </configuration>
           </plugin>

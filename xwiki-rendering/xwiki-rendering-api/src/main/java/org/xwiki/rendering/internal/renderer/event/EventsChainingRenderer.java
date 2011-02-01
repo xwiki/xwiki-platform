@@ -49,23 +49,25 @@ public class EventsChainingRenderer extends AbstractChainingPrintRenderer
     /**
      * {@inheritDoc}
      * 
-     * @see org.xwiki.rendering.listener.chaining.AbstractChainingListener#beginDocument(java.util.Map)
+     * @see org.xwiki.rendering.listener.chaining.AbstractChainingListener#beginDocument()
+     * @since 3.0M2
      */
     @Override
-    public void beginDocument(Map<String, String> parameters)
+    public void beginDocument()
     {
-        getPrinter().println("beginDocument" + serializeParameters(parameters));
+        getPrinter().println("beginDocument");
     }
 
     /**
      * {@inheritDoc}
      * 
-     * @see org.xwiki.rendering.listener.chaining.AbstractChainingListener#endDocument(java.util.Map)
+     * @see org.xwiki.rendering.listener.chaining.AbstractChainingListener#endDocument()
+     * @since 3.0M2
      */
     @Override
-    public void endDocument(Map<String, String> parameters)
+    public void endDocument()
     {
-        getPrinter().print("endDocument" + serializeParameters(parameters));
+        getPrinter().print("endDocument");
     }
 
     /**

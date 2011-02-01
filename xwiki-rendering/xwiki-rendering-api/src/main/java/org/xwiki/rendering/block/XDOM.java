@@ -105,7 +105,7 @@ public class XDOM extends AbstractBlock
      */
     public void before(Listener listener)
     {
-        listener.beginDocument(getParameters());
+        listener.beginDocument();
     }
 
     /**
@@ -115,7 +115,7 @@ public class XDOM extends AbstractBlock
      */
     public void after(Listener listener)
     {
-        listener.endDocument(getParameters());
+        listener.endDocument();
     }
 
     /**

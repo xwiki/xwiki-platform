@@ -99,13 +99,14 @@ public class TextOnNewLineStateChainingListener extends AbstractChainingListener
     /**
      * {@inheritDoc}
      * 
-     * @see org.xwiki.rendering.listener.chaining.AbstractChainingListener#beginDocument(java.util.Map)
+     * @see AbstractChainingListener#beginDocument()
+     * @since 3.0M2
      */
     @Override
-    public void beginDocument(Map<String, String> parameters)
+    public void beginDocument()
     {
         this.isTextOnNewLine = false;
-        super.beginDocument(parameters);
+        super.beginDocument();
     }
 
     /**

@@ -56,17 +56,17 @@ public interface Listener extends LinkListener, ImageListener
 
     /**
      * Start of the document.
-     * 
-     * @param parameters a generic list of parameters. Example: style="background-color: blue"
+     *
+     * @since 3.0M2
      */
-    void beginDocument(Map<String, String> parameters);
+    void beginDocument();
 
     /**
      * End of the document.
-     * 
-     * @param parameters a generic list of parameters. Example: style="background-color: blue"
+     *
+     * @since 3.0M2
      */
-    void endDocument(Map<String, String> parameters);
+    void endDocument();
 
     /**
      * Start a group of elements. Groups are used to allow using standalone elements in list items, table cells, etc.

@@ -53,13 +53,14 @@ public class EmptyBlockChainingListener extends AbstractChainingListener
     /**
      * {@inheritDoc}
      *
-     * @see org.xwiki.rendering.listener.chaining.AbstractChainingListener#beginDocument(java.util.Map)
+     * @see AbstractChainingListener#beginDocument()
+     * @since 3.0M2
      */
     @Override
-    public void beginDocument(Map<String, String> parameters)
+    public void beginDocument()
     {
         startContainerBlock();
-        super.beginDocument(parameters);
+        super.beginDocument();
     }
 
     /**
@@ -305,12 +306,13 @@ public class EmptyBlockChainingListener extends AbstractChainingListener
     /**
      * {@inheritDoc}
      *
-     * @see org.xwiki.rendering.listener.chaining.AbstractChainingListener#endDocument(java.util.Map) 
+     * @see AbstractChainingListener#endDocument()
+     * @since 3.0M2
      */
     @Override
-    public void endDocument(Map<String, String> parameters)
+    public void endDocument()
     {
-        super.endDocument(parameters);
+        super.endDocument();
         stopContainerBlock();
     }
 

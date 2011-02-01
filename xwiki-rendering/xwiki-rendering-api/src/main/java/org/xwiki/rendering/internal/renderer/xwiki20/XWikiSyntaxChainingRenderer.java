@@ -162,10 +162,11 @@ public class XWikiSyntaxChainingRenderer extends AbstractChainingPrintRenderer i
     /**
      * {@inheritDoc}
      * 
-     * @see org.xwiki.rendering.listener.chaining.AbstractChainingListener#endDocument(java.util.Map)
+     * @see org.xwiki.rendering.listener.chaining.AbstractChainingListener#endDocument()
+     * @since 3.0M2
      */
     @Override
-    public void endDocument(Map<String, String> parameters)
+    public void endDocument()
     {
         // Ensure that all data in the escape printer have been flushed
         getXWikiPrinter().flush();

@@ -98,12 +98,13 @@ public class LookaheadChainingListener extends AbstractChainingListener
     /**
      * {@inheritDoc}
      * 
-     * @see org.xwiki.rendering.listener.chaining.AbstractChainingListener#beginDocument(java.util.Map)
+     * @see AbstractChainingListener#beginDocument()
+     * @since 3.0M2
      */
     @Override
-    public void beginDocument(Map<String, String> parameters)
+    public void beginDocument()
     {
-        this.previousEvents.beginDocument(parameters);
+        this.previousEvents.beginDocument();
         flush();
     }
 
@@ -333,12 +334,13 @@ public class LookaheadChainingListener extends AbstractChainingListener
     /**
      * {@inheritDoc}
      * 
-     * @see org.xwiki.rendering.listener.chaining.AbstractChainingListener#endDocument(java.util.Map)
+     * @see AbstractChainingListener#endDocument()
+     * @since 3.0M2
      */
     @Override
-    public void endDocument(Map<String, String> parameters)
+    public void endDocument()
     {
-        this.previousEvents.endDocument(parameters);
+        this.previousEvents.endDocument();
         flush();
     }
 

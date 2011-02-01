@@ -128,7 +128,7 @@ public class XWikiCommentHandler extends CommentHandler
 
         PrintRenderer linkLabelRenderer = this.xwikiSyntaxPrintRendererFactory.createRenderer(printer);
         // Make sure to flush whatever the renderer implementation
-        linkLabelRenderer.beginDocument(Listener.EMPTY_PARAMETERS);
+        linkLabelRenderer.beginDocument();
 
         XWikiGeneratorListener xwikiListener = this.parser.createXWikiGeneratorListener(linkLabelRenderer, null);
 
@@ -147,7 +147,7 @@ public class XWikiCommentHandler extends CommentHandler
         PrintRenderer linkLabelRenderer = (PrintRenderer) xwikiListener.getListener();
 
         // Make sure to flush whatever the renderer implementation
-        linkLabelRenderer.endDocument(Listener.EMPTY_PARAMETERS);
+        linkLabelRenderer.endDocument();
 
         boolean isFreeStandingLink = (Boolean) stack.getStackParameter("isFreeStandingLink");
 

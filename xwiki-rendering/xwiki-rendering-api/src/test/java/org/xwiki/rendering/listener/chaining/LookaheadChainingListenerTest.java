@@ -42,7 +42,7 @@ public class LookaheadChainingListenerTest
         }
 
         @Override
-        public void beginDocument(Map<String, String> parameters)
+        public void beginDocument()
         {
             this.calls++;
         }
@@ -54,7 +54,7 @@ public class LookaheadChainingListenerTest
         }
 
         @Override
-        public void endDocument(Map<String, String> parameters)
+        public void endDocument()
         {
             this.calls++;
         }
@@ -76,7 +76,7 @@ public class LookaheadChainingListenerTest
         chain.addListener(testListener);
 
         // The begin document flushes
-        listener.beginDocument(Collections.<String, String> emptyMap());
+        listener.beginDocument();
         Assert.assertEquals(1, testListener.calls);
 
         // 1st lookahead, nothing is sent to the test listener
@@ -100,7 +100,7 @@ public class LookaheadChainingListenerTest
         Assert.assertNull(listener.getNextEvent(3));
 
         // The end document flushes
-        listener.endDocument(Collections.<String, String> emptyMap());
+        listener.endDocument();
         Assert.assertEquals(5, testListener.calls);
         Assert.assertNull(listener.getNextEvent());
     }

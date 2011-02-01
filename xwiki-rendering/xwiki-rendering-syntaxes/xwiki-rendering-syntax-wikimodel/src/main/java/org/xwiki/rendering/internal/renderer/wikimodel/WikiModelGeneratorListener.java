@@ -80,26 +80,27 @@ public class WikiModelGeneratorListener implements Listener
     /**
      * {@inheritDoc}
      * 
-     * @see org.xwiki.rendering.listener.Listener#beginDocument(java.util.Map)
+     * @see org.xwiki.rendering.listener.Listener#beginDocument()
+     * @since 3.0M2
      */
-    public void beginDocument(Map<String, String> parameters)
+    public void beginDocument()
     {
         pushContext();
 
-        this.wikimodelListener.beginDocument(createWikiParameters(parameters));
-        this.wikimodelListener.beginSection(this.docLevel++, getContext().headerLevel++,
-            createWikiParameters(parameters));
+        this.wikimodelListener.beginDocument(WikiParameters.EMPTY);
+        this.wikimodelListener.beginSection(this.docLevel++, getContext().headerLevel++, WikiParameters.EMPTY);
     }
 
     /**
      * {@inheritDoc}
      * 
-     * @see org.xwiki.rendering.listener.Listener#endDocument(java.util.Map)
+     * @see org.xwiki.rendering.listener.Listener#endDocument()
+     * @since 3.0M2
      */
-    public void endDocument(Map<String, String> parameters)
+    public void endDocument()
     {
-        this.wikimodelListener.endSection(this.docLevel--, getContext().headerLevel, createWikiParameters(parameters));
-        this.wikimodelListener.endDocument(createWikiParameters(parameters));
+        this.wikimodelListener.endSection(this.docLevel--, getContext().headerLevel, WikiParameters.EMPTY);
+        this.wikimodelListener.endDocument(WikiParameters.EMPTY);
 
         popContext();
     }

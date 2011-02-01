@@ -143,9 +143,10 @@ public class XDOMGeneratorListener implements Listener
     /**
      * {@inheritDoc}
      * 
-     * @see org.xwiki.rendering.listener.Listener#beginDocument(java.util.Map)
+     * @see org.xwiki.rendering.listener.Listener#beginDocument()
+     * @since 3.0M2
      */
-    public void beginDocument(Map<String, String> parameters)
+    public void beginDocument()
     {
         this.stack.push(this.marker);
     }
@@ -336,9 +337,10 @@ public class XDOMGeneratorListener implements Listener
     /**
      * {@inheritDoc}
      * 
-     * @see org.xwiki.rendering.listener.Listener#endDocument(java.util.Map)
+     * @see org.xwiki.rendering.listener.Listener#endDocument()
+     * @since 3.0M2
      */
-    public void endDocument(Map<String, String> parameters)
+    public void endDocument()
     {
         // Do nothing. This is supposed to append only once for the hole document
     }

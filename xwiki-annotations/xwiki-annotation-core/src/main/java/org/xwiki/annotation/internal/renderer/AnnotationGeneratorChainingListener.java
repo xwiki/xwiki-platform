@@ -186,11 +186,13 @@ public class AnnotationGeneratorChainingListener extends QueueListener implement
 
     /**
      * {@inheritDoc}
+     *
+     * @since 3.0M2
      */
     @Override
-    public void endDocument(Map<String, String> parameters)
+    public void endDocument()
     {
-        super.endDocument(parameters);
+        super.endDocument();
 
         // create the bookmarks
         mapAnnotations();

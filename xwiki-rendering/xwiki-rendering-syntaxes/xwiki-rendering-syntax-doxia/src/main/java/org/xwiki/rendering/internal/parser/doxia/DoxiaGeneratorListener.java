@@ -41,9 +41,10 @@ public class DoxiaGeneratorListener implements Listener
     /**
      * {@inheritDoc}
      * 
-     * @see Listener#beginDocument(Map)
+     * @see org.xwiki.rendering.listener.Listener#beginDocument()
+     * @since 3.0M2
      */
-    public void beginDocument(Map<String, String> parameters)
+    public void beginDocument()
     {
         this.sink.body();
     }
@@ -51,9 +52,10 @@ public class DoxiaGeneratorListener implements Listener
     /**
      * {@inheritDoc}
      * 
-     * @see Listener#endDocument(Map)
+     * @see org.xwiki.rendering.listener.Listener#endDocument()
+     * @since 3.0M2
      */
-    public void endDocument(Map<String, String> parameters)
+    public void endDocument()
     {
         this.sink.body_();
     }

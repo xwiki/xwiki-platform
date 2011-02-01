@@ -137,7 +137,7 @@ public class DOMXMLWriter extends XMLWriter
     @Override
     public void write(Element element, InputStream is) throws IOException
     {
-        element.addText(IOUtils.toString(is, format.getEncoding()));
+        element.addText(IOUtils.toString(is, this.format.getEncoding()));
         write(element);
     }
 
@@ -172,7 +172,7 @@ public class DOMXMLWriter extends XMLWriter
         Base64OutputStream out = new Base64OutputStream(baos, true, 0, null);
         IOUtils.copy(is, out);
         out.close();
-        element.addText(baos.toString(format.getEncoding()));
+        element.addText(baos.toString(this.format.getEncoding()));
         write(element);
     }
 
@@ -186,8 +186,8 @@ public class DOMXMLWriter extends XMLWriter
     @Override
     public void writeDocumentEnd(Document doc) throws IOException
     {
-        if (!parent.isEmpty()) {
-            writeClose(parent.firstElement());
+        if (!this.parent.isEmpty()) {
+            writeClose(this.parent.firstElement());
         }
     }
 
@@ -214,10 +214,10 @@ public class DOMXMLWriter extends XMLWriter
     @Override
     public void write(Element element) throws IOException
     {
-        if (parent.isEmpty()) {
-            doc.setRootElement(element);
+        if (this.parent.isEmpty()) {
+            this.doc.setRootElement(element);
         } else {
-            parent.add(element);
+            this.parent.add(element);
         }
     }
 
@@ -232,10 +232,10 @@ public class DOMXMLWriter extends XMLWriter
     public void writeClose(Element element) throws IOException
     {
         try {
-            while (parent.peek() != element) {
-                parent.pop();
+            while (this.parent.peek() != element) {
+                this.parent.pop();
             }
-            parent.pop();
+            this.parent.pop();
         } catch (EmptyStackException e) {
             throw new IOException("FATAL: Closing a element that have never been opened");
         }
@@ -252,13 +252,13 @@ public class DOMXMLWriter extends XMLWriter
     @Override
     public void writeOpen(Element element) throws IOException
     {
-        if (parent.isEmpty()) {
-            doc.setRootElement(element);
+        if (this.parent.isEmpty()) {
+            this.doc.setRootElement(element);
         } else {
-            parent.peek().add(element);
+            this.parent.peek().add(element);
         }
 
-        parent.push(element);
+        this.parent.push(element);
     }
 
     /**

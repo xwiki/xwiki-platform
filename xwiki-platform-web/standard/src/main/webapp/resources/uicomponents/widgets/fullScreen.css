@@ -87,3 +87,8 @@
   padding: 0 2px !important;
   border: 0 none !important;
 }
+.fullScreenWrapper .bottombuttons {
+  background-color: $theme.backgroundSecondaryColor;
+  border-top: 1px solid $theme.borderColor;
+  padding: .5em;
+}

@@ -27,6 +27,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -35,10 +36,16 @@ import org.xwiki.cache.CacheException;
 import org.xwiki.cache.CacheManager;
 import org.xwiki.cache.config.CacheConfiguration;
 import org.xwiki.cache.eviction.LRUEvictionConfiguration;
+import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.rendering.syntax.Syntax;
 
 import com.novell.ldap.LDAPConnection;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
+import com.xpn.xwiki.doc.XWikiDocument;
+import com.xpn.xwiki.objects.BaseObject;
+import com.xpn.xwiki.objects.classes.BaseClass;
+import com.xpn.xwiki.user.impl.LDAP.LDAPProfileXClass;
 import com.xpn.xwiki.web.Utils;
 
 /**
@@ -63,6 +70,16 @@ public class XWikiLDAPUtils
      * The name of the LDAP groups cache.
      */
     private static final String CACHE_NAME_GROUPS = "groups";
+
+    /**
+     * The name of the XWiki group member field.
+     */
+    private static final String XWIKI_GROUP_MEMBERFIELD = "member";
+
+    /**
+     * The XWiki space where users are stored.
+     */
+    private static final String XWIKI_USER_SPACE = "XWiki";
 
     /**
      * The configuration of the LDAP group cache.
@@ -600,4 +617,378 @@ public class XWikiLDAPUtils
 
         return userDN;
     }
+
+    /**
+     * Update or create XWiki user base on LDAP.
+     * 
+     * @param userProfile the name of the user.
+     * @param ldapDn the LDAP user DN.
+     * @param ldapUid the UID field.
+     * @param searchAttributeListIn the attributes of the LDAP user.
+     * @param context the XWiki context.
+     * @throws XWikiException error when updating or creating XWiki user.
+     */
+    // TODO this method does a variable re-assignment on userProfile.
+    // This need to be investigated and refactored to avoid this need.
+    public void syncUser(XWikiDocument userProfile, List<XWikiLDAPSearchAttribute> searchAttributeListIn,
+        String ldapDn, String ldapUid, XWikiContext context) throws XWikiException
+    {
+        // check if we have to create the user
+        XWikiLDAPConfig config = XWikiLDAPConfig.getInstance();
+
+        if (userProfile.isNew() || config.getLDAPParam("ldap_update_user", "0", context).equals("1")) {
+
+            LOG.debug("LDAP attributes will be used to update XWiki attributes.");
+
+            List<XWikiLDAPSearchAttribute> searchAttributeList = searchAttributeListIn;
+
+            // get attributes from LDAP if we don't already have them
+            if (searchAttributeList == null) {
+                // didn't get attributes before, so do it now
+                searchAttributeList =
+                    this.getConnection().searchLDAP(ldapDn, null, getAttributeNameTable(context),
+                        LDAPConnection.SCOPE_BASE);
+            }
+
+            if (searchAttributeList == null) {
+                if (LOG.isDebugEnabled()) {
+                    LOG.error("Can't find any attributes for user [" + ldapDn + "]");
+                }
+            }
+
+            if (userProfile.isNew()) {
+                LOG.debug("Creating new XWiki user based on LDAP attribues located at [" + ldapDn + "]");
+
+                userProfile = createUserFromLDAP(userProfile, searchAttributeList, ldapDn, ldapUid, context);
+
+                LOG.debug("New XWiki user created: [" + userProfile.getDocumentReference() + "]");
+
+            } else {
+
+                LOG.debug("Updating existing user with LDAP attribues located at " + ldapDn);
+
+                try {
+                    updateUserFromLDAP(userProfile, searchAttributeList, ldapDn, ldapUid, context);
+                } catch (XWikiException e) {
+                    LOG.error("Failed to synchronise user's informations", e);
+                }
+            }
+        }
+    }
+
+    /**
+     * Synchronize user XWiki membership with it's LDAP membership.
+     * 
+     * @param xwikiUserName the name of the user.
+     * @param userDN the LDAP DN of the user.
+     * @param groupMappings the mapping between XWiki groups names and LDAP groups names.
+     * @param context the XWiki context.
+     * @throws XWikiException error when synchronizing user membership.
+     */
+    public void syncGroupsMembership(String xwikiUserName, String userDN, Map<String, Set<String>> groupMappings,
+        XWikiContext context) throws XWikiException
+    {
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Updating group membership for the user: " + xwikiUserName);
+        }
+
+        Collection<String> xwikiUserGroupList =
+            context.getWiki().getGroupService(context).getAllGroupsNamesForMember(xwikiUserName, 0, 0, context);
+
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("The user belongs to following XWiki groups: ");
+            for (String userGroupName : xwikiUserGroupList) {
+                LOG.debug(userGroupName);
+            }
+        }
+
+        // go through mapped groups to locate the user
+        for (Map.Entry<String, Set<String>> entry : groupMappings.entrySet()) {
+            String xwikiGrouNamep = entry.getKey();
+            Set<String> groupDNSet = entry.getValue();
+
+            if (xwikiUserGroupList.contains(xwikiGrouNamep)) {
+                if (!this.isMemberOfGroups(userDN, groupDNSet, context)) {
+                    removeUserFromXWikiGroup(xwikiUserName, xwikiGrouNamep, context);
+                }
+            } else {
+                if (this.isMemberOfGroups(userDN, groupDNSet, context)) {
+                    addUserToXWikiGroup(xwikiUserName, xwikiGrouNamep, context);
+                }
+            }
+        }
+    }
+
+    /**
+     * @param context the XWiki context.
+     * @return the LDAP user attributes names.
+     */
+    public String[] getAttributeNameTable(XWikiContext context)
+    {
+        String[] attributeNameTable = null;
+
+        XWikiLDAPConfig config = XWikiLDAPConfig.getInstance();
+
+        List<String> attributeNameList = new ArrayList<String>();
+        config.getUserMappings(attributeNameList, context);
+
+        int lsize = attributeNameList.size();
+        if (lsize > 0) {
+            attributeNameTable = attributeNameList.toArray(new String[lsize]);
+        }
+
+        return attributeNameTable;
+    }
+
+    /**
+     * Create an XWiki user and set all mapped attributes from LDAP to XWiki attributes.
+     * 
+     * @param userProfile the XWiki user profile.
+     * @param searchAttributes the attributes.
+     * @param ldapDN the LDAP DN of the user.
+     * @param ldapUid the LDAP unique id of the user.
+     * @param context the XWiki context.
+     * @return the created user.
+     * @throws XWikiException error when creating XWiki user.
+     */
+    protected XWikiDocument createUserFromLDAP(XWikiDocument userProfile,
+        List<XWikiLDAPSearchAttribute> searchAttributes, String ldapDN, String ldapUid, XWikiContext context)
+        throws XWikiException
+    {
+        XWikiLDAPConfig config = XWikiLDAPConfig.getInstance();
+
+        Map<String, String> userMappings = config.getUserMappings(null, context);
+
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Start first synchronization of LDAP profile [" + searchAttributes
+                + "] with new user profile based on mapping " + userMappings);
+        }
+
+        Map<String, String> map = new HashMap<String, String>();
+        if (searchAttributes != null) {
+            for (XWikiLDAPSearchAttribute lattr : searchAttributes) {
+                String lval = lattr.value;
+                String xattr = userMappings.get(lattr.name.toLowerCase());
+
+                if (xattr == null) {
+                    continue;
+                }
+
+                map.put(xattr, lval);
+            }
+        }
+
+        // Mark user active
+        map.put("active", "1");
+
+        context.getWiki().createUser(userProfile.getName(), map, context);
+
+        // Update ldap profile object
+        XWikiDocument createdUserProfile = context.getWiki().getDocument(userProfile.getDocumentReference(), context);
+        LDAPProfileXClass ldapXClass = new LDAPProfileXClass(context);
+
+        if (ldapXClass.updateLDAPObject(createdUserProfile, ldapDN, ldapUid)) {
+            context.getWiki().saveDocument(createdUserProfile, "Created user profile from LDAP server", context);
+        }
+
+        return createdUserProfile;
+    }
+
+    /**
+     * Sets attributes on the user object based on attribute values provided by the LDAP.
+     * 
+     * @param userProfile the XWiki user profile document.
+     * @param searchAttributes the attributes of the LDAP user to update.
+     * @param ldapDN the DN of the LDAP user to update
+     * @param ldapUid value of the unique identifier for the user to update.
+     * @param context the XWiki context.
+     * @throws XWikiException error when updating XWiki user.
+     */
+    protected void updateUserFromLDAP(XWikiDocument userProfile, List<XWikiLDAPSearchAttribute> searchAttributes,
+        String ldapDN, String ldapUid, XWikiContext context) throws XWikiException
+    {
+        XWikiLDAPConfig config = XWikiLDAPConfig.getInstance();
+
+        Map<String, String> userMappings = config.getUserMappings(null, context);
+
+        BaseClass userClass = context.getWiki().getUserClass(context);
+
+        BaseObject userObj = userProfile.getXObject(userClass.getDocumentReference());
+
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Start synchronization of LDAP profile [" + searchAttributes
+                + "] with existing user profile based on mapping " + userMappings);
+        }
+
+        Map<String, String> map = new HashMap<String, String>();
+        if (searchAttributes != null) {
+            for (XWikiLDAPSearchAttribute lattr : searchAttributes) {
+                String key = userMappings.get(lattr.name.toLowerCase());
+                if (key == null || userClass.get(key) == null) {
+                    continue;
+                }
+                String value = lattr.value;
+
+                String objValue = userObj.getStringValue(key);
+                if (objValue == null || !objValue.equals(value)) {
+                    map.put(key, value);
+                }
+            }
+        }
+
+        boolean needsUpdate = false;
+        if (!map.isEmpty()) {
+            userClass.fromMap(map, userObj);
+            needsUpdate = true;
+        }
+
+        // Update ldap profile object
+        LDAPProfileXClass ldaXClass = new LDAPProfileXClass(context);
+        needsUpdate |= ldaXClass.updateLDAPObject(userProfile, ldapDN, ldapUid);
+
+        if (needsUpdate) {
+            context.getWiki().saveDocument(userProfile, "Synchronized user profile with LDAP server", true, context);
+        }
+    }
+
+    /**
+     * Add user name to provided XWiki group.
+     * 
+     * @param xwikiUserName the full name of the user.
+     * @param groupName the name of the group.
+     * @param context the XWiki context.
+     */
+    // TODO move this methods in a toolkit for all platform.
+    protected void addUserToXWikiGroup(String xwikiUserName, String groupName, XWikiContext context)
+    {
+        try {
+            if (LOG.isDebugEnabled()) {
+                LOG.debug(MessageFormat.format("Adding user {0} to xwiki group {1}", xwikiUserName, groupName));
+            }
+
+            BaseClass groupClass = context.getWiki().getGroupClass(context);
+
+            // Get document representing group
+            XWikiDocument groupDoc = context.getWiki().getDocument(groupName, context);
+
+            // Add a member object to document
+            BaseObject memberObj = groupDoc.newXObject(groupClass.getDocumentReference(), context);
+            Map<String, String> map = new HashMap<String, String>();
+            map.put(XWIKI_GROUP_MEMBERFIELD, xwikiUserName);
+            groupClass.fromMap(map, memberObj);
+
+            // If the document is new, set its content
+            if (groupDoc.isNew()) {
+                groupDoc.setSyntax(Syntax.XWIKI_2_0);
+                groupDoc.setContent("{{include document='XWiki.XWikiGroupSheet' /}}");
+            }
+
+            // Save modifications
+            context.getWiki().saveDocument(groupDoc, context);
+
+            if (LOG.isDebugEnabled()) {
+                LOG.debug(MessageFormat.format("Finished adding user {0} to xwiki group {1}",
+                    xwikiUserName, groupName));
+            }
+
+        } catch (Exception e) {
+            LOG.error(MessageFormat.format("Failed to add a user [{0}] to a group [{1}]", xwikiUserName, groupName), e);
+        }
+    }
+
+    /**
+     * Remove user name from provided XWiki group.
+     * 
+     * @param xwikiUserName the full name of the user.
+     * @param groupName the name of the group.
+     * @param context the XWiki context.
+     */
+    // TODO move this methods in a toolkit for all platform.
+    protected void removeUserFromXWikiGroup(String xwikiUserName, String groupName, XWikiContext context)
+    {
+        try {
+            BaseClass groupClass = context.getWiki().getGroupClass(context);
+
+            // Get the XWiki document holding the objects comprising the group membership list
+            XWikiDocument groupDoc = context.getWiki().getDocument(groupName, context);
+
+            // Get and remove the specific group membership object for the user
+            BaseObject groupObj =
+                groupDoc.getXObject(groupClass.getDocumentReference(), XWIKI_GROUP_MEMBERFIELD, xwikiUserName);
+            groupDoc.removeXObject(groupObj);
+
+            // Save modifications
+            context.getWiki().saveDocument(groupDoc, context);
+        } catch (Exception e) {
+            LOG.error("Failed to remove a user from a group " + xwikiUserName + " group: " + groupName, e);
+        }
+    }
+
+    /**
+     * @param validXWikiUserName the valid XWiki name of the user to get the profile for. Used for fast lookup relying
+     *            on the document cache before doing a database search.
+     * @param ldapUid the UID to get the profile for
+     * @param context the XWiki context
+     * @return the XWiki document of the user with the passed UID
+     * @throws XWikiException when a problem occurs while retrieving the user profile
+     */
+    public XWikiDocument getUserProfileByUid(String validXWikiUserName, String ldapUid, XWikiContext context)
+        throws XWikiException
+    {
+        LDAPProfileXClass ldapXClass = new LDAPProfileXClass(context);
+
+        // Try default profile name (generally in the cache)
+        XWikiDocument userProfile =
+            context.getWiki().getDocument(
+                new DocumentReference(context.getDatabase(), XWIKI_USER_SPACE, validXWikiUserName), context);
+
+        if (!ldapUid.equalsIgnoreCase(ldapXClass.getUid(userProfile))) {
+            // Search for existing profile with provided uid
+            userProfile = ldapXClass.searchDocumentByUid(ldapUid);
+
+            // Resolve default profile patch of an uid
+            if (userProfile == null) {
+                userProfile = getAvailableUserProfile(validXWikiUserName, ldapUid, context);
+            }
+        }
+
+        return userProfile;
+    }
+
+    /**
+     * @param validXWikiUserName a valid XWiki username for which to get a profile document
+     * @param ldapUid ldap UID of the user profile to get
+     * @param context the XWiki context
+     * @return a (new) XWiki document for the passed username
+     * @throws XWikiException when a problem occurs while retrieving the user profile
+     */
+    private XWikiDocument getAvailableUserProfile(String validXWikiUserName, String ldapUid, XWikiContext context)
+        throws XWikiException
+    {
+        BaseClass userClass = context.getWiki().getUserClass(context);
+        LDAPProfileXClass ldapXClass = new LDAPProfileXClass(context);
+
+        DocumentReference userReference =
+            new DocumentReference(context.getDatabase(), XWIKI_USER_SPACE, validXWikiUserName);
+
+        // Check if the default profile document is available
+        for (int i = 0; true; ++i) {
+            if (i > 0) {
+                userReference.setName(validXWikiUserName + "_" + i);
+            }
+
+            XWikiDocument doc = context.getWiki().getDocument(userReference, context);
+
+            // Don't use non user existing document
+            if (doc.isNew() || doc.getXObject(userClass.getDocumentReference()) != null) {
+                String ldapUidFromObject = ldapXClass.getUid(doc);
+
+                // If the user is a LDAP user compare uids
+                if (ldapUidFromObject == null || ldapUid.equalsIgnoreCase(ldapUidFromObject)) {
+                    return doc;
+                }
+            }
+        }
+    }
+
 }

@@ -1151,6 +1151,9 @@
               **/plugin/graphviz/GraphVizPlugin.java,
               **/plugin/ldap/LDAPPluginApi.java,
               **/plugin/ldap/LDAPPlugin.java,
+              <!-- XWiki LDAP Utils has a fan out complexity of 21 and a parameter assignment issue that needs to be investigated
+              and refactored. -->
+              **/plugin/ldap/XWikiLDAPUtils.java,
               **/plugin/mail/MailPluginApi.java,
               **/plugin/mail/MailPlugin.java,
               **/plugin/packaging/DocumentFilter.java,

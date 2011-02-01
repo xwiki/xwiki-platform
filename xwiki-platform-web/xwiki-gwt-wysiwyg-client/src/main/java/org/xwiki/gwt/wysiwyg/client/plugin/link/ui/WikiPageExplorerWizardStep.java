@@ -79,7 +79,9 @@ public class WikiPageExplorerWizardStep extends AbstractExplorerWizardStep
         } else if (StringUtils.isEmpty(pageReference.getPageName())) {
             displayError(Strings.INSTANCE.linkNoPageSelectedError());
             async.onSuccess(false);
-        } else if (getData().getDestination().getEntityReference().equals(pageReference.getEntityReference())) {
+        } else if (!StringUtils.isEmpty(getData().getData().getReference())
+            && getData().getDestination().getEntityReference().equals(pageReference.getEntityReference())) {
+            // The link destination has not changed and is already serialized.
             async.onSuccess(true);
         } else {
             updateLinkConfig(pageReference.getEntityReference(), new AsyncCallback<Boolean>()

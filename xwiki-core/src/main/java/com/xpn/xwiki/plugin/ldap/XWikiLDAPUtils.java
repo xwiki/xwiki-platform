@@ -659,7 +659,7 @@ public class XWikiLDAPUtils
             if (userProfile.isNew()) {
                 LOG.debug("Creating new XWiki user based on LDAP attribues located at [" + ldapDn + "]");
 
-                userProfile = createUserFromLDAP(userProfile, searchAttributeList, ldapDn, ldapUid, context);
+                createUserFromLDAP(userProfile, searchAttributeList, ldapDn, ldapUid, context);
 
                 LOG.debug("New XWiki user created: [" + userProfile.getDocumentReference() + "]");
 

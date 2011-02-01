@@ -36,6 +36,7 @@ import org.xwiki.rendering.renderer.printer.DefaultWikiPrinter;
 import org.xwiki.rendering.renderer.printer.WikiPrinter;
 import org.xwiki.rendering.scaffolding.MockWikiModel;
 import org.xwiki.rendering.syntax.SyntaxFactory;
+import org.xwiki.rendering.transformation.TransformationContext;
 import org.xwiki.rendering.transformation.TransformationManager;
 import org.xwiki.test.AbstractComponentTestCase;
 
@@ -226,8 +227,8 @@ public class AnnotationXHTMLRendererTest extends AbstractComponentTestCase
 
         // run transformations
         TransformationManager transformationManager = getComponentManager().lookup(TransformationManager.class);
-        transformationManager.performTransformations(xdom, syntaxFactory.createSyntaxFromIdString(docFactory
-            .getDocument(docName).getSyntax()));
+        transformationManager.performTransformations(xdom, new TransformationContext(xdom,
+            syntaxFactory.createSyntaxFromIdString(docFactory.getDocument(docName).getSyntax())));
 
         AnnotationPrintRenderer renderer =
             getComponentManager().lookup(AnnotationPrintRenderer.class, ANNOTATIONS_RENDERER_HINT);
@@ -256,8 +257,8 @@ public class AnnotationXHTMLRendererTest extends AbstractComponentTestCase
 
         // run transformations
         TransformationManager transformationManager = getComponentManager().lookup(TransformationManager.class);
-        transformationManager.performTransformations(xdom, syntaxFactory.createSyntaxFromIdString(docFactory
-            .getDocument(docName).getSyntax()));
+        transformationManager.performTransformations(xdom, new TransformationContext(xdom,
+            syntaxFactory.createSyntaxFromIdString(docFactory.getDocument(docName).getSyntax())));
 
         AnnotationPrintRenderer renderer =
             getComponentManager().lookup(AnnotationPrintRenderer.class, ANNOTATIONS_RENDERER_HINT);

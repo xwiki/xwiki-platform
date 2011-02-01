@@ -145,7 +145,7 @@ viewers.Tags = Class.create({
       Element.replace(form, form._x_activator);
     }.bindAsEventListener(this));
     // Replace the Cancel link (which is supposed to 
-    var cancel = new Element("input", {type: "reset", value : form.down('.button-add-tag-cancel').innerHTML, "class" : "button"});
+    var cancel = new Element("input", {type: "reset", value : form.down('.button-add-tag-cancel').innerHTML, "class" : "button secondary"});
     form.down('.button-add-tag-cancel').replace(cancel);
 
     new XWiki.widgets.Suggest(form.down('input[type=text]'), {

@@ -23,7 +23,7 @@ a.tag-delete, a.tag-delete:visited {
   color: $theme.textPrimaryColor;
 }
 .tag-wrapper a.tag-delete:hover {
-  color: #C00;
+  color: $theme.notificationErrorColor;
 }
 .tag-add {
   color: $theme.textPrimaryColor;
@@ -54,7 +54,7 @@ a.tag-delete, a.tag-delete:visited {
 }
 
 .tag-add-form label {
-  color: $theme.textColor;
+  color: $theme.textSecondaryColor;
   font-size: 80%;
   margin: 2px 0;
 }
@@ -62,7 +62,7 @@ a.tag-delete, a.tag-delete:visited {
 .tag-add-form .input-tag {
   width: 16em;
   height: 80%;
-  margin-right: 3px;
+  margin: 0 3px .3em 0;
 }
 
 .tag-add-form .buttonwrapper {

@@ -153,7 +153,6 @@ public class ContextMacroTest extends AbstractMockingComponentTestCase
         final DocumentReferenceResolver<String> drr =
             getComponentManager().lookup(DocumentReferenceResolver.class, "current");
         final DocumentAccessBridge dab = getComponentManager().lookup(DocumentAccessBridge.class);
-        final XDOMResourceReferenceResolver xrrr = getComponentManager().lookup(XDOMResourceReferenceResolver.class);
         getMockery().checking(new Expectations() {{
             oneOf(drr).resolve("wiki:space.page");
             will(returnValue(docReference));
@@ -165,8 +164,6 @@ public class ContextMacroTest extends AbstractMockingComponentTestCase
             // Second call is for the passed document
             oneOf(dab).hasProgrammingRights();
             will(returnValue(false));
-            // Don't do anything. We're not testing the XDOMResourceReferenceResolver here (it has its own unit tests).
-            oneOf(xrrr).resolve(with(any(List.class)), with(equal(docReference)));
         }});
 
         ContextMacroParameters parameters = new ContextMacroParameters();

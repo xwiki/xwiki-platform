@@ -305,6 +305,17 @@ public class QueueListener extends LinkedList<QueueListener.Event> implements Li
 
     /**
      * {@inheritDoc}
+     *
+     * @see org.xwiki.rendering.listener.Listener#beginMetaData(MetaData)
+     * @since 3.0M2
+     */
+    public void beginMetaData(MetaData metadata)
+    {
+        saveEvent(EventType.BEGIN_METADATA, metadata);
+    }
+
+    /**
+     * {@inheritDoc}
      * 
      * @see org.xwiki.rendering.listener.Listener#endDefinitionDescription()
      */
@@ -496,6 +507,17 @@ public class QueueListener extends LinkedList<QueueListener.Event> implements Li
     public void endTableRow(Map<String, String> parameters)
     {
         saveEvent(EventType.END_TABLE_ROW, parameters);
+    }
+
+    /**
+     * {@inheritDoc}
+     *
+     * @see org.xwiki.rendering.listener.Listener#endMetaData(MetaData)
+     * @since 3.0M2
+     */
+    public void endMetaData(MetaData metadata)
+    {
+        saveEvent(EventType.END_METADATA, metadata);
     }
 
     /**

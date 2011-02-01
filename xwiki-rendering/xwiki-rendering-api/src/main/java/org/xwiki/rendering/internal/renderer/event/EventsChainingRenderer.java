@@ -25,6 +25,7 @@ import java.util.Map;
 import org.apache.commons.lang.StringUtils;
 import org.xwiki.rendering.listener.Format;
 import org.xwiki.rendering.listener.HeaderLevel;
+import org.xwiki.rendering.listener.MetaData;
 import org.xwiki.rendering.listener.reference.ResourceReference;
 import org.xwiki.rendering.listener.ListType;
 import org.xwiki.rendering.listener.chaining.ListenerChain;
@@ -349,6 +350,32 @@ public class EventsChainingRenderer extends AbstractChainingPrintRenderer
 
     /**
      * {@inheritDoc}
+     *
+     * @see org.xwiki.rendering.renderer.AbstractChainingPrintRenderer#beginMetaData(
+     *      org.xwiki.rendering.listener.MetaData)
+     * @since 3.0M2
+     */
+    @Override
+    public void beginMetaData(MetaData metadata)
+    {
+        getPrinter().println("beginMetaData" + serializeParameters(metadata.getMetaData()));
+    }
+    
+    /**
+     * {@inheritDoc}
+     *
+     * @see org.xwiki.rendering.renderer.AbstractChainingPrintRenderer#endMetaData(
+     *      org.xwiki.rendering.listener.MetaData)
+     * @since 3.0M2
+     */
+    @Override
+    public void endMetaData(MetaData metadata)
+    {
+        getPrinter().println("endMetaData" + serializeParameters(metadata.getMetaData()));
+    }
+    
+    /**
+     * {@inheritDoc}
      * 
      * @see org.xwiki.rendering.renderer.AbstractChainingPrintRenderer#onId(java.lang.String)
      */
@@ -664,16 +691,16 @@ public class EventsChainingRenderer extends AbstractChainingPrintRenderer
         getPrinter().println(macroBuffer.toString());
     }
 
-    private String serializeParameters(Map<String, String> parameters)
+    private String serializeParameters(Map<String, ? extends Object> parameters)
     {
         StringBuffer parametersStr = new StringBuffer();
-        for (Map.Entry<String, String> entry : parameters.entrySet()) {
-            String value = entry.getValue();
+        for (Map.Entry<String, ? extends Object> entry : parameters.entrySet()) {
+            String value = entry.getValue().toString();
             String key = entry.getKey();
 
             if (key != null && value != null) {
                 parametersStr.append('[').append(getEscaped(entry.getKey())).append(']').append('=').append('[')
-                    .append(getEscaped(entry.getValue())).append(']');
+                    .append(getEscaped(entry.getValue().toString())).append(']');
             }
         }
 

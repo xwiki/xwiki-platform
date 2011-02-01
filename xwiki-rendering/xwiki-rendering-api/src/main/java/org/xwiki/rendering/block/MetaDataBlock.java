@@ -19,100 +19,84 @@
  */
 package org.xwiki.rendering.block;
 
-import org.xwiki.rendering.listener.Listener;
-import org.xwiki.rendering.util.IdGenerator;
-
-import java.util.List;
 import java.util.Collections;
+import java.util.List;
+
+import org.xwiki.rendering.listener.Listener;
+import org.xwiki.rendering.listener.MetaData;
 
 /**
- * Contains the full tree of {@link Block} that represent a XWiki Document's content.
- * 
+ * Represents any kind of MetaData in the XDOM (eg saving original blocks so that the XWiki Syntax Renderer can restore
+ * them after a transformation has been executed, source reference, etc).
+ *
  * @version $Id$
- * @since 1.5M2
+ * @since 3.0M2
  */
-public class XDOM extends AbstractBlock
+public class MetaDataBlock extends AbstractBlock
 {
     /**
-     * Constructs an empty XDOM. Useful for example when calling a macro that doesn't use the XDOM parameter passed to
-     * it.
+     * Contains all MetaData for this Block and its children.
      */
-    public static final XDOM EMPTY = new XDOM(Collections.<Block> emptyList());
+    private MetaData metaData;
 
     /**
-     * Stateful id generator for this document. We store it in the XDOM because it is the only object which remains the
-     * same between parsing, transformation and rendering, and we need to generate ids during parsing and during
-     * transformation.
+     * @param childBlocks the list of children blocks of the block to construct
+     * @param metaData the metadata to set
+     * @see AbstractBlock#AbstractBlock(List)
      */
-    private IdGenerator idGenerator;
+    public MetaDataBlock(List<Block> childBlocks, MetaData metaData)
+    {
+        super(childBlocks);
+        this.metaData = metaData;
+    }
+
+    /**
+     * Helper constructor.
+     *
+     * @param childBlocks the list of children blocks of the block to construct
+     * @param key the metadata key to set
+     * @param value the metadata value to set
+     * @see AbstractBlock#AbstractBlock(List)
+     */
+    public MetaDataBlock(List<Block> childBlocks, String key, Object value)
+    {
+        this(childBlocks, new MetaData(Collections.singletonMap(key, value)));
+    }
 
     /**
      * @param childBlocks the list of children blocks of the block to construct
      * @see AbstractBlock#AbstractBlock(List)
      */
-    public XDOM(List<Block> childBlocks)
+    public MetaDataBlock(List<Block> childBlocks)
     {
-        super(childBlocks);
-
-        this.idGenerator = new IdGenerator();
+        this(childBlocks, new MetaData());
     }
 
     /**
-     * @param childBlocks the list of children blocks of the block to construct
-     * @param idGenerator a stateful id generator for this document
+     * @return the metadata for this block, see {@link MetaData}
      */
-    public XDOM(List<Block> childBlocks, IdGenerator idGenerator)
+    public MetaData getMetaData()
     {
-        super(childBlocks);
-
-        this.idGenerator = idGenerator;
-    }
-
-    /**
-     * @return a stateful id generator for the whole document.
-     */
-    public IdGenerator getIdGenerator()
-    {
-        return this.idGenerator;
-    }
-
-    /**
-     * @param idGenerator a stateful id generator for the whole document.
-     * @since 2.1M1
-     */
-    public void setIdGenerator(IdGenerator idGenerator)
-    {
-        this.idGenerator = idGenerator;
+        return this.metaData;
     }
 
     /**
      * {@inheritDoc}
-     * 
+     *
      * @see org.xwiki.rendering.block.AbstractBlock#before(org.xwiki.rendering.listener.Listener)
      */
     public void before(Listener listener)
     {
-        listener.beginDocument();
+        listener.beginMetaData(getMetaData());
     }
 
     /**
      * {@inheritDoc}
-     * 
+     *
      * @see org.xwiki.rendering.block.AbstractBlock#after(org.xwiki.rendering.listener.Listener)
      */
     public void after(Listener listener)
     {
-        listener.endDocument();
-    }
-
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.rendering.block.AbstractBlock#clone()
-     */
-    @Override
-    public XDOM clone()
-    {
-        return (XDOM) super.clone();
+        listener.endMetaData(getMetaData());
     }
 }

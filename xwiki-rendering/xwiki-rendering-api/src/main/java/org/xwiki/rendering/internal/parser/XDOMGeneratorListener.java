@@ -42,6 +42,7 @@ import org.xwiki.rendering.block.LinkBlock;
 import org.xwiki.rendering.block.ListItemBlock;
 import org.xwiki.rendering.block.MacroBlock;
 import org.xwiki.rendering.block.MacroMarkerBlock;
+import org.xwiki.rendering.block.MetaDataBlock;
 import org.xwiki.rendering.block.NewLineBlock;
 import org.xwiki.rendering.block.NumberedListBlock;
 import org.xwiki.rendering.block.ParagraphBlock;
@@ -60,6 +61,7 @@ import org.xwiki.rendering.block.WordBlock;
 import org.xwiki.rendering.block.XDOM;
 import org.xwiki.rendering.listener.Format;
 import org.xwiki.rendering.listener.HeaderLevel;
+import org.xwiki.rendering.listener.MetaData;
 import org.xwiki.rendering.listener.reference.ResourceReference;
 import org.xwiki.rendering.listener.ListType;
 import org.xwiki.rendering.listener.Listener;
@@ -306,6 +308,17 @@ public class XDOMGeneratorListener implements Listener
 
     /**
      * {@inheritDoc}
+     *
+     * @see org.xwiki.rendering.listener.Listener#beginMetaData(org.xwiki.rendering.listener.MetaData)
+     * @since 3.0M2
+     */
+    public void beginMetaData(MetaData metadata)
+    {
+        this.stack.push(this.marker);
+    }
+
+    /**
+     * {@inheritDoc}
      * 
      * @see org.xwiki.rendering.listener.Listener#endDefinitionDescription()
      */
@@ -500,6 +513,17 @@ public class XDOMGeneratorListener implements Listener
     public void endLink(ResourceReference reference, boolean isFreeStandingURI, Map<String, String> parameters)
     {
         this.stack.push(new LinkBlock(generateListFromStack(), reference, isFreeStandingURI, parameters));
+    }
+
+    /**
+     * {@inheritDoc}
+     *
+     * @see org.xwiki.rendering.listener.Listener#endMetaData(org.xwiki.rendering.listener.MetaData)
+     * @since 3.0M2
+     */
+    public void endMetaData(MetaData metadata)
+    {
+        this.stack.push(new MetaDataBlock(generateListFromStack(), metadata));
     }
 
     /**

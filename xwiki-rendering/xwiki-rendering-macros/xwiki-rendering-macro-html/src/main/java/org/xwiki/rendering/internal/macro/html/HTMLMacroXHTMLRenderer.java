@@ -28,6 +28,7 @@ import org.xwiki.component.phase.InitializationException;
 import org.xwiki.rendering.listener.chaining.BlockStateChainingListener;
 import org.xwiki.rendering.listener.chaining.ListenerChain;
 import org.xwiki.rendering.listener.chaining.EmptyBlockChainingListener;
+import org.xwiki.rendering.listener.chaining.MetaDataStateChainingListener;
 import org.xwiki.rendering.renderer.AbstractChainingPrintRenderer;
 import org.xwiki.rendering.internal.renderer.xhtml.image.XHTMLImageRenderer;
 import org.xwiki.rendering.internal.renderer.xhtml.link.XHTMLLinkRenderer;
@@ -75,6 +76,7 @@ public class HTMLMacroXHTMLRenderer extends AbstractChainingPrintRenderer implem
         chain.addListener(this);
         chain.addListener(new BlockStateChainingListener(chain));
         chain.addListener(new EmptyBlockChainingListener(chain));
+        chain.addListener(new MetaDataStateChainingListener(chain));
         chain.addListener(new HTMLMacroXHTMLChainingRenderer(this.linkRenderer, this.imageRenderer, chain));
     }
 }

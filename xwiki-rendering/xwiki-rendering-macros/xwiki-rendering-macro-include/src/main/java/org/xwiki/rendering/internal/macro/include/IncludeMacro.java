@@ -19,6 +19,7 @@
  */
 package org.xwiki.rendering.internal.macro.include;
 
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -36,8 +37,9 @@ import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.block.MacroMarkerBlock;
+import org.xwiki.rendering.block.MetaDataBlock;
 import org.xwiki.rendering.internal.macro.MacroContentParser;
-import org.xwiki.rendering.internal.macro.context.XDOMResourceReferenceResolver;
+import org.xwiki.rendering.listener.MetaData;
 import org.xwiki.rendering.macro.AbstractMacro;
 import org.xwiki.rendering.macro.MacroExecutionException;
 import org.xwiki.rendering.macro.include.IncludeMacroParameters;
@@ -86,12 +88,6 @@ public class IncludeMacro extends AbstractMacro<IncludeMacroParameters>
      */
     @Requirement("current")
     private DocumentReferenceResolver<String> currentDocumentReferenceResolver;
-
-    /**
-     * Used to transform relative resource references in XDOM with absolute references.
-     */
-    @Requirement
-    private XDOMResourceReferenceResolver xdomResourceReferenceResolver;
 
     /**
      * Used to serialize resolved document links into a string again since the Rendering API only manipulates Strings
@@ -204,14 +200,9 @@ public class IncludeMacro extends AbstractMacro<IncludeMacroParameters>
             result = executeWithCurrentContext(includedReference, includedContent, newContext);
         }
 
-        // Step 4: Modify relative references.
-        // We need to handle the case when there are relative links specified in the content of the included document.
-        // These link references need to be resolved against the document being included and not the including document.
-        // TODO: When http://jira.xwiki.org/jira/browse/XWIKI-4802 is implemented it should be possible remove this
-        // code portion and instead perform the resolution at render time, using context information.
-        if (result.size() > 0) {
-            this.xdomResourceReferenceResolver.resolve(result, includedReference);
-        }
+        // Step 4: Wrap Blocks in a MetaDataBlock with the "source" metadata specified so that potential relative
+        // links/images are resolved correctly at render time.
+        result = Arrays.asList((Block) new MetaDataBlock(result, MetaData.SOURCE, parameters.getDocument()));
 
         return result;
     }

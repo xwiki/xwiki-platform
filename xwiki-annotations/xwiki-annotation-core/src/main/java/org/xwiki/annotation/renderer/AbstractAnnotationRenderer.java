@@ -30,6 +30,7 @@ import org.xwiki.component.phase.InitializationException;
 import org.xwiki.rendering.listener.chaining.BlockStateChainingListener;
 import org.xwiki.rendering.listener.chaining.EmptyBlockChainingListener;
 import org.xwiki.rendering.listener.chaining.ListenerChain;
+import org.xwiki.rendering.listener.chaining.MetaDataStateChainingListener;
 import org.xwiki.rendering.parser.StreamParser;
 import org.xwiki.rendering.renderer.AbstractChainingPrintRenderer;
 import org.xwiki.rendering.renderer.reference.link.LinkLabelGenerator;
@@ -93,9 +94,10 @@ public abstract class AbstractAnnotationRenderer extends AbstractChainingPrintRe
         chain.addListener(new LinkLabelGeneratorChainingListener(getLinkLabelGenerator(), plainTextParser, chain));
         // annotations generator, chained to map the annotations and maintain the annotations state while rendering
         chain.addListener((AnnotationGeneratorChainingListener) annotationsGenerator);
-        // block state listener and empty block listeners needed by the XHTML renderer
+        // Following listeners are needed by the XHTML renderer
         chain.addListener(new BlockStateChainingListener(chain));
         chain.addListener(new EmptyBlockChainingListener(chain));
+        chain.addListener(new MetaDataStateChainingListener(chain));
         // the actual annotations renderer
         chain.addListener(getAnnotationPrintRenderer(chain));
     }

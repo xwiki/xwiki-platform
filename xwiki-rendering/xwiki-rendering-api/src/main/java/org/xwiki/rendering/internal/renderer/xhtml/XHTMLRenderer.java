@@ -30,6 +30,7 @@ import org.xwiki.rendering.internal.renderer.xhtml.link.XHTMLLinkRenderer;
 import org.xwiki.rendering.listener.chaining.BlockStateChainingListener;
 import org.xwiki.rendering.listener.chaining.ListenerChain;
 import org.xwiki.rendering.listener.chaining.EmptyBlockChainingListener;
+import org.xwiki.rendering.listener.chaining.MetaDataStateChainingListener;
 import org.xwiki.rendering.renderer.AbstractChainingPrintRenderer;
 
 /**
@@ -73,6 +74,7 @@ public class XHTMLRenderer extends AbstractChainingPrintRenderer implements Init
         chain.addListener(this);
         chain.addListener(new BlockStateChainingListener(chain));
         chain.addListener(new EmptyBlockChainingListener(chain));
+        chain.addListener(new MetaDataStateChainingListener(chain));
         chain.addListener(new XHTMLChainingRenderer(this.linkRenderer, this.imageRenderer, chain));
     }
 }

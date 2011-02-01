@@ -24,6 +24,7 @@ import org.xwiki.rendering.internal.renderer.xhtml.link.XHTMLLinkRenderer;
 import org.xwiki.rendering.listener.chaining.BlockStateChainingListener;
 import org.xwiki.rendering.listener.chaining.ListenerChain;
 import org.xwiki.rendering.listener.chaining.EmptyBlockChainingListener;
+import org.xwiki.rendering.listener.chaining.MetaDataStateChainingListener;
 import org.xwiki.rendering.renderer.AbstractChainingPrintRenderer;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.InstantiationStrategy;
@@ -76,6 +77,7 @@ public class AnnotatedXHTMLRenderer extends AbstractChainingPrintRenderer implem
         chain.addListener(this);
         chain.addListener(new BlockStateChainingListener(chain));
         chain.addListener(new EmptyBlockChainingListener(chain));
+        chain.addListener(new MetaDataStateChainingListener(chain));
         chain.addListener(new AnnotatedXHTMLChainingRenderer(this.linkRenderer, this.imageRenderer, chain));
     }
 }

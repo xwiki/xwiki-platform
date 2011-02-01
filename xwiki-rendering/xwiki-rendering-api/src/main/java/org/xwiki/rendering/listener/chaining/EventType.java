@@ -23,6 +23,7 @@ import java.util.Map;
 
 import org.xwiki.rendering.listener.Format;
 import org.xwiki.rendering.listener.HeaderLevel;
+import org.xwiki.rendering.listener.MetaData;
 import org.xwiki.rendering.listener.reference.ResourceReference;
 import org.xwiki.rendering.listener.ListType;
 import org.xwiki.rendering.listener.Listener;
@@ -338,6 +339,18 @@ public enum EventType
         public void fireEvent(Listener listener, Object[] eventParameters)
         {
             listener.endTableRow((Map<String, String>) eventParameters[0]);
+        }
+    },
+    BEGIN_METADATA {
+        public void fireEvent(Listener listener, Object[] eventParameters)
+        {
+            listener.beginMetaData((MetaData) eventParameters[0]);
+        }
+    },
+    END_METADATA {
+        public void fireEvent(Listener listener, Object[] eventParameters)
+        {
+            listener.endMetaData((MetaData) eventParameters[0]);
         }
     },
     ON_RAW_TEXT {

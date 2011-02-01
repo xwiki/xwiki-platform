@@ -78,12 +78,14 @@ public class IncludeMacroTest extends AbstractComponentTestCase
     public void testIncludeMacroWithNewContextShowsVelocityMacrosAreIsolated() throws Exception
     {
         String expected = "beginDocument\n"
+            + "beginMetaData [[source]=[wiki:space.page]]\n"
             + "beginMacroMarkerStandalone [velocity] [] [#testmacro]\n"
             + "beginParagraph\n"
             + "onSpecialSymbol [#]\n"
             + "onWord [testmacro]\n"
             + "endParagraph\n"
             + "endMacroMarkerStandalone [velocity] [] [#testmacro]\n"
+            + "endMetaData [[source]=[wiki:space.page]]\n"
             + "endDocument";
 
         // We verify that a Velocity macro set in the including page is not seen in the included page.
@@ -97,7 +99,9 @@ public class IncludeMacroTest extends AbstractComponentTestCase
     public void testIncludeMacroWithCurrentContextShowsVelocityMacrosAreShared() throws Exception
     {
         String expected = "beginDocument\n"
+            + "beginMetaData [[source]=[wiki:space.page]]\n"
             + "onMacroStandalone [velocity] [] [#testmacro]\n"
+            + "endMetaData [[source]=[wiki:space.page]]\n"
             + "endDocument";
 
         // We verify that a Velocity macro set in the including page is seen in the included page.
@@ -122,24 +126,23 @@ public class IncludeMacroTest extends AbstractComponentTestCase
     }
 
     /**
-     * Verify that relative links are made absolute in the XDOM returned by the Include macro.
+     * Verify that relative links returned by the Include macro as wrapped with a MetaDataBlock.
      */
     @Test
     public void testIncludeMacroWhenIncludingDocumentWithRelativeReferences() throws Exception
     {
         String expected = "beginDocument\n"
+            + "beginMetaData [[source]=[includedWiki:includedSpace.includedPage]]\n"
             + "beginParagraph\n"
-            + "beginLink [Typed = [false] Type = [doc] Reference = [includedWiki:includedSpace.page]] [false]\n"
-            + "endLink [Typed = [false] Type = [doc] Reference = [includedWiki:includedSpace.page]] [false]\n"
+            + "beginLink [Typed = [false] Type = [doc] Reference = [page]] [false]\n"
+            + "endLink [Typed = [false] Type = [doc] Reference = [page]] [false]\n"
             + "onSpace\n"
-            + "beginLink [Typed = [true] Type = [attach] "
-                + "Reference = [includedWiki:includedSpace.includedPage@test.png]] [false]\n"
-            + "endLink [Typed = [true] Type = [attach] "
-                + "Reference = [includedWiki:includedSpace.includedPage@test.png]] [false]\n"
+            + "beginLink [Typed = [true] Type = [attach] Reference = [test.png]] [false]\n"
+            + "endLink [Typed = [true] Type = [attach] Reference = [test.png]] [false]\n"
             + "onSpace\n"
-            + "onImage [Typed = [false] Type = [attach] "
-                + "Reference = [includedWiki:includedSpace.includedPage@test.png]] [true]\n"
+            + "onImage [Typed = [false] Type = [attach] Reference = [test.png]] [true]\n"
             + "endParagraph\n"
+            + "endMetaData [[source]=[includedWiki:includedSpace.includedPage]]\n"
             + "endDocument";
 
         setUpDocumentMock("includedWiki:includedSpace.includedPage",

@@ -50,6 +50,14 @@ public class ResourceReference implements Cloneable
     private String reference;
 
     /**
+     * @see #getBaseReference()
+     *
+     * Note that the reason we store the base reference as a String and not as an Entity Reference is because we want
+     * the Rendering module independent of the XWiki Model so that it can be used independently of XWiki.
+     */
+    private String baseReference;
+
+    /**
      * @see #getType()
      */
     private ResourceType type;
@@ -104,6 +112,23 @@ public class ResourceReference implements Cloneable
     public String getReference()
     {
         return this.reference;
+    }
+
+    /**
+     * @param baseReference see {@link #getBaseReference()}
+     */
+    public void setBaseReference(String baseReference)
+    {
+        this.baseReference = baseReference;
+    }
+
+    /**
+     * @return the base reference to use when we need to compute an absolute reference and {@link #getReference()}
+     *         returns a non absolute reference, can be {@code null}
+     */
+    public String getBaseReference()
+    {
+        return this.baseReference;
     }
 
     /**
@@ -191,6 +216,10 @@ public class ResourceReference implements Cloneable
             sb.append(" ");
             sb.append("Reference = [").append(getReference()).append("]");
         }
+        if (getBaseReference() != null) {
+            sb.append(" ");
+            sb.append("Base Reference = [").append(getBaseReference()).append("]");
+        }
         Map<String, String> params = getParameters();
         if (!params.isEmpty()) {
             sb.append(" ");
@@ -238,6 +267,7 @@ public class ResourceReference implements Cloneable
             .append(getType())
             .append(isTyped())
             .append(getReference())
+            .append(getBaseReference())
             .append(getParameters())
             .toHashCode();
     }
@@ -263,6 +293,7 @@ public class ResourceReference implements Cloneable
             .append(getType(), rhs.getType())
             .append(isTyped(), rhs.isTyped())
             .append(getReference(), rhs.getReference())
+            .append(getBaseReference(), rhs.getBaseReference())
             .append(getParameters(), rhs.getParameters())
             .isEquals();
     }

@@ -329,6 +329,52 @@ public class XWikiWikiModelTest extends AbstractMockingComponentTestCase
             this.wikiModel.getImageURL(reference, Collections.<String, String>emptyMap()));
     }
 
+    @Test
+    public void testGetDocumentViewURLWhenNoBaseReference() throws Exception
+    {
+        final DocumentReferenceResolver<String> documentResolver =
+            getComponentManager().lookup(DocumentReferenceResolver.class, "current");
+        final DocumentReference documentReference = new DocumentReference("wiki", "space", "page");
+        final DocumentAccessBridge documentAccessBridge = getComponentManager().lookup(DocumentAccessBridge.class);
+        getMockery().checking(new Expectations()
+        {
+            {
+                oneOf(documentResolver).resolve("reference", new Object[]{});
+                will(returnValue(documentReference));
+                oneOf(documentAccessBridge).getDocumentURL(documentReference, "view", null, null);
+                will(returnValue("viewurl"));
+            }
+        });
+
+        ResourceReference reference = new ResourceReference("reference", ResourceType.DOCUMENT);
+        Assert.assertEquals("viewurl", this.wikiModel.getDocumentViewURL(reference));
+    }
+
+    @Test
+    public void testGetDocumentViewURLWhenBaseReferenceSpecified() throws Exception
+    {
+        final DocumentReferenceResolver<String> documentResolver =
+            getComponentManager().lookup(DocumentReferenceResolver.class, "current");
+        final DocumentReference baseDocumentReference = new DocumentReference("wiki", "space", "base");
+        final DocumentReference documentReference = new DocumentReference("wiki", "space", "page");
+        final DocumentAccessBridge documentAccessBridge = getComponentManager().lookup(DocumentAccessBridge.class);
+        getMockery().checking(new Expectations()
+        {
+            {
+                oneOf(documentResolver).resolve("base", new Object[]{});
+                will(returnValue(baseDocumentReference));
+                oneOf(documentResolver).resolve("reference", baseDocumentReference);
+                will(returnValue(documentReference));
+                oneOf(documentAccessBridge).getDocumentURL(documentReference, "view", null, null);
+                will(returnValue("viewurl"));
+            }
+        });
+
+        ResourceReference reference = new ResourceReference("reference", ResourceType.DOCUMENT);
+        reference.setBaseReference("base");
+        Assert.assertEquals("viewurl", this.wikiModel.getDocumentViewURL(reference));
+    }
+
     private void setUpCommonExpectations(final String expectedAttachmentURL, 
         final boolean expectedIsImageDimensionsIncludedInImageURL) throws Exception
     {

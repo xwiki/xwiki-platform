@@ -657,4 +657,30 @@ public class CompositeListener implements Listener
             listener.onImage(reference, isFreeStandingURI, parameters);
         }
     }
+
+    /**
+     * {@inheritDoc}
+     *
+     * @see org.xwiki.rendering.listener.Listener#beginMetaData(MetaData)
+     * @since 3.0M2
+     */
+    public void beginMetaData(MetaData metadata)
+    {
+        for (Listener listener : listeners) {
+            listener.beginMetaData(metadata);
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     *
+     * @see org.xwiki.rendering.listener.Listener#endMetaData(MetaData)
+     * @since 3.0M2
+     */
+    public void endMetaData(MetaData metadata)
+    {
+        for (Listener listener : listeners) {
+            listener.endMetaData(metadata);
+        }
+    }
 }

@@ -32,6 +32,7 @@ import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.bridge.SkinAccessBridge;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.Requirement;
+import org.xwiki.model.reference.AttachmentReference;
 import org.xwiki.model.reference.AttachmentReferenceResolver;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
@@ -126,8 +127,7 @@ public class XWikiWikiModel implements WikiModel
      */
     public String getLinkURL(ResourceReference linkReference)
     {
-        return this.documentAccessBridge.getAttachmentURL(
-            this.currentAttachmentReferenceResolver.resolve(linkReference.getReference()),
+        return this.documentAccessBridge.getAttachmentURL(resolveAttachmentReference(linkReference),
             linkReference.getParameter(AttachmentResourceReference.QUERY_STRING), true);
     }
 
@@ -178,8 +178,7 @@ public class XWikiWikiModel implements WikiModel
      */
     public boolean isDocumentAvailable(ResourceReference documentResourceReference)
     {
-        DocumentReference documentReference =
-            this.currentDocumentReferenceResolver.resolve(documentResourceReference.getReference());
+        DocumentReference documentReference = resolveDocumentReference(documentResourceReference);
         return this.documentAccessBridge.exists(documentReference);
     }
 
@@ -190,8 +189,7 @@ public class XWikiWikiModel implements WikiModel
      */
     public String getDocumentViewURL(ResourceReference documentResourceReference)
     {
-        DocumentReference documentReference =
-            this.currentDocumentReferenceResolver.resolve(documentResourceReference.getReference());
+        DocumentReference documentReference = resolveDocumentReference(documentResourceReference);
         return this.documentAccessBridge.getDocumentURL(documentReference, "view",
             documentResourceReference.getParameter(DocumentResourceReference.QUERY_STRING),
             documentResourceReference.getParameter(DocumentResourceReference.ANCHOR));
@@ -233,10 +231,56 @@ public class XWikiWikiModel implements WikiModel
             }
         }
 
-        DocumentReference documentReference =
-            this.currentDocumentReferenceResolver.resolve(documentResourceReference.getReference());
+        DocumentReference documentReference = resolveDocumentReference(documentResourceReference);
         return this.documentAccessBridge.getDocumentURL(documentReference, "create", modifiedQueryString,
             documentResourceReference.getParameter(DocumentResourceReference.ANCHOR));
+    }
+
+    /**
+     * Resolve the reference passed as a String into a DocumentReference object.
+     *
+     * @param documentResourceReference the resource to transform into a {@link DocumentReference} object
+     * @return the resolved reference resolved using the base resource reference if any
+     */
+    private DocumentReference resolveDocumentReference(ResourceReference documentResourceReference)
+    {
+        DocumentReference documentReference;
+        if (documentResourceReference.getBaseReference() != null) {
+            // If the passed reference has a base reference, resolve it first with a current resolver (it should
+            // normally be absolute but who knows what the API caller has specified...)
+            DocumentReference baseReference =
+                this.currentDocumentReferenceResolver.resolve(documentResourceReference.getBaseReference());
+            documentReference =
+                this.currentDocumentReferenceResolver.resolve(documentResourceReference.getReference(), baseReference);
+        } else {
+            documentReference = this.currentDocumentReferenceResolver.resolve(documentResourceReference.getReference());
+        }
+
+        return documentReference;
+    }
+
+    /**
+     * Resolve the reference passed as a String into an AttachmentReference object.
+     *
+     * @param attachmentResourceReference the resource to transform into a {@link AttachmentReference} object
+     * @return the resolved reference resolved using the base resource reference if any
+     */
+    private AttachmentReference resolveAttachmentReference(ResourceReference attachmentResourceReference)
+    {
+        AttachmentReference attachmentReference;
+        if (attachmentResourceReference.getBaseReference() != null) {
+            // If the passed reference has a base reference, resolve it first with a current resolver (it should
+            // normally be absolute but who knows what the API caller has specified...)
+            DocumentReference baseReference =
+                this.currentDocumentReferenceResolver.resolve(attachmentResourceReference.getBaseReference());
+            attachmentReference = this.currentAttachmentReferenceResolver.resolve(
+                attachmentResourceReference.getReference(), baseReference);
+        } else {
+            attachmentReference = this.currentAttachmentReferenceResolver.resolve(
+                attachmentResourceReference.getReference());
+        }
+
+        return attachmentReference;
     }
 
     /**
@@ -255,7 +299,7 @@ public class XWikiWikiModel implements WikiModel
         String style = imageParameters.get("style");
         if (StringUtils.isNotBlank(style)) {
             try {
-                CSSStyleDeclaration sd = cssParser.parseStyleDeclaration(new InputSource(new StringReader(style)));
+                CSSStyleDeclaration sd = this.cssParser.parseStyleDeclaration(new InputSource(new StringReader(style)));
                 value = sd.getPropertyValue(dimension);
             } catch (IOException e) {
                 // Ignore the style parameter.
@@ -288,11 +332,11 @@ public class XWikiWikiModel implements WikiModel
             } else {
                 // If image width and height are unspecified or if they are not expressed in pixels then limit the image
                 // size to best fit the rectangle specified in the configuration (keeping aspect ratio).
-                int widthLimit = xwikiRenderingConfiguration.getImageWidthLimit();
+                int widthLimit = this.xwikiRenderingConfiguration.getImageWidthLimit();
                 if (widthLimit > 0) {
                     queryString.append('&').append(WIDTH).append('=').append(widthLimit);
                 }
-                int heightLimit = xwikiRenderingConfiguration.getImageHeightLimit();
+                int heightLimit = this.xwikiRenderingConfiguration.getImageHeightLimit();
                 if (heightLimit > 0) {
                     queryString.append('&').append(HEIGHT).append('=').append(heightLimit);
                 }

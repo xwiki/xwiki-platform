@@ -23,6 +23,7 @@ import java.util.Map;
 
 import org.xwiki.rendering.listener.Format;
 import org.xwiki.rendering.listener.HeaderLevel;
+import org.xwiki.rendering.listener.MetaData;
 import org.xwiki.rendering.listener.reference.ResourceReference;
 import org.xwiki.rendering.listener.ListType;
 import org.xwiki.rendering.listener.QueueListener;
@@ -198,6 +199,20 @@ public class LookaheadChainingListener extends AbstractChainingListener
         firePreviousEvent();
     }
 
+    /**
+     * {@inheritDoc}
+     *
+     * @see org.xwiki.rendering.listener.chaining.AbstractChainingListener#beginMetaData(
+     *      org.xwiki.rendering.listener.MetaData)
+     * @since 3.0M2
+     */
+    @Override
+    public void beginMetaData(MetaData metadata)
+    {
+        this.previousEvents.beginMetaData(metadata);
+        firePreviousEvent();
+    }
+    
     /**
      * {@inheritDoc}
      * 
@@ -433,6 +448,20 @@ public class LookaheadChainingListener extends AbstractChainingListener
         firePreviousEvent();
     }
 
+    /**
+     * {@inheritDoc}
+     *
+     * @see org.xwiki.rendering.listener.chaining.AbstractChainingListener#endMetaData(
+     *      org.xwiki.rendering.listener.MetaData)
+     * @since 3.0M2
+     */
+    @Override
+    public void endMetaData(MetaData metadata)
+    {
+        this.previousEvents.endMetaData(metadata);
+        firePreviousEvent();
+    }
+    
     /**
      * {@inheritDoc}
      * 

@@ -26,6 +26,8 @@ import org.xwiki.rendering.internal.renderer.xhtml.image.XHTMLImageRenderer;
 import org.xwiki.rendering.internal.renderer.xhtml.link.XHTMLLinkRenderer;
 import org.xwiki.rendering.listener.Format;
 import org.xwiki.rendering.listener.HeaderLevel;
+import org.xwiki.rendering.listener.MetaData;
+import org.xwiki.rendering.listener.chaining.MetaDataStateChainingListener;
 import org.xwiki.rendering.listener.reference.ResourceReference;
 import org.xwiki.rendering.listener.ListType;
 import org.xwiki.rendering.listener.chaining.BlockStateChainingListener;
@@ -80,6 +82,11 @@ public class XHTMLChainingRenderer extends AbstractChainingPrintRenderer
     protected EmptyBlockChainingListener getEmptyBlockState()
     {
         return (EmptyBlockChainingListener) getListenerChain().getListener(EmptyBlockChainingListener.class);
+    }
+
+    protected MetaDataStateChainingListener getMetaDataState()
+    {
+        return (MetaDataStateChainingListener) getListenerChain().getListener(MetaDataStateChainingListener.class);
     }
 
     // Printer
@@ -258,6 +265,13 @@ public class XHTMLChainingRenderer extends AbstractChainingPrintRenderer
         // Ensure the link renderer is using the latest printer since the original printer used could have been
         // superseded by another one in the printer stack.
         this.linkRenderer.setXHTMLWikiPrinter(getXHTMLWikiPrinter());
+
+        // If the ResourceReference doesn't have a base reference specified, then look for one in previously sent
+        // events (it's sent in begin/endMetaData events).
+        String baseReference = reference.getBaseReference();
+        if (baseReference == null) {
+            reference.setBaseReference((String) getMetaDataState().getMetaData(MetaData.SOURCE));
+        }
 
         this.linkRenderer.beginLink(reference, isFreeStandingURI, parameters);
     }
@@ -717,6 +731,14 @@ public class XHTMLChainingRenderer extends AbstractChainingPrintRenderer
         // Ensure the image renderer is using the latest printer since the original printer used could have been
         // superseded by another one in the printer stack.
         this.imageRenderer.setXHTMLWikiPrinter(getXHTMLWikiPrinter());
+
+        // If the ResourceReference doesn't have a base reference specified, then look for one in previously sent
+        // events (it's sent in begin/endMetaData events).
+        String baseReference = reference.getBaseReference();
+        if (baseReference == null) {
+            reference.setBaseReference((String) getMetaDataState().getMetaData(MetaData.SOURCE));
+        }
+
         this.imageRenderer.onImage(reference, isFreeStandingURI, parameters);
     }
 

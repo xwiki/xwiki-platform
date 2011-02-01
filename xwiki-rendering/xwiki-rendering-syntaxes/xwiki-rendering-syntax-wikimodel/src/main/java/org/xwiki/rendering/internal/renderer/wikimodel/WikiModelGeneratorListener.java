@@ -31,6 +31,7 @@ import org.wikimodel.wem.WikiFormat;
 import org.wikimodel.wem.WikiParameter;
 import org.wikimodel.wem.WikiParameters;
 import org.xwiki.rendering.internal.parser.wikimodel.DefaultXWikiGeneratorListener;
+import org.xwiki.rendering.listener.MetaData;
 import org.xwiki.rendering.listener.reference.ResourceReference;
 import org.xwiki.rendering.listener.ListType;
 import org.xwiki.rendering.listener.Listener;
@@ -495,7 +496,7 @@ public class WikiModelGeneratorListener implements Listener
 
     /**
      * {@inheritDoc}
-     * @see Listener#onImage(org.xwiki.rendering.listener.reference.ResourceReference , boolean, java.util.Map)
+     * @see Listener#onImage(org.xwiki.rendering.listener.reference.ResourceReference, boolean, java.util.Map)
      * @since 2.5RC1
      */
     public void onImage(ResourceReference reference, boolean isFreeStandingURI, Map<String, String> parameters)
@@ -503,6 +504,30 @@ public class WikiModelGeneratorListener implements Listener
         // Note: This means that any WikiModel listener needs to be overridden with a XWiki specific
         // version that knows how to handle XWiki image location format.
         // TODO this.wikimodelListener.onReference("image:" + imageLocation);
+    }
+
+    /**
+     * {@inheritDoc}
+     * @see Listener#beginMetaData(org.xwiki.rendering.listener.MetaData)
+     * @since 3.0M2
+     */
+    public void beginMetaData(MetaData metadata)
+    {
+        // WikiModel has a notion of Property but it's different from XWiki's notion of MetaData. We could map some
+        // specific metadata as WikiModel's property but it's not important since it would be useful only to benefit
+        // from WikiModel's Renderer implementations and such implementation won't use XWiki's metadata anyway.
+    }
+
+    /**
+     * {@inheritDoc}
+     * @see Listener#endMetaData(org.xwiki.rendering.listener.MetaData)
+     * @since 3.0M2
+     */
+    public void endMetaData(MetaData metadata)
+    {
+        // WikiModel has a notion of Property but it's different from XWiki's notion of MetaData. We could map some
+        // specific metadata as WikiModel's property but it's not important since it would be useful only to benefit
+        // from WikiModel's Renderer implementations and such implementation won't use XWiki's metadata anyway.
     }
 
     private WikiParameters createWikiParameters(Map<String, String> parameters)

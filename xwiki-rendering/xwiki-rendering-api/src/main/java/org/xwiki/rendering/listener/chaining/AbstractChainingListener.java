@@ -23,6 +23,7 @@ import java.util.Map;
 
 import org.xwiki.rendering.listener.Format;
 import org.xwiki.rendering.listener.HeaderLevel;
+import org.xwiki.rendering.listener.MetaData;
 import org.xwiki.rendering.listener.reference.ResourceReference;
 import org.xwiki.rendering.listener.ListType;
 import org.xwiki.rendering.syntax.Syntax;
@@ -310,6 +311,20 @@ public abstract class AbstractChainingListener implements ChainingListener
 
     /**
      * {@inheritDoc}
+     *
+     * @see org.xwiki.rendering.listener.Listener#beginMetaData(org.xwiki.rendering.listener.MetaData)
+     * @since 3.0M2
+     */
+    public void beginMetaData(MetaData metadata)
+    {
+        ChainingListener next = getListenerChain().getNextListener(getClass());
+        if (next != null) {
+            next.beginMetaData(metadata);
+        }
+    }
+
+    /**
+     * {@inheritDoc}
      * 
      * @see ChainingListener#endDefinitionDescription()
      */
@@ -555,6 +570,20 @@ public abstract class AbstractChainingListener implements ChainingListener
         ChainingListener next = getListenerChain().getNextListener(getClass());
         if (next != null) {
             next.endTableRow(parameters);
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     *
+     * @see org.xwiki.rendering.listener.Listener#endMetaData(org.xwiki.rendering.listener.MetaData)
+     * @since 3.0M2
+     */
+    public void endMetaData(MetaData metadata)
+    {
+        ChainingListener next = getListenerChain().getNextListener(getClass());
+        if (next != null) {
+            next.endMetaData(metadata);
         }
     }
 

@@ -561,4 +561,26 @@ public class WrappingListener implements Listener
     {
         this.listener.onImage(reference, isFreeStandingURI, parameters);
     }
+
+    /**
+     * {@inheritDoc}
+     *
+     * @see org.xwiki.rendering.listener.Listener#beginMetaData(MetaData)
+     * @since 3.0M2
+     */
+    public void beginMetaData(MetaData metadata)
+    {
+        this.listener.beginMetaData(metadata);
+    }
+
+    /**
+     * {@inheritDoc}
+     *
+     * @see org.xwiki.rendering.listener.Listener#endMetaData(MetaData)
+     * @since 3.0M2
+     */
+    public void endMetaData(MetaData metadata)
+    {
+        this.listener.endMetaData(metadata);
+    }
 }

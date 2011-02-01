@@ -69,6 +69,22 @@ public interface Listener extends LinkListener, ImageListener
     void endDocument();
 
     /**
+     * Start of MetaData (eg saving source from where the content is coming from).
+     *
+     * @param metadata the metadata
+     * @since 3.0M2
+     */
+    void beginMetaData(MetaData metadata);
+
+    /**
+     * End of MetaData.
+     *
+     * @param metadata the metadata
+     * @since 3.0M2
+     */
+    void endMetaData(MetaData metadata);
+
+    /**
      * Start a group of elements. Groups are used to allow using standalone elements in list items, table cells, etc.
      * They can also be used to set parameters on a group of standalone elements.
      * 
@@ -347,7 +363,7 @@ public interface Listener extends LinkListener, ImageListener
     void onNewLine();
 
     /**
-     * A {@link org.xwiki.rendering.macro.Macro} by itself on a line (ie not inside another Block).
+     * A Macro.
      * 
      * @param id the macro id (eg "toc" for the TOC macro)
      * @param macroParameters the macro parameters

@@ -24,6 +24,7 @@ import java.util.Map;
 import org.apache.maven.doxia.sink.Sink;
 import org.xwiki.rendering.listener.Format;
 import org.xwiki.rendering.listener.HeaderLevel;
+import org.xwiki.rendering.listener.MetaData;
 import org.xwiki.rendering.listener.reference.ResourceReference;
 import org.xwiki.rendering.listener.ListType;
 import org.xwiki.rendering.listener.Listener;
@@ -508,5 +509,27 @@ public class DoxiaGeneratorListener implements Listener
         // TODO: Handle free standing URI (if supported by Doxia)
         this.sink.figureGraphics(reference.getReference());
         this.sink.figure_();
+    }
+
+    /**
+     * {@inheritDoc}
+     *
+     * @see org.xwiki.rendering.listener.Listener#beginMetaData(org.xwiki.rendering.listener.MetaData)
+     * @since 3.0M2
+     */
+    public void beginMetaData(MetaData metadata)
+    {
+        // Doxia doesn't support the notion of metadata
+    }
+
+    /**
+     * {@inheritDoc}
+     *
+     * @see org.xwiki.rendering.listener.Listener#endMetaData(org.xwiki.rendering.listener.MetaData)
+     * @since 3.0M2
+     */
+    public void endMetaData(MetaData metadata)
+    {
+        // Doxia doesn't support the notion of metadata
     }
 }

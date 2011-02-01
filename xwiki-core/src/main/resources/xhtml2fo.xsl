@@ -1969,6 +1969,7 @@ WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING O
         <!-- Disabled, since images overlowing only one of the dimensions (e.g. larger width, but good height) will be stretched.
         <xsl:if test="$has-height and $has-width"><xsl:attribute name="scaling">non-uniform</xsl:attribute></xsl:if>-->
         <!-- Allow images to be resized -->
+        <!-- DON'T try to correct DPI on images without specified dimensions! -->
         <xsl:attribute name="content-height">scale-to-fit</xsl:attribute>
         <xsl:attribute name="content-width">scale-to-fit</xsl:attribute>
         <!-- Min and max width -->

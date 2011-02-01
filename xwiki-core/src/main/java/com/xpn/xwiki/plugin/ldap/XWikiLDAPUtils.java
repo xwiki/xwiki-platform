@@ -744,10 +744,9 @@ public class XWikiLDAPUtils
      * @param ldapDN the LDAP DN of the user.
      * @param ldapUid the LDAP unique id of the user.
      * @param context the XWiki context.
-     * @return the created user.
      * @throws XWikiException error when creating XWiki user.
      */
-    protected XWikiDocument createUserFromLDAP(XWikiDocument userProfile,
+    protected void createUserFromLDAP(XWikiDocument userProfile,
         List<XWikiLDAPSearchAttribute> searchAttributes, String ldapDN, String ldapUid, XWikiContext context)
         throws XWikiException
     {
@@ -786,8 +785,6 @@ public class XWikiLDAPUtils
         if (ldapXClass.updateLDAPObject(createdUserProfile, ldapDN, ldapUid)) {
             context.getWiki().saveDocument(createdUserProfile, "Created user profile from LDAP server", context);
         }
-
-        return createdUserProfile;
     }
 
     /**

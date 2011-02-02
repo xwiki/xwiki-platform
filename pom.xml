@@ -171,6 +171,7 @@
     <module>xwiki-extension</module>
     <module>xwiki-legacy</module>
     <module>xwiki-skin</module>
+    <module>xwiki-store</module>
   </modules>
   <profiles>
     <profile>

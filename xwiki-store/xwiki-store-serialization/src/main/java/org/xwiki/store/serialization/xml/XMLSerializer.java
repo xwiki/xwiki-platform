@@ -1,0 +1,58 @@
+/*
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+ *
+ */
+
+package org.xwiki.store.serialization.xml;
+
+import java.io.IOException;
+
+import org.dom4j.Element;
+import org.xwiki.component.annotation.ComponentRole;
+import org.xwiki.store.serialization.xml.internal.XMLWriter;
+import org.xwiki.store.serialization.Serializer;
+
+/**
+ * A Serializer which converts objects into XML Elements and back.
+ *
+ * @param <T> The class of object which the serializer can serialize.
+ * @version $Id$
+ * @since 3.0M1
+ */
+@ComponentRole()
+public interface XMLSerializer<T> extends Serializer<T>
+{
+    /**
+     * Deserialize from an XML Element.
+     *
+     * @param xmlElement the root element of a serialized object.
+     * @return a new object made by deserializing the XML Element.
+     * @throws IOException if something goes wrong.
+     */
+    T parse(final Element xmlElement) throws IOException;
+
+    /**
+     * Serialize to an XMLWriter.
+     *
+     * @param object the object to serialize.
+     * @param writeTo write output to this.
+     * @throws IOException if something goes wrong.
+     */
+    void serialize(final T object, final XMLWriter writeTo) throws IOException;
+}

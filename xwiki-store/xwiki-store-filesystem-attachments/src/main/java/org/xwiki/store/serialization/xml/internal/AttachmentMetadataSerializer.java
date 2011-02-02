@@ -65,11 +65,10 @@ public class AttachmentMetadataSerializer extends AbstractXMLSerializer<XWikiAtt
     /** Interpret a node by this name as the date the attachment was saved. */
     private static final String DATE = "date";
 
-
     /**
-     * @param docel the root element of a serialized attachment.
-     * @return a new XWikiAttachment with metadata filled in.
-     * @throws IOException if something goes wrong.
+     * {@inheritDoc}
+     *
+     * @see AbstractXMLSerializer#parse(Element)
      */
     public XWikiAttachment parse(final Element docel) throws IOException
     {
@@ -98,9 +97,9 @@ public class AttachmentMetadataSerializer extends AbstractXMLSerializer<XWikiAtt
     }
 
     /**
-     * @param attach write the metadata from this attachment.
-     * @param writer write data to this.
-     * @throws IOException if something goes wrong.
+     * {@inheritDoc}
+     *
+     * @see AbstractXMLSerializer#serialize(T, XMLWriter)
      */
     public void serialize(final XWikiAttachment attach, final XMLWriter writer) throws IOException
     {

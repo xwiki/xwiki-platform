@@ -81,9 +81,9 @@ public class AttachmentListMetadataSerializer extends AbstractXMLSerializer<List
     }
 
     /**
-     * @param docel the root element of the serialized attachment list.
-     * @return a list of new XWikiAttachments with metadata filled in.
-     * @throws IOException if something goes wrong.
+     * {@inheritDoc}
+     *
+     * @see AbstractXMLSerializer#parse(Element)
      */
     public List<XWikiAttachment> parse(final Element docel) throws IOException
     {
@@ -102,9 +102,9 @@ public class AttachmentListMetadataSerializer extends AbstractXMLSerializer<List
     }
 
     /**
-     * @param attachments a list of attachments to serialize.
-     * @param writer write data to this.
-     * @throws IOException if something goes wrong.
+     * {@inheritDoc}
+     *
+     * @see AbstractXMLSerializer#serialize(T, XMLWriter)
      */
     public void serialize(final List<XWikiAttachment> attachments,
                           final XMLWriter writer)

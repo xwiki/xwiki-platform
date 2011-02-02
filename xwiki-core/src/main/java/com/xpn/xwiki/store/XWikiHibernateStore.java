@@ -1761,6 +1761,15 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
         boolean bTransaction) throws XWikiException
     {
         try {
+            // The version number must be bumped and the date must be set before the attachment
+            // metadata is saved. Changing the version and date after calling
+            // session.save()/session.update() "worked" (the altered version was what Hibernate saved)
+            // but only if everything is done in the same transaction and as far as I know it
+            // depended on undefined behavior.
+            if (attachment.isContentDirty()) {
+                attachment.updateContentArchive(context);
+            }
+
             if (bTransaction) {
                 checkHibernate(context);
                 bTransaction = beginTransaction(context);

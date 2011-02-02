@@ -75,9 +75,6 @@ public class XWikiHibernateAttachmentStore extends XWikiHibernateBaseStore imple
     {
         try {
             XWikiAttachmentContent content = attachment.getAttachment_content();
-            if (content.isContentDirty()) {
-                attachment.updateContentArchive(context);
-            }
             if (bTransaction) {
                 checkHibernate(context);
                 bTransaction = beginTransaction(context);
@@ -103,6 +100,7 @@ public class XWikiHibernateAttachmentStore extends XWikiHibernateBaseStore imple
                 if (attachment.getAttachment_archive() == null) {
                     attachment.loadArchive(context);
                 }
+                // The archive has been updated in XWikiHibernateStore.saveAttachment()
                 context.getWiki().getAttachmentVersioningStore().saveArchive(attachment.getAttachment_archive(),
                     context, false);
 

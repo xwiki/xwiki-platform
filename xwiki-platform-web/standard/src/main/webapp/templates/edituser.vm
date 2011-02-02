@@ -26,5 +26,5 @@ $msg.get("rightsmanager.edituserprofile")&nbsp;&nbsp;<a href="$doc.getURL()">$ms
 #end
 <br /><br />
 <span class="buttonwrapper"><input class="button" type="submit" name="formactionsave" value="$msg.get("save")" onclick=" window.lb.lbSaveForm();"/></span>
-<span class="buttonwrapper"><input class="button" type="submit secondary" name="formactioncancel" value="$msg.get("cancel")" onclick=" window.lb.lbHide(); window.lb.lbClearData(); return false;"/></span>
+<span class="buttonwrapper"><input class="button secondary" type="submit" name="formactioncancel" value="$msg.get("cancel")" onclick=" window.lb.lbHide(); window.lb.lbClearData(); return false;"/></span>
 </div>

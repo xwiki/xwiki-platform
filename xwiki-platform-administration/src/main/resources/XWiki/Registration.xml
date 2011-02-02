@@ -647,7 +647,7 @@ $heading
       ##
       &lt;input class="button" type="submit" value="$msg.get('save')" onclick="window.lb.lbSaveForm();"/&gt;
       &lt;/span&gt;#* End ButtonWrapper then start another...*#&lt;span class="buttonwrapper"&gt;
-      &lt;input class="button" type="submit" value="$msg.get("cancel")" onclick="Form.disable(window.lb.form); window.lb.lbClose();"/&gt;
+      &lt;input class="button secondary" type="submit" value="$msg.get("cancel")" onclick="Form.disable(window.lb.form); window.lb.lbClose();"/&gt;
     #else
       ## Not using the LightBox
       &lt;input type="submit" value="$msg.get('core.register.submit')" class="button"/&gt;

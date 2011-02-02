@@ -132,9 +132,7 @@ public class DocumentXHTMLLinkTypeRenderer extends AbstractXHTMLLinkTypeRenderer
         // Add all parameters to the A attributes
         anchorAttributes.putAll(parameters);
 
-        if (StringUtils.isEmpty(reference.getReference())) {
-            renderAutoLink(reference, spanAttributes, anchorAttributes);
-        } else if (this.wikiModel.isDocumentAvailable(reference)) {
+        if (this.wikiModel.isDocumentAvailable(reference)) {
             spanAttributes.put(CLASS, WIKILINK);
             anchorAttributes.put(XHTMLLinkRenderer.HREF, this.wikiModel.getDocumentViewURL(reference));
         } else {

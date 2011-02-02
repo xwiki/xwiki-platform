@@ -32,7 +32,7 @@ import org.xwiki.model.reference.EntityReferenceSerializer;
  * document reference in the "wiki" Wiki, the "space" Space and the "page" Page).
  * 
  * @version $Id$
- * @since 2.5M1
+ * @since 3.0M2
  */
 @Component("path")
 public class PathStringEntityReferenceSerializer implements EntityReferenceSerializer<String>
@@ -52,15 +52,18 @@ public class PathStringEntityReferenceSerializer implements EntityReferenceSeria
         StringBuilder representation = new StringBuilder();
         // While we still have children and they're not the children of the reference to serialize
         while (currentReference != null && currentReference != reference.getChild()) {
-            serializeEntityReference(currentReference, representation, currentReference == reference, parameters);
+            serializeEntityReference(currentReference,
+                                     representation,
+                                     (currentReference == reference),
+                                     parameters);
             currentReference = currentReference.getChild();
         }
         return representation.toString();
     }
 
     /**
-     * Add a segment to the path. All non-URL compatible characters are escaped in the URL-escape format (%NN). If this
-     * is not the last segment in the reference, append a file separator at the end.
+     * Add a segment to the path. All non-URL compatible characters are escaped in the URL-escape format
+     * (%NN). If this is not the last segment in the reference, append a file separator at the end.
      * 
      * @param currentReference the current reference segment to append
      * @param representation the output, where the segment is appended
@@ -71,7 +74,8 @@ public class PathStringEntityReferenceSerializer implements EntityReferenceSeria
         boolean isLastReference, Object... parameters)
     {
         try {
-            representation.append(URLEncoder.encode(currentReference.getName(), "UTF-8").replace(".", "%2E"));
+            representation.append(
+                URLEncoder.encode(currentReference.getName(), "UTF-8").replace(".", "%2E"));
         } catch (UnsupportedEncodingException ex) {
             // This will never happen, UTF-8 is always available
         }

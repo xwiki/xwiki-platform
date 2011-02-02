@@ -769,11 +769,11 @@ public class DefaultDocumentAccessBridge implements DocumentAccessBridge
         String url;
         if (isFullURL) {
             XWikiContext xcontext = getContext();
-            url =
-                    xcontext.getURLFactory().createAttachmentURL(attachmentReference.getName(),
-                        attachmentReference.getDocumentReference().getLastSpaceReference().getName(),
-                        attachmentReference.getDocumentReference().getName(), "download", queryString,
-                        attachmentReference.getDocumentReference().getWikiReference().getName(), xcontext).toString();
+            url = xcontext.getURLFactory().getURL(xcontext.getURLFactory().createAttachmentURL(
+                attachmentReference.getName(),
+                attachmentReference.getDocumentReference().getLastSpaceReference().getName(),
+                attachmentReference.getDocumentReference().getName(), "download", queryString,
+                attachmentReference.getDocumentReference().getWikiReference().getName(), xcontext), xcontext);
         } else {
             XWikiContext xcontext = getContext();
             String documentReference =

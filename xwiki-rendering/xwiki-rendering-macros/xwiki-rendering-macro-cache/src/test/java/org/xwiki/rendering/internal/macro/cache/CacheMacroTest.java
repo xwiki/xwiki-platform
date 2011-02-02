@@ -24,7 +24,7 @@ import java.util.List;
 
 import org.junit.*;
 import org.xwiki.rendering.block.Block;
-import org.xwiki.rendering.internal.transformation.MacroTransformation;
+import org.xwiki.rendering.internal.transformation.macro.MacroTransformation;
 import org.xwiki.rendering.macro.Macro;
 import org.xwiki.rendering.macro.cache.CacheMacroParameters;
 import org.xwiki.rendering.macro.script.ScriptMockSetup;

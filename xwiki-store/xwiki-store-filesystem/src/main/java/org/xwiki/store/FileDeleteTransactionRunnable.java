@@ -104,7 +104,8 @@ public class FileDeleteTransactionRunnable extends StartableTransactionRunnable<
      * 2. There is a main file and no backup. Nothing has probably happened, do nothing to rollback.
      * 3. There are neither backup nor main files, this means we tried to delete a file which didn't exist
      *    to begin with.
-     * 4. There are both main and backup files. AAAAAaaa what do we do?! Log and do nothing.
+     * 4. There are both main and backup files. AAAAAaaa what do we do?! Throw an exception which will be
+     *    reported.
      *
      * @see StartableTransactionRunnable#onRollback()
      */
@@ -133,8 +134,11 @@ public class FileDeleteTransactionRunnable extends StartableTransactionRunnable<
 
             // 4.
             if (isBackupFile && isMainFile) {
-                // High severity log, this should never happen.
-                return;
+                throw new IllegalStateException("Tried to rollback the deletion of file "
+                                                + this.toDelete.getAbsolutePath() + " and encountered a "
+                                                + "backup and a main file. Since the main file is renamed "
+                                                + "to a backup location before deleting, this should never "
+                                                + "happen.");
             }
         }
     }

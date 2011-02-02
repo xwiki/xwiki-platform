@@ -237,7 +237,7 @@ public class FileSaveTransactionRunnable extends StartableTransactionRunnable<Tr
      *    back to the main location.
      *
      * 3. If there is a file in each location which should not happen and if it does,
-     *    do nothing but log a high severity warning.
+     *    throw an exception which will be printed in the log.
      */
     private void onRollbackWithTempFile()
     {
@@ -257,7 +257,13 @@ public class FileSaveTransactionRunnable extends StartableTransactionRunnable<Tr
 
         // 3.
         if (isBackupFile && isMainFile) {
-            // TODO log a high severity warning, this should never happen.
+            throw new IllegalStateException("Tried to rollback the saving of file "
+                                            + this.toSave.getAbsolutePath() + " and encountered a "
+                                            + "backup, a temp file, and a main file. Since any existing "
+                                            + "main file is renamed to a temp location and the content is "
+                                            + "saved in the backup location and then renamed to the main "
+                                            + "location, the existance of all 3 at once should never "
+                                            + "happen.");
         }
     }
 

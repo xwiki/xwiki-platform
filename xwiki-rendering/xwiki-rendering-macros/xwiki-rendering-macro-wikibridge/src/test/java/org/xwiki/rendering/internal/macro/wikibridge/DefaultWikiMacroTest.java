@@ -38,6 +38,7 @@ import org.xwiki.component.descriptor.DefaultComponentDescriptor;
 import org.xwiki.context.Execution;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.rendering.converter.Converter;
+import org.xwiki.rendering.listener.reference.DocumentResourceReference;
 import org.xwiki.rendering.macro.MacroId;
 import org.xwiki.rendering.macro.descriptor.DefaultContentDescriptor;
 import org.xwiki.rendering.macro.script.ScriptMockSetup;
@@ -49,6 +50,7 @@ import org.xwiki.rendering.macro.wikibridge.WikiMacroVisibility;
 import org.xwiki.rendering.parser.Parser;
 import org.xwiki.rendering.renderer.printer.DefaultWikiPrinter;
 import org.xwiki.rendering.syntax.Syntax;
+import org.xwiki.rendering.wiki.WikiModel;
 import org.xwiki.script.ScriptContextManager;
 import org.xwiki.test.AbstractComponentTestCase;
 import org.xwiki.velocity.VelocityEngine;
@@ -75,6 +77,8 @@ public class DefaultWikiMacroTest extends AbstractComponentTestCase
     /** XWiki/2.0 parser. */
     private Parser xwiki20Parser;
 
+    private WikiModel mockWikiModel;
+
     /**
      * {@inheritDoc}
      * 
@@ -91,6 +95,7 @@ public class DefaultWikiMacroTest extends AbstractComponentTestCase
         // Script setup.
         ScriptMockSetup scriptMockSetup = new ScriptMockSetup(getMockery(), getComponentManager());
         final DocumentAccessBridge mockDocBridge = scriptMockSetup.bridge;
+        this.mockWikiModel = scriptMockSetup.wikiModel;
 
         this.wikiMacroDocumentReference = new DocumentReference("wiki", "space", "macroPage");
         this.wikiMacroManager = getComponentManager().lookup(WikiMacroManager.class);
@@ -173,6 +178,13 @@ public class DefaultWikiMacroTest extends AbstractComponentTestCase
     {
         registerWikiMacro("wikimacro1", "{{toc/}}");
 
+        getMockery().checking(new Expectations() {{
+            DocumentResourceReference reference = new DocumentResourceReference(null);
+            reference.setAnchor("Hheading");
+            allowing(mockWikiModel).getDocumentViewURL(reference);
+            will(returnValue("url"));
+        }});
+
         Converter converter = getComponentManager().lookup(Converter.class);
 
         DefaultWikiPrinter printer = new DefaultWikiPrinter();
@@ -182,7 +194,7 @@ public class DefaultWikiMacroTest extends AbstractComponentTestCase
         // Note: We're using XHTML as the output syntax just to make it easy for asserting.
         Assert
             .assertEquals("<h1 id=\"Hheading\"><span>heading</span></h1>"
-                + "<ul><li><span class=\"wikilink\"><a href=\"#Hheading\">heading</a></span></li></ul>",
+                + "<ul><li><span class=\"wikilink\"><a href=\"url\">heading</a></span></li></ul>",
                 printer.toString());
     }
 

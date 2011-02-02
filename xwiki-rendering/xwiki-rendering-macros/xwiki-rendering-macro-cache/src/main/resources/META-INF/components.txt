@@ -1,0 +1,2 @@
+org.xwiki.rendering.internal.macro.cache.CacheMacro
+org.xwiki.rendering.internal.macro.cache.DefaultMacroContentParser

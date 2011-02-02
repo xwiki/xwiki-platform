@@ -32,7 +32,9 @@
   <artifactId>xwiki-core-store-parent</artifactId>
   <name>XWiki Platform - Core - Storage - Parent POM</name>
   <packaging>pom</packaging>
-  <description>XWiki Platform - Core - Storage - Parent POM</description>
+  <description>XWiki data storage module.
+This module is intended to replace xwiki-core/src/main/com/xpn/xwiki/store in due time.
+</description>
   <modules>
     <module>xwiki-store-api</module>
     <module>xwiki-store-transaction</module>

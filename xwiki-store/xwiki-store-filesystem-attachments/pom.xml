@@ -33,7 +33,7 @@
   </parent>
   <artifactId>xwiki-core-store-filesystem-attachments</artifactId>
   <name>XWiki Platform - Core - Storage - Filesystem - Attachments</name>
-  <description>XWiki Platform - Core - Storage - Filesystem - Attachments</description>
+  <description>A means to store XWikiAttachments on the filesystem with versioning.</description>
   <properties>
     <!-- Skip Clirr execution, since this is a new component -->
     <xwiki.clirr.skip>true</xwiki.clirr.skip>

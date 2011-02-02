@@ -31,7 +31,7 @@
   </parent>
   <artifactId>xwiki-core-store-api</artifactId>
   <name>XWiki Platform - Core - Storage - Api</name>
-  <description>XWiki Platform - Core - Storage - Api</description>
+  <description>Generic interfaces relating to storage.</description>
   <properties>
     <!-- Skip Clirr execution, since this is a new component -->
     <xwiki.clirr.skip>true</xwiki.clirr.skip>

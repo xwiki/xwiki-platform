@@ -31,7 +31,7 @@
   </parent>
   <artifactId>xwiki-core-store-serialization</artifactId>
   <name>XWiki Platform - Core - Storage - Serialization</name>
-  <description>XWiki Platform - Core - Storage - Serialization</description>
+  <description>Serializers and deserializers for storing objects on the disk or exporting them.</description>
   <properties>
     <!-- Skip Clirr execution, since this is a new component -->
     <xwiki.clirr.skip>true</xwiki.clirr.skip>

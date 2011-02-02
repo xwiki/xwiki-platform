@@ -23,6 +23,7 @@ import java.util.Map;
 
 import org.xwiki.rendering.listener.Format;
 import org.xwiki.rendering.listener.HeaderLevel;
+import org.xwiki.rendering.listener.MetaData;
 import org.xwiki.rendering.listener.reference.ResourceReference;
 import org.xwiki.rendering.listener.ListType;
 import org.xwiki.rendering.syntax.Syntax;
@@ -107,14 +108,14 @@ public class ConsecutiveNewLineStateChainingListener extends AbstractChainingLis
     /**
      * {@inheritDoc}
      * 
-     * @see AbstractChainingListener#endDocument()
+     * @see AbstractChainingListener#endDocument(org.xwiki.rendering.listener.MetaData)
      * @since 3.0M2
      */
     @Override
-    public void endDocument()
+    public void endDocument(MetaData metaData)
     {
         this.newLineCount = 0;
-        super.endDocument();
+        super.endDocument(metaData);
     }
 
     /**

@@ -32,6 +32,7 @@ import org.xwiki.rendering.internal.parser.WikiModelXHTMLParser;
 import org.xwiki.rendering.internal.parser.wikimodel.DefaultXWikiGeneratorListener;
 import org.xwiki.rendering.internal.parser.wikimodel.XWikiGeneratorListener;
 import org.xwiki.rendering.listener.Listener;
+import org.xwiki.rendering.listener.MetaData;
 import org.xwiki.rendering.renderer.PrintRenderer;
 import org.xwiki.rendering.renderer.PrintRendererFactory;
 import org.xwiki.rendering.renderer.printer.DefaultWikiPrinter;
@@ -108,7 +109,7 @@ public class XWikiReferenceTagHandler extends ReferenceTagHandler
 
                 PrintRenderer linkLabelRenderer = this.xwikiSyntaxPrintRendererFactory.createRenderer(printer);
                 // Make sure to flush whatever the renderer implementation
-                linkLabelRenderer.beginDocument();
+                linkLabelRenderer.beginDocument(MetaData.EMPTY);
 
                 XWikiGeneratorListener xwikiListener =
                     this.parser.createXWikiGeneratorListener(linkLabelRenderer, null);
@@ -163,7 +164,7 @@ public class XWikiReferenceTagHandler extends ReferenceTagHandler
                 PrintRenderer linkLabelRenderer = (PrintRenderer) xwikiListener.getListener();
 
                 // Make sure to flush whatever the renderer implementation
-                linkLabelRenderer.endDocument();
+                linkLabelRenderer.endDocument(MetaData.EMPTY);
 
                 String label = linkLabelRenderer.getPrinter().toString();
                 WikiReference reference =

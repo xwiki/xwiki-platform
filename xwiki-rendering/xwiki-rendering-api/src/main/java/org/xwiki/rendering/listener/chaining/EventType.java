@@ -40,13 +40,13 @@ public enum EventType
     BEGIN_DOCUMENT {
         public void fireEvent(Listener listener, Object[] eventParameters)
         {
-            listener.beginDocument();
+            listener.beginDocument((MetaData) eventParameters[0]);
         }
     },
     END_DOCUMENT {
         public void fireEvent(Listener listener, Object[] eventParameters)
         {
-            listener.endDocument();
+            listener.endDocument((MetaData) eventParameters[0]);
         }
     },
     BEGIN_GROUP {

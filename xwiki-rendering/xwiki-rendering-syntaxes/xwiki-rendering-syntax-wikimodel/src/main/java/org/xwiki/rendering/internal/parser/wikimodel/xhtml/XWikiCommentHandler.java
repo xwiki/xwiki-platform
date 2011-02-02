@@ -30,8 +30,8 @@ import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.rendering.internal.parser.WikiModelXHTMLParser;
 import org.xwiki.rendering.internal.parser.wikimodel.XWikiGeneratorListener;
+import org.xwiki.rendering.listener.MetaData;
 import org.xwiki.rendering.listener.reference.ResourceReference;
-import org.xwiki.rendering.listener.Listener;
 import org.xwiki.rendering.parser.ResourceReferenceParser;
 import org.xwiki.rendering.renderer.PrintRenderer;
 import org.xwiki.rendering.renderer.PrintRendererFactory;
@@ -128,7 +128,7 @@ public class XWikiCommentHandler extends CommentHandler
 
         PrintRenderer linkLabelRenderer = this.xwikiSyntaxPrintRendererFactory.createRenderer(printer);
         // Make sure to flush whatever the renderer implementation
-        linkLabelRenderer.beginDocument();
+        linkLabelRenderer.beginDocument(MetaData.EMPTY);
 
         XWikiGeneratorListener xwikiListener = this.parser.createXWikiGeneratorListener(linkLabelRenderer, null);
 
@@ -147,7 +147,7 @@ public class XWikiCommentHandler extends CommentHandler
         PrintRenderer linkLabelRenderer = (PrintRenderer) xwikiListener.getListener();
 
         // Make sure to flush whatever the renderer implementation
-        linkLabelRenderer.endDocument();
+        linkLabelRenderer.endDocument(MetaData.EMPTY);
 
         boolean isFreeStandingLink = (Boolean) stack.getStackParameter("isFreeStandingLink");
 

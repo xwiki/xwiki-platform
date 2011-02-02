@@ -142,12 +142,12 @@ public class QueueListener extends LinkedList<QueueListener.Event> implements Li
     /**
      * {@inheritDoc}
      * 
-     * @see Listener#beginDocument()
+     * @see Listener#beginDocument(MetaData)
      * @since 3.0M2
      */
-    public void beginDocument()
+    public void beginDocument(MetaData metaData)
     {
-        saveEvent(EventType.BEGIN_DOCUMENT);
+        saveEvent(EventType.BEGIN_DOCUMENT, metaData);
     }
 
     /**
@@ -348,12 +348,12 @@ public class QueueListener extends LinkedList<QueueListener.Event> implements Li
     /**
      * {@inheritDoc}
      * 
-     * @see Listener#endDocument()
+     * @see Listener#endDocument(MetaData)
      * @since 3.0M2
      */
-    public void endDocument()
+    public void endDocument(MetaData metaData)
     {
-        saveEvent(EventType.END_DOCUMENT);
+        saveEvent(EventType.END_DOCUMENT, metaData);
     }
 
     /**

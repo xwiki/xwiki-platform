@@ -20,6 +20,7 @@
 package org.xwiki.rendering.block;
 
 import org.xwiki.rendering.listener.Listener;
+import org.xwiki.rendering.listener.MetaData;
 import org.xwiki.rendering.util.IdGenerator;
 
 import java.util.List;
@@ -31,7 +32,7 @@ import java.util.Collections;
  * @version $Id$
  * @since 1.5M2
  */
-public class XDOM extends AbstractBlock
+public class XDOM extends MetaDataBlock
 {
     /**
      * Constructs an empty XDOM. Useful for example when calling a macro that doesn't use the XDOM parameter passed to
@@ -52,9 +53,17 @@ public class XDOM extends AbstractBlock
      */
     public XDOM(List<Block> childBlocks)
     {
-        super(childBlocks);
+        this(childBlocks, new IdGenerator(), MetaData.EMPTY);
+    }
 
-        this.idGenerator = new IdGenerator();
+    /**
+     * @param childBlocks the list of children blocks of the block to construct
+     * @param metaData the meta data to add for this block
+     * @see AbstractBlock#AbstractBlock(List)
+     */
+    public XDOM(List<Block> childBlocks, MetaData metaData)
+    {
+        this(childBlocks, new IdGenerator(), metaData);
     }
 
     /**
@@ -63,8 +72,18 @@ public class XDOM extends AbstractBlock
      */
     public XDOM(List<Block> childBlocks, IdGenerator idGenerator)
     {
-        super(childBlocks);
+        this(childBlocks, idGenerator, MetaData.EMPTY);
+    }
 
+    /**
+     * @param childBlocks the list of children blocks of the block to construct
+     * @param metaData the meta data to add for this block
+     * @param idGenerator a stateful id generator for this document
+     * @see AbstractBlock#AbstractBlock(List)
+     */
+    public XDOM(List<Block> childBlocks, IdGenerator idGenerator, MetaData metaData)
+    {
+        super(childBlocks, metaData);
         this.idGenerator = idGenerator;
     }
 
@@ -92,7 +111,7 @@ public class XDOM extends AbstractBlock
      */
     public void before(Listener listener)
     {
-        listener.beginDocument();
+        listener.beginDocument(getMetaData());
     }
 
     /**
@@ -102,7 +121,7 @@ public class XDOM extends AbstractBlock
      */
     public void after(Listener listener)
     {
-        listener.endDocument();
+        listener.endDocument(getMetaData());
     }
 
     /**

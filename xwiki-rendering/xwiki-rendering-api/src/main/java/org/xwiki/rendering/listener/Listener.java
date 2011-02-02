@@ -57,16 +57,18 @@ public interface Listener extends LinkListener, ImageListener
     /**
      * Start of the document.
      *
+     * @param metaData the meta data to associate to the following events, see {@link MetaData}
      * @since 3.0M2
      */
-    void beginDocument();
+    void beginDocument(MetaData metaData);
 
     /**
      * End of the document.
      *
+     * @param metaData the meta data associated with the previous events, see {@link MetaData}
      * @since 3.0M2
      */
-    void endDocument();
+    void endDocument(MetaData metaData);
 
     /**
      * Start of MetaData (eg saving source from where the content is coming from).

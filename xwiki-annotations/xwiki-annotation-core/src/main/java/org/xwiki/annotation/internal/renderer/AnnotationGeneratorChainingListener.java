@@ -35,6 +35,7 @@ import org.xwiki.annotation.content.ContentAlterer;
 import org.xwiki.annotation.renderer.AnnotationEvent;
 import org.xwiki.annotation.renderer.AnnotationEvent.AnnotationEventType;
 import org.xwiki.rendering.listener.Listener;
+import org.xwiki.rendering.listener.MetaData;
 import org.xwiki.rendering.listener.QueueListener;
 import org.xwiki.rendering.listener.chaining.ChainingListener;
 import org.xwiki.rendering.listener.chaining.ListenerChain;
@@ -190,9 +191,9 @@ public class AnnotationGeneratorChainingListener extends QueueListener implement
      * @since 3.0M2
      */
     @Override
-    public void endDocument()
+    public void endDocument(MetaData metaData)
     {
-        super.endDocument();
+        super.endDocument(metaData);
 
         // create the bookmarks
         mapAnnotations();

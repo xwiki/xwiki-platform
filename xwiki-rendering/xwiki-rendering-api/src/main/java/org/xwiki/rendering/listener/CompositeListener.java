@@ -99,13 +99,13 @@ public class CompositeListener implements Listener
     /**
      * {@inheritDoc}
      * 
-     * @see Listener#beginDocument()
+     * @see Listener#beginDocument(MetaData)
      * @since 3.0M2
      */
-    public void beginDocument()
+    public void beginDocument(MetaData metaData)
     {
         for (Listener listener : listeners) {
-            listener.beginDocument();
+            listener.beginDocument(metaData);
         }
     }
 
@@ -318,13 +318,13 @@ public class CompositeListener implements Listener
     /**
      * {@inheritDoc}
      * 
-     * @see Listener#endDocument()
+     * @see Listener#endDocument(MetaData)
      * @since 3.0M2
      */
-    public void endDocument()
+    public void endDocument(MetaData metaData)
     {
         for (Listener listener : listeners) {
-            listener.endDocument();
+            listener.endDocument(metaData);
         }
     }
 

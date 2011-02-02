@@ -50,25 +50,25 @@ public class EventsChainingRenderer extends AbstractChainingPrintRenderer
     /**
      * {@inheritDoc}
      * 
-     * @see org.xwiki.rendering.listener.chaining.AbstractChainingListener#beginDocument()
+     * @see org.xwiki.rendering.listener.chaining.AbstractChainingListener#beginDocument(MetaData)
      * @since 3.0M2
      */
     @Override
-    public void beginDocument()
+    public void beginDocument(MetaData metaData)
     {
-        getPrinter().println("beginDocument");
+        getPrinter().println("beginDocument" + serializeParameters(metaData.getMetaData()));
     }
 
     /**
      * {@inheritDoc}
      * 
-     * @see org.xwiki.rendering.listener.chaining.AbstractChainingListener#endDocument()
+     * @see org.xwiki.rendering.listener.chaining.AbstractChainingListener#endDocument(MetaData)
      * @since 3.0M2
      */
     @Override
-    public void endDocument()
+    public void endDocument(MetaData metaData)
     {
-        getPrinter().print("endDocument");
+        getPrinter().print("endDocument" + serializeParameters(metaData.getMetaData()));
     }
 
     /**
@@ -356,9 +356,9 @@ public class EventsChainingRenderer extends AbstractChainingPrintRenderer
      * @since 3.0M2
      */
     @Override
-    public void beginMetaData(MetaData metadata)
+    public void beginMetaData(MetaData metaData)
     {
-        getPrinter().println("beginMetaData" + serializeParameters(metadata.getMetaData()));
+        getPrinter().println("beginMetaData" + serializeParameters(metaData.getMetaData()));
     }
     
     /**
@@ -369,9 +369,9 @@ public class EventsChainingRenderer extends AbstractChainingPrintRenderer
      * @since 3.0M2
      */
     @Override
-    public void endMetaData(MetaData metadata)
+    public void endMetaData(MetaData metaData)
     {
-        getPrinter().println("endMetaData" + serializeParameters(metadata.getMetaData()));
+        getPrinter().println("endMetaData" + serializeParameters(metaData.getMetaData()));
     }
     
     /**

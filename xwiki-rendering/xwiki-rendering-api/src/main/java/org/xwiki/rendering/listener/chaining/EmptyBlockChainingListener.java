@@ -19,6 +19,7 @@
  */
 package org.xwiki.rendering.listener.chaining;
 
+import org.xwiki.rendering.listener.MetaData;
 import org.xwiki.rendering.syntax.Syntax;
 import org.xwiki.rendering.listener.Format;
 import org.xwiki.rendering.listener.reference.ResourceReference;
@@ -53,14 +54,14 @@ public class EmptyBlockChainingListener extends AbstractChainingListener
     /**
      * {@inheritDoc}
      *
-     * @see AbstractChainingListener#beginDocument()
+     * @see AbstractChainingListener#beginDocument(org.xwiki.rendering.listener.MetaData)
      * @since 3.0M2
      */
     @Override
-    public void beginDocument()
+    public void beginDocument(MetaData metaData)
     {
         startContainerBlock();
-        super.beginDocument();
+        super.beginDocument(metaData);
     }
 
     /**
@@ -306,13 +307,13 @@ public class EmptyBlockChainingListener extends AbstractChainingListener
     /**
      * {@inheritDoc}
      *
-     * @see AbstractChainingListener#endDocument()
+     * @see AbstractChainingListener#endDocument(org.xwiki.rendering.listener.MetaData)
      * @since 3.0M2
      */
     @Override
-    public void endDocument()
+    public void endDocument(MetaData metaData)
     {
-        super.endDocument();
+        super.endDocument(metaData);
         stopContainerBlock();
     }
 

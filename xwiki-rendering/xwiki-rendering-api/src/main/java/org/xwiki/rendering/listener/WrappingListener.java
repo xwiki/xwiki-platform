@@ -55,23 +55,23 @@ public class WrappingListener implements Listener
     /**
      * {@inheritDoc}
      * 
-     * @see Listener#beginDocument()
+     * @see Listener#beginDocument(MetaData)
      * @since 3.0M2
      */
-    public void beginDocument()
+    public void beginDocument(MetaData metaData)
     {
-        this.listener.beginDocument();
+        this.listener.beginDocument(metaData);
     }
 
     /**
      * {@inheritDoc}
      * 
-     * @see Listener#endDocument()
+     * @see Listener#endDocument(MetaData)
      * @since 3.0M2
      */
-    public void endDocument()
+    public void endDocument(MetaData metaData)
     {
-        this.listener.endDocument();
+        this.listener.endDocument(metaData);
     }
 
     /**

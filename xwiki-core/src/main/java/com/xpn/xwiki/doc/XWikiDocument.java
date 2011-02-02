@@ -91,6 +91,7 @@ import org.xwiki.rendering.block.LinkBlock;
 import org.xwiki.rendering.block.MacroBlock;
 import org.xwiki.rendering.block.SectionBlock;
 import org.xwiki.rendering.block.XDOM;
+import org.xwiki.rendering.listener.MetaData;
 import org.xwiki.rendering.listener.reference.DocumentResourceReference;
 import org.xwiki.rendering.listener.HeaderLevel;
 import org.xwiki.rendering.listener.reference.ResourceType;
@@ -791,9 +792,9 @@ public class XWikiDocument implements DocumentModelBridge
         // document's context. For example this is true for the Admin page, see
         // http://jira.xwiki.org/jira/browse/XWIKI-4274 for more details.
 
-        String source = getTranslatedContent(context);
+        String content = getTranslatedContent(context);
 
-        String renderedContent = this.renderingCache.getRenderedContent(getDocumentReference(), source, context);
+        String renderedContent = this.renderingCache.getRenderedContent(getDocumentReference(), content, context);
 
         String documentName =
             this.defaultEntityReferenceSerializer.serialize(isolateVelocityMacros ? getDocumentReference() : context
@@ -832,10 +833,10 @@ public class XWikiDocument implements DocumentModelBridge
                     TransformationContext txContext = new TransformationContext();
                     txContext.setSyntax(getSyntax());
                     txContext.setId(documentName);
-                    renderedContent = performSyntaxConversion(source, targetSyntax, txContext);
+                    renderedContent = performSyntaxConversion(content, documentName, targetSyntax, txContext);
                 }
 
-                this.renderingCache.setRenderedContent(getDocumentReference(), source, renderedContent, context);
+                this.renderingCache.setRenderedContent(getDocumentReference(), content, renderedContent, context);
             } finally {
                 if (isInRenderingEngine != null) {
                     context.put("isInRenderingEngine", isInRenderingEngine);
@@ -941,8 +942,8 @@ public class XWikiDocument implements DocumentModelBridge
                     TransformationContext txContext = new TransformationContext();
                     txContext.setSyntax(syntaxFactory.createSyntaxFromIdString(sourceSyntaxId));
                     txContext.setId(documentName);
-                    result =
-                        performSyntaxConversion(text, syntaxFactory.createSyntaxFromIdString(targetSyntaxId), txContext);
+                    result = performSyntaxConversion(text, documentName,
+                        syntaxFactory.createSyntaxFromIdString(targetSyntaxId), txContext);
                 }
 
                 this.renderingCache.setRenderedContent(getDocumentReference(), text, result, context);
@@ -7399,17 +7400,22 @@ public class XWikiDocument implements DocumentModelBridge
      * Convert the passed content from the passed syntax to the passed new syntax.
      * 
      * @param content the content to convert
+     * @param source the reference to where the content comes from (eg document reference)
      * @param targetSyntax the new syntax after the conversion
      * @param txContext the context when Transformation are executed or null if transformation shouldn't be executed
      * @return the converted content in the new syntax
      * @throws XWikiException if an exception occurred during the conversion process
      * @since 2.4M2
      */
-    private static String performSyntaxConversion(String content, Syntax targetSyntax, TransformationContext txContext)
-        throws XWikiException
+    private static String performSyntaxConversion(String content, String source, Syntax targetSyntax,
+        TransformationContext txContext) throws XWikiException
     {
         try {
             XDOM dom = parseContent(txContext.getSyntax().toIdString(), content);
+
+            // Set the source metadata for the parsed XDOM so that Renderers can resolve relative links/images based
+            // on it.
+            dom.getMetaData().addMetaData(MetaData.SOURCE, source);
 
             return performSyntaxConversion(dom, targetSyntax, txContext);
         } catch (Exception e) {

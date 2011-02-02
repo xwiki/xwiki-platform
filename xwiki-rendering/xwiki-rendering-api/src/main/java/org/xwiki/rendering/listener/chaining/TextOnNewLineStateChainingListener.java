@@ -23,6 +23,7 @@ import java.util.Map;
 
 import org.xwiki.rendering.listener.Format;
 import org.xwiki.rendering.listener.HeaderLevel;
+import org.xwiki.rendering.listener.MetaData;
 import org.xwiki.rendering.listener.reference.ResourceReference;
 import org.xwiki.rendering.listener.ListType;
 import org.xwiki.rendering.syntax.Syntax;
@@ -99,14 +100,14 @@ public class TextOnNewLineStateChainingListener extends AbstractChainingListener
     /**
      * {@inheritDoc}
      * 
-     * @see AbstractChainingListener#beginDocument()
+     * @see AbstractChainingListener#beginDocument(org.xwiki.rendering.listener.MetaData)
      * @since 3.0M2
      */
     @Override
-    public void beginDocument()
+    public void beginDocument(MetaData metaData)
     {
         this.isTextOnNewLine = false;
-        super.beginDocument();
+        super.beginDocument(metaData);
     }
 
     /**

@@ -26,6 +26,7 @@ import org.xwiki.rendering.internal.renderer.printer.XWikiSyntaxEscapeWikiPrinte
 import org.xwiki.rendering.internal.renderer.xwiki20.reference.XWikiSyntaxResourceRenderer;
 import org.xwiki.rendering.listener.Format;
 import org.xwiki.rendering.listener.HeaderLevel;
+import org.xwiki.rendering.listener.MetaData;
 import org.xwiki.rendering.listener.reference.ResourceReference;
 import org.xwiki.rendering.listener.ListType;
 import org.xwiki.rendering.listener.chaining.BlockStateChainingListener;
@@ -162,11 +163,11 @@ public class XWikiSyntaxChainingRenderer extends AbstractChainingPrintRenderer i
     /**
      * {@inheritDoc}
      * 
-     * @see org.xwiki.rendering.listener.chaining.AbstractChainingListener#endDocument()
+     * @see org.xwiki.rendering.listener.chaining.AbstractChainingListener#endDocument(MetaData)
      * @since 3.0M2
      */
     @Override
-    public void endDocument()
+    public void endDocument(MetaData metaData)
     {
         // Ensure that all data in the escape printer have been flushed
         getXWikiPrinter().flush();

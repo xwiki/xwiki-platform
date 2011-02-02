@@ -102,14 +102,14 @@ public abstract class AbstractChainingListener implements ChainingListener
     /**
      * {@inheritDoc}
      * 
-     * @see org.xwiki.rendering.listener.Listener#beginDocument()
+     * @see org.xwiki.rendering.listener.Listener#beginDocument(org.xwiki.rendering.listener.MetaData)
      * @since 3.0M2
      */
-    public void beginDocument()
+    public void beginDocument(MetaData metaData)
     {
         ChainingListener next = getListenerChain().getNextListener(getClass());
         if (next != null) {
-            next.beginDocument();
+            next.beginDocument(metaData);
         }
     }
 
@@ -366,14 +366,14 @@ public abstract class AbstractChainingListener implements ChainingListener
     /**
      * {@inheritDoc}
      * 
-     * @see org.xwiki.rendering.listener.Listener#endDocument()
+     * @see org.xwiki.rendering.listener.Listener#endDocument(org.xwiki.rendering.listener.MetaData)
      * @since 3.0M2
      */
-    public void endDocument()
+    public void endDocument(MetaData metaData)
     {
         ChainingListener next = getListenerChain().getNextListener(getClass());
         if (next != null) {
-            next.endDocument();
+            next.endDocument(metaData);
         }
     }
 

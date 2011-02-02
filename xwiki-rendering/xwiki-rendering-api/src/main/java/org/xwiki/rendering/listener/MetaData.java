@@ -32,6 +32,11 @@ import java.util.Map;
 public class MetaData
 {
     /**
+     * Represents no MetaData.
+     */
+    public static final MetaData EMPTY = new MetaData();
+
+    /**
      * Represents a source metaData, which corresponds to the reference to the source entity containing the content
      * to render. The reference is a free form text in a format that is understood by the Listeners supporting it.
      */

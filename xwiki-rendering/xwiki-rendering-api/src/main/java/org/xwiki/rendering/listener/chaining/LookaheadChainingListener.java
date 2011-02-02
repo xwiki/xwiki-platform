@@ -99,13 +99,13 @@ public class LookaheadChainingListener extends AbstractChainingListener
     /**
      * {@inheritDoc}
      * 
-     * @see AbstractChainingListener#beginDocument()
+     * @see AbstractChainingListener#beginDocument(org.xwiki.rendering.listener.MetaData)
      * @since 3.0M2
      */
     @Override
-    public void beginDocument()
+    public void beginDocument(MetaData metaData)
     {
-        this.previousEvents.beginDocument();
+        this.previousEvents.beginDocument(metaData);
         flush();
     }
 
@@ -349,13 +349,13 @@ public class LookaheadChainingListener extends AbstractChainingListener
     /**
      * {@inheritDoc}
      * 
-     * @see AbstractChainingListener#endDocument()
+     * @see AbstractChainingListener#endDocument(org.xwiki.rendering.listener.MetaData)
      * @since 3.0M2
      */
     @Override
-    public void endDocument()
+    public void endDocument(MetaData metaData)
     {
-        this.previousEvents.endDocument();
+        this.previousEvents.endDocument(metaData);
         flush();
     }
 

@@ -69,19 +69,36 @@ public class MetaDataStateChainingListener extends AbstractChainingListener
      * {@inheritDoc}
      */
     @Override
-    public void beginMetaData(MetaData metadata)
+    public void beginDocument(MetaData metaData)
     {
-        this.metaDataStack.push(metadata);
-        super.beginMetaData(metadata);
+        this.metaDataStack.push(metaData);
+        super.beginDocument(metaData);
+    }
+
+    @Override
+    public void endDocument(MetaData metaData)
+    {
+        super.endDocument(metaData);
+        this.metaDataStack.pop();
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public void endMetaData(MetaData metadata)
+    public void beginMetaData(MetaData metaData)
     {
-        super.endMetaData(metadata);
+        this.metaDataStack.push(metaData);
+        super.beginMetaData(metaData);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void endMetaData(MetaData metaData)
+    {
+        super.endMetaData(metaData);
         this.metaDataStack.pop();
     }
 }

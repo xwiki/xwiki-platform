@@ -32,6 +32,7 @@ import org.xwiki.rendering.internal.renderer.xhtml.image.XHTMLImageRenderer;
 import org.xwiki.rendering.internal.renderer.xhtml.link.XHTMLLinkRenderer;
 import org.xwiki.rendering.listener.Format;
 import org.xwiki.rendering.listener.HeaderLevel;
+import org.xwiki.rendering.listener.MetaData;
 import org.xwiki.rendering.listener.reference.ResourceReference;
 import org.xwiki.rendering.listener.ListType;
 import org.xwiki.rendering.listener.chaining.EventType;
@@ -281,14 +282,14 @@ public class AnnotationXHTMLChainingRenderer extends XHTMLChainingRenderer imple
     /**
      * {@inheritDoc}
      * 
-     * @see org.xwiki.rendering.listener.chaining.AbstractChainingListener#endDocument()
+     * @see org.xwiki.rendering.listener.chaining.AbstractChainingListener#endDocument(MetaData)
      * @since 3.0M2
      */
     @Override
-    public void endDocument()
+    public void endDocument(MetaData metaData)
     {
         getAnnotationsMarkerPrinter().closeAllAnnotationMarkers();
-        super.endDocument();
+        super.endDocument(metaData);
     }
 
     /**

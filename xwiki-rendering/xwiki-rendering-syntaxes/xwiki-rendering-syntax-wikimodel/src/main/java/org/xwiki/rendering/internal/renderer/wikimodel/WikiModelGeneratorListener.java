@@ -81,10 +81,10 @@ public class WikiModelGeneratorListener implements Listener
     /**
      * {@inheritDoc}
      * 
-     * @see org.xwiki.rendering.listener.Listener#beginDocument()
+     * @see org.xwiki.rendering.listener.Listener#beginDocument(org.xwiki.rendering.listener.MetaData)
      * @since 3.0M2
      */
-    public void beginDocument()
+    public void beginDocument(MetaData metaData)
     {
         pushContext();
 
@@ -95,10 +95,10 @@ public class WikiModelGeneratorListener implements Listener
     /**
      * {@inheritDoc}
      * 
-     * @see org.xwiki.rendering.listener.Listener#endDocument()
+     * @see org.xwiki.rendering.listener.Listener#endDocument(org.xwiki.rendering.listener.MetaData)
      * @since 3.0M2
      */
-    public void endDocument()
+    public void endDocument(MetaData metaData)
     {
         this.wikimodelListener.endSection(this.docLevel--, getContext().headerLevel, WikiParameters.EMPTY);
         this.wikimodelListener.endDocument(WikiParameters.EMPTY);

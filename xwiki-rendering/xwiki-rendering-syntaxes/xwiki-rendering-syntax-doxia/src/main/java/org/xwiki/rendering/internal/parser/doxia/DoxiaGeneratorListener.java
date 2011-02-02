@@ -42,10 +42,10 @@ public class DoxiaGeneratorListener implements Listener
     /**
      * {@inheritDoc}
      * 
-     * @see org.xwiki.rendering.listener.Listener#beginDocument()
+     * @see org.xwiki.rendering.listener.Listener#beginDocument(org.xwiki.rendering.listener.MetaData)
      * @since 3.0M2
      */
-    public void beginDocument()
+    public void beginDocument(MetaData metaData)
     {
         this.sink.body();
     }
@@ -53,10 +53,10 @@ public class DoxiaGeneratorListener implements Listener
     /**
      * {@inheritDoc}
      * 
-     * @see org.xwiki.rendering.listener.Listener#endDocument()
+     * @see org.xwiki.rendering.listener.Listener#endDocument(org.xwiki.rendering.listener.MetaData)
      * @since 3.0M2
      */
-    public void endDocument()
+    public void endDocument(MetaData metaData)
     {
         this.sink.body_();
     }

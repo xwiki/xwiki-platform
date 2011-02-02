@@ -21,8 +21,10 @@ package org.xwiki.extension.repository.internal;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -75,6 +77,8 @@ public class DefaultCoreExtensionRepository extends AbstractLogEnabled implement
     private void loadExtensions()
     {
         Set<URL> basURLs = ClasspathHelper.getUrlsForPackagePrefix("META-INF.maven");
+
+        basURLs = filterURLs(basURLs);
 
         ConfigurationBuilder configurationBuilder = new ConfigurationBuilder();
         configurationBuilder.setScanners(new ResourcesScanner());
@@ -164,6 +168,27 @@ public class DefaultCoreExtensionRepository extends AbstractLogEnabled implement
                 }
             }
         }
+    }
+
+    private Set<URL> filterURLs(Set<URL> urls)
+    {
+        Set<URL> results = new HashSet<URL>(urls.size());
+        for (URL url : urls) {
+            String cleanURL = url.toString();
+            // Fix JBoss URLs
+            if (url.getProtocol().startsWith("vfszip:")) {
+                cleanURL = cleanURL.replaceFirst("vfszip:", "file:");
+            } else if (url.getProtocol().startsWith("vfsfile:")) {
+                cleanURL = cleanURL.replaceFirst("vfsfile:", "file:");
+            }
+            cleanURL = cleanURL.replaceFirst("\\.jar/", ".jar!/");
+            try {
+                results.add(new URL(cleanURL));
+            } catch (MalformedURLException ex) {
+                // Shouldn't happen, but we can't do more to fix this URL.
+            }
+        }
+        return results;
     }
 
     private String packagingToType(String packaging)

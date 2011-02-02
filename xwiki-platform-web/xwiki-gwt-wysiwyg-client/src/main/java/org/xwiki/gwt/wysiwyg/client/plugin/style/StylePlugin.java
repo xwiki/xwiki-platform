@@ -19,8 +19,12 @@
  */
 package org.xwiki.gwt.wysiwyg.client.plugin.style;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import org.xwiki.gwt.user.client.Config;
@@ -32,11 +36,11 @@ import org.xwiki.gwt.wysiwyg.client.plugin.internal.FocusWidgetUIExtension;
 import org.xwiki.gwt.wysiwyg.client.plugin.style.exec.BlockStyleNameExecutable;
 import org.xwiki.gwt.wysiwyg.client.plugin.style.exec.InlineStyleNameExecutable;
 
-import com.google.gwt.dom.client.Node;
 import com.google.gwt.dom.client.NodeList;
 import com.google.gwt.dom.client.OptGroupElement;
 import com.google.gwt.dom.client.OptionElement;
 import com.google.gwt.dom.client.SelectElement;
+import com.google.gwt.dom.client.Style.Display;
 import com.google.gwt.event.dom.client.ChangeEvent;
 import com.google.gwt.event.dom.client.ChangeHandler;
 import com.google.gwt.user.client.ui.ListBox;
@@ -65,19 +69,31 @@ public class StylePlugin extends AbstractStatefulPlugin implements ChangeHandler
     private static final String SELECTED = "selected";
 
     /**
+     * The name of the boolean property that specifies if a style name is in-line or not.
+     */
+    private static final String INLINE = "inline";
+
+    /**
      * The widget used to pick a style name.
      */
     private ListBox styleNamePicker;
 
     /**
-     * The group of in-line style names.
+     * The list of in-line style names.
      */
-    private OptGroupElement inlineStyleGroup;
+    private final List<OptionElement> inlineStyles = new ArrayList<OptionElement>();
 
     /**
-     * The group of block style names.
+     * The list of block style names.
      */
-    private OptGroupElement blockStyleGroup;
+    private final List<OptionElement> blockStyles = new ArrayList<OptionElement>();
+
+    /**
+     * Stores the previous value for each of the style commands to speed up the style picker update.
+     * 
+     * @see #update(List, Command)
+     */
+    private final Map<Command, String> previousValue = new HashMap<Command, String>();
 
     /**
      * User interface extension for the editor tool bar.
@@ -116,24 +132,38 @@ public class StylePlugin extends AbstractStatefulPlugin implements ChangeHandler
         styleNamePicker.addItem(Strings.INSTANCE.stylePickerLabel(), "");
         saveRegistration(styleNamePicker.addChangeHandler(this));
 
-        blockStyleGroup = styleNamePicker.getElement().getOwnerDocument().createOptGroupElement();
-        blockStyleGroup.setLabel(Strings.INSTANCE.styleBlockGroupLabel());
-        styleNamePicker.getElement().appendChild(blockStyleGroup);
-
-        inlineStyleGroup = styleNamePicker.getElement().getOwnerDocument().createOptGroupElement();
-        inlineStyleGroup.setLabel(Strings.INSTANCE.styleInlineGroupLabel());
-        styleNamePicker.getElement().appendChild(inlineStyleGroup);
-
         StyleDescriptorJSONParser parser = new StyleDescriptorJSONParser();
         for (StyleDescriptor descriptor : parser.parse(getConfig().getParameter("styleNames", "[]"))) {
             styleNamePicker.addItem(descriptor.getLabel(), descriptor.getName());
-            OptGroupElement group = descriptor.isInline() ? inlineStyleGroup : blockStyleGroup;
             NodeList<OptionElement> options = SelectElement.as(styleNamePicker.getElement()).getOptions();
-            group.appendChild(options.getItem(options.getLength() - 1));
+            OptionElement option = options.getItem(options.getLength() - 1);
+            option.setPropertyBoolean(INLINE, descriptor.isInline());
+            (descriptor.isInline() ? inlineStyles : blockStyles).add(option);
+        }
+
+        if (blockStyles.size() > 0 && inlineStyles.size() > 0) {
+            groupStyleNames(Strings.INSTANCE.styleBlockGroupLabel(), blockStyles);
+            groupStyleNames(Strings.INSTANCE.styleInlineGroupLabel(), inlineStyles);
         }
         styleNamePicker.setSelectedIndex(0);
 
         toolBarExtension.addFeature("stylename", styleNamePicker);
+    }
+
+    /**
+     * Group the given style names under the specified group.
+     * 
+     * @param groupLabel the group label
+     * @param styleNames the style names to group
+     */
+    private void groupStyleNames(String groupLabel, List<OptionElement> styleNames)
+    {
+        OptGroupElement group = styleNamePicker.getElement().getOwnerDocument().createOptGroupElement();
+        group.setLabel(groupLabel);
+        styleNamePicker.getElement().appendChild(group);
+        for (OptionElement styleName : styleNames) {
+            group.appendChild(styleName);
+        }
     }
 
     /**
@@ -148,6 +178,8 @@ public class StylePlugin extends AbstractStatefulPlugin implements ChangeHandler
             styleNamePicker = null;
         }
 
+        blockStyles.clear();
+        inlineStyles.clear();
         toolBarExtension.clearFeatures();
 
         super.destroy();
@@ -165,7 +197,13 @@ public class StylePlugin extends AbstractStatefulPlugin implements ChangeHandler
             styleNamePicker.setSelectedIndex(0);
             // Ignore the first option which is used as the list box label.
             if (selectedIndex > 0) {
-                toggleStyle(SelectElement.as(styleNamePicker.getElement()).getOptions().getItem(selectedIndex));
+                // The method that returns the options from a select element is broken in WebKit browsers.
+                // See http://code.google.com/p/google-web-toolkit/issues/detail?id=4916 .
+                if (selectedIndex <= blockStyles.size()) {
+                    toggleStyle(blockStyles.get(selectedIndex - 1));
+                } else {
+                    toggleStyle(inlineStyles.get(selectedIndex - blockStyles.size() - 1));
+                }
             }
         }
     }
@@ -178,8 +216,7 @@ public class StylePlugin extends AbstractStatefulPlugin implements ChangeHandler
     private void toggleStyle(OptionElement styleOption)
     {
         String styleName = styleOption.getValue();
-        boolean inline = styleOption.getParentNode() == inlineStyleGroup;
-        Command command = inline ? INLINE_STYLE_NAME : BLOCK_STYLE_NAME;
+        Command command = styleOption.getPropertyBoolean(INLINE) ? INLINE_STYLE_NAME : BLOCK_STYLE_NAME;
         getTextArea().setFocus(true);
         getTextArea().getCommandManager().execute(command, styleName);
     }
@@ -192,30 +229,44 @@ public class StylePlugin extends AbstractStatefulPlugin implements ChangeHandler
     public void update()
     {
         if (styleNamePicker.isEnabled()) {
-            update(blockStyleGroup, BLOCK_STYLE_NAME);
-            update(inlineStyleGroup, INLINE_STYLE_NAME);
+            update(blockStyles, BLOCK_STYLE_NAME);
+            update(inlineStyles, INLINE_STYLE_NAME);
         }
     }
 
     /**
-     * Updates the selected state of all the options in the specified group.
+     * Updates the selected state of all the options in the specified list.
      * 
-     * @param group a group of style name options
+     * @param styleNameOptions the list of style name options to update
      * @param styleNameCommand the command used to retrieve the list of applied style names
      */
-    private void update(OptGroupElement group, Command styleNameCommand)
+    private void update(List<OptionElement> styleNameOptions, Command styleNameCommand)
     {
+        // Ignore if the list of options is empty.
+        if (styleNameOptions.size() == 0) {
+            return;
+        }
+
+        // Check if the style name picker needs to be updated.
         String appliedStyleNames = getTextArea().getCommandManager().getStringValue(styleNameCommand);
+        String previouslyAppliedStyleNames = previousValue.get(styleNameCommand);
+        if (appliedStyleNames.equals(previouslyAppliedStyleNames)) {
+            return;
+        }
+        previousValue.put(styleNameCommand, appliedStyleNames);
+
+        // Update the style name picker.
         Set<String> styleNames = new HashSet<String>(Arrays.asList(appliedStyleNames.split("\\s+")));
-        Node child = group.getFirstChild();
-        while (child != null) {
-            OptionElement option = (OptionElement) child;
+        for (OptionElement option : styleNameOptions) {
             if (styleNames.contains(option.getValue())) {
                 option.addClassName(SELECTED);
             } else {
                 option.removeClassName(SELECTED);
             }
-            child = child.getNextSibling();
         }
+
+        // Some browsers (e.g. Internet Explorer) don't update the selected options if we don't redisplay the select.
+        styleNamePicker.getElement().getStyle().setDisplay(Display.NONE);
+        styleNamePicker.getElement().getStyle().clearDisplay();
     }
 }

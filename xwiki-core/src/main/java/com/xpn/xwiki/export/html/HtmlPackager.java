@@ -267,12 +267,12 @@ public class HtmlPackager
 
         // Add required skins to ZIP file
         for (String skinName : urlf.getNeededSkins()) {
-            addSkinToZip(skinName, zos, urlf.getExporteSkinFiles(), context);
+            addSkinToZip(skinName, zos, urlf.getExportedSkinFiles(), context);
         }
 
         // add "resources" folder
         File file = new File(context.getWiki().getEngineContext().getRealPath("/resources/"));
-        addDirToZip(file, zos, "resources" + ZIPPATH_SEPARATOR, urlf.getExporteSkinFiles());
+        addDirToZip(file, zos, "resources" + ZIPPATH_SEPARATOR, urlf.getExportedSkinFiles());
 
         // Add attachments and generated skin files files to ZIP file
         addDirToZip(tempdir, zos, "", null);

@@ -80,7 +80,7 @@ public class ExportURLFactory extends XWikiServletURLFactory
     /**
      * @return the list of custom skin files.
      */
-    public Collection<String> getExporteSkinFiles()
+    public Collection<String> getExportedSkinFiles()
     {
         return this.exporteSkinFiles;
     }

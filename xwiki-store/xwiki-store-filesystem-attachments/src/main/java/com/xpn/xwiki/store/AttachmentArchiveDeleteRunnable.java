@@ -37,7 +37,7 @@ import org.xwiki.store.FileDeleteTransactionRunnable;
  * safely, it should not hang in a halfway state.
  * 
  * @version $Id$
- * @since 3.0M1
+ * @since 3.0M2
  */
 public class AttachmentArchiveDeleteRunnable extends StartableTransactionRunnable
 {

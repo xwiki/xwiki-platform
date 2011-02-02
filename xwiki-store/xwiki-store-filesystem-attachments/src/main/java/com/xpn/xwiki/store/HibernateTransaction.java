@@ -23,7 +23,7 @@ package com.xpn.xwiki.store;
  * A Transaction based on Hibernate storage engine.
  *
  * @version $Id$
- * @since 3.0M1
+ * @since 3.0M2
  */
 public interface HibernateTransaction
 {

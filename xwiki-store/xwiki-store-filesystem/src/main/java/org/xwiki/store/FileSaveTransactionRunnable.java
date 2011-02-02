@@ -35,7 +35,7 @@ import org.apache.commons.io.IOUtils;
  * It is only final when the onComplete function is called.
  *
  * @version $Id$
- * @since 3.0M1
+ * @since 3.0M2
  */
 public class FileSaveTransactionRunnable extends StartableTransactionRunnable<TransactionRunnable>
 {

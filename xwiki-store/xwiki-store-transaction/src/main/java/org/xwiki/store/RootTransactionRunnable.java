@@ -25,7 +25,7 @@ package org.xwiki.store;
  *
  * @param <T> see: {@link TransactionRunnable}
  * @version $Id$
- * @since 3.0M1
+ * @since 3.0M2
  */
 public class RootTransactionRunnable<T> extends StartableTransactionRunnable<T>
 {

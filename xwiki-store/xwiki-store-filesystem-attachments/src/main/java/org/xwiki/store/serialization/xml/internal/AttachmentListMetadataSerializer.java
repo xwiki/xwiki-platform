@@ -45,7 +45,7 @@ import org.xwiki.store.serialization.xml.XMLSerializer;
  * &lt;/attachment-list&gt;
  *
  * @version $Id$
- * @since 3.0M1
+ * @since 3.0M2
  */
 @Component("attachment-list-meta/1.0")
 public class AttachmentListMetadataSerializer extends AbstractXMLSerializer<List<XWikiAttachment>>

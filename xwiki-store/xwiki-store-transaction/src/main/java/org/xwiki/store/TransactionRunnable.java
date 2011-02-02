@@ -39,7 +39,7 @@ import java.util.ListIterator;
  *            be a compile time error.
  *
  * @version $Id$
- * @since 3.0M1
+ * @since 3.0M2
  */
 public class TransactionRunnable<T>
 {

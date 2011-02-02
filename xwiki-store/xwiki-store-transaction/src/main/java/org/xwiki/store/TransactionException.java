@@ -32,7 +32,7 @@ import java.util.List;
  * must be done, each may throw an exception but the others must run all the same.
  *
  * @version $Id$
- * @since 3.0M1
+ * @since 3.0M2
  */
 public class TransactionException extends Exception
 {

@@ -25,7 +25,7 @@ import java.io.File;
  * A means of getting files for storing information about a given attachment.
  *
  * @version $Id$
- * @since 3.0M1
+ * @since 3.0M2
  */
 public interface AttachmentFileProvider
 {

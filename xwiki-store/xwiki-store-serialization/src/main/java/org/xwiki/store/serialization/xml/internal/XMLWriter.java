@@ -53,7 +53,7 @@ import org.dom4j.io.OutputFormat;
  * </p>
  * 
  * @version $Id$
- * @since 3.0M1
+ * @since 3.0M2
  */
 public class XMLWriter extends org.dom4j.io.XMLWriter
 {

@@ -53,7 +53,7 @@ import org.apache.commons.io.IOUtils;
  * Tests for FilesystemAttachmentVersioningStore.
  *
  * @version $Id$
- * @since 3.0M1
+ * @since 3.0M2
  */
 public class FilesystemAttachmentVersioningStoreTest extends AbstractMockingComponentTestCase
 {

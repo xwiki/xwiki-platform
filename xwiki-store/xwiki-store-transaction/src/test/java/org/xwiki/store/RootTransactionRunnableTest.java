@@ -25,7 +25,7 @@ import org.junit.Test;
  * Make sure RootTransactionRunnable cannot be run in a larger TR.
  *
  * @version $Id$
- * @since 3.0M1
+ * @since 3.0M2
  */
 public class RootTransactionRunnableTest
 {

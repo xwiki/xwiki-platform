@@ -69,7 +69,7 @@ import org.apache.commons.io.IOUtils;
  * Tests for FilesystemAttachmentStore.
  *
  * @version $Id$
- * @since 3.0M1
+ * @since 3.0M2
  */
 @RunWith(JMock.class)
 public class FilesystemAttachmentStoreTest extends AbstractMockingComponentTestCase

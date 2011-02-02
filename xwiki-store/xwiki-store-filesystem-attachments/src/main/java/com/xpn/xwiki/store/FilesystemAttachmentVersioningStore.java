@@ -43,7 +43,7 @@ import org.xwiki.store.StartableTransactionRunnable;
  * Filesystem based AttachmentVersioningStore implementation.
  * 
  * @version $Id$
- * @since 3.0M1
+ * @since 3.0M2
  */
 @Component("file")
 public class FilesystemAttachmentVersioningStore implements AttachmentVersioningStore

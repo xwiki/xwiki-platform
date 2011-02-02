@@ -26,7 +26,7 @@ import java.io.InputStream;
  * A generic thing which provides access to an InputStream on demand.
  *
  * @version $Id$
- * @since 3.0M1
+ * @since 3.0M2
  */
 public interface StreamProvider
 {

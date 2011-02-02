@@ -33,7 +33,7 @@ import org.xwiki.component.annotation.Component;
  * A serializer for saving the metadata from an XWikiAttachment.
  *
  * @version $Id$
- * @since 3.0M1
+ * @since 3.0M2
  */
 @Component("attachment-meta/1.0")
 public class AttachmentMetadataSerializer extends AbstractXMLSerializer<XWikiAttachment>

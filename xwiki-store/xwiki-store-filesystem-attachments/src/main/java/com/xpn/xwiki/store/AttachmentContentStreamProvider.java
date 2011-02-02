@@ -31,7 +31,7 @@ import org.xwiki.store.StreamProvider;
  * Used to save the content of each attachment to the correct file.
  *
  * @version $Id$
- * @since 3.0M1
+ * @since 3.0M2
  */
 public class AttachmentContentStreamProvider implements StreamProvider
 {

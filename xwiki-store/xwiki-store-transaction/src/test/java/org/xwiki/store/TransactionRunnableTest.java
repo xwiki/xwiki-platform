@@ -27,7 +27,7 @@ import org.junit.Test;
  * Tests for TransactionRunnable.
  *
  * @version $Id$
- * @since 3.0M1
+ * @since 3.0M2
  */
 public class TransactionRunnableTest
 {

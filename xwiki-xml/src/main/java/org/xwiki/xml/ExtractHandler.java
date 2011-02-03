@@ -79,7 +79,7 @@ public class ExtractHandler extends DefaultHandler
          */
         public String getQName()
         {
-            return qName;
+            return this.qName;
         }
 
         /**
@@ -87,7 +87,7 @@ public class ExtractHandler extends DefaultHandler
          */
         public Attributes getAtts()
         {
-            return atts;
+            return this.atts;
         }
     }
 
@@ -110,16 +110,16 @@ public class ExtractHandler extends DefaultHandler
      * The stack of open tags; when the lower bound is reached all the tags in the stack must be opened; when the upper
      * bound is reached all the tags in the stack must be closed.
      */
-    private Stack<XMLTag> openTags = new Stack<XMLTag>();
+    private Stack<XMLTag> openedTags = new Stack<XMLTag>();
 
     /**
      * The fragment that is extracted during the parsing process.
      */
-    private StringBuffer result;
+    private StringBuilder result = new StringBuilder();
 
     /**
-     * <code>true</code> if the extraction was successful. The parsing process throws an exception when the upper
-     * bound is reached; this flag is useful to distinguish between this exception and the others.
+     * <code>true</code> if the extraction was successful. The parsing process throws an exception when the upper bound
+     * is reached; this flag is useful to distinguish between this exception and the others.
      */
     private boolean finished;
 
@@ -139,8 +139,8 @@ public class ExtractHandler extends DefaultHandler
         if (length <= 0) {
             throw new SAXException("Length must be greater than 0");
         }
-        lowerBound = start;
-        upperBound = lowerBound + length;
+        this.lowerBound = start;
+        this.upperBound = this.lowerBound + length;
     }
 
     /**
@@ -148,7 +148,7 @@ public class ExtractHandler extends DefaultHandler
      */
     public String getResult()
     {
-        return result.toString();
+        return this.result.toString();
     }
 
     /**
@@ -156,7 +156,7 @@ public class ExtractHandler extends DefaultHandler
      */
     public boolean isFinished()
     {
-        return finished;
+        return this.finished;
     }
 
     /**
@@ -167,11 +167,11 @@ public class ExtractHandler extends DefaultHandler
      */
     private void openTag(String qName, Attributes atts)
     {
-        result.append('<').append(qName);
+        this.result.append('<').append(qName);
         for (int i = 0; i < atts.getLength(); i++) {
-            result.append(' ').append(atts.getQName(i)).append("=\"").append(atts.getValue(i)).append('\"');
+            this.result.append(' ').append(atts.getQName(i)).append("=\"").append(atts.getValue(i)).append('\"');
         }
-        result.append('>');
+        this.result.append('>');
     }
 
     /**
@@ -181,7 +181,7 @@ public class ExtractHandler extends DefaultHandler
      */
     private void openTags()
     {
-        for (XMLTag tag : openTags) {
+        for (XMLTag tag : this.openedTags) {
             openTag(tag.getQName(), tag.getAtts());
         }
     }
@@ -193,8 +193,8 @@ public class ExtractHandler extends DefaultHandler
      */
     private void closeTags()
     {
-        while (!openTags.isEmpty()) {
-            closeTag(openTags.pop().getQName());
+        while (!this.openedTags.isEmpty()) {
+            closeTag(this.openedTags.pop().getQName());
         }
     }
 
@@ -205,7 +205,7 @@ public class ExtractHandler extends DefaultHandler
      */
     private void closeTag(String qName)
     {
-        result.append("</").append(qName).append('>');
+        this.result.append("</").append(qName).append('>');
     }
 
     /**
@@ -213,7 +213,7 @@ public class ExtractHandler extends DefaultHandler
      */
     private boolean isExtracting()
     {
-        return lowerBound <= counter && counter <= upperBound;
+        return this.lowerBound <= this.counter && this.counter <= this.upperBound;
     }
 
     /**
@@ -221,13 +221,14 @@ public class ExtractHandler extends DefaultHandler
      * 
      * @see DefaultHandler#startDocument()
      */
+    @Override
     public void startDocument() throws SAXException
     {
         super.startDocument();
-        counter = 0;
-        openTags.clear();
-        result = new StringBuffer();
-        finished = false;
+        this.counter = 0;
+        this.openedTags.clear();
+        this.result.setLength(0);
+        this.finished = false;
     }
 
     /**
@@ -235,9 +236,10 @@ public class ExtractHandler extends DefaultHandler
      * 
      * @see DefaultHandler#startElement(String, String, String, Attributes)
      */
+    @Override
     public void startElement(String namespaceURI, String localName, String qName, Attributes atts) throws SAXException
     {
-        openTags.push(new XMLTag(qName, atts));
+        this.openedTags.push(new XMLTag(qName, atts));
         if (isExtracting()) {
             openTag(qName, atts);
         }
@@ -248,39 +250,40 @@ public class ExtractHandler extends DefaultHandler
      * 
      * @see DefaultHandler#characters(char[], int, int)
      */
+    @Override
     public void characters(char[] ch, int start, int length) throws SAXException
     {
-        int offset = lowerBound - counter;
+        int offset = this.lowerBound - this.counter;
         if (offset > 0) {
             if (offset > length) {
-                counter += length;
+                this.counter += length;
                 return;
             } else {
-                counter = lowerBound;
+                this.counter = this.lowerBound;
                 openTags();
                 characters(ch, start + offset, length - offset);
                 return;
             }
         }
-        int remainingLength = upperBound - counter;
+        int remainingLength = this.upperBound - this.counter;
         if (remainingLength <= length) {
             String content = new String(ch, start, remainingLength);
             int spaceIndex = remainingLength;
             if (remainingLength == length || ch[remainingLength] != ' ') {
-                spaceIndex = content.lastIndexOf(" ");
+                spaceIndex = content.lastIndexOf(' ');
             }
             if (spaceIndex >= 0) {
-                counter += spaceIndex;
-                result.append(content.substring(0, spaceIndex));
+                this.counter += spaceIndex;
+                this.result.append(content.substring(0, spaceIndex));
             } else {
-                counter = upperBound;
-                result.append(content);
+                this.counter = this.upperBound;
+                this.result.append(content);
             }
             endDocument();
             throw new SAXException("Length limit reached");
         } else {
-            counter += length;
-            result.append(ch, start, length);
+            this.counter += length;
+            this.result.append(ch, start, length);
         }
     }
 
@@ -289,11 +292,12 @@ public class ExtractHandler extends DefaultHandler
      * 
      * @see DefaultHandler#endElement(String, String, String)
      */
+    @Override
     public void endElement(String namespaceURI, String localName, String qName) throws SAXException
     {
         // We assume the XML fragment is well defined, and thus we shouldn't have a closed tag
         // without its pair open tag. So we don't test for empty stack or tag match.
-        openTags.pop();
+        this.openedTags.pop();
         if (isExtracting()) {
             closeTag(qName);
         }
@@ -304,6 +308,7 @@ public class ExtractHandler extends DefaultHandler
      * 
      * @see DefaultHandler#endDocument()
      */
+    @Override
     public void endDocument() throws SAXException
     {
         super.endDocument();
@@ -312,6 +317,6 @@ public class ExtractHandler extends DefaultHandler
             closeTags();
         }
         // set finished flag to distinguish between "length limit reached" and other exceptions
-        finished = true;
+        this.finished = true;
     }
 }

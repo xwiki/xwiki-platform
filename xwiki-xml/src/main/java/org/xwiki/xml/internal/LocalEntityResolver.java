@@ -19,23 +19,23 @@
  */
 package org.xwiki.xml.internal;
 
-import org.xml.sax.InputSource;
-import org.xml.sax.SAXException;
-import org.xwiki.component.annotation.Component;
-import org.xwiki.component.logging.AbstractLogEnabled;
-import org.xwiki.xml.EntityResolver;
-
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
 import java.net.URISyntaxException;
 
+import org.xml.sax.InputSource;
+import org.xml.sax.SAXException;
+import org.xwiki.component.annotation.Component;
+import org.xwiki.component.logging.AbstractLogEnabled;
+import org.xwiki.xml.EntityResolver;
+
 /**
- * Entity resolver that resolves entities using entity files (like xhtml-symbol.ent, xhtml-special.ent,
- * xhtml-lat1.ent) located on the file system (in the classpath). This allows an XML parser that uses this
- * entity resolver to work even when there's no internet connection. It also speeds up the entity resolution.
- *  
+ * Entity resolver that resolves entities using entity files (like xhtml-symbol.ent, xhtml-special.ent, xhtml-lat1.ent)
+ * located on the file system (in the classpath). This allows an XML parser that uses this entity resolver to work even
+ * when there's no internet connection. It also speeds up the entity resolution.
+ * 
  * @version $Id$
  */
 @Component
@@ -73,7 +73,7 @@ public class LocalEntityResolver extends AbstractLogEnabled implements EntityRes
             URI uri = new URI(systemId);
 
             if ("http".equals(uri.getScheme()) || "file".equals(uri.getScheme())) {
-                String filename = (new File(uri.getPath())).getName();
+                String filename = new File(uri.getPath()).getName();
                 InputStream istream = getClass().getClassLoader().getResourceAsStream(filename);
                 if (istream != null) {
                     source = new InputSource(istream);

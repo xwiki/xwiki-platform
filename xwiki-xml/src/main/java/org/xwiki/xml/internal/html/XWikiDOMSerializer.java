@@ -20,7 +20,6 @@
  */
 package org.xwiki.xml.internal.html;
 
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.regex.Matcher;
@@ -58,7 +57,7 @@ public class XWikiDOMSerializer
     /**
      * The Regex Pattern to recognize a CDATA block.
      */
-    private static final Pattern CDATA_PATTERN = 
+    private static final Pattern CDATA_PATTERN =
         Pattern.compile("<!\\[CDATA\\[.*(\\]\\]>|<!\\[CDATA\\[)", Pattern.DOTALL);
 
     /**
@@ -100,8 +99,7 @@ public class XWikiDOMSerializer
     }
 
     /**
-     * Perform CDATA transformations if the user has specified to use CDATA inside scripts and style
-     * elements.
+     * Perform CDATA transformations if the user has specified to use CDATA inside scripts and style elements.
      * 
      * @param document the W3C Document to use for creating new DOM elements
      * @param element the W3C element to which we'll add the text content to
@@ -110,19 +108,19 @@ public class XWikiDOMSerializer
      */
     private void flushContent(Document document, Element element, StringBuffer bufferedContent, Object item)
     {
-        if (bufferedContent.length() > 0 && (item == null || !(item instanceof ContentToken))) {
+        if (bufferedContent.length() > 0 && !(item instanceof ContentToken)) {
             // Flush the buffered content
             String nodeName = element.getNodeName();
-            boolean specialCase = props.isUseCdataForScriptAndStyle()
+            boolean specialCase = this.props.isUseCdataForScriptAndStyle()
                 && ("script".equalsIgnoreCase(nodeName) || "style".equalsIgnoreCase(nodeName));
             String content = bufferedContent.toString();
-            
-            if (escapeXml && !specialCase) {
-                content = Utils.escapeXml(content, props, true);
+
+            if (this.escapeXml && !specialCase) {
+                content = Utils.escapeXml(content, this.props, true);
             } else if (specialCase) {
                 content = processCDATABlocks(content);
             }
-            
+
             // Generate a javascript comment in front on the CDATA block so that it works in IE6 and when
             // serving XHTML under a mimetype of HTML.
             if (specialCase) {
@@ -131,7 +129,7 @@ public class XWikiDOMSerializer
             } else {
                 element.appendChild(document.createTextNode(content));
             }
-            
+
             bufferedContent.setLength(0);
         }
     }
@@ -157,12 +155,11 @@ public class XWikiDOMSerializer
             result.append(StringEscapeUtils.unescapeHtml(content.substring(cursor)));
         }
         // Ensure ther's no invalid <![CDATA[ or ]]> remaining.
-        String contentResult = result.toString().replaceAll("<!\\[CDATA\\[", "");
-        contentResult = contentResult.toString().replaceAll("\\]\\]>", "");
-        
+        String contentResult = result.toString().replace("<![CDATA[", "").replace("]]>", "");
+
         return contentResult;
     }
-    
+
     /**
      * Serialize a given SF HTML Cleaner node.
      * 
@@ -170,7 +167,7 @@ public class XWikiDOMSerializer
      * @param element the W3C element to which we'll add the subnodes to
      * @param tagChildren the SF HTML Cleaner nodes to serialize for that node
      */
-    private void createSubnodes(Document document, Element element, List tagChildren)
+    private void createSubnodes(Document document, Element element, List<Object> tagChildren)
     {
         // We've modified the original implementation based in SF's HTML Cleaner to better handle CDATA.
         // More specifically we want to handle the following 3 use cases:
@@ -187,18 +184,15 @@ public class XWikiDOMSerializer
         // wrapping them in a CDATA section.
         //
         // Use case 3: useCData = false
-        // Simply group all ContentToken together. 
-        
+        // Simply group all ContentToken together.
+
         StringBuffer bufferedContent = new StringBuffer();
-        
+
         if (tagChildren != null) {
-            Iterator it = tagChildren.iterator();
-            while (it.hasNext()) {
-                Object item = it.next();
-                
+            for (Object item : tagChildren) {
                 // Flush content tokens
                 flushContent(document, element, bufferedContent, item);
-                
+
                 if (item instanceof CommentToken) {
                     CommentToken commentToken = (CommentToken) item;
                     Comment comment = document.createComment(commentToken.getContent());
@@ -210,14 +204,13 @@ public class XWikiDOMSerializer
                 } else if (item instanceof TagNode) {
                     TagNode subTagNode = (TagNode) item;
                     Element subelement = document.createElement(subTagNode.getName());
-                    Map attributes = subTagNode.getAttributes();
-                    Iterator entryIterator = attributes.entrySet().iterator();
-                    while (entryIterator.hasNext()) {
-                        Map.Entry entry = (Map.Entry) entryIterator.next();
-                        String attrName = (String) entry.getKey();
-                        String attrValue = (String) entry.getValue();
-                        if (escapeXml) {
-                            attrValue = Utils.escapeXml(attrValue, props, true);
+                    @SuppressWarnings("unchecked")
+                    Map<String, String> attributes = subTagNode.getAttributes();
+                    for (Map.Entry<String, String> entry : attributes.entrySet()) {
+                        String attrName = entry.getKey();
+                        String attrValue = entry.getValue();
+                        if (this.escapeXml) {
+                            attrValue = Utils.escapeXml(attrValue, this.props, true);
                         }
                         subelement.setAttribute(attrName, attrValue);
                     }
@@ -226,8 +219,9 @@ public class XWikiDOMSerializer
                     createSubnodes(document, subelement, subTagNode.getChildren());
 
                     element.appendChild(subelement);
-                } else if (item instanceof List) {
-                    List sublist = (List) item;
+                } else if (item instanceof List< ? >) {
+                    @SuppressWarnings("unchecked")
+                    List<Object> sublist = (List<Object>) item;
                     createSubnodes(document, element, sublist);
                 }
             }

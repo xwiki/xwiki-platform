@@ -100,7 +100,7 @@ public class DefaultHTMLCleaner implements HTMLCleaner, Initializable
     /**
      * {@inheritDoc}
      * 
-     * @see org.xwiki.xml.html.HTMLCleaner#clean(java.io.Reader) 
+     * @see org.xwiki.xml.html.HTMLCleaner#clean(java.io.Reader)
      */
     public Document clean(Reader originalHtmlContent)
     {
@@ -115,14 +115,14 @@ public class DefaultHTMLCleaner implements HTMLCleaner, Initializable
      */
     public Document clean(Reader originalHtmlContent, HTMLCleanerConfiguration configuration)
     {
-        Document result = null;   
-        
+        Document result = null;
+
         // HtmlCleaner is not threadsafe. Thus we need to recreate an instance at each run since otherwise we would need
         // to synchronize this clean() method which would slow down the whole system by queuing up cleaning requests.
         // See http://sourceforge.net/tracker/index.php?func=detail&aid=2139927&group_id=183053&atid=903699
         CleanerProperties cleanerProperties = getDefaultCleanerProperties(configuration);
-        HtmlCleaner cleaner = new HtmlCleaner(cleanerProperties);        
-        
+        HtmlCleaner cleaner = new HtmlCleaner(cleanerProperties);
+
         cleaner.setTransformations(getDefaultCleanerTransformations());
         TagNode cleanedNode;
         try {
@@ -131,12 +131,12 @@ public class DefaultHTMLCleaner implements HTMLCleaner, Initializable
             // This shouldn't happen since we're not doing any IO... I consider this a flaw in the design of HTML
             // Cleaner.
             throw new RuntimeException("Unhandled error when cleaning HTML", e);
-        }        
-        
+        }
+
         // Workaround HTML XML declaration bug.
         fixCleanedNodeBug(cleanedNode);
-        
-        // Serialize the cleanedNode TagNode into a w3c dom. Ideally following code should be enough. 
+
+        // Serialize the cleanedNode TagNode into a w3c dom. Ideally following code should be enough.
         // But SF's HTML Cleaner seems to omit the DocType declaration while serializing.
         // See https://sourceforge.net/tracker/index.php?func=detail&aid=2062318&group_id=183053&atid=903696
         //      cleanedNode.setDocType(new DoctypeToken("html", "PUBLIC", "-//W3C//DTD XHTML 1.0 Strict//EN",
@@ -149,7 +149,7 @@ public class DefaultHTMLCleaner implements HTMLCleaner, Initializable
         try {
             // Since there's a bug in SF's HTML Cleaner in that it doesn't recognize CDATA blocks we need to turn off
             // character escaping (hence the false value passed) and do the escaping in XMLUtils.toString(). Note that
-            // this can cause problem for code not serializing the W3C DOM to a String since it won't have the 
+            // this can cause problem for code not serializing the W3C DOM to a String since it won't have the
             // characters escaped.
             // See https://sourceforge.net/tracker/index.php?func=detail&aid=2691888&group_id=183053&atid=903696
             Document tempDoc = new XWikiDOMSerializer(cleanerProperties, false).createDOM(cleanedNode);
@@ -157,18 +157,18 @@ public class DefaultHTMLCleaner implements HTMLCleaner, Initializable
                 DocumentBuilderFactory.newInstance().newDocumentBuilder().getDOMImplementation();
             DocumentType docType =
                 domImpl.createDocumentType(QUALIFIED_NAME_HTML, "-//W3C//DTD XHTML 1.0 Strict//EN",
-                    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd");
+                "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd");
             result = domImpl.createDocument(null, QUALIFIED_NAME_HTML, docType);
             result.replaceChild(result.adoptNode(tempDoc.getDocumentElement()), result.getDocumentElement());
         } catch (ParserConfigurationException ex) {
             throw new RuntimeException("Error while serializing TagNode into w3c dom.", ex);
         }
-        
+
         // Finally apply filters.
         for (HTMLFilter filter : configuration.getFilters()) {
             filter.filter(result, configuration.getParameters());
         }
-        
+
         return result;
     }
 
@@ -194,20 +194,20 @@ public class DefaultHTMLCleaner implements HTMLCleaner, Initializable
         CleanerProperties defaultProperties = new CleanerProperties();
         defaultProperties.setOmitUnknownTags(true);
         defaultProperties.setNamespacesAware(true);
-        
+
         // HTML Cleaner uses the compact notation by default but we don't want that since:
         // - it's more work and not required since not compact notation is valid XHTML
         // - expanded elements can also be rendered fine in browsers that only support HTML.
         defaultProperties.setUseEmptyElementTags(false);
-        
+
         // Wrap script and style content in CDATA blocks
         defaultProperties.setUseCdataForScriptAndStyle(true);
-        
+
         // Handle the NAMESPACE_AWARE configuration property
         String param = configuration.getParameters().get(HTMLCleanerConfiguration.NAMESPACES_AWARE);
         boolean namespacesAware = (param != null) ? Boolean.parseBoolean(param) : defaultProperties.isNamespacesAware();
         defaultProperties.setNamespacesAware(namespacesAware);
-        
+
         return defaultProperties;
     }
 
@@ -254,11 +254,9 @@ public class DefaultHTMLCleaner implements HTMLCleaner, Initializable
         TagNode body = cleanedNode.getElementsByName("body", false)[0];
         if (body.getChildren().size() > 0) {
             Object firstBodyChild = body.getChildren().get(0);
-            if (firstBodyChild != null && ContentToken.class.isAssignableFrom(firstBodyChild.getClass())) {
-                ContentToken token = (ContentToken) firstBodyChild;
-                if (token.getContent().startsWith("<?xml")) {
-                    body.removeChild(token);
-                }
+            if (firstBodyChild instanceof ContentToken
+                && ((ContentToken) firstBodyChild).getContent().startsWith("<?xml")) {
+                body.removeChild(firstBodyChild);
             }
         }
     }

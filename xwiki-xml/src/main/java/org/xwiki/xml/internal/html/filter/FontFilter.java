@@ -38,15 +38,11 @@ import org.xwiki.xml.html.filter.AbstractHTMLFilter;
 public class FontFilter extends AbstractHTMLFilter
 {
     /**
-     * A map holding the translation from 'size' attribute of html font tag to 'font-size' css property. 
+     * A map holding the translation from 'size' attribute of html font tag to 'font-size' css property.
      */
-    private Map<String, String> fontSizeMap;
-    
-    /**
-     * Constructs a {@link FontFilter}.
-     */
-    public FontFilter()
-    {
+    private static final Map<String, String> fontSizeMap;
+
+    static {
         fontSizeMap = new HashMap<String, String>();
         fontSizeMap.put("1", "0.6em");
         fontSizeMap.put("2", "0.8em");
@@ -62,7 +58,7 @@ public class FontFilter extends AbstractHTMLFilter
         fontSizeMap.put("+2", fontSizeMap.get("5"));
         fontSizeMap.put("+3", fontSizeMap.get("6"));
     }
-    
+
     /**
      * {@inheritDoc}
      * 
@@ -87,10 +83,10 @@ public class FontFilter extends AbstractHTMLFilter
                 fontSizeCss = (fontSizeCss != null) ? fontSizeCss : fontSize;
                 buffer.append(String.format("font-size:%s;", fontSizeCss));
             }
-            if (fontTag.hasAttribute(ATTRIBUTE_STYLE)) {
+            if (fontTag.hasAttribute(ATTRIBUTE_STYLE) && fontTag.getAttribute(ATTRIBUTE_STYLE).trim().length() == 0) {
                 buffer.append(fontTag.getAttribute(ATTRIBUTE_STYLE));
             }
-            if (!buffer.toString().trim().equals("")) {
+            if (buffer.length() > 0) {
                 span.setAttribute(ATTRIBUTE_STYLE, buffer.toString());
             }
             fontTag.getParentNode().insertBefore(span, fontTag);

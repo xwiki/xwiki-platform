@@ -624,14 +624,6 @@ public class XWiki implements XWikiDocChangeNotificationInterface, EventListener
         }
     }
 
-    public static String getFormEncoded(String content)
-    {
-        Filter filter = new CharacterFilter();
-        filter.removeAttribute("'");
-        String scontent = filter.process(content);
-        return scontent;
-    }
-
     public static HttpClient getHttpClient(int timeout, String userAgent)
     {
         HttpClient client = new HttpClient();
@@ -681,13 +673,6 @@ public class XWiki implements XWikiDocChangeNotificationInterface, EventListener
     public static String getServerWikiPage(String servername)
     {
         return "XWiki.XWikiServer" + StringUtils.capitalize(servername);
-    }
-
-    public static String getXMLEncoded(String content)
-    {
-        Filter filter = new CharacterFilter();
-        String scontent = filter.process(content);
-        return scontent;
     }
 
     public static String getTextArea(String content, XWikiContext context)

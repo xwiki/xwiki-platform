@@ -20,6 +20,8 @@
  */
 package com.xpn.xwiki.api;
 
+import org.xwiki.xml.internal.XMLScriptService;
+
 import com.xpn.xwiki.api.XWiki;
 import com.xpn.xwiki.api.Util;
 import com.xpn.xwiki.XWikiException;
@@ -635,5 +637,32 @@ public privileged aspect XWikiCompatibilityAspect
     public String XWiki.getMessage(String id)
     {
         return this.xwiki.getMessage(id, getXWikiContext());
+    }
+
+    /**
+     * Transform a text in a form compatible text
+     * 
+     * @param content text to transform
+     * @return encoded result
+     * @deprecated Use $escapetool.xml
+     */
+    @Deprecated
+    public String XWiki.getFormEncoded(String content)
+    {
+        return XMLScriptService.escape(content);
+    }
+
+    /**
+     * Transform a text in a XML compatible text This method uses Apache CharacterFilter which swaps single quote
+     * (&#39;) for left single quotation mark (&#8217;)
+     * 
+     * @param content text to transform
+     * @return encoded result
+     * @deprecated Use $escapetool.xml
+     */
+    @Deprecated
+    public String XWiki.getXMLEncoded(String content)
+    {
+        return XMLScriptService.escape(content);
     }
 }

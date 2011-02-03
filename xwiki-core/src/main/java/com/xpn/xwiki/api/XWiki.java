@@ -435,29 +435,6 @@ public class XWiki extends Api
     }
 
     /**
-     * Transform a text in a form compatible text
-     * 
-     * @param content text to transform
-     * @return encoded result
-     */
-    public String getFormEncoded(String content)
-    {
-        return com.xpn.xwiki.XWiki.getFormEncoded(content);
-    }
-
-    /**
-     * Transform a text in a XML compatible text This method uses Apache CharacterFilter which swaps single quote
-     * (&#39;) for left single quotation mark (&#8217;)
-     * 
-     * @param content text to transform
-     * @return encoded result
-     */
-    public String getXMLEncoded(String content)
-    {
-        return com.xpn.xwiki.XWiki.getXMLEncoded(content);
-    }
-
-    /**
      * Output content in the edit content textarea
      * 
      * @param content content to output

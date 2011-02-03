@@ -1,6 +1,4 @@
-package com.xpn.xwiki.plugin.autotag;
-
-/**
+/*
  * Copyright 2001-2005 The Apache Software Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -15,19 +13,17 @@ package com.xpn.xwiki.plugin.autotag;
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package com.xpn.xwiki.plugin.autotag;
 
 /**
- * A stemmer for French words. The algorithm is based on the work of Dr Martin Porter on his
- * snowball project<br>
+ * A stemmer for French words. The algorithm is based on the work of Dr Martin Porter on his snowball project<br>
  * refer to http://snowball.sourceforge.net/french/stemmer.html<br>
  * (French stemming algorithm) for details
  * 
  * @author Patrick Talbot
  */
-
 public class FrenchStemmer
 {
-
     /**
      * Buffer for the terms while stemming them.
      */

@@ -40,23 +40,23 @@ public class FontFilter extends AbstractHTMLFilter
     /**
      * A map holding the translation from 'size' attribute of html font tag to 'font-size' css property.
      */
-    private static final Map<String, String> fontSizeMap;
+    private static final Map<String, String> FONT_SIZE_MAP;
 
     static {
-        fontSizeMap = new HashMap<String, String>();
-        fontSizeMap.put("1", "0.6em");
-        fontSizeMap.put("2", "0.8em");
-        fontSizeMap.put("3", "1.0em");
-        fontSizeMap.put("4", "1.2em");
-        fontSizeMap.put("5", "1.4em");
-        fontSizeMap.put("6", "1.6em");
-        fontSizeMap.put("7", "1.8em");
-        fontSizeMap.put("-3", "0.4em");
-        fontSizeMap.put("-2", fontSizeMap.get("1"));
-        fontSizeMap.put("-1", fontSizeMap.get("2"));
-        fontSizeMap.put("+1", fontSizeMap.get("4"));
-        fontSizeMap.put("+2", fontSizeMap.get("5"));
-        fontSizeMap.put("+3", fontSizeMap.get("6"));
+        FONT_SIZE_MAP = new HashMap<String, String>();
+        FONT_SIZE_MAP.put("1", "0.6em");
+        FONT_SIZE_MAP.put("2", "0.8em");
+        FONT_SIZE_MAP.put("3", "1.0em");
+        FONT_SIZE_MAP.put("4", "1.2em");
+        FONT_SIZE_MAP.put("5", "1.4em");
+        FONT_SIZE_MAP.put("6", "1.6em");
+        FONT_SIZE_MAP.put("7", "1.8em");
+        FONT_SIZE_MAP.put("-3", "0.4em");
+        FONT_SIZE_MAP.put("-2", FONT_SIZE_MAP.get("1"));
+        FONT_SIZE_MAP.put("-1", FONT_SIZE_MAP.get("2"));
+        FONT_SIZE_MAP.put("+1", FONT_SIZE_MAP.get("4"));
+        FONT_SIZE_MAP.put("+2", FONT_SIZE_MAP.get("5"));
+        FONT_SIZE_MAP.put("+3", FONT_SIZE_MAP.get("6"));
     }
 
     /**
@@ -79,7 +79,7 @@ public class FontFilter extends AbstractHTMLFilter
             }
             if (fontTag.hasAttribute(ATTRIBUTE_FONTSIZE)) {
                 String fontSize = fontTag.getAttribute(ATTRIBUTE_FONTSIZE);
-                String fontSizeCss = fontSizeMap.get(fontSize);
+                String fontSizeCss = FONT_SIZE_MAP.get(fontSize);
                 fontSizeCss = (fontSizeCss != null) ? fontSizeCss : fontSize;
                 buffer.append(String.format("font-size:%s;", fontSizeCss));
             }

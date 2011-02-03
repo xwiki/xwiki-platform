@@ -155,8 +155,7 @@ public class DefaultHTMLCleaner implements HTMLCleaner, Initializable
             Document tempDoc = new XWikiDOMSerializer(cleanerProperties, false).createDOM(cleanedNode);
             DOMImplementation domImpl =
                 DocumentBuilderFactory.newInstance().newDocumentBuilder().getDOMImplementation();
-            DocumentType docType =
-                domImpl.createDocumentType(QUALIFIED_NAME_HTML, "-//W3C//DTD XHTML 1.0 Strict//EN",
+            DocumentType docType = domImpl.createDocumentType(QUALIFIED_NAME_HTML, "-//W3C//DTD XHTML 1.0 Strict//EN",
                 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd");
             result = domImpl.createDocument(null, QUALIFIED_NAME_HTML, docType);
             result.replaceChild(result.adoptNode(tempDoc.getDocumentElement()), result.getDocumentElement());

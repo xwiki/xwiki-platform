@@ -27,6 +27,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
+import java.util.regex.Pattern;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.api.Api;
@@ -39,7 +40,9 @@ public class AutoTagPlugin extends XWikiDefaultPlugin implements XWikiPluginInte
 
     public static final int LANG_ENGLISH = 1;
 
-    public static final String NAME = "autotag";
+    private static final String PLUGIN_NAME = "autotag";
+
+    private static final Pattern SPECIAL_CHARS = Pattern.compile("<|>|=|/|\"|\u0093");
 
     public final static String[] FRENCH_STOP_WORDS =
         {"a", "afin", "ai", "ainsi", "apr\u00e8s", "attendu", "au", "aujourd", "auquel", "aussi",
@@ -77,9 +80,9 @@ public class AutoTagPlugin extends XWikiDefaultPlugin implements XWikiPluginInte
         "way", "could", "my", "than", "first", "been", "call", "who", "its", "now", "find", "long",
         "down", "day", "did", "get", "come", "may"};
 
-    List<String> ignoreList = new ArrayList<String>();
+    private List<String> ignoreList = new ArrayList<String>();
 
-    List<String> dontignoreList = null;
+    private List<String> dontignoreList = new ArrayList<String>();
 
     int maxTag = 100;
 
@@ -107,7 +110,7 @@ public class AutoTagPlugin extends XWikiDefaultPlugin implements XWikiPluginInte
     @Override
     public String getName()
     {
-        return NAME;
+        return PLUGIN_NAME;
     }
 
     @Override
@@ -163,7 +166,7 @@ public class AutoTagPlugin extends XWikiDefaultPlugin implements XWikiPluginInte
         tagcloud.setStemmedWordFreqMap(stemmedWordFreqMap);
 
         // we order the list by the value to select the most frequent tags
-        LinkedHashMap<String, Integer> orderedMap = sortMap(stemmedWordFreqMap);
+        Map<String, Integer> orderedMap = sortMap(stemmedWordFreqMap);
 
         String[] keyset = (String[]) orderedMap.keySet().toArray();
 
@@ -218,7 +221,7 @@ public class AutoTagPlugin extends XWikiDefaultPlugin implements XWikiPluginInte
         return new TreeSet<T>(oSet);
     }
 
-    public static <K, V> LinkedHashMap<K, V> sortMap(Map<K, V> hmap)
+    public static <K, V> Map<K, V> sortMap(Map<K, V> hmap)
     {
         LinkedHashMap<K, V> map = new LinkedHashMap<K, V>();
 
@@ -259,20 +262,16 @@ public class AutoTagPlugin extends XWikiDefaultPlugin implements XWikiPluginInte
         }
 
         for (String word : words.keySet()) {
-            if (word.indexOf("<") >= 0 || word.indexOf(">") >= 0 || word.indexOf("=") >= 0
-                || word.indexOf("\"") >= 0 || word.indexOf("/") >= 0
-                || word.indexOf("\u0093") >= 0) {
+            if (SPECIAL_CHARS.matcher(word).find()) {
                 if (!this.ignoreList.contains(word)) {
                     this.ignoreList.add(word);
                 }
             }
         }
 
-        if (this.ignoreList != null) {
-            for (String word : this.ignoreList) {
-                if (this.dontignoreList == null || !this.dontignoreList.contains(word)) {
-                    words.remove(word);
-                }
+        for (String word : this.ignoreList) {
+            if (!this.dontignoreList.contains(word)) {
+                words.remove(word);
             }
         }
 
@@ -364,10 +363,10 @@ public class AutoTagPlugin extends XWikiDefaultPlugin implements XWikiPluginInte
 
     public int getLanguageConstant(String lang)
     {
-        if (lang.trim().toLowerCase().equals("fr")) {
+        if (lang.trim().equalsIgnoreCase("fr")) {
             return AutoTagPlugin.LANG_FRENCH;
         }
-        // default english
+        // default English
         return AutoTagPlugin.LANG_ENGLISH;
     }
 }

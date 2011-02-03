@@ -419,7 +419,7 @@ public class Context extends Api
     }
 
     /**
-     * Sets the cache duration in seconds. Setting this to a non-zero, pozitive value will cause the rendered document
+     * Sets the cache duration in seconds. Setting this to a non-zero, positive value will cause the rendered document
      * to be stored in a cache, so next time a client requests this document, if it is still in the cache, and the
      * document content did not change, then it will be taken from the cache and will not be parsed/rendered again.
      * While it is a good idea to cache pages containing only static content (no scripting), it should be used with care

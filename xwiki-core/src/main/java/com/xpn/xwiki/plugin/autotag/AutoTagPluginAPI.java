@@ -19,32 +19,28 @@
  */
 package com.xpn.xwiki.plugin.autotag;
 
-import com.xpn.xwiki.api.Api;
 import com.xpn.xwiki.XWikiContext;
+import com.xpn.xwiki.plugin.PluginApi;
 
-public class AutoTagPluginAPI extends Api
+public class AutoTagPluginAPI extends PluginApi<AutoTagPlugin>
 {
-
-    private AutoTagPlugin plugin;
-
     public AutoTagPluginAPI(XWikiContext context)
     {
-        super(context);
+        super(null, context);
     }
 
     public AutoTagPluginAPI(AutoTagPlugin autoTagPlugin, XWikiContext context)
     {
-        super(context);
-        this.plugin = autoTagPlugin;
+        super(autoTagPlugin, context);
     }
 
     public TagCloud generateTagCloud(String text, int lang)
     {
-        return plugin.generateTagCloud(text, lang);
+        return getProtectedPlugin().generateTagCloud(text, lang);
     }
-    
-    public TagCloud generateTagCloud(String text, String lang) 
+
+    public TagCloud generateTagCloud(String text, String lang)
     {
-        return plugin.generateTagCloud(text, plugin.getLanguageConstant(lang));
+        return getProtectedPlugin().generateTagCloud(text, getProtectedPlugin().getLanguageConstant(lang));
     }
 }

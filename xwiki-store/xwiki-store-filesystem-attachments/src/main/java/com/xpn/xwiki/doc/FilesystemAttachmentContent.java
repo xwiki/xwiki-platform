@@ -107,7 +107,7 @@ public class FilesystemAttachmentContent extends XWikiAttachmentContent
         final class LockingFileInputStream extends FileInputStream
         {
             /** The lock to lock while reading the file. */
-            private final Lock lock;
+            private Lock lock;
 
             /**
              * The Constructor.
@@ -126,8 +126,12 @@ public class FilesystemAttachmentContent extends XWikiAttachmentContent
             /** {@inheritDoc} */
             public void close() throws IOException
             {
-                super.close();
-                this.lock.unlock();
+                // Make sure this only happens once.
+                if (this.lock != null) {
+                    super.close();
+                    this.lock.unlock();
+                    this.lock = null;
+                }
             }
         }
 

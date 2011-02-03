@@ -152,6 +152,11 @@ public class FileDeleteTransactionRunnable extends StartableTransactionRunnable<
      */
     protected void onComplete() throws IOException
     {
+        if (!this.preRunComplete) {
+            throw new IllegalStateException("Deleting file: " + this.toDelete.getAbsolutePath()
+                                            + " onPreRun has not been called, maybe the class was extended "
+                                            + "and it was overridden?");
+        }
         try {
             this.clearBackup();
         } finally {

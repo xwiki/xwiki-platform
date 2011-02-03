@@ -431,25 +431,12 @@ public class FilesystemAttachmentStore implements XWikiAttachmentStoreInterface
         {
             new FileDeleteTransactionRunnable(attachFile, tempFile, lock).runIn(this);
 
-            this.attachment = attachment;
-            this.updateDocument = updateDocument;
-            this.context = context;
-        }
-
-        /**
-         * {@inheritDoc}
-         *
-         * @see TransactionRunnable#onPreRun()
-         */
-        public void onPreRun() throws Exception
-        {
             // If the store supports deleting in the same transaction then do it.
-            final AttachmentVersioningStore avs =
-                this.context.getWiki().getAttachmentVersioningStore();
+            final AttachmentVersioningStore avs = context.getWiki().getAttachmentVersioningStore();
 
             if (avs instanceof FilesystemAttachmentVersioningStore) {
                 final FilesystemAttachmentVersioningStore favs = (FilesystemAttachmentVersioningStore) avs;
-                favs.getArchiveDeleteRunnable(this.attachment.getAttachment_archive()).runIn(this);
+                favs.getArchiveDeleteRunnable(attachment.getAttachment_archive()).runIn(this);
             } else {
                 new TransactionRunnable<HibernateTransaction>() {
                     protected void onRun() throws XWikiException
@@ -459,7 +446,9 @@ public class FilesystemAttachmentStore implements XWikiAttachmentStoreInterface
                 } .runIn(this);
             }
 
-            super.onPreRun();
+            this.context = context;
+            this.attachment = attachment;
+            this.updateDocument = updateDocument;
         }
 
         /**
@@ -488,11 +477,13 @@ public class FilesystemAttachmentStore implements XWikiAttachmentStoreInterface
                         break;
                     }
                 }
-                context.getWiki().getStore().saveXWikiDoc(attachment.getDoc(), context, false);
+                this.context.getWiki().getStore().saveXWikiDoc(this.attachment.getDoc(),
+                                                               this.context,
+                                                               false);
             }
 
             // Delete the attachment metadata.
-            session.delete(attachment);
+            session.delete(this.attachment);
         }
     }
 }

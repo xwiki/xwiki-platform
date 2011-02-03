@@ -52,6 +52,9 @@ public class TransactionRunnable<T>
      */
     private TransactionRunnable<T> parent;
 
+    /** If true then this runnable has already started and nothing else may be runIn it. */
+    private boolean hasPreRun;
+
     /**
      * Run this TransactionRunnable inside of a "parent" runnable.
      * This runnable will not be pre-run until after the parent is pre-run and this will not be
@@ -106,6 +109,10 @@ public class TransactionRunnable<T>
             throw new IllegalStateException("This TransactionRunnable is already scheduled to run inside "
                                             + this.parent.toString() + " and cannot be run in "
                                             + parentRunnable.toString() + " too.");
+        }
+        if (parentRunnable.hasPreRun) {
+            throw new IllegalStateException("This TransactionRunnable cannot be runIn() " + parentRunnable
+                                            + " because it has already started 'the ship has set sail'");
         }
         parentRunnable.assertNoLoop(this);
 
@@ -250,7 +257,9 @@ public class TransactionRunnable<T>
         final ListIterator<TransactionRunnable> runPathIterator = this.getRunPath().listIterator();
         try {
             while (runPathIterator.hasNext()) {
-                runPathIterator.next().onPreRun();
+                final TransactionRunnable tr = runPathIterator.next();
+                tr.hasPreRun = true;
+                tr.onPreRun();
             }
         } catch (Throwable t) {
             final List<Throwable> errors = new ArrayList<Throwable>();

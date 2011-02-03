@@ -2,7 +2,6 @@ package com.xpn.xwiki.plugin.autotag;
 
 import java.util.Map;
 import java.util.Set;
-import java.util.Iterator;
 
 public class TagCloud
 {
@@ -10,27 +9,27 @@ public class TagCloud
 
     private String text;
 
-    private Map countedWordMap;
+    private Set<Tag> tags;
 
-    private Map stemmedWordMap;
+    private Map<String, Integer> countedWordMap;
 
-    private Map stemmedWordFreqMap;
+    private Map<String, Map<String, Integer>> stemmedWordMap;
 
-    public Set getTags()
+    private Map<String, Integer> stemmedWordFreqMap;
+
+    public Set<Tag> getTags()
     {
-        return tags;
+        return this.tags;
     }
 
-    public void setTags(Set tags)
+    public void setTags(Set<Tag> tags)
     {
         this.tags = tags;
     }
 
-    private Set tags;
-
     public String getText()
     {
-        return text;
+        return this.text;
     }
 
     public void setText(String text)
@@ -40,7 +39,7 @@ public class TagCloud
 
     public String[] getWordList()
     {
-        return wordList;
+        return this.wordList;
     }
 
     public void setWordList(String[] wordList)
@@ -48,43 +47,42 @@ public class TagCloud
         this.wordList = wordList;
     }
 
-    public Map getCountedWordMap()
+    public Map<String, Integer> getCountedWordMap()
     {
-        return countedWordMap;
+        return this.countedWordMap;
     }
 
-    public void setCountedWordMap(Map countedWordMap)
+    public void setCountedWordMap(Map<String, Integer> countedWordMap)
     {
         this.countedWordMap = countedWordMap;
     }
 
-    public Map getStemmedWordMap()
+    public Map<String, Map<String, Integer>> getStemmedWordMap()
     {
-        return stemmedWordMap;
+        return this.stemmedWordMap;
     }
 
-    public void setStemmedWordMap(Map stemmedWordMap)
+    public void setStemmedWordMap(Map<String, Map<String, Integer>> stemmedWordMap)
     {
         this.stemmedWordMap = stemmedWordMap;
     }
 
-    public Map getStemmedWordFreqMap()
+    public Map<String, Integer> getStemmedWordFreqMap()
     {
-        return stemmedWordFreqMap;
+        return this.stemmedWordFreqMap;
     }
 
-    public void setStemmedWordFreqMap(Map stemmedWordFreqMap)
+    public void setStemmedWordFreqMap(Map<String, Integer> stemmedWordFreqMap)
     {
         this.stemmedWordFreqMap = stemmedWordFreqMap;
     }
 
     public String getHtml()
     {
-        StringBuffer strb = new StringBuffer();
-        Iterator it = tags.iterator();
-        while (it.hasNext()) {
-            strb.append(((Tag) it.next()).getHtml());
+        StringBuilder result = new StringBuilder();
+        for (Tag t : this.tags) {
+            result.append(t.getHtml());
         }
-        return strb.toString();
+        return result.toString();
     }
 }

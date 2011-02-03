@@ -1,8 +1,7 @@
 package com.xpn.xwiki.plugin.autotag;
 
-public class Tag implements Comparable
+public class Tag implements Comparable<Tag>
 {
-
     String name;
 
     long size;
@@ -11,18 +10,15 @@ public class Tag implements Comparable
     {
         this.size = tagSize;
         this.name = tagName;
-
     }
 
-    public int compareTo(Object o)
+    public int compareTo(Tag o)
     {
-        if (o instanceof Tag)
-            return -((Tag) o).name.compareTo(name);
-        return 0;
+        return -o.name.compareTo(this.name);
     }
 
     public String getHtml()
     {
-        return "<a class=\"f" + size + "\">" + name + "</a> ";
+        return "<a class=\"f" + this.size + "\">" + this.name + "</a> ";
     }
 }

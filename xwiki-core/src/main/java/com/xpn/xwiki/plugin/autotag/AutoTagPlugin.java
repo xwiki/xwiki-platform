@@ -1,11 +1,18 @@
 package com.xpn.xwiki.plugin.autotag;
 
-import com.xpn.xwiki.plugin.XWikiDefaultPlugin;
-import com.xpn.xwiki.plugin.XWikiPluginInterface;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.SortedSet;
+import java.util.TreeSet;
+
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.api.Api;
-
-import java.util.*;
+import com.xpn.xwiki.plugin.XWikiDefaultPlugin;
+import com.xpn.xwiki.plugin.XWikiPluginInterface;
 
 public class AutoTagPlugin extends XWikiDefaultPlugin implements XWikiPluginInterface
 {
@@ -13,7 +20,7 @@ public class AutoTagPlugin extends XWikiDefaultPlugin implements XWikiPluginInte
 
     public static final int LANG_ENGLISH = 1;
 
-    public static String name = "autotag";
+    public static final String NAME = "autotag";
 
     public final static String[] FRENCH_STOP_WORDS =
         {"a", "afin", "ai", "ainsi", "apr\u00e8s", "attendu", "au", "aujourd", "auquel", "aussi",
@@ -40,20 +47,20 @@ public class AutoTagPlugin extends XWikiDefaultPlugin implements XWikiPluginInte
         "toutes", "tu", "un", "une", "va", "vers", "voici", "voil\u00e0", "vos", "votre", "vous",
         "vu", "v\u00f4tre", "v\u00f4tres", "y", "\u00e0", "\u00e7a", "\u00e8s", "\u00e9t\u00e9",
         "\u00eatre", "\u00f4", "avez", "parce", "suis"};
-    
+
     public final static String[] ENGLISH_STOP_WORDS =
-        {"the", "of", "and", "a", "to", "in", "is", "you", "that", "it", "he", "was", "for", "on", 
-        "are", "as", "with", "his", "they", "I", "at", "be", "this", "have", "from", "or", "one", 
+        {"the", "of", "and", "a", "to", "in", "is", "you", "that", "it", "he", "was", "for", "on",
+        "are", "as", "with", "his", "they", "I", "at", "be", "this", "have", "from", "or", "one",
         "had", "by", "but", "not", "what", "all", "were", "we", "when", "your", "can", "said",
-        "there", "use", "an", "each", "which", "she", "do", "how", "their", "if", "will", "up", 
-        "other", "about", "out", "many", "then", "them", "these", "so", "some", "her", "would", 
-        "make", "like", "him", "into", "time", "has", "look", "two", "more", "go", "see", "no", 
-        "way", "could", "my", "than", "first", "been", "call", "who", "its", "now", "find", "long", 
-        "down", "day", "did", "get", "come", "may"};    
+        "there", "use", "an", "each", "which", "she", "do", "how", "their", "if", "will", "up",
+        "other", "about", "out", "many", "then", "them", "these", "so", "some", "her", "would",
+        "make", "like", "him", "into", "time", "has", "look", "two", "more", "go", "see", "no",
+        "way", "could", "my", "than", "first", "been", "call", "who", "its", "now", "find", "long",
+        "down", "day", "did", "get", "come", "may"};
 
-    List ignoreList = new ArrayList();
+    List<String> ignoreList = new ArrayList<String>();
 
-    List dontignoreList = null;
+    List<String> dontignoreList = null;
 
     int maxTag = 100;
 
@@ -67,6 +74,7 @@ public class AutoTagPlugin extends XWikiDefaultPlugin implements XWikiPluginInte
         init(context);
     }
 
+    @Override
     public void init(XWikiContext context)
     {
         super.init(context);
@@ -77,11 +85,13 @@ public class AutoTagPlugin extends XWikiDefaultPlugin implements XWikiPluginInte
      * 
      * @return plugin name
      */
+    @Override
     public String getName()
     {
-        return name;
+        return NAME;
     }
 
+    @Override
     public Api getPluginApi(XWikiPluginInterface plugin, XWikiContext context)
     {
         return new AutoTagPluginAPI((AutoTagPlugin) plugin, context);
@@ -106,33 +116,27 @@ public class AutoTagPlugin extends XWikiDefaultPlugin implements XWikiPluginInte
         return tagcloud;
     }
 
-    private Set calculateTags(TagCloud tagcloud)
+    private Set<Tag> calculateTags(TagCloud tagcloud)
     {
-        Map stemmedWords = tagcloud.getStemmedWordMap();
-        Map stemmedWordFreqMap = new HashMap();
-
-        Iterator it = stemmedWords.keySet().iterator();
+        Map<String, Map<String, Integer>> stemmedWords = tagcloud.getStemmedWordMap();
+        Map<String, Integer> stemmedWordFreqMap = new HashMap<String, Integer>();
 
         // we calculate the frequency of each word
-        while (it.hasNext()) {
-            Integer totalFreq = new Integer(0);
+        for (Map.Entry<String, Map<String, Integer>> stemmedWord : stemmedWords.entrySet()) {
+            Integer totalFreq = Integer.valueOf(0);
             String leadWord = "";
-            Integer leadFreq = new Integer(0);
+            Integer leadFreq = Integer.valueOf(0);
 
-            String stemmedWord = (String) it.next();
-            Map wordMap = (Map) stemmedWords.get(stemmedWord);
+            Map<String, Integer> wordMap = stemmedWord.getValue();
 
-            Iterator itWordMap = wordMap.keySet().iterator();
-            while (itWordMap.hasNext()) {
-                String word = (String) itWordMap.next();
+            for (Map.Entry<String, Integer> word : wordMap.entrySet()) {
+                Integer freq = word.getValue();
 
-                Integer freq = ((Integer) wordMap.get(word));
-
-                totalFreq = new Integer(freq.intValue() + totalFreq.intValue());
+                totalFreq = Integer.valueOf(freq.intValue() + totalFreq.intValue());
 
                 if (freq.intValue() > leadFreq.intValue()) {
-                    leadFreq = ((Integer) wordMap.get(word));
-                    leadWord = word;
+                    leadFreq = word.getValue();
+                    leadWord = word.getKey();
                 }
             }
             stemmedWordFreqMap.put(leadWord, totalFreq);
@@ -140,34 +144,31 @@ public class AutoTagPlugin extends XWikiDefaultPlugin implements XWikiPluginInte
         tagcloud.setStemmedWordFreqMap(stemmedWordFreqMap);
 
         // we order the list by the value to select the most frequent tags
-        LinkedHashMap orderedMap = sortMap(stemmedWordFreqMap);
+        LinkedHashMap<String, Integer> orderedMap = sortMap(stemmedWordFreqMap);
 
-        Object[] keyset = orderedMap.keySet().toArray();
+        String[] keyset = (String[]) orderedMap.keySet().toArray();
 
-        LinkedHashMap tagMap = new LinkedHashMap();
+        LinkedHashMap<String, Integer> tagMap = new LinkedHashMap<String, Integer>();
 
-        for (int i = 0, pos = keyset.length - 1; i < keyset.length && i < maxTag; i++, pos--) {
+        for (int i = 0, pos = keyset.length - 1; i < keyset.length && i < this.maxTag; i++, pos--) {
             tagMap.put(keyset[pos], orderedMap.get(keyset[pos]));
         }
 
-        Object[] freqs = tagMap.values().toArray();
+        Integer[] freqs = (Integer[]) tagMap.values().toArray();
 
-        Integer maxFreq = (Integer) freqs[0];
-        Integer minFreq = (Integer) freqs[freqs.length - 1];
+        Integer maxFreq = freqs[0];
+        Integer minFreq = freqs[freqs.length - 1];
 
-        Integer ftot = new Integer(0);
+        Integer ftot = Integer.valueOf(0);
 
-        for (int i = 0; i < freqs.length; i++)
-            ftot = new Integer(((Integer) freqs[i]).intValue() + ftot.intValue());
+        for (int i = 0; i < freqs.length; i++) {
+            ftot = Integer.valueOf(freqs[i].intValue() + ftot.intValue());
+        }
 
-        it = sortSet(tagMap.keySet()).iterator();
-        SortedSet tagSet = new TreeSet();
+        SortedSet<Tag> tagSet = new TreeSet<Tag>();
 
-        while (it.hasNext()) {
-            String tagName = (String) it.next();
-            long size =
-                getTagSize(((Integer) tagMap.get(tagName)).intValue(), maxFreq.intValue(),
-                    minFreq.intValue(), ftot.intValue());
+        for (String tagName : sortSet(tagMap.keySet())) {
+            long size = getTagSize(tagMap.get(tagName), maxFreq, minFreq, ftot);
             Tag tag = new Tag(tagName, size);
             tagSet.add(tag);
         }
@@ -177,7 +178,7 @@ public class AutoTagPlugin extends XWikiDefaultPlugin implements XWikiPluginInte
 
     private long getTagSize(double freq, double fmax, double fmin, double ftot)
     {
-        int fontrange = maxTagSize - minTagSize;
+        int fontrange = this.maxTagSize - this.minTagSize;
 
         // tweak this if all the words seem too similar in size or extremely different
         // rely on the cumulative by x% (0 = 0%, 1 = 100%)
@@ -188,80 +189,71 @@ public class AutoTagPlugin extends XWikiDefaultPlugin implements XWikiPluginInte
         double px = freq / ftot * sumpx;
 
         // sizes based on word's frequency deviation from max/min frequencies
-        px +=
-            Math.pow((freq - fmin) / (1 > fmax - fmin ? 1 : fmax - fmin), 0.8)
-                * (fontrange * (1 - cuml_importance));
-        double res = maxTagSize < px + minTagSize ? maxTagSize : px + minTagSize;
+        px += Math.pow((freq - fmin) / (1 > fmax - fmin ? 1 : fmax - fmin), 0.8) * (fontrange * (1 - cuml_importance));
+        double res = this.maxTagSize < px + this.minTagSize ? this.maxTagSize : px + this.minTagSize;
         return Math.round(res);
     }
 
-    public static SortedSet sortSet(Set oSet)
+    public static <T extends Comparable<T>> SortedSet<T> sortSet(Set<T> oSet)
     {
-        SortedSet set = new TreeSet();
-
-        Iterator it = oSet.iterator();
-        while (it.hasNext()) {
-            set.add(it.next());
-        }
-        return set;
+        return new TreeSet<T>(oSet);
     }
 
-    public static LinkedHashMap sortMap(Map hmap)
+    public static <K, V> LinkedHashMap<K, V> sortMap(Map<K, V> hmap)
     {
-        LinkedHashMap map = new LinkedHashMap();
+        LinkedHashMap<K, V> map = new LinkedHashMap<K, V>();
 
-        List mapKeys = new ArrayList(hmap.keySet());
-        List mapValues = new ArrayList(hmap.values());
+        List<K> mapKeys = new ArrayList<K>(hmap.keySet());
+        List<V> mapValues = new ArrayList<V>(hmap.values());
 
-        // hmap.clear();
-
-        TreeSet sortedSet = new TreeSet(mapValues);
-        Object[] sortedArray = sortedSet.toArray();
+        TreeSet<V> sortedSet = new TreeSet<V>(mapValues);
+        @SuppressWarnings("unchecked")
+        V[] sortedArray = (V[]) sortedSet.toArray();
 
         for (int i = 0; i < sortedArray.length; i++) {
             for (int j = 0; j < mapValues.size(); j++) {
-                if (mapValues.get(j).equals(sortedArray[i]))
+                if (mapValues.get(j).equals(sortedArray[i])) {
                     map.put(mapKeys.get(j), sortedArray[i]);
+                }
             }
         }
         return map;
     }
 
-    private Map clearStopWords(TagCloud tagcloud, int lang)
+    private Map<String, Integer> clearStopWords(TagCloud tagcloud, int lang)
     {
-        Map words = tagcloud.getCountedWordMap();
+        Map<String, Integer> words = tagcloud.getCountedWordMap();
         String[] stopWordsArray = new String[0];
-        switch(lang) {
+        switch (lang) {
             case LANG_ENGLISH:
                 stopWordsArray = ENGLISH_STOP_WORDS;
                 break;
             case LANG_FRENCH:
                 stopWordsArray = FRENCH_STOP_WORDS;
                 break;
-            default: 
-                //nothing
+            default:
+                // nothing
                 break;
         }
         for (int i = 0; i < stopWordsArray.length; i++) {
             words.remove(stopWordsArray[i]);
         }
 
-        Iterator wit = words.keySet().iterator();
-        while (wit.hasNext()) {
-            String word = (String) wit.next();
+        for (String word : words.keySet()) {
             if (word.indexOf("<") >= 0 || word.indexOf(">") >= 0 || word.indexOf("=") >= 0
                 || word.indexOf("\"") >= 0 || word.indexOf("/") >= 0
-                || word.indexOf("\u0093") >= 0)
-                if (!ignoreList.contains(word))
-                    ignoreList.add(word);
+                || word.indexOf("\u0093") >= 0) {
+                if (!this.ignoreList.contains(word)) {
+                    this.ignoreList.add(word);
+                }
+            }
         }
 
-        if (ignoreList != null) {
-            Iterator it = ignoreList.iterator();
-            while (it.hasNext()) {
-                String word = (String) it.next();
-                if (dontignoreList == null || !dontignoreList.contains(word))
+        if (this.ignoreList != null) {
+            for (String word : this.ignoreList) {
+                if (this.dontignoreList == null || !this.dontignoreList.contains(word)) {
                     words.remove(word);
+                }
             }
         }
 
@@ -269,39 +261,39 @@ public class AutoTagPlugin extends XWikiDefaultPlugin implements XWikiPluginInte
         return words;
     }
 
-    private Map countWords(TagCloud tagcloud)
+    private Map<String, Integer> countWords(TagCloud tagcloud)
     {
         String[] words = tagcloud.getWordList();
-        Map wordsCnt = new HashMap();
+        Map<String, Integer> wordsCnt = new HashMap<String, Integer>();
 
         for (int i = 0; i < words.length; i++) {
             String word = words[i];
             if (!wordsCnt.containsKey(word)) {
-                wordsCnt.put(word, new Integer(0));
+                wordsCnt.put(word, Integer.valueOf(0));
             }
-            wordsCnt.put(word, new Integer(((Integer) wordsCnt.get(word)).intValue() + 1));
+            wordsCnt.put(word, Integer.valueOf((wordsCnt.get(word)).intValue() + 1));
         }
         tagcloud.setCountedWordMap(wordsCnt);
         return wordsCnt;
     }
 
-    private Map stemmer(TagCloud tagcloud, int lang)
+    private Map<String, Map<String, Integer>> stemmer(TagCloud tagcloud, int lang)
     {
-        Map words = tagcloud.getCountedWordMap();
+        Map<String, Integer> words = tagcloud.getCountedWordMap();
         FrenchStemmer stemmer;
-        Map stemmedWordMap = new HashMap();
+        Map<String, Map<String, Integer>> stemmedWordMap = new HashMap<String, Map<String, Integer>>();
 
         stemmer = new FrenchStemmer();
 
-        Iterator it = words.keySet().iterator();
-        while (it.hasNext()) {
-            String word = (String) it.next();
-            if (word.length() <= 2)
+        for (String word : words.keySet()) {
+            if (word.length() <= 2) {
                 continue;
+            }
             String stemmedWord = stemmer.stem(word);
-            if (!stemmedWordMap.containsKey(stemmedWord))
-                stemmedWordMap.put(stemmedWord, new HashMap());
-            ((Map) stemmedWordMap.get(stemmedWord)).put(word, words.get(word));
+            if (!stemmedWordMap.containsKey(stemmedWord)) {
+                stemmedWordMap.put(stemmedWord, new HashMap<String, Integer>());
+            }
+            stemmedWordMap.get(stemmedWord).put(word, words.get(word));
         }
         tagcloud.setStemmedWordMap(stemmedWordMap);
         return stemmedWordMap;
@@ -350,12 +342,13 @@ public class AutoTagPlugin extends XWikiDefaultPlugin implements XWikiPluginInte
         tagcloud.setWordList(words);
         return words;
     }
-    
-    public int getLanguageConstant(String lang) {
+
+    public int getLanguageConstant(String lang)
+    {
         if (lang.trim().toLowerCase().equals("fr")) {
             return AutoTagPlugin.LANG_FRENCH;
-        }        
-        //default english
+        }
+        // default english
         return AutoTagPlugin.LANG_ENGLISH;
     }
 }

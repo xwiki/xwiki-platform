@@ -27,12 +27,12 @@ public class FrenchStemmer
     /**
      * Buffer for the terms while stemming them.
      */
-    private StringBuffer sb = new StringBuffer();
+    private StringBuilder sb = new StringBuilder();
 
     /**
      * A temporary buffer, used to reconstruct R2
      */
-    private StringBuffer tb = new StringBuffer();
+    private StringBuilder tb = new StringBuilder();
 
     /**
      * Region R0 is equal to the whole buffer
@@ -40,21 +40,21 @@ public class FrenchStemmer
     private String R0;
 
     /**
-     * Region RV "If the word begins with two vowels, RV is the region after the third letter,
-     * otherwise the region after the first vowel not at the beginning of the word, or the end of
-     * the word if these positions cannot be found."
+     * Region RV "If the word begins with two vowels, RV is the region after the third letter, otherwise the region
+     * after the first vowel not at the beginning of the word, or the end of the word if these positions cannot be
+     * found."
      */
     private String RV;
 
     /**
-     * Region R1 "R1 is the region after the first non-vowel following a vowel or is the null region
-     * at the end of the word if there is no such non-vowel"
+     * Region R1 "R1 is the region after the first non-vowel following a vowel or is the null region at the end of the
+     * word if there is no such non-vowel"
      */
     private String R1;
 
     /**
-     * Region R2 "R2 is the region after the first non-vowel in R1 following a vowel or is the null
-     * region at the end of the word if there is no such non-vowel"
+     * Region R2 "R2 is the region after the first non-vowel in R1 following a vowel or is the null region at the end of
+     * the word if there is no such non-vowel"
      */
     private String R2;
 
@@ -84,37 +84,39 @@ public class FrenchStemmer
         term = term.toLowerCase();
 
         // Reset the StringBuffer.
-        sb.delete(0, sb.length());
-        sb.insert(0, term);
+        this.sb.delete(0, this.sb.length());
+        this.sb.insert(0, term);
 
         // reset the booleans
-        modified = false;
-        suite = false;
+        this.modified = false;
+        this.suite = false;
 
-        sb = treatVowels(sb);
+        this.sb = treatVowels(this.sb);
 
         setStrings();
 
         step1();
 
-        if (!modified || suite) {
-            if (RV != null) {
-                suite = step2a();
-                if (!suite)
+        if (!this.modified || this.suite) {
+            if (this.RV != null) {
+                this.suite = step2a();
+                if (!this.suite) {
                     step2b();
+                }
             }
         }
 
-        if (modified || suite)
+        if (this.modified || this.suite) {
             step3();
-        else
+        } else {
             step4();
+        }
 
         step5();
 
         step6();
 
-        return sb.toString();
+        return this.sb.toString();
     }
 
     /**
@@ -124,15 +126,16 @@ public class FrenchStemmer
     private void setStrings()
     {
         // set the strings
-        R0 = sb.toString();
-        RV = retrieveRV(sb);
-        R1 = retrieveR(sb);
-        if (R1 != null) {
-            tb.delete(0, tb.length());
-            tb.insert(0, R1);
-            R2 = retrieveR(tb);
-        } else
-            R2 = null;
+        this.R0 = this.sb.toString();
+        this.RV = retrieveRV(this.sb);
+        this.R1 = retrieveR(this.sb);
+        if (this.R1 != null) {
+            this.tb.delete(0, this.tb.length());
+            this.tb.insert(0, this.R1);
+            this.R2 = retrieveR(this.tb);
+        } else {
+            this.R2 = null;
+        }
     }
 
     /**
@@ -143,61 +146,64 @@ public class FrenchStemmer
     {
         String[] suffix =
             {"ances", "iqUes", "ismes", "ables", "istes", "ance", "iqUe", "isme", "able", "iste"};
-        deleteFrom(R2, suffix);
+        deleteFrom(this.R2, suffix);
 
-        replaceFrom(R2, new String[] {"logies", "logie"}, "log");
-        replaceFrom(R2, new String[] {"usions", "utions", "usion", "ution"}, "u");
-        replaceFrom(R2, new String[] {"ences", "ence"}, "ent");
+        replaceFrom(this.R2, new String[] {"logies", "logie"}, "log");
+        replaceFrom(this.R2, new String[] {"usions", "utions", "usion", "ution"}, "u");
+        replaceFrom(this.R2, new String[] {"ences", "ence"}, "ent");
 
         String[] search = {"atrices", "ateurs", "ations", "atrice", "ateur", "ation"};
-        deleteButSuffixFromElseReplace(R2, search, "ic", true, R0, "iqU");
+        deleteButSuffixFromElseReplace(this.R2, search, "ic", true, this.R0, "iqU");
 
-        deleteButSuffixFromElseReplace(R2, new String[] {"ements", "ement"}, "eus", false, R0,
+        deleteButSuffixFromElseReplace(this.R2, new String[] {"ements", "ement"}, "eus", false, this.R0,
             "eux");
-        deleteButSuffixFrom(R2, new String[] {"ements", "ement"}, "ativ", false);
-        deleteButSuffixFrom(R2, new String[] {"ements", "ement"}, "iv", false);
-        deleteButSuffixFrom(R2, new String[] {"ements", "ement"}, "abl", false);
-        deleteButSuffixFrom(R2, new String[] {"ements", "ement"}, "iqU", false);
+        deleteButSuffixFrom(this.R2, new String[] {"ements", "ement"}, "ativ", false);
+        deleteButSuffixFrom(this.R2, new String[] {"ements", "ement"}, "iv", false);
+        deleteButSuffixFrom(this.R2, new String[] {"ements", "ement"}, "abl", false);
+        deleteButSuffixFrom(this.R2, new String[] {"ements", "ement"}, "iqU", false);
 
-        deleteFromIfTestVowelBeforeIn(R1, new String[] {"issements", "issement"}, false, R0);
-        deleteFrom(RV, new String[] {"ements", "ement"});
+        deleteFromIfTestVowelBeforeIn(this.R1, new String[] {"issements", "issement"}, false, this.R0);
+        deleteFrom(this.RV, new String[] {"ements", "ement"});
 
-        deleteButSuffixFromElseReplace(R2, new String[] {"it\u00e9s", "it\u00e9"}, "abil", false,
-            R0, "abl");
-        deleteButSuffixFromElseReplace(R2, new String[] {"it\u00e9s", "it\u00e9"}, "ic", false,
-            R0, "iqU");
-        deleteButSuffixFrom(R2, new String[] {"it\u00e9s", "it\u00e9"}, "iv", true);
+        deleteButSuffixFromElseReplace(this.R2, new String[] {"it\u00e9s", "it\u00e9"}, "abil", false,
+            this.R0, "abl");
+        deleteButSuffixFromElseReplace(this.R2, new String[] {"it\u00e9s", "it\u00e9"}, "ic", false,
+            this.R0, "iqU");
+        deleteButSuffixFrom(this.R2, new String[] {"it\u00e9s", "it\u00e9"}, "iv", true);
 
         String[] autre = {"ifs", "ives", "if", "ive"};
-        deleteButSuffixFromElseReplace(R2, autre, "icat", false, R0, "iqU");
-        deleteButSuffixFromElseReplace(R2, autre, "at", true, R2, "iqU");
+        deleteButSuffixFromElseReplace(this.R2, autre, "icat", false, this.R0, "iqU");
+        deleteButSuffixFromElseReplace(this.R2, autre, "at", true, this.R2, "iqU");
 
-        replaceFrom(R0, new String[] {"eaux"}, "eau");
+        replaceFrom(this.R0, new String[] {"eaux"}, "eau");
 
-        replaceFrom(R1, new String[] {"aux"}, "al");
+        replaceFrom(this.R1, new String[] {"aux"}, "al");
 
-        deleteButSuffixFromElseReplace(R2, new String[] {"euses", "euse"}, "", true, R1, "eux");
+        deleteButSuffixFromElseReplace(this.R2, new String[] {"euses", "euse"}, "", true, this.R1, "eux");
 
-        deleteFrom(R2, new String[] {"eux"});
+        deleteFrom(this.R2, new String[] {"eux"});
 
         // if one of the next steps is performed, we will need to perform step2a
         boolean temp = false;
-        temp = replaceFrom(RV, new String[] {"amment"}, "ant");
-        if (temp == true)
-            suite = true;
-        temp = replaceFrom(RV, new String[] {"emment"}, "ent");
-        if (temp == true)
-            suite = true;
-        temp = deleteFromIfTestVowelBeforeIn(RV, new String[] {"ments", "ment"}, true, RV);
-        if (temp == true)
-            suite = true;
+        temp = replaceFrom(this.RV, new String[] {"amment"}, "ant");
+        if (temp == true) {
+            this.suite = true;
+        }
+        temp = replaceFrom(this.RV, new String[] {"emment"}, "ent");
+        if (temp == true) {
+            this.suite = true;
+        }
+        temp = deleteFromIfTestVowelBeforeIn(this.RV, new String[] {"ments", "ment"}, true, this.RV);
+        if (temp == true) {
+            this.suite = true;
+        }
 
     }
 
     /**
      * Second step (A) of the Porter Algorithmn<br>
-     * Will be performed if nothing changed from the first step or changed were done in the amment,
-     * emment, ments or ment suffixes<br>
+     * Will be performed if nothing changed from the first step or changed were done in the amment, emment, ments or
+     * ment suffixes<br>
      * refer to http://snowball.sourceforge.net/french/stemmer.html for an explanation
      * 
      * @return boolean - true if something changed in the StringBuffer
@@ -210,7 +216,7 @@ public class FrenchStemmer
             "issantes", "issante", "issants", "issant", "issait", "issais", "issions", "issons",
             "issiez", "issez", "issent", "isses", "isse", "ir", "is", "\u00eet", "it", "ies",
             "ie", "i"};
-        return deleteFromIfTestVowelBeforeIn(RV, search, false, RV);
+        return deleteFromIfTestVowelBeforeIn(this.RV, search, false, this.RV);
     }
 
     /**
@@ -224,15 +230,15 @@ public class FrenchStemmer
             {"eraIent", "erais", "erait", "erai", "eras", "erions", "eriez", "erons", "eront",
             "erez", "\u00e8rent", "era", "\u00e9es", "iez", "\u00e9e", "\u00e9s", "er", "ez",
             "\u00e9"};
-        deleteFrom(RV, suffix);
+        deleteFrom(this.RV, suffix);
 
         String[] search =
             {"assions", "assiez", "assent", "asses", "asse", "aIent", "antes", "aIent", "Aient",
             "ante", "\u00e2mes", "\u00e2tes", "ants", "ant", "ait", "a\u00eet", "ais", "Ait",
             "A\u00eet", "Ais", "\u00e2t", "as", "ai", "Ai", "a"};
-        deleteButSuffixFrom(RV, search, "e", true);
+        deleteButSuffixFrom(this.RV, search, "e", true);
 
-        deleteFrom(R2, new String[] {"ions"});
+        deleteFrom(this.R2, new String[] {"ions"});
     }
 
     /**
@@ -241,13 +247,13 @@ public class FrenchStemmer
      */
     private void step3()
     {
-        if (sb.length() > 0) {
-            char ch = sb.charAt(sb.length() - 1);
+        if (this.sb.length() > 0) {
+            char ch = this.sb.charAt(this.sb.length() - 1);
             if (ch == 'Y') {
-                sb.setCharAt(sb.length() - 1, 'i');
+                this.sb.setCharAt(this.sb.length() - 1, 'i');
                 setStrings();
             } else if (ch == '\u00E7') {
-                sb.setCharAt(sb.length() - 1, 'c');
+                this.sb.setCharAt(this.sb.length() - 1, 'c');
                 setStrings();
             }
         }
@@ -259,23 +265,24 @@ public class FrenchStemmer
      */
     private void step4()
     {
-        if (sb.length() > 1) {
-            char ch = sb.charAt(sb.length() - 1);
+        if (this.sb.length() > 1) {
+            char ch = this.sb.charAt(this.sb.length() - 1);
             if (ch == 's') {
-                char b = sb.charAt(sb.length() - 2);
+                char b = this.sb.charAt(this.sb.length() - 2);
                 if (b != 'a' && b != 'i' && b != 'o' && b != 'u' && b != '\u00E8' && b != 's') {
-                    sb.delete(sb.length() - 1, sb.length());
+                    this.sb.delete(this.sb.length() - 1, this.sb.length());
                     setStrings();
                 }
             }
         }
-        boolean found = deleteFromIfPrecededIn(R2, new String[] {"ion"}, RV, "s");
-        if (!found)
-            found = deleteFromIfPrecededIn(R2, new String[] {"ion"}, RV, "t");
+        boolean found = deleteFromIfPrecededIn(this.R2, new String[] {"ion"}, this.RV, "s");
+        if (!found) {
+            found = deleteFromIfPrecededIn(this.R2, new String[] {"ion"}, this.RV, "t");
+        }
 
-        replaceFrom(RV, new String[] {"I\u00e8re", "i\u00e8re", "Ier", "ier"}, "i");
-        deleteFrom(RV, new String[] {"e"});
-        deleteFromIfPrecededIn(RV, new String[] {"\u00eb"}, R0, "gu");
+        replaceFrom(this.RV, new String[] {"I\u00e8re", "i\u00e8re", "Ier", "ier"}, "i");
+        deleteFrom(this.RV, new String[] {"e"});
+        deleteFromIfPrecededIn(this.RV, new String[] {"\u00eb"}, this.R0, "gu");
     }
 
     /**
@@ -284,10 +291,10 @@ public class FrenchStemmer
      */
     private void step5()
     {
-        if (R0 != null) {
-            if (R0.endsWith("enn") || R0.endsWith("onn") || R0.endsWith("ett")
-                || R0.endsWith("ell") || R0.endsWith("eill")) {
-                sb.delete(sb.length() - 1, sb.length());
+        if (this.R0 != null) {
+            if (this.R0.endsWith("enn") || this.R0.endsWith("onn") || this.R0.endsWith("ett")
+                || this.R0.endsWith("ell") || this.R0.endsWith("eill")) {
+                this.sb.delete(this.sb.length() - 1, this.sb.length());
                 setStrings();
             }
         }
@@ -299,12 +306,12 @@ public class FrenchStemmer
      */
     private void step6()
     {
-        if (R0 != null && R0.length() > 0) {
+        if (this.R0 != null && this.R0.length() > 0) {
             boolean seenVowel = false;
             boolean seenConson = false;
             int pos = -1;
-            for (int i = R0.length() - 1; i > -1; i--) {
-                char ch = R0.charAt(i);
+            for (int i = this.R0.length() - 1; i > -1; i--) {
+                char ch = this.R0.charAt(i);
                 if (isVowel(ch)) {
                     if (!seenVowel) {
                         if (ch == '\u00E9') {
@@ -314,14 +321,16 @@ public class FrenchStemmer
                     }
                     seenVowel = true;
                 } else {
-                    if (seenVowel)
+                    if (seenVowel) {
                         break;
-                    else
+                    } else {
                         seenConson = true;
+                    }
                 }
             }
-            if (pos > -1 && seenConson && !seenVowel)
-                sb.setCharAt(pos, 'e');
+            if (pos > -1 && seenConson && !seenVowel) {
+                this.sb.setCharAt(pos, 'e');
+            }
         }
     }
 
@@ -342,7 +351,7 @@ public class FrenchStemmer
             for (int i = 0; i < search.length; i++) {
                 if (source.endsWith(search[i])) {
                     if (from != null && from.endsWith(prefix + search[i])) {
-                        sb.delete(sb.length() - search[i].length(), sb.length());
+                        this.sb.delete(this.sb.length() - search[i].length(), this.sb.length());
                         found = true;
                         setStrings();
                         break;
@@ -370,10 +379,10 @@ public class FrenchStemmer
             for (int i = 0; i < search.length; i++) {
                 if (source.endsWith(search[i])) {
                     if ((search[i].length() + 1) <= from.length()) {
-                        boolean test = isVowel(sb.charAt(sb.length() - (search[i].length() + 1)));
+                        boolean test = isVowel(this.sb.charAt(this.sb.length() - (search[i].length() + 1)));
                         if (test == vowel) {
-                            sb.delete(sb.length() - search[i].length(), sb.length());
-                            modified = true;
+                            this.sb.delete(this.sb.length() - search[i].length(), this.sb.length());
+                            this.modified = true;
                             found = true;
                             setStrings();
                             break;
@@ -399,13 +408,13 @@ public class FrenchStemmer
         if (source != null) {
             for (int i = 0; i < search.length; i++) {
                 if (source.endsWith(prefix + search[i])) {
-                    sb.delete(sb.length() - (prefix.length() + search[i].length()), sb.length());
-                    modified = true;
+                    this.sb.delete(this.sb.length() - (prefix.length() + search[i].length()), this.sb.length());
+                    this.modified = true;
                     setStrings();
                     break;
                 } else if (without && source.endsWith(search[i])) {
-                    sb.delete(sb.length() - search[i].length(), sb.length());
-                    modified = true;
+                    this.sb.delete(this.sb.length() - search[i].length(), this.sb.length());
+                    this.modified = true;
                     setStrings();
                     break;
                 }
@@ -429,19 +438,19 @@ public class FrenchStemmer
         if (source != null) {
             for (int i = 0; i < search.length; i++) {
                 if (source.endsWith(prefix + search[i])) {
-                    sb.delete(sb.length() - (prefix.length() + search[i].length()), sb.length());
-                    modified = true;
+                    this.sb.delete(this.sb.length() - (prefix.length() + search[i].length()), this.sb.length());
+                    this.modified = true;
                     setStrings();
                     break;
                 } else if (from != null && from.endsWith(prefix + search[i])) {
-                    sb.replace(sb.length() - (prefix.length() + search[i].length()), sb.length(),
+                    this.sb.replace(this.sb.length() - (prefix.length() + search[i].length()), this.sb.length(),
                         replace);
-                    modified = true;
+                    this.modified = true;
                     setStrings();
                     break;
                 } else if (without && source.endsWith(search[i])) {
-                    sb.delete(sb.length() - search[i].length(), sb.length());
-                    modified = true;
+                    this.sb.delete(this.sb.length() - search[i].length(), this.sb.length());
+                    this.modified = true;
                     setStrings();
                     break;
                 }
@@ -462,8 +471,8 @@ public class FrenchStemmer
         if (source != null) {
             for (int i = 0; i < search.length; i++) {
                 if (source.endsWith(search[i])) {
-                    sb.replace(sb.length() - search[i].length(), sb.length(), replace);
-                    modified = true;
+                    this.sb.replace(this.sb.length() - search[i].length(), this.sb.length(), replace);
+                    this.modified = true;
                     found = true;
                     setStrings();
                     break;
@@ -484,8 +493,8 @@ public class FrenchStemmer
         if (source != null) {
             for (int i = 0; i < suffix.length; i++) {
                 if (source.endsWith(suffix[i])) {
-                    sb.delete(sb.length() - suffix[i].length(), sb.length());
-                    modified = true;
+                    this.sb.delete(this.sb.length() - suffix[i].length(), this.sb.length());
+                    this.modified = true;
                     setStrings();
                     break;
                 }
@@ -528,13 +537,13 @@ public class FrenchStemmer
 
     /**
      * Retrieve the "R zone" (1 or 2 depending on the buffer) and return the corresponding string<br>
-     * "R is the region after the first non-vowel following a vowel or is the null region at the end
-     * of the word if there is no such non-vowel"<br>
+     * "R is the region after the first non-vowel following a vowel or is the null region at the end of the word if
+     * there is no such non-vowel"<br>
      * 
      * @param buffer java.lang.StringBuffer - the in buffer
      * @return java.lang.String - the resulting string
      */
-    private String retrieveR(StringBuffer buffer)
+    private String retrieveR(StringBuilder buffer)
     {
         int len = buffer.length();
         int pos = -1;
@@ -552,24 +561,25 @@ public class FrenchStemmer
                     break;
                 }
             }
-            if (consonne > -1 && (consonne + 1) < len)
+            if (consonne > -1 && (consonne + 1) < len) {
                 return buffer.substring(consonne + 1, len);
-            else
+            } else {
                 return null;
-        } else
+            }
+        } else {
             return null;
+        }
     }
 
     /**
      * Retrieve the "RV zone" from a buffer an return the corresponding string<br>
-     * "If the word begins with two vowels, RV is the region after the third letter, otherwise the
-     * region after the first vowel not at the beginning of the word, or the end of the word if
-     * these positions cannot be found."<br>
+     * "If the word begins with two vowels, RV is the region after the third letter, otherwise the region after the
+     * first vowel not at the beginning of the word, or the end of the word if these positions cannot be found."<br>
      * 
      * @param buffer java.lang.StringBuffer - the in buffer
      * @return java.lang.String - the resulting string
      */
-    private String retrieveRV(StringBuffer buffer)
+    private String retrieveRV(StringBuilder buffer)
     {
         int len = buffer.length();
         if (buffer.length() > 3) {
@@ -583,13 +593,15 @@ public class FrenchStemmer
                         break;
                     }
                 }
-                if (pos + 1 < len)
+                if (pos + 1 < len) {
                     return buffer.substring(pos + 1, len);
-                else
+                } else {
                     return null;
+                }
             }
-        } else
+        } else {
             return null;
+        }
     }
 
     /**
@@ -600,7 +612,7 @@ public class FrenchStemmer
      * @param buffer java.util.StringBuffer - the buffer to treat
      * @return java.util.StringBuffer - the treated buffer
      */
-    private StringBuffer treatVowels(StringBuffer buffer)
+    private StringBuilder treatVowels(StringBuilder buffer)
     {
         for (int c = 0; c < buffer.length(); c++) {
             char ch = buffer.charAt(c);
@@ -608,30 +620,36 @@ public class FrenchStemmer
             if (c == 0) // first char
             {
                 if (buffer.length() > 1) {
-                    if (ch == 'y' && isVowel(buffer.charAt(c + 1)))
+                    if (ch == 'y' && isVowel(buffer.charAt(c + 1))) {
                         buffer.setCharAt(c, 'Y');
+                    }
                 }
             } else if (c == buffer.length() - 1) // last char
             {
-                if (ch == 'u' && buffer.charAt(c - 1) == 'q')
+                if (ch == 'u' && buffer.charAt(c - 1) == 'q') {
                     buffer.setCharAt(c, 'U');
-                if (ch == 'y' && isVowel(buffer.charAt(c - 1)))
+                }
+                if (ch == 'y' && isVowel(buffer.charAt(c - 1))) {
                     buffer.setCharAt(c, 'Y');
+                }
             } else // other cases
             {
                 if (ch == 'u') {
-                    if (buffer.charAt(c - 1) == 'q')
+                    if (buffer.charAt(c - 1) == 'q') {
                         buffer.setCharAt(c, 'U');
-                    else if (isVowel(buffer.charAt(c - 1)) && isVowel(buffer.charAt(c + 1)))
+                    } else if (isVowel(buffer.charAt(c - 1)) && isVowel(buffer.charAt(c + 1))) {
                         buffer.setCharAt(c, 'U');
+                    }
                 }
                 if (ch == 'i') {
-                    if (isVowel(buffer.charAt(c - 1)) && isVowel(buffer.charAt(c + 1)))
+                    if (isVowel(buffer.charAt(c - 1)) && isVowel(buffer.charAt(c + 1))) {
                         buffer.setCharAt(c, 'I');
+                    }
                 }
                 if (ch == 'y') {
-                    if (isVowel(buffer.charAt(c - 1)) || isVowel(buffer.charAt(c + 1)))
+                    if (isVowel(buffer.charAt(c - 1)) || isVowel(buffer.charAt(c + 1))) {
                         buffer.setCharAt(c, 'Y');
+                    }
                 }
             }
         }

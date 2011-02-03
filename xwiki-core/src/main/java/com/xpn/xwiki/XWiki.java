@@ -200,12 +200,24 @@ import com.xpn.xwiki.web.includeservletasstring.IncludeServletAsString;
 
 public class XWiki implements XWikiDocChangeNotificationInterface, EventListener
 {
+    /** Name of the default wiki. */
+    public static final String DEFAULT_MAIN_WIKI = "xwiki";
+
+    /** Name of the default home space. */
+    public static final String DEFAULT_HOME_SPACE = "Main";
+
+    /** Name of the default system space. */
+    public static final String SYSTEM_SPACE = "XWiki";
+
+    /** Name of the default space homepage. */
+    public static final String DEFAULT_SPACE_HOMEPAGE = "WebHome";
+
     /** Logging helper object. */
     protected static final Log LOG = LogFactory.getLog(XWiki.class);
 
     /** Frequently used Document reference, the class which holds virtual wiki definitions. */
-    private static final DocumentReference VIRTUAL_WIKI_DEFINITION_CLASS_REFERENCE = new DocumentReference("xwiki",
-        "XWiki", "XWikiServerClass");
+    private static final DocumentReference VIRTUAL_WIKI_DEFINITION_CLASS_REFERENCE =
+        new DocumentReference(DEFAULT_MAIN_WIKI, SYSTEM_SPACE, "XWikiServerClass");
 
     /** XWiki configuration loaded from xwiki.cfg. */
     private XWikiConfig config;
@@ -378,7 +390,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface, EventListener
 
     public static XWiki getMainXWiki(XWikiContext context) throws XWikiException
     {
-        String xwikiname = "xwiki";
+        String xwikiname = DEFAULT_MAIN_WIKI;
         XWiki xwiki;
         XWikiEngineContext econtext = context.getEngineContext();
 
@@ -541,7 +553,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface, EventListener
             }
 
             wikiDefinition =
-                new DocumentReference("xwiki", "XWiki", "XWikiServer" + StringUtils.capitalize(servername));
+                new DocumentReference(DEFAULT_MAIN_WIKI, SYSTEM_SPACE, "XWikiServer" + StringUtils.capitalize(servername));
         }
 
         // Check if this wiki definition exists in the Database
@@ -1564,7 +1576,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface, EventListener
             String spaceFromFullname = fullname.substring(0, dotPosition);
             String name = fullname.substring(dotPosition + 1);
             if (name.equals("")) {
-                name = "WebHome";
+                name = getDefaultPage(context);
             }
             return getDocument(spaceFromFullname + "." + name, context);
         } else {
@@ -1897,7 +1909,8 @@ public class XWiki implements XWikiDocChangeNotificationInterface, EventListener
             XWikiDocument doc = getDocument(skin, context);
             if (!doc.isNew()) {
                 // Try parsing the object property
-                BaseObject object = doc.getXObject(new DocumentReference(context.getDatabase(), "XWiki", "XWikiSkins"));
+                BaseObject object =
+                    doc.getXObject(new DocumentReference(context.getDatabase(), SYSTEM_SPACE, "XWikiSkins"));
                 if (object != null) {
                     String content = object.getStringValue(template);
                     if (!StringUtils.isBlank(content)) {
@@ -2055,7 +2068,8 @@ public class XWiki implements XWikiDocChangeNotificationInterface, EventListener
             XWikiDocument doc = getDocument(skin, context);
             if (!doc.isNew()) {
                 // Look for an object property
-                BaseObject object = doc.getXObject(new DocumentReference(context.getDatabase(), "XWiki", "XWikiSkins"));
+                BaseObject object =
+                    doc.getXObject(new DocumentReference(context.getDatabase(), SYSTEM_SPACE, "XWikiSkins"));
                 if (object != null) {
                     String content = object.getStringValue(filename);
                     if (!StringUtils.isBlank(content)) {
@@ -2295,9 +2309,8 @@ public class XWiki implements XWikiDocChangeNotificationInterface, EventListener
     public String getXWikiPreference(String prefname, String fallback_param, String default_value, XWikiContext context)
     {
         try {
-            DocumentReference xwikiPreferencesReference =
-                new DocumentReference("XWikiPreferences", new SpaceReference("XWiki", new WikiReference(
-                    context.getDatabase())));
+            DocumentReference xwikiPreferencesReference = new DocumentReference("XWikiPreferences",
+                new SpaceReference(SYSTEM_SPACE, new WikiReference(context.getDatabase())));
             XWikiDocument doc = getDocument(xwikiPreferencesReference, context);
             // First we try to get a translated preference object
             BaseObject object =
@@ -2354,9 +2367,8 @@ public class XWiki implements XWikiDocChangeNotificationInterface, EventListener
                 XWikiDocument doc = getDocument(space + ".WebPreferences", context);
 
                 // First we try to get a translated preference object
-                DocumentReference xwikiPreferencesReference =
-                    new DocumentReference("XWikiPreferences", new SpaceReference("XWiki", new WikiReference(
-                        context.getDatabase())));
+                DocumentReference xwikiPreferencesReference = new DocumentReference("XWikiPreferences",
+                    new SpaceReference(SYSTEM_SPACE, new WikiReference(context.getDatabase())));
                 BaseObject object =
                     doc.getXObject(xwikiPreferencesReference, "default_language", context.getLanguage(), true);
                 String result = "";
@@ -3020,7 +3032,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface, EventListener
         XWikiDocument doc;
         boolean needsUpdate = false;
 
-        doc = getDocument(new DocumentReference(context.getDatabase(), "XWiki", "TagClass"), context);
+        doc = getDocument(new DocumentReference(context.getDatabase(), SYSTEM_SPACE, "TagClass"), context);
 
         BaseClass bclass = doc.getXClass();
         if (context.get("initdone") != null) {
@@ -3055,7 +3067,8 @@ public class XWiki implements XWikiDocChangeNotificationInterface, EventListener
      */
     public BaseClass getSheetClass(XWikiContext context) throws XWikiException
     {
-        XWikiDocument doc = getDocument(new DocumentReference(context.getDatabase(), "XWiki", "SheetClass"), context);
+        XWikiDocument doc =
+            getDocument(new DocumentReference(context.getDatabase(), SYSTEM_SPACE, "SheetClass"), context);
         boolean needsUpdate = doc.isNew();
 
         BaseClass bclass = doc.getXClass();
@@ -3093,7 +3106,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface, EventListener
         XWikiDocument doc;
         boolean needsUpdate = false;
 
-        doc = getDocument(new DocumentReference(context.getDatabase(), "XWiki", "XWikiUsers"), context);
+        doc = getDocument(new DocumentReference(context.getDatabase(), SYSTEM_SPACE, "XWikiUsers"), context);
 
         BaseClass bclass = doc.getXClass();
         if (context.get("initdone") != null) {
@@ -3146,7 +3159,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface, EventListener
         XWikiDocument doc;
         boolean needsUpdate = false;
 
-        doc = getDocument(new DocumentReference(context.getDatabase(), "XWiki", "GlobalRedirect"), context);
+        doc = getDocument(new DocumentReference(context.getDatabase(), SYSTEM_SPACE, "GlobalRedirect"), context);
 
         BaseClass bclass = doc.getXClass();
         if (context.get("initdone") != null) {
@@ -3177,7 +3190,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface, EventListener
         XWikiDocument doc;
         boolean needsUpdate = false;
 
-        doc = getDocument(new DocumentReference(context.getDatabase(), "XWiki", "XWikiPreferences"), context);
+        doc = getDocument(new DocumentReference(context.getDatabase(), SYSTEM_SPACE, "XWikiPreferences"), context);
 
         BaseClass bclass = doc.getXClass();
         if (context.get("initdone") != null) {
@@ -3322,7 +3335,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface, EventListener
         XWikiDocument template = null;
         boolean needsUpdate = false;
 
-        doc = getDocument(new DocumentReference(context.getDatabase(), "XWiki", "XWikiGroups"), context);
+        doc = getDocument(new DocumentReference(context.getDatabase(), SYSTEM_SPACE, "XWikiGroups"), context);
         BaseClass bclass = doc.getXClass();
         if (context.get("initdone") != null) {
             return bclass;
@@ -3336,7 +3349,8 @@ public class XWiki implements XWikiDocChangeNotificationInterface, EventListener
         }
 
         // Create the group template document and attach a XWiki.XWikiGroupClass object
-        template = getDocument(new DocumentReference(context.getDatabase(), "XWiki", "XWikiGroupTemplate"), context);
+        template =
+            getDocument(new DocumentReference(context.getDatabase(), SYSTEM_SPACE, "XWikiGroupTemplate"), context);
         if (template.isNew()) {
             if (!getDefaultDocumentSyntax().equalsIgnoreCase(XWikiDocument.XWIKI10_SYNTAXID)) {
                 template.setContent("{{include document=\"XWiki.XWikiGroupSheet\"/}}");
@@ -3361,7 +3375,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface, EventListener
         XWikiDocument doc;
         boolean needsUpdate = false;
 
-        doc = getDocument(new DocumentReference(context.getDatabase(), "XWiki", pagename), context);
+        doc = getDocument(new DocumentReference(context.getDatabase(), SYSTEM_SPACE, pagename), context);
         BaseClass bclass = doc.getXClass();
         if (context.get("initdone") != null) {
             return bclass;
@@ -3430,7 +3444,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface, EventListener
         XWikiDocument doc;
         boolean needsUpdate = false;
 
-        doc = getDocument(new DocumentReference(context.getDatabase(), "XWiki", "XWikiComments"), context);
+        doc = getDocument(new DocumentReference(context.getDatabase(), SYSTEM_SPACE, "XWikiComments"), context);
 
         BaseClass bclass = doc.getXClass();
         if (context.get("initdone") != null) {
@@ -3455,7 +3469,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface, EventListener
         XWikiDocument doc;
         boolean needsUpdate = false;
 
-        doc = getDocument(new DocumentReference(context.getDatabase(), "XWiki", "XWikiSkins"), context);
+        doc = getDocument(new DocumentReference(context.getDatabase(), SYSTEM_SPACE, "XWikiSkins"), context);
 
         BaseClass bclass = doc.getXClass();
         if (context.get("initdone") != null) {
@@ -4867,7 +4881,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface, EventListener
 
             String wikiServerPage = "XWikiServer" + wikiName.substring(0, 1).toUpperCase() + wikiName.substring(1);
             // Verify is server page already exist
-            XWikiDocument serverdoc = getDocument("XWiki", wikiServerPage, context);
+            XWikiDocument serverdoc = getDocument(SYSTEM_SPACE, wikiServerPage, context);
             if (serverdoc.isNew()) {
                 // clear entry in virtual wiki cache
                 this.virtualWikiMap.remove(wikiUrl);
@@ -6335,7 +6349,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface, EventListener
     {
         String defaultSpace = getXWikiPreference("defaultweb", "", context);
         if (StringUtils.isEmpty(defaultSpace)) {
-            return Param("xwiki.defaultweb", "Main");
+            return Param("xwiki.defaultweb", DEFAULT_HOME_SPACE);
         }
         return defaultSpace;
     }
@@ -6384,7 +6398,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface, EventListener
     {
         String defaultPage = getXWikiPreference("defaultpage", "", context);
         if (StringUtils.isEmpty(defaultPage)) {
-            return Param("xwiki.defaultpage", "WebHome");
+            return Param("xwiki.defaultpage", DEFAULT_HOME_SPACE);
         }
         return defaultPage;
     }

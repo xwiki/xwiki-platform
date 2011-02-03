@@ -7567,9 +7567,8 @@ public class XWikiDocument implements DocumentModelBridge
      */
     public DocumentReference resolveClassReference(String documentName)
     {
-        DocumentReference defaultReference =
-            new DocumentReference(getDocumentReference().getWikiReference().getName(), "XWiki", getDocumentReference()
-                .getName());
+        DocumentReference defaultReference = new DocumentReference(getDocumentReference().getWikiReference().getName(),
+            XWiki.SYSTEM_SPACE, getDocumentReference().getName());
         return this.explicitDocumentReferenceResolver.resolve(documentName, defaultReference);
     }
 
@@ -7578,9 +7577,8 @@ public class XWikiDocument implements DocumentModelBridge
      */
     private DocumentReference resolveClassReference(EntityReference reference)
     {
-        DocumentReference defaultReference =
-            new DocumentReference(getDocumentReference().getWikiReference().getName(), "XWiki", getDocumentReference()
-                .getName());
+        DocumentReference defaultReference = new DocumentReference(getDocumentReference().getWikiReference().getName(),
+            XWiki.SYSTEM_SPACE, getDocumentReference().getName());
         return this.explicitReferenceDocumentReferenceResolver.resolve(reference, defaultReference);
     }
 

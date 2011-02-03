@@ -1271,9 +1271,8 @@ public class XWiki extends Api
             if (hasProgrammingRights()) {
                 registerRight = true;
             } else {
-                registerRight =
-                    this.xwiki.getRightService().hasAccessLevel("register", getXWikiContext().getUser(),
-                        "XWiki.XWikiPreferences", getXWikiContext());
+                registerRight = this.xwiki.getRightService().hasAccessLevel("register", getXWikiContext().getUser(),
+                    "XWiki.XWikiPreferences", getXWikiContext());
             }
 
             if (registerRight) {
@@ -2343,9 +2342,8 @@ public class XWiki extends Api
     public boolean renamePage(Document doc, String newFullName)
     {
         try {
-            if (this.xwiki.exists(newFullName, getXWikiContext())
-                && !this.xwiki.getRightService().hasAccessLevel("delete", getXWikiContext().getUser(), newFullName,
-                    getXWikiContext())) {
+            if (this.xwiki.exists(newFullName, getXWikiContext()) && !this.xwiki.getRightService().hasAccessLevel(
+                "delete", getXWikiContext().getUser(), newFullName, getXWikiContext())) {
                 return false;
             }
             if (this.xwiki.getRightService().hasAccessLevel("edit", getXWikiContext().getUser(), doc.getFullName(),

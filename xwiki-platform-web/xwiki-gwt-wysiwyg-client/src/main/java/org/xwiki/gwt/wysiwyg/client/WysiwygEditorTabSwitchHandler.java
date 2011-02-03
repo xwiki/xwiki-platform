@@ -54,16 +54,6 @@ public class WysiwygEditorTabSwitchHandler implements SelectionHandler<Integer>,
     private static final Command SUBMIT = new Command("submit");
 
     /**
-     * The command used to enable or disable the rich text area.
-     */
-    private static final Command ENABLE = new Command("enable");
-
-    /**
-     * The command used to notify all the rich text area listeners when its content has been reset.
-     */
-    private static final Command RESET = new Command("reset");
-
-    /**
      * The underlying WYSIWYG editor instance.
      */
     private final WysiwygEditor editor;
@@ -284,7 +274,7 @@ public class WysiwygEditorTabSwitchHandler implements SelectionHandler<Integer>,
     private void enableSourceTab()
     {
         // Disable the rich text area to avoid submitting its content.
-        editor.getRichTextEditor().getTextArea().getCommandManager().execute(ENABLE, false);
+        editor.getRichTextEditor().getTextArea().getCommandManager().execute(Command.ENABLE, false);
 
         // Enable the source editor in order to be able to submit its content.
         editor.getPlainTextEditor().getTextArea().setEnabled(true);
@@ -443,7 +433,7 @@ public class WysiwygEditorTabSwitchHandler implements SelectionHandler<Integer>,
     private void onSwitchToWysiwygSuccess()
     {
         // Reset the content of the rich text area.
-        editor.getRichTextEditor().getTextArea().getCommandManager().execute(RESET);
+        editor.getRichTextEditor().getTextArea().getCommandManager().execute(Command.RESET);
         // If we are still on the WYSIWYG tab..
         if (editor.getSelectedTab() == WysiwygEditorConfig.WYSIWYG_TAB_INDEX) {
             enableWysiwygTab();
@@ -462,10 +452,12 @@ public class WysiwygEditorTabSwitchHandler implements SelectionHandler<Integer>,
             plainTextEditor.getTextArea().setEnabled(false);
         }
 
+        // Enable the rich text area in order to be able to edit and submit its content.
+        // We have to enable the rich text area before initializing the rich text editor because some of the editing
+        // features are loaded only when the rich text area is enabled.
+        editor.getRichTextEditor().getTextArea().getCommandManager().execute(Command.ENABLE, true);
         // Initialize the rich text editor if this is the first time we switch to WYSIWYG tab.
         editor.maybeInitializeRichTextEditor();
-        // Enable the rich text area in order to be able to edit and submit its content.
-        editor.getRichTextEditor().getTextArea().getCommandManager().execute(ENABLE, true);
         // Restore the DOM selection before executing the commands.
         restoreDOMSelection();
         // Store the initial value of the rich text area in case it is submitted without gaining focus.

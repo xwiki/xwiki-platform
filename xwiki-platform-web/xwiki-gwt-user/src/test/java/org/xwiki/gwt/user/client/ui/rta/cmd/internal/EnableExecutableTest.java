@@ -17,11 +17,10 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.gwt.wysiwyg.client.plugin.submit.exec;
+package org.xwiki.gwt.user.client.ui.rta.cmd.internal;
 
+import org.xwiki.gwt.user.client.ui.rta.RichTextAreaTestCase;
 import org.xwiki.gwt.user.client.ui.rta.cmd.Command;
-import org.xwiki.gwt.wysiwyg.client.RichTextAreaTestCase;
-
 
 /**
  * Unit test for {@link EnableExecutable}.
@@ -31,11 +30,6 @@ import org.xwiki.gwt.wysiwyg.client.RichTextAreaTestCase;
 public class EnableExecutableTest extends RichTextAreaTestCase
 {
     /**
-     * The command used to enable or disable the rich text area.
-     */
-    private static final Command ENABLE = new Command("enable");
-
-    /**
      * {@inheritDoc}
      * 
      * @see RichTextAreaTestCase#gwtSetUp()
@@ -44,7 +38,7 @@ public class EnableExecutableTest extends RichTextAreaTestCase
     {
         super.gwtSetUp();
 
-        rta.getCommandManager().registerCommand(ENABLE, new EnableExecutable(rta));
+        rta.getCommandManager().registerCommand(Command.ENABLE, new EnableExecutable(rta));
     }
 
     /**
@@ -56,14 +50,14 @@ public class EnableExecutableTest extends RichTextAreaTestCase
         {
             public void execute()
             {
-                assertTrue(rta.getCommandManager().isSupported(ENABLE));
-                assertTrue(rta.getCommandManager().isEnabled(ENABLE));
+                assertTrue(rta.getCommandManager().isSupported(Command.ENABLE));
+                assertTrue(rta.getCommandManager().isEnabled(Command.ENABLE));
 
-                assertTrue(rta.getCommandManager().isExecuted(ENABLE));
-                assertTrue(rta.getCommandManager().execute(ENABLE, false));
-                assertFalse(rta.getCommandManager().isExecuted(ENABLE));
-                assertTrue(rta.getCommandManager().execute(ENABLE, true));
-                assertTrue(rta.getCommandManager().isExecuted(ENABLE));
+                assertTrue(rta.getCommandManager().isExecuted(Command.ENABLE));
+                assertTrue(rta.getCommandManager().execute(Command.ENABLE, false));
+                assertFalse(rta.getCommandManager().isExecuted(Command.ENABLE));
+                assertTrue(rta.getCommandManager().execute(Command.ENABLE, true));
+                assertTrue(rta.getCommandManager().isExecuted(Command.ENABLE));
             }
         });
     }

@@ -32,23 +32,6 @@
   <define-linker name="StandardsMode" class="org.xwiki.gwt.core.linker.StandardsModeIFrameLinker" />
   <add-linker name="StandardsMode" />
 
-  <!-- ColorPlugin -->
-  <replace-with class="org.xwiki.gwt.wysiwyg.client.plugin.color.ColorPlugin">
-    <when-type-is class="org.xwiki.gwt.wysiwyg.client.plugin.color.ColorPlugin" />
-  </replace-with>
-
-  <replace-with class="org.xwiki.gwt.wysiwyg.client.plugin.color.MozillaColorPlugin">
-    <when-type-is class="org.xwiki.gwt.wysiwyg.client.plugin.color.ColorPlugin" />
-    <any>
-      <when-property-is name="user.agent" value="gecko1_8" />
-      <!--
-        Opera and Mozilla have the same behavior: "backcolor" command changes the background color of block level
-        elements while "hilitecolor" affects the in-line text selection.
-      -->
-      <when-property-is name="user.agent" value="opera" />
-    </any>
-  </replace-with>
-
   <!-- MacroDisplayer -->
   <replace-with class="org.xwiki.gwt.wysiwyg.client.plugin.macro.MacroDisplayer">
     <when-type-is class="org.xwiki.gwt.wysiwyg.client.plugin.macro.MacroDisplayer" />

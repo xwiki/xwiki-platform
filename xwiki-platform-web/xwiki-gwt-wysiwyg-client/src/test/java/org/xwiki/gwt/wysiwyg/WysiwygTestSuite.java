@@ -23,7 +23,7 @@ import junit.framework.Test;
 import junit.framework.TestSuite;
 
 import org.xwiki.gwt.wysiwyg.client.ToolBarControllerTest;
-import org.xwiki.gwt.wysiwyg.client.plugin.color.ColorPickerTest;
+import org.xwiki.gwt.wysiwyg.client.plugin.color.ColorConverterTest;
 import org.xwiki.gwt.wysiwyg.client.plugin.format.exec.FormatBlockExecutableTest;
 import org.xwiki.gwt.wysiwyg.client.plugin.format.exec.RemoveFormatExecutableTest;
 import org.xwiki.gwt.wysiwyg.client.plugin.history.HistoryTest;
@@ -45,7 +45,6 @@ import org.xwiki.gwt.wysiwyg.client.plugin.separator.exec.InsertHRExecutableTest
 import org.xwiki.gwt.wysiwyg.client.plugin.style.StyleDescriptorJSONParserTest;
 import org.xwiki.gwt.wysiwyg.client.plugin.style.exec.BlockStyleNameExecutableTest;
 import org.xwiki.gwt.wysiwyg.client.plugin.style.exec.InlineStyleNameExecutableTest;
-import org.xwiki.gwt.wysiwyg.client.plugin.submit.exec.EnableExecutableTest;
 import org.xwiki.gwt.wysiwyg.client.syntax.internal.DefaultSyntaxValidatorManagerTest;
 import org.xwiki.gwt.wysiwyg.client.syntax.internal.DefaultValidationRuleTest;
 import org.xwiki.gwt.wysiwyg.client.syntax.internal.DisablingRuleTest;
@@ -111,8 +110,7 @@ public class WysiwygTestSuite extends GWTTestSuite
         suite.addTestSuite(IndentExecutableTest.class);
         suite.addTestSuite(OutdentExecutableTest.class);
         suite.addTestSuite(ListBehaviorAdjusterTest.class);
-        suite.addTestSuite(ColorPickerTest.class);
-        suite.addTestSuite(EnableExecutableTest.class);
+        suite.addTestSuite(ColorConverterTest.class);
         suite.addTestSuite(LinePluginTest.class);
         suite.addTestSuite(StyleDescriptorJSONParserTest.class);
         suite.addTestSuite(BlockStyleNameExecutableTest.class);

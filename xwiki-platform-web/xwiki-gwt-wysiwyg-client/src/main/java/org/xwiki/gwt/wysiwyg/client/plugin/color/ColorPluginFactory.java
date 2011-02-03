@@ -22,8 +22,6 @@ package org.xwiki.gwt.wysiwyg.client.plugin.color;
 import org.xwiki.gwt.wysiwyg.client.plugin.Plugin;
 import org.xwiki.gwt.wysiwyg.client.plugin.internal.AbstractPluginFactory;
 
-import com.google.gwt.core.client.GWT;
-
 /**
  * Factory for {@link ColorPlugin}.
  * 
@@ -62,6 +60,6 @@ public final class ColorPluginFactory extends AbstractPluginFactory
      */
     public Plugin newInstance()
     {
-        return GWT.create(ColorPlugin.class);
+        return new ColorPlugin();
     }
 }

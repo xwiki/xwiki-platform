@@ -31,6 +31,11 @@ import com.google.gwt.user.client.ui.PopupPanel;
 public class ColorPicker extends PopupPanel implements SelectionHandler<String>
 {
     /**
+     * The object used to get the hex code for a given color.
+     */
+    private final ColorConverter converter = new ColorConverter();
+
+    /**
      * Creates a new color picker that uses the given color palette.
      * 
      * @param palette the color palette to be used by this color picker
@@ -81,54 +86,6 @@ public class ColorPicker extends PopupPanel implements SelectionHandler<String>
      */
     public void setColor(String color)
     {
-        getColorPalette().setSelectedColor(convertToHex(color));
-    }
-
-    /**
-     * Converts the specified color code to hex code (as in {@code #F0F0EE}). The following input formats are supported:
-     * <ul>
-     * <li>IE's decimal integer format: 8242323</li>
-     * <li>RGB CSS expression: {@code rgb(255,125,75)}</li>
-     * </ul>
-     * .
-     * 
-     * @param color a color code, in one of the supported formats
-     * @return the hex code of the specified color
-     */
-    public static String convertToHex(String color)
-    {
-        if (color == null) {
-            return null;
-        }
-        try {
-            // The color is a decimal integer (IE specific).
-            String hex = Integer.toHexString(Integer.parseInt(color));
-            char[] padding = new char[Math.max(0, 6 - hex.length())];
-            for (int i = 0; i < padding.length; i++) {
-                padding[i] = '0';
-            }
-            hex = String.valueOf(padding) + hex;
-            // We have to reverse the order of the channels because IE gives as BGR instead of RGB.
-            hex = '#' + hex.substring(4) + hex.substring(2, 4) + hex.substring(0, 2);
-            return hex.toUpperCase();
-        } catch (NumberFormatException e) {
-            String rgbRegExp = "^rgb\\s*\\(\\s*([0-9]+).*,\\s*([0-9]+).*,\\s*([0-9]+).*\\)$";
-            String[] rgb = color.toLowerCase().replaceAll(rgbRegExp, "$1,$2,$3").split(",");
-            if (rgb.length == 3) {
-                // The color is a RGB CSS expression.
-                StringBuffer hex = new StringBuffer("#");
-                for (int i = 0; i < rgb.length; i++) {
-                    String channel = Integer.toHexString(Integer.parseInt(rgb[i]));
-                    if (channel.length() == 1) {
-                        channel = '0' + channel;
-                    }
-                    hex.append(channel);
-                }
-                return hex.toString().toUpperCase();
-            } else {
-                // Either already hex color or unknown format. Leave it as it is.
-                return color;
-            }
-        }
+        getColorPalette().setSelectedColor(converter.convertToHex(color));
     }
 }

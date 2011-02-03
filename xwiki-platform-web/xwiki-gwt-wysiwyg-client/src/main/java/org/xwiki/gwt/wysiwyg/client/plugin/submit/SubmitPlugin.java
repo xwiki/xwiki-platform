@@ -22,6 +22,8 @@ package org.xwiki.gwt.wysiwyg.client.plugin.submit;
 import org.xwiki.gwt.dom.client.DOMUtils;
 import org.xwiki.gwt.dom.client.Element;
 import org.xwiki.gwt.dom.client.JavaScriptObject;
+import org.xwiki.gwt.user.client.ActionEvent;
+import org.xwiki.gwt.user.client.ActionHandler;
 import org.xwiki.gwt.user.client.Config;
 import org.xwiki.gwt.user.client.StringUtils;
 import org.xwiki.gwt.user.client.ui.HiddenConfig;
@@ -31,8 +33,6 @@ import org.xwiki.gwt.user.client.ui.rta.cmd.CommandListener;
 import org.xwiki.gwt.user.client.ui.rta.cmd.CommandManager;
 import org.xwiki.gwt.wysiwyg.client.plugin.internal.AbstractPlugin;
 import org.xwiki.gwt.wysiwyg.client.plugin.internal.StatelessUIExtension;
-import org.xwiki.gwt.wysiwyg.client.plugin.submit.exec.EnableExecutable;
-import org.xwiki.gwt.wysiwyg.client.plugin.submit.exec.ResetExecutable;
 import org.xwiki.gwt.wysiwyg.client.plugin.submit.exec.SubmitExecutable;
 
 import com.google.gwt.dom.client.Document;
@@ -47,7 +47,7 @@ import com.google.gwt.user.client.Window.ClosingHandler;
  * 
  * @version $Id$
  */
-public class SubmitPlugin extends AbstractPlugin implements BlurHandler, CommandListener, ClosingHandler
+public class SubmitPlugin extends AbstractPlugin implements BlurHandler, CommandListener, ClosingHandler, ActionHandler
 {
     /**
      * The name attribute, used by HTML form elements to pass data to the server when the form is submitted.
@@ -65,20 +65,14 @@ public class SubmitPlugin extends AbstractPlugin implements BlurHandler, Command
     private static final String DEFAULT_SYNTAX = "xhtml/1.0";
 
     /**
+     * The action fired when the rich text area finishes loading and all the plug-ins are initialized.
+     */
+    private static final String LOADED = "loaded";
+
+    /**
      * The command used to store the value of the rich text area before submitting the including form.
      */
     private static final Command SUBMIT = new Command("submit");
-
-    /**
-     * The command used to enable or disable the rich text area. Use this command to prevent the content of the rich
-     * text area to be submitted.
-     */
-    private static final Command ENABLE = new Command("enable");
-
-    /**
-     * The command used to reset the content of the rich text area.
-     */
-    private static final Command RESET = new Command("reset");
 
     /**
      * This flag tells the server that it needs to convert the editor output from HTML to the storage syntax before
@@ -119,8 +113,6 @@ public class SubmitPlugin extends AbstractPlugin implements BlurHandler, Command
 
         String hookId = getConfig().getParameter("hookId");
         getTextArea().getCommandManager().registerCommand(SUBMIT, new SubmitExecutable(textArea, hookId));
-        getTextArea().getCommandManager().registerCommand(ENABLE, new EnableExecutable(textArea));
-        getTextArea().getCommandManager().registerCommand(RESET, new ResetExecutable(textArea));
 
         if (getTextArea().getCommandManager().isSupported(SUBMIT)) {
             Element hook = (Element) Document.get().getElementById(hookId);
@@ -146,6 +138,9 @@ public class SubmitPlugin extends AbstractPlugin implements BlurHandler, Command
                 // Listen to submit event.
                 hookSubmitEvent(form);
             }
+
+            // Save the initial content of the rich text area, after all the plug-ins have been initialized.
+            saveRegistration(getTextArea().addActionHandler(LOADED, this));
 
             // Submit the content when the rich text area looses the focus or the user navigates away.
             saveRegistration(getTextArea().addBlurHandler(this));
@@ -254,8 +249,8 @@ public class SubmitPlugin extends AbstractPlugin implements BlurHandler, Command
      */
     public void onCommand(CommandManager sender, Command command, String param)
     {
-        if (hiddenConfig != null && sender == getTextArea().getCommandManager() && ENABLE.equals(command)) {
-            if (getTextArea().getCommandManager().isExecuted(ENABLE)) {
+        if (hiddenConfig != null && sender == getTextArea().getCommandManager() && Command.ENABLE.equals(command)) {
+            if (getTextArea().getCommandManager().isExecuted(Command.ENABLE)) {
                 hiddenConfig.addFlag(REQUIRES_HTML_CONVERSION);
             } else {
                 hiddenConfig.removeFlag(REQUIRES_HTML_CONVERSION);
@@ -274,4 +269,15 @@ public class SubmitPlugin extends AbstractPlugin implements BlurHandler, Command
         onSubmit();
     }
 
+    /**
+     * {@inheritDoc}
+     * 
+     * @see ActionHandler#onAction(ActionEvent)
+     */
+    public void onAction(ActionEvent event)
+    {
+        if (LOADED.equals(event.getActionName())) {
+            getTextArea().getCommandManager().execute(SUBMIT);
+        }
+    }
 }

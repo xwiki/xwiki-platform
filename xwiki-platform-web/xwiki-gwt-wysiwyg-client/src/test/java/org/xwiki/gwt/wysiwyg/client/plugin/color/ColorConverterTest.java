@@ -21,13 +21,12 @@ package org.xwiki.gwt.wysiwyg.client.plugin.color;
 
 import org.xwiki.gwt.wysiwyg.client.WysiwygTestCase;
 
-
 /**
  * Unit tests for {@link ColorPicker}.
  * 
  * @version $Id$
  */
-public class ColorPickerTest extends WysiwygTestCase
+public class ColorConverterTest extends WysiwygTestCase
 {
     /**
      * The array of hex color codes that are tested.
@@ -36,13 +35,18 @@ public class ColorPickerTest extends WysiwygTestCase
         new String[] {"#000000", "#FF0000", "#00FF00", "#0000FF", "#FFFFFF", "#C27BA0"};
 
     /**
+     * The object being tested.
+     */
+    private ColorConverter converter = new ColorConverter();
+
+    /**
      * Tests if a decimal integer (IE specific) is converted to hex.
      */
     public void testConvertDecimalIntegerToHex()
     {
         String[] decimals = new String[] {"0", "255", "65280", "16711680", "16777215", "10517442"};
         for (int i = 0; i < HEX_CODES.length; i++) {
-            assertEquals(HEX_CODES[i], ColorPicker.convertToHex(decimals[i]).toUpperCase());
+            assertEquals(HEX_CODES[i], converter.convertToHex(decimals[i]).toUpperCase());
         }
     }
 
@@ -51,11 +55,10 @@ public class ColorPickerTest extends WysiwygTestCase
      */
     public void testConvertRGBToHex()
     {
-        String[] rgbCodes =
-            new String[] {"rgb(0, 0, 0)", "rgb(255, 0, 0)", "rgb(0, 255, 0)", "rgb(0, 0, 255)", "rgb(255, 255, 255)",
-                "rgb(194, 123, 160)"};
+        String[] rgbCodes = new String[] {"rgb(0, 0, 0)", "rgb(255, 0, 0)", "rgb(0, 255, 0)",
+            "rgb(0, 0, 255)", "rgb(255, 255, 255)", "rgb(194, 123, 160)"};
         for (int i = 0; i < HEX_CODES.length; i++) {
-            assertEquals(HEX_CODES[i], ColorPicker.convertToHex(rgbCodes[i]).toUpperCase());
+            assertEquals(HEX_CODES[i], converter.convertToHex(rgbCodes[i]).toUpperCase());
         }
     }
 
@@ -65,16 +68,15 @@ public class ColorPickerTest extends WysiwygTestCase
     public void testConvertHexToHex()
     {
         String hex = "#F0F0EE";
-        assertEquals(hex, ColorPicker.convertToHex(hex));
+        assertEquals(hex, converter.convertToHex(hex));
     }
 
     /**
-     * Tests if a color name is left unchanged. Update this test when support for color names will be added.
+     * Tests if a color name properly converted to hex.
      */
     public void testConvertColorNameToHex()
     {
-        String colorName = "red";
-        assertEquals(colorName, ColorPicker.convertToHex(colorName));
+        assertEquals(HEX_CODES[1], converter.convertToHex("red"));
     }
 
     /**
@@ -82,6 +84,14 @@ public class ColorPickerTest extends WysiwygTestCase
      */
     public void testConvertNullToHex()
     {
-        assertNull(ColorPicker.convertToHex(null));
+        assertNull(converter.convertToHex(null));
+    }
+
+    /**
+     * Converter should return {@code null} for unknown formats.
+     */
+    public void testConvertUnknownToHex()
+    {
+        assertNull(converter.convertToHex("transparent"));
     }
 }

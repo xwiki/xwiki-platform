@@ -22,13 +22,13 @@ package org.xwiki.gwt.wysiwyg.client.plugin.color;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.xwiki.gwt.dom.client.Style;
 import org.xwiki.gwt.user.client.Config;
 import org.xwiki.gwt.user.client.ui.rta.RichTextArea;
 import org.xwiki.gwt.user.client.ui.rta.cmd.Command;
-import org.xwiki.gwt.user.client.ui.rta.cmd.Executable;
+import org.xwiki.gwt.user.client.ui.rta.cmd.internal.InlineStyleExecutable;
 import org.xwiki.gwt.wysiwyg.client.Images;
 import org.xwiki.gwt.wysiwyg.client.Strings;
-import org.xwiki.gwt.wysiwyg.client.plugin.color.exec.BackColorExecutable;
 import org.xwiki.gwt.wysiwyg.client.plugin.internal.AbstractPlugin;
 import org.xwiki.gwt.wysiwyg.client.plugin.internal.FocusWidgetUIExtension;
 
@@ -99,7 +99,10 @@ public class ColorPlugin extends AbstractPlugin implements ClickHandler, CloseHa
         super.init(textArea, config);
 
         // Register custom executables.
-        getTextArea().getCommandManager().registerCommand(Command.BACK_COLOR, getBackColorExecutable());
+        getTextArea().getCommandManager().registerCommand(Command.FORE_COLOR,
+            new InlineStyleExecutable(textArea, Style.COLOR));
+        getTextArea().getCommandManager().registerCommand(Command.BACK_COLOR,
+            new InlineStyleExecutable(textArea, Style.BACKGROUND_COLOR));
 
         addFeature("forecolor", Command.FORE_COLOR, Images.INSTANCE.foreColor(), Strings.INSTANCE.foreColor());
         addFeature("backcolor", Command.BACK_COLOR, Images.INSTANCE.backColor(), Strings.INSTANCE.backColor());
@@ -207,13 +210,5 @@ public class ColorPlugin extends AbstractPlugin implements ClickHandler, CloseHa
             saveRegistration(colorPicker.addCloseHandler(this));
         }
         return colorPicker;
-    }
-
-    /**
-     * @return the executable used to change the background color of the selected text
-     */
-    protected Executable getBackColorExecutable()
-    {
-        return new BackColorExecutable(getTextArea());
     }
 }

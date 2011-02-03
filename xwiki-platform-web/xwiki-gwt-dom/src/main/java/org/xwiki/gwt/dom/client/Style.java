@@ -44,11 +44,6 @@ public class Style extends com.google.gwt.dom.client.Style
     public static final String DISPLAY = "display";
 
     /**
-     * Sets the background color of an element.
-     */
-    public static final String BACKGROUND_COLOR = "backgroundColor";
-
-    /**
      * Sets the stack order of an element. An element with greater stack order is always in front of another element
      * with lower stack order.<br/>
      * Elements can have negative stack orders.<br/>
@@ -96,6 +91,19 @@ public class Style extends com.google.gwt.dom.client.Style
      * The font-size property sets the size of a font.
      */
     public static final Property FONT_SIZE = new Property("font-size", "fontSize", true, false, FontSize.MEDIUM);
+
+    /**
+     * The color property specifies the color of text.
+     */
+    public static final Property COLOR = new Property("color", true, false, "");
+
+    /**
+     * The background-color property sets the background color of an element.
+     * <p>
+     * The background of an element is the total size of the element, including padding and border (but not the margin).
+     */
+    public static final Property BACKGROUND_COLOR =
+        new Property("background-color", "backgroundColor", false, false, "transparent");
 
     /**
      * Sets the width of an element.

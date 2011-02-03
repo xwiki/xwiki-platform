@@ -51,8 +51,7 @@ public class DefaultHistory implements History, KeyDownHandler, PasteHandler, Co
      * The list of commands that should be ignored, meaning that they shouldn't generate history entries.
      */
     private static final List<Command> IGNORED_COMMANDS =
-        Arrays.asList(Command.UNDO, Command.REDO, new Command("submit"), new Command("update"), new Command("reset"),
-            new Command("enable"));
+        Arrays.asList(Command.UNDO, Command.REDO, new Command("submit"), Command.UPDATE, Command.RESET, Command.ENABLE);
 
     /**
      * The rich text area for which we record the history. Actions taken on this rich text area trigger the update of

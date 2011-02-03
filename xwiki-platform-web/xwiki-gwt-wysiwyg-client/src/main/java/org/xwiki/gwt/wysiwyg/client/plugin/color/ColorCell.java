@@ -35,9 +35,14 @@ public class ColorCell extends FlowPanel
     public static final String NORMAL_STYLE_NAME = "colorCell";
 
     /**
-     * The CSS class name used when the color cell is selected.
+     * The CSS class name used when a dark color is selected.
      */
-    public static final String SELECTED_STYLE_NAME = "colorCell-selected";
+    public static final String SELECTED_DARK_STYLE_NAME = "colorCell-selected-dark";
+
+    /**
+     * The CSS class name used when a light color is selected.
+     */
+    public static final String SELECTED_LIGHT_STYLE_NAME = "colorCell-selected-light";
 
     /**
      * The CSS class name used when the color cell is hovered.
@@ -48,6 +53,11 @@ public class ColorCell extends FlowPanel
      * This cell's color code.
      */
     private final String color;
+
+    /**
+     * The CSS class name used when the color cell is selected. It depends on the color brightness.
+     */
+    private final String selectedStyleName;
 
     /**
      * Flag indicating if this cell was clicked, thus selected.
@@ -64,6 +74,7 @@ public class ColorCell extends FlowPanel
         super();
 
         this.color = color;
+        selectedStyleName = getBrightness(color) < .5 ? SELECTED_DARK_STYLE_NAME : SELECTED_LIGHT_STYLE_NAME;
         getElement().getStyle().setBackgroundColor(color);
         addStyleName(NORMAL_STYLE_NAME);
 
@@ -95,12 +106,10 @@ public class ColorCell extends FlowPanel
     {
         this.selected = selected;
         if (selected) {
-            removeStyleName(NORMAL_STYLE_NAME);
             removeStyleName(HOVERED_STYLE_NAME);
-            addStyleName(SELECTED_STYLE_NAME);
+            addStyleName(selectedStyleName);
         } else {
-            removeStyleName(SELECTED_STYLE_NAME);
-            addStyleName(NORMAL_STYLE_NAME);
+            removeStyleName(selectedStyleName);
         }
     }
 
@@ -117,5 +126,19 @@ public class ColorCell extends FlowPanel
             removeStyleName(HOVERED_STYLE_NAME);
         }
         super.onBrowserEvent(event);
+    }
+
+    /**
+     * Computes the brightness of the given color.
+     * 
+     * @param color a HEX color code
+     * @return a value between 0 and 1, where 0 is darkest and 1 is brightest
+     */
+    private double getBrightness(String color)
+    {
+        int red = Integer.parseInt(color.substring(1, 3), 16);
+        int green = Integer.parseInt(color.substring(3, 5), 16);
+        int blue = Integer.parseInt(color.substring(5, 7), 16);
+        return (red / 255.0 * .30) + (green / 255.0 * .59) + (blue / 255.0 * .11);
     }
 }

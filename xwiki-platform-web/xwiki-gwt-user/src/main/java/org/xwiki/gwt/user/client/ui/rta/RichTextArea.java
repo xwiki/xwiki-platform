@@ -28,13 +28,9 @@ import org.xwiki.gwt.dom.client.PasteHandler;
 import org.xwiki.gwt.user.client.ActionEvent;
 import org.xwiki.gwt.user.client.ActionHandler;
 import org.xwiki.gwt.user.client.HasActionHandlers;
-import org.xwiki.gwt.user.client.ui.rta.cmd.Command;
 import org.xwiki.gwt.user.client.ui.rta.cmd.CommandManager;
 import org.xwiki.gwt.user.client.ui.rta.cmd.internal.DefaultCommandManager;
-import org.xwiki.gwt.user.client.ui.rta.cmd.internal.DefaultExecutable;
-import org.xwiki.gwt.user.client.ui.rta.cmd.internal.DeleteExecutable;
-import org.xwiki.gwt.user.client.ui.rta.cmd.internal.InsertHTMLExecutable;
-import org.xwiki.gwt.user.client.ui.rta.cmd.internal.UpdateExecutable;
+import org.xwiki.gwt.user.client.ui.rta.cmd.internal.DefaultCommandProvider;
 import org.xwiki.gwt.user.client.ui.rta.internal.BehaviorAdjuster;
 
 import com.google.gwt.core.client.GWT;
@@ -103,23 +99,7 @@ public class RichTextArea extends com.google.gwt.user.client.ui.RichTextArea imp
     public RichTextArea()
     {
         this(new DefaultCommandManager());
-
-        // Register default executables.
-        Command[] defaultCommands = new Command[] {Command.BACK_COLOR, Command.BOLD, Command.CREATE_LINK,
-            Command.FONT_NAME, Command.FONT_SIZE, Command.FORE_COLOR, Command.FORMAT_BLOCK, Command.INDENT,
-            Command.INSERT_HORIZONTAL_RULE, Command.INSERT_IMAGE, Command.INSERT_ORDERED_LIST, Command.INSERT_PARAGRAPH,
-            Command.INSERT_UNORDERED_LIST, Command.ITALIC, Command.JUSTIFY_CENTER, Command.JUSTIFY_FULL,
-            Command.JUSTIFY_LEFT, Command.JUSTIFY_RIGHT, Command.OUTDENT, Command.REDO, Command.REMOVE_FORMAT,
-            Command.STRIKE_THROUGH, Command.SUB_SCRIPT, Command.SUPER_SCRIPT, Command.TELETYPE, Command.UNDERLINE,
-            Command.UNDO, Command.UNLINK};
-        for (int i = 0; i < defaultCommands.length; i++) {
-            cm.registerCommand(defaultCommands[i], new DefaultExecutable(this, defaultCommands[i].toString()));
-        }
-
-        // Register custom executables.
-        cm.registerCommand(Command.DELETE, new DeleteExecutable(this));
-        cm.registerCommand(Command.INSERT_HTML, new InsertHTMLExecutable(this));
-        cm.registerCommand(new Command("update"), new UpdateExecutable());
+        new DefaultCommandProvider().provideTo(this);
     }
 
     /**

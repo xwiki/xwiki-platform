@@ -13,8 +13,8 @@
   border-top:1px solid #EFEFEF;
   height:21px;
   width:21px;
-  margin:0pt;
-  padding:0px;
+  margin:0;
+  padding:0;
   text-align:center;
   vertical-align:middle;
 }
@@ -22,8 +22,8 @@
 .xColorPalette .colorCell {
   height:15px;
   width:15px;
-  padding:0px;
-  margin:0px;
+  padding:0;
+  margin:0;
   border:3px solid white; 
 }
 
@@ -31,10 +31,13 @@
   border:3px solid #CCCCCC;
 }
 
-.xColorPalette .colorCell-selected {
-  height:15px;
-  width:15px;
-  padding:2px;
-  margin:0px;
-  border:1px solid white;
+.xColorPalette .colorCell-selected-dark, .xColorPalette .colorCell-selected-light {
+  background-position:center center;
+  background-repeat:no-repeat  
+}
+.xColorPalette .colorCell-selected-dark {
+  background-image:url("../images/checked-white.gif");
+}
+.xColorPalette .colorCell-selected-light {
+  background-image:url("../images/checked-black.gif");
 }

@@ -76,9 +76,7 @@ html>body .xToolbar .gwt-ToggleButton-down-disabled {
 .xToolbar .gwt-ListBox {
   background:#F0F0EE none repeat scroll 0% !important;
   border:2px inset white !important;
-  font-family:'MS Sans Serif',sans-serif,Verdana,Arial;
-  font-size:7pt !important;
-  font-weight:normal;
+  font-size:smaller;
   height: 20px;
   margin-top:3px;
   padding:0px !important;
@@ -86,7 +84,6 @@ html>body .xToolbar .gwt-ToggleButton-down-disabled {
 }
 
 .xToolbar .gwt-ListBox optgroup {
-  font-size:small;
   margin-top:6px;
 }
 
@@ -101,10 +98,10 @@ html>body .xToolbar .gwt-ToggleButton-down-disabled {
 }
 
 .xToolbar .xStyleNamePicker option {
-  padding-left: 20px;
+  padding-left: 17px;
   text-transform: capitalize;
 }
 
 .xToolbar .xStyleNamePicker .selected {
-  background:url(../images/checked.png) no-repeat scroll 2px center #E0E0E0;
+  background:url(../images/checked-black.gif) no-repeat scroll 2px center #E0E0E0;
 }

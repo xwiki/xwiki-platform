@@ -52,6 +52,11 @@ public class Command
     public static final Command DELETE = new Command("delete");
 
     /**
+     * Enables or disables the rich text area. When disabled the rich text area can't be edited nor submitted.
+     */
+    public static final Command ENABLE = new Command("enable");
+
+    /**
      * This command will set the font face for a selection or at the insertion point if there is no selection.<br/>
      * The given string is such as would be used in the "name" attribute of the font tag.
      */
@@ -168,6 +173,13 @@ public class Command
     public static final Command REMOVE_FORMAT = new Command("removeformat");
 
     /**
+     * Resets the content of the rich text area. It has an optional parameter that can be used to set the content of the
+     * rich text area. If the parameter is missing then this command only notifies the listeners that the content of the
+     * rich text area has changed.
+     */
+    public static final Command RESET = new Command("reset");
+
+    /**
      * If there is no selection, the insertion point will set strikethrough for subsequently typed characters.<br/>
      * If there is a selection and all of the characters are already striked, the strikethrough will be removed.
      * Otherwise, all selected characters will have a line drawn through them.
@@ -220,6 +232,11 @@ public class Command
      * the text will remain.
      */
     public static final Command UNLINK = new Command("unlink");
+
+    /**
+     * This command is used only to notify the command listeners that they need to update their state.
+     */
+    public static final Command UPDATE = new Command("update");
 
     /**
      * The name of the command. For predefined commands (supported by the built-in rich text editor, the one offered by

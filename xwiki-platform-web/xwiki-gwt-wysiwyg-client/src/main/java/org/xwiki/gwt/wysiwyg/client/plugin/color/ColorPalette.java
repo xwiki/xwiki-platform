@@ -134,7 +134,7 @@ public class ColorPalette extends Composite implements HasSelectionHandlers<Stri
             for (int i = 0; i < getColorGrid().getRowCount(); i++) {
                 for (int j = 0; j < getColorGrid().getColumnCount(); j++) {
                     ColorCell cell = (ColorCell) getColorGrid().getWidget(i, j);
-                    if (cell.getColor().equals(color)) {
+                    if (cell.getColor().equalsIgnoreCase(color)) {
                         setSelectedCell(cell);
                         return;
                     }

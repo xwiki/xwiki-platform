@@ -32,10 +32,6 @@
   <name>XWiki Platform - Web - GWT - User</name>
   <packaging>jar</packaging>
   <description>An extension of the GWT User package, providing improved widgets and additional utility classes.</description>
-  <properties>
-    <!-- Skip Clirr execution because public API has been changed. Remove this after 3.0 release. -->
-    <xwiki.clirr.skip>true</xwiki.clirr.skip>
-  </properties>
   <dependencies>
     <!-- GWT core dependencies -->
     <dependency>

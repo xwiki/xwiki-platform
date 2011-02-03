@@ -64,14 +64,14 @@ public class RichTextEditorController implements Updatable, MouseUpHandler, KeyU
         "submit line separator text valign justify list indent history format font color symbol table";
 
     /**
+     * The list of default extensions for the {@code rootUI} extension point.
+     */
+    public static final String DEFAULT_ROOT_UI_EXTENSIONS = "submit";
+
+    /**
      * The regular expression used to express the separator for tool bar and menu bar feature names in configuration.
      */
     private static final String WHITE_SPACE_SEPARATOR = "\\s+";
-
-    /**
-     * The command used to store the value of the rich text area before submitting the including form.
-     */
-    private static final Command SUBMIT = new Command("submit");
 
     /**
      * The object used to configure the editor and its plugins.
@@ -232,7 +232,6 @@ public class RichTextEditorController implements Updatable, MouseUpHandler, KeyU
             extendRootUI();
             fillMenu();
             toolBarController.fill(config, pluginManager);
-            initTextArea();
 
             richTextEditor.setLoading(false);
             ActionEvent.fire(getRichTextEditor().getTextArea(), "loaded");
@@ -255,7 +254,8 @@ public class RichTextEditorController implements Updatable, MouseUpHandler, KeyU
      */
     protected void extendRootUI()
     {
-        String[] rootExtensionNames = config.getParameter("rootUI", SUBMIT.toString()).split(WHITE_SPACE_SEPARATOR);
+        String[] rootExtensionNames =
+            config.getParameter("rootUI", DEFAULT_ROOT_UI_EXTENSIONS).split(WHITE_SPACE_SEPARATOR);
         for (int i = 0; i < rootExtensionNames.length; i++) {
             UIExtension rootExtension = pluginManager.getUIExtension("root", rootExtensionNames[i]);
             if (rootExtension != null) {
@@ -277,21 +277,6 @@ public class RichTextEditorController implements Updatable, MouseUpHandler, KeyU
                 richTextEditor.getMenu().addItem((MenuItem) uie.getUIObject(entries[i]));
             }
         }
-    }
-
-    /**
-     * Initializes the rich text area.
-     */
-    protected void initTextArea()
-    {
-        if (!richTextEditor.getTextArea().isEnabled()) {
-            // Enable the rich text area in order to be able to edit and submit its content, and notify the plug-ins.
-            richTextEditor.getTextArea().getCommandManager().execute(new Command("enable"), true);
-        }
-        // Focus the rich text area before executing the commands to ensure it has a proper selection.
-        richTextEditor.getTextArea().setFocus(true);
-        // Store the initial content of the rich text area.
-        richTextEditor.getTextArea().getCommandManager().execute(SUBMIT);
     }
 
     /**

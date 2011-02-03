@@ -4416,7 +4416,7 @@ public class XWikiDocument implements DocumentModelBridge
 
             DocumentReference currentDocumentReference = getDocumentReference();
             for (String name : list) {
-                int i1 = name.indexOf(">");
+                int i1 = name.indexOf('>');
                 if (i1 != -1) {
                     name = name.substring(i1 + 1);
                 }
@@ -4424,19 +4424,19 @@ public class XWikiDocument implements DocumentModelBridge
                 if (i1 != -1) {
                     name = name.substring(i1 + 4);
                 }
-                i1 = name.indexOf("#");
+                i1 = name.indexOf('#');
                 if (i1 != -1) {
                     name = name.substring(0, i1);
                 }
-                i1 = name.indexOf("?");
+                i1 = name.indexOf('?');
                 if (i1 != -1) {
                     name = name.substring(0, i1);
                 }
 
                 // Let's get rid of anything that's not a real link
-                if (name.trim().equals("") || (name.indexOf("$") != -1) || (name.indexOf("://") != -1)
-                    || (name.indexOf("\"") != -1) || (name.indexOf("\'") != -1) || (name.indexOf("..") != -1)
-                    || (name.indexOf(":") != -1) || (name.indexOf("=") != -1)) {
+                if (name.trim().equals("") || (name.indexOf('$') != -1) || (name.indexOf("://") != -1)
+                    || (name.indexOf('"') != -1) || (name.indexOf('\'') != -1) || (name.indexOf("..") != -1)
+                    || (name.indexOf(':') != -1) || (name.indexOf('=') != -1)) {
                     continue;
                 }
 
@@ -4444,14 +4444,14 @@ public class XWikiDocument implements DocumentModelBridge
                 String newname = StringUtils.replace(Util.noaccents(name), " ", "");
 
                 // If it is a local link let's add the space
-                if (newname.indexOf(".") == -1) {
+                if (newname.indexOf('.') == -1) {
                     newname = getSpace() + "." + name;
                 }
                 if (context.getWiki().exists(newname, context)) {
                     name = newname;
                 } else {
                     // If it is a local link let's add the space
-                    if (name.indexOf(".") == -1) {
+                    if (name.indexOf('.') == -1) {
                         name = getSpace() + "." + name;
                     }
                 }
@@ -4720,7 +4720,7 @@ public class XWikiDocument implements DocumentModelBridge
 
                 if (macroBlock.getId().equalsIgnoreCase("include")) {
                     String documentName = macroBlock.getParameters().get("document");
-                    if (documentName.indexOf(".") == -1) {
+                    if (documentName.indexOf('.') == -1) {
                         documentName = getSpace() + "." + documentName;
                     }
                     result.add(documentName);
@@ -4742,7 +4742,7 @@ public class XWikiDocument implements DocumentModelBridge
             List<String> list = context.getUtil().getUniqueMatches(content, pattern, 2);
             for (int i = 0; i < list.size(); i++) {
                 String name = list.get(i);
-                if (name.indexOf(".") == -1) {
+                if (name.indexOf('.') == -1) {
                     list.set(i, getSpace() + "." + name);
                 }
             }
@@ -4815,9 +4815,9 @@ public class XWikiDocument implements DocumentModelBridge
 
     public XWikiAttachment addAttachment(String fileName, byte[] data, XWikiContext context) throws XWikiException
     {
-        int i = fileName.indexOf("\\");
+        int i = fileName.indexOf('\\');
         if (i == -1) {
-            i = fileName.indexOf("/");
+            i = fileName.indexOf('/');
         }
 
         String filename = fileName.substring(i + 1);
@@ -6273,9 +6273,9 @@ public class XWikiDocument implements DocumentModelBridge
         while (it.hasNext()) {
             String name = (String) it.next();
             if (name.startsWith(start)) {
-                int pos = name.indexOf("_", start.length() + 1);
+                int pos = name.indexOf('_', start.length() + 1);
                 String prefix = name.substring(0, pos);
-                int num = Integer.decode(prefix.substring(prefix.lastIndexOf("_") + 1)).intValue();
+                int num = Integer.decode(prefix.substring(prefix.lastIndexOf('_') + 1)).intValue();
                 if (!objectsNumberDone.contains(Integer.valueOf(num))) {
                     objectsNumberDone.add(Integer.valueOf(num));
                     objects.add(addXObjectFromRequest(classReference, pref, num, context));
@@ -6463,9 +6463,9 @@ public class XWikiDocument implements DocumentModelBridge
         while (it.hasNext()) {
             String name = (String) it.next();
             if (name.startsWith(start)) {
-                int pos = name.indexOf("_", start.length() + 1);
+                int pos = name.indexOf('_', start.length() + 1);
                 String prefix = name.substring(0, pos);
-                int num = Integer.decode(prefix.substring(prefix.lastIndexOf("_") + 1)).intValue();
+                int num = Integer.decode(prefix.substring(prefix.lastIndexOf('_') + 1)).intValue();
                 if (!objectsNumberDone.contains(Integer.valueOf(num))) {
                     objectsNumberDone.add(Integer.valueOf(num));
                     objects.add(updateXObjectFromRequest(classReference, pref, num, context));

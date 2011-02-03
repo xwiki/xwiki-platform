@@ -553,7 +553,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface, EventListener
 
         // Set the wiki owner
         String wikiOwner = doc.getStringValue(VIRTUAL_WIKI_DEFINITION_CLASS_REFERENCE, "owner");
-        if (wikiOwner.indexOf(":") == -1) {
+        if (wikiOwner.indexOf(':') == -1) {
             wikiOwner = xwiki.getDatabase() + ":" + wikiOwner;
         }
         context.setWikiOwner(wikiOwner);
@@ -1124,7 +1124,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface, EventListener
                 }
 
                 wikiOwner = doc.getStringValue(VIRTUAL_WIKI_DEFINITION_CLASS_REFERENCE, "owner");
-                if (wikiOwner.indexOf(":") == -1) {
+                if (wikiOwner.indexOf(':') == -1) {
                     wikiOwner = context.getMainXWiki() + ":" + wikiOwner;
                 }
             } finally {
@@ -1559,7 +1559,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface, EventListener
     @Deprecated
     public XWikiDocument getDocument(String space, String fullname, XWikiContext context) throws XWikiException
     {
-        int dotPosition = fullname.lastIndexOf(".");
+        int dotPosition = fullname.lastIndexOf('.');
         if (dotPosition != -1) {
             String spaceFromFullname = fullname.substring(0, dotPosition);
             String name = fullname.substring(dotPosition + 1);
@@ -2152,7 +2152,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface, EventListener
             skin = getDefaultBaseSkin(context);
         }
         try {
-            if (skin.indexOf(".") != -1) {
+            if (skin.indexOf('.') != -1) {
                 if (!getRightService().hasAccessLevel("view", context.getUser(), skin, context)) {
                     LOG.debug("Cannot access configured skin due to access rights, using the default skin.");
                     skin = Param("xwiki.defaultskin", getDefaultBaseSkin(context));
@@ -3490,7 +3490,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface, EventListener
             XWikiRequest request = context.getRequest();
             // Get the user document
             String username = convertUsername(request.getParameter("xwikiname"), context);
-            if (username.indexOf(".") == -1) {
+            if (username.indexOf('.') == -1) {
                 username = "XWiki." + username;
             }
             XWikiDocument userDocument = getDocument(username, context);
@@ -4172,7 +4172,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface, EventListener
         }
 
         try {
-            int i0 = topic.indexOf(":");
+            int i0 = topic.indexOf(':');
             if (i0 != -1) {
                 incdatabase = topic.substring(0, i0);
                 database = context.getDatabase();
@@ -5729,7 +5729,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface, EventListener
 
     public String getDocName(String docname)
     {
-        return docname.substring(docname.indexOf(".") + 1);
+        return docname.substring(docname.indexOf('.') + 1);
     }
 
     public String getUserName(String user, XWikiContext context)
@@ -5815,7 +5815,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface, EventListener
         if (hasCentralizedAuthentication(context)) {
             return getUserName(user, null, true, context);
         } else {
-            return getUserName(user.substring(user.indexOf(":") + 1), null, true, context);
+            return getUserName(user.substring(user.indexOf(':') + 1), null, true, context);
         }
     }
 
@@ -5824,7 +5824,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface, EventListener
         if (hasCentralizedAuthentication(context)) {
             return getUserName(user, format, true, context);
         } else {
-            return getUserName(user.substring(user.indexOf(":") + 1), format, true, context);
+            return getUserName(user.substring(user.indexOf(':') + 1), format, true, context);
         }
     }
 
@@ -5833,7 +5833,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface, EventListener
         if (hasCentralizedAuthentication(context)) {
             return getUserName(user, format, link, context);
         } else {
-            return getUserName(user.substring(user.indexOf(":") + 1), format, link, context);
+            return getUserName(user.substring(user.indexOf(':') + 1), format, link, context);
         }
     }
 
@@ -6236,7 +6236,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface, EventListener
             list = context.getUtil().getUniqueMatches(content, pattern, 2);
             for (int i = 0; i < list.size(); i++) {
                 String name = list.get(i);
-                if (name.indexOf(".") == -1) {
+                if (name.indexOf('.') == -1) {
                     list.set(i, defaultSpace + "." + name);
                 }
             }
@@ -6650,7 +6650,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface, EventListener
             return null;
         }
 
-        if (getConvertingUserNameType(context).equals("1") && (username.indexOf("@") != -1)) {
+        if (getConvertingUserNameType(context).equals("1") && (username.indexOf('@') != -1)) {
             String id = "" + username.hashCode();
             id = id.replaceAll("-", "");
             if (username.length() > 1) {
@@ -6927,7 +6927,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface, EventListener
 
     public PropertyClass getPropertyClassFromName(String propPath, XWikiContext context)
     {
-        int i1 = propPath.indexOf("_");
+        int i1 = propPath.indexOf('_');
         if (i1 == -1) {
             return null;
         } else {

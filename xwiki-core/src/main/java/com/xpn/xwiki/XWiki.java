@@ -626,7 +626,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface, EventListener
 
         if (timeout != 0) {
             client.getParams().setSoTimeout(timeout);
-            client.getParams().setParameter("http.connection.timeout", new Integer(timeout));
+            client.getParams().setParameter("http.connection.timeout", Integer.valueOf(timeout));
         }
 
         client.getParams().setParameter("http.useragent", userAgent);
@@ -3775,7 +3775,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface, EventListener
             smtpc.connect(server, Integer.parseInt(port));
             int reply = smtpc.getReplyCode();
             if (!SMTPReply.isPositiveCompletion(reply)) {
-                Object[] args = {server, port, new Integer(reply), smtpc.getReplyString()};
+                Object[] args = {server, port, Integer.valueOf(reply), smtpc.getReplyString()};
                 throw new XWikiException(XWikiException.MODULE_XWIKI_EMAIL,
                     XWikiException.ERROR_XWIKI_EMAIL_CONNECT_FAILED,
                     "Could not connect to server {0} port {1} error code {2} ({3})", null, args);
@@ -3783,7 +3783,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface, EventListener
 
             if (smtpc.login(login) == false) {
                 reply = smtpc.getReplyCode();
-                Object[] args = {server, port, new Integer(reply), smtpc.getReplyString()};
+                Object[] args = {server, port, Integer.valueOf(reply), smtpc.getReplyString()};
                 throw new XWikiException(XWikiException.MODULE_XWIKI_EMAIL,
                     XWikiException.ERROR_XWIKI_EMAIL_LOGIN_FAILED,
                     "Could not login to mail server {0} port {1} error code {2} ({3})", null, args);
@@ -3791,7 +3791,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface, EventListener
 
             if (smtpc.sendSimpleMessage(sender, recipient, message) == false) {
                 reply = smtpc.getReplyCode();
-                Object[] args = {server, port, new Integer(reply), smtpc.getReplyString()};
+                Object[] args = {server, port, Integer.valueOf(reply), smtpc.getReplyString()};
                 throw new XWikiException(XWikiException.MODULE_XWIKI_EMAIL,
                     XWikiException.ERROR_XWIKI_EMAIL_SEND_FAILED,
                     "Could not send mail to server {0} port {1} error code {2} ({3})", null, args);
@@ -4937,7 +4937,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface, EventListener
             // Copy base wiki
             int nb = copyWiki(baseWikiName, wikiName, wikilanguage, context);
             // Save the number of docs copied in the context
-            context.put("nbdocs", new Integer(nb));
+            context.put("nbdocs", Integer.valueOf(nb));
 
             // Create user page in his wiki
             // Let's not create it anymore.. this makes the creator loose

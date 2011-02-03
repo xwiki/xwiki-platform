@@ -91,11 +91,11 @@ import org.xwiki.rendering.block.LinkBlock;
 import org.xwiki.rendering.block.MacroBlock;
 import org.xwiki.rendering.block.SectionBlock;
 import org.xwiki.rendering.block.XDOM;
+import org.xwiki.rendering.listener.HeaderLevel;
 import org.xwiki.rendering.listener.MetaData;
 import org.xwiki.rendering.listener.reference.DocumentResourceReference;
-import org.xwiki.rendering.listener.HeaderLevel;
-import org.xwiki.rendering.listener.reference.ResourceType;
 import org.xwiki.rendering.listener.reference.ResourceReference;
+import org.xwiki.rendering.listener.reference.ResourceType;
 import org.xwiki.rendering.parser.ParseException;
 import org.xwiki.rendering.parser.Parser;
 import org.xwiki.rendering.renderer.BlockRenderer;
@@ -2920,7 +2920,7 @@ public class XWikiDocument implements DocumentModelBridge
 
         // display each line
         for (int i = 0; i < objects.size(); i++) {
-            vcontext.put("id", new Integer(i + 1));
+            vcontext.put("id", Integer.valueOf(i + 1));
             BaseObject object = objects.get(i);
             if (object != null) {
                 for (String name : bclass.getPropertyList()) {
@@ -5693,13 +5693,13 @@ public class XWikiDocument implements DocumentModelBridge
 
             String saveMessage =
                 context.getMessageTool().get("core.comment.renameLink",
-                    Arrays.asList(this.compactEntityReferenceSerializer.serialize(newDocumentReference)));
+                Arrays.asList(this.compactEntityReferenceSerializer.serialize(newDocumentReference)));
             xwiki.saveDocument(backlinkDocument, saveMessage, true, context);
         }
 
         // Get new document
         XWikiDocument newDocument = xwiki.getDocument(newDocumentReference, context);
-        
+
         // Step 4: Refactor the links contained in the document
         if (Utils.getComponentManager().hasComponent(BlockRenderer.class, getSyntax().toIdString())) {
             // Only support syntax for which a renderer is provided
@@ -6276,8 +6276,8 @@ public class XWikiDocument implements DocumentModelBridge
                 int pos = name.indexOf("_", start.length() + 1);
                 String prefix = name.substring(0, pos);
                 int num = Integer.decode(prefix.substring(prefix.lastIndexOf("_") + 1)).intValue();
-                if (!objectsNumberDone.contains(new Integer(num))) {
-                    objectsNumberDone.add(new Integer(num));
+                if (!objectsNumberDone.contains(Integer.valueOf(num))) {
+                    objectsNumberDone.add(Integer.valueOf(num));
                     objects.add(addXObjectFromRequest(classReference, pref, num, context));
                 }
             }
@@ -6466,8 +6466,8 @@ public class XWikiDocument implements DocumentModelBridge
                 int pos = name.indexOf("_", start.length() + 1);
                 String prefix = name.substring(0, pos);
                 int num = Integer.decode(prefix.substring(prefix.lastIndexOf("_") + 1)).intValue();
-                if (!objectsNumberDone.contains(new Integer(num))) {
-                    objectsNumberDone.add(new Integer(num));
+                if (!objectsNumberDone.contains(Integer.valueOf(num))) {
+                    objectsNumberDone.add(Integer.valueOf(num));
                     objects.add(updateXObjectFromRequest(classReference, pref, num, context));
                 }
             }

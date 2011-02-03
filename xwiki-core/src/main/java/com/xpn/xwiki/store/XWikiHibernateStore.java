@@ -101,10 +101,9 @@ import com.xpn.xwiki.stats.impl.XWikiStats;
 import com.xpn.xwiki.util.Util;
 import com.xpn.xwiki.web.Utils;
 
-
 /**
  * The XWiki Hibernate database driver.
- *
+ * 
  * @version $Id$
  */
 @Component
@@ -123,7 +122,8 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
     /**
      * Used to convert a string into a proper Document Reference.
      */
-    private DocumentReferenceResolver currentDocumentReferenceResolver =
+    @SuppressWarnings("unchecked")
+    private DocumentReferenceResolver<String> currentDocumentReferenceResolver =
         Utils.getComponent(DocumentReferenceResolver.class, "current");
 
     /**
@@ -131,24 +131,28 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
      * blanks, except for the page name for which the default page name is used instead and for the wiki name for which
      * the current wiki is used instead of the current document reference's wiki.
      */
-    private DocumentReferenceResolver currentMixedDocumentReferenceResolver =
+    @SuppressWarnings("unchecked")
+    private DocumentReferenceResolver<String> currentMixedDocumentReferenceResolver =
         Utils.getComponent(DocumentReferenceResolver.class, "currentmixed");
 
     /**
      * Used to convert a proper Document Reference to string (standard form).
      */
+    @SuppressWarnings("unchecked")
     private EntityReferenceSerializer<String> defaultEntityReferenceSerializer =
         Utils.getComponent(EntityReferenceSerializer.class);
 
     /**
      * Used to convert a Document Reference to string (compact form without the wiki part).
      */
+    @SuppressWarnings("unchecked")
     private EntityReferenceSerializer<String> compactWikiEntityReferenceSerializer =
         Utils.getComponent(EntityReferenceSerializer.class, "compactwiki");
 
     /**
      * Used to convert a proper Document Reference to a string but without the wiki name.
      */
+    @SuppressWarnings("unchecked")
     private EntityReferenceSerializer<String> localEntityReferenceSerializer =
         Utils.getComponent(EntityReferenceSerializer.class, "local");
 
@@ -589,24 +593,22 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
                         for (int i = 0; i < classes.length; i++) {
                             String oldclass = classes[i];
                             if (!oldclass.equals(nc.newProperty().getClass().getName())) {
-                                Query q =
-                                    session.createQuery(
-                                        "select p from " + oldclass + " as p, BaseObject as o" + " where o.className=?"
-                                            + "  and p.id=o.id and p.name=?").setString(0, bclass.getName()).setString(
-                                        1, nc.getName());
-                                for (Iterator it = q.list().iterator(); it.hasNext();) {
-                                    BaseProperty np = (BaseProperty) it.next();
+                                Query q = session.createQuery(
+                                    "select p from " + oldclass + " as p, BaseObject as o" + " where o.className=?"
+                                    + "  and p.id=o.id and p.name=?").setString(0, bclass.getName()).setString(
+                                    1, nc.getName());
+                                for (BaseProperty np : (List<BaseProperty>) q.list()) {
                                     BaseProperty np1 = nc.newProperty();
                                     np1.setId(np.getId());
                                     np1.setName(np.getName());
                                     if (nc.getNumberType().equals("integer")) {
-                                        np1.setValue(new Integer(((Number) np.getValue()).intValue()));
+                                        np1.setValue(Integer.valueOf(((Number) np.getValue()).intValue()));
                                     } else if (nc.getNumberType().equals("float")) {
-                                        np1.setValue(new Float(((Number) np.getValue()).floatValue()));
+                                        np1.setValue(Float.valueOf(((Number) np.getValue()).floatValue()));
                                     } else if (nc.getNumberType().equals("double")) {
-                                        np1.setValue(new Double(((Number) np.getValue()).doubleValue()));
+                                        np1.setValue(Double.valueOf(((Number) np.getValue()).doubleValue()));
                                     } else if (nc.getNumberType().equals("long")) {
-                                        np1.setValue(new Long(((Number) np.getValue()).longValue()));
+                                        np1.setValue(Long.valueOf(((Number) np.getValue()).longValue()));
                                     }
                                     session.delete(np);
                                     session.save(np1);
@@ -1081,7 +1083,7 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
 
             if (!alreadyLoaded) {
                 try {
-                    session.load(object, new Integer(object1.getId()));
+                    session.load(object, Integer.valueOf(object1.getId()));
                 } catch (ObjectNotFoundException e) {
                     // There is no object data saved
                     object = null;
@@ -1110,7 +1112,7 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
                 try {
                     if ((bclass != null) && (bclass.hasCustomMapping()) && context.getWiki().hasCustomMappings()) {
                         Session dynamicSession = session.getSession(EntityMode.MAP);
-                        Object map = dynamicSession.load(bclass.getName(), new Integer(object.getId()));
+                        Object map = dynamicSession.load(bclass.getName(), Integer.valueOf(object.getId()));
                         // Let's make sure to look for null fields in the dynamic mapping
                         bclass.fromValueMap((Map) map, object);
                         handledProps = bclass.getCustomMappingPropertyList(context);
@@ -1129,11 +1131,7 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
                 Query query = session.createQuery("select prop.name, prop.classType from BaseProperty as prop where "
                     + "prop.id.id = :id");
                 query.setInteger("id", object.getId());
-                List list = query.list();
-                Iterator it = list.iterator();
-                while (it.hasNext()) {
-                    Object obj = it.next();
-                    Object[] result = (Object[]) obj;
+                for (Object[] result : (List<Object[]>) query.list()) {
                     String name = (String) result[0];
                     // No need to load fields already loaded from
                     // custom mapping
@@ -1246,7 +1244,7 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
             if ((bclass != null) && (bclass.hasCustomMapping()) && context.getWiki().hasCustomMappings()) {
                 handledProps = bclass.getCustomMappingPropertyList(context);
                 Session dynamicSession = session.getSession(EntityMode.MAP);
-                Object map = dynamicSession.get(bclass.getName(), new Integer(object.getId()));
+                Object map = dynamicSession.get(bclass.getName(), Integer.valueOf(object.getId()));
                 if (map != null) {
                     if (evict) {
                         dynamicSession.evict(map);
@@ -1530,7 +1528,7 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
             Session session = getSession(context);
 
             try {
-                session.load(bclass, new Integer(bclass.getId()));
+                session.load(bclass, Integer.valueOf(bclass.getId()));
 
                 Query query =
                     session

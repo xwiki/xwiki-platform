@@ -63,7 +63,7 @@ public class RegisterAction extends XWikiAction
                 result = xwiki.createUser(context);
             }
             VelocityContext vcontext = (VelocityContext) context.get("vcontext");
-            vcontext.put("reg", new Integer(result));
+            vcontext.put("reg", Integer.valueOf(result));
 
             // Redirect if a redirection parameter is passed.
             String redirect = Utils.getRedirect(request, null);

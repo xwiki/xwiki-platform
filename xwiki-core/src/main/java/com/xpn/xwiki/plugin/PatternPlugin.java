@@ -22,163 +22,108 @@ package com.xpn.xwiki.plugin;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Vector;
 
 import org.apache.commons.lang.StringUtils;
-import org.apache.ecs.filter.CharacterFilter;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.xwiki.bridge.event.DocumentCreatedEvent;
+import org.xwiki.bridge.event.DocumentDeletedEvent;
 import org.xwiki.bridge.event.DocumentUpdatedEvent;
+import org.xwiki.context.Execution;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.observation.EventListener;
 import org.xwiki.observation.ObservationManager;
 import org.xwiki.observation.event.Event;
+import org.xwiki.xml.internal.XMLScriptService;
 
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
-import com.xpn.xwiki.objects.StringProperty;
 import com.xpn.xwiki.render.WikiSubstitution;
 import com.xpn.xwiki.util.Util;
 import com.xpn.xwiki.web.Utils;
 
+/**
+ * Plugin which allows to define a series of substitutions to apply to the content during the rendering process.
+ * Substitutions are defined in the {@code Plugins.PatternPlugin} document in the main wiki (only global configuration
+ * is supported at the moment), using objects of the {@code Plugins.PatternPlugin} class, which must have three fields:
+ * <ul>
+ * <li><tt>pattern</tt>: either a Perl regular expression replace starting with the <tt>s/</tt> command, or a plain text
+ * string to replace</li>
+ * <li><tt>result</tt>: the replacement string to use when the pattern is a plain text</li>
+ * <li><tt>description</tt>: a short description of the substitution</li>
+ * </ul>
+ * <p>
+ * The substitutions occur near the end of the rendering process for the xwiki/1.0 syntax only, after the content has
+ * already been processed by the main rendering components (Velocity, Groovy, Radeox).
+ * </p>
+ * <p>
+ * Another special transformation performed by the plugin is to replace the string {@code %PATTERNS%} with a table
+ * listing the currently enabled substitutions.
+ * </p>
+ * 
+ * @version $Id$
+ */
 public class PatternPlugin extends XWikiDefaultPlugin implements EventListener
 {
-    Vector<String> patterns = new Vector<String>();
+    /** Logging helper object. */
+    private static final Log LOG = LogFactory.getLog(PatternPlugin.class);
 
-    Vector<String> results = new Vector<String>();
+    /** The document holding the configuration data. */
+    private static final DocumentReference CONFIGURATION_DOCUMENT =
+        new DocumentReference("Plugins", "PatternPlugin", "xwiki");
 
-    Vector<String> descriptions = new Vector<String>();
+    /** The class used for storing the configuration. */
+    private static final DocumentReference CONFIGURATION_CLASS = CONFIGURATION_DOCUMENT;
 
-    WikiSubstitution patternListSubstitution;
-
+    /** Events monitored by this plugin, all changes on the configuration document. */
     private static final List<Event> EVENTS = new ArrayList<Event>()
     {
         {
-            add(new DocumentCreatedEvent(new DocumentReference("xwiki", "Plugins", "PatternPlugin")));
-            add(new DocumentUpdatedEvent(new DocumentReference("xwiki", "Plugins", "PatternPlugin")));
+            add(new DocumentCreatedEvent(CONFIGURATION_DOCUMENT));
+            add(new DocumentUpdatedEvent(CONFIGURATION_DOCUMENT));
+            add(new DocumentDeletedEvent(CONFIGURATION_DOCUMENT));
         }
     };
 
+    /** The list of configured patterns to search for. */
+    private List<String> patterns = new ArrayList<String>();
+
+    /** The list of configured replacement strings. */
+    private List<String> results = new ArrayList<String>();
+
+    /** The list of configured substitution description. */
+    private List<String> descriptions = new ArrayList<String>();
+
+    /** Special wiki substitution which replaces the %PATTERNS% string with a table listing the configured patterns. */
+    private WikiSubstitution patternListSubstitution;
+
+    /**
+     * The mandatory plugin constructor, this is the method called (through reflection) by the plugin manager.
+     * 
+     * @param name the plugin name
+     * @param className the name of this class, ignored
+     * @param context the current request context
+     */
     public PatternPlugin(String name, String className, XWikiContext context)
     {
         super(name, className, context);
         init(context);
 
-        // register for any modifications of the Plugins.PatternPlugin document..
+        // Watch for any modifications of the Plugins.PatternPlugin document.
         Utils.getComponent(ObservationManager.class).addListener(this);
+        this.patternListSubstitution = new WikiSubstitution(context.getUtil(), "%PATTERNS%");
     }
 
+    /**
+     * {@inheritDoc}
+     * 
+     * @see org.xwiki.observation.EventListener#getEvents()
+     */
     public List<Event> getEvents()
     {
         return EVENTS;
-    }
-
-    @Override
-    public void init(XWikiContext context)
-    {
-        XWiki xwiki = context.getWiki();
-        try {
-            this.patterns.clear();
-            this.results.clear();
-            this.descriptions.clear();
-            XWikiDocument pattern_doc = xwiki.getDocument("Plugins", "PatternPlugin", context);
-            Vector<BaseObject> patternlist = pattern_doc.getObjects("Plugins.PatternPlugin");
-            if (patternlist != null) {
-                for (BaseObject obj : patternlist) {
-                    if (obj == null) {
-                        continue;
-                    }
-                    this.patterns.add(((StringProperty) obj.get("pattern")).getValue().toString());
-                    this.results.add(((StringProperty) obj.get("result")).getValue().toString());
-                    this.descriptions.add(((StringProperty) obj.get("description")).getValue().toString());
-                }
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
-        this.patternListSubstitution = new WikiSubstitution(context.getUtil(), "%PATTERNS%");
-        // Add a notification rule if the preference property plugin is modified
-    }
-
-    public void addPattern(String pattern, String result, String description)
-    {
-        this.patterns.add(pattern);
-        this.results.add(result);
-        this.descriptions.add(description);
-    }
-
-    public String getPatternList()
-    {
-        CharacterFilter filter = new CharacterFilter();
-        StringBuffer list = new StringBuffer();
-        list.append("{pre}\n");
-        list.append("<table border=1>");
-        list.append("<tr><td><strong>Pattern</strong></td>");
-        list.append("<td><strong>Result</strong></td><td><strong>Description</strong></td></tr>");
-        for (int i = 0; i < this.patterns.size(); i++) {
-            list.append("<tr><td>");
-            list.append(filter.process(this.patterns.get(i)));
-            list.append("</td><td>");
-            list.append(filter.process(this.results.get(i)));
-            list.append("</td><td>");
-            list.append(this.descriptions.get(i));
-            list.append("</td></tr>");
-        }
-        list.append("</table>");
-        list.append("\n{/pre}");
-        return list.toString();
-    }
-
-    @Override
-    public String commonTagsHandler(String line, XWikiContext context)
-    {
-        String subst = getPatternList();
-        subst = StringUtils.replace(subst, "$", "\\$");
-        this.patternListSubstitution.setSubstitution(subst);
-        line = this.patternListSubstitution.substitute(line);
-        return line;
-    }
-
-    @Override
-    public String startRenderingHandler(String line, XWikiContext context)
-    {
-        return line;
-    }
-
-    @Override
-    public String outsidePREHandler(String line, XWikiContext context)
-    {
-        Util util = context.getUtil();
-
-        for (int i = 0; i < this.patterns.size(); i++) {
-            String pattern = this.patterns.get(i);
-            String result = this.results.get(i);
-            try {
-                if (pattern.startsWith("s/")) {
-                    line = util.substitute(pattern, line);
-                } else {
-                    line = StringUtils.replace(line, " " + pattern, " " + result);
-                }
-            } catch (Exception e) {
-                // Log a error but do not fail..
-            }
-        }
-
-        return line;
-    }
-
-    @Override
-    public String insidePREHandler(String line, XWikiContext context)
-    {
-        return line;
-    }
-
-    @Override
-    public String endRenderingHandler(String line, XWikiContext context)
-    {
-        return line;
     }
 
     /**
@@ -190,6 +135,127 @@ public class PatternPlugin extends XWikiDefaultPlugin implements EventListener
     public void onEvent(Event event, Object source, Object data)
     {
         // If the PatternPlugin document has been modified we need to reload the patterns
-        init((XWikiContext) data);
+        init((XWikiContext) Utils.getComponent(Execution.class).getContext().getProperty("xwikicontext"));
+    }
+
+    /**
+     * Reads the configuration data and prepares the plugin.
+     * 
+     * @param context the current request context
+     * @see XWikiPluginInterface#init(XWikiContext)
+     */
+    @Override
+    public void init(XWikiContext context)
+    {
+        XWiki xwiki = context.getWiki();
+        try {
+            synchronized (this.patterns) {
+                this.patterns.clear();
+                this.results.clear();
+                this.descriptions.clear();
+                XWikiDocument configurationDoc = xwiki.getDocument(CONFIGURATION_DOCUMENT, context);
+                List<BaseObject> patternList = configurationDoc.getXObjects(CONFIGURATION_CLASS);
+                if (patternList == null) {
+                    return;
+                }
+                for (BaseObject pattern : patternList) {
+                    if (pattern == null) {
+                        continue;
+                    }
+                    addPattern(pattern.getStringValue("pattern"), pattern.getStringValue("result"),
+                        pattern.getStringValue("description"));
+                }
+            }
+        } catch (Exception ex) {
+            LOG.error("Failed to initialize the Pattern plugin: " + ex.getMessage(), ex);
+        }
+    }
+
+    /**
+     * Adds a pattern to the list of transformations performed by the plugin.
+     * 
+     * @param pattern the regular expression to search for
+     * @param result what to use instead
+     * @param description the description of this transformation
+     */
+    public void addPattern(String pattern, String result, String description)
+    {
+        synchronized (this.patterns) {
+            this.patterns.add(pattern);
+            this.results.add(result);
+            this.descriptions.add(description);
+        }
+    }
+
+    /**
+     * Replaces the occurrence of %PATTERNS% with the list of enabled substitutions.
+     * 
+     * @param content the current content being rendered
+     * @param context the current request context
+     * @return the resulting content after the mentioned substitution
+     * @see XWikiPluginInterface#commonTagsHandler(String, XWikiContext)
+     */
+    @Override
+    public String commonTagsHandler(String content, XWikiContext context)
+    {
+        String subst = getPatternList();
+        subst = StringUtils.replace(subst, "$", "\\$");
+        this.patternListSubstitution.setSubstitution(subst);
+        return this.patternListSubstitution.substitute(content);
+    }
+
+    /**
+     * Apply the currently enabled substitutions on a line of content.
+     * 
+     * @param line the current line being rendered on which to apply substitutions
+     * @param context the current request context
+     * @return the processed line
+     * @see XWikiPluginInterface#outsidePREHandler(String, XWikiContext)
+     */
+    @Override
+    public String outsidePREHandler(String line, XWikiContext context)
+    {
+        Util util = context.getUtil();
+        String result = line;
+
+        for (int i = 0; i < this.patterns.size(); i++) {
+            String pattern = this.patterns.get(i);
+            try {
+                if (pattern.startsWith("s/")) {
+                    result = util.substitute(pattern, result);
+                } else {
+                    result = StringUtils.replace(result, " " + pattern, " " + this.results.get(i));
+                }
+            } catch (Exception ex) {
+                LOG.error("Failed to apply pattern [" + pattern + "]: " + ex.getMessage());
+            }
+        }
+
+        return result;
+    }
+
+    /**
+     * Generate a table listing all the enabled substitutions.
+     * 
+     * @return a HTML table surrounded by pre markers
+     */
+    private String getPatternList()
+    {
+        StringBuilder list = new StringBuilder();
+        list.append("{pre}\n<table><thead><tr><th>Pattern</th><th>Result</th><th>Description</th></tr></thead><tbody>");
+        synchronized (this.patterns) {
+            for (int i = 0; i < this.patterns.size(); ++i) {
+                list.append("<tr><td>");
+                list.append(XMLScriptService.escape(this.patterns.get(i)));
+                list.append("</td><td>");
+                list.append(XMLScriptService.escape(this.results.get(i)));
+                list.append("</td> <td>");
+                list.append(XMLScriptService.escape(this.descriptions.get(i)));
+                list.append("</td></tr>");
+            }
+            list.append("</tbody></table>");
+            list.append("\n{/pre}");
+        }
+        return list.toString();
     }
 }

@@ -66,7 +66,7 @@ public class XWikiPluginManager
     @SuppressWarnings("unchecked")
     public void addPlugin(String name, String className, XWikiContext context)
     {
-        if (pluginClassNames.contains(className)) {
+        if (this.pluginClassNames.contains(className)) {
             if (LOG.isInfoEnabled()) {
                 LOG.info(String.format("Skipping already registered plugin [%s]", name));
             }
@@ -84,9 +84,9 @@ public class XWikiPluginManager
             Class<XWikiPluginInterface> pluginClass = (Class<XWikiPluginInterface>) Class.forName(className);
             XWikiPluginInterface plugin = pluginClass.getConstructor(classes).newInstance(args);
             if (plugin != null) {
-                plugins.add(plugin.getName());
-                plugins_classes.put(plugin.getName(), plugin);
-                pluginClassNames.add(className);
+                this.plugins.add(plugin.getName());
+                this.plugins_classes.put(plugin.getName(), plugin);
+                this.pluginClassNames.add(className);
                 initPlugin(plugin, pluginClass, context);
             }
         } catch (Exception ex) {
@@ -97,12 +97,12 @@ public class XWikiPluginManager
 
     public void removePlugin(String className)
     {
-        plugins.remove(className);
-        Object plugin = plugins_classes.get(className);
-        plugins_classes.remove(className);
+        this.plugins.remove(className);
+        Object plugin = this.plugins_classes.get(className);
+        this.plugins_classes.remove(className);
 
-        for (String name : functionList.keySet()) {
-            Vector<XWikiPluginInterface> pluginList = functionList.get(name);
+        for (String name : this.functionList.keySet()) {
+            Vector<XWikiPluginInterface> pluginList = this.functionList.get(name);
             pluginList.remove(plugin);
         }
     }
@@ -121,12 +121,12 @@ public class XWikiPluginManager
 
     public XWikiPluginInterface getPlugin(String className)
     {
-        return plugins_classes.get(className);
+        return this.plugins_classes.get(className);
     }
 
     public Vector<String> getPlugins()
     {
-        return plugins;
+        return this.plugins;
     }
 
     public void setPlugins(Vector<String> plugins)
@@ -138,7 +138,7 @@ public class XWikiPluginManager
     {
         for (Method method : XWikiPluginInterface.class.getMethods()) {
             String name = method.getName();
-            functionList.put(name, new Vector<XWikiPluginInterface>());
+            this.functionList.put(name, new Vector<XWikiPluginInterface>());
         }
     }
 
@@ -147,16 +147,17 @@ public class XWikiPluginManager
     {
         for (Method method : pluginClass.getDeclaredMethods()) {
             String name = method.getName();
-            if (functionList.containsKey(name))
-                functionList.get(name).add((XWikiPluginInterface) plugin);
+            if (this.functionList.containsKey(name)) {
+                this.functionList.get(name).add((XWikiPluginInterface) plugin);
+            }
         }
         ((XWikiPluginInterface) plugin).init(context);
     }
 
     public Vector<XWikiPluginInterface> getPlugins(String functionName)
     {
-        if (functionList.containsKey(functionName)) {
-            return functionList.get(functionName);
+        if (this.functionList.containsKey(functionName)) {
+            return this.functionList.get(functionName);
         }
         return null;
     }
@@ -285,7 +286,7 @@ public class XWikiPluginManager
             try {
                 attach = plugin.downloadAttachment(attach, context);
             } catch (Exception ex) {
-                LOG.warn("downloadAttachment failed for plugin [" + plugin.getClassName() + "]: " + ex.getMessage());
+                LOG.warn("downloadAttachment failed for plugin [" + plugin.getName() + "]: " + ex.getMessage());
             }
         }
         return attach;

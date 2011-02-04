@@ -57,13 +57,16 @@ $xwiki.ssfx.use('js/xwiki/table/livetable.css', true)
 #if($doc.fullName == 'Main.UserDirectory')
   #set($groupDoc = $xwiki.getDocument('XWiki.XWikiAllGroup'))
 #end
-#macro(hasEditGroupRight)
-  #set($hasEditGroupRight = false)
-  #if(($hasAdmin || $hasEdit) &amp;&amp; $doc.getObject('XWiki.XWikiGroups', false))
-    #set($hasEditGroupRight = true)
+#macro(hasGroupRight $right $hasGroupRight)
+  #set($result = false)
+  #if($!xwiki.hasAccessLevel("$!right", $xcontext.user, $doc.fullName) &amp;&amp; $doc.getObject('XWiki.XWikiGroups', false))
+    #set($result = true)
   #end
+  #set($hasGroupRight = $util.null)
+  #setVariable("$hasGroupRight" $result)
 #end
-#hasEditGroupRight()
+#hasGroupRight('edit' $hasEditGroupRight)
+#hasGroupRight('delete' $hasDeleteGroupRight)
 ##
 ##
 {{/velocity}}
@@ -209,7 +212,7 @@ $xwiki.ssfx.use('js/xwiki/table/livetable.css', true)
     'ajaxActions': {'delete': true}
    }
 })
-#if($xcontext.action == 'inline' &amp;&amp; $hasEditGroupRight)
+#if($xcontext.action == 'inline' &amp;&amp; $hasDeleteGroupRight)
   #set($columns = ['_avatar', 'member', '_actions'])
 #else
   #set($columns = ['_avatar', 'member'])

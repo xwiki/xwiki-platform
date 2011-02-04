@@ -19,7 +19,6 @@
  */
 package org.xwiki.rendering.internal.macro.script;
 
-
 import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.Requirement;
@@ -31,10 +30,9 @@ import org.xwiki.rendering.macro.script.PrivilegedScriptMacro;
 import org.xwiki.rendering.macro.script.ScriptMacroParameters;
 import org.xwiki.rendering.transformation.MacroTransformationContext;
 
-
 /**
  * Listens to {@link org.xwiki.script.event.ScriptEvaluatingEvent} and aborts execution if the user is
- * permitted to execute the script.
+ * not permitted to execute the script.
  * 
  * @version $Id$
  * @since 2.5M1

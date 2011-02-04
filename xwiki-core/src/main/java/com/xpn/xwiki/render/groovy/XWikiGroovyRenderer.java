@@ -19,38 +19,41 @@
  */
 package com.xpn.xwiki.render.groovy;
 
-import com.xpn.xwiki.XWikiContext;
-import com.xpn.xwiki.XWikiException;
-import com.xpn.xwiki.api.Context;
-import com.xpn.xwiki.api.Document;
-import com.xpn.xwiki.api.XWiki;
-import com.xpn.xwiki.api.Util;
-import com.xpn.xwiki.doc.XWikiDocument;
-import com.xpn.xwiki.render.XWikiInterpreter;
-import com.xpn.xwiki.render.XWikiRenderer;
-import com.xpn.xwiki.render.XWikiVirtualMacro;
-import com.xpn.xwiki.web.Utils;
-import com.xpn.xwiki.web.XWikiRequest;
 import groovy.lang.GroovyClassLoader;
 import groovy.lang.Writable;
 import groovy.text.Template;
-import org.apache.commons.lang.StringUtils;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-import org.codehaus.groovy.runtime.InvokerHelper;
-import org.xwiki.cache.CacheManager;
-import org.xwiki.cache.DisposableCacheValue;
-import org.xwiki.cache.Cache;
-import org.xwiki.cache.CacheException;
-import org.xwiki.cache.config.CacheConfiguration;
-import org.xwiki.cache.eviction.LRUEvictionConfiguration;
-import org.xwiki.component.manager.ComponentLookupException;
 
 import java.io.Writer;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import org.apache.commons.lang.StringUtils;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.codehaus.groovy.runtime.InvokerHelper;
+import org.xwiki.cache.Cache;
+import org.xwiki.cache.CacheException;
+import org.xwiki.cache.CacheManager;
+import org.xwiki.cache.DisposableCacheValue;
+import org.xwiki.cache.config.CacheConfiguration;
+import org.xwiki.cache.eviction.LRUEvictionConfiguration;
+import org.xwiki.component.manager.ComponentLookupException;
+import org.xwiki.xml.internal.XMLScriptService;
+
+import com.xpn.xwiki.XWikiContext;
+import com.xpn.xwiki.XWikiException;
+import com.xpn.xwiki.api.Context;
+import com.xpn.xwiki.api.Document;
+import com.xpn.xwiki.api.Util;
+import com.xpn.xwiki.api.XWiki;
+import com.xpn.xwiki.doc.XWikiDocument;
+import com.xpn.xwiki.render.XWikiInterpreter;
+import com.xpn.xwiki.render.XWikiRenderer;
+import com.xpn.xwiki.render.XWikiVirtualMacro;
+import com.xpn.xwiki.web.Utils;
+import com.xpn.xwiki.web.XWikiRequest;
 
 public class XWikiGroovyRenderer implements XWikiRenderer, XWikiInterpreter
 {
@@ -217,12 +220,10 @@ public class XWikiGroovyRenderer implements XWikiRenderer, XWikiInterpreter
             String title;
             String text;
 
-            XWikiException xe =
-                new XWikiException(XWikiException.MODULE_XWIKI_RENDERING,
-                    XWikiException.ERROR_XWIKI_RENDERING_GROOVY_EXCEPTION, "Error while parsing groovy page {0}", e,
-                    args);
+            XWikiException xe = new XWikiException(XWikiException.MODULE_XWIKI_RENDERING,
+                XWikiException.ERROR_XWIKI_RENDERING_GROOVY_EXCEPTION, "Error while parsing groovy page {0}", e, args);
             title = xe.getMessage();
-            text = com.xpn.xwiki.XWiki.getFormEncoded(xe.getFullMessage());
+            text = XMLScriptService.escape(xe.getFullMessage());
 
             return "<a href=\"\" onclick=\"document.getElementById('xwikierror').style.display='block'; return false;\">"
                 + title

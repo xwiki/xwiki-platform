@@ -42,6 +42,8 @@ $response.setContentType('application/x-json')
 ## livetable data
     "doc_viewable" : ${xwiki.hasAccessLevel('view', $xcontext.user, $m)},
     "doc_hasadmin" : ${xwiki.hasAccessLevel('admin', $xcontext.user, $doc.fullName)},
+    "doc_hasedit" : ${xwiki.hasAccessLevel('edit', $xcontext.user, $doc.fullName)},
+    "doc_hasdelete" : ${xwiki.hasAccessLevel('delete', $xcontext.user, $doc.fullName)},
     "member"   : "$xwiki.getUserName($m, false)#if($hasAdmin || $isAdvancedUser) (#if($wikiname != 'local')$wikiname:#end$m)#end",
     "member_url" : "$xwiki.getURL($m)",
     "doc_delete_url" : "$doc.getURL('view', "xpage=deletegroupmember&fullname=${m}&ajax=true")",

@@ -1393,9 +1393,12 @@ input.button:hover , .buttonwrapper  a:hover{
 
 /* Section titles */
 .vertical-menu .group {
-  background-color: $theme.backgroundSecondaryColor;
+  background-color: $theme.panelCollapsedBackgroundColor;
   font-weight: 700;
   font-variant: small-caps;
+}
+.vertical-menu .group * {
+  color: $theme.panelCollapsedTextColor;
 }
 
 /* Highlight items when hovering */
@@ -1403,10 +1406,10 @@ input.button:hover , .buttonwrapper  a:hover{
   background-color: $theme.highlightColor;
 }
 .vertical-menu .group:hover {
-  background-color: $theme.menuBackgroundColor;
+  background-color: $theme.panelHeaderBackgroundColor;
 }
 .vertical-menu .group:hover * {
-  color: $theme.menuLinkColor;
+  color: $theme.panelHeaderTextColor;
 }
 
 /* Selected item */
@@ -1415,11 +1418,11 @@ input.button:hover , .buttonwrapper  a:hover{
   font-weight: bold;
 }
 .vertical-menu .current-group {
-  background-color: $theme.menuBackgroundColor;
-  color: $theme.menuLinkColor;
+  background-color: $theme.panelHeaderBackgroundColor;
+  color: $theme.panelHeaderTextColor;
 }
 .vertical-menu .current-group * {
-  color: $theme.menuLinkColor;
+  color: $theme.panelHeaderTextColor;
 }
 
 /* Draw an arrow pointing right for the selected item */

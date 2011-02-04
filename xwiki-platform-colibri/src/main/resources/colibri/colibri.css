@@ -1441,7 +1441,7 @@ input.button:hover , .buttonwrapper  a:hover{
   right: -11px;
 }
 .vertical-menu .current-group:after {
-  border-left-color: $theme.menuBackgroundColor !important;
+  border-left-color: $theme.panelHeaderBackgroundColor !important;
 }
 
 /* @group PANELS */

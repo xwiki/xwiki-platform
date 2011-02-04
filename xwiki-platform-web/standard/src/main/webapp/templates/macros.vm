@@ -1923,9 +1923,10 @@ function (row, i, table) {
         td.appendChild(link);
         tr.appendChild(td);
       #elseif("$colname" == "_actions")
-        if(row.doc_hasadmin) {
-          var td = new Element("td", {'class':'actions'});
-          #foreach($action in $colprop.get("actions"))
+        var adminActions = ['admin', 'copy', 'rights'];
+        var td = new Element("td", {'class' : 'actions'});
+        #foreach($action in $colprop.get("actions"))
+          if(row.doc_hasadmin || '${action}' == 'view' || (row.doc_hasedit && adminActions.indexOf('${action}') < 0)){
             #if($velocityCount > 1)
             td.insert(" ");
             #end
@@ -1948,9 +1949,9 @@ function (row, i, table) {
               });
             #end
             td.insert(link);
-          #end
-          tr.appendChild(td);
-        }
+          }
+        #end
+        tr.appendChild(td);
       #else
         #set($tdClass = "${jscolname} link$!{colprop.link} type$!{colprop.type}")
         var fieldel = new Element("td", {'class':"$tdClass"});
@@ -1981,7 +1982,7 @@ function (row, i, table) {
           tr.insert(new Element("td").update(name + "*"));
         #elseif($jscolname == "doc_space")
           tr.insert(new Element("td").update(space));
-        #elseif($jscolname != "_actions")
+        #else
           tr.insert(new Element("td").update(" "));
         #end
       #end

@@ -23,13 +23,15 @@ import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.api.Api;
 
 /**
- * Base class for all plugin APIs. API Objects are the Java Objects that can be manipulated from
- * Velocity or Groovy scripts in XWiki documents. They wrap around a fully functional Plugin object,
- * and forward safe calls to that object.
+ * Base class for all plugin APIs. API Objects are the Java Objects that can be manipulated from Velocity or Groovy
+ * scripts in XWiki documents. They wrap around a fully functional and privileged Plugin object, and forward safe calls
+ * to that object.
  * 
  * @param <T> The type of the internal plugin.
  * @version $Id$
+ * @deprecated the plugin technology is deprecated, consider rewriting as components
  */
+@Deprecated
 public class PluginApi<T extends XWikiPluginInterface> extends Api
 {
     /**
@@ -50,17 +52,16 @@ public class PluginApi<T extends XWikiPluginInterface> extends Api
     }
 
     /**
-     * Return the inner plugin object. This method is only for the plugin API's internal use, and
-     * should not be exposed to scripting languages. It is an XWiki practice to expose all the
-     * functionality using an API, and allow access to the internal objects only to users with
-     * Programming Rights.
+     * Return the inner plugin object. This method is only for the plugin API's internal use, and should not be exposed
+     * to scripting languages. It is an XWiki practice to expose all the functionality using an API, and allow access to
+     * the internal objects only to users with Programming Rights.
      * 
      * @return The wrapped plugin object.
      * @since 1.3RC1
      */
     protected T getProtectedPlugin()
     {
-        return plugin;
+        return this.plugin;
     }
 
     /**
@@ -72,7 +73,7 @@ public class PluginApi<T extends XWikiPluginInterface> extends Api
     public T getInternalPlugin()
     {
         if (hasProgrammingRights()) {
-            return plugin;
+            return this.plugin;
         }
         return null;
     }

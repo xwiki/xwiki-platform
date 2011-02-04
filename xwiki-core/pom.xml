@@ -1163,7 +1163,6 @@
               **/plugin/packaging/PackageException.java,
               **/plugin/packaging/Package.java,
               **/plugin/packaging/PackagePlugin.java,
-              **/plugin/PluginException.java,
               **/plugin/query/DefaultQuery.java,
               **/plugin/query/HibernateQuery.java,
               **/plugin/query/IQueryFactory.java,

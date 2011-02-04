@@ -1921,12 +1921,12 @@ function (row, i, table) {
         td.appendChild(link);
         tr.appendChild(td);
       #elseif("$colname" == "_actions")
-        var adminActions = ['admin', 'copy', 'rights'];
+        var adminActions = ['admin', 'rename', 'rights'];
         var td = new Element("td", {'class' : 'actions'});
         #foreach($action in $colprop.get("actions"))
-          if(row.doc_hasadmin || '${action}' == 'view' || (row.doc_hasedit && adminActions.indexOf('${action}') < 0)){
+          if(row.doc_hasadmin || '${action}' == 'view' || (row.doc_hasdelete && '${action}' == 'delete') || (row.doc_hasedit && adminActions.indexOf('${action}') < 0) && '${action}' != 'delete'){
             #if($velocityCount > 1)
-            td.insert(" ");
+              td.insert(" ");
             #end
             #if($transprefix != '' && $msg.get("${transprefix}_actions.${action}") != "${transprefix}_actions.${action}")
               #set($text = $msg.get("${transprefix}_actions.${action}"))

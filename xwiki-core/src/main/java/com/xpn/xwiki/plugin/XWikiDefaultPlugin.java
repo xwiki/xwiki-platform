@@ -18,110 +18,215 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  *
  */
-
 package com.xpn.xwiki.plugin;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.api.Api;
 import com.xpn.xwiki.doc.XWikiAttachment;
 
+/**
+ * Abstract base plugin implementation.
+ * 
+ * @version $Id$
+ * @deprecated the plugin technology is deprecated, consider rewriting as components
+ */
+@Deprecated
 public class XWikiDefaultPlugin implements XWikiPluginInterface
 {
+    /**
+     * The plugin name.
+     * 
+     * @see #getName()
+     */
     private String name;
 
+    /**
+     * The mandatory plugin constructor, this is the method called (through reflection) by the plugin manager.
+     * 
+     * @param name the plugin name, usually ignored, since plugins have a fixed name
+     * @param className the name of this class, ignored
+     * @param context the current request context
+     */
     public XWikiDefaultPlugin(String name, String className, XWikiContext context)
     {
         setClassName(className);
         setName(name);
     }
 
-    public void init(XWikiContext context)
-    {
-    }
-
-    public void virtualInit(XWikiContext context)
-    {
-    }
-
-    public void flushCache(XWikiContext context)
-    {
-        flushCache();
-    }
-
-    public void flushCache()
-    {
-
-    }
-
-    public String commonTagsHandler(String line, XWikiContext context)
-    {
-        return line;
-    }
-
-    public String startRenderingHandler(String line, XWikiContext context)
-    {
-        return line;
-    }
-
-    public String outsidePREHandler(String line, XWikiContext context)
-    {
-        return line;
-    }
-
-    public String insidePREHandler(String line, XWikiContext context)
-    {
-        return line;
-    }
-
-    public String endRenderingHandler(String line, XWikiContext context)
-    {
-        return line;
-    }
-
-    public Api getPluginApi(XWikiPluginInterface plugin, XWikiContext context)
-    {
-        return null;
-    }
-
+    /**
+     * {@inheritDoc}
+     */
     public String getName()
     {
         return this.name;
     }
 
-    public void setName(String name)
+    /**
+     * {@inheritDoc}
+     */
+    public Api getPluginApi(XWikiPluginInterface plugin, XWikiContext context)
     {
-        this.name = name;
+        // No public API by default
+        return null;
     }
 
-    public String getClassName()
+    /**
+     * {@inheritDoc}
+     */
+    public void init(XWikiContext context)
     {
-        return this.name;
+        // The default is to do nothing
     }
 
-    public void setClassName(String name)
+    /**
+     * {@inheritDoc}
+     */
+    public void virtualInit(XWikiContext context)
     {
-        this.name = name;
+        // The default is to do nothing
     }
 
-    public void beginRendering(XWikiContext context)
+    /**
+     * {@inheritDoc}
+     */
+    public void flushCache(XWikiContext context)
     {
+        flushCache();
     }
 
-    public void endRendering(XWikiContext context)
+    /**
+     * Older equivalent of the {@link #flushCache(XWikiContext)} method without a context provided.
+     * 
+     * @deprecated use {@link #flushCache(XWikiContext)} instead
+     */
+    @Deprecated
+    public void flushCache()
     {
+        // The default is to do nothing
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public void beginParsing(XWikiContext context)
     {
+        // The default is to do nothing
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    public void beginRendering(XWikiContext context)
+    {
+        // The default is to do nothing
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public String commonTagsHandler(String content, XWikiContext context)
+    {
+        // The default is to do nothing, just return back the same content
+        return content;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public String startRenderingHandler(String content, XWikiContext context)
+    {
+        // The default is to do nothing, just return back the same content
+        return content;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public String outsidePREHandler(String line, XWikiContext context)
+    {
+        // The default is to do nothing, just return back the same content
+        return line;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public String insidePREHandler(String line, XWikiContext context)
+    {
+        // The default is to do nothing, just return back the same content
+        return line;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public String endRenderingHandler(String content, XWikiContext context)
+    {
+        // The default is to do nothing, just return back the same content
+        return content;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public void endRendering(XWikiContext context)
+    {
+        // The default is to do nothing
+    }
+
+    /**
+     * {@inheritDoc}
+     */
     public String endParsing(String content, XWikiContext context)
     {
         return content;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public XWikiAttachment downloadAttachment(XWikiAttachment attachment, XWikiContext context)
     {
+        // The default is to do nothing, just return the original attachment
         return attachment;
+    }
+
+    /**
+     * Set the plugin name. Don't use outside the constructor.
+     * 
+     * @param name the new name of the plugin
+     * @deprecated most plugins hard code their names, so this doesn't really work
+     */
+    @Deprecated
+    public void setName(String name)
+    {
+        // Shouldn't really change the name of the plugin, but for backwards compatibility...
+        this.name = name;
+    }
+
+    /**
+     * Old method that doesn't really work. Don't use.
+     * 
+     * @return the name of the plugin
+     * @deprecated use {@link #getName()} instead
+     */
+    @Deprecated
+    public String getClassName()
+    {
+        return this.name;
+    }
+
+    /**
+     * Old method that doesn't really work. Don't use.
+     * 
+     * @param name the new name of the plugin
+     * @deprecated most plugins hard code their names, so this doesn't really work, and changing the classname isn't
+     *             really possible
+     */
+    @Deprecated
+    public void setClassName(String name)
+    {
+        // Shouldn't really change the name of the plugin, but for backwards compatibility...
+        this.name = name;
     }
 }

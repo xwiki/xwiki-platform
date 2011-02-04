@@ -1191,7 +1191,6 @@
               **/plugin/usertools/XWikiUserManagementToolsAPI.java,
               **/plugin/usertools/XWikiUserManagementToolsImpl.java,
               **/plugin/usertools/XWikiUserManagementTools.java,
-              **/plugin/XWikiDefaultPlugin.java,
               **/plugin/XWikiPluginManager.java,
               **/pref/api/XWikiPrefService.java,
               **/pref/impl/xwiki/XWikiPrefServiceImpl.java,

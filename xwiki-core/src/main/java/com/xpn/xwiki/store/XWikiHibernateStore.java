@@ -1325,20 +1325,12 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
         deleteXWikiCollection(baseObject, context, b);
     }
 
-    /**
-     * @deprecated This is internal to XWikiHibernateStore and may be removed in the future.
-     */
-    @Deprecated
-    public void deleteXWikiClass(BaseClass baseClass, XWikiContext context, boolean b) throws XWikiException
+    private void deleteXWikiClass(BaseClass baseClass, XWikiContext context, boolean b) throws XWikiException
     {
         deleteXWikiCollection(baseClass, context, b);
     }
 
-    /**
-     * @deprecated This is internal to XWikiHibernateStore and may be removed in the future.
-     */
-    @Deprecated
-    public void loadXWikiProperty(PropertyInterface property, XWikiContext context, boolean bTransaction)
+    private void loadXWikiProperty(PropertyInterface property, XWikiContext context, boolean bTransaction)
         throws XWikiException
     {
         try {
@@ -1448,11 +1440,7 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
         }
     }
 
-    /**
-     * @deprecated This is internal to XWikiHibernateStore and may be removed in the future.
-     */
-    @Deprecated
-    public void saveXWikiClass(BaseClass bclass, XWikiContext context, boolean bTransaction) throws XWikiException
+    private void saveXWikiClass(BaseClass bclass, XWikiContext context, boolean bTransaction) throws XWikiException
     {
         try {
             if (bTransaction) {
@@ -1505,20 +1493,7 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
         }
     }
 
-    /**
-     * @deprecated This is internal to XWikiHibernateStore and may be removed in the future.
-     */
-    @Deprecated
-    public BaseClass loadXWikiClass(BaseClass bclass, XWikiContext context) throws XWikiException
-    {
-        return loadXWikiClass(bclass, context, true);
-    }
-
-    /**
-     * @deprecated This is internal to XWikiHibernateStore and may be removed in the future.
-     */
-    @Deprecated
-    public BaseClass loadXWikiClass(BaseClass bclass, XWikiContext context, boolean bTransaction) throws XWikiException
+    private BaseClass loadXWikiClass(BaseClass bclass, XWikiContext context, boolean bTransaction) throws XWikiException
     {
         try {
             if (bTransaction) {
@@ -1572,11 +1547,7 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
         }
     }
 
-    /**
-     * @deprecated This is internal to XWikiHibernateStore and may be removed in the future.
-     */
-    @Deprecated
-    public void saveXWikiClassProperty(PropertyClass property, XWikiContext context, boolean bTransaction)
+    private void saveXWikiClassProperty(PropertyClass property, XWikiContext context, boolean bTransaction)
         throws XWikiException
     {
         try {
@@ -1663,11 +1634,7 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
         }
     }
 
-    /**
-     * @deprecated This is internal to XWikiHibernateStore and may be removed in the future.
-     */
-    @Deprecated
-    public void loadAttachmentList(XWikiDocument doc, XWikiContext context, boolean bTransaction) throws XWikiException
+    private void loadAttachmentList(XWikiDocument doc, XWikiContext context, boolean bTransaction) throws XWikiException
     {
         try {
             if (bTransaction) {
@@ -1703,11 +1670,7 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
         }
     }
 
-    /**
-     * @deprecated This is internal to XWikiHibernateStore and may be removed in the future.
-     */
-    @Deprecated
-    public void saveAttachmentList(XWikiDocument doc, XWikiContext context, boolean bTransaction) throws XWikiException
+    private void saveAttachmentList(XWikiDocument doc, XWikiContext context, boolean bTransaction) throws XWikiException
     {
         try {
             if (bTransaction) {
@@ -1741,21 +1704,13 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
         }
     }
 
-    /**
-     * @deprecated This is internal to XWikiHibernateStore and may be removed in the future.
-     */
-    @Deprecated
-    public void saveAttachment(XWikiAttachment attachment, XWikiContext context, boolean bTransaction)
+    private void saveAttachment(XWikiAttachment attachment, XWikiContext context, boolean bTransaction)
         throws XWikiException
     {
         saveAttachment(attachment, true, context, bTransaction);
     }
 
-    /**
-     * @deprecated This is internal to XWikiHibernateStore and may be removed in the future.
-     */
-    @Deprecated
-    public void saveAttachment(XWikiAttachment attachment, boolean parentUpdate, XWikiContext context,
+    private void saveAttachment(XWikiAttachment attachment, boolean parentUpdate, XWikiContext context,
         boolean bTransaction) throws XWikiException
     {
         try {
@@ -2805,11 +2760,7 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
         }
     }
 
-    /**
-     * @deprecated This is internal to XWikiHibernateStore and may be removed in the future.
-     */
-    @Deprecated
-    public SessionFactory injectCustomMappingsInSessionFactory(XWikiDocument doc, XWikiContext context)
+    private SessionFactory injectCustomMappingsInSessionFactory(XWikiDocument doc, XWikiContext context)
         throws XWikiException
     {
         // If we haven't turned of dynamic custom mappings we should not inject them
@@ -2862,11 +2813,7 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
         return injectInSessionFactory(config);
     }
 
-    /**
-     * @deprecated This is internal to XWikiHibernateStore and may be removed in the future.
-     */
-    @Deprecated
-    public SessionFactory injectInSessionFactory(Configuration config) throws XWikiException
+    private SessionFactory injectInSessionFactory(Configuration config) throws XWikiException
     {
         SessionFactoryImpl sfactory = (SessionFactoryImpl) config.buildSessionFactory();
         Settings settings = sfactory.getSettings();
@@ -3024,24 +2971,6 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
         } else {
             return ArrayUtils.contains(validtypes, name);
         }
-    }
-
-    /**
-     * @deprecated This is internal to XWikiHibernateStore and may be removed in the future.
-     */
-    @Deprecated
-    public XWikiBatcherStats getBatcherStats()
-    {
-        return null; // XWikiBatcher.getSQLStats();
-    }
-
-    /**
-     * @deprecated This is internal to XWikiHibernateStore and may be removed in the future.
-     */
-    @Deprecated
-    public void resetBatcherStats()
-    {
-        // XWikiBatcher.getSQLStats().resetStats();
     }
 
     /**

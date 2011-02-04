@@ -84,11 +84,11 @@ public class AutoTagPlugin extends XWikiDefaultPlugin implements XWikiPluginInte
 
     private List<String> dontignoreList = new ArrayList<String>();
 
-    int maxTag = 100;
+    private int maxTag = 100;
 
-    int maxTagSize = 64;
+    private int maxTagSize = 64;
 
-    int minTagSize = 12;
+    private int minTagSize = 12;
 
     public AutoTagPlugin(String name, String className, XWikiContext context)
     {

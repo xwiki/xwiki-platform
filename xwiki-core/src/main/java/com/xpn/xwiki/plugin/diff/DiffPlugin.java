@@ -10,8 +10,8 @@ import org.suigeneris.jrcs.diff.Revision;
 import org.suigeneris.jrcs.diff.delta.Chunk;
 import org.suigeneris.jrcs.diff.delta.Delta;
 import org.suigeneris.jrcs.util.ToString;
+import org.xwiki.xml.internal.XMLScriptService;
 
-import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.api.Api;
@@ -94,7 +94,7 @@ public class DiffPlugin extends XWikiDefaultPlugin
 
     protected String escape(String text)
     {
-        return XWiki.getXMLEncoded(text);
+        return XMLScriptService.escape(text);
     }
 
     /**

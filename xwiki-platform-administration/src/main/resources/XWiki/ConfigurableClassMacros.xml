@@ -144,6 +144,77 @@
 #end
 
 
+#macro(findCustomSectionsToConfigure $adminMenu)
+  #set ($outputList = [])
+  #set ($global = ($editor == 'globaladmin'))
+  #findNamesOfAppsToConfigure('', $global, $currentSpace, $outputList)
+  #set ($sectionsByName = {})
+  #set ($categoriesByName = {})
+  #foreach ($category in $adminMenu)
+    #set ($discard = $categoriesByName.put($category.id, $category))
+    #foreach ($section in $category.children)
+      #set ($discard = $sectionsByName.put($section.id, $section))
+    #end
+  #end
+  ##
+  #set ($query = "editor=$escapetool.url(${editor})")
+  #if ($editor != 'globaladmin')
+    #set ($query = $query + "&amp;amp;space=$escapetool.url(${currentSpace})")
+  #end
+  #foreach ($appName in $outputList)
+    ##
+    ## Get the configurable application
+    #set ($app = $xwiki.getDocument($appName))
+    ##
+    ## If getDocument returns null, then warn the user that they don't have view access to that application.
+    #if (!$app)
+!      #set ($discard = $appsUserCannotView.add($appName))
+    #end
+    ##
+    #foreach ($configurableObject in $app.getObjects($nameOfThisDocument))
+      #set ($displayInSection = $app.getValue('displayInSection', $configurableObject))
+      ##
+      ## If there is no section for this configurable or if the section cannot be edited, then check if the
+      ## application can be edited by the current user, if so then we display the icon from the current app and
+      ## don't display any message to tell the user they can't edit that section.
+      #if ($sectionsByName.containsKey($displayInSection))
+        #set ($appSection = $sectionsByName.get($displayInSection))
+        #set ($appSection.configurable = true)
+        #set ($newSection = false)
+      #else
+        ##
+        ## If there is no section for this configurable, then we will have to add one.
+        #set ($appSection = {'id' : $displayInSection, 'name' : $msg.get("admin.${displayInSection.toLowerCase()}"), 'url': $xwiki.getURL($currentDoc, $adminAction, "${query}&amp;amp;section=$escapetool.url(${displayInSection})"), 'configurable' : true})
+        #if ($app.getValue('configureGlobally', $configurableObject) != 1)
+          #set ($appSection.perSpace = true)
+        #end
+        #set ($key = "admin.${displayInSection.toLowerCase()}.description")
+        #if ($msg.get($key) != $key)
+          #set ($appSection.description = $msg.get($key))
+        #end
+        #set ($discard = $sectionsByName.put($displayInSection, $appSection))
+        #set ($discard = $categoriesByName.get('applications').children.add($appSection))
+        #set ($newSection = true)
+      #end
+      ##
+      ## If an attachment by the filename iconAttachment exists and is an image
+      #set ($attachment = $app.getAttachment("$!app.getValue('iconAttachment', $configurableObject)"))
+      #if ($attachment &amp;&amp; $attachment.isImage())
+        ## Set the icon for this section as the attachment URL.
+        #set ($appSection.iconReference = "${appName}@${attachment.getFilename()}")
+      #end
+      ##
+      ## If the user doesn't have edit access to the application, we want to show a message on the icon
+      #if (!$xcontext.hasAccessLevel('edit', $app.getFullName()) &amp;&amp; $newSection)
+        #set ($appSection.readOnly = true)
+      #elseif ($xcontext.hasAccessLevel('edit', $app.getFullName()) &amp;&amp; $appSection.readOnly)
+        #set ($appSection.readOnly = false)
+      #end
+    #end## Foreach configurable object in this app.
+  #end## Foreach application which is configurable.
+#end
+
+
 #*
  * Show the heading for configuration for a given application.
  *

@@ -361,7 +361,7 @@ iKAtTBe0AQfYWgXdAG9qCi1fA5wQWwLgSdydYgcsNRLABafWgzPNB4DsfrNE6VJz6VvXltr/A+kB
     if (e.tagName != undefined &amp;&amp; e.tagName.toLowerCase() == 'div' &amp;&amp; e.getAttribute('class') != undefined &amp;&amp; e.getAttribute('class').indexOf('errormessage') != -1)
     {
       errorShown = true;
-    } else if (!errorShown 
+    } else if (!errorShown
                &amp;&amp; e.tagName != undefined
                &amp;&amp; e.tagName.toLowerCase() == 'h1'
                &amp;&amp; e.getAttribute('id') != undefined
@@ -377,7 +377,7 @@ iKAtTBe0AQfYWgXdAG9qCi1fA5wQWwLgSdydYgcsNRLABafWgzPNB4DsfrNE6VJz6VvXltr/A+kB
   var inputs = document.getElementsByTagName('input');
   for (var i = 0; i &lt; inputs.length; i++) {
     if (inputs[i].getAttribute('type') != undefined &amp;&amp; inputs[i].getAttribute('type').toLowerCase() == 'submit') {
-      inputs[i].parentNode.removeChild(inputs[i]);
+      inputs[i].up('.bottombuttons').remove();
     }
   }
 
@@ -413,30 +413,30 @@ iKAtTBe0AQfYWgXdAG9qCi1fA5wQWwLgSdydYgcsNRLABafWgzPNB4DsfrNE6VJz6VvXltr/A+kB
 
 {{velocity}}
 #*
- * This part takes the configuration from any documents containing XWiki.ConfigurableClass objects and creates a form 
+ * This part takes the configuration from any documents containing XWiki.ConfigurableClass objects and creates a form
  * for each. To includeForm this document, you may specify:
  *
  * $section - String - The section which we are administrating eg: "Registration", "Users", or "Import".
  *                     If none is specified then it checks for a request parameter called "section" and uses that,
  *                     if no parameter, then this code assumes that it is part of the admin icons sheet and adds icons
- *                     for any section which is not in $sections, in that event, this code assumes it is being run 
+ *                     for any section which is not in $sections, in that event, this code assumes it is being run
  *                     inside of a &lt;ul&gt; block.
  *
- * $sections - List&lt;String&gt; - If section is not specified, any sections on this list will not have icons made for them
+ * $sections - List&lt;String&gt; - If section is not specified, any sections on this list will not have icons made for them,
  *                            the assumption being that the icons are already there. If section is specified then this
  *                            is not taken into account and may safely be undefined.
  *
- * $currentDoc - String (document.fullName) - The administration document, users who don't have permission to edit 
- *                                            it will not be able to include applications (possibly injecting 
+ * $currentDoc - String (document.fullName) - The administration document, users who don't have permission to edit
+ *                                            it will not be able to include applications (possibly injecting
  *                                            arbitrary code.) if none specified then $doc.getFullName() is used.
  *
  * $globaladmin - boolean - If set true then we will assume we are administrationg the entire wiki.
  *                          If not set then we look for a request parameter called "editor" if that exists and equals
- *                          "globaladmin" then $globaladmin is true, if it doesn't exist then we check to see if 
+ *                          "globaladmin" then $globaladmin is true, if it doesn't exist then we check to see if
  *                          $currentDoc.getFullName() equals "XWiki.XWikiPreferences".
  *
  * $doNotUnlockConfigurableDocuments - boolean - If true then this code will not make any attempt to unlock configurable
- *                                               documents. By default it does because it locks any document in the 
+ *                                               documents. By default it does because it locks any document in the
  *                                               section which is being configured which would lead to a lot of stray
  *                                               locks if they weren't all canceled. Only recommended if this page is
  *                                               being included twice in the same page.
@@ -468,7 +468,7 @@ $xwiki.jsfx.use('js/xwiki/actionbuttons/actionButtons.js', true)
 ## Removing the next line will open a security hole.
 #sandboxDocument()
 ##
-## This application locks every document in a section while that section is being edited so we should 
+## This application locks every document in a section while that section is being edited so we should
 ## check for locks held by the current user on any of the applications configured here and remove them.
 #if(!$doNotUnlockConfigurableDocuments)
   #set($outputList = [])
@@ -524,187 +524,172 @@ $xwiki.jsfx.use('js/xwiki/actionbuttons/actionButtons.js', true)
 
       {{error}}$msg.get('xe.admin.configurable.noPermissionThisApplication'){{/error}}
 
+    #elseif(!$documentSavedByAuthorizedUser)
+      #showHeading($appName, $headingShowing)
+
+      {{error}}$msg.get('xe.admin.configurable.applicationAuthorNoAdmin', [$app.Author]){{/error}}
+
+    ##
+    ##------------------------------------------------------------------------------------------------------------
+    ## If the document is locked and not by the current user and forceEdit is not set true,
+    #elseif($app.getLocked() &amp;&amp; $app.getLockingUser() != $xcontext.getUser() &amp;&amp; !$request.getParameter('forceEdit'))
+      #set($requestURL = "$request.getRequestURL()")
+      #if($requestURL.indexOf('?') == -1)
+        #set($requestURL = "${requestURL}?")
+      #end
+      #showHeading($appName, $headingShowing)
+
+      {{error}}$msg.get('doclockedby') $app.getLockingUser() [[$msg.get('forcelock')&gt;&gt;${requestURL}&amp;forceEdit=1]]{{/error}}
+
     #else
+      ## If the document is not already locked, attempt to acquire the lock.
+      #if(!$app.getLocked())
+        ## Try to use an AJAX call to lock the document.
+
+        {{html wiki=true}}
+          &lt;noscript&gt;
+
+            {{warning}}$msg.get('xe.admin.configurable.cannotLockNoJavascript'){{/warning}}
+
+          &lt;/noscript&gt;
+          &lt;script type="text/javascript"&gt;
+            document.observe("xwiki:dom:loaded", function() {
+              new Ajax.Request("$xwiki.getURL($app.getFullName(), 'lock', 'ajax=1')");
+            });
+          &lt;/script&gt;
+        {{/html}}
+        #set($discard = $lockedDocumentNames.add($app.getFullName()))
+      #end
+      ##------------------------------------------------------------------------------------------------------------
+      ## Done Locking.
       ##
-      #if(!$documentSavedByAuthorizedUser)
+      ## Get all objects of the "ConfigurableClass" from this document.
+      #set($allConfigurableObjs = $app.getObjects($nameOfThisDocument))
+      ## Separate out the objects which are for this section.
+      #set($configurableObjs = [])
+      #foreach($configurableObj in $allConfigurableObjs)
+        #if($app.getValue('displayInSection', $configurableObj) == $section)
+          ## If this is space admin, then don't display global, if global don't display space.
+          #if($globaladmin == ($app.getValue('configureGlobally', $configurableObj) == 1))
+            #set($discard = $configurableObjs.add($configurableObj))
+          #end
+        #end
+      #end
+      #if($configurableObjs.size() == 0)
+        ## Internal error, not translated.
         #showHeading($appName, $headingShowing)
 
-        {{error}}$msg.get('xe.admin.configurable.applicationAuthorNoAdmin', [$app.Author]){{/error}}
+        {{error}}Internal error: All objects were filtered out for application: $appName.{{/error}}
 
       #else
-        ##
-        ## Locking document
-        ##------------------------------------------------------------------------------------------------------------
-        #if($app.getLocked())
-          #set($locked = true)
-        #end
-        ## If the document is locked and not by the current user and forceEdit is not set true,
-        #if($locked &amp;&amp; $app.getLockingUser() != $xcontext.getUser() &amp;&amp; !$request.getParameter('forceEdit'))
-          #set($requestURL = "$request.getRequestURL()")
-          #if($requestURL.indexOf('?') == -1)
-            #set($requestURL = "${requestURL}?")
+        #set($formAction = $xwiki.getURL($app.getFullName(), 'save'))
+        #set($formId = "${section.toLowerCase()}_${app.getFullName()}")
+        #set($escapedAppName = $escapetool.xml($app.getFullName()))
+        #foreach($configurableObj in $configurableObjs)
+          ## Display the header if one exists.
+          #set($heading = $app.getValue('heading', $configurableObj))
+          #if($heading &amp;&amp; $heading != '')
+            == #evaluate($heading) ==
           #end
-          #showHeading($appName, $headingShowing)
-
-          {{error}}$msg.get('doclockedby') $app.getLockingUser() [[$msg.get('forcelock')&gt;&gt;${requestURL}&amp;forceEdit=1]]{{/error}}
-
-        #else
-          ## If the document is not already locked, attempt to acquire the lock.
-          #if(!$locked)
-            ## Try to use an AJAX call to lock the document.
-
-
-            {{html wiki=true}}
-              &lt;noscript&gt;
-
-                {{warning}}$msg.get('xe.admin.configurable.cannotLockNoJavascript'){{/warning}}
-
-              &lt;/noscript&gt;
-              &lt;script type="text/javascript"&gt;
-                document.observe("xwiki:dom:loaded", function() {
-                  new Ajax.Request("$xwiki.getURL($app.getFullName(), 'lock', 'ajax=1')");
-                });
-              &lt;/script&gt;
-            {{/html}}
-
-            #set($discard = $lockedDocumentNames.add($app.getFullName()))
-          #end
-          ##------------------------------------------------------------------------------------------------------------
-          ## Done Locking.
           ##
-          ## Get all objects of the "ConfigurableClass" from this document.
-          #set($allConfigurableObjs = $app.getObjects($nameOfThisDocument))
-          ## Separate out the objects which are for this section.
-          #set($configurableObjs = [])
-          #foreach($configurableObj in $allConfigurableObjs)
-            #if($app.getValue('displayInSection', $configurableObj) == $section)
-              ## If this is space admin, then don't display global, if global don't display space.
-              #if($globaladmin == ($app.getValue('configureGlobally', $configurableObj) == 1))
-                  #set($discard = $configurableObjs.add($configurableObj))
-              #end
-            #end
+          #set($codeToExecute = "$!app.getValue('codeToExecute', $configurableObj)")
+          #if($codeToExecute != '')
+            (%class="codeToExecute"%)(((##
+              #evaluate($codeToExecute)##
+            )))
           #end
-          #if($configurableObjs.size() == 0)
-            ## Internal error, not translated.
-            #showHeading($appName, $headingShowing)
+          ##
+          ## If propertiesToShow is set, then we will only show the properties contained therein.
+          #set($propertiesToShow = $app.getValue('propertiesToShow', $configurableObj))
+          #if(!$propertiesToShow || $propertiesToShow.getClass().getName().indexOf('List') == -1)
+            #set($propertiesToShow = [])
+          #end
+          ##
+          ## If linkPrefix is set, then we will make each property label a link which starts with that prefix.
+          #set($linkPrefix = "$!app.getValue('linkPrefix', $configurableObj)")
+          ##
+          ## If the Configurable object specifies a configuration class, use it,
+          ## otherwise assume custom forms are used instead.
+          #set($configClassName = "$!app.getValue('configurationClass', $configurableObj)")
+          #if($configClassName != '')
+            #set($objClass = $xwiki.getDocument($configClassName).getxWikiClass())
+            #if(!$objClass || $objClass.getClass().getName().indexOf('.Class') == -1)
+              #showHeading($appName, $headingShowing)
 
-            {{error}}Internal error: All objects were filtered out for application: $appName.{{/error}}
+              {{error}}$msg.get('xe.admin.configurable.configurationClassNonexistant'){{/error}}
 
-          #else
-            #set($formAction = $xwiki.getURL($app.getFullName(), 'save'))
-            #set($formId = "${section.toLowerCase()}_${app.getFullName()}")
-            #set($escapedAppName = $escapetool.xml($app.getFullName()))
-            #foreach($configurableObj in $configurableObjs)
-              ## Display the header if one exists.
-              #set($heading = $app.getValue('heading', $configurableObj))
-              #if($heading &amp;&amp; $heading != '')
-                == #evaluate($heading) ==
-              #end
+            #else
+              ## Use the first object from the document which is of the configuration class.
+              #set($obj = $app.getObject($objClass.getName()))
               ##
-              #set($codeToExecute = "$!app.getValue('codeToExecute', $configurableObj)")
-              #if($codeToExecute != '')
-                (%class="codeToExecute"%)(((##
-                  #evaluate($codeToExecute)##
-                )))
-              #end
-              ##
-              ## If propertiesToShow is set, then we will only show the properties contained therein.
-              #set($propertiesToShow = $app.getValue('propertiesToShow', $configurableObj))
-              #if(!$propertiesToShow || $propertiesToShow.getClass().getName().indexOf('List') == -1)
-                #set($propertiesToShow = [])
-              #end
-              ##
-              ## If linkPrefix is set, then we will make each property label a link which starts with that prefix.
-              #set($linkPrefix = "$!app.getValue('linkPrefix', $configurableObj)")
-              ##
-              ## If the Configurable object specifies a configuration class, use it, 
-              ## otherwise assume custom forms are used instead.
-              #set($configClassName = "$!app.getValue('configurationClass', $configurableObj)")
-              #if($configClassName != '')
-                #set($objClass = $xwiki.getDocument($configClassName).getxWikiClass())
-                #if(!$objClass || $objClass.getClass().getName().indexOf('.Class') == -1)
-                  #showHeading($appName, $headingShowing)
+              #if(!$obj || $obj.getClass().getName().indexOf('.Object') == -1)
+                #showHeading($appName, $headingShowing)
 
-                  {{error}}$msg.get('xe.admin.configurable.configurationClassNonexistant'){{/error}}
+                {{error}}
+                  $msg.get('xe.admin.configurable.noObjectOfConfigurationClassFound', [$objClass.getName(), $app.getFullName()])
+                {{/error}}
 
-                #else
-                  ## Use the first object from the document which is of the configuration class.
-                  #set($obj = $app.getObject($objClass.getName()))
-                  ##
-                  #if(!$obj || $obj.getClass().getName().indexOf('.Object') == -1)
-                    #showHeading($appName, $headingShowing)
+              #else
+                ##
+                ## Merge save buttons, remove headings from subsections, and make information links into popups.
+                ## This is not done if there is only a custom defined form.
+                $xwiki.jsx.use($nameOfThisDocument)##
+                ##
+                ## We don't begin the form until we have content for it so that a configurable can specify a
+                ## custom form in codeToExecute and if that configurable object is the first of it's kind in that
+                ## document, the custom form will not be put inside of our form.
+                #if(!$insideForm)
+                  ## We are opening a form and fieldset without closing it, thus we cannot clean this html.
 
-                    {{error}}
-                      $msg.get('xe.admin.configurable.noObjectOfConfigurationClassFound',
-                        [$objClass.getName(), $app.getFullName()])
-                    {{/error}}
-
-                  #else
-                    ##
-                    ## Merge save buttons, remove headings from subsections, and make information links into popups.
-                    ## This is not done if there is only a custom defined form.
-                    $xwiki.jsx.use($nameOfThisDocument)
-                    ##
-                    ## We don't begin the form until we have content for it so that a configurable can specify a 
-                    ## custom form in codeToExecute and if that configurable object is the first of it's kind in that
-                    ## document, the custom form will not be put inside of our form.
-                    #if(!$insideForm)
-                      ## We are opening a form and fieldset without closing it, thus we cannot clean this html.
-
-                      {{html clean=false}}
-                      &lt;form id="$formId" method="post" action="$formAction" class="xform half"&gt;
+                  {{html clean=false}}
+                    &lt;form id="$formId" method="post" action="$formAction" class="xform half"&gt;
                       &lt;fieldset&gt;
-                      {{/html}}
-                      #set($insideForm = true)
-                    #end
+                  {{/html}}
+                  #set($insideForm = true)
+                #end
 
-                    {{html}}
-                    $formHtml.toString()
-                    {{/html}}
+                {{html}}
+                  $formHtml.toString()
+                {{/html}}
+              #end## If object exists
+            #end## If class exists
+          #end## If class name is specified.
+        #end## Foreach configurable object found in this document
+        ## If a form was started then we end it.
+        #if($insideForm)
 
-                  #end## If object exists
-                #end## If class exists
-              #end## If class name is specified.
-            #end## Foreach configurable object found in this document
-            ## If a form was started then we end it.
-            #if($insideForm)
-
-              ## This is closing an open form which was opened above, we cannot clean this html.
-              {{html clean=false}}
-              ## We add in a redirect field to prevent the user from being carried away when they save
-              ## if they don't have javascript.
-              #set($thisURL = $request.getRequestURL())
-              #if($request.getQueryString() &amp;&amp; $request.getQueryString().length() &gt; 0)
-                #set($thisURL = "${thisURL}?$request.getQueryString()")
-              #end
-              &lt;input type="hidden" id="${escapedAppName}_redirect" name="$redirectParameter" value="$escapetool.xml($thisURL)" /&gt;
-              &lt;input type="hidden" name="form_token" value="$!{services.csrf.getToken()}" /&gt;
-              &lt;/fieldset&gt;
-              &lt;div class="bottombuttons"&gt;
-                &lt;p class="admin-buttons"&gt;
-                  &lt;span class="buttonwrapper"&gt;
-                    ## Text to display on the button. If there is a heading then this button should be labeled
-                    ## that it is for saving this section. Otherwise it should be a generic "save" button.
-                    #if($headingShowing)
-                      #set($buttonText = "$msg.get('admin.save') $escapedAppName")
-                    #else
-                      #set($buttonText = "$msg.get('admin.save')")
-                    #end                      
-                    &lt;input class="button" type="submit" name="action_saveandcontinue" value="$buttonText" /&gt;
-                  &lt;/span&gt;
-                &lt;/p&gt;
-              &lt;/div&gt; ## bottombuttons
-              &lt;/form&gt;
-              #set($insideForm = false)
-              {{/html}}
-
-            #end
-          #end## If there are configurable objects
-        #end## If document is not locked or forceEdit is enabled
-      #end## If app author has permission to edit admin page
-    #end## If the current user has permission to edit the configurable application.
+          ## This is closing an open form which was opened above, we cannot clean this html.
+          {{html clean=false}}
+          ## We add in a redirect field to prevent the user from being carried away when they save
+          ## if they don't have javascript.
+          #set($thisURL = $request.getRequestURL())
+          #if($request.getQueryString() &amp;&amp; $request.getQueryString().length() &gt; 0)
+            #set($thisURL = "${thisURL}?$request.getQueryString()")
+          #end
+          &lt;input type="hidden" id="${escapedAppName}_redirect" name="$redirectParameter" value="$escapetool.xml($thisURL)" /&gt;
+          &lt;input type="hidden" name="form_token" value="$!{services.csrf.getToken()}" /&gt;
+          &lt;/fieldset&gt;
+          &lt;div class="bottombuttons"&gt;
+            &lt;p class="admin-buttons"&gt;
+              &lt;span class="buttonwrapper"&gt;
+                ## Text to display on the button. If there is a heading then this button should be labeled
+                ## that it is for saving this section. Otherwise it should be a generic "save" button.
+                #if($headingShowing)
+                  #set($buttonText = "$msg.get('admin.save') $escapedAppName")
+                #else
+                  #set($buttonText = "$msg.get('admin.save')")
+                #end
+                &lt;input class="button" type="submit" name="action_saveandcontinue" value="$buttonText" /&gt;
+              &lt;/span&gt;
+            &lt;/p&gt;
+          &lt;/div&gt; ## bottombuttons
+          &lt;/form&gt;
+          #set($insideForm = false)
+          {{/html}}
+        #end
+      #end## If there are configurable objects
+    #end## If document is not locked or forceEdit is enabled
   #end## Foreach document name in names to configure
-
 
   {{html}}
   &lt;script type="text/javascript"&gt;
@@ -751,7 +736,7 @@ $xwiki.jsfx.use('js/xwiki/actionbuttons/actionButtons.js', true)
     #if(!$app)
       #set($discard = $appsUserCannotView.add($appName))
     #end
-    ## 
+    ##
     #set($configurableObjects = $app.getObjects($nameOfThisDocument))
     #foreach($configurableObject in $configurableObjects)
       #set($displayInSection = $app.getValue('displayInSection', $configurableObject))

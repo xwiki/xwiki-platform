@@ -33,11 +33,11 @@ import com.xpn.xwiki.XWikiException;
 @Deprecated
 public class PluginException extends XWikiException
 {
-    /** The name of the plugin that triggered the exception. */
-    private final String pluginName;
-
     /** Custom message format to use for plugin exceptions. */
     private static final MessageFormat CUSTOM_MESSAGE = new MessageFormat("Exception in plugin [{0}]: {1}");
+
+    /** The name of the plugin that triggered the exception. */
+    private final String pluginName;
 
     /**
      * Exception constructor.

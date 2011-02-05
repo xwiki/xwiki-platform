@@ -25,6 +25,7 @@ import java.util.List;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.plugin.activitystream.api.ActivityEvent;
+import com.xpn.xwiki.plugin.activitystream.api.ActivityEventType;
 
 /**
  * @version $Id$
@@ -100,7 +101,7 @@ public class ActivityEventImpl implements ActivityEvent
      * Body message of the event.
      */
     private String body = "";
-    
+
     /**
      * Version of the document at the time the event occured.
      */
@@ -136,7 +137,7 @@ public class ActivityEventImpl implements ActivityEvent
      */
     public String getDisplayTitle(XWikiContext context)
     {
-        return context.getMessageTool().get(title, getParams());
+        return context.getMessageTool().get(this.title, getParams());
     }
 
     /**
@@ -144,7 +145,7 @@ public class ActivityEventImpl implements ActivityEvent
      */
     public String getDisplayBody(XWikiContext context)
     {
-        return context.getMessageTool().get(body, getParams());
+        return context.getMessageTool().get(this.body, getParams());
     }
 
     /**
@@ -152,7 +153,7 @@ public class ActivityEventImpl implements ActivityEvent
      */
     public String getDisplayDate(XWikiContext context)
     {
-        return context.getWiki().formatDate(date, null, context);
+        return context.getWiki().formatDate(this.date, null, context);
     }
 
     /**
@@ -160,7 +161,7 @@ public class ActivityEventImpl implements ActivityEvent
      */
     public String getDisplayUser(XWikiContext context)
     {
-        return context.getWiki().getLocalUserName(user, context);
+        return context.getWiki().getUserName(this.user, context);
     }
 
     /**
@@ -206,7 +207,7 @@ public class ActivityEventImpl implements ActivityEvent
      */
     public String getEventId()
     {
-        return eventId;
+        return this.eventId;
     }
 
     /**
@@ -222,7 +223,7 @@ public class ActivityEventImpl implements ActivityEvent
      */
     public String getRequestId()
     {
-        return requestId;
+        return this.requestId;
     }
 
     /**
@@ -238,7 +239,7 @@ public class ActivityEventImpl implements ActivityEvent
      */
     public int getPriority()
     {
-        return priority;
+        return this.priority;
     }
 
     /**
@@ -254,7 +255,7 @@ public class ActivityEventImpl implements ActivityEvent
      */
     public String getApplication()
     {
-        return application;
+        return this.application;
     }
 
     /**
@@ -264,15 +265,15 @@ public class ActivityEventImpl implements ActivityEvent
     {
         this.stream = stream;
     }
-    
+
     /**
      * {@inheritDoc}
      */
     public String getVersion()
     {
-        return version;
+        return this.version;
     }
-    
+
     /**
      * {@inheritDoc}
      */
@@ -288,7 +289,7 @@ public class ActivityEventImpl implements ActivityEvent
      */
     public String getParam1()
     {
-        return param1;
+        return this.param1;
     }
 
     /**
@@ -304,7 +305,7 @@ public class ActivityEventImpl implements ActivityEvent
      */
     public String getParam2()
     {
-        return param2;
+        return this.param2;
     }
 
     /**
@@ -320,7 +321,7 @@ public class ActivityEventImpl implements ActivityEvent
      */
     public String getParam3()
     {
-        return param3;
+        return this.param3;
     }
 
     /**
@@ -336,7 +337,7 @@ public class ActivityEventImpl implements ActivityEvent
      */
     public String getParam4()
     {
-        return param4;
+        return this.param4;
     }
 
     /**
@@ -352,7 +353,7 @@ public class ActivityEventImpl implements ActivityEvent
      */
     public String getParam5()
     {
-        return param5;
+        return this.param5;
     }
 
     /**
@@ -368,7 +369,7 @@ public class ActivityEventImpl implements ActivityEvent
      */
     public String getWiki()
     {
-        return wiki;
+        return this.wiki;
     }
 
     /**
@@ -384,7 +385,7 @@ public class ActivityEventImpl implements ActivityEvent
      */
     public String getType()
     {
-        return type;
+        return this.type;
     }
 
     /**
@@ -400,7 +401,7 @@ public class ActivityEventImpl implements ActivityEvent
      */
     public String getUser()
     {
-        return user;
+        return this.user;
     }
 
     /**
@@ -416,7 +417,7 @@ public class ActivityEventImpl implements ActivityEvent
      */
     public String getSpace()
     {
-        return space;
+        return this.space;
     }
 
     /**
@@ -432,7 +433,7 @@ public class ActivityEventImpl implements ActivityEvent
      */
     public String getPage()
     {
-        return page;
+        return this.page;
     }
 
     /**
@@ -448,7 +449,7 @@ public class ActivityEventImpl implements ActivityEvent
      */
     public String getUrl()
     {
-        return url;
+        return this.url;
     }
 
     /**
@@ -464,7 +465,7 @@ public class ActivityEventImpl implements ActivityEvent
      */
     public String getTitle()
     {
-        return title;
+        return this.title;
     }
 
     /**
@@ -480,7 +481,7 @@ public class ActivityEventImpl implements ActivityEvent
      */
     public String getBody()
     {
-        return body;
+        return this.body;
     }
 
     /**
@@ -496,7 +497,7 @@ public class ActivityEventImpl implements ActivityEvent
      */
     public Date getDate()
     {
-        return date;
+        return this.date;
     }
 
     /**
@@ -512,7 +513,7 @@ public class ActivityEventImpl implements ActivityEvent
      */
     public String getStream()
     {
-        return stream;
+        return this.stream;
     }
 
     /**

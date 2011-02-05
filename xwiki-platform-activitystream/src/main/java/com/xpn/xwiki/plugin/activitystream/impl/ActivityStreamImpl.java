@@ -192,17 +192,15 @@ public class ActivityStreamImpl implements ActivityStream, EventListener
         String keySeparator = EVENT_ID_ELEMENTS_SEPARATOR;
         String wikiSpaceSeparator = ":";
 
-        String key =
-            event.getStream() + keySeparator + event.getApplication() + keySeparator + event.getWiki()
-                + wikiSpaceSeparator + event.getPage() + keySeparator + event.getType();
+        String key = event.getStream() + keySeparator + event.getApplication() + keySeparator + event.getWiki()
+            + wikiSpaceSeparator + event.getPage() + keySeparator + event.getType();
         long hash = key.hashCode();
         if (hash < 0) {
             hash = -hash;
         }
 
-        String id =
-            "" + hash + keySeparator + event.getDate().getTime() + keySeparator
-                + RandomStringUtils.randomAlphanumeric(8);
+        String id = "" + hash + keySeparator + event.getDate().getTime() + keySeparator
+            + RandomStringUtils.randomAlphanumeric(8);
         if (context.get(REQUEST_ID_CONTEXT_KEY) == null) {
             context.put(REQUEST_ID_CONTEXT_KEY, id);
         }
@@ -235,7 +233,6 @@ public class ActivityStreamImpl implements ActivityStream, EventListener
     /**
      * {@inheritDoc}
      */
-
     public String getStreamName(String space, XWikiContext context)
     {
         return space;
@@ -434,9 +431,8 @@ public class ActivityStreamImpl implements ActivityStream, EventListener
                     bTransactionMutable = hibstore.beginTransaction(false, context);
                 }
                 Session session = hibstore.getSession(context);
-                Query query =
-                    session
-                        .createQuery("select act.eventId from ActivityEventImpl as act where act.eventId = :eventId");
+                Query query = session.createQuery(
+                    "select act.eventId from ActivityEventImpl as act where act.eventId = :eventId");
                 query.setString("eventId", eventId);
                 if (query.uniqueResult() != null) {
                     act = new ActivityEventImpl();
@@ -468,9 +464,8 @@ public class ActivityStreamImpl implements ActivityStream, EventListener
                     bTransactionMutable = hibstore.beginTransaction(false, context);
                 }
                 Session session = hibstore.getSession(context);
-                Query query =
-                    session
-                        .createQuery("select act.eventId from ActivityEventImpl as act where act.eventId = :eventId");
+                Query query = session.createQuery(
+                    "select act.eventId from ActivityEventImpl as act where act.eventId = :eventId");
                 query.setString("eventId", eventId);
                 if (query.uniqueResult() != null) {
                     act = new ActivityEventImpl();

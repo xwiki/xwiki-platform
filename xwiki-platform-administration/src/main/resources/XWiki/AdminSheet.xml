@@ -2541,43 +2541,19 @@ WAP4i9ywscF/axyXL5fOHAQAAAAASUVORK5CYII=
 <property>
 <code>/* Administration application custom JavaScript */
 
-function showAdminSections(e) {
-  $('admin-page-menu').style.display = "none";
-  rmClass($('admin-page-menu'), "hidden");
-  toggleClass($('showsectionswrapper'), "hidden");
-  toggleClass($('hidesectionswrapper'), "hidden");
-  if (!eltHasClass($('admin-page-menu'), "alreadyMoved")) {
- $('admin-page-menu').parentNode.insertBefore($('admin-page-menu'), $('admin-page-content'));
-    addClass($('admin-page-menu'), "alreadyMoved");
+document.observe('xwiki:dom:loaded', function() {
+  if($('goto-select')) {
+    Event.observe($('goto-select'), 'change', function (event) {
+      var select = event.element();
+      var i = select.selectedIndex;
+      if (window.location != select.options[i].value) {
+        window.location = select.options[i].value;
+      }
+    });
+    $('goto-select').next().hide();
   }
-  Effect.SlideDown('admin-page-menu', { duration: 0.7 });
-  Event.stop(e);
-}
-
-function hideAdminSections(e) {
-  toggleClass($('showsectionswrapper'), "hidden");
-  toggleClass($('hidesectionswrapper'), "hidden");
-  $('admin-page-menu').style.display = "none";
-  Event.stop(e);
-}
-
-function goTo(e) {
-  var select = $('goto-select');
-  var i = select.selectedIndex;
-  if (window.location != select.options[i].value) {
-    window.location = select.options[i].value;
-  }
-}
-
-Event.observe(window, 'load', function() {
-  if($('showsections')) { Event.observe($('showsections'), 'click', showAdminSections, false); }
-  if($('hidesections')) { Event.observe($('hidesections'), 'click', hideAdminSections, false); }
-  if($('goto-select')) { Event.observe($('goto-select'), 'change', goTo, false); }
 });
-</code>
-</property>
-<property>
-<name>Administration application javascript</name>
+</code></property><property><name>Administration application javascript</name>
 </property>
 <property>
 <parse>0</parse>
@@ -2666,252 +2642,94 @@ Event.observe(window, 'load', function() {
 <cache>long</cache>
 </property>
 <property>
-<code>/* Override xwiki.js */
+<code>#template('colorThemeInit.vm')
 
-.hidden {
-  display: none !important;
+#document-title {
+  margin-bottom: 1em;
+}
+#change-context {
+  float: right;
+  padding-top: 15px;
+}
+#goto-select optgroup {
+  margin: 6px;
 }
 
-/* Override userandgroups.css */
+/*******************************************************/
 
-.display td, #specialusersandgroups td {
-    border: 1px solid #7c7c7c !important;
+#admin-page-content {
+  margin-left: 15em;
 }
+
+.admin-category {
+  list-style: none outside none;
+  margin: 0 !important;
+  float: left;
+}
+
+.admin-category li {
+  clear: left;
+  color: $theme.textSecondaryColor;
+  margin: 0 1.5em 2em 0;
+  max-width: 400px;
+}
+
+.admin-category strong {
+  font-size: 1.44em;
+  line-height: 2em;
+}
+
+.admin-category img {
+  float: left;
+  margin: 0 1em 0 0;
+}
+
+.admin-category .description {
+  font-size: .9em;
+  display: block;
+}
+
+.admin-menu .configurationIcon  {
+  background-image: url("$xwiki.getSkinFile('icons/silk/wrench.gif')");
+}
+
+.admin-menu .lfIcon {
+  background-image: url("$xwiki.getSkinFile('icons/silk/layout_content.gif')");
+}
+
+.admin-menu .usersgroupsIcon  {
+  background-image: url("$xwiki.getSkinFile('icons/silk/group.gif')");
+}
+
+.admin-menu .contentIcon  {
+  background-image: url("$xwiki.getSkinFile('icons/silk/folder_page.gif')");
+}
+
+.admin-menu .applicationsIcon  {
+  background-image: url("$xwiki.getSkinFile('icons/silk/plugin.gif')");
+}
+
+.admin-menu .readOnly {
+  background-image: url("$xwiki.getSkinFile('icons/silk/error.gif')");
+  background-position: 5px;
+  background-repeat: no-repeat;
+}
+
+/* Override general table styles. */
+/* TODO: Move to livetable.css */
 
 #userstable td, #groupstable td, #usersandgroupstable td, #alldocstable td {
-    border-color: transparent;
+  border-color: transparent;
 }
 
 #userstable, #groupstable, #usersandgroupstable, #alldocstable {
-    border-color: transparent;
-}
-
-/* Additions */
-
-#admin-page-header .submenuitem a, #admin-page-header .submenuitem a:link, #admin-page-header .submenuitem a:visited, #admin-page-header .submenuitem a:active  {
-  display:block;
-  float: none;
-  width: 100%;
-  font-size:0.8em;
-  font-weight: bold;
-  text-decoration:none;
-  height:auto;
-  padding:2px 0 0 0;
-  line-height:1.2em;
-  border: 0;
-  text-align: left;
-  color:#FFF;
-}
-
-#admin-page-header .submenuitem a:hover {
-  text-decoration: underline;
-  background-image: none;
-}
-
-#admin-page-header {
-  color: #FFF;
-  padding-top: 5px;
-  padding-bottom: 5px;
-  background-color: #AFAFB5;
-}
-
-.admin-page-header-spacer {
-  clear:both;
-  height:5px;
-}
-
-h1#admin-header {
-  float:left;
-  line-height: 46px;
-  margin-left: 20px;
-  font-size: 2em;
-  font-weight: bold;
-  margin-top: 0px;
-  overflow:hidden;
-}
-
-#change-context {
-  float:right;
-  margin-right:20px;
-  width:300px;
-  font-size:12px;
-  line-height: 22px;
-  text-align:right;
-}
-
-#goto-globaladmin a {
-  color: #808085;
-  font-weight: bold;
-}
-
-#admin-page-menu {
- clear: both;
- width: 100%;
-}
-
-#admin-icons {
-  float: left;
-  width: 100%;
-  margin: 0px;
-}
-
-#admin-icons li {
-  list-style-type: none;
-  display: inline-block;
-  width: 125px;
-  margin: 15px;
-  text-align: center;
-  vertical-align: top;
-}
-/* For IE6/7, which don't really understand inline-block on block elements */
-* html #admin-icons li {
-  display: inline;
-}
-*+html #admin-icons li {
-  display: inline;
-}
-
-#admin-icons li a {
-  display:  block;
-  background-position: 50% 0%;
-  background-repeat: no-repeat;
-  width: 124px;
-  font-weight: bold;
-  color: #808085;
-  text-decoration: none;
-}
-
-#admin-icons li a img {
-  display: block;
-  height: 85px;
-  text-decoration: none;
-  border: 0;
-}
-
-#admin-page {
-  width: 100%;
-}
-
-#admin-page-content {
-  background-color: #F9F9F9;
-  margin: 0px auto;
-  margin-top: 10px;
-  padding: 5px;
-  clear: both;
-}
-
-#if($xwiki.getBaseSkin() == "albatross")
-h1#admin-header {
-  margin-bottom: 0px;
-}
-
-#showsectionswrapper, #hidesectionswrapper {
-  float: right;
-  margin: 0px;
-}
-
-.rightmenu .submenu .submenuitem {
-  border: 0px;
-  margin: 0px;
-  padding: 0px;
-}
-
-.rightmenu #tmAdmin a strong {
-  padding: 0px !important;
-}
-
-#admin-page .bottombuttons {
-  background: transparent !important;
-  margin: 0px auto !important;
-  margin-bottom: 10 px !important;
-}
-
-.bottombuttons .buttonwrapper {
-  display: inline;
-}
-#end
-
-#admin-page-content #xwikieditcontent {
-  background-color: transparent;
-}
-
-#admin-page-content fieldset {
-  border: 0px;
-  border-bottom: 3px solid #FFF;
-  margin-bottom: 10px;
-}
-
-#admin-page-content fieldset p {
-  width: 80%;
-  display: block;
-  margin-bottom: 10px;
-  padding-left: 10px;
-  padding-right: 10px;
-}
-
-#admin-page-content fieldset legend {
-  color: #606B72;
-  font-size: 1.5em;
-  font-weight: bold;
-  padding-top: 10px;
-  padding-left: 10px;
-}
-
-p.legend {
-  width: auto !important;
-  padding: 0px;
-  margin: 0px;
-  color: #606B72;
-  font-size: 1.5em;
-  font-weight: bold;
-  margin-bottom: 10px;
-}
-
-#admin-page-content fieldset p label {
-  width: 30% !important;
-  float: left;
-  color: #4A4A4B;
-  font-weight: bold;
-  clear: left;
-  margin-bottom: 10px;
-  padding-left: 10px;
-  padding-right: 10px;
-}
-
-#admin-page-content fieldset p input, #admin-page-content fieldset p textarea  {
-  width: 65%;
-  margin-left: 10px;
-  margin-bottom: 10px;
-}
-
-/* Checkboxes are centered in some browsers without this. */
-#admin-page-content fieldset p input[type=checkbox] {
-  width: auto;
-  margin: 0 0 0 10px;
-}
-
-#admin-page-content fieldset p select {
-  width: 30%;
-  margin-left: 10px;
-  margin-bottom: 10px;
-}
-
-#goto-select {
-  clear:both;
-  width:290px;
-}
-
-#goto-select optgroup {
-  margin: 6px;
+  border-color: transparent;
 }
 
 #usersandgroupstable-filters #name {
     width: 65%;
 }
-</code>
-</property>
-<property>
-<name>Administration application stylesheet</name>
+</code></property><property><name>Administration application stylesheet</name>
 </property>
 <property>
 <parse>1</parse>
@@ -2920,144 +2738,308 @@ p.legend {
 <use>onDemand</use>
 </property>
 </object>
-<content>{{velocity}}
+<content>{{include document="XWiki.ConfigurableClassMacros" /}}
+
+{{velocity output="false"}}
+#if ($request.xaction == 'switchContext')
+  $response.sendRedirect($request.target)
+  #stop
+#end
+
+#set ($adminAction = 'admin')
+#set ($crtCategoryId = "$!{request.category}")
+#if ($crtCategoryId != '')
+  #set ($crtCategoryId = $mathtool.toInteger($crtCategoryId))
+#end
+#set ($crtSectionId = "$!{request.section}")
+
+##
+## Admin menu map
+##
+#set($adminMenu = [
+  {
+    'id' : 'configuration',
+    'children': [
+       {'id' : 'General'},
+       {'id' : 'Programming'},
+       {'id' : 'XWiki.OfficeImporterAdmin'}
+    ]
+  },
+  {
+    'id' : 'lf',
+    'children': [
+       {'id' : 'Presentation', 'perSpace' : true},
+       {'id' : 'Panels.PanelWizard', 'perSpace' : true}
+    ]
+  },
+  {
+    'id' : 'usersgroups',
+    'children': [
+       {'id' : 'Users'},
+       {'id' : 'Groups'},
+       {'id' : 'Rights', 'perSpace' : true},
+       {'id' : 'Registration'}
+    ]
+  },
+  {
+    'id' : 'content',
+    'children': [
+       {'id' : 'Import', 'action' : 'import'},
+       {'id' : 'Export', 'action' : 'export'},
+       {'id' : 'Templates'}
+    ]
+  },
+  {
+    'id' : 'applications',
+    'children' : []
+  }
+])
+
+##
+## Fill in the list of custom applications to configure
+##
+#findCustomSectionsToConfigure($adminMenu)
+
+##
+## Filter only the sections that are valid in a space, when administering a space
+##
+#if ($editor == 'spaceadmin')
+  #set ($categoriesToRemove = [])
+  #foreach ($category in $adminMenu)
+    #set ($sectionsToRemove = [])
+    #foreach ($section on $category.children)
+      #if (!$section.perSpace)
+        #set ($discard = $sectionsToRemove.add($section))
+      #end
+    #end
+    #set ($discard = $category.children.removeAll($sectionsToRemove))
+    #if ($category.children.size() == 0)
+      #set ($discard = $categoriesToRemove.add($category))
+    #end
+  #end
+  #set ($discard = $adminMenu.removeAll($categoriesToRemove))
+#end
+#if ("$!crtCategoryId" != '' &amp;&amp; $crtCategoryId &gt;= $adminMenu.size())
+  #set ($crtCategoryId = '')
+#end
+
+#if ($crtSectionId != '')
+  #set ($crtItemId = $crtSectionId)
+#elseif ($crtCategoryId != '')
+  #set ($crtItemId = $adminMenu.get($crtCategoryId).id)
+#end
+#set ($crtSection = $util.null)
+#set ($crtCategory = $util.null)
+
+
+##
+## Prepare the Admin menu map for processing
+##
+#foreach ($category in $adminMenu)
+  ## "Standard" URLs and icons for categories
+  #set ($category.url = $xwiki.getURL($currentDoc, $adminAction, "category=${mathtool.sub($velocityCount, 1)}"))
+  #set ($category.iconReference = "XWiki.AdminSheet@${category.id}.png")
+  #set ($category.description = $msg.get("admin.${category.id}.description"))
+  #set ($category.cssClass = "${category.id}Icon")
+  #set ($category.name = $msg.get("admin.${category.id}"))
+  #if ("$!{crtCategoryId}" != '' &amp;&amp; $velocityCount == $mathtool.add($crtCategoryId, 1))
+    #set ($crtCategory = $category)
+  #end
+  ##
+  ## Process each admin section
+  #foreach ($section in $category.children)
+    #if ($xwiki.exists($section.id) || $xwiki.exists("XWiki.Admin${section.id}Sheet"))
+      #if ($crtSectionId == $section.id)
+        #set ($crtSection = $section)
+        #set ($crtCategory = $category)
+      #end
+      #set ($section.iconReference = '')
+      #if ($section.id.indexOf('.') &gt; 0)
+        #set ($sectionDoc = $xwiki.getDocument($section.id))
+        #set ($section.name = $sectionDoc.getDisplayTitle())
+        #if ($sectionDoc.getAttachment('icon.png'))
+          #set ($section.iconReference = "${sectionDoc}@icon.png")
+        #end
+      #else
+        #set ($sectionDoc = $xwiki.getDocument('XWiki.AdminSheet'))
+        #set ($section.name = $msg.get("admin.${section.id.toLowerCase()}"))
+        #set ($iconName = "${section.id.toLowerCase()}.png")
+        #if ($sectionDoc.getAttachment($iconName))
+          #set ($section.iconReference = "${sectionDoc}@${iconName}")
+        #end
+      #end
+      #set ($query = "editor=$escapetool.url(${editor})&amp;amp;section=$escapetool.url(${section.id})")
+      #if ($editor != 'globaladmin')
+        #set ($query = $query + "&amp;amp;space=$escapetool.url(${currentSpace})")
+      #end
+      #set ($action = "$!{section.action}")
+      #if ($action == '')
+        #set ($action = $adminAction)
+      #end
+      #set ($section.url = $xwiki.getURL($currentDoc, $action, $query))
+      #set ($key = "admin.${section.id.toLowerCase()}.description")
+      #if ($msg.get($key) != $key)
+        #set ($section.description = $msg.get($key))
+      #end
+    #elseif ($section.configurable)
+      #if ($section.readOnly)
+        #set ($section.cssClass = 'readOnly')
+      #end
+      #if ($crtSectionId == $section.id)
+        #set ($crtSection = $section)
+        #set ($crtCategory = $category)
+      #end
+    #end
+  #end
+#end
+
+#**
+ * Displays the sections from an administration category
+ *
+ * Expected format:
+ * sections = vector of items
+ * item = map with the following fields:
+ *        'id'       : mandatory
+ *        'name'     : the text displayed for the corresponding menu item;
+ *                     optional, defaults to
+ *                     $msg.get("$!{translationPrefix}${item.id}")
+ *        'description' : the description displayed for the corresponding section;
+ *                     optional
+ *        'link'     : the "action" of the menu item; mandatory
+ *        'cssClass' : a specific css class for the menu item for custom
+ *                     styling; optional, defaults to ''
+ *
+ * @param $sections the sections list, in the format described above
+ * @param $translationPrefix the translation prefix added to the id of each
+ *        item, in order to generate the name and description; ignored when
+ *        name or description are specified
+ *#
+#macro(admin_displayCategory $sections $translationPrefix)
+(% class="admin-category" %)
+  #foreach ($section in $sections)
+    * {{html wiki="true"}}&lt;a href="$section.url"&gt;[[image:${section.iconReference}]] **${section.name}**&lt;/a&gt;{{/html}} (% class="description" %)$!{section.description}
+  #end
+#end
+
+
+#**
+ * Displays the administration categories
+ *
+ * Expected format:
+ * sections = vector of items
+ * item = map with the following fields:
+ *        'id'       : mandatory
+ *        'name'     : the text displayed for the corresponding menu item;
+ *                     optional, defaults to
+ *                     $msg.get("$!{translationPrefix}${item.id}")
+ *        'description' : the description displayed for the corresponding section;
+ *                     optional
+ *        'link'     : the "action" of the menu item; mandatory
+ *        'cssClass' : a specific css class for the menu item for custom
+ *                     styling; optional, defaults to ''
+ *
+ * @param $sections the sections list, in the format described above
+ * @param $translationPrefix the translation prefix added to the id of each
+ *        item, in order to generate the name and description; ignored when
+ *        name or description are specified
+ *#
+#macro(admin_displayCategories $adminMenu $translationPrefix)
+(% class="admin-category" %)
+  #foreach ($category in $adminMenu)
+    * {{html wiki="true"}}&lt;a href="$category.url"&gt;[[image:${category.iconReference}]] **${msg.get("${translationPrefix}${category.id}")}**&lt;/a&gt;{{/html}} (% class="description" %)$!{category.description}
+  #end
+#end
+
+#**
+ * Displays the drop down allowing to choose a different space to administer.
+ *#
+#macro (admin_spaceSwitch)
+{{html}}
+  &lt;form id="change-context" class="xformInline"&gt;
+    &lt;div&gt;
+      &lt;input type="hidden" name="xaction" value="switchContext" /&gt;
+      &lt;select id="goto-select" name="target"&gt;
+        #if ($xwiki.hasAccessLevel('admin', $xcontext.user, 'XWiki.XWikiPreferences'))
+          &lt;optgroup label="$msg.get('admin.gotoglobaladministration')"&gt;
+            &lt;option value="$xwiki.getURL('XWiki.XWikiPreferences', 'admin')" #if("$!{editor}"=="globaladmin")selected="selected"#end&gt;$msg.get('admin.globaladministration')&lt;/option&gt;
+          &lt;/optgroup&gt;
+        #end
+        &lt;optgroup label="$msg.get('admin.gotospaceadministration')"&gt;
+        #foreach($spaceitem in $xwiki.spaces)
+          #if ($xwiki.hasAccessLevel('admin', $xcontext.user, "${spaceitem}.WebPreferences"))
+            &lt;option value="$xwiki.getURL("${spaceitem}.WebPreferences", 'admin')" #if("$!{currentSpace}" == ${spaceitem} &amp;&amp; "$!{editor}" != 'globaladmin')selected="selected"#end&gt;$escapetool.xml($spaceitem)&lt;/option&gt;
+          #end
+        #end
+        &lt;/optgroup&gt;
+      &lt;/select&gt;
+      &lt;span class="buttonwrapper"&gt;&lt;input type="submit" value="$escapetool.xml($msg.get('admin.switchContext'))" class="button" /&gt;&lt;/span&gt;
+    &lt;/div&gt;
+  &lt;/form&gt;
+{{/html}}
+#end
+{{/velocity}}
+
+{{velocity}}
 ##**************************************************************************************************
-## Administration Sheet,used to display a common UI for some wiki features (presentation, users,
+## Administration Sheet, used to display a common UI for some wiki features (presentation, users,
 ## groups, rights etc.) at global / space level and also for several applications.
 ##**************************************************************************************************
 #if($xcontext.action == 'view')
   $response.sendRedirect($xwiki.getURL($doc.getFullName(), 'admin', $request.getQueryString()))##
 #else
-  ##----------------------------------------------------------------------------
-  ## hard-coded links to app. admin pages which appear at global/space level
-  ## TODO: replace this when the new IX are ready
-  ##----------------------------------------------------------------------------
-  #set($globalAppAdmin = ['Panels.PanelWizard', 'XWiki.OfficeImporterAdmin'])
-  #set($spaceAppAdmin = ['Panels.PanelWizard'])
-  ##------------------------------------------------------------------------------
-  #set($section = "$!{request.section}")
-  ##-------------------------------------
-  ## determine the displayed sections
-  ##-------------------------------------
   $xwiki.jsfx.use('js/scriptaculous/scriptaculous.js')##
   $xwiki.jsx.use('XWiki.AdminSheet')##
   $xwiki.ssx.use('XWiki.AdminSheet')##
-  #if($editor == 'globaladmin')
-    #set($currentDoc = 'XWiki.XWikiPreferences')
-    #set($sections = ['General', 'Presentation', 'Registration', 'Programming', 'Rights', 'Users', 'Groups', 'Import', 'Export', 'Templates'])
-    #set($discard = $sections.addAll($globalAppAdmin))
-  #elseif($editor == 'spaceadmin')
-    #set($currentDoc = "${currentSpace}.WebPreferences")
-    #set($sections = ['Presentation', 'Rights'])
-    #set($discard = $sections.addAll($spaceAppAdmin))
+  #if ($crtSectionId != '' &amp;&amp; $crtSectionId.indexOf('.') &gt; 0)
+    #set ($sectionName = $xwiki.getDocument($crtSectionId).getDisplayTitle())
+  #elseif ($crtSectionId != '')
+    #set ($sectionName = $msg.get("admin.${crtSectionId.toLowerCase()}"))
+  #elseif ($crtCategoryId != '')
+    #set ($sectionName = $msg.get("admin.${crtItemId}"))
+  #elseif ($editor == 'globaladmin')
+    #set ($sectionName = $msg.get('xe.admin.global'))
+  #else
+    #set ($sectionName = $currentSpace)
   #end
-  #if($section != '' &amp;&amp; $section.indexOf('.') &gt; 0)
-    #set($sectionname = $xwiki.getDocument($section).getDisplayTitle())
-  #elseif($section != '')
-    ## If there is no translation (translated message is equals to key), don't display the message key, but the section name instead.
-    #if($msg.get("admin.${section.toLowerCase()}") != "admin.${section.toLowerCase()}") 
-      #set($sectionname = $msg.get("admin.${section.toLowerCase()}")) 
-    #else
-      #set($sectionname = $section)
-    #end
-  #end
+#admin_spaceSwitch()
+(% id="hierarchy" %)(((
+#if ($crtCategory){{html}}&lt;a href="${xwiki.getURL($currentDoc, $adminAction)}"&gt;$msg.get('admin.main.title')&lt;/a&gt;{{/html}}#{else}(% class="current" %)$msg.get('admin.main.title')(%%)#{end}#if ($crtCategory) (% class="separator" %)»(%%) #if ($crtSection){{html}}&lt;a href="${crtCategory.url}"&gt;${crtCategory.name}&lt;/a&gt;{{/html}}#{else}(% class="current" %)${crtCategory.name}(%%)#{end}#if ($crtSection) (% class="separator" %)»(%%) (% class="current" %)${crtSection.name}(%%)#end#end
+)))
+(% id="document-title" %)(((
+  = $msg.get('admin.section.title', [$sectionName]) =
+)))
+
+  #verticalNavigation($adminMenu {'translationPrefix' : 'admin.', 'crtItemId' : "$!crtItemId", 'cssClass' : 'admin-menu'})
   ##-----------------------------------------
   ## admin-page display
   ##-----------------------------------------
-  {{html clean="false"}}
-  &lt;div id="admin-page"&gt;
-    &lt;div id="admin-page-header"&gt;
-      &lt;div class="admin-page-header-spacer"&gt;&amp;nbsp;&lt;/div&gt;
-      &lt;h1 id="admin-header"&gt;#if($section == '')$escapetool.xml($msg.get("admin.${editor}"))#else $escapetool.xml($sectionname)#end&lt;/h1&gt;
-      &lt;div id="change-context"&gt;
-        &lt;label for="goto-select" class="hidden"&gt;$msg.get('admin.placetoadminister')&lt;/label&gt;
-        &lt;select id="goto-select"&gt;
-          #if ($xwiki.hasAccessLevel('admin', $xcontext.user, 'XWiki.XWikiPreferences'))
-            &lt;optgroup label="$msg.get('admin.gotoglobaladministration')"&gt;
-              &lt;option value="$xwiki.getURL('XWiki.XWikiPreferences', 'admin')" #if("$!{editor}"=="globaladmin")selected="selected"#end&gt;$msg.get('admin.globaladministration')&lt;/option&gt;
-            &lt;/optgroup&gt;
-          #end
-          &lt;optgroup label="$msg.get('admin.gotospaceadministration')"&gt;
-          #foreach($spaceitem in $xwiki.spaces)
-            #if ($xwiki.hasAccessLevel('admin', $xcontext.user, "${spaceitem}.WebPreferences"))
-              &lt;option value="$xwiki.getURL("${spaceitem}.WebPreferences", 'admin')" #if("$!{currentSpace}" == ${spaceitem} &amp;&amp; "$!{editor}" != 'globaladmin')selected="selected"#end&gt;$escapetool.xml($spaceitem)&lt;/option&gt;
-            #end
-          #end
-          &lt;/optgroup&gt;
-        &lt;/select&gt;
-        #if($section != '')&lt;br/&gt;&lt;span id="showsectionswrapper" class="buttonwrapper"&gt;&lt;a id="showsections" href="$xwiki.getURL($currentDoc, 'admin')"&gt;$msg.get('admin.showsections')&lt;/a&gt;&lt;/span&gt;
-          &lt;span id="hidesectionswrapper" class="hidden buttonwrapper"&gt;&lt;a id="hidesections" href="$xwiki.getURL($currentDoc, 'admin')"&gt;$msg.get('admin.hidesections')&lt;/a&gt;&lt;/span&gt;#end
-      &lt;/div&gt; ## change-context
-      &lt;div class="admin-page-header-spacer"&gt;&amp;nbsp;&lt;/div&gt;
-    &lt;/div&gt; ## admin-page-header
-    #if($section != '')
-      &lt;div id="admin-page-content"&gt;
-        &lt;div class="$escapetool.xml($sectionname)"&gt;&lt;/div&gt;        
+    #if(!$crtSection &amp;&amp; !$crtCategory)
+      #admin_displayCategories($adminMenu 'admin.')
+    #elseif (!$crtSection)
+      #admin_displayCategory($crtCategory.children 'admin.')
+    #else
+      (% id="admin-page-content" %)(((
         ##------------------------------------------------------------------------------------------------------------
         ## The Administration allows editing other pages from different applications inside the admin context (UI)
         ##------------------------------------------------------------------------------------------------------------
         #if("$!{request.editmode}" == 'inline' &amp;&amp; $xwiki.exists($section))
-          $xcontext.setDisplayMode('edit')
-          {{include document="XWiki.AdminInlineSheet" /}}
-          ##includeForm('XWiki.AdminInlineSheet')
-          ##--------------------------------------------------------------------------------------------------------------
-          ## The Administration app., along with its default sections, dynamically includes and display pages from apps.
-          ## (hard-coded links). TODO: replace the hard-coded links by Interface Extensions
-          ##--------------------------------------------------------------------------------------------------------------
+          $xcontext.setDisplayMode('edit')##
+
+          {{html clean="false"}}{{include document="XWiki.AdminInlineSheet" /}}{{/html}}
         #else
           #if($xwiki.exists("XWiki.Admin${section}Sheet"))
             ## Custom XE administration section
-            #includeForm("XWiki.Admin${section}Sheet")
+
+            {{include document="XWiki.Admin${section}Sheet" /}}
+
           #elseif($xwiki.exists($section))
-            #includeForm($section)
+            {{html clean="false"}}#includeForm($section){{/html}}
           #end
         #end
-        #includeForm('XWiki.ConfigurableClass')
-      &lt;/div&gt; ## admin-page-content
+        #if ($crtSection.configurable)
+          {{include document="XWiki.ConfigurableClass" /}}
+        #end
+      ))) ## admin-page-content
     #end
-    &lt;div id="admin-page-menu" #if($section != '')class="hidden"#end&gt;
-      &lt;ul id="admin-icons"&gt;
-      #foreach($asection in $sections)
-        #if($xwiki.exists($asection) || $xwiki.exists("XWiki.Admin${asection}Sheet"))
-          #set($aiconurl = '')
-          #if($asection.indexOf('.') &gt; 0)
-            #set($adoc = $xwiki.getDocument($asection))
-            #set($atitle = $adoc.getDisplayTitle())
-            #if($adoc.getAttachment('icon.png'))
-              #set($aiconurl = $adoc.getAttachmentURL('icon.png'))
-            #end
-          #else
-            #set($adoc = $xwiki.getDocument("XWiki.AdminSheet"))
-            #set($atitle = $msg.get("admin.${asection.toLowerCase()}"))
-            #set($aiconname = "${asection.toLowerCase()}.png")
-            #if($adoc.getAttachment($aiconname))
-              #set($aiconurl = $adoc.getAttachmentURL($aiconname))
-            #end
-          #end
-          #set($query = "editor=$escapetool.url(${editor})&amp;amp;section=$escapetool.url(${asection})")
-          #if($editor != 'globaladmin')
-            #set($query = $query + "&amp;amp;space=$escapetool.url(${currentSpace})")
-          #end
-          #set($dotindx = $asection.indexOf('.'))
-          #if($dotindx &gt; 0) #set($name = $asection.replaceAll("\.", "_")) #else #set($name = $asection) #end
-          #if($asection == 'Import')
-            #set($url =  $xwiki.getURL('XWiki.Import', 'import', $query))
-          #elseif($asection == 'Export')
-            #set($url = $xwiki.getURL('XWiki.Export', 'export', $query))
-          #elseif($xwiki.exists("XWiki.Admin${asection}Sheet"))
-            #set($url = $xwiki.getURL($currentDoc, 'admin', $query))
-          #elseif($xwiki.exists($asection))
-            #set($url = $xwiki.getURL($currentDoc, 'admin', $query))
-          #end
-          &lt;li class="${name}"&gt;&lt;a href="$url"&gt;&lt;span&gt;#if("$!aiconurl" != '')&lt;img src="$aiconurl" alt="$name icon" /&gt;#end#if("$!atitle" != '')$atitle#else$name#end&lt;/span&gt;&lt;/a&gt;&lt;/li&gt;
-        #end
-      #end
-      #set($section = '')
-      #set($doNotUnlockConfigurableDocuments = true)
-      #includeForm('XWiki.ConfigurableClass')
-      &lt;/ul&gt;
-    &lt;/div&gt; ## admin-page-menu
-  &lt;/div&gt; ## admin-page
-  {{/html}}
 #end
 {{/velocity}}</content></xwikidoc>

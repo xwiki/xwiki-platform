@@ -373,8 +373,8 @@ iKAtTBe0AQfYWgXdAG9qCi1fA5wQWwLgSdydYgcsNRLABafWgzPNB4DsfrNE6VJz6VvXltr/A+kB
   }
 
   // Hide individual submit buttons.
-  var forms = document.getElementsByTagName('form');
-  var inputs = document.getElementsByTagName('input');
+  var forms = $('admin-page-content').select('form');
+  var inputs = $('admin-page-content').select('input');
   for (var i = 0; i &lt; inputs.length; i++) {
     if (inputs[i].getAttribute('type') != undefined &amp;&amp; inputs[i].getAttribute('type').toLowerCase() == 'submit') {
       inputs[i].up('.bottombuttons').remove();

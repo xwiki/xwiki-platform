@@ -3230,7 +3230,7 @@ document.observe('xwiki:dom:loaded', function() {
  *#
 #macro (admin_spaceSwitch)
 {{html}}
-  &lt;form id="change-context" class="xformInline"&gt;
+  &lt;form id="change-context" class="xformInline" action=""&gt;
     &lt;div&gt;
       &lt;input type="hidden" name="xaction" value="switchContext" /&gt;
       &lt;select id="goto-select" name="target"&gt;

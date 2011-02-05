@@ -25,7 +25,6 @@ import java.util.List;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.plugin.activitystream.api.ActivityEvent;
-import com.xpn.xwiki.plugin.activitystream.api.ActivityEventType;
 
 /**
  * @version $Id$

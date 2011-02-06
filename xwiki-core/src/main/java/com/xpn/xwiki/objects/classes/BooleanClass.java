@@ -21,6 +21,9 @@
 package com.xpn.xwiki.objects.classes;
 
 import java.util.Map;
+import java.util.List;
+import java.util.ArrayList;
+import java.util.Arrays;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.ecs.xhtml.div;
@@ -372,11 +375,17 @@ public class BooleanClass extends PropertyClass
         select.setSize(3);
         String String0 = getDisplayValue(context, 0);
         String String1 = getDisplayValue(context, 1);
+        String fieldFullName = getFieldFullName();
+        Number[] selectArray = ((Number[]) criteria.getParameter(fieldFullName));
+        List<Number> selectlist = (selectArray != null) ? Arrays.asList(selectArray) : new ArrayList<Number>();
 
-        option[] options = {new option("---", ""), new option(String1, "1"), new option(String0, "0")};
-        options[0].addElement("---");
-        options[1].addElement(String1);
-        options[2].addElement(String0);
+        option[] options = {new option(String1, "1"), new option(String0, "0")};
+        options[0].addElement(String1);
+        options[1].addElement(String0);
+        if (selectlist.contains(new Integer(1)))
+         options[0].setSelected(true); 
+        if (selectlist.contains(new Integer(0)))
+         options[1].setSelected(true); 
 
         /*
          * try { IntegerProperty prop = (IntegerProperty) object.safeget(name); if (prop!=null) { Integer ivalue =
@@ -408,13 +417,33 @@ public class BooleanClass extends PropertyClass
     }
 
     @Override
+    public void makeQuery(Map<String, Object> map, String prefix, XWikiCriteria query, List<String> criteriaList)
+    {
+        Object values = map.get(prefix);
+        if ((values == null) || (values.equals(""))) {
+            return;
+        }
+
+        // :value = doc.object(XWiki.ArticleClass).category
+
+        Number[] valuesarray = (Number[]) values;
+        String[] criteriaarray = new String[valuesarray.length];
+        for (int i = 0; i < valuesarray.length; i++) {
+            criteriaarray[i] =  "" + valuesarray[i] + " = " + getFullQueryPropertyName();
+        }
+        criteriaList.add("(" + StringUtils.join(criteriaarray, " or ") + ")");
+        return;
+    }
+
+
+    @Override
     public void fromSearchMap(XWikiQuery query, Map<String, String[]> map)
     {
         String[] data = map.get("");
         if (data != null) {
-            Object[] data2 = new Object[data.length];
+            Number[] data2 = new Number[data.length];
             for (int i = 0; i < data.length; i++) {
-                data2[i] = fromString(data[i]).getValue();
+                data2[i] = (Number) fromString(data[i]).getValue();
             }
             query.setParam(getObject().getName() + "_" + getName(), data2);
         }

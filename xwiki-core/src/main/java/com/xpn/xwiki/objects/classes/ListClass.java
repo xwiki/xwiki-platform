@@ -688,14 +688,22 @@ public abstract class ListClass extends PropertyClass
             return;
         }
 
+        // if multiselect
+        // :category member of obj.category
+        // otherwise 
+        // :category = obj.category
+        String separator = isMultiSelect() ? " member of " : " = ";
+
+
+ 
         if (values instanceof String) {
             // general comparison '=' - tests at least one value =
-            criteriaList.add("@xp:" + getName() + "='" + values.toString() + "'");
+            criteriaList.add("'" + values.toString() + "'" + separator  + getFullQueryPropertyName());
         } else {
             String[] valuesarray = (String[]) values;
             String[] criteriaarray = new String[valuesarray.length];
             for (int i = 0; i < valuesarray.length; i++) {
-                criteriaarray[i] = "@xp:" + getName() + "='" + valuesarray[i] + "'";
+                criteriaarray[i] = "'" + valuesarray[i] + "'" + separator + getFullQueryPropertyName();
             }
             criteriaList.add("(" + StringUtils.join(criteriaarray, " or ") + ")");
         }

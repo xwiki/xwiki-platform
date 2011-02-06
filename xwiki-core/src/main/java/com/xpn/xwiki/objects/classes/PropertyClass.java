@@ -598,4 +598,8 @@ public class PropertyClass extends BaseCollection implements PropertyClassInterf
 
         return result;
     }
+    
+    protected String getFullQueryPropertyName() {
+        return "obj." + getName();
+    }
 }

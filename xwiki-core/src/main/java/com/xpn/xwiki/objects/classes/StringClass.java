@@ -151,24 +151,24 @@ public class StringClass extends PropertyClass
             String startsWith = (String) map.get(prefix + "startswith");
             String endsWith = (String) map.get(prefix + "endswith");
             if ("1".equals(startsWith)) {
-                criteriaList.add("jcr:like(@xp:" + getName() + ", '" + value + "%')");
+                criteriaList.add("lower(" + getFullQueryPropertyName() + ") like '" + value.toLowerCase() + "%'");
             } else if ("1".equals(endsWith)) {
-                criteriaList.add("jcr:like(@xp:" + getName() + ", '%" + value + "')");
+                criteriaList.add("lower(" + getFullQueryPropertyName() + ") like '%" + value.toLowerCase() + "'");
             } else {
-                criteriaList.add("jcr:like(@xp:" + getName() + ", '%" + value + "%')");
+                criteriaList.add("lower(" + getFullQueryPropertyName() + ") like '%" + value.toLowerCase() + "%'");
             }
             return;
         }
 
         value = (String) map.get(prefix + "exact");
         if ((value != null) && (!value.equals(""))) {
-            criteriaList.add("@xp:" + getName() + "='" + value + "'");
+            criteriaList.add(getFullQueryPropertyName() + "='" + value + "'");
             return;
         }
 
         value = (String) map.get(prefix + "not");
         if ((value != null) && (!value.equals(""))) {
-            criteriaList.add("@xp:" + getName() + "!='" + value + "'");
+            criteriaList.add(getFullQueryPropertyName() + "!='" + value + "'");
             return;
         }
     }

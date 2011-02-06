@@ -312,28 +312,25 @@ public class QueryPlugin extends XWikiDefaultPlugin implements IQueryFactory {
     }
 
     public String makeQuery(XWikiQuery query) throws XWikiException {
-        StringBuffer xpath = new StringBuffer();
+        StringBuffer xwqlfrom = new StringBuffer();
+        StringBuffer xwqlwhere = new StringBuffer();
+        StringBuffer xwqlorder = new StringBuffer();
+        
         Set classes = query.getClasses();
         if (classes.size()>1)
          throw new XWikiException(XWikiException.MODULE_XWIKI_STORE, XWikiException.ERROR_XWIKI_STORE_SEARCH_NOTIMPL, "Search with more than one class is not implemented");
         if (classes.size()==0)
-         return "/*/*";
+         return "";
 
         String className = (String) classes.toArray()[0];
         BaseClass bclass = context.getWiki().getClass(className, context);
-        xpath.append("/*/*/obj/");
-        xpath.append(className.replaceAll("\\.", "/"));
-        String where= bclass.makeQuery(query);
-        if (!where.equals(""))
-        {
-            xpath.append("[");
-            xpath.append(where);
-            xpath.append("]");
+        xwqlfrom.append("doc.object(" + className + ") as obj");
+        String where = bclass.makeQuery(query);
+        if (!where.equals("")) {
+            xwqlwhere.append(where);
         }
-        xpath.append("/jcr:deref(@doc, '*')/@fullName");
 
         List oProps = query.getOrderProperties();
-        String orderClause = "";
         if ((oProps!=null)&&(oProps.size()>0)) {
             for (int i=0;i<oProps.size();i++) {
                 OrderClause clause = (OrderClause) oProps.get(i);
@@ -343,22 +340,25 @@ public class QueryPlugin extends XWikiDefaultPlugin implements IQueryFactory {
                     String propClassName = propPath.substring(0, i1);
                     if (propClassName.equals(className)) {
                         String propName = propPath.substring(i1+1);
-                        if (!orderClause.equals("")) {
-                            orderClause += " and ";
+                        if (xwqlorder.length()!=0) {
+                        	xwqlorder.append(",");
                         }
-                        orderClause += "@xp:" + propName;
+                        xwqlorder.append("obj." + propName);                      
                         if (clause.getOrder()==OrderClause.DESC)
-                            orderClause += " descending";
+                        	xwqlorder.append(" desc");
                     }
                 }
             }
         }
-        if (!orderClause.equals("")) {
-            xpath.append(" order by ");
-            xpath.append(orderClause);
+        
+        String xwql = "from " + xwqlfrom.toString();
+        if (xwqlwhere.length()!=0)
+          xwql += " where " + xwqlwhere.toString();
+        if (xwqlorder.length()!=0) {
+           xwql += " order by " + xwqlorder.toString();
         }
 
-        return xpath.toString();
+        return xwql;
     }
 
     /*

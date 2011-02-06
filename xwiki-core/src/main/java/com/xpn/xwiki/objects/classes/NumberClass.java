@@ -187,19 +187,19 @@ public class NumberClass extends PropertyClass
     {
         Number value = (Number) map.get(prefix);
         if ((value != null) && (!value.equals(""))) {
-            criteriaList.add("@xp:" + getName() + "=" + value.toString());
+            criteriaList.add(getFullQueryPropertyName() + "=" + value.toString());
             return;
         }
 
         value = (Number) map.get(prefix + "lessthan");
         if ((value != null) && (!value.equals(""))) {
-            criteriaList.add("@xp:" + getName() + "<=" + value.toString());
+            criteriaList.add(getFullQueryPropertyName() + "<=" + value.toString());
             return;
         }
 
         value = (Number) map.get(prefix + "morethan");
         if ((value != null) && (!value.equals(""))) {
-            criteriaList.add("@xp:" + getName() + ">=" + value.toString());
+            criteriaList.add(getFullQueryPropertyName() + ">=" + value.toString());
             return;
         }
     }

@@ -11,8 +11,8 @@
 <customClass></customClass>
 <contentAuthor>XWiki.Admin</contentAuthor>
 <creationDate>1272285137000</creationDate>
-<date>1277382180000</date>
-<contentUpdateDate>1277382180000</contentUpdateDate>
+<date>1297082641000</date>
+<contentUpdateDate>1297082641000</contentUpdateDate>
 <version>1.1</version>
 <title>Search administration</title>
 <template></template>
@@ -294,6 +294,9 @@ q3n9C1M5CmQytaHRAAAAAElFTkSuQmCC</content></attachment>
 {{velocity output="false"}}
 ## Create the configuration object if it does not exists
 #if (!$searchConfigObj)
+  #if ($searchConfigDoc.parent == "")
+    $searchConfigDoc.setParent("XWiki.SearchAdmin")
+  #end
   #set($searchConfigObj = $searchConfigDoc.getObject($searchConfigClass.name, true))
   $searchConfigDoc.save()
 #end

@@ -23,10 +23,10 @@
 
 Available tests can be found on the [test suite&gt;Selenium.AllTests] page.
 
-#set($doc = $xwiki.getDocument("Selenium.Selenium"))
-#set($testsuiteurl = $xwiki.getURLEncoded("$xwiki.getURL('Selenium.AllTests', 'view', 'xpage=plain')"))
+#set($doc = $xwiki.getDocument('Selenium.Selenium'))
+#set($testsuiteurl = $escapetool.url("$xwiki.getURL('Selenium.AllTests', 'view', 'xpage=plain')"))
 #set($queryString = "TestRunner.html?test=$testsuiteurl&amp;resultsUrl=../postResults")
-#set($url = $xwiki.getPlugin("zipexplorer").getFileLink($doc, "selenium.zip", $queryString))
+#set($url = $xwiki.getPlugin('zipexplorer').getFileLink($doc, 'selenium.zip', $queryString))
 
 Click &lt;a href="$url"&gt;here&lt;/a&gt; to execute these tests in the Selenium Test Runner.
 </content></xwikidoc>

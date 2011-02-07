@@ -76,9 +76,15 @@ public class WikiMacroExecutionEventListener extends AbstractLogEnabled implemen
     @Requirement
     private DocumentAccessBridge documentAccessBridge;
 
+    /**
+     * Temporarily used to resolve the user as a valid document reference.
+     */
     @Requirement
     private DocumentReferenceResolver<String> resolver;
 
+    /**
+     * Temporarily used to serialize a document reference pointing to a user as a String.
+     */
     @Requirement
     private EntityReferenceSerializer<String> serializer;
 

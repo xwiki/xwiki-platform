@@ -2743,12 +2743,12 @@ Your account on $wikiname has been successfully activated. You can now login at 
 </property>
 <property>
 <meta>&lt;meta name="revisit-after" content="7 days" /&gt;
-&lt;meta name="description" content="$xwiki.getXMLEncoded($!doc.getRenderedTitle("plain/1.0"))" /&gt;
+&lt;meta name="description" content="$escapetool.xml($!tdoc.plainTitle)" /&gt;
 #set($keywords = "wiki,$!doc.getTags()")
-&lt;meta name="keywords" content="$xwiki.getXMLEncoded($keywords.replaceAll('[|,]', ' ').trim())" /&gt;
+&lt;meta name="keywords" content="$escapetool.xml($keywords.replaceAll('[|,]', ' ').trim())" /&gt;
 &lt;meta name="distribution" content="GLOBAL" /&gt;
 &lt;meta name="rating" content="General" /&gt;
-&lt;meta name="author" content="$xwiki.getXMLEncoded($!xwiki.getLocalUserName($doc.getAuthor(), false))" /&gt;
+&lt;meta name="author" content="$escapetool.xml($!xwiki.getUserName($doc.getAuthor(), false))" /&gt;
 &lt;meta http-equiv="reply-to" content="" /&gt;
 &lt;meta name="language" content="$!xcontext.language" /&gt;
 ## We verify that we don't display RSS feeds on the login page since it causes problems if these feeds are

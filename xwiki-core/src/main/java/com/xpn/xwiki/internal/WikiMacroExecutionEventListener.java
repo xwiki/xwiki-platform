@@ -28,6 +28,8 @@ import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.Requirement;
 import org.xwiki.component.logging.AbstractLogEnabled;
 import org.xwiki.context.Execution;
+import org.xwiki.model.reference.DocumentReferenceResolver;
+import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.observation.EventListener;
 import org.xwiki.observation.event.Event;
 import org.xwiki.rendering.macro.wikibridge.WikiMacro;
@@ -74,6 +76,12 @@ public class WikiMacroExecutionEventListener extends AbstractLogEnabled implemen
     @Requirement
     private DocumentAccessBridge documentAccessBridge;
 
+    @Requirement
+    private DocumentReferenceResolver<String> resolver;
+
+    @Requirement
+    private EntityReferenceSerializer<String> serializer;
+
     /**
      * {@inheritDoc}
      * 
@@ -118,7 +126,8 @@ public class WikiMacroExecutionEventListener extends AbstractLogEnabled implemen
                 // user. It's cloned to make sure it not really modifying the real document but only do that for the
                 // current context.
                 contextDoc = contextDoc.clone();
-                contextDoc.setContentAuthor(wikiMacroDocument.getContentAuthor());
+                contextDoc.setContentAuthor(this.serializer.serialize(this.resolver.resolve(
+                    wikiMacroDocument.getContentAuthor(), wikiMacroDocument.getDocumentReference())));
 
                 xwikiContext.setDoc(contextDoc);
             } catch (Exception e) {

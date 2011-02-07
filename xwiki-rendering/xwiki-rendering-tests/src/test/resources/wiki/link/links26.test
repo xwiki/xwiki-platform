@@ -24,8 +24,8 @@ endDocument
 .#-----------------------------------------------------
 .expect|xwiki/2.0
 .#-----------------------------------------------------
-{{id name="name"}}bar
+{{id name="name"/}}bar
 
-{{id name="id"}}bar
+{{id name="id"/}}bar
 
 bar

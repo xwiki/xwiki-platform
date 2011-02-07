@@ -22,8 +22,6 @@ package org.xwiki.gwt.wysiwyg.client.plugin.submit;
 import org.xwiki.gwt.dom.client.DOMUtils;
 import org.xwiki.gwt.dom.client.Element;
 import org.xwiki.gwt.dom.client.JavaScriptObject;
-import org.xwiki.gwt.user.client.ActionEvent;
-import org.xwiki.gwt.user.client.ActionHandler;
 import org.xwiki.gwt.user.client.Config;
 import org.xwiki.gwt.user.client.StringUtils;
 import org.xwiki.gwt.user.client.ui.HiddenConfig;
@@ -35,6 +33,8 @@ import org.xwiki.gwt.wysiwyg.client.plugin.internal.AbstractPlugin;
 import org.xwiki.gwt.wysiwyg.client.plugin.internal.StatelessUIExtension;
 import org.xwiki.gwt.wysiwyg.client.plugin.submit.exec.SubmitExecutable;
 
+import com.google.gwt.core.client.Scheduler;
+import com.google.gwt.core.client.Scheduler.ScheduledCommand;
 import com.google.gwt.dom.client.Document;
 import com.google.gwt.event.dom.client.BlurEvent;
 import com.google.gwt.event.dom.client.BlurHandler;
@@ -47,7 +47,7 @@ import com.google.gwt.user.client.Window.ClosingHandler;
  * 
  * @version $Id$
  */
-public class SubmitPlugin extends AbstractPlugin implements BlurHandler, CommandListener, ClosingHandler, ActionHandler
+public class SubmitPlugin extends AbstractPlugin implements BlurHandler, CommandListener, ClosingHandler
 {
     /**
      * The name attribute, used by HTML form elements to pass data to the server when the form is submitted.
@@ -63,11 +63,6 @@ public class SubmitPlugin extends AbstractPlugin implements BlurHandler, Command
      * Default syntax. Can be overwritten from the configuration.
      */
     private static final String DEFAULT_SYNTAX = "xhtml/1.0";
-
-    /**
-     * The action fired when the rich text area finishes loading and all the plug-ins are initialized.
-     */
-    private static final String LOADED = "loaded";
 
     /**
      * The command used to store the value of the rich text area before submitting the including form.
@@ -140,7 +135,17 @@ public class SubmitPlugin extends AbstractPlugin implements BlurHandler, Command
             }
 
             // Save the initial content of the rich text area, after all the plug-ins have been initialized.
-            saveRegistration(getTextArea().addActionHandler(LOADED, this));
+            // Note that we can't use the "loaded" action event because event handlers are registered after the current
+            // event is processed. In this case the "loaded" action event is fired after all the plug-ins have been
+            // initialized but still while the rich text area "load" event is handled (and the reason for this is to
+            // ensure the order of the action events).
+            Scheduler.get().scheduleDeferred(new ScheduledCommand()
+            {
+                public void execute()
+                {
+                    onSubmit();
+                }
+            });
 
             // Submit the content when the rich text area looses the focus or the user navigates away.
             saveRegistration(getTextArea().addBlurHandler(this));
@@ -267,17 +272,5 @@ public class SubmitPlugin extends AbstractPlugin implements BlurHandler, Command
     {
         // Allow the browser to cache the content of the rich text area when the user navigates away from the edit page.
         onSubmit();
-    }
-
-    /**
-     * {@inheritDoc}
-     * 
-     * @see ActionHandler#onAction(ActionEvent)
-     */
-    public void onAction(ActionEvent event)
-    {
-        if (LOADED.equals(event.getActionName())) {
-            getTextArea().getCommandManager().execute(SUBMIT);
-        }
     }
 }

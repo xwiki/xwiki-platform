@@ -235,16 +235,7 @@ public class RichTextEditorController implements Updatable, MouseUpHandler, KeyU
             toolBarController.fill(config, pluginManager);
 
             richTextEditor.setLoading(false);
-            // We must fire the "loaded" action event after the current ("load") event (if any) is handled because event
-            // handlers added while an event is processed are registered only after that event is handled. This way we
-            // allow editor plug-ins to listen to "loaded" action event.
-            Scheduler.get().scheduleDeferred(new ScheduledCommand()
-            {
-                public void execute()
-                {
-                    ActionEvent.fire(getRichTextEditor().getTextArea(), "loaded");
-                }
-            });
+            ActionEvent.fire(getRichTextEditor().getTextArea(), "loaded");
         }
     }
 

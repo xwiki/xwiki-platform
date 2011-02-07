@@ -29,6 +29,7 @@ import org.xwiki.gwt.dom.client.Range;
 import org.xwiki.gwt.dom.client.Selection;
 import org.xwiki.gwt.dom.client.Text;
 import org.xwiki.gwt.dom.client.TextFragment;
+import org.xwiki.gwt.user.client.StringUtils;
 import org.xwiki.gwt.user.client.ui.rta.RichTextArea;
 
 import com.google.gwt.dom.client.Node;
@@ -276,9 +277,27 @@ public class InlineStyleExecutable extends AbstractSelectionExecutable
         if (node.getNodeType() != Node.ELEMENT_NODE) {
             node = node.getParentNode();
         }
-        if (node == null || node.getNodeType() != Node.ELEMENT_NODE) {
-            return null;
+        return node == null || node.getNodeType() != Node.ELEMENT_NODE ? null : getParameter(Element.as(node));
+    }
+
+    /**
+     * @param element a DOM element
+     * @return the {@link #property} value taken from the given element's computed style
+     */
+    protected String getParameter(Element element)
+    {
+        if (getProperty().isInheritable()) {
+            return element.getComputedStyleProperty(property.getJSName());
+        } else {
+            Node node = element;
+            while (node != null && node.getNodeType() == Node.ELEMENT_NODE) {
+                String value = Element.as(node).getComputedStyleProperty(property.getJSName());
+                if (!StringUtils.areEqual(getProperty().getDefaultValue(), value)) {
+                    return value;
+                }
+                node = node.getParentNode();
+            }
+            return getProperty().getDefaultValue();
         }
-        return Element.as(node).getComputedStyleProperty(property.getJSName());
     }
 }

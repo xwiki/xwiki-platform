@@ -587,7 +587,7 @@ public class XWikiSyntaxChainingRenderer extends AbstractChainingPrintRenderer i
     @Override
     public void onId(String name)
     {
-        print("{{id name=\"" + name + "\"}}");
+        print("{{id name=\"" + name + "\"/}}");
     }
 
     /**

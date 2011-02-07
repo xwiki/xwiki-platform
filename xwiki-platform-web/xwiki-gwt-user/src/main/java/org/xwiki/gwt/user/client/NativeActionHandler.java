@@ -47,7 +47,7 @@ public class NativeActionHandler implements ActionHandler
     /**
      * {@inheritDoc}
      * 
-     * @see NativeActionHandler#onAction(ActionEvent)
+     * @see ActionHandler#onAction(ActionEvent)
      */
     public native void onAction(ActionEvent event)
     /*-{

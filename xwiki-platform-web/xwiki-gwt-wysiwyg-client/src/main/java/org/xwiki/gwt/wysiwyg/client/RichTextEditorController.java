@@ -34,6 +34,7 @@ import org.xwiki.gwt.wysiwyg.client.plugin.internal.DefaultPluginManager;
 import org.xwiki.gwt.wysiwyg.client.syntax.SyntaxValidator;
 
 import com.google.gwt.core.client.Scheduler;
+import com.google.gwt.core.client.Scheduler.ScheduledCommand;
 import com.google.gwt.event.dom.client.KeyUpEvent;
 import com.google.gwt.event.dom.client.KeyUpHandler;
 import com.google.gwt.event.dom.client.LoadEvent;
@@ -209,7 +210,7 @@ public class RichTextEditorController implements Updatable, MouseUpHandler, KeyU
                 // attach process did not finish (i.e. the rich text editor widget appears to detached although its
                 // underlying element is attached to the DOM tree). Let the logical attach process finish and then
                 // initialize the rich text editor.
-                Scheduler.get().scheduleDeferred(new com.google.gwt.user.client.Command()
+                Scheduler.get().scheduleDeferred(new ScheduledCommand()
                 {
                     public void execute()
                     {
@@ -234,7 +235,16 @@ public class RichTextEditorController implements Updatable, MouseUpHandler, KeyU
             toolBarController.fill(config, pluginManager);
 
             richTextEditor.setLoading(false);
-            ActionEvent.fire(getRichTextEditor().getTextArea(), "loaded");
+            // We must fire the "loaded" action event after the current ("load") event (if any) is handled because event
+            // handlers added while an event is processed are registered only after that event is handled. This way we
+            // allow editor plug-ins to listen to "loaded" action event.
+            Scheduler.get().scheduleDeferred(new ScheduledCommand()
+            {
+                public void execute()
+                {
+                    ActionEvent.fire(getRichTextEditor().getTextArea(), "loaded");
+                }
+            });
         }
     }
 

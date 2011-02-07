@@ -70,6 +70,7 @@
             <exclude>org/xwiki/gwt/dom/client/Style</exclude>
             <exclude>org/xwiki/gwt/user/client/ui/rta/RichTextArea</exclude>
             <exclude>org/xwiki/gwt/wysiwyg/client/RichTextEditorController</exclude>
+            <exclude>org/xwiki/gwt/wysiwyg/client/RichTextEditorController$2</exclude>
             <exclude>org/xwiki/gwt/wysiwyg/client/plugin/color/ColorCell</exclude>
             <exclude>org/xwiki/gwt/wysiwyg/client/plugin/color/ColorPicker</exclude>
             <exclude>org/xwiki/gwt/wysiwyg/client/plugin/color/ColorPlugin</exclude>

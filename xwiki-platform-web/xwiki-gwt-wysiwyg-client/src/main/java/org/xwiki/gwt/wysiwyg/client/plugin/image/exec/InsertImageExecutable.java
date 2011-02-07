@@ -81,7 +81,7 @@ public class InsertImageExecutable extends AbstractInsertElementExecutable<Image
         super.write(config, image);
         if (internal) {
             // Adjust the new image URL so that the image is resized on the server.
-            updateURL(getSelectedElement(), url);
+            updateURL(image, url);
         }
     }
 

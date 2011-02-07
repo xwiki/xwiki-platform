@@ -66,15 +66,6 @@ public class RichTextAreaImplMozilla extends com.google.gwt.user.client.ui.impl.
         if (!iframe[@org.xwiki.gwt.user.client.ui.rta.RichTextArea::INITIALIZING]) return;
         this.@com.google.gwt.user.client.ui.impl.RichTextAreaImplStandard::onElementInitialized()();
 
-        try {
-            // It seems that the following line of code fixes the Midas bug which prevents the user to delete any HTML
-            // inserted through DOM API before any printable key has been pressed.
-            iframe.contentWindow.document.execCommand('undo', false, null);
-        } catch(e) {
-            // Ignore: execCommand throws an exception if the iframe is hidden through CSS. This can happen when the
-            // rich text area is loaded in background.
-        }
-
         var outer = this;
         iframe.contentWindow.addEventListener('unload', function(event) {
             event.target.defaultView.removeEventListener('unload', arguments.callee, false);
@@ -95,7 +86,18 @@ public class RichTextAreaImplMozilla extends com.google.gwt.user.client.ui.impl.
     protected void setEnabledImpl(boolean enabled)
     {
         if (enabled != isEnabledImpl()) {
-            ((Document) IFrameElement.as(elem).getContentDocument()).setDesignMode(enabled);
+            Document document = (Document) IFrameElement.as(elem).getContentDocument();
+            document.setDesignMode(enabled);
+            if (enabled) {
+                try {
+                    // It seems that the following line of code fixes the Midas bug which prevents the user to delete
+                    // any HTML inserted through DOM API before any printable key has been pressed.
+                    document.execCommand("undo", null);
+                } catch (Exception e) {
+                    // Ignore: execCommand throws an exception if the in-line frame is hidden through CSS. This can
+                    // happen when the rich text area is loaded in background.
+                }
+            }
         }
     }
 

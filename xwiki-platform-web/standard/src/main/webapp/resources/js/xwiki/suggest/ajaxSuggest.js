@@ -227,7 +227,7 @@ var XWiki = (function(XWiki){
     var pointer = this;
 
     // create ajax request
-    var url = this.options.script + this.options.varname + "=" + encodeURI(this.fld.value.strip());
+    var url = this.options.script + this.options.varname + "=" + encodeURIComponent(this.fld.value.strip());
     var method = this.options.method;
     var headers = {};
     if (this.options.json) {

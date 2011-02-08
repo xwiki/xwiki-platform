@@ -291,10 +291,13 @@ public class MyPersistentLoginManager extends DefaultPersistentLoginManager
         cookieValue.append("; HttpOnly");
 
         // Session cookies should be discarded.
-        // Keep this the last one, since Safari 5 drops everything after the Discard part.
-        if (cookie.getMaxAge() < 0) {
-            cookieValue.append("; Discard");
-        }
+        // FIXME Safari 5 can't handle properly "Discard", as it really discards all the response header data after the
+        // first "Discard" encountered, so it will only see the first such cookie. Disabled for the moment until Safari
+        // gets fixed, or a better idea comes to mind.
+        // Since we don't set a Max-Age, the rfc2109 behavior will kick in, and recognize this as a session cookie.
+        // if (cookie.getMaxAge() < 0) {
+        // cookieValue.append("; Discard");
+        // }
         response.addHeader("Set-Cookie", cookieValue.toString());
     }
 

@@ -748,11 +748,6 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
                         continue;
                     }
 
-                    if (classReference.equals(groupsDocumentReference)) {
-                        hasGroups = true;
-                        continue;
-                    }
-
                     // It seems to search before is case insensitive. And this would break the loading if we get an
                     // object which doesn't really belong to this document
                     if (!object.getDocumentReference().equals(doc.getDocumentReference())) {
@@ -773,10 +768,20 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
                         newobject.setGuid(object.getGuid());
                         object = newobject;
                     }
-                    loadXWikiCollection(object, doc, context, false, true);
+
+                    if (classReference.equals(groupsDocumentReference)) {
+                        // Groups objects are handled differently.
+                        hasGroups = true;
+                    } else {
+                        loadXWikiCollection(object, doc, context, false, true);
+                    }
                     doc.setXObject(object.getNumber(), object);
                 }
 
+                // AFAICT this was added as an emergency patch because loading of objects has proven
+                // too slow and the objects which cause the most overhead are the XWikiGroups objects
+                // as each group object (each group member) would otherwise cost 2 database queries.
+                // This will do every group member in a single query.
                 if (hasGroups) {
                     Query query2 = session.createQuery("select bobject.number, prop.value from StringProperty as prop, "
                         + "BaseObject as bobject where bobject.name = :name and bobject.className='XWiki.XWikiGroups' "

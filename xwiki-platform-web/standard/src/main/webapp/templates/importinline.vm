@@ -5,9 +5,9 @@
 ## control the creation so that we can set the parent and thus not make it
 ## orphaned + we set a save comment and make it a minor edit.
 ##---------------------------------------------------------------------------
-#set($importDoc = $xwiki.getDocument("XWiki.Import"))
+#set($importDoc = $xwiki.getDocument('XWiki.XWikiPreferences'))
 #if($importDoc.isNew())
-  $importDoc.setParent("XWiki.XWikiPreferences")
+  $importDoc.setParent('XWiki.WebHome')
   $importDoc.save("Creating document to which to attach XAR files to import", true)
 #end
 ##---------------------------------------------------------------------------
@@ -17,7 +17,7 @@
   #set($redirect = $xwiki.getRequestURL())
 #end
 #if(!$redirect)
-  #set($redirect = $importDoc.getURL("import", "section=Import"))
+  #set($redirect = $importDoc.getURL('import', 'section=Import'))
 #end
 ##---------------------------------------------------------------------------
 ## Import the documents from the selected XAR.

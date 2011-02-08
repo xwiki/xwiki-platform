@@ -51,7 +51,7 @@
     <junit.version>3.8.2</junit.version>
     <!-- Versions of XWiki dependencies used in Platform/Web modules -->
     <platform.tool.configuration.version>1.45</platform.tool.configuration.version>
-    <platform.core.version>${project.version}</platform.core.version>
+    <platform.core.version>3.0-milestone-2</platform.core.version>
     <!-- Lock albatross version because it isn't developed anymore. -->
     <platform.skin.albatross.version>1.30</platform.skin.albatross.version>
     <platform.skin.toucan.version>1.38</platform.skin.toucan.version>

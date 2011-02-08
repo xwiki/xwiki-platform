@@ -1389,6 +1389,7 @@ input.button:hover , .buttonwrapper  a:hover{
   display: block;
   padding: .5em .5em .5em 30px;
   text-decoration: none;
+  word-wrap: break-word;
 }
 
 /* Section titles */

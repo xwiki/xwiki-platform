@@ -37,6 +37,7 @@ import org.wikimodel.wem.WikiStyle;
 import org.xwiki.rendering.listener.CompositeListener;
 import org.xwiki.rendering.listener.Format;
 import org.xwiki.rendering.listener.HeaderLevel;
+import org.xwiki.rendering.listener.MetaData;
 import org.xwiki.rendering.listener.reference.ResourceReference;
 import org.xwiki.rendering.listener.ListType;
 import org.xwiki.rendering.listener.Listener;
@@ -321,11 +322,6 @@ public class DefaultXWikiGeneratorListener implements XWikiGeneratorListener
         getListener().beginDefinitionTerm();
     }
 
-    public void beginDocument()
-    {
-        beginDocument(WikiParameters.EMPTY);
-    }
-
     /**
      * {@inheritDoc}
      * 
@@ -335,6 +331,8 @@ public class DefaultXWikiGeneratorListener implements XWikiGeneratorListener
     {
         if (this.documentDepth > 0) {
             getListener().beginGroup(convertParameters(params));
+        } else {
+            getListener().beginDocument(MetaData.EMPTY);
         }
 
         ++this.documentDepth;
@@ -579,11 +577,6 @@ public class DefaultXWikiGeneratorListener implements XWikiGeneratorListener
         getListener().endDefinitionTerm();
     }
 
-    public void endDocument()
-    {
-        endDocument(WikiParameters.EMPTY);
-    }
-
     /**
      * {@inheritDoc}
      * 
@@ -597,6 +590,8 @@ public class DefaultXWikiGeneratorListener implements XWikiGeneratorListener
 
         if (this.documentDepth > 0) {
             getListener().endGroup(convertParameters(params));
+        } else {
+            getListener().endDocument(MetaData.EMPTY);
         }
     }
 

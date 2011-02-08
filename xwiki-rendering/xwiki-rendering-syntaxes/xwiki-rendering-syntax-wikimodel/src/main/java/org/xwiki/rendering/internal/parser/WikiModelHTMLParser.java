@@ -25,6 +25,7 @@ import java.io.StringReader;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.Requirement;
 import org.xwiki.rendering.block.XDOM;
+import org.xwiki.rendering.listener.Listener;
 import org.xwiki.rendering.parser.ParseException;
 import org.xwiki.rendering.syntax.Syntax;
 import org.xwiki.xml.html.HTMLCleaner;
@@ -55,7 +56,7 @@ public class WikiModelHTMLParser extends WikiModelXHTMLParser
     {
         return Syntax.HTML_4_01;
     }
-    
+
     /**
      * {@inheritDoc}
      * 
@@ -65,5 +66,17 @@ public class WikiModelHTMLParser extends WikiModelXHTMLParser
     public XDOM parse(Reader source) throws ParseException
     {
         return super.parse(new StringReader(HTMLUtils.toString(this.htmlCleaner.clean(source))));
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see org.xwiki.rendering.internal.parser.wikimodel.AbstractWikiModelParser#parse(java.io.Reader,
+     *      org.xwiki.rendering.listener.Listener)
+     */
+    @Override
+    public void parse(Reader source, Listener listener) throws ParseException
+    {
+        super.parse(new StringReader(HTMLUtils.toString(this.htmlCleaner.clean(source))), listener);
     }
 }

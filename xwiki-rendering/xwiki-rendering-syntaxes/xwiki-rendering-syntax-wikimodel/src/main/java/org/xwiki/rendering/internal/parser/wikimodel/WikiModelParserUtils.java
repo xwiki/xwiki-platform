@@ -21,11 +21,11 @@ package org.xwiki.rendering.internal.parser.wikimodel;
 
 import java.io.StringReader;
 import java.util.List;
-import java.util.Map;
 
 import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.internal.parser.WikiModelXHTMLParser;
 import org.xwiki.rendering.internal.parser.WikiModelXWiki20Parser;
+import org.xwiki.rendering.listener.InlineFilterListener;
 import org.xwiki.rendering.listener.Listener;
 import org.xwiki.rendering.listener.WrappingListener;
 import org.xwiki.rendering.parser.ParseException;
@@ -85,35 +85,11 @@ public class WikiModelParserUtils extends ParserUtils
 
     public void parseInline(StreamParser parser, String content, Listener listener) throws ParseException
     {
-        WrappingListener inlineFilterListener = new WrappingListener()
+        WrappingListener inlineFilterListener = new InlineFilterListener()
         {
             private boolean foundWord = false;
 
             private boolean foundSpace = false;
-
-            @Override
-            public void beginSection(Map<String, String> parameters)
-            {
-                // Filter
-            }
-
-            @Override
-            public void endSection(Map<String, String> parameters)
-            {
-                // Filter
-            }
-
-            @Override
-            public void beginParagraph(Map<String, String> parameters)
-            {
-                // Filter
-            }
-
-            @Override
-            public void endParagraph(Map<String, String> parameters)
-            {
-                // Filter
-            }
 
             @Override
             public void onWord(String word)

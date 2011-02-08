@@ -28,7 +28,9 @@ import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.configuration.ConfigurationSource;
 import org.xwiki.rendering.block.XDOM;
 import org.xwiki.rendering.parser.Parser;
+import org.xwiki.rendering.parser.StreamParser;
 import org.xwiki.rendering.renderer.BlockRenderer;
+import org.xwiki.rendering.renderer.PrintRendererFactory;
 import org.xwiki.rendering.renderer.printer.DefaultWikiPrinter;
 import org.xwiki.rendering.renderer.printer.WikiPrinter;
 import org.xwiki.rendering.syntax.SyntaxFactory;
@@ -52,15 +54,17 @@ public class RenderingTestCase extends MockObjectTestCase
 
     private String targetSyntaxId;
 
+    private boolean streaming;
+
     private boolean runTransformations;
 
     private Map<String, ? > configuration;
 
     /**
-     * @since 2.4M1
+     * @since 3.0M3
      */
     public RenderingTestCase(String testName, String input, String expected, String parserId, String targetSyntaxId,
-        boolean runTransformations, Map<String, ? > configuration)
+        boolean streaming, boolean runTransformations, Map<String, ? > configuration)
     {
         super(testName);
 
@@ -68,6 +72,7 @@ public class RenderingTestCase extends MockObjectTestCase
         this.expected = expected;
         this.parserId = parserId;
         this.targetSyntaxId = targetSyntaxId;
+        this.streaming = streaming;
         this.runTransformations = runTransformations;
         this.configuration = configuration;
     }
@@ -89,7 +94,7 @@ public class RenderingTestCase extends MockObjectTestCase
 
                 for (Map.Entry<String, ? > entry : this.configuration.entrySet()) {
                     originalConfiguration.put(entry.getKey(),
-                        mockConfigurationSource.<String>getProperty(entry.getKey()));
+                        mockConfigurationSource.<String> getProperty(entry.getKey()));
                     mockConfigurationSource.setProperty(entry.getKey(), entry.getValue());
                 }
             }
@@ -115,20 +120,28 @@ public class RenderingTestCase extends MockObjectTestCase
 
     private void runTestInternal() throws Throwable
     {
-        Parser parser = getComponentManager().lookup(Parser.class, this.parserId);
-        XDOM xdom = parser.parse(new StringReader(this.input));
-
-        if (this.runTransformations) {
-            SyntaxFactory syntaxFactory = getComponentManager().lookup(SyntaxFactory.class);
-            TransformationManager transformationManager = getComponentManager().lookup(TransformationManager.class);
-            TransformationContext txContext = new TransformationContext(xdom,
-                syntaxFactory.createSyntaxFromIdString(this.parserId));
-            transformationManager.performTransformations(xdom, txContext);
-        }
-
-        BlockRenderer renderer = getComponentManager().lookup(BlockRenderer.class, this.targetSyntaxId);
         WikiPrinter printer = new DefaultWikiPrinter();
-        renderer.render(xdom, printer);
+
+        if (!this.streaming) {
+            Parser parser = getComponentManager().lookup(Parser.class, this.parserId);
+            XDOM xdom = parser.parse(new StringReader(this.input));
+
+            if (this.runTransformations) {
+                SyntaxFactory syntaxFactory = getComponentManager().lookup(SyntaxFactory.class);
+                TransformationManager transformationManager = getComponentManager().lookup(TransformationManager.class);
+                TransformationContext txContext =
+                    new TransformationContext(xdom, syntaxFactory.createSyntaxFromIdString(this.parserId));
+                transformationManager.performTransformations(xdom, txContext);
+            }
+
+            BlockRenderer renderer = getComponentManager().lookup(BlockRenderer.class, this.targetSyntaxId);
+            renderer.render(xdom, printer);
+        } else {
+            StreamParser parser = getComponentManager().lookup(StreamParser.class, this.parserId);
+            PrintRendererFactory printRendererFactory =
+                getComponentManager().lookup(PrintRendererFactory.class, this.targetSyntaxId);
+            parser.parse(new StringReader(this.input), printRendererFactory.createRenderer(printer));
+        }
 
         assertEquals(this.expected, printer.toString());
     }

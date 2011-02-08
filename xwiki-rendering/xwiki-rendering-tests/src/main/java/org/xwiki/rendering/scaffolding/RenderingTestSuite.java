@@ -49,6 +49,11 @@ public class RenderingTestSuite extends TestSuite
         public Map<String, String> expectations = new HashMap<String, String>();
 
         /**
+         * @since 3.0M3
+         */
+        public boolean streaming;
+
+        /**
          * @since 2.5RC1
          */
         public boolean runTransformations;
@@ -117,8 +122,8 @@ public class RenderingTestSuite extends TestSuite
 
                 RenderingTestCase testCase = new RenderingTestCase(
                     computeTestName(testResourceName, parserId, targetSyntaxId), input,
-                    data.expectations.get(targetSyntaxId), parserId, targetSyntaxId, data.runTransformations,
-                    data.configuration);
+                    data.expectations.get(targetSyntaxId), parserId, targetSyntaxId, data.streaming,
+                    data.runTransformations, data.configuration);
                 addTest(testCase);
             }
         }
@@ -145,7 +150,7 @@ public class RenderingTestSuite extends TestSuite
         // Read each line and look for lines starting with ".". When this happens it means we've found a separate
         // test case.
         try {
-            Map map = null;
+            Map<String, String> map = null;
             String keyName = null;
             boolean skip = false;
             StringBuffer buffer = new StringBuffer();
@@ -157,6 +162,8 @@ public class RenderingTestSuite extends TestSuite
                         if (line.toLowerCase().contains("todo")) {
                             System.out.println(line);
                         }
+                    } else if (line.startsWith(".streaming")) {
+                        data.streaming = true;
                     } else if (line.startsWith(".runTransformations")) {
                         data.runTransformations = true;
                     } else if (line.startsWith(".configuration")) {
@@ -207,7 +214,7 @@ public class RenderingTestSuite extends TestSuite
         return data;
     }
 
-    private void saveBuffer(StringBuffer buffer, Map map, Map<String, String> inputs, String keyName)
+    private void saveBuffer(StringBuffer buffer, Map<String, String> map, Map<String, String> inputs, String keyName)
     {
         // Remove the last newline since our test format forces an additional new lines
         // at the end of input texts.

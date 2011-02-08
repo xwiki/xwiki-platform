@@ -1,0 +1,29 @@
+.streaming
+.#-----------------------------------------------------
+.input|xhtml/1.0
+.#-----------------------------------------------------
+<p>one <strong>two</strong> <em>three</em></p>
+.#-----------------------------------------------------
+.input|xwiki/2.0
+.#-----------------------------------------------------
+one **two** //three//
+.#-----------------------------------------------------
+.input|twiki/1.0
+.#-----------------------------------------------------
+one *two* _three_
+.#-----------------------------------------------------
+.expect|event/1.0
+.#-----------------------------------------------------
+beginDocument
+beginParagraph
+onWord [one]
+onSpace
+beginFormat [BOLD]
+onWord [two]
+endFormat [BOLD]
+onSpace
+beginFormat [ITALIC]
+onWord [three]
+endFormat [ITALIC]
+endParagraph
+endDocument

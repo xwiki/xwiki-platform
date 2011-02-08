@@ -29,6 +29,7 @@ import org.apache.maven.doxia.sink.SinkEventAttributes;
 import org.xwiki.rendering.listener.CompositeListener;
 import org.xwiki.rendering.listener.Format;
 import org.xwiki.rendering.listener.HeaderLevel;
+import org.xwiki.rendering.listener.MetaData;
 import org.xwiki.rendering.listener.reference.ResourceReference;
 import org.xwiki.rendering.listener.ListType;
 import org.xwiki.rendering.listener.Listener;
@@ -208,7 +209,7 @@ public class XWikiGeneratorSink implements Sink
      */
     public void body(SinkEventAttributes attributes)
     {
-        // Nothing to do
+        getListener().beginDocument(MetaData.EMPTY);
     }
 
     /**
@@ -218,7 +219,7 @@ public class XWikiGeneratorSink implements Sink
      */
     public void body()
     {
-        // Nothing to do
+        getListener().beginDocument(MetaData.EMPTY);
     }
 
     /**
@@ -228,7 +229,7 @@ public class XWikiGeneratorSink implements Sink
      */
     public void body_()
     {
-        // Nothing to do
+        getListener().endDocument(MetaData.EMPTY);
     }
 
     /**

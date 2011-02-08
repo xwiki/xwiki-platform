@@ -27,7 +27,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-rest</artifactId>
-    <version>3.0-milestone-2</version>
+    <version>3.0-SNAPSHOT</version>
   </parent>
   <groupId>com.xpn.xwiki.platform</groupId>
   <artifactId>xwiki-rest-server</artifactId>

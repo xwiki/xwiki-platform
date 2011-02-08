@@ -27,7 +27,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-core-parent</artifactId>
-    <version>3.0-milestone-2</version>
+    <version>3.0-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-core-classloader</artifactId>
   <name>XWiki Platform - Core - ClassLoader</name>

@@ -197,6 +197,7 @@
                 <exclude>org/xwiki/officeimporter/openoffice/OpenOfficeManager$ManagerState</exclude>
                 <!-- To be removed when we release 2.7 -->
                 <exclude>org/xwiki/url/standard/StandardURLConfiguration</exclude>
+                <exclude>org/xwiki/rendering/scaffolding/RenderingTestCase</exclude>
               </excludes>
             </configuration>
           </plugin>

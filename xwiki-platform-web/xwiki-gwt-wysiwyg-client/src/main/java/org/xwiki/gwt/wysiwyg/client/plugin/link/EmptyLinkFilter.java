@@ -23,6 +23,9 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
+import org.xwiki.gwt.dom.client.DOMUtils;
+import org.xwiki.gwt.dom.client.filter.HiddenElements;
+import org.xwiki.gwt.dom.client.filter.NodeFilter;
 import org.xwiki.gwt.dom.client.Document;
 import org.xwiki.gwt.user.client.StringUtils;
 import org.xwiki.gwt.user.client.ui.rta.RichTextArea;
@@ -34,7 +37,6 @@ import com.google.gwt.dom.client.AnchorElement;
 import com.google.gwt.dom.client.Element;
 import com.google.gwt.dom.client.Node;
 import com.google.gwt.dom.client.NodeList;
-import com.google.gwt.dom.client.Style.Display;
 
 /**
  * Client side empty link cleaner, to delete all links without content before the content is submitted. This is to
@@ -48,6 +50,11 @@ public class EmptyLinkFilter implements CommandListener
      * The submit rich text area command.
      */
     private static final Command SUBMIT = new Command("submit");
+
+    /**
+     * The node filter used to detect if a link is displayed or not.
+     */
+    private static final NodeFilter HIDDEN = new HiddenElements();
 
     /**
      * The rich text area for which this command listener cleans the empty listener.
@@ -129,21 +136,15 @@ public class EmptyLinkFilter implements CommandListener
 
     /**
      * We have to iterate all the ancestor elements and check if each is displayed because the {@code display} CSS
-     * property is not inherited.
+     * property is not inherited. We check the computed display value instead of the in-line value because the given
+     * element or one of its ancestors can be hidden from the style sheet.
      * 
      * @param element a DOM element
      * @return {@code true} if the given element is displayed, {@code false} otherwise
      */
     private boolean isDisplayed(Element element)
     {
-        Element ancestor = element;
-        while (ancestor != null) {
-            if (Display.NONE.getCssName().equals(ancestor.getStyle().getDisplay())) {
-                return false;
-            }
-            ancestor = ancestor.getParentElement();
-        }
-        return true;
+        return DOMUtils.getInstance().getFirstAncestor(element, HIDDEN) == null;
     }
 
     /**

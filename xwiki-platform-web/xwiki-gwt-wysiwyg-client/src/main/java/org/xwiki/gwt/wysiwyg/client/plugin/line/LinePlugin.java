@@ -206,6 +206,10 @@ public class LinePlugin extends AbstractPlugin implements KeyDownHandler, KeyUpH
      */
     protected void handleRepeatableKey(Event event)
     {
+        // Don't handle the key if the event was canceled by a different party.
+        if (event.isCancelled()) {
+            return;
+        }
         switch (event.getKeyCode()) {
             case KeyCodes.KEY_ENTER:
                 onEnter(event);

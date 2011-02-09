@@ -29,7 +29,9 @@ import org.xwiki.gwt.wysiwyg.client.cleaner.HTMLCleaner;
 import org.xwiki.gwt.wysiwyg.client.converter.HTMLConverter;
 import org.xwiki.rendering.block.XDOM;
 import org.xwiki.rendering.parser.Parser;
+import org.xwiki.rendering.parser.StreamParser;
 import org.xwiki.rendering.renderer.BlockRenderer;
+import org.xwiki.rendering.renderer.PrintRendererFactory;
 import org.xwiki.rendering.renderer.printer.DefaultWikiPrinter;
 import org.xwiki.rendering.renderer.printer.WikiPrinter;
 import org.xwiki.rendering.syntax.SyntaxFactory;
@@ -59,6 +61,12 @@ public class DefaultHTMLConverter implements HTMLConverter
      */
     @Requirement("xhtml/1.0")
     private Parser xhtmlParser;
+
+    /**
+     * The component used to parse the XHTML obtained after cleaning, when transformations are not executed.
+     */
+    @Requirement("xhtml/1.0")
+    private StreamParser xhtmlStreamParser;
 
     /**
      * The component used to create syntax instances from syntax identifiers.
@@ -102,13 +110,11 @@ public class DefaultHTMLConverter implements HTMLConverter
             // Clean
             String html = htmlCleaner.clean(dirtyHTML);
 
-            // Parse
-            XDOM xdom = xhtmlParser.parse(new StringReader(html));
-
-            // Render
+            // Parse & Render
+            // Note that transformations are not executed when converting XHTML to source syntax.
             WikiPrinter printer = new DefaultWikiPrinter();
-            BlockRenderer renderer = componentManager.lookup(BlockRenderer.class, syntaxId);
-            renderer.render(xdom, printer);
+            PrintRendererFactory printRendererFactory = componentManager.lookup(PrintRendererFactory.class, syntaxId);
+            xhtmlStreamParser.parse(new StringReader(html), printRendererFactory.createRenderer(printer));
 
             return printer.toString();
         } catch (Exception e) {

@@ -25,7 +25,7 @@ import java.util.Map;
  * Wrap a listener and skip begin/endDocument events.
  * 
  * @version $Id$
- * @since 3.0M3
+ * @since 2.7.1
  */
 public class InlineFilterListener extends WrappingListener
 {

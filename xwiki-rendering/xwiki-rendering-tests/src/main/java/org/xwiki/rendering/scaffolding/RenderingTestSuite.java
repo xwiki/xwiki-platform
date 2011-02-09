@@ -49,7 +49,7 @@ public class RenderingTestSuite extends TestSuite
         public Map<String, String> expectations = new HashMap<String, String>();
 
         /**
-         * @since 3.0M3
+         * @since 2.7.1
          */
         public boolean streaming;
 

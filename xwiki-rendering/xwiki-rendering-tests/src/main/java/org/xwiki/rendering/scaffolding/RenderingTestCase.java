@@ -61,7 +61,7 @@ public class RenderingTestCase extends MockObjectTestCase
     private Map<String, ? > configuration;
 
     /**
-     * @since 3.0M3
+     * @since 2.7.1
      */
     public RenderingTestCase(String testName, String input, String expected, String parserId, String targetSyntaxId,
         boolean streaming, boolean runTransformations, Map<String, ? > configuration)

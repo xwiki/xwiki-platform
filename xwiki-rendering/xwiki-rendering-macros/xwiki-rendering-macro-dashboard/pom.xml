@@ -38,14 +38,19 @@
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-surefire-plugin</artifactId>
         <configuration>
-          <includes>
-            <include>**/RenderingTests.java</include>
-          </includes>
+          <excludes>
+            <exclude>**/RenderingTests.java</exclude>
+          </excludes>
         </configuration>
       </plugin>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-checkstyle-plugin</artifactId>
+        <configuration>
+          <excludes>
+            com/xpn/xwiki/dashboard/DefaultGadgetReader.java
+          </excludes>
+        </configuration>
       </plugin>
     </plugins>
   </build>
@@ -57,7 +62,17 @@
     </dependency>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-core-bridge</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-core-skin</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>com.xpn.xwiki.platform</groupId>
+      <artifactId>xwiki-core</artifactId>
       <version>${project.version}</version>
     </dependency>
   </dependencies>

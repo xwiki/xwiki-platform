@@ -27,15 +27,18 @@ import java.util.Map;
 import org.apache.commons.lang.StringUtils;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.Requirement;
+import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.block.GroupBlock;
-import org.xwiki.rendering.block.MacroBlock;
 import org.xwiki.rendering.macro.AbstractMacro;
 import org.xwiki.rendering.macro.Macro;
 import org.xwiki.rendering.macro.MacroExecutionException;
 import org.xwiki.rendering.macro.container.ContainerMacroParameters;
 import org.xwiki.rendering.macro.dashboard.DashboardMacroParameters;
+import org.xwiki.rendering.macro.dashboard.DashboardRenderer;
+import org.xwiki.rendering.macro.dashboard.Gadget;
+import org.xwiki.rendering.macro.dashboard.GadgetReader;
 import org.xwiki.rendering.transformation.MacroTransformationContext;
 import org.xwiki.skinx.SkinExtension;
 
@@ -48,6 +51,12 @@ import org.xwiki.skinx.SkinExtension;
 @Component(DashboardMacro.MACRO_NAME)
 public class DashboardMacro extends AbstractMacro<DashboardMacroParameters>
 {
+    /**
+     * The marker to set as class parameter for the gadget containers in this dashboard, i.e. the elements that can
+     * contain gadgets.
+     */
+    public static final String GADGET_CONTAINER = "gadget-container";
+
     /**
      * The name of this macro.
      */
@@ -71,10 +80,16 @@ public class DashboardMacro extends AbstractMacro<DashboardMacroParameters>
     private SkinExtension ssfx;
 
     /**
-     * The component manager, to inject to the GadgetBoxMacro.
+     * The component manager, to resolve the dashboard renderer by layout hint.
      */
     @Requirement
     private ComponentManager componentManager;
+
+    /**
+     * The gadget reader providing the list of {@link Gadget}s to render on this dashboard.
+     */
+    @Requirement
+    private GadgetReader gadgetReader;
 
     /**
      * Instantiates the dashboard macro, setting the name, description and parameters type.
@@ -98,26 +113,33 @@ public class DashboardMacro extends AbstractMacro<DashboardMacroParameters>
 
         ssfx.use("uicomponents/dashboard/dashboard.css", fxParams);
 
-        // do the layouting with the container macro
-        ContainerMacroParameters containerParameters = new ContainerMacroParameters();
-        containerParameters.setJustify(true);
-        containerParameters.setLayoutStyle(parameters.getLayout());
-        List<Block> layoutedResult = containerMacro.execute(containerParameters, content, context);
-
-        // get all the macro blocks inside and wrap them in a gadget macro, which will generate a title for it and a box
-        // around it to be able to have decoration and drag it
-        // TODO: expand container macros and descend into them. Container macro is a special case, used for layouting
-        // dashboards and not as a gadget
-        for (Block layoutedTopLevelBlock : layoutedResult) {
-            for (MacroBlock macroBlock : layoutedTopLevelBlock.getChildrenByType(MacroBlock.class, true)) {
-                // clone the macro block here, because otherwise we will not have it in the parent anymore
-                GadgetMacro gadgetBoxMacro = new GadgetMacro((MacroBlock) macroBlock.clone(), this.componentManager);
-                // execute with null params and null content since they will be generated anyway, from the set macro
-                // block
-                List<Block> boxMacroBlocks = gadgetBoxMacro.execute(null, null, context);
-                // replace the macro block in its parent with the blocks returned by the box macro
-                macroBlock.getParent().replaceChild(boxMacroBlocks, macroBlock);
-            }
+        // get the gadgets from the objects
+        List<Gadget> gadgets;
+        try {
+            gadgets = gadgetReader.getGadgets(context);
+        } catch (Exception e) {
+            String message = "Could not get the gadgets.";
+            // log and throw further
+            getLogger().error(message, e);
+            throw new MacroExecutionException(message, e);
+        }
+        DashboardRenderer renderer =
+            getDashboardRenderer(StringUtils.isEmpty(parameters.getLayout()) ? "columns" : parameters.getLayout());
+        if (renderer == null) {
+            String message = "Could not find dashboard renderer " + parameters.getLayout();
+            // log and throw further
+            getLogger().error(message);
+            throw new MacroExecutionException(message);
+        }
+        // else, layout
+        List<Block> layoutedResult;
+        try {
+            layoutedResult = renderer.renderGadgets(gadgets, context);
+        } catch (Exception e) {
+            String message = "Could not render the gadgets for layout " + parameters.getLayout();
+            // log and throw further
+            getLogger().error(message, e);
+            throw new MacroExecutionException(message, e);
         }
 
         // put everything in a nice toplevel group for this dashboard, to be able to add classes to it
@@ -128,6 +150,20 @@ public class DashboardMacro extends AbstractMacro<DashboardMacroParameters>
             + (StringUtils.isEmpty(parameters.getStyle()) ? "" : " " + parameters.getStyle()));
 
         return Collections.<Block> singletonList(topLevel);
+    }
+
+    /**
+     * @param layout the layout style parameter of this dashboard, to find the renderer for
+     * @return the dashboard renderer, according to the style parameter of this dashboard macro
+     */
+    protected DashboardRenderer getDashboardRenderer(String layout)
+    {
+        try {
+            return componentManager.lookup(DashboardRenderer.class, layout);
+        } catch (ComponentLookupException e) {
+            // TODO: maybe should log?
+            return null;
+        }
     }
 
     /**

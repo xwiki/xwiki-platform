@@ -1,1 +1,3 @@
 org.xwiki.rendering.internal.macro.dashboard.DashboardMacro
+com.xpn.xwiki.dashboard.DefaultGadgetReader
+org.xwiki.rendering.internal.macro.dashboard.ColumnsDashboardRenderer

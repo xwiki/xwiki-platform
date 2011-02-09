@@ -96,8 +96,11 @@ public class RichTextAreaCommand implements com.google.gwt.user.client.Command
     public void execute()
     {
         if (focus) {
+            // Rich text area needs to be focused in order to have a proper selection or caret.
             rta.setFocus(true);
         }
-        rta.getCommandManager().execute(command, parameter);
+        if (rta.getCommandManager().isEnabled(command)) {
+            rta.getCommandManager().execute(command, parameter);
+        }
     }
 }

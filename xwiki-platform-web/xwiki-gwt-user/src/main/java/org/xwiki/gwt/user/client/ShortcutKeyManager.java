@@ -36,15 +36,14 @@ import com.google.gwt.event.dom.client.KeyPressHandler;
 import com.google.gwt.event.dom.client.KeyUpEvent;
 import com.google.gwt.event.dom.client.KeyUpHandler;
 import com.google.gwt.event.shared.HandlerRegistration;
-import com.google.gwt.user.client.Command;
 
 /**
- * Associates {@link Command}s to shortcut keys.<br/>
+ * Associates {@link ShortcutKeyCommand}s to shortcut keys.
  * 
  * @version $Id$
  */
-public class ShortcutKeyManager extends HashMap<ShortcutKey, Command> implements KeyDownHandler, KeyPressHandler,
-    KeyUpHandler
+public class ShortcutKeyManager extends HashMap<ShortcutKey, ShortcutKeyCommand> implements KeyDownHandler,
+    KeyPressHandler, KeyUpHandler
 {
     /**
      * Field required by all {@link java.io.Serializable} classes.
@@ -55,7 +54,7 @@ public class ShortcutKeyManager extends HashMap<ShortcutKey, Command> implements
      * The last command executed. The command is reset on each KeyDown event because only then we have the right key
      * code and key modifiers. Also, KeyPress and KeyUp events shouldn't be triggered without a KeyDown event.
      */
-    private Command command;
+    private ShortcutKeyCommand command;
 
     /**
      * Flag used to avoid handling the shortcut key on both KeyDown and KeyPress events. This flag is needed because of
@@ -69,7 +68,7 @@ public class ShortcutKeyManager extends HashMap<ShortcutKey, Command> implements
     /**
      * Adds the necessary key handlers to be able to catch shortcut keys.
      * 
-     * @param source and object that fires keyboard events
+     * @param source an object that fires keyboard events
      * @return a list of handler registrations that can be used to remove the added key handlers
      */
     public List<HandlerRegistration> addHandlers(HasAllKeyHandlers source)
@@ -96,8 +95,10 @@ public class ShortcutKeyManager extends HashMap<ShortcutKey, Command> implements
         if (command != null) {
             // Prevent default browser behavior.
             ((Event) event.getNativeEvent()).xPreventDefault();
-            // Schedule command.
-            Scheduler.get().scheduleDeferred(command);
+            if (command.isRepeatable()) {
+                // Schedule command.
+                Scheduler.get().scheduleDeferred(command);
+            }
         }
     }
 
@@ -111,7 +112,7 @@ public class ShortcutKeyManager extends HashMap<ShortcutKey, Command> implements
         if (command != null) {
             // Prevent default browser behavior (apparently it's not enough to cancel the KeyDown event).
             ((Event) event.getNativeEvent()).xPreventDefault();
-            if (!ignoreNextKeyPress) {
+            if (!ignoreNextKeyPress && command.isRepeatable()) {
                 // Schedule command.
                 Scheduler.get().scheduleDeferred(command);
             }
@@ -129,6 +130,12 @@ public class ShortcutKeyManager extends HashMap<ShortcutKey, Command> implements
         if (command != null) {
             // Prevent default browser behavior (apparently it's not enough to cancel the KeyDown event).
             ((Event) event.getNativeEvent()).xPreventDefault();
+            if (!command.isRepeatable()) {
+                // The command wasn't scheduled on key down and key press. Schedule the command now.
+                Scheduler.get().scheduleDeferred(command);
+            }
+            // Make sure the command is not executed again when the key up event for the modifier keys is fired.
+            command = null;
         }
     }
 

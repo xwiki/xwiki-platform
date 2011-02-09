@@ -26,6 +26,7 @@ import java.util.Map;
 import org.xwiki.gwt.user.client.ClickCommand;
 import org.xwiki.gwt.user.client.Config;
 import org.xwiki.gwt.user.client.ShortcutKey;
+import org.xwiki.gwt.user.client.ShortcutKeyCommand;
 import org.xwiki.gwt.user.client.ShortcutKeyManager;
 import org.xwiki.gwt.user.client.ShortcutKey.ModifierKey;
 import org.xwiki.gwt.user.client.ui.rta.RichTextArea;
@@ -109,9 +110,9 @@ public class HistoryPlugin extends AbstractPlugin implements ClickHandler
             toolBarExtension.addFeature(name, button);
             buttons.put(button, command);
 
-            ClickCommand clickCommand = new ClickCommand(button);
-            shortcutKeyManager.put(new ShortcutKey(keyCode, EnumSet.of(ModifierKey.CTRL)), clickCommand);
-            shortcutKeyManager.put(new ShortcutKey(keyCode, EnumSet.of(ModifierKey.META)), clickCommand);
+            ShortcutKeyCommand shortcutKeyCommand = new ShortcutKeyCommand(new ClickCommand(button), true);
+            shortcutKeyManager.put(new ShortcutKey(keyCode, EnumSet.of(ModifierKey.CTRL)), shortcutKeyCommand);
+            shortcutKeyManager.put(new ShortcutKey(keyCode, EnumSet.of(ModifierKey.META)), shortcutKeyCommand);
         }
     }
 

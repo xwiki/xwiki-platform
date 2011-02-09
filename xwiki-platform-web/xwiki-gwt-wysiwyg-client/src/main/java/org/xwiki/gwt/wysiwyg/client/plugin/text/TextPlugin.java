@@ -27,6 +27,7 @@ import org.xwiki.gwt.dom.client.Style;
 import org.xwiki.gwt.user.client.ClickCommand;
 import org.xwiki.gwt.user.client.Config;
 import org.xwiki.gwt.user.client.ShortcutKey;
+import org.xwiki.gwt.user.client.ShortcutKeyCommand;
 import org.xwiki.gwt.user.client.ShortcutKeyManager;
 import org.xwiki.gwt.user.client.ShortcutKey.ModifierKey;
 import org.xwiki.gwt.user.client.ui.rta.RichTextArea;
@@ -70,7 +71,7 @@ public class TextPlugin extends AbstractStatefulPlugin implements ClickHandler
     /**
      * Associates commands to shortcut keys.
      */
-    private ShortcutKeyManager shortcutKeyManager;
+    private final ShortcutKeyManager shortcutKeyManager = new ShortcutKeyManager();
 
     /**
      * {@inheritDoc}
@@ -91,8 +92,6 @@ public class TextPlugin extends AbstractStatefulPlugin implements ClickHandler
             new ToggleInlineStyleExecutable(textArea, Style.TEXT_DECORATION, Style.TextDecoration.LINE_THROUGH, "del"));
         getTextArea().getCommandManager().registerCommand(Command.TELETYPE,
             new ToggleInlineStyleExecutable(textArea, Style.FONT_FAMILY, "monospace", "tt"));
-
-        shortcutKeyManager = new ShortcutKeyManager();
 
         addFeature("bold", Command.BOLD, Images.INSTANCE.bold(), Strings.INSTANCE.bold(), 'B');
         addFeature("italic", Command.ITALIC, Images.INSTANCE.italic(), Strings.INSTANCE.italic(), 'I');
@@ -145,9 +144,9 @@ public class TextPlugin extends AbstractStatefulPlugin implements ClickHandler
     {
         ToggleButton button = addFeature(name, command, imageResource, title);
         if (button != null) {
-            ClickCommand clickCommand = new ClickCommand(button);
-            shortcutKeyManager.put(new ShortcutKey(keyCode, EnumSet.of(ModifierKey.CTRL)), clickCommand);
-            shortcutKeyManager.put(new ShortcutKey(keyCode, EnumSet.of(ModifierKey.META)), clickCommand);
+            ShortcutKeyCommand shortcutKeyCommand = new ShortcutKeyCommand(new ClickCommand(button));
+            shortcutKeyManager.put(new ShortcutKey(keyCode, EnumSet.of(ModifierKey.CTRL)), shortcutKeyCommand);
+            shortcutKeyManager.put(new ShortcutKey(keyCode, EnumSet.of(ModifierKey.META)), shortcutKeyCommand);
         }
         return button;
     }

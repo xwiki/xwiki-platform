@@ -93,6 +93,14 @@
       <artifactId>xwiki-core-annotations-velocity</artifactId>
       <version>${platform.core.version}</version>
     </dependency>
+    <!-- Dashboard macro dependency, so that it's packed in the war -->
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-core-rendering-macro-dashboard</artifactId>
+      <version>${project.version}</version>
+      <!-- Only needed at runtime since it's a component implementation -->
+      <scope>runtime</scope>
+    </dependency>
     <!-- Skin modules
          Note: even though the dependency plugin below doesn't need explicit dependencies set
          to work it's a best practice to put them here since they are real dependencies -->

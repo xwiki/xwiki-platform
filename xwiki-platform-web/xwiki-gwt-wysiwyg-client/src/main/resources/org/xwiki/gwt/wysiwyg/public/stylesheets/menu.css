@@ -62,7 +62,7 @@
 }
 
 .gwt-MenuBar-vertical .gwt-MenuItem {
-  padding: 4px 14px;
+  padding: 4px 8px;
 }
 
 .gwt-MenuBar-vertical .gwt-MenuItemSeparator {
@@ -157,11 +157,23 @@
 }
 
 .gwt-MenuItem .gwt-MenuItemIcon {
+  float: left;
   margin-left: -5px;
   vertical-align: middle;
 }
 
+.gwt-MenuBar-vertical .gwt-MenuItem .gwt-MenuItemIcon {
+  margin-left: 0px;
+}
+
 .gwt-MenuItem .gwt-MenuItemLabel {
-  display: inline;
-  padding-left: 6px;
+  float: left;
+  line-height: 20px;
+  padding-left: 3px;
+}
+
+.gwt-MenuItem .gwt-MenuItemShortcutKeyLabel {
+  float: right;
+  line-height: 20px;
+  margin-left: 30px;
 }

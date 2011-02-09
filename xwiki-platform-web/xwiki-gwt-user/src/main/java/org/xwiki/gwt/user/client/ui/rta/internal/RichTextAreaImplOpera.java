@@ -169,4 +169,20 @@ public class RichTextAreaImplOpera extends com.google.gwt.user.client.ui.impl.Ri
         elem.contentWindow.removeEventListener('dblclick', elem.__gwt_handler, true);
         elem.contentWindow.removeEventListener('paste', elem.__gwt_handler, true);
     }-*/;
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see com.google.gwt.user.client.ui.impl.RichTextAreaImplOpera#setFocus(boolean)
+     */
+    @Override
+    public void setFocus(boolean focused)
+    {
+        if (focused) {
+            // We need to focus the body element (especially if we set contentEditable=true) to initialize the caret
+            // (otherwise the caret is hidden before the user clicks on the rich text area).
+            IFrameElement.as(getElement()).getContentDocument().getBody().focus();
+        }
+        super.setFocus(focused);
+    }
 }

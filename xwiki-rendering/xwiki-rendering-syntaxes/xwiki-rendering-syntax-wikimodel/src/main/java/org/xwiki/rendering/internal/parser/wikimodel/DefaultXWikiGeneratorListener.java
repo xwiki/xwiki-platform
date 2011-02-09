@@ -38,13 +38,12 @@ import org.wikimodel.wem.WikiStyle;
 import org.xwiki.rendering.listener.CompositeListener;
 import org.xwiki.rendering.listener.Format;
 import org.xwiki.rendering.listener.HeaderLevel;
-import org.xwiki.rendering.listener.MetaData;
-import org.xwiki.rendering.listener.reference.ResourceReference;
 import org.xwiki.rendering.listener.ListType;
 import org.xwiki.rendering.listener.Listener;
 import org.xwiki.rendering.listener.QueueListener;
-import org.xwiki.rendering.parser.ResourceReferenceParser;
+import org.xwiki.rendering.listener.reference.ResourceReference;
 import org.xwiki.rendering.parser.ParseException;
+import org.xwiki.rendering.parser.ResourceReferenceParser;
 import org.xwiki.rendering.parser.StreamParser;
 import org.xwiki.rendering.renderer.PrintRenderer;
 import org.xwiki.rendering.renderer.PrintRendererFactory;
@@ -333,7 +332,7 @@ public class DefaultXWikiGeneratorListener implements XWikiGeneratorListener
         if (this.documentDepth > 0) {
             getListener().beginGroup(convertParameters(params));
         } else {
-            getListener().beginDocument(MetaData.EMPTY);
+            getListener().beginDocument(convertParameters(params));
         }
 
         ++this.documentDepth;
@@ -592,7 +591,7 @@ public class DefaultXWikiGeneratorListener implements XWikiGeneratorListener
         if (this.documentDepth > 0) {
             getListener().endGroup(convertParameters(params));
         } else {
-            getListener().endDocument(MetaData.EMPTY);
+            getListener().endDocument(convertParameters(params));
         }
     }
 
@@ -934,8 +933,7 @@ public class DefaultXWikiGeneratorListener implements XWikiGeneratorListener
         onReference(reference.getLink(), reference.getLabel(), false, convertParameters(reference.getParameters()));
     }
 
-    protected void onReference(String reference, String label, boolean isFreeStandingURI,
-        Map<String, String> parameters)
+    protected void onReference(String reference, String label, boolean isFreeStandingURI, Map<String, String> parameters)
     {
         flushFormat();
 

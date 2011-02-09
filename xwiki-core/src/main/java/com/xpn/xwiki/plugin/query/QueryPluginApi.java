@@ -85,8 +85,6 @@ public class QueryPluginApi extends Api implements IQueryFactory {
             } catch (InvalidQueryException e) {
                 throw new XWikiException(XWikiException.MODULE_XWIKI_PLUGINS, XWikiException.ERROR_XWIKI_UNKNOWN, "Invalid xpath query: " + q);
             }
-        if (qp.isJcr(this))
-            return new SecJcrQuery( q, Query.XPATH, this );
         return null;
     }
 
@@ -106,8 +104,6 @@ public class QueryPluginApi extends Api implements IQueryFactory {
             } catch (InvalidQueryException e) {
                 throw new XWikiException(XWikiException.MODULE_XWIKI_PLUGINS, XWikiException.ERROR_XWIKI_UNKNOWN, "Invalid jcrsql query: " + q);
             }
-        if (qp.isJcr(this))
-            return new SecJcrQuery( q, Query.SQL, this );
         return null;
     }
 

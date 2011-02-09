@@ -42,7 +42,6 @@ import com.xpn.xwiki.objects.classes.BaseClass;
 import com.xpn.xwiki.plugin.XWikiDefaultPlugin;
 import com.xpn.xwiki.plugin.XWikiPluginInterface;
 import com.xpn.xwiki.store.XWikiStoreInterface;
-import com.xpn.xwiki.store.jcr.XWikiJcrStore;
 
 /** Plugin for Query API */
 public class QueryPlugin extends XWikiDefaultPlugin implements IQueryFactory {
@@ -114,7 +113,7 @@ public class QueryPlugin extends XWikiDefaultPlugin implements IQueryFactory {
     }
 
     boolean isJcr(IQueryFactory qf) {
-        return qf.getContext().getWiki().getNotCacheStore() instanceof XWikiJcrStore;
+        return false;
     }
 
     /** Translate query string to query tree */
@@ -143,8 +142,6 @@ public class QueryPlugin extends XWikiDefaultPlugin implements IQueryFactory {
             } catch (InvalidQueryException e) {
                 throw new XWikiException(XWikiException.MODULE_XWIKI_PLUGINS, XWikiException.ERROR_XWIKI_UNKNOWN, "Invalid xpath query: " + q, e);
             }
-        if (isJcr(qf))
-            return new JcrQuery( q, Query.XPATH, qf );
         return null;
     }
 
@@ -168,8 +165,6 @@ public class QueryPlugin extends XWikiDefaultPlugin implements IQueryFactory {
             } catch (InvalidQueryException e) {
                 throw new XWikiException(XWikiException.MODULE_XWIKI_PLUGINS, XWikiException.ERROR_XWIKI_UNKNOWN, "Invalid jcrsql query: " + q);
             }
-        if (isJcr(qf))
-            return new JcrQuery( q, Query.SQL, qf );
         return null;
     }
 

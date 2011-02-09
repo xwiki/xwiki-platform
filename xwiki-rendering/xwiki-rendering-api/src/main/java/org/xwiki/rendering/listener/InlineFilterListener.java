@@ -21,9 +21,9 @@ package org.xwiki.rendering.listener;
 
 import java.util.Map;
 
-
 /**
  * Wrap a listener and skip begin/endDocument events.
+ * 
  * @version $Id$
  * @since 3.0M3
  */
@@ -50,28 +50,48 @@ public class InlineFilterListener extends WrappingListener
     {
         // Disable this event
     }
-    
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see org.xwiki.rendering.listener.WrappingListener#beginSection(java.util.Map)
+     */
     @Override
     public void beginSection(Map<String, String> parameters)
     {
-        // Filter
+        // Disable this event
     }
 
+    /**
+     * {@inheritDoc}
+     * 
+     * @see org.xwiki.rendering.listener.WrappingListener#endSection(java.util.Map)
+     */
     @Override
     public void endSection(Map<String, String> parameters)
     {
-        // Filter
+        // Disable this event
     }
 
+    /**
+     * {@inheritDoc}
+     * 
+     * @see org.xwiki.rendering.listener.WrappingListener#beginParagraph(java.util.Map)
+     */
     @Override
     public void beginParagraph(Map<String, String> parameters)
     {
-        // Filter
+        // Disable this event
     }
 
+    /**
+     * {@inheritDoc}
+     * 
+     * @see org.xwiki.rendering.listener.WrappingListener#endParagraph(java.util.Map)
+     */
     @Override
     public void endParagraph(Map<String, String> parameters)
     {
-        // Filter
+        // Disable this event
     }
 }

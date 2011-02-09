@@ -198,6 +198,9 @@ public class FilesystemAttachmentVersioningStore implements AttachmentVersioning
                               final boolean bTransaction)
         throws XWikiException
     {
+        if (attachment == null) {
+            throw new NullPointerException("The attachment to delete cannot be null");
+        }
         try {
             final XWikiAttachmentArchive archive = this.loadArchive(attachment, context, bTransaction);
             this.getArchiveDeleteRunnable(archive).start();
@@ -225,6 +228,9 @@ public class FilesystemAttachmentVersioningStore implements AttachmentVersioning
      */
     public StartableTransactionRunnable getArchiveDeleteRunnable(final XWikiAttachmentArchive archive)
     {
+        if (archive == null) {
+            throw new NullPointerException("The archive to delete cannot be null.");
+        }
         if (archive.getAttachment() == null) {
             throw new IllegalArgumentException(
                 "Cannot delete an archive unless it is associated with an attachment.");

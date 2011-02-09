@@ -286,11 +286,13 @@ public class FilesystemAttachmentStore implements XWikiAttachmentStoreInterface
      * @param context the XWikiContext for the request.
      * @return a TransactionRunnable for deleting the attachment which must be run inside of an
      *                               XWikiHibernateTransaction
+     * @throws XWikiException if unable to load the attachment archive to delete.
      */
     private TransactionRunnable<XWikiHibernateTransaction> getAttachmentDeleteRunnable(
         final XWikiAttachment attachment,
         final boolean updateDocument,
         final XWikiContext context)
+        throws XWikiException
     {
         final File attachFile =
             this.fileTools.getAttachmentFileProvider(attachment).getAttachmentContentFile();
@@ -421,6 +423,7 @@ public class FilesystemAttachmentStore implements XWikiAttachmentStoreInterface
          * @param attachFile the file to where the attachment content is stored.
          * @param tempFile the file to to move the attachment content to temporarily.
          * @param lock this Lock will be locked while the attachment file is being written to.
+         * @throws XWikiException if unable to load the archive for the attachment to delete.
          */
         public AttachmentDeleteTransactionRunnable(final XWikiAttachment attachment,
                                                    final boolean updateDocument,
@@ -428,6 +431,7 @@ public class FilesystemAttachmentStore implements XWikiAttachmentStoreInterface
                                                    final File attachFile,
                                                    final File tempFile,
                                                    final ReadWriteLock lock)
+            throws XWikiException
         {
             new FileDeleteTransactionRunnable(attachFile, tempFile, lock).runIn(this);
 
@@ -436,7 +440,7 @@ public class FilesystemAttachmentStore implements XWikiAttachmentStoreInterface
 
             if (avs instanceof FilesystemAttachmentVersioningStore) {
                 final FilesystemAttachmentVersioningStore favs = (FilesystemAttachmentVersioningStore) avs;
-                favs.getArchiveDeleteRunnable(attachment.getAttachment_archive()).runIn(this);
+                favs.getArchiveDeleteRunnable(attachment.loadArchive(context)).runIn(this);
             } else {
                 new TransactionRunnable<HibernateTransaction>() {
                     protected void onRun() throws XWikiException

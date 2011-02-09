@@ -199,7 +199,6 @@ $xwiki.getUserName("xwiki:${username}")
 #end
 
 
-#end
 ###
 ###    Separator
 ###

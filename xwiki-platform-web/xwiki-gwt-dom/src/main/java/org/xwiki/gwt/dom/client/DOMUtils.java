@@ -24,6 +24,10 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 
+import org.xwiki.gwt.dom.client.filter.HiddenElements;
+import org.xwiki.gwt.dom.client.filter.NodeFilter;
+import org.xwiki.gwt.dom.client.filter.WithName;
+
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.JsArrayString;
 import com.google.gwt.dom.client.Node;
@@ -109,6 +113,11 @@ public abstract class DOMUtils
      */
     private static final String[] HTML_SPECIAL_BLOCK_LEVEL_ELEMENTS =
         new String[] {HR, "ul", "ol", "dl", "table", "tbody", "thead", "tfoot", "tr", "form"};
+
+    /**
+     * The name of the attribute that controls if the content of an element can be edited or not.
+     */
+    private static final String CONTENT_EDITABLE_ATTR = "contentEditable";
 
     /**
      * The instance in use.
@@ -468,22 +477,48 @@ public abstract class DOMUtils
      */
     public Node getFirstAncestor(Node node, String... tagNames)
     {
-        // transform the tagNames to look for to lower case, to be able to do case insensitive comparison
-        List<String> lowerCaseNames = new ArrayList<String>();
-        for (String name : tagNames) {
-            lowerCaseNames.add(name.toLowerCase());
-        }
-        Node parent = node;
-        // While there is a parent
-        while (parent != null) {
-            // Check if this node is the needed element
-            if (parent.getNodeType() == Node.ELEMENT_NODE
-                && lowerCaseNames.contains(parent.getNodeName().toLowerCase())) {
-                return parent;
+        return getFirstAncestor(node, new WithName(tagNames));
+    }
+
+    /**
+     * Searches for the first ancestor of the given node, including the node itself, that matches the specified filter.
+     * The search order starts with {@code node} and continues to the root of the tree.
+     * 
+     * @param node the node whose ancestor needs to be found
+     * @param filter the object used to filter the ancestors
+     * @return the first ancestor of the given node that matches the filter
+     */
+    public Node getFirstAncestor(Node node, NodeFilter filter)
+    {
+        Node ancestor = node;
+        while (ancestor != null) {
+            if (filter.acceptNode(ancestor) == NodeFilter.Action.ACCEPT) {
+                return ancestor;
             }
-            parent = parent.getParentNode();
+            ancestor = ancestor.getParentNode();
         }
         return null;
+    }
+
+    /**
+     * Searches for the last ancestor of the given node, including the node itself, that matches the specified filter.
+     * The search order starts with {@code node} and continues to the root of the tree.
+     * 
+     * @param node the node whose ancestor needs to be found
+     * @param filter the object used to filter the ancestors
+     * @return the last ancestor of the given node that matches the filter
+     */
+    public Node getLastAncestor(Node node, NodeFilter filter)
+    {
+        Node ancestor = node;
+        Node lastAncestor = null;
+        while (ancestor != null) {
+            if (filter.acceptNode(ancestor) == NodeFilter.Action.ACCEPT) {
+                lastAncestor = ancestor;
+            }
+            ancestor = ancestor.getParentNode();
+        }
+        return lastAncestor;
     }
 
     /**
@@ -1281,8 +1316,17 @@ public abstract class DOMUtils
                 // BODY element.
             }
         }
+        // The node we have right now might not be displayed. Look for its first displayed ancestor.
+        Node lastHiddenAncestor = getLastAncestor(node, new HiddenElements());
+        if (lastHiddenAncestor != null) {
+            node = lastHiddenAncestor.getParentNode();
+            if (node == null) {
+                return;
+            }
+        }
+        // At this point we can be sure that the node we have is displayed, but we need an element.
         if (node.getNodeType() != Node.ELEMENT_NODE) {
-            node = node.getParentNode();
+            node = node.getParentElement();
         }
         // At this point, we should have an element to scroll into view.
         ((Element) node).scrollIntoView();
@@ -1314,27 +1358,27 @@ public abstract class DOMUtils
     /**
      * Puts the given document in design mode or in view-only mode.
      * <p>
-     * NOTE: The standard implementation of this method sets the value of the {@code designMode} DOM document property.
-     * We set the value of the {@code contentEditable} property on the document's body instead, if the browser doesn't
-     * fully support the {@code designMode} property.
+     * NOTE: The standard implementation of this method sets the {@link #CONTENT_EDITABLE_ATTR} attribute on the body
+     * element because otherwise read-only regions, marked with {@code contentEditable=false}, would be ignored. Browser
+     * specific implementations might use document's {@code designMode} property instead.
      * 
      * @param document a DOM document
      * @param designMode {@code true} to enter design mode, {@code false} to go back to view-only mode
      */
-    public native void setDesignMode(Document document, boolean designMode)
-    /*-{
-        document.designMode = designMode ? 'on' : 'off';
-    }-*/;
+    public void setDesignMode(Document document, boolean designMode)
+    {
+        document.getBody().setAttribute(CONTENT_EDITABLE_ATTR, String.valueOf(designMode));
+    }
 
     /**
      * @param document a DOM document
      * @return {@code true} if the given document is in design mode, {@code false} otherwise
      * @see #setDesignMode(Document, boolean)
      */
-    public native boolean isDesignMode(Document document)
-    /*-{
-        return document.designMode.toLowerCase() == 'on';
-    }-*/;
+    public boolean isDesignMode(Document document)
+    {
+        return Boolean.valueOf(document.getBody().getAttribute(CONTENT_EDITABLE_ATTR));
+    }
 
     /**
      * Stop the given window from loading its document.

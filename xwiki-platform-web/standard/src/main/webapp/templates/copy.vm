@@ -16,29 +16,49 @@
   #template("startpage.vm")
   <div class="main layoutsubsection">
   <div id="mainContentArea">
-    <div id="document-title"><h1>$msg.get('core.copy.copydoc')</h1></div>
-    #set($sourcedoc = "$!{request.sourcedoc}")
-    #set($targetdoc = "$!{request.targetdoc}")
+    <div id="document-title"><h1>$msg.get('core.copy.title', [$escapetool.xml($doc.displayTitle), $doc.getURL()])</h1></div>
+    ##------------------------------------------------
+    ## Get source reference
+    ##------------------------------------------------
+    #set($sourcewiki = "$!{request.sourceWikiName}")
+    #if("$!sourcewiki" == "")
+      #set($sourcewiki = $xcontext.database)
+    #end
+    #set($sourcespace = "$!{request.sourceSpaceName}")
+    #set($sourcepage = "$!{request.sourcePageName}")
+    ##------------------------------------------------
+    ## Get source reference
+    ##------------------------------------------------
+    #set($targetwiki = "$!{request.targetWikiName}")
+    #if("$!targetwiki" == "")
+      #set($targetwiki = $xcontext.database)
+    #end
+    #set($targetspace = "$!{request.targetSpaceName}")
+    #set($targetpage = "$!{request.targetPageName}")
+    ##------------------------------------------------
+    ## Get which translated pages we need to copy
+    ##------------------------------------------------
     #if("$!request.language" != "" && "$!{request.language}" != 'ALL')
       #set($language = "$!{request.language}")
       #set($escapedLanguage = "$!{escapetool.xml($request.language)}")
     #end
-    #set($sourcewiki = $xcontext.database)
-    #set($targetwiki = $xcontext.database)
-    #if($targetdoc != "" && $!{services.csrf.isTokenValid("$!{request.getParameter('form_token')}")})
-    #set($ok = $xwiki.copyDocument($sourcedoc, $targetdoc, $sourcewiki, $targetwiki, $language, false, true))
-    #set($prefixedSourcedoc = "#if($sourcewiki!=$xcontext.database)$sourcewiki:#end$sourcedoc")
-    #set($prefixedTargetdoc = "#if($targetwiki!=$xcontext.database)$targetwiki:#end$targetdoc")
-    #if($escapedLanguage)
-      #set($fromurl = $xwiki.getURL("$prefixedSourcedoc", "view", "language=${escapedLanguage}"))
-      #set($tourl = $xwiki.getURL("$prefixedTargetdoc", "view", "language=${escapedLanguage}"))
-    #else
-      #set($fromurl = $xwiki.getURL("$prefixedSourcedoc"))
-      #set($tourl = $xwiki.getURL("$prefixedTargetdoc"))
-    #end
-    #set($sourcelink = "<a href='${fromurl}'>$!{escapetool.xml($prefixedSourcedoc)} #if($escapedLanguage)($escapedLanguage)#end</a>")
-    #set($targetlink = "<a href='${tourl}'>$!{escapetool.xml($prefixedTargetdoc)}</a>")
-    #info("$msg.get('core.copy.copyingdoc', [$sourcelink, $targetlink])")
+    ##-------------------------------------------------------------
+    ## Decide whether to perform the copy or display the copy form
+    ##-------------------------------------------------------------
+    #if($sourcewiki != "" && $sourcespace != "" && $sourcepage != "" && $targetwiki != "" && $targetspace != "" && $targetpage != "" && $!{services.csrf.isTokenValid("$!{request.getParameter('form_token')}")})
+      #set($sourceDocReference = $services.model.createDocumentReference($sourcewiki, $sourcespace, $sourcepage))
+      #set($targetDocReference = $services.model.createDocumentReference($targetwiki, $targetspace, $targetpage))
+      #set($ok = $xwiki.copyDocument($sourceDocReference, $targetDocReference, $language, false, true))
+      #if($escapedLanguage)
+        #set($fromurl = $xwiki.getURL($sourceDocReference, "view", "language=${escapedLanguage}"))
+        #set($tourl = $xwiki.getURL($targetDocReference, "view", "language=${escapedLanguage}"))
+      #else
+        #set($fromurl = $xwiki.getURL($sourceDocReference))
+        #set($tourl = $xwiki.getURL($targetDocReference))
+      #end
+      #set($sourcelink = "<a href='${fromurl}'>$!{escapetool.xml($sourceDocReference.name)} #if($escapedLanguage)($escapedLanguage)#end</a>")
+      #set($targetlink = "<a href='${tourl}'>$!{escapetool.xml($targetDocReference.name)}</a>")
+      #info("$msg.get('core.copy.copyingdoc', [$sourcelink, $targetlink])")
     #else
     <form action="" class="xform third">
     <div class="hidden">
@@ -47,11 +67,35 @@
       <input type="hidden" name="xpage" value="copy" />
     </div>
     <dl>
+      ##------------------
+      ## Wiki Source field
+      ##------------------
+      #if($xwiki.isVirtualMode() && $xwiki.hasProgrammingRights())
       <dt>
-        <label>$msg.get("core.copy.sourcedoc")</label>
-        <span class="xHint">$msg.get('core.copy.sourcedoc.hint')</span>
+        <label for="sourceWikiName">$msg.get("core.copy.sourcewiki")</label>
+        <span class="xHint">$msg.get('core.copy.sourcewiki.hint')</span>
       </dt>
-      <dd>$!{escapetool.xml($doc.fullName)} <input type="hidden" name="sourcedoc" value="$!{escapetool.xml($doc.fullName)}" size="60"/></dd>
+      <dd>$!{escapetool.xml($doc.wiki)} <input type="hidden" id="sourceWikiName" name="sourceWikiName" value="$!{escapetool.xml($doc.wiki)}" size="60"/></dd>
+      #end
+      ##------------------
+      ## Space Source field
+      ##------------------
+      <dt>
+        <label for="sourceSpaceName">$msg.get("core.copy.sourcespace")</label>
+        <span class="xHint">$msg.get('core.copy.sourcespace.hint')</span>
+      </dt>
+      <dd>$!{escapetool.xml($doc.space)} <input type="hidden" id="sourceSpaceName" name="sourceSpaceName" value="$!{escapetool.xml($doc.space)}" size="60"/></dd>
+      ##------------------
+      ## Page Source field
+      ##------------------
+      <dt>
+        <label for="sourcePageName">$msg.get("core.copy.sourcepage")</label>
+        <span class="xHint">$msg.get('core.copy.sourcepage.hint')</span>
+      </dt>
+      <dd>$!{escapetool.xml($doc.name)} <input type="hidden" id="sourcePageName" name="sourcePageName" value="$!{escapetool.xml($doc.name)}" size="60"/></dd>
+      ##------------------
+      ## Translation field
+      ##------------------
       #set ($docTranslations = $doc.getTranslationList())
       #if ($docTranslations.size() > 0)
       <dt>
@@ -69,11 +113,46 @@
         </select>
       </dd>
       #end
+      ##------------------
+      ## Wiki Target field
+      ##------------------
+      #if($xwiki.isVirtualMode() && $xwiki.hasProgrammingRights())
       <dt>
-        <label for="targetdoc">$msg.get("core.copy.targetdoc")</label>
-        <span class="xHint">$msg.get('core.copy.targetdoc.hint')</span>
+        <label for="targetWikiName">$msg.get("core.copy.targetwiki")</label>
+        <span class="xHint">$msg.get('core.copy.targetwiki.hint')</span>
       </dt>
-      <dd><input type="text" id="targetdoc" name="targetdoc" value="$!{escapetool.xml($targetdoc)}" size="60" /></dd>
+      <dd>
+        <select id="targetWikiName" name="targetWikiName">
+          #set ($wikis = $xwiki.getXWiki().getVirtualWikisDatabaseNames($context.getContext()))
+          #foreach ($wiki in $wikis)
+            <option #if ($wiki == $doc.wiki) selected="selected" #end>$!{escapetool.xml($doc.wiki)}</option>
+          #end
+        </select>
+      </dd>
+      #end
+      ##-------------------
+      ## Space Target field
+      ##-------------------
+      <dt>
+        <label for="targetSpaceName">$msg.get('core.copy.targetspace')</label>
+        <span class="xHint">$msg.get('core.copy.targetspace.hint')</span>
+      </dt>
+      <dd>
+        <select id="targetSpaceName" name="targetSpaceName">
+          #set ($spaces = $xwiki.getSpaces())
+          #foreach ($space in $spaces)
+            <option #if ($space == $doc.space) selected="selected" #end>$!{escapetool.xml($space)}</option>
+          #end
+        </select>
+      </dd>
+      ##------------------
+      ## Page Target field
+      ##------------------
+      <dt>
+        <label for="targetPageName">$msg.get("core.copy.targetpage")</label>
+        <span class="xHint">$msg.get('core.copy.targetpage.hint')</span>
+      </dt>
+      <dd><input type="text" id="targetPageName" name="targetPageName" value="$!{escapetool.xml($doc.name)}" size="60" /></dd>
     </dl>
     <div class="buttons"><span class="buttonwrapper"><input type="submit" value="Copy" class="button"/></span></div>
     </form>

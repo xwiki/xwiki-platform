@@ -1,6 +1,6 @@
-// script.aculo.us scriptaculous.js v1.8.3, Thu Oct 08 11:23:33 +0200 2009
+// script.aculo.us scriptaculous.js v1.9.0, Thu Dec 23 16:54:48 -0500 2010
 
-// Copyright (c) 2005-2009 Thomas Fuchs (http://script.aculo.us, http://mir.aculo.us)
+// Copyright (c) 2005-2010 Thomas Fuchs (http://script.aculo.us, http://mir.aculo.us)
 //
 // Permission is hereby granted, free of charge, to any person obtaining
 // a copy of this software and associated documentation files (the
@@ -24,7 +24,7 @@
 // For details, see the script.aculo.us web site: http://script.aculo.us/
 
 var Scriptaculous = {
-  Version: '1.8.3',
+  Version: '1.9.0',
   require: function(libraryName) {
     // Changed in XWiki to work as a defered script
     var script = document.createElement('script');
@@ -50,7 +50,7 @@ var Scriptaculous = {
 
     var js = /scriptaculous\.js(\?.*)?$/;
     // Changed in XWiki from findAll to select because SmartGWT overwrites findAll
-    $$('head script[src]').select(function(s) {
+    $$('script[src]').select(function(s) {
       return s.src.match(js);
     }).each(function(s) {
       var path = s.src.replace(js, ''),

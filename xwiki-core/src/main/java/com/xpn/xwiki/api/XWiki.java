@@ -1499,6 +1499,30 @@ public class XWiki extends Api
     }
 
     /**
+     * Privileged API to copy a translation of a document to another document of the same name in another wiki
+     * additionally resetting the version and overwriting the previous document
+     *
+     * @param sourceDocumentReference the reference to the document to copy
+     * @param targetDocumentReference the reference to the document to create
+     * @param wikilanguage language to copy
+     * @param reset true to reset versions
+     * @param force true to overwrite the previous document
+     * @return true if the copy was sucessful
+     * @throws XWikiException if the document was not copied properly
+     * @since 3.0M3
+     */
+    public boolean copyDocument(DocumentReference sourceDocumentReference, DocumentReference targetDocumentReference,
+        String wikilanguage, boolean reset, boolean force) throws XWikiException
+    {
+        if (hasProgrammingRights()) {
+            return this.xwiki.copyDocument(sourceDocumentReference, targetDocumentReference, wikilanguage, reset,
+                force, true, getXWikiContext());
+        }
+
+        return false;
+    }
+
+    /**
      * Privileged API to copy a space to another wiki, optionally deleting all document of the target space
      * 
      * @param space source Space
@@ -1769,7 +1793,7 @@ public class XWiki extends Api
     }
 
     /**
-     * API to retrieve the URL of an a Wiki Document in any mode, optionally adding a query string The URL is generated
+     * API to retrieve the URL of a Wiki Document in any mode, optionally adding a query string The URL is generated
      * differently depending on the environment (Servlet, Portlet, PDF, etc..) The URL generation can be modified by
      * implementing a new XWikiURLFactory object. The query string will be modified to be added in the way the
      * environment needs it. It is important to not add the query string parameter manually after a URL. Some
@@ -1784,6 +1808,25 @@ public class XWiki extends Api
     public String getURL(String fullname, String action, String querystring) throws XWikiException
     {
         return this.xwiki.getURL(fullname, action, querystring, getXWikiContext());
+    }
+
+    /**
+     * API to retrieve the URL of a Wiki Document in any mode, optionally adding a query string The URL is generated
+     * differently depending on the environment (Servlet, Portlet, PDF, etc..) The URL generation can be modified by
+     * implementing a new XWikiURLFactory object. The query string will be modified to be added in the way the
+     * environment needs it. It is important to not add the query string parameter manually after a URL. Some
+     * environments will not accept this (like the Portlet environement).
+     *
+     * @param reference the reference to the document for which to return the URL for
+     * @param action the mode in which to access the document (view/edit/save/..). Any valid XWiki action is possible
+     * @param querystring the Query String to provide in the usual mode (name1=value1&name2=value=2) including encoding
+     * @return a URL as a string pointing to the wiki document in view mode
+     * @throws XWikiException if the URL could not be generated properly
+     * @since 3.0M3
+     */
+    public String getURL(DocumentReference reference, String action, String querystring) throws XWikiException
+    {
+        return this.xwiki.getURL(reference, action, querystring, null, getXWikiContext());
     }
 
     /**

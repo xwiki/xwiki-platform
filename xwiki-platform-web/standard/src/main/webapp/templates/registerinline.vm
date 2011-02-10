@@ -21,7 +21,7 @@
     #info($msg.get('core.register.successful', [$xwiki.getUserName($xwname), ${escapetool.xml($request.xwikiname)}]))
   #end
   #if(!$reg || $reg < 0)
-    <form id="register" action="" method="post">
+    <form id="register" action="" method="post" class="xform third">
       <div>
         ## CSRF prevention
         <input type="hidden" name="form_token" value="$!{services.csrf.getToken()}" />
@@ -40,29 +40,29 @@
         #end
         <dl>
           #set($prop = $class.first_name)
-          <dt>$msg.get('core.register.firstName')</dt>
+          <dt><label for="register_${prop.name}">$msg.get('core.register.firstName')</label></dt>
           <dd>$doc.displayEdit($prop, 'register_',  $obj)</dd>
 
           #set($prop = $class.last_name)
-          <dt>$msg.get('core.register.lastName')</dt>
+          <dt><label for="register_${prop.name}">$msg.get('core.register.lastName')</label></dt>
           <dd>$doc.displayEdit($prop, 'register_',  $obj)</dd>
 
-          <dt>$msg.get('core.register.username')</dt>
-          <dd><input name="xwikiname" type="text" size="20" onfocus="prepareName(document.forms.register);" /></dd>
+          <dt><label for="register_username">$msg.get('core.register.username') <span class="xRequired">$msg.get('core.validation.required')</span></label></dt>
+          <dd><input name="xwikiname" id="register_username" type="text" size="20" onfocus="prepareName(document.forms.register);" /></dd>
 
           #set($prop = $class.password)
-          <dt>$msg.get('core.register.password')</dt>
+          <dt><label for="register_${prop.name}">$msg.get('core.register.password') <span class="xRequired">$msg.get('core.validation.required')</span></label></dt>
           <dd>$doc.displayEdit($prop, 'register_',  $obj)</dd>
 
-          <dt>$msg.get('core.register.passwordRepeat')</dt>
+          <dt><label for="register2_${prop.name}">$msg.get('core.register.passwordRepeat') <span class="xRequired">$msg.get('core.validation.required')</span></label></dt>
           <dd>$doc.displayEdit($prop, 'register2_',  $obj)</dd>
 
           #set($prop = $class.email)
-          <dt>$msg.get('core.register.email')</dt>
+          <dt><label for="register_${prop.name}">$msg.get('core.register.email')</label></dt>
           <dd>$doc.displayEdit($prop, 'register_',  $obj)</dd>
         </dl>
-        <span class="buttonwrapper"><input type="submit" value="$msg.get('core.register.submit')" class="button"/></span>
       </div>
+      <div class="buttons"><span class="buttonwrapper"><input type="submit" value="$msg.get('core.register.submit')" class="button"/></span></div>
     </form>
   #end
 #else

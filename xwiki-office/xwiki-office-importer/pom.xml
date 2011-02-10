@@ -70,8 +70,12 @@
     <dependency>
       <groupId>org.artofsolving.jodconverter</groupId>
       <artifactId>jodconverter-core</artifactId>
-      <!-- We use a custom build that includes a fix for http://code.google.com/p/jodconverter/issues/detail?id=75 -->
-      <version>3.0-beta-3.20101216</version>
+      <!--
+        We use a custom build that includes:
+          * a fix for http://code.google.com/p/jodconverter/issues/detail?id=75
+          * a fix for http://jira.xwiki.org/jira/browse/XWIKI-5979
+      -->
+      <version>3.0-beta-3.20110210</version>
     </dependency>
     <dependency>
       <!--
@@ -113,7 +117,8 @@
            -->
           <excludes>
               org/xwiki/officeimporter/internal/DefaultOfficeImporter.java,
-              org/xwiki/officeimporter/internal/splitter/DefaultXDOMOfficeDocumentSplitter.java
+              org/xwiki/officeimporter/internal/splitter/DefaultXDOMOfficeDocumentSplitter.java,
+              org/xwiki/officeimporter/OfficeImporterVelocityBridge.java
           </excludes>
         </configuration>
       </plugin>

@@ -260,7 +260,7 @@ public class IncludeMacro extends AbstractMacro<IncludeMacroParameters>
      */
     private DocumentReference resolve(Block block, String documentName)
     {
-        // TODO: use macro source informations to resolve document reference besed on the macro source instead of the
+        // TODO: use macro source informations to resolve document reference based on the macro source instead of the
         // context
 
         return this.currentDocumentReferenceResolver.resolve(documentName);

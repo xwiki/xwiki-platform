@@ -1212,15 +1212,11 @@ div#xwikiobjects input[type="checkbox"], div#xwikiclassproperties input[type="ch
   background-image: url("$xwiki.getSkinFile('icons/silk/wrench.gif')");
 }
 
-.actionmenu .tmWatchlistManager {
-  background-image: url("$xwiki.getSkinFile('icons/silk/star.gif')");
-}
-
 .actionmenu .tmWatchWiki, .actionmenu .tmWatchSpace, .actionmenu .tmWatchDocument {
   background-image: url("$xwiki.getSkinFile('icons/xwiki/star-gray.png')");
 }
 
-.actionmenu .tmUnwatchWiki, .actionmenu .tmUnwatchSpace, .actionmenu .tmUnwatchDocument {
+.actionmenu .tmWatchlistManager, .actionmenu .tmUnwatchWiki, .actionmenu .tmUnwatchSpace, .actionmenu .tmUnwatchDocument {
   background-image: url("$xwiki.getSkinFile('icons/xwiki/star-yellow.png')");
 }
 

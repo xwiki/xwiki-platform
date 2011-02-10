@@ -23,6 +23,15 @@
   cursor: pointer;
 }
 
+/*
+  Limit the image size in case the server-side resize fails (which can happen for images that don't use the RGB color
+  scheme, but CMYK for instance). See XWIKI-3644.
+*/
+.xImagesSelector .xListItem .xImagePreview img {
+  max-height: 95px;
+  max-width: 135px;
+}
+
 .xImagesSelector .xListItem .xNewImagePreview {
   text-align: left;
   vertical-align: bottom;

@@ -5669,8 +5669,8 @@ public class XWikiDocument implements DocumentModelBridge
         RenamePageReplaceLinkHandler linkHandler = new RenamePageReplaceLinkHandler();
 
         // Used for replacing links in XWiki Syntax 1.0
-        Link oldLink = new LinkParser().parse(this.localEntityReferenceSerializer.serialize(getDocumentReference()));
-        Link newLink = new LinkParser().parse(this.localEntityReferenceSerializer.serialize(newDocumentReference));
+        Link oldLink = createLink(getDocumentReference());
+        Link newLink = createLink(newDocumentReference);
 
         for (DocumentReference backlinkDocumentReference : backlinkDocumentReferences) {
             XWikiDocument backlinkDocument = xwiki.getDocument(backlinkDocumentReference, context);
@@ -5737,6 +5737,24 @@ public class XWikiDocument implements DocumentModelBridge
         // Step 6: The current document needs to point to the renamed document as otherwise it's pointing to an
         // invalid XWikiDocument object as it's been deleted...
         clone(newDocument);
+    }
+
+    /**
+     * Generate a {@link Link} object from {@link DocumentReference} to be used in
+     * {@link DocumentParser#parseLinksAndReplace(String, Link, Link, com.xpn.xwiki.content.parsers.ReplaceLinkHandler, String)}
+     * 
+     * @param documentReference the full document reference
+     * @return a {@link Link}
+     */
+    private Link createLink(DocumentReference documentReference)
+    {
+        Link link = new Link();
+
+        link.setVirtualWikiAlias(documentReference.getWikiReference().getName());
+        link.setSpace(documentReference.getLastSpaceReference().getName());
+        link.setPage(documentReference.getName());
+
+        return link;
     }
 
     /**

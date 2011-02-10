@@ -159,16 +159,17 @@ public class DefaultOpenOfficeManager extends AbstractLogEnabled implements Open
      */
     public void start() throws OpenOfficeManagerException
     {
-        if (!checkState(ManagerState.CONNECTED)) {
-            initialize();
-            try {
-                this.jodOOManager.start();
-                setState(ManagerState.CONNECTED);
-                getLogger().info("Open Office instance started.");
-            } catch (Exception ex) {
-                setState(ManagerState.ERROR);
-                throw new OpenOfficeManagerException("Error while connecting / starting openoffice.", ex);
-            }
+        // If the OpenOffice server is running then stop it in order to restart the connection.
+        stop();
+
+        initialize();
+        try {
+            this.jodOOManager.start();
+            setState(ManagerState.CONNECTED);
+            getLogger().info("Open Office instance started.");
+        } catch (Exception e) {
+            setState(ManagerState.ERROR);
+            throw new OpenOfficeManagerException("Error while connecting / starting openoffice.", e);
         }
     }
 
@@ -179,14 +180,17 @@ public class DefaultOpenOfficeManager extends AbstractLogEnabled implements Open
      */
     public void stop() throws OpenOfficeManagerException
     {
-        if (checkState(ManagerState.CONNECTED)) {
-            try {
-                this.jodOOManager.stop();
-                setState(ManagerState.NOT_CONNECTED);
-                getLogger().info("Open Office instance stopped.");
-            } catch (Exception ex) {
+        // We should try stopping the OpenOffice server even if the status is not connected but we should not raise an
+        // error if there is a failure to stop.
+        boolean connected = checkState(ManagerState.CONNECTED);
+        try {
+            this.jodOOManager.stop();
+            setState(ManagerState.NOT_CONNECTED);
+            getLogger().info("Open Office instance stopped.");
+        } catch (Exception e) {
+            if (connected) {
                 setState(ManagerState.ERROR);
-                throw new OpenOfficeManagerException("Error while disconnecting / shutting down openoffice.", ex);
+                throw new OpenOfficeManagerException("Error while disconnecting / shutting down openoffice.", e);
             }
         }
     }

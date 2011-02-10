@@ -36,7 +36,9 @@ import org.xwiki.officeimporter.builder.XDOMOfficeDocumentBuilder;
 import org.xwiki.officeimporter.builder.XHTMLOfficeDocumentBuilder;
 import org.xwiki.officeimporter.document.XDOMOfficeDocument;
 import org.xwiki.officeimporter.document.XHTMLOfficeDocument;
+import org.xwiki.officeimporter.openoffice.OpenOfficeConfiguration;
 import org.xwiki.officeimporter.openoffice.OpenOfficeManager;
+import org.xwiki.officeimporter.openoffice.OpenOfficeManagerException;
 import org.xwiki.officeimporter.openoffice.OpenOfficeManager.ManagerState;
 import org.xwiki.officeimporter.splitter.TargetDocumentDescriptor;
 import org.xwiki.officeimporter.splitter.XDOMOfficeDocumentSplitter;
@@ -85,6 +87,11 @@ public class OfficeImporterVelocityBridge
     private OpenOfficeManager officeManager;
 
     /**
+     * Used to query the OpenOffice server configuration.
+     */
+    private OpenOfficeConfiguration officeConfiguration;
+
+    /**
      * Used for building {@link XHTMLOfficeDocument} instances from office documents.
      */
     private XHTMLOfficeDocumentBuilder xhtmlBuilder;
@@ -127,6 +134,7 @@ public class OfficeImporterVelocityBridge
             this.currentMixedDocumentReferenceResolver =
                 componentManager.lookup(DocumentReferenceResolver.class, "currentmixed");
             this.officeManager = componentManager.lookup(OpenOfficeManager.class);
+            this.officeConfiguration = componentManager.lookup(OpenOfficeConfiguration.class);
             this.xhtmlBuilder = componentManager.lookup(XHTMLOfficeDocumentBuilder.class);
             this.xdomBuilder = componentManager.lookup(XDOMOfficeDocumentBuilder.class);
             this.presentationBuilder = componentManager.lookup(PresentationBuilder.class);
@@ -155,10 +163,10 @@ public class OfficeImporterVelocityBridge
         String referenceDocument, boolean filterStyles)
     {
         try {
-            connect();
+            assertConnected();
             return xhtmlBuilder.build(officeFileStream, officeFileName, currentMixedDocumentReferenceResolver
                 .resolve(referenceDocument), filterStyles);
-        } catch (OfficeImporterException ex) {
+        } catch (Exception ex) {
             setErrorMessage(ex.getMessage());
             logger.error(ex.getMessage(), ex);
         }
@@ -206,14 +214,14 @@ public class OfficeImporterVelocityBridge
         String referenceDocument, boolean filterStyles)
     {
         try {
-            connect();
+            assertConnected();
             DocumentReference reference = currentMixedDocumentReferenceResolver.resolve(referenceDocument);
             if (isPresentation(officeFileName)) {
                 return presentationBuilder.build(officeFileStream, officeFileName, reference);
             } else {
                 return xdomBuilder.build(officeFileStream, officeFileName, reference, filterStyles);
             }
-        } catch (OfficeImporterException ex) {
+        } catch (Exception ex) {
             setErrorMessage(ex.getMessage());
             logger.error(ex.getMessage(), ex);
         }
@@ -349,14 +357,27 @@ public class OfficeImporterVelocityBridge
     }
 
     /**
-     * Attempts to connect to an openoffice server for conversions.
+     * Checks if the connection to the OpenOffice server has been established. If the OpenOffice server has been
+     * configured to start automatically then we make an attempt to start it (usually this means that the OpenOffice
+     * server failed to start when XE started and so we try one more time to connect).
      * 
-     * @throws OfficeImporterException if an openoffice server is not available.
+     * @throws OfficeImporterException if the connection to the OpenOffice server is not established
+     * @throws OpenOfficeManagerException if the attempt to start the OpenOffice server failed
      */
-    private void connect() throws OfficeImporterException
+    private void assertConnected() throws OfficeImporterException, OpenOfficeManagerException
     {
-        if (!officeManager.getState().equals(ManagerState.CONNECTED)) {
-            throw new OfficeImporterException("OpenOffice server unavailable.");
+        boolean connected = officeManager.getState().equals(ManagerState.CONNECTED);
+        if (!connected) {
+            // Check if the OpenOffice server was configured to start automatically.
+            if (officeConfiguration.isAutoStart()) {
+                // The OpenOffice server probably failed to start automatically when XE started. Try one more time to
+                // connect.
+                officeManager.start();
+                connected = officeManager.getState().equals(ManagerState.CONNECTED);
+            }
+            if (!connected) {
+                throw new OfficeImporterException("OpenOffice server unavailable.");
+            }
         }
     }
 

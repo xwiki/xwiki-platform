@@ -2,7 +2,7 @@
 ### Rename document template, step 1: choose new name + updated backlinks + updated parents
 ###
 ## TODO: check if this information should be displayed?
-<div id="document-title"><h1>$msg.get('core.rename.title', [$escapetool.xml($doc.fullName)])</h1></div>
+<div id="document-title"><h1>$msg.get('core.rename.title')</h1></div>
 #set($newname = $msg.get('core.rename.inputPrompt'))
 <form action="?xpage=rename&amp;step=2" method="post" class="xform third"
     onsubmit="if(this.newPageName.value=='${escapetool.xml($newname)}') this.newPageName.value=''">
@@ -15,6 +15,16 @@
   #set($pweb = $doc.space)
   <div class="padded">
     <dl>
+      <dt>
+        <label for="sourceSpaceName">$msg.get("core.rename.sourcespace")</label>
+        <span class="xHint">$msg.get('core.rename.sourcespace.hint')</span>
+      </dt>
+      <dd>$!{escapetool.xml($doc.space)} <input type="hidden" id="sourceSpaceName" name="sourceSpaceName" value="$!{escapetool.xml($doc.space)}" size="60"/></dd>
+      <dt>
+        <label for="sourcePageName">$msg.get("core.rename.sourcepage")</label>
+        <span class="xHint">$msg.get('core.rename.sourcepage.hint')</span>
+      </dt>
+      <dd>$!{escapetool.xml($doc.name)} <input type="hidden" id="sourcePageName" name="sourcePageName" value="$!{escapetool.xml($doc.name)}" size="60"/></dd>
       <dt>
         <label for="newSpaceName">$msg.get('core.rename.newspace')</label>
         <span class="xHint">$msg.get('core.rename.newspace.hint')</span>

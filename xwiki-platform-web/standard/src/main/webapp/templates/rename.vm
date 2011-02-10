@@ -56,10 +56,10 @@
             #end
           #end
           ## Save the old document name so that we can display it in the notice box. After the rename the
-          ## doc points to the new name!
-          #set ($oldDocName = $doc.fullName)
+          ## doc points to the new reference!
+          #set ($oldDocReference = $doc.documentReference)
           $doc.rename($newDocReference, $backlinks, $children)
-          #xwikimessageboxstart("$msg.get('notice')" "$msg.get('core.rename.success', [${escapetool.xml($oldDocName)}, ${escapetool.xml($doc.fullName)}, $xwiki.getURL($doc.fullName)])")
+          #xwikimessageboxstart("$msg.get('notice')" "$msg.get('core.rename.success', [${escapetool.xml($oldDocReference.name)}, ${escapetool.xml($doc.name)}, $doc.getURL(), ${escapetool.xml($oldDocReference.getLastSpaceReference().getName())}, ${escapetool.xml($doc.space)}])")
           #xwikimessageboxend()
         #end
       #end

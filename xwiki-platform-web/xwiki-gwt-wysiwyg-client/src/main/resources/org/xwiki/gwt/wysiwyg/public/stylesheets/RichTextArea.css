@@ -70,6 +70,15 @@ h1 {
   letter-spacing: normal !important;
 }
 
+/* Fix for XWIKI-3752 by overriding path/to/firefox/res/contenteditable.css rules */
+a:-moz-read-write {
+  color: $theme.linkColor !important;
+  text-decoration: none !important;
+}
+a:hover:-moz-read-write {
+  text-decoration: underline !important;
+} 
+
 .macro {
   background-color: transparent;
   border: 1px dashed #CCCCCC;

@@ -187,9 +187,9 @@ Rw52Dj97Ru7HP/4rSJIf/OBlePXVV5O/aGgkl+K37++g5vL/dmrHZnVCF2wAAAAASUVORK5CYII=
       &lt;div id="dhtmltooltip" style="visibility: hidden;"&gt;&lt;/div&gt;
       #set($ajaxdoc = $xwiki.getDocument("Panels.AjaxEditor"))
       #if($request.place)
-        #set($ajaxurl = $xwiki.getDocument("Panels.PanelLayoutUpdate").getURL("view", "xpage=plain&amp;place=$!{escapetool.url($request.place)}&amp;prefsdoc=${currentDoc}"))
+        #set($ajaxurl = $xwiki.getDocument('Panels.PanelLayoutUpdate').getURL('view', "xpage=plain&amp;place=$!{escapetool.url($request.place)}&amp;prefsdoc=${escapetool.url($currentDoc)}&amp;form_token=${escapetool.url($services.csrf.getToken())}"))
       #else
-        #set($ajaxurl = $xwiki.getDocument("Panels.PanelLayoutUpdate").getURL("view", "xpage=plain&amp;prefsdoc=${currentDoc}"))
+        #set($ajaxurl = $xwiki.getDocument("Panels.PanelLayoutUpdate").getURL("view", "xpage=plain&amp;prefsdoc=${escapetool.url($currentDoc)}&amp;form_token=${escapetool.url($services.csrf.getToken())}"))
       #end
       $xwiki.jsfx.use("js/scriptaculous/scriptaculous.js")
       $xwiki.jsfx.use("js/xwiki/accordion/accordion.js")

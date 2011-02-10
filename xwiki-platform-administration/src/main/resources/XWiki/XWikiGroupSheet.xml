@@ -171,7 +171,7 @@ $xwiki.ssfx.use('js/xwiki/table/livetable.css', true)
           },
           addNewMember: function(uorg, input) {
             if (input) {
-              var url = "${doc.getURL()}?xpage=adduorg&amp;uorg=" + uorg + "&amp;name=" + input.value;
+              var url = "${doc.getURL()}?xpage=adduorg&amp;uorg=" + encodeURIComponent(uorg) + "&amp;name=" + encodeURIComponent(input.value);
               new Ajax.Request(url, {
                 method: 'get',
                 onSuccess: function(transport) {

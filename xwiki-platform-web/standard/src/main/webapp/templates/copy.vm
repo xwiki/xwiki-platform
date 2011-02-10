@@ -124,6 +124,8 @@
       <dd>
         <select id="targetWikiName" name="targetWikiName">
           #set ($wikis = $xwiki.getXWiki().getVirtualWikisDatabaseNames($context.getContext()))
+          ## Add the main wiki since getVirtualWikisDatabaseNames() doesn't include it
+          $wikis.add($context.getMainWikiName())
           #foreach ($wiki in $wikis)
             <option #if ($wiki == $doc.wiki) selected="selected" #end>$!{escapetool.xml($doc.wiki)}</option>
           #end

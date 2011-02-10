@@ -156,7 +156,10 @@
       </dt>
       <dd><input type="text" id="targetPageName" name="targetPageName" value="$!{escapetool.xml($doc.name)}" size="60" /></dd>
     </dl>
-    <div class="buttons"><span class="buttonwrapper"><input type="submit" value="$msg.get('core.copy.submit')" class="button"/></span></div>
+    <div class="buttons">
+      <span class="buttonwrapper"><input type="submit" value="$msg.get('core.copy.submit')" class="button"/></span>
+      <span class="buttonwrapper"><a class="secondary button" href="$doc.getURL()">$msg.get('core.copy.cancel')</a></span>
+    </div>
     </form>
     #end
     <div class="clearfloats"></div>

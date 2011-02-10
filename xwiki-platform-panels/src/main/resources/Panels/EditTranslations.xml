@@ -131,15 +131,16 @@
     #end
   #end
   &lt;div&gt;
-  $msg.get("panels.translation.translate")
-  #set($elangs = ",")
-  #foreach($elang in $doc.translationList)
-    #set($elangs = "${elangs}$elang,")
-  #end
+  #set($elangs = $doc.translationList)
+  #set($translationHTML = "")
   #foreach($olang in $xwiki.getXWikiPreference("languages").split("[|, ]"))
-    #if(($elangs.indexOf(",$olang,") == -1) &amp;&amp; ($olang != $doc.defaultLanguage) &amp;&amp; ($olang != $forcetrans))
-      &lt;a href="$doc.getURL("edit", "editor=${editor}&amp;amp;language=${olang}")"&gt;$olang&lt;/a&gt;
+    #if(!$elangs.contains($olang) &amp;&amp; ($olang != $doc.defaultLanguage) &amp;&amp; ($olang != $forcetrans))
+      #set($translationHTML = "${translationHTML}&lt;a href=""$doc.getURL(""edit"", ""editor=${editor}&amp;amp;language=${olang}"")""&gt;$olang&lt;/a&gt;&lt;br /&gt;")
     #end
+  #end
+  #if($translationHTML != "")
+    $msg.get("panels.translation.translate")\\
+    $translationHTML
   #end
   &lt;/div&gt;
   #panelfooter()

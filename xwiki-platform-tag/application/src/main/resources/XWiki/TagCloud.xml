@@ -306,73 +306,74 @@ ol.tagCloud .ultraPopular {
 <guid>a98525e7-1607-418b-b763-aa062d9ff71d</guid>
 <property>
 <code>{{velocity}}
-## 
+##
 ## tagCloudSpace - the space to display the tag cloud for. If blank, display cloud for the whole wiki. Default is blank.
-#set($tagCloudSpace = $context.macro.params.get('space'))
+#set ($tagCloudSpace = $context.macro.params.get('space'))
 ##
-## Configurable popularity levels. You must an even number of levels. Default: 6.
-##
+## Configurable popularity levels. You must enter an even number of levels. Default: 6.
 #set ($popularityLevels = ["notPopular", "notVeryPopular", "somewhatPopular", "popular", "veryPopular", "ultraPopular"])
-$xwiki.ssx.use("XWiki.TagCloud")
+#set ($levelsHalf = $popularityLevels.size() / 2)
+##
+$xwiki.ssx.use('XWiki.TagCloud')##
 ##
 ## Get tag count map. Key: tag, value: number of occurrences.
-## Store the minimum number of occurrences for a tag.
-##
 #set ($tagCount = $xwiki.tag.getTagCount("$!tagCloudSpace"))
-#set ($sortedTagCounts = $sorttool.sort($tagCount.values()))
-#set ($maxIndex = $sortedTagCounts.size() - 1)
-#set ($minCount = $listtool.get($sortedTagCounts, 0))
-#set ($maxCount = $listtool.get($sortedTagCounts, $maxIndex))
 ##
-## Calculate the total number of tags in the wiki.
-##
-#set ($totalTagNumber = 0)
-#foreach ($currentTagCount in $sortedTagCounts)
-  #set ($totalTagNumber = $totalTagNumber + $currentTagCount)
-#end
-##
-## Build popularity map using the difference between minimum maximum tag occurrences counts
-## and the average tag occurences count.
-##
-#set ($countAverage = $mathtool.div($totalTagNumber, $tagCount.size()))
-#set ($levelsHalf = $popularityLevels.size() / 2)
-#set ($firstHalfCountDelta = $mathtool.sub($countAverage, $minCount))
-#set ($secondHalfCountDelta = $mathtool.sub($maxCount, $countAverage))
-#set ($popularityMap = $util.getHashMap())
-#set ($firstHalfIntervalSize = $mathtool.div($firstHalfCountDelta, $levelsHalf))
-#set ($secondHalfIntervalSize = $mathtool.div($secondHalfCountDelta, $levelsHalf))
-#set ($previousPopularityMax = $minCount)
-#set ($intervalSize = $firstHalfIntervalSize)
-#set ($halfPassed = false)
-#foreach ($popularityLevel in $popularityLevels)
-  #if ($velocityCount &gt; $levelsHalf &amp;&amp; !$halfPassed)
-    #set ($intervalSize = $secondHalfIntervalSize)
-    #set ($halfPassed = true)
+## Only build popularity map if at least one tag exists
+#if ($tagCount.size() &gt; 0)
+  ##
+  ## Store the minimum and maximum number of occurrences.
+  #set ($sortedTagCounts = $sorttool.sort($tagCount.values()))
+  #set ($maxIndex = $sortedTagCounts.size() - 1)
+  #set ($minCount = $listtool.get($sortedTagCounts, 0))
+  #set ($maxCount = $listtool.get($sortedTagCounts, $maxIndex))
+  ##
+  ## Calculate the total number of tags in the wiki.
+  #set ($totalTagNumber = 0)
+  #foreach ($currentTagCount in $sortedTagCounts)
+    #set ($totalTagNumber = $totalTagNumber + $currentTagCount)
   #end
-  #set ($currentPopularityMax = $mathtool.add($previousPopularityMax, $intervalSize))
-  #set ($discard = $popularityMap.put($currentPopularityMax, $popularityLevel))
-  #set ($previousPopularityMax = $currentPopularityMax)
+  #set ($countAverage = $mathtool.div($totalTagNumber, $tagCount.size()))
+  ##
+  ## Build popularity map using the difference between minimum / maximum tag occurrences counts, and the average tag occurences count.
+  #set ($firstHalfIntervalSize = $mathtool.div($mathtool.sub($countAverage, $minCount), $levelsHalf))
+  #set ($secondHalfIntervalSize = $mathtool.div($mathtool.sub($maxCount, $countAverage), $levelsHalf))
+  ##
+  ## Use a sorted map
+  #set ($popularityMap = $util.getTreeMap())
+  #set ($previousPopularityMax = $minCount)
+  #set ($intervalSize = $firstHalfIntervalSize)
+  #set ($halfPassed = false)
+  #foreach ($popularityLevel in $popularityLevels)
+    #if ($velocityCount &gt; $levelsHalf &amp;&amp; !$halfPassed)
+      #set ($intervalSize = $secondHalfIntervalSize)
+      #set ($halfPassed = true)
+    #end
+    #set ($currentPopularityMax = $mathtool.add($previousPopularityMax, $intervalSize))
+    ##
+    ## round the threshold
+    #set ($threshold = $mathtool.roundTo(1, $currentPopularityMax))
+    #set ($discard = $popularityMap.put($threshold, $popularityLevel))
+    #set ($previousPopularityMax = $currentPopularityMax)
+  #end
 #end
 ##
 ## Display tag cloud.
-##
 {{html}}
 #if ($tagCount.size() &gt; 0)
-    &lt;ol class="tagCloud"&gt;
-      #foreach($tag in $tagCount.keySet())
-        ## This hackish loop could be made simpler with #break (introduced in velocity 1.6)
-        #set($classSet = false)
-        #foreach($popularityMax in $sorttool.sort($popularityMap.keySet()))
-          #if($tagCount.get($tag) &gt; $popularityMax)
-            ## Tag already processed
-          #elseif(!$classSet)
-            #set($liClass = $popularityMap.get($popularityMax))
-            #set($classSet = true)
-          #end
-        #end
-        &lt;li class="$liClass"&gt;&lt;a class="tag" href="$xwiki.getURL("Main.Tags", "view", "do=viewTag&amp;amp;tag=$escapetool.url($tag)")" title="$msg.get("xe.tag.tooltip", ["${tagCount.get($tag)}"])"&gt;$escapetool.xml($tag)&lt;/a&gt;&lt;/li&gt;
+  &lt;ol class="tagCloud"&gt;
+  #foreach ($tagEntry in $tagCount.entrySet())
+    #foreach ($popularityEntry in $popularityMap.entrySet())
+      #if ($popularityEntry.Key &gt;= $tagEntry.Value)
+        #set ($liClass = $popularityEntry.Value)
+        #break
       #end
-    &lt;/ol&gt;
+    #end
+    &lt;li class="$liClass"&gt;
+      &lt;a class="tag" href="$xwiki.getURL("Main.Tags", "view", "do=viewTag&amp;amp;tag=$escapetool.url($tagEntry.Key)")" title="$msg.get("xe.tag.tooltip", ["$tagEntry.Value"])"&gt;$escapetool.xml($tagEntry.Key)&lt;/a&gt;
+    &lt;/li&gt;
+  #end
+  &lt;/ol&gt;
 #else
   #if("$!tagCloudSpace" == "")
     $msg.get("xe.tag.notags")
@@ -381,8 +382,13 @@ $xwiki.ssx.use("XWiki.TagCloud")
   #end
 #end
 {{/html}}
-{{/velocity}}
-</code></property><property><contentDescription></contentDescription></property><property><contentType>No content</contentType>
+{{/velocity}}</code>
+</property>
+<property>
+<contentDescription></contentDescription>
+</property>
+<property>
+<contentType>No content</contentType>
 </property>
 <property>
 <defaultCategory>Content</defaultCategory>

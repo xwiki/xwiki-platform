@@ -22,7 +22,6 @@ package org.xwiki.rendering.internal.macro.dashboard;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.xwiki.component.annotation.Component;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.macro.MacroExecutionException;

@@ -42,7 +42,6 @@ import org.xwiki.rendering.transformation.MacroTransformationContext;
  * @version $Id$
  * @since 3.0M3
  */
-@Component("blockscontainer")
 class BlocksContainerMacro extends AbstractContainerMacro<ContainerMacroParameters>
 {
     /**

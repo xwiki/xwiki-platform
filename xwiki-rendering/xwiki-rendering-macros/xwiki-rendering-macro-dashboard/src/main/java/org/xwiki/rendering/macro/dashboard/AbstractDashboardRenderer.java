@@ -29,6 +29,7 @@ import org.xwiki.rendering.listener.HeaderLevel;
 
 /**
  * @version $Id$
+ * @since 3.0M3
  */
 public abstract class AbstractDashboardRenderer implements DashboardRenderer
 {

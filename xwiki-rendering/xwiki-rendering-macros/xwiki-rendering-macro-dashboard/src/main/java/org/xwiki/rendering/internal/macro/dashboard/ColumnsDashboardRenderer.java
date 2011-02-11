@@ -40,6 +40,7 @@ import org.xwiki.rendering.transformation.MacroTransformationContext;
  * the second being the index of the gadget inside the column.
  * 
  * @version $Id$
+ * @since 3.0M3
  */
 class ColumnGadget extends Gadget
 {

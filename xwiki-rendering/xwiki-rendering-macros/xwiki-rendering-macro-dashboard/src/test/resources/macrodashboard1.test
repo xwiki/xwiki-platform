@@ -1,0 +1,30 @@
+.runTransformations
+.#-----------------------------------------------------------------
+.# Note that we mock the gathering of Gadgets data (from XObjects).
+.#-----------------------------------------------------------------
+.input|xwiki/2.0
+.#-----------------------------------------------------
+{{dashboard/}}
+.#-----------------------------------------------------
+.expect|event/1.0
+.#-----------------------------------------------------
+beginDocument
+beginMacroMarkerStandalone [dashboard] []
+beginGroup [[class]=[dashboard]]
+beginGroup [[class]=[container-justified container-columns]]
+beginGroup [[class]=[gadget-container column first-column last-column]]
+beginGroup [[class]=[gadget]]
+beginHeader [2, null] [[class]=[gadget-title]]
+onWord [title]
+endHeader [2, null] [[class]=[gadget-title]]
+beginGroup [[class]=[gadget-content]]
+onWord [content]
+endGroup [[class]=[gadget-content]]
+endGroup [[class]=[gadget]]
+endGroup [[class]=[gadget-container column first-column last-column]]
+beginGroup [[class]=[clearfloats]]
+endGroup [[class]=[clearfloats]]
+endGroup [[class]=[container-justified container-columns]]
+endGroup [[class]=[dashboard]]
+endMacroMarkerStandalone [dashboard] []
+endDocument

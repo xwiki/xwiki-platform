@@ -32,9 +32,7 @@ import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.block.GroupBlock;
 import org.xwiki.rendering.macro.AbstractMacro;
-import org.xwiki.rendering.macro.Macro;
 import org.xwiki.rendering.macro.MacroExecutionException;
-import org.xwiki.rendering.macro.container.ContainerMacroParameters;
 import org.xwiki.rendering.macro.dashboard.DashboardMacroParameters;
 import org.xwiki.rendering.macro.dashboard.DashboardRenderer;
 import org.xwiki.rendering.macro.dashboard.Gadget;
@@ -66,12 +64,6 @@ public class DashboardMacro extends AbstractMacro<DashboardMacroParameters>
      * The description of this macro.
      */
     private static final String DESCRIPTION = "A macro to define a dashboard.";
-
-    /**
-     * The container macro, to delegate layouting the gadgets.
-     */
-    @Requirement("container")
-    private Macro<ContainerMacroParameters> containerMacro;
 
     /**
      * CSS file skin extension, to include the dashboard css.

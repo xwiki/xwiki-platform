@@ -199,7 +199,7 @@ tt, tt *, tt tt.wikimodel-verbatim {
 
 tt.wikimodel-verbatim {
   font-family: sans-serif;
-  white-space: pre;
+  white-space: pre-wrap;
 }
 
 em {

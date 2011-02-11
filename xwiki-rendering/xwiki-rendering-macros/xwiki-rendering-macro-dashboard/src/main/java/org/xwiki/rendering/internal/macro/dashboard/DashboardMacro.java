@@ -153,7 +153,7 @@ public class DashboardMacro extends AbstractMacro<DashboardMacroParameters>
         try {
             return componentManager.lookup(DashboardRenderer.class, layout);
         } catch (ComponentLookupException e) {
-            // TODO: maybe should log?
+            getLogger().warn("Could not find the Dashboard renderer for layout \"" + layout + "\"");
             return null;
         }
     }

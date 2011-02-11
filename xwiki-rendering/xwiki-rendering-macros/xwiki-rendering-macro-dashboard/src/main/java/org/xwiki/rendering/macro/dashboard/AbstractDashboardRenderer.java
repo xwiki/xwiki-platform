@@ -28,6 +28,9 @@ import org.xwiki.rendering.block.HeaderBlock;
 import org.xwiki.rendering.listener.HeaderLevel;
 
 /**
+ * Superclass for the dashboard renderers, which provides a method to decorate a gadget in an uniform manner for all the
+ * dashboard renderers, regardless of the layout.
+ * 
  * @version $Id$
  * @since 3.0M3
  */
@@ -37,6 +40,11 @@ public abstract class AbstractDashboardRenderer implements DashboardRenderer
      * The HTML class attribute name.
      */
     protected static final String CLASS = "class";
+
+    /**
+     * The HTML id attribute name.
+     */
+    protected static final String ID = "id";
 
     /**
      * Decorates the passed gadget and renders it as a list of XDOM blocks.
@@ -57,7 +65,10 @@ public abstract class AbstractDashboardRenderer implements DashboardRenderer
 
         // and wrap everything in a container, to give it a class
         GroupBlock gadgetBlock = new GroupBlock();
-        gadgetBlock.setParameter(CLASS, "gadget");
+        String idPrefix = "gadget";
+        gadgetBlock.setParameter(CLASS, idPrefix);
+        // put an underscore here because it doesn't hurt at this level and it helps scriptaculous on the frontend
+        gadgetBlock.setParameter(ID, idPrefix + "_" + gadget.getId());
         gadgetBlock.addChild(titleBlock);
         gadgetBlock.addChild(contentGroup);
 

@@ -85,12 +85,11 @@ public class RenderingTests extends TestCase
         {
             {
                 allowing(mockGadgetReader).getGadgets(with(any(MacroTransformationContext.class)));
-                will(returnValue(Arrays.asList(new Gadget(Arrays.<Block>asList(new WordBlock("title")),
-                    Arrays.<Block>asList(new WordBlock("content")), "1,1"))));
+                will(returnValue(Arrays.asList(new Gadget("0", Arrays.<Block> asList(new WordBlock("title")), Arrays
+                    .<Block> asList(new WordBlock("content")), "1,1"))));
             }
         });
-        DefaultComponentDescriptor<GadgetReader> descriptorGR =
-            new DefaultComponentDescriptor<GadgetReader>();
+        DefaultComponentDescriptor<GadgetReader> descriptorGR = new DefaultComponentDescriptor<GadgetReader>();
         descriptorGR.setRole(GadgetReader.class);
         componentManager.registerComponent(descriptorGR, mockGadgetReader);
     }

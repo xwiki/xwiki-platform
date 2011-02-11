@@ -37,18 +37,13 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-surefire-plugin</artifactId>
-        <configuration>
-          <excludes>
-            <exclude>**/RenderingTests.java</exclude>
-          </excludes>
-        </configuration>
       </plugin>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-checkstyle-plugin</artifactId>
         <configuration>
           <excludes>
-            com/xpn/xwiki/dashboard/DefaultGadgetReader.java
+            org/xwiki/rendering/internal/macro/dashboard/DefaultGadgetReader.java
           </excludes>
         </configuration>
       </plugin>

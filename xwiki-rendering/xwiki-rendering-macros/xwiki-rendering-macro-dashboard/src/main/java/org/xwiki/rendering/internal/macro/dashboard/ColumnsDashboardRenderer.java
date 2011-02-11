@@ -57,13 +57,14 @@ class ColumnGadget extends Gadget
     /**
      * Creates a column gadget using the passed title, content and position.
      * 
+     * @param id the id of this gadget
      * @param title the title of the gadget
      * @param content the content of the gadget
      * @param position the position of the gadget
      */
-    public ColumnGadget(List<Block> title, List<Block> content, String position)
+    public ColumnGadget(String id, List<Block> title, List<Block> content, String position)
     {
-        super(title, content, position);
+        super(id, title, content, position);
     }
 
     /**
@@ -73,7 +74,7 @@ class ColumnGadget extends Gadget
      */
     public ColumnGadget(Gadget gadget)
     {
-        this(gadget.getTitle(), gadget.getContent(), gadget.getPosition());
+        this(gadget.getId(), gadget.getTitle(), gadget.getContent(), gadget.getPosition());
     }
 
     /**
@@ -97,7 +98,7 @@ class ColumnGadget extends Gadget
     {
         super.setPosition(position);
 
-        // parse the position as a "container, index" pair and store the container number and index.
+        // parse the position as a "container, index" pair and store the container number and index. <br />
         // TODO: move this code in an API class since the comma separated format is more generic than the columns layout
         // split by comma, first position is column, second position is index
         String[] split = position.split(",");

@@ -32,6 +32,11 @@ import org.xwiki.rendering.block.Block;
 public class Gadget
 {
     /**
+     * The identifier of this gadget, to render in the content.
+     */
+    private String id;
+    
+    /**
      * The title of this gadget.
      */
     private List<Block> title;
@@ -49,12 +54,14 @@ public class Gadget
     /**
      * Creates a gadget from a title, content and position.
      * 
+     * @param id the id of this gadget
      * @param title the title of the gadget
      * @param content the content of the gadget
      * @param position the position of the gadget
      */
-    public Gadget(List<Block> title, List<Block> content, String position)
+    public Gadget(String id, List<Block> title, List<Block> content, String position)
     {
+        this.setId(id);
         this.setTitle(title);
         this.setContent(content);
         this.setPosition(position);
@@ -106,5 +113,21 @@ public class Gadget
     public void setPosition(String position)
     {
         this.position = position;
+    }
+
+    /**
+     * @return the id of this gadget, to render in the content
+     */
+    public String getId()
+    {
+        return id;
+    }
+
+    /**
+     * @param id the id to set to this gadget
+     */
+    public void setId(String id)
+    {
+        this.id = id;
     }
 }

@@ -60,7 +60,7 @@ import com.xpn.xwiki.objects.BaseObject;
 public class DefaultGadgetReader implements GadgetReader
 {
     /**
-     * The reference to the gadgets class, relative to the current wiki.
+     * The reference to the gadgets class, relative to the current wiki. <br /> 
      * TODO: to make sure that this class exists before trying to read objects of this type.
      */
     private static final EntityReference GADGET_CLASS =
@@ -92,7 +92,7 @@ public class DefaultGadgetReader implements GadgetReader
     private VelocityManager velocityManager;
 
     /**
-     * The component manager, to get the appropriate parser for the content of the gadget and the title. 
+     * The component manager, to get the appropriate parser for the content of the gadget and the title.
      */
     @Requirement
     private ComponentManager componentManager;
@@ -158,13 +158,14 @@ public class DefaultGadgetReader implements GadgetReader
             String title = xObject.getStringValue("title");
             String content = xObject.getLargeStringValue("content");
             String position = xObject.getStringValue("position");
+            String id = xObject.getNumber() + "";
 
             // render title with velocity
             StringWriter writer = new StringWriter();
             // FIXME: the engine has an issue with $ and # as last character. To test and fix if it happens
             velocityEngine.evaluate(velocityContext, writer, key, title);
             String gadgetTitle = writer.toString();
-            
+
             // parse both the title and content in the syntax of the transformation context
             XDOM titleXDom = contentParser.parse(new StringReader(gadgetTitle));
             List<Block> titleBlocks = titleXDom.getChildren();
@@ -174,7 +175,7 @@ public class DefaultGadgetReader implements GadgetReader
             parserUtils.removeTopLevelParagraph(contentBlocks);
 
             // create a gadget will all these and add the gadget to the container of gadgets
-            gadgets.add(new Gadget(titleBlocks, contentBlocks, position));
+            gadgets.add(new Gadget(id, titleBlocks, contentBlocks, position));
         }
         return gadgets;
     }

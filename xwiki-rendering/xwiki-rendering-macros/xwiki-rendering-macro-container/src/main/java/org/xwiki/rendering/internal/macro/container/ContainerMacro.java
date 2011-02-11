@@ -1,17 +1,33 @@
+/*
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+ */
 package org.xwiki.rendering.internal.macro.container;
 
-import java.io.StringReader;
 import java.util.List;
 
 import org.xwiki.component.annotation.Component;
-import org.xwiki.component.manager.ComponentLookupException;
+import org.xwiki.component.annotation.Requirement;
 import org.xwiki.rendering.block.Block;
-import org.xwiki.rendering.block.XDOM;
+import org.xwiki.rendering.internal.macro.MacroContentParser;
 import org.xwiki.rendering.macro.MacroExecutionException;
 import org.xwiki.rendering.macro.container.AbstractContainerMacro;
 import org.xwiki.rendering.macro.container.ContainerMacroParameters;
-import org.xwiki.rendering.parser.ParseException;
-import org.xwiki.rendering.parser.Parser;
 import org.xwiki.rendering.transformation.MacroTransformationContext;
 
 /**
@@ -36,27 +52,17 @@ public class ContainerMacro extends AbstractContainerMacro<ContainerMacroParamet
     private static final String DESCRIPTION = "A macro to enclose multiple groups and add decoration, such as layout.";
 
     /**
+     * Used to parse the macro content.
+     */
+    @Requirement
+    private MacroContentParser contentParser;
+
+    /**
      * Creates a container macro.
      */
     public ContainerMacro()
     {
         super("Container", DESCRIPTION, ContainerMacroParameters.class);
-    }
-
-    /**
-     * Get the parser of the desired wiki syntax.
-     * 
-     * @param syntaxId the syntax to get the parser for
-     * @return the parser of the current wiki syntax
-     * @throws MacroExecutionException Failed to find source parser
-     */
-    protected Parser getSyntaxParser(String syntaxId) throws MacroExecutionException
-    {
-        try {
-            return (Parser) getComponentManager().lookup(Parser.class, syntaxId);
-        } catch (ComponentLookupException e) {
-            throw new MacroExecutionException("Failed to find source parser", e);
-        }
     }
 
     /**
@@ -70,20 +76,7 @@ public class ContainerMacro extends AbstractContainerMacro<ContainerMacroParamet
     protected List<Block> getContent(ContainerMacroParameters parameters, String content,
         MacroTransformationContext context) throws MacroExecutionException
     {
-        XDOM parsedDom;
-
-        // get a parser for the desired syntax identifier
-        Parser parser = getSyntaxParser(context.getSyntax().toIdString());
-
-        try {
-            // parse the content of the wiki macro that has been injected by the component manager
-            parsedDom = parser.parse(new StringReader(content == null ? "" : content));
-        } catch (ParseException e) {
-            throw new MacroExecutionException("Failed to parse content [" + content + "] with Syntax parser ["
-                + parser.getSyntax() + "]", e);
-        }
-
-        return parsedDom.getChildren();
+        return this.contentParser.parse(content, context, false, false);
     }
 
     /**

@@ -20,8 +20,10 @@
 package org.xwiki.rendering.internal.macro;
 
 import java.io.StringReader;
+import java.util.Collections;
 import java.util.List;
 
+import org.apache.commons.lang.StringUtils;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.Requirement;
 import org.xwiki.component.manager.ComponentLookupException;
@@ -62,6 +64,11 @@ public class DefaultMacroContentParser implements MacroContentParser
     public List<Block> parse(String content, MacroTransformationContext macroContext, boolean transform,
         boolean removeTopLevelParagraph) throws MacroExecutionException
     {
+        // If the content is empty return an empty list
+        if (StringUtils.isEmpty(content)) {
+            return Collections.emptyList();
+        }
+
         // If there's no syntax specified in the Transformation throw an error
         if (macroContext.getSyntax() == null) {
             throw new MacroExecutionException("Invalid Transformation: missing Syntax");

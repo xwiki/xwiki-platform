@@ -323,4 +323,99 @@ public class XWikiServletURLFactoryTest extends AbstractBridgedXWikiComponentTes
         url = urlFactory.getURL(new URL("http://wiki2server/xwiki/bin/view/Space/Page"), getContext());
         assertEquals("http://wiki2server/xwiki/bin/view/Space/Page", url);
     }
+
+    /**
+     * When getServerURL is called on a resource from the main wiki,
+     * the user is in a subwiki, and xwiki.home is set, xwiki.home should be returned.
+     * see: XWIKI-5981
+     */
+    public void testGetServerURLFromVirtualWithXWikiDotHomeEnabled() throws MalformedURLException
+    {
+        getContext().setURL(new URL("http://virtual1.mywiki.tld/xwiki/view/InitialSpace/InitialPage"));
+        getContext().setDatabase("subwiki");
+
+        // This is called by XWiki#getXWiki() and is set to whatever the user asks for.
+        // The test sets it to "xwiki" which is wrong for this test.
+        getContext().setOriginalDatabase("subwiki");
+
+        config.setProperty("xwiki.home", "http://mainwiki.mywiki.tld/");
+        config.setProperty("xwiki.virtual", "1");
+        urlFactory.init(getContext());
+        assertEquals("http://mainwiki.mywiki.tld/",
+                     urlFactory.getServerURL("xwiki", getContext()).toString());
+    }
+
+    /**
+     * Proves that from a virtual wiki, URLs generated to point to the main wiki will use xwiki.home.
+     * see: XWIKI-5981
+     */
+    public void testXWikiDotHomeParameterFromVirtualWiki() throws MalformedURLException
+    {
+        getContext().setURL(new URL("http://virtual1.mywiki.tld/xwiki/view/InitialSpace/InitialPage"));
+        getContext().setDatabase("subwiki");
+
+        // This is called by XWiki#getXWiki() and is set to whatever the user asks for.
+        // The test sets it to "xwiki" which is wrong for this test.
+        getContext().setOriginalDatabase("subwiki");
+
+        config.setProperty("xwiki.home", "http://mainwiki.mywiki.tld/");
+        config.setProperty("xwiki.virtual", "1");
+
+        // Reinitialize the URL factory to take into account the new request URL.
+        urlFactory.init(getContext());
+
+        // No wiki passed, assume same wiki. we should expect it to return http://virtual1.mywiki.tld/
+        URL url = urlFactory.createURL("Space", "Page", "view", "param1=1", "anchor", null, getContext());
+        assertEquals(new URL("http://virtual1.mywiki.tld/xwiki/bin/view/Space/Page?param1=1#anchor"), url);
+        // We are already in virtual1 so it should be a relative reference.
+        assertEquals("/xwiki/bin/view/Space/Page?param1=1#anchor", urlFactory.getURL(url, getContext()));
+
+        // Pass "xwiki" as the wiki, expect it to return the main wiki as set in the xwiki.home parameter.
+        url = urlFactory.createURL("Space", "Page", "view", "param1=1", "anchor", "xwiki", getContext());
+        assertEquals(new URL("http://mainwiki.mywiki.tld/xwiki/bin/view/Space/Page?param1=1#anchor"), url);
+        assertEquals("http://mainwiki.mywiki.tld/xwiki/bin/view/Space/Page?param1=1#anchor",
+                     urlFactory.getURL(url, getContext()));
+    }
+
+    /**
+     * When getServerURL is called on a resource from the main wiki,
+     * the user is in the main wiki, and xwiki.home is set, xwiki.home should be returned.
+     * see: XWIKI-5981
+     */
+    public void testGetServerURLNonVirtualModeWithXWikiDotHomeEnabled() throws MalformedURLException
+    {
+        getContext().setURL(new URL("http://127.0.0.1:8080/xwiki/view/InitialSpace/InitialPage"));
+        config.setProperty("xwiki.home", "http://mainwiki.mywiki.tld/");
+        urlFactory.init(getContext());
+        // TODO: Fix getServerURL() so that is is consistent about returning a trailing / or not.
+        assertEquals("http://mainwiki.mywiki.tld",
+                     urlFactory.getServerURL("xwiki", getContext()).toString());
+        assertEquals("http://mainwiki.mywiki.tld",
+                     urlFactory.getServerURL(null, getContext()).toString());
+    }
+
+    /**
+     * Proves that in a single wiki instance, URLs are always generated using xwiki.home if present.
+     * see: XWIKI-5981
+     */
+    public void testXWikiDotHomeParameterNonVirtualMode() throws MalformedURLException
+    {
+        // Some proxies will modify the host field without adding a x-forwarded-host field,
+        // Using xwiki.home we should be able to make it work anyway.
+        getContext().setURL(new URL("http://localhost:8080/xwiki/view/InitialSpace/InitialPage"));
+        config.setProperty("xwiki.home", "http://mainwiki.mywiki.tld/");
+        // Reinitialize the URL factory to take into account the new request URL.
+        urlFactory.init(getContext());
+
+        // No wiki passed, assume main wiki. we should expect it to return mainwiki.mywiki.tld and not
+        // xwiki.mywiki.tld.
+        URL url = urlFactory.createURL("Space", "Page", "view", "param1=1", "anchor", null, getContext());
+        assertEquals(new URL("http://mainwiki.mywiki.tld/xwiki/bin/view/Space/Page?param1=1#anchor"), url);
+        assertEquals("/xwiki/bin/view/Space/Page?param1=1#anchor", urlFactory.getURL(url, getContext()));
+
+        // Pass "xwiki" as the wiki, expect same result.
+        url = urlFactory.createURL("Space", "Page", "view", "param1=1", "anchor", "xwiki", getContext());
+        assertEquals(new URL("http://mainwiki.mywiki.tld/xwiki/bin/view/Space/Page?param1=1#anchor"), url);
+        assertEquals("/xwiki/bin/view/Space/Page?param1=1#anchor", urlFactory.getURL(url, getContext()));
+    }
 }

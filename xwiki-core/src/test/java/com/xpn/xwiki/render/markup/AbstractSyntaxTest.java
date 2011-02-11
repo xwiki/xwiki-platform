@@ -59,6 +59,9 @@ public abstract class AbstractSyntaxTest extends AbstractBridgedXWikiComponentTe
         this.mockXWiki.stubs().method("getEncoding").will(returnValue("UTF-8"));
         this.mockXWiki.stubs().method("getServletPath").will(returnValue("bin/"));
 
+        // Generating a URL causes XWiki.Param("xwiki.home") to be called.
+        this.mockXWiki.stubs().method("Param").will(returnValue(null));
+
         this.context.setWiki((XWiki) this.mockXWiki.proxy());
 
         this.context.setURLFactory(new XWikiServletURLFactory(new URL("http://localhost/"), "xwiki/", "bin/"));

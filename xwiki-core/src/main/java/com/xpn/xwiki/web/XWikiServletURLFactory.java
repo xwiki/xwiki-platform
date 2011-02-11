@@ -41,6 +41,11 @@ public class XWikiServletURLFactory extends XWikiDefaultURLFactory
 {
     private static final Log LOG = LogFactory.getLog(XWikiServletURLFactory.class);
 
+    /**
+     * This is the URL which was requested by the user
+     * possibly with the host modified if x-forwarded-host header is set or if xwiki.home parameter
+     * is set and we are viewing the main page.
+     */
     protected URL serverURL;
 
     protected String contextPath;
@@ -121,16 +126,42 @@ public class XWikiServletURLFactory extends XWikiDefaultURLFactory
      */
     private String getHost(XWikiContext context)
     {
-        // Tests usually set the context URL but don't set the request object.
-        if (context.getRequest() != null) {
-            // Check reverse-proxy mode (e.g. Apache's mod_proxy_http).
-            String proxyHost = StringUtils.substringBefore(context.getRequest().getHeader("x-forwarded-host"), ",");
-            if (!StringUtils.isEmpty(proxyHost)) {
-                return proxyHost;
+        URL url = context.getURL();
+
+        // Check reverse-proxy mode (e.g. Apache's mod_proxy_http).
+        String proxyHost = StringUtils.substringBefore(context.getRequest().getHeader("x-forwarded-host"), ",");
+        if (!StringUtils.isEmpty(proxyHost)) {
+            return proxyHost;
+        }
+        // If the reverse proxy does not support the x-forwarded-host parameter
+        // we allow the user to force the the host name by using the xwiki.home param.
+        final URL homeParam = getXWikiHomeParameter(context);
+        if (homeParam != null && context.isMainWiki()) {
+            url = homeParam;
+        }
+
+        return url.getHost() + (url.getPort() < 0 ? "" : (":" + url.getPort()));
+    }
+
+    /** @return a URL made from the xwiki.cfg parameter xwiki.home or null if undefined or unparsable. */
+    private static URL getXWikiHomeParameter(final XWikiContext context)
+    {
+        final String surl = getXWikiHomeParameterAsString(context);
+        if (!StringUtils.isEmpty(surl)) {
+            try {
+                return new URL(surl);
+            } catch (MalformedURLException e) {
+                LOG.warn("Could not create URL from xwiki.cfg xwiki.home parameter: " + surl
+                         + " Ignoring parameter.");
             }
         }
-        URL url = context.getURL();
-        return url.getHost() + (url.getPort() < 0 ? "" : (":" + url.getPort()));
+        return null;
+    }
+
+    /** @return the xwiki.home parameter or null if undefined. */
+    private static String getXWikiHomeParameterAsString(final XWikiContext context)
+    {
+        return context.getWiki().Param("xwiki.home", null);
     }
 
     /**
@@ -143,16 +174,33 @@ public class XWikiServletURLFactory extends XWikiDefaultURLFactory
         return getServerURL(context.getDatabase(), context);
     }
 
+    /**
+     * Get the url of the server EG: http://www.xwiki.org/
+     * This function sometimes will return a URL with a trailing / and other times not.
+     * This is because the xwiki.home param is recommended to have a trailing / but this.serverURL
+     * never does.
+     *
+     * @param xwikidb the name of the database (subwiki) if null it is assumed to be the same as the wiki
+     *                which we are currently displaying.
+     * @param context the XWikiContext used to determine the current wiki and the value if the xwiki.home
+     *                parameter if needed as well as access the xwiki server document if in virtual mode.
+     * @return a URL containing the protocol, host, and port (if applicable) of the server to use for the
+     *         given database.
+     */
     public URL getServerURL(String xwikidb, XWikiContext context) throws MalformedURLException
     {
         if (xwikidb == null || xwikidb.equals(context.getOriginalDatabase())) {
+            // This is the case if we are getting a URL for a page which is in
+            // the same wiki as the page which is now being displayed.
             return this.serverURL;
         }
 
         if (context.isMainWiki(xwikidb)) {
-            String surl = context.getWiki().Param("xwiki.home", null);
-            if (!StringUtils.isEmpty(surl)) {
-                return new URL(surl);
+            // Not in the same wiki so we are in a subwiki and we want a URL which points to the main wiki.
+            // if xwiki.home is set then lets return that.
+            final URL homeParam = getXWikiHomeParameter(context);
+            if (homeParam != null) {
+                return homeParam;
             }
         }
 

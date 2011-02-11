@@ -268,6 +268,14 @@ public class XWikiContext extends Hashtable<Object, Object>
         return previous;
     }
 
+    /**
+     * Get the "original" database name.
+     * In single wiki mode this will be "xwiki", but in virtual wiki mode this will be
+     * the database name for the wiki which the user requested. If the database is switched
+     * to load some piece of data, this will remember what it should be switched back to.
+     *
+     * @return the db name originally requested by the user.
+     */
     public String getOriginalDatabase()
     {
         return this.orig_database;

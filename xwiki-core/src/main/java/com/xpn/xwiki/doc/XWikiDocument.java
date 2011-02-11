@@ -1740,14 +1740,15 @@ public class XWikiDocument implements DocumentModelBridge
      */
     public XWikiDocumentArchive loadDocumentArchive()
     {
-        if (getDocumentArchive() != null) {
-            return getDocumentArchive();
+        XWikiDocumentArchive arch = getDocumentArchive();
+        if (arch != null) {
+            return arch;
         }
 
         XWikiContext xcontext = getXWikiContext();
 
         try {
-            XWikiDocumentArchive arch = getVersioningStore(xcontext).getXWikiDocumentArchive(this, xcontext);
+            arch = getVersioningStore(xcontext).getXWikiDocumentArchive(this, xcontext);
 
             // Put a copy of the archive in the soft reference for later use if needed.
             setDocumentArchive(arch);

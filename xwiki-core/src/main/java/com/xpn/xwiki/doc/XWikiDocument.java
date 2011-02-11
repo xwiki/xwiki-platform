@@ -198,12 +198,12 @@ public class XWikiDocument implements DocumentModelBridge
     /**
      * First author of the document.
      */
-    private String creator;
+    private DocumentReference creatorReference;
 
     /**
      * The Author is changed when any part of the document changes (content, objects, attachments).
      */
-    private String author;
+    private DocumentReference authorReference;
 
     /**
      * The last user that has changed the document's content (ie not object, attachments). The Content author is only
@@ -211,7 +211,7 @@ public class XWikiDocument implements DocumentModelBridge
      * document and this is the reason we need to know the last author who's modified the content since programming
      * rights depend on this.
      */
-    private String contentAuthor;
+    private DocumentReference contentAuthorReference;
 
     private String customClass;
 
@@ -1387,43 +1387,183 @@ public class XWikiDocument implements DocumentModelBridge
         }
     }
 
+    /**
+     * @since 3.0M3
+     */
+    public DocumentReference getAuthorReference()
+    {
+        return this.authorReference;
+    }
+
+    /**
+     * @since 3.0M3
+     */
+    public void setAuthorReference(DocumentReference authorReference)
+    {
+        this.authorReference = authorReference;
+    }
+
+    /**
+     * Note that this method cannot be removed for now since it's used by Hibernate for saving a XWikiDocument.
+     * 
+     * @deprecated since 3.0M3 use {@link #getAuthorReference()} instead
+     */
+    @Deprecated
     public String getAuthor()
     {
-        return this.author != null ? this.author.trim() : "";
+        String author;
+        DocumentReference authorReference = getAuthorReference();
+        if (authorReference == null) {
+            author = "";
+        } else {
+            author = this.compactWikiEntityReferenceSerializer.serialize(authorReference, getDocumentReference());
+        }
+
+        return author;
     }
 
-    public String getContentAuthor()
-    {
-        return this.contentAuthor != null ? this.contentAuthor.trim() : "";
-    }
-
+    /**
+     * Note that this method cannot be removed for now since it's used by Hibernate for loading a XWikiDocument.
+     * 
+     * @deprecated since 3.0M3 use {@link #setAuthorReference} instead
+     */
+    @Deprecated
     public void setAuthor(String author)
     {
-        if (!getAuthor().equals(author)) {
+        // Note: Consider "" or null as the same, i.e. the author not being set
+        DocumentReference authorReference = null;
+        if (author != null && author.length() > 0) {
+            authorReference =
+                this.explicitReferenceDocumentReferenceResolver.resolve(
+                    this.xClassEntityReferenceResolver.resolve(author, EntityType.DOCUMENT), getDocumentReference());
+        }
+
+        if ((getAuthorReference() == null && authorReference != null)
+            || (getAuthorReference() != null && !getAuthorReference().equals(authorReference))) {
             setMetaDataDirty(true);
         }
-        this.author = author;
+
+        setAuthorReference(authorReference);
     }
 
+    /**
+     * @since 3.0M3
+     */
+    public DocumentReference getContentAuthorReference()
+    {
+        return this.contentAuthorReference;
+    }
+
+    /**
+     * @since 3.0M3
+     */
+    public void setContentAuthorReference(DocumentReference contentAuthorReference)
+    {
+        this.contentAuthorReference = contentAuthorReference;
+    }
+
+    /**
+     * Note that this method cannot be removed for now since it's used by Hibernate for saving a XWikiDocument.
+     * 
+     * @deprecated since 3.0M3 use {@link #getContentAuthorReference()} instead
+     */
+    @Deprecated
+    public String getContentAuthor()
+    {
+        String contentAuthor;
+        DocumentReference contentAuthorReference = getContentAuthorReference();
+        if (contentAuthorReference == null) {
+            contentAuthor = "";
+        } else {
+            contentAuthor =
+                this.compactWikiEntityReferenceSerializer.serialize(contentAuthorReference, getDocumentReference());
+        }
+
+        return contentAuthor;
+    }
+
+    /**
+     * Note that this method cannot be removed for now since it's used by Hibernate for loading a XWikiDocument.
+     * 
+     * @deprecated since 3.0M3 use {@link #setContentAuthorReference} instead
+     */
+    @Deprecated
     public void setContentAuthor(String contentAuthor)
     {
-        if (!getContentAuthor().equals(contentAuthor)) {
+        // Note: Consider "" or null as the same, i.e. the content author not being set
+        DocumentReference contentAuthorReference = null;
+        if (contentAuthor != null && contentAuthor.length() > 0) {
+            contentAuthorReference =
+                this.explicitReferenceDocumentReferenceResolver.resolve(
+                    this.xClassEntityReferenceResolver.resolve(contentAuthor, EntityType.DOCUMENT),
+                    getDocumentReference());
+        }
+
+        if ((getContentAuthorReference() == null && contentAuthorReference != null)
+            || (getContentAuthorReference() != null && !getContentAuthorReference().equals(contentAuthorReference))) {
             setMetaDataDirty(true);
         }
-        this.contentAuthor = contentAuthor;
+
+        setContentAuthorReference(contentAuthorReference);
     }
 
+    /**
+     * @since 3.0M3
+     */
+    public DocumentReference getCreatorReference()
+    {
+        return this.creatorReference;
+    }
+
+    /**
+     * @since 3.0M3
+     */
+    public void setCreatorReference(DocumentReference creatorReference)
+    {
+        this.creatorReference = creatorReference;
+    }
+
+    /**
+     * Note that this method cannot be removed for now since it's used by Hibernate for saving a XWikiDocument.
+     * 
+     * @deprecated since 3.0M2 use {@link #getCreatorReference()} instead
+     */
+    @Deprecated
     public String getCreator()
     {
-        return this.creator != null ? this.creator.trim() : "";
+        String creator;
+        DocumentReference creatorReference = getCreatorReference();
+        if (creatorReference == null) {
+            creator = "";
+        } else {
+            creator = this.compactWikiEntityReferenceSerializer.serialize(creatorReference, getDocumentReference());
+        }
+
+        return creator;
     }
 
+    /**
+     * Note that this method cannot be removed for now since it's used by Hibernate for loading a XWikiDocument.
+     * 
+     * @deprecated since 3.0M2 use {@link #setCreatorReference} instead
+     */
+    @Deprecated
     public void setCreator(String creator)
     {
-        if (!getCreator().equals(creator)) {
+        // Note: Consider "" or null as the same, i.e. the creator not being set
+        DocumentReference creatorReference = null;
+        if (creator != null && creator.length() > 0) {
+            creatorReference =
+                this.explicitReferenceDocumentReferenceResolver.resolve(
+                    this.xClassEntityReferenceResolver.resolve(creator, EntityType.DOCUMENT), getDocumentReference());
+        }
+
+        if ((getCreatorReference() == null && creatorReference != null)
+            || (getCreatorReference() != null && !getCreatorReference().equals(creatorReference))) {
             setMetaDataDirty(true);
         }
-        this.creator = creator;
+
+        setCreatorReference(creatorReference);
     }
 
     public Date getDate()
@@ -7364,7 +7504,6 @@ public class XWikiDocument implements DocumentModelBridge
         this.creationDate.setTime((this.creationDate.getTime() / 1000) * 1000);
         this.content = "";
         this.format = "";
-        this.author = "";
         this.language = "";
         this.defaultLanguage = "";
         this.attachmentList = new ArrayList<XWikiAttachment>();

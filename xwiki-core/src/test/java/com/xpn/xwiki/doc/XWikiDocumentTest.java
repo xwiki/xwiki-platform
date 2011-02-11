@@ -322,7 +322,7 @@ public class XWikiDocumentTest extends AbstractBridgedXWikiComponentTestCase
         this.document.setAuthor(author);
         XWikiDocument copy = this.document.copyDocument(this.document.getName() + " Copy", getContext());
 
-        assertTrue(author.equals(copy.getAuthor()));
+        assertEquals("XWiki.Albatross", copy.getAuthor());
     }
 
     public void testCreatorAfterDocumentCopy() throws XWikiException
@@ -331,7 +331,7 @@ public class XWikiDocumentTest extends AbstractBridgedXWikiComponentTestCase
         this.document.setCreator(creator);
         XWikiDocument copy = this.document.copyDocument(this.document.getName() + " Copy", getContext());
 
-        assertTrue(creator.equals(copy.getCreator()));
+        assertEquals("XWiki.Condor", copy.getCreator());
     }
 
     public void testCreationDateAfterDocumentCopy() throws Exception
@@ -340,7 +340,7 @@ public class XWikiDocumentTest extends AbstractBridgedXWikiComponentTestCase
         Thread.sleep(1000);
         XWikiDocument copy = this.document.copyDocument(this.document.getName() + " Copy", getContext());
 
-        assertTrue(copy.getCreationDate().equals(sourceCreationDate));
+        assertEquals(sourceCreationDate, copy.getCreationDate());
     }
 
     public void testObjectGuidsAfterDocumentCopy() throws Exception

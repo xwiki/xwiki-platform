@@ -133,24 +133,22 @@ public class XWikiTest extends AbstractBridgedXWikiComponentTestCase
         getContext().setUser("Earth");
     }
 
-    public void testAuthorAfterDocumentCopy() throws XWikiException
+    public void testAuthorIsntChangedAfterDocumentCopy() throws XWikiException
     {
         String copyName = "Lyre";
-        String currentUser = getContext().getUser();
         this.apiXWiki.copyDocument(this.apiDocument.getName(), copyName);
         Document copy = this.apiXWiki.getDocument(copyName);
 
-        assertTrue(currentUser.equals(copy.getAuthor()));
+        assertEquals("XWiki.Earth", copy.getAuthor());
     }
 
-    public void testCreatorAfterDocumentCopy() throws XWikiException
+    public void testCreatorIsntChangedAfterDocumentCopy() throws XWikiException
     {
         String copyName = "Sirius";
-        String currentUser = getContext().getUser();
         this.apiXWiki.copyDocument(this.apiDocument.getName(), copyName);
         Document copy = this.apiXWiki.getDocument(copyName);
 
-        assertTrue(currentUser.equals(copy.getCreator()));
+        assertEquals("XWiki.Earth", copy.getCreator());
     }
 
     public void testCreationDateAfterDocumentCopy() throws XWikiException, InterruptedException

@@ -17,7 +17,7 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package com.xpn.xwiki.dashboard;
+package org.xwiki.rendering.internal.macro.dashboard;
 
 import java.io.StringReader;
 import java.io.StringWriter;
@@ -51,8 +51,7 @@ import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
 
 /**
- * Default gadget reader, reads the gadgets from XWiki Objects attached to the current document. <br />
- * FIXME: this is not backwards compat
+ * Default gadget reader, reads the gadgets from XWiki Objects attached to the current document.
  * 
  * @version $Id$
  * @since 3.0M3

@@ -70,7 +70,6 @@ public class DefaultDocumentAccessBridge implements DocumentAccessBridge
 
     private XWikiContext getContext()
     {
-
         return (XWikiContext) this.execution.getContext().getProperty("xwikicontext");
     }
 

@@ -301,6 +301,12 @@ XWiki.widgets.FullScreen = Class.create({
     }
     // Remember the maximized element
     this.maximized = targetElement;
+    // Remember the cursor position and scroll offset (needed for circumventing https://bugzilla.mozilla.org/show_bug.cgi?id=633789 )
+    if (typeof targetElement.setSelectionRange == 'function') {
+      var selectionStart = targetElement.selectionStart;
+      var selectionEnd = targetElement.selectionEnd;
+      var scrollTop = targetElement.scrollTop;
+    }
     // Remember the original dimensions of the maximized element
     targetElement._originalStyle = {
       'width' : targetElement.style['width'],
@@ -387,11 +393,24 @@ XWiki.widgets.FullScreen = Class.create({
     if (targetElement._toolbar) {
       targetElement._toolbar.viewportOffset();
     }
+    // Reset the cursor and scroll offset
+    if (typeof targetElement.setSelectionRange == 'function') {
+      // This is approximate, since the textarea width changes, and more lines can fit in the same vertical space
+      targetElement.scrollTop = scrollTop;
+      targetElement.selectionStart = selectionStart;
+      targetElement.selectionEnd = selectionEnd;
+    }
     document.fire("xwiki:fullscreen:entered", { "target" : targetElement });
   },
   /** Restore the layout. */
   closeFullScreen : function() {
     var targetElement = this.maximized;
+    // Remember the cursor position and scroll offset (needed for circumventing https://bugzilla.mozilla.org/show_bug.cgi?id=633789 )
+    if (typeof targetElement.setSelectionRange == 'function') {
+      var selectionStart = targetElement.selectionStart;
+      var selectionEnd = targetElement.selectionEnd;
+      var scrollTop = targetElement.scrollTop;
+    }
     // Hide the exit buttons
     this.closeButton.hide();
     this.actionCloseButtonWrapper.hide();
@@ -455,6 +474,13 @@ XWiki.widgets.FullScreen = Class.create({
     delete this.maximized;
     if (this.maximizedReference) {
       this.maximizedReference.value = '';
+    }
+    // Reset the cursor and scroll offset
+    if (typeof targetElement.setSelectionRange == 'function') {
+      // This is approximate, since the textarea width changes, and more lines can fit in the same vertical space
+      targetElement.scrollTop = scrollTop;
+      targetElement.selectionStart = selectionStart;
+      targetElement.selectionEnd = selectionEnd;
     }
     document.fire("xwiki:fullscreen:exited", { "target" : targetElement });
   },

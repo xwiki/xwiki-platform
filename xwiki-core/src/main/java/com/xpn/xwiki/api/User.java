@@ -83,13 +83,18 @@ public class User extends Api
      */
     public boolean isUserInGroup(String groupName)
     {
+        boolean result = false;
         try {
-            return user.isUserInGroup(groupName, getXWikiContext());
+            if (this.user == null) {
+                LOG.warn("Invalid null user");
+            } else {
+                result = this.user.isUserInGroup(groupName, getXWikiContext());
+            }
         } catch (Exception ex) {
-            LOG.warn(new MessageFormat("Unhandled exception checking if user {0}"
+            LOG.warn(new MessageFormat("Unhandled exception while checking if user {0}"
                 + " belongs to group {1}").format(new java.lang.Object[] {user, groupName}), ex);
         }
-        return false;
+        return result;
     }
 
     /**

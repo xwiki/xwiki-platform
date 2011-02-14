@@ -20,6 +20,7 @@
 package com.xpn.xwiki.api;
 
 import org.jmock.Mock;
+import org.xwiki.model.reference.DocumentReference;
 
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
@@ -36,23 +37,6 @@ import com.xpn.xwiki.user.api.XWikiUser;
  */
 public class UserTest extends AbstractBridgedXWikiComponentTestCase
 {
-    private Mock mockXWiki;
-
-    protected void setUp() throws Exception
-    {
-        super.setUp();
-        
-        this.mockXWiki = mock(XWiki.class);
-        getContext().setWiki((XWiki) mockXWiki.proxy());
-        XWikiDocument doc = new XWikiDocument("XWiki", "Admin");
-        BaseClass userClass = new BaseClass();
-        userClass.addTextField("email", "email address", 20);
-        mockXWiki.stubs().method("getXClass").will(returnValue(userClass));
-        BaseObject userObj = doc.newObject("XWiki.XWikiUsers", getContext());
-        userObj.setStringValue("email", "admin@mail.com");
-        mockXWiki.stubs().method("getDocument").will(returnValue(doc));
-    }
-
     /**
      * Checks that XWIKI-2040 remains fixed.
      */
@@ -70,8 +54,18 @@ public class UserTest extends AbstractBridgedXWikiComponentTestCase
         assertFalse(u.isUserInGroup("XWiki.InexistentGroupName"));
     }
 
-    public void testGetEmail()
+    public void testGetEmail() throws Exception
     {
+        Mock mockXWiki = mock(XWiki.class);
+        getContext().setWiki((XWiki) mockXWiki.proxy());
+        XWikiDocument doc = new XWikiDocument(new DocumentReference("xwiki", "XWiki", "Admin"));
+        BaseClass userClass = new BaseClass();
+        userClass.addTextField("email", "email address", 20);
+        mockXWiki.stubs().method("getXClass").will(returnValue(userClass));
+        BaseObject userObj = doc.newXObject(new DocumentReference("xwiki", "XWiki", "XWikiUsers"), getContext());
+        userObj.setStringValue("email", "admin@mail.com");
+        mockXWiki.stubs().method("getDocument").will(returnValue(doc));
+
         User u = new User(null, null);
         assertNull(u.getEmail());
 

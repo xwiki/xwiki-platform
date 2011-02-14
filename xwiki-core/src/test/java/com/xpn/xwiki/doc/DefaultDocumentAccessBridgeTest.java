@@ -21,6 +21,7 @@ package com.xpn.xwiki.doc;
 
 import org.jmock.Mock;
 import org.xwiki.bridge.DocumentAccessBridge;
+import org.xwiki.model.reference.DocumentReference;
 
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.test.AbstractBridgedXWikiComponentTestCase;
@@ -54,7 +55,7 @@ public class DefaultDocumentAccessBridgeTest extends AbstractBridgedXWikiCompone
 
     public void testGetUrlEmptyDocument()
     {
-        getContext().setDoc(new XWikiDocument("Space", "Page"));
+        getContext().setDoc(new XWikiDocument(new DocumentReference("Wiki", "Space", "Page")));
         this.mockXWiki.stubs().method("getURL").will(returnValue("/xwiki/bin/view/Main/WebHome"));
 
         assertEquals("/xwiki/bin/view/Main/WebHome", this.documentAccessBridge.getURL("", "view", "", ""));

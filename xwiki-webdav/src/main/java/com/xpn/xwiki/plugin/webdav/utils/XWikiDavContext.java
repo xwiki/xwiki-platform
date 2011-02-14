@@ -133,7 +133,7 @@ public class XWikiDavContext
             xwikiContext.setDatabase("xwiki");
 
             ServletContainerInitializer containerInitializer =
-                (ServletContainerInitializer) Utils.getComponent(ServletContainerInitializer.class);
+                Utils.getComponent(ServletContainerInitializer.class);
             containerInitializer.initializeRequest(xwikiContext.getRequest().getHttpServletRequest(), xwikiContext);
             containerInitializer.initializeResponse(xwikiContext.getResponse().getHttpServletResponse());
             containerInitializer.initializeSession(xwikiContext.getRequest().getHttpServletRequest());
@@ -174,7 +174,7 @@ public class XWikiDavContext
     private static void initCache() throws DavException
     {
         try {
-            CacheManager cacheManager = (CacheManager) Utils.getComponent(CacheManager.class, "default");
+            CacheManager cacheManager = Utils.getComponent(CacheManager.class, "default");
             CacheFactory factory = cacheManager.getCacheFactory();
             CacheConfiguration conf = new CacheConfiguration();
             LRUEvictionConfiguration lec = new LRUEvictionConfiguration();
@@ -467,7 +467,7 @@ public class XWikiDavContext
     }
 
     /**
-     * A shortcut to {@link XWikiStoreInterface#search(String, int, int, XWikiContext)}.
+     * A shortcut to {@link com.xpn.xwiki.store.XWikiStoreInterface#search(String, int, int, XWikiContext)}.
      * 
      * @param sql the HQL query.
      * @return search results.

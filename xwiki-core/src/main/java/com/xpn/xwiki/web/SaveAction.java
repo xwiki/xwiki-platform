@@ -86,7 +86,7 @@ public class SaveAction extends PreviewAction
         } else {
             tdoc = doc.getTranslatedDocument(language, context);
             if ((tdoc == doc) && xwiki.isMultiLingual(context)) {
-                tdoc = new XWikiDocument(doc.getSpace(), doc.getName());
+                tdoc = new XWikiDocument(doc.getDocumentReference());
                 tdoc.setLanguage(language);
                 tdoc.setStore(doc.getStore());
             } else if (tdoc != doc) {
@@ -113,7 +113,7 @@ public class SaveAction extends PreviewAction
         }
 
         if (sectionNumber != 0) {
-            XWikiDocument sectionDoc = (XWikiDocument) tdoc.clone();
+            XWikiDocument sectionDoc = tdoc.clone();
             sectionDoc.readFromForm((EditForm) form, context);
             String sectionContent = sectionDoc.getContent() + "\n";
             String content = doc.updateDocumentSection(sectionNumber, sectionContent);

@@ -19,6 +19,9 @@
  */
 package com.xpn.xwiki;
 
+import java.io.ByteArrayInputStream;
+import java.io.InputStreamReader;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -56,6 +59,7 @@ import com.xpn.xwiki.store.XWikiVersioningStoreInterface;
 import com.xpn.xwiki.test.AbstractBridgedXWikiComponentTestCase;
 import com.xpn.xwiki.web.XWikiRequest;
 import com.xpn.xwiki.web.XWikiServletRequest;
+import com.xpn.xwiki.web.XWikiServletRequestStub;
 
 /**
  * Unit tests for {@link com.xpn.xwiki.XWiki}.
@@ -79,7 +83,10 @@ public class XWikiTest extends AbstractBridgedXWikiComponentTestCase
     {
         super.setUp();
 
-        this.document = new XWikiDocument("MilkyWay", "Fidis");
+        this.document = new XWikiDocument(new DocumentReference("Wiki", "MilkyWay", "Fidis"));
+        getContext().setRequest(new XWikiServletRequestStub());
+        getContext().setURL(new URL("http://localhost:8080/xwiki/bin/view/MilkyWay/Fidis"));
+
         this.xwiki = new XWiki(new XWikiConfig(), getContext())
         {
             protected void registerWikiMacros()
@@ -194,17 +201,21 @@ public class XWikiTest extends AbstractBridgedXWikiComponentTestCase
 
     public void testParseTemplateConsidersObjectField() throws XWikiException
     {
-        XWikiDocument skinClass = new XWikiDocument("XWiki", "XWikiSkins");
-        skinClass.getxWikiClass().addTextAreaField("template.vm", "template", 80, 20);
+        DocumentReference skinReference = new DocumentReference("xwiki", "XWiki", "XWikiSkins");
+        XWikiDocument skinClass = new XWikiDocument(skinReference);
+        skinClass.getXClass().addTextAreaField("template.vm", "template", 80, 20);
         this.xwiki.saveDocument(skinClass, getContext());
-        XWikiDocument skin = new XWikiDocument("XWiki", "Skin");
-        BaseObject obj = skin.newObject("XWiki.XWikiSkins", getContext());
+
+        DocumentReference mySkinReference = new DocumentReference("xwiki", "XWiki", "Skin");
+        XWikiDocument skinDocument = new XWikiDocument(mySkinReference);
+        BaseObject obj = skinDocument.newXObject(skinReference, getContext());
         obj.setLargeStringValue("template.vm", "parsing a field");
-        this.xwiki.saveDocument(skin, getContext());
+        this.xwiki.saveDocument(skinDocument, getContext());
+
         getContext().put("skin", "XWiki.Skin");
         assertEquals("XWiki.Skin", this.xwiki.getSkin(getContext()));
-        assertFalse(this.xwiki.getDocument("XWiki.Skin", getContext()).isNew());
-        assertEquals(skin, this.xwiki.getDocument("XWiki.Skin", getContext()));
+        assertFalse(this.xwiki.getDocument(mySkinReference, getContext()).isNew());
+        assertEquals(skinDocument, this.xwiki.getDocument(mySkinReference, getContext()));
         assertEquals("parsing a field", this.xwiki.parseTemplate("template.vm", getContext()));
     }
 
@@ -213,7 +224,7 @@ public class XWikiTest extends AbstractBridgedXWikiComponentTestCase
      */
     public void testParseTemplateConsidersAttachment() throws XWikiException
     {
-        XWikiDocument skin = new XWikiDocument("XWiki", "Skin");
+        XWikiDocument skin = new XWikiDocument(new DocumentReference("Wiki", "XWiki", "Skin"));
         XWikiAttachment attachment = new XWikiAttachment();
         skin.getAttachmentList().add(attachment);
         attachment.setContent("parsing an attachment".getBytes());
@@ -230,24 +241,27 @@ public class XWikiTest extends AbstractBridgedXWikiComponentTestCase
     /**
      * See XWIKI-2098
      */
-    public void testParseTemplateConsidersObjectFieldBeforeAttachment() throws XWikiException
+    public void testParseTemplateConsidersObjectFieldBeforeAttachment() throws Exception
     {
-        XWikiDocument skinClass = new XWikiDocument("XWiki", "XWikiSkins");
-        skinClass.getxWikiClass().addTextAreaField("template.vm", "template", 80, 20);
+        DocumentReference skinReference = new DocumentReference("xwiki", "XWiki", "XWikiSkins");
+        XWikiDocument skinClass = new XWikiDocument(skinReference);
+        skinClass.getXClass().addTextAreaField("template.vm", "template", 80, 20);
         this.xwiki.saveDocument(skinClass, getContext());
-        XWikiDocument skin = new XWikiDocument("XWiki", "Skin");
-        BaseObject obj = skin.newObject("XWiki.XWikiSkins", getContext());
+
+        DocumentReference mySkinReference = new DocumentReference("xwiki", "XWiki", "Skin");
+        XWikiDocument skinDocument = new XWikiDocument(mySkinReference);
+        BaseObject obj = skinDocument.newXObject(skinReference, getContext());
         obj.setLargeStringValue("template.vm", "parsing a field");
         XWikiAttachment attachment = new XWikiAttachment();
-        skin.getAttachmentList().add(attachment);
-        attachment.setContent("parsing an attachment".getBytes());
+        skinDocument.getAttachmentList().add(attachment);
+        attachment.setContent(new ByteArrayInputStream("parsing an attachment".getBytes()));
         attachment.setFilename("template.vm");
-        attachment.setDoc(skin);
-        this.xwiki.saveDocument(skin, getContext());
+        attachment.setDoc(skinDocument);
+        this.xwiki.saveDocument(skinDocument, getContext());
         getContext().put("skin", "XWiki.Skin");
         assertEquals("XWiki.Skin", this.xwiki.getSkin(getContext()));
-        assertFalse(this.xwiki.getDocument("XWiki.Skin", getContext()).isNew());
-        assertEquals(skin, this.xwiki.getDocument("XWiki.Skin", getContext()));
+        assertFalse(this.xwiki.getDocument(mySkinReference, getContext()).isNew());
+        assertEquals(skinDocument, this.xwiki.getDocument(mySkinReference, getContext()));
         assertEquals("parsing a field", this.xwiki.parseTemplate("template.vm", getContext()));
     }
 
@@ -416,7 +430,7 @@ public class XWikiTest extends AbstractBridgedXWikiComponentTestCase
         context.setRequest((XWikiRequest) request.proxy());
 
         // Prepare the user profile
-        XWikiDocument testUser = new XWikiDocument("XWiki", "TestUser");
+        XWikiDocument testUser = new XWikiDocument(new DocumentReference("Wiki", "XWiki", "TestUser"));
         BaseObject userObject = (BaseObject) this.xwiki.getUserClass(context).newObject(context);
         testUser.addObject("XWiki.XWikiUsers", userObject);
         this.xwiki.saveDocument(testUser, context);

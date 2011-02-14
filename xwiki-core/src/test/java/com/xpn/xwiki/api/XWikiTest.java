@@ -28,6 +28,7 @@ import java.util.Random;
 import org.jmock.Mock;
 import org.jmock.core.Invocation;
 import org.jmock.core.stub.CustomStub;
+import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.rendering.syntax.Syntax;
 
 import com.xpn.xwiki.XWikiConfig;
@@ -126,7 +127,8 @@ public class XWikiTest extends AbstractBridgedXWikiComponentTestCase
         this.xwiki.setRightService((XWikiRightService) this.mockXWikiRightService.proxy());
 
         getContext().setUser("Redtail");
-        this.apiDocument = new Document(new XWikiDocument("MilkyWay", "Fidis"), getContext());
+        this.apiDocument =
+            new Document(new XWikiDocument(new DocumentReference("Wiki", "MilkyWay", "Fidis")), getContext());
         this.apiDocument.getDocument().setCreator("c" + getContext().getUser());
         this.apiDocument.getDocument().setAuthor("a" + getContext().getUser());
         this.apiDocument.save();

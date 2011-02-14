@@ -23,6 +23,7 @@ package com.xpn.xwiki;
 import org.jmock.Mock;
 import org.jmock.core.Invocation;
 import org.jmock.core.stub.CustomStub;
+import org.xwiki.model.reference.DocumentReference;
 
 import com.xpn.xwiki.api.Document;
 import com.xpn.xwiki.doc.XWikiDocument;
@@ -90,7 +91,7 @@ public class XWikiNotificationTest extends AbstractBridgedXWikiComponentTestCase
         TestListener listener = new TestListener();
         this.xwiki.getNotificationManager().addGeneralRule(new DocChangeRule(listener));
 
-        XWikiDocument document = new XWikiDocument("Space", "Page");
+        XWikiDocument document = new XWikiDocument(new DocumentReference("Wiki", "Space", "Page"));
 
         this.xwiki.saveDocument(document, getContext());
         assertTrue("Listener not called", listener.hasListenerBeenCalled);
@@ -110,10 +111,10 @@ public class XWikiNotificationTest extends AbstractBridgedXWikiComponentTestCase
         listener.expectedNewStatus = false;
         this.xwiki.getNotificationManager().addGeneralRule(new DocChangeRule(listener));
 
-        XWikiDocument original = new XWikiDocument("Space", "Page");
+        XWikiDocument original = new XWikiDocument(new DocumentReference("Wiki", "Space", "Page"));
         original.setNew(false);
         original.setContent("Old content");
-        XWikiDocument document = new XWikiDocument("Space", "Page");
+        XWikiDocument document = new XWikiDocument(new DocumentReference("Wiki", "Space", "Page"));
         document.setContent("New content");
         document.setOriginalDocument(original);
 

@@ -20,12 +20,14 @@
  */
 package com.xpn.xwiki.web;
 
+import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.net.MalformedURLException;
 import java.net.URL;
 
 import org.apache.commons.io.FileUtils;
 import org.jmock.Mock;
+import org.xwiki.model.reference.DocumentReference;
 
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.doc.XWikiAttachment;
@@ -76,12 +78,12 @@ public class ExportURLFactoryTest extends AbstractBridgedXWikiComponentTestCase
      * {@link ExportURLFactory#createAttachmentURL(String, String, String, String, String, com.xpn.xwiki.XWikiContext)}
      * correctly escapes spaces into %20 when the exported document contains spaces in its name.
      */
-    public void testCreateAttachmentURL() throws MalformedURLException
+    public void testCreateAttachmentURL() throws Exception
     {
         // Prepare the exported document and attachment.
-        XWikiDocument doc = new XWikiDocument(" Space ", "New  Page");
+        XWikiDocument doc = new XWikiDocument(new DocumentReference("xwiki", " Space ", "New  Page"));
         XWikiAttachment attachment = new XWikiAttachment(doc, "img .jpg");
-        attachment.setContent("test".getBytes());
+        attachment.setContent(new ByteArrayInputStream("test".getBytes()));
         doc.getAttachmentList().add(attachment);
         this.mockXWiki.stubs().method("getDocument").will(returnValue(doc));
 

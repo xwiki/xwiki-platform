@@ -91,7 +91,7 @@ public class SaveAction extends PreviewAction
                 tdoc.setStore(doc.getStore());
             } else if (tdoc != doc) {
                 // Same as above, clone the object retrieved from the store cache.
-                tdoc = (XWikiDocument) tdoc.clone();
+                tdoc = tdoc.clone();
             }
             tdoc.setTranslation(1);
         }

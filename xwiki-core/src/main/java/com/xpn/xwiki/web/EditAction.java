@@ -52,7 +52,7 @@ public class EditAction extends XWikiAction
         }
 
         // we need to clone so that nothing happens in memory
-        doc = (XWikiDocument) doc.clone();
+        doc = doc.clone();
         context.put("doc", doc);
         vcontext.put("doc", doc.newDocument(context));
 
@@ -124,10 +124,10 @@ public class EditAction extends XWikiAction
                 // If the translated doc object is the same as the doc object
                 // this means the translated doc did not exists so we need to create it
                 if ((!hasTranslation) && context.getWiki().isMultiLingual(context)) {
-                    tdoc = new XWikiDocument(doc.getSpace(), doc.getName());
+                    tdoc = new XWikiDocument(doc.getDocumentReference());
                     tdoc.setLanguage(languagetoedit);
                     tdoc.setContent(doc.getContent());
-                    tdoc.setSyntaxId(doc.getSyntaxId());
+                    tdoc.setSyntax(doc.getSyntax());
                     tdoc.setAuthor(context.getUser());
                     tdoc.setStore(doc.getStore());
                     context.put("tdoc", tdoc);
@@ -135,7 +135,7 @@ public class EditAction extends XWikiAction
                 }
             }
 
-            XWikiDocument tdoc2 = (XWikiDocument) tdoc.clone();
+            XWikiDocument tdoc2 = tdoc.clone();
             if (content != null) {
                 tdoc2.setContent(content);
                 tdoc2.setTitle(title);

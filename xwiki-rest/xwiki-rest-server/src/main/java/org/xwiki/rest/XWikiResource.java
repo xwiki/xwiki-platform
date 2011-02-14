@@ -36,6 +36,7 @@ import org.xwiki.component.descriptor.ComponentInstantiationStrategy;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.component.phase.Initializable;
 import org.xwiki.component.phase.InitializationException;
+import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.query.QueryManager;
 import org.xwiki.rest.model.jaxb.ObjectFactory;
 
@@ -204,8 +205,8 @@ public class XWikiResource implements XWikiRestComponent, Initializable
                 if (failIfDoesntExist) {
                     throw new WebApplicationException(Status.NOT_FOUND);
                 } else {
-                    XWikiDocument xwikiDocument = new XWikiDocument(spaceName, pageName);
-                    xwikiDocument.setDatabase(wikiName);
+                    XWikiDocument xwikiDocument =
+                        new XWikiDocument(new DocumentReference(wikiName, spaceName, pageName));
                     xwikiDocument.setLanguage(language);
                     doc = new Document(xwikiDocument, Utils.getXWikiContext(componentManager));
 

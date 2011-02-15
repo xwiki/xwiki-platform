@@ -124,7 +124,10 @@ public class DefaultCSRFToken extends AbstractLogEnabled implements CSRFToken, I
             if (!this.tokens.containsKey(key)) {
                 byte[] bytes = new byte[TOKEN_LENGTH];
                 this.random.nextBytes(bytes);
-                token = Base64.encodeBase64URLSafeString(bytes);
+                // Base64 encoded token can contain __ or -- which breaks the layout (see XWIKI-5996). Replacing them
+                // with x reduces randomness a bit, but it seems that other special characters are either used in XWiki
+                // syntax or not URL-safe
+                token = Base64.encodeBase64URLSafeString(bytes).replaceAll("[_=+-]", "x");
                 this.tokens.put(key, token);
             }
             return this.tokens.get(key);

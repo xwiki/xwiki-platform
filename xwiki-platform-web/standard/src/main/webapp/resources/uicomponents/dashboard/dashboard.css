@@ -26,3 +26,52 @@
   padding: 10px 15px;
 }
 
+/* gadget handles on the dashboard */
+.gadget .gadget-title .settings-menu .remove {
+  background-image: url("/xwiki/resources/icons/silk/cross.gif");
+  background-repeat: no-repeat;
+  height: 16px;
+  width: 16px;
+  cursor: pointer;
+  margin: 2px;
+}
+
+.gadget .gadget-title .settings {
+  background-image: url("/xwiki/resources/icons/silk/cog.gif");
+  background-position: center;
+  background-repeat: no-repeat;
+  height: 16px;
+  width: 20px;
+  position: absolute;
+  top: 2px;
+  right: 2px;
+  cursor: pointer;
+}
+
+.gadget .gadget-title .settings-open {
+  background-color: $theme.backgroundSecondaryColor;
+}
+
+.gadget .gadget-title .settings-menu {
+  width: 20px;
+  height: 20px;
+  position: absolute;
+  top: 18px;
+  right: 2px;
+  background-color: $theme.backgroundSecondaryColor;
+}
+
+/* Drag & drop effects */
+.gadget-container-hover-highlight {
+  background-color: $theme.highlightColor;
+}
+
+.column .gadget-placeholder {
+  margin-top: 10px;
+  padding: 20px;
+  background-color: $theme.highlightColor;
+}
+
+.dashboard-edit .gadget .gadget-title {
+  cursor: move;
+}

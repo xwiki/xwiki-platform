@@ -4,9 +4,9 @@
 ## don't fill 100% because IE doesn't fit things properly in
 #set($columnsTotalWidth = 99.9)
 ## 1.5% padding right to all the columns except last one
-#set($columnRightPadding = 1.5)
+#set($columnPadding = 0.75)
 ## compute the percent of the screen width of a column
-#set($computedColumnWidth = (($columnsTotalWidth - $columnRightPadding * ($columnsNumber - 1)) / $columnsNumber))
+#set($computedColumnWidth = (($columnsTotalWidth - $columnPadding * 2 * ($columnsNumber - 1)) / $columnsNumber))
 
 ## FIXME: this style should not be here, it's style for the container overall, not for the columns layout. 
 ## For the moment it's here to minimize the number of requested csss, 
@@ -20,9 +20,23 @@
 .container-columns .column {
   float: left;
   width: ${computedColumnWidth}%;
-  padding-right: ${columnRightPadding}%;
+  padding-right: ${columnPadding}%;
+  padding-left: ${columnPadding}%;
 }
 
+/* Make sure that the columns take space when they're empty: if height is auto, and they are floated, 
+   they will collapse as if they didn't exist, which breaks the layout */
+.container-columns .column {
+  min-height: 10px;
+}
+/* And for IE6, which doesn't understand the min-height */
+* html .container-columns .column {
+  height: 10px;
+} 
+
+.container-columns .first-column {
+  padding-left: 0;
+}
 .container-columns .last-column {
   padding-right: 0;
 }

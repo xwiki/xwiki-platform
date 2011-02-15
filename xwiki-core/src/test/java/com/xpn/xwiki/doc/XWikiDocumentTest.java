@@ -164,7 +164,7 @@ public class XWikiDocumentTest extends AbstractBridgedXWikiComponentTestCase
         this.mockXWikiStoreInterface.stubs().method("search").will(returnValue(new ArrayList<XWikiDocument>()));
     }
 
-    public void testConstructor()
+    public void testDeprecatedConstructors()
     {
         DocumentReference defaultReference = new DocumentReference("xwiki", "Main", "WebHome");
 
@@ -458,7 +458,7 @@ public class XWikiDocumentTest extends AbstractBridgedXWikiComponentTestCase
 
     public void testCloneSaveVersions()
     {
-        XWikiDocument doc1 = new XWikiDocument("qwe", "qwe");
+        XWikiDocument doc1 = new XWikiDocument(new DocumentReference("qwe", "qwe", "qwe"));
         XWikiDocument doc2 = doc1.clone();
         doc1.incrementVersion();
         doc2.incrementVersion();
@@ -467,7 +467,7 @@ public class XWikiDocumentTest extends AbstractBridgedXWikiComponentTestCase
 
     public void testAddObject() throws XWikiException
     {
-        XWikiDocument doc = new XWikiDocument("test", "document");
+        XWikiDocument doc = new XWikiDocument(new DocumentReference("test", "test", "document"));
         this.mockXWiki.stubs().method("getClass").will(returnValue(new BaseClass()));
         BaseObject object = BaseClass.newCustomClassInstance("XWiki.XWikiUsers", getContext());
         doc.addObject("XWiki.XWikiUsers", object);
@@ -481,7 +481,7 @@ public class XWikiDocumentTest extends AbstractBridgedXWikiComponentTestCase
         tagClass.setName(classname);
         tagClass.addStaticListField(XWikiConstant.TAG_CLASS_PROP_TAGS, "Tags", 30, true, "", "checkbox");
 
-        XWikiDocument doc = new XWikiDocument("test", "document");
+        XWikiDocument doc = new XWikiDocument(new DocumentReference("test", "test", "document"));
         this.mockXWiki.stubs().method("getXClass").will(returnValue(tagClass));
         this.mockXWiki.stubs().method("getEncoding").will(returnValue("iso-8859-1"));
 
@@ -522,7 +522,8 @@ public class XWikiDocumentTest extends AbstractBridgedXWikiComponentTestCase
 
     public void testGetUniqueLinkedPages10()
     {
-        XWikiDocument contextDocument = new XWikiDocument("contextdocspace", "contextdocpage");
+        XWikiDocument contextDocument =
+            new XWikiDocument(new DocumentReference("contextdocwiki", "contextdocspace", "contextdocpage"));
         getContext().setDoc(contextDocument);
 
         this.mockXWiki.stubs().method("exists").will(returnValue(true));
@@ -538,7 +539,8 @@ public class XWikiDocumentTest extends AbstractBridgedXWikiComponentTestCase
 
     public void testGetUniqueLinkedPages()
     {
-        XWikiDocument contextDocument = new XWikiDocument("contextdocspace", "contextdocpage");
+        XWikiDocument contextDocument =
+            new XWikiDocument(new DocumentReference("contextdocwiki", "contextdocspace", "contextdocpage"));
         getContext().setDoc(contextDocument);
 
         this.document.setContent("[[TargetPage]][[TargetLabel>>TargetPage]][[TargetSpace.TargetPage]]"

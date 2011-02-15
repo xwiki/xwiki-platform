@@ -1309,11 +1309,11 @@ public class Document extends Api
                 return Collections.emptyList();
             }
             if (origdoc == null) {
-                return this.doc.getContentDiff(new XWikiDocument(newdoc.getSpace(), newdoc.getName()), newdoc.doc,
+                return this.doc.getContentDiff(new XWikiDocument(newdoc.getDocumentReference()), newdoc.doc,
                     getXWikiContext());
             }
             if (newdoc == null) {
-                return this.doc.getContentDiff(origdoc.doc, new XWikiDocument(origdoc.getSpace(), origdoc.getName()),
+                return this.doc.getContentDiff(origdoc.doc, new XWikiDocument(origdoc.getDocumentReference()),
                     getXWikiContext());
             }
 
@@ -1338,11 +1338,11 @@ public class Document extends Api
                 return Collections.emptyList();
             }
             if (origdoc == null) {
-                return this.doc.getXMLDiff(new XWikiDocument(newdoc.getSpace(), newdoc.getName()), newdoc.doc,
+                return this.doc.getXMLDiff(new XWikiDocument(newdoc.getDocumentReference()), newdoc.doc,
                     getXWikiContext());
             }
             if (newdoc == null) {
-                return this.doc.getXMLDiff(origdoc.doc, new XWikiDocument(origdoc.getSpace(), origdoc.getName()),
+                return this.doc.getXMLDiff(origdoc.doc, new XWikiDocument(origdoc.getDocumentReference()),
                     getXWikiContext());
             }
 
@@ -1367,12 +1367,12 @@ public class Document extends Api
                 return Collections.emptyList();
             }
             if (origdoc == null) {
-                return this.doc.getRenderedContentDiff(new XWikiDocument(newdoc.getSpace(), newdoc.getName()),
+                return this.doc.getRenderedContentDiff(new XWikiDocument(newdoc.getDocumentReference()),
                     newdoc.doc, getXWikiContext());
             }
             if (newdoc == null) {
-                return this.doc.getRenderedContentDiff(origdoc.doc, new XWikiDocument(origdoc.getSpace(),
-                    origdoc.getName()), getXWikiContext());
+                return this.doc.getRenderedContentDiff(origdoc.doc, new XWikiDocument(origdoc.getDocumentReference()),
+                    getXWikiContext());
             }
 
             return this.doc.getRenderedContentDiff(origdoc.doc, newdoc.doc, getXWikiContext());
@@ -1395,11 +1395,11 @@ public class Document extends Api
                 return Collections.emptyList();
             }
             if (origdoc == null) {
-                return this.doc.getMetaDataDiff(new XWikiDocument(newdoc.getSpace(), newdoc.getName()), newdoc.doc,
+                return this.doc.getMetaDataDiff(new XWikiDocument(newdoc.getDocumentReference()), newdoc.doc,
                     getXWikiContext());
             }
             if (newdoc == null) {
-                return this.doc.getMetaDataDiff(origdoc.doc, new XWikiDocument(origdoc.getSpace(), origdoc.getName()),
+                return this.doc.getMetaDataDiff(origdoc.doc, new XWikiDocument(origdoc.getDocumentReference()),
                     getXWikiContext());
             }
 
@@ -1423,11 +1423,11 @@ public class Document extends Api
                 return Collections.emptyList();
             }
             if (origdoc == null) {
-                return this.doc.getObjectDiff(new XWikiDocument(newdoc.getSpace(), newdoc.getName()), newdoc.doc,
+                return this.doc.getObjectDiff(new XWikiDocument(newdoc.getDocumentReference()), newdoc.doc,
                     getXWikiContext());
             }
             if (newdoc == null) {
-                return this.doc.getObjectDiff(origdoc.doc, new XWikiDocument(origdoc.getSpace(), origdoc.getName()),
+                return this.doc.getObjectDiff(origdoc.doc, new XWikiDocument(origdoc.getDocumentReference()),
                     getXWikiContext());
             }
 
@@ -1451,11 +1451,11 @@ public class Document extends Api
                 return Collections.emptyList();
             }
             if (origdoc == null) {
-                return this.doc.getClassDiff(new XWikiDocument(newdoc.getSpace(), newdoc.getName()), newdoc.doc,
+                return this.doc.getClassDiff(new XWikiDocument(newdoc.getDocumentReference()), newdoc.doc,
                     getXWikiContext());
             }
             if (newdoc == null) {
-                return this.doc.getClassDiff(origdoc.doc, new XWikiDocument(origdoc.getSpace(), origdoc.getName()),
+                return this.doc.getClassDiff(origdoc.doc, new XWikiDocument(origdoc.getDocumentReference()),
                     getXWikiContext());
             }
 
@@ -1479,12 +1479,12 @@ public class Document extends Api
                 return Collections.emptyList();
             }
             if (origdoc == null) {
-                return this.doc.getAttachmentDiff(new XWikiDocument(newdoc.getSpace(), newdoc.getName()), newdoc.doc,
+                return this.doc.getAttachmentDiff(new XWikiDocument(newdoc.getDocumentReference()), newdoc.doc,
                     getXWikiContext());
             }
             if (newdoc == null) {
                 return this.doc.getAttachmentDiff(origdoc.doc,
-                    new XWikiDocument(origdoc.getSpace(), origdoc.getName()), getXWikiContext());
+                    new XWikiDocument(origdoc.getDocumentReference()), getXWikiContext());
             }
 
             return this.doc.getAttachmentDiff(origdoc.doc, newdoc.doc, getXWikiContext());

@@ -48,7 +48,7 @@ public class PropertyChangedRuleTest extends AbstractBridgedXWikiComponentTestCa
 
     private String testClassName = "Test.TestClass";
 
-    private DocumentReference testClassReference = new DocumentReference("xwiki", "Test", "TestClass");
+    private DocumentReference testClassReference = new DocumentReference("Test", "Test", "TestClass");
 
     private BaseClass testClass;
 
@@ -56,7 +56,7 @@ public class PropertyChangedRuleTest extends AbstractBridgedXWikiComponentTestCa
 
     private String otherClassName = "Test.OtherClass";
 
-    private DocumentReference testOtherClassReference = new DocumentReference("xwiki", "Test", "OtherClass");
+    private DocumentReference testOtherClassReference = new DocumentReference("Test", "Test", "OtherClass");
 
     private String testPropertyName = "field";
 
@@ -85,12 +85,12 @@ public class PropertyChangedRuleTest extends AbstractBridgedXWikiComponentTestCa
 
         this.context.setWiki((XWiki) this.mockXWiki.proxy());
 
-        this.classDoc = new XWikiDocument("Test", "TestClass");
-        this.testClass = this.classDoc.getxWikiClass();
+        this.classDoc = new XWikiDocument(new DocumentReference("Test", "Test", "TestClass"));
+        this.testClass = this.classDoc.getXClass();
         testClass.addTextField(this.testPropertyName, this.testPropertyName, 10);
 
-        XWikiDocument otherClassDoc = new XWikiDocument("Test", "OtherClass");
-        this.otherClass = otherClassDoc.getxWikiClass();
+        XWikiDocument otherClassDoc = new XWikiDocument(new DocumentReference("Test", "Test", "OtherClass"));
+        this.otherClass = otherClassDoc.getXClass();
         // Just to make tests a little more interesting
         this.otherClass.addTextField(this.testPropertyName, this.testPropertyName, 10);
 
@@ -99,8 +99,8 @@ public class PropertyChangedRuleTest extends AbstractBridgedXWikiComponentTestCa
 
     public void testVerifySingleObjectNotChanged() throws XWikiException
     {
-        XWikiDocument newDoc = new XWikiDocument("Test", "TestDoc");
-        XWikiDocument oldDoc = new XWikiDocument("Test", "TestDoc");
+        XWikiDocument newDoc = new XWikiDocument(new DocumentReference("Test", "Test", "TestDoc"));
+        XWikiDocument oldDoc = new XWikiDocument(new DocumentReference("Test", "Test", "TestDoc"));
 
         BaseObject oldObj = oldDoc.newObject(this.testClassName, this.context);
         BaseObject newObj = newDoc.newObject(this.testClassName, this.context);
@@ -120,8 +120,8 @@ public class PropertyChangedRuleTest extends AbstractBridgedXWikiComponentTestCa
 
     public void testVerifySingleObjectChanged() throws XWikiException
     {
-        XWikiDocument newDoc = new XWikiDocument("Test", "TestDoc");
-        XWikiDocument oldDoc = new XWikiDocument("Test", "TestDoc");
+        XWikiDocument newDoc = new XWikiDocument(new DocumentReference("Test", "Test", "TestDoc"));
+        XWikiDocument oldDoc = new XWikiDocument(new DocumentReference("Test", "Test", "TestDoc"));
 
         BaseObject oldObj = oldDoc.newObject(this.testClassName, this.context);
         BaseObject newObj = newDoc.newObject(this.testClassName, this.context);
@@ -141,8 +141,8 @@ public class PropertyChangedRuleTest extends AbstractBridgedXWikiComponentTestCa
 
     public void testVerifySingleObjectXWikiClassNotChanged() throws XWikiException
     {
-        XWikiDocument newDoc = (XWikiDocument) this.classDoc.clone();
-        XWikiDocument oldDoc = (XWikiDocument) this.classDoc.clone();
+        XWikiDocument newDoc = this.classDoc.clone();
+        XWikiDocument oldDoc = this.classDoc.clone();
 
         BaseObject oldObj = oldDoc.newObject(this.testClassName, this.context);
         BaseObject newObj = newDoc.newObject(this.testClassName, this.context);
@@ -162,8 +162,8 @@ public class PropertyChangedRuleTest extends AbstractBridgedXWikiComponentTestCa
 
     public void testVerifyMultipleObjectsXWikiClassNotChanged() throws XWikiException
     {
-        XWikiDocument newDoc = (XWikiDocument) this.classDoc.clone();
-        XWikiDocument oldDoc = (XWikiDocument) this.classDoc.clone();
+        XWikiDocument newDoc = this.classDoc.clone();
+        XWikiDocument oldDoc = this.classDoc.clone();
 
         BaseObject otherOldObject = oldDoc.newObject(this.otherClassName, this.context);
         BaseObject oldObj = oldDoc.newObject(this.testClassName, this.context);
@@ -187,8 +187,8 @@ public class PropertyChangedRuleTest extends AbstractBridgedXWikiComponentTestCa
 
     public void testVerifyMultipleObjectsXWikiClassChanged() throws XWikiException
     {
-        XWikiDocument newDoc = (XWikiDocument) this.classDoc.clone();
-        XWikiDocument oldDoc = (XWikiDocument) this.classDoc.clone();
+        XWikiDocument newDoc = this.classDoc.clone();
+        XWikiDocument oldDoc = this.classDoc.clone();
 
         BaseObject otherOldObject = oldDoc.newObject(this.otherClassName, this.context);
         BaseObject oldObj = oldDoc.newObject(this.testClassName, this.context);
@@ -212,8 +212,8 @@ public class PropertyChangedRuleTest extends AbstractBridgedXWikiComponentTestCa
 
     public void testVerifySingleObjectXWikiClassChanged() throws XWikiException
     {
-        XWikiDocument newDoc = (XWikiDocument) this.classDoc.clone();
-        XWikiDocument oldDoc = (XWikiDocument) this.classDoc.clone();
+        XWikiDocument newDoc = this.classDoc.clone();
+        XWikiDocument oldDoc = this.classDoc.clone();
 
         BaseObject oldObj = oldDoc.newObject(this.testClassName, this.context);
         BaseObject newObj = newDoc.newObject(this.testClassName, this.context);
@@ -233,8 +233,8 @@ public class PropertyChangedRuleTest extends AbstractBridgedXWikiComponentTestCa
 
     public void testVerifyMultipleObjectsMultipleXWikiClassChanged() throws XWikiException
     {
-        XWikiDocument newDoc = (XWikiDocument) this.classDoc.clone();
-        XWikiDocument oldDoc = (XWikiDocument) this.classDoc.clone();
+        XWikiDocument newDoc = this.classDoc.clone();
+        XWikiDocument oldDoc = this.classDoc.clone();
 
         BaseObject otherOldObject = oldDoc.newObject(this.otherClassName, this.context);
         BaseObject oldObj = oldDoc.newObject(this.testClassName, this.context);
@@ -262,8 +262,8 @@ public class PropertyChangedRuleTest extends AbstractBridgedXWikiComponentTestCa
 
     public void testVerifyMultipleObjectsMultipleXWikiClassNotChanged() throws XWikiException
     {
-        XWikiDocument newDoc = (XWikiDocument) this.classDoc.clone();
-        XWikiDocument oldDoc = (XWikiDocument) this.classDoc.clone();
+        XWikiDocument newDoc = this.classDoc.clone();
+        XWikiDocument oldDoc = this.classDoc.clone();
 
         BaseObject otherOldObject = oldDoc.newObject(this.otherClassName, this.context);
         BaseObject oldObj = oldDoc.newObject(this.testClassName, this.context);
@@ -291,8 +291,8 @@ public class PropertyChangedRuleTest extends AbstractBridgedXWikiComponentTestCa
 
     public void testVerifyObjectAdded() throws XWikiException
     {
-        XWikiDocument newDoc = new XWikiDocument("Test", "TestDoc");
-        XWikiDocument oldDoc = new XWikiDocument("Test", "TestDoc");
+        XWikiDocument newDoc = new XWikiDocument(new DocumentReference("Test", "Test", "TestDoc"));
+        XWikiDocument oldDoc = new XWikiDocument(new DocumentReference("Test", "Test", "TestDoc"));
 
         BaseObject newObj = newDoc.newObject(this.testClassName, this.context);
 
@@ -310,8 +310,8 @@ public class PropertyChangedRuleTest extends AbstractBridgedXWikiComponentTestCa
 
     public void testVerifyObjectDeleted() throws XWikiException
     {
-        XWikiDocument newDoc = new XWikiDocument("Test", "TestDoc");
-        XWikiDocument oldDoc = new XWikiDocument("Test", "TestDoc");
+        XWikiDocument newDoc = new XWikiDocument(new DocumentReference("Test", "Test", "TestDoc"));
+        XWikiDocument oldDoc = new XWikiDocument(new DocumentReference("Test", "Test", "TestDoc"));
 
         BaseObject oldObj = oldDoc.newObject(this.testClassName, this.context);
 
@@ -329,8 +329,8 @@ public class PropertyChangedRuleTest extends AbstractBridgedXWikiComponentTestCa
 
     public void testVerifyNoObjectOfClassObjectDeleted() throws XWikiException
     {
-        XWikiDocument newDoc = new XWikiDocument("Test", "TestDoc");
-        XWikiDocument oldDoc = new XWikiDocument("Test", "TestDoc");
+        XWikiDocument newDoc = new XWikiDocument(new DocumentReference("Test", "Test", "TestDoc"));
+        XWikiDocument oldDoc = new XWikiDocument(new DocumentReference("Test", "Test", "TestDoc"));
 
         BaseObject oldObj = oldDoc.newObject(this.testClassName, this.context);
         BaseObject newObj = newDoc.newObject(this.otherClassName, this.context);
@@ -350,8 +350,8 @@ public class PropertyChangedRuleTest extends AbstractBridgedXWikiComponentTestCa
 
     public void testVerifyNoObjectOfClass() throws XWikiException
     {
-        XWikiDocument newDoc = new XWikiDocument("Test", "TestDoc");
-        XWikiDocument oldDoc = new XWikiDocument("Test", "TestDoc");
+        XWikiDocument newDoc = new XWikiDocument(new DocumentReference("Test", "Test", "TestDoc"));
+        XWikiDocument oldDoc = new XWikiDocument(new DocumentReference("Test", "Test", "TestDoc"));
 
         BaseObject oldObj = oldDoc.newObject(this.otherClassName, this.context);
         BaseObject newObj = newDoc.newObject(this.otherClassName, this.context);
@@ -371,8 +371,8 @@ public class PropertyChangedRuleTest extends AbstractBridgedXWikiComponentTestCa
 
     public void testVerifyMultipleObjectsPropertyNotChanged() throws XWikiException
     {
-        XWikiDocument newDoc = new XWikiDocument("Test", "TestDoc");
-        XWikiDocument oldDoc = new XWikiDocument("Test", "TestDoc");
+        XWikiDocument newDoc = new XWikiDocument(new DocumentReference("Test", "Test", "TestDoc"));
+        XWikiDocument oldDoc = new XWikiDocument(new DocumentReference("Test", "Test", "TestDoc"));
 
         BaseObject newObj1 = newDoc.newObject(this.testClassName, this.context);
         newObj1.setStringValue(this.testPropertyName, "value1");
@@ -396,8 +396,8 @@ public class PropertyChangedRuleTest extends AbstractBridgedXWikiComponentTestCa
 
     public void testVerifyMultipleObjectsPropertyChanged() throws XWikiException
     {
-        XWikiDocument newDoc = new XWikiDocument("Test", "TestDoc");
-        XWikiDocument oldDoc = new XWikiDocument("Test", "TestDoc");
+        XWikiDocument newDoc = new XWikiDocument(new DocumentReference("Test", "Test", "TestDoc"));
+        XWikiDocument oldDoc = new XWikiDocument(new DocumentReference("Test", "Test", "TestDoc"));
 
         BaseObject newObj1 = newDoc.newObject(this.testClassName, this.context);
         newObj1.setStringValue(this.testPropertyName, "value1");
@@ -421,8 +421,8 @@ public class PropertyChangedRuleTest extends AbstractBridgedXWikiComponentTestCa
 
     public void testVerifyMultipleObjectsOtherObjectAdded() throws XWikiException
     {
-        XWikiDocument newDoc = new XWikiDocument("Test", "TestDoc");
-        XWikiDocument oldDoc = new XWikiDocument("Test", "TestDoc");
+        XWikiDocument newDoc = new XWikiDocument(new DocumentReference("Test", "Test", "TestDoc"));
+        XWikiDocument oldDoc = new XWikiDocument(new DocumentReference("Test", "Test", "TestDoc"));
 
         BaseObject newObj1 = newDoc.newObject(this.testClassName, this.context);
         newObj1.setStringValue(this.testPropertyName, "value1");
@@ -448,8 +448,8 @@ public class PropertyChangedRuleTest extends AbstractBridgedXWikiComponentTestCa
 
     public void testVerifyMultipleObjectsOtherObjectDeleted() throws XWikiException
     {
-        XWikiDocument newDoc = new XWikiDocument("Test", "TestDoc");
-        XWikiDocument oldDoc = new XWikiDocument("Test", "TestDoc");
+        XWikiDocument newDoc = new XWikiDocument(new DocumentReference("Test", "Test", "TestDoc"));
+        XWikiDocument oldDoc = new XWikiDocument(new DocumentReference("Test", "Test", "TestDoc"));
 
         BaseObject newObj1 = newDoc.newObject(this.testClassName, this.context);
         newObj1.setStringValue(this.testPropertyName, "value1");
@@ -475,8 +475,8 @@ public class PropertyChangedRuleTest extends AbstractBridgedXWikiComponentTestCa
 
     public void testVerifyMultipleObjectsObjectAdded() throws XWikiException
     {
-        XWikiDocument newDoc = new XWikiDocument("Test", "TestDoc");
-        XWikiDocument oldDoc = new XWikiDocument("Test", "TestDoc");
+        XWikiDocument newDoc = new XWikiDocument(new DocumentReference("Test", "Test", "TestDoc"));
+        XWikiDocument oldDoc = new XWikiDocument(new DocumentReference("Test", "Test", "TestDoc"));
 
         BaseObject newObj1 = newDoc.newObject(this.testClassName, this.context);
         newObj1.setStringValue(this.testPropertyName, "value1");
@@ -498,8 +498,8 @@ public class PropertyChangedRuleTest extends AbstractBridgedXWikiComponentTestCa
 
     public void testVerifyMultipleObjectsObjectDeleted() throws XWikiException
     {
-        XWikiDocument newDoc = new XWikiDocument("Test", "TestDoc");
-        XWikiDocument oldDoc = new XWikiDocument("Test", "TestDoc");
+        XWikiDocument newDoc = new XWikiDocument(new DocumentReference("Test", "Test", "TestDoc"));
+        XWikiDocument oldDoc = new XWikiDocument(new DocumentReference("Test", "Test", "TestDoc"));
 
         BaseObject newObj1 = newDoc.newObject(this.testClassName, this.context);
         newObj1.setStringValue(this.testPropertyName, "value1");
@@ -521,8 +521,8 @@ public class PropertyChangedRuleTest extends AbstractBridgedXWikiComponentTestCa
 
     public void testVerifyMultipleObjectsOtherObjectAddedPropertyChanged() throws XWikiException
     {
-        XWikiDocument newDoc = new XWikiDocument("Test", "TestDoc");
-        XWikiDocument oldDoc = new XWikiDocument("Test", "TestDoc");
+        XWikiDocument newDoc = new XWikiDocument(new DocumentReference("Test", "Test", "TestDoc"));
+        XWikiDocument oldDoc = new XWikiDocument(new DocumentReference("Test", "Test", "TestDoc"));
 
         BaseObject newObj1 = newDoc.newObject(this.testClassName, this.context);
         newObj1.setStringValue(this.testPropertyName, "value1");
@@ -548,8 +548,8 @@ public class PropertyChangedRuleTest extends AbstractBridgedXWikiComponentTestCa
 
     public void testVerifyMultipleObjectsClassChanged() throws XWikiException
     {
-        XWikiDocument newDoc = new XWikiDocument("Test", "TestDoc");
-        XWikiDocument oldDoc = new XWikiDocument("Test", "TestDoc");
+        XWikiDocument newDoc = new XWikiDocument(new DocumentReference("Test", "Test", "TestDoc"));
+        XWikiDocument oldDoc = new XWikiDocument(new DocumentReference("Test", "Test", "TestDoc"));
 
         BaseObject newObj1 = newDoc.newObject(this.testClassName, this.context);
         newObj1.setStringValue(this.testPropertyName, "value1");

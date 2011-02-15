@@ -23,6 +23,7 @@ import java.util.Date;
 
 import org.jmock.Mock;
 import org.suigeneris.jrcs.rcs.Version;
+import org.xwiki.model.reference.DocumentReference;
 
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiConfig;
@@ -155,7 +156,7 @@ public class XWikiDocumentArchiveTest extends AbstractBridgedXWikiComponentTestC
         // Set a username with a space
         System.setProperty("user.name", "Vincent Massol");
         
-        XWikiDocument doc = new XWikiDocument("KnowledgeBase", "WebHome");
+        XWikiDocument doc = new XWikiDocument(new DocumentReference("Wiki", "KnowledgeBase", "WebHome"));
         doc.setContent(doc.getContent() + "\nsomething added");
         archive.updateArchive(doc, XWikiRightService.GUEST_USER_FULLNAME, new Date(), "some comment", null, context);
 
@@ -167,7 +168,7 @@ public class XWikiDocumentArchiveTest extends AbstractBridgedXWikiComponentTestC
     
     public void testUpdateLoad() throws XWikiException
     {
-        XWikiDocument doc = new XWikiDocument("Test", "Test");
+        XWikiDocument doc = new XWikiDocument(new DocumentReference("Test", "Test", "Test"));
         doc.setContent("content 1.1");
         
         XWikiDocumentArchive archive = new XWikiDocumentArchive(doc.getId());
@@ -218,7 +219,7 @@ public class XWikiDocumentArchiveTest extends AbstractBridgedXWikiComponentTestC
     
     public void testRemoveVersions() throws XWikiException
     {
-        XWikiDocument doc = new XWikiDocument("Test", "Test");
+        XWikiDocument doc = new XWikiDocument(new DocumentReference("Test", "Test", "Test"));
         XWikiDocumentArchive archive = new XWikiDocumentArchive(doc.getId());
         doc.setDocumentArchive(archive);
         String author = "XWiki.some author";
@@ -257,7 +258,7 @@ public class XWikiDocumentArchiveTest extends AbstractBridgedXWikiComponentTestC
      */
     public void testVerifyCreationDateWhenLoadingDocumentFromArchive() throws Exception
     {
-        XWikiDocument doc = new XWikiDocument("Test", "Test");
+        XWikiDocument doc = new XWikiDocument(new DocumentReference("Test", "Test", "Test"));
         XWikiDocumentArchive archive = new XWikiDocumentArchive(doc.getId());
         doc.setDocumentArchive(archive);
         String author = "XWiki.some author";
@@ -280,7 +281,7 @@ public class XWikiDocumentArchiveTest extends AbstractBridgedXWikiComponentTestC
 
     public void testVerifyDiffAndFullRevisionAlgorithm() throws Exception
     {
-        XWikiDocument doc = new XWikiDocument("Test", "Test");
+        XWikiDocument doc = new XWikiDocument(new DocumentReference("Test", "Test", "Test"));
         XWikiDocumentArchive archive = new XWikiDocumentArchive(doc.getId());
         doc.setDocumentArchive(archive);
         String author = "XWiki.some author";

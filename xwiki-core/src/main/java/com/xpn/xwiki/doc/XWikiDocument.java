@@ -3454,8 +3454,8 @@ public class XWikiDocument implements DocumentModelBridge
             // use version field instead of getRCSVersion because it returns "1.1" if version==null.
             doc.version = this.version;
             doc.setDocumentArchive(getDocumentArchive());
-            doc.setAuthor(getAuthor());
-            doc.setContentAuthor(getContentAuthor());
+            doc.setAuthorReference(getAuthorReference());
+            doc.setContentAuthorReference(getContentAuthorReference());
             doc.setContent(getContent());
             doc.setContentDirty(isContentDirty());
             doc.setCreationDate(getCreationDate());
@@ -3474,7 +3474,7 @@ public class XWikiDocument implements DocumentModelBridge
             doc.setStore(getStore());
             doc.setTemplateDocumentReference(getTemplateDocumentReference());
             doc.setParentReference(getRelativeParentReference());
-            doc.setCreator(getCreator());
+            doc.setCreatorReference(getCreatorReference());
             doc.setDefaultLanguage(getDefaultLanguage());
             doc.setDefaultTemplate(getDefaultTemplate());
             doc.setValidationScript(getValidationScript());

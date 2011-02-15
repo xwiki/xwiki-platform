@@ -3945,8 +3945,8 @@ public class XWiki implements XWikiDocChangeNotificationInterface, EventListener
             doc.setParentReference(parentReference);
             doc.setContent(content);
             doc.setSyntax(syntax);
-            doc.setCreator(doc.getFullName());
-            doc.setAuthor(doc.getFullName());
+            doc.setCreatorReference(doc.getDocumentReference());
+            doc.setAuthorReference(doc.getDocumentReference());
 
             protectUserPage(doc.getFullName(), userRights, doc, context);
 

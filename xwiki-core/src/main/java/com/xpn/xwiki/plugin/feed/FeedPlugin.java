@@ -646,7 +646,7 @@ public class FeedPlugin extends XWikiDefaultPlugin implements XWikiPluginInterfa
         }
         if (StringUtils.isBlank(doc.getAuthor())) {
             needsUpdate = true;
-            doc.setAuthor(doc.getCreator());
+            doc.setAuthorReference(doc.getCreatorReference());
         }
         if (StringUtils.isBlank(doc.getTitle())) {
             needsUpdate = true;
@@ -707,7 +707,7 @@ public class FeedPlugin extends XWikiDefaultPlugin implements XWikiPluginInterfa
 
         if (StringUtils.isBlank(doc.getAuthor())) {
             needsUpdate = true;
-            doc.setAuthor(doc.getCreator());
+            doc.setAuthorReference(doc.getCreatorReference());
         }
 
         if (StringUtils.isBlank(doc.getTitle())) {

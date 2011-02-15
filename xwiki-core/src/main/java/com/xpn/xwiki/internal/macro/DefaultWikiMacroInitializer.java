@@ -255,7 +255,7 @@ public class DefaultWikiMacroInitializer extends AbstractLogEnabled implements W
         }
         if (StringUtils.isBlank(doc.getAuthor())) {
             needsUpdate = true;
-            doc.setAuthor(doc.getCreator());
+            doc.setAuthorReference(doc.getCreatorReference());
         }
         if (StringUtils.isBlank(doc.getParent())) {
             needsUpdate = true;

@@ -20,6 +20,7 @@
 package com.xpn.xwiki.store;
 
 import org.suigeneris.jrcs.rcs.Version;
+import org.xwiki.model.reference.DocumentReference;
 
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiException;
@@ -54,7 +55,7 @@ public class VoidAttachmentVersioningStoreTest extends AbstractBridgedXWikiCompo
         // is store correctly inited?
         assertEquals(VoidAttachmentVersioningStore.class, this.store.getClass());
         // create doc, attachment & attachment archive
-        XWikiDocument doc = new XWikiDocument("Main", "Test");
+        XWikiDocument doc = new XWikiDocument(new DocumentReference("Wiki", "Main", "Test"));
         XWikiAttachment attachment = new XWikiAttachment(doc, "filename");
         attachment.setContent(new byte[] {1});
         attachment.updateContentArchive(getContext());
@@ -70,7 +71,7 @@ public class VoidAttachmentVersioningStoreTest extends AbstractBridgedXWikiCompo
 
     public void testHistory() throws XWikiException
     {
-        XWikiDocument doc = new XWikiDocument("Main", "Test");
+        XWikiDocument doc = new XWikiDocument(new DocumentReference("Wiki", "Main", "Test"));
         XWikiAttachment attachment = new XWikiAttachment(doc, "filename");
         // 1.1
         attachment.setContent(new byte[] {1});

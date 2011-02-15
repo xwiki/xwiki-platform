@@ -29,6 +29,7 @@ import java.util.Map;
 import org.jmock.Mock;
 import org.jmock.core.Invocation;
 import org.jmock.core.stub.CustomStub;
+import org.xwiki.model.reference.DocumentReference;
 
 import com.sun.syndication.feed.synd.SyndEntry;
 import com.sun.syndication.feed.synd.SyndEntryImpl;
@@ -46,6 +47,7 @@ import com.xpn.xwiki.store.XWikiVersioningStoreInterface;
 import com.xpn.xwiki.test.AbstractBridgedXWikiComponentTestCase;
 import com.xpn.xwiki.user.api.XWikiRightService;
 import com.xpn.xwiki.user.impl.xwiki.XWikiRightServiceImpl;
+import com.xpn.xwiki.web.XWikiServletRequestStub;
 import com.xpn.xwiki.web.XWikiServletURLFactory;
 
 /**
@@ -78,7 +80,7 @@ public class SyndEntryDocumentSourceTest extends AbstractBridgedXWikiComponentTe
 
         getContext().setUser("Condor");
 
-        doc = new XWikiDocument("MilkyWay", "Fidis");
+        doc = new XWikiDocument(new DocumentReference("Wiki", "MilkyWay", "Fidis"));
         doc.setCreator("Condor");
         doc.setAuthor("Albatross");
         doc.setTitle("Fidis from MilkyWay");
@@ -110,6 +112,11 @@ public class SyndEntryDocumentSourceTest extends AbstractBridgedXWikiComponentTe
     {
         final Map<String, XWikiDocument> docs = new HashMap<String, XWikiDocument>();
         final XWikiContext context = getContext();
+
+        // Set URL/Request
+        context.setRequest(new XWikiServletRequestStub());
+        context.setURL(new URL("http://localhost:8080/xwiki/bin/view/MilkyWay/Fidis"));
+
         final XWiki xwiki = new XWiki(new XWikiConfig(), context)
         {
             protected void registerWikiMacros()

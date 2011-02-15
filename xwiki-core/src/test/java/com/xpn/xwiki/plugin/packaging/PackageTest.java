@@ -28,6 +28,7 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
 import org.jmock.Mock;
+import org.xwiki.model.reference.DocumentReference;
 
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.doc.XWikiDocument;
@@ -64,11 +65,11 @@ public class PackageTest extends AbstractBridgedXWikiComponentTestCase
         String docTitle = "Un \u00e9t\u00e9 36";
         String docContent = "\u00e0\u00e7\u00e9\u00e8\u00c0\u00c7\u00c9\u00c8\u00ef\u00f6\u00eb\u00fc";
 
-        XWikiDocument doc1 = new XWikiDocument("Main", "Document1");
+        XWikiDocument doc1 = new XWikiDocument(new DocumentReference("Wiki", "Main", "Document1"));
         doc1.setTitle(docTitle);
         doc1.setContent(docContent);
 
-        XWikiDocument doc2 = new XWikiDocument("Main", "Document2");
+        XWikiDocument doc2 = new XWikiDocument(new DocumentReference("Wiki", "Main", "Document2"));
         doc2.setTitle(docTitle);
         doc2.setContent(docContent);
 

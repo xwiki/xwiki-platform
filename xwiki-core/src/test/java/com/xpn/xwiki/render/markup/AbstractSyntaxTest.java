@@ -24,6 +24,7 @@ import java.net.URL;
 import java.util.ArrayList;
 
 import org.jmock.Mock;
+import org.xwiki.model.reference.DocumentReference;
 
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
@@ -66,7 +67,7 @@ public abstract class AbstractSyntaxTest extends AbstractBridgedXWikiComponentTe
 
         this.context.setURLFactory(new XWikiServletURLFactory(new URL("http://localhost/"), "xwiki/", "bin/"));
 
-        this.document = new XWikiDocument("Main", "WebHome");
+        this.document = new XWikiDocument(new DocumentReference("Wiki", "Main", "WebHome"));
 
         this.context.setDoc(this.document);
     }

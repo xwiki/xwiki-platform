@@ -37,6 +37,7 @@ import org.jmock.Mock;
 import org.jmock.core.Invocation;
 import org.jmock.core.stub.CustomStub;
 import org.jmock.core.stub.VoidStub;
+import org.xwiki.model.reference.DocumentReference;
 
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiConfig;
@@ -186,7 +187,7 @@ public class ImportTest extends AbstractBridgedXWikiComponentTestCase
      */
     public void testImportDocument() throws Exception
     {
-        XWikiDocument doc1 = new XWikiDocument("Test", "DocImport");
+        XWikiDocument doc1 = new XWikiDocument(new DocumentReference("Test", "Test", "DocImport"));
         doc1.setDefaultLanguage("en");
 
         byte[] zipFile = this.createZipFile(new XWikiDocument[] {doc1}, new String[] {"ISO-8859-1"});
@@ -198,16 +199,18 @@ public class ImportTest extends AbstractBridgedXWikiComponentTestCase
         this.pack.install(getContext());
 
         // check if it is there
-        XWikiDocument foundDocument = this.xwiki.getDocument("Test.DocImport", getContext());
+        XWikiDocument foundDocument =
+            this.xwiki.getDocument(new DocumentReference("Test", "Test", "DocImport"), getContext());
         assertFalse(foundDocument.isNew());
 
-        XWikiDocument nonExistingDocument = this.xwiki.getDocument("Test.DocImportNonexisting", getContext());
+        XWikiDocument nonExistingDocument =
+            this.xwiki.getDocument(new DocumentReference("Test", "Test", "DocImportNonexisting"), getContext());
         assertTrue(nonExistingDocument.isNew());
 
         XWikiDocument foundTranslationDocument = foundDocument.getTranslatedDocument("fr", getContext());
         assertSame(foundDocument, foundTranslationDocument);
 
-        XWikiDocument doc1Translation = new XWikiDocument("Test", "DocImport");
+        XWikiDocument doc1Translation = new XWikiDocument(new DocumentReference("Test", "Test", "DocImport"));
         doc1Translation.setLanguage("fr");
         doc1Translation.setDefaultLanguage("en");
         this.xwiki.saveDocument(doc1Translation, getContext());
@@ -222,7 +225,7 @@ public class ImportTest extends AbstractBridgedXWikiComponentTestCase
      */
     public void testImportOverwriteDocument() throws Exception
     {
-        XWikiDocument doc1 = new XWikiDocument("Test", "DocImportOverwrite");
+        XWikiDocument doc1 = new XWikiDocument(new DocumentReference("Test", "Test", "DocImportOverwrite"));
         doc1.setDefaultLanguage("en");
 
         byte[] zipFile = this.createZipFile(new XWikiDocument[] {doc1}, new String[] {"ISO-8859-1"});
@@ -234,12 +237,13 @@ public class ImportTest extends AbstractBridgedXWikiComponentTestCase
         this.pack.install(getContext());
 
         // check if it is there
-        XWikiDocument foundDocument = this.xwiki.getDocument("Test.DocImportOverwrite", getContext());
+        XWikiDocument foundDocument =
+            this.xwiki.getDocument(new DocumentReference("Test", "Test", "DocImportOverwrite"), getContext());
         assertFalse(foundDocument.isNew());
 
         // create the overwriting document
         String newContent = "This is new content";
-        XWikiDocument overwritingDoc = new XWikiDocument("Test", "DocImportOverwrite");
+        XWikiDocument overwritingDoc = new XWikiDocument(new DocumentReference("Test", "Test", "DocImportOverwrite"));
         overwritingDoc.setContent(newContent);
 
         zipFile = this.createZipFile(new XWikiDocument[] {overwritingDoc}, new String[] {"ISO-8859-1"});
@@ -251,7 +255,8 @@ public class ImportTest extends AbstractBridgedXWikiComponentTestCase
         this.pack.install(getContext());
 
         // check if the document is there
-        XWikiDocument foundOverwritingDoc = this.xwiki.getDocument("Test.DocImportOverwrite", getContext());
+        XWikiDocument foundOverwritingDoc =
+            this.xwiki.getDocument(new DocumentReference("Test", "Test", "DocImportOverwrite"), getContext());
         assertFalse(foundOverwritingDoc.isNew());
         assertEquals(foundOverwritingDoc.getContent(), newContent);
     }
@@ -263,10 +268,10 @@ public class ImportTest extends AbstractBridgedXWikiComponentTestCase
      */
     public void testImportTranslationsOverwrite() throws Exception
     {
-        XWikiDocument original = new XWikiDocument("Test", "DocTranslation");
+        XWikiDocument original = new XWikiDocument(new DocumentReference("Test", "Test", "DocTranslation"));
         original.setDefaultLanguage("en");
         original.setTranslation(0);
-        XWikiDocument translation = new XWikiDocument("Test", "DocTranslation");
+        XWikiDocument translation = new XWikiDocument(new DocumentReference("Test", "Test", "DocTranslation"));
         translation.setLanguage("fr");
         translation.setDefaultLanguage("en");
         translation.setTranslation(1);
@@ -280,7 +285,8 @@ public class ImportTest extends AbstractBridgedXWikiComponentTestCase
         this.pack = new Package();
         this.pack.Import(zipFile, getContext());
         this.pack.install(getContext());
-        XWikiDocument foundDocument = this.xwiki.getDocument("Test.DocTranslation", getContext());
+        XWikiDocument foundDocument =
+            this.xwiki.getDocument(new DocumentReference("Test", "Test", "DocTranslation"), getContext());
         assertFalse(foundDocument.isNew());
         // get the translation
         XWikiDocument translationDoc = foundDocument.getTranslatedDocument("fr", getContext());
@@ -291,7 +297,7 @@ public class ImportTest extends AbstractBridgedXWikiComponentTestCase
         // import again and do the same tests
         this.pack.Import(zipFile, getContext());
         this.pack.install(getContext());
-        foundDocument = this.xwiki.getDocument("Test.DocTranslation", getContext());
+        foundDocument = this.xwiki.getDocument(new DocumentReference("Test", "Test", "DocTranslation"), getContext());
         // might not be the best method to test the document is in the store though...
         assertFalse(foundDocument.isNew());
         // get the translation

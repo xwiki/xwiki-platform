@@ -30,7 +30,7 @@ import com.xpn.xwiki.plugin.PluginException;
 import com.xpn.xwiki.plugin.XWikiDefaultPlugin;
 import com.xpn.xwiki.plugin.XWikiPluginInterface;
 import org.apache.velocity.VelocityContext;
-
+import org.xwiki.rendering.syntax.Syntax;
 
 public class XWikiUserManagementToolsImpl extends XWikiDefaultPlugin implements XWikiPluginInterface, XWikiUserManagementTools {
     public static final String DEFAULT_USER_SPACE = "XWiki";
@@ -104,12 +104,12 @@ public class XWikiUserManagementToolsImpl extends XWikiDefaultPlugin implements 
         }
         Document userApiDoc = userDoc.newDocument(context);
 
-        if (!context.getWiki().getDefaultDocumentSyntax().equals(XWikiDocument.XWIKI10_SYNTAXID)) {
+        if (!context.getWiki().getDefaultDocumentSyntax().equals(Syntax.XWIKI_1_0.toIdString())) {
             userApiDoc.setContent("{{include document=\"XWiki.XWikiUserSheet\"/}}");
-            userApiDoc.setSyntaxId(XWikiDocument.XWIKI20_SYNTAXID);
+            userApiDoc.setSyntax(Syntax.XWIKI_2_0);
         } else {
             userApiDoc.setContent("#includeForm(\"XWiki.XWikiUserSheet\")");
-            userApiDoc.setSyntaxId(XWikiDocument.XWIKI10_SYNTAXID);
+            userApiDoc.setSyntax(Syntax.XWIKI_1_0);
         }
 
         String template = DEFAULT_USERTEMPLATE_CLASS;

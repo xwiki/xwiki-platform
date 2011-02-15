@@ -28,7 +28,7 @@ import org.apache.velocity.VelocityContext;
 import org.jmock.Mock;
 import org.jmock.core.Invocation;
 import org.jmock.core.stub.CustomStub;
-import org.xwiki.component.descriptor.DefaultComponentDescriptor;
+import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.rendering.syntax.Syntax;
 
 import com.xpn.xwiki.XWiki;
@@ -87,8 +87,8 @@ public class XWikiDocumentRenderingTest extends AbstractBridgedXWikiComponentTes
     {
         super.setUp();
 
-        this.document = new XWikiDocument(DOCWIKI, DOCSPACE, DOCNAME);
-        this.document.setSyntaxId("xwiki/1.0");
+        this.document = new XWikiDocument(new DocumentReference(DOCWIKI, DOCSPACE, DOCNAME));
+        this.document.setSyntax(Syntax.XWIKI_1_0);
         this.document.setLanguage("en");
         this.document.setDefaultLanguage("en");
         this.document.setNew(false);
@@ -96,7 +96,7 @@ public class XWikiDocumentRenderingTest extends AbstractBridgedXWikiComponentTes
         getContext().setDoc(this.document);
 
         this.translatedDocument = new XWikiDocument();
-        this.translatedDocument.setSyntaxId("xwiki/1.0");
+        this.translatedDocument.setSyntax(Syntax.XWIKI_1_0);
         this.translatedDocument.setLanguage("fr");
         this.translatedDocument.setNew(false);
 
@@ -170,7 +170,7 @@ public class XWikiDocumentRenderingTest extends AbstractBridgedXWikiComponentTes
 
     public void testGetRenderedTitleWithTitle() throws XWikiException
     {
-        this.document.setSyntaxId("xwiki/2.0");
+        this.document.setSyntax(Syntax.XWIKI_2_0);
 
         this.document.setTitle("title");
 
@@ -194,7 +194,7 @@ public class XWikiDocumentRenderingTest extends AbstractBridgedXWikiComponentTes
 
     public void testGetRenderedTitleWithoutTitleHTML() throws XWikiException
     {
-        this.document.setSyntaxId("xwiki/2.0");
+        this.document.setSyntax(Syntax.XWIKI_2_0);
 
         this.document.setContent("content not in section\n" + "= header 1=\nheader 1 content\n"
             + "== header 2==\nheader 2 content");
@@ -231,7 +231,7 @@ public class XWikiDocumentRenderingTest extends AbstractBridgedXWikiComponentTes
 
     public void testGetRenderedTitleWithoutTitlePLAIN() throws XWikiException
     {
-        this.document.setSyntaxId("xwiki/2.0");
+        this.document.setSyntax(Syntax.XWIKI_2_0);
 
         this.document.setContent("content not in section\n" + "= **header 1**=\nheader 1 content\n"
             + "== header 2==\nheader 2 content");
@@ -246,7 +246,7 @@ public class XWikiDocumentRenderingTest extends AbstractBridgedXWikiComponentTes
 
     public void testGetRenderedTitleNoTitleAndContent() throws XWikiException
     {
-        this.document.setSyntaxId("xwiki/2.0");
+        this.document.setSyntax(Syntax.XWIKI_2_0);
 
         assertEquals("Page", this.document.getRenderedTitle(Syntax.XHTML_1_0, getContext()));
     }
@@ -264,7 +264,7 @@ public class XWikiDocumentRenderingTest extends AbstractBridgedXWikiComponentTes
 
     public void testExtractTitle()
     {
-        this.document.setSyntaxId("xwiki/2.0");
+        this.document.setSyntax(Syntax.XWIKI_2_0);
 
         this.document.setContent("content not in section\n" + "= header 1=\nheader 1 content\n"
             + "== header 2==\nheader 2 content");

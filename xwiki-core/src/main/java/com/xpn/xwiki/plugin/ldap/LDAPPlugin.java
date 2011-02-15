@@ -29,6 +29,7 @@ import java.util.Iterator;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.xwiki.rendering.syntax.Syntax;
 
 import com.novell.ldap.LDAPAttribute;
 import com.novell.ldap.LDAPAttributeSet;
@@ -424,12 +425,12 @@ public class LDAPPlugin extends XWikiDefaultPlugin implements XWikiPluginInterfa
                 XWikiDocument doc = context.getWiki().getDocument(fullwikiname, context);
                 doc.setParent("");
                 doc.addObject(bclass.getName(), bobj);
-                if (!context.getWiki().getDefaultDocumentSyntax().equals(XWikiDocument.XWIKI10_SYNTAXID)) {
+                if (!context.getWiki().getDefaultDocumentSyntax().equals(Syntax.XWIKI_1_0.toIdString())) {
                     doc.setContent("{{include document=\"XWiki.XWikiUserSheet\"/}}");
-                    doc.setSyntaxId(XWikiDocument.XWIKI20_SYNTAXID);
+                    doc.setSyntax(Syntax.XWIKI_2_0);
                 } else {
                     doc.setContent("#includeForm(\"XWiki.XWikiUserSheet\")");
-                    doc.setSyntaxId(XWikiDocument.XWIKI10_SYNTAXID);
+                    doc.setSyntax(Syntax.XWIKI_1_0);
                 }
                 context.getWiki().protectUserPage(fullwikiname, "edit", doc, context);
                 context.getWiki().saveDocument(doc, context.getMessageTool().get("core.comment.createdUser"), context);

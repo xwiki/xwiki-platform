@@ -143,7 +143,7 @@ public class XWikiAuthServiceImplTest extends AbstractBridgedXWikiComponentTestC
     public void testLogintoVirtualXwikiWithWikiPrefixUsername() throws Exception
     {
         // Setup simple user profile documents
-        XWikiDocument userDocLocal = new XWikiDocument("local", "XWiki", "Admin");
+        XWikiDocument userDocLocal = new XWikiDocument(new DocumentReference("local", "XWiki", "Admin"));
 
         // Make a simple XWiki.XWikiUsers class that will contain a default password field
         BaseClass userClass = new BaseClass();

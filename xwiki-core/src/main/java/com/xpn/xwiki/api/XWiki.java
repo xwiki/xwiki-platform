@@ -1585,7 +1585,7 @@ public class XWiki extends Api
         if (pre) {
             String includerSyntax = this.xwiki.getCurrentContentSyntaxId(null, this.context);
 
-            if (includerSyntax != null && XWikiDocument.XWIKI10_SYNTAXID.equals(includerSyntax)) {
+            if (includerSyntax != null && Syntax.XWIKI_1_0.toIdString().equals(includerSyntax)) {
                 result = "{pre}" + result + "{/pre}";
             }
         }
@@ -1611,7 +1611,7 @@ public class XWiki extends Api
         if (pre) {
             String includerSyntax = this.xwiki.getCurrentContentSyntaxId(null, this.context);
 
-            if (includerSyntax != null && XWikiDocument.XWIKI10_SYNTAXID.equals(includerSyntax)) {
+            if (includerSyntax != null && Syntax.XWIKI_1_0.toIdString().equals(includerSyntax)) {
                 result = "{pre}" + result + "{/pre}";
             }
         }

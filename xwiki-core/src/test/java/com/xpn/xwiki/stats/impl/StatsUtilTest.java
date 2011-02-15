@@ -85,7 +85,7 @@ public class StatsUtilTest extends AbstractBridgedXWikiComponentTestCase
 
         this.mockXWiki.stubs().method("Param").will(returnValue("XWiki.XWikiGuest"));
         this.mockXWiki.stubs().method("getDocument")
-            .will(returnValue(new XWikiDocument("xwiki", "XWiki", "XWikiGuest")));
+            .will(returnValue(new XWikiDocument(new DocumentReference("xwiki", "XWiki", "XWikiGuest"))));
 
         assertEquals(
             new HashSet<DocumentReference>(Arrays.asList(new DocumentReference("xwiki", "XWiki", "XWikiGuest"))),
@@ -93,14 +93,15 @@ public class StatsUtilTest extends AbstractBridgedXWikiComponentTestCase
 
         this.mockXWiki.stubs().method("Param").will(returnValue("XWiki.supeRadmin"));
         this.mockXWiki.stubs().method("getDocument")
-            .will(returnValue(new XWikiDocument("xwiki", "XWiki", "supeRadmin")));
+            .will(returnValue(new XWikiDocument(new DocumentReference("xwiki", "XWiki", "supeRadmin"))));
 
         assertEquals(
             new HashSet<DocumentReference>(Arrays.asList(new DocumentReference("xwiki", "XWiki", "supeRadmin"))),
             StatsUtil.getRequestFilteredUsers(getContext()));
 
         this.mockXWiki.stubs().method("Param").will(returnValue("invalid"));
-        this.mockXWiki.stubs().method("getDocument").will(returnValue(new XWikiDocument("xwiki", "Space", "invalid")));
+        this.mockXWiki.stubs().method("getDocument").will(returnValue(
+            new XWikiDocument(new DocumentReference("xwiki", "Space", "invalid"))));
 
         assertEquals(new HashSet<DocumentReference>(), StatsUtil.getRequestFilteredUsers(getContext()));
 

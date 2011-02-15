@@ -14,6 +14,8 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Vector;
 
+import org.xwiki.rendering.syntax.Syntax;
+
 public class Group
 {
     private Document doc;
@@ -320,7 +322,7 @@ public class Group
         if ((content == null) || (content.equals(""))) {
             needsUpdate = true;
             doc.setContent("1 XWikiGroups");
-            doc.setSyntaxId(XWikiDocument.XWIKI10_SYNTAXID);
+            doc.setSyntax(Syntax.XWIKI_1_0);
         }
 
         if (needsUpdate)
@@ -352,7 +354,7 @@ public class Group
         if ((content == null) || (content.equals(""))) {
             needsUpdate = true;
             doc.setContent("1 DirectoryGroupClass");
-            doc.setSyntaxId(XWikiDocument.XWIKI10_SYNTAXID);
+            doc.setSyntax(Syntax.XWIKI_1_0);
         }
 
         if (needsUpdate)
@@ -385,7 +387,7 @@ public class Group
         if ((content == null) || (content.equals(""))) {
             needsUpdate = true;
             doc.setContent("1 XWikiGroup");
-            doc.setSyntaxId(XWikiDocument.XWIKI10_SYNTAXID);
+            doc.setSyntax(Syntax.XWIKI_1_0);
         }
 
         if (needsUpdate)

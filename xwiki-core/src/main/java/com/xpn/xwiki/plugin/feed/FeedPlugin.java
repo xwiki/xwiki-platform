@@ -652,10 +652,10 @@ public class FeedPlugin extends XWikiDefaultPlugin implements XWikiPluginInterfa
             needsUpdate = true;
             doc.setTitle("XWiki Aggregator URL Class");
         }
-        if (StringUtils.isBlank(doc.getContent()) || !XWikiDocument.XWIKI20_SYNTAXID.equals(doc.getSyntaxId())) {
+        if (StringUtils.isBlank(doc.getContent()) || !Syntax.XWIKI_2_0.equals(doc.getSyntax())) {
             needsUpdate = true;
             doc.setContent("{{include document=\"XWiki.ClassSheet\" /}}");
-            doc.setSyntaxId(XWikiDocument.XWIKI20_SYNTAXID);
+            doc.setSyntax(Syntax.XWIKI_2_0);
         }
         if (StringUtils.isBlank(doc.getParent())) {
             needsUpdate = true;
@@ -715,10 +715,10 @@ public class FeedPlugin extends XWikiDefaultPlugin implements XWikiPluginInterfa
             doc.setTitle("XWiki Feed Entry Class");
         }
 
-        if (StringUtils.isBlank(doc.getContent()) || !XWikiDocument.XWIKI20_SYNTAXID.equals(doc.getSyntaxId())) {
+        if (StringUtils.isBlank(doc.getContent()) || !Syntax.XWIKI_2_0.equals(doc.getSyntax())) {
             needsUpdate = true;
             doc.setContent("{{include document=\"XWiki.ClassSheet\" /}}");
-            doc.setSyntaxId(XWikiDocument.XWIKI20_SYNTAXID);
+            doc.setSyntax(Syntax.XWIKI_2_0);
         }
 
         if (StringUtils.isBlank(doc.getParent())) {

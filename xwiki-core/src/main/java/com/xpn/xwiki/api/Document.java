@@ -554,7 +554,7 @@ public class Document extends Api
     @Deprecated
     public String getRenderedContent(String text) throws XWikiException
     {
-        return this.doc.getRenderedContent(text, XWikiDocument.XWIKI10_SYNTAXID, getXWikiContext());
+        return this.doc.getRenderedContent(text, Syntax.XWIKI_1_0.toIdString(), getXWikiContext());
     }
 
     /**

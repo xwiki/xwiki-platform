@@ -165,10 +165,6 @@ public class XWikiDocument implements DocumentModelBridge
     /** Regex for finding the first level 1 or 2 heading in the document title, to be used as the document title. */
     private static final Pattern HEADING_PATTERN_10 = Pattern.compile("^\\s*+1(?:\\.1)?\\s++(.++)$", Pattern.MULTILINE);
 
-    public static final String XWIKI10_SYNTAXID = Syntax.XWIKI_1_0.toIdString();
-
-    public static final String XWIKI20_SYNTAXID = Syntax.XWIKI_2_0.toIdString();
-
     private String title;
 
     /**
@@ -4889,7 +4885,7 @@ public class XWikiDocument implements DocumentModelBridge
         throws XWikiException
     {
         String result = pclass.displayView(pclass.getName(), prefix, object, context);
-        return getRenderedContent(result, XWIKI10_SYNTAXID, context);
+        return getRenderedContent(result, Syntax.XWIKI_1_0.toIdString(), context);
     }
 
     public String displayView(PropertyClass pclass, String prefix, BaseCollection object, XWikiContext context)
@@ -7484,7 +7480,7 @@ public class XWikiDocument implements DocumentModelBridge
      */
     public boolean is10Syntax(String syntaxId)
     {
-        return XWIKI10_SYNTAXID.equalsIgnoreCase(syntaxId);
+        return Syntax.XWIKI_1_0.toIdString().equalsIgnoreCase(syntaxId);
     }
 
     private void init(DocumentReference reference)

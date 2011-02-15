@@ -32,12 +32,12 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.xwiki.model.internal.reference.PathStringEntityReferenceSerializer;
+import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.store.filesystem.internal.FilesystemStoreTools;
 import org.xwiki.store.filesystem.internal.DefaultFilesystemStoreTools;
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.web.Utils;
 import com.xpn.xwiki.XWikiContext;
-import com.xpn.xwiki.store.AttachmentVersioningStore;
 import com.xpn.xwiki.doc.XWikiAttachment;
 import com.xpn.xwiki.doc.XWikiAttachmentContent;
 import com.xpn.xwiki.doc.FilesystemAttachmentContent;
@@ -131,7 +131,7 @@ public class FilesystemAttachmentStoreTest extends AbstractMockingComponentTestC
         this.mockAttachVersionStore = this.jmockContext.mock(AttachmentVersioningStore.class);
         this.mockArchive = this.jmockContext.mock(XWikiAttachmentArchive.class);
         this.mockHibernateSession = this.jmockContext.mock(Session.class);
-        this.doc = new XWikiDocument("xwiki", "Main", "WebHome");
+        this.doc = new XWikiDocument(new DocumentReference("xwiki", "Main", "WebHome"));
 
         this.mockAttach = this.jmockContext.mock(XWikiAttachment.class);
         this.jmockContext.checking(new Expectations() {{

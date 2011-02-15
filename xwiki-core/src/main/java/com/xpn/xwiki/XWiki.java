@@ -3335,7 +3335,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface, EventListener
         template =
             getDocument(new DocumentReference(context.getDatabase(), SYSTEM_SPACE, "XWikiGroupTemplate"), context);
         if (template.isNew()) {
-            if (!getDefaultDocumentSyntax().equalsIgnoreCase(XWikiDocument.XWIKI10_SYNTAXID)) {
+            if (!getDefaultDocumentSyntax().equalsIgnoreCase(Syntax.XWIKI_1_0.toIdString())) {
                 template.setContent("{{include document=\"XWiki.XWikiGroupSheet\"/}}");
                 template.setSyntax(Syntax.XWIKI_2_0);
             } else {
@@ -3534,7 +3534,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface, EventListener
 
             String content;
             Syntax syntax;
-            if (!getDefaultDocumentSyntax().equals(XWikiDocument.XWIKI10_SYNTAXID)) {
+            if (!getDefaultDocumentSyntax().equals(Syntax.XWIKI_1_0.toIdString())) {
                 content = "{{include document=\"XWiki.XWikiUserSheet\"/}}";
                 syntax = Syntax.XWIKI_2_0;
             } else {
@@ -3869,7 +3869,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface, EventListener
 
         String content;
         Syntax syntax;
-        if (!context.getWiki().getDefaultDocumentSyntax().equals(XWikiDocument.XWIKI10_SYNTAXID)) {
+        if (!context.getWiki().getDefaultDocumentSyntax().equals(Syntax.XWIKI_1_0.toIdString())) {
             content = "{{include document=\"XWiki.XWikiUserSheet\"/}}";
             syntax = Syntax.XWIKI_2_0;
         } else {
@@ -3971,7 +3971,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface, EventListener
     public int createUser(String xwikiname, Map map, String parent, String content, String userRights,
         XWikiContext context) throws XWikiException
     {
-        return createUser(xwikiname, map, parent, content, XWikiDocument.XWIKI10_SYNTAXID, userRights, context);
+        return createUser(xwikiname, map, parent, content, Syntax.XWIKI_1_0.toIdString(), userRights, context);
     }
 
     public void setUserDefaultGroup(String fullwikiname, XWikiContext context) throws XWikiException
@@ -4875,12 +4875,12 @@ public class XWiki implements XWikiDocChangeNotificationInterface, EventListener
                 if (wikilanguage != null) {
                     serverdoc.setStringValue(VIRTUAL_WIKI_DEFINITION_CLASS_REFERENCE, "language", wikilanguage);
                 }
-                if (!getDefaultDocumentSyntax().equals(XWikiDocument.XWIKI10_SYNTAXID)) {
+                if (!getDefaultDocumentSyntax().equals(Syntax.XWIKI_1_0.toIdString())) {
                     serverdoc.setContent("{{include document=\"XWiki.XWikiServerForm\"/}}\n");
-                    serverdoc.setSyntaxId(XWikiDocument.XWIKI20_SYNTAXID);
+                    serverdoc.setSyntax(Syntax.XWIKI_2_0);
                 } else {
                     serverdoc.setContent("#includeForm(\"XWiki.XWikiServerForm\")\n");
-                    serverdoc.setSyntaxId(XWikiDocument.XWIKI10_SYNTAXID);
+                    serverdoc.setSyntax(Syntax.XWIKI_1_0);
                 }
                 serverdoc.setParentReference(VIRTUAL_WIKI_DEFINITION_CLASS_REFERENCE);
                 saveDocument(serverdoc, context);
@@ -7346,7 +7346,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface, EventListener
         }
         if (StringUtils.isBlank(doc.getContent())) {
             needsUpdate = true;
-            if (!getDefaultDocumentSyntax().equals(XWikiDocument.XWIKI10_SYNTAXID)) {
+            if (!getDefaultDocumentSyntax().equals(Syntax.XWIKI_1_0.toIdString())) {
                 doc.setContent("{{include document=\"XWiki.ClassSheet\" /}}");
                 doc.setSyntax(Syntax.XWIKI_2_0);
             } else {

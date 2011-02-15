@@ -61,7 +61,7 @@ public class DefaultWikiMacroFactoryTest extends AbstractBridgedXWikiComponentTe
         obj.setIntValue("supportsInlineMode", 1);
         obj.setStringValue("contentType", "No content");
         obj.setStringValue("code", "==Hi==");
-        macroDefinitionDoc = new XWikiDocument("xwiki", "Macros", "Test");
+        macroDefinitionDoc = new XWikiDocument(new DocumentReference("xwiki", "Macros", "Test"));
         macroDefinitionDoc.addObject("XWiki.WikiMacroClass", obj);
 
         // Setup the mock xwiki.

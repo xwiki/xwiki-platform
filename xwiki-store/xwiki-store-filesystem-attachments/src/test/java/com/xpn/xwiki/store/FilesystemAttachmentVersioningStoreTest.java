@@ -26,12 +26,12 @@ import java.io.ByteArrayInputStream;
 import java.util.ArrayList;
 
 import org.xwiki.model.internal.reference.PathStringEntityReferenceSerializer;
+import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.store.filesystem.internal.FilesystemStoreTools;
 import org.xwiki.store.filesystem.internal.DefaultFilesystemStoreTools;
 import org.xwiki.store.serialization.xml.internal.AttachmentListMetadataSerializer;
 import org.xwiki.store.serialization.xml.internal.AttachmentMetadataSerializer;
 import org.xwiki.store.filesystem.internal.AttachmentFileProvider;
-import com.xpn.xwiki.store.AttachmentVersioningStore;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.doc.XWikiAttachment;
 import com.xpn.xwiki.doc.XWikiAttachmentContent;
@@ -82,7 +82,7 @@ public class FilesystemAttachmentVersioningStoreTest extends AbstractMockingComp
             new AttachmentListMetadataSerializer(new AttachmentMetadataSerializer());
         this.versionStore = new FilesystemAttachmentVersioningStore(this.fileTools, serializer);
 
-        final XWikiDocument doc = new XWikiDocument("xwiki", "Main", "WebHome");
+        final XWikiDocument doc = new XWikiDocument(new DocumentReference("xwiki", "Main", "WebHome"));
 
         final XWikiAttachment version1 = new XWikiAttachment();
         version1.setVersion("1.1");

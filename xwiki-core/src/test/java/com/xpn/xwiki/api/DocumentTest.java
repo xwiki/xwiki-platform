@@ -79,7 +79,7 @@ public class DocumentTest extends AbstractBridgedXWikiComponentTestCase
         mockXWiki.stubs().method("getXClass").will(returnValue(c));
         getContext().setWiki((XWiki) mockXWiki.proxy());
 
-        XWikiDocument doc = new XWikiDocument("Wiki", "Space", "Page");
+        XWikiDocument doc = new XWikiDocument(new DocumentReference("Wiki", "Space", "Page"));
 
         for (int i = 0; i < 10; ++i) {
             doc.newObject("XWiki.XWikiComments", getContext());

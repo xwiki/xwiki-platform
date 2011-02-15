@@ -30,6 +30,7 @@ import org.jmock.Mock;
 import org.jmock.core.Invocation;
 import org.jmock.core.stub.CustomStub;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.rendering.syntax.Syntax;
 
 import com.sun.syndication.feed.synd.SyndEntry;
 import com.sun.syndication.feed.synd.SyndEntryImpl;
@@ -85,7 +86,7 @@ public class SyndEntryDocumentSourceTest extends AbstractBridgedXWikiComponentTe
         doc.setAuthor("Albatross");
         doc.setTitle("Fidis from MilkyWay");
         doc.setContent("blah blah blah..");
-        doc.setSyntaxId("xwiki/1.0");
+        doc.setSyntax(Syntax.XWIKI_1_0);
 
         initArticleClass();
 

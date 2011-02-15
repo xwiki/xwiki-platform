@@ -37,6 +37,18 @@ import com.xpn.xwiki.objects.BaseObject;
 public aspect XWikiDocumentCompatibilityAspect
 {   
     /**
+     * @deprecated since 3.0M3 use {@code Syntax.XWIKI_1_0} instead
+     */
+    @Deprecated
+    public static final String XWikiDocument.XWIKI10_SYNTAXID = Syntax.XWIKI_1_0.toIdString();
+
+    /**
+     * @deprecated since 3.0M3 use {@code Syntax.XWIKI_2_0} instead
+     */
+    @Deprecated
+    public static final String XWikiDocument.XWIKI20_SYNTAXID = Syntax.XWIKI_2_0.toIdString();
+
+    /**
      * @deprecated use setStringListValue or setDBStringListProperty
      */
     @Deprecated

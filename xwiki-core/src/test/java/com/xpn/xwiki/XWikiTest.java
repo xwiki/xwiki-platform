@@ -317,7 +317,7 @@ public class XWikiTest extends AbstractBridgedXWikiComponentTestCase
         ObservationManager om = getComponentManager().lookup(ObservationManager.class);
         om.addListener((EventListener) mockListener.proxy());
 
-        XWikiDocument document = new XWikiDocument("xwikitest", "Some", "Document");
+        XWikiDocument document = new XWikiDocument(new DocumentReference("xwikitest", "Some", "Document"));
         document.setContent("the content");
 
         // Ensure that the onEvent method has been called before and after the save
@@ -343,7 +343,7 @@ public class XWikiTest extends AbstractBridgedXWikiComponentTestCase
         ObservationManager om = getComponentManager().lookup(ObservationManager.class);
         om.addListener((EventListener) mockListener.proxy());
 
-        XWikiDocument document = new XWikiDocument("xwikitest", "Another", "Document");
+        XWikiDocument document = new XWikiDocument(new DocumentReference("xwikitest", "Another", "Document"));
         document.setContent("the content");
 
         // Not expectation on mock Listener since we're not subscribed to Document save events

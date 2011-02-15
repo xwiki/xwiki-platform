@@ -546,7 +546,7 @@ public class XWikiDocumentTest extends AbstractBridgedXWikiComponentTestCase
         this.document.setContent("[[TargetPage]][[TargetLabel>>TargetPage]][[TargetSpace.TargetPage]]"
             + "[[TargetLabel>>TargetSpace.TargetPage?param=value#anchor]][[http://externallink]][[mailto:mailto]]"
             + "[[]][[#anchor]][[?param=value]][[targetwiki:TargetSpace.TargetPage]]");
-        this.document.setSyntaxId("xwiki/2.0");
+        this.document.setSyntax(Syntax.XWIKI_2_0);
 
         Set<String> linkedPages = this.document.getUniqueLinkedPages(getContext());
 
@@ -580,7 +580,7 @@ public class XWikiDocumentTest extends AbstractBridgedXWikiComponentTestCase
     {
         this.document.setContent("content not in section\n" + "= header 1=\nheader 1 content\n"
             + "== header 2==\nheader 2 content");
-        this.document.setSyntaxId("xwiki/2.0");
+        this.document.setSyntax(Syntax.XWIKI_2_0);
 
         List<DocumentSection> headers = this.document.getSections();
 
@@ -621,7 +621,7 @@ public class XWikiDocumentTest extends AbstractBridgedXWikiComponentTestCase
     {
         this.document.setContent("content not in section\n" + "= header 1=\nheader 1 content\n"
             + "== header 2==\nheader 2 content");
-        this.document.setSyntaxId("xwiki/2.0");
+        this.document.setSyntax(Syntax.XWIKI_2_0);
 
         DocumentSection header1 = this.document.getDocumentSection(1);
         DocumentSection header2 = this.document.getDocumentSection(2);
@@ -653,7 +653,7 @@ public class XWikiDocumentTest extends AbstractBridgedXWikiComponentTestCase
         this.document.setContent("content not in section\n" + "= header 1=\nheader 1 content\n"
             + "== header 2==\nheader 2 content\n" + "=== header 3===\nheader 3 content\n"
             + "== header 4==\nheader 4 content");
-        this.document.setSyntaxId("xwiki/2.0");
+        this.document.setSyntax(Syntax.XWIKI_2_0);
 
         String content1 = this.document.getContentOfSection(1);
         String content2 = this.document.getContentOfSection(2);
@@ -751,7 +751,7 @@ public class XWikiDocumentTest extends AbstractBridgedXWikiComponentTestCase
     {
         this.document.setContent("content not in section\n" + "= header 1=\nheader 1 content\n"
             + "== header 2==\nheader 2 content");
-        this.document.setSyntaxId("xwiki/2.0");
+        this.document.setSyntax(Syntax.XWIKI_2_0);
 
         // Modify section content
         String content1 = this.document.updateDocumentSection(2, "== header 2==\nmodified header 2 content");
@@ -793,7 +793,7 @@ public class XWikiDocumentTest extends AbstractBridgedXWikiComponentTestCase
     {
         this.mockXWiki.stubs().method("getCurrentContentSyntaxId").will(returnValue("xwiki/2.0"));
 
-        this.document.setSyntaxId("xwiki/2.0");
+        this.document.setSyntax(Syntax.XWIKI_2_0);
 
         assertEquals("string", this.document.display("string", "view", getContext()));
         assertEquals(
@@ -809,10 +809,10 @@ public class XWikiDocumentTest extends AbstractBridgedXWikiComponentTestCase
         this.mockXWiki.stubs().method("getCurrentContentSyntaxId").will(returnValue("xwiki/1.0"));
 
         XWikiDocument doc10 = new XWikiDocument();
-        doc10.setSyntaxId("xwiki/1.0");
+        doc10.setSyntax(Syntax.XWIKI_1_0);
         getContext().setDoc(doc10);
 
-        this.document.setSyntaxId("xwiki/2.0");
+        this.document.setSyntax(Syntax.XWIKI_2_0);
 
         assertEquals("string", this.document.display("string", "view", getContext()));
         assertEquals(
@@ -827,7 +827,7 @@ public class XWikiDocumentTest extends AbstractBridgedXWikiComponentTestCase
         this.mockXWiki.stubs().method("getCurrentContentSyntaxId").will(returnValue("xwiki/2.0"));
 
         XWikiDocument doc10 = new XWikiDocument();
-        doc10.setSyntaxId("xwiki/2.0");
+        doc10.setSyntax(Syntax.XWIKI_2_0);
         getContext().setDoc(doc10);
 
         assertEquals("string", this.document.display("string", "view", getContext()));
@@ -868,7 +868,7 @@ public class XWikiDocumentTest extends AbstractBridgedXWikiComponentTestCase
 
         getContext().put("isInRenderingEngine", false);
 
-        this.document.setSyntaxId("xwiki/2.0");
+        this.document.setSyntax(Syntax.XWIKI_2_0);
 
         assertEquals("string", this.document.display("string", "view", getContext()));
         assertEquals(
@@ -901,7 +901,7 @@ public class XWikiDocumentTest extends AbstractBridgedXWikiComponentTestCase
     public void testGetRenderedContent10() throws XWikiException
     {
         this.document.setContent("*bold*");
-        this.document.setSyntaxId("xwiki/1.0");
+        this.document.setSyntax(Syntax.XWIKI_1_0);
 
         this.mockXWikiRenderingEngine.expects(once()).method("renderDocument").will(returnValue("<b>bold</b>"));
 
@@ -909,7 +909,7 @@ public class XWikiDocumentTest extends AbstractBridgedXWikiComponentTestCase
 
         this.translatedDocument = new XWikiDocument();
         this.translatedDocument.setContent("~italic~");
-        this.translatedDocument.setSyntaxId("xwiki/2.0");
+        this.translatedDocument.setSyntax(Syntax.XWIKI_2_0);
         this.translatedDocument.setNew(false);
 
         this.mockXWiki.stubs().method("getLanguagePreference").will(returnValue("fr"));
@@ -928,7 +928,7 @@ public class XWikiDocumentTest extends AbstractBridgedXWikiComponentTestCase
 
         this.translatedDocument = new XWikiDocument();
         this.translatedDocument.setContent("//italic//");
-        this.translatedDocument.setSyntaxId("xwiki/1.0");
+        this.translatedDocument.setSyntax(Syntax.XWIKI_1_0);
         this.translatedDocument.setNew(false);
 
         this.mockXWiki.stubs().method("getLanguagePreference").will(returnValue("fr"));
@@ -939,7 +939,7 @@ public class XWikiDocumentTest extends AbstractBridgedXWikiComponentTestCase
 
     public void testGetRenderedContentWithSourceSyntax() throws XWikiException
     {
-        this.document.setSyntaxId("xwiki/1.0");
+        this.document.setSyntax(Syntax.XWIKI_1_0);
 
         assertEquals("<p><strong>bold</strong></p>", this.document.getRenderedContent("**bold**", "xwiki/2.0",
             getContext()));

@@ -32,6 +32,7 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.securityfilter.realm.SimplePrincipal;
+import org.xwiki.rendering.syntax.Syntax;
 
 import java.io.UnsupportedEncodingException;
 import java.security.Principal;
@@ -174,12 +175,12 @@ public class LDAPAuthServiceImpl extends XWikiAuthServiceImpl
                 XWikiDocument doc = context.getWiki().getDocument(fullwikiname, context);
                 doc.setParent("");
                 doc.addObject(bclass.getName(), bobj);
-                if (!context.getWiki().getDefaultDocumentSyntax().equals(XWikiDocument.XWIKI10_SYNTAXID)) {
+                if (!context.getWiki().getDefaultDocumentSyntax().equals(Syntax.XWIKI_1_0.toIdString())) {
                     doc.setContent("{{include document=\"XWiki.XWikiUserSheet\"/}}");
-                    doc.setSyntaxId(XWikiDocument.XWIKI20_SYNTAXID);                    
+                    doc.setSyntax(Syntax.XWIKI_2_0);
                 } else {
                     doc.setContent("#includeForm(\"XWiki.XWikiUserSheet\")");
-                    doc.setSyntaxId(XWikiDocument.XWIKI10_SYNTAXID);
+                    doc.setSyntax(Syntax.XWIKI_1_0);
                 }
 
                 context.getWiki().protectUserPage(fullwikiname, "edit", doc, context);

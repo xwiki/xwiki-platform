@@ -29,6 +29,7 @@ import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.Requirement;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
+import org.xwiki.context.Execution;
 import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.block.GroupBlock;
 import org.xwiki.rendering.macro.AbstractMacro;
@@ -56,6 +57,12 @@ public class DashboardMacro extends AbstractMacro<DashboardMacroParameters>
     public static final String GADGET_CONTAINER = "gadget-container";
 
     /**
+     * The prefix of the id of the gadget containers in this dashboard, i.e. the elements that can contain gadgets. To
+     * be completed by the individual renderers with the container ids.
+     */
+    public static final String GADGET_CONTAINER_PREFIX = "gadgetcontainer_";
+
+    /**
      * The name of this macro.
      */
     public static final String MACRO_NAME = "dashboard";
@@ -70,6 +77,12 @@ public class DashboardMacro extends AbstractMacro<DashboardMacroParameters>
      */
     @Requirement("ssfx")
     private SkinExtension ssfx;
+
+    /**
+     * JS file skin extension, to include the dashboard.js.
+     */
+    @Requirement("jsfx")
+    private SkinExtension jsfx;
 
     /**
      * The component manager, to resolve the dashboard renderer by layout hint.
@@ -100,11 +113,6 @@ public class DashboardMacro extends AbstractMacro<DashboardMacroParameters>
     public List<Block> execute(DashboardMacroParameters parameters, String content, MacroTransformationContext context)
         throws MacroExecutionException
     {
-        Map<String, Object> fxParams = new HashMap<String, Object>();
-        fxParams.put("forceSkinAction", true);
-
-        ssfx.use("uicomponents/dashboard/dashboard.css", fxParams);
-
         // get the gadgets from the objects
         List<Gadget> gadgets;
         try {
@@ -133,6 +141,18 @@ public class DashboardMacro extends AbstractMacro<DashboardMacroParameters>
             getLogger().error(message, e);
             throw new MacroExecutionException(message, e);
         }
+
+        // include the css and js for this macro. here so that it's included after any dependencies have included their
+        // css, so that it cascades properly
+        Map<String, Object> fxParamsForceSkinAction = new HashMap<String, Object>();
+        fxParamsForceSkinAction.put("forceSkinAction", true);
+        ssfx.use("uicomponents/dashboard/dashboard.css", fxParamsForceSkinAction);
+        Map<String, Object> fxParamsNoDefer = new HashMap<String, Object>();
+        fxParamsNoDefer.put("defer", false);
+        // re-use the effects to make it non-deferred 
+        jsfx.use("js/scriptaculous/effects.js", fxParamsNoDefer);
+        jsfx.use("js/scriptaculous/dragdrop.js", fxParamsNoDefer);
+        jsfx.use("uicomponents/dashboard/dashboard.js", fxParamsForceSkinAction);
 
         // put everything in a nice toplevel group for this dashboard, to be able to add classes to it
         GroupBlock topLevel = new GroupBlock();

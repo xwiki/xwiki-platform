@@ -68,17 +68,25 @@ public class RenderingTests extends TestCase
         componentManager.unregisterComponent(ComponentManager.class, "context");
 
         final SkinExtension mockSsfx = mockery.mock(SkinExtension.class, "ssfxMock");
+        final SkinExtension mockJsfx = mockery.mock(SkinExtension.class, "jsfxMock");
         mockery.checking(new Expectations()
         {
             {
                 allowing(mockSsfx).use(with("uicomponents/container/columns.css"), with(any(Map.class)));
                 allowing(mockSsfx).use(with("uicomponents/dashboard/dashboard.css"), with(any(Map.class)));
+                allowing(mockJsfx).use(with("js/scriptaculous/dragdrop.js"), with(any(Map.class)));
+                allowing(mockJsfx).use(with("js/scriptaculous/effects.js"), with(any(Map.class)));
+                allowing(mockJsfx).use(with("uicomponents/dashboard/dashboard.js"), with(any(Map.class)));
             }
         });
         DefaultComponentDescriptor<SkinExtension> ssfxDesc = new DefaultComponentDescriptor<SkinExtension>();
         ssfxDesc.setRole(SkinExtension.class);
         ssfxDesc.setRoleHint("ssfx");
         componentManager.registerComponent(ssfxDesc, mockSsfx);
+        DefaultComponentDescriptor<SkinExtension> jsfxDesc = new DefaultComponentDescriptor<SkinExtension>();
+        jsfxDesc.setRole(SkinExtension.class);
+        jsfxDesc.setRoleHint("jsfx");
+        componentManager.registerComponent(jsfxDesc, mockJsfx);
 
         final GadgetReader mockGadgetReader = mockery.mock(GadgetReader.class);
         mockery.checking(new Expectations()

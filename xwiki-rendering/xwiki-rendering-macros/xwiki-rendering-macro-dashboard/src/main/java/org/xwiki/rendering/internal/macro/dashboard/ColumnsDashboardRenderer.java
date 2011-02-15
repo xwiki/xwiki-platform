@@ -173,6 +173,8 @@ public class ColumnsDashboardRenderer extends AbstractDashboardRenderer
         for (int i = 0; i < columns; i++) {
             GroupBlock gContainer = new GroupBlock();
             gContainer.setParameter(CLASS, DashboardMacro.GADGET_CONTAINER);
+            // and generate the ids of the gadget containers, which are column numbers, 1 based
+            gContainer.setParameter(ID, DashboardMacro.GADGET_CONTAINER_PREFIX + (i + 1));
             gadgetContainers.add(gContainer);
         }
 

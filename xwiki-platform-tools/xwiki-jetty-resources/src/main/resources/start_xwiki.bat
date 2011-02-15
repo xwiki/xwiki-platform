@@ -21,7 +21,7 @@ REM -------------------------------------------------------------------------
 
 set JETTY_HOME=jetty
 set JETTY_PORT=8080
-set XWIKI_OPTS=-Xmx300m
+set XWIKI_OPTS=-Xmx512m -XX:MaxPermSize=128m
 
 REM Ensure the logs directory exists as otherwise Jetty reports an error
 if not exist %JETTY_HOME%\logs mkdir %JETTY_HOME%\logs

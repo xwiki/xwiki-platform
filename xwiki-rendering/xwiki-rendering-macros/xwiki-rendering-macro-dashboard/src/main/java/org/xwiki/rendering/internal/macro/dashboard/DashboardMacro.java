@@ -29,7 +29,6 @@ import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.Requirement;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
-import org.xwiki.context.Execution;
 import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.block.GroupBlock;
 import org.xwiki.rendering.macro.AbstractMacro;
@@ -149,7 +148,7 @@ public class DashboardMacro extends AbstractMacro<DashboardMacroParameters>
         ssfx.use("uicomponents/dashboard/dashboard.css", fxParamsForceSkinAction);
         Map<String, Object> fxParamsNoDefer = new HashMap<String, Object>();
         fxParamsNoDefer.put("defer", false);
-        // re-use the effects to make it non-deferred 
+        // re-use the effects to make it non-deferred
         jsfx.use("js/scriptaculous/effects.js", fxParamsNoDefer);
         jsfx.use("js/scriptaculous/dragdrop.js", fxParamsNoDefer);
         jsfx.use("uicomponents/dashboard/dashboard.js", fxParamsForceSkinAction);

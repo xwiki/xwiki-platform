@@ -171,21 +171,21 @@ public class XWikiTest extends AbstractBridgedXWikiComponentTestCase
     public void testAuthorAfterDocumentCopy() throws XWikiException
     {
         String copyName = "Lyre";
-        String author = this.document.getAuthor();
+        DocumentReference author = this.document.getAuthorReference();
         this.xwiki.copyDocument(this.document.getName(), this.document.getSpace() + "." + copyName, getContext());
         XWikiDocument copy = this.xwiki.getDocument(copyName, getContext());
 
-        assertTrue(author.equals(copy.getAuthor()));
+        assertEquals(author, copy.getAuthorReference());
     }
 
     public void testCreatorAfterDocumentCopy() throws XWikiException
     {
         String copyName = "Sirius";
-        String creator = this.document.getCreator();
+        DocumentReference creator = this.document.getCreatorReference();
         this.xwiki.copyDocument(this.document.getName(), this.document.getSpace() + "." + copyName, getContext());
         XWikiDocument copy = this.xwiki.getDocument(copyName, getContext());
 
-        assertTrue(creator.equals(copy.getCreator()));
+        assertEquals(creator, copy.getCreatorReference());
     }
 
     public void testCreationDateAfterDocumentCopy() throws XWikiException, InterruptedException

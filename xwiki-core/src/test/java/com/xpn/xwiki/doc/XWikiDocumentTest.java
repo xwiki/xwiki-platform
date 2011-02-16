@@ -318,20 +318,20 @@ public class XWikiDocumentTest extends AbstractBridgedXWikiComponentTestCase
 
     public void testAuthorAfterDocumentCopy() throws XWikiException
     {
-        String author = "Albatross";
-        this.document.setAuthor(author);
+        DocumentReference author = new DocumentReference("Wiki", "XWiki", "Albatross");
+        this.document.setAuthorReference(author);
         XWikiDocument copy = this.document.copyDocument(this.document.getName() + " Copy", getContext());
 
-        assertEquals("XWiki.Albatross", copy.getAuthor());
+        assertEquals(author, copy.getAuthorReference());
     }
 
     public void testCreatorAfterDocumentCopy() throws XWikiException
     {
-        String creator = "Condor";
-        this.document.setCreator(creator);
+        DocumentReference creator = new DocumentReference("Wiki", "XWiki", "Condor");
+        this.document.setCreatorReference(creator);
         XWikiDocument copy = this.document.copyDocument(this.document.getName() + " Copy", getContext());
 
-        assertEquals("XWiki.Condor", copy.getCreator());
+        assertEquals(creator, copy.getCreatorReference());
     }
 
     public void testCreationDateAfterDocumentCopy() throws Exception

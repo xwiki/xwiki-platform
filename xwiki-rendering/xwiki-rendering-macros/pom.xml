@@ -125,5 +125,6 @@
     <module>xwiki-rendering-macro-dashboard</module>
     <module>xwiki-rendering-macro-context</module>
     <module>xwiki-rendering-macro-cache</module>
+    <module>xwiki-rendering-macro-gallery</module>
   </modules>
 </project>

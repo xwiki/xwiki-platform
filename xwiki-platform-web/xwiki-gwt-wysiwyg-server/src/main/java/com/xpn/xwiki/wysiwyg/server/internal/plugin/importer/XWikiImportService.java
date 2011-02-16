@@ -19,19 +19,26 @@
  */
 package com.xpn.xwiki.wysiwyg.server.internal.plugin.importer;
 
+import java.io.InputStream;
 import java.io.StringReader;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.w3c.dom.Document;
+import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.component.annotation.Requirement;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.gwt.wysiwyg.client.plugin.importer.ImportService;
 import org.xwiki.gwt.wysiwyg.client.wiki.Attachment;
 import org.xwiki.model.reference.AttachmentReference;
-import org.xwiki.model.reference.EntityReferenceSerializer;
-import org.xwiki.officeimporter.OfficeImporter;
+import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.officeimporter.builder.PresentationBuilder;
+import org.xwiki.officeimporter.builder.XDOMOfficeDocumentBuilder;
+import org.xwiki.officeimporter.document.XDOMOfficeDocument;
 import org.xwiki.xml.html.HTMLCleaner;
 import org.xwiki.xml.html.HTMLCleanerConfiguration;
 import org.xwiki.xml.html.HTMLUtils;
@@ -51,24 +58,33 @@ public class XWikiImportService implements ImportService
     private static final Log LOG = LogFactory.getLog(XWikiImportService.class);
 
     /**
-     * The component used to import office documents.
+     * File extensions corresponding to slide presentations.
      */
-    @Requirement
-    private OfficeImporter officeImporter;
-
-    /**
-     * The component used to serialize {@link org.xwiki.model.reference.DocumentReference} instances. This component is
-     * needed only because OfficeImporter component uses String instead of
-     * {@link org.xwiki.model.reference.DocumentReference}.
-     */
-    @Requirement
-    private EntityReferenceSerializer<String> entityReferenceSerializer;
+    private static final List<String> PRESENTATION_FORMAT_EXTENSIONS = Arrays.asList("ppt", "pptx", "odp");
 
     /**
      * The component manager. We need it because we have to access some components dynamically.
      */
     @Requirement
     private ComponentManager componentManager;
+
+    /**
+     * The component used to access the content of the office attachments.
+     */
+    @Requirement
+    private DocumentAccessBridge documentAccessBridge;
+
+    /**
+     * The component used to convert office presentations to XDOM.
+     */
+    @Requirement
+    private PresentationBuilder presentationBuilder;
+
+    /**
+     * The component used to convert office text documents to XDOM.
+     */
+    @Requirement
+    private XDOMOfficeDocumentBuilder documentBuilder;
 
     /**
      * The object used to convert between client and server entity reference.
@@ -83,7 +99,7 @@ public class XWikiImportService implements ImportService
     public String cleanOfficeHTML(String htmlPaste, String cleanerHint, Map<String, String> cleaningParams)
     {
         try {
-            HTMLCleaner cleaner = this.componentManager.lookup(HTMLCleaner.class, cleanerHint);
+            HTMLCleaner cleaner = componentManager.lookup(HTMLCleaner.class, cleanerHint);
             HTMLCleanerConfiguration configuration = cleaner.getDefaultConfiguration();
             configuration.setParameters(cleaningParams);
             Document cleanedDocument = cleaner.clean(new StringReader(htmlPaste), configuration);
@@ -102,21 +118,53 @@ public class XWikiImportService implements ImportService
      */
     public String officeToXHTML(Attachment attachment, Map<String, String> cleaningParams)
     {
+        org.xwiki.gwt.wysiwyg.client.wiki.AttachmentReference clientAttachmentReference =
+            new org.xwiki.gwt.wysiwyg.client.wiki.AttachmentReference(attachment.getReference());
         try {
-            org.xwiki.gwt.wysiwyg.client.wiki.AttachmentReference clientAttachmentReference =
-                new org.xwiki.gwt.wysiwyg.client.wiki.AttachmentReference(attachment.getReference());
-            AttachmentReference attachmentReference = entityReferenceConverter.convert(clientAttachmentReference);
-            // Omit the XML declaration and the document type because the returned XHTML is inserted at the caret
-            // position or replaces the current selection in the rich text area.
-            cleaningParams.put("omitXMLDeclaration", Boolean.TRUE.toString());
-            cleaningParams.put("omitDocumentType", Boolean.TRUE.toString());
-            // OfficeImporter should be improved to use DocumentName instead of String. This will remove the need for a
-            // DocumentNameSerializer.
-            return officeImporter.importAttachment(this.entityReferenceSerializer.serialize(attachmentReference
-                .getDocumentReference()), attachmentReference.getName(), cleaningParams);
+            return importAttachment(entityReferenceConverter.convert(clientAttachmentReference), cleaningParams);
         } catch (Exception e) {
-            LOG.error("Exception while importing office document.", e);
+            LOG.error("Exception while importing office document: " + clientAttachmentReference.getFileName(), e);
             throw new RuntimeException(e.getLocalizedMessage());
         }
+    }
+
+    /**
+     * Imports an office document that was previously attached to a wiki page.
+     * 
+     * @param attachmentReference specifies the office document to import
+     * @param parameters import parameters; {@code filterStyles} controls whether styles are filtered when importing
+     *            office text documents
+     * @return the annotated XHTML text obtained from the specified office document
+     * @throws Exception is importing the specified attachment fails
+     */
+    private String importAttachment(AttachmentReference attachmentReference, Map<String, String> parameters)
+        throws Exception
+    {
+        InputStream officeFileStream = documentAccessBridge.getAttachmentContent(attachmentReference);
+        String officeFileName = attachmentReference.getName();
+        DocumentReference targetDocRef = attachmentReference.getDocumentReference();
+        XDOMOfficeDocument xdomOfficeDocument = null;
+        if (isPresentation(attachmentReference.getName())) {
+            xdomOfficeDocument = presentationBuilder.build(officeFileStream, officeFileName, targetDocRef);
+        } else {
+            boolean filterStyles = "strict".equals(parameters.get("filterStyles"));
+            xdomOfficeDocument = documentBuilder.build(officeFileStream, officeFileName, targetDocRef, filterStyles);
+        }
+        // Attach the images extracted from the imported office document to the target wiki document.
+        for (Map.Entry<String, byte[]> artifact : xdomOfficeDocument.getArtifacts().entrySet()) {
+            AttachmentReference artifactReference = new AttachmentReference(artifact.getKey(), targetDocRef);
+            documentAccessBridge.setAttachmentContent(artifactReference, artifact.getValue());
+        }
+        return xdomOfficeDocument.getContentAsString("annotatedxhtml/1.0");
+    }
+
+    /**
+     * @param fileName a file name
+     * @return {@code true} if the specified file is an office presentation, {@code false} otherwise
+     */
+    private boolean isPresentation(String fileName)
+    {
+        String fileExtension = StringUtils.substringAfterLast(fileName, ".");
+        return PRESENTATION_FORMAT_EXTENSIONS.contains(fileExtension);
     }
 }

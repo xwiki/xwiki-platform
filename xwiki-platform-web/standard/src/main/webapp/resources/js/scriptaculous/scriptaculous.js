@@ -26,6 +26,9 @@
 var Scriptaculous = {
   Version: '1.9.0',
   require: function(libraryName) {
+    if ($$("script[src$='" + libraryName.replace(/http...[^\/]*/, '') + "']").length > 0) {
+      return;
+    }
     // Changed in XWiki to work as a defered script
     var script = document.createElement('script');
     script.type = 'text/javascript';

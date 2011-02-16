@@ -30,7 +30,7 @@ XWiki.Gallery = Class.create({
   },
   _collectImages : function(container) {
     var images = [];
-    var imageElements = container.getElementsByTagName('img');
+    var imageElements = container.select('img');
     for(var i = 0; i < imageElements.length; i++) {
       var imageElement = imageElements[i];
       images.push({url: imageElement.getAttribute('src'), title: imageElement.title});
@@ -100,13 +100,10 @@ XWiki.Gallery = Class.create({
     // Remove container padding;
     var width = dimensions.width - 20;
     var height = dimensions.height - 20;
-    this.container.style.width = width + 'px';
-    this.container.style.height = height + 'px';
-    this.currentImage.parentNode.style.height = height + 'px';
-    this.currentImage.parentNode.style.lineHeight = height + 'px';
-    this.currentImage.style.maxHeight = height + 'px';
+    this.container.setStyle({width: width + 'px', height: height + 'px'});
+    this.currentImage.up().setStyle({height: height + 'px', lineHeight: height + 'px'});
     // Remove width reserved for the navigation arrows.
-    this.currentImage.style.maxWidth = (width - 128) + 'px';
+    this.currentImage.setStyle({maxHeight: height + 'px', maxWidth: (width - 128) + 'px'});
   },
   _resetSize : function() {
     this.container.style.cssText = '';
@@ -125,7 +122,7 @@ XWiki.Gallery = Class.create({
     this.currentImage.title = this.images[index].title;
     this.currentImage.src = this.images[index].url;
     this.index = index;
-    this.indexDisplay.firstChild.nodeValue = (index + 1) + ' / ' + this.images.length;
+    this.indexDisplay.update((index + 1) + ' / ' + this.images.length);
   }
 });
 // End XWiki augmentation.

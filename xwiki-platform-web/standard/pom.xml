@@ -523,6 +523,7 @@
               <exclude>**/notification.css</exclude>
               <exclude>**/usersandgroups.js</exclude>
               <exclude>**/columns.css</exclude>
+              <exclude>**/gallery.css</exclude>
             </excludes>
           </configuration>
         </plugin>

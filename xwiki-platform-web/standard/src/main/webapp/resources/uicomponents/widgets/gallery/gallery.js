@@ -4,7 +4,7 @@ XWiki.Gallery = Class.create({
   initialize : function(container) {
     this.images = this._collectImages(container);
 
-    this.container = container.update('<input type="text" tabindex="-1" class="focusCatcher"/><div class="currentImageWrapper"><img class="currentImage" alt="Current image"/></div><div class="navigation"><div class="previous" title="Show previous image">&lt;</div><div class="next" title="Show next image">&gt;</div><div style="clear:both"></div></div><div class="index">0 / 0</div><div class="maximize" title="Maximize"></div>');
+    this.container = container.update('<input type="text" tabindex="-1" class="focusCatcher"/><div class="currentImageWrapper"><img class="currentImage" alt="${escapetool.xml($msg.get("core.widgets.gallery.currentImage"))}"/></div><div class="navigation"><div class="previous" title="${escapetool.xml($msg.get("core.widgets.gallery.previousImage"))}">&lt;</div><div class="next" title="${escapetool.xml($msg.get("core.widgets.gallery.nextImage"))}">&gt;</div><div style="clear:both"></div></div><div class="index">0 / 0</div><div class="maximize" title="${escapetool.xml($msg.get("core.widgets.gallery.maximize"))}"></div>');
     this.container.addClassName('xGallery');
 
     this.focusCatcher = this.container.down('.focusCatcher');
@@ -86,7 +86,7 @@ XWiki.Gallery = Class.create({
   _onToggleMaximize : function() {
     this.maximizeToggle.toggleClassName('maximize');
     this.maximizeToggle.toggleClassName('minimize');
-    this.maximizeToggle.title = this.maximizeToggle.hasClassName('maximize') ? 'Maximize' : 'Minimize';
+    this.maximizeToggle.title = this.maximizeToggle.hasClassName('maximize') ? '${escapetool.javascript($msg.get("core.widgets.gallery.maximize"))}' : '${escapetool.javascript($msg.get("core.widgets.gallery.minimize"))}';
     this.container.toggleClassName('maximized');
     $(document.documentElement).toggleClassName('maximized');
     if (this.container.hasClassName('maximized')) {

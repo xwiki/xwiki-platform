@@ -19,7 +19,6 @@
  */
 package org.xwiki.officeimporter.internal.builder;
 
-import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.io.StringReader;
 import java.io.UnsupportedEncodingException;
@@ -41,8 +40,11 @@ import org.xwiki.officeimporter.builder.PresentationBuilder;
 import org.xwiki.officeimporter.document.XDOMOfficeDocument;
 import org.xwiki.officeimporter.openoffice.OpenOfficeConverterException;
 import org.xwiki.officeimporter.openoffice.OpenOfficeManager;
-import org.xwiki.rendering.parser.ParseException;
+import org.xwiki.rendering.block.Block;
+import org.xwiki.rendering.block.ExpandedMacroBlock;
+import org.xwiki.rendering.block.XDOM;
 import org.xwiki.rendering.parser.Parser;
+import org.xwiki.rendering.renderer.BlockRenderer;
 import org.xwiki.xml.html.HTMLCleaner;
 import org.xwiki.xml.html.HTMLCleanerConfiguration;
 import org.xwiki.xml.html.HTMLUtils;
@@ -87,7 +89,7 @@ public class DefaultPresentationBuilder implements PresentationBuilder
     private HTMLCleaner ooHTMLCleaner;
 
     /**
-     * XHTML/1.0 syntax parser used to build an XDOM from an XHTML input.
+     * The component used to parse the XHTML obtained after cleaning.
      */
     @Requirement("xhtml/1.0")
     private Parser xhtmlParser;
@@ -99,60 +101,45 @@ public class DefaultPresentationBuilder implements PresentationBuilder
         DocumentReference documentReference) throws OfficeImporterException
     {
         // Invoke OpenOffice document converter.
+        Map<String, byte[]> artifacts = importPresentation(officeFileStream, officeFileName);
+
+        // Create presentation HTML.
+        String html = buildPresentationHTML(artifacts, StringUtils.substringBeforeLast(officeFileName, "."));
+
+        // Clear and adjust presentation HTML (slide image URLs are updated to point to the corresponding attachments).
+        html = cleanPresentationHTML(html, documentReference);
+
+        // Create the XDOM.
+        XDOM xdom = buildPresentationXDOM(html, documentReference);
+
+        return new XDOMOfficeDocument(xdom, artifacts, componentManager);
+    }
+
+    /**
+     * Invokes the Office Server to convert the given input stream. The result is a map of artifacts including slide
+     * images.
+     * 
+     * @param officeFileStream the office presentation byte stream
+     * @param officeFileName the name of the office presentation that is being imported
+     * @return the map of artifacts created by the Office Server
+     * @throws OfficeImporterException if converting the office presentation fails
+     */
+    protected Map<String, byte[]> importPresentation(InputStream officeFileStream, String officeFileName)
+        throws OfficeImporterException
+    {
         Map<String, InputStream> inputStreams = new HashMap<String, InputStream>();
         inputStreams.put(officeFileName, officeFileStream);
-        Map<String, byte[]> artifacts;
         try {
             // The OpenOffice converter uses the output file name extension to determine the output format/syntax.
             // The returned artifacts are of three types: imgX.jpg (slide screen shot), imgX.html (HTML page that
             // display the corresponding slide screen shot) and textX.html (HTML page that display the text extracted
             // from the corresponding slide). We use "img0.html" as the output file name because the corresponding
             // artifact displays a screen shot of the first presentation slide.
-            artifacts = officeManager.getConverter().convert(inputStreams, officeFileName, "img0.html");
+            return officeManager.getConverter().convert(inputStreams, officeFileName, "img0.html");
         } catch (OpenOfficeConverterException e) {
             String message = "Error while converting document [%s] into html.";
             throw new OfficeImporterException(String.format(message, officeFileName), e);
         }
-
-        // Create presentation HTML.
-        String html = buildPresentationHTML(artifacts, StringUtils.substringBeforeLast(officeFileName, "."));
-
-        // Clear and adjust presentation HTML (slide image URLs are updated to point to the corresponding attachments).
-        HTMLCleanerConfiguration configuration = ooHTMLCleaner.getDefaultConfiguration();
-        configuration.setParameters(Collections.singletonMap("targetDocument", entityReferenceSerializer
-            .serialize(documentReference)));
-        Document xhtmlDocument = ooHTMLCleaner.clean(new StringReader(html), configuration);
-        HTMLUtils.stripHTMLEnvelope(xhtmlDocument);
-        html = HTMLUtils.toString(xhtmlDocument);
-
-        // Parse presentation HTML.
-        try {
-            return new XDOMOfficeDocument(xhtmlParser.parse(new StringReader(html)), artifacts, this.componentManager);
-        } catch (ParseException e) {
-            throw new OfficeImporterException("Failed to parse presentation HTML.", e);
-        }
-    }
-
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.officeimporter.builder.PresentationBuilder#build(java.io.InputStream, java.lang.String)
-     */
-    @Deprecated
-    public XDOMOfficeDocument build(InputStream officeFileStream, String officeFileName) throws OfficeImporterException
-    {
-        return build(officeFileStream, officeFileName, documentAccessBridge.getCurrentDocumentReference());
-    }
-
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.officeimporter.builder.PresentationBuilder#build(byte[])
-     */
-    @Deprecated
-    public XDOMOfficeDocument build(byte[] officeFileData) throws OfficeImporterException
-    {
-        return build(new ByteArrayInputStream(officeFileData), "input.tmp");
     }
 
     /**
@@ -166,7 +153,7 @@ public class DefaultPresentationBuilder implements PresentationBuilder
      * @param nameSpace the prefix to add in front of all slide image names to prevent name conflicts
      * @return the presentation HTML
      */
-    private String buildPresentationHTML(Map<String, byte[]> presentationArtifacts, String nameSpace)
+    protected String buildPresentationHTML(Map<String, byte[]> presentationArtifacts, String nameSpace)
     {
         StringBuilder presentationHTML = new StringBuilder();
 
@@ -200,5 +187,49 @@ public class DefaultPresentationBuilder implements PresentationBuilder
         }
 
         return presentationHTML.toString();
+    }
+
+    /**
+     * Cleans the presentation HTML. This method must be called mainly to ensure that the slide image URLs are updated
+     * to point to the corresponding attachments.
+     * 
+     * @param dirtyHTML the HTML to be cleaned
+     * @param targetDocumentReference the document where the slide images will be attached
+     * @return the cleaned HTML
+     */
+    protected String cleanPresentationHTML(String dirtyHTML, DocumentReference targetDocumentReference)
+    {
+        HTMLCleanerConfiguration configuration = ooHTMLCleaner.getDefaultConfiguration();
+        configuration.setParameters(Collections.singletonMap("targetDocument", entityReferenceSerializer
+            .serialize(targetDocumentReference)));
+        Document xhtmlDocument = ooHTMLCleaner.clean(new StringReader(dirtyHTML), configuration);
+        HTMLUtils.stripHTMLEnvelope(xhtmlDocument);
+        return HTMLUtils.toString(xhtmlDocument);
+    }
+
+    /**
+     * Parses the given HTML text into an XDOM tree.
+     * 
+     * @param html the HTML text to parse
+     * @param targetDocumentReference specifies the document where the presentation will be imported; we use the target
+     *            document reference to get the syntax of the target document;
+     * @return a XDOM tree
+     * @throws OfficeImporterException if parsing the given HTML fails
+     */
+    protected XDOM buildPresentationXDOM(String html, DocumentReference targetDocumentReference)
+        throws OfficeImporterException
+    {
+        try {
+            String syntaxId = documentAccessBridge.getDocument(targetDocumentReference).getSyntax().toIdString();
+            BlockRenderer renderer = componentManager.lookup(BlockRenderer.class, syntaxId);
+
+            Map<String, String> galleryParameters = Collections.emptyMap();
+            ExpandedMacroBlock gallery = new ExpandedMacroBlock("gallery", galleryParameters, renderer, false);
+            gallery.addChildren(xhtmlParser.parse(new StringReader(html)).getChildren());
+
+            return new XDOM(Collections.singletonList((Block) gallery));
+        } catch (Exception e) {
+            throw new OfficeImporterException("Failed to build presentation XDOM.", e);
+        }
     }
 }

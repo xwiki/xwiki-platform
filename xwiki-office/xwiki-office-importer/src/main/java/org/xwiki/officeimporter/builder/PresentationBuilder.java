@@ -42,33 +42,10 @@ public interface PresentationBuilder
      * 
      * @param officeFileStream {@link InputStream} corresponding to the office presentation.
      * @param officeFileName name of the office document (used to determine input document format).
-     * @param reference reference document w.r.t which the presentation is built. 
+     * @param reference reference document w.r.t which the presentation is built.
      * @return {@link XDOMOfficeDocument} corresponding to the given office presentation.
      * @throws OfficeImporterException if an error occurs while performing the import operation.
      */
     XDOMOfficeDocument build(InputStream officeFileStream, String officeFileName, DocumentReference reference)
         throws OfficeImporterException;
-
-    /**
-     * Builds a (slide-show) {@link XDOMOfficeDocument} corresponding to the given office presentation.
-     * 
-     * @param officeFileStream {@link InputStream} corresponding to the office presentation.
-     * @param officeFileName name of the office document (used to determine input document format).
-     * @return {@link XDOMOfficeDocument} corresponding to the given office presentation.
-     * @throws OfficeImporterException if an error occurs while performing the import operation.
-     * @deprecated use {@link #build(InputStream, String, DocumentReference)} instead since 2.2.0
-     */
-    @Deprecated
-    XDOMOfficeDocument build(InputStream officeFileStream, String officeFileName) throws OfficeImporterException;
-
-    /**
-     * Builds a (slide-show) {@link XDOMOfficeDocument} corresponding to the given office presentation.
-     * 
-     * @param officeFileData binary data of the office presentation.
-     * @return an {@link XDOMOfficeDocument} containing a slide-show similar to that of the office document.
-     * @throws OfficeImporterException if an error occurs while performing the import operation.
-     * @deprecated use {@link #build(InputStream, String)} instead since 2.2M1.
-     */
-    @Deprecated
-    XDOMOfficeDocument build(byte[] officeFileData) throws OfficeImporterException;
 }

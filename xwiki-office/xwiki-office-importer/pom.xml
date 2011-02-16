@@ -89,6 +89,13 @@
       <scope>provided</scope>
     </dependency>
     <dependency>
+      <!-- Gallery macro is used to display imported office presentations. -->
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-core-rendering-macro-gallery</artifactId>
+      <version>${project.version}</version>
+      <scope>provided</scope>
+    </dependency>
+    <dependency>
       <groupId>org.codehaus.groovy</groupId>
       <artifactId>groovy-all</artifactId>
     </dependency>
@@ -116,9 +123,10 @@
                 module code."
            -->
           <excludes>
-              org/xwiki/officeimporter/internal/DefaultOfficeImporter.java,
-              org/xwiki/officeimporter/internal/splitter/DefaultXDOMOfficeDocumentSplitter.java,
-              org/xwiki/officeimporter/OfficeImporterVelocityBridge.java
+            <!-- Has too many dependencies, especially on the rendering module -->
+            org/xwiki/officeimporter/internal/builder/DefaultPresentationBuilder.java,
+            <!-- Needs to be refactored into a ScriptService -->
+            org/xwiki/officeimporter/OfficeImporterVelocityBridge.java
           </excludes>
         </configuration>
       </plugin>

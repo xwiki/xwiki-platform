@@ -19,7 +19,6 @@
  */
 package org.xwiki.officeimporter.openoffice;
 
-import org.artofsolving.jodconverter.OfficeDocumentConverter;
 import org.xwiki.component.annotation.ComponentRole;
 
 /**
@@ -112,11 +111,4 @@ public interface OpenOfficeManager
      * @return {@link OpenOfficeConverter} instance suitable for performing document conversion tasks.
      */
     OpenOfficeConverter getConverter();
-
-    /**
-     * @return a {@link OfficeDocumentConverter} associated with this {@link OpenOfficeManager}.
-     * @deprecated use {@link #getConverter()} instead since 2.2M1
-     */
-    @Deprecated
-    OfficeDocumentConverter getDocumentConverter();
 }

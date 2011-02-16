@@ -29,14 +29,18 @@ import org.xwiki.component.logging.AbstractLogEnabled;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.context.Execution;
 import org.xwiki.model.reference.AttachmentReference;
+import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.office.viewer.OfficeViewer;
 import org.xwiki.office.viewer.OfficeViewerScriptService;
 import org.xwiki.officeimporter.openoffice.OpenOfficeConverter;
 import org.xwiki.officeimporter.openoffice.OpenOfficeManager;
-import org.xwiki.rendering.block.Block;
+import org.xwiki.rendering.block.XDOM;
 import org.xwiki.rendering.renderer.BlockRenderer;
 import org.xwiki.rendering.renderer.printer.DefaultWikiPrinter;
 import org.xwiki.rendering.renderer.printer.WikiPrinter;
+import org.xwiki.rendering.syntax.Syntax;
+import org.xwiki.rendering.transformation.TransformationContext;
+import org.xwiki.rendering.transformation.TransformationManager;
 
 /**
  * Default implementation of {@link OfficeViewerScriptService}.
@@ -85,6 +89,12 @@ public class DefaultOfficeViewerScriptService extends AbstractLogEnabled impleme
     private DocumentAccessBridge documentAccessBridge;
 
     /**
+     * The component used to perform the XDOM transformations.
+     */
+    @Requirement
+    private TransformationManager transformationManager;
+
+    /**
      * {@inheritDoc}
      * 
      * @see OfficeViewerScriptService#getCaughtException()
@@ -115,13 +125,16 @@ public class DefaultOfficeViewerScriptService extends AbstractLogEnabled impleme
         // Clear previous caught exception.
         execution.getContext().removeProperty(OFFICE_VIEW_EXCEPTION);
         try {
+            DocumentReference documentReference = attachmentReference.getDocumentReference();
             // Check whether current user has view rights on the document containing the attachment.
-            if (!documentAccessBridge.isDocumentViewable(attachmentReference.getDocumentReference())) {
+            if (!documentAccessBridge.isDocumentViewable(documentReference)) {
                 throw new RuntimeException("Inadequate privileges.");
             }
 
             // Create the view and render the result.
-            return render(officeViewer.createView(attachmentReference, parameters), "xhtml/1.0");
+            Syntax fromSyntax = documentAccessBridge.getDocument(documentReference).getSyntax();
+            Syntax toSyntax = Syntax.XHTML_1_0;
+            return render(officeViewer.createView(attachmentReference, parameters), fromSyntax, toSyntax);
         } catch (Exception e) {
             // Save caught exception.
             execution.getContext().setProperty(OFFICE_VIEW_EXCEPTION, e);
@@ -142,18 +155,24 @@ public class DefaultOfficeViewerScriptService extends AbstractLogEnabled impleme
     }
 
     /**
-     * Renders the given block into specified syntax.
+     * Renders the given XDOM into specified syntax.
      * 
-     * @param block {@link Block} to be rendered
-     * @param syntaxId expected output syntax
+     * @param xdom the {@link XDOM} to be rendered
+     * @param fromSyntax the syntax for which to perform the transformations
+     * @param toSyntax expected output syntax
      * @return string holding the result of rendering
      * @throws Exception if an error occurs during rendering
      */
-    private String render(Block block, String syntaxId) throws Exception
+    private String render(XDOM xdom, Syntax fromSyntax, Syntax toSyntax) throws Exception
     {
+        // Perform the transformations. This is required for office presentations which use the gallery macro to display
+        // the slide images.
+        TransformationContext context = new TransformationContext(xdom, fromSyntax);
+        transformationManager.performTransformations(xdom, context);
+
         WikiPrinter printer = new DefaultWikiPrinter();
-        BlockRenderer renderer = componentManager.lookup(BlockRenderer.class, syntaxId);
-        renderer.render(block, printer);
+        BlockRenderer renderer = componentManager.lookup(BlockRenderer.class, toSyntax.toIdString());
+        renderer.render(xdom, printer);
         return printer.toString();
     }
 }

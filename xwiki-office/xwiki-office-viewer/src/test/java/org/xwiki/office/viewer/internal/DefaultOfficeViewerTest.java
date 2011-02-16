@@ -353,7 +353,7 @@ public class DefaultOfficeViewerTest extends AbstractMockingComponentTestCase
         {
             {
                 oneOf(documentAccessBridge).getDocumentURL(ATTACHMENT_REFERENCE.getDocumentReference(), "temp", null,
-                    null);
+                    null, true);
                 will(returnValue("/xwiki/bin/temp/Main/Test"));
             }
         });

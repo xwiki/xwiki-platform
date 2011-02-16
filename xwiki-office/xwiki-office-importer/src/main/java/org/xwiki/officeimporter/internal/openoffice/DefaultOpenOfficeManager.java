@@ -225,15 +225,4 @@ public class DefaultOpenOfficeManager extends AbstractLogEnabled implements Open
     {
         return (this.state == expectedState);
     }
-
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.officeimporter.openoffice.OpenOfficeManager#getDocumentConverter()
-     */
-    @Deprecated
-    public OfficeDocumentConverter getDocumentConverter()
-    {
-        return this.jodConverter;
-    }
 }

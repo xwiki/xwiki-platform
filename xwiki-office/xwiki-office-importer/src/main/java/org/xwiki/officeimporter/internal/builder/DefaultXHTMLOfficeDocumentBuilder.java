@@ -114,17 +114,4 @@ public class DefaultXHTMLOfficeDocumentBuilder extends AbstractLogEnabled implem
         // Return a new XHTMLOfficeDocument instance.
         return new XHTMLOfficeDocument(xhtmlDoc, artifacts);
     }
-
-    /**
-     * {@inheritDoc}
-     * 
-     * @deprecated use {@link #build(InputStream, String, DocumentReference, boolean)} since 2.2M1
-     */
-    @Deprecated
-    public XHTMLOfficeDocument build(byte[] officeFileData, org.xwiki.bridge.DocumentName reference,
-        boolean filterStyles) throws OfficeImporterException
-    {
-        return build(new ByteArrayInputStream(officeFileData), "input.tmp", new DocumentReference(reference.getWiki(),
-            reference.getSpace(), reference.getPage()), filterStyles);
-    }
 }

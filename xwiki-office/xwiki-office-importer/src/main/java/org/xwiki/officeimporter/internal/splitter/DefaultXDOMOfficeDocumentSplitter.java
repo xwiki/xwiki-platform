@@ -24,10 +24,10 @@ import java.util.List;
 import java.util.Map;
 
 import org.xwiki.bridge.DocumentAccessBridge;
-import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.Requirement;
 import org.xwiki.component.manager.ComponentManager;
+import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.officeimporter.OfficeImporterException;
@@ -75,7 +75,7 @@ public class DefaultXDOMOfficeDocumentSplitter implements XDOMOfficeDocumentSpli
      * Required for converting string document names to {@link org.xwiki.model.reference.DocumentReference} instances.
      */
     @Requirement("currentmixed")
-    private DocumentReferenceResolver currentMixedDocumentReferenceResolver;
+    private DocumentReferenceResolver<String> currentMixedDocumentReferenceResolver;
 
     /**
      * The {@link DocumentSplitter} used for splitting wiki documents.
@@ -91,6 +91,7 @@ public class DefaultXDOMOfficeDocumentSplitter implements XDOMOfficeDocumentSpli
 
     /**
      * {@inheritDoc}
+     * 
      * @since 2.2M1
      */
     public Map<TargetDocumentDescriptor, XDOMOfficeDocument> split(XDOMOfficeDocument officeDocument,
@@ -99,7 +100,8 @@ public class DefaultXDOMOfficeDocumentSplitter implements XDOMOfficeDocumentSpli
     {
         // TODO: This code needs to be refactored along with the xwiki-refactoring module code.
         String strBaseDoc = this.entityReferenceSerializer.serialize(baseDocumentReference);
-        Map<TargetDocumentDescriptor, XDOMOfficeDocument> result = new HashMap<TargetDocumentDescriptor, XDOMOfficeDocument>();
+        Map<TargetDocumentDescriptor, XDOMOfficeDocument> result =
+            new HashMap<TargetDocumentDescriptor, XDOMOfficeDocument>();
 
         // Create splitting and naming criterion for refactoring.
         SplittingCriterion splittingCriterion = new HeadingLevelSplittingCriterion(headingLevelsToSplit);
@@ -111,8 +113,7 @@ public class DefaultXDOMOfficeDocumentSplitter implements XDOMOfficeDocumentSpli
 
         for (WikiDocument doc : documents) {
             // Initialize a target page descriptor.
-            DocumentReference targetReference =
-                this.currentMixedDocumentReferenceResolver.resolve(doc.getFullName());
+            DocumentReference targetReference = this.currentMixedDocumentReferenceResolver.resolve(doc.getFullName());
             TargetDocumentDescriptor targetDocumentDescriptor =
                 new TargetDocumentDescriptor(targetReference, this.componentManager);
             if (doc.getParent() != null) {
@@ -158,18 +159,5 @@ public class DefaultXDOMOfficeDocumentSplitter implements XDOMOfficeDocumentSpli
         } else {
             throw new OfficeImporterException("The specified naming criterion is not implemented yet.");
         }
-    }
-
-    /**
-     * {@inheritDoc}
-     * @deprecated use {@link #split(XDOMOfficeDocument, int[], String, DocumentReference)} since 2.2.M1
-     */
-    @Deprecated
-    public Map<TargetDocumentDescriptor, XDOMOfficeDocument> split(XDOMOfficeDocument xdomOfficeDocument,
-        int[] headingLevelsToSplit, String namingCriterionHint, org.xwiki.bridge.DocumentName baseDocumentName)
-        throws OfficeImporterException
-    {
-        return split(xdomOfficeDocument, headingLevelsToSplit, namingCriterionHint, new DocumentReference(
-            baseDocumentName.getWiki(), baseDocumentName.getSpace(), baseDocumentName.getPage()));
     }
 }

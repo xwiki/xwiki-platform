@@ -19,7 +19,6 @@
  */
 package org.xwiki.officeimporter;
 
-import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.util.Arrays;
 import java.util.List;
@@ -29,6 +28,7 @@ import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.component.logging.Logger;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.context.Execution;
+import org.xwiki.model.reference.AttachmentReference;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.officeimporter.builder.PresentationBuilder;
@@ -67,11 +67,6 @@ public class OfficeImporterVelocityBridge
     private Execution execution;
 
     /**
-     * Internal {@link OfficeImporter} component.
-     */
-    private OfficeImporter importer;
-
-    /**
      * The {@link DocumentAccessBridge} component.
      */
     private DocumentAccessBridge docBridge;
@@ -79,7 +74,7 @@ public class OfficeImporterVelocityBridge
     /**
      * Used for converting string document names to objects.
      */
-    private DocumentReferenceResolver currentMixedDocumentReferenceResolver;
+    private DocumentReferenceResolver<String> currentMixedDocumentReferenceResolver;
 
     /**
      * Used to query openoffice server status.
@@ -129,7 +124,6 @@ public class OfficeImporterVelocityBridge
         this.logger = logger;
         try {
             this.execution = componentManager.lookup(Execution.class);
-            this.importer = componentManager.lookup(OfficeImporter.class);
             this.docBridge = componentManager.lookup(DocumentAccessBridge.class);
             this.currentMixedDocumentReferenceResolver =
                 componentManager.lookup(DocumentReferenceResolver.class, "currentmixed");
@@ -145,9 +139,7 @@ public class OfficeImporterVelocityBridge
     }
 
     /**
-     * <p>
      * Imports the given office document into an {@link XHTMLOfficeDocument}.
-     * </p>
      * 
      * @param officeFileStream binary data stream corresponding to input office document.
      * @param officeFileName name of the input office document, this argument is mainly used for determining input
@@ -174,9 +166,7 @@ public class OfficeImporterVelocityBridge
     }
 
     /**
-     * <p>
      * Imports the given {@link XHTMLOfficeDocument} into an {@link XDOMOfficeDocument}.
-     * </p>
      * 
      * @param xhtmlOfficeDocument {@link XHTMLOfficeDocument} to be imported.
      * @return {@link XDOMOfficeDocument} containing {@link org.xwiki.rendering.block.XDOM} result of the import
@@ -195,9 +185,7 @@ public class OfficeImporterVelocityBridge
     }
 
     /**
-     * <p>
      * Imports the given office document into an {@link XDOMOfficeDocument}.
-     * </p>
      * 
      * @param officeFileStream binary data stream corresponding to input office document.
      * @param officeFileName name of the input office document, this argument is mainly is used for determining input
@@ -229,12 +217,10 @@ public class OfficeImporterVelocityBridge
     }
 
     /**
-     * <p>
      * Splits the given {@link XDOMOfficeDocument} into multiple {@link XDOMOfficeDocument} instances according to the
      * specified criterion. This method is useful when a single office document has to be imported and split into
      * multiple wiki pages. An auto generated TOC structure will be returned associated to <b>rootDocumentName</b>
      * {@link org.xwiki.officeimporter.splitter.TargetDocumentDescriptor} entry.
-     * </p>
      * 
      * @param xdomDocument {@link XDOMOfficeDocument} to be split.
      * @param headingLevels heading levels defining the split points on the original document.
@@ -264,9 +250,7 @@ public class OfficeImporterVelocityBridge
     }
 
     /**
-     * <p>
      * Attempts to save the given {@link XDOMOfficeDocument} into the target wiki page specified by arguments.
-     * </p>
      * 
      * @param doc {@link XDOMOfficeDocument} to be saved.
      * @param target name of the target wiki page.
@@ -290,9 +274,9 @@ public class OfficeImporterVelocityBridge
             }
 
             // Save.
-            if (docBridge.exists(target) && append) {
+            if (docBridge.exists(docReference) && append) {
                 // Check whether existing document's syntax is same as target syntax.
-                String currentSyntaxId = docBridge.getDocument(docReference).getSyntaxId();
+                String currentSyntaxId = docBridge.getDocument(docReference).getSyntax().toIdString();
                 if (!currentSyntaxId.equals(syntaxId)) {
                     String message =
                         "Target document [%s] exists but it's sytax [%s] is different from specified syntax [%s]";
@@ -300,13 +284,13 @@ public class OfficeImporterVelocityBridge
                 }
 
                 // Append the content.
-                String currentContent = docBridge.getDocumentContent(target);
+                String currentContent = docBridge.getDocumentContent(docReference, null);
                 String newContent = currentContent + "\n" + doc.getContentAsString(syntaxId);
-                docBridge.setDocumentContent(target, newContent, "Updated by office importer.", false);
+                docBridge.setDocumentContent(docReference, newContent, "Updated by office importer.", false);
             } else {
-                docBridge.setDocumentSyntaxId(target, syntaxId);
-                docBridge.setDocumentContent(target, doc.getContentAsString(syntaxId), "Created by office importer.",
-                    false);
+                docBridge.setDocumentSyntaxId(docReference, syntaxId);
+                docBridge.setDocumentContent(docReference, doc.getContentAsString(syntaxId),
+                    "Created by office importer.", false);
 
                 // Set parent if provided.
                 if (null != parent) {
@@ -323,7 +307,7 @@ public class OfficeImporterVelocityBridge
             }
 
             // Finally attach all the artifacts into target document.
-            attachArtifacts(doc.getArtifacts(), target);
+            attachArtifacts(doc.getArtifacts(), docReference);
 
             return true;
         } catch (OfficeImporterException ex) {
@@ -397,86 +381,19 @@ public class OfficeImporterVelocityBridge
      * Utility method for attaching artifacts into a wiki page.
      * 
      * @param artifacts map of artifact content against their names.
-     * @param target target wiki page into which artifacts are to be attached.
+     * @param targetDocumentReference target wiki page into which artifacts are to be attached.
      */
-    private void attachArtifacts(Map<String, byte[]> artifacts, String target)
+    private void attachArtifacts(Map<String, byte[]> artifacts, DocumentReference targetDocumentReference)
     {
         for (Map.Entry<String, byte[]> artifact : artifacts.entrySet()) {
+            AttachmentReference attachmentReference =
+                new AttachmentReference(artifact.getKey(), targetDocumentReference);
             try {
-                docBridge.setAttachmentContent(target, artifact.getKey(), artifact.getValue());
+                docBridge.setAttachmentContent(attachmentReference, artifact.getValue());
             } catch (Exception ex) {
                 // Log the error and skip the artifact.
                 logger.error("Error while attaching artifact.", ex);
             }
         }
-    }
-
-    /**
-     * Imports the passed Office document into the target wiki page.
-     * 
-     * @param fileContent the binary content of the input document.
-     * @param fileName the name of the source document (should have a valid extension since the extension is used to
-     *            find out the office document's format).
-     * @param targetDocument the name of the resulting wiki page.
-     * @param options the optional parameters for the conversion.
-     * @return true if the operation was a success.
-     * @deprecated use individual import methods instead since 2.2M1
-     */
-    @Deprecated
-    public boolean importDocument(byte[] fileContent, String fileName, String targetDocument,
-        Map<String, String> options)
-    {
-        boolean success = false;
-        try {
-            validateRequest(targetDocument, options);
-            importer.importStream(new ByteArrayInputStream(fileContent), fileName, targetDocument, options);
-            success = true;
-        } catch (OfficeImporterException ex) {
-            logger.error(ex.getMessage(), ex);
-            execution.getContext().setProperty(OFFICE_IMPORTER_ERROR, ex.getMessage());
-        } catch (Exception ex) {
-            logger.error(ex.getMessage(), ex);
-            setErrorMessage("Internal error while finalizing the target document.");
-        }
-        return success;
-    }
-
-    /**
-     * Checks if this request is valid. For a request to be valid, the target document should be editable by the current
-     * user. And if this is not an append request, the target document should not exist.
-     * 
-     * @param targetDocument the target document.
-     * @param options additional parameters passed in for the import operation.
-     * @throws OfficeImporterException if the request is invalid.
-     */
-    private void validateRequest(String targetDocument, Map<String, String> options) throws OfficeImporterException
-    {
-        if (!docBridge.isDocumentEditable(currentMixedDocumentReferenceResolver.resolve(targetDocument))) {
-            throw new OfficeImporterException("Inadequate privileges.");
-        } else if (docBridge.exists(targetDocument) && !isAppendRequest(options)) {
-            throw new OfficeImporterException("The target document " + targetDocument + " already exists.");
-        }
-    }
-
-    /**
-     * @return any error messages thrown while importing.
-     * @deprecated use {@link #getErrorMessage()} instead since 2.2M1.
-     */
-    @Deprecated
-    public String getLastErrorMessage()
-    {
-        return getErrorMessage();
-    }
-
-    /**
-     * Utility method for checking if a request is made to append the importer result to an existing page.
-     * 
-     * @param options additional parameters passed in for the import operation.
-     * @return true if the params indicate that this is an append request.
-     */
-    private boolean isAppendRequest(Map<String, String> options)
-    {
-        String appendParam = options.get("appendContent");
-        return (appendParam != null) ? appendParam.equals("true") : false;
     }
 }

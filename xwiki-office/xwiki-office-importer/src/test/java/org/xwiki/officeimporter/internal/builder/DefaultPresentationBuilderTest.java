@@ -22,26 +22,31 @@ package org.xwiki.officeimporter.internal.builder;
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.io.StringReader;
-import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import junit.framework.Assert;
 
 import org.jmock.Expectations;
 import org.junit.Before;
+import org.junit.Test;
+import org.xwiki.bridge.DocumentModelBridge;
 import org.xwiki.model.reference.AttachmentReference;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.officeimporter.OfficeImporterException;
 import org.xwiki.officeimporter.builder.PresentationBuilder;
-import org.xwiki.officeimporter.document.XDOMOfficeDocument;
 import org.xwiki.officeimporter.internal.AbstractOfficeImporterTest;
 import org.xwiki.officeimporter.openoffice.OpenOfficeConverter;
 import org.xwiki.officeimporter.openoffice.OpenOfficeConverterException;
 import org.xwiki.rendering.block.Block;
+import org.xwiki.rendering.block.ExpandedMacroBlock;
+import org.xwiki.rendering.block.GroupBlock;
 import org.xwiki.rendering.block.XDOM;
 import org.xwiki.rendering.parser.ParseException;
 import org.xwiki.rendering.parser.Parser;
+import org.xwiki.rendering.syntax.Syntax;
 
 /**
  * Test case for {@link DefaultPresentationBuilder}.
@@ -62,9 +67,9 @@ public class DefaultPresentationBuilderTest extends AbstractOfficeImporterTest
     private static final String OUTPUT_FILE_NAME = "img0.html";
 
     /**
-     * The {@link PresentationBuilder} component.
+     * The {@link PresentationBuilder} component being tested.
      */
-    private PresentationBuilder presentationBuilder;
+    private DefaultPresentationBuilder presentationBuilder;
 
     /**
      * The component used to parse the presentation HTML.
@@ -79,7 +84,7 @@ public class DefaultPresentationBuilderTest extends AbstractOfficeImporterTest
     {
         super.setUp();
 
-        this.presentationBuilder = getComponentManager().lookup(PresentationBuilder.class);
+        presentationBuilder = (DefaultPresentationBuilder) getComponentManager().lookup(PresentationBuilder.class);
     }
 
     /**
@@ -96,26 +101,16 @@ public class DefaultPresentationBuilderTest extends AbstractOfficeImporterTest
     }
 
     /**
-     * Test presentation {@link XDOMOfficeDocument} building.
+     * Tests {@link DefaultPresentationBuilder#importPresentation(InputStream, String)}.
      */
-    @org.junit.Test
-    public void testPresentationBuilding()
+    @Test
+    public void testImportPresentation()
     {
-        // Create & register a mock document converter to by-pass OpenOffice server.
-        final InputStream mockOfficeFileStream = new ByteArrayInputStream(new byte[1024]);
-        final Map<String, InputStream> mockInput = new HashMap<String, InputStream>();
-        mockInput.put(INPUT_FILE_NAME, mockOfficeFileStream);
-        final Map<String, byte[]> mockOutput = new HashMap<String, byte[]>();
-        mockOutput.put("img0.jpg", new byte[0]);
-        mockOutput.put(OUTPUT_FILE_NAME, new byte[0]);
-        mockOutput.put("text0.html", new byte[0]);
-        mockOutput.put("img1.jpg", new byte[0]);
-        mockOutput.put("img1.html", new byte[0]);
-        mockOutput.put("text1.html", new byte[0]);
-
+        InputStream officeFileStream = new ByteArrayInputStream(new byte[1024]);
+        final Map<String, InputStream> input = Collections.singletonMap(INPUT_FILE_NAME, officeFileStream);
+        final Map<String, byte[]> output = Collections.singletonMap(OUTPUT_FILE_NAME, new byte[0]);
         final OpenOfficeConverter mockDocumentConverter = getMockery().mock(OpenOfficeConverter.class);
-        final DocumentReference reference = new DocumentReference("xwiki", "Main", "Test");
-        final String stringReference = "xwiki:Main.Test";
+
         getMockery().checking(new Expectations()
         {
             {
@@ -123,49 +118,116 @@ public class DefaultPresentationBuilderTest extends AbstractOfficeImporterTest
                 will(returnValue(mockDocumentConverter));
 
                 try {
-                    oneOf(mockDocumentConverter).convert(mockInput, INPUT_FILE_NAME, OUTPUT_FILE_NAME);
-                    will(returnValue(mockOutput));
+                    oneOf(mockDocumentConverter).convert(input, INPUT_FILE_NAME, OUTPUT_FILE_NAME);
+                    will(returnValue(output));
                 } catch (OpenOfficeConverterException e) {
                     Assert.fail(e.getMessage());
                 }
-
-                oneOf(mockDefaultStringEntityReferenceSerializer).serialize(reference);
-                will(returnValue(stringReference));
             }
         });
 
-        final AttachmentReference firstImageReference = new AttachmentReference("office-slide0.jpg", reference);
-        final AttachmentReference secondImageReference = new AttachmentReference("office-slide1.jpg", reference);
+        try {
+            Assert.assertEquals(output, presentationBuilder.importPresentation(officeFileStream, INPUT_FILE_NAME));
+        } catch (OfficeImporterException e) {
+            Assert.fail(e.getMessage());
+        }
+    }
+
+    /**
+     * Tests {@link DefaultPresentationBuilder#buildPresentationHTML(Map, String)}.
+     */
+    @Test
+    public void testBuildPresentationHTML()
+    {
+        final Map<String, byte[]> artifacts = new HashMap<String, byte[]>();
+        artifacts.put("img0.jpg", new byte[0]);
+        artifacts.put(OUTPUT_FILE_NAME, new byte[0]);
+        artifacts.put("text0.html", new byte[0]);
+        artifacts.put("img1.jpg", new byte[0]);
+        artifacts.put("img1.html", new byte[0]);
+        artifacts.put("text1.html", new byte[0]);
+
+        Assert.assertEquals("<p><img src=\"test-slide0.jpg\"/></p><p><img src=\"test-slide1.jpg\"/></p>",
+            presentationBuilder.buildPresentationHTML(artifacts, "test"));
+        Assert.assertEquals(2, artifacts.size());
+        Assert.assertTrue(artifacts.containsKey("test-slide0.jpg"));
+        Assert.assertTrue(artifacts.containsKey("test-slide1.jpg"));
+    }
+
+    /**
+     * Tests {@link DefaultPresentationBuilder#cleanPresentationHTML(String, DocumentReference)}.
+     */
+    @Test
+    public void testCleanPresentationHTML()
+    {
+        final DocumentReference reference = new DocumentReference("xwiki", "Main", "Test");
+        final String stringReference = "xwiki:Main.Test";
+        final AttachmentReference imageReference = new AttachmentReference("office-slide0.jpg", reference);
+
         getMockery().checking(new Expectations()
         {
             {
+                oneOf(mockDefaultStringEntityReferenceSerializer).serialize(reference);
+                will(returnValue(stringReference));
+
                 oneOf(mockDocumentReferenceResolver).resolve(stringReference);
                 will(returnValue(reference));
 
-                oneOf(mockDocumentAccessBridge).getAttachmentURL(firstImageReference, false);
+                oneOf(mockDocumentAccessBridge).getAttachmentURL(imageReference, false);
                 will(returnValue("/xwiki/bin/download/Main/Test/office-slide0.jpg"));
+            }
+        });
 
-                oneOf(mockDocumentAccessBridge).getAttachmentURL(secondImageReference, false);
-                will(returnValue("/xwiki/bin/download/Main/Test/office-slide1.jpg"));
+        Assert.assertEquals("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"
+            + "<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Strict//EN\" "
+            + "\"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd\">\n"
+            + "<html><p><!--startimage:false|-|attach|-|office-slide0.jpg-->"
+            + "<img src=\"/xwiki/bin/download/Main/Test/office-slide0.jpg\"></img><!--stopimage--></p></html>\n",
+            presentationBuilder.cleanPresentationHTML("<p><img src=\"office-slide0.jpg\"/></p>", reference));
+    }
+
+    /**
+     * Tests {@link DefaultPresentationBuilder#buildPresentationXDOM(String, DocumentReference)}.
+     */
+    @Test
+    public void testBuildPresentationXDOM()
+    {
+        final DocumentReference reference = new DocumentReference("wiki", "Space", "Page");
+        final DocumentModelBridge mockDocumentModelBridge = getMockery().mock(DocumentModelBridge.class);
+        final Block galleryContent = new GroupBlock();
+        getMockery().checking(new Expectations()
+        {
+            {
+                try {
+                    oneOf(mockDocumentAccessBridge).getDocument(reference);
+                    will(returnValue(mockDocumentModelBridge));
+                } catch (Exception e) {
+                    Assert.fail(e.getMessage());
+                }
+
+                oneOf(mockDocumentModelBridge).getSyntax();
+                will(returnValue(Syntax.XWIKI_2_0));
 
                 try {
                     oneOf(mockXHTMLParser).parse(with(aNonNull(StringReader.class)));
-                    will(returnValue(new XDOM(Arrays.asList(new Block[] {}))));
+                    will(returnValue(new XDOM(Collections.singletonList(galleryContent))));
                 } catch (ParseException e) {
                     Assert.fail(e.getMessage());
                 }
             }
         });
 
-        XDOMOfficeDocument presentation = null;
+        XDOM xdom = null;
         try {
-            presentation = presentationBuilder.build(mockOfficeFileStream, INPUT_FILE_NAME, reference);
+            xdom = presentationBuilder.buildPresentationXDOM("some HTML", reference);
         } catch (OfficeImporterException e) {
             Assert.fail(e.getMessage());
         }
-        Assert.assertNotNull(presentation.getContentDocument());
-        Assert.assertEquals(2, presentation.getArtifacts().size());
-        Assert.assertTrue(presentation.getArtifacts().containsKey(firstImageReference.getName()));
-        Assert.assertTrue(presentation.getArtifacts().containsKey(secondImageReference.getName()));
+        Assert.assertNotNull(xdom);
+
+        List<ExpandedMacroBlock> macros = xdom.getChildrenByType(ExpandedMacroBlock.class, false);
+        Assert.assertEquals(1, macros.size());
+        Assert.assertEquals("gallery", macros.get(0).getId());
+        Assert.assertEquals(galleryContent, macros.get(0).getChildren().get(0));
     }
 }

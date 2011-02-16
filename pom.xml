@@ -241,6 +241,16 @@
                 <exclude>org/xwiki/rendering/listener/chaining/LookaheadChainingListener</exclude>
                 <exclude>org/xwiki/rendering/listener/chaining/TextOnNewLineStateChainingListener</exclude>
                 <exclude>org/xwiki/rendering/scaffolding/RenderingTestCase</exclude>
+                <!-- Changes below are caused by the removal of the deprecated methods/classes in office importer module -->
+                <exclude>org/xwiki/officeimporter/OfficeImporter</exclude>
+                <exclude>org/xwiki/officeimporter/OfficeImporterFilter</exclude>
+                <exclude>org/xwiki/officeimporter/OfficeImporterVelocityBridge</exclude>
+                <exclude>org/xwiki/officeimporter/builder/PresentationBuilder</exclude>
+                <exclude>org/xwiki/officeimporter/builder/XDOMOfficeDocumentBuilder</exclude>
+                <exclude>org/xwiki/officeimporter/builder/XHTMLOfficeDocumentBuilder</exclude>
+                <exclude>org/xwiki/officeimporter/openoffice/OpenOfficeDocumentConverter</exclude>
+                <exclude>org/xwiki/officeimporter/openoffice/OpenOfficeManager</exclude>
+                <exclude>org/xwiki/officeimporter/splitter/XDOMOfficeDocumentSplitter</exclude>
               </excludes>
             </configuration>
           </plugin>

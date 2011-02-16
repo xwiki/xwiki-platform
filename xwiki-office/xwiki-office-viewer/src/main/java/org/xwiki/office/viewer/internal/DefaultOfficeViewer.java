@@ -75,10 +75,9 @@ public class DefaultOfficeViewer extends AbstractOfficeViewer
         Map<String, String> parameters) throws Exception
     {
         XDOMOfficeDocument xdomOfficeDocument = createXDOM(attachmentReference, parameters);
-        Set<File> temporaryFiles = processImages(attachmentReference, xdomOfficeDocument);
-
-        XDOM xdom = xdomOfficeDocument.getContentDocument();
         String attachmentVersion = documentAccessBridge.getAttachmentVersion(attachmentReference);
+        XDOM xdom = xdomOfficeDocument.getContentDocument();
+        Set<File> temporaryFiles = processImages(xdom, xdomOfficeDocument.getArtifacts(), attachmentReference);
         return new OfficeDocumentView(attachmentReference, attachmentVersion, xdom, temporaryFiles);
     }
 
@@ -86,18 +85,17 @@ public class DefaultOfficeViewer extends AbstractOfficeViewer
      * Processes all the image blocks in the given XDOM and changes image URL to point to a temporary file for those
      * images that are view artifacts.
      * 
+     * @param xdom the XDOM whose image blocks are to be processed
+     * @param artifacts specify which of the image blocks should be processed; only the image blocks that were generated
+     *            during the office import process should be processed
      * @param attachmentReference a reference to the office file that is being viewed; this reference is used to compute
      *            the path to the temporary directory holding the image artifacts
-     * @param xdomOfficeDocument the XDOM whose image blocks have to be processed
      * @return the set of temporary files corresponding to image artifacts
      */
-    private Set<File> processImages(AttachmentReference attachmentReference, XDOMOfficeDocument xdomOfficeDocument)
+    private Set<File> processImages(XDOM xdom, Map<String, byte[]> artifacts, AttachmentReference attachmentReference)
     {
-        XDOM xdom = xdomOfficeDocument.getContentDocument();
-        Map<String, byte[]> artifacts = xdomOfficeDocument.getArtifacts();
-        Set<File> temporaryFiles = new HashSet<File>();
-
         // Process all image blocks.
+        Set<File> temporaryFiles = new HashSet<File>();
         List<ImageBlock> imgBlocks = xdom.getChildrenByType(ImageBlock.class, true);
         for (ImageBlock imgBlock : imgBlocks) {
             String imageReference = imgBlock.getReference().getReference();
@@ -109,11 +107,13 @@ public class DefaultOfficeViewer extends AbstractOfficeViewer
                     File tempFile =
                         saveTemporaryFile(attachmentReference, imageReference, artifacts.get(imageReference));
 
-                    // Build a URL Image Reference which links to above temporary image file.
+                    // Create a URL image reference which links to above temporary image file.
                     ResourceReference urlImageReference =
                         new ResourceReference(buildURL(attachmentReference, tempFile.getName()), ResourceType.URL);
+                    // XWiki 2.0 doesn't support typed image references. Note that the URL is absolute.
+                    urlImageReference.setTyped(false);
 
-                    // Replace the old image block with new one backed by the URLImage.
+                    // Replace the old image block with a new one that uses the above URL image reference.
                     Block newImgBlock = new ImageBlock(urlImageReference, false, imgBlock.getParameters());
                     imgBlock.getParent().replaceChild(Arrays.asList(newImgBlock), imgBlock);
 

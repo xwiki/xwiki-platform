@@ -2,11 +2,12 @@
 #set($columns = "$request.columns")
 #set($columnsNumber = $util.parseInt("$!columns"))
 ## don't fill 100% because IE doesn't fit things properly in
-#set($columnsTotalWidth = 99.9)
+#set($columnsTotalWidth = 99)
 ## 1.5% padding right to all the columns except last one
 #set($columnPadding = 0.75)
-## compute the percent of the screen width of a column
-#set($computedColumnWidth = (($columnsTotalWidth - $columnPadding * 2 * ($columnsNumber - 1)) / $columnsNumber))
+## compute the percent of the screen width of a column. Round so that the java upper rounding doesn't screw IE, and because 2 decimals should be enough for everyone. 
+#set($rawComputedColumnWidth = (($columnsTotalWidth - $columnPadding * 2 * ($columnsNumber - 1)) / $columnsNumber))
+#set($computedColumnWidth = $mathtool.roundTo(2, $rawComputedColumnWidth))
 
 ## FIXME: this style should not be here, it's style for the container overall, not for the columns layout. 
 ## For the moment it's here to minimize the number of requested csss, 

@@ -656,16 +656,11 @@ public class XWikiHibernateBaseStore implements Initializable
      */
     protected String escapeSchema(String schema, XWikiContext context)
     {
-        DatabaseProduct databaseProduct = getDatabaseProductName(context);
+        Dialect dialect = Dialect.getDialect(getConfiguration().getProperties());
 
-        String escapedSchema;
-        if (DatabaseProduct.MYSQL == databaseProduct) {
-            // MySQL does not use SQL92 escaping syntax by default
-            escapedSchema = "`" + schema.replace("`", "``") + "`";
-        } else {
-            // Use SQL92 escape syntax
-            escapedSchema = "\"" + schema.replace("\"", "\"\"") + "\"";
-        }
+        String closeQuote = String.valueOf(dialect.closeQuote());
+        String escapedSchema =
+            dialect.openQuote() + schema.replace(closeQuote, closeQuote + closeQuote) + closeQuote;
 
         return escapedSchema;
     }
@@ -889,9 +884,9 @@ public class XWikiHibernateBaseStore implements Initializable
 
     /**
      * Hibernate and JDBC will wrap the exception thrown by the trigger in another exception (the
-     * java.sql.BatchUpdateException) and this exception is sometimes wrapped again.
-     * Also the java.sql.BatchUpdateException stores the underlying trigger exception in the nextException and not
-     * in the cause property. The following method helps you to get to the underlying trigger message.
+     * java.sql.BatchUpdateException) and this exception is sometimes wrapped again. Also the
+     * java.sql.BatchUpdateException stores the underlying trigger exception in the nextException and not in the cause
+     * property. The following method helps you to get to the underlying trigger message.
      */
     private String getExceptionMessage(Throwable t)
     {

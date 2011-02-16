@@ -35,11 +35,12 @@ public interface GadgetReader
 {
     /**
      * Reads the gadgets for the passed macro transformation context.
-     * 
+     *
+     * @param source the source to read dashboard gadgets from (a document serialized reference) 
      * @param context the dashboard macro transformation context
      * @return the list of gadgets for the currently executing macro
      * @throws Exception in case anything goes wrong reading data, the exception should be translated by the dashboard
      *             macro caller into a macro execution exception
      */
-    List<Gadget> getGadgets(MacroTransformationContext context) throws Exception;
+    List<Gadget> getGadgets(String source, MacroTransformationContext context) throws Exception;
 }

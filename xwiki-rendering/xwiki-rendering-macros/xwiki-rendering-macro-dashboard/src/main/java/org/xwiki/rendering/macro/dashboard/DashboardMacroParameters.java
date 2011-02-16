@@ -43,6 +43,12 @@ public class DashboardMacroParameters
     private String style = "";
 
     /**
+     * The source of the dashboard macro, as a serialized document reference, where the gadget configurations should be
+     * read from.
+     */
+    private String source;
+
+    /**
      * @return the layout style of this dashboard
      */
     public String getLayout()
@@ -80,5 +86,26 @@ public class DashboardMacroParameters
     public void setStyle(String style)
     {
         this.style = style;
+    }
+
+    /**
+     * @return the source of the dashboard macro, as a serialized document reference, where the gadget configurations
+     *         should be read from.
+     * @since 3.0M3
+     */
+    public String getSource()
+    {
+        return source;
+    }
+
+    /**
+     * @param source the source to set
+     * @since 3.0M3 
+     */
+    @PropertyDescription("The source of the dashboard macro, as a serialized document reference, where the gadget "
+        + "configurations (objects) should be read from. By default the current document will be used.")
+    public void setSource(String source)
+    {
+        this.source = source;
     }
 }

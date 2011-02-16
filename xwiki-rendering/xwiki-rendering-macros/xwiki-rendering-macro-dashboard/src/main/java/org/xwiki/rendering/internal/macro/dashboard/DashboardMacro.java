@@ -115,7 +115,7 @@ public class DashboardMacro extends AbstractMacro<DashboardMacroParameters>
         // get the gadgets from the objects
         List<Gadget> gadgets;
         try {
-            gadgets = gadgetReader.getGadgets(context);
+            gadgets = gadgetReader.getGadgets(parameters.getSource(), context);
         } catch (Exception e) {
             String message = "Could not get the gadgets.";
             // log and throw further
@@ -146,11 +146,12 @@ public class DashboardMacro extends AbstractMacro<DashboardMacroParameters>
         Map<String, Object> fxParamsForceSkinAction = new HashMap<String, Object>();
         fxParamsForceSkinAction.put("forceSkinAction", true);
         ssfx.use("uicomponents/dashboard/dashboard.css", fxParamsForceSkinAction);
-        Map<String, Object> fxParamsNoDefer = new HashMap<String, Object>();
-        fxParamsNoDefer.put("defer", false);
-        // re-use the effects to make it non-deferred
-        jsfx.use("js/scriptaculous/effects.js", fxParamsNoDefer);
-        jsfx.use("js/scriptaculous/dragdrop.js", fxParamsNoDefer);
+        // include the effects.js and dragdrop.js that are needed by the dashboard js
+        jsfx.use("js/scriptaculous/effects.js");
+        jsfx.use("js/scriptaculous/dragdrop.js");
+        // this is only needed in inline mode, but it might be needed in view as well, in the future
+        // FIXME: add a current action verification here, and only include in inline mode. This means that
+        // dashboardmacro would depend on XWikiContext :(
         jsfx.use("uicomponents/dashboard/dashboard.js", fxParamsForceSkinAction);
 
         // put everything in a nice toplevel group for this dashboard, to be able to add classes to it

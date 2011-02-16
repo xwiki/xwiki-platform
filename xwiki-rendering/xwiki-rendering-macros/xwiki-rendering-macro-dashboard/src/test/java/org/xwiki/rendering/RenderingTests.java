@@ -22,6 +22,9 @@ package org.xwiki.rendering;
 import java.util.Arrays;
 import java.util.Map;
 
+import junit.framework.Test;
+import junit.framework.TestCase;
+
 import org.jmock.Expectations;
 import org.jmock.Mockery;
 import org.xwiki.component.descriptor.DefaultComponentDescriptor;
@@ -35,9 +38,6 @@ import org.xwiki.rendering.scaffolding.RenderingTestSuite;
 import org.xwiki.rendering.transformation.MacroTransformationContext;
 import org.xwiki.skinx.SkinExtension;
 import org.xwiki.test.ComponentManagerTestSetup;
-
-import junit.framework.Test;
-import junit.framework.TestCase;
 
 /**
  * All Rendering integration tests defined in text files using a special format.
@@ -74,8 +74,8 @@ public class RenderingTests extends TestCase
             {
                 allowing(mockSsfx).use(with("uicomponents/container/columns.css"), with(any(Map.class)));
                 allowing(mockSsfx).use(with("uicomponents/dashboard/dashboard.css"), with(any(Map.class)));
-                allowing(mockJsfx).use(with("js/scriptaculous/dragdrop.js"), with(any(Map.class)));
-                allowing(mockJsfx).use(with("js/scriptaculous/effects.js"), with(any(Map.class)));
+                allowing(mockJsfx).use(with("js/scriptaculous/dragdrop.js"));
+                allowing(mockJsfx).use(with("js/scriptaculous/effects.js"));
                 allowing(mockJsfx).use(with("uicomponents/dashboard/dashboard.js"), with(any(Map.class)));
             }
         });
@@ -92,7 +92,8 @@ public class RenderingTests extends TestCase
         mockery.checking(new Expectations()
         {
             {
-                allowing(mockGadgetReader).getGadgets(with(any(MacroTransformationContext.class)));
+                allowing(mockGadgetReader).getGadgets(with(any(String.class)),
+                    with(any(MacroTransformationContext.class)));
                 will(returnValue(Arrays.asList(new Gadget("0", Arrays.<Block> asList(new WordBlock("title")), Arrays
                     .<Block> asList(new WordBlock("content")), "1,1"))));
             }

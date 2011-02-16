@@ -24,6 +24,7 @@ import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.velocity.VelocityContext;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.Requirement;
@@ -34,12 +35,11 @@ import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.rendering.block.Block;
-import org.xwiki.rendering.block.MetaDataBlock;
 import org.xwiki.rendering.block.XDOM;
-import org.xwiki.rendering.listener.MetaData;
 import org.xwiki.rendering.macro.dashboard.Gadget;
 import org.xwiki.rendering.macro.dashboard.GadgetReader;
 import org.xwiki.rendering.parser.Parser;
+import org.xwiki.rendering.syntax.Syntax;
 import org.xwiki.rendering.transformation.MacroTransformationContext;
 import org.xwiki.rendering.util.ParserUtils;
 import org.xwiki.velocity.VelocityEngine;
@@ -60,7 +60,7 @@ import com.xpn.xwiki.objects.BaseObject;
 public class DefaultGadgetReader implements GadgetReader
 {
     /**
-     * The reference to the gadgets class, relative to the current wiki. <br /> 
+     * The reference to the gadgets class, relative to the current wiki. <br />
      * TODO: to make sure that this class exists before trying to read objects of this type.
      */
     private static final EntityReference GADGET_CLASS =
@@ -100,39 +100,41 @@ public class DefaultGadgetReader implements GadgetReader
     /**
      * {@inheritDoc}
      * 
-     * @see org.xwiki.rendering.macro.dashboard.GadgetReader
-     *      #getGadgets(org.xwiki.rendering.transformation.MacroTransformationContext)
+     * @see org.xwiki.rendering.macro.dashboard.GadgetReader #getGadgets(String, MacroTransformationContext)
      */
-    public List<Gadget> getGadgets(MacroTransformationContext context) throws Exception
+    public List<Gadget> getGadgets(String source, MacroTransformationContext context) throws Exception
     {
-        DocumentReference currentDocRef = getCurrentDocument(context);
-        if (currentDocRef == null) {
+        // use the passed source as a document reference
+        DocumentReference sourceDocRef = getSourceDocumentReference(source);
+        if (sourceDocRef == null) {
             return new ArrayList<Gadget>();
         }
 
         // get the current document, read the objects and turn that into gadgets
         XWikiContext xContext = getXWikiContext();
         XWiki xWiki = xContext.getWiki();
-        XWikiDocument currentDoc = xWiki.getDocument(currentDocRef, xContext);
+        XWikiDocument sourceDoc = xWiki.getDocument(sourceDocRef, xContext);
         DocumentReference gadgetsClass = currentReferenceEntityResolver.resolve(GADGET_CLASS);
-        List<BaseObject> gadgetObjects = currentDoc.getXObjects(gadgetsClass);
+        List<BaseObject> gadgetObjects = sourceDoc.getXObjects(gadgetsClass);
 
         if (gadgetObjects == null) {
             return new ArrayList<Gadget>();
         }
 
-        return prepareGadgets(gadgetObjects, context);
+        return prepareGadgets(gadgetObjects, sourceDoc.getSyntax(), context);
     }
 
     /**
      * Prepares a list of gadgets from a list of XWiki objects.
      * 
      * @param objects the objects to read the gadgets from
+     * @param sourceSyntax the syntax of the source of the gadget objects
      * @param context the macro transformation context, where the dashboard macro is being executed
      * @return the list of gadgets, as read from the xwiki objects
      * @throws Exception in case something happens while rendering the content in the objects
      */
-    private List<Gadget> prepareGadgets(List<BaseObject> objects, MacroTransformationContext context) throws Exception
+    private List<Gadget> prepareGadgets(List<BaseObject> objects, Syntax sourceSyntax,
+        MacroTransformationContext context) throws Exception
     {
         List<Gadget> gadgets = new ArrayList<Gadget>();
 
@@ -146,7 +148,7 @@ public class DefaultGadgetReader implements GadgetReader
         }
         VelocityEngine velocityEngine = velocityManager.getVelocityEngine();
         // prepare the parser to parse the title and content of the gadget into blocks
-        Parser contentParser = (Parser) componentManager.lookup(Parser.class, context.getSyntax().toIdString());
+        Parser contentParser = (Parser) componentManager.lookup(Parser.class, sourceSyntax.toIdString());
         ParserUtils parserUtils = new ParserUtils();
 
         for (BaseObject xObject : objects) {
@@ -181,30 +183,21 @@ public class DefaultGadgetReader implements GadgetReader
     }
 
     /**
-     * Gets the current document reference from the context.
+     * Resolves the source of the dashboard, based on the source parameter passed to this reader, handling the default
+     * behaviour when the source is missing.
      * 
-     * @param context the macro transformation context
+     * @param source the serialized reference of the document to read gadgets from
      * @return the document reference to the current document (the document containing the macro, if it's an include)
      */
-    private DocumentReference getCurrentDocument(MacroTransformationContext context)
+    private DocumentReference getSourceDocumentReference(String source)
     {
-        // go up recursively to the first metadata block that has a source metadata
-        Block currentBlock = context.getCurrentMacroBlock();
-        MetaDataBlock metadataBlock = currentBlock.getPreviousBlockByType(MetaDataBlock.class, true);
-        String sourceMetadata = null;
-        while (sourceMetadata == null && metadataBlock != null) {
-            sourceMetadata = (String) metadataBlock.getMetaData().getMetaData(MetaData.SOURCE);
-            metadataBlock = metadataBlock.getPreviousBlockByType(MetaDataBlock.class, true);
+        // if the source is empty or null, use current document
+        if (StringUtils.isEmpty(source)) {
+            return getXWikiContext().getDoc().getDocumentReference();
         }
 
-        // if no such block was found, the reference is null
-        if (sourceMetadata == null) {
-            return null;
-        }
-
-        // resolve the source reference
-        DocumentReference currentDocRef = currentReferenceResolver.resolve(sourceMetadata);
-        return currentDocRef;
+        // resolve the source as document reference, relative to current context
+        return currentReferenceResolver.resolve(source);
     }
 
     /**

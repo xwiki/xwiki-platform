@@ -504,7 +504,6 @@ public class XWikiHibernateBaseStore implements Initializable
                 }
             } catch (Exception e) {
             }
-            ;
             try {
                 if (bTransaction) {
                     endTransaction(context, true);
@@ -600,13 +599,14 @@ public class XWikiHibernateBaseStore implements Initializable
 
                 if (context.getDatabase() != null) {
                     String schemaName = getSchemaFromWikiName(context);
+                    String escapedSchemaName = escapeSchema(schemaName, context);
 
                     DatabaseProduct databaseProduct = getDatabaseProductName(context);
                     if (DatabaseProduct.ORACLE == databaseProduct) {
                         Statement stmt = null;
                         try {
                             stmt = session.connection().createStatement();
-                            stmt.execute("alter session set current_schema = " + schemaName);
+                            stmt.execute("alter session set current_schema = " + escapedSchemaName);
                         } finally {
                             try {
                                 if (stmt != null) {
@@ -620,7 +620,7 @@ public class XWikiHibernateBaseStore implements Initializable
                         Statement stmt = null;
                         try {
                             stmt = session.connection().createStatement();
-                            stmt.execute("SET SCHEMA " + schemaName);
+                            stmt.execute("SET SCHEMA " + escapedSchemaName);
                         } finally {
                             try {
                                 if (stmt != null) {
@@ -645,6 +645,29 @@ public class XWikiHibernateBaseStore implements Initializable
                     "Exception while switching to database {0}", e, args);
             }
         }
+    }
+
+    /**
+     * Escape schema name depending of the database engine.
+     * 
+     * @param schema the schema name to escape
+     * @param context the XWiki context to get database engine identifier
+     * @return the escaped version
+     */
+    protected String escapeSchema(String schema, XWikiContext context)
+    {
+        DatabaseProduct databaseProduct = getDatabaseProductName(context);
+
+        String escapedSchema;
+        if (DatabaseProduct.MYSQL == databaseProduct) {
+            // MySQL does not use SQL92 escaping syntax by default
+            escapedSchema = "`" + schema.replace("`", "``") + "`";
+        } else {
+            // Use SQL92 escape syntax
+            escapedSchema = "\"" + schema.replace("\"", "\"\"") + "\"";
+        }
+
+        return escapedSchema;
     }
 
     /**

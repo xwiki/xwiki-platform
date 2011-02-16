@@ -22,7 +22,6 @@ package com.xpn.xwiki.store;
 import java.io.Serializable;
 import java.lang.reflect.Field;
 import java.sql.Connection;
-import java.sql.PreparedStatement;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -102,10 +101,9 @@ import com.xpn.xwiki.stats.impl.XWikiStats;
 import com.xpn.xwiki.util.Util;
 import com.xpn.xwiki.web.Utils;
 
-
 /**
  * The XWiki Hibernate database driver.
- *
+ * 
  * @version $Id$
  */
 @Component
@@ -269,50 +267,35 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
     {
         boolean bTransaction = true;
         String database = context.getDatabase();
-        PreparedStatement stmt = null;
+        Statement stmt = null;
         try {
             bTransaction = beginTransaction(context);
             Session session = getSession(context);
             Connection connection = session.connection();
+            stmt = connection.createStatement();
 
             String schema = getSchemaFromWikiName(wikiName, context);
+            String escapedSchema = escapeSchema(schema, context);
 
             DatabaseProduct databaseProduct = getDatabaseProductName(context);
             if (DatabaseProduct.ORACLE == databaseProduct) {
-                stmt = connection.prepareStatement("create user ? identified by ?");
-                stmt.setString(1, schema);
-                stmt.setString(2, schema);
-                stmt.execute();
-                stmt.close();
-                stmt = connection.prepareStatement("grant resource to ?");
-                stmt.setString(1, schema);
-                stmt.setString(2, schema);
-                stmt.execute();
+                stmt.execute("create user " + escapedSchema + " identified by " + escapedSchema);
+                stmt.execute("grant resource to " + escapedSchema);
             } else if (DatabaseProduct.DERBY == databaseProduct) {
-                stmt = connection.prepareStatement("CREATE SCHEMA ?");
-                stmt.setString(1, schema);
-                stmt.execute();
+                stmt.execute("CREATE SCHEMA " + escapedSchema);
             } else if (DatabaseProduct.HSQLDB == databaseProduct) {
-                stmt = connection.prepareStatement("CREATE SCHEMA ? AUTHORIZATION DBA");
-                stmt.setString(1, schema);
-                stmt.execute();
+                stmt.execute("CREATE SCHEMA " + escapedSchema + " AUTHORIZATION DBA");
             } else if (DatabaseProduct.DB2 == databaseProduct) {
-                stmt = connection.prepareStatement("CREATE SCHEMA ?");
-                stmt.setString(1, schema);
-                stmt.execute();
+                stmt.execute("CREATE SCHEMA " + escapedSchema);
             } else if (DatabaseProduct.MYSQL == databaseProduct) {
                 // TODO: find a proper java lib to convert from java encoding to mysql charset name and collation
                 if (context.getWiki().getEncoding().equals("UTF-8")) {
-                    stmt = connection.prepareStatement("create database ? CHARACTER SET utf8 COLLATE utf8_bin");
+                    stmt.execute("create database " + escapedSchema + " CHARACTER SET utf8 COLLATE utf8_bin");
                 } else {
-                    stmt = connection.prepareStatement("create database ?");
+                    stmt.execute("create database " + escapedSchema);
                 }
-                stmt.setString(1, schema);
-                stmt.execute();
             } else {
-                stmt = connection.prepareStatement("create database ?");
-                stmt.setString(1, schema);
-                stmt.execute();
+                stmt.execute("create database " + escapedSchema);
             }
 
             endTransaction(context, true);
@@ -347,29 +330,28 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
     {
         boolean bTransaction = true;
         String database = context.getDatabase();
-        PreparedStatement stmt = null;
+        Statement stmt = null;
         try {
             bTransaction = beginTransaction(context);
             Session session = getSession(context);
             Connection connection = session.connection();
+            stmt = connection.createStatement();
 
             String schema = getSchemaFromWikiName(wikiName, context);
+            String escapedSchema = escapeSchema(schema, context);
 
             DatabaseProduct databaseProduct = getDatabaseProductName(context);
             if (DatabaseProduct.ORACLE == databaseProduct) {
-                stmt = connection.prepareStatement("DROP USER ? CASCADE");
+                stmt.execute("DROP USER " + escapedSchema + " CASCADE");
             } else if (DatabaseProduct.DERBY == databaseProduct) {
-                stmt = connection.prepareStatement("DROP SCHEMA ?");
+                stmt.execute("DROP SCHEMA " + escapedSchema);
             } else if (DatabaseProduct.HSQLDB == databaseProduct) {
-                stmt = connection.prepareStatement("DROP SCHEMA ?");
+                stmt.execute("DROP SCHEMA " + escapedSchema);
             } else if (DatabaseProduct.DB2 == databaseProduct) {
-                stmt = connection.prepareStatement("DROP SCHEMA ? RESTRICT");
-            } else {
-                stmt = connection.prepareStatement("DROP DATABASE ?");
+                stmt.execute("DROP SCHEMA " + escapedSchema + " RESTRICT");
+            } else if (DatabaseProduct.MYSQL == databaseProduct) {
+                stmt.execute("DROP DATABASE " + escapedSchema);
             }
-
-            stmt.setString(1, schema);
-            stmt.execute();
 
             endTransaction(context, true);
         } catch (Exception e) {

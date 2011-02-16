@@ -51,7 +51,9 @@ public class StandardXWikiURLFactoryTest extends AbstractComponentTestCase
 {
     private XWikiURLFactory factory;
 
-    private HostResolver mockHostResolver;
+    private HostResolver mockPathBasedHostResolver;
+
+    private HostResolver mockDomainHostResolver;
 
     private StandardURLConfiguration mockConfiguration;
 
@@ -59,7 +61,8 @@ public class StandardXWikiURLFactoryTest extends AbstractComponentTestCase
     protected void registerComponents() throws Exception
     {
         this.mockConfiguration = registerMockComponent(StandardURLConfiguration.class);
-        this.mockHostResolver = registerMockComponent(HostResolver.class);
+        this.mockPathBasedHostResolver = registerMockComponent(HostResolver.class, "path", "path");
+        this.mockDomainHostResolver = registerMockComponent(HostResolver.class, "domain", "domain");
 
         this.factory = getComponentManager().lookup(XWikiURLFactory.class, "standard");
     }
@@ -158,7 +161,9 @@ public class StandardXWikiURLFactoryTest extends AbstractComponentTestCase
         throws Exception
     {
         getMockery().checking(new Expectations() {{
-            allowing(mockHostResolver).resolve(expectedHost);
+            allowing(mockDomainHostResolver).resolve(expectedHost);
+                will(returnValue(new WikiReference("Wiki")));
+            allowing(mockPathBasedHostResolver).resolve(expectedHost);
                 will(returnValue(new WikiReference("Wiki")));
             allowing(mockConfiguration).isPathBasedMultiWiki();
                 will(returnValue(!isDomainBasedWikiFormat));

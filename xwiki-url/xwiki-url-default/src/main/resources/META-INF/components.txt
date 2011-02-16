@@ -4,3 +4,5 @@ org.xwiki.url.internal.standard.URLXWikiURLSerializer
 org.xwiki.url.internal.standard.StandardXWikiURLFactory
 org.xwiki.url.internal.standard.DefaultStandardURLConfiguration
 org.xwiki.url.internal.standard.EntityXWikiURLBuilder
+org.xwiki.url.internal.standard.DomainHostResolver
+org.xwiki.url.internal.standard.PathBasedHostResolver

@@ -50,47 +50,80 @@ public class DefaultContainer implements Container
 
     public void pushRequest(Request request)
     {
-        this.request.get().push(request);
+        Stack<Request> requests = this.request.get();
+        if (requests != null) {
+            requests.push(request);
+        }
     }
     
     public void popRequest()
     {
-        this.request.get().pop();
+        Stack<Request> requests = this.request.get();
+        if (requests != null) {
+            requests.pop();
+        }
     }
     
     public Request getRequest()
     {
-        return this.request.get().peek();
+        Request result = null;
+        Stack<Request> requests = this.request.get();
+        if (requests != null) {
+            result = requests.peek();
+        }
+        return result;
     }
 
     public Response getResponse()
     {
-        return this.response.get().peek();
+        Response result = null;
+        Stack<Response> responses = this.response.get();
+        if (responses != null) {
+            result = responses.peek();
+        }
+        return result;
     }
 
     public void pushResponse(Response response)
     {
-        this.response.get().push(response);
+        Stack<Response> responses = this.response.get();
+        if (responses != null) {
+            responses.push(response);
+        }
     }
     
     public void popResponse()
     {
-        this.response.get().pop();
+        Stack<Response> responses = this.response.get();
+        if (responses != null) {
+            responses.pop();
+        }
     }
 
     public Session getSession()
     {
-        return this.session.get().peek();
+        Session result = null;
+        Stack<Session> sessions = this.session.get();
+        if (sessions != null) {
+            result = sessions.peek();
+        }
+        return result;
     }
 
     public void pushSession(Session session)
     {
-        this.session.get().push(session);
+        Stack<Session> sessions = this.session.get();
+        if (sessions != null) {
+            sessions.push(session);
+        }
     }
     
     public void popSession()
     {
-        this.session.get().pop();
+        Stack<Session> sessions = this.session.get();
+        if (sessions != null) {
+            sessions.pop();
+        }
     }
 
     public void setApplicationContext(ApplicationContext context)

@@ -27,6 +27,7 @@ import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.Requirement;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.container.Container;
+import org.xwiki.container.Request;
 import org.xwiki.url.XWikiEntityURL;
 import org.xwiki.url.XWikiURL;
 import org.xwiki.url.XWikiURLType;
@@ -46,10 +47,10 @@ public class DefaultActionManager implements ActionManager
     public void handleRequest() throws ActionException
     {
         // Get the action to execute from the request URL
-        XWikiURL requestURL = this.container.getRequest().getURL();
+        XWikiURL requestURL = (XWikiURL) this.container.getRequest().getProperty(Request.XWIKI_URL);
         
         // TODO: We need to handle non document actions too.
-        if (requestURL.getType() == XWikiURLType.ENTITY) {
+        if (requestURL != null && requestURL.getType() == XWikiURLType.ENTITY) {
             String actionName = ((XWikiEntityURL) requestURL).getAction();
             handleRequest(actionName);
         }

@@ -87,13 +87,21 @@ public class AbstractComponentTestCase extends AbstractMockingTestCase
     }
 
     /**
+     * @since 3.0M3
+     */
+    public <T> T registerMockComponent(Class<T> role, String hint, String mockId) throws Exception
+    {
+        DefaultComponentDescriptor<T> descriptor = createComponentDescriptor(role);
+        descriptor.setRoleHint(hint);
+        return registerMockComponent(descriptor, mockId);
+    }
+
+    /**
      * @since 2.4RC1
      */
     public <T> T registerMockComponent(Class<T> role, String hint) throws Exception
     {
-        DefaultComponentDescriptor<T> descriptor = createComponentDescriptor(role);
-        descriptor.setRoleHint(hint);
-        return registerMockComponent(descriptor);
+        return registerMockComponent(role, hint, null);
     }
 
     /**
@@ -109,7 +117,20 @@ public class AbstractComponentTestCase extends AbstractMockingTestCase
      */
     private <T> T registerMockComponent(ComponentDescriptor<T> descriptor) throws Exception
     {
-        T instance = getMockery().mock(descriptor.getRole());
+        return registerMockComponent(descriptor, null);
+    }
+
+    /**
+     * @since 3.0M3
+     */
+    private <T> T registerMockComponent(ComponentDescriptor<T> descriptor, String mockId) throws Exception
+    {
+        T instance;
+        if (mockId != null) {
+            instance = getMockery().mock(descriptor.getRole(), mockId);
+        } else {
+            instance = getMockery().mock(descriptor.getRole());
+        }
         getComponentManager().registerComponent(descriptor, instance);
         return instance;
     }

@@ -63,8 +63,11 @@ public class StandardXWikiURLFactory implements XWikiURLFactory<URL>
     @Requirement
     private StandardURLConfiguration configuration;
 
-    @Requirement
-    private HostResolver hostResolver;
+    @Requirement("path")
+    private HostResolver pathBasedHostResolver;
+
+    @Requirement("domain")
+    private HostResolver domainHostResolver;
 
     @Requirement
     private ComponentManager componentManager;
@@ -208,12 +211,12 @@ public class StandardXWikiURLFactory implements XWikiURLFactory<URL>
      */
     protected WikiReference extractWikiReference(URI uri, URLParsingState state)
     {
-        String host = null;
+        WikiReference wikiReference = null;
         if (this.configuration.isPathBasedMultiWiki()) {
             // If the first path element isn't the value of the wikiPathPrefix configuration value then we fall back
             // to the host name. This also allows the main wiki URL to be domain-based even for a path-based multiwiki.
             if (state.urlSegments.get(0).equalsIgnoreCase(this.configuration.getWikiPathPrefix())) {
-                host = state.urlSegments.get(1);
+                wikiReference = this.pathBasedHostResolver.resolve(state.urlSegments.get(1));
                 // Remove the first 2 segments so that when this method returns the remaining URL segments point to
                 // the next meaningful item to extract, whether the wiki was domain-based or path-based. 
                 state.urlSegments.remove(0);
@@ -222,10 +225,10 @@ public class StandardXWikiURLFactory implements XWikiURLFactory<URL>
                 state.urlType = XWikiURLType.ENTITY;
             }
         }
-        if (host == null) {
-            host = uri.getHost();
+        if (wikiReference == null) {
+            wikiReference = this.domainHostResolver.resolve(uri.getHost());
         }
-        return this.hostResolver.resolve(host);
+        return wikiReference;
     }
 
     protected XWikiURLType getXWikiURLType(String type) throws InvalidURLException

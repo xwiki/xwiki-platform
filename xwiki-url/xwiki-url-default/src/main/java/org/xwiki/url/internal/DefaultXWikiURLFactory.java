@@ -38,7 +38,7 @@ import org.xwiki.url.XWikiURLFactory;
  * @version $Id$
  * @since 3.0M3
  */
-@Component("default")
+@Component
 public class DefaultXWikiURLFactory implements XWikiURLFactory<URL>
 {
     /**

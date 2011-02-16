@@ -206,6 +206,7 @@
                 <exclude>org/xwiki/properties/converter/Converter</exclude>
                 <exclude>org/xwiki/rendering/macro/descriptor/ParameterDescriptor</exclude>
                 <exclude>org/xwiki/rendering/block/Block</exclude>
+                <exclude>org/xwiki/container/Request</exclude>
                 <!-- Changes below are caused by the removal of the FatherBlock interface -->
                 <exclude>org/xwiki/rendering/block/AbstractFatherBlock</exclude>
                 <exclude>org/xwiki/rendering/block/FatherBlock</exclude>

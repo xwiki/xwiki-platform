@@ -19,12 +19,15 @@
  */
 package org.xwiki.url;
 
+import org.xwiki.component.annotation.ComponentRole;
+
 /**
  * Configuration options for the URL module.
  *
  * @version $Id$
  * @since 2.3M1
  */
+@ComponentRole
 public interface URLConfiguration
 {
     /**

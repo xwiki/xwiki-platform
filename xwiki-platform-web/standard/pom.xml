@@ -510,8 +510,8 @@
             <includes>
               <include>resources/js/**.js</include>
               <include>resources/js/**.css</include>
-              <include>resources/uicompontents/**.js</include>
-              <include>resources/uicompontents/**.css</include>
+              <include>resources/uicomponents/**.js</include>
+              <include>resources/uicomponents/**.css</include>
             </includes>
             <excludes>
               <!-- Exclude already minified files -->

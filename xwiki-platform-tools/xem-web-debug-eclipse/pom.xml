@@ -50,13 +50,6 @@
       <version>1.5.8</version>
     </dependency>
     
-    <dependency>
-      <groupId>org.hibernate</groupId>
-      <artifactId>hibernate-validator</artifactId>
-      <version>4.0.2.GA</version>
-      <scope>runtime</scope>
-    </dependency>
-    
     <!-- Databases -->
     <dependency>
       <groupId>mysql</groupId>
@@ -94,12 +87,6 @@
       <groupId>com.xpn.xwiki.platform</groupId>
       <artifactId>xwiki-web-gwt</artifactId>
       <version>${project.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>com.xpn.xwiki.platform</groupId>
-      <artifactId>xwiki-web-gwt-wysiwyg-server</artifactId>
-      <version>${project.version}</version>
-      <type>war</type>
     </dependency>
     <!-- The WebDAV module -->
     <dependency>
@@ -383,7 +370,10 @@
       <version>${platform.activitystream.version}</version>
     </dependency>
 
-    <!-- XEM plugins -->
+    <!--  -->
+    <!-- XWiki Enterprise Manager -->
+    <!--  -->
+
     <dependency>
       <groupId>com.xpn.xwiki.platform.plugins</groupId>
       <artifactId>xwiki-plugin-application-manager</artifactId>

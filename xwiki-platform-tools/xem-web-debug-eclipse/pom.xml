@@ -40,18 +40,13 @@
   </scm>
   <properties>
     <!-- XEM dependencies -->
-    <platform.plugin.applicationmanager.version>1.18-SNAPSHOT</platform.plugin.applicationmanager.version>
+    <platform.plugin.applicationmanager.version>1.19-SNAPSHOT</platform.plugin.applicationmanager.version>
     <platform.plugin.wikimanager.version>1.25-SNAPSHOT</platform.plugin.wikimanager.version>
   </properties>
   <dependencies>
     <dependency>
       <groupId>org.slf4j</groupId>
       <artifactId>slf4j-log4j12</artifactId>
-      <version>1.5.8</version>
-    </dependency>
-     <dependency>
-      <groupId>org.slf4j</groupId>
-      <artifactId>slf4j-api</artifactId>
       <version>1.5.8</version>
     </dependency>
     
@@ -83,8 +78,52 @@
       <artifactId>postgresql</artifactId>
       <version>8.2-504.jdbc3</version>
     </dependency>
-
+    
+    <!--  -->
+    <!-- Web Standard -->
+    <!--  -->
+    
+    <dependency>
+      <groupId>com.xpn.xwiki.platform</groupId>
+      <artifactId>xwiki-core</artifactId>
+      <version>${platform.core.version}</version>
+    </dependency>
+    <!-- Add the GWT JAR so that XWiki Core is GWT-ready and so that the XWiki GWT Servlet can
+         be activated by default in web.xml -->
+    <dependency>
+      <groupId>com.xpn.xwiki.platform</groupId>
+      <artifactId>xwiki-web-gwt</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>com.xpn.xwiki.platform</groupId>
+      <artifactId>xwiki-web-gwt-wysiwyg-server</artifactId>
+      <version>${project.version}</version>
+      <type>war</type>
+    </dependency>
+    <!-- The WebDAV module -->
+    <dependency>
+      <groupId>com.xpn.xwiki.platform</groupId>
+      <artifactId>xwiki-webdav</artifactId>
+      <version>${platform.core.version}</version>
+    </dependency>
+    <!-- The REST module -->
+    <dependency>
+      <groupId>com.xpn.xwiki.platform</groupId>
+      <artifactId>xwiki-rest-server</artifactId>
+      <version>${platform.core.version}</version>
+    </dependency>
     <!-- The annotations modules -->
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-core-annotations-core</artifactId>
+      <version>${platform.core.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-core-annotations-reference</artifactId>
+      <version>${platform.core.version}</version>
+    </dependency>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-core-annotations-io</artifactId>
@@ -105,12 +144,147 @@
       <artifactId>xwiki-core-annotations-velocity</artifactId>
       <version>${platform.core.version}</version>
     </dependency>
-
-    <!-- Needed for Web -->
+    <!-- Default macros dependencies, so that they are packed in the war
+         Please try to keep them in alphabetical order -->    
+   <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-core-rendering-macro-box</artifactId>
+      <version>${project.version}</version>
+      <!-- Only needed at runtime since it's a component implementation -->
+      <scope>runtime</scope>
+    </dependency>
     <dependency>
-      <groupId>com.xpn.xwiki.platform</groupId>
-      <artifactId>xwiki-core</artifactId>
-      <version>${platform.core.version}</version>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-core-rendering-macro-chart</artifactId>
+      <version>${project.version}</version>
+      <!-- Only needed at runtime since it's a component implementation -->
+      <scope>runtime</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-core-rendering-macro-code</artifactId>
+      <version>${project.version}</version>
+      <!-- Only needed at runtime since it's a component implementation -->
+      <scope>runtime</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-core-rendering-macro-container</artifactId>
+      <version>${project.version}</version>
+      <!-- Only needed at runtime since it's a component implementation -->
+      <scope>runtime</scope>
+    </dependency>    
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-core-rendering-macro-dashboard</artifactId>
+      <version>${project.version}</version>
+      <!-- Only needed at runtime since it's a component implementation -->
+      <scope>runtime</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-core-rendering-macro-footnotes</artifactId>
+      <version>${project.version}</version>
+      <!-- Only needed at runtime since it's a component implementation -->
+      <scope>runtime</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-core-rendering-macro-formula</artifactId>
+      <version>${project.version}</version>
+      <!-- Only needed at runtime since it's a component implementation -->
+      <scope>runtime</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-core-rendering-macro-groovy</artifactId>
+      <version>${project.version}</version>
+      <!-- Only needed at runtime since it's a component implementation -->
+      <scope>runtime</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-core-rendering-macro-python</artifactId>
+      <version>${project.version}</version>
+      <!-- Only needed at runtime since it's a component implementation -->
+      <scope>runtime</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-core-rendering-macro-html</artifactId>
+      <version>${project.version}</version>
+      <!-- Only needed at runtime since it's a component implementation -->
+      <scope>runtime</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-core-rendering-macro-id</artifactId>
+      <version>${project.version}</version>
+      <!-- Only needed at runtime since it's a component implementation -->
+      <scope>runtime</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-core-rendering-macro-include</artifactId>
+      <version>${project.version}</version>
+      <!-- Only needed at runtime since it's a component implementation -->
+      <scope>runtime</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-core-rendering-macro-message</artifactId>
+      <version>${project.version}</version>
+      <!-- Only needed at runtime since it's a component implementation -->
+      <scope>runtime</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-core-rendering-macro-rss</artifactId>
+      <version>${project.version}</version>
+      <!-- Only needed at runtime since it's a component implementation -->
+      <scope>runtime</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-core-rendering-macro-toc</artifactId>
+      <version>${project.version}</version>
+      <!-- Only needed at runtime since it's a component implementation -->
+      <scope>runtime</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-core-rendering-macro-useravatar</artifactId>
+      <version>${project.version}</version>
+      <!-- Only needed at runtime since it's a component implementation -->
+      <scope>runtime</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-core-rendering-macro-velocity</artifactId>
+      <version>${project.version}</version>
+      <!-- Only needed at runtime since it's a component implementation -->
+      <scope>runtime</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-core-office-viewer</artifactId>
+      <version>${project.version}</version>
+      <scope>runtime</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-core-office-macro</artifactId>
+      <version>${project.version}</version>
+      <scope>runtime</scope>
+    </dependency>
+    <!-- needed for JSR 303 (Bean Validation) clients such as xwiki-core properties. 
+         It is just one JSR 303 implements among others so it's distribution decision to choose this one.
+         Note that hibernate-validator depends on Java 6 since 4.1 branch.
+    -->
+    <dependency>
+      <groupId>org.hibernate</groupId>
+      <artifactId>hibernate-validator</artifactId>
+      <version>4.0.2.GA</version>
     </dependency>
     <!-- Captcha component -->
     <dependency>
@@ -136,8 +310,17 @@
       <artifactId>xwiki-core-extension-handler-jar</artifactId>
       <version>${platform.core.version}</version>
     </dependency>
+    <!-- Legacy / Backward compatibility -->
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-core-legacy</artifactId>
+      <version>${platform.core.version}</version>
+    </dependency>
 
-    <!-- Needed for GWT/WYSIWYG -->
+    <!--  -->
+    <!-- WYSIWYG -->
+    <!--  -->
+
     <dependency>
       <groupId>com.xpn.xwiki.platform</groupId>
       <artifactId>xwiki-web-gwt</artifactId>
@@ -149,27 +332,10 @@
       <version>${project.version}</version>
     </dependency>
 
-    <!-- The WebDAV module -->
-    <dependency>
-      <groupId>com.xpn.xwiki.platform</groupId>
-      <artifactId>xwiki-webdav</artifactId>
-      <version>${platform.core.version}</version>
-    </dependency>
-    <!-- The REST module -->
-    <dependency>
-      <groupId>com.xpn.xwiki.platform</groupId>
-      <artifactId>xwiki-rest-server</artifactId>
-      <version>${platform.core.version}</version>
-    </dependency>
+    <!--  -->
+    <!-- XWiki Enterprise -->
+    <!--  -->
 
-    <!-- Deprecated APIs -->
-    <dependency>
-      <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-core-legacy</artifactId>
-      <version>${platform.core.version}</version>
-    </dependency>
-
-    <!-- XE plugins -->
     <dependency>
       <groupId>com.xpn.xwiki.platform.plugins</groupId>
       <artifactId>xwiki-plugin-watchlist</artifactId>

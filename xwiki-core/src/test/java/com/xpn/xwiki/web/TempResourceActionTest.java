@@ -29,6 +29,8 @@ import org.junit.Before;
 import org.junit.Test;
 import org.xwiki.container.ApplicationContext;
 import org.xwiki.container.Container;
+import org.xwiki.context.ExecutionContext;
+import org.xwiki.context.ExecutionContextManager;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.test.AbstractBridgedComponentTestCase;
@@ -62,10 +64,13 @@ public class TempResourceActionTest extends AbstractBridgedComponentTestCase
 
         final Container mockContainer = registerMockComponent(Container.class);
         final ApplicationContext mockAppContext = registerMockComponent(ApplicationContext.class);
+        final ExecutionContextManager mockExecutionContextManager =
+            registerMockComponent(ExecutionContextManager.class);
 
         getMockery().checking(new Expectations()
         {
             {
+                allowing(mockExecutionContextManager).initialize(with(any(ExecutionContext.class)));
                 ignoring(mockContainer).setApplicationContext(with(any(ApplicationContext.class)));
                 allowing(mockContainer).getApplicationContext();
                 will(returnValue(mockAppContext));

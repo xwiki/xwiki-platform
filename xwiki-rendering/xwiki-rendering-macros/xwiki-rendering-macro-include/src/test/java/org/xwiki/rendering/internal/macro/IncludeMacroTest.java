@@ -239,6 +239,68 @@ public class IncludeMacroTest extends AbstractComponentTestCase
         assertBlocks(expected, blocks, this.rendererFactory);
     }
 
+    @Test
+    public void testIncludeMacroWhenSectionSpecified() throws Exception
+    {
+        String expected = "beginDocument\n"
+            + "beginMetaData [[source]=[document]]\n"
+            + "beginHeader [1, Hsection]\n"
+            + "onWord [section]\n"
+            + "endHeader [1, Hsection]\n"
+            + "beginParagraph\n"
+            + "onWord [content2]\n"
+            + "endParagraph\n"
+            + "endMetaData [[source]=[document]]\n"
+            + "endDocument";
+
+        IncludeMacroParameters parameters = new IncludeMacroParameters();
+        parameters.setDocument("document");
+        parameters.setSection("Hsection");
+
+        final DocumentReference resolvedReference = new DocumentReference("wiki", "space", "document");
+        final DocumentModelBridge mockDocument = getMockery().mock(DocumentModelBridge.class);
+        getMockery().checking(new Expectations() {{
+            oneOf(mockSetup.documentReferenceResolver).resolve("document");
+                will(returnValue(resolvedReference));
+            oneOf(mockSetup.bridge).isDocumentViewable(resolvedReference); will(returnValue(true));
+            oneOf(mockSetup.bridge).getDocument(resolvedReference); will(returnValue(mockDocument));
+            oneOf(mockDocument).getSyntax(); will(returnValue(Syntax.XWIKI_2_0));
+            oneOf(mockDocument).getXDOM(); will(returnValue(getXDOM("content1\n\n= section =\ncontent2")));
+        }});
+
+        List<Block> blocks = this.includeMacro.execute(parameters, null,
+            createMacroTransformationContext("whatever", false));
+
+        assertBlocks(expected, blocks, this.rendererFactory);
+    }
+
+    @Test
+    public void testIncludeMacroWhenInvalidSectionSpecified() throws Exception
+    {
+        IncludeMacroParameters parameters = new IncludeMacroParameters();
+        parameters.setDocument("document");
+        parameters.setSection("unknown");
+
+        final DocumentReference resolvedReference = new DocumentReference("wiki", "space", "document");
+        final DocumentModelBridge mockDocument = getMockery().mock(DocumentModelBridge.class);
+        getMockery().checking(new Expectations() {{
+            oneOf(mockSetup.documentReferenceResolver).resolve("document");
+                will(returnValue(resolvedReference));
+            oneOf(mockSetup.bridge).isDocumentViewable(resolvedReference); will(returnValue(true));
+            oneOf(mockSetup.bridge).getDocument(resolvedReference); will(returnValue(mockDocument));
+            oneOf(mockDocument).getSyntax(); will(returnValue(Syntax.XWIKI_2_0));
+            oneOf(mockDocument).getXDOM(); will(returnValue(getXDOM("content")));
+        }});
+
+        try {
+            this.includeMacro.execute(parameters, null, createMacroTransformationContext("whatever", false));
+            Assert.fail("Should have raised an exception");
+        } catch (MacroExecutionException expected) {
+            Assert.assertEquals("Cannot find section [unknown] in document [wiki:space.document]",
+                expected.getMessage());
+        }
+    }
+
     private MacroTransformationContext createMacroTransformationContext(String documentName, boolean isInline)
     {
         MacroTransformationContext context = new MacroTransformationContext();

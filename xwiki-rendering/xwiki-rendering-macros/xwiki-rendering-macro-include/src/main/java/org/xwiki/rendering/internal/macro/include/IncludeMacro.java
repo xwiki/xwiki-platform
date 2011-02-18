@@ -36,9 +36,11 @@ import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.rendering.block.Block;
+import org.xwiki.rendering.block.HeaderBlock;
 import org.xwiki.rendering.block.MacroMarkerBlock;
 import org.xwiki.rendering.block.MetaDataBlock;
 import org.xwiki.rendering.block.XDOM;
+import org.xwiki.rendering.block.match.BlockMatcher;
 import org.xwiki.rendering.internal.macro.MacroContentParser;
 import org.xwiki.rendering.listener.MetaData;
 import org.xwiki.rendering.macro.AbstractMacro;
@@ -142,8 +144,8 @@ public class IncludeMacro extends AbstractMacro<IncludeMacroParameters>
      * 
      * @see org.xwiki.rendering.macro.Macro#execute(Object, String, MacroTransformationContext)
      */
-    public List<Block> execute(IncludeMacroParameters parameters, String content, MacroTransformationContext context)
-        throws MacroExecutionException
+    public List<Block> execute(IncludeMacroParameters parameters, String content,
+        MacroTransformationContext context) throws MacroExecutionException
     {
         // Step 1: Perform checks
         if (parameters.getDocument() == null) {
@@ -171,7 +173,7 @@ public class IncludeMacro extends AbstractMacro<IncludeMacroParameters>
                 + this.defaultEntityReferenceSerializer.serialize(includedReference) + "]", e);
         }
         Syntax includedSyntax = documentBridge.getSyntax();
-        XDOM includedContent = documentBridge.getXDOM();
+        XDOM includedContent = getContent(documentBridge, parameters.getSection(), includedReference);
 
         // Step 3: Parse and transform the included document's content.
 
@@ -203,6 +205,35 @@ public class IncludeMacro extends AbstractMacro<IncludeMacroParameters>
         result = Arrays.asList((Block) new MetaDataBlock(result, MetaData.SOURCE, parameters.getDocument()));
 
         return result;
+    }
+
+    private XDOM getContent(DocumentModelBridge document, final String section, DocumentReference includedReference)
+        throws MacroExecutionException
+    {
+        XDOM includedContent = document.getXDOM();
+
+        if (section != null) {
+            HeaderBlock headerBlock = (HeaderBlock) includedContent.getFirstBlock(new BlockMatcher() {
+                public boolean match(Block block)
+                {
+                    if (block instanceof HeaderBlock) {
+                        HeaderBlock headerBlock = (HeaderBlock) block;
+                        if (headerBlock.getId().equals(section)) {
+                            return true;
+                        }
+                    }
+                    return false;
+                }
+            }, Block.Axes.DESCENDANT);
+            if (headerBlock == null) {
+                throw new MacroExecutionException("Cannot find section [" + section
+                    + "] in document [" + this.defaultEntityReferenceSerializer.serialize(includedReference) + "]");
+            } else {
+                includedContent = new XDOM(headerBlock.getSection().getChildren());
+            }
+        }
+
+        return includedContent;
     }
 
     /**

@@ -58,6 +58,11 @@ public class IncludeMacroParameters
     private Context context = Context.CURRENT;
 
     /**
+     * @see #getSection()
+     */
+    private String section;
+
+    /**
      * @param document the name of the document to include.
      */
     @PropertyMandatory
@@ -93,5 +98,23 @@ public class IncludeMacroParameters
     public Context getContext()
     {
         return this.context;
+    }
+
+    /**
+     * @param sectionId see {@link #getSection()}
+     */
+    @PropertyDescription("an optional id of a section to include in the specified document")
+    public void setSection(String sectionId)
+    {
+        this.section = sectionId;
+    }
+
+    /**
+     * @return the optional id of a section to include in the referenced document. If not specified the whole document
+     *         is included.
+     */
+    public String getSection()
+    {
+        return this.section;
     }
 }

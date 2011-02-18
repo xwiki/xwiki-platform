@@ -20,6 +20,7 @@
 package org.xwiki.rendering;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Map;
 
 import junit.framework.Test;
@@ -33,7 +34,7 @@ import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.block.WordBlock;
 import org.xwiki.rendering.macro.dashboard.Gadget;
-import org.xwiki.rendering.macro.dashboard.GadgetReader;
+import org.xwiki.rendering.macro.dashboard.GadgetSource;
 import org.xwiki.rendering.scaffolding.RenderingTestSuite;
 import org.xwiki.rendering.transformation.MacroTransformationContext;
 import org.xwiki.skinx.SkinExtension;
@@ -88,18 +89,21 @@ public class RenderingTests extends TestCase
         jsfxDesc.setRoleHint("jsfx");
         componentManager.registerComponent(jsfxDesc, mockJsfx);
 
-        final GadgetReader mockGadgetReader = mockery.mock(GadgetReader.class);
+        final GadgetSource mockGadgetSource = mockery.mock(GadgetSource.class);
         mockery.checking(new Expectations()
         {
             {
-                allowing(mockGadgetReader).getGadgets(with(any(String.class)),
+                allowing(mockGadgetSource).getGadgets(with(any(String.class)),
                     with(any(MacroTransformationContext.class)));
                 will(returnValue(Arrays.asList(new Gadget("0", Arrays.<Block> asList(new WordBlock("title")), Arrays
                     .<Block> asList(new WordBlock("content")), "1,1"))));
+                allowing(mockGadgetSource).getDashboardSourceMetadata(with(any(String.class)),
+                    with(any(MacroTransformationContext.class)));
+                will(returnValue(Collections.<Block> emptyList()));
             }
         });
-        DefaultComponentDescriptor<GadgetReader> descriptorGR = new DefaultComponentDescriptor<GadgetReader>();
-        descriptorGR.setRole(GadgetReader.class);
-        componentManager.registerComponent(descriptorGR, mockGadgetReader);
+        DefaultComponentDescriptor<GadgetSource> descriptorGR = new DefaultComponentDescriptor<GadgetSource>();
+        descriptorGR.setRole(GadgetSource.class);
+        componentManager.registerComponent(descriptorGR, mockGadgetSource);
     }
 }

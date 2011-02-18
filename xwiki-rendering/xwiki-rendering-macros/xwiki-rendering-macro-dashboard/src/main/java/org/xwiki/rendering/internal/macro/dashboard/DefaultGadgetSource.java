@@ -22,6 +22,7 @@ package org.xwiki.rendering.internal.macro.dashboard;
 import java.io.StringReader;
 import java.io.StringWriter;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import org.apache.commons.lang.StringUtils;
@@ -35,9 +36,14 @@ import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.rendering.block.Block;
+import org.xwiki.rendering.block.GroupBlock;
+import org.xwiki.rendering.block.LinkBlock;
+import org.xwiki.rendering.block.WordBlock;
 import org.xwiki.rendering.block.XDOM;
+import org.xwiki.rendering.listener.reference.ResourceReference;
+import org.xwiki.rendering.listener.reference.ResourceType;
 import org.xwiki.rendering.macro.dashboard.Gadget;
-import org.xwiki.rendering.macro.dashboard.GadgetReader;
+import org.xwiki.rendering.macro.dashboard.GadgetSource;
 import org.xwiki.rendering.parser.Parser;
 import org.xwiki.rendering.syntax.Syntax;
 import org.xwiki.rendering.transformation.MacroTransformationContext;
@@ -57,7 +63,7 @@ import com.xpn.xwiki.objects.BaseObject;
  * @since 3.0M3
  */
 @Component
-public class DefaultGadgetReader implements GadgetReader
+public class DefaultGadgetSource implements GadgetSource
 {
     /**
      * The reference to the gadgets class, relative to the current wiki. <br />
@@ -100,7 +106,7 @@ public class DefaultGadgetReader implements GadgetReader
     /**
      * {@inheritDoc}
      * 
-     * @see org.xwiki.rendering.macro.dashboard.GadgetReader #getGadgets(String, MacroTransformationContext)
+     * @see org.xwiki.rendering.macro.dashboard.GadgetSource #getGadgets(String, MacroTransformationContext)
      */
     public List<Gadget> getGadgets(String source, MacroTransformationContext context) throws Exception
     {
@@ -208,5 +214,58 @@ public class DefaultGadgetReader implements GadgetReader
     private XWikiContext getXWikiContext()
     {
         return (XWikiContext) execution.getContext().getProperty("xwikicontext");
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see org.xwiki.rendering.macro.dashboard.GadgetSource#getDashboardSourceMetadata(java.lang.String,
+     *      org.xwiki.rendering.transformation.MacroTransformationContext)
+     */
+    public List<Block> getDashboardSourceMetadata(String source, MacroTransformationContext context)
+    {
+        DocumentReference sourceDoc = getSourceDocumentReference(source);
+        String classParameterName = "class";
+        GroupBlock metadataContainer = new GroupBlock();
+        metadataContainer.setParameter(classParameterName, DashboardMacro.METADATA);
+
+        // generate anchors for the urls
+        XWikiContext xContext = getXWikiContext();
+        String editURL = xContext.getWiki().getURL(sourceDoc, "save", "", "", xContext);
+        LinkBlock editURLBlock =
+            new LinkBlock(Collections.<Block> emptyList(), new ResourceReference(editURL, ResourceType.URL), false);
+        editURLBlock.setParameter(classParameterName, DashboardMacro.EDIT_URL);
+        metadataContainer.addChild(editURLBlock);
+        String removeURL = xContext.getWiki().getURL(sourceDoc, "objectremove", "", "", xContext);
+        LinkBlock removeURLBlock =
+            new LinkBlock(Collections.<Block> emptyList(), new ResourceReference(removeURL, ResourceType.URL), false);
+        removeURLBlock.setParameter(classParameterName, DashboardMacro.REMOVE_URL);
+        metadataContainer.addChild(removeURLBlock);
+        String addURL = xContext.getWiki().getURL(sourceDoc, "objectadd", "", "", xContext);
+        LinkBlock addURLBlock =
+            new LinkBlock(Collections.<Block> emptyList(), new ResourceReference(addURL, ResourceType.URL), false);
+        addURLBlock.setParameter(classParameterName, DashboardMacro.ADD_URL);
+        metadataContainer.addChild(addURLBlock);
+
+        // and create divs for the source metadata
+        GroupBlock sourcePageBlock = new GroupBlock();
+        sourcePageBlock.addChild(new WordBlock(sourceDoc.getName()));
+        sourcePageBlock.setParameter(classParameterName, DashboardMacro.SOURCE_PAGE);
+        metadataContainer.addChild(sourcePageBlock);
+        GroupBlock sourceSpaceBlock = new GroupBlock();
+        sourceSpaceBlock.addChild(new WordBlock(sourceDoc.getSpaceReferences().get(0).getName()));
+        sourceSpaceBlock.setParameter(classParameterName, DashboardMacro.SOURCE_SPACE);
+        metadataContainer.addChild(sourceSpaceBlock);
+        GroupBlock sourceWikiBlock = new GroupBlock();
+        sourceWikiBlock.addChild(new WordBlock(sourceDoc.getWikiReference().getName()));
+        sourceWikiBlock.setParameter(classParameterName, DashboardMacro.SOURCE_WIKI);
+        metadataContainer.addChild(sourceWikiBlock);
+        String sourceURL = xContext.getWiki().getURL(sourceDoc, "view", "", "", xContext);
+        LinkBlock sourceURLBlock =
+            new LinkBlock(Collections.<Block> emptyList(), new ResourceReference(sourceURL, ResourceType.URL), false);
+        sourceURLBlock.setParameter(classParameterName, DashboardMacro.SOURCE_URL);
+        metadataContainer.addChild(sourceURLBlock);
+
+        return Collections.<Block> singletonList(metadataContainer);
     }
 }

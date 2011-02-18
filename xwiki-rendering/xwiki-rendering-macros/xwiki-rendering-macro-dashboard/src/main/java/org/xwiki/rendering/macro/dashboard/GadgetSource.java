@@ -22,6 +22,7 @@ package org.xwiki.rendering.macro.dashboard;
 import java.util.List;
 
 import org.xwiki.component.annotation.ComponentRole;
+import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.transformation.MacroTransformationContext;
 
 /**
@@ -31,16 +32,29 @@ import org.xwiki.rendering.transformation.MacroTransformationContext;
  * @since 3.0M3
  */
 @ComponentRole
-public interface GadgetReader
+public interface GadgetSource
 {
     /**
      * Reads the gadgets for the passed macro transformation context.
-     *
-     * @param source the source to read dashboard gadgets from (a document serialized reference) 
+     * 
+     * @param source the source to read dashboard gadgets from (a document serialized reference)
      * @param context the dashboard macro transformation context
      * @return the list of gadgets for the currently executing macro
      * @throws Exception in case anything goes wrong reading data, the exception should be translated by the dashboard
      *             macro caller into a macro execution exception
      */
     List<Gadget> getGadgets(String source, MacroTransformationContext context) throws Exception;
+
+    /**
+     * Get the metadata about this dashboard source, such as source document fullname, gadget add url, gadget remove
+     * url, etc, to pass to the client. <br />
+     * TODO: find a better place for this code, ftm it's here because this is the only class that knows about XWiki data
+     * model
+     * 
+     * @param source the source to read dashboard gadgets from (a document serialized reference)
+     * @param context the dashboard macro transformation context
+     * @return a list of blocks that represent the XDOM with the metadata. TODO: might as well be a map of metadata and
+     *         leave the rendering in XDOM to the dashboard macro, but ftm this does the job
+     */
+    List<Block> getDashboardSourceMetadata(String source, MacroTransformationContext context);
 }

@@ -43,7 +43,7 @@
         <artifactId>maven-checkstyle-plugin</artifactId>
         <configuration>
           <excludes>
-            org/xwiki/rendering/internal/macro/dashboard/DefaultGadgetReader.java
+            org/xwiki/rendering/internal/macro/dashboard/DefaultGadgetSource.java
           </excludes>
         </configuration>
       </plugin>

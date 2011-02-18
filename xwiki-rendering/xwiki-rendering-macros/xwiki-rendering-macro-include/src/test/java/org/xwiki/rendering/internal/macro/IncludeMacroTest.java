@@ -19,6 +19,7 @@
  */
 package org.xwiki.rendering.internal.macro;
 
+import java.io.StringReader;
 import java.io.StringWriter;
 import java.util.Collections;
 import java.util.List;
@@ -29,12 +30,12 @@ import junit.framework.Assert;
 import org.jmock.Expectations;
 import org.junit.Test;
 import org.xwiki.bridge.DocumentModelBridge;
-import org.xwiki.model.reference.AttachmentReference;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.block.MacroBlock;
 import org.xwiki.rendering.block.MacroMarkerBlock;
 import org.xwiki.rendering.block.MetaDataBlock;
+import org.xwiki.rendering.block.XDOM;
 import org.xwiki.rendering.internal.macro.include.IncludeMacro;
 import org.xwiki.rendering.internal.transformation.macro.MacroTransformation;
 import org.xwiki.rendering.listener.MetaData;
@@ -43,6 +44,7 @@ import org.xwiki.rendering.macro.MacroExecutionException;
 import org.xwiki.rendering.macro.include.IncludeMacroParameters;
 import org.xwiki.rendering.macro.include.IncludeMacroParameters.Context;
 import org.xwiki.rendering.macro.script.ScriptMockSetup;
+import org.xwiki.rendering.parser.Parser;
 import org.xwiki.rendering.renderer.PrintRendererFactory;
 import org.xwiki.rendering.syntax.Syntax;
 import org.xwiki.rendering.transformation.MacroTransformationContext;
@@ -228,7 +230,7 @@ public class IncludeMacroTest extends AbstractComponentTestCase
                 will(returnValue(resolvedReference));
             oneOf(mockSetup.bridge).isDocumentViewable(resolvedReference); will(returnValue(true));
             oneOf(mockSetup.bridge).getDocument(resolvedReference); will(returnValue(mockDocument));
-            oneOf(mockDocument).getContent(); will(returnValue("content"));
+            oneOf(mockDocument).getXDOM(); will(returnValue(getXDOM("content")));
             oneOf(mockDocument).getSyntax(); will(returnValue(Syntax.XWIKI_2_0));
         }});
 
@@ -255,8 +257,13 @@ public class IncludeMacroTest extends AbstractComponentTestCase
                 will(returnValue(reference));
             allowing(mockSetup.bridge).getDocument(reference); will(returnValue(mockDocument));
             allowing(mockDocument).getSyntax(); will(returnValue(Syntax.XWIKI_2_0));
-            allowing(mockDocument).getContent(); will(returnValue(content));
+            allowing(mockDocument).getXDOM(); will(returnValue(getXDOM(content)));
         }});
+    }
+
+    private XDOM getXDOM(String content) throws Exception
+    {
+        return getComponentManager().lookup(Parser.class, "xwiki/2.0").parse(new StringReader(content));
     }
 
     private List<Block> runIncludeMacroWithPreVelocity(Context context, String velocity, String includedContent)

@@ -20,6 +20,7 @@
 package org.xwiki.bridge;
 
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.rendering.block.XDOM;
 import org.xwiki.rendering.syntax.Syntax;
 
 /**
@@ -123,4 +124,10 @@ public interface DocumentModelBridge
      * @return a string identifying the current version of this document
      */
     String getVersion();
+
+    /**
+     * @return the XDOM for the document
+     * @since 3.0M3
+     */
+    XDOM getXDOM();
 }

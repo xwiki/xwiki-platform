@@ -38,6 +38,7 @@ import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.block.MacroMarkerBlock;
 import org.xwiki.rendering.block.MetaDataBlock;
+import org.xwiki.rendering.block.XDOM;
 import org.xwiki.rendering.internal.macro.MacroContentParser;
 import org.xwiki.rendering.listener.MetaData;
 import org.xwiki.rendering.macro.AbstractMacro;
@@ -46,6 +47,7 @@ import org.xwiki.rendering.macro.include.IncludeMacroParameters;
 import org.xwiki.rendering.macro.include.IncludeMacroParameters.Context;
 import org.xwiki.rendering.syntax.Syntax;
 import org.xwiki.rendering.transformation.MacroTransformationContext;
+import org.xwiki.rendering.transformation.TransformationContext;
 
 /**
  * @version $Id$
@@ -168,8 +170,8 @@ public class IncludeMacro extends AbstractMacro<IncludeMacroParameters>
             throw new MacroExecutionException("Failed to load Document ["
                 + this.defaultEntityReferenceSerializer.serialize(includedReference) + "]", e);
         }
-        String includedContent = documentBridge.getContent();
         Syntax includedSyntax = documentBridge.getSyntax();
+        XDOM includedContent = documentBridge.getXDOM();
 
         // Step 3: Parse and transform the included document's content.
 
@@ -285,7 +287,7 @@ public class IncludeMacro extends AbstractMacro<IncludeMacroParameters>
      * @return the result of parsing and transformation of the document to include.
      * @throws MacroExecutionException error when parsing content.
      */
-    private List<Block> executeWithNewContext(DocumentReference includedDocumentReference, String includedContent,
+    private List<Block> executeWithNewContext(DocumentReference includedDocumentReference, XDOM includedContent,
         MacroTransformationContext macroContext) throws MacroExecutionException
     {
         List<Block> result;
@@ -324,7 +326,7 @@ public class IncludeMacro extends AbstractMacro<IncludeMacroParameters>
      * @return the result of parsing and transformation of the document to include.
      * @throws MacroExecutionException error when parsing content.
      */
-    private List<Block> executeWithCurrentContext(DocumentReference includedDocumentReference, String includedContent,
+    private List<Block> executeWithCurrentContext(DocumentReference includedDocumentReference, XDOM includedContent,
         MacroTransformationContext macroContext) throws MacroExecutionException
     {
         return generateIncludedPageDOM(includedDocumentReference, includedContent, macroContext, false);
@@ -340,19 +342,25 @@ public class IncludeMacro extends AbstractMacro<IncludeMacroParameters>
      * @return the result of parsing and transformation of the document to include.
      * @throws MacroExecutionException error when parsing content.
      */
-    private List<Block> generateIncludedPageDOM(DocumentReference includedDocumentReference, String includedContent,
+    private List<Block> generateIncludedPageDOM(DocumentReference includedDocumentReference, XDOM includedContent,
         MacroTransformationContext macroContext, boolean transform) throws MacroExecutionException
     {
         List<Block> result;
-        try {
 
-            // Only run Macro transformation when the context is a new one as otherwise we need the macros in the
-            // included page to be added to the list of macros on the including page so that they're all sorted
-            // and executed in the right order. Note that this works only because the Include macro has the highest
-            // execution priority and is thus executed first.
-            result = this.contentParser.parse(includedContent, macroContext, transform, false);
-        } catch (Exception e) {
-            throw new MacroExecutionException("Failed to parse included page [" + includedDocumentReference + "]", e);
+        if (transform && macroContext.getTransformation() != null) {
+            // Make sure we clone the XDOM since the transformation is going to modify it and we don't want the
+            // original XDOM to carry away the changes.
+            XDOM clonedContent = includedContent.clone();
+            TransformationContext txContext = new TransformationContext(clonedContent, macroContext.getSyntax());
+            txContext.setId(macroContext.getId());
+            try {
+                macroContext.getTransformation().transform(clonedContent, txContext);
+            } catch (Exception e) {
+                throw new MacroExecutionException("Failed to include page [" + includedDocumentReference + "]", e);
+            }
+            result = clonedContent.getChildren();
+        } else {
+            result = includedContent.getChildren();
         }
 
         return result;

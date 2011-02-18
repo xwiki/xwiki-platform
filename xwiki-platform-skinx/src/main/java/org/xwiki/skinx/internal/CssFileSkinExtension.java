@@ -28,22 +28,7 @@ import org.xwiki.skinx.AbstractWrapperSkinExtension;
  * @version $Id$
  * @since 1.20
  */
-@Component(CssFileSkinExtension.NAME)
+@Component("ssfx")
 public class CssFileSkinExtension extends AbstractWrapperSkinExtension
 {
-    /**
-     * The name of this extension.
-     */
-    static final String NAME = "ssfx";
-
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.skinx.AbstractWrapperSkinExtension#getName()
-     */
-    @Override
-    public String getName()
-    {
-        return NAME;
-    }
 }

@@ -28,22 +28,7 @@ import org.xwiki.skinx.AbstractWrapperSkinExtension;
  * @version $Id$
  * @since 1.20
  */
-@Component(CssDocumentSkinExtension.NAME)
+@Component("ssx")
 public class CssDocumentSkinExtension extends AbstractWrapperSkinExtension
 {
-    /**
-     * The name of this extension.
-     */
-    static final String NAME = "ssx";
-    
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.skinx.AbstractWrapperSkinExtension#getName()
-     */
-    @Override
-    public String getName()
-    {
-        return NAME;
-    }
 }

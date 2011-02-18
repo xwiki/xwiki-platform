@@ -23,27 +23,12 @@ import org.xwiki.component.annotation.Component;
 import org.xwiki.skinx.AbstractWrapperSkinExtension;
 
 /**
- * Skin extension that provides the wrapper on the object Javascript extensions.
+ * Skin extension that provides the wrapper on the object JavaScript extensions.
  * 
  * @version $Id$
  * @since 1.20
  */
-@Component(JsDocumentSkinExtension.NAME)
+@Component("jsx")
 public class JsDocumentSkinExtension extends AbstractWrapperSkinExtension
 {
-    /**
-     * The name of this extension.
-     */
-    static final String NAME = "jsx";
-
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.skinx.AbstractWrapperSkinExtension#getName()
-     */
-    @Override
-    public String getName()
-    {
-        return NAME;
-    }
 }

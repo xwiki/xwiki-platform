@@ -27,8 +27,11 @@ import java.util.List;
 
 import org.junit.Assert;
 import org.junit.Test;
-import org.xwiki.rendering.listener.reference.DocumentResourceReference;
+import org.xwiki.rendering.block.Block.Axes;
+import org.xwiki.rendering.block.match.AnyBlockMatcher;
+import org.xwiki.rendering.block.match.SameBlockMatcher;
 import org.xwiki.rendering.listener.HeaderLevel;
+import org.xwiki.rendering.listener.reference.DocumentResourceReference;
 import org.xwiki.rendering.listener.reference.ResourceReference;
 import org.xwiki.rendering.listener.reference.ResourceType;
 
@@ -220,5 +223,112 @@ public class BlockTest
         Assert.assertEquals(0, p1.getChildren().size());
         Assert.assertNull(b2.getPreviousSibling());
         Assert.assertNull(b2.getNextSibling());
+    }
+
+    @Test
+    public void testGetBlocks()
+    {
+        final WordBlock precedingBlockChild1 = new WordBlock("pc1");
+        final WordBlock precedingBlockChild2 = new WordBlock("pc2");
+        final ParagraphBlock precedingBlock = new ParagraphBlock(Arrays.<Block> asList(precedingBlockChild1, precedingBlockChild2))
+            {public String toString(){return "precedingBlock";}};
+
+        final WordBlock contextBlockChild21 = new WordBlock("cc21");
+        final WordBlock contextBlockChild22 = new WordBlock("cc22");
+        final ParagraphBlock contextBlockChild2 = new ParagraphBlock(Arrays.<Block> asList(contextBlockChild21, contextBlockChild22))
+            {public String toString(){return "contextBlockChild2";}};
+        
+        final WordBlock contextBlockChild11 = new WordBlock("cc11");
+        final WordBlock contextBlockChild12 = new WordBlock("cc12");
+        final ParagraphBlock contextBlockChild1 = new ParagraphBlock(Arrays.<Block> asList(contextBlockChild11, contextBlockChild12))
+            {public String toString(){return "contextBlockChild1";}};
+        
+        final ParagraphBlock contextBlock = new ParagraphBlock(Arrays.<Block> asList(contextBlockChild1, contextBlockChild2))
+            {public String toString(){return "contextBlock";}};
+
+        final WordBlock followingBlockChild1 = new WordBlock("fc1");
+        final WordBlock followingBlockChild2 = new WordBlock("fc2");
+        final ParagraphBlock followingBlock = new ParagraphBlock(Arrays.<Block> asList(followingBlockChild1, followingBlockChild2))
+            {public String toString(){return "followingBlock";}};
+
+        final ParagraphBlock parentBlock = new ParagraphBlock(Arrays.<Block> asList(precedingBlock, contextBlock, followingBlock))
+            {public String toString(){return "parentBlock";}};
+        
+        final ParagraphBlock rootBlock = new ParagraphBlock(Arrays.<Block> asList(parentBlock))
+            {public String toString(){return "rootBlock";}};
+
+        // tests
+ 
+        Assert.assertEquals(Arrays.asList(parentBlock, rootBlock), contextBlock.getBlocks(AnyBlockMatcher.ANYBLOCKMATCHER, Axes.ANCESTOR));
+        Assert.assertEquals(Arrays.asList(contextBlock, parentBlock, rootBlock), contextBlock.getBlocks(AnyBlockMatcher.ANYBLOCKMATCHER, Axes.ANCESTOR_OR_SELF));
+        Assert.assertEquals(Arrays.asList(contextBlockChild1, contextBlockChild2), contextBlock.getBlocks(AnyBlockMatcher.ANYBLOCKMATCHER, Axes.CHILD));
+        Assert.assertEquals(Arrays.asList(contextBlockChild1, contextBlockChild11, contextBlockChild12, contextBlockChild2, contextBlockChild21, contextBlockChild22), contextBlock.getBlocks(AnyBlockMatcher.ANYBLOCKMATCHER, Axes.DESCENDANT));
+        Assert.assertEquals(Arrays.asList(contextBlock, contextBlockChild1, contextBlockChild11, contextBlockChild12, contextBlockChild2, contextBlockChild21, contextBlockChild22), contextBlock.getBlocks(AnyBlockMatcher.ANYBLOCKMATCHER, Axes.DESCENDANT_OR_SELF));
+        Assert.assertEquals(Arrays.asList(followingBlock, followingBlockChild1, followingBlockChild2), contextBlock.getBlocks(AnyBlockMatcher.ANYBLOCKMATCHER, Axes.FOLLOWING));
+        Assert.assertEquals(Arrays.asList(followingBlock), contextBlock.getBlocks(AnyBlockMatcher.ANYBLOCKMATCHER, Axes.FOLLOWING_SIBLING));
+        Assert.assertEquals(Arrays.asList(parentBlock), contextBlock.getBlocks(AnyBlockMatcher.ANYBLOCKMATCHER, Axes.PARENT));
+        Assert.assertEquals(Arrays.asList(precedingBlock, precedingBlockChild1, precedingBlockChild2), contextBlock.getBlocks(AnyBlockMatcher.ANYBLOCKMATCHER, Axes.PRECEDING));
+        Assert.assertEquals(Arrays.asList(precedingBlock), contextBlock.getBlocks(AnyBlockMatcher.ANYBLOCKMATCHER, Axes.PRECEDING_SIBLING));
+        Assert.assertEquals(Arrays.asList(contextBlock), contextBlock.getBlocks(AnyBlockMatcher.ANYBLOCKMATCHER, Axes.SELF));
+    }
+
+    @Test
+    public void testGetFirstBlock()
+    {
+        final WordBlock unexistingBlock = new WordBlock("unexistingBlock");
+
+        final WordBlock precedingBlockChild1 = new WordBlock("pc1");
+        final WordBlock precedingBlockChild2 = new WordBlock("pc2");
+        final ParagraphBlock precedingBlock = new ParagraphBlock(Arrays.<Block> asList(precedingBlockChild1, precedingBlockChild2))
+            {public String toString(){return "precedingBlock";}};
+
+        final WordBlock contextBlockChild21 = new WordBlock("cc21");
+        final WordBlock contextBlockChild22 = new WordBlock("cc22");
+        final ParagraphBlock contextBlockChild2 = new ParagraphBlock(Arrays.<Block> asList(contextBlockChild21, contextBlockChild22))
+            {public String toString(){return "contextBlockChild2";}};
+        
+        final WordBlock contextBlockChild11 = new WordBlock("cc11");
+        final WordBlock contextBlockChild12 = new WordBlock("cc12");
+        final ParagraphBlock contextBlockChild1 = new ParagraphBlock(Arrays.<Block> asList(contextBlockChild11, contextBlockChild12))
+            {public String toString(){return "contextBlockChild1";}};
+        
+        final ParagraphBlock contextBlock = new ParagraphBlock(Arrays.<Block> asList(contextBlockChild1, contextBlockChild2))
+            {public String toString(){return "contextBlock";}};
+
+        final WordBlock followingBlockChild1 = new WordBlock("fc1");
+        final WordBlock followingBlockChild2 = new WordBlock("fc2");
+        final ParagraphBlock followingBlock = new ParagraphBlock(Arrays.<Block> asList(followingBlockChild1, followingBlockChild2))
+            {public String toString(){return "followingBlock";}};
+
+        final ParagraphBlock parentBlock = new ParagraphBlock(Arrays.<Block> asList(precedingBlock, contextBlock, followingBlock))
+            {public String toString(){return "parentBlock";}};
+        
+        final ParagraphBlock rootBlock = new ParagraphBlock(Arrays.<Block> asList(parentBlock))
+            {public String toString(){return "rootBlock";}};
+
+        // tests
+
+        Assert.assertSame(parentBlock, contextBlock.getFirstBlock(AnyBlockMatcher.ANYBLOCKMATCHER, Axes.ANCESTOR));
+        Assert.assertSame(rootBlock, contextBlock.getFirstBlock(new SameBlockMatcher(rootBlock), Axes.ANCESTOR));
+        Assert.assertSame(contextBlock, contextBlock.getFirstBlock(AnyBlockMatcher.ANYBLOCKMATCHER, Axes.ANCESTOR_OR_SELF));
+        Assert.assertSame(rootBlock, contextBlock.getFirstBlock(new SameBlockMatcher(rootBlock), Axes.ANCESTOR_OR_SELF));
+        Assert.assertSame(contextBlockChild1, contextBlock.getFirstBlock(AnyBlockMatcher.ANYBLOCKMATCHER, Axes.CHILD));
+        Assert.assertSame(contextBlockChild2, contextBlock.getFirstBlock(new SameBlockMatcher(contextBlockChild2), Axes.CHILD));
+        Assert.assertSame(contextBlockChild1, contextBlock.getFirstBlock(AnyBlockMatcher.ANYBLOCKMATCHER, Axes.DESCENDANT));
+        Assert.assertSame(contextBlockChild22, contextBlock.getFirstBlock(new SameBlockMatcher(contextBlockChild22), Axes.DESCENDANT));
+        Assert.assertSame(contextBlock, contextBlock.getFirstBlock(AnyBlockMatcher.ANYBLOCKMATCHER, Axes.DESCENDANT_OR_SELF));
+        Assert.assertSame(contextBlockChild22, contextBlock.getFirstBlock(new SameBlockMatcher(contextBlockChild22), Axes.DESCENDANT_OR_SELF));
+        Assert.assertSame(followingBlock, contextBlock.getFirstBlock(AnyBlockMatcher.ANYBLOCKMATCHER, Axes.FOLLOWING));
+        Assert.assertSame(followingBlockChild2, contextBlock.getFirstBlock(new SameBlockMatcher(followingBlockChild2), Axes.FOLLOWING));
+        Assert.assertSame(followingBlock, contextBlock.getFirstBlock(AnyBlockMatcher.ANYBLOCKMATCHER, Axes.FOLLOWING_SIBLING));
+        Assert.assertNull(contextBlock.getFirstBlock(new SameBlockMatcher(unexistingBlock), Axes.FOLLOWING_SIBLING));
+        Assert.assertSame(parentBlock, contextBlock.getFirstBlock(AnyBlockMatcher.ANYBLOCKMATCHER, Axes.PARENT));
+        Assert.assertNull(contextBlock.getFirstBlock(new SameBlockMatcher(unexistingBlock), Axes.PARENT));
+        Assert.assertSame(precedingBlock, contextBlock.getFirstBlock(AnyBlockMatcher.ANYBLOCKMATCHER, Axes.PRECEDING));
+        Assert.assertSame(precedingBlockChild2, contextBlock.getFirstBlock(new SameBlockMatcher(precedingBlockChild2), Axes.PRECEDING));
+        Assert.assertSame(precedingBlock, contextBlock.getFirstBlock(AnyBlockMatcher.ANYBLOCKMATCHER, Axes.PRECEDING_SIBLING));
+        Assert.assertNull(contextBlock.getFirstBlock(new SameBlockMatcher(unexistingBlock), Axes.PRECEDING_SIBLING));
+        Assert.assertSame(contextBlock, contextBlock.getFirstBlock(AnyBlockMatcher.ANYBLOCKMATCHER, Axes.SELF));
+        Assert.assertNull(contextBlock.getFirstBlock(new SameBlockMatcher(unexistingBlock), Axes.SELF));
     }
 }

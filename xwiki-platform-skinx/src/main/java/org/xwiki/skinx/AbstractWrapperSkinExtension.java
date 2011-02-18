@@ -21,6 +21,7 @@ package org.xwiki.skinx;
 
 import java.util.Map;
 
+import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.Requirement;
 import org.xwiki.context.Execution;
 
@@ -29,8 +30,9 @@ import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.plugin.skinx.SkinExtensionPluginApi;
 
 /**
- * The abstract implementation of the wrapper around the skinx plugin. Provides the mechanism needed to grab the skin
- * extensions plugins and call the use methods on them, subclasses only need to provide the name of the skin extension.
+ * The abstract implementation of the wrapper around the skinx plugins. Provides the mechanism needed to grab the skin
+ * extensions plugins and call the {@code use} methods on them, subclasses only need to provide the name of the skin
+ * extension through their {@link SkinExtension} role hint.
  * 
  * @version $Id$
  * @since 1.20
@@ -38,16 +40,14 @@ import com.xpn.xwiki.plugin.skinx.SkinExtensionPluginApi;
 public abstract class AbstractWrapperSkinExtension implements SkinExtension
 {
 
-    /**
-     * Execution context, needed to grab the sx plugins to include js and css.
-     */
+    /** Execution context handler, needed for accessing the XWikiContext. */
     @Requirement
     private Execution execution;
 
     /**
      * {@inheritDoc}
      * 
-     * @see org.xwiki.skinx.SkinExtension#use(java.lang.String)
+     * @see SkinExtension#use(java.lang.String)
      */
     public void use(String resource)
     {
@@ -57,7 +57,7 @@ public abstract class AbstractWrapperSkinExtension implements SkinExtension
     /**
      * {@inheritDoc}
      * 
-     * @see org.xwiki.skinx.SkinExtension#use(java.lang.String, java.util.Map)
+     * @see SkinExtension#use(java.lang.String, java.util.Map)
      */
     public void use(String resource, Map<String, Object> parameters)
     {
@@ -65,7 +65,7 @@ public abstract class AbstractWrapperSkinExtension implements SkinExtension
     }
 
     /**
-     * @return the {@link SkinExtensionPluginApi} in the running wiki.
+     * @return the {@link SkinExtensionPluginApi} in the running wiki
      */
     private SkinExtensionPluginApi getSkinExtensionPluginApi()
     {
@@ -75,7 +75,10 @@ public abstract class AbstractWrapperSkinExtension implements SkinExtension
     }
 
     /**
-     * @return the name of the skin extension (e.g. ssx, jsfx, etc) to wrap.
+     * @return the name of the skin extension (e.g. ssx, jsfx, etc) to wrap
      */
-    public abstract String getName();
+    public String getName()
+    {
+        return getClass().getAnnotation(Component.class).value();
+    }
 }

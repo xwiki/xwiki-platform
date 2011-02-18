@@ -2,15 +2,17 @@ var XWiki = (function (XWiki) {
 // Start XWiki augmentation.
 XWiki.Dashboard = Class.create( {
   initialize : function(element) {
+    this.element = element;  
     //the class of the gadget objects 
     this.gadgetsClass = "XWiki.GadgetClass";
-    // the source of the dashboard, the document where the objects are stored and which needs to be updated
-    // TODO: put me here, but it's a bit tough because we don't know if as URL or as fullname or space, page, wiki vars
+    // read the metadata of the dashboard, the edit, add, remove URLs and the source of the dashboard
+    this.readMetadata();
+    // display the warning if we're editing a dashboard configured in a different document
+    this.displayWarning();
     // flag to know if the dashboard was edited or not, to know if requests should be sent on save or not
     this.edited = false;
     // the list of removed gadgets, to really remove when the inline form is submitted
     this.removed = new Array();
-    this.element = element;
     // add an extra class to this element, to know that it's editing, for css that needs to be special on edit
     this.element.addClassName("dashboard-edit");
     // find out all the gadget-containers in element and add them ids
@@ -20,6 +22,43 @@ XWiki.Dashboard = Class.create( {
     
     // add save listener, to save the dashboard before submit of the form
     document.observe("xwiki:actions:save", this.saveChanges.bindAsEventListener(this));
+  },
+  
+  /**
+   * Reads the dashboard metadata from the HTML of the dashboard.
+   */
+  readMetadata : function() {
+    // FIXME: check if all these elements are there or not, if not default on current document
+    this.editURL = this.element.down('.metadata .editurl').readAttribute('href');
+    this.removeURL = this.element.down('.metadata .removeurl').readAttribute('href');
+    this.addURL = this.element.down('.metadata .addurl').readAttribute('href');
+    
+    this.sourcePage = this.element.down('.metadata .sourcepage').innerHTML;
+    this.sourceSpace = this.element.down('.metadata .sourcespace').innerHTML;
+    this.sourceWiki = this.element.down('.metadata .sourcewiki').innerHTML;
+    this.sourceURL = this.element.down('.metadata .sourceurl').readAttribute('href');
+  },
+  
+  /**
+   * Displays a warning at the top of the dashboard, if the source of the dashboard is not the current document, 
+   * telling the users that they're editing something else that might impact other dashboards as well.
+   */
+  displayWarning : function() {
+    if (XWiki.currentDocument.page != this.sourcePage || XWiki.currentDocument.space != this.sourceSpace 
+        || XWiki.currentDocument.wiki != this.sourceWiki) {
+      // by default styled by the colibri skin
+      var warningElt = new Element('div', {'class' : 'box warningmessage'});
+      // FIXME: I don't like the way these messages are used, should be able to insert the link in the translation
+      var information = "$msg.get('dashboard.actions.edit.differentsource.information')";
+      var warning = "$msg.get('dashboard.actions.edit.differentsource.warning')";
+      var link = new Element('a', {'href' : this.sourceURL});
+      link.update(this.sourceWiki + ':' + this.sourceSpace + '.' + this.sourcePage);
+      warningElt.insert(information);
+      warningElt.insert(link);
+      warningElt.insert(warning);
+      
+      this.element.insert({'top' : warningElt});
+    }
   },
   
   /**
@@ -113,7 +152,7 @@ XWiki.Dashboard = Class.create( {
         return;
       }
       // create a remove button in the settings menu
-      var removeLink = new Element('div', {'class' : 'remove', 'title' : '$msg.get("dashboard.gadget.action.delete.tooltip")'});
+      var removeLink = new Element('div', {'class' : 'remove', 'title' : '$msg.get("dashboard.gadget.actions.delete.tooltip")'});
       removeLink.observe('click', this.onRemoveGadget.bindAsEventListener(this));
       var actionsContainer = new Element('div', {'class' : 'settings-menu'})
       actionsContainer.hide();
@@ -169,14 +208,14 @@ XWiki.Dashboard = Class.create( {
     }
     var gadgetId = this._getGadgetId(gadget);
     this.removed.push(gadgetId);
-    // send a request to the REST url to remove the object corresponding to this gadget    
-    // TODO: this should be the URI to the dashboard source, not to the current page
-    var gadgetObjectURL = XWiki.contextPath + '/rest/wikis/' + encodeURIComponent(XWiki.currentWiki) + '/spaces/' + 
-                          encodeURIComponent(XWiki.currentSpace) + '/pages/' + encodeURIComponent(XWiki.currentPage) + 
-                          '/objects/' + encodeURIComponent(this.gadgetsClass) + '/' + gadgetId + '?media=json&method=DELETE';
     new XWiki.widgets.ConfirmedAjaxRequest(
-      gadgetObjectURL,
-      {  
+      this.removeURL,
+      {
+        parameters : {
+          'classname' : encodeURIComponent(this.gadgetsClass),
+          'classid' : encodeURIComponent(gadgetId),
+          'ajax' : '1'
+        },
         onCreate : function() {
           // Disable the button, to avoid a cascade of clicks from impatient users
           item.disabled = true;
@@ -188,11 +227,50 @@ XWiki.Dashboard = Class.create( {
       },
       /* Interaction parameters */
       {
-         confirmationText: "$msg.get('dashboard.gadget.action.delete.confirm')",
-         progressMessageText : "$msg.get('dashboard.gadget.action.delete.inProgress')",
-         successMessageText : "$msg.get('dashboard.gadget.action.delete.done')",
-         failureMessageText : "$msg.get('dashboard.gadget.action.delete.failed')"
+         confirmationText: "$msg.get('dashboard.gadget.actions.delete.confirm')",
+         progressMessageText : "$msg.get('dashboard.gadget.actions.delete.inProgress')",
+         successMessageText : "$msg.get('dashboard.gadget.actions.delete.done')",
+         failureMessageText : "$msg.get('dashboard.gadget.actions.delete.failed')"
       }      
+    );
+  },
+
+  /**
+   * Actually performs the gadget edits, calling the onComplete callback when the edit is done.
+   * 
+   * @param onComplete callback to notify when all the requests have finished
+   */
+  doEditGadgets : function(onComplete) {
+    var editParameters = this.prepareEditParameters();
+    // add the ajax parameter to the edit, to not get redirected after the call 
+    editParameters.set('ajax', '1');
+    // send the ajax request to do the edit
+    new Ajax.Request(
+      this.editURL,
+      {
+        parameters : editParameters,
+        onSuccess : function(response) {
+          this.edited = false;
+          if (onComplete) {
+            onComplete();
+          }
+        }.bind(this),
+        onFailure: function(response) {
+          var failureReason = response.statusText;
+          if (response.statusText == '' /* No response */ || response.status == 12031 /* In IE */) {
+            failureReason = 'Server not responding';
+          }
+          // show the error message at the bottom
+          this._x_notification = new XWiki.widgets.Notification(
+              "$msg.get('dashboard.actions.edit.failed')" + failureReason, "error", {timeout : 5});
+          if (onComplete) {
+            onComplete();
+          }          
+        }.bind(this),
+        on0: function (response) {
+          response.request.options.onFailure(response);
+        }.bind(this)        
+      }
     );
   },
   
@@ -211,29 +289,36 @@ XWiki.Dashboard = Class.create( {
    * inline edit form.  
    */
   saveChanges : function(event) {
+    // if there are no changes, don't do anything
     if (!this.edited) {
       return;
     }
+    
+    // if there are changes, stop the save event, send an ajax request to the source of the dashboard to save it, 
+    // and then, when it's done, refire the save event
+    
+    // stop the event, so that it doesn't actually send the request just yet, we'll send it when we're done with saving
+    event.stop();
+    event.memo.originalEvent.stop();
+    
+    // get the element of the event
+    var eventElt = event.memo.originalEvent.element();
 
-    var editFields = this.prepareEditParameters();
-    // get the edit form
-    var editForm = event.memo.form;
-    // put the fields in a dashboard layout fieldset, to be able to update them on subsequent saves 
-    // (in case of save & continue)
-    // FIXME: add the name of the dashboard in here, will cause issues when there are multiple dashboards
-    var dashboardFieldSet = editForm.down('.dashboard-layout-fieldset');
-    if (dashboardFieldSet) {
-      // empty the dashboard field set, to fill in with the new fields after
-      dashboardFieldSet.update('');
-    } else {
-      // create the dashboard field set, to fill in with the new fields
-      dashboardFieldSet = new Element('fieldset', {'class' : 'dashboard-layout-fieldset'});
-      editForm.insert(dashboardFieldSet);      
-    }
-    editFields.each(function(editField) {
-      // create a hidden input for the update of the position of the gadget object and append it to the form
-      var fieldInput = new Element('input', {'name' : editField.key, 'value' : editField.value, 'type' : 'hidden'});
-      dashboardFieldSet.insert(fieldInput);
+    // start to submit the edit, notify
+    this._x_edit_notification = new XWiki.widgets.Notification("$msg.get('dashboard.actions.save.loading')", 
+        "inprogress");
+
+    // save the edit
+    this.doEditGadgets(function() {
+      // and re-fire the save event, only if the changes were saved fine (edited is canceled)
+      if (!this.edited) {
+        // resume the form submit
+        eventElt.click();
+      }
+      // and remove the notification
+      if (this._x_edit_notification) {
+        this._x_edit_notification.hide();
+      }
     }.bind(this));
   },
 

@@ -26,6 +26,11 @@
   padding: 10px 15px;
 }
 
+/* Hide the dashboard metadata */
+.dashboard .metadata {
+  display: none;
+}
+
 /* gadget handles on the dashboard */
 .gadget .gadget-title .settings-menu .remove {
   background-image: url("/xwiki/resources/icons/silk/cross.gif");

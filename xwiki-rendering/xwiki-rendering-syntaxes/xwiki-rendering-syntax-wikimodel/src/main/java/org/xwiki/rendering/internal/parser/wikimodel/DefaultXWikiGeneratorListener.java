@@ -48,6 +48,7 @@ import org.xwiki.rendering.parser.StreamParser;
 import org.xwiki.rendering.renderer.PrintRenderer;
 import org.xwiki.rendering.renderer.PrintRendererFactory;
 import org.xwiki.rendering.renderer.printer.DefaultWikiPrinter;
+import org.xwiki.rendering.syntax.Syntax;
 import org.xwiki.rendering.util.IdGenerator;
 
 /**
@@ -106,13 +107,17 @@ public class DefaultXWikiGeneratorListener implements XWikiGeneratorListener
 
     private WikiFormat lastEndFormat = null;
 
+    private Syntax syntax;
+
+    private MetaData documentMetadata;
+
     /**
      * @see <a href="http://code.google.com/p/wikimodel/issues/detail?id=87">wikimodel issue 87</a>
-     * @since 2.5RC1
+     * @since 3.0M3
      */
     public DefaultXWikiGeneratorListener(StreamParser parser, Listener listener,
         ResourceReferenceParser linkReferenceParser, ResourceReferenceParser imageReferenceParser,
-        PrintRendererFactory plainRendererFactory, IdGenerator idGenerator)
+        PrintRendererFactory plainRendererFactory, IdGenerator idGenerator, Syntax syntax)
     {
         pushListener(listener);
 
@@ -121,6 +126,9 @@ public class DefaultXWikiGeneratorListener implements XWikiGeneratorListener
         this.imageReferenceParser = imageReferenceParser;
         this.idGenerator = idGenerator != null ? idGenerator : new IdGenerator();
         this.plainRendererFactory = plainRendererFactory;
+        this.syntax = syntax;
+        this.documentMetadata = new MetaData();
+        this.documentMetadata.addMetaData(MetaData.SYNTAX, this.syntax);
     }
 
     /**
@@ -332,7 +340,7 @@ public class DefaultXWikiGeneratorListener implements XWikiGeneratorListener
         if (this.documentDepth > 0) {
             getListener().beginGroup(convertParameters(params));
         } else {
-            getListener().beginDocument(MetaData.EMPTY);
+            getListener().beginDocument(this.documentMetadata);
         }
 
         ++this.documentDepth;
@@ -591,7 +599,7 @@ public class DefaultXWikiGeneratorListener implements XWikiGeneratorListener
         if (this.documentDepth > 0) {
             getListener().endGroup(convertParameters(params));
         } else {
-            getListener().endDocument(MetaData.EMPTY);
+            getListener().endDocument(this.documentMetadata);
         }
     }
 
@@ -933,8 +941,7 @@ public class DefaultXWikiGeneratorListener implements XWikiGeneratorListener
         onReference(reference.getLink(), reference.getLabel(), false, convertParameters(reference.getParameters()));
     }
 
-    protected void onReference(String reference, String label, boolean isFreeStandingURI,
-        Map<String, String> parameters)
+    protected void onReference(String reference, String label, boolean isFreeStandingURI, Map<String, String> parameters)
     {
         flushFormat();
 

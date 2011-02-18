@@ -193,6 +193,6 @@ public class WikiModelXHTMLParser extends AbstractWikiModelParser
     public XWikiGeneratorListener createXWikiGeneratorListener(Listener listener, IdGenerator idGenerator)
     {
         return new XHTMLXWikiGeneratorListener(getLinkLabelParser(), listener, getLinkReferenceParser(),
-            getImageReferenceParser(), this.plainRendererFactory, idGenerator);
+            getImageReferenceParser(), this.plainRendererFactory, idGenerator, getSyntax());
     }
 }

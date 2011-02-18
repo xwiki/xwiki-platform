@@ -25,7 +25,7 @@ import java.util.Map;
 
 /**
  * Represents a set of MetaData.
- *
+ * 
  * @version $Id$
  * @since 3.0M2
  */
@@ -37,10 +37,16 @@ public class MetaData
     public static final MetaData EMPTY = new MetaData();
 
     /**
-     * Represents a source metaData, which corresponds to the reference to the source entity containing the content
-     * to render. The reference is a free form text in a format that is understood by the Listeners supporting it.
+     * Represents a source metaData, which corresponds to the reference to the source entity containing the content to
+     * render. The reference is a free form text in a format that is understood by the Listeners supporting it.
      */
     public static final String SOURCE = "source";
+
+    /**
+     * Represents the syntax of the content found in macro containing wiki content (like a box macro for example).
+     * @since 3.0M3
+     */
+    public static final String SYNTAX = "syntax";
 
     /**
      * Contains all MetaData for this Block and its children.

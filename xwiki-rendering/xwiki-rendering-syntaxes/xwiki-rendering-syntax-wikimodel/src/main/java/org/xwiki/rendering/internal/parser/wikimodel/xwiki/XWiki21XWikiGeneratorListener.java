@@ -29,11 +29,12 @@ import org.xwiki.rendering.listener.Listener;
 import org.xwiki.rendering.parser.ResourceReferenceParser;
 import org.xwiki.rendering.parser.StreamParser;
 import org.xwiki.rendering.renderer.PrintRendererFactory;
+import org.xwiki.rendering.syntax.Syntax;
 import org.xwiki.rendering.util.IdGenerator;
 
 /**
  * WikiModel listener bridge for the XWiki Syntax 2.1.
- *
+ * 
  * @version $Id$
  * @since 2.5RC1
  */
@@ -56,18 +57,20 @@ public class XWiki21XWikiGeneratorListener extends DefaultXWikiGeneratorListener
      * @param imageReferenceParser the parser to parse image references
      * @param plainRendererFactory used to generate header ids
      * @param idGenerator used to generate header ids
+     * @param syntax the syntax of the parsed source
+     * @since 3.0M3
      */
     public XWiki21XWikiGeneratorListener(StreamParser parser, Listener listener,
         ResourceReferenceParser linkReferenceParser, ResourceReferenceParser imageReferenceParser,
-        PrintRendererFactory plainRendererFactory, IdGenerator idGenerator)
+        PrintRendererFactory plainRendererFactory, IdGenerator idGenerator, Syntax syntax)
     {
-        super(parser, listener, linkReferenceParser, imageReferenceParser, plainRendererFactory, idGenerator);
+        super(parser, listener, linkReferenceParser, imageReferenceParser, plainRendererFactory, idGenerator, syntax);
     }
 
     /**
      * {@inheritDoc}
-     *
-     * @see DefaultXWikiGeneratorListener#onReference(String, String, boolean, java.util.Map) 
+     * 
+     * @see DefaultXWikiGeneratorListener#onReference(String, String, boolean, java.util.Map)
      */
     protected void onReference(ResourceReference reference, String label, boolean isFreeStandingURI,
         Map<String, String> parameters)
@@ -91,7 +94,7 @@ public class XWiki21XWikiGeneratorListener extends DefaultXWikiGeneratorListener
 
     /**
      * {@inheritDoc}
-     *
+     * 
      * @see DefaultXWikiGeneratorListener#onImage(org.xwiki.rendering.listener.reference.ResourceReference , boolean,
      *      java.util.Map)
      */

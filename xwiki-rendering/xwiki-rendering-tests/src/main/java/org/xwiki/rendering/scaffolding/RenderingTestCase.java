@@ -27,6 +27,8 @@ import org.jmock.cglib.MockObjectTestCase;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.configuration.ConfigurationSource;
 import org.xwiki.rendering.block.XDOM;
+import org.xwiki.rendering.listener.MetaData;
+import org.xwiki.rendering.listener.WrappingListener;
 import org.xwiki.rendering.parser.Parser;
 import org.xwiki.rendering.parser.StreamParser;
 import org.xwiki.rendering.renderer.BlockRenderer;
@@ -135,12 +137,23 @@ public class RenderingTestCase extends MockObjectTestCase
             }
 
             BlockRenderer renderer = getComponentManager().lookup(BlockRenderer.class, this.targetSyntaxId);
+
+            // remove source syntax from XDOM metadata
+            Map<String, Object> metadataMap = new HashMap<String, Object>(xdom.getMetaData().getMetaData());
+            metadataMap.remove(MetaData.SYNTAX);
+            xdom = new XDOM(xdom.getChildren(), new MetaData(metadataMap));
+
             renderer.render(xdom, printer);
         } else {
             StreamParser parser = getComponentManager().lookup(StreamParser.class, this.parserId);
             PrintRendererFactory printRendererFactory =
                 getComponentManager().lookup(PrintRendererFactory.class, this.targetSyntaxId);
-            parser.parse(new StringReader(this.input), printRendererFactory.createRenderer(printer));
+
+            // remove source syntax from begin/endDocument metadata
+            WrappingListener listener = new SyntaxWrappingListener();
+            listener.setWrappedListener(printRendererFactory.createRenderer(printer));
+
+            parser.parse(new StringReader(this.input), listener);
         }
 
         assertEquals(this.expected, printer.toString());

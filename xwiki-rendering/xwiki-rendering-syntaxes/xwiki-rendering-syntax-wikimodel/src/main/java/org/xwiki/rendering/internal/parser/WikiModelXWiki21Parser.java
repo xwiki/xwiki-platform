@@ -107,6 +107,6 @@ public class WikiModelXWiki21Parser extends AbstractWikiModelParser
     public XWikiGeneratorListener createXWikiGeneratorListener(Listener listener, IdGenerator idGenerator)
     {
         return new XWiki21XWikiGeneratorListener(getLinkLabelParser(), listener, getLinkReferenceParser(),
-            getImageReferenceParser(), this.plainRendererFactory, idGenerator);
+            getImageReferenceParser(), this.plainRendererFactory, idGenerator, getSyntax());
     }
 }

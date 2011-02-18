@@ -26,6 +26,7 @@ import java.util.regex.Pattern;
 
 import org.xwiki.component.annotation.Component;
 import org.xwiki.rendering.listener.Listener;
+import org.xwiki.rendering.listener.MetaData;
 import org.xwiki.rendering.parser.ParseException;
 import org.xwiki.rendering.parser.StreamParser;
 import org.xwiki.rendering.syntax.Syntax;
@@ -86,6 +87,7 @@ public class PlainTextStreamParser implements StreamParser
         BufferedReader bufferedSource = new BufferedReader(source);
         int charAsInt;
 
+        listener.beginDocument(MetaData.EMPTY);
         listener.beginParagraph(Listener.EMPTY_PARAMETERS);
 
         while ((charAsInt = readChar(bufferedSource)) != -1) {
@@ -123,5 +125,6 @@ public class PlainTextStreamParser implements StreamParser
         }
 
         listener.endParagraph(Listener.EMPTY_PARAMETERS);
+        listener.endDocument(MetaData.EMPTY);
     }
 }

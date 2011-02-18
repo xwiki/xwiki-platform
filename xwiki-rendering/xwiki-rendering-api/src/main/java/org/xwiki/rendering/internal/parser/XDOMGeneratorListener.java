@@ -94,7 +94,14 @@ public class XDOMGeneratorListener implements Listener
 
     public XDOM getXDOM()
     {
-        return new XDOM(generateListFromStack());
+        List<Block> blocks = generateListFromStack();
+
+        // support even events without begin/endDocument for partial content
+        if (!blocks.isEmpty() && blocks.get(0) instanceof XDOM) {
+            return (XDOM) blocks.get(0);
+        } else {
+            return new XDOM(blocks);
+        }
     }
 
     private List<Block> generateListFromStack()
@@ -355,7 +362,7 @@ public class XDOMGeneratorListener implements Listener
      */
     public void endDocument(MetaData metaData)
     {
-        // Do nothing. This is supposed to append only once for the hole document
+        this.stack.push(new XDOM(generateListFromStack(), metaData));
     }
 
     /**

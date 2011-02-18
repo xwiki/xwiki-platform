@@ -94,8 +94,9 @@ public abstract class AbstractDoxiaParser extends AbstractLogEnabled implements 
      */
     private void parse(Reader source, Listener listener, IdGenerator idGenerator) throws ParseException
     {
-        XWikiGeneratorSink doxiaSink = new XWikiGeneratorSink(listener, this.linkReferenceParser,
-            this.plainRendererFactory, idGenerator, this.plainParser);
+        XWikiGeneratorSink doxiaSink =
+            new XWikiGeneratorSink(listener, this.linkReferenceParser, this.plainRendererFactory, idGenerator,
+                this.plainParser, getSyntax());
 
         org.apache.maven.doxia.parser.Parser parser = createDoxiaParser();
         try {

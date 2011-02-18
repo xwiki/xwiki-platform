@@ -29,6 +29,7 @@ import org.apache.maven.doxia.sink.SinkEventAttributes;
 import org.xwiki.rendering.listener.CompositeListener;
 import org.xwiki.rendering.listener.Format;
 import org.xwiki.rendering.listener.HeaderLevel;
+import org.xwiki.rendering.listener.InlineFilterListener;
 import org.xwiki.rendering.listener.MetaData;
 import org.xwiki.rendering.listener.reference.ResourceReference;
 import org.xwiki.rendering.listener.ListType;
@@ -42,6 +43,7 @@ import org.xwiki.rendering.parser.StreamParser;
 import org.xwiki.rendering.renderer.PrintRenderer;
 import org.xwiki.rendering.renderer.PrintRendererFactory;
 import org.xwiki.rendering.renderer.printer.DefaultWikiPrinter;
+import org.xwiki.rendering.syntax.Syntax;
 import org.xwiki.rendering.util.IdGenerator;
 
 /**
@@ -68,11 +70,15 @@ public class XWikiGeneratorSink implements Sink
 
     private int inlineDepth = 0;
 
+    private Syntax syntax;
+
+    private MetaData documentMetadata;
+
     /**
-     * @since 2.0M3
+     * @since 3.0M3
      */
     public XWikiGeneratorSink(Listener listener, ResourceReferenceParser linkReferenceParser,
-        PrintRendererFactory plainRendererFactory, IdGenerator idGenerator, StreamParser plainParser)
+        PrintRendererFactory plainRendererFactory, IdGenerator idGenerator, StreamParser plainParser, Syntax syntax)
     {
         pushListener(listener);
 
@@ -80,6 +86,9 @@ public class XWikiGeneratorSink implements Sink
         this.idGenerator = idGenerator != null ? idGenerator : new IdGenerator();
         this.plainRendererFactory = plainRendererFactory;
         this.plainParser = plainParser;
+        this.syntax = syntax;
+        this.documentMetadata = new MetaData();
+        this.documentMetadata.addMetaData(MetaData.SYNTAX, this.syntax);
     }
 
     public Listener getListener()
@@ -209,7 +218,7 @@ public class XWikiGeneratorSink implements Sink
      */
     public void body(SinkEventAttributes attributes)
     {
-        getListener().beginDocument(MetaData.EMPTY);
+        body();
     }
 
     /**
@@ -219,7 +228,7 @@ public class XWikiGeneratorSink implements Sink
      */
     public void body()
     {
-        getListener().beginDocument(MetaData.EMPTY);
+        getListener().beginDocument(this.documentMetadata);
     }
 
     /**
@@ -229,7 +238,7 @@ public class XWikiGeneratorSink implements Sink
      */
     public void body_()
     {
-        getListener().endDocument(MetaData.EMPTY);
+        getListener().endDocument(this.documentMetadata);
     }
 
     /**
@@ -1409,20 +1418,7 @@ public class XWikiGeneratorSink implements Sink
         // text to extract spaces, special symbols and words.
 
         // TODO: Use an inline parser. See http://jira.xwiki.org/jira/browse/XWIKI-2748
-        WrappingListener inlineFilterListener = new WrappingListener()
-        {
-            @Override
-            public void beginParagraph(Map<String, String> parameters)
-            {
-                // Filter
-            }
-
-            @Override
-            public void endParagraph(Map<String, String> parameters)
-            {
-                // Filter
-            }
-        };
+        WrappingListener inlineFilterListener = new InlineFilterListener();
         inlineFilterListener.setWrappedListener(getListener());
 
         // Parse the text using the plain text parser

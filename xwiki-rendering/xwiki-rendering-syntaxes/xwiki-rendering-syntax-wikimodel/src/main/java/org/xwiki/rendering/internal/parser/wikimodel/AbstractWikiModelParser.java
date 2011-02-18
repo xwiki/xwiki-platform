@@ -122,7 +122,7 @@ public abstract class AbstractWikiModelParser extends AbstractLogEnabled impleme
     public XWikiGeneratorListener createXWikiGeneratorListener(Listener listener, IdGenerator idGenerator)
     {
         return new DefaultXWikiGeneratorListener(getLinkLabelParser(), listener, getLinkReferenceParser(),
-            getImageReferenceParser(), this.plainRendererFactory, idGenerator);
+            getImageReferenceParser(), this.plainRendererFactory, idGenerator, getSyntax());
     }
 
     /**

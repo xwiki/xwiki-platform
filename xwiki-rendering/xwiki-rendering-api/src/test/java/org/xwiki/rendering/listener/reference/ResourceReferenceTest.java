@@ -36,10 +36,10 @@ public class ResourceReferenceTest
         ResourceReference reference2 = new ResourceReference("reference", ResourceType.DOCUMENT);
         Assert.assertEquals(reference1, reference2);
 
-        reference2.setBaseReference("base");
+        reference2.addBaseReference("base");
         Assert.assertFalse(reference1.equals(reference2));
 
-        reference1.setBaseReference("base");
+        reference1.addBaseReference("base");
         Assert.assertEquals(reference1, reference2);
     }
 
@@ -50,8 +50,8 @@ public class ResourceReferenceTest
         ResourceReference reference2 = new ResourceReference("reference", ResourceType.DOCUMENT);
         Assert.assertEquals(reference1.hashCode(), reference2.hashCode());
 
-        reference1.setBaseReference("base");
-        reference2.setBaseReference("base");
+        reference1.addBaseReference("base");
+        reference2.addBaseReference("base");
         Assert.assertEquals(reference1.hashCode(), reference2.hashCode());
     }
 }

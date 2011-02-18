@@ -19,6 +19,8 @@
  */
 package org.xwiki.rendering.listener.chaining;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.ListIterator;
 import java.util.Stack;
 
@@ -46,17 +48,39 @@ public class MetaDataStateChainingListener extends AbstractChainingListener
     }
 
     /**
+     * @param <T> the type of the value for the passed key
+     * @param key the key for which to find the value
+     * @return the accumulated MetaData during all the previous begin/endMetaData events
+     */
+    public <T> List<T> getAllMetaData(String key)
+    {
+        List<T> result = new ArrayList<T>();
+        if (!this.metaDataStack.isEmpty()) {
+            ListIterator<MetaData> it = this.metaDataStack.listIterator();
+            while (it.hasNext()) {
+                MetaData metaData = it.next();
+                Object value = metaData.getMetaData(key);
+                if (value != null) {
+                    result.add((T) metaData.getMetaData(key));
+                }
+            }
+        }
+        return result;
+    }
+
+    /**
+     * @param <T> the type of the value for the passed key
      * @param key the key for which to find the value
      * @return the accumulated MetaData during all the previous begin/endMetaData events, for the passed key
      */
-    public Object getMetaData(String key)
+    public <T> T getMetaData(String key)
     {
-        Object result = null;
+        T result = null;
         if (!this.metaDataStack.isEmpty()) {
             ListIterator<MetaData> it = this.metaDataStack.listIterator(this.metaDataStack.size());
             while (it.hasPrevious()) {
                 MetaData metaData = it.previous();
-                result = metaData.getMetaData(key);
+                result = (T) metaData.getMetaData(key);
                 if (result != null) {
                     break;
                 }

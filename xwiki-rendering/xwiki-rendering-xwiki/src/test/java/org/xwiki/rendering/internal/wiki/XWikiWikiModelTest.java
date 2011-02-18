@@ -371,7 +371,7 @@ public class XWikiWikiModelTest extends AbstractMockingComponentTestCase
         });
 
         ResourceReference reference = new ResourceReference("reference", ResourceType.DOCUMENT);
-        reference.setBaseReference("base");
+        reference.addBaseReference("base");
         Assert.assertEquals("viewurl", this.wikiModel.getDocumentViewURL(reference));
     }
 

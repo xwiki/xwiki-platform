@@ -72,15 +72,19 @@ public class XHTMLRendererTest extends AbstractComponentTestCase
         final ResourceReference blockReference = new ResourceReference("reference", ResourceType.DOCUMENT);
         List<Block> linkBlocks = Arrays.asList((Block) new LinkBlock(Arrays.asList((Block) new WordBlock("label")),
             blockReference, true));
-        MetaData metaData = new MetaData();
-        metaData.addMetaData(MetaData.SOURCE, "base");
-        XDOM xdom = new XDOM(Arrays.asList((Block) new MetaDataBlock(linkBlocks, metaData)));
+        MetaData metaData1 = new MetaData();
+        metaData1.addMetaData(MetaData.SOURCE, "base1");
+        MetaData metaData2 = new MetaData();
+        metaData2.addMetaData(MetaData.SOURCE, "base2");
+        XDOM xdom = new XDOM(Arrays.asList((Block) new MetaDataBlock(
+            Arrays.asList((Block) new MetaDataBlock(linkBlocks, metaData2)), metaData1)));
 
         getMockery().checking(new Expectations() {{
             // This is the part of the test verification: we verify that the passed Resource Reference has its base
             // reference set.
             ResourceReference reference = new ResourceReference("reference", ResourceType.DOCUMENT);
-            reference.setBaseReference("base");
+            reference.addBaseReference("base1");
+            reference.addBaseReference("base2");
             oneOf(mockWikiModel).isDocumentAvailable(reference);
             will(returnValue(true));
             oneOf(mockWikiModel).getDocumentViewURL(reference);
@@ -99,7 +103,7 @@ public class XHTMLRendererTest extends AbstractComponentTestCase
     public void testBeginLinkDoesntUseSourceMetaDataIfBaseReferenceSpecified()
     {
         final ResourceReference blockReference = new ResourceReference("reference", ResourceType.DOCUMENT);
-        blockReference.setBaseReference("original base");
+        blockReference.addBaseReference("original base");
 
         List<Block> linkBlocks = Arrays.asList((Block) new LinkBlock(Arrays.asList((Block) new WordBlock("label")),
             blockReference, true));
@@ -111,7 +115,7 @@ public class XHTMLRendererTest extends AbstractComponentTestCase
             // This is the part of the test verification: we verify that the passed Resource Reference has its base
             // reference set.
             ResourceReference reference = new ResourceReference("reference", ResourceType.DOCUMENT);
-            reference.setBaseReference("original base");
+            reference.addBaseReference("original base");
             oneOf(mockWikiModel).isDocumentAvailable(reference);
             will(returnValue(true));
             oneOf(mockWikiModel).getDocumentViewURL(reference);
@@ -139,7 +143,7 @@ public class XHTMLRendererTest extends AbstractComponentTestCase
             // This is the part of the test verification: we verify that the passed Resource Reference has its base
             // reference set.
             ResourceReference reference = new ResourceReference("reference", ResourceType.ATTACHMENT);
-            reference.setBaseReference("base");
+            reference.addBaseReference("base");
             oneOf(mockWikiModel).getImageURL(reference, Collections.<String, String>emptyMap());
             will(returnValue("imageurl"));
         }});
@@ -156,7 +160,7 @@ public class XHTMLRendererTest extends AbstractComponentTestCase
     public void testOnImageDoesntUseSourceMetaDataIfBaseReferenceSpecified()
     {
         final ResourceReference blockReference = new ResourceReference("reference", ResourceType.ATTACHMENT);
-        blockReference.setBaseReference("original base");
+        blockReference.addBaseReference("original base");
 
         List<Block> imageBlocks = Arrays.asList((Block) new ImageBlock(blockReference, true));
         MetaData metaData = new MetaData();
@@ -167,7 +171,7 @@ public class XHTMLRendererTest extends AbstractComponentTestCase
             // This is the part of the test verification: we verify that the passed Resource Reference has its base
             // reference set.
             ResourceReference reference = new ResourceReference("reference", ResourceType.ATTACHMENT);
-            reference.setBaseReference("original base");
+            reference.addBaseReference("original base");
             oneOf(mockWikiModel).getImageURL(reference, Collections.<String, String>emptyMap());
             will(returnValue("imageurl"));
         }});

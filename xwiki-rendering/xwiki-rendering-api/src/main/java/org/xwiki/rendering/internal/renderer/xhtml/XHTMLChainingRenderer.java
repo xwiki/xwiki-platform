@@ -20,6 +20,7 @@
 package org.xwiki.rendering.internal.renderer.xhtml;
 
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.xwiki.rendering.internal.renderer.xhtml.image.XHTMLImageRenderer;
@@ -268,9 +269,9 @@ public class XHTMLChainingRenderer extends AbstractChainingPrintRenderer
 
         // If the ResourceReference doesn't have a base reference specified, then look for one in previously sent
         // events (it's sent in begin/endMetaData events).
-        String baseReference = reference.getBaseReference();
-        if (baseReference == null) {
-            reference.setBaseReference((String) getMetaDataState().getMetaData(MetaData.SOURCE));
+        List<String> baseReferences = reference.getBaseReferences();
+        if (baseReferences.isEmpty()) {
+            reference.addBaseReferences(getMetaDataState().<String>getAllMetaData(MetaData.SOURCE));
         }
 
         this.linkRenderer.beginLink(reference, isFreeStandingURI, parameters);
@@ -734,9 +735,9 @@ public class XHTMLChainingRenderer extends AbstractChainingPrintRenderer
 
         // If the ResourceReference doesn't have a base reference specified, then look for one in previously sent
         // events (it's sent in begin/endMetaData events).
-        String baseReference = reference.getBaseReference();
-        if (baseReference == null) {
-            reference.setBaseReference((String) getMetaDataState().getMetaData(MetaData.SOURCE));
+        List<String> baseReferences = reference.getBaseReferences();
+        if (baseReferences.isEmpty()) {
+            reference.addBaseReferences(getMetaDataState().<String>getAllMetaData(MetaData.SOURCE));
         }
 
         this.imageRenderer.onImage(reference, isFreeStandingURI, parameters);

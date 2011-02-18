@@ -23,6 +23,7 @@ import java.io.IOException;
 import java.io.StringReader;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
+import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.lang.StringUtils;
@@ -245,11 +246,10 @@ public class XWikiWikiModel implements WikiModel
     private DocumentReference resolveDocumentReference(ResourceReference documentResourceReference)
     {
         DocumentReference documentReference;
-        if (documentResourceReference.getBaseReference() != null) {
+        if (!documentResourceReference.getBaseReferences().isEmpty()) {
             // If the passed reference has a base reference, resolve it first with a current resolver (it should
             // normally be absolute but who knows what the API caller has specified...)
-            DocumentReference baseReference =
-                this.currentDocumentReferenceResolver.resolve(documentResourceReference.getBaseReference());
+            DocumentReference baseReference = resolveBaseReference(documentResourceReference.getBaseReferences());
             documentReference =
                 this.currentDocumentReferenceResolver.resolve(documentResourceReference.getReference(), baseReference);
         } else {
@@ -257,6 +257,27 @@ public class XWikiWikiModel implements WikiModel
         }
 
         return documentReference;
+    }
+
+    /**
+     * Resolve the list of base references taking the first element in the list, resolving it and then resolving the
+     * other elements based on the previous resolving.
+     *
+     * @param baseReferences the list of base references to resolve
+     * @return the resolved base reference against which to resolve the target resource reference
+     */
+    private DocumentReference resolveBaseReference(List<String> baseReferences)
+    {
+        DocumentReference resolvedBaseReference = null;
+        for (String baseReference : baseReferences) {
+            if (resolvedBaseReference != null) {
+                resolvedBaseReference =
+                    this.currentDocumentReferenceResolver.resolve(baseReference, resolvedBaseReference);
+            } else {
+                resolvedBaseReference = this.currentDocumentReferenceResolver.resolve(baseReference);
+            }
+        }
+        return resolvedBaseReference;
     }
 
     /**
@@ -268,11 +289,10 @@ public class XWikiWikiModel implements WikiModel
     private AttachmentReference resolveAttachmentReference(ResourceReference attachmentResourceReference)
     {
         AttachmentReference attachmentReference;
-        if (attachmentResourceReference.getBaseReference() != null) {
+        if (!attachmentResourceReference.getBaseReferences().isEmpty()) {
             // If the passed reference has a base reference, resolve it first with a current resolver (it should
             // normally be absolute but who knows what the API caller has specified...)
-            DocumentReference baseReference =
-                this.currentDocumentReferenceResolver.resolve(attachmentResourceReference.getBaseReference());
+            DocumentReference baseReference = resolveBaseReference(attachmentResourceReference.getBaseReferences());
             attachmentReference = this.currentAttachmentReferenceResolver.resolve(
                 attachmentResourceReference.getReference(), baseReference);
         } else {

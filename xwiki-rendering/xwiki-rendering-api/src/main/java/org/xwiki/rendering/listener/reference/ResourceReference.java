@@ -19,9 +19,11 @@
  */
 package org.xwiki.rendering.listener.reference;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.lang.builder.EqualsBuilder;
@@ -37,6 +39,21 @@ import org.apache.commons.lang.builder.HashCodeBuilder;
 public class ResourceReference implements Cloneable
 {
     /**
+     * Bracket start char.
+     */
+    private static final char BRACKET_START = '[';
+
+    /**
+     * Bracket dtop char.
+     */
+    private static final char BRACKET_STOP = ']';
+
+    /**
+     * Comma followed by space.
+     */
+    private static final String COMMA_SPACE = ", ";
+
+    /**
      * @see #isTyped()
      */
     private boolean isTyped = true;
@@ -50,12 +67,12 @@ public class ResourceReference implements Cloneable
     private String reference;
 
     /**
-     * @see #getBaseReference()
+     * @see #getBaseReferences()
      *
      * Note that the reason we store the base reference as a String and not as an Entity Reference is because we want
      * the Rendering module independent of the XWiki Model so that it can be used independently of XWiki.
      */
-    private String baseReference;
+    private List<String> baseReferences;
 
     /**
      * @see #getType()
@@ -115,20 +132,40 @@ public class ResourceReference implements Cloneable
     }
 
     /**
-     * @param baseReference see {@link #getBaseReference()}
+     * @param baseReference see {@link #getBaseReferences()}
      */
-    public void setBaseReference(String baseReference)
+    public void addBaseReference(String baseReference)
     {
-        this.baseReference = baseReference;
+        if (this.baseReferences == null) {
+            this.baseReferences = new ArrayList<String>();
+        }
+        this.baseReferences.add(baseReference);
     }
 
     /**
-     * @return the base reference to use when we need to compute an absolute reference and {@link #getReference()}
-     *         returns a non absolute reference, can be {@code null}
+     * @param baseReferences see {@link #getBaseReferences()}
      */
-    public String getBaseReference()
+    public void addBaseReferences(List<String> baseReferences)
     {
-        return this.baseReference;
+        for (String baseReference : baseReferences) {
+            addBaseReference(baseReference);
+        }
+    }
+
+    /**
+     * @return the base references to use when we need to compute an absolute reference and {@link #getReference()}
+     *         returns a non absolute reference, can be {@code null}. When resolving references the list should be
+     *         evaluated from first to last (the last entries qualifying the entries earlier in the list)
+     */
+    public List<String> getBaseReferences()
+    {
+        List<String> result;
+        if (this.baseReferences == null) {
+            result = Collections.emptyList();
+        } else {
+            result = Collections.unmodifiableList(this.baseReferences);
+        }
+        return result;
     }
 
     /**
@@ -216,9 +253,18 @@ public class ResourceReference implements Cloneable
             sb.append(" ");
             sb.append("Reference = [").append(getReference()).append("]");
         }
-        if (getBaseReference() != null) {
+        if (!getBaseReferences().isEmpty()) {
             sb.append(" ");
-            sb.append("Base Reference = [").append(getBaseReference()).append("]");
+            sb.append("Base References = [");
+            Iterator<String> it = getBaseReferences().listIterator();
+            while (it.hasNext()) {
+                String baseReference = it.next();
+                sb.append(BRACKET_START).append(baseReference).append(BRACKET_STOP);
+                if (it.hasNext()) {
+                    sb.append(COMMA_SPACE);
+                }
+            }
+            sb.append(BRACKET_STOP);
         }
         Map<String, String> params = getParameters();
         if (!params.isEmpty()) {
@@ -227,12 +273,13 @@ public class ResourceReference implements Cloneable
             Iterator<Map.Entry<String, String>> it = params.entrySet().iterator();
             while (it.hasNext()) {
                 Map.Entry<String, String> entry = it.next();
-                sb.append("[").append(entry.getKey()).append("] = [").append(entry.getValue()).append("]");
+                sb.append(BRACKET_START).append(entry.getKey()).append("] = [").append(entry.getValue());
+                sb.append(BRACKET_STOP);
                 if (it.hasNext()) {
-                    sb.append(", ");
+                    sb.append(COMMA_SPACE);
                 }
             }
-            sb.append("]");
+            sb.append(BRACKET_STOP);
         }
 
         return sb.toString();
@@ -267,7 +314,7 @@ public class ResourceReference implements Cloneable
             .append(getType())
             .append(isTyped())
             .append(getReference())
-            .append(getBaseReference())
+            .append(getBaseReferences())
             .append(getParameters())
             .toHashCode();
     }
@@ -293,7 +340,7 @@ public class ResourceReference implements Cloneable
             .append(getType(), rhs.getType())
             .append(isTyped(), rhs.isTyped())
             .append(getReference(), rhs.getReference())
-            .append(getBaseReference(), rhs.getBaseReference())
+            .append(getBaseReferences(), rhs.getBaseReferences())
             .append(getParameters(), rhs.getParameters())
             .isEquals();
     }

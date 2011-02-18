@@ -151,9 +151,7 @@ public class IncludeMacro extends AbstractMacro<IncludeMacroParameters>
 
         DocumentReference includedReference = resolve(context.getCurrentMacroBlock(), parameters.getDocument());
 
-        if (context.getCurrentMacroBlock() != null) {
-            checkRecursiveInclusion(context.getCurrentMacroBlock(), includedReference);
-        }
+        checkRecursiveInclusion(context.getCurrentMacroBlock(), includedReference);
 
         if (!this.documentAccessBridge.isDocumentViewable(includedReference)) {
             throw new MacroExecutionException("Current user doesn't have view rights on document ["
@@ -163,8 +161,6 @@ public class IncludeMacro extends AbstractMacro<IncludeMacroParameters>
         Context parametersContext = parameters.getContext();
 
         // Step 2: Extract included document's content and syntax.
-        // TODO: use macro source information to resolve document reference based on the macro source instead
-        // of the context
         DocumentModelBridge documentBridge;
         try {
             documentBridge = this.documentAccessBridge.getDocument(includedReference);
@@ -254,16 +250,30 @@ public class IncludeMacro extends AbstractMacro<IncludeMacroParameters>
     /**
      * Convert document name into proper {@link DocumentReference}.
      * 
-     * @param block the block from which to resolve the document reference
-     * @param documentName the document name
-     * @return the document reference
+     * @param block the block from which to look for a MetaData Block containing the Source
+     * @param documentName the document reference passed by the user to the macro
+     * @return the resolved absolute document reference
      */
     private DocumentReference resolve(Block block, String documentName)
     {
-        // TODO: use macro source informations to resolve document reference based on the macro source instead of the
-        // context
+        DocumentReference result;
 
-        return this.currentDocumentReferenceResolver.resolve(documentName);
+        String sourceMetadata = null;
+        MetaDataBlock metadataBlock = block.getPreviousBlockByType(MetaDataBlock.class, true);
+        while (sourceMetadata == null && metadataBlock != null) {
+            sourceMetadata = (String) metadataBlock.getMetaData().getMetaData(MetaData.SOURCE);
+            metadataBlock = metadataBlock.getPreviousBlockByType(MetaDataBlock.class, true);
+        }
+
+        // If no Source MetaData was found resolve against the current document as a failsafe solution.
+        if (sourceMetadata == null) {
+            result = this.currentDocumentReferenceResolver.resolve(documentName);
+        } else {
+            result = this.currentDocumentReferenceResolver.resolve(documentName,
+                this.currentDocumentReferenceResolver.resolve(sourceMetadata));
+        }
+
+        return result;
     }
 
     /**

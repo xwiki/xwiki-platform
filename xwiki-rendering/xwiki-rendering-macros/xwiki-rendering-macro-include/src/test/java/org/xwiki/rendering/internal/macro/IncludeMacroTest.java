@@ -34,8 +34,10 @@ import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.block.MacroBlock;
 import org.xwiki.rendering.block.MacroMarkerBlock;
+import org.xwiki.rendering.block.MetaDataBlock;
 import org.xwiki.rendering.internal.macro.include.IncludeMacro;
 import org.xwiki.rendering.internal.transformation.macro.MacroTransformation;
+import org.xwiki.rendering.listener.MetaData;
 import org.xwiki.rendering.macro.Macro;
 import org.xwiki.rendering.macro.MacroExecutionException;
 import org.xwiki.rendering.macro.include.IncludeMacroParameters;
@@ -117,7 +119,7 @@ public class IncludeMacroTest extends AbstractComponentTestCase
         IncludeMacroParameters parameters = new IncludeMacroParameters();
 
         try {
-            this.includeMacro.execute(parameters, null, new MacroTransformationContext());
+            this.includeMacro.execute(parameters, null, createMacroTransformationContext("whatever", false));
             Assert.fail("An exception should have been thrown");
         } catch (MacroExecutionException expected) {
             Assert.assertEquals("You must specify a 'document' parameter pointing to the document to include.",
@@ -158,7 +160,8 @@ public class IncludeMacroTest extends AbstractComponentTestCase
         parameters.setDocument("includedWiki:includedSpace.includedPage");
         parameters.setContext(Context.NEW);
 
-        List<Block> blocks = this.includeMacro.execute(parameters, null, new MacroTransformationContext());
+        List<Block> blocks = this.includeMacro.execute(parameters, null,
+            createMacroTransformationContext("whatever", false));
 
         assertBlocks(expected, blocks, this.rendererFactory);
     }
@@ -175,25 +178,72 @@ public class IncludeMacroTest extends AbstractComponentTestCase
 
         this.includeMacro.setDocumentAccessBridge(mockSetup.bridge);
 
-        MacroBlock includeMacro =
-            new MacroBlock("include", Collections.singletonMap("document", "wiki:space.page"), false);
+        MacroTransformationContext macroContext = createMacroTransformationContext("wiki:space.page", false);
+        // Add an Include Macro MarkerBlock as a parent of the include Macro block since this is what would have
+        // happened if an Include macro is included in another Include macro.
         new MacroMarkerBlock("include", Collections.singletonMap("document", "space.page"),
-            Collections.<Block>singletonList(includeMacro), false);
-        MacroTransformationContext context = new MacroTransformationContext();
-        context.setCurrentMacroBlock(includeMacro);
+            Collections.<Block>singletonList(macroContext.getCurrentMacroBlock()), false);
 
         IncludeMacroParameters parameters = new IncludeMacroParameters();
         parameters.setDocument("wiki:space.page");
         parameters.setContext(Context.CURRENT);
         
         try {
-            this.includeMacro.execute(parameters, null, context);
+            this.includeMacro.execute(parameters, null, macroContext);
             Assert.fail("The include macro hasn't checked the recursive inclusion");
         } catch (MacroExecutionException expected) {
             if (!expected.getMessage().startsWith("Found recursive inclusion")) {
                 throw expected;
             }
         }
+    }
+
+    @Test
+    public void testIncludeMacroInsideSourceMetaDataBlockAndWithRelativeDocumentReferencePassed()
+        throws Exception
+    {
+        String expected = "beginDocument\n"
+            + "beginMetaData [[source]=[relativePage]]\n"
+            + "beginParagraph\n"
+            + "onWord [content]\n"
+            + "endParagraph\n"
+            + "endMetaData [[source]=[relativePage]]\n"
+            + "endDocument";
+
+        IncludeMacroParameters parameters = new IncludeMacroParameters();
+        parameters.setDocument("relativePage");
+
+        MacroTransformationContext macroContext = createMacroTransformationContext("whatever", false);
+        // Add a Source MetaData Block as a parent of the include Macro block.
+        new MetaDataBlock(Collections.<Block>singletonList(macroContext.getCurrentMacroBlock()),
+            new MetaData(Collections.<String, Object>singletonMap(MetaData.SOURCE, "wiki:space.page")));
+
+        final DocumentReference sourceReference = new DocumentReference("wiki", "space", "page");
+        final DocumentReference resolvedReference = new DocumentReference("wiki", "space", "relativePage");
+        final DocumentModelBridge mockDocument = getMockery().mock(DocumentModelBridge.class);
+        getMockery().checking(new Expectations() {{
+            oneOf(mockSetup.documentReferenceResolver).resolve("wiki:space.page");
+                will(returnValue(sourceReference));
+            oneOf(mockSetup.documentReferenceResolver).resolve("relativePage", sourceReference);
+                will(returnValue(resolvedReference));
+            oneOf(mockSetup.bridge).isDocumentViewable(resolvedReference); will(returnValue(true));
+            oneOf(mockSetup.bridge).getDocument(resolvedReference); will(returnValue(mockDocument));
+            oneOf(mockDocument).getContent(); will(returnValue("content"));
+            oneOf(mockDocument).getSyntax(); will(returnValue(Syntax.XWIKI_2_0));
+        }});
+
+        List<Block> blocks = this.includeMacro.execute(parameters, null, macroContext);
+
+        assertBlocks(expected, blocks, this.rendererFactory);
+    }
+
+    private MacroTransformationContext createMacroTransformationContext(String documentName, boolean isInline)
+    {
+        MacroTransformationContext context = new MacroTransformationContext();
+        MacroBlock includeMacro =
+            new MacroBlock("include", Collections.singletonMap("document", documentName), isInline);
+        context.setCurrentMacroBlock(includeMacro);
+        return context;
     }
 
     private void setUpDocumentMock(final String resolve, final DocumentReference reference, final String content)
@@ -241,7 +291,7 @@ public class IncludeMacroTest extends AbstractComponentTestCase
         // macro can transform included page which is using a new context.
         MacroTransformation macroTransformation =
             (MacroTransformation) getComponentManager().lookup(Transformation.class, "macro");
-        MacroTransformationContext macroContext = new MacroTransformationContext();
+        MacroTransformationContext macroContext = createMacroTransformationContext("wiki:space.page", false);
         macroContext.setId("templateId");
         macroContext.setTransformation(macroTransformation);
 

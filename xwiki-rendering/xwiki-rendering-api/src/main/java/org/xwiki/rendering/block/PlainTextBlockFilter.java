@@ -40,7 +40,7 @@ import org.xwiki.rendering.renderer.reference.link.LinkLabelGenerator;
 public class PlainTextBlockFilter implements BlockFilter
 {
     /**
-     * The set of valid Block classes as toc item content.
+     * The set of valid Block classes as plain text content.
      */
     private static final Set<Class< ? extends Block>> VALID_PLAINTEXT_BLOCKS = new HashSet<Class< ? extends Block>>()
     {

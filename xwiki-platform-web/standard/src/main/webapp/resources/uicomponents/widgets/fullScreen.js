@@ -285,6 +285,7 @@ XWiki.widgets.FullScreen = Class.create({
     * - All the initial styles of the altered elements are remembered, so that they can be restored when exiting fullscreen
     */
   makeFullScreen : function (targetElement) {
+    document.fire("xwiki:fullscreen:enter", { "target" : targetElement });
     // Store the selector of the target element in the form, in the hidden input called 'x-maximized'.
     // This is needed so that the full screen can be reactivated when comming back from preview, if it was activate before
     // the user hit the preview button.
@@ -405,6 +406,7 @@ XWiki.widgets.FullScreen = Class.create({
   /** Restore the layout. */
   closeFullScreen : function() {
     var targetElement = this.maximized;
+    document.fire("xwiki:fullscreen:exit", { "target" : targetElement });
     // Remember the cursor position and scroll offset (needed for circumventing https://bugzilla.mozilla.org/show_bug.cgi?id=633789 )
     if (typeof targetElement.setSelectionRange == 'function') {
       var selectionStart = targetElement.selectionStart;

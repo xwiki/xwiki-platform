@@ -217,6 +217,27 @@ var Wysiwyg =
 
 // Enhance the WysiwygEditor class with custom events.
 Wysiwyg.onModuleLoad(function() {
+    // Declare the functions that will ensure the selection is preserved whenever we switch to fullscreen editing and back.
+    WysiwygEditor.prototype._beforeToggleFullScreen = function(event) {
+        if (event.memo.target.down('.gwt-RichTextArea') == this.getRichTextArea()) {
+            // Save the current selection range.
+            this._selectionRange = this.getSelectionRange();
+            // Disable the rich text area.
+            this.getCommandManager().execute('enable', 'false');
+        }
+    }
+    WysiwygEditor.prototype._afterToggleFullScreen = function(event) {
+        if (event.memo.target.down('.gwt-RichTextArea') == this.getRichTextArea()) {
+            // Re-enable the rich text area.
+            this.getCommandManager().execute('enable', 'true');
+            // Restore the selection range.
+            this.setSelectionRange(this._selectionRange);
+            // We have to delay the focus because we are currently handling the native click event.
+            setTimeout(function() {
+                this.setFocus(true);
+            }.bind(this), 10);
+        }
+    }
     var WysiwygEditorAspect = function() {
         WysiwygEditorAspect.base.constructor.apply(this, arguments);
         if (this.getRichTextArea()) {
@@ -228,6 +249,13 @@ Wysiwyg.onModuleLoad(function() {
             for(var i = 0; i < actionNames.length; i++) {
                 this.addActionHandler(actionNames[i], onAction.bind(this));
             }
+
+            // Preserve rich text area selection when switching to fullscreen editing and back. See XWIKI-6003.
+            document.observe('xwiki:fullscreen:enter', this._beforeToggleFullScreen.bindAsEventListener(this));
+            document.observe('xwiki:fullscreen:entered', this._afterToggleFullScreen.bindAsEventListener(this));
+            document.observe('xwiki:fullscreen:exit', this._beforeToggleFullScreen.bindAsEventListener(this));
+            document.observe('xwiki:fullscreen:exited', this._afterToggleFullScreen.bindAsEventListener(this));
+
             // If the editor was successfully created then fire a custom event.
             document.fire('xwiki:wysiwyg:created', {'instance': this});
             // Update the list of WYSIWYG editor instances.

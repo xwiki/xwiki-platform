@@ -55,23 +55,23 @@ public final class CommandManagerApi extends JavaScriptObject
             this.cm = cm;
         }
         $wnd.CommandManager.prototype.execute = function(commandName, parameter) {
-            var command = @org.xwiki.gwt.user.client.ui.rta.cmd.Command::new(Ljava/lang/String;)(commandName);
-            return this.cm.@org.xwiki.gwt.user.client.ui.rta.cmd.CommandManager::execute(Lorg/xwiki/gwt/user/client/ui/rta/cmd/Command;Ljava/lang/String;)(command, parameter);
+            var command = @org.xwiki.gwt.user.client.ui.rta.cmd.Command::new(Ljava/lang/String;)('' + commandName);
+            return this.cm.@org.xwiki.gwt.user.client.ui.rta.cmd.CommandManager::execute(Lorg/xwiki/gwt/user/client/ui/rta/cmd/Command;Ljava/lang/String;)(command, '' + parameter);
         }
         $wnd.CommandManager.prototype.getValue = function(commandName) {
-            var command = @org.xwiki.gwt.user.client.ui.rta.cmd.Command::new(Ljava/lang/String;)(commandName);
+            var command = @org.xwiki.gwt.user.client.ui.rta.cmd.Command::new(Ljava/lang/String;)('' + commandName);
             return this.cm.@org.xwiki.gwt.user.client.ui.rta.cmd.CommandManager::getStringValue(Lorg/xwiki/gwt/user/client/ui/rta/cmd/Command;)(command);
         }
         $wnd.CommandManager.prototype.isEnabled = function(commandName) {
-            var command = @org.xwiki.gwt.user.client.ui.rta.cmd.Command::new(Ljava/lang/String;)(commandName);
+            var command = @org.xwiki.gwt.user.client.ui.rta.cmd.Command::new(Ljava/lang/String;)('' + commandName);
             return this.cm.@org.xwiki.gwt.user.client.ui.rta.cmd.CommandManager::isEnabled(Lorg/xwiki/gwt/user/client/ui/rta/cmd/Command;)(command);
         }
         $wnd.CommandManager.prototype.isExecuted = function(commandName) {
-            var command = @org.xwiki.gwt.user.client.ui.rta.cmd.Command::new(Ljava/lang/String;)(commandName);
+            var command = @org.xwiki.gwt.user.client.ui.rta.cmd.Command::new(Ljava/lang/String;)('' + commandName);
             return this.cm.@org.xwiki.gwt.user.client.ui.rta.cmd.CommandManager::isExecuted(Lorg/xwiki/gwt/user/client/ui/rta/cmd/Command;)(command);
         }
         $wnd.CommandManager.prototype.isSupported = function(commandName) {
-            var command = @org.xwiki.gwt.user.client.ui.rta.cmd.Command::new(Ljava/lang/String;)(commandName);
+            var command = @org.xwiki.gwt.user.client.ui.rta.cmd.Command::new(Ljava/lang/String;)('' + commandName);
             return this.cm.@org.xwiki.gwt.user.client.ui.rta.cmd.CommandManager::isSupported(Lorg/xwiki/gwt/user/client/ui/rta/cmd/Command;)(command);
         }
     }-*/;

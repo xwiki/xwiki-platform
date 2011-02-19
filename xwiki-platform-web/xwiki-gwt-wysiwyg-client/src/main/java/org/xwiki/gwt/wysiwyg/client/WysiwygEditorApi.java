@@ -20,6 +20,8 @@
 package org.xwiki.gwt.wysiwyg.client;
 
 import org.xwiki.gwt.dom.client.JavaScriptObject;
+import org.xwiki.gwt.dom.client.Range;
+import org.xwiki.gwt.dom.client.Selection;
 import org.xwiki.gwt.user.client.Config;
 import org.xwiki.gwt.user.client.NativeActionHandler;
 import org.xwiki.gwt.user.client.NativeAsyncCallback;
@@ -32,6 +34,7 @@ import org.xwiki.gwt.wysiwyg.client.converter.HTMLConverterAsync;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.JsArrayString;
+import com.google.gwt.dom.client.Node;
 import com.google.gwt.event.logical.shared.CloseEvent;
 import com.google.gwt.event.logical.shared.CloseHandler;
 import com.google.gwt.event.shared.HandlerRegistration;
@@ -52,6 +55,30 @@ public class WysiwygEditorApi
      * The command used to submit the value of the rich text area.
      */
     public static final Command SUBMIT = new Command("submit");
+
+    /**
+     * The property of the JavaScript object returned by {@link #getSelectionRange()} that holds the reference to the
+     * DOM node where the selection starts.
+     */
+    private static final String START_CONTAINER = "startContainer";
+
+    /**
+     * The property of the JavaScript object returned by {@link #getSelectionRange()} that holds the offset within the
+     * {@link #START_CONTAINER}.
+     */
+    private static final String START_OFFSET = "startOffset";
+
+    /**
+     * The property of the JavaScript object returned by {@link #getSelectionRange()} that holds the reference to the
+     * DOM node where the selection ends.
+     */
+    private static final String END_CONTAINER = "endContainer";
+
+    /**
+     * The property of the JavaScript object returned by {@link #getSelectionRange()} that holds the offset within the
+     * {@link #END_CONTAINER}.
+     */
+    private static final String END_OFFSET = "endOffset";
 
     /**
      * The underlying {@link WysiwygEditor} which is exposed in native JavaScript code.
@@ -233,6 +260,60 @@ public class WysiwygEditorApi
     }
 
     /**
+     * Focused or blurs the WYSIWYG editor.
+     * 
+     * @param focused {@code true} to focus the WYSIWYG editor, {@code false} to blur it
+     */
+    public void setFocus(boolean focused)
+    {
+        if (editor.getRichTextEditor().getTextArea().isEnabled()) {
+            editor.getRichTextEditor().getTextArea().setFocus(focused);
+        } else {
+            editor.getPlainTextEditor().getTextArea().setFocus(focused);
+        }
+    }
+
+    /**
+     * @return the rich text area's selection range
+     */
+    public JavaScriptObject getSelectionRange()
+    {
+        RichTextArea textArea = editor.getRichTextEditor().getTextArea();
+        if (textArea.isAttached()) {
+            Selection selection = textArea.getDocument().getSelection();
+            if (selection.getRangeCount() > 0) {
+                Range range = selection.getRangeAt(0);
+                JavaScriptObject jsRange = (JavaScriptObject) JavaScriptObject.createObject();
+                jsRange.set(START_CONTAINER, range.getStartContainer());
+                jsRange.set(START_OFFSET, range.getStartOffset());
+                jsRange.set(END_CONTAINER, range.getEndContainer());
+                jsRange.set(END_OFFSET, range.getEndOffset());
+                return jsRange;
+            }
+        }
+        return null;
+    }
+
+    /**
+     * Sets the rich text area's selection range.
+     * 
+     * @param jsRange a JavaScript object that has these properties: {@code startContainer}, {@code startOffset},
+     *            {@code endContainer} and {@code endOffset}
+     */
+    public void setSelectionRange(JavaScriptObject jsRange)
+    {
+        RichTextArea textArea = editor.getRichTextEditor().getTextArea();
+        if (jsRange != null && textArea.isAttached()) {
+            Selection selection = textArea.getDocument().getSelection();
+            Range range = textArea.getDocument().createRange();
+            range.setStart((Node) jsRange.get(START_CONTAINER), (Integer) jsRange.get(START_OFFSET));
+            range.setEnd((Node) jsRange.get(END_CONTAINER), (Integer) jsRange.get(END_OFFSET));
+            selection.removeAllRanges();
+            selection.addRange(range);
+        }
+    }
+
+    /**
      * Publishes the JavaScript API that can be used to create and control {@link WysiwygEditor}s.
      */
     public static native void publish()
@@ -260,7 +341,7 @@ public class WysiwygEditorApi
             return this.instance.@org.xwiki.gwt.wysiwyg.client.WysiwygEditorApi::getCommandManagerApi()();
         }
         $wnd.WysiwygEditor.prototype.addActionHandler = function(actionName, handler) {
-            var registration = this.instance.@org.xwiki.gwt.wysiwyg.client.WysiwygEditorApi::addActionHandler(Ljava/lang/String;Lorg/xwiki/gwt/dom/client/JavaScriptObject;)(actionName, handler);
+            var registration = this.instance.@org.xwiki.gwt.wysiwyg.client.WysiwygEditorApi::addActionHandler(Ljava/lang/String;Lorg/xwiki/gwt/dom/client/JavaScriptObject;)('' + actionName, handler);
             return function() {
                 if (registration) {
                     registration.@com.google.gwt.event.shared.HandlerRegistration::removeHandler()();
@@ -269,10 +350,19 @@ public class WysiwygEditorApi
             };
         }
         $wnd.WysiwygEditor.prototype.getParameter = function(name) {
-            return this.instance.@org.xwiki.gwt.wysiwyg.client.WysiwygEditorApi::getParameter(Ljava/lang/String;)(name);
+            return this.instance.@org.xwiki.gwt.wysiwyg.client.WysiwygEditorApi::getParameter(Ljava/lang/String;)('' + name);
         }
         $wnd.WysiwygEditor.prototype.getParameterNames = function() {
             return this.instance.@org.xwiki.gwt.wysiwyg.client.WysiwygEditorApi::getParameterNames()();
+        }
+        $wnd.WysiwygEditor.prototype.setFocus = function(focused) {
+            return this.instance.@org.xwiki.gwt.wysiwyg.client.WysiwygEditorApi::setFocus(Z)(!!focused);
+        }
+        $wnd.WysiwygEditor.prototype.getSelectionRange = function() {
+            return this.instance.@org.xwiki.gwt.wysiwyg.client.WysiwygEditorApi::getSelectionRange()();
+        }
+        $wnd.WysiwygEditor.prototype.setSelectionRange = function(range) {
+            this.instance.@org.xwiki.gwt.wysiwyg.client.WysiwygEditorApi::setSelectionRange(Lorg/xwiki/gwt/dom/client/JavaScriptObject;)(range);
         }
     }-*/;
 }

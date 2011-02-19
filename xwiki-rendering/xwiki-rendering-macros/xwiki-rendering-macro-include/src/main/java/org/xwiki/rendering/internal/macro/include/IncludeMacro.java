@@ -41,6 +41,8 @@ import org.xwiki.rendering.block.MacroMarkerBlock;
 import org.xwiki.rendering.block.MetaDataBlock;
 import org.xwiki.rendering.block.XDOM;
 import org.xwiki.rendering.block.match.BlockMatcher;
+import org.xwiki.rendering.block.match.ClassBlockMatcher;
+import org.xwiki.rendering.block.match.CompositeBlockMatcher;
 import org.xwiki.rendering.internal.macro.MacroContentParser;
 import org.xwiki.rendering.listener.MetaData;
 import org.xwiki.rendering.macro.AbstractMacro;
@@ -207,24 +209,33 @@ public class IncludeMacro extends AbstractMacro<IncludeMacroParameters>
         return result;
     }
 
+    /**
+     * Get the content to include (either full target document or a specific section's content).
+     *
+     * @param document the reference to the document from which to get the content
+     * @param section the id of the section from which to get the content in that document or null to take the whole
+     *        content
+     * @param includedReference the resolved absolute reference of the included document
+     * @return the content as an XDOM tree
+     * @throws MacroExecutionException if no section of the passed if exists in the included document
+     */
     private XDOM getContent(DocumentModelBridge document, final String section, DocumentReference includedReference)
         throws MacroExecutionException
     {
         XDOM includedContent = document.getXDOM();
 
         if (section != null) {
-            HeaderBlock headerBlock = (HeaderBlock) includedContent.getFirstBlock(new BlockMatcher() {
-                public boolean match(Block block)
-                {
-                    if (block instanceof HeaderBlock) {
+            HeaderBlock headerBlock = (HeaderBlock) includedContent.getFirstBlock(
+                new CompositeBlockMatcher(new ClassBlockMatcher(HeaderBlock.class), new BlockMatcher() {
+                    public boolean match(Block block)
+                    {
                         HeaderBlock headerBlock = (HeaderBlock) block;
                         if (headerBlock.getId().equals(section)) {
                             return true;
                         }
+                        return false;
                     }
-                    return false;
-                }
-            }, Block.Axes.DESCENDANT);
+                }),Block.Axes.DESCENDANT);
             if (headerBlock == null) {
                 throw new MacroExecutionException("Cannot find section [" + section
                     + "] in document [" + this.defaultEntityReferenceSerializer.serialize(includedReference) + "]");
@@ -291,19 +302,26 @@ public class IncludeMacro extends AbstractMacro<IncludeMacroParameters>
     {
         DocumentReference result;
 
-        String sourceMetadata = null;
-        MetaDataBlock metadataBlock = block.getPreviousBlockByType(MetaDataBlock.class, true);
-        while (sourceMetadata == null && metadataBlock != null) {
-            sourceMetadata = (String) metadataBlock.getMetaData().getMetaData(MetaData.SOURCE);
-            metadataBlock = metadataBlock.getPreviousBlockByType(MetaDataBlock.class, true);
-        }
+        MetaDataBlock metaDataBlock = (MetaDataBlock) block.getFirstBlock(
+            new CompositeBlockMatcher(new ClassBlockMatcher(MetaDataBlock.class), new BlockMatcher() {
+                public boolean match(Block block)
+                {
+                    MetaDataBlock metaDataBlock = (MetaDataBlock) block;
+                    String sourceMetaData = (String) metaDataBlock.getMetaData().getMetaData(MetaData.SOURCE);
+                    if (sourceMetaData != null) {
+                        return true;
+                    }
+                    return false;
+                }
+            }), Block.Axes.ANCESTOR);
 
         // If no Source MetaData was found resolve against the current document as a failsafe solution.
-        if (sourceMetadata == null) {
+        if (metaDataBlock == null) {
             result = this.currentDocumentReferenceResolver.resolve(documentName);
         } else {
+            String sourceMetaData = (String) metaDataBlock.getMetaData().getMetaData(MetaData.SOURCE);
             result = this.currentDocumentReferenceResolver.resolve(documentName,
-                this.currentDocumentReferenceResolver.resolve(sourceMetadata));
+                this.currentDocumentReferenceResolver.resolve(sourceMetaData));
         }
 
         return result;

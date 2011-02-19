@@ -260,7 +260,7 @@ public class WysiwygEditorApi
     }
 
     /**
-     * Focused or blurs the WYSIWYG editor.
+     * Focuses or blurs the WYSIWYG editor.
      * 
      * @param focused {@code true} to focus the WYSIWYG editor, {@code false} to blur it
      */

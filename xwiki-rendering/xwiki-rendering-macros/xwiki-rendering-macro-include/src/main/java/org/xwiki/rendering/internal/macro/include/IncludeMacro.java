@@ -229,11 +229,7 @@ public class IncludeMacro extends AbstractMacro<IncludeMacroParameters>
                 new CompositeBlockMatcher(new ClassBlockMatcher(HeaderBlock.class), new BlockMatcher() {
                     public boolean match(Block block)
                     {
-                        HeaderBlock headerBlock = (HeaderBlock) block;
-                        if (headerBlock.getId().equals(section)) {
-                            return true;
-                        }
-                        return false;
+                        return ((HeaderBlock) block).getId().equals(section);
                     }
                 }),Block.Axes.DESCENDANT);
             if (headerBlock == null) {
@@ -306,12 +302,7 @@ public class IncludeMacro extends AbstractMacro<IncludeMacroParameters>
             new CompositeBlockMatcher(new ClassBlockMatcher(MetaDataBlock.class), new BlockMatcher() {
                 public boolean match(Block block)
                 {
-                    MetaDataBlock metaDataBlock = (MetaDataBlock) block;
-                    String sourceMetaData = (String) metaDataBlock.getMetaData().getMetaData(MetaData.SOURCE);
-                    if (sourceMetaData != null) {
-                        return true;
-                    }
-                    return false;
+                    return ((MetaDataBlock) block).getMetaData().contains(MetaData.SOURCE);
                 }
             }), Block.Axes.ANCESTOR);
 

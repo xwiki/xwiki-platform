@@ -98,6 +98,16 @@ public class MetaData
     }
 
     /**
+     * @param key the key to the metadata element to check for
+     * @return true if there's a metadata with the passed key, false otherwise
+     * @since 3.0M3
+     */
+    public boolean contains(Object key)
+    {
+        return this.metadata.containsKey(key);
+    }
+
+    /**
      * @return all the metadata
      */
     public Map<String, Object> getMetaData()

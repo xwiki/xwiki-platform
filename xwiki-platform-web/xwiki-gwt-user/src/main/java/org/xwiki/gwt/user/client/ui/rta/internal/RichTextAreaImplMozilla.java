@@ -23,6 +23,7 @@ import org.xwiki.gwt.dom.client.Document;
 import org.xwiki.gwt.dom.client.Element;
 import org.xwiki.gwt.user.client.ui.rta.RichTextArea;
 
+import com.google.gwt.dom.client.BodyElement;
 import com.google.gwt.dom.client.IFrameElement;
 
 /**
@@ -88,17 +89,35 @@ public class RichTextAreaImplMozilla extends com.google.gwt.user.client.ui.impl.
         if (enabled != isEnabledImpl()) {
             Document document = (Document) IFrameElement.as(elem).getContentDocument();
             document.setDesignMode(enabled);
-            if (enabled) {
+            // When the rich text area is empty the design mode is not fully initialized until the user types a
+            // printable key. This causes problems if we add content to the rich text area using the DOM API before the
+            // user has typed any printable key (e.g. insert a symbol, a link, an image etc.). We found that inserting
+            // some text using the insertHTML command and then deleting it fixes this problem. Unfortunately by doing
+            // this we also add an entry to the browser's editing history. We're safe as long as we use a custom history
+            // mechanism. See https://bugzilla.mozilla.org/show_bug.cgi?id=346523
+            if (enabled && isEmpty(document)) {
                 try {
-                    // It seems that the following line of code fixes the Midas bug which prevents the user to delete
-                    // any HTML inserted through DOM API before any printable key has been pressed.
-                    document.execCommand("undo", null);
+                    document.execCommand("insertHTML", "x");
+                    document.execCommand("selectAll", null);
+                    document.execCommand("delete", null);
                 } catch (Exception e) {
                     // Ignore: execCommand throws an exception if the in-line frame is hidden through CSS. This can
                     // happen when the rich text area is loaded in background.
                 }
             }
         }
+    }
+
+    /**
+     * A document is empty is its body is empty. The body element is empty if it contains just a {@code br} element.
+     * 
+     * @param document a DOM document
+     * @return {@code true} if the given document is empty, {@code false} otherwise
+     */
+    private boolean isEmpty(Document document)
+    {
+        BodyElement body = document.getBody();
+        return body.getChildCount() == 1 && "br".equalsIgnoreCase(body.getFirstChild().getNodeName());
     }
 
     /**

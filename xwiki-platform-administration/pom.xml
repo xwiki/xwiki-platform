@@ -31,7 +31,7 @@
   </parent>
   <artifactId>xwiki-application-administration</artifactId>
   <name>XWiki Platform - Applications - Administration</name>
-  <version>What is the release version for "XWiki Platform - Applications - Administration"? (org.xwiki.platform.applications:xwiki-application-administration) 1.44: : 1.44.1</version>
+  <version>1.44-SNAPSHOT</version>
   <packaging>xar</packaging>
   <description>Application for administrating wiki features like users, groups, rights etc.</description>
   <!-- We must configure SCM in each module. For more information see:

@@ -60,7 +60,7 @@ public class EditGadgetWizardStep extends EditMacroWizardStep
     /**
      * {@inheritDoc}
      * 
-     * @see org.xwiki.gwt.wysiwyg.client.plugin.macro.ui.SelectMacroWizardStep#getStepTitle()
+     * @see EditMacroWizardStep#getStepTitle()
      */
     @Override
     public String getStepTitle()
@@ -74,8 +74,7 @@ public class EditGadgetWizardStep extends EditMacroWizardStep
     /**
      * {@inheritDoc}
      * 
-     * @see org.xwiki.gwt.wysiwyg.client.plugin.macro.ui.EditMacroWizardStep#init(java.lang.Object,
-     *      com.google.gwt.user.client.rpc.AsyncCallback)
+     * @see EditMacroWizardStep#init(java.lang.Object, AsyncCallback)
      */
     @Override
     public void init(Object data, AsyncCallback< ? > cb)
@@ -114,7 +113,7 @@ public class EditGadgetWizardStep extends EditMacroWizardStep
     /**
      * {@inheritDoc}
      * 
-     * @see org.xwiki.gwt.wysiwyg.client.plugin.macro.ui.EditMacroWizardStep#getResult()
+     * @see EditMacroWizardStep#getResult()
      */
     @Override
     public Object getResult()

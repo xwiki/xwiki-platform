@@ -26,7 +26,7 @@ import org.xwiki.gwt.wysiwyg.client.plugin.macro.ui.SelectMacroWizardStep;
 
 /**
  * The wizard step to select a gadget, extending the macro selecting step. <br />
- * FIXME: remove some macros from the list, the ones that don't mase sense as gadgets such as "dashboard", or that are
+ * FIXME: remove some macros from the list, the ones that don't make sense as gadgets such as "dashboard", or that are
  * not part of the gadgets category. Add multiple categories to macros.
  * 
  * @version $Id$
@@ -50,7 +50,7 @@ public class SelectGadgetWizardStep extends SelectMacroWizardStep
     /**
      * {@inheritDoc}
      * 
-     * @see org.xwiki.gwt.wysiwyg.client.plugin.macro.ui.SelectMacroWizardStep#getStepTitle()
+     * @see SelectMacroWizardStep#getStepTitle()
      */
     @Override
     public String getStepTitle()

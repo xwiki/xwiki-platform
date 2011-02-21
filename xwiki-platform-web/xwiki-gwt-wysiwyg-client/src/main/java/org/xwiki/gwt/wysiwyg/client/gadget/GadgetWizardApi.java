@@ -77,7 +77,7 @@ public class GadgetWizardApi implements WizardListener
     private final MacroServiceAsync macroService;
 
     /**
-     * The javascript callback called called when the insert is done.
+     * The javascript callback called when the insert is done.
      */
     @SuppressWarnings("unused")
     private JavaScriptObject insertCallback;
@@ -168,7 +168,7 @@ public class GadgetWizardApi implements WizardListener
             editStep.setDirectionName(NavigationDirection.FINISH, Strings.INSTANCE.gadgetInsertActionLabel());
             editStep.setValidDirections(EnumSet.of(NavigationDirection.PREVIOUS, NavigationDirection.FINISH));
 
-            //... and put them all together in a wizard
+            // ... and put them all together in a wizard
             WizardStepMap insertSteps = new WizardStepMap();
             insertSteps.put(SELECT_STEP_NAME, selectStep);
             insertSteps.put(EDIT_STEP_NAME, editStep);

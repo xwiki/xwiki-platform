@@ -21,7 +21,6 @@ package org.xwiki.gwt.wysiwyg.client;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.i18n.client.Constants;
-import com.google.gwt.user.client.ui.Widget;
 
 /**
  * A collection of {@link Constants} used to localize the user interface.

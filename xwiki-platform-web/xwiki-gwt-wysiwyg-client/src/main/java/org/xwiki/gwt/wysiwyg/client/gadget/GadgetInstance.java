@@ -43,7 +43,7 @@ public class GadgetInstance
     /**
      * @return the macroCall
      */
-    protected MacroCall getMacroCall()
+    public MacroCall getMacroCall()
     {
         return macroCall;
     }
@@ -51,7 +51,7 @@ public class GadgetInstance
     /**
      * @param macroCall the macroCall to set
      */
-    protected void setMacroCall(MacroCall macroCall)
+    public void setMacroCall(MacroCall macroCall)
     {
         this.macroCall = macroCall;
     }
@@ -59,7 +59,7 @@ public class GadgetInstance
     /**
      * @return the title
      */
-    protected String getTitle()
+    public String getTitle()
     {
         return title;
     }
@@ -67,7 +67,7 @@ public class GadgetInstance
     /**
      * @param title the title to set
      */
-    protected void setTitle(String title)
+    public void setTitle(String title)
     {
         this.title = title;
     }

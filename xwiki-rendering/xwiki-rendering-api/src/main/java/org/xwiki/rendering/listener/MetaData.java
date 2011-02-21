@@ -92,7 +92,7 @@ public class MetaData
      * @param key the key to the metadata element to retrieve (e.g. "syntax")
      * @return the metadata corresponding to the passed key of null if no such metadata exist.
      */
-    public Object getMetaData(Object key)
+    public Object getMetaData(String key)
     {
         return this.metadata.get(key);
     }
@@ -102,7 +102,7 @@ public class MetaData
      * @return true if there's a metadata with the passed key, false otherwise
      * @since 3.0M3
      */
-    public boolean contains(Object key)
+    public boolean contains(String key)
     {
         return this.metadata.containsKey(key);
     }

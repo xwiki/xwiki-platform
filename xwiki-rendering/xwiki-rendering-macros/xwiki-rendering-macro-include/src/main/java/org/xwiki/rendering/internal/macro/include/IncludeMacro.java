@@ -175,7 +175,7 @@ public class IncludeMacro extends AbstractMacro<IncludeMacroParameters>
         // if CONTEXT_CURRENT, then simply get the included page's content, parse it and return the resulting AST
         // (i.e. don't apply any transformations since we don't want any Macro to be executed at this stage since they
         // should be executed by the currently running Macro Transformation.
-        List<Block> result;
+        XDOM result;
         MacroTransformationContext newContext = context.clone();
         newContext.setSyntax(includedSyntax);
         if (parametersContext == Context.NEW) {
@@ -190,9 +190,10 @@ public class IncludeMacro extends AbstractMacro<IncludeMacroParameters>
 
         // Step 4: Wrap Blocks in a MetaDataBlock with the "source" metadata specified so that potential relative
         // links/images are resolved correctly at render time.
-        result = Arrays.asList((Block) new MetaDataBlock(result, MetaData.SOURCE, parameters.getDocument()));
+        MetaDataBlock metadata = new MetaDataBlock(result.getChildren(), result.getMetaData());
+        metadata.getMetaData().addMetaData(MetaData.SOURCE, parameters.getDocument());
 
-        return result;
+        return Arrays.<Block>asList(metadata);
     }
 
     /**
@@ -222,7 +223,7 @@ public class IncludeMacro extends AbstractMacro<IncludeMacroParameters>
                 throw new MacroExecutionException("Cannot find section [" + section
                     + "] in document [" + this.defaultEntityReferenceSerializer.serialize(includedReference) + "]");
             } else {
-                includedContent = new XDOM(headerBlock.getSection().getChildren());
+                includedContent = new XDOM(headerBlock.getSection().getChildren(), includedContent.getMetaData());
             }
         }
 
@@ -313,10 +314,10 @@ public class IncludeMacro extends AbstractMacro<IncludeMacroParameters>
      * @return the result of parsing and transformation of the document to include.
      * @throws MacroExecutionException error when parsing content.
      */
-    private List<Block> executeWithNewContext(DocumentReference includedDocumentReference, XDOM includedContent,
+    private XDOM executeWithNewContext(DocumentReference includedDocumentReference, XDOM includedContent,
         MacroTransformationContext macroContext) throws MacroExecutionException
     {
-        List<Block> result;
+        XDOM result;
 
         try {
             // Push new Execution Context to isolate the contexts (Velocity, Groovy, etc).
@@ -352,7 +353,7 @@ public class IncludeMacro extends AbstractMacro<IncludeMacroParameters>
      * @return the result of parsing and transformation of the document to include.
      * @throws MacroExecutionException error when parsing content.
      */
-    private List<Block> executeWithCurrentContext(DocumentReference includedDocumentReference, XDOM includedContent,
+    private XDOM executeWithCurrentContext(DocumentReference includedDocumentReference, XDOM includedContent,
         MacroTransformationContext macroContext) throws MacroExecutionException
     {
         return generateIncludedPageDOM(includedDocumentReference, includedContent, macroContext, false);
@@ -368,10 +369,10 @@ public class IncludeMacro extends AbstractMacro<IncludeMacroParameters>
      * @return the result of parsing and transformation of the document to include.
      * @throws MacroExecutionException error when parsing content.
      */
-    private List<Block> generateIncludedPageDOM(DocumentReference includedDocumentReference, XDOM includedContent,
+    private XDOM generateIncludedPageDOM(DocumentReference includedDocumentReference, XDOM includedContent,
         MacroTransformationContext macroContext, boolean transform) throws MacroExecutionException
     {
-        List<Block> result;
+        XDOM result;
 
         if (transform && macroContext.getTransformation() != null) {
             // Make sure we clone the XDOM since the transformation is going to modify it and we don't want the
@@ -384,9 +385,9 @@ public class IncludeMacro extends AbstractMacro<IncludeMacroParameters>
             } catch (Exception e) {
                 throw new MacroExecutionException("Failed to include page [" + includedDocumentReference + "]", e);
             }
-            result = clonedContent.getChildren();
+            result = clonedContent;
         } else {
-            result = includedContent.getChildren();
+            result = includedContent;
         }
 
         return result;

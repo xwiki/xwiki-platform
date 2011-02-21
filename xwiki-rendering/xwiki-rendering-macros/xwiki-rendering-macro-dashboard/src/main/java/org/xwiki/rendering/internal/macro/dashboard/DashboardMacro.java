@@ -182,14 +182,19 @@ public class DashboardMacro extends AbstractMacro<DashboardMacroParameters>
             throw new MacroExecutionException(message, e);
         }
 
+        boolean isInEditMode = gadgetSource.isEditing();
+
         // include the css and js for this macro. here so that it's included after any dependencies have included their
         // css, so that it cascades properly
-        this.includeResources(gadgetSource.isEditing());
+        this.includeResources(isInEditMode);
 
         // put everything in a nice toplevel group for this dashboard, to be able to add classes to it
         GroupBlock topLevel = new GroupBlock();
-        // just under the toplevel, above the content, slip in the metadata, for the client code
-        topLevel.addChildren(gadgetSource.getDashboardSourceMetadata(parameters.getSource(), context));
+        // just under the toplevel, above the content, slip in the metadata, for the client code, only if we're in edit
+        // mode
+        if (isInEditMode) {
+            topLevel.addChildren(gadgetSource.getDashboardSourceMetadata(parameters.getSource(), context));
+        }
         topLevel.addChildren(layoutedResult);
         // add the style attribute of the dashboard macro as a class to the toplevel container
         topLevel.setParameter("class", MACRO_NAME

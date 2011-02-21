@@ -80,3 +80,17 @@
 .dashboard-edit .gadget .gadget-title {
   cursor: move;
 }
+
+/* Add button decoration */
+.dashboard-edit .addgadget {
+  background: url($xwiki.getSkinFile("icons/silk/add.gif")) no-repeat 3px 3px #4D9244;
+  cursor: pointer;
+  float: right;
+  line-height: 16px;
+  padding-left: 18px;
+  font-weight: bold;
+  margin-top: 20px;
+  padding: 3px 3px 3px 22px;
+  text-transform: uppercase;
+  color: #FFFFFF;
+}

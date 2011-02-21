@@ -79,6 +79,7 @@
             <exclude>org/xwiki/gwt/wysiwyg/client/plugin/color/exec/HiliteColorExecutable</exclude>
             <exclude>org/xwiki/gwt/wysiwyg/client/plugin/submit/exec/EnableExecutable</exclude>
             <exclude>org/xwiki/gwt/wysiwyg/client/plugin/submit/exec/ResetExecutable</exclude>
+            <exclude>org/xwiki/gwt/wysiwyg/client/Strings</exclude>
           </excludes>
         </configuration>
       </plugin>

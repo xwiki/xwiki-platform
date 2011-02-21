@@ -637,4 +637,12 @@ public class SelectMacroWizardStep extends AbstractMacroWizardStep implements Do
             ((VerticalResizePanel) getPanel()).refreshHeights();
         }
     }
+
+    /**
+     * @return the validationMessage
+     */
+    protected Label getValidationMessage()
+    {
+        return validationMessage;
+    }
 }

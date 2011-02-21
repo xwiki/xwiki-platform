@@ -19,6 +19,7 @@ XWiki.Dashboard = Class.create( {
     this.containers = element.select(".gadget-container");
     this.createDragAndDrops();
     this.addGadgetsHandlers();
+    this.addNewGadgetHandler();
     
     // add save listener, to save the dashboard before submit of the form
     document.observe("xwiki:actions:save", this.saveChanges.bindAsEventListener(this));
@@ -47,7 +48,7 @@ XWiki.Dashboard = Class.create( {
     if (XWiki.currentDocument.page != this.sourcePage || XWiki.currentDocument.space != this.sourceSpace 
         || XWiki.currentDocument.wiki != this.sourceWiki) {
       // by default styled by the colibri skin
-      var warningElt = new Element('div', {'class' : 'box warningmessage'});
+      var warningElt = new Element('div', {'class' : 'box warningmessage differentsource'});
       // FIXME: I don't like the way these messages are used, should be able to insert the link in the translation
       var information = "$msg.get('dashboard.actions.edit.differentsource.information')";
       var warning = "$msg.get('dashboard.actions.edit.differentsource.warning')";
@@ -193,6 +194,82 @@ XWiki.Dashboard = Class.create( {
     });
   },
   
+  /**
+   * Adds the handler to add the new gadget on the dashboard, the "Add" button at the top.
+   */
+  addNewGadgetHandler : function() {
+    // create the button
+    var addButton = new Element('div', {'class' : 'addgadget', 'title' : "$msg.get('dashboard.actions.add.tooltip')"});
+    addButton.update("$msg.get('dashboard.actions.add.button')");
+    addButton.observe('click', function(event) {
+      // get the gadget wizard and start adding a gadget
+      Wysiwyg.onModuleLoad(function() {
+        gadgetWizard = new XWiki.GadgetWizard();
+        gadgetWizard.add(this.onAddGadget.bind(this));
+      }.bind(this));
+    }.bindAsEventListener(this));
+    // check if the warning is there, if it is, put the button under it
+    var warning = this.element.down('.differentsource');
+    if (warning) {
+      warning.insert({'after' : addButton});
+    } else {
+      this.element.insert({'top' : addButton});
+    }
+    // and put a clearfloats after the add
+    addButton.insert({'after' : new Element('div', {'class' : 'clearfloats'})});
+  },
+
+  /**
+   * Handles the command to actually add the gadget, after the user has filled in the wizard
+   * 
+   * @param macroMarker the string representing the HTML of the macro call, to send to the server as the wysiwyg 
+   *        generated value for the gadget content field 
+   */
+  onAddGadget : function (gadgetConfig) {
+    // compose the parameters for the object add action
+    // compose the html comment for the contentField
+    var contentField = "<!--" + gadgetConfig.content + "--><!--stopmacro-->";
+    // to generate the position of the newly added gadget, on the last position in the last column
+    var lastColumn = this.containers.length;
+    var lastIndex = this.containers.last().select('.gadget').length + 1;
+    // prepare parameters
+    var addParameters = new Hash();
+    // class
+    addParameters.set('classname', this.gadgetsClass);
+    // title
+    addParameters.set(this.gadgetsClass + '_title', gadgetConfig.title);
+    // content
+    addParameters.set(this.gadgetsClass + '_content', contentField);
+    addParameters.set('RequiresHTMLConversion', this.gadgetsClass + '_content');
+    addParameters.set(this.gadgetsClass + '_content_syntax', "xwiki/2.0");
+    // position
+    addParameters.set(this.gadgetsClass + '_position', lastColumn + ', ' + lastIndex);
+    // aaaand send the request
+    this._x_notification = new XWiki.widgets.Notification("$msg.get('dashboard.actions.add.loading')", "inprogress"); 
+    new Ajax.Request(
+      this.addURL,
+      {
+        parameters : addParameters,
+        onSuccess : function (response) {
+          // don't hide the notification here, leave it loading, will be removed by the reload
+          // FIXME: reload only that widget
+          window.location.reload();
+        }.bind(this),
+        onFailure : function(response) {
+          var failureReason = response.statusText;
+          if (response.statusText == '' /* No response */ || response.status == 12031 /* In IE */) {
+            failureReason = 'Server not responding';
+          }
+          this._x_notification.replace(new XWiki.widgets.Notification(
+              "$msg.get('dashboard.actions.add.failed')" + failureReason, "error", {timeout : 5}));
+        }.bind(this),
+        on0: function (response) {
+          response.request.options.onFailure(response);
+        }.bind(this)        
+      }
+    );
+  },
+
   /**
    * Removes the gadget passed by its id.
    * 

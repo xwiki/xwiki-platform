@@ -282,4 +282,20 @@ public class EditMacroWizardStep extends AbstractMacroWizardStep
             contentDisplayer.setFocused(true);
         }
     }
+
+    /**
+     * @return the macroDescriptor
+     */
+    protected MacroDescriptor getMacroDescriptor()
+    {
+        return macroDescriptor;
+    }
+
+    /**
+     * @return the macroCall
+     */
+    protected MacroCall getMacroCall()
+    {
+        return macroCall;
+    }
 }

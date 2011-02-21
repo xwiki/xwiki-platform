@@ -20,6 +20,7 @@
 package org.xwiki.gwt.wysiwyg.client;
 
 import org.xwiki.gwt.user.client.ui.rta.cmd.CommandManagerApi;
+import org.xwiki.gwt.wysiwyg.client.gadget.GadgetWizardApi;
 
 import com.google.gwt.core.client.EntryPoint;
 
@@ -39,5 +40,7 @@ public class Wysiwyg implements EntryPoint
     {
         CommandManagerApi.publish();
         WysiwygEditorApi.publish();
+        // TODO: this is not the right place for this, since the gadget API is used only by the dashboard
+        GadgetWizardApi.publish();
     }
 }

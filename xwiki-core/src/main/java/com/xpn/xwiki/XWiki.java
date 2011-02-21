@@ -5822,6 +5822,9 @@ public class XWiki implements XWikiDocChangeNotificationInterface, EventListener
 
     public String formatDate(Date date, String format, XWikiContext context)
     {
+        if (date == null) {
+            return "";
+        }
         String xformat = format;
         String defaultFormat = "yyyy/MM/dd HH:mm";
 
@@ -5855,7 +5858,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface, EventListener
 
             return sdf.format(date);
         } catch (Exception e) {
-            e.printStackTrace();
+            LOG.info("Failed to format date [" + date + "] with pattern [" + xformat + "]: " + e.getMessage());
             if (format == null) {
                 if (xformat.equals(defaultFormat)) {
                     return date.toString();

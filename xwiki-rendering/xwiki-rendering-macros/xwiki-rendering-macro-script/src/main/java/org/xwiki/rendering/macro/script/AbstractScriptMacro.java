@@ -25,15 +25,12 @@ import java.util.List;
 
 import org.apache.commons.lang.StringUtils;
 import org.xwiki.component.annotation.Requirement;
-import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.context.Execution;
 import org.xwiki.observation.ObservationManager;
-import org.xwiki.script.event.ScriptEvaluatedEvent;
-import org.xwiki.script.event.ScriptEvaluatingEvent;
 import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.block.MacroBlock;
-import org.xwiki.rendering.block.XDOM;
+import org.xwiki.rendering.internal.macro.MacroContentParser;
 import org.xwiki.rendering.macro.AbstractMacro;
 import org.xwiki.rendering.macro.MacroExecutionException;
 import org.xwiki.rendering.macro.descriptor.ContentDescriptor;
@@ -41,14 +38,17 @@ import org.xwiki.rendering.parser.ParseException;
 import org.xwiki.rendering.parser.Parser;
 import org.xwiki.rendering.transformation.MacroTransformationContext;
 import org.xwiki.rendering.util.ParserUtils;
+import org.xwiki.script.event.ScriptEvaluatedEvent;
+import org.xwiki.script.event.ScriptEvaluatingEvent;
 
 /**
  * Base Class for script evaluation macros.
  * <p>
  * It is not obvious to see how macro execution works just from looking at the code. A lot of checking and
  * initialization is done in listeners to the {@link org.xwiki.script.event.ScriptEvaluatingEvent} and
- * {@link org.xwiki.script.event.ScriptEvaluatedEvent}. E.g. the check for programming rights for JSR223 scripts, check for nested
- * script macros and selecting the right class loader is done there.</p>
+ * {@link org.xwiki.script.event.ScriptEvaluatedEvent}. E.g. the check for programming rights for JSR223 scripts, check
+ * for nested script macros and selecting the right class loader is done there.
+ * </p>
  * 
  * @param <P> the type of macro parameters bean.
  * @version $Id$
@@ -64,6 +64,7 @@ public abstract class AbstractScriptMacro<P extends ScriptMacroParameters> exten
 
     /**
      * Used to find if the current document's author has programming rights.
+     * 
      * @deprecated since 2.5M1 (not used any more)
      */
     @Requirement
@@ -90,13 +91,21 @@ public abstract class AbstractScriptMacro<P extends ScriptMacroParameters> exten
     private Parser plainTextParser;
 
     /**
-     * Used to clean result of the parser syntax.
+     * The parser used to parse box content and box title parameter.
      */
-    private ParserUtils parserUtils = new ParserUtils();
+    @Requirement
+    private MacroContentParser contentParser;
 
-    /** Observation manager used to sent evaluation events. */
+    /**
+     * Observation manager used to sent evaluation events.
+     */
     @Requirement
     private ObservationManager observation;
+
+    /**
+     * Utility to remove the top level paragraph.
+     */
+    private ParserUtils parserUtils = new ParserUtils();
 
     /**
      * @param macroName the name of the macro (eg "groovy")
@@ -194,8 +203,7 @@ public abstract class AbstractScriptMacro<P extends ScriptMacroParameters> exten
                 }
             } finally {
                 // send evaluation finished event
-                observation.notify(new ScriptEvaluatedEvent(getDescriptor().getId().getId()), context,
-                        parameters);
+                observation.notify(new ScriptEvaluatedEvent(getDescriptor().getId().getId()), context, parameters);
             }
         }
 
@@ -218,10 +226,7 @@ public abstract class AbstractScriptMacro<P extends ScriptMacroParameters> exten
         List<Block> result;
 
         if (parameters.isWiki()) {
-            XDOM parsedDom = parseSourceSyntax(content, context);
-
-            // 3) If in inline mode remove any top level paragraph
-            result = parsedDom.getChildren();
+            result = parseSourceSyntax(content, context);
         } else {
             try {
                 result = this.plainTextParser.parse(new StringReader(content)).getChildren();
@@ -232,11 +237,11 @@ public abstract class AbstractScriptMacro<P extends ScriptMacroParameters> exten
             }
         }
 
+        // 3) If in inline mode remove any top level paragraph
         if (context.isInline()) {
-            // TODO: use inline parser instead
             this.parserUtils.removeTopLevelParagraph(result);
 
-            // Make sure included macro is incline when script macro itself is inline
+            // Make sure included macro is inline when script macro itself is inline
             // TODO: use inline parser instead
             if (!result.isEmpty() && result.get(0) instanceof MacroBlock && !((MacroBlock) result.get(0)).isInline()) {
                 MacroBlock macro = (MacroBlock) result.get(0);
@@ -307,38 +312,16 @@ public abstract class AbstractScriptMacro<P extends ScriptMacroParameters> exten
     }
 
     /**
-     * Get the parser of the current wiki syntax.
-     * 
-     * @param context the context of the macro transformation.
-     * @return the parser of the current wiki syntax.
-     * @throws MacroExecutionException Failed to find source parser.
-     */
-    protected Parser getSyntaxParser(MacroTransformationContext context) throws MacroExecutionException
-    {
-        try {
-            return getComponentManager().lookup(Parser.class, context.getSyntax().toIdString());
-        } catch (ComponentLookupException e) {
-            throw new MacroExecutionException("Failed to find source parser", e);
-        }
-    }
-
-    /**
      * Parse provided content with the parser of the current wiki syntax.
      * 
      * @param content the content to parse.
      * @param context the context of the macro transformation.
-     * @return an XDOM containing the parser content.
+     * @return the result of the parsing.
      * @throws MacroExecutionException failed to parse content
      */
-    protected XDOM parseSourceSyntax(String content, MacroTransformationContext context) throws MacroExecutionException
+    protected List<Block> parseSourceSyntax(String content, MacroTransformationContext context)
+        throws MacroExecutionException
     {
-        Parser parser = getSyntaxParser(context);
-
-        try {
-            return parser.parse(new StringReader(content));
-        } catch (ParseException e) {
-            throw new MacroExecutionException("Failed to parse content [" + content + "] with Syntax parser ["
-                + parser.getSyntax() + "]", e);
-        }
+        return this.contentParser.parse(content, context, false, false);
     }
 }

@@ -32,10 +32,13 @@ import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.Requirement;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.rendering.block.Block;
+import org.xwiki.rendering.block.Block.Axes;
 import org.xwiki.rendering.block.MacroBlock;
 import org.xwiki.rendering.block.MacroMarkerBlock;
 import org.xwiki.rendering.block.RawBlock;
 import org.xwiki.rendering.block.XDOM;
+import org.xwiki.rendering.block.match.ClassBlockMatcher;
+import org.xwiki.rendering.internal.macro.MacroContentParser;
 import org.xwiki.rendering.macro.AbstractMacro;
 import org.xwiki.rendering.macro.MacroExecutionException;
 import org.xwiki.rendering.macro.descriptor.DefaultContentDescriptor;
@@ -80,6 +83,11 @@ public class HTMLMacro extends AbstractMacro<HTMLMacroParameters>
     private static final Syntax XHTML_SYNTAX = new Syntax(SyntaxType.XHTML, "1.0");
 
     /**
+     * Used to search for inner macros.
+     */
+    private static final ClassBlockMatcher MACROBLOCKMATCHER = new ClassBlockMatcher(MacroBlock.class);
+
+    /**
      * To clean the passed HTML so that it's valid XHTML (this is required since we use an XML parser to parse it).
      */
     @Requirement
@@ -98,6 +106,12 @@ public class HTMLMacro extends AbstractMacro<HTMLMacroParameters>
      */
     @Requirement("xhtmlmacro/1.0")
     private PrintRendererFactory xhtmlRendererFactory;
+
+    /**
+     * The parser used to parse macro content.
+     */
+    @Requirement
+    private MacroContentParser contentParser;
 
     /**
      * Create and initialize the descriptor of the macro.
@@ -136,8 +150,7 @@ public class HTMLMacro extends AbstractMacro<HTMLMacroParameters>
             // a wiki syntax parser and render it back using a special renderer to print the XDOM blocks into
             // a text representing the resulting XHTML content.
             if (parameters.getWiki()) {
-                normalizedContent =
-                    renderWikiSyntax(normalizedContent, context.getTransformation(), context.getSyntax(), context);
+                normalizedContent = renderWikiSyntax(normalizedContent, context.getTransformation(), context);
             }
 
             // Clean the HTML into valid XHTML if the user has asked (it's the default).
@@ -217,27 +230,25 @@ public class HTMLMacro extends AbstractMacro<HTMLMacroParameters>
      * 
      * @param content the content to parse
      * @param transformation the macro transformation to execute macros when wiki is set to true
-     * @param wikiSyntax the wiki syntax used inside the HTML macro
      * @param context the context of the macros transformation process
      * @return the output XHTML as a string containing the XWiki Syntax resolved as XHTML
      * @throws MacroExecutionException in case there's a parsing problem
      */
-    private String renderWikiSyntax(String content, Transformation transformation, Syntax wikiSyntax,
-        MacroTransformationContext context) throws MacroExecutionException
+    private String renderWikiSyntax(String content, Transformation transformation, MacroTransformationContext context)
+        throws MacroExecutionException
     {
         String xhtml;
 
         try {
             // Parse the wiki syntax
-            Parser parser = this.componentManager.lookup(Parser.class, wikiSyntax.toIdString());
-            XDOM xdom = parser.parse(new StringReader(content));
+            XDOM xdom = this.contentParser.parseXDOM(content, context, false, false);
 
             // Force clean=false for sub HTML macro:
             // - at this point we don't know the context of the macro, it can be some <div> directly followed by the
             // html macro, it this case the macro will be parsed as inline block
             // - by forcing clean=false, we also make the html macro merge the whole html before cleaning so the cleaner
             // have the chole context and can clean better
-            List<MacroBlock> macros = xdom.getChildrenByType(MacroBlock.class, true);
+            List<MacroBlock> macros = (List) xdom.getBlocks(MACROBLOCKMATCHER, Axes.DESCENDANT);
             for (MacroBlock macro : macros) {
                 if (macro.getId().equals("html")) {
                     macro.setParameter("clean", "false");
@@ -247,8 +258,8 @@ public class HTMLMacro extends AbstractMacro<HTMLMacroParameters>
             MacroBlock htmlMacroBlock = context.getCurrentMacroBlock();
 
             MacroMarkerBlock htmlMacroMarker =
-                new MacroMarkerBlock(htmlMacroBlock.getId(), htmlMacroBlock.getParameters(), htmlMacroBlock
-                    .getContent(), xdom.getChildren(), htmlMacroBlock.isInline());
+                new MacroMarkerBlock(htmlMacroBlock.getId(), htmlMacroBlock.getParameters(),
+                    htmlMacroBlock.getContent(), xdom.getChildren(), htmlMacroBlock.isInline());
             // otherwise the HTML block will not be able to access the parent DOM
             htmlMacroMarker.setParent(htmlMacroBlock.getParent());
 
@@ -265,8 +276,7 @@ public class HTMLMacro extends AbstractMacro<HTMLMacroParameters>
             xhtml = printer.toString();
 
         } catch (Exception e) {
-            throw new MacroExecutionException("Failed to parse content [" + content + "] written in [" + wikiSyntax
-                + "] syntax.", e);
+            throw new MacroExecutionException("Failed to parse content [" + content + "].", e);
         }
 
         return xhtml;

@@ -20,6 +20,7 @@
 package org.xwiki.rendering.internal.macro;
 
 import java.io.StringReader;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
@@ -29,7 +30,12 @@ import org.xwiki.component.annotation.Requirement;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.rendering.block.Block;
+import org.xwiki.rendering.block.MacroBlock;
+import org.xwiki.rendering.block.MetaDataBlock;
 import org.xwiki.rendering.block.XDOM;
+import org.xwiki.rendering.block.Block.Axes;
+import org.xwiki.rendering.block.match.MetadataBlockMatcher;
+import org.xwiki.rendering.listener.MetaData;
 import org.xwiki.rendering.macro.MacroExecutionException;
 import org.xwiki.rendering.parser.Parser;
 import org.xwiki.rendering.syntax.Syntax;
@@ -39,7 +45,7 @@ import org.xwiki.rendering.util.ParserUtils;
 
 /**
  * Default implementation for {@link org.xwiki.rendering.internal.macro.MacroContentParser}.
- *
+ * 
  * @version $Id$
  * @since 3.0M1
  */
@@ -59,41 +65,56 @@ public class DefaultMacroContentParser implements MacroContentParser
 
     /**
      * {@inheritDoc}
+     * 
      * @see MacroContentParser#parse(String, MacroTransformationContext, boolean, boolean)
      */
     public List<Block> parse(String content, MacroTransformationContext macroContext, boolean transform,
         boolean removeTopLevelParagraph) throws MacroExecutionException
     {
+        return parseXDOM(content, macroContext, transform, removeTopLevelParagraph).getChildren();
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see org.xwiki.rendering.internal.macro.MacroContentParser#parseXDOM(java.lang.String,
+     *      org.xwiki.rendering.transformation.MacroTransformationContext, boolean, boolean)
+     */
+    public XDOM parseXDOM(String content, MacroTransformationContext macroContext, boolean transform,
+        boolean removeTopLevelParagraph) throws MacroExecutionException
+    {
         // If the content is empty return an empty list
         if (StringUtils.isEmpty(content)) {
-            return Collections.emptyList();
+            return new XDOM(Collections.<Block> emptyList());
         }
 
+        Syntax syntax = getCurrentSyntax(macroContext);
+
         // If there's no syntax specified in the Transformation throw an error
-        if (macroContext.getSyntax() == null) {
+        if (syntax == null) {
             throw new MacroExecutionException("Invalid Transformation: missing Syntax");
         }
 
         try {
-            List<Block> blocks = getSyntaxParser(macroContext.getSyntax()).parse(
-                new StringReader(content)).getChildren();
+            XDOM result = getSyntaxParser(syntax).parse(new StringReader(content));
 
             if (transform && macroContext.getTransformation() != null) {
-                XDOM xdom = new XDOM(blocks);
-                TransformationContext txContext = new TransformationContext(xdom, macroContext.getSyntax());
+                TransformationContext txContext = new TransformationContext(result, syntax);
                 txContext.setId(macroContext.getId());
                 try {
-                    macroContext.getTransformation().transform(xdom, txContext);
+                    macroContext.getTransformation().transform(result, txContext);
                 } catch (Exception e) {
                     throw new MacroExecutionException("Failed to perform transformation", e);
                 }
-                blocks = xdom.getChildren();
             }
 
             if (removeTopLevelParagraph) {
-                this.parserUtils.removeTopLevelParagraph(blocks);
+                List<Block> children = new ArrayList<Block>(result.getChildren());
+                this.parserUtils.removeTopLevelParagraph(children);
+                result.setChildren(children);
             }
-            return blocks;
+
+            return result;
         } catch (Exception e) {
             throw new MacroExecutionException("Failed to parse content [" + content + "]", e);
         }
@@ -101,7 +122,7 @@ public class DefaultMacroContentParser implements MacroContentParser
 
     /**
      * Get the parser for the current syntax.
-     *
+     * 
      * @param syntax the current syntax of the title content
      * @return the parser for the current syntax
      * @throws org.xwiki.rendering.macro.MacroExecutionException Failed to find source parser.
@@ -113,5 +134,30 @@ public class DefaultMacroContentParser implements MacroContentParser
         } catch (ComponentLookupException e) {
             throw new MacroExecutionException("Failed to find source parser for syntax [" + syntax + "]", e);
         }
+    }
+
+    /**
+     * Find the current syntax to use for macro supporting wiki content/parameters/whatever.
+     * 
+     * @param context the macro execution context containing the default syntax and the current macro block
+     * @return the current syntax
+     */
+    protected Syntax getCurrentSyntax(MacroTransformationContext context)
+    {
+        Syntax currentSyntax = context.getSyntax();
+
+        MacroBlock currentMacroBlock = context.getCurrentMacroBlock();
+
+        if (currentMacroBlock != null) {
+            MetaDataBlock metaDataBlock =
+                (MetaDataBlock) currentMacroBlock.getFirstBlock(new MetadataBlockMatcher(MetaData.SYNTAX),
+                    Axes.ANCESTOR_OR_SELF);
+
+            if (metaDataBlock != null) {
+                currentSyntax = (Syntax) metaDataBlock.getMetaData().getMetaData(MetaData.SYNTAX);
+            }
+        }
+
+        return currentSyntax;
     }
 }

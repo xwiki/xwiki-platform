@@ -117,6 +117,13 @@ public interface Block extends Cloneable
     void addChildren(List< ? extends Block> blocksToAdd);
 
     /**
+     * Replace current children by the provided list of {@link Block}s.
+     * 
+     * @param children the new children
+     */
+    void setChildren(List< ? extends Block> children);
+
+    /**
      * Helper method to add a single child block to the current block before the provided existing child block. For
      * adding several blocks at once use {@link #addChildren(java.util.List)}.
      * 

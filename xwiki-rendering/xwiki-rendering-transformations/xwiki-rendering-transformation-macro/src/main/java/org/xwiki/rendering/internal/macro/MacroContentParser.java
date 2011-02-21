@@ -23,12 +23,13 @@ import java.util.List;
 
 import org.xwiki.component.annotation.ComponentRole;
 import org.xwiki.rendering.block.Block;
+import org.xwiki.rendering.block.XDOM;
 import org.xwiki.rendering.macro.MacroExecutionException;
 import org.xwiki.rendering.transformation.MacroTransformationContext;
 
 /**
  * Parses content of a macro field (parameter, macro content) in a given syntax.
- *
+ * 
  * @version $Id$
  * @since 3.0M1
  */
@@ -38,7 +39,7 @@ public interface MacroContentParser
     /**
      * Parses content of a macro field (parameter, macro content) in a given syntax and optionally remove the top level
      * paragraph.
-     *
+     * 
      * @param content the content to parse
      * @param macroContext the executing Macro context (from which to get the current syntax, etc)
      * @param transform if true then executes transformations
@@ -47,5 +48,19 @@ public interface MacroContentParser
      * @throws MacroExecutionException in case of a parsing error
      */
     List<Block> parse(String content, MacroTransformationContext macroContext, boolean transform,
+        boolean removeTopLevelParagraph) throws MacroExecutionException;
+
+    /**
+     * Parses content of a macro field (parameter, macro content) in a given syntax and optionally remove the top level
+     * paragraph.
+     * 
+     * @param content the content to parse
+     * @param macroContext the executing Macro context (from which to get the current syntax, etc)
+     * @param transform if true then executes transformations
+     * @param removeTopLevelParagraph whether the top level paragraph should be removed after parsing
+     * @return the result as a {@link org.xwiki.rendering.block.Block}s
+     * @throws MacroExecutionException in case of a parsing error
+     */
+    XDOM parseXDOM(String content, MacroTransformationContext macroContext, boolean transform,
         boolean removeTopLevelParagraph) throws MacroExecutionException;
 }

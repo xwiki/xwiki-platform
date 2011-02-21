@@ -58,10 +58,17 @@
       <artifactId>xwiki-core-model</artifactId>
       <version>${project.version}</version>
     </dependency>
+
     <!-- Testing dependencies -->
     <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-core-rendering-tests</artifactId>
+      <version>${project.version}</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-core-rendering-macro-html</artifactId>
       <version>${project.version}</version>
       <scope>test</scope>
     </dependency>

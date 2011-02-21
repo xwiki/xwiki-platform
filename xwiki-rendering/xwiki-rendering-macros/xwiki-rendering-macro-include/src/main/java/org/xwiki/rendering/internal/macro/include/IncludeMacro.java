@@ -42,6 +42,7 @@ import org.xwiki.rendering.block.XDOM;
 import org.xwiki.rendering.block.match.BlockMatcher;
 import org.xwiki.rendering.block.match.ClassBlockMatcher;
 import org.xwiki.rendering.block.match.CompositeBlockMatcher;
+import org.xwiki.rendering.block.match.MetadataBlockMatcher;
 import org.xwiki.rendering.listener.MetaData;
 import org.xwiki.rendering.macro.AbstractMacro;
 import org.xwiki.rendering.macro.MacroExecutionException;
@@ -285,21 +286,17 @@ public class IncludeMacro extends AbstractMacro<IncludeMacroParameters>
     {
         DocumentReference result;
 
-        MetaDataBlock metaDataBlock = (MetaDataBlock) block.getFirstBlock(
-            new CompositeBlockMatcher(new ClassBlockMatcher(MetaDataBlock.class), new BlockMatcher() {
-                public boolean match(Block block)
-                {
-                    return ((MetaDataBlock) block).getMetaData().contains(MetaData.SOURCE);
-                }
-            }), Block.Axes.ANCESTOR);
+        MetaDataBlock metaDataBlock =
+            (MetaDataBlock) block.getFirstBlock(new MetadataBlockMatcher(MetaData.SOURCE), Block.Axes.ANCESTOR);
 
         // If no Source MetaData was found resolve against the current document as a failsafe solution.
         if (metaDataBlock == null) {
             result = this.currentDocumentReferenceResolver.resolve(documentName);
         } else {
             String sourceMetaData = (String) metaDataBlock.getMetaData().getMetaData(MetaData.SOURCE);
-            result = this.currentDocumentReferenceResolver.resolve(documentName,
-                this.currentDocumentReferenceResolver.resolve(sourceMetaData));
+            result =
+                this.currentDocumentReferenceResolver.resolve(documentName,
+                    this.currentDocumentReferenceResolver.resolve(sourceMetaData));
         }
 
         return result;

@@ -28,7 +28,6 @@ import java.util.Map;
 
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
-import org.xwiki.rendering.block.Block.Axes;
 import org.xwiki.rendering.block.match.BlockMatcher;
 import org.xwiki.rendering.block.match.ClassBlockMatcher;
 import org.xwiki.rendering.listener.Listener;
@@ -153,6 +152,18 @@ public abstract class AbstractBlock implements Block
         for (Block blockToAdd : blocksToAdd) {
             addChild(blockToAdd);
         }
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see org.xwiki.rendering.block.Block#setChildren(java.util.List)
+     */
+    public void setChildren(List< ? extends Block> children)
+    {
+        this.childrenBlocks.clear();
+
+        addChildren(children);
     }
 
     /**
@@ -964,7 +975,7 @@ public abstract class AbstractBlock implements Block
 
         return nextBlock != null ? nextBlock.getFirstBlock(matcher, nextAxes) : null;
     }
-    
+
     /**
      * {@inheritDoc}
      * 

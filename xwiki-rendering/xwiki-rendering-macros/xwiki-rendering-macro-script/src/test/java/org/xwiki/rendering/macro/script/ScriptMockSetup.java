@@ -38,9 +38,9 @@ public class ScriptMockSetup
 {
     public DocumentAccessBridge bridge;
     
-    public AttachmentReferenceResolver attachmentReferenceResolver;
+    public AttachmentReferenceResolver<String> attachmentReferenceResolver;
     
-    public DocumentReferenceResolver documentReferenceResolver;
+    public DocumentReferenceResolver<String> documentReferenceResolver;
 
     public WikiModel wikiModel;
 

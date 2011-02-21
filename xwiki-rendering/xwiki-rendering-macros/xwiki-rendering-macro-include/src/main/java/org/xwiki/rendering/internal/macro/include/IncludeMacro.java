@@ -28,7 +28,6 @@ import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.bridge.DocumentModelBridge;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.Requirement;
-import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.context.Execution;
 import org.xwiki.context.ExecutionContext;
 import org.xwiki.context.ExecutionContextManager;
@@ -43,7 +42,6 @@ import org.xwiki.rendering.block.XDOM;
 import org.xwiki.rendering.block.match.BlockMatcher;
 import org.xwiki.rendering.block.match.ClassBlockMatcher;
 import org.xwiki.rendering.block.match.CompositeBlockMatcher;
-import org.xwiki.rendering.internal.macro.MacroContentParser;
 import org.xwiki.rendering.listener.MetaData;
 import org.xwiki.rendering.macro.AbstractMacro;
 import org.xwiki.rendering.macro.MacroExecutionException;
@@ -64,12 +62,6 @@ public class IncludeMacro extends AbstractMacro<IncludeMacroParameters>
      * The description of the macro.
      */
     private static final String DESCRIPTION = "Include other pages into the current page.";
-
-    /**
-     * Used to find the parser from syntax identifier.
-     */
-    @Requirement
-    private ComponentManager componentManager;
 
     /**
      * Used to get the current context that we clone if the users asks to execute the included page in its own context.
@@ -101,12 +93,6 @@ public class IncludeMacro extends AbstractMacro<IncludeMacroParameters>
      */
     @Requirement
     private EntityReferenceSerializer<String> defaultEntityReferenceSerializer;
-
-    /**
-     * The parser used to parse included document content.
-     */
-    @Requirement
-    private MacroContentParser contentParser;
 
     /**
      * Default constructor.

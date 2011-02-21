@@ -24,6 +24,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.xwiki.rendering.listener.Format;
+import org.xwiki.rendering.listener.InlineFilterListener;
 import org.xwiki.rendering.listener.reference.ResourceReference;
 import org.xwiki.rendering.listener.reference.ResourceType;
 import org.xwiki.rendering.listener.WrappingListener;
@@ -52,54 +53,6 @@ public class LinkLabelGeneratorChainingListener extends AbstractChainingListener
      * chain.
      */
     protected StreamParser linkLabelParser;
-
-    /**
-     * InlineFilter listener is a listener that wrapps another listener and filters out the block events.
-     * 
-     * @version $Id$
-     */
-    protected static class InlineFilterListener extends WrappingListener
-    {
-        /**
-         * {@inheritDoc}
-         * 
-         * @see org.xwiki.rendering.listener.WrappingListener#beginSection(java.util.Map)
-         */
-        @Override
-        public void beginSection(Map<String, String> parameters)
-        {
-        }
-
-        /**
-         * {@inheritDoc}
-         * 
-         * @see org.xwiki.rendering.listener.WrappingListener#endSection(java.util.Map)
-         */
-        @Override
-        public void endSection(Map<String, String> parameters)
-        {
-        }
-
-        /**
-         * {@inheritDoc}
-         * 
-         * @see org.xwiki.rendering.listener.WrappingListener#beginParagraph(java.util.Map)
-         */
-        @Override
-        public void beginParagraph(Map<String, String> parameters)
-        {
-        }
-
-        /**
-         * {@inheritDoc}
-         * 
-         * @see org.xwiki.rendering.listener.WrappingListener#endParagraph(java.util.Map)
-         */
-        @Override
-        public void endParagraph(Map<String, String> parameters)
-        {
-        }
-    }
 
     /**
      * Creates a new link generator chaining listener.

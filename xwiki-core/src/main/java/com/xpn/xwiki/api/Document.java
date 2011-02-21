@@ -106,20 +106,30 @@ public class Document extends Api
      * blanks, except for the page name for which the default page name is used instead and for the wiki name for which
      * the current wiki is used instead of the current document reference's wiki.
      */
+    @SuppressWarnings("unchecked")
     private DocumentReferenceResolver<String> currentMixedDocumentReferenceResolver =
         Utils.getComponent(DocumentReferenceResolver.class, "currentmixed");
 
     /**
      * Used to convert a proper Document Reference to string (standard form).
      */
+    @SuppressWarnings("unchecked")
     private EntityReferenceSerializer<String> defaultEntityReferenceSerializer =
         Utils.getComponent(EntityReferenceSerializer.class);
 
     /**
      * Used to convert a proper Document Reference to a string but without the wiki name.
      */
+    @SuppressWarnings("unchecked")
     private EntityReferenceSerializer<String> localEntityReferenceSerializer =
         Utils.getComponent(EntityReferenceSerializer.class, "local");
+
+    /**
+     * Used to convert user references to string.
+     */
+    @SuppressWarnings("unchecked")
+    private EntityReferenceSerializer<String> compactWikiEntityReferenceSerializer =
+        Utils.getComponent(EntityReferenceSerializer.class, "compactwiki");
 
     /**
      * Document constructor.
@@ -234,7 +244,7 @@ public class Document extends Api
      */
     public String getFullName()
     {
-        return this.doc.getFullName();
+        return this.localEntityReferenceSerializer.serialize(this.doc.getDocumentReference());
     }
 
     /**
@@ -247,7 +257,7 @@ public class Document extends Api
      */
     public String getPrefixedFullName()
     {
-        return (getWiki() != null ? getWiki() + ":" : "") + getFullName();
+        return this.defaultEntityReferenceSerializer.serialize(this.doc.getDocumentReference());
     }
 
     /**
@@ -300,7 +310,7 @@ public class Document extends Api
      */
     public String getDisplayTitle()
     {
-        return this.doc.getDisplayTitle(getXWikiContext());
+        return this.doc.getRenderedTitle(Syntax.XHTML_1_0, getXWikiContext());
     }
 
     /**
@@ -346,7 +356,7 @@ public class Document extends Api
      */
     public String getAuthor()
     {
-        return this.doc.getAuthor();
+        return this.compactWikiEntityReferenceSerializer.serialize(this.doc.getAuthorReference());
     }
 
     /**
@@ -357,7 +367,7 @@ public class Document extends Api
      */
     public String getContentAuthor()
     {
-        return this.doc.getContentAuthor();
+        return this.compactWikiEntityReferenceSerializer.serialize(this.doc.getContentAuthorReference());
     }
 
     /**
@@ -406,7 +416,7 @@ public class Document extends Api
      */
     public String getCreator()
     {
-        return this.doc.getCreator();
+        return this.compactWikiEntityReferenceSerializer.serialize(this.doc.getCreatorReference());
     }
 
     /**
@@ -680,7 +690,7 @@ public class Document extends Api
 
     /**
      * Get an old revision of an attachment.
-     *
+     * 
      * @param filename the name of the attachment.
      * @param version a revision number such as "1.1" or "1.2".
      * @return the URL for accessing to the archive of the attachment "filename" at the version "version"
@@ -692,12 +702,12 @@ public class Document extends Api
 
     /**
      * Get an old revision of an attachment.
-     *
+     * 
      * @param filename the name of the attachment.
      * @param version a revision number such as "1.1" or "1.2".
      * @param queryString additional query parameters to pass in the request.
-     * @return the URL for accessing to the archive of the attachment "filename" at the version "version" 
-     *         with the given queryString parameters.
+     * @return the URL for accessing to the archive of the attachment "filename" at the version "version" with the given
+     *         queryString parameters.
      */
     public String getAttachmentRevisionURL(String filename, String version, String queryString)
     {
@@ -706,7 +716,7 @@ public class Document extends Api
 
     /**
      * Get the URL of this document.
-     *
+     * 
      * @return the URL to view this document, this will be a relitive URL for example: /xwiki/bin/view/Main/WebHome
      * @see #getExternalURL() for an absolute URL which can used outside of the site.
      */
@@ -717,7 +727,7 @@ public class Document extends Api
 
     /**
      * Get the URL to do a given action on this document.
-     *
+     * 
      * @param action what to do to the document for example "view", "edit" or "inline".
      * @return the URL of this document with the given action.
      * @see #getExternalURL(String) for an absolute URL which can used outside of the site.
@@ -729,7 +739,7 @@ public class Document extends Api
 
     /**
      * Get the URL to do a given action on this document.
-     *
+     * 
      * @param action what to do to the document for example "view", "edit" or "inline".
      * @param queryString parameters to pass in the request eg: "paramA=value1&paramB=value2"
      * @return the URL of this document with the given action and queryString as parameters.
@@ -742,9 +752,9 @@ public class Document extends Api
 
     /**
      * Get the external URL to do a given action on this document.
-     *
-     * @return the full URL of the document, sutable for use at external websites
-     *         for example: http://www.xwiki.org/xwiki/bin/view/Main/WebHome
+     * 
+     * @return the full URL of the document, sutable for use at external websites for example:
+     *         http://www.xwiki.org/xwiki/bin/view/Main/WebHome
      * @see #getURL() for a reletive URL which can only be used inside of the site.
      */
     public String getExternalURL()
@@ -754,7 +764,7 @@ public class Document extends Api
 
     /**
      * Get the external URL to do a given action on this document.
-     *
+     * 
      * @param action what to do to the document for example "view", "edit" or "inline".
      * @return the URL of this document with the given action.
      * @see #getURL() for a relative URL which can only be used inside of the site.
@@ -766,11 +776,10 @@ public class Document extends Api
 
     /**
      * Get the URL to do a given action on this document.
-     *
+     * 
      * @param action what to do to the document for example "view", "edit" or "inline".
      * @param queryString parameters to pass in the request eg: "paramA=value1&paramB=value2"
      * @return the URL of this document with the given action and queryString as parameters.
-
      * @see #getURL() for a relative URL which can only be used inside of the site.
      */
     public String getExternalURL(String action, String queryString)
@@ -2197,7 +2206,8 @@ public class Document extends Api
     public Attachment addAttachment(String fileName, InputStream iStream)
     {
         try {
-            return new Attachment(this, this.getDoc().addAttachment(fileName, iStream, getXWikiContext()), getXWikiContext());
+            return new Attachment(this, this.getDoc().addAttachment(fileName, iStream, getXWikiContext()),
+                getXWikiContext());
         } catch (XWikiException e) {
             // TODO Log the error and let the user know about it
         } catch (IOException e) {
@@ -2209,7 +2219,8 @@ public class Document extends Api
     public Attachment addAttachment(String fileName, byte[] data)
     {
         try {
-            return new Attachment(this, this.getDoc().addAttachment(fileName, data, getXWikiContext()), getXWikiContext());
+            return new Attachment(this, this.getDoc().addAttachment(fileName, data, getXWikiContext()),
+                getXWikiContext());
         } catch (XWikiException e) {
             // TODO Log the error and let the user know about it
         }

@@ -76,8 +76,11 @@ public class TablePlugin extends AbstractPlugin implements CommandListener
         menuExtension = new TableMenuExtension(this);
         getUIExtensionList().add(menuExtension);
 
-        // Listen to the reset command and disable the browser built-in table editing feature.
+        // Listen to the "enable" command and disable the browser built-in table editing feature.
         rta.getCommandManager().addCommandListener(this);
+        // At this point the rich text area may be already enabled so let's make sure the built-in table editing feature
+        // is disabled.
+        disableInlineTableEditing();
     }
 
     /**
@@ -133,7 +136,17 @@ public class TablePlugin extends AbstractPlugin implements CommandListener
     public void onCommand(CommandManager sender, Command command, String param)
     {
         if ("enable".equalsIgnoreCase(command.toString())) {
-            // Disable the standard table editing feature of because it doesn't handle the table header correctly.
+            // Disable the built-in table editing feature because it doesn't handle the table header correctly.
+            disableInlineTableEditing();
+        }
+    }
+
+    /**
+     * Disable the built-in table editing feature.
+     */
+    private void disableInlineTableEditing()
+    {
+        if (getTextArea().isEnabled()) {
             getTextArea().getDocument().execCommand("enableInlineTableEditing", "false");
         }
     }

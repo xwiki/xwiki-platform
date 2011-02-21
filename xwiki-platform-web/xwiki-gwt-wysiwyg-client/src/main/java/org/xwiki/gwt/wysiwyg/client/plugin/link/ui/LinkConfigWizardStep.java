@@ -22,6 +22,7 @@ package org.xwiki.gwt.wysiwyg.client.plugin.link.ui;
 import java.util.EnumSet;
 
 import org.xwiki.gwt.user.client.FocusCommand;
+import org.xwiki.gwt.user.client.StringUtils;
 import org.xwiki.gwt.user.client.ui.wizard.NavigationListener;
 import org.xwiki.gwt.user.client.ui.wizard.NavigationListenerCollection;
 import org.xwiki.gwt.user.client.ui.wizard.SourcesNavigationEvents;
@@ -33,6 +34,7 @@ import org.xwiki.gwt.wysiwyg.client.wiki.AttachmentReference;
 import org.xwiki.gwt.wysiwyg.client.wiki.EntityLink;
 import org.xwiki.gwt.wysiwyg.client.wiki.ResourceReference;
 import org.xwiki.gwt.wysiwyg.client.wiki.WikiServiceAsync;
+import org.xwiki.gwt.wysiwyg.client.wiki.ResourceReference.ResourceType;
 
 import com.google.gwt.core.client.Scheduler;
 import com.google.gwt.event.dom.client.KeyCodes;
@@ -200,22 +202,25 @@ public class LinkConfigWizardStep implements WizardStep, SourcesNavigationEvents
                     }
                 });
         } else {
-            init(null, callback);
+            init(entityLink.getDestination(), callback);
         }
     }
 
     /**
      * Initializes the wizard step based on the underlying link configuration object. If the link label is an image the
-     * UI is adjusted accordingly.
+     * UI is adjusted accordingly (the image name is displayed as the link label and the link label is read-only). If
+     * the link target is an attachment we use the attachment name as the link label.
      * 
-     * @param imageReference a reference to the image that is the link label, or {@code null} if the link label is not
-     *            an image
+     * @param labelResourceReference a reference to the resource specified by the link label
      * @param callback the object to be notified after the wizard step has been initialized
      */
-    private void init(ResourceReference imageReference, AsyncCallback< ? > callback)
+    private void init(ResourceReference labelResourceReference, AsyncCallback< ? > callback)
     {
         LinkConfig linkConfig = entityLink.getData();
-        labelTextBox.setText(imageReference != null ? new AttachmentReference(imageReference.getEntityReference())
+        boolean useFileName =
+            labelResourceReference.getType() == ResourceType.ATTACHMENT
+                && (linkConfig.isReadOnlyLabel() || StringUtils.isEmpty(linkConfig.getLabel()));
+        labelTextBox.setText(useFileName ? new AttachmentReference(labelResourceReference.getEntityReference())
             .getFileName() : linkConfig.getLabelText());
         labelTextBox.setEnabled(!linkConfig.isReadOnlyLabel());
         tooltipTextBox.setText(linkConfig.getTooltip() == null ? "" : linkConfig.getTooltip());

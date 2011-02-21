@@ -109,8 +109,7 @@ public abstract class AbstractExternalLinkWizardStep extends LinkConfigWizardSte
         {
             public void onSuccess(Boolean result)
             {
-                String url = getData().getData().getUrl();
-                urlTextBox.setText(url == null ? "" : url);
+                urlTextBox.setText(getData().getData().getUrl());
                 cb.onSuccess(null);
             }
 

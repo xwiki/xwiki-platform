@@ -77,6 +77,7 @@ public class RenderingTests extends TestCase
                 allowing(mockSsfx).use(with("uicomponents/dashboard/dashboard.css"), with(any(Map.class)));
                 allowing(mockJsfx).use(with("js/scriptaculous/dragdrop.js"));
                 allowing(mockJsfx).use(with("js/scriptaculous/effects.js"));
+                allowing(mockJsfx).use(with("js/xwiki/wysiwyg/xwe/XWikiWysiwyg.js"), with(any(Map.class)));
                 allowing(mockJsfx).use(with("uicomponents/dashboard/dashboard.js"), with(any(Map.class)));
             }
         });
@@ -100,6 +101,9 @@ public class RenderingTests extends TestCase
                 allowing(mockGadgetSource).getDashboardSourceMetadata(with(any(String.class)),
                     with(any(MacroTransformationContext.class)));
                 will(returnValue(Collections.<Block> emptyList()));
+                allowing(mockGadgetSource).isEditing();
+                // return true on is editing, to take as many paths possible
+                will(returnValue(true));
             }
         });
         DefaultComponentDescriptor<GadgetSource> descriptorGR = new DefaultComponentDescriptor<GadgetSource>();

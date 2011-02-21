@@ -79,7 +79,7 @@ public class DashboardMacro extends AbstractMacro<DashboardMacroParameters>
 
     /**
      * The identifier of the remove url metadata.
-     */    
+     */
     public static final String REMOVE_URL = "removeurl";
 
     /**
@@ -89,14 +89,14 @@ public class DashboardMacro extends AbstractMacro<DashboardMacroParameters>
 
     /**
      * The identifier of the source space metadata.
-     */    
+     */
     public static final String SOURCE_SPACE = "sourcespace";
 
     /**
      * The identifier of the source wiki metadata.
-     */    
+     */
     public static final String SOURCE_WIKI = "sourcewiki";
-    
+
     /**
      * The identifier of the source url metadata.
      */
@@ -184,16 +184,7 @@ public class DashboardMacro extends AbstractMacro<DashboardMacroParameters>
 
         // include the css and js for this macro. here so that it's included after any dependencies have included their
         // css, so that it cascades properly
-        Map<String, Object> fxParamsForceSkinAction = new HashMap<String, Object>();
-        fxParamsForceSkinAction.put("forceSkinAction", true);
-        ssfx.use("uicomponents/dashboard/dashboard.css", fxParamsForceSkinAction);
-        // include the effects.js and dragdrop.js that are needed by the dashboard js
-        jsfx.use("js/scriptaculous/effects.js");
-        jsfx.use("js/scriptaculous/dragdrop.js");
-        // this is only needed in inline mode, but it might be needed in view as well, in the future
-        // FIXME: add a current action verification here, and only include in inline mode. This means that
-        // dashboardmacro would depend on XWikiContext :(
-        jsfx.use("uicomponents/dashboard/dashboard.js", fxParamsForceSkinAction);
+        this.includeResources(gadgetSource.isEditing());
 
         // put everything in a nice toplevel group for this dashboard, to be able to add classes to it
         GroupBlock topLevel = new GroupBlock();
@@ -205,6 +196,29 @@ public class DashboardMacro extends AbstractMacro<DashboardMacroParameters>
             + (StringUtils.isEmpty(parameters.getStyle()) ? "" : " " + parameters.getStyle()));
 
         return Collections.<Block> singletonList(topLevel);
+    }
+
+    /**
+     * Includes the js and css resources for the dashboard macro.
+     * 
+     * @param editMode whether the dashboard is in edit mode or not (js resources need to be loaded only in edit mode)
+     */
+    protected void includeResources(boolean editMode)
+    {
+        Map<String, Object> fxParamsForceSkinAction = new HashMap<String, Object>();
+        fxParamsForceSkinAction.put("forceSkinAction", true);
+        ssfx.use("uicomponents/dashboard/dashboard.css", fxParamsForceSkinAction);
+        // include the js resources, for editing, in edit mode only
+        if (editMode) {
+            // include the effects.js and dragdrop.js that are needed by the dashboard js
+            jsfx.use("js/scriptaculous/effects.js");
+            jsfx.use("js/scriptaculous/dragdrop.js");
+            Map<String, Object> fxParamsNonDeferred = new HashMap<String, Object>();
+            fxParamsNonDeferred.putAll(fxParamsForceSkinAction);
+            fxParamsNonDeferred.put("defer", false);
+            jsfx.use("js/xwiki/wysiwyg/xwe/XWikiWysiwyg.js", fxParamsNonDeferred);
+            jsfx.use("uicomponents/dashboard/dashboard.js", fxParamsForceSkinAction);
+        }
     }
 
     /**

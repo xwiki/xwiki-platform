@@ -57,4 +57,12 @@ public interface GadgetSource
      *         leave the rendering in XDOM to the dashboard macro, but ftm this does the job
      */
     List<Block> getDashboardSourceMetadata(String source, MacroTransformationContext context);
+
+    /**
+     * @return {@code true} if the the current context is in edit mode (gadgets can be edited -- positions, parameters,
+     *         adding gadgets etc), {@code false} otherwise <br />
+     *         TODO: find a better place to put this function, but for now this is the only interface towards XWiki data
+     *         model, and since the mode is set on the current context, this function needs to be here
+     */
+    boolean isEditing();
 }

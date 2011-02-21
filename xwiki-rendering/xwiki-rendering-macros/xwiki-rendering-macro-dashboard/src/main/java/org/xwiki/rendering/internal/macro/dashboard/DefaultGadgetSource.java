@@ -268,4 +268,16 @@ public class DefaultGadgetSource implements GadgetSource
 
         return Collections.<Block> singletonList(metadataContainer);
     }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see org.xwiki.rendering.macro.dashboard.GadgetSource#isEditing()
+     */
+    public boolean isEditing()
+    {
+        // get the XWiki context and look at the action. if it's inline, it's edit mode
+        XWikiContext context = getXWikiContext();
+        return "inline".equals(context.getAction());
+    }
 }

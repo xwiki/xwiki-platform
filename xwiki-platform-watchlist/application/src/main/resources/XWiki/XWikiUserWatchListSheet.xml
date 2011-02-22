@@ -39,18 +39,22 @@ $xwiki.ssx.use("XWiki.XWikiUserSheet")##
       &lt;h1&gt;$msg.get('platform.core.profile.section.watchlistManagement')&lt;/h1&gt;
       &lt;dl&gt;
         &lt;dt class="label"&gt;&lt;label&gt;$msg.get('platform.core.profile.watchlist.notifier')&lt;/label&gt;&lt;/dt&gt;
-        #set($notifiers = $xwiki.searchDocuments(", BaseObject obj where doc.fullName=obj.name and obj.className='XWiki.WatchListJobClass'"))
+        #set($notifierDocs = $xwiki.watchlist.getNotifiers())
         #set($currentNotifier = $doc.getObject('XWiki.WatchListClass').getProperty('interval').getValue())
         &lt;dd&gt;
           #if($xcontext.action=='view')
             #if("$!currentNotifier" != "")
-              $xwiki.getDocument($currentNotifier).getDisplayTitle()
+              #foreach($notifierDoc in $notifierDocs)
+                #if($notifierDoc.getFullName() == $currentNotifier)
+                  $notifierDoc.getDisplayTitle()
+                #end
+              #end
             #end
           #else
             &lt;select name="XWiki.WatchListClass_0_interval"&gt;
               &lt;option value=""&gt;&amp;nbsp;&lt;/option&gt;
-              #foreach($notifier in $notifiers)
-                &lt;option value="$notifier"#if($notifier==$currentNotifier) selected="selected"#end&gt;$xwiki.getDocument($notifier).getDisplayTitle()&lt;/option&gt;
+              #foreach($notifierDoc in $notifierDocs)
+                &lt;option value="$notifierDoc.getFullName()"#if($notifierDoc.getFullName()==$currentNotifier) selected="selected"#end&gt;$notifierDoc.getDisplayTitle()&lt;/option&gt;
               #end
             &lt;/select&gt;
           #end

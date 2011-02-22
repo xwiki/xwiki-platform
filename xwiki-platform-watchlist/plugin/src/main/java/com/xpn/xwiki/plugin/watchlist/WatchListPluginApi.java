@@ -22,6 +22,7 @@ package com.xpn.xwiki.plugin.watchlist;
 import com.sun.syndication.feed.synd.SyndFeed;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
+import com.xpn.xwiki.api.Document;
 import com.xpn.xwiki.plugin.PluginApi;
 import com.xpn.xwiki.plugin.watchlist.WatchListStore.ElementType;
 
@@ -404,6 +405,16 @@ public class WatchListPluginApi extends PluginApi<WatchListPlugin>
     public SyndFeed getFeed(String user, int entryNumber) throws XWikiException
     {
         return getWatchListPlugin().getFeedManager().getFeed(user, entryNumber, context);        
+    }
+    
+    /**
+     * Get the list of available notifiers (list of document full names, example: "Scheduler.WatchListHourlyNotifier").
+     *
+     * @return the list of available notifiers
+     */
+    public List<Document> getNotifiers()
+    {
+        return getWatchListPlugin().getJobManager().getJobs(context);
     }
 
     /**

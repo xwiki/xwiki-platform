@@ -19,7 +19,9 @@
  */
 package com.xpn.xwiki.plugin.watchlist;
 
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
@@ -27,6 +29,7 @@ import org.apache.commons.logging.LogFactory;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
+import com.xpn.xwiki.api.Document;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.objects.classes.BaseClass;
@@ -54,7 +57,7 @@ public class WatchListJobManager
      * WatchList Job last fire time property name.
      */
     public static final String WATCHLIST_JOB_LAST_FIRE_TIME_PROP = "last_fire_time";
-    
+
     /**
      * Name of the groups property in the XWiki rights class.
      */
@@ -69,7 +72,7 @@ public class WatchListJobManager
      * Name of the allow property in the XWiki rights class.
      */
     public static final String XWIKI_RIGHTS_CLASS_ALLOW_PROPERTY = "allow";
-    
+
     /**
      * Logger.
      */
@@ -155,7 +158,7 @@ public class WatchListJobManager
             doc.setTitle("XWiki WatchList Notifier Class");
         }
         if (StringUtils.isBlank(doc.getContent()) || !XWikiDocument.XWIKI20_SYNTAXID.equals(doc.getSyntaxId())) {
-            needsUpdate = true;      
+            needsUpdate = true;
             doc.setContent("{{include document=\"XWiki.ClassSheet\" /}}");
             doc.setSyntaxId(XWikiDocument.XWIKI20_SYNTAXID);
         }
@@ -174,7 +177,7 @@ public class WatchListJobManager
      * @return true if the document has been updated, false otherwise
      * @throws XWikiException if the object creation fails
      */
-    private boolean createWatchListJobObject(XWikiDocument doc, String emailTemplate, XWikiContext context) 
+    private boolean createWatchListJobObject(XWikiDocument doc, String emailTemplate, XWikiContext context)
         throws XWikiException
     {
         BaseObject obj = null;
@@ -214,7 +217,7 @@ public class WatchListJobManager
         boolean needsUpdate = false;
         BaseObject editRights = doc.getObject(XWIKI_RIGHTS_CLASS, 0);
         BaseObject viewRights = doc.getObject(XWIKI_RIGHTS_CLASS, 1);
-        
+
         if (editRights == null) {
             int index = doc.createNewObject(XWIKI_RIGHTS_CLASS, context);
             editRights = doc.getObject(XWIKI_RIGHTS_CLASS, index);
@@ -223,7 +226,7 @@ public class WatchListJobManager
             editRights.setIntValue(XWIKI_RIGHTS_CLASS_ALLOW_PROPERTY, 1);
             needsUpdate = true;
         }
-        
+
         if (viewRights == null) {
             int index = doc.createNewObject(XWIKI_RIGHTS_CLASS, context);
             viewRights = doc.getObject(XWIKI_RIGHTS_CLASS, index);
@@ -273,10 +276,10 @@ public class WatchListJobManager
             needsUpdate |= createWatchListJobRightsObject(doc, context);
             needsUpdate |= createWatchListJobObject(doc, emailTemplate, context);
             needsUpdate |= setWatchListCommonDocumentsFields(doc);
-            
+
             if (StringUtils.isBlank(doc.getTitle())) {
                 needsUpdate = true;
-                doc.setTitle("$msg.get(\"" + nameResource +  "\")");                
+                doc.setTitle("$msg.get(\"" + nameResource + "\")");
             }
 
             if (StringUtils.isBlank(doc.getContent())) {
@@ -293,6 +296,36 @@ public class WatchListJobManager
             LOG.error("Cannot initialize WatchListJob", e);
         }
     }
+    
+    /**
+     * Get the list of available jobs (list of {@link XWikiDocument}).
+     * 
+     * @param context Context of the request
+     * @return the list of available jobs
+     */
+    public List<Document> getJobs(XWikiContext context)
+    {
+        String oriDatabase = context.getDatabase();
+        List<Object> params = new ArrayList<Object>();
+        List<Document> results = new ArrayList<Document>();
+
+        try {
+            context.setDatabase(context.getMainXWiki());
+            params.add(WATCHLIST_JOB_CLASS);
+            List<String> docNames = context.getWiki().getStore().searchDocumentsNames(
+                ", BaseObject obj where doc.fullName=obj.name and obj.className=?", 0, 0, params, context);
+            for (String docName : docNames) {
+                XWikiDocument doc = context.getWiki().getDocument(docName, context);
+                results.add(new Document(doc, context));
+            }
+        } catch (Exception e) {
+            LOG.error("error getting list of available watchlist jobs", e);
+        } finally {
+            context.setDatabase(oriDatabase);
+        }
+
+        return results;
+    }
 
     /**
      * Create default WatchList jobs in the wiki.
@@ -303,11 +336,11 @@ public class WatchListJobManager
     public void init(XWikiContext context) throws XWikiException
     {
         initWatchListJobClass(context);
-        initWatchListJob("Scheduler.WatchListHourlyNotifier", "WatchList hourly notifier", 
-            "watchlist.job.hourly", WatchListNotifier.DEFAULT_EMAIL_TEMPLATE, "0 0 * * * ?", context);
-        initWatchListJob("Scheduler.WatchListDailyNotifier", "WatchList daily notifier", 
-            "watchlist.job.daily", WatchListNotifier.DEFAULT_EMAIL_TEMPLATE, "0 0 0 * * ?", context);
-        initWatchListJob("Scheduler.WatchListWeeklyNotifier", "WatchList weekly notifier", 
-            "watchlist.job.weekly", WatchListNotifier.DEFAULT_EMAIL_TEMPLATE, "0 0 0 ? * MON", context);
+        initWatchListJob("Scheduler.WatchListHourlyNotifier", "WatchList hourly notifier", "watchlist.job.hourly",
+            WatchListNotifier.DEFAULT_EMAIL_TEMPLATE, "0 0 * * * ?", context);
+        initWatchListJob("Scheduler.WatchListDailyNotifier", "WatchList daily notifier", "watchlist.job.daily",
+            WatchListNotifier.DEFAULT_EMAIL_TEMPLATE, "0 0 0 * * ?", context);
+        initWatchListJob("Scheduler.WatchListWeeklyNotifier", "WatchList weekly notifier", "watchlist.job.weekly",
+            WatchListNotifier.DEFAULT_EMAIL_TEMPLATE, "0 0 0 ? * MON", context);
     }
 }

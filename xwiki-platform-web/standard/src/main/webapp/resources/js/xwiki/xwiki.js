@@ -1449,13 +1449,16 @@ document.observe('xwiki:dom:loaded', function() {
     if (hierarchyElement || breadcrumbsElement) {
       ['blur', 'change', 'xwiki:suggest:selected'].each(function(monitoredEvent) {
         parentInputField.observe(monitoredEvent, function () {
+          var parameters = {
+            xpage: 'xpart',
+            vm: (hierarchyElement ? 'hierarchy.vm' : 'space.vm'),
+            parent : parentInputField.value
+          };
+          if (titleInputField) {
+            parameters.title = titleInputField.value;
+          }
           new Ajax.Request(XWiki.currentDocument.getURL('edit'), {
-            parameters: {
-              xpage: 'xpart',
-              vm: (hierarchyElement ? 'hierarchy.vm' : 'space.vm'),
-              parent : parentInputField.value,
-              title : titleInputField.value
-            },
+            parameters: parameters,
             onSuccess : function(response) {
               if (hierarchyElement) {
                 hierarchyElement.replace(response.responseText);

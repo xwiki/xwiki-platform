@@ -1514,6 +1514,9 @@ h1.xwikipaneltitle {
 .panelitem {
   display: block;
   overflow: hidden;
+  word-wrap: break-word;
+  padding-left: 1em;
+  text-indent: -1em;
 }
 
 .pitemseparator {

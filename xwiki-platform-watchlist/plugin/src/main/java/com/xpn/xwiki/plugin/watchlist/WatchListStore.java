@@ -36,6 +36,7 @@ import org.xwiki.observation.event.DocumentDeleteEvent;
 import org.xwiki.observation.event.DocumentSaveEvent;
 import org.xwiki.observation.event.DocumentUpdateEvent;
 import org.xwiki.observation.event.Event;
+import org.xwiki.rendering.syntax.Syntax;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
@@ -233,10 +234,10 @@ public class WatchListStore implements EventListener
             needsUpdate = true;
             doc.setTitle("XWiki WatchList Notification Rules Class");
         }
-        if (StringUtils.isBlank(doc.getContent()) || !XWikiDocument.XWIKI20_SYNTAXID.equals(doc.getSyntaxId())) {
+        if (StringUtils.isBlank(doc.getContent()) || !Syntax.XWIKI_2_0.equals(doc.getSyntax())) {
             needsUpdate = true;      
             doc.setContent("{{include document=\"XWiki.ClassSheet\" /}}");
-            doc.setSyntaxId(XWikiDocument.XWIKI20_SYNTAXID);
+            doc.setSyntax(Syntax.XWIKI_2_0);
         }
 
         if (needsUpdate) {

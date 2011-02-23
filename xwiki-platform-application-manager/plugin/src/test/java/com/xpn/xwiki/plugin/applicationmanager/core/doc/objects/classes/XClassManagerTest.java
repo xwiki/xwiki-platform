@@ -28,6 +28,7 @@ import java.util.Map;
 import org.jmock.Mock;
 import org.jmock.core.Invocation;
 import org.jmock.core.stub.CustomStub;
+import org.xwiki.model.reference.DocumentReference;
 
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
@@ -96,6 +97,19 @@ public class XClassManagerTest extends AbstractBridgedXWikiComponentTestCase
                 XWikiContext context = (XWikiContext) invocation.parameterValues.get(1);
 
                 XWikiDocument doc = context.getWiki().getDocument(classFullName, context);
+
+                return doc.getxWikiClass();
+            }
+        });
+        mockXWiki.stubs().method("getXClass").will(new CustomStub("Implements XWiki.getClass")
+        {
+            public Object invoke(Invocation invocation) throws Throwable
+            {
+                DocumentReference classReference = (DocumentReference) invocation.parameterValues.get(0);
+                XWikiContext context = (XWikiContext) invocation.parameterValues.get(1);
+
+                XWikiDocument doc = context.getWiki().getDocument(
+                    classReference.getLastSpaceReference().getName() + "." + classReference.getName(), context);
 
                 return doc.getxWikiClass();
             }

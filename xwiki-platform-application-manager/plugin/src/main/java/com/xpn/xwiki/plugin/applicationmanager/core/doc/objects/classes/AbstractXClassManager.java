@@ -27,6 +27,8 @@ import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.xwiki.rendering.syntax.Syntax;
+
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
@@ -502,7 +504,7 @@ public abstract class AbstractXClassManager<T extends XObjectDocument> implement
                     DOCUMENTCONTENT_SHEET_PREFIX + getClassSheetFullName() + DOCUMENTCONTENT_EXT;
                 String content = getResourceDocumentContent(documentContentPath);
                 doc.setContent(content != null ? content : getClassSheetDefaultContent());
-                doc.setSyntaxId(XWikiDocument.XWIKI10_SYNTAXID);
+                doc.setSyntax(Syntax.XWIKI_1_0);
             }
 
             if (doc.isNew() || needsUpdate) {

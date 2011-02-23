@@ -4813,10 +4813,39 @@ public class XWiki implements XWikiDocChangeNotificationInterface, EventListener
         }
     }
 
+    /**
+     * Copy an entire wiki to a target wiki.
+     * <p>
+     * It does not override document already existing in target wiki.
+     * 
+     * @param sourceWiki the source wiki identifier
+     * @param targetWiki the target wiki identifier
+     * @param language the language to copy
+     * @param context the XWiki context
+     * @return the number of copied documents
+     * @throws XWikiException failed to copy wiki
+     */
     public int copyWiki(String sourceWiki, String targetWiki, String language, XWikiContext context)
         throws XWikiException
     {
-        return copySpaceBetweenWikis(null, sourceWiki, targetWiki, language, context);
+        return copyWiki(sourceWiki, targetWiki, language, false, context);
+    }
+
+    /**
+     * Copy an entire wiki to a target wiki.
+     * 
+     * @param sourceWiki the source wiki identifier
+     * @param targetWiki the target wiki identifier
+     * @param language the language to copy
+     * @param clean clean the target wiki before copying
+     * @param context the XWiki context
+     * @return the number of copied documents
+     * @throws XWikiException failed to copy wiki
+     */
+    public int copyWiki(String sourceWiki, String targetWiki, String language, boolean clean, XWikiContext context)
+        throws XWikiException
+    {
+        return copySpaceBetweenWikis(null, sourceWiki, targetWiki, language, clean, context);
     }
 
     /**

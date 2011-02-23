@@ -26,6 +26,7 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
+import java.util.Arrays;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
@@ -258,13 +259,40 @@ public class ImagePlugin extends XWikiDefaultPlugin
     private XWikiAttachment downloadImage(XWikiAttachment image, int width, int height, float quality,
         XWikiContext context) throws Exception
     {
-        boolean keepAspectRatio = Boolean.valueOf(context.getRequest().getParameter("keepAspectRatio"));
         if (this.imageCache == null) {
             initCache(context);
-            if (this.imageCache == null) {
-                return shrinkImage(image, width, height, keepAspectRatio, quality, context);
-            }
         }
+        boolean keepAspectRatio = Boolean.valueOf(context.getRequest().getParameter("keepAspectRatio"));
+        XWikiAttachment thumbnail =
+            this.imageCache == null ? shrinkImage(image, width, height, keepAspectRatio, quality, context)
+                : downloadImageFromCache(image, width, height, keepAspectRatio, quality, context);
+        // If the image has been transformed, update the file name extension to match the image format.
+        String fileName = thumbnail.getFilename();
+        String extension = StringUtils.lowerCase(StringUtils.substringAfterLast(fileName, String.valueOf('.')));
+        if (thumbnail != image && !Arrays.asList("jpeg", "jpg", "png").contains(extension)) {
+            // The scaled image is PNG, so correct the extension in order to output the correct MIME type.
+            thumbnail.setFilename(StringUtils.substringBeforeLast(fileName, ".") + ".png");
+        }
+        return thumbnail;
+    }
+
+    /**
+     * Downloads the given image from cache.
+     * 
+     * @param image the image to be downloaded
+     * @param width the desired image width; this value is taken into account only if it is greater than zero and less
+     *            than the current image width
+     * @param height the desired image height; this value is taken into account only if it is greater than zero and less
+     *            than the current image height
+     * @param keepAspectRatio {@code true} to preserve aspect ratio when resizing the image, {@code false} otherwise
+     * @param quality the desired compression quality
+     * @param context the XWiki context
+     * @return the transformed image
+     * @throws Exception if transforming the image fails
+     */
+    private XWikiAttachment downloadImageFromCache(XWikiAttachment image, int width, int height,
+        boolean keepAspectRatio, float quality, XWikiContext context) throws Exception
+    {
         String key =
             String.format("%s;%s;%s;%s;%s;%s", image.getId(), image.getVersion(), width, height, keepAspectRatio,
                 quality);
@@ -276,12 +304,6 @@ public class ImagePlugin extends XWikiDefaultPlugin
         } else {
             thumbnail = shrinkImage(image, width, height, keepAspectRatio, quality, context);
             this.imageCache.set(key, thumbnail.getContent(context));
-        }
-        if (!StringUtils.endsWithIgnoreCase(thumbnail.getFilename(), "jpeg")
-            && !StringUtils.endsWithIgnoreCase(thumbnail.getFilename(), "jpg")
-            && !StringUtils.endsWithIgnoreCase(thumbnail.getFilename(), "png")) {
-            // The scaled image is PNG, so correct the extension in order to output the correct MIME type.
-            thumbnail.setFilename(StringUtils.substringBeforeLast(thumbnail.getFilename(), ".") + ".png");
         }
         return thumbnail;
     }

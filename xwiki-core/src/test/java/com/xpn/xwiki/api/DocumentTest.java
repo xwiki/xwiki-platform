@@ -24,6 +24,8 @@ import java.util.List;
 import junit.framework.Assert;
 
 import org.jmock.Mock;
+import org.jmock.core.stub.CustomStub;
+import org.jmock.core.Invocation;
 import org.xwiki.model.reference.DocumentReference;
 
 import com.xpn.xwiki.XWiki;
@@ -34,6 +36,7 @@ import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.objects.BaseProperty;
 import com.xpn.xwiki.objects.classes.BaseClass;
 import com.xpn.xwiki.test.AbstractBridgedXWikiComponentTestCase;
+import com.xpn.xwiki.user.api.XWikiRightService;
 
 public class DocumentTest extends AbstractBridgedXWikiComponentTestCase
 {
@@ -105,5 +108,64 @@ public class DocumentTest extends AbstractBridgedXWikiComponentTestCase
                 Assert.assertEquals("Comment", ((BaseProperty) obj.get("comment")).getValue());
             }
         }
+    }
+
+    public void testSaveAsAuthorUsesGuestIfDroppedPermissions() throws XWikiException
+    {
+        final XWikiDocument xdoc = new XWikiDocument("Space", "Page");
+
+        final Mock mockRightService = mock(XWikiRightService.class);
+
+        mockRightService.expects(once())
+            .method("hasAccessLevel").with(eq("edit"),
+                                           eq("XWiki.Alice"),
+                                           ANYTHING,
+                                           ANYTHING).will(returnValue(true));
+
+        mockRightService.expects(once())
+            .method("hasAccessLevel").with(eq("edit"),
+                                           eq("XWikiGuest"),
+                                           ANYTHING,
+                                           ANYTHING).will(returnValue(false));
+
+        final Mock mockXWiki = mock(XWiki.class);
+        mockXWiki.stubs().method("getRightService")
+            .will(returnValue((XWikiRightService)mockRightService.proxy()));
+        mockXWiki.expects(once()).method("saveDocument").with(ANYTHING, ANYTHING, ANYTHING, ANYTHING)
+            .will(new CustomStub("Make sure the contentAuthor is Alice") {
+                public Object invoke(Invocation invocation) throws Throwable
+                {
+                    assertEquals("Saving a document before calling dropPermissions() did not save as "
+                                 + "the author.",
+                                 "XWiki.Alice",
+                                 ((XWikiContext) invocation.parameterValues.get(3)).getUser());
+                    return null;
+                }
+            });
+        this.getContext().setWiki((XWiki) mockXWiki.proxy());
+
+        final Document doc = new Document(xdoc, this.getContext());
+        this.getContext().setDoc(xdoc);
+
+        // Alice is the author.
+        xdoc.setContentAuthor("XWiki.Alice");
+
+        // Bob is the viewer
+        this.getContext().setUser("XWiki.Bob");
+
+        doc.saveAsAuthor();
+
+        this.getContext().dropPermissions();
+        try {
+            doc.saveAsAuthor();
+            fail("saveAsAuthor did not throw an exception after dropPermissions() had been called.");
+        } catch (XWikiException e) {
+            assertTrue("Wrong error message when trying to save a document after calling dropPermissions()",
+                       e.getMessage().contains("Access denied; user XWikiGuest, acting through script in "
+                                             + "document Space.Page cannot save document Space.Page"));
+        }
+
+        assertEquals("After dropping permissions and attempting to save a document, the user was "
+                     + "perminantly switched to guest.", "XWiki.Bob", this.getContext().getUser());
     }
 }

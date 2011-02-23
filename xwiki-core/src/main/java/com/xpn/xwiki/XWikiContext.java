@@ -605,4 +605,37 @@ public class XWikiContext extends Hashtable<Object, Object>
     {
         return (String) get("editor_wysiwyg");
     }
+
+    /**
+     * After this is called:
+     * 1. {@link com.xpn.xwiki.api.Api#hasProgrammingRights()} will always return false.
+     * 2. {@link com.xpn.xwiki.api.XWiki#getDocumentAsAuthor(org.xwiki.model.reference.DocumentReference)},
+     *    {@link com.xpn.xwiki.api.XWiki#getDocumentAsAuthor(String)},
+     *    {@link com.xpn.xwiki.api.Document#saveAsAuthor()},
+     *    {@link com.xpn.xwiki.api.Document#saveAsAuthor(String)},
+     *    {@link com.xpn.xwiki.api.Document#saveAsAuthor(String, boolean)},
+     *    and {@link com.xpn.xwiki.api.Document#deleteAsAuthor()} will perform all of their actions as
+     *    if the document's content author was the guest user (XWiki.XWikiGuest).
+     *
+     * In effect, no code requiring "programming right" will run, and if the document content author
+     * (see: {@link com.xpn.xwiki.api.Document#getContentAuthor()}) is a user who has "programming right",
+     * there will be no way for code following this call to save another document as this user, blessing
+     * it too with programming right.
+     *
+     * Once dropped, permissions cannot be regained for the duration of the request.
+     *
+     * @since 3.0M3
+     */
+    public void dropPermissions()
+    {
+        put("hasDroppedPermissions", "true");
+    }
+
+    /**
+     * @return true if {@link XWikiContext#dropPermissions()} has been called on this context.
+     */
+    public boolean hasDroppedPermissions()
+    {
+        return this.get("hasDroppedPermissions") != null;
+    }
 }

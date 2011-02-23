@@ -425,4 +425,21 @@ public class XWikiRightServiceImplTest extends AbstractBridgedXWikiComponentTest
             .hasAccessLevel("view", XWikiRightService.GUEST_USER_FULLNAME, doc.getPrefixedFullName(), true,
                 getContext()));
     }
+
+    /**
+     * This test will fail unless:
+     * SuperAdmin has programming permission before calling dropPermissions().
+     * SuperAdmin does not have programming permission after calling dropPermissions().
+     */
+    public void testProgrammingRightsAfterDropPermissions()
+    {
+        // Nobody even superadmin gets PR after they have given it up.
+        this.getContext().setUser(XWikiRightService.SUPERADMIN_USER_FULLNAME);
+
+        assertTrue("User does not have programming right prior to calling dropPermissions()",
+                   this.rightService.hasProgrammingRights(this.getContext()));
+        this.getContext().dropPermissions();
+        assertFalse("Author retains programming right after calling dropPermissions()",
+                   this.rightService.hasProgrammingRights(this.getContext()));
+    }
 }

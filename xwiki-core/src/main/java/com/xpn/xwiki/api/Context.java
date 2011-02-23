@@ -591,6 +591,6 @@ public class Context extends Api
      */
     public void dropPermissions()
     {
-        getXWikiContext().put("hasDroppedPermissions", "true");
+        getXWikiContext().dropPermissions();
     }
 }

@@ -23,6 +23,16 @@ package com.xpn.xwiki.plugin.applicationmanager;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.xwiki.bridge.event.DocumentCreatedEvent;
+import org.xwiki.bridge.event.DocumentUpdatedEvent;
+import org.xwiki.observation.EventListener;
+import org.xwiki.observation.ObservationManager;
+import org.xwiki.observation.event.Event;
+
+import com.xpn.xwiki.XWikiContext;
+import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.api.Api;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.plugin.XWikiDefaultPlugin;
@@ -30,16 +40,6 @@ import com.xpn.xwiki.plugin.XWikiPluginInterface;
 import com.xpn.xwiki.plugin.applicationmanager.doc.XWikiApplicationClass;
 import com.xpn.xwiki.web.Utils;
 import com.xpn.xwiki.web.XWikiURLFactory;
-import com.xpn.xwiki.XWikiContext;
-import com.xpn.xwiki.XWikiException;
-
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-import org.xwiki.observation.EventListener;
-import org.xwiki.observation.ObservationManager;
-import org.xwiki.observation.event.DocumentSaveEvent;
-import org.xwiki.observation.event.DocumentUpdateEvent;
-import org.xwiki.observation.event.Event;
 
 /**
  * Entry point of the Application Manager plugin.
@@ -66,8 +66,8 @@ public class ApplicationManagerPlugin extends XWikiDefaultPlugin implements Even
     private static final List<Event> EVENTS = new ArrayList<Event>()
     {
         {
-            add(new DocumentUpdateEvent());
-            add(new DocumentSaveEvent());
+            add(new DocumentUpdatedEvent());
+            add(new DocumentCreatedEvent());
         }
     };
 

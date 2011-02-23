@@ -96,7 +96,7 @@
             scope="request">
         <forward name="viewattachrev" path="/templates/viewattachrev.vm"/>
     </action>
-    <!---Add by me-->
+
     <action path="/viewrev/"
             type ="com.xpn.xwiki.web.ViewrevAction"
             name="viewrev"

@@ -29,6 +29,7 @@ import java.util.Set;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.xwiki.rendering.syntax.Syntax;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
@@ -256,10 +257,10 @@ public abstract class AbstractDocumentSkinExtensionPlugin extends AbstractSkinEx
                 needsUpdate = true;
                 doc.setTitle("XWiki " + getExtensionName() + " Extension Class");
             }
-            if (StringUtils.isBlank(doc.getContent()) || !XWikiDocument.XWIKI20_SYNTAXID.equals(doc.getSyntaxId())) {
+            if (StringUtils.isBlank(doc.getContent()) || !Syntax.XWIKI_2_0.equals(doc.getSyntax())) {
                 needsUpdate = true;
                 doc.setContent("{{include document=\"XWiki.ClassSheet\" /}}");
-                doc.setSyntaxId(XWikiDocument.XWIKI20_SYNTAXID);
+                doc.setSyntax(Syntax.XWIKI_2_0);
             }
 
             if (needsUpdate) {

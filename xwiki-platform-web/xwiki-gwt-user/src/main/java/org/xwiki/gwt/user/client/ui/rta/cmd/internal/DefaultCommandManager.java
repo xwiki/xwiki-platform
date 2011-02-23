@@ -40,12 +40,21 @@ public class DefaultCommandManager extends AbstractCommandManager
         if (executable == null) {
             return false;
         }
-        if (commandListeners.fireBeforeCommand(this, cmd, param)) {
+
+        firingDepth++;
+        boolean stop = commandListeners.fireBeforeCommand(this, cmd, param);
+        firingDepth--;
+        handlePendingRegistrations();
+        if (stop) {
             return false;
         }
+
         boolean success = executable.execute(param);
         if (success) {
+            firingDepth++;
             commandListeners.fireCommand(this, cmd, param);
+            firingDepth--;
+            handlePendingRegistrations();
         }
         return success;
     }

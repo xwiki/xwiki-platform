@@ -45,8 +45,12 @@ public class CommandListenerCollection extends ArrayList<CommandListener>
     public boolean fireBeforeCommand(CommandManager sender, Command command, String param)
     {
         for (CommandListener listener : this) {
-            if (listener.onBeforeCommand(sender, command, param)) {
-                return true;
+            try {
+                if (listener.onBeforeCommand(sender, command, param)) {
+                    return true;
+                }
+            } catch (Exception e) {
+                // Ignore.
             }
         }
         return false;
@@ -62,7 +66,11 @@ public class CommandListenerCollection extends ArrayList<CommandListener>
     public void fireCommand(CommandManager sender, Command command, String param)
     {
         for (CommandListener listener : this) {
-            listener.onCommand(sender, command, param);
+            try {
+                listener.onCommand(sender, command, param);
+            } catch (Exception e) {
+                // Ignore.
+            }
         }
     }
 }

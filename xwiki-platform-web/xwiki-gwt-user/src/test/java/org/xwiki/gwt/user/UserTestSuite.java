@@ -26,6 +26,8 @@ import org.xwiki.gwt.user.client.StringUtilsTest;
 import org.xwiki.gwt.user.client.TimerTest;
 import org.xwiki.gwt.user.client.ui.rta.RichTextAreaTest;
 import org.xwiki.gwt.user.client.ui.rta.SelectionPreserverTest;
+import org.xwiki.gwt.user.client.ui.rta.cmd.CommandListenerCollectionTest;
+import org.xwiki.gwt.user.client.ui.rta.cmd.internal.DefaultCommandManagerTest;
 import org.xwiki.gwt.user.client.ui.rta.cmd.internal.DeleteExecutableTest;
 import org.xwiki.gwt.user.client.ui.rta.cmd.internal.EnableExecutableTest;
 import org.xwiki.gwt.user.client.ui.rta.cmd.internal.InsertHTMLExecutableTest;
@@ -55,13 +57,15 @@ public class UserTestSuite extends GWTTestSuite
         TestSuite suite = new TestSuite("XWiki GWT-User Unit Tests");
 
         suite.addTestSuite(TimerTest.class);
+        suite.addTestSuite(StringUtilsTest.class);
+        suite.addTestSuite(CommandListenerCollectionTest.class);
+        suite.addTestSuite(DefaultCommandManagerTest.class);
         suite.addTestSuite(RichTextAreaTest.class);
+        suite.addTestSuite(SelectionPreserverTest.class);
         suite.addTestSuite(DeleteExecutableTest.class);
         suite.addTestSuite(InsertHTMLExecutableTest.class);
         suite.addTestSuite(StyleExecutableTest.class);
         suite.addTestSuite(EnableExecutableTest.class);
-        suite.addTestSuite(SelectionPreserverTest.class);
-        suite.addTestSuite(StringUtilsTest.class);
 
         return suite;
     }

@@ -19,7 +19,9 @@
  */
 package org.xwiki.gwt.user.client.ui.rta.cmd.internal;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.xwiki.gwt.user.client.ui.rta.cmd.Command;
@@ -27,7 +29,6 @@ import org.xwiki.gwt.user.client.ui.rta.cmd.CommandListener;
 import org.xwiki.gwt.user.client.ui.rta.cmd.CommandListenerCollection;
 import org.xwiki.gwt.user.client.ui.rta.cmd.CommandManager;
 import org.xwiki.gwt.user.client.ui.rta.cmd.Executable;
-
 
 /**
  * An abstract command manager that knows only how to register commands and listeners.
@@ -37,23 +38,70 @@ import org.xwiki.gwt.user.client.ui.rta.cmd.Executable;
 public abstract class AbstractCommandManager implements CommandManager
 {
     /**
+     * A registration that is pending to be handled because the firing depth is greater than 0. This represents a
+     * {@link CommandListener} that waits to be added or removed.
+     */
+    private static class PendingRegistration
+    {
+        /**
+         * The listener that is waiting to be added or removed.
+         */
+        private final CommandListener listener;
+
+        /**
+         * Whether the listener is waiting to be added or removed.
+         */
+        private final boolean add;
+
+        /**
+         * Creates a new pending registration.
+         * 
+         * @param listener the listener that is waiting to be handled
+         * @param add {@code true} if the listener is waiting to be added, {@code false} if it is waiting to be removed
+         */
+        public PendingRegistration(CommandListener listener, boolean add)
+        {
+            this.listener = listener;
+            this.add = add;
+        }
+
+        /**
+         * @return {@link #listener}
+         */
+        public CommandListener getListener()
+        {
+            return listener;
+        }
+
+        /**
+         * @return {@link #add}
+         */
+        public boolean isAdd()
+        {
+            return add;
+        }
+    }
+
+    /**
      * The list of listeners that will be notified whenever a command is executed by this manager.
      */
-    protected final CommandListenerCollection commandListeners;
+    protected final CommandListenerCollection commandListeners = new CommandListenerCollection();
+
+    /**
+     * The current firing depth. Command listeners are registered right away if firing depth is 0, otherwise the
+     * registration is deferred until the firing depth becomes 0.
+     */
+    protected int firingDepth;
 
     /**
      * The map of executable known by this command manager manager.
      */
-    private final Map<Command, Executable> executables;
+    private final Map<Command, Executable> executables = new HashMap<Command, Executable>();
 
     /**
-     * Creates a new command manager that has no commands registered.
+     * The list of command listeners that are waiting to be handled because the firing depth is greater than 0.
      */
-    public AbstractCommandManager()
-    {
-        commandListeners = new CommandListenerCollection();
-        executables = new HashMap<Command, Executable>();
-    }
+    private final List<PendingRegistration> pendingRegistrations = new ArrayList<PendingRegistration>();
 
     /**
      * {@inheritDoc}
@@ -125,7 +173,11 @@ public abstract class AbstractCommandManager implements CommandManager
      */
     public void addCommandListener(CommandListener listener)
     {
-        commandListeners.add(listener);
+        if (firingDepth == 0) {
+            commandListeners.add(listener);
+        } else {
+            pendingRegistrations.add(new PendingRegistration(listener, true));
+        }
     }
 
     /**
@@ -135,7 +187,28 @@ public abstract class AbstractCommandManager implements CommandManager
      */
     public void removeCommandListener(CommandListener listener)
     {
-        commandListeners.remove(listener);
+        if (firingDepth == 0) {
+            commandListeners.remove(listener);
+        } else {
+            pendingRegistrations.add(new PendingRegistration(listener, false));
+        }
+    }
+
+    /**
+     * Handle pending registrations.
+     */
+    protected void handlePendingRegistrations()
+    {
+        if (firingDepth == 0) {
+            for (PendingRegistration pendingRegistration : pendingRegistrations) {
+                if (pendingRegistration.isAdd()) {
+                    commandListeners.add(pendingRegistration.getListener());
+                } else {
+                    commandListeners.remove(pendingRegistration.getListener());
+                }
+            }
+            pendingRegistrations.clear();
+        }
     }
 
     /**

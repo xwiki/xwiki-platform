@@ -564,7 +564,7 @@ public abstract class AbstractXClassManager<T extends XObjectDocument> implement
                     getResourceDocumentContent(DOCUMENTCONTENT_TEMPLATE_PREFIX + getClassTemplateFullName()
                         + DOCUMENTCONTENT_EXT);
                 doc.setContent(content != null ? content : getClassTemplateDefaultContent());
-                doc.setSyntaxId(XWikiDocument.XWIKI10_SYNTAXID);
+                doc.setSyntax(Syntax.XWIKI_1_0);
 
                 doc.setParent(getClassFullName());
             }

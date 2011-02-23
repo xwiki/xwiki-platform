@@ -505,7 +505,7 @@ public final class WikiManager
             }
 
             // Create wiki database/schema
-            createWikiDatabase(newWikiName, context);
+            createWikiDatabase(newWikiName, context, templateWikiName == null);
 
             // Save new wiki descriptor document.
             wikiSuperDocToSave.save(comment);
@@ -587,12 +587,14 @@ public final class WikiManager
      * 
      * @param targetWiki the name of the new database/schema.
      * @param context the Xwiki context.
+     * @param initClasses indicate if standard classes should be initalized
      * @throws WikiManagerException <ul>
      *             <li>{@link WikiManagerException#ERROR_WM_XWIKINOTVIRTUAL}: xwiki is not in virtual mode.</li>
      *             <li>{@link WikiManagerException#ERROR_WM_UPDATEDATABASE}: error occurred when updating database.</li>
      *             </ul>
      */
-    private void createWikiDatabase(String targetWiki, XWikiContext context) throws WikiManagerException
+    private void createWikiDatabase(String targetWiki, XWikiContext context, boolean initClasses)
+        throws WikiManagerException
     {
         XWikiPluginMessageTool msg = getMessageTool(context);
 
@@ -612,7 +614,7 @@ public final class WikiManager
 
         // Init database/schema
         try {
-            xwiki.updateDatabase(targetWiki, true, context);
+            xwiki.updateDatabase(targetWiki, true, false, context);
         } catch (Exception e) {
             throw new WikiManagerException(WikiManagerException.ERROR_WM_UPDATEDATABASE, msg.get(
                 WikiManagerMessageTool.ERROR_UPDATEDATABASE, targetWiki), e);

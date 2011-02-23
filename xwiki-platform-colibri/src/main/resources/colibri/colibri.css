@@ -745,7 +745,7 @@ div.buttonwrapper {
   width: 99.8%;
 }
 
-.editbody #hierarchy {
+.inlinebody #hierarchy, .editbody #hierarchy {
   display: inline-block;
   border-right: 1px solid $theme.pageContentBackgroundColor; /* Fixes an IE8 layout issue */
 }
@@ -755,7 +755,8 @@ div.buttonwrapper {
   display: inline-block;
   vertical-align: middle;
 }
-#mainEditArea:target #hierarchy, #mainEditArea:target .edit-meta-tools {
+#mainEditArea:target #hierarchy, #mainEditArea:target .edit-meta-tools,
+#mainContentArea:target #hierarchy, #mainContentArea:target .edit-meta-tools {
   display: none;
 }
 .edit-meta-tools a {
@@ -775,7 +776,7 @@ div.buttonwrapper {
 }
 
 /* Parent editing area */
-#mainEditArea #parentinput {
+#mainEditArea #parentinput, #mainContentArea #parentinput {
   display: none;
   background: $theme.backgroundSecondaryColor;
   padding: 4px 12px;
@@ -783,10 +784,10 @@ div.buttonwrapper {
   font-size: 90%;
 }
 /* Don't combine the following two rules, otherwise IE will fail to recognize either of them */
-#mainEditArea:target #parentinput {
+#mainEditArea:target #parentinput, #mainContentArea:target #parentinput {
   display: block;
 }
-#mainEditArea #parentinput.active {
+#mainEditArea #parentinput.active, #mainContentArea #parentinput.active {
   display: block;
 }
 #parentinput label {

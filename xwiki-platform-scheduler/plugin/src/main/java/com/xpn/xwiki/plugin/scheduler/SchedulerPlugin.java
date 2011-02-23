@@ -35,6 +35,7 @@ import org.quartz.Scheduler;
 import org.quartz.SchedulerException;
 import org.quartz.Trigger;
 import org.quartz.impl.StdSchedulerFactory;
+import org.xwiki.rendering.syntax.Syntax;
 import org.xwiki.script.service.ScriptServiceManager;
 
 import com.xpn.xwiki.XWiki;
@@ -669,10 +670,10 @@ public class SchedulerPlugin extends XWikiDefaultPlugin
             needsUpdate = true;
             doc.setTitle("XWiki Scheduler Job Class");
         }
-        if (StringUtils.isBlank(doc.getContent()) || !XWikiDocument.XWIKI20_SYNTAXID.equals(doc.getSyntaxId())) {
+        if (StringUtils.isBlank(doc.getContent()) || !Syntax.XWIKI_2_0.equals(doc.getSyntax())) {
             needsUpdate = true;
             doc.setContent("{{include document=\"XWiki.ClassSheet\" /}}");
-            doc.setSyntaxId(XWikiDocument.XWIKI20_SYNTAXID);
+            doc.setSyntax(Syntax.XWIKI_2_0);
         }
 
         if (needsUpdate) {

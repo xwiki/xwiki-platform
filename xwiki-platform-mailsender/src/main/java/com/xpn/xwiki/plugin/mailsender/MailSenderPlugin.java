@@ -58,6 +58,7 @@ import org.apache.commons.logging.LogFactory;
 import org.apache.velocity.VelocityContext;
 import org.apache.velocity.app.Velocity;
 import org.apache.velocity.context.Context;
+import org.xwiki.rendering.syntax.Syntax;
 
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
@@ -265,10 +266,10 @@ public class MailSenderPlugin extends XWikiDefaultPlugin
             needsUpdate = true;
             doc.setTitle("XWiki Mail Class");
         }
-        if (StringUtils.isBlank(doc.getContent()) || !XWikiDocument.XWIKI20_SYNTAXID.equals(doc.getSyntaxId())) {
+        if (StringUtils.isBlank(doc.getContent()) || !Syntax.XWIKI_2_0.equals(doc.getSyntax())) {
             needsUpdate = true;
             doc.setContent("{{include document=\"XWiki.ClassSheet\" /}}");
-            doc.setSyntaxId(XWikiDocument.XWIKI20_SYNTAXID);
+            doc.setSyntax(Syntax.XWIKI_2_0);
         }
 
         if (needsUpdate) {

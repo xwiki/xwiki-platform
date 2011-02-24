@@ -30,6 +30,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.xwiki.bridge.event.WikiCreatedEvent;
 import org.xwiki.observation.ObservationManager;
+import org.xwiki.rendering.syntax.Syntax;
 
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
@@ -337,7 +338,8 @@ public final class WikiManager
 
                     includeFormatParams[2] = docFullName;
                     targetDoc.setContent(MessageFormat.format("#includeInContext(\"{0}{1}{2}\")", includeFormatParams));
-                    targetDoc.setSyntaxId(XWikiDocument.XWIKI10_SYNTAXID);
+                    targetDoc.setSyntax(Syntax.XWIKI_1_0);
+                    xwiki.saveDocument(targetDoc, context);
                 }
 
                 // Replace documents contents to link
@@ -347,7 +349,8 @@ public final class WikiManager
 
                     includeFormatParams[2] = docFullName;
                     targetDoc.setContent(MessageFormat.format("#includeTopic(\"{0}{1}{2}\")", includeFormatParams));
-                    targetDoc.setSyntaxId(XWikiDocument.XWIKI10_SYNTAXID);
+                    targetDoc.setSyntax(Syntax.XWIKI_1_0);
+                    xwiki.saveDocument(targetDoc, context);
                 }
             }
         } finally {

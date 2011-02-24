@@ -126,7 +126,7 @@ public final class ApplicationManager
      */
     public List<XWikiApplication> getApplicationList(XWikiContext context) throws XWikiException
     {
-        return XWikiApplicationClass.getInstance(context).searchXObjectDocuments(context);
+        return XWikiApplicationClass.getInstance(context, false).searchXObjectDocuments(context);
     }
 
     /**
@@ -205,7 +205,7 @@ public final class ApplicationManager
     public XWikiApplication getApplication(String appName, XWikiContext context, boolean validate)
         throws XWikiException
     {
-        return XWikiApplicationClass.getInstance(context).getApplication(appName, validate, context);
+        return XWikiApplicationClass.getInstance(context, false).getApplication(appName, validate, context);
     }
 
     /**

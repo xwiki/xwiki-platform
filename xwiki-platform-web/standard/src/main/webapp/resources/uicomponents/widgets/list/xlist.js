@@ -103,11 +103,12 @@ var XWiki = function(XWiki){
             this.iconImage.onload = function(){
                 this.listItemElement.setStyle({
                   backgroundImage: "url(" + this.iconImage.src + ")",
-                  backgroundRepeat: 'no-repeat'
+                  backgroundRepeat: 'no-repeat',
+                  // TODO: support background position as option
+                  backgroundPosition : '3px 3px'
                 });
                 this.listItemElement.down(".xitemcontainer").setStyle({
-                  textIndent:(this.iconImage.width + 5) + 'px',
-                  height: this.iconImage.height + 'px'
+                  textIndent:(this.iconImage.width + 6) + 'px'
                 });
             }.bind(this)
             this.iconImage.src = icon;

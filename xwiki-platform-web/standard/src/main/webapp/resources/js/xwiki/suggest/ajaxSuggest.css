@@ -28,7 +28,14 @@ div.suggestItems ul {
 div.suggestItems li {
   overflow:hidden;
   white-space:nowrap;
-  margin-right:2px;
+}
+
+div.suggestItems li div.xitemcontainer {
+  height:20px;
+}
+
+div.suggestItems * {
+  line-height:1.6em;
 }
 
 ul.suggestList {
@@ -39,18 +46,17 @@ ul.suggestList {
 }
 
 ul.suggestList .xhighlight {
-    background-color: $theme.highlightColor;
+  background-color: $theme.highlightColor;
+  cursor:pointer;
 }
 
 div.suggestItemName {
     text-indent: 0;
 }
 
-div.suggestItemInfo {
-    color: #556677;
-    font-size: 0.8em;
-    padding-left: 20px;
-    text-indent: 0;
+div.suggestItem {
+    color: $theme.textColor;
+    font-size: 0.875em;
 }
 
 div.suggestItemName,

@@ -365,7 +365,7 @@ var XWiki = (function(XWiki){
 
     div.style.left = pos.left + "px";
     div.style.top = (pos.top + this.fld.offsetHeight + this.options.offsety) + "px";
-    div.style.width = this.fld.offsetWidth + "px";
+    div.style.width = (this.fld.offsetWidth - 2) + "px";
 
     // set mouseover functions for div
     // when mouse pointer leaves div, set a timeout to remove the list after an interval

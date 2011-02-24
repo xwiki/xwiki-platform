@@ -1,7 +1,7 @@
 #template('colorThemeInit.vm')
 
 .xhover {
-	background:red;
+  background:red;
 }
 
 input[type="text"].suggest {
@@ -9,7 +9,7 @@ input[type="text"].suggest {
 }
 
 body {
-	position: relative;
+  position: relative;
 }
 
 div.suggestItems {
@@ -51,17 +51,17 @@ ul.suggestList .xhighlight {
 }
 
 div.suggestItemName {
-    text-indent: 0;
+  text-indent: 0;
 }
 
 div.suggestItem {
-    color: $theme.textColor;
-    font-size: 0.875em;
+  color: $theme.textColor;
+  font-size: 0.875em;
 }
 
 div.suggestItemName,
 div.suggestItemInfo {
-    text-decoration: inherit;
+  text-decoration: inherit;
 }
 
 .highlight {

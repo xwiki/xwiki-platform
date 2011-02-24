@@ -54,7 +54,7 @@ div.suggestItemName {
   text-indent: 0;
 }
 
-div.suggestItem {
+div.suggestItem, li.noSuggestion div {
   color: $theme.textColor;
   font-size: 0.875em;
 }
@@ -70,3 +70,16 @@ div.suggestItemInfo {
   text-decoration: inherit;
 }
 
+div.resultContainer div.sourceName {
+  background-color:$theme.panelCollapsedBackgroundColor;
+  font-variant: small-caps;
+  font-weight: 700;
+  color:$theme.panelHeaderBackgroundColor;
+  padding-top:3px;
+  font-size:0.875em;
+}
+
+div.resultContainer div.sourceContent.loading {
+  background-position:center center;
+  min-height:30px;
+}

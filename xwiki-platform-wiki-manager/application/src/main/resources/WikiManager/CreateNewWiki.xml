@@ -50,8 +50,8 @@
 #macro(getRequestList $paramlist $paramname)
   #set ($paramtable = [])
   #set ($paramtable = $request.getParameterValues($paramname))
-  #if ($paramtable)
-    #set ($paramlist = [])
+  #if ($paramtable && $paramlist)
+    #set ($ok = $paramlist.clear())
     #foreach($paramvalue in $paramtable)
       #set ($ok = $paramlist.add($paramvalue))
     #end
@@ -156,11 +156,17 @@
   $wikidocument.set("server", "${wikiname}.${DOMAINNAME}")
 #end
 ##
+#set($readeruserlist = [])
 #getRequestList($readeruserlist "readersusers")
+#set($readergrouplist = [])
 #getRequestList($readergrouplist "readersgroups")
+#set($writeruserlist = [])
 #getRequestList($writeruserlist "writersusers")
+#set($writergrouplist = [])
 #getRequestList($writergrouplist "writersgroups")
+#set($adminuserlist = [])
 #getRequestList($adminuserlist "adminsusers")
+#set($admingrouplist = [])
 #getRequestList($admingrouplist "adminsgroups")
 #if ($request.forcewikiname &amp;&amp; $request.forcewikiname == 'on')
   #set ($failonexist = false)

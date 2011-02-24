@@ -2592,6 +2592,8 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
     public List<XWikiDocument> searchDocuments(String wheresql, boolean distinctbylanguage, boolean customMapping,
         boolean checkRight, int nb, int start, List< ? > parameterValues, XWikiContext context) throws XWikiException
     {
+        // Search documents
+        List<Object[]> documentDatas = new ArrayList<Object[]>();
         boolean bTransaction = true;
         MonitorPlugin monitor = Util.getMonitorPlugin(context);
         try {
@@ -2626,35 +2628,10 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
             if (nb != 0) {
                 query.setMaxResults(nb);
             }
-            Iterator it = query.list().iterator();
-            List list = new ArrayList();
-            while (it.hasNext()) {
-                Object[] result = (Object[]) it.next();
-
-                XWikiDocument doc = new XWikiDocument((String) result[0], (String) result[1]);
-                if (checkRight) {
-                    if (context.getWiki().getRightService().checkAccess("view", doc, context) == false) {
-                        continue;
-                    }
-                }
-
-                String name = doc.getFullName();
-                if (distinctbylanguage) {
-                    String language = (String) result[2];
-                    if ((language == null) || (language.equals(""))) {
-                        list.add(context.getWiki().getDocument(name, context));
-                    } else {
-                        XWikiDocument doc2 = context.getWiki().getDocument(name, context);
-                        list.add(doc2.getTranslatedDocument(language, context));
-                    }
-                } else {
-                    list.add(context.getWiki().getDocument(name, context));
-                }
-            }
+            documentDatas.addAll(query.list());
             if (bTransaction) {
                 endTransaction(context, false, false);
             }
-            return list;
         } catch (Exception e) {
             throw new XWikiException(XWikiException.MODULE_XWIKI_STORE,
                 XWikiException.ERROR_XWIKI_STORE_HIBERNATE_SEARCH,
@@ -2672,6 +2649,33 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
                 monitor.endTimer("hibernate");
             }
         }
+
+        // Resolve documents. We use two separated sessions because rights service could need to switch database to
+        // check rights
+        List<XWikiDocument> documents = new ArrayList<XWikiDocument>();
+        for (Object[] result : documentDatas) {
+            XWikiDocument doc = new XWikiDocument(new DocumentReference(context.getDatabase(), (String) result[0], (String) result[1]));
+            if (checkRight) {
+                if (context.getWiki().getRightService().checkAccess("view", doc, context) == false) {
+                    continue;
+                }
+            }
+
+            DocumentReference documentReference = doc.getDocumentReference();
+            if (distinctbylanguage) {
+                String language = (String) result[2];
+                XWikiDocument document = context.getWiki().getDocument(documentReference, context);
+                if ((language == null) || (language.equals(""))) {
+                    documents.add(document);
+                } else {
+                    documents.add(document.getTranslatedDocument(language, context));
+                }
+            } else {
+                documents.add(context.getWiki().getDocument(documentReference, context));
+            }
+        }
+
+        return documents;
     }
 
     /**

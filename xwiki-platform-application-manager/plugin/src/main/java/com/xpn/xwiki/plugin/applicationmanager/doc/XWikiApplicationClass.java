@@ -225,14 +225,14 @@ public class XWikiApplicationClass extends AbstractXClassManager<XWikiApplicatio
 
     /**
      * Return unique instance of XWikiApplicationClass and update documents for this context. It also check if the
-     * corresponding Xwiki class/template/sheet exist in context's database and create it if not.
+     * corresponding XWiki class/template/sheet exist in context's database and create it if not.
      * 
      * @param context the XWiki context.
-     * @param check indicate if class existance has to be checked in the wiki.
+     * @param check indicate if class existence has to be checked in the wiki.
      * @return a unique instance of XWikiApplicationClass.
      * @throws XWikiException error when checking for class, class template and class sheet.
      */
-    protected static XWikiApplicationClass getInstance(XWikiContext context, boolean check) throws XWikiException
+    public static XWikiApplicationClass getInstance(XWikiContext context, boolean check) throws XWikiException
     {
         synchronized (XWikiApplicationClass.class) {
             if (instance == null) {

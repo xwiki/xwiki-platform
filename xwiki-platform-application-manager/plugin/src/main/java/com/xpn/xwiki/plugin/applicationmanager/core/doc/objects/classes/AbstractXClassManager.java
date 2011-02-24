@@ -25,6 +25,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import org.xwiki.rendering.syntax.Syntax;
@@ -932,8 +933,6 @@ public abstract class AbstractXClassManager<T extends XObjectDocument> implement
     public List<T> searchXObjectDocumentsByFields(Object[][] fieldDescriptors, XWikiContext context)
         throws XWikiException
     {
-        check(context);
-
         List<Object> parameterValues = new ArrayList<Object>();
         String where = createWhereClause(fieldDescriptors, parameterValues);
 
@@ -995,16 +994,24 @@ public abstract class AbstractXClassManager<T extends XObjectDocument> implement
      */
     public List<T> newXObjectDocumentList(List<XWikiDocument> documents, XWikiContext context) throws XWikiException
     {
-        List<T> list = new ArrayList<T>(documents.size());
+        List<T> list;
 
-        for (XWikiDocument doc : documents) {
-            List<BaseObject> objects = doc.getObjects(getClassFullName());
+        if (!documents.isEmpty()) {
+            check(context);
 
-            for (BaseObject bobject : objects) {
-                if (bobject != null) {
-                    list.add(newXObjectDocument(doc, bobject.getNumber(), context));
+            list = new ArrayList<T>(documents.size());
+
+            for (XWikiDocument doc : documents) {
+                List<BaseObject> objects = doc.getObjects(getClassFullName());
+
+                for (BaseObject bobject : objects) {
+                    if (bobject != null) {
+                        list.add(newXObjectDocument(doc, bobject.getNumber(), context));
+                    }
                 }
             }
+        } else {
+            list = Collections.emptyList();
         }
 
         return list;

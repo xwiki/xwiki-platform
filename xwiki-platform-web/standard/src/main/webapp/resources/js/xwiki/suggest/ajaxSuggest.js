@@ -48,7 +48,9 @@ var XWiki = (function(XWiki){
     // The id of the element that will hold the suggest element
     parentContainer : "body",
     // Should results fragments be highlighted when matching typed input
-    highlight: true
+    highlight: true,
+    // Fade the suggestion container on clear
+    fadeOnClear: true
   },
   sInput : "",
   nInputChars : 0,
@@ -62,11 +64,11 @@ var XWiki = (function(XWiki){
    * @param {Object} param the options
    */
   initialize: function (fld, param){
-    this.fld = $(fld);
 
-    if (!this.fld) {
+    if (!fld) {
       return false;
     }
+    this.setInputField(fld);
 
     // Clone default options from the prototype so that they are not shared and extend options with passed parameters
     this.options = Object.extend(Object.clone(this.options), param || { });
@@ -92,6 +94,17 @@ var XWiki = (function(XWiki){
     } else {
       this.seps = "";
     }
+
+  },
+
+  /**
+   * Sets or replace the input field associated with this suggest.
+   */
+  setInputField: function(input){
+    if (this.fld) {
+      this.fld.stopObserving();
+    }
+    this.fld = $(input);
     // Bind the key listeners on the input field.
     this.fld.observe("keyup", this.onKeyUp.bindAsEventListener(this));
     if (Prototype.Browser.IE || Prototype.Browser.WebKit) {
@@ -111,7 +124,7 @@ var XWiki = (function(XWiki){
    * though.
    */
   onKeyUp: function(event)
-  {
+  { 
     var key = event.keyCode;
     switch(key) {
       // Ignore special keys, which are treated in onKeyPress
@@ -341,6 +354,11 @@ var XWiki = (function(XWiki){
       $(this.options.parentContainer).insert(div);
 
       this.container = div;
+
+      document.fire("xwiki:suggest:containerCreated", {
+        'container' : this.container,
+        'suggest' : this
+      });
     }
 
     if (this.sources.length > 1) {
@@ -390,6 +408,11 @@ var XWiki = (function(XWiki){
         }
       }
     }
+
+    var ev = this.container.fire("xwiki:suggest:containerPrepared", {
+      'container' : this.container,
+      'suggest' : this
+    });
 
     return this.container;
   },
@@ -568,8 +591,9 @@ var XWiki = (function(XWiki){
   {
     if (this.iHighlighted && !this.iHighlighted.hasClassName('noSuggestion'))
     {
+      var selection, newFieldValue
       if(this.sInput == "" && this.fld.value == "")
-        this.sInput = this.fld.value = this.iHighlighted.down(".suggestValue").innerHTML;
+        selection = newFieldValue = this.iHighlighted.down(".suggestValue").innerHTML;
       else {
         if(this.seps) {
            var lastIndx = -1;
@@ -577,51 +601,48 @@ var XWiki = (function(XWiki){
              if(this.fld.value.lastIndexOf(this.seps.charAt(i)) > lastIndx)
                lastIndx = this.fld.value.lastIndexOf(this.seps.charAt(i));
             if(lastIndx == -1)
-              this.sInput = this.fld.value = this.iHighlighted.down(".suggestValue").innerHTML;
+              selection = newFieldValue = this.iHighlighted.down(".suggestValue").innerHTML;
             else
             {
-              this.fld.value = this.fld.value.substring(0, lastIndx+1) + this.iHighlighted.down(".suggestValue").innerHTML;
-               this.sInput = this.fld.value.substring(lastIndx+1);
+               newFieldValue = this.fld.value.substring(0, lastIndx+1) + this.iHighlighted.down(".suggestValue").innerHTML;
+               selection = newFieldValue.substring(lastIndx+1);
            }
         }
         else
-          this.sInput = this.fld.value = this.iHighlighted.down(".suggestValue").innerHTML;
+          selection = newFieldValue = this.iHighlighted.down(".suggestValue").innerHTML;
       }
 
-      Event.fire(this.fld, "xwiki:suggest:selected", {
+      var event = Event.fire(this.fld, "xwiki:suggest:selected", {
+        'suggest' : this,
         'id': this.iHighlighted.down(".suggestId").innerHTML,
         'value': this.iHighlighted.down(".suggestValue").innerHTML,
         'info': this.iHighlighted.down(".suggestInfo").innerHTML
       });
-      this.fld.focus();
 
-      /*
-      // move cursor to end of input (safari)
-      //
-      if (this.fld.selectionStart)
-        this.fld.setSelectionRange(this.sInput.length, this.sInput.length);*/
+      if (!event.stopped) {
+        this.sInput = selection;
+        this.fld.value = newFieldValue;
+        this.fld.focus();
+        this.clearSuggestions();
 
-      this.clearSuggestions();
+        // pass selected object to callback function, if exists
+        if (typeof(this.options.callback) == "function") {
+          this.options.callback({
+            'id': this.iHighlighted.down(".suggestId").innerHTML,
+            'value': this.iHighlighted.down(".suggestValue").innerHTML,
+            'info': this.iHighlighted.down(".suggestInfo").innerHTML
+          });
+        }
 
-      // pass selected object to callback function, if exists
-
-      if (typeof(this.options.callback) == "function") {
-        this.options.callback( {
-          'id': this.iHighlighted.down(".suggestId").innerHTML,
-          'value': this.iHighlighted.down(".suggestValue").innerHTML,
-          'info': this.iHighlighted.down(".suggestInfo").innerHTML
-        } );
+        //there is a hidden input
+        if(this.fld.id.indexOf("_suggest") > 0) {
+          var hidden_id = this.fld.id.substring(0, this.fld.id.indexOf("_suggest"));
+          var hidden_inp = $(hidden_id);
+          if (hidden_inp) {
+            hidden_inp.value =  this.iHighlighted.down(".suggestInfo").innerHTML;
+          }
+        }
       }
-
-      //there is a hidden input
-      if(this.fld.id.indexOf("_suggest") > 0) {
-        var hidden_id = this.fld.id.substring(0, this.fld.id.indexOf("_suggest"));
-        var hidden_inp = $(hidden_id);
-
-        if(hidden_inp)
-           hidden_inp.value =  this.iHighlighted.down(".suggestInfo").innerHTML;
-      }
-
     }
   },
 
@@ -648,14 +669,20 @@ var XWiki = (function(XWiki){
    */
   clearSuggestions: function() {
     this.killTimeout();
-    var ele = $(this.resultContainer);
+    var ele = $(this.container);
     var pointer = this;
     if (ele) {
-      var fade = new Effect.Fade(ele, {duration: "0.25", afterFinish : function() {
-        if($(pointer.container)) {
-          $(pointer.container).remove();
-        }
-      }});
+      if (this.options.fadeOnClear) {
+        var fade = new Effect.Fade(ele, {duration: "0.25", afterFinish : function() {
+          if($(pointer.container)) {
+            $(pointer.container).remove();
+          }
+        }});
+      }
+      else {
+        $(this.container).remove();     
+      }
+      document.fire("xwiki:suggest:clearSuggestions", { 'suggest' : this});
     }
   }
 

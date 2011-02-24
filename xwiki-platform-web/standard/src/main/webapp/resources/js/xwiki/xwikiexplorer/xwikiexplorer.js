@@ -1067,20 +1067,23 @@ isc.XWETreeGrid.addMethods({
      */
     getSelectedResourceProperty : function(propertyName) {
         var value = this.getValue();
-        // If the input field is empty then we consider that there's no selected resource.
-        return value.length > 0 ? XWiki.resource.get(value)[propertyName] : null;
+        var selectedRecord = this.getSelectedRecord();
+        if (value.length > 0) {
+            return XWiki.resource.get(value)[propertyName];
+        } else if (selectedRecord != null) {
+            return selectedRecord.isNewPage && propertyName == 'name' ? null : selectedRecord.resource[propertyName];
+        }
+        return null;
     },
 
     /**
      * Is the selected resource a new page.
      */
     isNewPage : function() {
-        // There's no record selected when we create a new page in a new space since we can't select a space that does
-        // not exist in the tree.
-        if (this.getSelectedRecord() == null) {
-          return true;
-        }
-        return this.getSelectedRecord().isNewPage;
+        // There's no record selected when we target a new page in a new space since we can't select a space that does
+        // not exist in the tree, but the input value must not be empty in this case.
+        var selectedRecord = this.getSelectedRecord();
+        return selectedRecord == null ? this.getValue().length > 0 : selectedRecord.isNewPage;
     },
 
     /**

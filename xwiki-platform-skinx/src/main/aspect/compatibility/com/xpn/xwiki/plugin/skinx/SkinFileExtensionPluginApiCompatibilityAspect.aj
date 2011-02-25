@@ -41,6 +41,9 @@ public aspect SkinFileExtensionPluginApiCompatibilityAspect
         // fullScreen script has been moved and renamed in XWiki 2.6RC2 / 2.7M1 See XWIKI-5659
         compatibilityMap.put("js/xwiki/editors/fullScreenEdit.js", "uicomponents/widgets/fullScreen.js");
         compatibilityMap.put("js/xwiki/editors/fullScreenEdit.css", "uicomponents/widgets/fullScreen.css");
+        // suggest script has been moved and renamed in XWiki 3.1M3 See XWIKI-6043
+        compatibilityMap.put("js/xwiki/suggest/ajaxSuggest.js", "uicomponents/suggest/suggest.js");
+        compatibilityMap.put("js/xwiki/suggest/ajaxSuggest.css", "uicomponents/suggest/suggest.css");
     }
 
     /**

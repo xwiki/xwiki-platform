@@ -13,9 +13,9 @@ There is still some things to do once the project is imported into Eclipse works
 == Set configuration ==
 
 This project comes with some example configuration you need to copy/past and set as you need it to:
-* src/main/webapp/WEB-INF/xwiki.cfg.default -> WebContent/WEB-INF/xwiki.cfg
-* src/main/webapp/WEB-INF/xwiki.properties.default -> WebContent/WEB-INF/xwiki.properties
-* src/main/webapp/WEB-INF/hibernate.<database>.cfg.xml.default -> WebContent/WEB-INF/hibernate.cfg.xml
+* src/main/webapp/WEB-INF/xwiki.cfg.default -> src/main/webapp/WEB-INF/xwiki.cfg
+* src/main/webapp/WEB-INF/xwiki.properties.default -> src/main/webapp/WEB-INF/xwiki.properties
+* src/main/webapp/WEB-INF/hibernate.<database>.cfg.xml.default -> src/main/webapp/WEB-INF/hibernate.cfg.xml
 
 = TODO =
 

@@ -172,6 +172,7 @@
     <module>xwiki-legacy</module>
     <module>xwiki-skin</module>
     <module>xwiki-store</module>
+    <module>xwiki-eventstream</module>
   </modules>
   <profiles>
     <profile>

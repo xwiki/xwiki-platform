@@ -43,7 +43,9 @@ public class MetaData
     public static final String SOURCE = "source";
 
     /**
-     * Represents the syntax of the content found in macro containing wiki content (like a box macro for example).
+     * Represents the syntax of the content found in macro containing wiki content (like a box macro for example). The
+     * value has to be a {@link org.xwiki.rendering.syntax.Syntax} object.
+     * 
      * @since 3.0M3
      */
     public static final String SYNTAX = "syntax";

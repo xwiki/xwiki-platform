@@ -19,7 +19,7 @@ $pdfdoc.use("XWiki.PDFClass")
 #if($pdfheader=="")
 #set($title = $pdfdoc.display("title", "rendered"))
 #if((!$title)||($title==""))
-$escapetool.xml($!doc.space) - $escapetool.xml($!doc.displayTitle)
+$escapetool.xml($!doc.space) - $escapetool.xml($!tdoc.displayTitle)
 #else
 $escapetool.xml($title)
 #end

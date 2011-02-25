@@ -56,7 +56,7 @@ var XWiki = (function(XWiki){
   sInput : "",
   nInputChars : 0,
   aSuggestions : [],
-  iHighlighted : 0,
+  iHighlighted : null,
 
   /**
    * Initialize the suggest
@@ -593,7 +593,7 @@ var XWiki = (function(XWiki){
    * return true if a suggestion is highlighted, false otherwise
    */
   hasActiveSelection: function(){
-    return typeof this.iHighlighted == 'undefined';
+    return this.iHighlighted;
   },
 
   setHighlightedValue: function ()

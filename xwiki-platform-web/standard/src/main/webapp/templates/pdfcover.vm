@@ -2,7 +2,7 @@
 <h1>
 #set($title = "$!pdfdoc.display('title', 'rendered')")
 #if($title == '')
-  $escapetool.xml($!doc.displayTitle)
+  $escapetool.xml($!tdoc.displayTitle)
 #else
   $escapetool.xml($title)
 #end

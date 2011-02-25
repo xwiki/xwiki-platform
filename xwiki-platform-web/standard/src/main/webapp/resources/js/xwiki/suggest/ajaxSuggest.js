@@ -50,7 +50,8 @@ var XWiki = (function(XWiki){
     // Should results fragments be highlighted when matching typed input
     highlight: true,
     // Fade the suggestion container on clear
-    fadeOnClear: true
+    fadeOnClear: true,
+    insertBeforeSuggestions: null
   },
   sInput : "",
   nInputChars : 0,
@@ -168,9 +169,6 @@ var XWiki = (function(XWiki){
 
     switch(key) {
       case Event.KEY_RETURN:
-        if(this.aSuggestions.length == 1) {
-          this.highlightFirst();
-        }
         this.setHighlightedValue();
         Event.stop(event);
         break;
@@ -354,6 +352,10 @@ var XWiki = (function(XWiki){
       $(this.options.parentContainer).insert(div);
 
       this.container = div;
+
+      if (this.options.insertBeforeSuggestions) {
+	    this.resultContainer.insert(this.options.insertBeforeSuggestions);
+      }
 
       document.fire("xwiki:suggest:containerCreated", {
         'container' : this.container,
@@ -585,6 +587,13 @@ var XWiki = (function(XWiki){
         this.setHighlight(first);
       }
     }
+  },
+
+  /**
+   * return true if a suggestion is highlighted, false otherwise
+   */
+  hasActiveSelection: function(){
+    return typeof this.iHighlighted == 'undefined';
   },
 
   setHighlightedValue: function ()

@@ -58,7 +58,7 @@ var XWiki = (function (XWiki) {
      * Submits the form or go to a selected page according to selection.
      */
     onSuggestionSelected: function(event) {
-      if (event.memo.suggest = this.suggest) {
+      if (event.memo.suggest == this.suggest) {
         event.stop();
         this.onClearSuggestions(event);
         this.virtualSearchInput.value = event.memo.value;

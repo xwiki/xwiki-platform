@@ -412,6 +412,11 @@ var XWiki = (function(XWiki){
           this.resultContainer.insert(sourceContainer);
         }
       }
+    } else {
+      // In mono-source mode, reset the list if present
+      if (this.resultContainer.down("ul")) {
+        this.resultContainer.down("ul").remove();
+      }
     }
 
     var ev = this.container.fire("xwiki:suggest:containerPrepared", {

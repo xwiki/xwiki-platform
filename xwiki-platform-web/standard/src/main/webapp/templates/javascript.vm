@@ -21,6 +21,27 @@ $xwiki.jsfx.use('uicomponents/widgets/notification.js', true)
 $xwiki.ssfx.use('uicomponents/widgets/notification.css', true)
 $xwiki.jsfx.use('uicomponents/widgets/list/xlist.js')
 $xwiki.jsfx.use('uicomponents/suggest/suggest.js')
+#if($xwiki.exists('XWiki.SearchSuggestConfig'))
+  ## Hook to request the search suggest script if search suggest configuration is present.
+  ## We can't just have it as a always-use SSX yet since we compute a hash to be sure to refresh
+  ## the file when the configuration changes.
+  ## Ideally, this code should be located in a interface extension, in the search application.
+  #set($searchSuggestConfigDocument = $xwiki.getDocument('XWiki.SearchSuggestConfig'))
+  #set($searchSuggestConfigObject = $searchSuggestConfigDocument.getObject('XWiki.SearchSuggestConfig'))
+  #if($searchSuggestConfigObject.getProperty('activated').value == 1)
+   #set($searchSuggestConfigHash = '')
+   #foreach($source in $searchSuggestConfigDocument.getObjects('XWiki.SearchSuggestSourceClass'))
+     #if($source.getProperty('activated').value == 1)
+       #set($sourceId = "${source.get('name')}:${source.get('url')}:${source.get('highlight')}:${source.get('icon')}}")
+       #set($searchSuggestConfigHash = "${searchSuggestConfigHash}|${sourceId}")
+     #end
+   #end
+   $xwiki.jsfx.use('uicomponents/search/searchSuggest.js', {
+    'forceSkinAction' : true,  
+    'h' : $searchSuggestConfigHash.hashCode()  
+   })
+  #end
+#end
 <script type="text/javascript" src="$xwiki.getSkinFile("js/prototype/prototype.js")"></script>
 <script type="text/javascript" src="$xwiki.getSkinFile("js/xwiki/xwiki.js", true)"></script>
 <script type="text/javascript">

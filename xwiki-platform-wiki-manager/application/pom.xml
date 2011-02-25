@@ -27,15 +27,15 @@
   <parent>
     <groupId>org.xwiki.platform.applications</groupId>
     <artifactId>xwiki-applications</artifactId>
-    <version>36-SNAPSHOT</version>
+    <version>35</version>
   </parent>
   <artifactId>xwiki-application-wiki-manager</artifactId>
   <name>XWiki Platform - Applications - Wiki Manager</name>
-  <version>1.25-SNAPSHOT</version>
+  <version>1.25</version>
   <packaging>xar</packaging>
   <description>Manages creation and installation of children Wikis</description>
   <properties>
-    <platform.plugin.wikimanager.version>${project.version}</platform.plugin.wikimanager.version>
+    <platform.plugin.wikimanager.version>1.25</platform.plugin.wikimanager.version>
   </properties>
   <dependencies>
     <dependency>

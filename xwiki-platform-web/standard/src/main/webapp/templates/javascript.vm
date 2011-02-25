@@ -1,7 +1,7 @@
 ##
 ## CSS files related to JS libraries.
 ##
-<link href="$xwiki.getSkinFile("js/xwiki/suggest/ajaxSuggest.css", true)" rel="stylesheet" type="text/css" />
+<link href="$xwiki.getSkinFile("uicomponents/suggest/suggest.css", true)" rel="stylesheet" type="text/css" />
 <link href="$xwiki.getSkinFile("js/xwiki/lightbox/lightbox.css", true)" rel="stylesheet" type="text/css" />
 <!--[if IE]>
   <link href="$xwiki.getSkinFile("js/xwiki/lightbox/lightboxIE.css", true)" rel="stylesheet" type="text/css" />
@@ -20,7 +20,7 @@ $xwiki.jsfx.use('uicomponents/widgets/confirmedAjaxRequest.js', true)
 $xwiki.jsfx.use('uicomponents/widgets/notification.js', true)
 $xwiki.ssfx.use('uicomponents/widgets/notification.css', true)
 $xwiki.jsfx.use('uicomponents/widgets/list/xlist.js')
-$xwiki.jsfx.use('js/xwiki/suggest/ajaxSuggest.js')
+$xwiki.jsfx.use('uicomponents/suggest/suggest.js')
 <script type="text/javascript" src="$xwiki.getSkinFile("js/prototype/prototype.js")"></script>
 <script type="text/javascript" src="$xwiki.getSkinFile("js/xwiki/xwiki.js", true)"></script>
 <script type="text/javascript">

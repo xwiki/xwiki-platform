@@ -1,7 +1,7 @@
 #template('colorThemeInit.vm')
 
 .xhover {
-	background:red;
+  background:red;
 }
 
 input[type="text"].suggest {
@@ -9,7 +9,7 @@ input[type="text"].suggest {
 }
 
 body {
-	position: relative;
+  position: relative;
 }
 
 div.suggestItems {
@@ -25,6 +25,19 @@ div.suggestItems ul {
   margin: 0px;
 }
 
+div.suggestItems li {
+  overflow:hidden;
+  white-space:nowrap;
+}
+
+div.suggestItems li div.xitemcontainer {
+  height:20px;
+}
+
+div.suggestItems * {
+  line-height:1.6em;
+}
+
 ul.suggestList {
   margin:0px !important;
   text-transform:none;
@@ -33,23 +46,22 @@ ul.suggestList {
 }
 
 ul.suggestList .xhighlight {
-    background-color: $theme.highlightColor;
+  background-color: $theme.highlightColor;
+  cursor:pointer;
 }
 
 div.suggestItemName {
-    text-indent: 0;
+  text-indent: 0;
 }
 
-div.suggestItemInfo {
-    color: #556677;
-    font-size: 0.8em;
-    padding-left: 20px;
-    text-indent: 0;
+div.suggestItem, li.noSuggestion div {
+  color: $theme.textColor;
+  font-size: 0.875em;
 }
 
 div.suggestItemName,
 div.suggestItemInfo {
-    text-decoration: inherit;
+  text-decoration: inherit;
 }
 
 .highlight {
@@ -58,3 +70,16 @@ div.suggestItemInfo {
   text-decoration: inherit;
 }
 
+div.resultContainer div.sourceName {
+  background-color:$theme.panelCollapsedBackgroundColor;
+  font-variant: small-caps;
+  font-weight: 700;
+  color:$theme.panelHeaderBackgroundColor;
+  padding-top:3px;
+  font-size:0.875em;
+}
+
+div.resultContainer div.sourceContent.loading {
+  background-position:center center;
+  min-height:30px;
+}

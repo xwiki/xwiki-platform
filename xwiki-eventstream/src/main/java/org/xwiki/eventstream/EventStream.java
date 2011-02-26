@@ -42,7 +42,7 @@ public interface EventStream
     void addEvent(Event e);
 
     /**
-     * Search stored events. The query will be prefixed with a hardcoded {@code select evt from Event as event} or
+     * Search stored events. The query will be prefixed with a hardcoded {@code select event from Event as event} or
      * equivalent stub which selects actual events from the storage, so it must start with further {@code from} or
      * {@code where} statements.
      * 

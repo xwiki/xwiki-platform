@@ -18,7 +18,7 @@ var XWiki = (function (XWiki) {
         
       this.modalContainer = new Element('div', {'class': 'xdialog-modal-container'}).hide();
       var screen = new Element('div', {'class': 'xdialog-screen'}).setStyle({
-         opacity : 0.35,
+         opacity : 0.25,
          backgroundColor : "#000000"
       });
       this.modalContainer.insert(screen);
@@ -60,14 +60,15 @@ var XWiki = (function (XWiki) {
     onSuggestionSelected: function(event) {
       if (event.memo.suggest == this.suggest) {
         event.stop();
-        this.onClearSuggestions(event);
-        this.virtualSearchInput.value = event.memo.value;
         if (!event.memo.id) {
           // Submit form
+          this.devirtualizeSearchInput();
           this.realSearchInput.up('form').submit();
         }
         else {
           // Go to page
+          this.modalContainer.hide();
+          this.virtualSearchInput.value = event.memo.value;     
           window.location = event.memo.id;;
         }
       }

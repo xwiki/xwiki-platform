@@ -1,74 +1,74 @@
-#if("$!request.pdfcover" != '0')
-  #set($displayPdfCover = 1)
+#if ("$!request.pdfcover" != '0')
+  #set ($displayPdfCover = 1)
 #else
-  #set($displayPdfCover = 0)
+  #set ($displayPdfCover = 0)
 #end
-#if("$!request.pdftoc" != '0')
-  #set($displayPdfToc = 1)
+#if ("$!request.pdftoc" != '0')
+  #set ($displayPdfToc = 1)
 #else
-  #set($displayPdfToc = 0)
+  #set ($displayPdfToc = 0)
 #end
-<?xml version="1.0" encoding="$xwiki.encoding" ?>
+<?xml version="1.0" encoding="${xwiki.encoding}" ?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
 <title>
-$pdfdoc.use("XWiki.PDFClass")
-#set($pdfheader = $pdfdoc.display("title","rendered"))
-#if($pdfheader=="")
-#set($title = $pdfdoc.display("title", "rendered"))
-#if((!$title)||($title==""))
-$escapetool.xml($!doc.space) - $escapetool.xml($!tdoc.displayTitle)
+##
+## We'll keep calling the next line before each property display. This is intentional, since one of the fields could
+## also call doc.use with a different object, thus setting a different current object. Don't try to optimize by
+## reducing the duplication!
+##
+$pdfdoc.use('XWiki.PDFClass')
+#set ($title = $pdfdoc.display('title', 'rendered'))
+#if ((!$title) || ($title == ''))
+  $!{escapetool.xml($doc.space)} - $!{escapetool.xml($tdoc.displayTitle)}
 #else
-$escapetool.xml($title)
-#end
-#else
-$escapetool.xml($pdfheader)
+  $escapetool.xml($title)
 #end
 </title>
-<meta http-equiv="Content-Type" content="text/html; charset=$xwiki.encoding" />
+<meta http-equiv="Content-Type" content="text/html; charset=${xwiki.encoding}" />
 </head>
 <body id="body" class="${xcontext.action}body" pdfcover="${displayPdfCover}" pdftoc="${displayPdfToc}">
 <div class="pdfheader">
-$pdfdoc.use("XWiki.PDFClass")
-#set($pdfheader = $pdfdoc.display("header","rendered"))
-#if($pdfheader=="")
-#template("pdfheader.vm")
+$pdfdoc.use('XWiki.PDFClass')
+#set ($pdfheader = $pdfdoc.display('header', 'rendered'))
+#if ($pdfheader == '')
+  #template("pdfheader.vm")
 #else
-$pdfheader
+  $pdfheader
 #end
 </div>
 <div class="pdffooter">
-$pdfdoc.use("XWiki.PDFClass")
-#set($pdffooter = $pdfdoc.display("footer", "rendered"))
-#if($pdffooter=="")
-#template("pdffooter.vm")
+$pdfdoc.use('XWiki.PDFClass')
+#set ($pdffooter = $pdfdoc.display('footer', 'rendered'))
+#if ($pdffooter == '')
+  #template("pdffooter.vm")
 #else
-$pdffooter
+  $pdffooter
 #end
 </div>
-#if($displayPdfCover == 1)
-<div class="pdfcover">
-$pdfdoc.use("XWiki.PDFClass")
-#set($pdfcover = $pdfdoc.display("cover", "rendered"))
-#if($pdfcover=="")
-#template("pdfcover.vm")
-#else
-$pdfcover
+#if ($displayPdfCover == 1)
+  <div class="pdfcover">
+  $pdfdoc.use('XWiki.PDFClass')
+  #set ($pdfcover = $pdfdoc.display('cover', 'rendered'))
+  #if ($pdfcover == '')
+    #template("pdfcover.vm")
+  #else
+    $pdfcover
+  #end
+  </div>
 #end
-</div>
-#end
-#if($displayPdfToc == 1)
-<div class="pdftoc">
-$pdfdoc.use("XWiki.PDFClass")
-#set($pdftoc = $pdfdoc.display("toc", "rendered"))
-#if($pdftoc=="")
-#template("pdftoc.vm")
-#else
-$pdftoc
-#end
-</div>
+#if ($displayPdfToc == 1)
+  <div class="pdftoc">
+  $pdfdoc.use('XWiki.PDFClass')
+  #set ($pdftoc = $pdfdoc.display('toc', 'rendered'))
+  #if ($pdftoc == '')
+    #template("pdftoc.vm")
+  #else
+    $pdftoc
+  #end
+  </div>
 #end
 <div id="xwikimaincontainer">
 <div id="xwikimaincontainerinner">

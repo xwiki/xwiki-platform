@@ -1,56 +1,56 @@
 #template("xwikivars.vm")
-#if($request.pdftemplate)
-#set($pdfdoc = $xwiki.getDocument($request.pdftemplate))
+#if ($request.pdftemplate)
+  #set ($pdfdoc = $xwiki.getDocument($request.pdftemplate))
 #else
-#set($pdfdoc = $doc)
+  #set($pdfdoc = $tdoc)
 #end
-$pdfdoc.use("XWiki.PDFClass")
+$pdfdoc.use('XWiki.PDFClass')
 #template("pdfhtmlheader.vm")
-#set($withPageBreaks = false)
-#if($request.pagebreaks&&($request.pagebreaks=="1"))
-#set($withPageBreaks = true)
+#set ($withPageBreaks = false)
+#if ("$!{request.pagebreaks}" == '1')
+  #set ($withPageBreaks = true)
 #end
-#if($request.pages)
- #foreach($page in $request.getParameterValues("pages"))
-  #if($velocityCount!=0)
-   #pagebreak()
+#if ($request.pages)
+  #foreach ($page in $request.getParameterValues('pages'))
+    #set ($pageDoc = $xwiki.getDocument($page))
+    $pageDoc.getRenderedContent()
+    #if ($request.includechilds)
+      #set ($clevel = $util.parseInt($request.includechilds))
+      #includeChildren($page $withPageBreaks)
+    #elseif ($request.includelinks)
+      #set ($clevel = $util.parseInt($request.includelinks))
+      #includeLinks($page $withPageBreaks)
+    #end
+    #if ($velocityHasNext)
+      #pagebreak()
+    #end
   #end
-   #set($pageDoc = $xwiki.getDocument($page))
-   $pageDoc.getRenderedContent()
-   #if($request.includechilds)
-    #set($clevel = $util.parseInt($request.includechilds))
-    #includeChilds($page  $withPageBreaks)
-   #elseif($request.includelinks)
-    #set($clevel = $util.parseInt($request.includelinks))
-    #includeLinks($page $withPageBreaks)
-   #end
- #end
 #else
-<div id="xwikicontent">
-$cdoc.getRenderedContent()
-</div>
- #if($request.includechilds)
-  #set($clevel = $util.parseInt($request.includechilds))
-  #includeChilds($cdoc.fullName $withPageBreaks)
- #elseif($request.includelinks)
-  #set($clevel = $util.parseInt($request.includelinks))
-  #includeLinks($cdoc.fullName $withPageBreaks)
- #end
+  <div id="xwikicontent">
+    $cdoc.getRenderedContent()
+  </div>
+  #if ($request.includechilds)
+    #set ($clevel = $util.parseInt($request.includechilds))
+    #includeChildren($cdoc.fullName $withPageBreaks)
+  #elseif ($request.includelinks)
+    #set ($clevel = $util.parseInt($request.includelinks))
+    #includeLinks($cdoc.fullName $withPageBreaks)
+  #end
 #end
 #set($footnotes = "#putFootnotes()")
 $xwiki.renderText($footnotes, $doc)
-#if ($request.comments&&($request.comments=="1"))
-#template("comments2.vm")
+#if ("$!{request.comments}" == '1')
+  #template("comments2.vm")
 #end
-#if ($request.attachments&&($request.attachments=="1"))
-<div id="xwikiattachments">
-#foreach ($attach in $doc.attachmentList)
-#if ($attach.isImage())
-<img src="$doc.getAttachmentURL("${attach.filename}", "download")" alt="${attach.filename}" />
-<br />
-#end
-#end
-</div>
+#if ("$!{request.attachments}" == '1')
+  <div id="xwikiattachments">
+  #foreach ($attach in $doc.attachmentList)
+    #if ($attach.isImage())
+      <img src="${doc.getAttachmentURL($attach.filename)}" alt="${attach.filename}" />
+      <br />
+    #end
+  #end
+  </div>
 #end
 </div>
 </div>

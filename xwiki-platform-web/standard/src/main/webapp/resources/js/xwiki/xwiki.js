@@ -480,8 +480,8 @@ Object.extend(XWiki, {
             method: 'get',
             onComplete: function() {
               if (element.nodeName == 'A') {
-                element.parentNode.toggleClassName('hidden');
-                $(XWiki.watchlist.flowMap[element.id]).parentNode.toggleClassName('hidden');
+                element.up().toggleClassName('hidden');
+                $(XWiki.watchlist.flowMap[element.id]).up().toggleClassName('hidden');
               } else {
                 element.toggleClassName('hidden');
                 $(XWiki.watchlist.flowMap[element.id]).toggleClassName('hidden');
@@ -509,7 +509,7 @@ Object.extend(XWiki, {
                 Event.stop(event);
                 var element = event.element();
                 while (element.id == '') {
-                    element = element.parentNode;
+                    element = element.up();
                 }
                 XWiki.watchlist.executeAction(element);
               });

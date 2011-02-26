@@ -82,14 +82,14 @@ public class IncludeMacroTest extends AbstractComponentTestCase
     public void testIncludeMacroWithNewContextShowsVelocityMacrosAreIsolated() throws Exception
     {
         String expected = "beginDocument\n"
-            + "beginMetaData [[source]=[wiki:space.page][syntax]=[XWiki 2.0]]\n"
+            + "beginMetaData [[syntax]=[XWiki 2.0][source]=[wiki:space.page]]\n"
             + "beginMacroMarkerStandalone [velocity] [] [#testmacro]\n"
             + "beginParagraph\n"
             + "onSpecialSymbol [#]\n"
             + "onWord [testmacro]\n"
             + "endParagraph\n"
             + "endMacroMarkerStandalone [velocity] [] [#testmacro]\n"
-            + "endMetaData [[source]=[wiki:space.page][syntax]=[XWiki 2.0]]\n"
+            + "endMetaData [[syntax]=[XWiki 2.0][source]=[wiki:space.page]]\n"
             + "endDocument";
 
         // We verify that a Velocity macro set in the including page is not seen in the included page.
@@ -103,9 +103,9 @@ public class IncludeMacroTest extends AbstractComponentTestCase
     public void testIncludeMacroWithCurrentContextShowsVelocityMacrosAreShared() throws Exception
     {
         String expected = "beginDocument\n"
-            + "beginMetaData [[source]=[wiki:space.page][syntax]=[XWiki 2.0]]\n"
+            + "beginMetaData [[syntax]=[XWiki 2.0][source]=[wiki:space.page]]\n"
             + "onMacroStandalone [velocity] [] [#testmacro]\n"
-            + "endMetaData [[source]=[wiki:space.page][syntax]=[XWiki 2.0]]\n"
+            + "endMetaData [[syntax]=[XWiki 2.0][source]=[wiki:space.page]]\n"
             + "endDocument";
 
         // We verify that a Velocity macro set in the including page is seen in the included page.
@@ -136,7 +136,7 @@ public class IncludeMacroTest extends AbstractComponentTestCase
     public void testIncludeMacroWhenIncludingDocumentWithRelativeReferences() throws Exception
     {
         String expected = "beginDocument\n"
-            + "beginMetaData [[source]=[includedWiki:includedSpace.includedPage][syntax]=[XWiki 2.0]]\n"
+            + "beginMetaData [[syntax]=[XWiki 2.0][source]=[includedWiki:includedSpace.includedPage]]\n"
             + "beginParagraph\n"
             + "beginLink [Typed = [false] Type = [doc] Reference = [page]] [false]\n"
             + "endLink [Typed = [false] Type = [doc] Reference = [page]] [false]\n"
@@ -146,7 +146,7 @@ public class IncludeMacroTest extends AbstractComponentTestCase
             + "onSpace\n"
             + "onImage [Typed = [false] Type = [attach] Reference = [test.png]] [true]\n"
             + "endParagraph\n"
-            + "endMetaData [[source]=[includedWiki:includedSpace.includedPage][syntax]=[XWiki 2.0]]\n"
+            + "endMetaData [[syntax]=[XWiki 2.0][source]=[includedWiki:includedSpace.includedPage]]\n"
             + "endDocument";
 
         setUpDocumentMock("includedWiki:includedSpace.includedPage",
@@ -205,11 +205,11 @@ public class IncludeMacroTest extends AbstractComponentTestCase
         throws Exception
     {
         String expected = "beginDocument\n"
-            + "beginMetaData [[source]=[relativePage][syntax]=[XWiki 2.0]]\n"
+            + "beginMetaData [[syntax]=[XWiki 2.0][source]=[relativePage]]\n"
             + "beginParagraph\n"
             + "onWord [content]\n"
             + "endParagraph\n"
-            + "endMetaData [[source]=[relativePage][syntax]=[XWiki 2.0]]\n"
+            + "endMetaData [[syntax]=[XWiki 2.0][source]=[relativePage]]\n"
             + "endDocument";
 
         IncludeMacroParameters parameters = new IncludeMacroParameters();
@@ -243,14 +243,14 @@ public class IncludeMacroTest extends AbstractComponentTestCase
     public void testIncludeMacroWhenSectionSpecified() throws Exception
     {
         String expected = "beginDocument\n"
-            + "beginMetaData [[source]=[document][syntax]=[XWiki 2.0]]\n"
+            + "beginMetaData [[syntax]=[XWiki 2.0][source]=[document]]\n"
             + "beginHeader [1, Hsection]\n"
             + "onWord [section]\n"
             + "endHeader [1, Hsection]\n"
             + "beginParagraph\n"
             + "onWord [content2]\n"
             + "endParagraph\n"
-            + "endMetaData [[source]=[document][syntax]=[XWiki 2.0]]\n"
+            + "endMetaData [[syntax]=[XWiki 2.0][source]=[document]]\n"
             + "endDocument";
 
         IncludeMacroParameters parameters = new IncludeMacroParameters();

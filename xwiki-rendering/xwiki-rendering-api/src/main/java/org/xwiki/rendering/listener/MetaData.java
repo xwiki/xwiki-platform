@@ -20,12 +20,12 @@
 package org.xwiki.rendering.listener;
 
 import java.util.Collections;
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 /**
  * Represents a set of MetaData.
- * 
+ *
  * @version $Id$
  * @since 3.0M2
  */
@@ -45,15 +45,17 @@ public class MetaData
     /**
      * Represents the syntax of the content found in macro containing wiki content (like a box macro for example). The
      * value has to be a {@link org.xwiki.rendering.syntax.Syntax} object.
-     * 
+     *
      * @since 3.0M3
      */
     public static final String SYNTAX = "syntax";
 
     /**
      * Contains all MetaData for this Block and its children.
+     * Note: we preserve the order of metadata elements as they are added as a service for the user so he can count
+     * on it.
      */
-    private Map<String, Object> metadata = new HashMap<String, Object>();
+    private Map<String, Object> metadata = new LinkedHashMap<String, Object>();
 
     /**
      * Empty metaData.

@@ -797,7 +797,7 @@ public class XWikiDocumentTest extends AbstractBridgedXWikiComponentTestCase
 
         assertEquals("string", this.document.display("string", "view", getContext()));
         assertEquals(
-            "{{html clean=\"false\" wiki=\"false\"}}<pre><input size='30' id='Space.Page_0_string' value='string' name='Space.Page_0_string' type='text'/></pre>{{/html}}",
+            "{{html clean=\"false\" wiki=\"false\"}}<input size='30' id='Space.Page_0_string' value='string' name='Space.Page_0_string' type='text'/>{{/html}}",
             this.document.display("string", "edit", getContext()));
 
         assertEquals("{{html clean=\"false\" wiki=\"false\"}}<p>area</p>{{/html}}", this.document.display("area",
@@ -832,7 +832,7 @@ public class XWikiDocumentTest extends AbstractBridgedXWikiComponentTestCase
 
         assertEquals("string", this.document.display("string", "view", getContext()));
         assertEquals(
-            "{{html clean=\"false\" wiki=\"false\"}}<pre><input size='30' id='Space.Page_0_string' value='string' name='Space.Page_0_string' type='text'/></pre>{{/html}}",
+            "{{html clean=\"false\" wiki=\"false\"}}<input size='30' id='Space.Page_0_string' value='string' name='Space.Page_0_string' type='text'/>{{/html}}",
             this.document.display("string", "edit", getContext()));
 
         this.mockXWikiRenderingEngine.expects(once()).method("renderText").with(eq("area"), ANYTHING, ANYTHING).will(
@@ -872,7 +872,7 @@ public class XWikiDocumentTest extends AbstractBridgedXWikiComponentTestCase
 
         assertEquals("string", this.document.display("string", "view", getContext()));
         assertEquals(
-            "<pre><input size='30' id='Space.Page_0_string' value='string' name='Space.Page_0_string' type='text'/></pre>",
+            "<input size='30' id='Space.Page_0_string' value='string' name='Space.Page_0_string' type='text'/>",
             this.document.display("string", "edit", getContext()));
 
         assertEquals("<p>area</p>", this.document.display("area", "view", getContext()));
@@ -953,10 +953,10 @@ public class XWikiDocumentTest extends AbstractBridgedXWikiComponentTestCase
         // "database:space.name" (no change)
 
         DocumentReference sourceReference = new DocumentReference(this.document.getDocumentReference());
-    	this.document.setContent("[[pageinsamespace]]");
-    	this.document.setSyntax(Syntax.XWIKI_2_0);
+        this.document.setContent("[[pageinsamespace]]");
+        this.document.setSyntax(Syntax.XWIKI_2_0);
         DocumentReference targetReference = new DocumentReference("newwikiname", "newspace", "newpage");
-    	XWikiDocument targetDocument = this.document.duplicate(targetReference);
+        XWikiDocument targetDocument = this.document.duplicate(targetReference);
 
         DocumentReference reference1 = new DocumentReference(DOCWIKI, DOCSPACE, "Page1");
         XWikiDocument doc1 = new XWikiDocument(reference1);
@@ -997,7 +997,7 @@ public class XWikiDocumentTest extends AbstractBridgedXWikiComponentTestCase
             Arrays.asList(reference1, reference2, reference3), Arrays.asList(reference4, reference5), getContext());
 
         // Test links
-		assertEquals("[[Wiki:Space.pageinsamespace]]", this.document.getContent());
+        assertEquals("[[Wiki:Space.pageinsamespace]]", this.document.getContent());
         assertEquals("[[newwikiname:newspace.newpage]] " + "[[someName>>newwikiname:newspace.newpage]] "
             + "[[newwikiname:newspace.newpage]]", doc1.getContent());
         assertEquals("[[newspace.newpage]]", doc2.getContent());

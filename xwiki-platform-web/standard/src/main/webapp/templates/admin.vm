@@ -59,6 +59,7 @@
     #set ($needsupdate = true)
   #end
   #if ($needsupdate)
+    $!doc.setParent("${doc.space}.WebHome")
     #set ($discard = $doc.save())
   #end
 #end

@@ -116,6 +116,147 @@ WXeToWvwgYGls1xAsKTwi1/8E9y8eevLMXMZtaJaB7X4tQHPxVfgXYKe4OIzQ6enDXOyRQMHS6lE
 ddWHt792K8+t3VfqUWto6TrLtrz8RXSUCfSHg/eIAM/Ba5Xm0DX4CHTV6g+HrxV6LjKBTUyKg/iS
 Rw52Dj97Ru7HP/4rSJIf/OBlePXVV5O/aGgkl+K37++g5vL/dmrHZnVCF2wAAAAASUVORK5CYII=
 </content></attachment>
+<object>
+<class>
+<name>XWiki.JavaScriptExtension</name>
+<customClass></customClass>
+<customMapping></customMapping>
+<defaultViewSheet></defaultViewSheet>
+<defaultEditSheet></defaultEditSheet>
+<defaultWeb></defaultWeb>
+<nameField></nameField>
+<validationScript></validationScript>
+<cache>
+<cache>0</cache>
+<disabled>0</disabled>
+<displayType>select</displayType>
+<multiSelect>0</multiSelect>
+<name>cache</name>
+<number>5</number>
+<prettyName>Caching policy</prettyName>
+<relationalStorage>0</relationalStorage>
+<separator> </separator>
+<separators> ,|</separators>
+<size>1</size>
+<unmodifiable>0</unmodifiable>
+<values>long|short|default|forbid</values>
+<classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+</cache>
+<code>
+<disabled>0</disabled>
+<name>code</name>
+<number>2</number>
+<prettyName>Code</prettyName>
+<rows>20</rows>
+<size>50</size>
+<unmodifiable>0</unmodifiable>
+<classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+</code>
+<name>
+<disabled>0</disabled>
+<name>name</name>
+<number>1</number>
+<prettyName>Name</prettyName>
+<size>30</size>
+<unmodifiable>0</unmodifiable>
+<classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+</name>
+<parse>
+<disabled>0</disabled>
+<displayFormType>select</displayFormType>
+<displayType>yesno</displayType>
+<name>parse</name>
+<number>4</number>
+<prettyName>Parse content</prettyName>
+<unmodifiable>0</unmodifiable>
+<classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+</parse>
+<use>
+<cache>0</cache>
+<disabled>0</disabled>
+<displayType>select</displayType>
+<multiSelect>0</multiSelect>
+<name>use</name>
+<number>3</number>
+<prettyName>Use this extension</prettyName>
+<relationalStorage>0</relationalStorage>
+<separator> </separator>
+<separators> ,|</separators>
+<size>1</size>
+<unmodifiable>0</unmodifiable>
+<values>currentPage=Always on this page|onDemand=On demand|always=Always on this wiki</values>
+<classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+</use>
+</class>
+<name>Panels.PanelWizard</name>
+<number>0</number>
+<className>XWiki.JavaScriptExtension</className>
+<guid>f4e922fd-a0e0-4630-8df4-425f89637a09</guid>
+<property>
+<cache>long</cache>
+</property>
+<property>
+<code>document.observe('xwiki:dom:loaded', (function() {
+  var _showTooltipOnHover = function(event) {
+    var panel = event.element();
+    if (!panel.hasClassName('panelcontainer')) {
+      panel = panel.up('.panelcontainer');
+    }
+    if(!window.isDraggingPanel &amp;&amp; panel._x_tooltip.strip()) {
+      showtip(panel, panel._x_tooltip, 300);
+    }
+  }
+  $$('.panelcontainer').each(function(panel) {
+    panel._x_tooltip = panel.title;
+    panel.title = "";
+    Event.observe(panel, "mouseover", _showTooltipOnHover);
+  });
+
+  $('draganddroptooltip')._x_tooltip = $('draganddroptooltip').title;
+  $('draganddroptooltip').title = '';
+  Event.observe($('draganddroptooltip'), "mouseover", function() {
+    if(window.isDraggingPanel) {
+      return;
+    }
+    showtip($('draganddroptooltip'), $('draganddroptooltip')._x_tooltip, 300);
+  });
+
+  Event.observe($('firstwtab'), "click", function(event) {
+    event.stop();
+    switchToWizardPage($('firstwtab'), 'PanelListSection');
+  });
+
+  Event.observe($('secondwtab'), "click", function(event) {
+    event.stop();
+    switchToWizardPage($('secondwtab'), 'PageLayoutSection');
+  });
+
+  Event.observe($$('.pagelayoutoption0')[0], "click", function(event) { changePreviewLayout($$('.pagelayoutoption0')[0], 0); });
+  Event.observe($$('.pagelayoutoption1')[0], "click", function(event) { changePreviewLayout($$('.pagelayoutoption1')[0], 1); });
+  Event.observe($$('.pagelayoutoption2')[0], "click", function(event) { changePreviewLayout($$('.pagelayoutoption2')[0], 2); });
+  Event.observe($$('.pagelayoutoption3')[0], "click", function(event) { changePreviewLayout($$('.pagelayoutoption3')[0], 3); });
+
+  Event.observe($('saveLayout'), "click", function(event) {
+    event.stop();
+    save();
+  });
+
+  Event.observe($('revertLayout'), "click", function(event) {
+    event.stop();
+    revert();
+  });
+}));</code>
+</property>
+<property>
+<name>Wizard listeners</name>
+</property>
+<property>
+<parse>0</parse>
+</property>
+<property>
+<use>onDemand</use>
+</property>
+</object>
 <content>{pre}
 ##
 ## Redirect to force right and left panels layout
@@ -153,6 +294,7 @@ Rw52Dj97Ru7HP/4rSJIf/OBlePXVV5O/aGgkl+K37++g5vL/dmrHZnVCF2wAAAAASUVORK5CYII=
 ## Check for admin right for the current preferences document (XWiki.XWikiPreferences or Space.WebPreferences)
 ##
 #if($accessLevel)
+  $xwiki.jsx.use('Panels.PanelWizard')##
   &lt;div class="floatcontainer"&gt;
     &lt;ul class="xwikitabbar" id="panelEditorSteps"&gt;
       &lt;li id="firstwtab" class="active"&gt;&lt;a href="#PanelListSection"&gt;$escapetool.xml($msg.get('panelwizard.panellist'))&lt;/a&gt;&lt;/li&gt;
@@ -161,7 +303,7 @@ Rw52Dj97Ru7HP/4rSJIf/OBlePXVV5O/aGgkl+K37++g5vL/dmrHZnVCF2wAAAAASUVORK5CYII=
   &lt;/div&gt;
   &lt;div id="xwikieditcontent" class="clear"&gt;
     &lt;div id="PanelListSection"&gt;
-      &lt;span id="draganddroptooltip" class="hastooltip"&gt;$msg.get('panelwizard.draganddrop')
+      &lt;span id="draganddroptooltip" class="hastooltip" title="${escapetool.xml($msg.get('panelwizard.tip'))}"&gt;$msg.get('panelwizard.draganddrop')&lt;/span&gt;
       #set($panelClass = $xwiki.getDocument("Panels.PanelClass").xWikiClass)
       #set($categoryList = $panelClass.category.getProperty("values").value.split("[|]"))
       #set($sql = ", BaseObject as obj where obj.name=doc.fullName and obj.className='Panels.PanelClass' and doc.fullName!='Panels.PanelTemplate'")
@@ -266,18 +408,9 @@ Rw52Dj97Ru7HP/4rSJIf/OBlePXVV5O/aGgkl+K37++g5vL/dmrHZnVCF2wAAAAASUVORK5CYII=
                     #set($obj = $panelDoc.getObject("Panels.PanelClass"))
                           &lt;div class="panelitemc"&gt;
                             &lt;div class="label"&gt;$doc.display("name", $obj)&lt;/div&gt;
-                            &lt;div id="panelContainer${panelCount}" class="panelcontainer"&gt;#if($panelsStatus.get($item) == "false")#displaypanel("$item")#else&lt;div class="panel"&gt;&lt;/div&gt;#end&lt;/div&gt;
+                            &lt;div id="panelContainer${panelCount}" class="panelcontainer" title="${escapetool.xml($doc.display('description', $obj))}"&gt;#if($panelsStatus.get($item) == "false")#displaypanel("$item")#else&lt;div class="panel"&gt;&lt;/div&gt;#end&lt;/div&gt;
                             &lt;div class="xwikibuttonlink"&gt;&lt;a href="$xwiki.getURL($item, 'inline')"&gt;$escapetool.xml($msg.get('edit'))&lt;/a&gt; &lt;a href="$xwiki.getURL("$item", "delete")"&gt;$escapetool.xml($msg.get('delete'))&lt;/a&gt;&lt;/div&gt;
                           &lt;/div&gt;
-                          &lt;script type="text/javascript"&gt;
-                          //&lt;![CDATA[
-                            Event.observe($("panelContainer${panelCount}"), "mouseover", function(event) {
-                              if(!window.isDraggingPanel) {
-                                showtip(Event.element(event), unescape('$escapetool.url($doc.display("description", $obj)).replaceAll("[+]", "%20").replaceAll("'", "&amp;#39;")'), 300);
-                              }
-                            });
-                          //]]&gt;
-                          &lt;/script&gt;
                           #set($panelCount = $panelCount + 1)
                    #end
                  #end
@@ -358,46 +491,10 @@ Rw52Dj97Ru7HP/4rSJIf/OBlePXVV5O/aGgkl+K37++g5vL/dmrHZnVCF2wAAAAASUVORK5CYII=
       &lt;span class="buttonwrapper"&gt;&lt;a href="$xwiki.getURL("Panels.WebHome")"&gt;$escapetool.xml($msg.get('xe.panels.wizard.homepage'))&lt;/a&gt;&lt;/span&gt;
     &lt;/span&gt;
   &lt;/div&gt;
-  &lt;script type="text/javascript"&gt;
-  //&lt;![CDATA[
-    Event.observe($('draganddroptooltip'), "mouseover", function() {
-      if(window.isDraggingPanel) {
-        return; 
-      } 
-      showtip($('draganddroptooltip'), "$escapetool.javascript($msg.get('panelwizard.tip'))", 300);
-    });
-
-    Event.observe($('firstwtab'), "click", function(event) {
-      switchToWizardPage($('firstwtab'), 'PanelListSection'); 
-      return false;
-    });
-
-    Event.observe($('secondwtab'), "click", function(event) {
-      switchToWizardPage($('secondwtab'), 'PageLayoutSection'); 
-      return false;
-    });
-
-    Event.observe($$('.pagelayoutoption0')[0], "click", function(event) { changePreviewLayout($$('.pagelayoutoption0')[0], 0); });
-    Event.observe($$('.pagelayoutoption1')[0], "click", function(event) { changePreviewLayout($$('.pagelayoutoption1')[0], 1); });
-    Event.observe($$('.pagelayoutoption2')[0], "click", function(event) { changePreviewLayout($$('.pagelayoutoption2')[0], 2); });
-    Event.observe($$('.pagelayoutoption3')[0], "click", function(event) { changePreviewLayout($$('.pagelayoutoption3')[0], 3); });
-
-    Event.observe($('saveLayout'), "click", function(event) {
-      save(); 
-      return false;
-    });
-
-    Event.observe($('revertLayout'), "click", function(event) {
-      revert(); 
-      return false;
-    });
-  //]]&gt;
-  &lt;/script&gt;
 #else
   #xwikimessageboxstart($escapetool.xml($msg.get('panelwizard.paneleditor')) '')
   $escapetool.xml($msg.get('panelwizard.needadminright'))
   #xwikimessageboxend()
 #end
 #end ## redirect
-{/pre}</content>
-</xwikidoc>
+{/pre}</content></xwikidoc>

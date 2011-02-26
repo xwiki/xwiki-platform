@@ -30,7 +30,6 @@ $!xwiki.ssx.use('Stats.Style')
 &lt;th style="width:40%"&gt;$msg.get('xe.statistics.page')&lt;/th&gt;
 &lt;th style="width:40%"&gt;$msg.get('xe.statistics.space')&lt;/th&gt;
 &lt;/tr&gt;
-
 &lt;/thead&gt;
 &lt;tbody&gt;
 #foreach($item in $stats)

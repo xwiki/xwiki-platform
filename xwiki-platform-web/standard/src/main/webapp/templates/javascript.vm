@@ -73,57 +73,54 @@ $xwiki.get('jsfx').use('uicomponents/widgets/validation/livevalidation_prototype
 $xwiki.get('ssfx').use('uicomponents/widgets/validation/livevalidation.css')
 <script type="text/javascript">
 // <![CDATA[
- var cancelEditNextOnunload;
- var cancelCancelEditFlag = true;
- var  lockEditFlag = false;
+var cancelEditNextOnunload;
+var cancelCancelEditFlag = true;
+var lockEditFlag = false;
 
- function cancelEditResponse(){
- }
+function cancelEditResponse() {
+}
 
- function cancelEdit(){
-     if (cancelCancelEditFlag) {
-       var surl = "$doc.getExternalURL("cancel", "ajax=1")";
-       var myAjax = new Ajax.Request(
-                 surl,
-                 {
-                     method: 'get',
-                     parameters: "",
-                     asynchronous: true,
-                     discardResponse: true
-                 });
-        cancelCancelEditFlag = false;
-     }
-     if (cancelEditNextOnunload!=null)
-           cancelEditNextOnunload();
- }
+function cancelEdit() {
+  if (cancelCancelEditFlag) {
+    var surl = "$doc.getExternalURL('cancel', 'ajax=1')";
+    var myAjax = new Ajax.Request(surl, {
+      method: 'get',
+      parameters: "",
+      asynchronous: true,
+      discardResponse: true
+    });
+    cancelCancelEditFlag = false;
+  }
+  if (cancelEditNextOnunload) {
+    cancelEditNextOnunload();
+  }
+}
 
- function lockEdit(){
-    if (lockEditFlag==false) {
-#if($xcontext.action=="inline")
-      var surl = "$doc.getExternalURL("lock")?action=inline&ajax=1&${docvariant.replaceAll("&amp;", "&")}";
+function lockEdit() {
+  if (!lockEditFlag) {
+#if ($xcontext.action == 'inline')
+    var surl = "$doc.getExternalURL('lock', "action=inline&ajax=1&${docvariant.replace('&amp;', '&')}")";
 #else
-      var surl = "$doc.getExternalURL("lock")?ajax=1&${docvariant.replaceAll("&amp;", "&")}";
+    var surl = "$doc.getExternalURL('lock', "ajax=1&${docvariant.replace('&amp;', '&')}")";
 #end
-      var myAjax = new Ajax.Request(
-                surl,
-                {
-                    method: 'get',
-                    parameters: "",
-                    asynchronous: true
-                });
-       lockEditFlag = false;
-    }
- }
+    var myAjax = new Ajax.Request(surl, {
+      method: 'get',
+      parameters: "",
+      asynchronous: true
+    });
+    lockEditFlag = false;
+  }
+}
 
- function prepareCancelEdit() {
-    lockEdit();
- }
- function cancelCancelEdit() {
-     cancelCancelEditFlag = false;
- }
-    Event.observe(window, "unload", cancelEdit);
-    Event.observe(window, "pagehide", cancelEdit);
-    Event.observe(document, "dom:loaded", prepareCancelEdit);
+function prepareCancelEdit() {
+  lockEdit();
+}
+function cancelCancelEdit() {
+  cancelCancelEditFlag = false;
+}
+Event.observe(window, "unload", cancelEdit);
+Event.observe(window, "pagehide", cancelEdit);
+Event.observe(document, "dom:loaded", prepareCancelEdit);
 // ]]>
 </script>
 #end

@@ -74,9 +74,11 @@ public class EventGroup
      */
     public EventGroup(Event... events)
     {
-        for (Event e : events) {
-            if (e != null) {
-                this.events.add(e);
+        if (events != null) {
+            for (Event e : events) {
+                if (e != null) {
+                    this.events.add(e);
+                }
             }
         }
     }

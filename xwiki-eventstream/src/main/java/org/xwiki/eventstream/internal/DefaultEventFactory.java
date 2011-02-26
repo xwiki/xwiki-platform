@@ -66,7 +66,7 @@ public class DefaultEventFactory implements EventFactory
         Event result = new DefaultEvent();
         result.setId(UUID.randomUUID().toString());
         result.setGroupId(getCurrentGroupId());
-        result.setUser((DocumentReference) this.resolver.resolve(this.bridge.getCurrentUser(), EntityType.DOCUMENT));
+        result.setUser(new DocumentReference(this.resolver.resolve(this.bridge.getCurrentUser(), EntityType.DOCUMENT)));
         result.setDate(new Date());
         return result;
     }

@@ -27,7 +27,7 @@ import java.util.regex.Pattern;
  * @version $Id$
  * @since 1.8M1
  */
-public class AbstractSyntaxFilter extends AbstractFilter
+public abstract class AbstractSyntaxFilter extends AbstractFilter
 {
     private Pattern syntax10Pattern;
 

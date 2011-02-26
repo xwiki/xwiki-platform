@@ -523,6 +523,7 @@
               <exclude>**/usersandgroups.js</exclude>
               <exclude>**/columns.css</exclude>
               <exclude>**/gallery.css</exclude>
+              <exclude>**/searchSuggest.js</exclude>
             </excludes>
           </configuration>
         </plugin>

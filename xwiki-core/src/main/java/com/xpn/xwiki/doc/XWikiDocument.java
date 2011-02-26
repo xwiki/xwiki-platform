@@ -118,7 +118,6 @@ import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.api.DocumentSection;
 import com.xpn.xwiki.content.Link;
 import com.xpn.xwiki.content.parsers.DocumentParser;
-import com.xpn.xwiki.content.parsers.LinkParser;
 import com.xpn.xwiki.content.parsers.RenamePageReplaceLinkHandler;
 import com.xpn.xwiki.content.parsers.ReplacementResultCollection;
 import com.xpn.xwiki.criteria.impl.RevisionCriteria;
@@ -1429,9 +1428,8 @@ public class XWikiDocument implements DocumentModelBridge
         // Note: Consider "" or null as the same, i.e. the author not being set
         DocumentReference authorReference = null;
         if (author != null && author.length() > 0) {
-            authorReference =
-                this.explicitReferenceDocumentReferenceResolver.resolve(
-                    this.xClassEntityReferenceResolver.resolve(author, EntityType.DOCUMENT), getDocumentReference());
+            authorReference = this.explicitReferenceDocumentReferenceResolver.resolve(
+                this.xClassEntityReferenceResolver.resolve(author, EntityType.DOCUMENT), getDocumentReference());
         }
 
         if ((getAuthorReference() == null && authorReference != null)
@@ -1489,10 +1487,8 @@ public class XWikiDocument implements DocumentModelBridge
         // Note: Consider "" or null as the same, i.e. the content author not being set
         DocumentReference contentAuthorReference = null;
         if (contentAuthor != null && contentAuthor.length() > 0) {
-            contentAuthorReference =
-                this.explicitReferenceDocumentReferenceResolver.resolve(
-                    this.xClassEntityReferenceResolver.resolve(contentAuthor, EntityType.DOCUMENT),
-                    getDocumentReference());
+            contentAuthorReference = this.explicitReferenceDocumentReferenceResolver.resolve(
+                this.xClassEntityReferenceResolver.resolve(contentAuthor, EntityType.DOCUMENT), getDocumentReference());
         }
 
         if ((getContentAuthorReference() == null && contentAuthorReference != null)
@@ -1549,9 +1545,8 @@ public class XWikiDocument implements DocumentModelBridge
         // Note: Consider "" or null as the same, i.e. the creator not being set
         DocumentReference creatorReference = null;
         if (creator != null && creator.length() > 0) {
-            creatorReference =
-                this.explicitReferenceDocumentReferenceResolver.resolve(
-                    this.xClassEntityReferenceResolver.resolve(creator, EntityType.DOCUMENT), getDocumentReference());
+            creatorReference = this.explicitReferenceDocumentReferenceResolver.resolve(
+                this.xClassEntityReferenceResolver.resolve(creator, EntityType.DOCUMENT), getDocumentReference());
         }
 
         if ((getCreatorReference() == null && creatorReference != null)
@@ -4700,13 +4695,12 @@ public class XWikiDocument implements DocumentModelBridge
         // the current wiki.
         // - the parent document reference saved in the database matches the page name part of this document's
         // reference (eg "page") and the parent document's space is the same as this document's space.
-        List<String> whereParams =
-            Arrays.asList(this.defaultEntityReferenceSerializer.serialize(getDocumentReference()),
-                this.localEntityReferenceSerializer.serialize(getDocumentReference()),
-                getDocumentReference().getName(), getDocumentReference().getLastSpaceReference().getName());
+        List<String> params = Arrays.asList(this.defaultEntityReferenceSerializer.serialize(getDocumentReference()),
+            this.localEntityReferenceSerializer.serialize(getDocumentReference()),
+            getDocumentReference().getName(), getDocumentReference().getLastSpaceReference().getName());
 
         String whereStatement = "doc.parent=? or doc.parent=? or (doc.parent=? and doc.space=?)";
-        return context.getWiki().getStore().searchDocumentReferences(whereStatement, nb, start, whereParams, context);
+        return context.getWiki().getStore().searchDocumentReferences(whereStatement, nb, start, params, context);
     }
 
     /**

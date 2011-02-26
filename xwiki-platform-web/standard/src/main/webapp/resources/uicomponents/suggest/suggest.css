@@ -38,6 +38,10 @@ div.suggestItems * {
   line-height:1.6em;
 }
 
+div.suggestItems em {
+  font-weight:700;
+}
+
 ul.suggestList {
   margin:0px !important;
   text-transform:none;

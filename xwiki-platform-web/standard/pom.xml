@@ -301,6 +301,13 @@
       <artifactId>xwiki-core-legacy</artifactId>
       <version>${platform.core.version}</version>
     </dependency>
+    <!-- Event Stream Module -->
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-core-eventstream</artifactId>
+      <version>${platform.core.version}</version>
+    </dependency>
+    <!-- Legacy / Backward compatibility -->
   </dependencies>
   <properties>
     <!-- Don't run CLIRR on the .war since there's no Java code here. -->

@@ -34,7 +34,7 @@
   <version>1.24-SNAPSHOT</version>
   <description>XWiki Platform - Plugins - Lucene search</description>
   <properties>
-    <platform.core.version>2.7-SNAPSHOT</platform.core.version>
+    <platform.core.version>3.0-SNAPSHOT</platform.core.version>
   </properties>
   <dependencies>
     <dependency>
@@ -42,12 +42,6 @@
       <artifactId>xwiki-core</artifactId>
       <version>${platform.core.version}</version>
       <scope>provided</scope>
-      <exclusions>
-        <exclusion>
-          <groupId>org.apache.poi</groupId>
-          <artifactId>poi</artifactId>
-        </exclusion>
-     </exclusions>
     </dependency>
     <dependency>
       <groupId>org.apache.lucene</groupId>
@@ -69,37 +63,14 @@
     <!-- Attachments parsing -->
     <dependency>
       <groupId>org.apache.tika</groupId>
-      <artifactId>tika-core</artifactId>
-      <version>0.8</version>
-    </dependency>
-    <dependency>
-      <groupId>org.apache.tika</groupId>
       <artifactId>tika-parsers</artifactId>
-      <version>0.8</version>
+      <version>0.9</version>
       <exclusions>
         <exclusion>
           <groupId>asm</groupId>
           <artifactId>asm</artifactId>
         </exclusion>
-        <!-- Tika parsers 0.8 drags ROME 0.9, while xwiki-core provides ROME 1.0 -->
-        <exclusion>
-          <groupId>rome</groupId>
-          <artifactId>rome</artifactId>
-        </exclusion>
-        <!-- TODO: Remove when upgrade to tika 0.9.
-        netcdf jar embeds some standard libraries in conflict with the versions we are using. -->
-        <exclusion>
-          <groupId>edu.ucar</groupId>
-          <artifactId>netcdf</artifactId>
-        </exclusion>
       </exclusions>
-    </dependency>
-    <!-- TODO: Remove when upgrade to tika 0.9.
-    netcdf jar embeds some standard libraries in conflict with the versions we are using. -->
-    <dependency>
-      <groupId>edu.ucar</groupId>
-      <artifactId>netcdf</artifactId>
-      <version>4.2-min</version>
     </dependency>
 
     <!-- We only need this for setting the thread name... -->

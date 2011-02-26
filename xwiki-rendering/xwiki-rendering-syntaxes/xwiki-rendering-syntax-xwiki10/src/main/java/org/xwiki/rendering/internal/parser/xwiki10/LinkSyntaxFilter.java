@@ -50,7 +50,9 @@ public class LinkSyntaxFilter extends AbstractFilter implements Initializable
      */
     public void initialize() throws InitializationException
     {
-        setPriority(1000);
+        // make sure to match link before wiki syntax (which is 1000) since wiki syntax is not supported in links label
+        // in xwiki/1.0 syntax
+        setPriority(900);
     }
 
     /**
@@ -115,8 +117,8 @@ public class LinkSyntaxFilter extends AbstractFilter implements Initializable
 
                 // Done, now print the link
                 if (text != null) {
-                    linkResult.append(this.escape20Filter.filter(text, filterContext).replace("~", "~~").replace(">>",
-                        "~>~>").replace("||", "~|~|"));
+                    linkResult.append(this.escape20Filter.filter(text, filterContext).replace("~", "~~")
+                        .replace(">>", "~>~>").replace("||", "~|~|"));
                     linkResult.append(">>");
                 }
 

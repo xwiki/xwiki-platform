@@ -140,7 +140,13 @@ dt {
   margin: 10px 0 0;
 }
 
-input[type="text"], input[type="password"], textarea, select {
+input[type="text"], input[type="password"] {
+  background-color: $theme.pageContentBackgroundColor ;
+  border: 1px solid $theme.borderColor;
+  color: $theme.textColor;
+}
+/* Duplicated because IE6 chokes on the first two selectors. Don't recombine! */
+textarea, select {
   background-color: $theme.pageContentBackgroundColor ;
   border: 1px solid $theme.borderColor;
   color: $theme.textColor;
@@ -1259,6 +1265,7 @@ div#xwikiobjects input[type="checkbox"], div#xwikiclassproperties input[type="ch
 .xform input[type="text"], .xform input[type="password"] {
   width: 99%;
 }
+/* Duplicated because IE6 chokes on the first two selectors. Don't recombine! */
 .xform select, .xform textarea {
   width: 99%;
 }

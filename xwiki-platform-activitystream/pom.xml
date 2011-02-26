@@ -36,7 +36,7 @@
   <packaging>jar</packaging>
   <description>XWiki Platform - Plugins - Activity Stream</description>
   <properties>
-    <platform.core.version>2.7-rc-1</platform.core.version>
+    <platform.core.version>3.0-SNAPSHOT</platform.core.version>
     <platform.plugin.scheduler.version>1.25-SNAPSHOT</platform.plugin.scheduler.version>
     <jmock.version>1.1.0</jmock.version>
   </properties>
@@ -69,6 +69,18 @@
       <groupId>com.xpn.xwiki.platform.plugins</groupId>
       <artifactId>xwiki-plugin-scheduler</artifactId>
       <version>${platform.plugin.scheduler.version}</version>
+      <scope>provided</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-core-query-manager</artifactId>
+      <version>${platform.core.version}</version>
+      <scope>provided</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-core-eventstream</artifactId>
+      <version>${platform.core.version}</version>
       <scope>provided</scope>
     </dependency>
     <dependency>

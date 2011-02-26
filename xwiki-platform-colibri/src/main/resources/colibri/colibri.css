@@ -1256,8 +1256,10 @@ div#xwikiobjects input[type="checkbox"], div#xwikiclassproperties input[type="ch
   margin-bottom: 1em;
 }
 
-.xform input[type="text"], .xform input[type="password"],
-.xform select, .xform textarea{
+.xform input[type="text"], .xform input[type="password"] {
+  width: 99%;
+}
+.xform select, .xform textarea {
   width: 99%;
 }
 

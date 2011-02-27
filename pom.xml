@@ -37,6 +37,8 @@
   <description>XWiki Platform - Core - Parent POM</description>
   <properties>
     <!-- Versions of XWiki dependencies used in Core modules -->
+    <rendering.version>3.0-SNAPSHOT</rendering.version>
+    <!-- Versions of XWiki dependencies used in Core modules -->
     <clirr.previous.version>2.7</clirr.previous.version>
   </properties>
   <scm>
@@ -199,52 +201,14 @@
                 <exclude>com/xpn/xwiki/api/XWikiCompatibilityAspect</exclude>
                 <exclude>com/xpn/xwiki/pdf/api/PdfExport*</exclude>
                 <exclude>org/xwiki/bridge/DocumentModelBridge</exclude>
-                <exclude>org/xwiki/rendering/macro/box/AbstractBoxMacro</exclude>
                 <exclude>org/xwiki/officeimporter/openoffice/OpenOfficeConverter</exclude>
                 <exclude>org/xwiki/properties/ConverterManager</exclude>
                 <exclude>org/xwiki/properties/PropertyDescriptor</exclude>
                 <exclude>org/xwiki/properties/converter/AbstractConverter</exclude>
                 <exclude>org/xwiki/properties/converter/Converter</exclude>
-                <exclude>org/xwiki/rendering/macro/descriptor/ParameterDescriptor</exclude>
-                <exclude>org/xwiki/rendering/block/Block</exclude>
-                <exclude>org/xwiki/container/Request</exclude>
+                <exclude>org/xwiki/rendering/macro/box/AbstractBoxMacro</exclude>
                	<exclude>org/xwiki/rendering/macro/script/AbstractScriptMacro</exclude>
-                <exclude>org/xwiki/rendering/parser/xwiki10/AbstractSyntaxFilter</exclude>
-                <!-- Changes below are caused by the removal of the FatherBlock interface -->
-                <exclude>org/xwiki/rendering/block/AbstractFatherBlock</exclude>
-                <exclude>org/xwiki/rendering/block/FatherBlock</exclude>
-                <exclude>org/xwiki/rendering/block/BulletedListBlock</exclude>
-                <exclude>org/xwiki/rendering/block/DefinitionDescriptionBlock</exclude>
-                <exclude>org/xwiki/rendering/block/DefinitionListBlock</exclude>
-                <exclude>org/xwiki/rendering/block/DefinitionTermBlock</exclude>
-                <exclude>org/xwiki/rendering/block/FormatBlock</exclude>
-                <exclude>org/xwiki/rendering/block/GroupBlock</exclude>
-                <exclude>org/xwiki/rendering/block/HeaderBlock</exclude>
-                <exclude>org/xwiki/rendering/block/LinkBlock</exclude>
-                <exclude>org/xwiki/rendering/block/ListItemBlock</exclude>
-                <exclude>org/xwiki/rendering/block/MacroMarkerBlock</exclude>
-                <exclude>org/xwiki/rendering/block/NumberedListBlock</exclude>
-                <exclude>org/xwiki/rendering/block/ParagraphBlock</exclude>
-                <exclude>org/xwiki/rendering/block/QuotationBlock</exclude>
-                <exclude>org/xwiki/rendering/block/SectionBlock</exclude>
-                <exclude>org/xwiki/rendering/block/TableBlock</exclude>
-                <exclude>org/xwiki/rendering/block/TableCellBlock</exclude>
-                <exclude>org/xwiki/rendering/block/TableHeadCellBlock</exclude>
-                <exclude>org/xwiki/rendering/block/TableRowBlock</exclude>
-                <exclude>org/xwiki/rendering/block/XDOM</exclude>
-                <exclude>org/xwiki/rendering/block/QuotationLineBlock</exclude>
-                <exclude>org/xwiki/rendering/syntax/SyntaxType</exclude>
-                <exclude>org/xwiki/rendering/listener/CompositeListener</exclude>
-                <exclude>org/xwiki/rendering/listener/Listener</exclude>
-                <exclude>org/xwiki/rendering/listener/QueueListener</exclude>
-                <exclude>org/xwiki/rendering/listener/WrappingListener</exclude>
-                <exclude>org/xwiki/rendering/listener/chaining/AbstractChainingListener</exclude>
-                <exclude>org/xwiki/rendering/listener/chaining/BlockStateChainingListener</exclude>
-                <exclude>org/xwiki/rendering/listener/chaining/ConsecutiveNewLineStateChainingListener</exclude>
-                <exclude>org/xwiki/rendering/listener/chaining/EmptyBlockChainingListener</exclude>
-                <exclude>org/xwiki/rendering/listener/chaining/LookaheadChainingListener</exclude>
-                <exclude>org/xwiki/rendering/listener/chaining/TextOnNewLineStateChainingListener</exclude>
-                <exclude>org/xwiki/rendering/scaffolding/RenderingTestCase</exclude>
+                <exclude>org/xwiki/container/Request</exclude>
                 <!-- Changes below are caused by the removal of the deprecated methods/classes in office importer module -->
                 <exclude>org/xwiki/officeimporter/OfficeImporter</exclude>
                 <exclude>org/xwiki/officeimporter/OfficeImporterFilter</exclude>

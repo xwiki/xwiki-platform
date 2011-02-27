@@ -1,9 +1,0 @@
-.#-----------------------------------------------------
-.input|xwiki/1.0
-.#-----------------------------------------------------
-$response.sendRedirect($diffDoc.getURL("view", "viewer=changes&rev1=${rev1}&rev2=${rev2}"))
-non velocity
-.#-----------------------------------------------------
-.expect|xwiki/2.0
-.#-----------------------------------------------------
-{{velocity filter="none"}}{{html clean="false" wiki="true"}}$response.sendRedirect($diffDoc.getURL("view", "viewer=changes&rev1=${rev1}&rev2=${rev2}")){{/html}}{{/velocity}} non velocity

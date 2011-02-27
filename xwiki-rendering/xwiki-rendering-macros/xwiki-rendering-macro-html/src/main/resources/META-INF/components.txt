@@ -1,3 +1,0 @@
-org.xwiki.rendering.internal.macro.html.HTMLMacro
-org.xwiki.rendering.internal.macro.html.HTMLMacroXHTMLRenderer
-org.xwiki.rendering.internal.macro.html.HTMLMacroXHTMLRendererFactory

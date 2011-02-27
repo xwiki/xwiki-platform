@@ -50,6 +50,7 @@
     <smartgwt.version>2.0</smartgwt.version>
     <junit.version>3.8.2</junit.version>
     <!-- Versions of XWiki dependencies used in Platform/Web modules -->
+    <rendering.version>3.0-SNAPSHOT</rendering.version>
     <platform.tool.configuration.version>1.46-SNAPSHOT</platform.tool.configuration.version>
     <platform.core.version>${project.version}</platform.core.version>
     <!-- Lock albatross version because it isn't developed anymore. -->

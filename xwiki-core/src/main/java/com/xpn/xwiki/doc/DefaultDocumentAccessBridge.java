@@ -884,7 +884,7 @@ public class DefaultDocumentAccessBridge implements DocumentAccessBridge
     {
         XWikiContext xcontext = getContext();
 
-        return xcontext.getWiki().getRightService().hasProgrammingRights(xcontext.getDoc(), xcontext);
+        return xcontext.getWiki().getRightService().hasProgrammingRights(xcontext);
     }
 
     /**

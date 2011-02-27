@@ -932,6 +932,11 @@ public class XWikiRightServiceImpl implements XWikiRightService
 
     public boolean hasProgrammingRights(XWikiContext context)
     {
+        // Once dropPermissions has been called, the document in the
+        // context cannot have programming permission.
+        if (context.hasDroppedPermissions()) {
+            return false;
+        }
         XWikiDocument sdoc = (XWikiDocument) context.get("sdoc");
         if (sdoc == null) {
             sdoc = context.getDoc();
@@ -943,11 +948,6 @@ public class XWikiRightServiceImpl implements XWikiRightService
     public boolean hasProgrammingRights(XWikiDocument doc, XWikiContext context)
     {
         try {
-            // Nothing can have programming if the XWikiContext has had dropPermissions called on it.
-            if (context.hasDroppedPermissions()) {
-                return false;
-            }
-
             if (doc == null) {
                 // If no context document is set, then check the rights of the current user
                 return isSuperAdminOrProgramming(context.getUser(), null, "programming", true, context);

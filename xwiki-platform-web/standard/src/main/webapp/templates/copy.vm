@@ -97,7 +97,7 @@
       ## Translation field
       ##------------------
       #set ($docTranslations = $doc.getTranslationList())
-      #if ($docTranslations.size() > 0)
+      #if ($xwiki.isMultiLingual() && $docTranslations.size() > 0)
       <dt>
         <label for="language">$msg.get("language")</label>
         <span class="xHint">$msg.get('core.copy.language.hint')</span>

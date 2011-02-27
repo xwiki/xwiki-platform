@@ -30,6 +30,7 @@
   <name>XWiki Macro - Example</name>
   <description>XWiki Macro - Example</description>
   <properties>
+    <rendering.version>3.0-SNAPSHOT</rendering.version>
     <platform.core.version>2.5</platform.core.version>
   </properties>
   <build>
@@ -55,21 +56,21 @@
   </build>
   <dependencies>
     <dependency>
-      <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-core-rendering-syntax-wikimodel</artifactId>
-      <version>${platform.core.version}</version>
+      <groupId>org.xwiki.rendering</groupId>
+      <artifactId>xwiki-rendering-syntax-wikimodel</artifactId>
+      <version>${rendering.version}</version>
     </dependency>
     <!-- Testing dependencies -->
     <dependency>
-      <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-core-rendering-tests</artifactId>
-      <version>${platform.core.version}</version>
+      <groupId>org.xwiki.rendering</groupId>
+      <artifactId>xwiki-rendering-tests</artifactId>
+      <version>${rendering.version}</version>
       <scope>test</scope>
     </dependency>
     <dependency>
-      <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-core-rendering-api</artifactId>
-      <version>${platform.core.version}</version>
+      <groupId>org.xwiki.rendering</groupId>
+      <artifactId>xwiki-rendering-api</artifactId>
+      <version>${rendering.version}</version>
       <type>test-jar</type>
       <scope>test</scope>
     </dependency>

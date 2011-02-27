@@ -12,7 +12,7 @@
 ## Note: The document name is not internally used to determine if a user has programming access level. We pass XWiki.XWikiPreferences for consistency with the call for global admin
 #set ($hasProgramming = $xwiki.hasAccessLevel('programming', $xcontext.user, 'XWiki.XWikiPreferences'))
 #set ($hasSpaceAdmin = $xwiki.hasAccessLevel('admin', $xcontext.user, "${doc.space}.WebPreferences"))
-#set ($hasWatch = $xwiki.watchlist && !$isGuest && !$isSuperAdmin && $xwiki.exists($services.model.serialize($services.model.createDocumentReference($xcontext.wiki, 'XWiki', 'XWikiUserWatchListSheet'), 'local')))
+#set ($hasWatch = $xwiki.watchlist && !$isGuest && !$isSuperAdmin && $xwiki.exists($services.model.serialize($services.model.createDocumentReference($xcontext.database, 'XWiki', 'XWikiUserWatchListSheet'), 'local')))
 ##
 ## Are comments, attachments, history etc. enabled?
 ##

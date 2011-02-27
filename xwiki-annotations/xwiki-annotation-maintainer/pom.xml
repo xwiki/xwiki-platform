@@ -73,19 +73,19 @@
       <version>1.1.0</version>
     </dependency>
     <dependency>
-      <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-core-rendering-api</artifactId>
-      <version>${project.version}</version>
+      <groupId>org.xwiki.rendering</groupId>
+      <artifactId>xwiki-rendering-api</artifactId>
+      <version>${rendering.version}</version>
     </dependency>
     <dependency>
-      <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-core-rendering-syntax-wikimodel</artifactId>
-      <version>${project.version}</version>
+      <groupId>org.xwiki.rendering</groupId>
+      <artifactId>xwiki-rendering-syntax-wikimodel</artifactId>
+      <version>${rendering.version}</version>
     </dependency>
     <dependency>
-      <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-core-rendering-transformation-macro</artifactId>
-      <version>${project.version}</version>
+      <groupId>org.xwiki.rendering</groupId>
+      <artifactId>xwiki-rendering-transformation-macro</artifactId>
+      <version>${rendering.version}</version>
       <scope>test</scope>
     </dependency>
     <dependency>

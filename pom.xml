@@ -168,7 +168,7 @@
     <module>xwiki-captcha</module>
     <module>xwiki-annotations</module>
     <module>xwiki-management</module>
-    <module>xwiki-crypto</module>
+    <!--module>xwiki-crypto</module-->
     <module>xwiki-csrf</module>
     <module>xwiki-extension</module>
     <module>xwiki-legacy</module>

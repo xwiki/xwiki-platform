@@ -54,7 +54,7 @@
       <scope>test</scope>
     </dependency>
     <!-- Seems like there's no transitive dependencies for test-jar types so we need
-         to specify these dependencies even though they are in the xwiki-core-rendering-tests
+         to specify these dependencies even though they are in the xwiki-rendering-tests
          POM. -->
     <dependency>
       <groupId>org.xwiki.rendering</groupId>
@@ -82,7 +82,7 @@
               <rules>
                 <bannedDependencies>
                   <excludes>
-                    <exclude>org.xwiki.platform:xwiki-core-rendering-macro-html</exclude>
+                    <exclude>org.xwiki.rendering:xwiki-rendering-macro-html</exclude>
                   </excludes>
                 </bannedDependencies>
               </rules>

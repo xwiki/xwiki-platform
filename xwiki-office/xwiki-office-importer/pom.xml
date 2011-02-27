@@ -38,9 +38,9 @@
       <version>${project.version}</version>
     </dependency>
     <dependency>
-      <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-core-rendering-api</artifactId>
-      <version>${project.version}</version>
+      <groupId>org.xwiki.rendering</groupId>
+      <artifactId>xwiki-rendering-api</artifactId>
+      <version>${rendering.version}</version>
     </dependency>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
@@ -101,9 +101,9 @@
     </dependency>
     <!-- Runtime dependencies -->
     <dependency>
-      <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-core-rendering-syntax-wikimodel</artifactId>
-      <version>${project.version}</version>
+      <groupId>org.xwiki.rendering</groupId>
+      <artifactId>xwiki-rendering-syntax-wikimodel</artifactId>
+      <version>${rendering.version}</version>
       <scope>runtime</scope>
     </dependency>
   </dependencies>

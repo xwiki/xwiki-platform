@@ -46,16 +46,16 @@
 
     <!-- Testing dependencies -->
     <dependency>
-      <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-core-rendering-api</artifactId>
-      <version>${project.version}</version>
+      <groupId>org.xwiki.rendering</groupId>
+      <artifactId>xwiki-rendering-api</artifactId>
+      <version>${rendering.version}</version>
       <type>test-jar</type>
       <scope>test</scope>
     </dependency>
     <dependency>
-      <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-core-rendering-macro-html</artifactId>
-      <version>${project.version}</version>
+      <groupId>org.xwiki.rendering</groupId>
+      <artifactId>xwiki-rendering-macro-html</artifactId>
+      <version>${rendering.version}</version>
       <scope>test</scope>
     </dependency>
     <dependency>

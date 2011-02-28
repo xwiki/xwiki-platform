@@ -63,6 +63,8 @@ public abstract class AbstractTask<R extends Request> implements Task
             this.exceptions = new ArrayList<Exception>(1);
             this.exceptions.add(e);
         }
+        
+        setStatus(Status.FINISHED);
     }
 
     protected abstract void start() throws Exception;

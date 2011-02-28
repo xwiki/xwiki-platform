@@ -31,6 +31,7 @@ public abstract class AbstractExtensionHandlerTest extends AbstractComponentTest
         // lookup
 
         this.taskManager = getComponentManager().lookup(TaskManager.class);
+        this.localExtensionRepository = getComponentManager().lookup(LocalExtensionRepository.class);
     }
 
     @Override

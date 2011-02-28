@@ -20,6 +20,7 @@
 package org.xwiki.extension.task.internal;
 
 import org.xwiki.component.annotation.Component;
+import org.xwiki.component.annotation.Requirement;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.extension.task.InstallRequest;
@@ -33,6 +34,7 @@ import org.xwiki.extension.task.UninstallRequest;
 @Component
 public class DefaultTaskManager implements TaskManager
 {
+    @Requirement
     private ComponentManager componentManager;
 
     private Task currentTask;
@@ -59,7 +61,7 @@ public class DefaultTaskManager implements TaskManager
         }
 
         try {
-            this.currentTask = this.componentManager.lookup(Task.class);
+            this.currentTask = this.componentManager.lookup(Task.class, taskId);
         } catch (ComponentLookupException e) {
             throw new TaskException("Failed to lookup any Task for role hint [" + taskId + "]", e);
         }

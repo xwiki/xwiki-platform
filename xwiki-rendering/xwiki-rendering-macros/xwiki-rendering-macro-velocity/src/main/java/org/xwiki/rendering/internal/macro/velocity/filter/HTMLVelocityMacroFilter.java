@@ -325,7 +325,7 @@ public class HTMLVelocityMacroFilter extends AbstractLogEnabled implements Veloc
         }
 
         /**
-         * @return Used to store velocity directive chish does not generate output until something else is found. It's
+         * @return Used to store velocity directive whish does not generate output until something else is found. It's
          *         used to match a whole group of white space including no output velocity code.
          */
         public StringBuffer getWsGroup()

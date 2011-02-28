@@ -46,7 +46,7 @@ $xwiki.ssx.use("XWiki.XWikiUserSheet")##
             #if("$!currentNotifier" != "")
               #foreach($notifierDoc in $notifierDocs)
                 #if($notifierDoc.getFullName() == $currentNotifier)
-                  $notifierDoc.getDisplayTitle()
+                  $notifierDoc.getPlainTitle()
                 #end
               #end
             #end
@@ -54,7 +54,7 @@ $xwiki.ssx.use("XWiki.XWikiUserSheet")##
             &lt;select name="XWiki.WatchListClass_0_interval"&gt;
               &lt;option value=""&gt;&amp;nbsp;&lt;/option&gt;
               #foreach($notifierDoc in $notifierDocs)
-                &lt;option value="$notifierDoc.getFullName()"#if($notifierDoc.getFullName()==$currentNotifier) selected="selected"#end&gt;$notifierDoc.getDisplayTitle()&lt;/option&gt;
+                &lt;option value="$notifierDoc.getFullName()"#if($notifierDoc.getFullName()==$currentNotifier) selected="selected"#end&gt;$notifierDoc.getPlainTitle()&lt;/option&gt;
               #end
             &lt;/select&gt;
           #end

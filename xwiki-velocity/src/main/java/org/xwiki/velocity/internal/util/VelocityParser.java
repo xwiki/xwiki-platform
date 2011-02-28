@@ -62,6 +62,7 @@ public class VelocityParser extends AbstractLogEnabled
         VELOCITYDIRECTIVE_BEGIN.add("foreach");
         VELOCITYDIRECTIVE_BEGIN.add("literal");
         VELOCITYDIRECTIVE_BEGIN.add("macro");
+        VELOCITYDIRECTIVE_BEGIN.add("define");
 
         VELOCITYDIRECTIVE_END.add("end");
 

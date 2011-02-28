@@ -581,7 +581,7 @@ $xwiki.get('ssfx').use('uicomponents/widgets/validation/livevalidation.css')
     &amp;&amp; $xcontext.hasProgrammingRights()
     &amp;&amp; $xcontext.getDoc().getDocumentReference().equals($xwiki.getDocument($documentName).getDocumentReference()))
 ##
-  #set($discard = $xcontext.getDoc().setAuthor('XWiki.XWikiGuest'))
+  $xcontext.dropPermissions()##
 #end
 ##
 ## Access level to register must be explicitly checked because it is only checked in XWiki.prepareDocuments

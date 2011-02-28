@@ -305,6 +305,11 @@
       <artifactId>xwiki-core-extension-handler-jar</artifactId>
       <version>${platform.core.version}</version>
     </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-core-extension-handler-xar</artifactId>
+      <version>${platform.core.version}</version>
+    </dependency>
     <!-- Legacy / Backward compatibility -->
     <dependency>
       <groupId>org.xwiki.platform</groupId>

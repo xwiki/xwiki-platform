@@ -42,6 +42,7 @@
     <!-- XEM dependencies -->
     <platform.plugin.applicationmanager.version>1.19-SNAPSHOT</platform.plugin.applicationmanager.version>
     <platform.plugin.wikimanager.version>1.25-SNAPSHOT</platform.plugin.wikimanager.version>
+    <rendering.version>${platform.core.version}</rendering.version>
   </properties>
   <dependencies>
     <dependency>
@@ -96,7 +97,7 @@
     <!-- The REST module -->
     <dependency>
       <groupId>com.xpn.xwiki.platform</groupId>
-      <artifactId>xwiki-rest-server</artifactId>
+      <artifactId>xwiki-core-rest-server</artifactId>
       <version>${platform.core.version}</version>
     </dependency>
     <!-- The annotations modules -->
@@ -183,6 +184,13 @@
     </dependency>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-core-rendering-macro-gallery</artifactId>
+      <version>${project.version}</version>
+      <!-- Only needed at runtime since it's a component implementation -->
+      <scope>runtime</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-core-rendering-macro-groovy</artifactId>
       <version>${project.version}</version>
       <!-- Only needed at runtime since it's a component implementation -->
@@ -196,9 +204,9 @@
       <scope>runtime</scope>
     </dependency>
     <dependency>
-      <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-core-rendering-macro-html</artifactId>
-      <version>${project.version}</version>
+      <groupId>org.xwiki.rendering</groupId>
+      <artifactId>xwiki-rendering-macro-html</artifactId>
+      <version>${rendering.version}</version>
       <!-- Only needed at runtime since it's a component implementation -->
       <scope>runtime</scope>
     </dependency>
@@ -231,9 +239,9 @@
       <scope>runtime</scope>
     </dependency>
     <dependency>
-      <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-core-rendering-macro-toc</artifactId>
-      <version>${project.version}</version>
+      <groupId>org.xwiki.rendering</groupId>
+      <artifactId>xwiki-rendering-macro-toc</artifactId>
+      <version>${rendering.version}</version>
       <!-- Only needed at runtime since it's a component implementation -->
       <scope>runtime</scope>
     </dependency>
@@ -271,6 +279,7 @@
       <groupId>org.hibernate</groupId>
       <artifactId>hibernate-validator</artifactId>
       <version>4.0.2.GA</version>
+      <scope>runtime</scope>
     </dependency>
     <!-- Captcha component -->
     <dependency>
@@ -300,6 +309,12 @@
     <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-core-legacy</artifactId>
+      <version>${platform.core.version}</version>
+    </dependency>
+    <!-- Event Stream Module -->
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-core-eventstream</artifactId>
       <version>${platform.core.version}</version>
     </dependency>
 

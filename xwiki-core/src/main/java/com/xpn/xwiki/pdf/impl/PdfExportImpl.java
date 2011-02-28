@@ -321,7 +321,11 @@ public class PdfExportImpl implements PdfExport
             // Tidy can't solve duplicate IDs, so it needs to be done manually
             DocumentBuilder docBuilder = dbFactory.newDocumentBuilder();
             docBuilder.setEntityResolver(Utils.getComponent(EntityResolver.class));
-            Document doc = docBuilder.parse(new InputSource(new StringReader(tidyOutput.toString())));
+            String tidied = tidyOutput.toString().trim();
+            if (StringUtils.isEmpty(tidied)) {
+                tidied = input.trim();
+            }
+            Document doc = docBuilder.parse(new InputSource(new StringReader(tidied)));
             List<String> seenIDs = new ArrayList<String>();
             this.cleanIDs(doc.getDocumentElement(), seenIDs);
 

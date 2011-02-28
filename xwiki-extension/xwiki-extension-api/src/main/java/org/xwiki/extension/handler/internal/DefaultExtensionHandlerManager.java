@@ -41,43 +41,50 @@ public class DefaultExtensionHandlerManager implements ExtensionHandlerManager
         return this.componentManager.lookup(ExtensionHandler.class, localExtension.getType().toString().toLowerCase());
     }
 
-    public void install(LocalExtension localExtension) throws InstallException
+    public void install(LocalExtension localExtension, String namespace) throws InstallException
+    {
+        ExtensionHandler extensionHandler;
+        try {
+            // Load extension
+            extensionHandler = getExtensionHandler(localExtension);
+        } catch (ComponentLookupException e) {
+            throw new InstallException("Can't find any extension handler for the extension type [" + localExtension
+                + "]", e);
+        }
+
+        try {
+            extensionHandler.install(localExtension, namespace);
+        } catch (Exception e) {
+            // TODO: cleanup
+
+            throw new InstallException("Failed to install extension [" + localExtension.getId() + "]", e);
+        }
+    }
+
+    public void uninstall(LocalExtension localExtension, String namespace) throws UninstallException
     {
         try {
             // Load extension
             ExtensionHandler extensionHandler = getExtensionHandler(localExtension);
 
-            extensionHandler.install(localExtension);
+            extensionHandler.uninstall(localExtension, namespace);
         } catch (ComponentLookupException e) {
-            throw new InstallException("Can't find any extension installer for the extension type [" + localExtension
+            throw new UninstallException("Can't find any extension handler for the extension type [" + localExtension
                 + "]");
         }
     }
 
-    public void uninstall(LocalExtension localExtension) throws UninstallException
-    {
-        try {
-            // Load extension
-            ExtensionHandler extensionHandler = getExtensionHandler(localExtension);
-
-            extensionHandler.uninstall(localExtension);
-        } catch (ComponentLookupException e) {
-            throw new UninstallException("Can't find any extension installer for the extension type [" + localExtension
-                + "]");
-        }
-    }
-
-    public void upgrade(LocalExtension previousLocalExtension, LocalExtension newLocalExtension)
+    public void upgrade(LocalExtension previousLocalExtension, LocalExtension newLocalExtension, String namespace)
         throws InstallException
     {
         try {
             // Load extension
             ExtensionHandler extensionInstaller = getExtensionHandler(previousLocalExtension);
 
-            extensionInstaller.upgrade(previousLocalExtension, newLocalExtension);
+            extensionInstaller.upgrade(previousLocalExtension, newLocalExtension, namespace);
         } catch (ComponentLookupException e) {
-            throw new InstallException("Can't find any extension installer for the extension type ["
-                + newLocalExtension + "]");
+            throw new InstallException("Can't find any extension handler for the extension type [" + newLocalExtension
+                + "]");
         }
     }
 }

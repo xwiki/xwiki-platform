@@ -23,11 +23,11 @@ import java.net.URI;
 
 public class ExtensionRepositoryId
 {
-    private String id;
+    private final String id;
 
-    private String type;
+    private final String type;
 
-    private URI uri;
+    private final URI uri;
 
     public ExtensionRepositoryId(String id, String type, URI uri)
     {

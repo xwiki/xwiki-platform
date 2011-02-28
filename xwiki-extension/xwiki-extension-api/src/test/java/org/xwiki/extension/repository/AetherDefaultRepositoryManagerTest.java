@@ -28,7 +28,6 @@ import java.util.zip.ZipInputStream;
 
 import junit.framework.Assert;
 
-import org.apache.commons.io.FileUtils;
 import org.junit.Before;
 import org.junit.Test;
 import org.xwiki.extension.Extension;
@@ -36,6 +35,7 @@ import org.xwiki.extension.ExtensionDependency;
 import org.xwiki.extension.ExtensionException;
 import org.xwiki.extension.ExtensionId;
 import org.xwiki.extension.ResolveException;
+import org.xwiki.extension.test.RepositoryUtil;
 import org.xwiki.test.AbstractComponentTestCase;
 
 public class AetherDefaultRepositoryManagerTest extends AbstractComponentTestCase
@@ -44,18 +44,19 @@ public class AetherDefaultRepositoryManagerTest extends AbstractComponentTestCas
 
     private ExtensionId rubyArtifactId;
 
+    private RepositoryUtil repositoryUtil;
+
     @Before
     public void setUp() throws Exception
     {
         super.setUp();
 
-        getConfigurationSource().setProperty("extension.aether.localRepository",
-            "target/AetherDefaultRepositoryManagerTest/test-aether-repository");
+        this.repositoryUtil = new RepositoryUtil(getClass().getSimpleName(), getConfigurationSource());
+        this.repositoryUtil.setup();
 
-        File testDirectory = new File("target/AetherDefaultRepositoryManagerTest");
-        if (testDirectory.exists()) {
-            FileUtils.deleteDirectory(testDirectory);
-        }
+        this.rubyArtifactId = new ExtensionId("org.xwiki.platform:xwiki-core-rendering-macro-ruby", "2.4");
+
+        // lookup
 
         this.repositoryManager = getComponentManager().lookup(ExtensionRepositoryManager.class);
 
@@ -64,7 +65,6 @@ public class AetherDefaultRepositoryManagerTest extends AbstractComponentTestCas
         this.repositoryManager.addRepository(new ExtensionRepositoryId("xwiki-releases", "maven", new URI(
             "http://maven.xwiki.org/releases/")));
 
-        this.rubyArtifactId = new ExtensionId("org.xwiki.platform:xwiki-core-rendering-macro-ruby", "2.4");
     }
 
     @Test
@@ -73,8 +73,8 @@ public class AetherDefaultRepositoryManagerTest extends AbstractComponentTestCas
         Extension artifact = this.repositoryManager.resolve(this.rubyArtifactId);
 
         Assert.assertNotNull(artifact);
-        Assert.assertEquals("org.xwiki.platform:xwiki-core-rendering-macro-ruby", artifact.getId());
-        Assert.assertEquals("2.4", artifact.getVersion());
+        Assert.assertEquals("org.xwiki.platform:xwiki-core-rendering-macro-ruby", artifact.getId().getId());
+        Assert.assertEquals("2.4", artifact.getId().getVersion());
         Assert.assertEquals("jar", artifact.getType());
         Assert.assertEquals("xwiki-releases", artifact.getRepository().getId().getId());
 

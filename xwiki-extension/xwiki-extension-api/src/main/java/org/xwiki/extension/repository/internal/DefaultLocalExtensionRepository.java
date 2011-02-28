@@ -23,12 +23,13 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.FilenameFilter;
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
-import java.net.URLEncoder;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.ListIterator;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
@@ -62,6 +63,8 @@ import org.xwiki.extension.InstallException;
 import org.xwiki.extension.LocalExtension;
 import org.xwiki.extension.ResolveException;
 import org.xwiki.extension.UninstallException;
+import org.xwiki.extension.internal.VersionManager;
+import org.xwiki.extension.repository.CoreExtensionRepository;
 import org.xwiki.extension.repository.ExtensionRepositoryId;
 import org.xwiki.extension.repository.LocalExtensionRepository;
 
@@ -73,13 +76,31 @@ public class DefaultLocalExtensionRepository extends AbstractLogEnabled implemen
     @Requirement
     private ExtensionManagerConfiguration configuration;
 
+    @Requirement
+    private CoreExtensionRepository coreExtensionRepository;
+
+    @Requirement
+    private VersionManager versionManager;
+
+    private DocumentBuilderFactory documentBuilderFactory = DocumentBuilderFactory.newInstance();
+
     private ExtensionRepositoryId repositoryId;
 
     private File rootFolder;
 
-    private Map<String, LocalExtension> extensions = new ConcurrentHashMap<String, LocalExtension>();
+    private Map<ExtensionId, LocalExtension> extensions = new ConcurrentHashMap<ExtensionId, LocalExtension>();
 
-    private Map<String, Set<String>> backwardDependenciesMap = new ConcurrentHashMap<String, Set<String>>();
+    /**
+     * <extension id, extensions>
+     */
+    private Map<String, List<LocalExtension>> extensionsVersions =
+        new ConcurrentHashMap<String, List<LocalExtension>>();
+
+    /**
+     * <extension id, <namespace, extensions>>, used only for installed extensions
+     */
+    private Map<String, Map<String, Set<LocalExtension>>> backwardDependenciesMap =
+        new ConcurrentHashMap<String, Map<String, Set<LocalExtension>>>();
 
     public void initialize() throws InitializationException
     {
@@ -92,6 +113,8 @@ public class DefaultLocalExtensionRepository extends AbstractLogEnabled implemen
 
     private void loadExtensions()
     {
+        // Load local extension from repository
+
         File rootFolder = getRootFolder();
 
         if (rootFolder.exists()) {
@@ -110,42 +133,181 @@ public class DefaultLocalExtensionRepository extends AbstractLogEnabled implemen
 
                         addLocalExtension(localExtension);
                     } catch (Exception e) {
-                        getLogger().warn("Failed to load extensoin from file [" + child + "] in local repository", e);
+                        getLogger().warn("Failed to load extension from file [" + child + "] in local repository", e);
                     }
                 }
             }
         } else {
             rootFolder.mkdirs();
         }
+
+        // Validate local extension
+
+        Map<String, Set<String>> validatedExtension = new HashMap<String, Set<String>>();
+        for (List<LocalExtension> extensionVersions : this.extensionsVersions.values()) {
+            for (ListIterator<LocalExtension> it = extensionVersions.listIterator(extensionVersions.size()); it
+                .hasPrevious();) {
+                LocalExtension localExtension = it.previous();
+
+                validateExtension(localExtension, validatedExtension);
+            }
+        }
     }
 
-    private void removeLocalExtension(LocalExtension localExtension)
+    private void validateExtension(LocalExtension localExtension, Map<String, Set<String>> validatedExtension)
     {
-        this.backwardDependenciesMap.remove(localExtension.getId());
-        this.extensions.remove(localExtension.getId());
-        for (ExtensionDependency dependency : localExtension.getDependencies()) {
-            Set<String> backwardDependencies = this.backwardDependenciesMap.get(dependency.getId());
+        if (localExtension.getNamespaces() == null) {
+            validateExtension(localExtension, validatedExtension, null);
+        } else {
+            for (String namespace : localExtension.getNamespaces()) {
+                validateExtension(localExtension, validatedExtension, namespace);
+            }
+        }
+    }
 
-            if (backwardDependencies != null) {
-                backwardDependencies.remove(localExtension.getId());
+    private void validateExtension(LocalExtension localExtension, Map<String, Set<String>> validatedExtension,
+        String namespace)
+    {
+        Set<String> extensions = validatedExtension.get(namespace);
+        if (extensions == null) {
+            extensions = new HashSet<String>();
+            validatedExtension.put(namespace, extensions);
+        }
+
+        if (!extensions.contains(localExtension.getId().getId())) {
+            validateExtension(localExtension, extensions, namespace);
+        }
+    }
+
+    private void validateExtension(LocalExtension localExtension, Set<String> validatedExtensions, String namespace)
+    {
+        try {
+            if (!localExtension.isInstalled(namespace)
+                || this.coreExtensionRepository.exists(localExtension.getId().getId())) {
+                // Impossible to overwrite core extensions
+                ((DefaultLocalExtension) localExtension).setInstalled(false, namespace);
+                return;
+            }
+
+            // Validate dependencies
+            for (ExtensionDependency dependency : localExtension.getDependencies()) {
+                boolean enabled = false;
+
+                List<LocalExtension> dependencyVersions = this.extensionsVersions.get(dependency.getId());
+                if (dependencyVersions != null) {
+                    for (ListIterator<LocalExtension> it = dependencyVersions.listIterator(dependencyVersions.size()); it
+                        .hasPrevious();) {
+                        LocalExtension dependencyExtension = it.previous();
+
+                        if (!validatedExtensions.contains(dependency.getId())) {
+                            validateExtension(dependencyExtension, validatedExtensions, namespace);
+                        }
+
+                        if (dependencyExtension.isInstalled(namespace)) {
+                            enabled = true;
+                            break;
+                        }
+                    }
+                } else {
+                    enabled = this.coreExtensionRepository.exists(dependency.getId());
+                }
+
+                if (!enabled) {
+                    ((DefaultLocalExtension) localExtension).setInstalled(false, namespace);
+                    return;
+                }
+            }
+
+            // Complete local extension installation
+            addLocalExtensionBackwardDependencies(localExtension, namespace);
+        } finally {
+            validatedExtensions.add(localExtension.getId().getId());
+        }
+    }
+
+    private void uninstallLocalExtension(DefaultLocalExtension localExtension, String namespace)
+        throws UninstallException
+    {
+        localExtension.setInstalled(false, namespace);
+
+        try {
+            saveDescriptor(localExtension);
+        } catch (Exception e) {
+            throw new UninstallException("Failed to modify extension descriptor", e);
+        }
+
+        // Clean caches
+
+        removeFromBackwardDependencies(localExtension);
+    }
+
+    private void removeFromBackwardDependencies(LocalExtension localExtension)
+    {
+        Collection<String> namespaces = localExtension.getNamespaces();
+
+        if (namespaces == null) {
+            this.backwardDependenciesMap.remove(localExtension.getId().getId());
+        } else {
+            Map<String, Set<LocalExtension>> namespaceBackwardDependencies =
+                this.backwardDependenciesMap.get(localExtension.getId().getId());
+
+            for (String namespace : namespaces) {
+                namespaceBackwardDependencies.remove(namespace);
             }
         }
     }
 
     private void addLocalExtension(LocalExtension localExtension)
     {
-        for (ExtensionDependency dependency : localExtension.getDependencies()) {
-            Set<String> backwardDependencies = this.backwardDependenciesMap.get(dependency.getId());
+        // extensions
+        this.extensions.put(localExtension.getId(), localExtension);
 
-            if (backwardDependencies == null) {
-                backwardDependencies = new HashSet<String>();
-                this.backwardDependenciesMap.put(dependency.getId(), backwardDependencies);
+        // versions
+        List<LocalExtension> extensionsVersions = this.extensionsVersions.get(localExtension.getId().getId());
+
+        if (extensionsVersions == null) {
+            extensionsVersions = new ArrayList<LocalExtension>();
+            this.extensionsVersions.put(localExtension.getId().getId(), extensionsVersions);
+
+            extensionsVersions.add(localExtension);
+        } else {
+            int index = 0;
+            while (index < extensionsVersions.size()
+                && versionManager.compareVersions(localExtension.getId().getVersion(), extensionsVersions.get(index)
+                    .getId().getVersion()) > 0) {
+                ++index;
             }
 
-            backwardDependencies.add(localExtension.getId());
+            extensionsVersions.add(index, localExtension);
         }
+    }
 
-        this.extensions.put(localExtension.getId(), localExtension);
+    private void addLocalExtension(LocalExtension localExtension, String namespace)
+    {
+        addLocalExtension(localExtension);
+
+        addLocalExtensionBackwardDependencies(localExtension, namespace);
+    }
+
+    private void addLocalExtensionBackwardDependencies(LocalExtension localExtension, String namespace)
+    {
+        for (ExtensionDependency dependency : localExtension.getDependencies()) {
+            Map<String, Set<LocalExtension>> namespaceBackwardDependencies =
+                this.backwardDependenciesMap.get(dependency.getId());
+
+            if (namespaceBackwardDependencies == null) {
+                namespaceBackwardDependencies = new HashMap<String, Set<LocalExtension>>();
+                this.backwardDependenciesMap.put(dependency.getId(), namespaceBackwardDependencies);
+            }
+
+            Set<LocalExtension> backwardDependencies = namespaceBackwardDependencies.get(namespace);
+            if (backwardDependencies == null) {
+                backwardDependencies = new HashSet<LocalExtension>();
+                namespaceBackwardDependencies.put(namespace, backwardDependencies);
+            }
+
+            backwardDependencies.add(localExtension);
+        }
     }
 
     public File getRootFolder()
@@ -157,10 +319,9 @@ public class DefaultLocalExtensionRepository extends AbstractLogEnabled implemen
 
     public Extension resolve(ExtensionId extensionId) throws ResolveException
     {
-        LocalExtension localExtension = getLocalExtension(extensionId.getId());
+        LocalExtension localExtension = this.extensions.get(extensionId);
 
-        if (localExtension == null
-            || (extensionId.getVersion() != null && !localExtension.getVersion().equals(extensionId.getVersion()))) {
+        if (localExtension == null) {
             throw new ResolveException("Can't find extension [" + extensionId + "]");
         }
 
@@ -169,14 +330,7 @@ public class DefaultLocalExtensionRepository extends AbstractLogEnabled implemen
 
     public boolean exists(ExtensionId extensionId)
     {
-        LocalExtension localExtension = getLocalExtension(extensionId.getId());
-
-        if (localExtension == null
-            || (extensionId.getVersion() != null && !localExtension.getVersion().equals(extensionId.getVersion()))) {
-            return false;
-        }
-
-        return true;
+        return this.extensions.containsKey(extensionId);
     }
 
     public ExtensionRepositoryId getId()
@@ -186,16 +340,38 @@ public class DefaultLocalExtensionRepository extends AbstractLogEnabled implemen
 
     // LocalRepository
 
-    public List<LocalExtension> getLocalExtensions()
+    public Collection<LocalExtension> getLocalExtensions()
     {
-        return new ArrayList<LocalExtension>(this.extensions.values());
+        return Collections.unmodifiableCollection(this.extensions.values());
     }
 
-    public LocalExtension getLocalExtension(String id)
+    public List<LocalExtension> getInstalledExtensions(String namespace)
     {
-        LocalExtension extension = this.extensions.get(id);
+        Collection<LocalExtension> extensions = this.extensions.values();
 
-        return extension != null ? extension : null;
+        List<LocalExtension> installedExtensions = new ArrayList<LocalExtension>(extensions.size());
+        for (LocalExtension localExtension : extensions) {
+            if (localExtension.isInstalled(namespace)) {
+                installedExtensions.add(localExtension);
+            }
+        }
+
+        return installedExtensions;
+    }
+
+    public LocalExtension getInstalledExtension(String id, String namespace)
+    {
+        List<LocalExtension> versions = this.extensionsVersions.get(id);
+
+        if (versions != null) {
+            for (LocalExtension extension : versions) {
+                if (extension.isInstalled(namespace)) {
+                    return extension;
+                }
+            }
+        }
+
+        return null;
     }
 
     private LocalExtension createExtension(Extension extension, boolean dependency)
@@ -204,7 +380,7 @@ public class DefaultLocalExtensionRepository extends AbstractLogEnabled implemen
 
         localExtension.setDependency(dependency);
 
-        localExtension.setFile(getFile(localExtension.getId(), localExtension.getVersion(), localExtension.getType()));
+        localExtension.setFile(getFile(localExtension.getId(), localExtension.getType()));
 
         return localExtension;
     }
@@ -214,22 +390,24 @@ public class DefaultLocalExtensionRepository extends AbstractLogEnabled implemen
         return this.extensions.size();
     }
 
-    public List< ? extends LocalExtension> getExtensions(int nb, int offset)
+    public Collection< ? extends LocalExtension> getExtensions(int nb, int offset)
     {
-        return getLocalExtensions().subList(offset, offset + nb);
+        return new ArrayList<LocalExtension>(this.extensions.values()).subList(offset, offset + nb);
     }
 
-    public LocalExtension installExtension(Extension extension, boolean dependency) throws InstallException
+    public LocalExtension installExtension(Extension extension, boolean dependency, String namespace)
+        throws InstallException
     {
-        LocalExtension localExtension = getLocalExtension(extension.getId());
+        LocalExtension localExtension = getInstalledExtension(extension.getId().getId(), namespace);
 
-        if (localExtension == null || !extension.getVersion().equals(localExtension.getVersion())) {
+        if (localExtension == null || !extension.getId().getVersion().equals(localExtension.getId().getVersion())
+            || (localExtension.getNamespaces() != null && !localExtension.getNamespaces().contains(namespace))) {
             localExtension = createExtension(extension, dependency);
 
             try {
                 extension.download(localExtension.getFile());
                 saveDescriptor(localExtension);
-                addLocalExtension(localExtension);
+                addLocalExtension(localExtension, namespace);
             } catch (Exception e) {
                 // TODO: clean
 
@@ -240,46 +418,43 @@ public class DefaultLocalExtensionRepository extends AbstractLogEnabled implemen
         return localExtension;
     }
 
-    public void uninstallExtension(LocalExtension localExtension) throws UninstallException
+    public void uninstallExtension(LocalExtension localExtension, String namespace) throws UninstallException
     {
-        localExtension.getFile().delete();
-        getDescriptorFile(localExtension.getId(), localExtension.getVersion()).delete();
-
-        LocalExtension existingExtension = getLocalExtension(localExtension.getId());
+        LocalExtension existingExtension = getInstalledExtension(localExtension.getId().getId(), namespace);
 
         if (existingExtension == localExtension) {
-            removeLocalExtension(localExtension);
+            uninstallLocalExtension((DefaultLocalExtension) localExtension, namespace);
         }
     }
 
     private void saveDescriptor(LocalExtension extension) throws ParserConfigurationException, TransformerException,
         IOException
     {
-        DocumentBuilderFactory documentBuilderFactory = DocumentBuilderFactory.newInstance();
-        DocumentBuilder documentBuilder = documentBuilderFactory.newDocumentBuilder();
+        DocumentBuilder documentBuilder = this.documentBuilderFactory.newDocumentBuilder();
         Document document = documentBuilder.newDocument();
 
         Element extensionElement = document.createElement("extension");
         document.appendChild(extensionElement);
 
-        addElement(document, extensionElement, "id", extension.getId());
-        addElement(document, extensionElement, "version", extension.getVersion());
+        addElement(document, extensionElement, "id", extension.getId().getId());
+        addElement(document, extensionElement, "version", extension.getId().getVersion());
         addElement(document, extensionElement, "type", extension.getType());
 
         addElement(document, extensionElement, "dependency", String.valueOf(extension.isDependency()));
-        addElement(document, extensionElement, "enabled", String.valueOf(extension.isEnabled()));
+        addElement(document, extensionElement, "installed", String.valueOf(extension.isInstalled()));
         addElement(document, extensionElement, "description", extension.getDescription());
         addElement(document, extensionElement, "author", extension.getAuthor());
         addElement(document, extensionElement, "website", extension.getWebSite());
 
         addDependencies(document, extensionElement, extension);
+        addNamespaces(document, extensionElement, extension);
 
         TransformerFactory transfac = TransformerFactory.newInstance();
         Transformer trans = transfac.newTransformer();
         trans.setOutputProperty(OutputKeys.INDENT, "yes");
 
         DOMSource source = new DOMSource(document);
-        File file = getDescriptorFile(extension.getId(), extension.getVersion());
+        File file = getDescriptorFile(extension.getId());
         FileOutputStream fos = new FileOutputStream(file);
         try {
             Result result = new StreamResult(fos);
@@ -289,26 +464,14 @@ public class DefaultLocalExtensionRepository extends AbstractLogEnabled implemen
         }
     }
 
-    private File getFile(String id, String version, String type)
+    private File getFile(ExtensionId id, String type)
     {
-        return new File(getRootFolder(), getFileName(id, version, type));
+        return new File(getRootFolder(), id.getId() + "-" + id.getVersion() + "." + type);
     }
 
-    private File getDescriptorFile(String id, String version)
+    private File getDescriptorFile(ExtensionId id)
     {
-        return new File(getRootFolder(), getFileName(id, version, "xed"));
-    }
-
-    private String getFileName(String id, String version, String extension)
-    {
-        String fileName = id + "-" + version + "." + extension;
-        try {
-            return URLEncoder.encode(fileName, "UTF-8");
-        } catch (UnsupportedEncodingException e) {
-            // Should never happen
-
-            return fileName;
-        }
+        return new File(getRootFolder(), id.getId() + "-" + id.getVersion() + ".xed");
     }
 
     private void addElement(Document document, Element parentElement, String elementName, String elementValue)
@@ -319,28 +482,41 @@ public class DefaultLocalExtensionRepository extends AbstractLogEnabled implemen
         parentElement.appendChild(element);
     }
 
-    private void addDependencies(Document document, Element parentElement, LocalExtension extension)
+    private void addDependencies(Document document, Element parentElement, Extension extension)
     {
-        Element dependenciesElement = document.createElement("dependencies");
-        parentElement.appendChild(dependenciesElement);
+        if (extension.getDependencies() != null && !extension.getDependencies().isEmpty()) {
+            Element dependenciesElement = document.createElement("dependencies");
+            parentElement.appendChild(dependenciesElement);
 
-        for (ExtensionDependency dependency : extension.getDependencies()) {
-            Element dependencyElement = document.createElement("dependency");
-            dependenciesElement.appendChild(dependencyElement);
+            for (ExtensionDependency dependency : extension.getDependencies()) {
+                Element dependencyElement = document.createElement("dependency");
+                dependenciesElement.appendChild(dependencyElement);
 
-            addElement(document, dependencyElement, "id", dependency.getId());
-            addElement(document, dependencyElement, "version", dependency.getVersion());
+                addElement(document, dependencyElement, "id", dependency.getId());
+                addElement(document, dependencyElement, "version", dependency.getVersion());
+            }
+        }
+    }
+
+    private void addNamespaces(Document document, Element parentElement, LocalExtension extension)
+    {
+        if (extension.getNamespaces() != null) {
+            Element wikisElement = document.createElement("namespaces");
+            parentElement.appendChild(wikisElement);
+
+            for (String namespace : extension.getNamespaces()) {
+                addElement(document, wikisElement, "namespace", namespace);
+            }
         }
     }
 
     private LocalExtension loadDescriptor(File descriptor) throws ParserConfigurationException, SAXException,
         IOException
     {
-        DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
-        DocumentBuilder db = dbf.newDocumentBuilder();
-        Document doc = db.parse(descriptor);
+        DocumentBuilder documentBuilder = this.documentBuilderFactory.newDocumentBuilder();
+        Document document = documentBuilder.parse(descriptor);
 
-        Element extensionElement = doc.getDocumentElement();
+        Element extensionElement = document.getDocumentElement();
 
         // Mandatory fields
 
@@ -349,10 +525,10 @@ public class DefaultLocalExtensionRepository extends AbstractLogEnabled implemen
         Node typeNode = extensionElement.getElementsByTagName("type").item(0);
 
         DefaultLocalExtension localExtension =
-            new DefaultLocalExtension(this, idNode.getTextContent(), versionNode.getTextContent(),
+            new DefaultLocalExtension(this, new ExtensionId(idNode.getTextContent(), versionNode.getTextContent()),
                 typeNode.getTextContent());
 
-        localExtension.setFile(getFile(localExtension.getId(), localExtension.getVersion(), localExtension.getType()));
+        localExtension.setFile(getFile(localExtension.getId(), localExtension.getType()));
 
         // Optional fields
 
@@ -360,9 +536,9 @@ public class DefaultLocalExtensionRepository extends AbstractLogEnabled implemen
         if (dependencyNode != null) {
             localExtension.setDependency(Boolean.valueOf(dependencyNode.getTextContent()));
         }
-        Node enabledNode = getNode(extensionElement, "enabled");
+        Node enabledNode = getNode(extensionElement, "installed");
         if (enabledNode != null) {
-            localExtension.setEnabled(Boolean.valueOf(enabledNode.getTextContent()));
+            localExtension.setInstalled(Boolean.valueOf(enabledNode.getTextContent()));
         }
         Node descriptionNode = getNode(extensionElement, "description");
         if (descriptionNode != null) {
@@ -381,9 +557,9 @@ public class DefaultLocalExtensionRepository extends AbstractLogEnabled implemen
 
         NodeList dependenciesNodes = extensionElement.getElementsByTagName("dependencies");
         if (dependenciesNodes.getLength() > 0) {
-            NodeList dependencies = dependenciesNodes.item(0).getChildNodes();
-            for (int i = 0; i < dependencies.getLength(); ++i) {
-                Node dependency = dependencies.item(i);
+            NodeList dependenciesNodeList = dependenciesNodes.item(0).getChildNodes();
+            for (int i = 0; i < dependenciesNodeList.getLength(); ++i) {
+                Node dependency = dependenciesNodeList.item(i);
 
                 if (dependency.getNodeName().equals("dependency")) {
                     Node dependencyIdNode = getNode(dependency, "id");
@@ -392,6 +568,17 @@ public class DefaultLocalExtensionRepository extends AbstractLogEnabled implemen
                     localExtension.addDependency(new LocalExtensionDependency(dependencyIdNode.getTextContent(),
                         dependencyVersionNode.getTextContent()));
                 }
+            }
+        }
+
+        // Namespaces
+        NodeList namespacesNodes = extensionElement.getElementsByTagName("namespaces");
+        if (namespacesNodes.getLength() > 0) {
+            NodeList namespaces = namespacesNodes.item(0).getChildNodes();
+            for (int i = 0; i < namespaces.getLength(); ++i) {
+                Node namespaceNode = namespaces.item(i);
+
+                localExtension.addNamespace(namespaceNode.getTextContent());
             }
         }
 
@@ -419,24 +606,17 @@ public class DefaultLocalExtensionRepository extends AbstractLogEnabled implemen
         return children.getLength() > 0 ? children.item(0) : null;
     }
 
-    public List<LocalExtension> getBackwardDependencies(String id) throws ResolveException
+    public Collection<LocalExtension> getBackwardDependencies(String id, String namespace) throws ResolveException
     {
-        if (getLocalExtension(id) == null) {
-            throw new ResolveException("Extension [" + id + "] does not exists");
+        if (getInstalledExtension(id, namespace) == null) {
+            throw new ResolveException("Extension [" + id + "] does is not installed");
         }
 
-        Set<String> backwardDependencyNames = this.backwardDependenciesMap.get(id);
+        Map<String, Set<LocalExtension>> namespaceBackwardDependenciesMap = this.backwardDependenciesMap.get(id);
+        Set<LocalExtension> backwardDependencies =
+            namespaceBackwardDependenciesMap != null ? namespaceBackwardDependenciesMap.get(id) : null;
 
-        List<LocalExtension> backwardDependencies;
-        if (backwardDependencyNames != null) {
-            backwardDependencies = new ArrayList<LocalExtension>(backwardDependencyNames.size());
-            for (String extensionId : backwardDependencyNames) {
-                backwardDependencies.add(getLocalExtension(extensionId));
-            }
-        } else {
-            backwardDependencies = Collections.<LocalExtension> emptyList();
-        }
-
-        return backwardDependencies;
+        return backwardDependencies != null ? Collections.unmodifiableCollection(backwardDependencies) : Collections
+            .<LocalExtension> emptyList();
     }
 }

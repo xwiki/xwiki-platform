@@ -17,23 +17,16 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.extension.repository;
+package org.xwiki.extension.task;
 
-import java.util.Collection;
+import org.xwiki.component.annotation.ComponentRole;
 
-import org.xwiki.extension.Extension;
-import org.xwiki.extension.ExtensionId;
-import org.xwiki.extension.ResolveException;
-
-public interface ExtensionRepository
+@ComponentRole
+public interface TaskManager
 {
-    ExtensionRepositoryId getId();
-    
-    Extension resolve(ExtensionId extensionId) throws ResolveException;
+    Task getCurrentTask();
 
-    boolean exists(ExtensionId extensionId);
-    
-    int countExtensions();
-    
-    Collection< ? extends Extension> getExtensions(int nb, int offset);
+    Task install(InstallRequest request) throws TaskException;
+
+    Task uninstall(UninstallRequest request) throws TaskException;
 }

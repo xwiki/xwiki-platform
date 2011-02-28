@@ -17,13 +17,9 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.extension.handler.jar.internal;
+package org.xwiki.extension.task;
 
-import org.xwiki.classloader.ExtendedURLClassLoader;
-import org.xwiki.component.annotation.ComponentRole;
-
-@ComponentRole
-public interface JarExtensionClassLoader
+public class AbstractRequest implements Request
 {
-    ExtendedURLClassLoader getURLClassLoader();
+    
 }

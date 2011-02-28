@@ -19,26 +19,10 @@
  */
 package org.xwiki.extension;
 
-import java.util.List;
-
 import org.xwiki.component.annotation.ComponentRole;
 
 @ComponentRole
 public interface ExtensionManager
 {
-    List<Extension> getAvailableExtensions(int nb, int offset);
-
-    List< ? extends Extension> getInstalledExtensions(int nb, int offset);
-
-    int coundAvailableExtensions();
-
-    int coundInstalledExtensions();
-
-    // LocalExtension installExtension(String name) throws InstallException;
-
-    LocalExtension installExtension(ExtensionId extensionId) throws InstallException;
-
-    void uninstallExtension(String id) throws UninstallException;
-
-    Extension resolveExtension(ExtensionId extensionId) throws ResolveException;
+    Extension resolveExtension(ExtensionId extensionId, String namespace) throws ResolveException;
 }

@@ -27,14 +27,14 @@ import org.xwiki.extension.handler.ExtensionHandler;
 
 public abstract class AbstractExtensionHandler extends AbstractLogEnabled implements ExtensionHandler
 {
-    public void upgrade(LocalExtension previousLocalExtension, LocalExtension newLocalExtension)
+    public void upgrade(LocalExtension previousLocalExtension, LocalExtension newLocalExtension, String namespace)
         throws InstallException
     {
         try {
-            uninstall(previousLocalExtension);
+            uninstall(previousLocalExtension, namespace);
         } catch (UninstallException e) {
             throw new InstallException("Failed to uninstall previous extension [" + previousLocalExtension + "]");
         }
-        install(newLocalExtension);
+        install(newLocalExtension, namespace);
     }
 }

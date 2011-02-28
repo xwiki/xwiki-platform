@@ -26,9 +26,7 @@ import org.xwiki.extension.repository.ExtensionRepository;
 
 public interface Extension
 {
-    String getId();
-
-    String getVersion();
+    ExtensionId getId();
 
     String getType();
 
@@ -38,10 +36,6 @@ public interface Extension
 
     String getAuthor();
 
-    /**
-     * TODO: introduce ExtensionDependency when we will need version range, for now {@link ExtensionId#getVersion()} is
-     * the minimum version (maven-like rule)
-     */
     List<ExtensionDependency> getDependencies();
 
     void download(File file) throws ExtensionException;

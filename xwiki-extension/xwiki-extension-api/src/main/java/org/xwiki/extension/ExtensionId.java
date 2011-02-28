@@ -21,9 +21,9 @@ package org.xwiki.extension;
 
 public class ExtensionId
 {
-    private String id;
+    private final String id;
 
-    private String version;
+    private final String version;
 
     public ExtensionId(String id, String version)
     {

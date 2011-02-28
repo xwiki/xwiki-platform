@@ -19,7 +19,7 @@
  */
 package org.xwiki.extension.repository;
 
-import java.util.List;
+import java.util.Collection;
 
 import org.xwiki.component.annotation.ComponentRole;
 import org.xwiki.extension.Extension;
@@ -31,13 +31,15 @@ import org.xwiki.extension.UninstallException;
 @ComponentRole
 public interface LocalExtensionRepository extends ExtensionRepository
 {
-    List<LocalExtension> getLocalExtensions();
+    Collection<LocalExtension> getLocalExtensions();
 
-    LocalExtension getLocalExtension(String id);
+    Collection<LocalExtension> getInstalledExtensions(String namespace);
 
-    LocalExtension installExtension(Extension extension, boolean dependency) throws InstallException;
+    LocalExtension getInstalledExtension(String id, String namespace);
 
-    void uninstallExtension(LocalExtension extension) throws UninstallException;
+    LocalExtension installExtension(Extension extension, boolean dependency, String namespace) throws InstallException;
 
-    List<LocalExtension> getBackwardDependencies(String id) throws ResolveException;
+    void uninstallExtension(LocalExtension extension, String namespace) throws UninstallException;
+
+    Collection<LocalExtension> getBackwardDependencies(String id, String namespace) throws ResolveException;
 }

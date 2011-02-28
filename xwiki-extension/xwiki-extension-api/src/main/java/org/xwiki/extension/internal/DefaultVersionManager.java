@@ -29,14 +29,19 @@ public class DefaultVersionManager implements VersionManager
         String[] elements2 = StringUtils.split(version2, '.');
 
         for (int i = 0; i < elements1.length; ++i) {
-            int result = compareElement(elements1[i], elements2[i]);
-            
+            int result;
+            if (elements2.length == i) {
+                result = 1;
+            } else  {
+                result = compareElement(elements1[i], elements2[i]);
+            }
+
             if (result != 0) {
                 return result;
             }
         }
         
-        return 0;
+        return elements2.length > elements1.length ? -1 : 0;
     }
 
     private int compareElement(String element1, String element2)

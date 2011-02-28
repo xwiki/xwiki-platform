@@ -23,6 +23,7 @@ import java.io.File;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -71,7 +72,8 @@ public class DefaultExtensionManagerConfiguration extends AbstractLogEnabled imp
     {
         List<ExtensionRepositoryId> repositories = new ArrayList<ExtensionRepositoryId>();
 
-        List<String> repositoryStrings = this.configurationSource.getProperty("extension.repositories", List.class);
+        List<String> repositoryStrings =
+            this.configurationSource.getProperty("extension.repositories", Collections.<String> emptyList());
 
         if (repositoryStrings != null && !repositoryStrings.isEmpty()) {
             for (String repositoryString : repositoryStrings) {

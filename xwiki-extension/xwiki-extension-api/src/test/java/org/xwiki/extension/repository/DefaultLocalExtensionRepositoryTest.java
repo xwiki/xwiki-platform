@@ -19,14 +19,8 @@
  */
 package org.xwiki.extension.repository;
 
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-
 import junit.framework.Assert;
 
-import org.apache.commons.io.FileUtils;
-import org.apache.commons.io.IOUtils;
 import org.junit.Before;
 import org.junit.Test;
 import org.xwiki.extension.Extension;
@@ -34,43 +28,27 @@ import org.xwiki.extension.ExtensionId;
 import org.xwiki.extension.ResolveException;
 import org.xwiki.extension.repository.internal.DefaultLocalExtensionRepository;
 import org.xwiki.extension.test.ConfigurableDefaultCoreExtensionRepository;
+import org.xwiki.extension.test.RepositoryUtil;
 import org.xwiki.test.AbstractComponentTestCase;
 
 public class DefaultLocalExtensionRepositoryTest extends AbstractComponentTestCase
 {
-    private DefaultLocalExtensionRepository localExtensionRepository;
+    private LocalExtensionRepository localExtensionRepository;
+
+    private RepositoryUtil repositoryUtil;
 
     @Before
     public void setUp() throws Exception
     {
         super.setUp();
 
-        getConfigurationSource().setProperty("extension.localRepository",
-            "target/DefaultLocalExtensionRepositoryTest/test-repository");
+        this.repositoryUtil = new RepositoryUtil(getClass().getSimpleName(), getConfigurationSource());
+        this.repositoryUtil.setup();
 
-        File testDirectory = new File("target/DefaultLocalExtensionRepositoryTest");
-        if (testDirectory.exists()) {
-            FileUtils.deleteDirectory(testDirectory);
-        }
+        // lookup
 
-        copyResourceToFile("/localextensions/existingextension-version.type", new File("target/DefaultLocalExtensionRepositoryTest/test-repository/existingextension-version.type"));
-        copyResourceToFile("/localextensions/existingextension-version.xed", new File("target/DefaultLocalExtensionRepositoryTest/test-repository/existingextension-version.xed"));
-        copyResourceToFile("/localextensions/existingextensiondependency-version.type", new File("target/DefaultLocalExtensionRepositoryTest/test-repository/existingextensiondependency-version.type"));
-        copyResourceToFile("/localextensions/existingextensiondependency-version.xed", new File("target/DefaultLocalExtensionRepositoryTest/test-repository/existingextensiondependency-version.xed"));
-        
         this.localExtensionRepository =
             (DefaultLocalExtensionRepository) getComponentManager().lookup(LocalExtensionRepository.class);
-    }
-    
-    private void copyResourceToFile(String resource, File file) throws IOException
-    {
-        file.getParentFile().mkdirs();
-        
-        FileOutputStream fileStream = new FileOutputStream(file);
-        
-        IOUtils.copy(getClass().getResourceAsStream(resource), fileStream);
-        
-        fileStream.close();
     }
 
     @Override
@@ -90,13 +68,13 @@ public class DefaultLocalExtensionRepositoryTest extends AbstractComponentTestCa
     @Test
     public void testGetLocalExtension()
     {
-        Assert.assertNull(this.localExtensionRepository.getLocalExtension("unexistingextension"));
+        Assert.assertNull(this.localExtensionRepository.getInstalledExtension("unexistingextension", null));
 
-        Extension extension = this.localExtensionRepository.getLocalExtension("existingextension");
+        Extension extension = this.localExtensionRepository.getInstalledExtension("existingextension", null);
 
         Assert.assertNotNull(extension);
-        Assert.assertEquals("existingextension", extension.getId());
-        Assert.assertEquals("version", extension.getVersion());
+        Assert.assertEquals("existingextension", extension.getId().getId());
+        Assert.assertEquals("version", extension.getId().getVersion());
         Assert.assertEquals("type", extension.getType());
         Assert.assertEquals("existingextensiondependency", extension.getDependencies().get(0).getId());
         Assert.assertEquals("version", extension.getDependencies().get(0).getVersion());
@@ -124,19 +102,7 @@ public class DefaultLocalExtensionRepositoryTest extends AbstractComponentTestCa
         Extension extension = this.localExtensionRepository.resolve(new ExtensionId("existingextension", "version"));
 
         Assert.assertNotNull(extension);
-        Assert.assertEquals("existingextension", extension.getId());
-        Assert.assertEquals("version", extension.getVersion());
-    }
-
-    @Test
-    public void testInstallExtension() throws ResolveException
-    {
-        // TODO
-    }
-
-    @Test
-    public void testUninstallExtension() throws ResolveException
-    {
-        // TODO
+        Assert.assertEquals("existingextension", extension.getId().getId());
+        Assert.assertEquals("version", extension.getId().getVersion());
     }
 }

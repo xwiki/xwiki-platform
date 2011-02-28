@@ -19,27 +19,33 @@
  */
 package org.xwiki.extension.internal.script;
 
-import java.util.List;
+import java.util.Collection;
 
 import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.Requirement;
+import org.xwiki.context.Execution;
 import org.xwiki.extension.CoreExtension;
 import org.xwiki.extension.Extension;
 import org.xwiki.extension.ExtensionId;
 import org.xwiki.extension.ExtensionManager;
-import org.xwiki.extension.InstallException;
 import org.xwiki.extension.LocalExtension;
 import org.xwiki.extension.ResolveException;
-import org.xwiki.extension.UninstallException;
 import org.xwiki.extension.internal.VersionManager;
 import org.xwiki.extension.repository.CoreExtensionRepository;
 import org.xwiki.extension.repository.LocalExtensionRepository;
+import org.xwiki.extension.task.InstallRequest;
+import org.xwiki.extension.task.Task;
+import org.xwiki.extension.task.TaskException;
+import org.xwiki.extension.task.TaskManager;
+import org.xwiki.extension.task.UninstallRequest;
 import org.xwiki.script.service.ScriptService;
 
 @Component("extension")
 public class ExtensionManagerScriptService implements ScriptService
 {
+    private static final String EXTENSIONERROR_KEY = "extensionerror";
+
     @Requirement
     private ExtensionManager extensionManager;
 
@@ -55,85 +61,132 @@ public class ExtensionManagerScriptService implements ScriptService
     @Requirement
     private CoreExtensionRepository coreExtensionRepository;
 
-    public LocalExtension install(String id, String version) throws InstallException
+    @Requirement
+    private TaskManager taskManager;
+
+    @Requirement
+    private Execution execution;
+
+    public Exception getLastError()
     {
-        if (!this.documentAccessBridge.hasProgrammingRights()) {
-            return null;
-        }
+        return (Exception) this.execution.getContext().getProperty(EXTENSIONERROR_KEY);
+    }
+
+    private void setError(Exception e)
+    {
+        this.execution.getContext().setProperty(EXTENSIONERROR_KEY, e);
+    }
+
+    public Extension resolve(String id, String version, String namespace)
+    {
+        setError(null);
+
+        Extension extension;
 
         try {
-            return this.extensionManager.installExtension(new ExtensionId(id, version));
-        } catch (Exception ex) {
-            // Public script services should not throw errors
-            return null;
+            extension = this.extensionManager.resolveExtension(new ExtensionId(id, version), namespace);
+        } catch (ResolveException e) {
+            setError(e);
+
+            extension = null;
         }
+
+        return extension;
     }
 
-    public Extension resolve(String id, String version) throws ResolveException
+    public Collection<LocalExtension> getBackwardDependencies(String id, String wiki)
     {
-        try {
-            return this.extensionManager.resolveExtension(new ExtensionId(id, version));
-        } catch (Exception ex) {
-            // Public script services should not throw errors
-            return null;
-        }
-    }
+        setError(null);
 
-    public void uninstall(String id) throws UninstallException
-    {
-        if (!this.documentAccessBridge.hasProgrammingRights()) {
-            return;
-        }
+        Collection<LocalExtension> extensions;
 
         try {
-            this.extensionManager.uninstallExtension(id);
-        } catch (Exception ex) {
-            // Public script services should not throw errors
+            extensions = this.localExtensionRepository.getBackwardDependencies(id, wiki);
+        } catch (ResolveException e) {
+            setError(e);
+
+            extensions = null;
         }
+
+        return extensions;
     }
 
-    public List<LocalExtension> getBackwardDependencies(String id) throws ResolveException
+    public LocalExtension getInstalledExtension(String id, String namespace)
     {
-        try {
-            return this.localExtensionRepository.getBackwardDependencies(id);
-        } catch (Exception ex) {
-            // Public script services should not throw errors
-            return null;
-        }
+        return this.localExtensionRepository.getInstalledExtension(id, namespace);
     }
 
-    public List<LocalExtension> getInstalledExtensions()
-    {
-        return this.localExtensionRepository.getLocalExtensions();
-    }
-
-    public LocalExtension getInstalledExtension(String id)
-    {
-        try {
-            return this.localExtensionRepository.getLocalExtension(id);
-        } catch (Exception ex) {
-            // Public script services should not throw errors
-            return null;
-        }
-    }
-
-    public List<CoreExtension> getCoreExtensions()
+    public Collection<CoreExtension> getCoreExtensions()
     {
         return this.coreExtensionRepository.getCoreExtensions();
     }
 
     public CoreExtension getCoreExtension(String id)
     {
-        try {
-            return this.coreExtensionRepository.getCoreExtension(id);
-        } catch (Exception ex) {
-            // Public script services should not throw errors
-            return null;
-        }
+        return this.coreExtensionRepository.getCoreExtension(id);
     }
 
     public VersionManager getVersionManager()
     {
         return this.versionManager;
+    }
+
+    // Tasks
+
+    public Task getCurrentTask()
+    {
+        if (!this.documentAccessBridge.hasProgrammingRights()) {
+            return null;
+        }
+
+        return this.taskManager.getCurrentTask();
+    }
+
+    public Task install(String id, String version, String wiki)
+    {
+        if (!this.documentAccessBridge.hasProgrammingRights()) {
+            return null;
+        }
+
+        setError(null);
+
+        InstallRequest installRequest = new InstallRequest();
+        installRequest.addExtension(new ExtensionId(id, null));
+        installRequest.addNamespace(wiki);
+
+        Task task;
+        try {
+            task = this.taskManager.install(installRequest);
+        } catch (TaskException e) {
+            setError(e);
+
+            task = null;
+        }
+
+        return task;
+    }
+
+    public Task uninstall(String id, String wiki)
+    {
+        if (!this.documentAccessBridge.hasProgrammingRights()) {
+            return null;
+        }
+
+        setError(null);
+
+        UninstallRequest uninstallRequest = new UninstallRequest();
+        uninstallRequest.addExtension(new ExtensionId(id, null));
+        uninstallRequest.addNamespace(wiki);
+
+        Task task;
+        try {
+            task = this.taskManager.uninstall(uninstallRequest);
+        } catch (TaskException e) {
+            setError(e);
+
+            task = null;
+        }
+
+        return task;
     }
 }

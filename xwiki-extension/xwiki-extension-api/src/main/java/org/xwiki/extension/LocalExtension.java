@@ -20,12 +20,20 @@
 package org.xwiki.extension;
 
 import java.io.File;
+import java.util.Collection;
 
 public interface LocalExtension extends Extension
 {
     File getFile();
 
-    boolean isEnabled();
+    boolean isInstalled();
+
+    boolean isInstalled(String namespace);
+
+    /**
+     * @return the namespaces in which this extension is enabled. Null means root namespace (i.e all namespaces).
+     */
+    Collection<String> getNamespaces();
 
     /**
      * @return true if the the extension has been installed only because it was a dependency of another extension

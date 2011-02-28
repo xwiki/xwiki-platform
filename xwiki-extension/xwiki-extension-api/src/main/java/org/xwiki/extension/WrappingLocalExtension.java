@@ -17,23 +17,47 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.extension.repository;
+package org.xwiki.extension;
 
+import java.io.File;
 import java.util.Collection;
 
-import org.xwiki.extension.Extension;
-import org.xwiki.extension.ExtensionId;
-import org.xwiki.extension.ResolveException;
-
-public interface ExtensionRepository
+public class WrappingLocalExtension extends WrappingExtension implements LocalExtension
 {
-    ExtensionRepositoryId getId();
-    
-    Extension resolve(ExtensionId extensionId) throws ResolveException;
+    public WrappingLocalExtension(LocalExtension localExtension)
+    {
+        super(localExtension);
+    }
 
-    boolean exists(ExtensionId extensionId);
+    public LocalExtension getLocalExtension()
+    {
+        return (LocalExtension) getExtension();
+    }
+
+    // LocalExtension
+
+    public File getFile()
+    {
+        return getLocalExtension().getFile();
+    }
+
+    public boolean isInstalled()
+    {
+        return getLocalExtension().isInstalled();
+    }
     
-    int countExtensions();
-    
-    Collection< ? extends Extension> getExtensions(int nb, int offset);
+    public boolean isInstalled(String namespace)
+    {
+        return getLocalExtension().isInstalled(namespace);
+    }
+
+    public boolean isDependency()
+    {
+        return getLocalExtension().isDependency();
+    }
+
+    public Collection<String> getNamespaces()
+    {
+        return getLocalExtension().getNamespaces();
+    }
 }

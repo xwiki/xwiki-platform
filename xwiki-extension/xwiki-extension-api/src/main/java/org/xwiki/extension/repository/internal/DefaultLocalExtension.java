@@ -25,59 +25,35 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.Set;
 
 import org.apache.commons.io.IOUtils;
+import org.xwiki.extension.AbstractExtension;
 import org.xwiki.extension.Extension;
-import org.xwiki.extension.ExtensionDependency;
 import org.xwiki.extension.ExtensionException;
+import org.xwiki.extension.ExtensionId;
 import org.xwiki.extension.LocalExtension;
-import org.xwiki.extension.repository.ExtensionRepository;
 
-public class DefaultLocalExtension implements LocalExtension
+public class DefaultLocalExtension extends AbstractExtension implements LocalExtension
 {
     private File file;
 
-    private boolean enabled = true;
+    private boolean installed = true;
 
     private boolean isDependency;
 
-    private String id;
+    private Set<String> namespaces;
 
-    private String version;
-
-    private String type;
-
-    private String description;
-
-    private String author;
-
-    private String website;
-
-    private List<ExtensionDependency> dependencies = new ArrayList<ExtensionDependency>();
-
-    private DefaultLocalExtensionRepository repository;
-
-    public DefaultLocalExtension(DefaultLocalExtensionRepository repository, String id, String version, String type)
+    public DefaultLocalExtension(DefaultLocalExtensionRepository repository, ExtensionId id, String type)
     {
-        this.repository = repository;
-
-        this.id = id;
-        this.version = version;
-        this.type = type;
+        super(repository, id, type);
     }
 
     public DefaultLocalExtension(DefaultLocalExtensionRepository repository, Extension extension)
     {
-        this(repository, extension.getId(), extension.getVersion(), extension.getType());
-
-        this.dependencies.addAll(extension.getDependencies());
-
-        setDescription(extension.getDescription());
-        setAuthor(extension.getAuthor());
-        setWebsite(extension.getWebSite());
+        super(repository, extension);
     }
 
     public void setFile(File file)
@@ -85,9 +61,32 @@ public class DefaultLocalExtension implements LocalExtension
         this.file = file;
     }
 
-    public void setEnabled(boolean enabled)
+    public void setInstalled(boolean enabled)
     {
-        this.enabled = enabled;
+        this.installed = enabled;
+    }
+
+    public void setInstalled(boolean enabled, String namespace)
+    {
+        if (enabled) {
+            setInstalled(true);
+
+            if (namespace != null) {
+                addNamespace(namespace);
+            } else {
+                this.namespaces = null;
+            }
+        } else {
+            if (this.namespaces != null) {
+                this.namespaces.remove(namespace);
+
+                if (namespace == null || this.namespaces.isEmpty()) {
+                    this.namespaces = null;
+                }
+            }
+
+            setInstalled(this.namespaces != null);
+        }
     }
 
     public void setDependency(boolean isDependency)
@@ -95,22 +94,32 @@ public class DefaultLocalExtension implements LocalExtension
         this.isDependency = isDependency;
     }
 
+    public Collection<String> getNamespaces()
+    {
+        return this.namespaces;
+    }
+
+    public void setNamespaces(Collection<String> namespaces)
+    {
+        if (this.namespaces == null) {
+            this.namespaces = new HashSet<String>();
+        } else {
+            this.namespaces.clear();
+        }
+
+        this.namespaces.addAll(namespaces);
+    }
+
+    public void addNamespace(String namespace)
+    {
+        if (this.namespaces == null) {
+            this.namespaces = new HashSet<String>();
+        }
+
+        this.namespaces.add(namespace);
+    }
+
     // Extension
-
-    public void setDescription(String description)
-    {
-        this.description = description;
-    }
-
-    public void setAuthor(String author)
-    {
-        this.author = author;
-    }
-
-    public void setWebsite(String website)
-    {
-        this.website = website;
-    }
 
     public void download(File file) throws ExtensionException
     {
@@ -149,51 +158,6 @@ public class DefaultLocalExtension implements LocalExtension
         }
     }
 
-    public String getId()
-    {
-        return this.id;
-    }
-
-    public String getVersion()
-    {
-        return this.version;
-    }
-
-    public String getType()
-    {
-        return this.type;
-    }
-
-    public String getDescription()
-    {
-        return this.description;
-    }
-
-    public String getAuthor()
-    {
-        return this.author;
-    }
-
-    public String getWebSite()
-    {
-        return this.website;
-    }
-
-    public void addDependency(ExtensionDependency dependency)
-    {
-        this.dependencies.add(dependency);
-    }
-
-    public List<ExtensionDependency> getDependencies()
-    {
-        return Collections.unmodifiableList(this.dependencies);
-    }
-
-    public ExtensionRepository getRepository()
-    {
-        return this.repository;
-    }
-
     // LocalExtension
 
     public File getFile()
@@ -201,19 +165,18 @@ public class DefaultLocalExtension implements LocalExtension
         return this.file;
     }
 
-    public boolean isEnabled()
+    public boolean isInstalled()
     {
-        return this.enabled;
+        return this.installed;
+    }
+
+    public boolean isInstalled(String namespace)
+    {
+        return isInstalled() && (this.namespaces == null || this.namespaces.contains(namespace));
     }
 
     public boolean isDependency()
     {
         return this.isDependency;
-    }
-
-    @Override
-    public String toString()
-    {
-        return getId() + '-' + getVersion();
     }
 }

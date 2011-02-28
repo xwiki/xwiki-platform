@@ -34,9 +34,9 @@
   <packaging>jar</packaging>
   <description>XWiki Platform - Core - Extension - API</description>
   <properties>
-    <aether.version>1.7</aether.version>
-    <maven.version>3.0</maven.version>
-    <wagon.providers.version>1.0-beta-6</wagon.providers.version>
+    <aether.version>1.11</aether.version>
+    <maven.version>3.0.2</maven.version>
+    <wagon.providers.version>1.0-beta-7</wagon.providers.version>
   </properties>
   <dependencies>
     <dependency>
@@ -76,17 +76,24 @@
       </exclusions>
     </dependency>
 
+    <!-- Wagon -->
+    <dependency>
+      <groupId>org.apache.maven.wagon</groupId>
+      <artifactId>wagon-ftp</artifactId>
+      <version>${wagon.providers.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.maven.wagon</groupId>
+      <artifactId>wagon-ssh</artifactId>
+      <version>${wagon.providers.version}</version>
+    </dependency>
+
     <!-- Aether -->
     <!-- Make sure using the proper version of plexus -->
     <dependency>
       <groupId>org.codehaus.plexus</groupId>
       <artifactId>plexus-utils</artifactId>
       <version>2.0.4</version>
-    </dependency>
-    <dependency>
-      <groupId>org.apache.maven</groupId>
-      <artifactId>maven-aether-provider</artifactId>
-      <version>${maven.version}</version>
     </dependency>
     <dependency>
       <groupId>org.sonatype.aether</groupId>
@@ -101,6 +108,22 @@
     <dependency>
       <groupId>org.sonatype.aether</groupId>
       <artifactId>aether-impl</artifactId>
+      <version>${aether.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.sonatype.aether</groupId>
+      <artifactId>aether-connector-asynchttpclient</artifactId>
+      <version>${aether.version}</version>
+      <exclusions>
+      	<exclusion>
+      		<artifactId>jcl-over-slf4j</artifactId>
+      		<groupId>org.slf4j</groupId>
+      	</exclusion>
+      </exclusions>
+    </dependency>
+    <dependency>
+      <groupId>org.sonatype.aether</groupId>
+      <artifactId>aether-connector-file</artifactId>
       <version>${aether.version}</version>
     </dependency>
     <dependency>
@@ -120,36 +143,10 @@
       </exclusions>
     </dependency>
     
-    <!-- Wagon -->
     <dependency>
-      <groupId>org.apache.maven.wagon</groupId>
-      <artifactId>wagon-file</artifactId>
-      <version>${wagon.providers.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>org.apache.maven.wagon</groupId>
-      <artifactId>wagon-ftp</artifactId>
-      <version>${wagon.providers.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>org.apache.maven.wagon</groupId>
-      <artifactId>wagon-http-lightweight</artifactId>
-      <version>${wagon.providers.version}</version>
-      <exclusions>
-        <exclusion>
-          <groupId>nekohtml</groupId>
-          <artifactId>nekohtml</artifactId>
-        </exclusion>
-        <exclusion>
-          <groupId>nekohtml</groupId>
-          <artifactId>xercesMinimal</artifactId>
-        </exclusion>
-      </exclusions>
-    </dependency>
-    <dependency>
-      <groupId>org.apache.maven.wagon</groupId>
-      <artifactId>wagon-ssh</artifactId>
-      <version>${wagon.providers.version}</version>
+      <groupId>org.apache.maven</groupId>
+      <artifactId>maven-aether-provider</artifactId>
+      <version>${maven.version}</version>
     </dependency>
     
     <!-- Scripting -->
@@ -164,6 +161,12 @@
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-core-shared-tests</artifactId>
       <version>${project.version}</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.sonatype.aether</groupId>
+      <artifactId>aether-test-util</artifactId>
+      <version>${aether.version}</version>
       <scope>test</scope>
     </dependency>
   </dependencies>
@@ -189,7 +192,7 @@
       </plugin>
     </plugins>
   </build>
-  
+
   <repositories>
     <repository>
       <id>reflections-repo</id>
@@ -198,4 +201,3 @@
     </repository>
   </repositories>
 </project>
-       

@@ -19,7 +19,7 @@
  */
 package org.xwiki.extension.repository;
 
-import java.util.List;
+import java.util.Collection;
 
 import org.xwiki.component.annotation.ComponentRole;
 import org.xwiki.extension.CoreExtension;
@@ -27,7 +27,7 @@ import org.xwiki.extension.CoreExtension;
 @ComponentRole
 public interface CoreExtensionRepository extends ExtensionRepository
 {
-    List<CoreExtension> getCoreExtensions();
+    Collection<CoreExtension> getCoreExtensions();
 
     CoreExtension getCoreExtension(String id);
 

@@ -17,24 +17,17 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.extension.repository.internal;
+package org.xwiki.extension;
 
-import java.io.File;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import org.xwiki.extension.CoreExtension;
-import org.xwiki.extension.ExtensionDependency;
-import org.xwiki.extension.ExtensionException;
-import org.xwiki.extension.ExtensionId;
 import org.xwiki.extension.repository.ExtensionRepository;
+import org.xwiki.extension.repository.internal.DefaultLocalExtensionRepository;
 
-public class DefaultCoreExtension implements CoreExtension
+public abstract class AbstractExtension implements Extension
 {
-    private URL url;
-
     private ExtensionId id;
 
     private String type;
@@ -47,28 +40,42 @@ public class DefaultCoreExtension implements CoreExtension
 
     private List<ExtensionDependency> dependencies = new ArrayList<ExtensionDependency>();
 
-    private DefaultCoreExtensionRepository repository;
+    private DefaultLocalExtensionRepository repository;
 
-    public DefaultCoreExtension(ExtensionId id, String type)
-    {
-        this.id = id;
-    }
-
-    public DefaultCoreExtension(DefaultCoreExtensionRepository repository, URL url, ExtensionId id, String type)
+    public AbstractExtension(DefaultLocalExtensionRepository repository, ExtensionId id, String type)
     {
         this.repository = repository;
-
-        this.url = url;
 
         this.id = id;
         this.type = type;
     }
 
+    public AbstractExtension(DefaultLocalExtensionRepository repository, Extension extension)
+    {
+        this(repository, extension.getId(), extension.getType());
+
+        setDescription(extension.getDescription());
+        setAuthor(extension.getAuthor());
+        setWebsite(extension.getWebSite());
+        
+        this.dependencies.addAll(extension.getDependencies());
+    }
+
     // Extension
 
-    public void download(File file) throws ExtensionException
+    public void setDescription(String description)
     {
-        // TODO
+        this.description = description;
+    }
+
+    public void setAuthor(String author)
+    {
+        this.author = author;
+    }
+
+    public void setWebsite(String website)
+    {
+        this.website = website;
     }
 
     public ExtensionId getId()
@@ -96,6 +103,11 @@ public class DefaultCoreExtension implements CoreExtension
         return this.website;
     }
 
+    public void addDependency(ExtensionDependency dependency)
+    {
+        this.dependencies.add(dependency);
+    }
+
     public List<ExtensionDependency> getDependencies()
     {
         return Collections.unmodifiableList(this.dependencies);
@@ -106,16 +118,23 @@ public class DefaultCoreExtension implements CoreExtension
         return this.repository;
     }
 
-    // CoreExtension
-
-    public URL getURL()
-    {
-        return this.url;
-    }
+    // Object
 
     @Override
     public String toString()
     {
         return getId().toString();
+    }
+
+    @Override
+    public boolean equals(Object obj)
+    {
+        return this == obj || (obj instanceof Extension && getId().equals(((Extension) obj).getId()));
+    }
+
+    @Override
+    public int hashCode()
+    {
+        return getId().hashCode();
     }
 }

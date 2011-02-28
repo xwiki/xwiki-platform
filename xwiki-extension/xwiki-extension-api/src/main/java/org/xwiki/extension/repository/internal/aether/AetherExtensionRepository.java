@@ -47,7 +47,7 @@ public class AetherExtensionRepository implements ExtensionRepository
 {
     private ExtensionRepositoryId repositoryId;
 
-    private AetherConfiguration mavenConfiguration;
+    private AetherConfiguration aetherConfiguration;
 
     private PlexusComponentManager plexusComponentManager;
 
@@ -58,12 +58,12 @@ public class AetherExtensionRepository implements ExtensionRepository
     private RemoteRepository remoteRepository;
 
     public AetherExtensionRepository(ExtensionRepositoryId repositoryId, RepositorySystemSession session,
-        AetherConfiguration mavenConfiguration, PlexusComponentManager mavenComponentManager)
+        AetherConfiguration aetherConfiguration, PlexusComponentManager mavenComponentManager)
         throws ComponentLookupException
     {
         this.repositoryId = repositoryId;
 
-        this.mavenConfiguration = mavenConfiguration;
+        this.aetherConfiguration = aetherConfiguration;
 
         this.plexusComponentManager = mavenComponentManager;
 

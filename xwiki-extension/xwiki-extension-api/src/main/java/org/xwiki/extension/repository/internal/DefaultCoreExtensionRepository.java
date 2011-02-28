@@ -24,6 +24,7 @@ import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -128,10 +129,11 @@ public class DefaultCoreExtensionRepository extends AbstractLogEnabled implement
                 }
 
                 DefaultCoreExtension coreExtension =
-                    new DefaultCoreExtension(this, ClasspathHelper.getBaseUrl(descriptorUrl, basURLs), groupId + ":"
-                        + mavenModel.getArtifactId(), version, packagingToType(mavenModel.getPackaging()));
+                    new DefaultCoreExtension(this, ClasspathHelper.getBaseUrl(descriptorUrl, basURLs), new ExtensionId(
+                        groupId + ":" + mavenModel.getArtifactId(), version),
+                        packagingToType(mavenModel.getPackaging()));
 
-                this.extensions.put(coreExtension.getId(), coreExtension);
+                this.extensions.put(coreExtension.getId().getId(), coreExtension);
 
                 for (Dependency dependency : mavenModel.getDependencies()) {
                     if (dependency.getGroupId().equals("${project.groupId}")) {
@@ -161,7 +163,8 @@ public class DefaultCoreExtensionRepository extends AbstractLogEnabled implement
                 String dependencyId = dependency.getGroupId() + ":" + dependency.getArtifactId();
                 if (!this.extensions.containsKey(dependencyId)) {
                     CoreExtension coreExtension =
-                        new DefaultCoreExtension(this, ClasspathHelper.getBaseUrl(descriptorUrl, basURLs), dependencyId, dependency.getVersion(),
+                        new DefaultCoreExtension(this, ClasspathHelper.getBaseUrl(descriptorUrl, basURLs),
+                            new ExtensionId(dependencyId, dependency.getVersion()),
                             packagingToType(dependency.getType()));
 
                     this.extensions.put(dependencyId, coreExtension);
@@ -170,6 +173,11 @@ public class DefaultCoreExtensionRepository extends AbstractLogEnabled implement
         }
     }
 
+    /**
+     * JBoss returns URLs with the vfszip and vfsfile protocol for resources, and the org.reflections library doesn't
+     * recognize them. This is more a bug inside the reflections library, but we can write a small workaround for a
+     * quick fix on our side.
+     */
     private Set<URL> filterURLs(Set<URL> urls)
     {
         Set<URL> results = new HashSet<URL>(urls.size());
@@ -208,7 +216,7 @@ public class DefaultCoreExtensionRepository extends AbstractLogEnabled implement
         Extension extension = getCoreExtension(extensionId.getId());
 
         if (extension == null
-            || (extensionId.getVersion() != null && !extension.getVersion().equals(extensionId.getVersion()))) {
+            || (extensionId.getVersion() != null && !extension.getId().getVersion().equals(extensionId.getVersion()))) {
             throw new ResolveException("Could not find extension [" + extensionId + "]");
         }
 
@@ -220,7 +228,7 @@ public class DefaultCoreExtensionRepository extends AbstractLogEnabled implement
         Extension extension = getCoreExtension(extensionId.getId());
 
         if (extension == null
-            || (extensionId.getVersion() != null && !extension.getVersion().equals(extensionId.getVersion()))) {
+            || (extensionId.getVersion() != null && !extension.getId().getVersion().equals(extensionId.getVersion()))) {
             return false;
         }
 
@@ -244,7 +252,7 @@ public class DefaultCoreExtensionRepository extends AbstractLogEnabled implement
         return this.extensions.size();
     }
 
-    public List<CoreExtension> getCoreExtensions()
+    public Collection<CoreExtension> getCoreExtensions()
     {
         return new ArrayList<CoreExtension>(this.extensions.values());
     }
@@ -254,8 +262,8 @@ public class DefaultCoreExtensionRepository extends AbstractLogEnabled implement
         return this.extensions.get(id);
     }
 
-    public List< ? extends CoreExtension> getExtensions(int nb, int offset)
+    public Collection< ? extends CoreExtension> getExtensions(int nb, int offset)
     {
-        return getCoreExtensions().subList(offset, offset + nb);
+        return new ArrayList<CoreExtension>(this.extensions.values()).subList(offset, offset + nb);
     }
 }

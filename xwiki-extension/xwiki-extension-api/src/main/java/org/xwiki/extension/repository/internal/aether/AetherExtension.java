@@ -47,7 +47,7 @@ public class AetherExtension implements Extension
 
     private ArtifactDescriptorResult artifactDescriptorResult;
 
-    private ExtensionId extensionId;
+    private ExtensionId id;
 
     private String extensionType;
 
@@ -57,7 +57,7 @@ public class AetherExtension implements Extension
 
     private RepositorySystem repositorySystem;
 
-    public AetherExtension(ExtensionId artifactId, ArtifactDescriptorResult artifactDescriptorResult,
+    public AetherExtension(ExtensionId id, ArtifactDescriptorResult artifactDescriptorResult,
         AetherExtensionRepository repository, PlexusComponentManager mavenComponentManager)
         throws ComponentLookupException
     {
@@ -65,21 +65,16 @@ public class AetherExtension implements Extension
 
         this.repository = repository;
 
-        this.extensionId = artifactId;
+        this.id = id;
         this.artifactDescriptorResult = artifactDescriptorResult;
         this.extensionType = artifactDescriptorResult.getArtifact().getExtension();
 
         this.repositorySystem = this.plexusComponentManager.getPlexus().lookup(RepositorySystem.class);
     }
 
-    public String getId()
+    public ExtensionId getId()
     {
-        return this.extensionId.getId();
-    }
-
-    public String getVersion()
-    {
-        return this.extensionId.getVersion();
+        return this.id;
     }
 
     public String getAuthor()

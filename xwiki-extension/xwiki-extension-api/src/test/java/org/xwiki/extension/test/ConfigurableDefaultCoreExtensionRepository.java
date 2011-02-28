@@ -24,6 +24,7 @@ import org.xwiki.component.descriptor.DefaultComponentDescriptor;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.component.manager.ComponentRepositoryException;
 import org.xwiki.extension.CoreExtension;
+import org.xwiki.extension.ExtensionId;
 import org.xwiki.extension.repository.CoreExtensionRepository;
 import org.xwiki.extension.repository.internal.DefaultCoreExtension;
 import org.xwiki.extension.repository.internal.DefaultCoreExtensionRepository;
@@ -43,11 +44,11 @@ public class ConfigurableDefaultCoreExtensionRepository extends DefaultCoreExten
 
     public void addExtensions(CoreExtension extension)
     {
-        this.extensions.put(extension.getId(), extension);
+        this.extensions.put(extension.getId().getId(), extension);
     }
 
-    public void addExtensions(String name, String version)
+    public void addExtensions(String id, String version)
     {
-        this.extensions.put(name, new DefaultCoreExtension(name, version, "unknown"));
+        this.extensions.put(id, new DefaultCoreExtension(new ExtensionId(id, version), "unknown"));
     }
 }

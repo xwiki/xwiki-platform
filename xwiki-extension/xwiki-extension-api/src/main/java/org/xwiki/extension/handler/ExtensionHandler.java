@@ -27,9 +27,10 @@ import org.xwiki.extension.UninstallException;
 @ComponentRole
 public interface ExtensionHandler
 {
-    void install(LocalExtension localExtension) throws InstallException;
+    void install(LocalExtension localExtension, String namespace) throws InstallException;
 
-    void uninstall(LocalExtension localExtension) throws UninstallException;
+    void uninstall(LocalExtension localExtension, String namespace) throws UninstallException;
 
-    void upgrade(LocalExtension previousLocalExtension, LocalExtension newLocalExtension) throws InstallException;
+    void upgrade(LocalExtension previousLocalExtension, LocalExtension newLocalExtension, String namespace)
+        throws InstallException;
 }

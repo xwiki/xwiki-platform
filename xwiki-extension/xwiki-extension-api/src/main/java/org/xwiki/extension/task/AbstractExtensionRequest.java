@@ -17,23 +17,41 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.extension.repository;
+package org.xwiki.extension.task;
 
-import java.util.Collection;
+import java.util.ArrayList;
+import java.util.List;
 
-import org.xwiki.extension.Extension;
 import org.xwiki.extension.ExtensionId;
-import org.xwiki.extension.ResolveException;
 
-public interface ExtensionRepository
+public class AbstractExtensionRequest extends AbstractRequest
 {
-    ExtensionRepositoryId getId();
-    
-    Extension resolve(ExtensionId extensionId) throws ResolveException;
+    private List<ExtensionId> extensions = new ArrayList<ExtensionId>();
 
-    boolean exists(ExtensionId extensionId);
+    private List<String> namespaces;
+
+    public List<ExtensionId> getExtensions()
+    {
+        return this.extensions;
+    }
+
+    public List<String> getNamespaces()
+    {
+        return this.namespaces;
+    }
     
-    int countExtensions();
+    public boolean hasNamespaces()
+    {
+        return this.namespaces != null && !this.namespaces.isEmpty();
+    }
+
+    public boolean addExtension(ExtensionId extensionId)
+    {
+        return this.extensions.add(extensionId);
+    }
     
-    Collection< ? extends Extension> getExtensions(int nb, int offset);
+    public boolean addNamespace(String namespace)
+    {
+        return this.namespaces.add(namespace);
+    }
 }

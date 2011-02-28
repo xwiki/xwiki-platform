@@ -24,6 +24,11 @@
   border: 1px solid $theme.borderColor;
   width: 90%;
 }
+div#xwikiobjects input[type="checkbox"], div#xwikiclassproperties input[type="checkbox"],
+div#xwikiobjects input[type="radio"], div#xwikiclassproperties input[type="radio"] {
+  width: auto;
+  border: none;
+}
 .boolean-property input {
   width: auto !important;
   border: none !important;

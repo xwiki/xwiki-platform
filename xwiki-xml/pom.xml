@@ -29,65 +29,13 @@
     <artifactId>xwiki-core-parent</artifactId>
     <version>3.0-SNAPSHOT</version>
   </parent>
-  <artifactId>xwiki-core-xml</artifactId>
-  <name>XWiki Platform - Core - XML</name>
-  <packaging>jar</packaging>
-  <description>XWiki Platform - Core - XML</description>
-  <dependencies>
-    <dependency>
-      <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-core-component-api</artifactId>
-      <version>${project.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-core-script</artifactId>
-      <version>${project.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>commons-lang</groupId>
-      <artifactId>commons-lang</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>net.sourceforge.htmlcleaner</groupId>
-      <artifactId>htmlcleaner</artifactId>
-      <version>2.1</version>
-      <!-- HTML Cleaner uses JDOM 1.0 but we want to use JDOM 1.1 so we need to exclude it -->
-      <exclusions>
-        <exclusion>
-          <groupId>jdom</groupId>
-          <artifactId>jdom</artifactId>
-        </exclusion>
-      </exclusions>
-    </dependency>
-    <dependency>
-      <groupId>jdom</groupId>
-      <artifactId>jdom</artifactId>
-      <version>1.1</version>
-    </dependency>    
-    <!-- Testing dependencies -->
-    <dependency>
-      <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-core-shared-tests</artifactId>
-      <version>${project.version}</version>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>commons-logging</groupId>
-      <artifactId>commons-logging</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>xerces</groupId>
-      <artifactId>xercesImpl</artifactId>
-      <version>2.8.1</version>
-    </dependency>
-    <dependency>
-      <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-core-component-default</artifactId>
-      <version>${project.version}</version>
-      <scope>test</scope>
-    </dependency>
-  </dependencies>
+  <artifactId>xwiki-core-xml-parent</artifactId>
+  <name>XWiki Platform - Core - XML - Parent POM</name>
+  <packaging>pom</packaging>
+  <description>XWiki Platform - Core - XML - Parent POM</description>
+  <modules>
+    <module>xwiki-xml-default</module>
+  </modules>
   <build>
     <plugins>
       <plugin>

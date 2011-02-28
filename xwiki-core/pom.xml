@@ -651,7 +651,7 @@
     </dependency>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-core-xml</artifactId>
+      <artifactId>xwiki-core-xml-default</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>

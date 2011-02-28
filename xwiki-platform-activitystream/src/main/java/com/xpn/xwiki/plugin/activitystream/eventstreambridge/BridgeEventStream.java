@@ -184,7 +184,7 @@ public class BridgeEventStream implements EventStream
         }
         result.setUser(this.serializer.serialize(e.getUser()));
         result.setVersion(e.getDocumentVersion());
-        result.setWiki(this.localSerializer.serialize(e.getWiki()));
+        result.setWiki(this.serializer.serialize(e.getWiki()));
 
         return result;
     }
@@ -220,10 +220,10 @@ public class BridgeEventStream implements EventStream
         result.setId(e.getEventId());
         result.setDocumentTitle(e.getParam1());
         if (e.getParam2() != null) {
-            if (e.getType().endsWith("Attachment")) {
+            if (StringUtils.endsWith(e.getType(), "Attachment")) {
                 result.setRelatedEntity(this.explicitResolver.resolve(e.getParam2(), EntityType.ATTACHMENT,
                     result.getDocument()));
-            } else if (e.getType().endsWith("Comment") || e.getType().endsWith("Annotation")) {
+            } else if (StringUtils.endsWith(e.getType(), "Comment") || StringUtils.endsWith(e.getType(), "Annotation")) {
                 result.setRelatedEntity(this.explicitResolver.resolve(e.getParam2(), EntityType.OBJECT,
                     result.getDocument()));
             }

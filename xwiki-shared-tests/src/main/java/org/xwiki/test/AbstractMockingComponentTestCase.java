@@ -19,6 +19,12 @@
  */
 package org.xwiki.test;
 
+import java.lang.reflect.Field;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.List;
+import java.util.Set;
+
 import org.junit.Before;
 import org.xwiki.component.annotation.ComponentAnnotationLoader;
 import org.xwiki.component.annotation.ComponentDescriptorFactory;
@@ -28,12 +34,6 @@ import org.xwiki.component.descriptor.DefaultComponentDescriptor;
 import org.xwiki.component.embed.EmbeddableComponentManager;
 import org.xwiki.component.util.ReflectionUtils;
 import org.xwiki.test.annotation.MockingRequirement;
-
-import java.lang.reflect.Field;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.List;
-import java.util.Set;
 
 /**
  * Unit tests for Components should extend this class instead of the older
@@ -50,9 +50,9 @@ import java.util.Set;
  * {
  *     &#64;MockingRequirement
  *     private MyComponent myComponent;
- *
+ * 
  *     private SomeRequirementComponentRoleClass requirement;
- *
+ * 
  *     &#64;Override
  *     &#64;Before
  *     public void setUp() throws Exception
@@ -63,7 +63,7 @@ import java.util.Set;
  *     ...
  * }
  * </code></pre>
- *
+ * 
  * @version $Id$
  * @since 2.2M1
  */
@@ -109,21 +109,21 @@ public class AbstractMockingComponentTestCase extends AbstractMockingTestCase
     }
 
     /**
-     * Provides a hook so that users of this class can perform configuration before the component
-     * is looked up. This allows for example the ability to set expectations on mocked components
-     * used in Initializable.initialize() methods.
+     * Provides a hook so that users of this class can perform configuration before the component is looked up. This
+     * allows for example the ability to set expectations on mocked components used in Initializable.initialize()
+     * methods.
      */
     public void configure() throws Exception
     {
-        // Do nothing by default, this method is supposed to be overridden if needed.        
+        // Do nothing by default, this method is supposed to be overridden if needed.
     }
 
-    private void registerMockDependencies(ComponentDescriptor descriptor, MockingRequirement mockingRequirement)
+    private <T> void registerMockDependencies(ComponentDescriptor<T> descriptor, MockingRequirement mockingRequirement)
         throws Exception
     {
-        List<Class < ? >> exceptions = Arrays.asList(mockingRequirement.exceptions());
-        Collection<ComponentDependency<?>> dependencyDescriptors = descriptor.getComponentDependencies();
-        for (ComponentDependency<?> dependencyDescriptor : dependencyDescriptors) {
+        List<Class< ? >> exceptions = Arrays.asList(mockingRequirement.exceptions());
+        Collection<ComponentDependency< ? >> dependencyDescriptors = descriptor.getComponentDependencies();
+        for (ComponentDependency< ? > dependencyDescriptor : dependencyDescriptors) {
             // Only register a mock if it isn't an exception
             // TODO: Handle multiple roles/hints.
             if (!exceptions.contains(dependencyDescriptor.getRole())) {
@@ -156,13 +156,13 @@ public class AbstractMockingComponentTestCase extends AbstractMockingTestCase
                 componentRoleClass = componentRoleClasses.iterator().next();
             }
         }
-        return componentRoleClass;        
+        return componentRoleClass;
     }
 
     /**
      * @return a configured Component Manager
      */
-     public EmbeddableComponentManager getComponentManager() throws Exception
+    public EmbeddableComponentManager getComponentManager() throws Exception
     {
         return this.componentManager;
     }

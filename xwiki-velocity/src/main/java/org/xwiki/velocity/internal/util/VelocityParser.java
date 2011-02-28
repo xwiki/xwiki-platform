@@ -69,7 +69,6 @@ public class VelocityParser extends AbstractLogEnabled
         VELOCITYDIRECTIVE_PARAM.addAll(VELOCITYDIRECTIVE_BEGIN);
         VELOCITYDIRECTIVE_PARAM.add("set");
         VELOCITYDIRECTIVE_PARAM.add("elseif");
-        VELOCITYDIRECTIVE_PARAM.add("define");
         VELOCITYDIRECTIVE_PARAM.add("evaluate");
         VELOCITYDIRECTIVE_PARAM.add("include");
 

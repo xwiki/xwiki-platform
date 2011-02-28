@@ -57,6 +57,7 @@
   </dependencies>
   <modules>
     <module>xwiki-extension-handler-jar</module>
+    <module>xwiki-extension-handler-xar</module>
   </modules>
 </project>
        

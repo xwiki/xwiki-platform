@@ -219,11 +219,12 @@ public class BridgeEventStream implements EventStream
         result.setDocument(new DocumentReference(this.resolver.resolve(e.getPage(), EntityType.DOCUMENT)));
         result.setId(e.getEventId());
         result.setDocumentTitle(e.getParam1());
-        if (e.getParam2() != null) {
+        if (StringUtils.isNotEmpty(e.getParam2())) {
             if (StringUtils.endsWith(e.getType(), "Attachment")) {
                 result.setRelatedEntity(this.explicitResolver.resolve(e.getParam2(), EntityType.ATTACHMENT,
                     result.getDocument()));
-            } else if (StringUtils.endsWith(e.getType(), "Comment") || StringUtils.endsWith(e.getType(), "Annotation")) {
+            } else if (StringUtils.endsWith(e.getType(), "Comment")
+                || StringUtils.endsWith(e.getType(), "Annotation")) {
                 result.setRelatedEntity(this.explicitResolver.resolve(e.getParam2(), EntityType.OBJECT,
                     result.getDocument()));
             }

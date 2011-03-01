@@ -347,11 +347,21 @@ public class DefaultLocalExtensionRepository extends AbstractLogEnabled implemen
 
     public List<LocalExtension> getInstalledExtensions(String namespace)
     {
-        Collection<LocalExtension> extensions = this.extensions.values();
-
         List<LocalExtension> installedExtensions = new ArrayList<LocalExtension>(extensions.size());
-        for (LocalExtension localExtension : extensions) {
+        for (LocalExtension localExtension : this.extensions.values()) {
             if (localExtension.isInstalled(namespace)) {
+                installedExtensions.add(localExtension);
+            }
+        }
+
+        return installedExtensions;
+    }
+
+    public List<LocalExtension> getInstalledExtensions()
+    {
+        List<LocalExtension> installedExtensions = new ArrayList<LocalExtension>(extensions.size());
+        for (LocalExtension localExtension : this.extensions.values()) {
+            if (localExtension.isInstalled()) {
                 installedExtensions.add(localExtension);
             }
         }

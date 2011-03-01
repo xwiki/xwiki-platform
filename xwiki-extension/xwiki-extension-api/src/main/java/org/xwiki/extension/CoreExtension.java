@@ -24,4 +24,9 @@ import java.net.URL;
 public interface CoreExtension extends Extension
 {
     URL getURL();
+
+    /**
+     * @return true if the core extension is guessed meaning that it may not be really here or have the right veersion
+     */
+    boolean isGuessed();
 }

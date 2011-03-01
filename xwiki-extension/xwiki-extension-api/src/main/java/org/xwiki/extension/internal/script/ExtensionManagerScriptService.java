@@ -116,6 +116,16 @@ public class ExtensionManagerScriptService implements ScriptService
         return this.localExtensionRepository.getInstalledExtension(id, namespace);
     }
 
+    public Collection<LocalExtension> getInstalledExtensions(String namespace)
+    {
+        return this.localExtensionRepository.getInstalledExtensions(namespace);
+    }
+
+    public Collection<LocalExtension> getInstalledExtensions()
+    {
+        return this.localExtensionRepository.getInstalledExtensions();
+    }
+
     public Collection<CoreExtension> getCoreExtensions()
     {
         return this.coreExtensionRepository.getCoreExtensions();

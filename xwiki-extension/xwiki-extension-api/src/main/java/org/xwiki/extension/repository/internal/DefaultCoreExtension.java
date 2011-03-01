@@ -21,47 +21,23 @@ package org.xwiki.extension.repository.internal;
 
 import java.io.File;
 import java.net.URL;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
 
+import org.xwiki.extension.AbstractExtension;
 import org.xwiki.extension.CoreExtension;
-import org.xwiki.extension.ExtensionDependency;
 import org.xwiki.extension.ExtensionException;
 import org.xwiki.extension.ExtensionId;
-import org.xwiki.extension.repository.ExtensionRepository;
 
-public class DefaultCoreExtension implements CoreExtension
+public class DefaultCoreExtension extends AbstractExtension implements CoreExtension
 {
     private URL url;
 
-    private ExtensionId id;
-
-    private String type;
-
-    private String description;
-
-    private String author;
-
-    private String website;
-
-    private List<ExtensionDependency> dependencies = new ArrayList<ExtensionDependency>();
-
-    private DefaultCoreExtensionRepository repository;
-
-    public DefaultCoreExtension(ExtensionId id, String type)
-    {
-        this.id = id;
-    }
+    private boolean guessed;
 
     public DefaultCoreExtension(DefaultCoreExtensionRepository repository, URL url, ExtensionId id, String type)
     {
-        this.repository = repository;
+        super(repository, id, type);
 
         this.url = url;
-
-        this.id = id;
-        this.type = type;
     }
 
     // Extension
@@ -71,39 +47,9 @@ public class DefaultCoreExtension implements CoreExtension
         // TODO
     }
 
-    public ExtensionId getId()
+    public void setId(ExtensionId id)
     {
-        return this.id;
-    }
-
-    public String getType()
-    {
-        return this.type;
-    }
-
-    public String getDescription()
-    {
-        return this.description;
-    }
-
-    public String getAuthor()
-    {
-        return this.author;
-    }
-
-    public String getWebSite()
-    {
-        return this.website;
-    }
-
-    public List<ExtensionDependency> getDependencies()
-    {
-        return Collections.unmodifiableList(this.dependencies);
-    }
-
-    public ExtensionRepository getRepository()
-    {
-        return this.repository;
+        super.setId(id);
     }
 
     // CoreExtension
@@ -113,6 +59,18 @@ public class DefaultCoreExtension implements CoreExtension
         return this.url;
     }
 
+    public boolean isGuessed()
+    {
+        return this.guessed;
+    }
+
+    public void setGuessed(boolean guessed)
+    {
+        this.guessed = guessed;
+    }
+    
+    // Object
+    
     @Override
     public String toString()
     {

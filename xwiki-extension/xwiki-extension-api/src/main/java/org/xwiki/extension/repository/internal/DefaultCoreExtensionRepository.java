@@ -161,13 +161,18 @@ public class DefaultCoreExtensionRepository extends AbstractLogEnabled implement
             // Add dependencies that does not provide proper pom.xml resource and can't be found in the classpath
             for (Dependency dependency : dependencies) {
                 String dependencyId = dependency.getGroupId() + ":" + dependency.getArtifactId();
-                if (!this.extensions.containsKey(dependencyId)) {
-                    CoreExtension coreExtension =
+                DefaultCoreExtension coreExtension = (DefaultCoreExtension)this.extensions.get(dependencyId);
+                if (coreExtension == null) {
+                    coreExtension =
                         new DefaultCoreExtension(this, ClasspathHelper.getBaseUrl(descriptorUrl, basURLs),
                             new ExtensionId(dependencyId, dependency.getVersion()),
                             packagingToType(dependency.getType()));
+                    coreExtension.setGuessed(true);
 
                     this.extensions.put(dependencyId, coreExtension);
+                } else if (coreExtension.getId().getVersion().charAt(0) == '$') {
+                    coreExtension.setId(new ExtensionId(dependencyId, dependency.getVersion()));
+                    coreExtension.setGuessed(true);
                 }
             }
         }

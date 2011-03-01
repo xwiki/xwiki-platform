@@ -24,7 +24,6 @@ import java.util.Collections;
 import java.util.List;
 
 import org.xwiki.extension.repository.ExtensionRepository;
-import org.xwiki.extension.repository.internal.DefaultLocalExtensionRepository;
 
 public abstract class AbstractExtension implements Extension
 {
@@ -40,9 +39,9 @@ public abstract class AbstractExtension implements Extension
 
     private List<ExtensionDependency> dependencies = new ArrayList<ExtensionDependency>();
 
-    private DefaultLocalExtensionRepository repository;
+    private ExtensionRepository repository;
 
-    public AbstractExtension(DefaultLocalExtensionRepository repository, ExtensionId id, String type)
+    public AbstractExtension(ExtensionRepository repository, ExtensionId id, String type)
     {
         this.repository = repository;
 
@@ -50,7 +49,7 @@ public abstract class AbstractExtension implements Extension
         this.type = type;
     }
 
-    public AbstractExtension(DefaultLocalExtensionRepository repository, Extension extension)
+    public AbstractExtension(ExtensionRepository repository, Extension extension)
     {
         this(repository, extension.getId(), extension.getType());
 
@@ -81,6 +80,11 @@ public abstract class AbstractExtension implements Extension
     public ExtensionId getId()
     {
         return this.id;
+    }
+    
+    protected void setId(ExtensionId id)
+    {
+        this.id = id;
     }
 
     public String getType()

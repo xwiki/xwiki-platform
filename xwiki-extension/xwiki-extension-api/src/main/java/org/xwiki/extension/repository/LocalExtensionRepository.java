@@ -35,6 +35,8 @@ public interface LocalExtensionRepository extends ExtensionRepository
 
     Collection<LocalExtension> getInstalledExtensions(String namespace);
 
+    Collection<LocalExtension> getInstalledExtensions();
+
     LocalExtension getInstalledExtension(String id, String namespace);
 
     LocalExtension installExtension(Extension extension, boolean dependency, String namespace) throws InstallException;

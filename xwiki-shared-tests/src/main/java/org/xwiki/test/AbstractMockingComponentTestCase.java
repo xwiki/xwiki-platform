@@ -130,7 +130,8 @@ public class AbstractMockingComponentTestCase extends AbstractMockingTestCase
                 DefaultComponentDescriptor cd = new DefaultComponentDescriptor();
                 cd.setRole(dependencyDescriptor.getRole());
                 cd.setRoleHint(dependencyDescriptor.getRoleHint());
-                this.componentManager.registerComponent(cd, getMockery().mock(dependencyDescriptor.getRole()));
+                this.componentManager.registerComponent(
+                    cd, getMockery().mock(dependencyDescriptor.getRole(), dependencyDescriptor.getName()));
             }
         }
     }

@@ -67,7 +67,7 @@
     </dependency>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-core-xml</artifactId>
+      <artifactId>xwiki-core-xml-default</artifactId>
       <version>${platform.core.version}</version>
       <scope>provided</scope>
     </dependency>

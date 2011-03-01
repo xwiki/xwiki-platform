@@ -161,7 +161,7 @@
 
   <form method="POST" action="$doc.getName()?export=2">
 
-#set($docs = $xwiki.getSpaceDocsName($SpaceName))
+  #set($docs = $xwiki.getSpaceDocsName($SpaceName))
   <table border="1" style="text-align:center;">
   <tr><td>Name</td><td>Export</td><td colspan="3">Default Action</td></tr>
   <tr><td colspan="2"></td><td>overwrite</td><td>merge objects</td><td>skip</td></tr>
@@ -290,25 +290,25 @@
 
 
       <tr><td>[$docInfo.getFullName()>$docInfo.getFullName()]</td> <td>__$import.getTestInstallToString($docInfo.isInstallable())__</td>
-#if($import.getTestInstallToString($docInfo.isInstallable()) == "Already exist")
-  #if ($import.getActionToString($docInfo.getDefaultAction()) == "overwrite")
-    <td><input type="radio" name="$docInfo.getFullName()_default" value="overwrite" checked="true" /></td>
-  #else
-    <td><input type="radio" name="$docInfo.getFullName()_default" value="overwrite" /></td>
-  #end
-  #if ($import.getActionToString($docInfo.getDefaultAction()) == "merge")
-    <td><input type="radio" name="$docInfo.getFullName()_default" value="merge" checked="true" /></td>
-  #else
-   <td><input type="radio" name="$docInfo.getFullName()_default" value="merge" /></td>
-  #end
-  #if ($import.getActionToString($docInfo.getDefaultAction()) == "skip")
-    <td><input type="radio" name="$docInfo.getFullName()_default" value="skip" checked="true" /></td> </tr>
-  #else
-    <td><input type="radio" name="$docInfo.getFullName()_default" value="skip" /></td> </tr>
-  #end
-#else
-  <td colspan="3"></td>
-#end
+      #if($import.getTestInstallToString($docInfo.isInstallable()) == "Already exist")
+        #if ($import.getActionToString($docInfo.getDefaultAction()) == "overwrite")
+          <td><input type="radio" name="$docInfo.getFullName()_default" value="overwrite" checked="true" /></td>
+        #else
+          <td><input type="radio" name="$docInfo.getFullName()_default" value="overwrite" /></td>
+        #end
+        #if ($import.getActionToString($docInfo.getDefaultAction()) == "merge")
+          <td><input type="radio" name="$docInfo.getFullName()_default" value="merge" checked="true" /></td>
+        #else
+          <td><input type="radio" name="$docInfo.getFullName()_default" value="merge" /></td>
+        #end
+        #if ($import.getActionToString($docInfo.getDefaultAction()) == "skip")
+          <td><input type="radio" name="$docInfo.getFullName()_default" value="skip" checked="true" /></td> </tr>
+        #else
+          <td><input type="radio" name="$docInfo.getFullName()_default" value="skip" /></td> </tr>
+        #end
+      #else
+        <td colspan="3"></td>
+      #end
 
 
     #end
@@ -321,6 +321,7 @@
     #end
     </form>
   #end
+#end
 #end
 ##
 ##

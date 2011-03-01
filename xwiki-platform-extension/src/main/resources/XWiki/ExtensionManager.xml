@@ -11,8 +11,8 @@
 <customClass></customClass>
 <contentAuthor>XWiki.Admin</contentAuthor>
 <creationDate>1284043167000</creationDate>
-<date>1298969789000</date>
-<contentUpdateDate>1298969789000</contentUpdateDate>
+<date>1298991189000</date>
+<contentUpdateDate>1298991189000</contentUpdateDate>
 <version>1.1</version>
 <title>Extension Manager</title>
 <template></template>
@@ -313,6 +313,9 @@ This application is experimental, use it at your own risk.
 {{velocity output="false"}}
 #set($extensionManager = $services.extension)
 #set($versionManager = $extensionManager.versionManager)
+#if($request.extensionwiki &amp;&amp; $request.extensionwiki.trim() != '')
+  #set($extensionwiki = $request.extensionwiki)
+#end
 {{/velocity}}
 
 {{velocity}}
@@ -328,6 +331,11 @@ This application is experimental, use it at your own risk.
   &lt;p&gt;
     &lt;label for="extensionversion"&gt;Extension version&lt;/label&gt;
     &lt;input id="extensionversion" name="extensionversion" type="text" title="Extension version" #if($request.extensionversion)value="${escapetool.xml($request.extensionversion)}"#end /&gt;
+  &lt;/p&gt;
+
+  &lt;p&gt;
+    &lt;label for="extensionwiki"&gt;Extension wiki&lt;/label&gt;
+    &lt;input id="extensionwiki" name="extensionwiki" type="text" title="Extension wiki" #if($extensionwiki)value="${escapetool.xml($extensionwiki)}"#end /&gt;
   &lt;/p&gt;
 
   &lt;span class="buttonwrapper"&gt;&lt;input type="submit" value="Resolve" name="actionresolve" class="button"/&gt;&lt;/span&gt;
@@ -348,7 +356,7 @@ This application is experimental, use it at your own risk.
     {{error}}You have to provide both extension id and version.{{/error}}
   #else
     #macro(resolveExtension $extensionid $extensionversion $extensionlevel)
-      #set($extension = $extensionManager.resolve($extensionid, $extensionversion, null))
+      #set($extension = $extensionManager.resolve($extensionid, $extensionversion, $extensionwiki))
       #if (!$extension)
         #set($lasterror = $extensionManager.lastError)
         {{error}}Failed to resolve extension with id $request.extensionid and version $extensionversion: $lasterror.message{{/error}}
@@ -377,17 +385,17 @@ This application is experimental, use it at your own risk.
   #if (!$request.extensionid || !$request.extensionversion)
     {{error}}You have to provide both extension id and version.{{/error}}
   #elseif ($request.confirm)
-    #set($extension = $extensionManager.install($request.extensionid, $request.extensionversion, null))
+    #set($extension = $extensionManager.install($request.extensionid, $request.extensionversion, $extensionwiki))
     #set($lasterror = $extensionManager.lastError)
     #if ($lasterror)
       {{error}}Failed to install extension with id $request.extensionid: $lasterror.message{{/error}}
     #end
   #else
     #macro(prepareInstall $extensionid $extensionversion $extensionsToInstall $extensionsToUpgrade $extensionsSuggested, $coreExtensionsConflicts)
-      #set($extension = $extensionManager.resolve($extensionid, $extensionversion, null))
+      #set($extension = $extensionManager.resolve($extensionid, $extensionversion, $extensionwiki))
       #set($extensionclass = "${extension.class}")
       #if (!$extensionclass.endsWith('CoreExtension') &amp;&amp; !$extensionclass.endsWith('LocalExtension'))
-        #if ($extensionManager.getInstalledExtension($extensionid, null))
+        #if ($extensionManager.getInstalledExtension($extensionid, $extensionwiki))
           #set($extensionsToUpgrade[$extension.id] = $extension)
         #else
           #set($extensionsToInstall[$extension.id] = $extension)
@@ -463,7 +471,7 @@ This application is experimental, use it at your own risk.
   #if (!$request.extensionid || !$request.extensionversion)
     {{error}}You have to provide both extension id and version.{{/error}}
   #elseif($request.confirm)
-    #set($extension = $extensionManager.uninstall($request.extensionid, null))
+    #set($extension = $extensionManager.uninstall($request.extensionid, $extensionwiki))
     #set($lasterror = $extensionManager.lastError)
     #if ($lasterror)
       {{error}}Failed to uninstall extension with id $request.extensionid: $lasterror.message{{/error}}
@@ -471,7 +479,7 @@ This application is experimental, use it at your own risk.
   #else
     #macro(prepareUninstall $extensionid $extensionsToUninstall)
       #set($void = $extensionsToUninstall.add($extensionid))
-      #set($backwardDependencies = $extensionManager.getBackwardDependencies($extensionid, null))
+      #set($backwardDependencies = $extensionManager.getBackwardDependencies($extensionid, $extensionwiki))
       #prepareUninstallBackwardDependencies($backwardDependencies, $extensionsToUninstall)
     #end
     #macro(prepareUninstallBackwardDependencies $backwardDependencies $extensionsToUninstall)
@@ -507,20 +515,31 @@ This application is experimental, use it at your own risk.
 {{velocity}}
 = Installed extensions
 
-#set($extensions = $extensionManager.getInstalledExtensions(null))
-|=Id|=Version|=Type#if ($hasProgramming)|=Actions#end
+#set($extensions = $extensionManager.getInstalledExtensions())
+#if ($extensions.isEmpty())
+  {{info}}No extension installed.{{/info}}##
+#else
+  |=Id|=Version|=Type|=Wikis#if ($hasProgramming)|=Actions#end
 
-#foreach($extension in $extensions)
-|$extension.id|$extension.id.version|$extension.type#if ($hasProgramming)|{{html clean="false"}}
-      &lt;form action="$xwiki.requestURL" enctype="multipart/form-data" method="post"&gt;
-        &lt;fieldset&gt;
-          &lt;input name="extensionid" value="${escapetool.xml($extension.id)}" type="hidden" /&gt;
-          &lt;input name="extensionversion" value="${escapetool.xml($extension.id.version)}" type="hidden" /&gt;
-          &lt;span class="buttonwrapper"&gt;&lt;input type="submit" value="Uninstall" name="actionuninstall" class="button"/&gt;&lt;/span&gt;
-        &lt;/fieldset&gt;
-      &lt;/form&gt;
-      {{/html}}#end
-
+  #foreach($extension in $extensions)
+  |$extension.id|$extension.id.version|$extension.type##
+        |#if($extension.namespaces)
+          $extension.namespaces##
+         #else
+          All wikis##
+         #end
+        #if ($hasProgramming)
+          |{{html clean="false"}}
+            &lt;form action="$xwiki.requestURL" enctype="multipart/form-data" method="post"&gt;
+              &lt;fieldset&gt;
+                &lt;input name="extensionid" value="${escapetool.xml($extension.id)}" type="hidden" /&gt;
+                &lt;input name="extensionversion" value="${escapetool.xml($extension.id.version)}" type="hidden" /&gt;
+                &lt;span class="buttonwrapper"&gt;&lt;input type="submit" value="Uninstall" name="actionuninstall" class="button"/&gt;&lt;/span&gt;
+              &lt;/fieldset&gt;
+            &lt;/form&gt;
+          {{/html}}##
+        #end
+#end
 #end
 {{/velocity}}
 
@@ -534,7 +553,7 @@ This application is experimental, use it at your own risk.
 |=Id|=Version|=Type
 #foreach($extension in $extensions)
   #if ($extension.id.id.startsWith("org.xwiki") || $extension.id.id.startsWith("com.xpn"))
-|(%title="$extension.getURL()"%)$extension.id.id|$extension.id.version|$extension.type
+    |(%title="$extension.getURL()"%)$extension.id.id|$extension.id.version|$extension.type
   #end
 #end
 
@@ -542,8 +561,17 @@ This application is experimental, use it at your own risk.
 
 |=Id|=Version|=Type
 #foreach($extension in $extensions)
-  #if (!$extension.id.id.startsWith("org.xwiki") &amp;&amp; !$extension.id.id.startsWith("com.xpn"))
-|(%title="$extension.getURL()"%)$extension.id.id|$extension.id.version|$extension.type
+  #if (!$extension.guessed &amp;&amp; !$extension.id.id.startsWith("org.xwiki") &amp;&amp; !$extension.id.id.startsWith("com.xpn"))
+    |(%title="$extension.getURL()"%)$extension.id.id|$extension.id.version|$extension.type
+  #end
+#end
+
+== Guessed third party core extensions
+
+|=Id|=Version|=Type
+#foreach($extension in $extensions)
+  #if ($extension.guessed)
+    |(%title="$extension.getURL()"%)$extension.id.id|$extension.id.version|$extension.type
   #end
 #end
 {{/velocity}}</content></xwikidoc>

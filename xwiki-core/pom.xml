@@ -1035,8 +1035,6 @@
               **/plugin/graphviz/GraphVizMacro.java,
               **/plugin/graphviz/GraphVizPluginApi.java,
               **/plugin/graphviz/GraphVizPlugin.java,
-              **/plugin/ldap/LDAPPluginApi.java,
-              **/plugin/ldap/LDAPPlugin.java,
               <!-- XWiki LDAP Utils has a fan out complexity of 21 that needs to be investigated and refactored. -->
               **/plugin/ldap/XWikiLDAPUtils.java,
               **/plugin/mail/MailPluginApi.java,
@@ -1175,7 +1173,6 @@
               **/user/api/XWikiRightNotFoundException.java,
               **/user/api/XWikiRightService.java,
               **/user/api/XWikiUser.java,
-              **/user/impl/LDAP/LDAPAuthServiceImpl.java,
               **/user/impl/LDAP/LDAPProfileXClass.java,
               **/user/impl/LDAP/XWikiLDAPAuthServiceImpl.java,
               **/user/impl/xwiki/AppServerTrustedAuthServiceImpl.java,

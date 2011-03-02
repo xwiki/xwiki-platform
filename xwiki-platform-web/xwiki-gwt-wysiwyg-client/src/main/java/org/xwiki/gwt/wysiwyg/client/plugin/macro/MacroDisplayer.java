@@ -31,8 +31,6 @@ import org.xwiki.gwt.dom.client.InnerHTMLListener;
 import org.xwiki.gwt.user.client.ui.rta.RichTextArea;
 
 import com.google.gwt.dom.client.Node;
-import com.google.gwt.dom.client.NodeList;
-import com.google.gwt.dom.client.Style.Display;
 
 /**
  * Hides macro meta data and displays macro output in a read only text box.
@@ -62,6 +60,11 @@ public class MacroDisplayer implements InnerHTMLListener
     public static final String INLINE_MACRO_STYLE_NAME = MACRO_STYLE_NAME + "-inline";
 
     /**
+     * The CSS class name used on the macro container when a place-holder is displayed instead of the macro output.
+     */
+    public static final String COLLAPSED_MACRO_STYLE_NAME = MACRO_STYLE_NAME + "-collapsed";
+
+    /**
      * The prefix of the start macro comment node.
      */
     public static final String START_MACRO_COMMENT_PREFIX = "startmacro:";
@@ -79,7 +82,23 @@ public class MacroDisplayer implements InnerHTMLListener
     /**
      * The underlying rich text area where the macros are displayed.
      */
-    private RichTextArea textArea;
+    private final RichTextArea textArea;
+
+    /**
+     * Creates a new macro displayer for the given rich text area.
+     * 
+     * @param textArea the rich text area whose macros will be displayed using this object
+     */
+    public MacroDisplayer(RichTextArea textArea)
+    {
+        this.textArea = textArea;
+
+        // Listen to rich text area's inner HTML changes to detect new macros.
+        textArea.getDocument().addInnerHTMLListener(this);
+
+        // Display the current macros.
+        display(getStartMacroCommentNodes(textArea.getDocument().getBody()));
+    }
 
     /**
      * Destroys this displayer.
@@ -95,28 +114,6 @@ public class MacroDisplayer implements InnerHTMLListener
     public RichTextArea getTextArea()
     {
         return textArea;
-    }
-
-    /**
-     * Sets the underlying rich text area where the macros are displayed.<br/>
-     * NOTE: We were forced to add this method because instances of this class are created using deferred binding and
-     * thus we cannot pass the rich text area as a parameter to the constructor. As a consequence this method can be
-     * called only once.
-     * 
-     * @param textArea the rich text area whose macros will be displayed using this object
-     */
-    public void setTextArea(RichTextArea textArea)
-    {
-        if (this.textArea != null) {
-            throw new IllegalStateException("Text area has already been set!");
-        }
-        this.textArea = textArea;
-
-        // Listen to rich text area's inner HTML changes to detect new macros.
-        textArea.getDocument().addInnerHTMLListener(this);
-
-        // Display the current macros.
-        display(getStartMacroCommentNodes(textArea.getDocument().getBody()));
     }
 
     /**
@@ -193,9 +190,12 @@ public class MacroDisplayer implements InnerHTMLListener
      */
     protected Element createMacroContainer(Node start, Node stop, int siblingCount)
     {
+        boolean inLine = isInLine(start, stop, siblingCount);
+
         // Create the read only text box.
-        Element container = createReadOnlyBox();
-        container.setClassName(MACRO_STYLE_NAME);
+        Element container = createReadOnlyBox(inLine);
+        container.addClassName(MACRO_STYLE_NAME);
+        container.addClassName(inLine ? INLINE_MACRO_STYLE_NAME : BLOCK_MACRO_STYLE_NAME);
 
         MacroCall call = new MacroCall(start.getNodeValue());
         container.setTitle(call.getName() + " macro");
@@ -207,14 +207,11 @@ public class MacroDisplayer implements InnerHTMLListener
         if (siblingCount > 0) {
             int startIndex = domUtils.getNodeIndex(start);
             int endIndex = startIndex + siblingCount + 1;
+            Document doc = textArea.getDocument();
             // We need to put macro output inside a container to be able to hide it when the macro is collapsed.
-            Element output = textArea.getDocument().createDivElement().cast();
-            output.setClassName("macro-output");
+            Element output = Element.as(inLine ? doc.createSpanElement() : doc.createDivElement());
             output.appendChild(domUtils.extractNodeContents(start.getParentNode(), startIndex + 1, endIndex));
-
-            // Let's see if the macro should be displayed in-line or as a block.
-            container.addClassName(isInLine(output) ? INLINE_MACRO_STYLE_NAME : BLOCK_MACRO_STYLE_NAME);
-
+            output.setClassName("macro-output");
             container.appendChild(output);
         }
 
@@ -225,29 +222,37 @@ public class MacroDisplayer implements InnerHTMLListener
     }
 
     /**
-     * @param output the output of a macro
+     * @param start start macro comment node
+     * @param stop stop macro comment node
+     * @param siblingCount the number of siblings between start and stop nodes
      * @return {@code false} if the output of the macro contains block-level elements and thus the macro needs to be
      *         displayed as a block, {@code true} otherwise
      */
-    private boolean isInLine(Element output)
+    private boolean isInLine(Node start, Node stop, int siblingCount)
     {
-        Node child = output.getFirstChild();
-        while (child != null) {
-            if (domUtils.isBlock(child)) {
-                return false;
+        if (siblingCount > 0) {
+            Node sibling = start.getNextSibling();
+            while (sibling != stop) {
+                if (domUtils.isBlock(sibling)) {
+                    return false;
+                }
+                sibling = sibling.getNextSibling();
             }
-            child = child.getNextSibling();
+            return true;
+        } else {
+            return !domUtils.isFlowContainer(start.getParentNode());
         }
-        return true;
     }
 
     /**
+     * @param inLine {@code true} if the read-only box is going to displayed in-line, {@code false} otherwise
      * @return an element whose contents cannot be edited inside the rich text area
      */
-    protected Element createReadOnlyBox()
+    protected Element createReadOnlyBox(boolean inLine)
     {
-        Element container = (Element) textArea.getDocument().createElement(getMacroContainerTagName());
-        container.setAttribute("contentEditable", "false");
+        Document doc = textArea.getDocument();
+        Element container = Element.as(inLine ? doc.createSpanElement() : doc.createDivElement());
+        container.setClassName("readOnly");
         return container;
     }
 
@@ -289,7 +294,14 @@ public class MacroDisplayer implements InnerHTMLListener
     {
         Document document = textArea.getDocument();
 
+        // We use a separate element to display the macro icon to be sure that the line height is not less than the
+        // image height (we cannot set the height for in-line macros). We use a span instead of an image element because
+        // we couldn't find a way to hide the image selection when a collapsed macro is selected.
+        Element macroIcon = Element.as(document.createSpanElement());
+        macroIcon.setClassName("macro-icon");
+
         Element placeHolder = document.createSpanElement().cast();
+        placeHolder.appendChild(macroIcon);
         placeHolder.appendChild(document.createTextNode(call.getName()));
         placeHolder.setClassName("macro-placeholder");
 
@@ -343,8 +355,12 @@ public class MacroDisplayer implements InnerHTMLListener
      */
     public boolean isMacroContainer(Node node)
     {
-        return getMacroContainerTagName().equalsIgnoreCase(node.getNodeName())
-            && Element.as(node).hasClassName(MACRO_STYLE_NAME);
+        if (!Element.is(node)) {
+            return false;
+        }
+        Element element = Element.as(node);
+        return element.hasClassName(MACRO_STYLE_NAME) && element.hasAttribute(Element.META_DATA_ATTR)
+            && element.getAttribute(Element.META_DATA_ATTR).startsWith(START_MACRO_COMMENT_PREFIX, 4);
     }
 
     /**
@@ -353,23 +369,29 @@ public class MacroDisplayer implements InnerHTMLListener
      */
     public List<Element> getMacroContainers(Element root)
     {
+        Node node = root;
         List<Element> containers = new ArrayList<Element>();
-        NodeList<com.google.gwt.dom.client.Element> divs = root.getElementsByTagName(getMacroContainerTagName());
-        for (int i = 0; i < divs.getLength(); i++) {
-            Element div = divs.getItem(i).cast();
-            if (isMacroContainer(div)) {
-                containers.add(div);
+        while (true) {
+            boolean isMacroContainer = isMacroContainer(node);
+            if (!node.hasChildNodes() || isMacroContainer) {
+                // Add the node to the list of containers and skip its descendants.
+                if (isMacroContainer) {
+                    containers.add(Element.as(node));
+                }
+                // Look for the next node.
+                while (node != root && node.getNextSibling() == null) {
+                    node = node.getParentNode();
+                }
+                if (node == root) {
+                    break;
+                } else {
+                    node = node.getNextSibling();
+                }
+            } else {
+                node = node.getFirstChild();
             }
         }
         return containers;
-    }
-
-    /**
-     * @return the name of the element used as macro container
-     */
-    protected String getMacroContainerTagName()
-    {
-        return "button";
     }
 
     /**
@@ -382,12 +404,11 @@ public class MacroDisplayer implements InnerHTMLListener
     {
         Element output = getOutput(container);
         boolean collapse = collapsed || output == null;
-        if (output != null) {
-            output.getStyle().setDisplay(collapse ? Display.NONE : Display.BLOCK);
+        if (collapse) {
+            container.addClassName(COLLAPSED_MACRO_STYLE_NAME);
+        } else {
+            container.removeClassName(COLLAPSED_MACRO_STYLE_NAME);
         }
-
-        Element placeHolder = getPlaceHolder(container);
-        placeHolder.getStyle().setDisplay(collapse ? Display.INLINE : Display.NONE);
     }
 
     /**
@@ -396,7 +417,7 @@ public class MacroDisplayer implements InnerHTMLListener
      */
     public boolean isCollapsed(Element container)
     {
-        return !Display.NONE.getCssName().equals(getPlaceHolder(container).getStyle().getDisplay());
+        return container.hasClassName(COLLAPSED_MACRO_STYLE_NAME);
     }
 
     /**
@@ -406,6 +427,18 @@ public class MacroDisplayer implements InnerHTMLListener
     protected Element getOutput(Element container)
     {
         return (Element) getPlaceHolder(container).getNextSibling();
+    }
+
+    /**
+     * This method is useful to determine if a macro can be expanded or not. Macros that don't generate any output are
+     * always displayed as collapsed because otherwise they would be invisible to the user.
+     * 
+     * @param container a macro container
+     * @return {@code true} if the specified macro has any output, {@code false} otherwise
+     */
+    public boolean hasOutput(Element container)
+    {
+        return getOutput(container) != null;
     }
 
     /**

@@ -19,10 +19,12 @@
  */
 package org.xwiki.gwt.wysiwyg.client.plugin.macro.exec;
 
+import org.xwiki.gwt.dom.client.DocumentFragment;
+import org.xwiki.gwt.dom.client.Element;
+import org.xwiki.gwt.user.client.ui.rta.cmd.Executable;
 import org.xwiki.gwt.user.client.ui.rta.cmd.internal.InsertHTMLExecutable;
 import org.xwiki.gwt.wysiwyg.client.plugin.macro.MacroPlugin;
 import org.xwiki.gwt.wysiwyg.client.plugin.macro.MacroSelector;
-
 
 /**
  * Inserts a new macro in the edited document or replaces an existing one.
@@ -54,9 +56,22 @@ public class InsertExecutable extends InsertHTMLExecutable
      */
     public boolean execute(String param)
     {
-        // We don't go through the command manager because we don't want to trigger the history mechanism.
-        return super.execute("<!--" + param + "--><!--stopmacro-->")
-            && rta.getCommandManager().getExecutable(MacroPlugin.REFRESH).execute(null);
+        // Prepare the macro markers.
+        DocumentFragment markers = rta.getDocument().createDocumentFragment();
+        markers.appendChild(rta.getDocument().createComment(param));
+        markers.appendChild(rta.getDocument().createComment("stopmacro"));
+        // Note: We refresh the rich text area after inserting the macro without going through the command manager
+        // because we don't want to trigger the history mechanism.
+        Executable refresh = rta.getCommandManager().getExecutable(MacroPlugin.REFRESH);
+        if (selector.getMacroCount() > 0) {
+            // Edit selected macro.
+            Element selectedMacro = selector.getMacro(0);
+            selectedMacro.getParentNode().replaceChild(markers, selectedMacro);
+            return refresh.execute(null);
+        } else {
+            // Insert a new macro.
+            return super.execute(markers) && refresh.execute(null);
+        }
     }
 
     /**
@@ -71,5 +86,16 @@ public class InsertExecutable extends InsertHTMLExecutable
         } else {
             return null;
         }
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see InsertHTMLExecutable#isExecuted()
+     */
+    @Override
+    public boolean isExecuted()
+    {
+        return selector.getMacroCount() > 0;
     }
 }

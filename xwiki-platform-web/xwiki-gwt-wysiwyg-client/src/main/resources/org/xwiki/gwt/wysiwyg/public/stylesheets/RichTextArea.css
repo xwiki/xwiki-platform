@@ -77,52 +77,63 @@ a:-moz-read-write {
 }
 a:hover:-moz-read-write {
   text-decoration: underline !important;
-} 
+}
+
+.readOnly {
+  /* Use a hidden border so that the read-only container is not resized when hovered. */
+  border: 1px dotted transparent;
+}
+
+.readOnly:hover {
+  /* Show the boundaries of a read-only region when hovering. */
+  border: 1px dotted #CCC;
+}
 
 .macro {
-  background-color: transparent;
-  border: 1px dashed #CCCCCC;
-  font-size: 100%;
-  /* Prevent vertical resizing in IE */
-  height: auto !important;
-  /* Remove button padding in IE */
-  overflow: visible;
-  padding: 1px;
-  text-align: left;
-  /* Prevent word wrapping inside a macro container in IE */
-  white-space: nowrap;
-}
-
-.macro-inline {
-  display: inline;
-  margin: 0px;
-  /* Prevent horizontal resizing in IE */
-  width: auto !important;
-}
-
-.macro-block {
-  display: block;
-  margin-right: auto;
-  /*
-    In IE6 the horizontal scroll bar appears even if we remove the padding and the border from the macro. In IE7 the
-    horizontal scroll bar appears when the macro is selected and the resize handlers are shown. Using a width of 99%
-    seems to prevent the horizontal scroll bar in IE.
-  */
-  width: 99% !important;
 }
 
 .macro-selected {
-  background-color: #E8F2FE;
+  background-color: AliceBlue;
+  border: 1px dotted #CCC;
 }
 
-.macro .macro-placeholder {
+.macro-collapsed {
+  border: 1px dotted #CCC;
+  padding: 2px;
+}
+
+.macro-block.macro-collapsed {
+  /* Separate two consecutive collapsed block macros. */
+  margin-top: 1px;
+}
+
+.macro-collapsed .macro-placeholder {
+  /* Show the macro content place-holder only when the macro is collapsed. */
+  display: inline !important;
+}
+
+.macro-collapsed .macro-output {
+  /* Hide the macro output when the macro is collapsed. */
+  display: none !important;
+}
+
+.macro .macro-placeholder .macro-icon {
   background-image: url(../images/macro.gif);
-  background-position: left center;
   background-repeat: no-repeat;
+  display: inline-block;
+  height: 16px;
+  padding-right: 2px;
+  vertical-align: middle;
+  width: 16px;
+}
+
+.main .macro .macro-placeholder {
   color: gray;
-  font-size: 87.5%;
-  font-style: italic;
-  padding-left: 20px;
+  /* Hide the macro content place-holder by default. Display it only when the macro is collapsed. */
+  display: none;
+  font-family: monospace;
+  /* Keep the macro icon and the macro name on the same line. */
+  white-space: nowrap;
 }
 
 .xEmbeddedObject {

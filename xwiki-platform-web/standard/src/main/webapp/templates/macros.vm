@@ -1963,7 +1963,7 @@ var $jsVarName = {
 #set($ok = $parameters.put('displayTabs', 'true'))
 #set($ok = $parameters.put('defaultEditor', 'wysiwyg'))
 #end
-#set($ok = $parameters.put('plugins', $xwiki.getXWikiPreference('wysiwyg.plugins', "submit line separator embed text valign list indent history format symbol link image table macro import#if($full && $request.sync) sync#end")))
+#set($ok = $parameters.put('plugins', $xwiki.getXWikiPreference('wysiwyg.plugins', "submit readonly line separator embed text valign list indent history format symbol link image table macro import#if($full && $request.sync) sync#end")))
 #set($ok = $parameters.put('menu', $xwiki.getXWikiPreference('wysiwyg.menu', 'link image table macro import')))
 #set($ok = $parameters.put('toolbar', $xwiki.getXWikiPreference('wysiwyg.toolbar', 'bold italic underline strikethrough | subscript superscript | unorderedlist orderedlist | outdent indent | undo redo | format | hr symbol | paste')))
 #set($ok = $parameters.put('wiki', $editedDocument.wiki))

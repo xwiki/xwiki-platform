@@ -35,6 +35,7 @@ import org.xwiki.gwt.wysiwyg.client.plugin.line.LinePluginFactory;
 import org.xwiki.gwt.wysiwyg.client.plugin.link.LinkPluginFactory;
 import org.xwiki.gwt.wysiwyg.client.plugin.list.ListPluginFactory;
 import org.xwiki.gwt.wysiwyg.client.plugin.macro.MacroPluginFactory;
+import org.xwiki.gwt.wysiwyg.client.plugin.readonly.ReadOnlyPluginFactory;
 import org.xwiki.gwt.wysiwyg.client.plugin.separator.SeparatorPluginFactory;
 import org.xwiki.gwt.wysiwyg.client.plugin.style.StylePluginFactory;
 import org.xwiki.gwt.wysiwyg.client.plugin.submit.SubmitPluginFactory;
@@ -83,6 +84,7 @@ public final class WysiwygEditorFactory
         // add additional SyntaxValidator for other syntaxes
 
         pfm = new DefaultPluginFactoryManager();
+        pfm.addPluginFactory(ReadOnlyPluginFactory.getInstance());
         pfm.addPluginFactory(LinePluginFactory.getInstance());
         pfm.addPluginFactory(SubmitPluginFactory.getInstance());
         pfm.addPluginFactory(SeparatorPluginFactory.getInstance());

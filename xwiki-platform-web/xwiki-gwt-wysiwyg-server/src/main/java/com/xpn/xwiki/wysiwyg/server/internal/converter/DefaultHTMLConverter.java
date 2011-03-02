@@ -28,12 +28,14 @@ import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.gwt.wysiwyg.client.cleaner.HTMLCleaner;
 import org.xwiki.gwt.wysiwyg.client.converter.HTMLConverter;
 import org.xwiki.rendering.block.XDOM;
+import org.xwiki.rendering.listener.MetaData;
 import org.xwiki.rendering.parser.Parser;
 import org.xwiki.rendering.parser.StreamParser;
 import org.xwiki.rendering.renderer.BlockRenderer;
 import org.xwiki.rendering.renderer.PrintRendererFactory;
 import org.xwiki.rendering.renderer.printer.DefaultWikiPrinter;
 import org.xwiki.rendering.renderer.printer.WikiPrinter;
+import org.xwiki.rendering.syntax.Syntax;
 import org.xwiki.rendering.syntax.SyntaxFactory;
 import org.xwiki.rendering.transformation.Transformation;
 import org.xwiki.rendering.transformation.TransformationContext;
@@ -157,7 +159,7 @@ public class DefaultHTMLConverter implements HTMLConverter
      * 
      * @see HTMLConverter#parseAndRender(String, String)
      */
-    public String parseAndRender(String dirtyHTML, String syntax)
+    public String parseAndRender(String dirtyHTML, String syntaxId)
     {
         try {
             // Clean
@@ -166,10 +168,16 @@ public class DefaultHTMLConverter implements HTMLConverter
             // Parse
             XDOM xdom = xhtmlParser.parse(new StringReader(html));
 
+            // The XHTML parser sets the "syntax" meta data property of the created XDOM to "xhtml/1.0". The syntax meta
+            // data is used as the default syntax for macro content. We have to change this to the specified syntax
+            // because HTML is used only to be able to edit the source syntax in the WYSIWYG editor.
+            Syntax syntax = syntaxFactory.createSyntaxFromIdString(syntaxId);
+            xdom.getMetaData().addMetaData(MetaData.SYNTAX, syntax);
+
             // Execute macro transformations
             TransformationContext txContext = new TransformationContext();
             txContext.setXDOM(xdom);
-            txContext.setSyntax(syntaxFactory.createSyntaxFromIdString(syntax));
+            txContext.setSyntax(syntax);
             macroTransformation.transform(xdom, txContext);
 
             // Render

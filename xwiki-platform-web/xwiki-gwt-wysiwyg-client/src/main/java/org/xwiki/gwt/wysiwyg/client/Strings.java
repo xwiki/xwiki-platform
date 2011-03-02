@@ -122,19 +122,33 @@ public interface Strings extends Constants
 
     String macroCollapse();
 
+    String macroCollapseShortcutKeyLabel();
+
     String macroCollapseAll();
+
+    String macroCollapseAllShortcutKeyLabel();
 
     String macroExpand();
 
+    String macroExpandShortcutKeyLabel();
+
     String macroExpandAll();
+
+    String macroExpandAllShortcutKeyLabel();
 
     String macroRefresh();
 
+    String macroRefreshShortcutKeyLabel();
+
     String macroEdit();
+
+    String macroEditShortcutKeyLabel();
 
     String macroEditDialogCaption();
 
     String macroInsert();
+
+    String macroInsertShortcutKeyLabel();
 
     String macroInsertDialogCaption();
 

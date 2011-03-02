@@ -26,7 +26,6 @@ import org.xwiki.gwt.dom.client.Element;
 import org.xwiki.gwt.user.client.ui.rta.cmd.internal.AbstractSelectionExecutable;
 import org.xwiki.gwt.wysiwyg.client.plugin.macro.MacroSelector;
 
-
 /**
  * Collapses or expands the selected macros or all the macros present in the edited document if no macros are selected.
  * 
@@ -97,7 +96,7 @@ public class CollapseExecutable extends AbstractSelectionExecutable
     public boolean isExecuted()
     {
         for (Element macro : getMacros()) {
-            if (selector.getDisplayer().isCollapsed(macro) != collapse) {
+            if (selector.getDisplayer().hasOutput(macro) && selector.getDisplayer().isCollapsed(macro) != collapse) {
                 return false;
             }
         }

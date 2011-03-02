@@ -20,6 +20,7 @@
 package org.xwiki.gwt.wysiwyg.client.plugin.macro;
 
 import org.xwiki.gwt.user.client.Config;
+import org.xwiki.gwt.user.client.ShortcutKeyManager;
 import org.xwiki.gwt.user.client.StringUtils;
 import org.xwiki.gwt.user.client.ui.rta.RichTextArea;
 import org.xwiki.gwt.user.client.ui.rta.cmd.Command;
@@ -28,16 +29,12 @@ import org.xwiki.gwt.wysiwyg.client.plugin.macro.exec.CollapseExecutable;
 import org.xwiki.gwt.wysiwyg.client.plugin.macro.exec.InsertExecutable;
 import org.xwiki.gwt.wysiwyg.client.plugin.macro.exec.RefreshExecutable;
 
-import com.google.gwt.core.client.GWT;
-import com.google.gwt.event.dom.client.DoubleClickEvent;
-import com.google.gwt.event.dom.client.DoubleClickHandler;
-
 /**
  * WYSIWYG editor plug-in for inserting macros and for editing macro parameters.
  * 
  * @version $Id$
  */
-public class MacroPlugin extends AbstractPlugin implements DoubleClickHandler
+public class MacroPlugin extends AbstractPlugin
 {
     /**
      * Rich text area command for refreshing macro output.
@@ -91,6 +88,16 @@ public class MacroPlugin extends AbstractPlugin implements DoubleClickHandler
     private final MacroServiceAsync macroService;
 
     /**
+     * The object that listens to rich text area events and performs actions on the existing macros.
+     */
+    private final MacroController macroControler;
+
+    /**
+     * The object used to register shortcut keys for the macro plug-in features.
+     */
+    private final ShortcutKeyManager shortcutKeyManager = new ShortcutKeyManager();
+
+    /**
      * Creates a new macro plug-in that uses the specified macro service.
      * 
      * @param macroService the macro service to be used for retrieving the macro descriptors
@@ -98,6 +105,7 @@ public class MacroPlugin extends AbstractPlugin implements DoubleClickHandler
     public MacroPlugin(MacroServiceAsync macroService)
     {
         this.macroService = macroService;
+        this.macroControler = new MacroController(this);
     }
 
     /**
@@ -109,8 +117,7 @@ public class MacroPlugin extends AbstractPlugin implements DoubleClickHandler
     {
         super.init(textArea, config);
 
-        displayer = GWT.create(MacroDisplayer.class);
-        displayer.setTextArea(getTextArea());
+        displayer = new MacroDisplayer(getTextArea());
         selector = new MacroSelector(displayer);
         wizard = new MacroWizard(displayer, config, macroService);
 
@@ -122,7 +129,8 @@ public class MacroPlugin extends AbstractPlugin implements DoubleClickHandler
         getTextArea().getCommandManager().registerCommand(EXPAND, new CollapseExecutable(selector, false));
         getTextArea().getCommandManager().registerCommand(INSERT, new InsertExecutable(selector));
 
-        saveRegistration(getTextArea().addDoubleClickHandler(this));
+        saveRegistrations(shortcutKeyManager.addHandlers(getTextArea()));
+        saveRegistrations(macroControler.addHadlers());
 
         menuExtension = new MacroMenuExtension(this);
         getUIExtensionList().add(menuExtension.getExtension());
@@ -142,6 +150,7 @@ public class MacroPlugin extends AbstractPlugin implements DoubleClickHandler
     {
         menuExtension.destroy();
         toolBarExtension.destroy();
+        shortcutKeyManager.clear();
 
         getTextArea().getCommandManager().unregisterCommand(REFRESH);
         getTextArea().getCommandManager().unregisterCommand(COLLAPSE);
@@ -169,6 +178,22 @@ public class MacroPlugin extends AbstractPlugin implements DoubleClickHandler
     }
 
     /**
+     * @return the object that can be used to register shortcut keys for macro plug-in features
+     */
+    ShortcutKeyManager getShortcutKeyManager()
+    {
+        return shortcutKeyManager;
+    }
+
+    /**
+     * @return the service used to retrieve the macro descriptors
+     */
+    public MacroServiceAsync getMacroService()
+    {
+        return macroService;
+    }
+
+    /**
      * Start the edit macro wizard.
      */
     public void edit()
@@ -192,17 +217,5 @@ public class MacroPlugin extends AbstractPlugin implements DoubleClickHandler
     public void insert(String macroId)
     {
         wizard.insert(macroId);
-    }
-
-    /**
-     * {@inheritDoc}
-     * 
-     * @see DoubleClickHandler#onDoubleClick(DoubleClickEvent)
-     */
-    public void onDoubleClick(DoubleClickEvent event)
-    {
-        if (event.getSource() == getTextArea() && getSelector().getMacroCount() == 1) {
-            edit();
-        }
     }
 }

@@ -20,11 +20,15 @@
 package org.xwiki.gwt.wysiwyg.client.plugin.macro;
 
 import java.util.ArrayList;
+import java.util.EnumSet;
 import java.util.List;
 
 import org.xwiki.gwt.user.client.DeferredUpdater;
 import org.xwiki.gwt.user.client.RichTextAreaCommand;
+import org.xwiki.gwt.user.client.ShortcutKey;
+import org.xwiki.gwt.user.client.ShortcutKeyCommand;
 import org.xwiki.gwt.user.client.Updatable;
+import org.xwiki.gwt.user.client.ShortcutKey.ModifierKey;
 import org.xwiki.gwt.user.client.ui.MenuBar;
 import org.xwiki.gwt.user.client.ui.MenuItem;
 import org.xwiki.gwt.user.client.ui.MenuListener;
@@ -32,6 +36,7 @@ import org.xwiki.gwt.wysiwyg.client.Images;
 import org.xwiki.gwt.wysiwyg.client.Strings;
 import org.xwiki.gwt.wysiwyg.client.plugin.internal.MenuItemUIExtension;
 
+import com.google.gwt.resources.client.ImageResource;
 import com.google.gwt.user.client.ui.MenuItemSeparator;
 import com.google.gwt.user.client.ui.UIObject;
 
@@ -109,15 +114,15 @@ public class MacroMenuExtension implements Updatable, MenuListener
         this.plugin = plugin;
 
         MenuItem refresh =
-            new MenuItem(Strings.INSTANCE.macroRefresh(), new RichTextAreaCommand(plugin.getTextArea(),
-                MacroPlugin.REFRESH, null, false));
-        refresh.setIcon(Images.INSTANCE.macroRefresh());
+            createMenuItem(Strings.INSTANCE.macroRefresh(), Strings.INSTANCE.macroRefreshShortcutKeyLabel(),
+                Images.INSTANCE.macroRefresh(), new RichTextAreaCommand(plugin.getTextArea(), MacroPlugin.REFRESH,
+                    null, false), 'R');
         collapse =
-            new MenuItem(Strings.INSTANCE.macroCollapseAll(), new RichTextAreaCommand(plugin.getTextArea(),
-                MacroPlugin.COLLAPSE));
+            createMenuItem(Strings.INSTANCE.macroCollapseAll(), Strings.INSTANCE.macroCollapseAllShortcutKeyLabel(),
+                null, new RichTextAreaCommand(plugin.getTextArea(), MacroPlugin.COLLAPSE), 'C');
         expand =
-            new MenuItem(Strings.INSTANCE.macroExpandAll(), new RichTextAreaCommand(plugin.getTextArea(),
-                MacroPlugin.EXPAND));
+            createMenuItem(Strings.INSTANCE.macroExpandAll(), Strings.INSTANCE.macroExpandAllShortcutKeyLabel(), null,
+                new RichTextAreaCommand(plugin.getTextArea(), MacroPlugin.EXPAND), 'E');
         edit = new MenuItem(Strings.INSTANCE.macroEdit(), new com.google.gwt.user.client.Command()
         {
             public void execute()
@@ -126,14 +131,18 @@ public class MacroMenuExtension implements Updatable, MenuListener
             }
         });
         edit.setIcon(Images.INSTANCE.macroEdit());
-        insert = new MenuItem(Strings.INSTANCE.macroInsert(), new com.google.gwt.user.client.Command()
-        {
-            public void execute()
-            {
-                plugin.insert();
-            }
-        });
-        insert.setIcon(Images.INSTANCE.macroInsert());
+        edit.setShortcutKeyLabel(Strings.INSTANCE.macroEditShortcutKeyLabel());
+        insert =
+            createMenuItem(Strings.INSTANCE.macroInsert(), Strings.INSTANCE.macroInsertShortcutKeyLabel(),
+                Images.INSTANCE.macroInsert(), new com.google.gwt.user.client.Command()
+                {
+                    public void execute()
+                    {
+                        if (plugin.getSelector().getMacroCount() <= 0) {
+                            plugin.insert();
+                        }
+                    }
+                }, 'M');
 
         insertSubMenuEntries = new ArrayList<UIObject>();
         insertSubMenuEntries.add(insert);
@@ -158,6 +167,30 @@ public class MacroMenuExtension implements Updatable, MenuListener
         macroMenuItem.addMenuListener(this);
 
         menuExtension.addFeature(MacroPluginFactory.getInstance().getPluginName(), macroMenuItem);
+    }
+
+    /**
+     * @param label the label of the menu item
+     * @param shortcutKeyLabel the text used to display the shortcut key associated with the created menu item
+     * @param icon the icon of the menu item
+     * @param command the command triggered by the returned menu item
+     * @param keyCode the shortcut key used to trigger the command associated with the returned menu item
+     * @return a new menu item
+     */
+    private MenuItem createMenuItem(String label, String shortcutKeyLabel, ImageResource icon,
+        com.google.gwt.user.client.Command command, char keyCode)
+    {
+        ShortcutKeyCommand shortcutKeyCommand = new ShortcutKeyCommand(command);
+        plugin.getShortcutKeyManager().put(new ShortcutKey(keyCode, EnumSet.of(ModifierKey.CTRL, ModifierKey.SHIFT)),
+            shortcutKeyCommand);
+        MenuItem menuItem = new MenuItem(label, shortcutKeyCommand);
+        if (icon != null) {
+            menuItem.setIcon(icon);
+        }
+        if (shortcutKeyLabel != null) {
+            menuItem.setShortcutKeyLabel(shortcutKeyLabel);
+        }
+        return menuItem;
     }
 
     /**
@@ -216,7 +249,9 @@ public class MacroMenuExtension implements Updatable, MenuListener
             }
             edit.setEnabled(plugin.getSelector().getMacroCount() == 1);
             collapse.setText(Strings.INSTANCE.macroCollapse());
+            collapse.setShortcutKeyLabel(Strings.INSTANCE.macroCollapseShortcutKeyLabel());
             expand.setText(Strings.INSTANCE.macroExpand());
+            expand.setShortcutKeyLabel(Strings.INSTANCE.macroExpandShortcutKeyLabel());
         } else {
             if (macroSubMenu.getItem(0) != insertSubMenuEntries.get(0)) {
                 macroSubMenu.clearItems();
@@ -224,7 +259,9 @@ public class MacroMenuExtension implements Updatable, MenuListener
             }
             insert.setEnabled(plugin.getTextArea().getCommandManager().isEnabled(MacroPlugin.INSERT));
             collapse.setText(Strings.INSTANCE.macroCollapseAll());
+            collapse.setShortcutKeyLabel(Strings.INSTANCE.macroCollapseAllShortcutKeyLabel());
             expand.setText(Strings.INSTANCE.macroExpandAll());
+            expand.setShortcutKeyLabel(Strings.INSTANCE.macroExpandAllShortcutKeyLabel());
         }
     }
 

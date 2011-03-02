@@ -32,14 +32,14 @@
   <define-linker name="StandardsMode" class="org.xwiki.gwt.core.linker.StandardsModeIFrameLinker" />
   <add-linker name="StandardsMode" />
 
-  <!-- MacroDisplayer -->
-  <replace-with class="org.xwiki.gwt.wysiwyg.client.plugin.macro.MacroDisplayer">
-    <when-type-is class="org.xwiki.gwt.wysiwyg.client.plugin.macro.MacroDisplayer" />
+  <!-- ReadOnlyPlugin -->
+  <replace-with class="org.xwiki.gwt.wysiwyg.client.plugin.readonly.ReadOnlyKeyboardHandler">
+    <when-type-is class="org.xwiki.gwt.wysiwyg.client.plugin.readonly.ReadOnlyKeyboardHandler" />
   </replace-with>
 
-  <replace-with class="org.xwiki.gwt.wysiwyg.client.plugin.macro.internal.MozillaMacroDisplayer">
-    <when-type-is class="org.xwiki.gwt.wysiwyg.client.plugin.macro.MacroDisplayer" />
-    <when-property-is name="user.agent" value="gecko1_8" />
+  <replace-with class="org.xwiki.gwt.wysiwyg.client.plugin.readonly.SafariReadOnlyKeyboardHandler">
+    <when-type-is class="org.xwiki.gwt.wysiwyg.client.plugin.readonly.ReadOnlyKeyboardHandler" />
+    <when-property-is name="user.agent" value="safari" />
   </replace-with>
 
   <!-- LinePlugin -->

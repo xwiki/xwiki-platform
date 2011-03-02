@@ -46,6 +46,7 @@ import com.xpn.xwiki.objects.classes.BaseClass;
 import com.xpn.xwiki.plugin.XWikiDefaultPlugin;
 import com.xpn.xwiki.plugin.XWikiPluginInterface;
 
+@Deprecated
 public class LDAPPlugin extends XWikiDefaultPlugin implements XWikiPluginInterface
 {
     private static final Log log = LogFactory.getLog(LDAPPlugin.class);

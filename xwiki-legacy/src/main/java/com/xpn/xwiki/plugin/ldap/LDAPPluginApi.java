@@ -29,6 +29,7 @@ import com.xpn.xwiki.api.Api;
 
 import java.util.HashMap;
 
+@Deprecated
 public class LDAPPluginApi extends Api {
         private LDAPPlugin plugin;
 

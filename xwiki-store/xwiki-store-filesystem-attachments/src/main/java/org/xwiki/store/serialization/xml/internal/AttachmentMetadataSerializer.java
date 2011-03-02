@@ -36,7 +36,7 @@ import org.xwiki.component.annotation.Component;
  * @since 3.0M2
  */
 @Component("attachment-meta/1.0")
-public class AttachmentMetadataSerializer extends AbstractXMLSerializer<XWikiAttachment>
+public class AttachmentMetadataSerializer extends AbstractXMLSerializer<XWikiAttachment, XWikiAttachment>
 {
     /** The root element for serialized element. */
     private static final String ROOT_ELEMENT_NAME = "attachment";

@@ -37,19 +37,20 @@ import org.xwiki.store.serialization.xml.XMLSerializer;
 /**
  * A Serializer which converts objects into XML Elements and back.
  *
- * @param <T> The class of object which the serializer can serialize.
+ * @param <R> The class of object which the serializer can serialize (what it requires).
+ * @param <P> The class of object which will be provided by this serializer when it parses data.
  * @version $Id$
  * @since 3.0M2
  */
 @ComponentRole()
-public abstract class AbstractXMLSerializer<T> implements XMLSerializer<T>
+public abstract class AbstractXMLSerializer<R, P extends R> implements XMLSerializer<R, P>
 {
     /**
      * {@inheritDoc}
      *
      * @see org.xwiki.store.filesystem.internal.XMLSerializer#serialize(T)
      */
-    public InputStream serialize(final T object) throws IOException
+    public InputStream serialize(final R object) throws IOException
     {
         // This puts everything on the heap for now.
         // if size becomes a major problem, the alternitive is to fork over another thread
@@ -82,7 +83,7 @@ public abstract class AbstractXMLSerializer<T> implements XMLSerializer<T>
      *
      * @see org.xwiki.store.filesystem.internal.XMLSerializer#parse(InputStream)
      */
-    public T parse(final InputStream stream) throws IOException
+    public P parse(final InputStream stream) throws IOException
     {
         final SAXReader reader = new SAXReader();
 

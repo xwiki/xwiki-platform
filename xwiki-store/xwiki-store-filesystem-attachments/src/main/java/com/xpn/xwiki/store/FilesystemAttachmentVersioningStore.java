@@ -22,6 +22,7 @@ package com.xpn.xwiki.store;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStream;
+import java.io.IOException;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.List;
 
@@ -57,7 +58,7 @@ public class FilesystemAttachmentVersioningStore implements AttachmentVersioning
 
     /** A serializer for the list of attachment metdata. */
     @Requirement("attachment-list-meta/1.0")
-    private Serializer<List<XWikiAttachment>> metaSerializer;
+    private Serializer<List<XWikiAttachment>, List<XWikiAttachment>> metaSerializer;
 
     /**
      * Testing Constructor.
@@ -66,7 +67,8 @@ public class FilesystemAttachmentVersioningStore implements AttachmentVersioning
      * @param metaSerializer a serializer for attachment versioning metadata.
      */
     public FilesystemAttachmentVersioningStore(final FilesystemStoreTools fileTools,
-                                               final Serializer<List<XWikiAttachment>> metaSerializer)
+                                               final Serializer<List<XWikiAttachment>,
+                                                                List<XWikiAttachment>> metaSerializer)
     {
         this.fileTools = fileTools;
         this.metaSerializer = metaSerializer;
@@ -87,7 +89,36 @@ public class FilesystemAttachmentVersioningStore implements AttachmentVersioning
                                               final boolean bTransaction)
         throws XWikiException
     {
-        final AttachmentFileProvider provider = this.fileTools.getAttachmentFileProvider(attachment);
+
+        try {
+            return this.loadArchive(attachment, this.fileTools.getAttachmentFileProvider(attachment));
+        } catch (Exception e) {
+            if (e instanceof XWikiException) {
+                throw (XWikiException) e;
+            }
+            final Object[] args = {attachment.getFilename(), UNKNOWN_NAME};
+            if (attachment.getDoc() != null) {
+                args[1] = attachment.getDoc().getFullName();
+            }
+            throw new XWikiException(XWikiException.MODULE_XWIKI_STORE,
+                                     XWikiException.ERROR_XWIKI_UNKNOWN,
+                                     "Exception while loading attachment archive {0} for document {1}",
+                                     e, args);
+        }
+    }
+
+    /**
+     * Load an attachment archive from a specified location.
+     *
+     * @param attachment the attachment to load the archive for.
+     * @param provider a means of gaining access to the location where the archive is stored.
+     * @return an XWikiAttachmentArchive for the given attachment.
+     * @throws IOException if the metadata cannot be found or there is a failure while parsing it.
+     */
+    XWikiAttachmentArchive loadArchive(final XWikiAttachment attachment,
+                                       final AttachmentFileProvider provider)
+        throws IOException
+    {
         final File metaFile = provider.getAttachmentVersioningMetaFile();
 
         // If no meta file then assume no archive and return an empty archive.
@@ -102,18 +133,6 @@ public class FilesystemAttachmentVersioningStore implements AttachmentVersioning
             final InputStream is = new FileInputStream(metaFile);
             attachList = this.metaSerializer.parse(is);
             is.close();
-        } catch (Exception e) {
-            if (e instanceof XWikiException) {
-                throw (XWikiException) e;
-            }
-            final Object[] args = {attachment.getFilename(), UNKNOWN_NAME};
-            if (attachment.getDoc() != null) {
-                args[1] = attachment.getDoc().getFullName();
-            }
-            throw new XWikiException(XWikiException.MODULE_XWIKI_STORE,
-                                     XWikiException.ERROR_XWIKI_UNKNOWN,
-                                     "Exception while loading attachment archive {0} for document {1}",
-                                     e, args);
         } finally {
             lock.readLock().unlock();
         }

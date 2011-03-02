@@ -20,8 +20,6 @@
 package com.xpn.xwiki.store;
 
 import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -36,6 +34,7 @@ import org.xwiki.store.serialization.Serializer;
 import org.xwiki.store.StartableTransactionRunnable;
 import org.xwiki.store.FileSaveTransactionRunnable;
 import org.xwiki.store.StreamProvider;
+import org.xwiki.store.serialization.SerializationStreamProvider;
 
 
 /**
@@ -64,7 +63,8 @@ public class AttachmentArchiveSaveRunnable extends StartableTransactionRunnable
     public AttachmentArchiveSaveRunnable(final XWikiAttachmentArchive archive,
                                          final FilesystemStoreTools fileTools,
                                          final AttachmentFileProvider provider,
-                                         final Serializer<List<XWikiAttachment>> serializer,
+                                         final Serializer<List<XWikiAttachment>,
+                                                          List<XWikiAttachment>> serializer,
                                          final XWikiContext context)
         throws XWikiException
     {
@@ -90,7 +90,7 @@ public class AttachmentArchiveSaveRunnable extends StartableTransactionRunnable
 
         // Then do the metadata.
         final StreamProvider metaProvider =
-            new AttachmentListMetadataStreamProvider(serializer, attachmentVersions);
+            new SerializationStreamProvider<List<XWikiAttachment>>(serializer, attachmentVersions);
         addSaver(metaProvider, fileTools, provider.getAttachmentVersioningMetaFile());
     }
 
@@ -110,41 +110,5 @@ public class AttachmentArchiveSaveRunnable extends StartableTransactionRunnable
                                         fileTools.getBackupFile(saveHere),
                                         fileTools.getLockForFile(saveHere),
                                         provider).runIn(this);
-    }
-
-    /**
-     * A stream provider based on the metadata for each attachment in a list.
-     * Used to save the metadata file for the list of attachments.
-     */
-    private static class AttachmentListMetadataStreamProvider implements StreamProvider
-    {
-        /** The serializer for converting the list of attachments into a stream of metadata. */
-        private final Serializer<List<XWikiAttachment>> serializer;
-
-        /** The list of attachments to get the stream of metadata from. */
-        private final List<XWikiAttachment> attachList;
-
-        /**
-         * The Constructor.
-         *
-         * @param serializer the serializer for converting the list of attachments into a stream of data.
-         * @param attachList the list of attachments to serialize.
-         */
-        public AttachmentListMetadataStreamProvider(final Serializer<List<XWikiAttachment>> serializer,
-                                                    final List<XWikiAttachment> attachList)
-        {
-            this.serializer = serializer;
-            this.attachList = attachList;
-        }
-
-        /**
-         * {@inheritDoc}
-         *
-         * @see StreamProvider#getStream()
-         */
-        public InputStream getStream() throws IOException
-        {
-            return this.serializer.serialize(this.attachList);
-        }
     }
 }

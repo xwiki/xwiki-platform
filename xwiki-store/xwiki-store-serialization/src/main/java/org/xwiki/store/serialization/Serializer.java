@@ -29,12 +29,13 @@ import org.xwiki.component.annotation.ComponentRole;
 /**
  * A generic thing for converting objects of a known type into InputStreams and back again.
  *
- * @param <T> The class of object which the serializer can serialize.
+ * @param <R> The class of object which the serializer can serialize (what it requires).
+ * @param <P> The class of object which will be provided by this serializer when it parses data.
  * @version $Id$
  * @since 3.0M2
  */
 @ComponentRole()
-public interface Serializer<T>
+public interface Serializer<R, P extends R>
 {
     /**
      * Parse an InputStream and create a new object.
@@ -45,7 +46,7 @@ public interface Serializer<T>
      *                     handled by this serializer, the object was serialized with
      *                     a different Serializer, or something goes wrong along the way.
      */
-    T parse(final InputStream stream) throws IOException;
+    P parse(final InputStream stream) throws IOException;
 
     /**
      * Serialize the given object and return an InputStream.
@@ -54,5 +55,5 @@ public interface Serializer<T>
      * @return an InputStream which can be used to create a new object using parse().
      * @throws IOException if something goes wrong while serializing.
      */
-    InputStream serialize(final T object) throws IOException;
+    InputStream serialize(R object) throws IOException;
 }

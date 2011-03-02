@@ -39,7 +39,7 @@ import org.xwiki.store.serialization.xml.XMLSerializer;
  * @version $Id$
  * @since 3.0M2
  */
-public class AbstractXMLSerializerTest extends AbstractXMLSerializer<Element>
+public class AbstractXMLSerializerTest extends AbstractXMLSerializer<Element, Element>
 {
     private static final String TEST_CONTENT =
         "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"

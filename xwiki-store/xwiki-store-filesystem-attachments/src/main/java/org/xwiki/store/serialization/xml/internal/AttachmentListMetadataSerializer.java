@@ -48,7 +48,8 @@ import org.xwiki.store.serialization.xml.XMLSerializer;
  * @since 3.0M2
  */
 @Component("attachment-list-meta/1.0")
-public class AttachmentListMetadataSerializer extends AbstractXMLSerializer<List<XWikiAttachment>>
+public class AttachmentListMetadataSerializer
+    extends AbstractXMLSerializer<List<XWikiAttachment>, List<XWikiAttachment>>
 {
     /** The root element for serialized element. */
     private static final String ROOT_ELEMENT_NAME = "attachment-list";
@@ -61,7 +62,7 @@ public class AttachmentListMetadataSerializer extends AbstractXMLSerializer<List
 
     /** Needed to serialize/parse the individual attachments. */
     @Requirement("attachment-meta/1.0")
-    private XMLSerializer<XWikiAttachment> attachSerializer;
+    private XMLSerializer<XWikiAttachment, XWikiAttachment> attachSerializer;
 
     /** Default constructor. For component manager. */
     public AttachmentListMetadataSerializer()
@@ -75,7 +76,8 @@ public class AttachmentListMetadataSerializer extends AbstractXMLSerializer<List
      *
      * @param attachSerializer the serializer used to serialize/parse the individual attachments.
      */
-    public AttachmentListMetadataSerializer(final XMLSerializer<XWikiAttachment> attachSerializer)
+    public AttachmentListMetadataSerializer(
+        final XMLSerializer<XWikiAttachment, XWikiAttachment> attachSerializer)
     {
         this.attachSerializer = attachSerializer;
     }
@@ -91,7 +93,7 @@ public class AttachmentListMetadataSerializer extends AbstractXMLSerializer<List
             throw new IOException("XML not recognizable as archive metadata, expecting <archive> tag");
         }
         if (!THIS_SERIALIZER.equals(docel.attribute(SERIALIZER_PARAM).getValue())) {
-            throw new IOException("Cannot parse this attchment archive metadata, it was saved with a "
+            throw new IOException("Cannot parse this attachment archive metadata, it was saved with a "
                                   + "different serializer.");
         }
         final List<XWikiAttachment> attachments = new ArrayList<XWikiAttachment>(docel.elements().size());

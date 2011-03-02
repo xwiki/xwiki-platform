@@ -31,12 +31,13 @@ import org.xwiki.store.serialization.Serializer;
 /**
  * A Serializer which converts objects into XML Elements and back.
  *
- * @param <T> The class of object which the serializer can serialize.
+ * @param <R> The class of object which the serializer can serialize (what it requires).
+ * @param <P> The class of object which will be provided by this serializer when it parses data.
  * @version $Id$
  * @since 3.0M2
  */
 @ComponentRole()
-public interface XMLSerializer<T> extends Serializer<T>
+public interface XMLSerializer<R, P extends R> extends Serializer<R, P>
 {
     /**
      * Deserialize from an XML Element.
@@ -45,7 +46,7 @@ public interface XMLSerializer<T> extends Serializer<T>
      * @return a new object made by deserializing the XML Element.
      * @throws IOException if something goes wrong.
      */
-    T parse(final Element xmlElement) throws IOException;
+    P parse(final Element xmlElement) throws IOException;
 
     /**
      * Serialize to an XMLWriter.
@@ -54,5 +55,5 @@ public interface XMLSerializer<T> extends Serializer<T>
      * @param writeTo write output to this.
      * @throws IOException if something goes wrong.
      */
-    void serialize(final T object, final XMLWriter writeTo) throws IOException;
+    void serialize(final R object, final XMLWriter writeTo) throws IOException;
 }

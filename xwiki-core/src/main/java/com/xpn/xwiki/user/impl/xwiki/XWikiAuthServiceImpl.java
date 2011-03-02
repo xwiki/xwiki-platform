@@ -49,7 +49,6 @@ import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.objects.classes.PasswordClass;
-import com.xpn.xwiki.plugin.ldap.LDAPPlugin;
 import com.xpn.xwiki.user.api.XWikiAuthService;
 import com.xpn.xwiki.user.api.XWikiUser;
 import com.xpn.xwiki.util.Util;
@@ -622,21 +621,7 @@ public class XWikiAuthServiceImpl extends AbstractXWikiAuthService
                     LOG.debug("User page does not exist for user " + user);
                 }
 
-                if ("ldap".equals(createuser)) {
-                    // Let's create the user from ldap
-                    LDAPPlugin ldapplugin = (LDAPPlugin) context.getWiki().getPlugin("ldap", context);
-                    if (ldapplugin != null) {
-                        if (LOG.isDebugEnabled()) {
-                            LOG.debug("Creating user from ldap for user " + user);
-                        }
-
-                        ldapplugin.createUserFromLDAP(wikiname, user, null, null, context);
-                    } else {
-                        if (LOG.isErrorEnabled()) {
-                            LOG.error("Impossible to create user from LDAP because LDAP plugin is not activated");
-                        }
-                    }
-                } else if ("empty".equals(createuser)) {
+                if ("empty".equals(createuser)) {
                     if (LOG.isDebugEnabled()) {
                         LOG.debug("Creating emptry user for user " + user);
                     }

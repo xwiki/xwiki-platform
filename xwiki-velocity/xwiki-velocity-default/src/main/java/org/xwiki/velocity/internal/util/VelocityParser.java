@@ -26,7 +26,7 @@ import org.xwiki.component.logging.AbstractLogEnabled;
 import org.xwiki.component.logging.Logger;
 
 /**
- * Provide helpers to parser velocity script.
+ * Provide helpers to parse velocity scripts.
  * 
  * @version $Id$
  */

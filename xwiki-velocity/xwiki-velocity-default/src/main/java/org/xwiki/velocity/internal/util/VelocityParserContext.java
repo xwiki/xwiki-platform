@@ -24,7 +24,7 @@ import java.util.Stack;
 import org.xwiki.velocity.internal.util.VelocityBlock.VelocityType;
 
 /**
- * Provided to {@link VelocityParser} helpers to return some informations.
+ * Provided to {@link VelocityParser} helpers to return some information.
  * 
  * @version $Id$
  */

@@ -46,7 +46,7 @@
     </dependency>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-core-velocity</artifactId>
+      <artifactId>xwiki-core-velocity-default</artifactId>
       <version>${project.version}</version>
       <scope>test</scope>
     </dependency>

@@ -3,7 +3,6 @@ package org.xwiki.velocity.introspection;
 import org.apache.velocity.util.introspection.Info;
 import org.apache.velocity.util.introspection.VelMethod;
 import org.apache.velocity.util.introspection.VelPropertyGet;
-import org.xwiki.velocity.introspection.AbstractChainableUberspector;
 
 public class TestingUberspector extends AbstractChainableUberspector
 {

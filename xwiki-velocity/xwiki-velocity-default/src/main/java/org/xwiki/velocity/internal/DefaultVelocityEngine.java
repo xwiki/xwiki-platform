@@ -16,7 +16,6 @@
  * License along with this software; if not, write to the Free
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
- *
  */
 package org.xwiki.velocity.internal;
 
@@ -39,9 +38,7 @@ import org.xwiki.component.annotation.InstantiationStrategy;
 import org.xwiki.component.annotation.Requirement;
 import org.xwiki.component.descriptor.ComponentInstantiationStrategy;
 import org.xwiki.component.logging.AbstractLogEnabled;
-import org.xwiki.container.ApplicationContext;
-import org.xwiki.container.Container;
-import org.xwiki.container.servlet.ServletApplicationContext;
+import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.velocity.VelocityConfiguration;
 import org.xwiki.velocity.VelocityEngine;
 import org.xwiki.velocity.XWikiVelocityException;
@@ -58,15 +55,11 @@ import org.xwiki.velocity.XWikiVelocityException;
 public class DefaultVelocityEngine extends AbstractLogEnabled implements VelocityEngine, LogChute
 {
     /**
-     * The name of the Velocity configuration property that specifies the ResourceLoader that Velocity should use when
-     * locating velocimacros.
+     * Used to set it as a Velocity Application Attribute so that Velocity extensions done by XWiki can use it to
+     * lookup other components.
      */
-    private static final String RESOURCE_LOADER = "resource.loader";
-
-    /**
-     * The Velocity engine we're wrapping.
-     */
-    private org.apache.velocity.app.VelocityEngine engine;
+    @Requirement
+    private ComponentManager componentManager;
 
     /**
      * Velocity configuration to get the list of configured Velocity properties.
@@ -75,11 +68,9 @@ public class DefaultVelocityEngine extends AbstractLogEnabled implements Velocit
     private VelocityConfiguration velocityConfiguration;
 
     /**
-     * The Container component. We need it in order to store the ServletContext as a property in the Application Context
-     * so that the Velocity Tools WebappLoader can find it.
+     * The Velocity engine we're wrapping.
      */
-    @Requirement
-    private Container container;
+    private org.apache.velocity.app.VelocityEngine engine;
 
     /**
      * See the comment in {@link #init(org.apache.velocity.runtime.RuntimeServices)}.
@@ -94,59 +85,60 @@ public class DefaultVelocityEngine extends AbstractLogEnabled implements Velocit
      * 
      * @see VelocityEngine#initialize(Properties)
      */
-    public void initialize(Properties properties) throws XWikiVelocityException
+    public void initialize(Properties overridingProperties) throws XWikiVelocityException
     {
-        this.engine = new org.apache.velocity.app.VelocityEngine();
+        org.apache.velocity.app.VelocityEngine velocityEngine = new org.apache.velocity.app.VelocityEngine();
 
-        Properties velocityProperties = this.velocityConfiguration.getProperties();
+        // Add the Component Manager to allow Velocity extensions to lookup components.
+        velocityEngine.setApplicationAttribute(ComponentManager.class.getName(), this.componentManager);
 
-        // If the Velocity configuration uses the
-        // <code>org.apache.velocity.tools.view.servlet.WebappLoader</code> Velocity Tools class
-        // then we need to set the ServletContext object as a Velocity Application Attribute as
-        // it's used to load resources from the webapp directory in WebapLoader.
-        String resourceLoader =
-            properties.getProperty(RESOURCE_LOADER, velocityProperties.getProperty(RESOURCE_LOADER));
-        if (resourceLoader != null && resourceLoader.equals("webapp")) {
-            ApplicationContext context = this.container.getApplicationContext();
-            if (context instanceof ServletApplicationContext) {
-                getEngine().setApplicationAttribute("javax.servlet.ServletContext",
-                    ((ServletApplicationContext) context).getServletContext());
-            }
+        initializeProperties(velocityEngine, this.velocityConfiguration.getProperties(), overridingProperties);
+
+        try {
+            velocityEngine.init();
+        } catch (Exception e) {
+            throw new XWikiVelocityException("Cannot start the Velocity engine", e);
         }
 
+        this.engine = velocityEngine;
+    }
+
+    /**
+     * @param velocityEngine the Velocity engine against which to initialize Velocity properties
+     * @param configurationProperties the Velocity properties coming from XWiki's configuration
+     * @param overridingProperties the Velocity properties that override the properties coming from XWiki's
+     *        configuration
+     */
+    private void initializeProperties(org.apache.velocity.app.VelocityEngine velocityEngine,
+        Properties configurationProperties, Properties overridingProperties)
+    {
         // Avoid "unable to find resource 'VM_global_library.vm' in any resource loader." if no
         // Velocimacro library is defined. This value is overriden below.
-        getEngine().setProperty("velocimacro.library", "");
+        velocityEngine.setProperty("velocimacro.library", "");
 
-        getEngine().setProperty(RuntimeConstants.RUNTIME_LOG_LOGSYSTEM, this);
+        velocityEngine.setProperty(RuntimeConstants.RUNTIME_LOG_LOGSYSTEM, this);
 
         // Configure Velocity by passing the properties defined in this component's configuration
-        if (velocityProperties != null) {
-            for (Enumeration< ? > e = velocityProperties.propertyNames(); e.hasMoreElements();) {
+        if (configurationProperties != null) {
+            for (Enumeration< ? > e = configurationProperties.propertyNames(); e.hasMoreElements();) {
                 String key = e.nextElement().toString();
                 // Only set a property if it's not overridden by one of the passed properties
-                if (!properties.containsKey(key)) {
-                    String value = velocityProperties.getProperty(key);
-                    getEngine().setProperty(key, value);
+                if (!overridingProperties.containsKey(key)) {
+                    String value = configurationProperties.getProperty(key);
+                    velocityEngine.setProperty(key, value);
                     getLogger().debug("Setting property [" + key + "] = [" + value + "]");
                 }
             }
         }
 
         // Override the component's static properties with the ones passed in parameter
-        if (properties != null) {
-            for (Enumeration< ? > e = properties.propertyNames(); e.hasMoreElements();) {
+        if (overridingProperties != null) {
+            for (Enumeration< ? > e = overridingProperties.propertyNames(); e.hasMoreElements();) {
                 String key = e.nextElement().toString();
-                String value = properties.getProperty(key);
-                getEngine().setProperty(key, value);
+                String value = overridingProperties.getProperty(key);
+                velocityEngine.setProperty(key, value);
                 getLogger().debug("Overriding property [" + key + "] = [" + value + "]");
             }
-        }
-
-        try {
-            getEngine().init();
-        } catch (Exception e) {
-            throw new XWikiVelocityException("Cannot start the Velocity engine", e);
         }
     }
 
@@ -258,17 +250,6 @@ public class DefaultVelocityEngine extends AbstractLogEnabled implements Velocit
                 this.namespaceUsageCount.put(namespace, count);
             }
         }
-    }
-
-    /**
-     * Provides access to the {@link org.apache.velocity.app.VelocityEngine Velocity Engine}, which can be used to call
-     * all Velocity services.
-     * 
-     * @return the initialized Velocity engine
-     */
-    private org.apache.velocity.app.VelocityEngine getEngine()
-    {
-        return this.engine;
     }
 
     /**

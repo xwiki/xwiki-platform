@@ -31,10 +31,12 @@ import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.Requirement;
 import org.xwiki.context.Execution;
 import org.xwiki.rendering.syntax.SyntaxFactory;
+import org.xwiki.velocity.VelocityConfiguration;
 import org.xwiki.velocity.VelocityEngine;
 import org.xwiki.velocity.VelocityFactory;
 import org.xwiki.velocity.VelocityManager;
 import org.xwiki.velocity.XWikiVelocityException;
+import org.xwiki.velocity.XWikiWebappResourceLoader;
 import org.xwiki.velocity.internal.VelocityExecutionContextInitializer;
 
 import com.xpn.xwiki.XWikiContext;
@@ -53,6 +55,18 @@ import com.xpn.xwiki.web.Utils;
 @Component
 public class DefaultVelocityManager implements VelocityManager
 {
+    /**
+     * The name of the Velocity configuration property that specifies the ResourceLoader name that Velocity should use
+     * when locating templates.
+     */
+    private static final String RESOURCE_LOADER = "resource.loader";
+
+    /**
+     * The name of the Velocity configuration property that specifies the ResourceLoader class to use to locate
+     * Velocity templates.
+     */
+    private static final String RESOURCE_LOADER_CLASS = "xwiki.resource.loader.class";
+
     /**
      * Store one VelocityEngine instance per skin since a skin is allowed to have a global velocimacro macros.vm file.
      */
@@ -184,6 +198,13 @@ public class DefaultVelocityManager implements VelocityManager
         } else {
             // Gather the global Velocity macros that we want to have. These are skin dependent.
             Properties properties = new Properties();
+
+            // If the user hasn't specified any custom Velocity Resource Loader to use, use the XWiki Resource Loader
+            if (!Utils.getComponent(VelocityConfiguration.class).getProperties().containsKey(RESOURCE_LOADER)) {
+                properties.setProperty(RESOURCE_LOADER, "xwiki");
+                properties.setProperty(RESOURCE_LOADER_CLASS, XWikiWebappResourceLoader.class.getName());
+            }
+
             // Note: if you don't want any template to be used set the property named
             // xwiki.render.velocity.macrolist to an empty string value.
             String macroList = xcontext.getWiki().Param("xwiki.render.velocity.macrolist");

@@ -26,7 +26,6 @@ import org.apache.velocity.tools.generic.ListTool;
 import org.apache.velocity.tools.generic.MathTool;
 import org.apache.velocity.tools.generic.NumberTool;
 import org.apache.velocity.tools.generic.SortTool;
-import org.apache.velocity.tools.view.servlet.WebappLoader;
 import org.apache.velocity.util.introspection.SecureUberspector;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.Requirement;
@@ -64,6 +63,7 @@ public class DefaultVelocityConfiguration implements Initializable, VelocityConf
      */
     private Properties defaultTools = new Properties();
 
+
     /**
      * Default properties.
      */
@@ -86,9 +86,7 @@ public class DefaultVelocityConfiguration implements Initializable, VelocityConf
         this.defaultTools.setProperty("regextool", RegexTool.class.getName());
 
         // Default Velocity properties
-        this.defaultProperties.setProperty("resource.loader", "webapp");
         this.defaultProperties.setProperty("directive.set.null.allowed", Boolean.TRUE.toString());
-        this.defaultProperties.setProperty("webapp.resource.loader.class", WebappLoader.class.getName());
         this.defaultProperties.setProperty("velocimacro.messages.on", Boolean.FALSE.toString());
         this.defaultProperties.setProperty("velocimacro.max.depth", "100");
         this.defaultProperties.setProperty("resource.manager.logwhenfound", Boolean.FALSE.toString());

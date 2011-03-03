@@ -337,12 +337,13 @@ public class XWikiDocumentRenderingTest extends AbstractBridgedXWikiComponentTes
         Mock mockVelocityManager = registerMockComponent(VelocityManager.class);
         mockVelocityManager.stubs().method("getVelocityContext").will(returnValue(vcontext));
 
-        VelocityEngine vengine =
-            getComponentManager().lookup(VelocityFactory.class).createVelocityEngine("default", new Properties());
+        VelocityEngine vengine = getComponentManager().lookup(VelocityFactory.class).createVelocityEngine(
+            "default", new Properties());
         // Save the number of cached macro templates in the Velocity engine so that we can compare after the
         // document is rendered.
         JMXVelocityEngineMBean mbean = new JMXVelocityEngine(vengine);
         int cachedMacroNamespaceSize = mbean.getTemplates().values().size();
+        assertTrue(cachedMacroNamespaceSize > 0);
 
         mockVelocityManager.stubs().method("getVelocityEngine").will(returnValue(vengine));
 

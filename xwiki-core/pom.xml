@@ -518,7 +518,7 @@
     </dependency>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-core-velocity-default</artifactId>
+      <artifactId>xwiki-core-velocity-webapp</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>

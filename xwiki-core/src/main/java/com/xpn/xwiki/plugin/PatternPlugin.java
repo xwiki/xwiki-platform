@@ -34,7 +34,7 @@ import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.observation.EventListener;
 import org.xwiki.observation.ObservationManager;
 import org.xwiki.observation.event.Event;
-import org.xwiki.xml.internal.XMLScriptService;
+import org.xwiki.xml.XMLUtils;
 
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
@@ -246,11 +246,11 @@ public class PatternPlugin extends XWikiDefaultPlugin implements EventListener
         synchronized (this.patterns) {
             for (int i = 0; i < this.patterns.size(); ++i) {
                 list.append("<tr><td>");
-                list.append(XMLScriptService.escape(this.patterns.get(i)));
+                list.append(XMLUtils.escape(this.patterns.get(i)));
                 list.append("</td><td>");
-                list.append(XMLScriptService.escape(this.results.get(i)));
+                list.append(XMLUtils.escape(this.results.get(i)));
                 list.append("</td> <td>");
-                list.append(XMLScriptService.escape(this.descriptions.get(i)));
+                list.append(XMLUtils.escape(this.descriptions.get(i)));
                 list.append("</td></tr>");
             }
             list.append("</tbody></table>");

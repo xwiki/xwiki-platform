@@ -44,7 +44,7 @@ import org.apache.log4j.MDC;
 import org.apache.struts.upload.MultipartRequestWrapper;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
-import org.xwiki.xml.internal.XMLScriptService;
+import org.xwiki.xml.XMLUtils;
 
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
@@ -516,12 +516,12 @@ public class Utils
      * 
      * @param value the text to escape, may be null
      * @return a new escaped <code>String</code>, <code>null</code> if null input
-     * @deprecated starting with 2.7 use {@link XMLScriptService#escape(Object) $services.xml.escape(content)}
+     * @deprecated starting with 2.7 use {@link XMLUtils#escape(Object) $services.xml.escape(content)}
      */
     @Deprecated
     public static String formEncode(String value)
     {
-        return XMLScriptService.escape(value);
+        return XMLUtils.escape(value);
     }
 
     public static String SQLFilter(String text)

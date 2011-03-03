@@ -117,7 +117,7 @@ import org.xwiki.rendering.syntax.Syntax;
 import org.xwiki.rendering.syntax.SyntaxFactory;
 import org.xwiki.url.XWikiEntityURL;
 import org.xwiki.url.standard.XWikiURLBuilder;
-import org.xwiki.xml.internal.XMLScriptService;
+import org.xwiki.xml.XMLUtils;
 
 import com.xpn.xwiki.api.Api;
 import com.xpn.xwiki.api.Document;
@@ -5765,12 +5765,12 @@ public class XWiki implements XWikiDocChangeNotificationInterface, EventListener
         try {
             userdoc = getDocument(user, context);
             if (userdoc == null) {
-                return XMLScriptService.escape(user);
+                return XMLUtils.escape(user);
             }
 
             BaseObject userobj = userdoc.getObject("XWiki.XWikiUsers");
             if (userobj == null) {
-                return XMLScriptService.escape(userdoc.getDocumentReference().getName());
+                return XMLUtils.escape(userdoc.getDocumentReference().getName());
             }
 
             Set<String> proplist = userobj.getPropertyList();
@@ -5790,7 +5790,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface, EventListener
                     + context.getDoc().getDocumentReference() + ">", vcontext, context);
             }
 
-            text = XMLScriptService.escape(text.trim());
+            text = XMLUtils.escape(text.trim());
 
             if (link) {
                 text = "<span class=\"wikilink\"><a href=\"" + userdoc.getURL("view", context) + "\">" + text

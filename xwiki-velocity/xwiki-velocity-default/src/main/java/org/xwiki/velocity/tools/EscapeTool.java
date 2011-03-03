@@ -17,10 +17,9 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-
 package org.xwiki.velocity.tools;
 
-import org.xwiki.xml.internal.XMLScriptService;
+import org.xwiki.xml.XMLUtils;
 
 /**
  * <p>
@@ -47,6 +46,6 @@ public class EscapeTool extends org.apache.velocity.tools.generic.EscapeTool
     @Override
     public String xml(Object content)
     {
-        return XMLScriptService.escape(content);
+        return XMLUtils.escape(content);
     }
 }

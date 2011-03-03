@@ -23,7 +23,6 @@ import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.io.StringReader;
 import java.io.StringWriter;
-import java.util.regex.Pattern;
 
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
@@ -61,36 +60,6 @@ public class XMLScriptService implements ScriptService
     /** Xerces configuration parameter for disabling fetching and checking XMLs against their DTD. */
     private static final String DISABLE_DTD_PARAM = "http://apache.org/xml/features/nonvalidating/load-external-dtd";
 
-    /** XML encoding of the "ampersand" character. */
-    private static final String AMP = "&#38;";
-
-    /** Regular expression recognizing XML-escaped "ampersand" characters. */
-    private static final Pattern AMP_PATTERN = Pattern.compile("&(?:amp|#0*+38|#x0*+26);");
-
-    /** XML encoding of the "single quote" character. */
-    private static final String APOS = "&#39;";
-
-    /** Regular expression recognizing XML-escaped "single quote" characters. */
-    private static final Pattern APOS_PATTERN = Pattern.compile("&(?:apos|#0*+39|#x0*+27);");
-
-    /** XML encoding of the "double quote" character. */
-    private static final String QUOT = "&#34;";
-
-    /** Regular expression recognizing XML-escaped "double quote" characters. */
-    private static final Pattern QUOT_PATTERN = Pattern.compile("&(?:quot|#0*+34|#x0*+22);");
-
-    /** XML encoding of the "less than" character. */
-    private static final String LT = "&#60;";
-
-    /** Regular expression recognizing XML-escaped "less than" characters. */
-    private static final Pattern LT_PATTERN = Pattern.compile("&(?:lt|#0*+60|#x0*+3[cC]);");
-
-    /** XML encoding of the "greater than" character. */
-    private static final String GT = "&#62;";
-
-    /** Regular expression recognizing XML-escaped "greater than" characters. */
-    private static final Pattern GT_PATTERN = Pattern.compile("&(?:gt|#0*+62|#x0*+3[eE]);");
-
     /** Helper object for manipulating DOM Level 3 Load and Save APIs. */
     private DOMImplementationLS lsImpl;
 
@@ -104,117 +73,6 @@ public class XMLScriptService implements ScriptService
         } catch (Exception ex) {
             LOG.warn("Cannot initialize the XML Script Service", ex);
         }
-    }
-
-    /**
-     * Escapes all the XML special characters in a <code>String</code> using numerical XML entities. Specifically,
-     * escapes &lt;, &gt;, ", ' and &amp;.
-     * 
-     * @param content the text to escape, may be {@code null}
-     * @return a new escaped {@code String}, {@code null} if {@code null} input
-     */
-    public static String escape(Object content)
-    {
-        return escapeForAttributeValue(content);
-    }
-
-    /**
-     * Escapes all the XML special characters in a <code>String</code> using numerical XML entities, so that the
-     * resulting string can safely be used as an XML attribute value. Specifically, escapes &lt;, &gt;, ", ' and &amp;.
-     * 
-     * @param content the text to escape, may be {@code null}
-     * @return a new escaped {@code String}, {@code null} if {@code null} input
-     */
-    public static String escapeForAttributeValue(Object content)
-    {
-        if (content == null) {
-            return null;
-        }
-        String str = String.valueOf(content);
-        StringBuilder result = new StringBuilder((int) (str.length() * 1.1));
-        int length = str.length();
-        char c;
-        for (int i = 0; i < length; ++i) {
-            c = str.charAt(i);
-            switch (c) {
-                case '&':
-                    result.append(AMP);
-                    break;
-                case '\'':
-                    result.append(APOS);
-                    break;
-                case '"':
-                    result.append(QUOT);
-                    break;
-                case '<':
-                    result.append(LT);
-                    break;
-                case '>':
-                    result.append(GT);
-                    break;
-                default:
-                    result.append(c);
-            }
-        }
-        return result.toString();
-    }
-
-    /**
-     * Escapes the XML special characters in a <code>String</code> using numerical XML entities, so that the resulting
-     * string can safely be used as an XML text node. Specifically, escapes &lt;, &gt;, and &amp;.
-     * 
-     * @param content the text to escape, may be {@code null}
-     * @return a new escaped {@code String}, {@code null} if {@code null} input
-     */
-    public static String escapeForElementContent(Object content)
-    {
-        if (content == null) {
-            return null;
-        }
-        String str = String.valueOf(content);
-        StringBuilder result = new StringBuilder((int) (str.length() * 1.1));
-        int length = str.length();
-        char c;
-        for (int i = 0; i < length; ++i) {
-            c = str.charAt(i);
-            switch (c) {
-                case '&':
-                    result.append(AMP);
-                    break;
-                case '<':
-                    result.append(LT);
-                    break;
-                case '>':
-                    result.append(GT);
-                    break;
-                default:
-                    result.append(c);
-            }
-        }
-        return result.toString();
-    }
-
-    /**
-     * Unescape encoded special XML characters. Only &gt;, &lt; &amp;, " and ' are unescaped, since they are the only
-     * ones that affect the resulting markup.
-     * 
-     * @param content the text to decode, may be {@code null}
-     * @return unescaped content, {@code null} if {@code null} input
-     */
-    public static String unescape(Object content)
-    {
-        if (content == null) {
-            return null;
-        }
-        String str = String.valueOf(content);
-
-        str = APOS_PATTERN.matcher(str).replaceAll("'");
-        str = QUOT_PATTERN.matcher(str).replaceAll("\"");
-        str = LT_PATTERN.matcher(str).replaceAll("<");
-        str = GT_PATTERN.matcher(str).replaceAll(">");
-        str = AMP_PATTERN.matcher(str).replaceAll("&");
-
-        return str;
     }
 
     /**

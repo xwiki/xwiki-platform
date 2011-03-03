@@ -20,7 +20,7 @@
  */
 package com.xpn.xwiki.api;
 
-import org.xwiki.xml.internal.XMLScriptService;
+import org.xwiki.xml.XMLUtils;
 
 import com.xpn.xwiki.api.XWiki;
 import com.xpn.xwiki.api.Util;
@@ -649,7 +649,7 @@ public privileged aspect XWikiCompatibilityAspect
     @Deprecated
     public String XWiki.getFormEncoded(String content)
     {
-        return XMLScriptService.escape(content);
+        return XMLUtils.escape(content);
     }
 
     /**
@@ -663,6 +663,6 @@ public privileged aspect XWikiCompatibilityAspect
     @Deprecated
     public String XWiki.getXMLEncoded(String content)
     {
-        return XMLScriptService.escape(content);
+        return XMLUtils.escape(content);
     }
 }

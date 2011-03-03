@@ -40,7 +40,7 @@ import org.xwiki.cache.DisposableCacheValue;
 import org.xwiki.cache.config.CacheConfiguration;
 import org.xwiki.cache.eviction.LRUEvictionConfiguration;
 import org.xwiki.component.manager.ComponentLookupException;
-import org.xwiki.xml.internal.XMLScriptService;
+import org.xwiki.xml.XMLUtils;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
@@ -223,7 +223,7 @@ public class XWikiGroovyRenderer implements XWikiRenderer, XWikiInterpreter
             XWikiException xe = new XWikiException(XWikiException.MODULE_XWIKI_RENDERING,
                 XWikiException.ERROR_XWIKI_RENDERING_GROOVY_EXCEPTION, "Error while parsing groovy page {0}", e, args);
             title = xe.getMessage();
-            text = XMLScriptService.escape(xe.getFullMessage());
+            text = XMLUtils.escape(xe.getFullMessage());
 
             return "<a href=\"\" onclick=\"document.getElementById('xwikierror').style.display='block'; return false;\">"
                 + title

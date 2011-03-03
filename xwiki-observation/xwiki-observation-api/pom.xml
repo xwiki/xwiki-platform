@@ -40,8 +40,8 @@
   <description>XWiki Platform - Core - Observation - API</description>
   <dependencies>
     <dependency>
-      <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-core-component-api</artifactId>
+      <groupId>org.xwiki.commons</groupId>
+      <artifactId>xwiki-commons-component-api</artifactId>
       <version>${project.version}</version>
     </dependency>
   </dependencies>

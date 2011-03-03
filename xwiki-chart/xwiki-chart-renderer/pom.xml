@@ -33,8 +33,8 @@
   <description>XWiki component for rendering charts into images</description>
   <dependencies>
     <dependency>
-      <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-core-component-api</artifactId>
+      <groupId>org.xwiki.commons</groupId>
+      <artifactId>xwiki-commons-component-api</artifactId>
       <version>${project.version}</version>
     </dependency>  
     <dependency>

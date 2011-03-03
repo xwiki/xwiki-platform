@@ -45,6 +45,12 @@ public class JsSkinFileExtensionPlugin extends AbstractSkinExtensionPlugin
     public static final String PLUGIN_NAME = "jsfx";
 
     /**
+     * The name of the preference (in the configuration file) specifying what is the default value of the defer, in case
+     * nothing is specified in the parameters of this extension.
+     */
+    public static final String DEFER_DEFAULT_PARAM = "xwiki.plugins.skinx.deferred.default";
+
+    /**
      * XWiki plugin constructor.
      * 
      * @param name The name of the plugin, which can be used for retrieving the plugin API from velocity. Unused.
@@ -96,7 +102,10 @@ public class JsSkinFileExtensionPlugin extends AbstractSkinExtensionPlugin
                 result.append("?").append(parameters);
             }
         }
-        if (BooleanUtils.toBooleanDefaultIfNull((Boolean) getParameter("defer", filename, context), true)) {
+        // check if js should be deferred, defaults to the preference configured in the cfg file, which defaults to true
+        String defaultDeferString = context.getWiki().Param(DEFER_DEFAULT_PARAM);
+        Boolean defaultDefer = (!StringUtils.isEmpty(defaultDeferString)) ? Boolean.valueOf(defaultDeferString) : true;
+        if (BooleanUtils.toBooleanDefaultIfNull((Boolean) getParameter("defer", filename, context), defaultDefer)) {
             result.append("' defer='defer");
         }
         result.append("'></script>\n");

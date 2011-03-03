@@ -21,6 +21,7 @@
 package com.xpn.xwiki.plugin.skinx;
 
 import org.apache.commons.lang.BooleanUtils;
+import org.apache.commons.lang.StringUtils;
 
 import com.xpn.xwiki.XWikiContext;
 
@@ -32,6 +33,12 @@ import com.xpn.xwiki.XWikiContext;
  */
 public class JsResourceSkinExtensionPlugin extends AbstractResourceSkinExtensionPlugin
 {
+    /**
+     * The name of the preference (in the configuration file) specifying what is the default value of the defer, in case
+     * nothing is specified in the parameters of this extension.
+     */
+    public static final String DEFER_DEFAULT_PARAM = "xwiki.plugins.skinx.deferred.default";
+
     /**
      * XWiki plugin constructor.
      * 
@@ -76,7 +83,10 @@ public class JsResourceSkinExtensionPlugin extends AbstractResourceSkinExtension
     protected String generateLink(String url, String resourceName, XWikiContext context)
     {
         StringBuilder result = new StringBuilder("<script type='text/javascript' src='").append(url).append("'");
-        if (BooleanUtils.toBooleanDefaultIfNull((Boolean) getParameter("defer", resourceName, context), true)) {
+        // check if js should be deferred, defaults to the preference configured in the cfg file, which defaults to true
+        String defaultDeferString = context.getWiki().Param(DEFER_DEFAULT_PARAM);
+        Boolean defaultDefer = (!StringUtils.isEmpty(defaultDeferString)) ? Boolean.valueOf(defaultDeferString) : true;
+        if (BooleanUtils.toBooleanDefaultIfNull((Boolean) getParameter("defer", resourceName, context), defaultDefer)) {
             result.append(" defer='defer'");
         }
         result.append("></script>\n");

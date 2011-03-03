@@ -19,16 +19,9 @@
  */
 package org.xwiki.test;
 
-import java.io.File;
-import java.io.InputStream;
-import java.net.MalformedURLException;
-import java.net.URL;
-
 import org.xwiki.component.descriptor.DefaultComponentDescriptor;
 import org.xwiki.component.embed.EmbeddableComponentManager;
 import org.xwiki.configuration.ConfigurationSource;
-import org.xwiki.container.ApplicationContext;
-import org.xwiki.container.Container;
 import org.xwiki.context.Execution;
 import org.xwiki.context.ExecutionContext;
 import org.xwiki.context.ExecutionContextManager;
@@ -43,38 +36,6 @@ public class XWikiComponentInitializer
     private EmbeddableComponentManager componentManager;
 
     private MockConfigurationSource configurationSource;
-
-    /**
-     * This method should be called before {@link #initializeExecution()} since some components will require the
-     * Container component to be set up (for example to access resource such as the XWikiconfiguration file).
-     */
-    public void initializeContainer() throws Exception
-    {
-        Container container = getComponentManager().lookup(Container.class);
-
-        // We set up a default stubbed ApplicationContext implementation. Tests that need a more controlled
-        // version can use Mocks and call setApplicationContext(), setRequest(), etc on the Container object.
-        container.setApplicationContext(new ApplicationContext()
-        {
-            public URL getResource(String resourceName) throws MalformedURLException
-            {
-                if (resourceName.contains("xwiki.properties")) {
-                    return this.getClass().getClassLoader().getResource("xwiki.properties");
-                }
-                throw new RuntimeException("Not implemented");
-            }
-
-            public InputStream getResourceAsStream(String resourceName)
-            {
-                throw new RuntimeException("Not implemented");
-            }
-
-            public File getTemporaryDirectory()
-            {
-                throw new RuntimeException("Not implemented");
-            }
-        });
-    }
 
     public void initializeConfigurationSource() throws Exception
     {

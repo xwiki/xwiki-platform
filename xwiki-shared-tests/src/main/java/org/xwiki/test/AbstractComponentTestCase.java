@@ -42,7 +42,6 @@ public class AbstractComponentTestCase extends AbstractMockingTestCase
     @Before
     public void setUp() throws Exception
     {
-        this.initializer.initializeContainer();
         this.initializer.initializeConfigurationSource();
 
         // Put before execution context initialization because it could be needed for some executing context

@@ -92,7 +92,6 @@ public class ComponentManagerTestSetup extends TestSetup
     @Override
     protected void setUp() throws Exception
     {
-        this.initializer.initializeContainer();
         this.initializer.initializeConfigurationSource();
 
         // Register defined component descriptors as components

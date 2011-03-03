@@ -52,11 +52,9 @@ public abstract class AbstractROMTestCase
     @Before
     public void setUp() throws Exception
     {
-        this.initializer1.initializeContainer();
         this.initializer1.initializeConfigurationSource();
         this.initializer1.initializeExecution();
 
-        this.initializer2.initializeContainer();
         this.initializer2.initializeConfigurationSource();
         this.initializer2.initializeExecution();
 

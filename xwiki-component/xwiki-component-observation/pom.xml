@@ -35,10 +35,6 @@
   <description>XWiki Platform - Core - Component - Observation</description>
   <dependencies>
     <dependency>
-      <groupId>commons-logging</groupId>
-      <artifactId>commons-logging</artifactId>
-    </dependency>
-    <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-core-observation-api</artifactId>
       <version>${project.version}</version>

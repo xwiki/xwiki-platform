@@ -34,7 +34,6 @@
   <packaging>pom</packaging>
   <description>XWiki Platform - Core - XML - Parent POM</description>
   <modules>
-    <module>xwiki-xml-default</module>
     <module>xwiki-xml-script</module>
   </modules>
   <build>

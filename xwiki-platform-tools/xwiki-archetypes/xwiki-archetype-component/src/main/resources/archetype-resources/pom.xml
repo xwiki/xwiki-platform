@@ -46,8 +46,8 @@
   </build>
   <dependencies>
     <dependency>
-      <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-core-component-default</artifactId>
+      <groupId>org.xwiki.commons</groupId>
+      <artifactId>xwiki-commons-component-default</artifactId>
       <version>${platform.core.version}</version>
     </dependency>
     <!-- Only needed if some of the component's APIs must be made visible to scripting in wiki pages -->

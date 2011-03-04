@@ -35,11 +35,11 @@ import org.apache.commons.logging.LogFactory;
 import com.novell.ldap.LDAPAttribute;
 import com.novell.ldap.LDAPAttributeSet;
 import com.novell.ldap.LDAPConnection;
+import com.novell.ldap.LDAPConstraints;
 import com.novell.ldap.LDAPDN;
 import com.novell.ldap.LDAPEntry;
 import com.novell.ldap.LDAPException;
 import com.novell.ldap.LDAPJSSESecureSocketFactory;
-import com.novell.ldap.LDAPSearchConstraints;
 import com.novell.ldap.LDAPSearchResults;
 import com.novell.ldap.LDAPSocketFactory;
 import com.xpn.xwiki.XWikiContext;
@@ -161,8 +161,10 @@ public class XWikiLDAPConnection
             connect(ldapHost, port);
 
             // set referral following
-            LDAPSearchConstraints constraints = this.connection.getSearchConstraints();
+            LDAPConstraints constraints = this.connection.getConstraints();
+            constraints.setTimeLimit(1000);
             constraints.setReferralFollowing(true);
+            constraints.setReferralHandler(new LDAPPluginReferralHandler(loginDN, password, context));
             this.connection.setConstraints(constraints);
 
             // bind
@@ -285,8 +287,6 @@ public class XWikiLDAPConnection
         List<XWikiLDAPSearchAttribute> searchAttributeList = null;
 
         LDAPSearchResults searchResults = null;
-        LDAPSearchConstraints cons = new LDAPSearchConstraints();
-        cons.setTimeLimit(1000);
 
         if (LOG.isDebugEnabled()) {
             LOG.debug(MessageFormat.format("LDAP search: baseDN=[{0}] query=[{1}] attr=[{2}] ldapScope=[{3}]", baseDN,
@@ -295,7 +295,7 @@ public class XWikiLDAPConnection
 
         try {
             // filter return all attributes return attrs and values time out value
-            searchResults = this.connection.search(baseDN, ldapScope, filter, attr, false, cons);
+            searchResults = this.connection.search(baseDN, ldapScope, filter, attr, false);
 
             if (!searchResults.hasMore()) {
                 return null;
@@ -318,7 +318,7 @@ public class XWikiLDAPConnection
         } finally {
             if (searchResults != null) {
                 try {
-                    this.connection.abandon(searchResults, cons);
+                    this.connection.abandon(searchResults);
                 } catch (LDAPException e) {
                     if (LOG.isDebugEnabled()) {
                         LOG.debug("LDAP Search clean up failed", e);
@@ -369,10 +369,10 @@ public class XWikiLDAPConnection
 
     /**
      * Fully escape DN value (the part after the =).
+     * <p>
+     * For example, for the dn value "Acme, Inc", the escapeLDAPDNValue method returns "Acme\, Inc".
+     * </p>
      * 
-     * <p>For example, for the dn value "Acme, Inc", the escapeLDAPDNValue method
-    * returns "Acme\, Inc".</p>
-    * 
      * @param value the DN value to escape
      * @return the escaped version o the DN value
      */

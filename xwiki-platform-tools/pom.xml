@@ -42,7 +42,6 @@
     <url>http://svn.xwiki.org/svnroot/xwiki/platform/xwiki-tools/trunk</url>
   </scm>
   <modules>
-    <module>xwiki-verification-resources</module>
     <module>xwiki-xar-plugin</module>
     <module>xwiki-xar-handlers</module>
     <module>xwiki-xmldoc-update-plugin</module>

@@ -26,12 +26,15 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.math.NumberUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.suigeneris.jrcs.diff.delta.Chunk;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
+import org.xwiki.model.reference.EntityReferenceSerializer;
+import org.xwiki.model.reference.WikiReference;
 import org.xwiki.query.QueryManager;
 import org.xwiki.rendering.renderer.PrintRendererFactory;
 import org.xwiki.rendering.syntax.Syntax;
@@ -80,6 +83,14 @@ public class XWiki extends Api
     @SuppressWarnings("unchecked")
     private DocumentReferenceResolver<String> defaultDocumentReferenceResolver = Utils
         .getComponent(DocumentReferenceResolver.class);
+
+    /**
+     * The object used to serialize entity references into strings. We need it because we have front APIs that work with
+     * entity references but have to call older, often internal, methods that still use string references.
+     */
+    @SuppressWarnings("unchecked")
+    private EntityReferenceSerializer<String> defaultStringEntityReferenceSerialzier =
+        Utils.getComponent(EntityReferenceSerializer.class);
 
     /**
      * XWiki API Constructor
@@ -1414,7 +1425,7 @@ public class XWiki extends Api
     }
 
     /**
-     * Privileged API to copy a document to another document in the same wiki
+     * API to copy a document to another document in the same wiki
      * 
      * @param docname source document
      * @param targetdocname target document
@@ -1427,7 +1438,7 @@ public class XWiki extends Api
     }
 
     /**
-     * Privileged API to copy a translation of a document to another document in the same wiki
+     * API to copy a translation of a document to another document in the same wiki
      * 
      * @param docname source document
      * @param targetdocname target document
@@ -1441,7 +1452,7 @@ public class XWiki extends Api
     }
 
     /**
-     * Privileged API to copy a translation of a document to another document of the same name in another wiki
+     * API to copy a translation of a document to another document of the same name in another wiki
      * 
      * @param docname source document
      * @param sourceWiki source wiki
@@ -1457,7 +1468,7 @@ public class XWiki extends Api
     }
 
     /**
-     * Privileged API to copy a translation of a document to another document of the same name in another wiki
+     * API to copy a translation of a document to another document of the same name in another wiki
      * additionally resetting the version
      * 
      * @param docname source document
@@ -1475,7 +1486,7 @@ public class XWiki extends Api
     }
 
     /**
-     * Privileged API to copy a translation of a document to another document of the same name in another wiki
+     * API to copy a translation of a document to another document of the same name in another wiki
      * additionally resetting the version and overwriting the previous document
      * 
      * @param docname source document
@@ -1490,33 +1501,48 @@ public class XWiki extends Api
     public boolean copyDocument(String docname, String targetdocname, String sourceWiki, String targetWiki,
         String wikilanguage, boolean reset, boolean force) throws XWikiException
     {
-        if (hasProgrammingRights()) {
-            return this.xwiki.copyDocument(docname, targetdocname, sourceWiki, targetWiki, wikilanguage, reset, force,
-                true, getXWikiContext());
+        DocumentReference sourceDocumentReference = this.currentMixedDocumentReferenceResolver.resolve(docname);
+        if (!StringUtils.isEmpty(sourceWiki)) {
+            sourceDocumentReference.setWikiReference(new WikiReference(sourceWiki));
         }
 
-        return false;
+        DocumentReference targetDocumentReference = this.currentMixedDocumentReferenceResolver.resolve(targetdocname);
+        if (!StringUtils.isEmpty(targetWiki)) {
+            targetDocumentReference.setWikiReference(new WikiReference(targetWiki));
+        }
+
+        return this.copyDocument(sourceDocumentReference, targetDocumentReference, wikilanguage, reset, force);
     }
 
     /**
-     * Privileged API to copy a translation of a document to another document of the same name in another wiki
-     * additionally resetting the version and overwriting the previous document
-     *
+     * API to copy a translation of a document to another document of the same name in another wiki additionally
+     * resetting the version and overwriting the previous document
+     * 
      * @param sourceDocumentReference the reference to the document to copy
      * @param targetDocumentReference the reference to the document to create
      * @param wikilanguage language to copy
-     * @param reset true to reset versions
-     * @param force true to overwrite the previous document
-     * @return true if the copy was sucessful
+     * @param resetHistory {@code true} to reset versions
+     * @param overwrite {@code true} to overwrite the previous document
+     * @return {@code true} if the copy was sucessful
      * @throws XWikiException if the document was not copied properly
      * @since 3.0M3
      */
     public boolean copyDocument(DocumentReference sourceDocumentReference, DocumentReference targetDocumentReference,
-        String wikilanguage, boolean reset, boolean force) throws XWikiException
+        String wikilanguage, boolean resetHistory, boolean overwrite) throws XWikiException
     {
-        if (hasProgrammingRights()) {
-            return this.xwiki.copyDocument(sourceDocumentReference, targetDocumentReference, wikilanguage, reset,
-                force, true, getXWikiContext());
+        // In order to copy the source document the user must have at least the right to view it.
+        if (hasAccessLevel("view", this.defaultStringEntityReferenceSerialzier.serialize(sourceDocumentReference))) {
+            String targetDocStringRef = this.defaultStringEntityReferenceSerialzier.serialize(targetDocumentReference);
+            // To create the target document the user must have edit rights. If the target document exists and the user
+            // wants to overwrite it then he needs delete right.
+            // Note: We have to check if the target document exists before checking the delete right because delete
+            // right is denied if not explicitly specified.
+            if (hasAccessLevel("edit", targetDocStringRef)
+                && (!overwrite || !exists(targetDocumentReference) || hasAccessLevel("delete", targetDocStringRef))) {
+                // Reset creation data otherwise the required rights for page copy need to be reconsidered.
+                return this.xwiki.copyDocument(sourceDocumentReference, targetDocumentReference, wikilanguage,
+                    resetHistory, overwrite, true, getXWikiContext());
+            }
         }
 
         return false;

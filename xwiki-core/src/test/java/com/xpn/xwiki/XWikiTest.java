@@ -20,7 +20,6 @@
 package com.xpn.xwiki;
 
 import java.io.ByteArrayInputStream;
-import java.io.InputStreamReader;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -170,20 +169,22 @@ public class XWikiTest extends AbstractBridgedXWikiComponentTestCase
 
     public void testAuthorAfterDocumentCopy() throws XWikiException
     {
-        String copyName = "Lyre";
+        DocumentReference copyReference =
+            new DocumentReference("Lyre", this.document.getDocumentReference().getLastSpaceReference());
         DocumentReference author = this.document.getAuthorReference();
-        this.xwiki.copyDocument(this.document.getName(), this.document.getSpace() + "." + copyName, getContext());
-        XWikiDocument copy = this.xwiki.getDocument(copyName, getContext());
+        this.xwiki.copyDocument(this.document.getDocumentReference(), copyReference, getContext());
+        XWikiDocument copy = this.xwiki.getDocument(copyReference, getContext());
 
         assertEquals(author, copy.getAuthorReference());
     }
 
     public void testCreatorAfterDocumentCopy() throws XWikiException
     {
-        String copyName = "Sirius";
+        DocumentReference copyReference =
+            new DocumentReference("Sirius", this.document.getDocumentReference().getLastSpaceReference());
         DocumentReference creator = this.document.getCreatorReference();
-        this.xwiki.copyDocument(this.document.getName(), this.document.getSpace() + "." + copyName, getContext());
-        XWikiDocument copy = this.xwiki.getDocument(copyName, getContext());
+        this.xwiki.copyDocument(this.document.getDocumentReference(), copyReference, getContext());
+        XWikiDocument copy = this.xwiki.getDocument(copyReference, getContext());
 
         assertEquals(creator, copy.getCreatorReference());
     }
@@ -192,9 +193,11 @@ public class XWikiTest extends AbstractBridgedXWikiComponentTestCase
     {
         Date sourceCreationDate = this.document.getCreationDate();
         Thread.sleep(1000);
-        String copyName = this.document.getName() + "Copy";
-        this.xwiki.copyDocument(this.document.getName(), this.document.getSpace() + "." + copyName, getContext());
-        XWikiDocument copy = this.xwiki.getDocument(copyName, getContext());
+        DocumentReference copyReference =
+            new DocumentReference(this.document.getDocumentReference().getName() + "Copy", this.document
+                .getDocumentReference().getLastSpaceReference());
+        this.xwiki.copyDocument(this.document.getDocumentReference(), copyReference, getContext());
+        XWikiDocument copy = this.xwiki.getDocument(copyReference, getContext());
 
         assertTrue(copy.getCreationDate().equals(sourceCreationDate));
     }

@@ -4440,31 +4440,12 @@ public class XWiki implements XWikiDocChangeNotificationInterface, EventListener
     }
 
     /**
-     * @deprecated since 2.2M2 use {@link #copyDocument(DocumentReference, DocumentReference, XWikiContext)}
-     */
-    @Deprecated
-    public boolean copyDocument(String docname, String targetdocname, XWikiContext context) throws XWikiException
-    {
-        return copyDocument(docname, targetdocname, null, null, null, true, context);
-    }
-
-    /**
      * @since 2.2M2
      */
     public boolean copyDocument(DocumentReference sourceDocumentReference, DocumentReference targetDocumentReference,
         boolean reset, XWikiContext context) throws XWikiException
     {
         return copyDocument(sourceDocumentReference, targetDocumentReference, null, reset, context);
-    }
-
-    /**
-     * @deprecated since 2.2M2 use {@link #copyDocument(DocumentReference, DocumentReference, boolean, XWikiContext)}
-     */
-    @Deprecated
-    public boolean copyDocument(String docname, String targetdocname, boolean reset, XWikiContext context)
-        throws XWikiException
-    {
-        return copyDocument(docname, targetdocname, null, null, null, reset, context);
     }
 
     /**
@@ -4478,43 +4459,12 @@ public class XWiki implements XWikiDocChangeNotificationInterface, EventListener
     }
 
     /**
-     * @deprecated since 2.2M2 use
-     *             {@link #copyDocument(DocumentReference, DocumentReference, boolean, boolean, boolean, XWikiContext)}
-     */
-    @Deprecated
-    public boolean copyDocument(String docname, String targetdocname, boolean reset, boolean force,
-        boolean resetCreationData, XWikiContext context) throws XWikiException
-    {
-        return copyDocument(docname, targetdocname, null, null, null, reset, force, resetCreationData, context);
-    }
-
-    /**
      * @since 2.2M2
      */
     public boolean copyDocument(DocumentReference sourceDocumentReference, DocumentReference targetDocumentReference,
         String wikilanguage, XWikiContext context) throws XWikiException
     {
         return copyDocument(sourceDocumentReference, targetDocumentReference, wikilanguage, true, context);
-    }
-
-    /**
-     * @deprecated since 2.2M2 use {@link #copyDocument(DocumentReference, DocumentReference, String, XWikiContext)}
-     */
-    @Deprecated
-    public boolean copyDocument(String docname, String targetdocname, String wikilanguage, XWikiContext context)
-        throws XWikiException
-    {
-        return copyDocument(docname, targetdocname, null, null, wikilanguage, true, context);
-    }
-
-    /**
-     * @deprecated since 2.2M2 use {@link #copyDocument(DocumentReference, DocumentReference, String, XWikiContext)}
-     */
-    @Deprecated
-    public boolean copyDocument(String docname, String sourceWiki, String targetWiki, String wikilanguage,
-        XWikiContext context) throws XWikiException
-    {
-        return copyDocument(docname, docname, sourceWiki, targetWiki, wikilanguage, true, context);
     }
 
     /**
@@ -4527,17 +4477,6 @@ public class XWiki implements XWikiDocChangeNotificationInterface, EventListener
     }
 
     /**
-     * @deprecated since 2.2M2 use
-     *             {@link #copyDocument(DocumentReference, DocumentReference, String, boolean, XWikiContext)}
-     */
-    @Deprecated
-    public boolean copyDocument(String docname, String targetdocname, String sourceWiki, String targetWiki,
-        String wikilanguage, boolean reset, XWikiContext context) throws XWikiException
-    {
-        return copyDocument(docname, targetdocname, sourceWiki, targetWiki, wikilanguage, reset, false, context);
-    }
-
-    /**
      * @since 2.2M2
      */
     public boolean copyDocument(DocumentReference sourceDocumentReference, DocumentReference targetDocumentReference,
@@ -4545,17 +4484,6 @@ public class XWiki implements XWikiDocChangeNotificationInterface, EventListener
     {
         return copyDocument(sourceDocumentReference, targetDocumentReference, wikilanguage, reset, force, false,
             context);
-    }
-
-    /**
-     * @deprecated since 2.2M2 use
-     *             {@link #copyDocument(DocumentReference, DocumentReference, String, boolean, boolean, XWikiContext)}
-     */
-    @Deprecated
-    public boolean copyDocument(String docname, String targetdocname, String sourceWiki, String targetWiki,
-        String wikilanguage, boolean reset, boolean force, XWikiContext context) throws XWikiException
-    {
-        return copyDocument(docname, targetdocname, sourceWiki, targetWiki, wikilanguage, reset, force, false, context);
     }
 
     /**
@@ -4736,29 +4664,6 @@ public class XWiki implements XWikiDocChangeNotificationInterface, EventListener
         }
     }
 
-    /**
-     * @deprecated since 2.2M2 use
-     *             {@link #copyDocument(DocumentReference, DocumentReference, String, boolean, boolean, boolean, XWikiContext)}
-     */
-    @Deprecated
-    public boolean copyDocument(String docname, String targetdocname, String sourceWiki, String targetWiki,
-        String wikilanguage, boolean reset, boolean force, boolean resetCreationData, XWikiContext context)
-        throws XWikiException
-    {
-        DocumentReference sourceDocumentReference = this.currentMixedDocumentReferenceResolver.resolve(docname);
-        if (!StringUtils.isEmpty(sourceWiki)) {
-            sourceDocumentReference.setWikiReference(new WikiReference(sourceWiki));
-        }
-
-        DocumentReference targetDocumentReference = this.currentMixedDocumentReferenceResolver.resolve(targetdocname);
-        if (!StringUtils.isEmpty(targetWiki)) {
-            targetDocumentReference.setWikiReference(new WikiReference(targetWiki));
-        }
-
-        return copyDocument(sourceDocumentReference, targetDocumentReference, wikilanguage, reset, force,
-            resetCreationData, context);
-    }
-
     public int copySpaceBetweenWikis(String space, String sourceWiki, String targetWiki, String language,
         XWikiContext context) throws XWikiException
     {
@@ -4803,8 +4708,14 @@ public class XWiki implements XWikiDocChangeNotificationInterface, EventListener
                 LOG.info("Copying " + list.size() + " documents from wiki " + sourceWiki + " to wiki " + targetWiki);
             }
 
+            WikiReference sourceWikiReference = new WikiReference(sourceWiki);
+            WikiReference targetWikiReference = new WikiReference(targetWiki);
             for (String docname : list) {
-                copyDocument(docname, sourceWiki, targetWiki, language, context);
+                DocumentReference sourceDocumentReference = this.currentMixedDocumentReferenceResolver.resolve(docname);
+                sourceDocumentReference.setWikiReference(sourceWikiReference);
+                DocumentReference targetDocumentReference = new DocumentReference(sourceDocumentReference.clone());
+                targetDocumentReference.setWikiReference(targetWikiReference);
+                copyDocument(sourceDocumentReference, targetDocumentReference, language, context);
                 nb++;
             }
             return nb;

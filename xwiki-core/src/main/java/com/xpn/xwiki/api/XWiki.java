@@ -85,11 +85,11 @@ public class XWiki extends Api
         .getComponent(DocumentReferenceResolver.class);
 
     /**
-     * The object used to serialize entity references into strings. We need it because we have front APIs that work with
-     * entity references but have to call older, often internal, methods that still use string references.
+     * The object used to serialize entity references into strings. We need it because we have script APIs that work
+     * with entity references but have to call older, often internal, methods that still use string references.
      */
     @SuppressWarnings("unchecked")
-    private EntityReferenceSerializer<String> defaultStringEntityReferenceSerialzier =
+    private EntityReferenceSerializer<String> defaultStringEntityReferenceSerializer =
         Utils.getComponent(EntityReferenceSerializer.class);
 
     /**
@@ -1531,8 +1531,8 @@ public class XWiki extends Api
         String wikilanguage, boolean resetHistory, boolean overwrite) throws XWikiException
     {
         // In order to copy the source document the user must have at least the right to view it.
-        if (hasAccessLevel("view", this.defaultStringEntityReferenceSerialzier.serialize(sourceDocumentReference))) {
-            String targetDocStringRef = this.defaultStringEntityReferenceSerialzier.serialize(targetDocumentReference);
+        if (hasAccessLevel("view", this.defaultStringEntityReferenceSerializer.serialize(sourceDocumentReference))) {
+            String targetDocStringRef = this.defaultStringEntityReferenceSerializer.serialize(targetDocumentReference);
             // To create the target document the user must have edit rights. If the target document exists and the user
             // wants to overwrite it then he needs delete right.
             // Note: We have to check if the target document exists before checking the delete right because delete

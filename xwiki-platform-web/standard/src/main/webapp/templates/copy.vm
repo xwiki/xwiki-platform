@@ -48,17 +48,20 @@
     #if($sourcewiki != "" && $sourcespace != "" && $sourcepage != "" && $targetwiki != "" && $targetspace != "" && $targetpage != "" && $!{services.csrf.isTokenValid("$!{request.getParameter('form_token')}")})
       #set($sourceDocReference = $services.model.createDocumentReference($sourcewiki, $sourcespace, $sourcepage))
       #set($targetDocReference = $services.model.createDocumentReference($targetwiki, $targetspace, $targetpage))
-      #set($ok = $xwiki.copyDocument($sourceDocReference, $targetDocReference, $language, false, true))
-      #if($escapedLanguage)
-        #set($fromurl = $xwiki.getURL($sourceDocReference, "view", "language=${escapedLanguage}"))
-        #set($tourl = $xwiki.getURL($targetDocReference, "view", "language=${escapedLanguage}"))
+      #if($xwiki.copyDocument($sourceDocReference, $targetDocReference, $language, false, true))
+        #if($escapedLanguage)
+          #set($fromurl = $xwiki.getURL($sourceDocReference, "view", "language=${escapedLanguage}"))
+          #set($tourl = $xwiki.getURL($targetDocReference, "view", "language=${escapedLanguage}"))
+        #else
+          #set($fromurl = $xwiki.getURL($sourceDocReference))
+          #set($tourl = $xwiki.getURL($targetDocReference))
+        #end
+        #set($sourcelink = "<a href='${fromurl}'>$!{escapetool.xml($sourceDocReference.name)} #if($escapedLanguage)($escapedLanguage)#end</a>")
+        #set($targetlink = "<a href='${tourl}'>$!{escapetool.xml($targetDocReference.name)}</a>")
+        #info("$msg.get('core.copy.copyingdoc', [$sourcelink, $targetlink])")
       #else
-        #set($fromurl = $xwiki.getURL($sourceDocReference))
-        #set($tourl = $xwiki.getURL($targetDocReference))
+        #error("$msg.get('core.rename.targetNotWritable')")
       #end
-      #set($sourcelink = "<a href='${fromurl}'>$!{escapetool.xml($sourceDocReference.name)} #if($escapedLanguage)($escapedLanguage)#end</a>")
-      #set($targetlink = "<a href='${tourl}'>$!{escapetool.xml($targetDocReference.name)}</a>")
-      #info("$msg.get('core.copy.copyingdoc', [$sourcelink, $targetlink])")
     #else
     <form action="" class="xform third">
     <div class="hidden">

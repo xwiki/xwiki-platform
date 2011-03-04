@@ -122,16 +122,17 @@
 ##
 ## Actions menu
 ##
+#set ($canView = !$doc.isNew() && $xwiki.checkAccess($doc.fullName, 'view'))
 #set ($canDelete = !$doc.isNew() && $xwiki.checkAccess($doc.fullName, 'delete'))
 #set ($canImport = $xwiki.exists('XWiki.OfficeImporter') && $xwiki.checkAccess('XWiki.OfficeImporter', 'view') && !$isguest)
-#if($canDelete || $canImport)
+#if($canView || $canDelete || $canImport)
   #xwikitopmenuentrystart('' $msg.get('core.menu.actions') 'tmFile')
   #if($canDelete)
     #submenuitem($doc.getURL('delete', $!languageparams) $msg.get('core.menu.delete') 'tmActionDelete')
     #submenuitem($doc.getURL('view', 'xpage=rename&amp;step=1') $msg.get('core.menu.rename') 'tmActionRename')
-    #if($xwiki.hasProgrammingRights())
-      #submenuitem($doc.getURL('view', 'xpage=copy') $msg.get('core.menu.copy') 'tmActionCopy')
-    #end
+  #end
+  #if($canView)
+    #submenuitem($doc.getURL('view', 'xpage=copy') $msg.get('core.menu.copy') 'tmActionCopy')
   #end
   #if($canImport)
     #submenuitem($xwiki.getURL('XWiki.OfficeImporter', 'view') $msg.get('core.menu.create.pageFromOffice') 'tmActionImport')

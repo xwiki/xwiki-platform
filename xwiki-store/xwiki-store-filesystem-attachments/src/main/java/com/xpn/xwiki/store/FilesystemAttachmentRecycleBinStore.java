@@ -425,7 +425,7 @@ public class FilesystemAttachmentRecycleBinStore implements AttachmentRecycleBin
         }
 
         final File contentFile = provider.getAttachmentContentFile();
-        final XWikiAttachment attachment = new XWikiAttachment();
+        final XWikiAttachment attachment = delAttach.getAttachment();
         attachment.setAttachment_content(
             new FilesystemAttachmentContent(contentFile,
                                             attachment,
@@ -435,7 +435,6 @@ public class FilesystemAttachmentRecycleBinStore implements AttachmentRecycleBin
             ((FilesystemAttachmentVersioningStore) this.attachmentVersionStore)
                 .loadArchive(attachment, provider));
 
-        delAttach.setAttachment(attachment, null);
         return delAttach.getImmutable();
     }
 

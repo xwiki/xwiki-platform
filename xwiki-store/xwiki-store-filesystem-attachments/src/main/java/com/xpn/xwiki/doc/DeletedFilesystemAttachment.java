@@ -168,8 +168,6 @@ public class DeletedFilesystemAttachment extends DeletedAttachment
         } else {
             result = (XWikiAttachment) this.attachment.clone();
         }
-        // If it's an empty attachment then lets give it a filename.
-        result.setFilename(this.getFilename());
 
         result.setDoc(context.getWiki().getDocument(this.getDocumentReference(), context));
         return result;

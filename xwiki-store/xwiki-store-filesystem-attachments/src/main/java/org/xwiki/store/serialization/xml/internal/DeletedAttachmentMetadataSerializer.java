@@ -24,11 +24,14 @@ package org.xwiki.store.serialization.xml.internal;
 import java.io.IOException;
 import java.util.Date;
 
-import com.xpn.xwiki.doc.DeletedAttachment;
+import com.xpn.xwiki.doc.XWikiAttachment;
+import com.xpn.xwiki.doc.DeletedFilesystemAttachment;
 import com.xpn.xwiki.doc.MutableDeletedFilesystemAttachment;
 import org.dom4j.Element;
 import org.dom4j.dom.DOMElement;
 import org.xwiki.component.annotation.Component;
+import org.xwiki.component.annotation.Requirement;
+import org.xwiki.store.serialization.xml.XMLSerializer;
 
 /**
  * A serializer for saving the metadata from a deleted XWikiAttachment.
@@ -38,7 +41,7 @@ import org.xwiki.component.annotation.Component;
  */
 @Component("deleted-attachment-meta/1.0")
 public class DeletedAttachmentMetadataSerializer
-    extends AbstractXMLSerializer<DeletedAttachment, MutableDeletedFilesystemAttachment>
+    extends AbstractXMLSerializer<DeletedFilesystemAttachment, MutableDeletedFilesystemAttachment>
 {
     /** The root element for serialized element. */
     private static final String ROOT_ELEMENT_NAME = "deletedattachment";
@@ -49,16 +52,18 @@ public class DeletedAttachmentMetadataSerializer
     /** Value of SERIALIZER_PARAM must be this in order to continue parsing. */
     private static final String THIS_SERIALIZER = "deletedattachment-meta/1.0";
 
-
-
-    /** Interpret a node by this name as the name of the attached file. */
-    private static final String FILENAME = "filename";
-
     /** Interpret a node by this name as the document full name of the deleter's user document. */
     private static final String DELETER = "deleter";
 
     /** Interpret this node as the date of deletion in seconds from the epoch. */
     private static final String DATE_DELETED = "datedeleted";
+
+    /** Interpret this node as the an attachment to be parsed by the attachment-meta serializer. */
+    private static final String ATTACHMENT = "attachment";
+
+    /** Needed to serialize/parse the deleted attachment metadata. */
+    @Requirement("attachment-meta/1.0")
+    private XMLSerializer<XWikiAttachment, XWikiAttachment> attachSerializer;
 
     /**
      * {@inheritDoc}
@@ -79,9 +84,9 @@ public class DeletedAttachmentMetadataSerializer
         }
         final MutableDeletedFilesystemAttachment out = new MutableDeletedFilesystemAttachment();
 
-        out.setFilename(docel.element(FILENAME).getText());
         out.setDeleter(docel.element(DELETER).getText());
         out.setDate(new Date(Long.parseLong(docel.element(DATE_DELETED).getText())));
+        out.setAttachment(this.attachSerializer.parse(docel.element(ATTACHMENT)), null);
 
         return out;
     }
@@ -91,16 +96,16 @@ public class DeletedAttachmentMetadataSerializer
      * 
      * @see AbstractXMLSerializer#serialize(T, XMLWriter)
      */
-    public void serialize(final DeletedAttachment delAttach, final XMLWriter writer)
+    public void serialize(final DeletedFilesystemAttachment delAttach, final XMLWriter writer)
         throws IOException
     {
         final Element docel = new DOMElement(ROOT_ELEMENT_NAME);
         docel.addAttribute(SERIALIZER_PARAM, THIS_SERIALIZER);
         writer.writeOpen(docel);
 
-        writer.write(new DOMElement(FILENAME).addText(delAttach.getFilename()));
         writer.write(new DOMElement(DELETER).addText(delAttach.getDeleter()));
         writer.write(new DOMElement(DATE_DELETED).addText(delAttach.getDate().getTime() + ""));
+        this.attachSerializer.serialize(delAttach.getAttachment(), writer);
 
         writer.writeClose(docel);
     }

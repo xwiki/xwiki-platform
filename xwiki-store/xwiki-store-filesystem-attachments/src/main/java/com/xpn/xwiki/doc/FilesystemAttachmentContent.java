@@ -173,14 +173,11 @@ public class FilesystemAttachmentContent extends XWikiAttachmentContent
         return (int) size;
     }
 
-    /**
-     * {@inheritDoc}
-     *
-     * @see com.xpn.xwiki.doc.XWikiAttachmentContent#setContentDirty(boolean)
+    /*
+     * Despite being an immutable implementation, setContentDirty(boolean) is not overridden,
+     * this is because there is the possibility that the attachment will be moved from one
+     * document to another, from versioning store to main store, or from deleted attachments to
+     * main store and the core uses setContentDirty and isContentDirty as a way to signal
+     * that there is reason to want to save the attachment.
      */
-    public void setContentDirty(final boolean contentDirty)
-    {
-        // Do nothing here, the content is never dirty since this implementation is only ever loaded from
-        // the store and is immutable.
-    }
 }

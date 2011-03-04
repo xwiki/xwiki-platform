@@ -34,7 +34,6 @@
   <packaging>pom</packaging>
   <description>XWiki Platform - Core - Configuration - Parent POM</description>
   <modules>
-    <module>xwiki-configuration-api</module>
     <module>xwiki-configuration-default</module>
   </modules>
 </project>

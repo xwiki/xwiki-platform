@@ -34,7 +34,6 @@
   <packaging>pom</packaging>
   <description>XWiki Platform - Core - Observation - Parent</description>
   <modules>
-    <module>xwiki-observation-api</module>
     <module>xwiki-observation-local</module>
     <module>xwiki-observation-remote</module>
   </modules>

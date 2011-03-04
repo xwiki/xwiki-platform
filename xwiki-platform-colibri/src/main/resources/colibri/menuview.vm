@@ -200,11 +200,12 @@
     $xwiki.jsx.use('XWiki.SharePage')
     $xwiki.ssx.use('XWiki.SharePage')
   #end
+  #set ($canView = !$doc.isNew() && $xwiki.checkAccess($doc.fullName, 'view'))
   #set ($canDelete = !$doc.isNew() && $xwiki.checkAccess($doc.fullName, 'delete'))
-  #if($canDelete || $xwiki.hasProgrammingRights())
+  #if($canView || $canDelete)
     #submenuseparator()
   #end
-  #if($xwiki.hasProgrammingRights())
+  #if($canView)
     #submenuitem($doc.getURL('view', 'xpage=copy') $msg.get('core.menu.copy') 'tmActionCopy', '')
   #end
   #if($canDelete)

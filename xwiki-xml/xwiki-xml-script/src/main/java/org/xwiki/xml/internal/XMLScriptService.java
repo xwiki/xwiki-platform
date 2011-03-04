@@ -44,6 +44,7 @@ import org.w3c.dom.ls.LSParser;
 import org.w3c.dom.ls.LSSerializer;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.script.service.ScriptService;
+import org.xwiki.xml.XMLUtils;
 
 /**
  * Provides Scripting APIs for handling XML.
@@ -73,6 +74,54 @@ public class XMLScriptService implements ScriptService
         } catch (Exception ex) {
             LOG.warn("Cannot initialize the XML Script Service", ex);
         }
+    }
+
+    /**
+     * Escapes all the XML special characters in a <code>String</code> using numerical XML entities. Specifically,
+     * escapes &lt;, &gt;, ", ' and &amp;.
+     *
+     * @param content the text to escape, may be {@code null}
+     * @return a new escaped {@code String}, {@code null} if {@code null} input
+     */
+    public static String escape(Object content)
+    {
+        return XMLUtils.escape(content);
+    }
+
+    /**
+     * Escapes all the XML special characters in a <code>String</code> using numerical XML entities, so that the
+     * resulting string can safely be used as an XML attribute value. Specifically, escapes &lt;, &gt;, ", ' and &amp;.
+     *
+     * @param content the text to escape, may be {@code null}
+     * @return a new escaped {@code String}, {@code null} if {@code null} input
+     */
+    public static String escapeForAttributeValue(Object content)
+    {
+        return XMLUtils.escapeAttributeValue(content);
+    }
+
+    /**
+     * Escapes the XML special characters in a <code>String</code> using numerical XML entities, so that the resulting
+     * string can safely be used as an XML text node. Specifically, escapes &lt;, &gt;, and &amp;.
+     *
+     * @param content the text to escape, may be {@code null}
+     * @return a new escaped {@code String}, {@code null} if {@code null} input
+     */
+    public static String escapeForElementContent(Object content)
+    {
+        return XMLUtils.escapeElementContent(content);
+    }
+
+    /**
+     * Unescape encoded special XML characters. Only &gt;, &lt; &amp;, " and ' are unescaped, since they are the only
+     * ones that affect the resulting markup.
+     *
+     * @param content the text to decode, may be {@code null}
+     * @return unescaped content, {@code null} if {@code null} input
+     */
+    public static String unescape(Object content)
+    {
+        return XMLUtils.unescape(content);
     }
 
     /**

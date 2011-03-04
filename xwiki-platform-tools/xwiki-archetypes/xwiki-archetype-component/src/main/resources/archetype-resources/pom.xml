@@ -58,8 +58,8 @@
     </dependency>
     <!-- Testing dependencies -->
     <dependency>
-      <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-core-shared-tests</artifactId>
+      <groupId>org.xwiki.commons</groupId>
+      <artifactId>xwiki-commons-tests</artifactId>
       <version>${platform.core.version}</version>
       <scope>test</scope>
     </dependency>

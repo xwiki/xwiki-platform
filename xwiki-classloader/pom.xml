@@ -50,8 +50,8 @@
       <version>2.1</version>
     </dependency>
     <dependency>
-      <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-core-shared-tests</artifactId>
+      <groupId>org.xwiki.commons</groupId>
+      <artifactId>xwiki-commons-tests</artifactId>
       <version>${project.version}</version>
       <scope>test</scope>
     </dependency>

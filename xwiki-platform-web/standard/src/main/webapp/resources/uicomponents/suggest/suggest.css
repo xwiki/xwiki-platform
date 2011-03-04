@@ -40,6 +40,7 @@ div.suggestItems * {
 
 div.suggestItems em {
   font-weight:700;
+  margin-right:2px;
 }
 
 ul.suggestList {

@@ -54,8 +54,8 @@
       <version>${project.version}</version>
     </dependency>
     <dependency>
-      <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-core-component-observation</artifactId>
+      <groupId>org.xwiki.commons</groupId>
+      <artifactId>xwiki-commons-component-observation</artifactId>
       <version>${project.version}</version>
       <scope>runtime</scope>
     </dependency>

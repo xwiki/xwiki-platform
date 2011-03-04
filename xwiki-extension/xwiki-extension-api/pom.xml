@@ -35,7 +35,7 @@
   <description>XWiki Platform - Core - Extension - API</description>
   <properties>
     <aether.version>1.11</aether.version>
-    <maven.version>3.0.2</maven.version>
+    <maven.version>3.0.3</maven.version>
     <wagon.providers.version>1.0-beta-7</wagon.providers.version>
   </properties>
   <dependencies>

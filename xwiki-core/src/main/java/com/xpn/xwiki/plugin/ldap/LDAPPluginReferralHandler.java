@@ -20,6 +20,8 @@
  */
 package com.xpn.xwiki.plugin.ldap;
 
+import java.text.MessageFormat;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -52,7 +54,7 @@ public class LDAPPluginReferralHandler implements LDAPAuthHandler
     /**
      * The XWiki context.
      */
-    private XWikiContext xcontext = null;
+    private XWikiContext xcontext;
 
     /**
      * @param bindDN the DN to use when binding.
@@ -74,11 +76,11 @@ public class LDAPPluginReferralHandler implements LDAPAuthHandler
     public LDAPAuthProvider getAuthProvider(String host, int port)
     {
         try {
-            LOG.debug("Looking for auth for referral to " + host + ":" + port);
+            LOG.debug(MessageFormat.format("Looking for auth for referral to {0}:{1}", host, port));
 
             return new LDAPAuthProvider(this.bindDN, this.bindPassword.getBytes("UTF8"));
         } catch (Exception e) {
-            LOG.error("Failed to create LDAPAuthProvider for referral " + host + ":" + port);
+            LOG.error(MessageFormat.format("Failed to create LDAPAuthProvider for referral {0}:{1}", host, port));
 
             return null;
         }

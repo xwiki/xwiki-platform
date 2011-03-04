@@ -34,7 +34,6 @@
   <packaging>pom</packaging>
   <description>XWiki Platform - Core - Component - Parent POM</description>
   <modules>
-    <module>xwiki-component-default</module>
     <module>xwiki-component-multi</module>
   </modules>
 </project>

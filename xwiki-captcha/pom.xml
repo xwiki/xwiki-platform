@@ -54,8 +54,8 @@
     </dependency>
     <!-- CaptchaVelocityContextInitializer needs access to VelocityContextInitializer -->
     <dependency>
-      <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-core-velocity-default</artifactId>
+      <groupId>org.xwiki.commons</groupId>
+      <artifactId>xwiki-commons-velocity</artifactId>
       <version>${project.version}</version>
     </dependency>
     <!-- Jcaptcha Api -->

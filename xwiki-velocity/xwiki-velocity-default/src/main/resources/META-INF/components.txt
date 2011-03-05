@@ -1,6 +1,0 @@
-org.xwiki.velocity.internal.DefaultVelocityFactory
-org.xwiki.velocity.internal.VelocityExecutionContextInitializer
-org.xwiki.velocity.internal.DefaultVelocityEngine
-org.xwiki.velocity.internal.DefaultVelocityContextFactory
-org.xwiki.velocity.internal.DefaultVelocityConfiguration
-org.xwiki.velocity.internal.ServicesVelocityContextInitializer

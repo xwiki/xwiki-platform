@@ -34,7 +34,6 @@
   <packaging>pom</packaging>
   <description>XWiki Platform - Core - Velocity - Parent POM</description>
   <modules>
-    <module>xwiki-velocity-default</module>
     <module>xwiki-velocity-webapp</module>
   </modules>
   <dependencies>

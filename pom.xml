@@ -160,7 +160,6 @@
     <module>xwiki-rest</module>
     <module>xwiki-refactoring</module>
     <module>xwiki-chart</module>
-    <module>xwiki-properties</module>
     <module>xwiki-formula</module>
     <module>xwiki-classloader</module>
     <module>xwiki-captcha</module>

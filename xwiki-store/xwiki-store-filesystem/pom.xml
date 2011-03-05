@@ -43,18 +43,10 @@
       <artifactId>xwiki-core-store-transaction</artifactId>
       <version>${project.version}</version>
     </dependency>
-
     <!-- IOUtils is used by FileSaveTransactionRunnable -->
     <dependency>
       <groupId>commons-io</groupId>
       <artifactId>commons-io</artifactId>
-    </dependency>
-
-    <dependency>
-      <groupId>junit</groupId>
-      <artifactId>junit</artifactId>
-      <version>4.5</version>
-      <scope>test</scope>
     </dependency>
   </dependencies>
 </project>

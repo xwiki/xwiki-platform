@@ -104,13 +104,5 @@ tools to make it very hard for the user to make them. Also, since a TransactionR
 reason to be very long (it can just branch off into another runnable) this will make testing and 
 code review easy in the place where it is most important. This part of the code is entirely generic 
 and has no dependence on any type of underlying transactional storage engine.
-</description>
-  <dependencies>
-    <dependency>
-      <groupId>junit</groupId>
-      <artifactId>junit</artifactId>
-      <version>4.5</version>
-      <scope>test</scope>
-    </dependency>
-  </dependencies>
+  </description>
 </project>

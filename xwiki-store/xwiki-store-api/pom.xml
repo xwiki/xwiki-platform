@@ -32,12 +32,4 @@
   <artifactId>xwiki-core-store-api</artifactId>
   <name>XWiki Platform - Core - Storage - Api</name>
   <description>Generic interfaces relating to storage.</description>
-  <dependencies>
-    <dependency>
-      <groupId>junit</groupId>
-      <artifactId>junit</artifactId>
-      <version>4.5</version>
-      <scope>test</scope>
-    </dependency>
-  </dependencies>
 </project>

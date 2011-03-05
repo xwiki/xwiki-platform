@@ -35,8 +35,8 @@
   <dependencies>
     <!-- Used by CryptoScriptService which provides a service to Velocity scripts -->
     <dependency>
-      <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-core-script</artifactId>
+      <groupId>org.xwiki.commons</groupId>
+      <artifactId>xwiki-commons-script</artifactId>
       <version>${project.version}</version>
     </dependency>
     <!-- The core cryptography engine, used everywhere -->

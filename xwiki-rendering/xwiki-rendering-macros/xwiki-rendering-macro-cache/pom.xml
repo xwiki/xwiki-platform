@@ -77,8 +77,4 @@
       <scope>test</scope>
     </dependency>
   </dependencies>
-  <properties>
-    <!-- To be removed once this module is first released -->
-    <xwiki.clirr.skip>true</xwiki.clirr.skip>
-  </properties>
 </project>

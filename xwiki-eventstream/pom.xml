@@ -62,10 +62,6 @@
       <scope>test</scope>
     </dependency>
   </dependencies>
-  <properties>
-    <!-- First version, remove after releasing 3.0 -->
-    <xwiki.clirr.skip>true</xwiki.clirr.skip>
-  </properties>
   <build>
     <plugins>
       <plugin>

@@ -46,8 +46,4 @@
       <version>${commons.version}</version>
     </dependency>
   </dependencies>
-  <properties>
-    <!-- Skip Clirr execution, since this is a new component. Remove when XE 3.0 is released. -->
-    <xwiki.clirr.skip>true</xwiki.clirr.skip>
-  </properties>
 </project>

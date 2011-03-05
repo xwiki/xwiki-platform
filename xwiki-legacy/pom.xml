@@ -33,9 +33,6 @@
   <name>XWiki Platform - Core - Legacy</name>
   <packaging>jar</packaging>
   <description>XWiki Platform - Core - Legacy</description>
-  <properties>
-    <xwiki.clirr.skip>true</xwiki.clirr.skip>
-  </properties>
   <dependencies>
     <dependency>
       <groupId>com.xpn.xwiki.platform</groupId>

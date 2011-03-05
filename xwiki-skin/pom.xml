@@ -32,11 +32,6 @@
   <artifactId>xwiki-core-skin</artifactId>
   <name>XWiki Platform - Core - Skin</name>
   <description>XWiki Platform - Core - Skin</description>
-  <properties>
-    <!-- TODO: Remove once XE 3.0 is released (since we're comparing with the last released minor which is currently
-         XE 2.7 -->
-    <xwiki.clirr.skip>true</xwiki.clirr.skip>
-  </properties>
   <dependencies>
     <dependency>
       <groupId>org.xwiki.commons</groupId>

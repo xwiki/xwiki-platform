@@ -42,10 +42,6 @@
     <module>xwiki-store-filesystem</module>
     <module>xwiki-store-filesystem-attachments</module>
   </modules>
-  <properties>
-    <!-- Skip Clirr execution, since this is a new component -->
-    <xwiki.clirr.skip>true</xwiki.clirr.skip>
-  </properties>
   <build>
     <plugins>
       <plugin>

@@ -39,8 +39,4 @@
       <version>${project.version}</version>
     </dependency>
   </dependencies>
-  <properties>
-    <!-- Remove when this module is first released. -->
-    <xwiki.clirr.skip>true</xwiki.clirr.skip>
-  </properties>
 </project>

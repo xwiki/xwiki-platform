@@ -33,10 +33,6 @@
   <artifactId>xwiki-core-rendering-macro-gallery</artifactId>
   <name>XWiki Platform - Core - Rendering - Macro - Gallery</name>
   <description>A simple image gallery. Images are collected from the macro content and displayed using a slide-show view.</description>
-  <properties>
-    <!-- Skip clirr because this macro doesn't have a stable release. Remove once XE 3.0 is released. -->
-    <xwiki.clirr.skip>true</xwiki.clirr.skip>
-  </properties>
   <dependencies>
     <dependency>
       <groupId>org.xwiki.platform</groupId>

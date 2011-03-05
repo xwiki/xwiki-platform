@@ -52,8 +52,8 @@
     </dependency>
     <!-- Only needed if some of the component's APIs must be made visible to scripting in wiki pages -->
     <dependency>
-      <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-core-script</artifactId>
+      <groupId>org.xwiki.commons</groupId>
+      <artifactId>xwiki-commons-script</artifactId>
       <version>${platform.core.version}</version>
     </dependency>
     <!-- Testing dependencies -->

@@ -51,7 +51,7 @@
     <dependency>
       <groupId>org.xwiki.commons</groupId>
       <artifactId>xwiki-commons-context</artifactId>
-      <version>${project.version}</version>
+      <version>${commons.version}</version>
     </dependency>
     <!--
       Even if this is already included by the xwiki-core dependency, we include it again here to make sure that, if
@@ -60,12 +60,12 @@
     <dependency>
       <groupId>org.xwiki.commons</groupId>
       <artifactId>xwiki-commons-observation-api</artifactId>
-      <version>${project.version}</version>
+      <version>${commons.version}</version>
     </dependency>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-core-model</artifactId>
-      <version>${project.version}</version>
+      <version>${commons.version}</version>
     </dependency>
     <dependency>
       <groupId>org.incava</groupId>
@@ -97,7 +97,7 @@
     <dependency>
       <groupId>org.xwiki.commons</groupId>
       <artifactId>xwiki-commons-tests</artifactId>
-      <version>${project.version}</version>
+      <version>${commons.version}</version>
       <scope>test</scope>
     </dependency>
     <dependency>

@@ -51,7 +51,7 @@
     <dependency>
       <groupId>org.xwiki.commons</groupId>
       <artifactId>xwiki-commons-tests</artifactId>
-      <version>${project.version}</version>
+      <version>${commons.version}</version>
       <scope>test</scope>
     </dependency>
   </dependencies>

@@ -69,7 +69,7 @@
     <dependency>
       <groupId>org.xwiki.commons</groupId>
       <artifactId>xwiki-commons-component-api</artifactId>
-      <version>${project.version}</version>
+      <version>${commons.version}</version>
     </dependency>
     <dependency>
       <groupId>javax.xml.bind</groupId>

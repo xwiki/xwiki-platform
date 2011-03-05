@@ -26,7 +26,7 @@
   <modelVersion>4.0.0</modelVersion>
   <parent>
     <groupId>org.xwiki.platform</groupId>
-    <artifactId>xwiki-core-parent</artifactId>
+    <artifactId>xwiki-core-store-parent</artifactId>
     <version>3.0-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-core-store-transaction</artifactId>
@@ -105,10 +105,6 @@ reason to be very long (it can just branch off into another runnable) this will 
 code review easy in the place where it is most important. This part of the code is entirely generic 
 and has no dependence on any type of underlying transactional storage engine.
 </description>
-  <properties>
-    <!-- Skip Clirr execution, since this is a new component -->
-    <xwiki.clirr.skip>true</xwiki.clirr.skip>
-  </properties>
   <dependencies>
     <dependency>
       <groupId>junit</groupId>
@@ -117,22 +113,4 @@ and has no dependence on any type of underlying transactional storage engine.
       <scope>test</scope>
     </dependency>
   </dependencies>
-  <build>
-    <plugins>
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-surefire-plugin</artifactId>
-        <configuration>
-          <includes>
-            <include>**/*Test.java</include>
-          </includes>
-        </configuration>
-      </plugin>
-      <plugin>
-        <!-- Apply the Checkstyle configurations defined in the top level pom.xml file -->
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-checkstyle-plugin</artifactId>
-      </plugin>
-    </plugins>
-  </build>
 </project>

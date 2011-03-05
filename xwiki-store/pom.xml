@@ -32,9 +32,9 @@
   <artifactId>xwiki-core-store-parent</artifactId>
   <name>XWiki Platform - Core - Storage - Parent POM</name>
   <packaging>pom</packaging>
-  <description>XWiki data storage module.
-This module is intended to replace xwiki-core/src/main/com/xpn/xwiki/store in due time.
-</description>
+  <description>
+    XWiki data storage module. This module is intended to replace xwiki-core/src/main/com/xpn/xwiki/store in due time.
+  </description>
   <modules>
     <module>xwiki-store-api</module>
     <module>xwiki-store-transaction</module>
@@ -42,4 +42,17 @@ This module is intended to replace xwiki-core/src/main/com/xpn/xwiki/store in du
     <module>xwiki-store-filesystem</module>
     <module>xwiki-store-filesystem-attachments</module>
   </modules>
+  <properties>
+    <!-- Skip Clirr execution, since this is a new component -->
+    <xwiki.clirr.skip>true</xwiki.clirr.skip>
+  </properties>
+  <build>
+    <plugins>
+      <plugin>
+        <!-- Apply the Checkstyle configurations defined in the top level pom.xml file -->
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-checkstyle-plugin</artifactId>
+      </plugin>
+    </plugins>
+  </build>
 </project>

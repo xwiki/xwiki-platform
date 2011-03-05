@@ -36,7 +36,7 @@
     <dependency>
       <groupId>org.xwiki.commons</groupId>
       <artifactId>xwiki-commons-context</artifactId>
-      <version>${project.version}</version>
+      <version>${commons.version}</version>
     </dependency>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
@@ -58,7 +58,7 @@
     <dependency>
       <groupId>org.xwiki.commons</groupId>
       <artifactId>xwiki-commons-velocity</artifactId>
-      <version>${project.version}</version>
+      <version>${commons.version}</version>
       <scope>test</scope>
     </dependency>
     <dependency>

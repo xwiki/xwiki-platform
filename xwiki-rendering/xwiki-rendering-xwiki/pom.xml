@@ -42,12 +42,12 @@
     <dependency>
       <groupId>org.xwiki.commons</groupId>
       <artifactId>xwiki-commons-configuration-api</artifactId>
-      <version>${project.version}</version>
+      <version>${commons.version}</version>
     </dependency>
     <dependency>
       <groupId>org.xwiki.commons</groupId>
       <artifactId>xwiki-commons-script</artifactId>
-      <version>${project.version}</version>
+      <version>${commons.version}</version>
     </dependency>
     <dependency>
       <!-- For parsing the CSS from the style attribute. -->
@@ -78,7 +78,7 @@
     <dependency>
       <groupId>org.xwiki.commons</groupId>
       <artifactId>xwiki-commons-component-default</artifactId>
-      <version>${project.version}</version>
+      <version>${commons.version}</version>
       <scope>test</scope>
     </dependency>
   </dependencies>

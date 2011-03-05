@@ -26,21 +26,17 @@
   <modelVersion>4.0.0</modelVersion>
   <parent>
     <groupId>org.xwiki.platform</groupId>
-    <artifactId>xwiki-core-parent</artifactId>
+    <artifactId>xwiki-core-store-parent</artifactId>
     <version>3.0-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-core-store-filesystem-attachments</artifactId>
   <name>XWiki Platform - Core - Storage - Filesystem - Attachments</name>
   <description>A means to store XWikiAttachments on the filesystem with versioning.</description>
-  <properties>
-    <!-- Skip Clirr execution, since this is a new component -->
-    <xwiki.clirr.skip>true</xwiki.clirr.skip>
-  </properties>
   <dependencies>
     <dependency>
       <groupId>org.xwiki.commons</groupId>
       <artifactId>xwiki-commons-component-api</artifactId>
-      <version>${project.version}</version>
+      <version>${commons.version}</version>
     </dependency>
 
     <!-- Needed for DocumentReferenceSerializer implementation. -->
@@ -95,7 +91,7 @@
     <dependency>
       <groupId>org.xwiki.commons</groupId>
       <artifactId>xwiki-commons-tests</artifactId>
-      <version>${project.version}</version>
+      <version>${commons.version}</version>
       <scope>test</scope>
     </dependency>
 
@@ -122,15 +118,6 @@
   </dependencies>
   <build>
     <plugins>
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-surefire-plugin</artifactId>
-        <configuration>
-          <includes>
-            <include>**/*Test.java</include>
-          </includes>
-        </configuration>
-      </plugin>
       <plugin>
         <!-- Apply the Checkstyle configurations defined in the top level pom.xml file -->
         <groupId>org.apache.maven.plugins</groupId>

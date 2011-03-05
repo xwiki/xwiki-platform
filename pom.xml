@@ -25,11 +25,12 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <parent>
-    <groupId>org.xwiki.platform</groupId>
-    <artifactId>xwiki</artifactId>
+    <groupId>org.xwiki.commons</groupId>
+    <artifactId>xwiki-commons</artifactId>
     <version>40-SNAPSHOT</version>
-    <relativePath>../pom</relativePath>
+    <relativePath>../../xwiki-commons-pom</relativePath>
   </parent>
+  <groupId>org.xwiki.platform</groupId>
   <artifactId>xwiki-core-parent</artifactId>
   <name>XWiki Platform - Core - Parent POM</name>
   <packaging>pom</packaging>
@@ -38,6 +39,7 @@
   <properties>
     <!-- Versions of XWiki dependencies used in Core modules -->
     <rendering.version>3.0-SNAPSHOT</rendering.version>
+    <commons.version>3.0-SNAPSHOT</commons.version>
     <!-- Versions of XWiki dependencies used in Core modules -->
     <clirr.previous.version>2.7</clirr.previous.version>
   </properties>

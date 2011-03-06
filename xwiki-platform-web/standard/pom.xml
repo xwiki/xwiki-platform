@@ -351,7 +351,37 @@
                 <resourceBundle>org.xwiki.platform.tools:xwiki-configuration-resources:${platform.tool.configuration.version}</resourceBundle>
               </resourceBundles>
               <properties>
-                <xwikiDbConnectionUrl>none</xwikiDbConnectionUrl>
+                  <!-- Configuration data for hibernate.cfg.xml -->
+                  <xwikiDbConnectionUrl>none</xwikiDbConnectionUrl>
+                  <!-- Configuration data for xwiki.cfg -->
+                  <xwikiCfgPlugins>\
+                    com.xpn.xwiki.monitor.api.MonitorPlugin,\
+                    com.xpn.xwiki.plugin.calendar.CalendarPlugin,\
+                    com.xpn.xwiki.plugin.feed.FeedPlugin,\
+                    com.xpn.xwiki.plugin.ldap.LDAPPlugin,\
+                    com.xpn.xwiki.plugin.google.GooglePlugin,\
+                    com.xpn.xwiki.plugin.mail.MailPlugin,\
+                    com.xpn.xwiki.plugin.packaging.PackagePlugin,\
+                    com.xpn.xwiki.plugin.query.QueryPlugin,\
+                    com.xpn.xwiki.plugin.svg.SVGPlugin,\
+                    com.xpn.xwiki.plugin.charts.ChartingPlugin,\
+                    com.xpn.xwiki.plugin.fileupload.FileUploadPlugin,\
+                    com.xpn.xwiki.plugin.image.ImagePlugin,\
+                    com.xpn.xwiki.plugin.userdirectory.UserDirectoryPlugin,\
+                    com.xpn.xwiki.plugin.usertools.XWikiUserManagementToolsImpl,\
+                    com.xpn.xwiki.plugin.zipexplorer.ZipExplorerPlugin,\
+                    com.xpn.xwiki.plugin.autotag.AutoTagPlugin,\
+                    com.xpn.xwiki.plugin.lucene.LucenePlugin,\
+                    com.xpn.xwiki.plugin.diff.DiffPlugin,\
+                    com.xpn.xwiki.plugin.rightsmanager.RightsManagerPlugin
+                  </xwikiCfgPlugins>
+                  <xwikiCfgVirtual>0</xwikiCfgVirtual>
+                  <xwikiCfgExo>0</xwikiCfgExo>
+                  <xwikiCfgEditCommentMandatory>0</xwikiCfgEditCommentMandatory>
+                  <xwikiCfgDefaultSkin>colibri</xwikiCfgDefaultSkin>
+                  <xwikiCfgDefaultBaseSkin>colibri</xwikiCfgDefaultBaseSkin>
+                  <xwikiCfgEncoding>UTF-8</xwikiCfgEncoding>
+                  <xwikiCfgAdditionalProperties />
               </properties>
             </configuration>
           </execution>

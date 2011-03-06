@@ -23,17 +23,17 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <parent>
-    <groupId>org.xwiki.platform</groupId>
-    <artifactId>xwiki</artifactId>
+    <groupId>org.xwiki.commons</groupId>
+    <artifactId>xwiki-commons</artifactId>
     <version>40-SNAPSHOT</version>
-    <relativePath>../pom</relativePath>
+    <relativePath>../../xwiki-commons-pom</relativePath>
   </parent>
   <groupId>com.xpn.xwiki.platform</groupId>
   <artifactId>xwiki-web</artifactId>
   <version>3.0-SNAPSHOT</version>
   <name>XWiki Platform - Web - Parent POM</name>
   <packaging>pom</packaging>
-  <description>Common web resources for all XWiki WARs</description>
+  <description>Common web resources for the XWiki Platform WAR</description>
   <scm>
     <connection>scm:svn:http://svn.xwiki.org/svnroot/xwiki/platform/web/trunk</connection>
     <developerConnection>scm:svn:https://svn.xwiki.org/svnroot/xwiki/platform/web/trunk</developerConnection>
@@ -58,6 +58,14 @@
     <platform.skin.toucan.version>1.39-SNAPSHOT</platform.skin.toucan.version>
     <platform.skin.colibri.version>1.30-SNAPSHOT</platform.skin.colibri.version>
   </properties>
+  <modules>
+    <module>gwt</module>
+    <module>xwiki-gwt-dom</module>
+    <module>xwiki-gwt-user</module>
+    <module>xwiki-gwt-wysiwyg-client</module>
+    <module>xwiki-gwt-wysiwyg-server</module>
+    <module>standard</module>
+  </modules>
   <build>
     <plugins>
       <plugin>
@@ -89,48 +97,6 @@
       </plugin>
     </plugins>
   </build>
-  <profiles>
-    <profile>
-      <id>default</id>
-      <activation>
-        <activeByDefault>true</activeByDefault>
-      </activation>
-      <modules>
-        <module>gwt</module>
-        <module>xwiki-gwt-dom</module>
-        <module>xwiki-gwt-user</module>
-        <module>xwiki-gwt-wysiwyg-client</module>
-        <module>xwiki-gwt-wysiwyg-server</module>
-        <module>standard</module>
-      </modules>
-    </profile>
-    <profile>
-      <!-- XWiki Enterprise -->
-      <id>xe</id>
-      <modules>
-        <module>gwt</module>
-        <module>xwiki-gwt-dom</module>
-        <module>xwiki-gwt-user</module>
-        <module>xwiki-gwt-wysiwyg-client</module>
-        <module>xwiki-gwt-wysiwyg-server</module>
-        <module>wysiwyg</module>
-        <module>standard</module>
-      </modules>
-    </profile>
-    <profile>
-      <!-- XWiki Enterprise Manager -->
-      <id>xem</id>
-      <modules>
-        <module>gwt</module>
-        <module>xwiki-gwt-dom</module>
-        <module>xwiki-gwt-user</module>
-        <module>xwiki-gwt-wysiwyg-client</module>
-        <module>xwiki-gwt-wysiwyg-server</module>
-        <module>wysiwyg</module>
-        <module>standard</module>
-      </modules>
-    </profile>
-  </profiles>
   <repositories>
     <repository>
       <id>smartgwt-maven</id>

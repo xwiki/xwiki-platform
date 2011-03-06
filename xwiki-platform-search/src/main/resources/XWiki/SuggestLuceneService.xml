@@ -11,10 +11,10 @@
 <customClass></customClass>
 <contentAuthor>XWiki.Admin</contentAuthor>
 <creationDate>1280310630000</creationDate>
-<date>1299278686000</date>
-<contentUpdateDate>1299278686000</contentUpdateDate>
-<version>3.1</version>
-<title></title>
+<date>1299414337000</date>
+<contentUpdateDate>1299414337000</contentUpdateDate>
+<version>1.1</version>
+<title>Lucene Suggestion Service</title>
 <template></template>
 <defaultTemplate></defaultTemplate>
 <validationScript></validationScript>
@@ -48,7 +48,7 @@
         #set($name = $itemdoc.getDisplayTitle())
         #set($url = $itemdoc.getURL())
       #end
-      &lt;rs id="$url" info="$escapetool.xml($name)"&gt;$escapetool.xml($itemdoc.fullName)&lt;/rs&gt;
+      &lt;rs id="$url" info="${escapetool.xml($itemdoc.fullName)}"&gt;$escapetool.xml($name)&lt;/rs&gt;
     #end
   &lt;/results&gt;
 #else

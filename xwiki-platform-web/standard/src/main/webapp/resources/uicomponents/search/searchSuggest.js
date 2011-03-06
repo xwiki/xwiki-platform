@@ -113,7 +113,10 @@ var XWiki = (function (XWiki) {
         align: "right",
         minchars: 3,    
         sources : this.sources,
-        insertBeforeSuggestions : new Element("div", {'class' : 'results'}).update(allResultsNode.getElement())
+        insertBeforeSuggestions : new Element("div", {'class' : 'results'}).update(allResultsNode.getElement()),
+        displayValue:true,
+        displayValueText: "in ",
+        timeout: 0
       });
     },
 

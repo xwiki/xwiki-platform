@@ -30,10 +30,6 @@ div.suggestItems li {
   white-space:nowrap;
 }
 
-div.suggestItems li div.xitemcontainer {
-  height:20px;
-}
-
 div.suggestItems * {
   line-height:1.6em;
 }
@@ -41,6 +37,16 @@ div.suggestItems * {
 div.suggestItems em {
   font-weight:700;
   margin-right:2px;
+}
+
+div.suggestItems div.info {
+  color: $theme.textSecondaryColor;
+  font-size: 0.8em;
+  padding-left:5px;
+}
+
+div.suggestItems div.info span.legend {
+  font-weight: normal;
 }
 
 ul.suggestList {

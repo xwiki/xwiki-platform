@@ -51,7 +51,11 @@ var XWiki = (function(XWiki){
     highlight: true,
     // Fade the suggestion container on clear
     fadeOnClear: true,
-    insertBeforeSuggestions: null
+    insertBeforeSuggestions: null,
+    // Should value be displayed as a hint
+    displayValue: false,
+    // Display value prefix text 
+    displayValueText: "Value :"
   },
   sInput : "",
   nInputChars : 0,
@@ -73,7 +77,6 @@ var XWiki = (function(XWiki){
 
     // Clone default options from the prototype so that they are not shared and extend options with passed parameters
     this.options = Object.extend(Object.clone(this.options), param || { });
-
     if (typeof this.options.sources == 'object' && this.options.sources.length > 1) {
       // We are in multi-sources mode
       this.sources = this.options.sources;
@@ -481,13 +484,21 @@ var XWiki = (function(XWiki){
         // Otherwise we just put row result value
         var output = arr[i].value;
       }
-      var span = new Element("span").update(output);
+      if (!this.options.displayValue) {
+        var displayNode = new Element("span", {'class':'info'}).update(output);
+      }
+      else {
+        var displayNode = new Element("div").insert(new Element('div', {'class':'value'}).update(output))
+                                            .insert(new Element('div', {'class':'info'}).update(
+	                                          "<span class='legend'>" + this.options.displayValueText + "</span>" + arr[i].info)
+	                                        );
+      }
       var valueNode = new Element('div')
             .insert(new Element('span', {'class':'suggestId'}).update(arr[i].id))
             .insert(new Element('span', {'class':'suggestValue'}).update(arr[i].value))
             .insert(new Element('span', {'class':'suggestInfo'}).update(arr[i].info));
 
-      var item = new XWiki.widgets.XListItem( span , {
+      var item = new XWiki.widgets.XListItem( displayNode , {
         containerClasses: 'suggestItem',
         value: valueNode,
         noHighlight: true // we do the highlighting ourselves
@@ -509,7 +520,9 @@ var XWiki = (function(XWiki){
 
     // remove list after an interval
     var pointer = this;
-    this.toID = setTimeout(function () { pointer.clearSuggestions() }, this.options.timeout);
+    if (this.options.timeout > 0) {
+      this.toID = setTimeout(function () { pointer.clearSuggestions() }, this.options.timeout);
+    }
   },
 
   /**
@@ -688,7 +701,7 @@ var XWiki = (function(XWiki){
     this.killTimeout();
     var ele = $(this.container);
     var pointer = this;
-    if (ele) {
+    if (ele && ele.parentNode) {
       if (this.options.fadeOnClear) {
         var fade = new Effect.Fade(ele, {duration: "0.25", afterFinish : function() {
           if($(pointer.container)) {

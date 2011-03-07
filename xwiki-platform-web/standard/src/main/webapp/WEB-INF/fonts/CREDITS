@@ -356,7 +356,11 @@ precisely, "Public Domain under GNU Licence Produced by DMS
 Electronics for The Sri Lanka Tipitaka Project" (taken from the font
 comment), and took the effort of recoding the font to Unicode.
 
-These glyphs have since been replaced by those from the LKLUG font.
+These glyphs were later replaced by those from the LKLUG font
+<http://www.lug.lk/fonts/lklug>
+
+Finally the range was completely replaced by glyphs from the sinh TeX
+font, with much help and advice from Harshula Jayasuriya.
 
 	Sinhala					(U+0D80-U+0DFF)
        
@@ -517,13 +521,18 @@ of ancient sources.
 Created by hand a Cherokee range specially for FreeFont to be "in line with
 the classic Cherokee typefaces used in 19th century printing", but also to
 fit well with ranges previously in FreeFont.  Then he made Unified Canadian
-Syllabics in Sans, and a Cherokee and Kayah Li in Mono!
+Syllabics in Sans, and a Cherokee and Kayah Li in Mono!  And never to be
+outdone by himself, then did UCAS Extended and Osmanya....  What next?
+
 	Armenian (serif)                        (U+0530-U+058F)
 	Cherokee                                (U+13A0-U+13FF)
-	Unified Canadian Syllabics              (U+13A0-U+13FF)
+	Unified Canadian Aboriginal Syllabics   (U+1400-U+167F)
+	UCAS Extended                           (U+18B0-U+18F5)
 	Kayah Li                                (U+A900-U+A92F)
 	Tifinagh                                (U+2D30-U+2D7F)
+	Vai                                     (U+A500-U+A62B)
 	Latin Extended-D (Mayanist letters)     (U+A720-U+A7FF)
+	Osmanya                                 (U+10480-U+104a7)
 
 * Yannis Haralambous and Wellcome Institute
 
@@ -545,7 +554,7 @@ to repsonsible people at the Trust.
 
 The Sinhala font project has taken the glyphs from Yannis Haralambous'
 Sinhala font, to produce a Unicode TrueType font, LKLUG.  These glyphs
-have been for a while included in FreeFont.
+were for a while included in FreeFont.
 
 	Sinhala					(U+0D80-U+0DFF)
 
@@ -557,6 +566,11 @@ left fingerprints almost everywhere, and is responsible for these blocks:
 	Glagolitic                              (U+2C00-U+2C5F)
 	Coptic                                  (U+2C80-U+2CFF)
 
+* Pavel Skrylev is responsible for
+	Cyrillic Extended-A                     (U+2DEO-U+2DFF)
+  as well as many of the additions to
+	Cyrillic Extended-B                     (U+A640-U+A65F)
+
 Notes:
 
 *: The glyph collection looks license-compatible, but its author has
@@ -564,4 +578,4 @@ Notes:
    this glyph collection.
 
 --------------------------------------------------------------------------
-$Id: CREDITS,v 1.26 2009/12/28 19:00:00 Stevan_White Exp $
+$Id: CREDITS,v 1.28 2010/09/11 13:24:11 Stevan_White Exp $

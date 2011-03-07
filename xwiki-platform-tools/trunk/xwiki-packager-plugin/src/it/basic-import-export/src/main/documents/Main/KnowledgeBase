@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+
+<xwikidoc>
+<web>Main</web>
+<name>KnowledgeBase</name>
+<language></language>
+<defaultLanguage>en</defaultLanguage>
+<translation>0</translation>
+<parent>XWiki.Menu</parent>
+<author>XWiki.Admin</author>
+<creationDate>1107712021000</creationDate>
+<date>1107712021000</date>
+<version>1.2</version>
+<content>1 Wiki Knowledge Base
+
+This is the Wiki Knowledge Base, where you can start writing about your favorite subjects.
+
+To create new pages, use brackets around the words you want to create links for:
+
+* [Example Link 1]
+* [Example Link 2]</content>
+</xwikidoc>

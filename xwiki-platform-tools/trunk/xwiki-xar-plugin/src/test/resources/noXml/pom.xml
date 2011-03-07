@@ -1,0 +1,14 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <parent>
+    <groupId>com.xpn.xwiki.products</groupId>
+    <artifactId>xwiki-enterprise-parent</artifactId>
+    <version>1.7-SNAPSHOT</version>
+  </parent>
+  <artifactId>xwiki-enterprise-wiki</artifactId>
+  <name>XWiki test project for xwiki-xar-plugin</name>
+  <packaging>xar</packaging>
+  <description>XWiki Products - Enterprise - Wiki</description>
+  <dependencies>
+  </dependencies>
+</project>

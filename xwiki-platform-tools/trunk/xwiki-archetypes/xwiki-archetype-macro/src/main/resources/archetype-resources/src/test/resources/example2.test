@@ -1,0 +1,26 @@
+.runTransformations
+.#-----------------------------------------------------
+.input|xwiki/2.0
+.# Test the macro in inline mode
+.#-----------------------------------------------------
+This is inline {{example parameter="hello"/}}
+.#-----------------------------------------------------
+.expect|xhtml/1.0
+.#-----------------------------------------------------
+<p>This is inline hello</p>
+.#-----------------------------------------------------
+.expect|event/1.0
+.#-----------------------------------------------------
+beginDocument
+beginParagraph
+onWord [This]
+onSpace
+onWord [is]
+onSpace
+onWord [inline]
+onSpace
+beginMacroMarkerInline [example] [parameter=hello]
+onWord [hello]
+endMacroMarkerInline [example] [parameter=hello]
+endParagraph
+endDocument

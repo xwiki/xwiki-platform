@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+
+<xwikidoc>
+<web>XWiki</web>
+<name>PresentationClass</name>
+<language></language>
+<defaultLanguage>en</defaultLanguage>
+<translation>0</translation>
+<parent>XWiki.XWikiClasses</parent>
+<author>XWiki.Admin</author>
+<creationDate>1107712021000</creationDate>
+<date>1107712021000</date>
+<version>1.2</version>
+<class>
+<name>XWiki.PresentationClass</name>
+<logo>
+<name>logo</name>
+<prettyName>logo</prettyName>
+<unmodifiable>0</unmodifiable>
+<size>80</size>
+<number>1</number>
+<classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+</logo>
+<header>
+<name>header</name>
+<prettyName>header</prettyName>
+<unmodifiable>0</unmodifiable>
+<size>80</size>
+<rows>10</rows>
+<number>2</number>
+<classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+</header>
+<footer>
+<name>footer</name>
+<prettyName>footer</prettyName>
+<unmodifiable>0</unmodifiable>
+<size>80</size>
+<rows>10</rows>
+<number>3</number>
+<classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+</footer>
+</class>
+<content>#set($defaultparent = "XWiki.PresentationClass")
+#set($defaultweb = "Main")
+#includeForm("xwiki:XWiki.ClassSheet")</content>
+</xwikidoc>

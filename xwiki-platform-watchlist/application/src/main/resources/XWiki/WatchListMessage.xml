@@ -7,7 +7,7 @@
 <defaultLanguage></defaultLanguage>
 <translation>0</translation>
 <parent>XWiki.WebHome</parent>
-<creator></creator>
+<creator>XWiki.Admin</creator>
 <author>XWiki.Admin</author>
 <customClass></customClass>
 <contentAuthor>XWiki.Admin</contentAuthor>

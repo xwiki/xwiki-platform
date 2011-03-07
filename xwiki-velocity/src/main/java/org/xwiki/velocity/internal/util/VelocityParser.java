@@ -26,7 +26,7 @@ import org.xwiki.component.logging.AbstractLogEnabled;
 import org.xwiki.component.logging.Logger;
 
 /**
- * Provide helpers to parser velocity script.
+ * Provide helpers to parse velocity scripts.
  * 
  * @version $Id$
  */
@@ -117,6 +117,8 @@ public class VelocityParser extends AbstractLogEnabled
         } else if (array[i + 1] == '{' || Character.isLetter(array[i + 1])) {
             // A directive
             i = getDirective(array, currentIndex, velocityBlock, context);
+        } else {
+            throw new InvalidVelocityException();
         }
 
         return i;

@@ -27,7 +27,7 @@
   <parent>
     <groupId>org.xwiki.commons</groupId>
     <artifactId>xwiki-commons</artifactId>
-    <version>40</version>
+    <version>41-SNAPSHOT</version>
     <relativePath>../../commons/xwiki-commons-pom</relativePath>
   </parent>
   <groupId>org.xwiki.platform.tools</groupId>

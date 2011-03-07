@@ -322,6 +322,12 @@
       <artifactId>xwiki-core-eventstream</artifactId>
       <version>${platform.core.version}</version>
     </dependency>
+    <!-- XML Script Service -->
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-core-xml-script</artifactId>
+      <version>${project.version}</version>
+    </dependency>
 
     <!--  -->
     <!-- WYSIWYG -->

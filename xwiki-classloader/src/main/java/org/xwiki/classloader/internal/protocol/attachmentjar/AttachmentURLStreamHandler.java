@@ -85,7 +85,7 @@ public class AttachmentURLStreamHandler extends URLStreamHandler implements Exte
     
     private String getAttachmentReference(URL url)
     {
-        // If the URL doesn't start with the JAR scheme prefix something is wrong
+        // If the URL doesn't start with the Attachment JAR scheme prefix something is wrong
         String urlAsString = url.toString();
         if (!urlAsString.startsWith(ATTACHMENT_JAR_PREFIX)) {
             throw new RuntimeException("An attachment JAR URL should start with [" 

@@ -37,7 +37,7 @@ public class IndentVelocityMacroFilterTest
     private VelocityContext context;
 
     @Before
-    protected void setUp() throws Exception
+    public void setUp() throws Exception
     {
         this.filter = new IndentVelocityMacroFilter();
 

@@ -26,7 +26,7 @@
     <groupId>org.xwiki.commons</groupId>
     <artifactId>xwiki-commons</artifactId>
     <version>40-SNAPSHOT</version>
-    <relativePath>../../xwiki-commons-pom</relativePath>
+    <relativePath>../../commons/xwiki-commons-pom</relativePath>
   </parent>
   <groupId>com.xpn.xwiki.platform</groupId>
   <artifactId>xwiki-web</artifactId>

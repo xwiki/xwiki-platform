@@ -19,31 +19,26 @@
  */
 package org.xwiki.rendering.internal.macro.velocity.filter;
 
-import junit.framework.TestCase;
+import junit.framework.Assert;
 
 import org.apache.velocity.VelocityContext;
+import org.junit.Before;
+import org.junit.Test;
 
 /**
  * Validate the behavior of {@link HTMLVelocityMacroFilter}.
  * 
  * @version $Id$
  */
-public class IndentVelocityMacroFilterTest extends TestCase
+public class IndentVelocityMacroFilterTest
 {
     private IndentVelocityMacroFilter filter;
 
     private VelocityContext context;
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see junit.framework.TestCase#setUp()
-     */
-    @Override
+    @Before
     protected void setUp() throws Exception
     {
-        super.setUp();
-
         this.filter = new IndentVelocityMacroFilter();
 
         this.context = new VelocityContext();
@@ -51,9 +46,10 @@ public class IndentVelocityMacroFilterTest extends TestCase
 
     public void assertFilter(String expected, String input)
     {
-        assertEquals(expected, this.filter.before(input, this.context));
+        Assert.assertEquals(expected, this.filter.before(input, this.context));
     }
 
+    @Test
     public void testFilter()
     {
         assertFilter("", " ");

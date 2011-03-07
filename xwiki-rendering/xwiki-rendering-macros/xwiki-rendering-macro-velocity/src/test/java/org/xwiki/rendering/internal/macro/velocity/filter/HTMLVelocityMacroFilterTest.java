@@ -19,31 +19,26 @@
  */
 package org.xwiki.rendering.internal.macro.velocity.filter;
 
-import junit.framework.TestCase;
+import junit.framework.Assert;
 
 import org.apache.velocity.VelocityContext;
+import org.junit.Before;
+import org.junit.Test;
 
 /**
  * Validate the behavior of {@link HTMLVelocityMacroFilter}.
  * 
  * @version $Id$
  */
-public class HTMLVelocityMacroFilterTest extends TestCase
+public class HTMLVelocityMacroFilterTest
 {
     private HTMLVelocityMacroFilter filter;
 
     private VelocityContext context;
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see junit.framework.TestCase#setUp()
-     */
-    @Override
-    protected void setUp() throws Exception
+    @Before
+    public void setUp() throws Exception
     {
-        super.setUp();
-
         this.filter = new HTMLVelocityMacroFilter();
         this.filter.initialize();
 
@@ -52,9 +47,10 @@ public class HTMLVelocityMacroFilterTest extends TestCase
 
     public void assertFilter(String expected, String input)
     {
-        assertEquals(expected, this.filter.before(input, this.context));
+        Assert.assertEquals(expected, this.filter.before(input, this.context));
     }
 
+    @Test
     public void testFilter()
     {
         assertFilter("T T", "T T");
@@ -69,6 +65,7 @@ public class HTMLVelocityMacroFilterTest extends TestCase
         assertFilter("T", "  T");
     }
 
+    @Test
     public void testFilterSP()
     {
         assertFilter("T$spT", "T$spT");
@@ -77,6 +74,7 @@ public class HTMLVelocityMacroFilterTest extends TestCase
         assertFilter("T $sp T", "T  $sp  T");
     }
 
+    @Test
     public void testFilterNL()
     {
         assertFilter("${nl}", "$nl");
@@ -94,6 +92,7 @@ public class HTMLVelocityMacroFilterTest extends TestCase
         assertFilter("T \\$nl T", "T\n \n \\$nl \n \nT");
     }
 
+    @Test
     public void testFilterIndent()
     {
         assertFilter("#if (true)\ntext#end", "#if (true)\n text#end");
@@ -103,17 +102,20 @@ public class HTMLVelocityMacroFilterTest extends TestCase
         assertFilter("#if (true)\n#if (true)\ntext#end#end", "#if (true)\n  #if (true)\n    text#end#end");
     }
 
+    @Test
     public void testFilterComment()
     {
         assertFilter("", "##comment\n#*comment*#");
     }
 
+    @Test
     public void testFilterDirective()
     {
         assertFilter("#set()\n#if()\n#foreach()\n#end\n#elseif()\n#else\n#macro()\n#somemacro() T",
             "##comment\n#set()\n#if()\n#foreach()\n#end\n#elseif()\n#else\n#macro()\n#somemacro()\nT");
     }
 
+    @Test
     public void testFilterDirectiveSet()
     {
         assertFilter("#set()\n", "#set()\n");
@@ -123,10 +125,11 @@ public class HTMLVelocityMacroFilterTest extends TestCase
 
         assertFilter("#set()\nT", "#set()\n\n \tT");
         assertFilter("T #set()\nT", "T #set()\n\n \tT");
-        
+
         assertFilter("#if()\ntext#end", "#if()\ntext\n#end");
     }
 
+    @Test
     public void testFilterDirectiveMacro()
     {
         assertFilter("#somemacro() T", "#somemacro()\nT");
@@ -134,9 +137,18 @@ public class HTMLVelocityMacroFilterTest extends TestCase
         assertFilter("#somemacro()#set()\n", "#somemacro()\n#set()\n");
     }
 
+    @Test
     public void testFilterWithMSNL()
     {
         assertFilter("#set()\n", "#set()\r\n");
         assertFilter("#set()\n", "#set()\r");
+    }
+
+    @Test
+    public void testInvalidOrPartial()
+    {
+        assertFilter("#${escapetool.H}${declaredRight}#${escapetool.H}",
+            "#${escapetool.H}${declaredRight}#${escapetool.H}");
+        assertFilter("$ notvar", "$ notvar");
     }
 }

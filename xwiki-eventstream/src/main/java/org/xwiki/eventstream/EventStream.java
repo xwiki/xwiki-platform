@@ -30,6 +30,7 @@ import org.xwiki.query.QueryException;
  * The stream of events, allowing to store and retrieve events.
  * 
  * @version $Id$
+ * @since 3.0M2
  */
 @ComponentRole
 public interface EventStream

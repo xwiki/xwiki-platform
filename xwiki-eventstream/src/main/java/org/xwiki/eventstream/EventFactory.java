@@ -29,6 +29,7 @@ import org.xwiki.component.annotation.ComponentRole;
  * {@link Event#getDate() date}.
  * 
  * @version $Id$
+ * @since 3.0M2
  */
 @ComponentRole
 public interface EventFactory

@@ -29,6 +29,7 @@ import java.util.Set;
  * A group of related events, all happening as a consequence of the same action.
  * 
  * @version $Id$
+ * @since 3.0M2
  */
 public class EventGroup
 {

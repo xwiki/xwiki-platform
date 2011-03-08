@@ -79,6 +79,7 @@ import org.xwiki.model.reference.WikiReference;
  * </p>
  * 
  * @version $Id$
+ * @since 3.0M2
  */
 public interface Event
 {

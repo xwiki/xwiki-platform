@@ -171,6 +171,7 @@
     <module>xwiki-skin</module>
     <module>xwiki-store</module>
     <module>xwiki-eventstream</module>
+    <module>xwiki-messagestream</module>
   </modules>
   <profiles>
     <profile>

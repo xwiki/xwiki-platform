@@ -103,6 +103,22 @@ public class BridgeEventStream implements EventStream
     /**
      * {@inheritDoc}
      * 
+     * @see EventStream#deleteEvent(Event)
+     */
+    public void deleteEvent(Event e)
+    {
+        try {
+            XWikiContext context = getXWikiContext();
+            ActivityStreamPlugin plugin = getPlugin(context);
+            plugin.getActivityStream().deleteActivityEvent(convertEventToActivity(e), context);
+        } catch (ActivityStreamException ex) {
+            // Unlikely; nothing we can do
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
      * @see EventStream#getRelatedEvents(Event)
      */
     public EventGroup getRelatedEvents(Event e)

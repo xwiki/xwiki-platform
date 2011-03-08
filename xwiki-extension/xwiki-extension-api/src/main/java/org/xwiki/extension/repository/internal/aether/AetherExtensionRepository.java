@@ -40,14 +40,11 @@ import org.xwiki.extension.ExtensionId;
 import org.xwiki.extension.ResolveException;
 import org.xwiki.extension.repository.ExtensionRepository;
 import org.xwiki.extension.repository.ExtensionRepositoryId;
-import org.xwiki.extension.repository.internal.aether.configuration.AetherConfiguration;
 import org.xwiki.extension.repository.internal.plexus.PlexusComponentManager;
 
 public class AetherExtensionRepository implements ExtensionRepository
 {
     private ExtensionRepositoryId repositoryId;
-
-    private AetherConfiguration aetherConfiguration;
 
     private PlexusComponentManager plexusComponentManager;
 
@@ -58,12 +55,9 @@ public class AetherExtensionRepository implements ExtensionRepository
     private RemoteRepository remoteRepository;
 
     public AetherExtensionRepository(ExtensionRepositoryId repositoryId, RepositorySystemSession session,
-        AetherConfiguration aetherConfiguration, PlexusComponentManager mavenComponentManager)
-        throws ComponentLookupException
+        PlexusComponentManager mavenComponentManager) throws ComponentLookupException
     {
         this.repositoryId = repositoryId;
-
-        this.aetherConfiguration = aetherConfiguration;
 
         this.plexusComponentManager = mavenComponentManager;
 
@@ -93,15 +87,16 @@ public class AetherExtensionRepository implements ExtensionRepository
     public Extension resolve(ExtensionId extensionId) throws ResolveException
     {
         Artifact artifact = new DefaultArtifact(extensionId.getId() + ':' + extensionId.getVersion());
-        
-        Artifact pomArtifact = new SubArtifact( artifact, "", "pom" );
+
+        Artifact pomArtifact = new SubArtifact(artifact, "", "pom");
         LocalArtifactRequest localArtifactRequest = new LocalArtifactRequest();
         localArtifactRequest.setArtifact(pomArtifact);
-        LocalArtifactResult localArtifactResult = this.session.getLocalRepositoryManager().find(this.session, localArtifactRequest);
+        LocalArtifactResult localArtifactResult =
+            this.session.getLocalRepositoryManager().find(this.session, localArtifactRequest);
         if (localArtifactResult.getFile() != null) {
             localArtifactResult.getFile().delete();
         }
-        
+
         ArtifactDescriptorRequest artifactDescriptorRequest = new ArtifactDescriptorRequest();
         artifactDescriptorRequest.setArtifact(artifact);
         artifactDescriptorRequest.addRepository(this.remoteRepository);
@@ -127,7 +122,7 @@ public class AetherExtensionRepository implements ExtensionRepository
             throw new ResolveException("Failed to resolve extension [" + extensionId + "]", e);
         }
     }
-    
+
     private ArtifactDescriptorResult resolveArtifact(ExtensionId extensionId) throws ResolveException
     {
         Artifact artifact = new DefaultArtifact(extensionId.getId() + ':' + extensionId.getVersion());
@@ -142,7 +137,7 @@ public class AetherExtensionRepository implements ExtensionRepository
         } catch (ArtifactDescriptorException e) {
             throw new ResolveException("Failed to resolve aether artifact", e);
         }
-        
+
         return result;
     }
 

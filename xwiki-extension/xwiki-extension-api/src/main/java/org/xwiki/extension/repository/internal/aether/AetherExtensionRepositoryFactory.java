@@ -44,7 +44,7 @@ public class AetherExtensionRepositoryFactory extends AbstractLogEnabled impleme
     private PlexusComponentManager aetherComponentManager;
 
     @Requirement
-    private AetherConfiguration mavenConfiguration;
+    private AetherConfiguration aetherConfiguration;
 
     private DefaultRepositorySystemSession session;
 
@@ -59,7 +59,7 @@ public class AetherExtensionRepositoryFactory extends AbstractLogEnabled impleme
 
         this.session = new MavenRepositorySystemSession();
 
-        LocalRepository localRepo = new LocalRepository(this.mavenConfiguration.getLocalRepository());
+        LocalRepository localRepo = new LocalRepository(this.aetherConfiguration.getLocalRepository());
         this.session.setLocalRepositoryManager(repositorySystem.newLocalRepositoryManager(localRepo));
         this.session.setIgnoreMissingArtifactDescriptor(false);
         this.session.setIgnoreInvalidArtifactDescriptor(false);
@@ -68,8 +68,7 @@ public class AetherExtensionRepositoryFactory extends AbstractLogEnabled impleme
     public ExtensionRepository createRepository(ExtensionRepositoryId repositoryId) throws ExtensionRepositoryException
     {
         try {
-            return new AetherExtensionRepository(repositoryId, this.session, this.mavenConfiguration,
-                this.aetherComponentManager);
+            return new AetherExtensionRepository(repositoryId, this.session, this.aetherComponentManager);
         } catch (Exception e) {
             throw new ExtensionRepositoryException("Failed to create repository [" + repositoryId + "]", e);
         }

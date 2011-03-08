@@ -11,6 +11,10 @@
   $xwiki.watchlist.addWiki($doc.wiki)
 #elseif ($do == 'removewiki')
   $xwiki.watchlist.removeWiki($doc.wiki)
+#elseif ($do == 'adduser')
+  $xwiki.watchlist.addUser($doc.fullName)
+#elseif ($do == 'removeuser')
+  $xwiki.watchlist.removeUser($doc.fullName)
 #end
 #if ("$!request.xredirect" != "")
   $response.sendRedirect($request.xredirect)

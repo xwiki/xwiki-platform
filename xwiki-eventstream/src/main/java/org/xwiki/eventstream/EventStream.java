@@ -60,4 +60,12 @@ public interface EventStream
      * @return the event's group of related events
      */
     EventGroup getRelatedEvents(Event e);
+
+    /**
+     * Delete an event from the storage. This method does not perform any rights check, it should be done before calling
+     * this method.
+     * 
+     * @param e the event to delete
+     */
+    void deleteEvent(Event e);
 }

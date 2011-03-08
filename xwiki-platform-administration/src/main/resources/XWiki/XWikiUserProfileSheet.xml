@@ -22,6 +22,125 @@
 <minorEdit>false</minorEdit>
 <syntaxId>xwiki/2.0</syntaxId>
 <hidden>false</hidden>
+<object>
+<class>
+<name>XWiki.StyleSheetExtension</name>
+<customClass></customClass>
+<customMapping></customMapping>
+<defaultViewSheet></defaultViewSheet>
+<defaultEditSheet></defaultEditSheet>
+<defaultWeb></defaultWeb>
+<nameField></nameField>
+<validationScript></validationScript>
+<cache>
+<cache>0</cache>
+<disabled>0</disabled>
+<displayType>select</displayType>
+<multiSelect>0</multiSelect>
+<name>cache</name>
+<number>5</number>
+<prettyName>Caching policy</prettyName>
+<relationalStorage>0</relationalStorage>
+<separator> </separator>
+<separators> ,|</separators>
+<size>1</size>
+<unmodifiable>0</unmodifiable>
+<values>long|short|default|forbid</values>
+<classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+</cache>
+<code>
+<disabled>0</disabled>
+<name>code</name>
+<number>2</number>
+<prettyName>Code</prettyName>
+<rows>20</rows>
+<size>50</size>
+<unmodifiable>0</unmodifiable>
+<classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+</code>
+<name>
+<disabled>0</disabled>
+<name>name</name>
+<number>1</number>
+<prettyName>Name</prettyName>
+<size>30</size>
+<unmodifiable>0</unmodifiable>
+<classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+</name>
+<parse>
+<disabled>0</disabled>
+<displayFormType>select</displayFormType>
+<displayType>yesno</displayType>
+<name>parse</name>
+<number>4</number>
+<prettyName>Parse content</prettyName>
+<unmodifiable>0</unmodifiable>
+<classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+</parse>
+<use>
+<cache>0</cache>
+<disabled>0</disabled>
+<displayType>select</displayType>
+<multiSelect>0</multiSelect>
+<name>use</name>
+<number>3</number>
+<prettyName>Use this extension</prettyName>
+<relationalStorage>0</relationalStorage>
+<separator> </separator>
+<separators> ,|</separators>
+<size>1</size>
+<unmodifiable>0</unmodifiable>
+<values>currentPage=Always on this page|onDemand=On demand|always=Always on this wiki</values>
+<classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+</use>
+</class>
+<name>XWiki.XWikiUserProfileSheet</name>
+<number>0</number>
+<className>XWiki.StyleSheetExtension</className>
+<guid>69c76935-fbd0-4167-af11-8ad356c88ba9</guid>
+<property>
+<cache>long</cache>
+</property>
+<property>
+<code>#template('colorThemeInit.vm')
+
+.userstatus-follow {
+  padding-bottom: 10px;
+  margin-bottom: 20px;
+}
+
+.userstatus-follow .unfollow {
+  background: transparent 2px center url("$xwiki.getSkinFile('icons/silk/cross.gif')") no-repeat;
+  display: inline-block;
+  width:16px;
+  text-indent: 20px;
+  overflow: hidden;
+  padding: 4px 0;
+  ## padding: 4px 6px 4px 22px;
+}
+
+.userstatus-follow .follow, .userstatus-follow .following {
+  background: $theme.menuAddEntryBackgroundColor 2px center url("$xwiki.getSkinFile('icons/silk/accept.gif')") no-repeat;
+  border-radius: 4px;
+  -webkit-border-radius: 4px;
+  -moz-border-radius: 4px;
+  color: $theme.menuAddEntryLinkColor !important;
+  padding: 4px 6px 4px 22px;
+}
+.userstatus-follow .follow {
+  background-image: url("$xwiki.getSkinFile('icons/silk/add.gif')");
+}</code>
+</property>
+<property>
+<name>'Follow' css</name>
+</property>
+<property>
+<parse>1</parse>
+</property>
+<property>
+<use>currentPage</use>
+</property>
+</object>
 <content>{{velocity}}
 #set($obj = $doc.getObject("XWiki.XWikiUsers"))
 #set($obfuscateEmail = true)
@@ -90,10 +209,26 @@ $xwiki.ssx.use("XWiki.XWikiUserSheet")##
   #if ($xcontext.action == 'view')
     &lt;div class="half column"&gt;
       &lt;div class="userRecentChanges"&gt;
+      #if ($context.user == $doc.fullName)
         &lt;h1&gt;$msg.get('platform.core.profile.section.activity')&lt;/h1&gt;
+      #else
+        &lt;h1&gt;$msg.get('platform.core.profile.section.activityof', [$xwiki.getUserName($doc.fullName, false)])&lt;/h1&gt;
+        #if ($hasWatch)
+        $xwiki.ssx.use('XWiki.XWikiUserProfileSheet')##
+        &lt;div class="userstatus-follow"&gt;
+          #set ($xredirect = $doc.getURL($context.action, $request.queryString))
+          #if ($xwiki.watchlist.isUserWatched(${doc.prefixedFullName}))
+          &lt;span class="following"&gt;$msg.get('xe.activity.messages.following')&lt;/span&gt;
+          &lt;a class="action unfollow" href="$doc.getURL('view', "xpage=watch&amp;amp;do=removeuser&amp;amp;xredirect=${escapetool.url($xredirect)}")"&gt;$msg.get('xe.activity.messages.unfollow')&lt;/a&gt;
+          #else
+          &lt;a class="action follow" href="$doc.getURL('view', "xpage=watch&amp;amp;do=adduser&amp;amp;xredirect=${escapetool.url($xredirect)}")"&gt;$msg.get('xe.activity.messages.follow')&lt;/a&gt;
+          #end
+        &lt;/div&gt;
+        #end
+      #end
 {{/html}}
 
-{{activity authors="${doc.fullName}" /}}
+{{activity authors="${doc.fullName},${doc.prefixedFullName}" /}}
 
 {{html clean="false"}}
       &lt;/div&gt;

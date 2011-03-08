@@ -306,10 +306,15 @@
       <artifactId>xwiki-core-legacy</artifactId>
       <version>${platform.core.version}</version>
     </dependency>
-    <!-- Event Stream Module -->
+    <!-- Event & Message Stream Modules -->
     <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-core-eventstream</artifactId>
+      <version>${platform.core.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-core-messagestream</artifactId>
       <version>${platform.core.version}</version>
     </dependency>
     <!-- XML Script Service -->

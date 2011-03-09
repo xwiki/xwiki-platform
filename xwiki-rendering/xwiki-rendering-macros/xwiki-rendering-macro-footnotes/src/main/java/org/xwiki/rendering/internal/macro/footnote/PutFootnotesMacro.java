@@ -114,9 +114,9 @@ public class PutFootnotesMacro extends AbstractMacro<FootnoteMacroParameters>
         List<MacroMarkerBlock> footnotes = root.getChildrenByType(MacroMarkerBlock.class, true);
         for (ListIterator<MacroMarkerBlock> it = footnotes.listIterator(); it.hasNext();) {
             MacroMarkerBlock macro = it.next();
-            if (FootnoteMacro.MACRO_NAME.equals(macro.getName())) {
+            if (FootnoteMacro.MACRO_NAME.equals(macro.getId())) {
                 continue;
-            } else if (PutFootnotesMacro.MACRO_NAME.equals(macro.getName())) {
+            } else if (PutFootnotesMacro.MACRO_NAME.equals(macro.getId())) {
                 macro.getParent().replaceChild(Collections.<Block> emptyList(), macro);
             }
             it.remove();

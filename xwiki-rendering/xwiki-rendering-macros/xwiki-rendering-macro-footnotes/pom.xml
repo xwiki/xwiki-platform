@@ -32,11 +32,4 @@
   <artifactId>xwiki-core-rendering-macro-footnotes</artifactId>
   <name>XWiki Platform - Core - Rendering - Macro - Footnotes</name>
   <description>Rendering macro for generating footnotes</description>
-  <dependencies>
-    <dependency>
-      <groupId>org.xwiki.commons</groupId>
-      <artifactId>xwiki-commons-context</artifactId>
-      <version>${commons.version}</version>
-    </dependency>
-  </dependencies>
 </project>

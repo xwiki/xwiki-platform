@@ -31,7 +31,7 @@
   </parent>
   <artifactId>xwiki-plugin-lucene</artifactId>
   <name>XWiki Platform - Plugins - Lucene search</name>
-  <version>1.24</version>
+  <version>1.25-SNAPSHOT</version>
   <description>XWiki Platform - Plugins - Lucene search</description>
   <properties>
     <commons.version>3.0-milestone-3</commons.version>
@@ -104,9 +104,9 @@
   <!-- We must configure SCM in each module. For more information see:
        http://svn.xwiki.org/svnroot/xwiki/platform/pom/trunk/pom.xml -->
   <scm>
-    <connection>scm:svn:http://svn.xwiki.org/svnroot/xwiki/platform/xwiki-plugins/tags/xwiki-plugin-lucene-1.24</connection>
-    <developerConnection>scm:svn:https://svn.xwiki.org/svnroot/xwiki/platform/xwiki-plugins/tags/xwiki-plugin-lucene-1.24</developerConnection>
-    <url>http://svn.xwiki.org/svnroot/xwiki/platform/xwiki-plugins/tags/xwiki-plugin-lucene-1.24</url>
+    <connection>scm:svn:http://svn.xwiki.org/svnroot/xwiki/platform/xwiki-plugins/trunk/lucene</connection>
+    <developerConnection>scm:svn:https://svn.xwiki.org/svnroot/xwiki/platform/xwiki-plugins/trunk/lucene</developerConnection>
+    <url>http://svn.xwiki.org/svnroot/xwiki/platform/xwiki-plugins/trunk/lucene</url>
   </scm>
   <issueManagement>
     <system>jira</system>

@@ -231,7 +231,7 @@
  {
    var str = "";
 
-   if (users.value != "" || users.value != "") {
+   if (users.value != "" || groups.value != "") {
      str = "&lt;ul class=\"star\"&gt;";
 
      if (users.value != "")

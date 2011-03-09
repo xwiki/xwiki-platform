@@ -93,7 +93,6 @@
     </plugins>
   </build>
   <modules>
-    <module>xwiki-rendering-macro-id</module>
     <module>xwiki-rendering-macro-include</module>
     <module>xwiki-rendering-macro-script</module>
     <module>xwiki-rendering-macro-velocity</module>

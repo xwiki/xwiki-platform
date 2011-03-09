@@ -44,9 +44,9 @@
     <clirr.previous.version>2.7</clirr.previous.version>
   </properties>
   <scm>
-    <connection>scm:svn:http://svn.xwiki.org/svnroot/xwiki/platform/core/tags/xwiki-core-parent-3.0-milestone-3</connection>
-    <developerConnection>scm:svn:https://svn.xwiki.org/svnroot/xwiki/platform/core/tags/xwiki-core-parent-3.0-milestone-3</developerConnection>
-    <url>http://svn.xwiki.org/svnroot/xwiki/platform/core/tags/xwiki-core-parent-3.0-milestone-3</url>
+    <connection>scm:svn:http://svn.xwiki.org/svnroot/xwiki/platform/core/tags/xwiki-core-3.0-milestone-3</connection>
+    <developerConnection>scm:svn:https://svn.xwiki.org/svnroot/xwiki/platform/core/tags/xwiki-core-3.0-milestone-3</developerConnection>
+    <url>http://svn.xwiki.org/svnroot/xwiki/platform/core/tags/xwiki-core-3.0-milestone-3</url>
   </scm>
   <issueManagement>
     <system>jira</system>

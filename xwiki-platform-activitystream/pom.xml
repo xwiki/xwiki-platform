@@ -28,7 +28,7 @@
   <parent>
     <groupId>com.xpn.xwiki.platform.plugins</groupId>
     <artifactId>xwiki-plugins</artifactId>
-    <version>30-SNAPSHOT</version>
+    <version>29</version>
   </parent>
   <artifactId>xwiki-plugin-activitystream</artifactId>
   <version>1.11-SNAPSHOT</version>
@@ -36,8 +36,8 @@
   <packaging>jar</packaging>
   <description>XWiki Platform - Plugins - Activity Stream</description>
   <properties>
-    <platform.core.version>3.0-SNAPSHOT</platform.core.version>
-    <platform.plugin.scheduler.version>1.25-SNAPSHOT</platform.plugin.scheduler.version>
+    <platform.core.version>3.0-milestone-3</platform.core.version>
+    <platform.plugin.scheduler.version>1.25</platform.plugin.scheduler.version>
     <jmock.version>1.1.0</jmock.version>
   </properties>
   <dependencies>

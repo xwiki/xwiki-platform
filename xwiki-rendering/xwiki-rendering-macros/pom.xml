@@ -100,7 +100,6 @@
     <module>xwiki-rendering-macro-code</module>
     <module>xwiki-rendering-macro-rss</module>
     <module>xwiki-rendering-macro-useravatar</module>
-    <module>xwiki-rendering-macro-message</module>
     <module>xwiki-rendering-macro-footnotes</module>
     <module>xwiki-rendering-macro-wikibridge</module>
     <module>xwiki-rendering-macro-ruby</module>

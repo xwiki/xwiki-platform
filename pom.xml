@@ -38,8 +38,8 @@
   <description>XWiki Platform - Core - Parent POM</description>
   <properties>
     <!-- Versions of XWiki dependencies used in Core modules -->
-    <rendering.version>${project.version}</rendering.version>
-    <commons.version>${project.version}</commons.version>
+    <rendering.version>3.0-milestone-3</rendering.version>
+    <commons.version>3.0-milestone-3</commons.version>
     <!-- Versions of XWiki dependencies used in Core modules -->
     <clirr.previous.version>2.7</clirr.previous.version>
   </properties>

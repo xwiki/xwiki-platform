@@ -34,6 +34,7 @@
   <version>1.24-SNAPSHOT</version>
   <description>XWiki Platform - Plugins - Lucene search</description>
   <properties>
+    <commons.version>3.0-milestone-3</commons.version>
     <platform.core.version>3.0-milestone-3</platform.core.version>
   </properties>
   <dependencies>
@@ -81,9 +82,9 @@
 
     <!-- Test dependencies -->
     <dependency>
-      <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-core-shared-tests</artifactId>
-      <version>${platform.core.version}</version>
+      <groupId>org.xwiki.commons</groupId>
+      <artifactId>xwiki-commons-tests</artifactId>
+      <version>${commons.version}</version>
       <scope>test</scope>
     </dependency>
     <dependency>

@@ -1,2 +1,0 @@
-org.xwiki.rendering.internal.macro.footnote.FootnoteMacro
-org.xwiki.rendering.internal.macro.footnote.PutFootnotesMacro

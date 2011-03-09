@@ -52,6 +52,11 @@ public class FootnoteMacro extends AbstractMacro<FootnoteMacroParameters>
     private static final String CONTENT_DESCRIPTION = "the text to place in the footnote";
 
     /**
+     * Matches MacroBlocks having a macro id of {@link PutFootnotesMacro#MACRO_NAME}.
+     */
+    private static final MacroBlockMatcher MACRO_BLOCK_MATCHER = new MacroBlockMatcher(PutFootnotesMacro.MACRO_NAME);
+
+    /**
      * Create and initialize the descriptor of the macro.
      */
     public FootnoteMacro()
@@ -92,8 +97,7 @@ public class FootnoteMacro extends AbstractMacro<FootnoteMacroParameters>
     {
         Block root = context.getXDOM();
 
-        Block matchingBlock = root.getFirstBlock(new MacroBlockMatcher(PutFootnotesMacro.MACRO_NAME),
-            Block.Axes.DESCENDANT);
+        Block matchingBlock = root.getFirstBlock(MACRO_BLOCK_MATCHER, Block.Axes.DESCENDANT);
         if (matchingBlock != null) {
             return Collections.emptyList();
         }

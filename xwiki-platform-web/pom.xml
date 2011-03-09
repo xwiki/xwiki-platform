@@ -50,6 +50,7 @@
     <smartgwt.version>2.0</smartgwt.version>
     <junit.version>3.8.2</junit.version>
     <!-- Versions of XWiki dependencies used in Platform/Web modules -->
+    <commons.version>3.0-milestone-3</commons.version>
     <rendering.version>3.0-milestone-3</rendering.version>
     <platform.tool.configuration.version>1.45</platform.tool.configuration.version>
     <platform.core.version>3.0-milestone-3</platform.core.version>

@@ -58,9 +58,9 @@
         This dependency is required only for its annotations. GWT-RPC services are implemented as components in XWiki
         and for this reason service interfaces have to be annotated as component roles.
       -->
-      <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-core-component-api</artifactId>
-      <version>${platform.core.version}</version>
+      <groupId>org.xwiki.commons</groupId>
+      <artifactId>xwiki-commons-component-api</artifactId>
+      <version>${commons.version}</version>
       <scope>provided</scope>
     </dependency>
     <!-- Test dependencies -->

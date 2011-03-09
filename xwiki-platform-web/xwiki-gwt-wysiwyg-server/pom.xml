@@ -66,9 +66,9 @@
       <scope>provided</scope>
     </dependency>
     <dependency>
-      <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-core-xml-default</artifactId>
-      <version>${platform.core.version}</version>
+      <groupId>org.xwiki.commons</groupId>
+      <artifactId>xwiki-commons-xml</artifactId>
+      <version>${commons.version}</version>
       <scope>provided</scope>
     </dependency>
     <dependency>
@@ -96,9 +96,9 @@
     </dependency>
     <!-- Test dependencies -->
     <dependency>
-      <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-core-shared-tests</artifactId>
-      <version>${platform.core.version}</version>
+      <groupId>org.xwiki.commons</groupId>
+      <artifactId>xwiki-commons-tests</artifactId>
+      <version>${commons.version}</version>
       <scope>test</scope>
     </dependency>
     <dependency>

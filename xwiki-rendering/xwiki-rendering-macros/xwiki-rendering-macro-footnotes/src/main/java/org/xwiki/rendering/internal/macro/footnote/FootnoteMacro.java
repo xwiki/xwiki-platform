@@ -25,6 +25,7 @@ import java.util.List;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.block.MacroBlock;
+import org.xwiki.rendering.block.match.MacroBlockMatcher;
 import org.xwiki.rendering.macro.AbstractMacro;
 import org.xwiki.rendering.macro.MacroExecutionException;
 import org.xwiki.rendering.macro.descriptor.DefaultContentDescriptor;
@@ -90,11 +91,11 @@ public class FootnoteMacro extends AbstractMacro<FootnoteMacroParameters>
         throws MacroExecutionException
     {
         Block root = context.getXDOM();
-        List<MacroBlock> macros = root.getChildrenByType(MacroBlock.class, true);
-        for (MacroBlock macro : macros) {
-            if (PutFootnotesMacro.MACRO_NAME.equals(macro.getId())) {
-                return Collections.emptyList();
-            }
+
+        Block matchingBlock = root.getFirstBlock(new MacroBlockMatcher(PutFootnotesMacro.MACRO_NAME),
+            Block.Axes.DESCENDANT);
+        if (matchingBlock != null) {
+            return Collections.emptyList();
         }
 
         Block putFootnotesMacro =

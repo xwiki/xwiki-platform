@@ -38,9 +38,9 @@
       <artifactId>commons-io</artifactId>
     </dependency>
     <dependency>
-      <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-core-rendering-macro-box</artifactId>
-      <version>${project.version}</version>
+      <groupId>org.xwiki.rendering</groupId>
+      <artifactId>xwiki-rendering-macro-box</artifactId>
+      <version>${rendering.version}</version>
     </dependency>
     <dependency>
       <groupId>org.python</groupId>

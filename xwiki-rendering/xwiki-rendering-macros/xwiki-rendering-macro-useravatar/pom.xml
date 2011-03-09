@@ -26,7 +26,7 @@
   <parent>
     <artifactId>xwiki-core-rendering-macros-parent</artifactId>
     <groupId>org.xwiki.platform</groupId>
-    <version>3.0-SNAPSHOT</version>
+    <version>3.0-test</version>
   </parent>
   <modelVersion>4.0.0</modelVersion>
   <artifactId>xwiki-core-rendering-macro-useravatar</artifactId>

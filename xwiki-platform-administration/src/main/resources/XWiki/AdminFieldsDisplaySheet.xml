@@ -48,20 +48,30 @@
         &lt;label #if($prop)for="${prefsclassname}_${obj.number}_${prop.name}"#end class="$field"&gt;$title
         #if($field == 'skin')
           #set ($skin = $xwiki.skin)
-          #if ($skin.indexOf('.') != -1)
-            &amp;nbsp;&lt;span class="buttonwrapper"&gt;&lt;a href="$xwiki.getURL($skin)"&gt;$msg.get('admin.customize')&lt;/a&gt;&lt;/span&gt;
-          #end
+          &lt;span class="buttonwrapper"&gt;&lt;a href="$xwiki.getURL($skin)"#if ($skin.indexOf('.') &lt; 0) class="hidden"#end&gt;$msg.get('admin.customize')&lt;/a&gt;&lt;/span&gt;
         #end
         #if($field == 'colorTheme')
-          #set ($colorThemeName = $xwiki.getXWikiPreference('colorTheme'))
-          #if ($colorThemeName.indexOf('.') != -1)
-            &amp;nbsp;&lt;span class="buttonwrapper"&gt;&lt;a href="$xwiki.getURL($colorThemeName, 'inline')"&gt;$msg.get('admin.customize')&lt;/a&gt;&lt;/span&gt;
+          #if ($editor == 'globaladmin')
+            #set ($colorThemeName = $xwiki.getXWikiPreference('colorTheme'))
+          #else
+            #set ($colorThemeName = $xwiki.getSpacePreference('colorTheme'))
+            #set ($wikiColorTheme = $xwiki.getDocument($xwiki.getXWikiPreference('colorTheme')))
+            #if (!$wikiColorTheme.isNew())
+              #set ($colorThemeHint = $msg.get('admin.colortheme.wikiSetting', ["&lt;a href='$wikiColorTheme.getURL()'&gt;$wikiColorTheme.plainTitle&lt;/a&gt;"]))
+            #end
           #end
+          #if($xwiki.exists('ColorThemes.WebHome'))
+            #set ($colorThemeHint = "$!{colorThemeHint} &lt;strong&gt;&lt;a href=""$xwiki.getURL('ColorThemes.WebHome')""&gt;$msg.get('admin.colortheme.manage')&lt;/a&gt;&lt;/strong&gt;")
+          #end
+          &lt;span class="buttonwrapper"&gt;&lt;a href="$xwiki.getURL($colorThemeName, 'inline')"#if ($colorThemeName.indexOf('.') &lt; 0) class="hidden"#end&gt;$msg.get('admin.customize')&lt;/a&gt;&lt;/span&gt;
         #end
         &lt;/label&gt;
         &lt;/dt&gt;
         #if ($prop)
           &lt;dd&gt;$doc.display($prop.name, 'edit', $obj).replaceAll('(^..html.*?}})|(../html..$)', '')&lt;/dd&gt;
+          #if($field == 'colorTheme' &amp;&amp; $colorThemeHint)
+            &lt;dd class="xHint"&gt;$colorThemeHint&lt;/dd&gt;
+          #end
         #end
       #end
       #if ($fields.size() &gt; 0)

@@ -130,11 +130,12 @@
 </property>
 </object>
 <content>{{velocity output="false"}}
-### Administer the presentation preferences globally and at space level.
 $xwiki.jsx.use('XWiki.AdminPresentationSheet')
-#set ($legend = ['skin'])
-#set ($params = $util.hashMap)
-#set ($params.skin = ['skin', 'colorTheme', 'stylesheet', 'stylesheets'])
+### Change the skin and color theme, at global or space level
+#set($legend = ['skin', 'colortheme'])
+#set($params = $util.hashMap)
+#set($params.skin = ['skin', 'stylesheet', 'stylesheets'])
+#set($params.colortheme = ['colorTheme'])
 {{/velocity}}
 
 {{include document="XWiki.AdminFieldsDisplaySheet" /}}</content></xwikidoc>

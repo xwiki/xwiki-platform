@@ -1310,6 +1310,18 @@ div#xwikiobjects input[type="checkbox"], div#xwikiclassproperties input[type="ch
   margin-bottom: .3em;
 }
 
+.xform .xHelp {
+  background: transparent url("$xwiki.getSkinFile('icons/silk/information.gif')") 0 0 no-repeat;
+  float: right;
+  height: 16px;
+  line-height: 250px; /* Push the text away. */
+  margin-top: -20px; /* Should be 16px + 0.3em */
+  margin-right: 1px; /* Compensate for the border on the input elements */
+  overflow: hidden;
+  text-align: left !important; /* Make sure the text is left-aligned so that the inner box always starts at the top-left corner */
+  width: 16px;
+}
+
 .xform .xErrorMsg {
   color: $theme.notificationErrorColor;
   display: block;

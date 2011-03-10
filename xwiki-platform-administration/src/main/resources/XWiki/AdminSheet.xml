@@ -2947,6 +2947,7 @@ document.observe('xwiki:dom:loaded', function() {
   color: $theme.textSecondaryColor;
   margin: 0 1.5em 2em 0;
   max-width: 400px;
+  overflow: hidden;
 }
 
 .admin-category strong {

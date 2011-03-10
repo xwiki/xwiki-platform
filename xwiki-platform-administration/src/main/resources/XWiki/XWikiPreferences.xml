@@ -233,6 +233,23 @@
 <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
 </convertmail>
 <core.defaultDocumentSyntax>
+<customDisplay>{{velocity}}
+{{html wiki="false" clean="false"}}
+#if ("$!value" == '')
+  #set ($value = $xwiki.getDefaultDocumentSyntax())
+#end
+&lt;select name="${object.getxWikiClass().name}_${object.number}_${name}" id="${object.getxWikiClass().name}_${object.number}_${name}"&gt;
+#set ($configuredSyntaxes = $xwiki.getConfiguredSyntaxes())
+#set ($availableParserSyntaxes = $services.rendering.getAvailableParserSyntaxes())
+##
+#foreach($syntax in $availableParserSyntaxes)
+  #if($configuredSyntaxes.contains($syntax.toIdString()))
+    &lt;option value="$syntax.toIdString()"#if($syntax.toIdString().equalsIgnoreCase($value)) selected="selected"#end&gt;$syntax.toString()&lt;/option&gt;
+  #end
+#end
+&lt;/select&gt;
+{{/html}}
+{{/velocity}}</customDisplay>
 <disabled>0</disabled>
 <name>core.defaultDocumentSyntax</name>
 <number>59</number>
@@ -1694,6 +1711,23 @@
 <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
 </convertmail>
 <core.defaultDocumentSyntax>
+<customDisplay>{{velocity}}
+{{html wiki="false" clean="false"}}
+#if ("$!value" == '')
+  #set ($value = $xwiki.getDefaultDocumentSyntax())
+#end
+&lt;select name="${object.getxWikiClass().name}_${object.number}_${name}" id="${object.getxWikiClass().name}_${object.number}_${name}"&gt;
+#set ($configuredSyntaxes = $xwiki.getConfiguredSyntaxes())
+#set ($availableParserSyntaxes = $services.rendering.getAvailableParserSyntaxes())
+##
+#foreach($syntax in $availableParserSyntaxes)
+  #if($configuredSyntaxes.contains($syntax.toIdString()))
+    &lt;option value="$syntax.toIdString()"#if($syntax.toIdString().equalsIgnoreCase($value)) selected="selected"#end&gt;$syntax.toString()&lt;/option&gt;
+  #end
+#end
+&lt;/select&gt;
+{{/html}}
+{{/velocity}}</customDisplay>
 <disabled>0</disabled>
 <name>core.defaultDocumentSyntax</name>
 <number>59</number>
@@ -2734,6 +2768,12 @@ Your account on $wikiname has been successfully activated. You can now login at 
 </property>
 <property>
 <convertmail></convertmail>
+</property>
+<property>
+<core.defaultDocumentSyntax></core.defaultDocumentSyntax>
+</property>
+<property>
+<dateformat></dateformat>
 </property>
 <property>
 <default_language>en</default_language>

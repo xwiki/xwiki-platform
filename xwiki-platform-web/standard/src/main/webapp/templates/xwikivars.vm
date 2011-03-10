@@ -17,8 +17,8 @@
 ## Are comments, attachments, history etc. enabled?
 ##
 #macro (retrieveSetting $settingName $settingValue)
-  #set ($settingValue = $xwiki.getSpacePreference($settingName))
-  #if ("$!{settingValue}" != "false" && "$!{settingValue}" != "no" && "$!{settingValue}" != "0")
+  #set ($settingValue = "$!{xwiki.getSpacePreference($settingName)}")
+  #if ($settingValue != 'false' && $settingValue != 'no' && $settingValue != '0')
     #set ($settingValue = true)
   #else
     #set ($settingValue = false)

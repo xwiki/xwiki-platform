@@ -6,13 +6,13 @@
 <defaultLanguage>en</defaultLanguage>
 <translation>0</translation>
 <parent>XWiki.XWikiPreferences</parent>
-<creator>XWiki.Admin</creator>
-<author>XWiki.Admin</author>
+<creator>xwiki:XWiki.Admin</creator>
+<author>xwiki:XWiki.Admin</author>
 <customClass></customClass>
-<contentAuthor>XWiki.Admin</contentAuthor>
-<creationDate>1211801518000</creationDate>
-<date>1294164055000</date>
-<contentUpdateDate>1294164055000</contentUpdateDate>
+<contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+<creationDate>1211797918000</creationDate>
+<date>1299773184000</date>
+<contentUpdateDate>1299773184000</contentUpdateDate>
 <version>1.1</version>
 <title>AdminSheet</title>
 <template></template>
@@ -289,7 +289,7 @@ YII=
 </content></attachment><attachment>
 <filename>applications.png</filename>
 <filesize>7358</filesize>
-<author>XWiki.Admin</author>
+<author>xwiki:XWiki.Admin</author>
 <date>1296854749000</date>
 <version>1.1</version>
 <comment></comment><content>iVBORw0KGgoAAAANSUhEUgAAAH0AAABVCAYAAABkf+t+AAAchUlEQVR4Xu2da5BlV3men7X25exz
@@ -425,7 +425,7 @@ RK5CYII=
 </content></attachment><attachment>
 <filename>registration.png</filename>
 <filesize>7935</filesize>
-<author>XWiki.Admin</author>
+<author>xwiki:XWiki.Admin</author>
 <date>1296853602000</date>
 <version>1.1</version>
 <comment></comment><content>iVBORw0KGgoAAAANSUhEUgAAAH0AAABVCAYAAABkf+t+AAAexklEQVR4Xu19ebAcxZnnL6vvfueh
@@ -570,7 +570,7 @@ r6BfCMJKo9fp6T/kLQf2BfDbt8h9+MMfQVS45ZY/ohMqSR/01g8XQtbyLL3tw4XwHxVD+NhMINuy
 AAAAAElFTkSuQmCC</content></attachment><attachment>
 <filename>users.png</filename>
 <filesize>12054</filesize>
-<author>XWiki.Admin</author>
+<author>xwiki:XWiki.Admin</author>
 <date>1296853435000</date>
 <version>1.1</version>
 <comment></comment><content>iVBORw0KGgoAAAANSUhEUgAAAH0AAABVCAYAAABkf+t+AAAu3UlEQVR4XuyWT2sbRxjGZ2b/SKuV
@@ -787,7 +787,7 @@ WMx5HHJ9pfQKYFwiaNXoG9gY516OZKOlib7HUWJB6GXEC4ExLRcZ4DtQrng8Xi07Ozu6IEe7bJvL
 8X9S/pd/AH6N8wavROl7AAAAAElFTkSuQmCC</content></attachment><attachment>
 <filename>export.png</filename>
 <filesize>7585</filesize>
-<author>XWiki.Admin</author>
+<author>xwiki:XWiki.Admin</author>
 <date>1296854234000</date>
 <version>1.1</version>
 <comment></comment><content>iVBORw0KGgoAAAANSUhEUgAAAH0AAABVCAYAAABkf+t+AAAdaElEQVR4Xuxd268kx1n/dU9fZ85l
@@ -1170,8 +1170,8 @@ E4TdzgO00YfMQhCD5d3O+V3+YApwlFF2yKI9m6GL0p6gBHQFeF5ZDDVIgJfpkQKWEuIkhh4f2xh4
 FnQGL4B0ZuSaJKEfviZN0Cf9BUyfy444Xt0RAAAAAElFTkSuQmCC</content></attachment><attachment>
 <filename>templates.png</filename>
 <filesize>5760</filesize>
-<author>XWiki.Admin</author>
-<date>1284769198000</date>
+<author>xwiki:XWiki.Admin</author>
+<date>1284765598000</date>
 <version>1.1</version>
 <comment></comment><content>iVBORw0KGgoAAAANSUhEUgAAAH0AAABVCAYAAABkf+t+AAAABmJLR0QA/wD/AP+gvaeTAAAWNUlE
 QVR4Xuyav28bRxbH3yx/LkVySUWWJSuRFMQnC7LiGOcUcQK3BzssDkiKwK6MK6+41mUQ3B/gLt0h
@@ -1277,7 +1277,7 @@ zn/1Ud4DLy/Z0AvgCnpQxIsP6+0amIKtoYeDh8A9gOtvcQ/g//v6A5oBi1cqpeH7AAAAAElFTkSu
 QmCC</content></attachment><attachment>
 <filename>groups.png</filename>
 <filesize>10977</filesize>
-<author>XWiki.Admin</author>
+<author>xwiki:XWiki.Admin</author>
 <date>1296853321000</date>
 <version>1.1</version>
 <comment></comment><content>iVBORw0KGgoAAAANSUhEUgAAAH0AAABVCAYAAABkf+t+AAAqqElEQVR4XuyZTY8UxxnHq2q6e/pl
@@ -1475,7 +1475,7 @@ X39cu88CkDrwxBqLtr4EiDFb5kS2uTHWw26PiSJz0L3vgPfgMx74sZ4/OqaLD+ze3p4De3h4mB50
 GZZqt6b4TPlPyv/yN1+1bpLB6fI+AAAAAElFTkSuQmCC</content></attachment><attachment>
 <filename>programming.png</filename>
 <filesize>11160</filesize>
-<author>XWiki.Admin</author>
+<author>xwiki:XWiki.Admin</author>
 <date>1296853879000</date>
 <version>1.1</version>
 <comment></comment><content>iVBORw0KGgoAAAANSUhEUgAAAH0AAABVCAYAAABkf+t+AAArX0lEQVR4XuyW32scVRTHz73zY+fX
@@ -1676,7 +1676,7 @@ nuV9ttdaKq13yXSI615efoz/4IWLVwcCvAePwt2hA3xqvYBxcbF9Qu+Nk2zsKVv3Tg4Qdg8fZkMf
 j19sDTw5ee4mk4nR0T9ivQE60f+SrL39BJswNUrHpg7bAAAAAElFTkSuQmCC</content></attachment><attachment>
 <filename>import.png</filename>
 <filesize>8456</filesize>
-<author>XWiki.Admin</author>
+<author>xwiki:XWiki.Admin</author>
 <date>1296854813000</date>
 <version>1.1</version>
 <comment></comment><content>iVBORw0KGgoAAAANSUhEUgAAAH0AAABVCAYAAABkf+t+AAAgz0lEQVR4Xu19a6wkx3Xed6rnfZ8P
@@ -1831,7 +1831,7 @@ KFnIGDFDutMAAAAASUVORK5CYII=
 </content></attachment><attachment>
 <filename>content.png</filename>
 <filesize>8456</filesize>
-<author>XWiki.Admin</author>
+<author>xwiki:XWiki.Admin</author>
 <date>1296854234000</date>
 <version>1.1</version>
 <comment></comment><content>iVBORw0KGgoAAAANSUhEUgAAAH0AAABVCAYAAABkf+t+AAAgz0lEQVR4Xu19a6wkx3Xed6rnfZ8P
@@ -1986,7 +1986,7 @@ KFnIGDFDutMAAAAASUVORK5CYII=
 </content></attachment><attachment>
 <filename>lf.png</filename>
 <filesize>4901</filesize>
-<author>XWiki.Admin</author>
+<author>xwiki:XWiki.Admin</author>
 <date>1296853696000</date>
 <version>1.1</version>
 <comment></comment><content>iVBORw0KGgoAAAANSUhEUgAAAH0AAABVCAYAAABkf+t+AAAS7ElEQVR4Xu2d3Y/c1nXAz+UMOR/7
@@ -2078,7 +2078,7 @@ Rw52Dj97Ru7HP/4rSJIf/OBlePXVV5O/aGgkl+K37++g5vL/dmrHZnVCF2wAAAAASUVORK5CYII=
 </content></attachment><attachment>
 <filename>usersgroups.png</filename>
 <filesize>10977</filesize>
-<author>XWiki.Admin</author>
+<author>xwiki:XWiki.Admin</author>
 <date>1296853310000</date>
 <version>1.1</version>
 <comment></comment><content>iVBORw0KGgoAAAANSUhEUgAAAH0AAABVCAYAAABkf+t+AAAqqElEQVR4XuyZTY8UxxnHq2q6e/pl
@@ -2540,7 +2540,7 @@ YII=
 </content></attachment><attachment>
 <filename>rights.png</filename>
 <filesize>10836</filesize>
-<author>XWiki.Admin</author>
+<author>xwiki:XWiki.Admin</author>
 <date>1296853523000</date>
 <version>1.1</version>
 <comment></comment><content>iVBORw0KGgoAAAANSUhEUgAAAH0AAABVCAYAAABkf+t+AAAqG0lEQVR4XuyXTW8bRRjHn9k3e732

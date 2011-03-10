@@ -6,10 +6,10 @@
 <defaultLanguage>en</defaultLanguage>
 <translation>0</translation>
 <parent>Main.XWikiUsers</parent>
-<creator>XWiki.Admin</creator>
-<author>XWiki.Admin</author>
+<creator>xwiki:XWiki.Admin</creator>
+<author>xwiki:XWiki.Admin</author>
 <customClass></customClass>
-<contentAuthor>XWiki.Admin</contentAuthor>
+<contentAuthor>xwiki:XWiki.Admin</contentAuthor>
 <creationDate>1106308018000</creationDate>
 <date>1106308018000</date>
 <contentUpdateDate>1106308018000</contentUpdateDate>
@@ -25,7 +25,7 @@
 <attachment>
 <filename>noavatar.png</filename>
 <filesize>3076</filesize>
-<author>XWiki.Admin</author>
+<author>xwiki:XWiki.Admin</author>
 <date>1263400909000</date>
 <version>1.1</version>
 <comment></comment>

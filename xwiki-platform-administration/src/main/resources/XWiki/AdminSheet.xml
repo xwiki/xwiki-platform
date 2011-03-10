@@ -3039,7 +3039,11 @@ document.observe('xwiki:dom:loaded', function() {
 #foreach ($category in $adminMenu)
   ## "Standard" URLs and icons for categories
   #set ($category.url = $xwiki.getURL($currentDoc, $adminAction, "category=${mathtool.sub($velocityCount, 1)}"))
-  #set ($category.iconReference = "XWiki.AdminSheet@${category.id}.png")
+  #if ($xwiki.getDocument('XWiki.AdminSheet').getAttachment("${category.id}.png"))
+    #set ($category.iconReference = "XWiki.AdminSheet@${category.id}.png")
+  #else
+    #set ($category.iconReference = "XWiki.ConfigurableClass@DefaultAdminSectionIcon.png")
+  #end
   #set ($category.description = $msg.get("admin.${category.id}.description"))
   #set ($category.cssClass = "${category.id}Icon")
   #set ($category.name = $msg.get("admin.${category.id}"))
@@ -3067,6 +3071,8 @@ document.observe('xwiki:dom:loaded', function() {
         #set ($iconName = "${section.id.toLowerCase()}.png")
         #if ($sectionDoc.getAttachment($iconName))
           #set ($section.iconReference = "${sectionDoc}@${iconName}")
+        #else
+          #set ($section.iconReference = 'XWiki.ConfigurableClass@DefaultAdminSectionIcon.png')
         #end
       #end
       #set ($query = "editor=$escapetool.url(${editor})&amp;amp;section=$escapetool.url(${section.id})")

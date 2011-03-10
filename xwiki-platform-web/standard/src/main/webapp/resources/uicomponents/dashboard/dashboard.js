@@ -20,6 +20,7 @@ XWiki.Dashboard = Class.create( {
     this.createDragAndDrops();
     this.addGadgetsHandlers();
     this.addNewGadgetHandler();
+    this.addNewContainerHandler();
     
     // add save listener, to save the dashboard before submit of the form
     document.observe("xwiki:actions:save", this.saveChanges.bindAsEventListener(this));
@@ -120,24 +121,43 @@ XWiki.Dashboard = Class.create( {
     var containerIds = new Array();
     this.containers.each(function(container) {
       containerIds.push(container.readAttribute('id'));
-    });    
+    });
     
     // create a sortable for each gadget container
     containerIds.each(function(containerId) {
-      Sortable.create(containerId, {
-        tag:'div', 
-        only:'gadget', 
-        handle:'gadget-title', 
-        overlap: 'vertical', 
-        scroll: window, 
-        containment: containerIds, 
-        dropOnEmpty: true, 
-        constraint: false,
-        ghosting:false,
-        hoverclass: 'gadget-container-hover-highlight',
-        onUpdate: this.onMoveGadget.bind(this)
-      });
+      this.makeSortable(containerId, containerIds, this.onMoveGadget.bind(this));
     }.bind(this));
+
+    // add the decorators to the gadgets on drag & drop
+    var doOnStartDrag = this._doOnStartDrag.bind(this);
+    var doOnEndDrag = this._doOnEndDrag.bind(this);
+    Draggables.addObserver({
+        onStart: doOnStartDrag,
+        onEnd: doOnEndDrag
+    });    
+  },
+
+  /**
+   * Makes the container identified by containerId sortable, that is accepting drags and drops.
+   * 
+   * @param containerId the id of the container to make sortable
+   * @param containerIds the list of ids of all containers that are sortable
+   * @param onMove move callback, to be called when 
+   */
+  makeSortable : function(containerId, containerIds, onMove) {
+    Sortable.create(containerId, {
+      tag: 'div', 
+      only: 'gadget', 
+      handle: 'gadget-title', 
+      overlap: 'vertical', 
+      scroll: window, 
+      containment: containerIds, 
+      dropOnEmpty: true, 
+      constraint: false,
+      ghosting: false,
+      hoverclass: 'gadget-container-hover-highlight',
+      onUpdate: onMove
+    });
   },
   
   /**
@@ -184,14 +204,6 @@ XWiki.Dashboard = Class.create( {
         }
       });
     }.bind(this));
-
-    // add the decorators to the gadgets on drag & drop
-    var doOnStartDrag = this._doOnStartDrag.bind(this);
-    var doOnEndDrag = this._doOnEndDrag.bind(this);
-    Draggables.addObserver({
-        onStart: doOnStartDrag,
-        onEnd: doOnEndDrag
-    });
   },
   
   /**
@@ -313,6 +325,56 @@ XWiki.Dashboard = Class.create( {
   },
 
   /**
+   * Creates the button to add a new container in this dashboard, and inserts it after the add gadget button.
+   * FIXME: this is columns layout specific, because it uses translations keys specific to columns
+   */
+  addNewContainerHandler : function() {
+    // create the button
+    var addButton = new Element('div', {'class' : 'addcontainer', 'title' : "$msg.get('dashboard.actions.columns.add.tooltip')"});
+    addButton.update("$msg.get('dashboard.actions.columns.add.button')");
+    addButton.observe('click', this.onAddColumn.bindAsEventListener(this));
+    var addGadgetButton = this.element.down('.addgadget');
+    addGadgetButton.insert({'before' : addButton});
+  },
+
+  /**
+   * Adds a column in this dashboard.
+   * FIXME: this is columns layout specific, need to find a way to generate this on the server
+   * 
+   * @param event the click event, on the 'add column' button.
+   */
+  onAddColumn : function(event) {
+    // get the currently last container, to add after it
+    var lastContainer = this.containers.last();
+    var currentlyLastContainerId = this._getContainerId(lastContainer);
+    var newIdNumber = 1 + parseInt(currentlyLastContainerId, 10);
+    var newId = 'gadgetcontainer_' + newIdNumber; 
+    // create the container
+    var newContainer = new Element('div', {'class' : lastContainer.readAttribute('class'), 
+      'id' : newId});
+    // update the other containers - this is now the last column
+    lastContainer.removeClassName('last-column');
+    // add it in the DOM and in the containers list
+    lastContainer.insert({'after' : newContainer});
+    this.containers.push(newContainer);
+    // make it draggable
+    var containerIds = new Array();
+    this.containers.each(function(container) {
+      containerIds.push(container.readAttribute('id'));
+    });
+    this.makeSortable(newId, containerIds, this.onMoveGadget.bind(this));
+    // insert the css element in the head of this document, to update the columns css to one more column
+    var linkElement = new Element('link', 
+        {'href' : '$xwiki.getSkinFile("uicomponents/container/columns.css", true)' + '?columns=' + this.containers.length, 
+         'type' : 'text/css', 
+         'rel' : 'stylesheet'}
+    );
+    // get the head element and insert the new css link element at the end
+    var headElt = $(document.getElementsByTagName('head')[0]);
+    headElt.insert(linkElement);
+  },
+
+  /**
    * Actually performs the gadget edits, calling the onComplete callback when the edit is done.
    * 
    * @param onComplete callback to notify when all the requests have finished
@@ -407,7 +469,7 @@ XWiki.Dashboard = Class.create( {
   prepareEditParameters : function() {
     var parameters = new Hash();
     // for each gadget in the containers, put it in the map, along with its new position
-    this.element.select('.gadget-container').each(function(container) {
+    this.containers.each(function(container) {
       // get the id of the container
       var containerId = this._getContainerId(container);
       // foreach of its gadget children, get the position and compose the position update field

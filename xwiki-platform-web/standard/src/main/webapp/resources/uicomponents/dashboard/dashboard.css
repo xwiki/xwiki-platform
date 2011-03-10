@@ -82,7 +82,7 @@
 }
 
 /* Add button decoration */
-.dashboard-edit .addgadget {
+.dashboard-edit .addgadget, .dashboard-edit .addcontainer {
   background: url($xwiki.getSkinFile("icons/silk/add.gif")) no-repeat 3px 3px #4D9244;
   cursor: pointer;
   float: right;
@@ -90,6 +90,7 @@
   padding-left: 18px;
   font-weight: bold;
   margin-top: 20px;
+  margin-left: 5px;
   padding: 3px 3px 3px 22px;
   text-transform: uppercase;
   color: #FFFFFF;

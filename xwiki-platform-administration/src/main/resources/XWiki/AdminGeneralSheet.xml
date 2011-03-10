@@ -24,10 +24,9 @@
 <hidden>false</hidden>
 <content>{{velocity output="false"}}
 ### Administrate general wiki preferences, at global level
-#set($legend = ['language', 'editor', 'admin', 'smtp'])
+#set($legend = ['language', 'admin', 'smtp'])
 #set($params = $util.hashMap)
 #set($params.language = ['multilingual', 'languages' , 'default_language', 'dateformat'])
-#set($params.editor = ['editor', 'core.defaultDocumentSyntax', 'xwiki.title.mandatory'])
 #set($params.admin = ['admin_email'])
 #set($params.smtp = ['smtp_server', 'smtp_port', 'smtp_server_username', 'smtp_server_password', 'javamail_extra_props'])
 {{/velocity}}

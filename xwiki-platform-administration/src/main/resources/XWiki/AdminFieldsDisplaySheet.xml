@@ -61,7 +61,7 @@
         &lt;/label&gt;
         &lt;/dt&gt;
         #if ($prop)
-          &lt;dd&gt;$doc.displayEdit($prop, "${prefsclassname}_${obj.number}_", $obj)&lt;/dd&gt;
+          &lt;dd&gt;$doc.display($prop.name, 'edit', $obj).replaceAll('(^..html.*?}})|(../html..$)', '')&lt;/dd&gt;
         #end
       #end
       #if ($fields.size() &gt; 0)

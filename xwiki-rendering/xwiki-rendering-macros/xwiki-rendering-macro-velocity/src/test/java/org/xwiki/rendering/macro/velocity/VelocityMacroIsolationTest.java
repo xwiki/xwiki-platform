@@ -27,7 +27,7 @@ import org.xwiki.rendering.syntax.Syntax;
 import org.xwiki.rendering.transformation.MacroTransformationContext;
 import org.xwiki.test.AbstractComponentTestCase;
 
-import static org.xwiki.rendering.scaffolding.BlockAssert.*;
+import static org.xwiki.rendering.test.BlockAssert.*;
 
 /**
  * Verify that a Velocity macro defined in one page is not visible from another page.

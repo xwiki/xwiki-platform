@@ -54,13 +54,12 @@
       <scope>test</scope>
     </dependency>
     <!-- Seems like there's no transitive dependencies for test-jar types so we need
-         to specify these dependencies even though they are in the xwiki-rendering-tests
+         to specify these dependencies even though they are in the xwiki-rendering-integration-tests
          POM. -->
     <dependency>
       <groupId>org.xwiki.rendering</groupId>
-      <artifactId>xwiki-rendering-api</artifactId>
+      <artifactId>xwiki-rendering-test</artifactId>
       <version>${rendering.version}</version>
-      <type>test-jar</type>
       <scope>test</scope>
     </dependency>
   </dependencies>

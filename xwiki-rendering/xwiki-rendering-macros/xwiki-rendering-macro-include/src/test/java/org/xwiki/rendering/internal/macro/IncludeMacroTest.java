@@ -52,7 +52,7 @@ import org.xwiki.rendering.transformation.Transformation;
 import org.xwiki.test.AbstractComponentTestCase;
 import org.xwiki.velocity.VelocityManager;
 
-import static org.xwiki.rendering.scaffolding.BlockAssert.*;
+import static org.xwiki.rendering.test.BlockAssert.*;
 
 /**
  * Unit tests for {@link IncludeMacro}.

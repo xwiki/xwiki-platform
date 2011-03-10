@@ -256,13 +256,13 @@
         #if ($out.indexOf('type=''checkbox''') != -1)
           $out
         #end
+        $escapetool.xml($prettyName)
+        &lt;/label&gt;
         #if($linkPrefix != '')
           #set($linkScript = "$linkPrefix$propName")
-          &lt;a href="$escapetool.xml("#evaluate($linkScript)")"&gt;$escapetool.xml($prettyName)&lt;/a&gt;
-        #else
-          $escapetool.xml($prettyName)
+          &lt;a href="$escapetool.xml("#evaluate($linkScript)")" class="xHelp" title="$msg.get('admin.documentation')"&gt;$msg.get('admin.documentation')&lt;/a&gt;
         #end
-        &lt;/label&gt;&lt;/dt&gt;
+        &lt;/dt&gt;
         #if ($out.indexOf('type=''checkbox''') == -1)
           &lt;dd&gt;$out&lt;/dd&gt;
         #end

@@ -58,6 +58,8 @@
     <platform.skin.albatross.version>1.30</platform.skin.albatross.version>
     <platform.skin.toucan.version>1.40-SNAPSHOT</platform.skin.toucan.version>
     <platform.skin.colibri.version>1.31-SNAPSHOT</platform.skin.colibri.version>
+    <!-- The previous stable version of this project, used to catch API breakages. -->
+    <clirr.previous.version>2.7</clirr.previous.version>
   </properties>
   <modules>
     <module>gwt</module>
@@ -73,6 +75,7 @@
         <groupId>org.codehaus.mojo</groupId>
         <artifactId>clirr-maven-plugin</artifactId>
         <configuration>
+          <comparisonVersion>${clirr.previous.version}</comparisonVersion>
           <excludes>
             <exclude>**/internal/**</exclude>
             <exclude>**/test/**</exclude>

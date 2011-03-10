@@ -136,7 +136,19 @@
 <colorTheme>
 <cache>0</cache>
 <classname></classname>
-<customDisplay></customDisplay>
+<customDisplay>{{velocity}}
+{{html wiki="false" clean="false"}}
+#if ("$!value" == '')
+  #set ($value = '')
+#end
+&lt;select name="${object.getxWikiClass().name}_${object.number}_${name}" id="${object.getxWikiClass().name}_${object.number}_${name}"&gt;
+  #if ($editor != 'globaladmin')&lt;option value=""#if ($value == '') selected="selected"#end&gt;---&lt;/option&gt;#end
+#foreach($theme in $xwiki.wrapDocs($xwiki.searchDocuments(", BaseObject as theme where doc.fullName=theme.name and theme.className='ColorThemes.ColorThemeClass' and doc.fullName&lt;&gt;'ColorThemes.ColorThemeTemplate' order by doc.title")))
+  &lt;option value="$theme.fullName"#if ($theme.fullName.equals($value)) selected="selected"#end&gt;$theme.plainTitle&lt;/option&gt;
+#end
+&lt;/select&gt;
+{{/html}}
+{{/velocity}}</customDisplay>
 <disabled>0</disabled>
 <displayType>select</displayType>
 <idField></idField>
@@ -1712,7 +1724,19 @@
 <colorTheme>
 <cache>0</cache>
 <classname></classname>
-<customDisplay></customDisplay>
+<customDisplay>{{velocity}}
+{{html wiki="false" clean="false"}}
+#if ("$!value" == '')
+  #set ($value = '')
+#end
+&lt;select name="${object.getxWikiClass().name}_${object.number}_${name}" id="${object.getxWikiClass().name}_${object.number}_${name}"&gt;
+  #if ($editor != 'globaladmin')&lt;option value=""#if ($value == '') selected="selected"#end&gt;---&lt;/option&gt;#end
+#foreach($theme in $xwiki.wrapDocs($xwiki.searchDocuments(", BaseObject as theme where doc.fullName=theme.name and theme.className='ColorThemes.ColorThemeClass' and doc.fullName&lt;&gt;'ColorThemes.ColorThemeTemplate' order by doc.title")))
+  &lt;option value="$theme.fullName"#if ($theme.fullName.equals($value)) selected="selected"#end&gt;$theme.plainTitle&lt;/option&gt;
+#end
+&lt;/select&gt;
+{{/html}}
+{{/velocity}}</customDisplay>
 <disabled>0</disabled>
 <displayType>select</displayType>
 <idField></idField>

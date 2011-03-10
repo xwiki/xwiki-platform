@@ -40,7 +40,6 @@
     <url>http://svn.xwiki.org/svnroot/xwiki/platform/xwiki-tools/trunk/xwiki-archetypes</url>
   </scm>
   <modules>
-    <module>xwiki-archetype-macro</module>
     <module>xwiki-archetype-component</module>
   </modules>
 </project>

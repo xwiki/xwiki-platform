@@ -23,31 +23,33 @@
 <syntaxId>xwiki/2.0</syntaxId>
 <hidden>false</hidden>
 <content>{{velocity}}
-= $msg.get('admin.templates.createprovider') =
+(% class="xform half" %)(((
+== $msg.get('admin.templates.createprovider') ==
 
 {{html}}
   &lt;form action="$doc.getURL('create')" method="post"&gt;
-    &lt;div&gt;
+    &lt;dl&gt;
+      &lt;dt&gt;&lt;label for="space"&gt;$msg.get('admin.templates.createprovider.space')&lt;/label&gt;&lt;/dt&gt;
+      &lt;dd&gt;&lt;input type="text" id="space" name="space" value="XWiki" size="8"/&gt;&lt;/dd&gt;
+      &lt;dt&gt;&lt;label for="page"&gt;$msg.get('admin.templates.createprovider.page')&lt;/label&gt;&lt;/dt&gt;
+      &lt;dd&gt;&lt;input type="text" id="page" name="page" value="$msg.get('admin.templates.createprovider.defaultdocname')" class="withTip"'/&gt;&lt;/dd&gt;
+    &lt;/dl&gt;
+    &lt;div class="buttons"&gt;
       &lt;input type="hidden" name="form_token" value="$!{services.csrf.getToken()}" /&gt;
       &lt;input type="hidden" name="parent" value="XWiki.TemplateProviderClass"/&gt;
       &lt;input type="hidden" name="template" value="XWiki.TemplateProviderTemplate"/&gt;
-      &lt;label for="space"&gt;$msg.get('admin.templates.createprovider.space')&lt;/label&gt;
-      &lt;input type="text" id="space" name="space" value="XWiki" size="8"/&gt;
-      &lt;label for="page"&gt;$msg.get('admin.templates.createprovider.page')&lt;/label&gt;
-      &lt;input type="text" id="page" name="page" value="$msg.get('admin.templates.createprovider.defaultdocname')" class="withTip"'/&gt;
-      &lt;input id="createTemplateProvider" type="submit" value="$msg.get('admin.templates.createprovider.create')" class="button"/&gt;
+      &lt;span class="buttonwrapper"&gt;&lt;input id="createTemplateProvider" type="submit" value="$msg.get('admin.templates.createprovider.create')" class="button"/&gt;&lt;/span&gt;
     &lt;/div&gt;
   &lt;/form&gt;
 {{/html}}
-
 #set($availableProviders = $xwiki.searchDocuments(", BaseObject obj where doc.fullName=obj.name and obj.className='XWiki.TemplateProviderClass' and doc.fullName!='XWiki.TemplateProviderTemplate'"))
 #if($availableProviders.size() &gt; 0)
 
-= $msg.get('admin.templates.providerslist') =
+== $msg.get('admin.templates.providerslist') ==
 
   #foreach($providerFullname in $availableProviders)
     * [[$xwiki.getDocument($providerFullname).getTitle()&gt;&gt;$providerFullname]]
   #end
 #end
-{{/velocity}}</content>
-</xwikidoc>
+)))
+{{/velocity}}</content></xwikidoc>

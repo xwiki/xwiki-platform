@@ -7,7 +7,7 @@ $xwiki.jsfx.use('js/xwiki/editors/dataeditors.js', true)##
 ## The edited XClass
 #set($class = $doc.getxWikiClass())
 ## These meta-properties are not fully implemented, or almost never used
-#set($hiddenProperties = ['tooltip', 'customDisplay', 'unmodifiable', 'contenttype', 'disabled'])
+#set($hiddenProperties = ['tooltip', 'unmodifiable', 'contenttype', 'disabled'])
 ## Some additional details for a few unclear meta-properties
 #set($propertyDetails = {
   'values' : "(separated by '|'; Example: <tt>value1=Text displayed for value 1|value2=Text displayed for value 2|value3|value4</tt>)",

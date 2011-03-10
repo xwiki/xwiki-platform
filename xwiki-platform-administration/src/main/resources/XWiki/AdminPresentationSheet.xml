@@ -23,19 +23,10 @@
 <syntaxId>xwiki/2.0</syntaxId>
 <hidden>false</hidden>
 <content>{{velocity output="false"}}
-### Administrate the presentation preferences globally and at space level.
-#if("$!editor" == 'globaladmin')
-  #set($legend = ['header', 'panels', 'footer', 'skin'])
-#else
-  #set($legend = ['header', 'panels', 'skin'])
-#end
-#set($params = $util.hashMap)
-#set($params.header = ['title', 'meta'])
-#set($params.panels = ['showLeftPanels', 'leftPanels', 'showRightPanels', 'rightPanels'])
-#set($params.skin = ['skin', 'colorTheme', 'stylesheet', 'stylesheets'])
-#if("$!editor" == 'globaladmin')
-  #set($params.footer = ['webcopyright', 'version'])
-#end
+### Administer the presentation preferences globally and at space level.
+#set ($legend = ['skin'])
+#set ($params = $util.hashMap)
+#set ($params.skin = ['skin', 'colorTheme', 'stylesheet', 'stylesheets'])
 {{/velocity}}
 
 {{include document="XWiki.AdminFieldsDisplaySheet" /}}</content></xwikidoc>

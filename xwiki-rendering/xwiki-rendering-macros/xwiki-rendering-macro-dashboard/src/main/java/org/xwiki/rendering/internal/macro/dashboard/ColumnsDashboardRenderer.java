@@ -162,10 +162,15 @@ public class ColumnsDashboardRenderer extends AbstractDashboardRenderer
         });
 
         // get the maximmum column number in the gadgets list and create that number of columns. This is the column
-        // number of the last gadget in the ordered list
-        int columns = 0;
+        // number of the last gadget in the ordered list. Default is 1 column, the empty dashboard is made of one empty
+        // column
+        int columns = 1;
         if (!columnGadgets.isEmpty()) {
-            columns = columnGadgets.get(columnGadgets.size() - 1).getColumn();
+            // prevent bad configurations to mess up the dashboard layout
+            int lastGadgetsColumn = columnGadgets.get(columnGadgets.size() - 1).getColumn();
+            if (lastGadgetsColumn > 1) {
+                columns = lastGadgetsColumn;
+            }
         }
 
         // create the list of gadget containers

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <xwikidoc>
 <web>XWiki</web>
-<name>AdminProgrammingSheet</name>
+<name>AdminLocalizationSheet</name>
 <language></language>
 <defaultLanguage>en</defaultLanguage>
 <translation>0</translation>
@@ -10,11 +10,11 @@
 <author>xwiki:XWiki.Admin</author>
 <customClass></customClass>
 <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
-<creationDate>1211797663000</creationDate>
-<date>1299686915000</date>
-<contentUpdateDate>1299686915000</contentUpdateDate>
+<creationDate>1299686113000</creationDate>
+<date>1299686193000</date>
+<contentUpdateDate>1299686193000</contentUpdateDate>
 <version>1.1</version>
-<title>AdminProgrammingSheet</title>
+<title>AdminLocalizationSheet</title>
 <template></template>
 <defaultTemplate></defaultTemplate>
 <validationScript></validationScript>
@@ -23,11 +23,11 @@
 <syntaxId>xwiki/2.0</syntaxId>
 <hidden>false</hidden>
 <content>{{velocity output="false"}}
-### Globally administrate the programming preferences.
-#set($legend = ['programming'])
+### Administer localization wiki preferences, at global level
+#set($legend = ['language', 'translations'])
 #set($params = $util.hashMap)
-#set($params.programming = ['macros_languages', 'macros_velocity', 'macros_groovy', 'macros_mapping', 'notification_pages'])
+#set($params.language = ['multilingual', 'languages' , 'default_language', 'dateformat'])
+#set($params.translations = ['documentBundles'])
 {{/velocity}}
 
-{{include document="XWiki.AdminFieldsDisplaySheet" /}}
-</content></xwikidoc>
+{{include document="XWiki.AdminFieldsDisplaySheet" /}}</content></xwikidoc>

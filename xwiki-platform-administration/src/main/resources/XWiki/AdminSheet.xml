@@ -3046,6 +3046,7 @@ document.observe('xwiki:dom:loaded', function() {
     'id' : 'lf',
     'children': [
        {'id' : 'Presentation', 'perSpace' : true},
+       {'id' : 'Elements', 'perSpace' : true},
        {'id' : 'Panels.PanelWizard', 'perSpace' : true}
     ]
   },

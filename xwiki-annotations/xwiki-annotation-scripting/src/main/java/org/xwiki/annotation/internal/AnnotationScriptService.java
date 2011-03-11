@@ -41,7 +41,7 @@ import com.xpn.xwiki.XWikiException;
  * @version $Id$
  * @since 3.0-RC1
  */
-@Component
+@Component("annotations")
 public class AnnotationScriptService
 {
     /**

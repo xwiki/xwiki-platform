@@ -45,7 +45,7 @@ public class AnnotationVelocityContextInitializer extends AbstractLogEnabled imp
     /**
      * The hint under which the annotations script service is registered.
      */
-    private static final String ANNOTATION_SCRIPT_CONTEXT_HINT = VELOCITY_CONTEXT_KEY;
+    private static final String ANNOTATION_SCRIPT_SERVICE_HINT = VELOCITY_CONTEXT_KEY;
 
     /**
      * Component manager to pull all services instances to build the bridge.
@@ -63,7 +63,7 @@ public class AnnotationVelocityContextInitializer extends AbstractLogEnabled imp
         try {
             // create a wrapper of the annotation service for exposing its methods in velocity
             ScriptService annotationsScriptService = componentManager.lookup(ScriptService.class, 
-                ANNOTATION_SCRIPT_CONTEXT_HINT);
+                ANNOTATION_SCRIPT_SERVICE_HINT);
             context.put(VELOCITY_CONTEXT_KEY, annotationsScriptService);
         } catch (ComponentLookupException e) {
             getLogger().warn(

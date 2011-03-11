@@ -83,6 +83,10 @@
   margin-top: 5px;
 }
 
+#addNewMember td {
+  border:none;
+}
+
 .addlabel {
   font-weight: bold;
 }

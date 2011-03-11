@@ -31,6 +31,7 @@ import org.xwiki.component.annotation.Requirement;
 import org.xwiki.context.Execution;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReferenceSerializer;
+import org.xwiki.script.service.ScriptService;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
@@ -42,7 +43,7 @@ import com.xpn.xwiki.XWikiException;
  * @since 3.0-RC1
  */
 @Component("annotations")
-public class AnnotationScriptService
+public class AnnotationScriptService implements ScriptService
 {
     /**
      * The annotation service to execute annotation functions.

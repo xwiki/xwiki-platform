@@ -46,6 +46,11 @@
       <artifactId>xwiki-core</artifactId>
       <version>${project.version}</version>
     </dependency>
+    <dependency>
+      <groupId>org.xwiki.commons</groupId>
+      <artifactId>xwiki-commons-script</artifactId>
+      <version>${commons.version}</version>
+    </dependency>    
   </dependencies>
   <build>
     <plugins>

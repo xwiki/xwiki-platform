@@ -11,8 +11,8 @@
 <customClass></customClass>
 <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
 <creationDate>1242173909000</creationDate>
-<date>1288812724000</date>
-<contentUpdateDate>1288812724000</contentUpdateDate>
+<date>1299827657000</date>
+<contentUpdateDate>1299827657000</contentUpdateDate>
 <version>1.1</version>
 <title></title>
 <template></template>
@@ -80,7 +80,7 @@ $xwiki.ssfx.use('js/xwiki/table/livetable.css', true)
         &lt;td class="addlabel"&gt;$msg.get('xe.admin.groups.addUser')
           #if(!$mainwk)
             &lt;/td&gt;
-            &lt;td&gt;&lt;select name="wiki" onchange="changeWiki(this);"&gt;
+            &lt;td&gt;&lt;select name="wiki" id="addUserScope"&gt;
                 &lt;option value="local" selected="selected"&gt;$msg.get('xe.admin.local')&lt;/option&gt;
                 &lt;option value="global"&gt;$msg.get('xe.admin.global')&lt;/option&gt;
               &lt;/select&gt;
@@ -99,7 +99,7 @@ $xwiki.ssfx.use('js/xwiki/table/livetable.css', true)
         &lt;td class="addlabel"&gt;$msg.get('xe.admin.groups.addGroup')
           #if(!$mainwk)
             &lt;/td&gt;
-            &lt;td&gt;&lt;select name="wiki" onchange="changeWiki(this);"&gt;
+            &lt;td&gt;&lt;select name="wiki" id="addGroupScope"&gt;
                 &lt;option value="local" selected="selected"&gt;$msg.get('xe.admin.local')&lt;/option&gt;
                 &lt;option value="global"&gt;$msg.get('xe.admin.global')&lt;/option&gt;
               &lt;/select&gt;
@@ -158,13 +158,13 @@ $xwiki.ssfx.use('js/xwiki/table/livetable.css', true)
           createSuggest: function(input, uorg, suggestObj) {
             // Clear the errors
             $('errMsg').innerHTML = "";
-            suggesturl = "${doc.getURL('view', 'xpage=uorgsuggest&amp;classname=XWiki.XWikiUsers&amp;wiki=local')}";
+            suggesturl = "${doc.getURL('view', 'xpage=uorgsuggest&amp;classname=XWiki.XWikiUsers')}";
 
             if (uorg == "user") {
-              suggesturl += "&amp;uorg=user&amp;";
+              suggesturl += "&amp;uorg=user&amp;wiki=" + ($('addUserScope') ? $('addUserScope').value : "local") + "&amp;";
               icon = "$xwiki.getSkinFile('icons/silk/user.gif')";
             } else {
-              suggesturl += "&amp;uorg=group&amp;";
+              suggesturl += "&amp;uorg=group&amp;wiki=" + ($('addGroupScope') ? $('addGroupScope').value  : "local") + "&amp;";
               icon = "$xwiki.getSkinFile('icons/silk/group.gif')";
             }
             return new XWiki.widgets.Suggest(input, { script: suggesturl, varname:'input', icon:icon });

@@ -20,6 +20,15 @@
   #if($viewer != 'information' && $showinformation)
     #set ($discard = $docextralinks.add(["information", $msg.get("docextra.information"), -1]))
   #end
+  #if($showannotations)
+    #if(!$annotationCount)
+      ## Annotation count is supposed to be defined in xwikivars.vm. If for a reason or another it is not
+      ## defined at this point, we tap into the standard annotation class, and do not load again the 
+      ## config document. This however should not happen.
+      #set($annotationCount = $doc.getObjects('AnnotationCode.AnnotationClass').size())
+    #end
+    #set ($discard = $docextralinks.add(["annotations", $msg.get("docextra.annotation"), $annotationCount]))
+  #end
 #end
 ##
 ##

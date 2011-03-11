@@ -88,6 +88,30 @@ div.resultContainer div.sourceName {
   color:$theme.panelHeaderBackgroundColor;
   padding-top:3px;
   font-size:0.875em;
+  background-position:3px 3px;
+  background-repeat:no-repeat;
+}
+
+.horizontalLayout div.resultContainer div.sourceName {
+  float:left;
+  width:150px;
+  margin-right:3px;
+  padding-right:20px;
+  text-align:right;
+  background-position:right center;
+}
+
+.horizontalLayout div.resultContainer div.xitemcontainer {
+  margin-left:10px;
+}
+
+.horizontalLayout div.resultContainer div.results {
+  clear:both;
+  background-color:$theme.panelCollapsedBackgroundColor;
+}
+
+.horizontalLayout div.resultContainer ul.suggestList {
+  background-color:white;
 }
 
 div.resultContainer div.sourceContent.loading {

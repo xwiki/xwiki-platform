@@ -410,9 +410,7 @@ var XWiki = (function(XWiki){
             var iconImage = new Image();
             iconImage.onload = function(){
               this.sourceHeader.setStyle({
-                backgroundImage: "url(" + this.iconImage.src + ")",
-                backgroundRepeat: 'no-repeat',
-                backgroundPosition : '3px 3px'
+                backgroundImage: "url(" + this.iconImage.src + ")"
               });
               this.sourceHeader.setStyle({
                 textIndent:(this.iconImage.width + 6) + 'px'

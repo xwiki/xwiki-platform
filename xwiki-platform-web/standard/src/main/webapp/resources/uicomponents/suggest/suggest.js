@@ -55,7 +55,9 @@ var XWiki = (function(XWiki){
     // Should value be displayed as a hint
     displayValue: false,
     // Display value prefix text 
-    displayValueText: "Value :"
+    displayValueText: "Value :",
+    // How to align the suggestion list when its with is different than the input field width
+    align: "left"
   },
   sInput : "",
   nInputChars : 0,
@@ -335,14 +337,26 @@ var XWiki = (function(XWiki){
 
       var div = new Element("div", { 'class': "suggestItems "+ this.options.className });
     
-      // get position of target textfield
-      // position holding div below it
-      // set width of holding div to width of field
+      // Get position of target textfield
       var pos = this.fld.cumulativeOffset();
 
-      div.style.left = pos.left + "px";
+      // Container width is passed as an option, or field width if no width provided.
+      // The 2px substracted correspond to one pixel of border on each side of the field,
+      // this allows to have the suggestion box borders well aligned with the field borders.
+      // FIXME this should be computed instead, since border might not always be 1px.
+      var containerWidth = this.options.width ? this.options.width : (this.fld.offsetWidth - 2)
+
+      if (this.options.align == 'left') {
+        // Align the box on the left
+        div.style.left = pos.left + "px";
+      } else {
+        // Align the box on the right.
+        // This has a visible effect only when the container width is not the same as the input width
+        div.style.left = (pos.left - containerWidth + this.fld.offsetWidth - 2) + "px";
+      }
+
       div.style.top = (pos.top + this.fld.offsetHeight + this.options.offsety) + "px";
-      div.style.width = (this.fld.offsetWidth - 2) + "px";
+      div.style.width = containerWidth + "px";
 
       // set mouseover functions for div
       // when mouse pointer leaves div, set a timeout to remove the list after an interval

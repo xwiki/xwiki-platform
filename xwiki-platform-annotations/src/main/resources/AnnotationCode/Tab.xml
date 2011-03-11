@@ -27,7 +27,7 @@
 {{velocity filter="none"}}
 {{html wiki="false" clean="false"}}
 ## clean=false because otherwise the html macro fails on blockquote
-  #set($annotationsList = $annotations.getAnnotations($doc.prefixedFullName))
+  #set($annotationsList = $services.annotations.getAnnotations($doc.prefixedFullName))
   #if($annotationsList.size() &gt; 0)
     &lt;div id="allAnnotations"&gt;
     #foreach($ann in $annotationsList)

@@ -477,7 +477,7 @@ document.observe('xwiki:annotations:settings:loaded', function() {
       &lt;div class="annotation-filters collapsed"  id="annotation-filters"&gt;
         &lt;div class="annotation-filters-toggler"&gt;&lt;a href="#annotation-filters"&gt;$msg.get('annotations.filters.show')&lt;/a&gt;&lt;/div&gt;
         &lt;div class="criteria"&gt;
-          #set($annotationsList = $annotations.getAnnotations($!request.target))
+          #set($annotationsList = $services.annotations.getAnnotations($!request.target))
           #displayAnnotatorCheckboxes($annotationsList)
         &lt;/div&gt;
       &lt;/div&gt;

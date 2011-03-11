@@ -70,7 +70,7 @@
  *#
 #macro(displayEditBox $id $docWiki $docSpace $docPage)
   ## TODO: unhardcode this reference generation here when document reference will be available in velo. Or build Annotation velocity API for xwiki
-  #set($ann = $annotations.getAnnotation("${docWiki}:${docSpace}.${docPage}", $id))
+  #set($ann = $services.annotations.getAnnotation("${docWiki}:${docSpace}.${docPage}", $id))
   &lt;div class="annotation-box annotation-box-edit"&gt;
     #if($ann)
       #set($editURL = "${restURL}/wikis/" + $escapetool.url($docWiki) + "/spaces/" + $escapetool.url($docSpace) + "/pages/" + $escapetool.url($docPage) + "/annotation/" + $escapetool.url($ann.id) + "?method=PUT&amp;media=json")
@@ -94,7 +94,7 @@
  *#
 #macro(displayViewBox $id $docWiki $docSpace $docPage)
   ## TODO: unhardcode this reference generation here when document reference will be available in velo. Or build Annotation velocity API for xwiki
-  #set($ann = $annotations.getAnnotation("${docWiki}:${docSpace}.${docPage}", $id))
+  #set($ann = $services.annotations.getAnnotation("${docWiki}:${docSpace}.${docPage}", $id))
   &lt;div class="annotation-box annotation-box-view"&gt;
     #if ($ann)
       #*&lt;div class="links"&gt;
@@ -174,7 +174,7 @@
  *#
 #macro(displayAnnotationToolbox $ann $mode $docWiki $docSpace $docPage)
   &lt;span class="annotationTools"&gt;
-    #if($mode != 'create' &amp;&amp; $annotations.canEditAnnotation($ann.id, $docWiki, $docSpace, $docPage))
+    #if($mode != 'create' &amp;&amp; $services.annotations.canEditAnnotation($ann.id, $docWiki, $docSpace, $docPage))
       #set($editURL = "${restURL}/wikis/" + $escapetool.url($docWiki) + "/spaces/" + $escapetool.url($docSpace) + "/pages/" + $escapetool.url($docPage) + "/annotation/" + $escapetool.url($ann.id) + "?method=PUT&amp;media=json")
       #if ("$!{ann.state}" == 'UPDATED')
         &lt;span class="tool accept"&gt;&lt;a class="validate" href="${editURL}" title="$msg.get('annotations.action.validate.tooltip')"&gt;$msg.get('annotations.action.validate.text')&lt;/a&gt;&lt;/span&gt;

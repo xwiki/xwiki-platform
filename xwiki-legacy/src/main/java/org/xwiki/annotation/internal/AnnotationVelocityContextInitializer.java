@@ -25,6 +25,7 @@ import org.xwiki.component.annotation.Requirement;
 import org.xwiki.component.logging.AbstractLogEnabled;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
+import org.xwiki.script.service.ScriptService;
 import org.xwiki.velocity.VelocityContextInitializer;
 
 /**
@@ -40,6 +41,11 @@ public class AnnotationVelocityContextInitializer extends AbstractLogEnabled imp
      * The key to add to the velocity context.
      */
     public static final String VELOCITY_CONTEXT_KEY = "annotations";
+    
+    /**
+     * The hint under which the annotations script service is registered.
+     */
+    private static final String ANNOTATION_SCRIPT_CONTEXT_HINT = VELOCITY_CONTEXT_KEY;
 
     /**
      * Component manager to pull all services instances to build the bridge.
@@ -56,8 +62,9 @@ public class AnnotationVelocityContextInitializer extends AbstractLogEnabled imp
     {
         try {
             // create a wrapper of the annotation service for exposing its methods in velocity
-            AnnotationScriptService bridge = componentManager.lookup(AnnotationScriptService.class);
-            context.put(VELOCITY_CONTEXT_KEY, bridge);
+            ScriptService annotationsScriptService = componentManager.lookup(ScriptService.class, 
+                ANNOTATION_SCRIPT_CONTEXT_HINT);
+            context.put(VELOCITY_CONTEXT_KEY, annotationsScriptService);
         } catch (ComponentLookupException e) {
             getLogger().warn(
                 "Could not initialize the annotations velocity bridge, "

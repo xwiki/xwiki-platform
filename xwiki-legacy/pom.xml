@@ -54,12 +54,7 @@
       <artifactId>xwiki-core-bridge</artifactId>
       <version>${project.version}</version>
     </dependency>
-    <dependency>
-      <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-core-annotations-scripting</artifactId>
-      <version>${project.version}</version>
-    </dependency>
-
+    
     <!-- Testing dependencies -->
     <dependency>
       <groupId>org.xwiki.platform</groupId>

@@ -1,1 +1,2 @@
 org.xwiki.legacy.internal.LegacyEventDispatcher
+org.xwiki.annotation.internal.AnnotationVelocityContextInitializer

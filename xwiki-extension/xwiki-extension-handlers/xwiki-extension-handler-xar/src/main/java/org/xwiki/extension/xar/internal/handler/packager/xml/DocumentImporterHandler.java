@@ -22,7 +22,6 @@ package org.xwiki.extension.xar.internal.handler.packager.xml;
 import org.dom4j.io.SAXContentHandler;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
-import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.model.reference.DocumentReference;
 
@@ -42,15 +41,11 @@ public class DocumentImporterHandler extends AbstractHandler
      */
     public SAXContentHandler domBuilder = new SAXContentHandler();
 
-    public DocumentImporterHandler(ComponentManager componentManager)
+    public DocumentImporterHandler(ComponentManager componentManager, String wiki)
     {
         super(componentManager);
 
-        try {
-            setCurrentBean(new XWikiDocument(new DocumentReference(getXWikiContext().getDatabase(), "XWiki", "Page")));
-        } catch (ComponentLookupException e) {
-            setCurrentBean(new XWikiDocument());
-        }
+        setCurrentBean(new XWikiDocument(new DocumentReference(wiki, "XWiki", "Page")));
 
         // skip useless known elements
         this.skippedElements.add("version");

@@ -53,6 +53,8 @@ public class AbstractHandler extends DefaultHandler
 
     protected Set<String> skippedElements = new HashSet<String>();
 
+    protected Set<String> supportedElements;
+
     public AbstractHandler(ComponentManager componentManager)
     {
         this.componentManager = componentManager;
@@ -80,6 +82,21 @@ public class AbstractHandler extends DefaultHandler
         this.currentBean = currentBean;
     }
 
+    protected void addsupportedElements(String supportedElement)
+    {
+        if (this.supportedElements == null) {
+            this.supportedElements = new HashSet<String>();
+        }
+
+        this.supportedElements.add(supportedElement);
+    }
+
+    public boolean isSupported(String elementName)
+    {
+        return !this.skippedElements.contains(elementName)
+            && (this.supportedElements == null || this.supportedElements.contains(elementName));
+    }
+
     // ContentHandler
 
     @Override
@@ -88,7 +105,7 @@ public class AbstractHandler extends DefaultHandler
         if (this.currentHandler == null) {
             if (this.depth == 0) {
                 startHandlerElement(uri, localName, qName, attributes);
-            } else {
+            } else if (this.depth == 1) {
                 startElementInternal(uri, localName, qName, attributes);
             }
         }
@@ -105,7 +122,7 @@ public class AbstractHandler extends DefaultHandler
     {
         if (this.currentHandler != null) {
             this.currentHandler.characters(ch, start, length);
-        } else {
+        } else if (this.depth == 2) {
             charactersInternal(ch, start, length);
         }
     }
@@ -125,7 +142,7 @@ public class AbstractHandler extends DefaultHandler
         } else {
             if (this.depth == 0) {
                 endHandlerElement(uri, localName, qName);
-            } else {
+            } else if (this.depth == 1) {
                 endElementInternal(uri, localName, qName);
             }
         }
@@ -136,7 +153,7 @@ public class AbstractHandler extends DefaultHandler
     protected void startElementInternal(String uri, String localName, String qName, Attributes attributes)
         throws SAXException
     {
-        if (this.depth == 1 && !this.skippedElements.contains(qName)) {
+        if (isSupported(qName)) {
             if (this.value == null) {
                 this.value = new StringBuffer();
             } else {
@@ -147,14 +164,14 @@ public class AbstractHandler extends DefaultHandler
 
     protected void charactersInternal(char[] ch, int start, int length) throws SAXException
     {
-        if (this.depth == 2 && this.currentBean != null && this.value != null) {
+        if (this.currentBean != null && this.value != null) {
             this.value.append(ch, start, length);
         }
     }
 
     protected void endElementInternal(String uri, String localName, String qName) throws SAXException
     {
-        if (this.depth == 1 && this.currentBean != null && this.value != null) {
+        if (this.currentBean != null && this.value != null) {
             Method setter;
             try {
                 setter = this.currentBean.getClass().getMethod("set" + StringUtils.capitalize(qName), String.class);

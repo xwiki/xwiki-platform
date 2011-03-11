@@ -31,6 +31,11 @@ public class RootHandler extends AbstractHandler
 {
     private Map<String, ContentHandler> handlers = new HashMap<String, ContentHandler>();
 
+    public RootHandler()
+    {
+        super(null, null);
+    }
+
     public RootHandler(ComponentManager componentManager)
     {
         super(componentManager, null);
@@ -50,7 +55,7 @@ public class RootHandler extends AbstractHandler
         if (handler != null) {
             setCurrentHandler(handler);
         } else {
-            super.startHandlerElement(uri, localName, qName, attributes);
+            throw new UnknownRootElement(qName);
         }
     }
 }

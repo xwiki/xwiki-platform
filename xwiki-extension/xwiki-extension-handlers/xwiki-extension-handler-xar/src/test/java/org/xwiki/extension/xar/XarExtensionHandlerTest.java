@@ -31,11 +31,14 @@ import org.jmock.lib.action.CustomAction;
 import org.junit.Before;
 import org.junit.Test;
 import org.xwiki.extension.ExtensionId;
+import org.xwiki.extension.InstallException;
+import org.xwiki.extension.event.ExtensionInstalled;
 import org.xwiki.extension.handler.ExtensionHandler;
 import org.xwiki.extension.repository.internal.DefaultLocalExtension;
 import org.xwiki.extension.test.RepositoryUtil;
 import org.xwiki.extension.xar.internal.handler.XarExtensionHandler;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.observation.ObservationManager;
 
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
@@ -48,9 +51,12 @@ public class XarExtensionHandlerTest extends AbstractBridgedComponentTestCase
 {
     private XWiki mockXWiki;
 
-    private Map<DocumentReference, XWikiDocument> documents = new HashMap<DocumentReference, XWikiDocument>();
+    private Map<DocumentReference, Map<String, XWikiDocument>> documents =
+        new HashMap<DocumentReference, Map<String, XWikiDocument>>();
 
     private XarExtensionHandler handler;
+
+    private ObservationManager observationManager;
 
     private ExtensionId localXarExtensiontId;
 
@@ -86,50 +92,84 @@ public class XarExtensionHandlerTest extends AbstractBridgedComponentTestCase
 
         // checking
 
-        getMockery().checking(new Expectations() {{
-            allowing(mockXWiki).getDocument(with(any(DocumentReference.class)), with(any(XWikiContext.class))); will(new CustomAction("getDocument")
+        getMockery().checking(new Expectations()
+        {
             {
-                public Object invoke(org.jmock.api.Invocation invocation) throws Throwable
+                allowing(mockXWiki).getDocument(with(any(DocumentReference.class)), with(any(XWikiContext.class)));
+                will(new CustomAction("getDocument")
                 {
-                    XWikiDocument document = documents.get(invocation.getParameter(0));
-                    
-                    if (document == null) {
-                        document = new XWikiDocument((DocumentReference)invocation.getParameter(0));
+                    public Object invoke(org.jmock.api.Invocation invocation) throws Throwable
+                    {
+                        Map<String, XWikiDocument> documentLanguages = documents.get(invocation.getParameter(0));
+
+                        if (documentLanguages == null) {
+                            documentLanguages = new HashMap<String, XWikiDocument>();
+                            documents.put((DocumentReference) invocation.getParameter(0), documentLanguages);
+                        }
+
+                        XWikiDocument document = documentLanguages.get("en");
+
+                        if (document == null) {
+                            document = new XWikiDocument((DocumentReference) invocation.getParameter(0));
+                        }
+
+                        return document;
                     }
+                });
 
-                    return document;
-                }
-            });
-
-            allowing(mockXWiki).saveDocument(with(any(XWikiDocument.class)), with(any(String.class)), with(any(XWikiContext.class))); will(new CustomAction("saveDocument")
-            {
-                public Object invoke(org.jmock.api.Invocation invocation) throws Throwable
+                allowing(mockXWiki).saveDocument(with(any(XWikiDocument.class)), with(any(String.class)),
+                    with(any(XWikiContext.class)));
+                will(new CustomAction("saveDocument")
                 {
-                    XWikiDocument document = (XWikiDocument)invocation.getParameter(0);
+                    public Object invoke(org.jmock.api.Invocation invocation) throws Throwable
+                    {
+                        XWikiDocument document = (XWikiDocument) invocation.getParameter(0);
 
-                    document.incrementVersion();
-                    document.setNew(false);
+                        document.incrementVersion();
+                        document.setNew(false);
 
-                    documents.put(document.getDocumentReference(), document);
+                        Map<String, XWikiDocument> documentLanguages = documents.get(document.getDocumentReference());
 
-                    return null;
-                }
-            });
+                        if (documentLanguages == null) {
+                            documentLanguages = new HashMap<String, XWikiDocument>();
+                            documents.put(document.getDocumentReference(), documentLanguages);
+                        }
 
-            allowing(mockXWiki).deleteDocument(with(any(XWikiDocument.class)), with(any(XWikiContext.class))); will(new CustomAction("deleteDocument")
-            {
-                public Object invoke(org.jmock.api.Invocation invocation) throws Throwable
+                        documentLanguages.put(document.getRealLanguage(), document);
+
+                        return null;
+                    }
+                });
+
+                allowing(mockXWiki).deleteDocument(with(any(XWikiDocument.class)), with(any(XWikiContext.class)));
+                will(new CustomAction("deleteDocument")
                 {
-                    documents.remove(((XWikiDocument)invocation.getParameter(0)).getDocumentReference());
-                    
-                    return null;
-                }
-            });
-        }});
+                    public Object invoke(org.jmock.api.Invocation invocation) throws Throwable
+                    {
+                        XWikiDocument document = (XWikiDocument) invocation.getParameter(0);
+
+                        Map<String, XWikiDocument> documentLanguages = documents.get(document.getDocumentReference());
+
+                        if (documentLanguages != null) {
+                            documentLanguages.remove(document.getRealLanguage());
+                        }
+
+                        return null;
+                    }
+                });
+            }
+        });
 
         // lookup
 
         this.handler = (XarExtensionHandler) getComponentManager().lookup(ExtensionHandler.class, "xar");
+        this.observationManager = (ObservationManager) getComponentManager().lookup(ObservationManager.class);
+    }
+
+    private void install() throws InstallException
+    {
+        this.handler.install(this.localXarExtension, "wiki");
+        this.observationManager.notify(new ExtensionInstalled(this.localXarExtension.getId()), this.localXarExtension);
     }
 
     @Test
@@ -137,34 +177,33 @@ public class XarExtensionHandlerTest extends AbstractBridgedComponentTestCase
     {
         // install
 
-        this.handler.install(this.localXarExtension, "wiki");
+        install();
 
         // validate
 
-        XWikiDocument document =
-            this.mockXWiki.getDocument(new DocumentReference("wiki", "space", "page"), getContext());
+        XWikiDocument page = this.mockXWiki.getDocument(new DocumentReference("wiki", "space", "page"), getContext());
 
-        Assert.assertFalse("Document wiki.space.page has not been saved in the database", document.isNew());
+        Assert.assertFalse("Document wiki.space.page has not been saved in the database", page.isNew());
 
-        Assert.assertEquals("Wrong content", "content", document.getContent());
-        Assert.assertEquals("Wrong author", "XWiki.author", document.getAuthor());
-        Assert.assertEquals("Wrong versions", "1.1", document.getVersion());
+        Assert.assertEquals("Wrong content", "content", page.getContent());
+        Assert.assertEquals("Wrong author", "XWiki.author", page.getAuthor());
+        Assert.assertEquals("Wrong versions", "1.1", page.getVersion());
 
-        BaseClass baseClass = document.getXClass();
+        BaseClass baseClass = page.getXClass();
         Assert.assertNotNull(baseClass.getField("property"));
         Assert.assertEquals("property", baseClass.getField("property").getName());
         Assert.assertSame(NumberClass.class, baseClass.getField("property").getClass());
+
+        XWikiDocument page1 =
+            this.mockXWiki.getDocument(new DocumentReference("wiki", "space1", "page1"), getContext());
+
+        Assert.assertFalse("Document wiki.space2.page2 has not been saved in the database", page1.isNew());
     }
 
     @Test
     public void testUpgrade() throws Exception
     {
-        XWikiDocument previousDocument = new XWikiDocument(new DocumentReference("wiki", "space", "page"));
-
-        previousDocument.setContent("previous content");
-        previousDocument.setAuthor("XWiki.previousauthor");
-
-        this.mockXWiki.saveDocument(previousDocument, "", getContext());
+        install();
 
         // upgrade
 
@@ -172,25 +211,34 @@ public class XarExtensionHandlerTest extends AbstractBridgedComponentTestCase
 
         // validate
 
-        XWikiDocument document =
-            this.mockXWiki.getDocument(new DocumentReference("wiki", "space", "page"), getContext());
+        XWikiDocument page = this.mockXWiki.getDocument(new DocumentReference("wiki", "space", "page"), getContext());
 
-        Assert.assertFalse("Document wiki.space.page has not been saved in the database", document.isNew());
+        Assert.assertFalse("Document wiki.space.page has not been saved in the database", page.isNew());
 
-        Assert.assertEquals("Wrong content", "content 2", document.getContent());
-        Assert.assertEquals("Wrong author", "XWiki.author", document.getAuthor());
-        Assert.assertEquals("Wrong versions", "2.1", document.getVersion());
-        
-        BaseClass baseClass = document.getXClass();
+        Assert.assertEquals("Wrong content", "content 2", page.getContent());
+        Assert.assertEquals("Wrong author", "XWiki.author", page.getAuthor());
+        Assert.assertEquals("Wrong versions", "2.1", page.getVersion());
+
+        BaseClass baseClass = page.getXClass();
         Assert.assertNotNull(baseClass.getField("property"));
         Assert.assertEquals("property", baseClass.getField("property").getName());
         Assert.assertSame(NumberClass.class, baseClass.getField("property").getClass());
+
+        XWikiDocument page2 =
+            this.mockXWiki.getDocument(new DocumentReference("wiki", "space2", "page2"), getContext());
+
+        Assert.assertFalse("Document wiki.space2.page2 has not been saved in the database", page2.isNew());
+
+        XWikiDocument page1 =
+            this.mockXWiki.getDocument(new DocumentReference("wiki", "space1", "page1"), getContext());
+
+        Assert.assertTrue("Document wiki.space1.page1 has not been removed from the database", page1.isNew());
     }
 
     @Test
     public void testUninstall() throws Exception
     {
-        this.mockXWiki.saveDocument(new XWikiDocument(new DocumentReference("wiki", "space", "page")), "", getContext());
+        install();
 
         // uninstall
 
@@ -198,9 +246,14 @@ public class XarExtensionHandlerTest extends AbstractBridgedComponentTestCase
 
         // validate
 
-        XWikiDocument document =
+        XWikiDocument page =
             this.mockXWiki.getDocument(new DocumentReference("wiki", "space", "page"), getContext());
 
-        Assert.assertTrue("Document wiki.space.page has not been removed from the database", document.isNew());
+        Assert.assertTrue("Document wiki.space.page has not been removed from the database", page.isNew());
+        
+        XWikiDocument page1 =
+            this.mockXWiki.getDocument(new DocumentReference("wiki", "space1", "page1"), getContext());
+
+        Assert.assertTrue("Document wiki.space1.page1 has not been removed from the database", page1.isNew());
     }
 }

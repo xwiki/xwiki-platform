@@ -20,20 +20,30 @@
 package org.xwiki.extension.xar.internal.handler;
 
 import java.io.IOException;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.Requirement;
 import org.xwiki.extension.InstallException;
 import org.xwiki.extension.LocalExtension;
+import org.xwiki.extension.ResolveException;
 import org.xwiki.extension.UninstallException;
 import org.xwiki.extension.handler.internal.AbstractExtensionHandler;
+import org.xwiki.extension.repository.LocalExtensionRepository;
 import org.xwiki.extension.xar.internal.handler.packager.Packager;
+import org.xwiki.extension.xar.internal.handler.packager.XarEntry;
+import org.xwiki.extension.xar.internal.repository.XarLocalExtension;
 
 @Component("xar")
 public class XarExtensionHandler extends AbstractExtensionHandler
 {
     @Requirement
     private Packager packager;
+
+    @Requirement("xar")
+    private LocalExtensionRepository xarRepository;
 
     // TODO: support question/answer with the UI to resolve conflicts
     public void install(LocalExtension localExtension, String namespace) throws InstallException
@@ -51,7 +61,7 @@ public class XarExtensionHandler extends AbstractExtensionHandler
     public void upgrade(LocalExtension previousLocalExtension, LocalExtension newLocalExtension, String namespace)
         throws InstallException
     {
-        // TODO:
+        // TODO
         // 1) find all modified pages between old and new version
         // 2) compare old version and wiki (to find pages modified by user)
         // 3) delete pages removed in new version (even if modified ?)
@@ -59,7 +69,42 @@ public class XarExtensionHandler extends AbstractExtensionHandler
         // 4.1) merge modified pages in wiki with diff between old/new version
         // 4.2) update unmodified pages different between old and new version
 
+        // CURRENT
+
+        // Produce a pages diff between previous and new version
+        Set<XarEntry> previousPages = new HashSet<XarEntry>();
+        try {
+            XarLocalExtension previousXarExtension =
+                (XarLocalExtension) this.xarRepository.resolve(previousLocalExtension.getId());
+            previousPages.addAll(previousXarExtension.getPages());
+        } catch (ResolveException e) {
+            // Not supposed to be possible
+            throw new InstallException("Failed to get xar extension [" + previousLocalExtension.getId()
+                + "] from xar repository", e);
+        }
+
+        List<XarEntry> newPages;
+        try {
+            XarLocalExtension newXarExtension =
+                (XarLocalExtension) this.xarRepository.resolve(newLocalExtension.getId());
+            newPages = newXarExtension.getPages();
+        } catch (ResolveException e) {
+            try {
+                newPages = this.packager.getEntries(newLocalExtension.getFile());
+            } catch (IOException e1) {
+                throw new InstallException("Failed to get xar extension [" + newLocalExtension.getId() + "] pages", e);
+            }
+        }
+
+        for (XarEntry entry : newPages) {
+            previousPages.remove(entry);
+        }
+
+        // Install new pages
         install(newLocalExtension, namespace);
+
+        // Remove old version pages not anymore in the new version
+        this.packager.unimportPages(previousPages, namespace);
     }
 
     public void uninstall(LocalExtension localExtension, String namespace) throws UninstallException
@@ -68,9 +113,14 @@ public class XarExtensionHandler extends AbstractExtensionHandler
         // common pages which is not very nice but still could happen technically)
 
         try {
-            this.packager.unimportXAR(localExtension.getFile(), namespace);
-        } catch (IOException e) {
-            throw new UninstallException("Failed to import xar for extension [" + localExtension + "]", e);
+            XarLocalExtension xarLocalExtension =
+                (XarLocalExtension) this.xarRepository.resolve(localExtension.getId());
+            List<XarEntry> pages = xarLocalExtension.getPages();
+            this.packager.unimportPages(pages, namespace);
+        } catch (ResolveException e) {
+            // Not supposed to be possible
+            throw new UninstallException("Failed to get xar extension [" + localExtension.getId()
+                + "] from xar repository", e);
         }
     }
 }

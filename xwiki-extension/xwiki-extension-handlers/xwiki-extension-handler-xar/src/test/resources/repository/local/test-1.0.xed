@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<extension>
+  <id>test</id>
+  <version>1.0</version>
+  <type>xar</type>
+  <dependency>false</dependency>
+  <enabled>true</enabled>
+  <description>description</description>
+  <author>author</author>
+  <website>http://website</website>
+</extension>

@@ -21,6 +21,8 @@ package org.xwiki.extension.xar.internal.handler.packager;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Collection;
+import java.util.List;
 
 import org.xwiki.component.annotation.ComponentRole;
 
@@ -35,4 +37,8 @@ public interface Packager
     void importXAR(File xarFile, String wiki) throws IOException;
 
     void unimportXAR(File xarFile, String wiki) throws IOException;
+
+    List<XarEntry> getEntries(File xarFile) throws IOException;
+
+    void unimportPages(Collection<XarEntry> pages, String wiki);
 }

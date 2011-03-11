@@ -14,45 +14,37 @@ var XWiki = (function (XWiki) {
         
       this.sources = sources;
         
-      this.realSearchInput = $(searchInput);
-        
-      this.modalContainer = new Element('div', {'class': 'xdialog-modal-container'}).hide();
-      var screen = new Element('div', {'class': 'xdialog-screen'}).setStyle({
-         opacity : 0.25,
-         backgroundColor : "#000000"
-      });
-      this.modalContainer.insert(screen);
-      this.modalContainer.insert(new Element('div', {'id' : 'searchSuggest'}));
-      document.body.appendChild(this.modalContainer);
-    
+      this.searchInput = $(searchInput);
+
       document.observe("xwiki:suggest:clearSuggestions", this.onClearSuggestions.bindAsEventListener(this));
       document.observe("xwiki:suggest:containerCreated", this.onSuggestContainerCreated.bindAsEventListener(this)); 
-      document.observe("xwiki:suggest:containerPrepared", this.onSuggestContainerPrepared.bindAsEventListener(this));
       document.observe("xwiki:suggest:selected", this.onSuggestionSelected.bindAsEventListener(this));
     
       this.createSuggest();
     },
-    
+      
     /**
      * Callback triggered when the original suggest clears its suggestions.
      */
     onClearSuggestions: function(event){
       if (event.memo.suggest == this.suggest) {
-        this.modalContainer.hide();
-        this.devirtualizeSearchInput();
+        // Restore bottom border style
+        this.searchInput.setStyle({'borderBottomStyle' : this.searchInputBorderBottomSavedStyle});
       }
     },
-    
+      
     /**
-     * Callback triggered when the original suggest has prepared its results container.
+     * Callback triggered when the original suggest has created its results container.
      */
-    onSuggestContainerPrepared: function(event){
-      if (event.memo.suggest == this.suggest && event.memo.suggest == this.suggest) {
-        this.modalContainer.show();
-        this.virtualizeSearchInput();
+    onSuggestContainerCreated: function(event){
+      if (event.memo.suggest == this.suggest) {
+        // Save the style of the bottom border of the input field so that we can restore it later on
+        this.searchInputBorderBottomSavedStyle = this.searchInput.getStyle('borderBottomStyle');
+        // Hide bottom border of input field to not double the container border just under the field
+        this.searchInput.setStyle({'borderBottomStyle' : 'none'});
       }
     },
-    
+
     /**
      * Callback triggered when a suggestion is selected.
      * Submits the form or go to a selected page according to selection.
@@ -62,13 +54,10 @@ var XWiki = (function (XWiki) {
         event.stop();
         if (!event.memo.id) {
           // Submit form
-          this.devirtualizeSearchInput();
-          this.realSearchInput.up('form').submit();
+          this.searchInput.up('form').submit();
         }
         else {
           // Go to page
-          this.modalContainer.hide();
-          this.virtualSearchInput.value = event.memo.value;     
           window.location = event.memo.id;;
         }
       }
@@ -96,8 +85,7 @@ var XWiki = (function (XWiki) {
         'classes' : 'suggestList',
         'eventListeners' : {
           'click': function(event){
-            this.devirtualizeSearchInput();
-            this.realSearchInput.up('form').submit();
+            this.searchInput.up('form').submit();
           },
           'mouseover':function(event){
             this.suggest.clearHighlight();
@@ -106,9 +94,9 @@ var XWiki = (function (XWiki) {
           }
         }
       });
-      this.suggest = new XWiki.widgets.Suggest( this.realSearchInput, {
+      this.suggest = new XWiki.widgets.Suggest( this.searchInput, {
         parentContainer: $('searchSuggest'),
-        className: 'ajaxsuggest searchSuggest',
+        className: 'searchSuggest horizontalLayout',
         fadeOnClear:false,
         align: "right",
         minchars: 3,    
@@ -116,70 +104,22 @@ var XWiki = (function (XWiki) {
         insertBeforeSuggestions : new Element("div", {'class' : 'results'}).update(allResultsNode.getElement()),
         displayValue:true,
         displayValueText: "in ",
-        timeout: 0
+        timeout: 0,
+        width: 500,
+        align: "right"
       });
     },
-
-    /**
-     * Add a "virtual" search input on top of the original one, so that it appears on top of the modal container.
-     */ 
-    virtualizeSearchInput: function(){
-      if (!this.isVirtual) {
-        this.isVirtual = true;
-        this.virtualSearchInput.value = this.realSearchInput.value;
-        this.virtualSearchInput.show();
-        this.virtualSearchInput.focus();
-        this.suggest.setInputField(this.virtualSearchInput);
-      }
-    },
-
-    /**
-     * Hides the virtual search input
-     */
-    devirtualizeSearchInput: function(){
-      this.realSearchInput.value = this.virtualSearchInput.value;
-      this.realSearchInput.focus();
-      this.suggest.setInputField(this.realSearchInput);
-      this.isVirtual = false;
-    },
     
-    /**
-     * Callback triggered when the original suggest has created its results container.
-     */
-    onSuggestContainerCreated: function(event){
-      if (event.memo.suggest == this.suggest) {
-        var container = event.memo.container;
-        this.modalContainer.show();
-        this.virtualSearchInput = this.realSearchInput.clone();
-        this.virtualSearchInput.id = this.realSearchInput.id + '-virtual';
-        this.virtualSearchInput.clonePosition(container, { setWidth : false });
-        $('searchSuggest').insert(this.virtualSearchInput);
-        this.virtualSearchInput.setStyle({position : 'absolute'});
-        this.virtualSearchInput.setStyle({
-          top : (this.virtualSearchInput.cumulativeOffset().top - this.realSearchInput.getHeight()) + 'px',
-          position:'absolute'
-        });
-
-        if (Prototype.Browser.IE || Prototype.Browser.WebKit) {
-          this.virtualSearchInput.observe("keydown", this.onKeyPress.bindAsEventListener(this));
-        } else {
-          this.virtualSearchInput.observe("keypress", this.onKeyPress.bindAsEventListener(this));
-        }
-      }
-    },
-
    /**
     * Callback triggered when a key has been typed on the virtual input.
     */
    onKeyPress: function(event){
      var key = event.keyCode;
      switch(key) {
-      // Ignore special keys, which are treated in onKeyPress
        case Event.KEY_RETURN:
          if (!this.suggest.hasActiveSelection()) {
-           this.devirtualizeSearchInput();
            event.stop();
-           this.realSearchInput.up('form').submit();
+           this.searchInput.up('form').submit();
          }
        default:
      }

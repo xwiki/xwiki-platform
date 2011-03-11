@@ -40,6 +40,7 @@ $xwiki.jsfx.use('uicomponents/suggest/suggest.js')
     'forceSkinAction' : true,  
     'h' : $searchSuggestConfigHash.hashCode()  
    })
+   $xwiki.ssfx.use('uicomponents/search/searchSuggest.css', true)
   #end
 #end
 <script type="text/javascript" src="$xwiki.getSkinFile("js/prototype/prototype.js")"></script>

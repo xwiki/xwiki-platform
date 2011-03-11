@@ -25,9 +25,11 @@ import org.xwiki.extension.ExtensionId;
 import org.xwiki.extension.LocalExtension;
 import org.xwiki.extension.ResolveException;
 import org.xwiki.extension.UninstallException;
+import org.xwiki.extension.event.ExtensionUninstalled;
 import org.xwiki.extension.handler.ExtensionHandlerManager;
 import org.xwiki.extension.repository.LocalExtensionRepository;
 import org.xwiki.extension.task.UninstallRequest;
+import org.xwiki.observation.ObservationManager;
 
 @Component("uninstall")
 public class UninstallTask extends AbstractTask<UninstallRequest>
@@ -37,6 +39,9 @@ public class UninstallTask extends AbstractTask<UninstallRequest>
 
     @Requirement
     private ExtensionHandlerManager extensionHandlerManager;
+    
+    @Requirement
+    private ObservationManager observationManager;
 
     @Override
     protected void start() throws Exception
@@ -93,5 +98,7 @@ public class UninstallTask extends AbstractTask<UninstallRequest>
         if (namespace == null || localExtension.getNamespaces().size() == 1) {
             this.localExtensionRepository.uninstallExtension(localExtension, namespace);
         }
+        
+        this.observationManager.notify(new ExtensionUninstalled(localExtension.getId()), localExtension, null);
     }
 }

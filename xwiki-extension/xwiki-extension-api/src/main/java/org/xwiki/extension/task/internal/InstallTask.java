@@ -28,12 +28,15 @@ import org.xwiki.extension.ExtensionId;
 import org.xwiki.extension.InstallException;
 import org.xwiki.extension.LocalExtension;
 import org.xwiki.extension.ResolveException;
+import org.xwiki.extension.event.ExtensionInstalled;
+import org.xwiki.extension.event.ExtensionUpgraded;
 import org.xwiki.extension.handler.ExtensionHandlerManager;
 import org.xwiki.extension.internal.VersionManager;
 import org.xwiki.extension.repository.CoreExtensionRepository;
 import org.xwiki.extension.repository.ExtensionRepositoryManager;
 import org.xwiki.extension.repository.LocalExtensionRepository;
 import org.xwiki.extension.task.InstallRequest;
+import org.xwiki.observation.ObservationManager;
 
 @Component("install")
 public class InstallTask extends AbstractTask<InstallRequest>
@@ -52,6 +55,9 @@ public class InstallTask extends AbstractTask<InstallRequest>
 
     @Requirement
     private ExtensionHandlerManager extensionHandlerManager;
+
+    @Requirement
+    private ObservationManager observationManager;
 
     @Override
     protected void start() throws Exception
@@ -81,7 +87,8 @@ public class InstallTask extends AbstractTask<InstallRequest>
 
         LocalExtension previousExtension = null;
 
-        LocalExtension localExtension = this.localExtensionRepository.getInstalledExtension(extensionId.getId(), namespace);
+        LocalExtension localExtension =
+            this.localExtensionRepository.getInstalledExtension(extensionId.getId(), namespace);
         if (localExtension != null) {
             int diff =
                 this.versionManager.compareVersions(extensionId.getVersion(), localExtension.getId().getVersion());
@@ -109,7 +116,8 @@ public class InstallTask extends AbstractTask<InstallRequest>
 
         LocalExtension previousExtension = null;
 
-        LocalExtension localExtension = this.localExtensionRepository.getInstalledExtension(extensionDependency.getId(), namespace);
+        LocalExtension localExtension =
+            this.localExtensionRepository.getInstalledExtension(extensionDependency.getId(), namespace);
         if (localExtension != null) {
             int diff =
                 this.versionManager.compareVersions(extensionDependency.getVersion(), localExtension.getId()
@@ -163,8 +171,14 @@ public class InstallTask extends AbstractTask<InstallRequest>
 
         if (previousExtension != null) {
             this.extensionHandlerManager.upgrade(previousExtension, localExtension, namespace);
+
+            this.observationManager.notify(new ExtensionUpgraded(localExtension.getId()), localExtension,
+                previousExtension);
         } else {
             this.extensionHandlerManager.install(localExtension, namespace);
+
+            this.observationManager.notify(new ExtensionInstalled(localExtension.getId()), localExtension,
+                previousExtension);
         }
 
         return localExtension;

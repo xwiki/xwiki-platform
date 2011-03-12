@@ -90,7 +90,7 @@
     </dependency>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-core-annotations-velocity</artifactId>
+      <artifactId>xwiki-core-annotations-scripting</artifactId>
       <version>${platform.core.version}</version>
     </dependency>
     <!-- Default macros dependencies, so that they are packed in the war

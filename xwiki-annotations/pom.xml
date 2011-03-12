@@ -40,6 +40,6 @@
     <module>xwiki-annotation-reference</module>
     <module>xwiki-annotation-io</module>
     <module>xwiki-annotation-maintainer</module>
-    <module>xwiki-annotation-velocity</module>
+    <module>xwiki-annotation-scripting</module>
   </modules>
 </project>

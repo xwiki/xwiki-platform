@@ -77,17 +77,18 @@ public class WikiServiceAsyncCacheProxy implements WikiServiceAsync
     /**
      * {@inheritDoc}
      */
-    public void getRecentlyModifiedPages(int start, int count, AsyncCallback<List<WikiPage>> async)
+    public void getRecentlyModifiedPages(String wikiName, int start, int count, AsyncCallback<List<WikiPage>> async)
     {
-        service.getRecentlyModifiedPages(start, count, async);
+        service.getRecentlyModifiedPages(wikiName, start, count, async);
     }
 
     /**
      * {@inheritDoc}
      */
-    public void getMatchingPages(String keyword, int start, int count, AsyncCallback<List<WikiPage>> async)
+    public void getMatchingPages(String wikiName, String keyword, int start, int count,
+        AsyncCallback<List<WikiPage>> async)
     {
-        service.getMatchingPages(keyword, start, count, async);
+        service.getMatchingPages(wikiName, keyword, start, count, async);
     }
 
     /**

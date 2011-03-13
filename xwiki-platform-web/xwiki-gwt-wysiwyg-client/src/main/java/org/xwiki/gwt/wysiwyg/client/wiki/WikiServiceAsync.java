@@ -32,7 +32,7 @@ import com.google.gwt.user.client.rpc.AsyncCallback;
 public interface WikiServiceAsync
 {
     /**
-     * Check if the current wiki is part of a multiwiki (i.e. this is a virtual wiki).
+     * Checks if the editor is running in a multiwiki environment.
      * 
      * @param async object used for asynchronous communication between server and client
      */
@@ -48,8 +48,7 @@ public interface WikiServiceAsync
     /**
      * Returns a list of all spaces names in the specified wiki.
      * 
-     * @param wikiName the name of the wiki to search for spaces. If this is <code>null</code>, the current wiki will be
-     *            used.
+     * @param wikiName the name of the wiki to search for spaces. If this is {@code null} the current wiki will be used
      * @param async object used for asynchronous communication between server and client
      */
     void getSpaceNames(String wikiName, AsyncCallback<List<String>> async);
@@ -57,28 +56,30 @@ public interface WikiServiceAsync
     /**
      * Returns the list of the page names from a given space and a given wiki.
      * 
-     * @param wikiName the name of the wiki. Pass <code>null</code> if this should use the current wiki.
+     * @param wikiName the name of the wiki. Pass {@code null} if the current wiki should be used instead
      * @param spaceName the name of the space
      * @param async object used for asynchronous communication between server and client
      */
     void getPageNames(String wikiName, String spaceName, AsyncCallback<List<String>> async);
 
     /**
+     * @param wikiName the name of the wiki where to look for modified pages
      * @param start the start index of the list of pages to return
      * @param count the number of pages to return
      * @param async object used for asynchronous communication between server and client, to return on success the
      *            recently {@code count} modified pages of the current user, starting from position {@code start}
      */
-    void getRecentlyModifiedPages(int start, int count, AsyncCallback<List<WikiPage>> async);
+    void getRecentlyModifiedPages(String wikiName, int start, int count, AsyncCallback<List<WikiPage>> async);
 
     /**
+     * @param wikiName the wiki where to run the search
      * @param start the start index of the list of pages to return
      * @param count the number of pages to return
      * @param keyword the keyword to search the pages for
      * @param async object used for asynchronous communication between server and client, to return on success the
      *            {@code count} pages whose full name or title match the keyword, starting from position {@code start}
      */
-    void getMatchingPages(String keyword, int start, int count, AsyncCallback<List<WikiPage>> async);
+    void getMatchingPages(String wikiName, String keyword, int start, int count, AsyncCallback<List<WikiPage>> async);
 
     /**
      * Creates an entity link configuration object (URL, reference) for a link with the specified origin and

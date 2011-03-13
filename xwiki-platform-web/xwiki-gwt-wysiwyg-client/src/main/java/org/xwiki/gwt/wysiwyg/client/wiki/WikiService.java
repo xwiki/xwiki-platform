@@ -38,45 +38,47 @@ import com.google.gwt.user.client.rpc.RemoteServiceRelativePath;
 public interface WikiService extends RemoteService
 {
     /**
-     * Check if the current wiki is part of a multiwiki (i.e. this is a virtual wiki).
+     * Checks if the editor is running in a multiwiki environment.
      * 
-     * @return true if the current wiki is a multiwiki, and false in the other case
+     * @return {@code true} if we are in a multiwiki environment, {@code false} otherwise
      */
     Boolean isMultiWiki();
 
     /**
-     * @return a list containing the names of all wikis.
+     * @return a list containing the names of all wikis
      */
     List<String> getVirtualWikiNames();
 
     /**
-     * @param wikiName the name of the wiki to search for spaces. If this is <code>null</code>, the current wiki will be
-     *            used.
-     * @return a list of all spaces names in the specified wiki.
+     * @param wikiName the name of the wiki to search for spaces. If this is {@code null} the current wiki will be used
+     * @return a list of all spaces names in the specified wiki
      */
     List<String> getSpaceNames(String wikiName);
 
     /**
-     * @param wikiName the name of the wiki. Pass <code>null</code> if this should use the current wiki.
+     * @param wikiName the name of the wiki. Pass {@code null} if the current wiki should be used instead
      * @param spaceName the name of the space
-     * @return the list of the page names from a given space and a given wiki.
+     * @return the list of the page names from a given space and a given wiki
      */
     List<String> getPageNames(String wikiName, String spaceName);
 
     /**
+     * @param wikiName the name of the wiki where to look for modified pages
      * @param start the start index of the list of pages to return
      * @param count the number of pages to return
-     * @return the recently {@code count} modified pages of the current user, starting from position {@code start}
+     * @return the recently {@code count} modified pages of the current user from the specified wiki, starting from
+     *         position {@code start}
      */
-    List<WikiPage> getRecentlyModifiedPages(int start, int count);
+    List<WikiPage> getRecentlyModifiedPages(String wikiName, int start, int count);
 
     /**
+     * @param wikiName the wiki where to run the search
      * @param start the start index of the list of pages to return
      * @param count the number of pages to return
      * @param keyword the keyword to search the pages for
      * @return the {@code count} pages whose full name or title match the keyword, starting from position {@code start}
      */
-    List<WikiPage> getMatchingPages(String keyword, int start, int count);
+    List<WikiPage> getMatchingPages(String wikiName, String keyword, int start, int count);
 
     /**
      * Creates an entity link configuration object (URL, link reference) for a link with the specified origin and

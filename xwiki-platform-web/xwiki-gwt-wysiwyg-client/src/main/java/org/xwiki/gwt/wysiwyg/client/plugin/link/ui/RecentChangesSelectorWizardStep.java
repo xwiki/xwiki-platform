@@ -22,6 +22,7 @@ package org.xwiki.gwt.wysiwyg.client.plugin.link.ui;
 import java.util.List;
 
 import org.xwiki.gwt.wysiwyg.client.wiki.WikiPage;
+import org.xwiki.gwt.wysiwyg.client.wiki.WikiPageReference;
 import org.xwiki.gwt.wysiwyg.client.wiki.WikiServiceAsync;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
@@ -50,6 +51,7 @@ public class RecentChangesSelectorWizardStep extends AbstractPageListSelectorWiz
     @Override
     protected void fetchData(AsyncCallback<List<WikiPage>> callback)
     {
-        getWikiService().getRecentlyModifiedPages(0, 20, callback);
+        String wikiName = new WikiPageReference(getData().getOrigin()).getWikiName();
+        getWikiService().getRecentlyModifiedPages(wikiName, 0, 20, callback);
     }
 }

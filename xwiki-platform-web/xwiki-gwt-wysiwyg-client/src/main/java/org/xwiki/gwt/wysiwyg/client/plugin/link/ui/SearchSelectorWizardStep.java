@@ -25,6 +25,7 @@ import org.xwiki.gwt.user.client.StringUtils;
 import org.xwiki.gwt.user.client.ui.ListItem;
 import org.xwiki.gwt.wysiwyg.client.Strings;
 import org.xwiki.gwt.wysiwyg.client.wiki.WikiPage;
+import org.xwiki.gwt.wysiwyg.client.wiki.WikiPageReference;
 import org.xwiki.gwt.wysiwyg.client.wiki.WikiServiceAsync;
 
 import com.google.gwt.event.dom.client.ClickEvent;
@@ -125,7 +126,8 @@ public class SearchSelectorWizardStep extends AbstractPageListSelectorWizardStep
     @Override
     protected void fetchData(AsyncCallback<List<WikiPage>> callback)
     {
-        getWikiService().getMatchingPages(getKeyword(), 0, 20, callback);
+        String wikiName = new WikiPageReference(getData().getOrigin()).getWikiName();
+        getWikiService().getMatchingPages(wikiName, getKeyword(), 0, 20, callback);
     }
 
     /**

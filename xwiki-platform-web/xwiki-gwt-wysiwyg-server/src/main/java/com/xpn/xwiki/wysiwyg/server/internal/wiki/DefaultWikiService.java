@@ -38,6 +38,9 @@ import org.xwiki.gwt.wysiwyg.client.wiki.WikiPage;
 import org.xwiki.gwt.wysiwyg.client.wiki.WikiPageReference;
 import org.xwiki.gwt.wysiwyg.client.wiki.WikiService;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.DocumentReferenceResolver;
+import org.xwiki.model.reference.EntityReferenceSerializer;
+import org.xwiki.model.reference.WikiReference;
 import org.xwiki.rendering.syntax.Syntax;
 
 import com.xpn.xwiki.XWikiContext;
@@ -82,6 +85,18 @@ public class DefaultWikiService implements WikiService
      */
     @Requirement
     private CSRFToken csrf;
+
+    /**
+     * The component used to resolve a string document reference.
+     */
+    @Requirement
+    private DocumentReferenceResolver<String> documentReferenceResolver;
+
+    /**
+     * The component used to serialize an entity reference.
+     */
+    @Requirement
+    private EntityReferenceSerializer<String> entityReferenceSerializer;
 
     /**
      * The object used to convert between client and server entity reference.
@@ -182,28 +197,11 @@ public class DefaultWikiService implements WikiService
      */
     public List<String> getPageNames(String wikiName, String spaceName)
     {
-        XWikiContext xcontext = getXWikiContext();
-        String database = xcontext.getDatabase();
-        List<DocumentReference> documentReferences = null;
         String query = "where doc.space = ? order by doc.fullName asc";
         List<String> parameters = Arrays.asList(spaceName);
-        try {
-            if (wikiName != null) {
-                xcontext.setDatabase(wikiName);
-            }
-            documentReferences = xcontext.getWiki().getStore().searchDocumentReferences(query, parameters, xcontext);
-        } catch (XWikiException e) {
-            LOG.error(e.getLocalizedMessage(), e);
-        } finally {
-            if (wikiName != null) {
-                xcontext.setDatabase(database);
-            }
-        }
         List<String> pagesNames = new ArrayList<String>();
-        if (documentReferences != null) {
-            for (DocumentReference documentReference : documentReferences) {
-                pagesNames.add(documentReference.getName());
-            }
+        for (DocumentReference documentReference : searchDocumentReferences(wikiName, query, parameters, 0, 0)) {
+            pagesNames.add(documentReference.getName());
         }
         return pagesNames;
     }
@@ -213,19 +211,11 @@ public class DefaultWikiService implements WikiService
      * 
      * @see WikiService#getRecentlyModifiedPages(int, int)
      */
-    public List<WikiPage> getRecentlyModifiedPages(int start, int count)
+    public List<WikiPage> getRecentlyModifiedPages(String wikiName, int start, int count)
     {
-        try {
-            XWikiContext context = getXWikiContext();
-            String query = "where doc.author = ? order by doc.date desc";
-            List<String> parameters = Arrays.asList(context.getUser());
-            List<DocumentReference> documentReferences =
-                context.getWiki().getStore().searchDocumentReferences(query, count, start, parameters, context);
-            return getWikiPages(documentReferences);
-        } catch (XWikiException e) {
-            LOG.error(e.getLocalizedMessage(), e);
-            throw new RuntimeException("Failed to retrieve the lists of recently modified pages.", e);
-        }
+        String query = "where doc.author = ? order by doc.date desc";
+        List<String> parameters = Arrays.asList(getCurrentUserRelativeTo(wikiName));
+        return getWikiPages(searchDocumentReferences(wikiName, query, parameters, start, count));
     }
 
     /**
@@ -233,31 +223,71 @@ public class DefaultWikiService implements WikiService
      * 
      * @see WikiService#getMatchingPages(String, int, int)
      */
-    public List<WikiPage> getMatchingPages(String keyword, int start, int count)
+    public List<WikiPage> getMatchingPages(String wikiName, String keyword, int start, int count)
     {
-        try {
-            List<String> blackListedSpaces = getBlackListedSpaces();
-            String notInBlackListedSpaces = "";
-            if (blackListedSpaces.size() > 0) {
-                notInBlackListedSpaces =
-                    "doc.web not in (?" + StringUtils.repeat(",?", blackListedSpaces.size() - 1) + ") and ";
-            }
-            String query =
-                "where " + notInBlackListedSpaces + "(lower(doc.title) like '%'||?||'%' or"
-                    + " lower(doc.fullName) like '%'||?||'%')" + " order by doc.fullName asc";
-            List<String> parameters = new ArrayList<String>(blackListedSpaces);
-            // Add twice the keyword, once for the document title and once for the document name.
-            parameters.add(keyword.toLowerCase());
-            parameters.add(keyword.toLowerCase());
+        List<String> blackListedSpaces = getBlackListedSpaces();
+        String notInBlackListedSpaces = "";
+        if (blackListedSpaces.size() > 0) {
+            notInBlackListedSpaces =
+                "doc.web not in (?" + StringUtils.repeat(",?", blackListedSpaces.size() - 1) + ") and ";
+        }
+        String query =
+            "where " + notInBlackListedSpaces + "(lower(doc.title) like '%'||?||'%' or"
+                + " lower(doc.fullName) like '%'||?||'%')" + " order by doc.fullName asc";
+        List<String> parameters = new ArrayList<String>(blackListedSpaces);
+        // Add twice the keyword, once for the document title and once for the document name.
+        parameters.add(keyword.toLowerCase());
+        parameters.add(keyword.toLowerCase());
 
-            XWikiContext context = getXWikiContext();
-            List<DocumentReference> documentReferences =
-                context.getWiki().getStore().searchDocumentReferences(query, count, start, parameters, context);
-            return getWikiPages(documentReferences);
+        return getWikiPages(searchDocumentReferences(wikiName, query, parameters, start, count));
+    }
+
+    /**
+     * Searches documents in the specified wiki.
+     * 
+     * @param wikiName the wiki where to search for documents
+     * @param query the query to execute
+     * @param parameters the query parameters
+     * @param start the position in the result set where to start
+     * @param count the maximum number of documents to retrieve
+     * @return the documents from the specified wiki that match the given query
+     */
+    private List<DocumentReference> searchDocumentReferences(String wikiName, String query, List<String> parameters,
+        int start, int count)
+    {
+        XWikiContext context = getXWikiContext();
+        String database = context.getDatabase();
+
+        try {
+            if (wikiName != null) {
+                context.setDatabase(wikiName);
+            }
+            return context.getWiki().getStore().searchDocumentReferences(query, count, start, parameters, context);
         } catch (XWikiException e) {
             LOG.error(e.getLocalizedMessage(), e);
             throw new RuntimeException("Failed to search XWiki pages.", e);
+        } finally {
+            if (wikiName != null) {
+                context.setDatabase(database);
+            }
         }
+    }
+
+    /**
+     * @param wikiName the name of a wiki
+     * @return the name of the current user, relative to the specified wiki
+     */
+    private String getCurrentUserRelativeTo(String wikiName)
+    {
+        XWikiContext context = getXWikiContext();
+        String currentUser = context.getUser();
+        String currentWiki = context.getDatabase();
+        if (!currentWiki.equals(wikiName)) {
+            WikiReference currentWikiRef = new WikiReference(currentWiki);
+            DocumentReference currentUserRef = documentReferenceResolver.resolve(currentUser, currentWikiRef);
+            currentUser = entityReferenceSerializer.serialize(currentUserRef, new WikiReference(wikiName));
+        }
+        return currentUser;
     }
 
     /**
@@ -265,19 +295,22 @@ public class DefaultWikiService implements WikiService
      * 
      * @param documentReferences a list of document references
      * @return the list of {@link WikiPage}s corresponding to the given document references
-     * @throws XWikiException if anything goes wrong while creating the list of {@link WikiPage}s
      */
-    private List<WikiPage> getWikiPages(List<DocumentReference> documentReferences) throws XWikiException
+    private List<WikiPage> getWikiPages(List<DocumentReference> documentReferences)
     {
+        XWikiContext context = getXWikiContext();
         List<WikiPage> wikiPages = new ArrayList<WikiPage>();
         for (DocumentReference documentReference : documentReferences) {
-            WikiPage wikiPage = new WikiPage();
-            XWikiContext context = getXWikiContext();
-            XWikiDocument document = context.getWiki().getDocument(documentReference, context);
-            wikiPage.setReference(entityReferenceConverter.convert(documentReference).getEntityReference());
-            wikiPage.setTitle(document.getRenderedTitle(Syntax.XHTML_1_0, context));
-            wikiPage.setUrl(document.getURL("view", context));
-            wikiPages.add(wikiPage);
+            try {
+                WikiPage wikiPage = new WikiPage();
+                XWikiDocument document = context.getWiki().getDocument(documentReference, context);
+                wikiPage.setReference(entityReferenceConverter.convert(documentReference).getEntityReference());
+                wikiPage.setTitle(document.getRenderedTitle(Syntax.XHTML_1_0, context));
+                wikiPage.setUrl(document.getURL("view", context));
+                wikiPages.add(wikiPage);
+            } catch (XWikiException e) {
+                LOG.warn("Failed to load document " + documentReference, e);
+            }
         }
         return wikiPages;
     }

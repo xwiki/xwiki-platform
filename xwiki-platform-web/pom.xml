@@ -95,6 +95,9 @@
             <exclude>org/xwiki/gwt/wysiwyg/client/plugin/macro/MacroPlugin</exclude>
             <exclude>org/xwiki/gwt/wysiwyg/client/plugin/submit/exec/EnableExecutable</exclude>
             <exclude>org/xwiki/gwt/wysiwyg/client/plugin/submit/exec/ResetExecutable</exclude>
+            <exclude>org/xwiki/gwt/wysiwyg/client/wiki/WikiService</exclude>
+            <exclude>org/xwiki/gwt/wysiwyg/client/wiki/WikiServiceAsync</exclude>
+            <exclude>org/xwiki/gwt/wysiwyg/client/wiki/WikiServiceAsyncCacheProxy</exclude>
             <exclude>org/xwiki/gwt/wysiwyg/client/Strings</exclude>
           </excludes>
         </configuration>

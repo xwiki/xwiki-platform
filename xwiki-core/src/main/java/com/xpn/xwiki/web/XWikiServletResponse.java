@@ -166,7 +166,7 @@ public class XWikiServletResponse implements XWikiResponse
 
     public void setHeader(String name, String value)
     {
-        this.response.addHeader(name, value);
+        this.response.setHeader(name, value);
     }
 
     public void addHeader(String name, String value)

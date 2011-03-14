@@ -128,7 +128,7 @@
     </dependency>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-core-annotations-velocity</artifactId>
+      <artifactId>xwiki-core-annotations-scripting</artifactId>
       <version>${platform.core.version}</version>
     </dependency>
     <!-- Default macros dependencies, so that they are packed in the war
@@ -143,28 +143,28 @@
     <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-core-rendering-macro-chart</artifactId>
-      <version>${project.version}</version>
+      <version>${platform.core.version}</version>
       <!-- Only needed at runtime since it's a component implementation -->
       <scope>runtime</scope>
     </dependency>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-core-rendering-macro-code</artifactId>
-      <version>${project.version}</version>
+      <version>${platform.core.version}</version>
       <!-- Only needed at runtime since it's a component implementation -->
       <scope>runtime</scope>
     </dependency>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-core-rendering-macro-container</artifactId>
-      <version>${project.version}</version>
+      <version>${platform.core.version}</version>
       <!-- Only needed at runtime since it's a component implementation -->
       <scope>runtime</scope>
     </dependency>    
     <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-core-rendering-macro-dashboard</artifactId>
-      <version>${project.version}</version>
+      <version>${platform.core.version}</version>
       <!-- Only needed at runtime since it's a component implementation -->
       <scope>runtime</scope>
     </dependency>
@@ -178,28 +178,28 @@
     <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-core-rendering-macro-formula</artifactId>
-      <version>${project.version}</version>
+      <version>${platform.core.version}</version>
       <!-- Only needed at runtime since it's a component implementation -->
       <scope>runtime</scope>
     </dependency>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-core-rendering-macro-gallery</artifactId>
-      <version>${project.version}</version>
+      <version>${platform.core.version}</version>
       <!-- Only needed at runtime since it's a component implementation -->
       <scope>runtime</scope>
     </dependency>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-core-rendering-macro-groovy</artifactId>
-      <version>${project.version}</version>
+      <version>${platform.core.version}</version>
       <!-- Only needed at runtime since it's a component implementation -->
       <scope>runtime</scope>
     </dependency>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-core-rendering-macro-python</artifactId>
-      <version>${project.version}</version>
+      <version>${platform.core.version}</version>
       <!-- Only needed at runtime since it's a component implementation -->
       <scope>runtime</scope>
     </dependency>
@@ -220,7 +220,7 @@
     <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-core-rendering-macro-include</artifactId>
-      <version>${project.version}</version>
+      <version>${platform.core.version}</version>
       <!-- Only needed at runtime since it's a component implementation -->
       <scope>runtime</scope>
     </dependency>
@@ -234,7 +234,7 @@
     <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-core-rendering-macro-rss</artifactId>
-      <version>${project.version}</version>
+      <version>${platform.core.version}</version>
       <!-- Only needed at runtime since it's a component implementation -->
       <scope>runtime</scope>
     </dependency>
@@ -248,27 +248,27 @@
     <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-core-rendering-macro-useravatar</artifactId>
-      <version>${project.version}</version>
+      <version>${platform.core.version}</version>
       <!-- Only needed at runtime since it's a component implementation -->
       <scope>runtime</scope>
     </dependency>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-core-rendering-macro-velocity</artifactId>
-      <version>${project.version}</version>
+      <version>${platform.core.version}</version>
       <!-- Only needed at runtime since it's a component implementation -->
       <scope>runtime</scope>
     </dependency>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-core-office-viewer</artifactId>
-      <version>${project.version}</version>
+      <version>${platform.core.version}</version>
       <scope>runtime</scope>
     </dependency>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-core-office-macro</artifactId>
-      <version>${project.version}</version>
+      <version>${platform.core.version}</version>
       <scope>runtime</scope>
     </dependency>
     <!-- needed for JSR 303 (Bean Validation) clients such as xwiki-core properties. 
@@ -316,17 +316,22 @@
       <artifactId>xwiki-core-legacy</artifactId>
       <version>${platform.core.version}</version>
     </dependency>
-    <!-- Event Stream Module -->
+    <!-- Event & Message Stream Modules -->
     <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-core-eventstream</artifactId>
+      <version>${platform.core.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-core-messagestream</artifactId>
       <version>${platform.core.version}</version>
     </dependency>
     <!-- XML Script Service -->
     <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-core-xml-script</artifactId>
-      <version>${project.version}</version>
+      <version>${platform.core.version}</version>
     </dependency>
 
     <!--  -->

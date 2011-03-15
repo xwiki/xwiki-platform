@@ -17,58 +17,34 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.rendering;
+package org.xwiki.rendering.macro.container;
 
 import java.util.Map;
-
-import junit.framework.Test;
-import junit.framework.TestCase;
 
 import org.jmock.Expectations;
 import org.jmock.Mockery;
 import org.jmock.integration.junit4.JUnit4Mockery;
+import org.junit.runner.RunWith;
 import org.xwiki.component.descriptor.DefaultComponentDescriptor;
-import org.xwiki.rendering.scaffolding.RenderingTestSuite;
+import org.xwiki.component.manager.ComponentManager;
+import org.xwiki.rendering.test.integration.RenderingTestSuite;
 import org.xwiki.skinx.SkinExtension;
-import org.xwiki.test.ComponentManagerTestSetup;
 
 /**
- * All Rendering integration tests defined in text files using a special format.
- * 
+ * Run all tests found in {@code *.test} files located in the classpath. These {@code *.test} files must follow the
+ * conventions described in {@link org.xwiki.rendering.test.integration.TestDataParser}.
+ *
  * @version $Id$
- * @since 2.5M2
+ * @since 3.0RC1
  */
-public class RenderingTests extends TestCase
+@RunWith(RenderingTestSuite.class)
+public class IntegrationTests
 {
-    /**
-     * The mockery to create the skinx mocks.
-     */
-    private static Mockery mockery = new JUnit4Mockery();
-
-    /**
-     * Builds the test suite.
-     * 
-     * @return the test suite for the container tests.
-     * @throws Exception if an exception occurs while preparing the tests from the test files.
-     */
-    public static Test suite() throws Exception
+    @RenderingTestSuite.Initialized
+    public void initialize(ComponentManager componentManager) throws Exception
     {
-        RenderingTestSuite suite = new RenderingTestSuite("Test Container Macro");
+        Mockery mockery = new JUnit4Mockery();
 
-        ComponentManagerTestSetup testSetup = new ComponentManagerTestSetup(suite);
-        setUpSkinExtensionStubs(testSetup);
-
-        return testSetup;
-    }
-
-    /**
-     * Sets up the stubs for the skin extensions, allowing use methods to be called on them.
-     * 
-     * @param testSetup the test setup to register the skinx stubs in
-     * @throws Exception in case anything goes wrong
-     */
-    private static void setUpSkinExtensionStubs(ComponentManagerTestSetup testSetup) throws Exception
-    {
         final SkinExtension ssfxMock = mockery.mock(SkinExtension.class, "ssfxMock");
 
         mockery.checking(new Expectations()
@@ -85,6 +61,6 @@ public class RenderingTests extends TestCase
         ssfxDesc.setRole(SkinExtension.class);
         ssfxDesc.setRoleHint("ssfx");
 
-        testSetup.getComponentManager().registerComponent(ssfxDesc, ssfxMock);
+        componentManager.registerComponent(ssfxDesc, ssfxMock);
     }
 }

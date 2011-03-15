@@ -61,9 +61,9 @@
     </dependency>
     <!-- Testing Dependencies -->
     <dependency>
-      <groupId>org.xwiki.commons</groupId>
-      <artifactId>xwiki-commons-test</artifactId>
-      <version>${commons.version}</version>
+      <groupId>org.xwiki.rendering</groupId>
+      <artifactId>xwiki-rendering-test</artifactId>
+      <version>${rendering.version}</version>
       <scope>test</scope>
     </dependency>
   </dependencies>
@@ -74,7 +74,7 @@
         <artifactId>maven-surefire-plugin</artifactId>   
         <configuration>
           <includes>
-            <include>**/RenderingTests.java</include>
+            <include>**/IntegrationTests.java</include>
           </includes>
         </configuration>
       </plugin>

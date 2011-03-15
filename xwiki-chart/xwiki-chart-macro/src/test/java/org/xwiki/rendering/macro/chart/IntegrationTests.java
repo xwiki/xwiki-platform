@@ -22,6 +22,7 @@ package org.xwiki.rendering.macro.chart;
 import org.apache.commons.io.IOUtils;
 import org.jmock.Expectations;
 import org.jmock.Mockery;
+import org.jmock.integration.junit4.JUnit4Mockery;
 import org.junit.runner.RunWith;
 import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.bridge.DocumentModelBridge;
@@ -45,19 +46,19 @@ public class IntegrationTests
     @RenderingTestSuite.Initialized
     public void initialize(ComponentManager componentManager) throws Exception
     {
-        Mockery context = new Mockery();
+        Mockery mockery = new JUnit4Mockery();
 
         // Document Access Bridge Mock
-        final DocumentAccessBridge mockDocumentAccessBridge = context.mock(DocumentAccessBridge.class);
+        final DocumentAccessBridge mockDocumentAccessBridge = mockery.mock(DocumentAccessBridge.class);
         DefaultComponentDescriptor<DocumentAccessBridge> descriptorDAB =
             new DefaultComponentDescriptor<DocumentAccessBridge>();
         descriptorDAB.setRole(DocumentAccessBridge.class);
         componentManager.registerComponent(descriptorDAB, mockDocumentAccessBridge);
 
         final DocumentReference documentReference = new DocumentReference("xwiki", "Test", "Test");
-        final DocumentModelBridge mockDocument = context.mock(DocumentModelBridge.class);
+        final DocumentModelBridge mockDocument = mockery.mock(DocumentModelBridge.class);
 
-        context.checking(new Expectations() {{
+        mockery.checking(new Expectations() {{
             allowing(mockDocumentAccessBridge).getURL(with(any(String.class)), with(equal("charting")),
                 with(any(String.class)), with(any(String.class)));
                 will(returnValue("http://localhost/charts"));
@@ -77,13 +78,13 @@ public class IntegrationTests
         }});
 
         // Document Name Serializer Mock
-        final EntityReferenceSerializer mockEntityReferenceSerializer = context.mock(EntityReferenceSerializer.class);
+        final EntityReferenceSerializer mockEntityReferenceSerializer = mockery.mock(EntityReferenceSerializer.class);
         DefaultComponentDescriptor<EntityReferenceSerializer> descriptorERS =
             new DefaultComponentDescriptor<EntityReferenceSerializer>();
         descriptorERS.setRole(EntityReferenceSerializer.class);
         componentManager.registerComponent(descriptorERS, mockEntityReferenceSerializer);
 
-        context.checking(new Expectations() {{
+        mockery.checking(new Expectations() {{
             allowing(mockEntityReferenceSerializer).serialize(documentReference); will(returnValue("Test.Test"));
         }});
     }

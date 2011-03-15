@@ -19,33 +19,25 @@
  */
 package org.xwiki.rendering.macro.php;
 
+import org.jmock.integration.junit4.JUnit4Mockery;
+import org.junit.runner.RunWith;
+import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.rendering.macro.script.ScriptMockSetup;
-import org.xwiki.rendering.scaffolding.RenderingTestSuite;
-import org.xwiki.test.ComponentManagerTestSetup;
-
-import junit.framework.Test;
-import junit.framework.TestCase;
+import org.xwiki.rendering.test.integration.RenderingTestSuite;
 
 /**
- * Rendering tests for the php macro.
- * 
+ * Run all tests found in {@code *.test} files located in the classpath. These {@code *.test} files must follow the
+ * conventions described in {@link org.xwiki.rendering.test.integration.TestDataParser}.
+ *
  * @version $Id$
- * @since 2.1M1
+ * @since 3.0RC1
  */
-public class RenderingTests extends TestCase
+@RunWith(RenderingTestSuite.class)
+public class IntegrationTests
 {
-    /**
-     * Creates a rendering test suit for testing the PHP macro.
-     * 
-     * @return rendering test suit for testing the PHP macro.
-     * @throws Exception if an error occurs while setting up the test suite.
-     */
-    public static Test suite() throws Exception
+    @RenderingTestSuite.Initialized
+    public void initialize(ComponentManager componentManager) throws Exception
     {
-        RenderingTestSuite suite = new RenderingTestSuite("Test PHP Macro");
-        ComponentManagerTestSetup testSetup = new ComponentManagerTestSetup(suite);
-        new ScriptMockSetup(testSetup.getComponentManager());
-
-        return testSetup;
+        new ScriptMockSetup(new JUnit4Mockery(), componentManager);
     }
 }

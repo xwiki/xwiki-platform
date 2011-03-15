@@ -23,7 +23,6 @@ import org.xwiki.component.annotation.Component;
 import org.xwiki.component.descriptor.DefaultComponentDescriptor;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.component.manager.ComponentRepositoryException;
-import org.xwiki.extension.CoreExtension;
 import org.xwiki.extension.ExtensionId;
 import org.xwiki.extension.repository.CoreExtensionRepository;
 import org.xwiki.extension.repository.internal.DefaultCoreExtension;
@@ -42,7 +41,7 @@ public class ConfigurableDefaultCoreExtensionRepository extends DefaultCoreExten
         componentManager.registerComponent(componentDescriptor);
     }
 
-    public void addExtensions(CoreExtension extension)
+    public void addExtensions(DefaultCoreExtension extension)
     {
         this.extensions.put(extension.getId().getId(), extension);
     }

@@ -21,34 +21,33 @@ package org.xwiki.rendering.macro.script;
 
 import java.util.Collections;
 
-import junit.framework.Test;
-import junit.framework.TestCase;
-
 import org.jmock.Expectations;
 import org.jmock.Mockery;
+import org.jmock.integration.junit4.JUnit4Mockery;
+import org.junit.runner.RunWith;
 import org.xwiki.component.descriptor.DefaultComponentDescriptor;
+import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.observation.EventListener;
 import org.xwiki.observation.event.Event;
-import org.xwiki.script.event.ScriptEvaluatingEvent;
-import org.xwiki.rendering.scaffolding.RenderingTestSuite;
+import org.xwiki.rendering.test.integration.RenderingTestSuite;
 import org.xwiki.rendering.transformation.MacroTransformationContext;
-import org.xwiki.test.ComponentManagerTestSetup;
+import org.xwiki.script.event.ScriptEvaluatingEvent;
 
 /**
- * All Rendering integration tests defined in text files using a special format.
- * 
+ * Run all tests found in {@code *.test} files located in the classpath. These {@code *.test} files must follow the
+ * conventions described in {@link org.xwiki.rendering.test.integration.TestDataParser}.
+ *
  * @version $Id$
- * @since 2.0M1
+ * @since 3.0RC1
  */
-public class RenderingTests extends TestCase
+@RunWith(RenderingTestSuite.class)
+public class IntegrationTests
 {
-    public static Test suite() throws Exception
+    @RenderingTestSuite.Initialized
+    public void initialize(ComponentManager componentManager) throws Exception
     {
-        RenderingTestSuite suite = new RenderingTestSuite("Test all Parsers/Renderers");
-
-        ComponentManagerTestSetup testSetup = new ComponentManagerTestSetup(suite);
-        Mockery mockery = new Mockery();
-        new ScriptMockSetup(mockery, testSetup.getComponentManager());
+        Mockery mockery = new JUnit4Mockery();
+        new ScriptMockSetup(mockery, componentManager);
 
         // fake nested script validator never fails
         final EventListener nestedValidator
@@ -65,8 +64,6 @@ public class RenderingTests extends TestCase
             = new DefaultComponentDescriptor<EventListener>();
         validatorDescriptor.setRole(EventListener.class);
         validatorDescriptor.setRoleHint("nestedscriptmacrovalidator");
-        testSetup.getComponentManager().registerComponent(validatorDescriptor, nestedValidator);
-
-        return testSetup;
+        componentManager.registerComponent(validatorDescriptor, nestedValidator);
     }
 }

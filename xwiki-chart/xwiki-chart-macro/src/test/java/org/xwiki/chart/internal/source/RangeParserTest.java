@@ -30,7 +30,7 @@ import org.junit.Test;
 public class RangeParserTest
 {
     @Test
-    public void testRangeParser()
+    public void getColumnNumberFromIdentifier()
     {
         Assert.assertEquals(0, AbstractTableBlockDataSource.getColumnNumberFromIdentifier("A4"));
         Assert.assertEquals(1, AbstractTableBlockDataSource.getColumnNumberFromIdentifier("B4"));

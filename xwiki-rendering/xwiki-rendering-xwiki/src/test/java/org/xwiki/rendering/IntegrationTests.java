@@ -19,43 +19,32 @@
  */
 package org.xwiki.rendering;
 
-import junit.framework.Test;
-import junit.framework.TestCase;
-
 import org.jmock.Expectations;
 import org.jmock.Mockery;
+import org.jmock.integration.junit4.JUnit4Mockery;
+import org.junit.runner.RunWith;
 import org.xwiki.component.descriptor.DefaultComponentDescriptor;
-import org.xwiki.component.embed.EmbeddableComponentManager;
+import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.model.reference.AttachmentReference;
 import org.xwiki.model.reference.AttachmentReferenceResolver;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.rendering.scaffolding.MockWikiModel;
-import org.xwiki.rendering.scaffolding.RenderingTestSuite;
-import org.xwiki.test.ComponentManagerTestSetup;
+import org.xwiki.rendering.test.integration.RenderingTestSuite;
 
 /**
- * All Rendering integration tests defined in text files using a special format.
+ * Run all tests found in {@code *.test} files located in the classpath. These {@code *.test} files must follow the
+ * conventions described in {@link org.xwiki.rendering.test.integration.TestDataParser}.
  *
  * @version $Id$
- * @since 2.5RC1
+ * @since 3.0RC1
  */
-public class RenderingTests extends TestCase
+@RunWith(RenderingTestSuite.class)
+public class IntegrationTests
 {
-    public static Test suite() throws Exception
+    @RenderingTestSuite.Initialized
+    public void initialize(ComponentManager componentManager) throws Exception
     {
-        RenderingTestSuite suite =
-            new RenderingTestSuite("Rendering tests requiring the wiki notion and that run inside XWiki");
-
-        ComponentManagerTestSetup testSetup = new ComponentManagerTestSetup(suite);
-        testSetup.addComponentDescriptor(MockWikiModel.getComponentDescriptor());
-        setUpMocks(testSetup.getComponentManager());
-
-        return testSetup;
-    }
-
-    public static void setUpMocks(EmbeddableComponentManager componentManager) throws Exception
-    {
-        Mockery mockery = new Mockery();
+        Mockery mockery = new JUnit4Mockery();
 
         // Attachment Reference Resolver Mock
         final AttachmentReferenceResolver<String> mockResolver = mockery.mock(AttachmentReferenceResolver.class);
@@ -69,5 +58,8 @@ public class RenderingTests extends TestCase
         descriptorARS.setRole(AttachmentReferenceResolver.class);
         descriptorARS.setRoleHint("current");
         componentManager.registerComponent(descriptorARS, mockResolver);
+
+        // WikiModel Mock
+        componentManager.registerComponent(MockWikiModel.getComponentDescriptor());
     }
 }

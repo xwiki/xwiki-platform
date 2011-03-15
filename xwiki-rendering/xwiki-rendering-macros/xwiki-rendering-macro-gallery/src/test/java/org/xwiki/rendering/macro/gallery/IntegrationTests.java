@@ -17,67 +17,47 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.rendering;
+package org.xwiki.rendering.macro.gallery;
 
 import java.util.Map;
 
-import junit.framework.Test;
-import junit.framework.TestCase;
-
 import org.jmock.Expectations;
 import org.jmock.Mockery;
+import org.jmock.integration.junit4.JUnit4Mockery;
+import org.junit.runner.RunWith;
 import org.xwiki.component.descriptor.DefaultComponentDescriptor;
-import org.xwiki.component.embed.EmbeddableComponentManager;
-import org.xwiki.rendering.scaffolding.RenderingTestSuite;
+import org.xwiki.component.manager.ComponentManager;
+import org.xwiki.rendering.test.integration.RenderingTestSuite;
 import org.xwiki.skinx.SkinExtension;
-import org.xwiki.test.ComponentManagerTestSetup;
 
 /**
- * All rendering integration tests defined in text files using a special format.
- * 
+ * Run all tests found in {@code *.test} files located in the classpath. These {@code *.test} files must follow the
+ * conventions described in {@link org.xwiki.rendering.test.integration.TestDataParser}.
+ *
  * @version $Id$
- * @since 3.0M3
+ * @since 3.0RC1
  */
-public class RenderingTests extends TestCase
+@RunWith(RenderingTestSuite.class)
+public class IntegrationTests
 {
-    /**
-     * Creates the test suite.
-     * 
-     * @return the test suite
-     * @throws Exception is creating the test suite fails
-     */
-    public static Test suite() throws Exception
+    @RenderingTestSuite.Initialized
+    public void initialize(ComponentManager componentManager) throws Exception
     {
-        RenderingTestSuite suite = new RenderingTestSuite("Test Gallery Macro");
-
-        ComponentManagerTestSetup testSetup = new ComponentManagerTestSetup(suite);
-        setUpMocks(testSetup.getComponentManager());
-
-        return testSetup;
-    }
-
-    /**
-     * Registers mock components to the given component manager.
-     * 
-     * @param componentManager the component manager were to register the mock components
-     */
-    private static void setUpMocks(EmbeddableComponentManager componentManager)
-    {
-        Mockery mockery = new Mockery();
+        Mockery mockery = new JUnit4Mockery();
         registerMockSkinExtension(componentManager, mockery, "jsfx");
         registerMockSkinExtension(componentManager, mockery, "ssfx");
     }
 
     /**
      * Registers a mock skin extension component with the given role hint.
-     * 
+     *
      * @param componentManager the component manager where to register the mock skin extension component
      * @param mockery the object used to mock the skin extension component
      * @param hint the role hint to use for the skin extension component
      */
     @SuppressWarnings("unchecked")
-    private static void registerMockSkinExtension(EmbeddableComponentManager componentManager, Mockery mockery,
-        String hint)
+    private void registerMockSkinExtension(ComponentManager componentManager, Mockery mockery, String hint)
+        throws Exception
     {
         final SkinExtension skinExtension = mockery.mock(SkinExtension.class, hint);
         DefaultComponentDescriptor<SkinExtension> descriptor = new DefaultComponentDescriptor<SkinExtension>();

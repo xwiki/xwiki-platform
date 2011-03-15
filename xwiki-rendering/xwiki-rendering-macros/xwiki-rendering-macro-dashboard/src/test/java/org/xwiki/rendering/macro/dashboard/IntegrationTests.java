@@ -17,50 +17,38 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.rendering;
+package org.xwiki.rendering.macro.dashboard;
 
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Map;
 
-import junit.framework.Test;
-import junit.framework.TestCase;
-
 import org.jmock.Expectations;
 import org.jmock.Mockery;
+import org.jmock.integration.junit4.JUnit4Mockery;
+import org.junit.runner.RunWith;
 import org.xwiki.component.descriptor.DefaultComponentDescriptor;
-import org.xwiki.component.embed.EmbeddableComponentManager;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.block.WordBlock;
-import org.xwiki.rendering.macro.dashboard.Gadget;
-import org.xwiki.rendering.macro.dashboard.GadgetSource;
-import org.xwiki.rendering.scaffolding.RenderingTestSuite;
+import org.xwiki.rendering.test.integration.RenderingTestSuite;
 import org.xwiki.rendering.transformation.MacroTransformationContext;
 import org.xwiki.skinx.SkinExtension;
-import org.xwiki.test.ComponentManagerTestSetup;
 
 /**
- * All Rendering integration tests defined in text files using a special format.
- * 
+ * Run all tests found in {@code *.test} files located in the classpath. These {@code *.test} files must follow the
+ * conventions described in {@link org.xwiki.rendering.test.integration.TestDataParser}.
+ *
  * @version $Id$
- * @since 3.0M3
+ * @since 3.0RC1
  */
-public class RenderingTests extends TestCase
+@RunWith(RenderingTestSuite.class)
+public class IntegrationTests
 {
-    public static Test suite() throws Exception
+    @RenderingTestSuite.Initialized
+    public void initialize(ComponentManager componentManager) throws Exception
     {
-        RenderingTestSuite suite = new RenderingTestSuite("Test Dashboard Macro");
-
-        ComponentManagerTestSetup testSetup = new ComponentManagerTestSetup(suite);
-        setUpMocks(testSetup.getComponentManager());
-
-        return testSetup;
-    }
-
-    public static void setUpMocks(EmbeddableComponentManager componentManager) throws Exception
-    {
-        Mockery mockery = new Mockery();
+        Mockery mockery = new JUnit4Mockery();
 
         // Since we have a dependency on xwiki-core the Context Component Manager will be found and the test will try
         // to look up the Dashboard macro in the User and Wiki Component Manager and thus need a Current User and a
@@ -96,8 +84,8 @@ public class RenderingTests extends TestCase
             {
                 allowing(mockGadgetSource).getGadgets(with(any(String.class)),
                     with(any(MacroTransformationContext.class)));
-                will(returnValue(Arrays.asList(new Gadget("0", Arrays.<Block> asList(new WordBlock("title")), Arrays
-                    .<Block> asList(new WordBlock("content")), "1,1"))));
+                will(returnValue(Arrays.asList(new Gadget("0", Arrays.<Block>asList(new WordBlock("title")), Arrays
+                    .<Block>asList(new WordBlock("content")), "1,1"))));
                 allowing(mockGadgetSource).getDashboardSourceMetadata(with(any(String.class)),
                     with(any(MacroTransformationContext.class)));
                 will(returnValue(Collections.<Block> emptyList()));

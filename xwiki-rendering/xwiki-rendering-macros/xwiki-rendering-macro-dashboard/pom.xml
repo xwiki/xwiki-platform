@@ -32,23 +32,6 @@
   <artifactId>xwiki-core-rendering-macro-dashboard</artifactId>
   <name>XWiki Platform - Core - Rendering - Macro - Dashboard</name>
   <description>Displays the macro instances (gadgets) inside in a dashboard.</description>
-  <build>
-    <plugins>
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-surefire-plugin</artifactId>
-      </plugin>
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-checkstyle-plugin</artifactId>
-        <configuration>
-          <excludes>
-            org/xwiki/rendering/internal/macro/dashboard/DefaultGadgetSource.java
-          </excludes>
-        </configuration>
-      </plugin>
-    </plugins>
-  </build>
   <dependencies>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
@@ -71,4 +54,17 @@
       <version>${project.version}</version>
     </dependency>
   </dependencies>
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-checkstyle-plugin</artifactId>
+        <configuration>
+          <excludes>
+            org/xwiki/rendering/internal/macro/dashboard/DefaultGadgetSource.java
+          </excludes>
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
 </project>

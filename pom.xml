@@ -216,16 +216,6 @@
                 <exclude>org/xwiki/officeimporter/openoffice/OpenOfficeDocumentConverter</exclude>
                 <exclude>org/xwiki/officeimporter/openoffice/OpenOfficeManager</exclude>
                 <exclude>org/xwiki/officeimporter/splitter/XDOMOfficeDocumentSplitter</exclude>
-                <!-- Changes from the Extension module -->
-                <exclude>org/xwiki/extension/CoreExtension</exclude>
-                <exclude>org/xwiki/extension/Extension</exclude>
-                <exclude>org/xwiki/extension/ExtensionManager</exclude>
-                <exclude>org/xwiki/extension/LocalExtension</exclude>
-                <exclude>org/xwiki/extension/handler/ExtensionHandler</exclude>
-                <exclude>org/xwiki/extension/handler/ExtensionHandlerManager</exclude>
-                <exclude>org/xwiki/extension/repository/CoreExtensionRepository</exclude>
-                <exclude>org/xwiki/extension/repository/ExtensionRepository</exclude>
-                <exclude>org/xwiki/extension/repository/LocalExtensionRepository</exclude>
               </excludes>
             </configuration>
           </plugin>

@@ -11,8 +11,8 @@ $response.setStatus(404)
 #else
 #xwikimessageboxstart($msg.get("notice") $msg.get("thispagedoesnotexist"))
 #if($hasEdit)
-#set($url = $doc.getURL("edit", $editparams))
-$xwiki.parseMessage("youcanclicktoedit")
+#set($url = $doc.getURL("create", $editparams))
+$msg.get('core.viewers.content.doesnotexists.edittocreate', [$url])
 #end
 #template("recyclebinlist.vm")
 #xwikimessageboxend()

@@ -21,6 +21,7 @@ package org.xwiki.rendering.macro.script;
 
 import org.jmock.Expectations;
 import org.jmock.Mockery;
+import org.jmock.integration.junit4.JUnit4Mockery;
 import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.component.descriptor.DefaultComponentDescriptor;
 import org.xwiki.component.manager.ComponentManager;
@@ -49,7 +50,7 @@ public class ScriptMockSetup
      */
     public ScriptMockSetup(ComponentManager componentManager) throws Exception
     {
-        this(new Mockery(), componentManager);
+        this(new JUnit4Mockery(), componentManager);
     }
 
     public ScriptMockSetup(Mockery mockery, ComponentManager componentManager) throws Exception

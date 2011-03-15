@@ -28,7 +28,6 @@ import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.Requirement;
 import org.xwiki.component.manager.ComponentManager;
-import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.rendering.block.TableBlock;
 import org.xwiki.rendering.block.XDOM;
 import org.xwiki.rendering.macro.MacroExecutionException;
@@ -56,12 +55,6 @@ public class MacroContentTableBlockDataSource extends AbstractTableBlockDataSour
     private DocumentAccessBridge docBridge;
 
     /**
-     * {@link EntityReferenceSerializer} component.
-     */
-    @Requirement
-    private EntityReferenceSerializer<String> entityReferenceSerializer;
-
-    /**
      * {@inheritDoc}
      */
     protected TableBlock getTableBlock(String macroContent, Map<String, String> macroParameters)
@@ -73,13 +66,11 @@ public class MacroContentTableBlockDataSource extends AbstractTableBlockDataSour
                 + "its content.");
         }
 
-        // Get the current document name.
-        String documentName = this.entityReferenceSerializer.serialize(this.docBridge.getCurrentDocumentReference());
-        
         // Parse the macro content into an XDOM.
         XDOM xdom;
         try {
-            Parser parser = componentManager.lookup(Parser.class, docBridge.getDocumentSyntaxId(documentName));
+            Parser parser = componentManager.lookup(Parser.class,
+                docBridge.getDocument(this.docBridge.getCurrentDocumentReference()).getSyntax().toIdString());
             xdom = parser.parse(new StringReader(macroContent));
         } catch (Exception ex) {
             throw new MacroExecutionException("Error while parsing macro content.", ex);

@@ -17,48 +17,40 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.rendering;
-
-import junit.framework.Test;
-import junit.framework.TestCase;
+package org.xwiki.rendering.macro.rss;
 
 import org.jmock.Expectations;
 import org.jmock.Mockery;
+import org.jmock.integration.junit4.JUnit4Mockery;
+import org.junit.runner.RunWith;
 import org.xwiki.bridge.SkinAccessBridge;
 import org.xwiki.component.descriptor.DefaultComponentDescriptor;
-import org.xwiki.component.embed.EmbeddableComponentManager;
-import org.xwiki.rendering.scaffolding.RenderingTestSuite;
-import org.xwiki.test.ComponentManagerTestSetup;
+import org.xwiki.component.manager.ComponentManager;
+import org.xwiki.rendering.test.integration.RenderingTestSuite;
 
 /**
- * All Rendering integration tests defined in text files using a special format.
- * 
+ * Run all tests found in {@code *.test} files located in the classpath. These {@code *.test} files must follow the
+ * conventions described in {@link org.xwiki.rendering.test.integration.TestDataParser}.
+ *
  * @version $Id$
- * @since 1.8RC1
+ * @since 3.0RC1
  */
-public class RenderingTests extends TestCase
+@RunWith(RenderingTestSuite.class)
+public class IntegrationTests
 {
-    public static Test suite() throws Exception
+    @RenderingTestSuite.Initialized
+    public void initialize(ComponentManager componentManager) throws Exception
     {
-        RenderingTestSuite suite = new RenderingTestSuite("Test RSS Macro");
-        ComponentManagerTestSetup testSetup = new ComponentManagerTestSetup(suite);
-        setUpMocks(testSetup.getComponentManager());
+        Mockery mockery = new JUnit4Mockery();
 
-        return testSetup;
-    }
-    
-    public static void setUpMocks(EmbeddableComponentManager componentManager) throws Exception
-    {
-        Mockery context = new Mockery();
-
-        final SkinAccessBridge mockSkinAccessBridge = context.mock(SkinAccessBridge.class);
+        final SkinAccessBridge mockSkinAccessBridge = mockery.mock(SkinAccessBridge.class);
         DefaultComponentDescriptor<SkinAccessBridge> descriptorSAB = new DefaultComponentDescriptor<SkinAccessBridge>();
         descriptorSAB.setRole(SkinAccessBridge.class);
         componentManager.registerComponent(descriptorSAB, mockSkinAccessBridge);
 
-        context.checking(new Expectations() {{
+        mockery.checking(new Expectations() {{
             allowing(mockSkinAccessBridge).getSkinFile(with(any(String.class)));
                 will(returnValue("/xwiki/skins/albatross/icons/black-rss.png"));
         }});
-    }    
+    }
 }

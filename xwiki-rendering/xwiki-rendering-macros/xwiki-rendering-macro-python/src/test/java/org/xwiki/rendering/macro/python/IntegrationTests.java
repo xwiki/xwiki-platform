@@ -24,44 +24,31 @@ import javax.script.SimpleScriptContext;
 
 import org.jmock.Expectations;
 import org.jmock.Mockery;
+import org.jmock.integration.junit4.JUnit4Mockery;
+import org.junit.runner.RunWith;
 import org.xwiki.component.descriptor.DefaultComponentDescriptor;
-import org.xwiki.component.embed.EmbeddableComponentManager;
+import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.rendering.macro.script.ScriptMockSetup;
-import org.xwiki.rendering.scaffolding.RenderingTestSuite;
+import org.xwiki.rendering.test.integration.RenderingTestSuite;
 import org.xwiki.script.ScriptContextManager;
-import org.xwiki.test.ComponentManagerTestSetup;
-
-import junit.framework.Test;
-import junit.framework.TestCase;
 
 /**
- * Rendering tests for python macro.
- * 
+ * Run all tests found in {@code *.test} files located in the classpath. These {@code *.test} files must follow the
+ * conventions described in {@link org.xwiki.rendering.test.integration.TestDataParser}.
+ *
  * @version $Id$
- * @since 2.0M2
+ * @since 3.0RC1
  */
-public class RenderingTests extends TestCase
+@RunWith(RenderingTestSuite.class)
+public class IntegrationTests
 {
-    /**
-     * Creates a rendering test suit for testing python macro.
-     * 
-     * @return rendering test suit for testing python macro.
-     * @throws Exception if an error occurs while setting up the test suite.
-     */
-    public static Test suite() throws Exception
+    @RenderingTestSuite.Initialized
+    public void initialize(ComponentManager componentManager) throws Exception
     {
-        RenderingTestSuite suite = new RenderingTestSuite("Test Python Macro");
-        ComponentManagerTestSetup testSetup = new ComponentManagerTestSetup(suite);
-        setUpMocks(testSetup.getComponentManager());
+        Mockery mockery = new JUnit4Mockery();
 
-        return testSetup;
-    }
-    
-    public static void setUpMocks(EmbeddableComponentManager componentManager) throws Exception
-    {
-        Mockery mockery = new Mockery();
-        ScriptMockSetup mockSetup = new ScriptMockSetup(mockery, componentManager);
-        
+        new ScriptMockSetup(mockery, componentManager);
+
         // Script Context Mock
         final ScriptContextManager mockScriptContextManager = mockery.mock(ScriptContextManager.class);
         final SimpleScriptContext scriptContext = new SimpleScriptContext();

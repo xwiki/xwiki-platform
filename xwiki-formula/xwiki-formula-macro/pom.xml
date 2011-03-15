@@ -52,7 +52,7 @@
         <artifactId>maven-surefire-plugin</artifactId>
         <configuration>
           <includes>
-            <include>**/RenderingTests.java</include>
+            <include>**/IntegrationTests.java</include>
           </includes>
         </configuration>
       </plugin>

@@ -17,64 +17,55 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.rendering;
-
-import junit.framework.Test;
-import junit.framework.TestCase;
+package org.xwiki.rendering.macro.formula;
 
 import org.jmock.Expectations;
 import org.jmock.Mockery;
+import org.jmock.integration.junit4.JUnit4Mockery;
+import org.junit.runner.RunWith;
 import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.component.descriptor.DefaultComponentDescriptor;
-import org.xwiki.component.embed.EmbeddableComponentManager;
+import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.formula.ImageData;
 import org.xwiki.formula.ImageStorage;
-import org.xwiki.rendering.macro.formula.FormulaMacroConfiguration;
-import org.xwiki.rendering.scaffolding.RenderingTestSuite;
-import org.xwiki.test.ComponentManagerTestSetup;
+import org.xwiki.rendering.test.integration.RenderingTestSuite;
 
 /**
- * All Rendering integration tests defined in text files using a special format.
- * 
+ * Run all tests found in {@code *.test} files located in the classpath. These {@code *.test} files must follow the
+ * conventions described in {@link org.xwiki.rendering.test.integration.TestDataParser}.
+ *
  * @version $Id$
- * @since 2.0M3
+ * @since 3.0RC1
  */
-public class RenderingTests extends TestCase
+@RunWith(RenderingTestSuite.class)
+public class IntegrationTests
 {
-    public static Test suite() throws Exception
+    @RenderingTestSuite.Initialized
+    public void initialize(ComponentManager componentManager) throws Exception
     {
-        RenderingTestSuite suite = new RenderingTestSuite("Test Equation Macro");
-        ComponentManagerTestSetup testSetup = new ComponentManagerTestSetup(suite);
-        setUpMocks(testSetup.getComponentManager());
-
-        return testSetup;
-    }
-
-    public static void setUpMocks(EmbeddableComponentManager componentManager) throws Exception
-    {
-        Mockery context = new Mockery();
+        Mockery mockery = new JUnit4Mockery();
 
         // Document Access Bridge Mock
-        final DocumentAccessBridge mockDocumentAccessBridge = context.mock(DocumentAccessBridge.class);
+        final DocumentAccessBridge mockDocumentAccessBridge = mockery.mock(DocumentAccessBridge.class);
         DefaultComponentDescriptor<DocumentAccessBridge> descriptorDAB =
             new DefaultComponentDescriptor<DocumentAccessBridge>();
         descriptorDAB.setRole(DocumentAccessBridge.class);
         componentManager.registerComponent(descriptorDAB, mockDocumentAccessBridge);
 
         // Image Storage Mock
-        final ImageStorage mockImageStorage = context.mock(ImageStorage.class);
+        final ImageStorage mockImageStorage = mockery.mock(ImageStorage.class);
         DefaultComponentDescriptor<ImageStorage> descriptorIS = new DefaultComponentDescriptor<ImageStorage>();
         descriptorIS.setRole(ImageStorage.class);
         componentManager.registerComponent(descriptorIS, mockImageStorage);
 
         // Configuration Mock
-        final FormulaMacroConfiguration mockConfiguration = context.mock(FormulaMacroConfiguration.class);
+        final FormulaMacroConfiguration mockConfiguration = mockery.mock(FormulaMacroConfiguration.class);
         DefaultComponentDescriptor<FormulaMacroConfiguration> descriptorEMC =
             new DefaultComponentDescriptor<FormulaMacroConfiguration>();
         descriptorEMC.setRole(FormulaMacroConfiguration.class);
         componentManager.registerComponent(descriptorEMC, mockConfiguration);
 
-        context.checking(new Expectations() {{
+        mockery.checking(new Expectations() {{
             atLeast(2).of(mockDocumentAccessBridge).getURL(null, "tex", null, null);
             will(returnValue("/xwiki/bin/view/Main/"));
 

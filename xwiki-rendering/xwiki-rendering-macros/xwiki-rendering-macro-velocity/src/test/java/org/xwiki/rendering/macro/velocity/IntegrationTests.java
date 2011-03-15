@@ -19,31 +19,27 @@
  */
 package org.xwiki.rendering.macro.velocity;
 
-import junit.framework.Test;
-import junit.framework.TestCase;
-
+import org.junit.runner.RunWith;
+import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.rendering.macro.script.ScriptMockSetup;
-import org.xwiki.rendering.scaffolding.RenderingTestSuite;
-import org.xwiki.test.ComponentManagerTestSetup;
+import org.xwiki.rendering.test.integration.RenderingTestSuite;
 
 /**
- * All Rendering integration tests defined in text files using a special format.
- * 
+ * Run all tests found in {@code *.test} files located in the classpath. These {@code *.test} files must follow the
+ * conventions described in {@link org.xwiki.rendering.test.integration.TestDataParser}.
+ *
  * @version $Id$
- * @since 1.7M3
+ * @since 3.0RC1
  */
-public class RenderingTests extends TestCase
+@RunWith(RenderingTestSuite.class)
+public class IntegrationTests
 {
-    public static Test suite() throws Exception
+    @RenderingTestSuite.Initialized
+    public void initialize(ComponentManager componentManager) throws Exception
     {
-        RenderingTestSuite suite = new RenderingTestSuite("Test Velocity Macro");
-
-        ComponentManagerTestSetup testSetup = new ComponentManagerTestSetup(suite);
-        new ScriptMockSetup(testSetup.getComponentManager());
+        new ScriptMockSetup(componentManager);
 
         // Note: We're using a static Mock for the VelocityManager since it leads to a cleaner code
         // (the Include Macro is reusing it too). We register this mock as real component in components.txt.
-
-        return testSetup;
     }
 }

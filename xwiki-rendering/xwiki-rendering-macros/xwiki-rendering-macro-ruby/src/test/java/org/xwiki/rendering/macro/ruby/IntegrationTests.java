@@ -19,7 +19,6 @@
  */
 package org.xwiki.rendering.macro.ruby;
 
-import org.jmock.integration.junit4.JUnit4Mockery;
 import org.junit.runner.RunWith;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.rendering.macro.script.ScriptMockSetup;
@@ -38,6 +37,6 @@ public class IntegrationTests
     @RenderingTestSuite.Initialized
     public void initialize(ComponentManager componentManager) throws Exception
     {
-        new ScriptMockSetup(new JUnit4Mockery(), componentManager);
+        new ScriptMockSetup(componentManager);
     }
 }

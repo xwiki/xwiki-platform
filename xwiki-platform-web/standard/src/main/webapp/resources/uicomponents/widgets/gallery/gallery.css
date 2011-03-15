@@ -17,7 +17,8 @@ $selector {
 #foreach($item in $selector.split('\s*,\s*'))
 * html $item, ##
 #end {
-  /* This is for IE6, which doesn't understand the escaped equal sign (not even the unicode escape) but fortunately accepts the quoted value. */
+  /* This is for IE6, which doesn't understand the escaped equal sign (not even the unicode escape) but fortunately
+  accepts the quoted value. */
   filter: "progid:DXImageTransform.Microsoft.Alpha(Opacity=$value)";
 }
 /* end IE opacity setting */
@@ -29,13 +30,15 @@ $selector {
 .xGallery {
   background-color: black;
   padding: 10px;
+  /* Position relative is required because some of the inner elements have position absolute and the gallery container
+  must be their offset parent. */
   position: relative;
   width: ${mathtool.add($imageMaxWidth, 128)}px;
 }
 
 .xGallery.maximized {
   left: 0;
-  position: absolute;
+  position: fixed;
   top: 0;
   z-index: 1001;
 }

@@ -75,7 +75,7 @@ XWiki.Gallery = Class.create({
       case 70: /* F */
         this._onToggleMaximize();
         break;
-      defualt:
+      default:
         stop = false;
         break;
     }

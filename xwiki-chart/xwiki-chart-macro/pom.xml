@@ -75,7 +75,6 @@
         <configuration>
           <includes>
             <include>**/RenderingTests.java</include>
-            <include>**/RangeParserTests.java</include>
           </includes>
         </configuration>
       </plugin>

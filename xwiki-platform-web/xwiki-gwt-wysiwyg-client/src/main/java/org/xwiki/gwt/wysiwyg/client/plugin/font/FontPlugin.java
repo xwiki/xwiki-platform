@@ -55,7 +55,7 @@ public class FontPlugin extends AbstractStatefulPlugin implements ChangeHandler
     /**
      * The list of default font sizes.
      */
-    private static final String DEFAULT_FONT_SIZES = "8pt,10pt,12pt,14pt,18pt,24pt,36pt";
+    private static final String DEFAULT_FONT_SIZES = "8px 10px 12px 14px 18px 24px 36px";
 
     /**
      * The association between pickers and the commands that are executed on change events.

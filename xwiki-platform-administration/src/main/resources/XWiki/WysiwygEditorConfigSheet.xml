@@ -509,7 +509,7 @@ XWiki.ListBox = Class.create({
 
     this.removeButton = new Element('input', {type: "image", 'class': 'icon', title: "$escapetool.javascript($msg.get('wysiwyg.admin.widgets.listBox.delete'))",  src: "$xwiki.getSkinFile('icons/silk/cross.gif')", alt:"$escapetool.javascript($msg.get('wysiwyg.admin.widgets.listBox.delete'))"});
     this.removeButton.observe('click', this._onClickRemove.bindAsEventListener(this));
-    
+
     this.container = new Element('div', {'class': 'listBoxWrapper'});
     this.container.appendChild(this.selectElement);
     this.container.appendChild(this.removeButton);
@@ -517,7 +517,7 @@ XWiki.ListBox = Class.create({
   _createList : function(items, size, multiple) {
     var options = new Array(items.length + 1).join('&lt;option&gt;__label__&lt;/option&gt;');
     // Use a DIV to create the select otherwise it doesn't work in IE.
-    var select = new Element('div').update('&lt;select size="' + window.parseInt(size) + '" multiple=" + !!multiple + "&gt;' + options + '&lt;/select&gt;').firstChild;
+    var select = new Element('div').update('&lt;select size="' + window.parseInt(size) + (!!multiple ? '" multiple="multiple"&gt;' : '"&gt;') + options + '&lt;/select&gt;').firstChild;
     for(var i = 0; i &lt; items.length; i++){
       var item = items[i];
       if (typeof item == 'string') {
@@ -667,7 +667,7 @@ XWiki.StyleNameListBox = Class.create(XWiki.ListBox, {
     this.inlineStyleGroup = new Element('optgroup', {'label': '$escapetool.javascript($msg.get('wysiwyg.admin.widgets.styleNamesEditor.inlineStyles'))'});
     this.selectElement.appendChild(this.blockStyleGroup);
     this.selectElement.appendChild(this.inlineStyleGroup);
-    
+
     styleNames.evalJSON().each(function(style) {
       style.label = style.label || style.name;
       style.inline = typeof style.inline == 'undefined' || !!style.inline;

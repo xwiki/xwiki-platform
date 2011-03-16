@@ -83,9 +83,9 @@ public class FontPlugin extends AbstractStatefulPlugin implements ChangeHandler
             new InlineStyleExecutable(textArea, Style.FONT_SIZE));
 
         addFeature("fontname", Command.FONT_NAME, new FontFamilyPicker(), Strings.INSTANCE.font(), "fontNames",
-            DEFAULT_FONT_NAMES);
+            DEFAULT_FONT_NAMES, "\\s*,\\s*");
         addFeature("fontsize", Command.FONT_SIZE, new FontSizePicker(), Strings.INSTANCE.fontSize(), "fontSizes",
-            DEFAULT_FONT_SIZES);
+            DEFAULT_FONT_SIZES, "\\s+");
 
         if (toolBarExtension.getFeatures().length > 0) {
             registerTextAreaHandlers();
@@ -102,15 +102,16 @@ public class FontPlugin extends AbstractStatefulPlugin implements ChangeHandler
      * @param title the tool tip used on the tool bar widget
      * @param parameter the configuration parameter that holds the list of possible values for this feature
      * @param defaultValues the default list of possible values for this list
+     * @param separator the regular expression used to split the list of values
      */
     private void addFeature(String name, Command command, ListBox picker, String title, String parameter,
-        String defaultValues)
+        String defaultValues, String separator)
     {
         if (getTextArea().getCommandManager().isSupported(command)) {
             picker.setTitle(title);
             saveRegistration(picker.addChangeHandler(this));
 
-            String[] values = getConfig().getParameter(parameter, defaultValues).split("\\s*,\\s*");
+            String[] values = getConfig().getParameter(parameter, defaultValues).split(separator);
             for (int i = 0; i < values.length; i++) {
                 picker.addItem(values[i]);
             }

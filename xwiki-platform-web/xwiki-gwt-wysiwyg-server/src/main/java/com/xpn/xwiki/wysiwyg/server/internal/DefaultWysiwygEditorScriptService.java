@@ -28,6 +28,7 @@ import org.xwiki.rendering.parser.Parser;
 import org.xwiki.rendering.renderer.PrintRendererFactory;
 
 import com.xpn.xwiki.XWikiContext;
+import com.xpn.xwiki.wysiwyg.server.WysiwygEditorConfiguration;
 import com.xpn.xwiki.wysiwyg.server.WysiwygEditorScriptService;
 
 /**
@@ -61,6 +62,12 @@ public class DefaultWysiwygEditorScriptService implements WysiwygEditorScriptSer
      */
     @Requirement
     private HTMLConverter htmlConverter;
+
+    /**
+     * The component used to access the WYSIWYG editor configuration properties.
+     */
+    @Requirement
+    private WysiwygEditorConfiguration editorConfiguration;
 
     /**
      * @return the XWiki context
@@ -145,5 +152,15 @@ public class DefaultWysiwygEditorScriptService implements WysiwygEditorScriptSer
                 getXWikiContext().remove(IS_IN_RENDERING_ENGINE);
             }
         }
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see WysiwygEditorScriptService#getConfig()
+     */
+    public WysiwygEditorConfiguration getConfig()
+    {
+        return editorConfiguration;
     }
 }

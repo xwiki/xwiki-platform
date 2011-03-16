@@ -24,6 +24,7 @@ import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.rendering.syntax.Syntax;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
@@ -46,6 +47,9 @@ public class DocumentImporterHandler extends AbstractHandler
         super(componentManager);
 
         setCurrentBean(new XWikiDocument(new DocumentReference(wiki, "XWiki", "Page")));
+
+        // Default syntax in a XAR is xwiki/1.0
+        getDocument().setSyntax(Syntax.XWIKI_1_0);
 
         // skip useless known elements
         this.skippedElements.add("version");
